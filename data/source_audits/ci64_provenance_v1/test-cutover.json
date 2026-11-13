@@ -54,6 +54,12 @@
       "mode": "100644",
       "sha256": "caade7cea6dae7b304efb346fb466dfe433dad6f94484a1ed3e1bb5f546443d0"
     },
+    "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py": {
+      "blob_sha1": "138457bd9bc6540ee0d14578f82561fed87c2fcd",
+      "bytes": 14280,
+      "mode": "100644",
+      "sha256": "26467cfb68d1e4464c5f926a1278bd67433f5ac99699ebdc9666deb7ab1255ed"
+    },
     "tests/factions/chaos_daemons/integration/test_cavalcade_v995_roster.py": {
       "blob_sha1": "e34b65d3e9af4b3a9ee0b60896b799b18fe1fe12",
       "bytes": 67730,

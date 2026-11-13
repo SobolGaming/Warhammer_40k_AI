@@ -1,6 +1,12 @@
 from __future__ import annotations
 
 from warhammer40k_core.core.keyword_membership import keyword_inventory_contains
+from warhammer40k_core.engine.catalog_named_weapon_profiles import (
+    equipped_named_weapon_profile_ids,
+)
+from warhammer40k_core.engine.catalog_named_weapon_profiles import (
+    weapon_name_match_token as _weapon_name_match_token,
+)
 from warhammer40k_core.engine.core_ability_materialization import (
     DEADLY_DEMISE_RANGE_INCHES as DEADLY_DEMISE_RANGE_INCHES,
 )
@@ -62,7 +68,6 @@ from warhammer40k_core.core.dice import (
 )
 from warhammer40k_core.core.modifiers import RollModifier
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind, RulesetDescriptor
-from warhammer40k_core.core.wargear import Wargear
 from warhammer40k_core.core.weapon_profiles import (
     AbilityDescriptor,
     RangeProfileKind,
@@ -1112,6 +1117,7 @@ class CatalogNamedWeaponAbilityChoiceRuntime:
             )
         effect = _named_weapon_ability_choice_persisting_effect(
             state=context.state,
+            army_catalog=context.army_catalog,
             result_id=context.result.result_id,
             group=group,
             option=option,
@@ -2380,25 +2386,11 @@ def _model_has_named_weapon(
     model: ModelInstance,
     weapon_names: tuple[str, ...],
 ) -> bool:
-    if type(army_catalog) is not ArmyCatalog:
-        raise GameLifecycleError("Catalog named weapon lookup requires an ArmyCatalog.")
-    if type(model) is not ModelInstance:
-        raise GameLifecycleError("Catalog named weapon lookup requires a model instance.")
-    requested_tokens = {_weapon_name_match_token(name) for name in weapon_names}
-    for wargear_id in model.wargear_ids:
-        wargear = _catalog_wargear_by_id(army_catalog, wargear_id=wargear_id)
-        for profile in wargear.weapon_profiles:
-            if _weapon_name_match_token(profile.name) in requested_tokens:
-                return True
-    return False
-
-
-def _catalog_wargear_by_id(army_catalog: ArmyCatalog, *, wargear_id: str) -> Wargear:
-    requested_wargear_id = _validate_identifier("wargear_id", wargear_id)
-    for wargear in army_catalog.wargear:
-        if wargear.wargear_id == requested_wargear_id:
-            return wargear
-    raise GameLifecycleError("Catalog named weapon lookup found unknown wargear.")
+    return bool(
+        equipped_named_weapon_profile_ids(
+            army_catalog=army_catalog, model=model, weapon_names=weapon_names
+        )
+    )
 
 
 def _current_placed_alive_model_instance_ids_for_unit(
@@ -2960,6 +2952,7 @@ def named_weapon_ability_choice_option_label(
 def _named_weapon_ability_choice_persisting_effect(
     *,
     state: GameState,
+    army_catalog: ArmyCatalog,
     result_id: str,
     group: CatalogNamedWeaponAbilityChoiceGroup,
     option: CatalogNamedWeaponAbilityChoiceOption,
@@ -2974,6 +2967,15 @@ def _named_weapon_ability_choice_persisting_effect(
         ),
         **selected_payload,
         "effect_kind": CATALOG_NAMED_WEAPON_ABILITY_CHOICE_EFFECT_KIND,
+        "weapon_profile_ids_by_model": {
+            model.model_instance_id: list(
+                equipped_named_weapon_profile_ids(
+                    army_catalog=army_catalog, model=model, weapon_names=group.weapon_names
+                )
+            )
+            for model in group.unit.own_models
+            if model.model_instance_id in group.target_model_instance_ids
+        },
     }
     return PersistingEffect(
         effect_id=f"{result}:catalog-named-weapon-ability-choice",
@@ -3139,7 +3141,6 @@ def _selected_catalog_named_weapon_ability_grants(
         raise GameLifecycleError("Catalog named weapon ability grants require context.")
     if context.source_phase is not BattlePhase.SHOOTING:
         return ()
-    profile_token = _weapon_name_match_token(context.weapon_profile.name)
     grants: list[CatalogWeaponKeywordGrant] = []
     for effect in context.state.persisting_effects_for_unit(context.attacking_unit_instance_id):
         if not isinstance(effect.effect_payload, dict):
@@ -3150,8 +3151,9 @@ def _selected_catalog_named_weapon_ability_grants(
         target_model_ids = _payload_string_tuple(payload, key="target_model_instance_ids")
         if context.attacker_model_instance_id not in target_model_ids:
             continue
-        weapon_names = _payload_string_tuple(payload, key="weapon_names")
-        if profile_token not in {_weapon_name_match_token(name) for name in weapon_names}:
+        bindings = _payload_object(payload.get("weapon_profile_ids_by_model"))
+        profile_ids = _payload_string_tuple(bindings, key=context.attacker_model_instance_id)
+        if context.weapon_profile.profile_id not in profile_ids:
             continue
         keyword = _weapon_keyword_from_value(_payload_string(payload, key="keyword"))
         ability = _weapon_ability_descriptor_for_selected_choice_payload(
@@ -5469,15 +5471,6 @@ def _mortal_wounds_expression_token(expression: DiceExpression | int) -> str:
     if isinstance(expression, int):
         return str(expression)
     return expression.canonical()
-
-
-def _weapon_name_match_token(value: str) -> str:
-    if type(value) is not str:
-        raise GameLifecycleError("Catalog named weapon name must be a string.")
-    stripped = value.strip()
-    if not stripped:
-        raise GameLifecycleError("Catalog named weapon name must not be empty.")
-    return " ".join(stripped.casefold().replace("-", " ").split())
 
 
 def _weapon_scope_matches_profile(*, weapon_scope: str, profile: WeaponProfile) -> bool:

@@ -1,422 +1,496 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "cbcff75ff758574e16248e62384b719410adb92a",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:ff9037cb0bf1101d2d6aee0f65ba652398a0bc3c4d19c4c1dd152f0db0bf845c",
-  "operation_map_sha256": "7f78ac96a27f5e6a639f3c8295c482e3adac6e79de9d40a92bee8cb7ffc0b8e2",
+  "base": "2ebe37f8ff5d69f343c7363dd4538e6a3c8f1a56",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:8d7e3355d9db2c9477ba63b752dc1dfa054b5c00583ea467e3fbbc0e21d5638d",
+  "operation_map_sha256": "4a2365317e64f6c420edf9b7f016ba77ed978dea370ede3673e340f98ffaec75",
   "changes": {
     "README.md": {
-      "before_sha256": "a32436a13eb10b65f525d4d5d19847fdff0696fd9e69dc587dcf35cd678f56fb",
-      "after_sha256": "e6ac96404465effabdf86cb326afce3a2e6290090a27823437da64395c9e2546",
+      "before_sha256": "e6ac96404465effabdf86cb326afce3a2e6290090a27823437da64395c9e2546",
+      "after_sha256": "03e76b093cf675610a36bd3ce631264cb6b1757d48965edf657c159e97c06acf",
       "owners": {
         "@document": {
-          "before": "a32436a13eb10b65f525d4d5d19847fdff0696fd9e69dc587dcf35cd678f56fb",
-          "after": "e6ac96404465effabdf86cb326afce3a2e6290090a27823437da64395c9e2546"
+          "before": "e6ac96404465effabdf86cb326afce3a2e6290090a27823437da64395c9e2546",
+          "after": "03e76b093cf675610a36bd3ce631264cb6b1757d48965edf657c159e97c06acf"
         }
       }
     },
     "ci/test_shards/current-covered-baseline.json": {
-      "before_sha256": "e5c889d3268c11a3efdd440d90df47f16c4ecd11be35e732cf461faca0c08832",
-      "after_sha256": "30059a9fe5487c35589c5c3944218659d198b7d3a60a2ffa1c616dcf2bda0e05",
+      "before_sha256": "30059a9fe5487c35589c5c3944218659d198b7d3a60a2ffa1c616dcf2bda0e05",
+      "after_sha256": "7acac7eb2f8986bfd8d23edb2e3a61ac19048343491fb5f8e07c9d6ae1677508",
       "owners": {
         "@document": {
-          "before": "e5c889d3268c11a3efdd440d90df47f16c4ecd11be35e732cf461faca0c08832",
-          "after": "30059a9fe5487c35589c5c3944218659d198b7d3a60a2ffa1c616dcf2bda0e05"
+          "before": "30059a9fe5487c35589c5c3944218659d198b7d3a60a2ffa1c616dcf2bda0e05",
+          "after": "7acac7eb2f8986bfd8d23edb2e3a61ac19048343491fb5f8e07c9d6ae1677508"
         }
       }
     },
     "ci/test_shards/current-derived-assignment.json": {
-      "before_sha256": "dccbe41f284e9be880a319a94f71110c0fde440c7ec0f574e9b22030d6de8708",
-      "after_sha256": "9d22e61a87fcc215ef65b901756a5b7179eeff252159a997cd4fe00733d68de2",
+      "before_sha256": "9d22e61a87fcc215ef65b901756a5b7179eeff252159a997cd4fe00733d68de2",
+      "after_sha256": "c6e15924f448f8fcc9976e80eda4212cf284cce22ea4a35703df286f8431eb15",
       "owners": {
         "@document": {
-          "before": "dccbe41f284e9be880a319a94f71110c0fde440c7ec0f574e9b22030d6de8708",
-          "after": "9d22e61a87fcc215ef65b901756a5b7179eeff252159a997cd4fe00733d68de2"
+          "before": "9d22e61a87fcc215ef65b901756a5b7179eeff252159a997cd4fe00733d68de2",
+          "after": "c6e15924f448f8fcc9976e80eda4212cf284cce22ea4a35703df286f8431eb15"
         }
       }
     },
     "ci/test_shards/current-runtime-compatibility.json": {
-      "before_sha256": "dd3e789ee8c22644b92a25faab0ab10c3ffe498b2a40eb74a59c30f56754addb",
-      "after_sha256": "1c87ca8f745dcca343046747c11ad2a874a4674ad3e1f8a216bff7380315afc3",
+      "before_sha256": "1c87ca8f745dcca343046747c11ad2a874a4674ad3e1f8a216bff7380315afc3",
+      "after_sha256": "718f182da6761aed678fff4df700b4a1d688319e29aa230f3cb4012525c5e925",
       "owners": {
         "@document": {
-          "before": "dd3e789ee8c22644b92a25faab0ab10c3ffe498b2a40eb74a59c30f56754addb",
-          "after": "1c87ca8f745dcca343046747c11ad2a874a4674ad3e1f8a216bff7380315afc3"
+          "before": "1c87ca8f745dcca343046747c11ad2a874a4674ad3e1f8a216bff7380315afc3",
+          "after": "718f182da6761aed678fff4df700b4a1d688319e29aa230f3cb4012525c5e925"
         }
       }
     },
     "ci/test_shards/durations.json": {
-      "before_sha256": "5bef6d9aa1d26e60c796be7034c788a83436b6745a46c95bccb4f51b8dc002b7",
-      "after_sha256": "5ae66215f2d857bc7aa0abc718ae036860359890b7db5567aaaa03c3b10ce0c1",
+      "before_sha256": "5ae66215f2d857bc7aa0abc718ae036860359890b7db5567aaaa03c3b10ce0c1",
+      "after_sha256": "fa21735e08d12e96d70992a515a7e56b31a32d62fe1f7f8b47acb36a075d3227",
       "owners": {
         "@document": {
-          "before": "5bef6d9aa1d26e60c796be7034c788a83436b6745a46c95bccb4f51b8dc002b7",
-          "after": "5ae66215f2d857bc7aa0abc718ae036860359890b7db5567aaaa03c3b10ce0c1"
+          "before": "5ae66215f2d857bc7aa0abc718ae036860359890b7db5567aaaa03c3b10ce0c1",
+          "after": "fa21735e08d12e96d70992a515a7e56b31a32d62fe1f7f8b47acb36a075d3227"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
-      "before_sha256": "4fd483ff568af668782a02f18ce6c815f2ac5a7257afa714eff963f619b7c5e3",
-      "after_sha256": "51116c8b2679a606f8a1a0c0b7e318e4b751ca7fc82f66fbffd8f0861f47f882",
+      "before_sha256": "51116c8b2679a606f8a1a0c0b7e318e4b751ca7fc82f66fbffd8f0861f47f882",
+      "after_sha256": "59a309fab257a27e9e89c320dbface40a4d7ef4eebd15394bcd4f06bce879603",
       "owners": {
         "@document": {
-          "before": "4fd483ff568af668782a02f18ce6c815f2ac5a7257afa714eff963f619b7c5e3",
-          "after": "51116c8b2679a606f8a1a0c0b7e318e4b751ca7fc82f66fbffd8f0861f47f882"
+          "before": "51116c8b2679a606f8a1a0c0b7e318e4b751ca7fc82f66fbffd8f0861f47f882",
+          "after": "59a309fab257a27e9e89c320dbface40a4d7ef4eebd15394bcd4f06bce879603"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
-      "before_sha256": "6f335bae81bfc682178da64c36e0923ae6c7db77afd734169588be97a3e81b29",
-      "after_sha256": "cf149970e8cb7a142eb016b75c730996c1c8fdc7af0ca684d91762da79725590",
+      "before_sha256": "cf149970e8cb7a142eb016b75c730996c1c8fdc7af0ca684d91762da79725590",
+      "after_sha256": "08df1baa7250c78286a197a07333e21ae684508d85a56048251feac120b9d784",
       "owners": {
         "@document": {
-          "before": "6f335bae81bfc682178da64c36e0923ae6c7db77afd734169588be97a3e81b29",
-          "after": "cf149970e8cb7a142eb016b75c730996c1c8fdc7af0ca684d91762da79725590"
+          "before": "cf149970e8cb7a142eb016b75c730996c1c8fdc7af0ca684d91762da79725590",
+          "after": "08df1baa7250c78286a197a07333e21ae684508d85a56048251feac120b9d784"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
-      "before_sha256": "43d67b7aaee252b3b1d00bda975460f913ff38b218e3272e302a541608323a83",
-      "after_sha256": "5d513e370a3ddf6ed37c4c455885b85f64f65d54a2ae12153a2a9c685cf1bdb4",
+      "before_sha256": "5d513e370a3ddf6ed37c4c455885b85f64f65d54a2ae12153a2a9c685cf1bdb4",
+      "after_sha256": "6622e1ea6a70cb1fceabc3d925fb2c0c126e0c8237ef1b514269cfe30fafe47d",
       "owners": {
         "@document": {
-          "before": "43d67b7aaee252b3b1d00bda975460f913ff38b218e3272e302a541608323a83",
-          "after": "5d513e370a3ddf6ed37c4c455885b85f64f65d54a2ae12153a2a9c685cf1bdb4"
+          "before": "5d513e370a3ddf6ed37c4c455885b85f64f65d54a2ae12153a2a9c685cf1bdb4",
+          "after": "6622e1ea6a70cb1fceabc3d925fb2c0c126e0c8237ef1b514269cfe30fafe47d"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
-      "before_sha256": "b8a973403f46514f5598f6aa8e878b2927a60edaad17a5010f900500ac37e4b9",
-      "after_sha256": "5200260b666b8eb00e4727a7657cfb9a9127e71230c64ead6dc22a0814f1eec9",
+      "before_sha256": "5200260b666b8eb00e4727a7657cfb9a9127e71230c64ead6dc22a0814f1eec9",
+      "after_sha256": "07c60548e1e8847fe0b370333a11325e73bc1fee39bcfe24f3dc68c81f47540b",
       "owners": {
         "@document": {
-          "before": "b8a973403f46514f5598f6aa8e878b2927a60edaad17a5010f900500ac37e4b9",
-          "after": "5200260b666b8eb00e4727a7657cfb9a9127e71230c64ead6dc22a0814f1eec9"
+          "before": "5200260b666b8eb00e4727a7657cfb9a9127e71230c64ead6dc22a0814f1eec9",
+          "after": "07c60548e1e8847fe0b370333a11325e73bc1fee39bcfe24f3dc68c81f47540b"
         }
       }
     },
     "ci/test_shards/shard-2.txt": {
-      "before_sha256": "3de136f1b0fcd5aba0b0b3b45ae6398cce79ef2c01aee2e8627fbea288561588",
-      "after_sha256": "63c9ceff239a8f3471d7bf1df8b01e8b05c469458a37eea69e975217df564f87",
+      "before_sha256": "63c9ceff239a8f3471d7bf1df8b01e8b05c469458a37eea69e975217df564f87",
+      "after_sha256": "f4785cbf29ad8a7a498732defaeedd0a99ca81860cf25cdfd05e58cca4098ba1",
       "owners": {
         "@document": {
-          "before": "3de136f1b0fcd5aba0b0b3b45ae6398cce79ef2c01aee2e8627fbea288561588",
-          "after": "63c9ceff239a8f3471d7bf1df8b01e8b05c469458a37eea69e975217df564f87"
+          "before": "63c9ceff239a8f3471d7bf1df8b01e8b05c469458a37eea69e975217df564f87",
+          "after": "f4785cbf29ad8a7a498732defaeedd0a99ca81860cf25cdfd05e58cca4098ba1"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
-      "before_sha256": "fe76465f67ce1fff17827d50db85c2b336f4a7402d473bc08e9b3d8b0207aa1b",
-      "after_sha256": "4e3537b764a392dc8d250ecc2e06ad2ecacda50930e6fb707f85be2f66301263",
+      "before_sha256": "4e3537b764a392dc8d250ecc2e06ad2ecacda50930e6fb707f85be2f66301263",
+      "after_sha256": "0b2b4f526da4ad4ba6f32a94e6bb0f3fcc05cefeb505db053911fbae9fb45c6e",
       "owners": {
         "@document": {
-          "before": "fe76465f67ce1fff17827d50db85c2b336f4a7402d473bc08e9b3d8b0207aa1b",
-          "after": "4e3537b764a392dc8d250ecc2e06ad2ecacda50930e6fb707f85be2f66301263"
+          "before": "4e3537b764a392dc8d250ecc2e06ad2ecacda50930e6fb707f85be2f66301263",
+          "after": "0b2b4f526da4ad4ba6f32a94e6bb0f3fcc05cefeb505db053911fbae9fb45c6e"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
-      "before_sha256": "2f4c57738aa240ae459e5c6f2cbff536d6e6e8f8fd8bb72cd261e980a9915d06",
-      "after_sha256": "986697b8460efdcfb73ff4df1f375ee04006f1a1d5d6c4f01db91ad8299de557",
+      "before_sha256": "986697b8460efdcfb73ff4df1f375ee04006f1a1d5d6c4f01db91ad8299de557",
+      "after_sha256": "8a088a124d7f32b92894d17656527af742565a19c241f39934f3c8c2730a300a",
       "owners": {
         "@document": {
-          "before": "2f4c57738aa240ae459e5c6f2cbff536d6e6e8f8fd8bb72cd261e980a9915d06",
-          "after": "986697b8460efdcfb73ff4df1f375ee04006f1a1d5d6c4f01db91ad8299de557"
+          "before": "986697b8460efdcfb73ff4df1f375ee04006f1a1d5d6c4f01db91ad8299de557",
+          "after": "8a088a124d7f32b92894d17656527af742565a19c241f39934f3c8c2730a300a"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
-      "before_sha256": "eaa6045c213680ab11dd233562ec4e4e64ed82c5547b51f3b75003af6baab3cc",
-      "after_sha256": "3b65a1b3b93326029e821ae2a5125c1f7388c8c0344a006cc0c98fed752e3189",
+      "before_sha256": "3b65a1b3b93326029e821ae2a5125c1f7388c8c0344a006cc0c98fed752e3189",
+      "after_sha256": "90d4cdfb11e56b6acbca56b093130b69492fd75aa0367df3228336a9ac56821a",
       "owners": {
         "@document": {
-          "before": "eaa6045c213680ab11dd233562ec4e4e64ed82c5547b51f3b75003af6baab3cc",
-          "after": "3b65a1b3b93326029e821ae2a5125c1f7388c8c0344a006cc0c98fed752e3189"
+          "before": "3b65a1b3b93326029e821ae2a5125c1f7388c8c0344a006cc0c98fed752e3189",
+          "after": "90d4cdfb11e56b6acbca56b093130b69492fd75aa0367df3228336a9ac56821a"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
-      "before_sha256": "9edaa713b00a3b6921722510df7e6f9cec2c33bfb433156aba715f1f1096f796",
-      "after_sha256": "0b591402c5e93be5e460bb715238c7f69d91bf9c8a52100396f7a516110ef3f3",
+      "before_sha256": "0b591402c5e93be5e460bb715238c7f69d91bf9c8a52100396f7a516110ef3f3",
+      "after_sha256": "0c0b4d1399171c785d03c606eec0df32d54a1c936607d5350acdcee65355404a",
       "owners": {
         "@document": {
-          "before": "9edaa713b00a3b6921722510df7e6f9cec2c33bfb433156aba715f1f1096f796",
-          "after": "0b591402c5e93be5e460bb715238c7f69d91bf9c8a52100396f7a516110ef3f3"
+          "before": "0b591402c5e93be5e460bb715238c7f69d91bf9c8a52100396f7a516110ef3f3",
+          "after": "0c0b4d1399171c785d03c606eec0df32d54a1c936607d5350acdcee65355404a"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
-      "before_sha256": "113a12b47e1635c0d8043a28334561d4e1a196fc73b449c65ad2772cd9805aba",
-      "after_sha256": "dec5f2456021d8d41725674c40adf8be2f45ed401f6ea2db13e5166429e95bca",
+      "before_sha256": "dec5f2456021d8d41725674c40adf8be2f45ed401f6ea2db13e5166429e95bca",
+      "after_sha256": "9e514d9bfb1cf4ccfec70dc4a80089c0499c32763657c48b946459e54a49543a",
       "owners": {
         "@document": {
-          "before": "113a12b47e1635c0d8043a28334561d4e1a196fc73b449c65ad2772cd9805aba",
-          "after": "dec5f2456021d8d41725674c40adf8be2f45ed401f6ea2db13e5166429e95bca"
+          "before": "dec5f2456021d8d41725674c40adf8be2f45ed401f6ea2db13e5166429e95bca",
+          "after": "9e514d9bfb1cf4ccfec70dc4a80089c0499c32763657c48b946459e54a49543a"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
-      "before_sha256": "70da46f9b9007ccb8889e1f62933bf1500caaae5d88fd4c7ae4c72afadb273d6",
-      "after_sha256": "31d1aa16d16038c091317ad3dccd3dff6c7974fd27f3c16874b17a628f5926f3",
+      "before_sha256": "31d1aa16d16038c091317ad3dccd3dff6c7974fd27f3c16874b17a628f5926f3",
+      "after_sha256": "ed69ecdec06873840694c5a3a011ae0bef2aa8ae8639006d54e499e8c4835b4f",
       "owners": {
         "@document": {
-          "before": "70da46f9b9007ccb8889e1f62933bf1500caaae5d88fd4c7ae4c72afadb273d6",
-          "after": "31d1aa16d16038c091317ad3dccd3dff6c7974fd27f3c16874b17a628f5926f3"
+          "before": "31d1aa16d16038c091317ad3dccd3dff6c7974fd27f3c16874b17a628f5926f3",
+          "after": "ed69ecdec06873840694c5a3a011ae0bef2aa8ae8639006d54e499e8c4835b4f"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "f82d1e3d99061f9696535d84dfa0ad5e138121431429b1f739f17b1a24d44adb",
-      "after_sha256": "04d6011ab2bcf1a7a5995e2133b1b4cb05567d2f5fc858eab61b73ae5e666130",
+      "before_sha256": "04d6011ab2bcf1a7a5995e2133b1b4cb05567d2f5fc858eab61b73ae5e666130",
+      "after_sha256": "1aab4095da8bff2eeb40a3177e131c44929b72ea3f7311e70faff55097b5d408",
       "owners": {
         "@document": {
-          "before": "f82d1e3d99061f9696535d84dfa0ad5e138121431429b1f739f17b1a24d44adb",
-          "after": "04d6011ab2bcf1a7a5995e2133b1b4cb05567d2f5fc858eab61b73ae5e666130"
+          "before": "04d6011ab2bcf1a7a5995e2133b1b4cb05567d2f5fc858eab61b73ae5e666130",
+          "after": "1aab4095da8bff2eeb40a3177e131c44929b72ea3f7311e70faff55097b5d408"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "535df253e0a96ba378d33e8e799d1fc8431d4642ec2b6b649f464b8e77724553",
-      "after_sha256": "7233ec00fa2f346036c8fabccb3414c2d95ee7f6cccb88d4180726d480b11fdb",
+      "before_sha256": "7233ec00fa2f346036c8fabccb3414c2d95ee7f6cccb88d4180726d480b11fdb",
+      "after_sha256": "4d80d92190e282efc945b2bd60dec4e9ea79463a8f90440de94d7bc5adfe3abb",
       "owners": {
         "@document": {
-          "before": "535df253e0a96ba378d33e8e799d1fc8431d4642ec2b6b649f464b8e77724553",
-          "after": "7233ec00fa2f346036c8fabccb3414c2d95ee7f6cccb88d4180726d480b11fdb"
+          "before": "7233ec00fa2f346036c8fabccb3414c2d95ee7f6cccb88d4180726d480b11fdb",
+          "after": "4d80d92190e282efc945b2bd60dec4e9ea79463a8f90440de94d7bc5adfe3abb"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "3091c2eabcb9fcfaaeb805aebf49bdda9961eea984c500ba2e92df0669f1fcc3",
-      "after_sha256": "b308c314bc5b12b351b4fecf661bee2bbae48c3a4fb7f6b640f86a4e89f018a2",
+      "before_sha256": "b308c314bc5b12b351b4fecf661bee2bbae48c3a4fb7f6b640f86a4e89f018a2",
+      "after_sha256": "ebfc105d7f597a68985a519ea4009110b63d9641017053caa79dbd721aca0848",
       "owners": {
         "@document": {
-          "before": "3091c2eabcb9fcfaaeb805aebf49bdda9961eea984c500ba2e92df0669f1fcc3",
-          "after": "b308c314bc5b12b351b4fecf661bee2bbae48c3a4fb7f6b640f86a4e89f018a2"
+          "before": "b308c314bc5b12b351b4fecf661bee2bbae48c3a4fb7f6b640f86a4e89f018a2",
+          "after": "ebfc105d7f597a68985a519ea4009110b63d9641017053caa79dbd721aca0848"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "300d31f133718d7f49eb741adc51a1958c699763d5ad2acc128bced67683c4f4",
-      "after_sha256": "a5ed55bdd97ea6814ab6e3a783f78e2f97e4b1e5d450f482a088a54d221ece74",
+      "before_sha256": "a5ed55bdd97ea6814ab6e3a783f78e2f97e4b1e5d450f482a088a54d221ece74",
+      "after_sha256": "a0ba32fde44bfdc273ee511871c77b86ea48c6b1e0190a69cb24616910c96a5a",
       "owners": {
         "@document": {
-          "before": "300d31f133718d7f49eb741adc51a1958c699763d5ad2acc128bced67683c4f4",
-          "after": "a5ed55bdd97ea6814ab6e3a783f78e2f97e4b1e5d450f482a088a54d221ece74"
+          "before": "a5ed55bdd97ea6814ab6e3a783f78e2f97e4b1e5d450f482a088a54d221ece74",
+          "after": "a0ba32fde44bfdc273ee511871c77b86ea48c6b1e0190a69cb24616910c96a5a"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "ab3a9fda3507945dc10dbf10fbf8108ce2a90ef1937f48552e1ae1c9e262758b",
-      "after_sha256": "73e1b3c188e026276b547a900fe6e8549e23c3151935c71b6c75fc1c72582f62",
+      "before_sha256": "73e1b3c188e026276b547a900fe6e8549e23c3151935c71b6c75fc1c72582f62",
+      "after_sha256": "869789e595e774edf7a171dd1a01345e9ffc634ce8e6fc7fb612318c49383b6a",
       "owners": {
         "@document": {
-          "before": "ab3a9fda3507945dc10dbf10fbf8108ce2a90ef1937f48552e1ae1c9e262758b",
-          "after": "73e1b3c188e026276b547a900fe6e8549e23c3151935c71b6c75fc1c72582f62"
+          "before": "73e1b3c188e026276b547a900fe6e8549e23c3151935c71b6c75fc1c72582f62",
+          "after": "869789e595e774edf7a171dd1a01345e9ffc634ce8e6fc7fb612318c49383b6a"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "f57a9d24731a138b8a456fcabd0a38c09f7383dc192edb18e9c84d1ded65808e",
-      "after_sha256": "438f8b25390d459e242468d89d31d40e91bec6c6e257785efcb4aa4a0fa3f93b",
+      "before_sha256": "438f8b25390d459e242468d89d31d40e91bec6c6e257785efcb4aa4a0fa3f93b",
+      "after_sha256": "031f52d5df7107e59258e246cfa004858e2948632455566db5c90eeb0481f2d2",
       "owners": {
         "@document": {
-          "before": "f57a9d24731a138b8a456fcabd0a38c09f7383dc192edb18e9c84d1ded65808e",
-          "after": "438f8b25390d459e242468d89d31d40e91bec6c6e257785efcb4aa4a0fa3f93b"
+          "before": "438f8b25390d459e242468d89d31d40e91bec6c6e257785efcb4aa4a0fa3f93b",
+          "after": "031f52d5df7107e59258e246cfa004858e2948632455566db5c90eeb0481f2d2"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "4299fa33eec8411de67bd0e97cdc95d6ce00bed77015f136ecdcc14f734e48fc",
-      "after_sha256": "eb689df46817baf659a033753b2568ed0eb88bb86d6452c31295ec1b0a5ee6bc",
+      "before_sha256": "eb689df46817baf659a033753b2568ed0eb88bb86d6452c31295ec1b0a5ee6bc",
+      "after_sha256": "1740ec940b1a93047259012847ee3bfee9b4c7e9a741dce986d8be19c506f93b",
       "owners": {
         "@document": {
-          "before": "4299fa33eec8411de67bd0e97cdc95d6ce00bed77015f136ecdcc14f734e48fc",
-          "after": "eb689df46817baf659a033753b2568ed0eb88bb86d6452c31295ec1b0a5ee6bc"
+          "before": "eb689df46817baf659a033753b2568ed0eb88bb86d6452c31295ec1b0a5ee6bc",
+          "after": "1740ec940b1a93047259012847ee3bfee9b4c7e9a741dce986d8be19c506f93b"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "b24f6d4ea616886b858acb6fa83e177f0a71b10cc94de03dda85645d5696ef14",
-      "after_sha256": "bc92a1bc7fc7a0978bbdffa81519b4895e8891dedea7a2fa6eb646e3ad8550c5",
+      "before_sha256": "bc92a1bc7fc7a0978bbdffa81519b4895e8891dedea7a2fa6eb646e3ad8550c5",
+      "after_sha256": "827509859f87b8263b984c943c8dac97be5121408df61f514b59b1d4d27ac6ae",
       "owners": {
         "@document": {
-          "before": "b24f6d4ea616886b858acb6fa83e177f0a71b10cc94de03dda85645d5696ef14",
-          "after": "bc92a1bc7fc7a0978bbdffa81519b4895e8891dedea7a2fa6eb646e3ad8550c5"
+          "before": "bc92a1bc7fc7a0978bbdffa81519b4895e8891dedea7a2fa6eb646e3ad8550c5",
+          "after": "827509859f87b8263b984c943c8dac97be5121408df61f514b59b1d4d27ac6ae"
         }
       }
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
-      "before_sha256": "7b59252df0a05dd80729b574f71bec0c2227ff4071d511f0e96855bb28effd61",
-      "after_sha256": "0711cbcfdf9f7db0bc4f0fb713bff2ede497d222068612d5226b331bfdb5f740",
+      "before_sha256": "0711cbcfdf9f7db0bc4f0fb713bff2ede497d222068612d5226b331bfdb5f740",
+      "after_sha256": "629424e7fd056ab7345dc36435ea98fc06b0c281ce40c9bc5a6d2516fbf0133c",
       "owners": {
         "@document": {
-          "before": "7b59252df0a05dd80729b574f71bec0c2227ff4071d511f0e96855bb28effd61",
-          "after": "0711cbcfdf9f7db0bc4f0fb713bff2ede497d222068612d5226b331bfdb5f740"
+          "before": "0711cbcfdf9f7db0bc4f0fb713bff2ede497d222068612d5226b331bfdb5f740",
+          "after": "629424e7fd056ab7345dc36435ea98fc06b0c281ce40c9bc5a6d2516fbf0133c"
+        }
+      }
+    },
+    "docs/ADAPTER_DECISION_CONTRACT.md": {
+      "before_sha256": "00ccaa72fc0139ea0bbbb40df66242c5335b81d0b55b61fde4e92e5c066d59f4",
+      "after_sha256": "6e900fa963f42b55e72844a469c3839706b5d88a7b06dcbabe32d33be7a7192e",
+      "owners": {
+        "@document": {
+          "before": "00ccaa72fc0139ea0bbbb40df66242c5335b81d0b55b61fde4e92e5c066d59f4",
+          "after": "6e900fa963f42b55e72844a469c3839706b5d88a7b06dcbabe32d33be7a7192e"
         }
       }
     },
     "docs/AI_POLICY_INTERFACE.md": {
-      "before_sha256": "73ac09cff6ac248f5e0748ac1ae42ee322741c2b3622984c39edd9a26cd2c785",
-      "after_sha256": "87208bac86e47f8e4f1b5d256b7ac327c39677b99b6ebace1ddec4f97310a231",
+      "before_sha256": "87208bac86e47f8e4f1b5d256b7ac327c39677b99b6ebace1ddec4f97310a231",
+      "after_sha256": "8919231d9ecd774047df6886ef0a5752c9f8ed858e030e86c67703fbd893d788",
       "owners": {
         "@document": {
-          "before": "73ac09cff6ac248f5e0748ac1ae42ee322741c2b3622984c39edd9a26cd2c785",
-          "after": "87208bac86e47f8e4f1b5d256b7ac327c39677b99b6ebace1ddec4f97310a231"
+          "before": "87208bac86e47f8e4f1b5d256b7ac327c39677b99b6ebace1ddec4f97310a231",
+          "after": "8919231d9ecd774047df6886ef0a5752c9f8ed858e030e86c67703fbd893d788"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
-      "before_sha256": "6a67a4e90f56428b66a6db45fc72ebf370f9d773eb59e390578c83b5de723c54",
-      "after_sha256": "43f1ad5f824374064ac5503998dab34f91da70149f24160d2bdb79d93164d649",
+      "before_sha256": "43f1ad5f824374064ac5503998dab34f91da70149f24160d2bdb79d93164d649",
+      "after_sha256": "f3067266c4c6fc61007087599419ac12a7c627ec262fc75e10c6c5f9311952a0",
       "owners": {
         "@document": {
-          "before": "6a67a4e90f56428b66a6db45fc72ebf370f9d773eb59e390578c83b5de723c54",
-          "after": "43f1ad5f824374064ac5503998dab34f91da70149f24160d2bdb79d93164d649"
-        }
-      }
-    },
-    "docs/performance/current/escape-survivor-history-20261113-reconstruction.json": {
-      "before_sha256": null,
-      "after_sha256": "7ba32e4a3c259e42ddaed5d8a58d9499d73d3947afd52afdfc63c45bc47050b7",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "7ba32e4a3c259e42ddaed5d8a58d9499d73d3947afd52afdfc63c45bc47050b7"
+          "before": "43f1ad5f824374064ac5503998dab34f91da70149f24160d2bdb79d93164d649",
+          "after": "f3067266c4c6fc61007087599419ac12a7c627ec262fc75e10c6c5f9311952a0"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "cf60111206a846f90b46919ef7ebc72cda548e2c36c92329fcc8360e7c4be3f2",
-      "after_sha256": "3a795b96aa209a350912285f9e9df39d2048234c295d2f942c9f30545fe5b993",
+      "before_sha256": "3a795b96aa209a350912285f9e9df39d2048234c295d2f942c9f30545fe5b993",
+      "after_sha256": "e07f540c8ef9f55fe9b3ffcdf28628fdbd420acb6a98c2854d1676b99a18d5ff",
       "owners": {
         "@document": {
-          "before": "cf60111206a846f90b46919ef7ebc72cda548e2c36c92329fcc8360e7c4be3f2",
-          "after": "3a795b96aa209a350912285f9e9df39d2048234c295d2f942c9f30545fe5b993"
+          "before": "3a795b96aa209a350912285f9e9df39d2048234c295d2f942c9f30545fe5b993",
+          "after": "e07f540c8ef9f55fe9b3ffcdf28628fdbd420acb6a98c2854d1676b99a18d5ff"
         }
       }
     },
     "scripts/current_shard_assignment.py": {
-      "before_sha256": "7b3a5c08d984c896d2b7f8eed426cd243756ab3dde8b19322f6cf25cfae0904c",
-      "after_sha256": "eeddfc633a2b0cc43ead53d6a2397486f297f585aaf7392ff5a936b6dfb9ad34",
+      "before_sha256": "eeddfc633a2b0cc43ead53d6a2397486f297f585aaf7392ff5a936b6dfb9ad34",
+      "after_sha256": "305e498bec457d0384d6a7c7002ecf3d45adf374d9419bdd423ec73c11fb6303",
       "owners": {
         "load_assignment": {
-          "before": "bdf97c28c20425914d6d50698dff511298c20734d424b980197f544d6025a432",
-          "after": "f64e79624baca52d7298fa1928febda32810f1c2b8467d8648ddc06080879f78"
+          "before": "f64e79624baca52d7298fa1928febda32810f1c2b8467d8648ddc06080879f78",
+          "after": "53666b9ca13e691029eff57fc4071d3ba81c4941994b38b9da8c798a7a934e91"
         }
       }
     },
     "scripts/current_shard_compatibility.py": {
-      "before_sha256": "ef5d502697fedb8a30e873c2c7ac037d2c05c2a53b882b1453bf999b991754b6",
-      "after_sha256": "4f5331b5b5965f8ec7e4b3fa110e27719d5a4668939ba750e81f358983a6ac26",
+      "before_sha256": "4f5331b5b5965f8ec7e4b3fa110e27719d5a4668939ba750e81f358983a6ac26",
+      "after_sha256": "5523a9b101b91c22b22b3e5c4b4df668e031c5d52566e6eec33c2741a117f390",
       "owners": {
         "@module": {
-          "before": "05cf257512c540f0b195fa4bacc88626d92b6a3faad6eb99b0831d9c33254b3f",
-          "after": "c5997d071159f5a07a9a7d6f69f4769f00964d84cb21153d2a5c576af68ee783"
+          "before": "c5997d071159f5a07a9a7d6f69f4769f00964d84cb21153d2a5c576af68ee783",
+          "after": "26e015e937e0a940eeac9f6ab05d3cf7d2fd12dd270daa51c3c8117e0b1dd9ff"
         },
         "_baseline": {
-          "before": "416b6d80ab029e9143bb5a2420bc9d27247cc27c377f9445820ad317c9c0c5f5",
-          "after": "4236ada359fc2922865f47907fee75306ce6a8fa9c91dc18107b82f7bfcf732e"
+          "before": "4236ada359fc2922865f47907fee75306ce6a8fa9c91dc18107b82f7bfcf732e",
+          "after": "df8d197a2d076a91142dd1cf59a344598cdcd073784510b1b17ef1e1e3941704"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "aa1d036bb361c88218c8d8f799e8af160b6b317b5000f77d570cf05d73f72505",
-      "after_sha256": "5a97721e290e868b301ed0dbfcb3eefff34a41ebb4ca982aa660665d50078346",
+      "before_sha256": "5a97721e290e868b301ed0dbfcb3eefff34a41ebb4ca982aa660665d50078346",
+      "after_sha256": "dd9509243a9995a67375284b1dc38395295a7c973ab82ef59631a3066a770a5e",
       "owners": {
         "@document": {
-          "before": "aa1d036bb361c88218c8d8f799e8af160b6b317b5000f77d570cf05d73f72505",
-          "after": "5a97721e290e868b301ed0dbfcb3eefff34a41ebb4ca982aa660665d50078346"
+          "before": "5a97721e290e868b301ed0dbfcb3eefff34a41ebb4ca982aa660665d50078346",
+          "after": "dd9509243a9995a67375284b1dc38395295a7c973ab82ef59631a3066a770a5e"
         }
       }
     },
-    "src/warhammer40k_core/engine/movement_decision_authority.py": {
-      "before_sha256": "a80f6068e85766fadab5021e59d0a5c50d079972a9f4fec1a8d4794f5270d25c",
-      "after_sha256": "eca02d1119122710328fe4d7a3a08b4a17123d09cbb273a5be9e1b361c345e83",
+    "src/warhammer40k_core/engine/catalog_named_weapon_profiles.py": {
+      "before_sha256": null,
+      "after_sha256": "df8551ac22fde8d6eb86b42c1918fb3fd65c933d6ae70c8bcf9356879a2dd6d8",
       "owners": {
-        "MovementCompletionAuthority": {
+        "@module": {
           "before": null,
-          "after": "ad5e95526b0b482965144ca0b096f5a62ea5486d1029ca0501e1d0bbc1c81ffd"
+          "after": "7bb88dca8070523f7badeaabf4f0123ced07003b860aad0a3cff87b1871c65bc"
         },
-        "_completion_witness": {
+        "equipped_named_weapon_profile_ids": {
           "before": null,
-          "after": "9147a43017af58a61219b0d54e839325260805768c0ae0cd7bba420ddc82efaf"
+          "after": "609c9d69f77051be0d2f953c4be4888a3a2873d87687a7edbfba4c5a96fde2de"
         },
-        "_hazard_completion_proposal_records": {
+        "weapon_name_match_token": {
           "before": null,
-          "after": "aebe0d943ee2f0c043d8debb23c3e97e316665e649a5f1b2874d1f64626b8d31"
+          "after": "69c399c86528b8e791f54a56504316eb8f285580dab5389740a25d16ad9e99b8"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/catalog_rule_consumption.py": {
+      "before_sha256": "82ba1bcc844d3164e51b66f895db5ca197974c315999e17119a69577ce68fe9a",
+      "after_sha256": "a82ce36c3563ecf97460e41629ae1a6b60695292dd75cd478bd39e480f2dbec6",
+      "owners": {
+        "@module": {
+          "before": "ef3877b65ebbf06b51098e8268fd69169196e84ccdea2e2f78c1939a69cbadcb",
+          "after": "32533d3b3214bc184434de90236867f723c3ea3d5523b216c3195b796e299009"
         },
-        "validate_movement_completion_decision_authority": {
-          "before": "4caf99c49f442a322f9ced2fd3174525520ba337a3c7d865520b79e3c4c58c6b",
-          "after": "a6614a1e04956ac01753dfdf2b0341a5d979ead18f6cfadab681048df223d71b"
+        "CatalogNamedWeaponAbilityChoiceRuntime.result_handler": {
+          "before": "2067e1334c1c1862ce3e06ebc7ca7a87f681fd4af7aab33c37f803361eaa8a38",
+          "after": "1b4343353fe9383c6e84e0e461916d34f1fd05f234f5e19aa6436262fd46a858"
         },
-        "validated_movement_transition": {
-          "before": "51970ed8c9d48ce6b829d39022c8261f8b74939caf993f4f3a4549b42649b151",
-          "after": "f4be975678f5914ceb462d36000e7041521525df92996e42f36ae3bedcfbfd3f"
+        "_catalog_wargear_by_id": {
+          "before": "100a0b64d5b1fd63f28549369e3d4e1493071736e5a6075bffdbcb83005fa630",
+          "after": null
+        },
+        "_model_has_named_weapon": {
+          "before": "24b50183e8f3b74337e775c9a352cac6acd70d2b42897b4e6c97e1fc7aab0c7e",
+          "after": "04234f53c4b9d78dd65c2da8d566f7ec2822df36c17523cac04648c08990443d"
+        },
+        "_named_weapon_ability_choice_persisting_effect": {
+          "before": "c181b2d4f91925a1614deee61e02d5b0f96b73f3ff9d043482174de9bd4609d8",
+          "after": "e50ddeba23aa5061ffa8492b1d076e1c96b7911e0eb4dbf26c6f2a3d249a7d58"
+        },
+        "_selected_catalog_named_weapon_ability_grants": {
+          "before": "75f7d8413bb9d3a36b463fa100bc2a93928462646c5fda2411342bc6ef1372e4",
+          "after": "31888b98b32a870a08416979d7b79364943417ccd8e783c7da6f091799e427a3"
+        },
+        "_weapon_name_match_token": {
+          "before": "35fa11605b6a99cee5a5e79a8398fde0b46401dd5c2466819c499df6904519b8",
+          "after": null
         }
       }
     },
     "tests/code_quality/test_current_shard_compatibility.py": {
-      "before_sha256": "d1630ef7723a007074ca223dd316ac969fde816629ec22eb73c8bccbd225f287",
-      "after_sha256": "d98e873a565e5484e3b99118615939414f8353ba7723f52b666edc0a075d43f7",
+      "before_sha256": "d98e873a565e5484e3b99118615939414f8353ba7723f52b666edc0a075d43f7",
+      "after_sha256": "23493bb4629a2b0b4ae090b4c0be940618c1c25f0da01c07bf1674015eeb8a19",
       "owners": {
         "test_compatibility_boundary_rejects_stale_or_forged_inputs": {
-          "before": "5cf4b8a8c13a2757ea12c7c5a04d6df877cd31645d30668ee7a169cbf1fa8dbf",
-          "after": "3ca479af6631e2392a5c2de230b159e6ed7e6023051d5aa82ad043942103c78b"
+          "before": "3ca479af6631e2392a5c2de230b159e6ed7e6023051d5aa82ad043942103c78b",
+          "after": "52ee90e9890d8713df8cf5119b5866c3ac0424c1216ceff21ec4067ff8ddcc40"
         },
         "test_current_dispatch_has_exact_inventory_and_disclosed_selector_moves": {
-          "before": "e11a8f6f02eea2ea32b6285849f57d6bb8cee5f93b61747889f7c09f0d358a10",
-          "after": "c28bbb376c74880b9470516ca785c9aa4c8331fd9595503164f743d75b2b17c4"
+          "before": "c28bbb376c74880b9470516ca785c9aa4c8331fd9595503164f743d75b2b17c4",
+          "after": "472cd2cf30949edf9a1356b49068ee85119ad16fcabdd9ab3d332e751eaa058d"
+        }
+      }
+    },
+    "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py": {
+      "before_sha256": null,
+      "after_sha256": "26467cfb68d1e4464c5f926a1278bd67433f5ac99699ebdc9666deb7ab1255ed",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "a09180df5cf5874fcf670eb8597c0c0f526de105220d5a869886a9eff3e7e6f4"
+        },
+        "native_command_checkpoint": {
+          "before": null,
+          "after": "8c36019c2907be3cf18a6bcfc64c79c9acac81141ae553fa69addc4ff3b8c1f9"
+        },
+        "native_mustered_session": {
+          "before": null,
+          "after": "bb6c96a57fe3b91a36d89a3c37b4582adebde61beb1e6595f7ba5b3654b9ab9a"
+        },
+        "test_native_prefix_preserves_real_rules_terrain_and_exact_history": {
+          "before": null,
+          "after": "94b6bedd8fad09941b4952343cad47ebafd6b2be37d9886d5ee69745f3f7fd04"
+        },
+        "test_native_roles_keep_complete_equipment_in_full_legal_rosters": {
+          "before": null,
+          "after": "61668d8ed07fc29154ec60ccf57a2ae1de6aad3d0f6da5b8eb8e9fde4f95ada8"
         }
       }
     },
     "tests/rules/section07/coverage.json": {
-      "before_sha256": "d2ccf01707f04dc0160f5e83739848d28064aeaa8767c207fcbf25f6484af06d",
-      "after_sha256": "59cd19b2805f5a4cc78f56cfef751fe9eaefcb1a21f90cc3cbbdeb337c8ca41d",
+      "before_sha256": "59cd19b2805f5a4cc78f56cfef751fe9eaefcb1a21f90cc3cbbdeb337c8ca41d",
+      "after_sha256": "182a245de7a417f48f8eaab6a41d12d67c3901529599ca1ca2b9bd5962156336",
       "owners": {
         "@document": {
-          "before": "d2ccf01707f04dc0160f5e83739848d28064aeaa8767c207fcbf25f6484af06d",
-          "after": "59cd19b2805f5a4cc78f56cfef751fe9eaefcb1a21f90cc3cbbdeb337c8ca41d"
+          "before": "59cd19b2805f5a4cc78f56cfef751fe9eaefcb1a21f90cc3cbbdeb337c8ca41d",
+          "after": "182a245de7a417f48f8eaab6a41d12d67c3901529599ca1ca2b9bd5962156336"
         }
       }
     },
-    "tests/rules/section09/test_escape_survivor_persistence.py": {
+    "tests/support/cavalcade_native_prefix.py": {
       "before_sha256": null,
-      "after_sha256": "b70029a1609ac6996755d24254744cd3e37af955f81188e5f9062a5afb9c1e68",
+      "after_sha256": "c713be8f95d94ea72078cefd548ff629fd6016c76e2dc6060710faa7550ccbb0",
       "owners": {
         "@module": {
           "before": null,
-          "after": "719c256129860154cb92207fce60baa4cfc99946f3ec8acf67243f7e7ef3fe13"
+          "after": "c55b61cf0d7ded7b766169e15e46b91b064a3cbe4e44894e75eeb842cb7d38e6"
         },
-        "_assert_survivor_retry_roundtrip": {
+        "NativeRangedAudit": {
           "before": null,
-          "after": "492c4e7db470995959d535174f78b39ff09193550727b7e47552df58b7951e4d"
+          "after": "0f78d7bd3e9f6e743eb128e9186a5c9bce190a302946e5f79d48ca3a02796c56"
         },
-        "_authority_inputs": {
+        "complete_native_prefix": {
           "before": null,
-          "after": "f03e84ecbf829e77b3b43b8ed9d23685427d918f7512d80d19bd68c3cddb1168"
+          "after": "897fb9b92c52b3932545e1ac36c46e52599c8fe9e5eb176c100612a2b6ce1cd7"
         },
-        "_completed_escape": {
+        "native_prefix_witness": {
           "before": null,
-          "after": "94c5a034555d2041f73c7bd36f09a1880e4166336d8484eebafc9ebe43f361b3"
+          "after": "0b9d2db28e1fc9812edb279f620538a7c7ac1eabcf5c9ab6011432dbb897b6ab"
         },
-        "test_completed_hazard_survivor_retry_roundtrips_without_rerolls": {
+        "native_ranged_audit": {
           "before": null,
-          "after": "bf97b40dc30bc98bb8127d3cf8b58d5ed34e6a0744a3a626894b949e3fa24084"
+          "after": "ad4caed08b97cb3cbeef00ae3208f01b1735ef75ec78adae4313566e666d8bce"
+        }
+      }
+    },
+    "tests/support/cavalcade_v995.py": {
+      "before_sha256": null,
+      "after_sha256": "3da5b81a9b714a0b4ce04a6ddc17cc9775fdb3697980145c4b80200faee6fc82",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "dc083ca2888e43dacb7321779a17f4c7686cf6a7ec1275ba2e6d22f10feb7124"
         },
-        "test_natural_escape_survivor_checkpoint_roundtrips": {
+        "_DeploymentFixture": {
           "before": null,
-          "after": "fe969cd16d2a9c2080b724cd7de9ac118f89b7c675d310eb98e9faebca7a4c33"
+          "after": "0d0f4b0fc033ddaf36cfc48262147aa35508960c936384a9fafc2b0a48aed1a4"
         },
-        "test_pre_hazard_rejected_proposal_then_survivor_retry_roundtrips": {
+        "_MirrorSetupPolicy": {
           "before": null,
-          "after": "ba40e6997bd89f693808e647186421808cb5be4000eac75a5b35bd5776e0ed9a"
+          "after": "b80ee2d60d602a866837c6be762f564155f15db03582bb36ebbcb85c38d3eb6c"
         },
-        "test_survivor_authority_rejects_missing_survivor": {
+        "_MirrorSetupPolicy.__init__": {
           "before": null,
-          "after": "c9f291008fd804b047750067977091095903602743d6877b96035f647a973336"
+          "after": "9053bc2735cd25770bf75fe076f2f865ca51ad8e96fa66e04d84774ade350f8a"
         },
-        "test_survivor_authority_rejects_unrelated_hazard": {
+        "_MirrorSetupPolicy.choose": {
           "before": null,
-          "after": "be5c8d5f35d826e2dede319c609786b7d5da4b50ac569abcfb8e4287264e8072"
+          "after": "0490fd03bca08e240de6aa047d26b52c1214867f8f0d15fa1e1b215bdf65bdb7"
+        },
+        "deployment_fixture": {
+          "before": null,
+          "after": "6e2a122427cb255f00d34d866dfe622d342f9a9a413a95dc189e6c9edf95b682"
+        },
+        "mirror_router": {
+          "before": null,
+          "after": "d3e57b9f66cc18c189084fc983fd8c3033b30b77f48cda5537704e867e84eba2"
+        },
+        "strict_mirror_session": {
+          "before": null,
+          "after": "37c2736f4ac26db1cf4d44dd50c2345a55906660b680af9b489104d96eae1cf8"
         }
       }
     }
@@ -426,9 +500,9 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Keep normal-path regressions, runtime/contract publication, bounded operator observations and current derived scheduling consistent with the shared Fall Back survivor-history repair.",
-      "source_obligation": "Ordinary accepted Desperate Escape may remove models before movement completion. Bind effective paths to the exact completed hazard packet, authenticated deaths and explicit survivor retry chain; retain every surviving full path and reject unrelated or missing authority. Original operator config, roster, seeds, paths and prefixes remain unchanged.",
-      "unchanged_work": "No solver, search budget, movement geometry, RNG, source weapon profile, adapter payload shape, cache policy or learning behavior changes. Separate declared canonical regression compositions exercise partial/complete casualties and retry without editing live health. One fresh covered observation supplies derived scheduling; matched reconstruction and current conformance remain separate from full-game and causal screening claims."
+      "rationale": "Qualify a separately versioned native full-roster prefix and repair its reproduced named-weapon-family admission failure through shared catalog-derived equipped-profile binding; preserve historical synthetic findings and rejected routes.",
+      "source_obligation": "The native Lord of Change is equipped with the Bolt of Change weapon family and both declared modes. Its source-backed Master of Magicks choice must discover that equipped family and apply its selected ability to those exact stable profile IDs, preserving exact-profile selectors, bearer restrictions and ordinary persistence/replay. The selected full v995 roster keeps reviewed datasheets, October points and provisional geometry provenance.",
+      "unchanged_work": "This is a bounded rule-semantics repair, with stable profile bindings in existing persisting-effect data and the same serializers and decision/replay routes. No solver, search, cache, geometry, RNG, budget, source weapon statistics or public choice payload changes. The new named fixture repeats the finite existing setup recipe while historical test source stays byte-identical. Fresh covered observation supplies only current derived scheduling; native route evidence does not certify tactical benefit, complete games or learning."
     },
     "ci/test_shards/current-covered-baseline.json": {
       "category": "rule_semantics",
@@ -437,9 +511,9 @@
         "scoped-shard-allocation"
       ],
       "selected_families": [],
-      "rationale": "Keep normal-path regressions, runtime/contract publication, bounded operator observations and current derived scheduling consistent with the shared Fall Back survivor-history repair.",
-      "source_obligation": "Ordinary accepted Desperate Escape may remove models before movement completion. Bind effective paths to the exact completed hazard packet, authenticated deaths and explicit survivor retry chain; retain every surviving full path and reject unrelated or missing authority. Original operator config, roster, seeds, paths and prefixes remain unchanged.",
-      "unchanged_work": "No solver, search budget, movement geometry, RNG, source weapon profile, adapter payload shape, cache policy or learning behavior changes. Separate declared canonical regression compositions exercise partial/complete casualties and retry without editing live health. One fresh covered observation supplies derived scheduling; matched reconstruction and current conformance remain separate from full-game and causal screening claims."
+      "rationale": "Qualify a separately versioned native full-roster prefix and repair its reproduced named-weapon-family admission failure through shared catalog-derived equipped-profile binding; preserve historical synthetic findings and rejected routes.",
+      "source_obligation": "The native Lord of Change is equipped with the Bolt of Change weapon family and both declared modes. Its source-backed Master of Magicks choice must discover that equipped family and apply its selected ability to those exact stable profile IDs, preserving exact-profile selectors, bearer restrictions and ordinary persistence/replay. The selected full v995 roster keeps reviewed datasheets, October points and provisional geometry provenance.",
+      "unchanged_work": "This is a bounded rule-semantics repair, with stable profile bindings in existing persisting-effect data and the same serializers and decision/replay routes. No solver, search, cache, geometry, RNG, budget, source weapon statistics or public choice payload changes. The new named fixture repeats the finite existing setup recipe while historical test source stays byte-identical. Fresh covered observation supplies only current derived scheduling; native route evidence does not certify tactical benefit, complete games or learning."
     },
     "ci/test_shards/current-derived-assignment.json": {
       "category": "rule_semantics",
@@ -448,9 +522,9 @@
         "scoped-shard-allocation"
       ],
       "selected_families": [],
-      "rationale": "Keep normal-path regressions, runtime/contract publication, bounded operator observations and current derived scheduling consistent with the shared Fall Back survivor-history repair.",
-      "source_obligation": "Ordinary accepted Desperate Escape may remove models before movement completion. Bind effective paths to the exact completed hazard packet, authenticated deaths and explicit survivor retry chain; retain every surviving full path and reject unrelated or missing authority. Original operator config, roster, seeds, paths and prefixes remain unchanged.",
-      "unchanged_work": "No solver, search budget, movement geometry, RNG, source weapon profile, adapter payload shape, cache policy or learning behavior changes. Separate declared canonical regression compositions exercise partial/complete casualties and retry without editing live health. One fresh covered observation supplies derived scheduling; matched reconstruction and current conformance remain separate from full-game and causal screening claims."
+      "rationale": "Qualify a separately versioned native full-roster prefix and repair its reproduced named-weapon-family admission failure through shared catalog-derived equipped-profile binding; preserve historical synthetic findings and rejected routes.",
+      "source_obligation": "The native Lord of Change is equipped with the Bolt of Change weapon family and both declared modes. Its source-backed Master of Magicks choice must discover that equipped family and apply its selected ability to those exact stable profile IDs, preserving exact-profile selectors, bearer restrictions and ordinary persistence/replay. The selected full v995 roster keeps reviewed datasheets, October points and provisional geometry provenance.",
+      "unchanged_work": "This is a bounded rule-semantics repair, with stable profile bindings in existing persisting-effect data and the same serializers and decision/replay routes. No solver, search, cache, geometry, RNG, budget, source weapon statistics or public choice payload changes. The new named fixture repeats the finite existing setup recipe while historical test source stays byte-identical. Fresh covered observation supplies only current derived scheduling; native route evidence does not certify tactical benefit, complete games or learning."
     },
     "ci/test_shards/current-runtime-compatibility.json": {
       "category": "rule_semantics",
@@ -459,9 +533,9 @@
         "scoped-shard-allocation"
       ],
       "selected_families": [],
-      "rationale": "Keep normal-path regressions, runtime/contract publication, bounded operator observations and current derived scheduling consistent with the shared Fall Back survivor-history repair.",
-      "source_obligation": "Ordinary accepted Desperate Escape may remove models before movement completion. Bind effective paths to the exact completed hazard packet, authenticated deaths and explicit survivor retry chain; retain every surviving full path and reject unrelated or missing authority. Original operator config, roster, seeds, paths and prefixes remain unchanged.",
-      "unchanged_work": "No solver, search budget, movement geometry, RNG, source weapon profile, adapter payload shape, cache policy or learning behavior changes. Separate declared canonical regression compositions exercise partial/complete casualties and retry without editing live health. One fresh covered observation supplies derived scheduling; matched reconstruction and current conformance remain separate from full-game and causal screening claims."
+      "rationale": "Qualify a separately versioned native full-roster prefix and repair its reproduced named-weapon-family admission failure through shared catalog-derived equipped-profile binding; preserve historical synthetic findings and rejected routes.",
+      "source_obligation": "The native Lord of Change is equipped with the Bolt of Change weapon family and both declared modes. Its source-backed Master of Magicks choice must discover that equipped family and apply its selected ability to those exact stable profile IDs, preserving exact-profile selectors, bearer restrictions and ordinary persistence/replay. The selected full v995 roster keeps reviewed datasheets, October points and provisional geometry provenance.",
+      "unchanged_work": "This is a bounded rule-semantics repair, with stable profile bindings in existing persisting-effect data and the same serializers and decision/replay routes. No solver, search, cache, geometry, RNG, budget, source weapon statistics or public choice payload changes. The new named fixture repeats the finite existing setup recipe while historical test source stays byte-identical. Fresh covered observation supplies only current derived scheduling; native route evidence does not certify tactical benefit, complete games or learning."
     },
     "ci/test_shards/durations.json": {
       "category": "rule_semantics",
@@ -469,9 +543,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Keep normal-path regressions, runtime/contract publication, bounded operator observations and current derived scheduling consistent with the shared Fall Back survivor-history repair.",
-      "source_obligation": "Ordinary accepted Desperate Escape may remove models before movement completion. Bind effective paths to the exact completed hazard packet, authenticated deaths and explicit survivor retry chain; retain every surviving full path and reject unrelated or missing authority. Original operator config, roster, seeds, paths and prefixes remain unchanged.",
-      "unchanged_work": "No solver, search budget, movement geometry, RNG, source weapon profile, adapter payload shape, cache policy or learning behavior changes. Separate declared canonical regression compositions exercise partial/complete casualties and retry without editing live health. One fresh covered observation supplies derived scheduling; matched reconstruction and current conformance remain separate from full-game and causal screening claims."
+      "rationale": "Qualify a separately versioned native full-roster prefix and repair its reproduced named-weapon-family admission failure through shared catalog-derived equipped-profile binding; preserve historical synthetic findings and rejected routes.",
+      "source_obligation": "The native Lord of Change is equipped with the Bolt of Change weapon family and both declared modes. Its source-backed Master of Magicks choice must discover that equipped family and apply its selected ability to those exact stable profile IDs, preserving exact-profile selectors, bearer restrictions and ordinary persistence/replay. The selected full v995 roster keeps reviewed datasheets, October points and provisional geometry provenance.",
+      "unchanged_work": "This is a bounded rule-semantics repair, with stable profile bindings in existing persisting-effect data and the same serializers and decision/replay routes. No solver, search, cache, geometry, RNG, budget, source weapon statistics or public choice payload changes. The new named fixture repeats the finite existing setup recipe while historical test source stays byte-identical. Fresh covered observation supplies only current derived scheduling; native route evidence does not certify tactical benefit, complete games or learning."
     },
     "ci/test_shards/shard-1.txt": {
       "category": "rule_semantics",
@@ -479,9 +553,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Keep normal-path regressions, runtime/contract publication, bounded operator observations and current derived scheduling consistent with the shared Fall Back survivor-history repair.",
-      "source_obligation": "Ordinary accepted Desperate Escape may remove models before movement completion. Bind effective paths to the exact completed hazard packet, authenticated deaths and explicit survivor retry chain; retain every surviving full path and reject unrelated or missing authority. Original operator config, roster, seeds, paths and prefixes remain unchanged.",
-      "unchanged_work": "No solver, search budget, movement geometry, RNG, source weapon profile, adapter payload shape, cache policy or learning behavior changes. Separate declared canonical regression compositions exercise partial/complete casualties and retry without editing live health. One fresh covered observation supplies derived scheduling; matched reconstruction and current conformance remain separate from full-game and causal screening claims."
+      "rationale": "Qualify a separately versioned native full-roster prefix and repair its reproduced named-weapon-family admission failure through shared catalog-derived equipped-profile binding; preserve historical synthetic findings and rejected routes.",
+      "source_obligation": "The native Lord of Change is equipped with the Bolt of Change weapon family and both declared modes. Its source-backed Master of Magicks choice must discover that equipped family and apply its selected ability to those exact stable profile IDs, preserving exact-profile selectors, bearer restrictions and ordinary persistence/replay. The selected full v995 roster keeps reviewed datasheets, October points and provisional geometry provenance.",
+      "unchanged_work": "This is a bounded rule-semantics repair, with stable profile bindings in existing persisting-effect data and the same serializers and decision/replay routes. No solver, search, cache, geometry, RNG, budget, source weapon statistics or public choice payload changes. The new named fixture repeats the finite existing setup recipe while historical test source stays byte-identical. Fresh covered observation supplies only current derived scheduling; native route evidence does not certify tactical benefit, complete games or learning."
     },
     "ci/test_shards/shard-10.txt": {
       "category": "rule_semantics",
@@ -489,9 +563,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Keep normal-path regressions, runtime/contract publication, bounded operator observations and current derived scheduling consistent with the shared Fall Back survivor-history repair.",
-      "source_obligation": "Ordinary accepted Desperate Escape may remove models before movement completion. Bind effective paths to the exact completed hazard packet, authenticated deaths and explicit survivor retry chain; retain every surviving full path and reject unrelated or missing authority. Original operator config, roster, seeds, paths and prefixes remain unchanged.",
-      "unchanged_work": "No solver, search budget, movement geometry, RNG, source weapon profile, adapter payload shape, cache policy or learning behavior changes. Separate declared canonical regression compositions exercise partial/complete casualties and retry without editing live health. One fresh covered observation supplies derived scheduling; matched reconstruction and current conformance remain separate from full-game and causal screening claims."
+      "rationale": "Qualify a separately versioned native full-roster prefix and repair its reproduced named-weapon-family admission failure through shared catalog-derived equipped-profile binding; preserve historical synthetic findings and rejected routes.",
+      "source_obligation": "The native Lord of Change is equipped with the Bolt of Change weapon family and both declared modes. Its source-backed Master of Magicks choice must discover that equipped family and apply its selected ability to those exact stable profile IDs, preserving exact-profile selectors, bearer restrictions and ordinary persistence/replay. The selected full v995 roster keeps reviewed datasheets, October points and provisional geometry provenance.",
+      "unchanged_work": "This is a bounded rule-semantics repair, with stable profile bindings in existing persisting-effect data and the same serializers and decision/replay routes. No solver, search, cache, geometry, RNG, budget, source weapon statistics or public choice payload changes. The new named fixture repeats the finite existing setup recipe while historical test source stays byte-identical. Fresh covered observation supplies only current derived scheduling; native route evidence does not certify tactical benefit, complete games or learning."
     },
     "ci/test_shards/shard-11.txt": {
       "category": "rule_semantics",
@@ -499,9 +573,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Keep normal-path regressions, runtime/contract publication, bounded operator observations and current derived scheduling consistent with the shared Fall Back survivor-history repair.",
-      "source_obligation": "Ordinary accepted Desperate Escape may remove models before movement completion. Bind effective paths to the exact completed hazard packet, authenticated deaths and explicit survivor retry chain; retain every surviving full path and reject unrelated or missing authority. Original operator config, roster, seeds, paths and prefixes remain unchanged.",
-      "unchanged_work": "No solver, search budget, movement geometry, RNG, source weapon profile, adapter payload shape, cache policy or learning behavior changes. Separate declared canonical regression compositions exercise partial/complete casualties and retry without editing live health. One fresh covered observation supplies derived scheduling; matched reconstruction and current conformance remain separate from full-game and causal screening claims."
+      "rationale": "Qualify a separately versioned native full-roster prefix and repair its reproduced named-weapon-family admission failure through shared catalog-derived equipped-profile binding; preserve historical synthetic findings and rejected routes.",
+      "source_obligation": "The native Lord of Change is equipped with the Bolt of Change weapon family and both declared modes. Its source-backed Master of Magicks choice must discover that equipped family and apply its selected ability to those exact stable profile IDs, preserving exact-profile selectors, bearer restrictions and ordinary persistence/replay. The selected full v995 roster keeps reviewed datasheets, October points and provisional geometry provenance.",
+      "unchanged_work": "This is a bounded rule-semantics repair, with stable profile bindings in existing persisting-effect data and the same serializers and decision/replay routes. No solver, search, cache, geometry, RNG, budget, source weapon statistics or public choice payload changes. The new named fixture repeats the finite existing setup recipe while historical test source stays byte-identical. Fresh covered observation supplies only current derived scheduling; native route evidence does not certify tactical benefit, complete games or learning."
     },
     "ci/test_shards/shard-12.txt": {
       "category": "rule_semantics",
@@ -509,9 +583,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Keep normal-path regressions, runtime/contract publication, bounded operator observations and current derived scheduling consistent with the shared Fall Back survivor-history repair.",
-      "source_obligation": "Ordinary accepted Desperate Escape may remove models before movement completion. Bind effective paths to the exact completed hazard packet, authenticated deaths and explicit survivor retry chain; retain every surviving full path and reject unrelated or missing authority. Original operator config, roster, seeds, paths and prefixes remain unchanged.",
-      "unchanged_work": "No solver, search budget, movement geometry, RNG, source weapon profile, adapter payload shape, cache policy or learning behavior changes. Separate declared canonical regression compositions exercise partial/complete casualties and retry without editing live health. One fresh covered observation supplies derived scheduling; matched reconstruction and current conformance remain separate from full-game and causal screening claims."
+      "rationale": "Qualify a separately versioned native full-roster prefix and repair its reproduced named-weapon-family admission failure through shared catalog-derived equipped-profile binding; preserve historical synthetic findings and rejected routes.",
+      "source_obligation": "The native Lord of Change is equipped with the Bolt of Change weapon family and both declared modes. Its source-backed Master of Magicks choice must discover that equipped family and apply its selected ability to those exact stable profile IDs, preserving exact-profile selectors, bearer restrictions and ordinary persistence/replay. The selected full v995 roster keeps reviewed datasheets, October points and provisional geometry provenance.",
+      "unchanged_work": "This is a bounded rule-semantics repair, with stable profile bindings in existing persisting-effect data and the same serializers and decision/replay routes. No solver, search, cache, geometry, RNG, budget, source weapon statistics or public choice payload changes. The new named fixture repeats the finite existing setup recipe while historical test source stays byte-identical. Fresh covered observation supplies only current derived scheduling; native route evidence does not certify tactical benefit, complete games or learning."
     },
     "ci/test_shards/shard-2.txt": {
       "category": "rule_semantics",
@@ -519,9 +593,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Keep normal-path regressions, runtime/contract publication, bounded operator observations and current derived scheduling consistent with the shared Fall Back survivor-history repair.",
-      "source_obligation": "Ordinary accepted Desperate Escape may remove models before movement completion. Bind effective paths to the exact completed hazard packet, authenticated deaths and explicit survivor retry chain; retain every surviving full path and reject unrelated or missing authority. Original operator config, roster, seeds, paths and prefixes remain unchanged.",
-      "unchanged_work": "No solver, search budget, movement geometry, RNG, source weapon profile, adapter payload shape, cache policy or learning behavior changes. Separate declared canonical regression compositions exercise partial/complete casualties and retry without editing live health. One fresh covered observation supplies derived scheduling; matched reconstruction and current conformance remain separate from full-game and causal screening claims."
+      "rationale": "Qualify a separately versioned native full-roster prefix and repair its reproduced named-weapon-family admission failure through shared catalog-derived equipped-profile binding; preserve historical synthetic findings and rejected routes.",
+      "source_obligation": "The native Lord of Change is equipped with the Bolt of Change weapon family and both declared modes. Its source-backed Master of Magicks choice must discover that equipped family and apply its selected ability to those exact stable profile IDs, preserving exact-profile selectors, bearer restrictions and ordinary persistence/replay. The selected full v995 roster keeps reviewed datasheets, October points and provisional geometry provenance.",
+      "unchanged_work": "This is a bounded rule-semantics repair, with stable profile bindings in existing persisting-effect data and the same serializers and decision/replay routes. No solver, search, cache, geometry, RNG, budget, source weapon statistics or public choice payload changes. The new named fixture repeats the finite existing setup recipe while historical test source stays byte-identical. Fresh covered observation supplies only current derived scheduling; native route evidence does not certify tactical benefit, complete games or learning."
     },
     "ci/test_shards/shard-3.txt": {
       "category": "rule_semantics",
@@ -529,9 +603,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Keep normal-path regressions, runtime/contract publication, bounded operator observations and current derived scheduling consistent with the shared Fall Back survivor-history repair.",
-      "source_obligation": "Ordinary accepted Desperate Escape may remove models before movement completion. Bind effective paths to the exact completed hazard packet, authenticated deaths and explicit survivor retry chain; retain every surviving full path and reject unrelated or missing authority. Original operator config, roster, seeds, paths and prefixes remain unchanged.",
-      "unchanged_work": "No solver, search budget, movement geometry, RNG, source weapon profile, adapter payload shape, cache policy or learning behavior changes. Separate declared canonical regression compositions exercise partial/complete casualties and retry without editing live health. One fresh covered observation supplies derived scheduling; matched reconstruction and current conformance remain separate from full-game and causal screening claims."
+      "rationale": "Qualify a separately versioned native full-roster prefix and repair its reproduced named-weapon-family admission failure through shared catalog-derived equipped-profile binding; preserve historical synthetic findings and rejected routes.",
+      "source_obligation": "The native Lord of Change is equipped with the Bolt of Change weapon family and both declared modes. Its source-backed Master of Magicks choice must discover that equipped family and apply its selected ability to those exact stable profile IDs, preserving exact-profile selectors, bearer restrictions and ordinary persistence/replay. The selected full v995 roster keeps reviewed datasheets, October points and provisional geometry provenance.",
+      "unchanged_work": "This is a bounded rule-semantics repair, with stable profile bindings in existing persisting-effect data and the same serializers and decision/replay routes. No solver, search, cache, geometry, RNG, budget, source weapon statistics or public choice payload changes. The new named fixture repeats the finite existing setup recipe while historical test source stays byte-identical. Fresh covered observation supplies only current derived scheduling; native route evidence does not certify tactical benefit, complete games or learning."
     },
     "ci/test_shards/shard-4.txt": {
       "category": "rule_semantics",
@@ -539,9 +613,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Keep normal-path regressions, runtime/contract publication, bounded operator observations and current derived scheduling consistent with the shared Fall Back survivor-history repair.",
-      "source_obligation": "Ordinary accepted Desperate Escape may remove models before movement completion. Bind effective paths to the exact completed hazard packet, authenticated deaths and explicit survivor retry chain; retain every surviving full path and reject unrelated or missing authority. Original operator config, roster, seeds, paths and prefixes remain unchanged.",
-      "unchanged_work": "No solver, search budget, movement geometry, RNG, source weapon profile, adapter payload shape, cache policy or learning behavior changes. Separate declared canonical regression compositions exercise partial/complete casualties and retry without editing live health. One fresh covered observation supplies derived scheduling; matched reconstruction and current conformance remain separate from full-game and causal screening claims."
+      "rationale": "Qualify a separately versioned native full-roster prefix and repair its reproduced named-weapon-family admission failure through shared catalog-derived equipped-profile binding; preserve historical synthetic findings and rejected routes.",
+      "source_obligation": "The native Lord of Change is equipped with the Bolt of Change weapon family and both declared modes. Its source-backed Master of Magicks choice must discover that equipped family and apply its selected ability to those exact stable profile IDs, preserving exact-profile selectors, bearer restrictions and ordinary persistence/replay. The selected full v995 roster keeps reviewed datasheets, October points and provisional geometry provenance.",
+      "unchanged_work": "This is a bounded rule-semantics repair, with stable profile bindings in existing persisting-effect data and the same serializers and decision/replay routes. No solver, search, cache, geometry, RNG, budget, source weapon statistics or public choice payload changes. The new named fixture repeats the finite existing setup recipe while historical test source stays byte-identical. Fresh covered observation supplies only current derived scheduling; native route evidence does not certify tactical benefit, complete games or learning."
     },
     "ci/test_shards/shard-6.txt": {
       "category": "rule_semantics",
@@ -549,9 +623,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Keep normal-path regressions, runtime/contract publication, bounded operator observations and current derived scheduling consistent with the shared Fall Back survivor-history repair.",
-      "source_obligation": "Ordinary accepted Desperate Escape may remove models before movement completion. Bind effective paths to the exact completed hazard packet, authenticated deaths and explicit survivor retry chain; retain every surviving full path and reject unrelated or missing authority. Original operator config, roster, seeds, paths and prefixes remain unchanged.",
-      "unchanged_work": "No solver, search budget, movement geometry, RNG, source weapon profile, adapter payload shape, cache policy or learning behavior changes. Separate declared canonical regression compositions exercise partial/complete casualties and retry without editing live health. One fresh covered observation supplies derived scheduling; matched reconstruction and current conformance remain separate from full-game and causal screening claims."
+      "rationale": "Qualify a separately versioned native full-roster prefix and repair its reproduced named-weapon-family admission failure through shared catalog-derived equipped-profile binding; preserve historical synthetic findings and rejected routes.",
+      "source_obligation": "The native Lord of Change is equipped with the Bolt of Change weapon family and both declared modes. Its source-backed Master of Magicks choice must discover that equipped family and apply its selected ability to those exact stable profile IDs, preserving exact-profile selectors, bearer restrictions and ordinary persistence/replay. The selected full v995 roster keeps reviewed datasheets, October points and provisional geometry provenance.",
+      "unchanged_work": "This is a bounded rule-semantics repair, with stable profile bindings in existing persisting-effect data and the same serializers and decision/replay routes. No solver, search, cache, geometry, RNG, budget, source weapon statistics or public choice payload changes. The new named fixture repeats the finite existing setup recipe while historical test source stays byte-identical. Fresh covered observation supplies only current derived scheduling; native route evidence does not certify tactical benefit, complete games or learning."
     },
     "ci/test_shards/shard-7.txt": {
       "category": "rule_semantics",
@@ -559,9 +633,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Keep normal-path regressions, runtime/contract publication, bounded operator observations and current derived scheduling consistent with the shared Fall Back survivor-history repair.",
-      "source_obligation": "Ordinary accepted Desperate Escape may remove models before movement completion. Bind effective paths to the exact completed hazard packet, authenticated deaths and explicit survivor retry chain; retain every surviving full path and reject unrelated or missing authority. Original operator config, roster, seeds, paths and prefixes remain unchanged.",
-      "unchanged_work": "No solver, search budget, movement geometry, RNG, source weapon profile, adapter payload shape, cache policy or learning behavior changes. Separate declared canonical regression compositions exercise partial/complete casualties and retry without editing live health. One fresh covered observation supplies derived scheduling; matched reconstruction and current conformance remain separate from full-game and causal screening claims."
+      "rationale": "Qualify a separately versioned native full-roster prefix and repair its reproduced named-weapon-family admission failure through shared catalog-derived equipped-profile binding; preserve historical synthetic findings and rejected routes.",
+      "source_obligation": "The native Lord of Change is equipped with the Bolt of Change weapon family and both declared modes. Its source-backed Master of Magicks choice must discover that equipped family and apply its selected ability to those exact stable profile IDs, preserving exact-profile selectors, bearer restrictions and ordinary persistence/replay. The selected full v995 roster keeps reviewed datasheets, October points and provisional geometry provenance.",
+      "unchanged_work": "This is a bounded rule-semantics repair, with stable profile bindings in existing persisting-effect data and the same serializers and decision/replay routes. No solver, search, cache, geometry, RNG, budget, source weapon statistics or public choice payload changes. The new named fixture repeats the finite existing setup recipe while historical test source stays byte-identical. Fresh covered observation supplies only current derived scheduling; native route evidence does not certify tactical benefit, complete games or learning."
     },
     "ci/test_shards/shard-8.txt": {
       "category": "rule_semantics",
@@ -569,9 +643,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Keep normal-path regressions, runtime/contract publication, bounded operator observations and current derived scheduling consistent with the shared Fall Back survivor-history repair.",
-      "source_obligation": "Ordinary accepted Desperate Escape may remove models before movement completion. Bind effective paths to the exact completed hazard packet, authenticated deaths and explicit survivor retry chain; retain every surviving full path and reject unrelated or missing authority. Original operator config, roster, seeds, paths and prefixes remain unchanged.",
-      "unchanged_work": "No solver, search budget, movement geometry, RNG, source weapon profile, adapter payload shape, cache policy or learning behavior changes. Separate declared canonical regression compositions exercise partial/complete casualties and retry without editing live health. One fresh covered observation supplies derived scheduling; matched reconstruction and current conformance remain separate from full-game and causal screening claims."
+      "rationale": "Qualify a separately versioned native full-roster prefix and repair its reproduced named-weapon-family admission failure through shared catalog-derived equipped-profile binding; preserve historical synthetic findings and rejected routes.",
+      "source_obligation": "The native Lord of Change is equipped with the Bolt of Change weapon family and both declared modes. Its source-backed Master of Magicks choice must discover that equipped family and apply its selected ability to those exact stable profile IDs, preserving exact-profile selectors, bearer restrictions and ordinary persistence/replay. The selected full v995 roster keeps reviewed datasheets, October points and provisional geometry provenance.",
+      "unchanged_work": "This is a bounded rule-semantics repair, with stable profile bindings in existing persisting-effect data and the same serializers and decision/replay routes. No solver, search, cache, geometry, RNG, budget, source weapon statistics or public choice payload changes. The new named fixture repeats the finite existing setup recipe while historical test source stays byte-identical. Fresh covered observation supplies only current derived scheduling; native route evidence does not certify tactical benefit, complete games or learning."
     },
     "ci/test_shards/shard-9.txt": {
       "category": "rule_semantics",
@@ -579,9 +653,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Keep normal-path regressions, runtime/contract publication, bounded operator observations and current derived scheduling consistent with the shared Fall Back survivor-history repair.",
-      "source_obligation": "Ordinary accepted Desperate Escape may remove models before movement completion. Bind effective paths to the exact completed hazard packet, authenticated deaths and explicit survivor retry chain; retain every surviving full path and reject unrelated or missing authority. Original operator config, roster, seeds, paths and prefixes remain unchanged.",
-      "unchanged_work": "No solver, search budget, movement geometry, RNG, source weapon profile, adapter payload shape, cache policy or learning behavior changes. Separate declared canonical regression compositions exercise partial/complete casualties and retry without editing live health. One fresh covered observation supplies derived scheduling; matched reconstruction and current conformance remain separate from full-game and causal screening claims."
+      "rationale": "Qualify a separately versioned native full-roster prefix and repair its reproduced named-weapon-family admission failure through shared catalog-derived equipped-profile binding; preserve historical synthetic findings and rejected routes.",
+      "source_obligation": "The native Lord of Change is equipped with the Bolt of Change weapon family and both declared modes. Its source-backed Master of Magicks choice must discover that equipped family and apply its selected ability to those exact stable profile IDs, preserving exact-profile selectors, bearer restrictions and ordinary persistence/replay. The selected full v995 roster keeps reviewed datasheets, October points and provisional geometry provenance.",
+      "unchanged_work": "This is a bounded rule-semantics repair, with stable profile bindings in existing persisting-effect data and the same serializers and decision/replay routes. No solver, search, cache, geometry, RNG, budget, source weapon statistics or public choice payload changes. The new named fixture repeats the finite existing setup recipe while historical test source stays byte-identical. Fresh covered observation supplies only current derived scheduling; native route evidence does not certify tactical benefit, complete games or learning."
     },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
@@ -589,9 +663,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Keep normal-path regressions, runtime/contract publication, bounded operator observations and current derived scheduling consistent with the shared Fall Back survivor-history repair.",
-      "source_obligation": "Ordinary accepted Desperate Escape may remove models before movement completion. Bind effective paths to the exact completed hazard packet, authenticated deaths and explicit survivor retry chain; retain every surviving full path and reject unrelated or missing authority. Original operator config, roster, seeds, paths and prefixes remain unchanged.",
-      "unchanged_work": "No solver, search budget, movement geometry, RNG, source weapon profile, adapter payload shape, cache policy or learning behavior changes. Separate declared canonical regression compositions exercise partial/complete casualties and retry without editing live health. One fresh covered observation supplies derived scheduling; matched reconstruction and current conformance remain separate from full-game and causal screening claims."
+      "rationale": "Qualify a separately versioned native full-roster prefix and repair its reproduced named-weapon-family admission failure through shared catalog-derived equipped-profile binding; preserve historical synthetic findings and rejected routes.",
+      "source_obligation": "The native Lord of Change is equipped with the Bolt of Change weapon family and both declared modes. Its source-backed Master of Magicks choice must discover that equipped family and apply its selected ability to those exact stable profile IDs, preserving exact-profile selectors, bearer restrictions and ordinary persistence/replay. The selected full v995 roster keeps reviewed datasheets, October points and provisional geometry provenance.",
+      "unchanged_work": "This is a bounded rule-semantics repair, with stable profile bindings in existing persisting-effect data and the same serializers and decision/replay routes. No solver, search, cache, geometry, RNG, budget, source weapon statistics or public choice payload changes. The new named fixture repeats the finite existing setup recipe while historical test source stays byte-identical. Fresh covered observation supplies only current derived scheduling; native route evidence does not certify tactical benefit, complete games or learning."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
@@ -599,9 +673,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Keep normal-path regressions, runtime/contract publication, bounded operator observations and current derived scheduling consistent with the shared Fall Back survivor-history repair.",
-      "source_obligation": "Ordinary accepted Desperate Escape may remove models before movement completion. Bind effective paths to the exact completed hazard packet, authenticated deaths and explicit survivor retry chain; retain every surviving full path and reject unrelated or missing authority. Original operator config, roster, seeds, paths and prefixes remain unchanged.",
-      "unchanged_work": "No solver, search budget, movement geometry, RNG, source weapon profile, adapter payload shape, cache policy or learning behavior changes. Separate declared canonical regression compositions exercise partial/complete casualties and retry without editing live health. One fresh covered observation supplies derived scheduling; matched reconstruction and current conformance remain separate from full-game and causal screening claims."
+      "rationale": "Qualify a separately versioned native full-roster prefix and repair its reproduced named-weapon-family admission failure through shared catalog-derived equipped-profile binding; preserve historical synthetic findings and rejected routes.",
+      "source_obligation": "The native Lord of Change is equipped with the Bolt of Change weapon family and both declared modes. Its source-backed Master of Magicks choice must discover that equipped family and apply its selected ability to those exact stable profile IDs, preserving exact-profile selectors, bearer restrictions and ordinary persistence/replay. The selected full v995 roster keeps reviewed datasheets, October points and provisional geometry provenance.",
+      "unchanged_work": "This is a bounded rule-semantics repair, with stable profile bindings in existing persisting-effect data and the same serializers and decision/replay routes. No solver, search, cache, geometry, RNG, budget, source weapon statistics or public choice payload changes. The new named fixture repeats the finite existing setup recipe while historical test source stays byte-identical. Fresh covered observation supplies only current derived scheduling; native route evidence does not certify tactical benefit, complete games or learning."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
@@ -609,9 +683,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Keep normal-path regressions, runtime/contract publication, bounded operator observations and current derived scheduling consistent with the shared Fall Back survivor-history repair.",
-      "source_obligation": "Ordinary accepted Desperate Escape may remove models before movement completion. Bind effective paths to the exact completed hazard packet, authenticated deaths and explicit survivor retry chain; retain every surviving full path and reject unrelated or missing authority. Original operator config, roster, seeds, paths and prefixes remain unchanged.",
-      "unchanged_work": "No solver, search budget, movement geometry, RNG, source weapon profile, adapter payload shape, cache policy or learning behavior changes. Separate declared canonical regression compositions exercise partial/complete casualties and retry without editing live health. One fresh covered observation supplies derived scheduling; matched reconstruction and current conformance remain separate from full-game and causal screening claims."
+      "rationale": "Qualify a separately versioned native full-roster prefix and repair its reproduced named-weapon-family admission failure through shared catalog-derived equipped-profile binding; preserve historical synthetic findings and rejected routes.",
+      "source_obligation": "The native Lord of Change is equipped with the Bolt of Change weapon family and both declared modes. Its source-backed Master of Magicks choice must discover that equipped family and apply its selected ability to those exact stable profile IDs, preserving exact-profile selectors, bearer restrictions and ordinary persistence/replay. The selected full v995 roster keeps reviewed datasheets, October points and provisional geometry provenance.",
+      "unchanged_work": "This is a bounded rule-semantics repair, with stable profile bindings in existing persisting-effect data and the same serializers and decision/replay routes. No solver, search, cache, geometry, RNG, budget, source weapon statistics or public choice payload changes. The new named fixture repeats the finite existing setup recipe while historical test source stays byte-identical. Fresh covered observation supplies only current derived scheduling; native route evidence does not certify tactical benefit, complete games or learning."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
@@ -619,9 +693,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Keep normal-path regressions, runtime/contract publication, bounded operator observations and current derived scheduling consistent with the shared Fall Back survivor-history repair.",
-      "source_obligation": "Ordinary accepted Desperate Escape may remove models before movement completion. Bind effective paths to the exact completed hazard packet, authenticated deaths and explicit survivor retry chain; retain every surviving full path and reject unrelated or missing authority. Original operator config, roster, seeds, paths and prefixes remain unchanged.",
-      "unchanged_work": "No solver, search budget, movement geometry, RNG, source weapon profile, adapter payload shape, cache policy or learning behavior changes. Separate declared canonical regression compositions exercise partial/complete casualties and retry without editing live health. One fresh covered observation supplies derived scheduling; matched reconstruction and current conformance remain separate from full-game and causal screening claims."
+      "rationale": "Qualify a separately versioned native full-roster prefix and repair its reproduced named-weapon-family admission failure through shared catalog-derived equipped-profile binding; preserve historical synthetic findings and rejected routes.",
+      "source_obligation": "The native Lord of Change is equipped with the Bolt of Change weapon family and both declared modes. Its source-backed Master of Magicks choice must discover that equipped family and apply its selected ability to those exact stable profile IDs, preserving exact-profile selectors, bearer restrictions and ordinary persistence/replay. The selected full v995 roster keeps reviewed datasheets, October points and provisional geometry provenance.",
+      "unchanged_work": "This is a bounded rule-semantics repair, with stable profile bindings in existing persisting-effect data and the same serializers and decision/replay routes. No solver, search, cache, geometry, RNG, budget, source weapon statistics or public choice payload changes. The new named fixture repeats the finite existing setup recipe while historical test source stays byte-identical. Fresh covered observation supplies only current derived scheduling; native route evidence does not certify tactical benefit, complete games or learning."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
@@ -629,9 +703,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Keep normal-path regressions, runtime/contract publication, bounded operator observations and current derived scheduling consistent with the shared Fall Back survivor-history repair.",
-      "source_obligation": "Ordinary accepted Desperate Escape may remove models before movement completion. Bind effective paths to the exact completed hazard packet, authenticated deaths and explicit survivor retry chain; retain every surviving full path and reject unrelated or missing authority. Original operator config, roster, seeds, paths and prefixes remain unchanged.",
-      "unchanged_work": "No solver, search budget, movement geometry, RNG, source weapon profile, adapter payload shape, cache policy or learning behavior changes. Separate declared canonical regression compositions exercise partial/complete casualties and retry without editing live health. One fresh covered observation supplies derived scheduling; matched reconstruction and current conformance remain separate from full-game and causal screening claims."
+      "rationale": "Qualify a separately versioned native full-roster prefix and repair its reproduced named-weapon-family admission failure through shared catalog-derived equipped-profile binding; preserve historical synthetic findings and rejected routes.",
+      "source_obligation": "The native Lord of Change is equipped with the Bolt of Change weapon family and both declared modes. Its source-backed Master of Magicks choice must discover that equipped family and apply its selected ability to those exact stable profile IDs, preserving exact-profile selectors, bearer restrictions and ordinary persistence/replay. The selected full v995 roster keeps reviewed datasheets, October points and provisional geometry provenance.",
+      "unchanged_work": "This is a bounded rule-semantics repair, with stable profile bindings in existing persisting-effect data and the same serializers and decision/replay routes. No solver, search, cache, geometry, RNG, budget, source weapon statistics or public choice payload changes. The new named fixture repeats the finite existing setup recipe while historical test source stays byte-identical. Fresh covered observation supplies only current derived scheduling; native route evidence does not certify tactical benefit, complete games or learning."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
@@ -639,9 +713,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Keep normal-path regressions, runtime/contract publication, bounded operator observations and current derived scheduling consistent with the shared Fall Back survivor-history repair.",
-      "source_obligation": "Ordinary accepted Desperate Escape may remove models before movement completion. Bind effective paths to the exact completed hazard packet, authenticated deaths and explicit survivor retry chain; retain every surviving full path and reject unrelated or missing authority. Original operator config, roster, seeds, paths and prefixes remain unchanged.",
-      "unchanged_work": "No solver, search budget, movement geometry, RNG, source weapon profile, adapter payload shape, cache policy or learning behavior changes. Separate declared canonical regression compositions exercise partial/complete casualties and retry without editing live health. One fresh covered observation supplies derived scheduling; matched reconstruction and current conformance remain separate from full-game and causal screening claims."
+      "rationale": "Qualify a separately versioned native full-roster prefix and repair its reproduced named-weapon-family admission failure through shared catalog-derived equipped-profile binding; preserve historical synthetic findings and rejected routes.",
+      "source_obligation": "The native Lord of Change is equipped with the Bolt of Change weapon family and both declared modes. Its source-backed Master of Magicks choice must discover that equipped family and apply its selected ability to those exact stable profile IDs, preserving exact-profile selectors, bearer restrictions and ordinary persistence/replay. The selected full v995 roster keeps reviewed datasheets, October points and provisional geometry provenance.",
+      "unchanged_work": "This is a bounded rule-semantics repair, with stable profile bindings in existing persisting-effect data and the same serializers and decision/replay routes. No solver, search, cache, geometry, RNG, budget, source weapon statistics or public choice payload changes. The new named fixture repeats the finite existing setup recipe while historical test source stays byte-identical. Fresh covered observation supplies only current derived scheduling; native route evidence does not certify tactical benefit, complete games or learning."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
@@ -649,9 +723,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Keep normal-path regressions, runtime/contract publication, bounded operator observations and current derived scheduling consistent with the shared Fall Back survivor-history repair.",
-      "source_obligation": "Ordinary accepted Desperate Escape may remove models before movement completion. Bind effective paths to the exact completed hazard packet, authenticated deaths and explicit survivor retry chain; retain every surviving full path and reject unrelated or missing authority. Original operator config, roster, seeds, paths and prefixes remain unchanged.",
-      "unchanged_work": "No solver, search budget, movement geometry, RNG, source weapon profile, adapter payload shape, cache policy or learning behavior changes. Separate declared canonical regression compositions exercise partial/complete casualties and retry without editing live health. One fresh covered observation supplies derived scheduling; matched reconstruction and current conformance remain separate from full-game and causal screening claims."
+      "rationale": "Qualify a separately versioned native full-roster prefix and repair its reproduced named-weapon-family admission failure through shared catalog-derived equipped-profile binding; preserve historical synthetic findings and rejected routes.",
+      "source_obligation": "The native Lord of Change is equipped with the Bolt of Change weapon family and both declared modes. Its source-backed Master of Magicks choice must discover that equipped family and apply its selected ability to those exact stable profile IDs, preserving exact-profile selectors, bearer restrictions and ordinary persistence/replay. The selected full v995 roster keeps reviewed datasheets, October points and provisional geometry provenance.",
+      "unchanged_work": "This is a bounded rule-semantics repair, with stable profile bindings in existing persisting-effect data and the same serializers and decision/replay routes. No solver, search, cache, geometry, RNG, budget, source weapon statistics or public choice payload changes. The new named fixture repeats the finite existing setup recipe while historical test source stays byte-identical. Fresh covered observation supplies only current derived scheduling; native route evidence does not certify tactical benefit, complete games or learning."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
@@ -659,9 +733,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Keep normal-path regressions, runtime/contract publication, bounded operator observations and current derived scheduling consistent with the shared Fall Back survivor-history repair.",
-      "source_obligation": "Ordinary accepted Desperate Escape may remove models before movement completion. Bind effective paths to the exact completed hazard packet, authenticated deaths and explicit survivor retry chain; retain every surviving full path and reject unrelated or missing authority. Original operator config, roster, seeds, paths and prefixes remain unchanged.",
-      "unchanged_work": "No solver, search budget, movement geometry, RNG, source weapon profile, adapter payload shape, cache policy or learning behavior changes. Separate declared canonical regression compositions exercise partial/complete casualties and retry without editing live health. One fresh covered observation supplies derived scheduling; matched reconstruction and current conformance remain separate from full-game and causal screening claims."
+      "rationale": "Qualify a separately versioned native full-roster prefix and repair its reproduced named-weapon-family admission failure through shared catalog-derived equipped-profile binding; preserve historical synthetic findings and rejected routes.",
+      "source_obligation": "The native Lord of Change is equipped with the Bolt of Change weapon family and both declared modes. Its source-backed Master of Magicks choice must discover that equipped family and apply its selected ability to those exact stable profile IDs, preserving exact-profile selectors, bearer restrictions and ordinary persistence/replay. The selected full v995 roster keeps reviewed datasheets, October points and provisional geometry provenance.",
+      "unchanged_work": "This is a bounded rule-semantics repair, with stable profile bindings in existing persisting-effect data and the same serializers and decision/replay routes. No solver, search, cache, geometry, RNG, budget, source weapon statistics or public choice payload changes. The new named fixture repeats the finite existing setup recipe while historical test source stays byte-identical. Fresh covered observation supplies only current derived scheduling; native route evidence does not certify tactical benefit, complete games or learning."
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
       "category": "rule_semantics",
@@ -669,41 +743,41 @@
         "ci78-prototype-evidence-0e09425e4315bf61bb6c4427fa7917fe62c2ed867dcb01798f9451a957182b0a"
       ],
       "selected_families": [],
-      "rationale": "Keep normal-path regressions, runtime/contract publication, bounded operator observations and current derived scheduling consistent with the shared Fall Back survivor-history repair.",
-      "source_obligation": "Ordinary accepted Desperate Escape may remove models before movement completion. Bind effective paths to the exact completed hazard packet, authenticated deaths and explicit survivor retry chain; retain every surviving full path and reject unrelated or missing authority. Original operator config, roster, seeds, paths and prefixes remain unchanged.",
-      "unchanged_work": "No solver, search budget, movement geometry, RNG, source weapon profile, adapter payload shape, cache policy or learning behavior changes. Separate declared canonical regression compositions exercise partial/complete casualties and retry without editing live health. One fresh covered observation supplies derived scheduling; matched reconstruction and current conformance remain separate from full-game and causal screening claims."
+      "rationale": "Qualify a separately versioned native full-roster prefix and repair its reproduced named-weapon-family admission failure through shared catalog-derived equipped-profile binding; preserve historical synthetic findings and rejected routes.",
+      "source_obligation": "The native Lord of Change is equipped with the Bolt of Change weapon family and both declared modes. Its source-backed Master of Magicks choice must discover that equipped family and apply its selected ability to those exact stable profile IDs, preserving exact-profile selectors, bearer restrictions and ordinary persistence/replay. The selected full v995 roster keeps reviewed datasheets, October points and provisional geometry provenance.",
+      "unchanged_work": "This is a bounded rule-semantics repair, with stable profile bindings in existing persisting-effect data and the same serializers and decision/replay routes. No solver, search, cache, geometry, RNG, budget, source weapon statistics or public choice payload changes. The new named fixture repeats the finite existing setup recipe while historical test source stays byte-identical. Fresh covered observation supplies only current derived scheduling; native route evidence does not certify tactical benefit, complete games or learning."
+    },
+    "docs/ADAPTER_DECISION_CONTRACT.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Qualify a separately versioned native full-roster prefix and repair its reproduced named-weapon-family admission failure through shared catalog-derived equipped-profile binding; preserve historical synthetic findings and rejected routes.",
+      "source_obligation": "The native Lord of Change is equipped with the Bolt of Change weapon family and both declared modes. Its source-backed Master of Magicks choice must discover that equipped family and apply its selected ability to those exact stable profile IDs, preserving exact-profile selectors, bearer restrictions and ordinary persistence/replay. The selected full v995 roster keeps reviewed datasheets, October points and provisional geometry provenance.",
+      "unchanged_work": "This is a bounded rule-semantics repair, with stable profile bindings in existing persisting-effect data and the same serializers and decision/replay routes. No solver, search, cache, geometry, RNG, budget, source weapon statistics or public choice payload changes. The new named fixture repeats the finite existing setup recipe while historical test source stays byte-identical. Fresh covered observation supplies only current derived scheduling; native route evidence does not certify tactical benefit, complete games or learning."
     },
     "docs/AI_POLICY_INTERFACE.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Keep normal-path regressions, runtime/contract publication, bounded operator observations and current derived scheduling consistent with the shared Fall Back survivor-history repair.",
-      "source_obligation": "Ordinary accepted Desperate Escape may remove models before movement completion. Bind effective paths to the exact completed hazard packet, authenticated deaths and explicit survivor retry chain; retain every surviving full path and reject unrelated or missing authority. Original operator config, roster, seeds, paths and prefixes remain unchanged.",
-      "unchanged_work": "No solver, search budget, movement geometry, RNG, source weapon profile, adapter payload shape, cache policy or learning behavior changes. Separate declared canonical regression compositions exercise partial/complete casualties and retry without editing live health. One fresh covered observation supplies derived scheduling; matched reconstruction and current conformance remain separate from full-game and causal screening claims."
+      "rationale": "Qualify a separately versioned native full-roster prefix and repair its reproduced named-weapon-family admission failure through shared catalog-derived equipped-profile binding; preserve historical synthetic findings and rejected routes.",
+      "source_obligation": "The native Lord of Change is equipped with the Bolt of Change weapon family and both declared modes. Its source-backed Master of Magicks choice must discover that equipped family and apply its selected ability to those exact stable profile IDs, preserving exact-profile selectors, bearer restrictions and ordinary persistence/replay. The selected full v995 roster keeps reviewed datasheets, October points and provisional geometry provenance.",
+      "unchanged_work": "This is a bounded rule-semantics repair, with stable profile bindings in existing persisting-effect data and the same serializers and decision/replay routes. No solver, search, cache, geometry, RNG, budget, source weapon statistics or public choice payload changes. The new named fixture repeats the finite existing setup recipe while historical test source stays byte-identical. Fresh covered observation supplies only current derived scheduling; native route evidence does not certify tactical benefit, complete games or learning."
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Keep normal-path regressions, runtime/contract publication, bounded operator observations and current derived scheduling consistent with the shared Fall Back survivor-history repair.",
-      "source_obligation": "Ordinary accepted Desperate Escape may remove models before movement completion. Bind effective paths to the exact completed hazard packet, authenticated deaths and explicit survivor retry chain; retain every surviving full path and reject unrelated or missing authority. Original operator config, roster, seeds, paths and prefixes remain unchanged.",
-      "unchanged_work": "No solver, search budget, movement geometry, RNG, source weapon profile, adapter payload shape, cache policy or learning behavior changes. Separate declared canonical regression compositions exercise partial/complete casualties and retry without editing live health. One fresh covered observation supplies derived scheduling; matched reconstruction and current conformance remain separate from full-game and causal screening claims."
-    },
-    "docs/performance/current/escape-survivor-history-20261113-reconstruction.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Keep normal-path regressions, runtime/contract publication, bounded operator observations and current derived scheduling consistent with the shared Fall Back survivor-history repair.",
-      "source_obligation": "Ordinary accepted Desperate Escape may remove models before movement completion. Bind effective paths to the exact completed hazard packet, authenticated deaths and explicit survivor retry chain; retain every surviving full path and reject unrelated or missing authority. Original operator config, roster, seeds, paths and prefixes remain unchanged.",
-      "unchanged_work": "No solver, search budget, movement geometry, RNG, source weapon profile, adapter payload shape, cache policy or learning behavior changes. Separate declared canonical regression compositions exercise partial/complete casualties and retry without editing live health. One fresh covered observation supplies derived scheduling; matched reconstruction and current conformance remain separate from full-game and causal screening claims."
+      "rationale": "Qualify a separately versioned native full-roster prefix and repair its reproduced named-weapon-family admission failure through shared catalog-derived equipped-profile binding; preserve historical synthetic findings and rejected routes.",
+      "source_obligation": "The native Lord of Change is equipped with the Bolt of Change weapon family and both declared modes. Its source-backed Master of Magicks choice must discover that equipped family and apply its selected ability to those exact stable profile IDs, preserving exact-profile selectors, bearer restrictions and ordinary persistence/replay. The selected full v995 roster keeps reviewed datasheets, October points and provisional geometry provenance.",
+      "unchanged_work": "This is a bounded rule-semantics repair, with stable profile bindings in existing persisting-effect data and the same serializers and decision/replay routes. No solver, search, cache, geometry, RNG, budget, source weapon statistics or public choice payload changes. The new named fixture repeats the finite existing setup recipe while historical test source stays byte-identical. Fresh covered observation supplies only current derived scheduling; native route evidence does not certify tactical benefit, complete games or learning."
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Keep normal-path regressions, runtime/contract publication, bounded operator observations and current derived scheduling consistent with the shared Fall Back survivor-history repair.",
-      "source_obligation": "Ordinary accepted Desperate Escape may remove models before movement completion. Bind effective paths to the exact completed hazard packet, authenticated deaths and explicit survivor retry chain; retain every surviving full path and reject unrelated or missing authority. Original operator config, roster, seeds, paths and prefixes remain unchanged.",
-      "unchanged_work": "No solver, search budget, movement geometry, RNG, source weapon profile, adapter payload shape, cache policy or learning behavior changes. Separate declared canonical regression compositions exercise partial/complete casualties and retry without editing live health. One fresh covered observation supplies derived scheduling; matched reconstruction and current conformance remain separate from full-game and causal screening claims."
+      "rationale": "Qualify a separately versioned native full-roster prefix and repair its reproduced named-weapon-family admission failure through shared catalog-derived equipped-profile binding; preserve historical synthetic findings and rejected routes.",
+      "source_obligation": "The native Lord of Change is equipped with the Bolt of Change weapon family and both declared modes. Its source-backed Master of Magicks choice must discover that equipped family and apply its selected ability to those exact stable profile IDs, preserving exact-profile selectors, bearer restrictions and ordinary persistence/replay. The selected full v995 roster keeps reviewed datasheets, October points and provisional geometry provenance.",
+      "unchanged_work": "This is a bounded rule-semantics repair, with stable profile bindings in existing persisting-effect data and the same serializers and decision/replay routes. No solver, search, cache, geometry, RNG, budget, source weapon statistics or public choice payload changes. The new named fixture repeats the finite existing setup recipe while historical test source stays byte-identical. Fresh covered observation supplies only current derived scheduling; native route evidence does not certify tactical benefit, complete games or learning."
     },
     "scripts/current_shard_assignment.py": {
       "category": "rule_semantics",
@@ -711,9 +785,9 @@
         "scoped-shard-allocation"
       ],
       "selected_families": [],
-      "rationale": "Keep normal-path regressions, runtime/contract publication, bounded operator observations and current derived scheduling consistent with the shared Fall Back survivor-history repair.",
-      "source_obligation": "Ordinary accepted Desperate Escape may remove models before movement completion. Bind effective paths to the exact completed hazard packet, authenticated deaths and explicit survivor retry chain; retain every surviving full path and reject unrelated or missing authority. Original operator config, roster, seeds, paths and prefixes remain unchanged.",
-      "unchanged_work": "No solver, search budget, movement geometry, RNG, source weapon profile, adapter payload shape, cache policy or learning behavior changes. Separate declared canonical regression compositions exercise partial/complete casualties and retry without editing live health. One fresh covered observation supplies derived scheduling; matched reconstruction and current conformance remain separate from full-game and causal screening claims."
+      "rationale": "Qualify a separately versioned native full-roster prefix and repair its reproduced named-weapon-family admission failure through shared catalog-derived equipped-profile binding; preserve historical synthetic findings and rejected routes.",
+      "source_obligation": "The native Lord of Change is equipped with the Bolt of Change weapon family and both declared modes. Its source-backed Master of Magicks choice must discover that equipped family and apply its selected ability to those exact stable profile IDs, preserving exact-profile selectors, bearer restrictions and ordinary persistence/replay. The selected full v995 roster keeps reviewed datasheets, October points and provisional geometry provenance.",
+      "unchanged_work": "This is a bounded rule-semantics repair, with stable profile bindings in existing persisting-effect data and the same serializers and decision/replay routes. No solver, search, cache, geometry, RNG, budget, source weapon statistics or public choice payload changes. The new named fixture repeats the finite existing setup recipe while historical test source stays byte-identical. Fresh covered observation supplies only current derived scheduling; native route evidence does not certify tactical benefit, complete games or learning."
     },
     "scripts/current_shard_compatibility.py": {
       "category": "rule_semantics",
@@ -721,9 +795,9 @@
         "scoped-shard-allocation"
       ],
       "selected_families": [],
-      "rationale": "Keep normal-path regressions, runtime/contract publication, bounded operator observations and current derived scheduling consistent with the shared Fall Back survivor-history repair.",
-      "source_obligation": "Ordinary accepted Desperate Escape may remove models before movement completion. Bind effective paths to the exact completed hazard packet, authenticated deaths and explicit survivor retry chain; retain every surviving full path and reject unrelated or missing authority. Original operator config, roster, seeds, paths and prefixes remain unchanged.",
-      "unchanged_work": "No solver, search budget, movement geometry, RNG, source weapon profile, adapter payload shape, cache policy or learning behavior changes. Separate declared canonical regression compositions exercise partial/complete casualties and retry without editing live health. One fresh covered observation supplies derived scheduling; matched reconstruction and current conformance remain separate from full-game and causal screening claims."
+      "rationale": "Qualify a separately versioned native full-roster prefix and repair its reproduced named-weapon-family admission failure through shared catalog-derived equipped-profile binding; preserve historical synthetic findings and rejected routes.",
+      "source_obligation": "The native Lord of Change is equipped with the Bolt of Change weapon family and both declared modes. Its source-backed Master of Magicks choice must discover that equipped family and apply its selected ability to those exact stable profile IDs, preserving exact-profile selectors, bearer restrictions and ordinary persistence/replay. The selected full v995 roster keeps reviewed datasheets, October points and provisional geometry provenance.",
+      "unchanged_work": "This is a bounded rule-semantics repair, with stable profile bindings in existing persisting-effect data and the same serializers and decision/replay routes. No solver, search, cache, geometry, RNG, budget, source weapon statistics or public choice payload changes. The new named fixture repeats the finite existing setup recipe while historical test source stays byte-identical. Fresh covered observation supplies only current derived scheduling; native route evidence does not certify tactical benefit, complete games or learning."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
@@ -734,21 +808,29 @@
         "source-record"
       ],
       "selected_families": [],
-      "rationale": "Keep normal-path regressions, runtime/contract publication, bounded operator observations and current derived scheduling consistent with the shared Fall Back survivor-history repair.",
-      "source_obligation": "Ordinary accepted Desperate Escape may remove models before movement completion. Bind effective paths to the exact completed hazard packet, authenticated deaths and explicit survivor retry chain; retain every surviving full path and reject unrelated or missing authority. Original operator config, roster, seeds, paths and prefixes remain unchanged.",
-      "unchanged_work": "No solver, search budget, movement geometry, RNG, source weapon profile, adapter payload shape, cache policy or learning behavior changes. Separate declared canonical regression compositions exercise partial/complete casualties and retry without editing live health. One fresh covered observation supplies derived scheduling; matched reconstruction and current conformance remain separate from full-game and causal screening claims."
+      "rationale": "Qualify a separately versioned native full-roster prefix and repair its reproduced named-weapon-family admission failure through shared catalog-derived equipped-profile binding; preserve historical synthetic findings and rejected routes.",
+      "source_obligation": "The native Lord of Change is equipped with the Bolt of Change weapon family and both declared modes. Its source-backed Master of Magicks choice must discover that equipped family and apply its selected ability to those exact stable profile IDs, preserving exact-profile selectors, bearer restrictions and ordinary persistence/replay. The selected full v995 roster keeps reviewed datasheets, October points and provisional geometry provenance.",
+      "unchanged_work": "This is a bounded rule-semantics repair, with stable profile bindings in existing persisting-effect data and the same serializers and decision/replay routes. No solver, search, cache, geometry, RNG, budget, source weapon statistics or public choice payload changes. The new named fixture repeats the finite existing setup recipe while historical test source stays byte-identical. Fresh covered observation supplies only current derived scheduling; native route evidence does not certify tactical benefit, complete games or learning."
     },
-    "src/warhammer40k_core/engine/movement_decision_authority.py": {
-      "category": "serialization_or_replay_work",
+    "src/warhammer40k_core/engine/catalog_named_weapon_profiles.py": {
+      "category": "rule_semantics",
       "operations": [
-        "desperate-escape-survivor-history"
+        "equipped-named-weapon-family-bindings"
       ],
-      "selected_families": [
-        "reconstruction"
+      "selected_families": [],
+      "rationale": "Qualify a separately versioned native full-roster prefix and repair its reproduced named-weapon-family admission failure through shared catalog-derived equipped-profile binding; preserve historical synthetic findings and rejected routes.",
+      "source_obligation": "The native Lord of Change is equipped with the Bolt of Change weapon family and both declared modes. Its source-backed Master of Magicks choice must discover that equipped family and apply its selected ability to those exact stable profile IDs, preserving exact-profile selectors, bearer restrictions and ordinary persistence/replay. The selected full v995 roster keeps reviewed datasheets, October points and provisional geometry provenance.",
+      "unchanged_work": "This is a bounded rule-semantics repair, with stable profile bindings in existing persisting-effect data and the same serializers and decision/replay routes. No solver, search, cache, geometry, RNG, budget, source weapon statistics or public choice payload changes. The new named fixture repeats the finite existing setup recipe while historical test source stays byte-identical. Fresh covered observation supplies only current derived scheduling; native route evidence does not certify tactical benefit, complete games or learning."
+    },
+    "src/warhammer40k_core/engine/catalog_rule_consumption.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "equipped-named-weapon-family-bindings"
       ],
-      "rationale": "Authenticate the accepted proposal and its actual surviving physical paths through the shared post-hazard completion/retry authority, preserving ordinary persistence and replay.",
-      "source_obligation": "Ordinary accepted Desperate Escape may remove models before movement completion. Bind effective paths to the exact completed hazard packet, authenticated deaths and explicit survivor retry chain; retain every surviving full path and reject unrelated or missing authority. Original operator config, roster, seeds, paths and prefixes remain unchanged.",
-      "unchanged_work": "No solver, search budget, movement geometry, RNG, source weapon profile, adapter payload shape, cache policy or learning behavior changes. Separate declared canonical regression compositions exercise partial/complete casualties and retry without editing live health. One fresh covered observation supplies derived scheduling; matched reconstruction and current conformance remain separate from full-game and causal screening claims."
+      "selected_families": [],
+      "rationale": "Qualify a separately versioned native full-roster prefix and repair its reproduced named-weapon-family admission failure through shared catalog-derived equipped-profile binding; preserve historical synthetic findings and rejected routes.",
+      "source_obligation": "The native Lord of Change is equipped with the Bolt of Change weapon family and both declared modes. Its source-backed Master of Magicks choice must discover that equipped family and apply its selected ability to those exact stable profile IDs, preserving exact-profile selectors, bearer restrictions and ordinary persistence/replay. The selected full v995 roster keeps reviewed datasheets, October points and provisional geometry provenance.",
+      "unchanged_work": "This is a bounded rule-semantics repair, with stable profile bindings in existing persisting-effect data and the same serializers and decision/replay routes. No solver, search, cache, geometry, RNG, budget, source weapon statistics or public choice payload changes. The new named fixture repeats the finite existing setup recipe while historical test source stays byte-identical. Fresh covered observation supplies only current derived scheduling; native route evidence does not certify tactical benefit, complete games or learning."
     },
     "tests/code_quality/test_current_shard_compatibility.py": {
       "category": "rule_semantics",
@@ -756,9 +838,19 @@
         "scoped-shard-allocation"
       ],
       "selected_families": [],
-      "rationale": "Keep normal-path regressions, runtime/contract publication, bounded operator observations and current derived scheduling consistent with the shared Fall Back survivor-history repair.",
-      "source_obligation": "Ordinary accepted Desperate Escape may remove models before movement completion. Bind effective paths to the exact completed hazard packet, authenticated deaths and explicit survivor retry chain; retain every surviving full path and reject unrelated or missing authority. Original operator config, roster, seeds, paths and prefixes remain unchanged.",
-      "unchanged_work": "No solver, search budget, movement geometry, RNG, source weapon profile, adapter payload shape, cache policy or learning behavior changes. Separate declared canonical regression compositions exercise partial/complete casualties and retry without editing live health. One fresh covered observation supplies derived scheduling; matched reconstruction and current conformance remain separate from full-game and causal screening claims."
+      "rationale": "Qualify a separately versioned native full-roster prefix and repair its reproduced named-weapon-family admission failure through shared catalog-derived equipped-profile binding; preserve historical synthetic findings and rejected routes.",
+      "source_obligation": "The native Lord of Change is equipped with the Bolt of Change weapon family and both declared modes. Its source-backed Master of Magicks choice must discover that equipped family and apply its selected ability to those exact stable profile IDs, preserving exact-profile selectors, bearer restrictions and ordinary persistence/replay. The selected full v995 roster keeps reviewed datasheets, October points and provisional geometry provenance.",
+      "unchanged_work": "This is a bounded rule-semantics repair, with stable profile bindings in existing persisting-effect data and the same serializers and decision/replay routes. No solver, search, cache, geometry, RNG, budget, source weapon statistics or public choice payload changes. The new named fixture repeats the finite existing setup recipe while historical test source stays byte-identical. Fresh covered observation supplies only current derived scheduling; native route evidence does not certify tactical benefit, complete games or learning."
+    },
+    "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "native-v995-prefix-regressions"
+      ],
+      "selected_families": [],
+      "rationale": "Qualify a separately versioned native full-roster prefix and repair its reproduced named-weapon-family admission failure through shared catalog-derived equipped-profile binding; preserve historical synthetic findings and rejected routes.",
+      "source_obligation": "The native Lord of Change is equipped with the Bolt of Change weapon family and both declared modes. Its source-backed Master of Magicks choice must discover that equipped family and apply its selected ability to those exact stable profile IDs, preserving exact-profile selectors, bearer restrictions and ordinary persistence/replay. The selected full v995 roster keeps reviewed datasheets, October points and provisional geometry provenance.",
+      "unchanged_work": "This is a bounded rule-semantics repair, with stable profile bindings in existing persisting-effect data and the same serializers and decision/replay routes. No solver, search, cache, geometry, RNG, budget, source weapon statistics or public choice payload changes. The new named fixture repeats the finite existing setup recipe while historical test source stays byte-identical. Fresh covered observation supplies only current derived scheduling; native route evidence does not certify tactical benefit, complete games or learning."
     },
     "tests/rules/section07/coverage.json": {
       "category": "rule_semantics",
@@ -766,24 +858,32 @@
         "qualification40-exact-b6886d3bc2fb1ca4"
       ],
       "selected_families": [],
-      "rationale": "Keep normal-path regressions, runtime/contract publication, bounded operator observations and current derived scheduling consistent with the shared Fall Back survivor-history repair.",
-      "source_obligation": "Ordinary accepted Desperate Escape may remove models before movement completion. Bind effective paths to the exact completed hazard packet, authenticated deaths and explicit survivor retry chain; retain every surviving full path and reject unrelated or missing authority. Original operator config, roster, seeds, paths and prefixes remain unchanged.",
-      "unchanged_work": "No solver, search budget, movement geometry, RNG, source weapon profile, adapter payload shape, cache policy or learning behavior changes. Separate declared canonical regression compositions exercise partial/complete casualties and retry without editing live health. One fresh covered observation supplies derived scheduling; matched reconstruction and current conformance remain separate from full-game and causal screening claims."
+      "rationale": "Qualify a separately versioned native full-roster prefix and repair its reproduced named-weapon-family admission failure through shared catalog-derived equipped-profile binding; preserve historical synthetic findings and rejected routes.",
+      "source_obligation": "The native Lord of Change is equipped with the Bolt of Change weapon family and both declared modes. Its source-backed Master of Magicks choice must discover that equipped family and apply its selected ability to those exact stable profile IDs, preserving exact-profile selectors, bearer restrictions and ordinary persistence/replay. The selected full v995 roster keeps reviewed datasheets, October points and provisional geometry provenance.",
+      "unchanged_work": "This is a bounded rule-semantics repair, with stable profile bindings in existing persisting-effect data and the same serializers and decision/replay routes. No solver, search, cache, geometry, RNG, budget, source weapon statistics or public choice payload changes. The new named fixture repeats the finite existing setup recipe while historical test source stays byte-identical. Fresh covered observation supplies only current derived scheduling; native route evidence does not certify tactical benefit, complete games or learning."
     },
-    "tests/rules/section09/test_escape_survivor_persistence.py": {
+    "tests/support/cavalcade_native_prefix.py": {
       "category": "rule_semantics",
       "operations": [
-        "desperate-escape-survivor-controls"
+        "native-v995-prefix-regressions"
       ],
       "selected_families": [],
-      "rationale": "Keep normal-path regressions, runtime/contract publication, bounded operator observations and current derived scheduling consistent with the shared Fall Back survivor-history repair.",
-      "source_obligation": "Ordinary accepted Desperate Escape may remove models before movement completion. Bind effective paths to the exact completed hazard packet, authenticated deaths and explicit survivor retry chain; retain every surviving full path and reject unrelated or missing authority. Original operator config, roster, seeds, paths and prefixes remain unchanged.",
-      "unchanged_work": "No solver, search budget, movement geometry, RNG, source weapon profile, adapter payload shape, cache policy or learning behavior changes. Separate declared canonical regression compositions exercise partial/complete casualties and retry without editing live health. One fresh covered observation supplies derived scheduling; matched reconstruction and current conformance remain separate from full-game and causal screening claims."
+      "rationale": "Qualify a separately versioned native full-roster prefix and repair its reproduced named-weapon-family admission failure through shared catalog-derived equipped-profile binding; preserve historical synthetic findings and rejected routes.",
+      "source_obligation": "The native Lord of Change is equipped with the Bolt of Change weapon family and both declared modes. Its source-backed Master of Magicks choice must discover that equipped family and apply its selected ability to those exact stable profile IDs, preserving exact-profile selectors, bearer restrictions and ordinary persistence/replay. The selected full v995 roster keeps reviewed datasheets, October points and provisional geometry provenance.",
+      "unchanged_work": "This is a bounded rule-semantics repair, with stable profile bindings in existing persisting-effect data and the same serializers and decision/replay routes. No solver, search, cache, geometry, RNG, budget, source weapon statistics or public choice payload changes. The new named fixture repeats the finite existing setup recipe while historical test source stays byte-identical. Fresh covered observation supplies only current derived scheduling; native route evidence does not certify tactical benefit, complete games or learning."
+    },
+    "tests/support/cavalcade_v995.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "native-v995-prefix-regressions"
+      ],
+      "selected_families": [],
+      "rationale": "Qualify a separately versioned native full-roster prefix and repair its reproduced named-weapon-family admission failure through shared catalog-derived equipped-profile binding; preserve historical synthetic findings and rejected routes.",
+      "source_obligation": "The native Lord of Change is equipped with the Bolt of Change weapon family and both declared modes. Its source-backed Master of Magicks choice must discover that equipped family and apply its selected ability to those exact stable profile IDs, preserving exact-profile selectors, bearer restrictions and ordinary persistence/replay. The selected full v995 roster keeps reviewed datasheets, October points and provisional geometry provenance.",
+      "unchanged_work": "This is a bounded rule-semantics repair, with stable profile bindings in existing persisting-effect data and the same serializers and decision/replay routes. No solver, search, cache, geometry, RNG, budget, source weapon statistics or public choice payload changes. The new named fixture repeats the finite existing setup recipe while historical test source stays byte-identical. Fresh covered observation supplies only current derived scheduling; native route evidence does not certify tactical benefit, complete games or learning."
     }
   },
   "milestone": "ordinary",
-  "comparisons": {
-    "reconstruction": "docs/performance/current/escape-survivor-history-20261113-reconstruction.json"
-  },
+  "comparisons": {},
   "full_game": null
 }
