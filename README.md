@@ -372,7 +372,7 @@ preflight retains its twelve-case partition. Two finite step5g modules add sourc
 partitions of 32 and 30 exact cases. The bounded mirror setup case is a separate
 selector; its file selector denotes the remaining cases. CI always deselects that
 node from parallel work and runs it once on its owning shard. All other files remain
-intact. The resulting 506 selectors select exactly 6,309 cases, including eighteen terrain-preparation/cache regressions and nine connected-endpoint controls. The required guards verify the exact selected inventory and partition.
+intact. The resulting 506 selectors select exactly 6,318 cases, including eighteen terrain-preparation/cache regressions and eighteen connected-endpoint/ordered-history controls. The required guards verify the exact selected inventory and partition.
 Verify that every selected file or declared case appears exactly once:
 
 ```bash
@@ -389,7 +389,7 @@ snapshot. Historical Python is never executed and historical receipts are unchan
 missing objects remain errors, including after squash merges and branch deletion.
 
 The current baseline must bind unchanged historical gameplay test sources, exactly
-the twenty-seven reviewed additions, current runtime and profile/file/case costs,
+the thirty-six reviewed additions, current runtime and profile/file/case costs,
 32 parallel workers plus the isolated one-worker mirror, 67% full-package branch
 coverage and an approved 1,620/1,800-second supervisor receipt. It is local evidence,
 not a hosted observation. Dispatch takes each retained case's maximum of its fresh
