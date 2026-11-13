@@ -3,13 +3,18 @@
 from __future__ import annotations
 
 from dataclasses import replace
+from typing import TYPE_CHECKING, cast
+
+if TYPE_CHECKING:
+    from warhammer40k_core.engine.decision_record import DecisionRecord
+    from warhammer40k_core.engine.event_log import EventRecord, JsonValue
 
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
     geometry_model_for_placement,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
-from warhammer40k_core.geometry.pathing import PathWitness
+from warhammer40k_core.geometry.pathing import PathWitness, PathWitnessPayload
 from warhammer40k_core.geometry.volume import Model
 
 
@@ -78,3 +83,39 @@ def sequential_peer_models(
         for model in sorted(friendly_models, key=lambda item: item.model_id)
         if model.model_id != moving_model_instance_id
     )
+
+
+def complete_movement_witness(
+    *,
+    event: EventRecord,
+    payload: dict[str, JsonValue],
+    resolution: dict[str, JsonValue],
+    decisions: tuple[DecisionRecord, ...],
+) -> PathWitness:
+    """Retain accepted global order, including attached and stationary members."""
+    recorded_witness = resolution.get("witness")
+    if event.event_type != "movement_activation_completed":
+        records = tuple(
+            record
+            for record in decisions
+            if record.request.request_id == payload["request_id"]
+            and record.result.result_id == payload["result_id"]
+        )
+        if len(records) != 1:
+            raise GameLifecycleError("Deemed contact movement decision is absent or duplicated.")
+        if event.event_type != "fight_movement_completed":
+            if not isinstance(records[0].result.payload, dict):
+                raise GameLifecycleError("Deemed contact reactive movement decision is absent.")
+            recorded_witness = records[0].result.payload.get("witness")
+        else:
+            from warhammer40k_core.engine.fight_resolution import (
+                fight_movement_proposal_from_payload,
+            )
+
+            proposal = fight_movement_proposal_from_payload(records[0].result.payload)
+            recorded_witness = (
+                None if proposal.witness is None else cast(JsonValue, proposal.witness.to_payload())
+            )
+    if not isinstance(recorded_witness, dict):
+        raise GameLifecycleError("Deemed contact actual path witness is absent.")
+    return PathWitness.from_payload(cast(PathWitnessPayload, recorded_witness))

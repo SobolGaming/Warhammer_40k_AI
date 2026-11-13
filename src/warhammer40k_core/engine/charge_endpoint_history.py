@@ -28,6 +28,10 @@ from warhammer40k_core.engine.primary_mission_boundary_physical_authority import
     PhysicalModelAuthority,
     physical_model_authority_before_event,
 )
+from warhammer40k_core.engine.sequential_movement import (
+    complete_movement_witness,
+    sequential_peer_models,
+)
 from warhammer40k_core.engine.take_to_the_skies import flight_selection
 from warhammer40k_core.geometry.base_contact_proof import endpoint_excluded_by_bodies
 from warhammer40k_core.geometry.connected_endpoint_proof import (
@@ -36,7 +40,6 @@ from warhammer40k_core.geometry.connected_endpoint_proof import (
 from warhammer40k_core.geometry.endpoint_support import endpoint_support_elevations
 from warhammer40k_core.geometry.movement_endpoint_proof import endpoint_excluded_by_terrain
 from warhammer40k_core.geometry.movement_reachability import MovementGoal
-from warhammer40k_core.geometry.pathing import PathWitness
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.geometry.volume import Model
 
@@ -98,7 +101,11 @@ def validate_charge_endpoint_history(
                 raise GameLifecycleError("Charge endpoint history requires complete paths.")
             model_id = displacement.model_instance_id
             paths.append((model_id, displacement.path_witness.poses_for_model(model_id)))
-        witness = PathWitness.for_paths(tuple(paths))
+        witness = complete_movement_witness(
+            event=event, payload=payload, resolution=payload, decisions=decision_records
+        )
+        if dict(witness.model_paths) != dict(paths):
+            raise GameLifecycleError("Charge historical submitted paths drifted.")
         rows = validate_charge_model_endpoint_inventory(
             value=endpoint.get("model_endpoints"),
             witness=witness,
@@ -168,6 +175,11 @@ def validate_charge_endpoint_history(
                 replace(geometry[model_id], pose=witness.final_pose_for_model(model_id))
                 for model_id in sorted(source_ids - {row.model_instance_id})
             )
+            occupied = sequential_peer_models(
+                friendly_models=tuple(geometry[model_id] for model_id in sorted(source_ids)),
+                witness=witness,
+                moving_model_instance_id=row.model_instance_id,
+            )
             if start.pose != witness.poses_for_model(row.model_instance_id)[0]:
                 raise GameLifecycleError("Charge historical path start drifted.")
             component_id = identities[row.model_instance_id][1].unit_instance_id
@@ -235,6 +247,9 @@ def validate_charge_endpoint_history(
                         peers=peers,
                         goal=goal,
                         horizontal_inches=policy.max_horizontal_inches,
+                        blockers=tuple(m for m in peers if m in occupied),
+                        terrain=tuple(v for f in features for v in f.terrain_volumes()),
+                        terrain_features=features,
                     )
                 )
                 if (

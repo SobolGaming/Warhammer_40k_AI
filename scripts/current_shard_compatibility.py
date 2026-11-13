@@ -77,7 +77,15 @@ NEW_NODES |= frozenset(
         "test_connected_endpoint_proof_relaxes_the_entire_goal_and_peer_graph[tangent]",
         "test_connected_endpoint_proof_relaxes_the_entire_goal_and_peer_graph[shape]",
         "test_connected_endpoint_proof_relaxes_the_entire_goal_and_peer_graph[body]",
-        "test_connected_endpoint_certificate_survives_charge_history_reconstruction",
+        "test_connected_endpoint_certificate_survives_charge_history_reconstruction[disjoint]",
+        "test_connected_endpoint_certificate_survives_charge_history_reconstruction[blocked]",
+        "test_connected_endpoint_overlap_requires_collision_and_support_proof[blocked]",
+        "test_connected_endpoint_overlap_requires_collision_and_support_proof[clear]",
+        "test_connected_endpoint_overlap_requires_collision_and_support_proof[raised]",
+        "test_connected_endpoint_overlap_requires_collision_and_support_proof[remote-support]",
+        "test_connected_endpoint_overlap_requires_collision_and_support_proof[tangent]",
+        "test_connected_endpoint_overlap_requires_collision_and_support_proof[shape]",
+        "test_connected_endpoint_overlap_requires_collision_and_support_proof[reachable]",
     )
 )
 
@@ -165,7 +173,7 @@ def _baseline(
     if (
         cases.keys() != history.baseline.keys() | NEW_NODES
         or not history.baseline.keys() < cases.keys()
-        or len(cases) - len(history.baseline) != 27
+        or len(cases) - len(history.baseline) != 35
         or set(additions) != {NEW_OWNER, CONNECTED_OWNER}
         or set(additions) & {node.split("::", 1)[0] for node in history.baseline}
     ):

@@ -22,7 +22,10 @@ from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.primary_mission_boundary_physical_authority import (
     physical_model_authority_before_event,
 )
-from warhammer40k_core.engine.sequential_movement import sequential_peer_models
+from warhammer40k_core.engine.sequential_movement import (
+    complete_movement_witness,
+    sequential_peer_models,
+)
 from warhammer40k_core.geometry.base_contact import (
     DeemedBaseContact,
     DeemedBaseContactPayload,
@@ -38,7 +41,6 @@ from warhammer40k_core.geometry.movement_query_payloads import (
 )
 from warhammer40k_core.geometry.pathing import (
     PathWitness,
-    PathWitnessPayload,
 )
 from warhammer40k_core.geometry.volume import Model
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th.core_base_contact_2026_09 import (
@@ -144,7 +146,7 @@ def validate_base_contact_history(
                 if raw.get("deemed_base_contacts"):
                     raise GameLifecycleError("Deemed contact requires an overhanging enemy.")
                 continue
-            complete_witness = _complete_movement_witness(
+            complete_witness = complete_movement_witness(
                 event=event, payload=payload, resolution=resolution, decisions=decisions
             )
             friendly_models = sequential_peer_models(
@@ -414,39 +416,3 @@ def validate_base_contact_history(
                 raise GameLifecycleError(
                     "Deemed contact witness inventory differs from the accepted move."
                 )
-
-
-def _complete_movement_witness(
-    *,
-    event: EventRecord,
-    payload: dict[str, JsonValue],
-    resolution: dict[str, JsonValue],
-    decisions: tuple[DecisionRecord, ...],
-) -> PathWitness:
-    """Retain accepted global order, including attached and stationary members."""
-    recorded_witness = resolution.get("witness")
-    if event.event_type != "movement_activation_completed":
-        records = tuple(
-            record
-            for record in decisions
-            if record.request.request_id == payload["request_id"]
-            and record.result.result_id == payload["result_id"]
-        )
-        if len(records) != 1:
-            raise GameLifecycleError("Deemed contact movement decision is absent or duplicated.")
-        if event.event_type != "fight_movement_completed":
-            if not isinstance(records[0].result.payload, dict):
-                raise GameLifecycleError("Deemed contact reactive movement decision is absent.")
-            recorded_witness = records[0].result.payload.get("witness")
-        else:
-            from warhammer40k_core.engine.fight_resolution import (
-                fight_movement_proposal_from_payload,
-            )
-
-            proposal = fight_movement_proposal_from_payload(records[0].result.payload)
-            recorded_witness = (
-                None if proposal.witness is None else cast(JsonValue, proposal.witness.to_payload())
-            )
-    if not isinstance(recorded_witness, dict):
-        raise GameLifecycleError("Deemed contact actual path witness is absent.")
-    return PathWitness.from_payload(cast(PathWitnessPayload, recorded_witness))

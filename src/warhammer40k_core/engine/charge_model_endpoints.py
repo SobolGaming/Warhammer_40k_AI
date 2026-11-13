@@ -222,6 +222,11 @@ def _reachability(
             peers=query.coherent_models,
             goal=query.goal,
             horizontal_inches=query.coherency_horizontal_inches,
+            blockers=tuple(
+                m for m in query.coherent_models if m in query.path_context.friendly_models
+            ),
+            terrain=query.terrain_context.terrain,
+            terrain_features=query.terrain_context.terrain_features,
         )
     ):
         result = MovementReachabilityResult(
