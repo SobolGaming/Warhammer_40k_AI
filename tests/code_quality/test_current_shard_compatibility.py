@@ -277,10 +277,11 @@ def test_ci_fetches_only_exact_declared_source_objects() -> None:
 
     anchors = revisions(DIRECTORY)
     assert anchors == tuple(sorted(set(anchors)))
-    assert len(anchors) == 38
-    from scripts.current_native_serial_role import PRODUCER
+    assert len(anchors) == 39
+    from scripts.current_native_serial_role import COMBINED_PRODUCER, PRODUCER
 
     assert PRODUCER in anchors
+    assert COMBINED_PRODUCER in anchors
     workflow = (ROOT / ".github/workflows/ci.yml").read_text()
     assert workflow.count("run: python3 -B scripts/fetch_scheduling_sources.py") == 4
 
@@ -457,7 +458,12 @@ def test_source_bootstrap_preserves_history_for_shared_historical_clones(tmp_pat
         "allocation-scope.json": {"source": source},
         "current-runtime-compatibility.json": {"historical_revision": current},
         "current-covered-baseline.json": {"source_head": current},
-        "current-native-serial-role.json": {"source_head": producer},
+        "current-native-serial-role.json": {
+            "observations": {
+                "standalone": {"source_head": producer},
+                "with_mirror": {"source_head": historical_tip},
+            }
+        },
     }.items():
         (directory / name).write_text(json.dumps(record))
     subprocess.run(
@@ -490,10 +496,17 @@ def test_native_serial_role_preserves_complete_phases_and_measurement_scope() ->
     )
     role = load_native_serial_role(ROOT, DIRECTORY, descriptor["native_serial_role"], nodes)
     assert role.seconds == 444.5446871509996
+    assert role.with_mirror_seconds == 389.046601379
     assert role.metadata["worker_count"] == 1
     assert len(cast(list[str], role.metadata["cases"])) == 6
-    assert role.seconds < cast(float, role.metadata["worker_elapsed_seconds"])
-    assert "not the measured global source" in str(role.metadata["source_applicability"])
+    observations = cast(dict[str, dict[str, object]], role.metadata["observations"])
+    assert role.seconds < cast(float, observations["standalone"]["worker_elapsed_seconds"])
+    assert "not the measured global source" in str(
+        observations["standalone"]["source_applicability"]
+    )
+    assert len(cast(list[str], observations["with_mirror"]["cases"])) == 7
+    assert observations["with_mirror"]["source_binding_count"] == 391
+    assert observations["standalone"]["source_binding_count"] == 365
     assert "not hosted observations" in str(role.metadata["role"])
     assert (
         hashlib.sha256((DIRECTORY / compatibility.BASELINE_FILE).read_bytes()).hexdigest()
@@ -523,7 +536,8 @@ def test_native_serial_role_rejects_incomplete_or_different_observation(
 ) -> None:
     from scripts.current_native_serial_role import FILENAME, load_native_serial_role
 
-    record = json.loads((DIRECTORY / FILENAME).read_bytes())
+    document = json.loads((DIRECTORY / FILENAME).read_bytes())
+    record = document["observations"]["standalone"]
     if change == "raw_hash":
         record["raw"]["worker"]["sha256"] = "0" * 64
     elif change == "producer":
@@ -569,7 +583,7 @@ def test_native_serial_role_rejects_incomplete_or_different_observation(
                 json.dumps(controller).encode()
             ).hexdigest()
     path = tmp_path / FILENAME
-    path.write_text(json.dumps(record))
+    path.write_text(json.dumps(document))
     reference = {"file": FILENAME, "sha256": hashlib.sha256(path.read_bytes()).hexdigest()}
     nodes = frozenset(
         node
@@ -588,9 +602,14 @@ def test_native_serial_score_uses_complete_role_once_without_old_case_duplicatio
     cohort = Cohort("historical", {old: 3.0, mirror: 11.0}, {}, {}, 2.0, 9.0)
     assert (
         compatibility.derived_score(
-            ("tests/fake.py", mirror, native), costs, costs, cohort, native_serial_seconds=17.0
+            ("tests/fake.py", mirror, native),
+            costs,
+            costs,
+            cohort,
+            native_serial_seconds=17.0,
+            native_with_mirror_seconds=13.0,
         )
-        == 40.0
+        == 36.0
     )
     with pytest.raises(SystemExit, match="complete role observation"):
         compatibility.derived_score((mirror, native), costs, costs, cohort)
@@ -616,6 +635,14 @@ def test_current_execution_summary_discloses_native_serial_accounting(
         sharding.SERIAL_BEHAVIORAL_CASE,
         *cast(list[str], native["cases"]),
     }
+    selected = (
+        "with_mirror"
+        if sharding.SERIAL_BEHAVIORAL_CASE
+        in next(group for group in plan.groups if compatibility.NATIVE_PREFIX_OWNER in group)
+        else "standalone"
+    )
+    assert execution["native_selected_context"] == selected
+    assert execution["native_selected_phase_seconds"] == native[selected + "_native_phase_seconds"]
     assert "assignment_wall_lower_bound_seconds" not in execution
     assert "assignment_wall_planning_estimate_seconds" in execution
     assert "not a physical lower bound" in str(execution["estimate_role"])
@@ -638,11 +665,136 @@ def test_native_serial_only_lane_charges_the_larger_existing_role_residual(
     ) == 3.0 + 17.0 + max(parallel_residual, mirror_residual)
     assert (
         compatibility.derived_score(
-            ("tests/fake.py", mirror, native), costs, costs, cohort, native_serial_seconds=17.0
+            ("tests/fake.py", mirror, native),
+            costs,
+            costs,
+            cohort,
+            native_serial_seconds=17.0,
+            native_with_mirror_seconds=13.0,
         )
-        == 3.0 + 11.0 + 17.0 + mirror_residual
+        == 3.0 + 11.0 + 13.0 + mirror_residual
     )
     assert (
         compatibility.derived_score(("tests/fake.py",), costs, costs, cohort)
         == 3.0 + parallel_residual
     )
+
+
+@pytest.mark.parametrize("combined_seconds", [13.0, 23.0])
+def test_native_serial_context_selects_observed_combined_even_when_slower(
+    combined_seconds: float,
+) -> None:
+    mirror, native = sharding.SERIAL_BEHAVIORAL_CASE, compatibility.NATIVE_PREFIX_OWNER
+    costs = {mirror: 11.0, native + "::one": 100.0}
+    cohort = Cohort("historical", {mirror: 11.0}, {}, {}, 2.0, 9.0)
+    assert (
+        compatibility.derived_score(
+            (mirror, native),
+            costs,
+            costs,
+            cohort,
+            native_serial_seconds=17.0,
+            native_with_mirror_seconds=combined_seconds,
+        )
+        == 11.0 + combined_seconds + 9.0
+    )
+    assert (
+        compatibility.derived_score(
+            (native,),
+            costs,
+            costs,
+            cohort,
+            native_serial_seconds=17.0,
+            native_with_mirror_seconds=combined_seconds,
+        )
+        == 17.0 + 9.0
+    )
+    with pytest.raises(SystemExit, match="this context"):
+        compatibility.derived_score(
+            (mirror, native), costs, costs, cohort, native_serial_seconds=17.0
+        )
+    with pytest.raises(SystemExit, match="this context"):
+        compatibility.derived_score(
+            (native,), costs, costs, cohort, native_with_mirror_seconds=combined_seconds
+        )
+
+
+@pytest.mark.parametrize(
+    "change",
+    [
+        "missing_context",
+        "duplicate_producer",
+        "wrong_order",
+        "missing_phase",
+        "failed_phase",
+        "legacy_binding",
+        "import_binding",
+        "full_map",
+        "admission",
+        "progress",
+    ],
+)
+def test_native_serial_combined_context_rejects_wrong_or_incomplete_evidence(
+    tmp_path: Path, change: str
+) -> None:
+    from scripts.current_native_serial_role import FILENAME, PRODUCER, load_native_serial_role
+
+    document = json.loads((DIRECTORY / FILENAME).read_bytes())
+    record = document["observations"]["with_mirror"]
+    if change == "missing_context":
+        del document["observations"]["with_mirror"]
+    elif change == "duplicate_producer":
+        record["source_head"] = PRODUCER
+    elif change in {"legacy_binding", "import_binding"}:
+        name = (
+            "tests/factions/chaos_daemons/integration/test_cavalcade_v995_roster.py"
+            if change == "legacy_binding"
+            else "tests/support/faction_batch01.py"
+        )
+        record["source_files"][name] = "0" * 64
+    else:
+        name = {
+            "full_map": "source_preflight",
+            "admission": "admission",
+            "progress": "progress",
+        }.get(change, "worker")
+        raw = (
+            record["raw"][name]
+            if name == "worker"
+            else document["source_evidence"]["with_mirror"][name]
+        )
+        if change == "progress":
+            events = [json.loads(line) for line in raw["text"].splitlines()]
+            events = [event for event in events if event.get("event") != "session_finish"]
+            raw["text"] = "\n".join(json.dumps(event) for event in events) + "\n"
+        else:
+            value = json.loads(raw["text"])
+            if change == "wrong_order":
+                value["collected_nodeids"].reverse()
+            elif change == "missing_phase":
+                value["reports"].pop()
+            elif change == "failed_phase":
+                value["reports"][0]["outcome"] = "failed"
+            elif change == "full_map":
+                value["inputs"].pop(next(iter(value["inputs"])))
+            else:
+                value["case_order"].reverse()
+            raw["text"] = json.dumps(value)
+            if change in {"missing_phase", "failed_phase"}:
+                controller = json.loads(record["raw"]["controller"]["text"])
+                controller["reports"] = value["reports"]
+                record["raw"]["controller"]["text"] = json.dumps(controller)
+                record["raw"]["controller"]["sha256"] = hashlib.sha256(
+                    json.dumps(controller).encode()
+                ).hexdigest()
+        raw["sha256"] = hashlib.sha256(raw["text"].encode()).hexdigest()
+    path = tmp_path / FILENAME
+    path.write_text(json.dumps(document))
+    reference = {"file": FILENAME, "sha256": hashlib.sha256(path.read_bytes()).hexdigest()}
+    nodes = frozenset(
+        node
+        for node in compatibility.NEW_NODES
+        if node.startswith(compatibility.NATIVE_PREFIX_OWNER + "::")
+    )
+    with pytest.raises(SystemExit):
+        load_native_serial_role(ROOT, tmp_path, reference, nodes)

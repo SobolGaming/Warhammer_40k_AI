@@ -11,7 +11,7 @@
   "historical_revision": "008be8a8cb0b50b232fe022452762b3906489b49",
   "native_serial_role": {
     "file": "current-native-serial-role.json",
-    "sha256": "a59dbda60a3b695ebb159b973799b2782ad48a00c7f861289e67f8ed3543e2fa"
+    "sha256": "98166b84dcd84b9aedef84ff8280f35c96aebe698d70aa9989354d7b1e4c5bfc"
   },
   "new_test_sources": {
     "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py": "26467cfb68d1e4464c5f926a1278bd67433f5ac99699ebdc9666deb7ab1255ed",

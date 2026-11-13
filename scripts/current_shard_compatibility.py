@@ -250,12 +250,11 @@ def derived_score(
     *,
     unknown: str | None = None,
     native_serial_seconds: float | None = None,
+    native_with_mirror_seconds: float | None = None,
 ) -> float:
     from scripts.build_test_shards import SERIAL_BEHAVIORAL_CASE
 
     native = NATIVE_PREFIX_OWNER in group
-    if native and native_serial_seconds is None:
-        raise SystemExit("Native serial scheduling requires its complete role observation.")
     chunks = worker_chunks(tuple(name for name in group if name != NATIVE_PREFIX_OWNER), dispatch)
     additions = current.keys() - historical.cases.keys()
 
@@ -277,7 +276,12 @@ def derived_score(
     mirror = SERIAL_BEHAVIORAL_CASE in group
     serial = cost(SERIAL_BEHAVIORAL_CASE) if mirror else 0.0
     if native:
-        serial += _seconds(native_serial_seconds)
+        selected_seconds = native_with_mirror_seconds if mirror else native_serial_seconds
+        if selected_seconds is None:
+            raise SystemExit(
+                "Native serial scheduling requires its complete role observation for this context."
+            )
+        serial += _seconds(selected_seconds)
     if mirror and SERIAL_BEHAVIORAL_CASE in historical.groups:
         serial += historical.setup[historical.groups[SERIAL_BEHAVIORAL_CASE]]
     residual = historical.mirror_residual if mirror else historical.parallel_residual
@@ -343,7 +347,12 @@ def plan(root: Path, directory: Path, cases: dict[str, float]) -> Plan:
             return (
                 *tuple(
                     derived_score(
-                        group, dispatch, current, cohort, native_serial_seconds=native_role.seconds
+                        group,
+                        dispatch,
+                        current,
+                        cohort,
+                        native_serial_seconds=native_role.seconds,
+                        native_with_mirror_seconds=native_role.with_mirror_seconds,
                     )
                     for cohort in history.cohorts[:-1]
                 ),
@@ -354,6 +363,7 @@ def plan(root: Path, directory: Path, cases: dict[str, float]) -> Plan:
                     extension.stress,
                     unknown=extension.unknown_node,
                     native_serial_seconds=native_role.seconds,
+                    native_with_mirror_seconds=native_role.with_mirror_seconds,
                 ),
                 derived_score(
                     group,
@@ -361,6 +371,7 @@ def plan(root: Path, directory: Path, cases: dict[str, float]) -> Plan:
                     current,
                     history.cohorts[-1],
                     native_serial_seconds=native_role.seconds,
+                    native_with_mirror_seconds=native_role.with_mirror_seconds,
                 ),
             )
 
@@ -463,14 +474,18 @@ def derive_summary(
     )
     execution = cast(dict[str, object], payload["execution_model"])
     native = cast(dict[str, object], result.metadata["native_serial_role"])
-    native_seconds = cast(float, native["complete_phase_seconds"])
     serial_case = sharding.SERIAL_BEHAVIORAL_CASE
+    native_group = next(group for group in result.groups if NATIVE_PREFIX_OWNER in group)
+    native_context = "with_mirror" if serial_case in native_group else "standalone"
+    native_seconds = cast(float, native[native_context + "_native_phase_seconds"])
     selector_costs = cast(dict[str, float], payload["planning_selector_seconds"])
     peaks = sharding._selector_case_peaks(selector_costs, result.dispatch)
     serial_costs = {serial_case: result.dispatch[serial_case], NATIVE_PREFIX_OWNER: native_seconds}
     execution["serial_cases"] = [serial_case, *cast(list[str], native["cases"])]
     execution["serial_selectors"] = [serial_case, NATIVE_PREFIX_OWNER]
     execution["native_serial_role"] = native
+    execution["native_selected_context"] = native_context
+    execution["native_selected_phase_seconds"] = native_seconds
     execution["shard_worker_seconds"] = {
         str(index): round(
             math.fsum(

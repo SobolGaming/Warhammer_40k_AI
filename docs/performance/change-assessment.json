@@ -6,31 +6,31 @@
   "changes": {
     "ci/test_shards/current-native-serial-role.json": {
       "before_sha256": null,
-      "after_sha256": "a59dbda60a3b695ebb159b973799b2782ad48a00c7f861289e67f8ed3543e2fa",
+      "after_sha256": "98166b84dcd84b9aedef84ff8280f35c96aebe698d70aa9989354d7b1e4c5bfc",
       "owners": {
         "@document": {
           "before": null,
-          "after": "a59dbda60a3b695ebb159b973799b2782ad48a00c7f861289e67f8ed3543e2fa"
+          "after": "98166b84dcd84b9aedef84ff8280f35c96aebe698d70aa9989354d7b1e4c5bfc"
         }
       }
     },
     "ci/test_shards/current-runtime-compatibility.json": {
       "before_sha256": "718f182da6761aed678fff4df700b4a1d688319e29aa230f3cb4012525c5e925",
-      "after_sha256": "4f0a8aaada6d99c1641840ef21640338cc5c37818681998ddedab21d1103a089",
+      "after_sha256": "522d0d1b3a989fde452945e23f33caf3cdb1730b4957c65ecc13b5c66454cb10",
       "owners": {
         "@document": {
           "before": "718f182da6761aed678fff4df700b4a1d688319e29aa230f3cb4012525c5e925",
-          "after": "4f0a8aaada6d99c1641840ef21640338cc5c37818681998ddedab21d1103a089"
+          "after": "522d0d1b3a989fde452945e23f33caf3cdb1730b4957c65ecc13b5c66454cb10"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "before_sha256": "f3067266c4c6fc61007087599419ac12a7c627ec262fc75e10c6c5f9311952a0",
-      "after_sha256": "b403e2f15676ab2062385a6f61ee4ead3490d1bf61d3f04bb401a188450e0d29",
+      "after_sha256": "d0ec48bad0b79d776ec37ccd1d9e915b4f95fefb024591ead7562dbef319e2e0",
       "owners": {
         "@document": {
           "before": "f3067266c4c6fc61007087599419ac12a7c627ec262fc75e10c6c5f9311952a0",
-          "after": "b403e2f15676ab2062385a6f61ee4ead3490d1bf61d3f04bb401a188450e0d29"
+          "after": "d0ec48bad0b79d776ec37ccd1d9e915b4f95fefb024591ead7562dbef319e2e0"
         }
       }
     },
@@ -46,19 +46,27 @@
     },
     "scripts/current_native_serial_role.py": {
       "before_sha256": null,
-      "after_sha256": "9f3df1fb7c3573b50ea1f9254530070cfee04d82605b047cfab3047420338c06",
+      "after_sha256": "68a0fec55989f49b2e84d62fa59ade4eb4c577c8c9965cf4d7459baf6441d8ab",
       "owners": {
         "@module": {
           "before": null,
-          "after": "aeb018d71bf577a56a87f64c8eb657473190c99c88851959dc0631ebafb6bfd0"
+          "after": "71ffb9ea62c2a71f5e079379aac3b236b46bf7c54f5c06ad2aab68d33ed7bec2"
         },
         "NativeSerialRole": {
           "before": null,
-          "after": "57617a2cb176aa97d5617192bcd40716389605dedd47f19dea4d445b4ade1c2d"
+          "after": "99ca9e82a57a3f93a01e53640692c431cd2415c710368bfdcc47db803ac9a664"
+        },
+        "_observation": {
+          "before": null,
+          "after": "659eb5dfac7fcf1eba72b3d64108a697e90d1c247993a176ad13563cf2e009db"
+        },
+        "_source_evidence": {
+          "before": null,
+          "after": "a4f1477fb635326dd89eb73523858aece9612a2624f8e8c4c78a195f15d13fe0"
         },
         "load_native_serial_role": {
           "before": null,
-          "after": "4fc647863621b0829535adf87403836fe1665ff60ab0cf9ca879ad7765463260"
+          "after": "2bee03479e2583b510281442a4747b0da9a2f4970501a04f365c0e0427d4310e"
         },
         "source_paths": {
           "before": null,
@@ -68,29 +76,29 @@
     },
     "scripts/current_shard_compatibility.py": {
       "before_sha256": "5523a9b101b91c22b22b3e5c4b4df668e031c5d52566e6eec33c2741a117f390",
-      "after_sha256": "6fb38192e654cfc0030935dd2645f1e4108c9590e42ed03c18e65e452a23d10c",
+      "after_sha256": "b38ae5887fa1dc8d49753e0100b27c3903b78ea6a72044dfb4e38e3e34978699",
       "owners": {
         "derive_summary": {
           "before": "105c0b7554537cd4cc15d58ab528f628b5afce562b0139af28aa1ccfbb143042",
-          "after": "b0375938b7cd961ae41f5bdee74bd9021a99f3d9107537f0db1a93cc61533e94"
+          "after": "5154caac319160f37043377d92b2ba63d6cdd062e4772ea1d7a091c0c424583f"
         },
         "derived_score": {
           "before": "ff255c1024131a15e945b92cf04b3fbf63e23125b46bc7e00752d4794411d205",
-          "after": "9e6bad7bb986fd8ac4fee7a33a7bef33f719040fe6cfa04378abd1f2450beef0"
+          "after": "63a7a3e29c414a0b02b64943a7685fe5e4f75589a0c723ee557763fbc84c16c9"
         },
         "plan": {
           "before": "cb8a2f377214fe5bcb40b0b4d6cef73feaa3320160df43689f30a4aacc2829ab",
-          "after": "f2cbd5b2b69129dee801492a885193b3b3865d1eee51e9bc9cebd30ab284f632"
+          "after": "d31bac5702e9c116206b82f4f013e2a31070d0f00a4aaecec571d576488b499d"
         }
       }
     },
     "scripts/fetch_scheduling_sources.py": {
       "before_sha256": "a51182604f10e2edaeff2439f7c69fe8a9b9dc07847a80fa7a1eb7d3178fab47",
-      "after_sha256": "37d8a50b81b0b026fc742473e7ca1ca24c8659657d72dffb5b08ac6b8371b9cd",
+      "after_sha256": "b3204f7bbd2113287d0d5259f50807b13ed76e7519a1171163ab97a09adaf4a4",
       "owners": {
         "revisions": {
           "before": "8b4969504e1db26e3749205cd71cbba2f7abe9e549d4e8bcc548cf548c818daf",
-          "after": "550415b68a34b0d04fdafdee64eaa5ca4946ebda9aa2b1e902ca4f65f11da44e"
+          "after": "0714c5b2c3dafe23aa104c8801de5e7b5c866d81d859ae1d0c039e3bfc96b869"
         }
       }
     },
@@ -120,7 +128,7 @@
     },
     "tests/code_quality/test_current_shard_compatibility.py": {
       "before_sha256": "23493bb4629a2b0b4ae090b4c0be940618c1c25f0da01c07bf1674015eeb8a19",
-      "after_sha256": "77411f851f4ef43f973c5d87b5c0fdefcd7de2500d99ee9d783bea9dd2d0c888",
+      "after_sha256": "6cac046fc0a99c336bef2b477d5c5ccb21c5813b4dac43b03481828b11549b99",
       "owners": {
         "@module": {
           "before": "54576b3787ce5513a436c73b118735a75494e932c9c2065df13f4ba6712ec3b7",
@@ -128,31 +136,39 @@
         },
         "test_ci_fetches_only_exact_declared_source_objects": {
           "before": "3334ef60e3118caa8f89240e89f1ecb285af4d77b9fb46218ed816f1b286ba12",
-          "after": "04099f0d09653308a93cd530c8ac64408f050bbbe297d8a1d4fb1440c2c383a2"
+          "after": "8412f7d5487bae3842c0304cd21d65e7cce004bad3653afa8021d09d3dfcfd31"
         },
         "test_current_execution_summary_discloses_native_serial_accounting": {
           "before": null,
-          "after": "8e1fa5c13338c7ce196f2c066e6df4b43bb27f7c1b514f62b534791bf6ce6e29"
+          "after": "0341bc4671ce8bd83d5d9246700c70eaa7de694b3699848a4cdc7a246d67ba80"
+        },
+        "test_native_serial_combined_context_rejects_wrong_or_incomplete_evidence": {
+          "before": null,
+          "after": "7622f5bb013513aeb55dafde4e025436ad88ac57b0f5a74f0cae5eddcacac35f"
+        },
+        "test_native_serial_context_selects_observed_combined_even_when_slower": {
+          "before": null,
+          "after": "cbf7c3b11c0bb6178031092ff851c7bc6289b15d213a688b020673b6484e450f"
         },
         "test_native_serial_only_lane_charges_the_larger_existing_role_residual": {
           "before": null,
-          "after": "872281f72045de69a2f8a86cca861282cf808de42d4d0c48bfd2829cd3ba13a3"
+          "after": "9d8993ceb6b0043d7f93ca5ccad1c1377172237249107757c2a60fd111e05c00"
         },
         "test_native_serial_role_preserves_complete_phases_and_measurement_scope": {
           "before": null,
-          "after": "75fe37ba164aee511e0b20ce2d694bfff87bd9b37f5e853227b553d4b5f0b0b3"
+          "after": "d9aebc07e78ef5aff4bf2f1a4737fb342fefddfc98aa16a20638619b5c196a99"
         },
         "test_native_serial_role_rejects_incomplete_or_different_observation": {
           "before": null,
-          "after": "24c735312d0e4725d21135ee74043569aa37982bb8a7604b1b641bf61e2099b8"
+          "after": "a669e1ebbaef596b4f3ca7dc53e85edd0c46807b2f4092cdeda4bf6ef423a1ec"
         },
         "test_native_serial_score_uses_complete_role_once_without_old_case_duplication": {
           "before": null,
-          "after": "e7944468559e20d0233c75714810ebd2bedee4900aaa49d28da403ea57c07ecd"
+          "after": "46b90ab36b00b4ea9f0443136595f7729f3f3a9d1b13fdf2bf6baadade203360"
         },
         "test_source_bootstrap_preserves_history_for_shared_historical_clones": {
           "before": "87cc0ed931631c44abcfede292107f4ee1ece01e747231303e2d7003bed1ddeb",
-          "after": "799e8589047e06f2d8f0773ecd8b3b8878d95d53d2012391d3662275e4582ec6"
+          "after": "e6d7c1094613956b62d876dbd19eee66c500f45f3c42f75bd925c2aa5d9938f8"
         }
       }
     }
