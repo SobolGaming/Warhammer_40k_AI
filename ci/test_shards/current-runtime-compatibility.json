@@ -9,6 +9,10 @@
   },
   "current_runtime_fingerprint": "8d7e3355d9db2c9477ba63b752dc1dfa054b5c00583ea467e3fbbc0e21d5638d",
   "historical_revision": "008be8a8cb0b50b232fe022452762b3906489b49",
+  "native_serial_role": {
+    "file": "current-native-serial-role.json",
+    "sha256": "a59dbda60a3b695ebb159b973799b2782ad48a00c7f861289e67f8ed3543e2fa"
+  },
   "new_test_sources": {
     "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py": "26467cfb68d1e4464c5f926a1278bd67433f5ac99699ebdc9666deb7ab1255ed",
     "tests/rules/section03/test_terrain_path_preparation.py": "869ce37ba5d43d7a1c5558c94fceaf33eb81bfff62c2e5f13019551f2c071438",

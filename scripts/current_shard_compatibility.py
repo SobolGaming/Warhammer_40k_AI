@@ -249,10 +249,14 @@ def derived_score(
     historical: Cohort,
     *,
     unknown: str | None = None,
+    native_serial_seconds: float | None = None,
 ) -> float:
     from scripts.build_test_shards import SERIAL_BEHAVIORAL_CASE
 
-    chunks = worker_chunks(group, dispatch)
+    native = NATIVE_PREFIX_OWNER in group
+    if native and native_serial_seconds is None:
+        raise SystemExit("Native serial scheduling requires its complete role observation.")
+    chunks = worker_chunks(tuple(name for name in group if name != NATIVE_PREFIX_OWNER), dispatch)
     additions = current.keys() - historical.cases.keys()
 
     def cost(node: str) -> float:
@@ -272,13 +276,14 @@ def derived_score(
     ]
     mirror = SERIAL_BEHAVIORAL_CASE in group
     serial = cost(SERIAL_BEHAVIORAL_CASE) if mirror else 0.0
+    if native:
+        serial += _seconds(native_serial_seconds)
     if mirror and SERIAL_BEHAVIORAL_CASE in historical.groups:
         serial += historical.setup[historical.groups[SERIAL_BEHAVIORAL_CASE]]
-    return (
-        max(workers)
-        + serial
-        + (historical.mirror_residual if mirror else historical.parallel_residual)
-    )
+    residual = historical.mirror_residual if mirror else historical.parallel_residual
+    if native and not mirror:
+        residual = max(historical.parallel_residual, historical.mirror_residual)
+    return max(workers) + serial + residual
 
 
 @dataclass(frozen=True)
@@ -302,6 +307,7 @@ def plan(root: Path, directory: Path, cases: dict[str, float]) -> Plan:
             "baseline",
             "new_test_sources",
             "assignment",
+            "native_serial_role",
         },
         "runtime compatibility",
     )
@@ -314,6 +320,14 @@ def plan(root: Path, directory: Path, cases: dict[str, float]) -> Plan:
             raise SystemExit(
                 "Current scheduling baseline differs from the complete covered evidence."
             )
+        from scripts.current_native_serial_role import load_native_serial_role
+
+        native_role = load_native_serial_role(
+            root,
+            directory,
+            descriptor["native_serial_role"],
+            frozenset(node for node in NEW_NODES if node.startswith(NATIVE_PREFIX_OWNER + "::")),
+        )
         current = {node: _seconds(value) for node, value in cases.items()}
         old_dispatch = calibrated_seconds(
             read_json(history.directory / "hosted-calibration.json"),
@@ -328,13 +342,26 @@ def plan(root: Path, directory: Path, cases: dict[str, float]) -> Plan:
         def scores(group: tuple[str, ...]) -> tuple[float, ...]:
             return (
                 *tuple(
-                    derived_score(group, dispatch, current, cohort)
+                    derived_score(
+                        group, dispatch, current, cohort, native_serial_seconds=native_role.seconds
+                    )
                     for cohort in history.cohorts[:-1]
                 ),
                 derived_score(
-                    group, dispatch, current, extension.stress, unknown=extension.unknown_node
+                    group,
+                    dispatch,
+                    current,
+                    extension.stress,
+                    unknown=extension.unknown_node,
+                    native_serial_seconds=native_role.seconds,
                 ),
-                derived_score(group, dispatch, current, history.cohorts[-1]),
+                derived_score(
+                    group,
+                    dispatch,
+                    current,
+                    history.cohorts[-1],
+                    native_serial_seconds=native_role.seconds,
+                ),
             )
 
         from scripts.current_shard_assignment import load_assignment, require_planning_limits
@@ -360,6 +387,15 @@ def plan(root: Path, directory: Path, cases: dict[str, float]) -> Plan:
             "historical_revision": HISTORICAL_REVISION,
             "current_runtime_fingerprint": descriptor["current_runtime_fingerprint"],
             "baseline": descriptor["baseline"],
+            "native_serial_role": native_role.metadata,
+            "derived_score_role": (
+                "Historical cohort projection plus unchanged current additions and separately "
+                "measured local native serial role; not observed hosted execution"
+            ),
+            "partial_raw_role": (
+                "Retained historical worker-chunk projection; not the current native "
+                "serial controller topology"
+            ),
             "assignment": descriptor["assignment"],
             "retained_selector_moves": assignment["retained_selector_moves"],
             "new_selector_placement": assignment["new_selector_placement"],
@@ -424,6 +460,42 @@ def derive_summary(
     payload["strategy"] = "reviewed-current-assignment-with-authenticated-historical-projection-v1"
     cast(dict[str, object], payload["execution_model"])["cold_shard_assignment"] = (
         "preserved-cold1-mirror2-pinned4-fixed5"
+    )
+    execution = cast(dict[str, object], payload["execution_model"])
+    native = cast(dict[str, object], result.metadata["native_serial_role"])
+    native_seconds = cast(float, native["complete_phase_seconds"])
+    serial_case = sharding.SERIAL_BEHAVIORAL_CASE
+    selector_costs = cast(dict[str, float], payload["planning_selector_seconds"])
+    peaks = sharding._selector_case_peaks(selector_costs, result.dispatch)
+    serial_costs = {serial_case: result.dispatch[serial_case], NATIVE_PREFIX_OWNER: native_seconds}
+    execution["serial_cases"] = [serial_case, *cast(list[str], native["cases"])]
+    execution["serial_selectors"] = [serial_case, NATIVE_PREFIX_OWNER]
+    execution["native_serial_role"] = native
+    execution["shard_worker_seconds"] = {
+        str(index): round(
+            math.fsum(
+                4 * serial_costs[name] if name in serial_costs else selector_costs[name]
+                for name in group
+            ),
+            3,
+        )
+        for index, group in enumerate(result.groups, 1)
+    }
+    del execution["assignment_wall_lower_bound_seconds"]
+    execution["assignment_wall_planning_estimate_seconds"] = {
+        str(index): round(
+            math.fsum(serial_costs[name] for name in group if name in serial_costs)
+            + max(
+                math.fsum(selector_costs[name] for name in group if name not in serial_costs) / 4,
+                max((peaks[name] for name in group if name not in serial_costs), default=0.0),
+            ),
+            3,
+        )
+        for index, group in enumerate(result.groups, 1)
+    }
+    execution["estimate_role"] = (
+        "Hybrid scheduling estimate, not a physical lower bound, hosted observation "
+        "or timing qualification"
     )
     payload["runtime_compatibility"] = result.metadata
     return payload, result

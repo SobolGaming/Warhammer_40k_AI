@@ -17,9 +17,12 @@ def revisions(directory: Path) -> tuple[str, ...]:
     scope = json.loads((directory / "allocation-scope.json").read_bytes())
     descriptor = json.loads((directory / "current-runtime-compatibility.json").read_bytes())
     baseline = json.loads((directory / "current-covered-baseline.json").read_bytes())
+    native = json.loads((directory / "current-native-serial-role.json").read_bytes())
     sources = [row["source"] for row in calibration["reports"]] + [scope["source"]]
     values = {source[key] for source in sources for key in ("pr_head", "checkout")}
-    values.update((descriptor["historical_revision"], baseline["source_head"]))
+    values.update(
+        (descriptor["historical_revision"], baseline["source_head"], native["source_head"])
+    )
     if any(
         not isinstance(value, str) or re.fullmatch("[0-9a-f]{40}", value) is None
         for value in values
