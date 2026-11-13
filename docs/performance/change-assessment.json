@@ -276,11 +276,11 @@
     },
     "docs/performance/current/escape-survivor-history-20261113-reconstruction.json": {
       "before_sha256": null,
-      "after_sha256": "61d11c9e1deab3d4b206782f79e29ffecb0fd135dd812817fa842b98c2e174d6",
+      "after_sha256": "7ba32e4a3c259e42ddaed5d8a58d9499d73d3947afd52afdfc63c45bc47050b7",
       "owners": {
         "@document": {
           "before": null,
-          "after": "61d11c9e1deab3d4b206782f79e29ffecb0fd135dd812817fa842b98c2e174d6"
+          "after": "7ba32e4a3c259e42ddaed5d8a58d9499d73d3947afd52afdfc63c45bc47050b7"
         }
       }
     },
@@ -356,7 +356,7 @@
     },
     "tests/code_quality/test_current_shard_compatibility.py": {
       "before_sha256": "d1630ef7723a007074ca223dd316ac969fde816629ec22eb73c8bccbd225f287",
-      "after_sha256": "4f7c5c28e1358e7f1f40f1a46d3472fe517593bc976fa849d02d736be0add821",
+      "after_sha256": "d98e873a565e5484e3b99118615939414f8353ba7723f52b666edc0a075d43f7",
       "owners": {
         "test_compatibility_boundary_rejects_stale_or_forged_inputs": {
           "before": "5cf4b8a8c13a2757ea12c7c5a04d6df877cd31645d30668ee7a169cbf1fa8dbf",
@@ -364,7 +364,7 @@
         },
         "test_current_dispatch_has_exact_inventory_and_disclosed_selector_moves": {
           "before": "e11a8f6f02eea2ea32b6285849f57d6bb8cee5f93b61747889f7c09f0d358a10",
-          "after": "50994e1431fc0c6f8ce0094cbf5a43c8e7078543841fd5a5acf1f0c06acbdfd9"
+          "after": "c28bbb376c74880b9470516ca785c9aa4c8331fd9595503164f743d75b2b17c4"
         }
       }
     },
