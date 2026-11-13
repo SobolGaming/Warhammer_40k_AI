@@ -59,6 +59,7 @@ def validate_charge_contact_permissions(
             event_index=event_index,
             payload=payload,
             ruleset_descriptor=ruleset,
+            configured_ruleset_descriptor_hash=state.ruleset_descriptor_hash,
         )
         roll = authority.charge_roll_result
     else:

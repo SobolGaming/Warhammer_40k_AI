@@ -43,8 +43,8 @@ def test_current_dispatch_has_exact_inventory_and_disclosed_selector_moves(
     summary, plan = admitted
     cases = sharding.summary_case_seconds(summary)
     additions = cases.keys() - historical.baseline.keys()
-    assert len(cases) == 6318
-    assert len(additions) == 36
+    assert len(cases) == 6319
+    assert len(additions) == 37
     assert plan.dispatch.keys() == cases.keys()
     assert all(plan.dispatch[node] >= cases[node] for node in historical.baseline)
     assert all(plan.dispatch[node] == cases[node] for node in additions)
@@ -191,7 +191,7 @@ def test_compatibility_boundary_rejects_stale_or_forged_inputs(
         if change in {"node", "new_node"}
         else sharding.summary_case_seconds(summary)
     )
-    with pytest.raises(SystemExit, match="twenty-seven" if change == "new_node" else None):
+    with pytest.raises(SystemExit, match="thirty-seven" if change == "new_node" else None):
         compatibility.plan(ROOT, tmp_path, costs)
 
 

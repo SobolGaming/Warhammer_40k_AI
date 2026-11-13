@@ -193,4 +193,5 @@ def validate_physical_transition_decision_authority(
             event_index=event_index,
             payload=event.payload,
             ruleset_descriptor=state.runtime_ruleset_descriptor(),
+            configured_ruleset_descriptor_hash=state.ruleset_descriptor_hash,
         )

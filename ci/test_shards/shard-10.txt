@@ -4,7 +4,6 @@ tests/infrastructure/adapters/test_canonical_coverage_preflight.py::test_coverag
 tests/infrastructure/adapters/test_deployment_experiment.py
 tests/infrastructure/missions/unit/test_boundary_checkpoint_redaction.py
 tests/infrastructure/missions/unit/test_step5e_operation_marker_conditions.py
-tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_layout_a_scores_through_lifecycle_views_and_replay[player-a-take-and-hold-vs-reconnaissance-layout-1]
 tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_layout_a_scores_through_lifecycle_views_and_replay[player-b-purge-the-foe-vs-reconnaissance-layout-1]
 tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_layout_a_scores_through_lifecycle_views_and_replay[player-b-take-and-hold-vs-reconnaissance-layout-1]
 tests/infrastructure/missions/unit/test_step5g_pairing_certification_layout_b.py::test_phase17n_step5g_layout_b_scores_through_lifecycle_views_and_replay[player-b-reconnaissance-vs-reconnaissance-layout-2]
@@ -17,7 +16,6 @@ tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_re
 tests/rules/rules24/unit/test_facade_evidence.py
 tests/rules/section00/test_inventory.py
 tests/rules/section01/test_01_02_cargo_return.py
-tests/rules/section01/test_01_04_contact_movement.py
 tests/rules/section02/test_02_02_04_healing.py
 tests/rules/section03/test_cleanup.py
 tests/rules/section03/test_coherency.py

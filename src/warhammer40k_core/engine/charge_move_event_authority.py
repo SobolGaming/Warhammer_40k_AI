@@ -144,6 +144,7 @@ def validate_charge_move_completed_event_authority(
     event_index: int,
     payload: dict[str, JsonValue],
     ruleset_descriptor: RulesetDescriptor,
+    configured_ruleset_descriptor_hash: str,
 ) -> ChargeMoveCompletedEventAuthority:
     """Authenticate a charge completion against its exact decision and path chain."""
     if type(event_index) is not int or not 0 <= event_index < len(event_records):
@@ -235,6 +236,7 @@ def validate_charge_move_completed_event_authority(
         proposal_request=proposal_request,
         witness=witness,
         ruleset_descriptor=ruleset_descriptor,
+        configured_ruleset_descriptor_hash=configured_ruleset_descriptor_hash,
     )
     from warhammer40k_core.engine.interrupted_charge import charge_turn_owner_at_event
 
@@ -562,6 +564,7 @@ def _validate_transition_and_result_payload(
     proposal_request: MovementProposalRequest,
     witness: PathWitness,
     ruleset_descriptor: RulesetDescriptor,
+    configured_ruleset_descriptor_hash: str,
 ) -> BattlefieldTransitionBatch:
     raw_transition = _object(payload.get("transition_batch"), "transition batch")
     transition = BattlefieldTransitionBatch.from_payload(
@@ -658,6 +661,7 @@ def _validate_transition_and_result_payload(
         witness=witness,
         maximum_distance=maximum_distance,
         ruleset_descriptor=ruleset_descriptor,
+        configured_ruleset_descriptor_hash=configured_ruleset_descriptor_hash,
     )
     return transition
 
@@ -670,6 +674,7 @@ def _validate_result_summary(
     witness: PathWitness,
     maximum_distance: float,
     ruleset_descriptor: RulesetDescriptor,
+    configured_ruleset_descriptor_hash: str,
 ) -> None:
     selected = ChargeTargetSelection.from_payload(
         (proposal_request.context or {}).get("target_selection")
@@ -683,12 +688,15 @@ def _validate_result_summary(
         != list(proposal.charge_target_unit_instance_ids)
     ):
         raise GameLifecycleError("Charge move-completed result summary drifted.")
+    # Live resolution records the configured descriptor identity. Reconstructed
+    # mission policy can have identical rules but a different descriptor version;
+    # the state/config consistency owner authenticates the configured hash.
     raw_coherency = _object(payload.get("coherency_result"), "coherency result")
     coherency = UnitCoherencyResult.from_payload(cast(UnitCoherencyResultPayload, raw_coherency))
     if (
         coherency.to_payload() != raw_coherency
         or not coherency.is_coherent
-        or coherency.ruleset_descriptor_hash != ruleset_descriptor.descriptor_hash
+        or coherency.ruleset_descriptor_hash != configured_ruleset_descriptor_hash
         or coherency.unit_instance_id != proposal.unit_instance_id
         or tuple(sorted(coherency.model_instance_ids)) != witness.model_ids()
     ):

@@ -949,6 +949,7 @@ def validate_unit_move_completed_battle_shock_request_authority(
         event_index=trigger_index,
         payload=trigger_payload,
         ruleset_descriptor=state.runtime_ruleset_descriptor(),
+        configured_ruleset_descriptor_hash=state.ruleset_descriptor_hash,
     )
     triggering_unit_id = _required_identifier(
         trigger_payload.get("unit_instance_id"),

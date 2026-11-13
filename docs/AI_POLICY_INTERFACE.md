@@ -2066,9 +2066,60 @@ search budgets retain their existing authority. A constructed legal attached-uni
 charge and independently decoded state/events/decisions exercise that proof owner;
 this clause-level fixture does not qualify full roster/session persistence.
 
-The authenticated saved context admits four such exclusions: both preferred and
-engagement queries for models 002 and 003. Model 001's and model 004's preferred
-queries remain unresolved, while the prior reachable alternative remains subject
-to complete path/terrain/endpoint checks. These per-query certificates do not
-establish a legal complete Charge Move, tactical benefit, Stage 2 completion,
+The authenticated saved context admits four such disjoint-component exclusions:
+both preferred and engagement queries for models 002 and 003. The subsequent
+occupied-region extension also excludes model 004's preferred endpoint, using
+only peers already occupying that region at the current physical path boundary
+and relaxed support bounds. Historical admission reconstructs the same physical
+boundary from complete paths. Model 001's preferred query remains unresolved;
+its reachable engagement alternative alone is not a complete unit witness.
+These per-query certificates do not qualify tactical benefit, Stage 2 completion,
 learning admission or full-game performance.
+
+## Constructive whole-unit Charge witness
+
+A fresh bounded diagnosis on post-PR675 main preserves the exact saved model-001
+preferred query and its `unresolved` result after 20 explored nodes. The search
+generates 105 goals; full-path attempts fail through occupied endpoints,
+battlefield bounds or terrain. Exhausting that graph does not establish
+impossibility. The original corrected witness and its historical failed or
+censored evaluations retain their outcomes.
+
+A separate constructive witness starts from the identical 63-record pending
+checkpoint, with the same natural nine-inch roll, seed, terrain, geometry and
+physical order 005, 004, 003, 002, 001. It advances the leading four models to
+(2.4, 31.0), (2.4, 29.5), (2.4, 27.8) and (2.4, 26.2), then moves model 001 to
+(1.0, 24.9), all at ground level. Full paths include the lateral approach
+waypoints; these coordinates are not an endpoint-only admission. Every path is
+within the original nine-inch budget. Ordinary resolution re-evaluates all ten
+obligations in this changed peer context: every model satisfies both preferred
+distance and engagement, and all five path checks, five terrain checks and
+whole-unit coherency pass. No prior exclusion or alternative is carried over as
+the answer to a changed context. No solver, search limit or rules answer changes.
+
+Ordinary submission accepts the charge and emits its completion event at 64
+decisions and 658 events. The engine automatically opens the first Fight pile-in
+request; it is left pending, with no Fight decision submitted. The first
+save/load check exposed a normal persistence failure: live coherency records the
+configured named ruleset identity, while historical admission compared it with
+the mission-derived descriptor's different version/hash despite identical
+policies. The shared Charge completion authority now receives the configured
+hash from state, which lifecycle admission binds to configuration. Physical
+transition, Charge contact and Charge-triggered Battle-shock history use that
+same owner; reconstructed policies still govern the rule checks. A regression
+submits a legal charge through `LocalGameSession` under a named descriptor,
+round-trips JSON persistence, reproduces replay and rejects a substituted
+coherency hash. It preserves reversed physical order and complete paths.
+The retained, unedited operator checkpoint now also restores exactly and its
+ordinary replay reproduces all 64 decisions and 658 events, with the same final
+event-log hash and no diagnostics. All ten endpoint obligations remain satisfied;
+the first Fight request remains untouched.
+
+This is bounded operator evidence through the existing movement-proposal
+contract, not a policy candidate generator or a training admission. The accepted
+Charge Move establishes movement and engagement feasibility only; Fight,
+damage, sacrifice/E benefit, a matched tactical horizon, Stage 2 completion,
+learning and full-game throughput remain unqualified. Existing source, roster,
+provisional geometry, mission/layout, points and public-seed limits remain;
+`useful_reference_status` stays `scoped_gap`, `reference_target` stays null and
+`eligible_for_learning` stays false.

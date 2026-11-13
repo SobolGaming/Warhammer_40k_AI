@@ -1,446 +1,402 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "988b9e7c5eca5f8c9c7bc19255f11aef69de4f3b",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:841b1cbac64d3f0f6474b5f94aecd7c2bf8fb041c84c532e579dce20ad0557ae",
-  "operation_map_sha256": "99636456edb8d0b8ec413b25f15eadba383417266eb71ca1adc14e0cf9c81fa7",
+  "base": "8afefe1d92b84c2192c4df92ef07ba7847c2e0bb",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:cb5eb39b0778a1be7c89c167357007d3b3263147ff73741cd69b26a96d5dc8a6",
+  "operation_map_sha256": "38f7ba067fef46da27116e194f735c56c533ac45fb4ccc5348ac483f699a552d",
   "changes": {
     "README.md": {
-      "before_sha256": "3593bda19e9b5611b89a7be84c7cb9d78eeecd1ad6bea9ac53413b72664f8719",
-      "after_sha256": "c9ff117ba119c152b5d37f70c2ad815e0c49013b8cb8e35a398c953aaa29b064",
+      "before_sha256": "c9ff117ba119c152b5d37f70c2ad815e0c49013b8cb8e35a398c953aaa29b064",
+      "after_sha256": "a32436a13eb10b65f525d4d5d19847fdff0696fd9e69dc587dcf35cd678f56fb",
       "owners": {
         "@document": {
-          "before": "3593bda19e9b5611b89a7be84c7cb9d78eeecd1ad6bea9ac53413b72664f8719",
-          "after": "c9ff117ba119c152b5d37f70c2ad815e0c49013b8cb8e35a398c953aaa29b064"
+          "before": "c9ff117ba119c152b5d37f70c2ad815e0c49013b8cb8e35a398c953aaa29b064",
+          "after": "a32436a13eb10b65f525d4d5d19847fdff0696fd9e69dc587dcf35cd678f56fb"
         }
       }
     },
     "ci/test_shards/current-covered-baseline.json": {
-      "before_sha256": "c77c28be4387e22a4b75bb55643e1177a37d54efd33ef9f03ed2f2c59bfc37f8",
-      "after_sha256": "8446ec96f65048e3b658fd5b8b017e4b613888461e6002780db6b300de0b60e7",
+      "before_sha256": "8446ec96f65048e3b658fd5b8b017e4b613888461e6002780db6b300de0b60e7",
+      "after_sha256": "e5c889d3268c11a3efdd440d90df47f16c4ecd11be35e732cf461faca0c08832",
       "owners": {
         "@document": {
-          "before": "c77c28be4387e22a4b75bb55643e1177a37d54efd33ef9f03ed2f2c59bfc37f8",
-          "after": "8446ec96f65048e3b658fd5b8b017e4b613888461e6002780db6b300de0b60e7"
+          "before": "8446ec96f65048e3b658fd5b8b017e4b613888461e6002780db6b300de0b60e7",
+          "after": "e5c889d3268c11a3efdd440d90df47f16c4ecd11be35e732cf461faca0c08832"
         }
       }
     },
     "ci/test_shards/current-derived-assignment.json": {
-      "before_sha256": "106ee9c14f8c647a78eab060373a588e1f8dfbc3eb567ced1643b981a072aede",
-      "after_sha256": "e8225578b13d9be839766e93801097c81454a7ff2de2a80d3545383db36e4df3",
+      "before_sha256": "e8225578b13d9be839766e93801097c81454a7ff2de2a80d3545383db36e4df3",
+      "after_sha256": "dccbe41f284e9be880a319a94f71110c0fde440c7ec0f574e9b22030d6de8708",
       "owners": {
         "@document": {
-          "before": "106ee9c14f8c647a78eab060373a588e1f8dfbc3eb567ced1643b981a072aede",
-          "after": "e8225578b13d9be839766e93801097c81454a7ff2de2a80d3545383db36e4df3"
+          "before": "e8225578b13d9be839766e93801097c81454a7ff2de2a80d3545383db36e4df3",
+          "after": "dccbe41f284e9be880a319a94f71110c0fde440c7ec0f574e9b22030d6de8708"
         }
       }
     },
     "ci/test_shards/current-runtime-compatibility.json": {
-      "before_sha256": "53dbf93591d4195f5e6290eb7f55932549274a696462ce3ec490601c8879427e",
-      "after_sha256": "691970e708d633b1c68d4d0509973cfe8cd1bb42b58e4f14006313ba424a2ab1",
+      "before_sha256": "691970e708d633b1c68d4d0509973cfe8cd1bb42b58e4f14006313ba424a2ab1",
+      "after_sha256": "dd3e789ee8c22644b92a25faab0ab10c3ffe498b2a40eb74a59c30f56754addb",
       "owners": {
         "@document": {
-          "before": "53dbf93591d4195f5e6290eb7f55932549274a696462ce3ec490601c8879427e",
-          "after": "691970e708d633b1c68d4d0509973cfe8cd1bb42b58e4f14006313ba424a2ab1"
+          "before": "691970e708d633b1c68d4d0509973cfe8cd1bb42b58e4f14006313ba424a2ab1",
+          "after": "dd3e789ee8c22644b92a25faab0ab10c3ffe498b2a40eb74a59c30f56754addb"
         }
       }
     },
     "ci/test_shards/durations.json": {
-      "before_sha256": "0406f6adb05229bd29e43ef73fab5318a0a61c160d8a58a659c97f2fd92a9496",
-      "after_sha256": "e255f245c5976f9220cc9de26efb243f852cb6bdd7762e205ec9099801837507",
+      "before_sha256": "e255f245c5976f9220cc9de26efb243f852cb6bdd7762e205ec9099801837507",
+      "after_sha256": "5bef6d9aa1d26e60c796be7034c788a83436b6745a46c95bccb4f51b8dc002b7",
       "owners": {
         "@document": {
-          "before": "0406f6adb05229bd29e43ef73fab5318a0a61c160d8a58a659c97f2fd92a9496",
-          "after": "e255f245c5976f9220cc9de26efb243f852cb6bdd7762e205ec9099801837507"
+          "before": "e255f245c5976f9220cc9de26efb243f852cb6bdd7762e205ec9099801837507",
+          "after": "5bef6d9aa1d26e60c796be7034c788a83436b6745a46c95bccb4f51b8dc002b7"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
-      "before_sha256": "2ae23ccbfcfc329c02a8b800f67062a23b0b941086be509fdf18eef2f6661edc",
-      "after_sha256": "982d7b7e24b2489301394af1f3dcd43b02df3cc7bf26bfc2c96f528470cefa53",
+      "before_sha256": "982d7b7e24b2489301394af1f3dcd43b02df3cc7bf26bfc2c96f528470cefa53",
+      "after_sha256": "4fd483ff568af668782a02f18ce6c815f2ac5a7257afa714eff963f619b7c5e3",
       "owners": {
         "@document": {
-          "before": "2ae23ccbfcfc329c02a8b800f67062a23b0b941086be509fdf18eef2f6661edc",
-          "after": "982d7b7e24b2489301394af1f3dcd43b02df3cc7bf26bfc2c96f528470cefa53"
+          "before": "982d7b7e24b2489301394af1f3dcd43b02df3cc7bf26bfc2c96f528470cefa53",
+          "after": "4fd483ff568af668782a02f18ce6c815f2ac5a7257afa714eff963f619b7c5e3"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
-      "before_sha256": "cf8390e8e2778b072fe9837b2051efff4df6150db8a87809f6df3898c22b8118",
-      "after_sha256": "69bc2897bc0cc2ff24b38028e5261a4137bae5508022334ed1bba1c89403212a",
+      "before_sha256": "69bc2897bc0cc2ff24b38028e5261a4137bae5508022334ed1bba1c89403212a",
+      "after_sha256": "6f335bae81bfc682178da64c36e0923ae6c7db77afd734169588be97a3e81b29",
       "owners": {
         "@document": {
-          "before": "cf8390e8e2778b072fe9837b2051efff4df6150db8a87809f6df3898c22b8118",
-          "after": "69bc2897bc0cc2ff24b38028e5261a4137bae5508022334ed1bba1c89403212a"
+          "before": "69bc2897bc0cc2ff24b38028e5261a4137bae5508022334ed1bba1c89403212a",
+          "after": "6f335bae81bfc682178da64c36e0923ae6c7db77afd734169588be97a3e81b29"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
-      "before_sha256": "4158dc856bf4b439bdf42fc162817218979b6452612bc8b615f0a38022118564",
-      "after_sha256": "2f4e6867110938a72ae52ed1b6d8b5b3636d5fee07909d85fe1ae7930d31b461",
+      "before_sha256": "2f4e6867110938a72ae52ed1b6d8b5b3636d5fee07909d85fe1ae7930d31b461",
+      "after_sha256": "43d67b7aaee252b3b1d00bda975460f913ff38b218e3272e302a541608323a83",
       "owners": {
         "@document": {
-          "before": "4158dc856bf4b439bdf42fc162817218979b6452612bc8b615f0a38022118564",
-          "after": "2f4e6867110938a72ae52ed1b6d8b5b3636d5fee07909d85fe1ae7930d31b461"
+          "before": "2f4e6867110938a72ae52ed1b6d8b5b3636d5fee07909d85fe1ae7930d31b461",
+          "after": "43d67b7aaee252b3b1d00bda975460f913ff38b218e3272e302a541608323a83"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
-      "before_sha256": "b40b963e66fa536b26ecbdd9312e51ef6dd49a32ba735e8972a34ff2e61dfdc7",
-      "after_sha256": "ff8275a45b0cd2436810b5e4f01a0e86fd6164fa218627db3725abef3d2a12f3",
+      "before_sha256": "ff8275a45b0cd2436810b5e4f01a0e86fd6164fa218627db3725abef3d2a12f3",
+      "after_sha256": "b8a973403f46514f5598f6aa8e878b2927a60edaad17a5010f900500ac37e4b9",
       "owners": {
         "@document": {
-          "before": "b40b963e66fa536b26ecbdd9312e51ef6dd49a32ba735e8972a34ff2e61dfdc7",
-          "after": "ff8275a45b0cd2436810b5e4f01a0e86fd6164fa218627db3725abef3d2a12f3"
+          "before": "ff8275a45b0cd2436810b5e4f01a0e86fd6164fa218627db3725abef3d2a12f3",
+          "after": "b8a973403f46514f5598f6aa8e878b2927a60edaad17a5010f900500ac37e4b9"
         }
       }
     },
     "ci/test_shards/shard-2.txt": {
-      "before_sha256": "0b22b2b1014380aba5c4d8097ffebf681f069e34aab19f3750caf344f9efc087",
-      "after_sha256": "e44e710d41d33ccef5dcde21291afa222ff87c48ef9afcc201ecfc96896b0402",
+      "before_sha256": "e44e710d41d33ccef5dcde21291afa222ff87c48ef9afcc201ecfc96896b0402",
+      "after_sha256": "3de136f1b0fcd5aba0b0b3b45ae6398cce79ef2c01aee2e8627fbea288561588",
       "owners": {
         "@document": {
-          "before": "0b22b2b1014380aba5c4d8097ffebf681f069e34aab19f3750caf344f9efc087",
-          "after": "e44e710d41d33ccef5dcde21291afa222ff87c48ef9afcc201ecfc96896b0402"
+          "before": "e44e710d41d33ccef5dcde21291afa222ff87c48ef9afcc201ecfc96896b0402",
+          "after": "3de136f1b0fcd5aba0b0b3b45ae6398cce79ef2c01aee2e8627fbea288561588"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
-      "before_sha256": "57e6b622e70b1f798652097de97af4dd04dbf4a0804d3369a664cad865cd3673",
-      "after_sha256": "a4ca19e3b7a6d45bbda751173c5b572a93a461758d4fce0caed5604db4ece336",
+      "before_sha256": "a4ca19e3b7a6d45bbda751173c5b572a93a461758d4fce0caed5604db4ece336",
+      "after_sha256": "fe76465f67ce1fff17827d50db85c2b336f4a7402d473bc08e9b3d8b0207aa1b",
       "owners": {
         "@document": {
-          "before": "57e6b622e70b1f798652097de97af4dd04dbf4a0804d3369a664cad865cd3673",
-          "after": "a4ca19e3b7a6d45bbda751173c5b572a93a461758d4fce0caed5604db4ece336"
+          "before": "a4ca19e3b7a6d45bbda751173c5b572a93a461758d4fce0caed5604db4ece336",
+          "after": "fe76465f67ce1fff17827d50db85c2b336f4a7402d473bc08e9b3d8b0207aa1b"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
-      "before_sha256": "2a88d9cd94a063523da8e6e92114ab6f73f7b6574a70ae15e755ec852365e106",
-      "after_sha256": "13ec1976be831bff00d1f6fed79ffba0e65d1ffda46e93024d6e863108cf912e",
+      "before_sha256": "13ec1976be831bff00d1f6fed79ffba0e65d1ffda46e93024d6e863108cf912e",
+      "after_sha256": "2f4c57738aa240ae459e5c6f2cbff536d6e6e8f8fd8bb72cd261e980a9915d06",
       "owners": {
         "@document": {
-          "before": "2a88d9cd94a063523da8e6e92114ab6f73f7b6574a70ae15e755ec852365e106",
-          "after": "13ec1976be831bff00d1f6fed79ffba0e65d1ffda46e93024d6e863108cf912e"
+          "before": "13ec1976be831bff00d1f6fed79ffba0e65d1ffda46e93024d6e863108cf912e",
+          "after": "2f4c57738aa240ae459e5c6f2cbff536d6e6e8f8fd8bb72cd261e980a9915d06"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
-      "before_sha256": "ed790ceeee4c10b9e009a74243d624988c1df5f67dc6d9b85f8b1f843f2f9baa",
-      "after_sha256": "cb2b5c8ca4423901546515109348ffddb252e92886d4208652d66aeeff25270b",
+      "before_sha256": "cb2b5c8ca4423901546515109348ffddb252e92886d4208652d66aeeff25270b",
+      "after_sha256": "eaa6045c213680ab11dd233562ec4e4e64ed82c5547b51f3b75003af6baab3cc",
       "owners": {
         "@document": {
-          "before": "ed790ceeee4c10b9e009a74243d624988c1df5f67dc6d9b85f8b1f843f2f9baa",
-          "after": "cb2b5c8ca4423901546515109348ffddb252e92886d4208652d66aeeff25270b"
+          "before": "cb2b5c8ca4423901546515109348ffddb252e92886d4208652d66aeeff25270b",
+          "after": "eaa6045c213680ab11dd233562ec4e4e64ed82c5547b51f3b75003af6baab3cc"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
-      "before_sha256": "9443d559a1410adda7201a18aff0b2321dc2c53960379ad0f6332e64e8e07d1f",
-      "after_sha256": "8c6ec9ecc8502234ebc65030a9e6a9e3707d19653264cb4b19a1f1f18c74bfd8",
+      "before_sha256": "8c6ec9ecc8502234ebc65030a9e6a9e3707d19653264cb4b19a1f1f18c74bfd8",
+      "after_sha256": "9edaa713b00a3b6921722510df7e6f9cec2c33bfb433156aba715f1f1096f796",
       "owners": {
         "@document": {
-          "before": "9443d559a1410adda7201a18aff0b2321dc2c53960379ad0f6332e64e8e07d1f",
-          "after": "8c6ec9ecc8502234ebc65030a9e6a9e3707d19653264cb4b19a1f1f18c74bfd8"
+          "before": "8c6ec9ecc8502234ebc65030a9e6a9e3707d19653264cb4b19a1f1f18c74bfd8",
+          "after": "9edaa713b00a3b6921722510df7e6f9cec2c33bfb433156aba715f1f1096f796"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
-      "before_sha256": "ddc668a3fc5262a48e90863cc02284b9c2ce6e04a7976403b03e97efe5af3879",
-      "after_sha256": "8a7b90183bf9ba701564f7c50d8c298c7f8f3f497677ad68c6ed2067fba891e1",
+      "before_sha256": "8a7b90183bf9ba701564f7c50d8c298c7f8f3f497677ad68c6ed2067fba891e1",
+      "after_sha256": "113a12b47e1635c0d8043a28334561d4e1a196fc73b449c65ad2772cd9805aba",
       "owners": {
         "@document": {
-          "before": "ddc668a3fc5262a48e90863cc02284b9c2ce6e04a7976403b03e97efe5af3879",
-          "after": "8a7b90183bf9ba701564f7c50d8c298c7f8f3f497677ad68c6ed2067fba891e1"
+          "before": "8a7b90183bf9ba701564f7c50d8c298c7f8f3f497677ad68c6ed2067fba891e1",
+          "after": "113a12b47e1635c0d8043a28334561d4e1a196fc73b449c65ad2772cd9805aba"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
-      "before_sha256": "b80e7d918238603582a187f963d686385698ccb7aef1dc9255f0ad74d1e2a168",
-      "after_sha256": "c37e1d01df5a3e41aec6377627708f67c4dc88f7250272d34351adf9376712a2",
+      "before_sha256": "c37e1d01df5a3e41aec6377627708f67c4dc88f7250272d34351adf9376712a2",
+      "after_sha256": "70da46f9b9007ccb8889e1f62933bf1500caaae5d88fd4c7ae4c72afadb273d6",
       "owners": {
         "@document": {
-          "before": "b80e7d918238603582a187f963d686385698ccb7aef1dc9255f0ad74d1e2a168",
-          "after": "c37e1d01df5a3e41aec6377627708f67c4dc88f7250272d34351adf9376712a2"
+          "before": "c37e1d01df5a3e41aec6377627708f67c4dc88f7250272d34351adf9376712a2",
+          "after": "70da46f9b9007ccb8889e1f62933bf1500caaae5d88fd4c7ae4c72afadb273d6"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "6a9ae7d62ff75679903d8342d884ae6b05abd565b349140a5b73ddf66b756982",
-      "after_sha256": "13533a96910ed6bb851312e45ef41b162a926f5c5c3c2c61a1087228e2bc9bca",
+      "before_sha256": "13533a96910ed6bb851312e45ef41b162a926f5c5c3c2c61a1087228e2bc9bca",
+      "after_sha256": "f82d1e3d99061f9696535d84dfa0ad5e138121431429b1f739f17b1a24d44adb",
       "owners": {
         "@document": {
-          "before": "6a9ae7d62ff75679903d8342d884ae6b05abd565b349140a5b73ddf66b756982",
-          "after": "13533a96910ed6bb851312e45ef41b162a926f5c5c3c2c61a1087228e2bc9bca"
+          "before": "13533a96910ed6bb851312e45ef41b162a926f5c5c3c2c61a1087228e2bc9bca",
+          "after": "f82d1e3d99061f9696535d84dfa0ad5e138121431429b1f739f17b1a24d44adb"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "037d4dc197740f6297fa7cf0befc411212e83c0839680abec0b472ffe3a291e0",
-      "after_sha256": "377c78bd77fbddb217a571f124a3be645ac614013109b0c7872d9b77d8b7bc24",
+      "before_sha256": "377c78bd77fbddb217a571f124a3be645ac614013109b0c7872d9b77d8b7bc24",
+      "after_sha256": "535df253e0a96ba378d33e8e799d1fc8431d4642ec2b6b649f464b8e77724553",
       "owners": {
         "@document": {
-          "before": "037d4dc197740f6297fa7cf0befc411212e83c0839680abec0b472ffe3a291e0",
-          "after": "377c78bd77fbddb217a571f124a3be645ac614013109b0c7872d9b77d8b7bc24"
+          "before": "377c78bd77fbddb217a571f124a3be645ac614013109b0c7872d9b77d8b7bc24",
+          "after": "535df253e0a96ba378d33e8e799d1fc8431d4642ec2b6b649f464b8e77724553"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "baf8eb1768831902b440ae57dc47c3498d900935cac3f2e850089320dde64a84",
-      "after_sha256": "103641b29bee8c7df853213c09af47001bb3a391b0471c3c206176ecbcb277ca",
+      "before_sha256": "103641b29bee8c7df853213c09af47001bb3a391b0471c3c206176ecbcb277ca",
+      "after_sha256": "3091c2eabcb9fcfaaeb805aebf49bdda9961eea984c500ba2e92df0669f1fcc3",
       "owners": {
         "@document": {
-          "before": "baf8eb1768831902b440ae57dc47c3498d900935cac3f2e850089320dde64a84",
-          "after": "103641b29bee8c7df853213c09af47001bb3a391b0471c3c206176ecbcb277ca"
+          "before": "103641b29bee8c7df853213c09af47001bb3a391b0471c3c206176ecbcb277ca",
+          "after": "3091c2eabcb9fcfaaeb805aebf49bdda9961eea984c500ba2e92df0669f1fcc3"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "65f9442761771850c5cc23b5fe9e61072bf8ca37070c2b6245290ad74e2e68b8",
-      "after_sha256": "3bc8e498e0211dbb6c0852507e07b9be0d08449df9fd9478faafc70c2077788c",
+      "before_sha256": "3bc8e498e0211dbb6c0852507e07b9be0d08449df9fd9478faafc70c2077788c",
+      "after_sha256": "300d31f133718d7f49eb741adc51a1958c699763d5ad2acc128bced67683c4f4",
       "owners": {
         "@document": {
-          "before": "65f9442761771850c5cc23b5fe9e61072bf8ca37070c2b6245290ad74e2e68b8",
-          "after": "3bc8e498e0211dbb6c0852507e07b9be0d08449df9fd9478faafc70c2077788c"
+          "before": "3bc8e498e0211dbb6c0852507e07b9be0d08449df9fd9478faafc70c2077788c",
+          "after": "300d31f133718d7f49eb741adc51a1958c699763d5ad2acc128bced67683c4f4"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "1caf07d0262e6f4e5581416eb10314a49a36ebec095f27d89fc2537645bb4312",
-      "after_sha256": "2c644f9210db83b79d678ffc817a04d02804806b6686d58f9e16fd2364b9e4cc",
+      "before_sha256": "2c644f9210db83b79d678ffc817a04d02804806b6686d58f9e16fd2364b9e4cc",
+      "after_sha256": "ab3a9fda3507945dc10dbf10fbf8108ce2a90ef1937f48552e1ae1c9e262758b",
       "owners": {
         "@document": {
-          "before": "1caf07d0262e6f4e5581416eb10314a49a36ebec095f27d89fc2537645bb4312",
-          "after": "2c644f9210db83b79d678ffc817a04d02804806b6686d58f9e16fd2364b9e4cc"
+          "before": "2c644f9210db83b79d678ffc817a04d02804806b6686d58f9e16fd2364b9e4cc",
+          "after": "ab3a9fda3507945dc10dbf10fbf8108ce2a90ef1937f48552e1ae1c9e262758b"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "5ebc4804231e1c4cb41b11f1055b9439a20a6cb9887a28357f29192a59977321",
-      "after_sha256": "f6ec379d8aa2d3f0491f0daca643c5b51b50a754014a86f2d1d2e01a0f44a797",
+      "before_sha256": "f6ec379d8aa2d3f0491f0daca643c5b51b50a754014a86f2d1d2e01a0f44a797",
+      "after_sha256": "f57a9d24731a138b8a456fcabd0a38c09f7383dc192edb18e9c84d1ded65808e",
       "owners": {
         "@document": {
-          "before": "5ebc4804231e1c4cb41b11f1055b9439a20a6cb9887a28357f29192a59977321",
-          "after": "f6ec379d8aa2d3f0491f0daca643c5b51b50a754014a86f2d1d2e01a0f44a797"
+          "before": "f6ec379d8aa2d3f0491f0daca643c5b51b50a754014a86f2d1d2e01a0f44a797",
+          "after": "f57a9d24731a138b8a456fcabd0a38c09f7383dc192edb18e9c84d1ded65808e"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "39de1b6dd068ae84a221c30175c86ce2ffb5343589dc028caa055ad84cd87a48",
-      "after_sha256": "0ac7379d30c2611efc68728c37970cbe9f8574b3c8c8b12d8b2ce3c8598e6789",
+      "before_sha256": "0ac7379d30c2611efc68728c37970cbe9f8574b3c8c8b12d8b2ce3c8598e6789",
+      "after_sha256": "4299fa33eec8411de67bd0e97cdc95d6ce00bed77015f136ecdcc14f734e48fc",
       "owners": {
         "@document": {
-          "before": "39de1b6dd068ae84a221c30175c86ce2ffb5343589dc028caa055ad84cd87a48",
-          "after": "0ac7379d30c2611efc68728c37970cbe9f8574b3c8c8b12d8b2ce3c8598e6789"
+          "before": "0ac7379d30c2611efc68728c37970cbe9f8574b3c8c8b12d8b2ce3c8598e6789",
+          "after": "4299fa33eec8411de67bd0e97cdc95d6ce00bed77015f136ecdcc14f734e48fc"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "2d5edaae0ec6b83f5739dbb456511fd964adf3a5743715629cdca9722d1f7b9c",
-      "after_sha256": "7800bd568b150302a330bbec8d3524b811cab43b59cf4d055a24b2d33c4398c9",
+      "before_sha256": "7800bd568b150302a330bbec8d3524b811cab43b59cf4d055a24b2d33c4398c9",
+      "after_sha256": "b24f6d4ea616886b858acb6fa83e177f0a71b10cc94de03dda85645d5696ef14",
       "owners": {
         "@document": {
-          "before": "2d5edaae0ec6b83f5739dbb456511fd964adf3a5743715629cdca9722d1f7b9c",
-          "after": "7800bd568b150302a330bbec8d3524b811cab43b59cf4d055a24b2d33c4398c9"
+          "before": "7800bd568b150302a330bbec8d3524b811cab43b59cf4d055a24b2d33c4398c9",
+          "after": "b24f6d4ea616886b858acb6fa83e177f0a71b10cc94de03dda85645d5696ef14"
         }
       }
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
-      "before_sha256": "542a8ca9813733c3a71afb9e4ee287db1e2546267b7bee6731479f7736417623",
-      "after_sha256": "c5c0ee2718a66f9f808290c4e8edbc295d3b5352940c0c4283b2f60c98998082",
+      "before_sha256": "c5c0ee2718a66f9f808290c4e8edbc295d3b5352940c0c4283b2f60c98998082",
+      "after_sha256": "7b59252df0a05dd80729b574f71bec0c2227ff4071d511f0e96855bb28effd61",
       "owners": {
         "@document": {
-          "before": "542a8ca9813733c3a71afb9e4ee287db1e2546267b7bee6731479f7736417623",
-          "after": "c5c0ee2718a66f9f808290c4e8edbc295d3b5352940c0c4283b2f60c98998082"
+          "before": "c5c0ee2718a66f9f808290c4e8edbc295d3b5352940c0c4283b2f60c98998082",
+          "after": "7b59252df0a05dd80729b574f71bec0c2227ff4071d511f0e96855bb28effd61"
+        }
+      }
+    },
+    "docs/AI_POLICY_INTERFACE.md": {
+      "before_sha256": "88bde0288275efb3739aaf4cb7e99d141c3a53718cb55e11ea58b669c4f1dd71",
+      "after_sha256": "ba39b83cfdfc152f0d3716ba66e5c787be2496f35e175135bf48cdad76476be3",
+      "owners": {
+        "@document": {
+          "before": "88bde0288275efb3739aaf4cb7e99d141c3a53718cb55e11ea58b669c4f1dd71",
+          "after": "ba39b83cfdfc152f0d3716ba66e5c787be2496f35e175135bf48cdad76476be3"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
-      "before_sha256": "abf034b6a6cf77942f2e0770ea8869abc2420c5e2f4e3fd1aec345df6321659b",
-      "after_sha256": "c9c22ede67333a52d6be04555a2ec0bd3ddf9df675b120a7945d1951a255ea1a",
+      "before_sha256": "c9c22ede67333a52d6be04555a2ec0bd3ddf9df675b120a7945d1951a255ea1a",
+      "after_sha256": "5270c2c817d628c9fce543ddc7b7692b745e039de5dacf05d86b616f0fe935fa",
       "owners": {
         "@document": {
-          "before": "abf034b6a6cf77942f2e0770ea8869abc2420c5e2f4e3fd1aec345df6321659b",
-          "after": "c9c22ede67333a52d6be04555a2ec0bd3ddf9df675b120a7945d1951a255ea1a"
+          "before": "c9c22ede67333a52d6be04555a2ec0bd3ddf9df675b120a7945d1951a255ea1a",
+          "after": "5270c2c817d628c9fce543ddc7b7692b745e039de5dacf05d86b616f0fe935fa"
         }
       }
     },
-    "docs/performance/current/blocked-endpoints-20261113-movement.json": {
+    "docs/performance/current/configured-charge-identity-20261113-reconstruction.json": {
       "before_sha256": null,
-      "after_sha256": "a5363d1b2c2626877f3a8514fd4b98b5d92e719d220fcdbc00ad663ede615222",
+      "after_sha256": "ed76ec1f0b9364eefbcc04f53e5e6db38cd4b9e7beba04c955039ca428d6aaa8",
       "owners": {
         "@document": {
           "before": null,
-          "after": "a5363d1b2c2626877f3a8514fd4b98b5d92e719d220fcdbc00ad663ede615222"
+          "after": "ed76ec1f0b9364eefbcc04f53e5e6db38cd4b9e7beba04c955039ca428d6aaa8"
         }
       }
     },
-    "docs/performance/current/blocked-endpoints-20261113-reconstruction.json": {
-      "before_sha256": null,
-      "after_sha256": "6de4d5e54c2b2ca673b6d8c799dde694b65d9ad60ddb3b5d20d30e17124815b8",
+    "docs/performance/policy-v3/operation-map.json": {
+      "before_sha256": "4a8727a8743b40fba9a90b8013f895ccb9bb226e8cf19fc2336528793ca096bd",
+      "after_sha256": "cf60111206a846f90b46919ef7ebc72cda548e2c36c92329fcc8360e7c4be3f2",
       "owners": {
         "@document": {
-          "before": null,
-          "after": "6de4d5e54c2b2ca673b6d8c799dde694b65d9ad60ddb3b5d20d30e17124815b8"
-        }
-      }
-    },
-    "docs/performance/current/blocked-endpoints-20261113-setup.json": {
-      "before_sha256": null,
-      "after_sha256": "52b90becac99dc141345866f497d7ee535aac8bef26647e65327a8e20a60e955",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "52b90becac99dc141345866f497d7ee535aac8bef26647e65327a8e20a60e955"
-        }
-      }
-    },
-    "docs/performance/current/blocked-endpoints-20261113-visibility.json": {
-      "before_sha256": null,
-      "after_sha256": "0b26efd27e1d4393ce246ae5fc6bf9186ab6854753ba3efeb9aadc663dfc579b",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "0b26efd27e1d4393ce246ae5fc6bf9186ab6854753ba3efeb9aadc663dfc579b"
+          "before": "4a8727a8743b40fba9a90b8013f895ccb9bb226e8cf19fc2336528793ca096bd",
+          "after": "cf60111206a846f90b46919ef7ebc72cda548e2c36c92329fcc8360e7c4be3f2"
         }
       }
     },
     "scripts/current_shard_compatibility.py": {
-      "before_sha256": "d8dd2ec69e85278057945d58ed718aa8470e48899d41bb7d8ee40342b842c6ff",
-      "after_sha256": "8590202b71dbf9e237efc2e672afecdf73dabab72a29243dd8105f39189df2a4",
+      "before_sha256": "8590202b71dbf9e237efc2e672afecdf73dabab72a29243dd8105f39189df2a4",
+      "after_sha256": "ef5d502697fedb8a30e873c2c7ac037d2c05c2a53b882b1453bf999b991754b6",
       "owners": {
         "@module": {
-          "before": "36bedaa9a1ef4a224d85c678ddca4751bf3b7475745e4e3ca2132e408db83d06",
-          "after": "293f7d82f259b541c58b78c2268e5f7c78eb39a16ef01b9798bbd59b06d84b66"
+          "before": "293f7d82f259b541c58b78c2268e5f7c78eb39a16ef01b9798bbd59b06d84b66",
+          "after": "05cf257512c540f0b195fa4bacc88626d92b6a3faad6eb99b0831d9c33254b3f"
         },
         "_baseline": {
-          "before": "59baa1ff1b56cdfb10ba1b4b5afcbb5f04a14195cfe063c4cd03422c5500da9f",
-          "after": "1a8340cd8b53fa8e2e7ed70b4b79a6049ed61f74ac3227864d0d5e35f05f1a18"
+          "before": "1a8340cd8b53fa8e2e7ed70b4b79a6049ed61f74ac3227864d0d5e35f05f1a18",
+          "after": "416b6d80ab029e9143bb5a2420bc9d27247cc27c377f9445820ad317c9c0c5f5"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "843880192ba7305c90fb62ad18a1a3b50a518beed1d213e88663c53f7dff7c4a",
-      "after_sha256": "579875ac8d8c616356c2d9208e86b4eb8f8026cbc03fec7a6d24266f8702f48e",
+      "before_sha256": "579875ac8d8c616356c2d9208e86b4eb8f8026cbc03fec7a6d24266f8702f48e",
+      "after_sha256": "aa1d036bb361c88218c8d8f799e8af160b6b317b5000f77d570cf05d73f72505",
       "owners": {
         "@document": {
-          "before": "843880192ba7305c90fb62ad18a1a3b50a518beed1d213e88663c53f7dff7c4a",
-          "after": "579875ac8d8c616356c2d9208e86b4eb8f8026cbc03fec7a6d24266f8702f48e"
+          "before": "579875ac8d8c616356c2d9208e86b4eb8f8026cbc03fec7a6d24266f8702f48e",
+          "after": "aa1d036bb361c88218c8d8f799e8af160b6b317b5000f77d570cf05d73f72505"
         }
       }
     },
-    "src/warhammer40k_core/engine/base_contact_history.py": {
-      "before_sha256": "2e4a1f902da661b5b486e6e9e924fbb5eaa2dc011115a2be94029d3dee54f786",
-      "after_sha256": "be7b40f54a6d364475952d35f0ff8135a5bf9abbb281ef6489b876add3bae7a0",
+    "src/warhammer40k_core/engine/base_contact_charge_history.py": {
+      "before_sha256": "617ca94c95032227ba88ba9b3a8806234f95125368202f67583b06d48c62b3d5",
+      "after_sha256": "01878d1cfe4880f18cd5f662b68493bdfb283bff632671c69e06a8c8da246586",
       "owners": {
-        "@module": {
-          "before": "ed744f2eb351e42b039fc450f65ce8e258b91f906f3f1f9a715d6872fcf39140",
-          "after": "428406ad3f71b9058ad6dc519b4d8a124144b6a2d2ea734678096427c742b963"
-        },
-        "_complete_movement_witness": {
-          "before": "889c483ce5eaac4b2940a5359c14a40dd38325bd819416396d6e43c3deadc3f2",
-          "after": null
-        },
-        "validate_base_contact_history": {
-          "before": "f79b246a5f2607153069e67af3ee27c0fb9654aeec9bf3098e28a4024c4fc8bf",
-          "after": "853bd0c81df08451cc8ed4fbedfa613db5d6283ebe29484e6a9c8ee6a1016d95"
+        "validate_charge_contact_permissions": {
+          "before": "777ab95cf0f1c4594194ee14ceca1268262ad6918995e10fa67666e12922008f",
+          "after": "2d12a5c3c0855d370df1d6f8326b9b9642b2a7bd01083ac33214519429134ce6"
         }
       }
     },
-    "src/warhammer40k_core/engine/charge_endpoint_history.py": {
-      "before_sha256": "b4318c6c104ad07903c8e72f1b76fb16a3c34afb5e6ccf9e9aee13008ffb3ebb",
-      "after_sha256": "79f7667888e122c6728cd8199724db30457b26ac48b19644315f4d234e58799c",
+    "src/warhammer40k_core/engine/battle_shock_event_authority.py": {
+      "before_sha256": "31834acf80c55006f5a28e2cfd727950600a0676bf2bf60098c165a902bb3cb8",
+      "after_sha256": "2d80ebb089666a49a452d8267cb3c65640ea61c24a7d3817e3a3d22a61d1e028",
       "owners": {
-        "@module": {
-          "before": "871e515462b0327b7226a57b4b9ba24e1f760d583edae90c8e50ecafbfdfe92b",
-          "after": "bb1ec4f49bb6dd1fd6e0f29b96c118abff6ae964f62404357413f7bdc8bcf47f"
-        },
-        "validate_charge_endpoint_history": {
-          "before": "f841919cd39fc889ca1b323ea5aebccb25830b7732480e53fa5861045fc50014",
-          "after": "6ea22f5aef07770815a15cb08e81e0e5a4f98dc356b1b80a2b23cf7f9ee52200"
+        "validate_unit_move_completed_battle_shock_request_authority": {
+          "before": "baaa04f29336ce0bfa7140be297284273dfc6917cc2d6d120381844f847ccdc2",
+          "after": "d2eb24b4ab954916f9cc73e432050876f219d7a5049432bded41fda80612a535"
         }
       }
     },
-    "src/warhammer40k_core/engine/charge_model_endpoints.py": {
-      "before_sha256": "9ae2e2acf40edaf874cf5adaa76b153c94e3f6abf7cd722efd65e6a0185b1c34",
-      "after_sha256": "e8a3d1fd5a7f457778bc644ffc5e3c4541f654fc37a8b8bb09c590a48714f87f",
+    "src/warhammer40k_core/engine/charge_move_event_authority.py": {
+      "before_sha256": "4f6086e4724f66e8852361860787f2abf46203b8799b5b1aba02b641c189aa5d",
+      "after_sha256": "ec6df29eff5b64b06c5ed8826b007b16975d8c724e5ed5a400e58b3f0bc919b9",
       "owners": {
-        "_reachability": {
-          "before": "039b319fe900393508a115b42dd21e96f128cad4e6cd48a323c84926885a055b",
-          "after": "14d755cf79d432994c633e2a1892642d87d5dcf82c8500fcd13721bb94df8db7"
+        "_validate_result_summary": {
+          "before": "96e2f949616713fb760b6c10f5bd50cdf115365382cb6c9e5438746a5e0c42c3",
+          "after": "1e4edc70937e1ef1e1f30eae2583c0bf0babd4bb01d358ab1e16c13cce1a4d92"
+        },
+        "_validate_transition_and_result_payload": {
+          "before": "8f7799cacc935638b42229425d92ad51a4ee8c0e898b627773470f0d0e4ef3da",
+          "after": "724d1a5e080cbd8a307426c40ce5357ae365c6a7ac7282af828b5923807bef2b"
+        },
+        "validate_charge_move_completed_event_authority": {
+          "before": "dc19bc0c0006b918322b8cdd416da499f4d5c65dde5a37d4725330767d016771",
+          "after": "11e1bfe57ecb0c1f4862f0b17adda0376fc8e931de8434cf51ed169917aa801f"
         }
       }
     },
-    "src/warhammer40k_core/engine/sequential_movement.py": {
-      "before_sha256": "4b65e72d1a424f86120bc23f1cf139d45232259fe0732100b714b9885fd8d40f",
-      "after_sha256": "73b52d3c20bb751a24c8c9def991d8ae02e4ef54b9ada5fd3f35f7a570f3bbe3",
+    "src/warhammer40k_core/engine/primary_mission_event_decision_authority.py": {
+      "before_sha256": "3c2649b2ee8be42d4618e193c0c78a658164259d7bfc1c3adda44368ceb6748e",
+      "after_sha256": "13cc506e875ad2cb974bb919f939c4abfbf54bb72d4ae95b7cb89ea34a098f15",
       "owners": {
-        "@module": {
-          "before": "aab48ae75f1ddf14cc0fdf90e2ea5991aa851d35d9fb836f7531a0270a0aa50c",
-          "after": "2c5a7b4dac8e0dc27bf21a6ad5b2628a3fdd02ea558bca632c7b3bc17950ae8d"
-        },
-        "complete_movement_witness": {
-          "before": null,
-          "after": "1e95e24b85f688fb13e8244161897ee3871fa7c0061d60dd1f9fe742d7d05719"
-        }
-      }
-    },
-    "src/warhammer40k_core/geometry/connected_endpoint_proof.py": {
-      "before_sha256": "3288087cf4be7a308a035edcae7ccd072f536b409cbd2b7c807454d570f4c26a",
-      "after_sha256": "a6a86e3543e6b9b68254de66901b990e3dffc718ac6d8e524008f984b6f5041d",
-      "owners": {
-        "@module": {
-          "before": "38e411ef005dd6104288d9336b63b1a13c00cd61a794d8feb1b7daf6907674ba",
-          "after": "9252b1fc8723fbbea36d01bf1f895bd911301435de99967275bee62f8ffbe7d9"
-        },
-        "_blocked_overlap_excluded": {
-          "before": null,
-          "after": "f59f7c7a13f3cd9d8fb5c73ccb622597ebd8197fb8d6e65f9b4ec1722fbe8628"
-        },
-        "endpoint_excluded_by_connected_components": {
-          "before": "be7a2830cf6110d2852dbc8836c35157d5b885378cfc596e0a9417e03a61ce19",
-          "after": "15914c3da90eb30f8045bb63e478baee81611bf776fabe08fe0728c2a26038b3"
+        "validate_physical_transition_decision_authority": {
+          "before": "5f0cd2691e3f822e706329815dd9dfb25d70c66751b67d772a6b6b8f4f5a19c1",
+          "after": "fad85e60d3ae92d1a3423285c49f7352a95b04a2715b50a6a98f9e419ab0fa9d"
         }
       }
     },
     "tests/code_quality/test_current_shard_compatibility.py": {
-      "before_sha256": "929f1f7f3d190e547a3a32a6d3496ca4e40306f51e441f95a9788aa298e253e7",
-      "after_sha256": "826808f58d379ecbc77dc35894a82fe3d8b5d7cf2f77a4b261e1c43f94f97fb5",
+      "before_sha256": "826808f58d379ecbc77dc35894a82fe3d8b5d7cf2f77a4b261e1c43f94f97fb5",
+      "after_sha256": "d1630ef7723a007074ca223dd316ac969fde816629ec22eb73c8bccbd225f287",
       "owners": {
+        "test_compatibility_boundary_rejects_stale_or_forged_inputs": {
+          "before": "d3a3e03cb8aa1d4ead1c98b0177d5e33649d2b5f8dd83df15dff1710aa7888dc",
+          "after": "5cf4b8a8c13a2757ea12c7c5a04d6df877cd31645d30668ee7a169cbf1fa8dbf"
+        },
         "test_current_dispatch_has_exact_inventory_and_disclosed_selector_moves": {
-          "before": "fb4a618d2857c819a49ac13eaa3e8a0d5e95d76a81c97b677c67df7aadc5ee9d",
-          "after": "38d6978f628074595323e015032d187cefb0f55ceb2fd49f2e70669006040ac6"
+          "before": "38d6978f628074595323e015032d187cefb0f55ceb2fd49f2e70669006040ac6",
+          "after": "e11a8f6f02eea2ea32b6285849f57d6bb8cee5f93b61747889f7c09f0d358a10"
         }
       }
     },
     "tests/rules/section07/coverage.json": {
-      "before_sha256": "1d85fb53a5542b587becf158dc61296cf39d90e346eaec6c81d9fb9612fa088e",
-      "after_sha256": "58340457b8c67025918aed645d99e39faa90d3a51bacce158fb82174551dd207",
+      "before_sha256": "58340457b8c67025918aed645d99e39faa90d3a51bacce158fb82174551dd207",
+      "after_sha256": "d2ccf01707f04dc0160f5e83739848d28064aeaa8767c207fcbf25f6484af06d",
       "owners": {
         "@document": {
-          "before": "1d85fb53a5542b587becf158dc61296cf39d90e346eaec6c81d9fb9612fa088e",
-          "after": "58340457b8c67025918aed645d99e39faa90d3a51bacce158fb82174551dd207"
+          "before": "58340457b8c67025918aed645d99e39faa90d3a51bacce158fb82174551dd207",
+          "after": "d2ccf01707f04dc0160f5e83739848d28064aeaa8767c207fcbf25f6484af06d"
         }
       }
     },
     "tests/rules/section11/test_connected_endpoints.py": {
-      "before_sha256": "9a4ddfd33bae2e8ebe7720a6621a1b222793a071ef31675f42e9bd1ed430a5a0",
-      "after_sha256": "227dca6bdf231aa48a75f57dbfffa1dc405a84e99fd5bb6a00c8a3b889fcb09d",
+      "before_sha256": "227dca6bdf231aa48a75f57dbfffa1dc405a84e99fd5bb6a00c8a3b889fcb09d",
+      "after_sha256": "78272e696bf5f3d7c977c379efe763fe80211067c06cc6e7d8be61d8c2775591",
       "owners": {
-        "@module": {
-          "before": "a48232ef4fb069532f4fbe6b3af36f44053d21d6880291e5880b2824957c0ce0",
-          "after": "9640e0046af7ac6950f3642f3869e297e83d392dae94462cc0da6ca621b031bf"
-        },
-        "test_connected_endpoint_certificate_survives_charge_history_reconstruction": {
-          "before": "15065253805b2b8834781e498e427900f82811a622d08283e3d71b41165be9eb",
-          "after": "6ce6faa36a5a5cd866e61116f14ef20ba23c8dc08874f65a6f972795f0bfe4c2"
-        },
-        "test_connected_endpoint_overlap_requires_collision_and_support_proof": {
+        "test_named_ruleset_charge_completion_survives_persistence": {
           "before": null,
-          "after": "a82fd5f51c3d1b13226822779f3942cf7d8c6e5d34bded2250ade17858d31512"
-        },
-        "test_shared_ordered_history_reader_preserves_existing_fight_witness": {
-          "before": null,
-          "after": "9a3f9396ad9dd78bec37c62d7efbae3b0c31fa1a1af908bb5bd9342c4a75901c"
+          "after": "57399ecce2d3d445aa9fae761b456e04de1a906d0277def5a2c53f49d58137f0"
         }
       }
     }
@@ -450,9 +406,9 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Admit a narrow collision/support exclusion for overlapping disconnected-component goal regions, with current physical occupancy and ordered exact-context historical recomputation.",
-      "source_obligation": "Preserve submitted physical execution order, complete-prefix path and terrain legality, every endpoint obligation, exact source geometry, seeds and search budgets. Unsupported or satisfiable relaxations retain ordinary search; only a sufficient negative certificate changes status. Model001 preferred remains unresolved; its engagement path is neither preferred nor whole-unit proof.",
-      "unchanged_work": "Generic movement reachability, navigation, cache keys, seeds, budgets and accepted physical validation are unchanged. Historical observations stay in their producing snapshots; nine additional exact cases and a fresh complete local profile update derived scheduling only. The saved whole charge remains unresolved and full-game performance is unqualified."
+      "rationale": "Update the maintained current case count to6319 and its existing README authentication checksum before the covered input freeze.",
+      "source_obligation": "An ordinary accepted Charge with the supported named configuration must preserve configured identity through strict save/load/replay. Do not weaken record checks or historical admission. Preserve seeds, physical order, complete path and terrain checks, all model obligations, coverage and timing budgets.",
+      "unchanged_work": "No solver, candidate generation, cache policy, movement geometry, RNG seed, source content, adapter payload schema or gameplay budget changes. The original fixed-peer model001 query remains unresolved; the revised whole-unit witness directly satisfies all ten obligations. One complete covered observation supplies derived scheduling without repeating a valid timing run solely for compliance. Full-game and tactical/learning qualification remain unclaimed."
     },
     "ci/test_shards/current-covered-baseline.json": {
       "category": "rule_semantics",
@@ -461,9 +417,9 @@
         "scoped-shard-allocation"
       ],
       "selected_families": [],
-      "rationale": "Admit a narrow collision/support exclusion for overlapping disconnected-component goal regions, with current physical occupancy and ordered exact-context historical recomputation.",
-      "source_obligation": "Preserve submitted physical execution order, complete-prefix path and terrain legality, every endpoint obligation, exact source geometry, seeds and search budgets. Unsupported or satisfiable relaxations retain ordinary search; only a sufficient negative certificate changes status. Model001 preferred remains unresolved; its engagement path is neither preferred nor whole-unit proof.",
-      "unchanged_work": "Generic movement reachability, navigation, cache keys, seeds, budgets and accepted physical validation are unchanged. Historical observations stay in their producing snapshots; nine additional exact cases and a fresh complete local profile update derived scheduling only. The saved whole charge remains unresolved and full-game performance is unqualified."
+      "rationale": "Refresh current derived scheduling from the single complete valid covered observation for the new runtime and one added case; retain all historical phase evidence and exact planning/approval/execution limits.",
+      "source_obligation": "An ordinary accepted Charge with the supported named configuration must preserve configured identity through strict save/load/replay. Do not weaken record checks or historical admission. Preserve seeds, physical order, complete path and terrain checks, all model obligations, coverage and timing budgets.",
+      "unchanged_work": "No solver, candidate generation, cache policy, movement geometry, RNG seed, source content, adapter payload schema or gameplay budget changes. The original fixed-peer model001 query remains unresolved; the revised whole-unit witness directly satisfies all ten obligations. One complete covered observation supplies derived scheduling without repeating a valid timing run solely for compliance. Full-game and tactical/learning qualification remain unclaimed."
     },
     "ci/test_shards/current-derived-assignment.json": {
       "category": "rule_semantics",
@@ -472,9 +428,9 @@
         "scoped-shard-allocation"
       ],
       "selected_families": [],
-      "rationale": "Admit a narrow collision/support exclusion for overlapping disconnected-component goal regions, with current physical occupancy and ordered exact-context historical recomputation.",
-      "source_obligation": "Preserve submitted physical execution order, complete-prefix path and terrain legality, every endpoint obligation, exact source geometry, seeds and search budgets. Unsupported or satisfiable relaxations retain ordinary search; only a sufficient negative certificate changes status. Model001 preferred remains unresolved; its engagement path is neither preferred nor whole-unit proof.",
-      "unchanged_work": "Generic movement reachability, navigation, cache keys, seeds, budgets and accepted physical validation are unchanged. Historical observations stay in their producing snapshots; nine additional exact cases and a fresh complete local profile update derived scheduling only. The saved whole charge remains unresolved and full-game performance is unqualified."
+      "rationale": "Refresh current derived scheduling from the single complete valid covered observation for the new runtime and one added case; retain all historical phase evidence and exact planning/approval/execution limits.",
+      "source_obligation": "An ordinary accepted Charge with the supported named configuration must preserve configured identity through strict save/load/replay. Do not weaken record checks or historical admission. Preserve seeds, physical order, complete path and terrain checks, all model obligations, coverage and timing budgets.",
+      "unchanged_work": "No solver, candidate generation, cache policy, movement geometry, RNG seed, source content, adapter payload schema or gameplay budget changes. The original fixed-peer model001 query remains unresolved; the revised whole-unit witness directly satisfies all ten obligations. One complete covered observation supplies derived scheduling without repeating a valid timing run solely for compliance. Full-game and tactical/learning qualification remain unclaimed."
     },
     "ci/test_shards/current-runtime-compatibility.json": {
       "category": "rule_semantics",
@@ -483,9 +439,9 @@
         "scoped-shard-allocation"
       ],
       "selected_families": [],
-      "rationale": "Admit a narrow collision/support exclusion for overlapping disconnected-component goal regions, with current physical occupancy and ordered exact-context historical recomputation.",
-      "source_obligation": "Preserve submitted physical execution order, complete-prefix path and terrain legality, every endpoint obligation, exact source geometry, seeds and search budgets. Unsupported or satisfiable relaxations retain ordinary search; only a sufficient negative certificate changes status. Model001 preferred remains unresolved; its engagement path is neither preferred nor whole-unit proof.",
-      "unchanged_work": "Generic movement reachability, navigation, cache keys, seeds, budgets and accepted physical validation are unchanged. Historical observations stay in their producing snapshots; nine additional exact cases and a fresh complete local profile update derived scheduling only. The saved whole charge remains unresolved and full-game performance is unqualified."
+      "rationale": "Refresh current derived scheduling from the single complete valid covered observation for the new runtime and one added case; retain all historical phase evidence and exact planning/approval/execution limits.",
+      "source_obligation": "An ordinary accepted Charge with the supported named configuration must preserve configured identity through strict save/load/replay. Do not weaken record checks or historical admission. Preserve seeds, physical order, complete path and terrain checks, all model obligations, coverage and timing budgets.",
+      "unchanged_work": "No solver, candidate generation, cache policy, movement geometry, RNG seed, source content, adapter payload schema or gameplay budget changes. The original fixed-peer model001 query remains unresolved; the revised whole-unit witness directly satisfies all ten obligations. One complete covered observation supplies derived scheduling without repeating a valid timing run solely for compliance. Full-game and tactical/learning qualification remain unclaimed."
     },
     "ci/test_shards/durations.json": {
       "category": "rule_semantics",
@@ -493,9 +449,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit a narrow collision/support exclusion for overlapping disconnected-component goal regions, with current physical occupancy and ordered exact-context historical recomputation.",
-      "source_obligation": "Preserve submitted physical execution order, complete-prefix path and terrain legality, every endpoint obligation, exact source geometry, seeds and search budgets. Unsupported or satisfiable relaxations retain ordinary search; only a sufficient negative certificate changes status. Model001 preferred remains unresolved; its engagement path is neither preferred nor whole-unit proof.",
-      "unchanged_work": "Generic movement reachability, navigation, cache keys, seeds, budgets and accepted physical validation are unchanged. Historical observations stay in their producing snapshots; nine additional exact cases and a fresh complete local profile update derived scheduling only. The saved whole charge remains unresolved and full-game performance is unqualified."
+      "rationale": "Refresh current derived scheduling from the single complete valid covered observation for the new runtime and one added case; retain all historical phase evidence and exact planning/approval/execution limits.",
+      "source_obligation": "An ordinary accepted Charge with the supported named configuration must preserve configured identity through strict save/load/replay. Do not weaken record checks or historical admission. Preserve seeds, physical order, complete path and terrain checks, all model obligations, coverage and timing budgets.",
+      "unchanged_work": "No solver, candidate generation, cache policy, movement geometry, RNG seed, source content, adapter payload schema or gameplay budget changes. The original fixed-peer model001 query remains unresolved; the revised whole-unit witness directly satisfies all ten obligations. One complete covered observation supplies derived scheduling without repeating a valid timing run solely for compliance. Full-game and tactical/learning qualification remain unclaimed."
     },
     "ci/test_shards/shard-1.txt": {
       "category": "rule_semantics",
@@ -503,9 +459,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit a narrow collision/support exclusion for overlapping disconnected-component goal regions, with current physical occupancy and ordered exact-context historical recomputation.",
-      "source_obligation": "Preserve submitted physical execution order, complete-prefix path and terrain legality, every endpoint obligation, exact source geometry, seeds and search budgets. Unsupported or satisfiable relaxations retain ordinary search; only a sufficient negative certificate changes status. Model001 preferred remains unresolved; its engagement path is neither preferred nor whole-unit proof.",
-      "unchanged_work": "Generic movement reachability, navigation, cache keys, seeds, budgets and accepted physical validation are unchanged. Historical observations stay in their producing snapshots; nine additional exact cases and a fresh complete local profile update derived scheduling only. The saved whole charge remains unresolved and full-game performance is unqualified."
+      "rationale": "Refresh current derived scheduling from the single complete valid covered observation for the new runtime and one added case; retain all historical phase evidence and exact planning/approval/execution limits.",
+      "source_obligation": "An ordinary accepted Charge with the supported named configuration must preserve configured identity through strict save/load/replay. Do not weaken record checks or historical admission. Preserve seeds, physical order, complete path and terrain checks, all model obligations, coverage and timing budgets.",
+      "unchanged_work": "No solver, candidate generation, cache policy, movement geometry, RNG seed, source content, adapter payload schema or gameplay budget changes. The original fixed-peer model001 query remains unresolved; the revised whole-unit witness directly satisfies all ten obligations. One complete covered observation supplies derived scheduling without repeating a valid timing run solely for compliance. Full-game and tactical/learning qualification remain unclaimed."
     },
     "ci/test_shards/shard-10.txt": {
       "category": "rule_semantics",
@@ -513,9 +469,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit a narrow collision/support exclusion for overlapping disconnected-component goal regions, with current physical occupancy and ordered exact-context historical recomputation.",
-      "source_obligation": "Preserve submitted physical execution order, complete-prefix path and terrain legality, every endpoint obligation, exact source geometry, seeds and search budgets. Unsupported or satisfiable relaxations retain ordinary search; only a sufficient negative certificate changes status. Model001 preferred remains unresolved; its engagement path is neither preferred nor whole-unit proof.",
-      "unchanged_work": "Generic movement reachability, navigation, cache keys, seeds, budgets and accepted physical validation are unchanged. Historical observations stay in their producing snapshots; nine additional exact cases and a fresh complete local profile update derived scheduling only. The saved whole charge remains unresolved and full-game performance is unqualified."
+      "rationale": "Refresh current derived scheduling from the single complete valid covered observation for the new runtime and one added case; retain all historical phase evidence and exact planning/approval/execution limits.",
+      "source_obligation": "An ordinary accepted Charge with the supported named configuration must preserve configured identity through strict save/load/replay. Do not weaken record checks or historical admission. Preserve seeds, physical order, complete path and terrain checks, all model obligations, coverage and timing budgets.",
+      "unchanged_work": "No solver, candidate generation, cache policy, movement geometry, RNG seed, source content, adapter payload schema or gameplay budget changes. The original fixed-peer model001 query remains unresolved; the revised whole-unit witness directly satisfies all ten obligations. One complete covered observation supplies derived scheduling without repeating a valid timing run solely for compliance. Full-game and tactical/learning qualification remain unclaimed."
     },
     "ci/test_shards/shard-11.txt": {
       "category": "rule_semantics",
@@ -523,9 +479,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit a narrow collision/support exclusion for overlapping disconnected-component goal regions, with current physical occupancy and ordered exact-context historical recomputation.",
-      "source_obligation": "Preserve submitted physical execution order, complete-prefix path and terrain legality, every endpoint obligation, exact source geometry, seeds and search budgets. Unsupported or satisfiable relaxations retain ordinary search; only a sufficient negative certificate changes status. Model001 preferred remains unresolved; its engagement path is neither preferred nor whole-unit proof.",
-      "unchanged_work": "Generic movement reachability, navigation, cache keys, seeds, budgets and accepted physical validation are unchanged. Historical observations stay in their producing snapshots; nine additional exact cases and a fresh complete local profile update derived scheduling only. The saved whole charge remains unresolved and full-game performance is unqualified."
+      "rationale": "Refresh current derived scheduling from the single complete valid covered observation for the new runtime and one added case; retain all historical phase evidence and exact planning/approval/execution limits.",
+      "source_obligation": "An ordinary accepted Charge with the supported named configuration must preserve configured identity through strict save/load/replay. Do not weaken record checks or historical admission. Preserve seeds, physical order, complete path and terrain checks, all model obligations, coverage and timing budgets.",
+      "unchanged_work": "No solver, candidate generation, cache policy, movement geometry, RNG seed, source content, adapter payload schema or gameplay budget changes. The original fixed-peer model001 query remains unresolved; the revised whole-unit witness directly satisfies all ten obligations. One complete covered observation supplies derived scheduling without repeating a valid timing run solely for compliance. Full-game and tactical/learning qualification remain unclaimed."
     },
     "ci/test_shards/shard-12.txt": {
       "category": "rule_semantics",
@@ -533,9 +489,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit a narrow collision/support exclusion for overlapping disconnected-component goal regions, with current physical occupancy and ordered exact-context historical recomputation.",
-      "source_obligation": "Preserve submitted physical execution order, complete-prefix path and terrain legality, every endpoint obligation, exact source geometry, seeds and search budgets. Unsupported or satisfiable relaxations retain ordinary search; only a sufficient negative certificate changes status. Model001 preferred remains unresolved; its engagement path is neither preferred nor whole-unit proof.",
-      "unchanged_work": "Generic movement reachability, navigation, cache keys, seeds, budgets and accepted physical validation are unchanged. Historical observations stay in their producing snapshots; nine additional exact cases and a fresh complete local profile update derived scheduling only. The saved whole charge remains unresolved and full-game performance is unqualified."
+      "rationale": "Refresh current derived scheduling from the single complete valid covered observation for the new runtime and one added case; retain all historical phase evidence and exact planning/approval/execution limits.",
+      "source_obligation": "An ordinary accepted Charge with the supported named configuration must preserve configured identity through strict save/load/replay. Do not weaken record checks or historical admission. Preserve seeds, physical order, complete path and terrain checks, all model obligations, coverage and timing budgets.",
+      "unchanged_work": "No solver, candidate generation, cache policy, movement geometry, RNG seed, source content, adapter payload schema or gameplay budget changes. The original fixed-peer model001 query remains unresolved; the revised whole-unit witness directly satisfies all ten obligations. One complete covered observation supplies derived scheduling without repeating a valid timing run solely for compliance. Full-game and tactical/learning qualification remain unclaimed."
     },
     "ci/test_shards/shard-2.txt": {
       "category": "rule_semantics",
@@ -543,9 +499,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit a narrow collision/support exclusion for overlapping disconnected-component goal regions, with current physical occupancy and ordered exact-context historical recomputation.",
-      "source_obligation": "Preserve submitted physical execution order, complete-prefix path and terrain legality, every endpoint obligation, exact source geometry, seeds and search budgets. Unsupported or satisfiable relaxations retain ordinary search; only a sufficient negative certificate changes status. Model001 preferred remains unresolved; its engagement path is neither preferred nor whole-unit proof.",
-      "unchanged_work": "Generic movement reachability, navigation, cache keys, seeds, budgets and accepted physical validation are unchanged. Historical observations stay in their producing snapshots; nine additional exact cases and a fresh complete local profile update derived scheduling only. The saved whole charge remains unresolved and full-game performance is unqualified."
+      "rationale": "Refresh current derived scheduling from the single complete valid covered observation for the new runtime and one added case; retain all historical phase evidence and exact planning/approval/execution limits.",
+      "source_obligation": "An ordinary accepted Charge with the supported named configuration must preserve configured identity through strict save/load/replay. Do not weaken record checks or historical admission. Preserve seeds, physical order, complete path and terrain checks, all model obligations, coverage and timing budgets.",
+      "unchanged_work": "No solver, candidate generation, cache policy, movement geometry, RNG seed, source content, adapter payload schema or gameplay budget changes. The original fixed-peer model001 query remains unresolved; the revised whole-unit witness directly satisfies all ten obligations. One complete covered observation supplies derived scheduling without repeating a valid timing run solely for compliance. Full-game and tactical/learning qualification remain unclaimed."
     },
     "ci/test_shards/shard-3.txt": {
       "category": "rule_semantics",
@@ -553,9 +509,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit a narrow collision/support exclusion for overlapping disconnected-component goal regions, with current physical occupancy and ordered exact-context historical recomputation.",
-      "source_obligation": "Preserve submitted physical execution order, complete-prefix path and terrain legality, every endpoint obligation, exact source geometry, seeds and search budgets. Unsupported or satisfiable relaxations retain ordinary search; only a sufficient negative certificate changes status. Model001 preferred remains unresolved; its engagement path is neither preferred nor whole-unit proof.",
-      "unchanged_work": "Generic movement reachability, navigation, cache keys, seeds, budgets and accepted physical validation are unchanged. Historical observations stay in their producing snapshots; nine additional exact cases and a fresh complete local profile update derived scheduling only. The saved whole charge remains unresolved and full-game performance is unqualified."
+      "rationale": "Refresh current derived scheduling from the single complete valid covered observation for the new runtime and one added case; retain all historical phase evidence and exact planning/approval/execution limits.",
+      "source_obligation": "An ordinary accepted Charge with the supported named configuration must preserve configured identity through strict save/load/replay. Do not weaken record checks or historical admission. Preserve seeds, physical order, complete path and terrain checks, all model obligations, coverage and timing budgets.",
+      "unchanged_work": "No solver, candidate generation, cache policy, movement geometry, RNG seed, source content, adapter payload schema or gameplay budget changes. The original fixed-peer model001 query remains unresolved; the revised whole-unit witness directly satisfies all ten obligations. One complete covered observation supplies derived scheduling without repeating a valid timing run solely for compliance. Full-game and tactical/learning qualification remain unclaimed."
     },
     "ci/test_shards/shard-4.txt": {
       "category": "rule_semantics",
@@ -563,9 +519,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit a narrow collision/support exclusion for overlapping disconnected-component goal regions, with current physical occupancy and ordered exact-context historical recomputation.",
-      "source_obligation": "Preserve submitted physical execution order, complete-prefix path and terrain legality, every endpoint obligation, exact source geometry, seeds and search budgets. Unsupported or satisfiable relaxations retain ordinary search; only a sufficient negative certificate changes status. Model001 preferred remains unresolved; its engagement path is neither preferred nor whole-unit proof.",
-      "unchanged_work": "Generic movement reachability, navigation, cache keys, seeds, budgets and accepted physical validation are unchanged. Historical observations stay in their producing snapshots; nine additional exact cases and a fresh complete local profile update derived scheduling only. The saved whole charge remains unresolved and full-game performance is unqualified."
+      "rationale": "Refresh current derived scheduling from the single complete valid covered observation for the new runtime and one added case; retain all historical phase evidence and exact planning/approval/execution limits.",
+      "source_obligation": "An ordinary accepted Charge with the supported named configuration must preserve configured identity through strict save/load/replay. Do not weaken record checks or historical admission. Preserve seeds, physical order, complete path and terrain checks, all model obligations, coverage and timing budgets.",
+      "unchanged_work": "No solver, candidate generation, cache policy, movement geometry, RNG seed, source content, adapter payload schema or gameplay budget changes. The original fixed-peer model001 query remains unresolved; the revised whole-unit witness directly satisfies all ten obligations. One complete covered observation supplies derived scheduling without repeating a valid timing run solely for compliance. Full-game and tactical/learning qualification remain unclaimed."
     },
     "ci/test_shards/shard-6.txt": {
       "category": "rule_semantics",
@@ -573,9 +529,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit a narrow collision/support exclusion for overlapping disconnected-component goal regions, with current physical occupancy and ordered exact-context historical recomputation.",
-      "source_obligation": "Preserve submitted physical execution order, complete-prefix path and terrain legality, every endpoint obligation, exact source geometry, seeds and search budgets. Unsupported or satisfiable relaxations retain ordinary search; only a sufficient negative certificate changes status. Model001 preferred remains unresolved; its engagement path is neither preferred nor whole-unit proof.",
-      "unchanged_work": "Generic movement reachability, navigation, cache keys, seeds, budgets and accepted physical validation are unchanged. Historical observations stay in their producing snapshots; nine additional exact cases and a fresh complete local profile update derived scheduling only. The saved whole charge remains unresolved and full-game performance is unqualified."
+      "rationale": "Refresh current derived scheduling from the single complete valid covered observation for the new runtime and one added case; retain all historical phase evidence and exact planning/approval/execution limits.",
+      "source_obligation": "An ordinary accepted Charge with the supported named configuration must preserve configured identity through strict save/load/replay. Do not weaken record checks or historical admission. Preserve seeds, physical order, complete path and terrain checks, all model obligations, coverage and timing budgets.",
+      "unchanged_work": "No solver, candidate generation, cache policy, movement geometry, RNG seed, source content, adapter payload schema or gameplay budget changes. The original fixed-peer model001 query remains unresolved; the revised whole-unit witness directly satisfies all ten obligations. One complete covered observation supplies derived scheduling without repeating a valid timing run solely for compliance. Full-game and tactical/learning qualification remain unclaimed."
     },
     "ci/test_shards/shard-7.txt": {
       "category": "rule_semantics",
@@ -583,9 +539,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit a narrow collision/support exclusion for overlapping disconnected-component goal regions, with current physical occupancy and ordered exact-context historical recomputation.",
-      "source_obligation": "Preserve submitted physical execution order, complete-prefix path and terrain legality, every endpoint obligation, exact source geometry, seeds and search budgets. Unsupported or satisfiable relaxations retain ordinary search; only a sufficient negative certificate changes status. Model001 preferred remains unresolved; its engagement path is neither preferred nor whole-unit proof.",
-      "unchanged_work": "Generic movement reachability, navigation, cache keys, seeds, budgets and accepted physical validation are unchanged. Historical observations stay in their producing snapshots; nine additional exact cases and a fresh complete local profile update derived scheduling only. The saved whole charge remains unresolved and full-game performance is unqualified."
+      "rationale": "Refresh current derived scheduling from the single complete valid covered observation for the new runtime and one added case; retain all historical phase evidence and exact planning/approval/execution limits.",
+      "source_obligation": "An ordinary accepted Charge with the supported named configuration must preserve configured identity through strict save/load/replay. Do not weaken record checks or historical admission. Preserve seeds, physical order, complete path and terrain checks, all model obligations, coverage and timing budgets.",
+      "unchanged_work": "No solver, candidate generation, cache policy, movement geometry, RNG seed, source content, adapter payload schema or gameplay budget changes. The original fixed-peer model001 query remains unresolved; the revised whole-unit witness directly satisfies all ten obligations. One complete covered observation supplies derived scheduling without repeating a valid timing run solely for compliance. Full-game and tactical/learning qualification remain unclaimed."
     },
     "ci/test_shards/shard-8.txt": {
       "category": "rule_semantics",
@@ -593,9 +549,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit a narrow collision/support exclusion for overlapping disconnected-component goal regions, with current physical occupancy and ordered exact-context historical recomputation.",
-      "source_obligation": "Preserve submitted physical execution order, complete-prefix path and terrain legality, every endpoint obligation, exact source geometry, seeds and search budgets. Unsupported or satisfiable relaxations retain ordinary search; only a sufficient negative certificate changes status. Model001 preferred remains unresolved; its engagement path is neither preferred nor whole-unit proof.",
-      "unchanged_work": "Generic movement reachability, navigation, cache keys, seeds, budgets and accepted physical validation are unchanged. Historical observations stay in their producing snapshots; nine additional exact cases and a fresh complete local profile update derived scheduling only. The saved whole charge remains unresolved and full-game performance is unqualified."
+      "rationale": "Refresh current derived scheduling from the single complete valid covered observation for the new runtime and one added case; retain all historical phase evidence and exact planning/approval/execution limits.",
+      "source_obligation": "An ordinary accepted Charge with the supported named configuration must preserve configured identity through strict save/load/replay. Do not weaken record checks or historical admission. Preserve seeds, physical order, complete path and terrain checks, all model obligations, coverage and timing budgets.",
+      "unchanged_work": "No solver, candidate generation, cache policy, movement geometry, RNG seed, source content, adapter payload schema or gameplay budget changes. The original fixed-peer model001 query remains unresolved; the revised whole-unit witness directly satisfies all ten obligations. One complete covered observation supplies derived scheduling without repeating a valid timing run solely for compliance. Full-game and tactical/learning qualification remain unclaimed."
     },
     "ci/test_shards/shard-9.txt": {
       "category": "rule_semantics",
@@ -603,9 +559,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit a narrow collision/support exclusion for overlapping disconnected-component goal regions, with current physical occupancy and ordered exact-context historical recomputation.",
-      "source_obligation": "Preserve submitted physical execution order, complete-prefix path and terrain legality, every endpoint obligation, exact source geometry, seeds and search budgets. Unsupported or satisfiable relaxations retain ordinary search; only a sufficient negative certificate changes status. Model001 preferred remains unresolved; its engagement path is neither preferred nor whole-unit proof.",
-      "unchanged_work": "Generic movement reachability, navigation, cache keys, seeds, budgets and accepted physical validation are unchanged. Historical observations stay in their producing snapshots; nine additional exact cases and a fresh complete local profile update derived scheduling only. The saved whole charge remains unresolved and full-game performance is unqualified."
+      "rationale": "Refresh current derived scheduling from the single complete valid covered observation for the new runtime and one added case; retain all historical phase evidence and exact planning/approval/execution limits.",
+      "source_obligation": "An ordinary accepted Charge with the supported named configuration must preserve configured identity through strict save/load/replay. Do not weaken record checks or historical admission. Preserve seeds, physical order, complete path and terrain checks, all model obligations, coverage and timing budgets.",
+      "unchanged_work": "No solver, candidate generation, cache policy, movement geometry, RNG seed, source content, adapter payload schema or gameplay budget changes. The original fixed-peer model001 query remains unresolved; the revised whole-unit witness directly satisfies all ten obligations. One complete covered observation supplies derived scheduling without repeating a valid timing run solely for compliance. Full-game and tactical/learning qualification remain unclaimed."
     },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
@@ -613,9 +569,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Admit a narrow collision/support exclusion for overlapping disconnected-component goal regions, with current physical occupancy and ordered exact-context historical recomputation.",
-      "source_obligation": "Preserve submitted physical execution order, complete-prefix path and terrain legality, every endpoint obligation, exact source geometry, seeds and search budgets. Unsupported or satisfiable relaxations retain ordinary search; only a sufficient negative certificate changes status. Model001 preferred remains unresolved; its engagement path is neither preferred nor whole-unit proof.",
-      "unchanged_work": "Generic movement reachability, navigation, cache keys, seeds, budgets and accepted physical validation are unchanged. Historical observations stay in their producing snapshots; nine additional exact cases and a fresh complete local profile update derived scheduling only. The saved whole charge remains unresolved and full-game performance is unqualified."
+      "rationale": "Keep generated current runtime/contract identity, exact test authentication, and derived scheduling consistent with the bounded configured-charge identity repair.",
+      "source_obligation": "An ordinary accepted Charge with the supported named configuration must preserve configured identity through strict save/load/replay. Do not weaken record checks or historical admission. Preserve seeds, physical order, complete path and terrain checks, all model obligations, coverage and timing budgets.",
+      "unchanged_work": "No solver, candidate generation, cache policy, movement geometry, RNG seed, source content, adapter payload schema or gameplay budget changes. The original fixed-peer model001 query remains unresolved; the revised whole-unit witness directly satisfies all ten obligations. One complete covered observation supplies derived scheduling without repeating a valid timing run solely for compliance. Full-game and tactical/learning qualification remain unclaimed."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
@@ -623,9 +579,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Admit a narrow collision/support exclusion for overlapping disconnected-component goal regions, with current physical occupancy and ordered exact-context historical recomputation.",
-      "source_obligation": "Preserve submitted physical execution order, complete-prefix path and terrain legality, every endpoint obligation, exact source geometry, seeds and search budgets. Unsupported or satisfiable relaxations retain ordinary search; only a sufficient negative certificate changes status. Model001 preferred remains unresolved; its engagement path is neither preferred nor whole-unit proof.",
-      "unchanged_work": "Generic movement reachability, navigation, cache keys, seeds, budgets and accepted physical validation are unchanged. Historical observations stay in their producing snapshots; nine additional exact cases and a fresh complete local profile update derived scheduling only. The saved whole charge remains unresolved and full-game performance is unqualified."
+      "rationale": "Keep generated current runtime/contract identity, exact test authentication, and derived scheduling consistent with the bounded configured-charge identity repair.",
+      "source_obligation": "An ordinary accepted Charge with the supported named configuration must preserve configured identity through strict save/load/replay. Do not weaken record checks or historical admission. Preserve seeds, physical order, complete path and terrain checks, all model obligations, coverage and timing budgets.",
+      "unchanged_work": "No solver, candidate generation, cache policy, movement geometry, RNG seed, source content, adapter payload schema or gameplay budget changes. The original fixed-peer model001 query remains unresolved; the revised whole-unit witness directly satisfies all ten obligations. One complete covered observation supplies derived scheduling without repeating a valid timing run solely for compliance. Full-game and tactical/learning qualification remain unclaimed."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
@@ -633,9 +589,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Admit a narrow collision/support exclusion for overlapping disconnected-component goal regions, with current physical occupancy and ordered exact-context historical recomputation.",
-      "source_obligation": "Preserve submitted physical execution order, complete-prefix path and terrain legality, every endpoint obligation, exact source geometry, seeds and search budgets. Unsupported or satisfiable relaxations retain ordinary search; only a sufficient negative certificate changes status. Model001 preferred remains unresolved; its engagement path is neither preferred nor whole-unit proof.",
-      "unchanged_work": "Generic movement reachability, navigation, cache keys, seeds, budgets and accepted physical validation are unchanged. Historical observations stay in their producing snapshots; nine additional exact cases and a fresh complete local profile update derived scheduling only. The saved whole charge remains unresolved and full-game performance is unqualified."
+      "rationale": "Keep generated current runtime/contract identity, exact test authentication, and derived scheduling consistent with the bounded configured-charge identity repair.",
+      "source_obligation": "An ordinary accepted Charge with the supported named configuration must preserve configured identity through strict save/load/replay. Do not weaken record checks or historical admission. Preserve seeds, physical order, complete path and terrain checks, all model obligations, coverage and timing budgets.",
+      "unchanged_work": "No solver, candidate generation, cache policy, movement geometry, RNG seed, source content, adapter payload schema or gameplay budget changes. The original fixed-peer model001 query remains unresolved; the revised whole-unit witness directly satisfies all ten obligations. One complete covered observation supplies derived scheduling without repeating a valid timing run solely for compliance. Full-game and tactical/learning qualification remain unclaimed."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
@@ -643,9 +599,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Admit a narrow collision/support exclusion for overlapping disconnected-component goal regions, with current physical occupancy and ordered exact-context historical recomputation.",
-      "source_obligation": "Preserve submitted physical execution order, complete-prefix path and terrain legality, every endpoint obligation, exact source geometry, seeds and search budgets. Unsupported or satisfiable relaxations retain ordinary search; only a sufficient negative certificate changes status. Model001 preferred remains unresolved; its engagement path is neither preferred nor whole-unit proof.",
-      "unchanged_work": "Generic movement reachability, navigation, cache keys, seeds, budgets and accepted physical validation are unchanged. Historical observations stay in their producing snapshots; nine additional exact cases and a fresh complete local profile update derived scheduling only. The saved whole charge remains unresolved and full-game performance is unqualified."
+      "rationale": "Keep generated current runtime/contract identity, exact test authentication, and derived scheduling consistent with the bounded configured-charge identity repair.",
+      "source_obligation": "An ordinary accepted Charge with the supported named configuration must preserve configured identity through strict save/load/replay. Do not weaken record checks or historical admission. Preserve seeds, physical order, complete path and terrain checks, all model obligations, coverage and timing budgets.",
+      "unchanged_work": "No solver, candidate generation, cache policy, movement geometry, RNG seed, source content, adapter payload schema or gameplay budget changes. The original fixed-peer model001 query remains unresolved; the revised whole-unit witness directly satisfies all ten obligations. One complete covered observation supplies derived scheduling without repeating a valid timing run solely for compliance. Full-game and tactical/learning qualification remain unclaimed."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
@@ -653,9 +609,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Admit a narrow collision/support exclusion for overlapping disconnected-component goal regions, with current physical occupancy and ordered exact-context historical recomputation.",
-      "source_obligation": "Preserve submitted physical execution order, complete-prefix path and terrain legality, every endpoint obligation, exact source geometry, seeds and search budgets. Unsupported or satisfiable relaxations retain ordinary search; only a sufficient negative certificate changes status. Model001 preferred remains unresolved; its engagement path is neither preferred nor whole-unit proof.",
-      "unchanged_work": "Generic movement reachability, navigation, cache keys, seeds, budgets and accepted physical validation are unchanged. Historical observations stay in their producing snapshots; nine additional exact cases and a fresh complete local profile update derived scheduling only. The saved whole charge remains unresolved and full-game performance is unqualified."
+      "rationale": "Keep generated current runtime/contract identity, exact test authentication, and derived scheduling consistent with the bounded configured-charge identity repair.",
+      "source_obligation": "An ordinary accepted Charge with the supported named configuration must preserve configured identity through strict save/load/replay. Do not weaken record checks or historical admission. Preserve seeds, physical order, complete path and terrain checks, all model obligations, coverage and timing budgets.",
+      "unchanged_work": "No solver, candidate generation, cache policy, movement geometry, RNG seed, source content, adapter payload schema or gameplay budget changes. The original fixed-peer model001 query remains unresolved; the revised whole-unit witness directly satisfies all ten obligations. One complete covered observation supplies derived scheduling without repeating a valid timing run solely for compliance. Full-game and tactical/learning qualification remain unclaimed."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
@@ -663,9 +619,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Admit a narrow collision/support exclusion for overlapping disconnected-component goal regions, with current physical occupancy and ordered exact-context historical recomputation.",
-      "source_obligation": "Preserve submitted physical execution order, complete-prefix path and terrain legality, every endpoint obligation, exact source geometry, seeds and search budgets. Unsupported or satisfiable relaxations retain ordinary search; only a sufficient negative certificate changes status. Model001 preferred remains unresolved; its engagement path is neither preferred nor whole-unit proof.",
-      "unchanged_work": "Generic movement reachability, navigation, cache keys, seeds, budgets and accepted physical validation are unchanged. Historical observations stay in their producing snapshots; nine additional exact cases and a fresh complete local profile update derived scheduling only. The saved whole charge remains unresolved and full-game performance is unqualified."
+      "rationale": "Keep generated current runtime/contract identity, exact test authentication, and derived scheduling consistent with the bounded configured-charge identity repair.",
+      "source_obligation": "An ordinary accepted Charge with the supported named configuration must preserve configured identity through strict save/load/replay. Do not weaken record checks or historical admission. Preserve seeds, physical order, complete path and terrain checks, all model obligations, coverage and timing budgets.",
+      "unchanged_work": "No solver, candidate generation, cache policy, movement geometry, RNG seed, source content, adapter payload schema or gameplay budget changes. The original fixed-peer model001 query remains unresolved; the revised whole-unit witness directly satisfies all ten obligations. One complete covered observation supplies derived scheduling without repeating a valid timing run solely for compliance. Full-game and tactical/learning qualification remain unclaimed."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
@@ -673,9 +629,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Admit a narrow collision/support exclusion for overlapping disconnected-component goal regions, with current physical occupancy and ordered exact-context historical recomputation.",
-      "source_obligation": "Preserve submitted physical execution order, complete-prefix path and terrain legality, every endpoint obligation, exact source geometry, seeds and search budgets. Unsupported or satisfiable relaxations retain ordinary search; only a sufficient negative certificate changes status. Model001 preferred remains unresolved; its engagement path is neither preferred nor whole-unit proof.",
-      "unchanged_work": "Generic movement reachability, navigation, cache keys, seeds, budgets and accepted physical validation are unchanged. Historical observations stay in their producing snapshots; nine additional exact cases and a fresh complete local profile update derived scheduling only. The saved whole charge remains unresolved and full-game performance is unqualified."
+      "rationale": "Keep generated current runtime/contract identity, exact test authentication, and derived scheduling consistent with the bounded configured-charge identity repair.",
+      "source_obligation": "An ordinary accepted Charge with the supported named configuration must preserve configured identity through strict save/load/replay. Do not weaken record checks or historical admission. Preserve seeds, physical order, complete path and terrain checks, all model obligations, coverage and timing budgets.",
+      "unchanged_work": "No solver, candidate generation, cache policy, movement geometry, RNG seed, source content, adapter payload schema or gameplay budget changes. The original fixed-peer model001 query remains unresolved; the revised whole-unit witness directly satisfies all ten obligations. One complete covered observation supplies derived scheduling without repeating a valid timing run solely for compliance. Full-game and tactical/learning qualification remain unclaimed."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
@@ -683,9 +639,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Admit a narrow collision/support exclusion for overlapping disconnected-component goal regions, with current physical occupancy and ordered exact-context historical recomputation.",
-      "source_obligation": "Preserve submitted physical execution order, complete-prefix path and terrain legality, every endpoint obligation, exact source geometry, seeds and search budgets. Unsupported or satisfiable relaxations retain ordinary search; only a sufficient negative certificate changes status. Model001 preferred remains unresolved; its engagement path is neither preferred nor whole-unit proof.",
-      "unchanged_work": "Generic movement reachability, navigation, cache keys, seeds, budgets and accepted physical validation are unchanged. Historical observations stay in their producing snapshots; nine additional exact cases and a fresh complete local profile update derived scheduling only. The saved whole charge remains unresolved and full-game performance is unqualified."
+      "rationale": "Keep generated current runtime/contract identity, exact test authentication, and derived scheduling consistent with the bounded configured-charge identity repair.",
+      "source_obligation": "An ordinary accepted Charge with the supported named configuration must preserve configured identity through strict save/load/replay. Do not weaken record checks or historical admission. Preserve seeds, physical order, complete path and terrain checks, all model obligations, coverage and timing budgets.",
+      "unchanged_work": "No solver, candidate generation, cache policy, movement geometry, RNG seed, source content, adapter payload schema or gameplay budget changes. The original fixed-peer model001 query remains unresolved; the revised whole-unit witness directly satisfies all ten obligations. One complete covered observation supplies derived scheduling without repeating a valid timing run solely for compliance. Full-game and tactical/learning qualification remain unclaimed."
     },
     "data/source_audits/ci64_provenance_v1/test-cutover.json": {
       "category": "rule_semantics",
@@ -693,49 +649,41 @@
         "ci78-prototype-evidence-0e09425e4315bf61bb6c4427fa7917fe62c2ed867dcb01798f9451a957182b0a"
       ],
       "selected_families": [],
-      "rationale": "Admit a narrow collision/support exclusion for overlapping disconnected-component goal regions, with current physical occupancy and ordered exact-context historical recomputation.",
-      "source_obligation": "Preserve submitted physical execution order, complete-prefix path and terrain legality, every endpoint obligation, exact source geometry, seeds and search budgets. Unsupported or satisfiable relaxations retain ordinary search; only a sufficient negative certificate changes status. Model001 preferred remains unresolved; its engagement path is neither preferred nor whole-unit proof.",
-      "unchanged_work": "Generic movement reachability, navigation, cache keys, seeds, budgets and accepted physical validation are unchanged. Historical observations stay in their producing snapshots; nine additional exact cases and a fresh complete local profile update derived scheduling only. The saved whole charge remains unresolved and full-game performance is unqualified."
+      "rationale": "Keep generated current runtime/contract identity, exact test authentication, and derived scheduling consistent with the bounded configured-charge identity repair.",
+      "source_obligation": "An ordinary accepted Charge with the supported named configuration must preserve configured identity through strict save/load/replay. Do not weaken record checks or historical admission. Preserve seeds, physical order, complete path and terrain checks, all model obligations, coverage and timing budgets.",
+      "unchanged_work": "No solver, candidate generation, cache policy, movement geometry, RNG seed, source content, adapter payload schema or gameplay budget changes. The original fixed-peer model001 query remains unresolved; the revised whole-unit witness directly satisfies all ten obligations. One complete covered observation supplies derived scheduling without repeating a valid timing run solely for compliance. Full-game and tactical/learning qualification remain unclaimed."
+    },
+    "docs/AI_POLICY_INTERFACE.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Correct stale preferred-query status and record the verified whole-unit witness, all ten satisfied obligations, strict persistence/replay and first-Fight-request stop boundary.",
+      "source_obligation": "An ordinary accepted Charge with the supported named configuration must preserve configured identity through strict save/load/replay. Do not weaken record checks or historical admission. Preserve seeds, physical order, complete path and terrain checks, all model obligations, coverage and timing budgets.",
+      "unchanged_work": "No solver, candidate generation, cache policy, movement geometry, RNG seed, source content, adapter payload schema or gameplay budget changes. The original fixed-peer model001 query remains unresolved; the revised whole-unit witness directly satisfies all ten obligations. One complete covered observation supplies derived scheduling without repeating a valid timing run solely for compliance. Full-game and tactical/learning qualification remain unclaimed."
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Admit a narrow collision/support exclusion for overlapping disconnected-component goal regions, with current physical occupancy and ordered exact-context historical recomputation.",
-      "source_obligation": "Preserve submitted physical execution order, complete-prefix path and terrain legality, every endpoint obligation, exact source geometry, seeds and search budgets. Unsupported or satisfiable relaxations retain ordinary search; only a sufficient negative certificate changes status. Model001 preferred remains unresolved; its engagement path is neither preferred nor whole-unit proof.",
-      "unchanged_work": "Generic movement reachability, navigation, cache keys, seeds, budgets and accepted physical validation are unchanged. Historical observations stay in their producing snapshots; nine additional exact cases and a fresh complete local profile update derived scheduling only. The saved whole charge remains unresolved and full-game performance is unqualified."
+      "rationale": "Correct stale preferred-query status and record the verified whole-unit witness, all ten satisfied obligations, strict persistence/replay and first-Fight-request stop boundary.",
+      "source_obligation": "An ordinary accepted Charge with the supported named configuration must preserve configured identity through strict save/load/replay. Do not weaken record checks or historical admission. Preserve seeds, physical order, complete path and terrain checks, all model obligations, coverage and timing budgets.",
+      "unchanged_work": "No solver, candidate generation, cache policy, movement geometry, RNG seed, source content, adapter payload schema or gameplay budget changes. The original fixed-peer model001 query remains unresolved; the revised whole-unit witness directly satisfies all ten obligations. One complete covered observation supplies derived scheduling without repeating a valid timing run solely for compliance. Full-game and tactical/learning qualification remain unclaimed."
     },
-    "docs/performance/current/blocked-endpoints-20261113-movement.json": {
+    "docs/performance/current/configured-charge-identity-20261113-reconstruction.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Admit a narrow collision/support exclusion for overlapping disconnected-component goal regions, with current physical occupancy and ordered exact-context historical recomputation.",
-      "source_obligation": "Preserve submitted physical execution order, complete-prefix path and terrain legality, every endpoint obligation, exact source geometry, seeds and search budgets. Unsupported or satisfiable relaxations retain ordinary search; only a sufficient negative certificate changes status. Model001 preferred remains unresolved; its engagement path is neither preferred nor whole-unit proof.",
-      "unchanged_work": "Generic movement reachability, navigation, cache keys, seeds, budgets and accepted physical validation are unchanged. Historical observations stay in their producing snapshots; nine additional exact cases and a fresh complete local profile update derived scheduling only. The saved whole charge remains unresolved and full-game performance is unqualified."
+      "rationale": "Keep generated current runtime/contract identity, exact test authentication, and derived scheduling consistent with the bounded configured-charge identity repair.",
+      "source_obligation": "An ordinary accepted Charge with the supported named configuration must preserve configured identity through strict save/load/replay. Do not weaken record checks or historical admission. Preserve seeds, physical order, complete path and terrain checks, all model obligations, coverage and timing budgets.",
+      "unchanged_work": "No solver, candidate generation, cache policy, movement geometry, RNG seed, source content, adapter payload schema or gameplay budget changes. The original fixed-peer model001 query remains unresolved; the revised whole-unit witness directly satisfies all ten obligations. One complete covered observation supplies derived scheduling without repeating a valid timing run solely for compliance. Full-game and tactical/learning qualification remain unclaimed."
     },
-    "docs/performance/current/blocked-endpoints-20261113-reconstruction.json": {
+    "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Admit a narrow collision/support exclusion for overlapping disconnected-component goal regions, with current physical occupancy and ordered exact-context historical recomputation.",
-      "source_obligation": "Preserve submitted physical execution order, complete-prefix path and terrain legality, every endpoint obligation, exact source geometry, seeds and search budgets. Unsupported or satisfiable relaxations retain ordinary search; only a sufficient negative certificate changes status. Model001 preferred remains unresolved; its engagement path is neither preferred nor whole-unit proof.",
-      "unchanged_work": "Generic movement reachability, navigation, cache keys, seeds, budgets and accepted physical validation are unchanged. Historical observations stay in their producing snapshots; nine additional exact cases and a fresh complete local profile update derived scheduling only. The saved whole charge remains unresolved and full-game performance is unqualified."
-    },
-    "docs/performance/current/blocked-endpoints-20261113-setup.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Admit a narrow collision/support exclusion for overlapping disconnected-component goal regions, with current physical occupancy and ordered exact-context historical recomputation.",
-      "source_obligation": "Preserve submitted physical execution order, complete-prefix path and terrain legality, every endpoint obligation, exact source geometry, seeds and search budgets. Unsupported or satisfiable relaxations retain ordinary search; only a sufficient negative certificate changes status. Model001 preferred remains unresolved; its engagement path is neither preferred nor whole-unit proof.",
-      "unchanged_work": "Generic movement reachability, navigation, cache keys, seeds, budgets and accepted physical validation are unchanged. Historical observations stay in their producing snapshots; nine additional exact cases and a fresh complete local profile update derived scheduling only. The saved whole charge remains unresolved and full-game performance is unqualified."
-    },
-    "docs/performance/current/blocked-endpoints-20261113-visibility.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Admit a narrow collision/support exclusion for overlapping disconnected-component goal regions, with current physical occupancy and ordered exact-context historical recomputation.",
-      "source_obligation": "Preserve submitted physical execution order, complete-prefix path and terrain legality, every endpoint obligation, exact source geometry, seeds and search budgets. Unsupported or satisfiable relaxations retain ordinary search; only a sufficient negative certificate changes status. Model001 preferred remains unresolved; its engagement path is neither preferred nor whole-unit proof.",
-      "unchanged_work": "Generic movement reachability, navigation, cache keys, seeds, budgets and accepted physical validation are unchanged. Historical observations stay in their producing snapshots; nine additional exact cases and a fresh complete local profile update derived scheduling only. The saved whole charge remains unresolved and full-game performance is unqualified."
+      "rationale": "Keep generated current runtime/contract identity, exact test authentication, and derived scheduling consistent with the bounded configured-charge identity repair.",
+      "source_obligation": "An ordinary accepted Charge with the supported named configuration must preserve configured identity through strict save/load/replay. Do not weaken record checks or historical admission. Preserve seeds, physical order, complete path and terrain checks, all model obligations, coverage and timing budgets.",
+      "unchanged_work": "No solver, candidate generation, cache policy, movement geometry, RNG seed, source content, adapter payload schema or gameplay budget changes. The original fixed-peer model001 query remains unresolved; the revised whole-unit witness directly satisfies all ten obligations. One complete covered observation supplies derived scheduling without repeating a valid timing run solely for compliance. Full-game and tactical/learning qualification remain unclaimed."
     },
     "scripts/current_shard_compatibility.py": {
       "category": "rule_semantics",
@@ -743,9 +691,9 @@
         "scoped-shard-allocation"
       ],
       "selected_families": [],
-      "rationale": "Admit a narrow collision/support exclusion for overlapping disconnected-component goal regions, with current physical occupancy and ordered exact-context historical recomputation.",
-      "source_obligation": "Preserve submitted physical execution order, complete-prefix path and terrain legality, every endpoint obligation, exact source geometry, seeds and search budgets. Unsupported or satisfiable relaxations retain ordinary search; only a sufficient negative certificate changes status. Model001 preferred remains unresolved; its engagement path is neither preferred nor whole-unit proof.",
-      "unchanged_work": "Generic movement reachability, navigation, cache keys, seeds, budgets and accepted physical validation are unchanged. Historical observations stay in their producing snapshots; nine additional exact cases and a fresh complete local profile update derived scheduling only. The saved whole charge remains unresolved and full-game performance is unqualified."
+      "rationale": "Add exactly one declared named-ruleset persistence regression to the finite current scheduling extension (37 additions, 6319 total); retain every historical case and control.",
+      "source_obligation": "An ordinary accepted Charge with the supported named configuration must preserve configured identity through strict save/load/replay. Do not weaken record checks or historical admission. Preserve seeds, physical order, complete path and terrain checks, all model obligations, coverage and timing budgets.",
+      "unchanged_work": "No solver, candidate generation, cache policy, movement geometry, RNG seed, source content, adapter payload schema or gameplay budget changes. The original fixed-peer model001 query remains unresolved; the revised whole-unit witness directly satisfies all ten obligations. One complete covered observation supplies derived scheduling without repeating a valid timing run solely for compliance. Full-game and tactical/learning qualification remain unclaimed."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
@@ -753,70 +701,57 @@
         "source-record"
       ],
       "selected_families": [],
-      "rationale": "Admit a narrow collision/support exclusion for overlapping disconnected-component goal regions, with current physical occupancy and ordered exact-context historical recomputation.",
-      "source_obligation": "Preserve submitted physical execution order, complete-prefix path and terrain legality, every endpoint obligation, exact source geometry, seeds and search budgets. Unsupported or satisfiable relaxations retain ordinary search; only a sufficient negative certificate changes status. Model001 preferred remains unresolved; its engagement path is neither preferred nor whole-unit proof.",
-      "unchanged_work": "Generic movement reachability, navigation, cache keys, seeds, budgets and accepted physical validation are unchanged. Historical observations stay in their producing snapshots; nine additional exact cases and a fresh complete local profile update derived scheduling only. The saved whole charge remains unresolved and full-game performance is unqualified."
+      "rationale": "Keep generated current runtime/contract identity, exact test authentication, and derived scheduling consistent with the bounded configured-charge identity repair.",
+      "source_obligation": "An ordinary accepted Charge with the supported named configuration must preserve configured identity through strict save/load/replay. Do not weaken record checks or historical admission. Preserve seeds, physical order, complete path and terrain checks, all model obligations, coverage and timing budgets.",
+      "unchanged_work": "No solver, candidate generation, cache policy, movement geometry, RNG seed, source content, adapter payload schema or gameplay budget changes. The original fixed-peer model001 query remains unresolved; the revised whole-unit witness directly satisfies all ten obligations. One complete covered observation supplies derived scheduling without repeating a valid timing run solely for compliance. Full-game and tactical/learning qualification remain unclaimed."
     },
-    "src/warhammer40k_core/engine/base_contact_history.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "d07-model-owned-upper-floor-rule",
-        "order126-sequential-physical-movement"
-      ],
-      "selected_families": [],
-      "rationale": "Admit a narrow collision/support exclusion for overlapping disconnected-component goal regions, with current physical occupancy and ordered exact-context historical recomputation.",
-      "source_obligation": "Preserve submitted physical execution order, complete-prefix path and terrain legality, every endpoint obligation, exact source geometry, seeds and search budgets. Unsupported or satisfiable relaxations retain ordinary search; only a sufficient negative certificate changes status. Model001 preferred remains unresolved; its engagement path is neither preferred nor whole-unit proof.",
-      "unchanged_work": "Generic movement reachability, navigation, cache keys, seeds, budgets and accepted physical validation are unchanged. Historical observations stay in their producing snapshots; nine additional exact cases and a fresh complete local profile update derived scheduling only. The saved whole charge remains unresolved and full-game performance is unqualified."
-    },
-    "src/warhammer40k_core/engine/charge_endpoint_history.py": {
+    "src/warhammer40k_core/engine/base_contact_charge_history.py": {
       "category": "serialization_or_replay_work",
       "operations": [
-        "charge-endpoint-connectivity"
+        "charge-configured-ruleset-history-identity"
       ],
       "selected_families": [
-        "movement",
         "reconstruction"
       ],
-      "rationale": "Admit a narrow collision/support exclusion for overlapping disconnected-component goal regions, with current physical occupancy and ordered exact-context historical recomputation.",
-      "source_obligation": "Preserve submitted physical execution order, complete-prefix path and terrain legality, every endpoint obligation, exact source geometry, seeds and search budgets. Unsupported or satisfiable relaxations retain ordinary search; only a sufficient negative certificate changes status. Model001 preferred remains unresolved; its engagement path is neither preferred nor whole-unit proof.",
-      "unchanged_work": "Generic movement reachability, navigation, cache keys, seeds, budgets and accepted physical validation are unchanged. Historical observations stay in their producing snapshots; nine additional exact cases and a fresh complete local profile update derived scheduling only. The saved whole charge remains unresolved and full-game performance is unqualified."
+      "rationale": "Validate recorded coherency against the authoritative configured ruleset hash passed from state at all three historical consumers; retain the canonical descriptor for actual policy checks.",
+      "source_obligation": "An ordinary accepted Charge with the supported named configuration must preserve configured identity through strict save/load/replay. Do not weaken record checks or historical admission. Preserve seeds, physical order, complete path and terrain checks, all model obligations, coverage and timing budgets.",
+      "unchanged_work": "No solver, candidate generation, cache policy, movement geometry, RNG seed, source content, adapter payload schema or gameplay budget changes. The original fixed-peer model001 query remains unresolved; the revised whole-unit witness directly satisfies all ten obligations. One complete covered observation supplies derived scheduling without repeating a valid timing run solely for compliance. Full-game and tactical/learning qualification remain unclaimed."
     },
-    "src/warhammer40k_core/engine/charge_model_endpoints.py": {
-      "category": "algorithm_or_search",
+    "src/warhammer40k_core/engine/battle_shock_event_authority.py": {
+      "category": "serialization_or_replay_work",
       "operations": [
-        "charge-endpoint-connectivity"
+        "charge-configured-ruleset-history-identity"
       ],
       "selected_families": [
-        "movement",
         "reconstruction"
       ],
-      "rationale": "Admit a narrow collision/support exclusion for overlapping disconnected-component goal regions, with current physical occupancy and ordered exact-context historical recomputation.",
-      "source_obligation": "Preserve submitted physical execution order, complete-prefix path and terrain legality, every endpoint obligation, exact source geometry, seeds and search budgets. Unsupported or satisfiable relaxations retain ordinary search; only a sufficient negative certificate changes status. Model001 preferred remains unresolved; its engagement path is neither preferred nor whole-unit proof.",
-      "unchanged_work": "Generic movement reachability, navigation, cache keys, seeds, budgets and accepted physical validation are unchanged. Historical observations stay in their producing snapshots; nine additional exact cases and a fresh complete local profile update derived scheduling only. The saved whole charge remains unresolved and full-game performance is unqualified."
+      "rationale": "Validate recorded coherency against the authoritative configured ruleset hash passed from state at all three historical consumers; retain the canonical descriptor for actual policy checks.",
+      "source_obligation": "An ordinary accepted Charge with the supported named configuration must preserve configured identity through strict save/load/replay. Do not weaken record checks or historical admission. Preserve seeds, physical order, complete path and terrain checks, all model obligations, coverage and timing budgets.",
+      "unchanged_work": "No solver, candidate generation, cache policy, movement geometry, RNG seed, source content, adapter payload schema or gameplay budget changes. The original fixed-peer model001 query remains unresolved; the revised whole-unit witness directly satisfies all ten obligations. One complete covered observation supplies derived scheduling without repeating a valid timing run solely for compliance. Full-game and tactical/learning qualification remain unclaimed."
     },
-    "src/warhammer40k_core/engine/sequential_movement.py": {
-      "category": "rule_semantics",
+    "src/warhammer40k_core/engine/charge_move_event_authority.py": {
+      "category": "serialization_or_replay_work",
       "operations": [
-        "movement-rule-branch"
-      ],
-      "selected_families": [],
-      "rationale": "Admit a narrow collision/support exclusion for overlapping disconnected-component goal regions, with current physical occupancy and ordered exact-context historical recomputation.",
-      "source_obligation": "Preserve submitted physical execution order, complete-prefix path and terrain legality, every endpoint obligation, exact source geometry, seeds and search budgets. Unsupported or satisfiable relaxations retain ordinary search; only a sufficient negative certificate changes status. Model001 preferred remains unresolved; its engagement path is neither preferred nor whole-unit proof.",
-      "unchanged_work": "Generic movement reachability, navigation, cache keys, seeds, budgets and accepted physical validation are unchanged. Historical observations stay in their producing snapshots; nine additional exact cases and a fresh complete local profile update derived scheduling only. The saved whole charge remains unresolved and full-game performance is unqualified."
-    },
-    "src/warhammer40k_core/geometry/connected_endpoint_proof.py": {
-      "category": "algorithm_or_search",
-      "operations": [
-        "geometry-search"
+        "charge-configured-ruleset-history-identity"
       ],
       "selected_families": [
-        "movement",
-        "setup",
-        "visibility"
+        "reconstruction"
       ],
-      "rationale": "Admit a narrow collision/support exclusion for overlapping disconnected-component goal regions, with current physical occupancy and ordered exact-context historical recomputation.",
-      "source_obligation": "Preserve submitted physical execution order, complete-prefix path and terrain legality, every endpoint obligation, exact source geometry, seeds and search budgets. Unsupported or satisfiable relaxations retain ordinary search; only a sufficient negative certificate changes status. Model001 preferred remains unresolved; its engagement path is neither preferred nor whole-unit proof.",
-      "unchanged_work": "Generic movement reachability, navigation, cache keys, seeds, budgets and accepted physical validation are unchanged. Historical observations stay in their producing snapshots; nine additional exact cases and a fresh complete local profile update derived scheduling only. The saved whole charge remains unresolved and full-game performance is unqualified."
+      "rationale": "Validate recorded coherency against the authoritative configured ruleset hash passed from state at all three historical consumers; retain the canonical descriptor for actual policy checks.",
+      "source_obligation": "An ordinary accepted Charge with the supported named configuration must preserve configured identity through strict save/load/replay. Do not weaken record checks or historical admission. Preserve seeds, physical order, complete path and terrain checks, all model obligations, coverage and timing budgets.",
+      "unchanged_work": "No solver, candidate generation, cache policy, movement geometry, RNG seed, source content, adapter payload schema or gameplay budget changes. The original fixed-peer model001 query remains unresolved; the revised whole-unit witness directly satisfies all ten obligations. One complete covered observation supplies derived scheduling without repeating a valid timing run solely for compliance. Full-game and tactical/learning qualification remain unclaimed."
+    },
+    "src/warhammer40k_core/engine/primary_mission_event_decision_authority.py": {
+      "category": "serialization_or_replay_work",
+      "operations": [
+        "charge-configured-ruleset-history-identity"
+      ],
+      "selected_families": [
+        "reconstruction"
+      ],
+      "rationale": "Validate recorded coherency against the authoritative configured ruleset hash passed from state at all three historical consumers; retain the canonical descriptor for actual policy checks.",
+      "source_obligation": "An ordinary accepted Charge with the supported named configuration must preserve configured identity through strict save/load/replay. Do not weaken record checks or historical admission. Preserve seeds, physical order, complete path and terrain checks, all model obligations, coverage and timing budgets.",
+      "unchanged_work": "No solver, candidate generation, cache policy, movement geometry, RNG seed, source content, adapter payload schema or gameplay budget changes. The original fixed-peer model001 query remains unresolved; the revised whole-unit witness directly satisfies all ten obligations. One complete covered observation supplies derived scheduling without repeating a valid timing run solely for compliance. Full-game and tactical/learning qualification remain unclaimed."
     },
     "tests/code_quality/test_current_shard_compatibility.py": {
       "category": "rule_semantics",
@@ -824,9 +759,9 @@
         "scoped-shard-allocation"
       ],
       "selected_families": [],
-      "rationale": "Admit a narrow collision/support exclusion for overlapping disconnected-component goal regions, with current physical occupancy and ordered exact-context historical recomputation.",
-      "source_obligation": "Preserve submitted physical execution order, complete-prefix path and terrain legality, every endpoint obligation, exact source geometry, seeds and search budgets. Unsupported or satisfiable relaxations retain ordinary search; only a sufficient negative certificate changes status. Model001 preferred remains unresolved; its engagement path is neither preferred nor whole-unit proof.",
-      "unchanged_work": "Generic movement reachability, navigation, cache keys, seeds, budgets and accepted physical validation are unchanged. Historical observations stay in their producing snapshots; nine additional exact cases and a fresh complete local profile update derived scheduling only. The saved whole charge remains unresolved and full-game performance is unqualified."
+      "rationale": "Add exactly one declared named-ruleset persistence regression to the finite current scheduling extension (37 additions, 6319 total); retain every historical case and control.",
+      "source_obligation": "An ordinary accepted Charge with the supported named configuration must preserve configured identity through strict save/load/replay. Do not weaken record checks or historical admission. Preserve seeds, physical order, complete path and terrain checks, all model obligations, coverage and timing budgets.",
+      "unchanged_work": "No solver, candidate generation, cache policy, movement geometry, RNG seed, source content, adapter payload schema or gameplay budget changes. The original fixed-peer model001 query remains unresolved; the revised whole-unit witness directly satisfies all ten obligations. One complete covered observation supplies derived scheduling without repeating a valid timing run solely for compliance. Full-game and tactical/learning qualification remain unclaimed."
     },
     "tests/rules/section07/coverage.json": {
       "category": "rule_semantics",
@@ -834,9 +769,9 @@
         "qualification40-exact-b6886d3bc2fb1ca4"
       ],
       "selected_families": [],
-      "rationale": "Refresh the existing authenticated README input checksum after maintained current test-count edits; preserve every section07 source block, requirement and assertion.",
-      "source_obligation": "The complete hierarchy/raw-capture authentication test must authenticate the actual final README bytes. The test functions and other authenticated source identities remain unchanged.",
-      "unchanged_work": "This is a one-field checksum correction. Runtime and executable test code are unchanged. The original covered qualification and component cohort remain in their producing snapshots; selected component comparisons are newly measured because this metadata belongs to the required common fixture digest."
+      "rationale": "Update the maintained current case count to6319 and its existing README authentication checksum before the covered input freeze.",
+      "source_obligation": "An ordinary accepted Charge with the supported named configuration must preserve configured identity through strict save/load/replay. Do not weaken record checks or historical admission. Preserve seeds, physical order, complete path and terrain checks, all model obligations, coverage and timing budgets.",
+      "unchanged_work": "No solver, candidate generation, cache policy, movement geometry, RNG seed, source content, adapter payload schema or gameplay budget changes. The original fixed-peer model001 query remains unresolved; the revised whole-unit witness directly satisfies all ten obligations. One complete covered observation supplies derived scheduling without repeating a valid timing run solely for compliance. Full-game and tactical/learning qualification remain unclaimed."
     },
     "tests/rules/section11/test_connected_endpoints.py": {
       "category": "rule_semantics",
@@ -844,17 +779,14 @@
         "charge-connected-endpoint-controls"
       ],
       "selected_families": [],
-      "rationale": "Admit a narrow collision/support exclusion for overlapping disconnected-component goal regions, with current physical occupancy and ordered exact-context historical recomputation.",
-      "source_obligation": "Preserve submitted physical execution order, complete-prefix path and terrain legality, every endpoint obligation, exact source geometry, seeds and search budgets. Unsupported or satisfiable relaxations retain ordinary search; only a sufficient negative certificate changes status. Model001 preferred remains unresolved; its engagement path is neither preferred nor whole-unit proof.",
-      "unchanged_work": "Generic movement reachability, navigation, cache keys, seeds, budgets and accepted physical validation are unchanged. Historical observations stay in their producing snapshots; nine additional exact cases and a fresh complete local profile update derived scheduling only. The saved whole charge remains unresolved and full-game performance is unqualified."
+      "rationale": "Regress an ordinary accepted reversed-order five-model Charge under a supported named configuration through full JSON save/load and exact replay, with wrong-recorded-hash rejection.",
+      "source_obligation": "An ordinary accepted Charge with the supported named configuration must preserve configured identity through strict save/load/replay. Do not weaken record checks or historical admission. Preserve seeds, physical order, complete path and terrain checks, all model obligations, coverage and timing budgets.",
+      "unchanged_work": "No solver, candidate generation, cache policy, movement geometry, RNG seed, source content, adapter payload schema or gameplay budget changes. The original fixed-peer model001 query remains unresolved; the revised whole-unit witness directly satisfies all ten obligations. One complete covered observation supplies derived scheduling without repeating a valid timing run solely for compliance. Full-game and tactical/learning qualification remain unclaimed."
     }
   },
   "milestone": "ordinary",
   "comparisons": {
-    "visibility": "docs/performance/current/blocked-endpoints-20261113-visibility.json",
-    "movement": "docs/performance/current/blocked-endpoints-20261113-movement.json",
-    "setup": "docs/performance/current/blocked-endpoints-20261113-setup.json",
-    "reconstruction": "docs/performance/current/blocked-endpoints-20261113-reconstruction.json"
+    "reconstruction": "docs/performance/current/configured-charge-identity-20261113-reconstruction.json"
   },
   "full_game": null
 }

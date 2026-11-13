@@ -382,3 +382,81 @@ def test_connected_endpoint_certificate_survives_charge_history_reconstruction(
         ability_index_for_player=session.lifecycle._charge_phase_handler.ability_index_for_player,  # pyright: ignore[reportPrivateUsage]
     )
     assert restored.to_payload() == state.to_payload()
+
+
+def test_named_ruleset_charge_completion_survives_persistence() -> None:
+    from tests.phase15a_charge_test_support import (
+        _charge_lifecycle,
+        _compact_test_unit_poses,
+    )
+    from tests.support.section11_fixtures import select
+    from warhammer40k_core.adapters.local_session import LocalGameSession
+    from warhammer40k_core.engine.lifecycle import GameLifecycle
+    from warhammer40k_core.engine.phase import GameLifecycleError
+    from warhammer40k_core.engine.replay import ReplayRunner
+
+    # The supported named descriptor has the same movement policies as the
+    # mission-derived descriptor but a distinct configured version and hash.
+    lifecycle, units = _charge_lifecycle(
+        alpha_unit_ids=("charger", "spare"),
+        enemy_model_poses=_compact_test_unit_poses(origin=Pose.at(10, 24), model_count=5),
+        game_id="named-ruleset-charge-persistence",
+    )
+    session = LocalGameSession(lifecycle)
+    state = lifecycle.state
+    assert state is not None
+    configured = lifecycle.config.ruleset_descriptor
+    assert configured.descriptor_hash == state.ruleset_descriptor_hash
+    assert configured.descriptor_hash != state.runtime_ruleset_descriptor().descriptor_hash
+    assert configured.coherency_policy == state.runtime_ruleset_descriptor().coherency_policy
+    unit, enemy = units["charger"], units["enemy"]
+    select(session, unit)
+    request = lifecycle.pending_decision_request()
+    assert request is not None
+    if request.decision_type == "select_dice_reroll":
+        choose(session, "decline", result_id="named-charge:decline-reroll")
+    targets(session, (enemy.unit_instance_id,))
+    assert state.battlefield_state is not None
+    placement = state.battlefield_state.unit_placement_by_id(unit.unit_instance_id)
+    path = PathWitness.for_paths(
+        tuple(
+            (
+                model.model_instance_id,
+                (
+                    model.pose,
+                    Pose.at(
+                        model.pose.position.x,
+                        model.pose.position.y + 2.0,
+                        model.pose.position.z,
+                        facing_degrees=model.pose.facing.degrees,
+                    ),
+                ),
+            )
+            for model in reversed(placement.model_placements)
+        )
+    )
+    status = propose(session, unit.unit_instance_id, (enemy.unit_instance_id,), path)
+    assert status.status_kind is not LifecycleStatusKind.INVALID, status
+    event = events(session, "charge_move_completed")[-1]
+    coherency = event["coherency_result"]
+    assert isinstance(coherency, dict)
+    assert coherency["ruleset_descriptor_hash"] == configured.descriptor_hash
+    saved = json.loads(json.dumps(session.to_persistence_payload()))
+    restored = LocalGameSession.from_persistence_payload(saved)
+    assert restored.to_persistence_payload() == saved
+    replay = ReplayRunner.from_payload(saved["replay_artifact"]).run()
+    assert replay.to_payload()["status"] == "reproduced"
+
+    # The configured identity remains authoritative. Using the canonical policy
+    # descriptor's different hash in an otherwise accepted event is still wrong.
+    damaged = json.loads(json.dumps(lifecycle.to_payload()))
+    completion = next(
+        row
+        for row in damaged["decisions"]["event_log"]
+        if row["event_type"] == "charge_move_completed"
+    )
+    completion["payload"]["coherency_result"]["ruleset_descriptor_hash"] = (
+        state.runtime_ruleset_descriptor().descriptor_hash
+    )
+    with pytest.raises(GameLifecycleError, match="coherency authority drifted"):
+        GameLifecycle.from_payload(damaged)

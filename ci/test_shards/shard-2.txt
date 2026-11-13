@@ -7,10 +7,9 @@ tests/infrastructure/missions/unit/test_step5d_condemned_departure_conditions.py
 tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_every_layout_instantiates_two_sided_scoring_policies
 tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_layout_a_scores_through_lifecycle_views_and_replay[player-a-disruption-vs-disruption-layout-1]
 tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_layout_a_scores_through_lifecycle_views_and_replay[player-a-take-and-hold-vs-purge-the-foe-layout-1]
-tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_layout_a_scores_through_lifecycle_views_and_replay[player-b-take-and-hold-vs-priority-assets-layout-1]
+tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_layout_a_scores_through_lifecycle_views_and_replay[player-b-disruption-vs-disruption-layout-1]
 tests/infrastructure/missions/unit/test_step5g_pairing_certification_layout_b.py::test_phase17n_step5g_layout_b_scores_through_lifecycle_views_and_replay[player-a-reconnaissance-vs-reconnaissance-layout-2]
 tests/infrastructure/missions/unit/test_step5g_pairing_certification_layout_b.py::test_phase17n_step5g_layout_b_scores_through_lifecycle_views_and_replay[player-b-take-and-hold-vs-purge-the-foe-layout-2]
-tests/infrastructure/source/unit/test_source_identity_part2.py
 tests/infrastructure/source_governance/unit/test_support_evidence_inventories.py
 tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[unused-characteristics-player-b]
 tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[unused-damage-roll-one-player-a]
@@ -20,5 +19,6 @@ tests/rules/section07/test_facade.py
 tests/rules/section08/test_isolation.py
 tests/rules/section09/test_phase_flow.py
 tests/rules/section11/test_coverage_map.py
+tests/rules/section15/test_reactions.py
 tests/rules/section15/test_smoke.py
 tests/rules/section18/test_attached.py

@@ -35928,6 +35928,27 @@
       "families": [],
       "sensitive": false,
       "mandatory": true
+    },
+    "charge-configured-ruleset-history-identity": {
+      "paths": [
+        "src/warhammer40k_core/engine/base_contact_charge_history.py",
+        "src/warhammer40k_core/engine/battle_shock_event_authority.py",
+        "src/warhammer40k_core/engine/charge_move_event_authority.py",
+        "src/warhammer40k_core/engine/primary_mission_event_decision_authority.py"
+      ],
+      "owners": [
+        "_validate_result_summary",
+        "_validate_transition_and_result_payload",
+        "validate_charge_move_completed_event_authority",
+        "validate_charge_contact_permissions",
+        "validate_unit_move_completed_battle_shock_request_authority",
+        "validate_physical_transition_decision_authority"
+      ],
+      "families": [
+        "reconstruction"
+      ],
+      "sensitive": true,
+      "mandatory": true
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",
