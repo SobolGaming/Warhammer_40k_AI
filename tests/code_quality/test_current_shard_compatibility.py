@@ -193,7 +193,7 @@ def test_compatibility_boundary_rejects_stale_or_forged_inputs(
         if change in {"node", "new_node"}
         else sharding.summary_case_seconds(summary)
     )
-    with pytest.raises(SystemExit, match="forty-three" if change == "new_node" else None):
+    with pytest.raises(SystemExit, match="forty-nine" if change == "new_node" else None):
         compatibility.plan(ROOT, tmp_path, costs)
 
 

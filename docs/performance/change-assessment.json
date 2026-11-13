@@ -382,8 +382,12 @@
     },
     "tests/code_quality/test_current_shard_compatibility.py": {
       "before_sha256": "d98e873a565e5484e3b99118615939414f8353ba7723f52b666edc0a075d43f7",
-      "after_sha256": "1d72af2deb25efdf0dad35e7fecd87aa3ddc912d9641306d7497339b6e76741c",
+      "after_sha256": "23493bb4629a2b0b4ae090b4c0be940618c1c25f0da01c07bf1674015eeb8a19",
       "owners": {
+        "test_compatibility_boundary_rejects_stale_or_forged_inputs": {
+          "before": "3ca479af6631e2392a5c2de230b159e6ed7e6023051d5aa82ad043942103c78b",
+          "after": "52ee90e9890d8713df8cf5119b5866c3ac0424c1216ceff21ec4067ff8ddcc40"
+        },
         "test_current_dispatch_has_exact_inventory_and_disclosed_selector_moves": {
           "before": "c28bbb376c74880b9470516ca785c9aa4c8331fd9595503164f743d75b2b17c4",
           "after": "472cd2cf30949edf9a1356b49068ee85119ad16fcabdd9ab3d332e751eaa058d"
