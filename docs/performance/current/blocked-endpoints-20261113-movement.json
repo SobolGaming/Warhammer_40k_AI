@@ -1,0 +1,71 @@
+{
+  "base": {
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false,
+    "fixture_sha256": "78e7335e331d40799e05d7fcfc2cc710bff297cff92fff4cf252ab378d11e7df",
+    "host": {
+      "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+      "logical_cpus": 64,
+      "memory_bytes": 67359346688,
+      "platform": "Linux-6.18.58.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "57ae3e52c3fb40898614ec3375a4aeff907e2ea1c96263401104152246b22d75",
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:f76d19605442639b42ab34c9bd95dd9e45720a3ad1c74f3a82bf2055737afaa9",
+    "samples": {
+      "finite": [
+        2.582488244000004,
+        2.5603797579999963,
+        2.5608241580000026
+      ],
+      "parameterized": [
+        2.4031295909999955,
+        2.4289936090000026,
+        2.394102090000004
+      ]
+    },
+    "workload_sha256": "1af0bb7fa3733e4e31b8fa73f35839956e2ef5d2e952e6e378c2639ea9dd0427"
+  },
+  "base_revision": "988b9e7c5eca5f8c9c7bc19255f11aef69de4f3b",
+  "budget_profile": "current-change-relative-v1",
+  "family": "movement",
+  "head": {
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false,
+    "fixture_sha256": "78e7335e331d40799e05d7fcfc2cc710bff297cff92fff4cf252ab378d11e7df",
+    "host": {
+      "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+      "logical_cpus": 64,
+      "memory_bytes": 67359346688,
+      "platform": "Linux-6.18.58.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "57ae3e52c3fb40898614ec3375a4aeff907e2ea1c96263401104152246b22d75",
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:841b1cbac64d3f0f6474b5f94aecd7c2bf8fb041c84c532e579dce20ad0557ae",
+    "samples": {
+      "finite": [
+        2.601263908000007,
+        2.556287719999986,
+        2.573949543999987
+      ],
+      "parameterized": [
+        2.4160046929999908,
+        2.405320510000024,
+        2.415100965999983
+      ]
+    },
+    "workload_sha256": "1af0bb7fa3733e4e31b8fa73f35839956e2ef5d2e952e6e378c2639ea9dd0427"
+  },
+  "head_input_digest": "d1da42160920f232a329e8192833dc670d368ddd4f31d00cd95ce6f704e25e60",
+  "head_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:841b1cbac64d3f0f6474b5f94aecd7c2bf8fb041c84c532e579dce20ad0557ae",
+  "historical_failures": [
+    "Historical absolute-budget and unresolved/censored results remain unchanged. These representative components and the separate single saved-charge comparison do not certify complete-game performance.",
+    "Original producing input maps and the prior valid cohort are retained unchanged. These new-input measurements follow correction of the README authentication checksum in section07 coverage metadata, which participates in the required common fixture digest. Runtime code, workloads and sample counts are unchanged. No validator exception or relabeling of prior measurements is used."
+  ],
+  "policy": "rules-engine-performance-v3",
+  "workload_id": "order80-normal-move-occurrence-v1"
+}

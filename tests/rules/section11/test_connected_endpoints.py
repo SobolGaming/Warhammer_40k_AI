@@ -21,7 +21,7 @@ from tests.support.section11_fixtures import (
 )
 from warhammer40k_core.engine.phase import LifecycleStatusKind
 from warhammer40k_core.geometry.pathing import PathWitness
-from warhammer40k_core.geometry.pose import Pose
+from warhammer40k_core.geometry.pose import Point3, Pose
 
 
 @pytest.mark.parametrize("range_inches", [None, 1.0])
@@ -140,8 +140,114 @@ def test_connected_endpoint_proof_relaxes_the_entire_goal_and_peer_graph(control
     )
 
 
+@pytest.mark.parametrize(
+    "control", ["blocked", "clear", "raised", "remote-support", "tangent", "shape", "reachable"]
+)
+def test_connected_endpoint_overlap_requires_collision_and_support_proof(control: str) -> None:
+    from warhammer40k_core.geometry.base import CircularBase, OvalBase
+    from warhammer40k_core.geometry.connected_endpoint_proof import (
+        endpoint_excluded_by_connected_components,
+    )
+    from warhammer40k_core.geometry.movement_reachability import MovementGoal
+    from warhammer40k_core.geometry.terrain import TerrainVolume
+    from warhammer40k_core.geometry.volume import Model, ModelVolume
+
+    source = Model("mover", Pose.at(5, 10), CircularBase(0.5), ModelVolume(1))
+    lower = replace(source, model_id="lower", pose=Pose.at(10, 10))
+    upper = replace(source, model_id="upper", pose=Pose.at(10, 13.2))
+    target = replace(source, model_id="enemy", pose=Pose.at(10, 14.9))
+    goal = MovementGoal(models=(target,), range_inches=1)
+    terrain: tuple[TerrainVolume, ...] = ()
+    blockers: tuple[Model, ...] = (upper,)
+    if control == "clear":
+        blockers = ()
+    elif control == "raised":
+        terrain = (TerrainVolume("support", Point3(10, 13, 0), 4, 4, 1.5),)
+    elif control == "remote-support":
+        terrain = (TerrainVolume("support", Point3(40, 35, 0), 4, 4, 1.5),)
+    elif control == "tangent":
+        target = replace(target, pose=Pose.at(10, 15))
+        upper = replace(upper, pose=Pose.at(10, 14))
+        goal = MovementGoal(models=(target,), range_inches=1)
+        blockers = (upper,)
+    elif control == "shape":
+        source = replace(source, base=OvalBase(1, 1))
+    elif control == "reachable":
+        upper = replace(upper, pose=Pose.at(12.8, 11))
+        blockers = (lower, upper)
+    assert not endpoint_excluded_by_connected_components(
+        source=source, peers=(lower, upper), goal=goal, horizontal_inches=2
+    )
+    assert endpoint_excluded_by_connected_components(
+        source=source,
+        peers=(lower, upper),
+        goal=goal,
+        horizontal_inches=2,
+        blockers=blockers,
+        terrain=terrain,
+    ) is (control in {"blocked", "remote-support"})
+    if control == "reachable":
+        from tests.support.section01_geometry import witnessed_query
+        from warhammer40k_core.geometry.movement_reachability import movement_reachability
+
+        query = witnessed_query(source, Pose.at(10, 13), 10, goal, (target,))
+        query = replace(
+            query,
+            coherent_models=(lower, upper),
+            path_context=replace(query.path_context, friendly_models=blockers),
+        )
+        result = movement_reachability(query)
+        assert result.reachable
+        assert result.witness is not None
+        assert replace(query.path_context, witness=result.witness).validate().is_valid
+        assert replace(query.terrain_context, witness=result.witness).validate().is_valid
+
+
+def test_shared_ordered_history_reader_preserves_existing_fight_witness(
+    section11_definitions: Section02Definitions,
+) -> None:
+    from tests.support.section12_fixtures import (
+        begin as begin_fight,
+    )
+    from tests.support.section12_fixtures import (
+        checkpoint,
+        engaged_case,
+        paths,
+        submit_move,
+    )
+    from tests.support.section12_fixtures import (
+        session_for as fight_session,
+    )
+    from warhammer40k_core.core.ruleset_descriptor import FightPhaseStepKind
+    from warhammer40k_core.engine.sequential_movement import complete_movement_witness
+
+    state, unit, enemy = engaged_case(section11_definitions)
+    checkpoint(state, FightPhaseStepKind.PILE_IN)
+    session = fight_session(section11_definitions, state)
+    begin_fight(session)
+    witness = paths(state, (unit.unit_instance_id,), 0.5)
+    status = submit_move(session, targets=(enemy.unit_instance_id,), witness=witness)
+    assert status.status_kind is not LifecycleStatusKind.INVALID, status
+    controller = session.lifecycle.decision_controller
+    event = next(
+        e for e in controller.event_log.records if e.event_type == "fight_movement_completed"
+    )
+    assert isinstance(event.payload, dict)
+    assert (
+        complete_movement_witness(
+            event=event,
+            payload=event.payload,
+            resolution=event.payload,
+            decisions=tuple(controller.records),
+        )
+        == witness
+    )
+
+
+@pytest.mark.parametrize("proof", ["disjoint", "blocked"])
 def test_connected_endpoint_certificate_survives_charge_history_reconstruction(
     section11_definitions: Section02Definitions,
+    proof: str,
 ) -> None:
     from tests.setup_completion_helpers import record_current_battlefield_placements_for_fixture
     from tests.support.section00_fixtures import conversion_mission
@@ -210,11 +316,39 @@ def test_connected_endpoint_certificate_survives_charge_history_reconstruction(
     assert roll(session).value == 10
     path = PathWitness.for_paths(
         (
-            (near, (poses[near], Pose.at(17.3, 10))),
-            (bridge, (poses[bridge], Pose.at(14.2, 8.1))),
-            (far, (poses[far], Pose.at(11, 10))),
+            (near, (poses[near], Pose.at(17.3 if proof == "disjoint" else 17.5, 10))),
+            (
+                bridge,
+                (poses[bridge], Pose.at(14.2, 8.1) if proof == "disjoint" else Pose.at(16.8, 8.25)),
+            ),
+            (far, (poses[far], Pose.at(11 if proof == "disjoint" else 13.5, 10))),
         )
     )
+    if proof == "blocked":
+        from tests.support.section03_fixtures import geometry
+        from warhammer40k_core.geometry.connected_endpoint_proof import (
+            endpoint_excluded_by_connected_components,
+        )
+        from warhammer40k_core.geometry.movement_reachability import MovementGoal
+
+        source = geometry(leader, (poses[bridge],))[0]
+        peers = geometry(
+            body, tuple(path.final_pose_for_model(mid) for mid in body.own_model_ids())
+        )
+        goal = MovementGoal(
+            models=geometry(enemy, tuple(poses[mid] for mid in enemy.own_model_ids()), enemy=True),
+            range_inches=1,
+        )
+        assert not endpoint_excluded_by_connected_components(
+            source=source, peers=peers, goal=goal, horizontal_inches=2
+        )
+        assert endpoint_excluded_by_connected_components(
+            source=source,
+            peers=peers,
+            goal=goal,
+            horizontal_inches=2,
+            blockers=tuple(m for m in peers if m.model_id == near),
+        )
     status = propose(session, formation.attached_unit_instance_id, (enemy.unit_instance_id,), path)
     assert status.status_kind is not LifecycleStatusKind.INVALID, status
     event = events(session, "charge_move_completed")[-1]
@@ -225,8 +359,11 @@ def test_connected_endpoint_certificate_survives_charge_history_reconstruction(
     row = next(r for r in rows if isinstance(r, dict) and r["model_instance_id"] == bridge)
     assert isinstance(row, dict)
     admitted = ChargeModelEndpointWitness.from_payload(row)
-    assert admitted.engagement_reachability.status == "endpoint_unreachable"
-    assert admitted.engagement_reachability.alternative_witness is None
+    evidence = (
+        admitted.engagement_reachability if proof == "disjoint" else admitted.preferred_reachability
+    )
+    assert evidence.status == "endpoint_unreachable"
+    assert evidence.alternative_witness is None
     # This already-permitted attached-unit kernel is not a mustered roster. Test
     # the real persistence owner's proof admission with independently decoded
     # state/events/decisions; do not claim whole-session or setup qualification.
