@@ -2123,3 +2123,63 @@ learning and full-game throughput remain unqualified. Existing source, roster,
 provisional geometry, mission/layout, points and public-seed limits remain;
 `useful_reference_status` stays `scoped_gap`, `reference_target` stays null and
 `eligible_for_learning` stays false.
+
+## Post-charge Fight and no-charge operator comparison
+
+A separate frozen continuation on main
+`a816ce526e5b2cd05d5dba8fbb0d108a945f1c44` retains the accepted 64-decision,
+658-event Charge checkpoint unchanged. Its control reconstructs the identical
+first 60 decisions and 627 events through ordinary replay, then selects the
+offered `complete_charge_phase` option and declines the optional Heroic Intervention
+through its existing parameterized contract. Both arms stop at the first
+round-four player-A Movement `select_movement_unit` request, before any further
+E selection, movement or attack. Configuration, private seed, source catalog,
+mission, terrain, geometry and the complete historical movement routes are preserved.
+
+The charged arm declines optional Pile In and Consolidation for both units using
+the existing no-witness contract; their four completion events record empty
+physical transition batches. It selects B in Fights First, then S in Remaining
+Combats, with neither available activation passed. Both emit
+`melee_declaration_not_available` with `available_weapon_count=0`: this synthetic
+CORE configuration equips S and B only with ranged bolt rifles. Their
+`fight_selection_completed` events have no attack sequence and `has_fought=false`. No melee
+attack, allocation, save or damage resolution is exercised or qualified.
+This follows the retained Section 12 FAQ 2, which permits selection without an
+equipped weapon and resolves the selected type with no attacks; the existing
+`test_faq2_unequipped_native_body_is_selected_and_resolves_without_attacks`
+regression covers that distinction. It does not establish a supported native
+unarmed datasheet. The control has no eligible Fight activation.
+
+| Common-horizon observation | Charged arm | No-charge control |
+|---|---|---|
+| Decisions / total events | 70 / 754 | 62 / 688 |
+| RNG draws from the common origin / final total | 2 / 2 | 0 / 0 |
+| S survivors / total wounds | 5 / 10 | 5 / 10 |
+| B survivors / total wounds | 5 / 10 | 5 / 10 |
+| E survivors / total wounds | 3 / 6 | 3 / 6 |
+| Vehicle survivors / total wounds | 1 / 12 | 1 / 12 |
+| Objective control | B controls expansion-02; other five uncontrolled | All six uncontrolled |
+| Player A / player B VP | 0 / 3 | 0 / 0 |
+
+The charged arm's three B VP come from the existing Unstoppable Force
+turn-end rule for controlling a new non-home objective. B retains the accepted
+Charge endpoints; control B remains at its predeclaration positions. S, E and
+the vehicle retain identical positions between arms. E remains at ground-level
+(3, 45), (3, 46.8) and (3, 48.6), with two wounds on each model. The only random
+draws are the charged arm's original natural nine-inch Charge roll. Neither arm
+replaces, reseeds or aligns RNG history, and the differing consumption is not
+paired-dice causal evidence.
+
+The exact origin and both final checkpoints pass strict JSON save/load equality
+and ordinary `ReplayRunner`, including every original decision/event prefix and
+the final event-log hash with no diagnostics. Retained operator evidence includes
+full movement-decision payloads and paths, activation/completion events, objective
+and scoring records, RNG histories, and failed or interrupted harness attempts.
+No production behavior or regression inventory changes.
+
+This qualifies the bounded no-melee Fight continuation and common-horizon state
+comparison only. It establishes no screen sacrifice, melee damage outcome,
+E protection/follow-through benefit, adversarial tactical advantage, Stage 2
+completion, learning admission or full-game throughput. Earlier narrower reports
+retain their meanings; `useful_reference_status` remains `scoped_gap`,
+`reference_target` remains null and `eligible_for_learning` remains false.
