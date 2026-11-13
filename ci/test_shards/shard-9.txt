@@ -1,5 +1,6 @@
 tests/factions/chaos_daemons/integration/test_cavalcade_v995_roster.py
 tests/factions/chaos_daemons/unit/test_bloodcrushers_abilities.py
+tests/factions/chaos_daemons/unit/test_generic_rule_ability_registry.py
 tests/factions/grey_knights/unit/test_grey_knights_army_rule.py
 tests/factions/tyranids/unit/test_tyranids_army_rule.py
 tests/factions/world_eaters/unit/test_total_carnage_gameplay.py
@@ -22,6 +23,7 @@ tests/rules/section02/test_02_02_02_ignore_modifiers.py
 tests/rules/section03/test_isolation.py
 tests/rules/section05/test_isolation.py
 tests/rules/section06/test_mortals.py
+tests/rules/section09/test_distances.py
 tests/rules/section10/test_indirect.py
 tests/rules/section10/test_shooting_types.py
 tests/rules/section11/test_selection.py

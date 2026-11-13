@@ -14,6 +14,146 @@
         }
       }
     },
+    "ci/test_shards/current-covered-baseline.json": {
+      "before_sha256": "d90e031d9d59731de614890b2c3a7fcbce4cdeef9810677203768d4cd5ee7116",
+      "after_sha256": "c77c28be4387e22a4b75bb55643e1177a37d54efd33ef9f03ed2f2c59bfc37f8",
+      "owners": {
+        "@document": {
+          "before": "d90e031d9d59731de614890b2c3a7fcbce4cdeef9810677203768d4cd5ee7116",
+          "after": "c77c28be4387e22a4b75bb55643e1177a37d54efd33ef9f03ed2f2c59bfc37f8"
+        }
+      }
+    },
+    "ci/test_shards/current-derived-assignment.json": {
+      "before_sha256": "81dca2b98109d48ec7b6fd5c620962dd7264270086a30bccf16a7b8097ab47bb",
+      "after_sha256": "106ee9c14f8c647a78eab060373a588e1f8dfbc3eb567ced1643b981a072aede",
+      "owners": {
+        "@document": {
+          "before": "81dca2b98109d48ec7b6fd5c620962dd7264270086a30bccf16a7b8097ab47bb",
+          "after": "106ee9c14f8c647a78eab060373a588e1f8dfbc3eb567ced1643b981a072aede"
+        }
+      }
+    },
+    "ci/test_shards/current-runtime-compatibility.json": {
+      "before_sha256": "b488adced76d488879e107b3732cebf8bb8ac443ed340a6fc84827f8e8bff53f",
+      "after_sha256": "53dbf93591d4195f5e6290eb7f55932549274a696462ce3ec490601c8879427e",
+      "owners": {
+        "@document": {
+          "before": "b488adced76d488879e107b3732cebf8bb8ac443ed340a6fc84827f8e8bff53f",
+          "after": "53dbf93591d4195f5e6290eb7f55932549274a696462ce3ec490601c8879427e"
+        }
+      }
+    },
+    "ci/test_shards/durations.json": {
+      "before_sha256": "8d6911ea9a0491a8271ae9c946b72f09ddbe74b6502764c88e8036f60f5259ce",
+      "after_sha256": "0406f6adb05229bd29e43ef73fab5318a0a61c160d8a58a659c97f2fd92a9496",
+      "owners": {
+        "@document": {
+          "before": "8d6911ea9a0491a8271ae9c946b72f09ddbe74b6502764c88e8036f60f5259ce",
+          "after": "0406f6adb05229bd29e43ef73fab5318a0a61c160d8a58a659c97f2fd92a9496"
+        }
+      }
+    },
+    "ci/test_shards/shard-1.txt": {
+      "before_sha256": "040946c5a4e286731e0c954043afe79b50ccdf864c201e0537db555c8f146c15",
+      "after_sha256": "2ae23ccbfcfc329c02a8b800f67062a23b0b941086be509fdf18eef2f6661edc",
+      "owners": {
+        "@document": {
+          "before": "040946c5a4e286731e0c954043afe79b50ccdf864c201e0537db555c8f146c15",
+          "after": "2ae23ccbfcfc329c02a8b800f67062a23b0b941086be509fdf18eef2f6661edc"
+        }
+      }
+    },
+    "ci/test_shards/shard-10.txt": {
+      "before_sha256": "bd4fac947a7e4ddf9e055851897afcfec63f74d8ada800cf4ac9cfb67ef031be",
+      "after_sha256": "cf8390e8e2778b072fe9837b2051efff4df6150db8a87809f6df3898c22b8118",
+      "owners": {
+        "@document": {
+          "before": "bd4fac947a7e4ddf9e055851897afcfec63f74d8ada800cf4ac9cfb67ef031be",
+          "after": "cf8390e8e2778b072fe9837b2051efff4df6150db8a87809f6df3898c22b8118"
+        }
+      }
+    },
+    "ci/test_shards/shard-11.txt": {
+      "before_sha256": "e1c4177d15911b97f5e8132901fdffc6f95d5836dacd14ef8c353171016b7b5b",
+      "after_sha256": "4158dc856bf4b439bdf42fc162817218979b6452612bc8b615f0a38022118564",
+      "owners": {
+        "@document": {
+          "before": "e1c4177d15911b97f5e8132901fdffc6f95d5836dacd14ef8c353171016b7b5b",
+          "after": "4158dc856bf4b439bdf42fc162817218979b6452612bc8b615f0a38022118564"
+        }
+      }
+    },
+    "ci/test_shards/shard-12.txt": {
+      "before_sha256": "297ce9db2e5dcabd4e677e7905079c8558c23365d55e8f22277995aff008fd1f",
+      "after_sha256": "b40b963e66fa536b26ecbdd9312e51ef6dd49a32ba735e8972a34ff2e61dfdc7",
+      "owners": {
+        "@document": {
+          "before": "297ce9db2e5dcabd4e677e7905079c8558c23365d55e8f22277995aff008fd1f",
+          "after": "b40b963e66fa536b26ecbdd9312e51ef6dd49a32ba735e8972a34ff2e61dfdc7"
+        }
+      }
+    },
+    "ci/test_shards/shard-2.txt": {
+      "before_sha256": "7f93d282d5125ea250b56bc4639446b8d82734167faf0c10c0bc96eb936e358d",
+      "after_sha256": "0b22b2b1014380aba5c4d8097ffebf681f069e34aab19f3750caf344f9efc087",
+      "owners": {
+        "@document": {
+          "before": "7f93d282d5125ea250b56bc4639446b8d82734167faf0c10c0bc96eb936e358d",
+          "after": "0b22b2b1014380aba5c4d8097ffebf681f069e34aab19f3750caf344f9efc087"
+        }
+      }
+    },
+    "ci/test_shards/shard-3.txt": {
+      "before_sha256": "1d39c7ff45765cab761f6fa1a3ad483d4193a1b56f3be904d62839ee1a636d85",
+      "after_sha256": "57e6b622e70b1f798652097de97af4dd04dbf4a0804d3369a664cad865cd3673",
+      "owners": {
+        "@document": {
+          "before": "1d39c7ff45765cab761f6fa1a3ad483d4193a1b56f3be904d62839ee1a636d85",
+          "after": "57e6b622e70b1f798652097de97af4dd04dbf4a0804d3369a664cad865cd3673"
+        }
+      }
+    },
+    "ci/test_shards/shard-6.txt": {
+      "before_sha256": "77e2d525942f18743ec2746b32d46876e0bc92b294462145c06e927d079f4e4e",
+      "after_sha256": "ed790ceeee4c10b9e009a74243d624988c1df5f67dc6d9b85f8b1f843f2f9baa",
+      "owners": {
+        "@document": {
+          "before": "77e2d525942f18743ec2746b32d46876e0bc92b294462145c06e927d079f4e4e",
+          "after": "ed790ceeee4c10b9e009a74243d624988c1df5f67dc6d9b85f8b1f843f2f9baa"
+        }
+      }
+    },
+    "ci/test_shards/shard-7.txt": {
+      "before_sha256": "ac5699b5970b0a36875dac712b48d6fa6dfbd1c76c214219cf99634733bb5b83",
+      "after_sha256": "9443d559a1410adda7201a18aff0b2321dc2c53960379ad0f6332e64e8e07d1f",
+      "owners": {
+        "@document": {
+          "before": "ac5699b5970b0a36875dac712b48d6fa6dfbd1c76c214219cf99634733bb5b83",
+          "after": "9443d559a1410adda7201a18aff0b2321dc2c53960379ad0f6332e64e8e07d1f"
+        }
+      }
+    },
+    "ci/test_shards/shard-8.txt": {
+      "before_sha256": "66cb6a5255ab1e1ab2e5acf658e19fc4dc851fbc6329b8e332924d75e99c5028",
+      "after_sha256": "ddc668a3fc5262a48e90863cc02284b9c2ce6e04a7976403b03e97efe5af3879",
+      "owners": {
+        "@document": {
+          "before": "66cb6a5255ab1e1ab2e5acf658e19fc4dc851fbc6329b8e332924d75e99c5028",
+          "after": "ddc668a3fc5262a48e90863cc02284b9c2ce6e04a7976403b03e97efe5af3879"
+        }
+      }
+    },
+    "ci/test_shards/shard-9.txt": {
+      "before_sha256": "3a84591ad1a2535a67fb4e1295ff0aff614b4a7834b6681526ff6d1c81668181",
+      "after_sha256": "b80e7d918238603582a187f963d686385698ccb7aef1dc9255f0ad74d1e2a168",
+      "owners": {
+        "@document": {
+          "before": "3a84591ad1a2535a67fb4e1295ff0aff614b4a7834b6681526ff6d1c81668181",
+          "after": "b80e7d918238603582a187f963d686385698ccb7aef1dc9255f0ad74d1e2a168"
+        }
+      }
+    },
     "contracts/examples/persistence/session-persistence.json": {
       "before_sha256": "498a016b5f21801f41555243bf317cb39ce1ca3f0a491e853ef20c39167f0033",
       "after_sha256": "6a9ae7d62ff75679903d8342d884ae6b05abd565b349140a5b73ddf66b756982",
@@ -315,6 +455,149 @@
     "README.md": {
       "category": "governance",
       "operations": [],
+      "selected_families": [],
+      "rationale": "Admit a sufficient connected-component endpoint exclusion only for supported circular measurement geometry, with exact-context historical recomputation and positive legal controls.",
+      "source_obligation": "Preserve submitted physical execution order, complete-prefix path and terrain legality, every endpoint obligation, exact source geometry, seeds and search budgets. Unsupported or overlapping relaxations retain ordinary unresolved search; only a sufficient negative certificate changes status.",
+      "unchanged_work": "Generic movement reachability, navigation, cache keys, seeds, budgets and accepted physical validation are unchanged. Historical observations stay in their producing snapshots; nine exact new cases and a fresh complete local profile update derived scheduling only. The saved whole charge remains unresolved and full-game performance is unqualified."
+    },
+    "ci/test_shards/current-covered-baseline.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile",
+        "scoped-shard-allocation"
+      ],
+      "selected_families": [],
+      "rationale": "Admit a sufficient connected-component endpoint exclusion only for supported circular measurement geometry, with exact-context historical recomputation and positive legal controls.",
+      "source_obligation": "Preserve submitted physical execution order, complete-prefix path and terrain legality, every endpoint obligation, exact source geometry, seeds and search budgets. Unsupported or overlapping relaxations retain ordinary unresolved search; only a sufficient negative certificate changes status.",
+      "unchanged_work": "Generic movement reachability, navigation, cache keys, seeds, budgets and accepted physical validation are unchanged. Historical observations stay in their producing snapshots; nine exact new cases and a fresh complete local profile update derived scheduling only. The saved whole charge remains unresolved and full-game performance is unqualified."
+    },
+    "ci/test_shards/current-derived-assignment.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile",
+        "scoped-shard-allocation"
+      ],
+      "selected_families": [],
+      "rationale": "Admit a sufficient connected-component endpoint exclusion only for supported circular measurement geometry, with exact-context historical recomputation and positive legal controls.",
+      "source_obligation": "Preserve submitted physical execution order, complete-prefix path and terrain legality, every endpoint obligation, exact source geometry, seeds and search budgets. Unsupported or overlapping relaxations retain ordinary unresolved search; only a sufficient negative certificate changes status.",
+      "unchanged_work": "Generic movement reachability, navigation, cache keys, seeds, budgets and accepted physical validation are unchanged. Historical observations stay in their producing snapshots; nine exact new cases and a fresh complete local profile update derived scheduling only. The saved whole charge remains unresolved and full-game performance is unqualified."
+    },
+    "ci/test_shards/current-runtime-compatibility.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile",
+        "scoped-shard-allocation"
+      ],
+      "selected_families": [],
+      "rationale": "Admit a sufficient connected-component endpoint exclusion only for supported circular measurement geometry, with exact-context historical recomputation and positive legal controls.",
+      "source_obligation": "Preserve submitted physical execution order, complete-prefix path and terrain legality, every endpoint obligation, exact source geometry, seeds and search budgets. Unsupported or overlapping relaxations retain ordinary unresolved search; only a sufficient negative certificate changes status.",
+      "unchanged_work": "Generic movement reachability, navigation, cache keys, seeds, budgets and accepted physical validation are unchanged. Historical observations stay in their producing snapshots; nine exact new cases and a fresh complete local profile update derived scheduling only. The saved whole charge remains unresolved and full-game performance is unqualified."
+    },
+    "ci/test_shards/durations.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Admit a sufficient connected-component endpoint exclusion only for supported circular measurement geometry, with exact-context historical recomputation and positive legal controls.",
+      "source_obligation": "Preserve submitted physical execution order, complete-prefix path and terrain legality, every endpoint obligation, exact source geometry, seeds and search budgets. Unsupported or overlapping relaxations retain ordinary unresolved search; only a sufficient negative certificate changes status.",
+      "unchanged_work": "Generic movement reachability, navigation, cache keys, seeds, budgets and accepted physical validation are unchanged. Historical observations stay in their producing snapshots; nine exact new cases and a fresh complete local profile update derived scheduling only. The saved whole charge remains unresolved and full-game performance is unqualified."
+    },
+    "ci/test_shards/shard-1.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Admit a sufficient connected-component endpoint exclusion only for supported circular measurement geometry, with exact-context historical recomputation and positive legal controls.",
+      "source_obligation": "Preserve submitted physical execution order, complete-prefix path and terrain legality, every endpoint obligation, exact source geometry, seeds and search budgets. Unsupported or overlapping relaxations retain ordinary unresolved search; only a sufficient negative certificate changes status.",
+      "unchanged_work": "Generic movement reachability, navigation, cache keys, seeds, budgets and accepted physical validation are unchanged. Historical observations stay in their producing snapshots; nine exact new cases and a fresh complete local profile update derived scheduling only. The saved whole charge remains unresolved and full-game performance is unqualified."
+    },
+    "ci/test_shards/shard-10.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Admit a sufficient connected-component endpoint exclusion only for supported circular measurement geometry, with exact-context historical recomputation and positive legal controls.",
+      "source_obligation": "Preserve submitted physical execution order, complete-prefix path and terrain legality, every endpoint obligation, exact source geometry, seeds and search budgets. Unsupported or overlapping relaxations retain ordinary unresolved search; only a sufficient negative certificate changes status.",
+      "unchanged_work": "Generic movement reachability, navigation, cache keys, seeds, budgets and accepted physical validation are unchanged. Historical observations stay in their producing snapshots; nine exact new cases and a fresh complete local profile update derived scheduling only. The saved whole charge remains unresolved and full-game performance is unqualified."
+    },
+    "ci/test_shards/shard-11.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Admit a sufficient connected-component endpoint exclusion only for supported circular measurement geometry, with exact-context historical recomputation and positive legal controls.",
+      "source_obligation": "Preserve submitted physical execution order, complete-prefix path and terrain legality, every endpoint obligation, exact source geometry, seeds and search budgets. Unsupported or overlapping relaxations retain ordinary unresolved search; only a sufficient negative certificate changes status.",
+      "unchanged_work": "Generic movement reachability, navigation, cache keys, seeds, budgets and accepted physical validation are unchanged. Historical observations stay in their producing snapshots; nine exact new cases and a fresh complete local profile update derived scheduling only. The saved whole charge remains unresolved and full-game performance is unqualified."
+    },
+    "ci/test_shards/shard-12.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Admit a sufficient connected-component endpoint exclusion only for supported circular measurement geometry, with exact-context historical recomputation and positive legal controls.",
+      "source_obligation": "Preserve submitted physical execution order, complete-prefix path and terrain legality, every endpoint obligation, exact source geometry, seeds and search budgets. Unsupported or overlapping relaxations retain ordinary unresolved search; only a sufficient negative certificate changes status.",
+      "unchanged_work": "Generic movement reachability, navigation, cache keys, seeds, budgets and accepted physical validation are unchanged. Historical observations stay in their producing snapshots; nine exact new cases and a fresh complete local profile update derived scheduling only. The saved whole charge remains unresolved and full-game performance is unqualified."
+    },
+    "ci/test_shards/shard-2.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Admit a sufficient connected-component endpoint exclusion only for supported circular measurement geometry, with exact-context historical recomputation and positive legal controls.",
+      "source_obligation": "Preserve submitted physical execution order, complete-prefix path and terrain legality, every endpoint obligation, exact source geometry, seeds and search budgets. Unsupported or overlapping relaxations retain ordinary unresolved search; only a sufficient negative certificate changes status.",
+      "unchanged_work": "Generic movement reachability, navigation, cache keys, seeds, budgets and accepted physical validation are unchanged. Historical observations stay in their producing snapshots; nine exact new cases and a fresh complete local profile update derived scheduling only. The saved whole charge remains unresolved and full-game performance is unqualified."
+    },
+    "ci/test_shards/shard-3.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Admit a sufficient connected-component endpoint exclusion only for supported circular measurement geometry, with exact-context historical recomputation and positive legal controls.",
+      "source_obligation": "Preserve submitted physical execution order, complete-prefix path and terrain legality, every endpoint obligation, exact source geometry, seeds and search budgets. Unsupported or overlapping relaxations retain ordinary unresolved search; only a sufficient negative certificate changes status.",
+      "unchanged_work": "Generic movement reachability, navigation, cache keys, seeds, budgets and accepted physical validation are unchanged. Historical observations stay in their producing snapshots; nine exact new cases and a fresh complete local profile update derived scheduling only. The saved whole charge remains unresolved and full-game performance is unqualified."
+    },
+    "ci/test_shards/shard-6.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Admit a sufficient connected-component endpoint exclusion only for supported circular measurement geometry, with exact-context historical recomputation and positive legal controls.",
+      "source_obligation": "Preserve submitted physical execution order, complete-prefix path and terrain legality, every endpoint obligation, exact source geometry, seeds and search budgets. Unsupported or overlapping relaxations retain ordinary unresolved search; only a sufficient negative certificate changes status.",
+      "unchanged_work": "Generic movement reachability, navigation, cache keys, seeds, budgets and accepted physical validation are unchanged. Historical observations stay in their producing snapshots; nine exact new cases and a fresh complete local profile update derived scheduling only. The saved whole charge remains unresolved and full-game performance is unqualified."
+    },
+    "ci/test_shards/shard-7.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Admit a sufficient connected-component endpoint exclusion only for supported circular measurement geometry, with exact-context historical recomputation and positive legal controls.",
+      "source_obligation": "Preserve submitted physical execution order, complete-prefix path and terrain legality, every endpoint obligation, exact source geometry, seeds and search budgets. Unsupported or overlapping relaxations retain ordinary unresolved search; only a sufficient negative certificate changes status.",
+      "unchanged_work": "Generic movement reachability, navigation, cache keys, seeds, budgets and accepted physical validation are unchanged. Historical observations stay in their producing snapshots; nine exact new cases and a fresh complete local profile update derived scheduling only. The saved whole charge remains unresolved and full-game performance is unqualified."
+    },
+    "ci/test_shards/shard-8.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Admit a sufficient connected-component endpoint exclusion only for supported circular measurement geometry, with exact-context historical recomputation and positive legal controls.",
+      "source_obligation": "Preserve submitted physical execution order, complete-prefix path and terrain legality, every endpoint obligation, exact source geometry, seeds and search budgets. Unsupported or overlapping relaxations retain ordinary unresolved search; only a sufficient negative certificate changes status.",
+      "unchanged_work": "Generic movement reachability, navigation, cache keys, seeds, budgets and accepted physical validation are unchanged. Historical observations stay in their producing snapshots; nine exact new cases and a fresh complete local profile update derived scheduling only. The saved whole charge remains unresolved and full-game performance is unqualified."
+    },
+    "ci/test_shards/shard-9.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
       "selected_families": [],
       "rationale": "Admit a sufficient connected-component endpoint exclusion only for supported circular measurement geometry, with exact-context historical recomputation and positive legal controls.",
       "source_obligation": "Preserve submitted physical execution order, complete-prefix path and terrain legality, every endpoint obligation, exact source geometry, seeds and search budgets. Unsupported or overlapping relaxations retain ordinary unresolved search; only a sufficient negative certificate changes status.",

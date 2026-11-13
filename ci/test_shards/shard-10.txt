@@ -24,6 +24,7 @@ tests/rules/section07/test_trigger_effects.py
 tests/rules/section09/test_focused_checkpoint.py
 tests/rules/section12/test_ownership.py
 tests/rules/section12/test_retained_interactions.py
+tests/rules/section14/test_secured.py
 tests/rules/section15/test_reroll.py
 tests/rules/section16/test_completion.py
 tests/rules/section18/test_faqs.py

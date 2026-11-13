@@ -1,15 +1,31 @@
 {
-  "baseline_sha256": "d90e031d9d59731de614890b2c3a7fcbce4cdeef9810677203768d4cd5ee7116",
-  "current_runtime_fingerprint": "0b8e5714a12c2612efda8b92bcdb37be7c8045cb24d6b3c821527fecf21aee2f",
+  "baseline_sha256": "c77c28be4387e22a4b75bb55643e1177a37d54efd33ef9f03ed2f2c59bfc37f8",
+  "current_runtime_fingerprint": "f76d19605442639b42ab34c9bd95dd9e45720a3ad1c74f3a82bf2055737afaa9",
   "historical_revision": "008be8a8cb0b50b232fe022452762b3906489b49",
   "new_selector_placement": {
-    "tests/rules/section03/test_terrain_path_preparation.py": 8
+    "tests/rules/section03/test_terrain_path_preparation.py": 8,
+    "tests/rules/section11/test_connected_endpoints.py": 11
   },
   "retained_selector_moves": [
+    {
+      "from": 11,
+      "selector": "tests/factions/adeptus_custodes/unit/test_adeptus_custodes_army_rule.py",
+      "to": 3
+    },
+    {
+      "from": 2,
+      "selector": "tests/factions/aeldari/unit/test_generic_rule_ability_registry.py",
+      "to": 11
+    },
     {
       "from": 8,
       "selector": "tests/factions/chaos_daemons/unit/test_bloodcrushers_reserves.py",
       "to": 10
+    },
+    {
+      "from": 12,
+      "selector": "tests/factions/chaos_daemons/unit/test_generic_rule_ability_registry.py",
+      "to": 9
     },
     {
       "from": 9,
@@ -37,6 +53,11 @@
       "to": 4
     },
     {
+      "from": 3,
+      "selector": "tests/infrastructure/missions/unit/test_boundary_checkpoint_physical_authority.py",
+      "to": 8
+    },
+    {
       "from": 9,
       "selector": "tests/infrastructure/missions/unit/test_primary_scoring_boundary_lifecycle.py",
       "to": 8
@@ -62,6 +83,11 @@
       "to": 6
     },
     {
+      "from": 7,
+      "selector": "tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_layout_a_scores_through_lifecycle_views_and_replay[player-b-disruption-vs-reconnaissance-layout-1]",
+      "to": 12
+    },
+    {
       "from": 1,
       "selector": "tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_layout_a_scores_through_lifecycle_views_and_replay[player-b-reconnaissance-vs-reconnaissance-layout-1]",
       "to": 8
@@ -77,6 +103,11 @@
       "to": 3
     },
     {
+      "from": 7,
+      "selector": "tests/infrastructure/missions/unit/test_step5g_pairing_certification_layout_b.py::test_phase17n_step5g_layout_b_scores_through_lifecycle_views_and_replay[player-b-disruption-vs-disruption-layout-2]",
+      "to": 6
+    },
+    {
       "from": 1,
       "selector": "tests/infrastructure/missions/unit/test_step5g_pairing_certification_layout_b.py::test_phase17n_step5g_layout_b_scores_through_lifecycle_views_and_replay[player-b-purge-the-foe-vs-reconnaissance-layout-2]",
       "to": 12
@@ -84,12 +115,12 @@
     {
       "from": 10,
       "selector": "tests/infrastructure/missions/unit/test_step5g_pairing_certification_layout_b.py::test_phase17n_step5g_layout_b_scores_through_lifecycle_views_and_replay[player-b-take-and-hold-vs-priority-assets-layout-2]",
-      "to": 1
+      "to": 7
     },
     {
       "from": 8,
       "selector": "tests/infrastructure/missions/unit/test_step5g_pairing_certification_layout_b.py::test_phase17n_step5g_layout_b_scores_through_lifecycle_views_and_replay[player-b-take-and-hold-vs-take-and-hold-layout-2]",
-      "to": 7
+      "to": 12
     },
     {
       "from": 4,
@@ -114,7 +145,12 @@
     {
       "from": 9,
       "selector": "tests/rules/rules03/unit/test_setup.py",
-      "to": 1
+      "to": 6
+    },
+    {
+      "from": 2,
+      "selector": "tests/rules/rules18/unit/test_tactical_setup_proof.py",
+      "to": 7
     },
     {
       "from": 7,
@@ -130,6 +166,11 @@
       "from": 6,
       "selector": "tests/rules/section01/test_01_03_stratagem_ownership.py",
       "to": 3
+    },
+    {
+      "from": 3,
+      "selector": "tests/rules/section01/test_01_06_leadership.py",
+      "to": 8
     },
     {
       "from": 4,
@@ -229,7 +270,12 @@
     {
       "from": 12,
       "selector": "tests/rules/section09/test_distances.py",
-      "to": 3
+      "to": 9
+    },
+    {
+      "from": 6,
+      "selector": "tests/rules/section10/test_coverage_map.py",
+      "to": 12
     },
     {
       "from": 7,
@@ -252,6 +298,11 @@
       "to": 11
     },
     {
+      "from": 7,
+      "selector": "tests/rules/section12/test_coverage_map.py",
+      "to": 2
+    },
+    {
       "from": 1,
       "selector": "tests/rules/section12/test_movement.py",
       "to": 9
@@ -267,6 +318,11 @@
       "to": 8
     },
     {
+      "from": 6,
+      "selector": "tests/rules/section14/test_secured.py",
+      "to": 10
+    },
+    {
       "from": 12,
       "selector": "tests/rules/section15/test_epic.py",
       "to": 11
@@ -279,7 +335,7 @@
     {
       "from": 8,
       "selector": "tests/rules/section15/test_snap_range.py",
-      "to": 3
+      "to": 2
     },
     {
       "from": 2,
@@ -327,6 +383,21 @@
       "to": 7
     },
     {
+      "from": 3,
+      "selector": "tests/rules/section21/test_witness_admission.py",
+      "to": 12
+    },
+    {
+      "from": 6,
+      "selector": "tests/rules/section22/test_auras.py",
+      "to": 2
+    },
+    {
+      "from": 11,
+      "selector": "tests/rules/section22/test_plunging.py",
+      "to": 2
+    },
+    {
       "from": 2,
       "selector": "tests/rules/section23/test_transit.py",
       "to": 3
@@ -366,10 +437,8 @@
       "tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_layout_a_scores_through_lifecycle_views_and_replay[player-b-purge-the-foe-vs-disruption-layout-1]",
       "tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_layout_a_scores_through_lifecycle_views_and_replay[player-b-purge-the-foe-vs-purge-the-foe-layout-1]",
       "tests/infrastructure/missions/unit/test_step5g_pairing_certification_layout_b.py::test_phase17n_step5g_layout_b_scores_through_lifecycle_views_and_replay[player-a-disruption-vs-disruption-layout-2]",
-      "tests/infrastructure/missions/unit/test_step5g_pairing_certification_layout_b.py::test_phase17n_step5g_layout_b_scores_through_lifecycle_views_and_replay[player-b-take-and-hold-vs-priority-assets-layout-2]",
       "tests/infrastructure/missions/unit/test_step6g_secondary_certification_a_grievous_through_beacon.py",
       "tests/performance/test_phase10u_movement_pathing_profile.py",
-      "tests/rules/rules03/unit/test_setup.py",
       "tests/rules/section02/test_02_04_weapons.py",
       "tests/rules/section04/test_completion_boundaries.py",
       "tests/rules/section04/test_isolation.py",
@@ -414,6 +483,7 @@
       "tests/rules/section09/test_focused_checkpoint.py",
       "tests/rules/section12/test_ownership.py",
       "tests/rules/section12/test_retained_interactions.py",
+      "tests/rules/section14/test_secured.py",
       "tests/rules/section15/test_reroll.py",
       "tests/rules/section16/test_completion.py",
       "tests/rules/section18/test_faqs.py",
@@ -422,8 +492,8 @@
       "tests/rules/section25/test_inventory.py"
     ],
     "11": [
-      "tests/factions/adeptus_custodes/unit/test_adeptus_custodes_army_rule.py",
       "tests/factions/aeldari/unit/test_aspect_shrine_tokens.py",
+      "tests/factions/aeldari/unit/test_generic_rule_ability_registry.py",
       "tests/factions/aeldari/unit/test_mandiblasters.py",
       "tests/factions/chaos_daemons/integration/test_horror_split_materialization.py",
       "tests/factions/leagues_of_votann/unit/test_leagues_of_votann_army_rule.py",
@@ -451,6 +521,7 @@
       "tests/rules/section08/test_shock_completion.py",
       "tests/rules/section09/test_phase_flow.py",
       "tests/rules/section11/test_boundaries.py",
+      "tests/rules/section11/test_connected_endpoints.py",
       "tests/rules/section11/test_moves.py",
       "tests/rules/section12/test_consolidation.py",
       "tests/rules/section12/test_distance.py",
@@ -463,11 +534,9 @@
       "tests/rules/section18/test_emergency.py",
       "tests/rules/section19/test_formation.py",
       "tests/rules/section20/test_declarations.py",
-      "tests/rules/section22/test_plunging.py",
       "tests/rules/section24/test_movement.py"
     ],
     "12": [
-      "tests/factions/chaos_daemons/unit/test_generic_rule_ability_registry.py",
       "tests/factions/chaos_space_marines/unit/test_source_overlays.py",
       "tests/factions/emperors_children/integration/test_ws14_generic_ir_lifecycle.py",
       "tests/factions/orks/unit/test_orks_army_rule.py",
@@ -488,9 +557,11 @@
       "tests/infrastructure/missions/unit/test_event_companion_part2.py",
       "tests/infrastructure/missions/unit/test_mission_pack.py",
       "tests/infrastructure/missions/unit/test_secondary_scoring_state_evidence_authority.py",
+      "tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_layout_a_scores_through_lifecycle_views_and_replay[player-b-disruption-vs-reconnaissance-layout-1]",
       "tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_layout_a_scores_through_lifecycle_views_and_replay[player-b-take-and-hold-vs-purge-the-foe-layout-1]",
       "tests/infrastructure/missions/unit/test_step5g_pairing_certification_layout_b.py::test_phase17n_step5g_layout_b_scores_through_lifecycle_views_and_replay[player-a-take-and-hold-vs-priority-assets-layout-2]",
       "tests/infrastructure/missions/unit/test_step5g_pairing_certification_layout_b.py::test_phase17n_step5g_layout_b_scores_through_lifecycle_views_and_replay[player-b-purge-the-foe-vs-reconnaissance-layout-2]",
+      "tests/infrastructure/missions/unit/test_step5g_pairing_certification_layout_b.py::test_phase17n_step5g_layout_b_scores_through_lifecycle_views_and_replay[player-b-take-and-hold-vs-take-and-hold-layout-2]",
       "tests/infrastructure/missions/unit/test_step5g_pairing_certification_layout_c.py",
       "tests/infrastructure/missions/unit/test_step6g_secondary_certification_behind_through_cleanse.py",
       "tests/infrastructure/rule_execution/unit/test_generic_ir_support_validation.py",
@@ -524,6 +595,7 @@
       "tests/rules/section08/test_command_flow.py",
       "tests/rules/section09/test_coverage_map.py",
       "tests/rules/section09/test_restrictions.py",
+      "tests/rules/section10/test_coverage_map.py",
       "tests/rules/section12/test_continuations.py",
       "tests/rules/section13/test_movement.py",
       "tests/rules/section14/test_physical.py",
@@ -533,6 +605,7 @@
       "tests/rules/section20/test_inventory.py",
       "tests/rules/section21/test_clarifications.py",
       "tests/rules/section21/test_persistence.py",
+      "tests/rules/section21/test_witness_admission.py",
       "tests/rules/section23/test_combat.py",
       "tests/rules/section23/test_movement.py",
       "tests/rules/section23/test_other_moves.py",
@@ -543,7 +616,6 @@
     ],
     "2": [
       "tests/factions/aeldari/unit/test_battle_focus_consumers.py",
-      "tests/factions/aeldari/unit/test_generic_rule_ability_registry.py",
       "tests/factions/aeldari/unit/test_lhykhis.py",
       "tests/factions/chaos_daemons/integration/test_cavalcade_v995_roster.py::test_exact_mirror_deploys_all_78_models_and_replays_to_battle",
       "tests/factions/chaos_daemons/unit/test_generic_ir_support_validation.py",
@@ -568,7 +640,6 @@
       "tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[unused-damage-roll-one-player-a]",
       "tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[unused-damage-roll-player-a]",
       "tests/rules/rules07/unit/test_lifecycle.py",
-      "tests/rules/rules18/unit/test_tactical_setup_proof.py",
       "tests/rules/rules24/unit/test_prebattle.py",
       "tests/rules/section01/test_01_02_aura.py",
       "tests/rules/section01/test_01_02_effects.py",
@@ -586,16 +657,21 @@
       "tests/rules/section10/test_mixed_integration.py",
       "tests/rules/section10/test_selection.py",
       "tests/rules/section11/test_reactive.py",
+      "tests/rules/section12/test_coverage_map.py",
       "tests/rules/section15/test_bravery_faq50.py",
       "tests/rules/section15/test_smoke.py",
+      "tests/rules/section15/test_snap_range.py",
       "tests/rules/section16/test_source_limits_review.py",
       "tests/rules/section18/test_emergency_status.py",
       "tests/rules/section19/test_abilities.py",
       "tests/rules/section19/test_retained_scope.py",
+      "tests/rules/section22/test_auras.py",
+      "tests/rules/section22/test_plunging.py",
       "tests/rules/section24/test_core_instances.py",
       "tests/rules/section25/test_budgets.py"
     ],
     "3": [
+      "tests/factions/adeptus_custodes/unit/test_adeptus_custodes_army_rule.py",
       "tests/factions/black_templars/unit/test_black_templars_army_rule.py",
       "tests/factions/chaos_daemons/unit/test_source_overlays.py",
       "tests/factions/emperors_children/unit/test_runtime_consumer_evidence.py",
@@ -604,7 +680,6 @@
       "tests/infrastructure/adapters/test_canonical_coverage_preflight.py::test_coverage_totals_derive_each_kind_without_fixed_fixture_counts",
       "tests/infrastructure/adapters/test_training_admission.py",
       "tests/infrastructure/lifecycle/unit/test_lifecycle.py",
-      "tests/infrastructure/missions/unit/test_boundary_checkpoint_physical_authority.py",
       "tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_layout_a_scores_through_lifecycle_views_and_replay[player-a-disruption-vs-disruption-layout-1]",
       "tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_layout_a_scores_through_lifecycle_views_and_replay[player-a-reconnaissance-vs-reconnaissance-layout-1]",
       "tests/infrastructure/missions/unit/test_step5g_pairing_certification_layout_b.py::test_phase17n_step5g_layout_b_scores_through_lifecycle_views_and_replay[player-a-purge-the-foe-vs-priority-assets-layout-2]",
@@ -616,7 +691,6 @@
       "tests/rules/section01/test_01_02_tokens.py",
       "tests/rules/section01/test_01_03_batches.py",
       "tests/rules/section01/test_01_03_stratagem_ownership.py",
-      "tests/rules/section01/test_01_06_leadership.py",
       "tests/rules/section03/test_terrain_and_budgets.py",
       "tests/rules/section04/test_coverage_map.py",
       "tests/rules/section04/test_fight_facade.py",
@@ -630,20 +704,17 @@
       "tests/rules/section07/test_round_effect.py",
       "tests/rules/section08/test_isolation.py",
       "tests/rules/section08/test_rules_units.py",
-      "tests/rules/section09/test_distances.py",
       "tests/rules/section10/test_boundaries.py",
       "tests/rules/section10/test_phase_flow.py",
       "tests/rules/section11/test_coverage_map.py",
       "tests/rules/section11/test_rolls.py",
       "tests/rules/section13/test_ownership.py",
       "tests/rules/section14/test_marker_axes.py",
-      "tests/rules/section15/test_snap_range.py",
       "tests/rules/section16/test_restrictions.py",
       "tests/rules/section17/test_coverage_map.py",
       "tests/rules/section18/test_formations.py",
       "tests/rules/section19/test_coverage.py",
       "tests/rules/section19/test_table.py",
-      "tests/rules/section21/test_witness_admission.py",
       "tests/rules/section22/test_damage.py",
       "tests/rules/section22/test_inventory.py",
       "tests/rules/section23/test_inventory.py",
@@ -695,10 +766,12 @@
       "tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_layout_a_scores_through_lifecycle_views_and_replay[player-b-purge-the-foe-vs-priority-assets-layout-1]",
       "tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_layout_a_scores_through_lifecycle_views_and_replay[player-b-reconnaissance-vs-priority-assets-layout-1]",
       "tests/infrastructure/missions/unit/test_step5g_pairing_certification_layout_b.py::test_phase17n_step5g_layout_b_scores_through_lifecycle_views_and_replay[player-a-take-and-hold-vs-disruption-layout-2]",
+      "tests/infrastructure/missions/unit/test_step5g_pairing_certification_layout_b.py::test_phase17n_step5g_layout_b_scores_through_lifecycle_views_and_replay[player-b-disruption-vs-disruption-layout-2]",
       "tests/infrastructure/missions/unit/test_step5g_pairing_certification_layout_b.py::test_phase17n_step5g_layout_b_scores_through_lifecycle_views_and_replay[player-b-reconnaissance-vs-reconnaissance-layout-2]",
       "tests/infrastructure/missions/unit/test_step5g_pairing_certification_layout_b.py::test_phase17n_step5g_layout_b_scores_through_lifecycle_views_and_replay[player-b-take-and-hold-vs-purge-the-foe-layout-2]",
       "tests/infrastructure/runtime_content/unit/test_runtime_content.py",
       "tests/infrastructure/source/unit/test_source_overlays.py",
+      "tests/rules/rules03/unit/test_setup.py",
       "tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[duplicate-rapid-fire-player-b]",
       "tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[unused-wound-one-player-b]",
       "tests/rules/section01/test_01_02_attached_return.py",
@@ -713,9 +786,7 @@
       "tests/rules/section07/test_facade.py",
       "tests/rules/section09/test_fall_back.py",
       "tests/rules/section09/test_isolation.py",
-      "tests/rules/section10/test_coverage_map.py",
       "tests/rules/section14/test_boundaries.py",
-      "tests/rules/section14/test_secured.py",
       "tests/rules/section15/test_reactions.py",
       "tests/rules/section17/test_movement.py",
       "tests/rules/section18/test_coverage_map.py",
@@ -723,7 +794,6 @@
       "tests/rules/section19/test_destruction.py",
       "tests/rules/section19/test_toughness.py",
       "tests/rules/section21/test_inventory.py",
-      "tests/rules/section22/test_auras.py",
       "tests/rules/section22/test_wargear.py",
       "tests/rules/section23/test_deployment_return.py",
       "tests/rules/section24/test_damaged.py",
@@ -739,10 +809,8 @@
       "tests/infrastructure/missions/unit/test_event_companion.py",
       "tests/infrastructure/missions/unit/test_primary_scoring_grammar.py",
       "tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_every_layout_instantiates_two_sided_scoring_policies",
-      "tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_layout_a_scores_through_lifecycle_views_and_replay[player-b-disruption-vs-reconnaissance-layout-1]",
       "tests/infrastructure/missions/unit/test_step5g_pairing_certification_layout_b.py::test_phase17n_step5g_layout_b_scores_through_lifecycle_views_and_replay[player-a-priority-assets-vs-priority-assets-layout-2]",
-      "tests/infrastructure/missions/unit/test_step5g_pairing_certification_layout_b.py::test_phase17n_step5g_layout_b_scores_through_lifecycle_views_and_replay[player-b-disruption-vs-disruption-layout-2]",
-      "tests/infrastructure/missions/unit/test_step5g_pairing_certification_layout_b.py::test_phase17n_step5g_layout_b_scores_through_lifecycle_views_and_replay[player-b-take-and-hold-vs-take-and-hold-layout-2]",
+      "tests/infrastructure/missions/unit/test_step5g_pairing_certification_layout_b.py::test_phase17n_step5g_layout_b_scores_through_lifecycle_views_and_replay[player-b-take-and-hold-vs-priority-assets-layout-2]",
       "tests/infrastructure/missions/unit/test_step6g_secondary_certification.py",
       "tests/infrastructure/rule_execution/unit/test_generic_rule_ability_registry.py",
       "tests/infrastructure/rule_execution/unit/test_generic_rule_effect_identity.py",
@@ -753,6 +821,7 @@
       "tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[unused-defender-characteristics-player-a]",
       "tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[unused-defender-characteristics-player-b]",
       "tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[unused-wound-player-a]",
+      "tests/rules/rules18/unit/test_tactical_setup_proof.py",
       "tests/rules/rules24/unit/test_tracked_targets.py",
       "tests/rules/section01/test_01_02_presence.py",
       "tests/rules/section01/test_01_02_revival.py",
@@ -770,7 +839,6 @@
       "tests/rules/section09/test_selection.py",
       "tests/rules/section10/test_isolation.py",
       "tests/rules/section12/test_attacks.py",
-      "tests/rules/section12/test_coverage_map.py",
       "tests/rules/section12/test_retained_presence.py",
       "tests/rules/section13/test_consumers.py",
       "tests/rules/section13/test_coverage_map.py",
@@ -795,6 +863,7 @@
       "tests/factions/chaos_daemons/unit/test_chaos_daemons_army_rule.py",
       "tests/infrastructure/adapters/test_canonical_coverage_preflight.py::test_consistent_tampering_still_reproduces_the_real_engine",
       "tests/infrastructure/adapters/test_normal_move_scenario.py",
+      "tests/infrastructure/missions/unit/test_boundary_checkpoint_physical_authority.py",
       "tests/infrastructure/missions/unit/test_primary_scoring_boundary_lifecycle.py",
       "tests/infrastructure/missions/unit/test_step5b_marker_conditions.py",
       "tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_layout_a_scores_through_lifecycle_views_and_replay[player-b-disruption-vs-disruption-layout-1]",
@@ -812,6 +881,7 @@
       "tests/rules/section01/test_01_02_unrestricted.py",
       "tests/rules/section01/test_01_04_contact_lifetime.py",
       "tests/rules/section01/test_01_04_units.py",
+      "tests/rules/section01/test_01_06_leadership.py",
       "tests/rules/section02/test_02_01_identity.py",
       "tests/rules/section02/test_02_02_02_native_permission.py",
       "tests/rules/section02/test_02_02_04_healing.py",
@@ -844,6 +914,7 @@
     "9": [
       "tests/factions/chaos_daemons/integration/test_cavalcade_v995_roster.py",
       "tests/factions/chaos_daemons/unit/test_bloodcrushers_abilities.py",
+      "tests/factions/chaos_daemons/unit/test_generic_rule_ability_registry.py",
       "tests/factions/grey_knights/unit/test_grey_knights_army_rule.py",
       "tests/factions/tyranids/unit/test_tyranids_army_rule.py",
       "tests/factions/world_eaters/unit/test_total_carnage_gameplay.py",
@@ -866,6 +937,7 @@
       "tests/rules/section03/test_isolation.py",
       "tests/rules/section05/test_isolation.py",
       "tests/rules/section06/test_mortals.py",
+      "tests/rules/section09/test_distances.py",
       "tests/rules/section10/test_indirect.py",
       "tests/rules/section10/test_shooting_types.py",
       "tests/rules/section11/test_selection.py",
