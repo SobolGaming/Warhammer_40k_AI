@@ -101,6 +101,7 @@ NEW_NODES |= frozenset(
         "test_survivor_authority_rejects_missing_survivor",
         "test_survivor_authority_rejects_unrelated_hazard",
         "test_completed_hazard_survivor_retry_roundtrips_without_rerolls",
+        "test_pre_hazard_rejected_proposal_then_survivor_retry_roundtrips",
     )
 )
 
@@ -188,11 +189,11 @@ def _baseline(
     if (
         cases.keys() != history.baseline.keys() | NEW_NODES
         or not history.baseline.keys() < cases.keys()
-        or len(cases) - len(history.baseline) != 42
+        or len(cases) - len(history.baseline) != 43
         or set(additions) != {NEW_OWNER, CONNECTED_OWNER, ESCAPE_OWNER}
         or set(additions) & {node.split("::", 1)[0] for node in history.baseline}
     ):
-        raise SystemExit("Compatibility requires exactly the reviewed forty-two added cases.")
+        raise SystemExit("Compatibility requires exactly the reviewed forty-three added cases.")
     owners = {node.split("::", 1)[0] for node in cases}
     sources = _object(data["test_sources"], owners, "current test source inventory")
     try:

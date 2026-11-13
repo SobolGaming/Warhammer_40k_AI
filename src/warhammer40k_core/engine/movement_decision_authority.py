@@ -665,8 +665,36 @@ def _hazard_completion_proposal_records(
     )
     if len(candidates) <= 1:
         return candidates
+    from warhammer40k_core.engine.desperate_escape_mortal_wounds import RESOLVED
+
     by_request = {record.request.request_id: record for record in proposal_records}
+    packets = [
+        event.payload
+        for event in event_records
+        if event.event_type == RESOLVED
+        and isinstance(event.payload, dict)
+        and event.payload.get("application_id")
+        == payload.get("desperate_escape_mortal_application_id")
+    ]
+    if len(packets) != 1:
+        raise GameLifecycleError("Movement survivor retry hazard root is missing.")
+    # _completion_witness authenticates this packet's complete source against
+    # shared mortal-wound authority. Its original proposal roots only the later
+    # survivor chain; ordinary corrected proposals may precede that root.
+    root_id = _payload_string(packets[0], "movement_proposal_request_id")
+    if root_id not in by_request:
+        raise GameLifecycleError("Movement survivor retry original proposal is missing.")
+    root_requests = [
+        index
+        for index, event in enumerate(event_records)
+        if event.event_type == "decision_requested"
+        and event.payload == by_request[root_id].request.to_payload()
+    ]
+    if len(root_requests) != 1:
+        raise GameLifecycleError("Movement survivor retry original request drifted.")
+    root_index = root_requests[0]
     links = {}
+    seen_requests: set[str] = set()
     for index, event in enumerate(event_records):
         row = event.payload
         if event.event_type != "movement_proposal_requested" or not isinstance(row, dict):
@@ -675,16 +703,18 @@ def _hazard_completion_proposal_records(
         previous = row.get("previous_proposal_request_id")
         if not isinstance(request_id, str) or request_id not in by_request or previous is None:
             continue
-        if not isinstance(previous, str) or previous not in by_request or request_id in links:
+        if (
+            not isinstance(previous, str)
+            or previous not in by_request
+            or request_id in seen_requests
+        ):
             raise GameLifecycleError("Movement survivor retry chain drifted.")
+        seen_requests.add(request_id)
         record = by_request[request_id]
         predecessor = by_request[previous]
         request = MovementProposalRequest.from_decision_request_payload(record.request.payload)
         if (
-            request.context is None
-            or request.context.get("desperate_escape_completed_packet_id")
-            != payload.get("desperate_escape_mortal_application_id")
-            or _movement_proposal_request_sources(record)
+            _movement_proposal_request_sources(record)
             != _movement_proposal_request_sources(predecessor)
             or row.get("source_decision_request_id") != request.source_decision_request_id
             or row.get("source_decision_result_id") != request.source_decision_result_id
@@ -693,7 +723,21 @@ def _hazard_completion_proposal_records(
         validate_record_event_closure(
             event_records=event_records, mutation_index=index, record=predecessor
         )
-        if (predecessor.request.request_id, predecessor.result.result_id) not in rejected:
+        predecessor_rejected = (
+            predecessor.request.request_id,
+            predecessor.result.result_id,
+        ) in rejected
+        if request_id == root_id or index < root_index:
+            if not predecessor_rejected or row.get("rejected_result_id") != (
+                predecessor.result.result_id
+            ):
+                raise GameLifecycleError("Movement survivor ordinary retry prefix drifted.")
+            continue
+        if request.context is None or request.context.get(
+            "desperate_escape_completed_packet_id"
+        ) != payload.get("desperate_escape_mortal_application_id"):
+            raise GameLifecycleError("Movement survivor retry packet context drifted.")
+        if not predecessor_rejected:
             failures = [
                 e
                 for e in event_records[:index]
@@ -724,6 +768,8 @@ def _hazard_completion_proposal_records(
         if cursor in visited:
             raise GameLifecycleError("Movement survivor retry chain is cyclic.")
         visited.add(cursor)
+    if cursor != root_id:
+        raise GameLifecycleError("Movement survivor retry chain has the wrong hazard root.")
     if any(record.request.request_id not in visited for record in candidates):
         raise GameLifecycleError("Movement survivor retry chain omits an accepted proposal.")
     return (terminal[0],)

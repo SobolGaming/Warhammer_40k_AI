@@ -73,6 +73,7 @@ def _completed_escape(kind: str) -> dict[str, JsonValue]:
             "partial": "escape-survivor-partial-fixture-0",
             "complete": "escape-survivor-complete-fixture-2",
             "retry": "escape-survivor-retry-fixture-0",
+            "retry_prefix": "escape-survivor-retry-fixture-0",
         }[kind],
         alpha_unit_ids=("retreat", "spare"),
         enemy_unit_ids=("enemy",),
@@ -97,7 +98,7 @@ def _completed_escape(kind: str) -> dict[str, JsonValue]:
         origin = Pose.at(10, 22.5 if name == "enemy" else 35 if name == "spare" else 20)
         poses = (
             tuple(Pose.at(10 + 2 * i, 20) for i in range(len(unit.own_models)))
-            if kind == "retry" and name == "retreat"
+            if kind in ("retry", "retry_prefix") and name == "retreat"
             else _compact_test_unit_poses(origin=origin, model_count=len(unit.own_models))
         )
         battlefield = battlefield.with_unit_placement(
@@ -140,6 +141,7 @@ def _completed_escape(kind: str) -> dict[str, JsonValue]:
     session.advance_until_decision_or_terminal()
     retreat = units["retreat"].unit_instance_id
     retried = False
+    pre_hazard_rejected = False
     original_hazards: list[EventRecord] | None = None
     for _ in range(35):
         request = session.lifecycle.pending_decision_request()
@@ -163,12 +165,14 @@ def _completed_escape(kind: str) -> dict[str, JsonValue]:
             context = nested["context"]
             assert isinstance(context, dict)
             retry = "desperate_escape_completed_packet_id" in context
+            reject_prefix = kind == "retry_prefix" and not pre_hazard_rejected
+            distance = 50 if reject_prefix else 5
             paths = []
             for index, model in enumerate(placements):
                 x = 12 + 2 * index if retry else model.pose.position.x
                 start = model.pose
-                end = Pose.at(x, model.pose.position.y - 5)
-                midpoint = Pose.at((start.position.x + x) / 2, start.position.y - 2.5)
+                end = Pose.at(x, model.pose.position.y - distance)
+                midpoint = Pose.at((start.position.x + x) / 2, start.position.y - distance / 2)
                 paths.append((model.model_instance_id, (start, midpoint, end)))
             witness = PathWitness.for_paths(tuple(paths))
             retried = retried or retry
@@ -206,7 +210,10 @@ def _completed_escape(kind: str) -> dict[str, JsonValue]:
                         request.decision_type == "select_mortal_wound_model"
                         or len(request.options) == 1
                     )
-                    if kind == "retry" and request.decision_type == "select_mortal_wound_model":
+                    if (
+                        kind in ("retry", "retry_prefix")
+                        and request.decision_type == "select_mortal_wound_model"
+                    ):
                         middle = units["retreat"].own_models[2].model_instance_id
                         option = (
                             middle
@@ -219,9 +226,14 @@ def _completed_escape(kind: str) -> dict[str, JsonValue]:
                 request_id=request.request_id, result_id=f"escape:{count}", option_id=option
             )
         if status.status_kind is LifecycleStatusKind.INVALID:
-            assert kind == "retry"
+            assert kind in ("retry", "retry_prefix")
             assert not retried
             assert isinstance(status.payload, dict)
+            if kind == "retry_prefix" and not pre_hazard_rejected:
+                assert status.payload["violation_code"] == "movement_distance_exceeded"
+                pre_hazard_rejected = True
+                session.advance_until_decision_or_terminal()
+                continue
             assert status.payload["violation_code"] == "unit_coherency_broken"
             original_hazards = [
                 e
@@ -232,7 +244,9 @@ def _completed_escape(kind: str) -> dict[str, JsonValue]:
             session.advance_until_decision_or_terminal()
     else:
         raise AssertionError("Natural Fall Back did not complete")
-    if kind == "retry":
+    if kind == "retry_prefix":
+        assert pre_hazard_rejected
+    if kind in ("retry", "retry_prefix"):
         assert retried
         assert original_hazards is not None
         assert [
@@ -307,7 +321,15 @@ def test_survivor_authority_rejects_unrelated_hazard() -> None:
 
 
 def test_completed_hazard_survivor_retry_roundtrips_without_rerolls() -> None:
-    saved = deepcopy(_completed_escape("retry"))
+    _assert_survivor_retry_roundtrip("retry")
+
+
+def test_pre_hazard_rejected_proposal_then_survivor_retry_roundtrips() -> None:
+    _assert_survivor_retry_roundtrip("retry_prefix")
+
+
+def _assert_survivor_retry_roundtrip(kind: str) -> None:
+    saved = deepcopy(_completed_escape(kind))
     events, decisions, index, payload = _authority_inputs(saved)
     authority = validate_movement_completion_decision_authority(
         event_records=events, decision_records=decisions, mutation_index=index, payload=payload

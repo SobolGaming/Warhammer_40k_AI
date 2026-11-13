@@ -2255,10 +2255,15 @@ existing authenticated mortal-wound packet, completion and logical-death records
 Primary-mission physical history and Embark consume that same witness. Complete
 casualties admit no displacement; a completed-hazard coherency retry binds every
 emitted predecessor link and the final survivor proposal without rerolling hazards.
+Ordinary rejected proposals corrected before hazard acceptance retain their own
+typed rejection authority; only the chain rooted at the original hazard proposal
+requires the completed packet. A normal too-long proposal, correction, hazard
+casualty and survivor retry sequence directly covers that ordering.
 Missing survivors and unrelated hazard attribution fail closed. No gameplay
-rule, wire contract or RNG policy changes. Five focused controls use real sessions
+rule, wire contract or RNG policy changes. Six focused controls use real sessions
 for partial casualties, a declared singleton canonical one-wound composition,
-and reachable survivor retry, plus missing-survivor and wrong-packet rejection.
+and reachable survivor retries with and without an earlier rejected proposal,
+plus missing-survivor and wrong-packet rejection.
 Their fixed test-only seeds and initial fixture contracts do not alter operator
 history or search for a favorable operator outcome.
 
