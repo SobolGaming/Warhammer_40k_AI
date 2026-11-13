@@ -266,41 +266,41 @@
     },
     "docs/performance/current/blocked-endpoints-20261113-movement.json": {
       "before_sha256": null,
-      "after_sha256": "229f25299657778cf857f0677744e44a2312deb5fbf014dc1c383185544204f3",
+      "after_sha256": "a5363d1b2c2626877f3a8514fd4b98b5d92e719d220fcdbc00ad663ede615222",
       "owners": {
         "@document": {
           "before": null,
-          "after": "229f25299657778cf857f0677744e44a2312deb5fbf014dc1c383185544204f3"
+          "after": "a5363d1b2c2626877f3a8514fd4b98b5d92e719d220fcdbc00ad663ede615222"
         }
       }
     },
     "docs/performance/current/blocked-endpoints-20261113-reconstruction.json": {
       "before_sha256": null,
-      "after_sha256": "3b05a4af99bd88731d7afc5223f903a55e8ff323a0f0436e97f834f8d5e10e80",
+      "after_sha256": "6de4d5e54c2b2ca673b6d8c799dde694b65d9ad60ddb3b5d20d30e17124815b8",
       "owners": {
         "@document": {
           "before": null,
-          "after": "3b05a4af99bd88731d7afc5223f903a55e8ff323a0f0436e97f834f8d5e10e80"
+          "after": "6de4d5e54c2b2ca673b6d8c799dde694b65d9ad60ddb3b5d20d30e17124815b8"
         }
       }
     },
     "docs/performance/current/blocked-endpoints-20261113-setup.json": {
       "before_sha256": null,
-      "after_sha256": "af9e951cb2144ea557e42a173b4447fcd2287782d16933cb30d5a83d47c7bbf1",
+      "after_sha256": "52b90becac99dc141345866f497d7ee535aac8bef26647e65327a8e20a60e955",
       "owners": {
         "@document": {
           "before": null,
-          "after": "af9e951cb2144ea557e42a173b4447fcd2287782d16933cb30d5a83d47c7bbf1"
+          "after": "52b90becac99dc141345866f497d7ee535aac8bef26647e65327a8e20a60e955"
         }
       }
     },
     "docs/performance/current/blocked-endpoints-20261113-visibility.json": {
       "before_sha256": null,
-      "after_sha256": "8c9e5884d546b42239a6cea877f825ccee9c7cb1f969b16dd258e9b27ebcadda",
+      "after_sha256": "0b26efd27e1d4393ce246ae5fc6bf9186ab6854753ba3efeb9aadc663dfc579b",
       "owners": {
         "@document": {
           "before": null,
-          "after": "8c9e5884d546b42239a6cea877f825ccee9c7cb1f969b16dd258e9b27ebcadda"
+          "after": "0b26efd27e1d4393ce246ae5fc6bf9186ab6854753ba3efeb9aadc663dfc579b"
         }
       }
     },
@@ -409,6 +409,16 @@
         "test_current_dispatch_has_exact_inventory_and_disclosed_selector_moves": {
           "before": "fb4a618d2857c819a49ac13eaa3e8a0d5e95d76a81c97b677c67df7aadc5ee9d",
           "after": "38d6978f628074595323e015032d187cefb0f55ceb2fd49f2e70669006040ac6"
+        }
+      }
+    },
+    "tests/rules/section07/coverage.json": {
+      "before_sha256": "1d85fb53a5542b587becf158dc61296cf39d90e346eaec6c81d9fb9612fa088e",
+      "after_sha256": "58340457b8c67025918aed645d99e39faa90d3a51bacce158fb82174551dd207",
+      "owners": {
+        "@document": {
+          "before": "1d85fb53a5542b587becf158dc61296cf39d90e346eaec6c81d9fb9612fa088e",
+          "after": "58340457b8c67025918aed645d99e39faa90d3a51bacce158fb82174551dd207"
         }
       }
     },
@@ -817,6 +827,16 @@
       "rationale": "Admit a narrow collision/support exclusion for overlapping disconnected-component goal regions, with current physical occupancy and ordered exact-context historical recomputation.",
       "source_obligation": "Preserve submitted physical execution order, complete-prefix path and terrain legality, every endpoint obligation, exact source geometry, seeds and search budgets. Unsupported or satisfiable relaxations retain ordinary search; only a sufficient negative certificate changes status. Model001 preferred remains unresolved; its engagement path is neither preferred nor whole-unit proof.",
       "unchanged_work": "Generic movement reachability, navigation, cache keys, seeds, budgets and accepted physical validation are unchanged. Historical observations stay in their producing snapshots; nine additional exact cases and a fresh complete local profile update derived scheduling only. The saved whole charge remains unresolved and full-game performance is unqualified."
+    },
+    "tests/rules/section07/coverage.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "qualification40-exact-b6886d3bc2fb1ca4"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh the existing authenticated README input checksum after maintained current test-count edits; preserve every section07 source block, requirement and assertion.",
+      "source_obligation": "The complete hierarchy/raw-capture authentication test must authenticate the actual final README bytes. The test functions and other authenticated source identities remain unchanged.",
+      "unchanged_work": "This is a one-field checksum correction. Runtime and executable test code are unchanged. The original covered qualification and component cohort remain in their producing snapshots; selected component comparisons are newly measured because this metadata belongs to the required common fixture digest."
     },
     "tests/rules/section11/test_connected_endpoints.py": {
       "category": "rule_semantics",
