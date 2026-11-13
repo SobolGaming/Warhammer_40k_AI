@@ -86,6 +86,7 @@ NEW_NODES |= frozenset(
         "test_connected_endpoint_overlap_requires_collision_and_support_proof[tangent]",
         "test_connected_endpoint_overlap_requires_collision_and_support_proof[shape]",
         "test_connected_endpoint_overlap_requires_collision_and_support_proof[reachable]",
+        "test_shared_ordered_history_reader_preserves_existing_fight_witness",
     )
 )
 
@@ -173,7 +174,7 @@ def _baseline(
     if (
         cases.keys() != history.baseline.keys() | NEW_NODES
         or not history.baseline.keys() < cases.keys()
-        or len(cases) - len(history.baseline) != 35
+        or len(cases) - len(history.baseline) != 36
         or set(additions) != {NEW_OWNER, CONNECTED_OWNER}
         or set(additions) & {node.split("::", 1)[0] for node in history.baseline}
     ):

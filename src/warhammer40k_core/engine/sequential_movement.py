@@ -7,12 +7,13 @@ from typing import TYPE_CHECKING, cast
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.decision_record import DecisionRecord
-    from warhammer40k_core.engine.event_log import EventRecord, JsonValue
+    from warhammer40k_core.engine.event_log import EventRecord
 
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
     geometry_model_for_placement,
 )
+from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.geometry.pathing import PathWitness, PathWitnessPayload
 from warhammer40k_core.geometry.volume import Model

@@ -1621,10 +1621,10 @@
       "sha256": "41bb348875c07b02b623c09189071fe38defa2df2b7dc2636c1067b8749c17c6"
     },
     "tests/rules/section11/test_connected_endpoints.py": {
-      "blob_sha1": "48f7b10b3daa727ff71aed6d62ad7edb2d0b40a1",
-      "bytes": 15415,
+      "blob_sha1": "d99af8acbe50b05546721d67d9ed83b4e8b39e0b",
+      "bytes": 16889,
       "mode": "100644",
-      "sha256": "7efd1b4c8ac6a788a509a671cfb571ea0b315d6a1fe2f36162619d88912e2295"
+      "sha256": "227dca6bdf231aa48a75f57dbfffa1dc405a84e99fd5bb6a00c8a3b889fcb09d"
     },
     "tests/rules/section11/test_coverage_map.py": {
       "blob_sha1": "ed5c41b5aa9c4aed18a7358cedecd2929f3479f7",

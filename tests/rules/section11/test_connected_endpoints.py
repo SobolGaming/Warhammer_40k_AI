@@ -203,6 +203,47 @@ def test_connected_endpoint_overlap_requires_collision_and_support_proof(control
         assert replace(query.terrain_context, witness=result.witness).validate().is_valid
 
 
+def test_shared_ordered_history_reader_preserves_existing_fight_witness(
+    section11_definitions: Section02Definitions,
+) -> None:
+    from tests.support.section12_fixtures import (
+        begin as begin_fight,
+    )
+    from tests.support.section12_fixtures import (
+        checkpoint,
+        engaged_case,
+        paths,
+        submit_move,
+    )
+    from tests.support.section12_fixtures import (
+        session_for as fight_session,
+    )
+    from warhammer40k_core.core.ruleset_descriptor import FightPhaseStepKind
+    from warhammer40k_core.engine.sequential_movement import complete_movement_witness
+
+    state, unit, enemy = engaged_case(section11_definitions)
+    checkpoint(state, FightPhaseStepKind.PILE_IN)
+    session = fight_session(section11_definitions, state)
+    begin_fight(session)
+    witness = paths(state, (unit.unit_instance_id,), 0.5)
+    status = submit_move(session, targets=(enemy.unit_instance_id,), witness=witness)
+    assert status.status_kind is not LifecycleStatusKind.INVALID, status
+    controller = session.lifecycle.decision_controller
+    event = next(
+        e for e in controller.event_log.records if e.event_type == "fight_movement_completed"
+    )
+    assert isinstance(event.payload, dict)
+    assert (
+        complete_movement_witness(
+            event=event,
+            payload=event.payload,
+            resolution=event.payload,
+            decisions=tuple(controller.records),
+        )
+        == witness
+    )
+
+
 @pytest.mark.parametrize("proof", ["disjoint", "blocked"])
 def test_connected_endpoint_certificate_survives_charge_history_reconstruction(
     section11_definitions: Section02Definitions,
