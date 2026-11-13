@@ -2013,3 +2013,47 @@ Six searches remain unresolved and no charge is established or submitted.
 Existing persistence/replay/resolver and adapter contracts cover the unchanged
 payload shapes; generated build identities are refreshed. Timing is operator-only,
 with no latency-distribution, tactical, Stage 2, learning or full-game claim.
+
+
+## Saved model-003 engagement search boundary
+
+The exact corrected 005→001 witness still returns `unresolved` for model 003
+engagement on post-PR672 runtime. Observational diagnosis preserves its complete
+query, source checkpoint, physical order, nine-inch budget and all endpoint
+obligations. The queue empties after 78 pops: 57 explored nodes and 21 stale
+entries. The 128-node ceiling is not reached. Raising it cannot change this
+observed termination. The heuristic graph is not a continuous reachability proof.
+
+There are 2,610 navigation poses and 206 generated goal candidates across 58
+generation calls. Goal generation projects toward target centers at supported
+heights and facings; graph edges retain complete source-to-candidate prefixes.
+All 206 goal candidates fail full-group connectivity. Forty-one goal attempts
+pass both ordinary path and terrain validation before failing endpoint admission.
+Model 003 must bridge fixed-peer components {001,002} and {004,005}; satisfying
+the target range or having one nearby peer is insufficient.
+
+A separate diagnostic checks all ten lower-component/target pairs using exact
+rational arithmetic and circumscribed 2D disks. The nearest center separation is
+7.1598425 inches, greater than the relaxed combined reach of 6.5196851 inches.
+Thus this fixed-peer context cannot both connect to the lower component and
+reach a selected target, even after relaxing height, terrain and path length.
+This independent geometric argument is not an engine-issued certificate and
+does not relabel the runtime's `unresolved` result or decide another witness or
+the complete charge. Removing the lower component in a diagnostic sensitivity
+control admits sampled endpoints; that altered context authorizes no gameplay.
+
+The same diagnostic records 23,248 complete witness validations, but only five
+identical-path repeats. Ordinary path checks reject 10,140 attempts; terrain
+checks reject 12,990. Terrain validation remains the dominant measured owner.
+Its 126.299-second sampled/wrapped query is diagnostic, distinct from PR672's
+76.063-second primary observation; sampler self-time does not measure total
+instrumentation overhead. No comparative speedup follows. Repeated distinct
+prefix validation and lack of an answer are separate issues.
+
+The supported next experiment is a conservative continuous endpoint exclusion
+that accounts for every fixed-peer connected component, with positive legal
+controls and exact-context proof admission. The existing optional coherency
+proof checks only the mover's neighbor count and is not enabled for this charge
+query; enabling it alone does not supply that connectivity certificate. This
+diagnostic changes no runtime search, validation or cache behavior. A legal
+Charge Move, tactical benefit, Stage 2 completion and learning remain unqualified.
