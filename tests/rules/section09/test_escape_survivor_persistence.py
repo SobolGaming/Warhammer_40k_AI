@@ -12,10 +12,9 @@ from typing import cast
 
 import pytest
 
+from tests.phase15a_charge_config_helpers import _config, _mustered_armies
 from tests.phase15a_charge_test_support import (
     _compact_test_unit_poses,
-    _config,
-    _mustered_armies,
     _unit_placement_at,
 )
 from tests.setup_completion_helpers import (
@@ -167,7 +166,7 @@ def _completed_escape(kind: str) -> dict[str, JsonValue]:
             retry = "desperate_escape_completed_packet_id" in context
             reject_prefix = kind == "retry_prefix" and not pre_hazard_rejected
             distance = 50 if reject_prefix else 5
-            paths = []
+            paths: list[tuple[str, tuple[Pose, ...]]] = []
             for index, model in enumerate(placements):
                 x = 12 + 2 * index if retry else model.pose.position.x
                 start = model.pose

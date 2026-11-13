@@ -1,7 +1,7 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:78f7dd8bd692621415ef3b22898aca3167cdc610f51c558c2a791599c2f23e5d",
-  "fingerprint": "78f7dd8bd692621415ef3b22898aca3167cdc610f51c558c2a791599c2f23e5d",
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:ff9037cb0bf1101d2d6aee0f65ba652398a0bc3c4d19c4c1dd152f0db0bf845c",
+  "fingerprint": "ff9037cb0bf1101d2d6aee0f65ba652398a0bc3c4d19c4c1dd152f0db0bf845c",
   "resource_count": 3249,
   "resources": [
     {
@@ -11280,9 +11280,9 @@
       "sha256": "fb673caf96e061b38fe8baf87be589ee21d51a54931d77455c053f877b61ea1c"
     },
     {
-      "byte_length": 39780,
+      "byte_length": 39741,
       "path": "warhammer40k_core/engine/movement_decision_authority.py",
-      "sha256": "19ddb675a14469be6105d47a209a126c385a06bf17d584744fb122cb4254ecdf"
+      "sha256": "eca02d1119122710328fe4d7a3a08b4a17123d09cbb273a5be9e1b361c345e83"
     },
     {
       "byte_length": 14890,

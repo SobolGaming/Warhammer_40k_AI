@@ -630,7 +630,6 @@ def _completion_witness(
             or death.cause_kind is not authority.initial_logical_death_cause_binding.cause_kind
             or not isinstance(death.transition, DamageApplicationLogicalDeathTransition)
             or death.transition.damage_application != by_model[death.model_instance_id].to_payload()
-            or death.destroyed_model_placement is None
             or death.destroyed_model_placement.pose
             != original.witness.poses_for_model(death.model_instance_id)[0]
         ):
@@ -693,7 +692,7 @@ def _hazard_completion_proposal_records(
     if len(root_requests) != 1:
         raise GameLifecycleError("Movement survivor retry original request drifted.")
     root_index = root_requests[0]
-    links = {}
+    links: dict[str, str] = {}
     seen_requests: set[str] = set()
     for index, event in enumerate(event_records):
         row = event.payload
