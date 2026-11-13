@@ -2144,6 +2144,10 @@ Combats, with neither available activation passed. Both emit
 CORE configuration equips S and B only with ranged bolt rifles. Their
 `fight_selection_completed` events have no attack sequence and `has_fought=false`. No melee
 attack, allocation, save or damage resolution is exercised or qualified.
+S and B are synthetic Intercessor-like CORE test profiles, not source-backed
+Intercessor Squad datasheets. Their missing melee equipment is a property of this
+fixture; it is not evidence of missing weapons in official unit data. The result
+does not test native equipped melee combat.
 This follows the retained Section 12 FAQ 2, which permits selection without an
 equipped weapon and resolves the selected type with no attacks; the existing
 `test_faq2_unequipped_native_body_is_selected_and_resolves_without_attacks`
@@ -2191,11 +2195,18 @@ A separate frozen operator continuation starts from the retained #677 round-four
 A Movement checkpoints on base `cbcff75ff758574e16248e62384b719410adb92a`.
 It preserves configuration, catalog, mission, terrain, provisional geometry,
 private seed, original RNG history and every accepted decision/event prefix.
+S, B and E here are synthetic CORE test units. E's profile and loadout are not
+a native source-datasheet admission, just as S/B's absent melee weapons are not an
+official-data defect. These outcomes qualify fixture mechanics only, not real-unit
+screening or sacrifice behavior.
 E has three two-wound models at (3, 45), (3, 46.8), (3, 48.6), Movement 10,
-and its real `core-drop-carbine`: range 18, three attacks, BS 3, Strength 4,
-AP 0, Damage 1. The pre-choice engine target audit retains the unavailable
-opportunities: charged B is locked in combat with S, and control B is outside
-E's range. No artificial weapon or melee capability is introduced.
+and its actual equipped synthetic `core-drop-carbine`: range 18, three attacks,
+BS 3, Strength 4,
+AP 0, Damage 1. Initial equipment and source inspection precedes recipe
+selection. The subsequent shared engine target audit, captured after the v2 freeze
+but before attack measurement, retains the unavailable original opportunities:
+charged B is locked in combat with S, and control B is outside E's range.
+No artificial weapon or melee capability is introduced.
 
 Pre-choice mission inspection identifies terrain-area objective control. E is
 outside every objective area. The retained geometric audit places the nearest
@@ -2276,3 +2287,57 @@ repair only. Alternative objective routes, adversarial play, screening benefit,
 Stage 2 completion, learning admission and full-game throughput remain unqualified;
 `useful_reference_status` remains `scoped_gap`, `reference_target` remains null,
 and `eligible_for_learning` remains false.
+
+
+## Proposed native v995 screening workload
+
+`cavalcade-v995-native-screen-follow-through-v1` is a separately versioned proposal,
+not an executed continuation or a replacement for the synthetic records above.
+Reuse the full legal [2,000-point v995 roster](../data/army_lists/cavalcade-shadow-bloodthirster.json)
+on both sides: nine units and 39 models per player, with its existing selected
+Enhancements, Cavalcade of Chaos + Shadow Legion, October points and Purge the Foe
+layout 1. Start through the existing ordinary setup recipe to its round-one
+Command checkpoint; retain every other unit instead of extracting an artificial
+three-unit army. The [setup regression](../tests/factions/chaos_daemons/integration/test_cavalcade_v995_roster.py)
+establishes strict mustering, deployment, persistence and setup replay, not the
+proposed battle continuation.
+
+Read-only strict mustering of that exact roster confirms these equipped candidates:
+
+| Role | Roster selection and native datasheet | Equipped profiles relevant to the proposal |
+|---|---|---|
+| S, player A screen | `cavalcade-a:nurglings`, `000001133`, three models | `000001133:diseased-claws-and-teeth:standard`, melee, four attacks per model, WS 5, S 2, AP 0, D 1, Lethal Hits |
+| B, player B melee threat | `cavalcade-b:bloodcrushers-1`, `000001115`, six models | `000001115:hellblade:standard`, melee, A 2, WS 3, S 5, AP -2, D 2; `000001115:juggernauts-bladed-horn:standard`, melee, A 4, WS 4, S 6, AP -1, D 1, Extra Attacks and Lance |
+| E, player A ranged follow-through | `cavalcade-a:lord-of-change-1`, `000001120`, one model | Selected `000001120:rod-of-sorcery:standard`, 18 inches, A 6, BS 2, S 8, AP -1, D 2; equipped `000001120:bolt-of-change:witchfire`, 18 inches, A 9, BS 2, S 9, AP -1, D 1; also equipped melee `000001120:staff-of-tzeentch:standard` |
+
+These are pinned catalog characteristics before live modifiers and ability choices.
+The [versioned native catalog](../src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/chaos_daemons_cavalcade_2026_11/artifacts/catalog.json)
+has SHA-256 `d174bea9f2adb2a0d9b319fa3cfe0a0f43ef2157161df78b59ec90e3fc5bc8b2`.
+Bloodcrushers and Lord of Change are covered by the retained
+[selected-datasheet reconciliation](../src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/chaos_daemons_roster_2026_07/artifacts/official-pdf-reconciliation.json)
+for pages 30–31 and 40–41. The v995 [source review](../src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/chaos_daemons_cavalcade_2026_11/artifacts/source-review.json)
+pins Nurglings pages 80–81 and the retained PDF SHA-256
+`818f7ef144691b9eef6b3c5b5d0a39793690af5a958037b7055215e6675e6a2c`.
+These repository pins identify the reviewed source version; they do not assert
+independent verification against today's official app or newly measured geometry.
+
+The practical next step is a bounded ordinary approach from that complete setup
+to a common pre-choice checkpoint, then freeze S's screen/preserve alternatives,
+B's response, required native ability choices, and a common horizon before any
+attack measurement. Resolve actual equipped Charge/Fight attacks and casualties,
+then compare a legal E shooting continuation with its omission within each
+identically prepared history. Lord of Change supplies a practical ranged actor;
+its MONSTER status, live range, visibility, engagement restrictions and available
+weapon/profile choices require their own engine audit. Do not carry over the
+synthetic target-eligibility result. Any necessary Fall Back, charge-triggered
+damage, Mischief Makers, selected upgrades, aura or weapon-choice effects must
+resolve through their ordinary supported paths, with real costs and no replacement
+rolls. Objective access needs full legal witnesses, not geometric bounds alone.
+
+The [native support inventory](factions/chaos-daemons.md) separates component
+semantics from complete-game certification. Seven geometry heights remain
+provisional. Unavailable attacks, zero damage, rejected paths and unsupported
+reachable rules must be retained explicitly; an unsupported path stops the trial
+instead of replacing a unit, weapon or rule. The complete native battle prefix,
+matched horizon, persistence/replay, tactical usefulness, Stage 2 and learning
+admission remain unqualified until this separately authorized workload is executed.

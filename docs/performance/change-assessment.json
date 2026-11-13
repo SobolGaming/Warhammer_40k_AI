@@ -1,49 +1,466 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "a816ce526e5b2cd05d5dba8fbb0d108a945f1c44",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:cb5eb39b0778a1be7c89c167357007d3b3263147ff73741cd69b26a96d5dc8a6",
-  "operation_map_sha256": "38f7ba067fef46da27116e194f735c56c533ac45fb4ccc5348ac483f699a552d",
+  "base": "cbcff75ff758574e16248e62384b719410adb92a",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:78f7dd8bd692621415ef3b22898aca3167cdc610f51c558c2a791599c2f23e5d",
+  "operation_map_sha256": "7f78ac96a27f5e6a639f3c8295c482e3adac6e79de9d40a92bee8cb7ffc0b8e2",
   "changes": {
-    "docs/AI_POLICY_INTERFACE.md": {
-      "before_sha256": "ba39b83cfdfc152f0d3716ba66e5c787be2496f35e175135bf48cdad76476be3",
-      "after_sha256": "73ac09cff6ac248f5e0748ac1ae42ee322741c2b3622984c39edd9a26cd2c785",
+    "README.md": {
+      "before_sha256": "a32436a13eb10b65f525d4d5d19847fdff0696fd9e69dc587dcf35cd678f56fb",
+      "after_sha256": "e6ac96404465effabdf86cb326afce3a2e6290090a27823437da64395c9e2546",
       "owners": {
         "@document": {
-          "before": "ba39b83cfdfc152f0d3716ba66e5c787be2496f35e175135bf48cdad76476be3",
-          "after": "73ac09cff6ac248f5e0748ac1ae42ee322741c2b3622984c39edd9a26cd2c785"
+          "before": "a32436a13eb10b65f525d4d5d19847fdff0696fd9e69dc587dcf35cd678f56fb",
+          "after": "e6ac96404465effabdf86cb326afce3a2e6290090a27823437da64395c9e2546"
+        }
+      }
+    },
+    "contracts/examples/persistence/session-persistence.json": {
+      "before_sha256": "f82d1e3d99061f9696535d84dfa0ad5e138121431429b1f739f17b1a24d44adb",
+      "after_sha256": "7295a13d0cd6c858e13dcd4028e0ef64e62c4e7b63488657716f53dd4aa013c1",
+      "owners": {
+        "@document": {
+          "before": "f82d1e3d99061f9696535d84dfa0ad5e138121431429b1f739f17b1a24d44adb",
+          "after": "7295a13d0cd6c858e13dcd4028e0ef64e62c4e7b63488657716f53dd4aa013c1"
+        }
+      }
+    },
+    "contracts/examples/sessions/session-command-outcome.json": {
+      "before_sha256": "535df253e0a96ba378d33e8e799d1fc8431d4642ec2b6b649f464b8e77724553",
+      "after_sha256": "c71c4640824047a4fd618d87a9aae2024e49a5409c38378eb3f4fc64cc3f1c41",
+      "owners": {
+        "@document": {
+          "before": "535df253e0a96ba378d33e8e799d1fc8431d4642ec2b6b649f464b8e77724553",
+          "after": "c71c4640824047a4fd618d87a9aae2024e49a5409c38378eb3f4fc64cc3f1c41"
+        }
+      }
+    },
+    "contracts/examples/sessions/session-command-started.json": {
+      "before_sha256": "3091c2eabcb9fcfaaeb805aebf49bdda9961eea984c500ba2e92df0669f1fcc3",
+      "after_sha256": "5449365bde92a4c1f22fd215229ab7877a6bc312d097621b1e845b69a285e925",
+      "owners": {
+        "@document": {
+          "before": "3091c2eabcb9fcfaaeb805aebf49bdda9961eea984c500ba2e92df0669f1fcc3",
+          "after": "5449365bde92a4c1f22fd215229ab7877a6bc312d097621b1e845b69a285e925"
+        }
+      }
+    },
+    "contracts/examples/sessions/session-metadata-created.json": {
+      "before_sha256": "300d31f133718d7f49eb741adc51a1958c699763d5ad2acc128bced67683c4f4",
+      "after_sha256": "e16bec6b5dc781d2e9f57d8c0cd0b8ed68135ee9df84d0ae84b268788746abcb",
+      "owners": {
+        "@document": {
+          "before": "300d31f133718d7f49eb741adc51a1958c699763d5ad2acc128bced67683c4f4",
+          "after": "e16bec6b5dc781d2e9f57d8c0cd0b8ed68135ee9df84d0ae84b268788746abcb"
+        }
+      }
+    },
+    "contracts/examples/support-profile-player-a-redacted.json": {
+      "before_sha256": "ab3a9fda3507945dc10dbf10fbf8108ce2a90ef1937f48552e1ae1c9e262758b",
+      "after_sha256": "a232961aced71f9132afb59dc76243ad51cf7992858cf6e9ccc898c21a9d4415",
+      "owners": {
+        "@document": {
+          "before": "ab3a9fda3507945dc10dbf10fbf8108ce2a90ef1937f48552e1ae1c9e262758b",
+          "after": "a232961aced71f9132afb59dc76243ad51cf7992858cf6e9ccc898c21a9d4415"
+        }
+      }
+    },
+    "contracts/examples/support-profile-player-b-redacted.json": {
+      "before_sha256": "f57a9d24731a138b8a456fcabd0a38c09f7383dc192edb18e9c84d1ded65808e",
+      "after_sha256": "47043b7a651d7bb7a8eb08dfb4659e4e17144bddc9a35d115bd57a072a1d4be8",
+      "owners": {
+        "@document": {
+          "before": "f57a9d24731a138b8a456fcabd0a38c09f7383dc192edb18e9c84d1ded65808e",
+          "after": "47043b7a651d7bb7a8eb08dfb4659e4e17144bddc9a35d115bd57a072a1d4be8"
+        }
+      }
+    },
+    "contracts/examples/support-profile.json": {
+      "before_sha256": "4299fa33eec8411de67bd0e97cdc95d6ce00bed77015f136ecdcc14f734e48fc",
+      "after_sha256": "dbb286b1b7d0f3f1b76440d4a869ec2664e5fd6cdb809a26142eaa03d473bff3",
+      "owners": {
+        "@document": {
+          "before": "4299fa33eec8411de67bd0e97cdc95d6ce00bed77015f136ecdcc14f734e48fc",
+          "after": "dbb286b1b7d0f3f1b76440d4a869ec2664e5fd6cdb809a26142eaa03d473bff3"
+        }
+      }
+    },
+    "contracts/manifest.json": {
+      "before_sha256": "b24f6d4ea616886b858acb6fa83e177f0a71b10cc94de03dda85645d5696ef14",
+      "after_sha256": "55f0259617b3206e460748177e02d6b4f6d99a8539f0973fec67f6e6ebee5eca",
+      "owners": {
+        "@document": {
+          "before": "b24f6d4ea616886b858acb6fa83e177f0a71b10cc94de03dda85645d5696ef14",
+          "after": "55f0259617b3206e460748177e02d6b4f6d99a8539f0973fec67f6e6ebee5eca"
+        }
+      }
+    },
+    "data/source_audits/ci64_provenance_v1/test-cutover.json": {
+      "before_sha256": "7b59252df0a05dd80729b574f71bec0c2227ff4071d511f0e96855bb28effd61",
+      "after_sha256": "b7d28cb548559d2d64fa63948d578c668fd742f2bcfaea1fa67ff7ddf8d482cc",
+      "owners": {
+        "@document": {
+          "before": "7b59252df0a05dd80729b574f71bec0c2227ff4071d511f0e96855bb28effd61",
+          "after": "b7d28cb548559d2d64fa63948d578c668fd742f2bcfaea1fa67ff7ddf8d482cc"
+        }
+      }
+    },
+    "docs/AI_POLICY_INTERFACE.md": {
+      "before_sha256": "73ac09cff6ac248f5e0748ac1ae42ee322741c2b3622984c39edd9a26cd2c785",
+      "after_sha256": "d3ff458ca869a8d56796916e6bae67b07812b4d722bcbc89492c5720f1b57c33",
+      "owners": {
+        "@document": {
+          "before": "73ac09cff6ac248f5e0748ac1ae42ee322741c2b3622984c39edd9a26cd2c785",
+          "after": "d3ff458ca869a8d56796916e6bae67b07812b4d722bcbc89492c5720f1b57c33"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
-      "before_sha256": "5270c2c817d628c9fce543ddc7b7692b745e039de5dacf05d86b616f0fe935fa",
-      "after_sha256": "6a67a4e90f56428b66a6db45fc72ebf370f9d773eb59e390578c83b5de723c54",
+      "before_sha256": "6a67a4e90f56428b66a6db45fc72ebf370f9d773eb59e390578c83b5de723c54",
+      "after_sha256": "d6ccb425f8d38614464cff44117ee7823c55614b08362b33f3b87388fb9444d3",
       "owners": {
         "@document": {
-          "before": "5270c2c817d628c9fce543ddc7b7692b745e039de5dacf05d86b616f0fe935fa",
-          "after": "6a67a4e90f56428b66a6db45fc72ebf370f9d773eb59e390578c83b5de723c54"
+          "before": "6a67a4e90f56428b66a6db45fc72ebf370f9d773eb59e390578c83b5de723c54",
+          "after": "d6ccb425f8d38614464cff44117ee7823c55614b08362b33f3b87388fb9444d3"
+        }
+      }
+    },
+    "docs/performance/current/escape-survivor-history-20261113-reconstruction.json": {
+      "before_sha256": null,
+      "after_sha256": "074cdad22da8916fdf7c9748726febe6b5b63e94cf6a28a1377c9a3ac8c25191",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "074cdad22da8916fdf7c9748726febe6b5b63e94cf6a28a1377c9a3ac8c25191"
+        }
+      }
+    },
+    "docs/performance/policy-v3/operation-map.json": {
+      "before_sha256": "cf60111206a846f90b46919ef7ebc72cda548e2c36c92329fcc8360e7c4be3f2",
+      "after_sha256": "3a795b96aa209a350912285f9e9df39d2048234c295d2f942c9f30545fe5b993",
+      "owners": {
+        "@document": {
+          "before": "cf60111206a846f90b46919ef7ebc72cda548e2c36c92329fcc8360e7c4be3f2",
+          "after": "3a795b96aa209a350912285f9e9df39d2048234c295d2f942c9f30545fe5b993"
+        }
+      }
+    },
+    "scripts/current_shard_assignment.py": {
+      "before_sha256": "7b3a5c08d984c896d2b7f8eed426cd243756ab3dde8b19322f6cf25cfae0904c",
+      "after_sha256": "eeddfc633a2b0cc43ead53d6a2397486f297f585aaf7392ff5a936b6dfb9ad34",
+      "owners": {
+        "load_assignment": {
+          "before": "bdf97c28c20425914d6d50698dff511298c20734d424b980197f544d6025a432",
+          "after": "f64e79624baca52d7298fa1928febda32810f1c2b8467d8648ddc06080879f78"
+        }
+      }
+    },
+    "scripts/current_shard_compatibility.py": {
+      "before_sha256": "ef5d502697fedb8a30e873c2c7ac037d2c05c2a53b882b1453bf999b991754b6",
+      "after_sha256": "4f5331b5b5965f8ec7e4b3fa110e27719d5a4668939ba750e81f358983a6ac26",
+      "owners": {
+        "@module": {
+          "before": "05cf257512c540f0b195fa4bacc88626d92b6a3faad6eb99b0831d9c33254b3f",
+          "after": "c5997d071159f5a07a9a7d6f69f4769f00964d84cb21153d2a5c576af68ee783"
+        },
+        "_baseline": {
+          "before": "416b6d80ab029e9143bb5a2420bc9d27247cc27c377f9445820ad317c9c0c5f5",
+          "after": "4236ada359fc2922865f47907fee75306ce6a8fa9c91dc18107b82f7bfcf732e"
+        }
+      }
+    },
+    "src/warhammer40k_core/_engine_build_manifest.json": {
+      "before_sha256": "aa1d036bb361c88218c8d8f799e8af160b6b317b5000f77d570cf05d73f72505",
+      "after_sha256": "0b4e765ad636c8f1ed059dc441ba847a2a78b794c49b3309f4202b1a8ac87ad6",
+      "owners": {
+        "@document": {
+          "before": "aa1d036bb361c88218c8d8f799e8af160b6b317b5000f77d570cf05d73f72505",
+          "after": "0b4e765ad636c8f1ed059dc441ba847a2a78b794c49b3309f4202b1a8ac87ad6"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/movement_decision_authority.py": {
+      "before_sha256": "a80f6068e85766fadab5021e59d0a5c50d079972a9f4fec1a8d4794f5270d25c",
+      "after_sha256": "19ddb675a14469be6105d47a209a126c385a06bf17d584744fb122cb4254ecdf",
+      "owners": {
+        "MovementCompletionAuthority": {
+          "before": null,
+          "after": "ad5e95526b0b482965144ca0b096f5a62ea5486d1029ca0501e1d0bbc1c81ffd"
+        },
+        "_completion_witness": {
+          "before": null,
+          "after": "20c384a1306d27462a2bc2a824d43a7561b2269093a81aa470fba32715b02bca"
+        },
+        "_hazard_completion_proposal_records": {
+          "before": null,
+          "after": "9d77d6944b39e4308c9c038d1c31e30af56409c3efcdca8bb5f2e5befb2ecdfd"
+        },
+        "validate_movement_completion_decision_authority": {
+          "before": "4caf99c49f442a322f9ced2fd3174525520ba337a3c7d865520b79e3c4c58c6b",
+          "after": "a6614a1e04956ac01753dfdf2b0341a5d979ead18f6cfadab681048df223d71b"
+        },
+        "validated_movement_transition": {
+          "before": "51970ed8c9d48ce6b829d39022c8261f8b74939caf993f4f3a4549b42649b151",
+          "after": "f4be975678f5914ceb462d36000e7041521525df92996e42f36ae3bedcfbfd3f"
+        }
+      }
+    },
+    "tests/code_quality/test_current_shard_compatibility.py": {
+      "before_sha256": "d1630ef7723a007074ca223dd316ac969fde816629ec22eb73c8bccbd225f287",
+      "after_sha256": "4f7c5c28e1358e7f1f40f1a46d3472fe517593bc976fa849d02d736be0add821",
+      "owners": {
+        "test_compatibility_boundary_rejects_stale_or_forged_inputs": {
+          "before": "5cf4b8a8c13a2757ea12c7c5a04d6df877cd31645d30668ee7a169cbf1fa8dbf",
+          "after": "3ca479af6631e2392a5c2de230b159e6ed7e6023051d5aa82ad043942103c78b"
+        },
+        "test_current_dispatch_has_exact_inventory_and_disclosed_selector_moves": {
+          "before": "e11a8f6f02eea2ea32b6285849f57d6bb8cee5f93b61747889f7c09f0d358a10",
+          "after": "50994e1431fc0c6f8ce0094cbf5a43c8e7078543841fd5a5acf1f0c06acbdfd9"
+        }
+      }
+    },
+    "tests/rules/section09/test_escape_survivor_persistence.py": {
+      "before_sha256": null,
+      "after_sha256": "1a3d33ae4f9e57effcb9ac1f7e248ea8a928fd6296c5716f6596164fbe518501",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "d6609b481c633072889c395ad67036a45e67e444c421b9c5212f48b3d7e00402"
+        },
+        "_assert_survivor_retry_roundtrip": {
+          "before": null,
+          "after": "492c4e7db470995959d535174f78b39ff09193550727b7e47552df58b7951e4d"
+        },
+        "_authority_inputs": {
+          "before": null,
+          "after": "f03e84ecbf829e77b3b43b8ed9d23685427d918f7512d80d19bd68c3cddb1168"
+        },
+        "_completed_escape": {
+          "before": null,
+          "after": "aa6bb75449c5b4e4b0abe8461868695bc013d6f17481660080cd681e317f8dbe"
+        },
+        "test_completed_hazard_survivor_retry_roundtrips_without_rerolls": {
+          "before": null,
+          "after": "bf97b40dc30bc98bb8127d3cf8b58d5ed34e6a0744a3a626894b949e3fa24084"
+        },
+        "test_natural_escape_survivor_checkpoint_roundtrips": {
+          "before": null,
+          "after": "fe969cd16d2a9c2080b724cd7de9ac118f89b7c675d310eb98e9faebca7a4c33"
+        },
+        "test_pre_hazard_rejected_proposal_then_survivor_retry_roundtrips": {
+          "before": null,
+          "after": "ba40e6997bd89f693808e647186421808cb5be4000eac75a5b35bd5776e0ed9a"
+        },
+        "test_survivor_authority_rejects_missing_survivor": {
+          "before": null,
+          "after": "c9f291008fd804b047750067977091095903602743d6877b96035f647a973336"
+        },
+        "test_survivor_authority_rejects_unrelated_hazard": {
+          "before": null,
+          "after": "be5c8d5f35d826e2dede319c609786b7d5da4b50ac569abcfb8e4287264e8072"
         }
       }
     }
   },
   "rows": {
+    "README.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Keep normal-path regressions, runtime/contract publication, bounded operator observations and current derived scheduling consistent with the shared Fall Back survivor-history repair.",
+      "source_obligation": "Ordinary accepted Desperate Escape may remove models before movement completion. Bind effective paths to the exact completed hazard packet, authenticated deaths and explicit survivor retry chain; retain every surviving full path and reject unrelated or missing authority. Original operator config, roster, seeds, paths and prefixes remain unchanged.",
+      "unchanged_work": "No solver, search budget, movement geometry, RNG, source weapon profile, adapter payload shape, cache policy or learning behavior changes. Separate declared canonical regression compositions exercise partial/complete casualties and retry without editing live health. One fresh covered observation supplies derived scheduling; matched reconstruction and current conformance remain separate from full-game and causal screening claims."
+    },
+    "contracts/examples/persistence/session-persistence.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Keep normal-path regressions, runtime/contract publication, bounded operator observations and current derived scheduling consistent with the shared Fall Back survivor-history repair.",
+      "source_obligation": "Ordinary accepted Desperate Escape may remove models before movement completion. Bind effective paths to the exact completed hazard packet, authenticated deaths and explicit survivor retry chain; retain every surviving full path and reject unrelated or missing authority. Original operator config, roster, seeds, paths and prefixes remain unchanged.",
+      "unchanged_work": "No solver, search budget, movement geometry, RNG, source weapon profile, adapter payload shape, cache policy or learning behavior changes. Separate declared canonical regression compositions exercise partial/complete casualties and retry without editing live health. One fresh covered observation supplies derived scheduling; matched reconstruction and current conformance remain separate from full-game and causal screening claims."
+    },
+    "contracts/examples/sessions/session-command-outcome.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Keep normal-path regressions, runtime/contract publication, bounded operator observations and current derived scheduling consistent with the shared Fall Back survivor-history repair.",
+      "source_obligation": "Ordinary accepted Desperate Escape may remove models before movement completion. Bind effective paths to the exact completed hazard packet, authenticated deaths and explicit survivor retry chain; retain every surviving full path and reject unrelated or missing authority. Original operator config, roster, seeds, paths and prefixes remain unchanged.",
+      "unchanged_work": "No solver, search budget, movement geometry, RNG, source weapon profile, adapter payload shape, cache policy or learning behavior changes. Separate declared canonical regression compositions exercise partial/complete casualties and retry without editing live health. One fresh covered observation supplies derived scheduling; matched reconstruction and current conformance remain separate from full-game and causal screening claims."
+    },
+    "contracts/examples/sessions/session-command-started.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Keep normal-path regressions, runtime/contract publication, bounded operator observations and current derived scheduling consistent with the shared Fall Back survivor-history repair.",
+      "source_obligation": "Ordinary accepted Desperate Escape may remove models before movement completion. Bind effective paths to the exact completed hazard packet, authenticated deaths and explicit survivor retry chain; retain every surviving full path and reject unrelated or missing authority. Original operator config, roster, seeds, paths and prefixes remain unchanged.",
+      "unchanged_work": "No solver, search budget, movement geometry, RNG, source weapon profile, adapter payload shape, cache policy or learning behavior changes. Separate declared canonical regression compositions exercise partial/complete casualties and retry without editing live health. One fresh covered observation supplies derived scheduling; matched reconstruction and current conformance remain separate from full-game and causal screening claims."
+    },
+    "contracts/examples/sessions/session-metadata-created.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Keep normal-path regressions, runtime/contract publication, bounded operator observations and current derived scheduling consistent with the shared Fall Back survivor-history repair.",
+      "source_obligation": "Ordinary accepted Desperate Escape may remove models before movement completion. Bind effective paths to the exact completed hazard packet, authenticated deaths and explicit survivor retry chain; retain every surviving full path and reject unrelated or missing authority. Original operator config, roster, seeds, paths and prefixes remain unchanged.",
+      "unchanged_work": "No solver, search budget, movement geometry, RNG, source weapon profile, adapter payload shape, cache policy or learning behavior changes. Separate declared canonical regression compositions exercise partial/complete casualties and retry without editing live health. One fresh covered observation supplies derived scheduling; matched reconstruction and current conformance remain separate from full-game and causal screening claims."
+    },
+    "contracts/examples/support-profile-player-a-redacted.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Keep normal-path regressions, runtime/contract publication, bounded operator observations and current derived scheduling consistent with the shared Fall Back survivor-history repair.",
+      "source_obligation": "Ordinary accepted Desperate Escape may remove models before movement completion. Bind effective paths to the exact completed hazard packet, authenticated deaths and explicit survivor retry chain; retain every surviving full path and reject unrelated or missing authority. Original operator config, roster, seeds, paths and prefixes remain unchanged.",
+      "unchanged_work": "No solver, search budget, movement geometry, RNG, source weapon profile, adapter payload shape, cache policy or learning behavior changes. Separate declared canonical regression compositions exercise partial/complete casualties and retry without editing live health. One fresh covered observation supplies derived scheduling; matched reconstruction and current conformance remain separate from full-game and causal screening claims."
+    },
+    "contracts/examples/support-profile-player-b-redacted.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Keep normal-path regressions, runtime/contract publication, bounded operator observations and current derived scheduling consistent with the shared Fall Back survivor-history repair.",
+      "source_obligation": "Ordinary accepted Desperate Escape may remove models before movement completion. Bind effective paths to the exact completed hazard packet, authenticated deaths and explicit survivor retry chain; retain every surviving full path and reject unrelated or missing authority. Original operator config, roster, seeds, paths and prefixes remain unchanged.",
+      "unchanged_work": "No solver, search budget, movement geometry, RNG, source weapon profile, adapter payload shape, cache policy or learning behavior changes. Separate declared canonical regression compositions exercise partial/complete casualties and retry without editing live health. One fresh covered observation supplies derived scheduling; matched reconstruction and current conformance remain separate from full-game and causal screening claims."
+    },
+    "contracts/examples/support-profile.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Keep normal-path regressions, runtime/contract publication, bounded operator observations and current derived scheduling consistent with the shared Fall Back survivor-history repair.",
+      "source_obligation": "Ordinary accepted Desperate Escape may remove models before movement completion. Bind effective paths to the exact completed hazard packet, authenticated deaths and explicit survivor retry chain; retain every surviving full path and reject unrelated or missing authority. Original operator config, roster, seeds, paths and prefixes remain unchanged.",
+      "unchanged_work": "No solver, search budget, movement geometry, RNG, source weapon profile, adapter payload shape, cache policy or learning behavior changes. Separate declared canonical regression compositions exercise partial/complete casualties and retry without editing live health. One fresh covered observation supplies derived scheduling; matched reconstruction and current conformance remain separate from full-game and causal screening claims."
+    },
+    "contracts/manifest.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Keep normal-path regressions, runtime/contract publication, bounded operator observations and current derived scheduling consistent with the shared Fall Back survivor-history repair.",
+      "source_obligation": "Ordinary accepted Desperate Escape may remove models before movement completion. Bind effective paths to the exact completed hazard packet, authenticated deaths and explicit survivor retry chain; retain every surviving full path and reject unrelated or missing authority. Original operator config, roster, seeds, paths and prefixes remain unchanged.",
+      "unchanged_work": "No solver, search budget, movement geometry, RNG, source weapon profile, adapter payload shape, cache policy or learning behavior changes. Separate declared canonical regression compositions exercise partial/complete casualties and retry without editing live health. One fresh covered observation supplies derived scheduling; matched reconstruction and current conformance remain separate from full-game and causal screening claims."
+    },
+    "data/source_audits/ci64_provenance_v1/test-cutover.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "ci78-prototype-evidence-0e09425e4315bf61bb6c4427fa7917fe62c2ed867dcb01798f9451a957182b0a"
+      ],
+      "selected_families": [],
+      "rationale": "Keep normal-path regressions, runtime/contract publication, bounded operator observations and current derived scheduling consistent with the shared Fall Back survivor-history repair.",
+      "source_obligation": "Ordinary accepted Desperate Escape may remove models before movement completion. Bind effective paths to the exact completed hazard packet, authenticated deaths and explicit survivor retry chain; retain every surviving full path and reject unrelated or missing authority. Original operator config, roster, seeds, paths and prefixes remain unchanged.",
+      "unchanged_work": "No solver, search budget, movement geometry, RNG, source weapon profile, adapter payload shape, cache policy or learning behavior changes. Separate declared canonical regression compositions exercise partial/complete casualties and retry without editing live health. One fresh covered observation supplies derived scheduling; matched reconstruction and current conformance remain separate from full-game and causal screening claims."
+    },
     "docs/AI_POLICY_INTERFACE.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Maintain the bounded operator evidence and qualification limits for the fixed-loadout Fight continuation and exact-origin no-charge control.",
-      "source_obligation": "Preserve original configuration, seed, accepted ordinary decisions, physical witnesses and exact persistence/replay; report absence of equipped melee weapons without fabricating attacks or a screening benefit.",
-      "unchanged_work": "Documentation only. All engine, source data, test, dependency, contract, candidate, search, serialization and runtime fixture bytes are unchanged from merged PR676. Retain valid producing-snapshot timings; no full-game performance or tactical benefit is claimed."
+      "rationale": "Keep normal-path regressions, runtime/contract publication, bounded operator observations and current derived scheduling consistent with the shared Fall Back survivor-history repair.",
+      "source_obligation": "Ordinary accepted Desperate Escape may remove models before movement completion. Bind effective paths to the exact completed hazard packet, authenticated deaths and explicit survivor retry chain; retain every surviving full path and reject unrelated or missing authority. Original operator config, roster, seeds, paths and prefixes remain unchanged.",
+      "unchanged_work": "No solver, search budget, movement geometry, RNG, source weapon profile, adapter payload shape, cache policy or learning behavior changes. Separate declared canonical regression compositions exercise partial/complete casualties and retry without editing live health. One fresh covered observation supplies derived scheduling; matched reconstruction and current conformance remain separate from full-game and causal screening claims."
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Maintain the bounded operator evidence and qualification limits for the fixed-loadout Fight continuation and exact-origin no-charge control.",
-      "source_obligation": "Preserve original configuration, seed, accepted ordinary decisions, physical witnesses and exact persistence/replay; report absence of equipped melee weapons without fabricating attacks or a screening benefit.",
-      "unchanged_work": "Documentation only. All engine, source data, test, dependency, contract, candidate, search, serialization and runtime fixture bytes are unchanged from merged PR676. Retain valid producing-snapshot timings; no full-game performance or tactical benefit is claimed."
+      "rationale": "Keep normal-path regressions, runtime/contract publication, bounded operator observations and current derived scheduling consistent with the shared Fall Back survivor-history repair.",
+      "source_obligation": "Ordinary accepted Desperate Escape may remove models before movement completion. Bind effective paths to the exact completed hazard packet, authenticated deaths and explicit survivor retry chain; retain every surviving full path and reject unrelated or missing authority. Original operator config, roster, seeds, paths and prefixes remain unchanged.",
+      "unchanged_work": "No solver, search budget, movement geometry, RNG, source weapon profile, adapter payload shape, cache policy or learning behavior changes. Separate declared canonical regression compositions exercise partial/complete casualties and retry without editing live health. One fresh covered observation supplies derived scheduling; matched reconstruction and current conformance remain separate from full-game and causal screening claims."
+    },
+    "docs/performance/current/escape-survivor-history-20261113-reconstruction.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Keep normal-path regressions, runtime/contract publication, bounded operator observations and current derived scheduling consistent with the shared Fall Back survivor-history repair.",
+      "source_obligation": "Ordinary accepted Desperate Escape may remove models before movement completion. Bind effective paths to the exact completed hazard packet, authenticated deaths and explicit survivor retry chain; retain every surviving full path and reject unrelated or missing authority. Original operator config, roster, seeds, paths and prefixes remain unchanged.",
+      "unchanged_work": "No solver, search budget, movement geometry, RNG, source weapon profile, adapter payload shape, cache policy or learning behavior changes. Separate declared canonical regression compositions exercise partial/complete casualties and retry without editing live health. One fresh covered observation supplies derived scheduling; matched reconstruction and current conformance remain separate from full-game and causal screening claims."
+    },
+    "docs/performance/policy-v3/operation-map.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Keep normal-path regressions, runtime/contract publication, bounded operator observations and current derived scheduling consistent with the shared Fall Back survivor-history repair.",
+      "source_obligation": "Ordinary accepted Desperate Escape may remove models before movement completion. Bind effective paths to the exact completed hazard packet, authenticated deaths and explicit survivor retry chain; retain every surviving full path and reject unrelated or missing authority. Original operator config, roster, seeds, paths and prefixes remain unchanged.",
+      "unchanged_work": "No solver, search budget, movement geometry, RNG, source weapon profile, adapter payload shape, cache policy or learning behavior changes. Separate declared canonical regression compositions exercise partial/complete casualties and retry without editing live health. One fresh covered observation supplies derived scheduling; matched reconstruction and current conformance remain separate from full-game and causal screening claims."
+    },
+    "scripts/current_shard_assignment.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "scoped-shard-allocation"
+      ],
+      "selected_families": [],
+      "rationale": "Keep normal-path regressions, runtime/contract publication, bounded operator observations and current derived scheduling consistent with the shared Fall Back survivor-history repair.",
+      "source_obligation": "Ordinary accepted Desperate Escape may remove models before movement completion. Bind effective paths to the exact completed hazard packet, authenticated deaths and explicit survivor retry chain; retain every surviving full path and reject unrelated or missing authority. Original operator config, roster, seeds, paths and prefixes remain unchanged.",
+      "unchanged_work": "No solver, search budget, movement geometry, RNG, source weapon profile, adapter payload shape, cache policy or learning behavior changes. Separate declared canonical regression compositions exercise partial/complete casualties and retry without editing live health. One fresh covered observation supplies derived scheduling; matched reconstruction and current conformance remain separate from full-game and causal screening claims."
+    },
+    "scripts/current_shard_compatibility.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "scoped-shard-allocation"
+      ],
+      "selected_families": [],
+      "rationale": "Keep normal-path regressions, runtime/contract publication, bounded operator observations and current derived scheduling consistent with the shared Fall Back survivor-history repair.",
+      "source_obligation": "Ordinary accepted Desperate Escape may remove models before movement completion. Bind effective paths to the exact completed hazard packet, authenticated deaths and explicit survivor retry chain; retain every surviving full path and reject unrelated or missing authority. Original operator config, roster, seeds, paths and prefixes remain unchanged.",
+      "unchanged_work": "No solver, search budget, movement geometry, RNG, source weapon profile, adapter payload shape, cache policy or learning behavior changes. Separate declared canonical regression compositions exercise partial/complete casualties and retry without editing live health. One fresh covered observation supplies derived scheduling; matched reconstruction and current conformance remain separate from full-game and causal screening claims."
+    },
+    "src/warhammer40k_core/_engine_build_manifest.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "order108-terrain-semantics",
+        "order109-unit-control-semantics",
+        "order110-action-battle-shock-semantics",
+        "source-record"
+      ],
+      "selected_families": [],
+      "rationale": "Keep normal-path regressions, runtime/contract publication, bounded operator observations and current derived scheduling consistent with the shared Fall Back survivor-history repair.",
+      "source_obligation": "Ordinary accepted Desperate Escape may remove models before movement completion. Bind effective paths to the exact completed hazard packet, authenticated deaths and explicit survivor retry chain; retain every surviving full path and reject unrelated or missing authority. Original operator config, roster, seeds, paths and prefixes remain unchanged.",
+      "unchanged_work": "No solver, search budget, movement geometry, RNG, source weapon profile, adapter payload shape, cache policy or learning behavior changes. Separate declared canonical regression compositions exercise partial/complete casualties and retry without editing live health. One fresh covered observation supplies derived scheduling; matched reconstruction and current conformance remain separate from full-game and causal screening claims."
+    },
+    "src/warhammer40k_core/engine/movement_decision_authority.py": {
+      "category": "serialization_or_replay_work",
+      "operations": [
+        "desperate-escape-survivor-history"
+      ],
+      "selected_families": [
+        "reconstruction"
+      ],
+      "rationale": "Authenticate the accepted proposal and its actual surviving physical paths through the shared post-hazard completion/retry authority, preserving ordinary persistence and replay.",
+      "source_obligation": "Ordinary accepted Desperate Escape may remove models before movement completion. Bind effective paths to the exact completed hazard packet, authenticated deaths and explicit survivor retry chain; retain every surviving full path and reject unrelated or missing authority. Original operator config, roster, seeds, paths and prefixes remain unchanged.",
+      "unchanged_work": "No solver, search budget, movement geometry, RNG, source weapon profile, adapter payload shape, cache policy or learning behavior changes. Separate declared canonical regression compositions exercise partial/complete casualties and retry without editing live health. One fresh covered observation supplies derived scheduling; matched reconstruction and current conformance remain separate from full-game and causal screening claims."
+    },
+    "tests/code_quality/test_current_shard_compatibility.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "scoped-shard-allocation"
+      ],
+      "selected_families": [],
+      "rationale": "Keep normal-path regressions, runtime/contract publication, bounded operator observations and current derived scheduling consistent with the shared Fall Back survivor-history repair.",
+      "source_obligation": "Ordinary accepted Desperate Escape may remove models before movement completion. Bind effective paths to the exact completed hazard packet, authenticated deaths and explicit survivor retry chain; retain every surviving full path and reject unrelated or missing authority. Original operator config, roster, seeds, paths and prefixes remain unchanged.",
+      "unchanged_work": "No solver, search budget, movement geometry, RNG, source weapon profile, adapter payload shape, cache policy or learning behavior changes. Separate declared canonical regression compositions exercise partial/complete casualties and retry without editing live health. One fresh covered observation supplies derived scheduling; matched reconstruction and current conformance remain separate from full-game and causal screening claims."
+    },
+    "tests/rules/section09/test_escape_survivor_persistence.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "desperate-escape-survivor-controls"
+      ],
+      "selected_families": [],
+      "rationale": "Keep normal-path regressions, runtime/contract publication, bounded operator observations and current derived scheduling consistent with the shared Fall Back survivor-history repair.",
+      "source_obligation": "Ordinary accepted Desperate Escape may remove models before movement completion. Bind effective paths to the exact completed hazard packet, authenticated deaths and explicit survivor retry chain; retain every surviving full path and reject unrelated or missing authority. Original operator config, roster, seeds, paths and prefixes remain unchanged.",
+      "unchanged_work": "No solver, search budget, movement geometry, RNG, source weapon profile, adapter payload shape, cache policy or learning behavior changes. Separate declared canonical regression compositions exercise partial/complete casualties and retry without editing live health. One fresh covered observation supplies derived scheduling; matched reconstruction and current conformance remain separate from full-game and causal screening claims."
     }
   },
   "milestone": "ordinary",
-  "comparisons": {},
+  "comparisons": {
+    "reconstruction": "docs/performance/current/escape-survivor-history-20261113-reconstruction.json"
+  },
   "full_game": null
 }
