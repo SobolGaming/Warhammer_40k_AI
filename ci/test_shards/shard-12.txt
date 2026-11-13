@@ -55,6 +55,7 @@ tests/rules/section07/test_mission_boundary.py
 tests/rules/section08/test_command_flow.py
 tests/rules/section09/test_coverage_map.py
 tests/rules/section09/test_restrictions.py
+tests/rules/section11/test_connected_endpoints.py
 tests/rules/section12/test_continuations.py
 tests/rules/section13/test_movement.py
 tests/rules/section14/test_physical.py

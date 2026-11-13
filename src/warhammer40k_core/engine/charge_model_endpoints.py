@@ -11,9 +11,14 @@ import msgspec
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.geometry.connected_endpoint_proof import (
+    endpoint_excluded_by_connected_components,
+)
 from warhammer40k_core.geometry.movement_reachability import (
     MovementGoal,
     MovementReachabilityQuery,
+    MovementReachabilityResult,
+    MovementReachabilityStatus,
     movement_reachability,
 )
 from warhammer40k_core.geometry.pathing import (
@@ -210,7 +215,20 @@ def _reachability(
     query = replace(
         context.query, goal=goal, required_goals=(*context.query.required_goals, *extra_goals)
     )
-    result = movement_reachability(query)
+    if (
+        query.coherency_all_models_distance_inches is None
+        and endpoint_excluded_by_connected_components(
+            source=query.path_context.moving_model,
+            peers=query.coherent_models,
+            goal=query.goal,
+            horizontal_inches=query.coherency_horizontal_inches,
+        )
+    ):
+        result = MovementReachabilityResult(
+            None, 0, MovementReachabilityStatus.ENDPOINT_UNREACHABLE
+        )
+    else:
+        result = movement_reachability(query)
     lower = goal.distance_lower_bound(
         query.path_context.moving_model,
         ignores_vertical_distance=query.path_context.ignores_vertical_distance,
