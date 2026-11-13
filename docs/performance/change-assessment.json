@@ -420,6 +420,16 @@
         }
       }
     },
+    "tests/rules/section07/coverage.json": {
+      "before_sha256": "59cd19b2805f5a4cc78f56cfef751fe9eaefcb1a21f90cc3cbbdeb337c8ca41d",
+      "after_sha256": "182a245de7a417f48f8eaab6a41d12d67c3901529599ca1ca2b9bd5962156336",
+      "owners": {
+        "@document": {
+          "before": "59cd19b2805f5a4cc78f56cfef751fe9eaefcb1a21f90cc3cbbdeb337c8ca41d",
+          "after": "182a245de7a417f48f8eaab6a41d12d67c3901529599ca1ca2b9bd5962156336"
+        }
+      }
+    },
     "tests/support/cavalcade_native_prefix.py": {
       "before_sha256": null,
       "after_sha256": "c713be8f95d94ea72078cefd548ff629fd6016c76e2dc6060710faa7550ccbb0",
@@ -836,6 +846,16 @@
       "category": "rule_semantics",
       "operations": [
         "native-v995-prefix-regressions"
+      ],
+      "selected_families": [],
+      "rationale": "Qualify a separately versioned native full-roster prefix and repair its reproduced named-weapon-family admission failure through shared catalog-derived equipped-profile binding; preserve historical synthetic findings and rejected routes.",
+      "source_obligation": "The native Lord of Change is equipped with the Bolt of Change weapon family and both declared modes. Its source-backed Master of Magicks choice must discover that equipped family and apply its selected ability to those exact stable profile IDs, preserving exact-profile selectors, bearer restrictions and ordinary persistence/replay. The selected full v995 roster keeps reviewed datasheets, October points and provisional geometry provenance.",
+      "unchanged_work": "This is a bounded rule-semantics repair, with stable profile bindings in existing persisting-effect data and the same serializers and decision/replay routes. No solver, search, cache, geometry, RNG, budget, source weapon statistics or public choice payload changes. The new named fixture repeats the finite existing setup recipe while historical test source stays byte-identical. Fresh covered observation supplies only current derived scheduling; native route evidence does not certify tactical benefit, complete games or learning."
+    },
+    "tests/rules/section07/coverage.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "qualification40-exact-b6886d3bc2fb1ca4"
       ],
       "selected_families": [],
       "rationale": "Qualify a separately versioned native full-roster prefix and repair its reproduced named-weapon-family admission failure through shared catalog-derived equipped-profile binding; preserve historical synthetic findings and rejected routes.",
