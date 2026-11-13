@@ -3,8 +3,73 @@
   "base": "8950ffa4bbac05eab6b6dd4e1e59475dcbe8f53d",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:8d7e3355d9db2c9477ba63b752dc1dfa054b5c00583ea467e3fbbc0e21d5638d",
   "operation_map_sha256": "4a2365317e64f6c420edf9b7f016ba77ed978dea370ede3673e340f98ffaec75",
-  "changes": {},
-  "rows": {},
+  "changes": {
+    "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
+      "before_sha256": "f3067266c4c6fc61007087599419ac12a7c627ec262fc75e10c6c5f9311952a0",
+      "after_sha256": "361d4f0a24300b83b389fe04fb4fdedf2f838d7a69969af5783c8752ff496cc3",
+      "owners": {
+        "@document": {
+          "before": "f3067266c4c6fc61007087599419ac12a7c627ec262fc75e10c6c5f9311952a0",
+          "after": "361d4f0a24300b83b389fe04fb4fdedf2f838d7a69969af5783c8752ff496cc3"
+        }
+      }
+    },
+    "scripts/run_behavioral_coverage.sh": {
+      "before_sha256": "613a2c745f7fec571b1437ce5cbf92ea5571cd284769643887f9af31dcb313be",
+      "after_sha256": "4ed1c4fa8288101f1a31cff822fbc901a8ab29566107112cfb683896250c20bc",
+      "owners": {
+        "@document": {
+          "before": "613a2c745f7fec571b1437ce5cbf92ea5571cd284769643887f9af31dcb313be",
+          "after": "4ed1c4fa8288101f1a31cff822fbc901a8ab29566107112cfb683896250c20bc"
+        }
+      }
+    },
+    "tests/code_quality/test_ci_resource_diagnostics.py": {
+      "before_sha256": "1d3ce5b6a770b71b4da1e464ef8048784fce3132b71d4665c59880245e0fb758",
+      "after_sha256": "1731de73328cdf26074891439a69b620a862a37c29a237066ff71f18a185bb64",
+      "owners": {
+        "@module": {
+          "before": "8d3387d92034b5063495aa515163636af403a9f81df05c488669379a49e4cdbd",
+          "after": "14375577caf81c4d7568061a953e60017125f611def9b246799daa192269f92a"
+        },
+        "test_bounded_setup_lane_preserves_selection_coverage_and_failure": {
+          "before": null,
+          "after": "8ee1a50f39fa8d79ea3d6f7d5335f535e838ebbec950c6ad02d614a631849a42"
+        }
+      }
+    }
+  },
+  "rows": {
+    "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Repair repeated hosted native fixture setup timeouts by giving its unchanged ordinary legal-play cases the existing serial covered lane, preserving limits, assertions, complete inventory and fail-closed coverage aggregation.",
+      "source_obligation": "The full legal native roster, equipped profiles,42-decision setup, seed19 and120-second runner bound stay unchanged. The controller must run each admitted selector exactly once, preserve coverage across serial and parallel stages, and propagate either stage failure under the same1620/1800 supervisor.",
+      "unchanged_work": "No engine, rules, decision payload, setup fixture, serializer, replay, RNG, solver, source stats or gameplay horizon changes. Historical full-run9c observations remain their original producer and topology; any separate focused serial role evidence is bounded and identified. No full-game throughput claim or budget relaxation."
+    },
+    "scripts/run_behavioral_coverage.sh": {
+      "category": "measured_workload",
+      "operations": [
+        "covered-resource-diagnostics",
+        "covered-shard-workload"
+      ],
+      "selected_families": [],
+      "rationale": "Repair repeated hosted native fixture setup timeouts by giving its unchanged ordinary legal-play cases the existing serial covered lane, preserving limits, assertions, complete inventory and fail-closed coverage aggregation.",
+      "source_obligation": "The full legal native roster, equipped profiles,42-decision setup, seed19 and120-second runner bound stay unchanged. The controller must run each admitted selector exactly once, preserve coverage across serial and parallel stages, and propagate either stage failure under the same1620/1800 supervisor.",
+      "unchanged_work": "No engine, rules, decision payload, setup fixture, serializer, replay, RNG, solver, source stats or gameplay horizon changes. Historical full-run9c observations remain their original producer and topology; any separate focused serial role evidence is bounded and identified. No full-game throughput claim or budget relaxation."
+    },
+    "tests/code_quality/test_ci_resource_diagnostics.py": {
+      "category": "measured_workload",
+      "operations": [
+        "covered-resource-diagnostics"
+      ],
+      "selected_families": [],
+      "rationale": "Repair repeated hosted native fixture setup timeouts by giving its unchanged ordinary legal-play cases the existing serial covered lane, preserving limits, assertions, complete inventory and fail-closed coverage aggregation.",
+      "source_obligation": "The full legal native roster, equipped profiles,42-decision setup, seed19 and120-second runner bound stay unchanged. The controller must run each admitted selector exactly once, preserve coverage across serial and parallel stages, and propagate either stage failure under the same1620/1800 supervisor.",
+      "unchanged_work": "No engine, rules, decision payload, setup fixture, serializer, replay, RNG, solver, source stats or gameplay horizon changes. Historical full-run9c observations remain their original producer and topology; any separate focused serial role evidence is bounded and identified. No full-game throughput claim or budget relaxation."
+    }
+  },
   "milestone": "ordinary",
   "comparisons": {},
   "full_game": null
