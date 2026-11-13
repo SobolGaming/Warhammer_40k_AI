@@ -2338,6 +2338,75 @@ The [native support inventory](factions/chaos-daemons.md) separates component
 semantics from complete-game certification. Seven geometry heights remain
 provisional. Unavailable attacks, zero damage, rejected paths and unsupported
 reachable rules must be retained explicitly; an unsupported path stops the trial
-instead of replacing a unit, weapon or rule. The complete native battle prefix,
-matched horizon, persistence/replay, tactical usefulness, Stage 2 and learning
-admission remain unqualified until this separately authorized workload is executed.
+instead of replacing a unit, weapon or rule. The admission slice below qualifies only its specified native prefix. A matched
+combat horizon, tactical usefulness, Stage 2 and learning admission remain
+unqualified.
+
+
+## Native v995 admission and bounded battle prefix
+
+The first slice of `cavalcade-v995-native-screen-follow-through-v1` uses the
+unchanged complete 2,000-point mirror roster and ordinary setup described above.
+The source audit rechecks the actual retained official PDF against its recorded
+SHA-256 and the selected catalog, source-review and reconciliation artifacts.
+It does not claim verification against a newer app or source version. Both armies
+retain nine units, 39 models, all selected equipment, all four Enhancement/Upgrade
+assignments and the seven explicitly provisional geometry heights.
+
+The complete E loadout includes the selected rod of sorcery, staff of Tzeentch,
+and both alternative Bolt of Change profiles: witchfire and focused witchfire.
+The latter is 18 inches, A9, BS2, S9, AP-2, D3 with Hazardous and Psychic; these
+are catalog values before live modifiers. The two Bolt profiles are alternatives,
+not two separately equipped weapons. Each Bloodcrusher retains its hellblade and
+Juggernaut's bladed horn, including Extra Attacks/Lance; the distinct selected
+Icon/Instrument bearers and Soul-shattering Charge upgrade remain present.
+Nurglings retain diseased claws and teeth with Lethal Hits, plus their native
+Mischief Makers rule. The [active regression](../tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py)
+checks full roster legality, per-model equipment, family/profile identity and
+ordinary facade execution.
+
+The finite route recipes and first round-one player-A Shooting horizon were
+declared before attacks or damage measurements. Both Be'lakor models choose
+Shadow Lord through their ordinary round-start requests. The original S
+one-inch negative-Y Normal Move is rejected with
+`model_cannot_be_placed_at_endpoint`: the third Nurgling's path approaches the
+ruin's short ground wall. A separately frozen S-stationary/E-one-inch-negative-Y
+recipe is rejected with `friendly_vehicle_monster_transit_forbidden`, with
+Be'lakor directly ahead of E. A one-off S negative-X sidestep is also rejected
+with `end_on_model_overlap` near the friendly Plaguebearers. These finite
+rejections do not prove that every screen approach is impossible.
+
+The accepted prefix keeps S and the other seven A units stationary and moves E
+through the full polyline `(14,49,0) -> (18,49,0) -> (18,48,0)`, preserving
+facing and using the ordinary Normal Move proposal. It declines the optional
+finite and parameterized Stratagem windows, including end-of-Movement
+Overwatch, through the shared viewer session API. All B units remain present.
+The stopping point is the mandatory Master of Magicks request at the start of
+A's first Shooting phase, before any attack or ability-option selection in the
+operator trial. This is a legal E route and battle-prefix admission, not an
+admitted S screen, Bloodcrusher charge, or paired delayed-tradeoff outcome.
+
+Ordinary entry to that phase exposed a genuine blocker: named-weapon discovery
+looked only at profile display names, so the source name “Bolt of Change” failed
+to match its witchfire/focused-witchfire family. Its modifier consumer repeated
+the same mismatch. Shared catalog resolution now binds the equipped weapon
+family or exact profile selector to stable profile IDs, records those IDs per
+target model in the accepted effect, and applies the chosen ability by identity.
+No faction-specific gate, profile-suffix inference or alternate decision path is
+introduced. The finite choice contract is unchanged. A further regression selects
+Ignores Cover through the ordinary Master of Magicks request, proves that both
+Bolt modes receive it while the rod and staff do not, and checks complete JSON
+save/load and ordinary replay. This regression does not roll an attack.
+
+The native E/B audit uses the real equipped ranged profiles and battlefield
+terrain. E satisfies the generic shooter-state prerequisite, but neither Bolt
+mode nor the rod has B in its 18-inch range, so no legal E-to-B declaration is
+established at this horizon. Independent visibility is explicitly not evaluated: range already excludes
+the declaration. Earlier uncompleted diagnostic work is not a visibility answer. Full-roster geometry, MONSTER restrictions, selected
+abilities, upgrade-triggered damage, Mischief Makers, complete Charge/Fight
+witnesses and a later E declaration still require ordinary qualification along
+the eventual route. In particular, no real native melee, casualty or damage
+comparison, screening advantage, full-game certification, Stage 2 completion or
+learning eligibility follows. The synthetic evidence and its narrower conclusions
+remain unchanged; `useful_reference_status` remains `scoped_gap`,
+`reference_target` remains null and `eligible_for_learning` remains false.

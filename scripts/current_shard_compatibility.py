@@ -106,6 +106,22 @@ NEW_NODES |= frozenset(
 )
 
 
+NATIVE_PREFIX_OWNER = (
+    "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py"
+)
+NEW_NODES |= frozenset(
+    f"{NATIVE_PREFIX_OWNER}::{case}"
+    for case in (
+        "test_native_roles_keep_complete_equipment_in_full_legal_rosters[cavalcade-a:nurglings-3-weapons0]",
+        "test_native_roles_keep_complete_equipment_in_full_legal_rosters[cavalcade-b:bloodcrushers-1-6-weapons1]",
+        "test_native_roles_keep_complete_equipment_in_full_legal_rosters[cavalcade-a:lord-of-change-1-1-weapons2]",
+        "test_native_prefix_preserves_real_rules_terrain_and_exact_history[ranged-sidestep]",
+        "test_native_prefix_preserves_real_rules_terrain_and_exact_history[blocked-screen]",
+        "test_native_prefix_preserves_real_rules_terrain_and_exact_history[blocked-ranged]",
+    )
+)
+
+
 def enabled(directory: Path, summary: dict[str, object] | None = None) -> bool:
     declared = (directory / FILENAME).is_file()
     if not declared and (
@@ -189,11 +205,11 @@ def _baseline(
     if (
         cases.keys() != history.baseline.keys() | NEW_NODES
         or not history.baseline.keys() < cases.keys()
-        or len(cases) - len(history.baseline) != 43
-        or set(additions) != {NEW_OWNER, CONNECTED_OWNER, ESCAPE_OWNER}
+        or len(cases) - len(history.baseline) != 49
+        or set(additions) != {NEW_OWNER, CONNECTED_OWNER, ESCAPE_OWNER, NATIVE_PREFIX_OWNER}
         or set(additions) & {node.split("::", 1)[0] for node in history.baseline}
     ):
-        raise SystemExit("Compatibility requires exactly the reviewed forty-three added cases.")
+        raise SystemExit("Compatibility requires exactly the reviewed forty-nine added cases.")
     owners = {node.split("::", 1)[0] for node in cases}
     sources = _object(data["test_sources"], owners, "current test source inventory")
     try:
