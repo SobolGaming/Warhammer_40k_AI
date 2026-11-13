@@ -1,17 +1,17 @@
 {
   "assignment": {
     "file": "current-derived-assignment.json",
-    "sha256": "e8225578b13d9be839766e93801097c81454a7ff2de2a80d3545383db36e4df3"
+    "sha256": "dccbe41f284e9be880a319a94f71110c0fde440c7ec0f574e9b22030d6de8708"
   },
   "baseline": {
     "file": "current-covered-baseline.json",
-    "sha256": "8446ec96f65048e3b658fd5b8b017e4b613888461e6002780db6b300de0b60e7"
+    "sha256": "e5c889d3268c11a3efdd440d90df47f16c4ecd11be35e732cf461faca0c08832"
   },
-  "current_runtime_fingerprint": "841b1cbac64d3f0f6474b5f94aecd7c2bf8fb041c84c532e579dce20ad0557ae",
+  "current_runtime_fingerprint": "cb5eb39b0778a1be7c89c167357007d3b3263147ff73741cd69b26a96d5dc8a6",
   "historical_revision": "008be8a8cb0b50b232fe022452762b3906489b49",
   "new_test_sources": {
     "tests/rules/section03/test_terrain_path_preparation.py": "869ce37ba5d43d7a1c5558c94fceaf33eb81bfff62c2e5f13019551f2c071438",
-    "tests/rules/section11/test_connected_endpoints.py": "227dca6bdf231aa48a75f57dbfffa1dc405a84e99fd5bb6a00c8a3b889fcb09d"
+    "tests/rules/section11/test_connected_endpoints.py": "78272e696bf5f3d7c977c379efe763fe80211067c06cc6e7d8be61d8c2775591"
   },
   "schema": "historical-snapshot-current-baseline-v1"
 }

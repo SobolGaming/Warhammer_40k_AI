@@ -2,6 +2,7 @@ tests/factions/emperors_children/test_shared_attack_consumers.py
 tests/factions/world_eaters/unit/test_world_eaters_army_rule.py
 tests/infrastructure/missions/unit/test_primary_scoring_grammar.py
 tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_layout_a_scores_through_lifecycle_views_and_replay[player-a-reconnaissance-vs-reconnaissance-layout-1]
+tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_layout_a_scores_through_lifecycle_views_and_replay[player-b-take-and-hold-vs-priority-assets-layout-1]
 tests/infrastructure/missions/unit/test_step5g_pairing_certification_layout_b.py::test_phase17n_step5g_layout_b_scores_through_lifecycle_views_and_replay[player-a-disruption-vs-priority-assets-layout-2]
 tests/infrastructure/missions/unit/test_step5g_pairing_certification_layout_b.py::test_phase17n_step5g_layout_b_scores_through_lifecycle_views_and_replay[player-a-priority-assets-vs-priority-assets-layout-2]
 tests/infrastructure/missions/unit/test_step6g_secondary_certification.py
@@ -18,7 +19,6 @@ tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_re
 tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[unused-wound-player-a]
 tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[unused-wound-player-b]
 tests/rules/section00/test_conversion.py
-tests/rules/section01/test_01_02_attached.py
 tests/rules/section01/test_01_02_aura.py
 tests/rules/section01/test_01_03_timing.py
 tests/rules/section01/test_01_07_actions.py
@@ -32,7 +32,6 @@ tests/rules/section05/test_destruction_credit.py
 tests/rules/section05/test_saves.py
 tests/rules/section07/test_isolation.py
 tests/rules/section07/test_out_of_phase.py
-tests/rules/section07/test_round_effect.py
 tests/rules/section09/test_coverage_map.py
 tests/rules/section09/test_fall_back.py
 tests/rules/section09/test_forced_escape.py

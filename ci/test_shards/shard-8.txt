@@ -4,6 +4,7 @@ tests/infrastructure/adapters/test_canonical_coverage_preflight.py::test_consist
 tests/infrastructure/adapters/test_normal_move_scenario.py
 tests/infrastructure/missions/unit/test_event_companion.py
 tests/infrastructure/missions/unit/test_primary_scoring_boundary_lifecycle.py
+tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_layout_a_scores_through_lifecycle_views_and_replay[player-a-purge-the-foe-vs-priority-assets-layout-1]
 tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_layout_a_scores_through_lifecycle_views_and_replay[player-b-take-and-hold-vs-disruption-layout-1]
 tests/infrastructure/missions/unit/test_step5g_pairing_certification_layout_b.py::test_phase17n_step5g_layout_b_scores_through_lifecycle_views_and_replay[player-a-purge-the-foe-vs-reconnaissance-layout-2]
 tests/infrastructure/missions/unit/test_step5g_pairing_certification_layout_b.py::test_phase17n_step5g_layout_b_scores_through_lifecycle_views_and_replay[player-a-take-and-hold-vs-disruption-layout-2]

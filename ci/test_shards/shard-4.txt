@@ -20,7 +20,6 @@ tests/rules/section06/test_isolation_and_guards.py
 tests/rules/section08/test_command_flow.py
 tests/rules/section10/test_indirect.py
 tests/rules/section11/test_boundaries.py
-tests/rules/section12/test_attacks.py
 tests/rules/section13/test_coverage_map.py
 tests/rules/section13/test_ownership.py
 tests/rules/section14/test_marker_axes.py
