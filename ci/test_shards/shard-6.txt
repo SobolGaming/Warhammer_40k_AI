@@ -15,6 +15,7 @@ tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_ph
 tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_layout_a_scores_through_lifecycle_views_and_replay[player-b-reconnaissance-vs-priority-assets-layout-1]
 tests/infrastructure/missions/unit/test_step5g_pairing_certification_layout_b.py::test_phase17n_step5g_layout_b_scores_through_lifecycle_views_and_replay[player-b-disruption-vs-priority-assets-layout-2]
 tests/infrastructure/missions/unit/test_step5g_pairing_certification_layout_b.py::test_phase17n_step5g_layout_b_scores_through_lifecycle_views_and_replay[player-b-reconnaissance-vs-priority-assets-layout-2]
+tests/infrastructure/rule_execution/unit/test_rule_execution.py
 tests/infrastructure/source/unit/test_source_overlays.py
 tests/rules/rules03/unit/test_setup.py
 tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[duplicate-rapid-fire-player-b]
@@ -33,6 +34,7 @@ tests/rules/section12/test_consolidation.py
 tests/rules/section13/test_hidden.py
 tests/rules/section15/test_snap_faqs.py
 tests/rules/section15/test_use.py
+tests/rules/section16/test_movement.py
 tests/rules/section19/test_destruction.py
 tests/rules/section21/test_surge.py
 tests/rules/section21/test_witness_admission.py

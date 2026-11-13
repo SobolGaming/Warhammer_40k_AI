@@ -3,10 +3,9 @@ tests/factions/chaos_daemons/integration/test_horror_split_materialization.py
 tests/factions/leagues_of_votann/unit/test_leagues_of_votann_army_rule.py
 tests/infrastructure/adapters/test_finite_candidates.py
 tests/infrastructure/adapters/test_preserve_scenario.py
-tests/infrastructure/lifecycle/unit/test_prebattle.py
+tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_layout_a_scores_through_lifecycle_views_and_replay[player-a-disruption-vs-reconnaissance-layout-1]
 tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_layout_a_scores_through_lifecycle_views_and_replay[player-a-priority-assets-vs-priority-assets-layout-1]
 tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_layout_a_scores_through_lifecycle_views_and_replay[player-a-reconnaissance-vs-priority-assets-layout-1]
-tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_layout_a_scores_through_lifecycle_views_and_replay[player-a-take-and-hold-vs-take-and-hold-layout-1]
 tests/infrastructure/missions/unit/test_step5g_pairing_certification_layout_b.py::test_phase17n_step5g_layout_b_scores_through_lifecycle_views_and_replay[player-a-disruption-vs-disruption-layout-2]
 tests/infrastructure/missions/unit/test_step5g_pairing_certification_layout_b.py::test_phase17n_step5g_layout_b_scores_through_lifecycle_views_and_replay[player-a-disruption-vs-reconnaissance-layout-2]
 tests/infrastructure/missions/unit/test_step5g_pairing_certification_layout_b.py::test_phase17n_step5g_layout_b_scores_through_lifecycle_views_and_replay[player-a-take-and-hold-vs-take-and-hold-layout-2]
@@ -19,7 +18,9 @@ tests/rules/section01/test_01_02_presence.py
 tests/rules/section01/test_01_03_ownership.py
 tests/rules/section01/test_01_05_choice.py
 tests/rules/section01/test_01_06_07_morale.py
+tests/rules/section02/test_02_03_01_nested.py
 tests/rules/section02/test_02_04_live_consumers.py
+tests/rules/section02/test_02_05_keywords.py
 tests/rules/section03/test_cleanup_mission.py
 tests/rules/section03/test_movement_paths.py
 tests/rules/section04/test_targets.py
@@ -27,10 +28,8 @@ tests/rules/section08/test_cp_resource.py
 tests/rules/section08/test_shock_completion.py
 tests/rules/section10/test_boundaries.py
 tests/rules/section10/test_isolation.py
-tests/rules/section11/test_reactive.py
 tests/rules/section12/test_coverage_map.py
 tests/rules/section12/test_distance.py
-tests/rules/section12/test_phase.py
 tests/rules/section14/test_faqs.py
 tests/rules/section14/test_range.py
 tests/rules/section15/test_target_guards.py
@@ -39,7 +38,6 @@ tests/rules/section17/test_blocker_ownership.py
 tests/rules/section17/test_shooting.py
 tests/rules/section18/test_disembark.py
 tests/rules/section18/test_emergency.py
-tests/rules/section19/test_scope_controls.py
 tests/rules/section22/test_facade.py
 tests/rules/section24/test_damaged.py
 tests/rules/section24/test_scout_boundary.py

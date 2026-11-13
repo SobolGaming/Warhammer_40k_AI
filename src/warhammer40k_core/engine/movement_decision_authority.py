@@ -82,6 +82,14 @@ _DISPLACEMENT_KIND_BY_ACTION = {
 
 
 @dataclass(frozen=True, slots=True)
+class MovementCompletionAuthority:
+    """The accepted proposal and its authenticated post-hazard physical paths."""
+
+    proposal: MovementProposalPayload
+    witness: PathWitness | None
+
+
+@dataclass(frozen=True, slots=True)
 class EmbarkMovementCompletion:
     """An accepted move at its Embark choice and an optional later completion."""
 
@@ -290,7 +298,7 @@ def validated_movement_transition(
     *,
     payload: dict[str, JsonValue],
     action: str,
-    witness: PathWitness,
+    witness: PathWitness | None,
 ) -> BattlefieldTransitionBatch:
     raw_transition = payload.get("transition_batch")
     if not isinstance(raw_transition, dict):
@@ -302,12 +310,13 @@ def validated_movement_transition(
         raise GameLifecycleError("Primary mission movement transition cannot place models.")
     expected_kind = _DISPLACEMENT_KIND_BY_ACTION[action]
     removal_ids = {row.model_instance_id for row in transition.removals}
-    witness_paths = dict(witness.model_paths)
+    paths = () if witness is None else witness.model_paths
+    witness_paths = dict(paths)
     if not removal_ids <= set(witness_paths):
         raise GameLifecycleError("Primary mission movement removal witness drifted.")
     expected_displaced_ids = {
         model_id
-        for model_id, poses in witness.model_paths
+        for model_id, poses in paths
         if poses[0] != poses[-1] and model_id not in removal_ids
     }
     if {row.model_instance_id for row in transition.displacements} != expected_displaced_ids:
@@ -340,7 +349,7 @@ def validate_movement_completion_decision_authority(
     decision_records: tuple[DecisionRecord, ...],
     mutation_index: int,
     payload: dict[str, JsonValue],
-) -> MovementProposalPayload | None:
+) -> MovementCompletionAuthority | None:
     """Authenticate ordinary movement classification and its accepted proposal chain."""
     action_record = validate_mutation_decision_closure(
         event_records=event_records,
@@ -374,11 +383,19 @@ def validate_movement_completion_decision_authority(
         mutation_index=mutation_index,
         proposal_records=proposal_records,
     )
-    proposal_records = tuple(
-        record
-        for record in proposal_records
-        if (record.request.request_id, record.result.result_id) not in rejected
-    )
+    if action == "fall_back" and payload.get("desperate_escape_mortal_application_id") is not None:
+        proposal_records = _hazard_completion_proposal_records(
+            event_records=event_records[:mutation_index],
+            proposal_records=proposal_records,
+            rejected=rejected,
+            payload=payload,
+        )
+    else:
+        proposal_records = tuple(
+            record
+            for record in proposal_records
+            if (record.request.request_id, record.result.result_id) not in rejected
+        )
     if len(proposal_records) != 1:
         raise GameLifecycleError("Primary mission movement proposal authority drifted.")
     proposal_record = proposal_records[0]
@@ -424,6 +441,14 @@ def validate_movement_completion_decision_authority(
     validation = proposal.validation_result_for_request(proposal_request)
     if not validation.is_valid:
         raise GameLifecycleError("Primary mission movement proposal/result authority drifted.")
+    witness = _completion_witness(
+        event_records=event_records,
+        mutation_index=mutation_index,
+        payload=payload,
+        proposal_record=proposal_record,
+        proposal=proposal,
+        decision_records=decision_records,
+    )
     if (
         proposal_record.request.actor_id != payload.get("active_player_id")
         or proposal_record.result.actor_id != payload.get("active_player_id")
@@ -436,10 +461,317 @@ def validate_movement_completion_decision_authority(
         or proposal.unit_instance_id != unit_id
         or proposal.movement_phase_action != action
         or payload.get("movement_mode") != proposal.movement_mode
-        or payload.get("witness") != proposal.witness.to_payload()
+        or payload.get("witness") != (None if witness is None else witness.to_payload())
     ):
         raise GameLifecycleError("Primary mission movement proposal semantics drifted.")
-    return proposal
+    return MovementCompletionAuthority(proposal=proposal, witness=witness)
+
+
+def _completion_witness(
+    *,
+    event_records: tuple[EventRecord, ...],
+    mutation_index: int,
+    payload: dict[str, JsonValue],
+    proposal_record: DecisionRecord,
+    proposal: MovementProposalPayload,
+    decision_records: tuple[DecisionRecord, ...],
+) -> PathWitness | None:
+    application_id = payload.get("desperate_escape_mortal_application_id")
+    if application_id is None:
+        return proposal.witness
+    from warhammer40k_core.engine.damage_allocation import (
+        MortalWoundApplication,
+        MortalWoundApplicationPayload,
+    )
+    from warhammer40k_core.engine.desperate_escape_mortal_wounds import (
+        CONTINUED,
+        RESOLVED,
+        SOURCE_KIND,
+    )
+    from warhammer40k_core.engine.model_logical_death import (
+        MODEL_LOGICAL_DEATH_RECORDED_EVENT,
+        DamageApplicationLogicalDeathTransition,
+        model_logical_death_record_from_event,
+    )
+    from warhammer40k_core.engine.mortal_wound_application_authority import (
+        completion_events_for_authority,
+        mortal_wound_application_authority_inventory,
+    )
+
+    if proposal.movement_phase_action != "fall_back" or type(application_id) is not str:
+        raise GameLifecycleError("Movement survivor witness requires its Fall Back hazard packet.")
+    prior = event_records[:mutation_index]
+    inventory = mortal_wound_application_authority_inventory(
+        event_records=prior, game_id=_payload_string(payload, "game_id")
+    )
+    if application_id not in inventory:
+        raise GameLifecycleError("Movement survivor hazard authority is missing.")
+    started, authority = inventory[application_id]
+    source = authority.source_context
+    if not isinstance(source, dict):
+        raise GameLifecycleError("Movement survivor hazard source is invalid.")
+    action = source.get("action_result")
+    resolution = source.get("fall_back_result")
+    originals = [
+        record
+        for record in authoritative_decision_records(decision_records)
+        if record.request.request_id == source.get("movement_proposal_request_id")
+        and record.request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
+    ]
+    if len(originals) != 1 or not isinstance(originals[0].result.payload, dict):
+        raise GameLifecycleError("Movement survivor original proposal is missing.")
+    original_record = originals[0]
+    validate_record_event_closure(
+        event_records=event_records, mutation_index=prior.index(started), record=original_record
+    )
+    original = MovementProposalPayload.from_payload(
+        cast(MovementProposalPayloadPayload, original_record.result.payload)
+    )
+    original_request = MovementProposalRequest.from_decision_request_payload(
+        original_record.request.payload
+    )
+    if not original.validation_result_for_request(original_request).is_valid:
+        raise GameLifecycleError("Movement survivor original proposal context drifted.")
+    current_request = MovementProposalRequest.from_decision_request_payload(
+        proposal_record.request.payload
+    )
+    if proposal_record != original_record and (
+        current_request.context is None
+        or current_request.context.get("desperate_escape_completed_packet_id") != application_id
+        or _movement_proposal_request_sources(proposal_record)
+        != _movement_proposal_request_sources(original_record)
+    ):
+        raise GameLifecycleError("Movement survivor retry packet attribution drifted.")
+    if (
+        source.get("source_kind") != SOURCE_KIND
+        or source.get("unit_instance_id") != proposal.unit_instance_id
+        or authority.target_unit_instance_id != proposal.unit_instance_id
+        or authority.defender_player_id != proposal_record.request.actor_id
+        or not isinstance(action, dict)
+        or action.get("request_id") != payload.get("request_id")
+        or action.get("result_id") != payload.get("result_id")
+        or not isinstance(resolution, dict)
+        or resolution.get("witness") != original.witness.to_payload()
+    ):
+        raise GameLifecycleError("Movement survivor hazard proposal attribution drifted.")
+    resolved = [
+        event
+        for event in prior
+        if event.event_type == RESOLVED
+        and isinstance(event.payload, dict)
+        and event.payload.get("application_id") == application_id
+    ]
+    continued = [
+        event
+        for event in prior
+        if event.event_type == CONTINUED
+        and isinstance(event.payload, dict)
+        and event.payload.get("application_id") == application_id
+    ]
+    completed = completion_events_for_authority(authority=authority, event_records=prior)
+    if len(resolved) != 1 or len(continued) != 1 or len(completed) != 1:
+        raise GameLifecycleError("Movement survivor hazard completion authority drifted.")
+    terminal = resolved[0].payload
+    assert isinstance(terminal, dict)
+    if (
+        {
+            key: value
+            for key, value in terminal.items()
+            if key not in {"application_id", "mortal_application"}
+        }
+        != source
+        or continued[0].payload
+        != {
+            "application_id": application_id,
+            "movement_proposal_request_id": original_record.request.request_id,
+        }
+        or not prior.index(started)
+        < prior.index(completed[0])
+        < prior.index(resolved[0])
+        < prior.index(continued[0])
+    ):
+        raise GameLifecycleError("Movement survivor hazard continuation drifted.")
+    raw_application = terminal.get("mortal_application")
+    if (
+        not isinstance(raw_application, dict)
+        or not isinstance(completed[0].payload, dict)
+        or completed[0].payload.get("application") != raw_application
+    ):
+        raise GameLifecycleError("Movement survivor hazard damage evidence is missing.")
+    application = MortalWoundApplication.from_payload(
+        cast(MortalWoundApplicationPayload, raw_application)
+    )
+    destroyed = tuple(row for row in application.applications if row.destroyed)
+    destroyed_ids = tuple(row.model_instance_id for row in destroyed)
+    if (
+        application.target_unit_instance_id != proposal.unit_instance_id
+        or application.mortal_wounds != authority.mortal_wounds
+        or application.spill_over != authority.spill_over
+        or payload.get("destroyed_model_ids") != list(destroyed_ids)
+        or len(set(destroyed_ids)) != len(destroyed_ids)
+        or not set(destroyed_ids) <= {model_id for model_id, _poses in original.witness.model_paths}
+    ):
+        raise GameLifecycleError("Movement survivor casualty inventory drifted.")
+    deaths = [
+        (event, model_logical_death_record_from_event(event))
+        for event in prior
+        if event.event_type == MODEL_LOGICAL_DEATH_RECORDED_EVENT
+    ]
+    owned_deaths = [(event, row) for event, row in deaths if row.producer_id == application_id]
+    if {row.model_instance_id for _event, row in owned_deaths} != set(destroyed_ids) or len(
+        owned_deaths
+    ) != len(destroyed):
+        raise GameLifecycleError("Movement survivor logical-death inventory drifted.")
+    by_model = {row.model_instance_id: row for row in destroyed}
+    for event, death in owned_deaths:
+        if (
+            not prior.index(started) < prior.index(event) < prior.index(completed[0])
+            or death.rules_unit_instance_id != proposal.unit_instance_id
+            or death.cause_kind is not authority.initial_logical_death_cause_binding.cause_kind
+            or not isinstance(death.transition, DamageApplicationLogicalDeathTransition)
+            or death.transition.damage_application != by_model[death.model_instance_id].to_payload()
+            or death.destroyed_model_placement.pose
+            != original.witness.poses_for_model(death.model_instance_id)[0]
+        ):
+            raise GameLifecycleError("Movement survivor logical-death attribution drifted.")
+    surviving_ids = {model_id for model_id, _poses in original.witness.model_paths} - set(
+        destroyed_ids
+    )
+    if proposal_record != original_record and (
+        {model_id for model_id, _poses in proposal.witness.model_paths} != surviving_ids
+        or any(
+            poses[0] != original.witness.poses_for_model(model_id)[0]
+            for model_id, poses in proposal.witness.model_paths
+        )
+    ):
+        raise GameLifecycleError("Movement survivor retry model inventory drifted.")
+    surviving = tuple(path for path in proposal.witness.model_paths if path[0] in surviving_ids)
+    return PathWitness.for_paths(surviving) if surviving else None
+
+
+def _hazard_completion_proposal_records(
+    *,
+    event_records: tuple[EventRecord, ...],
+    proposal_records: tuple[DecisionRecord, ...],
+    rejected: frozenset[tuple[str, str]],
+    payload: dict[str, JsonValue],
+) -> tuple[DecisionRecord, ...]:
+    """Authenticate deferred coherency rejection and every emitted survivor retry link."""
+    candidates = tuple(
+        record
+        for record in proposal_records
+        if (record.request.request_id, record.result.result_id) not in rejected
+    )
+    if len(candidates) <= 1:
+        return candidates
+    from warhammer40k_core.engine.desperate_escape_mortal_wounds import RESOLVED
+
+    by_request = {record.request.request_id: record for record in proposal_records}
+    packets = [
+        event.payload
+        for event in event_records
+        if event.event_type == RESOLVED
+        and isinstance(event.payload, dict)
+        and event.payload.get("application_id")
+        == payload.get("desperate_escape_mortal_application_id")
+    ]
+    if len(packets) != 1:
+        raise GameLifecycleError("Movement survivor retry hazard root is missing.")
+    # _completion_witness authenticates this packet's complete source against
+    # shared mortal-wound authority. Its original proposal roots only the later
+    # survivor chain; ordinary corrected proposals may precede that root.
+    root_id = _payload_string(packets[0], "movement_proposal_request_id")
+    if root_id not in by_request:
+        raise GameLifecycleError("Movement survivor retry original proposal is missing.")
+    root_requests = [
+        index
+        for index, event in enumerate(event_records)
+        if event.event_type == "decision_requested"
+        and event.payload == by_request[root_id].request.to_payload()
+    ]
+    if len(root_requests) != 1:
+        raise GameLifecycleError("Movement survivor retry original request drifted.")
+    root_index = root_requests[0]
+    links: dict[str, str] = {}
+    seen_requests: set[str] = set()
+    for index, event in enumerate(event_records):
+        row = event.payload
+        if event.event_type != "movement_proposal_requested" or not isinstance(row, dict):
+            continue
+        request_id = row.get("request_id")
+        previous = row.get("previous_proposal_request_id")
+        if not isinstance(request_id, str) or request_id not in by_request or previous is None:
+            continue
+        if (
+            not isinstance(previous, str)
+            or previous not in by_request
+            or request_id in seen_requests
+        ):
+            raise GameLifecycleError("Movement survivor retry chain drifted.")
+        seen_requests.add(request_id)
+        record = by_request[request_id]
+        predecessor = by_request[previous]
+        request = MovementProposalRequest.from_decision_request_payload(record.request.payload)
+        if (
+            _movement_proposal_request_sources(record)
+            != _movement_proposal_request_sources(predecessor)
+            or row.get("source_decision_request_id") != request.source_decision_request_id
+            or row.get("source_decision_result_id") != request.source_decision_result_id
+        ):
+            raise GameLifecycleError("Movement survivor retry source drifted.")
+        validate_record_event_closure(
+            event_records=event_records, mutation_index=index, record=predecessor
+        )
+        predecessor_rejected = (
+            predecessor.request.request_id,
+            predecessor.result.result_id,
+        ) in rejected
+        if request_id == root_id or index < root_index:
+            if not predecessor_rejected or row.get("rejected_result_id") != (
+                predecessor.result.result_id
+            ):
+                raise GameLifecycleError("Movement survivor ordinary retry prefix drifted.")
+            continue
+        if request.context is None or request.context.get(
+            "desperate_escape_completed_packet_id"
+        ) != payload.get("desperate_escape_mortal_application_id"):
+            raise GameLifecycleError("Movement survivor retry packet context drifted.")
+        if not predecessor_rejected:
+            failures = [
+                e
+                for e in event_records[:index]
+                if e.event_type == "movement_action_invalid"
+                and isinstance(e.payload, dict)
+                and e.payload.get("request_id") == request.source_decision_request_id
+                and e.payload.get("result_id") == request.source_decision_result_id
+                and e.payload.get("unit_instance_id") == request.unit_instance_id
+                and e.payload.get("violation_code") == "unit_coherency_broken"
+                and e.payload.get("desperate_escape_mortal_application_id")
+                == payload.get("desperate_escape_mortal_application_id")
+            ]
+            if (
+                len(failures) != 1
+                or row.get("rejected_result_id") != request.source_decision_result_id
+            ):
+                raise GameLifecycleError("Movement survivor deferred rejection authority drifted.")
+        elif row.get("rejected_result_id") != predecessor.result.result_id:
+            raise GameLifecycleError("Movement survivor rejected retry result drifted.")
+        links[request_id] = previous
+    terminal = [record for record in candidates if record.request.request_id not in links.values()]
+    if len(terminal) != 1:
+        raise GameLifecycleError("Movement survivor retry lacks one terminal proposal.")
+    visited = {terminal[0].request.request_id}
+    cursor = terminal[0].request.request_id
+    while cursor in links:
+        cursor = links[cursor]
+        if cursor in visited:
+            raise GameLifecycleError("Movement survivor retry chain is cyclic.")
+        visited.add(cursor)
+    if cursor != root_id:
+        raise GameLifecycleError("Movement survivor retry chain has the wrong hazard root.")
+    if any(record.request.request_id not in visited for record in candidates):
+        raise GameLifecycleError("Movement survivor retry chain omits an accepted proposal.")
+    return (terminal[0],)
 
 
 def _rejected_movement_proposal_pairs(
