@@ -4,6 +4,166 @@
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:8d7e3355d9db2c9477ba63b752dc1dfa054b5c00583ea467e3fbbc0e21d5638d",
   "operation_map_sha256": "4a2365317e64f6c420edf9b7f016ba77ed978dea370ede3673e340f98ffaec75",
   "changes": {
+    "README.md": {
+      "before_sha256": "e6ac96404465effabdf86cb326afce3a2e6290090a27823437da64395c9e2546",
+      "after_sha256": "03e76b093cf675610a36bd3ce631264cb6b1757d48965edf657c159e97c06acf",
+      "owners": {
+        "@document": {
+          "before": "e6ac96404465effabdf86cb326afce3a2e6290090a27823437da64395c9e2546",
+          "after": "03e76b093cf675610a36bd3ce631264cb6b1757d48965edf657c159e97c06acf"
+        }
+      }
+    },
+    "ci/test_shards/current-covered-baseline.json": {
+      "before_sha256": "30059a9fe5487c35589c5c3944218659d198b7d3a60a2ffa1c616dcf2bda0e05",
+      "after_sha256": "7acac7eb2f8986bfd8d23edb2e3a61ac19048343491fb5f8e07c9d6ae1677508",
+      "owners": {
+        "@document": {
+          "before": "30059a9fe5487c35589c5c3944218659d198b7d3a60a2ffa1c616dcf2bda0e05",
+          "after": "7acac7eb2f8986bfd8d23edb2e3a61ac19048343491fb5f8e07c9d6ae1677508"
+        }
+      }
+    },
+    "ci/test_shards/current-derived-assignment.json": {
+      "before_sha256": "9d22e61a87fcc215ef65b901756a5b7179eeff252159a997cd4fe00733d68de2",
+      "after_sha256": "c6e15924f448f8fcc9976e80eda4212cf284cce22ea4a35703df286f8431eb15",
+      "owners": {
+        "@document": {
+          "before": "9d22e61a87fcc215ef65b901756a5b7179eeff252159a997cd4fe00733d68de2",
+          "after": "c6e15924f448f8fcc9976e80eda4212cf284cce22ea4a35703df286f8431eb15"
+        }
+      }
+    },
+    "ci/test_shards/current-runtime-compatibility.json": {
+      "before_sha256": "1c87ca8f745dcca343046747c11ad2a874a4674ad3e1f8a216bff7380315afc3",
+      "after_sha256": "718f182da6761aed678fff4df700b4a1d688319e29aa230f3cb4012525c5e925",
+      "owners": {
+        "@document": {
+          "before": "1c87ca8f745dcca343046747c11ad2a874a4674ad3e1f8a216bff7380315afc3",
+          "after": "718f182da6761aed678fff4df700b4a1d688319e29aa230f3cb4012525c5e925"
+        }
+      }
+    },
+    "ci/test_shards/durations.json": {
+      "before_sha256": "5ae66215f2d857bc7aa0abc718ae036860359890b7db5567aaaa03c3b10ce0c1",
+      "after_sha256": "fa21735e08d12e96d70992a515a7e56b31a32d62fe1f7f8b47acb36a075d3227",
+      "owners": {
+        "@document": {
+          "before": "5ae66215f2d857bc7aa0abc718ae036860359890b7db5567aaaa03c3b10ce0c1",
+          "after": "fa21735e08d12e96d70992a515a7e56b31a32d62fe1f7f8b47acb36a075d3227"
+        }
+      }
+    },
+    "ci/test_shards/shard-1.txt": {
+      "before_sha256": "51116c8b2679a606f8a1a0c0b7e318e4b751ca7fc82f66fbffd8f0861f47f882",
+      "after_sha256": "59a309fab257a27e9e89c320dbface40a4d7ef4eebd15394bcd4f06bce879603",
+      "owners": {
+        "@document": {
+          "before": "51116c8b2679a606f8a1a0c0b7e318e4b751ca7fc82f66fbffd8f0861f47f882",
+          "after": "59a309fab257a27e9e89c320dbface40a4d7ef4eebd15394bcd4f06bce879603"
+        }
+      }
+    },
+    "ci/test_shards/shard-10.txt": {
+      "before_sha256": "cf149970e8cb7a142eb016b75c730996c1c8fdc7af0ca684d91762da79725590",
+      "after_sha256": "08df1baa7250c78286a197a07333e21ae684508d85a56048251feac120b9d784",
+      "owners": {
+        "@document": {
+          "before": "cf149970e8cb7a142eb016b75c730996c1c8fdc7af0ca684d91762da79725590",
+          "after": "08df1baa7250c78286a197a07333e21ae684508d85a56048251feac120b9d784"
+        }
+      }
+    },
+    "ci/test_shards/shard-11.txt": {
+      "before_sha256": "5d513e370a3ddf6ed37c4c455885b85f64f65d54a2ae12153a2a9c685cf1bdb4",
+      "after_sha256": "6622e1ea6a70cb1fceabc3d925fb2c0c126e0c8237ef1b514269cfe30fafe47d",
+      "owners": {
+        "@document": {
+          "before": "5d513e370a3ddf6ed37c4c455885b85f64f65d54a2ae12153a2a9c685cf1bdb4",
+          "after": "6622e1ea6a70cb1fceabc3d925fb2c0c126e0c8237ef1b514269cfe30fafe47d"
+        }
+      }
+    },
+    "ci/test_shards/shard-12.txt": {
+      "before_sha256": "5200260b666b8eb00e4727a7657cfb9a9127e71230c64ead6dc22a0814f1eec9",
+      "after_sha256": "07c60548e1e8847fe0b370333a11325e73bc1fee39bcfe24f3dc68c81f47540b",
+      "owners": {
+        "@document": {
+          "before": "5200260b666b8eb00e4727a7657cfb9a9127e71230c64ead6dc22a0814f1eec9",
+          "after": "07c60548e1e8847fe0b370333a11325e73bc1fee39bcfe24f3dc68c81f47540b"
+        }
+      }
+    },
+    "ci/test_shards/shard-2.txt": {
+      "before_sha256": "63c9ceff239a8f3471d7bf1df8b01e8b05c469458a37eea69e975217df564f87",
+      "after_sha256": "f4785cbf29ad8a7a498732defaeedd0a99ca81860cf25cdfd05e58cca4098ba1",
+      "owners": {
+        "@document": {
+          "before": "63c9ceff239a8f3471d7bf1df8b01e8b05c469458a37eea69e975217df564f87",
+          "after": "f4785cbf29ad8a7a498732defaeedd0a99ca81860cf25cdfd05e58cca4098ba1"
+        }
+      }
+    },
+    "ci/test_shards/shard-3.txt": {
+      "before_sha256": "4e3537b764a392dc8d250ecc2e06ad2ecacda50930e6fb707f85be2f66301263",
+      "after_sha256": "0b2b4f526da4ad4ba6f32a94e6bb0f3fcc05cefeb505db053911fbae9fb45c6e",
+      "owners": {
+        "@document": {
+          "before": "4e3537b764a392dc8d250ecc2e06ad2ecacda50930e6fb707f85be2f66301263",
+          "after": "0b2b4f526da4ad4ba6f32a94e6bb0f3fcc05cefeb505db053911fbae9fb45c6e"
+        }
+      }
+    },
+    "ci/test_shards/shard-4.txt": {
+      "before_sha256": "986697b8460efdcfb73ff4df1f375ee04006f1a1d5d6c4f01db91ad8299de557",
+      "after_sha256": "8a088a124d7f32b92894d17656527af742565a19c241f39934f3c8c2730a300a",
+      "owners": {
+        "@document": {
+          "before": "986697b8460efdcfb73ff4df1f375ee04006f1a1d5d6c4f01db91ad8299de557",
+          "after": "8a088a124d7f32b92894d17656527af742565a19c241f39934f3c8c2730a300a"
+        }
+      }
+    },
+    "ci/test_shards/shard-6.txt": {
+      "before_sha256": "3b65a1b3b93326029e821ae2a5125c1f7388c8c0344a006cc0c98fed752e3189",
+      "after_sha256": "90d4cdfb11e56b6acbca56b093130b69492fd75aa0367df3228336a9ac56821a",
+      "owners": {
+        "@document": {
+          "before": "3b65a1b3b93326029e821ae2a5125c1f7388c8c0344a006cc0c98fed752e3189",
+          "after": "90d4cdfb11e56b6acbca56b093130b69492fd75aa0367df3228336a9ac56821a"
+        }
+      }
+    },
+    "ci/test_shards/shard-7.txt": {
+      "before_sha256": "0b591402c5e93be5e460bb715238c7f69d91bf9c8a52100396f7a516110ef3f3",
+      "after_sha256": "0c0b4d1399171c785d03c606eec0df32d54a1c936607d5350acdcee65355404a",
+      "owners": {
+        "@document": {
+          "before": "0b591402c5e93be5e460bb715238c7f69d91bf9c8a52100396f7a516110ef3f3",
+          "after": "0c0b4d1399171c785d03c606eec0df32d54a1c936607d5350acdcee65355404a"
+        }
+      }
+    },
+    "ci/test_shards/shard-8.txt": {
+      "before_sha256": "dec5f2456021d8d41725674c40adf8be2f45ed401f6ea2db13e5166429e95bca",
+      "after_sha256": "9e514d9bfb1cf4ccfec70dc4a80089c0499c32763657c48b946459e54a49543a",
+      "owners": {
+        "@document": {
+          "before": "dec5f2456021d8d41725674c40adf8be2f45ed401f6ea2db13e5166429e95bca",
+          "after": "9e514d9bfb1cf4ccfec70dc4a80089c0499c32763657c48b946459e54a49543a"
+        }
+      }
+    },
+    "ci/test_shards/shard-9.txt": {
+      "before_sha256": "31d1aa16d16038c091317ad3dccd3dff6c7974fd27f3c16874b17a628f5926f3",
+      "after_sha256": "ed69ecdec06873840694c5a3a011ae0bef2aa8ae8639006d54e499e8c4835b4f",
+      "owners": {
+        "@document": {
+          "before": "31d1aa16d16038c091317ad3dccd3dff6c7974fd27f3c16874b17a628f5926f3",
+          "after": "ed69ecdec06873840694c5a3a011ae0bef2aa8ae8639006d54e499e8c4835b4f"
+        }
+      }
+    },
     "contracts/examples/persistence/session-persistence.json": {
       "before_sha256": "04d6011ab2bcf1a7a5995e2133b1b4cb05567d2f5fc858eab61b73ae5e666130",
       "after_sha256": "1aab4095da8bff2eeb40a3177e131c44929b72ea3f7311e70faff55097b5d408",
@@ -322,6 +482,167 @@
     }
   },
   "rows": {
+    "README.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Qualify a separately versioned native full-roster prefix and repair its reproduced named-weapon-family admission failure through shared catalog-derived equipped-profile binding; preserve historical synthetic findings and rejected routes.",
+      "source_obligation": "The native Lord of Change is equipped with the Bolt of Change weapon family and both declared modes. Its source-backed Master of Magicks choice must discover that equipped family and apply its selected ability to those exact stable profile IDs, preserving exact-profile selectors, bearer restrictions and ordinary persistence/replay. The selected full v995 roster keeps reviewed datasheets, October points and provisional geometry provenance.",
+      "unchanged_work": "This is a bounded rule-semantics repair, with stable profile bindings in existing persisting-effect data and the same serializers and decision/replay routes. No solver, search, cache, geometry, RNG, budget, source weapon statistics or public choice payload changes. The new named fixture repeats the finite existing setup recipe while historical test source stays byte-identical. Fresh covered observation supplies only current derived scheduling; native route evidence does not certify tactical benefit, complete games or learning."
+    },
+    "ci/test_shards/current-covered-baseline.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile",
+        "scoped-shard-allocation"
+      ],
+      "selected_families": [],
+      "rationale": "Qualify a separately versioned native full-roster prefix and repair its reproduced named-weapon-family admission failure through shared catalog-derived equipped-profile binding; preserve historical synthetic findings and rejected routes.",
+      "source_obligation": "The native Lord of Change is equipped with the Bolt of Change weapon family and both declared modes. Its source-backed Master of Magicks choice must discover that equipped family and apply its selected ability to those exact stable profile IDs, preserving exact-profile selectors, bearer restrictions and ordinary persistence/replay. The selected full v995 roster keeps reviewed datasheets, October points and provisional geometry provenance.",
+      "unchanged_work": "This is a bounded rule-semantics repair, with stable profile bindings in existing persisting-effect data and the same serializers and decision/replay routes. No solver, search, cache, geometry, RNG, budget, source weapon statistics or public choice payload changes. The new named fixture repeats the finite existing setup recipe while historical test source stays byte-identical. Fresh covered observation supplies only current derived scheduling; native route evidence does not certify tactical benefit, complete games or learning."
+    },
+    "ci/test_shards/current-derived-assignment.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile",
+        "scoped-shard-allocation"
+      ],
+      "selected_families": [],
+      "rationale": "Qualify a separately versioned native full-roster prefix and repair its reproduced named-weapon-family admission failure through shared catalog-derived equipped-profile binding; preserve historical synthetic findings and rejected routes.",
+      "source_obligation": "The native Lord of Change is equipped with the Bolt of Change weapon family and both declared modes. Its source-backed Master of Magicks choice must discover that equipped family and apply its selected ability to those exact stable profile IDs, preserving exact-profile selectors, bearer restrictions and ordinary persistence/replay. The selected full v995 roster keeps reviewed datasheets, October points and provisional geometry provenance.",
+      "unchanged_work": "This is a bounded rule-semantics repair, with stable profile bindings in existing persisting-effect data and the same serializers and decision/replay routes. No solver, search, cache, geometry, RNG, budget, source weapon statistics or public choice payload changes. The new named fixture repeats the finite existing setup recipe while historical test source stays byte-identical. Fresh covered observation supplies only current derived scheduling; native route evidence does not certify tactical benefit, complete games or learning."
+    },
+    "ci/test_shards/current-runtime-compatibility.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile",
+        "scoped-shard-allocation"
+      ],
+      "selected_families": [],
+      "rationale": "Qualify a separately versioned native full-roster prefix and repair its reproduced named-weapon-family admission failure through shared catalog-derived equipped-profile binding; preserve historical synthetic findings and rejected routes.",
+      "source_obligation": "The native Lord of Change is equipped with the Bolt of Change weapon family and both declared modes. Its source-backed Master of Magicks choice must discover that equipped family and apply its selected ability to those exact stable profile IDs, preserving exact-profile selectors, bearer restrictions and ordinary persistence/replay. The selected full v995 roster keeps reviewed datasheets, October points and provisional geometry provenance.",
+      "unchanged_work": "This is a bounded rule-semantics repair, with stable profile bindings in existing persisting-effect data and the same serializers and decision/replay routes. No solver, search, cache, geometry, RNG, budget, source weapon statistics or public choice payload changes. The new named fixture repeats the finite existing setup recipe while historical test source stays byte-identical. Fresh covered observation supplies only current derived scheduling; native route evidence does not certify tactical benefit, complete games or learning."
+    },
+    "ci/test_shards/durations.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Qualify a separately versioned native full-roster prefix and repair its reproduced named-weapon-family admission failure through shared catalog-derived equipped-profile binding; preserve historical synthetic findings and rejected routes.",
+      "source_obligation": "The native Lord of Change is equipped with the Bolt of Change weapon family and both declared modes. Its source-backed Master of Magicks choice must discover that equipped family and apply its selected ability to those exact stable profile IDs, preserving exact-profile selectors, bearer restrictions and ordinary persistence/replay. The selected full v995 roster keeps reviewed datasheets, October points and provisional geometry provenance.",
+      "unchanged_work": "This is a bounded rule-semantics repair, with stable profile bindings in existing persisting-effect data and the same serializers and decision/replay routes. No solver, search, cache, geometry, RNG, budget, source weapon statistics or public choice payload changes. The new named fixture repeats the finite existing setup recipe while historical test source stays byte-identical. Fresh covered observation supplies only current derived scheduling; native route evidence does not certify tactical benefit, complete games or learning."
+    },
+    "ci/test_shards/shard-1.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Qualify a separately versioned native full-roster prefix and repair its reproduced named-weapon-family admission failure through shared catalog-derived equipped-profile binding; preserve historical synthetic findings and rejected routes.",
+      "source_obligation": "The native Lord of Change is equipped with the Bolt of Change weapon family and both declared modes. Its source-backed Master of Magicks choice must discover that equipped family and apply its selected ability to those exact stable profile IDs, preserving exact-profile selectors, bearer restrictions and ordinary persistence/replay. The selected full v995 roster keeps reviewed datasheets, October points and provisional geometry provenance.",
+      "unchanged_work": "This is a bounded rule-semantics repair, with stable profile bindings in existing persisting-effect data and the same serializers and decision/replay routes. No solver, search, cache, geometry, RNG, budget, source weapon statistics or public choice payload changes. The new named fixture repeats the finite existing setup recipe while historical test source stays byte-identical. Fresh covered observation supplies only current derived scheduling; native route evidence does not certify tactical benefit, complete games or learning."
+    },
+    "ci/test_shards/shard-10.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Qualify a separately versioned native full-roster prefix and repair its reproduced named-weapon-family admission failure through shared catalog-derived equipped-profile binding; preserve historical synthetic findings and rejected routes.",
+      "source_obligation": "The native Lord of Change is equipped with the Bolt of Change weapon family and both declared modes. Its source-backed Master of Magicks choice must discover that equipped family and apply its selected ability to those exact stable profile IDs, preserving exact-profile selectors, bearer restrictions and ordinary persistence/replay. The selected full v995 roster keeps reviewed datasheets, October points and provisional geometry provenance.",
+      "unchanged_work": "This is a bounded rule-semantics repair, with stable profile bindings in existing persisting-effect data and the same serializers and decision/replay routes. No solver, search, cache, geometry, RNG, budget, source weapon statistics or public choice payload changes. The new named fixture repeats the finite existing setup recipe while historical test source stays byte-identical. Fresh covered observation supplies only current derived scheduling; native route evidence does not certify tactical benefit, complete games or learning."
+    },
+    "ci/test_shards/shard-11.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Qualify a separately versioned native full-roster prefix and repair its reproduced named-weapon-family admission failure through shared catalog-derived equipped-profile binding; preserve historical synthetic findings and rejected routes.",
+      "source_obligation": "The native Lord of Change is equipped with the Bolt of Change weapon family and both declared modes. Its source-backed Master of Magicks choice must discover that equipped family and apply its selected ability to those exact stable profile IDs, preserving exact-profile selectors, bearer restrictions and ordinary persistence/replay. The selected full v995 roster keeps reviewed datasheets, October points and provisional geometry provenance.",
+      "unchanged_work": "This is a bounded rule-semantics repair, with stable profile bindings in existing persisting-effect data and the same serializers and decision/replay routes. No solver, search, cache, geometry, RNG, budget, source weapon statistics or public choice payload changes. The new named fixture repeats the finite existing setup recipe while historical test source stays byte-identical. Fresh covered observation supplies only current derived scheduling; native route evidence does not certify tactical benefit, complete games or learning."
+    },
+    "ci/test_shards/shard-12.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Qualify a separately versioned native full-roster prefix and repair its reproduced named-weapon-family admission failure through shared catalog-derived equipped-profile binding; preserve historical synthetic findings and rejected routes.",
+      "source_obligation": "The native Lord of Change is equipped with the Bolt of Change weapon family and both declared modes. Its source-backed Master of Magicks choice must discover that equipped family and apply its selected ability to those exact stable profile IDs, preserving exact-profile selectors, bearer restrictions and ordinary persistence/replay. The selected full v995 roster keeps reviewed datasheets, October points and provisional geometry provenance.",
+      "unchanged_work": "This is a bounded rule-semantics repair, with stable profile bindings in existing persisting-effect data and the same serializers and decision/replay routes. No solver, search, cache, geometry, RNG, budget, source weapon statistics or public choice payload changes. The new named fixture repeats the finite existing setup recipe while historical test source stays byte-identical. Fresh covered observation supplies only current derived scheduling; native route evidence does not certify tactical benefit, complete games or learning."
+    },
+    "ci/test_shards/shard-2.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Qualify a separately versioned native full-roster prefix and repair its reproduced named-weapon-family admission failure through shared catalog-derived equipped-profile binding; preserve historical synthetic findings and rejected routes.",
+      "source_obligation": "The native Lord of Change is equipped with the Bolt of Change weapon family and both declared modes. Its source-backed Master of Magicks choice must discover that equipped family and apply its selected ability to those exact stable profile IDs, preserving exact-profile selectors, bearer restrictions and ordinary persistence/replay. The selected full v995 roster keeps reviewed datasheets, October points and provisional geometry provenance.",
+      "unchanged_work": "This is a bounded rule-semantics repair, with stable profile bindings in existing persisting-effect data and the same serializers and decision/replay routes. No solver, search, cache, geometry, RNG, budget, source weapon statistics or public choice payload changes. The new named fixture repeats the finite existing setup recipe while historical test source stays byte-identical. Fresh covered observation supplies only current derived scheduling; native route evidence does not certify tactical benefit, complete games or learning."
+    },
+    "ci/test_shards/shard-3.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Qualify a separately versioned native full-roster prefix and repair its reproduced named-weapon-family admission failure through shared catalog-derived equipped-profile binding; preserve historical synthetic findings and rejected routes.",
+      "source_obligation": "The native Lord of Change is equipped with the Bolt of Change weapon family and both declared modes. Its source-backed Master of Magicks choice must discover that equipped family and apply its selected ability to those exact stable profile IDs, preserving exact-profile selectors, bearer restrictions and ordinary persistence/replay. The selected full v995 roster keeps reviewed datasheets, October points and provisional geometry provenance.",
+      "unchanged_work": "This is a bounded rule-semantics repair, with stable profile bindings in existing persisting-effect data and the same serializers and decision/replay routes. No solver, search, cache, geometry, RNG, budget, source weapon statistics or public choice payload changes. The new named fixture repeats the finite existing setup recipe while historical test source stays byte-identical. Fresh covered observation supplies only current derived scheduling; native route evidence does not certify tactical benefit, complete games or learning."
+    },
+    "ci/test_shards/shard-4.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Qualify a separately versioned native full-roster prefix and repair its reproduced named-weapon-family admission failure through shared catalog-derived equipped-profile binding; preserve historical synthetic findings and rejected routes.",
+      "source_obligation": "The native Lord of Change is equipped with the Bolt of Change weapon family and both declared modes. Its source-backed Master of Magicks choice must discover that equipped family and apply its selected ability to those exact stable profile IDs, preserving exact-profile selectors, bearer restrictions and ordinary persistence/replay. The selected full v995 roster keeps reviewed datasheets, October points and provisional geometry provenance.",
+      "unchanged_work": "This is a bounded rule-semantics repair, with stable profile bindings in existing persisting-effect data and the same serializers and decision/replay routes. No solver, search, cache, geometry, RNG, budget, source weapon statistics or public choice payload changes. The new named fixture repeats the finite existing setup recipe while historical test source stays byte-identical. Fresh covered observation supplies only current derived scheduling; native route evidence does not certify tactical benefit, complete games or learning."
+    },
+    "ci/test_shards/shard-6.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Qualify a separately versioned native full-roster prefix and repair its reproduced named-weapon-family admission failure through shared catalog-derived equipped-profile binding; preserve historical synthetic findings and rejected routes.",
+      "source_obligation": "The native Lord of Change is equipped with the Bolt of Change weapon family and both declared modes. Its source-backed Master of Magicks choice must discover that equipped family and apply its selected ability to those exact stable profile IDs, preserving exact-profile selectors, bearer restrictions and ordinary persistence/replay. The selected full v995 roster keeps reviewed datasheets, October points and provisional geometry provenance.",
+      "unchanged_work": "This is a bounded rule-semantics repair, with stable profile bindings in existing persisting-effect data and the same serializers and decision/replay routes. No solver, search, cache, geometry, RNG, budget, source weapon statistics or public choice payload changes. The new named fixture repeats the finite existing setup recipe while historical test source stays byte-identical. Fresh covered observation supplies only current derived scheduling; native route evidence does not certify tactical benefit, complete games or learning."
+    },
+    "ci/test_shards/shard-7.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Qualify a separately versioned native full-roster prefix and repair its reproduced named-weapon-family admission failure through shared catalog-derived equipped-profile binding; preserve historical synthetic findings and rejected routes.",
+      "source_obligation": "The native Lord of Change is equipped with the Bolt of Change weapon family and both declared modes. Its source-backed Master of Magicks choice must discover that equipped family and apply its selected ability to those exact stable profile IDs, preserving exact-profile selectors, bearer restrictions and ordinary persistence/replay. The selected full v995 roster keeps reviewed datasheets, October points and provisional geometry provenance.",
+      "unchanged_work": "This is a bounded rule-semantics repair, with stable profile bindings in existing persisting-effect data and the same serializers and decision/replay routes. No solver, search, cache, geometry, RNG, budget, source weapon statistics or public choice payload changes. The new named fixture repeats the finite existing setup recipe while historical test source stays byte-identical. Fresh covered observation supplies only current derived scheduling; native route evidence does not certify tactical benefit, complete games or learning."
+    },
+    "ci/test_shards/shard-8.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Qualify a separately versioned native full-roster prefix and repair its reproduced named-weapon-family admission failure through shared catalog-derived equipped-profile binding; preserve historical synthetic findings and rejected routes.",
+      "source_obligation": "The native Lord of Change is equipped with the Bolt of Change weapon family and both declared modes. Its source-backed Master of Magicks choice must discover that equipped family and apply its selected ability to those exact stable profile IDs, preserving exact-profile selectors, bearer restrictions and ordinary persistence/replay. The selected full v995 roster keeps reviewed datasheets, October points and provisional geometry provenance.",
+      "unchanged_work": "This is a bounded rule-semantics repair, with stable profile bindings in existing persisting-effect data and the same serializers and decision/replay routes. No solver, search, cache, geometry, RNG, budget, source weapon statistics or public choice payload changes. The new named fixture repeats the finite existing setup recipe while historical test source stays byte-identical. Fresh covered observation supplies only current derived scheduling; native route evidence does not certify tactical benefit, complete games or learning."
+    },
+    "ci/test_shards/shard-9.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Qualify a separately versioned native full-roster prefix and repair its reproduced named-weapon-family admission failure through shared catalog-derived equipped-profile binding; preserve historical synthetic findings and rejected routes.",
+      "source_obligation": "The native Lord of Change is equipped with the Bolt of Change weapon family and both declared modes. Its source-backed Master of Magicks choice must discover that equipped family and apply its selected ability to those exact stable profile IDs, preserving exact-profile selectors, bearer restrictions and ordinary persistence/replay. The selected full v995 roster keeps reviewed datasheets, October points and provisional geometry provenance.",
+      "unchanged_work": "This is a bounded rule-semantics repair, with stable profile bindings in existing persisting-effect data and the same serializers and decision/replay routes. No solver, search, cache, geometry, RNG, budget, source weapon statistics or public choice payload changes. The new named fixture repeats the finite existing setup recipe while historical test source stays byte-identical. Fresh covered observation supplies only current derived scheduling; native route evidence does not certify tactical benefit, complete games or learning."
+    },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
       "operations": [
