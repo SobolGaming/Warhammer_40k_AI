@@ -148,7 +148,7 @@
     },
     "workload_sha256": "e25816d3be41ff29858becdcf46562a5337596ab71ce2cb7f070cfd02be05f3c"
   },
-  "head_input_digest": "3f9d1010111bb5690355a1e19224be12388080582ef3e93c36031946752d6a4b",
+  "head_input_digest": "594b03ce8e6da57d77bd4bdb68b75788ec79ca32cd8b9fee096b907208ded6b8",
   "head_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:cb5eb39b0778a1be7c89c167357007d3b3263147ff73741cd69b26a96d5dc8a6",
   "historical_failures": [
     "Historical measurements, failures and unresolved queries remain unchanged. This matched representative reconstruction workload is not a full-game or charge-throughput qualification.",

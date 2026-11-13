@@ -276,11 +276,11 @@
     },
     "docs/performance/current/configured-charge-identity-20261113-reconstruction.json": {
       "before_sha256": null,
-      "after_sha256": "985ae07cbe06df984030a20be8ebf232b01e752165f5a5aae4b442c2aadf380b",
+      "after_sha256": "ed76ec1f0b9364eefbcc04f53e5e6db38cd4b9e7beba04c955039ca428d6aaa8",
       "owners": {
         "@document": {
           "before": null,
-          "after": "985ae07cbe06df984030a20be8ebf232b01e752165f5a5aae4b442c2aadf380b"
+          "after": "ed76ec1f0b9364eefbcc04f53e5e6db38cd4b9e7beba04c955039ca428d6aaa8"
         }
       }
     },
@@ -368,8 +368,12 @@
     },
     "tests/code_quality/test_current_shard_compatibility.py": {
       "before_sha256": "826808f58d379ecbc77dc35894a82fe3d8b5d7cf2f77a4b261e1c43f94f97fb5",
-      "after_sha256": "4af00f1ae46676650b128de5d6c8da8d3822dc5c9ab0dc4cbd97f62866f380d9",
+      "after_sha256": "d1630ef7723a007074ca223dd316ac969fde816629ec22eb73c8bccbd225f287",
       "owners": {
+        "test_compatibility_boundary_rejects_stale_or_forged_inputs": {
+          "before": "d3a3e03cb8aa1d4ead1c98b0177d5e33649d2b5f8dd83df15dff1710aa7888dc",
+          "after": "5cf4b8a8c13a2757ea12c7c5a04d6df877cd31645d30668ee7a169cbf1fa8dbf"
+        },
         "test_current_dispatch_has_exact_inventory_and_disclosed_selector_moves": {
           "before": "38d6978f628074595323e015032d187cefb0f55ceb2fd49f2e70669006040ac6",
           "after": "e11a8f6f02eea2ea32b6285849f57d6bb8cee5f93b61747889f7c09f0d358a10"
