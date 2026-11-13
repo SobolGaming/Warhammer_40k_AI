@@ -51,6 +51,7 @@ def test_current_dispatch_has_exact_inventory_and_disclosed_selector_moves(
     owner = "tests/rules/section03/test_terrain_path_preparation.py"
     assert {node.split("::", 1)[0] for node in additions} == {
         owner,
+        "tests/rules/section09/test_escape_survivor_persistence.py",
         "tests/rules/section11/test_connected_endpoints.py",
     }
     original = {
