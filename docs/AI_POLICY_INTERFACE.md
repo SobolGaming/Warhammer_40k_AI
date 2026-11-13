@@ -2050,10 +2050,25 @@ Its 126.299-second sampled/wrapped query is diagnostic, distinct from PR672's
 instrumentation overhead. No comparative speedup follows. Repeated distinct
 prefix validation and lack of an answer are separate issues.
 
-The supported next experiment is a conservative continuous endpoint exclusion
-that accounts for every fixed-peer connected component, with positive legal
-controls and exact-context proof admission. The existing optional coherency
-proof checks only the mover's neighbor count and is not enabled for this charge
-query; enabling it alone does not supply that connectivity certificate. This
-diagnostic changes no runtime search, validation or cache behavior. A legal
-Charge Move, tactical benefit, Stage 2 completion and learning remain unqualified.
+The charge alternative-query owner now has a sufficient connected-component
+endpoint exclusion for plain circular bases without body-part measurement.
+Exact rational enclosing disks relax height, terrain, path length and all other
+endpoint duties. Every connected full group must attach the mover to each
+component of the relaxed fixed-peer graph. A component whose entire neighborhood
+is disjoint from every target neighborhood supplies `endpoint_unreachable`;
+overlap and unsupported geometry retain ordinary search. The separate
+all-model-distance policy does not use this connectivity certificate.
+
+Historical admission recomputes the same proof using every other model's final
+submitted endpoint from the full witness, including attached components. Physical
+path order, complete-prefix validation, required and forbidden goals, seeds and
+search budgets retain their existing authority. A constructed legal attached-unit
+charge and independently decoded state/events/decisions exercise that proof owner;
+this clause-level fixture does not qualify full roster/session persistence.
+
+The authenticated saved context admits four such exclusions: both preferred and
+engagement queries for models 002 and 003. Model 001's and model 004's preferred
+queries remain unresolved, while the prior reachable alternative remains subject
+to complete path/terrain/endpoint checks. These per-query certificates do not
+establish a legal complete Charge Move, tactical benefit, Stage 2 completion,
+learning admission or full-game performance.

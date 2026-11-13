@@ -1,5 +1,5 @@
-tests/factions/adeptus_custodes/unit/test_adeptus_custodes_army_rule.py
 tests/factions/aeldari/unit/test_aspect_shrine_tokens.py
+tests/factions/aeldari/unit/test_generic_rule_ability_registry.py
 tests/factions/aeldari/unit/test_mandiblasters.py
 tests/factions/chaos_daemons/integration/test_horror_split_materialization.py
 tests/factions/leagues_of_votann/unit/test_leagues_of_votann_army_rule.py
@@ -27,6 +27,7 @@ tests/rules/section08/test_cp_resource.py
 tests/rules/section08/test_shock_completion.py
 tests/rules/section09/test_phase_flow.py
 tests/rules/section11/test_boundaries.py
+tests/rules/section11/test_connected_endpoints.py
 tests/rules/section11/test_moves.py
 tests/rules/section12/test_consolidation.py
 tests/rules/section12/test_distance.py
@@ -39,5 +40,4 @@ tests/rules/section16/test_movement.py
 tests/rules/section18/test_emergency.py
 tests/rules/section19/test_formation.py
 tests/rules/section20/test_declarations.py
-tests/rules/section22/test_plunging.py
 tests/rules/section24/test_movement.py

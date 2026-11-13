@@ -65,11 +65,11 @@ def load_assignment(
         if value != sorted(set(value)):
             raise SystemExit("Current shard selectors must be sorted and unique.")
     groups = tuple(tuple(cast(list[str], shards[str(index)])) for index in range(1, 13))
-    owner = next(iter(cast(dict[str, str], descriptor["new_test_sources"])))
+    owners = set(cast(dict[str, str], descriptor["new_test_sources"]))
     expected = Counter(selector for group in history.groups for selector in group)
-    expected[owner] += 1
+    expected.update(owners)
     selected = Counter(selector for group in groups for selector in group)
-    if selected != expected or len(selected) != 505:
+    if selected != expected or len(selected) != 506:
         raise SystemExit("Derived current assignment selector inventory differs.")
     extension = history.scope.extension
     assert extension is not None
@@ -90,7 +90,7 @@ def load_assignment(
         if original[selector] != current[selector]
     ]
     if record["retained_selector_moves"] != moves or record["new_selector_placement"] != {
-        owner: current[owner]
+        owner: current[owner] for owner in sorted(owners)
     }:
         raise SystemExit("Derived assignment relocation disclosure differs.")
     return groups, record

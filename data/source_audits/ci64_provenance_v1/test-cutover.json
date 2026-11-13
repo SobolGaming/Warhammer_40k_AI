@@ -222,17 +222,83 @@
       "mode": "100644",
       "sha256": "e8548335a237455fce0e5888c15f192a278620aaad31ff2a13139755492e3c56"
     },
+    "tests/infrastructure/adapters/test_canonical_coverage_preflight.py": {
+      "blob_sha1": "3c9f4f50f405d5703b5dccb3f519681b0d3a6688",
+      "bytes": 4342,
+      "mode": "100644",
+      "sha256": "90b2fbdcaa950cfa3002dc7c1b3172473639b66c94fd9192839162f95d148068"
+    },
+    "tests/infrastructure/adapters/test_canonical_deployment.py": {
+      "blob_sha1": "d4c44bae0f48f81620799197b89c84a1f4c23ff6",
+      "bytes": 8775,
+      "mode": "100644",
+      "sha256": "3dcc8f0433797ac4775f23c861b885f96fa3249c315171c72c6d9dfd13b8c518"
+    },
+    "tests/infrastructure/adapters/test_canonical_deployment_coverage.py": {
+      "blob_sha1": "21e4c505c9165a12b54f5b116b276586258638e1",
+      "bytes": 21213,
+      "mode": "100644",
+      "sha256": "4445262840af8cf94079b4d697bf7d74fea458ed27a2dbbe33a38b7908b917f3"
+    },
     "tests/infrastructure/adapters/test_deployment_candidates.py": {
       "blob_sha1": "75e28b6fa5220fcdcf98c99611166f6fcf58ca0e",
       "bytes": 61001,
       "mode": "100644",
       "sha256": "c1be572edd1ea3b57753c5633ece0017ea1fd688712afb5a0e8193a2c3596900"
     },
+    "tests/infrastructure/adapters/test_deployment_experiment.py": {
+      "blob_sha1": "2de515a536c7dac92b512a4bbf35371061acc004",
+      "bytes": 30945,
+      "mode": "100644",
+      "sha256": "e0c83ccc19f1c2ff2736aacdae10a3a5b0501a92a74aac26732ec52ec342c163"
+    },
+    "tests/infrastructure/adapters/test_deployment_geometry_features.py": {
+      "blob_sha1": "8c6bafe129269b04042ca3c31518e14859f1db13",
+      "bytes": 18084,
+      "mode": "100644",
+      "sha256": "12d4b70e44b1d8678086cac7aeee191579bed3d2aa5e553f6514c5f5cf37a67d"
+    },
     "tests/infrastructure/adapters/test_finite_candidates.py": {
       "blob_sha1": "c8967072bd63c9cce467b06ffe3853e76d880309",
       "bytes": 56841,
       "mode": "100644",
       "sha256": "46f9947f09bea4cb3dbbb0e665f488031c2565f2a3dad2097dd840627f0e2abb"
+    },
+    "tests/infrastructure/adapters/test_followthrough_scenario.py": {
+      "blob_sha1": "40f93d7699af8dc4f666b665705c3ae228ce3eee",
+      "bytes": 7622,
+      "mode": "100644",
+      "sha256": "3229c0dbfacbdaf1455aa6baf792362770cdca0fa20de8e47d0f74573cd81c51"
+    },
+    "tests/infrastructure/adapters/test_matched_attack_scenario.py": {
+      "blob_sha1": "f103a5018b75586d03c2c652068bcad80471404c",
+      "bytes": 10424,
+      "mode": "100644",
+      "sha256": "9431a05971747a3dffb3215688e790c4c79accfa74e24e772be834e0c3d14c9a"
+    },
+    "tests/infrastructure/adapters/test_normal_move_scenario.py": {
+      "blob_sha1": "536e3dff3c4d2646194e91efca2c20ee0db62e9b",
+      "bytes": 10093,
+      "mode": "100644",
+      "sha256": "30bb82e22114deb4d7e6b749b684fabd6e7463c41eb24786e7b7d9e023418917"
+    },
+    "tests/infrastructure/adapters/test_opposing_shooter_scenario.py": {
+      "blob_sha1": "bb20cc50fd3baa4b5075307c5bb670c86f09262e",
+      "bytes": 8047,
+      "mode": "100644",
+      "sha256": "b194cc112d8218eac3c08c984cdfa2ecf0c78abf9db9edec61f0d9ad2a0a73d3"
+    },
+    "tests/infrastructure/adapters/test_preserve_scenario.py": {
+      "blob_sha1": "5efb63c278a8211c493305c4367dbc888fda26c3",
+      "bytes": 7366,
+      "mode": "100644",
+      "sha256": "3d348cf932c4430ea470cf0377741771ecc24cf3a7a381d70d364d0590c15fe6"
+    },
+    "tests/infrastructure/adapters/test_runner_accounting.py": {
+      "blob_sha1": "e546b73a90011e01dccd45687fa2597e13b507e0",
+      "bytes": 42274,
+      "mode": "100644",
+      "sha256": "9c50a1ee78e7b79bd7c094b369fcb241336b154b46d54601e21ae087acdbc953"
     },
     "tests/infrastructure/adapters/test_training_admission.py": {
       "blob_sha1": "6ec2ce782106c0eae4aff382586e4c0c1b181ac1",
@@ -1092,6 +1158,12 @@
       "mode": "100644",
       "sha256": "fbd733274e65387c61d56b791fe7defe2ecbb87d845fba52319e6ff36ac90552"
     },
+    "tests/rules/section03/test_terrain_path_preparation.py": {
+      "blob_sha1": "47a7b5eeab268b7293f7984cf225d7d1f74642e9",
+      "bytes": 13299,
+      "mode": "100644",
+      "sha256": "869ce37ba5d43d7a1c5558c94fceaf33eb81bfff62c2e5f13019551f2c071438"
+    },
     "tests/rules/section04/test_allocation_and_effects.py": {
       "blob_sha1": "352c8abc0a73f86642688c0cfcb27311c0f9557c",
       "bytes": 9009,
@@ -1547,6 +1619,12 @@
       "bytes": 1186,
       "mode": "100644",
       "sha256": "41bb348875c07b02b623c09189071fe38defa2df2b7dc2636c1067b8749c17c6"
+    },
+    "tests/rules/section11/test_connected_endpoints.py": {
+      "blob_sha1": "4bd82acd75226755a42db4f8a789e7095eab7c1d",
+      "bytes": 11137,
+      "mode": "100644",
+      "sha256": "9a4ddfd33bae2e8ebe7720a6621a1b222793a071ef31675f42e9bd1ed430a5a0"
     },
     "tests/rules/section11/test_coverage_map.py": {
       "blob_sha1": "ed5c41b5aa9c4aed18a7358cedecd2929f3479f7",
@@ -2411,78 +2489,6 @@
       "bytes": 42323,
       "mode": "100644",
       "sha256": "04e5bfe1de7593075c7d5a8669c5b718eb8f4f24f82e14ffe2587358b0a7dc38"
-    },
-    "tests/infrastructure/adapters/test_deployment_geometry_features.py": {
-      "blob_sha1": "8c6bafe129269b04042ca3c31518e14859f1db13",
-      "bytes": 18084,
-      "mode": "100644",
-      "sha256": "12d4b70e44b1d8678086cac7aeee191579bed3d2aa5e553f6514c5f5cf37a67d"
-    },
-    "tests/infrastructure/adapters/test_deployment_experiment.py": {
-      "mode": "100644",
-      "bytes": 30945,
-      "sha256": "e0c83ccc19f1c2ff2736aacdae10a3a5b0501a92a74aac26732ec52ec342c163",
-      "blob_sha1": "2de515a536c7dac92b512a4bbf35371061acc004"
-    },
-    "tests/infrastructure/adapters/test_runner_accounting.py": {
-      "mode": "100644",
-      "bytes": 42274,
-      "sha256": "9c50a1ee78e7b79bd7c094b369fcb241336b154b46d54601e21ae087acdbc953",
-      "blob_sha1": "e546b73a90011e01dccd45687fa2597e13b507e0"
-    },
-    "tests/infrastructure/adapters/test_canonical_deployment.py": {
-      "mode": "100644",
-      "bytes": 8775,
-      "sha256": "3dcc8f0433797ac4775f23c861b885f96fa3249c315171c72c6d9dfd13b8c518",
-      "blob_sha1": "d4c44bae0f48f81620799197b89c84a1f4c23ff6"
-    },
-    "tests/infrastructure/adapters/test_canonical_deployment_coverage.py": {
-      "mode": "100644",
-      "blob_sha1": "21e4c505c9165a12b54f5b116b276586258638e1",
-      "sha256": "4445262840af8cf94079b4d697bf7d74fea458ed27a2dbbe33a38b7908b917f3",
-      "bytes": 21213
-    },
-    "tests/infrastructure/adapters/test_preserve_scenario.py": {
-      "blob_sha1": "5efb63c278a8211c493305c4367dbc888fda26c3",
-      "bytes": 7366,
-      "mode": "100644",
-      "sha256": "3d348cf932c4430ea470cf0377741771ecc24cf3a7a381d70d364d0590c15fe6"
-    },
-    "tests/infrastructure/adapters/test_normal_move_scenario.py": {
-      "blob_sha1": "536e3dff3c4d2646194e91efca2c20ee0db62e9b",
-      "bytes": 10093,
-      "mode": "100644",
-      "sha256": "30bb82e22114deb4d7e6b749b684fabd6e7463c41eb24786e7b7d9e023418917"
-    },
-    "tests/infrastructure/adapters/test_followthrough_scenario.py": {
-      "mode": "100644",
-      "blob_sha1": "40f93d7699af8dc4f666b665705c3ae228ce3eee",
-      "sha256": "3229c0dbfacbdaf1455aa6baf792362770cdca0fa20de8e47d0f74573cd81c51",
-      "bytes": 7622
-    },
-    "tests/infrastructure/adapters/test_canonical_coverage_preflight.py": {
-      "mode": "100644",
-      "blob_sha1": "3c9f4f50f405d5703b5dccb3f519681b0d3a6688",
-      "sha256": "90b2fbdcaa950cfa3002dc7c1b3172473639b66c94fd9192839162f95d148068",
-      "bytes": 4342
-    },
-    "tests/infrastructure/adapters/test_opposing_shooter_scenario.py": {
-      "mode": "100644",
-      "blob_sha1": "bb20cc50fd3baa4b5075307c5bb670c86f09262e",
-      "sha256": "b194cc112d8218eac3c08c984cdfa2ecf0c78abf9db9edec61f0d9ad2a0a73d3",
-      "bytes": 8047
-    },
-    "tests/infrastructure/adapters/test_matched_attack_scenario.py": {
-      "mode": "100644",
-      "blob_sha1": "f103a5018b75586d03c2c652068bcad80471404c",
-      "sha256": "9431a05971747a3dffb3215688e790c4c79accfa74e24e772be834e0c3d14c9a",
-      "bytes": 10424
-    },
-    "tests/rules/section03/test_terrain_path_preparation.py": {
-      "blob_sha1": "47a7b5eeab268b7293f7984cf225d7d1f74642e9",
-      "bytes": 13299,
-      "mode": "100644",
-      "sha256": "869ce37ba5d43d7a1c5558c94fceaf33eb81bfff62c2e5f13019551f2c071438"
     }
   },
   "active_roots": [

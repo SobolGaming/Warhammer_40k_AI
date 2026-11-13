@@ -30,6 +30,9 @@ from warhammer40k_core.engine.primary_mission_boundary_physical_authority import
 )
 from warhammer40k_core.engine.take_to_the_skies import flight_selection
 from warhammer40k_core.geometry.base_contact_proof import endpoint_excluded_by_bodies
+from warhammer40k_core.geometry.connected_endpoint_proof import (
+    endpoint_excluded_by_connected_components,
+)
 from warhammer40k_core.geometry.endpoint_support import endpoint_support_elevations
 from warhammer40k_core.geometry.movement_endpoint_proof import endpoint_excluded_by_terrain
 from warhammer40k_core.geometry.movement_reachability import MovementGoal
@@ -158,6 +161,13 @@ def validate_charge_endpoint_history(
             raise GameLifecycleError("Charge historical target geometry is absent.")
         for row in rows:
             start = geometry[row.model_instance_id]
+            # Alternative endpoints hold every other model at its submitted
+            # endpoint, exactly as charge_endpoint_query does. Path collision
+            # validation separately preserves physical execution order.
+            peers = tuple(
+                replace(geometry[model_id], pose=witness.final_pose_for_model(model_id))
+                for model_id in sorted(source_ids - {row.model_instance_id})
+            )
             if start.pose != witness.poses_for_model(row.model_instance_id)[0]:
                 raise GameLifecycleError("Charge historical path start drifted.")
             component_id = identities[row.model_instance_id][1].unit_instance_id
@@ -216,26 +226,41 @@ def validate_charge_endpoint_history(
                 if state.battlefield_state is None:
                     raise GameLifecycleError("Charge endpoint proof requires battlefield terrain.")
                 features = state.battlefield_state.terrain_features
-                if not endpoint_excluded_by_terrain(
-                    source=start,
-                    goal=goal,
-                    budget=cast(float, budget),
-                    ignores_vertical_distance=capabilities.ignores_vertical_distance,
-                    terrain=tuple(
-                        volume for feature in features for volume in feature.terrain_volumes()
-                    ),
-                    terrain_features=features,
-                ) and not (
-                    goal.range_inches is not None
-                    and endpoint_excluded_by_bodies(
+                policy = ruleset.coherency_policy
+                connected_exclusion = (
+                    policy.max_all_models_distance_inches is None
+                    and policy.max_horizontal_inches is not None
+                    and endpoint_excluded_by_connected_components(
                         source=start,
-                        targets=goal.models,
-                        range_inches=goal.range_inches,
+                        peers=peers,
+                        goal=goal,
+                        horizontal_inches=policy.max_horizontal_inches,
+                    )
+                )
+                if (
+                    not connected_exclusion
+                    and not endpoint_excluded_by_terrain(
+                        source=start,
+                        goal=goal,
                         budget=cast(float, budget),
-                        supported_elevations=endpoint_support_elevations(
-                            terrain=tuple(v for f in features for v in f.terrain_volumes()),
-                            features=features,
+                        ignores_vertical_distance=capabilities.ignores_vertical_distance,
+                        terrain=tuple(
+                            volume for feature in features for volume in feature.terrain_volumes()
                         ),
+                        terrain_features=features,
+                    )
+                    and not (
+                        goal.range_inches is not None
+                        and endpoint_excluded_by_bodies(
+                            source=start,
+                            targets=goal.models,
+                            range_inches=goal.range_inches,
+                            budget=cast(float, budget),
+                            supported_elevations=endpoint_support_elevations(
+                                terrain=tuple(v for f in features for v in f.terrain_volumes()),
+                                features=features,
+                            ),
+                        )
                     )
                 ):
                     raise GameLifecycleError("Charge historical endpoint proof drifted.")

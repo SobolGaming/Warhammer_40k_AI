@@ -42,7 +42,7 @@ ROLE = "Derived scheduling only; historical phases and current local observation
 
 # Closed inventory for this explicitly reviewed compatibility version.
 NEW_OWNER = "tests/rules/section03/test_terrain_path_preparation.py"
-NEW_NODES = frozenset(
+NEW_NODES: frozenset[str] = frozenset(
     f"{NEW_OWNER}::{case}"
     for case in (
         "test_immutable_terrain_caches_are_bounded_and_eviction_preserves_values",
@@ -63,6 +63,21 @@ NEW_NODES = frozenset(
         "test_terrain_footprint_cache_uses_exact_horizontal_geometry",
         "test_terrain_volume_cache_preserves_definition_identity_and_validation[False]",
         "test_terrain_volume_cache_preserves_definition_identity_and_validation[True]",
+    )
+)
+CONNECTED_OWNER = "tests/rules/section11/test_connected_endpoints.py"
+NEW_NODES |= frozenset(
+    f"{CONNECTED_OWNER}::{case}"
+    for case in (
+        "test_connected_endpoint_exclusion_requires_every_fixed_component[None]",
+        "test_connected_endpoint_exclusion_requires_every_fixed_component[1.0]",
+        "test_connected_endpoint_proof_relaxes_the_entire_goal_and_peer_graph[empty]",
+        "test_connected_endpoint_proof_relaxes_the_entire_goal_and_peer_graph[bridge]",
+        "test_connected_endpoint_proof_relaxes_the_entire_goal_and_peer_graph[union]",
+        "test_connected_endpoint_proof_relaxes_the_entire_goal_and_peer_graph[tangent]",
+        "test_connected_endpoint_proof_relaxes_the_entire_goal_and_peer_graph[shape]",
+        "test_connected_endpoint_proof_relaxes_the_entire_goal_and_peer_graph[body]",
+        "test_connected_endpoint_certificate_survives_charge_history_reconstruction",
     )
 )
 
@@ -150,11 +165,11 @@ def _baseline(
     if (
         cases.keys() != history.baseline.keys() | NEW_NODES
         or not history.baseline.keys() < cases.keys()
-        or len(cases) - len(history.baseline) != 18
-        or len(additions) != 1
+        or len(cases) - len(history.baseline) != 27
+        or set(additions) != {NEW_OWNER, CONNECTED_OWNER}
         or set(additions) & {node.split("::", 1)[0] for node in history.baseline}
     ):
-        raise SystemExit("Compatibility requires exactly the reviewed eighteen added cases.")
+        raise SystemExit("Compatibility requires exactly the reviewed twenty-seven added cases.")
     owners = {node.split("::", 1)[0] for node in cases}
     sources = _object(data["test_sources"], owners, "current test source inventory")
     try:

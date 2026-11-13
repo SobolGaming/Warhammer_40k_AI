@@ -1,4 +1,3 @@
-tests/factions/chaos_daemons/unit/test_generic_rule_ability_registry.py
 tests/factions/chaos_space_marines/unit/test_source_overlays.py
 tests/factions/emperors_children/integration/test_ws14_generic_ir_lifecycle.py
 tests/factions/orks/unit/test_orks_army_rule.py
@@ -19,9 +18,11 @@ tests/infrastructure/missions/unit/test_boundary_checkpoint_redaction.py
 tests/infrastructure/missions/unit/test_event_companion_part2.py
 tests/infrastructure/missions/unit/test_mission_pack.py
 tests/infrastructure/missions/unit/test_secondary_scoring_state_evidence_authority.py
+tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_layout_a_scores_through_lifecycle_views_and_replay[player-b-disruption-vs-reconnaissance-layout-1]
 tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_layout_a_scores_through_lifecycle_views_and_replay[player-b-take-and-hold-vs-purge-the-foe-layout-1]
 tests/infrastructure/missions/unit/test_step5g_pairing_certification_layout_b.py::test_phase17n_step5g_layout_b_scores_through_lifecycle_views_and_replay[player-a-take-and-hold-vs-priority-assets-layout-2]
 tests/infrastructure/missions/unit/test_step5g_pairing_certification_layout_b.py::test_phase17n_step5g_layout_b_scores_through_lifecycle_views_and_replay[player-b-purge-the-foe-vs-reconnaissance-layout-2]
+tests/infrastructure/missions/unit/test_step5g_pairing_certification_layout_b.py::test_phase17n_step5g_layout_b_scores_through_lifecycle_views_and_replay[player-b-take-and-hold-vs-take-and-hold-layout-2]
 tests/infrastructure/missions/unit/test_step5g_pairing_certification_layout_c.py
 tests/infrastructure/missions/unit/test_step6g_secondary_certification_behind_through_cleanse.py
 tests/infrastructure/rule_execution/unit/test_generic_ir_support_validation.py
@@ -55,6 +56,7 @@ tests/rules/section07/test_mission_boundary.py
 tests/rules/section08/test_command_flow.py
 tests/rules/section09/test_coverage_map.py
 tests/rules/section09/test_restrictions.py
+tests/rules/section10/test_coverage_map.py
 tests/rules/section12/test_continuations.py
 tests/rules/section13/test_movement.py
 tests/rules/section14/test_physical.py
@@ -64,6 +66,7 @@ tests/rules/section18/test_facade.py
 tests/rules/section20/test_inventory.py
 tests/rules/section21/test_clarifications.py
 tests/rules/section21/test_persistence.py
+tests/rules/section21/test_witness_admission.py
 tests/rules/section23/test_combat.py
 tests/rules/section23/test_movement.py
 tests/rules/section23/test_other_moves.py

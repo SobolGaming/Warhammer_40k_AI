@@ -17,8 +17,10 @@ from warhammer40k_core.geometry.pose import Pose
 
 def attached_case(
     definitions: Section02Definitions,
+    *,
+    body_datasheet: str = LORD,
 ) -> tuple[GameState, UnitInstance, UnitInstance, UnitInstance, AttachedUnitFormation]:
-    state, body, old_enemy = state_case(definitions)
+    state, body, old_enemy = state_case(definitions, datasheet=body_datasheet)
     leader = definitions.unit(LORD, identity="leader")
     add_unit(state, leader, (Pose.at(10, 12.5),))
     enemy = definitions.unit(SPAWN, army_id="enemy", identity="target")

@@ -1,5 +1,4 @@
 tests/factions/aeldari/unit/test_battle_focus_consumers.py
-tests/factions/aeldari/unit/test_generic_rule_ability_registry.py
 tests/factions/aeldari/unit/test_lhykhis.py
 tests/factions/chaos_daemons/integration/test_cavalcade_v995_roster.py::test_exact_mirror_deploys_all_78_models_and_replays_to_battle
 tests/factions/chaos_daemons/unit/test_generic_ir_support_validation.py
@@ -24,7 +23,6 @@ tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_re
 tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[unused-damage-roll-one-player-a]
 tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[unused-damage-roll-player-a]
 tests/rules/rules07/unit/test_lifecycle.py
-tests/rules/rules18/unit/test_tactical_setup_proof.py
 tests/rules/rules24/unit/test_prebattle.py
 tests/rules/section01/test_01_02_aura.py
 tests/rules/section01/test_01_02_effects.py
@@ -42,11 +40,15 @@ tests/rules/section08/test_examples.py
 tests/rules/section10/test_mixed_integration.py
 tests/rules/section10/test_selection.py
 tests/rules/section11/test_reactive.py
+tests/rules/section12/test_coverage_map.py
 tests/rules/section15/test_bravery_faq50.py
 tests/rules/section15/test_smoke.py
+tests/rules/section15/test_snap_range.py
 tests/rules/section16/test_source_limits_review.py
 tests/rules/section18/test_emergency_status.py
 tests/rules/section19/test_abilities.py
 tests/rules/section19/test_retained_scope.py
+tests/rules/section22/test_auras.py
+tests/rules/section22/test_plunging.py
 tests/rules/section24/test_core_instances.py
 tests/rules/section25/test_budgets.py

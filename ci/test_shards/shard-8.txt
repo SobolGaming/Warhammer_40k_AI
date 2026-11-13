@@ -1,6 +1,7 @@
 tests/factions/chaos_daemons/unit/test_chaos_daemons_army_rule.py
 tests/infrastructure/adapters/test_canonical_coverage_preflight.py::test_consistent_tampering_still_reproduces_the_real_engine
 tests/infrastructure/adapters/test_normal_move_scenario.py
+tests/infrastructure/missions/unit/test_boundary_checkpoint_physical_authority.py
 tests/infrastructure/missions/unit/test_primary_scoring_boundary_lifecycle.py
 tests/infrastructure/missions/unit/test_step5b_marker_conditions.py
 tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_layout_a_scores_through_lifecycle_views_and_replay[player-b-disruption-vs-disruption-layout-1]
@@ -18,6 +19,7 @@ tests/rules/section01/test_01_02_split.py
 tests/rules/section01/test_01_02_unrestricted.py
 tests/rules/section01/test_01_04_contact_lifetime.py
 tests/rules/section01/test_01_04_units.py
+tests/rules/section01/test_01_06_leadership.py
 tests/rules/section02/test_02_01_identity.py
 tests/rules/section02/test_02_02_02_native_permission.py
 tests/rules/section02/test_02_02_04_healing.py
