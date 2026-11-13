@@ -134,6 +134,16 @@
         }
       }
     },
+    "scripts/current_shard_assignment.py": {
+      "before_sha256": "eeddfc633a2b0cc43ead53d6a2397486f297f585aaf7392ff5a936b6dfb9ad34",
+      "after_sha256": "305e498bec457d0384d6a7c7002ecf3d45adf374d9419bdd423ec73c11fb6303",
+      "owners": {
+        "load_assignment": {
+          "before": "f64e79624baca52d7298fa1928febda32810f1c2b8467d8648ddc06080879f78",
+          "after": "53666b9ca13e691029eff57fc4071d3ba81c4941994b38b9da8c798a7a934e91"
+        }
+      }
+    },
     "scripts/current_shard_compatibility.py": {
       "before_sha256": "4f5331b5b5965f8ec7e4b3fa110e27719d5a4668939ba750e81f358983a6ac26",
       "after_sha256": "5523a9b101b91c22b22b3e5c4b4df668e031c5d52566e6eec33c2741a117f390",
@@ -429,6 +439,16 @@
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
+      "selected_families": [],
+      "rationale": "Qualify a separately versioned native full-roster prefix and repair its reproduced named-weapon-family admission failure through shared catalog-derived equipped-profile binding; preserve historical synthetic findings and rejected routes.",
+      "source_obligation": "The native Lord of Change is equipped with the Bolt of Change weapon family and both declared modes. Its source-backed Master of Magicks choice must discover that equipped family and apply its selected ability to those exact stable profile IDs, preserving exact-profile selectors, bearer restrictions and ordinary persistence/replay. The selected full v995 roster keeps reviewed datasheets, October points and provisional geometry provenance.",
+      "unchanged_work": "This is a bounded rule-semantics repair, with stable profile bindings in existing persisting-effect data and the same serializers and decision/replay routes. No solver, search, cache, geometry, RNG, budget, source weapon statistics or public choice payload changes. The new named fixture repeats the finite existing setup recipe while historical test source stays byte-identical. Fresh covered observation supplies only current derived scheduling; native route evidence does not certify tactical benefit, complete games or learning."
+    },
+    "scripts/current_shard_assignment.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "scoped-shard-allocation"
+      ],
       "selected_families": [],
       "rationale": "Qualify a separately versioned native full-roster prefix and repair its reproduced named-weapon-family admission failure through shared catalog-derived equipped-profile binding; preserve historical synthetic findings and rejected routes.",
       "source_obligation": "The native Lord of Change is equipped with the Bolt of Change weapon family and both declared modes. Its source-backed Master of Magicks choice must discover that equipped family and apply its selected ability to those exact stable profile IDs, preserving exact-profile selectors, bearer restrictions and ordinary persistence/replay. The selected full v995 roster keeps reviewed datasheets, October points and provisional geometry provenance.",
