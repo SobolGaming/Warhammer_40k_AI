@@ -372,7 +372,7 @@ preflight retains its twelve-case partition. Two finite step5g modules add sourc
 partitions of 32 and 30 exact cases. The bounded mirror setup case is a separate
 selector; its file selector denotes the remaining cases. CI always deselects that
 node from parallel work and runs it once on its owning shard. All other files remain
-intact. The resulting 506 selectors select exactly 6,318 cases, including eighteen terrain-preparation/cache regressions and eighteen connected-endpoint/ordered-history controls. The required guards verify the exact selected inventory and partition.
+intact. The resulting 506 selectors select exactly 6,319 cases, including eighteen terrain-preparation/cache regressions and nineteen connected-endpoint/ordered-history controls. The required guards verify the exact selected inventory and partition.
 Verify that every selected file or declared case appears exactly once:
 
 ```bash
