@@ -69,7 +69,7 @@ def load_assignment(
     expected = Counter(selector for group in history.groups for selector in group)
     expected.update(owners)
     selected = Counter(selector for group in groups for selector in group)
-    if selected != expected or len(selected) != 506:
+    if selected != expected or len(selected) != 507:
         raise SystemExit("Derived current assignment selector inventory differs.")
     extension = history.scope.extension
     assert extension is not None

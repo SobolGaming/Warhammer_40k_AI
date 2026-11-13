@@ -1524,6 +1524,12 @@
       "mode": "100644",
       "sha256": "f55b4b360bdb91df763701749de6c0db3cc945a0c264db915c7959806c29fc39"
     },
+    "tests/rules/section09/test_escape_survivor_persistence.py": {
+      "blob_sha1": "2c28c3ee8bbf27e97a97095c8009a96abca163b4",
+      "bytes": 14254,
+      "mode": "100644",
+      "sha256": "082bcc0d84daec5c1cf26e1c75b14ac0ee2c824638d0b824b2e987b24b4f599a"
+    },
     "tests/rules/section09/test_fall_back.py": {
       "blob_sha1": "c8d4a498af2713e0223bba6ff1d4b6c9278c1758",
       "bytes": 13357,

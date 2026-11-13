@@ -2183,3 +2183,91 @@ E protection/follow-through benefit, adversarial tactical advantage, Stage 2
 completion, learning admission or full-game throughput. Earlier narrower reports
 retain their meanings; `useful_reference_status` remains `scoped_gap`,
 `reference_target` remains null and `eligible_for_learning` remains false.
+
+
+## Post-charge E follow-through and shooting omission
+
+A separate frozen operator continuation starts from the retained #677 round-four
+A Movement checkpoints on base `cbcff75ff758574e16248e62384b719410adb92a`.
+It preserves configuration, catalog, mission, terrain, provisional geometry,
+private seed, original RNG history and every accepted decision/event prefix.
+E has three two-wound models at (3, 45), (3, 46.8), (3, 48.6), Movement 10,
+and its real `core-drop-carbine`: range 18, three attacks, BS 3, Strength 4,
+AP 0, Damage 1. The pre-choice engine target audit retains the unavailable
+opportunities: charged B is locked in combat with S, and control B is outside
+E's range. No artificial weapon or melee capability is introduced.
+
+Pre-choice mission inspection identifies terrain-area objective control. E is
+outside every objective area. The retained geometric audit places the nearest
+attacker-home boundary about 1.420 inches from a model base; the next-nearest
+central area is at least 14.420 inches away, beyond E's nominal Movement 10.
+These are geometric lower bounds, not full-path reachability or legal occupation
+proofs. No objective-access witness was attempted, and no unavailable scoring
+route or optimal choice is inferred. The full numeric audit receipt follows the
+initial inspection and precedes attack measurement.
+
+The original frozen six-inch positive-Y S retreat is retained as a rejected
+recipe: S's trailing model remains within enemy Engagement Range. Before any
+attack outcome, a separately retained v2 recipe changes only charged S's
+preparation. Ordinary Desperate Escape submission uses eleven-pose paths to
+(6, 26.4), (6, 28), (6, 29.6), (6, 31.2), (6, 32.8), in ascending model ID order.
+Its required natural hazard rolls inflict two mortal wounds and remove S001;
+four S models with eight wounds remain. The required post-move Battle-shock
+also resolves normally. E then makes the same witnessed six-inch negative-Y
+Normal Move in both histories; the vehicle stays stationary. Control S stays
+stationary. No preparation roll or casualty is replaced.
+
+Each history forks its identical accepted preparation into E shooting versus
+omitting E shooting only. The omission retains all S/E preparation costs.
+The shooting branch submits all three legally offered carbines against B;
+ordinary hit, wound, save and required allocation choices complete one nine-attack
+sequence. Optional reactions are declined. Both variants stop at the first
+round-four B Movement selection, before B moves. Unhandled harness choices
+resume the exact saved pending request under the frozen decline/allocation
+policy; rejected preparations, interrupted attempts and the initial restore
+failures remain in the evidence.
+
+| Common-horizon observation | Charged: E shoots | Charged: omit shot | Control: E shoots | Control: omit shot |
+|---|---|---|---|---|
+| Decisions / total events | 110 / 1052 | 83 / 913 | 96 / 909 | 73 / 797 |
+| Total RNG draws | 29 | 9 | 15 | 0 |
+| S survivors / wounds | 4 / 8 | 4 / 8 | 5 / 10 | 5 / 10 |
+| B survivors / wounds | 5 / 9 | 5 / 10 | 5 / 10 | 5 / 10 |
+| E survivors / wounds | 3 / 6 | 3 / 6 | 3 / 6 | 3 / 6 |
+| Vehicle survivors / wounds | 1 / 12 | 1 / 12 | 1 / 12 | 1 / 12 |
+| Player A / B VP | 0 / 7 | 0 / 7 | 0 / 0 | 0 / 0 |
+
+Within the charged history, shooting causes one additional B wound; within the
+control history its observed damage is zero. Neither attack kills a model.
+All final unit positions and objective-control results match within each pair;
+charged B controls expansion-02 and all control objectives remain uncontrolled.
+Charged B's existing three VP gain four at the next Command scoring boundary.
+The point totals match within each pair, although charged scoring-evidence hashes
+reflect the differing B wound state. Prepared RNG totals are nine versus zero;
+the histories are not paired future dice. Their damage difference establishes
+no screening, sacrifice or cross-history tactical benefit.
+
+The natural charged preparation exposed a genuine save/load failure: the live
+movement completion contains surviving paths, while historical authority required
+the original pre-hazard witness. Shared movement completion authority now retains
+the exact accepted proposal and derives its physical survivor witness from the
+existing authenticated mortal-wound packet, completion and logical-death records.
+Primary-mission physical history and Embark consume that same witness. Complete
+casualties admit no displacement; a completed-hazard coherency retry binds every
+emitted predecessor link and the final survivor proposal without rerolling hazards.
+Missing survivors and unrelated hazard attribution fail closed. No gameplay
+rule, wire contract or RNG policy changes. Five focused controls use real sessions
+for partial casualties, a declared singleton canonical one-wound composition,
+and reachable survivor retry, plus missing-survivor and wrong-packet rejection.
+Their fixed test-only seeds and initial fixture contracts do not alter operator
+history or search for a favorable operator outcome.
+
+All four unedited final checkpoints pass strict JSON save/load and exact ordinary
+replay on the repaired runtime, preserving both the original and preparation
+prefixes and RNG histories. Evidence retains complete paths, offers, allocations,
+damage, scoring, checkpoints, original producer receipts and final-runtime
+verification. This qualifies this bounded shooting continuation and persistence
+repair only. Alternative objective routes, adversarial play, screening benefit,
+Stage 2 completion, learning admission and full-game throughput remain unqualified;
+`useful_reference_status` remains `scoped_gap`, `reference_target` remains null,
+and `eligible_for_learning` remains false.
