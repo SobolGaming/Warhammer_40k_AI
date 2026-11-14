@@ -6333,12 +6333,12 @@
     "tests/unit/test_phase10i_terrain_movement.py::test_upper_ruins_floor_endpoint_fails_when_base_overhangs": 0.003
   },
   "execution_model": {
-    "assignment_wall_lower_bound_seconds": {
+    "assignment_wall_planning_estimate_seconds": {
       "1": 1923.942,
       "10": 1307.385,
       "11": 1346.078,
       "12": 1570.612,
-      "2": 1025.19,
+      "2": 1259.45,
       "3": 1501.478,
       "4": 1150.547,
       "5": 959.943,
@@ -6349,16 +6349,128 @@
     },
     "cold_shard_assignment": "preserved-cold1-mirror2-pinned4-fixed5",
     "cold_shard_id": 1,
+    "estimate_role": "Hybrid scheduling estimate, not a physical lower bound, hosted observation or timing qualification",
+    "native_selected_context": "with_mirror",
+    "native_selected_phase_seconds": 389.046601379,
+    "native_serial_role": {
+      "cases": [
+        "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py::test_native_roles_keep_complete_equipment_in_full_legal_rosters[cavalcade-a:nurglings-3-weapons0]",
+        "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py::test_native_roles_keep_complete_equipment_in_full_legal_rosters[cavalcade-b:bloodcrushers-1-6-weapons1]",
+        "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py::test_native_roles_keep_complete_equipment_in_full_legal_rosters[cavalcade-a:lord-of-change-1-1-weapons2]",
+        "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py::test_native_prefix_preserves_real_rules_terrain_and_exact_history[ranged-sidestep]",
+        "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py::test_native_prefix_preserves_real_rules_terrain_and_exact_history[blocked-screen]",
+        "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py::test_native_prefix_preserves_real_rules_terrain_and_exact_history[blocked-ranged]"
+      ],
+      "file": "current-native-serial-role.json",
+      "observations": {
+        "standalone": {
+          "additional_binding_role": "Native setup and movement helpers",
+          "cache_role": "Warm retained selected-source index; fresh worker/module fixtures",
+          "cases": [
+            "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py::test_native_roles_keep_complete_equipment_in_full_legal_rosters[cavalcade-a:nurglings-3-weapons0]",
+            "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py::test_native_roles_keep_complete_equipment_in_full_legal_rosters[cavalcade-b:bloodcrushers-1-6-weapons1]",
+            "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py::test_native_roles_keep_complete_equipment_in_full_legal_rosters[cavalcade-a:lord-of-change-1-1-weapons2]",
+            "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py::test_native_prefix_preserves_real_rules_terrain_and_exact_history[ranged-sidestep]",
+            "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py::test_native_prefix_preserves_real_rules_terrain_and_exact_history[blocked-screen]",
+            "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py::test_native_prefix_preserves_real_rules_terrain_and_exact_history[blocked-ranged]"
+          ],
+          "complete_phase_seconds": 444.5446871509996,
+          "controller_elapsed_seconds": 463.9442893670001,
+          "producer_input_digest": "c2a39d742eb1c425ab003f11715c146a71810713b18c66c35f6aae81cdc09de5",
+          "raw_artifact_sha256": {
+            "command": "d152a76eb3c848e36be1296052b72876422e6bc59d72b504b451cdba92026f9f",
+            "controller": "4cb551a5de11f243f871f8db323a614aa1910fba47376e6b7af1ea8aaf64a90f",
+            "junit": "7406be197d374ae85d3de1a24da808bcaa270b93817a9c196e6cae2c48efed39",
+            "selected_index": "c9178c3ead88edbb4dc8c2d7d304c2a082894827af1181f3275e8e1bca45e0ea",
+            "supervisor": "58e6f68f020843ead9e260c3a97e89cafe6a8d187e5ddb4917dc911cdeb47cbe",
+            "worker": "fdc7e0e495ba246f1d9d685dc847ebda1cef335f6387603dc33c45aa97d2340c"
+          },
+          "role": "Current local six-case serial observation; historical projections are not hosted observations",
+          "runtime_fingerprint": "8d7e3355d9db2c9477ba63b752dc1dfa054b5c00583ea467e3fbbc0e21d5638d",
+          "source_applicability": "Measured native/controller/config closure is unchanged; later accounting, QA and documentation are not the measured global source.",
+          "source_binding_count": 365,
+          "source_evidence_sha256": {
+            "progress": "3bc81f1b95926eeb997240941a668b43e7e121133162c8e5c12bdf321aae05ef",
+            "receipt": "4c3308e515019ae238f19e9b021fde29eaff8fcc56ebb69ef35713bea76373f8",
+            "source_postflight": "caf06c7b27a6e43c53256b1571e1c43360103eb9b0fb26986a1b0a8e5deeb6f8",
+            "source_preflight": "3513607e91dea2b29cd69324b4e6f8a0f3159433c98ff079c9454c974ad3ffea"
+          },
+          "source_head": "f900d0796b59b7859309af71e62a9e190934d10f",
+          "source_tree": "91ced8222364b9a24b8e1051f7ba9e6c0b9fc97d",
+          "stage_complete_phase_seconds": 444.5446871509996,
+          "supervisor_elapsed_seconds": 491.5383313960001,
+          "worker_count": 1,
+          "worker_elapsed_seconds": 445.7236967960001
+        },
+        "with_mirror": {
+          "additional_binding_role": "Conservative legacy module import context; no claim that unrelated helper functions execute",
+          "cache_role": "Warm retained selected-source index; fresh worker/module fixtures",
+          "cases": [
+            "tests/factions/chaos_daemons/integration/test_cavalcade_v995_roster.py::test_exact_mirror_deploys_all_78_models_and_replays_to_battle",
+            "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py::test_native_roles_keep_complete_equipment_in_full_legal_rosters[cavalcade-a:nurglings-3-weapons0]",
+            "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py::test_native_roles_keep_complete_equipment_in_full_legal_rosters[cavalcade-b:bloodcrushers-1-6-weapons1]",
+            "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py::test_native_roles_keep_complete_equipment_in_full_legal_rosters[cavalcade-a:lord-of-change-1-1-weapons2]",
+            "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py::test_native_prefix_preserves_real_rules_terrain_and_exact_history[ranged-sidestep]",
+            "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py::test_native_prefix_preserves_real_rules_terrain_and_exact_history[blocked-screen]",
+            "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py::test_native_prefix_preserves_real_rules_terrain_and_exact_history[blocked-ranged]"
+          ],
+          "complete_phase_seconds": 389.046601379,
+          "controller_elapsed_seconds": 575.435769818,
+          "producer_input_digest": "60f874b99b707ea9544acf01a86f3694f7a35d4c540243d06df68ab884aa0c51",
+          "raw_artifact_sha256": {
+            "command": "a2f6a41412635ee40fd25810491eddb100ec113d98e5166cd2ee0cfa83c6c2f7",
+            "controller": "9ffc17530452bec9bcaef668162238c177bb94102f15c5b3ce116160f9a755b7",
+            "junit": "25abcef0bf2f64aaa13a41c14ec3c64a4ed9c62bb94c729c6ff4cdecdb876367",
+            "selected_index": "e86b7fbac4585eaa3e6f5d32bd8cc044a26d6c0e32228a968c391398dfa8a1a7",
+            "supervisor": "7937e718db6b0807a947f8be69a1e979a407458d992aac2d52ee8e3f48ea48fb",
+            "worker": "02109e05c05ce51fda502e9e6d6e828b94a19e64d9faff3422236db94b8ea547"
+          },
+          "role": "Current local native observation after legacy mirror in the same ordered one-worker process; not hosted timing",
+          "runtime_fingerprint": "8d7e3355d9db2c9477ba63b752dc1dfa054b5c00583ea467e3fbbc0e21d5638d",
+          "source_applicability": "Measured native/controller/config closure is unchanged; later accounting, QA and documentation are not the measured global source.",
+          "source_binding_count": 391,
+          "source_evidence_sha256": {
+            "admission": "7a750f44fee0505d43a672d8f388c90c4e3b89950b445095239d32ff0b8c375d",
+            "progress": "ef6e0687291408697a5e8a668d39045f48e24f479caca9ef5585c222a120cac3",
+            "receipt": "99b6d589a6536766266313f663960f352bcd33bd0b2a3ade3bca1b5e5d1d8f9c",
+            "source_postflight": "9f7a8d45f034ba851c00acee8dc35ead63310532c148e3dc97e1a9d63c21bb05",
+            "source_preflight": "00e3c7c51cf5e4d83cb8830a6c4943dcb73d57d74b73e1270e644a90ea41ad82"
+          },
+          "source_head": "f8c44d8492ae48b8db53267252ef4ea6f276cf1a",
+          "source_tree": "4e6a63b81f455c57c8e63cb5e96abc61b97f171f",
+          "stage_complete_phase_seconds": 555.4913923400001,
+          "supervisor_elapsed_seconds": 602.9525580320001,
+          "worker_count": 1,
+          "worker_elapsed_seconds": 556.968767974
+        }
+      },
+      "role": "Two current local native serial contexts; historical projections are not hosted observations",
+      "selection_rule": "Use with_mirror only after legacy mirror in the same ordered serial process; otherwise standalone. Never select the smaller observation.",
+      "sha256": "98166b84dcd84b9aedef84ff8280f35c96aebe698d70aa9989354d7b1e4c5bfc",
+      "standalone_native_phase_seconds": 444.5446871509996,
+      "with_mirror_native_phase_seconds": 389.046601379,
+      "worker_count": 1
+    },
     "parallel_workers": 4,
     "serial_cases": [
-      "tests/factions/chaos_daemons/integration/test_cavalcade_v995_roster.py::test_exact_mirror_deploys_all_78_models_and_replays_to_battle"
+      "tests/factions/chaos_daemons/integration/test_cavalcade_v995_roster.py::test_exact_mirror_deploys_all_78_models_and_replays_to_battle",
+      "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py::test_native_roles_keep_complete_equipment_in_full_legal_rosters[cavalcade-a:nurglings-3-weapons0]",
+      "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py::test_native_roles_keep_complete_equipment_in_full_legal_rosters[cavalcade-b:bloodcrushers-1-6-weapons1]",
+      "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py::test_native_roles_keep_complete_equipment_in_full_legal_rosters[cavalcade-a:lord-of-change-1-1-weapons2]",
+      "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py::test_native_prefix_preserves_real_rules_terrain_and_exact_history[ranged-sidestep]",
+      "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py::test_native_prefix_preserves_real_rules_terrain_and_exact_history[blocked-screen]",
+      "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py::test_native_prefix_preserves_real_rules_terrain_and_exact_history[blocked-ranged]"
+    ],
+    "serial_selectors": [
+      "tests/factions/chaos_daemons/integration/test_cavalcade_v995_roster.py::test_exact_mirror_deploys_all_78_models_and_replays_to_battle",
+      "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py"
     ],
     "shard_worker_seconds": {
       "1": 7695.767,
       "10": 5229.539,
       "11": 5384.313,
       "12": 6282.45,
-      "2": 4100.762,
+      "2": 5037.798,
       "3": 6005.91,
       "4": 4602.189,
       "5": 3334.745,
@@ -7413,8 +7525,15 @@
       "sha256": "7acac7eb2f8986bfd8d23edb2e3a61ac19048343491fb5f8e07c9d6ae1677508"
     },
     "current_cases": 6331,
+    "current_planning_policy": {
+      "ceiling_seconds": 1350,
+      "planning_gap_to_1620_second_approval": 270,
+      "role": "Current empirical projection guard; not observed completion or timing approval",
+      "rounding_seconds": 30,
+      "version": "native-serial-current-planning-v1"
+    },
     "current_runtime_fingerprint": "8d7e3355d9db2c9477ba63b752dc1dfa054b5c00583ea467e3fbbc0e21d5638d",
-    "derived_stress_ceiling_seconds": 1054,
+    "derived_score_role": "Historical cohort projection plus unchanged current additions and separately measured local native serial role; not observed hosted execution",
     "derived_unknown_reservation_seconds": 465.533262819,
     "file": "current-runtime-compatibility.json",
     "historical_allocation_model": {
@@ -7606,7 +7725,6 @@
       }
     },
     "historical_cases": 6282,
-    "historical_ceiling_seconds": 1076,
     "historical_reservation_seconds_unchanged": 465.533262819,
     "historical_revision": "008be8a8cb0b50b232fe022452762b3906489b49",
     "historical_scoped_allocation": {
@@ -8473,7 +8591,105 @@
       ]
     },
     "historical_summary_sha256": "de0063553bb8de7bb091dd9185c7d7f99266ba992c71b460ffe84a0fd386b80c",
-    "latest_historical_ceiling_seconds": 1050,
+    "native_serial_role": {
+      "cases": [
+        "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py::test_native_roles_keep_complete_equipment_in_full_legal_rosters[cavalcade-a:nurglings-3-weapons0]",
+        "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py::test_native_roles_keep_complete_equipment_in_full_legal_rosters[cavalcade-b:bloodcrushers-1-6-weapons1]",
+        "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py::test_native_roles_keep_complete_equipment_in_full_legal_rosters[cavalcade-a:lord-of-change-1-1-weapons2]",
+        "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py::test_native_prefix_preserves_real_rules_terrain_and_exact_history[ranged-sidestep]",
+        "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py::test_native_prefix_preserves_real_rules_terrain_and_exact_history[blocked-screen]",
+        "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py::test_native_prefix_preserves_real_rules_terrain_and_exact_history[blocked-ranged]"
+      ],
+      "file": "current-native-serial-role.json",
+      "observations": {
+        "standalone": {
+          "additional_binding_role": "Native setup and movement helpers",
+          "cache_role": "Warm retained selected-source index; fresh worker/module fixtures",
+          "cases": [
+            "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py::test_native_roles_keep_complete_equipment_in_full_legal_rosters[cavalcade-a:nurglings-3-weapons0]",
+            "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py::test_native_roles_keep_complete_equipment_in_full_legal_rosters[cavalcade-b:bloodcrushers-1-6-weapons1]",
+            "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py::test_native_roles_keep_complete_equipment_in_full_legal_rosters[cavalcade-a:lord-of-change-1-1-weapons2]",
+            "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py::test_native_prefix_preserves_real_rules_terrain_and_exact_history[ranged-sidestep]",
+            "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py::test_native_prefix_preserves_real_rules_terrain_and_exact_history[blocked-screen]",
+            "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py::test_native_prefix_preserves_real_rules_terrain_and_exact_history[blocked-ranged]"
+          ],
+          "complete_phase_seconds": 444.5446871509996,
+          "controller_elapsed_seconds": 463.9442893670001,
+          "producer_input_digest": "c2a39d742eb1c425ab003f11715c146a71810713b18c66c35f6aae81cdc09de5",
+          "raw_artifact_sha256": {
+            "command": "d152a76eb3c848e36be1296052b72876422e6bc59d72b504b451cdba92026f9f",
+            "controller": "4cb551a5de11f243f871f8db323a614aa1910fba47376e6b7af1ea8aaf64a90f",
+            "junit": "7406be197d374ae85d3de1a24da808bcaa270b93817a9c196e6cae2c48efed39",
+            "selected_index": "c9178c3ead88edbb4dc8c2d7d304c2a082894827af1181f3275e8e1bca45e0ea",
+            "supervisor": "58e6f68f020843ead9e260c3a97e89cafe6a8d187e5ddb4917dc911cdeb47cbe",
+            "worker": "fdc7e0e495ba246f1d9d685dc847ebda1cef335f6387603dc33c45aa97d2340c"
+          },
+          "role": "Current local six-case serial observation; historical projections are not hosted observations",
+          "runtime_fingerprint": "8d7e3355d9db2c9477ba63b752dc1dfa054b5c00583ea467e3fbbc0e21d5638d",
+          "source_applicability": "Measured native/controller/config closure is unchanged; later accounting, QA and documentation are not the measured global source.",
+          "source_binding_count": 365,
+          "source_evidence_sha256": {
+            "progress": "3bc81f1b95926eeb997240941a668b43e7e121133162c8e5c12bdf321aae05ef",
+            "receipt": "4c3308e515019ae238f19e9b021fde29eaff8fcc56ebb69ef35713bea76373f8",
+            "source_postflight": "caf06c7b27a6e43c53256b1571e1c43360103eb9b0fb26986a1b0a8e5deeb6f8",
+            "source_preflight": "3513607e91dea2b29cd69324b4e6f8a0f3159433c98ff079c9454c974ad3ffea"
+          },
+          "source_head": "f900d0796b59b7859309af71e62a9e190934d10f",
+          "source_tree": "91ced8222364b9a24b8e1051f7ba9e6c0b9fc97d",
+          "stage_complete_phase_seconds": 444.5446871509996,
+          "supervisor_elapsed_seconds": 491.5383313960001,
+          "worker_count": 1,
+          "worker_elapsed_seconds": 445.7236967960001
+        },
+        "with_mirror": {
+          "additional_binding_role": "Conservative legacy module import context; no claim that unrelated helper functions execute",
+          "cache_role": "Warm retained selected-source index; fresh worker/module fixtures",
+          "cases": [
+            "tests/factions/chaos_daemons/integration/test_cavalcade_v995_roster.py::test_exact_mirror_deploys_all_78_models_and_replays_to_battle",
+            "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py::test_native_roles_keep_complete_equipment_in_full_legal_rosters[cavalcade-a:nurglings-3-weapons0]",
+            "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py::test_native_roles_keep_complete_equipment_in_full_legal_rosters[cavalcade-b:bloodcrushers-1-6-weapons1]",
+            "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py::test_native_roles_keep_complete_equipment_in_full_legal_rosters[cavalcade-a:lord-of-change-1-1-weapons2]",
+            "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py::test_native_prefix_preserves_real_rules_terrain_and_exact_history[ranged-sidestep]",
+            "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py::test_native_prefix_preserves_real_rules_terrain_and_exact_history[blocked-screen]",
+            "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py::test_native_prefix_preserves_real_rules_terrain_and_exact_history[blocked-ranged]"
+          ],
+          "complete_phase_seconds": 389.046601379,
+          "controller_elapsed_seconds": 575.435769818,
+          "producer_input_digest": "60f874b99b707ea9544acf01a86f3694f7a35d4c540243d06df68ab884aa0c51",
+          "raw_artifact_sha256": {
+            "command": "a2f6a41412635ee40fd25810491eddb100ec113d98e5166cd2ee0cfa83c6c2f7",
+            "controller": "9ffc17530452bec9bcaef668162238c177bb94102f15c5b3ce116160f9a755b7",
+            "junit": "25abcef0bf2f64aaa13a41c14ec3c64a4ed9c62bb94c729c6ff4cdecdb876367",
+            "selected_index": "e86b7fbac4585eaa3e6f5d32bd8cc044a26d6c0e32228a968c391398dfa8a1a7",
+            "supervisor": "7937e718db6b0807a947f8be69a1e979a407458d992aac2d52ee8e3f48ea48fb",
+            "worker": "02109e05c05ce51fda502e9e6d6e828b94a19e64d9faff3422236db94b8ea547"
+          },
+          "role": "Current local native observation after legacy mirror in the same ordered one-worker process; not hosted timing",
+          "runtime_fingerprint": "8d7e3355d9db2c9477ba63b752dc1dfa054b5c00583ea467e3fbbc0e21d5638d",
+          "source_applicability": "Measured native/controller/config closure is unchanged; later accounting, QA and documentation are not the measured global source.",
+          "source_binding_count": 391,
+          "source_evidence_sha256": {
+            "admission": "7a750f44fee0505d43a672d8f388c90c4e3b89950b445095239d32ff0b8c375d",
+            "progress": "ef6e0687291408697a5e8a668d39045f48e24f479caca9ef5585c222a120cac3",
+            "receipt": "99b6d589a6536766266313f663960f352bcd33bd0b2a3ade3bca1b5e5d1d8f9c",
+            "source_postflight": "9f7a8d45f034ba851c00acee8dc35ead63310532c148e3dc97e1a9d63c21bb05",
+            "source_preflight": "00e3c7c51cf5e4d83cb8830a6c4943dcb73d57d74b73e1270e644a90ea41ad82"
+          },
+          "source_head": "f8c44d8492ae48b8db53267252ef4ea6f276cf1a",
+          "source_tree": "4e6a63b81f455c57c8e63cb5e96abc61b97f171f",
+          "stage_complete_phase_seconds": 555.4913923400001,
+          "supervisor_elapsed_seconds": 602.9525580320001,
+          "worker_count": 1,
+          "worker_elapsed_seconds": 556.968767974
+        }
+      },
+      "role": "Two current local native serial contexts; historical projections are not hosted observations",
+      "selection_rule": "Use with_mirror only after legacy mirror in the same ordered serial process; otherwise standalone. Never select the smaller observation.",
+      "sha256": "98166b84dcd84b9aedef84ff8280f35c96aebe698d70aa9989354d7b1e4c5bfc",
+      "standalone_native_phase_seconds": 444.5446871509996,
+      "with_mirror_native_phase_seconds": 389.046601379,
+      "worker_count": 1
+    },
     "new_cases_without_hosted_observations": [
       "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py::test_native_prefix_preserves_real_rules_terrain_and_exact_history[blocked-ranged]",
       "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py::test_native_prefix_preserves_real_rules_terrain_and_exact_history[blocked-screen]",
@@ -8531,6 +8747,19 @@
       "tests/rules/section09/test_escape_survivor_persistence.py": 12,
       "tests/rules/section11/test_connected_endpoints.py": 9
     },
+    "partial_raw_role": "Retained historical worker-chunk projection; not the current native serial controller topology",
+    "retained_historical_planning_ceilings_seconds": [
+      1076,
+      1076,
+      1076,
+      1076,
+      1076,
+      1076,
+      1076,
+      1076,
+      1054,
+      1050
+    ],
     "retained_selector_moves": [
       {
         "from": 10,
@@ -10379,8 +10608,8 @@
       }
     ],
     "role": "Derived scheduling only; historical phases and current local observations stay separate",
-    "schema": "historical-snapshot-current-baseline-v1",
-    "sha256": "718f182da6761aed678fff4df700b4a1d688319e29aa230f3cb4012525c5e925",
+    "schema": "historical-snapshot-current-baseline-v2",
+    "sha256": "419b012be48b93db12e11f84c23d136a4edbf9b2a713d93a0da1d9f488be3d4e",
     "shards": {
       "1": {
         "derived_historical_plus_current_additions": [
@@ -10681,16 +10910,16 @@
       },
       "2": {
         "derived_historical_plus_current_additions": [
-          915.835431328001,
-          1074.91446167,
-          917.8715798029999,
-          985.3623953520009,
-          959.0801468240002,
-          963.1680601110011,
-          1074.7082507239988,
-          1068.2719104819985,
-          1016.5725910629992,
-          1045.368436649
+          1253.6052813370004,
+          1346.1022674000003,
+          1119.5074720709995,
+          1212.1181167380005,
+          1253.5635706990004,
+          1258.4234617550003,
+          1319.376995093,
+          1323.905547379998,
+          1206.6971498629982,
+          1249.5581437340006
         ],
         "expanded_6281_partial_raw": {
           "full_raw_role_score": null,

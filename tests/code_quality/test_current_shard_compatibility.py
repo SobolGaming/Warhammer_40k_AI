@@ -5,6 +5,7 @@ import json
 import shutil
 import subprocess
 import sys
+import xml.etree.ElementTree as ET
 from collections.abc import Iterator
 from pathlib import Path
 from typing import cast
@@ -85,9 +86,19 @@ def test_current_raw_projections_keep_missing_observations_null(
             raw = cast(dict[str, object], row[key])
             assert (raw["full_raw_role_score"] is None) == bool(raw["missing_nodes"])
         scores = cast(list[float], row["derived_historical_plus_current_additions"])
-        assert max(scores[:-2]) <= 1076
-        assert scores[-2] <= 1054
-        assert scores[-1] <= 1050
+        assert len(scores) == 10
+        assert max(scores) <= 1350
+    assert plan.metadata["retained_historical_planning_ceilings_seconds"] == [1076] * 8 + [
+        1054,
+        1050,
+    ]
+    assert plan.metadata["current_planning_policy"] == {
+        "version": "native-serial-current-planning-v1",
+        "role": "Current empirical projection guard; not observed completion or timing approval",
+        "ceiling_seconds": 1350,
+        "rounding_seconds": 30,
+        "planning_gap_to_1620_second_approval": 270,
+    }
     assert (
         plan.metadata["historical_scoped_allocation"]
         == json.loads((historical.directory / "durations.json").read_bytes())["scoped_allocation"]
@@ -276,7 +287,11 @@ def test_ci_fetches_only_exact_declared_source_objects() -> None:
 
     anchors = revisions(DIRECTORY)
     assert anchors == tuple(sorted(set(anchors)))
-    assert len(anchors) == 37
+    assert len(anchors) == 39
+    from scripts.current_native_serial_role import COMBINED_PRODUCER, PRODUCER
+
+    assert PRODUCER in anchors
+    assert COMBINED_PRODUCER in anchors
     workflow = (ROOT / ".github/workflows/ci.yml").read_text()
     assert workflow.count("run: python3 -B scripts/fetch_scheduling_sources.py") == 4
 
@@ -361,16 +376,52 @@ def test_current_assignment_rejects_tampered_data(
         compatibility.plan(ROOT, tmp_path, sharding.summary_case_seconds(summary))
 
 
-@pytest.mark.parametrize(
-    ("index", "seconds"), [(0, 1076.001), (8, 1054.001), (9, 1050.001), (0, float("nan"))]
-)
-def test_each_original_planning_ceiling_remains_mandatory(index: int, seconds: float) -> None:
+@pytest.mark.parametrize("index", range(10))
+def test_current_planning_ceiling_has_an_inclusive_exact_boundary(index: int) -> None:
     from scripts.current_shard_assignment import require_planning_limits
 
     values = [0.0] * 10
-    values[index] = seconds
-    with pytest.raises(SystemExit, match="unchanged planning ceilings"):
+    values[index] = 1350.0
+    require_planning_limits(tuple(values))
+    values[index] = 1350.001
+    with pytest.raises(SystemExit, match="reviewed current planning ceiling"):
         require_planning_limits(tuple(values))
+
+
+@pytest.mark.parametrize(
+    "values", [(0.0,) * 9, (0.0,) * 11, (float("nan"),) * 10, (float("inf"),) * 10, (-1.0,) * 10]
+)
+def test_current_planning_ceiling_rejects_incomplete_or_invalid_scores(
+    values: tuple[float, ...],
+) -> None:
+    from scripts.current_shard_assignment import require_planning_limits
+
+    with pytest.raises(SystemExit, match="reviewed current planning ceiling"):
+        require_planning_limits(values)
+
+
+@pytest.mark.parametrize(
+    "change", ["version", "ceiling_seconds", "planning_gap_to_1620_second_approval", "missing"]
+)
+def test_current_planning_policy_requires_the_reviewed_descriptor(
+    tmp_path: Path, change: str
+) -> None:
+    descriptor = json.loads((DIRECTORY / compatibility.FILENAME).read_bytes())
+    if change == "missing":
+        del descriptor["planning_policy"]
+    elif change == "version":
+        descriptor["planning_policy"][change] = "unreviewed"
+    else:
+        descriptor["planning_policy"][change] += 1
+    (tmp_path / compatibility.FILENAME).write_text(json.dumps(descriptor))
+    with pytest.raises(SystemExit, match=r"runtime compatibility|current planning policy"):
+        compatibility.plan(ROOT, tmp_path, {})
+
+
+def test_current_planning_amendment_retains_original_historical_ceilings() -> None:
+    from scripts.extended_shard_allocation import HISTORICAL_CEILING, LATEST_CEILING, STRESS_CEILING
+
+    assert (HISTORICAL_CEILING, STRESS_CEILING, LATEST_CEILING) == (1076, 1054, 1050)
 
 
 def test_source_bootstrap_preserves_history_for_shared_historical_clones(tmp_path: Path) -> None:
@@ -453,6 +504,12 @@ def test_source_bootstrap_preserves_history_for_shared_historical_clones(tmp_pat
         "allocation-scope.json": {"source": source},
         "current-runtime-compatibility.json": {"historical_revision": current},
         "current-covered-baseline.json": {"source_head": current},
+        "current-native-serial-role.json": {
+            "observations": {
+                "standalone": {"source_head": producer},
+                "with_mirror": {"source_head": historical_tip},
+            }
+        },
     }.items():
         (directory / name).write_text(json.dumps(record))
     subprocess.run(
@@ -472,3 +529,318 @@ def test_source_bootstrap_preserves_history_for_shared_historical_clones(tmp_pat
     assert git(borrowed, "rev-parse", "HEAD") == anchor
     assert git(checkout, "rev-parse", "--is-shallow-repository") == "false"
     assert git(checkout, "cat-file", "-t", producer) == "commit"
+
+
+def test_native_serial_role_preserves_complete_phases_and_measurement_scope() -> None:
+    from scripts.current_native_serial_role import load_native_serial_role
+
+    descriptor = json.loads((DIRECTORY / compatibility.FILENAME).read_bytes())
+    nodes = frozenset(
+        node
+        for node in compatibility.NEW_NODES
+        if node.startswith(compatibility.NATIVE_PREFIX_OWNER + "::")
+    )
+    role = load_native_serial_role(ROOT, DIRECTORY, descriptor["native_serial_role"], nodes)
+    assert role.seconds == 444.5446871509996
+    assert role.with_mirror_seconds == 389.046601379
+    assert role.metadata["worker_count"] == 1
+    assert len(cast(list[str], role.metadata["cases"])) == 6
+    observations = cast(dict[str, dict[str, object]], role.metadata["observations"])
+    assert role.seconds < cast(float, observations["standalone"]["worker_elapsed_seconds"])
+    assert "not the measured global source" in str(
+        observations["standalone"]["source_applicability"]
+    )
+    assert len(cast(list[str], observations["with_mirror"]["cases"])) == 7
+    assert observations["with_mirror"]["source_binding_count"] == 391
+    assert observations["standalone"]["source_binding_count"] == 365
+    assert "not hosted observations" in str(role.metadata["role"])
+    assert (
+        hashlib.sha256((DIRECTORY / compatibility.BASELINE_FILE).read_bytes()).hexdigest()
+        == "7acac7eb2f8986bfd8d23edb2e3a61ac19048343491fb5f8e07c9d6ae1677508"
+    )
+
+
+@pytest.mark.parametrize(
+    "change",
+    [
+        "raw_hash",
+        "producer",
+        "source",
+        "movement_helper",
+        "sequential_helper",
+        "worker_count",
+        "phase_missing",
+        "phase_duplicate",
+        "phase_failure",
+        "approval",
+        "runner",
+        "junit_skip",
+    ],
+)
+def test_native_serial_role_rejects_incomplete_or_different_observation(
+    tmp_path: Path, change: str
+) -> None:
+    from scripts.current_native_serial_role import FILENAME, load_native_serial_role
+
+    document = json.loads((DIRECTORY / FILENAME).read_bytes())
+    record = document["observations"]["standalone"]
+    if change == "raw_hash":
+        record["raw"]["worker"]["sha256"] = "0" * 64
+    elif change == "producer":
+        record["source_head"] = HISTORICAL_REVISION
+    elif change in {"source", "movement_helper", "sequential_helper"}:
+        owner = {
+            "source": "tests/support/cavalcade_v995.py",
+            "movement_helper": "tests/movement_submission_helpers.py",
+            "sequential_helper": "tests/sequential_translation_helpers.py",
+        }[change]
+        record["source_files"][owner] = "0" * 64
+    elif change == "junit_skip":
+        raw = record["raw"]["junit"]
+        junit = ET.fromstring(raw["text"])
+        ET.SubElement(next(junit.iter("testcase")), "skipped")
+        raw["text"] = ET.tostring(junit, encoding="unicode")
+        raw["sha256"] = hashlib.sha256(raw["text"].encode()).hexdigest()
+    else:
+        name = (
+            "supervisor" if change == "approval" else "command" if change == "runner" else "worker"
+        )
+        raw = record["raw"][name]
+        value = json.loads(raw["text"])
+        if change == "worker_count":
+            value["worker_count"] = "4"
+        elif change == "phase_missing":
+            value["reports"].pop()
+        elif change == "phase_duplicate":
+            value["reports"][-1] = value["reports"][0]
+        elif change == "phase_failure":
+            value["reports"][0]["outcome"] = "failed"
+        elif change == "approval":
+            value["approved"] = False
+        else:
+            value["inner_runner"]["max_seconds"] = 121
+        raw["text"] = json.dumps(value)
+        raw["sha256"] = hashlib.sha256(raw["text"].encode()).hexdigest()
+        if change.startswith("phase_"):
+            controller = json.loads(record["raw"]["controller"]["text"])
+            controller["reports"] = value["reports"]
+            record["raw"]["controller"]["text"] = json.dumps(controller)
+            record["raw"]["controller"]["sha256"] = hashlib.sha256(
+                json.dumps(controller).encode()
+            ).hexdigest()
+    path = tmp_path / FILENAME
+    path.write_text(json.dumps(document))
+    reference = {"file": FILENAME, "sha256": hashlib.sha256(path.read_bytes()).hexdigest()}
+    nodes = frozenset(
+        node
+        for node in compatibility.NEW_NODES
+        if node.startswith(compatibility.NATIVE_PREFIX_OWNER + "::")
+    )
+    with pytest.raises(SystemExit):
+        load_native_serial_role(ROOT, tmp_path, reference, nodes)
+
+
+def test_native_serial_score_uses_complete_role_once_without_old_case_duplication() -> None:
+    mirror = sharding.SERIAL_BEHAVIORAL_CASE
+    native = compatibility.NATIVE_PREFIX_OWNER
+    old = "tests/fake.py::old"
+    costs = {old: 3.0, mirror: 11.0, native + "::one": 100.0, native + "::two": 200.0}
+    cohort = Cohort("historical", {old: 3.0, mirror: 11.0}, {}, {}, 2.0, 9.0)
+    assert (
+        compatibility.derived_score(
+            ("tests/fake.py", mirror, native),
+            costs,
+            costs,
+            cohort,
+            native_serial_seconds=17.0,
+            native_with_mirror_seconds=13.0,
+        )
+        == 36.0
+    )
+    with pytest.raises(SystemExit, match="complete role observation"):
+        compatibility.derived_score((mirror, native), costs, costs, cohort)
+    assert (
+        compatibility.derived_score((native,), costs, costs, cohort, native_serial_seconds=17.0)
+        == 26.0
+    )
+    assert costs[native + "::one"] == 100.0
+    assert costs[native + "::two"] == 200.0
+
+
+def test_current_execution_summary_discloses_native_serial_accounting(
+    admitted: tuple[dict[str, object], compatibility.Plan],
+) -> None:
+    summary, plan = admitted
+    execution = cast(dict[str, object], summary["execution_model"])
+    native = cast(dict[str, object], plan.metadata["native_serial_role"])
+    assert execution["serial_selectors"] == [
+        sharding.SERIAL_BEHAVIORAL_CASE,
+        compatibility.NATIVE_PREFIX_OWNER,
+    ]
+    assert set(cast(list[str], execution["serial_cases"])) == {
+        sharding.SERIAL_BEHAVIORAL_CASE,
+        *cast(list[str], native["cases"]),
+    }
+    selected = (
+        "with_mirror"
+        if sharding.SERIAL_BEHAVIORAL_CASE
+        in next(group for group in plan.groups if compatibility.NATIVE_PREFIX_OWNER in group)
+        else "standalone"
+    )
+    assert execution["native_selected_context"] == selected
+    assert execution["native_selected_phase_seconds"] == native[selected + "_native_phase_seconds"]
+    assert "assignment_wall_lower_bound_seconds" not in execution
+    assert "assignment_wall_planning_estimate_seconds" in execution
+    assert "not a physical lower bound" in str(execution["estimate_role"])
+    assert "historical worker-chunk projection" in str(plan.metadata["partial_raw_role"])
+
+
+@pytest.mark.parametrize(("parallel_residual", "mirror_residual"), [(2.0, 9.0), (9.0, 2.0)])
+def test_native_serial_only_lane_charges_the_larger_existing_role_residual(
+    parallel_residual: float, mirror_residual: float
+) -> None:
+    native = compatibility.NATIVE_PREFIX_OWNER
+    old = "tests/fake.py::old"
+    mirror = sharding.SERIAL_BEHAVIORAL_CASE
+    costs = {old: 3.0, mirror: 11.0, native + "::one": 100.0, native + "::two": 200.0}
+    cohort = Cohort(
+        "historical", {old: 3.0, mirror: 11.0}, {}, {}, parallel_residual, mirror_residual
+    )
+    assert compatibility.derived_score(
+        ("tests/fake.py", native), costs, costs, cohort, native_serial_seconds=17.0
+    ) == 3.0 + 17.0 + max(parallel_residual, mirror_residual)
+    assert (
+        compatibility.derived_score(
+            ("tests/fake.py", mirror, native),
+            costs,
+            costs,
+            cohort,
+            native_serial_seconds=17.0,
+            native_with_mirror_seconds=13.0,
+        )
+        == 3.0 + 11.0 + 13.0 + mirror_residual
+    )
+    assert (
+        compatibility.derived_score(("tests/fake.py",), costs, costs, cohort)
+        == 3.0 + parallel_residual
+    )
+
+
+@pytest.mark.parametrize("combined_seconds", [13.0, 23.0])
+def test_native_serial_context_selects_observed_combined_even_when_slower(
+    combined_seconds: float,
+) -> None:
+    mirror, native = sharding.SERIAL_BEHAVIORAL_CASE, compatibility.NATIVE_PREFIX_OWNER
+    costs = {mirror: 11.0, native + "::one": 100.0}
+    cohort = Cohort("historical", {mirror: 11.0}, {}, {}, 2.0, 9.0)
+    assert (
+        compatibility.derived_score(
+            (mirror, native),
+            costs,
+            costs,
+            cohort,
+            native_serial_seconds=17.0,
+            native_with_mirror_seconds=combined_seconds,
+        )
+        == 11.0 + combined_seconds + 9.0
+    )
+    assert (
+        compatibility.derived_score(
+            (native,),
+            costs,
+            costs,
+            cohort,
+            native_serial_seconds=17.0,
+            native_with_mirror_seconds=combined_seconds,
+        )
+        == 17.0 + 9.0
+    )
+    with pytest.raises(SystemExit, match="this context"):
+        compatibility.derived_score(
+            (mirror, native), costs, costs, cohort, native_serial_seconds=17.0
+        )
+    with pytest.raises(SystemExit, match="this context"):
+        compatibility.derived_score(
+            (native,), costs, costs, cohort, native_with_mirror_seconds=combined_seconds
+        )
+
+
+@pytest.mark.parametrize(
+    "change",
+    [
+        "missing_context",
+        "duplicate_producer",
+        "wrong_order",
+        "missing_phase",
+        "failed_phase",
+        "legacy_binding",
+        "import_binding",
+        "full_map",
+        "admission",
+        "progress",
+    ],
+)
+def test_native_serial_combined_context_rejects_wrong_or_incomplete_evidence(
+    tmp_path: Path, change: str
+) -> None:
+    from scripts.current_native_serial_role import FILENAME, PRODUCER, load_native_serial_role
+
+    document = json.loads((DIRECTORY / FILENAME).read_bytes())
+    record = document["observations"]["with_mirror"]
+    if change == "missing_context":
+        del document["observations"]["with_mirror"]
+    elif change == "duplicate_producer":
+        record["source_head"] = PRODUCER
+    elif change in {"legacy_binding", "import_binding"}:
+        name = (
+            "tests/factions/chaos_daemons/integration/test_cavalcade_v995_roster.py"
+            if change == "legacy_binding"
+            else "tests/support/faction_batch01.py"
+        )
+        record["source_files"][name] = "0" * 64
+    else:
+        name = {
+            "full_map": "source_preflight",
+            "admission": "admission",
+            "progress": "progress",
+        }.get(change, "worker")
+        raw = (
+            record["raw"][name]
+            if name == "worker"
+            else document["source_evidence"]["with_mirror"][name]
+        )
+        if change == "progress":
+            events = [json.loads(line) for line in raw["text"].splitlines()]
+            events = [event for event in events if event.get("event") != "session_finish"]
+            raw["text"] = "\n".join(json.dumps(event) for event in events) + "\n"
+        else:
+            value = json.loads(raw["text"])
+            if change == "wrong_order":
+                value["collected_nodeids"].reverse()
+            elif change == "missing_phase":
+                value["reports"].pop()
+            elif change == "failed_phase":
+                value["reports"][0]["outcome"] = "failed"
+            elif change == "full_map":
+                value["inputs"].pop(next(iter(value["inputs"])))
+            else:
+                value["case_order"].reverse()
+            raw["text"] = json.dumps(value)
+            if change in {"missing_phase", "failed_phase"}:
+                controller = json.loads(record["raw"]["controller"]["text"])
+                controller["reports"] = value["reports"]
+                record["raw"]["controller"]["text"] = json.dumps(controller)
+                record["raw"]["controller"]["sha256"] = hashlib.sha256(
+                    json.dumps(controller).encode()
+                ).hexdigest()
+        raw["sha256"] = hashlib.sha256(raw["text"].encode()).hexdigest()
+    path = tmp_path / FILENAME
+    path.write_text(json.dumps(document))
+    reference = {"file": FILENAME, "sha256": hashlib.sha256(path.read_bytes()).hexdigest()}
+    nodes = frozenset(
+        node
+        for node in compatibility.NEW_NODES
+        if node.startswith(compatibility.NATIVE_PREFIX_OWNER + "::")
+    )
+    with pytest.raises(SystemExit):
+        load_native_serial_role(ROOT, tmp_path, reference, nodes)

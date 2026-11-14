@@ -47,12 +47,24 @@ fi
 isolated_status=0
 parallel_timing_dir="$TEST_TIMING_DIR"
 isolated_case="tests/factions/chaos_daemons/integration/test_cavalcade_v995_roster.py::test_exact_mirror_deploys_all_78_models_and_replays_to_battle"
+isolated_module="tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py"
+isolated_selectors=()
+parallel_paths=()
+for selector in "${shard_paths[@]}"; do
+  if [[ "$selector" == "$isolated_case" ]]; then
+    isolated_selectors=("$selector" "${isolated_selectors[@]}")
+  elif [[ "$selector" == "$isolated_module" ]]; then
+    isolated_selectors+=("$selector")
+  else
+    parallel_paths+=("$selector")
+  fi
+done
 isolation_args=(--deselect "$isolated_case")
-if grep -Fxq "$isolated_case" "$SHARD_MANIFEST"; then
-  # Keep the bounded success fixture separate from concurrent coverage
-  # work, including when refreshed costs move it to another shard.
+if (( ${#isolated_selectors[@]} )); then
+  # Keep bounded full-roster setup separate from concurrent coverage work.
+  # The native module shares its ordinary setup checkpoint in this one worker.
   if TEST_TIMING_DIR="$TEST_TIMING_DIR/isolated-mirror" \
-    uv run --no-sync python -m pytest "$isolated_case" \
+    uv run --no-sync python -m pytest "${isolated_selectors[@]}" \
         "${source_index_args[@]}" \
       -n 1 \
       --dist=worksteal \
@@ -65,7 +77,7 @@ if grep -Fxq "$isolated_case" "$SHARD_MANIFEST"; then
       --durations=100 \
       --durations-min=0.1 \
       --junitxml="reports/behavior-shard-${SHARD_ID}-isolated-mirror.xml"; then
-    echo "Isolated mirror test passed."
+    echo "Isolated covered setup cases passed."
   else
     isolated_status=$?
   fi
@@ -74,23 +86,25 @@ if grep -Fxq "$isolated_case" "$SHARD_MANIFEST"; then
   finish_source_index_build
 fi
 parallel_status=0
-if TEST_TIMING_DIR="$parallel_timing_dir" \
-  uv run --no-sync python -m pytest "${shard_paths[@]}" "${isolation_args[@]}" \
-  "${source_index_args[@]}" \
-  -n auto \
-  --dist=worksteal \
-  -o faulthandler_timeout=180 \
-  -o faulthandler_exit_on_timeout=false \
-  --selected-army-source-index="$SELECTED_ARMY_SOURCE_INDEX" \
-  --cov=warhammer40k_core \
-  --cov-report= \
-  --cov-fail-under=0 \
-  --durations=100 \
-  --durations-min=0.1 \
-  --junitxml="reports/behavior-shard-${SHARD_ID}.xml"; then
-  echo "Parallel shard cases passed."
-else
-  parallel_status=$?
+if (( ${#parallel_paths[@]} )); then
+  if TEST_TIMING_DIR="$parallel_timing_dir" \
+    uv run --no-sync python -m pytest "${parallel_paths[@]}" "${isolation_args[@]}" \
+    "${source_index_args[@]}" \
+    -n auto \
+    --dist=worksteal \
+    -o faulthandler_timeout=180 \
+    -o faulthandler_exit_on_timeout=false \
+    --selected-army-source-index="$SELECTED_ARMY_SOURCE_INDEX" \
+    --cov=warhammer40k_core \
+    --cov-report= \
+    --cov-fail-under=0 \
+    --durations=100 \
+    --durations-min=0.1 \
+    --junitxml="reports/behavior-shard-${SHARD_ID}.xml"; then
+    echo "Parallel shard cases passed."
+  else
+    parallel_status=$?
+  fi
 fi
 finish_source_index_build
 if (( isolated_status != 0 || parallel_status != 0 )); then
