@@ -264,3 +264,29 @@ cases, twelve shards, four hosted workers, local 32-worker qualification, 67%
 full-package branch coverage, exact 260 deferred quality cases, mirror 120-second
 bound, serial performance 180-second bound and quality 600-second limits. Fresh
 exact-head local and hosted gates and both independent reviews remain required.
+
+## Current planning amendment - 14 November 2026
+
+The owner authorized a bounded adjustment to empirical current scheduling estimates
+instead of prolonged marginal allocation tuning. The current compatibility descriptor
+now declares `native-serial-current-planning-v1`: all ten current projections use a
+1,350-second planning ceiling, rounded to a 30-second boundary, while retaining the
+existing twelve-shard assignment. The 270-second gap to actual approval is a planning
+allowance, not guaranteed runtime headroom or a passing timing result. The projections
+combine historical case, setup and role-residual observations with the separately
+source-bound local native serial context; they are neither physical lower bounds nor
+new hosted measurements.
+
+This amendment supersedes only the requirement that the current derived assignment
+use the original 1,076 / 1,054 / 1,050 planning budgets. Historical constants, allocator
+behavior, source snapshots, costs, receipts and outcomes remain unchanged, as do the
+maximum-of-current-and-historical dispatch hints. The complete current baseline and
+both native serial observations retain their original producers and contexts.
+
+Actual covered execution must still pass within 1,620 seconds inclusive; timing alone
+terminates the owned process group only above 1,800 seconds. Keep all 6,331 behavioral
+cases, 508 selectors, twelve shards, four hosted workers, local 32-worker qualification,
+67% full-package branch coverage, the unchanged 120-second bounded runner, 180-second
+serial performance command and 600-second quality limits. All required exact-head
+local and hosted gates and independent reviews remain mandatory. This planning change
+does not approve a workload, reclassify any prior failure or establish hosted robustness.

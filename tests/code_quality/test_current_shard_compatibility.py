@@ -86,9 +86,19 @@ def test_current_raw_projections_keep_missing_observations_null(
             raw = cast(dict[str, object], row[key])
             assert (raw["full_raw_role_score"] is None) == bool(raw["missing_nodes"])
         scores = cast(list[float], row["derived_historical_plus_current_additions"])
-        assert max(scores[:-2]) <= 1076
-        assert scores[-2] <= 1054
-        assert scores[-1] <= 1050
+        assert len(scores) == 10
+        assert max(scores) <= 1350
+    assert plan.metadata["retained_historical_planning_ceilings_seconds"] == [1076] * 8 + [
+        1054,
+        1050,
+    ]
+    assert plan.metadata["current_planning_policy"] == {
+        "version": "native-serial-current-planning-v1",
+        "role": "Current empirical projection guard; not observed completion or timing approval",
+        "ceiling_seconds": 1350,
+        "rounding_seconds": 30,
+        "planning_gap_to_1620_second_approval": 270,
+    }
     assert (
         plan.metadata["historical_scoped_allocation"]
         == json.loads((historical.directory / "durations.json").read_bytes())["scoped_allocation"]
@@ -366,16 +376,52 @@ def test_current_assignment_rejects_tampered_data(
         compatibility.plan(ROOT, tmp_path, sharding.summary_case_seconds(summary))
 
 
-@pytest.mark.parametrize(
-    ("index", "seconds"), [(0, 1076.001), (8, 1054.001), (9, 1050.001), (0, float("nan"))]
-)
-def test_each_original_planning_ceiling_remains_mandatory(index: int, seconds: float) -> None:
+@pytest.mark.parametrize("index", range(10))
+def test_current_planning_ceiling_has_an_inclusive_exact_boundary(index: int) -> None:
     from scripts.current_shard_assignment import require_planning_limits
 
     values = [0.0] * 10
-    values[index] = seconds
-    with pytest.raises(SystemExit, match="unchanged planning ceilings"):
+    values[index] = 1350.0
+    require_planning_limits(tuple(values))
+    values[index] = 1350.001
+    with pytest.raises(SystemExit, match="reviewed current planning ceiling"):
         require_planning_limits(tuple(values))
+
+
+@pytest.mark.parametrize(
+    "values", [(0.0,) * 9, (0.0,) * 11, (float("nan"),) * 10, (float("inf"),) * 10, (-1.0,) * 10]
+)
+def test_current_planning_ceiling_rejects_incomplete_or_invalid_scores(
+    values: tuple[float, ...],
+) -> None:
+    from scripts.current_shard_assignment import require_planning_limits
+
+    with pytest.raises(SystemExit, match="reviewed current planning ceiling"):
+        require_planning_limits(values)
+
+
+@pytest.mark.parametrize(
+    "change", ["version", "ceiling_seconds", "planning_gap_to_1620_second_approval", "missing"]
+)
+def test_current_planning_policy_requires_the_reviewed_descriptor(
+    tmp_path: Path, change: str
+) -> None:
+    descriptor = json.loads((DIRECTORY / compatibility.FILENAME).read_bytes())
+    if change == "missing":
+        del descriptor["planning_policy"]
+    elif change == "version":
+        descriptor["planning_policy"][change] = "unreviewed"
+    else:
+        descriptor["planning_policy"][change] += 1
+    (tmp_path / compatibility.FILENAME).write_text(json.dumps(descriptor))
+    with pytest.raises(SystemExit, match=r"runtime compatibility|current planning policy"):
+        compatibility.plan(ROOT, tmp_path, {})
+
+
+def test_current_planning_amendment_retains_original_historical_ceilings() -> None:
+    from scripts.extended_shard_allocation import HISTORICAL_CEILING, LATEST_CEILING, STRESS_CEILING
+
+    assert (HISTORICAL_CEILING, STRESS_CEILING, LATEST_CEILING) == (1076, 1054, 1050)
 
 
 def test_source_bootstrap_preserves_history_for_shared_historical_clones(tmp_path: Path) -> None:

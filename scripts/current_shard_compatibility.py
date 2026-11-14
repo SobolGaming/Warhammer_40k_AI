@@ -37,7 +37,7 @@ if TYPE_CHECKING:
 
 FILENAME = "current-runtime-compatibility.json"
 BASELINE_FILE = "current-covered-baseline.json"
-SCHEMA = "historical-snapshot-current-baseline-v1"
+SCHEMA = "historical-snapshot-current-baseline-v2"
 ROLE = "Derived scheduling only; historical phases and current local observations stay separate"
 
 # Closed inventory for this explicitly reviewed compatibility version.
@@ -312,11 +312,16 @@ def plan(root: Path, directory: Path, cases: dict[str, float]) -> Plan:
             "new_test_sources",
             "assignment",
             "native_serial_role",
+            "planning_policy",
         },
         "runtime compatibility",
     )
+    from scripts.current_shard_assignment import current_planning_policy
+
     if descriptor["schema"] != SCHEMA or descriptor["historical_revision"] != HISTORICAL_REVISION:
         raise SystemExit("Unreviewed scheduling compatibility boundary.")
+    if descriptor["planning_policy"] != current_planning_policy():
+        raise SystemExit("Unreviewed current planning policy.")
     with historical_snapshot(root) as history:
         unchanged_historical_files(directory, history)
         data = _baseline(root, directory, descriptor, history)
@@ -399,6 +404,7 @@ def plan(root: Path, directory: Path, cases: dict[str, float]) -> Plan:
             "current_runtime_fingerprint": descriptor["current_runtime_fingerprint"],
             "baseline": descriptor["baseline"],
             "native_serial_role": native_role.metadata,
+            "current_planning_policy": current_planning_policy(),
             "derived_score_role": (
                 "Historical cohort projection plus unchanged current additions and separately "
                 "measured local native serial role; not observed hosted execution"
@@ -426,9 +432,7 @@ def plan(root: Path, directory: Path, cases: dict[str, float]) -> Plan:
             "historical_scoped_allocation": cast(
                 dict[str, object], read_json(history.directory / "durations.json")
             )["scoped_allocation"],
-            "historical_ceiling_seconds": 1076,
-            "derived_stress_ceiling_seconds": 1054,
-            "latest_historical_ceiling_seconds": 1050,
+            "retained_historical_planning_ceilings_seconds": [1076] * 8 + [1054, 1050],
             "shards": rows,
         }
         return Plan(

@@ -19,5 +19,12 @@
     "tests/rules/section09/test_escape_survivor_persistence.py": "b70029a1609ac6996755d24254744cd3e37af955f81188e5f9062a5afb9c1e68",
     "tests/rules/section11/test_connected_endpoints.py": "78272e696bf5f3d7c977c379efe763fe80211067c06cc6e7d8be61d8c2775591"
   },
-  "schema": "historical-snapshot-current-baseline-v1"
+  "planning_policy": {
+    "ceiling_seconds": 1350,
+    "planning_gap_to_1620_second_approval": 270,
+    "role": "Current empirical projection guard; not observed completion or timing approval",
+    "rounding_seconds": 30,
+    "version": "native-serial-current-planning-v1"
+  },
+  "schema": "historical-snapshot-current-baseline-v2"
 }

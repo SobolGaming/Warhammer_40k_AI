@@ -14,6 +14,19 @@ from scripts.hosted_timing_calibration import _object, read_json
 FILENAME = "current-derived-assignment.json"
 SCHEMA = "reviewed-derived-current-shard-assignment-v1"
 ROLE = "Derived planning assignment only; no new hosted observations or timing qualification"
+CURRENT_PLANNING_CEILING = 1350
+CURRENT_PLANNING_POLICY = "native-serial-current-planning-v1"
+
+
+def current_planning_policy() -> dict[str, object]:
+    """Declare the reviewed current forecast guard separately from execution approval."""
+    return {
+        "version": CURRENT_PLANNING_POLICY,
+        "role": "Current empirical projection guard; not observed completion or timing approval",
+        "ceiling_seconds": CURRENT_PLANNING_CEILING,
+        "rounding_seconds": 30,
+        "planning_gap_to_1620_second_approval": 270,
+    }
 
 
 def load_assignment(
@@ -97,13 +110,11 @@ def load_assignment(
 
 
 def require_planning_limits(values: tuple[float, ...]) -> None:
-    from scripts.extended_shard_allocation import HISTORICAL_CEILING, LATEST_CEILING, STRESS_CEILING
-
     if (
         len(values) != 10
         or any(not math.isfinite(value) or value < 0 for value in values)
-        or max(values[:-2]) > HISTORICAL_CEILING
-        or values[-2] > STRESS_CEILING
-        or values[-1] > LATEST_CEILING
+        or max(values) > CURRENT_PLANNING_CEILING
     ):
-        raise SystemExit("Derived current assignment exceeds unchanged planning ceilings.")
+        raise SystemExit(
+            "Derived current assignment exceeds its reviewed current planning ceiling."
+        )
