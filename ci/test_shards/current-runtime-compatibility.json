@@ -9,11 +9,22 @@
   },
   "current_runtime_fingerprint": "8d7e3355d9db2c9477ba63b752dc1dfa054b5c00583ea467e3fbbc0e21d5638d",
   "historical_revision": "008be8a8cb0b50b232fe022452762b3906489b49",
+  "native_serial_role": {
+    "file": "current-native-serial-role.json",
+    "sha256": "98166b84dcd84b9aedef84ff8280f35c96aebe698d70aa9989354d7b1e4c5bfc"
+  },
   "new_test_sources": {
     "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py": "26467cfb68d1e4464c5f926a1278bd67433f5ac99699ebdc9666deb7ab1255ed",
     "tests/rules/section03/test_terrain_path_preparation.py": "869ce37ba5d43d7a1c5558c94fceaf33eb81bfff62c2e5f13019551f2c071438",
     "tests/rules/section09/test_escape_survivor_persistence.py": "b70029a1609ac6996755d24254744cd3e37af955f81188e5f9062a5afb9c1e68",
     "tests/rules/section11/test_connected_endpoints.py": "78272e696bf5f3d7c977c379efe763fe80211067c06cc6e7d8be61d8c2775591"
   },
-  "schema": "historical-snapshot-current-baseline-v1"
+  "planning_policy": {
+    "ceiling_seconds": 1350,
+    "planning_gap_to_1620_second_approval": 270,
+    "role": "Current empirical projection guard; not observed completion or timing approval",
+    "rounding_seconds": 30,
+    "version": "native-serial-current-planning-v1"
+  },
+  "schema": "historical-snapshot-current-baseline-v2"
 }

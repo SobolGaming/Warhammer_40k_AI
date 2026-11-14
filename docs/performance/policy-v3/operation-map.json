@@ -35870,7 +35870,9 @@
         "ci/test_shards/current-covered-baseline.json",
         "ci/test_shards/current-runtime-compatibility.json",
         "ci/test_shards/current-derived-assignment.json",
-        "tests/code_quality/test_current_shard_compatibility.py"
+        "tests/code_quality/test_current_shard_compatibility.py",
+        "scripts/current_native_serial_role.py",
+        "ci/test_shards/current-native-serial-role.json"
       ],
       "owners": [
         "*"
