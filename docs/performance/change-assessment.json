@@ -54,6 +54,16 @@
         }
       }
     },
+    "tests/rules/section07/coverage.json": {
+      "before_sha256": "5bbfa1403b06ca46e6c59ef469965bc8cafdaa5f4aef6564919dd1e9ee7ea876",
+      "after_sha256": "b4f665c7c549c74c25d72deafae2fac1d938ae1543656dd2f5b4839125889699",
+      "owners": {
+        "@document": {
+          "before": "5bbfa1403b06ca46e6c59ef469965bc8cafdaa5f4aef6564919dd1e9ee7ea876",
+          "after": "b4f665c7c549c74c25d72deafae2fac1d938ae1543656dd2f5b4839125889699"
+        }
+      }
+    },
     "tests/support/cavalcade_native_approach.py": {
       "before_sha256": null,
       "after_sha256": "12f24c56788071fd34eb81c53f53206288a833621680c6c720f65f525b251648",
@@ -166,6 +176,16 @@
       "selected_families": [],
       "rationale": "Add a separately bounded operator reproducer for a complete legal native mirror, ordinary round-four screen-labelled versus preservation paths, actual B response, read-only range/visibility/charge-target audits and exact persistence/replay. No production algorithm or existing measured workload is changed.",
       "source_obligation": "Retain all 78 models, actual source-backed equipment, original seed and deployment; preserve full PathWitness paths and rejected attempts through ordinary decisions. Distinguish native target eligibility from an accepted charge path or combat outcome.",
+      "unchanged_work": "The engine, source catalog, RNG, geometry solvers, serializers and replay authority are unchanged. Existing six-case native serial owner and source closure, all case/shard inventories, scheduling evidence, 67% full-package branch floor, twelve shards, 120-second mirror, 180-second smoke, 600-second quality and 1620/strictly-over-1800 covered limits remain unchanged. The new uncollected operator helpers have no historical benchmark family and assert no speedup, useful screen or full-game certification."
+    },
+    "tests/rules/section07/coverage.json": {
+      "category": "measured_workload",
+      "operations": [
+        "qualification40-exact-b6886d3bc2fb1ca4"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh only the current README authentication pin after the documented native operator addition. Preserve every historical source hash, semantic assertion and behavioral case; no gameplay work or runtime algorithm changes.",
+      "source_obligation": "Authenticate the actual canonical Git README bytes while retaining all other section07 source, obligation and assertion commitments unchanged.",
       "unchanged_work": "The engine, source catalog, RNG, geometry solvers, serializers and replay authority are unchanged. Existing six-case native serial owner and source closure, all case/shard inventories, scheduling evidence, 67% full-package branch floor, twelve shards, 120-second mirror, 180-second smoke, 600-second quality and 1620/strictly-over-1800 covered limits remain unchanged. The new uncollected operator helpers have no historical benchmark family and assert no speedup, useful screen or full-game certification."
     },
     "tests/support/cavalcade_native_approach.py": {
