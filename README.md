@@ -61,6 +61,16 @@ is zero. The historical branches start with different RNG states, so that damage
 difference does not establish an S benefit. This retained operator evidence adds
 no runtime admission or learning eligibility; Stage 2 remains incomplete.
 
+The separate [native round-four operator recipe](docs/AI_POLICY_INTERFACE.md#native-round-four-decision-point-and-paired-response)
+retains both complete legal 2,000-point Daemons rosters and actual equipment. Its
+ordinary approach preserves rejected paths, then compares S remaining stationary
+with a witnessed Nurglings move from one pre-action checkpoint. Both forks use
+the same Bloodcrusher response and stop before B4's charge selection. The
+reproducer audits B's actual charge-target eligibility and E's range and independent
+visibility. Common and both endpoints pass exact persistence/replay; independent
+E visibility remains incomplete. No native combat, useful screen,
+E attack or learning result is claimed.
+
 ## 2. Non-negotiable invariants
 
 These rules are enforced from the first commit.

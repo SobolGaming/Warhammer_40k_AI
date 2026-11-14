@@ -1,290 +1,128 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "8950ffa4bbac05eab6b6dd4e1e59475dcbe8f53d",
+  "base": "a8b19b16dccb88c43d0e1ae72be186b365bd9d79",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:8d7e3355d9db2c9477ba63b752dc1dfa054b5c00583ea467e3fbbc0e21d5638d",
-  "operation_map_sha256": "6d82638e100dedacd0f8e10712d3673c90459030caa87eabe7e07fcf08ed4dcd",
+  "operation_map_sha256": "ef82e108ec4b9b33c4e216c3a7fb997569e621dd10f82d96426bfeb39ef2ce39",
   "changes": {
     "README.md": {
-      "before_sha256": "03e76b093cf675610a36bd3ce631264cb6b1757d48965edf657c159e97c06acf",
-      "after_sha256": "42740012f27ca8b55306e3e405c1aea5fae6fa21f5dbcfe0cc27ef50426dd7a7",
+      "before_sha256": "42740012f27ca8b55306e3e405c1aea5fae6fa21f5dbcfe0cc27ef50426dd7a7",
+      "after_sha256": "171389a51063965adb6687b5f0c43c1238d96d2483acb51835eb1b583ce10e2c",
       "owners": {
         "@document": {
-          "before": "03e76b093cf675610a36bd3ce631264cb6b1757d48965edf657c159e97c06acf",
-          "after": "42740012f27ca8b55306e3e405c1aea5fae6fa21f5dbcfe0cc27ef50426dd7a7"
+          "before": "42740012f27ca8b55306e3e405c1aea5fae6fa21f5dbcfe0cc27ef50426dd7a7",
+          "after": "171389a51063965adb6687b5f0c43c1238d96d2483acb51835eb1b583ce10e2c"
         }
       }
     },
-    "ci/quality_shards/all.txt": {
-      "before_sha256": "47422221019fe8122ca38ea333dcdf7bc55b0deb5185950c3bcfd725a1db5b73",
-      "after_sha256": "4c8684ec6ed70ed2edac193d63d2b3f09eda88f107434c46b1a8ada940d3a21f",
+    "docs/AI_IMPLEMENTATION_PLAN.md": {
+      "before_sha256": "7c111ccc6afc10c26baa3d913736502ecf32f8e2a1d26eb2aff5fa1a6e4be872",
+      "after_sha256": "cfbc8118a9a1f96d31f28648a64cf22f42bc628b4b8e0fcaf721f04aa123abc9",
       "owners": {
         "@document": {
-          "before": "47422221019fe8122ca38ea333dcdf7bc55b0deb5185950c3bcfd725a1db5b73",
-          "after": "4c8684ec6ed70ed2edac193d63d2b3f09eda88f107434c46b1a8ada940d3a21f"
+          "before": "7c111ccc6afc10c26baa3d913736502ecf32f8e2a1d26eb2aff5fa1a6e4be872",
+          "after": "cfbc8118a9a1f96d31f28648a64cf22f42bc628b4b8e0fcaf721f04aa123abc9"
         }
       }
     },
-    "ci/quality_shards/shard-3.txt": {
-      "before_sha256": "30711fc493902820334066b4a6d1d348aef19794889ff6b519e1c4e2f16ba68b",
-      "after_sha256": "661d93d5715896fddb49a4086799d5e28c44cdbe3fd234355a99240875ac5aa5",
+    "docs/AI_POLICY_INTERFACE.md": {
+      "before_sha256": "8919231d9ecd774047df6886ef0a5752c9f8ed858e030e86c67703fbd893d788",
+      "after_sha256": "c16f94f78a6c7df6e1a83c0cb17b350aad2dc705d797f6fe41137f5062a8ae34",
       "owners": {
         "@document": {
-          "before": "30711fc493902820334066b4a6d1d348aef19794889ff6b519e1c4e2f16ba68b",
-          "after": "661d93d5715896fddb49a4086799d5e28c44cdbe3fd234355a99240875ac5aa5"
-        }
-      }
-    },
-    "ci/quality_shards/shard-4.txt": {
-      "before_sha256": "d19003159c624f903df9632243735bea7a2b8b1f6eb717652bbf1fff6996748e",
-      "after_sha256": "54d54ae75dae383e03efb755f8ffd73a9c7b34a962c32025db950d216491ad40",
-      "owners": {
-        "@document": {
-          "before": "d19003159c624f903df9632243735bea7a2b8b1f6eb717652bbf1fff6996748e",
-          "after": "54d54ae75dae383e03efb755f8ffd73a9c7b34a962c32025db950d216491ad40"
-        }
-      }
-    },
-    "ci/test_shards/current-native-serial-role.json": {
-      "before_sha256": null,
-      "after_sha256": "98166b84dcd84b9aedef84ff8280f35c96aebe698d70aa9989354d7b1e4c5bfc",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "98166b84dcd84b9aedef84ff8280f35c96aebe698d70aa9989354d7b1e4c5bfc"
-        }
-      }
-    },
-    "ci/test_shards/current-runtime-compatibility.json": {
-      "before_sha256": "718f182da6761aed678fff4df700b4a1d688319e29aa230f3cb4012525c5e925",
-      "after_sha256": "419b012be48b93db12e11f84c23d136a4edbf9b2a713d93a0da1d9f488be3d4e",
-      "owners": {
-        "@document": {
-          "before": "718f182da6761aed678fff4df700b4a1d688319e29aa230f3cb4012525c5e925",
-          "after": "419b012be48b93db12e11f84c23d136a4edbf9b2a713d93a0da1d9f488be3d4e"
-        }
-      }
-    },
-    "ci/test_shards/durations.json": {
-      "before_sha256": "fa21735e08d12e96d70992a515a7e56b31a32d62fe1f7f8b47acb36a075d3227",
-      "after_sha256": "9719ac83aab425adeb2b47e4a1a2aa0c150f15bea423166277e88b8e3d83f2cf",
-      "owners": {
-        "@document": {
-          "before": "fa21735e08d12e96d70992a515a7e56b31a32d62fe1f7f8b47acb36a075d3227",
-          "after": "9719ac83aab425adeb2b47e4a1a2aa0c150f15bea423166277e88b8e3d83f2cf"
+          "before": "8919231d9ecd774047df6886ef0a5752c9f8ed858e030e86c67703fbd893d788",
+          "after": "c16f94f78a6c7df6e1a83c0cb17b350aad2dc705d797f6fe41137f5062a8ae34"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
-      "before_sha256": "f3067266c4c6fc61007087599419ac12a7c627ec262fc75e10c6c5f9311952a0",
-      "after_sha256": "d98ad28d6d8f129744864236442ac465d5371f8d0ba58ac692ea98de98c00b51",
+      "before_sha256": "d98ad28d6d8f129744864236442ac465d5371f8d0ba58ac692ea98de98c00b51",
+      "after_sha256": "a5537ac57daa8f8041f745d463318bb0f21689cfebffb9dec29c9e5dd8f635a5",
       "owners": {
         "@document": {
-          "before": "f3067266c4c6fc61007087599419ac12a7c627ec262fc75e10c6c5f9311952a0",
-          "after": "d98ad28d6d8f129744864236442ac465d5371f8d0ba58ac692ea98de98c00b51"
-        }
-      }
-    },
-    "docs/SEQUENTIAL_REMEDIATION_REVIEW_POLICY.md": {
-      "before_sha256": "e7f99be9ca127d4de93b3d8c6d8bfd9f06b22dee40388a5048e00e309f70bf63",
-      "after_sha256": "c5228b1ab0c4c40758aa792507723d0ec282b6d009e2e8e1cef093167d9cab21",
-      "owners": {
-        "@document": {
-          "before": "e7f99be9ca127d4de93b3d8c6d8bfd9f06b22dee40388a5048e00e309f70bf63",
-          "after": "c5228b1ab0c4c40758aa792507723d0ec282b6d009e2e8e1cef093167d9cab21"
+          "before": "d98ad28d6d8f129744864236442ac465d5371f8d0ba58ac692ea98de98c00b51",
+          "after": "a5537ac57daa8f8041f745d463318bb0f21689cfebffb9dec29c9e5dd8f635a5"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "e07f540c8ef9f55fe9b3ffcdf28628fdbd420acb6a98c2854d1676b99a18d5ff",
-      "after_sha256": "6fa095a378a8d82974a5657b7217edd21241a650b05ef4234a016f285a5fe05d",
+      "before_sha256": "6fa095a378a8d82974a5657b7217edd21241a650b05ef4234a016f285a5fe05d",
+      "after_sha256": "8c67ee49bf7ad2f3dd8847646107410ebeda1aa657c80d9562ff86db077d4315",
       "owners": {
         "@document": {
-          "before": "e07f540c8ef9f55fe9b3ffcdf28628fdbd420acb6a98c2854d1676b99a18d5ff",
-          "after": "6fa095a378a8d82974a5657b7217edd21241a650b05ef4234a016f285a5fe05d"
+          "before": "6fa095a378a8d82974a5657b7217edd21241a650b05ef4234a016f285a5fe05d",
+          "after": "8c67ee49bf7ad2f3dd8847646107410ebeda1aa657c80d9562ff86db077d4315"
         }
       }
     },
-    "scripts/current_native_serial_role.py": {
+    "tests/support/cavalcade_native_approach.py": {
       "before_sha256": null,
-      "after_sha256": "68a0fec55989f49b2e84d62fa59ade4eb4c577c8c9965cf4d7459baf6441d8ab",
+      "after_sha256": "12f24c56788071fd34eb81c53f53206288a833621680c6c720f65f525b251648",
       "owners": {
         "@module": {
           "before": null,
-          "after": "71ffb9ea62c2a71f5e079379aac3b236b46bf7c54f5c06ad2aab68d33ed7bec2"
+          "after": "d94765bce80b636421abc56e3399e81ec4870b3021eed564b6a8deb70ed10e3a"
         },
-        "NativeSerialRole": {
+        "approach_moves": {
           "before": null,
-          "after": "99ca9e82a57a3f93a01e53640692c431cd2415c710368bfdcc47db803ac9a664"
+          "after": "a6d7d011a0a2aa6da094ccecf0f5596450b2d637922862669ba1d0dd7c89c949"
         },
-        "_observation": {
+        "at_screen_choice": {
           "before": null,
-          "after": "659eb5dfac7fcf1eba72b3d64108a697e90d1c247993a176ad13563cf2e009db"
+          "after": "6abc018d048e53f1570ceb40ccf4e3841a148504031e18669e35fe1e72f97852"
         },
-        "_source_evidence": {
+        "main": {
           "before": null,
-          "after": "a4f1477fb635326dd89eb73523858aece9612a2624f8e8c4c78a195f15d13fe0"
+          "after": "6db2f552b8a7837fcfd84f737fef15d0becbeebd3fa99a3702aa51893893350f"
         },
-        "load_native_serial_role": {
+        "native_producer": {
           "before": null,
-          "after": "2bee03479e2583b510281442a4747b0da9a2f4970501a04f365c0e0427d4310e"
+          "after": "bd6cbb91cd0c9b9a005b77f0d16679c206f1707e237cd7b333030907e3304467"
         },
-        "source_paths": {
+        "reproduce_native_common": {
           "before": null,
-          "after": "3454c7f9cc0f548be7f0b6a4e163f4ce0f8c0091b1377d2965ed02637106093b"
+          "after": "99663fb07098267a076d237f7387680b6addd9437b1b0c6744faa208f2282e72"
+        },
+        "submit_approach_choice": {
+          "before": null,
+          "after": "7b4697f090b53fc009e3fc87bf95b2a49dfebf33b092bcde5dd392f76fea59eb"
         }
       }
     },
-    "scripts/current_shard_assignment.py": {
-      "before_sha256": "305e498bec457d0384d6a7c7002ecf3d45adf374d9419bdd423ec73c11fb6303",
-      "after_sha256": "f727b23af8a6738ecf5fd2e535484e2a0bb1ec41efa5afd6d477a77f641b3fa6",
+    "tests/support/cavalcade_native_qualification.py": {
+      "before_sha256": null,
+      "after_sha256": "ebe53f2aca93e78d751383b1a93187886994e19b06e6b37ef52cdf07b5899659",
       "owners": {
         "@module": {
-          "before": "39c5e24c984e1d212d1a624088fdcd74a4ed7844f22fe19635b21537471d00c8",
-          "after": "58ccad4a43f2475a7d081329e484cba10f5b842061fac911d89e8d002437b1b2"
-        },
-        "current_planning_policy": {
           "before": null,
-          "after": "4bd3701745e7d3cc80255a58111435a26010da83bcfa904b9aa10ab324613da8"
+          "after": "7b64c266a1b302b38b162b9b2cf1075e04681c7976bef30347027bd82e11aae9"
         },
-        "require_planning_limits": {
-          "before": "68dfa212f2e59af74a7703b38f54bac1e2f17b8604c5ef30855484e3401dad60",
-          "after": "8cda05ac00fc277b420dec2a47b8345f02a0e491155aee252f9e8c7db5e09031"
-        }
-      }
-    },
-    "scripts/current_shard_compatibility.py": {
-      "before_sha256": "5523a9b101b91c22b22b3e5c4b4df668e031c5d52566e6eec33c2741a117f390",
-      "after_sha256": "e594d149fa1a039818def672ae5eb1e3750ccde518e774782f8b26a1c37db954",
-      "owners": {
-        "@module": {
-          "before": "26e015e937e0a940eeac9f6ab05d3cf7d2fd12dd270daa51c3c8117e0b1dd9ff",
-          "after": "62d8ff234e9efd2b219dea76c84a452a067915f132127c8786de58086f8ddf30"
-        },
-        "derive_summary": {
-          "before": "105c0b7554537cd4cc15d58ab528f628b5afce562b0139af28aa1ccfbb143042",
-          "after": "5154caac319160f37043377d92b2ba63d6cdd062e4772ea1d7a091c0c424583f"
-        },
-        "derived_score": {
-          "before": "ff255c1024131a15e945b92cf04b3fbf63e23125b46bc7e00752d4794411d205",
-          "after": "63a7a3e29c414a0b02b64943a7685fe5e4f75589a0c723ee557763fbc84c16c9"
-        },
-        "plan": {
-          "before": "cb8a2f377214fe5bcb40b0b4d6cef73feaa3320160df43689f30a4aacc2829ab",
-          "after": "138c3d250108dbd69f1ec95fdf8a390728454b1533ab625603e19a479534268e"
-        }
-      }
-    },
-    "scripts/fetch_scheduling_sources.py": {
-      "before_sha256": "a51182604f10e2edaeff2439f7c69fe8a9b9dc07847a80fa7a1eb7d3178fab47",
-      "after_sha256": "b3204f7bbd2113287d0d5259f50807b13ed76e7519a1171163ab97a09adaf4a4",
-      "owners": {
-        "revisions": {
-          "before": "8b4969504e1db26e3749205cd71cbba2f7abe9e549d4e8bcc548cf548c818daf",
-          "after": "0714c5b2c3dafe23aa104c8801de5e7b5c866d81d859ae1d0c039e3bfc96b869"
-        }
-      }
-    },
-    "scripts/run_behavioral_coverage.sh": {
-      "before_sha256": "613a2c745f7fec571b1437ce5cbf92ea5571cd284769643887f9af31dcb313be",
-      "after_sha256": "4ed1c4fa8288101f1a31cff822fbc901a8ab29566107112cfb683896250c20bc",
-      "owners": {
-        "@document": {
-          "before": "613a2c745f7fec571b1437ce5cbf92ea5571cd284769643887f9af31dcb313be",
-          "after": "4ed1c4fa8288101f1a31cff822fbc901a8ab29566107112cfb683896250c20bc"
-        }
-      }
-    },
-    "tests/code_quality/test_ci_resource_diagnostics.py": {
-      "before_sha256": "1d3ce5b6a770b71b4da1e464ef8048784fce3132b71d4665c59880245e0fb758",
-      "after_sha256": "1731de73328cdf26074891439a69b620a862a37c29a237066ff71f18a185bb64",
-      "owners": {
-        "@module": {
-          "before": "8d3387d92034b5063495aa515163636af403a9f81df05c488669379a49e4cdbd",
-          "after": "14375577caf81c4d7568061a953e60017125f611def9b246799daa192269f92a"
-        },
-        "test_bounded_setup_lane_preserves_selection_coverage_and_failure": {
+        "_visibility_worker": {
           "before": null,
-          "after": "8ee1a50f39fa8d79ea3d6f7d5335f535e838ebbec950c6ad02d614a631849a42"
-        }
-      }
-    },
-    "tests/code_quality/test_current_shard_compatibility.py": {
-      "before_sha256": "23493bb4629a2b0b4ae090b4c0be940618c1c25f0da01c07bf1674015eeb8a19",
-      "after_sha256": "0acce0468596ce40932e3f79bc72277e600e82572aa93a8d16e0f8171314e490",
-      "owners": {
-        "@module": {
-          "before": "54576b3787ce5513a436c73b118735a75494e932c9c2065df13f4ba6712ec3b7",
-          "after": "872b4cd2346333a6d046dab5c4f9a8e32dec6a4db2f1adda8f37e8e4c4df1a96"
+          "after": "1c70f0fe7c9ce2d4f2df6dce38a9a6a487bb8d5662f727b0067a1932f436792c"
         },
-        "test_ci_fetches_only_exact_declared_source_objects": {
-          "before": "3334ef60e3118caa8f89240e89f1ecb285af4d77b9fb46218ed816f1b286ba12",
-          "after": "8412f7d5487bae3842c0304cd21d65e7cce004bad3653afa8021d09d3dfcfd31"
-        },
-        "test_current_execution_summary_discloses_native_serial_accounting": {
+        "_write_json": {
           "before": null,
-          "after": "0341bc4671ce8bd83d5d9246700c70eaa7de694b3699848a4cdc7a246d67ba80"
+          "after": "cab764d0c921cddb8a253ebdf5261e1e0f77cf6719ef5d312c474e37ba88b99c"
         },
-        "test_current_planning_amendment_retains_original_historical_ceilings": {
+        "bounded_native_visibility": {
           "before": null,
-          "after": "f0d8db57e0fc1f6dd0dafe784cebeac912a350be3229c9e9b4bdcc26a55d9335"
+          "after": "ebdc2d875deef6ce6a74b4f0fafa286dd389227085f50b10fbd964a4609c11df"
         },
-        "test_current_planning_ceiling_has_an_inclusive_exact_boundary": {
+        "continue_native_branch": {
           "before": null,
-          "after": "9a344c4bdb0095817f9f3e5ed273c335cbadb1885c01a860f38a4800eef9597d"
+          "after": "f088f32a54fad16a8d9679915458d9802e6b970e30dc2d179c7eba472d70e6e6"
         },
-        "test_current_planning_ceiling_rejects_incomplete_or_invalid_scores": {
+        "native_interaction_audit": {
           "before": null,
-          "after": "0bfdb1cff4c80ab18fe634e246bcc9bfa779f833e644705ba0bede3e6cf24dc9"
+          "after": "add7f18b2b04221aeb9122c3f1c78b43a7e5d6abf3ce62b6b2e5f9226848d343"
         },
-        "test_current_planning_policy_requires_the_reviewed_descriptor": {
+        "qualify_native_checkpoint": {
           "before": null,
-          "after": "2618378c2f2fb26362a23e42c419c8b4cb7e0ee5f64f7cbdf8a727c2903e018e"
+          "after": "f19686635ec31dafc331a2e4e7e12fd65239f53fdcd1e80fb373ccc29d27a551"
         },
-        "test_current_raw_projections_keep_missing_observations_null": {
-          "before": "7c194c3f32b92fc2ba921b0bee21d70d858185f73928f45026160a62a8056a27",
-          "after": "8333e2b94cb776fa2112f8ca0b293b0a00228231a8c82caf0e94676167ded343"
-        },
-        "test_each_original_planning_ceiling_remains_mandatory": {
-          "before": "be0582f8967ae73ae07397b8ca49cf4e454087458bc0654f00c2877bd8f30e51",
-          "after": null
-        },
-        "test_native_serial_combined_context_rejects_wrong_or_incomplete_evidence": {
+        "qualify_native_pair": {
           "before": null,
-          "after": "7622f5bb013513aeb55dafde4e025436ad88ac57b0f5a74f0cae5eddcacac35f"
-        },
-        "test_native_serial_context_selects_observed_combined_even_when_slower": {
-          "before": null,
-          "after": "cbf7c3b11c0bb6178031092ff851c7bc6289b15d213a688b020673b6484e450f"
-        },
-        "test_native_serial_only_lane_charges_the_larger_existing_role_residual": {
-          "before": null,
-          "after": "9d8993ceb6b0043d7f93ca5ccad1c1377172237249107757c2a60fd111e05c00"
-        },
-        "test_native_serial_role_preserves_complete_phases_and_measurement_scope": {
-          "before": null,
-          "after": "d9aebc07e78ef5aff4bf2f1a4737fb342fefddfc98aa16a20638619b5c196a99"
-        },
-        "test_native_serial_role_rejects_incomplete_or_different_observation": {
-          "before": null,
-          "after": "a669e1ebbaef596b4f3ca7dc53e85edd0c46807b2f4092cdeda4bf6ef423a1ec"
-        },
-        "test_native_serial_score_uses_complete_role_once_without_old_case_duplication": {
-          "before": null,
-          "after": "46b90ab36b00b4ea9f0443136595f7729f3f3a9d1b13fdf2bf6baadade203360"
-        },
-        "test_source_bootstrap_preserves_history_for_shared_historical_clones": {
-          "before": "87cc0ed931631c44abcfede292107f4ee1ece01e747231303e2d7003bed1ddeb",
-          "after": "e6d7c1094613956b62d876dbd19eee66c500f45f3c42f75bd925c2aa5d9938f8"
-        }
-      }
-    },
-    "tests/rules/section07/coverage.json": {
-      "before_sha256": "182a245de7a417f48f8eaab6a41d12d67c3901529599ca1ca2b9bd5962156336",
-      "after_sha256": "5bbfa1403b06ca46e6c59ef469965bc8cafdaa5f4aef6564919dd1e9ee7ea876",
-      "owners": {
-        "@document": {
-          "before": "182a245de7a417f48f8eaab6a41d12d67c3901529599ca1ca2b9bd5962156336",
-          "after": "5bbfa1403b06ca46e6c59ef469965bc8cafdaa5f4aef6564919dd1e9ee7ea876"
+          "after": "dc579d5d7a44f0334fc57ad14f6e3234162416130c58e0953ab3b7fadce8ead6"
         }
       }
     }
@@ -294,170 +132,61 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Repair repeated hosted native fixture setup timeouts through the existing serial covered lane. Retain the original assignment with a versioned1350second current empirical planning guard, explicitly authorized for this topology; keep historical forecasts/evidence and all actual execution, coverage and quality gates unchanged.",
-      "source_obligation": "The full legal native roster, equipped profiles,42-decision setup, seed19 and120-second runner bound stay unchanged. The controller must run each admitted selector exactly once, preserve coverage across serial and parallel stages, and propagate either stage failure under the same1620/1800 supervisor.",
-      "unchanged_work": "No engine, rules, decision payload, setup fixture, serializer, replay, RNG, solver, source stats, gameplay horizon or additional selector moves. Original9c full measurements and f900/f8 bounded serial observations retain their producers and contexts. The1350second current planning guard is a forecast allowance, not a measured completion or guarantee; actual1620approval,strictly>1800termination,120inner,180smoke,600quality and67percentfullpackagebranch-enabledcoverage remain unchanged. No tactical benefit or full-game throughput claim."
+      "rationale": "Add a separately bounded operator reproducer for a complete legal native mirror, ordinary round-four screen-labelled versus preservation paths, actual B response, read-only range/visibility/charge-target audits and exact persistence/replay. No production algorithm or existing measured workload is changed.",
+      "source_obligation": "Retain all 78 models, actual source-backed equipment, original seed and deployment; preserve full PathWitness paths and rejected attempts through ordinary decisions. Distinguish native target eligibility from an accepted charge path or combat outcome.",
+      "unchanged_work": "The engine, source catalog, RNG, geometry solvers, serializers and replay authority are unchanged. Existing six-case native serial owner and source closure, all case/shard inventories, scheduling evidence, 67% full-package branch floor, twelve shards, 120-second mirror, 180-second smoke, 600-second quality and 1620/strictly-over-1800 covered limits remain unchanged. The new uncollected operator helpers have no historical benchmark family and assert no speedup, useful screen or full-game certification."
     },
-    "ci/quality_shards/all.txt": {
+    "docs/AI_IMPLEMENTATION_PLAN.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Repair repeated hosted native fixture setup timeouts through the existing serial covered lane. Retain the original assignment with a versioned1350second current empirical planning guard, explicitly authorized for this topology; keep historical forecasts/evidence and all actual execution, coverage and quality gates unchanged.",
-      "source_obligation": "The full legal native roster, equipped profiles,42-decision setup, seed19 and120-second runner bound stay unchanged. The controller must run each admitted selector exactly once, preserve coverage across serial and parallel stages, and propagate either stage failure under the same1620/1800 supervisor.",
-      "unchanged_work": "No engine, rules, decision payload, setup fixture, serializer, replay, RNG, solver, source stats, gameplay horizon or additional selector moves. Original9c full measurements and f900/f8 bounded serial observations retain their producers and contexts. The1350second current planning guard is a forecast allowance, not a measured completion or guarantee; actual1620approval,strictly>1800termination,120inner,180smoke,600quality and67percentfullpackagebranch-enabledcoverage remain unchanged. No tactical benefit or full-game throughput claim."
+      "rationale": "Add a separately bounded operator reproducer for a complete legal native mirror, ordinary round-four screen-labelled versus preservation paths, actual B response, read-only range/visibility/charge-target audits and exact persistence/replay. No production algorithm or existing measured workload is changed.",
+      "source_obligation": "Retain all 78 models, actual source-backed equipment, original seed and deployment; preserve full PathWitness paths and rejected attempts through ordinary decisions. Distinguish native target eligibility from an accepted charge path or combat outcome.",
+      "unchanged_work": "The engine, source catalog, RNG, geometry solvers, serializers and replay authority are unchanged. Existing six-case native serial owner and source closure, all case/shard inventories, scheduling evidence, 67% full-package branch floor, twelve shards, 120-second mirror, 180-second smoke, 600-second quality and 1620/strictly-over-1800 covered limits remain unchanged. The new uncollected operator helpers have no historical benchmark family and assert no speedup, useful screen or full-game certification."
     },
-    "ci/quality_shards/shard-3.txt": {
+    "docs/AI_POLICY_INTERFACE.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Repair repeated hosted native fixture setup timeouts through the existing serial covered lane. Retain the original assignment with a versioned1350second current empirical planning guard, explicitly authorized for this topology; keep historical forecasts/evidence and all actual execution, coverage and quality gates unchanged.",
-      "source_obligation": "The full legal native roster, equipped profiles,42-decision setup, seed19 and120-second runner bound stay unchanged. The controller must run each admitted selector exactly once, preserve coverage across serial and parallel stages, and propagate either stage failure under the same1620/1800 supervisor.",
-      "unchanged_work": "No engine, rules, decision payload, setup fixture, serializer, replay, RNG, solver, source stats, gameplay horizon or additional selector moves. Original9c full measurements and f900/f8 bounded serial observations retain their producers and contexts. The1350second current planning guard is a forecast allowance, not a measured completion or guarantee; actual1620approval,strictly>1800termination,120inner,180smoke,600quality and67percentfullpackagebranch-enabledcoverage remain unchanged. No tactical benefit or full-game throughput claim."
-    },
-    "ci/quality_shards/shard-4.txt": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Repair repeated hosted native fixture setup timeouts through the existing serial covered lane. Retain the original assignment with a versioned1350second current empirical planning guard, explicitly authorized for this topology; keep historical forecasts/evidence and all actual execution, coverage and quality gates unchanged.",
-      "source_obligation": "The full legal native roster, equipped profiles,42-decision setup, seed19 and120-second runner bound stay unchanged. The controller must run each admitted selector exactly once, preserve coverage across serial and parallel stages, and propagate either stage failure under the same1620/1800 supervisor.",
-      "unchanged_work": "No engine, rules, decision payload, setup fixture, serializer, replay, RNG, solver, source stats, gameplay horizon or additional selector moves. Original9c full measurements and f900/f8 bounded serial observations retain their producers and contexts. The1350second current planning guard is a forecast allowance, not a measured completion or guarantee; actual1620approval,strictly>1800termination,120inner,180smoke,600quality and67percentfullpackagebranch-enabledcoverage remain unchanged. No tactical benefit or full-game throughput claim."
-    },
-    "ci/test_shards/current-native-serial-role.json": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile",
-        "scoped-shard-allocation"
-      ],
-      "selected_families": [],
-      "rationale": "Repair repeated hosted native fixture setup timeouts through the existing serial covered lane. Retain the original assignment with a versioned1350second current empirical planning guard, explicitly authorized for this topology; keep historical forecasts/evidence and all actual execution, coverage and quality gates unchanged.",
-      "source_obligation": "The full legal native roster, equipped profiles,42-decision setup, seed19 and120-second runner bound stay unchanged. The controller must run each admitted selector exactly once, preserve coverage across serial and parallel stages, and propagate either stage failure under the same1620/1800 supervisor.",
-      "unchanged_work": "No engine, rules, decision payload, setup fixture, serializer, replay, RNG, solver, source stats, gameplay horizon or additional selector moves. Original9c full measurements and f900/f8 bounded serial observations retain their producers and contexts. The1350second current planning guard is a forecast allowance, not a measured completion or guarantee; actual1620approval,strictly>1800termination,120inner,180smoke,600quality and67percentfullpackagebranch-enabledcoverage remain unchanged. No tactical benefit or full-game throughput claim."
-    },
-    "ci/test_shards/current-runtime-compatibility.json": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile",
-        "scoped-shard-allocation"
-      ],
-      "selected_families": [],
-      "rationale": "Repair repeated hosted native fixture setup timeouts through the existing serial covered lane. Retain the original assignment with a versioned1350second current empirical planning guard, explicitly authorized for this topology; keep historical forecasts/evidence and all actual execution, coverage and quality gates unchanged.",
-      "source_obligation": "The full legal native roster, equipped profiles,42-decision setup, seed19 and120-second runner bound stay unchanged. The controller must run each admitted selector exactly once, preserve coverage across serial and parallel stages, and propagate either stage failure under the same1620/1800 supervisor.",
-      "unchanged_work": "No engine, rules, decision payload, setup fixture, serializer, replay, RNG, solver, source stats, gameplay horizon or additional selector moves. Original9c full measurements and f900/f8 bounded serial observations retain their producers and contexts. The1350second current planning guard is a forecast allowance, not a measured completion or guarantee; actual1620approval,strictly>1800termination,120inner,180smoke,600quality and67percentfullpackagebranch-enabledcoverage remain unchanged. No tactical benefit or full-game throughput claim."
-    },
-    "ci/test_shards/durations.json": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Repair repeated hosted native fixture setup timeouts through the existing serial covered lane. Retain the original assignment with a versioned1350second current empirical planning guard, explicitly authorized for this topology; keep historical forecasts/evidence and all actual execution, coverage and quality gates unchanged.",
-      "source_obligation": "The full legal native roster, equipped profiles,42-decision setup, seed19 and120-second runner bound stay unchanged. The controller must run each admitted selector exactly once, preserve coverage across serial and parallel stages, and propagate either stage failure under the same1620/1800 supervisor.",
-      "unchanged_work": "No engine, rules, decision payload, setup fixture, serializer, replay, RNG, solver, source stats, gameplay horizon or additional selector moves. Original9c full measurements and f900/f8 bounded serial observations retain their producers and contexts. The1350second current planning guard is a forecast allowance, not a measured completion or guarantee; actual1620approval,strictly>1800termination,120inner,180smoke,600quality and67percentfullpackagebranch-enabledcoverage remain unchanged. No tactical benefit or full-game throughput claim."
+      "rationale": "Add a separately bounded operator reproducer for a complete legal native mirror, ordinary round-four screen-labelled versus preservation paths, actual B response, read-only range/visibility/charge-target audits and exact persistence/replay. No production algorithm or existing measured workload is changed.",
+      "source_obligation": "Retain all 78 models, actual source-backed equipment, original seed and deployment; preserve full PathWitness paths and rejected attempts through ordinary decisions. Distinguish native target eligibility from an accepted charge path or combat outcome.",
+      "unchanged_work": "The engine, source catalog, RNG, geometry solvers, serializers and replay authority are unchanged. Existing six-case native serial owner and source closure, all case/shard inventories, scheduling evidence, 67% full-package branch floor, twelve shards, 120-second mirror, 180-second smoke, 600-second quality and 1620/strictly-over-1800 covered limits remain unchanged. The new uncollected operator helpers have no historical benchmark family and assert no speedup, useful screen or full-game certification."
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Repair repeated hosted native fixture setup timeouts through the existing serial covered lane. Retain the original assignment with a versioned1350second current empirical planning guard, explicitly authorized for this topology; keep historical forecasts/evidence and all actual execution, coverage and quality gates unchanged.",
-      "source_obligation": "The full legal native roster, equipped profiles,42-decision setup, seed19 and120-second runner bound stay unchanged. The controller must run each admitted selector exactly once, preserve coverage across serial and parallel stages, and propagate either stage failure under the same1620/1800 supervisor.",
-      "unchanged_work": "No engine, rules, decision payload, setup fixture, serializer, replay, RNG, solver, source stats, gameplay horizon or additional selector moves. Original9c full measurements and f900/f8 bounded serial observations retain their producers and contexts. The1350second current planning guard is a forecast allowance, not a measured completion or guarantee; actual1620approval,strictly>1800termination,120inner,180smoke,600quality and67percentfullpackagebranch-enabledcoverage remain unchanged. No tactical benefit or full-game throughput claim."
-    },
-    "docs/SEQUENTIAL_REMEDIATION_REVIEW_POLICY.md": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Repair repeated hosted native fixture setup timeouts through the existing serial covered lane. Retain the original assignment with a versioned1350second current empirical planning guard, explicitly authorized for this topology; keep historical forecasts/evidence and all actual execution, coverage and quality gates unchanged.",
-      "source_obligation": "The full legal native roster, equipped profiles,42-decision setup, seed19 and120-second runner bound stay unchanged. The controller must run each admitted selector exactly once, preserve coverage across serial and parallel stages, and propagate either stage failure under the same1620/1800 supervisor.",
-      "unchanged_work": "No engine, rules, decision payload, setup fixture, serializer, replay, RNG, solver, source stats, gameplay horizon or additional selector moves. Original9c full measurements and f900/f8 bounded serial observations retain their producers and contexts. The1350second current planning guard is a forecast allowance, not a measured completion or guarantee; actual1620approval,strictly>1800termination,120inner,180smoke,600quality and67percentfullpackagebranch-enabledcoverage remain unchanged. No tactical benefit or full-game throughput claim."
+      "rationale": "Add a separately bounded operator reproducer for a complete legal native mirror, ordinary round-four screen-labelled versus preservation paths, actual B response, read-only range/visibility/charge-target audits and exact persistence/replay. No production algorithm or existing measured workload is changed.",
+      "source_obligation": "Retain all 78 models, actual source-backed equipment, original seed and deployment; preserve full PathWitness paths and rejected attempts through ordinary decisions. Distinguish native target eligibility from an accepted charge path or combat outcome.",
+      "unchanged_work": "The engine, source catalog, RNG, geometry solvers, serializers and replay authority are unchanged. Existing six-case native serial owner and source closure, all case/shard inventories, scheduling evidence, 67% full-package branch floor, twelve shards, 120-second mirror, 180-second smoke, 600-second quality and 1620/strictly-over-1800 covered limits remain unchanged. The new uncollected operator helpers have no historical benchmark family and assert no speedup, useful screen or full-game certification."
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Repair repeated hosted native fixture setup timeouts through the existing serial covered lane. Retain the original assignment with a versioned1350second current empirical planning guard, explicitly authorized for this topology; keep historical forecasts/evidence and all actual execution, coverage and quality gates unchanged.",
-      "source_obligation": "The full legal native roster, equipped profiles,42-decision setup, seed19 and120-second runner bound stay unchanged. The controller must run each admitted selector exactly once, preserve coverage across serial and parallel stages, and propagate either stage failure under the same1620/1800 supervisor.",
-      "unchanged_work": "No engine, rules, decision payload, setup fixture, serializer, replay, RNG, solver, source stats, gameplay horizon or additional selector moves. Original9c full measurements and f900/f8 bounded serial observations retain their producers and contexts. The1350second current planning guard is a forecast allowance, not a measured completion or guarantee; actual1620approval,strictly>1800termination,120inner,180smoke,600quality and67percentfullpackagebranch-enabledcoverage remain unchanged. No tactical benefit or full-game throughput claim."
+      "rationale": "Add a separately bounded operator reproducer for a complete legal native mirror, ordinary round-four screen-labelled versus preservation paths, actual B response, read-only range/visibility/charge-target audits and exact persistence/replay. No production algorithm or existing measured workload is changed.",
+      "source_obligation": "Retain all 78 models, actual source-backed equipment, original seed and deployment; preserve full PathWitness paths and rejected attempts through ordinary decisions. Distinguish native target eligibility from an accepted charge path or combat outcome.",
+      "unchanged_work": "The engine, source catalog, RNG, geometry solvers, serializers and replay authority are unchanged. Existing six-case native serial owner and source closure, all case/shard inventories, scheduling evidence, 67% full-package branch floor, twelve shards, 120-second mirror, 180-second smoke, 600-second quality and 1620/strictly-over-1800 covered limits remain unchanged. The new uncollected operator helpers have no historical benchmark family and assert no speedup, useful screen or full-game certification."
     },
-    "scripts/current_native_serial_role.py": {
+    "tests/support/cavalcade_native_approach.py": {
       "category": "measured_workload",
       "operations": [
-        "scoped-shard-allocation"
+        "native-v995-approach-operator"
       ],
       "selected_families": [],
-      "rationale": "Repair repeated hosted native fixture setup timeouts through the existing serial covered lane. Retain the original assignment with a versioned1350second current empirical planning guard, explicitly authorized for this topology; keep historical forecasts/evidence and all actual execution, coverage and quality gates unchanged.",
-      "source_obligation": "The full legal native roster, equipped profiles,42-decision setup, seed19 and120-second runner bound stay unchanged. The controller must run each admitted selector exactly once, preserve coverage across serial and parallel stages, and propagate either stage failure under the same1620/1800 supervisor.",
-      "unchanged_work": "No engine, rules, decision payload, setup fixture, serializer, replay, RNG, solver, source stats, gameplay horizon or additional selector moves. Original9c full measurements and f900/f8 bounded serial observations retain their producers and contexts. The1350second current planning guard is a forecast allowance, not a measured completion or guarantee; actual1620approval,strictly>1800termination,120inner,180smoke,600quality and67percentfullpackagebranch-enabledcoverage remain unchanged. No tactical benefit or full-game throughput claim."
+      "rationale": "Add a separately bounded operator reproducer for a complete legal native mirror, ordinary round-four screen-labelled versus preservation paths, actual B response, read-only range/visibility/charge-target audits and exact persistence/replay. No production algorithm or existing measured workload is changed.",
+      "source_obligation": "Retain all 78 models, actual source-backed equipment, original seed and deployment; preserve full PathWitness paths and rejected attempts through ordinary decisions. Distinguish native target eligibility from an accepted charge path or combat outcome.",
+      "unchanged_work": "The engine, source catalog, RNG, geometry solvers, serializers and replay authority are unchanged. Existing six-case native serial owner and source closure, all case/shard inventories, scheduling evidence, 67% full-package branch floor, twelve shards, 120-second mirror, 180-second smoke, 600-second quality and 1620/strictly-over-1800 covered limits remain unchanged. The new uncollected operator helpers have no historical benchmark family and assert no speedup, useful screen or full-game certification."
     },
-    "scripts/current_shard_assignment.py": {
+    "tests/support/cavalcade_native_qualification.py": {
       "category": "measured_workload",
       "operations": [
-        "scoped-shard-allocation"
+        "native-v995-approach-operator"
       ],
       "selected_families": [],
-      "rationale": "Repair repeated hosted native fixture setup timeouts through the existing serial covered lane. Retain the original assignment with a versioned1350second current empirical planning guard, explicitly authorized for this topology; keep historical forecasts/evidence and all actual execution, coverage and quality gates unchanged.",
-      "source_obligation": "The full legal native roster, equipped profiles,42-decision setup, seed19 and120-second runner bound stay unchanged. The controller must run each admitted selector exactly once, preserve coverage across serial and parallel stages, and propagate either stage failure under the same1620/1800 supervisor.",
-      "unchanged_work": "No engine, rules, decision payload, setup fixture, serializer, replay, RNG, solver, source stats, gameplay horizon or additional selector moves. Original9c full measurements and f900/f8 bounded serial observations retain their producers and contexts. The1350second current planning guard is a forecast allowance, not a measured completion or guarantee; actual1620approval,strictly>1800termination,120inner,180smoke,600quality and67percentfullpackagebranch-enabledcoverage remain unchanged. No tactical benefit or full-game throughput claim."
-    },
-    "scripts/current_shard_compatibility.py": {
-      "category": "measured_workload",
-      "operations": [
-        "scoped-shard-allocation"
-      ],
-      "selected_families": [],
-      "rationale": "Repair repeated hosted native fixture setup timeouts through the existing serial covered lane. Retain the original assignment with a versioned1350second current empirical planning guard, explicitly authorized for this topology; keep historical forecasts/evidence and all actual execution, coverage and quality gates unchanged.",
-      "source_obligation": "The full legal native roster, equipped profiles,42-decision setup, seed19 and120-second runner bound stay unchanged. The controller must run each admitted selector exactly once, preserve coverage across serial and parallel stages, and propagate either stage failure under the same1620/1800 supervisor.",
-      "unchanged_work": "No engine, rules, decision payload, setup fixture, serializer, replay, RNG, solver, source stats, gameplay horizon or additional selector moves. Original9c full measurements and f900/f8 bounded serial observations retain their producers and contexts. The1350second current planning guard is a forecast allowance, not a measured completion or guarantee; actual1620approval,strictly>1800termination,120inner,180smoke,600quality and67percentfullpackagebranch-enabledcoverage remain unchanged. No tactical benefit or full-game throughput claim."
-    },
-    "scripts/fetch_scheduling_sources.py": {
-      "category": "measured_workload",
-      "operations": [
-        "scoped-shard-allocation"
-      ],
-      "selected_families": [],
-      "rationale": "Repair repeated hosted native fixture setup timeouts through the existing serial covered lane. Retain the original assignment with a versioned1350second current empirical planning guard, explicitly authorized for this topology; keep historical forecasts/evidence and all actual execution, coverage and quality gates unchanged.",
-      "source_obligation": "The full legal native roster, equipped profiles,42-decision setup, seed19 and120-second runner bound stay unchanged. The controller must run each admitted selector exactly once, preserve coverage across serial and parallel stages, and propagate either stage failure under the same1620/1800 supervisor.",
-      "unchanged_work": "No engine, rules, decision payload, setup fixture, serializer, replay, RNG, solver, source stats, gameplay horizon or additional selector moves. Original9c full measurements and f900/f8 bounded serial observations retain their producers and contexts. The1350second current planning guard is a forecast allowance, not a measured completion or guarantee; actual1620approval,strictly>1800termination,120inner,180smoke,600quality and67percentfullpackagebranch-enabledcoverage remain unchanged. No tactical benefit or full-game throughput claim."
-    },
-    "scripts/run_behavioral_coverage.sh": {
-      "category": "measured_workload",
-      "operations": [
-        "covered-resource-diagnostics",
-        "covered-shard-workload"
-      ],
-      "selected_families": [],
-      "rationale": "Repair repeated hosted native fixture setup timeouts through the existing serial covered lane. Retain the original assignment with a versioned1350second current empirical planning guard, explicitly authorized for this topology; keep historical forecasts/evidence and all actual execution, coverage and quality gates unchanged.",
-      "source_obligation": "The full legal native roster, equipped profiles,42-decision setup, seed19 and120-second runner bound stay unchanged. The controller must run each admitted selector exactly once, preserve coverage across serial and parallel stages, and propagate either stage failure under the same1620/1800 supervisor.",
-      "unchanged_work": "No engine, rules, decision payload, setup fixture, serializer, replay, RNG, solver, source stats, gameplay horizon or additional selector moves. Original9c full measurements and f900/f8 bounded serial observations retain their producers and contexts. The1350second current planning guard is a forecast allowance, not a measured completion or guarantee; actual1620approval,strictly>1800termination,120inner,180smoke,600quality and67percentfullpackagebranch-enabledcoverage remain unchanged. No tactical benefit or full-game throughput claim."
-    },
-    "tests/code_quality/test_ci_resource_diagnostics.py": {
-      "category": "measured_workload",
-      "operations": [
-        "covered-resource-diagnostics"
-      ],
-      "selected_families": [],
-      "rationale": "Repair repeated hosted native fixture setup timeouts through the existing serial covered lane. Retain the original assignment with a versioned1350second current empirical planning guard, explicitly authorized for this topology; keep historical forecasts/evidence and all actual execution, coverage and quality gates unchanged.",
-      "source_obligation": "The full legal native roster, equipped profiles,42-decision setup, seed19 and120-second runner bound stay unchanged. The controller must run each admitted selector exactly once, preserve coverage across serial and parallel stages, and propagate either stage failure under the same1620/1800 supervisor.",
-      "unchanged_work": "No engine, rules, decision payload, setup fixture, serializer, replay, RNG, solver, source stats, gameplay horizon or additional selector moves. Original9c full measurements and f900/f8 bounded serial observations retain their producers and contexts. The1350second current planning guard is a forecast allowance, not a measured completion or guarantee; actual1620approval,strictly>1800termination,120inner,180smoke,600quality and67percentfullpackagebranch-enabledcoverage remain unchanged. No tactical benefit or full-game throughput claim."
-    },
-    "tests/code_quality/test_current_shard_compatibility.py": {
-      "category": "measured_workload",
-      "operations": [
-        "scoped-shard-allocation"
-      ],
-      "selected_families": [],
-      "rationale": "Repair repeated hosted native fixture setup timeouts through the existing serial covered lane. Retain the original assignment with a versioned1350second current empirical planning guard, explicitly authorized for this topology; keep historical forecasts/evidence and all actual execution, coverage and quality gates unchanged.",
-      "source_obligation": "The full legal native roster, equipped profiles,42-decision setup, seed19 and120-second runner bound stay unchanged. The controller must run each admitted selector exactly once, preserve coverage across serial and parallel stages, and propagate either stage failure under the same1620/1800 supervisor.",
-      "unchanged_work": "No engine, rules, decision payload, setup fixture, serializer, replay, RNG, solver, source stats, gameplay horizon or additional selector moves. Original9c full measurements and f900/f8 bounded serial observations retain their producers and contexts. The1350second current planning guard is a forecast allowance, not a measured completion or guarantee; actual1620approval,strictly>1800termination,120inner,180smoke,600quality and67percentfullpackagebranch-enabledcoverage remain unchanged. No tactical benefit or full-game throughput claim."
-    },
-    "tests/rules/section07/coverage.json": {
-      "category": "measured_workload",
-      "operations": [
-        "qualification40-exact-b6886d3bc2fb1ca4"
-      ],
-      "selected_families": [],
-      "rationale": "Repair repeated hosted native fixture setup timeouts through the existing serial covered lane. Retain the original assignment with a versioned1350second current empirical planning guard, explicitly authorized for this topology; keep historical forecasts/evidence and all actual execution, coverage and quality gates unchanged.",
-      "source_obligation": "The full legal native roster, equipped profiles,42-decision setup, seed19 and120-second runner bound stay unchanged. The controller must run each admitted selector exactly once, preserve coverage across serial and parallel stages, and propagate either stage failure under the same1620/1800 supervisor.",
-      "unchanged_work": "No engine, rules, decision payload, setup fixture, serializer, replay, RNG, solver, source stats, gameplay horizon or additional selector moves. Original9c full measurements and f900/f8 bounded serial observations retain their producers and contexts. The1350second current planning guard is a forecast allowance, not a measured completion or guarantee; actual1620approval,strictly>1800termination,120inner,180smoke,600quality and67percentfullpackagebranch-enabledcoverage remain unchanged. No tactical benefit or full-game throughput claim."
+      "rationale": "Add a separately bounded operator reproducer for a complete legal native mirror, ordinary round-four screen-labelled versus preservation paths, actual B response, read-only range/visibility/charge-target audits and exact persistence/replay. No production algorithm or existing measured workload is changed.",
+      "source_obligation": "Retain all 78 models, actual source-backed equipment, original seed and deployment; preserve full PathWitness paths and rejected attempts through ordinary decisions. Distinguish native target eligibility from an accepted charge path or combat outcome.",
+      "unchanged_work": "The engine, source catalog, RNG, geometry solvers, serializers and replay authority are unchanged. Existing six-case native serial owner and source closure, all case/shard inventories, scheduling evidence, 67% full-package branch floor, twelve shards, 120-second mirror, 180-second smoke, 600-second quality and 1620/strictly-over-1800 covered limits remain unchanged. The new uncollected operator helpers have no historical benchmark family and assert no speedup, useful screen or full-game certification."
     }
   },
   "milestone": "ordinary",

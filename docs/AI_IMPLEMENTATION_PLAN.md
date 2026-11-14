@@ -20,7 +20,7 @@ Read this plan with [AGENTS.md](../AGENTS.md), [architecture](../ARCHITECTURE_V2
 | Training contracts | `ai/policy_contracts.py` defines TrainingFeature, TrainingRow, PolicyProvenance and four PolicyArtifactKind roles. `tests/unit/test_phase19_policy_contracts.py` is a historical, explicitly inactive/quarantined module; active bounded ranking/provenance and mixed-episode controls are in `tests/infrastructure/adapters/test_deployment_candidates.py` and `test_training_admission.py`. | Contracts exist; no verified populated training dataset or human replay corpus was found. A role enum does not prescribe four separate neural networks. |
 | Replay vs planning | `LocalGameSession.fork()` and persistence in `adapters/local_session.py` preserve authoritative lifecycle/RNG state. Contract 46 keeps private seed and draw authority out of player views. | Exact replay is useful and trusted. Forking alone is not information-safe planning or independent future dice. |
 | Full-game driver | `docs/performance/policy-v3/operation-map.json:full_game_profiles` is empty. `scripts/check_performance_policy.py` requires an available registered driver and evidence for `rules_complete`. | A runner, setup smoke or replay helper is not a registered supported full-game training workload. No measured full-game training throughput is established. |
-| Daemons | `docs/factions/chaos-daemons.md` and `AI_POLICY_INTERFACE.md`: exact v995 roster, nine units/39 models per side, seven provisional height records; real setup/replay reaches round-1 Command. | This admits the bounded setup and selected components, not FULL_GAME_SUPPORTED, REPLAY_VERIFIED or a ready sacrifice-learning matchup. Do not hand-edit generated faction guides. |
+| Daemons | `docs/factions/chaos-daemons.md` and `AI_POLICY_INTERFACE.md`: exact v995 roster, nine units/39 models per side, seven provisional height records; ordinary native setup/prefix and the separate round-four paired approach retain actual equipment and full paths. | Common and both endpoints pass exact persistence/replay; independent E visibility remains incomplete. B charge-target eligibility and E range/LOS are bounded audits, not an accepted charge/attack, useful screen, FULL_GAME_SUPPORTED or a ready sacrifice-learning matchup. Do not hand-edit generated faction guides. |
 | Core/faction completion | Core roadmap compliance claim requires all relevant implementation orders, S-MIRRORS, PFINAL and a fresh 25-category audit. Faction roadmap Gate 0 is PFINAL; L6 fieldable, L7 full-game/replay, L8 comprehensive certification differ. | No blanket certification is inferred from merged PRs, test totals or loaded rows. Scoped canonical experiments still need trustworthy mechanics; this plan neither bypasses faction gates nor adds a universal two-certified-faction learning prerequisite. |
 | Phase identifiers | Architecture retains grouped 19A-19F and 20A-20D rows; contracts explicitly anchor training/provenance to 19E. 17N and 18M-B+ retain relevant mission/conformance work. | Individual 19A/B/C/D/F and 20B/C assignments are not verified from the maintained map. Use grouped IDs and named work packages below, not invented renumbering. Core remediation P19B is unrelated to product Phase 19B. |
 | Corpora and fixtures | Replay tests, canonical scoring/charge helpers and conformance examples exist; references below. | Some helpers construct state directly. They are reference fixtures, not automatically valid training checkpoints, complete golden corpora or human demonstrations. Provenance/admission must be established for each selected experiment. |
@@ -942,6 +942,25 @@ differentials also execute the uncached product implementations. The current
 behavioral inventory contains 6,300 cases, including eighteen preparation/cache
 controls. Fresh actual-base visibility, movement, setup and reconstruction
 comparisons retain every prescribed case/sample and historical outcomes.
+
+### Native round-four candidate and response recipe
+
+The separate [native operator recipe](AI_POLICY_INTERFACE.md#native-round-four-decision-point-and-paired-response)
+keeps both legal 2,000-point v995 armies and their real weapons. Ordinary approach
+moves and explicit mandatory abilities reach a pre-S-action round-four checkpoint;
+the first three rejected routes remain in its history. A fourth rejected S path
+is retained separately. Preservation and the candidate called screen use separate
+forks, with the same B4 Normal Move response and a stop before B4 charge selection.
+The actual target-eligibility and independent E range/visibility audits preserve
+charge-path, attack and later E-activation gaps. The earlier round-five approach
+remains diagnostic evidence because it leaves no later ordinary A Shooting turn.
+
+Common and both endpoints pass exact persistence/replay. Independent E visibility
+remains unresolved. These fixed operator helpers do not alter the six-case native serial CI workload, its dependencies,
+coverage inventory, budgets or planning evidence. A feasible S move and a B target
+option do not establish useful screening, delayed benefit, Stage 2 completion or
+learning admission; the scoped gap, null reference target and learning exclusion
+remain in force.
 
 ## 6. First delayed-tradeoff experiment
 

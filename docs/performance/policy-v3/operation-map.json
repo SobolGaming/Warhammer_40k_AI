@@ -35981,6 +35981,18 @@
       "sensitive": false,
       "mandatory": false
     },
+    "native-v995-approach-operator": {
+      "paths": [
+        "tests/support/cavalcade_native_approach.py",
+        "tests/support/cavalcade_native_qualification.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
     "native-v995-prefix-regressions": {
       "paths": [
         "tests/support/cavalcade_v995.py",

@@ -2188,7 +2188,6 @@ completion, learning admission or full-game throughput. Earlier narrower reports
 retain their meanings; `useful_reference_status` remains `scoped_gap`,
 `reference_target` remains null and `eligible_for_learning` remains false.
 
-
 ## Post-charge E follow-through and shooting omission
 
 A separate frozen operator continuation starts from the retained #677 round-four
@@ -2410,3 +2409,125 @@ comparison, screening advantage, full-game certification, Stage 2 completion or
 learning eligibility follows. The synthetic evidence and its narrower conclusions
 remain unchanged; `useful_reference_status` remains `scoped_gap`,
 `reference_target` remains null and `eligible_for_learning` remains false.
+
+## Native round-four decision point and paired response
+
+The separate operator recipe `native-v995-round4-common-v1` continues the native
+prefix above with both complete legal 2,000-point rosters, all 78 models and their
+actual equipment. It changes no catalog, geometry, seed or checkpoint. The
+[maintained approach reproducer](../tests/support/cavalcade_native_approach.py)
+uses ordinary viewer submissions from setup; the
+[qualification companion](../tests/support/cavalcade_native_qualification.py)
+owns the isolated forks, read-only audits and strict persistence/replay checks.
+These helpers are not a policy, runtime admission API or collected CI workload.
+
+Every round-start Be'lakor request selects Shadow Lord and every Master of
+Magicks request selects Ignores Cover. All offered optional reactions and
+Stratagem windows are explicitly declined. Shooting and Charge are completed
+without attacks or charges during the approach. Unlisted units remain stationary;
+automatic phase progression and scoring retain their engine authority.
+
+| Turn | Accepted ordinary approach |
+|---|---|
+| A1 | Retained E polyline `(14,49,0) -> (18,49,0) -> (18,48,0)`; S stationary. |
+| B1 | B translates `(0,6,0)`. |
+| A2 | E translates `(0,-8,0)` and S `(0,-5,0)`. |
+| B2 | B translates `(-7,7,0)`. |
+| A3 | S translates `(0,-3,0)`. |
+| B3 | B translates `(0,5,0)`. |
+
+Every translation includes complete start/midpoint/end paths for all models in
+physical leading-first order, with height and facing retained. The declared B
+interaction area is X=14..26, Y=28..40 inches. Native geometry rejects B2's
+original `(-6,0,0)` endpoint for model overlap, its `(-6,3,0)` replacement for
+terrain placement, and S3's original `(1,-4,0)` endpoint for terrain placement.
+Those three ordinary rejected requests remain in the common prefix before the
+explicitly revised proposals. The separate S4 `(2.3,-4.4,0)` terrain rejection
+is reproduced on a diagnostic fork, with its full rejected payload retained.
+These finite failures do not prove that no other legal route exists.
+
+The final common boundary is round-four A Movement, before S selects its movement
+action. Preservation selects Remain Stationary. The candidate labelled `screen`
+selects Normal Move and submits the already demonstrated `(2.2,-4.48,0)` paths
+for all three Nurglings. Their endpoint X=9.31..11.09, Y=30.63..32.41 is west of
+the declared B interaction rectangle; neither the name nor the rectangle establishes
+a useful screen. On each
+independent fork, remaining A units stay stationary and attacks are omitted; B
+then makes the same `(1,5,0)` Normal Move, with its other units stationary. Both
+arms stop at the first B4 Charge request, before selecting a charging unit.
+
+At that actual Charge horizon the audit queries B's charge eligibility and S/E
+target distances using the live faction restriction registry and preserves its
+equipped hellblade and bladed-horn profiles. It records E-to-B closest physical
+range and all three equipped ranged profiles, then independently queries line of
+sight after both branch proofs. Full cover classification and a live shooting
+declaration are not established. These queries do not establish a charge path,
+roll, attack or damage outcome. E's generic shooter-state prerequisite is not an available A activation during B's turn. Round five remains
+for a possible later A follow-through; that continuation is not demonstrated.
+
+Reproduce the fixed chain and request the paired qualification with:
+
+```sh
+uv run --no-sync python -m tests.support.cavalcade_native_approach --output reports/native-round4 --qualify
+```
+
+The output retains the actual producer HEAD, dirty input hashes, complete common
+checkpoint and rejected records, separate fork checkpoints, both viewer/event
+comparisons, `ReplayRunner` results and actual timings. A fresh fixed-chain
+reproduction has a separate 900-second verification allowance. Common and each
+endpoint have separate 900-second qualification allowances; each branch's
+300-second construction clock includes the fork, continuation, checkpoint output
+and common-prefix equality checks. Both branch proofs finish before the separate
+audits. Each independent visibility query has a 300-second child-process cap,
+including current-runtime verification and a read-only canonical clone of the
+already qualified lifecycle. That clone never supplies gameplay authority.
+Timeout means unknown, not invisible. Other checks are cooperative at decision/
+replay boundaries; a late completed result remains evidence but fails its allowance.
+These are operator verification budgets, not changes to the existing CI mirror, native
+serial lane, smoke, quality or covered-controller limits.
+
+The first fresh round-four common reproduction reached record 212 through
+ordinary play. An extra common full-cover query exhausted its 900-second
+qualification allowance inside the shared scalar visibility solver; it returned
+no visibility answer and neither final fork had begun. The producer source and
+unmodified common checkpoint remain retained. The corrected harness accepts
+`--resume-common --qualify` to strictly restore that common checkpoint once and
+explicitly replay it before constructing the alternatives. A resumed common
+receipt does not claim comparison against a terminated process's live viewer
+objects. Fresh live endpoint qualification compares both viewer projections and
+event streams with the strictly restored endpoint; recovery receipts explicitly
+identify any original-live comparison lost with an interrupted process.
+The original common receipt's `endpoint` describes the planned B4 branch horizon;
+its actual common boundary remains A4 Movement record 212.
+
+Round four is the final fork boundary so that a later ordinary A Shooting turn
+remains available. The retained round-five route is only diagnostic evidence;
+the round-four common checkpoint is reproduced by ordinary play, never by editing
+that later checkpoint. Earlier campaign attempts and their actual timing results
+remain in the separate operator evidence.
+
+The common checkpoint and both complete branch endpoints pass exact JSON
+save/load and explicit `ReplayRunner` reproduction without diagnostics. The common
+has 212 decisions and 1,268 total events. Screen qualification also compares both
+live/restored viewer projections and event streams. The resumed common and
+preservation receipts omit their lost original-live comparison explicitly.
+
+| Alternative | Decisions / total events | B-to-S charge-declaration audit | B-to-E audit |
+|---|---|---|---|
+| Preserve | 263 / 1,530 | 12.333 inches; outside declaration range. | 5.212 inches; legal target. |
+| Screen candidate | 264 / 1,537 | 10.055 inches; legal target. | 5.212 inches; legal target. |
+
+B is eligible to select for charging in both arms. E-to-B physical range is 5.212
+inches, within all three equipped 18-inch ranged profiles, but this is B's Charge
+phase. The two rosters together retain all 78 models at full wounds. The screen
+move changes S's declaration-range status while E remains an eligible B target; no accepted
+charge path or useful protection follows from that fact.
+
+Both required independent LOS queries remain unresolved at their respective
+300-second caps. Separate read-only stacks identify full visibility classification
+in the shared scalar solver, after canonical loading, with no returned LOS answer
+in either arm. An exhausted query is not evidence of invisibility or an established
+incorrect rules result. No combat result, useful screen, E attack, delayed benefit,
+Stage 2 completion or learning eligibility is claimed;
+`useful_reference_status` remains `scoped_gap`, `reference_target` remains null,
+and `eligible_for_learning` remains false.
