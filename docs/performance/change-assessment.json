@@ -14,6 +14,36 @@
         }
       }
     },
+    "ci/quality_shards/all.txt": {
+      "before_sha256": "47422221019fe8122ca38ea333dcdf7bc55b0deb5185950c3bcfd725a1db5b73",
+      "after_sha256": "4c8684ec6ed70ed2edac193d63d2b3f09eda88f107434c46b1a8ada940d3a21f",
+      "owners": {
+        "@document": {
+          "before": "47422221019fe8122ca38ea333dcdf7bc55b0deb5185950c3bcfd725a1db5b73",
+          "after": "4c8684ec6ed70ed2edac193d63d2b3f09eda88f107434c46b1a8ada940d3a21f"
+        }
+      }
+    },
+    "ci/quality_shards/shard-3.txt": {
+      "before_sha256": "30711fc493902820334066b4a6d1d348aef19794889ff6b519e1c4e2f16ba68b",
+      "after_sha256": "661d93d5715896fddb49a4086799d5e28c44cdbe3fd234355a99240875ac5aa5",
+      "owners": {
+        "@document": {
+          "before": "30711fc493902820334066b4a6d1d348aef19794889ff6b519e1c4e2f16ba68b",
+          "after": "661d93d5715896fddb49a4086799d5e28c44cdbe3fd234355a99240875ac5aa5"
+        }
+      }
+    },
+    "ci/quality_shards/shard-4.txt": {
+      "before_sha256": "d19003159c624f903df9632243735bea7a2b8b1f6eb717652bbf1fff6996748e",
+      "after_sha256": "54d54ae75dae383e03efb755f8ffd73a9c7b34a962c32025db950d216491ad40",
+      "owners": {
+        "@document": {
+          "before": "d19003159c624f903df9632243735bea7a2b8b1f6eb717652bbf1fff6996748e",
+          "after": "54d54ae75dae383e03efb755f8ffd73a9c7b34a962c32025db950d216491ad40"
+        }
+      }
+    },
     "ci/test_shards/current-native-serial-role.json": {
       "before_sha256": null,
       "after_sha256": "98166b84dcd84b9aedef84ff8280f35c96aebe698d70aa9989354d7b1e4c5bfc",
@@ -261,6 +291,30 @@
   },
   "rows": {
     "README.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Repair repeated hosted native fixture setup timeouts through the existing serial covered lane. Retain the original assignment with a versioned1350second current empirical planning guard, explicitly authorized for this topology; keep historical forecasts/evidence and all actual execution, coverage and quality gates unchanged.",
+      "source_obligation": "The full legal native roster, equipped profiles,42-decision setup, seed19 and120-second runner bound stay unchanged. The controller must run each admitted selector exactly once, preserve coverage across serial and parallel stages, and propagate either stage failure under the same1620/1800 supervisor.",
+      "unchanged_work": "No engine, rules, decision payload, setup fixture, serializer, replay, RNG, solver, source stats, gameplay horizon or additional selector moves. Original9c full measurements and f900/f8 bounded serial observations retain their producers and contexts. The1350second current planning guard is a forecast allowance, not a measured completion or guarantee; actual1620approval,strictly>1800termination,120inner,180smoke,600quality and67percentfullpackagebranch-enabledcoverage remain unchanged. No tactical benefit or full-game throughput claim."
+    },
+    "ci/quality_shards/all.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Repair repeated hosted native fixture setup timeouts through the existing serial covered lane. Retain the original assignment with a versioned1350second current empirical planning guard, explicitly authorized for this topology; keep historical forecasts/evidence and all actual execution, coverage and quality gates unchanged.",
+      "source_obligation": "The full legal native roster, equipped profiles,42-decision setup, seed19 and120-second runner bound stay unchanged. The controller must run each admitted selector exactly once, preserve coverage across serial and parallel stages, and propagate either stage failure under the same1620/1800 supervisor.",
+      "unchanged_work": "No engine, rules, decision payload, setup fixture, serializer, replay, RNG, solver, source stats, gameplay horizon or additional selector moves. Original9c full measurements and f900/f8 bounded serial observations retain their producers and contexts. The1350second current planning guard is a forecast allowance, not a measured completion or guarantee; actual1620approval,strictly>1800termination,120inner,180smoke,600quality and67percentfullpackagebranch-enabledcoverage remain unchanged. No tactical benefit or full-game throughput claim."
+    },
+    "ci/quality_shards/shard-3.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Repair repeated hosted native fixture setup timeouts through the existing serial covered lane. Retain the original assignment with a versioned1350second current empirical planning guard, explicitly authorized for this topology; keep historical forecasts/evidence and all actual execution, coverage and quality gates unchanged.",
+      "source_obligation": "The full legal native roster, equipped profiles,42-decision setup, seed19 and120-second runner bound stay unchanged. The controller must run each admitted selector exactly once, preserve coverage across serial and parallel stages, and propagate either stage failure under the same1620/1800 supervisor.",
+      "unchanged_work": "No engine, rules, decision payload, setup fixture, serializer, replay, RNG, solver, source stats, gameplay horizon or additional selector moves. Original9c full measurements and f900/f8 bounded serial observations retain their producers and contexts. The1350second current planning guard is a forecast allowance, not a measured completion or guarantee; actual1620approval,strictly>1800termination,120inner,180smoke,600quality and67percentfullpackagebranch-enabledcoverage remain unchanged. No tactical benefit or full-game throughput claim."
+    },
+    "ci/quality_shards/shard-4.txt": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
