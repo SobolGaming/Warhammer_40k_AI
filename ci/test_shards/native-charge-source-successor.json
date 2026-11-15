@@ -8,7 +8,7 @@
     },
     "scripts/boolean_los_admission.py": {
       "before": "f1bbc073e8c0d46d471782c3518846a872ab9f3d8db0432d22393d1a44fa446b",
-      "after": "579e7d955ea727e6913ca76dae8e13c66f1df956207fa389d0fc4b870c415495"
+      "after": "6fab9e178ea89c71d1b7c84596ec944124b3eb336096cad451798fc3a262bb0a"
     },
     "tests/code_quality/test_current_shard_compatibility.py": {
       "before": "017ea13da6b7bff94f1bda7edf700e3cdae8ccbe298c76b94edd8d419fa88c30",

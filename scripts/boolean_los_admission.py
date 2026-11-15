@@ -82,9 +82,7 @@ def producer_inputs(root: Path, producer: str) -> dict[str, str]:
     return dict(sorted(inputs.items()))
 
 
-def validate_successor(
-    historical: dict[str, str], live: dict[str, str], record: object
-) -> None:
+def validate_successor(historical: dict[str, str], live: dict[str, str], record: object) -> None:
     """Admit only this finite reviewed delta; reject every other source change."""
     scope = _object(record, {"schema", "producer", "changes"}, "covered source successor")
     if (scope["schema"], scope["producer"]) != (
