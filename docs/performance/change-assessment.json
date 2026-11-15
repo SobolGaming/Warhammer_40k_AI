@@ -1,215 +1,67 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "a8b19b16dccb88c43d0e1ae72be186b365bd9d79",
+  "base": "416d068f3fd38d8b7ad46084826d36786352078c",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:8d7e3355d9db2c9477ba63b752dc1dfa054b5c00583ea467e3fbbc0e21d5638d",
   "operation_map_sha256": "ef82e108ec4b9b33c4e216c3a7fb997569e621dd10f82d96426bfeb39ef2ce39",
   "changes": {
-    "README.md": {
-      "before_sha256": "42740012f27ca8b55306e3e405c1aea5fae6fa21f5dbcfe0cc27ef50426dd7a7",
-      "after_sha256": "171389a51063965adb6687b5f0c43c1238d96d2483acb51835eb1b583ce10e2c",
-      "owners": {
-        "@document": {
-          "before": "42740012f27ca8b55306e3e405c1aea5fae6fa21f5dbcfe0cc27ef50426dd7a7",
-          "after": "171389a51063965adb6687b5f0c43c1238d96d2483acb51835eb1b583ce10e2c"
-        }
-      }
-    },
     "docs/AI_IMPLEMENTATION_PLAN.md": {
-      "before_sha256": "7c111ccc6afc10c26baa3d913736502ecf32f8e2a1d26eb2aff5fa1a6e4be872",
-      "after_sha256": "cfbc8118a9a1f96d31f28648a64cf22f42bc628b4b8e0fcaf721f04aa123abc9",
+      "before_sha256": "cfbc8118a9a1f96d31f28648a64cf22f42bc628b4b8e0fcaf721f04aa123abc9",
+      "after_sha256": "2fb3af0a6d448e2fd94d607d44a60213e817c02fb3cf947d91e0c9911ea89e95",
       "owners": {
         "@document": {
-          "before": "7c111ccc6afc10c26baa3d913736502ecf32f8e2a1d26eb2aff5fa1a6e4be872",
-          "after": "cfbc8118a9a1f96d31f28648a64cf22f42bc628b4b8e0fcaf721f04aa123abc9"
+          "before": "cfbc8118a9a1f96d31f28648a64cf22f42bc628b4b8e0fcaf721f04aa123abc9",
+          "after": "2fb3af0a6d448e2fd94d607d44a60213e817c02fb3cf947d91e0c9911ea89e95"
         }
       }
     },
     "docs/AI_POLICY_INTERFACE.md": {
-      "before_sha256": "8919231d9ecd774047df6886ef0a5752c9f8ed858e030e86c67703fbd893d788",
-      "after_sha256": "c16f94f78a6c7df6e1a83c0cb17b350aad2dc705d797f6fe41137f5062a8ae34",
+      "before_sha256": "c16f94f78a6c7df6e1a83c0cb17b350aad2dc705d797f6fe41137f5062a8ae34",
+      "after_sha256": "c35fe08be49de30ab708fbdc89bfef37235f2efb70dfecf88b39735f92c774e8",
       "owners": {
         "@document": {
-          "before": "8919231d9ecd774047df6886ef0a5752c9f8ed858e030e86c67703fbd893d788",
-          "after": "c16f94f78a6c7df6e1a83c0cb17b350aad2dc705d797f6fe41137f5062a8ae34"
+          "before": "c16f94f78a6c7df6e1a83c0cb17b350aad2dc705d797f6fe41137f5062a8ae34",
+          "after": "c35fe08be49de30ab708fbdc89bfef37235f2efb70dfecf88b39735f92c774e8"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
-      "before_sha256": "d98ad28d6d8f129744864236442ac465d5371f8d0ba58ac692ea98de98c00b51",
-      "after_sha256": "a5537ac57daa8f8041f745d463318bb0f21689cfebffb9dec29c9e5dd8f635a5",
+      "before_sha256": "a5537ac57daa8f8041f745d463318bb0f21689cfebffb9dec29c9e5dd8f635a5",
+      "after_sha256": "e8f5585fddd1dbf16b83ecb2496d093ae35e8f4e6fb8b3ab66e1f0395d8cadd0",
       "owners": {
         "@document": {
-          "before": "d98ad28d6d8f129744864236442ac465d5371f8d0ba58ac692ea98de98c00b51",
-          "after": "a5537ac57daa8f8041f745d463318bb0f21689cfebffb9dec29c9e5dd8f635a5"
+          "before": "a5537ac57daa8f8041f745d463318bb0f21689cfebffb9dec29c9e5dd8f635a5",
+          "after": "e8f5585fddd1dbf16b83ecb2496d093ae35e8f4e6fb8b3ab66e1f0395d8cadd0"
         }
       }
-    },
-    "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "6fa095a378a8d82974a5657b7217edd21241a650b05ef4234a016f285a5fe05d",
-      "after_sha256": "8c67ee49bf7ad2f3dd8847646107410ebeda1aa657c80d9562ff86db077d4315",
-      "owners": {
-        "@document": {
-          "before": "6fa095a378a8d82974a5657b7217edd21241a650b05ef4234a016f285a5fe05d",
-          "after": "8c67ee49bf7ad2f3dd8847646107410ebeda1aa657c80d9562ff86db077d4315"
-        }
-      }
-    },
-    "tests/rules/section07/coverage.json": {
-      "before_sha256": "5bbfa1403b06ca46e6c59ef469965bc8cafdaa5f4aef6564919dd1e9ee7ea876",
-      "after_sha256": "b4f665c7c549c74c25d72deafae2fac1d938ae1543656dd2f5b4839125889699",
-      "owners": {
-        "@document": {
-          "before": "5bbfa1403b06ca46e6c59ef469965bc8cafdaa5f4aef6564919dd1e9ee7ea876",
-          "after": "b4f665c7c549c74c25d72deafae2fac1d938ae1543656dd2f5b4839125889699"
-        }
-      }
-    },
-    "tests/support/cavalcade_native_approach.py": {
-      "before_sha256": null,
-      "after_sha256": "12f24c56788071fd34eb81c53f53206288a833621680c6c720f65f525b251648",
-      "owners": {
-        "@module": {
-          "before": null,
-          "after": "d94765bce80b636421abc56e3399e81ec4870b3021eed564b6a8deb70ed10e3a"
-        },
-        "approach_moves": {
-          "before": null,
-          "after": "a6d7d011a0a2aa6da094ccecf0f5596450b2d637922862669ba1d0dd7c89c949"
-        },
-        "at_screen_choice": {
-          "before": null,
-          "after": "6abc018d048e53f1570ceb40ccf4e3841a148504031e18669e35fe1e72f97852"
-        },
-        "main": {
-          "before": null,
-          "after": "6db2f552b8a7837fcfd84f737fef15d0becbeebd3fa99a3702aa51893893350f"
-        },
-        "native_producer": {
-          "before": null,
-          "after": "bd6cbb91cd0c9b9a005b77f0d16679c206f1707e237cd7b333030907e3304467"
-        },
-        "reproduce_native_common": {
-          "before": null,
-          "after": "99663fb07098267a076d237f7387680b6addd9437b1b0c6744faa208f2282e72"
-        },
-        "submit_approach_choice": {
-          "before": null,
-          "after": "7b4697f090b53fc009e3fc87bf95b2a49dfebf33b092bcde5dd392f76fea59eb"
-        }
-      }
-    },
-    "tests/support/cavalcade_native_qualification.py": {
-      "before_sha256": null,
-      "after_sha256": "ebe53f2aca93e78d751383b1a93187886994e19b06e6b37ef52cdf07b5899659",
-      "owners": {
-        "@module": {
-          "before": null,
-          "after": "7b64c266a1b302b38b162b9b2cf1075e04681c7976bef30347027bd82e11aae9"
-        },
-        "_visibility_worker": {
-          "before": null,
-          "after": "1c70f0fe7c9ce2d4f2df6dce38a9a6a487bb8d5662f727b0067a1932f436792c"
-        },
-        "_write_json": {
-          "before": null,
-          "after": "cab764d0c921cddb8a253ebdf5261e1e0f77cf6719ef5d312c474e37ba88b99c"
-        },
-        "bounded_native_visibility": {
-          "before": null,
-          "after": "ebdc2d875deef6ce6a74b4f0fafa286dd389227085f50b10fbd964a4609c11df"
-        },
-        "continue_native_branch": {
-          "before": null,
-          "after": "f088f32a54fad16a8d9679915458d9802e6b970e30dc2d179c7eba472d70e6e6"
-        },
-        "native_interaction_audit": {
-          "before": null,
-          "after": "add7f18b2b04221aeb9122c3f1c78b43a7e5d6abf3ce62b6b2e5f9226848d343"
-        },
-        "qualify_native_checkpoint": {
-          "before": null,
-          "after": "f19686635ec31dafc331a2e4e7e12fd65239f53fdcd1e80fb373ccc29d27a551"
-        },
-        "qualify_native_pair": {
-          "before": null,
-          "after": "dc579d5d7a44f0334fc57ad14f6e3234162416130c58e0953ab3b7fadce8ead6"
-        }
-      }
-    }
-  },
-  "rows": {
-    "README.md": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Add a separately bounded operator reproducer for a complete legal native mirror, ordinary round-four screen-labelled versus preservation paths, actual B response, read-only range/visibility/charge-target audits and exact persistence/replay. No production algorithm or existing measured workload is changed.",
-      "source_obligation": "Retain all 78 models, actual source-backed equipment, original seed and deployment; preserve full PathWitness paths and rejected attempts through ordinary decisions. Distinguish native target eligibility from an accepted charge path or combat outcome.",
-      "unchanged_work": "The engine, source catalog, RNG, geometry solvers, serializers and replay authority are unchanged. Existing six-case native serial owner and source closure, all case/shard inventories, scheduling evidence, 67% full-package branch floor, twelve shards, 120-second mirror, 180-second smoke, 600-second quality and 1620/strictly-over-1800 covered limits remain unchanged. The new uncollected operator helpers have no historical benchmark family and assert no speedup, useful screen or full-game certification."
-    },
-    "docs/AI_IMPLEMENTATION_PLAN.md": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Add a separately bounded operator reproducer for a complete legal native mirror, ordinary round-four screen-labelled versus preservation paths, actual B response, read-only range/visibility/charge-target audits and exact persistence/replay. No production algorithm or existing measured workload is changed.",
-      "source_obligation": "Retain all 78 models, actual source-backed equipment, original seed and deployment; preserve full PathWitness paths and rejected attempts through ordinary decisions. Distinguish native target eligibility from an accepted charge path or combat outcome.",
-      "unchanged_work": "The engine, source catalog, RNG, geometry solvers, serializers and replay authority are unchanged. Existing six-case native serial owner and source closure, all case/shard inventories, scheduling evidence, 67% full-package branch floor, twelve shards, 120-second mirror, 180-second smoke, 600-second quality and 1620/strictly-over-1800 covered limits remain unchanged. The new uncollected operator helpers have no historical benchmark family and assert no speedup, useful screen or full-game certification."
-    },
-    "docs/AI_POLICY_INTERFACE.md": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Add a separately bounded operator reproducer for a complete legal native mirror, ordinary round-four screen-labelled versus preservation paths, actual B response, read-only range/visibility/charge-target audits and exact persistence/replay. No production algorithm or existing measured workload is changed.",
-      "source_obligation": "Retain all 78 models, actual source-backed equipment, original seed and deployment; preserve full PathWitness paths and rejected attempts through ordinary decisions. Distinguish native target eligibility from an accepted charge path or combat outcome.",
-      "unchanged_work": "The engine, source catalog, RNG, geometry solvers, serializers and replay authority are unchanged. Existing six-case native serial owner and source closure, all case/shard inventories, scheduling evidence, 67% full-package branch floor, twelve shards, 120-second mirror, 180-second smoke, 600-second quality and 1620/strictly-over-1800 covered limits remain unchanged. The new uncollected operator helpers have no historical benchmark family and assert no speedup, useful screen or full-game certification."
-    },
-    "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Add a separately bounded operator reproducer for a complete legal native mirror, ordinary round-four screen-labelled versus preservation paths, actual B response, read-only range/visibility/charge-target audits and exact persistence/replay. No production algorithm or existing measured workload is changed.",
-      "source_obligation": "Retain all 78 models, actual source-backed equipment, original seed and deployment; preserve full PathWitness paths and rejected attempts through ordinary decisions. Distinguish native target eligibility from an accepted charge path or combat outcome.",
-      "unchanged_work": "The engine, source catalog, RNG, geometry solvers, serializers and replay authority are unchanged. Existing six-case native serial owner and source closure, all case/shard inventories, scheduling evidence, 67% full-package branch floor, twelve shards, 120-second mirror, 180-second smoke, 600-second quality and 1620/strictly-over-1800 covered limits remain unchanged. The new uncollected operator helpers have no historical benchmark family and assert no speedup, useful screen or full-game certification."
-    },
-    "docs/performance/policy-v3/operation-map.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Add a separately bounded operator reproducer for a complete legal native mirror, ordinary round-four screen-labelled versus preservation paths, actual B response, read-only range/visibility/charge-target audits and exact persistence/replay. No production algorithm or existing measured workload is changed.",
-      "source_obligation": "Retain all 78 models, actual source-backed equipment, original seed and deployment; preserve full PathWitness paths and rejected attempts through ordinary decisions. Distinguish native target eligibility from an accepted charge path or combat outcome.",
-      "unchanged_work": "The engine, source catalog, RNG, geometry solvers, serializers and replay authority are unchanged. Existing six-case native serial owner and source closure, all case/shard inventories, scheduling evidence, 67% full-package branch floor, twelve shards, 120-second mirror, 180-second smoke, 600-second quality and 1620/strictly-over-1800 covered limits remain unchanged. The new uncollected operator helpers have no historical benchmark family and assert no speedup, useful screen or full-game certification."
-    },
-    "tests/rules/section07/coverage.json": {
-      "category": "measured_workload",
-      "operations": [
-        "qualification40-exact-b6886d3bc2fb1ca4"
-      ],
-      "selected_families": [],
-      "rationale": "Refresh only the current README authentication pin after the documented native operator addition. Preserve every historical source hash, semantic assertion and behavioral case; no gameplay work or runtime algorithm changes.",
-      "source_obligation": "Authenticate the actual canonical Git README bytes while retaining all other section07 source, obligation and assertion commitments unchanged.",
-      "unchanged_work": "The engine, source catalog, RNG, geometry solvers, serializers and replay authority are unchanged. Existing six-case native serial owner and source closure, all case/shard inventories, scheduling evidence, 67% full-package branch floor, twelve shards, 120-second mirror, 180-second smoke, 600-second quality and 1620/strictly-over-1800 covered limits remain unchanged. The new uncollected operator helpers have no historical benchmark family and assert no speedup, useful screen or full-game certification."
-    },
-    "tests/support/cavalcade_native_approach.py": {
-      "category": "measured_workload",
-      "operations": [
-        "native-v995-approach-operator"
-      ],
-      "selected_families": [],
-      "rationale": "Add a separately bounded operator reproducer for a complete legal native mirror, ordinary round-four screen-labelled versus preservation paths, actual B response, read-only range/visibility/charge-target audits and exact persistence/replay. No production algorithm or existing measured workload is changed.",
-      "source_obligation": "Retain all 78 models, actual source-backed equipment, original seed and deployment; preserve full PathWitness paths and rejected attempts through ordinary decisions. Distinguish native target eligibility from an accepted charge path or combat outcome.",
-      "unchanged_work": "The engine, source catalog, RNG, geometry solvers, serializers and replay authority are unchanged. Existing six-case native serial owner and source closure, all case/shard inventories, scheduling evidence, 67% full-package branch floor, twelve shards, 120-second mirror, 180-second smoke, 600-second quality and 1620/strictly-over-1800 covered limits remain unchanged. The new uncollected operator helpers have no historical benchmark family and assert no speedup, useful screen or full-game certification."
-    },
-    "tests/support/cavalcade_native_qualification.py": {
-      "category": "measured_workload",
-      "operations": [
-        "native-v995-approach-operator"
-      ],
-      "selected_families": [],
-      "rationale": "Add a separately bounded operator reproducer for a complete legal native mirror, ordinary round-four screen-labelled versus preservation paths, actual B response, read-only range/visibility/charge-target audits and exact persistence/replay. No production algorithm or existing measured workload is changed.",
-      "source_obligation": "Retain all 78 models, actual source-backed equipment, original seed and deployment; preserve full PathWitness paths and rejected attempts through ordinary decisions. Distinguish native target eligibility from an accepted charge path or combat outcome.",
-      "unchanged_work": "The engine, source catalog, RNG, geometry solvers, serializers and replay authority are unchanged. Existing six-case native serial owner and source closure, all case/shard inventories, scheduling evidence, 67% full-package branch floor, twelve shards, 120-second mirror, 180-second smoke, 600-second quality and 1620/strictly-over-1800 covered limits remain unchanged. The new uncollected operator helpers have no historical benchmark family and assert no speedup, useful screen or full-game certification."
     }
   },
   "milestone": "ordinary",
   "comparisons": {},
-  "full_game": null
+  "full_game": null,
+  "rows": {
+    "docs/AI_IMPLEMENTATION_PLAN.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Document bounded read-only native LOS diagnosis and unresolved classification; no runtime optimization or measured workload change.",
+      "source_obligation": "Preserve exact retained checkpoints and original timeouts; separate lifecycle restoration from query work, actual charge eligibility from shooting LOS, and adjacent controls from native results.",
+      "unchanged_work": "Runtime, catalogs, provisional geometry, physical and MONSTER occlusion, seeds, positions, complete evidence/cache identity, tests, twelve shards and coverage/CI limits are unchanged. No speedup, useful-screen, combat or full-game claim. Required serial current-runtime smoke and exact-head local/remote gates remain mandatory."
+    },
+    "docs/AI_POLICY_INTERFACE.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Document bounded read-only native LOS diagnosis and unresolved classification; no runtime optimization or measured workload change.",
+      "source_obligation": "Preserve exact retained checkpoints and original timeouts; separate lifecycle restoration from query work, actual charge eligibility from shooting LOS, and adjacent controls from native results.",
+      "unchanged_work": "Runtime, catalogs, provisional geometry, physical and MONSTER occlusion, seeds, positions, complete evidence/cache identity, tests, twelve shards and coverage/CI limits are unchanged. No speedup, useful-screen, combat or full-game claim. Required serial current-runtime smoke and exact-head local/remote gates remain mandatory."
+    },
+    "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Document bounded read-only native LOS diagnosis and unresolved classification; no runtime optimization or measured workload change.",
+      "source_obligation": "Preserve exact retained checkpoints and original timeouts; separate lifecycle restoration from query work, actual charge eligibility from shooting LOS, and adjacent controls from native results.",
+      "unchanged_work": "Runtime, catalogs, provisional geometry, physical and MONSTER occlusion, seeds, positions, complete evidence/cache identity, tests, twelve shards and coverage/CI limits are unchanged. No speedup, useful-screen, combat or full-game claim. Required serial current-runtime smoke and exact-head local/remote gates remain mandatory."
+    }
+  }
 }

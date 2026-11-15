@@ -962,6 +962,17 @@ option do not establish useful screening, delayed benefit, Stage 2 completion or
 learning admission; the scoped gap, null reference target and learning exclusion
 remain in force.
 
+The [bounded LOS diagnosis](AI_POLICY_INTERFACE.md#bounded-native-los-diagnosis)
+separates checkpoint restoration from the two unchanged E-to-B queries and retains
+their original 300-second unresolved receipts. The Boolean engine query requests
+a complete visibility witness; its shared scalar owner reaches full-visibility
+classification before returning. No missing proof certificate was established to
+justify an optimization in this slice. A Boolean-only result would require a
+separately designed partial-evidence and cache contract across scalar, composite
+and battlefield-clipped geometry, preserving terrain/body occlusion, MONSTER
+rules and provisional-height qualifications. That work remains a proposed next
+boundary, not an implemented shortcut or a resolved screening result.
+
 ## 6. First delayed-tradeoff experiment
 
 **Status: proposed, not an existing certified benchmark.** Start from the earliest suitable canonical Core fixture/checkpoint. References: `tests/replay/test_phase18b_replay_runner.py`, `tests/shared/category_migration/primary_boundary_scoring_builders.py`, `tests/shared/category_migration/phase11f_game_end_scoring.py`, and `tests/support/selected_target_charge_fixtures.py`. Use real domain objects and normal engine decisions; do not import test modules into runtime or present a synthetic state alteration as an engine-generated checkpoint.
