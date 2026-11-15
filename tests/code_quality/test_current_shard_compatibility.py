@@ -31,6 +31,11 @@ from scripts.historical_shard_snapshot import (
 from scripts.shard_execution_model import Cohort, load_cohorts
 from tools.performance_policy import canonical_digest, runtime_inputs
 
+from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
+from warhammer40k_core.engine.battlefield_state import ModelPlacement, geometry_model_for_placement
+from warhammer40k_core.geometry.pose import Pose
+from warhammer40k_core.geometry.volume import Model
+
 ROOT = Path(__file__).resolve().parents[2]
 DIRECTORY = ROOT / "ci/test_shards"
 
@@ -1044,3 +1049,106 @@ def test_unreviewed_producer_is_rejected_before_archive() -> None:
     with pytest.raises(SystemExit, match="producer"):
         producer_inputs(ROOT, "0" * 40)
     assert len(SUCCESSOR_PATHS) == 4
+
+
+@pytest.fixture(scope="module")
+def native_charge_geometry() -> tuple[tuple[Model, ...], Model, RulesetDescriptor]:
+    """Real equipped native roster; pure-builder poses from its retained move recipe."""
+    from tests.support.cavalcade_native_prefix import RANGED_ID, THREAT_ID
+    from tests.support.cavalcade_v995 import deployment_fixture, strict_mirror_session
+
+    session = strict_mirror_session()
+    state = session.lifecycle.state
+    assert state is not None
+    assert session.lifecycle.config is not None
+    assert sum(len(u.own_models) for a in state.army_definitions for u in a.units) == 78
+    assert all(a.roster_legality_report.is_legal for a in state.army_definitions)
+    instances = {
+        m.model_instance_id: m
+        for a in state.army_definitions
+        for u in a.units
+        for m in u.own_models
+    }
+    fixture = deployment_fixture()
+    roles: dict[str, tuple[Model, ...]] = {}
+    for unit_id, dx, dy in ((THREAT_ID, -6, 23), (RANGED_ID, 0, -8)):
+        models = []
+        for raw in fixture["placements"][unit_id]:
+            placement = ModelPlacement.from_payload(raw)
+            p = placement.pose
+            placed = placement.with_pose(
+                Pose.at(
+                    p.position.x + dx,
+                    p.position.y + dy,
+                    p.position.z,
+                    facing_degrees=p.facing.degrees,
+                )
+            )
+            models.append(
+                geometry_model_for_placement(
+                    model=instances[placement.model_instance_id], placement=placed
+                )
+            )
+        roles[unit_id] = tuple(sorted(models, key=lambda m: m.model_id))
+    target = roles[RANGED_ID][0]
+    assert min(m.range_to(target) for m in roles[THREAT_ID]) == pytest.approx(5.211905011060019)
+    return roles[THREAT_ID], target, session.lifecycle.config.ruleset_descriptor
+
+
+@pytest.mark.parametrize(("budget", "formation"), [(6, "columns"), (9, "arc")])
+def test_native_charge_whole_formation_preserves_clearance_and_real_budget(
+    native_charge_geometry: tuple[tuple[Model, ...], Model, RulesetDescriptor],
+    budget: int,
+    formation: str,
+) -> None:
+    from dataclasses import replace
+
+    from tests.support.cavalcade_native_charge import (
+        formation_templates_for_models,
+        path_for_template,
+        template_fits,
+    )
+
+    models, target, ruleset = native_charge_geometry
+    selected = [
+        t
+        for t in formation_templates_for_models(models, target)
+        if template_fits(
+            t,
+            budget,
+            preferred=ruleset.charge_policy.preferred_target_distance_inches,
+            engagement=ruleset.engagement_policy.horizontal_inches,
+        )
+    ]
+    assert len(selected) == 1
+    assert isinstance(selected[0], dict)
+    assert selected[0]["formation"] == formation
+    witness = path_for_template(selected[0], budget)
+    assert witness.model_ids() == tuple(m.model_id for m in models)
+    ends = [replace(m, pose=witness.final_pose_for_model(m.model_id)) for m in models]
+    assert not any(a.base_overlaps(b) for i, a in enumerate(ends) for b in ends[i + 1 :])
+    for start, end in zip(models, ends, strict=True):
+        assert witness.poses_for_model(start.model_id)[0] == start.pose
+        assert start.pose.distance_3d_to(end.pose) <= budget
+        assert end.pose.facing == start.pose.facing
+        assert end.range_to(target) < start.range_to(target)
+        for goal in (
+            ruleset.charge_policy.preferred_target_distance_inches,
+            ruleset.engagement_policy.horizontal_inches,
+        ):
+            if start.range_to(target) - goal <= budget:
+                assert end.range_to(target) <= goal
+
+
+def test_native_charge_rejects_whole_template_instead_of_clipping_models(
+    native_charge_geometry: tuple[tuple[Model, ...], Model, RulesetDescriptor],
+) -> None:
+    from tests.support.cavalcade_native_charge import (
+        formation_templates_for_models,
+        path_for_template,
+    )
+
+    models, target, _ruleset = native_charge_geometry
+    arc = formation_templates_for_models(models, target)[1]
+    with pytest.raises(AssertionError, match="Whole formation exceeds charge budget"):
+        path_for_template(arc, 6)
