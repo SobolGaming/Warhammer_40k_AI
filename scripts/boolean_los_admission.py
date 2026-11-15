@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import hashlib
+import io
 import json
 import math
 import subprocess
+import tarfile
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import cast
@@ -34,6 +36,80 @@ TEST_SOURCES = {
     "tests/rules/section06/test_visibility.py": VISIBILITY_TEST_SHA256,
     "tests/rules/section06/test_visibility_ownership.py": OWNERSHIP_TEST_SHA256,
 }
+SOURCE_PRODUCER = "33d199058f2e65f544bcc535e41862e2c09207eb"
+SUCCESSOR_FILE = "ci/test_shards/native-charge-source-successor.json"
+SUCCESSOR_PATHS = frozenset(
+    {
+        "tests/support/cavalcade_native_charge.py",
+        "docs/performance/policy-v3/operation-map.json",
+        "scripts/boolean_los_admission.py",
+        "tests/code_quality/test_current_shard_compatibility.py",
+    }
+)
+
+
+def producer_inputs(root: Path, producer: str) -> dict[str, str]:
+    """Hash the complete original measurement inputs without running old code."""
+    from tools.performance_policy import MAP
+
+    if producer != SOURCE_PRODUCER:
+        raise SystemExit("Unreviewed covered source producer.")
+    archive = subprocess.check_output(
+        [
+            "git",
+            "archive",
+            producer,
+            "src",
+            "tests",
+            "scripts",
+            "tools",
+            "contracts/schemas",
+            "uv.lock",
+            "pyproject.toml",
+            MAP,
+        ],
+        cwd=root,
+        stderr=subprocess.PIPE,
+        timeout=30,
+    )
+    inputs = {}
+    with tarfile.open(fileobj=io.BytesIO(archive)) as stream:
+        for member in stream:
+            if member.isfile():
+                source = stream.extractfile(member)
+                assert source is not None
+                inputs[member.name] = hashlib.sha256(source.read()).hexdigest()
+    return dict(sorted(inputs.items()))
+
+
+def validate_successor(
+    historical: dict[str, str], live: dict[str, str], record: dict[str, object]
+) -> None:
+    """Admit only this finite reviewed delta; reject every other source change."""
+    scope = _object(record, {"schema", "producer", "changes"}, "covered source successor")
+    if (scope["schema"], scope["producer"]) != (
+        "native-charge-source-successor-v1",
+        SOURCE_PRODUCER,
+    ):
+        raise SystemExit("Unreviewed covered source successor.")
+    changes = _object(scope["changes"], set(SUCCESSOR_PATHS), "successor changes")
+    expected = historical.copy()
+    for name, value in changes.items():
+        row = _object(value, {"before", "after"}, "successor source hashes")
+        after = row["after"]
+        if (
+            row["before"] != historical.get(name)
+            or not isinstance(after, str)
+            or len(after) != 64
+            or any(c not in "0123456789abcdef" for c in after)
+            or after == row["before"]
+        ):
+            raise SystemExit("Covered source successor hashes differ: " + name)
+        expected[name] = after
+    # The original producer remains valid for its own evidence. A successor must
+    # include every declared new/changed file, with no unlisted source drift.
+    if live != historical and live != expected:
+        raise SystemExit("Live covered sources differ from the exact reviewed successor.")
 
 
 def validate_manifest(raw: bytes) -> None:
@@ -126,7 +202,7 @@ def fresh_native_role(
         raise SystemExit("Unreviewed fresh covered evidence schema.")
     pre = cast(dict[str, object], json.loads(_text(record["preflight"])))
     post = cast(dict[str, object], json.loads(_text(record["postflight"])))
-    inputs = runtime_inputs(root)
+    inputs = producer_inputs(root, str(baseline["source_head"]))
     tree = subprocess.check_output(
         ["git", "rev-parse", str(baseline["source_head"]) + "^{tree}"], cwd=root, text=True
     ).strip()
@@ -140,6 +216,7 @@ def fresh_native_role(
         or post.get("inputs_unchanged") is not True
     ):
         raise SystemExit("Fresh covered source pre/post identity differs.")
+    validate_successor(inputs, runtime_inputs(root), read_json(root / SUCCESSOR_FILE))
     supervisor = json.loads(_text(record["supervisor"]))
     if supervisor != baseline["supervisor"]:
         raise SystemExit("Fresh covered supervisor differs from the approved baseline.")

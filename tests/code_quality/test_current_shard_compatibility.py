@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import hashlib
 import json
 import shutil
@@ -13,6 +14,13 @@ from typing import cast
 import pytest
 from scripts import build_test_shards as sharding
 from scripts import current_shard_compatibility as compatibility
+from scripts.boolean_los_admission import (
+    SOURCE_PRODUCER,
+    SUCCESSOR_FILE,
+    SUCCESSOR_PATHS,
+    producer_inputs,
+    validate_successor,
+)
 from scripts.historical_shard_snapshot import (
     HISTORICAL_REVISION,
     MANIFEST,
@@ -21,6 +29,7 @@ from scripts.historical_shard_snapshot import (
     historical_snapshot,
 )
 from scripts.shard_execution_model import Cohort, load_cohorts
+from tools.performance_policy import canonical_digest, runtime_inputs
 
 ROOT = Path(__file__).resolve().parents[2]
 DIRECTORY = ROOT / "ci/test_shards"
@@ -934,3 +943,104 @@ def test_native_serial_combined_context_rejects_wrong_or_incomplete_evidence(
     )
     with pytest.raises(SystemExit):
         load_native_serial_role(ROOT, tmp_path, reference, nodes)
+
+
+@pytest.fixture(scope="module")
+def charge_inputs() -> dict[str, str]:
+    return producer_inputs(ROOT, SOURCE_PRODUCER)
+
+
+def test_original_producer_and_exact_reviewed_successor(charge_inputs: dict[str, str]) -> None:
+    evidence = json.loads((ROOT / "ci/test_shards/current-covered-evidence.json").read_bytes())
+    pre = json.loads(evidence["preflight"]["text"])
+    post = json.loads(evidence["postflight"]["text"])
+    assert len(charge_inputs) == 5029
+    assert pre["head"] == post["head"] == SOURCE_PRODUCER
+    assert pre["inputs"] == charge_inputs
+    assert pre["input_digest"] == post["input_digest"] == canonical_digest(charge_inputs)
+    record = json.loads((ROOT / SUCCESSOR_FILE).read_bytes())
+    validate_successor(charge_inputs, charge_inputs, record)
+    validate_successor(charge_inputs, runtime_inputs(ROOT), record)
+
+
+@pytest.mark.parametrize(
+    "name",
+    [
+        "tests/support/cavalcade_native_charge.py",
+        "scripts/boolean_los_admission.py",
+        "tests/conftest.py",
+        "scripts/run_covered_shard.py",
+        "uv.lock",
+        "tests/support/unreviewed_new_helper.py",
+    ],
+)
+@pytest.mark.parametrize("mutation", ["change", "delete"])
+def test_unlisted_or_wrong_live_bytes_fail(
+    charge_inputs: dict[str, str], name: str, mutation: str
+) -> None:
+    live = runtime_inputs(ROOT)
+    if mutation == "delete":
+        if name not in live:
+            # An unlisted addition is rejected as well as deletion of real inputs.
+            live[name] = "0" * 64
+        else:
+            del live[name]
+    else:
+        live[name] = "0" * 64
+    with pytest.raises(SystemExit):
+        validate_successor(charge_inputs, live, json.loads((ROOT / SUCCESSOR_FILE).read_bytes()))
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    [
+        "producer",
+        "schema",
+        "missing",
+        "extra",
+        "before",
+        "after",
+        "absent-before",
+    ],
+)
+def test_tampered_or_expanded_successor_fails(charge_inputs: dict[str, str], mutation: str) -> None:
+    record = json.loads((ROOT / SUCCESSOR_FILE).read_bytes())
+    name = "scripts/boolean_los_admission.py"
+    if mutation == "producer":
+        record["producer"] = "0" * 40
+    elif mutation == "schema":
+        record["schema"] = "unreviewed"
+    elif mutation == "missing":
+        del record["changes"][name]
+    elif mutation == "extra":
+        record["changes"]["uv.lock"] = {"before": charge_inputs["uv.lock"], "after": "0" * 64}
+    elif mutation == "before":
+        record["changes"][name]["before"] = "0" * 64
+    elif mutation == "absent-before":
+        record["changes"]["tests/support/cavalcade_native_charge.py"]["before"] = "0" * 64
+    else:
+        record["changes"][name]["after"] = "0" * 64
+    with pytest.raises(SystemExit):
+        validate_successor(charge_inputs, runtime_inputs(ROOT), record)
+
+
+@pytest.mark.parametrize("mutation", ["omit", "alter", "extra"])
+def test_producer_map_drift_fails(charge_inputs: dict[str, str], mutation: str) -> None:
+    changed = copy.copy(charge_inputs)
+    name = "uv.lock"
+    if mutation == "omit":
+        del changed[name]
+    elif mutation == "extra":
+        changed["tests/support/unreviewed_new_helper.py"] = "0" * 64
+    else:
+        changed[name] = "0" * 64
+    with pytest.raises(SystemExit):
+        validate_successor(
+            changed, runtime_inputs(ROOT), json.loads((ROOT / SUCCESSOR_FILE).read_bytes())
+        )
+
+
+def test_unreviewed_producer_is_rejected_before_archive() -> None:
+    with pytest.raises(SystemExit, match="producer"):
+        producer_inputs(ROOT, "0" * 40)
+    assert len(SUCCESSOR_PATHS) == 4

@@ -2688,3 +2688,5 @@ identity mismatch. V3 uses only the issued viewer request IDs, options and propo
 contexts for submissions, and re-freezes the same inputs, endpoint templates,
 choices and limits before any charge roll. The v2 source and failure remain
 retained; this is a harness repair, not an engine or rules change.
+
+The required scheduling admission exposed a complete-source identity mismatch: its retained 32-worker receipt was produced at `33d199058f2e65f544bcc535e41862e2c09207eb`, before this uncollected operator existed. The admission now authenticates all 5,029 original source inputs from that exact Git archive, without executing historical code, and permits only the four before/after file hashes in `ci/test_shards/native-charge-source-successor.json`. Every unlisted source change still fails. Original receipts, assignments, weights, inventories, worker calibration, runtime and deadline checks remain unchanged. This is source authentication, with no new performance claim.

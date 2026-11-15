@@ -2,15 +2,25 @@
   "policy": "rules-engine-performance-v3",
   "base": "b8fde6fb2992425edcbc55d43888d12db03fda6c",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:d637f1649b7c3bfee1683c0112ac0ba37233afbf1f9640e6b4f2bbf47fa46c55",
-  "operation_map_sha256": "0c1af706a4ba6ffde014b3bfd78e91cc509ed9b4e3f96526346cf2dbc54bb7d1",
+  "operation_map_sha256": "7ac167b37944e37269db4658b1059e24d97f5d602492de7ee17ebeae0512eb0e",
   "changes": {
+    "ci/test_shards/native-charge-source-successor.json": {
+      "before_sha256": null,
+      "after_sha256": "b8a4c76874f5d101928c45860b38b4ddf0738f9f4ed0c396fdef9130f78ff076",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "b8a4c76874f5d101928c45860b38b4ddf0738f9f4ed0c396fdef9130f78ff076"
+        }
+      }
+    },
     "docs/AI_POLICY_INTERFACE.md": {
       "before_sha256": "4a14350ee00f4045614eaa36004a32c21ddaf7576d1adefb21c55dc1b91a13a7",
-      "after_sha256": "1374eff65bd26f83fd192cdb1e38267051bd0a2aab162c9c7abe44059465f364",
+      "after_sha256": "a86dcfb15f38510599c7cdda4adb76da38ac20b4c814a79f5342193738c731c5",
       "owners": {
         "@document": {
           "before": "4a14350ee00f4045614eaa36004a32c21ddaf7576d1adefb21c55dc1b91a13a7",
-          "after": "1374eff65bd26f83fd192cdb1e38267051bd0a2aab162c9c7abe44059465f364"
+          "after": "a86dcfb15f38510599c7cdda4adb76da38ac20b4c814a79f5342193738c731c5"
         }
       }
     },
@@ -26,11 +36,67 @@
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "09596f0c185020f51488a09a0e56a3b6dc6d30f761ae9d93ac044ee37943566c",
-      "after_sha256": "d6590fe56a40482e72c61f856220ff05d7c1d6c15c5638f5ba93c6d6f1808deb",
+      "after_sha256": "26750c41b5dc2319221061fea842bf5de9fd55836166690cab3680c27f6415dd",
       "owners": {
         "@document": {
           "before": "09596f0c185020f51488a09a0e56a3b6dc6d30f761ae9d93ac044ee37943566c",
-          "after": "d6590fe56a40482e72c61f856220ff05d7c1d6c15c5638f5ba93c6d6f1808deb"
+          "after": "26750c41b5dc2319221061fea842bf5de9fd55836166690cab3680c27f6415dd"
+        }
+      }
+    },
+    "scripts/boolean_los_admission.py": {
+      "before_sha256": "f1bbc073e8c0d46d471782c3518846a872ab9f3d8db0432d22393d1a44fa446b",
+      "after_sha256": "35a00462f6193e65ece5e18db60c8f478789c29bfc0f31064067cb31fa063367",
+      "owners": {
+        "@module": {
+          "before": "149cb7bbb8c3999273c793362d6aabfca536a277fd8809c9e7ddeff85d96d41d",
+          "after": "1bdb52b77ec09ac68aab9cac86fc54d1fde1e61fbd71a7626c37fa713ad39e2b"
+        },
+        "fresh_native_role": {
+          "before": "0c431ace4e392fce65096e0c3fe076ba1f85ab0f6d39b47a3ff9112645e087e4",
+          "after": "9106d38af20e55ce86c2c7e00cf007c2f9cb024fee6125b61eeaea3198d6ad2c"
+        },
+        "producer_inputs": {
+          "before": null,
+          "after": "f52988c2b934e820ba51bf780e74a7d3b4b4c3e4c7c1c3245e2db05f9498345c"
+        },
+        "validate_successor": {
+          "before": null,
+          "after": "9cd7873df0ddf95e61ce18e5ef4b61780f5a25d0afbababd6414cac45e1cd0a8"
+        }
+      }
+    },
+    "tests/code_quality/test_current_shard_compatibility.py": {
+      "before_sha256": "017ea13da6b7bff94f1bda7edf700e3cdae8ccbe298c76b94edd8d419fa88c30",
+      "after_sha256": "1e5c95637b09595237bf194599127613b2603aa26fd0e5aa870e865a162bc3d7",
+      "owners": {
+        "@module": {
+          "before": "872b4cd2346333a6d046dab5c4f9a8e32dec6a4db2f1adda8f37e8e4c4df1a96",
+          "after": "88bd45bdcdf5ccac548765fb6c9709c6827d75b4463cf57f72944cc39a6169b2"
+        },
+        "charge_inputs": {
+          "before": null,
+          "after": "93384815002472450f2c1e335536d2a5e65ca1169ed25bd4b59120591372ca06"
+        },
+        "test_original_producer_and_exact_reviewed_successor": {
+          "before": null,
+          "after": "9be6161de8870b0d800731f6d58f055b8813eb2f4b5f212f1d3d57f17ddb7e5c"
+        },
+        "test_producer_map_drift_fails": {
+          "before": null,
+          "after": "23763489e340291238b3af5c6dc405225c8d3e41607bd1cd1450a92218d478b6"
+        },
+        "test_tampered_or_expanded_successor_fails": {
+          "before": null,
+          "after": "277d89caa3c916795b78ae4e81c4dd18fb994a007a94197b1616c819d32bd552"
+        },
+        "test_unlisted_or_wrong_live_bytes_fail": {
+          "before": null,
+          "after": "6dadfa40f9c84214fda1eed1937a9f7461cdb41e4d8ab5de3da00be0c0d5bffd"
+        },
+        "test_unreviewed_producer_is_rejected_before_archive": {
+          "before": null,
+          "after": "c97c17faf6bc6f6aa587141eeab989a9e62921fd2146456003c0cba873ad77f9"
         }
       }
     },
@@ -96,7 +162,7 @@
       "selected_families": [],
       "rationale": "Add and document a separately frozen operator-only charge experiment on the unchanged native round-four preserve/screen endpoints. Existing runtime and measured test workloads are unchanged; no optimization or speedup is claimed.",
       "source_obligation": "Preserve the legal equipped 78-model roster, original seed and ordinary history, complete six-model PathWitness proposals, natural dice and mandatory charge-triggered effects. Retain rejected paths and unresolved work; eligibility is not an accepted charge. Qualify complete accepted histories through exact JSON persistence, both viewer/event comparisons and ReplayRunner.",
-      "unchanged_work": "No production, catalog, solver, RNG, serialization, replay or existing test/inventory changes. Preserve 12 shards, at least 12 workers where applicable, 67% full-package branch coverage, 1620-second approval and strictly-over-1800 termination, mirror120, smoke180 and quality600 limits. The uncollected operator adds no historical benchmark family or full-game claim."
+      "unchanged_work": "Engine runtime, catalogs, solver, RNG, serialization/replay, behavior inventory, scheduling assignments and measured weights are unchanged. Preserve 12 shards, minimum 12 workers where applicable, 67% branch coverage, 1620-second approval, strictly-over-1800 termination, smoke180 and quality600 limits."
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "category": "governance",
@@ -104,7 +170,7 @@
       "selected_families": [],
       "rationale": "Add and document a separately frozen operator-only charge experiment on the unchanged native round-four preserve/screen endpoints. Existing runtime and measured test workloads are unchanged; no optimization or speedup is claimed.",
       "source_obligation": "Preserve the legal equipped 78-model roster, original seed and ordinary history, complete six-model PathWitness proposals, natural dice and mandatory charge-triggered effects. Retain rejected paths and unresolved work; eligibility is not an accepted charge. Qualify complete accepted histories through exact JSON persistence, both viewer/event comparisons and ReplayRunner.",
-      "unchanged_work": "No production, catalog, solver, RNG, serialization, replay or existing test/inventory changes. Preserve 12 shards, at least 12 workers where applicable, 67% full-package branch coverage, 1620-second approval and strictly-over-1800 termination, mirror120, smoke180 and quality600 limits. The uncollected operator adds no historical benchmark family or full-game claim."
+      "unchanged_work": "Engine runtime, catalogs, solver, RNG, serialization/replay, behavior inventory, scheduling assignments and measured weights are unchanged. Preserve 12 shards, minimum 12 workers where applicable, 67% branch coverage, 1620-second approval, strictly-over-1800 termination, smoke180 and quality600 limits."
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
@@ -112,7 +178,7 @@
       "selected_families": [],
       "rationale": "Add and document a separately frozen operator-only charge experiment on the unchanged native round-four preserve/screen endpoints. Existing runtime and measured test workloads are unchanged; no optimization or speedup is claimed.",
       "source_obligation": "Preserve the legal equipped 78-model roster, original seed and ordinary history, complete six-model PathWitness proposals, natural dice and mandatory charge-triggered effects. Retain rejected paths and unresolved work; eligibility is not an accepted charge. Qualify complete accepted histories through exact JSON persistence, both viewer/event comparisons and ReplayRunner.",
-      "unchanged_work": "No production, catalog, solver, RNG, serialization, replay or existing test/inventory changes. Preserve 12 shards, at least 12 workers where applicable, 67% full-package branch coverage, 1620-second approval and strictly-over-1800 termination, mirror120, smoke180 and quality600 limits. The uncollected operator adds no historical benchmark family or full-game claim."
+      "unchanged_work": "Engine runtime, catalogs, solver, RNG, serialization/replay, behavior inventory, scheduling assignments and measured weights are unchanged. Preserve 12 shards, minimum 12 workers where applicable, 67% branch coverage, 1620-second approval, strictly-over-1800 termination, smoke180 and quality600 limits."
     },
     "tests/support/cavalcade_native_charge.py": {
       "category": "measured_workload",
@@ -122,7 +188,35 @@
       "selected_families": [],
       "rationale": "Add and document a separately frozen operator-only charge experiment on the unchanged native round-four preserve/screen endpoints. Existing runtime and measured test workloads are unchanged; no optimization or speedup is claimed.",
       "source_obligation": "Preserve the legal equipped 78-model roster, original seed and ordinary history, complete six-model PathWitness proposals, natural dice and mandatory charge-triggered effects. Retain rejected paths and unresolved work; eligibility is not an accepted charge. Qualify complete accepted histories through exact JSON persistence, both viewer/event comparisons and ReplayRunner.",
-      "unchanged_work": "No production, catalog, solver, RNG, serialization, replay or existing test/inventory changes. Preserve 12 shards, at least 12 workers where applicable, 67% full-package branch coverage, 1620-second approval and strictly-over-1800 termination, mirror120, smoke180 and quality600 limits. The uncollected operator adds no historical benchmark family or full-game claim."
+      "unchanged_work": "Engine runtime, catalogs, solver, RNG, serialization/replay, behavior inventory, scheduling assignments and measured weights are unchanged. Preserve 12 shards, minimum 12 workers where applicable, 67% branch coverage, 1620-second approval, strictly-over-1800 termination, smoke180 and quality600 limits."
+    },
+    "ci/test_shards/native-charge-source-successor.json": {
+      "category": "measured_workload",
+      "operations": [
+        "scoped-shard-allocation"
+      ],
+      "selected_families": [],
+      "rationale": "Repair the demonstrated source-admission blocker by authenticating the complete original producer map and an exact finite four-file successor. All timing evidence, allocations, worker calibration and budgets remain unchanged; no optimization or performance claim.",
+      "source_obligation": "Preserve the legal equipped 78-model roster, original seed and ordinary history, complete six-model PathWitness proposals, natural dice and mandatory charge-triggered effects. Retain rejected paths and unresolved work; eligibility is not an accepted charge. Qualify complete accepted histories through exact JSON persistence, both viewer/event comparisons and ReplayRunner.",
+      "unchanged_work": "Engine runtime, catalogs, solver, RNG, serialization/replay, behavior inventory, scheduling assignments and measured weights are unchanged. Preserve 12 shards, minimum 12 workers where applicable, 67% branch coverage, 1620-second approval, strictly-over-1800 termination, smoke180 and quality600 limits."
+    },
+    "scripts/boolean_los_admission.py": {
+      "category": "measured_workload",
+      "operations": [
+        "scoped-shard-allocation"
+      ],
+      "selected_families": [],
+      "rationale": "Repair the demonstrated source-admission blocker by authenticating the complete original producer map and an exact finite four-file successor. All timing evidence, allocations, worker calibration and budgets remain unchanged; no optimization or performance claim.",
+      "source_obligation": "Preserve the legal equipped 78-model roster, original seed and ordinary history, complete six-model PathWitness proposals, natural dice and mandatory charge-triggered effects. Retain rejected paths and unresolved work; eligibility is not an accepted charge. Qualify complete accepted histories through exact JSON persistence, both viewer/event comparisons and ReplayRunner.",
+      "unchanged_work": "Engine runtime, catalogs, solver, RNG, serialization/replay, behavior inventory, scheduling assignments and measured weights are unchanged. Preserve 12 shards, minimum 12 workers where applicable, 67% branch coverage, 1620-second approval, strictly-over-1800 termination, smoke180 and quality600 limits."
+    },
+    "tests/code_quality/test_current_shard_compatibility.py": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Add and document a separately frozen operator-only charge experiment on the unchanged native round-four preserve/screen endpoints. Existing runtime and measured test workloads are unchanged; no optimization or speedup is claimed.",
+      "source_obligation": "Preserve the legal equipped 78-model roster, original seed and ordinary history, complete six-model PathWitness proposals, natural dice and mandatory charge-triggered effects. Retain rejected paths and unresolved work; eligibility is not an accepted charge. Qualify complete accepted histories through exact JSON persistence, both viewer/event comparisons and ReplayRunner.",
+      "unchanged_work": "Engine runtime, catalogs, solver, RNG, serialization/replay, behavior inventory, scheduling assignments and measured weights are unchanged. Preserve 12 shards, minimum 12 workers where applicable, 67% branch coverage, 1620-second approval, strictly-over-1800 termination, smoke180 and quality600 limits."
     }
   },
   "milestone": "ordinary",

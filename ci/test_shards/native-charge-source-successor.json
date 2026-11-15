@@ -1,0 +1,22 @@
+{
+  "schema": "native-charge-source-successor-v1",
+  "producer": "33d199058f2e65f544bcc535e41862e2c09207eb",
+  "changes": {
+    "docs/performance/policy-v3/operation-map.json": {
+      "before": null,
+      "after": "26750c41b5dc2319221061fea842bf5de9fd55836166690cab3680c27f6415dd"
+    },
+    "scripts/boolean_los_admission.py": {
+      "before": null,
+      "after": "35a00462f6193e65ece5e18db60c8f478789c29bfc0f31064067cb31fa063367"
+    },
+    "tests/code_quality/test_current_shard_compatibility.py": {
+      "before": null,
+      "after": "1e5c95637b09595237bf194599127613b2603aa26fd0e5aa870e865a162bc3d7"
+    },
+    "tests/support/cavalcade_native_charge.py": {
+      "before": null,
+      "after": "382c0b974852037a70c0ecf2a01bebf09c3fd50508efe1f3756dea2995126b7a"
+    }
+  }
+}
