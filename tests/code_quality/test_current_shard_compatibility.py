@@ -1071,7 +1071,8 @@ def native_charge_geometry() -> tuple[tuple[Model, ...], Model, RulesetDescripto
     }
     fixture = deployment_fixture()
     roles: dict[str, tuple[Model, ...]] = {}
-    for unit_id, dx, dy in ((THREAT_ID, -6, 23), (RANGED_ID, 0, -8)):
+    # E's original native sidestep is (+4,-1), followed by its (-8 Y) approach.
+    for unit_id, dx, dy in ((THREAT_ID, -6, 23), (RANGED_ID, 4, -9)):
         models = []
         for raw in fixture["placements"][unit_id]:
             placement = ModelPlacement.from_payload(raw)
