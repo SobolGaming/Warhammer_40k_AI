@@ -14,6 +14,56 @@
         }
       }
     },
+    "ci/test_shards/current-covered-baseline.json": {
+      "before_sha256": "7acac7eb2f8986bfd8d23edb2e3a61ac19048343491fb5f8e07c9d6ae1677508",
+      "after_sha256": "29be30196232f11d9221353d864a5447b555574be919c9b26781931c1b14b46e",
+      "owners": {
+        "@document": {
+          "before": "7acac7eb2f8986bfd8d23edb2e3a61ac19048343491fb5f8e07c9d6ae1677508",
+          "after": "29be30196232f11d9221353d864a5447b555574be919c9b26781931c1b14b46e"
+        }
+      }
+    },
+    "ci/test_shards/current-covered-evidence.json": {
+      "before_sha256": null,
+      "after_sha256": "9f591454f6d2d123624a1d9d20cb2f7f22a726beb2a5bfa5fade47797080fa9b",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "9f591454f6d2d123624a1d9d20cb2f7f22a726beb2a5bfa5fade47797080fa9b"
+        }
+      }
+    },
+    "ci/test_shards/current-derived-assignment.json": {
+      "before_sha256": "c6e15924f448f8fcc9976e80eda4212cf284cce22ea4a35703df286f8431eb15",
+      "after_sha256": "f670e10a44ee8ba95a63e5091c45331fe1da9bc38bcbce95f2309038ab4936ba",
+      "owners": {
+        "@document": {
+          "before": "c6e15924f448f8fcc9976e80eda4212cf284cce22ea4a35703df286f8431eb15",
+          "after": "f670e10a44ee8ba95a63e5091c45331fe1da9bc38bcbce95f2309038ab4936ba"
+        }
+      }
+    },
+    "ci/test_shards/current-runtime-compatibility.json": {
+      "before_sha256": "419b012be48b93db12e11f84c23d136a4edbf9b2a713d93a0da1d9f488be3d4e",
+      "after_sha256": "c4f53307b3797074d3036ebf7c0a72ce527c8426c87055fdc6b3c35950f21326",
+      "owners": {
+        "@document": {
+          "before": "419b012be48b93db12e11f84c23d136a4edbf9b2a713d93a0da1d9f488be3d4e",
+          "after": "c4f53307b3797074d3036ebf7c0a72ce527c8426c87055fdc6b3c35950f21326"
+        }
+      }
+    },
+    "ci/test_shards/durations.json": {
+      "before_sha256": "9719ac83aab425adeb2b47e4a1a2aa0c150f15bea423166277e88b8e3d83f2cf",
+      "after_sha256": "9d31f1ee22cdfe619b1987c4abd57aa0ff087d74fd3ba0a97510378f0fc059c2",
+      "owners": {
+        "@document": {
+          "before": "9719ac83aab425adeb2b47e4a1a2aa0c150f15bea423166277e88b8e3d83f2cf",
+          "after": "9d31f1ee22cdfe619b1987c4abd57aa0ff087d74fd3ba0a97510378f0fc059c2"
+        }
+      }
+    },
     "contracts/examples/persistence/session-persistence.json": {
       "before_sha256": "1aab4095da8bff2eeb40a3177e131c44929b72ea3f7311e70faff55097b5d408",
       "after_sha256": "3d3028967442591e7460a83653dea838205eb4e01b7c10f5bd720f171d344a9c",
@@ -413,6 +463,60 @@
     "README.md": {
       "category": "governance",
       "operations": [],
+      "selected_families": [],
+      "rationale": "Separate exact any-part evidence from complete visibility for Boolean consumers; preserve full classification, or maintain its exact-source validation and generated identity artifacts.",
+      "source_obligation": "Preserve continuous body/terrain/MONSTER and clipping predicates, exact fingerprints, complete full-visibility evidence, source-bound current qualification and all historical producer records.",
+      "unchanged_work": "No solver replacement, rounded keys, sampled-negative answers, allocation search, selector moves, worker changes, coverage reduction or altered execution deadline. Fresh current weights come from the required covered run; historical observations retain original sources."
+    },
+    "ci/test_shards/current-covered-baseline.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile",
+        "scoped-shard-allocation"
+      ],
+      "selected_families": [],
+      "rationale": "Separate exact any-part evidence from complete visibility for Boolean consumers; preserve full classification, or maintain its exact-source validation and generated identity artifacts.",
+      "source_obligation": "Preserve continuous body/terrain/MONSTER and clipping predicates, exact fingerprints, complete full-visibility evidence, source-bound current qualification and all historical producer records.",
+      "unchanged_work": "No solver replacement, rounded keys, sampled-negative answers, allocation search, selector moves, worker changes, coverage reduction or altered execution deadline. Fresh current weights come from the required covered run; historical observations retain original sources."
+    },
+    "ci/test_shards/current-covered-evidence.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile",
+        "scoped-shard-allocation"
+      ],
+      "selected_families": [],
+      "rationale": "Separate exact any-part evidence from complete visibility for Boolean consumers; preserve full classification, or maintain its exact-source validation and generated identity artifacts.",
+      "source_obligation": "Preserve continuous body/terrain/MONSTER and clipping predicates, exact fingerprints, complete full-visibility evidence, source-bound current qualification and all historical producer records.",
+      "unchanged_work": "No solver replacement, rounded keys, sampled-negative answers, allocation search, selector moves, worker changes, coverage reduction or altered execution deadline. Fresh current weights come from the required covered run; historical observations retain original sources."
+    },
+    "ci/test_shards/current-derived-assignment.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile",
+        "scoped-shard-allocation"
+      ],
+      "selected_families": [],
+      "rationale": "Separate exact any-part evidence from complete visibility for Boolean consumers; preserve full classification, or maintain its exact-source validation and generated identity artifacts.",
+      "source_obligation": "Preserve continuous body/terrain/MONSTER and clipping predicates, exact fingerprints, complete full-visibility evidence, source-bound current qualification and all historical producer records.",
+      "unchanged_work": "No solver replacement, rounded keys, sampled-negative answers, allocation search, selector moves, worker changes, coverage reduction or altered execution deadline. Fresh current weights come from the required covered run; historical observations retain original sources."
+    },
+    "ci/test_shards/current-runtime-compatibility.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile",
+        "scoped-shard-allocation"
+      ],
+      "selected_families": [],
+      "rationale": "Separate exact any-part evidence from complete visibility for Boolean consumers; preserve full classification, or maintain its exact-source validation and generated identity artifacts.",
+      "source_obligation": "Preserve continuous body/terrain/MONSTER and clipping predicates, exact fingerprints, complete full-visibility evidence, source-bound current qualification and all historical producer records.",
+      "unchanged_work": "No solver replacement, rounded keys, sampled-negative answers, allocation search, selector moves, worker changes, coverage reduction or altered execution deadline. Fresh current weights come from the required covered run; historical observations retain original sources."
+    },
+    "ci/test_shards/durations.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
       "selected_families": [],
       "rationale": "Separate exact any-part evidence from complete visibility for Boolean consumers; preserve full classification, or maintain its exact-source validation and generated identity artifacts.",
       "source_obligation": "Preserve continuous body/terrain/MONSTER and clipping predicates, exact fingerprints, complete full-visibility evidence, source-bound current qualification and all historical producer records.",

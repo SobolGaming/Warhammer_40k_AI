@@ -1,13 +1,17 @@
 {
   "assignment": {
     "file": "current-derived-assignment.json",
-    "sha256": "c6e15924f448f8fcc9976e80eda4212cf284cce22ea4a35703df286f8431eb15"
+    "sha256": "f670e10a44ee8ba95a63e5091c45331fe1da9bc38bcbce95f2309038ab4936ba"
   },
   "baseline": {
     "file": "current-covered-baseline.json",
-    "sha256": "7acac7eb2f8986bfd8d23edb2e3a61ac19048343491fb5f8e07c9d6ae1677508"
+    "sha256": "29be30196232f11d9221353d864a5447b555574be919c9b26781931c1b14b46e"
   },
-  "current_runtime_fingerprint": "8d7e3355d9db2c9477ba63b752dc1dfa054b5c00583ea467e3fbbc0e21d5638d",
+  "current_runtime_fingerprint": "d637f1649b7c3bfee1683c0112ac0ba37233afbf1f9640e6b4f2bbf47fa46c55",
+  "fresh_evidence": {
+    "file": "current-covered-evidence.json",
+    "sha256": "9f591454f6d2d123624a1d9d20cb2f7f22a726beb2a5bfa5fade47797080fa9b"
+  },
   "historical_revision": "008be8a8cb0b50b232fe022452762b3906489b49",
   "native_serial_role": {
     "file": "current-native-serial-role.json",
@@ -26,5 +30,5 @@
     "rounding_seconds": 30,
     "version": "native-serial-current-planning-v1"
   },
-  "schema": "historical-snapshot-current-baseline-v2"
+  "schema": "historical-snapshot-fresh-boolean-los-profile-v1"
 }
