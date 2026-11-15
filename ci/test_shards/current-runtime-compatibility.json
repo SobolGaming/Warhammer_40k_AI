@@ -1,16 +1,16 @@
 {
   "assignment": {
     "file": "current-derived-assignment.json",
-    "sha256": "f670e10a44ee8ba95a63e5091c45331fe1da9bc38bcbce95f2309038ab4936ba"
+    "sha256": "34b7c224c8465e3f5c1e4486816fca92aa3ce6a43599ba379027477b25c3d833"
   },
   "baseline": {
     "file": "current-covered-baseline.json",
-    "sha256": "29be30196232f11d9221353d864a5447b555574be919c9b26781931c1b14b46e"
+    "sha256": "7c656bf844098d5dbf19a734a6a8b0e0a9eeb4214315ebeaad8625cdd63c79d7"
   },
   "current_runtime_fingerprint": "d637f1649b7c3bfee1683c0112ac0ba37233afbf1f9640e6b4f2bbf47fa46c55",
   "fresh_evidence": {
     "file": "current-covered-evidence.json",
-    "sha256": "9f591454f6d2d123624a1d9d20cb2f7f22a726beb2a5bfa5fade47797080fa9b"
+    "sha256": "c748fcbe47c6e05ba5af082d0f3b9d90397d88b2099c01b494b562ea25f7196b"
   },
   "historical_revision": "008be8a8cb0b50b232fe022452762b3906489b49",
   "native_serial_role": {
