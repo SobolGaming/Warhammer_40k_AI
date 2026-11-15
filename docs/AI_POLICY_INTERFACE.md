@@ -2621,3 +2621,61 @@ range, a legal shooting declaration, an accepted charge, combat, useful screenin
 Stage 2 completion, full-game performance or learning. Roster, seed, positions,
 body/terrain/MONSTER occlusion and provisional model-height qualifications retain
 their existing meanings.
+
+### Frozen native Bloodcrusher charge response
+
+`tests.support.cavalcade_native_charge` is a separate operator experiment on the
+round-four common checkpoint. Preparation continues the unchanged preserve and
+screen recipes to their original B4 Charge boundary. It records both exact inputs
+and freezes the same eight ordered endpoint templates, six-model movement order,
+source hash and choices before either charge is selected. The templates use the
+actual B/E geometry; they are proposals, not proof of a legal charge.
+
+The response selects B, keeps its natural charge dice and selects only E when the
+engine offers that target. Each full six-model proposal follows its frozen
+template, with each straight path capped by the actual movement budget. Native
+validation owns legality, sequential collision, coherency and mandatory endpoint
+obligations. Rejections stay in the decision history. The operator tries at most
+eight templates, without changing engine search budgets. Exhaustion, an unhandled
+choice or unresolved computation remains incomplete; it never establishes that no
+legal charge exists. Optional reactions and Stratagems are declined. A completed
+charge must finish native mandatory triggered abilities and wound allocation,
+then stop at the first pending Fight decision without submitting it.
+
+Reproduce the common checkpoint with the existing command above, then run:
+
+```sh
+uv run --no-sync python -m tests.support.cavalcade_native_charge \
+  --common reports/native-round4/common-checkpoint.json --output reports/native-charge
+uv run --no-sync python -m tests.support.cavalcade_native_charge \
+  --output reports/native-charge --alternative preserve
+uv run --no-sync python -m tests.support.cavalcade_native_charge \
+  --output reports/native-charge --alternative screen
+uv run --no-sync python -m tests.support.cavalcade_native_charge \
+  --output reports/native-charge --alternative preserve --qualify-saved
+uv run --no-sync python -m tests.support.cavalcade_native_charge \
+  --output reports/native-charge --alternative screen --qualify-saved
+```
+
+Exact input restoration has a separate 900-second child-process allowance,
+including startup. The native response retains a 300-second cap and eight path
+attempts, including its durable output. Qualification is a separate 900-second
+capped operation: exact JSON persistence, both saved live viewer projections and
+event streams, and explicit full-history `ReplayRunner` equality. Interrupted validation
+retains the last pending and returned checkpoints and attempted paths as partial
+diagnostics. They cannot substitute for a completed response or replay proof.
+Receipts preserve positions, all model wounds/casualties and equipment, actual
+RNG events and history fingerprints, resource ledgers, decision-level costs and
+the original rejected approach paths. Different natural RNG histories are recorded
+without causal attribution. Successful target eligibility or arrival at Fight
+alone does not establish an accepted charge; the native completion event and
+mandatory effects are required. The scoped gap, null useful reference and learning
+exclusion remain in force.
+
+The first wrapper placed cold strict restoration inside the response's
+300-second clock. Its preserve attempt terminated unresolved at 300.041 seconds
+before any charge choice, roll or path submission. The v1 source, frozen procedure
+and timeout receipt remain retained. Before either charge roll, v2 separated
+strict restoration under the existing qualification allowance and re-froze the
+byte-identical inputs, endpoint templates, choices and charge-search limits.
+This harness correction changes no engine behavior or rules answer.

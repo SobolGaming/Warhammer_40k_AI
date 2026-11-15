@@ -35986,7 +35986,8 @@
     "native-v995-approach-operator": {
       "paths": [
         "tests/support/cavalcade_native_approach.py",
-        "tests/support/cavalcade_native_qualification.py"
+        "tests/support/cavalcade_native_qualification.py",
+        "tests/support/cavalcade_native_charge.py"
       ],
       "owners": [
         "*"
