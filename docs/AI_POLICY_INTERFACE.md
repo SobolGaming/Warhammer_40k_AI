@@ -2638,9 +2638,9 @@ template. V4 admits a whole formation only when every complete straight path fit
 the actual movement budget; it never clips individual paths. Native
 validation owns legality, sequential collision, coherency and mandatory endpoint
 obligations. Rejections stay in the decision history. The operator tries at most
-eight templates, without changing engine search budgets. Exhaustion, an unhandled
-choice or unresolved computation remains incomplete; it never establishes that no
-legal charge exists. Optional reactions and Stratagems are declined. A completed
+eight proposals from the finite frozen templates, without changing engine search
+budgets. Exhaustion, an unhandled choice or unresolved computation remains
+incomplete; it never establishes that no legal charge exists. Optional reactions and Stratagems are declined. A completed
 charge must finish native mandatory triggered abilities and wound allocation,
 then stop at the first pending Fight decision without submitting it.
 
@@ -2658,6 +2658,16 @@ uv run --no-sync python -m tests.support.cavalcade_native_charge \
 uv run --no-sync python -m tests.support.cavalcade_native_charge \
   --output reports/native-charge --alternative screen --qualify-saved
 ```
+
+To continue the original qualified partial histories after the formation repair,
+freeze a new output directory with `--repair-from reports/native-charge` instead
+of `--common`. This copies each exact retained checkpoint, including its natural
+charge roll and all eight rejected proposals, and checks its prior qualification
+receipt before constructing the new procedure. Keep the original evidence
+directory unchanged. Execute and qualify both alternatives in the new directory.
+The formation regressions verify geometry and budget admission only; accepted
+native charges, mandatory effects, first Fight and exact replay require those
+live continuations and remain unqualified until their receipts pass.
 
 Exact input restoration has a separate 900-second child-process allowance,
 including startup. The native response retains a 300-second cap and eight path

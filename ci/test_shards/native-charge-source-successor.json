@@ -12,7 +12,7 @@
     },
     "tests/code_quality/test_current_shard_compatibility.py": {
       "before": "017ea13da6b7bff94f1bda7edf700e3cdae8ccbe298c76b94edd8d419fa88c30",
-      "after": "368e63d536aa233f5422c10f15d71a0132d8ca5e029412b047f25b824aae0cd4"
+      "after": "6dde14faab05e27a9512ff641468c5cc9f0bb14348e2a5eda1ea1ecd7efc61de"
     },
     "tests/support/cavalcade_native_charge.py": {
       "before": null,

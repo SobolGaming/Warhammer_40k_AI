@@ -6,11 +6,11 @@
   "changes": {
     "ci/quality_shards/all.txt": {
       "before_sha256": "4c8684ec6ed70ed2edac193d63d2b3f09eda88f107434c46b1a8ada940d3a21f",
-      "after_sha256": "40e9228c4663f1e34f9874c5e76d929a44cf9798c1fcb18b62c8eec1efa7cb5b",
+      "after_sha256": "779bd44ad0264310a0958faca952f20fc20e8c47d305b83f1949fb9953754ee5",
       "owners": {
         "@document": {
           "before": "4c8684ec6ed70ed2edac193d63d2b3f09eda88f107434c46b1a8ada940d3a21f",
-          "after": "40e9228c4663f1e34f9874c5e76d929a44cf9798c1fcb18b62c8eec1efa7cb5b"
+          "after": "779bd44ad0264310a0958faca952f20fc20e8c47d305b83f1949fb9953754ee5"
         }
       }
     },
@@ -26,21 +26,21 @@
     },
     "ci/test_shards/native-charge-source-successor.json": {
       "before_sha256": null,
-      "after_sha256": "f5f7907083e823e698caa25a5c7cb2e19b8d859934214cfa047e681d222825c2",
+      "after_sha256": "cb7ba844ef90ff1ade441b5af923b8206567769f829ba4c7fa13378529696ca1",
       "owners": {
         "@document": {
           "before": null,
-          "after": "f5f7907083e823e698caa25a5c7cb2e19b8d859934214cfa047e681d222825c2"
+          "after": "cb7ba844ef90ff1ade441b5af923b8206567769f829ba4c7fa13378529696ca1"
         }
       }
     },
     "docs/AI_POLICY_INTERFACE.md": {
       "before_sha256": "4a14350ee00f4045614eaa36004a32c21ddaf7576d1adefb21c55dc1b91a13a7",
-      "after_sha256": "840fd4835711d68d889a773651136d3d6c8d5ba1380e203fc10087b66dd2aab1",
+      "after_sha256": "9669b17d3b809b14b5ac2a277d15fc1e952ef0aa88991db680725856065e1168",
       "owners": {
         "@document": {
           "before": "4a14350ee00f4045614eaa36004a32c21ddaf7576d1adefb21c55dc1b91a13a7",
-          "after": "840fd4835711d68d889a773651136d3d6c8d5ba1380e203fc10087b66dd2aab1"
+          "after": "9669b17d3b809b14b5ac2a277d15fc1e952ef0aa88991db680725856065e1168"
         }
       }
     },
@@ -88,7 +88,7 @@
     },
     "tests/code_quality/test_current_shard_compatibility.py": {
       "before_sha256": "017ea13da6b7bff94f1bda7edf700e3cdae8ccbe298c76b94edd8d419fa88c30",
-      "after_sha256": "368e63d536aa233f5422c10f15d71a0132d8ca5e029412b047f25b824aae0cd4",
+      "after_sha256": "6dde14faab05e27a9512ff641468c5cc9f0bb14348e2a5eda1ea1ecd7efc61de",
       "owners": {
         "@module": {
           "before": "872b4cd2346333a6d046dab5c4f9a8e32dec6a4db2f1adda8f37e8e4c4df1a96",
@@ -100,7 +100,7 @@
         },
         "native_charge_geometry": {
           "before": null,
-          "after": "f7e115c7a9324ae4126588d65f6af9fbdd542cccfdb91a3556f29500834f02a7"
+          "after": "3f3edaf71ea7cb5ffbba565bc41e82193de8b458a22fcf67d4450cd0b7e407de"
         },
         "test_native_charge_rejects_whole_template_instead_of_clipping_models": {
           "before": null,

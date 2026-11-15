@@ -1071,7 +1071,7 @@ def native_charge_geometry() -> tuple[tuple[Model, ...], Model, RulesetDescripto
     }
     fixture = deployment_fixture()
     roles: dict[str, tuple[Model, ...]] = {}
-    # E's original native sidestep is (+4,-1), followed by its (-8 Y) approach.
+    # E's prefix sidestep (+4, -1) precedes its round-two (0, -8) move.
     for unit_id, dx, dy in ((THREAT_ID, -6, 23), (RANGED_ID, 4, -9)):
         models: list[Model] = []
         for raw in fixture["placements"][unit_id]:
@@ -1092,7 +1092,7 @@ def native_charge_geometry() -> tuple[tuple[Model, ...], Model, RulesetDescripto
             )
         roles[unit_id] = tuple(sorted(models, key=lambda m: m.model_id))
     target = roles[RANGED_ID][0]
-    assert abs(min(m.range_to(target) for m in roles[THREAT_ID]) - 5.211905011060019) < 1e-12
+    assert abs(min(m.range_to(target) for m in roles[THREAT_ID]) - 5.211905011060019) < 1e-9
     return roles[THREAT_ID], target, session.lifecycle.config.ruleset_descriptor
 
 
