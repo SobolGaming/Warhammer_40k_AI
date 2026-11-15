@@ -2531,3 +2531,55 @@ incorrect rules result. No combat result, useful screen, E attack, delayed benef
 Stage 2 completion or learning eligibility is claimed;
 `useful_reference_status` remains `scoped_gap`, `reference_target` remains null,
 and `eligible_for_learning` remains false.
+
+### Bounded native LOS diagnosis
+
+The follow-up uses the exact retained preservation and screen checkpoints on
+unchanged runtime
+`warhammer40k-core-v2:runtime-tree-sha256-v1:8d7e3355d9db2c9477ba63b752dc1dfa054b5c00583ea467e3fbbc0e21d5638d`.
+The separate `native-los-after-680-evidence.zip` retains the diagnostic scripts
+`profile_native_los.py` and `controls_native_los.py`, checkpoint/lifecycle hashes,
+setup and query receipts, contexts, formulas and stacks. Each serial diagnostic
+authenticates the retained checkpoint and lifecycle, restores through
+`GameLifecycle.from_payload`, and checks exact payload equality before calling
+the same E-to-B API. Read/hash verification, restoration and equality are timed
+separately from the query's new 60-second cap; a 300-second outer worker allowance
+also includes startup and restoration. These instrumented diagnostics retain
+the original 300-second timeout receipts unchanged; they are neither replacement
+qualifications nor a latency distribution or optimization comparison.
+
+Both new queries terminate unresolved at the 60-second cap. The receipt clocks
+below include polling and termination overhead; no visibility Boolean returned.
+Full classification begins at query +2.0341 seconds (preserve) and +2.0487 seconds
+(screen); the first formula enters the solver wrapper at +2.3095 and +2.3291
+seconds respectively. Both formulas are byte-identical, 7,841,013 bytes, with one
+universal and one existential quantifier and one relevant full-visibility blocker.
+Both 20-second stack samples are inside Z3's solver check, separating the observed
+computation from checkpoint restoration. Separate constructed first-target
+controls for both contexts pass: obstacle-free geometry is fully visible, a
+target enclosure blocks visibility, cached/uncached results agree and changed
+geometry changes the context fingerprint. Exact half-millimetre corridor contact
+is blocked, as is a 1e-9-inch inward offset; a 1e-9-inch outward offset is clear.
+The original contexts remain unchanged. A prior scratch import failure and an
+interrupted all-target control attempt are retained separately without claimed
+answers; these adjacent controls do not resolve either native query.
+
+| Alternative | Read/hash seconds | Restore seconds | Payload equality seconds | Query receipt seconds | Worker wall seconds |
+|---|---:|---:|---:|---:|---:|
+| Preserve | 2.1076 | 65.8311 | 0.0606 | 60.2658 | 133.5445 |
+| Screen | 2.0874 | 66.2684 | 0.2493 | 60.1983 | 133.1493 |
+
+The Boolean `unit_has_line_of_sight_to_target` requests a complete
+`TerrainVisibilityContext` witness. Its shared scalar owner,
+`resolve_visibility_pair_uncached`, establishes any-part visibility internally
+before attempting full visibility through `visibility_formulas.decide_full` and
+Z3. A stalled pair's internal predicate does not supply the complete unit-level
+API result. No missing proof certificate was established to justify a narrow
+optimization, so this slice changes no runtime. A Boolean-only path would require
+a separately designed partial-evidence and cache contract across scalar,
+composite and battlefield-clipped geometry; the existing paired evidence must
+never contain an invented full-visibility value. Preserve body/terrain occlusion,
+MONSTER rules, provisional-height qualifications, fingerprint/cache identity and
+the exact roster, seed and positions. The B-to-E finding above remains charge
+target eligibility, not reverse shooting LOS or an accepted charge path. No
+combat, useful screening, E attack, full-game timing or learning claim follows.
