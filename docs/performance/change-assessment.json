@@ -1,67 +1,937 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "416d068f3fd38d8b7ad46084826d36786352078c",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:8d7e3355d9db2c9477ba63b752dc1dfa054b5c00583ea467e3fbbc0e21d5638d",
-  "operation_map_sha256": "ef82e108ec4b9b33c4e216c3a7fb997569e621dd10f82d96426bfeb39ef2ce39",
+  "base": "70b1d6ad4b5265fddae30aaf869e4f91471269af",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:d637f1649b7c3bfee1683c0112ac0ba37233afbf1f9640e6b4f2bbf47fa46c55",
+  "operation_map_sha256": "023948ce1ac86768e41732e2a5dca6a1020e173cfa7f81aa077c8f8a80b6b1fb",
   "changes": {
-    "docs/AI_IMPLEMENTATION_PLAN.md": {
-      "before_sha256": "cfbc8118a9a1f96d31f28648a64cf22f42bc628b4b8e0fcaf721f04aa123abc9",
-      "after_sha256": "2fb3af0a6d448e2fd94d607d44a60213e817c02fb3cf947d91e0c9911ea89e95",
+    "README.md": {
+      "before_sha256": "171389a51063965adb6687b5f0c43c1238d96d2483acb51835eb1b583ce10e2c",
+      "after_sha256": "9968f72e385b223b7245e1411b77bd4280cea5e6bf5d364e7f6b4d42a3717cd5",
       "owners": {
         "@document": {
-          "before": "cfbc8118a9a1f96d31f28648a64cf22f42bc628b4b8e0fcaf721f04aa123abc9",
-          "after": "2fb3af0a6d448e2fd94d607d44a60213e817c02fb3cf947d91e0c9911ea89e95"
+          "before": "171389a51063965adb6687b5f0c43c1238d96d2483acb51835eb1b583ce10e2c",
+          "after": "9968f72e385b223b7245e1411b77bd4280cea5e6bf5d364e7f6b4d42a3717cd5"
+        }
+      }
+    },
+    "ci/test_shards/current-covered-baseline.json": {
+      "before_sha256": "7acac7eb2f8986bfd8d23edb2e3a61ac19048343491fb5f8e07c9d6ae1677508",
+      "after_sha256": "7c656bf844098d5dbf19a734a6a8b0e0a9eeb4214315ebeaad8625cdd63c79d7",
+      "owners": {
+        "@document": {
+          "before": "7acac7eb2f8986bfd8d23edb2e3a61ac19048343491fb5f8e07c9d6ae1677508",
+          "after": "7c656bf844098d5dbf19a734a6a8b0e0a9eeb4214315ebeaad8625cdd63c79d7"
+        }
+      }
+    },
+    "ci/test_shards/current-covered-evidence.json": {
+      "before_sha256": null,
+      "after_sha256": "c748fcbe47c6e05ba5af082d0f3b9d90397d88b2099c01b494b562ea25f7196b",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "c748fcbe47c6e05ba5af082d0f3b9d90397d88b2099c01b494b562ea25f7196b"
+        }
+      }
+    },
+    "ci/test_shards/current-derived-assignment.json": {
+      "before_sha256": "c6e15924f448f8fcc9976e80eda4212cf284cce22ea4a35703df286f8431eb15",
+      "after_sha256": "34b7c224c8465e3f5c1e4486816fca92aa3ce6a43599ba379027477b25c3d833",
+      "owners": {
+        "@document": {
+          "before": "c6e15924f448f8fcc9976e80eda4212cf284cce22ea4a35703df286f8431eb15",
+          "after": "34b7c224c8465e3f5c1e4486816fca92aa3ce6a43599ba379027477b25c3d833"
+        }
+      }
+    },
+    "ci/test_shards/current-runtime-compatibility.json": {
+      "before_sha256": "419b012be48b93db12e11f84c23d136a4edbf9b2a713d93a0da1d9f488be3d4e",
+      "after_sha256": "2756dbdaeab7b5d02b8f1ec1a9fe357b65dd9e5d36a026d56d5c27f6d9485857",
+      "owners": {
+        "@document": {
+          "before": "419b012be48b93db12e11f84c23d136a4edbf9b2a713d93a0da1d9f488be3d4e",
+          "after": "2756dbdaeab7b5d02b8f1ec1a9fe357b65dd9e5d36a026d56d5c27f6d9485857"
+        }
+      }
+    },
+    "ci/test_shards/durations.json": {
+      "before_sha256": "9719ac83aab425adeb2b47e4a1a2aa0c150f15bea423166277e88b8e3d83f2cf",
+      "after_sha256": "3554a9d3e8783f79bc42aa0a5cb1edcec34595af451725345583b9cf1f9d2c02",
+      "owners": {
+        "@document": {
+          "before": "9719ac83aab425adeb2b47e4a1a2aa0c150f15bea423166277e88b8e3d83f2cf",
+          "after": "3554a9d3e8783f79bc42aa0a5cb1edcec34595af451725345583b9cf1f9d2c02"
+        }
+      }
+    },
+    "contracts/examples/persistence/session-persistence.json": {
+      "before_sha256": "1aab4095da8bff2eeb40a3177e131c44929b72ea3f7311e70faff55097b5d408",
+      "after_sha256": "3d3028967442591e7460a83653dea838205eb4e01b7c10f5bd720f171d344a9c",
+      "owners": {
+        "@document": {
+          "before": "1aab4095da8bff2eeb40a3177e131c44929b72ea3f7311e70faff55097b5d408",
+          "after": "3d3028967442591e7460a83653dea838205eb4e01b7c10f5bd720f171d344a9c"
+        }
+      }
+    },
+    "contracts/examples/sessions/session-command-outcome.json": {
+      "before_sha256": "4d80d92190e282efc945b2bd60dec4e9ea79463a8f90440de94d7bc5adfe3abb",
+      "after_sha256": "fa2b92cfad1e0d6c03ab3c34d72212fa633b4eb624478643c2b24ffe5cf1a783",
+      "owners": {
+        "@document": {
+          "before": "4d80d92190e282efc945b2bd60dec4e9ea79463a8f90440de94d7bc5adfe3abb",
+          "after": "fa2b92cfad1e0d6c03ab3c34d72212fa633b4eb624478643c2b24ffe5cf1a783"
+        }
+      }
+    },
+    "contracts/examples/sessions/session-command-started.json": {
+      "before_sha256": "ebfc105d7f597a68985a519ea4009110b63d9641017053caa79dbd721aca0848",
+      "after_sha256": "12001d2cfbea78ec9f6a7b1e24e01ec6c82dfd65eed247b4c6aaf8d914ef2ceb",
+      "owners": {
+        "@document": {
+          "before": "ebfc105d7f597a68985a519ea4009110b63d9641017053caa79dbd721aca0848",
+          "after": "12001d2cfbea78ec9f6a7b1e24e01ec6c82dfd65eed247b4c6aaf8d914ef2ceb"
+        }
+      }
+    },
+    "contracts/examples/sessions/session-metadata-created.json": {
+      "before_sha256": "a0ba32fde44bfdc273ee511871c77b86ea48c6b1e0190a69cb24616910c96a5a",
+      "after_sha256": "2b35f9d57a27b059cf65237d67fefcdb79317ce7e24f124e2a2fe83f9998e04f",
+      "owners": {
+        "@document": {
+          "before": "a0ba32fde44bfdc273ee511871c77b86ea48c6b1e0190a69cb24616910c96a5a",
+          "after": "2b35f9d57a27b059cf65237d67fefcdb79317ce7e24f124e2a2fe83f9998e04f"
+        }
+      }
+    },
+    "contracts/examples/support-profile-player-a-redacted.json": {
+      "before_sha256": "869789e595e774edf7a171dd1a01345e9ffc634ce8e6fc7fb612318c49383b6a",
+      "after_sha256": "f2793cb09f1b1f6d955f130d5305ab458095378f85f88853a7fb3b5a0fb5fb9c",
+      "owners": {
+        "@document": {
+          "before": "869789e595e774edf7a171dd1a01345e9ffc634ce8e6fc7fb612318c49383b6a",
+          "after": "f2793cb09f1b1f6d955f130d5305ab458095378f85f88853a7fb3b5a0fb5fb9c"
+        }
+      }
+    },
+    "contracts/examples/support-profile-player-b-redacted.json": {
+      "before_sha256": "031f52d5df7107e59258e246cfa004858e2948632455566db5c90eeb0481f2d2",
+      "after_sha256": "c5eb16bd3411d9a483d3219346954446807dc23607eec6b87c2449ea25e00307",
+      "owners": {
+        "@document": {
+          "before": "031f52d5df7107e59258e246cfa004858e2948632455566db5c90eeb0481f2d2",
+          "after": "c5eb16bd3411d9a483d3219346954446807dc23607eec6b87c2449ea25e00307"
+        }
+      }
+    },
+    "contracts/examples/support-profile.json": {
+      "before_sha256": "1740ec940b1a93047259012847ee3bfee9b4c7e9a741dce986d8be19c506f93b",
+      "after_sha256": "957d5c2ea0465b26ad43118939e92e21e844d255585200ba1b98737682796cb8",
+      "owners": {
+        "@document": {
+          "before": "1740ec940b1a93047259012847ee3bfee9b4c7e9a741dce986d8be19c506f93b",
+          "after": "957d5c2ea0465b26ad43118939e92e21e844d255585200ba1b98737682796cb8"
+        }
+      }
+    },
+    "contracts/manifest.json": {
+      "before_sha256": "827509859f87b8263b984c943c8dac97be5121408df61f514b59b1d4d27ac6ae",
+      "after_sha256": "4ed9ef9eb0d54b243862fa79939fac1872333ae24d5b38477c998cc4033256a6",
+      "owners": {
+        "@document": {
+          "before": "827509859f87b8263b984c943c8dac97be5121408df61f514b59b1d4d27ac6ae",
+          "after": "4ed9ef9eb0d54b243862fa79939fac1872333ae24d5b38477c998cc4033256a6"
+        }
+      }
+    },
+    "data/source_audits/ci64_provenance_v1/test-cutover.json": {
+      "before_sha256": "629424e7fd056ab7345dc36435ea98fc06b0c281ce40c9bc5a6d2516fbf0133c",
+      "after_sha256": "a9f79edb35492c8425af3226f50bab3b43f950401652b8ed5f770b225d94648f",
+      "owners": {
+        "@document": {
+          "before": "629424e7fd056ab7345dc36435ea98fc06b0c281ce40c9bc5a6d2516fbf0133c",
+          "after": "a9f79edb35492c8425af3226f50bab3b43f950401652b8ed5f770b225d94648f"
+        }
+      }
+    },
+    "docs/AI_IMPLEMENTATION_PLAN.md": {
+      "before_sha256": "2fb3af0a6d448e2fd94d607d44a60213e817c02fb3cf947d91e0c9911ea89e95",
+      "after_sha256": "2c7ef367c9a6dda96bea85213736e853f7e09ddc91dca3c55f01eca2512ba4d9",
+      "owners": {
+        "@document": {
+          "before": "2fb3af0a6d448e2fd94d607d44a60213e817c02fb3cf947d91e0c9911ea89e95",
+          "after": "2c7ef367c9a6dda96bea85213736e853f7e09ddc91dca3c55f01eca2512ba4d9"
         }
       }
     },
     "docs/AI_POLICY_INTERFACE.md": {
-      "before_sha256": "c16f94f78a6c7df6e1a83c0cb17b350aad2dc705d797f6fe41137f5062a8ae34",
-      "after_sha256": "c35fe08be49de30ab708fbdc89bfef37235f2efb70dfecf88b39735f92c774e8",
+      "before_sha256": "c35fe08be49de30ab708fbdc89bfef37235f2efb70dfecf88b39735f92c774e8",
+      "after_sha256": "4a14350ee00f4045614eaa36004a32c21ddaf7576d1adefb21c55dc1b91a13a7",
       "owners": {
         "@document": {
-          "before": "c16f94f78a6c7df6e1a83c0cb17b350aad2dc705d797f6fe41137f5062a8ae34",
-          "after": "c35fe08be49de30ab708fbdc89bfef37235f2efb70dfecf88b39735f92c774e8"
+          "before": "c35fe08be49de30ab708fbdc89bfef37235f2efb70dfecf88b39735f92c774e8",
+          "after": "4a14350ee00f4045614eaa36004a32c21ddaf7576d1adefb21c55dc1b91a13a7"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
-      "before_sha256": "a5537ac57daa8f8041f745d463318bb0f21689cfebffb9dec29c9e5dd8f635a5",
-      "after_sha256": "e8f5585fddd1dbf16b83ecb2496d093ae35e8f4e6fb8b3ab66e1f0395d8cadd0",
+      "before_sha256": "e8f5585fddd1dbf16b83ecb2496d093ae35e8f4e6fb8b3ab66e1f0395d8cadd0",
+      "after_sha256": "39a90f9a08ae8aaa6d4d411e5702fe3e35e9b2e120421ec673b68cba6da610b7",
       "owners": {
         "@document": {
-          "before": "a5537ac57daa8f8041f745d463318bb0f21689cfebffb9dec29c9e5dd8f635a5",
-          "after": "e8f5585fddd1dbf16b83ecb2496d093ae35e8f4e6fb8b3ab66e1f0395d8cadd0"
+          "before": "e8f5585fddd1dbf16b83ecb2496d093ae35e8f4e6fb8b3ab66e1f0395d8cadd0",
+          "after": "39a90f9a08ae8aaa6d4d411e5702fe3e35e9b2e120421ec673b68cba6da610b7"
+        }
+      }
+    },
+    "docs/SEQUENTIAL_REMEDIATION_REVIEW_POLICY.md": {
+      "before_sha256": "c5228b1ab0c4c40758aa792507723d0ec282b6d009e2e8e1cef093167d9cab21",
+      "after_sha256": "c19ddc0924576aba254bccf002fec8760edaedfaaeca97df41ea02e01e79b062",
+      "owners": {
+        "@document": {
+          "before": "c5228b1ab0c4c40758aa792507723d0ec282b6d009e2e8e1cef093167d9cab21",
+          "after": "c19ddc0924576aba254bccf002fec8760edaedfaaeca97df41ea02e01e79b062"
+        }
+      }
+    },
+    "docs/performance/current/boolean-los-20261115-planning1620-movement.json": {
+      "before_sha256": null,
+      "after_sha256": "e7022d4b1b24c7a246ec35a7f81fec4a4ab0c92be607456d36be592d6932959f",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "e7022d4b1b24c7a246ec35a7f81fec4a4ab0c92be607456d36be592d6932959f"
+        }
+      }
+    },
+    "docs/performance/current/boolean-los-20261115-planning1620-reconstruction.json": {
+      "before_sha256": null,
+      "after_sha256": "4777c3ea49429d31028ecbac48d3a0b15801889dac10e21807e4814e903fa771",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "4777c3ea49429d31028ecbac48d3a0b15801889dac10e21807e4814e903fa771"
+        }
+      }
+    },
+    "docs/performance/current/boolean-los-20261115-planning1620-setup.json": {
+      "before_sha256": null,
+      "after_sha256": "bfc2c5909eb343b033785573f44b00e1ee1872867e248d36259701a9f2804acc",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "bfc2c5909eb343b033785573f44b00e1ee1872867e248d36259701a9f2804acc"
+        }
+      }
+    },
+    "docs/performance/current/boolean-los-20261115-planning1620-visibility.json": {
+      "before_sha256": null,
+      "after_sha256": "b90ca44022e8c326f07b04e1a6519a62a37e1f002cf5dbf0262a485a93aa96e4",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "b90ca44022e8c326f07b04e1a6519a62a37e1f002cf5dbf0262a485a93aa96e4"
+        }
+      }
+    },
+    "docs/performance/policy-v3/operation-map.json": {
+      "before_sha256": "8c67ee49bf7ad2f3dd8847646107410ebeda1aa657c80d9562ff86db077d4315",
+      "after_sha256": "09596f0c185020f51488a09a0e56a3b6dc6d30f761ae9d93ac044ee37943566c",
+      "owners": {
+        "@document": {
+          "before": "8c67ee49bf7ad2f3dd8847646107410ebeda1aa657c80d9562ff86db077d4315",
+          "after": "09596f0c185020f51488a09a0e56a3b6dc6d30f761ae9d93ac044ee37943566c"
+        }
+      }
+    },
+    "scripts/boolean_los_admission.py": {
+      "before_sha256": null,
+      "after_sha256": "f1bbc073e8c0d46d471782c3518846a872ab9f3d8db0432d22393d1a44fa446b",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "149cb7bbb8c3999273c793362d6aabfca536a277fd8809c9e7ddeff85d96d41d"
+        },
+        "_text": {
+          "before": null,
+          "after": "363b78a70d0690ac62faa76fcdfe66a8ded099c494145f147d2b36e5ea399ae5"
+        },
+        "fresh_native_role": {
+          "before": null,
+          "after": "0c431ace4e392fce65096e0c3fe076ba1f85ab0f6d39b47a3ff9112645e087e4"
+        },
+        "transitioned_test": {
+          "before": null,
+          "after": "eeeafffdb14e5cd14e687f66fe8d7d29a2ab6b56dc620faf818c65fcf53449c0"
+        },
+        "validate_manifest": {
+          "before": null,
+          "after": "ba32d3ad3318cdc31239a9ea9d60b86747debed7aa3f6b16f4030134c833f58c"
+        },
+        "validate_transition": {
+          "before": null,
+          "after": "eb45fcfcfcd9291815fcc0b7f6bc7fdff4a45d30b7698b0b8a95c3bcfa501377"
+        }
+      }
+    },
+    "scripts/current_native_serial_role.py": {
+      "before_sha256": "68a0fec55989f49b2e84d62fa59ade4eb4c577c8c9965cf4d7459baf6441d8ab",
+      "after_sha256": "1eaf0150261a429a81bc4fa1b2be32cc2c291370bec709a8d6d8c8de511beab5",
+      "owners": {
+        "_observation": {
+          "before": "659eb5dfac7fcf1eba72b3d64108a697e90d1c247993a176ad13563cf2e009db",
+          "after": "6a013108a21e90a20d8652737c50255cd9d4b4414de0b0ad7b62a2ffbd4cd65e"
+        }
+      }
+    },
+    "scripts/current_shard_assignment.py": {
+      "before_sha256": "f727b23af8a6738ecf5fd2e535484e2a0bb1ec41efa5afd6d477a77f641b3fa6",
+      "after_sha256": "18ce9839918f3281800155d9d6f6349aec9a2a670dfa1de86b28beea147b8027",
+      "owners": {
+        "@module": {
+          "before": "58ccad4a43f2475a7d081329e484cba10f5b842061fac911d89e8d002437b1b2",
+          "after": "7d49d1e2969ceafc96708f6e9966cd9c6b58972fd544ac474c91aad0653d7b11"
+        },
+        "current_planning_policy": {
+          "before": "4bd3701745e7d3cc80255a58111435a26010da83bcfa904b9aa10ab324613da8",
+          "after": "e3fca6dd84e155bcb8f6dd58c151750e50a3cc0849a9c64be00eb32a9079c5a6"
+        }
+      }
+    },
+    "scripts/current_shard_compatibility.py": {
+      "before_sha256": "e594d149fa1a039818def672ae5eb1e3750ccde518e774782f8b26a1c37db954",
+      "after_sha256": "727959bae2ce1798821e086d84d9567eb1e2c45e4e438f0a296ef0d5fc466415",
+      "owners": {
+        "_baseline": {
+          "before": "df8d197a2d076a91142dd1cf59a344598cdcd073784510b1b17ef1e1e3941704",
+          "after": "64035e7e2d4d6a0e3c182fe4ecc0c9feeb2943817289cad926227d0003931e57"
+        },
+        "plan": {
+          "before": "138c3d250108dbd69f1ec95fdf8a390728454b1533ab625603e19a479534268e",
+          "after": "3590a78b6a9a67c1afb90de7e66a4569405b03d70f6d977189edade5a861d97b"
+        }
+      }
+    },
+    "src/warhammer40k_core/_engine_build_manifest.json": {
+      "before_sha256": "dd9509243a9995a67375284b1dc38395295a7c973ab82ef59631a3066a770a5e",
+      "after_sha256": "5d3b31896c265ba5cd152a79d147b8d48cbbecdc1898e8aa593791a7c8eb9312",
+      "owners": {
+        "@document": {
+          "before": "dd9509243a9995a67375284b1dc38395295a7c973ab82ef59631a3066a770a5e",
+          "after": "5d3b31896c265ba5cd152a79d147b8d48cbbecdc1898e8aa593791a7c8eb9312"
+        }
+      }
+    },
+    "src/warhammer40k_core/core/visibility.py": {
+      "before_sha256": "1c22dfbcfcf8a5ba2f8967ad4c218a4d3800e6cab1e6e7718c3f3d0fff3fc876",
+      "after_sha256": "22b7c34d34852feb507c3be2dacc78d819c6d09f02d2da3d5e20da726c7bd817",
+      "owners": {
+        "@module": {
+          "before": "80f92efae38e3836568d3d1e1aa0229e5a2634bf9eeaca51f550700a8d5a624c",
+          "after": "8ad9ab5bda7be68e3702905e92e6d05b01bb55eec2a1856e2d1ecf9ddfb3878c"
+        },
+        "TerrainVisibilityContext.has_line_of_sight": {
+          "before": null,
+          "after": "4ebe0eda87678c39bd87a413b161ac38fde576ad1e1747e31470fc82c136f942"
+        },
+        "_validate_boolean_target_model_ids": {
+          "before": null,
+          "after": "f79d44f81858c66a5fa4c546df25caaa197a2bebd9e5705c2b72f30ad2053a45"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/thousand_sons/army_rule.py": {
+      "before_sha256": "c1cc9a2644cab2747ca92384c6b058d0484dfef114af168a9dc00fa8995f9165",
+      "after_sha256": "38d84dce270ca182979584eb72c081a365c91c1c4a9c3c2b296b5190b7c6b466",
+      "owners": {
+        "_manifesting_model_can_see_target": {
+          "before": "d17281ad3cb904f55d9bded3a77724d396abd8d876b5ed244185e7d7117835f7",
+          "after": "7a3ad01078f8fdd4a0a2f827d8b36c3c3fab1b6c45f6d19490b0f57a34cb6fa4"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/shooting_targets.py": {
+      "before_sha256": "97ee0bfc130b4b426bc280f9e823bc7c366d1595aae6763d97a72885f28e8625",
+      "after_sha256": "f087201dfa03c10164f292b0fd93d9dfc6eb09940100ed7588acec812464dbc0",
+      "owners": {
+        "unit_has_line_of_sight_to_target": {
+          "before": "a62dc0435bdf22fcbad094de4dfeca563aaae36da101f8fa23375033c31d5cb6",
+          "after": "42651b9a9d34b1462886334135817a18228ccc132aa2ecdd805b01a0974685c4"
+        }
+      }
+    },
+    "src/warhammer40k_core/geometry/continuous_visibility.py": {
+      "before_sha256": "19ddccbcc1a433f837dba8ec539c3f5ca321b8061a2c69d78ffed750986d912c",
+      "after_sha256": "98bef87230485f553433bc80034e93d0911ef92c8244008cabc84b45a866f6dc",
+      "owners": {
+        "AnyPartVisibilityEvidence": {
+          "before": null,
+          "after": "d321fab48ca3db85008dae995a67647969736d7d1085d70d750396e9936df61b"
+        },
+        "AnyPartVisibilityEvidence.__post_init__": {
+          "before": null,
+          "after": "b8aeaf124c761104e73e6f7e370d841396a8862bfad32f961923ade647fa3e26"
+        },
+        "_resolve_any_part": {
+          "before": null,
+          "after": "c181791e57e11b1c06d6eec3faf021e17034c3b5b536b7fda8d9031d6362bf4f"
+        },
+        "resolve_any_visibility_pair": {
+          "before": null,
+          "after": "fb4cca59d8ca16f3f1caec19d4cb2d36757afabd703d7c05424fe3fa9f7acc75"
+        },
+        "resolve_any_visibility_pair_uncached": {
+          "before": null,
+          "after": "bd3651ecdafa04587c9550f348acaaee11898a719b3abe9e4460184d3824ac98"
+        },
+        "resolve_visibility_pair_uncached": {
+          "before": "c9714a543621087a69bdb34c596f2516a22427f1e4a9c68ace150fca19436f8c",
+          "after": "a043dc101ae1021fe19b4b90ea2d96e36fcf8c079c2867ced78f4bcb92fadffa"
+        }
+      }
+    },
+    "src/warhammer40k_core/geometry/physical_visibility.py": {
+      "before_sha256": "45fb0aac8f54b6613688e9724510ac4da618232f8a0b3428557fabdddf50ed41",
+      "after_sha256": "9a6ef36b773142084a839dae44acc66b21155953363499aa94ce2c7b3749b007",
+      "owners": {
+        "@module": {
+          "before": "6718d80d2c42b459e3f5378f3a2e82599fe66512f16793b9fb9cb0be04000445",
+          "after": "721b878dcd135055b28434942ca8362d2911ba51e0647bfac5233dcdd48b7d91"
+        },
+        "resolve_physical_any_visibility": {
+          "before": null,
+          "after": "2ab06f49d07663c7fba60e4cd64d01de7aa7223a77cb69becf41ee400700791b"
+        },
+        "resolve_physical_any_visibility_uncached": {
+          "before": null,
+          "after": "2a058568e4236d4cdcee2e21d17367ec805d4670b704d43c110545f4a3e732e2"
+        },
+        "resolve_physical_visibility_uncached": {
+          "before": "f971b021a48c53172012ee8c021146e9ce5b0f3969c566daa49b8d143ba7d136",
+          "after": "8836de71db0ab2d6c6ad72495c760ad1e285322b4dfec0ff05787f33b318c619"
+        }
+      }
+    },
+    "tests/code_quality/test_current_shard_compatibility.py": {
+      "before_sha256": "0acce0468596ce40932e3f79bc72277e600e82572aa93a8d16e0f8171314e490",
+      "after_sha256": "017ea13da6b7bff94f1bda7edf700e3cdae8ccbe298c76b94edd8d419fa88c30",
+      "owners": {
+        "test_current_dispatch_has_exact_inventory_and_disclosed_selector_moves": {
+          "before": "472cd2cf30949edf9a1356b49068ee85119ad16fcabdd9ab3d332e751eaa058d",
+          "after": "6766f6164e689da31c6e235fea00726d343dc11dfcc585394d2fd02025391fd8"
+        },
+        "test_current_planning_ceiling_has_an_inclusive_exact_boundary": {
+          "before": "9a344c4bdb0095817f9f3e5ed273c335cbadb1885c01a860f38a4800eef9597d",
+          "after": "42c479f14a17b48d1ea6cb7ebaf350c19830a5b8283d37eaa0a600bf3dfd359e"
+        },
+        "test_current_raw_projections_keep_missing_observations_null": {
+          "before": "8333e2b94cb776fa2112f8ca0b293b0a00228231a8c82caf0e94676167ded343",
+          "after": "cbebc05c9383c2b4f7ebf4965de3d7e30e55acb83c1737279f2c35808adf7491"
+        },
+        "test_native_serial_role_preserves_complete_phases_and_measurement_scope": {
+          "before": "d9aebc07e78ef5aff4bf2f1a4737fb342fefddfc98aa16a20638619b5c196a99",
+          "after": "9cffb7e572fd6ced404620b95aa03bff6dbbd8a99ab0911f9e352799163558db"
+        }
+      }
+    },
+    "tests/code_quality/test_extended_shard_allocation.py": {
+      "before_sha256": "2607df6aa86a5fd8372f807661b9d7105be5da9a622f737a5fa603d5febc50e9",
+      "after_sha256": "e96ca28eba1917a97286757081eaf4b74fb3bc548f5efa46764b4691d5a7b14d",
+      "owners": {
+        "inputs": {
+          "before": "6b6593fb1f920ebc6808e7f85fff194f7c53cbb2406fcfe7a82f54ac59216731",
+          "after": "52f7374cec9868b5ffbcce6e51e16faf0f03f1166c7929e3b6f30835af7633d7"
+        }
+      }
+    },
+    "tests/code_quality/test_scoped_shard_allocation.py": {
+      "before_sha256": "9245c2f8975cdc1776d51535467a6fb79d8c234469e6545c2e0985814614c2b9",
+      "after_sha256": "7c25b7cf678c4186ecbc659bf816b6f874a8cbee14a517c005e01f97cdcc0104",
+      "owners": {
+        "inputs": {
+          "before": "76f1108a7bb005b0d8d102eac4937b79765a217395475596873efacd92e06bb3",
+          "after": "13e9abb7038a5eca964c82ede15faa6d0f739229a0c51666d63ae900195a10f4"
+        }
+      }
+    },
+    "tests/rules/section06/coverage.json": {
+      "before_sha256": "978f253b8865601656841e9975548dc2c2e8ecb66ebbf9b98a8b3efc00032d93",
+      "after_sha256": "a8fcf72816be3d629070cbe2321dba37581797b42f9215b26b68ec0949277bf9",
+      "owners": {
+        "@document": {
+          "before": "978f253b8865601656841e9975548dc2c2e8ecb66ebbf9b98a8b3efc00032d93",
+          "after": "a8fcf72816be3d629070cbe2321dba37581797b42f9215b26b68ec0949277bf9"
+        }
+      }
+    },
+    "tests/rules/section06/test_visibility.py": {
+      "before_sha256": "8c1452eeb7c5c5c2ec0c0619fc45a2fa000d1323a1d7b6872f4934354854b61e",
+      "after_sha256": "5ae3fa685a0d75855d550b78107b4fe6b810e61d518b880b69ffbe8ed1c935ee",
+      "owners": {
+        "test_any_model_part_and_every_facing_part_native_geometry": {
+          "before": "00075b26dae9662a53a5fc6a7c6db54a6da0976da3145d2c01bee2fdf88747ca",
+          "after": "a7c428d4d17b9aa6254b70e0183e6ceb55cda88c803d3cc35ad6c01b220add3f"
+        },
+        "test_exact_corridor_contact_survives_rear_proof_search": {
+          "before": "0fb38ad042b9bea1eb92bc6f471e5358bd485eb0254d7644473928718e686a40",
+          "after": "2a676dd4e0a19c48f47b6f1c80ca8f1c7fb6624979a9ded715056fdf8703aa08"
+        },
+        "test_unit_visible_any_and_fully_visible_all_native_members": {
+          "before": "f7b4f1614e87af91057a693c723668baa6d92bdbf2b72a50370a99250fc145da",
+          "after": "dad80e512fc31bc64cabd11e2dd8ea5e9c552eba8fbca7d16992ff41cd6a772a"
+        }
+      }
+    },
+    "tests/rules/section06/test_visibility_ownership.py": {
+      "before_sha256": "eab9f586cf33b2c3d2dc08b1fac11bd7163a133c0de7d466873504dffcaeaafd",
+      "after_sha256": "7863b5747eb63c3f6d26562da55d93a6b05f1a41e5f7285eaa54448550430f08",
+      "owners": {
+        "@module": {
+          "before": "afa6a5a0a78a6d03551cabbad23622171b0836c3e85b5781f0100c862f3d6c91",
+          "after": "70ee5fd7a3e3e70e13da038ad5946479d43decd1c88b9e1647a467b0d09c64ea"
+        },
+        "test_faq63_incoming_body_part_and_clipped_outgoing_origin": {
+          "before": "96adca500005dfcd168ac4893ba7702432829e16465b0d3ecf59b6077ea47e42",
+          "after": "299d54b0f48b6830e2f283b31c395671d63f235426c0a9264562f8adfc41df02"
+        },
+        "test_observer_and_target_members_are_excluded_but_other_units_block": {
+          "before": "58f3833d0488912dbcbf8c820de5c8f1d8eeb66f02d96d469dc2892a54ea4190",
+          "after": "24744b8e772b8d5442a32302405885fb1cc07f02abe4aad576c8742de645e9d0"
+        }
+      }
+    },
+    "tests/rules/section07/coverage.json": {
+      "before_sha256": "b4f665c7c549c74c25d72deafae2fac1d938ae1543656dd2f5b4839125889699",
+      "after_sha256": "b3a4a396df256a02435c92423742206b1f4b1a9ca3793e5a799cef189bd7eb69",
+      "owners": {
+        "@document": {
+          "before": "b4f665c7c549c74c25d72deafae2fac1d938ae1543656dd2f5b4839125889699",
+          "after": "b3a4a396df256a02435c92423742206b1f4b1a9ca3793e5a799cef189bd7eb69"
         }
       }
     }
   },
-  "milestone": "ordinary",
-  "comparisons": {},
-  "full_game": null,
   "rows": {
+    "README.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Apply the explicit owner-approved current planning1620 policy; preserve actual1620 approval, strict-over1800 termination, complete67% branch coverage and all tests/assignments. Refresh only current documentation authentication.",
+      "source_obligation": "Version the current forecast policy transparently, retain every historical producer/threshold/outcome, and never increase allowed actual runtime or change the execution hard stop.",
+      "unchanged_work": "No case omission, selector move, worker change, dispatch-history membership change, retrospective passing outcome or actual execution-budget increase. Fresh records bind exact current source bytes."
+    },
+    "ci/test_shards/current-covered-baseline.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile",
+        "scoped-shard-allocation"
+      ],
+      "selected_families": [],
+      "rationale": "Separate exact any-part evidence from complete visibility for Boolean consumers; preserve full classification, or maintain its exact-source validation and generated identity artifacts.",
+      "source_obligation": "Preserve continuous body/terrain/MONSTER and clipping predicates, exact fingerprints, complete full-visibility evidence, source-bound current qualification and all historical producer records.",
+      "unchanged_work": "No solver replacement, rounded keys, sampled-negative answers, allocation search, selector moves, worker changes, coverage reduction or altered execution deadline. Fresh current weights come from the required covered run; historical observations retain original sources."
+    },
+    "ci/test_shards/current-covered-evidence.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile",
+        "scoped-shard-allocation"
+      ],
+      "selected_families": [],
+      "rationale": "Separate exact any-part evidence from complete visibility for Boolean consumers; preserve full classification, or maintain its exact-source validation and generated identity artifacts.",
+      "source_obligation": "Preserve continuous body/terrain/MONSTER and clipping predicates, exact fingerprints, complete full-visibility evidence, source-bound current qualification and all historical producer records.",
+      "unchanged_work": "No solver replacement, rounded keys, sampled-negative answers, allocation search, selector moves, worker changes, coverage reduction or altered execution deadline. Fresh current weights come from the required covered run; historical observations retain original sources."
+    },
+    "ci/test_shards/current-derived-assignment.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile",
+        "scoped-shard-allocation"
+      ],
+      "selected_families": [],
+      "rationale": "Separate exact any-part evidence from complete visibility for Boolean consumers; preserve full classification, or maintain its exact-source validation and generated identity artifacts.",
+      "source_obligation": "Preserve continuous body/terrain/MONSTER and clipping predicates, exact fingerprints, complete full-visibility evidence, source-bound current qualification and all historical producer records.",
+      "unchanged_work": "No solver replacement, rounded keys, sampled-negative answers, allocation search, selector moves, worker changes, coverage reduction or altered execution deadline. Fresh current weights come from the required covered run; historical observations retain original sources."
+    },
+    "ci/test_shards/current-runtime-compatibility.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile",
+        "scoped-shard-allocation"
+      ],
+      "selected_families": [],
+      "rationale": "Apply the explicit owner-approved current planning1620 policy; preserve actual1620 approval, strict-over1800 termination, complete67% branch coverage and all tests/assignments. Refresh only current documentation authentication.",
+      "source_obligation": "Version the current forecast policy transparently, retain every historical producer/threshold/outcome, and never increase allowed actual runtime or change the execution hard stop.",
+      "unchanged_work": "No case omission, selector move, worker change, dispatch-history membership change, retrospective passing outcome or actual execution-budget increase. Fresh records bind exact current source bytes."
+    },
+    "ci/test_shards/durations.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Apply the explicit owner-approved current planning1620 policy; preserve actual1620 approval, strict-over1800 termination, complete67% branch coverage and all tests/assignments. Refresh only current documentation authentication.",
+      "source_obligation": "Version the current forecast policy transparently, retain every historical producer/threshold/outcome, and never increase allowed actual runtime or change the execution hard stop.",
+      "unchanged_work": "No case omission, selector move, worker change, dispatch-history membership change, retrospective passing outcome or actual execution-budget increase. Fresh records bind exact current source bytes."
+    },
+    "contracts/examples/persistence/session-persistence.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Separate exact any-part evidence from complete visibility for Boolean consumers; preserve full classification, or maintain its exact-source validation and generated identity artifacts.",
+      "source_obligation": "Preserve continuous body/terrain/MONSTER and clipping predicates, exact fingerprints, complete full-visibility evidence, source-bound current qualification and all historical producer records.",
+      "unchanged_work": "No solver replacement, rounded keys, sampled-negative answers, allocation search, selector moves, worker changes, coverage reduction or altered execution deadline. Fresh current weights come from the required covered run; historical observations retain original sources."
+    },
+    "contracts/examples/sessions/session-command-outcome.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Separate exact any-part evidence from complete visibility for Boolean consumers; preserve full classification, or maintain its exact-source validation and generated identity artifacts.",
+      "source_obligation": "Preserve continuous body/terrain/MONSTER and clipping predicates, exact fingerprints, complete full-visibility evidence, source-bound current qualification and all historical producer records.",
+      "unchanged_work": "No solver replacement, rounded keys, sampled-negative answers, allocation search, selector moves, worker changes, coverage reduction or altered execution deadline. Fresh current weights come from the required covered run; historical observations retain original sources."
+    },
+    "contracts/examples/sessions/session-command-started.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Separate exact any-part evidence from complete visibility for Boolean consumers; preserve full classification, or maintain its exact-source validation and generated identity artifacts.",
+      "source_obligation": "Preserve continuous body/terrain/MONSTER and clipping predicates, exact fingerprints, complete full-visibility evidence, source-bound current qualification and all historical producer records.",
+      "unchanged_work": "No solver replacement, rounded keys, sampled-negative answers, allocation search, selector moves, worker changes, coverage reduction or altered execution deadline. Fresh current weights come from the required covered run; historical observations retain original sources."
+    },
+    "contracts/examples/sessions/session-metadata-created.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Separate exact any-part evidence from complete visibility for Boolean consumers; preserve full classification, or maintain its exact-source validation and generated identity artifacts.",
+      "source_obligation": "Preserve continuous body/terrain/MONSTER and clipping predicates, exact fingerprints, complete full-visibility evidence, source-bound current qualification and all historical producer records.",
+      "unchanged_work": "No solver replacement, rounded keys, sampled-negative answers, allocation search, selector moves, worker changes, coverage reduction or altered execution deadline. Fresh current weights come from the required covered run; historical observations retain original sources."
+    },
+    "contracts/examples/support-profile-player-a-redacted.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Separate exact any-part evidence from complete visibility for Boolean consumers; preserve full classification, or maintain its exact-source validation and generated identity artifacts.",
+      "source_obligation": "Preserve continuous body/terrain/MONSTER and clipping predicates, exact fingerprints, complete full-visibility evidence, source-bound current qualification and all historical producer records.",
+      "unchanged_work": "No solver replacement, rounded keys, sampled-negative answers, allocation search, selector moves, worker changes, coverage reduction or altered execution deadline. Fresh current weights come from the required covered run; historical observations retain original sources."
+    },
+    "contracts/examples/support-profile-player-b-redacted.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Separate exact any-part evidence from complete visibility for Boolean consumers; preserve full classification, or maintain its exact-source validation and generated identity artifacts.",
+      "source_obligation": "Preserve continuous body/terrain/MONSTER and clipping predicates, exact fingerprints, complete full-visibility evidence, source-bound current qualification and all historical producer records.",
+      "unchanged_work": "No solver replacement, rounded keys, sampled-negative answers, allocation search, selector moves, worker changes, coverage reduction or altered execution deadline. Fresh current weights come from the required covered run; historical observations retain original sources."
+    },
+    "contracts/examples/support-profile.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Separate exact any-part evidence from complete visibility for Boolean consumers; preserve full classification, or maintain its exact-source validation and generated identity artifacts.",
+      "source_obligation": "Preserve continuous body/terrain/MONSTER and clipping predicates, exact fingerprints, complete full-visibility evidence, source-bound current qualification and all historical producer records.",
+      "unchanged_work": "No solver replacement, rounded keys, sampled-negative answers, allocation search, selector moves, worker changes, coverage reduction or altered execution deadline. Fresh current weights come from the required covered run; historical observations retain original sources."
+    },
+    "contracts/manifest.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Separate exact any-part evidence from complete visibility for Boolean consumers; preserve full classification, or maintain its exact-source validation and generated identity artifacts.",
+      "source_obligation": "Preserve continuous body/terrain/MONSTER and clipping predicates, exact fingerprints, complete full-visibility evidence, source-bound current qualification and all historical producer records.",
+      "unchanged_work": "No solver replacement, rounded keys, sampled-negative answers, allocation search, selector moves, worker changes, coverage reduction or altered execution deadline. Fresh current weights come from the required covered run; historical observations retain original sources."
+    },
+    "data/source_audits/ci64_provenance_v1/test-cutover.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "ci78-prototype-evidence-0e09425e4315bf61bb6c4427fa7917fe62c2ed867dcb01798f9451a957182b0a"
+      ],
+      "selected_families": [],
+      "rationale": "Separate exact any-part evidence from complete visibility for Boolean consumers; preserve full classification, or maintain its exact-source validation and generated identity artifacts.",
+      "source_obligation": "Preserve continuous body/terrain/MONSTER and clipping predicates, exact fingerprints, complete full-visibility evidence, source-bound current qualification and all historical producer records.",
+      "unchanged_work": "No solver replacement, rounded keys, sampled-negative answers, allocation search, selector moves, worker changes, coverage reduction or altered execution deadline. Fresh current weights come from the required covered run; historical observations retain original sources."
+    },
     "docs/AI_IMPLEMENTATION_PLAN.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Document bounded read-only native LOS diagnosis and unresolved classification; no runtime optimization or measured workload change.",
-      "source_obligation": "Preserve exact retained checkpoints and original timeouts; separate lifecycle restoration from query work, actual charge eligibility from shooting LOS, and adjacent controls from native results.",
-      "unchanged_work": "Runtime, catalogs, provisional geometry, physical and MONSTER occlusion, seeds, positions, complete evidence/cache identity, tests, twelve shards and coverage/CI limits are unchanged. No speedup, useful-screen, combat or full-game claim. Required serial current-runtime smoke and exact-head local/remote gates remain mandatory."
+      "rationale": "Separate exact any-part evidence from complete visibility for Boolean consumers; preserve full classification, or maintain its exact-source validation and generated identity artifacts.",
+      "source_obligation": "Preserve continuous body/terrain/MONSTER and clipping predicates, exact fingerprints, complete full-visibility evidence, source-bound current qualification and all historical producer records.",
+      "unchanged_work": "No solver replacement, rounded keys, sampled-negative answers, allocation search, selector moves, worker changes, coverage reduction or altered execution deadline. Fresh current weights come from the required covered run; historical observations retain original sources."
     },
     "docs/AI_POLICY_INTERFACE.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Document bounded read-only native LOS diagnosis and unresolved classification; no runtime optimization or measured workload change.",
-      "source_obligation": "Preserve exact retained checkpoints and original timeouts; separate lifecycle restoration from query work, actual charge eligibility from shooting LOS, and adjacent controls from native results.",
-      "unchanged_work": "Runtime, catalogs, provisional geometry, physical and MONSTER occlusion, seeds, positions, complete evidence/cache identity, tests, twelve shards and coverage/CI limits are unchanged. No speedup, useful-screen, combat or full-game claim. Required serial current-runtime smoke and exact-head local/remote gates remain mandatory."
+      "rationale": "Separate exact any-part evidence from complete visibility for Boolean consumers; preserve full classification, or maintain its exact-source validation and generated identity artifacts.",
+      "source_obligation": "Preserve continuous body/terrain/MONSTER and clipping predicates, exact fingerprints, complete full-visibility evidence, source-bound current qualification and all historical producer records.",
+      "unchanged_work": "No solver replacement, rounded keys, sampled-negative answers, allocation search, selector moves, worker changes, coverage reduction or altered execution deadline. Fresh current weights come from the required covered run; historical observations retain original sources."
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Document bounded read-only native LOS diagnosis and unresolved classification; no runtime optimization or measured workload change.",
-      "source_obligation": "Preserve exact retained checkpoints and original timeouts; separate lifecycle restoration from query work, actual charge eligibility from shooting LOS, and adjacent controls from native results.",
-      "unchanged_work": "Runtime, catalogs, provisional geometry, physical and MONSTER occlusion, seeds, positions, complete evidence/cache identity, tests, twelve shards and coverage/CI limits are unchanged. No speedup, useful-screen, combat or full-game claim. Required serial current-runtime smoke and exact-head local/remote gates remain mandatory."
+      "rationale": "Separate exact any-part evidence from complete visibility for Boolean consumers; preserve full classification, or maintain its exact-source validation and generated identity artifacts.",
+      "source_obligation": "Preserve continuous body/terrain/MONSTER and clipping predicates, exact fingerprints, complete full-visibility evidence, source-bound current qualification and all historical producer records.",
+      "unchanged_work": "No solver replacement, rounded keys, sampled-negative answers, allocation search, selector moves, worker changes, coverage reduction or altered execution deadline. Fresh current weights come from the required covered run; historical observations retain original sources."
+    },
+    "docs/SEQUENTIAL_REMEDIATION_REVIEW_POLICY.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Apply the explicit owner-approved current planning1620 policy; preserve actual1620 approval, strict-over1800 termination, complete67% branch coverage and all tests/assignments. Refresh only current documentation authentication.",
+      "source_obligation": "Version the current forecast policy transparently, retain every historical producer/threshold/outcome, and never increase allowed actual runtime or change the execution hard stop.",
+      "unchanged_work": "No case omission, selector move, worker change, dispatch-history membership change, retrospective passing outcome or actual execution-budget increase. Fresh records bind exact current source bytes."
+    },
+    "docs/performance/current/boolean-los-20261115-planning1620-movement.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Separate exact any-part evidence from complete visibility for Boolean consumers; preserve full classification, or maintain its exact-source validation and generated identity artifacts.",
+      "source_obligation": "Preserve continuous body/terrain/MONSTER and clipping predicates, exact fingerprints, complete full-visibility evidence, source-bound current qualification and all historical producer records.",
+      "unchanged_work": "No solver replacement, rounded keys, sampled-negative answers, allocation search, selector moves, worker changes, coverage reduction or altered execution deadline. Fresh current weights come from the required covered run; historical observations retain original sources."
+    },
+    "docs/performance/current/boolean-los-20261115-planning1620-reconstruction.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Separate exact any-part evidence from complete visibility for Boolean consumers; preserve full classification, or maintain its exact-source validation and generated identity artifacts.",
+      "source_obligation": "Preserve continuous body/terrain/MONSTER and clipping predicates, exact fingerprints, complete full-visibility evidence, source-bound current qualification and all historical producer records.",
+      "unchanged_work": "No solver replacement, rounded keys, sampled-negative answers, allocation search, selector moves, worker changes, coverage reduction or altered execution deadline. Fresh current weights come from the required covered run; historical observations retain original sources."
+    },
+    "docs/performance/current/boolean-los-20261115-planning1620-setup.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Separate exact any-part evidence from complete visibility for Boolean consumers; preserve full classification, or maintain its exact-source validation and generated identity artifacts.",
+      "source_obligation": "Preserve continuous body/terrain/MONSTER and clipping predicates, exact fingerprints, complete full-visibility evidence, source-bound current qualification and all historical producer records.",
+      "unchanged_work": "No solver replacement, rounded keys, sampled-negative answers, allocation search, selector moves, worker changes, coverage reduction or altered execution deadline. Fresh current weights come from the required covered run; historical observations retain original sources."
+    },
+    "docs/performance/current/boolean-los-20261115-planning1620-visibility.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Separate exact any-part evidence from complete visibility for Boolean consumers; preserve full classification, or maintain its exact-source validation and generated identity artifacts.",
+      "source_obligation": "Preserve continuous body/terrain/MONSTER and clipping predicates, exact fingerprints, complete full-visibility evidence, source-bound current qualification and all historical producer records.",
+      "unchanged_work": "No solver replacement, rounded keys, sampled-negative answers, allocation search, selector moves, worker changes, coverage reduction or altered execution deadline. Fresh current weights come from the required covered run; historical observations retain original sources."
+    },
+    "docs/performance/policy-v3/operation-map.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Separate exact any-part evidence from complete visibility for Boolean consumers; preserve full classification, or maintain its exact-source validation and generated identity artifacts.",
+      "source_obligation": "Preserve continuous body/terrain/MONSTER and clipping predicates, exact fingerprints, complete full-visibility evidence, source-bound current qualification and all historical producer records.",
+      "unchanged_work": "No solver replacement, rounded keys, sampled-negative answers, allocation search, selector moves, worker changes, coverage reduction or altered execution deadline. Fresh current weights come from the required covered run; historical observations retain original sources."
+    },
+    "scripts/boolean_los_admission.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "scoped-shard-allocation"
+      ],
+      "selected_families": [],
+      "rationale": "Separate exact any-part evidence from complete visibility for Boolean consumers; preserve full classification, or maintain its exact-source validation and generated identity artifacts.",
+      "source_obligation": "Preserve continuous body/terrain/MONSTER and clipping predicates, exact fingerprints, complete full-visibility evidence, source-bound current qualification and all historical producer records.",
+      "unchanged_work": "No solver replacement, rounded keys, sampled-negative answers, allocation search, selector moves, worker changes, coverage reduction or altered execution deadline. Fresh current weights come from the required covered run; historical observations retain original sources."
+    },
+    "scripts/current_native_serial_role.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "scoped-shard-allocation"
+      ],
+      "selected_families": [],
+      "rationale": "Separate exact any-part evidence from complete visibility for Boolean consumers; preserve full classification, or maintain its exact-source validation and generated identity artifacts.",
+      "source_obligation": "Preserve continuous body/terrain/MONSTER and clipping predicates, exact fingerprints, complete full-visibility evidence, source-bound current qualification and all historical producer records.",
+      "unchanged_work": "No solver replacement, rounded keys, sampled-negative answers, allocation search, selector moves, worker changes, coverage reduction or altered execution deadline. Fresh current weights come from the required covered run; historical observations retain original sources."
+    },
+    "scripts/current_shard_assignment.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "scoped-shard-allocation"
+      ],
+      "selected_families": [],
+      "rationale": "Apply the explicit owner-approved current planning1620 policy; preserve actual1620 approval, strict-over1800 termination, complete67% branch coverage and all tests/assignments. Refresh only current documentation authentication.",
+      "source_obligation": "Version the current forecast policy transparently, retain every historical producer/threshold/outcome, and never increase allowed actual runtime or change the execution hard stop.",
+      "unchanged_work": "No case omission, selector move, worker change, dispatch-history membership change, retrospective passing outcome or actual execution-budget increase. Fresh records bind exact current source bytes."
+    },
+    "scripts/current_shard_compatibility.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "scoped-shard-allocation"
+      ],
+      "selected_families": [],
+      "rationale": "Separate exact any-part evidence from complete visibility for Boolean consumers; preserve full classification, or maintain its exact-source validation and generated identity artifacts.",
+      "source_obligation": "Preserve continuous body/terrain/MONSTER and clipping predicates, exact fingerprints, complete full-visibility evidence, source-bound current qualification and all historical producer records.",
+      "unchanged_work": "No solver replacement, rounded keys, sampled-negative answers, allocation search, selector moves, worker changes, coverage reduction or altered execution deadline. Fresh current weights come from the required covered run; historical observations retain original sources."
+    },
+    "src/warhammer40k_core/_engine_build_manifest.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "source-record"
+      ],
+      "selected_families": [],
+      "rationale": "Separate exact any-part evidence from complete visibility for Boolean consumers; preserve full classification, or maintain its exact-source validation and generated identity artifacts.",
+      "source_obligation": "Preserve continuous body/terrain/MONSTER and clipping predicates, exact fingerprints, complete full-visibility evidence, source-bound current qualification and all historical producer records.",
+      "unchanged_work": "No solver replacement, rounded keys, sampled-negative answers, allocation search, selector moves, worker changes, coverage reduction or altered execution deadline. Fresh current weights come from the required covered run; historical observations retain original sources."
+    },
+    "src/warhammer40k_core/core/visibility.py": {
+      "category": "hot_query_or_data_structure",
+      "operations": [
+        "visibility-query"
+      ],
+      "selected_families": [
+        "visibility"
+      ],
+      "rationale": "Separate exact any-part evidence from complete visibility for Boolean consumers; preserve full classification, or maintain its exact-source validation and generated identity artifacts.",
+      "source_obligation": "Preserve continuous body/terrain/MONSTER and clipping predicates, exact fingerprints, complete full-visibility evidence, source-bound current qualification and all historical producer records.",
+      "unchanged_work": "No solver replacement, rounded keys, sampled-negative answers, allocation search, selector moves, worker changes, coverage reduction or altered execution deadline. Fresh current weights come from the required covered run; historical observations retain original sources."
+    },
+    "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/thousand_sons/army_rule.py": {
+      "category": "hot_query_or_data_structure",
+      "operations": [
+        "order135-visibility-hot-consumers"
+      ],
+      "selected_families": [
+        "visibility"
+      ],
+      "rationale": "Separate exact any-part evidence from complete visibility for Boolean consumers; preserve full classification, or maintain its exact-source validation and generated identity artifacts.",
+      "source_obligation": "Preserve continuous body/terrain/MONSTER and clipping predicates, exact fingerprints, complete full-visibility evidence, source-bound current qualification and all historical producer records.",
+      "unchanged_work": "No solver replacement, rounded keys, sampled-negative answers, allocation search, selector moves, worker changes, coverage reduction or altered execution deadline. Fresh current weights come from the required covered run; historical observations retain original sources."
+    },
+    "src/warhammer40k_core/engine/shooting_targets.py": {
+      "category": "hot_query_or_data_structure",
+      "operations": [
+        "order135-visibility-hot-consumers"
+      ],
+      "selected_families": [
+        "visibility"
+      ],
+      "rationale": "Separate exact any-part evidence from complete visibility for Boolean consumers; preserve full classification, or maintain its exact-source validation and generated identity artifacts.",
+      "source_obligation": "Preserve continuous body/terrain/MONSTER and clipping predicates, exact fingerprints, complete full-visibility evidence, source-bound current qualification and all historical producer records.",
+      "unchanged_work": "No solver replacement, rounded keys, sampled-negative answers, allocation search, selector moves, worker changes, coverage reduction or altered execution deadline. Fresh current weights come from the required covered run; historical observations retain original sources."
+    },
+    "src/warhammer40k_core/geometry/continuous_visibility.py": {
+      "category": "hot_query_or_data_structure",
+      "operations": [
+        "geometry-search",
+        "cache-policy"
+      ],
+      "selected_families": [
+        "movement",
+        "reconstruction",
+        "setup",
+        "visibility"
+      ],
+      "rationale": "Separate exact any-part evidence from complete visibility for Boolean consumers; preserve full classification, or maintain its exact-source validation and generated identity artifacts.",
+      "source_obligation": "Preserve continuous body/terrain/MONSTER and clipping predicates, exact fingerprints, complete full-visibility evidence, source-bound current qualification and all historical producer records.",
+      "unchanged_work": "No solver replacement, rounded keys, sampled-negative answers, allocation search, selector moves, worker changes, coverage reduction or altered execution deadline. Fresh current weights come from the required covered run; historical observations retain original sources."
+    },
+    "src/warhammer40k_core/geometry/physical_visibility.py": {
+      "category": "hot_query_or_data_structure",
+      "operations": [
+        "geometry-search",
+        "cache-policy"
+      ],
+      "selected_families": [
+        "movement",
+        "reconstruction",
+        "setup",
+        "visibility"
+      ],
+      "rationale": "Separate exact any-part evidence from complete visibility for Boolean consumers; preserve full classification, or maintain its exact-source validation and generated identity artifacts.",
+      "source_obligation": "Preserve continuous body/terrain/MONSTER and clipping predicates, exact fingerprints, complete full-visibility evidence, source-bound current qualification and all historical producer records.",
+      "unchanged_work": "No solver replacement, rounded keys, sampled-negative answers, allocation search, selector moves, worker changes, coverage reduction or altered execution deadline. Fresh current weights come from the required covered run; historical observations retain original sources."
+    },
+    "tests/code_quality/test_current_shard_compatibility.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "scoped-shard-allocation"
+      ],
+      "selected_families": [],
+      "rationale": "Apply the explicit owner-approved current planning1620 policy; preserve actual1620 approval, strict-over1800 termination, complete67% branch coverage and all tests/assignments. Refresh only current documentation authentication.",
+      "source_obligation": "Version the current forecast policy transparently, retain every historical producer/threshold/outcome, and never increase allowed actual runtime or change the execution hard stop.",
+      "unchanged_work": "No case omission, selector move, worker change, dispatch-history membership change, retrospective passing outcome or actual execution-budget increase. Fresh records bind exact current source bytes."
+    },
+    "tests/code_quality/test_extended_shard_allocation.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "scoped-shard-allocation"
+      ],
+      "selected_families": [],
+      "rationale": "Separate exact any-part evidence from complete visibility for Boolean consumers; preserve full classification, or maintain its exact-source validation and generated identity artifacts.",
+      "source_obligation": "Preserve continuous body/terrain/MONSTER and clipping predicates, exact fingerprints, complete full-visibility evidence, source-bound current qualification and all historical producer records.",
+      "unchanged_work": "No solver replacement, rounded keys, sampled-negative answers, allocation search, selector moves, worker changes, coverage reduction or altered execution deadline. Fresh current weights come from the required covered run; historical observations retain original sources."
+    },
+    "tests/code_quality/test_scoped_shard_allocation.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "scoped-shard-allocation"
+      ],
+      "selected_families": [],
+      "rationale": "Separate exact any-part evidence from complete visibility for Boolean consumers; preserve full classification, or maintain its exact-source validation and generated identity artifacts.",
+      "source_obligation": "Preserve continuous body/terrain/MONSTER and clipping predicates, exact fingerprints, complete full-visibility evidence, source-bound current qualification and all historical producer records.",
+      "unchanged_work": "No solver replacement, rounded keys, sampled-negative answers, allocation search, selector moves, worker changes, coverage reduction or altered execution deadline. Fresh current weights come from the required covered run; historical observations retain original sources."
+    },
+    "tests/rules/section06/coverage.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "qualification40-exact-a6c79dbf9af6ff00"
+      ],
+      "selected_families": [],
+      "rationale": "Separate exact any-part evidence from complete visibility for Boolean consumers; preserve full classification, or maintain its exact-source validation and generated identity artifacts.",
+      "source_obligation": "Preserve continuous body/terrain/MONSTER and clipping predicates, exact fingerprints, complete full-visibility evidence, source-bound current qualification and all historical producer records.",
+      "unchanged_work": "No solver replacement, rounded keys, sampled-negative answers, allocation search, selector moves, worker changes, coverage reduction or altered execution deadline. Fresh current weights come from the required covered run; historical observations retain original sources."
+    },
+    "tests/rules/section06/test_visibility.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "qualification40-exact-9d30d0082c5a80f3",
+        "sorcerer-admission-exact-36"
+      ],
+      "selected_families": [],
+      "rationale": "Separate exact any-part evidence from complete visibility for Boolean consumers; preserve full classification, or maintain its exact-source validation and generated identity artifacts.",
+      "source_obligation": "Preserve continuous body/terrain/MONSTER and clipping predicates, exact fingerprints, complete full-visibility evidence, source-bound current qualification and all historical producer records.",
+      "unchanged_work": "No solver replacement, rounded keys, sampled-negative answers, allocation search, selector moves, worker changes, coverage reduction or altered execution deadline. Fresh current weights come from the required covered run; historical observations retain original sources."
+    },
+    "tests/rules/section06/test_visibility_ownership.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "qualification40-exact-f00d2df9ee40b370"
+      ],
+      "selected_families": [],
+      "rationale": "Separate exact any-part evidence from complete visibility for Boolean consumers; preserve full classification, or maintain its exact-source validation and generated identity artifacts.",
+      "source_obligation": "Preserve continuous body/terrain/MONSTER and clipping predicates, exact fingerprints, complete full-visibility evidence, source-bound current qualification and all historical producer records.",
+      "unchanged_work": "No solver replacement, rounded keys, sampled-negative answers, allocation search, selector moves, worker changes, coverage reduction or altered execution deadline. Fresh current weights come from the required covered run; historical observations retain original sources."
+    },
+    "tests/rules/section07/coverage.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "qualification40-exact-b6886d3bc2fb1ca4"
+      ],
+      "selected_families": [],
+      "rationale": "Apply the explicit owner-approved current planning1620 policy; preserve actual1620 approval, strict-over1800 termination, complete67% branch coverage and all tests/assignments. Refresh only current documentation authentication.",
+      "source_obligation": "Version the current forecast policy transparently, retain every historical producer/threshold/outcome, and never increase allowed actual runtime or change the execution hard stop.",
+      "unchanged_work": "No case omission, selector move, worker change, dispatch-history membership change, retrospective passing outcome or actual execution-budget increase. Fresh records bind exact current source bytes."
     }
-  }
+  },
+  "milestone": "ordinary",
+  "comparisons": {
+    "visibility": "docs/performance/current/boolean-los-20261115-planning1620-visibility.json",
+    "movement": "docs/performance/current/boolean-los-20261115-planning1620-movement.json",
+    "setup": "docs/performance/current/boolean-los-20261115-planning1620-setup.json",
+    "reconstruction": "docs/performance/current/boolean-los-20261115-planning1620-reconstruction.json"
+  },
+  "full_game": null
 }

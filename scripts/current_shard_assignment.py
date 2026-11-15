@@ -14,8 +14,8 @@ from scripts.hosted_timing_calibration import _object, read_json
 FILENAME = "current-derived-assignment.json"
 SCHEMA = "reviewed-derived-current-shard-assignment-v1"
 ROLE = "Derived planning assignment only; no new hosted observations or timing qualification"
-CURRENT_PLANNING_CEILING = 1350
-CURRENT_PLANNING_POLICY = "native-serial-current-planning-v1"
+CURRENT_PLANNING_CEILING = 1620
+CURRENT_PLANNING_POLICY = "native-serial-current-planning-v2"
 
 
 def current_planning_policy() -> dict[str, object]:
@@ -25,7 +25,7 @@ def current_planning_policy() -> dict[str, object]:
         "role": "Current empirical projection guard; not observed completion or timing approval",
         "ceiling_seconds": CURRENT_PLANNING_CEILING,
         "rounding_seconds": 30,
-        "planning_gap_to_1620_second_approval": 270,
+        "planning_gap_to_1620_second_approval": 0,
     }
 
 

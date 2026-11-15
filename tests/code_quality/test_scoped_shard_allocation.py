@@ -46,7 +46,9 @@ def authenticated_historical_inputs() -> Iterator[None]:
 @pytest.fixture(scope="module")
 def inputs() -> tuple[dict[str, float], dict[str, object], ScopedEvidence]:
     summary = json.loads((historical_directory / "durations.json").read_bytes())
-    costs = sharding.dispatch_case_seconds(summary, historical_directory / "durations.json")
+    with pytest.MonkeyPatch.context() as patch:
+        patch.setattr(sharding, "REPOSITORY_ROOT", historical_root)
+        costs = sharding.dispatch_case_seconds(summary, historical_directory / "durations.json")
     index = json.loads((historical_directory / "allocation-cohorts.json").read_bytes())
     scope = load_scope(
         historical_directory, root=historical_root, costs=costs, reference=index["scoped_evidence"]

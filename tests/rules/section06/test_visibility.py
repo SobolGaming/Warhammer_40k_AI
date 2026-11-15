@@ -72,6 +72,8 @@ def test_any_model_part_and_every_facing_part_native_geometry(
         observer_keywords=observer_unit.own_models[0].keywords,
     )
     witness = context.resolve_line_of_sight()
+    assert context.has_line_of_sight() is witness.unit_visible
+    assert context.has_line_of_sight(use_result_cache=False) is witness.unit_visible
     assert witness.unit_visible is visible
     assert witness.unit_fully_visible is fully
     assert witness.visible_model_ids == ((target.model_id,) if visible else ())
@@ -86,6 +88,10 @@ def test_any_model_part_and_every_facing_part_native_geometry(
         )
         assert witness.unit_fully_visible
     changed = replace(context, target_models=(replace(target, pose=Pose.at(22, 10)),))
+    assert changed.has_line_of_sight() is changed.resolve_line_of_sight().unit_visible
+    assert context.has_line_of_sight() is witness.unit_visible
+    with pytest.raises(GeometryError, match="current target"):
+        context.has_line_of_sight(target_model_ids=("missing-model",))
     with pytest.raises(GeometryError, match=r"geometry|evidence"):
         changed.benefit_of_cover(witness)
 
@@ -121,6 +127,12 @@ def test_unit_visible_any_and_fully_visible_all_native_members(
         terrain_volumes=walls,
     )
     witness = context.resolve_line_of_sight()
+    assert context.has_line_of_sight() is witness.unit_visible
+    for target in targets:
+        assert context.has_line_of_sight(target_model_ids=(target.model_id,)) is (
+            target.model_id in witness.visible_model_ids
+        )
+    assert not context.has_line_of_sight(target_model_ids=())
     assert witness.unit_visible is (blocked < 2)
     assert witness.unit_fully_visible is (blocked == 0)
     assert set(witness.visible_model_ids) == {m.model_id for m in targets[blocked:]}
@@ -501,6 +513,33 @@ def test_exact_corridor_contact_survives_rear_proof_search(shape: str, offset_si
     assert obstacle.intersects_corridor((F(-3), F(0), F(1)), (F(3), F(0), F(1))) is (
         offset_sign <= 0
     )
+    from warhammer40k_core.geometry.physical_visibility import (
+        BattlefieldVisibilityBounds,
+        resolve_physical_any_visibility_uncached,
+    )
+
+    # Every allowed endpoint has y>=0; the best corridor follows y=0.
+    # Clipping excludes negative-y origins which could see below the blocker.
+    observer = VisibilityPrism(
+        ((F(-4), F(-1)), (F(-3), F(-1)), (F(-3), F(1)), (F(-4), F(1))),
+        F(0),
+        F(2),
+        (F(-4), F(-1), F(-3), F(1)),
+    )
+    target = VisibilityPrism(
+        ((F(3), F(0)), (F(4), F(0)), (F(4), F(1)), (F(3), F(1))),
+        F(0),
+        F(2),
+        (F(3), F(0), F(4), F(1)),
+    )
+    result = resolve_physical_any_visibility_uncached(
+        (observer,),
+        (target,),
+        (obstacle,),
+        (obstacle,),
+        BattlefieldVisibilityBounds(F(-4), F(0), F(5), F(4)),
+    )
+    assert result.model_visible is (offset_sign > 0)
 
 
 @pytest.mark.parametrize("displaced", [False, True])

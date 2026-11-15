@@ -232,7 +232,13 @@ def _baseline(
             if digest != additions[owner]:
                 raise SystemExit("Added test source digest differs.")
         elif current != (history.root / owner).read_bytes():
-            raise SystemExit("Historical test source changed across compatibility boundary.")
+            from scripts.boolean_los_admission import SCHEMA as BOOLEAN_SCHEMA
+            from scripts.boolean_los_admission import transitioned_test
+
+            if descriptor["schema"] != BOOLEAN_SCHEMA or not transitioned_test(
+                root, owner, current, (history.root / owner).read_bytes()
+            ):
+                raise SystemExit("Historical test source changed across compatibility boundary.")
     from scripts.build_test_shards import summary_case_seconds
 
     # Keep the existing complete-profile case/file accounting, including finite selectors.
@@ -300,10 +306,14 @@ class Plan:
 
 
 def plan(root: Path, directory: Path, cases: dict[str, float]) -> Plan:
+    from scripts.boolean_los_admission import SCHEMA as BOOLEAN_SCHEMA
     from scripts.extended_shard_allocation import partial_projection
 
+    declared = read_json(directory / FILENAME)
+    fresh = isinstance(declared, dict) and declared.get("schema") == BOOLEAN_SCHEMA
+
     descriptor = _object(
-        read_json(directory / FILENAME),
+        declared,
         {
             "schema",
             "historical_revision",
@@ -313,12 +323,16 @@ def plan(root: Path, directory: Path, cases: dict[str, float]) -> Plan:
             "assignment",
             "native_serial_role",
             "planning_policy",
-        },
+        }
+        | ({"fresh_evidence"} if fresh else set()),
         "runtime compatibility",
     )
     from scripts.current_shard_assignment import current_planning_policy
 
-    if descriptor["schema"] != SCHEMA or descriptor["historical_revision"] != HISTORICAL_REVISION:
+    if (
+        descriptor["schema"] not in {SCHEMA, BOOLEAN_SCHEMA}
+        or descriptor["historical_revision"] != HISTORICAL_REVISION
+    ):
         raise SystemExit("Unreviewed scheduling compatibility boundary.")
     if descriptor["planning_policy"] != current_planning_policy():
         raise SystemExit("Unreviewed current planning policy.")
@@ -337,6 +351,14 @@ def plan(root: Path, directory: Path, cases: dict[str, float]) -> Plan:
             descriptor["native_serial_role"],
             frozenset(node for node in NEW_NODES if node.startswith(NATIVE_PREFIX_OWNER + "::")),
         )
+        if fresh:
+            from scripts.boolean_los_admission import fresh_native_role
+            from scripts.current_native_serial_role import NativeSerialRole
+
+            seconds, native_metadata = fresh_native_role(
+                root, directory, descriptor, data, native_role.metadata
+            )
+            native_role = NativeSerialRole(native_role.seconds, seconds, native_metadata)
         current = {node: _seconds(value) for node, value in cases.items()}
         old_dispatch = calibrated_seconds(
             read_json(history.directory / "hosted-calibration.json"),
@@ -383,6 +405,18 @@ def plan(root: Path, directory: Path, cases: dict[str, float]) -> Plan:
         from scripts.current_shard_assignment import load_assignment, require_planning_limits
 
         groups, assignment = load_assignment(directory, descriptor, history)
+        if fresh:
+            from scripts.boolean_los_admission import BASE
+            from scripts.build_test_shards import SERIAL_BEHAVIORAL_CASE
+            from scripts.historical_shard_snapshot import git_bytes
+
+            original = json.loads(
+                git_bytes(root, BASE, "ci/test_shards/current-derived-assignment.json")
+            )
+            if assignment["shards"] != original["shards"] or not any(
+                NATIVE_PREFIX_OWNER in group and SERIAL_BEHAVIORAL_CASE in group for group in groups
+            ):
+                raise SystemExit("Boolean LOS admission preserves the frozen combined allocation.")
         for group in groups:
             require_planning_limits(scores(group))
         rows = {
@@ -398,7 +432,7 @@ def plan(root: Path, directory: Path, cases: dict[str, float]) -> Plan:
         metadata: dict[str, object] = {
             "file": FILENAME,
             "sha256": hashlib.sha256((directory / FILENAME).read_bytes()).hexdigest(),
-            "schema": SCHEMA,
+            "schema": descriptor["schema"],
             "role": ROLE,
             "historical_revision": HISTORICAL_REVISION,
             "current_runtime_fingerprint": descriptor["current_runtime_fingerprint"],

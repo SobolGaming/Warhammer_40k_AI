@@ -68,7 +68,7 @@ with a witnessed Nurglings move from one pre-action checkpoint. Both forks use
 the same Bloodcrusher response and stop before B4's charge selection. The
 reproducer audits B's actual charge-target eligibility and E's range and independent
 visibility. Common and both endpoints pass exact persistence/replay; independent
-E visibility remains incomplete. No native combat, useful screen,
+E Boolean visibility is resolved by the separate [exact any-part path](docs/AI_POLICY_INTERFACE.md#exact-boolean-only-native-los); full classification and shooting remain unqualified. No native combat, useful screen,
 E attack or learning result is claimed.
 
 ## 2. Non-negotiable invariants
@@ -414,11 +414,12 @@ dispatch independently verify exact membership, finite partitions, fixed module
 alone on shard 5, pinned module on 4, mirror on 2 and cold role on 1. They recompute
 actual four-worker projections. The original historical/stress/latest planning
 ceilings of 1,076/1,054/1,050 seconds remain part of the retained historical model.
-The versioned current-only planning policy uses a 1,350-second ceiling for all ten
-projections, including the separately measured native serial context, while retaining
-the existing assignment. This empirical forecast guard is rounded to 30 seconds and
-leaves a 270-second planning gap below actual approval; it is not a runtime guarantee.
-Actual covered approval remains 1,620 seconds, with termination only above 1,800 seconds.
+The current-only planning policy `native-serial-current-planning-v2` uses a
+1,620-second ceiling for all ten projections, including the separately measured native
+serial context, while retaining the existing assignment. This empirical forecast guard
+matches actual approval and leaves no planning gap; it is not a runtime guarantee.
+Actual covered approval remains 1,620 seconds inclusive, with termination only above
+1,800 seconds.
 Original historical scores and partial unknowns remain separate; additions have no
 historical observations. No offline allocation search runs in CI, and planning
 estimates never qualify hosted timing. The complete
@@ -880,6 +881,14 @@ changed cases within an existing file require a refreshed complete all-passed
 behavioral profile to provide their exact case weights. Preserve previous measurements in
 Git history and retained source artifacts; never invent missing weights or
 substitute file averages for CI dispatch.
+
+The bounded Boolean LOS transition admits its exact runtime and two enhanced
+visibility test sources through a fresh complete covered profile. The required
+32-worker run and ordered one-worker legacy-mirror/native stage supply the
+current case weights and combined native phase cost. Original native observations
+remain authenticated against their own producers; the old standalone context is
+historical and cannot be selected by this transition. All twelve assignments,
+case/selector inventories, workers, coverage floors and timing gates remain fixed.
 
 `allocation-cohorts.json` selects nine complete effective hosted cohorts by their
 original worker-report SHA-256 identities. The allocator scores the actual four

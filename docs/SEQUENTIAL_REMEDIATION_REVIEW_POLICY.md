@@ -290,3 +290,25 @@ cases, 508 selectors, twelve shards, four hosted workers, local 32-worker qualif
 serial performance command and 600-second quality limits. All required exact-head
 local and hosted gates and independent reviews remain mandatory. This planning change
 does not approve a workload, reclassify any prior failure or establish hosted robustness.
+
+## Current planning alignment - 15 November 2026
+
+The owner aligned the internal current planning ceiling with the approved covered
+execution limit. `native-serial-current-planning-v2` uses 1,620 seconds for all ten
+current projections, retaining the existing twelve-shard assignment and leaving
+no planning gap below actual approval. This supersedes only the current 1,350-second
+forecast ceiling in the 14 November amendment. A passing forecast is not execution
+qualification or a runtime guarantee.
+
+Actual covered approval remains successful completion within 1,620 seconds inclusive.
+Timing alone still permits execution through exactly 1,800 seconds, with termination
+only above that boundary. Keep all 6,331 behavioral cases, 508 selectors, twelve shards,
+four hosted workers, local 32-worker qualification, 67% full-package branch coverage,
+the 120-second bounded runner, 180-second serial performance command and 600-second
+quality limits. Fresh exact-head local and hosted gates and both independent reviews
+remain required. No actual allowed runtime or hard-stop limit increases.
+
+Historical constants, source snapshots, costs, observations, memberships and outcomes
+retain their original meaning. The maximum-of-current-and-pinned-historical dispatch
+rule is unchanged; no prior local dispatch floors or retrospective passing outcomes
+are introduced by this alignment.

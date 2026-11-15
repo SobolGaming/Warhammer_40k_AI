@@ -121,9 +121,14 @@
             {
               "node": "tests/rules/section06/test_visibility.py::test_any_model_part_and_every_facing_part_native_geometry",
               "assertions": [
+                "assert context.has_line_of_sight() is witness.unit_visible",
+                "assert context.has_line_of_sight(use_result_cache=False) is witness.unit_visible",
                 "assert witness.unit_visible is visible",
                 "assert witness.unit_fully_visible is fully",
                 "assert witness.visible_model_ids == ((target.model_id,) if visible else ())",
+                "assert changed.has_line_of_sight() is changed.resolve_line_of_sight().unit_visible",
+                "assert context.has_line_of_sight() is witness.unit_visible",
+                "with pytest.raises(GeometryError, match='current target'):\n    context.has_line_of_sight(target_model_ids=('missing-model',))",
                 "with pytest.raises(GeometryError, match='geometry|evidence'):\n    changed.benefit_of_cover(witness)",
                 "assert not VisibilityQuery.from_segment(Point3(10, 10, 0), Point3(20, 10, 0), static_terrain=walls).resolve().has_line_of_sight",
                 "assert witness.unit_fully_visible"
@@ -132,13 +137,32 @@
             {
               "node": "tests/rules/section06/test_visibility_ownership.py::test_faq63_incoming_body_part_and_clipped_outgoing_origin",
               "assertions": [
+                "assert resolve_physical_any_visibility((opponent,), (body,), (wall,), (wall,), bounds).model_visible is incoming.model_visible",
+                "assert resolve_physical_any_visibility((body,), (opponent,), (wall,), (wall,), bounds).model_visible is outgoing.model_visible",
                 "assert incoming.model_visible",
                 "assert not incoming.model_fully_visible",
                 "assert incoming.clear_corridor is not None",
                 "assert incoming.clear_corridor[1][1] < 0",
                 "assert outgoing.model_visible is (not bounded)",
                 "assert resolve_physical_visibility((body,), (opponent,), (), (), bounds).model_fully_visible",
-                "assert not resolve_physical_visibility((opponent,), (prism(2, 1, 4, 3),), (wall,), (wall,), bounds).model_visible"
+                "assert not resolve_physical_visibility((opponent,), (prism(2, 1, 4, 3),), (wall,), (wall,), bounds).model_visible",
+                "assert evidence == resolve_physical_any_visibility_uncached(*args)",
+                "assert resolve_physical_any_visibility(*args) is evidence",
+                "assert resolve_physical_visibility.cache_info().currsize == 0",
+                "assert resolve_visibility_pair.cache_info().currsize == 0",
+                "assert not hasattr(evidence, 'model_fully_visible')",
+                "assert evidence.model_visible is (not blocked)",
+                "assert full_only.model_visible is clear.model_visible is True",
+                "assert full_only.input_fingerprint != clear.input_fingerprint",
+                "assert changed.model_visible",
+                "assert resolve_physical_any_visibility(*args) is evidence",
+                "assert mixed.model_visible",
+                "assert mixed.clear_corridor is not None",
+                "assert targets[-1].contains_point(mixed.clear_corridor[1])",
+                "assert evidence.model_visible is complete.model_visible",
+                "assert evidence.input_fingerprint == complete.input_fingerprint",
+                "assert decide_physical_any(tuple(map(ModelDomain.from_prism, observers)), tuple(map(ModelDomain.from_prism, targets)), blockers, None if bounds is None else bounds.values) is evidence.model_visible",
+                "assert changed.input_fingerprint != evidence.input_fingerprint"
               ]
             }
           ],
@@ -165,9 +189,14 @@
             {
               "node": "tests/rules/section06/test_visibility.py::test_any_model_part_and_every_facing_part_native_geometry",
               "assertions": [
+                "assert context.has_line_of_sight() is witness.unit_visible",
+                "assert context.has_line_of_sight(use_result_cache=False) is witness.unit_visible",
                 "assert witness.unit_visible is visible",
                 "assert witness.unit_fully_visible is fully",
                 "assert witness.visible_model_ids == ((target.model_id,) if visible else ())",
+                "assert changed.has_line_of_sight() is changed.resolve_line_of_sight().unit_visible",
+                "assert context.has_line_of_sight() is witness.unit_visible",
+                "with pytest.raises(GeometryError, match='current target'):\n    context.has_line_of_sight(target_model_ids=('missing-model',))",
                 "with pytest.raises(GeometryError, match='geometry|evidence'):\n    changed.benefit_of_cover(witness)",
                 "assert not VisibilityQuery.from_segment(Point3(10, 10, 0), Point3(20, 10, 0), static_terrain=walls).resolve().has_line_of_sight",
                 "assert witness.unit_fully_visible"
@@ -176,13 +205,32 @@
             {
               "node": "tests/rules/section06/test_visibility_ownership.py::test_faq63_incoming_body_part_and_clipped_outgoing_origin",
               "assertions": [
+                "assert resolve_physical_any_visibility((opponent,), (body,), (wall,), (wall,), bounds).model_visible is incoming.model_visible",
+                "assert resolve_physical_any_visibility((body,), (opponent,), (wall,), (wall,), bounds).model_visible is outgoing.model_visible",
                 "assert incoming.model_visible",
                 "assert not incoming.model_fully_visible",
                 "assert incoming.clear_corridor is not None",
                 "assert incoming.clear_corridor[1][1] < 0",
                 "assert outgoing.model_visible is (not bounded)",
                 "assert resolve_physical_visibility((body,), (opponent,), (), (), bounds).model_fully_visible",
-                "assert not resolve_physical_visibility((opponent,), (prism(2, 1, 4, 3),), (wall,), (wall,), bounds).model_visible"
+                "assert not resolve_physical_visibility((opponent,), (prism(2, 1, 4, 3),), (wall,), (wall,), bounds).model_visible",
+                "assert evidence == resolve_physical_any_visibility_uncached(*args)",
+                "assert resolve_physical_any_visibility(*args) is evidence",
+                "assert resolve_physical_visibility.cache_info().currsize == 0",
+                "assert resolve_visibility_pair.cache_info().currsize == 0",
+                "assert not hasattr(evidence, 'model_fully_visible')",
+                "assert evidence.model_visible is (not blocked)",
+                "assert full_only.model_visible is clear.model_visible is True",
+                "assert full_only.input_fingerprint != clear.input_fingerprint",
+                "assert changed.model_visible",
+                "assert resolve_physical_any_visibility(*args) is evidence",
+                "assert mixed.model_visible",
+                "assert mixed.clear_corridor is not None",
+                "assert targets[-1].contains_point(mixed.clear_corridor[1])",
+                "assert evidence.model_visible is complete.model_visible",
+                "assert evidence.input_fingerprint == complete.input_fingerprint",
+                "assert decide_physical_any(tuple(map(ModelDomain.from_prism, observers)), tuple(map(ModelDomain.from_prism, targets)), blockers, None if bounds is None else bounds.values) is evidence.model_visible",
+                "assert changed.input_fingerprint != evidence.input_fingerprint"
               ]
             }
           ],
@@ -210,6 +258,10 @@
               "assertions": [
                 "assert not {m.model_id for m in blockers}.intersection((*observer.own_model_ids(), *target.own_model_ids()))",
                 "assert len(blockers) == int(third_unit)",
+                "assert unit_has_line_of_sight_to_target(state=state, scenario=scenario(state), ruleset_descriptor=state.runtime_ruleset_descriptor(), observing_unit=observer, target_unit_id=target.unit_instance_id, placed_alive_models_only=True) is (not third_unit)",
+                "assert resolve_visibility_pair.cache_info().currsize == 0",
+                "assert resolve_physical_visibility.cache_info().currsize == 0",
+                "assert context.has_line_of_sight() is witness.unit_visible",
                 "assert witness.unit_visible is (not third_unit)",
                 "assert witness.unit_fully_visible is (not third_unit)",
                 "assert state.battlefield_state is not None"
@@ -240,6 +292,10 @@
               "assertions": [
                 "assert not {m.model_id for m in blockers}.intersection((*observer.own_model_ids(), *target.own_model_ids()))",
                 "assert len(blockers) == int(third_unit)",
+                "assert unit_has_line_of_sight_to_target(state=state, scenario=scenario(state), ruleset_descriptor=state.runtime_ruleset_descriptor(), observing_unit=observer, target_unit_id=target.unit_instance_id, placed_alive_models_only=True) is (not third_unit)",
+                "assert resolve_visibility_pair.cache_info().currsize == 0",
+                "assert resolve_physical_visibility.cache_info().currsize == 0",
+                "assert context.has_line_of_sight() is witness.unit_visible",
                 "assert witness.unit_visible is (not third_unit)",
                 "assert witness.unit_fully_visible is (not third_unit)",
                 "assert state.battlefield_state is not None"
@@ -296,9 +352,14 @@
             {
               "node": "tests/rules/section06/test_visibility.py::test_any_model_part_and_every_facing_part_native_geometry",
               "assertions": [
+                "assert context.has_line_of_sight() is witness.unit_visible",
+                "assert context.has_line_of_sight(use_result_cache=False) is witness.unit_visible",
                 "assert witness.unit_visible is visible",
                 "assert witness.unit_fully_visible is fully",
                 "assert witness.visible_model_ids == ((target.model_id,) if visible else ())",
+                "assert changed.has_line_of_sight() is changed.resolve_line_of_sight().unit_visible",
+                "assert context.has_line_of_sight() is witness.unit_visible",
+                "with pytest.raises(GeometryError, match='current target'):\n    context.has_line_of_sight(target_model_ids=('missing-model',))",
                 "with pytest.raises(GeometryError, match='geometry|evidence'):\n    changed.benefit_of_cover(witness)",
                 "assert not VisibilityQuery.from_segment(Point3(10, 10, 0), Point3(20, 10, 0), static_terrain=walls).resolve().has_line_of_sight",
                 "assert witness.unit_fully_visible"
@@ -327,9 +388,14 @@
             {
               "node": "tests/rules/section06/test_visibility.py::test_any_model_part_and_every_facing_part_native_geometry",
               "assertions": [
+                "assert context.has_line_of_sight() is witness.unit_visible",
+                "assert context.has_line_of_sight(use_result_cache=False) is witness.unit_visible",
                 "assert witness.unit_visible is visible",
                 "assert witness.unit_fully_visible is fully",
                 "assert witness.visible_model_ids == ((target.model_id,) if visible else ())",
+                "assert changed.has_line_of_sight() is changed.resolve_line_of_sight().unit_visible",
+                "assert context.has_line_of_sight() is witness.unit_visible",
+                "with pytest.raises(GeometryError, match='current target'):\n    context.has_line_of_sight(target_model_ids=('missing-model',))",
                 "with pytest.raises(GeometryError, match='geometry|evidence'):\n    changed.benefit_of_cover(witness)",
                 "assert not VisibilityQuery.from_segment(Point3(10, 10, 0), Point3(20, 10, 0), static_terrain=walls).resolve().has_line_of_sight",
                 "assert witness.unit_fully_visible"
@@ -359,9 +425,12 @@
             {
               "node": "tests/rules/section06/test_visibility.py::test_unit_visible_any_and_fully_visible_all_native_members",
               "assertions": [
+                "assert context.has_line_of_sight() is witness.unit_visible",
+                "assert not context.has_line_of_sight(target_model_ids=())",
                 "assert witness.unit_visible is (blocked < 2)",
                 "assert witness.unit_fully_visible is (blocked == 0)",
-                "assert set(witness.visible_model_ids) == {m.model_id for m in targets[blocked:]}"
+                "assert set(witness.visible_model_ids) == {m.model_id for m in targets[blocked:]}",
+                "assert context.has_line_of_sight(target_model_ids=(target.model_id,)) is (target.model_id in witness.visible_model_ids)"
               ]
             }
           ],
@@ -388,9 +457,12 @@
             {
               "node": "tests/rules/section06/test_visibility.py::test_unit_visible_any_and_fully_visible_all_native_members",
               "assertions": [
+                "assert context.has_line_of_sight() is witness.unit_visible",
+                "assert not context.has_line_of_sight(target_model_ids=())",
                 "assert witness.unit_visible is (blocked < 2)",
                 "assert witness.unit_fully_visible is (blocked == 0)",
-                "assert set(witness.visible_model_ids) == {m.model_id for m in targets[blocked:]}"
+                "assert set(witness.visible_model_ids) == {m.model_id for m in targets[blocked:]}",
+                "assert context.has_line_of_sight(target_model_ids=(target.model_id,)) is (target.model_id in witness.visible_model_ids)"
               ]
             }
           ],
@@ -419,6 +491,10 @@
               "assertions": [
                 "assert not {m.model_id for m in blockers}.intersection((*observer.own_model_ids(), *target.own_model_ids()))",
                 "assert len(blockers) == int(third_unit)",
+                "assert unit_has_line_of_sight_to_target(state=state, scenario=scenario(state), ruleset_descriptor=state.runtime_ruleset_descriptor(), observing_unit=observer, target_unit_id=target.unit_instance_id, placed_alive_models_only=True) is (not third_unit)",
+                "assert resolve_visibility_pair.cache_info().currsize == 0",
+                "assert resolve_physical_visibility.cache_info().currsize == 0",
+                "assert context.has_line_of_sight() is witness.unit_visible",
                 "assert witness.unit_visible is (not third_unit)",
                 "assert witness.unit_fully_visible is (not third_unit)",
                 "assert state.battlefield_state is not None"
@@ -1665,9 +1741,14 @@
             {
               "node": "tests/rules/section06/test_visibility.py::test_any_model_part_and_every_facing_part_native_geometry",
               "assertions": [
+                "assert context.has_line_of_sight() is witness.unit_visible",
+                "assert context.has_line_of_sight(use_result_cache=False) is witness.unit_visible",
                 "assert witness.unit_visible is visible",
                 "assert witness.unit_fully_visible is fully",
                 "assert witness.visible_model_ids == ((target.model_id,) if visible else ())",
+                "assert changed.has_line_of_sight() is changed.resolve_line_of_sight().unit_visible",
+                "assert context.has_line_of_sight() is witness.unit_visible",
+                "with pytest.raises(GeometryError, match='current target'):\n    context.has_line_of_sight(target_model_ids=('missing-model',))",
                 "with pytest.raises(GeometryError, match='geometry|evidence'):\n    changed.benefit_of_cover(witness)",
                 "assert not VisibilityQuery.from_segment(Point3(10, 10, 0), Point3(20, 10, 0), static_terrain=walls).resolve().has_line_of_sight",
                 "assert witness.unit_fully_visible"
@@ -1676,13 +1757,32 @@
             {
               "node": "tests/rules/section06/test_visibility_ownership.py::test_faq63_incoming_body_part_and_clipped_outgoing_origin",
               "assertions": [
+                "assert resolve_physical_any_visibility((opponent,), (body,), (wall,), (wall,), bounds).model_visible is incoming.model_visible",
+                "assert resolve_physical_any_visibility((body,), (opponent,), (wall,), (wall,), bounds).model_visible is outgoing.model_visible",
                 "assert incoming.model_visible",
                 "assert not incoming.model_fully_visible",
                 "assert incoming.clear_corridor is not None",
                 "assert incoming.clear_corridor[1][1] < 0",
                 "assert outgoing.model_visible is (not bounded)",
                 "assert resolve_physical_visibility((body,), (opponent,), (), (), bounds).model_fully_visible",
-                "assert not resolve_physical_visibility((opponent,), (prism(2, 1, 4, 3),), (wall,), (wall,), bounds).model_visible"
+                "assert not resolve_physical_visibility((opponent,), (prism(2, 1, 4, 3),), (wall,), (wall,), bounds).model_visible",
+                "assert evidence == resolve_physical_any_visibility_uncached(*args)",
+                "assert resolve_physical_any_visibility(*args) is evidence",
+                "assert resolve_physical_visibility.cache_info().currsize == 0",
+                "assert resolve_visibility_pair.cache_info().currsize == 0",
+                "assert not hasattr(evidence, 'model_fully_visible')",
+                "assert evidence.model_visible is (not blocked)",
+                "assert full_only.model_visible is clear.model_visible is True",
+                "assert full_only.input_fingerprint != clear.input_fingerprint",
+                "assert changed.model_visible",
+                "assert resolve_physical_any_visibility(*args) is evidence",
+                "assert mixed.model_visible",
+                "assert mixed.clear_corridor is not None",
+                "assert targets[-1].contains_point(mixed.clear_corridor[1])",
+                "assert evidence.model_visible is complete.model_visible",
+                "assert evidence.input_fingerprint == complete.input_fingerprint",
+                "assert decide_physical_any(tuple(map(ModelDomain.from_prism, observers)), tuple(map(ModelDomain.from_prism, targets)), blockers, None if bounds is None else bounds.values) is evidence.model_visible",
+                "assert changed.input_fingerprint != evidence.input_fingerprint"
               ]
             }
           ],
@@ -1740,13 +1840,32 @@
             {
               "node": "tests/rules/section06/test_visibility_ownership.py::test_faq63_incoming_body_part_and_clipped_outgoing_origin",
               "assertions": [
+                "assert resolve_physical_any_visibility((opponent,), (body,), (wall,), (wall,), bounds).model_visible is incoming.model_visible",
+                "assert resolve_physical_any_visibility((body,), (opponent,), (wall,), (wall,), bounds).model_visible is outgoing.model_visible",
                 "assert incoming.model_visible",
                 "assert not incoming.model_fully_visible",
                 "assert incoming.clear_corridor is not None",
                 "assert incoming.clear_corridor[1][1] < 0",
                 "assert outgoing.model_visible is (not bounded)",
                 "assert resolve_physical_visibility((body,), (opponent,), (), (), bounds).model_fully_visible",
-                "assert not resolve_physical_visibility((opponent,), (prism(2, 1, 4, 3),), (wall,), (wall,), bounds).model_visible"
+                "assert not resolve_physical_visibility((opponent,), (prism(2, 1, 4, 3),), (wall,), (wall,), bounds).model_visible",
+                "assert evidence == resolve_physical_any_visibility_uncached(*args)",
+                "assert resolve_physical_any_visibility(*args) is evidence",
+                "assert resolve_physical_visibility.cache_info().currsize == 0",
+                "assert resolve_visibility_pair.cache_info().currsize == 0",
+                "assert not hasattr(evidence, 'model_fully_visible')",
+                "assert evidence.model_visible is (not blocked)",
+                "assert full_only.model_visible is clear.model_visible is True",
+                "assert full_only.input_fingerprint != clear.input_fingerprint",
+                "assert changed.model_visible",
+                "assert resolve_physical_any_visibility(*args) is evidence",
+                "assert mixed.model_visible",
+                "assert mixed.clear_corridor is not None",
+                "assert targets[-1].contains_point(mixed.clear_corridor[1])",
+                "assert evidence.model_visible is complete.model_visible",
+                "assert evidence.input_fingerprint == complete.input_fingerprint",
+                "assert decide_physical_any(tuple(map(ModelDomain.from_prism, observers)), tuple(map(ModelDomain.from_prism, targets)), blockers, None if bounds is None else bounds.values) is evidence.model_visible",
+                "assert changed.input_fingerprint != evidence.input_fingerprint"
               ]
             }
           ],
@@ -1804,13 +1923,32 @@
             {
               "node": "tests/rules/section06/test_visibility_ownership.py::test_faq63_incoming_body_part_and_clipped_outgoing_origin",
               "assertions": [
+                "assert resolve_physical_any_visibility((opponent,), (body,), (wall,), (wall,), bounds).model_visible is incoming.model_visible",
+                "assert resolve_physical_any_visibility((body,), (opponent,), (wall,), (wall,), bounds).model_visible is outgoing.model_visible",
                 "assert incoming.model_visible",
                 "assert not incoming.model_fully_visible",
                 "assert incoming.clear_corridor is not None",
                 "assert incoming.clear_corridor[1][1] < 0",
                 "assert outgoing.model_visible is (not bounded)",
                 "assert resolve_physical_visibility((body,), (opponent,), (), (), bounds).model_fully_visible",
-                "assert not resolve_physical_visibility((opponent,), (prism(2, 1, 4, 3),), (wall,), (wall,), bounds).model_visible"
+                "assert not resolve_physical_visibility((opponent,), (prism(2, 1, 4, 3),), (wall,), (wall,), bounds).model_visible",
+                "assert evidence == resolve_physical_any_visibility_uncached(*args)",
+                "assert resolve_physical_any_visibility(*args) is evidence",
+                "assert resolve_physical_visibility.cache_info().currsize == 0",
+                "assert resolve_visibility_pair.cache_info().currsize == 0",
+                "assert not hasattr(evidence, 'model_fully_visible')",
+                "assert evidence.model_visible is (not blocked)",
+                "assert full_only.model_visible is clear.model_visible is True",
+                "assert full_only.input_fingerprint != clear.input_fingerprint",
+                "assert changed.model_visible",
+                "assert resolve_physical_any_visibility(*args) is evidence",
+                "assert mixed.model_visible",
+                "assert mixed.clear_corridor is not None",
+                "assert targets[-1].contains_point(mixed.clear_corridor[1])",
+                "assert evidence.model_visible is complete.model_visible",
+                "assert evidence.input_fingerprint == complete.input_fingerprint",
+                "assert decide_physical_any(tuple(map(ModelDomain.from_prism, observers)), tuple(map(ModelDomain.from_prism, targets)), blockers, None if bounds is None else bounds.values) is evidence.model_visible",
+                "assert changed.input_fingerprint != evidence.input_fingerprint"
               ]
             }
           ],

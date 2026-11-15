@@ -1,13 +1,17 @@
 {
   "assignment": {
     "file": "current-derived-assignment.json",
-    "sha256": "c6e15924f448f8fcc9976e80eda4212cf284cce22ea4a35703df286f8431eb15"
+    "sha256": "34b7c224c8465e3f5c1e4486816fca92aa3ce6a43599ba379027477b25c3d833"
   },
   "baseline": {
     "file": "current-covered-baseline.json",
-    "sha256": "7acac7eb2f8986bfd8d23edb2e3a61ac19048343491fb5f8e07c9d6ae1677508"
+    "sha256": "7c656bf844098d5dbf19a734a6a8b0e0a9eeb4214315ebeaad8625cdd63c79d7"
   },
-  "current_runtime_fingerprint": "8d7e3355d9db2c9477ba63b752dc1dfa054b5c00583ea467e3fbbc0e21d5638d",
+  "current_runtime_fingerprint": "d637f1649b7c3bfee1683c0112ac0ba37233afbf1f9640e6b4f2bbf47fa46c55",
+  "fresh_evidence": {
+    "file": "current-covered-evidence.json",
+    "sha256": "c748fcbe47c6e05ba5af082d0f3b9d90397d88b2099c01b494b562ea25f7196b"
+  },
   "historical_revision": "008be8a8cb0b50b232fe022452762b3906489b49",
   "native_serial_role": {
     "file": "current-native-serial-role.json",
@@ -20,11 +24,11 @@
     "tests/rules/section11/test_connected_endpoints.py": "78272e696bf5f3d7c977c379efe763fe80211067c06cc6e7d8be61d8c2775591"
   },
   "planning_policy": {
-    "ceiling_seconds": 1350,
-    "planning_gap_to_1620_second_approval": 270,
+    "ceiling_seconds": 1620,
+    "planning_gap_to_1620_second_approval": 0,
     "role": "Current empirical projection guard; not observed completion or timing approval",
     "rounding_seconds": 30,
-    "version": "native-serial-current-planning-v1"
+    "version": "native-serial-current-planning-v2"
   },
-  "schema": "historical-snapshot-current-baseline-v2"
+  "schema": "historical-snapshot-fresh-boolean-los-profile-v1"
 }

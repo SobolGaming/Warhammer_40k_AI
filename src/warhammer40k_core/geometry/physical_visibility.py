@@ -11,8 +11,10 @@ from typing import TypedDict, cast
 
 from warhammer40k_core.geometry.continuous_visibility import (
     VISIBILITY_ALGORITHM_ID,
+    AnyPartVisibilityEvidence,
     ContinuousVisibilityEvidence,
     prism_fingerprint_payload,
+    resolve_any_visibility_pair_uncached,
     resolve_visibility_pair_uncached,
 )
 from warhammer40k_core.geometry.physical_model import physical_prisms
@@ -236,6 +238,68 @@ def resolve_physical_visibility_uncached(
             ),
             input_fingerprint=fingerprint,
         )
+    evidence = resolve_physical_any_visibility_uncached(
+        observers, targets, any_blockers, full_blockers, bounds
+    )
+    if not evidence.model_visible:
+        return ContinuousVisibilityEvidence(
+            fingerprint,
+            False,
+            False,
+            evidence.visibility_proof,
+            "not_visible",
+            evidence.checked_witness_count,
+        )
+    full = decide_physical_full(
+        tuple(map(ModelDomain.from_prism, origins)),
+        tuple(map(ModelDomain.from_prism, destinations)),
+        full_blockers,
+        None if bounds is None else bounds.values,
+    )
+    return ContinuousVisibilityEvidence(
+        fingerprint,
+        True,
+        full,
+        evidence.visibility_proof,
+        "real_algebraic_target_parts",
+        evidence.checked_witness_count,
+        evidence.clear_corridor,
+    )
+
+
+@lru_cache(maxsize=4096)
+def resolve_physical_any_visibility(
+    observers: tuple[VisibilityPrism, ...],
+    targets: tuple[VisibilityPrism, ...],
+    any_blockers: tuple[VisibilityPrism, ...],
+    full_blockers: tuple[VisibilityPrism, ...],
+    bounds: BattlefieldVisibilityBounds | None,
+) -> AnyPartVisibilityEvidence:
+    return resolve_physical_any_visibility_uncached(
+        observers, targets, any_blockers, full_blockers, bounds
+    )
+
+
+def resolve_physical_any_visibility_uncached(
+    observers: tuple[VisibilityPrism, ...],
+    targets: tuple[VisibilityPrism, ...],
+    any_blockers: tuple[VisibilityPrism, ...],
+    full_blockers: tuple[VisibilityPrism, ...],
+    bounds: BattlefieldVisibilityBounds | None,
+) -> AnyPartVisibilityEvidence:
+    if not observers or not targets:
+        raise GeometryError("Physical visibility requires nonempty observer and target unions.")
+    fingerprint = physical_visibility_fingerprint(
+        observers, targets, any_blockers, full_blockers, bounds
+    )
+    origins, destinations = _reduce(observers), _reduce(targets)
+    if len(origins) == len(destinations) == 1 and (bounds is None or bounds.encloses(origins[0])):
+        return replace(
+            resolve_any_visibility_pair_uncached(
+                origins[0], destinations[0], any_blockers, full_blockers
+            ),
+            input_fingerprint=fingerprint,
+        )
     boxes = tuple(p for o in origins if (p := _enclosure(o, bounds)) is not None)
     if not boxes or all(
         all_corridors_blocked_by_plane(o, t, any_blockers)
@@ -244,9 +308,7 @@ def resolve_physical_visibility_uncached(
         for o in boxes
         for t in destinations
     ):
-        return ContinuousVisibilityEvidence(
-            fingerprint, False, False, "blocked_cross_section", "not_visible"
-        )
+        return AnyPartVisibilityEvidence(fingerprint, False, "blocked_cross_section")
     checked = 0
     ray: tuple[RationalPoint3, RationalPoint3] | None = None
     for o in origins:
@@ -281,14 +343,7 @@ def resolve_physical_visibility_uncached(
         origin_domains, target_domains, any_blockers, clipped
     )
     proof = "clear_corridor" if ray is not None else "real_algebraic_exists"
-    if not visible:
-        return ContinuousVisibilityEvidence(
-            fingerprint, False, False, proof, "not_visible", checked
-        )
-    full = decide_physical_full(origin_domains, target_domains, full_blockers, clipped)
-    return ContinuousVisibilityEvidence(
-        fingerprint, True, full, proof, "real_algebraic_target_parts", checked, ray
-    )
+    return AnyPartVisibilityEvidence(fingerprint, visible, proof, checked, ray)
 
 
 @lru_cache(maxsize=4096)
