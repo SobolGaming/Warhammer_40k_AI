@@ -68,7 +68,7 @@ with a witnessed Nurglings move from one pre-action checkpoint. Both forks use
 the same Bloodcrusher response and stop before B4's charge selection. The
 reproducer audits B's actual charge-target eligibility and E's range and independent
 visibility. Common and both endpoints pass exact persistence/replay; independent
-E visibility remains incomplete. No native combat, useful screen,
+E Boolean visibility is resolved by the separate [exact any-part path](docs/AI_POLICY_INTERFACE.md#exact-boolean-only-native-los); full classification and shooting remain unqualified. No native combat, useful screen,
 E attack or learning result is claimed.
 
 ## 2. Non-negotiable invariants
@@ -880,6 +880,14 @@ changed cases within an existing file require a refreshed complete all-passed
 behavioral profile to provide their exact case weights. Preserve previous measurements in
 Git history and retained source artifacts; never invent missing weights or
 substitute file averages for CI dispatch.
+
+The bounded Boolean LOS transition admits its exact runtime and two enhanced
+visibility test sources through a fresh complete covered profile. The required
+32-worker run and ordered one-worker legacy-mirror/native stage supply the
+current case weights and combined native phase cost. Original native observations
+remain authenticated against their own producers; the old standalone context is
+historical and cannot be selected by this transition. All twelve assignments,
+case/selector inventories, workers, coverage floors and timing gates remain fixed.
 
 `allocation-cohorts.json` selects nine complete effective hosted cohorts by their
 original worker-report SHA-256 identities. The allocator scores the actual four

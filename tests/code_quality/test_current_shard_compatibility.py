@@ -39,7 +39,9 @@ def historical() -> Iterator[HistoricalSnapshot]:
 
 
 def test_current_dispatch_has_exact_inventory_and_disclosed_selector_moves(
-    admitted: tuple[dict[str, object], compatibility.Plan], historical: HistoricalSnapshot
+    admitted: tuple[dict[str, object], compatibility.Plan],
+    historical: HistoricalSnapshot,
+    tmp_path: Path,
 ) -> None:
     summary, plan = admitted
     cases = sharding.summary_case_seconds(summary)
@@ -71,6 +73,53 @@ def test_current_dispatch_has_exact_inventory_and_disclosed_selector_moves(
     assert sharding.SERIAL_BEHAVIORAL_CASE not in plan.groups[0]
     assert plan.groups[4] == historical.groups[4]
     assert len({name for group in plan.groups for name in group}) == 508
+    from scripts.boolean_los_admission import SCHEMA as BOOLEAN_SCHEMA
+    from scripts.boolean_los_admission import fresh_native_role
+    from scripts.current_native_serial_role import load_native_serial_role
+
+    descriptor = json.loads((DIRECTORY / compatibility.FILENAME).read_bytes())
+    if descriptor["schema"] == BOOLEAN_SCHEMA:
+        baseline = json.loads((DIRECTORY / compatibility.BASELINE_FILE).read_bytes())
+        nodes = frozenset(
+            n
+            for n in compatibility.NEW_NODES
+            if n.startswith(compatibility.NATIVE_PREFIX_OWNER + "::")
+        )
+        previous = load_native_serial_role(ROOT, DIRECTORY, descriptor["native_serial_role"], nodes)
+        original = json.loads((DIRECTORY / descriptor["fresh_evidence"]["file"]).read_bytes())
+        for mutation in ("source", "phase", "duplicate", "failure", "workers", "receipt", "junit"):
+            document = json.loads(json.dumps(original))
+            key = "serial_worker"
+            raw = json.loads(document[key]["text"])
+            if mutation == "source":
+                key = "preflight"
+                raw = json.loads(document[key]["text"])
+                raw["head"] = "0" * 40
+            elif mutation == "phase":
+                raw["reports"].pop()
+            elif mutation == "duplicate":
+                raw["reports"].append(raw["reports"][0])
+            elif mutation == "failure":
+                raw["reports"][0]["outcome"] = "failed"
+            elif mutation == "workers":
+                raw["worker_count"] = "12"
+            elif mutation == "receipt":
+                key = "supervisor"
+                raw = json.loads(document[key]["text"])
+                raw["approved"] = False
+            if mutation == "junit":
+                key = "serial_junit"
+                text = document[key]["text"].replace('tests="7"', 'tests="6"', 1)
+                assert text != document[key]["text"]
+            else:
+                text = json.dumps(raw)
+            document[key] = {"text": text, "sha256": hashlib.sha256(text.encode()).hexdigest()}
+            path = tmp_path / descriptor["fresh_evidence"]["file"]
+            path.write_text(json.dumps(document))
+            changed = json.loads(json.dumps(descriptor))
+            changed["fresh_evidence"]["sha256"] = hashlib.sha256(path.read_bytes()).hexdigest()
+            with pytest.raises(SystemExit):
+                fresh_native_role(ROOT, tmp_path, changed, baseline, previous.metadata)
 
 
 def test_current_raw_projections_keep_missing_observations_null(
@@ -531,7 +580,10 @@ def test_source_bootstrap_preserves_history_for_shared_historical_clones(tmp_pat
     assert git(checkout, "cat-file", "-t", producer) == "commit"
 
 
-def test_native_serial_role_preserves_complete_phases_and_measurement_scope() -> None:
+def test_native_serial_role_preserves_complete_phases_and_measurement_scope(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
     from scripts.current_native_serial_role import load_native_serial_role
 
     descriptor = json.loads((DIRECTORY / compatibility.FILENAME).read_bytes())
@@ -555,9 +607,47 @@ def test_native_serial_role_preserves_complete_phases_and_measurement_scope() ->
     assert observations["standalone"]["source_binding_count"] == 365
     assert "not hosted observations" in str(role.metadata["role"])
     assert (
-        hashlib.sha256((DIRECTORY / compatibility.BASELINE_FILE).read_bytes()).hexdigest()
+        hashlib.sha256(
+            subprocess.check_output(
+                [
+                    "git",
+                    "show",
+                    "70b1d6ad4b5265fddae30aaf869e4f91471269af:ci/test_shards/current-covered-baseline.json",
+                ],
+                cwd=ROOT,
+            )
+        ).hexdigest()
         == "7acac7eb2f8986bfd8d23edb2e3a61ac19048343491fb5f8e07c9d6ae1677508"
     )
+    from scripts import boolean_los_admission as transition
+    from scripts.historical_shard_snapshot import git_bytes
+
+    transition.validate_transition(ROOT)
+    (tmp_path / Path(MANIFEST).parent).mkdir(parents=True)
+    (tmp_path / MANIFEST).write_bytes((ROOT / MANIFEST).read_bytes())
+    for owner in transition.TEST_SOURCES:
+        (tmp_path / owner).parent.mkdir(parents=True, exist_ok=True)
+        (tmp_path / owner).write_bytes((ROOT / owner).read_bytes())
+    with pytest.raises(SystemExit, match="actual runtime checkout"):
+        transition.validate_transition(tmp_path)
+    original_manifest = (ROOT / MANIFEST).read_bytes()
+    transition.validate_manifest(original_manifest)
+    changed_manifest = json.loads(original_manifest)
+    changed_manifest["build_id"] = "substituted-with-unchanged-fingerprint"
+    with pytest.raises(SystemExit, match="manifest bytes"):
+        transition.validate_manifest(json.dumps(changed_manifest).encode())
+    for owner in transition.TEST_SOURCES:
+        current = (ROOT / owner).read_bytes()
+        historical = git_bytes(ROOT, transition.BASE, owner)
+        assert transition.transitioned_test(ROOT, owner, current, historical)
+        for first, last in ((current + b"\n", historical), (current, historical + b"\n")):
+            with pytest.raises(SystemExit):
+                transition.transitioned_test(ROOT, owner, first, last)
+    assert not transition.transitioned_test(ROOT, "tests/unreviewed.py", b"", b"")
+    with monkeypatch.context() as context:
+        context.setattr(transition, "RUNTIME", "0" * 64)
+        with pytest.raises(SystemExit, match="runtime transition"):
+            transition.validate_transition(ROOT)
 
 
 @pytest.mark.parametrize(

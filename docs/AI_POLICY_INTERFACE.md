@@ -2583,3 +2583,41 @@ MONSTER rules, provisional-height qualifications, fingerprint/cache identity and
 the exact roster, seed and positions. The B-to-E finding above remains charge
 target eligibility, not reverse shooting LOS or an accepted charge path. No
 combat, useful screening, E attack, full-game timing or learning claim follows.
+
+### Exact Boolean-only native LOS
+
+The shared `TerrainVisibilityContext.has_line_of_sight` now answers exact
+any-part visibility for the caller's eligible target models and stops at the
+first visible model. Scalar, composite and battlefield-clipped inputs reuse the
+existing exact blocking certificates, positive corridor proofs and complete
+any-part formulas. Separate immutable `AnyPartVisibilityEvidence` and bounded
+4,096-entry caches contain no full-visibility field; complete input fingerprints
+still include full blockers and clipping bounds. Boolean unit LOS and Cabal
+range/visibility consumers use this path. Full visibility, shooting declarations,
+Hidden detection and cover retain their existing complete witness authority.
+No V1 samples, rounded keys, enemy-only filters or new geometric approximations
+are introduced.
+
+One uninstrumented serial observation per unchanged native checkpoint returns
+`LOS=True`, preserving exact lifecycle payload equality before and after the
+query. Restoration remains a separate cost:
+
+| Alternative | Read/hash seconds | Restore seconds | Payload equality seconds | Boolean query seconds |
+|---|---:|---:|---:|---:|
+| Preserve | 2.1186 | 67.5016 | 0.0598 | 1.9644 |
+| Screen | 2.1159 | 67.5558 | 0.2413 | 1.9546 |
+
+The original 300-second and instrumented 60-second unresolved receipts remain
+unchanged; their censored timings do not supply a complete-baseline speedup or a
+latency distribution. Twelve terminating base/head comparisons preserve entire
+complete evidence records, including proof labels, counts and rational witnesses.
+Differential controls cover blocked/visible scalar and physical unions, clipped
+origins, exact closed contact and rational offsets, full-blocker-only identity
+changes, cached/uncached agreement and mutation isolation. Constructed complete
+references that did not terminate remain unresolved and unqualified.
+
+These Boolean answers do not qualify full visibility, benefit of cover, weapon
+range, a legal shooting declaration, an accepted charge, combat, useful screening,
+Stage 2 completion, full-game performance or learning. Roster, seed, positions,
+body/terrain/MONSTER occlusion and provisional model-height qualifications retain
+their existing meanings.

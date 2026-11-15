@@ -85,6 +85,8 @@ from warhammer40k_core.geometry.physical_visibility import (
     physical_model_visibility_prisms,
     physical_source_group_obscures,
     physical_visibility_fingerprint,
+    resolve_physical_any_visibility,
+    resolve_physical_any_visibility_uncached,
     resolve_physical_visibility,
     resolve_physical_visibility_uncached,
 )
@@ -321,6 +323,40 @@ class TerrainVisibilityContext:
 
     def context_fingerprint(self) -> str:
         return _context_fingerprint(self)
+
+    def has_line_of_sight(
+        self,
+        *,
+        target_model_ids: tuple[str, ...] | None = None,
+        use_result_cache: bool = True,
+    ) -> bool:
+        """Answer any-part visibility without constructing full/cover evidence."""
+        selected = (
+            tuple(model.model_id for model in self.target_models)
+            if target_model_ids is None
+            else _validate_boolean_target_model_ids(target_model_ids, self.target_models)
+        )
+        terrain_area_feature_ids = feature_ids_associated_with_terrain_areas(
+            self.terrain_features, self.terrain_areas
+        )
+        resolver = (
+            resolve_physical_any_visibility
+            if use_result_cache
+            else resolve_physical_any_visibility_uncached
+        )
+        for target in self.target_models:
+            if target.model_id not in selected:
+                continue
+            entries = self._obstacle_entries(target, terrain_area_feature_ids)
+            if resolver(
+                physical_model_visibility_prisms(self.observer_model),
+                physical_model_visibility_prisms(target),
+                tuple(prism for prism, record in entries if record.blocks_model_visibility),
+                tuple(prism for prism, record in entries if record.blocks_full_visibility),
+                self.battlefield_bounds,
+            ).model_visible:
+                return True
+        return False
 
     def resolve_line_of_sight(self) -> LineOfSightWitness:
         return _resolve_context(self)
@@ -751,6 +787,16 @@ def _context_fingerprint(context: TerrainVisibilityContext) -> str:
             context.to_payload(), sort_keys=True, separators=(",", ":"), allow_nan=False
         ).encode("utf-8")
     ).hexdigest()
+
+
+def _validate_boolean_target_model_ids(
+    values: tuple[str, ...], targets: tuple[Model, ...]
+) -> tuple[str, ...]:
+    if type(values) is not tuple or any(type(value) is not str for value in values):
+        raise GeometryError("Boolean visibility targets must be a tuple of model IDs.")
+    if len(set(values)) != len(values) or set(values) - {model.model_id for model in targets}:
+        raise GeometryError("Boolean visibility targets must be unique current target model IDs.")
+    return values
 
 
 @lru_cache(maxsize=128)

@@ -1588,8 +1588,7 @@ def _manifesting_model_can_see_target(
         ),
         observer_keywords=manifesting_model.model.keywords,
     )
-    witness = context.resolve_line_of_sight()
-    return any(target_id in in_range_ids for target_id in witness.visible_model_ids)
+    return context.has_line_of_sight(target_model_ids=tuple(sorted(in_range_ids)))
 
 
 def _doombolt_lone_operative_excluded(

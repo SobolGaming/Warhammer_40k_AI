@@ -149,7 +149,14 @@ def _observation(
         .decode()
         .strip()
     )
-    runtime = json.loads((root / MANIFEST).read_bytes())["fingerprint"]
+    current_runtime = json.loads((root / MANIFEST).read_bytes())["fingerprint"]
+    runtime = fingerprint(root, producer)
+    transition_admitted = False
+    if current_runtime != runtime:
+        from scripts.boolean_los_admission import validate_transition
+
+        validate_transition(root)
+        transition_admitted = True
     if (
         tree != record["source_tree"]
         or fingerprint(root, producer) != runtime
@@ -166,10 +173,18 @@ def _observation(
     )
     blobs = {line.split("\t", 1)[1]: line.split()[2] for line in lines}
     for name, digest in sources.items():
-        content = (root / name).read_bytes()
+        content = git_bytes(root, producer, name)
         blob = hashlib.sha1(b"blob " + str(len(content)).encode() + b"\0" + content).hexdigest()
         if hashlib.sha256(content).hexdigest() != digest or blobs.get(name) != blob:
             raise SystemExit("Native serial measured dependency changed: " + name)
+        if (root / name).read_bytes() != content:
+            from scripts.boolean_los_admission import RUNTIME_SOURCES, validate_transition
+
+            if name not in RUNTIME_SOURCES | {MANIFEST}:
+                raise SystemExit("Native serial measured dependency changed: " + name)
+            if not transition_admitted:
+                validate_transition(root)
+                transition_admitted = True
     raw = _object(record["raw"], set(RAW_NAMES), "native serial raw artifacts")
     texts: dict[str, str] = {}
     hashes: dict[str, str] = {}

@@ -1399,16 +1399,16 @@
       "sha256": "56bbaf8fcf6671bbfbe66e56e539d6b9a4406ddfe66a6452383f3acfa02c4947"
     },
     "tests/rules/section06/test_visibility.py": {
-      "blob_sha1": "3bc28e261496ba856ebd690ad84087b751cc7e6d",
-      "bytes": 21303,
+      "blob_sha1": "2c0e05e71e20ec92b3d323cb9dc7fc35bc63af31",
+      "bytes": 22941,
       "mode": "100644",
-      "sha256": "8c1452eeb7c5c5c2ec0c0619fc45a2fa000d1323a1d7b6872f4934354854b61e"
+      "sha256": "5ae3fa685a0d75855d550b78107b4fe6b810e61d518b880b69ffbe8ed1c935ee"
     },
     "tests/rules/section06/test_visibility_ownership.py": {
-      "blob_sha1": "19870e0cd81980c745fd0d4dda60596ca6d2bc4e",
-      "bytes": 7599,
+      "blob_sha1": "cd11480157d4923ee79a6760d0f5f3844885a7bf",
+      "bytes": 12027,
       "mode": "100644",
-      "sha256": "eab9f586cf33b2c3d2dc08b1fac11bd7163a133c0de7d466873504dffcaeaafd"
+      "sha256": "7863b5747eb63c3f6d26562da55d93a6b05f1a41e5f7285eaa54448550430f08"
     },
     "tests/rules/section07/test_coverage_map.py": {
       "blob_sha1": "4497a9b274b5322c3b90a61c2ebc2eb4ec58ac80",

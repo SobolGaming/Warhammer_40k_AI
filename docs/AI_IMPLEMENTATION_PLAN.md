@@ -970,8 +970,15 @@ classification before returning. No missing proof certificate was established to
 justify an optimization in this slice. A Boolean-only result would require a
 separately designed partial-evidence and cache contract across scalar, composite
 and battlefield-clipped geometry, preserving terrain/body occlusion, MONSTER
-rules and provisional-height qualifications. That work remains a proposed next
-boundary, not an implemented shortcut or a resolved screening result.
+rules and provisional-height qualifications. The subsequent
+[exact Boolean path](AI_POLICY_INTERFACE.md#exact-boolean-only-native-los) now
+implements that boundary with separate immutable any-part evidence and bounded
+caches, retaining full classification for shooting, cover and detection callers.
+The unchanged native queries each return `True` in one fresh serial observation
+(1.9644/1.9546 seconds), with restoration measured separately (67.5016/67.5558
+seconds). Both lifecycle payloads remain exact. Original unresolved receipts
+retain their historical meaning; no cover, shooting, screening benefit, combat
+or learning qualification follows from these Boolean answers.
 
 ## 6. First delayed-tradeoff experiment
 

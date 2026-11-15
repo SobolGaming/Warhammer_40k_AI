@@ -102,6 +102,60 @@ def _point_from_payload(values: list[str]) -> RationalPoint3:
 
 
 @dataclass(frozen=True, slots=True)
+class AnyPartVisibilityEvidence:
+    """Exact any-part result; deliberately carries no full-visibility predicate."""
+
+    input_fingerprint: str
+    model_visible: bool
+    visibility_proof: str
+    checked_witness_count: int = 0
+    clear_corridor: tuple[RationalPoint3, RationalPoint3] | None = None
+
+    def __post_init__(self) -> None:
+        if (
+            type(self.input_fingerprint) is not str
+            or len(self.input_fingerprint) != 64
+            or any(c not in "0123456789abcdef" for c in self.input_fingerprint)
+        ):
+            raise GeometryError("Visibility evidence requires its complete input fingerprint.")
+        if type(self.model_visible) is not bool:
+            raise GeometryError("Visibility evidence predicates must be bools.")
+        if type(self.checked_witness_count) is not int or self.checked_witness_count < 0:
+            raise GeometryError("Visibility witness count must be a non-negative integer.")
+        if type(self.visibility_proof) is not str or self.visibility_proof not in {
+            "clear_enclosure",
+            "blocked_cross_section",
+            "blocked_circular_enclosure",
+            "blocked_endpoint_containment",
+            "clear_corridor",
+            "real_algebraic_exists",
+            "real_algebraic_planar_lines",
+        }:
+            raise GeometryError("Unsupported any-part visibility proof.")
+        if (self.visibility_proof == "clear_corridor") != (self.clear_corridor is not None):
+            raise GeometryError("A corridor proof requires its exact endpoints.")
+        if self.clear_corridor is not None and not self.model_visible:
+            raise GeometryError("A clear-corridor proof requires visible geometry.")
+        if self.clear_corridor is not None:
+            if type(self.clear_corridor) is not tuple or len(self.clear_corridor) != 2:
+                raise GeometryError("A corridor proof requires two immutable endpoints.")
+            for point in self.clear_corridor:
+                _validate_evidence_point(point)
+        if self.visibility_proof == "clear_enclosure" and not self.model_visible:
+            raise GeometryError("A clear enclosure proves visibility.")
+        if (
+            self.visibility_proof
+            in {
+                "blocked_cross_section",
+                "blocked_circular_enclosure",
+                "blocked_endpoint_containment",
+            }
+            and self.model_visible
+        ):
+            raise GeometryError("A complete blocking enclosure prevents visibility.")
+
+
+@dataclass(frozen=True, slots=True)
 class ContinuousVisibilityEvidence:
     input_fingerprint: str
     model_visible: bool
@@ -304,35 +358,10 @@ def resolve_visibility_pair_uncached(
         return ContinuousVisibilityEvidence(
             fingerprint, True, True, "clear_enclosure", "clear_enclosure"
         )
-    circular_blocked = all_corridors_blocked_by_circle(observer, target, any_blockers)
-    if circular_blocked or all_corridors_blocked_by_plane(observer, target, any_blockers):
-        return ContinuousVisibilityEvidence(
-            fingerprint,
-            False,
-            False,
-            "blocked_circular_enclosure" if circular_blocked else "blocked_cross_section",
-            "not_visible",
-        )
-    if all_corridors_blocked_by_endpoint_containment(observer, target, any_blockers):
-        return ContinuousVisibilityEvidence(
-            fingerprint, False, False, "blocked_endpoint_containment", "not_visible"
-        )
-    checked = 0
-    clear_ray: tuple[RationalPoint3, RationalPoint3] | None = None
-    for first, last in positive_ray_candidates(origin, destination, any_blockers):
-        checked += 1
-        if all(not blocker.intersects_corridor(first, last) for blocker in any_blockers):
-            clear_ray = (first, last)
-            break
-    any_proof = "clear_corridor" if clear_ray is not None else "real_algebraic_exists"
-    if clear_ray is not None:
-        visible = True
-    elif planar_line_reduction_applies(observer, target, any_blockers):
-        any_proof = "real_algebraic_planar_lines"
-        visible = decide_planar_any(observer, target, any_blockers)
-    else:
-        visible = decide_any(origin, destination, any_blockers)
-    if not visible:
+    any_evidence = _resolve_any_part(observer, target, any_blockers, fingerprint)
+    any_proof = any_evidence.visibility_proof
+    checked, clear_ray = any_evidence.checked_witness_count, any_evidence.clear_corridor
+    if not any_evidence.model_visible:
         return ContinuousVisibilityEvidence(
             fingerprint, False, False, any_proof, "not_visible", checked
         )
@@ -361,3 +390,62 @@ def resolve_visibility_pair_uncached(
         checked,
         clear_ray,
     )
+
+
+@lru_cache(maxsize=4096)
+def resolve_any_visibility_pair(
+    observer: VisibilityPrism,
+    target: VisibilityPrism,
+    visibility_blockers: tuple[VisibilityPrism, ...],
+    full_blockers: tuple[VisibilityPrism, ...],
+) -> AnyPartVisibilityEvidence:
+    return resolve_any_visibility_pair_uncached(
+        observer, target, visibility_blockers, full_blockers
+    )
+
+
+def resolve_any_visibility_pair_uncached(
+    observer: VisibilityPrism,
+    target: VisibilityPrism,
+    visibility_blockers: tuple[VisibilityPrism, ...],
+    full_blockers: tuple[VisibilityPrism, ...],
+) -> AnyPartVisibilityEvidence:
+    # Retain the complete input identity while evaluating only any-part blockers.
+    fingerprint = input_fingerprint(observer, target, visibility_blockers, full_blockers)
+    return _resolve_any_part(
+        observer, target, _relevant(observer, target, visibility_blockers), fingerprint
+    )
+
+
+def _resolve_any_part(
+    observer: VisibilityPrism,
+    target: VisibilityPrism,
+    any_blockers: tuple[VisibilityPrism, ...],
+    fingerprint: str,
+) -> AnyPartVisibilityEvidence:
+    origin, destination = ModelDomain.from_prism(observer), ModelDomain.from_prism(target)
+    circular_blocked = all_corridors_blocked_by_circle(observer, target, any_blockers)
+    if circular_blocked or all_corridors_blocked_by_plane(observer, target, any_blockers):
+        return AnyPartVisibilityEvidence(
+            fingerprint,
+            False,
+            "blocked_circular_enclosure" if circular_blocked else "blocked_cross_section",
+        )
+    if all_corridors_blocked_by_endpoint_containment(observer, target, any_blockers):
+        return AnyPartVisibilityEvidence(fingerprint, False, "blocked_endpoint_containment")
+    checked = 0
+    clear_ray: tuple[RationalPoint3, RationalPoint3] | None = None
+    for first, last in positive_ray_candidates(origin, destination, any_blockers):
+        checked += 1
+        if all(not blocker.intersects_corridor(first, last) for blocker in any_blockers):
+            clear_ray = (first, last)
+            break
+    any_proof = "clear_corridor" if clear_ray is not None else "real_algebraic_exists"
+    if clear_ray is not None:
+        visible = True
+    elif planar_line_reduction_applies(observer, target, any_blockers):
+        any_proof = "real_algebraic_planar_lines"
+        visible = decide_planar_any(observer, target, any_blockers)
+    else:
+        visible = decide_any(origin, destination, any_blockers)
+    return AnyPartVisibilityEvidence(fingerprint, visible, any_proof, checked, clear_ray)

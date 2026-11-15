@@ -647,9 +647,7 @@ def unit_has_line_of_sight_to_target(
             dynamic_model_blockers=blocker_models,
             observer_keywords=observing_unit.own_model_by_id(observer_model.model_id).keywords,
         )
-        if detection_eligible_model_ids.intersection(
-            context.resolve_line_of_sight().visible_model_ids
-        ):
+        if context.has_line_of_sight(target_model_ids=tuple(sorted(detection_eligible_model_ids))):
             return True
     return False
 
