@@ -2739,11 +2739,22 @@ save/load portability failure under the review policy. Original-platform Linux
 continuation does not repair it. No tolerance, rounding, altered historical event
 or geometry runtime change is authorized or claimed here.
 
-The original-platform v4 preserve continuation restores the exact retained input
-in 403.170 seconds, accepts its first complete column proposal, resolves native
-Brass Stampede against E, and stops at the first pending Fight movement decision.
-Its three new submissions are all in Charge; no Fight decision or attack is
-submitted. E falls from 18 to 10 wounds, all 78 models survive, and the response
-takes 77.926 seconds under the unchanged 300-second cap. Full accepted-history
-qualification and the paired screen result are still pending; this observation
-does not establish paired replay qualification or remove the Windows blocker.
+The original-platform v4 continuations restore the exact retained preserve/screen
+inputs in 403.170/413.187 seconds. Each accepts its first complete column/arc
+proposal, resolves native Brass Stampede against E, and stops at the first
+pending Fight movement decision. Each adds three Charge submissions, with no
+Fight decision or attack submitted. E falls from 18 to 10/12 wounds; all 78 models
+survive in each arm. Responses take 77.926/78.676 seconds under the unchanged
+300-second cap. The six natural ability trigger dice are 4,5,3,4,1,6 in preserve
+and 2,6,3,6,4,5 in screen; corresponding D3 damage rolls are 1,2,3,2 and 1,2,1,2.
+Both RNG draw counts rise from 2 to 12, with the original charge rolls retained.
+Equipment, all non-B positions and every resource ledger are unchanged; each arm
+costs zero CP. These response observations are separate from the required
+exact accepted-history persistence, both-viewer/event and full ReplayRunner
+qualification receipts. Different natural histories do not establish a causal
+screen benefit, and successful original-platform qualification cannot remove
+the Windows exact-restoration blocker. The accepted checkpoint hashes are
+`11be2055a7d0551f8299d3119da1009ba14d421ea666a12ab62cee7997a59149`
+(preserve) and
+`ddcf4f6357ff6d6f441e7e7a59eef13f38f51093b947358b3db1a28038005cd7`
+(screen). Both include every original rejected proposal.
