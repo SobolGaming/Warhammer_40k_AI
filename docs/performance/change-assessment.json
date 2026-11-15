@@ -6,11 +6,11 @@
   "changes": {
     "ci/test_shards/native-charge-source-successor.json": {
       "before_sha256": null,
-      "after_sha256": "c53445053c36f2a35a8d2a1fc0cde7fbf605ca7a6b9e33de4a0bbd0b78ea91f2",
+      "after_sha256": "ccd4b7843e6453ebd2ac455a2c27b29ae5124fd3c5367dea57eb8fe00c8e79df",
       "owners": {
         "@document": {
           "before": null,
-          "after": "c53445053c36f2a35a8d2a1fc0cde7fbf605ca7a6b9e33de4a0bbd0b78ea91f2"
+          "after": "ccd4b7843e6453ebd2ac455a2c27b29ae5124fd3c5367dea57eb8fe00c8e79df"
         }
       }
     },
@@ -46,7 +46,7 @@
     },
     "scripts/boolean_los_admission.py": {
       "before_sha256": "f1bbc073e8c0d46d471782c3518846a872ab9f3d8db0432d22393d1a44fa446b",
-      "after_sha256": "35a00462f6193e65ece5e18db60c8f478789c29bfc0f31064067cb31fa063367",
+      "after_sha256": "579e7d955ea727e6913ca76dae8e13c66f1df956207fa389d0fc4b870c415495",
       "owners": {
         "@module": {
           "before": "149cb7bbb8c3999273c793362d6aabfca536a277fd8809c9e7ddeff85d96d41d",
@@ -62,7 +62,7 @@
         },
         "validate_successor": {
           "before": null,
-          "after": "9cd7873df0ddf95e61ce18e5ef4b61780f5a25d0afbababd6414cac45e1cd0a8"
+          "after": "92459bdc4828fc21012543ce42c3ac69e7f6f65984eb6138a3640a8bc5472dc8"
         }
       }
     },
