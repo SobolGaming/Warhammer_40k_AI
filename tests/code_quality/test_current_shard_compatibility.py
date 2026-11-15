@@ -136,17 +136,17 @@ def test_current_raw_projections_keep_missing_observations_null(
             assert (raw["full_raw_role_score"] is None) == bool(raw["missing_nodes"])
         scores = cast(list[float], row["derived_historical_plus_current_additions"])
         assert len(scores) == 10
-        assert max(scores) <= 1350
+        assert max(scores) <= 1620
     assert plan.metadata["retained_historical_planning_ceilings_seconds"] == [1076] * 8 + [
         1054,
         1050,
     ]
     assert plan.metadata["current_planning_policy"] == {
-        "version": "native-serial-current-planning-v1",
+        "version": "native-serial-current-planning-v2",
         "role": "Current empirical projection guard; not observed completion or timing approval",
-        "ceiling_seconds": 1350,
+        "ceiling_seconds": 1620,
         "rounding_seconds": 30,
-        "planning_gap_to_1620_second_approval": 270,
+        "planning_gap_to_1620_second_approval": 0,
     }
     assert (
         plan.metadata["historical_scoped_allocation"]
@@ -430,9 +430,9 @@ def test_current_planning_ceiling_has_an_inclusive_exact_boundary(index: int) ->
     from scripts.current_shard_assignment import require_planning_limits
 
     values = [0.0] * 10
-    values[index] = 1350.0
+    values[index] = 1620.0
     require_planning_limits(tuple(values))
-    values[index] = 1350.001
+    values[index] = 1620.001
     with pytest.raises(SystemExit, match="reviewed current planning ceiling"):
         require_planning_limits(tuple(values))
 

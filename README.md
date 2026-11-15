@@ -414,11 +414,12 @@ dispatch independently verify exact membership, finite partitions, fixed module
 alone on shard 5, pinned module on 4, mirror on 2 and cold role on 1. They recompute
 actual four-worker projections. The original historical/stress/latest planning
 ceilings of 1,076/1,054/1,050 seconds remain part of the retained historical model.
-The versioned current-only planning policy uses a 1,350-second ceiling for all ten
-projections, including the separately measured native serial context, while retaining
-the existing assignment. This empirical forecast guard is rounded to 30 seconds and
-leaves a 270-second planning gap below actual approval; it is not a runtime guarantee.
-Actual covered approval remains 1,620 seconds, with termination only above 1,800 seconds.
+The current-only planning policy `native-serial-current-planning-v2` uses a
+1,620-second ceiling for all ten projections, including the separately measured native
+serial context, while retaining the existing assignment. This empirical forecast guard
+matches actual approval and leaves no planning gap; it is not a runtime guarantee.
+Actual covered approval remains 1,620 seconds inclusive, with termination only above
+1,800 seconds.
 Original historical scores and partial unknowns remain separate; additions have no
 historical observations. No offline allocation search runs in CI, and planning
 estimates never qualify hosted timing. The complete

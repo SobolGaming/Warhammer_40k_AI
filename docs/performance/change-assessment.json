@@ -6,11 +6,11 @@
   "changes": {
     "README.md": {
       "before_sha256": "171389a51063965adb6687b5f0c43c1238d96d2483acb51835eb1b583ce10e2c",
-      "after_sha256": "b0fe3a26ee44048af3b84fc260de7a42421672d540c62195fe2f7e7cc2998ba3",
+      "after_sha256": "9968f72e385b223b7245e1411b77bd4280cea5e6bf5d364e7f6b4d42a3717cd5",
       "owners": {
         "@document": {
           "before": "171389a51063965adb6687b5f0c43c1238d96d2483acb51835eb1b583ce10e2c",
-          "after": "b0fe3a26ee44048af3b84fc260de7a42421672d540c62195fe2f7e7cc2998ba3"
+          "after": "9968f72e385b223b7245e1411b77bd4280cea5e6bf5d364e7f6b4d42a3717cd5"
         }
       }
     },
@@ -46,11 +46,11 @@
     },
     "ci/test_shards/current-runtime-compatibility.json": {
       "before_sha256": "419b012be48b93db12e11f84c23d136a4edbf9b2a713d93a0da1d9f488be3d4e",
-      "after_sha256": "c4f53307b3797074d3036ebf7c0a72ce527c8426c87055fdc6b3c35950f21326",
+      "after_sha256": "704e3541f491906c337c3cf9c3128945923a4188d4049faba7f3d4a1426dc0ca",
       "owners": {
         "@document": {
           "before": "419b012be48b93db12e11f84c23d136a4edbf9b2a713d93a0da1d9f488be3d4e",
-          "after": "c4f53307b3797074d3036ebf7c0a72ce527c8426c87055fdc6b3c35950f21326"
+          "after": "704e3541f491906c337c3cf9c3128945923a4188d4049faba7f3d4a1426dc0ca"
         }
       }
     },
@@ -184,43 +184,53 @@
         }
       }
     },
-    "docs/performance/current/boolean-los-20261115-rootfix-movement.json": {
-      "before_sha256": null,
-      "after_sha256": "b791d2b1eb17bb0298df53a8a4795f07c7971c95db997bdb3b4760b27d8efb87",
+    "docs/SEQUENTIAL_REMEDIATION_REVIEW_POLICY.md": {
+      "before_sha256": "c5228b1ab0c4c40758aa792507723d0ec282b6d009e2e8e1cef093167d9cab21",
+      "after_sha256": "c19ddc0924576aba254bccf002fec8760edaedfaaeca97df41ea02e01e79b062",
       "owners": {
         "@document": {
-          "before": null,
-          "after": "b791d2b1eb17bb0298df53a8a4795f07c7971c95db997bdb3b4760b27d8efb87"
+          "before": "c5228b1ab0c4c40758aa792507723d0ec282b6d009e2e8e1cef093167d9cab21",
+          "after": "c19ddc0924576aba254bccf002fec8760edaedfaaeca97df41ea02e01e79b062"
         }
       }
     },
-    "docs/performance/current/boolean-los-20261115-rootfix-reconstruction.json": {
+    "docs/performance/current/boolean-los-20261115-planning1620-movement.json": {
       "before_sha256": null,
-      "after_sha256": "690eb697202d880f158fd2f27567dda02c8d015cd4e5a1ff1c6b844a8c7a8c76",
+      "after_sha256": "e7022d4b1b24c7a246ec35a7f81fec4a4ab0c92be607456d36be592d6932959f",
       "owners": {
         "@document": {
           "before": null,
-          "after": "690eb697202d880f158fd2f27567dda02c8d015cd4e5a1ff1c6b844a8c7a8c76"
+          "after": "e7022d4b1b24c7a246ec35a7f81fec4a4ab0c92be607456d36be592d6932959f"
         }
       }
     },
-    "docs/performance/current/boolean-los-20261115-rootfix-setup.json": {
+    "docs/performance/current/boolean-los-20261115-planning1620-reconstruction.json": {
       "before_sha256": null,
-      "after_sha256": "95fdc0198c56bfc423f6cebfb5ba6d6319f7ec18ce9dc775c100f962b21d7957",
+      "after_sha256": "4777c3ea49429d31028ecbac48d3a0b15801889dac10e21807e4814e903fa771",
       "owners": {
         "@document": {
           "before": null,
-          "after": "95fdc0198c56bfc423f6cebfb5ba6d6319f7ec18ce9dc775c100f962b21d7957"
+          "after": "4777c3ea49429d31028ecbac48d3a0b15801889dac10e21807e4814e903fa771"
         }
       }
     },
-    "docs/performance/current/boolean-los-20261115-rootfix-visibility.json": {
+    "docs/performance/current/boolean-los-20261115-planning1620-setup.json": {
       "before_sha256": null,
-      "after_sha256": "855ae6eabb09edc67f058e12d47cacb313024b1ad39772bda70c4f73bf95f41d",
+      "after_sha256": "bfc2c5909eb343b033785573f44b00e1ee1872867e248d36259701a9f2804acc",
       "owners": {
         "@document": {
           "before": null,
-          "after": "855ae6eabb09edc67f058e12d47cacb313024b1ad39772bda70c4f73bf95f41d"
+          "after": "bfc2c5909eb343b033785573f44b00e1ee1872867e248d36259701a9f2804acc"
+        }
+      }
+    },
+    "docs/performance/current/boolean-los-20261115-planning1620-visibility.json": {
+      "before_sha256": null,
+      "after_sha256": "b90ca44022e8c326f07b04e1a6519a62a37e1f002cf5dbf0262a485a93aa96e4",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "b90ca44022e8c326f07b04e1a6519a62a37e1f002cf5dbf0262a485a93aa96e4"
         }
       }
     },
@@ -271,6 +281,20 @@
         "_observation": {
           "before": "659eb5dfac7fcf1eba72b3d64108a697e90d1c247993a176ad13563cf2e009db",
           "after": "6a013108a21e90a20d8652737c50255cd9d4b4414de0b0ad7b62a2ffbd4cd65e"
+        }
+      }
+    },
+    "scripts/current_shard_assignment.py": {
+      "before_sha256": "f727b23af8a6738ecf5fd2e535484e2a0bb1ec41efa5afd6d477a77f641b3fa6",
+      "after_sha256": "18ce9839918f3281800155d9d6f6349aec9a2a670dfa1de86b28beea147b8027",
+      "owners": {
+        "@module": {
+          "before": "58ccad4a43f2475a7d081329e484cba10f5b842061fac911d89e8d002437b1b2",
+          "after": "7d49d1e2969ceafc96708f6e9966cd9c6b58972fd544ac474c91aad0653d7b11"
+        },
+        "current_planning_policy": {
+          "before": "4bd3701745e7d3cc80255a58111435a26010da83bcfa904b9aa10ab324613da8",
+          "after": "e3fca6dd84e155bcb8f6dd58c151750e50a3cc0849a9c64be00eb32a9079c5a6"
         }
       }
     },
@@ -390,11 +414,19 @@
     },
     "tests/code_quality/test_current_shard_compatibility.py": {
       "before_sha256": "0acce0468596ce40932e3f79bc72277e600e82572aa93a8d16e0f8171314e490",
-      "after_sha256": "4ce18a41d19d10924a1e213c7f58db3d69c29477a71dac90b36d6e77384ec312",
+      "after_sha256": "017ea13da6b7bff94f1bda7edf700e3cdae8ccbe298c76b94edd8d419fa88c30",
       "owners": {
         "test_current_dispatch_has_exact_inventory_and_disclosed_selector_moves": {
           "before": "472cd2cf30949edf9a1356b49068ee85119ad16fcabdd9ab3d332e751eaa058d",
           "after": "6766f6164e689da31c6e235fea00726d343dc11dfcc585394d2fd02025391fd8"
+        },
+        "test_current_planning_ceiling_has_an_inclusive_exact_boundary": {
+          "before": "9a344c4bdb0095817f9f3e5ed273c335cbadb1885c01a860f38a4800eef9597d",
+          "after": "42c479f14a17b48d1ea6cb7ebaf350c19830a5b8283d37eaa0a600bf3dfd359e"
+        },
+        "test_current_raw_projections_keep_missing_observations_null": {
+          "before": "8333e2b94cb776fa2112f8ca0b293b0a00228231a8c82caf0e94676167ded343",
+          "after": "cbebc05c9383c2b4f7ebf4965de3d7e30e55acb83c1737279f2c35808adf7491"
         },
         "test_native_serial_role_preserves_complete_phases_and_measurement_scope": {
           "before": "d9aebc07e78ef5aff4bf2f1a4737fb342fefddfc98aa16a20638619b5c196a99",
@@ -470,11 +502,11 @@
     },
     "tests/rules/section07/coverage.json": {
       "before_sha256": "b4f665c7c549c74c25d72deafae2fac1d938ae1543656dd2f5b4839125889699",
-      "after_sha256": "dabdfec3eedf90fd32f5e2518e3126b10012dfe2959ed9a9acb5c2ebf3ea5b8f",
+      "after_sha256": "b3a4a396df256a02435c92423742206b1f4b1a9ca3793e5a799cef189bd7eb69",
       "owners": {
         "@document": {
           "before": "b4f665c7c549c74c25d72deafae2fac1d938ae1543656dd2f5b4839125889699",
-          "after": "dabdfec3eedf90fd32f5e2518e3126b10012dfe2959ed9a9acb5c2ebf3ea5b8f"
+          "after": "b3a4a396df256a02435c92423742206b1f4b1a9ca3793e5a799cef189bd7eb69"
         }
       }
     }
@@ -484,9 +516,9 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Separate exact any-part evidence from complete visibility for Boolean consumers; preserve full classification, or maintain its exact-source validation and generated identity artifacts.",
-      "source_obligation": "Preserve continuous body/terrain/MONSTER and clipping predicates, exact fingerprints, complete full-visibility evidence, source-bound current qualification and all historical producer records.",
-      "unchanged_work": "No solver replacement, rounded keys, sampled-negative answers, allocation search, selector moves, worker changes, coverage reduction or altered execution deadline. Fresh current weights come from the required covered run; historical observations retain original sources."
+      "rationale": "Apply the explicit owner-approved current planning1620 policy; preserve actual1620 approval, strict-over1800 termination, complete67% branch coverage and all tests/assignments. Refresh only current documentation authentication.",
+      "source_obligation": "Version the current forecast policy transparently, retain every historical producer/threshold/outcome, and never increase allowed actual runtime or change the execution hard stop.",
+      "unchanged_work": "No case omission, selector move, worker change, dispatch-history membership change, retrospective passing outcome or actual execution-budget increase. Fresh records bind exact current source bytes."
     },
     "ci/test_shards/current-covered-baseline.json": {
       "category": "rule_semantics",
@@ -528,9 +560,9 @@
         "scoped-shard-allocation"
       ],
       "selected_families": [],
-      "rationale": "Separate exact any-part evidence from complete visibility for Boolean consumers; preserve full classification, or maintain its exact-source validation and generated identity artifacts.",
-      "source_obligation": "Preserve continuous body/terrain/MONSTER and clipping predicates, exact fingerprints, complete full-visibility evidence, source-bound current qualification and all historical producer records.",
-      "unchanged_work": "No solver replacement, rounded keys, sampled-negative answers, allocation search, selector moves, worker changes, coverage reduction or altered execution deadline. Fresh current weights come from the required covered run; historical observations retain original sources."
+      "rationale": "Apply the explicit owner-approved current planning1620 policy; preserve actual1620 approval, strict-over1800 termination, complete67% branch coverage and all tests/assignments. Refresh only current documentation authentication.",
+      "source_obligation": "Version the current forecast policy transparently, retain every historical producer/threshold/outcome, and never increase allowed actual runtime or change the execution hard stop.",
+      "unchanged_work": "No case omission, selector move, worker change, dispatch-history membership change, retrospective passing outcome or actual execution-budget increase. Fresh records bind exact current source bytes."
     },
     "ci/test_shards/durations.json": {
       "category": "rule_semantics",
@@ -538,9 +570,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Separate exact any-part evidence from complete visibility for Boolean consumers; preserve full classification, or maintain its exact-source validation and generated identity artifacts.",
-      "source_obligation": "Preserve continuous body/terrain/MONSTER and clipping predicates, exact fingerprints, complete full-visibility evidence, source-bound current qualification and all historical producer records.",
-      "unchanged_work": "No solver replacement, rounded keys, sampled-negative answers, allocation search, selector moves, worker changes, coverage reduction or altered execution deadline. Fresh current weights come from the required covered run; historical observations retain original sources."
+      "rationale": "Apply the explicit owner-approved current planning1620 policy; preserve actual1620 approval, strict-over1800 termination, complete67% branch coverage and all tests/assignments. Refresh only current documentation authentication.",
+      "source_obligation": "Version the current forecast policy transparently, retain every historical producer/threshold/outcome, and never increase allowed actual runtime or change the execution hard stop.",
+      "unchanged_work": "No case omission, selector move, worker change, dispatch-history membership change, retrospective passing outcome or actual execution-budget increase. Fresh records bind exact current source bytes."
     },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
@@ -656,7 +688,15 @@
       "source_obligation": "Preserve continuous body/terrain/MONSTER and clipping predicates, exact fingerprints, complete full-visibility evidence, source-bound current qualification and all historical producer records.",
       "unchanged_work": "No solver replacement, rounded keys, sampled-negative answers, allocation search, selector moves, worker changes, coverage reduction or altered execution deadline. Fresh current weights come from the required covered run; historical observations retain original sources."
     },
-    "docs/performance/current/boolean-los-20261115-rootfix-movement.json": {
+    "docs/SEQUENTIAL_REMEDIATION_REVIEW_POLICY.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Apply the explicit owner-approved current planning1620 policy; preserve actual1620 approval, strict-over1800 termination, complete67% branch coverage and all tests/assignments. Refresh only current documentation authentication.",
+      "source_obligation": "Version the current forecast policy transparently, retain every historical producer/threshold/outcome, and never increase allowed actual runtime or change the execution hard stop.",
+      "unchanged_work": "No case omission, selector move, worker change, dispatch-history membership change, retrospective passing outcome or actual execution-budget increase. Fresh records bind exact current source bytes."
+    },
+    "docs/performance/current/boolean-los-20261115-planning1620-movement.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
@@ -664,7 +704,7 @@
       "source_obligation": "Preserve continuous body/terrain/MONSTER and clipping predicates, exact fingerprints, complete full-visibility evidence, source-bound current qualification and all historical producer records.",
       "unchanged_work": "No solver replacement, rounded keys, sampled-negative answers, allocation search, selector moves, worker changes, coverage reduction or altered execution deadline. Fresh current weights come from the required covered run; historical observations retain original sources."
     },
-    "docs/performance/current/boolean-los-20261115-rootfix-reconstruction.json": {
+    "docs/performance/current/boolean-los-20261115-planning1620-reconstruction.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
@@ -672,7 +712,7 @@
       "source_obligation": "Preserve continuous body/terrain/MONSTER and clipping predicates, exact fingerprints, complete full-visibility evidence, source-bound current qualification and all historical producer records.",
       "unchanged_work": "No solver replacement, rounded keys, sampled-negative answers, allocation search, selector moves, worker changes, coverage reduction or altered execution deadline. Fresh current weights come from the required covered run; historical observations retain original sources."
     },
-    "docs/performance/current/boolean-los-20261115-rootfix-setup.json": {
+    "docs/performance/current/boolean-los-20261115-planning1620-setup.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
@@ -680,7 +720,7 @@
       "source_obligation": "Preserve continuous body/terrain/MONSTER and clipping predicates, exact fingerprints, complete full-visibility evidence, source-bound current qualification and all historical producer records.",
       "unchanged_work": "No solver replacement, rounded keys, sampled-negative answers, allocation search, selector moves, worker changes, coverage reduction or altered execution deadline. Fresh current weights come from the required covered run; historical observations retain original sources."
     },
-    "docs/performance/current/boolean-los-20261115-rootfix-visibility.json": {
+    "docs/performance/current/boolean-los-20261115-planning1620-visibility.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
@@ -715,6 +755,16 @@
       "rationale": "Separate exact any-part evidence from complete visibility for Boolean consumers; preserve full classification, or maintain its exact-source validation and generated identity artifacts.",
       "source_obligation": "Preserve continuous body/terrain/MONSTER and clipping predicates, exact fingerprints, complete full-visibility evidence, source-bound current qualification and all historical producer records.",
       "unchanged_work": "No solver replacement, rounded keys, sampled-negative answers, allocation search, selector moves, worker changes, coverage reduction or altered execution deadline. Fresh current weights come from the required covered run; historical observations retain original sources."
+    },
+    "scripts/current_shard_assignment.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "scoped-shard-allocation"
+      ],
+      "selected_families": [],
+      "rationale": "Apply the explicit owner-approved current planning1620 policy; preserve actual1620 approval, strict-over1800 termination, complete67% branch coverage and all tests/assignments. Refresh only current documentation authentication.",
+      "source_obligation": "Version the current forecast policy transparently, retain every historical producer/threshold/outcome, and never increase allowed actual runtime or change the execution hard stop.",
+      "unchanged_work": "No case omission, selector move, worker change, dispatch-history membership change, retrospective passing outcome or actual execution-budget increase. Fresh records bind exact current source bytes."
     },
     "scripts/current_shard_compatibility.py": {
       "category": "rule_semantics",
@@ -810,9 +860,9 @@
         "scoped-shard-allocation"
       ],
       "selected_families": [],
-      "rationale": "Separate exact any-part evidence from complete visibility for Boolean consumers; preserve full classification, or maintain its exact-source validation and generated identity artifacts.",
-      "source_obligation": "Preserve continuous body/terrain/MONSTER and clipping predicates, exact fingerprints, complete full-visibility evidence, source-bound current qualification and all historical producer records.",
-      "unchanged_work": "No solver replacement, rounded keys, sampled-negative answers, allocation search, selector moves, worker changes, coverage reduction or altered execution deadline. Fresh current weights come from the required covered run; historical observations retain original sources."
+      "rationale": "Apply the explicit owner-approved current planning1620 policy; preserve actual1620 approval, strict-over1800 termination, complete67% branch coverage and all tests/assignments. Refresh only current documentation authentication.",
+      "source_obligation": "Version the current forecast policy transparently, retain every historical producer/threshold/outcome, and never increase allowed actual runtime or change the execution hard stop.",
+      "unchanged_work": "No case omission, selector move, worker change, dispatch-history membership change, retrospective passing outcome or actual execution-budget increase. Fresh records bind exact current source bytes."
     },
     "tests/code_quality/test_extended_shard_allocation.py": {
       "category": "rule_semantics",
@@ -871,17 +921,17 @@
         "qualification40-exact-b6886d3bc2fb1ca4"
       ],
       "selected_families": [],
-      "rationale": "Separate exact any-part evidence from complete visibility for Boolean consumers; preserve full classification, or maintain its exact-source validation and generated identity artifacts.",
-      "source_obligation": "Preserve continuous body/terrain/MONSTER and clipping predicates, exact fingerprints, complete full-visibility evidence, source-bound current qualification and all historical producer records.",
-      "unchanged_work": "No solver replacement, rounded keys, sampled-negative answers, allocation search, selector moves, worker changes, coverage reduction or altered execution deadline. Fresh current weights come from the required covered run; historical observations retain original sources."
+      "rationale": "Apply the explicit owner-approved current planning1620 policy; preserve actual1620 approval, strict-over1800 termination, complete67% branch coverage and all tests/assignments. Refresh only current documentation authentication.",
+      "source_obligation": "Version the current forecast policy transparently, retain every historical producer/threshold/outcome, and never increase allowed actual runtime or change the execution hard stop.",
+      "unchanged_work": "No case omission, selector move, worker change, dispatch-history membership change, retrospective passing outcome or actual execution-budget increase. Fresh records bind exact current source bytes."
     }
   },
   "milestone": "ordinary",
   "comparisons": {
-    "visibility": "docs/performance/current/boolean-los-20261115-rootfix-visibility.json",
-    "movement": "docs/performance/current/boolean-los-20261115-rootfix-movement.json",
-    "setup": "docs/performance/current/boolean-los-20261115-rootfix-setup.json",
-    "reconstruction": "docs/performance/current/boolean-los-20261115-rootfix-reconstruction.json"
+    "visibility": "docs/performance/current/boolean-los-20261115-planning1620-visibility.json",
+    "movement": "docs/performance/current/boolean-los-20261115-planning1620-movement.json",
+    "setup": "docs/performance/current/boolean-los-20261115-planning1620-setup.json",
+    "reconstruction": "docs/performance/current/boolean-los-20261115-planning1620-reconstruction.json"
   },
   "full_game": null
 }
