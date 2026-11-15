@@ -184,43 +184,43 @@
         }
       }
     },
-    "docs/performance/current/boolean-los-20261115-authenticated-movement.json": {
+    "docs/performance/current/boolean-los-20261115-rootfix-movement.json": {
       "before_sha256": null,
-      "after_sha256": "6b4814302dae99f23690b0a1641926c544c97930a352536c720c4a952e4dd6fc",
+      "after_sha256": "b791d2b1eb17bb0298df53a8a4795f07c7971c95db997bdb3b4760b27d8efb87",
       "owners": {
         "@document": {
           "before": null,
-          "after": "6b4814302dae99f23690b0a1641926c544c97930a352536c720c4a952e4dd6fc"
+          "after": "b791d2b1eb17bb0298df53a8a4795f07c7971c95db997bdb3b4760b27d8efb87"
         }
       }
     },
-    "docs/performance/current/boolean-los-20261115-authenticated-reconstruction.json": {
+    "docs/performance/current/boolean-los-20261115-rootfix-reconstruction.json": {
       "before_sha256": null,
-      "after_sha256": "59e4049aab143a82373652c39ac8888a46c317381ecd34e2035370ea238b1cdf",
+      "after_sha256": "690eb697202d880f158fd2f27567dda02c8d015cd4e5a1ff1c6b844a8c7a8c76",
       "owners": {
         "@document": {
           "before": null,
-          "after": "59e4049aab143a82373652c39ac8888a46c317381ecd34e2035370ea238b1cdf"
+          "after": "690eb697202d880f158fd2f27567dda02c8d015cd4e5a1ff1c6b844a8c7a8c76"
         }
       }
     },
-    "docs/performance/current/boolean-los-20261115-authenticated-setup.json": {
+    "docs/performance/current/boolean-los-20261115-rootfix-setup.json": {
       "before_sha256": null,
-      "after_sha256": "8e397e7b376888718ca7f71f904dff3010e58d3bb582f3dfb916a77b8f26572e",
+      "after_sha256": "95fdc0198c56bfc423f6cebfb5ba6d6319f7ec18ce9dc775c100f962b21d7957",
       "owners": {
         "@document": {
           "before": null,
-          "after": "8e397e7b376888718ca7f71f904dff3010e58d3bb582f3dfb916a77b8f26572e"
+          "after": "95fdc0198c56bfc423f6cebfb5ba6d6319f7ec18ce9dc775c100f962b21d7957"
         }
       }
     },
-    "docs/performance/current/boolean-los-20261115-authenticated-visibility.json": {
+    "docs/performance/current/boolean-los-20261115-rootfix-visibility.json": {
       "before_sha256": null,
-      "after_sha256": "b07c059c7fd80c1657d6133df0d966a8643d78fb7a907dbc27645af955b77d6c",
+      "after_sha256": "855ae6eabb09edc67f058e12d47cacb313024b1ad39772bda70c4f73bf95f41d",
       "owners": {
         "@document": {
           "before": null,
-          "after": "b07c059c7fd80c1657d6133df0d966a8643d78fb7a907dbc27645af955b77d6c"
+          "after": "855ae6eabb09edc67f058e12d47cacb313024b1ad39772bda70c4f73bf95f41d"
         }
       }
     },
@@ -399,6 +399,26 @@
         "test_native_serial_role_preserves_complete_phases_and_measurement_scope": {
           "before": "d9aebc07e78ef5aff4bf2f1a4737fb342fefddfc98aa16a20638619b5c196a99",
           "after": "9cffb7e572fd6ced404620b95aa03bff6dbbd8a99ab0911f9e352799163558db"
+        }
+      }
+    },
+    "tests/code_quality/test_extended_shard_allocation.py": {
+      "before_sha256": "2607df6aa86a5fd8372f807661b9d7105be5da9a622f737a5fa603d5febc50e9",
+      "after_sha256": "e96ca28eba1917a97286757081eaf4b74fb3bc548f5efa46764b4691d5a7b14d",
+      "owners": {
+        "inputs": {
+          "before": "6b6593fb1f920ebc6808e7f85fff194f7c53cbb2406fcfe7a82f54ac59216731",
+          "after": "52f7374cec9868b5ffbcce6e51e16faf0f03f1166c7929e3b6f30835af7633d7"
+        }
+      }
+    },
+    "tests/code_quality/test_scoped_shard_allocation.py": {
+      "before_sha256": "9245c2f8975cdc1776d51535467a6fb79d8c234469e6545c2e0985814614c2b9",
+      "after_sha256": "7c25b7cf678c4186ecbc659bf816b6f874a8cbee14a517c005e01f97cdcc0104",
+      "owners": {
+        "inputs": {
+          "before": "76f1108a7bb005b0d8d102eac4937b79765a217395475596873efacd92e06bb3",
+          "after": "13e9abb7038a5eca964c82ede15faa6d0f739229a0c51666d63ae900195a10f4"
         }
       }
     },
@@ -636,7 +656,7 @@
       "source_obligation": "Preserve continuous body/terrain/MONSTER and clipping predicates, exact fingerprints, complete full-visibility evidence, source-bound current qualification and all historical producer records.",
       "unchanged_work": "No solver replacement, rounded keys, sampled-negative answers, allocation search, selector moves, worker changes, coverage reduction or altered execution deadline. Fresh current weights come from the required covered run; historical observations retain original sources."
     },
-    "docs/performance/current/boolean-los-20261115-authenticated-movement.json": {
+    "docs/performance/current/boolean-los-20261115-rootfix-movement.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
@@ -644,7 +664,7 @@
       "source_obligation": "Preserve continuous body/terrain/MONSTER and clipping predicates, exact fingerprints, complete full-visibility evidence, source-bound current qualification and all historical producer records.",
       "unchanged_work": "No solver replacement, rounded keys, sampled-negative answers, allocation search, selector moves, worker changes, coverage reduction or altered execution deadline. Fresh current weights come from the required covered run; historical observations retain original sources."
     },
-    "docs/performance/current/boolean-los-20261115-authenticated-reconstruction.json": {
+    "docs/performance/current/boolean-los-20261115-rootfix-reconstruction.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
@@ -652,7 +672,7 @@
       "source_obligation": "Preserve continuous body/terrain/MONSTER and clipping predicates, exact fingerprints, complete full-visibility evidence, source-bound current qualification and all historical producer records.",
       "unchanged_work": "No solver replacement, rounded keys, sampled-negative answers, allocation search, selector moves, worker changes, coverage reduction or altered execution deadline. Fresh current weights come from the required covered run; historical observations retain original sources."
     },
-    "docs/performance/current/boolean-los-20261115-authenticated-setup.json": {
+    "docs/performance/current/boolean-los-20261115-rootfix-setup.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
@@ -660,7 +680,7 @@
       "source_obligation": "Preserve continuous body/terrain/MONSTER and clipping predicates, exact fingerprints, complete full-visibility evidence, source-bound current qualification and all historical producer records.",
       "unchanged_work": "No solver replacement, rounded keys, sampled-negative answers, allocation search, selector moves, worker changes, coverage reduction or altered execution deadline. Fresh current weights come from the required covered run; historical observations retain original sources."
     },
-    "docs/performance/current/boolean-los-20261115-authenticated-visibility.json": {
+    "docs/performance/current/boolean-los-20261115-rootfix-visibility.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
@@ -794,6 +814,26 @@
       "source_obligation": "Preserve continuous body/terrain/MONSTER and clipping predicates, exact fingerprints, complete full-visibility evidence, source-bound current qualification and all historical producer records.",
       "unchanged_work": "No solver replacement, rounded keys, sampled-negative answers, allocation search, selector moves, worker changes, coverage reduction or altered execution deadline. Fresh current weights come from the required covered run; historical observations retain original sources."
     },
+    "tests/code_quality/test_extended_shard_allocation.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "scoped-shard-allocation"
+      ],
+      "selected_families": [],
+      "rationale": "Separate exact any-part evidence from complete visibility for Boolean consumers; preserve full classification, or maintain its exact-source validation and generated identity artifacts.",
+      "source_obligation": "Preserve continuous body/terrain/MONSTER and clipping predicates, exact fingerprints, complete full-visibility evidence, source-bound current qualification and all historical producer records.",
+      "unchanged_work": "No solver replacement, rounded keys, sampled-negative answers, allocation search, selector moves, worker changes, coverage reduction or altered execution deadline. Fresh current weights come from the required covered run; historical observations retain original sources."
+    },
+    "tests/code_quality/test_scoped_shard_allocation.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "scoped-shard-allocation"
+      ],
+      "selected_families": [],
+      "rationale": "Separate exact any-part evidence from complete visibility for Boolean consumers; preserve full classification, or maintain its exact-source validation and generated identity artifacts.",
+      "source_obligation": "Preserve continuous body/terrain/MONSTER and clipping predicates, exact fingerprints, complete full-visibility evidence, source-bound current qualification and all historical producer records.",
+      "unchanged_work": "No solver replacement, rounded keys, sampled-negative answers, allocation search, selector moves, worker changes, coverage reduction or altered execution deadline. Fresh current weights come from the required covered run; historical observations retain original sources."
+    },
     "tests/rules/section06/coverage.json": {
       "category": "rule_semantics",
       "operations": [
@@ -838,10 +878,10 @@
   },
   "milestone": "ordinary",
   "comparisons": {
-    "visibility": "docs/performance/current/boolean-los-20261115-authenticated-visibility.json",
-    "movement": "docs/performance/current/boolean-los-20261115-authenticated-movement.json",
-    "setup": "docs/performance/current/boolean-los-20261115-authenticated-setup.json",
-    "reconstruction": "docs/performance/current/boolean-los-20261115-authenticated-reconstruction.json"
+    "visibility": "docs/performance/current/boolean-los-20261115-rootfix-visibility.json",
+    "movement": "docs/performance/current/boolean-los-20261115-rootfix-movement.json",
+    "setup": "docs/performance/current/boolean-los-20261115-rootfix-setup.json",
+    "reconstruction": "docs/performance/current/boolean-los-20261115-rootfix-reconstruction.json"
   },
   "full_game": null
 }

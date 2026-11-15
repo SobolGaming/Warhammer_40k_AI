@@ -159,7 +159,9 @@ def test_exact_fetch_restores_squashed_away_calibration_in_main_only_checkout(
 @pytest.fixture(scope="module")
 def inputs() -> tuple[dict[str, float], ScopedEvidence]:
     summary = json.loads((historical_directory / "durations.json").read_bytes())
-    costs = sharding.dispatch_case_seconds(summary, historical_directory / "durations.json")
+    with pytest.MonkeyPatch.context() as patch:
+        patch.setattr(sharding, "REPOSITORY_ROOT", historical_root)
+        costs = sharding.dispatch_case_seconds(summary, historical_directory / "durations.json")
     scope = load_declared_scope(historical_directory, root=historical_root, costs=costs)
     assert scope is not None
     assert scope.extension is not None
