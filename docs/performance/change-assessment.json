@@ -4,6 +4,26 @@
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:d637f1649b7c3bfee1683c0112ac0ba37233afbf1f9640e6b4f2bbf47fa46c55",
   "operation_map_sha256": "7ac167b37944e37269db4658b1059e24d97f5d602492de7ee17ebeae0512eb0e",
   "changes": {
+    "ci/quality_shards/all.txt": {
+      "before_sha256": "4c8684ec6ed70ed2edac193d63d2b3f09eda88f107434c46b1a8ada940d3a21f",
+      "after_sha256": "276bcbfbb491e37b5b3189925c198e18908f6a5610dc1b5f74d495c3ddafbb33",
+      "owners": {
+        "@document": {
+          "before": "4c8684ec6ed70ed2edac193d63d2b3f09eda88f107434c46b1a8ada940d3a21f",
+          "after": "276bcbfbb491e37b5b3189925c198e18908f6a5610dc1b5f74d495c3ddafbb33"
+        }
+      }
+    },
+    "ci/quality_shards/shard-3.txt": {
+      "before_sha256": "661d93d5715896fddb49a4086799d5e28c44cdbe3fd234355a99240875ac5aa5",
+      "after_sha256": "5be1aa1d9acf69587ba839c7a35930c5fde922c484c85f25abdebe6d6324b2fd",
+      "owners": {
+        "@document": {
+          "before": "661d93d5715896fddb49a4086799d5e28c44cdbe3fd234355a99240875ac5aa5",
+          "after": "5be1aa1d9acf69587ba839c7a35930c5fde922c484c85f25abdebe6d6324b2fd"
+        }
+      }
+    },
     "ci/test_shards/native-charge-source-successor.json": {
       "before_sha256": null,
       "after_sha256": "a3056564f4aef777c0b03b23c70fd384e8ae5b84a89cedb1fb0354b3448f3d15",
@@ -218,6 +238,22 @@
       ],
       "selected_families": [],
       "rationale": "Repair the demonstrated source-admission blocker by authenticating the complete original producer map and an exact finite four-file successor. All timing evidence, allocations, worker calibration and budgets remain unchanged; no optimization or performance claim.",
+      "source_obligation": "Preserve the legal equipped 78-model roster, original seed and ordinary history, complete six-model PathWitness proposals, natural dice and mandatory charge-triggered effects. Retain rejected paths and unresolved work; eligibility is not an accepted charge. Qualify complete accepted histories through exact JSON persistence, both viewer/event comparisons and ReplayRunner.",
+      "unchanged_work": "Engine runtime, catalogs, solver, RNG, serialization/replay, behavior inventory, scheduling assignments and measured weights are unchanged. Preserve 12 shards, minimum 12 workers where applicable, 67% branch coverage, 1620-second approval, strictly-over-1800 termination, smoke180 and quality600 limits."
+    },
+    "ci/quality_shards/all.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Refresh only the 24 newly collected source-admission regression cases in the full inventory and their existing lane 3 module. Preserve every prior case, module assignment, finite deferral, worker count and deadline; no allocation or optimization.",
+      "source_obligation": "Preserve the legal equipped 78-model roster, original seed and ordinary history, complete six-model PathWitness proposals, natural dice and mandatory charge-triggered effects. Retain rejected paths and unresolved work; eligibility is not an accepted charge. Qualify complete accepted histories through exact JSON persistence, both viewer/event comparisons and ReplayRunner.",
+      "unchanged_work": "Engine runtime, catalogs, solver, RNG, serialization/replay, behavior inventory, scheduling assignments and measured weights are unchanged. Preserve 12 shards, minimum 12 workers where applicable, 67% branch coverage, 1620-second approval, strictly-over-1800 termination, smoke180 and quality600 limits."
+    },
+    "ci/quality_shards/shard-3.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Refresh only the 24 newly collected source-admission regression cases in the full inventory and their existing lane 3 module. Preserve every prior case, module assignment, finite deferral, worker count and deadline; no allocation or optimization.",
       "source_obligation": "Preserve the legal equipped 78-model roster, original seed and ordinary history, complete six-model PathWitness proposals, natural dice and mandatory charge-triggered effects. Retain rejected paths and unresolved work; eligibility is not an accepted charge. Qualify complete accepted histories through exact JSON persistence, both viewer/event comparisons and ReplayRunner.",
       "unchanged_work": "Engine runtime, catalogs, solver, RNG, serialization/replay, behavior inventory, scheduling assignments and measured weights are unchanged. Preserve 12 shards, minimum 12 workers where applicable, 67% branch coverage, 1620-second approval, strictly-over-1800 termination, smoke180 and quality600 limits."
     }
