@@ -2625,15 +2625,17 @@ their existing meanings.
 ### Frozen native Bloodcrusher charge response
 
 `tests.support.cavalcade_native_charge` is a separate operator experiment on the
-round-four common checkpoint. Preparation continues the unchanged preserve and
-screen recipes to their original B4 Charge boundary. It records both exact inputs
-and freezes the same eight ordered endpoint templates, six-model movement order,
-source hash and choices before either charge is selected. The templates use the
-actual B/E geometry; they are proposals, not proof of a legal charge.
+round-four common checkpoint. Initial preparation continues the unchanged preserve
+and screen recipes to their original B4 Charge boundary. V3 froze the same eight
+ordered endpoint templates, six-model movement order, source hash and choices
+before either charge was selected. Both natural rolls and all sixteen rejected
+proposals remain in the retained histories. The templates use actual B/E geometry;
+they are proposals, not proof of a legal charge.
 
 The response selects B, keeps its natural charge dice and selects only E when the
 engine offers that target. Each full six-model proposal follows its frozen
-template, with each straight path capped by the actual movement budget. Native
+template. V4 admits a whole formation only when every complete straight path fits
+the actual movement budget; it never clips individual paths. Native
 validation owns legality, sequential collision, coherency and mandatory endpoint
 obligations. Rejections stay in the decision history. The operator tries at most
 eight templates, without changing engine search budgets. Exhaustion, an unhandled
@@ -2690,3 +2692,48 @@ choices and limits before any charge roll. The v2 source and failure remain
 retained; this is a harness repair, not an engine or rules change.
 
 The required scheduling admission exposed a complete-source identity mismatch: its retained 32-worker receipt was produced at `33d199058f2e65f544bcc535e41862e2c09207eb`, before this uncollected operator existed. The admission now authenticates all 5,029 original source inputs from that exact Git archive, without executing historical code, and permits only the four before/after file hashes in `ci/test_shards/native-charge-source-successor.json`. Every unlisted source change still fails. Original receipts, assignments, weights, inventories, worker calibration, runtime and deadline checks remain unchanged. This is source authentication, with no new performance claim.
+
+The v3 validator correctly rejected B-to-B endpoint overlap in all eight proposals
+per arm. Independently clipping converging paths and packing the actual oval bases
+on a narrow ring caused real collisions; no validator defect was demonstrated.
+The bounded v4 operator repair constructs two complete disjoint formations from
+the actual six bases, retains the original model order, and freezes the same bank
+and admission rule for both arms. A conservative distance test excludes whole
+formations that exceed the natural budget or a directly reachable native endpoint
+goal; exclusion is not proof that every legal charge is impossible. The real
+ruleset supplies one-inch preferred and two-inch engagement distances. Independent
+native `resolve_charge_move` checks accept the six-inch column and nine-inch arc
+paths. Those read-only checks establish legal paths, not committed native charges.
+
+Resume the strictly qualified v3 checkpoints without rerolling their existing
+six- and nine-inch natural charge budgets:
+
+```sh
+uv run --no-sync python -m tests.support.cavalcade_native_charge \
+  --repair-from reports/native-charge-v3 --output reports/native-charge-v4
+```
+
+Then use the response and qualification commands above with the new output path.
+The v4 procedure is frozen before any new choice or ability die. It retains the
+entire rejected prefix and reuses the already pending charge movement rather than
+starting a new charge. Restore/response/qualification clocks and search limits
+are unchanged. Interrupted attempts remain separate immutable diagnostics.
+
+A Windows restoration of the untouched Linux-produced v3 preserve checkpoint
+fails exact lifecycle equality before any new choice. The rejected-charge event's
+endpoint distance is retained as `0.2500000000000031` and recomputes as
+`0.250000000000005` on Windows. An independent same-pose/base probe reproduces both
+values on their respective platforms; footprint WKB differs despite identical
+locked Shapely, GEOS and NumPy versions. This is a reproducible engine-generated
+save/load portability failure under the review policy. Original-platform Linux
+continuation does not repair it. No tolerance, rounding, altered historical event
+or geometry runtime change is authorized or claimed here.
+
+The original-platform v4 preserve continuation restores the exact retained input
+in 403.170 seconds, accepts its first complete column proposal, resolves native
+Brass Stampede against E, and stops at the first pending Fight movement decision.
+Its three new submissions are all in Charge; no Fight decision or attack is
+submitted. E falls from 18 to 10 wounds, all 78 models survive, and the response
+takes 77.926 seconds under the unchanged 300-second cap. Full accepted-history
+qualification and the paired screen result are still pending; this observation
+does not establish paired replay qualification or remove the Windows blocker.
