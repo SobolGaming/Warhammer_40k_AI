@@ -193,7 +193,8 @@
     "ci/test_shards/native-charge-source-successor.json": {
       "category": "measured_workload",
       "operations": [
-        "scoped-shard-allocation"
+        "scoped-shard-allocation",
+        "mfm-current-behavior-profile"
       ],
       "selected_families": [],
       "rationale": "Repair the demonstrated source-admission blocker by authenticating the complete original producer map and an exact finite four-file successor. All timing evidence, allocations, worker calibration and budgets remain unchanged; no optimization or performance claim.",
@@ -211,10 +212,12 @@
       "unchanged_work": "Engine runtime, catalogs, solver, RNG, serialization/replay, behavior inventory, scheduling assignments and measured weights are unchanged. Preserve 12 shards, minimum 12 workers where applicable, 67% branch coverage, 1620-second approval, strictly-over-1800 termination, smoke180 and quality600 limits."
     },
     "tests/code_quality/test_current_shard_compatibility.py": {
-      "category": "governance",
-      "operations": [],
+      "category": "measured_workload",
+      "operations": [
+        "scoped-shard-allocation"
+      ],
       "selected_families": [],
-      "rationale": "Add and document a separately frozen operator-only charge experiment on the unchanged native round-four preserve/screen endpoints. Existing runtime and measured test workloads are unchanged; no optimization or speedup is claimed.",
+      "rationale": "Repair the demonstrated source-admission blocker by authenticating the complete original producer map and an exact finite four-file successor. All timing evidence, allocations, worker calibration and budgets remain unchanged; no optimization or performance claim.",
       "source_obligation": "Preserve the legal equipped 78-model roster, original seed and ordinary history, complete six-model PathWitness proposals, natural dice and mandatory charge-triggered effects. Retain rejected paths and unresolved work; eligibility is not an accepted charge. Qualify complete accepted histories through exact JSON persistence, both viewer/event comparisons and ReplayRunner.",
       "unchanged_work": "Engine runtime, catalogs, solver, RNG, serialization/replay, behavior inventory, scheduling assignments and measured weights are unchanged. Preserve 12 shards, minimum 12 workers where applicable, 67% branch coverage, 1620-second approval, strictly-over-1800 termination, smoke180 and quality600 limits."
     }
