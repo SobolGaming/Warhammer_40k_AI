@@ -3,15 +3,15 @@
   "producer": "33d199058f2e65f544bcc535e41862e2c09207eb",
   "changes": {
     "docs/performance/policy-v3/operation-map.json": {
-      "before": null,
+      "before": "09596f0c185020f51488a09a0e56a3b6dc6d30f761ae9d93ac044ee37943566c",
       "after": "26750c41b5dc2319221061fea842bf5de9fd55836166690cab3680c27f6415dd"
     },
     "scripts/boolean_los_admission.py": {
-      "before": null,
+      "before": "f1bbc073e8c0d46d471782c3518846a872ab9f3d8db0432d22393d1a44fa446b",
       "after": "35a00462f6193e65ece5e18db60c8f478789c29bfc0f31064067cb31fa063367"
     },
     "tests/code_quality/test_current_shard_compatibility.py": {
-      "before": null,
+      "before": "017ea13da6b7bff94f1bda7edf700e3cdae8ccbe298c76b94edd8d419fa88c30",
       "after": "1e5c95637b09595237bf194599127613b2603aa26fd0e5aa870e865a162bc3d7"
     },
     "tests/support/cavalcade_native_charge.py": {
