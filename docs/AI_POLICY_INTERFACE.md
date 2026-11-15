@@ -2679,3 +2679,12 @@ and timeout receipt remain retained. Before either charge roll, v2 separated
 strict restoration under the existing qualification allowance and re-froze the
 byte-identical inputs, endpoint templates, choices and charge-search limits.
 This harness correction changes no engine behavior or rules answer.
+
+The v2 preserve run restored exactly in 359.187 seconds, then its first viewer
+submission failed because the harness passed an authoritative request ID to the
+viewer facade. No decision, roll, path or event was committed; its final checkpoint
+equals the original input exactly. Independent coding review reproduced the
+identity mismatch. V3 uses only the issued viewer request IDs, options and proposal
+contexts for submissions, and re-freezes the same inputs, endpoint templates,
+choices and limits before any charge roll. The v2 source and failure remain
+retained; this is a harness repair, not an engine or rules change.

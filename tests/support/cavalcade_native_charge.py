@@ -183,7 +183,7 @@ def prepare(common_path: Path, output: Path) -> None:
         inputs[alternative] = {"content_hash": saved["content_hash"], "before": snapshot(branch)}
         print("PREPARED", alternative, elapsed, flush=True)
     procedure: JsonValue = {
-        "schema": "native-bloodcrusher-E-charge-v2",
+        "schema": "native-bloodcrusher-E-charge-v3",
         "producer": native_producer(),
         "source_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
         "common_content_hash": checkpoint["content_hash"],
@@ -298,9 +298,10 @@ def respond(output: Path, alternative: NativeAlternative) -> None:
                 selected = True
             elif family == "select_charge_targets":
                 choices = [
-                    o.option_id
-                    for o in request.options
-                    if isinstance(o.payload, dict) and o.payload["target_ids"] == [RANGED_ID]
+                    option["option_id"]
+                    for option in public["options"]
+                    if isinstance(option["payload"], dict)
+                    and option["payload"]["target_ids"] == [RANGED_ID]
                 ]
                 choice = choices[0] if choices else "decline_charge_targets"
             elif family == "select_dice_reroll" or family == "resolve_reaction_window":
@@ -313,7 +314,7 @@ def respond(output: Path, alternative: NativeAlternative) -> None:
                 if attempt == 8:
                     outcome = "frozen_path_attempts_exhausted"
                     break
-                movement = MovementProposalRequest.from_decision_request_payload(request.payload)
+                movement = MovementProposalRequest.from_decision_request_payload(public["payload"])
                 assert movement.unit_instance_id == THREAT_ID
                 assert state.charge_phase_state is not None
                 distance = state.charge_phase_state.move_pending_distance_state()
@@ -334,30 +335,38 @@ def respond(output: Path, alternative: NativeAlternative) -> None:
                 attempt += 1
             elif family == "select_catalog_unit_move_completed_mortal_wounds_target":
                 choices = [
-                    o.option_id
-                    for o in request.options
-                    if isinstance(o.payload, dict)
+                    option["option_id"]
+                    for option in public["options"]
+                    if isinstance(option["payload"], dict)
                     and isinstance(
-                        o.payload.get("selected_unit_move_completed_mortal_wounds_target"), dict
+                        option["payload"].get("selected_unit_move_completed_mortal_wounds_target"),
+                        dict,
                     )
                     and cast(
                         dict[str, JsonValue],
-                        o.payload["selected_unit_move_completed_mortal_wounds_target"],
+                        option["payload"]["selected_unit_move_completed_mortal_wounds_target"],
                     )["target_unit_instance_id"]
                     == RANGED_ID
                 ]
                 assert len(choices) == 1, "Mandatory native ability must target E."
                 choice = choices[0]
             elif family == "select_mortal_wound_model":
-                choice = min(o.option_id for o in request.options)
+                choice = min(option["option_id"] for option in public["options"])
             else:
                 outcome = f"unhandled_native_choice:{family}"
                 break
+            if proposal is None:
+                choice = next(
+                    option["option_id"]
+                    for option in public["options"]
+                    if option["option_id"] == choice
+                )
             result_id = f"native-charge-{session.decision_record_count():04d}"
             # Preserve the exact pending state and attempted path before expensive validation.
             write_json(output / f"{alternative}-pending.json", session.to_persistence_payload())
             entry: dict[str, JsonValue] = {
                 "request": validate_json_value(request.to_payload()),
+                "issued_viewer_request": validate_json_value(public),
                 "option": choice,
                 "proposal": proposal,
             }
@@ -368,14 +377,14 @@ def respond(output: Path, alternative: NativeAlternative) -> None:
             if proposal is None:
                 status = session.submit_viewer_option(
                     viewer=viewer,
-                    request_id=request.request_id,
+                    request_id=public["request_id"],
                     option_id=choice,
                     result_id=result_id,
                 )
             else:
                 status = session.submit_viewer_parameterized_payload(
                     viewer=viewer,
-                    request_id=request.request_id,
+                    request_id=public["request_id"],
                     payload=proposal,
                     result_id=result_id,
                 )

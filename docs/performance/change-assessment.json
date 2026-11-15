@@ -6,11 +6,11 @@
   "changes": {
     "docs/AI_POLICY_INTERFACE.md": {
       "before_sha256": "4a14350ee00f4045614eaa36004a32c21ddaf7576d1adefb21c55dc1b91a13a7",
-      "after_sha256": "fe5b5777f402147bc1fa1d072662ab96450d2b0952e2f757c739739bbe4b8e05",
+      "after_sha256": "1374eff65bd26f83fd192cdb1e38267051bd0a2aab162c9c7abe44059465f364",
       "owners": {
         "@document": {
           "before": "4a14350ee00f4045614eaa36004a32c21ddaf7576d1adefb21c55dc1b91a13a7",
-          "after": "fe5b5777f402147bc1fa1d072662ab96450d2b0952e2f757c739739bbe4b8e05"
+          "after": "1374eff65bd26f83fd192cdb1e38267051bd0a2aab162c9c7abe44059465f364"
         }
       }
     },
@@ -36,7 +36,7 @@
     },
     "tests/support/cavalcade_native_charge.py": {
       "before_sha256": null,
-      "after_sha256": "710228e3bbb469c90b1291b03cdfdabac24f31cab61f1d7ace0daa7b55c8c165",
+      "after_sha256": "382c0b974852037a70c0ecf2a01bebf09c3fd50508efe1f3756dea2995126b7a",
       "owners": {
         "@module": {
           "before": null,
@@ -60,7 +60,7 @@
         },
         "prepare": {
           "before": null,
-          "after": "b18adf187b2cddf21d6ffddca2c5abb91ef7d59135a601dd2fa5e0aeebddf64f"
+          "after": "596c122af785c3af18a35f2210f56888666bcd879d9a495d0f6c973b262f4679"
         },
         "publish_response_phase": {
           "before": null,
@@ -72,7 +72,7 @@
         },
         "respond": {
           "before": null,
-          "after": "d5be48293f2ce9f46c7b0a6bfde0b1cc804644aff73dead47893c81ff1ce2d10"
+          "after": "df214b756ddb6ccae27963d0d5cd51aa39179e6abcaae1976d8381f5172d04eb"
         },
         "snapshot": {
           "before": null,
