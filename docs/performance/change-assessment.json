@@ -6,41 +6,41 @@
   "changes": {
     "ci/quality_shards/all.txt": {
       "before_sha256": "4c8684ec6ed70ed2edac193d63d2b3f09eda88f107434c46b1a8ada940d3a21f",
-      "after_sha256": "276bcbfbb491e37b5b3189925c198e18908f6a5610dc1b5f74d495c3ddafbb33",
+      "after_sha256": "779bd44ad0264310a0958faca952f20fc20e8c47d305b83f1949fb9953754ee5",
       "owners": {
         "@document": {
           "before": "4c8684ec6ed70ed2edac193d63d2b3f09eda88f107434c46b1a8ada940d3a21f",
-          "after": "276bcbfbb491e37b5b3189925c198e18908f6a5610dc1b5f74d495c3ddafbb33"
+          "after": "779bd44ad0264310a0958faca952f20fc20e8c47d305b83f1949fb9953754ee5"
         }
       }
     },
     "ci/quality_shards/shard-3.txt": {
       "before_sha256": "661d93d5715896fddb49a4086799d5e28c44cdbe3fd234355a99240875ac5aa5",
-      "after_sha256": "5be1aa1d9acf69587ba839c7a35930c5fde922c484c85f25abdebe6d6324b2fd",
+      "after_sha256": "76b12115657eeeac05871daa20816f8a9629ad5362fe1c4ae50921f9a2e5e945",
       "owners": {
         "@document": {
           "before": "661d93d5715896fddb49a4086799d5e28c44cdbe3fd234355a99240875ac5aa5",
-          "after": "5be1aa1d9acf69587ba839c7a35930c5fde922c484c85f25abdebe6d6324b2fd"
+          "after": "76b12115657eeeac05871daa20816f8a9629ad5362fe1c4ae50921f9a2e5e945"
         }
       }
     },
     "ci/test_shards/native-charge-source-successor.json": {
       "before_sha256": null,
-      "after_sha256": "a3056564f4aef777c0b03b23c70fd384e8ae5b84a89cedb1fb0354b3448f3d15",
+      "after_sha256": "cb7ba844ef90ff1ade441b5af923b8206567769f829ba4c7fa13378529696ca1",
       "owners": {
         "@document": {
           "before": null,
-          "after": "a3056564f4aef777c0b03b23c70fd384e8ae5b84a89cedb1fb0354b3448f3d15"
+          "after": "cb7ba844ef90ff1ade441b5af923b8206567769f829ba4c7fa13378529696ca1"
         }
       }
     },
     "docs/AI_POLICY_INTERFACE.md": {
       "before_sha256": "4a14350ee00f4045614eaa36004a32c21ddaf7576d1adefb21c55dc1b91a13a7",
-      "after_sha256": "a86dcfb15f38510599c7cdda4adb76da38ac20b4c814a79f5342193738c731c5",
+      "after_sha256": "168564427023aabf242b6de0bd541278640ce344743942edfdfd4a1804d8c48c",
       "owners": {
         "@document": {
           "before": "4a14350ee00f4045614eaa36004a32c21ddaf7576d1adefb21c55dc1b91a13a7",
-          "after": "a86dcfb15f38510599c7cdda4adb76da38ac20b4c814a79f5342193738c731c5"
+          "after": "168564427023aabf242b6de0bd541278640ce344743942edfdfd4a1804d8c48c"
         }
       }
     },
@@ -88,15 +88,27 @@
     },
     "tests/code_quality/test_current_shard_compatibility.py": {
       "before_sha256": "017ea13da6b7bff94f1bda7edf700e3cdae8ccbe298c76b94edd8d419fa88c30",
-      "after_sha256": "1e5c95637b09595237bf194599127613b2603aa26fd0e5aa870e865a162bc3d7",
+      "after_sha256": "6dde14faab05e27a9512ff641468c5cc9f0bb14348e2a5eda1ea1ecd7efc61de",
       "owners": {
         "@module": {
           "before": "872b4cd2346333a6d046dab5c4f9a8e32dec6a4db2f1adda8f37e8e4c4df1a96",
-          "after": "88bd45bdcdf5ccac548765fb6c9709c6827d75b4463cf57f72944cc39a6169b2"
+          "after": "c58beb38344c0c66fa77b72b94f57005e2fb2e1e33cba94b645079e8e79a189f"
         },
         "charge_inputs": {
           "before": null,
           "after": "93384815002472450f2c1e335536d2a5e65ca1169ed25bd4b59120591372ca06"
+        },
+        "native_charge_geometry": {
+          "before": null,
+          "after": "3f3edaf71ea7cb5ffbba565bc41e82193de8b458a22fcf67d4450cd0b7e407de"
+        },
+        "test_native_charge_rejects_whole_template_instead_of_clipping_models": {
+          "before": null,
+          "after": "fb5d0506f3272a392ed5256275e790df7cb4d7d44c93b424481058262c0768f2"
+        },
+        "test_native_charge_whole_formation_preserves_clearance_and_real_budget": {
+          "before": null,
+          "after": "0e1211ed1d97fa0171ed416f59195739a398c5f88ed024de214912f3242361fa"
         },
         "test_original_producer_and_exact_reviewed_successor": {
           "before": null,
@@ -122,31 +134,47 @@
     },
     "tests/support/cavalcade_native_charge.py": {
       "before_sha256": null,
-      "after_sha256": "382c0b974852037a70c0ecf2a01bebf09c3fd50508efe1f3756dea2995126b7a",
+      "after_sha256": "f717b45454379d0ea090d671a8acd3959009c73e5097fd5a75e73e53f45f6232",
       "owners": {
         "@module": {
           "before": null,
-          "after": "a1809d213f0e7cab2abf97f9ee3061f14890037003dfd8553f7fd49911e9491b"
+          "after": "366ab73049517b5d1cbf144c2ff6107a8ba9c85499a6fd4d9944727af65e25e2"
         },
         "contact_templates": {
           "before": null,
-          "after": "2216e76ec3a5c4700121e8c84fa70492a07a7823827d2a4d565bf61d18410c3c"
+          "after": "789da4a8762e81eab7320118554ea8675edf1c098e8d9608cd1bb3eb7b52ea6e"
         },
         "digest": {
           "before": null,
           "after": "c801374fd8045faeefe7eb50d2b7a301ad5bc8a9a39ddeb939b837330e06de75"
         },
+        "formation_templates": {
+          "before": null,
+          "after": "a3912db293d0ffcc481956718ed5108e119a83f2e585f13b65f29f2720d1c9f3"
+        },
+        "formation_templates_for_models": {
+          "before": null,
+          "after": "ff8f0334a530cec280a83f2b58b3eb7ed03f8cb3d272c9c0708fc94631741f91"
+        },
+        "freeze_procedure": {
+          "before": null,
+          "after": "f98f9e0bcf6eb1ffe6ca931440c15d866e05d47bae9b0042a0fe18cc13e3fe2c"
+        },
         "main": {
           "before": null,
-          "after": "c420e31a669362dba9eef71c28f94b4988ceca4f5492062d24ee1350b2c539c6"
+          "after": "e464a267c969df877feb31f997850156cb9ae9a96d2c3ce6ec2b33f417120597"
         },
         "path_for_template": {
           "before": null,
-          "after": "f6d4adce9fd0b879e372c833146c2e24c847a2edeb514e489eeba87f6ebd7fcf"
+          "after": "6202f118826c838aa914cd2c17a598c5cfc24e5cf6867458d37a0db65b5f2505"
         },
         "prepare": {
           "before": null,
-          "after": "596c122af785c3af18a35f2210f56888666bcd879d9a495d0f6c973b262f4679"
+          "after": "253021e0e6527572c2f347233f8293f80cddbdb4adb51c185e9f0536f3b741b9"
+        },
+        "prepare_repair": {
+          "before": null,
+          "after": "b72bc8fac1288501acff88b1a0c949e0f241047cd041b0ae619c10be09400fc9"
         },
         "publish_response_phase": {
           "before": null,
@@ -158,7 +186,7 @@
         },
         "respond": {
           "before": null,
-          "after": "df214b756ddb6ccae27963d0d5cd51aa39179e6abcaae1976d8381f5172d04eb"
+          "after": "310b8bffb03845069ea1044674723a84abbeef2704722d5069996b343d987781"
         },
         "snapshot": {
           "before": null,
@@ -167,6 +195,10 @@
         "supervised": {
           "before": null,
           "after": "60b78044dc05152e23459d178777c013e2ed4945880da032c1cb1e46cba28746"
+        },
+        "template_fits": {
+          "before": null,
+          "after": "38f6f8170b9af79ba07504bc8c8c8c65461ea8d24f35e02d1c2afa44f6da771e"
         },
         "write_json": {
           "before": null,
@@ -206,7 +238,7 @@
         "native-v995-approach-operator"
       ],
       "selected_families": [],
-      "rationale": "Add and document a separately frozen operator-only charge experiment on the unchanged native round-four preserve/screen endpoints. Existing runtime and measured test workloads are unchanged; no optimization or speedup is claimed.",
+      "rationale": "Repair the operator-only formation recipe to construct two complete disjoint formations and exclude whole budget/goal-infeasible templates instead of clipping paths. Continue exact retained partial histories without rerolling or deleting rejected proposals. No engine search, runtime, measured behavioral workload or performance claim changes.",
       "source_obligation": "Preserve the legal equipped 78-model roster, original seed and ordinary history, complete six-model PathWitness proposals, natural dice and mandatory charge-triggered effects. Retain rejected paths and unresolved work; eligibility is not an accepted charge. Qualify complete accepted histories through exact JSON persistence, both viewer/event comparisons and ReplayRunner.",
       "unchanged_work": "Engine runtime, catalogs, solver, RNG, serialization/replay, behavior inventory, scheduling assignments and measured weights are unchanged. Preserve 12 shards, minimum 12 workers where applicable, 67% branch coverage, 1620-second approval, strictly-over-1800 termination, smoke180 and quality600 limits."
     },
@@ -245,7 +277,7 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Refresh only the 24 newly collected source-admission regression cases in the full inventory and their existing lane 3 module. Preserve every prior case, module assignment, finite deferral, worker count and deadline; no allocation or optimization.",
+      "rationale": "Refresh the 24 source-admission and three whole-formation regression cases in the full inventory and their existing lane 3 module. Preserve every prior case, module assignment, finite deferral, worker count and deadline; no allocation or optimization.",
       "source_obligation": "Preserve the legal equipped 78-model roster, original seed and ordinary history, complete six-model PathWitness proposals, natural dice and mandatory charge-triggered effects. Retain rejected paths and unresolved work; eligibility is not an accepted charge. Qualify complete accepted histories through exact JSON persistence, both viewer/event comparisons and ReplayRunner.",
       "unchanged_work": "Engine runtime, catalogs, solver, RNG, serialization/replay, behavior inventory, scheduling assignments and measured weights are unchanged. Preserve 12 shards, minimum 12 workers where applicable, 67% branch coverage, 1620-second approval, strictly-over-1800 termination, smoke180 and quality600 limits."
     },
@@ -253,7 +285,7 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Refresh only the 24 newly collected source-admission regression cases in the full inventory and their existing lane 3 module. Preserve every prior case, module assignment, finite deferral, worker count and deadline; no allocation or optimization.",
+      "rationale": "Refresh the 24 source-admission and three whole-formation regression cases in the full inventory and their existing lane 3 module. Preserve every prior case, module assignment, finite deferral, worker count and deadline; no allocation or optimization.",
       "source_obligation": "Preserve the legal equipped 78-model roster, original seed and ordinary history, complete six-model PathWitness proposals, natural dice and mandatory charge-triggered effects. Retain rejected paths and unresolved work; eligibility is not an accepted charge. Qualify complete accepted histories through exact JSON persistence, both viewer/event comparisons and ReplayRunner.",
       "unchanged_work": "Engine runtime, catalogs, solver, RNG, serialization/replay, behavior inventory, scheduling assignments and measured weights are unchanged. Preserve 12 shards, minimum 12 workers where applicable, 67% branch coverage, 1620-second approval, strictly-over-1800 termination, smoke180 and quality600 limits."
     }

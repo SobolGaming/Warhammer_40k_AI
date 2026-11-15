@@ -2627,17 +2627,19 @@ their existing meanings.
 `tests.support.cavalcade_native_charge` is a separate operator experiment on the
 round-four common checkpoint. Preparation continues the unchanged preserve and
 screen recipes to their original B4 Charge boundary. It records both exact inputs
-and freezes the same eight ordered endpoint templates, six-model movement order,
-source hash and choices before either charge is selected. The templates use the
-actual B/E geometry; they are proposals, not proof of a legal charge.
+and freezes the endpoint templates, six-model movement order, source hash and
+choices before either charge is selected. The templates use the actual B/E
+geometry; they are proposals, not proof of a legal charge.
 
 The response selects B, keeps its natural charge dice and selects only E when the
-engine offers that target. Each full six-model proposal follows its frozen
-template, with each straight path capped by the actual movement budget. Native
+engine offers that target. The repaired v4 recipe constructs two complete,
+disjoint formations (columns and arc), then excludes a whole formation when its
+straight paths exceed the actual movement budget or its required endpoint goals.
+It never clips individual model paths. Native
 validation owns legality, sequential collision, coherency and mandatory endpoint
 obligations. Rejections stay in the decision history. The operator tries at most
-eight templates, without changing engine search budgets. Exhaustion, an unhandled
-choice or unresolved computation remains incomplete; it never establishes that no
+eight proposals from the finite frozen templates, without changing engine search
+budgets. Exhaustion, an unhandled choice or unresolved computation remains incomplete; it never establishes that no
 legal charge exists. Optional reactions and Stratagems are declined. A completed
 charge must finish native mandatory triggered abilities and wound allocation,
 then stop at the first pending Fight decision without submitting it.
@@ -2656,6 +2658,16 @@ uv run --no-sync python -m tests.support.cavalcade_native_charge \
 uv run --no-sync python -m tests.support.cavalcade_native_charge \
   --output reports/native-charge --alternative screen --qualify-saved
 ```
+
+To continue the original qualified partial histories after the formation repair,
+freeze a new output directory with `--repair-from reports/native-charge` instead
+of `--common`. This copies each exact retained checkpoint, including its natural
+charge roll and all eight rejected proposals, and checks its prior qualification
+receipt before constructing the new procedure. Keep the original evidence
+directory unchanged. Execute and qualify both alternatives in the new directory.
+The formation regressions verify geometry and budget admission only; accepted
+native charges, mandatory effects, first Fight and exact replay require those
+live continuations and remain unqualified until their receipts pass.
 
 Exact input restoration has a separate 900-second child-process allowance,
 including startup. The native response retains a 300-second cap and eight path
