@@ -4,13 +4,13 @@
   "workload_id": "order80-normal-move-occurrence-v1",
   "base_revision": "70b1d6ad4b5265fddae30aaf869e4f91471269af",
   "head_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:d637f1649b7c3bfee1683c0112ac0ba37233afbf1f9640e6b4f2bbf47fa46c55",
-  "head_input_digest": "98d45469cd7961fa09ede24264646175f6419f7740cf88aa4e8c44d102e32248",
+  "head_input_digest": "0e1c1ab56de9c0621c3ab1f5dcd8b1d8de5957d91e1a09b2027481ef9ec27b95",
   "budget_profile": "current-change-relative-v1",
   "base": {
     "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:8d7e3355d9db2c9477ba63b752dc1dfa054b5c00583ea467e3fbbc0e21d5638d",
     "host": {
       "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
-      "memory_bytes": 67359346688,
+      "memory_bytes": 67359367168,
       "logical_cpus": 64,
       "platform": "Linux-6.18.58.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
       "python": "3.14.5",
@@ -18,17 +18,17 @@
     },
     "lock_sha256": "57ae3e52c3fb40898614ec3375a4aeff907e2ea1c96263401104152246b22d75",
     "workload_sha256": "1af0bb7fa3733e4e31b8fa73f35839956e2ef5d2e952e6e378c2639ea9dd0427",
-    "fixture_sha256": "8876637c7fb2488dac1d943a0cfddcba54b7517ab670efaa365c2813acbaf55e",
+    "fixture_sha256": "50c30e83678c1f44be530265c04a002bc10a67d7e8022790c8cfc858b33e0187",
     "samples": {
       "finite": [
-        2.570943979000006,
-        2.557019312999998,
-        2.563728232999992
+        2.563288186999955,
+        2.543255337000005,
+        2.5625345220000213
       ],
       "parameterized": [
-        2.413120949000003,
-        2.3955206929999946,
-        2.395739702
+        2.3918673720000356,
+        2.387816742000041,
+        2.377151319999996
       ]
     },
     "completed": true,
@@ -39,7 +39,7 @@
     "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:d637f1649b7c3bfee1683c0112ac0ba37233afbf1f9640e6b4f2bbf47fa46c55",
     "host": {
       "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
-      "memory_bytes": 67359346688,
+      "memory_bytes": 67359367168,
       "logical_cpus": 64,
       "platform": "Linux-6.18.58.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
       "python": "3.14.5",
@@ -47,17 +47,17 @@
     },
     "lock_sha256": "57ae3e52c3fb40898614ec3375a4aeff907e2ea1c96263401104152246b22d75",
     "workload_sha256": "1af0bb7fa3733e4e31b8fa73f35839956e2ef5d2e952e6e378c2639ea9dd0427",
-    "fixture_sha256": "8876637c7fb2488dac1d943a0cfddcba54b7517ab670efaa365c2813acbaf55e",
+    "fixture_sha256": "50c30e83678c1f44be530265c04a002bc10a67d7e8022790c8cfc858b33e0187",
     "samples": {
       "finite": [
-        2.5821961569999985,
-        2.562474752000014,
-        2.567016921000004
+        2.5796884229999932,
+        2.5506971660000204,
+        2.558987221000052
       ],
       "parameterized": [
-        2.396604298999989,
-        2.3975351939999996,
-        2.394559672999975
+        2.38432244400002,
+        2.396893715000033,
+        2.3862355219999927
       ]
     },
     "completed": true,

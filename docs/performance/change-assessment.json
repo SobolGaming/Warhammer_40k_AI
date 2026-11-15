@@ -134,43 +134,43 @@
         }
       }
     },
-    "docs/performance/current/boolean-los-20261115-movement.json": {
+    "docs/performance/current/boolean-los-20261115-authenticated-movement.json": {
       "before_sha256": null,
-      "after_sha256": "fe0525f97f657908d86a43d2273cdfa12331d88bf70ea643e0f8ab77aadbbfa0",
+      "after_sha256": "6b4814302dae99f23690b0a1641926c544c97930a352536c720c4a952e4dd6fc",
       "owners": {
         "@document": {
           "before": null,
-          "after": "fe0525f97f657908d86a43d2273cdfa12331d88bf70ea643e0f8ab77aadbbfa0"
+          "after": "6b4814302dae99f23690b0a1641926c544c97930a352536c720c4a952e4dd6fc"
         }
       }
     },
-    "docs/performance/current/boolean-los-20261115-reconstruction.json": {
+    "docs/performance/current/boolean-los-20261115-authenticated-reconstruction.json": {
       "before_sha256": null,
-      "after_sha256": "035a0333cd1af34483dff60c40bc9b4f9baee45b444eeac5b1629da7c187a81f",
+      "after_sha256": "59e4049aab143a82373652c39ac8888a46c317381ecd34e2035370ea238b1cdf",
       "owners": {
         "@document": {
           "before": null,
-          "after": "035a0333cd1af34483dff60c40bc9b4f9baee45b444eeac5b1629da7c187a81f"
+          "after": "59e4049aab143a82373652c39ac8888a46c317381ecd34e2035370ea238b1cdf"
         }
       }
     },
-    "docs/performance/current/boolean-los-20261115-setup.json": {
+    "docs/performance/current/boolean-los-20261115-authenticated-setup.json": {
       "before_sha256": null,
-      "after_sha256": "8543814ed961348b285c8fabfe036d304cb7f02056ca17b4184bb80948b7b9d3",
+      "after_sha256": "8e397e7b376888718ca7f71f904dff3010e58d3bb582f3dfb916a77b8f26572e",
       "owners": {
         "@document": {
           "before": null,
-          "after": "8543814ed961348b285c8fabfe036d304cb7f02056ca17b4184bb80948b7b9d3"
+          "after": "8e397e7b376888718ca7f71f904dff3010e58d3bb582f3dfb916a77b8f26572e"
         }
       }
     },
-    "docs/performance/current/boolean-los-20261115-visibility.json": {
+    "docs/performance/current/boolean-los-20261115-authenticated-visibility.json": {
       "before_sha256": null,
-      "after_sha256": "1755776156da765bd2e57df020cee92d6c0ada4032656631989a522799e1cbea",
+      "after_sha256": "b07c059c7fd80c1657d6133df0d966a8643d78fb7a907dbc27645af955b77d6c",
       "owners": {
         "@document": {
           "before": null,
-          "after": "1755776156da765bd2e57df020cee92d6c0ada4032656631989a522799e1cbea"
+          "after": "b07c059c7fd80c1657d6133df0d966a8643d78fb7a907dbc27645af955b77d6c"
         }
       }
     },
@@ -352,6 +352,16 @@
         }
       }
     },
+    "tests/rules/section06/coverage.json": {
+      "before_sha256": "978f253b8865601656841e9975548dc2c2e8ecb66ebbf9b98a8b3efc00032d93",
+      "after_sha256": "a8fcf72816be3d629070cbe2321dba37581797b42f9215b26b68ec0949277bf9",
+      "owners": {
+        "@document": {
+          "before": "978f253b8865601656841e9975548dc2c2e8ecb66ebbf9b98a8b3efc00032d93",
+          "after": "a8fcf72816be3d629070cbe2321dba37581797b42f9215b26b68ec0949277bf9"
+        }
+      }
+    },
     "tests/rules/section06/test_visibility.py": {
       "before_sha256": "8c1452eeb7c5c5c2ec0c0619fc45a2fa000d1323a1d7b6872f4934354854b61e",
       "after_sha256": "5ae3fa685a0d75855d550b78107b4fe6b810e61d518b880b69ffbe8ed1c935ee",
@@ -385,6 +395,16 @@
         "test_observer_and_target_members_are_excluded_but_other_units_block": {
           "before": "58f3833d0488912dbcbf8c820de5c8f1d8eeb66f02d96d469dc2892a54ea4190",
           "after": "24744b8e772b8d5442a32302405885fb1cc07f02abe4aad576c8742de645e9d0"
+        }
+      }
+    },
+    "tests/rules/section07/coverage.json": {
+      "before_sha256": "b4f665c7c549c74c25d72deafae2fac1d938ae1543656dd2f5b4839125889699",
+      "after_sha256": "dabdfec3eedf90fd32f5e2518e3126b10012dfe2959ed9a9acb5c2ebf3ea5b8f",
+      "owners": {
+        "@document": {
+          "before": "b4f665c7c549c74c25d72deafae2fac1d938ae1543656dd2f5b4839125889699",
+          "after": "dabdfec3eedf90fd32f5e2518e3126b10012dfe2959ed9a9acb5c2ebf3ea5b8f"
         }
       }
     }
@@ -512,7 +532,7 @@
       "source_obligation": "Preserve continuous body/terrain/MONSTER and clipping predicates, exact fingerprints, complete full-visibility evidence, source-bound current qualification and all historical producer records.",
       "unchanged_work": "No solver replacement, rounded keys, sampled-negative answers, allocation search, selector moves, worker changes, coverage reduction or altered execution deadline. Fresh current weights come from the required covered run; historical observations retain original sources."
     },
-    "docs/performance/current/boolean-los-20261115-movement.json": {
+    "docs/performance/current/boolean-los-20261115-authenticated-movement.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
@@ -520,7 +540,7 @@
       "source_obligation": "Preserve continuous body/terrain/MONSTER and clipping predicates, exact fingerprints, complete full-visibility evidence, source-bound current qualification and all historical producer records.",
       "unchanged_work": "No solver replacement, rounded keys, sampled-negative answers, allocation search, selector moves, worker changes, coverage reduction or altered execution deadline. Fresh current weights come from the required covered run; historical observations retain original sources."
     },
-    "docs/performance/current/boolean-los-20261115-reconstruction.json": {
+    "docs/performance/current/boolean-los-20261115-authenticated-reconstruction.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
@@ -528,7 +548,7 @@
       "source_obligation": "Preserve continuous body/terrain/MONSTER and clipping predicates, exact fingerprints, complete full-visibility evidence, source-bound current qualification and all historical producer records.",
       "unchanged_work": "No solver replacement, rounded keys, sampled-negative answers, allocation search, selector moves, worker changes, coverage reduction or altered execution deadline. Fresh current weights come from the required covered run; historical observations retain original sources."
     },
-    "docs/performance/current/boolean-los-20261115-setup.json": {
+    "docs/performance/current/boolean-los-20261115-authenticated-setup.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
@@ -536,7 +556,7 @@
       "source_obligation": "Preserve continuous body/terrain/MONSTER and clipping predicates, exact fingerprints, complete full-visibility evidence, source-bound current qualification and all historical producer records.",
       "unchanged_work": "No solver replacement, rounded keys, sampled-negative answers, allocation search, selector moves, worker changes, coverage reduction or altered execution deadline. Fresh current weights come from the required covered run; historical observations retain original sources."
     },
-    "docs/performance/current/boolean-los-20261115-visibility.json": {
+    "docs/performance/current/boolean-los-20261115-authenticated-visibility.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
@@ -670,6 +690,16 @@
       "source_obligation": "Preserve continuous body/terrain/MONSTER and clipping predicates, exact fingerprints, complete full-visibility evidence, source-bound current qualification and all historical producer records.",
       "unchanged_work": "No solver replacement, rounded keys, sampled-negative answers, allocation search, selector moves, worker changes, coverage reduction or altered execution deadline. Fresh current weights come from the required covered run; historical observations retain original sources."
     },
+    "tests/rules/section06/coverage.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "qualification40-exact-a6c79dbf9af6ff00"
+      ],
+      "selected_families": [],
+      "rationale": "Separate exact any-part evidence from complete visibility for Boolean consumers; preserve full classification, or maintain its exact-source validation and generated identity artifacts.",
+      "source_obligation": "Preserve continuous body/terrain/MONSTER and clipping predicates, exact fingerprints, complete full-visibility evidence, source-bound current qualification and all historical producer records.",
+      "unchanged_work": "No solver replacement, rounded keys, sampled-negative answers, allocation search, selector moves, worker changes, coverage reduction or altered execution deadline. Fresh current weights come from the required covered run; historical observations retain original sources."
+    },
     "tests/rules/section06/test_visibility.py": {
       "category": "rule_semantics",
       "operations": [
@@ -690,14 +720,24 @@
       "rationale": "Separate exact any-part evidence from complete visibility for Boolean consumers; preserve full classification, or maintain its exact-source validation and generated identity artifacts.",
       "source_obligation": "Preserve continuous body/terrain/MONSTER and clipping predicates, exact fingerprints, complete full-visibility evidence, source-bound current qualification and all historical producer records.",
       "unchanged_work": "No solver replacement, rounded keys, sampled-negative answers, allocation search, selector moves, worker changes, coverage reduction or altered execution deadline. Fresh current weights come from the required covered run; historical observations retain original sources."
+    },
+    "tests/rules/section07/coverage.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "qualification40-exact-b6886d3bc2fb1ca4"
+      ],
+      "selected_families": [],
+      "rationale": "Separate exact any-part evidence from complete visibility for Boolean consumers; preserve full classification, or maintain its exact-source validation and generated identity artifacts.",
+      "source_obligation": "Preserve continuous body/terrain/MONSTER and clipping predicates, exact fingerprints, complete full-visibility evidence, source-bound current qualification and all historical producer records.",
+      "unchanged_work": "No solver replacement, rounded keys, sampled-negative answers, allocation search, selector moves, worker changes, coverage reduction or altered execution deadline. Fresh current weights come from the required covered run; historical observations retain original sources."
     }
   },
   "milestone": "ordinary",
   "comparisons": {
-    "visibility": "docs/performance/current/boolean-los-20261115-visibility.json",
-    "movement": "docs/performance/current/boolean-los-20261115-movement.json",
-    "setup": "docs/performance/current/boolean-los-20261115-setup.json",
-    "reconstruction": "docs/performance/current/boolean-los-20261115-reconstruction.json"
+    "visibility": "docs/performance/current/boolean-los-20261115-authenticated-visibility.json",
+    "movement": "docs/performance/current/boolean-los-20261115-authenticated-movement.json",
+    "setup": "docs/performance/current/boolean-los-20261115-authenticated-setup.json",
+    "reconstruction": "docs/performance/current/boolean-los-20261115-authenticated-reconstruction.json"
   },
   "full_game": null
 }
