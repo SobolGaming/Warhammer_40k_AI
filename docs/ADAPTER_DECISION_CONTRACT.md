@@ -16,6 +16,25 @@ Current creation/checkpoint/replay family versions reject legacy payloads lackin
 private seed authority. Use the matching retained runtime to inspect those
 artifacts. There is no silent public-ID seed fallback or implicit reseeding.
 
+## Explicit Linux execution authority
+
+`LinuxGameSession` implements the same `AdapterGameSession` contract through an
+operator-selected Linux process. Finite/proposal submissions, authenticated viewer
+contexts, automatic progress, RNG, projections and replay all remain inside that
+executor's ordinary `LocalGameSession` path. It introduces no player decision type,
+proposal kind, option family, viewer identity scheme or public network payload.
+The process transport is a private trusted-host boundary; it is not an endpoint for
+unauthenticated game clients. Existing server authorization/redaction still applies.
+
+Private `profiled-session-checkpoint-v1` envelopes bind an execution profile,
+profile hash, inner payload schema, original bytes/base64 and SHA256, explicit
+provenance receipt and complete envelope content hash. They do not add fields to
+the inner v2 local-session/v37 replay contracts. Restore, continuation, isolated
+forks and exact replay retain one profile for the complete history. Unknown or
+drifted executors fail explicitly, with no host-arithmetic fallback or tolerance.
+The [setup instructions](../README.md#linux-authoritative-execution-from-windows-and-linux)
+describe explicit installation registration and legacy enrollment.
+
 ## Player-scoped policy consumers
 
 The [AI policy interface](AI_POLICY_INTERFACE.md) consumes detached player views
