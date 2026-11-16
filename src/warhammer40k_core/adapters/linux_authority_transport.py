@@ -17,8 +17,13 @@ from warhammer40k_core.adapters.execution_profile import (
     ExecutionProfileError,
     content_hash,
     decode_json,
+    numerical_policy_for_profile,
     object_payload,
     validate_executor_profile,
+)
+from warhammer40k_core.adapters.numerical_policy import (
+    LEGACY_NUMERICAL_POLICY,
+    NumericalPolicyConfiguration,
 )
 from warhammer40k_core.build_identity import verified_engine_build_identity
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
@@ -55,8 +60,20 @@ class LinuxAuthority:
     """
 
     def __init__(
-        self, command: Sequence[str], *, expected_profile: JsonValue, timeout_seconds: float = 900.0
+        self,
+        command: Sequence[str],
+        *,
+        expected_profile: JsonValue,
+        numerical_policy: NumericalPolicyConfiguration = LEGACY_NUMERICAL_POLICY,
+        timeout_seconds: float = 900.0,
     ) -> None:
+        if type(numerical_policy) is not NumericalPolicyConfiguration:
+            raise ExecutionProfileError("Authority requires a numerical policy configuration.")
+        if numerical_policy_for_profile(expected_profile) != numerical_policy:
+            raise ExecutionProfileError(
+                "Registered profile and configured numerical policy differ."
+            )
+        self._numerical_policy = numerical_policy
         self._initialize(command, timeout_seconds=timeout_seconds)
         try:
             self._profile = self._receive()
@@ -104,6 +121,10 @@ class LinuxAuthority:
         self._output = self._process.stdout
         self._reader = Thread(target=self._read_responses, daemon=True)
         self._reader.start()
+
+    @property
+    def numerical_policy(self) -> NumericalPolicyConfiguration:
+        return self._numerical_policy
 
     @property
     def profile(self) -> JsonValue:

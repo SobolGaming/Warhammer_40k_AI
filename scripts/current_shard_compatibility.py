@@ -125,12 +125,14 @@ NEW_NODES |= frozenset(
 def enabled(directory: Path, summary: dict[str, object] | None = None) -> bool:
     from scripts.linux_authority_shard_admission import BASELINE_FILE as AUTHORITY_BASELINE_FILE
     from scripts.milli_inch_shard_admission import BASELINE_FILE as MILLI_BASELINE_FILE
+    from scripts.precision_profile_shard_admission import BASELINE_FILE as PROFILE_BASELINE_FILE
 
     declared = (directory / FILENAME).is_file()
     if not declared and (
         (directory / BASELINE_FILE).is_file()
         or (directory / AUTHORITY_BASELINE_FILE).is_file()
         or (directory / MILLI_BASELINE_FILE).is_file()
+        or (directory / PROFILE_BASELINE_FILE).is_file()
         or (
             summary is not None
             and (
@@ -166,11 +168,20 @@ def _baseline(
     from scripts.milli_inch_shard_admission import NODES as MILLI_NODES
     from scripts.milli_inch_shard_admission import OWNER as MILLI_OWNER
     from scripts.milli_inch_shard_admission import SCHEMA as MILLI_SCHEMA
+    from scripts.precision_profile_shard_admission import BASELINE_FILE as PROFILE_BASELINE_FILE
+    from scripts.precision_profile_shard_admission import NODES as PROFILE_NODES
+    from scripts.precision_profile_shard_admission import OWNER as PROFILE_OWNER
+    from scripts.precision_profile_shard_admission import SCHEMA as PROFILE_SCHEMA
 
-    milli = descriptor["schema"] == MILLI_SCHEMA
-    authority = descriptor["schema"] in {AUTHORITY_SCHEMA, MILLI_SCHEMA}
+    profile = descriptor["schema"] == PROFILE_SCHEMA
+    milli = descriptor["schema"] in {MILLI_SCHEMA, PROFILE_SCHEMA}
+    authority = descriptor["schema"] in {AUTHORITY_SCHEMA, MILLI_SCHEMA, PROFILE_SCHEMA}
     filename = (
-        MILLI_BASELINE_FILE if milli else (AUTHORITY_BASELINE_FILE if authority else BASELINE_FILE)
+        PROFILE_BASELINE_FILE
+        if profile
+        else MILLI_BASELINE_FILE
+        if milli
+        else (AUTHORITY_BASELINE_FILE if authority else BASELINE_FILE)
     )
     reference = _object(descriptor["baseline"], {"file", "sha256"}, "current baseline reference")
     path = directory / filename
@@ -239,6 +250,9 @@ def _baseline(
     if milli:
         expected_additions |= MILLI_NODES
         expected_owners.add(MILLI_OWNER)
+    if profile:
+        expected_additions |= PROFILE_NODES
+        expected_owners.add(PROFILE_OWNER)
     if (
         cases.keys() != history.baseline.keys() | expected_additions
         or not history.baseline.keys() < cases.keys()
@@ -271,8 +285,14 @@ def _baseline(
         elif current != (history.root / owner).read_bytes():
             from scripts.boolean_los_admission import SCHEMA as BOOLEAN_SCHEMA
             from scripts.boolean_los_admission import transitioned_test
+            from scripts.precision_profile_shard_admission import (
+                transitioned_test as profile_transitioned_test,
+            )
 
-            accepted = (
+            accepted = profile and profile_transitioned_test(
+                root, owner, current, (history.root / owner).read_bytes()
+            )
+            accepted = accepted or (
                 retained_test_transition(root, owner, current, (history.root / owner).read_bytes())
                 if authority
                 else descriptor["schema"] == BOOLEAN_SCHEMA
@@ -351,11 +371,13 @@ def plan(root: Path, directory: Path, cases: dict[str, float]) -> Plan:
     from scripts.extended_shard_allocation import partial_projection
     from scripts.linux_authority_shard_admission import SCHEMA as AUTHORITY_SCHEMA
     from scripts.milli_inch_shard_admission import SCHEMA as MILLI_SCHEMA
+    from scripts.precision_profile_shard_admission import SCHEMA as PROFILE_SCHEMA
 
     declared = read_json(directory / FILENAME)
     fresh = isinstance(declared, dict) and declared.get("schema") == BOOLEAN_SCHEMA
     authority = isinstance(declared, dict) and declared.get("schema") == AUTHORITY_SCHEMA
     milli = isinstance(declared, dict) and declared.get("schema") == MILLI_SCHEMA
+    profile = isinstance(declared, dict) and declared.get("schema") == PROFILE_SCHEMA
 
     descriptor = _object(
         declared,
@@ -369,13 +391,14 @@ def plan(root: Path, directory: Path, cases: dict[str, float]) -> Plan:
             "native_serial_role",
             "planning_policy",
         }
-        | ({"fresh_evidence"} if fresh or authority or milli else set()),
+        | ({"fresh_evidence"} if fresh or authority or milli or profile else set()),
         "runtime compatibility",
     )
     from scripts.current_shard_assignment import current_planning_policy
 
     if (
-        descriptor["schema"] not in {SCHEMA, BOOLEAN_SCHEMA, AUTHORITY_SCHEMA, MILLI_SCHEMA}
+        descriptor["schema"]
+        not in {SCHEMA, BOOLEAN_SCHEMA, AUTHORITY_SCHEMA, MILLI_SCHEMA, PROFILE_SCHEMA}
         or descriptor["historical_revision"] != HISTORICAL_REVISION
     ):
         raise SystemExit("Unreviewed scheduling compatibility boundary.")
@@ -393,7 +416,17 @@ def plan(root: Path, directory: Path, cases: dict[str, float]) -> Plan:
         expected_native = frozenset(
             node for node in NEW_NODES if node.startswith(NATIVE_PREFIX_OWNER + "::")
         )
-        if milli:
+        if profile:
+            from scripts.current_native_serial_role import NativeSerialRole
+            from scripts.precision_profile_shard_admission import (
+                current_native_role as profile_role,
+            )
+
+            seconds, native_metadata = profile_role(
+                root, directory, descriptor, data, expected_native
+            )
+            native_role = NativeSerialRole(None, seconds, native_metadata)
+        elif milli:
             from scripts.current_native_serial_role import NativeSerialRole
             from scripts.milli_inch_shard_admission import current_native_role as milli_native_role
 
@@ -467,6 +500,12 @@ def plan(root: Path, directory: Path, cases: dict[str, float]) -> Plan:
         from scripts.current_shard_assignment import load_assignment, require_planning_limits
 
         groups, assignment = load_assignment(directory, descriptor, history)
+        if profile:
+            from scripts.precision_profile_shard_admission import (
+                require_frozen_assignment as require_profile_assignment,
+            )
+
+            require_profile_assignment(root, groups)
         if milli:
             from scripts.milli_inch_shard_admission import (
                 require_frozen_assignment as require_milli_assignment,

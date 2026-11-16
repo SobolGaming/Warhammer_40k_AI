@@ -4,12 +4,13 @@ from __future__ import annotations
 
 import copy
 import json
-import subprocess
 from pathlib import Path
 
 import pytest
-from scripts.current_shard_compatibility import plan
+from scripts.complete_covered_evidence import verify_complete_covered_profile
+from scripts.current_shard_compatibility import NATIVE_PREFIX_OWNER, NEW_NODES
 from scripts.historical_shard_snapshot import MANIFEST, git_bytes
+from scripts.linux_authority_shard_admission import retained_native_inventory
 from scripts.milli_inch_shard_admission import (
     ASSIGNMENT_FILE,
     BASE,
@@ -28,6 +29,7 @@ from scripts.milli_inch_shard_admission import (
     retained_authority_artifacts,
     validate_runtime_transition,
 )
+from scripts.precision_profile_shard_admission import BASE as SUCCESSOR_BASE
 from tools.performance_policy import runtime_inputs
 
 from tests.support.retained_authority_sources import materialize_retained_sources
@@ -37,12 +39,11 @@ DIRECTORY = ROOT / "ci/test_shards"
 
 
 def test_milli_inch_runtime_is_only_the_exact_inactive_addition(tmp_path: Path) -> None:
-    validate_runtime_transition(ROOT)
     snapshot = tmp_path / "retained-source-data"
     snapshot.mkdir()
     materialize_retained_sources(ROOT, snapshot, revision=BASE)
     for name in (MODULE, MANIFEST):
-        (snapshot / name).write_bytes((ROOT / name).read_bytes())
+        (snapshot / name).write_bytes(git_bytes(ROOT, SUCCESSOR_BASE, name))
     validate_runtime_transition(snapshot)
     with pytest.raises(SystemExit, match="actual runtime checkout"):
         current_native_role(snapshot, snapshot / "ci/test_shards", {}, {}, frozenset())
@@ -66,8 +67,7 @@ def test_milli_inch_runtime_is_only_the_exact_inactive_addition(tmp_path: Path) 
 
 
 def test_milli_inch_complete_producer_is_current_source(tmp_path: Path) -> None:
-    head = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
-    assert producer_inputs(ROOT, head) == runtime_inputs(ROOT)
+    head = SUCCESSOR_BASE
     snapshot = tmp_path / "current-producer-data"
     snapshot.mkdir()
     materialize_retained_sources(ROOT, snapshot, revision=head)
@@ -132,21 +132,55 @@ def test_milli_inch_fetches_current_and_retained_producers() -> None:
     assert {BASE, baseline["source_head"], previous["source_head"]} <= set(sources)
 
 
-def test_live_milli_inch_profile_has_complete_fresh_evidence_and_fixed_inventory() -> None:
+def test_retained_milli_inch_profile_has_complete_original_evidence_and_fixed_inventory(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    from scripts import build_test_shards as sharding
     from scripts.build_test_shards import summary_case_seconds
 
-    descriptor = json.loads((DIRECTORY / "current-runtime-compatibility.json").read_bytes())
+    snapshot = tmp_path / "retained-foundation-source"
+    snapshot.mkdir()
+    materialize_retained_sources(ROOT, snapshot, revision=SUCCESSOR_BASE)
+    monkeypatch.setattr(sharding, "REPOSITORY_ROOT", snapshot)
+    monkeypatch.setattr(sharding, "TESTS_ROOT", snapshot / "tests")
+    descriptor = json.loads(
+        git_bytes(ROOT, SUCCESSOR_BASE, "ci/test_shards/current-runtime-compatibility.json")
+    )
     assert descriptor["schema"] == SCHEMA
     assert descriptor["current_runtime_fingerprint"] == RUNTIME
     assert descriptor["baseline"]["file"] == BASELINE_FILE
     assert descriptor["fresh_evidence"]["file"] == EVIDENCE_FILE
     assert descriptor["assignment"]["file"] == ASSIGNMENT_FILE
-    summary = json.loads((DIRECTORY / "durations.json").read_bytes())
+    summary = json.loads(git_bytes(ROOT, SUCCESSOR_BASE, "ci/test_shards/durations.json"))
     cases = summary_case_seconds(summary)
-    selected = plan(ROOT, DIRECTORY, cases)
+    baseline = json.loads((DIRECTORY / BASELINE_FILE).read_bytes())
+    native_nodes = frozenset(
+        node for node in NEW_NODES if node.startswith(NATIVE_PREFIX_OWNER + "::")
+    )
+    order, _ = retained_native_inventory(
+        ROOT, DIRECTORY, descriptor["native_serial_role"], native_nodes
+    )
+    seconds = verify_complete_covered_profile(
+        ROOT,
+        DIRECTORY,
+        descriptor["fresh_evidence"],
+        baseline,
+        producer_inputs(snapshot, baseline["source_head"]),
+        order,
+        filename=EVIDENCE_FILE,
+    )
+    assert (
+        seconds
+        == summary["runtime_compatibility"]["native_serial_role"][
+            "with_mirror_native_phase_seconds"
+        ]
+    )
+    assignment = json.loads(git_bytes(ROOT, SUCCESSOR_BASE, "ci/test_shards/" + ASSIGNMENT_FILE))
+    groups = tuple(tuple(assignment["shards"][str(index)]) for index in range(1, 13))
     previous = json.loads((DIRECTORY / "linux-authority-covered-baseline.json").read_bytes())
     assert len(NODES) == 25
     assert len(cases) == 6366
     assert cases.keys() == previous["case_seconds"].keys() | NODES
-    assert sum(len(group) for group in selected.groups) == 510
-    require_frozen_assignment(ROOT, selected.groups)
+    assert sum(len(group) for group in groups) == 510
+    require_frozen_assignment(ROOT, groups)

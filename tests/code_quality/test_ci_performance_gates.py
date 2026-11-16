@@ -21,16 +21,26 @@ from scripts.check_shard_coverage import check_shard_coverage
 ROOT = Path(__file__).resolve().parents[2]
 
 
-def test_precision_addition_preserves_retained_selection_and_admits_only_its_owner() -> None:
+def test_precision_addition_preserves_retained_selection_and_admits_only_its_owner(
+    tmp_path: Path,
+) -> None:
     from scripts import milli_inch_test_admission as admission
+    from scripts.precision_profile_shard_admission import BASE
 
-    raw = (ROOT / sharding.CUTOVER_PATH).read_bytes()
+    from tests.support.retained_authority_sources import materialize_retained_sources
+
+    snapshot = tmp_path / "foundation-source-data"
+    snapshot.mkdir()
+    materialize_retained_sources(ROOT, snapshot, revision=BASE)
+    raw = (snapshot / sharding.CUTOVER_PATH).read_bytes()
     assert hashlib.sha256(raw).hexdigest() == admission.RETAINED_CUTOVER_SHA256
     retained = json.loads(raw)
-    selected = sharding.behavioral_selection(ROOT)
+    selected = sharding.behavioral_selection(snapshot)
     assert set(selected.active_files) == set(retained["active_files"]) | {admission.OWNER}
-    selected.check_explicit(ROOT, (admission.OWNER,))
-    expected = hashlib.sha256(raw + b"\0" + (ROOT / admission.ADDITION).read_bytes()).hexdigest()
+    selected.check_explicit(snapshot, (admission.OWNER,))
+    expected = hashlib.sha256(
+        raw + b"\0" + (snapshot / admission.ADDITION).read_bytes()
+    ).hexdigest()
     assert selected.manifest_sha256 == expected
 
 
@@ -53,11 +63,13 @@ def test_precision_addition_requires_complete_exact_source_tuple(
     tmp_path: Path, change: str
 ) -> None:
     from scripts import milli_inch_test_admission as admission
+    from scripts.historical_shard_snapshot import git_bytes
+    from scripts.precision_profile_shard_admission import BASE
 
     for name in (admission.ADDITION, admission.MANIFEST, admission.SOURCE, admission.OWNER):
         target = tmp_path / name
         target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_bytes((ROOT / name).read_bytes())
+        target.write_bytes(git_bytes(ROOT, BASE, name))
     retained = admission.RETAINED_CUTOVER_SHA256
     if change in {"source", "test", "record"}:
         name = {"source": admission.SOURCE, "test": admission.OWNER, "record": admission.ADDITION}[
@@ -939,6 +951,7 @@ def test_cutover_real_pytest_cli_does_not_bypass_explicit_file_guard(
         "scripts/build_test_shards.py",
         "scripts/behavioral_selection_members.py",
         "scripts/milli_inch_test_admission.py",
+        "scripts/precision_profile_test_admission.py",
         "tests/conftest.py",
         "tests/timing_plugin.py",
         "tests/__init__.py",
@@ -989,6 +1002,7 @@ def test_cutover_real_cli_rejects_naming_override(cutover_root: Path) -> None:
         "scripts/build_test_shards.py",
         "scripts/behavioral_selection_members.py",
         "scripts/milli_inch_test_admission.py",
+        "scripts/precision_profile_test_admission.py",
         "tests/conftest.py",
         "tests/timing_plugin.py",
         "tests/__init__.py",

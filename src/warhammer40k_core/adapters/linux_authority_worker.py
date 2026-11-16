@@ -22,8 +22,10 @@ from warhammer40k_core.adapters.execution_profile import (
     ExecutionProfileError,
     checkpoint_bytes,
     checkpoint_envelope,
+    content_hash,
     decode_json,
     linux_execution_profile,
+    numerical_policy_for_profile,
     object_payload,
     string_field,
 )
@@ -81,15 +83,26 @@ class _OwnedSession:
     session: LocalGameSession
     provenance: JsonValue
     checkpoint: JsonValue = None
-    inner_checkpoint_hash: str | None = None
+    checkpoint_cache_identity: tuple[str, str, str] | None = None
 
 
 class LinuxAuthorityDispatcher:
     def __init__(self, profile: JsonValue) -> None:
-        self.profile = copy.deepcopy(profile)
+        self.numerical_policy = numerical_policy_for_profile(profile)
+        self._profile = copy.deepcopy(profile)
+        self._profile_hash = content_hash(self._profile)
         self._sessions: dict[str, _OwnedSession] = {}
         self._next_session = 0
         self._sequence = 0
+
+    @property
+    def profile(self) -> JsonValue:
+        return copy.deepcopy(self._profile)
+
+    def _checkpoint_cache_identity(self, inner_hash: str) -> tuple[str, str, str]:
+        return self.numerical_policy.checkpoint_cache_identity(
+            execution_profile_hash=self._profile_hash, inner_checkpoint_hash=inner_hash
+        )
 
     def dispatch(self, request: JsonValue) -> dict[str, JsonValue]:
         value = object_payload(request, label="Authority request")
@@ -143,7 +156,7 @@ class LinuxAuthorityDispatcher:
                         restored,
                         copy.deepcopy(args["provenance"]),
                         copy.deepcopy(args),
-                        string_field(inner, "content_hash"),
+                        self._checkpoint_cache_identity(string_field(inner, "content_hash")),
                     )
                 )
             if operation == "replay":
@@ -168,7 +181,7 @@ class LinuxAuthorityDispatcher:
                     session.fork(),
                     copy.deepcopy(owned.provenance),
                     copy.deepcopy(owned.checkpoint),
-                    owned.inner_checkpoint_hash,
+                    owned.checkpoint_cache_identity,
                 )
             )
         if operation == "to_persistence_payload":
@@ -176,13 +189,14 @@ class LinuxAuthorityDispatcher:
                 session.to_persistence_payload(), label="Inner session checkpoint"
             )
             inner_hash = string_field(inner, "content_hash")
-            if owned.checkpoint is None or owned.inner_checkpoint_hash != inner_hash:
+            cache_identity = self._checkpoint_cache_identity(inner_hash)
+            if owned.checkpoint is None or owned.checkpoint_cache_identity != cache_identity:
                 owned.checkpoint = checkpoint_envelope(
                     payload_bytes=canonical_json(inner).encode("utf-8"),
                     profile=self.profile,
                     provenance=owned.provenance,
                 )
-                owned.inner_checkpoint_hash = inner_hash
+                owned.checkpoint_cache_identity = cache_identity
             return copy.deepcopy(owned.checkpoint)
         if operation == "authoritative_identity_payload":
             return validate_json_value(session.authoritative_identity_payload())

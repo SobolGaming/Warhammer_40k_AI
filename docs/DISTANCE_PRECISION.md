@@ -1,13 +1,49 @@
 # Distance precision contract and rollout status
 
+## Explicit legacy policy binding
+
+New registered Linux executors use `linux-execution-profile-v2-numerical-policy`
+and explicitly declare `legacy-binary-inch-v1`. This ID names the existing
+unrounded binary-inch execution semantics; it does not claim that every internal
+calculation is floating point. `NumericalPolicyConfiguration` is immutable, and
+only that policy is admitted. The configured policy and registered profile are
+checked before launching an authority. Missing, unknown and
+`milli-inch-half-away-v1` policies fail closed. Inspection alone still does not
+register an executor or authorize gameplay.
+
+`LinuxGameSession.numerical_policy` exposes the selected authority configuration.
+Its opaque persistence and replay envelopes bind the policy through the complete
+execution profile, profile hash and envelope content hash. The authority-owned
+checkpoint cache separately keys the policy ID, execution-profile hash and exact
+inner checkpoint hash. Profiles are detached from caller-owned dictionaries so a
+caller cannot relabel an existing session or cached envelope. Restoration and
+replay require the exact registered profile before decoding the inner payload.
+
+This is the outer identity slice. Inner `GameConfig`, lifecycle, decision/event
+streams, replay artifacts, geometry/spatial witness hashes and the native
+`LocalGameSession` persistence format retain their existing bytes and semantics.
+The unprofiled native API remains the existing legacy path; it does not accept a
+new numerical mode. Retained profile-v1 envelopes require their original compatible
+executor. The generic envelope byte utility can preserve those original bytes,
+but that preservation does not admit them on a new profile-v2 executor. Explicit
+legacy enrollment retains its required provenance receipt and strict inner
+validation; no loader infers a replacement profile or migrates history.
+
+Geometry input canonicalization, policy-aware geometry/spatial hashes and geometry
+cache keys remain prerequisites for admitting another numerical mode. Their
+recorded legacy identities are deliberately unchanged here, including the
+historical explicit reconstruction recipe. The paused Fight evidence remains
+historical and unmodified. Linux remains authoritative; native Windows numerical
+equivalence and project-wide milli-inch rounding are not established by this slice.
+
 ## Staged milli-inch numerical policy
 
 `milli-inch-half-away-v1` defines the new distance arithmetic foundation. It is
 **not active gameplay or a replacement for `battlefield-coordinate-v1`** in this
 slice. Existing sessions, proposals, legality predicates, persistence and clients
 continue under their registered runtime. Importing the new pure arithmetic module
-does not opt a session into new semantics. Activation requires the coordinated
-profile, persistence and geometry changes below; clients must never opt in by
+does not opt a session into new semantics. Activation requires the remaining coordinated
+inner identity and geometry changes below; clients must never opt in by
 rounding an existing payload themselves.
 
 The policy quantum is exactly `1/1000 inch`. A canonical length or signed
@@ -75,9 +111,8 @@ evidence; they are not a general substitute for true contact. This foundation do
 not choose or activate that representation.
 
 Activation is dependency ordered: first this tested arithmetic foundation; then
-an explicit session numerical-policy identifier bound into execution profiles,
-configuration, persistence and replay; then coordinated geometry input,
-measurement, topology and exact/symbolic rule consumers; finally Windows and
+the explicit outer policy binding described above; then coordinated inner identity,
+geometry input, measurement, topology and exact/symbolic rule consumers; finally Windows and
 Linux client qualification against the registered Linux authority. Each slice
 requires its own exact-head reviews and CI. The active policy must participate
 in geometry/spatial hashes and cache keys, and be carried through events and
@@ -100,4 +135,5 @@ conversion, squared and algebraic measurements, strict/inclusive thresholds,
 contact versus overlap, path subdivision and accumulation, collapsed topology,
 profile/hash/cache separation, valid-state persistence/full replay, and both OS
 clients. Until those gates pass, this section specifies the target semantics and
-the implemented pure foundation only; it makes no project-wide rollout claim.
+the implemented pure foundation and outer legacy-policy binding only; it makes no
+project-wide rollout claim.

@@ -1,0 +1,30 @@
+{
+  "added_cases": 8,
+  "added_files": {
+    "tests/infrastructure/adapters/unit/test_numerical_policy.py": {
+      "blob_sha1": "c1391361cb336db772c6fc59cd664376f2ea580b",
+      "bytes": 4310,
+      "mode": "100644",
+      "sha256": "73c17636cf2fb3b2977d0bf050990199095aa4c4597c5c5b03bcf2f2dccf115e"
+    }
+  },
+  "retained_cutover_sha256": "4cd1f0b062fad661e1c71fe27d2e9f8279c3c21d2a9f7bea9e3b053db79afce3",
+  "retained_foundation_sha256": "9ebbf6d4cf39d25a60c78a4312e0a128c5b43b6c79c64ed91fa41e4387366e07",
+  "runtime_fingerprint": "ae914a56833e43a3bbf086730b354c7a18673ccc15ca93e4b474347b95380f19",
+  "schema": "finite-precision-profile-test-transition-v1",
+  "sources": {
+    "src/warhammer40k_core/adapters/execution_profile.py": "4effd97d70a8d71719380cbd6c47f59c3ed0ffb1e1d755875f760ecb9b33f00a",
+    "src/warhammer40k_core/adapters/linux_authority_transport.py": "ba509b5a63c48cc31af44e70a2bd9e8e86567b5e367e2734fa3ddadb224e71dc",
+    "src/warhammer40k_core/adapters/linux_authority_worker.py": "a999288f018d96a772917d2653cc6ae82bd3180ec32a4e82ab2f837005c432d7",
+    "src/warhammer40k_core/adapters/linux_session.py": "78ac218396507ef11f95a9b423739ac76c92e2f7801c0401ebd319e9323af212",
+    "src/warhammer40k_core/adapters/numerical_policy.py": "80bac8cc2264149cc8aba613df2c3db785810173e37435c09c369df118d86c5f"
+  },
+  "updated_files": {
+    "tests/infrastructure/adapters/unit/test_linux_authority.py": {
+      "blob_sha1": "8ec754d262fede8fa6907f9613b47003e3c10915",
+      "bytes": 13662,
+      "mode": "100644",
+      "sha256": "9d8abade332100121766655881547a6e0bf1813fe416414a022127605b988ec7"
+    }
+  }
+}

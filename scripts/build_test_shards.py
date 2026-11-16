@@ -426,10 +426,6 @@ def behavioral_selection(root: Path) -> BehavioralSelection:
         raise SystemExit("Native behavioral classification ledger changed.")
     if not isinstance(value["native_active_files"], dict):
         raise SystemExit("Native active file ledger must be an object.")
-    active = _selection_members(value["active_files"], root)
-    if not value["native_active_files"].keys() <= active.keys():
-        raise SystemExit("A native active Core/regression file was omitted.")
-    retained = _selection_members(value["retained_active_files"], root)
     updates = value["inactive_updates"]
     allowed_updates = {
         "tests/unit/test_phase11e_mission_scoring_cleanup.py": (
@@ -467,9 +463,28 @@ def behavioral_selection(root: Path) -> BehavioralSelection:
     inactive = _selection_members(present_inactive, root, current=current)
     inactive.update({name: value["inactive_legacy_files"][name] for name in retired})
     benchmarks = _selection_members(value["benchmark_files"], root)
+    # Preserve retained source diagnostics before the successor's complete cutover pin.
+    # Active replacements depend on that successor, so admit them after legacy checks.
+    from scripts.precision_profile_test_admission import profile_test_transition
+
+    profile_transition = profile_test_transition(root, hashlib.sha256(raw).hexdigest())
+    updates_for_profile = profile_transition[0] if profile_transition is not None else None
+    if (
+        updates_for_profile is not None
+        and not updates_for_profile.keys() <= value["active_files"].keys()
+    ):
+        raise SystemExit("Precision-profile replacement is outside the retained active selection.")
+    active = _selection_members(value["active_files"], root, current=updates_for_profile)
+    if not value["native_active_files"].keys() <= active.keys():
+        raise SystemExit("A native active Core/regression file was omitted.")
+    retained = _selection_members(value["retained_active_files"], root)
     from scripts.milli_inch_test_admission import precision_test_addition
 
-    addition = precision_test_addition(root, hashlib.sha256(raw).hexdigest())
+    addition = (
+        (profile_transition[1], profile_transition[2])
+        if profile_transition is not None
+        else precision_test_addition(root, hashlib.sha256(raw).hexdigest())
+    )
     if addition is not None:
         members, addition_raw = addition
         if active.keys() & members.keys():

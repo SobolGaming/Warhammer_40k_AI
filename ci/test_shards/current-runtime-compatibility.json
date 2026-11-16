@@ -1,16 +1,16 @@
 {
   "assignment": {
-    "file": "milli-inch-derived-assignment.json",
-    "sha256": "0554253c1259bc967fb2f60fac2428e8dbdeaebac177b7d40570ab9225aeff2e"
+    "file": "precision-profile-derived-assignment.json",
+    "sha256": "f75635997801c90697532b1cbaaea3519915c1ae644553decd9301ee7ec60c65"
   },
   "baseline": {
-    "file": "milli-inch-covered-baseline.json",
-    "sha256": "e8331fce2174c35ce7dea9d72e1fc24452a15eb75032ae294948e059dedc01f2"
+    "file": "precision-profile-covered-baseline.json",
+    "sha256": "a0e490d404a3bea831f0e44bcb2ca65874e33138c766fdcf1f6f757b37616fff"
   },
-  "current_runtime_fingerprint": "ff4277b5e1024958cc9f3e5464b5e26fc578c84b7a39130bece55d3ad0cf0add",
+  "current_runtime_fingerprint": "ae914a56833e43a3bbf086730b354c7a18673ccc15ca93e4b474347b95380f19",
   "fresh_evidence": {
-    "file": "milli-inch-covered-evidence.json",
-    "sha256": "59e94fe89d5770b3776badbcd3a0d8feaa12995fa84570f2187a65b316fc636e"
+    "file": "precision-profile-covered-evidence.json",
+    "sha256": "2ad92b6436a4e6ab7b14613cbeb55addca453b40748d1581dbd47684bb45557f"
   },
   "historical_revision": "008be8a8cb0b50b232fe022452762b3906489b49",
   "native_serial_role": {
@@ -19,7 +19,8 @@
   },
   "new_test_sources": {
     "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py": "26467cfb68d1e4464c5f926a1278bd67433f5ac99699ebdc9666deb7ab1255ed",
-    "tests/infrastructure/adapters/unit/test_linux_authority.py": "e30567808765adacc47cce1e5116ecc00be1ceb6a1af8accf27ffcc529d69aa8",
+    "tests/infrastructure/adapters/unit/test_linux_authority.py": "9d8abade332100121766655881547a6e0bf1813fe416414a022127605b988ec7",
+    "tests/infrastructure/adapters/unit/test_numerical_policy.py": "73c17636cf2fb3b2977d0bf050990199095aa4c4597c5c5b03bcf2f2dccf115e",
     "tests/rules/section01/test_milli_inch.py": "6fad7bf3bc123c2f217bb0ae46b96971d8591f1cda712a0d88ba4b1f0f5edb37",
     "tests/rules/section03/test_terrain_path_preparation.py": "869ce37ba5d43d7a1c5558c94fceaf33eb81bfff62c2e5f13019551f2c071438",
     "tests/rules/section09/test_escape_survivor_persistence.py": "b70029a1609ac6996755d24254744cd3e37af955f81188e5f9062a5afb9c1e68",
@@ -32,5 +33,5 @@
     "rounding_seconds": 30,
     "version": "native-serial-current-planning-v2"
   },
-  "schema": "historical-snapshot-milli-inch-foundation-v1"
+  "schema": "historical-snapshot-precision-profile-binding-v1"
 }
