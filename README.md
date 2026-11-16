@@ -330,7 +330,9 @@ register its returned JSON profile in operator configuration. Keep that register
 profile; do not automatically replace it when an executor drifts. It binds the
 engine build, interpreter, runtime sources/native libraries and numerical canaries.
 It identifies the selected installation, not all Linux machines with matching
-package versions. The client loads the registered profile before connecting:
+package versions. Client and executor must use the same engine build; mixed builds
+are rejected before a game is created or restored. The client loads the registered
+profile before connecting:
 
 ```python
 from warhammer40k_core.adapters.linux_authority_transport import LinuxAuthority

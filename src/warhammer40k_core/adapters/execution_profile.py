@@ -66,6 +66,18 @@ def content_hash(value: JsonValue) -> str:
     return hashlib.sha256(canonical_json(value).encode("utf-8")).hexdigest()
 
 
+def validate_executor_profile(
+    profile: JsonValue, *, expected: JsonValue, engine_build_id: str
+) -> None:
+    if profile != expected:
+        raise ExecutionProfileError("The installed Linux execution profile has drifted.")
+    value = object_payload(profile, label="Linux execution profile")
+    if value.get("schema_version") != PROFILE_SCHEMA:
+        raise ExecutionProfileError("Unsupported Linux execution profile schema.")
+    if value.get("engine_build_id") != engine_build_id:
+        raise ExecutionProfileError("Client and Linux authority require the same engine build.")
+
+
 def linux_execution_profile() -> dict[str, JsonValue]:
     """Identify this installed executor; never infer a profile from a save file.
 

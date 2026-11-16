@@ -5,7 +5,8 @@ from __future__ import annotations
 import copy
 import json
 import subprocess
-from collections.abc import Sequence
+from collections.abc import Generator, Sequence
+from contextlib import contextmanager
 from queue import Empty, Queue
 from threading import RLock, Thread
 from types import TracebackType
@@ -17,7 +18,9 @@ from warhammer40k_core.adapters.execution_profile import (
     content_hash,
     decode_json,
     object_payload,
+    validate_executor_profile,
 )
+from warhammer40k_core.build_identity import verified_engine_build_identity
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 
 if TYPE_CHECKING:
@@ -64,8 +67,11 @@ class LinuxAuthority:
         self._registered = True
 
     def _validate_profile(self, expected: JsonValue) -> None:
-        if self._profile != expected:
-            raise ExecutionProfileError("The installed Linux execution profile has drifted.")
+        validate_executor_profile(
+            self._profile,
+            expected=expected,
+            engine_build_id=verified_engine_build_identity().build_id,
+        )
 
     @classmethod
     def inspect(cls, command: Sequence[str], *, timeout_seconds: float = 60.0) -> JsonValue:
@@ -77,7 +83,7 @@ class LinuxAuthority:
             instance.close()
 
     def _initialize(self, command: Sequence[str], *, timeout_seconds: float) -> None:
-        if not command or any(not isinstance(part, str) or not part for part in command):
+        if not command or any(type(part) is not str or not part for part in command):
             raise ExecutionProfileError("An explicit Linux authority command is required.")
         if not 0 < timeout_seconds <= 1800.0:
             raise ExecutionProfileError("Authority timeout must be positive and at most 1800s.")
@@ -106,6 +112,16 @@ class LinuxAuthority:
     @property
     def profile_hash(self) -> str:
         return content_hash(self._profile)
+
+    @contextmanager
+    def session_transaction(self) -> Generator[None]:
+        """Keep creation/fork acknowledgement and proxy registration atomic."""
+        with self._lock:
+            yield
+
+    def register_session(self, session_id: str, session: LinuxGameSession) -> None:
+        with self._lock:
+            self._sessions[session_id] = session
 
     def _read_responses(self) -> None:
         try:
@@ -168,13 +184,13 @@ class LinuxAuthority:
         from warhammer40k_core.adapters.linux_session import LinuxGameSession
 
         with self._lock:
-            return LinuxGameSession._from_result(self, self.call(None, "create", {}))
+            return LinuxGameSession.from_authority_result(self, self.call(None, "create", {}))
 
     def restore(self, payload: JsonValue) -> LinuxGameSession:
         from warhammer40k_core.adapters.linux_session import LinuxGameSession
 
         with self._lock:
-            return LinuxGameSession._from_result(self, self.call(None, "restore", payload))
+            return LinuxGameSession.from_authority_result(self, self.call(None, "restore", payload))
 
     def enroll_legacy(self, payload_bytes: bytes, *, provenance: JsonValue) -> LinuxGameSession:
         from warhammer40k_core.adapters.execution_profile import checkpoint_envelope

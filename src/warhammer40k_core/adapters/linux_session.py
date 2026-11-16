@@ -37,10 +37,10 @@ class LinuxGameSession(AdapterGameSession):
     def __init__(self, authority: LinuxAuthority, session_id: str) -> None:
         self._authority = authority
         self._session_id = session_id
-        authority._sessions[session_id] = self
+        authority.register_session(session_id, self)
 
     @classmethod
-    def _from_result(cls, authority: LinuxAuthority, result: JsonValue) -> Self:
+    def from_authority_result(cls, authority: LinuxAuthority, result: JsonValue) -> Self:
         if not isinstance(result, str) or not result:
             raise ExecutionProfileError("Linux authority did not return a session identity.")
         return cls(authority, result)
@@ -54,8 +54,8 @@ class LinuxGameSession(AdapterGameSession):
         )
 
     def fork(self) -> Self:
-        with self._authority._lock:
-            return type(self)._from_result(self._authority, self._call("fork"))
+        with self._authority.session_transaction():
+            return type(self).from_authority_result(self._authority, self._call("fork"))
 
     def to_persistence_payload(self) -> JsonValue:
         return self._call("to_persistence_payload")

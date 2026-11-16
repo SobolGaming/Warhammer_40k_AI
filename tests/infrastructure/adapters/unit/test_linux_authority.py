@@ -19,10 +19,12 @@ from warhammer40k_core.adapters.access_control import (
 )
 from warhammer40k_core.adapters.contracts import AdapterGameSession
 from warhammer40k_core.adapters.execution_profile import (
+    PROFILE_SCHEMA,
     ExecutionProfileError,
     checkpoint_bytes,
     checkpoint_envelope,
     content_hash,
+    validate_executor_profile,
 )
 from warhammer40k_core.adapters.external_contract import SESSION_CREATE_SCHEMA_VERSION
 from warhammer40k_core.adapters.linux_authority_transport import (
@@ -73,6 +75,19 @@ def test_profile_enrollment_requires_a_receipt_and_checks_inner_bytes() -> None:
         checkpoint_bytes(validate_json_value(envelope), profile={})
 
 
+def test_executor_registration_requires_the_registered_profile_and_same_engine() -> None:
+    selected: JsonValue = {"schema_version": PROFILE_SCHEMA, "engine_build_id": "selected-build"}
+    validate_executor_profile(selected, expected=selected, engine_build_id="selected-build")
+    with pytest.raises(ExecutionProfileError, match="same engine build"):
+        validate_executor_profile(selected, expected=selected, engine_build_id="other-build")
+    with pytest.raises(ExecutionProfileError, match="has drifted"):
+        validate_executor_profile(
+            selected, expected={"other": True}, engine_build_id="selected-build"
+        )
+    with pytest.raises(ExecutionProfileError, match="Unsupported.*schema"):
+        validate_executor_profile({}, expected={}, engine_build_id="selected-build")
+
+
 def test_authority_framing_distinguishes_clean_close_from_truncated_json() -> None:
     stream = io.BytesIO()
     write_frame(stream, {"exact": 0.2500000000000031})
@@ -93,7 +108,9 @@ def test_dispatcher_real_native_roster_restore_fork_viewers_and_exact_replay() -
     sequence = 0
     retained: list[str] = []
 
-    def call(identity: str | None, operation: str, arguments: JsonValue) -> JsonValue:
+    def call(
+        identity: str | None, operation: str, arguments: JsonValue, *, expected_error: bool = False
+    ) -> JsonValue:
         nonlocal sequence
         sequence += 1
         response = dispatcher.dispatch(
@@ -105,6 +122,10 @@ def test_dispatcher_real_native_roster_restore_fork_viewers_and_exact_replay() -
                 "arguments": arguments,
             }
         )
+        if expected_error:
+            assert response["result"] is None
+            assert response["error"] is not None
+            return response["error"]
         assert response["error"] is None, response
         return response["result"]
 
@@ -162,8 +183,10 @@ def test_dispatcher_real_native_roster_restore_fork_viewers_and_exact_replay() -
     # Releasing one atomic fork cannot release another live proxy's state.
     retained.remove(fork)
     call(identity, "event_record_count", {})
-    assert fork not in dispatcher._sessions
-    assert restored in dispatcher._sessions
+    rejection = call(fork, "event_record_count", {}, expected_error=True)
+    assert isinstance(rejection, dict)
+    assert rejection["message"] == "Unknown or released authority session."
+    assert call(restored, "event_record_count", {}) == original.event_record_count()
 
 
 @pytest.mark.integration
@@ -180,6 +203,8 @@ def test_selected_linux_process_implements_adapter_session_and_roundtrips(tmp_pa
         "warhammer40k_core.adapters.linux_authority_worker",
     ]
     profile = LinuxAuthority.inspect(command)
+    with pytest.raises(ExecutionProfileError, match="registration failed"):
+        LinuxAuthority(command, expected_profile={"wrong-registered-executor": True})
     original = strict_mirror_session()
     config = GameConfig.from_payload(
         cast(GameConfigPayload, original.lifecycle.to_payload()["config"])
