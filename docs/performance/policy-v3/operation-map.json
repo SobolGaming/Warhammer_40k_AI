@@ -35884,7 +35884,12 @@
         "ci/test_shards/linux-authority-covered-baseline.json",
         "ci/test_shards/linux-authority-covered-evidence.json",
         "ci/test_shards/linux-authority-derived-assignment.json",
-        "ci/test_shards/linux-authority-e2094d9c/*"
+        "ci/test_shards/linux-authority-e2094d9c/*",
+        "scripts/milli_inch_shard_admission.py",
+        "tests/code_quality/test_milli_inch_shard_admission.py",
+        "ci/test_shards/milli-inch-covered-baseline.json",
+        "ci/test_shards/milli-inch-covered-evidence.json",
+        "ci/test_shards/milli-inch-derived-assignment.json"
       ],
       "owners": [
         "*"
@@ -36046,6 +36051,30 @@
         "src/warhammer40k_core/adapters/linux_authority_worker.py",
         "src/warhammer40k_core/adapters/linux_session.py",
         "tests/infrastructure/adapters/unit/test_linux_authority.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "milli-inch-test-admission": {
+      "paths": [
+        "scripts/behavioral_selection_members.py",
+        "scripts/milli_inch_test_admission.py",
+        "data/source_audits/ci64_provenance_v1/milli-inch-test-addition-v1.json"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "milli-inch-arithmetic-regressions": {
+      "paths": [
+        "tests/rules/section01/test_milli_inch.py"
       ],
       "owners": [
         "*"

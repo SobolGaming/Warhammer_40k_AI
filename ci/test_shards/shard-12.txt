@@ -38,6 +38,7 @@ tests/rules/section01/test_01_03_timing.py
 tests/rules/section01/test_01_04_contact_lifetime.py
 tests/rules/section01/test_01_06_leadership.py
 tests/rules/section01/test_coverage_map.py
+tests/rules/section01/test_milli_inch.py
 tests/rules/section02/test_02_02_03_attack_generation.py
 tests/rules/section02/test_02_02_03_damage_timing.py
 tests/rules/section03/test_coverage_map.py

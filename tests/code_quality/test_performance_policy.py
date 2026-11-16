@@ -1421,3 +1421,68 @@ def test_whispering_web_smoke_scope_rejects_unbounded_declarations(
             category="rule_semantics",
             change=change,
         )
+
+
+def test_milli_inch_map_retains_every_existing_sensitive_operation() -> None:
+    """Retain old obligations while allowing separately reviewed additive mappings."""
+    prior = object_value(
+        json.loads(
+            subprocess.check_output(
+                ["git", "show", "22f3fde616758008100bdf37d87edd671ed90d9a:" + MAP], cwd=ROOT
+            )
+        )
+    )
+    current = read_object(ROOT / MAP)
+    operations = object_value(current["operations"])
+    for name, paths in {
+        "milli-inch-test-admission": [
+            "scripts/behavioral_selection_members.py",
+            "scripts/milli_inch_test_admission.py",
+            "data/source_audits/ci64_provenance_v1/milli-inch-test-addition-v1.json",
+        ],
+        "milli-inch-arithmetic-regressions": ["tests/rules/section01/test_milli_inch.py"],
+    }.items():
+        assert operations[name] == {
+            "paths": paths,
+            "owners": ["*"],
+            "families": [],
+            "sensitive": False,
+            "mandatory": True,
+        }
+    scope = object_value(operations["scoped-shard-allocation"])
+    assert {
+        "scripts/milli_inch_shard_admission.py",
+        "tests/code_quality/test_milli_inch_shard_admission.py",
+        "ci/test_shards/milli-inch-covered-baseline.json",
+        "ci/test_shards/milli-inch-covered-evidence.json",
+        "ci/test_shards/milli-inch-derived-assignment.json",
+    } <= set(cast(list[str], scope["paths"]))
+    for name, old in object_value(prior["operations"]).items():
+        previous = object_value(old)
+        if previous["sensitive"] is True or previous["mandatory"] is True:
+            retained = object_value(operations[name])
+            for field in ("paths", "owners", "families"):
+                assert set(cast(list[str], previous[field])) <= set(
+                    cast(list[str], retained[field])
+                )
+            for field in ("sensitive", "mandatory"):
+                if previous[field] is True:
+                    assert retained[field] is True
+
+
+def test_milli_inch_arithmetic_keeps_sensitive_geometry_comparison_obligations() -> None:
+    value, changes, mapping = _assessment(
+        "src/warhammer40k_core/geometry/milli_inch.py",
+        owner="inches_to_ticks",
+        category="rule_semantics",
+        operations=("geometry-search",),
+    )
+    with pytest.raises(ValueError, match="Missing required detailed comparisons"):
+        _validate(value, changes, mapping)
+    row = object_value(object_value(value["rows"])[next(iter(changes))])
+    row["selected_families"] = ["visibility", "movement", "setup"]
+    value["comparisons"] = {
+        name: f"docs/performance/current/{name}.json"
+        for name in ("visibility", "movement", "setup")
+    }
+    assert _validate(value, changes, mapping) == {"visibility", "movement", "setup"}

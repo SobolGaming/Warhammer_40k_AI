@@ -21,6 +21,86 @@ from scripts.check_shard_coverage import check_shard_coverage
 ROOT = Path(__file__).resolve().parents[2]
 
 
+def test_precision_addition_preserves_retained_selection_and_admits_only_its_owner() -> None:
+    from scripts import milli_inch_test_admission as admission
+
+    raw = (ROOT / sharding.CUTOVER_PATH).read_bytes()
+    assert hashlib.sha256(raw).hexdigest() == admission.RETAINED_CUTOVER_SHA256
+    retained = json.loads(raw)
+    selected = sharding.behavioral_selection(ROOT)
+    assert set(selected.active_files) == set(retained["active_files"]) | {admission.OWNER}
+    selected.check_explicit(ROOT, (admission.OWNER,))
+    expected = hashlib.sha256(raw + b"\0" + (ROOT / admission.ADDITION).read_bytes()).hexdigest()
+    assert selected.manifest_sha256 == expected
+
+
+@pytest.mark.parametrize(
+    "change",
+    [
+        "none",
+        "source",
+        "test",
+        "record",
+        "missing_record",
+        "missing_source",
+        "missing_test",
+        "runtime",
+        "cutover",
+        "all_markers_missing",
+    ],
+)
+def test_precision_addition_requires_complete_exact_source_tuple(
+    tmp_path: Path, change: str
+) -> None:
+    from scripts import milli_inch_test_admission as admission
+
+    for name in (admission.ADDITION, admission.MANIFEST, admission.SOURCE, admission.OWNER):
+        target = tmp_path / name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes((ROOT / name).read_bytes())
+    retained = admission.RETAINED_CUTOVER_SHA256
+    if change in {"source", "test", "record"}:
+        name = {"source": admission.SOURCE, "test": admission.OWNER, "record": admission.ADDITION}[
+            change
+        ]
+        target = tmp_path / name
+        target.write_bytes(target.read_bytes() + b"\n")
+    elif change in {"missing_source", "missing_test", "missing_record"}:
+        name = {
+            "missing_source": admission.SOURCE,
+            "missing_test": admission.OWNER,
+            "missing_record": admission.ADDITION,
+        }[change]
+        (tmp_path / name).unlink()
+    elif change == "runtime":
+        target = tmp_path / admission.MANIFEST
+        manifest = json.loads(target.read_bytes())
+        manifest["fingerprint"] = "0" * 64
+        target.write_text(json.dumps(manifest))
+    elif change == "cutover":
+        retained = "0" * 64
+    elif change == "all_markers_missing":
+        for name in (admission.ADDITION, admission.SOURCE, admission.OWNER):
+            (tmp_path / name).unlink()
+    if change == "none":
+        addition = admission.precision_test_addition(tmp_path, retained)
+        assert addition is not None
+        assert set(addition[0]) == {admission.OWNER}
+    else:
+        with pytest.raises(SystemExit):
+            admission.precision_test_addition(tmp_path, retained)
+
+
+def test_precision_addition_does_not_reclassify_retained_snapshots(tmp_path: Path) -> None:
+    from scripts import milli_inch_test_admission as admission
+
+    assert admission.precision_test_addition(tmp_path, "retained-fixture") is None
+    manifest = tmp_path / admission.MANIFEST
+    manifest.parent.mkdir(parents=True)
+    manifest.write_text(json.dumps({"fingerprint": "c8f161f64399546b"}))
+    assert admission.precision_test_addition(tmp_path, "retained-fixture") is None
+
+
 def test_duration_dispatch_balances_actual_initial_worksteal_chunks() -> None:
     assert sharding.duration_worksteal_order(
         ("tests/rounded.py::case",), workers=4, selector_seconds={"tests/rounded.py": 0.0}
@@ -682,11 +762,11 @@ def test_cached_function_spans_match_python_ast_with_unicode(newline: str, tmp_p
     source = newline.join(
         (
             "@decorator",
-            'def first(): return "é" # trailing comment',
+            'def first(): return "Ã©" # trailing comment',
             "",
             "def second():",
-            '    """λ\fretained"""',
-            '    return "好"',
+            '    """Î»\fretained"""',
+            '    return "å¥½"',
             "",
         )
     )
@@ -857,6 +937,8 @@ def test_cutover_real_pytest_cli_does_not_bypass_explicit_file_guard(
     for name in (
         "scripts/__init__.py",
         "scripts/build_test_shards.py",
+        "scripts/behavioral_selection_members.py",
+        "scripts/milli_inch_test_admission.py",
         "tests/conftest.py",
         "tests/timing_plugin.py",
         "tests/__init__.py",
@@ -905,6 +987,8 @@ def test_cutover_real_cli_rejects_naming_override(cutover_root: Path) -> None:
     for name in (
         "scripts/__init__.py",
         "scripts/build_test_shards.py",
+        "scripts/behavioral_selection_members.py",
+        "scripts/milli_inch_test_admission.py",
         "tests/conftest.py",
         "tests/timing_plugin.py",
         "tests/__init__.py",
