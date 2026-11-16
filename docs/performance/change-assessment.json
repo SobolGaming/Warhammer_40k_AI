@@ -836,6 +836,16 @@
         }
       }
     },
+    "tests/rules/section07/coverage.json": {
+      "before_sha256": "b3a4a396df256a02435c92423742206b1f4b1a9ca3793e5a799cef189bd7eb69",
+      "after_sha256": "1360afbfb585d576674a18748e6f91b4b5d1a399d44862f0bcadf51db7a99cb1",
+      "owners": {
+        "@document": {
+          "before": "b3a4a396df256a02435c92423742206b1f4b1a9ca3793e5a799cef189bd7eb69",
+          "after": "1360afbfb585d576674a18748e6f91b4b5d1a399d44862f0bcadf51db7a99cb1"
+        }
+      }
+    },
     "tests/support/cavalcade_native_charge.py": {
       "before_sha256": null,
       "after_sha256": "f717b45454379d0ea090d671a8acd3959009c73e5097fd5a75e73e53f45f6232",
@@ -970,82 +980,82 @@
       "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "category": "measured_workload",
+      "category": "serialization_or_replay_work",
       "operations": [
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Preserve the finite packed-formation operator repair and authenticate the new runtime using a fresh complete covered source/phase profile. Historical readers remain exercised against exact static input data with current validator code. Retain all old selectors in place and add only the authority test file; no allocation search, timing-limit change, historical rewrite or speedup claim.",
+      "rationale": "Regenerate the existing external contract examples and manifest for the added authority modules' engine build ID. Public schemas, protocol versions and wire shapes remain unchanged. Generated identity/hash values do not change existing contract source-reuse work; no speed comparison or performance improvement is claimed. The real serial smoke and contract/client/package checks remain required.",
       "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
       "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "category": "measured_workload",
+      "category": "serialization_or_replay_work",
       "operations": [
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Preserve the finite packed-formation operator repair and authenticate the new runtime using a fresh complete covered source/phase profile. Historical readers remain exercised against exact static input data with current validator code. Retain all old selectors in place and add only the authority test file; no allocation search, timing-limit change, historical rewrite or speedup claim.",
+      "rationale": "Regenerate the existing external contract examples and manifest for the added authority modules' engine build ID. Public schemas, protocol versions and wire shapes remain unchanged. Generated identity/hash values do not change existing contract source-reuse work; no speed comparison or performance improvement is claimed. The real serial smoke and contract/client/package checks remain required.",
       "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
       "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "category": "measured_workload",
+      "category": "serialization_or_replay_work",
       "operations": [
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Preserve the finite packed-formation operator repair and authenticate the new runtime using a fresh complete covered source/phase profile. Historical readers remain exercised against exact static input data with current validator code. Retain all old selectors in place and add only the authority test file; no allocation search, timing-limit change, historical rewrite or speedup claim.",
+      "rationale": "Regenerate the existing external contract examples and manifest for the added authority modules' engine build ID. Public schemas, protocol versions and wire shapes remain unchanged. Generated identity/hash values do not change existing contract source-reuse work; no speed comparison or performance improvement is claimed. The real serial smoke and contract/client/package checks remain required.",
       "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
       "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "category": "measured_workload",
+      "category": "serialization_or_replay_work",
       "operations": [
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Preserve the finite packed-formation operator repair and authenticate the new runtime using a fresh complete covered source/phase profile. Historical readers remain exercised against exact static input data with current validator code. Retain all old selectors in place and add only the authority test file; no allocation search, timing-limit change, historical rewrite or speedup claim.",
+      "rationale": "Regenerate the existing external contract examples and manifest for the added authority modules' engine build ID. Public schemas, protocol versions and wire shapes remain unchanged. Generated identity/hash values do not change existing contract source-reuse work; no speed comparison or performance improvement is claimed. The real serial smoke and contract/client/package checks remain required.",
       "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
       "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "category": "measured_workload",
+      "category": "serialization_or_replay_work",
       "operations": [
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Preserve the finite packed-formation operator repair and authenticate the new runtime using a fresh complete covered source/phase profile. Historical readers remain exercised against exact static input data with current validator code. Retain all old selectors in place and add only the authority test file; no allocation search, timing-limit change, historical rewrite or speedup claim.",
+      "rationale": "Regenerate the existing external contract examples and manifest for the added authority modules' engine build ID. Public schemas, protocol versions and wire shapes remain unchanged. Generated identity/hash values do not change existing contract source-reuse work; no speed comparison or performance improvement is claimed. The real serial smoke and contract/client/package checks remain required.",
       "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
       "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "category": "measured_workload",
+      "category": "serialization_or_replay_work",
       "operations": [
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Preserve the finite packed-formation operator repair and authenticate the new runtime using a fresh complete covered source/phase profile. Historical readers remain exercised against exact static input data with current validator code. Retain all old selectors in place and add only the authority test file; no allocation search, timing-limit change, historical rewrite or speedup claim.",
+      "rationale": "Regenerate the existing external contract examples and manifest for the added authority modules' engine build ID. Public schemas, protocol versions and wire shapes remain unchanged. Generated identity/hash values do not change existing contract source-reuse work; no speed comparison or performance improvement is claimed. The real serial smoke and contract/client/package checks remain required.",
       "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
       "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
     },
     "contracts/examples/support-profile.json": {
-      "category": "measured_workload",
+      "category": "serialization_or_replay_work",
       "operations": [
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Preserve the finite packed-formation operator repair and authenticate the new runtime using a fresh complete covered source/phase profile. Historical readers remain exercised against exact static input data with current validator code. Retain all old selectors in place and add only the authority test file; no allocation search, timing-limit change, historical rewrite or speedup claim.",
+      "rationale": "Regenerate the existing external contract examples and manifest for the added authority modules' engine build ID. Public schemas, protocol versions and wire shapes remain unchanged. Generated identity/hash values do not change existing contract source-reuse work; no speed comparison or performance improvement is claimed. The real serial smoke and contract/client/package checks remain required.",
       "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
       "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
     },
     "contracts/manifest.json": {
-      "category": "measured_workload",
+      "category": "serialization_or_replay_work",
       "operations": [
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Preserve the finite packed-formation operator repair and authenticate the new runtime using a fresh complete covered source/phase profile. Historical readers remain exercised against exact static input data with current validator code. Retain all old selectors in place and add only the authority test file; no allocation search, timing-limit change, historical rewrite or speedup claim.",
+      "rationale": "Regenerate the existing external contract examples and manifest for the added authority modules' engine build ID. Public schemas, protocol versions and wire shapes remain unchanged. Generated identity/hash values do not change existing contract source-reuse work; no speed comparison or performance improvement is claimed. The real serial smoke and contract/client/package checks remain required.",
       "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
       "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
     },
@@ -1248,6 +1258,16 @@
       ],
       "selected_families": [],
       "rationale": "Add a separately configured complete AdapterGameSession process authority and strict profile-bound persistence envelopes. The actual base has no such API, so no matched speed comparison or unchanged new-mode cost is claimed. Four frozen native continuation/reciprocal restore/full replay operations complete in 791-800 seconds under the existing 900-second qualification cap. Native host session work is unchanged; the required serial runtime smoke remains mandatory.",
+      "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
+      "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
+    },
+    "tests/rules/section07/coverage.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "qualification40-exact-b6886d3bc2fb1ca4"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh only the current README authentication digest after documenting the selected Linux authority. Append the maintenance explanation and preserve all historical authenticated inputs, literal captures and gameplay obligation mappings. This repairs the demonstrated source-authentication test failure; no source-loading algorithm, existing test body or measured gameplay changes.",
       "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
       "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
     },
