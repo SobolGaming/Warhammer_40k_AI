@@ -35,13 +35,22 @@ def load_assignment(
     history: HistoricalSnapshot,
 ) -> tuple[tuple[tuple[str, ...], ...], dict[str, object]]:
     from scripts.build_test_shards import SERIAL_BEHAVIORAL_CASE
+    from scripts.linux_authority_shard_admission import (
+        ASSIGNMENT_FILE as AUTHORITY_ASSIGNMENT_FILE,
+    )
+    from scripts.linux_authority_shard_admission import (
+        SCHEMA as AUTHORITY_SCHEMA,
+    )
+
+    authority = descriptor["schema"] == AUTHORITY_SCHEMA
+    filename = AUTHORITY_ASSIGNMENT_FILE if authority else FILENAME
 
     reference = _object(
         descriptor["assignment"], {"file", "sha256"}, "derived assignment reference"
     )
-    path = directory / FILENAME
+    path = directory / filename
     if (
-        reference["file"] != FILENAME
+        reference["file"] != filename
         or hashlib.sha256(path.read_bytes()).hexdigest() != reference["sha256"]
     ):
         raise SystemExit("Derived current assignment evidence changed.")
@@ -82,7 +91,7 @@ def load_assignment(
     expected = Counter(selector for group in history.groups for selector in group)
     expected.update(owners)
     selected = Counter(selector for group in groups for selector in group)
-    if selected != expected or len(selected) != 508:
+    if selected != expected or len(selected) != (509 if authority else 508):
         raise SystemExit("Derived current assignment selector inventory differs.")
     extension = history.scope.extension
     assert extension is not None

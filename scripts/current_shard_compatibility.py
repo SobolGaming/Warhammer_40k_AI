@@ -123,9 +123,12 @@ NEW_NODES |= frozenset(
 
 
 def enabled(directory: Path, summary: dict[str, object] | None = None) -> bool:
+    from scripts.linux_authority_shard_admission import BASELINE_FILE as AUTHORITY_BASELINE_FILE
+
     declared = (directory / FILENAME).is_file()
     if not declared and (
         (directory / BASELINE_FILE).is_file()
+        or (directory / AUTHORITY_BASELINE_FILE).is_file()
         or (
             summary is not None
             and (
@@ -142,10 +145,28 @@ def enabled(directory: Path, summary: dict[str, object] | None = None) -> bool:
 def _baseline(
     root: Path, directory: Path, descriptor: dict[str, object], history: HistoricalSnapshot
 ) -> dict[str, object]:
+    from scripts.linux_authority_shard_admission import (
+        BASELINE_FILE as AUTHORITY_BASELINE_FILE,
+    )
+    from scripts.linux_authority_shard_admission import (
+        NODES as AUTHORITY_NODES,
+    )
+    from scripts.linux_authority_shard_admission import (
+        OWNER as AUTHORITY_OWNER,
+    )
+    from scripts.linux_authority_shard_admission import (
+        SCHEMA as AUTHORITY_SCHEMA,
+    )
+    from scripts.linux_authority_shard_admission import (
+        retained_test_transition,
+    )
+
+    authority = descriptor["schema"] == AUTHORITY_SCHEMA
+    filename = AUTHORITY_BASELINE_FILE if authority else BASELINE_FILE
     reference = _object(descriptor["baseline"], {"file", "sha256"}, "current baseline reference")
-    path = directory / BASELINE_FILE
+    path = directory / filename
     if (
-        reference["file"] != BASELINE_FILE
+        reference["file"] != filename
         or hashlib.sha256(path.read_bytes()).hexdigest() != reference["sha256"]
     ):
         raise SystemExit("Current baseline evidence changed.")
@@ -202,14 +223,18 @@ def _baseline(
         {node.split("::", 1)[0] for node in cases.keys() - history.baseline.keys()},
         "new test source inventory",
     )
+    expected_additions = NEW_NODES | (AUTHORITY_NODES if authority else frozenset())
+    expected_owners = {NEW_OWNER, CONNECTED_OWNER, ESCAPE_OWNER, NATIVE_PREFIX_OWNER}
+    if authority:
+        expected_owners.add(AUTHORITY_OWNER)
     if (
-        cases.keys() != history.baseline.keys() | NEW_NODES
+        cases.keys() != history.baseline.keys() | expected_additions
         or not history.baseline.keys() < cases.keys()
-        or len(cases) - len(history.baseline) != 49
-        or set(additions) != {NEW_OWNER, CONNECTED_OWNER, ESCAPE_OWNER, NATIVE_PREFIX_OWNER}
+        or len(cases) - len(history.baseline) != len(expected_additions)
+        or set(additions) != expected_owners
         or set(additions) & {node.split("::", 1)[0] for node in history.baseline}
     ):
-        raise SystemExit("Compatibility requires exactly the reviewed forty-nine added cases.")
+        raise SystemExit("Compatibility requires exactly the reviewed added cases for its profile.")
     owners = {node.split("::", 1)[0] for node in cases}
     sources = _object(data["test_sources"], owners, "current test source inventory")
     try:
@@ -235,9 +260,13 @@ def _baseline(
             from scripts.boolean_los_admission import SCHEMA as BOOLEAN_SCHEMA
             from scripts.boolean_los_admission import transitioned_test
 
-            if descriptor["schema"] != BOOLEAN_SCHEMA or not transitioned_test(
-                root, owner, current, (history.root / owner).read_bytes()
-            ):
+            accepted = (
+                retained_test_transition(root, owner, current, (history.root / owner).read_bytes())
+                if authority
+                else descriptor["schema"] == BOOLEAN_SCHEMA
+                and transitioned_test(root, owner, current, (history.root / owner).read_bytes())
+            )
+            if not accepted:
                 raise SystemExit("Historical test source changed across compatibility boundary.")
     from scripts.build_test_shards import summary_case_seconds
 
@@ -308,9 +337,11 @@ class Plan:
 def plan(root: Path, directory: Path, cases: dict[str, float]) -> Plan:
     from scripts.boolean_los_admission import SCHEMA as BOOLEAN_SCHEMA
     from scripts.extended_shard_allocation import partial_projection
+    from scripts.linux_authority_shard_admission import SCHEMA as AUTHORITY_SCHEMA
 
     declared = read_json(directory / FILENAME)
     fresh = isinstance(declared, dict) and declared.get("schema") == BOOLEAN_SCHEMA
+    authority = isinstance(declared, dict) and declared.get("schema") == AUTHORITY_SCHEMA
 
     descriptor = _object(
         declared,
@@ -324,13 +355,13 @@ def plan(root: Path, directory: Path, cases: dict[str, float]) -> Plan:
             "native_serial_role",
             "planning_policy",
         }
-        | ({"fresh_evidence"} if fresh else set()),
+        | ({"fresh_evidence"} if fresh or authority else set()),
         "runtime compatibility",
     )
     from scripts.current_shard_assignment import current_planning_policy
 
     if (
-        descriptor["schema"] not in {SCHEMA, BOOLEAN_SCHEMA}
+        descriptor["schema"] not in {SCHEMA, BOOLEAN_SCHEMA, AUTHORITY_SCHEMA}
         or descriptor["historical_revision"] != HISTORICAL_REVISION
     ):
         raise SystemExit("Unreviewed scheduling compatibility boundary.")
@@ -345,12 +376,21 @@ def plan(root: Path, directory: Path, cases: dict[str, float]) -> Plan:
             )
         from scripts.current_native_serial_role import load_native_serial_role
 
-        native_role = load_native_serial_role(
-            root,
-            directory,
-            descriptor["native_serial_role"],
-            frozenset(node for node in NEW_NODES if node.startswith(NATIVE_PREFIX_OWNER + "::")),
+        expected_native = frozenset(
+            node for node in NEW_NODES if node.startswith(NATIVE_PREFIX_OWNER + "::")
         )
+        if authority:
+            from scripts.current_native_serial_role import NativeSerialRole
+            from scripts.linux_authority_shard_admission import current_native_role
+
+            seconds, native_metadata = current_native_role(
+                root, directory, descriptor, data, expected_native
+            )
+            native_role = NativeSerialRole(None, seconds, native_metadata)
+        else:
+            native_role = load_native_serial_role(
+                root, directory, descriptor["native_serial_role"], expected_native
+            )
         if fresh:
             from scripts.boolean_los_admission import fresh_native_role
             from scripts.current_native_serial_role import NativeSerialRole
@@ -405,6 +445,10 @@ def plan(root: Path, directory: Path, cases: dict[str, float]) -> Plan:
         from scripts.current_shard_assignment import load_assignment, require_planning_limits
 
         groups, assignment = load_assignment(directory, descriptor, history)
+        if authority:
+            from scripts.linux_authority_shard_admission import require_frozen_assignment
+
+            require_frozen_assignment(root, groups)
         if fresh:
             from scripts.boolean_los_admission import BASE
             from scripts.build_test_shards import SERIAL_BEHAVIORAL_CASE

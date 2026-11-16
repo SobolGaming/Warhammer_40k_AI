@@ -302,8 +302,8 @@ uv run pytest tests/unit/test_phase10i_terrain_movement.py -q --no-cov
 
 Use `LinuxAuthority` when both clients must execute and replay with the same
 numerical runtime. Its `LinuxGameSession` implements `AdapterGameSession`; all
-rules, dice, choices, projections, saves and replay execute in the selected Linux
-process. Native `LocalGameSession` keeps its existing host behavior.
+rules, dice, choice validation and mutation, projections, saves and replay execute
+in the selected Linux process. Native `LocalGameSession` keeps its existing host behavior.
 
 Provision the trusted Linux checkout and locked Python environment first. On Linux,
 the executor command is:

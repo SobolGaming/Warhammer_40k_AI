@@ -101,7 +101,7 @@ def source_paths(root: Path) -> set[str]:
 
 @dataclass(frozen=True)
 class NativeSerialRole:
-    seconds: float
+    seconds: float | None
     with_mirror_seconds: float
     metadata: dict[str, object]
 

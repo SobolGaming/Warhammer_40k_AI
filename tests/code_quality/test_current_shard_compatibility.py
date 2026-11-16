@@ -1,3 +1,9 @@
+"""Retained pre-authority profile controls, evaluated with current validators.
+
+The live Linux-authority profile has separate source/phase admission controls.
+Historical measurement inputs are static data, never imported or executed.
+"""
+
 from __future__ import annotations
 
 import copy
@@ -7,7 +13,7 @@ import shutil
 import subprocess
 import sys
 import xml.etree.ElementTree as ET
-from collections.abc import Iterator
+from collections.abc import Generator, Iterator
 from pathlib import Path
 from typing import cast
 
@@ -31,13 +37,50 @@ from scripts.historical_shard_snapshot import (
 from scripts.shard_execution_model import Cohort, load_cohorts
 from tools.performance_policy import canonical_digest, runtime_inputs
 
+from tests.support.retained_authority_sources import materialize_retained_sources
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.engine.battlefield_state import ModelPlacement, geometry_model_for_placement
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.geometry.volume import Model
 
-ROOT = Path(__file__).resolve().parents[2]
+SOURCE_ROOT = Path(__file__).resolve().parents[2]
+ROOT = SOURCE_ROOT
 DIRECTORY = ROOT / "ci/test_shards"
+
+
+@pytest.fixture(scope="module", autouse=True)
+def retained_source_context(tmp_path_factory: pytest.TempPathFactory) -> Generator[None]:
+    from scripts import boolean_los_admission as transition
+    from scripts import current_native_serial_role as native
+    from scripts.linux_authority_shard_admission import validate_retained_boolean_sources
+
+    snapshot = tmp_path_factory.mktemp("retained-pre-authority")
+    materialize_retained_sources(SOURCE_ROOT, snapshot)
+    assert str(snapshot) not in sys.path
+    live_validation = transition.validate_transition
+    live_paths = native.source_paths
+
+    def source_paths(root: Path) -> set[str]:
+        if root.resolve() == snapshot.resolve():
+            # Current source discovery is code-relative. Rebase only its data
+            # paths; producer bytes remain independently authenticated below.
+            return {name.replace("\\", "/") for name in live_paths(SOURCE_ROOT)}
+        return live_paths(root)
+
+    def validate_source_context(root: Path) -> None:
+        if root.resolve() == snapshot.resolve():
+            validate_retained_boolean_sources(root)
+        else:
+            live_validation(root)
+
+    with pytest.MonkeyPatch.context() as context:
+        context.setattr(sys.modules[__name__], "ROOT", snapshot)
+        context.setattr(sys.modules[__name__], "DIRECTORY", snapshot / "ci/test_shards")
+        context.setattr(sharding, "REPOSITORY_ROOT", snapshot)
+        context.setattr(sharding, "TESTS_ROOT", snapshot / "tests")
+        context.setattr(transition, "validate_transition", validate_source_context)
+        context.setattr(native, "source_paths", source_paths)
+        yield
 
 
 @pytest.fixture(scope="module")
@@ -174,8 +217,28 @@ def test_generator_checker_and_live_dispatch_use_same_current_costs(
     summary, plan = admitted
     assert sharding.dispatch_case_seconds(summary, DIRECTORY / "durations.json") == plan.dispatch
     subprocess.run(
-        [sys.executable, "-B", "scripts/build_test_shards.py", "--check", "--shard-count", "12"],
-        cwd=ROOT,
+        [
+            sys.executable,
+            "-B",
+            "-c",
+            "import sys; from pathlib import Path; sys.path.insert(0, sys.argv[1]); "
+            "from scripts import build_test_shards as s; "
+            "from scripts import boolean_los_admission as b, current_native_serial_role as n; "
+            "from scripts.linux_authority_shard_admission "
+            "import validate_retained_boolean_sources; "
+            "live=b.validate_transition; data=Path(sys.argv[2]).resolve(); "
+            "b.validate_transition=lambda p: validate_retained_boolean_sources(p) "
+            "if p.resolve()==data else live(p); "
+            "paths=n.source_paths; source=Path(sys.argv[1]); "
+            "n.source_paths=lambda p: {v.replace(chr(92),'/') for v in paths(source)} "
+            "if p.resolve()==data else paths(p); "
+            "s.REPOSITORY_ROOT=Path(sys.argv[2]); s.TESTS_ROOT=s.REPOSITORY_ROOT/'tests'; "
+            "sys.argv=['current-retained-check','--check','--shard-count','12',"
+            "'--output-dir',str(s.REPOSITORY_ROOT/'ci/test_shards')]; raise SystemExit(s.main())",
+            str(SOURCE_ROOT),
+            str(ROOT),
+        ],
+        cwd=SOURCE_ROOT,
         check=True,
         timeout=180,
     )
@@ -557,7 +620,7 @@ def test_source_bootstrap_preserves_history_for_shared_historical_clones(tmp_pat
     scripts = checkout / "scripts"
     scripts.mkdir()
     shutil.copyfile(
-        ROOT / "scripts/fetch_scheduling_sources.py", scripts / "fetch_scheduling_sources.py"
+        SOURCE_ROOT / "scripts/fetch_scheduling_sources.py", scripts / "fetch_scheduling_sources.py"
     )
     directory = checkout / "ci/test_shards"
     directory.mkdir(parents=True)

@@ -84,7 +84,7 @@ def test_executor_registration_requires_the_registered_profile_and_same_engine()
         validate_executor_profile(
             selected, expected={"other": True}, engine_build_id="selected-build"
         )
-    with pytest.raises(ExecutionProfileError, match="Unsupported.*schema"):
+    with pytest.raises(ExecutionProfileError, match=r"Unsupported.*schema"):
         validate_executor_profile({}, expected={}, engine_build_id="selected-build")
 
 

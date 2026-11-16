@@ -2758,3 +2758,28 @@ the Windows exact-restoration blocker. The accepted checkpoint hashes are
 (preserve) and
 `ddcf4f6357ff6d6f441e7e7a59eef13f38f51093b947358b3db1a28038005cd7`
 (screen). Both include every original rejected proposal.
+
+The owner's subsequent cross-OS repair uses an explicit selected Linux authority,
+with Windows/WSL and Linux clients sharing its exact registered execution profile.
+It preserves native host-local behavior and the original bytes of both historical
+inputs. Private profile-bound checkpoint/replay envelopes record explicit legacy
+enrollment provenance; a different engine build or registered profile fails closed.
+This implements the allowed Linux-authoritative route, rather than claiming native
+Windows and Linux numerical kernels now agree.
+
+On engine build `e2094d9cc44578f56a4998fe6b4a8d1ff248a30a31127bbd4c15f629a7ae11b7`,
+the four frozen qualification operations complete under their existing 900-second
+allowance: Windows preserve continuation/full replay (799.266 seconds), Linux
+screen continuation/full replay (797.207), Linux restore/full replay of the
+Windows-written preserve envelope (791.494), and Windows restore/full replay of
+the Linux-written screen envelope (794.263). All use registered profile hash
+`e762ef67837fa76b3f230d5bcf4cd405a2b4a1cb93281222b3d6f90f0a5da841`
+and frozen procedure SHA-256
+`24528bb31e2a8cfa8c1a1af05e8143aa893c45d851ad742c857d05c29193afb4`.
+Each accepted inner checkpoint equals the corresponding original-platform hash
+above, including both viewer projections/event histories, RNG state, model
+positions, wounds, equipment and resource costs. Both arms stop at the first Fight
+movement decision, before any Fight submission or attack. No dice, seed, retained
+history, replay comparison or charge-search limit changes. These finite
+cross-client proofs qualify the selected installation; complete current-source
+local/hosted gates and both independent final-head reviews remain required.
