@@ -67,3 +67,4 @@ tests/code_quality/test_current_shard_compatibility.py
 tests/code_quality/test_linux_authority_shard_admission.py
 tests/code_quality/test_milli_inch_shard_admission.py
 tests/code_quality/test_precision_profile_shard_admission.py
+tests/code_quality/test_symbolic_milli_inch_shard_admission.py

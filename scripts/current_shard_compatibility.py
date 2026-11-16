@@ -126,6 +126,7 @@ def enabled(directory: Path, summary: dict[str, object] | None = None) -> bool:
     from scripts.linux_authority_shard_admission import BASELINE_FILE as AUTHORITY_BASELINE_FILE
     from scripts.milli_inch_shard_admission import BASELINE_FILE as MILLI_BASELINE_FILE
     from scripts.precision_profile_shard_admission import BASELINE_FILE as PROFILE_BASELINE_FILE
+    from scripts.symbolic_milli_inch_shard_admission import BASELINE_FILE as SYMBOLIC_BASELINE_FILE
 
     declared = (directory / FILENAME).is_file()
     if not declared and (
@@ -133,6 +134,7 @@ def enabled(directory: Path, summary: dict[str, object] | None = None) -> bool:
         or (directory / AUTHORITY_BASELINE_FILE).is_file()
         or (directory / MILLI_BASELINE_FILE).is_file()
         or (directory / PROFILE_BASELINE_FILE).is_file()
+        or (directory / SYMBOLIC_BASELINE_FILE).is_file()
         or (
             summary is not None
             and (
@@ -172,12 +174,24 @@ def _baseline(
     from scripts.precision_profile_shard_admission import NODES as PROFILE_NODES
     from scripts.precision_profile_shard_admission import OWNER as PROFILE_OWNER
     from scripts.precision_profile_shard_admission import SCHEMA as PROFILE_SCHEMA
+    from scripts.symbolic_milli_inch_shard_admission import BASELINE_FILE as SYMBOLIC_BASELINE_FILE
+    from scripts.symbolic_milli_inch_shard_admission import NODES as SYMBOLIC_NODES
+    from scripts.symbolic_milli_inch_shard_admission import OWNER as SYMBOLIC_OWNER
+    from scripts.symbolic_milli_inch_shard_admission import SCHEMA as SYMBOLIC_SCHEMA
 
-    profile = descriptor["schema"] == PROFILE_SCHEMA
-    milli = descriptor["schema"] in {MILLI_SCHEMA, PROFILE_SCHEMA}
-    authority = descriptor["schema"] in {AUTHORITY_SCHEMA, MILLI_SCHEMA, PROFILE_SCHEMA}
+    symbolic = descriptor["schema"] == SYMBOLIC_SCHEMA
+    profile = descriptor["schema"] in {PROFILE_SCHEMA, SYMBOLIC_SCHEMA}
+    milli = descriptor["schema"] in {MILLI_SCHEMA, PROFILE_SCHEMA, SYMBOLIC_SCHEMA}
+    authority = descriptor["schema"] in {
+        AUTHORITY_SCHEMA,
+        MILLI_SCHEMA,
+        PROFILE_SCHEMA,
+        SYMBOLIC_SCHEMA,
+    }
     filename = (
-        PROFILE_BASELINE_FILE
+        SYMBOLIC_BASELINE_FILE
+        if symbolic
+        else PROFILE_BASELINE_FILE
         if profile
         else MILLI_BASELINE_FILE
         if milli
@@ -253,6 +267,9 @@ def _baseline(
     if profile:
         expected_additions |= PROFILE_NODES
         expected_owners.add(PROFILE_OWNER)
+    if symbolic:
+        expected_additions |= SYMBOLIC_NODES
+        expected_owners.add(SYMBOLIC_OWNER)
     if (
         cases.keys() != history.baseline.keys() | expected_additions
         or not history.baseline.keys() < cases.keys()
@@ -372,12 +389,14 @@ def plan(root: Path, directory: Path, cases: dict[str, float]) -> Plan:
     from scripts.linux_authority_shard_admission import SCHEMA as AUTHORITY_SCHEMA
     from scripts.milli_inch_shard_admission import SCHEMA as MILLI_SCHEMA
     from scripts.precision_profile_shard_admission import SCHEMA as PROFILE_SCHEMA
+    from scripts.symbolic_milli_inch_shard_admission import SCHEMA as SYMBOLIC_SCHEMA
 
     declared = read_json(directory / FILENAME)
     fresh = isinstance(declared, dict) and declared.get("schema") == BOOLEAN_SCHEMA
     authority = isinstance(declared, dict) and declared.get("schema") == AUTHORITY_SCHEMA
     milli = isinstance(declared, dict) and declared.get("schema") == MILLI_SCHEMA
     profile = isinstance(declared, dict) and declared.get("schema") == PROFILE_SCHEMA
+    symbolic = isinstance(declared, dict) and declared.get("schema") == SYMBOLIC_SCHEMA
 
     descriptor = _object(
         declared,
@@ -391,14 +410,21 @@ def plan(root: Path, directory: Path, cases: dict[str, float]) -> Plan:
             "native_serial_role",
             "planning_policy",
         }
-        | ({"fresh_evidence"} if fresh or authority or milli or profile else set()),
+        | ({"fresh_evidence"} if fresh or authority or milli or profile or symbolic else set()),
         "runtime compatibility",
     )
     from scripts.current_shard_assignment import current_planning_policy
 
     if (
         descriptor["schema"]
-        not in {SCHEMA, BOOLEAN_SCHEMA, AUTHORITY_SCHEMA, MILLI_SCHEMA, PROFILE_SCHEMA}
+        not in {
+            SCHEMA,
+            BOOLEAN_SCHEMA,
+            AUTHORITY_SCHEMA,
+            MILLI_SCHEMA,
+            PROFILE_SCHEMA,
+            SYMBOLIC_SCHEMA,
+        }
         or descriptor["historical_revision"] != HISTORICAL_REVISION
     ):
         raise SystemExit("Unreviewed scheduling compatibility boundary.")
@@ -416,7 +442,17 @@ def plan(root: Path, directory: Path, cases: dict[str, float]) -> Plan:
         expected_native = frozenset(
             node for node in NEW_NODES if node.startswith(NATIVE_PREFIX_OWNER + "::")
         )
-        if profile:
+        if symbolic:
+            from scripts.current_native_serial_role import NativeSerialRole
+            from scripts.symbolic_milli_inch_shard_admission import (
+                current_native_role as symbolic_role,
+            )
+
+            seconds, native_metadata = symbolic_role(
+                root, directory, descriptor, data, expected_native
+            )
+            native_role = NativeSerialRole(None, seconds, native_metadata)
+        elif profile:
             from scripts.current_native_serial_role import NativeSerialRole
             from scripts.precision_profile_shard_admission import (
                 current_native_role as profile_role,
@@ -500,6 +536,12 @@ def plan(root: Path, directory: Path, cases: dict[str, float]) -> Plan:
         from scripts.current_shard_assignment import load_assignment, require_planning_limits
 
         groups, assignment = load_assignment(directory, descriptor, history)
+        if symbolic:
+            from scripts.symbolic_milli_inch_shard_admission import (
+                require_frozen_assignment as require_symbolic_assignment,
+            )
+
+            require_symbolic_assignment(root, groups)
         if profile:
             from scripts.precision_profile_shard_admission import (
                 require_frozen_assignment as require_profile_assignment,

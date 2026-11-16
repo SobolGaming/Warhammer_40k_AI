@@ -774,11 +774,11 @@ def test_cached_function_spans_match_python_ast_with_unicode(newline: str, tmp_p
     source = newline.join(
         (
             "@decorator",
-            'def first(): return "é" # trailing comment',
+            'def first(): return "Ã©" # trailing comment',
             "",
             "def second():",
-            '    """λ\fretained"""',
-            '    return "好"',
+            '    """Î»\fretained"""',
+            '    return "å¥½"',
             "",
         )
     )
@@ -952,6 +952,7 @@ def test_cutover_real_pytest_cli_does_not_bypass_explicit_file_guard(
         "scripts/behavioral_selection_members.py",
         "scripts/milli_inch_test_admission.py",
         "scripts/precision_profile_test_admission.py",
+        "scripts/symbolic_milli_inch_test_admission.py",
         "tests/conftest.py",
         "tests/timing_plugin.py",
         "tests/__init__.py",
@@ -1003,6 +1004,7 @@ def test_cutover_real_cli_rejects_naming_override(cutover_root: Path) -> None:
         "scripts/behavioral_selection_members.py",
         "scripts/milli_inch_test_admission.py",
         "scripts/precision_profile_test_admission.py",
+        "scripts/symbolic_milli_inch_test_admission.py",
         "tests/conftest.py",
         "tests/timing_plugin.py",
         "tests/__init__.py",
