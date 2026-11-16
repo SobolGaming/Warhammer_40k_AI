@@ -97,23 +97,27 @@ def verify_complete_covered_profile(
     workers_value = record["parallel_workers"]
     if not isinstance(workers_value, dict) or workers_value.keys() != {f"gw{i}" for i in range(32)}:
         raise SystemExit("Fresh covered profile requires exactly 32 parallel workers.")
-    workers = {name: json.loads(artifact_text(value)) for name, value in workers_value.items()}
+    workers = {
+        name: cast(dict[str, object], json.loads(artifact_text(value)))
+        for name, value in cast(dict[str, object], workers_value).items()
+    }
     phases: dict[tuple[str, str], float] = {}
     for name, worker in {"serial": serial, **workers}.items():
         is_serial = name == "serial"
         expected = set(serial_nodes) if is_serial else parallel_nodes
-        collected = worker.get("collected_nodeids")
+        collected_value = worker.get("collected_nodeids")
+        collected = cast(list[str], collected_value)
         if (
             worker.get("worker_count") != ("1" if is_serial else "32")
             or worker.get("worker") != ("gw0" if is_serial else name)
             or worker.get("exit_status") != 0
-            or not isinstance(collected, list)
+            or not isinstance(collected_value, list)
             or len(collected) != len(expected)
             or set(collected) != expected
             or (is_serial and collected != serial_nodes)
         ):
             raise SystemExit("Fresh covered worker or collection inventory differs.")
-        for value in worker["reports"]:
+        for value in cast(list[object], worker["reports"]):
             row = _object(value, {"nodeid", "phase", "seconds", "outcome"}, "fresh covered phase")
             node, phase = str(row["nodeid"]), str(row["phase"])
             if (

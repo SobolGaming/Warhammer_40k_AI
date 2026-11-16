@@ -208,7 +208,7 @@
     },
     "scripts/complete_covered_evidence.py": {
       "before_sha256": null,
-      "after_sha256": "c1c464b846a21f2ecfc310e52a48775137c80dcaee91703baddd8b67c4eed75d",
+      "after_sha256": "b32be4977ad1ccadc11c083d6bbb01ffc4d28f54a9e79eb01e720560cf388837",
       "owners": {
         "@module": {
           "before": null,
@@ -220,7 +220,7 @@
         },
         "verify_complete_covered_profile": {
           "before": null,
-          "after": "0e7adb6a862c4ea8f64ea9c7c5e71fe41bfe8059ba67e68e903ad908d54a836f"
+          "after": "8a3a4436e737c5724722a4e51667ec9f05445b87d9ab38cecd89a94b74e2a307"
         }
       }
     },
@@ -274,7 +274,7 @@
     },
     "scripts/linux_authority_shard_admission.py": {
       "before_sha256": null,
-      "after_sha256": "65ffe76acfab5d86384e56c0fe8ce7fa593468958b401a5d25ae884b83294fa8",
+      "after_sha256": "3220f3848811df565efcbe933fbed5538edb72c188dfe4050da7354e4e6b9868",
       "owners": {
         "@module": {
           "before": null,
@@ -298,7 +298,7 @@
         },
         "retained_native_inventory": {
           "before": null,
-          "after": "3ad98ae5ca8f6048de86df38228d64c6cf260429beb50dac3fdf5cdf503ec444"
+          "after": "54b805423315a70c32f29b681be5ddcc20439ad91131dc8a2458afeeecc2ffbb"
         },
         "retained_test_transition": {
           "before": null,
@@ -700,7 +700,7 @@
     },
     "tests/code_quality/test_current_shard_compatibility.py": {
       "before_sha256": "017ea13da6b7bff94f1bda7edf700e3cdae8ccbe298c76b94edd8d419fa88c30",
-      "after_sha256": "768ad8453c607af2775f2d84c0c2c5523bdf83d677b96629d551d555c484945b",
+      "after_sha256": "7bbffa6172bcd3bbed6fd476f08be83dba715761d90a217114f399de60be3d23",
       "owners": {
         "@module": {
           "before": "872b4cd2346333a6d046dab5c4f9a8e32dec6a4db2f1adda8f37e8e4c4df1a96",
@@ -729,6 +729,10 @@
         "test_native_charge_whole_formation_preserves_clearance_and_real_budget": {
           "before": null,
           "after": "0e1211ed1d97fa0171ed416f59195739a398c5f88ed024de214912f3242361fa"
+        },
+        "test_native_serial_role_preserves_complete_phases_and_measurement_scope": {
+          "before": "9cffb7e572fd6ced404620b95aa03bff6dbbd8a99ab0911f9e352799163558db",
+          "after": "55b2e8b2e5eddca99650c0ba1a3ee790520cb6e457a021d687a13fb58b4e5435"
         },
         "test_original_producer_and_exact_reviewed_successor": {
           "before": null,
@@ -922,7 +926,7 @@
     },
     "tests/support/retained_authority_sources.py": {
       "before_sha256": null,
-      "after_sha256": "84b1e832fd7bf3702500fc6817c0e4df5b4724430db4579f054ddc1dd777c892",
+      "after_sha256": "e6a1bdc4013c59a0dc8f16a4a3c0b7dfc18792a9bee5827fa77a9ffcb6f99717",
       "owners": {
         "@module": {
           "before": null,
@@ -930,7 +934,7 @@
         },
         "materialize_retained_sources": {
           "before": null,
-          "after": "b21b7615495a09b46492330041290906efd76f3b64b4b86c21f1528857272772"
+          "after": "2c4c0ef4463310b85fdc6d2fb71cd48db11704c497599e5e1884a747a4e5862c"
         }
       }
     }

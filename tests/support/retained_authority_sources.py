@@ -24,8 +24,9 @@ def materialize_retained_sources(
         raise ValueError("Retained source destination must be a new empty test directory.")
     git = ["git", "-c", f"safe.directory={repository.as_posix()}"]
     common = subprocess.check_output(
-        [*git, "rev-parse", "--path-format=absolute", "--git-common-dir"], cwd=repository, text=True
+        [*git, "rev-parse", "--git-common-dir"], cwd=repository, text=True
     ).strip()
+    objects = (repository / common).resolve() / "objects"
     subprocess.run(["git", "init", "--quiet", str(destination)], check=True, timeout=30)
     subprocess.run(
         ["git", "config", "core.autocrlf", "false"], cwd=destination, check=True, timeout=30
@@ -35,7 +36,7 @@ def materialize_retained_sources(
     )
     metadata = destination / ".git"
     (metadata / "objects/info/alternates").write_text(
-        (Path(common) / "objects").as_posix() + "\n", encoding="utf-8", newline="\n"
+        objects.as_posix() + "\n", encoding="utf-8", newline="\n"
     )
     (metadata / "HEAD").write_text(revision + "\n", encoding="ascii", newline="\n")
     subprocess.run(["git", "read-tree", revision], cwd=destination, check=True, timeout=30)

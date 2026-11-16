@@ -144,10 +144,11 @@ def retained_native_inventory(
     standalone = cast(dict[str, object], cast(dict[str, object], old["observations"])["standalone"])
     raw = cast(dict[str, object], standalone["raw"])
     worker = json.loads(cast(str, cast(dict[str, object], raw["worker"])["text"]))
-    order = worker["collected_nodeids"]
-    if not isinstance(order, list) or len(order) != 6 or set(order) != expected_nodes:
+    order_value = worker["collected_nodeids"]
+    order = cast(list[str], order_value)
+    if not isinstance(order_value, list) or len(order) != 6 or frozenset(order) != expected_nodes:
         raise SystemExit("Retained native case order differs from the six approved cases.")
-    return cast(list[str], order), {
+    return order, {
         "source_head": PREDECESSOR,
         "file": filename,
         "sha256": value["sha256"],

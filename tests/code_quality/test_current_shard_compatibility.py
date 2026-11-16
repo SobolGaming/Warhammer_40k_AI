@@ -671,6 +671,7 @@ def test_native_serial_role_preserves_complete_phases_and_measurement_scope(
     )
     role = load_native_serial_role(ROOT, DIRECTORY, descriptor["native_serial_role"], nodes)
     assert role.seconds == 444.5446871509996
+    assert role.seconds is not None
     assert role.with_mirror_seconds == 389.046601379
     assert role.metadata["worker_count"] == 1
     assert len(cast(list[str], role.metadata["cases"])) == 6
