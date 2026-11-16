@@ -2753,7 +2753,7 @@ costs zero CP. These response observations are separate from the required
 exact accepted-history persistence, both-viewer/event and full ReplayRunner
 qualification receipts. Different natural histories do not establish a causal
 screen benefit, and successful original-platform qualification cannot remove
-the Windows exact-restoration blocker. The accepted checkpoint hashes are
+the native Windows exact restoration blocker. The accepted checkpoint hashes are
 `11be2055a7d0551f8299d3119da1009ba14d421ea666a12ab62cee7997a59149`
 (preserve) and
 `ddcf4f6357ff6d6f441e7e7a59eef13f38f51093b947358b3db1a28038005cd7`
@@ -2803,6 +2803,33 @@ The backend-boundary repair uses existing declared footprint area, bounds and
 distance queries for hexadecimal numerical canaries, plus exact installed-native
 library hashes. The geometry backend itself remains unchanged. These canaries
 identify a selected installation; they do not prove universal numerical equivalence.
-The replacement runtime/profile requires fresh explicit registration and complete
-cross-OS continuation, reciprocal restore and full replay qualification. Earlier
-profiles, raw checkpoints and qualification outcomes retain their original meaning.
+The replacement engine build is
+`c8f161f64399546ba96a19a8ec9cdb8a29fd424d128f6b542d8011ba0ade1017`,
+with explicitly registered profile
+`c05ac510829263d8ee924012d6f68b40351c1ba5e398e7a2a44e5a3e5c3fe3d8`
+and frozen procedure SHA-256
+`8ef8c75e4f1f209916fc18857e4553f7da4af432436244775f220c38074cdb26`.
+Its Windows preserve continuation/full replay passes in 802.836 seconds and Linux
+screen continuation/full replay in 797.080 seconds. Both preserve the original
+accepted checkpoint hashes, both views/events and RNG state, resolving native
+charge effects and stopping at the first Fight movement request without submitting
+it. Linux restoration/full replay of the Windows-written preserve checkpoint
+passes in 787.708 seconds; Windows restoration/full replay of the Linux-written
+screen checkpoint passes in 786.336 seconds. All four operations finish within the
+unchanged 900-second allowance, reproduce 277/278 decisions and 1,645/1,650 events,
+and report no replay diagnostics. Reciprocal checkpoint/viewer/event agreement
+qualifies this explicitly selected installation; native Windows geometry and
+historical artifacts retain their original behavior.
+
+The current complete covered producer `ca0f94e07069d2b2de14eebcbe3db68d2148bd09`
+passes all 6,341 cases with 67.81076846421217% package coverage, branches enabled,
+in 1,546.2262741600002 supervisor seconds. The unchanged twelve-shard inventory
+retains all 508 prior selector placements and adds only the authority module on
+shard 12. Current admission files are
+`ci/test_shards/linux-authority-covered-baseline.json` and
+`ci/test_shards/linux-authority-covered-evidence.json`; the E209 copies remain
+prior-stage evidence. Earlier profiles, raw checkpoints,
+failed attempts and qualification outcomes retain their original meaning.
+Required local/hosted gates and both exact-final-head independent reviews remain
+delivery prerequisites. These observations do not qualify complete-game timing,
+tactical benefit or learning eligibility.

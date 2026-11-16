@@ -286,21 +286,21 @@
     },
     "docs/AI_POLICY_INTERFACE.md": {
       "before_sha256": "4a14350ee00f4045614eaa36004a32c21ddaf7576d1adefb21c55dc1b91a13a7",
-      "after_sha256": "bcf802283e4d5b5853890febca9f3937b506aa4a71c9b4991a5b96e0b29a2c4b",
+      "after_sha256": "fde8cca6226e6d3c06846eeb4fb5e0369e1e34e86d11a4081ad67012a4b45ebe",
       "owners": {
         "@document": {
           "before": "4a14350ee00f4045614eaa36004a32c21ddaf7576d1adefb21c55dc1b91a13a7",
-          "after": "bcf802283e4d5b5853890febca9f3937b506aa4a71c9b4991a5b96e0b29a2c4b"
+          "after": "fde8cca6226e6d3c06846eeb4fb5e0369e1e34e86d11a4081ad67012a4b45ebe"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "before_sha256": "39a90f9a08ae8aaa6d4d411e5702fe3e35e9b2e120421ec673b68cba6da610b7",
-      "after_sha256": "bf143d3be863be4e2c8b79d2f3403b1c5f252e314390c10d70f30b478b22f623",
+      "after_sha256": "ea2fd3708b6e15fa3fadeae8daf2e8a9b97e403a1e9c097e32c022bbcf1976bc",
       "owners": {
         "@document": {
           "before": "39a90f9a08ae8aaa6d4d411e5702fe3e35e9b2e120421ec673b68cba6da610b7",
-          "after": "bf143d3be863be4e2c8b79d2f3403b1c5f252e314390c10d70f30b478b22f623"
+          "after": "ea2fd3708b6e15fa3fadeae8daf2e8a9b97e403a1e9c097e32c022bbcf1976bc"
         }
       }
     },
@@ -1476,7 +1476,7 @@
         "selected-linux-session-authority"
       ],
       "selected_families": [],
-      "rationale": "Add a separately configured complete AdapterGameSession process authority and strict profile-bound persistence envelopes. The actual base has no such API, so no matched speed comparison or unchanged new-mode cost is claimed. Four frozen native continuation/reciprocal restore/full replay operations on the retained e209 stage complete in 791-800 seconds under the existing 900-second cap. The boundary repair uses declared numeric queries through the existing geometry backend without changing it; exact binary hashes remain bound and new canaries require fresh qualification. Native host session work is unchanged; the required serial runtime smoke remains mandatory.",
+      "rationale": "Add a separately configured complete AdapterGameSession process authority and strict profile-bound persistence envelopes. The actual base has no such API, so no matched speed comparison or unchanged new-mode cost is claimed. Four frozen native continuation/reciprocal restore/full replay operations on the retained e209 stage remain historical. Four fresh C8 operations complete in 786-803 seconds under the unchanged 900-second cap, with exact original checkpoint, viewer/event and full ReplayRunner agreement. The boundary repair uses declared numeric queries through the unchanged geometry backend; exact installed binary hashes and explicit profile registration remain bound. Native host session work is unchanged; the required serial runtime smoke remains mandatory.",
       "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
       "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
     },
@@ -1486,7 +1486,7 @@
         "selected-linux-session-authority"
       ],
       "selected_families": [],
-      "rationale": "Add a separately configured complete AdapterGameSession process authority and strict profile-bound persistence envelopes. The actual base has no such API, so no matched speed comparison or unchanged new-mode cost is claimed. Four frozen native continuation/reciprocal restore/full replay operations on the retained e209 stage complete in 791-800 seconds under the existing 900-second cap. The boundary repair uses declared numeric queries through the existing geometry backend without changing it; exact binary hashes remain bound and new canaries require fresh qualification. Native host session work is unchanged; the required serial runtime smoke remains mandatory.",
+      "rationale": "Add a separately configured complete AdapterGameSession process authority and strict profile-bound persistence envelopes. The actual base has no such API, so no matched speed comparison or unchanged new-mode cost is claimed. Four frozen native continuation/reciprocal restore/full replay operations on the retained e209 stage remain historical. Four fresh C8 operations complete in 786-803 seconds under the unchanged 900-second cap, with exact original checkpoint, viewer/event and full ReplayRunner agreement. The boundary repair uses declared numeric queries through the unchanged geometry backend; exact installed binary hashes and explicit profile registration remain bound. Native host session work is unchanged; the required serial runtime smoke remains mandatory.",
       "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
       "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
     },
@@ -1496,7 +1496,7 @@
         "selected-linux-session-authority"
       ],
       "selected_families": [],
-      "rationale": "Add a separately configured complete AdapterGameSession process authority and strict profile-bound persistence envelopes. The actual base has no such API, so no matched speed comparison or unchanged new-mode cost is claimed. Four frozen native continuation/reciprocal restore/full replay operations on the retained e209 stage complete in 791-800 seconds under the existing 900-second cap. The boundary repair uses declared numeric queries through the existing geometry backend without changing it; exact binary hashes remain bound and new canaries require fresh qualification. Native host session work is unchanged; the required serial runtime smoke remains mandatory.",
+      "rationale": "Add a separately configured complete AdapterGameSession process authority and strict profile-bound persistence envelopes. The actual base has no such API, so no matched speed comparison or unchanged new-mode cost is claimed. Four frozen native continuation/reciprocal restore/full replay operations on the retained e209 stage remain historical. Four fresh C8 operations complete in 786-803 seconds under the unchanged 900-second cap, with exact original checkpoint, viewer/event and full ReplayRunner agreement. The boundary repair uses declared numeric queries through the unchanged geometry backend; exact installed binary hashes and explicit profile registration remain bound. Native host session work is unchanged; the required serial runtime smoke remains mandatory.",
       "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
       "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
     },
@@ -1506,7 +1506,7 @@
         "selected-linux-session-authority"
       ],
       "selected_families": [],
-      "rationale": "Add a separately configured complete AdapterGameSession process authority and strict profile-bound persistence envelopes. The actual base has no such API, so no matched speed comparison or unchanged new-mode cost is claimed. Four frozen native continuation/reciprocal restore/full replay operations on the retained e209 stage complete in 791-800 seconds under the existing 900-second cap. The boundary repair uses declared numeric queries through the existing geometry backend without changing it; exact binary hashes remain bound and new canaries require fresh qualification. Native host session work is unchanged; the required serial runtime smoke remains mandatory.",
+      "rationale": "Add a separately configured complete AdapterGameSession process authority and strict profile-bound persistence envelopes. The actual base has no such API, so no matched speed comparison or unchanged new-mode cost is claimed. Four frozen native continuation/reciprocal restore/full replay operations on the retained e209 stage remain historical. Four fresh C8 operations complete in 786-803 seconds under the unchanged 900-second cap, with exact original checkpoint, viewer/event and full ReplayRunner agreement. The boundary repair uses declared numeric queries through the unchanged geometry backend; exact installed binary hashes and explicit profile registration remain bound. Native host session work is unchanged; the required serial runtime smoke remains mandatory.",
       "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
       "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
     },
@@ -1536,7 +1536,7 @@
         "selected-linux-session-authority"
       ],
       "selected_families": [],
-      "rationale": "Add a separately configured complete AdapterGameSession process authority and strict profile-bound persistence envelopes. The actual base has no such API, so no matched speed comparison or unchanged new-mode cost is claimed. Four frozen native continuation/reciprocal restore/full replay operations on the retained e209 stage complete in 791-800 seconds under the existing 900-second cap. The boundary repair uses declared numeric queries through the existing geometry backend without changing it; exact binary hashes remain bound and new canaries require fresh qualification. Native host session work is unchanged; the required serial runtime smoke remains mandatory.",
+      "rationale": "Add a separately configured complete AdapterGameSession process authority and strict profile-bound persistence envelopes. The actual base has no such API, so no matched speed comparison or unchanged new-mode cost is claimed. Four frozen native continuation/reciprocal restore/full replay operations on the retained e209 stage remain historical. Four fresh C8 operations complete in 786-803 seconds under the unchanged 900-second cap, with exact original checkpoint, viewer/event and full ReplayRunner agreement. The boundary repair uses declared numeric queries through the unchanged geometry backend; exact installed binary hashes and explicit profile registration remain bound. Native host session work is unchanged; the required serial runtime smoke remains mandatory.",
       "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
       "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
     },
