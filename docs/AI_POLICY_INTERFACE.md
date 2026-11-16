@@ -2783,3 +2783,19 @@ movement decision, before any Fight submission or attack. No dice, seed, retaine
 history, replay comparison or charge-search limit changes. These finite
 cross-client proofs qualify the selected installation; complete current-source
 local/hosted gates and both independent final-head reviews remain required.
+
+The authority runtime has a separate complete source-bound local covered profile
+at producer `d2aefc60fb84d27867ed3ee8c479e20168cc0a31`: all 6,341 cases pass with
+67.80947121027023% full-package branch coverage in 1,579.632937828 supervisor
+seconds, under the unchanged inclusive 1,620-second approval and strictly-over-
+1,800-second termination limits. It includes one ordered mirror/native worker and
+32 work-stealing remainder workers. The new baseline and complete raw evidence
+are `ci/test_shards/linux-authority-covered-baseline.json` and
+`ci/test_shards/linux-authority-covered-evidence.json`. Every current measurement
+input must equal its exact Git producer; the retained prior-runtime four-file
+exception is not extended to this runtime. All 508 existing selectors stay in
+place; only the ten-case authority module is added on shard 12, for 509 selectors.
+The earlier `4b4c461c` attempt remains failed: 6,340 passes, one stale current
+README-authentication hash and 1,622.989207761 supervisor seconds. Its historical
+hashes and literal captures remain unchanged after the narrow metadata repair.
+These are finite local observations, not hosted timing or full-game qualification.

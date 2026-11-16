@@ -44,6 +44,56 @@
         }
       }
     },
+    "ci/test_shards/current-runtime-compatibility.json": {
+      "before_sha256": "2756dbdaeab7b5d02b8f1ec1a9fe357b65dd9e5d36a026d56d5c27f6d9485857",
+      "after_sha256": "851fe598cc02564577e0b3bd3e5750dead6ab6053e755dd83e3d7392e3deb8f2",
+      "owners": {
+        "@document": {
+          "before": "2756dbdaeab7b5d02b8f1ec1a9fe357b65dd9e5d36a026d56d5c27f6d9485857",
+          "after": "851fe598cc02564577e0b3bd3e5750dead6ab6053e755dd83e3d7392e3deb8f2"
+        }
+      }
+    },
+    "ci/test_shards/durations.json": {
+      "before_sha256": "3554a9d3e8783f79bc42aa0a5cb1edcec34595af451725345583b9cf1f9d2c02",
+      "after_sha256": "b4581266e78b19bf30749c3fc0b894e53fca23cd8c00d7c4b1eab77a9e981581",
+      "owners": {
+        "@document": {
+          "before": "3554a9d3e8783f79bc42aa0a5cb1edcec34595af451725345583b9cf1f9d2c02",
+          "after": "b4581266e78b19bf30749c3fc0b894e53fca23cd8c00d7c4b1eab77a9e981581"
+        }
+      }
+    },
+    "ci/test_shards/linux-authority-covered-baseline.json": {
+      "before_sha256": null,
+      "after_sha256": "ad2b2c54ccdff062d6d31f807ac45642e016e3a8ed41b4d7b7985abbb37aeaa7",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "ad2b2c54ccdff062d6d31f807ac45642e016e3a8ed41b4d7b7985abbb37aeaa7"
+        }
+      }
+    },
+    "ci/test_shards/linux-authority-covered-evidence.json": {
+      "before_sha256": null,
+      "after_sha256": "c313cfc16ff1602718e2577a5d3576436db2679059fe71720f91fef51299610c",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "c313cfc16ff1602718e2577a5d3576436db2679059fe71720f91fef51299610c"
+        }
+      }
+    },
+    "ci/test_shards/linux-authority-derived-assignment.json": {
+      "before_sha256": null,
+      "after_sha256": "60cc5e84583fff8ab0e6746cd8fcad5a5c6e426f80976d71770db854e9540b8f",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "60cc5e84583fff8ab0e6746cd8fcad5a5c6e426f80976d71770db854e9540b8f"
+        }
+      }
+    },
     "ci/test_shards/native-charge-source-successor.json": {
       "before_sha256": null,
       "after_sha256": "cb7ba844ef90ff1ade441b5af923b8206567769f829ba4c7fa13378529696ca1",
@@ -51,6 +101,16 @@
         "@document": {
           "before": null,
           "after": "cb7ba844ef90ff1ade441b5af923b8206567769f829ba4c7fa13378529696ca1"
+        }
+      }
+    },
+    "ci/test_shards/shard-12.txt": {
+      "before_sha256": "07c60548e1e8847fe0b370333a11325e73bc1fee39bcfe24f3dc68c81f47540b",
+      "after_sha256": "894d88c58ab3888a033cc7bc4687978be3c2891cd263cbe613cfd995158ecf8a",
+      "owners": {
+        "@document": {
+          "before": "07c60548e1e8847fe0b370333a11325e73bc1fee39bcfe24f3dc68c81f47540b",
+          "after": "894d88c58ab3888a033cc7bc4687978be3c2891cd263cbe613cfd995158ecf8a"
         }
       }
     },
@@ -156,21 +216,21 @@
     },
     "docs/AI_POLICY_INTERFACE.md": {
       "before_sha256": "4a14350ee00f4045614eaa36004a32c21ddaf7576d1adefb21c55dc1b91a13a7",
-      "after_sha256": "e7baff4003e80ef0a765316221ced79031cd9c6065dd1eb62e34ec367574600c",
+      "after_sha256": "b72045b1dff56549acf0c69420c7187b525b2ff2973980219d19daaa825b8410",
       "owners": {
         "@document": {
           "before": "4a14350ee00f4045614eaa36004a32c21ddaf7576d1adefb21c55dc1b91a13a7",
-          "after": "e7baff4003e80ef0a765316221ced79031cd9c6065dd1eb62e34ec367574600c"
+          "after": "b72045b1dff56549acf0c69420c7187b525b2ff2973980219d19daaa825b8410"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "before_sha256": "39a90f9a08ae8aaa6d4d411e5702fe3e35e9b2e120421ec673b68cba6da610b7",
-      "after_sha256": "347a919692bae473e551295ce18c55909e835e82608f3868fb00818546c1b0fa",
+      "after_sha256": "bf143d3be863be4e2c8b79d2f3403b1c5f252e314390c10d70f30b478b22f623",
       "owners": {
         "@document": {
           "before": "39a90f9a08ae8aaa6d4d411e5702fe3e35e9b2e120421ec673b68cba6da610b7",
-          "after": "347a919692bae473e551295ce18c55909e835e82608f3868fb00818546c1b0fa"
+          "after": "bf143d3be863be4e2c8b79d2f3403b1c5f252e314390c10d70f30b478b22f623"
         }
       }
     },
@@ -972,11 +1032,75 @@
       "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
       "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
     },
+    "ci/test_shards/current-runtime-compatibility.json": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile",
+        "scoped-shard-allocation"
+      ],
+      "selected_families": [],
+      "rationale": "Preserve the finite packed-formation operator repair and authenticate the new runtime using a fresh complete covered source/phase profile. Historical readers remain exercised against exact static input data with current validator code. Retain all old selectors in place and add only the authority test file; no allocation search, timing-limit change, historical rewrite or speedup claim.",
+      "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
+      "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
+    },
+    "ci/test_shards/durations.json": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Preserve the finite packed-formation operator repair and authenticate the new runtime using a fresh complete covered source/phase profile. Historical readers remain exercised against exact static input data with current validator code. Retain all old selectors in place and add only the authority test file; no allocation search, timing-limit change, historical rewrite or speedup claim.",
+      "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
+      "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
+    },
+    "ci/test_shards/linux-authority-covered-baseline.json": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile",
+        "scoped-shard-allocation"
+      ],
+      "selected_families": [],
+      "rationale": "Preserve the finite packed-formation operator repair and authenticate the new runtime using a fresh complete covered source/phase profile. Historical readers remain exercised against exact static input data with current validator code. Retain all old selectors in place and add only the authority test file; no allocation search, timing-limit change, historical rewrite or speedup claim.",
+      "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
+      "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
+    },
+    "ci/test_shards/linux-authority-covered-evidence.json": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile",
+        "scoped-shard-allocation"
+      ],
+      "selected_families": [],
+      "rationale": "Preserve the finite packed-formation operator repair and authenticate the new runtime using a fresh complete covered source/phase profile. Historical readers remain exercised against exact static input data with current validator code. Retain all old selectors in place and add only the authority test file; no allocation search, timing-limit change, historical rewrite or speedup claim.",
+      "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
+      "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
+    },
+    "ci/test_shards/linux-authority-derived-assignment.json": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile",
+        "scoped-shard-allocation"
+      ],
+      "selected_families": [],
+      "rationale": "Preserve the finite packed-formation operator repair and authenticate the new runtime using a fresh complete covered source/phase profile. Historical readers remain exercised against exact static input data with current validator code. Retain all old selectors in place and add only the authority test file; no allocation search, timing-limit change, historical rewrite or speedup claim.",
+      "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
+      "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
+    },
     "ci/test_shards/native-charge-source-successor.json": {
       "category": "measured_workload",
       "operations": [
         "mfm-current-behavior-profile",
         "scoped-shard-allocation"
+      ],
+      "selected_families": [],
+      "rationale": "Preserve the finite packed-formation operator repair and authenticate the new runtime using a fresh complete covered source/phase profile. Historical readers remain exercised against exact static input data with current validator code. Retain all old selectors in place and add only the authority test file; no allocation search, timing-limit change, historical rewrite or speedup claim.",
+      "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
+      "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
+    },
+    "ci/test_shards/shard-12.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
       ],
       "selected_families": [],
       "rationale": "Preserve the finite packed-formation operator repair and authenticate the new runtime using a fresh complete covered source/phase profile. Historical readers remain exercised against exact static input data with current validator code. Retain all old selectors in place and add only the authority test file; no allocation search, timing-limit change, historical rewrite or speedup claim.",
