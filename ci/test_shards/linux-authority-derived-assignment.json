@@ -1,6 +1,6 @@
 {
-  "baseline_sha256": "ad2b2c54ccdff062d6d31f807ac45642e016e3a8ed41b4d7b7985abbb37aeaa7",
-  "current_runtime_fingerprint": "e2094d9cc44578f56a4998fe6b4a8d1ff248a30a31127bbd4c15f629a7ae11b7",
+  "baseline_sha256": "f41dd2a6bdd6ca5fc778ab68c2a991a2cc1eb9c865a477928a7ca2bbea7f74c7",
+  "current_runtime_fingerprint": "c8f161f64399546ba96a19a8ec9cdb8a29fd424d128f6b542d8011ba0ade1017",
   "historical_revision": "008be8a8cb0b50b232fe022452762b3906489b49",
   "new_selector_placement": {
     "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py": 2,
