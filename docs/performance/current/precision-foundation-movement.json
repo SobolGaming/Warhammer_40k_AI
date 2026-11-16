@@ -1,0 +1,70 @@
+{
+  "policy": "rules-engine-performance-v3",
+  "family": "movement",
+  "workload_id": "order80-normal-move-occurrence-v1",
+  "base_revision": "22f3fde616758008100bdf37d87edd671ed90d9a",
+  "head_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:ff4277b5e1024958cc9f3e5464b5e26fc578c84b7a39130bece55d3ad0cf0add",
+  "head_input_digest": "d7684a50a8107ec78d9fe18ad7bf8ddc8b2e5deb6ce0c1c19a3ad24c7a5d66cd",
+  "budget_profile": "current-change-relative-v1",
+  "base": {
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:c8f161f64399546ba96a19a8ec9cdb8a29fd424d128f6b542d8011ba0ade1017",
+    "host": {
+      "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+      "memory_bytes": 67359354880,
+      "logical_cpus": 64,
+      "platform": "Linux-6.18.58.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "57ae3e52c3fb40898614ec3375a4aeff907e2ea1c96263401104152246b22d75",
+    "workload_sha256": "1af0bb7fa3733e4e31b8fa73f35839956e2ef5d2e952e6e378c2639ea9dd0427",
+    "fixture_sha256": "443ee0f23449318ec9e6c1f4d616f2f755f4d3fcbad11c64d8a2f67cde2548f7",
+    "samples": {
+      "finite": [
+        2.586026765000014,
+        2.554128019000018,
+        2.567040592000012
+      ],
+      "parameterized": [
+        2.393680532000019,
+        2.395279466000005,
+        2.4010887430000025
+      ]
+    },
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false
+  },
+  "head": {
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:ff4277b5e1024958cc9f3e5464b5e26fc578c84b7a39130bece55d3ad0cf0add",
+    "host": {
+      "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+      "memory_bytes": 67359354880,
+      "logical_cpus": 64,
+      "platform": "Linux-6.18.58.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "57ae3e52c3fb40898614ec3375a4aeff907e2ea1c96263401104152246b22d75",
+    "workload_sha256": "1af0bb7fa3733e4e31b8fa73f35839956e2ef5d2e952e6e378c2639ea9dd0427",
+    "fixture_sha256": "443ee0f23449318ec9e6c1f4d616f2f755f4d3fcbad11c64d8a2f67cde2548f7",
+    "samples": {
+      "finite": [
+        2.590726518999986,
+        2.549790865999995,
+        2.5511397480000255
+      ],
+      "parameterized": [
+        2.3846323049999683,
+        2.4071007819999863,
+        2.393925496999998
+      ]
+    },
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false
+  },
+  "historical_failures": [
+    "Historical measurements and superseded task diagnostics retain their original outcomes. Inactive arithmetic does not certify gameplay activation, full-game performance or native cross-platform equivalence."
+  ]
+}

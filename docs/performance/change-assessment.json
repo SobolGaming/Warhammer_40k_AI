@@ -1,1110 +1,658 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "b8fde6fb2992425edcbc55d43888d12db03fda6c",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:c8f161f64399546ba96a19a8ec9cdb8a29fd424d128f6b542d8011ba0ade1017",
-  "operation_map_sha256": "1130f56ab7d1131bac0cca3dcff64a035ba63e17c7cda2c6e3c210605b7116e4",
+  "base": "22f3fde616758008100bdf37d87edd671ed90d9a",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:ff4277b5e1024958cc9f3e5464b5e26fc578c84b7a39130bece55d3ad0cf0add",
+  "operation_map_sha256": "e1123e9abc8fb565286a10558d4c61354935257387f090de9becdacbc9e03c23",
   "changes": {
-    "README.md": {
-      "before_sha256": "9968f72e385b223b7245e1411b77bd4280cea5e6bf5d364e7f6b4d42a3717cd5",
-      "after_sha256": "680bc413522e41731e495b0a8bdb689d993607241bf73be05db26ab7d16a0b24",
+    "ci/quality_shards/all.txt": {
+      "before_sha256": "f5ac12badea4ae73d0c7254f33acf821e9d26d589a8c32300db12dfa9b8851a4",
+      "after_sha256": "93138ba7276d0b0b2f2da5d8b32a6961200f1d65ce3e68f874b25c7a29a1511e",
       "owners": {
         "@document": {
-          "before": "9968f72e385b223b7245e1411b77bd4280cea5e6bf5d364e7f6b4d42a3717cd5",
-          "after": "680bc413522e41731e495b0a8bdb689d993607241bf73be05db26ab7d16a0b24"
+          "before": "f5ac12badea4ae73d0c7254f33acf821e9d26d589a8c32300db12dfa9b8851a4",
+          "after": "93138ba7276d0b0b2f2da5d8b32a6961200f1d65ce3e68f874b25c7a29a1511e"
         }
       }
     },
-    "ci/quality_shards/all.txt": {
-      "before_sha256": "4c8684ec6ed70ed2edac193d63d2b3f09eda88f107434c46b1a8ada940d3a21f",
-      "after_sha256": "f5ac12badea4ae73d0c7254f33acf821e9d26d589a8c32300db12dfa9b8851a4",
+    "ci/quality_shards/shard-2.txt": {
+      "before_sha256": "b0acb55b349e07c360ebf50be788ec35ae7747a91f79d1117d3d81a6b7129401",
+      "after_sha256": "2e5d6b5bf17db3b6ba9d6b204a128a9dd21e301aea344f34acb866c6d74a5ade",
       "owners": {
         "@document": {
-          "before": "4c8684ec6ed70ed2edac193d63d2b3f09eda88f107434c46b1a8ada940d3a21f",
-          "after": "f5ac12badea4ae73d0c7254f33acf821e9d26d589a8c32300db12dfa9b8851a4"
+          "before": "b0acb55b349e07c360ebf50be788ec35ae7747a91f79d1117d3d81a6b7129401",
+          "after": "2e5d6b5bf17db3b6ba9d6b204a128a9dd21e301aea344f34acb866c6d74a5ade"
         }
       }
     },
     "ci/quality_shards/shard-3-modules.txt": {
-      "before_sha256": "76945beeec75fda129162da268f5ee48bb072316eae1f2c09d436ff02074c55f",
-      "after_sha256": "a3a18cf79220d2f21d12110aa4ea3fb63df1ee098190ca40fa1d8853f0775dda",
+      "before_sha256": "a3a18cf79220d2f21d12110aa4ea3fb63df1ee098190ca40fa1d8853f0775dda",
+      "after_sha256": "74a16a2b70b0fe94d5a11285e4b4434f9e8a3f85f044f16418e0af65714ba615",
       "owners": {
         "@document": {
-          "before": "76945beeec75fda129162da268f5ee48bb072316eae1f2c09d436ff02074c55f",
-          "after": "a3a18cf79220d2f21d12110aa4ea3fb63df1ee098190ca40fa1d8853f0775dda"
+          "before": "a3a18cf79220d2f21d12110aa4ea3fb63df1ee098190ca40fa1d8853f0775dda",
+          "after": "74a16a2b70b0fe94d5a11285e4b4434f9e8a3f85f044f16418e0af65714ba615"
         }
       }
     },
     "ci/quality_shards/shard-3.txt": {
-      "before_sha256": "661d93d5715896fddb49a4086799d5e28c44cdbe3fd234355a99240875ac5aa5",
-      "after_sha256": "d1ff290bb6a6851f2dcf12b9663990fd5d4f444d353bd970430edd4666183662",
+      "before_sha256": "d1ff290bb6a6851f2dcf12b9663990fd5d4f444d353bd970430edd4666183662",
+      "after_sha256": "805340e3aa110242532b9b744d9241d3c471dc05b0494ec109e9090bc3136cdc",
       "owners": {
         "@document": {
-          "before": "661d93d5715896fddb49a4086799d5e28c44cdbe3fd234355a99240875ac5aa5",
-          "after": "d1ff290bb6a6851f2dcf12b9663990fd5d4f444d353bd970430edd4666183662"
+          "before": "d1ff290bb6a6851f2dcf12b9663990fd5d4f444d353bd970430edd4666183662",
+          "after": "805340e3aa110242532b9b744d9241d3c471dc05b0494ec109e9090bc3136cdc"
         }
       }
     },
     "ci/test_shards/current-runtime-compatibility.json": {
-      "before_sha256": "2756dbdaeab7b5d02b8f1ec1a9fe357b65dd9e5d36a026d56d5c27f6d9485857",
-      "after_sha256": "7b7a5cd3f62a3b4bae444d5aada825f65b9866887273abd04195984f79579ac7",
+      "before_sha256": "7b7a5cd3f62a3b4bae444d5aada825f65b9866887273abd04195984f79579ac7",
+      "after_sha256": "641994a150c39d7d0859df69f0df4feeb7824df068a54623dc43d4f296455ec6",
       "owners": {
         "@document": {
-          "before": "2756dbdaeab7b5d02b8f1ec1a9fe357b65dd9e5d36a026d56d5c27f6d9485857",
-          "after": "7b7a5cd3f62a3b4bae444d5aada825f65b9866887273abd04195984f79579ac7"
+          "before": "7b7a5cd3f62a3b4bae444d5aada825f65b9866887273abd04195984f79579ac7",
+          "after": "641994a150c39d7d0859df69f0df4feeb7824df068a54623dc43d4f296455ec6"
         }
       }
     },
     "ci/test_shards/durations.json": {
-      "before_sha256": "3554a9d3e8783f79bc42aa0a5cb1edcec34595af451725345583b9cf1f9d2c02",
-      "after_sha256": "ee08a6a92d5a1e4f6f54dec2adf30155eb600a306fc1d5101685853191af57a0",
+      "before_sha256": "ee08a6a92d5a1e4f6f54dec2adf30155eb600a306fc1d5101685853191af57a0",
+      "after_sha256": "69b9c4d0d96889dfab923accdea22d496931c5a2018ca8dedff85d94afa635bb",
       "owners": {
         "@document": {
-          "before": "3554a9d3e8783f79bc42aa0a5cb1edcec34595af451725345583b9cf1f9d2c02",
-          "after": "ee08a6a92d5a1e4f6f54dec2adf30155eb600a306fc1d5101685853191af57a0"
+          "before": "ee08a6a92d5a1e4f6f54dec2adf30155eb600a306fc1d5101685853191af57a0",
+          "after": "69b9c4d0d96889dfab923accdea22d496931c5a2018ca8dedff85d94afa635bb"
         }
       }
     },
-    "ci/test_shards/linux-authority-covered-baseline.json": {
+    "ci/test_shards/milli-inch-covered-baseline.json": {
       "before_sha256": null,
-      "after_sha256": "f41dd2a6bdd6ca5fc778ab68c2a991a2cc1eb9c865a477928a7ca2bbea7f74c7",
+      "after_sha256": "e8331fce2174c35ce7dea9d72e1fc24452a15eb75032ae294948e059dedc01f2",
       "owners": {
         "@document": {
           "before": null,
-          "after": "f41dd2a6bdd6ca5fc778ab68c2a991a2cc1eb9c865a477928a7ca2bbea7f74c7"
+          "after": "e8331fce2174c35ce7dea9d72e1fc24452a15eb75032ae294948e059dedc01f2"
         }
       }
     },
-    "ci/test_shards/linux-authority-covered-evidence.json": {
+    "ci/test_shards/milli-inch-covered-evidence.json": {
       "before_sha256": null,
-      "after_sha256": "62d9f84fd2d839bcf6138bd9070dfc06a43b40f9a063cf570e5a00595b085942",
+      "after_sha256": "59e94fe89d5770b3776badbcd3a0d8feaa12995fa84570f2187a65b316fc636e",
       "owners": {
         "@document": {
           "before": null,
-          "after": "62d9f84fd2d839bcf6138bd9070dfc06a43b40f9a063cf570e5a00595b085942"
+          "after": "59e94fe89d5770b3776badbcd3a0d8feaa12995fa84570f2187a65b316fc636e"
         }
       }
     },
-    "ci/test_shards/linux-authority-derived-assignment.json": {
+    "ci/test_shards/milli-inch-derived-assignment.json": {
       "before_sha256": null,
-      "after_sha256": "35257eef0c91e8833093f3b39181f8b06d517900afb2076e765390b04484bc02",
+      "after_sha256": "0554253c1259bc967fb2f60fac2428e8dbdeaebac177b7d40570ab9225aeff2e",
       "owners": {
         "@document": {
           "before": null,
-          "after": "35257eef0c91e8833093f3b39181f8b06d517900afb2076e765390b04484bc02"
-        }
-      }
-    },
-    "ci/test_shards/linux-authority-e2094d9c/current-runtime-compatibility.json": {
-      "before_sha256": null,
-      "after_sha256": "851fe598cc02564577e0b3bd3e5750dead6ab6053e755dd83e3d7392e3deb8f2",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "851fe598cc02564577e0b3bd3e5750dead6ab6053e755dd83e3d7392e3deb8f2"
-        }
-      }
-    },
-    "ci/test_shards/linux-authority-e2094d9c/durations.json": {
-      "before_sha256": null,
-      "after_sha256": "b4581266e78b19bf30749c3fc0b894e53fca23cd8c00d7c4b1eab77a9e981581",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "b4581266e78b19bf30749c3fc0b894e53fca23cd8c00d7c4b1eab77a9e981581"
-        }
-      }
-    },
-    "ci/test_shards/linux-authority-e2094d9c/linux-authority-covered-baseline.json": {
-      "before_sha256": null,
-      "after_sha256": "ad2b2c54ccdff062d6d31f807ac45642e016e3a8ed41b4d7b7985abbb37aeaa7",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "ad2b2c54ccdff062d6d31f807ac45642e016e3a8ed41b4d7b7985abbb37aeaa7"
-        }
-      }
-    },
-    "ci/test_shards/linux-authority-e2094d9c/linux-authority-covered-evidence.json": {
-      "before_sha256": null,
-      "after_sha256": "c313cfc16ff1602718e2577a5d3576436db2679059fe71720f91fef51299610c",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "c313cfc16ff1602718e2577a5d3576436db2679059fe71720f91fef51299610c"
-        }
-      }
-    },
-    "ci/test_shards/linux-authority-e2094d9c/linux-authority-derived-assignment.json": {
-      "before_sha256": null,
-      "after_sha256": "60cc5e84583fff8ab0e6746cd8fcad5a5c6e426f80976d71770db854e9540b8f",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "60cc5e84583fff8ab0e6746cd8fcad5a5c6e426f80976d71770db854e9540b8f"
-        }
-      }
-    },
-    "ci/test_shards/linux-authority-e2094d9c/provenance.json": {
-      "before_sha256": null,
-      "after_sha256": "36ead178070b899a8d4999c1d9aec177dc59cab8cff42fe8fc76ef05efb385fb",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "36ead178070b899a8d4999c1d9aec177dc59cab8cff42fe8fc76ef05efb385fb"
-        }
-      }
-    },
-    "ci/test_shards/linux-authority-e2094d9c/shard-12.txt": {
-      "before_sha256": null,
-      "after_sha256": "894d88c58ab3888a033cc7bc4687978be3c2891cd263cbe613cfd995158ecf8a",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "894d88c58ab3888a033cc7bc4687978be3c2891cd263cbe613cfd995158ecf8a"
-        }
-      }
-    },
-    "ci/test_shards/native-charge-source-successor.json": {
-      "before_sha256": null,
-      "after_sha256": "cb7ba844ef90ff1ade441b5af923b8206567769f829ba4c7fa13378529696ca1",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "cb7ba844ef90ff1ade441b5af923b8206567769f829ba4c7fa13378529696ca1"
+          "after": "0554253c1259bc967fb2f60fac2428e8dbdeaebac177b7d40570ab9225aeff2e"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
-      "before_sha256": "07c60548e1e8847fe0b370333a11325e73bc1fee39bcfe24f3dc68c81f47540b",
-      "after_sha256": "894d88c58ab3888a033cc7bc4687978be3c2891cd263cbe613cfd995158ecf8a",
+      "before_sha256": "894d88c58ab3888a033cc7bc4687978be3c2891cd263cbe613cfd995158ecf8a",
+      "after_sha256": "75ae27fb468e3a3a8b4d0a7b38ab816578633dfe31b340fc8341ff25b81eca30",
       "owners": {
         "@document": {
-          "before": "07c60548e1e8847fe0b370333a11325e73bc1fee39bcfe24f3dc68c81f47540b",
-          "after": "894d88c58ab3888a033cc7bc4687978be3c2891cd263cbe613cfd995158ecf8a"
+          "before": "894d88c58ab3888a033cc7bc4687978be3c2891cd263cbe613cfd995158ecf8a",
+          "after": "75ae27fb468e3a3a8b4d0a7b38ab816578633dfe31b340fc8341ff25b81eca30"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "3d3028967442591e7460a83653dea838205eb4e01b7c10f5bd720f171d344a9c",
-      "after_sha256": "a932c8d0b5683f9d52134e04484e754bc0ece4ac668a75b95f1997c5ce206ec6",
+      "before_sha256": "a932c8d0b5683f9d52134e04484e754bc0ece4ac668a75b95f1997c5ce206ec6",
+      "after_sha256": "a4ef6cc9174578a1ecb4ceedf1759e9eb52f6aaa2c25b75a883606177082dc43",
       "owners": {
         "@document": {
-          "before": "3d3028967442591e7460a83653dea838205eb4e01b7c10f5bd720f171d344a9c",
-          "after": "a932c8d0b5683f9d52134e04484e754bc0ece4ac668a75b95f1997c5ce206ec6"
+          "before": "a932c8d0b5683f9d52134e04484e754bc0ece4ac668a75b95f1997c5ce206ec6",
+          "after": "a4ef6cc9174578a1ecb4ceedf1759e9eb52f6aaa2c25b75a883606177082dc43"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "fa2b92cfad1e0d6c03ab3c34d72212fa633b4eb624478643c2b24ffe5cf1a783",
-      "after_sha256": "2a853926ca9f6b2ed4a9c357a34a9bce19c12c22b6654e3003b5dce34665e5ec",
+      "before_sha256": "2a853926ca9f6b2ed4a9c357a34a9bce19c12c22b6654e3003b5dce34665e5ec",
+      "after_sha256": "e800339443ce0599281144da8a54084014f9c3a4d6cbc449659feab971e9571e",
       "owners": {
         "@document": {
-          "before": "fa2b92cfad1e0d6c03ab3c34d72212fa633b4eb624478643c2b24ffe5cf1a783",
-          "after": "2a853926ca9f6b2ed4a9c357a34a9bce19c12c22b6654e3003b5dce34665e5ec"
+          "before": "2a853926ca9f6b2ed4a9c357a34a9bce19c12c22b6654e3003b5dce34665e5ec",
+          "after": "e800339443ce0599281144da8a54084014f9c3a4d6cbc449659feab971e9571e"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "12001d2cfbea78ec9f6a7b1e24e01ec6c82dfd65eed247b4c6aaf8d914ef2ceb",
-      "after_sha256": "beafc9e26cec968dd50cf6d7f4fad8d7a27abf7cbcf68fb304abd42bba8bd9b0",
+      "before_sha256": "beafc9e26cec968dd50cf6d7f4fad8d7a27abf7cbcf68fb304abd42bba8bd9b0",
+      "after_sha256": "4ea615fa4d17cf2e1c4079ba08ae7b8e077c1a6eaaf9b86cf11b35e7097cad60",
       "owners": {
         "@document": {
-          "before": "12001d2cfbea78ec9f6a7b1e24e01ec6c82dfd65eed247b4c6aaf8d914ef2ceb",
-          "after": "beafc9e26cec968dd50cf6d7f4fad8d7a27abf7cbcf68fb304abd42bba8bd9b0"
+          "before": "beafc9e26cec968dd50cf6d7f4fad8d7a27abf7cbcf68fb304abd42bba8bd9b0",
+          "after": "4ea615fa4d17cf2e1c4079ba08ae7b8e077c1a6eaaf9b86cf11b35e7097cad60"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "2b35f9d57a27b059cf65237d67fefcdb79317ce7e24f124e2a2fe83f9998e04f",
-      "after_sha256": "8ce3566c5fa718c580a7323b963a4c855dafb8ad1c353a22910025d8b9557a1a",
+      "before_sha256": "8ce3566c5fa718c580a7323b963a4c855dafb8ad1c353a22910025d8b9557a1a",
+      "after_sha256": "339c4c421cf76cafb16dbfe95fdfc0d8030ea2220cef92c9932c958fa471dd2d",
       "owners": {
         "@document": {
-          "before": "2b35f9d57a27b059cf65237d67fefcdb79317ce7e24f124e2a2fe83f9998e04f",
-          "after": "8ce3566c5fa718c580a7323b963a4c855dafb8ad1c353a22910025d8b9557a1a"
+          "before": "8ce3566c5fa718c580a7323b963a4c855dafb8ad1c353a22910025d8b9557a1a",
+          "after": "339c4c421cf76cafb16dbfe95fdfc0d8030ea2220cef92c9932c958fa471dd2d"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "f2793cb09f1b1f6d955f130d5305ab458095378f85f88853a7fb3b5a0fb5fb9c",
-      "after_sha256": "2f778cbbbada6ea650f169f9672256da7667e431c71514e6bae09616d8cc862d",
+      "before_sha256": "2f778cbbbada6ea650f169f9672256da7667e431c71514e6bae09616d8cc862d",
+      "after_sha256": "7b8741b1577a19cd14a982667de0ec5809d03ec5792f3c84ce65ba6bbb86bebf",
       "owners": {
         "@document": {
-          "before": "f2793cb09f1b1f6d955f130d5305ab458095378f85f88853a7fb3b5a0fb5fb9c",
-          "after": "2f778cbbbada6ea650f169f9672256da7667e431c71514e6bae09616d8cc862d"
+          "before": "2f778cbbbada6ea650f169f9672256da7667e431c71514e6bae09616d8cc862d",
+          "after": "7b8741b1577a19cd14a982667de0ec5809d03ec5792f3c84ce65ba6bbb86bebf"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "c5eb16bd3411d9a483d3219346954446807dc23607eec6b87c2449ea25e00307",
-      "after_sha256": "55a9a9046f027c3abdc372850aaf305dffc4ca57a65734e90b60ec7b0829357d",
+      "before_sha256": "55a9a9046f027c3abdc372850aaf305dffc4ca57a65734e90b60ec7b0829357d",
+      "after_sha256": "ebef5cb2cfac8e52c61598cf88ee6a2e55dee8bc5e3249bdcfc8e8fc6428dc70",
       "owners": {
         "@document": {
-          "before": "c5eb16bd3411d9a483d3219346954446807dc23607eec6b87c2449ea25e00307",
-          "after": "55a9a9046f027c3abdc372850aaf305dffc4ca57a65734e90b60ec7b0829357d"
+          "before": "55a9a9046f027c3abdc372850aaf305dffc4ca57a65734e90b60ec7b0829357d",
+          "after": "ebef5cb2cfac8e52c61598cf88ee6a2e55dee8bc5e3249bdcfc8e8fc6428dc70"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "957d5c2ea0465b26ad43118939e92e21e844d255585200ba1b98737682796cb8",
-      "after_sha256": "fc1023a7332283cb4a3ab5a04279dfb561c04c4c8d1090302bb38d2215473ba5",
+      "before_sha256": "fc1023a7332283cb4a3ab5a04279dfb561c04c4c8d1090302bb38d2215473ba5",
+      "after_sha256": "83dd30650d1d6c8b9a8b19f58a9b6b216a32ce4c470c1c892c7a7e0509b8b9d1",
       "owners": {
         "@document": {
-          "before": "957d5c2ea0465b26ad43118939e92e21e844d255585200ba1b98737682796cb8",
-          "after": "fc1023a7332283cb4a3ab5a04279dfb561c04c4c8d1090302bb38d2215473ba5"
+          "before": "fc1023a7332283cb4a3ab5a04279dfb561c04c4c8d1090302bb38d2215473ba5",
+          "after": "83dd30650d1d6c8b9a8b19f58a9b6b216a32ce4c470c1c892c7a7e0509b8b9d1"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "4ed9ef9eb0d54b243862fa79939fac1872333ae24d5b38477c998cc4033256a6",
-      "after_sha256": "8ce0732b340964cb6ca61c576d2ea106a933a46ede2ad52306af3826e1649d15",
+      "before_sha256": "8ce0732b340964cb6ca61c576d2ea106a933a46ede2ad52306af3826e1649d15",
+      "after_sha256": "d18fcb86c9e66e6d424d704961232b16d2cffff6850b75b9870b06c38d098927",
       "owners": {
         "@document": {
-          "before": "4ed9ef9eb0d54b243862fa79939fac1872333ae24d5b38477c998cc4033256a6",
-          "after": "8ce0732b340964cb6ca61c576d2ea106a933a46ede2ad52306af3826e1649d15"
+          "before": "8ce0732b340964cb6ca61c576d2ea106a933a46ede2ad52306af3826e1649d15",
+          "after": "d18fcb86c9e66e6d424d704961232b16d2cffff6850b75b9870b06c38d098927"
         }
       }
     },
-    "data/source_audits/ci64_provenance_v1/test-cutover.json": {
-      "before_sha256": "a9f79edb35492c8425af3226f50bab3b43f950401652b8ed5f770b225d94648f",
-      "after_sha256": "4cd1f0b062fad661e1c71fe27d2e9f8279c3c21d2a9f7bea9e3b053db79afce3",
+    "data/source_audits/ci64_provenance_v1/milli-inch-test-addition-v1.json": {
+      "before_sha256": null,
+      "after_sha256": "9ebbf6d4cf39d25a60c78a4312e0a128c5b43b6c79c64ed91fa41e4387366e07",
       "owners": {
         "@document": {
-          "before": "a9f79edb35492c8425af3226f50bab3b43f950401652b8ed5f770b225d94648f",
-          "after": "4cd1f0b062fad661e1c71fe27d2e9f8279c3c21d2a9f7bea9e3b053db79afce3"
+          "before": null,
+          "after": "9ebbf6d4cf39d25a60c78a4312e0a128c5b43b6c79c64ed91fa41e4387366e07"
         }
       }
     },
     "docs/ADAPTER_DECISION_CONTRACT.md": {
-      "before_sha256": "6e900fa963f42b55e72844a469c3839706b5d88a7b06dcbabe32d33be7a7192e",
-      "after_sha256": "f526468b2cce5afe61b865eba03bccabdb3fd1372de5a9648237048d68daa159",
+      "before_sha256": "f526468b2cce5afe61b865eba03bccabdb3fd1372de5a9648237048d68daa159",
+      "after_sha256": "7a6d945439fa0130dd6e3305480fe2e34794255f1715e444fe1b21191bcaf574",
       "owners": {
         "@document": {
-          "before": "6e900fa963f42b55e72844a469c3839706b5d88a7b06dcbabe32d33be7a7192e",
-          "after": "f526468b2cce5afe61b865eba03bccabdb3fd1372de5a9648237048d68daa159"
-        }
-      }
-    },
-    "docs/AI_POLICY_INTERFACE.md": {
-      "before_sha256": "4a14350ee00f4045614eaa36004a32c21ddaf7576d1adefb21c55dc1b91a13a7",
-      "after_sha256": "fde8cca6226e6d3c06846eeb4fb5e0369e1e34e86d11a4081ad67012a4b45ebe",
-      "owners": {
-        "@document": {
-          "before": "4a14350ee00f4045614eaa36004a32c21ddaf7576d1adefb21c55dc1b91a13a7",
-          "after": "fde8cca6226e6d3c06846eeb4fb5e0369e1e34e86d11a4081ad67012a4b45ebe"
+          "before": "f526468b2cce5afe61b865eba03bccabdb3fd1372de5a9648237048d68daa159",
+          "after": "7a6d945439fa0130dd6e3305480fe2e34794255f1715e444fe1b21191bcaf574"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
-      "before_sha256": "39a90f9a08ae8aaa6d4d411e5702fe3e35e9b2e120421ec673b68cba6da610b7",
-      "after_sha256": "ea2fd3708b6e15fa3fadeae8daf2e8a9b97e403a1e9c097e32c022bbcf1976bc",
+      "before_sha256": "ea2fd3708b6e15fa3fadeae8daf2e8a9b97e403a1e9c097e32c022bbcf1976bc",
+      "after_sha256": "0b751dc0c8df15e8e7bdc0efa88e8695b8f133ab0f88bd617b71b741d1cf6143",
       "owners": {
         "@document": {
-          "before": "39a90f9a08ae8aaa6d4d411e5702fe3e35e9b2e120421ec673b68cba6da610b7",
-          "after": "ea2fd3708b6e15fa3fadeae8daf2e8a9b97e403a1e9c097e32c022bbcf1976bc"
+          "before": "ea2fd3708b6e15fa3fadeae8daf2e8a9b97e403a1e9c097e32c022bbcf1976bc",
+          "after": "0b751dc0c8df15e8e7bdc0efa88e8695b8f133ab0f88bd617b71b741d1cf6143"
+        }
+      }
+    },
+    "docs/DISTANCE_PRECISION.md": {
+      "before_sha256": null,
+      "after_sha256": "bf77c9827fd0a3cce565a284bc03a23561bd5912e38c6687413e4162dfc4f877",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "bf77c9827fd0a3cce565a284bc03a23561bd5912e38c6687413e4162dfc4f877"
+        }
+      }
+    },
+    "docs/performance/current/precision-foundation-movement.json": {
+      "before_sha256": null,
+      "after_sha256": "06a3e778f73ad48ebca27a19f576509812ea19e5cbdd4b2fc5399cbf768a2749",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "06a3e778f73ad48ebca27a19f576509812ea19e5cbdd4b2fc5399cbf768a2749"
+        }
+      }
+    },
+    "docs/performance/current/precision-foundation-setup.json": {
+      "before_sha256": null,
+      "after_sha256": "ec31a0b0c8fbc4f5805f2fb0ed3640bdfcc6028c389fa54c824b29ab293fdcde",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "ec31a0b0c8fbc4f5805f2fb0ed3640bdfcc6028c389fa54c824b29ab293fdcde"
+        }
+      }
+    },
+    "docs/performance/current/precision-foundation-visibility.json": {
+      "before_sha256": null,
+      "after_sha256": "6bf828889e17fad48d084878792d36451c608de6b576c5044bdd9a8efdc1dcca",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "6bf828889e17fad48d084878792d36451c608de6b576c5044bdd9a8efdc1dcca"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "09596f0c185020f51488a09a0e56a3b6dc6d30f761ae9d93ac044ee37943566c",
-      "after_sha256": "39deb9266ae995ef53c595b2ad51072dc3c701a223e38ed8ea950622c38a0c26",
+      "before_sha256": "39deb9266ae995ef53c595b2ad51072dc3c701a223e38ed8ea950622c38a0c26",
+      "after_sha256": "302aef4012b33c886f53aee70d727f95d7da1bb99074ae87ca9acd07fed99d08",
       "owners": {
         "@document": {
-          "before": "09596f0c185020f51488a09a0e56a3b6dc6d30f761ae9d93ac044ee37943566c",
-          "after": "39deb9266ae995ef53c595b2ad51072dc3c701a223e38ed8ea950622c38a0c26"
+          "before": "39deb9266ae995ef53c595b2ad51072dc3c701a223e38ed8ea950622c38a0c26",
+          "after": "302aef4012b33c886f53aee70d727f95d7da1bb99074ae87ca9acd07fed99d08"
         }
       }
     },
-    "scripts/boolean_los_admission.py": {
-      "before_sha256": "f1bbc073e8c0d46d471782c3518846a872ab9f3d8db0432d22393d1a44fa446b",
-      "after_sha256": "43eb84cfe50ad176d0f1cba94e0610314f4cabc27626d57945dcf8ab0ee5463b",
-      "owners": {
-        "@module": {
-          "before": "149cb7bbb8c3999273c793362d6aabfca536a277fd8809c9e7ddeff85d96d41d",
-          "after": "4c672e2dbe27ddf2a6dece366f742e8ffb596f6c2d977ebff353eebe644b7026"
-        },
-        "fresh_native_role": {
-          "before": "0c431ace4e392fce65096e0c3fe076ba1f85ab0f6d39b47a3ff9112645e087e4",
-          "after": "b7362a93ec11ad4be8df5454bc372f70a368889f2f937ccb18ef0c4d5e874023"
-        },
-        "producer_inputs": {
-          "before": null,
-          "after": "f52988c2b934e820ba51bf780e74a7d3b4b4c3e4c7c1c3245e2db05f9498345c"
-        },
-        "validate_successor": {
-          "before": null,
-          "after": "92459bdc4828fc21012543ce42c3ac69e7f6f65984eb6138a3640a8bc5472dc8"
-        }
-      }
-    },
-    "scripts/complete_covered_evidence.py": {
+    "scripts/behavioral_selection_members.py": {
       "before_sha256": null,
-      "after_sha256": "b32be4977ad1ccadc11c083d6bbb01ffc4d28f54a9e79eb01e720560cf388837",
+      "after_sha256": "5da48bf04405cc583bbffd5ac013a84490607c4e20caf1705032843677c8f20e",
       "owners": {
         "@module": {
           "before": null,
-          "after": "fa0290205cbfd231f7262af1bd4d15ab9221eb7f9a2829583ebd6d464aaa72fb"
+          "after": "43f136cb72573c837ca5876e2397e5762182a2b460f9fee6c4490c4f9ddcbde9"
         },
-        "artifact_text": {
+        "_selection_members": {
           "before": null,
-          "after": "d77b1f20ebea9750b351e41b893d15ddc5af451b4a0cdb9a245043c39d4712de"
+          "after": "71741765189504460bd5d82ba74ab4815b2e14b8fdc4924825996feae6a4ef14"
         },
-        "verify_complete_covered_profile": {
+        "_selection_no_links": {
           "before": null,
-          "after": "8a3a4436e737c5724722a4e51667ec9f05445b87d9ab38cecd89a94b74e2a307"
+          "after": "8d6d707ea3950e5fbfe609063ec804df087aa83c6c8b486e47f92fef81f3d6b9"
+        },
+        "_selection_object": {
+          "before": null,
+          "after": "4a11724ad671dfef8d23e2d7fc595c6205d8f9ddd87bea27e0046ff730e49b9a"
         }
       }
     },
-    "scripts/current_native_serial_role.py": {
-      "before_sha256": "1eaf0150261a429a81bc4fa1b2be32cc2c291370bec709a8d6d8c8de511beab5",
-      "after_sha256": "d932f51f53459deb8b13900eb3523e3adc7d7aa8d284a29775bf20ffcb850fb5",
+    "scripts/build_test_shards.py": {
+      "before_sha256": "70dccb4f7260bb74de469f5251fc375510b42d80d3233d4d9556375237a23b01",
+      "after_sha256": "ab63504ee7702949ba71848ed1c46a31c53657177f331216badf8870ee0ad17d",
       "owners": {
-        "NativeSerialRole": {
-          "before": "99ca9e82a57a3f93a01e53640692c431cd2415c710368bfdcc47db803ac9a664",
-          "after": "e1bced09afa9e2425f5a26d138386205ab60a6bdfb9e91da9550b8f4b6c14e2c"
+        "_selection_members": {
+          "before": "71741765189504460bd5d82ba74ab4815b2e14b8fdc4924825996feae6a4ef14",
+          "after": "c01a173f42dab95cdcbae251919298efe80b29babbe870dbe3ce709836867e27"
+        },
+        "_selection_no_links": {
+          "before": "8d6d707ea3950e5fbfe609063ec804df087aa83c6c8b486e47f92fef81f3d6b9",
+          "after": "3170911deab7c428bf3e26ebb5f17294fe730299778144b35fdc36c958252d40"
+        },
+        "_selection_object": {
+          "before": "4a11724ad671dfef8d23e2d7fc595c6205d8f9ddd87bea27e0046ff730e49b9a",
+          "after": "45e463bcb43e46dbb69ac37e9271956632b53ead56880159c980d410856cec4d"
+        },
+        "behavioral_selection": {
+          "before": "40523886d1f7c329973334379b79230d39edc51661e8363df4e7fc69f806a267",
+          "after": "70194d6181acec96b58e9627a5d942b515c395081783728006b9b8bdbeaf603f"
         }
       }
     },
     "scripts/current_shard_assignment.py": {
-      "before_sha256": "18ce9839918f3281800155d9d6f6349aec9a2a670dfa1de86b28beea147b8027",
-      "after_sha256": "f00cb57f90c4f0fbb755a0d8436a14d59fb282ff2bd9b3f2fde0ab3dce52ee00",
+      "before_sha256": "f00cb57f90c4f0fbb755a0d8436a14d59fb282ff2bd9b3f2fde0ab3dce52ee00",
+      "after_sha256": "38655cf6dbca8dae25930ea64e4e20081812c20414ceb4851dc722aadddd2c7c",
       "owners": {
         "load_assignment": {
-          "before": "53666b9ca13e691029eff57fc4071d3ba81c4941994b38b9da8c798a7a934e91",
-          "after": "d196ec52d051e0a4714f1c1a449a4cab7dfc5282fb9686920baa4e24f6f3c2be"
+          "before": "d196ec52d051e0a4714f1c1a449a4cab7dfc5282fb9686920baa4e24f6f3c2be",
+          "after": "08fe9415b6dca022566cfedf62cd6bc91886c03860015de03aad38d255b64225"
         }
       }
     },
     "scripts/current_shard_compatibility.py": {
-      "before_sha256": "727959bae2ce1798821e086d84d9567eb1e2c45e4e438f0a296ef0d5fc466415",
-      "after_sha256": "bed5413dca7149afe49d305d1b0b97306fc0ac4428cfe817def86c32f0c6a8d6",
+      "before_sha256": "bed5413dca7149afe49d305d1b0b97306fc0ac4428cfe817def86c32f0c6a8d6",
+      "after_sha256": "f37741ac69919e00b772b3e378b5ca520026b84942d96782e0535857dc0a88c1",
       "owners": {
         "_baseline": {
-          "before": "64035e7e2d4d6a0e3c182fe4ecc0c9feeb2943817289cad926227d0003931e57",
-          "after": "4b218f0c1527307330b88e5f0196e37ede9f62a4356214969a7ba89e2cd45d5e"
+          "before": "4b218f0c1527307330b88e5f0196e37ede9f62a4356214969a7ba89e2cd45d5e",
+          "after": "e04152fd71a5f4362e90fd9a0337c7734d19ddc06282498fcdfbaec059d8cb8b"
         },
         "enabled": {
-          "before": "6cf403892ad8480696902c7228e5ef902d22fc2f928ea48d8262846ada84d871",
-          "after": "d5157403482ca9366c110f8474043372842152a5b991a646fdefefd250d9dea8"
+          "before": "d5157403482ca9366c110f8474043372842152a5b991a646fdefefd250d9dea8",
+          "after": "2e777b276f8141b46212d69f7eff58ef977b92de40f0955e9908df86a6634fa4"
         },
         "plan": {
-          "before": "3590a78b6a9a67c1afb90de7e66a4569405b03d70f6d977189edade5a861d97b",
-          "after": "5da9d4c3587cc77752895501b7a65e08648c70d7f26e341fc83e917139cfb3de"
+          "before": "5da9d4c3587cc77752895501b7a65e08648c70d7f26e341fc83e917139cfb3de",
+          "after": "76f2a50619ddeb3414c038c6c850a4f57a2ec5894ff0937f888a6588e59422be"
         }
       }
     },
     "scripts/fetch_scheduling_sources.py": {
-      "before_sha256": "b3204f7bbd2113287d0d5259f50807b13ed76e7519a1171163ab97a09adaf4a4",
-      "after_sha256": "6d0e48223132f4a2c6f24bdcfb69d5330366d39c5b8161e6920013a76cff80fe",
+      "before_sha256": "6d0e48223132f4a2c6f24bdcfb69d5330366d39c5b8161e6920013a76cff80fe",
+      "after_sha256": "9e0f5e4e9d5157cf342e9fe24796a210f863ce7308e28a74d704a005b5d470bf",
       "owners": {
         "revisions": {
-          "before": "0714c5b2c3dafe23aa104c8801de5e7b5c866d81d859ae1d0c039e3bfc96b869",
-          "after": "d45fa8446db442fd44fac1183c2af220b2f01688666b16d8ad21bc41682dccbe"
+          "before": "d45fa8446db442fd44fac1183c2af220b2f01688666b16d8ad21bc41682dccbe",
+          "after": "6fa73ba31a826481f75cab867d56cb93ab6e172e8ac1f1bfa95daf79aee16c53"
         }
       }
     },
-    "scripts/linux_authority_shard_admission.py": {
+    "scripts/milli_inch_shard_admission.py": {
       "before_sha256": null,
-      "after_sha256": "5aa151f47cd6d80c87f6f8e5762ef5f1df369fb46e3695cc088015948a684d9d",
+      "after_sha256": "635e6c235ed73c60d246d3d9c4326879889c3820c81d673ef27df0df4b6abfae",
       "owners": {
         "@module": {
           "before": null,
-          "after": "e8fca96931791794cc4d1f888d8bfb49bd4541e61910ab3e62aac077fc8641fa"
-        },
-        "archived_source_inputs": {
-          "before": null,
-          "after": "0f1d4f2cb3c8df4f415a2c759fe869bcbdfeee5a9daa00f9f3a9561cf42eeb42"
+          "after": "7b8fd177afb307159ebafb5a3d6b82594ab5d851a01f08bacdbdf04b63c8c212"
         },
         "current_native_role": {
           "before": null,
-          "after": "31cf414b2ebf346177c763a88db96c7f2550836a7af937f60fb38f90013b21a9"
+          "after": "1b6dfb2b159f85fc92860177512c62fecc20b4367af3f43d817eba4a01b1fdab"
         },
         "producer_inputs": {
           "before": null,
-          "after": "2ce4de513ad27a297520a74990ba08975a6656f7c7f056edadd2293ae0d362f2"
+          "after": "7f3341ebf831843c7e7656377f4ea37875ccb5d4ec75838ae6602bf56caeed79"
         },
         "require_frozen_assignment": {
           "before": null,
-          "after": "57c681e39703a8a80ff2003c34fd50b162c6b61f4dd19a9b6633c4b69c3f45ad"
+          "after": "c2177889cb098bff784350a65966cda1ab1c224d757736f080be0b62d16b4c4a"
         },
-        "retained_native_inventory": {
+        "require_test_sources": {
           "before": null,
-          "after": "54b805423315a70c32f29b681be5ddcc20439ad91131dc8a2458afeeecc2ffbb"
+          "after": "690dad7f3f18cc60e5fbfcc60896ab6df2e7ec9daeb333551075b4c28afe915f"
         },
-        "retained_test_transition": {
+        "retained_authority_artifacts": {
           "before": null,
-          "after": "652298b32ed71a3ddba7d17976f4c27a518650bab0ba2c86ea3da0d7d6f2af9e"
+          "after": "a401f94c8b121de7e0249de36a167f9e5ed9e851fa083af6128bc7d66a803e97"
         },
-        "validate_retained_boolean_sources": {
+        "validate_runtime_transition": {
           "before": null,
-          "after": "c1e8f2f106c98eca7f54fdc211026ff3325ceeeeafdd89f519d76719433b110a"
+          "after": "1127c7cf2af90b687b7b562a7234b0525ab439e649a144e7410b1ff8b8222972"
         }
       }
     },
-    "scripts/run_complete_covered_profile.py": {
+    "scripts/milli_inch_test_admission.py": {
       "before_sha256": null,
-      "after_sha256": "e81d3eab06c84057d697e01c8d0179cba1cf216b5f76a962ada3844600acedbd",
+      "after_sha256": "490847bc448e428f23f66c9ced2b347a3fc361b7fac55179a6f6a5393095fc03",
       "owners": {
         "@module": {
           "before": null,
-          "after": "b6d5fb58b4e3831aabe6bc0664d5b390bc337cc143885f6a087dd5b2ddd0ee60"
+          "after": "212fc2ef529fad0e6eabcbaa981c07735514acef7f62feb6e46338d32d94a0e1"
         },
-        "_source": {
+        "precision_test_addition": {
           "before": null,
-          "after": "b21669ee0be1dda0e545c273f09fc2829d51930f398e4d92e6764f3b9506ac09"
-        },
-        "_stage": {
-          "before": null,
-          "after": "f4bc2bc60623a06cf7258a3aaa17d290e14162459b9341b0a7ee66a5a00d626d"
-        },
-        "_write": {
-          "before": null,
-          "after": "37fee67e0e0ce2bfc75a3ce8a0ae6edb92d07b96248c13dff4efd811803e9c6b"
-        },
-        "main": {
-          "before": null,
-          "after": "692b88ae35f456e6b93345e1961e4e850ffd33112f041315204e7c62f390819b"
-        },
-        "run_worker": {
-          "before": null,
-          "after": "f89e048a1321e208589dbbf7266537a35d11c96609c74f9cf92ef196daf9bb21"
+          "after": "cbb03d30b083c8ef05c38e3b3e96c4486aa4f9c94e75db0992fa7a7f8075fee4"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "5d3b31896c265ba5cd152a79d147b8d48cbbecdc1898e8aa593791a7c8eb9312",
-      "after_sha256": "c39f86be7bf3bbcf5ee68970c04f1cba306148a6d4e444eb6f9e30d87145641e",
+      "before_sha256": "c39f86be7bf3bbcf5ee68970c04f1cba306148a6d4e444eb6f9e30d87145641e",
+      "after_sha256": "877007cc4b1bcbcd14dcc29bc646d9802ada575046b996b56789ba64267c2d08",
       "owners": {
         "@document": {
-          "before": "5d3b31896c265ba5cd152a79d147b8d48cbbecdc1898e8aa593791a7c8eb9312",
-          "after": "c39f86be7bf3bbcf5ee68970c04f1cba306148a6d4e444eb6f9e30d87145641e"
+          "before": "c39f86be7bf3bbcf5ee68970c04f1cba306148a6d4e444eb6f9e30d87145641e",
+          "after": "877007cc4b1bcbcd14dcc29bc646d9802ada575046b996b56789ba64267c2d08"
         }
       }
     },
-    "src/warhammer40k_core/adapters/execution_profile.py": {
+    "src/warhammer40k_core/geometry/milli_inch.py": {
       "before_sha256": null,
-      "after_sha256": "48886d5020e075e2a26b166ff99520911cd7b158c217a9a3724f6459daaa1cf8",
+      "after_sha256": "692a482b4be1b765ef351a249b928fdc156023086112b11266ba6b06ef8476c4",
       "owners": {
         "@module": {
           "before": null,
-          "after": "cdb7c9ecdfaf8537b8d038d238aad5fb861ddf24cb15d95ff93d3be6a945f74b"
+          "after": "5a20c0355acd761e588c6ae0ccbf6654ef941efe2c8f491529569376b45a24e0"
         },
-        "ExecutionProfileError": {
+        "DistancePrecisionError": {
           "before": null,
-          "after": "86d4acce3491343eac8bb42d55b463788463edc2e4715cd8508623ca761b0c49"
+          "after": "32e3427d866b53c587988a20202272d914a8333e2e23ae0718dcf0fd4f4d6568"
         },
-        "_cpu_identity": {
+        "UnsupportedExactPathError": {
           "before": null,
-          "after": "fc7903b3301ef92d1960a966a29f91e4e45dca7258c86c53de5bcad095533861"
+          "after": "3987b64814890d50d00ab400e000ef6f1894d850aab70e553251d9ace5d8f476"
         },
-        "_file_hash": {
+        "_exact_value": {
           "before": null,
-          "after": "91ec9a22ba44af9348d14ee04e9fefbccd865ce35fb9b1377644447f7e2b11de"
+          "after": "2c73777b0385603b404bcaf021f8a90ae01929079ba228d1eb0a795be8e34eec"
         },
-        "checkpoint_bytes": {
+        "_nonnegative_value": {
           "before": null,
-          "after": "3ffcfe9c1096231180e5266aea971d4582ce3082fd54dfa30b44235130732b99"
+          "after": "c1cbab479222fc3a78f25abec39da5a8606a28623be28e5037a7e766ccc78023"
         },
-        "checkpoint_envelope": {
+        "_round_ticks": {
           "before": null,
-          "after": "ff892f884bc999a70e9b978a6e6235d4aff5865203ccc4994e2758a272e648f5"
+          "after": "8e899572b939f200988a341aff14bffd2d349d17600ac8f620664517b76f26e8"
         },
-        "content_hash": {
+        "_validate_ticks": {
           "before": null,
-          "after": "0fcdd56473bedef07f1b53cf49b531a0cbdf6c7d8a7ea07f52f6484e652c2d3a"
+          "after": "80e7a08ce8f48d86d8b41402a27bcabc09673a9483e65079e1939d932f6a77b1"
         },
-        "decode_json": {
+        "inches_to_ticks": {
           "before": null,
-          "after": "209e1d87c27ca0660e3e4ea49026ec20d29b24f583032d3d51ca2a143a5b0511"
+          "after": "7e24641a30f8ff39ed560491dc6ebb3c3df416d0a0256bc3dbe861da612ed031"
         },
-        "linux_execution_profile": {
+        "millimeters_to_ticks": {
           "before": null,
-          "after": "61f0f9fa97360219186991f6b25240cdb31c28761276dbef49eca78a7ab1b2fc"
+          "after": "1181e365e30abbfc7a65394f8116e8315b25473a310da731dfceb735c71410c0"
         },
-        "object_payload": {
+        "radius_inches_from_diameter_ticks": {
           "before": null,
-          "after": "7d5267c05efea615e8c83002dbf681e97335d4968fbef16cab2c8c3c003fd4f3"
+          "after": "fbe0fc298195279a398bce175bd0dce546182585012668fa25084faec2ac00b7"
         },
-        "string_field": {
+        "rational_path_inches_to_ticks": {
           "before": null,
-          "after": "bef70900528ee3fab329dff546b7c9ca5875425bd7a44e80157b741c4da91e6c"
+          "after": "0df3838471ccd995f5a129cd765b7fb030f87b811879772ff240ccef255ca037"
         },
-        "validate_executor_profile": {
+        "squared_inches_to_ticks": {
           "before": null,
-          "after": "560caccad1cbb45ca5024e8cd22c90b5e748c4212f152edbfbe8ac4fa1b65eb2"
+          "after": "1d51714be60967c19e067172bb34818140698eddf4239259cd01183f45941211"
+        },
+        "squared_path_inches_to_ticks": {
+          "before": null,
+          "after": "108bfd6998ee7fe86070a02297c70107fb4ad0d8c624759a657e69a61efc2df2"
+        },
+        "ticks_to_inches": {
+          "before": null,
+          "after": "040bd134c26a12a74841c37261db1f2c0978ff6c879d8ec6a7691c0cb77a98c7"
         }
       }
     },
-    "src/warhammer40k_core/adapters/linux_authority_transport.py": {
-      "before_sha256": null,
-      "after_sha256": "ce793080440d1fa623565f46b2749da7c897997ced79afead317b1e02a6f4731",
+    "tests/code_quality/test_ci_performance_gates.py": {
+      "before_sha256": "ce9c7c8a9bf0895c7736dd729d81f79caee677e24dd215af397e7a37f7cb4a2a",
+      "after_sha256": "0bc9733bcdc5877141eabae2ba19e69f9285b65be9962fe933f305a0e7972cb0",
       "owners": {
-        "@module": {
-          "before": null,
-          "after": "16ded6a561029befaf4e32962721c11016af0681011f0c7b7c68c109eb83d927"
-        },
-        "LinuxAuthority": {
-          "before": null,
-          "after": "3385b26fdd16c02f7ed2434e25ae0d1059cd9e351b5fad44841614d38a30040c"
-        },
-        "LinuxAuthority.__enter__": {
-          "before": null,
-          "after": "b95f17faabf8e3b2641587fd8b89c7fcc65f74c377e1aca4ac7546c9b40df1cb"
-        },
-        "LinuxAuthority.__exit__": {
-          "before": null,
-          "after": "3c9d697e73cfd576b28e57caed6cc151d85e3cf200d4b68afd893eee71c04b36"
-        },
-        "LinuxAuthority.__init__": {
-          "before": null,
-          "after": "520ba6b828910024e9a782a843878b9c3b0a0c80990067d45711c1f010a2fafa"
-        },
-        "LinuxAuthority._initialize": {
-          "before": null,
-          "after": "7cb21264104f717e21759664a685cd05ac6b1391260426ab45286d05db63d7fd"
-        },
-        "LinuxAuthority._read_responses": {
-          "before": null,
-          "after": "abbf85d49cc104360a2770da6b0b3ca236bdb9d8d3a22ad504fbb4f66195ac84"
-        },
-        "LinuxAuthority._receive": {
-          "before": null,
-          "after": "48408ba1d8f315d03a2b02eb9982448a388a6aa865adb17144993b1e0f65cd61"
-        },
-        "LinuxAuthority._validate_profile": {
-          "before": null,
-          "after": "0fbb5c15670fde70295ad7fe625257c865010f88222affd3691a4c4a3cd48681"
-        },
-        "LinuxAuthority.call": {
-          "before": null,
-          "after": "723aecb6135afd88055dc8c367f25a14f45e34b9821947bb3850176cf281d172"
-        },
-        "LinuxAuthority.close": {
-          "before": null,
-          "after": "02332a81b9a560d7d722b54728fc8ed2672a42c5b11a47f143074e97c7e23ee2"
-        },
-        "LinuxAuthority.enroll_legacy": {
-          "before": null,
-          "after": "23c9a0880b918b088b33728b64a241bb06371c0763f4c144a7ed22f41d741034"
-        },
-        "LinuxAuthority.inspect": {
-          "before": null,
-          "after": "e08bf372b3307c56ef9b05db64bb4c0c14bc28b020663887d5095fe46ca84110"
-        },
-        "LinuxAuthority.profile": {
-          "before": null,
-          "after": "7c6c22062461e0b36089a7641f3358bf36210ee07128e67c126866c12385f5c3"
-        },
-        "LinuxAuthority.profile_hash": {
-          "before": null,
-          "after": "48a5e8706b7b1b48919205cb89dd65e9e7b78179d1d0bd439708528622432b1b"
-        },
-        "LinuxAuthority.register_session": {
-          "before": null,
-          "after": "bd1d945fbde03f15c66941b1410b2008de1071c359c5d0d4afe2d88b3d1c350a"
-        },
-        "LinuxAuthority.replay": {
-          "before": null,
-          "after": "c5a3fccd2a33ed4c754c5e2d1a1a759d3cf8f8a8718397edf43b47249ecdcfd6"
-        },
-        "LinuxAuthority.replay_legacy": {
-          "before": null,
-          "after": "cf9233bec0c1163cd91ff4046aa59f21f671416762d0b3acbd19d6ff09cc73d1"
-        },
-        "LinuxAuthority.restore": {
-          "before": null,
-          "after": "19a0991374ea83788200a435bc447f8e321fb4ba5470508dd08373a8b79f9c87"
-        },
-        "LinuxAuthority.session": {
-          "before": null,
-          "after": "66d85309956535f249727ebbd9c613d46d0f15de7b2ed943f21af8fc6dad460f"
-        },
-        "LinuxAuthority.session_transaction": {
-          "before": null,
-          "after": "816157befa894a03b799a2790f716973a88853082abd0ccb0747b5adf377f4d7"
-        },
-        "read_frame": {
-          "before": null,
-          "after": "3d6f4171df2a93978d186d6d1250274160f1438269e39d1fe9a3e1a887981acf"
-        },
-        "write_frame": {
-          "before": null,
-          "after": "d083eaae6a2aadb899be3013b003bef735c9c1f0ec9b702a82588519f0eab08c"
-        }
-      }
-    },
-    "src/warhammer40k_core/adapters/linux_authority_worker.py": {
-      "before_sha256": null,
-      "after_sha256": "edba30cba8bea10016a211f8d1654c364b275335c0814a2e84643db06e0a1f2e",
-      "owners": {
-        "@module": {
-          "before": null,
-          "after": "25191918153f8f28b347adb0b9e32ca22fba3533372c32178c81b32939188de6"
-        },
-        "LinuxAuthorityDispatcher": {
-          "before": null,
-          "after": "b6a2264b662acbc63c30bac1f97eca614a560736f660c6677fa08e45dae67218"
-        },
-        "LinuxAuthorityDispatcher.__init__": {
-          "before": null,
-          "after": "ad9b279114374f85bddc000c430d181e2e0ad9b7e2576b4872ef5c6c3663ef2e"
-        },
-        "LinuxAuthorityDispatcher._execute": {
-          "before": null,
-          "after": "6eec1d147ef76e2304375818521cccefc70126ffc2942816f0ff84309f0161d5"
-        },
-        "LinuxAuthorityDispatcher._register": {
-          "before": null,
-          "after": "8efeaa29f67dc2e3745cbe61956db7e2ca1dcb4e9f180c2aa09382bce080a33e"
-        },
-        "LinuxAuthorityDispatcher.dispatch": {
-          "before": null,
-          "after": "5720b5a38b0f446df412d42fd7f89fae7838fb7e1a525789c66b4d3ba8415688"
-        },
-        "_OwnedSession": {
-          "before": null,
-          "after": "380bb27ddf61a59b4f2da13c5adf7a7efe464de402c085509ddf309f4ea45cfd"
-        },
-        "_cursor": {
-          "before": null,
-          "after": "e7efc9dee911d59e2f8341783adc0280a553796dccab0dd2ff7c334146bac56b"
-        },
-        "_integer": {
-          "before": null,
-          "after": "801007670f4db14e32742767082fb7e6f9077676bb3ccd39673a3c29428a2b71"
-        },
-        "_read_owned_input": {
-          "before": null,
-          "after": "156a03b0ec81e9934b15040a196797e3ae42923d3e3f1709519380e4249da0c6"
-        },
-        "_viewer": {
-          "before": null,
-          "after": "f4f5f101dc9d970eba88771c23424a9fba9c7ce7ff10e9bb9cad11bb095ee6de"
-        },
-        "main": {
-          "before": null,
-          "after": "ac3156ff8904724582b71d97a3e22ffd6040a0e95c25f48554851a0063a8b1ae"
-        }
-      }
-    },
-    "src/warhammer40k_core/adapters/linux_session.py": {
-      "before_sha256": null,
-      "after_sha256": "df4795fad8fdc178d979ac27e802226d5799ceef430d343c7f9375f4a1826320",
-      "owners": {
-        "@module": {
-          "before": null,
-          "after": "1ecb40c7e9fdf1644b09e284a89537f906122dc3a4096ed8ede2e3b7d8f89547"
-        },
-        "LinuxGameSession": {
-          "before": null,
-          "after": "57e74b3fb3d7c790056c7b55c79fc968d2de167c6e2f714b7d148b5c084fd4be"
-        },
-        "LinuxGameSession.__init__": {
-          "before": null,
-          "after": "9a79e65b80db378df6151c05172dbfda7b7bc546aa88ace3ec7fc3eab9748154"
-        },
-        "LinuxGameSession._call": {
-          "before": null,
-          "after": "00d9d3e026ba1f39ee4f3b1fb399e91abfc61f11e12ffbca64010a6f85dfe4b9"
-        },
-        "LinuxGameSession._integer": {
-          "before": null,
-          "after": "5d8f1ec837baa82bbfb1f519682720388adb49eee7229f79181b05cfa684e8b2"
-        },
-        "LinuxGameSession._status": {
-          "before": null,
-          "after": "0b51ad830f5560ed9866cc07d9372fa1f1fae3bb7d37785dc5c430b54b67c05b"
-        },
-        "LinuxGameSession.advance_until_decision_or_terminal": {
-          "before": null,
-          "after": "38cb287b32084911908d548fed11a59162a7d252a9a979c879c3afa8dd06b946"
-        },
-        "LinuxGameSession.authoritative_event_page_for_context": {
-          "before": null,
-          "after": "da3d4f683b1f1ad016ae9797d39832886cdcd5996f62b582ec40982a5804372d"
-        },
-        "LinuxGameSession.authoritative_history_payload": {
-          "before": null,
-          "after": "71b2825d5d719f648686aa9375582d4d7548edd64ecc7b45bb526005bb0a1d6c"
-        },
-        "LinuxGameSession.authoritative_identity_payload": {
-          "before": null,
-          "after": "3a0e60c4cf342dd4fc36c9a2a16ad31a251580f45f006ebe9658ed2109efd6d2"
-        },
-        "LinuxGameSession.authoritative_visible_event_prefix_counts": {
-          "before": null,
-          "after": "2482803b1c7c08ed8e4866aa65238bc06eaac1e8faf84275dc89fd0390b7c2ba"
-        },
-        "LinuxGameSession.decision_record_count": {
-          "before": null,
-          "after": "1c9f5cf183fdb7d99d6ce1cd892d99bf8730864ecf6a1afb84a78411eccc3bee"
-        },
-        "LinuxGameSession.event_page_for_context": {
-          "before": null,
-          "after": "5f65757191dd49b4018ebb7a5f2483407ba61fb7835d67840aa69c92433f0c4c"
-        },
-        "LinuxGameSession.event_record_count": {
-          "before": null,
-          "after": "3a44a7dafd4dd7991fa2cb88deabef9814bc91b8fcb7b5241dfad43389a1f1e7"
-        },
-        "LinuxGameSession.events_since": {
-          "before": null,
-          "after": "b80860cbd097b21239e5d54b221c8882305e94e0976adc20261df539282ba8c6"
-        },
-        "LinuxGameSession.events_since_for_context": {
-          "before": null,
-          "after": "d0e7a64afd7665e46cd8b96ee898dbb9fb01922342cd51fd300bc9e0108c3000"
-        },
-        "LinuxGameSession.fork": {
-          "before": null,
-          "after": "5f8d0f0548de3eca0094725009e2802450bf6a6bb791ad46489030b877d1b7ae"
-        },
-        "LinuxGameSession.from_authority_result": {
-          "before": null,
-          "after": "75d106042b42cdb6afd18c631902ab2da71c78ebeb90544345b18d1f8247304b"
-        },
-        "LinuxGameSession.profiled_replay_artifact": {
-          "before": null,
-          "after": "a890df89d961d295a35e1c3d88c8d39be8b5e85dc5fdf454cee8990f17a35e4e"
-        },
-        "LinuxGameSession.replay_artifact": {
-          "before": null,
-          "after": "3b89c170e678479fe80928d2b4b6e488130f1735880abde07ac9ce9447b57e94"
-        },
-        "LinuxGameSession.rules_catalog_view": {
-          "before": null,
-          "after": "d4eeff047060060f316d1faaeda2a9b4aaf8e86d2b47e53025013c0f57d249ba"
-        },
-        "LinuxGameSession.start": {
-          "before": null,
-          "after": "dc0bec426c31493116ae09b9c47fba60a843dd866d09d131c35e1da62e7bc4ae"
-        },
-        "LinuxGameSession.status_for_context": {
-          "before": null,
-          "after": "d21a68cba8b5cdcd3bae051dd9d6c0a7ade08e462ca89abaf8eb1230d68fbded"
-        },
-        "LinuxGameSession.submit_option": {
-          "before": null,
-          "after": "a6d101105e648e623bbbf5072d0dabdef5b2194dfe8e14061b5004c381238634"
-        },
-        "LinuxGameSession.submit_parameterized_payload": {
-          "before": null,
-          "after": "538221dd0caae1ebfa80229ed1b321f853240f9ea6bfa93034d61b76fa0fc18d"
-        },
-        "LinuxGameSession.submit_viewer_option": {
-          "before": null,
-          "after": "a66c84077870c2a5a85e1f47c674df72ea00e17d1d549b4b7508c37ae3bbf89d"
-        },
-        "LinuxGameSession.submit_viewer_parameterized_payload": {
-          "before": null,
-          "after": "c518d3048a7a28f4d22a4f9a762fe777578832f94d2ebf0fa9bfccf6a3bcf51e"
-        },
-        "LinuxGameSession.support_profile": {
-          "before": null,
-          "after": "f455f5041912b584fc54e71b97addee025f5d8fa61bf3ca800dc3b7cb0f08d6f"
-        },
-        "LinuxGameSession.to_persistence_payload": {
-          "before": null,
-          "after": "d78365bb0c71d2ff1d83204b4bc0fc0472cda1d11cce26d1f8c8166ead82e645"
-        },
-        "LinuxGameSession.verify_replay": {
-          "before": null,
-          "after": "e0be5a8407f5b410e09eec41180742e6a8d2934c656929ba1579adad5924e7a4"
-        },
-        "LinuxGameSession.view": {
-          "before": null,
-          "after": "e0f99512e545ff3c1c52b4c5c6f4e20b6aa289239be029bda68005fd41de1d50"
-        },
-        "LinuxGameSession.view_for_context": {
-          "before": null,
-          "after": "4fa8365903328fecfa5673a6f1f9ab9f688435775fb036710435a11722f001af"
-        },
-        "LinuxGameSession.visible_event_count_for_context": {
-          "before": null,
-          "after": "524d2b9136be3c1bedddeb90c6d91ec05d61a8e7cabd4a4b2b8d187ccd24732b"
-        },
-        "viewer_payload": {
-          "before": null,
-          "after": "3bcecde7b722bed4e18faceba4ad5c3e22620e733f515986df214d3263b6fd5f"
-        }
-      }
-    },
-    "tests/code_quality/test_current_shard_compatibility.py": {
-      "before_sha256": "017ea13da6b7bff94f1bda7edf700e3cdae8ccbe298c76b94edd8d419fa88c30",
-      "after_sha256": "777f7b60f6c39e5ee893b1bec87e312b7d5ba5b94f9ec6044820341950f042a6",
-      "owners": {
-        "@module": {
-          "before": "872b4cd2346333a6d046dab5c4f9a8e32dec6a4db2f1adda8f37e8e4c4df1a96",
-          "after": "1d454f5e1cf391cd60065d0631aeac8db14490bdb33d4eb6a8a3aba465676061"
-        },
-        "charge_inputs": {
-          "before": null,
-          "after": "93384815002472450f2c1e335536d2a5e65ca1169ed25bd4b59120591372ca06"
-        },
-        "native_charge_geometry": {
-          "before": null,
-          "after": "3f3edaf71ea7cb5ffbba565bc41e82193de8b458a22fcf67d4450cd0b7e407de"
-        },
-        "retained_source_context": {
-          "before": null,
-          "after": "f008059e65371552147666685cf346f8d49660246c2dabe5e0af5fe1871fcd4c"
-        },
-        "test_compatibility_boundary_rejects_stale_or_forged_inputs": {
-          "before": "52ee90e9890d8713df8cf5119b5866c3ac0424c1216ceff21ec4067ff8ddcc40",
-          "after": "2b4de65c52b20ae8bebdc94fb5f663f7328453a3bd5ec599bdfddff9f70fa3e6"
-        },
-        "test_generator_checker_and_live_dispatch_use_same_current_costs": {
-          "before": "3b446b97be6ecdc2c9ad6b246af70a80983e7c79905e565c17faea5a4625273d",
-          "after": "f6884ec3680ff52d1a5d70ffa0f99a1012d2191bd08b5bea81ad759a2a73a7b7"
-        },
-        "test_native_charge_rejects_whole_template_instead_of_clipping_models": {
-          "before": null,
-          "after": "fb5d0506f3272a392ed5256275e790df7cb4d7d44c93b424481058262c0768f2"
-        },
-        "test_native_charge_whole_formation_preserves_clearance_and_real_budget": {
-          "before": null,
-          "after": "0e1211ed1d97fa0171ed416f59195739a398c5f88ed024de214912f3242361fa"
-        },
-        "test_native_serial_role_preserves_complete_phases_and_measurement_scope": {
-          "before": "9cffb7e572fd6ced404620b95aa03bff6dbbd8a99ab0911f9e352799163558db",
-          "after": "55b2e8b2e5eddca99650c0ba1a3ee790520cb6e457a021d687a13fb58b4e5435"
-        },
-        "test_original_producer_and_exact_reviewed_successor": {
-          "before": null,
-          "after": "9be6161de8870b0d800731f6d58f055b8813eb2f4b5f212f1d3d57f17ddb7e5c"
-        },
-        "test_producer_map_drift_fails": {
-          "before": null,
-          "after": "23763489e340291238b3af5c6dc405225c8d3e41607bd1cd1450a92218d478b6"
+        "test_cutover_real_cli_rejects_naming_override": {
+          "before": "1f8b10a7d209336f6c5b7a04e8f76bf5de5a5cb6a25375109ea484440ac5712f",
+          "after": "6b9c9a67865fb5d93c65349b5560ab1c22ce1380013d494c6a1601785de3e94c"
         },
-        "test_source_bootstrap_preserves_history_for_shared_historical_clones": {
-          "before": "e6d7c1094613956b62d876dbd19eee66c500f45f3c42f75bd925c2aa5d9938f8",
-          "after": "77701d57a558a0869ca912be121b33790fcb64f2f2fcd8f6bba55a891cff87d0"
+        "test_cutover_real_pytest_cli_does_not_bypass_explicit_file_guard": {
+          "before": "4e11b9ce830a4bf9e12bdd84abf062df2c8b8edf44599a9cd677ae83e2da1d19",
+          "after": "af804fd71fd6fc6a810c39e70ddb45529eff958bf82857671c1b9f1c39bb9d1b"
         },
-        "test_tampered_or_expanded_successor_fails": {
+        "test_precision_addition_does_not_reclassify_retained_snapshots": {
           "before": null,
-          "after": "277d89caa3c916795b78ae4e81c4dd18fb994a007a94197b1616c819d32bd552"
+          "after": "598cc1a7f23384fdcf016e1b1ede92c43c280a25700c8c75d8d79e778f2544ab"
         },
-        "test_unlisted_or_wrong_live_bytes_fail": {
+        "test_precision_addition_preserves_retained_selection_and_admits_only_its_owner": {
           "before": null,
-          "after": "6dadfa40f9c84214fda1eed1937a9f7461cdb41e4d8ab5de3da00be0c0d5bffd"
+          "after": "d8c7eaf612a0acbe79a26e9361f6fa654597a41fc860349d70a34aca146739d2"
         },
-        "test_unreviewed_producer_is_rejected_before_archive": {
+        "test_precision_addition_requires_complete_exact_source_tuple": {
           "before": null,
-          "after": "c97c17faf6bc6f6aa587141eeab989a9e62921fd2146456003c0cba873ad77f9"
+          "after": "58ed7f01cdd99233c7f2bcef0e3f4207c9611c84ac69ad1cfbbb7edd8fcafe60"
         }
       }
     },
     "tests/code_quality/test_linux_authority_shard_admission.py": {
-      "before_sha256": null,
-      "after_sha256": "63e3eae262f726f147aad50538a1a826f2c0d1f9b326777da02ba83f43a2f2e5",
+      "before_sha256": "63e3eae262f726f147aad50538a1a826f2c0d1f9b326777da02ba83f43a2f2e5",
+      "after_sha256": "32f076aeab7b287fb0d0ea682d2ca7d5ca983e147bb2527809964d9128427bcf",
       "owners": {
         "@module": {
-          "before": null,
-          "after": "2f3bac66ebd532c7a045dac09f6a3b54681b5fc1ebd16998cf8f463955dafa9a"
-        },
-        "retained_order": {
-          "before": null,
-          "after": "a457710a9b1d4b2d6878b69758a7e122b4cec62b62a5ac7098d3f02c2fd710b0"
+          "before": "2f3bac66ebd532c7a045dac09f6a3b54681b5fc1ebd16998cf8f463955dafa9a",
+          "after": "6d528fa687f9f5b4e958602d2cd23743f46e63150862968637088105bf47663b"
         },
         "test_current_authority_source_requires_its_complete_git_producer": {
-          "before": null,
-          "after": "62a2bf7fba5caac476d2b84a5857c4da67662bcf321e8e9d7e053afbb3078d6b"
+          "before": "62a2bf7fba5caac476d2b84a5857c4da67662bcf321e8e9d7e053afbb3078d6b",
+          "after": null
         },
         "test_live_authority_profile_has_complete_fresh_evidence_and_fixed_inventory": {
-          "before": null,
-          "after": "be946d251604c489cceedf52cb0c1a9fa31cb95b19d51649a28b750b366b8051"
+          "before": "be946d251604c489cceedf52cb0c1a9fa31cb95b19d51649a28b750b366b8051",
+          "after": null
         },
-        "test_new_runtime_does_not_fit_the_retained_four_source_exception": {
+        "test_retained_authority_profile_has_complete_original_evidence_and_fixed_inventory": {
           "before": null,
-          "after": "bf2d13d66c40a922254bcfcd48e17f61a0a7ecfd087d1add9721ada69a8af7d6"
+          "after": "ef683606477d1c60454a659f1dab80f390d67080e53a8f8b9cc0d9c386dad426"
         },
-        "test_new_selector_cannot_relocate_retained_work": {
+        "test_retained_authority_source_requires_its_complete_git_producer": {
           "before": null,
-          "after": "0dd7e6ac4361b92302cc944719febc4ad009430092ac0e5d131a130117771815"
-        },
-        "test_shared_complete_proof_rejects_drift": {
-          "before": null,
-          "after": "6ebbb34debad2344405a268ee6434b33fb8b3cd5d60ad64c676c7b34ca02f479"
-        },
-        "test_shared_reader_preserves_the_complete_retained_covered_proof": {
-          "before": null,
-          "after": "a9117c865d0a3579dec144ae054d3eb6d1a4d169612ee42c16eb6983644f25c0"
-        },
-        "test_unmeasured_native_standalone_is_not_an_invented_timing": {
-          "before": null,
-          "after": "f3a0280e00b8878a63faeaa33ab05b3b81e316f49000c30a0bbf4f25acebd29c"
+          "after": "c270a7649bb3dd14ed0fd3e5aa3d50231bd00a9105d860d1ff950f6eb099ef6d"
         }
       }
     },
-    "tests/infrastructure/adapters/unit/test_linux_authority.py": {
+    "tests/code_quality/test_milli_inch_shard_admission.py": {
       "before_sha256": null,
-      "after_sha256": "e30567808765adacc47cce1e5116ecc00be1ceb6a1af8accf27ffcc529d69aa8",
+      "after_sha256": "a9b4fa44c6580af8d245421805ac79e95aa984da9cc1a0ef3caf906a08128996",
       "owners": {
         "@module": {
           "before": null,
-          "after": "1d792bf3f8ba981df88878ad8600aee3c882615a0212e651ac46ff7a35796d46"
+          "after": "270ff3de0c81eb985b5be9f98f77d249d158646017a9743d22c244cc729152fd"
         },
-        "test_authority_framing_distinguishes_clean_close_from_truncated_json": {
+        "test_live_milli_inch_profile_has_complete_fresh_evidence_and_fixed_inventory": {
           "before": null,
-          "after": "f09fd5779320a99dd01324fd245a99cdd0ddbea79cafd117e177f5c1ce48dcd4"
+          "after": "a552e377cad54dc2c86f663cf4c89e3b5b876c8419d5766b23796e03ba07e36f"
         },
-        "test_dispatcher_real_native_roster_restore_fork_viewers_and_exact_replay": {
+        "test_milli_inch_complete_producer_is_current_source": {
           "before": null,
-          "after": "844444f825f27b46d2fa6e9399c066a59a1f1dc30a02058dcac345e822d7e019"
+          "after": "fb85799fa6df99c249d31d61f9a12a00d6ae89abe4f28f273a1772d4e3a9a4c2"
         },
-        "test_executor_registration_requires_the_registered_profile_and_same_engine": {
+        "test_milli_inch_fetches_current_and_retained_producers": {
           "before": null,
-          "after": "1e782ef02fc5744fc66f5fd9998347684bf74e4c98e0796fa9d410a6f5c2957b"
+          "after": "2c60a912a236158edafba3e5fa29d0d593e2398c8762fc261a86a800feb155b7"
         },
-        "test_profile_enrollment_requires_a_receipt_and_checks_inner_bytes": {
+        "test_milli_inch_new_selector_cannot_move_or_duplicate_retained_work": {
           "before": null,
-          "after": "d217b2393c124641561e0967a816807cc42cfca41d83c4a8c54f745e90b17174"
+          "after": "d21bbd24c8b8082eae591bd5efdb3bc0901987cebbb06c12567f2aa76491436b"
         },
-        "test_profile_envelope_keeps_original_bytes_and_explicit_provenance": {
+        "test_milli_inch_preserves_original_behavior_sources_and_authority_evidence": {
           "before": null,
-          "after": "aa6fa6228dc838aa482798dd3056a0ec76c224b6d69ca1fc85b05d2b11073264"
+          "after": "6a0bb91b76e1f4427c72d3ef14dc9dbbeb2d3255cf974a6659af28fe5fafea8d"
         },
-        "test_profile_envelope_rejects_binding_drift": {
+        "test_milli_inch_runtime_is_only_the_exact_inactive_addition": {
           "before": null,
-          "after": "1c7cccba7bc9957f03af6cce273758f2d32fcd4a7406e56e462b1f81d9f7c5f0"
-        },
-        "test_selected_linux_process_implements_adapter_session_and_roundtrips": {
-          "before": null,
-          "after": "0ea7004089c333b93c566d80d51ceea6d57fca30685de5fd4f57db8b82638469"
+          "after": "8356fe4b2c78c5d547560dbc1bde0c6373482848ee91d8b32ba19b883d993d54"
         }
       }
     },
-    "tests/rules/section07/coverage.json": {
-      "before_sha256": "b3a4a396df256a02435c92423742206b1f4b1a9ca3793e5a799cef189bd7eb69",
-      "after_sha256": "cea06c79ed546cda088d51118fabdda6fdc97993d7a3b5c680ee92cacc1c36f4",
+    "tests/code_quality/test_performance_policy.py": {
+      "before_sha256": "f745dcf09b6bf4f957424b6c030d39e1194488f576105ae2301adcd6c7b2511d",
+      "after_sha256": "c75d9785768bd0d37751667ab0ae04856b4a70dc1ac8bcd90859991ed29a3084",
       "owners": {
-        "@document": {
-          "before": "b3a4a396df256a02435c92423742206b1f4b1a9ca3793e5a799cef189bd7eb69",
-          "after": "cea06c79ed546cda088d51118fabdda6fdc97993d7a3b5c680ee92cacc1c36f4"
+        "test_milli_inch_arithmetic_keeps_sensitive_geometry_comparison_obligations": {
+          "before": null,
+          "after": "ec128d2e9177b9841691a38ffac13e5dce8a2c326c44b116903c3cb901917474"
+        },
+        "test_milli_inch_map_retains_every_existing_sensitive_operation": {
+          "before": null,
+          "after": "18e70a897f66abd0554bc64934592d1d32491f0ca3f07ebf4c8c520f3dc3c11d"
         }
       }
     },
-    "tests/support/cavalcade_native_charge.py": {
+    "tests/rules/section01/test_milli_inch.py": {
       "before_sha256": null,
-      "after_sha256": "f717b45454379d0ea090d671a8acd3959009c73e5097fd5a75e73e53f45f6232",
+      "after_sha256": "6fad7bf3bc123c2f217bb0ae46b96971d8591f1cda712a0d88ba4b1f0f5edb37",
       "owners": {
         "@module": {
           "before": null,
-          "after": "366ab73049517b5d1cbf144c2ff6107a8ba9c85499a6fd4d9944727af65e25e2"
+          "after": "081b378e1a8f7a90065739ecbaaa78f14715a1908f105c3bb5f0535202c53505"
         },
-        "contact_templates": {
+        "test_milli_inch_canonical_dimensions_derive_exact_half_tick_radii": {
           "before": null,
-          "after": "789da4a8762e81eab7320118554ea8675edf1c098e8d9608cd1bb3eb7b52ea6e"
+          "after": "01c9e89608e527df1ba9bf591eee183861e149d6acf59fc06629be11aeffc692"
         },
-        "digest": {
+        "test_milli_inch_decimal_context_cannot_change_results": {
           "before": null,
-          "after": "c801374fd8045faeefe7eb50d2b7a301ad5bc8a9a39ddeb939b837330e06de75"
+          "after": "7e42ca2c27563f288b13c6b2640695cc1ef9f1356da9e57032783fec84f8cfd5"
         },
-        "formation_templates": {
+        "test_milli_inch_exact_mm_conversion_precedes_single_rounding": {
           "before": null,
-          "after": "a3912db293d0ffcc481956718ed5108e119a83f2e585f13b65f29f2720d1c9f3"
+          "after": "d0a85c1cdbf118ece43563991e94296b1237904d809a7bb716f53871dbb5e32c"
         },
-        "formation_templates_for_models": {
+        "test_milli_inch_exact_sources_and_binary_float_semantics_are_distinct": {
           "before": null,
-          "after": "ff8f0334a530cec280a83f2b58b3eb7ed03f8cb3d272c9c0708fc94631741f91"
+          "after": "c667a4b200824aa2928944d7bedf7f45ddfed307868f5dbde764107de9856999"
         },
-        "freeze_procedure": {
+        "test_milli_inch_path_rejects_negative_and_unsupported_irrational_segments": {
           "before": null,
-          "after": "f98f9e0bcf6eb1ffe6ca931440c15d866e05d47bae9b0042a0fe18cc13e3fe2c"
+          "after": "58359b10d90aeefcb17b82e40e0aff68df951ebb41364bd9f347e30fd028f147"
         },
-        "main": {
+        "test_milli_inch_path_rounds_total_once_and_is_partition_invariant": {
           "before": null,
-          "after": "e464a267c969df877feb31f997850156cb9ae9a96d2c3ce6ec2b33f417120597"
+          "after": "6c6c0d8ec62763e818e8bc7e3955c5c19f904f8146f14f4a55ce1179b28ef5df"
         },
-        "path_for_template": {
+        "test_milli_inch_rejects_invalid_sources": {
           "before": null,
-          "after": "6202f118826c838aa914cd2c17a598c5cfc24e5cf6867458d37a0db65b5f2505"
+          "after": "08866c1d69e6f71241fb7c27c1594dc1742916aa4f0e13cd5538aa103f633fee"
         },
-        "prepare": {
+        "test_milli_inch_signed_rounding_ties_and_exact_neighbors": {
           "before": null,
-          "after": "253021e0e6527572c2f347233f8293f80cddbdb4adb51c185e9f0536f3b741b9"
+          "after": "5e77bb1b66163aefae99f3d9df71a375a5f2b5264f3986823090c925d7c9ce36"
         },
-        "prepare_repair": {
+        "test_milli_inch_squared_measurements_compare_exact_midpoints": {
           "before": null,
-          "after": "b72bc8fac1288501acff88b1a0c949e0f241047cd041b0ae619c10be09400fc9"
+          "after": "8a14cee47ae97a9e3119b4efb30f1422e3c98a73ecc412f4d327af29c0758d45"
         },
-        "publish_response_phase": {
+        "test_milli_inch_threshold_strictness_uses_rounded_length_without_epsilon": {
           "before": null,
-          "after": "f2d95311708859a4adf0a83228d7f7b66a7adcb6768d827dacecca04d1d6ed72"
+          "after": "616124a258acb34a5f8cbcee6a257b9bac8e5723e49f26a4ad284ccb859a6968"
         },
-        "qualify_saved": {
+        "test_milli_inch_zero_rounded_gap_is_not_a_topology_predicate": {
           "before": null,
-          "after": "4c90be9c10dcb94ddd4ff5dead5c7e3960c42a323110eea63ec011e10d5927e2"
-        },
-        "respond": {
-          "before": null,
-          "after": "310b8bffb03845069ea1044674723a84abbeef2704722d5069996b343d987781"
-        },
-        "snapshot": {
-          "before": null,
-          "after": "c9eaf32604cf3669d4ab2ac821eef5851836ad42b180b26c9519a140923ace8b"
-        },
-        "supervised": {
-          "before": null,
-          "after": "60b78044dc05152e23459d178777c013e2ed4945880da032c1cb1e46cba28746"
-        },
-        "template_fits": {
-          "before": null,
-          "after": "38f6f8170b9af79ba07504bc8c8c8c65461ea8d24f35e02d1c2afa44f6da771e"
-        },
-        "write_json": {
-          "before": null,
-          "after": "a55ef70012b2219c683b2f1da8fe8a7742c5b0419c137c12472f547893e1ea8c"
-        }
-      }
-    },
-    "tests/support/retained_authority_sources.py": {
-      "before_sha256": null,
-      "after_sha256": "aac3808826bbff48b488776d90e02086342f0dd9501062905591dbad8e41d1fe",
-      "owners": {
-        "@module": {
-          "before": null,
-          "after": "e774471a5565ec7a7040a6aaf754233b79c55c100a0091b2b9a25264ce554399"
-        },
-        "materialize_retained_sources": {
-          "before": null,
-          "after": "1ac8df53df6626f0388c83eacac5f348b10be41d8ce38a730eeea42102fe5e2e"
+          "after": "a2dd7e9766215e107e26403a7034abb26abbed321222414aa6252979257d4ec2"
         }
       }
     }
   },
   "rows": {
-    "README.md": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Document the selected Linux-authoritative execution route and its finite exact cross-client proofs, or register the added quality controls in their existing lane. Historical findings, receipts and deferred cases retain their original meaning.",
-      "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
-      "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
-    },
     "ci/quality_shards/all.txt": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Document the selected Linux-authoritative execution route and its finite exact cross-client proofs, or register the added quality controls in their existing lane. Historical findings, receipts and deferred cases retain their original meaning.",
-      "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
-      "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
+      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
+      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
+      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
+    },
+    "ci/quality_shards/shard-2.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
+      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
+      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
     },
     "ci/quality_shards/shard-3-modules.txt": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Document the selected Linux-authoritative execution route and its finite exact cross-client proofs, or register the added quality controls in their existing lane. Historical findings, receipts and deferred cases retain their original meaning.",
-      "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
-      "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
+      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
+      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
+      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
     },
     "ci/quality_shards/shard-3.txt": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Document the selected Linux-authoritative execution route and its finite exact cross-client proofs, or register the added quality controls in their existing lane. Historical findings, receipts and deferred cases retain their original meaning.",
-      "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
-      "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
+      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
+      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
+      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
     },
     "ci/test_shards/current-runtime-compatibility.json": {
       "category": "measured_workload",
@@ -1113,9 +661,9 @@
         "scoped-shard-allocation"
       ],
       "selected_families": [],
-      "rationale": "Preserve the finite packed-formation operator repair and authenticate the new runtime using a fresh complete covered source/phase profile. Historical readers remain exercised against exact static input data with current validator code. Retain all old selectors in place and add only the authority test file; no allocation search, timing-limit change, historical rewrite or speedup claim.",
-      "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
-      "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
+      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
+      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
+      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
     },
     "ci/test_shards/durations.json": {
       "category": "measured_workload",
@@ -1123,130 +671,42 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Preserve the finite packed-formation operator repair and authenticate the new runtime using a fresh complete covered source/phase profile. Historical readers remain exercised against exact static input data with current validator code. Retain all old selectors in place and add only the authority test file; no allocation search, timing-limit change, historical rewrite or speedup claim.",
-      "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
-      "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
+      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
+      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
+      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
     },
-    "ci/test_shards/linux-authority-covered-baseline.json": {
+    "ci/test_shards/milli-inch-covered-baseline.json": {
       "category": "measured_workload",
       "operations": [
         "mfm-current-behavior-profile",
         "scoped-shard-allocation"
       ],
       "selected_families": [],
-      "rationale": "Preserve the finite packed-formation operator repair and authenticate the new runtime using a fresh complete covered source/phase profile. Historical readers remain exercised against exact static input data with current validator code. Retain all old selectors in place and add only the authority test file; no allocation search, timing-limit change, historical rewrite or speedup claim.",
-      "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
-      "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
+      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
+      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
+      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
     },
-    "ci/test_shards/linux-authority-covered-evidence.json": {
+    "ci/test_shards/milli-inch-covered-evidence.json": {
       "category": "measured_workload",
       "operations": [
         "mfm-current-behavior-profile",
         "scoped-shard-allocation"
       ],
       "selected_families": [],
-      "rationale": "Preserve the finite packed-formation operator repair and authenticate the new runtime using a fresh complete covered source/phase profile. Historical readers remain exercised against exact static input data with current validator code. Retain all old selectors in place and add only the authority test file; no allocation search, timing-limit change, historical rewrite or speedup claim.",
-      "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
-      "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
+      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
+      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
+      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
     },
-    "ci/test_shards/linux-authority-derived-assignment.json": {
+    "ci/test_shards/milli-inch-derived-assignment.json": {
       "category": "measured_workload",
       "operations": [
         "mfm-current-behavior-profile",
         "scoped-shard-allocation"
       ],
       "selected_families": [],
-      "rationale": "Preserve the finite packed-formation operator repair and authenticate the new runtime using a fresh complete covered source/phase profile. Historical readers remain exercised against exact static input data with current validator code. Retain all old selectors in place and add only the authority test file; no allocation search, timing-limit change, historical rewrite or speedup claim.",
-      "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
-      "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
-    },
-    "ci/test_shards/linux-authority-e2094d9c/current-runtime-compatibility.json": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile",
-        "scoped-shard-allocation"
-      ],
-      "selected_families": [],
-      "rationale": "Preserve the finite packed-formation operator repair and authenticate the new runtime using a fresh complete covered source/phase profile. Historical readers remain exercised against exact static input data with current validator code. Retain all old selectors in place and add only the authority test file; no allocation search, timing-limit change, historical rewrite or speedup claim.",
-      "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
-      "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
-    },
-    "ci/test_shards/linux-authority-e2094d9c/durations.json": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile",
-        "scoped-shard-allocation"
-      ],
-      "selected_families": [],
-      "rationale": "Preserve the finite packed-formation operator repair and authenticate the new runtime using a fresh complete covered source/phase profile. Historical readers remain exercised against exact static input data with current validator code. Retain all old selectors in place and add only the authority test file; no allocation search, timing-limit change, historical rewrite or speedup claim.",
-      "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
-      "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
-    },
-    "ci/test_shards/linux-authority-e2094d9c/linux-authority-covered-baseline.json": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile",
-        "scoped-shard-allocation"
-      ],
-      "selected_families": [],
-      "rationale": "Preserve the finite packed-formation operator repair and authenticate the new runtime using a fresh complete covered source/phase profile. Historical readers remain exercised against exact static input data with current validator code. Retain all old selectors in place and add only the authority test file; no allocation search, timing-limit change, historical rewrite or speedup claim.",
-      "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
-      "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
-    },
-    "ci/test_shards/linux-authority-e2094d9c/linux-authority-covered-evidence.json": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile",
-        "scoped-shard-allocation"
-      ],
-      "selected_families": [],
-      "rationale": "Preserve the finite packed-formation operator repair and authenticate the new runtime using a fresh complete covered source/phase profile. Historical readers remain exercised against exact static input data with current validator code. Retain all old selectors in place and add only the authority test file; no allocation search, timing-limit change, historical rewrite or speedup claim.",
-      "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
-      "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
-    },
-    "ci/test_shards/linux-authority-e2094d9c/linux-authority-derived-assignment.json": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile",
-        "scoped-shard-allocation"
-      ],
-      "selected_families": [],
-      "rationale": "Preserve the finite packed-formation operator repair and authenticate the new runtime using a fresh complete covered source/phase profile. Historical readers remain exercised against exact static input data with current validator code. Retain all old selectors in place and add only the authority test file; no allocation search, timing-limit change, historical rewrite or speedup claim.",
-      "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
-      "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
-    },
-    "ci/test_shards/linux-authority-e2094d9c/provenance.json": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile",
-        "scoped-shard-allocation"
-      ],
-      "selected_families": [],
-      "rationale": "Preserve the finite packed-formation operator repair and authenticate the new runtime using a fresh complete covered source/phase profile. Historical readers remain exercised against exact static input data with current validator code. Retain all old selectors in place and add only the authority test file; no allocation search, timing-limit change, historical rewrite or speedup claim.",
-      "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
-      "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
-    },
-    "ci/test_shards/linux-authority-e2094d9c/shard-12.txt": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile",
-        "scoped-shard-allocation"
-      ],
-      "selected_families": [],
-      "rationale": "Preserve the finite packed-formation operator repair and authenticate the new runtime using a fresh complete covered source/phase profile. Historical readers remain exercised against exact static input data with current validator code. Retain all old selectors in place and add only the authority test file; no allocation search, timing-limit change, historical rewrite or speedup claim.",
-      "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
-      "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
-    },
-    "ci/test_shards/native-charge-source-successor.json": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile",
-        "scoped-shard-allocation"
-      ],
-      "selected_families": [],
-      "rationale": "Preserve the finite packed-formation operator repair and authenticate the new runtime using a fresh complete covered source/phase profile. Historical readers remain exercised against exact static input data with current validator code. Retain all old selectors in place and add only the authority test file; no allocation search, timing-limit change, historical rewrite or speedup claim.",
-      "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
-      "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
+      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
+      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
+      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
     },
     "ci/test_shards/shard-12.txt": {
       "category": "measured_workload",
@@ -1254,161 +714,175 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Preserve the finite packed-formation operator repair and authenticate the new runtime using a fresh complete covered source/phase profile. Historical readers remain exercised against exact static input data with current validator code. Retain all old selectors in place and add only the authority test file; no allocation search, timing-limit change, historical rewrite or speedup claim.",
-      "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
-      "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
+      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
+      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
+      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "category": "serialization_or_replay_work",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerate the existing external contract examples and manifest for the added authority modules' engine build ID. Public schemas, protocol versions and wire shapes remain unchanged. Generated identity/hash values do not change existing contract source-reuse work; no speed comparison or performance improvement is claimed. The real serial smoke and contract/client/package checks remain required.",
-      "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
-      "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
-    },
-    "contracts/examples/sessions/session-command-outcome.json": {
-      "category": "serialization_or_replay_work",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerate the existing external contract examples and manifest for the added authority modules' engine build ID. Public schemas, protocol versions and wire shapes remain unchanged. Generated identity/hash values do not change existing contract source-reuse work; no speed comparison or performance improvement is claimed. The real serial smoke and contract/client/package checks remain required.",
-      "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
-      "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
-    },
-    "contracts/examples/sessions/session-command-started.json": {
-      "category": "serialization_or_replay_work",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerate the existing external contract examples and manifest for the added authority modules' engine build ID. Public schemas, protocol versions and wire shapes remain unchanged. Generated identity/hash values do not change existing contract source-reuse work; no speed comparison or performance improvement is claimed. The real serial smoke and contract/client/package checks remain required.",
-      "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
-      "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
-    },
-    "contracts/examples/sessions/session-metadata-created.json": {
-      "category": "serialization_or_replay_work",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerate the existing external contract examples and manifest for the added authority modules' engine build ID. Public schemas, protocol versions and wire shapes remain unchanged. Generated identity/hash values do not change existing contract source-reuse work; no speed comparison or performance improvement is claimed. The real serial smoke and contract/client/package checks remain required.",
-      "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
-      "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
-    },
-    "contracts/examples/support-profile-player-a-redacted.json": {
-      "category": "serialization_or_replay_work",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerate the existing external contract examples and manifest for the added authority modules' engine build ID. Public schemas, protocol versions and wire shapes remain unchanged. Generated identity/hash values do not change existing contract source-reuse work; no speed comparison or performance improvement is claimed. The real serial smoke and contract/client/package checks remain required.",
-      "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
-      "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
-    },
-    "contracts/examples/support-profile-player-b-redacted.json": {
-      "category": "serialization_or_replay_work",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerate the existing external contract examples and manifest for the added authority modules' engine build ID. Public schemas, protocol versions and wire shapes remain unchanged. Generated identity/hash values do not change existing contract source-reuse work; no speed comparison or performance improvement is claimed. The real serial smoke and contract/client/package checks remain required.",
-      "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
-      "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
-    },
-    "contracts/examples/support-profile.json": {
-      "category": "serialization_or_replay_work",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerate the existing external contract examples and manifest for the added authority modules' engine build ID. Public schemas, protocol versions and wire shapes remain unchanged. Generated identity/hash values do not change existing contract source-reuse work; no speed comparison or performance improvement is claimed. The real serial smoke and contract/client/package checks remain required.",
-      "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
-      "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
-    },
-    "contracts/manifest.json": {
-      "category": "serialization_or_replay_work",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerate the existing external contract examples and manifest for the added authority modules' engine build ID. Public schemas, protocol versions and wire shapes remain unchanged. Generated identity/hash values do not change existing contract source-reuse work; no speed comparison or performance improvement is claimed. The real serial smoke and contract/client/package checks remain required.",
-      "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
-      "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
-    },
-    "data/source_audits/ci64_provenance_v1/test-cutover.json": {
       "category": "rule_semantics",
       "operations": [
-        "ci78-prototype-evidence-0e09425e4315bf61bb6c4427fa7917fe62c2ed867dcb01798f9451a957182b0a"
+        "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Register only the new ten-case real-session authority regression file and its exact bytes in the existing active-file ledger. The immutable native ledger, retired tests, 260 deferrals and source-loading algorithms remain unchanged. This ordinary regression admission does not change external-contract reuse work.",
-      "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
-      "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
+      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
+      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
+      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
+    },
+    "contracts/examples/sessions/session-command-outcome.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
+      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
+      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
+    },
+    "contracts/examples/sessions/session-command-started.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
+      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
+      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
+    },
+    "contracts/examples/sessions/session-metadata-created.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
+      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
+      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
+    },
+    "contracts/examples/support-profile-player-a-redacted.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
+      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
+      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
+    },
+    "contracts/examples/support-profile-player-b-redacted.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
+      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
+      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
+    },
+    "contracts/examples/support-profile.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
+      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
+      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
+    },
+    "contracts/manifest.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
+      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
+      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
+    },
+    "data/source_audits/ci64_provenance_v1/milli-inch-test-addition-v1.json": {
+      "category": "measured_workload",
+      "operations": [
+        "milli-inch-test-admission"
+      ],
+      "selected_families": [],
+      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
+      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
+      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
     },
     "docs/ADAPTER_DECISION_CONTRACT.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Document the selected Linux-authoritative execution route and its finite exact cross-client proofs, or register the added quality controls in their existing lane. Historical findings, receipts and deferred cases retain their original meaning.",
-      "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
-      "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
-    },
-    "docs/AI_POLICY_INTERFACE.md": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Document the selected Linux-authoritative execution route and its finite exact cross-client proofs, or register the added quality controls in their existing lane. Historical findings, receipts and deferred cases retain their original meaning.",
-      "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
-      "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
+      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
+      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
+      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Document the selected Linux-authoritative execution route and its finite exact cross-client proofs, or register the added quality controls in their existing lane. Historical findings, receipts and deferred cases retain their original meaning.",
-      "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
-      "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
+      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
+      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
+      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
+    },
+    "docs/DISTANCE_PRECISION.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
+      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
+      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
+    },
+    "docs/performance/current/precision-foundation-movement.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
+      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
+      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
+    },
+    "docs/performance/current/precision-foundation-setup.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
+      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
+      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
+    },
+    "docs/performance/current/precision-foundation-visibility.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
+      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
+      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Document the selected Linux-authoritative execution route and its finite exact cross-client proofs, or register the added quality controls in their existing lane. Historical findings, receipts and deferred cases retain their original meaning.",
-      "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
-      "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
+      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
+      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
+      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
     },
-    "scripts/boolean_los_admission.py": {
+    "scripts/behavioral_selection_members.py": {
       "category": "measured_workload",
       "operations": [
-        "scoped-shard-allocation"
+        "milli-inch-test-admission"
       ],
       "selected_families": [],
-      "rationale": "Preserve the finite packed-formation operator repair and authenticate the new runtime using a fresh complete covered source/phase profile. Historical readers remain exercised against exact static input data with current validator code. Retain all old selectors in place and add only the authority test file; no allocation search, timing-limit change, historical rewrite or speedup claim.",
-      "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
-      "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
+      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
+      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
+      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
     },
-    "scripts/complete_covered_evidence.py": {
-      "category": "measured_workload",
+    "scripts/build_test_shards.py": {
+      "category": "rule_semantics",
       "operations": [
-        "scoped-shard-allocation"
+        "ci78-cutover-owners-83cd0803bcde80cbfc805d2a110f3274d501da3bc2230de8cc7f95cc0cbd608f"
       ],
       "selected_families": [],
-      "rationale": "Preserve the finite packed-formation operator repair and authenticate the new runtime using a fresh complete covered source/phase profile. Historical readers remain exercised against exact static input data with current validator code. Retain all old selectors in place and add only the authority test file; no allocation search, timing-limit change, historical rewrite or speedup claim.",
-      "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
-      "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
-    },
-    "scripts/current_native_serial_role.py": {
-      "category": "measured_workload",
-      "operations": [
-        "scoped-shard-allocation"
-      ],
-      "selected_families": [],
-      "rationale": "Preserve the finite packed-formation operator repair and authenticate the new runtime using a fresh complete covered source/phase profile. Historical readers remain exercised against exact static input data with current validator code. Retain all old selectors in place and add only the authority test file; no allocation search, timing-limit change, historical rewrite or speedup claim.",
-      "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
-      "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
+      "rationale": "Implement finite admission semantics and preserve existing CLI assertions. The three extracted membership validators have identical original ASTs; forwarding wrappers and exact-source admission add no changed contract source scanner, generator, search, cache or serialization algorithm. Required fixture copies add the two helper dependencies. Existing mandatory mappings remain selected.",
+      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
+      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
     },
     "scripts/current_shard_assignment.py": {
       "category": "measured_workload",
@@ -1416,9 +890,9 @@
         "scoped-shard-allocation"
       ],
       "selected_families": [],
-      "rationale": "Preserve the finite packed-formation operator repair and authenticate the new runtime using a fresh complete covered source/phase profile. Historical readers remain exercised against exact static input data with current validator code. Retain all old selectors in place and add only the authority test file; no allocation search, timing-limit change, historical rewrite or speedup claim.",
-      "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
-      "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
+      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
+      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
+      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
     },
     "scripts/current_shard_compatibility.py": {
       "category": "measured_workload",
@@ -1426,9 +900,9 @@
         "scoped-shard-allocation"
       ],
       "selected_families": [],
-      "rationale": "Preserve the finite packed-formation operator repair and authenticate the new runtime using a fresh complete covered source/phase profile. Historical readers remain exercised against exact static input data with current validator code. Retain all old selectors in place and add only the authority test file; no allocation search, timing-limit change, historical rewrite or speedup claim.",
-      "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
-      "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
+      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
+      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
+      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
     },
     "scripts/fetch_scheduling_sources.py": {
       "category": "measured_workload",
@@ -1436,29 +910,29 @@
         "scoped-shard-allocation"
       ],
       "selected_families": [],
-      "rationale": "Preserve the finite packed-formation operator repair and authenticate the new runtime using a fresh complete covered source/phase profile. Historical readers remain exercised against exact static input data with current validator code. Retain all old selectors in place and add only the authority test file; no allocation search, timing-limit change, historical rewrite or speedup claim.",
-      "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
-      "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
+      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
+      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
+      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
     },
-    "scripts/linux_authority_shard_admission.py": {
+    "scripts/milli_inch_shard_admission.py": {
       "category": "measured_workload",
       "operations": [
         "scoped-shard-allocation"
       ],
       "selected_families": [],
-      "rationale": "Preserve the finite packed-formation operator repair and authenticate the new runtime using a fresh complete covered source/phase profile. Historical readers remain exercised against exact static input data with current validator code. Retain all old selectors in place and add only the authority test file; no allocation search, timing-limit change, historical rewrite or speedup claim.",
-      "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
-      "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
+      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
+      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
+      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
     },
-    "scripts/run_complete_covered_profile.py": {
+    "scripts/milli_inch_test_admission.py": {
       "category": "measured_workload",
       "operations": [
-        "scoped-shard-allocation"
+        "milli-inch-test-admission"
       ],
       "selected_families": [],
-      "rationale": "Preserve the finite packed-formation operator repair and authenticate the new runtime using a fresh complete covered source/phase profile. Historical readers remain exercised against exact static input data with current validator code. Retain all old selectors in place and add only the authority test file; no allocation search, timing-limit change, historical rewrite or speedup claim.",
-      "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
-      "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
+      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
+      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
+      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
@@ -1466,59 +940,34 @@
         "source-record"
       ],
       "selected_families": [],
-      "rationale": "Regenerate the runtime identity for the four added explicit authority adapter modules. This is the generated identity record, not a source ingestion, setup algorithm, rules or catalog change; no performance improvement is asserted.",
-      "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
-      "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
+      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
+      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
+      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
     },
-    "src/warhammer40k_core/adapters/execution_profile.py": {
-      "category": "serialization_or_replay_work",
+    "src/warhammer40k_core/geometry/milli_inch.py": {
+      "category": "rule_semantics",
       "operations": [
-        "selected-linux-session-authority"
+        "geometry-search"
+      ],
+      "selected_families": [
+        "movement",
+        "setup",
+        "visibility"
+      ],
+      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
+      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
+      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
+    },
+    "tests/code_quality/test_ci_performance_gates.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "ci78-cutover-owners-2bec45eb6ecc7574f5395711c9381e101ae612cb57b1a0e433c8a508aa991453",
+        "milli-inch-test-admission"
       ],
       "selected_families": [],
-      "rationale": "Add a separately configured complete AdapterGameSession process authority and strict profile-bound persistence envelopes. The actual base has no such API, so no matched speed comparison or unchanged new-mode cost is claimed. Four frozen native continuation/reciprocal restore/full replay operations on the retained e209 stage remain historical. Four fresh C8 operations complete in 786-803 seconds under the unchanged 900-second cap, with exact original checkpoint, viewer/event and full ReplayRunner agreement. The boundary repair uses declared numeric queries through the unchanged geometry backend; exact installed binary hashes and explicit profile registration remain bound. Native host session work is unchanged; the required serial runtime smoke remains mandatory.",
-      "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
-      "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
-    },
-    "src/warhammer40k_core/adapters/linux_authority_transport.py": {
-      "category": "serialization_or_replay_work",
-      "operations": [
-        "selected-linux-session-authority"
-      ],
-      "selected_families": [],
-      "rationale": "Add a separately configured complete AdapterGameSession process authority and strict profile-bound persistence envelopes. The actual base has no such API, so no matched speed comparison or unchanged new-mode cost is claimed. Four frozen native continuation/reciprocal restore/full replay operations on the retained e209 stage remain historical. Four fresh C8 operations complete in 786-803 seconds under the unchanged 900-second cap, with exact original checkpoint, viewer/event and full ReplayRunner agreement. The boundary repair uses declared numeric queries through the unchanged geometry backend; exact installed binary hashes and explicit profile registration remain bound. Native host session work is unchanged; the required serial runtime smoke remains mandatory.",
-      "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
-      "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
-    },
-    "src/warhammer40k_core/adapters/linux_authority_worker.py": {
-      "category": "serialization_or_replay_work",
-      "operations": [
-        "selected-linux-session-authority"
-      ],
-      "selected_families": [],
-      "rationale": "Add a separately configured complete AdapterGameSession process authority and strict profile-bound persistence envelopes. The actual base has no such API, so no matched speed comparison or unchanged new-mode cost is claimed. Four frozen native continuation/reciprocal restore/full replay operations on the retained e209 stage remain historical. Four fresh C8 operations complete in 786-803 seconds under the unchanged 900-second cap, with exact original checkpoint, viewer/event and full ReplayRunner agreement. The boundary repair uses declared numeric queries through the unchanged geometry backend; exact installed binary hashes and explicit profile registration remain bound. Native host session work is unchanged; the required serial runtime smoke remains mandatory.",
-      "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
-      "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
-    },
-    "src/warhammer40k_core/adapters/linux_session.py": {
-      "category": "serialization_or_replay_work",
-      "operations": [
-        "selected-linux-session-authority"
-      ],
-      "selected_families": [],
-      "rationale": "Add a separately configured complete AdapterGameSession process authority and strict profile-bound persistence envelopes. The actual base has no such API, so no matched speed comparison or unchanged new-mode cost is claimed. Four frozen native continuation/reciprocal restore/full replay operations on the retained e209 stage remain historical. Four fresh C8 operations complete in 786-803 seconds under the unchanged 900-second cap, with exact original checkpoint, viewer/event and full ReplayRunner agreement. The boundary repair uses declared numeric queries through the unchanged geometry backend; exact installed binary hashes and explicit profile registration remain bound. Native host session work is unchanged; the required serial runtime smoke remains mandatory.",
-      "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
-      "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
-    },
-    "tests/code_quality/test_current_shard_compatibility.py": {
-      "category": "measured_workload",
-      "operations": [
-        "scoped-shard-allocation"
-      ],
-      "selected_families": [],
-      "rationale": "Preserve the finite packed-formation operator repair and authenticate the new runtime using a fresh complete covered source/phase profile. Historical readers remain exercised against exact static input data with current validator code. Retain all old selectors in place and add only the authority test file; no allocation search, timing-limit change, historical rewrite or speedup claim.",
-      "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
-      "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
+      "rationale": "Implement finite admission semantics and preserve existing CLI assertions. The three extracted membership validators have identical original ASTs; forwarding wrappers and exact-source admission add no changed contract source scanner, generator, search, cache or serialization algorithm. Required fixture copies add the two helper dependencies. Existing mandatory mappings remain selected.",
+      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
+      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
     },
     "tests/code_quality/test_linux_authority_shard_admission.py": {
       "category": "measured_workload",
@@ -1526,52 +975,44 @@
         "scoped-shard-allocation"
       ],
       "selected_families": [],
-      "rationale": "Preserve the finite packed-formation operator repair and authenticate the new runtime using a fresh complete covered source/phase profile. Historical readers remain exercised against exact static input data with current validator code. Retain all old selectors in place and add only the authority test file; no allocation search, timing-limit change, historical rewrite or speedup claim.",
-      "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
-      "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
+      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
+      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
+      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
     },
-    "tests/infrastructure/adapters/unit/test_linux_authority.py": {
-      "category": "serialization_or_replay_work",
-      "operations": [
-        "selected-linux-session-authority"
-      ],
-      "selected_families": [],
-      "rationale": "Add a separately configured complete AdapterGameSession process authority and strict profile-bound persistence envelopes. The actual base has no such API, so no matched speed comparison or unchanged new-mode cost is claimed. Four frozen native continuation/reciprocal restore/full replay operations on the retained e209 stage remain historical. Four fresh C8 operations complete in 786-803 seconds under the unchanged 900-second cap, with exact original checkpoint, viewer/event and full ReplayRunner agreement. The boundary repair uses declared numeric queries through the unchanged geometry backend; exact installed binary hashes and explicit profile registration remain bound. Native host session work is unchanged; the required serial runtime smoke remains mandatory.",
-      "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
-      "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
-    },
-    "tests/rules/section07/coverage.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "qualification40-exact-b6886d3bc2fb1ca4"
-      ],
-      "selected_families": [],
-      "rationale": "Refresh only the current README authentication digest after documenting the selected Linux authority. Append the maintenance explanation and preserve all historical authenticated inputs, literal captures and gameplay obligation mappings. This repairs the demonstrated source-authentication test failure; no source-loading algorithm, existing test body or measured gameplay changes.",
-      "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
-      "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
-    },
-    "tests/support/cavalcade_native_charge.py": {
-      "category": "measured_workload",
-      "operations": [
-        "native-v995-approach-operator"
-      ],
-      "selected_families": [],
-      "rationale": "Preserve the finite packed-formation operator repair and authenticate the new runtime using a fresh complete covered source/phase profile. Historical readers remain exercised against exact static input data with current validator code. Retain all old selectors in place and add only the authority test file; no allocation search, timing-limit change, historical rewrite or speedup claim.",
-      "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
-      "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
-    },
-    "tests/support/retained_authority_sources.py": {
+    "tests/code_quality/test_milli_inch_shard_admission.py": {
       "category": "measured_workload",
       "operations": [
         "scoped-shard-allocation"
       ],
       "selected_families": [],
-      "rationale": "Preserve the finite packed-formation operator repair and authenticate the new runtime using a fresh complete covered source/phase profile. Historical readers remain exercised against exact static input data with current validator code. Retain all old selectors in place and add only the authority test file; no allocation search, timing-limit change, historical rewrite or speedup claim.",
-      "source_obligation": "Preserve real equipped roster, frozen natural charge dice and complete six-model paths; resolve mandatory native effects and stop at the first Fight decision. Execute and replay exactly through one explicitly selected Linux authority from Windows and Linux, retaining original inner histories and explicit provenance without rounding or relaxed comparisons.",
-      "unchanged_work": "Native LocalGameSession, rules, catalogs, geometry kernels, RNG and exact replay equality retain their existing behavior. No search or allocation optimization, reroll or budget expansion. Preserve 12 shards, existing selector placement, 32 local parallel workers, 67% full-package branch floor, 1620 approval / strictly-over-1800 termination, mirror120, smoke180 and quality600. Fresh weights are observations, not speedup claims."
+      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
+      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
+      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
+    },
+    "tests/code_quality/test_performance_policy.py": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
+      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
+      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
+    },
+    "tests/rules/section01/test_milli_inch.py": {
+      "category": "measured_workload",
+      "operations": [
+        "milli-inch-arithmetic-regressions"
+      ],
+      "selected_families": [],
+      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
+      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
+      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
     }
   },
   "milestone": "ordinary",
-  "comparisons": {},
+  "comparisons": {
+    "visibility": "docs/performance/current/precision-foundation-visibility.json",
+    "movement": "docs/performance/current/precision-foundation-movement.json",
+    "setup": "docs/performance/current/precision-foundation-setup.json"
+  },
   "full_game": null
 }
