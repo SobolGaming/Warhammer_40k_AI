@@ -35874,7 +35874,17 @@
         "scripts/current_native_serial_role.py",
         "ci/test_shards/current-native-serial-role.json",
         "scripts/boolean_los_admission.py",
-        "ci/test_shards/current-covered-evidence.json"
+        "ci/test_shards/current-covered-evidence.json",
+        "ci/test_shards/native-charge-source-successor.json",
+        "scripts/complete_covered_evidence.py",
+        "scripts/linux_authority_shard_admission.py",
+        "scripts/run_complete_covered_profile.py",
+        "tests/support/retained_authority_sources.py",
+        "tests/code_quality/test_linux_authority_shard_admission.py",
+        "ci/test_shards/linux-authority-covered-baseline.json",
+        "ci/test_shards/linux-authority-covered-evidence.json",
+        "ci/test_shards/linux-authority-derived-assignment.json",
+        "ci/test_shards/linux-authority-e2094d9c/*"
       ],
       "owners": [
         "*"
@@ -35986,7 +35996,8 @@
     "native-v995-approach-operator": {
       "paths": [
         "tests/support/cavalcade_native_approach.py",
-        "tests/support/cavalcade_native_qualification.py"
+        "tests/support/cavalcade_native_qualification.py",
+        "tests/support/cavalcade_native_charge.py"
       ],
       "owners": [
         "*"
@@ -36023,6 +36034,21 @@
         "_weapon_name_match_token",
         "equipped_named_weapon_profile_ids",
         "weapon_name_match_token"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "selected-linux-session-authority": {
+      "paths": [
+        "src/warhammer40k_core/adapters/execution_profile.py",
+        "src/warhammer40k_core/adapters/linux_authority_transport.py",
+        "src/warhammer40k_core/adapters/linux_authority_worker.py",
+        "src/warhammer40k_core/adapters/linux_session.py",
+        "tests/infrastructure/adapters/unit/test_linux_authority.py"
+      ],
+      "owners": [
+        "*"
       ],
       "families": [],
       "sensitive": false,

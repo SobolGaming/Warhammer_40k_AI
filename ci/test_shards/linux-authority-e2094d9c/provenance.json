@@ -1,0 +1,15 @@
+{
+  "schema": "retained-authority-stage-v1",
+  "head": "9790dac9c8049029bc9afcfe82e9fb18b78415ca",
+  "producer": "d2aefc60fb84d27867ed3ee8c479e20168cc0a31",
+  "runtime": "e2094d9cc44578f56a4998fe6b4a8d1ff248a30a31127bbd4c15f629a7ae11b7",
+  "role": "Retained prior runtime qualification; not current qualification after backend-boundary repair",
+  "files": {
+    "linux-authority-covered-baseline.json": "ad2b2c54ccdff062d6d31f807ac45642e016e3a8ed41b4d7b7985abbb37aeaa7",
+    "linux-authority-covered-evidence.json": "c313cfc16ff1602718e2577a5d3576436db2679059fe71720f91fef51299610c",
+    "linux-authority-derived-assignment.json": "60cc5e84583fff8ab0e6746cd8fcad5a5c6e426f80976d71770db854e9540b8f",
+    "current-runtime-compatibility.json": "851fe598cc02564577e0b3bd3e5750dead6ab6053e755dd83e3d7392e3deb8f2",
+    "durations.json": "b4581266e78b19bf30749c3fc0b894e53fca23cd8c00d7c4b1eab77a9e981581",
+    "shard-12.txt": "894d88c58ab3888a033cc7bc4687978be3c2891cd263cbe613cfd995158ecf8a"
+  }
+}

@@ -1,16 +1,16 @@
 {
   "assignment": {
-    "file": "current-derived-assignment.json",
-    "sha256": "34b7c224c8465e3f5c1e4486816fca92aa3ce6a43599ba379027477b25c3d833"
+    "file": "linux-authority-derived-assignment.json",
+    "sha256": "35257eef0c91e8833093f3b39181f8b06d517900afb2076e765390b04484bc02"
   },
   "baseline": {
-    "file": "current-covered-baseline.json",
-    "sha256": "7c656bf844098d5dbf19a734a6a8b0e0a9eeb4214315ebeaad8625cdd63c79d7"
+    "file": "linux-authority-covered-baseline.json",
+    "sha256": "f41dd2a6bdd6ca5fc778ab68c2a991a2cc1eb9c865a477928a7ca2bbea7f74c7"
   },
-  "current_runtime_fingerprint": "d637f1649b7c3bfee1683c0112ac0ba37233afbf1f9640e6b4f2bbf47fa46c55",
+  "current_runtime_fingerprint": "c8f161f64399546ba96a19a8ec9cdb8a29fd424d128f6b542d8011ba0ade1017",
   "fresh_evidence": {
-    "file": "current-covered-evidence.json",
-    "sha256": "c748fcbe47c6e05ba5af082d0f3b9d90397d88b2099c01b494b562ea25f7196b"
+    "file": "linux-authority-covered-evidence.json",
+    "sha256": "62d9f84fd2d839bcf6138bd9070dfc06a43b40f9a063cf570e5a00595b085942"
   },
   "historical_revision": "008be8a8cb0b50b232fe022452762b3906489b49",
   "native_serial_role": {
@@ -19,6 +19,7 @@
   },
   "new_test_sources": {
     "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py": "26467cfb68d1e4464c5f926a1278bd67433f5ac99699ebdc9666deb7ab1255ed",
+    "tests/infrastructure/adapters/unit/test_linux_authority.py": "e30567808765adacc47cce1e5116ecc00be1ceb6a1af8accf27ffcc529d69aa8",
     "tests/rules/section03/test_terrain_path_preparation.py": "869ce37ba5d43d7a1c5558c94fceaf33eb81bfff62c2e5f13019551f2c071438",
     "tests/rules/section09/test_escape_survivor_persistence.py": "b70029a1609ac6996755d24254744cd3e37af955f81188e5f9062a5afb9c1e68",
     "tests/rules/section11/test_connected_endpoints.py": "78272e696bf5f3d7c977c379efe763fe80211067c06cc6e7d8be61d8c2775591"
@@ -30,5 +31,5 @@
     "rounding_seconds": 30,
     "version": "native-serial-current-planning-v2"
   },
-  "schema": "historical-snapshot-fresh-boolean-los-profile-v1"
+  "schema": "historical-snapshot-linux-authority-profile-v1"
 }

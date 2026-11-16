@@ -298,6 +298,70 @@ uv sync --locked
 uv run pytest tests/unit/test_phase10i_terrain_movement.py -q --no-cov
 ```
 
+## Linux-authoritative execution from Windows and Linux
+
+Use `LinuxAuthority` when both clients must execute and replay with the same
+numerical runtime. Its `LinuxGameSession` implements `AdapterGameSession`; all
+rules, dice, choice validation and mutation, projections, saves and replay execute
+in the selected Linux process. Native `LocalGameSession` keeps its existing host behavior.
+
+Provision the trusted Linux checkout and locked Python environment first. On Linux,
+the executor command is:
+
+```python
+command = [
+    "/opt/warhammer/.venv/bin/python", "-B", "-X", "pycache_prefix=/dev/null",
+    "-m", "warhammer40k_core.adapters.linux_authority_worker",
+]
+```
+
+From Windows, prefix that same installed executor with WSL:
+
+```python
+command = [
+    "wsl.exe", "--distribution", "Ubuntu", "--cd", "/opt/warhammer", "--exec",
+    "/opt/warhammer/.venv/bin/python", "-B", "-X", "pycache_prefix=/dev/null",
+    "-m", "warhammer40k_core.adapters.linux_authority_worker",
+]
+```
+
+Inspect the installation once with `LinuxAuthority.inspect(command)` and explicitly
+register its returned JSON profile in operator configuration. Keep that registered
+profile; do not automatically replace it when an executor drifts. It binds the
+engine build, interpreter, runtime sources/native libraries and numerical canaries.
+It identifies the selected installation, not all Linux machines with matching
+package versions. Client and executor must use the same engine build; mixed builds
+are rejected before a game is created or restored. The client loads the registered
+profile before connecting:
+
+```python
+from warhammer40k_core.adapters.linux_authority_transport import LinuxAuthority
+from warhammer40k_core.adapters.server import AdapterGameServer
+
+with LinuxAuthority(command, expected_profile=registered_profile) as authority:
+    session = authority.session()
+    # Ordinary session.start(config), viewer submissions and event/view APIs apply.
+    server = AdapterGameServer(
+        session_factory=authority.session,
+        session_recovery_factory=authority.restore,
+    )
+```
+
+The authority must outlive its sessions/server. A missing, mismatched, disconnected
+or timed-out executor raises an explicit error. A timed-out submission has an
+unknown outcome; close that authority and restore the last acknowledged checkpoint.
+
+Private saves use `profiled-session-checkpoint-v1`, which binds the original inner
+payload bytes and schema, execution profile and explicit provenance receipt.
+`authority.restore(envelope)` requires that same registered profile.
+`session.profiled_replay_artifact(artifact_id=...)` exports the corresponding
+profile-bound replay; `authority.replay(envelope)` uses the existing exact runner.
+Bare legacy checkpoints/replays require deliberate `enroll_legacy(...)` or
+`replay_legacy(...)` with a nonempty provenance receipt. Enrollment preserves the
+original bytes and still requires complete strict reconstruction/replay. A
+compatible executor is not proof of an unknown artifact's original producer.
+Existing v2 checkpoint/v37 replay data and exact comparisons remain unchanged.
+
 ## Test commands
 
 Pytest defaults are intentionally lightweight: narrow local and IDE runs do not start xdist
@@ -382,11 +446,11 @@ preflight retains its twelve-case partition. Two finite step5g modules add sourc
 partitions of 32 and 30 exact cases. The bounded mirror setup case is a separate
 selector; its file selector denotes the remaining cases. CI always deselects that
 node from parallel work and runs it once on its owning shard. All other files remain
-intact. The resulting 508 selectors select exactly 6,331 cases, including eighteen
+intact. The resulting 509 selectors select exactly 6,341 cases, including eighteen
 terrain-preparation/cache regressions, nineteen connected-endpoint/ordered-history
 controls, six Desperate Escape survivor persistence controls in the natural
 Section 09 owner `test_escape_survivor_persistence.py`, and six native equipment,
-battle-prefix and named-weapon choice controls. The required guards verify the exact
+battle-prefix and named-weapon choice controls, plus ten Linux-authority session/profile controls. The required guards verify the exact
 selected inventory and partition.
 Verify that every selected file or declared case appears exactly once:
 
@@ -396,7 +460,10 @@ uv run --no-sync python scripts/build_test_shards.py --check --shard-count 12
 
 The compatibility descriptor pins the original scheduling snapshot at
 `008be8a8cb0b50b232fe022452762b3906489b49`, a complete current covered local baseline,
-and `current-derived-assignment.json`. Current validators authenticate every
+and `linux-authority-derived-assignment.json`. The separate
+`linux-authority-covered-baseline.json` and `linux-authority-covered-evidence.json`
+retain the complete source-bound current run. Prior e209-stage metadata is retained
+under `ci/test_shards/linux-authority-e2094d9c/`. Current validators authenticate every
 dispatch-contributing producer and tested checkout against Git, then validate the
 original data, runtime, test bytes, cohorts and reserve in a temporary historical
 snapshot. Historical Python is never executed and historical receipts are unchanged.
@@ -404,7 +471,7 @@ snapshot. Historical Python is never executed and historical receipts are unchan
 missing objects remain errors, including after squash merges and branch deletion.
 
 The current baseline must bind unchanged historical gameplay test sources, exactly
-the forty-nine reviewed additions, current runtime and profile/file/case costs,
+the fifty-nine reviewed additions, current runtime and profile/file/case costs,
 32 parallel workers plus the isolated one-worker mirror, 67% full-package branch
 coverage and an approved 1,620/1,800-second supervisor receipt. It is local evidence,
 not a hosted observation. Dispatch takes each retained case's maximum of its fresh

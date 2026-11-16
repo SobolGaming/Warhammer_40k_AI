@@ -312,6 +312,12 @@
       "mode": "100644",
       "sha256": "26ec230eb248fb840bae22117c1a802bfd209578f906895ae4e0e182aea5643c"
     },
+    "tests/infrastructure/adapters/unit/test_linux_authority.py": {
+      "blob_sha1": "f02d125b2e3ab7d49e1e7f0a7aa20a80ce4698a0",
+      "bytes": 11639,
+      "mode": "100644",
+      "sha256": "e30567808765adacc47cce1e5116ecc00be1ceb6a1af8accf27ffcc529d69aa8"
+    },
     "tests/infrastructure/adapters/unit/test_session_commands.py": {
       "blob_sha1": "6232e501f8011b78ac9e99b91792c579baec5694",
       "bytes": 39577,

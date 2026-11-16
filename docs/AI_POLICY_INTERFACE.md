@@ -2621,3 +2621,215 @@ range, a legal shooting declaration, an accepted charge, combat, useful screenin
 Stage 2 completion, full-game performance or learning. Roster, seed, positions,
 body/terrain/MONSTER occlusion and provisional model-height qualifications retain
 their existing meanings.
+
+### Frozen native Bloodcrusher charge response
+
+`tests.support.cavalcade_native_charge` is a separate operator experiment on the
+round-four common checkpoint. Initial preparation continues the unchanged preserve
+and screen recipes to their original B4 Charge boundary. V3 froze the same eight
+ordered endpoint templates, six-model movement order, source hash and choices
+before either charge was selected. Both natural rolls and all sixteen rejected
+proposals remain in the retained histories. The templates use actual B/E geometry;
+they are proposals, not proof of a legal charge.
+
+The response selects B, keeps its natural charge dice and selects only E when the
+engine offers that target. Each full six-model proposal follows its frozen
+template. V4 admits a whole formation only when every complete straight path fits
+the actual movement budget; it never clips individual paths. Native
+validation owns legality, sequential collision, coherency and mandatory endpoint
+obligations. Rejections stay in the decision history. The operator tries at most
+eight proposals from the finite frozen templates, without changing engine search
+budgets. Exhaustion, an unhandled choice or unresolved computation remains
+incomplete; it never establishes that no legal charge exists. Optional reactions and Stratagems are declined. A completed
+charge must finish native mandatory triggered abilities and wound allocation,
+then stop at the first pending Fight decision without submitting it.
+
+Reproduce the common checkpoint with the existing command above, then run:
+
+```sh
+uv run --no-sync python -m tests.support.cavalcade_native_charge \
+  --common reports/native-round4/common-checkpoint.json --output reports/native-charge
+uv run --no-sync python -m tests.support.cavalcade_native_charge \
+  --output reports/native-charge --alternative preserve
+uv run --no-sync python -m tests.support.cavalcade_native_charge \
+  --output reports/native-charge --alternative screen
+uv run --no-sync python -m tests.support.cavalcade_native_charge \
+  --output reports/native-charge --alternative preserve --qualify-saved
+uv run --no-sync python -m tests.support.cavalcade_native_charge \
+  --output reports/native-charge --alternative screen --qualify-saved
+```
+
+To continue the original qualified partial histories after the formation repair,
+freeze a new output directory with `--repair-from reports/native-charge` instead
+of `--common`. This copies each exact retained checkpoint, including its natural
+charge roll and all eight rejected proposals, and checks its prior qualification
+receipt before constructing the new procedure. Keep the original evidence
+directory unchanged. Execute and qualify both alternatives in the new directory.
+The formation regressions verify geometry and budget admission only; accepted
+native charges, mandatory effects, first Fight and exact replay require those
+live continuations and remain unqualified until their receipts pass.
+
+Exact input restoration has a separate 900-second child-process allowance,
+including startup. The native response retains a 300-second cap and eight path
+attempts, including its durable output. Qualification is a separate 900-second
+capped operation: exact JSON persistence, both saved live viewer projections and
+event streams, and explicit full-history `ReplayRunner` equality. Interrupted validation
+retains the last pending and returned checkpoints and attempted paths as partial
+diagnostics. They cannot substitute for a completed response or replay proof.
+Receipts preserve positions, all model wounds/casualties and equipment, actual
+RNG events and history fingerprints, resource ledgers, decision-level costs and
+the original rejected approach paths. Different natural RNG histories are recorded
+without causal attribution. Successful target eligibility or arrival at Fight
+alone does not establish an accepted charge; the native completion event and
+mandatory effects are required. The scoped gap, null useful reference and learning
+exclusion remain in force.
+
+The first wrapper placed cold strict restoration inside the response's
+300-second clock. Its preserve attempt terminated unresolved at 300.041 seconds
+before any charge choice, roll or path submission. The v1 source, frozen procedure
+and timeout receipt remain retained. Before either charge roll, v2 separated
+strict restoration under the existing qualification allowance and re-froze the
+byte-identical inputs, endpoint templates, choices and charge-search limits.
+This harness correction changes no engine behavior or rules answer.
+
+The v2 preserve run restored exactly in 359.187 seconds, then its first viewer
+submission failed because the harness passed an authoritative request ID to the
+viewer facade. No decision, roll, path or event was committed; its final checkpoint
+equals the original input exactly. Independent coding review reproduced the
+identity mismatch. V3 uses only the issued viewer request IDs, options and proposal
+contexts for submissions, and re-freezes the same inputs, endpoint templates,
+choices and limits before any charge roll. The v2 source and failure remain
+retained; this is a harness repair, not an engine or rules change.
+
+The required scheduling admission exposed a complete-source identity mismatch: its retained 32-worker receipt was produced at `33d199058f2e65f544bcc535e41862e2c09207eb`, before this uncollected operator existed. The admission now authenticates all 5,029 original source inputs from that exact Git archive, without executing historical code, and permits only the four before/after file hashes in `ci/test_shards/native-charge-source-successor.json`. Every unlisted source change still fails. Original receipts, assignments, weights, inventories, worker calibration, runtime and deadline checks remain unchanged. This is source authentication, with no new performance claim.
+
+The v3 validator correctly rejected B-to-B endpoint overlap in all eight proposals
+per arm. Independently clipping converging paths and packing the actual oval bases
+on a narrow ring caused real collisions; no validator defect was demonstrated.
+The bounded v4 operator repair constructs two complete disjoint formations from
+the actual six bases, retains the original model order, and freezes the same bank
+and admission rule for both arms. A conservative distance test excludes whole
+formations that exceed the natural budget or a directly reachable native endpoint
+goal; exclusion is not proof that every legal charge is impossible. The real
+ruleset supplies one-inch preferred and two-inch engagement distances. Independent
+native `resolve_charge_move` checks accept the six-inch column and nine-inch arc
+paths. Those read-only checks establish legal paths, not committed native charges.
+
+Resume the strictly qualified v3 checkpoints without rerolling their existing
+six- and nine-inch natural charge budgets:
+
+```sh
+uv run --no-sync python -m tests.support.cavalcade_native_charge \
+  --repair-from reports/native-charge-v3 --output reports/native-charge-v4
+```
+
+Then use the response and qualification commands above with the new output path.
+The v4 procedure is frozen before any new choice or ability die. It retains the
+entire rejected prefix and reuses the already pending charge movement rather than
+starting a new charge. Restore/response/qualification clocks and search limits
+are unchanged. Interrupted attempts remain separate immutable diagnostics.
+
+A Windows restoration of the untouched Linux-produced v3 preserve checkpoint
+fails exact lifecycle equality before any new choice. The rejected-charge event's
+endpoint distance is retained as `0.2500000000000031` and recomputes as
+`0.250000000000005` on Windows. An independent same-pose/base probe reproduces both
+values on their respective platforms; footprint WKB differs despite identical
+locked Shapely, GEOS and NumPy versions. This is a reproducible engine-generated
+save/load portability failure under the review policy. Original-platform Linux
+continuation does not repair it. No tolerance, rounding, altered historical event
+or geometry runtime change is authorized or claimed here.
+
+The original-platform v4 continuations restore the exact retained preserve/screen
+inputs in 403.170/413.187 seconds. Each accepts its first complete column/arc
+proposal, resolves native Brass Stampede against E, and stops at the first
+pending Fight movement decision. Each adds three Charge submissions, with no
+Fight decision or attack submitted. E falls from 18 to 10/12 wounds; all 78 models
+survive in each arm. Responses take 77.926/78.676 seconds under the unchanged
+300-second cap. The six natural ability trigger dice are 4,5,3,4,1,6 in preserve
+and 2,6,3,6,4,5 in screen; corresponding D3 damage rolls are 1,2,3,2 and 1,2,1,2.
+Both RNG draw counts rise from 2 to 12, with the original charge rolls retained.
+Equipment, all non-B positions and every resource ledger are unchanged; each arm
+costs zero CP. These response observations are separate from the required
+exact accepted-history persistence, both-viewer/event and full ReplayRunner
+qualification receipts. Different natural histories do not establish a causal
+screen benefit, and successful original-platform qualification cannot remove
+the native Windows exact restoration blocker. The accepted checkpoint hashes are
+`11be2055a7d0551f8299d3119da1009ba14d421ea666a12ab62cee7997a59149`
+(preserve) and
+`ddcf4f6357ff6d6f441e7e7a59eef13f38f51093b947358b3db1a28038005cd7`
+(screen). Both include every original rejected proposal.
+
+The owner's subsequent cross-OS repair uses an explicit selected Linux authority,
+with Windows/WSL and Linux clients sharing its exact registered execution profile.
+It preserves native host-local behavior and the original bytes of both historical
+inputs. Private profile-bound checkpoint/replay envelopes record explicit legacy
+enrollment provenance; a different engine build or registered profile fails closed.
+This implements the allowed Linux-authoritative route, rather than claiming native
+Windows and Linux numerical kernels now agree.
+
+The retained prior-stage proofs on engine build `e2094d9cc44578f56a4998fe6b4a8d1ff248a30a31127bbd4c15f629a7ae11b7`,
+the four frozen qualification operations complete under their existing 900-second
+allowance: Windows preserve continuation/full replay (799.266 seconds), Linux
+screen continuation/full replay (797.207), Linux restore/full replay of the
+Windows-written preserve envelope (791.494), and Windows restore/full replay of
+the Linux-written screen envelope (794.263). All use registered profile hash
+`e762ef67837fa76b3f230d5bcf4cd405a2b4a1cb93281222b3d6f90f0a5da841`
+and frozen procedure SHA-256
+`24528bb31e2a8cfa8c1a1af05e8143aa893c45d851ad742c857d05c29193afb4`.
+Each accepted inner checkpoint equals the corresponding original-platform hash
+above, including both viewer projections/event histories, RNG state, model
+positions, wounds, equipment and resource costs. Both arms stop at the first Fight
+movement decision, before any Fight submission or attack. No dice, seed, retained
+history, replay comparison or charge-search limit changes. These finite
+cross-client proofs qualify that prior-stage installation; complete current-source
+local/hosted gates and both independent final-head reviews remain required.
+
+That prior-stage authority runtime has a separate complete source-bound local covered profile
+at producer `d2aefc60fb84d27867ed3ee8c479e20168cc0a31`: all 6,341 cases pass with
+67.80947121027023% full-package branch coverage in 1,579.632937828 supervisor
+seconds, under the unchanged inclusive 1,620-second approval and strictly-over-
+1,800-second termination limits. It includes one ordered mirror/native worker and
+32 work-stealing remainder workers. The new baseline and complete raw evidence
+are retained unchanged under `ci/test_shards/linux-authority-e2094d9c/`. Every current measurement
+input must equal its exact Git producer; the retained prior-runtime four-file
+exception is not extended to this runtime. All 508 existing selectors stay in
+place; only the ten-case authority module is added on shard 12, for 509 selectors.
+The earlier `4b4c461c` attempt remains failed: 6,340 passes, one stale current
+README-authentication hash and 1,622.989207761 supervisor seconds. Its historical
+hashes and literal captures remain unchanged after the narrow metadata repair.
+These are finite local observations, not hosted timing or full-game qualification.
+
+The backend-boundary repair uses existing declared footprint area, bounds and
+distance queries for hexadecimal numerical canaries, plus exact installed-native
+library hashes. The geometry backend itself remains unchanged. These canaries
+identify a selected installation; they do not prove universal numerical equivalence.
+The replacement engine build is
+`c8f161f64399546ba96a19a8ec9cdb8a29fd424d128f6b542d8011ba0ade1017`,
+with explicitly registered profile
+`c05ac510829263d8ee924012d6f68b40351c1ba5e398e7a2a44e5a3e5c3fe3d8`
+and frozen procedure SHA-256
+`8ef8c75e4f1f209916fc18857e4553f7da4af432436244775f220c38074cdb26`.
+Its Windows preserve continuation/full replay passes in 802.836 seconds and Linux
+screen continuation/full replay in 797.080 seconds. Both preserve the original
+accepted checkpoint hashes, both views/events and RNG state, resolving native
+charge effects and stopping at the first Fight movement request without submitting
+it. Linux restoration/full replay of the Windows-written preserve checkpoint
+passes in 787.708 seconds; Windows restoration/full replay of the Linux-written
+screen checkpoint passes in 786.336 seconds. All four operations finish within the
+unchanged 900-second allowance, reproduce 277/278 decisions and 1,645/1,650 events,
+and report no replay diagnostics. Reciprocal checkpoint/viewer/event agreement
+qualifies this explicitly selected installation; native Windows geometry and
+historical artifacts retain their original behavior.
+
+The current complete covered producer `ca0f94e07069d2b2de14eebcbe3db68d2148bd09`
+passes all 6,341 cases with 67.81076846421217% package coverage, branches enabled,
+in 1,546.2262741600002 supervisor seconds. The unchanged twelve-shard inventory
+retains all 508 prior selector placements and adds only the authority module on
+shard 12. Current admission files are
+`ci/test_shards/linux-authority-covered-baseline.json` and
+`ci/test_shards/linux-authority-covered-evidence.json`; the E209 copies remain
+prior-stage evidence. Earlier profiles, raw checkpoints,
+failed attempts and qualification outcomes retain their original meaning.
+Required local/hosted gates and both exact-final-head independent reviews remain
+delivery prerequisites. These observations do not qualify complete-game timing,
+tactical benefit or learning eligibility.

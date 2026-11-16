@@ -21,6 +21,9 @@ def revisions(directory: Path) -> tuple[str, ...]:
     sources = [row["source"] for row in calibration["reports"]] + [scope["source"]]
     values = {source[key] for source in sources for key in ("pr_head", "checkout")}
     values.update((descriptor["historical_revision"], baseline["source_head"]))
+    if descriptor.get("schema") == "historical-snapshot-linux-authority-profile-v1":
+        current = json.loads((directory / "linux-authority-covered-baseline.json").read_bytes())
+        values.update((current["source_head"], "e2d7a899d162cc1972d8a158fc02978e54301cc2"))
     values.update(
         native["observations"][context]["source_head"] for context in ("standalone", "with_mirror")
     )

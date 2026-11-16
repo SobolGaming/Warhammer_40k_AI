@@ -1,18 +1,32 @@
+"""Retained pre-authority profile controls, evaluated with current validators.
+
+The live Linux-authority profile has separate source/phase admission controls.
+Historical measurement inputs are static data, never imported or executed.
+"""
+
 from __future__ import annotations
 
+import copy
 import hashlib
 import json
 import shutil
 import subprocess
 import sys
 import xml.etree.ElementTree as ET
-from collections.abc import Iterator
+from collections.abc import Generator, Iterator
 from pathlib import Path
 from typing import cast
 
 import pytest
 from scripts import build_test_shards as sharding
 from scripts import current_shard_compatibility as compatibility
+from scripts.boolean_los_admission import (
+    SOURCE_PRODUCER,
+    SUCCESSOR_FILE,
+    SUCCESSOR_PATHS,
+    producer_inputs,
+    validate_successor,
+)
 from scripts.historical_shard_snapshot import (
     HISTORICAL_REVISION,
     MANIFEST,
@@ -21,9 +35,52 @@ from scripts.historical_shard_snapshot import (
     historical_snapshot,
 )
 from scripts.shard_execution_model import Cohort, load_cohorts
+from tools.performance_policy import canonical_digest, runtime_inputs
 
-ROOT = Path(__file__).resolve().parents[2]
+from tests.support.retained_authority_sources import materialize_retained_sources
+from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
+from warhammer40k_core.engine.battlefield_state import ModelPlacement, geometry_model_for_placement
+from warhammer40k_core.geometry.pose import Pose
+from warhammer40k_core.geometry.volume import Model
+
+SOURCE_ROOT = Path(__file__).resolve().parents[2]
+ROOT = SOURCE_ROOT
 DIRECTORY = ROOT / "ci/test_shards"
+
+
+@pytest.fixture(scope="module", autouse=True)
+def retained_source_context(tmp_path_factory: pytest.TempPathFactory) -> Generator[None]:
+    from scripts import boolean_los_admission as transition
+    from scripts import current_native_serial_role as native
+    from scripts.linux_authority_shard_admission import validate_retained_boolean_sources
+
+    snapshot = tmp_path_factory.mktemp("retained-pre-authority")
+    materialize_retained_sources(SOURCE_ROOT, snapshot)
+    assert str(snapshot) not in sys.path
+    live_validation = transition.validate_transition
+    live_paths = native.source_paths
+
+    def source_paths(root: Path) -> set[str]:
+        if root.resolve() == snapshot.resolve():
+            # Current source discovery is code-relative. Rebase only its data
+            # paths; producer bytes remain independently authenticated below.
+            return {name.replace("\\", "/") for name in live_paths(SOURCE_ROOT)}
+        return live_paths(root)
+
+    def validate_source_context(root: Path) -> None:
+        if root.resolve() == snapshot.resolve():
+            validate_retained_boolean_sources(root)
+        else:
+            live_validation(root)
+
+    with pytest.MonkeyPatch.context() as context:
+        context.setattr(sys.modules[__name__], "ROOT", snapshot)
+        context.setattr(sys.modules[__name__], "DIRECTORY", snapshot / "ci/test_shards")
+        context.setattr(sharding, "REPOSITORY_ROOT", snapshot)
+        context.setattr(sharding, "TESTS_ROOT", snapshot / "tests")
+        context.setattr(transition, "validate_transition", validate_source_context)
+        context.setattr(native, "source_paths", source_paths)
+        yield
 
 
 @pytest.fixture(scope="module")
@@ -160,8 +217,28 @@ def test_generator_checker_and_live_dispatch_use_same_current_costs(
     summary, plan = admitted
     assert sharding.dispatch_case_seconds(summary, DIRECTORY / "durations.json") == plan.dispatch
     subprocess.run(
-        [sys.executable, "-B", "scripts/build_test_shards.py", "--check", "--shard-count", "12"],
-        cwd=ROOT,
+        [
+            sys.executable,
+            "-B",
+            "-c",
+            "import sys; from pathlib import Path; sys.path.insert(0, sys.argv[1]); "
+            "from scripts import build_test_shards as s; "
+            "from scripts import boolean_los_admission as b, current_native_serial_role as n; "
+            "from scripts.linux_authority_shard_admission "
+            "import validate_retained_boolean_sources; "
+            "live=b.validate_transition; data=Path(sys.argv[2]).resolve(); "
+            "b.validate_transition=lambda p: validate_retained_boolean_sources(p) "
+            "if p.resolve()==data else live(p); "
+            "paths=n.source_paths; source=Path(sys.argv[1]); "
+            "n.source_paths=lambda p: {v.replace(chr(92),'/') for v in paths(source)} "
+            "if p.resolve()==data else paths(p); "
+            "s.REPOSITORY_ROOT=Path(sys.argv[2]); s.TESTS_ROOT=s.REPOSITORY_ROOT/'tests'; "
+            "sys.argv=['current-retained-check','--check','--shard-count','12',"
+            "'--output-dir',str(s.REPOSITORY_ROOT/'ci/test_shards')]; raise SystemExit(s.main())",
+            str(SOURCE_ROOT),
+            str(ROOT),
+        ],
+        cwd=SOURCE_ROOT,
         check=True,
         timeout=180,
     )
@@ -253,7 +330,7 @@ def test_compatibility_boundary_rejects_stale_or_forged_inputs(
         if change in {"node", "new_node"}
         else sharding.summary_case_seconds(summary)
     )
-    with pytest.raises(SystemExit, match="forty-nine" if change == "new_node" else None):
+    with pytest.raises(SystemExit, match="reviewed added cases" if change == "new_node" else None):
         compatibility.plan(ROOT, tmp_path, costs)
 
 
@@ -543,7 +620,7 @@ def test_source_bootstrap_preserves_history_for_shared_historical_clones(tmp_pat
     scripts = checkout / "scripts"
     scripts.mkdir()
     shutil.copyfile(
-        ROOT / "scripts/fetch_scheduling_sources.py", scripts / "fetch_scheduling_sources.py"
+        SOURCE_ROOT / "scripts/fetch_scheduling_sources.py", scripts / "fetch_scheduling_sources.py"
     )
     directory = checkout / "ci/test_shards"
     directory.mkdir(parents=True)
@@ -594,6 +671,7 @@ def test_native_serial_role_preserves_complete_phases_and_measurement_scope(
     )
     role = load_native_serial_role(ROOT, DIRECTORY, descriptor["native_serial_role"], nodes)
     assert role.seconds == 444.5446871509996
+    assert role.seconds is not None
     assert role.with_mirror_seconds == 389.046601379
     assert role.metadata["worker_count"] == 1
     assert len(cast(list[str], role.metadata["cases"])) == 6
@@ -934,3 +1012,208 @@ def test_native_serial_combined_context_rejects_wrong_or_incomplete_evidence(
     )
     with pytest.raises(SystemExit):
         load_native_serial_role(ROOT, tmp_path, reference, nodes)
+
+
+@pytest.fixture(scope="module")
+def charge_inputs() -> dict[str, str]:
+    return producer_inputs(ROOT, SOURCE_PRODUCER)
+
+
+def test_original_producer_and_exact_reviewed_successor(charge_inputs: dict[str, str]) -> None:
+    evidence = json.loads((ROOT / "ci/test_shards/current-covered-evidence.json").read_bytes())
+    pre = json.loads(evidence["preflight"]["text"])
+    post = json.loads(evidence["postflight"]["text"])
+    assert len(charge_inputs) == 5029
+    assert pre["head"] == post["head"] == SOURCE_PRODUCER
+    assert pre["inputs"] == charge_inputs
+    assert pre["input_digest"] == post["input_digest"] == canonical_digest(charge_inputs)
+    record = json.loads((ROOT / SUCCESSOR_FILE).read_bytes())
+    validate_successor(charge_inputs, charge_inputs, record)
+    validate_successor(charge_inputs, runtime_inputs(ROOT), record)
+
+
+@pytest.mark.parametrize(
+    "name",
+    [
+        "tests/support/cavalcade_native_charge.py",
+        "scripts/boolean_los_admission.py",
+        "tests/conftest.py",
+        "scripts/run_covered_shard.py",
+        "uv.lock",
+        "tests/support/unreviewed_new_helper.py",
+    ],
+)
+@pytest.mark.parametrize("mutation", ["change", "delete"])
+def test_unlisted_or_wrong_live_bytes_fail(
+    charge_inputs: dict[str, str], name: str, mutation: str
+) -> None:
+    live = runtime_inputs(ROOT)
+    if mutation == "delete":
+        if name not in live:
+            # An unlisted addition is rejected as well as deletion of real inputs.
+            live[name] = "0" * 64
+        else:
+            del live[name]
+    else:
+        live[name] = "0" * 64
+    with pytest.raises(SystemExit):
+        validate_successor(charge_inputs, live, json.loads((ROOT / SUCCESSOR_FILE).read_bytes()))
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    [
+        "producer",
+        "schema",
+        "missing",
+        "extra",
+        "before",
+        "after",
+        "absent-before",
+    ],
+)
+def test_tampered_or_expanded_successor_fails(charge_inputs: dict[str, str], mutation: str) -> None:
+    record = json.loads((ROOT / SUCCESSOR_FILE).read_bytes())
+    name = "scripts/boolean_los_admission.py"
+    if mutation == "producer":
+        record["producer"] = "0" * 40
+    elif mutation == "schema":
+        record["schema"] = "unreviewed"
+    elif mutation == "missing":
+        del record["changes"][name]
+    elif mutation == "extra":
+        record["changes"]["uv.lock"] = {"before": charge_inputs["uv.lock"], "after": "0" * 64}
+    elif mutation == "before":
+        record["changes"][name]["before"] = "0" * 64
+    elif mutation == "absent-before":
+        record["changes"]["tests/support/cavalcade_native_charge.py"]["before"] = "0" * 64
+    else:
+        record["changes"][name]["after"] = "0" * 64
+    with pytest.raises(SystemExit):
+        validate_successor(charge_inputs, runtime_inputs(ROOT), record)
+
+
+@pytest.mark.parametrize("mutation", ["omit", "alter", "extra"])
+def test_producer_map_drift_fails(charge_inputs: dict[str, str], mutation: str) -> None:
+    changed = copy.copy(charge_inputs)
+    name = "uv.lock"
+    if mutation == "omit":
+        del changed[name]
+    elif mutation == "extra":
+        changed["tests/support/unreviewed_new_helper.py"] = "0" * 64
+    else:
+        changed[name] = "0" * 64
+    with pytest.raises(SystemExit):
+        validate_successor(
+            changed, runtime_inputs(ROOT), json.loads((ROOT / SUCCESSOR_FILE).read_bytes())
+        )
+
+
+def test_unreviewed_producer_is_rejected_before_archive() -> None:
+    with pytest.raises(SystemExit, match="producer"):
+        producer_inputs(ROOT, "0" * 40)
+    assert len(SUCCESSOR_PATHS) == 4
+
+
+@pytest.fixture(scope="module")
+def native_charge_geometry() -> tuple[tuple[Model, ...], Model, RulesetDescriptor]:
+    """Real equipped native roster; pure-builder poses from its retained move recipe."""
+    from tests.support.cavalcade_native_prefix import RANGED_ID, THREAT_ID
+    from tests.support.cavalcade_v995 import deployment_fixture, strict_mirror_session
+
+    session = strict_mirror_session()
+    state = session.lifecycle.state
+    assert state is not None
+    assert session.lifecycle.config is not None
+    assert sum(len(u.own_models) for a in state.army_definitions for u in a.units) == 78
+    assert all(a.roster_legality_report.is_legal for a in state.army_definitions)
+    instances = {
+        m.model_instance_id: m
+        for a in state.army_definitions
+        for u in a.units
+        for m in u.own_models
+    }
+    fixture = deployment_fixture()
+    roles: dict[str, tuple[Model, ...]] = {}
+    # E's prefix sidestep (+4, -1) precedes its round-two (0, -8) move.
+    for unit_id, dx, dy in ((THREAT_ID, -6, 23), (RANGED_ID, 4, -9)):
+        models: list[Model] = []
+        for raw in fixture["placements"][unit_id]:
+            placement = ModelPlacement.from_payload(raw)
+            p = placement.pose
+            placed = placement.with_pose(
+                Pose.at(
+                    p.position.x + dx,
+                    p.position.y + dy,
+                    p.position.z,
+                    facing_degrees=p.facing.degrees,
+                )
+            )
+            models.append(
+                geometry_model_for_placement(
+                    model=instances[placement.model_instance_id], placement=placed
+                )
+            )
+        roles[unit_id] = tuple(sorted(models, key=lambda m: m.model_id))
+    target = roles[RANGED_ID][0]
+    assert abs(min(m.range_to(target) for m in roles[THREAT_ID]) - 5.211905011060019) < 1e-9
+    return roles[THREAT_ID], target, session.lifecycle.config.ruleset_descriptor
+
+
+@pytest.mark.parametrize(("budget", "formation"), [(6, "columns"), (9, "arc")])
+def test_native_charge_whole_formation_preserves_clearance_and_real_budget(
+    native_charge_geometry: tuple[tuple[Model, ...], Model, RulesetDescriptor],
+    budget: int,
+    formation: str,
+) -> None:
+    from dataclasses import replace
+
+    from tests.support.cavalcade_native_charge import (
+        formation_templates_for_models,
+        path_for_template,
+        template_fits,
+    )
+
+    models, target, ruleset = native_charge_geometry
+    selected = [
+        t
+        for t in formation_templates_for_models(models, target)
+        if template_fits(
+            t,
+            budget,
+            preferred=ruleset.charge_policy.preferred_target_distance_inches,
+            engagement=ruleset.engagement_policy.horizontal_inches,
+        )
+    ]
+    assert len(selected) == 1
+    assert isinstance(selected[0], dict)
+    assert selected[0]["formation"] == formation
+    witness = path_for_template(selected[0], budget)
+    assert witness.model_ids() == tuple(m.model_id for m in models)
+    ends = [replace(m, pose=witness.final_pose_for_model(m.model_id)) for m in models]
+    assert not any(a.base_overlaps(b) for i, a in enumerate(ends) for b in ends[i + 1 :])
+    for start, end in zip(models, ends, strict=True):
+        assert witness.poses_for_model(start.model_id)[0] == start.pose
+        assert start.pose.distance_3d_to(end.pose) <= budget
+        assert end.pose.facing == start.pose.facing
+        assert end.range_to(target) < start.range_to(target)
+        for goal in (
+            ruleset.charge_policy.preferred_target_distance_inches,
+            ruleset.engagement_policy.horizontal_inches,
+        ):
+            if start.range_to(target) - goal <= budget:
+                assert end.range_to(target) <= goal
+
+
+def test_native_charge_rejects_whole_template_instead_of_clipping_models(
+    native_charge_geometry: tuple[tuple[Model, ...], Model, RulesetDescriptor],
+) -> None:
+    from tests.support.cavalcade_native_charge import (
+        formation_templates_for_models,
+        path_for_template,
+    )
+
+    models, target, _ruleset = native_charge_geometry
+    arc = formation_templates_for_models(models, target)[1]
+    with pytest.raises(AssertionError, match="Whole formation exceeds charge budget"):
+        path_for_template(arc, 6)
