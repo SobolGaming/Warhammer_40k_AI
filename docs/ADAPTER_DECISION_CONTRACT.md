@@ -1,5 +1,17 @@
 # Adapter Decision Contract
 
+## Distance precision foundation (inactive)
+
+The tested `milli-inch-half-away-v1` arithmetic foundation does not change any
+decision family, proposal payload, projection, submission validation or session
+default in this slice. Existing clients preserve engine-emitted geometry under
+`battlefield-coordinate-v1`; they must not snap an old session's inputs or infer
+new legality from rounded presentation. The [distance precision contract](DISTANCE_PRECISION.md)
+defines the explicit tie rule, dimensional semantics and coordinated profile,
+persistence, hash/cache, geometry-predicate and replay work required before
+activation. Linux remains the execution authority. Isolated arithmetic tests on
+two operating systems do not qualify native geometry or client equivalence.
+
 ## Private game randomness (Contract 46)
 
 Administrator game creation requires `config.private_rng_seed`, a private 256-bit

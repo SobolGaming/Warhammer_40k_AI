@@ -1,0 +1,18 @@
+{
+  "added_cases": 25,
+  "added_files": {
+    "tests/rules/section01/test_milli_inch.py": {
+      "blob_sha1": "7d2aae3d07516960663257a73622bf459b3c0a98",
+      "bytes": 7354,
+      "mode": "100644",
+      "sha256": "6fad7bf3bc123c2f217bb0ae46b96971d8591f1cda712a0d88ba4b1f0f5edb37"
+    }
+  },
+  "retained_cutover_sha256": "4cd1f0b062fad661e1c71fe27d2e9f8279c3c21d2a9f7bea9e3b053db79afce3",
+  "runtime_fingerprint": "ff4277b5e1024958cc9f3e5464b5e26fc578c84b7a39130bece55d3ad0cf0add",
+  "schema": "finite-milli-inch-test-addition-v1",
+  "source": {
+    "path": "src/warhammer40k_core/geometry/milli_inch.py",
+    "sha256": "692a482b4be1b765ef351a249b928fdc156023086112b11266ba6b06ef8476c4"
+  }
+}

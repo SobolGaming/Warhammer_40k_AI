@@ -41,9 +41,14 @@ def load_assignment(
     from scripts.linux_authority_shard_admission import (
         SCHEMA as AUTHORITY_SCHEMA,
     )
+    from scripts.milli_inch_shard_admission import ASSIGNMENT_FILE as MILLI_ASSIGNMENT_FILE
+    from scripts.milli_inch_shard_admission import SCHEMA as MILLI_SCHEMA
 
     authority = descriptor["schema"] == AUTHORITY_SCHEMA
-    filename = AUTHORITY_ASSIGNMENT_FILE if authority else FILENAME
+    milli = descriptor["schema"] == MILLI_SCHEMA
+    filename = (
+        MILLI_ASSIGNMENT_FILE if milli else (AUTHORITY_ASSIGNMENT_FILE if authority else FILENAME)
+    )
 
     reference = _object(
         descriptor["assignment"], {"file", "sha256"}, "derived assignment reference"
@@ -91,7 +96,7 @@ def load_assignment(
     expected = Counter(selector for group in history.groups for selector in group)
     expected.update(owners)
     selected = Counter(selector for group in groups for selector in group)
-    if selected != expected or len(selected) != (509 if authority else 508):
+    if selected != expected or len(selected) != (510 if milli else 509 if authority else 508):
         raise SystemExit("Derived current assignment selector inventory differs.")
     extension = history.scope.extension
     assert extension is not None
