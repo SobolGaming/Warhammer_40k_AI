@@ -1,622 +1,598 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "22f3fde616758008100bdf37d87edd671ed90d9a",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:ff4277b5e1024958cc9f3e5464b5e26fc578c84b7a39130bece55d3ad0cf0add",
-  "operation_map_sha256": "e1123e9abc8fb565286a10558d4c61354935257387f090de9becdacbc9e03c23",
+  "base": "13a8cad365b00fd9a96157dd029ee4db8121210f",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:ae914a56833e43a3bbf086730b354c7a18673ccc15ca93e4b474347b95380f19",
+  "operation_map_sha256": "1f4871e6f6403c0b6d768bff3bdbe1df4131372934ecbff17533ccf8817bbf03",
   "changes": {
     "ci/quality_shards/all.txt": {
-      "before_sha256": "f5ac12badea4ae73d0c7254f33acf821e9d26d589a8c32300db12dfa9b8851a4",
-      "after_sha256": "93138ba7276d0b0b2f2da5d8b32a6961200f1d65ce3e68f874b25c7a29a1511e",
+      "before_sha256": "93138ba7276d0b0b2f2da5d8b32a6961200f1d65ce3e68f874b25c7a29a1511e",
+      "after_sha256": "dfb3c4e0385dcbe832599bdcb54bbbc05a13a333a6896db02615e6ef37f2e2cd",
       "owners": {
         "@document": {
-          "before": "f5ac12badea4ae73d0c7254f33acf821e9d26d589a8c32300db12dfa9b8851a4",
-          "after": "93138ba7276d0b0b2f2da5d8b32a6961200f1d65ce3e68f874b25c7a29a1511e"
-        }
-      }
-    },
-    "ci/quality_shards/shard-2.txt": {
-      "before_sha256": "b0acb55b349e07c360ebf50be788ec35ae7747a91f79d1117d3d81a6b7129401",
-      "after_sha256": "2e5d6b5bf17db3b6ba9d6b204a128a9dd21e301aea344f34acb866c6d74a5ade",
-      "owners": {
-        "@document": {
-          "before": "b0acb55b349e07c360ebf50be788ec35ae7747a91f79d1117d3d81a6b7129401",
-          "after": "2e5d6b5bf17db3b6ba9d6b204a128a9dd21e301aea344f34acb866c6d74a5ade"
+          "before": "93138ba7276d0b0b2f2da5d8b32a6961200f1d65ce3e68f874b25c7a29a1511e",
+          "after": "dfb3c4e0385dcbe832599bdcb54bbbc05a13a333a6896db02615e6ef37f2e2cd"
         }
       }
     },
     "ci/quality_shards/shard-3-modules.txt": {
-      "before_sha256": "a3a18cf79220d2f21d12110aa4ea3fb63df1ee098190ca40fa1d8853f0775dda",
-      "after_sha256": "74a16a2b70b0fe94d5a11285e4b4434f9e8a3f85f044f16418e0af65714ba615",
+      "before_sha256": "74a16a2b70b0fe94d5a11285e4b4434f9e8a3f85f044f16418e0af65714ba615",
+      "after_sha256": "c6b3f36366deb9357d8494f64396fb33826cc956e5ba32cbc1de8d1ab72e7953",
       "owners": {
         "@document": {
-          "before": "a3a18cf79220d2f21d12110aa4ea3fb63df1ee098190ca40fa1d8853f0775dda",
-          "after": "74a16a2b70b0fe94d5a11285e4b4434f9e8a3f85f044f16418e0af65714ba615"
+          "before": "74a16a2b70b0fe94d5a11285e4b4434f9e8a3f85f044f16418e0af65714ba615",
+          "after": "c6b3f36366deb9357d8494f64396fb33826cc956e5ba32cbc1de8d1ab72e7953"
         }
       }
     },
     "ci/quality_shards/shard-3.txt": {
-      "before_sha256": "d1ff290bb6a6851f2dcf12b9663990fd5d4f444d353bd970430edd4666183662",
-      "after_sha256": "805340e3aa110242532b9b744d9241d3c471dc05b0494ec109e9090bc3136cdc",
+      "before_sha256": "805340e3aa110242532b9b744d9241d3c471dc05b0494ec109e9090bc3136cdc",
+      "after_sha256": "e87fe505ff45805927ba27195b35b3f284fd4d51abaf0f6c9a8b19704f9e9b1f",
       "owners": {
         "@document": {
-          "before": "d1ff290bb6a6851f2dcf12b9663990fd5d4f444d353bd970430edd4666183662",
-          "after": "805340e3aa110242532b9b744d9241d3c471dc05b0494ec109e9090bc3136cdc"
+          "before": "805340e3aa110242532b9b744d9241d3c471dc05b0494ec109e9090bc3136cdc",
+          "after": "e87fe505ff45805927ba27195b35b3f284fd4d51abaf0f6c9a8b19704f9e9b1f"
         }
       }
     },
     "ci/test_shards/current-runtime-compatibility.json": {
-      "before_sha256": "7b7a5cd3f62a3b4bae444d5aada825f65b9866887273abd04195984f79579ac7",
-      "after_sha256": "641994a150c39d7d0859df69f0df4feeb7824df068a54623dc43d4f296455ec6",
+      "before_sha256": "641994a150c39d7d0859df69f0df4feeb7824df068a54623dc43d4f296455ec6",
+      "after_sha256": "f3f7e19e24f538a54eb1fefa5c4603efd0623d79327a0d579e6663f9b2751402",
       "owners": {
         "@document": {
-          "before": "7b7a5cd3f62a3b4bae444d5aada825f65b9866887273abd04195984f79579ac7",
-          "after": "641994a150c39d7d0859df69f0df4feeb7824df068a54623dc43d4f296455ec6"
+          "before": "641994a150c39d7d0859df69f0df4feeb7824df068a54623dc43d4f296455ec6",
+          "after": "f3f7e19e24f538a54eb1fefa5c4603efd0623d79327a0d579e6663f9b2751402"
         }
       }
     },
     "ci/test_shards/durations.json": {
-      "before_sha256": "ee08a6a92d5a1e4f6f54dec2adf30155eb600a306fc1d5101685853191af57a0",
-      "after_sha256": "69b9c4d0d96889dfab923accdea22d496931c5a2018ca8dedff85d94afa635bb",
+      "before_sha256": "69b9c4d0d96889dfab923accdea22d496931c5a2018ca8dedff85d94afa635bb",
+      "after_sha256": "bdc62db1d17a7c850de23e85ecbad291c01f2e1d1ebbf54db5858aa05f65f346",
       "owners": {
         "@document": {
-          "before": "ee08a6a92d5a1e4f6f54dec2adf30155eb600a306fc1d5101685853191af57a0",
-          "after": "69b9c4d0d96889dfab923accdea22d496931c5a2018ca8dedff85d94afa635bb"
+          "before": "69b9c4d0d96889dfab923accdea22d496931c5a2018ca8dedff85d94afa635bb",
+          "after": "bdc62db1d17a7c850de23e85ecbad291c01f2e1d1ebbf54db5858aa05f65f346"
         }
       }
     },
-    "ci/test_shards/milli-inch-covered-baseline.json": {
+    "ci/test_shards/precision-profile-covered-baseline.json": {
       "before_sha256": null,
-      "after_sha256": "e8331fce2174c35ce7dea9d72e1fc24452a15eb75032ae294948e059dedc01f2",
+      "after_sha256": "032662725ee9f8c804da4e3e59cbf10435902a390acff6cd635a20f98dc71322",
       "owners": {
         "@document": {
           "before": null,
-          "after": "e8331fce2174c35ce7dea9d72e1fc24452a15eb75032ae294948e059dedc01f2"
+          "after": "032662725ee9f8c804da4e3e59cbf10435902a390acff6cd635a20f98dc71322"
         }
       }
     },
-    "ci/test_shards/milli-inch-covered-evidence.json": {
+    "ci/test_shards/precision-profile-covered-evidence.json": {
       "before_sha256": null,
-      "after_sha256": "59e94fe89d5770b3776badbcd3a0d8feaa12995fa84570f2187a65b316fc636e",
+      "after_sha256": "93ecd707d0c0d92ea20a1a01aa090371b70e62327c4b53639fca3b972d199d62",
       "owners": {
         "@document": {
           "before": null,
-          "after": "59e94fe89d5770b3776badbcd3a0d8feaa12995fa84570f2187a65b316fc636e"
+          "after": "93ecd707d0c0d92ea20a1a01aa090371b70e62327c4b53639fca3b972d199d62"
         }
       }
     },
-    "ci/test_shards/milli-inch-derived-assignment.json": {
+    "ci/test_shards/precision-profile-derived-assignment.json": {
       "before_sha256": null,
-      "after_sha256": "0554253c1259bc967fb2f60fac2428e8dbdeaebac177b7d40570ab9225aeff2e",
+      "after_sha256": "8a9854f9fc009de67bb2700e853b59231ef6225bb373c4deb1d702d59a862bba",
       "owners": {
         "@document": {
           "before": null,
-          "after": "0554253c1259bc967fb2f60fac2428e8dbdeaebac177b7d40570ab9225aeff2e"
+          "after": "8a9854f9fc009de67bb2700e853b59231ef6225bb373c4deb1d702d59a862bba"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
-      "before_sha256": "894d88c58ab3888a033cc7bc4687978be3c2891cd263cbe613cfd995158ecf8a",
-      "after_sha256": "75ae27fb468e3a3a8b4d0a7b38ab816578633dfe31b340fc8341ff25b81eca30",
+      "before_sha256": "75ae27fb468e3a3a8b4d0a7b38ab816578633dfe31b340fc8341ff25b81eca30",
+      "after_sha256": "6450bdc8f501e8d0129f6354fad55f0f4753bebf64bf0ed1a2ffb43000f7fb14",
       "owners": {
         "@document": {
-          "before": "894d88c58ab3888a033cc7bc4687978be3c2891cd263cbe613cfd995158ecf8a",
-          "after": "75ae27fb468e3a3a8b4d0a7b38ab816578633dfe31b340fc8341ff25b81eca30"
+          "before": "75ae27fb468e3a3a8b4d0a7b38ab816578633dfe31b340fc8341ff25b81eca30",
+          "after": "6450bdc8f501e8d0129f6354fad55f0f4753bebf64bf0ed1a2ffb43000f7fb14"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "a932c8d0b5683f9d52134e04484e754bc0ece4ac668a75b95f1997c5ce206ec6",
-      "after_sha256": "a4ef6cc9174578a1ecb4ceedf1759e9eb52f6aaa2c25b75a883606177082dc43",
+      "before_sha256": "a4ef6cc9174578a1ecb4ceedf1759e9eb52f6aaa2c25b75a883606177082dc43",
+      "after_sha256": "6adaeb93690a4340f7fd132be6192962c019807ad73ba62872e2f45f57f82429",
       "owners": {
         "@document": {
-          "before": "a932c8d0b5683f9d52134e04484e754bc0ece4ac668a75b95f1997c5ce206ec6",
-          "after": "a4ef6cc9174578a1ecb4ceedf1759e9eb52f6aaa2c25b75a883606177082dc43"
+          "before": "a4ef6cc9174578a1ecb4ceedf1759e9eb52f6aaa2c25b75a883606177082dc43",
+          "after": "6adaeb93690a4340f7fd132be6192962c019807ad73ba62872e2f45f57f82429"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "2a853926ca9f6b2ed4a9c357a34a9bce19c12c22b6654e3003b5dce34665e5ec",
-      "after_sha256": "e800339443ce0599281144da8a54084014f9c3a4d6cbc449659feab971e9571e",
+      "before_sha256": "e800339443ce0599281144da8a54084014f9c3a4d6cbc449659feab971e9571e",
+      "after_sha256": "838f020d23ad1322f7205ea17dc7f79304e03d140c1ba9171089d33b513a652f",
       "owners": {
         "@document": {
-          "before": "2a853926ca9f6b2ed4a9c357a34a9bce19c12c22b6654e3003b5dce34665e5ec",
-          "after": "e800339443ce0599281144da8a54084014f9c3a4d6cbc449659feab971e9571e"
+          "before": "e800339443ce0599281144da8a54084014f9c3a4d6cbc449659feab971e9571e",
+          "after": "838f020d23ad1322f7205ea17dc7f79304e03d140c1ba9171089d33b513a652f"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "beafc9e26cec968dd50cf6d7f4fad8d7a27abf7cbcf68fb304abd42bba8bd9b0",
-      "after_sha256": "4ea615fa4d17cf2e1c4079ba08ae7b8e077c1a6eaaf9b86cf11b35e7097cad60",
+      "before_sha256": "4ea615fa4d17cf2e1c4079ba08ae7b8e077c1a6eaaf9b86cf11b35e7097cad60",
+      "after_sha256": "13216633b130a409ca6758e14882e6748cedcff7cec0bd0515406292ea52f5f1",
       "owners": {
         "@document": {
-          "before": "beafc9e26cec968dd50cf6d7f4fad8d7a27abf7cbcf68fb304abd42bba8bd9b0",
-          "after": "4ea615fa4d17cf2e1c4079ba08ae7b8e077c1a6eaaf9b86cf11b35e7097cad60"
+          "before": "4ea615fa4d17cf2e1c4079ba08ae7b8e077c1a6eaaf9b86cf11b35e7097cad60",
+          "after": "13216633b130a409ca6758e14882e6748cedcff7cec0bd0515406292ea52f5f1"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "8ce3566c5fa718c580a7323b963a4c855dafb8ad1c353a22910025d8b9557a1a",
-      "after_sha256": "339c4c421cf76cafb16dbfe95fdfc0d8030ea2220cef92c9932c958fa471dd2d",
+      "before_sha256": "339c4c421cf76cafb16dbfe95fdfc0d8030ea2220cef92c9932c958fa471dd2d",
+      "after_sha256": "d9557ad46801e3e16cd9deeb9e6539269946b678e5ffd320f92bdcf0b4d733a3",
       "owners": {
         "@document": {
-          "before": "8ce3566c5fa718c580a7323b963a4c855dafb8ad1c353a22910025d8b9557a1a",
-          "after": "339c4c421cf76cafb16dbfe95fdfc0d8030ea2220cef92c9932c958fa471dd2d"
+          "before": "339c4c421cf76cafb16dbfe95fdfc0d8030ea2220cef92c9932c958fa471dd2d",
+          "after": "d9557ad46801e3e16cd9deeb9e6539269946b678e5ffd320f92bdcf0b4d733a3"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "2f778cbbbada6ea650f169f9672256da7667e431c71514e6bae09616d8cc862d",
-      "after_sha256": "7b8741b1577a19cd14a982667de0ec5809d03ec5792f3c84ce65ba6bbb86bebf",
+      "before_sha256": "7b8741b1577a19cd14a982667de0ec5809d03ec5792f3c84ce65ba6bbb86bebf",
+      "after_sha256": "8804f18034ee0efe6aee81e5620207a72a04b2d96f8b68cabe5dafd72b5c010d",
       "owners": {
         "@document": {
-          "before": "2f778cbbbada6ea650f169f9672256da7667e431c71514e6bae09616d8cc862d",
-          "after": "7b8741b1577a19cd14a982667de0ec5809d03ec5792f3c84ce65ba6bbb86bebf"
+          "before": "7b8741b1577a19cd14a982667de0ec5809d03ec5792f3c84ce65ba6bbb86bebf",
+          "after": "8804f18034ee0efe6aee81e5620207a72a04b2d96f8b68cabe5dafd72b5c010d"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "55a9a9046f027c3abdc372850aaf305dffc4ca57a65734e90b60ec7b0829357d",
-      "after_sha256": "ebef5cb2cfac8e52c61598cf88ee6a2e55dee8bc5e3249bdcfc8e8fc6428dc70",
+      "before_sha256": "ebef5cb2cfac8e52c61598cf88ee6a2e55dee8bc5e3249bdcfc8e8fc6428dc70",
+      "after_sha256": "e99693c530d342bf431d3c1c82a7b9ef3c54a2855e0a8a7a26b5ae7762563663",
       "owners": {
         "@document": {
-          "before": "55a9a9046f027c3abdc372850aaf305dffc4ca57a65734e90b60ec7b0829357d",
-          "after": "ebef5cb2cfac8e52c61598cf88ee6a2e55dee8bc5e3249bdcfc8e8fc6428dc70"
+          "before": "ebef5cb2cfac8e52c61598cf88ee6a2e55dee8bc5e3249bdcfc8e8fc6428dc70",
+          "after": "e99693c530d342bf431d3c1c82a7b9ef3c54a2855e0a8a7a26b5ae7762563663"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "fc1023a7332283cb4a3ab5a04279dfb561c04c4c8d1090302bb38d2215473ba5",
-      "after_sha256": "83dd30650d1d6c8b9a8b19f58a9b6b216a32ce4c470c1c892c7a7e0509b8b9d1",
+      "before_sha256": "83dd30650d1d6c8b9a8b19f58a9b6b216a32ce4c470c1c892c7a7e0509b8b9d1",
+      "after_sha256": "17b26b13d650870677d4915fa95f08296dec4ee7a1c1578d8ac9ee09b327cf90",
       "owners": {
         "@document": {
-          "before": "fc1023a7332283cb4a3ab5a04279dfb561c04c4c8d1090302bb38d2215473ba5",
-          "after": "83dd30650d1d6c8b9a8b19f58a9b6b216a32ce4c470c1c892c7a7e0509b8b9d1"
+          "before": "83dd30650d1d6c8b9a8b19f58a9b6b216a32ce4c470c1c892c7a7e0509b8b9d1",
+          "after": "17b26b13d650870677d4915fa95f08296dec4ee7a1c1578d8ac9ee09b327cf90"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "8ce0732b340964cb6ca61c576d2ea106a933a46ede2ad52306af3826e1649d15",
-      "after_sha256": "d18fcb86c9e66e6d424d704961232b16d2cffff6850b75b9870b06c38d098927",
+      "before_sha256": "d18fcb86c9e66e6d424d704961232b16d2cffff6850b75b9870b06c38d098927",
+      "after_sha256": "0e0dceb7619a41173bbd1e201beb8d6803010bb59602cf1bb6bf6ea92fef561f",
       "owners": {
         "@document": {
-          "before": "8ce0732b340964cb6ca61c576d2ea106a933a46ede2ad52306af3826e1649d15",
-          "after": "d18fcb86c9e66e6d424d704961232b16d2cffff6850b75b9870b06c38d098927"
+          "before": "d18fcb86c9e66e6d424d704961232b16d2cffff6850b75b9870b06c38d098927",
+          "after": "0e0dceb7619a41173bbd1e201beb8d6803010bb59602cf1bb6bf6ea92fef561f"
         }
       }
     },
-    "data/source_audits/ci64_provenance_v1/milli-inch-test-addition-v1.json": {
+    "data/source_audits/ci64_provenance_v1/precision-profile-test-transition-v1.json": {
       "before_sha256": null,
-      "after_sha256": "9ebbf6d4cf39d25a60c78a4312e0a128c5b43b6c79c64ed91fa41e4387366e07",
+      "after_sha256": "020dcec99278aa79f2215762a525c0c029231cdb9c64f1e988d4a1719e0fbb74",
       "owners": {
         "@document": {
           "before": null,
-          "after": "9ebbf6d4cf39d25a60c78a4312e0a128c5b43b6c79c64ed91fa41e4387366e07"
-        }
-      }
-    },
-    "docs/ADAPTER_DECISION_CONTRACT.md": {
-      "before_sha256": "f526468b2cce5afe61b865eba03bccabdb3fd1372de5a9648237048d68daa159",
-      "after_sha256": "7a6d945439fa0130dd6e3305480fe2e34794255f1715e444fe1b21191bcaf574",
-      "owners": {
-        "@document": {
-          "before": "f526468b2cce5afe61b865eba03bccabdb3fd1372de5a9648237048d68daa159",
-          "after": "7a6d945439fa0130dd6e3305480fe2e34794255f1715e444fe1b21191bcaf574"
+          "after": "020dcec99278aa79f2215762a525c0c029231cdb9c64f1e988d4a1719e0fbb74"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
-      "before_sha256": "ea2fd3708b6e15fa3fadeae8daf2e8a9b97e403a1e9c097e32c022bbcf1976bc",
-      "after_sha256": "0b751dc0c8df15e8e7bdc0efa88e8695b8f133ab0f88bd617b71b741d1cf6143",
+      "before_sha256": "0b751dc0c8df15e8e7bdc0efa88e8695b8f133ab0f88bd617b71b741d1cf6143",
+      "after_sha256": "78c48210dbc27937352423c0f19c3470342f52b9f627df8deb68c17af5b81ded",
       "owners": {
         "@document": {
-          "before": "ea2fd3708b6e15fa3fadeae8daf2e8a9b97e403a1e9c097e32c022bbcf1976bc",
-          "after": "0b751dc0c8df15e8e7bdc0efa88e8695b8f133ab0f88bd617b71b741d1cf6143"
+          "before": "0b751dc0c8df15e8e7bdc0efa88e8695b8f133ab0f88bd617b71b741d1cf6143",
+          "after": "78c48210dbc27937352423c0f19c3470342f52b9f627df8deb68c17af5b81ded"
         }
       }
     },
     "docs/DISTANCE_PRECISION.md": {
-      "before_sha256": null,
-      "after_sha256": "bf77c9827fd0a3cce565a284bc03a23561bd5912e38c6687413e4162dfc4f877",
+      "before_sha256": "bf77c9827fd0a3cce565a284bc03a23561bd5912e38c6687413e4162dfc4f877",
+      "after_sha256": "fd6a2162f381e50e64c32b5b6bf5fd1ecf54f20ef1f5dd47a61af96c29424c66",
       "owners": {
         "@document": {
-          "before": null,
-          "after": "bf77c9827fd0a3cce565a284bc03a23561bd5912e38c6687413e4162dfc4f877"
+          "before": "bf77c9827fd0a3cce565a284bc03a23561bd5912e38c6687413e4162dfc4f877",
+          "after": "fd6a2162f381e50e64c32b5b6bf5fd1ecf54f20ef1f5dd47a61af96c29424c66"
         }
       }
     },
-    "docs/performance/current/precision-foundation-movement.json": {
+    "docs/performance/current/precision-profile-reconstruction.json": {
       "before_sha256": null,
-      "after_sha256": "06a3e778f73ad48ebca27a19f576509812ea19e5cbdd4b2fc5399cbf768a2749",
+      "after_sha256": "56e885e4793f5a4e03d8246f28ade610d52342595798661ecf336c80b43a3814",
       "owners": {
         "@document": {
           "before": null,
-          "after": "06a3e778f73ad48ebca27a19f576509812ea19e5cbdd4b2fc5399cbf768a2749"
+          "after": "56e885e4793f5a4e03d8246f28ade610d52342595798661ecf336c80b43a3814"
         }
       }
     },
-    "docs/performance/current/precision-foundation-setup.json": {
+    "docs/performance/current/precision-profile-visibility.json": {
       "before_sha256": null,
-      "after_sha256": "ec31a0b0c8fbc4f5805f2fb0ed3640bdfcc6028c389fa54c824b29ab293fdcde",
+      "after_sha256": "bbf577bc97b4a9e5649e5594025635d3e8dcb0a6e2a876ef7b2f488dbda25ae3",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ec31a0b0c8fbc4f5805f2fb0ed3640bdfcc6028c389fa54c824b29ab293fdcde"
-        }
-      }
-    },
-    "docs/performance/current/precision-foundation-visibility.json": {
-      "before_sha256": null,
-      "after_sha256": "6bf828889e17fad48d084878792d36451c608de6b576c5044bdd9a8efdc1dcca",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "6bf828889e17fad48d084878792d36451c608de6b576c5044bdd9a8efdc1dcca"
+          "after": "bbf577bc97b4a9e5649e5594025635d3e8dcb0a6e2a876ef7b2f488dbda25ae3"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "39deb9266ae995ef53c595b2ad51072dc3c701a223e38ed8ea950622c38a0c26",
-      "after_sha256": "302aef4012b33c886f53aee70d727f95d7da1bb99074ae87ca9acd07fed99d08",
+      "before_sha256": "302aef4012b33c886f53aee70d727f95d7da1bb99074ae87ca9acd07fed99d08",
+      "after_sha256": "86fdd8a9f6f86a2bf8e5198e34794f7c3babe10e2d5993d9ed666467eeec40e9",
       "owners": {
         "@document": {
-          "before": "39deb9266ae995ef53c595b2ad51072dc3c701a223e38ed8ea950622c38a0c26",
-          "after": "302aef4012b33c886f53aee70d727f95d7da1bb99074ae87ca9acd07fed99d08"
-        }
-      }
-    },
-    "scripts/behavioral_selection_members.py": {
-      "before_sha256": null,
-      "after_sha256": "5da48bf04405cc583bbffd5ac013a84490607c4e20caf1705032843677c8f20e",
-      "owners": {
-        "@module": {
-          "before": null,
-          "after": "43f136cb72573c837ca5876e2397e5762182a2b460f9fee6c4490c4f9ddcbde9"
-        },
-        "_selection_members": {
-          "before": null,
-          "after": "71741765189504460bd5d82ba74ab4815b2e14b8fdc4924825996feae6a4ef14"
-        },
-        "_selection_no_links": {
-          "before": null,
-          "after": "8d6d707ea3950e5fbfe609063ec804df087aa83c6c8b486e47f92fef81f3d6b9"
-        },
-        "_selection_object": {
-          "before": null,
-          "after": "4a11724ad671dfef8d23e2d7fc595c6205d8f9ddd87bea27e0046ff730e49b9a"
+          "before": "302aef4012b33c886f53aee70d727f95d7da1bb99074ae87ca9acd07fed99d08",
+          "after": "86fdd8a9f6f86a2bf8e5198e34794f7c3babe10e2d5993d9ed666467eeec40e9"
         }
       }
     },
     "scripts/build_test_shards.py": {
-      "before_sha256": "70dccb4f7260bb74de469f5251fc375510b42d80d3233d4d9556375237a23b01",
-      "after_sha256": "ab63504ee7702949ba71848ed1c46a31c53657177f331216badf8870ee0ad17d",
+      "before_sha256": "ab63504ee7702949ba71848ed1c46a31c53657177f331216badf8870ee0ad17d",
+      "after_sha256": "d952a0cd4a9494def5977b3029d8631462623cd31cee1ec8049679f59a8119b6",
       "owners": {
-        "_selection_members": {
-          "before": "71741765189504460bd5d82ba74ab4815b2e14b8fdc4924825996feae6a4ef14",
-          "after": "c01a173f42dab95cdcbae251919298efe80b29babbe870dbe3ce709836867e27"
-        },
-        "_selection_no_links": {
-          "before": "8d6d707ea3950e5fbfe609063ec804df087aa83c6c8b486e47f92fef81f3d6b9",
-          "after": "3170911deab7c428bf3e26ebb5f17294fe730299778144b35fdc36c958252d40"
-        },
-        "_selection_object": {
-          "before": "4a11724ad671dfef8d23e2d7fc595c6205d8f9ddd87bea27e0046ff730e49b9a",
-          "after": "45e463bcb43e46dbb69ac37e9271956632b53ead56880159c980d410856cec4d"
-        },
         "behavioral_selection": {
-          "before": "40523886d1f7c329973334379b79230d39edc51661e8363df4e7fc69f806a267",
-          "after": "70194d6181acec96b58e9627a5d942b515c395081783728006b9b8bdbeaf603f"
+          "before": "70194d6181acec96b58e9627a5d942b515c395081783728006b9b8bdbeaf603f",
+          "after": "7dde57e6c8160da92d099045348068fd896b97bef737d4cd686193a967953e40"
         }
       }
     },
     "scripts/current_shard_assignment.py": {
-      "before_sha256": "f00cb57f90c4f0fbb755a0d8436a14d59fb282ff2bd9b3f2fde0ab3dce52ee00",
-      "after_sha256": "38655cf6dbca8dae25930ea64e4e20081812c20414ceb4851dc722aadddd2c7c",
+      "before_sha256": "38655cf6dbca8dae25930ea64e4e20081812c20414ceb4851dc722aadddd2c7c",
+      "after_sha256": "ffdd2ef2d064f44b4c694967c31f9cccaa758b71fe7ea2ebef8db16df043cc2c",
       "owners": {
         "load_assignment": {
-          "before": "d196ec52d051e0a4714f1c1a449a4cab7dfc5282fb9686920baa4e24f6f3c2be",
-          "after": "08fe9415b6dca022566cfedf62cd6bc91886c03860015de03aad38d255b64225"
+          "before": "08fe9415b6dca022566cfedf62cd6bc91886c03860015de03aad38d255b64225",
+          "after": "0bfeae982f5179ef62844d75c5984094c385b667ee9017abc6d5f625cdb00881"
         }
       }
     },
     "scripts/current_shard_compatibility.py": {
-      "before_sha256": "bed5413dca7149afe49d305d1b0b97306fc0ac4428cfe817def86c32f0c6a8d6",
-      "after_sha256": "f37741ac69919e00b772b3e378b5ca520026b84942d96782e0535857dc0a88c1",
+      "before_sha256": "f37741ac69919e00b772b3e378b5ca520026b84942d96782e0535857dc0a88c1",
+      "after_sha256": "6d67477da284d50c78f55bbd2f374377f25f775119b775d8afd3508516670ed9",
       "owners": {
         "_baseline": {
-          "before": "4b218f0c1527307330b88e5f0196e37ede9f62a4356214969a7ba89e2cd45d5e",
-          "after": "e04152fd71a5f4362e90fd9a0337c7734d19ddc06282498fcdfbaec059d8cb8b"
+          "before": "e04152fd71a5f4362e90fd9a0337c7734d19ddc06282498fcdfbaec059d8cb8b",
+          "after": "8425dd88b5c23af178109e25be71ceb8880f027025eb940c2068e1722b70ad8a"
         },
         "enabled": {
-          "before": "d5157403482ca9366c110f8474043372842152a5b991a646fdefefd250d9dea8",
-          "after": "2e777b276f8141b46212d69f7eff58ef977b92de40f0955e9908df86a6634fa4"
+          "before": "2e777b276f8141b46212d69f7eff58ef977b92de40f0955e9908df86a6634fa4",
+          "after": "90986b7c34b37635483f2d30470138b0627d07ef744ec3f8463a49d8ae205bf7"
         },
         "plan": {
-          "before": "5da9d4c3587cc77752895501b7a65e08648c70d7f26e341fc83e917139cfb3de",
-          "after": "76f2a50619ddeb3414c038c6c850a4f57a2ec5894ff0937f888a6588e59422be"
+          "before": "76f2a50619ddeb3414c038c6c850a4f57a2ec5894ff0937f888a6588e59422be",
+          "after": "9854f8f428aa005293b3fed2c0961c013934f83d4eda88a70ab2954ea2ff273c"
         }
       }
     },
     "scripts/fetch_scheduling_sources.py": {
-      "before_sha256": "6d0e48223132f4a2c6f24bdcfb69d5330366d39c5b8161e6920013a76cff80fe",
-      "after_sha256": "9e0f5e4e9d5157cf342e9fe24796a210f863ce7308e28a74d704a005b5d470bf",
+      "before_sha256": "9e0f5e4e9d5157cf342e9fe24796a210f863ce7308e28a74d704a005b5d470bf",
+      "after_sha256": "f32cd4eb091d5f3bc0254c38911996948ac915bbc37fafbb7dbfc1ada20a7b43",
       "owners": {
         "revisions": {
-          "before": "d45fa8446db442fd44fac1183c2af220b2f01688666b16d8ad21bc41682dccbe",
-          "after": "6fa73ba31a826481f75cab867d56cb93ab6e172e8ac1f1bfa95daf79aee16c53"
+          "before": "6fa73ba31a826481f75cab867d56cb93ab6e172e8ac1f1bfa95daf79aee16c53",
+          "after": "bd96a8902aec6d65ce1935b68fb4b59183e9dabe043dd5e3ad0774982e812e2c"
         }
       }
     },
-    "scripts/milli_inch_shard_admission.py": {
+    "scripts/precision_profile_shard_admission.py": {
       "before_sha256": null,
-      "after_sha256": "635e6c235ed73c60d246d3d9c4326879889c3820c81d673ef27df0df4b6abfae",
+      "after_sha256": "8c263d4bb53b7ad9c6acb384c3aa5eb193398c7781d96a999f839c08ee7349f8",
       "owners": {
         "@module": {
           "before": null,
-          "after": "7b8fd177afb307159ebafb5a3d6b82594ab5d851a01f08bacdbdf04b63c8c212"
+          "after": "d855cc7a2dd323f31c50533b37d1d921c251c76975df2cc5c0525737b342d53a"
         },
         "current_native_role": {
           "before": null,
-          "after": "1b6dfb2b159f85fc92860177512c62fecc20b4367af3f43d817eba4a01b1fdab"
+          "after": "17d0034470c474130ed2e152648b047fa1fd7274080e084aa2ae266ed5ed0aca"
         },
         "producer_inputs": {
           "before": null,
-          "after": "7f3341ebf831843c7e7656377f4ea37875ccb5d4ec75838ae6602bf56caeed79"
+          "after": "c3a95d4ac140119af95c597fb8c983c100a21ce48c3a36cef854fca18f82653a"
         },
         "require_frozen_assignment": {
           "before": null,
-          "after": "c2177889cb098bff784350a65966cda1ab1c224d757736f080be0b62d16b4c4a"
+          "after": "f01d3f0d0ebd684e2243e25221bb20dbc8b9b0f5b8ddae5bd821025646f20fad"
         },
         "require_test_sources": {
           "before": null,
-          "after": "690dad7f3f18cc60e5fbfcc60896ab6df2e7ec9daeb333551075b4c28afe915f"
+          "after": "c9bd3fb29eae31c2aeec07951e0bf650e51f1e8b2b4ae066baca117c4097d20c"
         },
         "retained_authority_artifacts": {
           "before": null,
-          "after": "a401f94c8b121de7e0249de36a167f9e5ed9e851fa083af6128bc7d66a803e97"
+          "after": "1c191e626edb1ca7c6d5839a60974b6b9ef5a9a044eb496173930286248af2c2"
+        },
+        "transitioned_test": {
+          "before": null,
+          "after": "73476c45533920a865fd2c4d37b7bbd98e8ffd5d6d0d1a5fe56ac216b8ef56bc"
         },
         "validate_runtime_transition": {
           "before": null,
-          "after": "1127c7cf2af90b687b7b562a7234b0525ab439e649a144e7410b1ff8b8222972"
+          "after": "ab2e331ddf5acb528e2695dae11f7a55ed46a832f42aef2abc52c9708594f69f"
         }
       }
     },
-    "scripts/milli_inch_test_admission.py": {
+    "scripts/precision_profile_test_admission.py": {
       "before_sha256": null,
-      "after_sha256": "490847bc448e428f23f66c9ced2b347a3fc361b7fac55179a6f6a5393095fc03",
+      "after_sha256": "669109e121754afbd95a1e43e689733d40f6b25e2bf59d738f9aca3241cc61dc",
       "owners": {
         "@module": {
           "before": null,
-          "after": "212fc2ef529fad0e6eabcbaa981c07735514acef7f62feb6e46338d32d94a0e1"
+          "after": "fd99d7c0cdbf40661b19fb9abf17f00fce1aa4213580085ed18cc943dfea0c96"
         },
-        "precision_test_addition": {
+        "profile_test_transition": {
           "before": null,
-          "after": "cbb03d30b083c8ef05c38e3b3e96c4486aa4f9c94e75db0992fa7a7f8075fee4"
+          "after": "f25c8974bade1b150d5c958c5d8e69e08be867fae1556fbe1ec857b260b9b864"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "c39f86be7bf3bbcf5ee68970c04f1cba306148a6d4e444eb6f9e30d87145641e",
-      "after_sha256": "877007cc4b1bcbcd14dcc29bc646d9802ada575046b996b56789ba64267c2d08",
+      "before_sha256": "877007cc4b1bcbcd14dcc29bc646d9802ada575046b996b56789ba64267c2d08",
+      "after_sha256": "8720328077466cb8a81ec154b227836bd8025a0a3172addacf8e2b840641005d",
       "owners": {
         "@document": {
-          "before": "c39f86be7bf3bbcf5ee68970c04f1cba306148a6d4e444eb6f9e30d87145641e",
-          "after": "877007cc4b1bcbcd14dcc29bc646d9802ada575046b996b56789ba64267c2d08"
+          "before": "877007cc4b1bcbcd14dcc29bc646d9802ada575046b996b56789ba64267c2d08",
+          "after": "8720328077466cb8a81ec154b227836bd8025a0a3172addacf8e2b840641005d"
         }
       }
     },
-    "src/warhammer40k_core/geometry/milli_inch.py": {
+    "src/warhammer40k_core/adapters/execution_profile.py": {
+      "before_sha256": "48886d5020e075e2a26b166ff99520911cd7b158c217a9a3724f6459daaa1cf8",
+      "after_sha256": "4effd97d70a8d71719380cbd6c47f59c3ed0ffb1e1d755875f760ecb9b33f00a",
+      "owners": {
+        "@module": {
+          "before": "cdb7c9ecdfaf8537b8d038d238aad5fb861ddf24cb15d95ff93d3be6a945f74b",
+          "after": "7e4957b88691704d81d64300c794bb6d87ccbe05504afd31b70ce7667d6dcb1a"
+        },
+        "linux_execution_profile": {
+          "before": "61f0f9fa97360219186991f6b25240cdb31c28761276dbef49eca78a7ab1b2fc",
+          "after": "5e8be7e8368676e68d719bab096923855cd2565105fa855cac8b8032e982adfe"
+        },
+        "numerical_policy_for_profile": {
+          "before": null,
+          "after": "91719e4d7db488a306de9bd280789de82a275e923982facea591938358ed1f96"
+        },
+        "validate_executor_profile": {
+          "before": "560caccad1cbb45ca5024e8cd22c90b5e748c4212f152edbfbe8ac4fa1b65eb2",
+          "after": "5084ebaa69154f09b37e1a9a2cde6362426617f5fdea15619f642e610e024d21"
+        }
+      }
+    },
+    "src/warhammer40k_core/adapters/linux_authority_transport.py": {
+      "before_sha256": "ce793080440d1fa623565f46b2749da7c897997ced79afead317b1e02a6f4731",
+      "after_sha256": "ba509b5a63c48cc31af44e70a2bd9e8e86567b5e367e2734fa3ddadb224e71dc",
+      "owners": {
+        "@module": {
+          "before": "16ded6a561029befaf4e32962721c11016af0681011f0c7b7c68c109eb83d927",
+          "after": "050b46fa1a74793e7106acf9fa69dfc52d52e1937ccf08400017a405bf93c816"
+        },
+        "LinuxAuthority.__init__": {
+          "before": "520ba6b828910024e9a782a843878b9c3b0a0c80990067d45711c1f010a2fafa",
+          "after": "6b11c3c4a828ec6b50708df27ecfc2a7142e958233ed30d265023220de4911be"
+        },
+        "LinuxAuthority.numerical_policy": {
+          "before": null,
+          "after": "993a0f742c89a1756f09aeb6991abfb4eda66a0eb41ab9a7e914619c0d6a02fb"
+        }
+      }
+    },
+    "src/warhammer40k_core/adapters/linux_authority_worker.py": {
+      "before_sha256": "edba30cba8bea10016a211f8d1654c364b275335c0814a2e84643db06e0a1f2e",
+      "after_sha256": "a999288f018d96a772917d2653cc6ae82bd3180ec32a4e82ab2f837005c432d7",
+      "owners": {
+        "@module": {
+          "before": "25191918153f8f28b347adb0b9e32ca22fba3533372c32178c81b32939188de6",
+          "after": "842b66be0baf6ab32256a046b2a3bdedf007d8ce0353f060219fd1d1adedaba5"
+        },
+        "LinuxAuthorityDispatcher.__init__": {
+          "before": "ad9b279114374f85bddc000c430d181e2e0ad9b7e2576b4872ef5c6c3663ef2e",
+          "after": "00c1469c60593d44dda2da630815fc920ed9f8f7d1422807d5c21a19a392d023"
+        },
+        "LinuxAuthorityDispatcher._checkpoint_cache_identity": {
+          "before": null,
+          "after": "917cddcbd892f511753cd9a925fe0f8f0a45f08ca52148f6bc30d5604e8a12b1"
+        },
+        "LinuxAuthorityDispatcher._execute": {
+          "before": "6eec1d147ef76e2304375818521cccefc70126ffc2942816f0ff84309f0161d5",
+          "after": "0d9e7bc7962de5f65b242480b61b9e43516bdf78d13c032640ebb9a33d5645e6"
+        },
+        "LinuxAuthorityDispatcher.profile": {
+          "before": null,
+          "after": "7c6c22062461e0b36089a7641f3358bf36210ee07128e67c126866c12385f5c3"
+        },
+        "_OwnedSession": {
+          "before": "380bb27ddf61a59b4f2da13c5adf7a7efe464de402c085509ddf309f4ea45cfd",
+          "after": "f086fd4bdff37e9c6a83a8e4d33c278b7e95053c2d077ef4e531ff085028a11e"
+        }
+      }
+    },
+    "src/warhammer40k_core/adapters/linux_session.py": {
+      "before_sha256": "df4795fad8fdc178d979ac27e802226d5799ceef430d343c7f9375f4a1826320",
+      "after_sha256": "78ac218396507ef11f95a9b423739ac76c92e2f7801c0401ebd319e9323af212",
+      "owners": {
+        "@module": {
+          "before": "1ecb40c7e9fdf1644b09e284a89537f906122dc3a4096ed8ede2e3b7d8f89547",
+          "after": "6f86c3a957456c49a19e41639a8c861c927a4f26e679349bc44a9cdfa2303efd"
+        },
+        "LinuxGameSession.numerical_policy": {
+          "before": null,
+          "after": "554f96bf5e939e06927c119cf2ef151fec7709eafb116940a9dbcc239802cf9e"
+        }
+      }
+    },
+    "src/warhammer40k_core/adapters/numerical_policy.py": {
       "before_sha256": null,
-      "after_sha256": "692a482b4be1b765ef351a249b928fdc156023086112b11266ba6b06ef8476c4",
+      "after_sha256": "80bac8cc2264149cc8aba613df2c3db785810173e37435c09c369df118d86c5f",
       "owners": {
         "@module": {
           "before": null,
-          "after": "5a20c0355acd761e588c6ae0ccbf6654ef941efe2c8f491529569376b45a24e0"
+          "after": "87260d98337695b233504611cd5740ed6393a28805f62f88eb9f4def74e97f7c"
         },
-        "DistancePrecisionError": {
+        "NumericalPolicyConfiguration": {
           "before": null,
-          "after": "32e3427d866b53c587988a20202272d914a8333e2e23ae0718dcf0fd4f4d6568"
+          "after": "fc74834e0da6e217974b7705ad6bf6631d237f115eb8b03e50a7627cfa1f9eb8"
         },
-        "UnsupportedExactPathError": {
+        "NumericalPolicyConfiguration.__post_init__": {
           "before": null,
-          "after": "3987b64814890d50d00ab400e000ef6f1894d850aab70e553251d9ace5d8f476"
+          "after": "552f928c1d942b3f2baa94075b68552ae5abbc0fc117ab4a978d6db528dec756"
         },
-        "_exact_value": {
+        "NumericalPolicyConfiguration.checkpoint_cache_identity": {
           "before": null,
-          "after": "2c73777b0385603b404bcaf021f8a90ae01929079ba228d1eb0a795be8e34eec"
+          "after": "d1d0a3787c7e7ffb0fca1285eed772a732e904fa3ec9a65e73a8c13ad4bf1afe"
         },
-        "_nonnegative_value": {
+        "NumericalPolicyError": {
           "before": null,
-          "after": "c1cbab479222fc3a78f25abec39da5a8606a28623be28e5037a7e766ccc78023"
-        },
-        "_round_ticks": {
-          "before": null,
-          "after": "8e899572b939f200988a341aff14bffd2d349d17600ac8f620664517b76f26e8"
-        },
-        "_validate_ticks": {
-          "before": null,
-          "after": "80e7a08ce8f48d86d8b41402a27bcabc09673a9483e65079e1939d932f6a77b1"
-        },
-        "inches_to_ticks": {
-          "before": null,
-          "after": "7e24641a30f8ff39ed560491dc6ebb3c3df416d0a0256bc3dbe861da612ed031"
-        },
-        "millimeters_to_ticks": {
-          "before": null,
-          "after": "1181e365e30abbfc7a65394f8116e8315b25473a310da731dfceb735c71410c0"
-        },
-        "radius_inches_from_diameter_ticks": {
-          "before": null,
-          "after": "fbe0fc298195279a398bce175bd0dce546182585012668fa25084faec2ac00b7"
-        },
-        "rational_path_inches_to_ticks": {
-          "before": null,
-          "after": "0df3838471ccd995f5a129cd765b7fb030f87b811879772ff240ccef255ca037"
-        },
-        "squared_inches_to_ticks": {
-          "before": null,
-          "after": "1d51714be60967c19e067172bb34818140698eddf4239259cd01183f45941211"
-        },
-        "squared_path_inches_to_ticks": {
-          "before": null,
-          "after": "108bfd6998ee7fe86070a02297c70107fb4ad0d8c624759a657e69a61efc2df2"
-        },
-        "ticks_to_inches": {
-          "before": null,
-          "after": "040bd134c26a12a74841c37261db1f2c0978ff6c879d8ec6a7691c0cb77a98c7"
+          "after": "ea46187b5ed69620bd6b9551822022a217652c2915357d4c8df3c536f003ccaa"
         }
       }
     },
     "tests/code_quality/test_ci_performance_gates.py": {
-      "before_sha256": "ce9c7c8a9bf0895c7736dd729d81f79caee677e24dd215af397e7a37f7cb4a2a",
-      "after_sha256": "0bc9733bcdc5877141eabae2ba19e69f9285b65be9962fe933f305a0e7972cb0",
+      "before_sha256": "0bc9733bcdc5877141eabae2ba19e69f9285b65be9962fe933f305a0e7972cb0",
+      "after_sha256": "c6a2cf89206a8db1965ac8c586c970e75dd6cc9beda92d53dba27a7d222b936a",
       "owners": {
         "test_cutover_real_cli_rejects_naming_override": {
-          "before": "1f8b10a7d209336f6c5b7a04e8f76bf5de5a5cb6a25375109ea484440ac5712f",
-          "after": "6b9c9a67865fb5d93c65349b5560ab1c22ce1380013d494c6a1601785de3e94c"
+          "before": "6b9c9a67865fb5d93c65349b5560ab1c22ce1380013d494c6a1601785de3e94c",
+          "after": "863999478a0477916d39a62b4a14c03e8effcd21a5fc007cecfb73c6d62d838d"
         },
         "test_cutover_real_pytest_cli_does_not_bypass_explicit_file_guard": {
-          "before": "4e11b9ce830a4bf9e12bdd84abf062df2c8b8edf44599a9cd677ae83e2da1d19",
-          "after": "af804fd71fd6fc6a810c39e70ddb45529eff958bf82857671c1b9f1c39bb9d1b"
-        },
-        "test_precision_addition_does_not_reclassify_retained_snapshots": {
-          "before": null,
-          "after": "598cc1a7f23384fdcf016e1b1ede92c43c280a25700c8c75d8d79e778f2544ab"
+          "before": "af804fd71fd6fc6a810c39e70ddb45529eff958bf82857671c1b9f1c39bb9d1b",
+          "after": "b38c635d8bbffce096af409ce83d38197a3098f5647a1338210728a82cbb2971"
         },
         "test_precision_addition_preserves_retained_selection_and_admits_only_its_owner": {
-          "before": null,
-          "after": "d8c7eaf612a0acbe79a26e9361f6fa654597a41fc860349d70a34aca146739d2"
+          "before": "d8c7eaf612a0acbe79a26e9361f6fa654597a41fc860349d70a34aca146739d2",
+          "after": "383a5b14f0c9d1304e3a8435293effe10ae34d39aedbf7956d0773c890cc8288"
         },
         "test_precision_addition_requires_complete_exact_source_tuple": {
-          "before": null,
-          "after": "58ed7f01cdd99233c7f2bcef0e3f4207c9611c84ac69ad1cfbbb7edd8fcafe60"
-        }
-      }
-    },
-    "tests/code_quality/test_linux_authority_shard_admission.py": {
-      "before_sha256": "63e3eae262f726f147aad50538a1a826f2c0d1f9b326777da02ba83f43a2f2e5",
-      "after_sha256": "32f076aeab7b287fb0d0ea682d2ca7d5ca983e147bb2527809964d9128427bcf",
-      "owners": {
-        "@module": {
-          "before": "2f3bac66ebd532c7a045dac09f6a3b54681b5fc1ebd16998cf8f463955dafa9a",
-          "after": "6d528fa687f9f5b4e958602d2cd23743f46e63150862968637088105bf47663b"
-        },
-        "test_current_authority_source_requires_its_complete_git_producer": {
-          "before": "62a2bf7fba5caac476d2b84a5857c4da67662bcf321e8e9d7e053afbb3078d6b",
-          "after": null
-        },
-        "test_live_authority_profile_has_complete_fresh_evidence_and_fixed_inventory": {
-          "before": "be946d251604c489cceedf52cb0c1a9fa31cb95b19d51649a28b750b366b8051",
-          "after": null
-        },
-        "test_retained_authority_profile_has_complete_original_evidence_and_fixed_inventory": {
-          "before": null,
-          "after": "ef683606477d1c60454a659f1dab80f390d67080e53a8f8b9cc0d9c386dad426"
-        },
-        "test_retained_authority_source_requires_its_complete_git_producer": {
-          "before": null,
-          "after": "c270a7649bb3dd14ed0fd3e5aa3d50231bd00a9105d860d1ff950f6eb099ef6d"
+          "before": "58ed7f01cdd99233c7f2bcef0e3f4207c9611c84ac69ad1cfbbb7edd8fcafe60",
+          "after": "3411d8be290199fdaffe3fb3bbfdb9785e3a961a0f986ea3a2ed64febbae3ed5"
         }
       }
     },
     "tests/code_quality/test_milli_inch_shard_admission.py": {
-      "before_sha256": null,
-      "after_sha256": "a9b4fa44c6580af8d245421805ac79e95aa984da9cc1a0ef3caf906a08128996",
+      "before_sha256": "a9b4fa44c6580af8d245421805ac79e95aa984da9cc1a0ef3caf906a08128996",
+      "after_sha256": "7505f823a120bb863c03b76576fd80fc6f0f07657ac4c986c50009d76f7f35b6",
       "owners": {
         "@module": {
-          "before": null,
-          "after": "270ff3de0c81eb985b5be9f98f77d249d158646017a9743d22c244cc729152fd"
+          "before": "270ff3de0c81eb985b5be9f98f77d249d158646017a9743d22c244cc729152fd",
+          "after": "e0ee1f69a90d67287fb5b5c2161017add4558b93c12793e419060209d4282923"
         },
         "test_live_milli_inch_profile_has_complete_fresh_evidence_and_fixed_inventory": {
-          "before": null,
-          "after": "a552e377cad54dc2c86f663cf4c89e3b5b876c8419d5766b23796e03ba07e36f"
+          "before": "a552e377cad54dc2c86f663cf4c89e3b5b876c8419d5766b23796e03ba07e36f",
+          "after": null
         },
         "test_milli_inch_complete_producer_is_current_source": {
-          "before": null,
-          "after": "fb85799fa6df99c249d31d61f9a12a00d6ae89abe4f28f273a1772d4e3a9a4c2"
-        },
-        "test_milli_inch_fetches_current_and_retained_producers": {
-          "before": null,
-          "after": "2c60a912a236158edafba3e5fa29d0d593e2398c8762fc261a86a800feb155b7"
-        },
-        "test_milli_inch_new_selector_cannot_move_or_duplicate_retained_work": {
-          "before": null,
-          "after": "d21bbd24c8b8082eae591bd5efdb3bc0901987cebbb06c12567f2aa76491436b"
-        },
-        "test_milli_inch_preserves_original_behavior_sources_and_authority_evidence": {
-          "before": null,
-          "after": "6a0bb91b76e1f4427c72d3ef14dc9dbbeb2d3255cf974a6659af28fe5fafea8d"
+          "before": "fb85799fa6df99c249d31d61f9a12a00d6ae89abe4f28f273a1772d4e3a9a4c2",
+          "after": "b0cb77635a80dc8a4e60f76da237ae62130134f961f4758cc36814488f42e6e5"
         },
         "test_milli_inch_runtime_is_only_the_exact_inactive_addition": {
-          "before": null,
-          "after": "8356fe4b2c78c5d547560dbc1bde0c6373482848ee91d8b32ba19b883d993d54"
-        }
-      }
-    },
-    "tests/code_quality/test_performance_policy.py": {
-      "before_sha256": "f745dcf09b6bf4f957424b6c030d39e1194488f576105ae2301adcd6c7b2511d",
-      "after_sha256": "c75d9785768bd0d37751667ab0ae04856b4a70dc1ac8bcd90859991ed29a3084",
-      "owners": {
-        "test_milli_inch_arithmetic_keeps_sensitive_geometry_comparison_obligations": {
-          "before": null,
-          "after": "ec128d2e9177b9841691a38ffac13e5dce8a2c326c44b116903c3cb901917474"
+          "before": "8356fe4b2c78c5d547560dbc1bde0c6373482848ee91d8b32ba19b883d993d54",
+          "after": "70215745b28a36a1b87aa78ae8a60f2a6aeaa9799c05235296b4ab23fdb16bf7"
         },
-        "test_milli_inch_map_retains_every_existing_sensitive_operation": {
+        "test_retained_milli_inch_profile_has_complete_original_evidence_and_fixed_inventory": {
           "before": null,
-          "after": "18e70a897f66abd0554bc64934592d1d32491f0ca3f07ebf4c8c520f3dc3c11d"
+          "after": "ef7c4785453cb510927209050d652e3c540af08dc4026c420f1316db86b3528f"
         }
       }
     },
-    "tests/rules/section01/test_milli_inch.py": {
+    "tests/code_quality/test_precision_profile_shard_admission.py": {
       "before_sha256": null,
-      "after_sha256": "6fad7bf3bc123c2f217bb0ae46b96971d8591f1cda712a0d88ba4b1f0f5edb37",
+      "after_sha256": "ab310b9d8eaefc5aff7761ca305665361f9c6d03e3652972513cf86c7966f047",
       "owners": {
         "@module": {
           "before": null,
-          "after": "081b378e1a8f7a90065739ecbaaa78f14715a1908f105c3bb5f0535202c53505"
+          "after": "863b271303e31e91c1a948e5ae8bf637db97628f9d9f3279c37f889a5ae2dea0"
         },
-        "test_milli_inch_canonical_dimensions_derive_exact_half_tick_radii": {
+        "test_profile_binding_admits_only_its_exact_runtime_transition": {
           "before": null,
-          "after": "01c9e89608e527df1ba9bf591eee183861e149d6acf59fc06629be11aeffc692"
+          "after": "af4f1e2150c61c725ec0d6eb76b978d615ee57827e902e9607f9b614bf29a8e8"
         },
-        "test_milli_inch_decimal_context_cannot_change_results": {
+        "test_profile_binding_fetches_both_current_and_retained_producers": {
           "before": null,
-          "after": "7e42ca2c27563f288b13c6b2640695cc1ef9f1356da9e57032783fec84f8cfd5"
+          "after": "dad8875785a2c6ee1deabfa532b15cfb6a2a8ccc10af91372410e1cee2ecece4"
         },
-        "test_milli_inch_exact_mm_conversion_precedes_single_rounding": {
+        "test_profile_binding_preserves_all_existing_performance_obligations": {
           "before": null,
-          "after": "d0a85c1cdbf118ece43563991e94296b1237904d809a7bb716f53871dbb5e32c"
+          "after": "98f0e923d8636b47ac24d97a54c4d47798ac223d33903c8b5074574473aa2f52"
         },
-        "test_milli_inch_exact_sources_and_binary_float_semantics_are_distinct": {
+        "test_profile_binding_preserves_retained_sources_and_evidence": {
           "before": null,
-          "after": "c667a4b200824aa2928944d7bedf7f45ddfed307868f5dbde764107de9856999"
+          "after": "3772dab8979b4cbd69dd0025f847ee5895bd366e5906fc229f086e2c3b995724"
         },
-        "test_milli_inch_path_rejects_negative_and_unsupported_irrational_segments": {
+        "test_profile_binding_requires_complete_fresh_evidence_and_fixed_inventory": {
           "before": null,
-          "after": "58359b10d90aeefcb17b82e40e0aff68df951ebb41364bd9f347e30fd028f147"
+          "after": "051fe87b76fb754c78a98dabd523f51d9380d6737a89cf8ca1be229506399670"
         },
-        "test_milli_inch_path_rounds_total_once_and_is_partition_invariant": {
+        "test_profile_binding_requires_its_complete_measured_producer": {
           "before": null,
-          "after": "6c6c0d8ec62763e818e8bc7e3955c5c19f904f8146f14f4a55ce1179b28ef5df"
+          "after": "1149dbcffce78ba90d8efe07ea9f2e37d070ee440d5bdceba2fac81fb1d8129d"
         },
-        "test_milli_inch_rejects_invalid_sources": {
+        "test_profile_binding_retains_twelve_shards_and_every_prior_selector": {
           "before": null,
-          "after": "08866c1d69e6f71241fb7c27c1594dc1742916aa4f0e13cd5538aa103f633fee"
+          "after": "4459700a1cad0c2bc050cd6d0311b966a30fb2dc3cf818e9d176e772622be7ec"
         },
-        "test_milli_inch_signed_rounding_ties_and_exact_neighbors": {
+        "test_profile_test_transition_leaves_historical_source_selection_closed": {
           "before": null,
-          "after": "5e77bb1b66163aefae99f3d9df71a375a5f2b5264f3986823090c925d7c9ce36"
+          "after": "396699e438cab9dcbffc33e91260abc0909ab2fcafbeac044b53c7601d807e1e"
         },
-        "test_milli_inch_squared_measurements_compare_exact_midpoints": {
+        "test_profile_test_transition_preserves_original_selection_bytes": {
           "before": null,
-          "after": "8a14cee47ae97a9e3119b4efb30f1422e3c98a73ecc412f4d327af29c0758d45"
+          "after": "685698bdc3e01e0a28c59ce1ce151f4805b2962a35f0be6f0e7a5386af4674da"
         },
-        "test_milli_inch_threshold_strictness_uses_rounded_length_without_epsilon": {
+        "test_profile_test_transition_rejects_source_record_and_identity_drift": {
           "before": null,
-          "after": "616124a258acb34a5f8cbcee6a257b9bac8e5723e49f26a4ad284ccb859a6968"
+          "after": "e13a92cbb685150f3fd513e80af648b362f60196db6986e840fb881cf9560571"
+        }
+      }
+    },
+    "tests/infrastructure/adapters/unit/test_linux_authority.py": {
+      "before_sha256": "e30567808765adacc47cce1e5116ecc00be1ceb6a1af8accf27ffcc529d69aa8",
+      "after_sha256": "9d8abade332100121766655881547a6e0bf1813fe416414a022127605b988ec7",
+      "owners": {
+        "@module": {
+          "before": "1d792bf3f8ba981df88878ad8600aee3c882615a0212e651ac46ff7a35796d46",
+          "after": "46b148a6b22da2d2fa7ef705343bb9e268a8c2acb9e112766ae13ae80ef779bd"
         },
-        "test_milli_inch_zero_rounded_gap_is_not_a_topology_predicate": {
+        "test_dispatcher_real_native_roster_restore_fork_viewers_and_exact_replay": {
+          "before": "844444f825f27b46d2fa6e9399c066a59a1f1dc30a02058dcac345e822d7e019",
+          "after": "e074a67c5ebec4c0e2b481f75f78b8da7943b44f2f9e454e4ec4530a1e4f97be"
+        },
+        "test_executor_registration_requires_the_registered_profile_and_same_engine": {
+          "before": "1e782ef02fc5744fc66f5fd9998347684bf74e4c98e0796fa9d410a6f5c2957b",
+          "after": "82cd724243a461f0af432b63cfd777aa94482fd55580a1d3f2250f256750a83b"
+        },
+        "test_selected_linux_process_implements_adapter_session_and_roundtrips": {
+          "before": "0ea7004089c333b93c566d80d51ceea6d57fca30685de5fd4f57db8b82638469",
+          "after": "857d4edc3fb14ba64a650d9fa6684c1e16b86ce4159b160f058c5c95e9ae37e5"
+        }
+      }
+    },
+    "tests/infrastructure/adapters/unit/test_numerical_policy.py": {
+      "before_sha256": null,
+      "after_sha256": "73c17636cf2fb3b2977d0bf050990199095aa4c4597c5c5b03bcf2f2dccf115e",
+      "owners": {
+        "@module": {
           "before": null,
-          "after": "a2dd7e9766215e107e26403a7034abb26abbed321222414aa6252979257d4ec2"
+          "after": "51de263decf7b60f10038eefe3ef8c2c674d714a76272fcdfc3dfe7b4d52aa36"
+        },
+        "test_missing_policy_and_retained_profile_require_their_original_executor": {
+          "before": null,
+          "after": "e988cd0738ad44bc101453e16a8d1d887d6dbadee958f9dadbe7a87dc646f0a1"
+        },
+        "test_policy_configuration_and_checkpoint_cache_identity_are_explicit": {
+          "before": null,
+          "after": "45e6b8814368e61f3376d6349148c556b81e21ea779d1ba41884af56c09c8b66"
+        },
+        "test_unknown_or_inactive_numerical_policy_is_never_executed": {
+          "before": null,
+          "after": "fb9ff902c91c703286c61cd52a37722ca3a5d4edf51124cc5e766c7530b56a2c"
         }
       }
     }
@@ -626,33 +602,25 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
-      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
-      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
-    },
-    "ci/quality_shards/shard-2.txt": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
-      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
-      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
+      "rationale": "Bind explicit legacy numerical-policy configuration to registered Linux profiles, saved and replay envelopes, and checkpoint cache identity. Preserve inner geometry and history bytes. Admit only the exact source/test successor with actual fresh covered observations. Mandatory cache mappings retain visibility and reconstruction comparisons.",
+      "source_obligation": "Implement the next dependency-ready outer policy binding after the inactive 0.001-inch foundation. Reject unknown, missing, mixed or inactive policies before authority use. Preserve retained histories, profiles, source recipes and original evidence without migration, using retained compatible executors.",
+      "unchanged_work": "No milli-inch execution activation, geometry or path algorithm changes, inner GameConfig/lifecycle/replay schema changes, historical witness rewrite, source exception or moved retained selector. Preserve32 local workers,12 hosted shards,67percent branch floor,1620second inclusive approval and termination only beyond1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
     "ci/quality_shards/shard-3-modules.txt": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
-      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
-      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
+      "rationale": "Bind explicit legacy numerical-policy configuration to registered Linux profiles, saved and replay envelopes, and checkpoint cache identity. Preserve inner geometry and history bytes. Admit only the exact source/test successor with actual fresh covered observations. Mandatory cache mappings retain visibility and reconstruction comparisons.",
+      "source_obligation": "Implement the next dependency-ready outer policy binding after the inactive 0.001-inch foundation. Reject unknown, missing, mixed or inactive policies before authority use. Preserve retained histories, profiles, source recipes and original evidence without migration, using retained compatible executors.",
+      "unchanged_work": "No milli-inch execution activation, geometry or path algorithm changes, inner GameConfig/lifecycle/replay schema changes, historical witness rewrite, source exception or moved retained selector. Preserve32 local workers,12 hosted shards,67percent branch floor,1620second inclusive approval and termination only beyond1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
     "ci/quality_shards/shard-3.txt": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
-      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
-      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
+      "rationale": "Bind explicit legacy numerical-policy configuration to registered Linux profiles, saved and replay envelopes, and checkpoint cache identity. Preserve inner geometry and history bytes. Admit only the exact source/test successor with actual fresh covered observations. Mandatory cache mappings retain visibility and reconstruction comparisons.",
+      "source_obligation": "Implement the next dependency-ready outer policy binding after the inactive 0.001-inch foundation. Reject unknown, missing, mixed or inactive policies before authority use. Preserve retained histories, profiles, source recipes and original evidence without migration, using retained compatible executors.",
+      "unchanged_work": "No milli-inch execution activation, geometry or path algorithm changes, inner GameConfig/lifecycle/replay schema changes, historical witness rewrite, source exception or moved retained selector. Preserve32 local workers,12 hosted shards,67percent branch floor,1620second inclusive approval and termination only beyond1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
     "ci/test_shards/current-runtime-compatibility.json": {
       "category": "measured_workload",
@@ -661,9 +629,9 @@
         "scoped-shard-allocation"
       ],
       "selected_families": [],
-      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
-      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
-      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
+      "rationale": "Bind explicit legacy numerical-policy configuration to registered Linux profiles, saved and replay envelopes, and checkpoint cache identity. Preserve inner geometry and history bytes. Admit only the exact source/test successor with actual fresh covered observations. Mandatory cache mappings retain visibility and reconstruction comparisons.",
+      "source_obligation": "Implement the next dependency-ready outer policy binding after the inactive 0.001-inch foundation. Reject unknown, missing, mixed or inactive policies before authority use. Preserve retained histories, profiles, source recipes and original evidence without migration, using retained compatible executors.",
+      "unchanged_work": "No milli-inch execution activation, geometry or path algorithm changes, inner GameConfig/lifecycle/replay schema changes, historical witness rewrite, source exception or moved retained selector. Preserve32 local workers,12 hosted shards,67percent branch floor,1620second inclusive approval and termination only beyond1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
     "ci/test_shards/durations.json": {
       "category": "measured_workload",
@@ -671,42 +639,42 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
-      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
-      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
+      "rationale": "Bind explicit legacy numerical-policy configuration to registered Linux profiles, saved and replay envelopes, and checkpoint cache identity. Preserve inner geometry and history bytes. Admit only the exact source/test successor with actual fresh covered observations. Mandatory cache mappings retain visibility and reconstruction comparisons.",
+      "source_obligation": "Implement the next dependency-ready outer policy binding after the inactive 0.001-inch foundation. Reject unknown, missing, mixed or inactive policies before authority use. Preserve retained histories, profiles, source recipes and original evidence without migration, using retained compatible executors.",
+      "unchanged_work": "No milli-inch execution activation, geometry or path algorithm changes, inner GameConfig/lifecycle/replay schema changes, historical witness rewrite, source exception or moved retained selector. Preserve32 local workers,12 hosted shards,67percent branch floor,1620second inclusive approval and termination only beyond1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
-    "ci/test_shards/milli-inch-covered-baseline.json": {
+    "ci/test_shards/precision-profile-covered-baseline.json": {
       "category": "measured_workload",
       "operations": [
         "mfm-current-behavior-profile",
         "scoped-shard-allocation"
       ],
       "selected_families": [],
-      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
-      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
-      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
+      "rationale": "Bind explicit legacy numerical-policy configuration to registered Linux profiles, saved and replay envelopes, and checkpoint cache identity. Preserve inner geometry and history bytes. Admit only the exact source/test successor with actual fresh covered observations. Mandatory cache mappings retain visibility and reconstruction comparisons.",
+      "source_obligation": "Implement the next dependency-ready outer policy binding after the inactive 0.001-inch foundation. Reject unknown, missing, mixed or inactive policies before authority use. Preserve retained histories, profiles, source recipes and original evidence without migration, using retained compatible executors.",
+      "unchanged_work": "No milli-inch execution activation, geometry or path algorithm changes, inner GameConfig/lifecycle/replay schema changes, historical witness rewrite, source exception or moved retained selector. Preserve32 local workers,12 hosted shards,67percent branch floor,1620second inclusive approval and termination only beyond1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
-    "ci/test_shards/milli-inch-covered-evidence.json": {
+    "ci/test_shards/precision-profile-covered-evidence.json": {
       "category": "measured_workload",
       "operations": [
         "mfm-current-behavior-profile",
         "scoped-shard-allocation"
       ],
       "selected_families": [],
-      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
-      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
-      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
+      "rationale": "Bind explicit legacy numerical-policy configuration to registered Linux profiles, saved and replay envelopes, and checkpoint cache identity. Preserve inner geometry and history bytes. Admit only the exact source/test successor with actual fresh covered observations. Mandatory cache mappings retain visibility and reconstruction comparisons.",
+      "source_obligation": "Implement the next dependency-ready outer policy binding after the inactive 0.001-inch foundation. Reject unknown, missing, mixed or inactive policies before authority use. Preserve retained histories, profiles, source recipes and original evidence without migration, using retained compatible executors.",
+      "unchanged_work": "No milli-inch execution activation, geometry or path algorithm changes, inner GameConfig/lifecycle/replay schema changes, historical witness rewrite, source exception or moved retained selector. Preserve32 local workers,12 hosted shards,67percent branch floor,1620second inclusive approval and termination only beyond1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
-    "ci/test_shards/milli-inch-derived-assignment.json": {
+    "ci/test_shards/precision-profile-derived-assignment.json": {
       "category": "measured_workload",
       "operations": [
         "mfm-current-behavior-profile",
         "scoped-shard-allocation"
       ],
       "selected_families": [],
-      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
-      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
-      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
+      "rationale": "Bind explicit legacy numerical-policy configuration to registered Linux profiles, saved and replay envelopes, and checkpoint cache identity. Preserve inner geometry and history bytes. Admit only the exact source/test successor with actual fresh covered observations. Mandatory cache mappings retain visibility and reconstruction comparisons.",
+      "source_obligation": "Implement the next dependency-ready outer policy binding after the inactive 0.001-inch foundation. Reject unknown, missing, mixed or inactive policies before authority use. Preserve retained histories, profiles, source recipes and original evidence without migration, using retained compatible executors.",
+      "unchanged_work": "No milli-inch execution activation, geometry or path algorithm changes, inner GameConfig/lifecycle/replay schema changes, historical witness rewrite, source exception or moved retained selector. Preserve32 local workers,12 hosted shards,67percent branch floor,1620second inclusive approval and termination only beyond1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
     "ci/test_shards/shard-12.txt": {
       "category": "measured_workload",
@@ -714,9 +682,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
-      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
-      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
+      "rationale": "Bind explicit legacy numerical-policy configuration to registered Linux profiles, saved and replay envelopes, and checkpoint cache identity. Preserve inner geometry and history bytes. Admit only the exact source/test successor with actual fresh covered observations. Mandatory cache mappings retain visibility and reconstruction comparisons.",
+      "source_obligation": "Implement the next dependency-ready outer policy binding after the inactive 0.001-inch foundation. Reject unknown, missing, mixed or inactive policies before authority use. Preserve retained histories, profiles, source recipes and original evidence without migration, using retained compatible executors.",
+      "unchanged_work": "No milli-inch execution activation, geometry or path algorithm changes, inner GameConfig/lifecycle/replay schema changes, historical witness rewrite, source exception or moved retained selector. Preserve32 local workers,12 hosted shards,67percent branch floor,1620second inclusive approval and termination only beyond1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
@@ -724,9 +692,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
-      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
-      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
+      "rationale": "Bind explicit legacy numerical-policy configuration to registered Linux profiles, saved and replay envelopes, and checkpoint cache identity. Preserve inner geometry and history bytes. Admit only the exact source/test successor with actual fresh covered observations. Mandatory cache mappings retain visibility and reconstruction comparisons.",
+      "source_obligation": "Implement the next dependency-ready outer policy binding after the inactive 0.001-inch foundation. Reject unknown, missing, mixed or inactive policies before authority use. Preserve retained histories, profiles, source recipes and original evidence without migration, using retained compatible executors.",
+      "unchanged_work": "No milli-inch execution activation, geometry or path algorithm changes, inner GameConfig/lifecycle/replay schema changes, historical witness rewrite, source exception or moved retained selector. Preserve32 local workers,12 hosted shards,67percent branch floor,1620second inclusive approval and termination only beyond1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
@@ -734,9 +702,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
-      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
-      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
+      "rationale": "Bind explicit legacy numerical-policy configuration to registered Linux profiles, saved and replay envelopes, and checkpoint cache identity. Preserve inner geometry and history bytes. Admit only the exact source/test successor with actual fresh covered observations. Mandatory cache mappings retain visibility and reconstruction comparisons.",
+      "source_obligation": "Implement the next dependency-ready outer policy binding after the inactive 0.001-inch foundation. Reject unknown, missing, mixed or inactive policies before authority use. Preserve retained histories, profiles, source recipes and original evidence without migration, using retained compatible executors.",
+      "unchanged_work": "No milli-inch execution activation, geometry or path algorithm changes, inner GameConfig/lifecycle/replay schema changes, historical witness rewrite, source exception or moved retained selector. Preserve32 local workers,12 hosted shards,67percent branch floor,1620second inclusive approval and termination only beyond1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
@@ -744,9 +712,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
-      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
-      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
+      "rationale": "Bind explicit legacy numerical-policy configuration to registered Linux profiles, saved and replay envelopes, and checkpoint cache identity. Preserve inner geometry and history bytes. Admit only the exact source/test successor with actual fresh covered observations. Mandatory cache mappings retain visibility and reconstruction comparisons.",
+      "source_obligation": "Implement the next dependency-ready outer policy binding after the inactive 0.001-inch foundation. Reject unknown, missing, mixed or inactive policies before authority use. Preserve retained histories, profiles, source recipes and original evidence without migration, using retained compatible executors.",
+      "unchanged_work": "No milli-inch execution activation, geometry or path algorithm changes, inner GameConfig/lifecycle/replay schema changes, historical witness rewrite, source exception or moved retained selector. Preserve32 local workers,12 hosted shards,67percent branch floor,1620second inclusive approval and termination only beyond1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
@@ -754,9 +722,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
-      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
-      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
+      "rationale": "Bind explicit legacy numerical-policy configuration to registered Linux profiles, saved and replay envelopes, and checkpoint cache identity. Preserve inner geometry and history bytes. Admit only the exact source/test successor with actual fresh covered observations. Mandatory cache mappings retain visibility and reconstruction comparisons.",
+      "source_obligation": "Implement the next dependency-ready outer policy binding after the inactive 0.001-inch foundation. Reject unknown, missing, mixed or inactive policies before authority use. Preserve retained histories, profiles, source recipes and original evidence without migration, using retained compatible executors.",
+      "unchanged_work": "No milli-inch execution activation, geometry or path algorithm changes, inner GameConfig/lifecycle/replay schema changes, historical witness rewrite, source exception or moved retained selector. Preserve32 local workers,12 hosted shards,67percent branch floor,1620second inclusive approval and termination only beyond1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
@@ -764,9 +732,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
-      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
-      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
+      "rationale": "Bind explicit legacy numerical-policy configuration to registered Linux profiles, saved and replay envelopes, and checkpoint cache identity. Preserve inner geometry and history bytes. Admit only the exact source/test successor with actual fresh covered observations. Mandatory cache mappings retain visibility and reconstruction comparisons.",
+      "source_obligation": "Implement the next dependency-ready outer policy binding after the inactive 0.001-inch foundation. Reject unknown, missing, mixed or inactive policies before authority use. Preserve retained histories, profiles, source recipes and original evidence without migration, using retained compatible executors.",
+      "unchanged_work": "No milli-inch execution activation, geometry or path algorithm changes, inner GameConfig/lifecycle/replay schema changes, historical witness rewrite, source exception or moved retained selector. Preserve32 local workers,12 hosted shards,67percent branch floor,1620second inclusive approval and termination only beyond1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
@@ -774,9 +742,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
-      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
-      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
+      "rationale": "Bind explicit legacy numerical-policy configuration to registered Linux profiles, saved and replay envelopes, and checkpoint cache identity. Preserve inner geometry and history bytes. Admit only the exact source/test successor with actual fresh covered observations. Mandatory cache mappings retain visibility and reconstruction comparisons.",
+      "source_obligation": "Implement the next dependency-ready outer policy binding after the inactive 0.001-inch foundation. Reject unknown, missing, mixed or inactive policies before authority use. Preserve retained histories, profiles, source recipes and original evidence without migration, using retained compatible executors.",
+      "unchanged_work": "No milli-inch execution activation, geometry or path algorithm changes, inner GameConfig/lifecycle/replay schema changes, historical witness rewrite, source exception or moved retained selector. Preserve32 local workers,12 hosted shards,67percent branch floor,1620second inclusive approval and termination only beyond1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
@@ -784,9 +752,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
-      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
-      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
+      "rationale": "Bind explicit legacy numerical-policy configuration to registered Linux profiles, saved and replay envelopes, and checkpoint cache identity. Preserve inner geometry and history bytes. Admit only the exact source/test successor with actual fresh covered observations. Mandatory cache mappings retain visibility and reconstruction comparisons.",
+      "source_obligation": "Implement the next dependency-ready outer policy binding after the inactive 0.001-inch foundation. Reject unknown, missing, mixed or inactive policies before authority use. Preserve retained histories, profiles, source recipes and original evidence without migration, using retained compatible executors.",
+      "unchanged_work": "No milli-inch execution activation, geometry or path algorithm changes, inner GameConfig/lifecycle/replay schema changes, historical witness rewrite, source exception or moved retained selector. Preserve32 local workers,12 hosted shards,67percent branch floor,1620second inclusive approval and termination only beyond1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
@@ -794,85 +762,59 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
-      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
-      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
+      "rationale": "Bind explicit legacy numerical-policy configuration to registered Linux profiles, saved and replay envelopes, and checkpoint cache identity. Preserve inner geometry and history bytes. Admit only the exact source/test successor with actual fresh covered observations. Mandatory cache mappings retain visibility and reconstruction comparisons.",
+      "source_obligation": "Implement the next dependency-ready outer policy binding after the inactive 0.001-inch foundation. Reject unknown, missing, mixed or inactive policies before authority use. Preserve retained histories, profiles, source recipes and original evidence without migration, using retained compatible executors.",
+      "unchanged_work": "No milli-inch execution activation, geometry or path algorithm changes, inner GameConfig/lifecycle/replay schema changes, historical witness rewrite, source exception or moved retained selector. Preserve32 local workers,12 hosted shards,67percent branch floor,1620second inclusive approval and termination only beyond1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
-    "data/source_audits/ci64_provenance_v1/milli-inch-test-addition-v1.json": {
-      "category": "measured_workload",
+    "data/source_audits/ci64_provenance_v1/precision-profile-test-transition-v1.json": {
+      "category": "rule_semantics",
       "operations": [
-        "milli-inch-test-admission"
+        "precision-profile-test-admission"
       ],
       "selected_families": [],
-      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
-      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
-      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
-    },
-    "docs/ADAPTER_DECISION_CONTRACT.md": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
-      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
-      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
+      "rationale": "Bind explicit legacy numerical-policy configuration to registered Linux profiles, saved and replay envelopes, and checkpoint cache identity. Preserve inner geometry and history bytes. Admit only the exact source/test successor with actual fresh covered observations. Mandatory cache mappings retain visibility and reconstruction comparisons.",
+      "source_obligation": "Implement the next dependency-ready outer policy binding after the inactive 0.001-inch foundation. Reject unknown, missing, mixed or inactive policies before authority use. Preserve retained histories, profiles, source recipes and original evidence without migration, using retained compatible executors.",
+      "unchanged_work": "No milli-inch execution activation, geometry or path algorithm changes, inner GameConfig/lifecycle/replay schema changes, historical witness rewrite, source exception or moved retained selector. Preserve32 local workers,12 hosted shards,67percent branch floor,1620second inclusive approval and termination only beyond1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
-      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
-      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
+      "rationale": "Bind explicit legacy numerical-policy configuration to registered Linux profiles, saved and replay envelopes, and checkpoint cache identity. Preserve inner geometry and history bytes. Admit only the exact source/test successor with actual fresh covered observations. Mandatory cache mappings retain visibility and reconstruction comparisons.",
+      "source_obligation": "Implement the next dependency-ready outer policy binding after the inactive 0.001-inch foundation. Reject unknown, missing, mixed or inactive policies before authority use. Preserve retained histories, profiles, source recipes and original evidence without migration, using retained compatible executors.",
+      "unchanged_work": "No milli-inch execution activation, geometry or path algorithm changes, inner GameConfig/lifecycle/replay schema changes, historical witness rewrite, source exception or moved retained selector. Preserve32 local workers,12 hosted shards,67percent branch floor,1620second inclusive approval and termination only beyond1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
     "docs/DISTANCE_PRECISION.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
-      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
-      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
+      "rationale": "Bind explicit legacy numerical-policy configuration to registered Linux profiles, saved and replay envelopes, and checkpoint cache identity. Preserve inner geometry and history bytes. Admit only the exact source/test successor with actual fresh covered observations. Mandatory cache mappings retain visibility and reconstruction comparisons.",
+      "source_obligation": "Implement the next dependency-ready outer policy binding after the inactive 0.001-inch foundation. Reject unknown, missing, mixed or inactive policies before authority use. Preserve retained histories, profiles, source recipes and original evidence without migration, using retained compatible executors.",
+      "unchanged_work": "No milli-inch execution activation, geometry or path algorithm changes, inner GameConfig/lifecycle/replay schema changes, historical witness rewrite, source exception or moved retained selector. Preserve32 local workers,12 hosted shards,67percent branch floor,1620second inclusive approval and termination only beyond1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
-    "docs/performance/current/precision-foundation-movement.json": {
+    "docs/performance/current/precision-profile-reconstruction.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
-      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
-      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
+      "rationale": "Bind explicit legacy numerical-policy configuration to registered Linux profiles, saved and replay envelopes, and checkpoint cache identity. Preserve inner geometry and history bytes. Admit only the exact source/test successor with actual fresh covered observations. Mandatory cache mappings retain visibility and reconstruction comparisons.",
+      "source_obligation": "Implement the next dependency-ready outer policy binding after the inactive 0.001-inch foundation. Reject unknown, missing, mixed or inactive policies before authority use. Preserve retained histories, profiles, source recipes and original evidence without migration, using retained compatible executors.",
+      "unchanged_work": "No milli-inch execution activation, geometry or path algorithm changes, inner GameConfig/lifecycle/replay schema changes, historical witness rewrite, source exception or moved retained selector. Preserve32 local workers,12 hosted shards,67percent branch floor,1620second inclusive approval and termination only beyond1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
-    "docs/performance/current/precision-foundation-setup.json": {
+    "docs/performance/current/precision-profile-visibility.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
-      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
-      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
-    },
-    "docs/performance/current/precision-foundation-visibility.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
-      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
-      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
+      "rationale": "Bind explicit legacy numerical-policy configuration to registered Linux profiles, saved and replay envelopes, and checkpoint cache identity. Preserve inner geometry and history bytes. Admit only the exact source/test successor with actual fresh covered observations. Mandatory cache mappings retain visibility and reconstruction comparisons.",
+      "source_obligation": "Implement the next dependency-ready outer policy binding after the inactive 0.001-inch foundation. Reject unknown, missing, mixed or inactive policies before authority use. Preserve retained histories, profiles, source recipes and original evidence without migration, using retained compatible executors.",
+      "unchanged_work": "No milli-inch execution activation, geometry or path algorithm changes, inner GameConfig/lifecycle/replay schema changes, historical witness rewrite, source exception or moved retained selector. Preserve32 local workers,12 hosted shards,67percent branch floor,1620second inclusive approval and termination only beyond1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
-      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
-      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
-    },
-    "scripts/behavioral_selection_members.py": {
-      "category": "measured_workload",
-      "operations": [
-        "milli-inch-test-admission"
-      ],
-      "selected_families": [],
-      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
-      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
-      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
+      "rationale": "Bind explicit legacy numerical-policy configuration to registered Linux profiles, saved and replay envelopes, and checkpoint cache identity. Preserve inner geometry and history bytes. Admit only the exact source/test successor with actual fresh covered observations. Mandatory cache mappings retain visibility and reconstruction comparisons.",
+      "source_obligation": "Implement the next dependency-ready outer policy binding after the inactive 0.001-inch foundation. Reject unknown, missing, mixed or inactive policies before authority use. Preserve retained histories, profiles, source recipes and original evidence without migration, using retained compatible executors.",
+      "unchanged_work": "No milli-inch execution activation, geometry or path algorithm changes, inner GameConfig/lifecycle/replay schema changes, historical witness rewrite, source exception or moved retained selector. Preserve32 local workers,12 hosted shards,67percent branch floor,1620second inclusive approval and termination only beyond1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
     "scripts/build_test_shards.py": {
       "category": "rule_semantics",
@@ -880,9 +822,9 @@
         "ci78-cutover-owners-83cd0803bcde80cbfc805d2a110f3274d501da3bc2230de8cc7f95cc0cbd608f"
       ],
       "selected_families": [],
-      "rationale": "Implement finite admission semantics and preserve existing CLI assertions. The three extracted membership validators have identical original ASTs; forwarding wrappers and exact-source admission add no changed contract source scanner, generator, search, cache or serialization algorithm. Required fixture copies add the two helper dependencies. Existing mandatory mappings remain selected.",
-      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
-      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
+      "rationale": "Bind explicit legacy numerical-policy configuration to registered Linux profiles, saved and replay envelopes, and checkpoint cache identity. Preserve inner geometry and history bytes. Admit only the exact source/test successor with actual fresh covered observations. Mandatory cache mappings retain visibility and reconstruction comparisons.",
+      "source_obligation": "Implement the next dependency-ready outer policy binding after the inactive 0.001-inch foundation. Reject unknown, missing, mixed or inactive policies before authority use. Preserve retained histories, profiles, source recipes and original evidence without migration, using retained compatible executors.",
+      "unchanged_work": "No milli-inch execution activation, geometry or path algorithm changes, inner GameConfig/lifecycle/replay schema changes, historical witness rewrite, source exception or moved retained selector. Preserve32 local workers,12 hosted shards,67percent branch floor,1620second inclusive approval and termination only beyond1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
     "scripts/current_shard_assignment.py": {
       "category": "measured_workload",
@@ -890,9 +832,9 @@
         "scoped-shard-allocation"
       ],
       "selected_families": [],
-      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
-      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
-      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
+      "rationale": "Bind explicit legacy numerical-policy configuration to registered Linux profiles, saved and replay envelopes, and checkpoint cache identity. Preserve inner geometry and history bytes. Admit only the exact source/test successor with actual fresh covered observations. Mandatory cache mappings retain visibility and reconstruction comparisons.",
+      "source_obligation": "Implement the next dependency-ready outer policy binding after the inactive 0.001-inch foundation. Reject unknown, missing, mixed or inactive policies before authority use. Preserve retained histories, profiles, source recipes and original evidence without migration, using retained compatible executors.",
+      "unchanged_work": "No milli-inch execution activation, geometry or path algorithm changes, inner GameConfig/lifecycle/replay schema changes, historical witness rewrite, source exception or moved retained selector. Preserve32 local workers,12 hosted shards,67percent branch floor,1620second inclusive approval and termination only beyond1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
     "scripts/current_shard_compatibility.py": {
       "category": "measured_workload",
@@ -900,9 +842,9 @@
         "scoped-shard-allocation"
       ],
       "selected_families": [],
-      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
-      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
-      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
+      "rationale": "Bind explicit legacy numerical-policy configuration to registered Linux profiles, saved and replay envelopes, and checkpoint cache identity. Preserve inner geometry and history bytes. Admit only the exact source/test successor with actual fresh covered observations. Mandatory cache mappings retain visibility and reconstruction comparisons.",
+      "source_obligation": "Implement the next dependency-ready outer policy binding after the inactive 0.001-inch foundation. Reject unknown, missing, mixed or inactive policies before authority use. Preserve retained histories, profiles, source recipes and original evidence without migration, using retained compatible executors.",
+      "unchanged_work": "No milli-inch execution activation, geometry or path algorithm changes, inner GameConfig/lifecycle/replay schema changes, historical witness rewrite, source exception or moved retained selector. Preserve32 local workers,12 hosted shards,67percent branch floor,1620second inclusive approval and termination only beyond1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
     "scripts/fetch_scheduling_sources.py": {
       "category": "measured_workload",
@@ -910,29 +852,29 @@
         "scoped-shard-allocation"
       ],
       "selected_families": [],
-      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
-      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
-      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
+      "rationale": "Bind explicit legacy numerical-policy configuration to registered Linux profiles, saved and replay envelopes, and checkpoint cache identity. Preserve inner geometry and history bytes. Admit only the exact source/test successor with actual fresh covered observations. Mandatory cache mappings retain visibility and reconstruction comparisons.",
+      "source_obligation": "Implement the next dependency-ready outer policy binding after the inactive 0.001-inch foundation. Reject unknown, missing, mixed or inactive policies before authority use. Preserve retained histories, profiles, source recipes and original evidence without migration, using retained compatible executors.",
+      "unchanged_work": "No milli-inch execution activation, geometry or path algorithm changes, inner GameConfig/lifecycle/replay schema changes, historical witness rewrite, source exception or moved retained selector. Preserve32 local workers,12 hosted shards,67percent branch floor,1620second inclusive approval and termination only beyond1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
-    "scripts/milli_inch_shard_admission.py": {
+    "scripts/precision_profile_shard_admission.py": {
       "category": "measured_workload",
       "operations": [
         "scoped-shard-allocation"
       ],
       "selected_families": [],
-      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
-      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
-      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
+      "rationale": "Bind explicit legacy numerical-policy configuration to registered Linux profiles, saved and replay envelopes, and checkpoint cache identity. Preserve inner geometry and history bytes. Admit only the exact source/test successor with actual fresh covered observations. Mandatory cache mappings retain visibility and reconstruction comparisons.",
+      "source_obligation": "Implement the next dependency-ready outer policy binding after the inactive 0.001-inch foundation. Reject unknown, missing, mixed or inactive policies before authority use. Preserve retained histories, profiles, source recipes and original evidence without migration, using retained compatible executors.",
+      "unchanged_work": "No milli-inch execution activation, geometry or path algorithm changes, inner GameConfig/lifecycle/replay schema changes, historical witness rewrite, source exception or moved retained selector. Preserve32 local workers,12 hosted shards,67percent branch floor,1620second inclusive approval and termination only beyond1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
-    "scripts/milli_inch_test_admission.py": {
+    "scripts/precision_profile_test_admission.py": {
       "category": "measured_workload",
       "operations": [
-        "milli-inch-test-admission"
+        "precision-profile-test-admission"
       ],
       "selected_families": [],
-      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
-      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
-      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
+      "rationale": "Bind explicit legacy numerical-policy configuration to registered Linux profiles, saved and replay envelopes, and checkpoint cache identity. Preserve inner geometry and history bytes. Admit only the exact source/test successor with actual fresh covered observations. Mandatory cache mappings retain visibility and reconstruction comparisons.",
+      "source_obligation": "Implement the next dependency-ready outer policy binding after the inactive 0.001-inch foundation. Reject unknown, missing, mixed or inactive policies before authority use. Preserve retained histories, profiles, source recipes and original evidence without migration, using retained compatible executors.",
+      "unchanged_work": "No milli-inch execution activation, geometry or path algorithm changes, inner GameConfig/lifecycle/replay schema changes, historical witness rewrite, source exception or moved retained selector. Preserve32 local workers,12 hosted shards,67percent branch floor,1620second inclusive approval and termination only beyond1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
@@ -940,23 +882,67 @@
         "source-record"
       ],
       "selected_families": [],
-      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
-      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
-      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
+      "rationale": "Bind explicit legacy numerical-policy configuration to registered Linux profiles, saved and replay envelopes, and checkpoint cache identity. Preserve inner geometry and history bytes. Admit only the exact source/test successor with actual fresh covered observations. Mandatory cache mappings retain visibility and reconstruction comparisons.",
+      "source_obligation": "Implement the next dependency-ready outer policy binding after the inactive 0.001-inch foundation. Reject unknown, missing, mixed or inactive policies before authority use. Preserve retained histories, profiles, source recipes and original evidence without migration, using retained compatible executors.",
+      "unchanged_work": "No milli-inch execution activation, geometry or path algorithm changes, inner GameConfig/lifecycle/replay schema changes, historical witness rewrite, source exception or moved retained selector. Preserve32 local workers,12 hosted shards,67percent branch floor,1620second inclusive approval and termination only beyond1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
-    "src/warhammer40k_core/geometry/milli_inch.py": {
+    "src/warhammer40k_core/adapters/execution_profile.py": {
       "category": "rule_semantics",
       "operations": [
-        "geometry-search"
+        "selected-linux-session-authority"
+      ],
+      "selected_families": [],
+      "rationale": "Bind explicit legacy numerical-policy configuration to registered Linux profiles, saved and replay envelopes, and checkpoint cache identity. Preserve inner geometry and history bytes. Admit only the exact source/test successor with actual fresh covered observations. Mandatory cache mappings retain visibility and reconstruction comparisons.",
+      "source_obligation": "Implement the next dependency-ready outer policy binding after the inactive 0.001-inch foundation. Reject unknown, missing, mixed or inactive policies before authority use. Preserve retained histories, profiles, source recipes and original evidence without migration, using retained compatible executors.",
+      "unchanged_work": "No milli-inch execution activation, geometry or path algorithm changes, inner GameConfig/lifecycle/replay schema changes, historical witness rewrite, source exception or moved retained selector. Preserve32 local workers,12 hosted shards,67percent branch floor,1620second inclusive approval and termination only beyond1800seconds; mirror120, smoke180 and quality600 remain mandatory."
+    },
+    "src/warhammer40k_core/adapters/linux_authority_transport.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "selected-linux-session-authority"
+      ],
+      "selected_families": [],
+      "rationale": "Bind explicit legacy numerical-policy configuration to registered Linux profiles, saved and replay envelopes, and checkpoint cache identity. Preserve inner geometry and history bytes. Admit only the exact source/test successor with actual fresh covered observations. Mandatory cache mappings retain visibility and reconstruction comparisons.",
+      "source_obligation": "Implement the next dependency-ready outer policy binding after the inactive 0.001-inch foundation. Reject unknown, missing, mixed or inactive policies before authority use. Preserve retained histories, profiles, source recipes and original evidence without migration, using retained compatible executors.",
+      "unchanged_work": "No milli-inch execution activation, geometry or path algorithm changes, inner GameConfig/lifecycle/replay schema changes, historical witness rewrite, source exception or moved retained selector. Preserve32 local workers,12 hosted shards,67percent branch floor,1620second inclusive approval and termination only beyond1800seconds; mirror120, smoke180 and quality600 remain mandatory."
+    },
+    "src/warhammer40k_core/adapters/linux_authority_worker.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "cache-policy",
+        "selected-linux-session-authority"
       ],
       "selected_families": [
-        "movement",
-        "setup",
+        "reconstruction",
         "visibility"
       ],
-      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
-      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
-      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
+      "rationale": "Bind explicit legacy numerical-policy configuration to registered Linux profiles, saved and replay envelopes, and checkpoint cache identity. Preserve inner geometry and history bytes. Admit only the exact source/test successor with actual fresh covered observations. Mandatory cache mappings retain visibility and reconstruction comparisons.",
+      "source_obligation": "Implement the next dependency-ready outer policy binding after the inactive 0.001-inch foundation. Reject unknown, missing, mixed or inactive policies before authority use. Preserve retained histories, profiles, source recipes and original evidence without migration, using retained compatible executors.",
+      "unchanged_work": "No milli-inch execution activation, geometry or path algorithm changes, inner GameConfig/lifecycle/replay schema changes, historical witness rewrite, source exception or moved retained selector. Preserve32 local workers,12 hosted shards,67percent branch floor,1620second inclusive approval and termination only beyond1800seconds; mirror120, smoke180 and quality600 remain mandatory."
+    },
+    "src/warhammer40k_core/adapters/linux_session.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "selected-linux-session-authority"
+      ],
+      "selected_families": [],
+      "rationale": "Bind explicit legacy numerical-policy configuration to registered Linux profiles, saved and replay envelopes, and checkpoint cache identity. Preserve inner geometry and history bytes. Admit only the exact source/test successor with actual fresh covered observations. Mandatory cache mappings retain visibility and reconstruction comparisons.",
+      "source_obligation": "Implement the next dependency-ready outer policy binding after the inactive 0.001-inch foundation. Reject unknown, missing, mixed or inactive policies before authority use. Preserve retained histories, profiles, source recipes and original evidence without migration, using retained compatible executors.",
+      "unchanged_work": "No milli-inch execution activation, geometry or path algorithm changes, inner GameConfig/lifecycle/replay schema changes, historical witness rewrite, source exception or moved retained selector. Preserve32 local workers,12 hosted shards,67percent branch floor,1620second inclusive approval and termination only beyond1800seconds; mirror120, smoke180 and quality600 remain mandatory."
+    },
+    "src/warhammer40k_core/adapters/numerical_policy.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "cache-policy",
+        "selected-linux-session-authority"
+      ],
+      "selected_families": [
+        "reconstruction",
+        "visibility"
+      ],
+      "rationale": "Bind explicit legacy numerical-policy configuration to registered Linux profiles, saved and replay envelopes, and checkpoint cache identity. Preserve inner geometry and history bytes. Admit only the exact source/test successor with actual fresh covered observations. Mandatory cache mappings retain visibility and reconstruction comparisons.",
+      "source_obligation": "Implement the next dependency-ready outer policy binding after the inactive 0.001-inch foundation. Reject unknown, missing, mixed or inactive policies before authority use. Preserve retained histories, profiles, source recipes and original evidence without migration, using retained compatible executors.",
+      "unchanged_work": "No milli-inch execution activation, geometry or path algorithm changes, inner GameConfig/lifecycle/replay schema changes, historical witness rewrite, source exception or moved retained selector. Preserve32 local workers,12 hosted shards,67percent branch floor,1620second inclusive approval and termination only beyond1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
     "tests/code_quality/test_ci_performance_gates.py": {
       "category": "rule_semantics",
@@ -965,19 +951,9 @@
         "milli-inch-test-admission"
       ],
       "selected_families": [],
-      "rationale": "Implement finite admission semantics and preserve existing CLI assertions. The three extracted membership validators have identical original ASTs; forwarding wrappers and exact-source admission add no changed contract source scanner, generator, search, cache or serialization algorithm. Required fixture copies add the two helper dependencies. Existing mandatory mappings remain selected.",
-      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
-      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
-    },
-    "tests/code_quality/test_linux_authority_shard_admission.py": {
-      "category": "measured_workload",
-      "operations": [
-        "scoped-shard-allocation"
-      ],
-      "selected_families": [],
-      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
-      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
-      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
+      "rationale": "Bind explicit legacy numerical-policy configuration to registered Linux profiles, saved and replay envelopes, and checkpoint cache identity. Preserve inner geometry and history bytes. Admit only the exact source/test successor with actual fresh covered observations. Mandatory cache mappings retain visibility and reconstruction comparisons.",
+      "source_obligation": "Implement the next dependency-ready outer policy binding after the inactive 0.001-inch foundation. Reject unknown, missing, mixed or inactive policies before authority use. Preserve retained histories, profiles, source recipes and original evidence without migration, using retained compatible executors.",
+      "unchanged_work": "No milli-inch execution activation, geometry or path algorithm changes, inner GameConfig/lifecycle/replay schema changes, historical witness rewrite, source exception or moved retained selector. Preserve32 local workers,12 hosted shards,67percent branch floor,1620second inclusive approval and termination only beyond1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
     "tests/code_quality/test_milli_inch_shard_admission.py": {
       "category": "measured_workload",
@@ -985,34 +961,45 @@
         "scoped-shard-allocation"
       ],
       "selected_families": [],
-      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
-      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
-      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
+      "rationale": "Bind explicit legacy numerical-policy configuration to registered Linux profiles, saved and replay envelopes, and checkpoint cache identity. Preserve inner geometry and history bytes. Admit only the exact source/test successor with actual fresh covered observations. Mandatory cache mappings retain visibility and reconstruction comparisons.",
+      "source_obligation": "Implement the next dependency-ready outer policy binding after the inactive 0.001-inch foundation. Reject unknown, missing, mixed or inactive policies before authority use. Preserve retained histories, profiles, source recipes and original evidence without migration, using retained compatible executors.",
+      "unchanged_work": "No milli-inch execution activation, geometry or path algorithm changes, inner GameConfig/lifecycle/replay schema changes, historical witness rewrite, source exception or moved retained selector. Preserve32 local workers,12 hosted shards,67percent branch floor,1620second inclusive approval and termination only beyond1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
-    "tests/code_quality/test_performance_policy.py": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
-      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
-      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
-    },
-    "tests/rules/section01/test_milli_inch.py": {
+    "tests/code_quality/test_precision_profile_shard_admission.py": {
       "category": "measured_workload",
       "operations": [
-        "milli-inch-arithmetic-regressions"
+        "scoped-shard-allocation"
       ],
       "selected_families": [],
-      "rationale": "Add exact inactive distance arithmetic and its finite source-bound test/scheduling admission. No existing gameplay consumer imports the helper. Preserve existing sensitive geometry mappings and supply actual matched visibility, movement and setup measurements rather than a policy exception.",
-      "source_obligation": "Implement the owner-directed 0.001-inch arithmetic foundation with exact ties away from zero, explicit dimensional semantics, no segment-wise path drift and typed unsupported irrational sums. Preserve every prior runtime resource except the add-only manifest, all prior behavioral test sources, historical measurements and runtime profiles.",
-      "unchanged_work": "No gameplay activation, rounding of angles or areas, old-history migration, geometry algorithm change, source exception, allocation search or moved retained selector. Add exactly25 arithmetic cases, preserve32 local profile workers plus one ordered mirror/native worker,12 hosted shards,67% full-package branch coverage,1620-second inclusive approval and termination strictly beyond1800seconds; smoke180 and quality600 remain mandatory."
+      "rationale": "Bind explicit legacy numerical-policy configuration to registered Linux profiles, saved and replay envelopes, and checkpoint cache identity. Preserve inner geometry and history bytes. Admit only the exact source/test successor with actual fresh covered observations. Mandatory cache mappings retain visibility and reconstruction comparisons.",
+      "source_obligation": "Implement the next dependency-ready outer policy binding after the inactive 0.001-inch foundation. Reject unknown, missing, mixed or inactive policies before authority use. Preserve retained histories, profiles, source recipes and original evidence without migration, using retained compatible executors.",
+      "unchanged_work": "No milli-inch execution activation, geometry or path algorithm changes, inner GameConfig/lifecycle/replay schema changes, historical witness rewrite, source exception or moved retained selector. Preserve32 local workers,12 hosted shards,67percent branch floor,1620second inclusive approval and termination only beyond1800seconds; mirror120, smoke180 and quality600 remain mandatory."
+    },
+    "tests/infrastructure/adapters/unit/test_linux_authority.py": {
+      "category": "measured_workload",
+      "operations": [
+        "selected-linux-session-authority"
+      ],
+      "selected_families": [],
+      "rationale": "Bind explicit legacy numerical-policy configuration to registered Linux profiles, saved and replay envelopes, and checkpoint cache identity. Preserve inner geometry and history bytes. Admit only the exact source/test successor with actual fresh covered observations. Mandatory cache mappings retain visibility and reconstruction comparisons.",
+      "source_obligation": "Implement the next dependency-ready outer policy binding after the inactive 0.001-inch foundation. Reject unknown, missing, mixed or inactive policies before authority use. Preserve retained histories, profiles, source recipes and original evidence without migration, using retained compatible executors.",
+      "unchanged_work": "No milli-inch execution activation, geometry or path algorithm changes, inner GameConfig/lifecycle/replay schema changes, historical witness rewrite, source exception or moved retained selector. Preserve32 local workers,12 hosted shards,67percent branch floor,1620second inclusive approval and termination only beyond1800seconds; mirror120, smoke180 and quality600 remain mandatory."
+    },
+    "tests/infrastructure/adapters/unit/test_numerical_policy.py": {
+      "category": "measured_workload",
+      "operations": [
+        "precision-profile-regressions"
+      ],
+      "selected_families": [],
+      "rationale": "Bind explicit legacy numerical-policy configuration to registered Linux profiles, saved and replay envelopes, and checkpoint cache identity. Preserve inner geometry and history bytes. Admit only the exact source/test successor with actual fresh covered observations. Mandatory cache mappings retain visibility and reconstruction comparisons.",
+      "source_obligation": "Implement the next dependency-ready outer policy binding after the inactive 0.001-inch foundation. Reject unknown, missing, mixed or inactive policies before authority use. Preserve retained histories, profiles, source recipes and original evidence without migration, using retained compatible executors.",
+      "unchanged_work": "No milli-inch execution activation, geometry or path algorithm changes, inner GameConfig/lifecycle/replay schema changes, historical witness rewrite, source exception or moved retained selector. Preserve32 local workers,12 hosted shards,67percent branch floor,1620second inclusive approval and termination only beyond1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     }
   },
   "milestone": "ordinary",
   "comparisons": {
-    "visibility": "docs/performance/current/precision-foundation-visibility.json",
-    "movement": "docs/performance/current/precision-foundation-movement.json",
-    "setup": "docs/performance/current/precision-foundation-setup.json"
+    "visibility": "docs/performance/current/precision-profile-visibility.json",
+    "reconstruction": "docs/performance/current/precision-profile-reconstruction.json"
   },
   "full_game": null
 }
