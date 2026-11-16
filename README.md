@@ -446,11 +446,11 @@ preflight retains its twelve-case partition. Two finite step5g modules add sourc
 partitions of 32 and 30 exact cases. The bounded mirror setup case is a separate
 selector; its file selector denotes the remaining cases. CI always deselects that
 node from parallel work and runs it once on its owning shard. All other files remain
-intact. The resulting 508 selectors select exactly 6,331 cases, including eighteen
+intact. The resulting 509 selectors select exactly 6,341 cases, including eighteen
 terrain-preparation/cache regressions, nineteen connected-endpoint/ordered-history
 controls, six Desperate Escape survivor persistence controls in the natural
 Section 09 owner `test_escape_survivor_persistence.py`, and six native equipment,
-battle-prefix and named-weapon choice controls. The required guards verify the exact
+battle-prefix and named-weapon choice controls, plus ten Linux-authority session/profile controls. The required guards verify the exact
 selected inventory and partition.
 Verify that every selected file or declared case appears exactly once:
 
@@ -460,7 +460,10 @@ uv run --no-sync python scripts/build_test_shards.py --check --shard-count 12
 
 The compatibility descriptor pins the original scheduling snapshot at
 `008be8a8cb0b50b232fe022452762b3906489b49`, a complete current covered local baseline,
-and `current-derived-assignment.json`. Current validators authenticate every
+and `linux-authority-derived-assignment.json`. The separate
+`linux-authority-covered-baseline.json` and `linux-authority-covered-evidence.json`
+retain the complete source-bound current run. Prior e209-stage metadata is retained
+under `ci/test_shards/linux-authority-e2094d9c/`. Current validators authenticate every
 dispatch-contributing producer and tested checkout against Git, then validate the
 original data, runtime, test bytes, cohorts and reserve in a temporary historical
 snapshot. Historical Python is never executed and historical receipts are unchanged.
@@ -468,7 +471,7 @@ snapshot. Historical Python is never executed and historical receipts are unchan
 missing objects remain errors, including after squash merges and branch deletion.
 
 The current baseline must bind unchanged historical gameplay test sources, exactly
-the forty-nine reviewed additions, current runtime and profile/file/case costs,
+the fifty-nine reviewed additions, current runtime and profile/file/case costs,
 32 parallel workers plus the isolated one-worker mirror, 67% full-package branch
 coverage and an approved 1,620/1,800-second supervisor receipt. It is local evidence,
 not a hosted observation. Dispatch takes each retained case's maximum of its fresh

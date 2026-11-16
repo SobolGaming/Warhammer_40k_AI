@@ -23,6 +23,9 @@ from pathlib import Path
 from warhammer40k_core.build_identity import verified_engine_build_identity
 from warhammer40k_core.engine.event_log import JsonValue, canonical_json, validate_json_value
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.geometry.base import CircularBase, OvalBase
+from warhammer40k_core.geometry.pose import Pose
+from warhammer40k_core.geometry.shapely_backend import footprint_for_base
 
 PROFILE_SCHEMA = "linux-execution-profile-v1"
 CHECKPOINT_SCHEMA = "profiled-session-checkpoint-v1"
@@ -120,21 +123,22 @@ def linux_execution_profile() -> dict[str, JsonValue]:
     # already be mapped before this inventory is captured.
     numpy = importlib.import_module("numpy")
     z3 = importlib.import_module("z3")
-    shapely = importlib.import_module("shapely")
-    affinity = importlib.import_module("shapely.affinity")
     numpy.sqrt(2.0)
     z3.get_version_string()
+    circle = footprint_for_base(CircularBase(100.0 / 25.4 / 2.0), Pose.at(18.0, 40.0))
+    oval = footprint_for_base(OvalBase(90.0, 52.5), Pose.at(-100.0, -200.0, facing_degrees=137.0))
     for line in Path("/proc/self/maps").read_text(encoding="utf-8").splitlines():
         columns = line.split(maxsplit=5)
         if len(columns) == 6 and columns[5].startswith("/"):
             path = Path(columns[5])
             if ".so" in path.name:
                 resources[f"loaded-library/{path.name}"] = _file_hash(path)
-    circle = shapely.Point(18.0, 40.0).buffer(100.0 / 25.4 / 2.0, quad_segs=64)
-    oval = affinity.scale(shapely.Point(0.0, 0.0).buffer(1.0, quad_segs=64), 45.0, 26.25)
     canaries: dict[str, JsonValue] = {
-        "circle_wkb": hashlib.sha256(circle.wkb).hexdigest(),
-        "rotated_oval_wkb": hashlib.sha256(affinity.rotate(oval, 137.0).wkb).hexdigest(),
+        "circle_area": circle.area.hex(),
+        "circle_bounds": [value.hex() for value in circle.bounds],
+        "rotated_oval_area": oval.area.hex(),
+        "rotated_oval_bounds": [value.hex() for value in oval.bounds],
+        "circle_to_rotated_oval_distance": circle.distance(oval).hex(),
         "sin_137": math.sin(math.radians(137.0)).hex(),
         "cos_37_96875": math.cos(math.radians(37.96875)).hex(),
     }
@@ -158,7 +162,6 @@ def linux_execution_profile() -> dict[str, JsonValue]:
             )
         },
         "python": sys.version,
-        "geos": shapely.geos_version_string,
         "distributions": versions,
         "resources": dict(sorted(resources.items())),
         "numerical_canaries": canaries,

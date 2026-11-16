@@ -13,6 +13,7 @@ import tarfile
 from pathlib import Path
 
 from scripts.linux_authority_shard_admission import PREDECESSOR
+from tools.generate_ability_support_matrix import DEFAULT_SOURCE_JSON_DIR
 
 
 def materialize_retained_sources(
@@ -57,7 +58,7 @@ def materialize_retained_sources(
             ".gitignore",
             ".gitattributes",
             ".github/workflows/ci.yml",
-            "data/source_snapshots/wahapedia/10th-edition/2026-06-14/json",
+            DEFAULT_SOURCE_JSON_DIR.as_posix(),
             "data/source_overlays",
             "data/source_audits/ci64_provenance_v1",
             "docs/performance/policy-v3/acts-provenance-20261031",

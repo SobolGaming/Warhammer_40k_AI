@@ -19,7 +19,7 @@ from scripts.historical_shard_snapshot import MANIFEST, fingerprint, git_bytes
 from scripts.hosted_timing_calibration import _object, read_json
 
 SCHEMA = "historical-snapshot-linux-authority-profile-v1"
-RUNTIME = "e2094d9cc44578f56a4998fe6b4a8d1ff248a30a31127bbd4c15f629a7ae11b7"
+RUNTIME = "c8f161f64399546ba96a19a8ec9cdb8a29fd424d128f6b542d8011ba0ade1017"
 PREDECESSOR = "e2d7a899d162cc1972d8a158fc02978e54301cc2"
 BASELINE_FILE = "linux-authority-covered-baseline.json"
 EVIDENCE_FILE = "linux-authority-covered-evidence.json"

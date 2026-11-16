@@ -35883,7 +35883,8 @@
         "tests/code_quality/test_linux_authority_shard_admission.py",
         "ci/test_shards/linux-authority-covered-baseline.json",
         "ci/test_shards/linux-authority-covered-evidence.json",
-        "ci/test_shards/linux-authority-derived-assignment.json"
+        "ci/test_shards/linux-authority-derived-assignment.json",
+        "ci/test_shards/linux-authority-e2094d9c/*"
       ],
       "owners": [
         "*"
