@@ -2,18 +2,18 @@
   "added_cases": 7,
   "added_files": {
     "tests/rules/section01/test_milli_inch_symbolic.py": {
-      "blob_sha1": "0a2d81244609b122826b739e9f53566725f55f4c",
-      "bytes": 7582,
+      "blob_sha1": "5b6e81170480bc6260701ebf3b67bc14bb75d334",
+      "bytes": 7876,
       "mode": "100644",
-      "sha256": "7631405d44df220439cf328c8a17ccc6ba27528b3b8e630e117d7125dfadfe95"
+      "sha256": "94813e259b6316d4cd87ec10ba976d419a44a3b357f0d8316df1eeade7f2ade4"
     }
   },
   "retained_cutover_sha256": "4cd1f0b062fad661e1c71fe27d2e9f8279c3c21d2a9f7bea9e3b053db79afce3",
   "retained_foundation_sha256": "9ebbf6d4cf39d25a60c78a4312e0a128c5b43b6c79c64ed91fa41e4387366e07",
   "retained_profile_sha256": "020dcec99278aa79f2215762a525c0c029231cdb9c64f1e988d4a1719e0fbb74",
-  "runtime_fingerprint": "c18e59cd11ababb179bb3ebf55a74b00fa1416e1d94194de6758505b0268297e",
+  "runtime_fingerprint": "c241ac72aad5f0fd846d950f733dbaee36795d3e8990f252f7f064df86af6efc",
   "schema": "finite-symbolic-milli-inch-test-transition-v1",
   "sources": {
-    "src/warhammer40k_core/geometry/milli_inch_symbolic.py": "f83a3da2f564cf3216c71e4a2992cf7dbd4f004287e8a48ca95b1cb796feeed8"
+    "src/warhammer40k_core/geometry/milli_inch_symbolic.py": "52b91e3e84a68737562a874410510c69ccad13065535b0475d4e9d716015a7a4"
   }
 }

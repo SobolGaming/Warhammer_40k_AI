@@ -10,6 +10,7 @@ import importlib
 import math
 import time
 from collections.abc import Iterable
+from decimal import Decimal
 from fractions import Fraction
 from typing import Literal, Protocol, cast
 
@@ -80,7 +81,7 @@ def symbolic_squared_path_inches_to_ticks(
         _remaining_ms(deadline)
         # The public measurement decoder validates exact source semantics first.
         squared_inches_to_ticks(source)
-        squared = Fraction(source)
+        squared = Fraction(Decimal(source) if isinstance(source, str) else source)
         numerator = math.isqrt(squared.numerator)
         denominator = math.isqrt(squared.denominator)
         if numerator**2 == squared.numerator and denominator**2 == squared.denominator:

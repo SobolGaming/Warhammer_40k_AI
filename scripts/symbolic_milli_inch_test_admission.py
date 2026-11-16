@@ -31,8 +31,8 @@ from scripts.precision_profile_test_admission import ADDITION as PROFILE_ADDITIO
 from scripts.precision_profile_test_admission import ADDITION_SHA256 as PROFILE_SHA256
 
 ADDITION = "data/source_audits/ci64_provenance_v1/symbolic-milli-inch-test-transition-v1.json"
-ADDITION_SHA256 = "4a7cc5fe41885ca02ee386eb0e1d441b17440bad6b53bcdc1608821318dc0fc0"
-RUNTIME = "c18e59cd11ababb179bb3ebf55a74b00fa1416e1d94194de6758505b0268297e"
+ADDITION_SHA256 = "23943a7fb56ba7b6e3da0888667d15959b4b1ae4e2148be0b6e6ab3d1aeeb9cb"
+RUNTIME = "c241ac72aad5f0fd846d950f733dbaee36795d3e8990f252f7f064df86af6efc"
 SOURCE = "src/warhammer40k_core/geometry/milli_inch_symbolic.py"
 OWNER = "tests/rules/section01/test_milli_inch_symbolic.py"
 

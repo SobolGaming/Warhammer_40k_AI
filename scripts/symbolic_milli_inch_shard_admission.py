@@ -13,14 +13,14 @@ from scripts.linux_authority_shard_admission import (
 
 SCHEMA = "historical-snapshot-milli-inch-symbolic-v1"
 BASE = "fc52e9166ff6380b606269ce362f4f1cbc6a2835"
-RUNTIME = "c18e59cd11ababb179bb3ebf55a74b00fa1416e1d94194de6758505b0268297e"
+RUNTIME = "c241ac72aad5f0fd846d950f733dbaee36795d3e8990f252f7f064df86af6efc"
 BASELINE_FILE = "symbolic-milli-inch-covered-baseline.json"
 EVIDENCE_FILE = "symbolic-milli-inch-covered-evidence.json"
 ASSIGNMENT_FILE = "symbolic-milli-inch-derived-assignment.json"
 MODULE = "src/warhammer40k_core/geometry/milli_inch_symbolic.py"
-MODULE_SHA256 = "f83a3da2f564cf3216c71e4a2992cf7dbd4f004287e8a48ca95b1cb796feeed8"
+MODULE_SHA256 = "52b91e3e84a68737562a874410510c69ccad13065535b0475d4e9d716015a7a4"
 OWNER = "tests/rules/section01/test_milli_inch_symbolic.py"
-TEST_SHA256 = "7631405d44df220439cf328c8a17ccc6ba27528b3b8e630e117d7125dfadfe95"
+TEST_SHA256 = "94813e259b6316d4cd87ec10ba976d419a44a3b357f0d8316df1eeade7f2ade4"
 NODES: frozenset[str] = frozenset(
     [
         "tests/rules/section01/test_milli_inch_symbolic.py::test_symbolic_length_bins_match_all_four_integer_relations",

@@ -774,11 +774,11 @@ def test_cached_function_spans_match_python_ast_with_unicode(newline: str, tmp_p
     source = newline.join(
         (
             "@decorator",
-            'def first(): return "Ã©" # trailing comment',
+            'def first(): return "é" # trailing comment',
             "",
             "def second():",
-            '    """Î»\fretained"""',
-            '    return "å¥½"',
+            '    """λ\fretained"""',
+            '    return "好"',
             "",
         )
     )

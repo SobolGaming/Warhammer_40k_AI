@@ -34,6 +34,10 @@ def test_symbolic_path_measures_complete_mixed_sum_once() -> None:
     assert symbolic_squared_path_inches_to_ticks(["1.00100025"]) == 1001
     assert Fraction.from_float(1.00100025) < Fraction("1.00100025")
     assert symbolic_squared_path_inches_to_ticks([1.00100025]) == 1000
+    # Preserve the retained Decimal source grammar, including accepted underscores.
+    for source, expected in (("1__0", 3162), ("_1", 1000), ("1_.0", 1000)):
+        assert squared_inches_to_ticks(source) == expected
+        assert symbolic_squared_path_inches_to_ticks([source]) == expected
     # A short ordinary path formerly exhausted blind root-sum search. Independent
     # integer-root enclosures place its complete length strictly in the 6714 bin.
     assert (
