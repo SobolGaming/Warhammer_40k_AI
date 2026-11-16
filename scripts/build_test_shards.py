@@ -427,15 +427,6 @@ def behavioral_selection(root: Path) -> BehavioralSelection:
     if not isinstance(value["native_active_files"], dict):
         raise SystemExit("Native active file ledger must be an object.")
     active = _selection_members(value["active_files"], root)
-    from scripts.milli_inch_test_admission import precision_test_addition
-
-    addition = precision_test_addition(root, hashlib.sha256(raw).hexdigest())
-    if addition is not None:
-        members, addition_raw = addition
-        if active.keys() & members.keys():
-            raise SystemExit("Precision test addition overlaps the retained selection.")
-        active.update(_selection_members(members, root))
-        raw += b"\0" + addition_raw
     if not value["native_active_files"].keys() <= active.keys():
         raise SystemExit("A native active Core/regression file was omitted.")
     retained = _selection_members(value["retained_active_files"], root)
@@ -476,6 +467,15 @@ def behavioral_selection(root: Path) -> BehavioralSelection:
     inactive = _selection_members(present_inactive, root, current=current)
     inactive.update({name: value["inactive_legacy_files"][name] for name in retired})
     benchmarks = _selection_members(value["benchmark_files"], root)
+    from scripts.milli_inch_test_admission import precision_test_addition
+
+    addition = precision_test_addition(root, hashlib.sha256(raw).hexdigest())
+    if addition is not None:
+        members, addition_raw = addition
+        if active.keys() & members.keys():
+            raise SystemExit("Precision test addition overlaps the retained selection.")
+        active.update(_selection_members(members, root))
+        raw += b"\0" + addition_raw
     if tuple(sorted(retained)) != RETAINED_ACTIVE_FILES or any(
         active.get(n) != row for n, row in retained.items()
     ):

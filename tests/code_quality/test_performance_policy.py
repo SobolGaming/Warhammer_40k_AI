@@ -1439,6 +1439,7 @@ def test_milli_inch_map_retains_every_existing_sensitive_operation() -> None:
             "scripts/behavioral_selection_members.py",
             "scripts/milli_inch_test_admission.py",
             "data/source_audits/ci64_provenance_v1/milli-inch-test-addition-v1.json",
+            "tests/code_quality/test_ci_performance_gates.py",
         ],
         "milli-inch-arithmetic-regressions": ["tests/rules/section01/test_milli_inch.py"],
     }.items():

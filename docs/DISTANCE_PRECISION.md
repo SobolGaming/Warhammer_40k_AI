@@ -63,6 +63,17 @@ Dimensional rules for activation:
   path segments. Rotated shapes require agreement between analytic predicates,
   the geometry backend and solver certificates.
 
+Activation must first resolve contact representability on the coordinate grid.
+For example, circular diameters of 1.000 and 1.001 inches require a centre
+separation of 1.0005 inches for true tangency, which no pair of integer-tick
+coplanar centres can represent. The activation design must explicitly reconcile
+coordinate quantization with legal contact placements and prove ordinary
+contact-required moves remain attainable, without inventing a contact tolerance,
+treating rounded zero as touching, or permitting overlap. Source-defined proximity
+and deemed-contact rules remain separate predicates with their own thresholds and
+evidence; they are not a general substitute for true contact. This foundation does
+not choose or activate that representation.
+
 Activation is dependency ordered: first this tested arithmetic foundation; then
 an explicit session numerical-policy identifier bound into execution profiles,
 configuration, persistence and replay; then coordinated geometry input,
