@@ -1,8 +1,8 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:ff4277b5e1024958cc9f3e5464b5e26fc578c84b7a39130bece55d3ad0cf0add",
-  "fingerprint": "ff4277b5e1024958cc9f3e5464b5e26fc578c84b7a39130bece55d3ad0cf0add",
-  "resource_count": 3255,
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:ae914a56833e43a3bbf086730b354c7a18673ccc15ca93e4b474347b95380f19",
+  "fingerprint": "ae914a56833e43a3bbf086730b354c7a18673ccc15ca93e4b474347b95380f19",
+  "resource_count": 3256,
   "resources": [
     {
       "byte_length": 113,
@@ -65,9 +65,9 @@
       "sha256": "7d6bd9e61d4c1711ad0047c08db30ee0d1236195538ed506e7a7e4f5285b1da4"
     },
     {
-      "byte_length": 10057,
+      "byte_length": 11041,
       "path": "warhammer40k_core/adapters/execution_profile.py",
-      "sha256": "48886d5020e075e2a26b166ff99520911cd7b158c217a9a3724f6459daaa1cf8"
+      "sha256": "4effd97d70a8d71719380cbd6c47f59c3ed0ffb1e1d755875f760ecb9b33f00a"
     },
     {
       "byte_length": 6317,
@@ -85,19 +85,19 @@
       "sha256": "c55acedc575241e590baa70ec6e1a6b3d64559bc460e03d37e49319e2d141f80"
     },
     {
-      "byte_length": 9673,
+      "byte_length": 10490,
       "path": "warhammer40k_core/adapters/linux_authority_transport.py",
-      "sha256": "ce793080440d1fa623565f46b2749da7c897997ced79afead317b1e02a6f4731"
+      "sha256": "ba509b5a63c48cc31af44e70a2bd9e8e86567b5e367e2734fa3ddadb224e71dc"
     },
     {
-      "byte_length": 16409,
+      "byte_length": 17077,
       "path": "warhammer40k_core/adapters/linux_authority_worker.py",
-      "sha256": "edba30cba8bea10016a211f8d1654c364b275335c0814a2e84643db06e0a1f2e"
+      "sha256": "a999288f018d96a772917d2653cc6ae82bd3180ec32a4e82ab2f837005c432d7"
     },
     {
-      "byte_length": 8703,
+      "byte_length": 8915,
       "path": "warhammer40k_core/adapters/linux_session.py",
-      "sha256": "df4795fad8fdc178d979ac27e802226d5799ceef430d343c7f9375f4a1826320"
+      "sha256": "78ac218396507ef11f95a9b423739ac76c92e2f7801c0401ebd319e9323af212"
     },
     {
       "byte_length": 35925,
@@ -108,6 +108,11 @@
       "byte_length": 2438,
       "path": "warhammer40k_core/adapters/network.py",
       "sha256": "b663d7e3896f77f43fa3d13f1e8051a8cca18919ef3cb7304f08125ef9915aa1"
+    },
+    {
+      "byte_length": 1407,
+      "path": "warhammer40k_core/adapters/numerical_policy.py",
+      "sha256": "80bac8cc2264149cc8aba613df2c3db785810173e37435c09c369df118d86c5f"
     },
     {
       "byte_length": 48822,

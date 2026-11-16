@@ -20,6 +20,10 @@ import sys
 import sysconfig
 from pathlib import Path
 
+from warhammer40k_core.adapters.numerical_policy import (
+    NumericalPolicyConfiguration,
+    NumericalPolicyError,
+)
 from warhammer40k_core.build_identity import verified_engine_build_identity
 from warhammer40k_core.engine.event_log import JsonValue, canonical_json, validate_json_value
 from warhammer40k_core.engine.phase import GameLifecycleError
@@ -27,7 +31,7 @@ from warhammer40k_core.geometry.base import CircularBase, OvalBase
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.geometry.shapely_backend import footprint_for_base
 
-PROFILE_SCHEMA = "linux-execution-profile-v1"
+PROFILE_SCHEMA = "linux-execution-profile-v2-numerical-policy"
 CHECKPOINT_SCHEMA = "profiled-session-checkpoint-v1"
 _RUNTIME_DISTRIBUTIONS = (
     "orjson",
@@ -79,6 +83,21 @@ def validate_executor_profile(
         raise ExecutionProfileError("Unsupported Linux execution profile schema.")
     if value.get("engine_build_id") != engine_build_id:
         raise ExecutionProfileError("Client and Linux authority require the same engine build.")
+    numerical_policy_for_profile(profile)
+
+
+def numerical_policy_for_profile(profile: JsonValue) -> NumericalPolicyConfiguration:
+    """Require an explicit supported policy; old profiles require their old executor."""
+    value = object_payload(profile, label="Linux execution profile")
+    if value.get("schema_version") != PROFILE_SCHEMA:
+        raise ExecutionProfileError("Unsupported Linux execution profile schema.")
+    policy_id = value.get("numerical_policy_id")
+    if not isinstance(policy_id, str):
+        raise ExecutionProfileError("Linux execution profile requires a numerical policy.")
+    try:
+        return NumericalPolicyConfiguration(policy_id)
+    except NumericalPolicyError as exc:
+        raise ExecutionProfileError(str(exc)) from exc
 
 
 def linux_execution_profile() -> dict[str, JsonValue]:
@@ -144,6 +163,7 @@ def linux_execution_profile() -> dict[str, JsonValue]:
     }
     return {
         "schema_version": PROFILE_SCHEMA,
+        "numerical_policy_id": NumericalPolicyConfiguration().numerical_policy_id,
         "engine_build_id": verified_engine_build_identity().build_id,
         "platform": platform.system(),
         "machine": platform.machine(),

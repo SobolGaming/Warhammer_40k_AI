@@ -17,6 +17,7 @@ from warhammer40k_core.adapters.event_stream import (
 )
 from warhammer40k_core.adapters.execution_profile import ExecutionProfileError
 from warhammer40k_core.adapters.linux_authority_transport import LinuxAuthority
+from warhammer40k_core.adapters.numerical_policy import NumericalPolicyConfiguration
 from warhammer40k_core.adapters.projection import GameViewPayload, RulesCatalogViewPayload
 from warhammer40k_core.adapters.support_profile import SupportProfilePayload
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
@@ -47,6 +48,10 @@ class LinuxGameSession(AdapterGameSession):
 
     def _call(self, operation: str, **arguments: JsonValue) -> JsonValue:
         return self._authority.call(self._session_id, operation, arguments)
+
+    @property
+    def numerical_policy(self) -> NumericalPolicyConfiguration:
+        return self._authority.numerical_policy
 
     def _status(self, operation: str, **arguments: JsonValue) -> LifecycleStatus:
         return LifecycleStatus.from_payload(

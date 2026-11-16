@@ -34,6 +34,7 @@ from warhammer40k_core.adapters.linux_authority_transport import (
 )
 from warhammer40k_core.adapters.linux_authority_worker import LinuxAuthorityDispatcher
 from warhammer40k_core.adapters.linux_session import viewer_payload
+from warhammer40k_core.adapters.numerical_policy import LEGACY_NUMERICAL_POLICY_ID
 from warhammer40k_core.adapters.server import AdapterGameServer
 from warhammer40k_core.adapters.session_persistence import SQLiteSessionPersistenceStore
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
@@ -76,7 +77,11 @@ def test_profile_enrollment_requires_a_receipt_and_checks_inner_bytes() -> None:
 
 
 def test_executor_registration_requires_the_registered_profile_and_same_engine() -> None:
-    selected: JsonValue = {"schema_version": PROFILE_SCHEMA, "engine_build_id": "selected-build"}
+    selected: JsonValue = {
+        "schema_version": PROFILE_SCHEMA,
+        "engine_build_id": "selected-build",
+        "numerical_policy_id": LEGACY_NUMERICAL_POLICY_ID,
+    }
     validate_executor_profile(selected, expected=selected, engine_build_id="selected-build")
     with pytest.raises(ExecutionProfileError, match="same engine build"):
         validate_executor_profile(selected, expected=selected, engine_build_id="other-build")
@@ -103,7 +108,11 @@ def test_dispatcher_real_native_roster_restore_fork_viewers_and_exact_replay() -
     original = strict_mirror_session()
     # This is a dispatcher contract test on the host, not a claim that this
     # host's numerical behavior is a registered Linux execution profile.
-    profile: JsonValue = {"dispatcher-contract-fixture": "host-native"}
+    profile: dict[str, JsonValue] = {
+        "schema_version": PROFILE_SCHEMA,
+        "numerical_policy_id": LEGACY_NUMERICAL_POLICY_ID,
+        "dispatcher-contract-fixture": "host-native",
+    }
     dispatcher = LinuxAuthorityDispatcher(profile)
     sequence = 0
     retained: list[str] = []
@@ -135,6 +144,21 @@ def test_dispatcher_real_native_roster_restore_fork_viewers_and_exact_replay() -
     )
     identity = cast(str, call(None, "restore", validate_json_value(envelope)))
     retained.append(identity)
+    assert call(identity, "to_persistence_payload", {}) == envelope
+    assert checkpoint_bytes(call(identity, "to_persistence_payload", {}), profile=profile) == raw
+    # Mutating caller-owned configuration or a returned profile cannot relabel
+    # an existing session or its cached checkpoint.
+    exported_profile = cast(dict[str, JsonValue], dispatcher.profile)
+    exported_profile["numerical_policy_id"] = "milli-inch-half-away-v1"
+    assert dispatcher.profile == profile
+    incompatible = checkpoint_envelope(
+        payload_bytes=raw,
+        profile=exported_profile,
+        provenance={"kind": "incompatible-policy-control"},
+    )
+    rejected = call(None, "restore", validate_json_value(incompatible), expected_error=True)
+    assert isinstance(rejected, dict)
+    assert "different execution profile" in str(rejected["message"])
     assert call(identity, "to_persistence_payload", {}) == envelope
     assert (
         call(identity, "authoritative_history_payload", {})
@@ -180,6 +204,18 @@ def test_dispatcher_real_native_roster_restore_fork_viewers_and_exact_replay() -
     )
     assert replay["status"] == "reproduced"
     assert replay["diagnostics"] == []
+    profiled_replay = call(restored, "profiled_replay_artifact", {"artifact_id": "linux-contract"})
+    assert call(None, "replay", profiled_replay) == replay
+    replay_envelope = cast(dict[str, JsonValue], profiled_replay)
+    incompatible_replay = checkpoint_envelope(
+        payload_bytes=checkpoint_bytes(profiled_replay, profile=profile),
+        profile=exported_profile,
+        provenance={"kind": "incompatible-policy-control"},
+        payload_schema=cast(str, replay_envelope["payload_schema"]),
+    )
+    rejected = call(None, "replay", validate_json_value(incompatible_replay), expected_error=True)
+    assert isinstance(rejected, dict)
+    assert "different execution profile" in str(rejected["message"])
     # Releasing one atomic fork cannot release another live proxy's state.
     retained.remove(fork)
     call(identity, "event_record_count", {})
@@ -203,14 +239,16 @@ def test_selected_linux_process_implements_adapter_session_and_roundtrips(tmp_pa
         "warhammer40k_core.adapters.linux_authority_worker",
     ]
     profile = LinuxAuthority.inspect(command)
-    with pytest.raises(ExecutionProfileError, match="registration failed"):
+    with pytest.raises(ExecutionProfileError, match=r"Unsupported.*schema"):
         LinuxAuthority(command, expected_profile={"wrong-registered-executor": True})
     original = strict_mirror_session()
     config = GameConfig.from_payload(
         cast(GameConfigPayload, original.lifecycle.to_payload()["config"])
     )
     with LinuxAuthority(command, expected_profile=profile) as authority:
+        assert authority.numerical_policy.numerical_policy_id == LEGACY_NUMERICAL_POLICY_ID
         session = authority.session()
+        assert session.numerical_policy == authority.numerical_policy
         assert isinstance(session, AdapterGameSession)
         session.start(config)
         session.advance_until_decision_or_terminal()

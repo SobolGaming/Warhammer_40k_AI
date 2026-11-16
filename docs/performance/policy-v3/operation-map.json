@@ -35889,7 +35889,12 @@
         "tests/code_quality/test_milli_inch_shard_admission.py",
         "ci/test_shards/milli-inch-covered-baseline.json",
         "ci/test_shards/milli-inch-covered-evidence.json",
-        "ci/test_shards/milli-inch-derived-assignment.json"
+        "ci/test_shards/milli-inch-derived-assignment.json",
+        "scripts/precision_profile_shard_admission.py",
+        "tests/code_quality/test_precision_profile_shard_admission.py",
+        "ci/test_shards/precision-profile-covered-baseline.json",
+        "ci/test_shards/precision-profile-covered-evidence.json",
+        "ci/test_shards/precision-profile-derived-assignment.json"
       ],
       "owners": [
         "*"
@@ -36050,7 +36055,8 @@
         "src/warhammer40k_core/adapters/linux_authority_transport.py",
         "src/warhammer40k_core/adapters/linux_authority_worker.py",
         "src/warhammer40k_core/adapters/linux_session.py",
-        "tests/infrastructure/adapters/unit/test_linux_authority.py"
+        "tests/infrastructure/adapters/unit/test_linux_authority.py",
+        "src/warhammer40k_core/adapters/numerical_policy.py"
       ],
       "owners": [
         "*"
@@ -36076,6 +36082,29 @@
     "milli-inch-arithmetic-regressions": {
       "paths": [
         "tests/rules/section01/test_milli_inch.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "precision-profile-test-admission": {
+      "paths": [
+        "scripts/precision_profile_test_admission.py",
+        "data/source_audits/ci64_provenance_v1/precision-profile-test-transition-v1.json"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "precision-profile-regressions": {
+      "paths": [
+        "tests/infrastructure/adapters/unit/test_numerical_policy.py"
       ],
       "owners": [
         "*"

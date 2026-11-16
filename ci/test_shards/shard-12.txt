@@ -11,6 +11,7 @@ tests/infrastructure/adapters/test_canonical_coverage_preflight.py::test_coverag
 tests/infrastructure/adapters/test_canonical_deployment.py
 tests/infrastructure/adapters/test_deployment_candidates.py
 tests/infrastructure/adapters/unit/test_linux_authority.py
+tests/infrastructure/adapters/unit/test_numerical_policy.py
 tests/infrastructure/lifecycle/unit/test_battlefield_transitions.py
 tests/infrastructure/lifecycle/unit/test_lifecycle.py
 tests/infrastructure/missions/unit/test_boundary_checkpoint_physical_authority.py
