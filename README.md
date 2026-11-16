@@ -71,12 +71,6 @@ visibility. Common and both endpoints pass exact persistence/replay; independent
 E Boolean visibility is resolved by the separate [exact any-part path](docs/AI_POLICY_INTERFACE.md#exact-boolean-only-native-los); full classification and shooting remain unqualified. No native combat, useful screen,
 E attack or learning result is claimed.
 
-Registered Linux authorities now bind the explicit `legacy-binary-inch-v1`
-numerical policy into execution profiles, opaque save/replay envelopes and
-checkpoint-cache identity. Inner historical payloads and geometry witness hashes
-remain unchanged; unknown and inactive milli-inch policies are rejected before
-execution. See [distance precision status](docs/DISTANCE_PRECISION.md).
-
 ## 2. Non-negotiable invariants
 
 These rules are enforced from the first commit.
