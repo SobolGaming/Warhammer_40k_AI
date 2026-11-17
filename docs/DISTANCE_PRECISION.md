@@ -36,6 +36,40 @@ historical explicit reconstruction recipe. The paused Fight evidence remains
 historical and unmodified. Linux remains authoritative; native Windows numerical
 equivalence and project-wide milli-inch rounding are not established by this slice.
 
+## Staged canonical circle input and topology prerequisite
+
+`geometry.milli_inch_circle.CanonicalCircle` is an inactive input boundary for
+closed circular disks. It canonicalizes signed centre coordinates and the source
+full diameter once; an odd diameter deliberately derives an exact half-tick radius.
+Decimal, binary-float and millimetre sources retain the arithmetic foundation's
+interpretations. Centres fit signed 64-bit ticks and diameters range from one to
+`2**63 - 1` ticks. Invalid, collapsed or out-of-range inputs raise typed errors.
+The immutable representation has strict `milli-inch-circle-v1` payloads and a
+hash covering the complete payload, including `milli-inch-half-away-v1`.
+
+Circle queries use integer squared distances without a tolerance or backend.
+`relation_to` distinguishes separated disks, external contact and interior overlap;
+containment, coincident disks and internal tangency count as interior overlap.
+`surface_gap_ticks` rounds the nonnegative surface gap exactly once, including
+irrational centre distances and half-tick radius sums. It uses integer square root
+and an exact squared midpoint comparison, never a rounded intermediate distance.
+A rounded zero gap can mean separation, contact or overlap and must not replace
+the topology query. Scalar rule consumers must still use their own strict or
+inclusive comparison against the returned canonical length.
+
+This representation does **not** solve contact placement. External tangency on
+integer-tick centres requires `4*(dx**2 + dy**2) == (d1 + d2)**2`. For diameters of
+different parity the right side is congruent to one modulo four, so no integer
+centre pair can satisfy it, even diagonally. The 1.000/1.001-inch pair therefore
+remains an explicit activation blocker. Same-parity exact contact is supported;
+no tolerance, snapped contact or overlap allowance is substituted for real contact.
+
+No gameplay caller imports this API. Contact-attainable authoritative placement,
+ovals/rotations, backend and solver agreement, inner policy and replay identity,
+geometry/spatial caches and coordinated rules remain pending. Active sessions
+retain legacy semantics and original historical bytes; Linux remains authoritative.
+This slice does not establish native OS equivalence or new-mode gameplay admission.
+
 ## Staged canonical simple-ring input prerequisite
 
 `geometry.milli_inch_polygon.CanonicalPolygon` is an inactive input boundary for

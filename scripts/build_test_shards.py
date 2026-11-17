@@ -465,11 +465,14 @@ def behavioral_selection(root: Path) -> BehavioralSelection:
     benchmarks = _selection_members(value["benchmark_files"], root)
     # Preserve retained source diagnostics before the successor's complete cutover pin.
     # Active replacements depend on that successor, so admit them after legacy checks.
+    from scripts.canonical_circle_test_admission import circle_test_transition
     from scripts.canonical_polygon_test_admission import polygon_test_transition
     from scripts.precision_profile_test_admission import profile_test_transition
     from scripts.symbolic_milli_inch_test_admission import symbolic_test_transition
 
-    profile_transition = polygon_test_transition(root, hashlib.sha256(raw).hexdigest())
+    profile_transition = circle_test_transition(root, hashlib.sha256(raw).hexdigest())
+    if profile_transition is None:
+        profile_transition = polygon_test_transition(root, hashlib.sha256(raw).hexdigest())
     if profile_transition is None:
         profile_transition = symbolic_test_transition(root, hashlib.sha256(raw).hexdigest())
     if profile_transition is None:
