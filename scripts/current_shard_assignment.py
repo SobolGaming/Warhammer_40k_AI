@@ -35,6 +35,8 @@ def load_assignment(
     history: HistoricalSnapshot,
 ) -> tuple[tuple[tuple[str, ...], ...], dict[str, object]]:
     from scripts.build_test_shards import SERIAL_BEHAVIORAL_CASE
+    from scripts.canonical_circle_shard_admission import ASSIGNMENT_FILE as CIRCLE_ASSIGNMENT_FILE
+    from scripts.canonical_circle_shard_admission import SCHEMA as CIRCLE_SCHEMA
     from scripts.canonical_polygon_shard_admission import ASSIGNMENT_FILE as POLYGON_ASSIGNMENT_FILE
     from scripts.canonical_polygon_shard_admission import SCHEMA as POLYGON_SCHEMA
     from scripts.linux_authority_shard_admission import (
@@ -52,13 +54,16 @@ def load_assignment(
     )
     from scripts.symbolic_milli_inch_shard_admission import SCHEMA as SYMBOLIC_SCHEMA
 
+    circle = descriptor["schema"] == CIRCLE_SCHEMA
     polygon = descriptor["schema"] == POLYGON_SCHEMA
     symbolic = descriptor["schema"] == SYMBOLIC_SCHEMA
     profile = descriptor["schema"] == PROFILE_SCHEMA
     authority = descriptor["schema"] == AUTHORITY_SCHEMA
     milli = descriptor["schema"] == MILLI_SCHEMA
     filename = (
-        POLYGON_ASSIGNMENT_FILE
+        CIRCLE_ASSIGNMENT_FILE
+        if circle
+        else POLYGON_ASSIGNMENT_FILE
         if polygon
         else SYMBOLIC_ASSIGNMENT_FILE
         if symbolic
@@ -116,7 +121,9 @@ def load_assignment(
     expected.update(owners)
     selected = Counter(selector for group in groups for selector in group)
     if selected != expected or len(selected) != (
-        513
+        514
+        if circle
+        else 513
         if polygon
         else 512
         if symbolic

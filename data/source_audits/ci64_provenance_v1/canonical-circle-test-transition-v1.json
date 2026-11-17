@@ -1,0 +1,21 @@
+{
+  "added_cases": 11,
+  "added_files": {
+    "tests/rules/section01/test_milli_inch_circle.py": {
+      "blob_sha1": "8aa3ba12e93653e76e488b26581f5b16034e907d",
+      "bytes": 11677,
+      "mode": "100644",
+      "sha256": "108a7edcaff877484ed35ffa21ac685b0b848703b7f65e8ef2fb00a620594194"
+    }
+  },
+  "retained_cutover_sha256": "4cd1f0b062fad661e1c71fe27d2e9f8279c3c21d2a9f7bea9e3b053db79afce3",
+  "retained_foundation_sha256": "9ebbf6d4cf39d25a60c78a4312e0a128c5b43b6c79c64ed91fa41e4387366e07",
+  "retained_polygon_sha256": "56253b70e4c56a6c6b9dd3a053b127211811fc1ec79e3a5097285feaf023c263",
+  "retained_profile_sha256": "020dcec99278aa79f2215762a525c0c029231cdb9c64f1e988d4a1719e0fbb74",
+  "retained_symbolic_sha256": "23943a7fb56ba7b6e3da0888667d15959b4b1ae4e2148be0b6e6ab3d1aeeb9cb",
+  "runtime_fingerprint": "9155e14c9c2ebf6932f47fff50f573bb7ee02b6573d76779ae538bedc8f33137",
+  "schema": "finite-canonical-circle-test-transition-v1",
+  "sources": {
+    "src/warhammer40k_core/geometry/milli_inch_circle.py": "90c753b7d8ca9fdd03f52d17b7d59a758b2257a86a2610a0e527be43485192a4"
+  }
+}
