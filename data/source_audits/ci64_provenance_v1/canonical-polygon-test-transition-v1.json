@@ -1,0 +1,20 @@
+{
+  "added_cases": 8,
+  "added_files": {
+    "tests/rules/section01/test_milli_inch_polygon.py": {
+      "blob_sha1": "1bfd7b7ca6affb71ae65bf1f4c6087004acc5e71",
+      "bytes": 7779,
+      "mode": "100644",
+      "sha256": "b36418144aa411b9a39797d191058430d9c8bba3e4e3d5a6dd3ce6f093ea6ee0"
+    }
+  },
+  "retained_cutover_sha256": "4cd1f0b062fad661e1c71fe27d2e9f8279c3c21d2a9f7bea9e3b053db79afce3",
+  "retained_foundation_sha256": "9ebbf6d4cf39d25a60c78a4312e0a128c5b43b6c79c64ed91fa41e4387366e07",
+  "retained_profile_sha256": "020dcec99278aa79f2215762a525c0c029231cdb9c64f1e988d4a1719e0fbb74",
+  "retained_symbolic_sha256": "23943a7fb56ba7b6e3da0888667d15959b4b1ae4e2148be0b6e6ab3d1aeeb9cb",
+  "runtime_fingerprint": "1741e3c9547f667ce281f6ad970a8c064bfcf1c49d992cff34219e03c8f30c1d",
+  "schema": "finite-canonical-polygon-test-transition-v1",
+  "sources": {
+    "src/warhammer40k_core/geometry/milli_inch_polygon.py": "049b1f46183933069dc27ce14db4e84e910ebdb13dcfbbdf945dcd64fb8ac80d"
+  }
+}

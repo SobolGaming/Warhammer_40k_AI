@@ -1,558 +1,562 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "fc52e9166ff6380b606269ce362f4f1cbc6a2835",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:c241ac72aad5f0fd846d950f733dbaee36795d3e8990f252f7f064df86af6efc",
-  "operation_map_sha256": "163fac653240f51e1ed3adc78116bd2852620d289bbf4011a93a6c157b3b586a",
+  "base": "99dcf4adb983a0f968c536b16e9d960182e63afe",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:1741e3c9547f667ce281f6ad970a8c064bfcf1c49d992cff34219e03c8f30c1d",
+  "operation_map_sha256": "8f37705eeba7c9d1f762bc97bacab336f5aa81ff85dbf68bfa673696bf8b4eba",
   "changes": {
     "ci/quality_shards/all.txt": {
-      "before_sha256": "dfb3c4e0385dcbe832599bdcb54bbbc05a13a333a6896db02615e6ef37f2e2cd",
-      "after_sha256": "94dab11a05ea13838f5b9eafc5adedeeae9d1f083fa75b556fd68f64d4f95d22",
+      "before_sha256": "94dab11a05ea13838f5b9eafc5adedeeae9d1f083fa75b556fd68f64d4f95d22",
+      "after_sha256": "23b58aad4c025dc89cea901db3fa62f4fa12102957e111e9548877a6da8bf6bd",
       "owners": {
         "@document": {
-          "before": "dfb3c4e0385dcbe832599bdcb54bbbc05a13a333a6896db02615e6ef37f2e2cd",
-          "after": "94dab11a05ea13838f5b9eafc5adedeeae9d1f083fa75b556fd68f64d4f95d22"
+          "before": "94dab11a05ea13838f5b9eafc5adedeeae9d1f083fa75b556fd68f64d4f95d22",
+          "after": "23b58aad4c025dc89cea901db3fa62f4fa12102957e111e9548877a6da8bf6bd"
         }
       }
     },
     "ci/quality_shards/shard-3-modules.txt": {
-      "before_sha256": "c6b3f36366deb9357d8494f64396fb33826cc956e5ba32cbc1de8d1ab72e7953",
-      "after_sha256": "b83d35e71991c35c9eb516a11d6805500357fbda811529b886b1f3057fd7b61f",
+      "before_sha256": "b83d35e71991c35c9eb516a11d6805500357fbda811529b886b1f3057fd7b61f",
+      "after_sha256": "1fc38bf2a9001eac4d79624aeb186c930e559238f2392d198d615dcbe87883d4",
       "owners": {
         "@document": {
-          "before": "c6b3f36366deb9357d8494f64396fb33826cc956e5ba32cbc1de8d1ab72e7953",
-          "after": "b83d35e71991c35c9eb516a11d6805500357fbda811529b886b1f3057fd7b61f"
+          "before": "b83d35e71991c35c9eb516a11d6805500357fbda811529b886b1f3057fd7b61f",
+          "after": "1fc38bf2a9001eac4d79624aeb186c930e559238f2392d198d615dcbe87883d4"
         }
       }
     },
     "ci/quality_shards/shard-3.txt": {
-      "before_sha256": "e87fe505ff45805927ba27195b35b3f284fd4d51abaf0f6c9a8b19704f9e9b1f",
-      "after_sha256": "95d9f56ea8db8f40896a550385902265096638d12ff14c34a19edc28ccbb2eb6",
+      "before_sha256": "95d9f56ea8db8f40896a550385902265096638d12ff14c34a19edc28ccbb2eb6",
+      "after_sha256": "04b8e3b8bd0aaa4a2a40e32e14eb7f593ac8969b8f67dfee3085392c8370d376",
       "owners": {
         "@document": {
-          "before": "e87fe505ff45805927ba27195b35b3f284fd4d51abaf0f6c9a8b19704f9e9b1f",
-          "after": "95d9f56ea8db8f40896a550385902265096638d12ff14c34a19edc28ccbb2eb6"
+          "before": "95d9f56ea8db8f40896a550385902265096638d12ff14c34a19edc28ccbb2eb6",
+          "after": "04b8e3b8bd0aaa4a2a40e32e14eb7f593ac8969b8f67dfee3085392c8370d376"
+        }
+      }
+    },
+    "ci/test_shards/canonical-polygon-covered-baseline.json": {
+      "before_sha256": null,
+      "after_sha256": "17d821475fc267db4fc182eccc5239a07ae183b098983cf213b3c5a3c2987cc0",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "17d821475fc267db4fc182eccc5239a07ae183b098983cf213b3c5a3c2987cc0"
+        }
+      }
+    },
+    "ci/test_shards/canonical-polygon-covered-evidence.json": {
+      "before_sha256": null,
+      "after_sha256": "3f0d32e7f12c09b4a7345c04ff3fef83aaacbd7ef075876ad820629db17119be",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "3f0d32e7f12c09b4a7345c04ff3fef83aaacbd7ef075876ad820629db17119be"
+        }
+      }
+    },
+    "ci/test_shards/canonical-polygon-derived-assignment.json": {
+      "before_sha256": null,
+      "after_sha256": "424196cf212f37978e4a3169de93c97b64189ee6a34c4c07d4ab039d52e79396",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "424196cf212f37978e4a3169de93c97b64189ee6a34c4c07d4ab039d52e79396"
         }
       }
     },
     "ci/test_shards/current-runtime-compatibility.json": {
-      "before_sha256": "ca1af2d139997aaebd412f35f4400e04ce1979dfa37028115afaeb6855e709ea",
-      "after_sha256": "ed1335acb8a357236ce3f749060670c1f284869f504e12cbed6de698815ff0ac",
+      "before_sha256": "ed1335acb8a357236ce3f749060670c1f284869f504e12cbed6de698815ff0ac",
+      "after_sha256": "a9819805dac5d927ac45fe5fff8fd6d30030cbe6b458bf88b95a2a1ce040646a",
       "owners": {
         "@document": {
-          "before": "ca1af2d139997aaebd412f35f4400e04ce1979dfa37028115afaeb6855e709ea",
-          "after": "ed1335acb8a357236ce3f749060670c1f284869f504e12cbed6de698815ff0ac"
+          "before": "ed1335acb8a357236ce3f749060670c1f284869f504e12cbed6de698815ff0ac",
+          "after": "a9819805dac5d927ac45fe5fff8fd6d30030cbe6b458bf88b95a2a1ce040646a"
         }
       }
     },
     "ci/test_shards/durations.json": {
-      "before_sha256": "ef50c15278e84f527d0701f61aae0c6836623bbb30fd0fad03d74fb28cc5587f",
-      "after_sha256": "86dfaf699527950cc4a1010746e2994db4d158eee6a775c0e08e66fabebd15b7",
+      "before_sha256": "86dfaf699527950cc4a1010746e2994db4d158eee6a775c0e08e66fabebd15b7",
+      "after_sha256": "1ab2fbb0d5994734afd9ed4029cf292777433ba6e99cc92ac4013ca8ef04cf1b",
       "owners": {
         "@document": {
-          "before": "ef50c15278e84f527d0701f61aae0c6836623bbb30fd0fad03d74fb28cc5587f",
-          "after": "86dfaf699527950cc4a1010746e2994db4d158eee6a775c0e08e66fabebd15b7"
+          "before": "86dfaf699527950cc4a1010746e2994db4d158eee6a775c0e08e66fabebd15b7",
+          "after": "1ab2fbb0d5994734afd9ed4029cf292777433ba6e99cc92ac4013ca8ef04cf1b"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
-      "before_sha256": "6450bdc8f501e8d0129f6354fad55f0f4753bebf64bf0ed1a2ffb43000f7fb14",
-      "after_sha256": "d630910c39d490d43830c60d2aca20e6fe2485233a8fe0bfdf25cdf58290177c",
+      "before_sha256": "d630910c39d490d43830c60d2aca20e6fe2485233a8fe0bfdf25cdf58290177c",
+      "after_sha256": "551f00f6ec3e5a8b420a56b2e5e17bf5882565f5ce6464f0d1995074879498cb",
       "owners": {
         "@document": {
-          "before": "6450bdc8f501e8d0129f6354fad55f0f4753bebf64bf0ed1a2ffb43000f7fb14",
-          "after": "d630910c39d490d43830c60d2aca20e6fe2485233a8fe0bfdf25cdf58290177c"
-        }
-      }
-    },
-    "ci/test_shards/symbolic-milli-inch-covered-baseline.json": {
-      "before_sha256": null,
-      "after_sha256": "1c3eed80a26137a90d73a77f537631d42459d065155535655c8ea07c814dccc6",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "1c3eed80a26137a90d73a77f537631d42459d065155535655c8ea07c814dccc6"
-        }
-      }
-    },
-    "ci/test_shards/symbolic-milli-inch-covered-evidence.json": {
-      "before_sha256": null,
-      "after_sha256": "8faff70771c70f413d1424a7f340a5fac88416645ff0b0daf4a3d23f4dd9f974",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "8faff70771c70f413d1424a7f340a5fac88416645ff0b0daf4a3d23f4dd9f974"
-        }
-      }
-    },
-    "ci/test_shards/symbolic-milli-inch-derived-assignment.json": {
-      "before_sha256": null,
-      "after_sha256": "10f22c92520ef7c226e386a14940207ccef957a8082911386cd137d413121ba2",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "10f22c92520ef7c226e386a14940207ccef957a8082911386cd137d413121ba2"
+          "before": "d630910c39d490d43830c60d2aca20e6fe2485233a8fe0bfdf25cdf58290177c",
+          "after": "551f00f6ec3e5a8b420a56b2e5e17bf5882565f5ce6464f0d1995074879498cb"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "6adaeb93690a4340f7fd132be6192962c019807ad73ba62872e2f45f57f82429",
-      "after_sha256": "31fe888e9d98a69a52fe8c59b301e81ed591b6991614567612c9e4f752a1a64f",
+      "before_sha256": "31fe888e9d98a69a52fe8c59b301e81ed591b6991614567612c9e4f752a1a64f",
+      "after_sha256": "1989c260963604a32afe6591d898dae4bf748598b6d9fa2e08112cec1381c1b1",
       "owners": {
         "@document": {
-          "before": "6adaeb93690a4340f7fd132be6192962c019807ad73ba62872e2f45f57f82429",
-          "after": "31fe888e9d98a69a52fe8c59b301e81ed591b6991614567612c9e4f752a1a64f"
+          "before": "31fe888e9d98a69a52fe8c59b301e81ed591b6991614567612c9e4f752a1a64f",
+          "after": "1989c260963604a32afe6591d898dae4bf748598b6d9fa2e08112cec1381c1b1"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "838f020d23ad1322f7205ea17dc7f79304e03d140c1ba9171089d33b513a652f",
-      "after_sha256": "5a667e4ad87f5d7edb65553c6154916217d8dcd6c2c6ab4fd62ba811ec5c290e",
+      "before_sha256": "5a667e4ad87f5d7edb65553c6154916217d8dcd6c2c6ab4fd62ba811ec5c290e",
+      "after_sha256": "ca0859d6646229afae4930f21c682cad13f3f5233f5ece3b62a12c424255c2a8",
       "owners": {
         "@document": {
-          "before": "838f020d23ad1322f7205ea17dc7f79304e03d140c1ba9171089d33b513a652f",
-          "after": "5a667e4ad87f5d7edb65553c6154916217d8dcd6c2c6ab4fd62ba811ec5c290e"
+          "before": "5a667e4ad87f5d7edb65553c6154916217d8dcd6c2c6ab4fd62ba811ec5c290e",
+          "after": "ca0859d6646229afae4930f21c682cad13f3f5233f5ece3b62a12c424255c2a8"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "13216633b130a409ca6758e14882e6748cedcff7cec0bd0515406292ea52f5f1",
-      "after_sha256": "914a1ae7f2a78b9e62243ea5edec42ac7c4f1462613ac8de77be21d4f403ec64",
+      "before_sha256": "914a1ae7f2a78b9e62243ea5edec42ac7c4f1462613ac8de77be21d4f403ec64",
+      "after_sha256": "2cce1ee808156d87a1f12b2da1eba15410b9089acfa3c6bce2262f86681f13f0",
       "owners": {
         "@document": {
-          "before": "13216633b130a409ca6758e14882e6748cedcff7cec0bd0515406292ea52f5f1",
-          "after": "914a1ae7f2a78b9e62243ea5edec42ac7c4f1462613ac8de77be21d4f403ec64"
+          "before": "914a1ae7f2a78b9e62243ea5edec42ac7c4f1462613ac8de77be21d4f403ec64",
+          "after": "2cce1ee808156d87a1f12b2da1eba15410b9089acfa3c6bce2262f86681f13f0"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "d9557ad46801e3e16cd9deeb9e6539269946b678e5ffd320f92bdcf0b4d733a3",
-      "after_sha256": "9ee70d2a67f7496cd89eef71a5e3c0e0a457e77732310177cc8e0995da49aed8",
+      "before_sha256": "9ee70d2a67f7496cd89eef71a5e3c0e0a457e77732310177cc8e0995da49aed8",
+      "after_sha256": "76fb847a77ed0ec757b0c3b0ff901919454defbe34abfa70da60d4aeedbebeec",
       "owners": {
         "@document": {
-          "before": "d9557ad46801e3e16cd9deeb9e6539269946b678e5ffd320f92bdcf0b4d733a3",
-          "after": "9ee70d2a67f7496cd89eef71a5e3c0e0a457e77732310177cc8e0995da49aed8"
+          "before": "9ee70d2a67f7496cd89eef71a5e3c0e0a457e77732310177cc8e0995da49aed8",
+          "after": "76fb847a77ed0ec757b0c3b0ff901919454defbe34abfa70da60d4aeedbebeec"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "8804f18034ee0efe6aee81e5620207a72a04b2d96f8b68cabe5dafd72b5c010d",
-      "after_sha256": "f1d01bf543337b7a051b6b8d91b3c64161d70d188f8c022fb7e681c43d55fb71",
+      "before_sha256": "f1d01bf543337b7a051b6b8d91b3c64161d70d188f8c022fb7e681c43d55fb71",
+      "after_sha256": "7e240ab6adda64fc6f8a38bb66da74f3a1c9451cb1886f253d936901bcf8c376",
       "owners": {
         "@document": {
-          "before": "8804f18034ee0efe6aee81e5620207a72a04b2d96f8b68cabe5dafd72b5c010d",
-          "after": "f1d01bf543337b7a051b6b8d91b3c64161d70d188f8c022fb7e681c43d55fb71"
+          "before": "f1d01bf543337b7a051b6b8d91b3c64161d70d188f8c022fb7e681c43d55fb71",
+          "after": "7e240ab6adda64fc6f8a38bb66da74f3a1c9451cb1886f253d936901bcf8c376"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "e99693c530d342bf431d3c1c82a7b9ef3c54a2855e0a8a7a26b5ae7762563663",
-      "after_sha256": "1d12f7916596142f326a2a0e3b06c5fcc28a6b83b754f552a3d1ef6363299bcb",
+      "before_sha256": "1d12f7916596142f326a2a0e3b06c5fcc28a6b83b754f552a3d1ef6363299bcb",
+      "after_sha256": "b09c4d6b83b8115be81952869edd8f81f4fed18533bb4d83c7c27b8214c774e2",
       "owners": {
         "@document": {
-          "before": "e99693c530d342bf431d3c1c82a7b9ef3c54a2855e0a8a7a26b5ae7762563663",
-          "after": "1d12f7916596142f326a2a0e3b06c5fcc28a6b83b754f552a3d1ef6363299bcb"
+          "before": "1d12f7916596142f326a2a0e3b06c5fcc28a6b83b754f552a3d1ef6363299bcb",
+          "after": "b09c4d6b83b8115be81952869edd8f81f4fed18533bb4d83c7c27b8214c774e2"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "17b26b13d650870677d4915fa95f08296dec4ee7a1c1578d8ac9ee09b327cf90",
-      "after_sha256": "56e806e0955d3fbcf59687ce014a903f15625352ac32888786f14a15a820b2b9",
+      "before_sha256": "56e806e0955d3fbcf59687ce014a903f15625352ac32888786f14a15a820b2b9",
+      "after_sha256": "460fcda75160d5a7c316c4574f3745aa8ee97cf282d801b7a73f76345ec8e74e",
       "owners": {
         "@document": {
-          "before": "17b26b13d650870677d4915fa95f08296dec4ee7a1c1578d8ac9ee09b327cf90",
-          "after": "56e806e0955d3fbcf59687ce014a903f15625352ac32888786f14a15a820b2b9"
+          "before": "56e806e0955d3fbcf59687ce014a903f15625352ac32888786f14a15a820b2b9",
+          "after": "460fcda75160d5a7c316c4574f3745aa8ee97cf282d801b7a73f76345ec8e74e"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "0e0dceb7619a41173bbd1e201beb8d6803010bb59602cf1bb6bf6ea92fef561f",
-      "after_sha256": "01c32e3259eab3b41e3000a1a5db160a94ccc5e97b28264e1c4de9ab052d62f1",
+      "before_sha256": "01c32e3259eab3b41e3000a1a5db160a94ccc5e97b28264e1c4de9ab052d62f1",
+      "after_sha256": "7b2c08256ae06043b586062a49b4f747b5b96e0db49b823e5f178ff07c4d972a",
       "owners": {
         "@document": {
-          "before": "0e0dceb7619a41173bbd1e201beb8d6803010bb59602cf1bb6bf6ea92fef561f",
-          "after": "01c32e3259eab3b41e3000a1a5db160a94ccc5e97b28264e1c4de9ab052d62f1"
+          "before": "01c32e3259eab3b41e3000a1a5db160a94ccc5e97b28264e1c4de9ab052d62f1",
+          "after": "7b2c08256ae06043b586062a49b4f747b5b96e0db49b823e5f178ff07c4d972a"
         }
       }
     },
-    "data/source_audits/ci64_provenance_v1/symbolic-milli-inch-test-transition-v1.json": {
+    "data/source_audits/ci64_provenance_v1/canonical-polygon-test-transition-v1.json": {
       "before_sha256": null,
-      "after_sha256": "23943a7fb56ba7b6e3da0888667d15959b4b1ae4e2148be0b6e6ab3d1aeeb9cb",
+      "after_sha256": "56253b70e4c56a6c6b9dd3a053b127211811fc1ec79e3a5097285feaf023c263",
       "owners": {
         "@document": {
           "before": null,
-          "after": "23943a7fb56ba7b6e3da0888667d15959b4b1ae4e2148be0b6e6ab3d1aeeb9cb"
+          "after": "56253b70e4c56a6c6b9dd3a053b127211811fc1ec79e3a5097285feaf023c263"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
-      "before_sha256": "78c48210dbc27937352423c0f19c3470342f52b9f627df8deb68c17af5b81ded",
-      "after_sha256": "be7d06223c888760c282ae795342cb873072619df03ac3088066d375970f109c",
+      "before_sha256": "be7d06223c888760c282ae795342cb873072619df03ac3088066d375970f109c",
+      "after_sha256": "7c36f28c8106e8652e112d43f2e93e5e07bfb0438ec3f5aaca47e79d8ca6c611",
       "owners": {
         "@document": {
-          "before": "78c48210dbc27937352423c0f19c3470342f52b9f627df8deb68c17af5b81ded",
-          "after": "be7d06223c888760c282ae795342cb873072619df03ac3088066d375970f109c"
+          "before": "be7d06223c888760c282ae795342cb873072619df03ac3088066d375970f109c",
+          "after": "7c36f28c8106e8652e112d43f2e93e5e07bfb0438ec3f5aaca47e79d8ca6c611"
         }
       }
     },
     "docs/DISTANCE_PRECISION.md": {
-      "before_sha256": "fd6a2162f381e50e64c32b5b6bf5fd1ecf54f20ef1f5dd47a61af96c29424c66",
-      "after_sha256": "791a9d62e17cd2599eef91e4e8bfe2d47b3b6960db6245152d06811a8213798f",
+      "before_sha256": "791a9d62e17cd2599eef91e4e8bfe2d47b3b6960db6245152d06811a8213798f",
+      "after_sha256": "1d0184e87692a7330896ffc3898c3bcba89b637ce2b3afa975e7441ba55507ce",
       "owners": {
         "@document": {
-          "before": "fd6a2162f381e50e64c32b5b6bf5fd1ecf54f20ef1f5dd47a61af96c29424c66",
-          "after": "791a9d62e17cd2599eef91e4e8bfe2d47b3b6960db6245152d06811a8213798f"
+          "before": "791a9d62e17cd2599eef91e4e8bfe2d47b3b6960db6245152d06811a8213798f",
+          "after": "1d0184e87692a7330896ffc3898c3bcba89b637ce2b3afa975e7441ba55507ce"
         }
       }
     },
-    "docs/performance/current/precision-symbolic-movement.json": {
+    "docs/performance/current/canonical-polygon-movement.json": {
       "before_sha256": null,
-      "after_sha256": "9b8e2839461bc74332f711ae52b659941cb7625c7f4f67f48bc13af24278dbbf",
+      "after_sha256": "c8255a9c2542a22476d59052e290df15c4203fb5cca4ded1f37fb51527e09a11",
       "owners": {
         "@document": {
           "before": null,
-          "after": "9b8e2839461bc74332f711ae52b659941cb7625c7f4f67f48bc13af24278dbbf"
+          "after": "c8255a9c2542a22476d59052e290df15c4203fb5cca4ded1f37fb51527e09a11"
         }
       }
     },
-    "docs/performance/current/precision-symbolic-setup.json": {
+    "docs/performance/current/canonical-polygon-setup.json": {
       "before_sha256": null,
-      "after_sha256": "a7bf02005938d524afcbeff60ef4961cf5da4d06084c6f23c184ea380578f4cf",
+      "after_sha256": "f3cb6193f50ed3b82d16b3c89d7d1a3062260ac8d19adec7029b03f9ebbaab5f",
       "owners": {
         "@document": {
           "before": null,
-          "after": "a7bf02005938d524afcbeff60ef4961cf5da4d06084c6f23c184ea380578f4cf"
+          "after": "f3cb6193f50ed3b82d16b3c89d7d1a3062260ac8d19adec7029b03f9ebbaab5f"
         }
       }
     },
-    "docs/performance/current/precision-symbolic-visibility.json": {
+    "docs/performance/current/canonical-polygon-visibility.json": {
       "before_sha256": null,
-      "after_sha256": "1c0a95989bdab0a5bfe6a8f6bd6ce34eb7aa07ab8e7bb790aef6feb205efdaf9",
+      "after_sha256": "3a6c390af0eaf306e8e5324c7416293e318506fe2008c3de2c8d2c288585c823",
       "owners": {
         "@document": {
           "before": null,
-          "after": "1c0a95989bdab0a5bfe6a8f6bd6ce34eb7aa07ab8e7bb790aef6feb205efdaf9"
+          "after": "3a6c390af0eaf306e8e5324c7416293e318506fe2008c3de2c8d2c288585c823"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "86fdd8a9f6f86a2bf8e5198e34794f7c3babe10e2d5993d9ed666467eeec40e9",
-      "after_sha256": "df7e17ffa6becc7c49f2c425468eff8b19ce5c37caeb85d3aab51edb584637cc",
+      "before_sha256": "df7e17ffa6becc7c49f2c425468eff8b19ce5c37caeb85d3aab51edb584637cc",
+      "after_sha256": "cd4087cd23f55e256dae3373f7947775fdea7b504278f7b63fbd80f53447266f",
       "owners": {
         "@document": {
-          "before": "86fdd8a9f6f86a2bf8e5198e34794f7c3babe10e2d5993d9ed666467eeec40e9",
-          "after": "df7e17ffa6becc7c49f2c425468eff8b19ce5c37caeb85d3aab51edb584637cc"
+          "before": "df7e17ffa6becc7c49f2c425468eff8b19ce5c37caeb85d3aab51edb584637cc",
+          "after": "cd4087cd23f55e256dae3373f7947775fdea7b504278f7b63fbd80f53447266f"
         }
       }
     },
     "scripts/build_test_shards.py": {
-      "before_sha256": "20517ab89c7f43f2c38c84b177bee799bc4b3094a10386e375586aaa0113f29b",
-      "after_sha256": "86698ce5e8ce4663cf502a07bfc7bed524aecc660aa52b3bc6b1d596be811f79",
+      "before_sha256": "86698ce5e8ce4663cf502a07bfc7bed524aecc660aa52b3bc6b1d596be811f79",
+      "after_sha256": "a20b3a8fc599d0f7afa69ba0e9be6e18d5a5fb8ae591c58383e711f0b6ddcb7f",
       "owners": {
         "behavioral_selection": {
-          "before": "c767b9e02b62c284c16db4f601731ac6e5321646878712b828a0d0afdadee656",
-          "after": "3cbfd684c5988944b868156036c5fbca9a4c66b3e460b7e481558fef00245501"
+          "before": "3cbfd684c5988944b868156036c5fbca9a4c66b3e460b7e481558fef00245501",
+          "after": "bfadd8fed565671cc2a8f40025722b29f3e7c6b5cac7551c124d0c5efad85b76"
+        }
+      }
+    },
+    "scripts/canonical_polygon_shard_admission.py": {
+      "before_sha256": null,
+      "after_sha256": "8e500f3e673e756c5dfae99bb4918a5b0e52c213d3aa9cdee0395377d4426467",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "e5ff1070391cf1834981950c7fa67b9b75ef29a7f0d10c9ba06567d1f26033a1"
+        },
+        "current_native_role": {
+          "before": null,
+          "after": "1d6f73a1277ab0f54dd59aee89ca21df7a49dd2fa0c1ed3579920508d05a5430"
+        },
+        "producer_inputs": {
+          "before": null,
+          "after": "d51b31eb6aaaf256c6107d16326a38d8ed54c105a7802933f4e66dfa2ddd0985"
+        },
+        "require_frozen_assignment": {
+          "before": null,
+          "after": "369ea555af8659202e8dfd684d714d0ed1527e8c77c3e927613da0aec3642bcb"
+        },
+        "require_test_sources": {
+          "before": null,
+          "after": "715445128511b1aec65f0fa8dacd2c7f2981ae9d8d2d16afdc439a0fd058ba13"
+        },
+        "retained_authority_artifacts": {
+          "before": null,
+          "after": "c7aff097eb98b7e27ae7fc9c7b466b08a5f53e78f1ff68849c59616cd36e30a9"
+        },
+        "validate_runtime_transition": {
+          "before": null,
+          "after": "d208ac4cd61e4fd93a0ff38fd256685ee162689676eecb97c91a4c315d2f9651"
+        }
+      }
+    },
+    "scripts/canonical_polygon_test_admission.py": {
+      "before_sha256": null,
+      "after_sha256": "18ebcbfa18a415c00fdba503e0bfdfb9b8cc90e810652d3354937fd7c9be5c59",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "a03de1e57142700cd0ad6f79576264679d62a909a12bf843228fbb367fb12477"
+        },
+        "_checked_bytes": {
+          "before": null,
+          "after": "2fa39044081f476e90ead1d3d9147935fd3ede8585a2e56735659b1e9d97c366"
+        },
+        "polygon_test_transition": {
+          "before": null,
+          "after": "557394124e9c3ff742448224ff14ddb2d90327bf708d83ff90472169a74561d8"
         }
       }
     },
     "scripts/current_shard_assignment.py": {
-      "before_sha256": "ffdd2ef2d064f44b4c694967c31f9cccaa758b71fe7ea2ebef8db16df043cc2c",
-      "after_sha256": "d70e10fd3267451b21afd30755723b71884a450c6a61c00f61333a4e5e2417b8",
+      "before_sha256": "d70e10fd3267451b21afd30755723b71884a450c6a61c00f61333a4e5e2417b8",
+      "after_sha256": "51acd02f684bf64867a295fca8d9540604b56d323df7c789775add06fedd7360",
       "owners": {
         "load_assignment": {
-          "before": "0bfeae982f5179ef62844d75c5984094c385b667ee9017abc6d5f625cdb00881",
-          "after": "b9afa227bf14c2d82d2f075e829cca38bc7c92aac14bee00941ea1aad23a4abb"
+          "before": "b9afa227bf14c2d82d2f075e829cca38bc7c92aac14bee00941ea1aad23a4abb",
+          "after": "74727ba97deb878cd72959ce88fe815cb8900baf183aa1c36e32e51704e16c0d"
         }
       }
     },
     "scripts/current_shard_compatibility.py": {
-      "before_sha256": "6d67477da284d50c78f55bbd2f374377f25f775119b775d8afd3508516670ed9",
-      "after_sha256": "5d6c7ee3644a87710c2350adb86cebf16b210001f32e1cc13c117d3891a45581",
+      "before_sha256": "5d6c7ee3644a87710c2350adb86cebf16b210001f32e1cc13c117d3891a45581",
+      "after_sha256": "c26ae14ab2c69ed78341734fb0d17d83f18d775aa81f6c9ad7bc0081e0a3ed1f",
       "owners": {
         "_baseline": {
-          "before": "8425dd88b5c23af178109e25be71ceb8880f027025eb940c2068e1722b70ad8a",
-          "after": "18f5c74a580912d8d563b30a10d4ee0b194ecc3efbe4f1e6451c0ac65d645555"
+          "before": "18f5c74a580912d8d563b30a10d4ee0b194ecc3efbe4f1e6451c0ac65d645555",
+          "after": "7789506fc7a4278f21754c1bc19c8d7d14ac7beb5e1aea9be87644bb320d44cf"
         },
         "enabled": {
-          "before": "90986b7c34b37635483f2d30470138b0627d07ef744ec3f8463a49d8ae205bf7",
-          "after": "6ce3a088301e53d5ea4eac72a43373bdd0a1aa001519d8af0a42aefb3cbc749d"
+          "before": "6ce3a088301e53d5ea4eac72a43373bdd0a1aa001519d8af0a42aefb3cbc749d",
+          "after": "d7364b6b127192643a8df91eeb321c08401e74a97038c2d7f23b384c9dc2cb2a"
         },
         "plan": {
-          "before": "9854f8f428aa005293b3fed2c0961c013934f83d4eda88a70ab2954ea2ff273c",
-          "after": "a4c73b0b0cfb5a5847d8fb88bfcdfb8408ccb8d34a18fcf8b0d5d20e00f6c43e"
+          "before": "a4c73b0b0cfb5a5847d8fb88bfcdfb8408ccb8d34a18fcf8b0d5d20e00f6c43e",
+          "after": "515939b93ede05a45195f641847f9d7b61297593e85f2bbf916e306ba27c3724"
         }
       }
     },
     "scripts/fetch_scheduling_sources.py": {
-      "before_sha256": "f32cd4eb091d5f3bc0254c38911996948ac915bbc37fafbb7dbfc1ada20a7b43",
-      "after_sha256": "4f31b627bec3424c0378519ae8717c07e9da4618cd167fcac4a9b383b8eab6a2",
+      "before_sha256": "4f31b627bec3424c0378519ae8717c07e9da4618cd167fcac4a9b383b8eab6a2",
+      "after_sha256": "eb7cdc66fa58bc29ca3fd83029aaf68365d3b6150b434761424ef8d54f4a02fd",
       "owners": {
         "revisions": {
-          "before": "bd96a8902aec6d65ce1935b68fb4b59183e9dabe043dd5e3ad0774982e812e2c",
-          "after": "a45e627d199cf8014716c43a66007cc333004c000fab3a808c4fd2aadeda48aa"
-        }
-      }
-    },
-    "scripts/symbolic_milli_inch_shard_admission.py": {
-      "before_sha256": null,
-      "after_sha256": "83293b62d3cb6cebdf2bb95af4ca14bee65300da47ab8e63a2b5df4db0e93070",
-      "owners": {
-        "@module": {
-          "before": null,
-          "after": "6c4f6a335de0cab7213151177345541e4c5c44d60ee2852d232d9290974ef360"
-        },
-        "current_native_role": {
-          "before": null,
-          "after": "f557dd858c6dda96a353cc8a9a51b28c9cd37b2ebec7ab8de4c9735ee6fc07f4"
-        },
-        "producer_inputs": {
-          "before": null,
-          "after": "e34569b4607120a01b5181241fa47928fef668cca855410684eb20e443f5f993"
-        },
-        "require_frozen_assignment": {
-          "before": null,
-          "after": "1b4a46ed9272666fae96edb895701df8dca795d229f6ad183bf2094e5d8f2010"
-        },
-        "require_test_sources": {
-          "before": null,
-          "after": "b8db0d65c33d9cae8185ec45fca5ff0b37efa85529a0bcb49a17554e19ea8014"
-        },
-        "retained_authority_artifacts": {
-          "before": null,
-          "after": "a1aa64f544c7df195461e123c9b4dddba18b0a9ffd049d61a920619268113330"
-        },
-        "validate_runtime_transition": {
-          "before": null,
-          "after": "24963e124c4fdded111b45be8a464f7eef4e5d5ab1e746b638400459b61ab642"
-        }
-      }
-    },
-    "scripts/symbolic_milli_inch_test_admission.py": {
-      "before_sha256": null,
-      "after_sha256": "2babf22c8180e7812f79daecc064b59dfce7e9b2938e190fd26616071d4b368c",
-      "owners": {
-        "@module": {
-          "before": null,
-          "after": "b004b2ccf0b3889866de31e4fa8e06a62d9dae929aa4dac44ea140b936c32f03"
-        },
-        "_checked_bytes": {
-          "before": null,
-          "after": "b863b6fa8e515ac25ae0d62b58c93819ab95c10adbb216fb815fb34b66792763"
-        },
-        "symbolic_test_transition": {
-          "before": null,
-          "after": "6ab4d9bdf0d88a8a7b4d3d875c7d41223900301a8cf6f0ef9d1feece3a9d2974"
+          "before": "a45e627d199cf8014716c43a66007cc333004c000fab3a808c4fd2aadeda48aa",
+          "after": "fb9004775049b4299b40298bebbeeb841a3dcbb3ea6275982cb160f782b1b3b3"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "8720328077466cb8a81ec154b227836bd8025a0a3172addacf8e2b840641005d",
-      "after_sha256": "e037acb8487c754648b296af933b83cf43a89d101823ec8d7f67b2fe0d0f9b88",
+      "before_sha256": "e037acb8487c754648b296af933b83cf43a89d101823ec8d7f67b2fe0d0f9b88",
+      "after_sha256": "0136120582463d17dece9935baa77548bd32ec5bce56e1aadc1c1aba796a5e78",
       "owners": {
         "@document": {
-          "before": "8720328077466cb8a81ec154b227836bd8025a0a3172addacf8e2b840641005d",
-          "after": "e037acb8487c754648b296af933b83cf43a89d101823ec8d7f67b2fe0d0f9b88"
+          "before": "e037acb8487c754648b296af933b83cf43a89d101823ec8d7f67b2fe0d0f9b88",
+          "after": "0136120582463d17dece9935baa77548bd32ec5bce56e1aadc1c1aba796a5e78"
         }
       }
     },
-    "src/warhammer40k_core/geometry/milli_inch_symbolic.py": {
+    "src/warhammer40k_core/geometry/milli_inch_polygon.py": {
       "before_sha256": null,
-      "after_sha256": "52b91e3e84a68737562a874410510c69ccad13065535b0475d4e9d716015a7a4",
+      "after_sha256": "049b1f46183933069dc27ce14db4e84e910ebdb13dcfbbdf945dcd64fb8ac80d",
       "owners": {
         "@module": {
           "before": null,
-          "after": "b262f426f283a96bc6388cdb48cd6d1f68dd801c2639538bb14c146bd166eef4"
+          "after": "3ad8107457b1ef5f2c0142d15ee8033eb962287ffece3b1cf8c6e924a593bb78"
         },
-        "UnresolvedDistanceMeasurementError": {
+        "CanonicalPolygon": {
           "before": null,
-          "after": "991a80b172f58a83a726dc64db909bd2f1316c6849238d0a258f5c194747b5ca"
+          "after": "9df34d705e33e8ebd6f76092972965cfee7fbe8aa079a15917c149c9be78efbb"
         },
-        "_Solver": {
+        "CanonicalPolygon.__post_init__": {
           "before": null,
-          "after": "56a59ed95bb18ad6971624694278570635aaf7c1e7c4b05a662592a03c40f193"
+          "after": "66ab0d5d40f19c7c11bc826e292e43faa5c62cd81b5794eab2f123663a0b9a34"
         },
-        "_Solver.check": {
+        "CanonicalPolygon._from_source": {
           "before": null,
-          "after": "1ed4760848d2fc78e6c8dfbd785acc90a479db7dfd041cc49a21feaf2f8d4f4f"
+          "after": "39ce8fd74a6476ef42eb17439fd99e5a8c16ff9da8351c20ada7285227b51954"
         },
-        "_Solver.from_string": {
+        "CanonicalPolygon.content_hash": {
           "before": null,
-          "after": "11b9db4dff13eb7a02e0c34a8bfef3dd2c4786384e332c0aca82b9abf2b94d42"
+          "after": "88f69da2e271c0197bc746b61a18a9423d3276c8294dd644858a55d3d7c3bc54"
         },
-        "_Solver.reason_unknown": {
+        "CanonicalPolygon.from_inches": {
           "before": null,
-          "after": "4205c40b7e80123f28bb2d3f1edb3657cd4c8594476ad159730c14f0977449fe"
+          "after": "cd15ed934f244cd6b77c563426984aad7ed95856fa7598c39d66b57f442f5d4c"
         },
-        "_Solver.set": {
+        "CanonicalPolygon.from_millimeters": {
           "before": null,
-          "after": "d7890dea7ff4029b36038efd49c46af5cd26f5c1b09370b81b4975969fa56d20"
+          "after": "649c6c07d1d3f4de4f8861bea07150eeb3a08f3cae2b32690874025f220ae296"
         },
-        "_SolverModule": {
+        "CanonicalPolygon.from_payload": {
           "before": null,
-          "after": "61d40b5d0c9884893c345c5dde49f03078786f825983649bcd6cae2d94c14e7b"
+          "after": "d304237e6e2d5e134be0c2063e99e61e060a1c7cdb8065f32db4b8802a2b74ac"
         },
-        "_SolverModule.Context": {
+        "CanonicalPolygon.to_payload": {
           "before": null,
-          "after": "42de5c5513823c32a9ff747eb07f998606f01ae7eb0802ebbb65ec25a0334cb5"
+          "after": "e8e0be6ae415adcdcfecf2e6102db1f80fb882616e9b7a9f7c2d416a08e5bfd9"
         },
-        "_SolverModule.Tactic": {
+        "CanonicalPolygonError": {
           "before": null,
-          "after": "75438e5a4f7a70c275be01e55118102e3dd4460b43681b644fe605167eb04b57"
+          "after": "03daf36e18320c0b6b1b81b0a92fb87dc0dec4fa8dc0c85158c53b6b69446f61"
         },
-        "_Tactic": {
+        "CanonicalPolygonPayload": {
           "before": null,
-          "after": "180bf963bf9d77bd9de2748d9338bfba99799e3162a66034874bab531eec560b"
+          "after": "958ecbb5748b0168b7f037d7d2a82a6298dcaef757056288313bb29eee6bd344"
         },
-        "_Tactic.solver": {
+        "_cross": {
           "before": null,
-          "after": "f064bc4e011ac2b1a1fed120783540a375c05b97eaab3dacbb108ead47eb2750"
+          "after": "e5c84c3d80b937a308861c83a7a5a52198fd4a4fec21a46d7a12956ce2a68973"
         },
-        "_decide": {
+        "_intersects": {
           "before": null,
-          "after": "e3ecbb7a7a10a3eb9e66995ad4fddf52cbd4e08a63bedeb21c2757d159856edd"
+          "after": "3575238ef20b66bf714475579835181a42eeb7288ebb6b8731d3f537078f1ee4"
         },
-        "_remaining_ms": {
+        "_on_segment": {
           "before": null,
-          "after": "6cc6463b0dc48742e10b11300b4c26520f853f442b74acbad136e826daa4d7f2"
+          "after": "dc09652670180be9c45a58806f6ddb0a66fd8af298b235c7a8e2cd3440a4c693"
         },
-        "rounded_length_constraint": {
+        "_signed_area": {
           "before": null,
-          "after": "436f2d9943f9f9b3c7bf7a5d4be85720a152bf4ada96d12ca41b7684dc2e48c8"
+          "after": "e9b4b4401537b7d1cd4a02aaaa0fcf46271fd95a01c5700408ad3d9eef5f065b"
         },
-        "symbolic_squared_path_inches_to_ticks": {
+        "_validate_ring": {
           "before": null,
-          "after": "e4164cfd3833206d0a8f76b2625714590340be84c80b7792947c62f36148957e"
+          "after": "3f45438b1ae9c67873682242385eb90505f27a6871e04926e21813b9ae7f3de0"
+        }
+      }
+    },
+    "tests/code_quality/test_canonical_polygon_shard_admission.py": {
+      "before_sha256": null,
+      "after_sha256": "a55ec908d0859269f07c53466bc1b6838b9882625355a46d6f7e860e7e0e38ab",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "efae01cee176485d7a8043ee964dae79364ff520f59ad755a513f48959e49b9a"
+        },
+        "test_polygon_binding_admits_only_its_exact_runtime_transition": {
+          "before": null,
+          "after": "f511de0d272a71b9db7644fb245ad2775ab6a4c6b5bc44851c88f01998402bef"
+        },
+        "test_polygon_binding_fetches_both_current_and_retained_producers": {
+          "before": null,
+          "after": "a67c72797a87cd183c35d29afd36116f0372634795d229e534ac4e3654830183"
+        },
+        "test_polygon_binding_preserves_all_existing_performance_obligations": {
+          "before": null,
+          "after": "aa82a4705243a808acfbc5648a85669444a4eb57be731bec31cebd20a24fd059"
+        },
+        "test_polygon_binding_preserves_retained_sources_and_evidence": {
+          "before": null,
+          "after": "a9446a7af7ebbaa8d89b2dc6b0991081d65f97f7ab6d970ebb48a0171af9b2b5"
+        },
+        "test_polygon_binding_requires_complete_fresh_evidence_and_fixed_inventory": {
+          "before": null,
+          "after": "d19c06e16346ab83b9d1d4a0c30badd13cf4089f8e441a7b3dbee1e334e91156"
+        },
+        "test_polygon_binding_requires_its_complete_measured_producer": {
+          "before": null,
+          "after": "e99658051999a22b4132bf7c10bb9356ff33512864e3e4ae5d962a0dba6c55a1"
+        },
+        "test_polygon_binding_retains_twelve_shards_and_every_prior_selector": {
+          "before": null,
+          "after": "544b7a089a7dee92a5b81b174e129b68b8936cc41233139c8474d3ccba877b2c"
+        },
+        "test_polygon_test_transition_leaves_historical_source_selection_closed": {
+          "before": null,
+          "after": "590d325415e889765c977787b5bbc1920eb28f2c5e6db8994b695325ba8a10bf"
+        },
+        "test_polygon_test_transition_preserves_original_selection_bytes": {
+          "before": null,
+          "after": "f900d33cd0c3ed9d1707697de9e5db5cdaec88b00b3c33b76d641a9324a5713d"
+        },
+        "test_polygon_test_transition_rejects_source_record_and_identity_drift": {
+          "before": null,
+          "after": "02f24717039c1d50f9af62d12984fb96cce7cc0fa18389704ef3900f3b58cf40"
         }
       }
     },
     "tests/code_quality/test_ci_performance_gates.py": {
-      "before_sha256": "c6a2cf89206a8db1965ac8c586c970e75dd6cc9beda92d53dba27a7d222b936a",
-      "after_sha256": "0236fecfd3c44e62f1f7ead7da7ea80bfa8d57a929390ec524871b89d16f69f4",
+      "before_sha256": "0236fecfd3c44e62f1f7ead7da7ea80bfa8d57a929390ec524871b89d16f69f4",
+      "after_sha256": "51fc5cc7053b530057cae9f25e5c68e793136365c2fc7e85a452afaf2730eab9",
       "owners": {
         "test_cutover_real_cli_rejects_naming_override": {
-          "before": "863999478a0477916d39a62b4a14c03e8effcd21a5fc007cecfb73c6d62d838d",
-          "after": "a7dc777c8a2f14021492e70a066fc028f41d95e9c85e6bcd28a8880263535ef5"
+          "before": "a7dc777c8a2f14021492e70a066fc028f41d95e9c85e6bcd28a8880263535ef5",
+          "after": "68b2a8d400d6d7da964ce23f6263d8f000a78df9e54bd90afa9489fdd257fea7"
         },
         "test_cutover_real_pytest_cli_does_not_bypass_explicit_file_guard": {
-          "before": "b38c635d8bbffce096af409ce83d38197a3098f5647a1338210728a82cbb2971",
-          "after": "de9e02fdc9fb3a1215bf51820ed679619562ad5d975f7500bee98d7c1013fb77"
-        }
-      }
-    },
-    "tests/code_quality/test_precision_profile_shard_admission.py": {
-      "before_sha256": "ab310b9d8eaefc5aff7761ca305665361f9c6d03e3652972513cf86c7966f047",
-      "after_sha256": "374a15764677f399473eca4b50eb97b1001d8be9ff859caa7a3c21c794d07c10",
-      "owners": {
-        "@module": {
-          "before": "863b271303e31e91c1a948e5ae8bf637db97628f9d9f3279c37f889a5ae2dea0",
-          "after": "ccd3aefb2ecad1ad3d8d468a9cc8ab273982c4910d11cf902e99ba0c8d7719ef"
-        },
-        "test_profile_binding_admits_only_its_exact_runtime_transition": {
-          "before": "af4f1e2150c61c725ec0d6eb76b978d615ee57827e902e9607f9b614bf29a8e8",
-          "after": "16b8ae3e48865a64bdb0c4e5c01899f91370c9d0d469b41372f02cf2e7b9d93b"
-        },
-        "test_profile_binding_requires_complete_fresh_evidence_and_fixed_inventory": {
-          "before": "051fe87b76fb754c78a98dabd523f51d9380d6737a89cf8ca1be229506399670",
-          "after": "7c6b65c7c04a42dd0f638b1c82b26ec08227c5553decf9153f350a3434170613"
-        },
-        "test_profile_binding_requires_its_complete_measured_producer": {
-          "before": "1149dbcffce78ba90d8efe07ea9f2e37d070ee440d5bdceba2fac81fb1d8129d",
-          "after": "43a99af088534224a01f48b93bdab0c8e2cdb58a4574e2e4c9a82082c7a4db80"
-        },
-        "test_profile_test_transition_preserves_original_selection_bytes": {
-          "before": "685698bdc3e01e0a28c59ce1ce151f4805b2962a35f0be6f0e7a5386af4674da",
-          "after": "e0890b385e5ccee27ba8ef2345f8d29e8575bf0772fde08492b9485f76e460a2"
-        },
-        "test_profile_test_transition_rejects_source_record_and_identity_drift": {
-          "before": "e13a92cbb685150f3fd513e80af648b362f60196db6986e840fb881cf9560571",
-          "after": "5df81f6105a92800ba4d7c7da53239b7870b4fc50af75dd9228230f10a76c080"
+          "before": "de9e02fdc9fb3a1215bf51820ed679619562ad5d975f7500bee98d7c1013fb77",
+          "after": "377ebda38ebe10cb99fff702abedc80202318b0e0f99c005c4dffab7b8e4f7a7"
         }
       }
     },
     "tests/code_quality/test_symbolic_milli_inch_shard_admission.py": {
-      "before_sha256": null,
-      "after_sha256": "8772cc4cdb2d17bec53a73a6fc4bf4db4e2614f9f115d49d93e4c728be7fb119",
+      "before_sha256": "8772cc4cdb2d17bec53a73a6fc4bf4db4e2614f9f115d49d93e4c728be7fb119",
+      "after_sha256": "5c54abbb340fc240a6373d97b613e05d938d4b6609726ec44b9e37ce2d180c3e",
       "owners": {
         "@module": {
-          "before": null,
-          "after": "e436afb1e02080cbc1e4134e73a8fc1a5dac81adacf747b9458b2e5640e7bf0a"
+          "before": "e436afb1e02080cbc1e4134e73a8fc1a5dac81adacf747b9458b2e5640e7bf0a",
+          "after": "42082050e84b2b989a59dabcfad36c4239eedaf36781b2634632e98a55b4429c"
         },
         "test_symbolic_binding_admits_only_its_exact_runtime_transition": {
-          "before": null,
-          "after": "a41cf2e65bddbb2c8994f81338158893b92696e6bc9dd8cdd8a08bae290e07e4"
-        },
-        "test_symbolic_binding_fetches_both_current_and_retained_producers": {
-          "before": null,
-          "after": "b9ff04ccac4c821a2d18d029dfea61098bca469518c6e5ae54a34b5bd0bd51f6"
-        },
-        "test_symbolic_binding_preserves_all_existing_performance_obligations": {
-          "before": null,
-          "after": "6af76cd96015570b1ebb0fee942f15a58ca9609bdf6abc6ddff19a3031ac3850"
-        },
-        "test_symbolic_binding_preserves_retained_sources_and_evidence": {
-          "before": null,
-          "after": "7881115d66f540a63dbb42a30aef113e58c685f18974e8cf1e8443721fee04a5"
+          "before": "a41cf2e65bddbb2c8994f81338158893b92696e6bc9dd8cdd8a08bae290e07e4",
+          "after": "c63ff9c507f3df1116d93502035a2a313fc11ced952824fc3a8282e0acd568f6"
         },
         "test_symbolic_binding_requires_complete_fresh_evidence_and_fixed_inventory": {
-          "before": null,
-          "after": "3d3a9c726b8ee0e9d63976e117939827efa6a224c920f1e695e42af18b76e236"
+          "before": "3d3a9c726b8ee0e9d63976e117939827efa6a224c920f1e695e42af18b76e236",
+          "after": "1a538b5afaeb58f73f729f006e17be6099086f7105dec1fce16c10e87a9b0779"
         },
         "test_symbolic_binding_requires_its_complete_measured_producer": {
-          "before": null,
-          "after": "e698ec3f5de7a54bf604ba131ce955afceb0ae749817ae792af43525ba533c7c"
-        },
-        "test_symbolic_binding_retains_twelve_shards_and_every_prior_selector": {
-          "before": null,
-          "after": "9537564c802f0971204055d866776c3521613322945c94f83f3b7341519ff6fc"
-        },
-        "test_symbolic_test_transition_leaves_historical_source_selection_closed": {
-          "before": null,
-          "after": "10bfb107172e2ba88fa5ed48a89f9ba4685911ee51a22abafdbddcba1ae64acc"
+          "before": "e698ec3f5de7a54bf604ba131ce955afceb0ae749817ae792af43525ba533c7c",
+          "after": "f58dda7df8a46b0e4d42bcc72f79edd8574a2df30b7ffffeba432ba76ad6c680"
         },
         "test_symbolic_test_transition_preserves_original_selection_bytes": {
-          "before": null,
-          "after": "2a21a993be085c72ed9485b8b2d798e71989344bdf9eecf0433251766c0224bd"
+          "before": "2a21a993be085c72ed9485b8b2d798e71989344bdf9eecf0433251766c0224bd",
+          "after": "ffad0cc858c5555afbb3511928db254cd4a91230549a2fe91bdd614b6a4bb242"
         },
         "test_symbolic_test_transition_rejects_source_record_and_identity_drift": {
-          "before": null,
-          "after": "b3bcb56b7fac68808af5516de8379470b8a9e774e7861ee2f10032915639d13f"
+          "before": "b3bcb56b7fac68808af5516de8379470b8a9e774e7861ee2f10032915639d13f",
+          "after": "79ed02a4c5c7680b176d9751796eeb66b90c4cfd39c5128b11ac8498b9214d46"
         }
       }
     },
-    "tests/rules/section01/test_milli_inch_symbolic.py": {
+    "tests/rules/section01/test_milli_inch_polygon.py": {
       "before_sha256": null,
-      "after_sha256": "94813e259b6316d4cd87ec10ba976d419a44a3b357f0d8316df1eeade7f2ade4",
+      "after_sha256": "b36418144aa411b9a39797d191058430d9c8bba3e4e3d5a6dd3ce6f093ea6ee0",
       "owners": {
         "@module": {
           "before": null,
-          "after": "e92b0e2450285f1ad218fe2a703ec58d93aeba2471cc59ab0eef3a49122d5b57"
+          "after": "f5e6e6f081e404a98b08e797af6a4c11978c1286c240f4ef3daeece092efa00d"
         },
-        "test_symbolic_length_bins_match_all_four_integer_relations": {
+        "test_canonical_ring_coordinate_bounds_guarantee_json_identity": {
           "before": null,
-          "after": "d99115dd89a0aa381fe49d313f4a5fbd0f9d4951b4a7262127590f5a84a46cbc"
+          "after": "d7a3482a2696938480f060302598154bd5f584b96c3dfd7ddb806fefe787d49f"
         },
-        "test_symbolic_measurement_deadline_fails_without_approximate_result": {
+        "test_canonical_ring_exact_units_decimal_context_and_float_interpretation": {
           "before": null,
-          "after": "d7afb268a8c8d09c27927b8b6e6662db6df3604a0ac2bd3e9d1d454f2b55ae0c"
+          "after": "b94707c2c094ec1f05c6c37295c6e3ad6778f72ddc8f013fd8bfe4e41a3661a7"
         },
-        "test_symbolic_measurement_rejects_invalid_sources_and_contracts": {
+        "test_canonical_ring_identity_binds_policy_version_winding_and_start": {
           "before": null,
-          "after": "f3821f56f9385108f1059a095697d18bd71991b5052be470fcdc2a7a363f72d0"
+          "after": "5b98587ae46589e5bc7d47cd06e060bed7dfc391be1d093731266df4684ae140"
         },
-        "test_symbolic_measurement_unknown_is_typed_and_not_a_distance": {
+        "test_canonical_ring_payload_is_detached_strict_and_revalidates_topology": {
           "before": null,
-          "after": "e596733ab01586705cbaedabece6f679e511f221bfd035325837180c57a68a5c"
+          "after": "d2572d680bf5c4939a12e5dfb578ce115e2ee73f5cf2398c7008901fd4c4d50b"
         },
-        "test_symbolic_path_exact_ties_and_irrational_neighbors_at_any_scale": {
+        "test_canonical_ring_rejects_invalid_sources_before_snapping_can_repair_them": {
           "before": null,
-          "after": "f7c441c09b96f3155aa8422ee8d5fb4b74dce4ff8a380d4bee285e5ab17e064a"
+          "after": "486cfe812fec398ed6b7ec83f53c9598c7d6108501bbdc7858e22ea943873939"
         },
-        "test_symbolic_path_measures_complete_mixed_sum_once": {
+        "test_canonical_ring_rejects_quantization_collapse_and_new_edge_contacts": {
           "before": null,
-          "after": "4d706ccb18c5e1a56af6b922d9c17e5f4709c6680b7caecd23920401b0ecbb15"
+          "after": "c664547762588fcdce1d236d821e1cb48329c5f1ae99243a6c759c1be39b6a88"
         },
-        "test_symbolic_path_subdivision_and_segment_order_preserve_total": {
+        "test_canonical_ring_rounds_signed_sources_once_and_preserves_order": {
           "before": null,
-          "after": "fa34b9beb92b55d2f987588e27d2a3d0d4893fb417e2e002fb13c0e99d59801a"
+          "after": "f1c94473b2d736defa1e58a762b613287ef88a5f1cc5d3d04e5c900aaeed7a0c"
+        },
+        "test_canonical_ring_topology_has_no_distance_or_coordinate_tolerance": {
+          "before": null,
+          "after": "335e12774fafd3ca340df86c3e4fe83b11f1754b5898b9b208f89ba555aa222a"
         }
       }
     }
@@ -562,25 +566,58 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Add an inactive exact whole-path measurement API and shared scalar half-tick predicates. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
-      "source_obligation": "Implement the owner-directed nearest0.001-inch prerequisite: sum rational square roots using independently certified exact dyadic enclosures and a bounded linear whole-bin implication proof, quantize the total once, preserve strict/inclusive midpoint bins and reject unresolved calculations explicitly. Retain historical source/evidence/runtime profiles without migration.",
-      "unchanged_work": "No gameplay activation, geometry input snapping, topology/contact changes, inner history migration or native OS equivalence claim. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
+      "rationale": "Add an inactive exact canonical simple-ring input boundary with typed rejection of invalid source and snapped topology, signed 64-bit tick coordinates and a strict policy/version-bound payload hash. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: validate exact source and canonical simple rings, quantize coordinates once, reject collapse, intersection, touching, backtracking and winding reversal without repair, and preserve source order. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new input API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
     "ci/quality_shards/shard-3-modules.txt": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Add an inactive exact whole-path measurement API and shared scalar half-tick predicates. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
-      "source_obligation": "Implement the owner-directed nearest0.001-inch prerequisite: sum rational square roots using independently certified exact dyadic enclosures and a bounded linear whole-bin implication proof, quantize the total once, preserve strict/inclusive midpoint bins and reject unresolved calculations explicitly. Retain historical source/evidence/runtime profiles without migration.",
-      "unchanged_work": "No gameplay activation, geometry input snapping, topology/contact changes, inner history migration or native OS equivalence claim. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
+      "rationale": "Add an inactive exact canonical simple-ring input boundary with typed rejection of invalid source and snapped topology, signed 64-bit tick coordinates and a strict policy/version-bound payload hash. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: validate exact source and canonical simple rings, quantize coordinates once, reject collapse, intersection, touching, backtracking and winding reversal without repair, and preserve source order. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new input API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
     "ci/quality_shards/shard-3.txt": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Add an inactive exact whole-path measurement API and shared scalar half-tick predicates. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
-      "source_obligation": "Implement the owner-directed nearest0.001-inch prerequisite: sum rational square roots using independently certified exact dyadic enclosures and a bounded linear whole-bin implication proof, quantize the total once, preserve strict/inclusive midpoint bins and reject unresolved calculations explicitly. Retain historical source/evidence/runtime profiles without migration.",
-      "unchanged_work": "No gameplay activation, geometry input snapping, topology/contact changes, inner history migration or native OS equivalence claim. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
+      "rationale": "Add an inactive exact canonical simple-ring input boundary with typed rejection of invalid source and snapped topology, signed 64-bit tick coordinates and a strict policy/version-bound payload hash. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: validate exact source and canonical simple rings, quantize coordinates once, reject collapse, intersection, touching, backtracking and winding reversal without repair, and preserve source order. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new input API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
+    },
+    "ci/test_shards/canonical-polygon-covered-baseline.json": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile",
+        "canonical-polygon-admission"
+      ],
+      "selected_families": [],
+      "rationale": "Add an inactive exact canonical simple-ring input boundary with typed rejection of invalid source and snapped topology, signed 64-bit tick coordinates and a strict policy/version-bound payload hash. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: validate exact source and canonical simple rings, quantize coordinates once, reject collapse, intersection, touching, backtracking and winding reversal without repair, and preserve source order. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new input API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
+    },
+    "ci/test_shards/canonical-polygon-covered-evidence.json": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile",
+        "canonical-polygon-admission"
+      ],
+      "selected_families": [],
+      "rationale": "Add an inactive exact canonical simple-ring input boundary with typed rejection of invalid source and snapped topology, signed 64-bit tick coordinates and a strict policy/version-bound payload hash. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: validate exact source and canonical simple rings, quantize coordinates once, reject collapse, intersection, touching, backtracking and winding reversal without repair, and preserve source order. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new input API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
+    },
+    "ci/test_shards/canonical-polygon-derived-assignment.json": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile",
+        "canonical-polygon-admission"
+      ],
+      "selected_families": [],
+      "rationale": "Add an inactive exact canonical simple-ring input boundary with typed rejection of invalid source and snapped topology, signed 64-bit tick coordinates and a strict policy/version-bound payload hash. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: validate exact source and canonical simple rings, quantize coordinates once, reject collapse, intersection, touching, backtracking and winding reversal without repair, and preserve source order. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new input API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
     "ci/test_shards/current-runtime-compatibility.json": {
       "category": "measured_workload",
@@ -589,9 +626,9 @@
         "scoped-shard-allocation"
       ],
       "selected_families": [],
-      "rationale": "Add an inactive exact whole-path measurement API and shared scalar half-tick predicates. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
-      "source_obligation": "Implement the owner-directed nearest0.001-inch prerequisite: sum rational square roots using independently certified exact dyadic enclosures and a bounded linear whole-bin implication proof, quantize the total once, preserve strict/inclusive midpoint bins and reject unresolved calculations explicitly. Retain historical source/evidence/runtime profiles without migration.",
-      "unchanged_work": "No gameplay activation, geometry input snapping, topology/contact changes, inner history migration or native OS equivalence claim. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
+      "rationale": "Add an inactive exact canonical simple-ring input boundary with typed rejection of invalid source and snapped topology, signed 64-bit tick coordinates and a strict policy/version-bound payload hash. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: validate exact source and canonical simple rings, quantize coordinates once, reject collapse, intersection, touching, backtracking and winding reversal without repair, and preserve source order. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new input API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
     "ci/test_shards/durations.json": {
       "category": "measured_workload",
@@ -599,9 +636,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Add an inactive exact whole-path measurement API and shared scalar half-tick predicates. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
-      "source_obligation": "Implement the owner-directed nearest0.001-inch prerequisite: sum rational square roots using independently certified exact dyadic enclosures and a bounded linear whole-bin implication proof, quantize the total once, preserve strict/inclusive midpoint bins and reject unresolved calculations explicitly. Retain historical source/evidence/runtime profiles without migration.",
-      "unchanged_work": "No gameplay activation, geometry input snapping, topology/contact changes, inner history migration or native OS equivalence claim. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
+      "rationale": "Add an inactive exact canonical simple-ring input boundary with typed rejection of invalid source and snapped topology, signed 64-bit tick coordinates and a strict policy/version-bound payload hash. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: validate exact source and canonical simple rings, quantize coordinates once, reject collapse, intersection, touching, backtracking and winding reversal without repair, and preserve source order. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new input API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
     "ci/test_shards/shard-12.txt": {
       "category": "measured_workload",
@@ -609,42 +646,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Add an inactive exact whole-path measurement API and shared scalar half-tick predicates. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
-      "source_obligation": "Implement the owner-directed nearest0.001-inch prerequisite: sum rational square roots using independently certified exact dyadic enclosures and a bounded linear whole-bin implication proof, quantize the total once, preserve strict/inclusive midpoint bins and reject unresolved calculations explicitly. Retain historical source/evidence/runtime profiles without migration.",
-      "unchanged_work": "No gameplay activation, geometry input snapping, topology/contact changes, inner history migration or native OS equivalence claim. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
-    },
-    "ci/test_shards/symbolic-milli-inch-covered-baseline.json": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile",
-        "symbolic-milli-inch-admission"
-      ],
-      "selected_families": [],
-      "rationale": "Add an inactive exact whole-path measurement API and shared scalar half-tick predicates. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
-      "source_obligation": "Implement the owner-directed nearest0.001-inch prerequisite: sum rational square roots using independently certified exact dyadic enclosures and a bounded linear whole-bin implication proof, quantize the total once, preserve strict/inclusive midpoint bins and reject unresolved calculations explicitly. Retain historical source/evidence/runtime profiles without migration.",
-      "unchanged_work": "No gameplay activation, geometry input snapping, topology/contact changes, inner history migration or native OS equivalence claim. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
-    },
-    "ci/test_shards/symbolic-milli-inch-covered-evidence.json": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile",
-        "symbolic-milli-inch-admission"
-      ],
-      "selected_families": [],
-      "rationale": "Add an inactive exact whole-path measurement API and shared scalar half-tick predicates. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
-      "source_obligation": "Implement the owner-directed nearest0.001-inch prerequisite: sum rational square roots using independently certified exact dyadic enclosures and a bounded linear whole-bin implication proof, quantize the total once, preserve strict/inclusive midpoint bins and reject unresolved calculations explicitly. Retain historical source/evidence/runtime profiles without migration.",
-      "unchanged_work": "No gameplay activation, geometry input snapping, topology/contact changes, inner history migration or native OS equivalence claim. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
-    },
-    "ci/test_shards/symbolic-milli-inch-derived-assignment.json": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile",
-        "symbolic-milli-inch-admission"
-      ],
-      "selected_families": [],
-      "rationale": "Add an inactive exact whole-path measurement API and shared scalar half-tick predicates. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
-      "source_obligation": "Implement the owner-directed nearest0.001-inch prerequisite: sum rational square roots using independently certified exact dyadic enclosures and a bounded linear whole-bin implication proof, quantize the total once, preserve strict/inclusive midpoint bins and reject unresolved calculations explicitly. Retain historical source/evidence/runtime profiles without migration.",
-      "unchanged_work": "No gameplay activation, geometry input snapping, topology/contact changes, inner history migration or native OS equivalence claim. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
+      "rationale": "Add an inactive exact canonical simple-ring input boundary with typed rejection of invalid source and snapped topology, signed 64-bit tick coordinates and a strict policy/version-bound payload hash. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: validate exact source and canonical simple rings, quantize coordinates once, reject collapse, intersection, touching, backtracking and winding reversal without repair, and preserve source order. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new input API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
@@ -726,63 +730,63 @@
       "source_obligation": "Current generated session, persistence and support-profile examples must publish the verified current engine identity. This is generation of current examples, not migration or relabeling of archived user saves or replay evidence.",
       "unchanged_work": "The generator, schemas, complete measured runtime/test/tool inputs, runtime algorithms and historical artifacts are unchanged. No new numerical policy, gameplay consumer, public shape, source recipe or native OS equivalence is admitted."
     },
-    "data/source_audits/ci64_provenance_v1/symbolic-milli-inch-test-transition-v1.json": {
+    "data/source_audits/ci64_provenance_v1/canonical-polygon-test-transition-v1.json": {
       "category": "rule_semantics",
       "operations": [
-        "symbolic-milli-inch-admission"
+        "canonical-polygon-admission"
       ],
       "selected_families": [],
-      "rationale": "Add an inactive exact whole-path measurement API and shared scalar half-tick predicates. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
-      "source_obligation": "Implement the owner-directed nearest0.001-inch prerequisite: sum rational square roots using independently certified exact dyadic enclosures and a bounded linear whole-bin implication proof, quantize the total once, preserve strict/inclusive midpoint bins and reject unresolved calculations explicitly. Retain historical source/evidence/runtime profiles without migration.",
-      "unchanged_work": "No gameplay activation, geometry input snapping, topology/contact changes, inner history migration or native OS equivalence claim. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
+      "rationale": "Add an inactive exact canonical simple-ring input boundary with typed rejection of invalid source and snapped topology, signed 64-bit tick coordinates and a strict policy/version-bound payload hash. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: validate exact source and canonical simple rings, quantize coordinates once, reject collapse, intersection, touching, backtracking and winding reversal without repair, and preserve source order. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new input API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Add an inactive exact whole-path measurement API and shared scalar half-tick predicates. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
-      "source_obligation": "Implement the owner-directed nearest0.001-inch prerequisite: sum rational square roots using independently certified exact dyadic enclosures and a bounded linear whole-bin implication proof, quantize the total once, preserve strict/inclusive midpoint bins and reject unresolved calculations explicitly. Retain historical source/evidence/runtime profiles without migration.",
-      "unchanged_work": "No gameplay activation, geometry input snapping, topology/contact changes, inner history migration or native OS equivalence claim. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
+      "rationale": "Add an inactive exact canonical simple-ring input boundary with typed rejection of invalid source and snapped topology, signed 64-bit tick coordinates and a strict policy/version-bound payload hash. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: validate exact source and canonical simple rings, quantize coordinates once, reject collapse, intersection, touching, backtracking and winding reversal without repair, and preserve source order. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new input API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
     "docs/DISTANCE_PRECISION.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Add an inactive exact whole-path measurement API and shared scalar half-tick predicates. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
-      "source_obligation": "Implement the owner-directed nearest0.001-inch prerequisite: sum rational square roots using independently certified exact dyadic enclosures and a bounded linear whole-bin implication proof, quantize the total once, preserve strict/inclusive midpoint bins and reject unresolved calculations explicitly. Retain historical source/evidence/runtime profiles without migration.",
-      "unchanged_work": "No gameplay activation, geometry input snapping, topology/contact changes, inner history migration or native OS equivalence claim. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
+      "rationale": "Add an inactive exact canonical simple-ring input boundary with typed rejection of invalid source and snapped topology, signed 64-bit tick coordinates and a strict policy/version-bound payload hash. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: validate exact source and canonical simple rings, quantize coordinates once, reject collapse, intersection, touching, backtracking and winding reversal without repair, and preserve source order. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new input API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
-    "docs/performance/current/precision-symbolic-movement.json": {
+    "docs/performance/current/canonical-polygon-movement.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Add an inactive exact whole-path measurement API and shared scalar half-tick predicates. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
-      "source_obligation": "Implement the owner-directed nearest0.001-inch prerequisite: sum rational square roots using independently certified exact dyadic enclosures and a bounded linear whole-bin implication proof, quantize the total once, preserve strict/inclusive midpoint bins and reject unresolved calculations explicitly. Retain historical source/evidence/runtime profiles without migration.",
-      "unchanged_work": "No gameplay activation, geometry input snapping, topology/contact changes, inner history migration or native OS equivalence claim. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
+      "rationale": "Add an inactive exact canonical simple-ring input boundary with typed rejection of invalid source and snapped topology, signed 64-bit tick coordinates and a strict policy/version-bound payload hash. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: validate exact source and canonical simple rings, quantize coordinates once, reject collapse, intersection, touching, backtracking and winding reversal without repair, and preserve source order. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new input API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
-    "docs/performance/current/precision-symbolic-setup.json": {
+    "docs/performance/current/canonical-polygon-setup.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Add an inactive exact whole-path measurement API and shared scalar half-tick predicates. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
-      "source_obligation": "Implement the owner-directed nearest0.001-inch prerequisite: sum rational square roots using independently certified exact dyadic enclosures and a bounded linear whole-bin implication proof, quantize the total once, preserve strict/inclusive midpoint bins and reject unresolved calculations explicitly. Retain historical source/evidence/runtime profiles without migration.",
-      "unchanged_work": "No gameplay activation, geometry input snapping, topology/contact changes, inner history migration or native OS equivalence claim. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
+      "rationale": "Add an inactive exact canonical simple-ring input boundary with typed rejection of invalid source and snapped topology, signed 64-bit tick coordinates and a strict policy/version-bound payload hash. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: validate exact source and canonical simple rings, quantize coordinates once, reject collapse, intersection, touching, backtracking and winding reversal without repair, and preserve source order. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new input API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
-    "docs/performance/current/precision-symbolic-visibility.json": {
+    "docs/performance/current/canonical-polygon-visibility.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Add an inactive exact whole-path measurement API and shared scalar half-tick predicates. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
-      "source_obligation": "Implement the owner-directed nearest0.001-inch prerequisite: sum rational square roots using independently certified exact dyadic enclosures and a bounded linear whole-bin implication proof, quantize the total once, preserve strict/inclusive midpoint bins and reject unresolved calculations explicitly. Retain historical source/evidence/runtime profiles without migration.",
-      "unchanged_work": "No gameplay activation, geometry input snapping, topology/contact changes, inner history migration or native OS equivalence claim. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
+      "rationale": "Add an inactive exact canonical simple-ring input boundary with typed rejection of invalid source and snapped topology, signed 64-bit tick coordinates and a strict policy/version-bound payload hash. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: validate exact source and canonical simple rings, quantize coordinates once, reject collapse, intersection, touching, backtracking and winding reversal without repair, and preserve source order. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new input API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Add an inactive exact whole-path measurement API and shared scalar half-tick predicates. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
-      "source_obligation": "Implement the owner-directed nearest0.001-inch prerequisite: sum rational square roots using independently certified exact dyadic enclosures and a bounded linear whole-bin implication proof, quantize the total once, preserve strict/inclusive midpoint bins and reject unresolved calculations explicitly. Retain historical source/evidence/runtime profiles without migration.",
-      "unchanged_work": "No gameplay activation, geometry input snapping, topology/contact changes, inner history migration or native OS equivalence claim. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
+      "rationale": "Add an inactive exact canonical simple-ring input boundary with typed rejection of invalid source and snapped topology, signed 64-bit tick coordinates and a strict policy/version-bound payload hash. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: validate exact source and canonical simple rings, quantize coordinates once, reject collapse, intersection, touching, backtracking and winding reversal without repair, and preserve source order. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new input API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
     "scripts/build_test_shards.py": {
       "category": "rule_semantics",
@@ -790,9 +794,29 @@
         "ci78-cutover-owners-83cd0803bcde80cbfc805d2a110f3274d501da3bc2230de8cc7f95cc0cbd608f"
       ],
       "selected_families": [],
-      "rationale": "Add an inactive exact whole-path measurement API and shared scalar half-tick predicates. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
-      "source_obligation": "Implement the owner-directed nearest0.001-inch prerequisite: sum rational square roots using independently certified exact dyadic enclosures and a bounded linear whole-bin implication proof, quantize the total once, preserve strict/inclusive midpoint bins and reject unresolved calculations explicitly. Retain historical source/evidence/runtime profiles without migration.",
-      "unchanged_work": "No gameplay activation, geometry input snapping, topology/contact changes, inner history migration or native OS equivalence claim. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
+      "rationale": "Add an inactive exact canonical simple-ring input boundary with typed rejection of invalid source and snapped topology, signed 64-bit tick coordinates and a strict policy/version-bound payload hash. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: validate exact source and canonical simple rings, quantize coordinates once, reject collapse, intersection, touching, backtracking and winding reversal without repair, and preserve source order. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new input API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
+    },
+    "scripts/canonical_polygon_shard_admission.py": {
+      "category": "measured_workload",
+      "operations": [
+        "canonical-polygon-admission"
+      ],
+      "selected_families": [],
+      "rationale": "Add an inactive exact canonical simple-ring input boundary with typed rejection of invalid source and snapped topology, signed 64-bit tick coordinates and a strict policy/version-bound payload hash. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: validate exact source and canonical simple rings, quantize coordinates once, reject collapse, intersection, touching, backtracking and winding reversal without repair, and preserve source order. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new input API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
+    },
+    "scripts/canonical_polygon_test_admission.py": {
+      "category": "measured_workload",
+      "operations": [
+        "canonical-polygon-admission"
+      ],
+      "selected_families": [],
+      "rationale": "Add an inactive exact canonical simple-ring input boundary with typed rejection of invalid source and snapped topology, signed 64-bit tick coordinates and a strict policy/version-bound payload hash. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: validate exact source and canonical simple rings, quantize coordinates once, reject collapse, intersection, touching, backtracking and winding reversal without repair, and preserve source order. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new input API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
     "scripts/current_shard_assignment.py": {
       "category": "measured_workload",
@@ -800,9 +824,9 @@
         "scoped-shard-allocation"
       ],
       "selected_families": [],
-      "rationale": "Add an inactive exact whole-path measurement API and shared scalar half-tick predicates. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
-      "source_obligation": "Implement the owner-directed nearest0.001-inch prerequisite: sum rational square roots using independently certified exact dyadic enclosures and a bounded linear whole-bin implication proof, quantize the total once, preserve strict/inclusive midpoint bins and reject unresolved calculations explicitly. Retain historical source/evidence/runtime profiles without migration.",
-      "unchanged_work": "No gameplay activation, geometry input snapping, topology/contact changes, inner history migration or native OS equivalence claim. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
+      "rationale": "Add an inactive exact canonical simple-ring input boundary with typed rejection of invalid source and snapped topology, signed 64-bit tick coordinates and a strict policy/version-bound payload hash. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: validate exact source and canonical simple rings, quantize coordinates once, reject collapse, intersection, touching, backtracking and winding reversal without repair, and preserve source order. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new input API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
     "scripts/current_shard_compatibility.py": {
       "category": "measured_workload",
@@ -810,9 +834,9 @@
         "scoped-shard-allocation"
       ],
       "selected_families": [],
-      "rationale": "Add an inactive exact whole-path measurement API and shared scalar half-tick predicates. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
-      "source_obligation": "Implement the owner-directed nearest0.001-inch prerequisite: sum rational square roots using independently certified exact dyadic enclosures and a bounded linear whole-bin implication proof, quantize the total once, preserve strict/inclusive midpoint bins and reject unresolved calculations explicitly. Retain historical source/evidence/runtime profiles without migration.",
-      "unchanged_work": "No gameplay activation, geometry input snapping, topology/contact changes, inner history migration or native OS equivalence claim. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
+      "rationale": "Add an inactive exact canonical simple-ring input boundary with typed rejection of invalid source and snapped topology, signed 64-bit tick coordinates and a strict policy/version-bound payload hash. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: validate exact source and canonical simple rings, quantize coordinates once, reject collapse, intersection, touching, backtracking and winding reversal without repair, and preserve source order. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new input API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
     "scripts/fetch_scheduling_sources.py": {
       "category": "measured_workload",
@@ -820,29 +844,9 @@
         "scoped-shard-allocation"
       ],
       "selected_families": [],
-      "rationale": "Add an inactive exact whole-path measurement API and shared scalar half-tick predicates. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
-      "source_obligation": "Implement the owner-directed nearest0.001-inch prerequisite: sum rational square roots using independently certified exact dyadic enclosures and a bounded linear whole-bin implication proof, quantize the total once, preserve strict/inclusive midpoint bins and reject unresolved calculations explicitly. Retain historical source/evidence/runtime profiles without migration.",
-      "unchanged_work": "No gameplay activation, geometry input snapping, topology/contact changes, inner history migration or native OS equivalence claim. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
-    },
-    "scripts/symbolic_milli_inch_shard_admission.py": {
-      "category": "measured_workload",
-      "operations": [
-        "symbolic-milli-inch-admission"
-      ],
-      "selected_families": [],
-      "rationale": "Add an inactive exact whole-path measurement API and shared scalar half-tick predicates. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
-      "source_obligation": "Implement the owner-directed nearest0.001-inch prerequisite: sum rational square roots using independently certified exact dyadic enclosures and a bounded linear whole-bin implication proof, quantize the total once, preserve strict/inclusive midpoint bins and reject unresolved calculations explicitly. Retain historical source/evidence/runtime profiles without migration.",
-      "unchanged_work": "No gameplay activation, geometry input snapping, topology/contact changes, inner history migration or native OS equivalence claim. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
-    },
-    "scripts/symbolic_milli_inch_test_admission.py": {
-      "category": "measured_workload",
-      "operations": [
-        "symbolic-milli-inch-admission"
-      ],
-      "selected_families": [],
-      "rationale": "Add an inactive exact whole-path measurement API and shared scalar half-tick predicates. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
-      "source_obligation": "Implement the owner-directed nearest0.001-inch prerequisite: sum rational square roots using independently certified exact dyadic enclosures and a bounded linear whole-bin implication proof, quantize the total once, preserve strict/inclusive midpoint bins and reject unresolved calculations explicitly. Retain historical source/evidence/runtime profiles without migration.",
-      "unchanged_work": "No gameplay activation, geometry input snapping, topology/contact changes, inner history migration or native OS equivalence claim. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
+      "rationale": "Add an inactive exact canonical simple-ring input boundary with typed rejection of invalid source and snapped topology, signed 64-bit tick coordinates and a strict policy/version-bound payload hash. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: validate exact source and canonical simple rings, quantize coordinates once, reject collapse, intersection, touching, backtracking and winding reversal without repair, and preserve source order. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new input API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
@@ -850,11 +854,11 @@
         "source-record"
       ],
       "selected_families": [],
-      "rationale": "Add an inactive exact whole-path measurement API and shared scalar half-tick predicates. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
-      "source_obligation": "Implement the owner-directed nearest0.001-inch prerequisite: sum rational square roots using independently certified exact dyadic enclosures and a bounded linear whole-bin implication proof, quantize the total once, preserve strict/inclusive midpoint bins and reject unresolved calculations explicitly. Retain historical source/evidence/runtime profiles without migration.",
-      "unchanged_work": "No gameplay activation, geometry input snapping, topology/contact changes, inner history migration or native OS equivalence claim. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
+      "rationale": "Add an inactive exact canonical simple-ring input boundary with typed rejection of invalid source and snapped topology, signed 64-bit tick coordinates and a strict policy/version-bound payload hash. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: validate exact source and canonical simple rings, quantize coordinates once, reject collapse, intersection, touching, backtracking and winding reversal without repair, and preserve source order. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new input API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
-    "src/warhammer40k_core/geometry/milli_inch_symbolic.py": {
+    "src/warhammer40k_core/geometry/milli_inch_polygon.py": {
       "category": "rule_semantics",
       "operations": [
         "geometry-search"
@@ -864,9 +868,19 @@
         "setup",
         "visibility"
       ],
-      "rationale": "Add an inactive exact whole-path measurement API and shared scalar half-tick predicates. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
-      "source_obligation": "Implement the owner-directed nearest0.001-inch prerequisite: sum rational square roots using independently certified exact dyadic enclosures and a bounded linear whole-bin implication proof, quantize the total once, preserve strict/inclusive midpoint bins and reject unresolved calculations explicitly. Retain historical source/evidence/runtime profiles without migration.",
-      "unchanged_work": "No gameplay activation, geometry input snapping, topology/contact changes, inner history migration or native OS equivalence claim. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
+      "rationale": "Add an inactive exact canonical simple-ring input boundary with typed rejection of invalid source and snapped topology, signed 64-bit tick coordinates and a strict policy/version-bound payload hash. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: validate exact source and canonical simple rings, quantize coordinates once, reject collapse, intersection, touching, backtracking and winding reversal without repair, and preserve source order. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new input API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
+    },
+    "tests/code_quality/test_canonical_polygon_shard_admission.py": {
+      "category": "measured_workload",
+      "operations": [
+        "canonical-polygon-admission"
+      ],
+      "selected_families": [],
+      "rationale": "Add an inactive exact canonical simple-ring input boundary with typed rejection of invalid source and snapped topology, signed 64-bit tick coordinates and a strict policy/version-bound payload hash. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: validate exact source and canonical simple rings, quantize coordinates once, reject collapse, intersection, touching, backtracking and winding reversal without repair, and preserve source order. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new input API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
     "tests/code_quality/test_ci_performance_gates.py": {
       "category": "rule_semantics",
@@ -875,19 +889,9 @@
         "milli-inch-test-admission"
       ],
       "selected_families": [],
-      "rationale": "Add an inactive exact whole-path measurement API and shared scalar half-tick predicates. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
-      "source_obligation": "Implement the owner-directed nearest0.001-inch prerequisite: sum rational square roots using independently certified exact dyadic enclosures and a bounded linear whole-bin implication proof, quantize the total once, preserve strict/inclusive midpoint bins and reject unresolved calculations explicitly. Retain historical source/evidence/runtime profiles without migration.",
-      "unchanged_work": "No gameplay activation, geometry input snapping, topology/contact changes, inner history migration or native OS equivalence claim. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
-    },
-    "tests/code_quality/test_precision_profile_shard_admission.py": {
-      "category": "measured_workload",
-      "operations": [
-        "scoped-shard-allocation"
-      ],
-      "selected_families": [],
-      "rationale": "Add an inactive exact whole-path measurement API and shared scalar half-tick predicates. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
-      "source_obligation": "Implement the owner-directed nearest0.001-inch prerequisite: sum rational square roots using independently certified exact dyadic enclosures and a bounded linear whole-bin implication proof, quantize the total once, preserve strict/inclusive midpoint bins and reject unresolved calculations explicitly. Retain historical source/evidence/runtime profiles without migration.",
-      "unchanged_work": "No gameplay activation, geometry input snapping, topology/contact changes, inner history migration or native OS equivalence claim. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
+      "rationale": "Add an inactive exact canonical simple-ring input boundary with typed rejection of invalid source and snapped topology, signed 64-bit tick coordinates and a strict policy/version-bound payload hash. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: validate exact source and canonical simple rings, quantize coordinates once, reject collapse, intersection, touching, backtracking and winding reversal without repair, and preserve source order. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new input API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
     "tests/code_quality/test_symbolic_milli_inch_shard_admission.py": {
       "category": "measured_workload",
@@ -895,26 +899,26 @@
         "symbolic-milli-inch-admission"
       ],
       "selected_families": [],
-      "rationale": "Add an inactive exact whole-path measurement API and shared scalar half-tick predicates. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
-      "source_obligation": "Implement the owner-directed nearest0.001-inch prerequisite: sum rational square roots using independently certified exact dyadic enclosures and a bounded linear whole-bin implication proof, quantize the total once, preserve strict/inclusive midpoint bins and reject unresolved calculations explicitly. Retain historical source/evidence/runtime profiles without migration.",
-      "unchanged_work": "No gameplay activation, geometry input snapping, topology/contact changes, inner history migration or native OS equivalence claim. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
+      "rationale": "Add an inactive exact canonical simple-ring input boundary with typed rejection of invalid source and snapped topology, signed 64-bit tick coordinates and a strict policy/version-bound payload hash. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: validate exact source and canonical simple rings, quantize coordinates once, reject collapse, intersection, touching, backtracking and winding reversal without repair, and preserve source order. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new input API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
-    "tests/rules/section01/test_milli_inch_symbolic.py": {
+    "tests/rules/section01/test_milli_inch_polygon.py": {
       "category": "measured_workload",
       "operations": [
-        "symbolic-milli-inch-regressions"
+        "canonical-polygon-regressions"
       ],
       "selected_families": [],
-      "rationale": "Add an inactive exact whole-path measurement API and shared scalar half-tick predicates. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
-      "source_obligation": "Implement the owner-directed nearest0.001-inch prerequisite: sum rational square roots using independently certified exact dyadic enclosures and a bounded linear whole-bin implication proof, quantize the total once, preserve strict/inclusive midpoint bins and reject unresolved calculations explicitly. Retain historical source/evidence/runtime profiles without migration.",
-      "unchanged_work": "No gameplay activation, geometry input snapping, topology/contact changes, inner history migration or native OS equivalence claim. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
+      "rationale": "Add an inactive exact canonical simple-ring input boundary with typed rejection of invalid source and snapped topology, signed 64-bit tick coordinates and a strict policy/version-bound payload hash. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: validate exact source and canonical simple rings, quantize coordinates once, reject collapse, intersection, touching, backtracking and winding reversal without repair, and preserve source order. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new input API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     }
   },
   "milestone": "ordinary",
   "comparisons": {
-    "visibility": "docs/performance/current/precision-symbolic-visibility.json",
-    "movement": "docs/performance/current/precision-symbolic-movement.json",
-    "setup": "docs/performance/current/precision-symbolic-setup.json"
+    "visibility": "docs/performance/current/canonical-polygon-visibility.json",
+    "movement": "docs/performance/current/canonical-polygon-movement.json",
+    "setup": "docs/performance/current/canonical-polygon-setup.json"
   },
   "full_game": null
 }

@@ -36,6 +36,41 @@ historical explicit reconstruction recipe. The paused Fight evidence remains
 historical and unmodified. Linux remains authoritative; native Windows numerical
 equivalence and project-wide milli-inch rounding are not established by this slice.
 
+## Staged canonical simple-ring input prerequisite
+
+`geometry.milli_inch_polygon.CanonicalPolygon` is an inactive input boundary for
+simple polygon rings without holes. It validates exact rational source coordinates,
+quantizes signed coordinates once to integer milli-inch ticks, then validates the
+canonical ring again. Decimal text and floats keep the source interpretations of
+the arithmetic foundation; millimetres use the exact conversion ratio. The legacy
+epsilon-based polygon implementation and all gameplay consumers remain unchanged.
+
+Both validations reject duplicate vertices (including an explicit closing vertex),
+zero area, adjacent backtracking/overlap and nonadjacent touching/intersection.
+Snapping that collapses an edge, creates invalid topology or reverses winding is
+rejected with a typed error. There is no automatic repair, vertex deletion or
+reordering. Straight collinear continuation remains valid and retains its vertices.
+Predicates use exact arithmetic, with no distance tolerance or geometry backend.
+
+Canonical coordinates must fit signed 64-bit integer ticks; out-of-range inputs
+raise a typed error before a canonical object exists. This explicit representation
+bound keeps every accepted coordinate serializable without changing interpreter
+integer-string limits.
+
+The immutable tick-ring representation has strict payload version
+`milli-inch-simple-ring-v1`, explicitly binds `milli-inch-half-away-v1`, and hashes
+the full canonical payload. Loading rejects missing/extra fields, other versions or
+policies, noninteger coordinates and invalid topology. Payloads are detached from
+caller-owned lists. Ring starting vertex and winding remain significant identity;
+the hash does not claim geometric equivalence between reordered rings.
+
+This API does not admit a new session policy, alter gameplay geometry/cache keys,
+or resolve legal contact placement. Inner session/replay policy identity,
+circle/oval contact representability, rotated primitives/backend and solver
+agreement, geometry/spatial cache integration and coordinated rule consumers are
+still required before activation. Historical payloads and evidence keep their
+original bytes and runtimes. Linux remains authoritative.
+
 ## Staged symbolic measurement prerequisite
 
 `geometry.milli_inch_symbolic` now supplies a separate, inactive exact path

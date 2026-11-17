@@ -35,6 +35,8 @@ def load_assignment(
     history: HistoricalSnapshot,
 ) -> tuple[tuple[tuple[str, ...], ...], dict[str, object]]:
     from scripts.build_test_shards import SERIAL_BEHAVIORAL_CASE
+    from scripts.canonical_polygon_shard_admission import ASSIGNMENT_FILE as POLYGON_ASSIGNMENT_FILE
+    from scripts.canonical_polygon_shard_admission import SCHEMA as POLYGON_SCHEMA
     from scripts.linux_authority_shard_admission import (
         ASSIGNMENT_FILE as AUTHORITY_ASSIGNMENT_FILE,
     )
@@ -50,12 +52,15 @@ def load_assignment(
     )
     from scripts.symbolic_milli_inch_shard_admission import SCHEMA as SYMBOLIC_SCHEMA
 
+    polygon = descriptor["schema"] == POLYGON_SCHEMA
     symbolic = descriptor["schema"] == SYMBOLIC_SCHEMA
     profile = descriptor["schema"] == PROFILE_SCHEMA
     authority = descriptor["schema"] == AUTHORITY_SCHEMA
     milli = descriptor["schema"] == MILLI_SCHEMA
     filename = (
-        SYMBOLIC_ASSIGNMENT_FILE
+        POLYGON_ASSIGNMENT_FILE
+        if polygon
+        else SYMBOLIC_ASSIGNMENT_FILE
         if symbolic
         else PROFILE_ASSIGNMENT_FILE
         if profile
@@ -111,7 +116,17 @@ def load_assignment(
     expected.update(owners)
     selected = Counter(selector for group in groups for selector in group)
     if selected != expected or len(selected) != (
-        512 if symbolic else 511 if profile else 510 if milli else 509 if authority else 508
+        513
+        if polygon
+        else 512
+        if symbolic
+        else 511
+        if profile
+        else 510
+        if milli
+        else 509
+        if authority
+        else 508
     ):
         raise SystemExit("Derived current assignment selector inventory differs.")
     extension = history.scope.extension
