@@ -1,16 +1,16 @@
 {
   "assignment": {
-    "file": "canonical-polygon-derived-assignment.json",
-    "sha256": "424196cf212f37978e4a3169de93c97b64189ee6a34c4c07d4ab039d52e79396"
+    "file": "canonical-circle-derived-assignment.json",
+    "sha256": "9b804fa5215f1f2772f23c3a0cc070df130f6da6534cb0c42dd5c34be58cad05"
   },
   "baseline": {
-    "file": "canonical-polygon-covered-baseline.json",
-    "sha256": "17d821475fc267db4fc182eccc5239a07ae183b098983cf213b3c5a3c2987cc0"
+    "file": "canonical-circle-covered-baseline.json",
+    "sha256": "09a3985d083e74244a651ecfaf79280bed19800cfa21c8a3251f7a737cd4d8e8"
   },
-  "current_runtime_fingerprint": "1741e3c9547f667ce281f6ad970a8c064bfcf1c49d992cff34219e03c8f30c1d",
+  "current_runtime_fingerprint": "9155e14c9c2ebf6932f47fff50f573bb7ee02b6573d76779ae538bedc8f33137",
   "fresh_evidence": {
-    "file": "canonical-polygon-covered-evidence.json",
-    "sha256": "3f0d32e7f12c09b4a7345c04ff3fef83aaacbd7ef075876ad820629db17119be"
+    "file": "canonical-circle-covered-evidence.json",
+    "sha256": "193e2e0b022106c5fd6ff8c5bfe289f48c28c75b3a0a28d2bf309418cf579450"
   },
   "historical_revision": "008be8a8cb0b50b232fe022452762b3906489b49",
   "native_serial_role": {
@@ -22,6 +22,7 @@
     "tests/infrastructure/adapters/unit/test_linux_authority.py": "9d8abade332100121766655881547a6e0bf1813fe416414a022127605b988ec7",
     "tests/infrastructure/adapters/unit/test_numerical_policy.py": "73c17636cf2fb3b2977d0bf050990199095aa4c4597c5c5b03bcf2f2dccf115e",
     "tests/rules/section01/test_milli_inch.py": "6fad7bf3bc123c2f217bb0ae46b96971d8591f1cda712a0d88ba4b1f0f5edb37",
+    "tests/rules/section01/test_milli_inch_circle.py": "108a7edcaff877484ed35ffa21ac685b0b848703b7f65e8ef2fb00a620594194",
     "tests/rules/section01/test_milli_inch_polygon.py": "b36418144aa411b9a39797d191058430d9c8bba3e4e3d5a6dd3ce6f093ea6ee0",
     "tests/rules/section01/test_milli_inch_symbolic.py": "94813e259b6316d4cd87ec10ba976d419a44a3b357f0d8316df1eeade7f2ade4",
     "tests/rules/section03/test_terrain_path_preparation.py": "869ce37ba5d43d7a1c5558c94fceaf33eb81bfff62c2e5f13019551f2c071438",
@@ -35,5 +36,5 @@
     "rounding_seconds": 30,
     "version": "native-serial-current-planning-v2"
   },
-  "schema": "historical-snapshot-canonical-polygon-v1"
+  "schema": "historical-snapshot-canonical-circle-v1"
 }
