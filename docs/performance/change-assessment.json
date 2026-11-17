@@ -94,6 +94,86 @@
         }
       }
     },
+    "contracts/examples/persistence/session-persistence.json": {
+      "before_sha256": "6adaeb93690a4340f7fd132be6192962c019807ad73ba62872e2f45f57f82429",
+      "after_sha256": "31fe888e9d98a69a52fe8c59b301e81ed591b6991614567612c9e4f752a1a64f",
+      "owners": {
+        "@document": {
+          "before": "6adaeb93690a4340f7fd132be6192962c019807ad73ba62872e2f45f57f82429",
+          "after": "31fe888e9d98a69a52fe8c59b301e81ed591b6991614567612c9e4f752a1a64f"
+        }
+      }
+    },
+    "contracts/examples/sessions/session-command-outcome.json": {
+      "before_sha256": "838f020d23ad1322f7205ea17dc7f79304e03d140c1ba9171089d33b513a652f",
+      "after_sha256": "5a667e4ad87f5d7edb65553c6154916217d8dcd6c2c6ab4fd62ba811ec5c290e",
+      "owners": {
+        "@document": {
+          "before": "838f020d23ad1322f7205ea17dc7f79304e03d140c1ba9171089d33b513a652f",
+          "after": "5a667e4ad87f5d7edb65553c6154916217d8dcd6c2c6ab4fd62ba811ec5c290e"
+        }
+      }
+    },
+    "contracts/examples/sessions/session-command-started.json": {
+      "before_sha256": "13216633b130a409ca6758e14882e6748cedcff7cec0bd0515406292ea52f5f1",
+      "after_sha256": "914a1ae7f2a78b9e62243ea5edec42ac7c4f1462613ac8de77be21d4f403ec64",
+      "owners": {
+        "@document": {
+          "before": "13216633b130a409ca6758e14882e6748cedcff7cec0bd0515406292ea52f5f1",
+          "after": "914a1ae7f2a78b9e62243ea5edec42ac7c4f1462613ac8de77be21d4f403ec64"
+        }
+      }
+    },
+    "contracts/examples/sessions/session-metadata-created.json": {
+      "before_sha256": "d9557ad46801e3e16cd9deeb9e6539269946b678e5ffd320f92bdcf0b4d733a3",
+      "after_sha256": "9ee70d2a67f7496cd89eef71a5e3c0e0a457e77732310177cc8e0995da49aed8",
+      "owners": {
+        "@document": {
+          "before": "d9557ad46801e3e16cd9deeb9e6539269946b678e5ffd320f92bdcf0b4d733a3",
+          "after": "9ee70d2a67f7496cd89eef71a5e3c0e0a457e77732310177cc8e0995da49aed8"
+        }
+      }
+    },
+    "contracts/examples/support-profile-player-a-redacted.json": {
+      "before_sha256": "8804f18034ee0efe6aee81e5620207a72a04b2d96f8b68cabe5dafd72b5c010d",
+      "after_sha256": "f1d01bf543337b7a051b6b8d91b3c64161d70d188f8c022fb7e681c43d55fb71",
+      "owners": {
+        "@document": {
+          "before": "8804f18034ee0efe6aee81e5620207a72a04b2d96f8b68cabe5dafd72b5c010d",
+          "after": "f1d01bf543337b7a051b6b8d91b3c64161d70d188f8c022fb7e681c43d55fb71"
+        }
+      }
+    },
+    "contracts/examples/support-profile-player-b-redacted.json": {
+      "before_sha256": "e99693c530d342bf431d3c1c82a7b9ef3c54a2855e0a8a7a26b5ae7762563663",
+      "after_sha256": "1d12f7916596142f326a2a0e3b06c5fcc28a6b83b754f552a3d1ef6363299bcb",
+      "owners": {
+        "@document": {
+          "before": "e99693c530d342bf431d3c1c82a7b9ef3c54a2855e0a8a7a26b5ae7762563663",
+          "after": "1d12f7916596142f326a2a0e3b06c5fcc28a6b83b754f552a3d1ef6363299bcb"
+        }
+      }
+    },
+    "contracts/examples/support-profile.json": {
+      "before_sha256": "17b26b13d650870677d4915fa95f08296dec4ee7a1c1578d8ac9ee09b327cf90",
+      "after_sha256": "56e806e0955d3fbcf59687ce014a903f15625352ac32888786f14a15a820b2b9",
+      "owners": {
+        "@document": {
+          "before": "17b26b13d650870677d4915fa95f08296dec4ee7a1c1578d8ac9ee09b327cf90",
+          "after": "56e806e0955d3fbcf59687ce014a903f15625352ac32888786f14a15a820b2b9"
+        }
+      }
+    },
+    "contracts/manifest.json": {
+      "before_sha256": "0e0dceb7619a41173bbd1e201beb8d6803010bb59602cf1bb6bf6ea92fef561f",
+      "after_sha256": "01c32e3259eab3b41e3000a1a5db160a94ccc5e97b28264e1c4de9ab052d62f1",
+      "owners": {
+        "@document": {
+          "before": "0e0dceb7619a41173bbd1e201beb8d6803010bb59602cf1bb6bf6ea92fef561f",
+          "after": "01c32e3259eab3b41e3000a1a5db160a94ccc5e97b28264e1c4de9ab052d62f1"
+        }
+      }
+    },
     "data/source_audits/ci64_provenance_v1/symbolic-milli-inch-test-transition-v1.json": {
       "before_sha256": null,
       "after_sha256": "23943a7fb56ba7b6e3da0888667d15959b4b1ae4e2148be0b6e6ab3d1aeeb9cb",
@@ -565,6 +645,86 @@
       "rationale": "Add an inactive exact whole-path measurement API and shared scalar half-tick predicates. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
       "source_obligation": "Implement the owner-directed nearest0.001-inch prerequisite: sum rational square roots using independently certified exact dyadic enclosures and a bounded linear whole-bin implication proof, quantize the total once, preserve strict/inclusive midpoint bins and reject unresolved calculations explicitly. Retain historical source/evidence/runtime profiles without migration.",
       "unchanged_work": "No gameplay activation, geometry input snapping, topology/contact changes, inner history migration or native OS equivalence claim. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
+    },
+    "contracts/examples/persistence/session-persistence.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate current synthetic contract examples with the existing generator so their advertised engine build and dependent commitments match the new packaged runtime; refresh their manifest hashes.",
+      "source_obligation": "Current generated session, persistence and support-profile examples must publish the verified current engine identity. This is generation of current examples, not migration or relabeling of archived user saves or replay evidence.",
+      "unchanged_work": "The generator, schemas, complete measured runtime/test/tool inputs, runtime algorithms and historical artifacts are unchanged. No new numerical policy, gameplay consumer, public shape, source recipe or native OS equivalence is admitted."
+    },
+    "contracts/examples/sessions/session-command-outcome.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate current synthetic contract examples with the existing generator so their advertised engine build and dependent commitments match the new packaged runtime; refresh their manifest hashes.",
+      "source_obligation": "Current generated session, persistence and support-profile examples must publish the verified current engine identity. This is generation of current examples, not migration or relabeling of archived user saves or replay evidence.",
+      "unchanged_work": "The generator, schemas, complete measured runtime/test/tool inputs, runtime algorithms and historical artifacts are unchanged. No new numerical policy, gameplay consumer, public shape, source recipe or native OS equivalence is admitted."
+    },
+    "contracts/examples/sessions/session-command-started.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate current synthetic contract examples with the existing generator so their advertised engine build and dependent commitments match the new packaged runtime; refresh their manifest hashes.",
+      "source_obligation": "Current generated session, persistence and support-profile examples must publish the verified current engine identity. This is generation of current examples, not migration or relabeling of archived user saves or replay evidence.",
+      "unchanged_work": "The generator, schemas, complete measured runtime/test/tool inputs, runtime algorithms and historical artifacts are unchanged. No new numerical policy, gameplay consumer, public shape, source recipe or native OS equivalence is admitted."
+    },
+    "contracts/examples/sessions/session-metadata-created.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate current synthetic contract examples with the existing generator so their advertised engine build and dependent commitments match the new packaged runtime; refresh their manifest hashes.",
+      "source_obligation": "Current generated session, persistence and support-profile examples must publish the verified current engine identity. This is generation of current examples, not migration or relabeling of archived user saves or replay evidence.",
+      "unchanged_work": "The generator, schemas, complete measured runtime/test/tool inputs, runtime algorithms and historical artifacts are unchanged. No new numerical policy, gameplay consumer, public shape, source recipe or native OS equivalence is admitted."
+    },
+    "contracts/examples/support-profile-player-a-redacted.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate current synthetic contract examples with the existing generator so their advertised engine build and dependent commitments match the new packaged runtime; refresh their manifest hashes.",
+      "source_obligation": "Current generated session, persistence and support-profile examples must publish the verified current engine identity. This is generation of current examples, not migration or relabeling of archived user saves or replay evidence.",
+      "unchanged_work": "The generator, schemas, complete measured runtime/test/tool inputs, runtime algorithms and historical artifacts are unchanged. No new numerical policy, gameplay consumer, public shape, source recipe or native OS equivalence is admitted."
+    },
+    "contracts/examples/support-profile-player-b-redacted.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate current synthetic contract examples with the existing generator so their advertised engine build and dependent commitments match the new packaged runtime; refresh their manifest hashes.",
+      "source_obligation": "Current generated session, persistence and support-profile examples must publish the verified current engine identity. This is generation of current examples, not migration or relabeling of archived user saves or replay evidence.",
+      "unchanged_work": "The generator, schemas, complete measured runtime/test/tool inputs, runtime algorithms and historical artifacts are unchanged. No new numerical policy, gameplay consumer, public shape, source recipe or native OS equivalence is admitted."
+    },
+    "contracts/examples/support-profile.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate current synthetic contract examples with the existing generator so their advertised engine build and dependent commitments match the new packaged runtime; refresh their manifest hashes.",
+      "source_obligation": "Current generated session, persistence and support-profile examples must publish the verified current engine identity. This is generation of current examples, not migration or relabeling of archived user saves or replay evidence.",
+      "unchanged_work": "The generator, schemas, complete measured runtime/test/tool inputs, runtime algorithms and historical artifacts are unchanged. No new numerical policy, gameplay consumer, public shape, source recipe or native OS equivalence is admitted."
+    },
+    "contracts/manifest.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate current synthetic contract examples with the existing generator so their advertised engine build and dependent commitments match the new packaged runtime; refresh their manifest hashes.",
+      "source_obligation": "Current generated session, persistence and support-profile examples must publish the verified current engine identity. This is generation of current examples, not migration or relabeling of archived user saves or replay evidence.",
+      "unchanged_work": "The generator, schemas, complete measured runtime/test/tool inputs, runtime algorithms and historical artifacts are unchanged. No new numerical policy, gameplay consumer, public shape, source recipe or native OS equivalence is admitted."
     },
     "data/source_audits/ci64_provenance_v1/symbolic-milli-inch-test-transition-v1.json": {
       "category": "rule_semantics",
