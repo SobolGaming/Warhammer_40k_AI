@@ -105,6 +105,31 @@ agreement, geometry/spatial cache integration and coordinated rule consumers are
 still required before activation. Historical payloads and evidence keep their
 original bytes and runtimes. Linux remains authoritative.
 
+## Staged canonical polygon point queries
+
+`geometry.milli_inch_polygon_queries` adds inactive exact queries against the
+closed, filled `CanonicalPolygon` representation. `polygon_point_location`
+distinguishes exterior, boundary and interior using exact integer sidedness and
+half-open ray crossings, including concave rings and horizontal edges. Query
+points must already be immutable signed 64-bit integer tick pairs; malformed or
+out-of-range points raise `CanonicalPolygonError` without implicit snapping.
+
+`polygon_point_distance_ticks` returns zero for interior or boundary points. For
+exterior points it selects the minimum exact rational squared distance to the
+closed ring segments, then rounds that derived length once through the shared
+squared-length arithmetic. Projection parameters, projected points and individual
+edge lengths are never quantized. Irrational distances use exact squared midpoint
+comparisons, without a float square root, epsilon or geometry backend. Derived
+lengths may exceed the signed coordinate bound. Exterior points can also have a
+rounded zero distance, so the measurement never establishes contact or containment.
+
+These functions leave canonical polygon payloads and hashes unchanged and have no
+gameplay callers. Polygon-to-polygon relations, other primitive pairs, off-grid
+contact placement, rotation/backend/solver agreement, inner identity and caches,
+and coordinated rules remain activation prerequisites. The legacy-only session
+policy, Linux authority, historical replay evidence and paused Fight experiment
+retain their existing semantics and bytes.
+
 ## Staged symbolic measurement prerequisite
 
 `geometry.milli_inch_symbolic` now supplies a separate, inactive exact path

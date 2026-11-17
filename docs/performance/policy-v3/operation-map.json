@@ -35894,7 +35894,8 @@
         "tests/code_quality/test_precision_profile_shard_admission.py",
         "ci/test_shards/precision-profile-covered-baseline.json",
         "ci/test_shards/precision-profile-covered-evidence.json",
-        "ci/test_shards/precision-profile-derived-assignment.json"
+        "ci/test_shards/precision-profile-derived-assignment.json",
+        "tests/code_quality/test_complete_covered_reporting.py"
       ],
       "owners": [
         "*"
@@ -36189,6 +36190,34 @@
     "canonical-circle-regressions": {
       "paths": [
         "tests/rules/section01/test_milli_inch_circle.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "canonical-polygon-queries-admission": {
+      "paths": [
+        "scripts/canonical_polygon_queries_test_admission.py",
+        "scripts/canonical_polygon_queries_shard_admission.py",
+        "tests/code_quality/test_canonical_polygon_queries_shard_admission.py",
+        "ci/test_shards/canonical-polygon-queries-covered-baseline.json",
+        "ci/test_shards/canonical-polygon-queries-covered-evidence.json",
+        "ci/test_shards/canonical-polygon-queries-derived-assignment.json",
+        "data/source_audits/ci64_provenance_v1/canonical-polygon-queries-test-transition-v1.json"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "canonical-polygon-queries-regressions": {
+      "paths": [
+        "tests/rules/section01/test_milli_inch_polygon_queries.py"
       ],
       "owners": [
         "*"

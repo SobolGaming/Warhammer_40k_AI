@@ -124,6 +124,9 @@ NEW_NODES |= frozenset(
 
 def enabled(directory: Path, summary: dict[str, object] | None = None) -> bool:
     from scripts.canonical_circle_shard_admission import BASELINE_FILE as CIRCLE_BASELINE_FILE
+    from scripts.canonical_polygon_queries_shard_admission import (
+        BASELINE_FILE as QUERIES_BASELINE_FILE,
+    )
     from scripts.canonical_polygon_shard_admission import BASELINE_FILE as POLYGON_BASELINE_FILE
     from scripts.linux_authority_shard_admission import BASELINE_FILE as AUTHORITY_BASELINE_FILE
     from scripts.milli_inch_shard_admission import BASELINE_FILE as MILLI_BASELINE_FILE
@@ -139,6 +142,7 @@ def enabled(directory: Path, summary: dict[str, object] | None = None) -> bool:
         or (directory / SYMBOLIC_BASELINE_FILE).is_file()
         or (directory / POLYGON_BASELINE_FILE).is_file()
         or (directory / CIRCLE_BASELINE_FILE).is_file()
+        or (directory / QUERIES_BASELINE_FILE).is_file()
         or (
             summary is not None
             and (
@@ -159,6 +163,12 @@ def _baseline(
     from scripts.canonical_circle_shard_admission import NODES as CIRCLE_NODES
     from scripts.canonical_circle_shard_admission import OWNER as CIRCLE_OWNER
     from scripts.canonical_circle_shard_admission import SCHEMA as CIRCLE_SCHEMA
+    from scripts.canonical_polygon_queries_shard_admission import (
+        BASELINE_FILE as QUERIES_BASELINE_FILE,
+    )
+    from scripts.canonical_polygon_queries_shard_admission import NODES as QUERIES_NODES
+    from scripts.canonical_polygon_queries_shard_admission import OWNER as QUERIES_OWNER
+    from scripts.canonical_polygon_queries_shard_admission import SCHEMA as QUERIES_SCHEMA
     from scripts.canonical_polygon_shard_admission import BASELINE_FILE as POLYGON_BASELINE_FILE
     from scripts.canonical_polygon_shard_admission import NODES as POLYGON_NODES
     from scripts.canonical_polygon_shard_admission import OWNER as POLYGON_OWNER
@@ -191,14 +201,21 @@ def _baseline(
     from scripts.symbolic_milli_inch_shard_admission import OWNER as SYMBOLIC_OWNER
     from scripts.symbolic_milli_inch_shard_admission import SCHEMA as SYMBOLIC_SCHEMA
 
-    circle = descriptor["schema"] == CIRCLE_SCHEMA
-    polygon = descriptor["schema"] in {POLYGON_SCHEMA, CIRCLE_SCHEMA}
-    symbolic = descriptor["schema"] in {SYMBOLIC_SCHEMA, POLYGON_SCHEMA, CIRCLE_SCHEMA}
+    queries = descriptor["schema"] == QUERIES_SCHEMA
+    circle = descriptor["schema"] in {CIRCLE_SCHEMA, QUERIES_SCHEMA}
+    polygon = descriptor["schema"] in {POLYGON_SCHEMA, CIRCLE_SCHEMA, QUERIES_SCHEMA}
+    symbolic = descriptor["schema"] in {
+        SYMBOLIC_SCHEMA,
+        POLYGON_SCHEMA,
+        CIRCLE_SCHEMA,
+        QUERIES_SCHEMA,
+    }
     profile = descriptor["schema"] in {
         PROFILE_SCHEMA,
         SYMBOLIC_SCHEMA,
         POLYGON_SCHEMA,
         CIRCLE_SCHEMA,
+        QUERIES_SCHEMA,
     }
     milli = descriptor["schema"] in {
         MILLI_SCHEMA,
@@ -206,6 +223,7 @@ def _baseline(
         SYMBOLIC_SCHEMA,
         POLYGON_SCHEMA,
         CIRCLE_SCHEMA,
+        QUERIES_SCHEMA,
     }
     authority = descriptor["schema"] in {
         AUTHORITY_SCHEMA,
@@ -214,9 +232,12 @@ def _baseline(
         SYMBOLIC_SCHEMA,
         POLYGON_SCHEMA,
         CIRCLE_SCHEMA,
+        QUERIES_SCHEMA,
     }
     filename = (
-        CIRCLE_BASELINE_FILE
+        QUERIES_BASELINE_FILE
+        if queries
+        else CIRCLE_BASELINE_FILE
         if circle
         else POLYGON_BASELINE_FILE
         if polygon
@@ -304,6 +325,9 @@ def _baseline(
     if circle:
         expected_additions |= CIRCLE_NODES
         expected_owners.add(CIRCLE_OWNER)
+    if queries:
+        expected_additions |= QUERIES_NODES
+        expected_owners.add(QUERIES_OWNER)
     if polygon:
         expected_additions |= POLYGON_NODES
         expected_owners.add(POLYGON_OWNER)
@@ -423,6 +447,7 @@ class Plan:
 def plan(root: Path, directory: Path, cases: dict[str, float]) -> Plan:
     from scripts.boolean_los_admission import SCHEMA as BOOLEAN_SCHEMA
     from scripts.canonical_circle_shard_admission import SCHEMA as CIRCLE_SCHEMA
+    from scripts.canonical_polygon_queries_shard_admission import SCHEMA as QUERIES_SCHEMA
     from scripts.canonical_polygon_shard_admission import SCHEMA as POLYGON_SCHEMA
     from scripts.extended_shard_allocation import partial_projection
     from scripts.linux_authority_shard_admission import SCHEMA as AUTHORITY_SCHEMA
@@ -437,6 +462,7 @@ def plan(root: Path, directory: Path, cases: dict[str, float]) -> Plan:
     profile = isinstance(declared, dict) and declared.get("schema") == PROFILE_SCHEMA
     symbolic = isinstance(declared, dict) and declared.get("schema") == SYMBOLIC_SCHEMA
     circle = isinstance(declared, dict) and declared.get("schema") == CIRCLE_SCHEMA
+    queries = isinstance(declared, dict) and declared.get("schema") == QUERIES_SCHEMA
     polygon = isinstance(declared, dict) and declared.get("schema") == POLYGON_SCHEMA
 
     descriptor = _object(
@@ -453,7 +479,7 @@ def plan(root: Path, directory: Path, cases: dict[str, float]) -> Plan:
         }
         | (
             {"fresh_evidence"}
-            if fresh or authority or milli or profile or symbolic or polygon or circle
+            if fresh or authority or milli or profile or symbolic or polygon or circle or queries
             else set()
         ),
         "runtime compatibility",
@@ -471,6 +497,7 @@ def plan(root: Path, directory: Path, cases: dict[str, float]) -> Plan:
             SYMBOLIC_SCHEMA,
             POLYGON_SCHEMA,
             CIRCLE_SCHEMA,
+            QUERIES_SCHEMA,
         }
         or descriptor["historical_revision"] != HISTORICAL_REVISION
     ):
@@ -489,7 +516,17 @@ def plan(root: Path, directory: Path, cases: dict[str, float]) -> Plan:
         expected_native = frozenset(
             node for node in NEW_NODES if node.startswith(NATIVE_PREFIX_OWNER + "::")
         )
-        if circle:
+        if queries:
+            from scripts.canonical_polygon_queries_shard_admission import (
+                current_native_role as queries_role,
+            )
+            from scripts.current_native_serial_role import NativeSerialRole
+
+            seconds, native_metadata = queries_role(
+                root, directory, descriptor, data, expected_native
+            )
+            native_role = NativeSerialRole(None, seconds, native_metadata)
+        elif circle:
             from scripts.canonical_circle_shard_admission import (
                 current_native_role as circle_role,
             )
@@ -603,6 +640,12 @@ def plan(root: Path, directory: Path, cases: dict[str, float]) -> Plan:
         from scripts.current_shard_assignment import load_assignment, require_planning_limits
 
         groups, assignment = load_assignment(directory, descriptor, history)
+        if queries:
+            from scripts.canonical_polygon_queries_shard_admission import (
+                require_frozen_assignment as require_queries_assignment,
+            )
+
+            require_queries_assignment(root, groups)
         if circle:
             from scripts.canonical_circle_shard_admission import (
                 require_frozen_assignment as require_circle_assignment,

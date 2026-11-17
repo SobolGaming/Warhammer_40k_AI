@@ -72,6 +72,20 @@ def _stage(
     return status
 
 
+def coverage_report_command(output: Path) -> list[str]:
+    """Generate complete JSON and enforce the unchanged floor in one analysis."""
+    return [
+        sys.executable,
+        "-B",
+        "-m",
+        "coverage",
+        "json",
+        "--fail-under=67",
+        "-o",
+        str(output / "coverage.json"),
+    ]
+
+
 def run_worker(output: Path) -> int:
     from tools.ability_support_sources import ability_support_index_inputs
 
@@ -197,13 +211,15 @@ def run_worker(output: Path) -> int:
                 "32",
                 "--junitxml=" + str(output / "parallel.xml"),
             ],
-            [*python, "-m", "coverage", "json", "-o", str(output / "coverage.json")],
-            [*python, "-m", "coverage", "report", "--fail-under=67"],
+            coverage_report_command(output),
         ],
         output=output,
         environment=parallel_environment,
         stages=stages,
     )
+    if status == 0:
+        totals = json.loads((output / "coverage.json").read_bytes())["totals"]
+        print(json.dumps({"coverage_totals": totals}), flush=True)
     post = _source()
     post["inputs_unchanged"] = (
         post["head"] == pre["head"]
