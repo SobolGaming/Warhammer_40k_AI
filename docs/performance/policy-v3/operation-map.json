@@ -35894,7 +35894,8 @@
         "tests/code_quality/test_precision_profile_shard_admission.py",
         "ci/test_shards/precision-profile-covered-baseline.json",
         "ci/test_shards/precision-profile-covered-evidence.json",
-        "ci/test_shards/precision-profile-derived-assignment.json"
+        "ci/test_shards/precision-profile-derived-assignment.json",
+        "tests/code_quality/test_complete_covered_reporting.py"
       ],
       "owners": [
         "*"
