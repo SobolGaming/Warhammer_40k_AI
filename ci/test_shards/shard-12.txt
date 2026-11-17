@@ -42,6 +42,7 @@ tests/rules/section01/test_coverage_map.py
 tests/rules/section01/test_milli_inch.py
 tests/rules/section01/test_milli_inch_circle.py
 tests/rules/section01/test_milli_inch_polygon.py
+tests/rules/section01/test_milli_inch_polygon_queries.py
 tests/rules/section01/test_milli_inch_symbolic.py
 tests/rules/section02/test_02_02_03_attack_generation.py
 tests/rules/section02/test_02_02_03_damage_timing.py

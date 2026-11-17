@@ -1,637 +1,615 @@
 {
-  "base": "20fe1ac0150a46ef5bedad6d42d8dd55f0c8e989",
+  "policy": "rules-engine-performance-v3",
+  "base": "b7ca731c69ee702de1a726f661cc404177827835",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:5ae984fe33c70e708ed920a2e06b228edbe9e042e79c322bdd9c84b196313d86",
+  "operation_map_sha256": "70ff3c3ac6c78f73be0634c2df027ee1bef965daf1808ce03a821a48987b50e7",
   "changes": {
     "ci/quality_shards/all.txt": {
-      "after_sha256": "c945772b532535857ce8583c545fdf1aac5543bcfce6dd7d4eae6a09576509e4",
-      "before_sha256": "23b58aad4c025dc89cea901db3fa62f4fa12102957e111e9548877a6da8bf6bd",
+      "before_sha256": "c945772b532535857ce8583c545fdf1aac5543bcfce6dd7d4eae6a09576509e4",
+      "after_sha256": "815d064559767b9447b1c0f9bd257697255b83ac76a36dcfaab4cb865f5e461a",
       "owners": {
         "@document": {
-          "after": "c945772b532535857ce8583c545fdf1aac5543bcfce6dd7d4eae6a09576509e4",
-          "before": "23b58aad4c025dc89cea901db3fa62f4fa12102957e111e9548877a6da8bf6bd"
+          "before": "c945772b532535857ce8583c545fdf1aac5543bcfce6dd7d4eae6a09576509e4",
+          "after": "815d064559767b9447b1c0f9bd257697255b83ac76a36dcfaab4cb865f5e461a"
         }
       }
     },
-    "ci/quality_shards/shard-3-modules.txt": {
-      "after_sha256": "5e075d370a39abbde3bd29920fdee2a17922afe40a1044f579c2d7b79a6e41da",
-      "before_sha256": "1fc38bf2a9001eac4d79624aeb186c930e559238f2392d198d615dcbe87883d4",
+    "ci/quality_shards/shard-4-modules.txt": {
+      "before_sha256": "616ecd789568a5cfd95aed25ed1da6117d66616e9b4eb197ec562ba27939c6ce",
+      "after_sha256": "f0e489094717a118bd4614736fc914b3337957bd45b548f2e31f7aef9f568a4d",
       "owners": {
         "@document": {
-          "after": "5e075d370a39abbde3bd29920fdee2a17922afe40a1044f579c2d7b79a6e41da",
-          "before": "1fc38bf2a9001eac4d79624aeb186c930e559238f2392d198d615dcbe87883d4"
+          "before": "616ecd789568a5cfd95aed25ed1da6117d66616e9b4eb197ec562ba27939c6ce",
+          "after": "f0e489094717a118bd4614736fc914b3337957bd45b548f2e31f7aef9f568a4d"
         }
       }
     },
-    "ci/quality_shards/shard-3.txt": {
-      "after_sha256": "6eec81184eebd01e83485ea03c698e18482ba53f843ebde069f72ecc8e77132f",
-      "before_sha256": "04b8e3b8bd0aaa4a2a40e32e14eb7f593ac8969b8f67dfee3085392c8370d376",
+    "ci/quality_shards/shard-4.txt": {
+      "before_sha256": "54d54ae75dae383e03efb755f8ffd73a9c7b34a962c32025db950d216491ad40",
+      "after_sha256": "ec26ea7700959e0cc94ce3606c1c0a0aa7e44d20bafdcc59328525b23c19a2ee",
       "owners": {
         "@document": {
-          "after": "6eec81184eebd01e83485ea03c698e18482ba53f843ebde069f72ecc8e77132f",
-          "before": "04b8e3b8bd0aaa4a2a40e32e14eb7f593ac8969b8f67dfee3085392c8370d376"
+          "before": "54d54ae75dae383e03efb755f8ffd73a9c7b34a962c32025db950d216491ad40",
+          "after": "ec26ea7700959e0cc94ce3606c1c0a0aa7e44d20bafdcc59328525b23c19a2ee"
         }
       }
     },
-    "ci/test_shards/canonical-circle-covered-baseline.json": {
-      "after_sha256": "09a3985d083e74244a651ecfaf79280bed19800cfa21c8a3251f7a737cd4d8e8",
+    "ci/test_shards/canonical-polygon-queries-covered-baseline.json": {
       "before_sha256": null,
+      "after_sha256": "cc0428da858d8a0181d5f18b4b3ac3d6fe3f74e7bd47ec8181ff23f7f59e1ec5",
       "owners": {
         "@document": {
-          "after": "09a3985d083e74244a651ecfaf79280bed19800cfa21c8a3251f7a737cd4d8e8",
-          "before": null
+          "before": null,
+          "after": "cc0428da858d8a0181d5f18b4b3ac3d6fe3f74e7bd47ec8181ff23f7f59e1ec5"
         }
       }
     },
-    "ci/test_shards/canonical-circle-covered-evidence.json": {
-      "after_sha256": "193e2e0b022106c5fd6ff8c5bfe289f48c28c75b3a0a28d2bf309418cf579450",
+    "ci/test_shards/canonical-polygon-queries-covered-evidence.json": {
       "before_sha256": null,
+      "after_sha256": "a1c69058c3eda1914e7a621064f0589742a6f803f5d4a3afea11794523acba37",
       "owners": {
         "@document": {
-          "after": "193e2e0b022106c5fd6ff8c5bfe289f48c28c75b3a0a28d2bf309418cf579450",
-          "before": null
+          "before": null,
+          "after": "a1c69058c3eda1914e7a621064f0589742a6f803f5d4a3afea11794523acba37"
         }
       }
     },
-    "ci/test_shards/canonical-circle-derived-assignment.json": {
-      "after_sha256": "9b804fa5215f1f2772f23c3a0cc070df130f6da6534cb0c42dd5c34be58cad05",
+    "ci/test_shards/canonical-polygon-queries-derived-assignment.json": {
       "before_sha256": null,
+      "after_sha256": "ccfc8df486b11007ef66d72f7d6d8091d104173cfb70a13748bd9ea112ad875c",
       "owners": {
         "@document": {
-          "after": "9b804fa5215f1f2772f23c3a0cc070df130f6da6534cb0c42dd5c34be58cad05",
-          "before": null
+          "before": null,
+          "after": "ccfc8df486b11007ef66d72f7d6d8091d104173cfb70a13748bd9ea112ad875c"
         }
       }
     },
     "ci/test_shards/current-runtime-compatibility.json": {
-      "after_sha256": "6b191e13b15c8870fdd493a61c8e01987bd01190412cfee462162de41ffffa3c",
-      "before_sha256": "a9819805dac5d927ac45fe5fff8fd6d30030cbe6b458bf88b95a2a1ce040646a",
+      "before_sha256": "6b191e13b15c8870fdd493a61c8e01987bd01190412cfee462162de41ffffa3c",
+      "after_sha256": "cff41068bd488e06a77dfe131034cae5d8fd2840b6c7cf8851747b1d331d8906",
       "owners": {
         "@document": {
-          "after": "6b191e13b15c8870fdd493a61c8e01987bd01190412cfee462162de41ffffa3c",
-          "before": "a9819805dac5d927ac45fe5fff8fd6d30030cbe6b458bf88b95a2a1ce040646a"
+          "before": "6b191e13b15c8870fdd493a61c8e01987bd01190412cfee462162de41ffffa3c",
+          "after": "cff41068bd488e06a77dfe131034cae5d8fd2840b6c7cf8851747b1d331d8906"
         }
       }
     },
     "ci/test_shards/durations.json": {
-      "after_sha256": "7ae5f0b0fd360f9ab4a9c27f56f4744db2d69baaf3f55446a67f39cdf31c1ef2",
-      "before_sha256": "1ab2fbb0d5994734afd9ed4029cf292777433ba6e99cc92ac4013ca8ef04cf1b",
+      "before_sha256": "7ae5f0b0fd360f9ab4a9c27f56f4744db2d69baaf3f55446a67f39cdf31c1ef2",
+      "after_sha256": "0298e4d9add56fd190cbe421282ec72d5c9f9c6cbe4ff06523faa1489ebd1e71",
       "owners": {
         "@document": {
-          "after": "7ae5f0b0fd360f9ab4a9c27f56f4744db2d69baaf3f55446a67f39cdf31c1ef2",
-          "before": "1ab2fbb0d5994734afd9ed4029cf292777433ba6e99cc92ac4013ca8ef04cf1b"
+          "before": "7ae5f0b0fd360f9ab4a9c27f56f4744db2d69baaf3f55446a67f39cdf31c1ef2",
+          "after": "0298e4d9add56fd190cbe421282ec72d5c9f9c6cbe4ff06523faa1489ebd1e71"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
-      "after_sha256": "5e44f138dcf9ec7f0f1c2337cab2955fae3f86559b24fe714f66ed13c2f4a597",
-      "before_sha256": "551f00f6ec3e5a8b420a56b2e5e17bf5882565f5ce6464f0d1995074879498cb",
+      "before_sha256": "5e44f138dcf9ec7f0f1c2337cab2955fae3f86559b24fe714f66ed13c2f4a597",
+      "after_sha256": "ba0af313719726213657f6c22e31387191acc0447031c45f89621a86e45c5868",
       "owners": {
         "@document": {
-          "after": "5e44f138dcf9ec7f0f1c2337cab2955fae3f86559b24fe714f66ed13c2f4a597",
-          "before": "551f00f6ec3e5a8b420a56b2e5e17bf5882565f5ce6464f0d1995074879498cb"
+          "before": "5e44f138dcf9ec7f0f1c2337cab2955fae3f86559b24fe714f66ed13c2f4a597",
+          "after": "ba0af313719726213657f6c22e31387191acc0447031c45f89621a86e45c5868"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "after_sha256": "2f1317abca8a94d919d330485067cac929599b2f6ab279683ce0872edc0433bf",
-      "before_sha256": "1989c260963604a32afe6591d898dae4bf748598b6d9fa2e08112cec1381c1b1",
+      "before_sha256": "2f1317abca8a94d919d330485067cac929599b2f6ab279683ce0872edc0433bf",
+      "after_sha256": "907db663da87f2b777ea6cdf461c197cc08948317449e55dd34fd09d586dd941",
       "owners": {
         "@document": {
-          "after": "2f1317abca8a94d919d330485067cac929599b2f6ab279683ce0872edc0433bf",
-          "before": "1989c260963604a32afe6591d898dae4bf748598b6d9fa2e08112cec1381c1b1"
+          "before": "2f1317abca8a94d919d330485067cac929599b2f6ab279683ce0872edc0433bf",
+          "after": "907db663da87f2b777ea6cdf461c197cc08948317449e55dd34fd09d586dd941"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "after_sha256": "38651ebeb077d409e0c1837b6cf1b36974e3631083b320d1e824af658ca1a152",
-      "before_sha256": "ca0859d6646229afae4930f21c682cad13f3f5233f5ece3b62a12c424255c2a8",
+      "before_sha256": "38651ebeb077d409e0c1837b6cf1b36974e3631083b320d1e824af658ca1a152",
+      "after_sha256": "6d889c41418e38a8184900bc4d28cf18a3bad9bb56c7fad643cbe56eea5f9a8e",
       "owners": {
         "@document": {
-          "after": "38651ebeb077d409e0c1837b6cf1b36974e3631083b320d1e824af658ca1a152",
-          "before": "ca0859d6646229afae4930f21c682cad13f3f5233f5ece3b62a12c424255c2a8"
+          "before": "38651ebeb077d409e0c1837b6cf1b36974e3631083b320d1e824af658ca1a152",
+          "after": "6d889c41418e38a8184900bc4d28cf18a3bad9bb56c7fad643cbe56eea5f9a8e"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "after_sha256": "d25d2214093e4ede6c5d8d162ad887027defc07802131aa6bd649ab48687532f",
-      "before_sha256": "2cce1ee808156d87a1f12b2da1eba15410b9089acfa3c6bce2262f86681f13f0",
+      "before_sha256": "d25d2214093e4ede6c5d8d162ad887027defc07802131aa6bd649ab48687532f",
+      "after_sha256": "8c32e50ab2a94d28f988a28bca312c3cbb6a41a003ee5e6e04390d5a65628db4",
       "owners": {
         "@document": {
-          "after": "d25d2214093e4ede6c5d8d162ad887027defc07802131aa6bd649ab48687532f",
-          "before": "2cce1ee808156d87a1f12b2da1eba15410b9089acfa3c6bce2262f86681f13f0"
+          "before": "d25d2214093e4ede6c5d8d162ad887027defc07802131aa6bd649ab48687532f",
+          "after": "8c32e50ab2a94d28f988a28bca312c3cbb6a41a003ee5e6e04390d5a65628db4"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "after_sha256": "e04e6b7615f9dec4aa4ac4ed64ba301f0e41583b24b322f1c87d122a23179d40",
-      "before_sha256": "76fb847a77ed0ec757b0c3b0ff901919454defbe34abfa70da60d4aeedbebeec",
+      "before_sha256": "e04e6b7615f9dec4aa4ac4ed64ba301f0e41583b24b322f1c87d122a23179d40",
+      "after_sha256": "a4b1976cf6a9f86b88e77cca332247fe295b12cd530afc371e485b861c4e61ac",
       "owners": {
         "@document": {
-          "after": "e04e6b7615f9dec4aa4ac4ed64ba301f0e41583b24b322f1c87d122a23179d40",
-          "before": "76fb847a77ed0ec757b0c3b0ff901919454defbe34abfa70da60d4aeedbebeec"
+          "before": "e04e6b7615f9dec4aa4ac4ed64ba301f0e41583b24b322f1c87d122a23179d40",
+          "after": "a4b1976cf6a9f86b88e77cca332247fe295b12cd530afc371e485b861c4e61ac"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "after_sha256": "f90f44b4d63f3a3ccdf58a8c970b5504f372969f5b5ec99bf98c8031ca41ee19",
-      "before_sha256": "7e240ab6adda64fc6f8a38bb66da74f3a1c9451cb1886f253d936901bcf8c376",
+      "before_sha256": "f90f44b4d63f3a3ccdf58a8c970b5504f372969f5b5ec99bf98c8031ca41ee19",
+      "after_sha256": "6b2c6e26062f29c676169a5429161fe6b23c234bf6176ce3b6a2aa91362be0c4",
       "owners": {
         "@document": {
-          "after": "f90f44b4d63f3a3ccdf58a8c970b5504f372969f5b5ec99bf98c8031ca41ee19",
-          "before": "7e240ab6adda64fc6f8a38bb66da74f3a1c9451cb1886f253d936901bcf8c376"
+          "before": "f90f44b4d63f3a3ccdf58a8c970b5504f372969f5b5ec99bf98c8031ca41ee19",
+          "after": "6b2c6e26062f29c676169a5429161fe6b23c234bf6176ce3b6a2aa91362be0c4"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "after_sha256": "e21e0dd534a2bb8acbda69b39e642bc306eb4bc3b07ec42024f955f1eb69633d",
-      "before_sha256": "b09c4d6b83b8115be81952869edd8f81f4fed18533bb4d83c7c27b8214c774e2",
+      "before_sha256": "e21e0dd534a2bb8acbda69b39e642bc306eb4bc3b07ec42024f955f1eb69633d",
+      "after_sha256": "0e4c951785657bbf47be7b67c3d6cdb97e7dd1e549acb8cbb0168f868cf9b53e",
       "owners": {
         "@document": {
-          "after": "e21e0dd534a2bb8acbda69b39e642bc306eb4bc3b07ec42024f955f1eb69633d",
-          "before": "b09c4d6b83b8115be81952869edd8f81f4fed18533bb4d83c7c27b8214c774e2"
+          "before": "e21e0dd534a2bb8acbda69b39e642bc306eb4bc3b07ec42024f955f1eb69633d",
+          "after": "0e4c951785657bbf47be7b67c3d6cdb97e7dd1e549acb8cbb0168f868cf9b53e"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "after_sha256": "9222be36ce62785e13a10da3ae165693e9ad3f9bc1aa81d71f23f1960568ec02",
-      "before_sha256": "460fcda75160d5a7c316c4574f3745aa8ee97cf282d801b7a73f76345ec8e74e",
+      "before_sha256": "9222be36ce62785e13a10da3ae165693e9ad3f9bc1aa81d71f23f1960568ec02",
+      "after_sha256": "d69defda2a217b8cdb7570dded60717d74935dd80ea50a18d2b9d92434aaa850",
       "owners": {
         "@document": {
-          "after": "9222be36ce62785e13a10da3ae165693e9ad3f9bc1aa81d71f23f1960568ec02",
-          "before": "460fcda75160d5a7c316c4574f3745aa8ee97cf282d801b7a73f76345ec8e74e"
+          "before": "9222be36ce62785e13a10da3ae165693e9ad3f9bc1aa81d71f23f1960568ec02",
+          "after": "d69defda2a217b8cdb7570dded60717d74935dd80ea50a18d2b9d92434aaa850"
         }
       }
     },
     "contracts/manifest.json": {
-      "after_sha256": "9e5ef3ef02c6f4362487a7e394de2fe8d1377f6efd087ea0c0cfc86d789a2508",
-      "before_sha256": "7b2c08256ae06043b586062a49b4f747b5b96e0db49b823e5f178ff07c4d972a",
+      "before_sha256": "9e5ef3ef02c6f4362487a7e394de2fe8d1377f6efd087ea0c0cfc86d789a2508",
+      "after_sha256": "f1424aa56ebf047f252c6c584f7aa9908ac87c86f692714c9f73c36349168213",
       "owners": {
         "@document": {
-          "after": "9e5ef3ef02c6f4362487a7e394de2fe8d1377f6efd087ea0c0cfc86d789a2508",
-          "before": "7b2c08256ae06043b586062a49b4f747b5b96e0db49b823e5f178ff07c4d972a"
+          "before": "9e5ef3ef02c6f4362487a7e394de2fe8d1377f6efd087ea0c0cfc86d789a2508",
+          "after": "f1424aa56ebf047f252c6c584f7aa9908ac87c86f692714c9f73c36349168213"
         }
       }
     },
-    "data/source_audits/ci64_provenance_v1/canonical-circle-test-transition-v1.json": {
-      "after_sha256": "a82643598fb01025704bd9d222643fce81e9f772d938a968f1b6568bd9542f19",
+    "data/source_audits/ci64_provenance_v1/canonical-polygon-queries-test-transition-v1.json": {
       "before_sha256": null,
+      "after_sha256": "46e4cd2b9e1045991a52c4361e4fe61ddaf230c07c8437a46a574e9eecf97820",
       "owners": {
         "@document": {
-          "after": "a82643598fb01025704bd9d222643fce81e9f772d938a968f1b6568bd9542f19",
-          "before": null
+          "before": null,
+          "after": "46e4cd2b9e1045991a52c4361e4fe61ddaf230c07c8437a46a574e9eecf97820"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
-      "after_sha256": "3caa069c1be2333da185916d6fd27bfb2a6e3191e78680d411598d272f7a1a7d",
-      "before_sha256": "7c36f28c8106e8652e112d43f2e93e5e07bfb0438ec3f5aaca47e79d8ca6c611",
+      "before_sha256": "3caa069c1be2333da185916d6fd27bfb2a6e3191e78680d411598d272f7a1a7d",
+      "after_sha256": "238db51651089e38332b4671daf369a9257d36bc18b89a8626a50ea6648c67bd",
       "owners": {
         "@document": {
-          "after": "3caa069c1be2333da185916d6fd27bfb2a6e3191e78680d411598d272f7a1a7d",
-          "before": "7c36f28c8106e8652e112d43f2e93e5e07bfb0438ec3f5aaca47e79d8ca6c611"
+          "before": "3caa069c1be2333da185916d6fd27bfb2a6e3191e78680d411598d272f7a1a7d",
+          "after": "238db51651089e38332b4671daf369a9257d36bc18b89a8626a50ea6648c67bd"
         }
       }
     },
     "docs/DISTANCE_PRECISION.md": {
-      "after_sha256": "4d768556cea0953254e24239face09550f2431a3f71690d3c988d567022ccc8e",
-      "before_sha256": "1d0184e87692a7330896ffc3898c3bcba89b637ce2b3afa975e7441ba55507ce",
+      "before_sha256": "4d768556cea0953254e24239face09550f2431a3f71690d3c988d567022ccc8e",
+      "after_sha256": "edeac69820cfbd60fee16c9c239b681a16949cfaef8680e7d0aa148436463a53",
       "owners": {
         "@document": {
-          "after": "4d768556cea0953254e24239face09550f2431a3f71690d3c988d567022ccc8e",
-          "before": "1d0184e87692a7330896ffc3898c3bcba89b637ce2b3afa975e7441ba55507ce"
+          "before": "4d768556cea0953254e24239face09550f2431a3f71690d3c988d567022ccc8e",
+          "after": "edeac69820cfbd60fee16c9c239b681a16949cfaef8680e7d0aa148436463a53"
         }
       }
     },
-    "docs/performance/current/canonical-circle-movement.json": {
-      "after_sha256": "9c4fbf287c9d88a6c2882f65cf8431006361ab8b494f134c49818788e22aa9b4",
+    "docs/performance/current/polygon-queries-movement.json": {
       "before_sha256": null,
+      "after_sha256": "5261b7fd02d2958426e266021c5da5cd1fca8d52812af63be80206a645bd37c4",
       "owners": {
         "@document": {
-          "after": "9c4fbf287c9d88a6c2882f65cf8431006361ab8b494f134c49818788e22aa9b4",
-          "before": null
+          "before": null,
+          "after": "5261b7fd02d2958426e266021c5da5cd1fca8d52812af63be80206a645bd37c4"
         }
       }
     },
-    "docs/performance/current/canonical-circle-setup.json": {
-      "after_sha256": "736bc6a0437124166a923038c7ef9235e3020c6c0c63baf71549819e8cd8dafe",
+    "docs/performance/current/polygon-queries-setup.json": {
       "before_sha256": null,
+      "after_sha256": "aabb8f5065ea5578ac916407762f9a03146fcc4ae6514d7eaa2348dfe33cfb29",
       "owners": {
         "@document": {
-          "after": "736bc6a0437124166a923038c7ef9235e3020c6c0c63baf71549819e8cd8dafe",
-          "before": null
+          "before": null,
+          "after": "aabb8f5065ea5578ac916407762f9a03146fcc4ae6514d7eaa2348dfe33cfb29"
         }
       }
     },
-    "docs/performance/current/canonical-circle-visibility.json": {
-      "after_sha256": "19b6c356c6954989272feadc4224a4f2358906fce425e9fdf201ba35465e1f6c",
+    "docs/performance/current/polygon-queries-visibility.json": {
       "before_sha256": null,
+      "after_sha256": "37b64538b7147b6773e62a45a52231199b94fe2e95de4df7b2b5f6d68d5d135d",
       "owners": {
         "@document": {
-          "after": "19b6c356c6954989272feadc4224a4f2358906fce425e9fdf201ba35465e1f6c",
-          "before": null
+          "before": null,
+          "after": "37b64538b7147b6773e62a45a52231199b94fe2e95de4df7b2b5f6d68d5d135d"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "after_sha256": "68d2f9ca4a62013a706f05ceaf38b5e5ae807407f5abb803667a0e122d4c40f9",
-      "before_sha256": "cd4087cd23f55e256dae3373f7947775fdea7b504278f7b63fbd80f53447266f",
+      "before_sha256": "68d2f9ca4a62013a706f05ceaf38b5e5ae807407f5abb803667a0e122d4c40f9",
+      "after_sha256": "e8c6e4e4db08b723fe7a3209df9c440d16ff8fe788e7244a35ca1ec74ec866a3",
       "owners": {
         "@document": {
-          "after": "68d2f9ca4a62013a706f05ceaf38b5e5ae807407f5abb803667a0e122d4c40f9",
-          "before": "cd4087cd23f55e256dae3373f7947775fdea7b504278f7b63fbd80f53447266f"
+          "before": "68d2f9ca4a62013a706f05ceaf38b5e5ae807407f5abb803667a0e122d4c40f9",
+          "after": "e8c6e4e4db08b723fe7a3209df9c440d16ff8fe788e7244a35ca1ec74ec866a3"
         }
       }
     },
     "scripts/build_test_shards.py": {
-      "after_sha256": "09231a49de3f6181bc52b89de73f0e0679966a1318b45f52489101216e7aae49",
-      "before_sha256": "a20b3a8fc599d0f7afa69ba0e9be6e18d5a5fb8ae591c58383e711f0b6ddcb7f",
+      "before_sha256": "09231a49de3f6181bc52b89de73f0e0679966a1318b45f52489101216e7aae49",
+      "after_sha256": "47b45fa127d260425fc92c4b3c39acfedd3660333d1de06e868ead77b20475b3",
       "owners": {
         "behavioral_selection": {
-          "after": "4ac84a799c461616604b90c10731b0f71bc4473f5a1d7b4b6512d139b2979e2f",
-          "before": "bfadd8fed565671cc2a8f40025722b29f3e7c6b5cac7551c124d0c5efad85b76"
+          "before": "4ac84a799c461616604b90c10731b0f71bc4473f5a1d7b4b6512d139b2979e2f",
+          "after": "1b9c0d8d6ad01e8e934b307cc389bb45cb936b8fc864c17b5ead08f85503de30"
         }
       }
     },
-    "scripts/canonical_circle_shard_admission.py": {
-      "after_sha256": "4b1570effb800956bd848d9e1c13d5912ae1ab5ee42c218b726502adce764ce9",
+    "scripts/canonical_polygon_queries_shard_admission.py": {
       "before_sha256": null,
+      "after_sha256": "d8003506d133533b3aecf8ce1c992c51190e0b61eedca1e7dca56011d2cc8637",
       "owners": {
         "@module": {
-          "after": "59c19ca19fe3c9b506883a775c3761e0a4d3afceda0f18a17cbba23402e45a10",
-          "before": null
+          "before": null,
+          "after": "75292b7fc27bda919049b3c8c0d38a47e19eb75e49605c8cf19c0e4ca54d4528"
         },
         "current_native_role": {
-          "after": "e14bf8e8c98c8494af9abfd37c59305c6def094f978e8834967419904c48c46b",
-          "before": null
+          "before": null,
+          "after": "08c9d8e0a8b15df30dba086a8e580d7f404bc4322db408c38a1b0f26a8d989b1"
         },
         "producer_inputs": {
-          "after": "f7c2a4a62cb77b51c9f66ccc032a51ecf0381b9a63968eddf2c205f0d259c65e",
-          "before": null
+          "before": null,
+          "after": "c30166c772b91d269012aa3f69fb00c53e3a45c5a76e120d9f39cc203ab1b3c2"
         },
         "require_frozen_assignment": {
-          "after": "6fbe102f43d3e56ce829117198197de557525d6862e2f134b8390c2a32ab21ba",
-          "before": null
+          "before": null,
+          "after": "b98c2c389c3504ccccba0d46cad260d9d5272a356b283570cc855684a5fe137f"
         },
         "require_test_sources": {
-          "after": "c800e52004cd5e71f18834b27f12ec834d456717485c76278c9551dc25f536d7",
-          "before": null
+          "before": null,
+          "after": "75e68882c6667d61d655dbab0a462aadb61e03985e1c860ae531030b7997cda3"
         },
         "retained_authority_artifacts": {
-          "after": "b8edbc662590899fa5c3e1c8058a37f7aa618b4e85d0e01783b1422956d88e37",
-          "before": null
+          "before": null,
+          "after": "3f7843bff34c0dfd491f2118b0cfd9987e3012722d569758ae601ef960ebba24"
         },
         "validate_runtime_transition": {
-          "after": "ff381ec001f0d599fae98f66b32c083d0134f88545a4a9e7af6f3c23750d6d7f",
-          "before": null
+          "before": null,
+          "after": "ba36fedd3ef4dc8183b39ca3998214c30f647b6f1269a88014ceb605921db1f6"
         }
       }
     },
-    "scripts/canonical_circle_test_admission.py": {
-      "after_sha256": "169366b4d771617ae92fb3a30cf283898f06fcb100663c33c976c0a0042f1252",
+    "scripts/canonical_polygon_queries_test_admission.py": {
       "before_sha256": null,
+      "after_sha256": "599d85a02f447a016a886621d4b3dd18cd7cbd6264c02b994e3d612f8c60ab1d",
       "owners": {
         "@module": {
-          "after": "f85a275ced4b41a65b7b63d5f458458890fa2142566e09b74cc3da03484688a0",
-          "before": null
+          "before": null,
+          "after": "dda5304f9ff250f18d53b895238cfacb1f34c45471e3bb89e6337036dbd224e9"
         },
         "_checked_bytes": {
-          "after": "1d9afbcc081e4e6f1eac5b2f4475d435a3fa34beae892239459c7637a1e4fa43",
-          "before": null
+          "before": null,
+          "after": "cd1153b201d574e6b6c9592558f0888ec105c3244ff06b714b17557a893a628e"
         },
-        "circle_test_transition": {
-          "after": "67d3d434cbb4cc1c6c217ce73a0b8abdbeb284e2fbdb8b21cdc7fed33804257c",
-          "before": null
+        "polygon_queries_test_transition": {
+          "before": null,
+          "after": "6198887f96026cf09f98cdd2a37d304e3947328233d3dc666160d8192d71826b"
         }
       }
     },
     "scripts/current_shard_assignment.py": {
-      "after_sha256": "622f37f4b775ccff259dd0bec52511d67883d068febb1b781ce3a35a021e5b9b",
-      "before_sha256": "51acd02f684bf64867a295fca8d9540604b56d323df7c789775add06fedd7360",
+      "before_sha256": "622f37f4b775ccff259dd0bec52511d67883d068febb1b781ce3a35a021e5b9b",
+      "after_sha256": "c86c390f522446d50cc81c83d789b45f389bd30ed903bc0c10196258e0be54bb",
       "owners": {
         "load_assignment": {
-          "after": "c8f43ebd30c77d4187d0f9472b566b39300bf4296d28f858891bbc9a2cf62de4",
-          "before": "74727ba97deb878cd72959ce88fe815cb8900baf183aa1c36e32e51704e16c0d"
+          "before": "c8f43ebd30c77d4187d0f9472b566b39300bf4296d28f858891bbc9a2cf62de4",
+          "after": "0705e4688e5e8219b72f13a5136ca9e449bde415aee24ec466887fc5ce5875af"
         }
       }
     },
     "scripts/current_shard_compatibility.py": {
-      "after_sha256": "7b59b886f23302da7ea6d68698b812097f13bf56573b20198dc38941dbac9148",
-      "before_sha256": "c26ae14ab2c69ed78341734fb0d17d83f18d775aa81f6c9ad7bc0081e0a3ed1f",
+      "before_sha256": "7b59b886f23302da7ea6d68698b812097f13bf56573b20198dc38941dbac9148",
+      "after_sha256": "1b40dff63d80a44095340e9feaea7e2b67a58f5b51a45de11c0ee84f8d2ebf76",
       "owners": {
         "_baseline": {
-          "after": "be68e65b5f9a899751be0cdbfaca6943491dcc93e05dbc65fa2c5f66c4384d20",
-          "before": "7789506fc7a4278f21754c1bc19c8d7d14ac7beb5e1aea9be87644bb320d44cf"
+          "before": "be68e65b5f9a899751be0cdbfaca6943491dcc93e05dbc65fa2c5f66c4384d20",
+          "after": "0807839f2a4cf18baa03c7e0b329039f00d6d110b81b7e3daf1d71d361b1baaf"
         },
         "enabled": {
-          "after": "3852482c6a7cdf5320a30625e824c9c41ab0bfb4996d9450507653dc81a39124",
-          "before": "d7364b6b127192643a8df91eeb321c08401e74a97038c2d7f23b384c9dc2cb2a"
+          "before": "3852482c6a7cdf5320a30625e824c9c41ab0bfb4996d9450507653dc81a39124",
+          "after": "c4b46ee554ceb00d43d9d8b2116f8a9dab014dfe819f7eeef588d364a4adff5d"
         },
         "plan": {
-          "after": "74308e2ea9a45ec74b49fe40b46f336293424075b305b7ccb552434dd47888ed",
-          "before": "515939b93ede05a45195f641847f9d7b61297593e85f2bbf916e306ba27c3724"
+          "before": "74308e2ea9a45ec74b49fe40b46f336293424075b305b7ccb552434dd47888ed",
+          "after": "15d4682f049f4ad53272fa89768dc3f1a15650e28866a6e0b1a62ca3e8cc67b2"
         }
       }
     },
     "scripts/fetch_scheduling_sources.py": {
-      "after_sha256": "c595eca699d193bcd607daf1b827f0ae7b2f9ff59452a61b76fd254c05e53e9a",
-      "before_sha256": "eb7cdc66fa58bc29ca3fd83029aaf68365d3b6150b434761424ef8d54f4a02fd",
+      "before_sha256": "c595eca699d193bcd607daf1b827f0ae7b2f9ff59452a61b76fd254c05e53e9a",
+      "after_sha256": "f51a953f1078e3af7c37b2dee1c4dd24d53f3d96f45267a94863cdf1f8e99cf0",
       "owners": {
         "revisions": {
-          "after": "387a36564758823a643b5cf5b0e9d095be73a15419d4ef31f41926f174e91dc4",
-          "before": "fb9004775049b4299b40298bebbeeb841a3dcbb3ea6275982cb160f782b1b3b3"
+          "before": "387a36564758823a643b5cf5b0e9d095be73a15419d4ef31f41926f174e91dc4",
+          "after": "439a9d9783c1ce8d89e00255b9939e704393a39a1d9fb8c252b8796356a07ce1"
+        }
+      }
+    },
+    "scripts/run_complete_covered_profile.py": {
+      "before_sha256": "e81d3eab06c84057d697e01c8d0179cba1cf216b5f76a962ada3844600acedbd",
+      "after_sha256": "89811ac8f2066d8bb5c8b168b2a156a2d2c82f146bfa707f159504c622bbbf39",
+      "owners": {
+        "coverage_report_command": {
+          "before": null,
+          "after": "03c49f351873d0e16794745990b73ce1f9c50e61318e312f56a81ff6da17a088"
+        },
+        "run_worker": {
+          "before": "f89e048a1321e208589dbbf7266537a35d11c96609c74f9cf92ef196daf9bb21",
+          "after": "ed7d0816d443aa3f7ced481c847efcd33a59bef1dec08c1d56b7960697bf3942"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "after_sha256": "e3164c1c5cca244c6188e1221636634b264c4aff1fdc77a3a65e3835a3ece4ec",
-      "before_sha256": "0136120582463d17dece9935baa77548bd32ec5bce56e1aadc1c1aba796a5e78",
+      "before_sha256": "e3164c1c5cca244c6188e1221636634b264c4aff1fdc77a3a65e3835a3ece4ec",
+      "after_sha256": "77d3174c3d2697188ed7782436e2f769a99d5610be8b63a7d8134d94674b9855",
       "owners": {
         "@document": {
-          "after": "e3164c1c5cca244c6188e1221636634b264c4aff1fdc77a3a65e3835a3ece4ec",
-          "before": "0136120582463d17dece9935baa77548bd32ec5bce56e1aadc1c1aba796a5e78"
+          "before": "e3164c1c5cca244c6188e1221636634b264c4aff1fdc77a3a65e3835a3ece4ec",
+          "after": "77d3174c3d2697188ed7782436e2f769a99d5610be8b63a7d8134d94674b9855"
         }
       }
     },
-    "src/warhammer40k_core/geometry/milli_inch_circle.py": {
-      "after_sha256": "90c753b7d8ca9fdd03f52d17b7d59a758b2257a86a2610a0e527be43485192a4",
+    "src/warhammer40k_core/geometry/milli_inch_polygon_queries.py": {
       "before_sha256": null,
+      "after_sha256": "768c92d7942f430c6be5a1d820a45302b6f1f802ac02150da850f758c9f1126a",
       "owners": {
         "@module": {
-          "after": "6a6e69a59c5a9577a9893f0626e44d5fd179640a1153a124723e8b703a783e9d",
-          "before": null
+          "before": null,
+          "after": "51f4758d47bfe1be4051a1e25d497fcf4d0aa1e3315da667f0d107ee29bd93ab"
         },
-        "CanonicalCircle": {
-          "after": "bb2844781fb840cf2aceeecfb89da30d65e195ddacae973e8b6dda8ab1c2ce62",
-          "before": null
+        "PolygonPointLocation": {
+          "before": null,
+          "after": "fb9818967df1f01ee4fbac073159b9171dd67b371fbae00eeabd1831b251cdea"
         },
-        "CanonicalCircle.__post_init__": {
-          "after": "840a8057d9c8e984be9428a34bc9d2a7b407eb21d6c7ed9c117db12486b100a7",
-          "before": null
+        "_point_location": {
+          "before": null,
+          "after": "646b5f5964dd9472da9b2908f5df17b2488471430cd0070238cdff311fa1b76a"
         },
-        "CanonicalCircle._squared_center_distance": {
-          "after": "e3c6048ec33f54c4a2c7f73935bdee1e1e4d0a5581f4d0ea6bbb8fc3f9909736",
-          "before": null
+        "_squared_segment_distance": {
+          "before": null,
+          "after": "8e685f7867eddd8103c6021f923fb40fb54aca0fb579f010eeab690b4bcf9025"
         },
-        "CanonicalCircle.content_hash": {
-          "after": "b9761cab49226b10d3dbe65a7c383da2a21149f562594d5ec51ea05cca3ca784",
-          "before": null
+        "_validate_query": {
+          "before": null,
+          "after": "3e10bbbe3d4f8016a247cecbacf9f87d64321f93bea4d3f4e8242c95da396f43"
         },
-        "CanonicalCircle.from_inches": {
-          "after": "2ccb44410eada5060f386eeceee1052ba51efc7a80aa2cd33e5d84b5f46eee49",
-          "before": null
+        "polygon_point_distance_ticks": {
+          "before": null,
+          "after": "302cc41166b834253961658bdd55106e3b0e18be1156c6b92e035cb068828cfc"
         },
-        "CanonicalCircle.from_millimeters": {
-          "after": "99569e276e95cd53b5c69f4e9b190168053d33899af2d3a1e5d876dbdd7cb948",
-          "before": null
-        },
-        "CanonicalCircle.from_payload": {
-          "after": "58227c23f30ba65c963bfb0d471fc47708157f280ac3dbdc8166d20352db5e41",
-          "before": null
-        },
-        "CanonicalCircle.radius_inches": {
-          "after": "b2de3ae66aa05966c3f4d9c225fe52a556f0cf97c288b2fa1064abd9a0e62e9d",
-          "before": null
-        },
-        "CanonicalCircle.relation_to": {
-          "after": "d5e0d0d35774e7b135027721eb6a8549e37cb86ace2e76f1af0b11ec87515ba5",
-          "before": null
-        },
-        "CanonicalCircle.surface_gap_ticks": {
-          "after": "bfa96fc5a23e8c6e82f335c3f51385c31270a79a6638f7e0ea9951fb1bbc398f",
-          "before": null
-        },
-        "CanonicalCircle.to_payload": {
-          "after": "ab8a175cd0695703afed05dd69d19cab7fea23f0d2eb03ec50e8c5c0007406d6",
-          "before": null
-        },
-        "CanonicalCircleError": {
-          "after": "0c975059f9478786cc02ec63a8676e72578ce57eed4b3887f41a6458ae92b56e",
-          "before": null
-        },
-        "CanonicalCirclePayload": {
-          "after": "cec397df5823f2773549eee9ad34e3eade2e86644f25d253b8b4e7baea8be27e",
-          "before": null
-        },
-        "CircleRelation": {
-          "after": "3e596b68d4687cdb4d21aa2faa95b1223ff9fce4de62c2cec190bbbc0b076d80",
-          "before": null
+        "polygon_point_location": {
+          "before": null,
+          "after": "107072a68baa893276eb431065ee27d1b48c40f665fe7afd9701727f213035a6"
         }
       }
     },
     "tests/code_quality/test_canonical_circle_shard_admission.py": {
-      "after_sha256": "71a8d1b4090d606e77d0c1de161c043873c32df605fa070368747d094e1c5157",
-      "before_sha256": null,
+      "before_sha256": "71a8d1b4090d606e77d0c1de161c043873c32df605fa070368747d094e1c5157",
+      "after_sha256": "80352b56c6edfd6cca1d31aba2a30b208f84b1a979373ca445b2f5c89b1f03d2",
       "owners": {
         "@module": {
-          "after": "05a7e1fe46a6b60b795bebf40bb99e71fa7a1091e3e8479297375b0b2a9a0f73",
-          "before": null
+          "before": "05a7e1fe46a6b60b795bebf40bb99e71fa7a1091e3e8479297375b0b2a9a0f73",
+          "after": "21de08ddb697c654b1b7eaa02ac36da0be66ef1b5129bb085b99215a44d2d155"
         },
         "test_circle_binding_admits_only_its_exact_runtime_transition": {
-          "after": "910fa095cd880e9d21478376935e88dfe7521010f2c5dafc6264485b99ea3f20",
-          "before": null
-        },
-        "test_circle_binding_fetches_both_current_and_retained_producers": {
-          "after": "0f6d4d6eb59691d6ab7cb4fd72ebd3429eadebc809a74b47ba50e737a4cdf8c7",
-          "before": null
-        },
-        "test_circle_binding_preserves_all_existing_performance_obligations": {
-          "after": "d14e5cfc024fd52a0c98b403e476b26806d4174a1feaf8ef1bfa4ba12da5e1ed",
-          "before": null
-        },
-        "test_circle_binding_preserves_retained_sources_and_evidence": {
-          "after": "2d8ef495542e92da8bb5b3b692056dbc450ae40e4587a92a25d02ed5e8542593",
-          "before": null
+          "before": "910fa095cd880e9d21478376935e88dfe7521010f2c5dafc6264485b99ea3f20",
+          "after": "d8d4b963662c389d58b53c90dd0772770f73c4c1005b6853d1695b5573a90534"
         },
         "test_circle_binding_requires_complete_fresh_evidence_and_fixed_inventory": {
-          "after": "cf5ab434fe0871fd97debde8a7ab41fae7295a660468a0716a1979b8e37ed608",
-          "before": null
+          "before": "cf5ab434fe0871fd97debde8a7ab41fae7295a660468a0716a1979b8e37ed608",
+          "after": "dd6671a335a187d4d8f959645aef9f95cc1a53ca546f00b275956d739ccbea98"
         },
         "test_circle_binding_requires_its_complete_measured_producer": {
-          "after": "bb8b237dfdb6be4699a9254c87243b4ff35f27c709185df73974b2d342fe199a",
-          "before": null
-        },
-        "test_circle_binding_retains_twelve_shards_and_every_prior_selector": {
-          "after": "5a6543d28a0dee73140af1cb85ceb46dbf67db121d574c408f08e55a0ebd800d",
-          "before": null
-        },
-        "test_circle_test_transition_leaves_historical_source_selection_closed": {
-          "after": "184e1f8b2cbe87f4171dd69ac62b22d22f8adb73e5486be0044ac4503cff9626",
-          "before": null
+          "before": "bb8b237dfdb6be4699a9254c87243b4ff35f27c709185df73974b2d342fe199a",
+          "after": "6d5e4039b76d843de70fbe585f1eefc1e778b7880ef691b95094e71d9ae11ab3"
         },
         "test_circle_test_transition_preserves_original_selection_bytes": {
-          "after": "4e340206ea3577b583b91871c6bdff721c6b7a98f119beaf3690df242db272d2",
-          "before": null
+          "before": "4e340206ea3577b583b91871c6bdff721c6b7a98f119beaf3690df242db272d2",
+          "after": "68b20db150b38522dc23c1d34b18c1536e864d7eecdd98c6eaa2a236054a399c"
         },
         "test_circle_test_transition_rejects_source_record_and_identity_drift": {
-          "after": "d8e8a195b5969f49c234a8da968635b4877005f912fe965a44da73d8ec0235a9",
-          "before": null
+          "before": "d8e8a195b5969f49c234a8da968635b4877005f912fe965a44da73d8ec0235a9",
+          "after": "1ecc68c1b8c63fdfc6cf28ef42325e1fe10c8dfc9df206bd83971a8b746a2090"
         }
       }
     },
-    "tests/code_quality/test_canonical_polygon_shard_admission.py": {
-      "after_sha256": "78da0ee35c02a4c6b831e05746ea1eece55573dd508ef05c91639bc2091c86a1",
-      "before_sha256": "a55ec908d0859269f07c53466bc1b6838b9882625355a46d6f7e860e7e0e38ab",
+    "tests/code_quality/test_canonical_polygon_queries_shard_admission.py": {
+      "before_sha256": null,
+      "after_sha256": "3eaf42966e2883ec259d40ca761e7189b75f786d677f7ea3ad946b5b6aab8a7a",
       "owners": {
         "@module": {
-          "after": "0c0aa9a5b30e9914f086d220307ed19cf59f9c96ff9ceed1e09b97384befdc58",
-          "before": "efae01cee176485d7a8043ee964dae79364ff520f59ad755a513f48959e49b9a"
+          "before": null,
+          "after": "c944ca26ec469398a9a80cc073aa140f34b8789599d0aa7d2149db2b8437258c"
         },
-        "test_polygon_binding_admits_only_its_exact_runtime_transition": {
-          "after": "ebb9ca79f70a5bbe58812ca91e967d3a585584da0c688da89c9b8d9678588867",
-          "before": "f511de0d272a71b9db7644fb245ad2775ab6a4c6b5bc44851c88f01998402bef"
+        "test_polygon_queries_binding_admits_only_its_exact_runtime_transition": {
+          "before": null,
+          "after": "f2943fef7f7ae5712982a5ca1e6598bca11c1f69b7eebeabcddaf4a05fda5462"
         },
-        "test_polygon_binding_requires_complete_fresh_evidence_and_fixed_inventory": {
-          "after": "450aec0d609866e708dde87b419a52a45b99caf34031333cb638f97899193042",
-          "before": "d19c06e16346ab83b9d1d4a0c30badd13cf4089f8e441a7b3dbee1e334e91156"
+        "test_polygon_queries_binding_fetches_both_current_and_retained_producers": {
+          "before": null,
+          "after": "2f18363753957c691eab3cdfbcf80ea3b14515d77515993dd58356e17362c87a"
         },
-        "test_polygon_binding_requires_its_complete_measured_producer": {
-          "after": "5a59ad8fc54ed8f095a6a8e25fa50381eb00843421578d1666be93efb37ee0f4",
-          "before": "e99658051999a22b4132bf7c10bb9356ff33512864e3e4ae5d962a0dba6c55a1"
+        "test_polygon_queries_binding_preserves_all_existing_performance_obligations": {
+          "before": null,
+          "after": "9cf32a03045e7c6f337a7cb3febf70044a03c45ed42e2c70c111967028cac355"
         },
-        "test_polygon_test_transition_preserves_original_selection_bytes": {
-          "after": "c4423c791068365eadf594f47055b74b7eee25f18051934bbabdeadc81e08ca1",
-          "before": "f900d33cd0c3ed9d1707697de9e5db5cdaec88b00b3c33b76d641a9324a5713d"
+        "test_polygon_queries_binding_preserves_retained_sources_and_evidence": {
+          "before": null,
+          "after": "af052074b784c3f1ffb00694d73130ea63e3c66c5b7ba594f787afa16227ba4c"
         },
-        "test_polygon_test_transition_rejects_source_record_and_identity_drift": {
-          "after": "34cac1b8f353b0491b858c5a792772b800c50b1ff62066d2a82433fa38544f18",
-          "before": "02f24717039c1d50f9af62d12984fb96cce7cc0fa18389704ef3900f3b58cf40"
+        "test_polygon_queries_binding_requires_complete_fresh_evidence_and_fixed_inventory": {
+          "before": null,
+          "after": "7a7d3f17dfe66244ae40b3a9d3435d2a5238213033a47a524051af94c8b663a0"
+        },
+        "test_polygon_queries_binding_requires_its_complete_measured_producer": {
+          "before": null,
+          "after": "7efc7bb054948ee2f6ed4798c3e8b3f8b1f9d593438f46be71dbb79958c14241"
+        },
+        "test_polygon_queries_binding_retains_twelve_shards_and_every_prior_selector": {
+          "before": null,
+          "after": "ededef66cbba5d2e5253b37317e0552f1d74efc15ca5120135b25a531312c42a"
+        },
+        "test_polygon_queries_test_transition_leaves_historical_source_selection_closed": {
+          "before": null,
+          "after": "abe66beda4678effe9fba08a0afc4a61a7ab5e44c5277c0805e58b2bbb7ffd3a"
+        },
+        "test_polygon_queries_test_transition_preserves_original_selection_bytes": {
+          "before": null,
+          "after": "afb53ed9ab104b924e785aa0b49b4d2393ab804e9da64f9d4d139ede06d9b456"
+        },
+        "test_polygon_queries_test_transition_rejects_source_record_and_identity_drift": {
+          "before": null,
+          "after": "3ce7720e1f93b1824dfeba9809a1a754025417d1ef01c1313276093d049fdc40"
         }
       }
     },
     "tests/code_quality/test_ci_performance_gates.py": {
-      "after_sha256": "d9e1c0b7402810cec459f2530be3b4005525199056b226369b54e42e1dac8429",
-      "before_sha256": "51fc5cc7053b530057cae9f25e5c68e793136365c2fc7e85a452afaf2730eab9",
+      "before_sha256": "d9e1c0b7402810cec459f2530be3b4005525199056b226369b54e42e1dac8429",
+      "after_sha256": "cc73a34761cecb39c349a30841fe10503b6ae79241cb5b703ad255ecd0b74d05",
       "owners": {
         "test_cutover_real_cli_rejects_naming_override": {
-          "after": "920546df1a0a46c06173b9e0f7735a697b5c3ba8c99f1deec52dab8d549c91c1",
-          "before": "68b2a8d400d6d7da964ce23f6263d8f000a78df9e54bd90afa9489fdd257fea7"
+          "before": "920546df1a0a46c06173b9e0f7735a697b5c3ba8c99f1deec52dab8d549c91c1",
+          "after": "c45c203fb727b733c028f478a473b0c2d943f56a4abf6409eb64b6dd58a05f3a"
         },
         "test_cutover_real_pytest_cli_does_not_bypass_explicit_file_guard": {
-          "after": "a39f2f7a4d9eed71d5a21001b8388d38fa66a64525e76b27222df81be238d77a",
-          "before": "377ebda38ebe10cb99fff702abedc80202318b0e0f99c005c4dffab7b8e4f7a7"
+          "before": "a39f2f7a4d9eed71d5a21001b8388d38fa66a64525e76b27222df81be238d77a",
+          "after": "9798de20d50004465c313ba2ead2b5d6bf35b59b684782913b90ed56ccbf1ec2"
         }
       }
     },
-    "tests/rules/section01/test_milli_inch_circle.py": {
-      "after_sha256": "108a7edcaff877484ed35ffa21ac685b0b848703b7f65e8ef2fb00a620594194",
+    "tests/code_quality/test_complete_covered_reporting.py": {
       "before_sha256": null,
+      "after_sha256": "6efc2f56b5ce976980e8e897eae2fefe4e497bfecc93d62bbf4cf53d73b8fa0c",
       "owners": {
         "@module": {
-          "after": "05ab085fc9188b20340c95e4e0829ac5b2814c0826a121853ef242554448b90b",
-          "before": null
+          "before": null,
+          "after": "d2add8a1fcafb04acf3b096658755873a8fc944dcb4923c997b2d59e5ccf184f"
         },
-        "test_circle_canonicalizes_signed_centers_and_full_diameter_once": {
-          "after": "8486f1909265f6732eb9c4c63464f3d0591b6035e26a878f730bf6133b4ce65a",
-          "before": null
+        "test_complete_json_reporting_preserves_floor_evidence_and_failure_propagation": {
+          "before": null,
+          "after": "4cc33c546dbf3a74e50b16306ff6111ac27dd2ed32344cb38e38e39133b3865e"
+        }
+      }
+    },
+    "tests/rules/section01/test_milli_inch_polygon_queries.py": {
+      "before_sha256": null,
+      "after_sha256": "2d3a04000d6c2c02e471d95fe97da22ef23ef58ee40fc7b6d50f7a10ec7dfe34",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "e8e6e369007eedc34c9cb135931a039633918765831e10d3cb00e1039497f7e7"
         },
-        "test_circle_gap_bin_certificates_cover_even_odd_diagonal_and_contained_disks": {
-          "after": "531dec11f8f85952aba49d7fd25cd5e8e49225f34201fe587697e8d43a74cbf8",
-          "before": null
+        "test_closed_filled_polygon_point_queries_cover_edges_vertices_and_interior": {
+          "before": null,
+          "after": "f701d7a4c2646204cfe54dd05b66ff1b86231bcdf31ffe36eedacdb256470507"
         },
-        "test_circle_identity_binds_policy_version_center_and_full_diameter": {
-          "after": "197cfa292d1f5afc5e445f71351484acfe4573621c4b5e5f64d6d70d18e16aca",
-          "before": null
+        "test_concave_polygon_queries_count_vertex_crossings_once": {
+          "before": null,
+          "after": "40a5b22e08629871cc9057206b46ac76c3b6a355ba25bc3676eb2e80b5743504"
         },
-        "test_circle_mixed_parity_contact_remains_unrepresentable_on_integer_grid": {
-          "after": "30a321fb5ed1442d16f697f2f774f4ebdeea4a051dabfc9b75cee2735f6e4431",
-          "before": null
+        "test_exterior_zero_distance_is_not_contact_and_projection_is_not_snapped": {
+          "before": null,
+          "after": "31dd97c2cb76b829bdfab7c1b325b92de7b375662d2673d5f24dd028a7ffba41"
         },
-        "test_circle_payload_is_detached_strict_and_revalidated": {
-          "after": "83f8e0ca74eaae25631ef48e63d2a232dab2acf119ddad6c06fbd5e9afee421e",
-          "before": null
+        "test_polygon_distance_rounds_exact_squared_minimum_without_float_intermediate": {
+          "before": null,
+          "after": "a1b4478ec981ce4c3940f1ef44441c62a53329786b286b8bd82a6f09d3fa4ef8"
         },
-        "test_circle_rejects_invalid_and_collapsed_sources": {
-          "after": "987bb662cbf4137617bc30a56a79fc1c82cc3819d562439cd3b5cbaed0afb77e",
-          "before": null
+        "test_polygon_queries_preserve_payload_and_identity": {
+          "before": null,
+          "after": "986c1b22d565113010bc7c8f076a9574fd9dc15b449bfc3ed1f999f9aa8b2d26"
         },
-        "test_circle_rejects_malformed_canonical_values_and_queries": {
-          "after": "08f6c7fa10c97c3899849a289cd2c3b53e1f4ab1e02b3dc0e0d6ce78e124d71d",
-          "before": null
+        "test_polygon_queries_preserve_translation_winding_start_and_collinear_vertices": {
+          "before": null,
+          "after": "307ff8c1d717c3f450fda883dc2f9698909603a3fa0c52c115a7d009b0cd33c0"
         },
-        "test_circle_representation_bounds_preserve_json_and_exact_large_distances": {
-          "after": "b8b8f19dc648ef6ce96023733134fc34219125f7bcee4853b7d61f20f56674d5",
-          "before": null
+        "test_polygon_queries_reject_noncanonical_points_and_objects_with_typed_errors": {
+          "before": null,
+          "after": "94ca61fb4c2e02e25fa17ae4fd617a7499044f3958fffc0a2eacec3360a24520"
         },
-        "test_circle_rounded_zero_does_not_establish_contact_or_permit_overlap": {
-          "after": "1181682ba6e19a7e6c23cde80108fb13126bf35c0ff2712b6fe1a38a3888013b",
-          "before": null
-        },
-        "test_circle_surface_gap_rounds_half_ticks_once_and_preserves_scalar_operators": {
-          "after": "202ec58c57d1825bc8c5f6571fa69ee63088a893fcbdb25b2f726dcbc15464de",
-          "before": null
-        },
-        "test_circle_topology_distinguishes_external_contact_overlap_and_containment": {
-          "after": "b13e6676b5e5742a77814ed6b1f0a7e4b3b7b4aad7d02bb31344493d3c2cd371",
-          "before": null
+        "test_polygon_query_coordinate_extremes_use_unbounded_intermediate_arithmetic": {
+          "before": null,
+          "after": "31b64b0e9ba8e60ad6adff44ad204c0969c0cf56d81e41cd1ed5c30882f8f37f"
         }
       }
     }
   },
-  "comparisons": {
-    "movement": "docs/performance/current/canonical-circle-movement.json",
-    "setup": "docs/performance/current/canonical-circle-setup.json",
-    "visibility": "docs/performance/current/canonical-circle-visibility.json"
-  },
-  "full_game": null,
-  "milestone": "ordinary",
-  "operation_map_sha256": "c12f6763a552c77310881c3db13c86ee5bff32a6ad1c881ae4aecd403633000f",
-  "policy": "rules-engine-performance-v3",
   "rows": {
     "ci/quality_shards/all.txt": {
       "category": "governance",
       "operations": [],
-      "rationale": "Add the inactive exact canonical circle input, topology and final-only surface-gap measurement prerequisite. Retain legacy gameplay consumers and all sensitive geometry mappings; actual matched visibility, movement and setup observations supply the required comparison. Finite scheduling admission binds only the exact source/test successor and fresh complete covered observation.",
       "selected_families": [],
-      "source_obligation": "Canonicalize signed centres and full diameters once, retain exact half-tick radii, distinguish real external contact from interior overlap and rounded zero gaps, and preserve historical source/evidence/runtime profiles without migration. Current contract examples publish the generated current runtime identity.",
-      "unchanged_work": "No gameplay activation, contact tolerance, inner-history migration, full-game performance or native OS equivalence claim. Different-parity contact placement remains an activation blocker. Preserve 32 local workers, 12 hosted shards, 67% complete branch coverage, 1620-second inclusive approval and termination only above 1800 seconds; mirror 120, smoke 180 and quality 600 limits remain."
+      "rationale": "Add an inactive exact canonical polygon point classification and once-rounded point distance queries with strict signed 64-bit tick input validation. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: classify canonical points as interior, boundary or exterior using exact integer predicates and measure distance to the closed filled polygon from exact rational squared segment distances before one final quantization. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
-    "ci/quality_shards/shard-3-modules.txt": {
+    "ci/quality_shards/shard-4-modules.txt": {
       "category": "governance",
       "operations": [],
-      "rationale": "Add the inactive exact canonical circle input, topology and final-only surface-gap measurement prerequisite. Retain legacy gameplay consumers and all sensitive geometry mappings; actual matched visibility, movement and setup observations supply the required comparison. Finite scheduling admission binds only the exact source/test successor and fresh complete covered observation.",
       "selected_families": [],
-      "source_obligation": "Canonicalize signed centres and full diameters once, retain exact half-tick radii, distinguish real external contact from interior overlap and rounded zero gaps, and preserve historical source/evidence/runtime profiles without migration. Current contract examples publish the generated current runtime identity.",
-      "unchanged_work": "No gameplay activation, contact tolerance, inner-history migration, full-game performance or native OS equivalence claim. Different-parity contact placement remains an activation blocker. Preserve 32 local workers, 12 hosted shards, 67% complete branch coverage, 1620-second inclusive approval and termination only above 1800 seconds; mirror 120, smoke 180 and quality 600 limits remain."
+      "rationale": "Add an inactive exact canonical polygon point classification and once-rounded point distance queries with strict signed 64-bit tick input validation. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: classify canonical points as interior, boundary or exterior using exact integer predicates and measure distance to the closed filled polygon from exact rational squared segment distances before one final quantization. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
-    "ci/quality_shards/shard-3.txt": {
+    "ci/quality_shards/shard-4.txt": {
       "category": "governance",
       "operations": [],
-      "rationale": "Add the inactive exact canonical circle input, topology and final-only surface-gap measurement prerequisite. Retain legacy gameplay consumers and all sensitive geometry mappings; actual matched visibility, movement and setup observations supply the required comparison. Finite scheduling admission binds only the exact source/test successor and fresh complete covered observation.",
       "selected_families": [],
-      "source_obligation": "Canonicalize signed centres and full diameters once, retain exact half-tick radii, distinguish real external contact from interior overlap and rounded zero gaps, and preserve historical source/evidence/runtime profiles without migration. Current contract examples publish the generated current runtime identity.",
-      "unchanged_work": "No gameplay activation, contact tolerance, inner-history migration, full-game performance or native OS equivalence claim. Different-parity contact placement remains an activation blocker. Preserve 32 local workers, 12 hosted shards, 67% complete branch coverage, 1620-second inclusive approval and termination only above 1800 seconds; mirror 120, smoke 180 and quality 600 limits remain."
+      "rationale": "Add an inactive exact canonical polygon point classification and once-rounded point distance queries with strict signed 64-bit tick input validation. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: classify canonical points as interior, boundary or exterior using exact integer predicates and measure distance to the closed filled polygon from exact rational squared segment distances before one final quantization. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
-    "ci/test_shards/canonical-circle-covered-baseline.json": {
+    "ci/test_shards/canonical-polygon-queries-covered-baseline.json": {
       "category": "measured_workload",
       "operations": [
-        "canonical-circle-admission",
-        "mfm-current-behavior-profile"
+        "mfm-current-behavior-profile",
+        "canonical-polygon-queries-admission"
       ],
-      "rationale": "Add the inactive exact canonical circle input, topology and final-only surface-gap measurement prerequisite. Retain legacy gameplay consumers and all sensitive geometry mappings; actual matched visibility, movement and setup observations supply the required comparison. Finite scheduling admission binds only the exact source/test successor and fresh complete covered observation.",
       "selected_families": [],
-      "source_obligation": "Canonicalize signed centres and full diameters once, retain exact half-tick radii, distinguish real external contact from interior overlap and rounded zero gaps, and preserve historical source/evidence/runtime profiles without migration. Current contract examples publish the generated current runtime identity.",
-      "unchanged_work": "No gameplay activation, contact tolerance, inner-history migration, full-game performance or native OS equivalence claim. Different-parity contact placement remains an activation blocker. Preserve 32 local workers, 12 hosted shards, 67% complete branch coverage, 1620-second inclusive approval and termination only above 1800 seconds; mirror 120, smoke 180 and quality 600 limits remain."
+      "rationale": "Add an inactive exact canonical polygon point classification and once-rounded point distance queries with strict signed 64-bit tick input validation. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: classify canonical points as interior, boundary or exterior using exact integer predicates and measure distance to the closed filled polygon from exact rational squared segment distances before one final quantization. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
-    "ci/test_shards/canonical-circle-covered-evidence.json": {
+    "ci/test_shards/canonical-polygon-queries-covered-evidence.json": {
       "category": "measured_workload",
       "operations": [
-        "canonical-circle-admission",
-        "mfm-current-behavior-profile"
+        "mfm-current-behavior-profile",
+        "canonical-polygon-queries-admission"
       ],
-      "rationale": "Add the inactive exact canonical circle input, topology and final-only surface-gap measurement prerequisite. Retain legacy gameplay consumers and all sensitive geometry mappings; actual matched visibility, movement and setup observations supply the required comparison. Finite scheduling admission binds only the exact source/test successor and fresh complete covered observation.",
       "selected_families": [],
-      "source_obligation": "Canonicalize signed centres and full diameters once, retain exact half-tick radii, distinguish real external contact from interior overlap and rounded zero gaps, and preserve historical source/evidence/runtime profiles without migration. Current contract examples publish the generated current runtime identity.",
-      "unchanged_work": "No gameplay activation, contact tolerance, inner-history migration, full-game performance or native OS equivalence claim. Different-parity contact placement remains an activation blocker. Preserve 32 local workers, 12 hosted shards, 67% complete branch coverage, 1620-second inclusive approval and termination only above 1800 seconds; mirror 120, smoke 180 and quality 600 limits remain."
+      "rationale": "Add an inactive exact canonical polygon point classification and once-rounded point distance queries with strict signed 64-bit tick input validation. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: classify canonical points as interior, boundary or exterior using exact integer predicates and measure distance to the closed filled polygon from exact rational squared segment distances before one final quantization. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
-    "ci/test_shards/canonical-circle-derived-assignment.json": {
+    "ci/test_shards/canonical-polygon-queries-derived-assignment.json": {
       "category": "measured_workload",
       "operations": [
-        "canonical-circle-admission",
-        "mfm-current-behavior-profile"
+        "mfm-current-behavior-profile",
+        "canonical-polygon-queries-admission"
       ],
-      "rationale": "Add the inactive exact canonical circle input, topology and final-only surface-gap measurement prerequisite. Retain legacy gameplay consumers and all sensitive geometry mappings; actual matched visibility, movement and setup observations supply the required comparison. Finite scheduling admission binds only the exact source/test successor and fresh complete covered observation.",
       "selected_families": [],
-      "source_obligation": "Canonicalize signed centres and full diameters once, retain exact half-tick radii, distinguish real external contact from interior overlap and rounded zero gaps, and preserve historical source/evidence/runtime profiles without migration. Current contract examples publish the generated current runtime identity.",
-      "unchanged_work": "No gameplay activation, contact tolerance, inner-history migration, full-game performance or native OS equivalence claim. Different-parity contact placement remains an activation blocker. Preserve 32 local workers, 12 hosted shards, 67% complete branch coverage, 1620-second inclusive approval and termination only above 1800 seconds; mirror 120, smoke 180 and quality 600 limits remain."
+      "rationale": "Add an inactive exact canonical polygon point classification and once-rounded point distance queries with strict signed 64-bit tick input validation. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: classify canonical points as interior, boundary or exterior using exact integer predicates and measure distance to the closed filled polygon from exact rational squared segment distances before one final quantization. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
     "ci/test_shards/current-runtime-compatibility.json": {
       "category": "measured_workload",
@@ -639,272 +617,282 @@
         "mfm-current-behavior-profile",
         "scoped-shard-allocation"
       ],
-      "rationale": "Add the inactive exact canonical circle input, topology and final-only surface-gap measurement prerequisite. Retain legacy gameplay consumers and all sensitive geometry mappings; actual matched visibility, movement and setup observations supply the required comparison. Finite scheduling admission binds only the exact source/test successor and fresh complete covered observation.",
       "selected_families": [],
-      "source_obligation": "Canonicalize signed centres and full diameters once, retain exact half-tick radii, distinguish real external contact from interior overlap and rounded zero gaps, and preserve historical source/evidence/runtime profiles without migration. Current contract examples publish the generated current runtime identity.",
-      "unchanged_work": "No gameplay activation, contact tolerance, inner-history migration, full-game performance or native OS equivalence claim. Different-parity contact placement remains an activation blocker. Preserve 32 local workers, 12 hosted shards, 67% complete branch coverage, 1620-second inclusive approval and termination only above 1800 seconds; mirror 120, smoke 180 and quality 600 limits remain."
+      "rationale": "Add an inactive exact canonical polygon point classification and once-rounded point distance queries with strict signed 64-bit tick input validation. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: classify canonical points as interior, boundary or exterior using exact integer predicates and measure distance to the closed filled polygon from exact rational squared segment distances before one final quantization. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
     "ci/test_shards/durations.json": {
       "category": "measured_workload",
       "operations": [
         "mfm-current-behavior-profile"
       ],
-      "rationale": "Add the inactive exact canonical circle input, topology and final-only surface-gap measurement prerequisite. Retain legacy gameplay consumers and all sensitive geometry mappings; actual matched visibility, movement and setup observations supply the required comparison. Finite scheduling admission binds only the exact source/test successor and fresh complete covered observation.",
       "selected_families": [],
-      "source_obligation": "Canonicalize signed centres and full diameters once, retain exact half-tick radii, distinguish real external contact from interior overlap and rounded zero gaps, and preserve historical source/evidence/runtime profiles without migration. Current contract examples publish the generated current runtime identity.",
-      "unchanged_work": "No gameplay activation, contact tolerance, inner-history migration, full-game performance or native OS equivalence claim. Different-parity contact placement remains an activation blocker. Preserve 32 local workers, 12 hosted shards, 67% complete branch coverage, 1620-second inclusive approval and termination only above 1800 seconds; mirror 120, smoke 180 and quality 600 limits remain."
+      "rationale": "Add an inactive exact canonical polygon point classification and once-rounded point distance queries with strict signed 64-bit tick input validation. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: classify canonical points as interior, boundary or exterior using exact integer predicates and measure distance to the closed filled polygon from exact rational squared segment distances before one final quantization. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
     "ci/test_shards/shard-12.txt": {
       "category": "measured_workload",
       "operations": [
         "mfm-current-behavior-profile"
       ],
-      "rationale": "Add the inactive exact canonical circle input, topology and final-only surface-gap measurement prerequisite. Retain legacy gameplay consumers and all sensitive geometry mappings; actual matched visibility, movement and setup observations supply the required comparison. Finite scheduling admission binds only the exact source/test successor and fresh complete covered observation.",
       "selected_families": [],
-      "source_obligation": "Canonicalize signed centres and full diameters once, retain exact half-tick radii, distinguish real external contact from interior overlap and rounded zero gaps, and preserve historical source/evidence/runtime profiles without migration. Current contract examples publish the generated current runtime identity.",
-      "unchanged_work": "No gameplay activation, contact tolerance, inner-history migration, full-game performance or native OS equivalence claim. Different-parity contact placement remains an activation blocker. Preserve 32 local workers, 12 hosted shards, 67% complete branch coverage, 1620-second inclusive approval and termination only above 1800 seconds; mirror 120, smoke 180 and quality 600 limits remain."
+      "rationale": "Add an inactive exact canonical polygon point classification and once-rounded point distance queries with strict signed 64-bit tick input validation. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: classify canonical points as interior, boundary or exterior using exact integer predicates and measure distance to the closed filled polygon from exact rational squared segment distances before one final quantization. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
       "operations": [
         "issue588-contract-publication"
       ],
-      "rationale": "Add the inactive exact canonical circle input, topology and final-only surface-gap measurement prerequisite. Retain legacy gameplay consumers and all sensitive geometry mappings; actual matched visibility, movement and setup observations supply the required comparison. Finite scheduling admission binds only the exact source/test successor and fresh complete covered observation.",
       "selected_families": [],
-      "source_obligation": "Canonicalize signed centres and full diameters once, retain exact half-tick radii, distinguish real external contact from interior overlap and rounded zero gaps, and preserve historical source/evidence/runtime profiles without migration. Current contract examples publish the generated current runtime identity.",
-      "unchanged_work": "No gameplay activation, contact tolerance, inner-history migration, full-game performance or native OS equivalence claim. Different-parity contact placement remains an activation blocker. Preserve 32 local workers, 12 hosted shards, 67% complete branch coverage, 1620-second inclusive approval and termination only above 1800 seconds; mirror 120, smoke 180 and quality 600 limits remain."
+      "rationale": "Regenerate current synthetic contract examples with the existing generator so their advertised engine build and dependent commitments match the new packaged runtime; refresh their manifest hashes.",
+      "source_obligation": "Current generated session, persistence and support-profile examples must publish the verified current engine identity. This is generation of current examples, not migration or relabeling of archived user saves or replay evidence.",
+      "unchanged_work": "The generator, schemas, complete measured runtime/test/tool inputs, runtime algorithms and historical artifacts are unchanged. No new numerical policy, gameplay consumer, public shape, source recipe or native OS equivalence is admitted."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
       "operations": [
         "issue588-contract-publication"
       ],
-      "rationale": "Add the inactive exact canonical circle input, topology and final-only surface-gap measurement prerequisite. Retain legacy gameplay consumers and all sensitive geometry mappings; actual matched visibility, movement and setup observations supply the required comparison. Finite scheduling admission binds only the exact source/test successor and fresh complete covered observation.",
       "selected_families": [],
-      "source_obligation": "Canonicalize signed centres and full diameters once, retain exact half-tick radii, distinguish real external contact from interior overlap and rounded zero gaps, and preserve historical source/evidence/runtime profiles without migration. Current contract examples publish the generated current runtime identity.",
-      "unchanged_work": "No gameplay activation, contact tolerance, inner-history migration, full-game performance or native OS equivalence claim. Different-parity contact placement remains an activation blocker. Preserve 32 local workers, 12 hosted shards, 67% complete branch coverage, 1620-second inclusive approval and termination only above 1800 seconds; mirror 120, smoke 180 and quality 600 limits remain."
+      "rationale": "Regenerate current synthetic contract examples with the existing generator so their advertised engine build and dependent commitments match the new packaged runtime; refresh their manifest hashes.",
+      "source_obligation": "Current generated session, persistence and support-profile examples must publish the verified current engine identity. This is generation of current examples, not migration or relabeling of archived user saves or replay evidence.",
+      "unchanged_work": "The generator, schemas, complete measured runtime/test/tool inputs, runtime algorithms and historical artifacts are unchanged. No new numerical policy, gameplay consumer, public shape, source recipe or native OS equivalence is admitted."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
       "operations": [
         "issue588-contract-publication"
       ],
-      "rationale": "Add the inactive exact canonical circle input, topology and final-only surface-gap measurement prerequisite. Retain legacy gameplay consumers and all sensitive geometry mappings; actual matched visibility, movement and setup observations supply the required comparison. Finite scheduling admission binds only the exact source/test successor and fresh complete covered observation.",
       "selected_families": [],
-      "source_obligation": "Canonicalize signed centres and full diameters once, retain exact half-tick radii, distinguish real external contact from interior overlap and rounded zero gaps, and preserve historical source/evidence/runtime profiles without migration. Current contract examples publish the generated current runtime identity.",
-      "unchanged_work": "No gameplay activation, contact tolerance, inner-history migration, full-game performance or native OS equivalence claim. Different-parity contact placement remains an activation blocker. Preserve 32 local workers, 12 hosted shards, 67% complete branch coverage, 1620-second inclusive approval and termination only above 1800 seconds; mirror 120, smoke 180 and quality 600 limits remain."
+      "rationale": "Regenerate current synthetic contract examples with the existing generator so their advertised engine build and dependent commitments match the new packaged runtime; refresh their manifest hashes.",
+      "source_obligation": "Current generated session, persistence and support-profile examples must publish the verified current engine identity. This is generation of current examples, not migration or relabeling of archived user saves or replay evidence.",
+      "unchanged_work": "The generator, schemas, complete measured runtime/test/tool inputs, runtime algorithms and historical artifacts are unchanged. No new numerical policy, gameplay consumer, public shape, source recipe or native OS equivalence is admitted."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
       "operations": [
         "issue588-contract-publication"
       ],
-      "rationale": "Add the inactive exact canonical circle input, topology and final-only surface-gap measurement prerequisite. Retain legacy gameplay consumers and all sensitive geometry mappings; actual matched visibility, movement and setup observations supply the required comparison. Finite scheduling admission binds only the exact source/test successor and fresh complete covered observation.",
       "selected_families": [],
-      "source_obligation": "Canonicalize signed centres and full diameters once, retain exact half-tick radii, distinguish real external contact from interior overlap and rounded zero gaps, and preserve historical source/evidence/runtime profiles without migration. Current contract examples publish the generated current runtime identity.",
-      "unchanged_work": "No gameplay activation, contact tolerance, inner-history migration, full-game performance or native OS equivalence claim. Different-parity contact placement remains an activation blocker. Preserve 32 local workers, 12 hosted shards, 67% complete branch coverage, 1620-second inclusive approval and termination only above 1800 seconds; mirror 120, smoke 180 and quality 600 limits remain."
+      "rationale": "Regenerate current synthetic contract examples with the existing generator so their advertised engine build and dependent commitments match the new packaged runtime; refresh their manifest hashes.",
+      "source_obligation": "Current generated session, persistence and support-profile examples must publish the verified current engine identity. This is generation of current examples, not migration or relabeling of archived user saves or replay evidence.",
+      "unchanged_work": "The generator, schemas, complete measured runtime/test/tool inputs, runtime algorithms and historical artifacts are unchanged. No new numerical policy, gameplay consumer, public shape, source recipe or native OS equivalence is admitted."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
       "operations": [
         "issue588-contract-publication"
       ],
-      "rationale": "Add the inactive exact canonical circle input, topology and final-only surface-gap measurement prerequisite. Retain legacy gameplay consumers and all sensitive geometry mappings; actual matched visibility, movement and setup observations supply the required comparison. Finite scheduling admission binds only the exact source/test successor and fresh complete covered observation.",
       "selected_families": [],
-      "source_obligation": "Canonicalize signed centres and full diameters once, retain exact half-tick radii, distinguish real external contact from interior overlap and rounded zero gaps, and preserve historical source/evidence/runtime profiles without migration. Current contract examples publish the generated current runtime identity.",
-      "unchanged_work": "No gameplay activation, contact tolerance, inner-history migration, full-game performance or native OS equivalence claim. Different-parity contact placement remains an activation blocker. Preserve 32 local workers, 12 hosted shards, 67% complete branch coverage, 1620-second inclusive approval and termination only above 1800 seconds; mirror 120, smoke 180 and quality 600 limits remain."
+      "rationale": "Regenerate current synthetic contract examples with the existing generator so their advertised engine build and dependent commitments match the new packaged runtime; refresh their manifest hashes.",
+      "source_obligation": "Current generated session, persistence and support-profile examples must publish the verified current engine identity. This is generation of current examples, not migration or relabeling of archived user saves or replay evidence.",
+      "unchanged_work": "The generator, schemas, complete measured runtime/test/tool inputs, runtime algorithms and historical artifacts are unchanged. No new numerical policy, gameplay consumer, public shape, source recipe or native OS equivalence is admitted."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
       "operations": [
         "issue588-contract-publication"
       ],
-      "rationale": "Add the inactive exact canonical circle input, topology and final-only surface-gap measurement prerequisite. Retain legacy gameplay consumers and all sensitive geometry mappings; actual matched visibility, movement and setup observations supply the required comparison. Finite scheduling admission binds only the exact source/test successor and fresh complete covered observation.",
       "selected_families": [],
-      "source_obligation": "Canonicalize signed centres and full diameters once, retain exact half-tick radii, distinguish real external contact from interior overlap and rounded zero gaps, and preserve historical source/evidence/runtime profiles without migration. Current contract examples publish the generated current runtime identity.",
-      "unchanged_work": "No gameplay activation, contact tolerance, inner-history migration, full-game performance or native OS equivalence claim. Different-parity contact placement remains an activation blocker. Preserve 32 local workers, 12 hosted shards, 67% complete branch coverage, 1620-second inclusive approval and termination only above 1800 seconds; mirror 120, smoke 180 and quality 600 limits remain."
+      "rationale": "Regenerate current synthetic contract examples with the existing generator so their advertised engine build and dependent commitments match the new packaged runtime; refresh their manifest hashes.",
+      "source_obligation": "Current generated session, persistence and support-profile examples must publish the verified current engine identity. This is generation of current examples, not migration or relabeling of archived user saves or replay evidence.",
+      "unchanged_work": "The generator, schemas, complete measured runtime/test/tool inputs, runtime algorithms and historical artifacts are unchanged. No new numerical policy, gameplay consumer, public shape, source recipe or native OS equivalence is admitted."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
       "operations": [
         "issue588-contract-publication"
       ],
-      "rationale": "Add the inactive exact canonical circle input, topology and final-only surface-gap measurement prerequisite. Retain legacy gameplay consumers and all sensitive geometry mappings; actual matched visibility, movement and setup observations supply the required comparison. Finite scheduling admission binds only the exact source/test successor and fresh complete covered observation.",
       "selected_families": [],
-      "source_obligation": "Canonicalize signed centres and full diameters once, retain exact half-tick radii, distinguish real external contact from interior overlap and rounded zero gaps, and preserve historical source/evidence/runtime profiles without migration. Current contract examples publish the generated current runtime identity.",
-      "unchanged_work": "No gameplay activation, contact tolerance, inner-history migration, full-game performance or native OS equivalence claim. Different-parity contact placement remains an activation blocker. Preserve 32 local workers, 12 hosted shards, 67% complete branch coverage, 1620-second inclusive approval and termination only above 1800 seconds; mirror 120, smoke 180 and quality 600 limits remain."
+      "rationale": "Regenerate current synthetic contract examples with the existing generator so their advertised engine build and dependent commitments match the new packaged runtime; refresh their manifest hashes.",
+      "source_obligation": "Current generated session, persistence and support-profile examples must publish the verified current engine identity. This is generation of current examples, not migration or relabeling of archived user saves or replay evidence.",
+      "unchanged_work": "The generator, schemas, complete measured runtime/test/tool inputs, runtime algorithms and historical artifacts are unchanged. No new numerical policy, gameplay consumer, public shape, source recipe or native OS equivalence is admitted."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
       "operations": [
         "issue588-contract-publication"
       ],
-      "rationale": "Add the inactive exact canonical circle input, topology and final-only surface-gap measurement prerequisite. Retain legacy gameplay consumers and all sensitive geometry mappings; actual matched visibility, movement and setup observations supply the required comparison. Finite scheduling admission binds only the exact source/test successor and fresh complete covered observation.",
       "selected_families": [],
-      "source_obligation": "Canonicalize signed centres and full diameters once, retain exact half-tick radii, distinguish real external contact from interior overlap and rounded zero gaps, and preserve historical source/evidence/runtime profiles without migration. Current contract examples publish the generated current runtime identity.",
-      "unchanged_work": "No gameplay activation, contact tolerance, inner-history migration, full-game performance or native OS equivalence claim. Different-parity contact placement remains an activation blocker. Preserve 32 local workers, 12 hosted shards, 67% complete branch coverage, 1620-second inclusive approval and termination only above 1800 seconds; mirror 120, smoke 180 and quality 600 limits remain."
+      "rationale": "Regenerate current synthetic contract examples with the existing generator so their advertised engine build and dependent commitments match the new packaged runtime; refresh their manifest hashes.",
+      "source_obligation": "Current generated session, persistence and support-profile examples must publish the verified current engine identity. This is generation of current examples, not migration or relabeling of archived user saves or replay evidence.",
+      "unchanged_work": "The generator, schemas, complete measured runtime/test/tool inputs, runtime algorithms and historical artifacts are unchanged. No new numerical policy, gameplay consumer, public shape, source recipe or native OS equivalence is admitted."
     },
-    "data/source_audits/ci64_provenance_v1/canonical-circle-test-transition-v1.json": {
+    "data/source_audits/ci64_provenance_v1/canonical-polygon-queries-test-transition-v1.json": {
       "category": "rule_semantics",
       "operations": [
-        "canonical-circle-admission"
+        "canonical-polygon-queries-admission"
       ],
-      "rationale": "Add the inactive exact canonical circle input, topology and final-only surface-gap measurement prerequisite. Retain legacy gameplay consumers and all sensitive geometry mappings; actual matched visibility, movement and setup observations supply the required comparison. Finite scheduling admission binds only the exact source/test successor and fresh complete covered observation.",
       "selected_families": [],
-      "source_obligation": "Canonicalize signed centres and full diameters once, retain exact half-tick radii, distinguish real external contact from interior overlap and rounded zero gaps, and preserve historical source/evidence/runtime profiles without migration. Current contract examples publish the generated current runtime identity.",
-      "unchanged_work": "No gameplay activation, contact tolerance, inner-history migration, full-game performance or native OS equivalence claim. Different-parity contact placement remains an activation blocker. Preserve 32 local workers, 12 hosted shards, 67% complete branch coverage, 1620-second inclusive approval and termination only above 1800 seconds; mirror 120, smoke 180 and quality 600 limits remain."
+      "rationale": "Add an inactive exact canonical polygon point classification and once-rounded point distance queries with strict signed 64-bit tick input validation. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: classify canonical points as interior, boundary or exterior using exact integer predicates and measure distance to the closed filled polygon from exact rational squared segment distances before one final quantization. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "category": "governance",
       "operations": [],
-      "rationale": "Add the inactive exact canonical circle input, topology and final-only surface-gap measurement prerequisite. Retain legacy gameplay consumers and all sensitive geometry mappings; actual matched visibility, movement and setup observations supply the required comparison. Finite scheduling admission binds only the exact source/test successor and fresh complete covered observation.",
       "selected_families": [],
-      "source_obligation": "Canonicalize signed centres and full diameters once, retain exact half-tick radii, distinguish real external contact from interior overlap and rounded zero gaps, and preserve historical source/evidence/runtime profiles without migration. Current contract examples publish the generated current runtime identity.",
-      "unchanged_work": "No gameplay activation, contact tolerance, inner-history migration, full-game performance or native OS equivalence claim. Different-parity contact placement remains an activation blocker. Preserve 32 local workers, 12 hosted shards, 67% complete branch coverage, 1620-second inclusive approval and termination only above 1800 seconds; mirror 120, smoke 180 and quality 600 limits remain."
+      "rationale": "Add an inactive exact canonical polygon point classification and once-rounded point distance queries with strict signed 64-bit tick input validation. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: classify canonical points as interior, boundary or exterior using exact integer predicates and measure distance to the closed filled polygon from exact rational squared segment distances before one final quantization. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
     "docs/DISTANCE_PRECISION.md": {
       "category": "governance",
       "operations": [],
-      "rationale": "Add the inactive exact canonical circle input, topology and final-only surface-gap measurement prerequisite. Retain legacy gameplay consumers and all sensitive geometry mappings; actual matched visibility, movement and setup observations supply the required comparison. Finite scheduling admission binds only the exact source/test successor and fresh complete covered observation.",
       "selected_families": [],
-      "source_obligation": "Canonicalize signed centres and full diameters once, retain exact half-tick radii, distinguish real external contact from interior overlap and rounded zero gaps, and preserve historical source/evidence/runtime profiles without migration. Current contract examples publish the generated current runtime identity.",
-      "unchanged_work": "No gameplay activation, contact tolerance, inner-history migration, full-game performance or native OS equivalence claim. Different-parity contact placement remains an activation blocker. Preserve 32 local workers, 12 hosted shards, 67% complete branch coverage, 1620-second inclusive approval and termination only above 1800 seconds; mirror 120, smoke 180 and quality 600 limits remain."
+      "rationale": "Add an inactive exact canonical polygon point classification and once-rounded point distance queries with strict signed 64-bit tick input validation. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: classify canonical points as interior, boundary or exterior using exact integer predicates and measure distance to the closed filled polygon from exact rational squared segment distances before one final quantization. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
-    "docs/performance/current/canonical-circle-movement.json": {
+    "docs/performance/current/polygon-queries-movement.json": {
       "category": "governance",
       "operations": [],
-      "rationale": "Add the inactive exact canonical circle input, topology and final-only surface-gap measurement prerequisite. Retain legacy gameplay consumers and all sensitive geometry mappings; actual matched visibility, movement and setup observations supply the required comparison. Finite scheduling admission binds only the exact source/test successor and fresh complete covered observation.",
       "selected_families": [],
-      "source_obligation": "Canonicalize signed centres and full diameters once, retain exact half-tick radii, distinguish real external contact from interior overlap and rounded zero gaps, and preserve historical source/evidence/runtime profiles without migration. Current contract examples publish the generated current runtime identity.",
-      "unchanged_work": "No gameplay activation, contact tolerance, inner-history migration, full-game performance or native OS equivalence claim. Different-parity contact placement remains an activation blocker. Preserve 32 local workers, 12 hosted shards, 67% complete branch coverage, 1620-second inclusive approval and termination only above 1800 seconds; mirror 120, smoke 180 and quality 600 limits remain."
+      "rationale": "Add an inactive exact canonical polygon point classification and once-rounded point distance queries with strict signed 64-bit tick input validation. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: classify canonical points as interior, boundary or exterior using exact integer predicates and measure distance to the closed filled polygon from exact rational squared segment distances before one final quantization. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
-    "docs/performance/current/canonical-circle-setup.json": {
+    "docs/performance/current/polygon-queries-setup.json": {
       "category": "governance",
       "operations": [],
-      "rationale": "Add the inactive exact canonical circle input, topology and final-only surface-gap measurement prerequisite. Retain legacy gameplay consumers and all sensitive geometry mappings; actual matched visibility, movement and setup observations supply the required comparison. Finite scheduling admission binds only the exact source/test successor and fresh complete covered observation.",
       "selected_families": [],
-      "source_obligation": "Canonicalize signed centres and full diameters once, retain exact half-tick radii, distinguish real external contact from interior overlap and rounded zero gaps, and preserve historical source/evidence/runtime profiles without migration. Current contract examples publish the generated current runtime identity.",
-      "unchanged_work": "No gameplay activation, contact tolerance, inner-history migration, full-game performance or native OS equivalence claim. Different-parity contact placement remains an activation blocker. Preserve 32 local workers, 12 hosted shards, 67% complete branch coverage, 1620-second inclusive approval and termination only above 1800 seconds; mirror 120, smoke 180 and quality 600 limits remain."
+      "rationale": "Add an inactive exact canonical polygon point classification and once-rounded point distance queries with strict signed 64-bit tick input validation. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: classify canonical points as interior, boundary or exterior using exact integer predicates and measure distance to the closed filled polygon from exact rational squared segment distances before one final quantization. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
-    "docs/performance/current/canonical-circle-visibility.json": {
+    "docs/performance/current/polygon-queries-visibility.json": {
       "category": "governance",
       "operations": [],
-      "rationale": "Add the inactive exact canonical circle input, topology and final-only surface-gap measurement prerequisite. Retain legacy gameplay consumers and all sensitive geometry mappings; actual matched visibility, movement and setup observations supply the required comparison. Finite scheduling admission binds only the exact source/test successor and fresh complete covered observation.",
       "selected_families": [],
-      "source_obligation": "Canonicalize signed centres and full diameters once, retain exact half-tick radii, distinguish real external contact from interior overlap and rounded zero gaps, and preserve historical source/evidence/runtime profiles without migration. Current contract examples publish the generated current runtime identity.",
-      "unchanged_work": "No gameplay activation, contact tolerance, inner-history migration, full-game performance or native OS equivalence claim. Different-parity contact placement remains an activation blocker. Preserve 32 local workers, 12 hosted shards, 67% complete branch coverage, 1620-second inclusive approval and termination only above 1800 seconds; mirror 120, smoke 180 and quality 600 limits remain."
+      "rationale": "Add an inactive exact canonical polygon point classification and once-rounded point distance queries with strict signed 64-bit tick input validation. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: classify canonical points as interior, boundary or exterior using exact integer predicates and measure distance to the closed filled polygon from exact rational squared segment distances before one final quantization. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
-      "rationale": "Add the inactive exact canonical circle input, topology and final-only surface-gap measurement prerequisite. Retain legacy gameplay consumers and all sensitive geometry mappings; actual matched visibility, movement and setup observations supply the required comparison. Finite scheduling admission binds only the exact source/test successor and fresh complete covered observation.",
       "selected_families": [],
-      "source_obligation": "Canonicalize signed centres and full diameters once, retain exact half-tick radii, distinguish real external contact from interior overlap and rounded zero gaps, and preserve historical source/evidence/runtime profiles without migration. Current contract examples publish the generated current runtime identity.",
-      "unchanged_work": "No gameplay activation, contact tolerance, inner-history migration, full-game performance or native OS equivalence claim. Different-parity contact placement remains an activation blocker. Preserve 32 local workers, 12 hosted shards, 67% complete branch coverage, 1620-second inclusive approval and termination only above 1800 seconds; mirror 120, smoke 180 and quality 600 limits remain."
+      "rationale": "Add an inactive exact canonical polygon point classification and once-rounded point distance queries with strict signed 64-bit tick input validation. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: classify canonical points as interior, boundary or exterior using exact integer predicates and measure distance to the closed filled polygon from exact rational squared segment distances before one final quantization. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
     "scripts/build_test_shards.py": {
       "category": "rule_semantics",
       "operations": [
         "ci78-cutover-owners-83cd0803bcde80cbfc805d2a110f3274d501da3bc2230de8cc7f95cc0cbd608f"
       ],
-      "rationale": "Add the inactive exact canonical circle input, topology and final-only surface-gap measurement prerequisite. Retain legacy gameplay consumers and all sensitive geometry mappings; actual matched visibility, movement and setup observations supply the required comparison. Finite scheduling admission binds only the exact source/test successor and fresh complete covered observation.",
       "selected_families": [],
-      "source_obligation": "Canonicalize signed centres and full diameters once, retain exact half-tick radii, distinguish real external contact from interior overlap and rounded zero gaps, and preserve historical source/evidence/runtime profiles without migration. Current contract examples publish the generated current runtime identity.",
-      "unchanged_work": "No gameplay activation, contact tolerance, inner-history migration, full-game performance or native OS equivalence claim. Different-parity contact placement remains an activation blocker. Preserve 32 local workers, 12 hosted shards, 67% complete branch coverage, 1620-second inclusive approval and termination only above 1800 seconds; mirror 120, smoke 180 and quality 600 limits remain."
+      "rationale": "Add an inactive exact canonical polygon point classification and once-rounded point distance queries with strict signed 64-bit tick input validation. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: classify canonical points as interior, boundary or exterior using exact integer predicates and measure distance to the closed filled polygon from exact rational squared segment distances before one final quantization. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
-    "scripts/canonical_circle_shard_admission.py": {
+    "scripts/canonical_polygon_queries_shard_admission.py": {
       "category": "measured_workload",
       "operations": [
-        "canonical-circle-admission"
+        "canonical-polygon-queries-admission"
       ],
-      "rationale": "Add the inactive exact canonical circle input, topology and final-only surface-gap measurement prerequisite. Retain legacy gameplay consumers and all sensitive geometry mappings; actual matched visibility, movement and setup observations supply the required comparison. Finite scheduling admission binds only the exact source/test successor and fresh complete covered observation.",
       "selected_families": [],
-      "source_obligation": "Canonicalize signed centres and full diameters once, retain exact half-tick radii, distinguish real external contact from interior overlap and rounded zero gaps, and preserve historical source/evidence/runtime profiles without migration. Current contract examples publish the generated current runtime identity.",
-      "unchanged_work": "No gameplay activation, contact tolerance, inner-history migration, full-game performance or native OS equivalence claim. Different-parity contact placement remains an activation blocker. Preserve 32 local workers, 12 hosted shards, 67% complete branch coverage, 1620-second inclusive approval and termination only above 1800 seconds; mirror 120, smoke 180 and quality 600 limits remain."
+      "rationale": "Add an inactive exact canonical polygon point classification and once-rounded point distance queries with strict signed 64-bit tick input validation. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: classify canonical points as interior, boundary or exterior using exact integer predicates and measure distance to the closed filled polygon from exact rational squared segment distances before one final quantization. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
-    "scripts/canonical_circle_test_admission.py": {
+    "scripts/canonical_polygon_queries_test_admission.py": {
       "category": "measured_workload",
       "operations": [
-        "canonical-circle-admission"
+        "canonical-polygon-queries-admission"
       ],
-      "rationale": "Add the inactive exact canonical circle input, topology and final-only surface-gap measurement prerequisite. Retain legacy gameplay consumers and all sensitive geometry mappings; actual matched visibility, movement and setup observations supply the required comparison. Finite scheduling admission binds only the exact source/test successor and fresh complete covered observation.",
       "selected_families": [],
-      "source_obligation": "Canonicalize signed centres and full diameters once, retain exact half-tick radii, distinguish real external contact from interior overlap and rounded zero gaps, and preserve historical source/evidence/runtime profiles without migration. Current contract examples publish the generated current runtime identity.",
-      "unchanged_work": "No gameplay activation, contact tolerance, inner-history migration, full-game performance or native OS equivalence claim. Different-parity contact placement remains an activation blocker. Preserve 32 local workers, 12 hosted shards, 67% complete branch coverage, 1620-second inclusive approval and termination only above 1800 seconds; mirror 120, smoke 180 and quality 600 limits remain."
+      "rationale": "Add an inactive exact canonical polygon point classification and once-rounded point distance queries with strict signed 64-bit tick input validation. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: classify canonical points as interior, boundary or exterior using exact integer predicates and measure distance to the closed filled polygon from exact rational squared segment distances before one final quantization. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
     "scripts/current_shard_assignment.py": {
       "category": "measured_workload",
       "operations": [
         "scoped-shard-allocation"
       ],
-      "rationale": "Add the inactive exact canonical circle input, topology and final-only surface-gap measurement prerequisite. Retain legacy gameplay consumers and all sensitive geometry mappings; actual matched visibility, movement and setup observations supply the required comparison. Finite scheduling admission binds only the exact source/test successor and fresh complete covered observation.",
       "selected_families": [],
-      "source_obligation": "Canonicalize signed centres and full diameters once, retain exact half-tick radii, distinguish real external contact from interior overlap and rounded zero gaps, and preserve historical source/evidence/runtime profiles without migration. Current contract examples publish the generated current runtime identity.",
-      "unchanged_work": "No gameplay activation, contact tolerance, inner-history migration, full-game performance or native OS equivalence claim. Different-parity contact placement remains an activation blocker. Preserve 32 local workers, 12 hosted shards, 67% complete branch coverage, 1620-second inclusive approval and termination only above 1800 seconds; mirror 120, smoke 180 and quality 600 limits remain."
+      "rationale": "Add an inactive exact canonical polygon point classification and once-rounded point distance queries with strict signed 64-bit tick input validation. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: classify canonical points as interior, boundary or exterior using exact integer predicates and measure distance to the closed filled polygon from exact rational squared segment distances before one final quantization. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
     "scripts/current_shard_compatibility.py": {
       "category": "measured_workload",
       "operations": [
         "scoped-shard-allocation"
       ],
-      "rationale": "Add the inactive exact canonical circle input, topology and final-only surface-gap measurement prerequisite. Retain legacy gameplay consumers and all sensitive geometry mappings; actual matched visibility, movement and setup observations supply the required comparison. Finite scheduling admission binds only the exact source/test successor and fresh complete covered observation.",
       "selected_families": [],
-      "source_obligation": "Canonicalize signed centres and full diameters once, retain exact half-tick radii, distinguish real external contact from interior overlap and rounded zero gaps, and preserve historical source/evidence/runtime profiles without migration. Current contract examples publish the generated current runtime identity.",
-      "unchanged_work": "No gameplay activation, contact tolerance, inner-history migration, full-game performance or native OS equivalence claim. Different-parity contact placement remains an activation blocker. Preserve 32 local workers, 12 hosted shards, 67% complete branch coverage, 1620-second inclusive approval and termination only above 1800 seconds; mirror 120, smoke 180 and quality 600 limits remain."
+      "rationale": "Add an inactive exact canonical polygon point classification and once-rounded point distance queries with strict signed 64-bit tick input validation. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: classify canonical points as interior, boundary or exterior using exact integer predicates and measure distance to the closed filled polygon from exact rational squared segment distances before one final quantization. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
     "scripts/fetch_scheduling_sources.py": {
       "category": "measured_workload",
       "operations": [
         "scoped-shard-allocation"
       ],
-      "rationale": "Add the inactive exact canonical circle input, topology and final-only surface-gap measurement prerequisite. Retain legacy gameplay consumers and all sensitive geometry mappings; actual matched visibility, movement and setup observations supply the required comparison. Finite scheduling admission binds only the exact source/test successor and fresh complete covered observation.",
       "selected_families": [],
-      "source_obligation": "Canonicalize signed centres and full diameters once, retain exact half-tick radii, distinguish real external contact from interior overlap and rounded zero gaps, and preserve historical source/evidence/runtime profiles without migration. Current contract examples publish the generated current runtime identity.",
-      "unchanged_work": "No gameplay activation, contact tolerance, inner-history migration, full-game performance or native OS equivalence claim. Different-parity contact placement remains an activation blocker. Preserve 32 local workers, 12 hosted shards, 67% complete branch coverage, 1620-second inclusive approval and termination only above 1800 seconds; mirror 120, smoke 180 and quality 600 limits remain."
+      "rationale": "Add an inactive exact canonical polygon point classification and once-rounded point distance queries with strict signed 64-bit tick input validation. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: classify canonical points as interior, boundary or exterior using exact integer predicates and measure distance to the closed filled polygon from exact rational squared segment distances before one final quantization. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
+    },
+    "scripts/run_complete_covered_profile.py": {
+      "category": "measured_workload",
+      "operations": [
+        "scoped-shard-allocation"
+      ],
+      "selected_families": [],
+      "rationale": "Enforce the unchanged67percent threshold in the required full JSON report using the locked Coverage CLI, eliminating a second full-source text-report analysis. The shared Coverage threshold and precision path remains authoritative.",
+      "source_obligation": "Preserve full-package source selection, branch measurement, default exclusions, all behavioral cases,32workers, cold index and the complete1620/1800second clock. Real CLI regressions exercise below-floor, exact-floor and branch-denominator failures. Retained late passing results remain timing failures.",
+      "unchanged_work": "No runtime engine change, numerical-policy activation, omitted case, branch denominator change, relaxed coverage/timing limit or retroactive qualification. One warm isolated comparison observed22.115seconds for redundant reporting; only fresh complete qualification can establish timing approval."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
       "operations": [
         "source-record"
       ],
-      "rationale": "Add the inactive exact canonical circle input, topology and final-only surface-gap measurement prerequisite. Retain legacy gameplay consumers and all sensitive geometry mappings; actual matched visibility, movement and setup observations supply the required comparison. Finite scheduling admission binds only the exact source/test successor and fresh complete covered observation.",
       "selected_families": [],
-      "source_obligation": "Canonicalize signed centres and full diameters once, retain exact half-tick radii, distinguish real external contact from interior overlap and rounded zero gaps, and preserve historical source/evidence/runtime profiles without migration. Current contract examples publish the generated current runtime identity.",
-      "unchanged_work": "No gameplay activation, contact tolerance, inner-history migration, full-game performance or native OS equivalence claim. Different-parity contact placement remains an activation blocker. Preserve 32 local workers, 12 hosted shards, 67% complete branch coverage, 1620-second inclusive approval and termination only above 1800 seconds; mirror 120, smoke 180 and quality 600 limits remain."
+      "rationale": "Add an inactive exact canonical polygon point classification and once-rounded point distance queries with strict signed 64-bit tick input validation. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: classify canonical points as interior, boundary or exterior using exact integer predicates and measure distance to the closed filled polygon from exact rational squared segment distances before one final quantization. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
-    "src/warhammer40k_core/geometry/milli_inch_circle.py": {
+    "src/warhammer40k_core/geometry/milli_inch_polygon_queries.py": {
       "category": "rule_semantics",
       "operations": [
         "geometry-search"
       ],
-      "rationale": "Add the inactive exact canonical circle input, topology and final-only surface-gap measurement prerequisite. Retain legacy gameplay consumers and all sensitive geometry mappings; actual matched visibility, movement and setup observations supply the required comparison. Finite scheduling admission binds only the exact source/test successor and fresh complete covered observation.",
       "selected_families": [
         "movement",
         "setup",
         "visibility"
       ],
-      "source_obligation": "Canonicalize signed centres and full diameters once, retain exact half-tick radii, distinguish real external contact from interior overlap and rounded zero gaps, and preserve historical source/evidence/runtime profiles without migration. Current contract examples publish the generated current runtime identity.",
-      "unchanged_work": "No gameplay activation, contact tolerance, inner-history migration, full-game performance or native OS equivalence claim. Different-parity contact placement remains an activation blocker. Preserve 32 local workers, 12 hosted shards, 67% complete branch coverage, 1620-second inclusive approval and termination only above 1800 seconds; mirror 120, smoke 180 and quality 600 limits remain."
+      "rationale": "Add an inactive exact canonical polygon point classification and once-rounded point distance queries with strict signed 64-bit tick input validation. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: classify canonical points as interior, boundary or exterior using exact integer predicates and measure distance to the closed filled polygon from exact rational squared segment distances before one final quantization. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
     "tests/code_quality/test_canonical_circle_shard_admission.py": {
       "category": "measured_workload",
       "operations": [
         "canonical-circle-admission"
       ],
-      "rationale": "Add the inactive exact canonical circle input, topology and final-only surface-gap measurement prerequisite. Retain legacy gameplay consumers and all sensitive geometry mappings; actual matched visibility, movement and setup observations supply the required comparison. Finite scheduling admission binds only the exact source/test successor and fresh complete covered observation.",
       "selected_families": [],
-      "source_obligation": "Canonicalize signed centres and full diameters once, retain exact half-tick radii, distinguish real external contact from interior overlap and rounded zero gaps, and preserve historical source/evidence/runtime profiles without migration. Current contract examples publish the generated current runtime identity.",
-      "unchanged_work": "No gameplay activation, contact tolerance, inner-history migration, full-game performance or native OS equivalence claim. Different-parity contact placement remains an activation blocker. Preserve 32 local workers, 12 hosted shards, 67% complete branch coverage, 1620-second inclusive approval and termination only above 1800 seconds; mirror 120, smoke 180 and quality 600 limits remain."
+      "rationale": "Add an inactive exact canonical polygon point classification and once-rounded point distance queries with strict signed 64-bit tick input validation. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: classify canonical points as interior, boundary or exterior using exact integer predicates and measure distance to the closed filled polygon from exact rational squared segment distances before one final quantization. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
-    "tests/code_quality/test_canonical_polygon_shard_admission.py": {
+    "tests/code_quality/test_canonical_polygon_queries_shard_admission.py": {
       "category": "measured_workload",
       "operations": [
-        "canonical-polygon-admission"
+        "canonical-polygon-queries-admission"
       ],
-      "rationale": "Add the inactive exact canonical circle input, topology and final-only surface-gap measurement prerequisite. Retain legacy gameplay consumers and all sensitive geometry mappings; actual matched visibility, movement and setup observations supply the required comparison. Finite scheduling admission binds only the exact source/test successor and fresh complete covered observation.",
       "selected_families": [],
-      "source_obligation": "Canonicalize signed centres and full diameters once, retain exact half-tick radii, distinguish real external contact from interior overlap and rounded zero gaps, and preserve historical source/evidence/runtime profiles without migration. Current contract examples publish the generated current runtime identity.",
-      "unchanged_work": "No gameplay activation, contact tolerance, inner-history migration, full-game performance or native OS equivalence claim. Different-parity contact placement remains an activation blocker. Preserve 32 local workers, 12 hosted shards, 67% complete branch coverage, 1620-second inclusive approval and termination only above 1800 seconds; mirror 120, smoke 180 and quality 600 limits remain."
+      "rationale": "Add an inactive exact canonical polygon point classification and once-rounded point distance queries with strict signed 64-bit tick input validation. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: classify canonical points as interior, boundary or exterior using exact integer predicates and measure distance to the closed filled polygon from exact rational squared segment distances before one final quantization. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
     "tests/code_quality/test_ci_performance_gates.py": {
       "category": "rule_semantics",
@@ -912,21 +900,37 @@
         "ci78-cutover-owners-2bec45eb6ecc7574f5395711c9381e101ae612cb57b1a0e433c8a508aa991453",
         "milli-inch-test-admission"
       ],
-      "rationale": "Add the inactive exact canonical circle input, topology and final-only surface-gap measurement prerequisite. Retain legacy gameplay consumers and all sensitive geometry mappings; actual matched visibility, movement and setup observations supply the required comparison. Finite scheduling admission binds only the exact source/test successor and fresh complete covered observation.",
       "selected_families": [],
-      "source_obligation": "Canonicalize signed centres and full diameters once, retain exact half-tick radii, distinguish real external contact from interior overlap and rounded zero gaps, and preserve historical source/evidence/runtime profiles without migration. Current contract examples publish the generated current runtime identity.",
-      "unchanged_work": "No gameplay activation, contact tolerance, inner-history migration, full-game performance or native OS equivalence claim. Different-parity contact placement remains an activation blocker. Preserve 32 local workers, 12 hosted shards, 67% complete branch coverage, 1620-second inclusive approval and termination only above 1800 seconds; mirror 120, smoke 180 and quality 600 limits remain."
+      "rationale": "Include the new imported finite-admission helper in both isolated CLI fixture source lists, so the positive active-file collection and negative inactive/naming guards execute their intended boundary.",
+      "source_obligation": "Preserve all existing collected CLI controls and their expected results. Three reproduced missing-import failures are repaired by completing fixture dependencies; no validator, selection policy or test count is weakened.",
+      "unchanged_work": "No engine runtime change, new test case, selector move, budget change or deferred control. The full exact-source quality suite still runs after covered qualification."
     },
-    "tests/rules/section01/test_milli_inch_circle.py": {
+    "tests/code_quality/test_complete_covered_reporting.py": {
       "category": "measured_workload",
       "operations": [
-        "canonical-circle-regressions"
+        "scoped-shard-allocation"
       ],
-      "rationale": "Add the inactive exact canonical circle input, topology and final-only surface-gap measurement prerequisite. Retain legacy gameplay consumers and all sensitive geometry mappings; actual matched visibility, movement and setup observations supply the required comparison. Finite scheduling admission binds only the exact source/test successor and fresh complete covered observation.",
       "selected_families": [],
-      "source_obligation": "Canonicalize signed centres and full diameters once, retain exact half-tick radii, distinguish real external contact from interior overlap and rounded zero gaps, and preserve historical source/evidence/runtime profiles without migration. Current contract examples publish the generated current runtime identity.",
-      "unchanged_work": "No gameplay activation, contact tolerance, inner-history migration, full-game performance or native OS equivalence claim. Different-parity contact placement remains an activation blocker. Preserve 32 local workers, 12 hosted shards, 67% complete branch coverage, 1620-second inclusive approval and termination only above 1800 seconds; mirror 120, smoke 180 and quality 600 limits remain."
+      "rationale": "Enforce the unchanged67percent threshold in the required full JSON report using the locked Coverage CLI, eliminating a second full-source text-report analysis. The shared Coverage threshold and precision path remains authoritative.",
+      "source_obligation": "Preserve full-package source selection, branch measurement, default exclusions, all behavioral cases,32workers, cold index and the complete1620/1800second clock. Real CLI regressions exercise below-floor, exact-floor and branch-denominator failures. Retained late passing results remain timing failures.",
+      "unchanged_work": "No runtime engine change, numerical-policy activation, omitted case, branch denominator change, relaxed coverage/timing limit or retroactive qualification. One warm isolated comparison observed22.115seconds for redundant reporting; only fresh complete qualification can establish timing approval."
+    },
+    "tests/rules/section01/test_milli_inch_polygon_queries.py": {
+      "category": "measured_workload",
+      "operations": [
+        "canonical-polygon-queries-regressions"
+      ],
+      "selected_families": [],
+      "rationale": "Add an inactive exact canonical polygon point classification and once-rounded point distance queries with strict signed 64-bit tick input validation. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: classify canonical points as interior, boundary or exterior using exact integer predicates and measure distance to the closed filled polygon from exact rational squared segment distances before one final quantization. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     }
   },
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:9155e14c9c2ebf6932f47fff50f573bb7ee02b6573d76779ae538bedc8f33137"
+  "milestone": "ordinary",
+  "comparisons": {
+    "visibility": "docs/performance/current/polygon-queries-visibility.json",
+    "movement": "docs/performance/current/polygon-queries-movement.json",
+    "setup": "docs/performance/current/polygon-queries-setup.json"
+  },
+  "full_game": null
 }
