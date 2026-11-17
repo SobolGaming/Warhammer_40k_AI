@@ -5,11 +5,10 @@ from __future__ import annotations
 import copy
 import hashlib
 import json
-import subprocess
 from pathlib import Path
 
 import pytest
-from scripts.current_shard_compatibility import plan
+from scripts.canonical_polygon_shard_admission import BASE as SUCCESSOR_BASE
 from scripts.historical_shard_snapshot import git_bytes
 from scripts.milli_inch_test_admission import (
     ADDITION as FOUNDATION_ADDITION,
@@ -55,14 +54,13 @@ TEST_SOURCES = {OWNER: TEST_SHA256}
 
 
 def test_symbolic_binding_admits_only_its_exact_runtime_transition(tmp_path: Path) -> None:
-    validate_runtime_transition(ROOT)
     snapshot = tmp_path / "source-data"
     snapshot.mkdir()
     materialize_retained_sources(ROOT, snapshot, revision=BASE)
     for name in (*RUNTIME_SOURCES, MANIFEST):
         target = snapshot / name
         target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_bytes((ROOT / name).read_bytes())
+        target.write_bytes(git_bytes(ROOT, SUCCESSOR_BASE, name))
     validate_runtime_transition(snapshot)
     with pytest.raises(SystemExit, match="actual runtime checkout"):
         current_native_role(snapshot, snapshot / "ci/test_shards", {}, {}, frozenset())
@@ -86,8 +84,7 @@ def test_symbolic_binding_admits_only_its_exact_runtime_transition(tmp_path: Pat
 
 
 def test_symbolic_binding_requires_its_complete_measured_producer(tmp_path: Path) -> None:
-    head = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
-    assert producer_inputs(ROOT, head) == runtime_inputs(ROOT)
+    head = SUCCESSOR_BASE
     snapshot = tmp_path / "producer-data"
     snapshot.mkdir()
     materialize_retained_sources(ROOT, snapshot, revision=head)
@@ -167,30 +164,70 @@ def test_symbolic_binding_fetches_both_current_and_retained_producers() -> None:
     assert {BASE, current["source_head"], previous["source_head"]} <= set(producers)
 
 
-def test_symbolic_binding_requires_complete_fresh_evidence_and_fixed_inventory() -> None:
+def test_symbolic_binding_requires_complete_fresh_evidence_and_fixed_inventory(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    from scripts import build_test_shards as sharding
     from scripts.build_test_shards import summary_case_seconds
+    from scripts.complete_covered_evidence import verify_complete_covered_profile
+    from scripts.current_shard_compatibility import NATIVE_PREFIX_OWNER, NEW_NODES
+    from scripts.linux_authority_shard_admission import retained_native_inventory
 
-    descriptor = json.loads((DIRECTORY / "current-runtime-compatibility.json").read_bytes())
+    snapshot = tmp_path / "retained-symbolic-source"
+    snapshot.mkdir()
+    materialize_retained_sources(ROOT, snapshot, revision=SUCCESSOR_BASE)
+    monkeypatch.setattr(sharding, "REPOSITORY_ROOT", snapshot)
+    monkeypatch.setattr(sharding, "TESTS_ROOT", snapshot / "tests")
+    descriptor = json.loads(
+        git_bytes(ROOT, SUCCESSOR_BASE, "ci/test_shards/current-runtime-compatibility.json")
+    )
     assert descriptor["schema"] == SCHEMA
     assert descriptor["current_runtime_fingerprint"] == RUNTIME
     assert descriptor["baseline"]["file"] == BASELINE_FILE
     assert descriptor["fresh_evidence"]["file"] == EVIDENCE_FILE
     assert descriptor["assignment"]["file"] == ASSIGNMENT_FILE
-    summary = json.loads((DIRECTORY / "durations.json").read_bytes())
+    summary = json.loads(git_bytes(ROOT, SUCCESSOR_BASE, "ci/test_shards/durations.json"))
     cases = summary_case_seconds(summary)
-    selected = plan(ROOT, DIRECTORY, cases)
+    baseline = json.loads((DIRECTORY / BASELINE_FILE).read_bytes())
+    native_nodes = frozenset(
+        node for node in NEW_NODES if node.startswith(NATIVE_PREFIX_OWNER + "::")
+    )
+    order, _ = retained_native_inventory(
+        ROOT, DIRECTORY, descriptor["native_serial_role"], native_nodes
+    )
+    seconds = verify_complete_covered_profile(
+        ROOT,
+        DIRECTORY,
+        descriptor["fresh_evidence"],
+        baseline,
+        producer_inputs(snapshot, baseline["source_head"]),
+        order,
+        filename=EVIDENCE_FILE,
+    )
+    assert (
+        seconds
+        == summary["runtime_compatibility"]["native_serial_role"][
+            "with_mirror_native_phase_seconds"
+        ]
+    )
+    assignment = json.loads(git_bytes(ROOT, SUCCESSOR_BASE, "ci/test_shards/" + ASSIGNMENT_FILE))
+    groups = tuple(tuple(assignment["shards"][str(index)]) for index in range(1, 13))
     previous = json.loads((DIRECTORY / "precision-profile-covered-baseline.json").read_bytes())
     assert cases.keys() == previous["case_seconds"].keys() | NODES
-    assert sum(len(group) for group in selected.groups) == 512
-    require_frozen_assignment(ROOT, selected.groups)
+    assert len(cases) == 6381
+    assert sum(len(group) for group in groups) == 512
+    require_frozen_assignment(ROOT, groups)
 
 
-def test_symbolic_test_transition_preserves_original_selection_bytes() -> None:
+def test_symbolic_test_transition_preserves_original_selection_bytes(tmp_path: Path) -> None:
     from scripts import build_test_shards as sharding
     from scripts import symbolic_milli_inch_test_admission as admission
 
-    raw = (ROOT / sharding.CUTOVER_PATH).read_bytes()
-    transition = admission.symbolic_test_transition(ROOT, hashlib.sha256(raw).hexdigest())
+    snapshot = tmp_path / "retained-symbolic-selection"
+    snapshot.mkdir()
+    materialize_retained_sources(ROOT, snapshot, revision=SUCCESSOR_BASE)
+    raw = (snapshot / sharding.CUTOVER_PATH).read_bytes()
+    transition = admission.symbolic_test_transition(snapshot, hashlib.sha256(raw).hexdigest())
     assert transition is not None
     updated, added, provenance = transition
     retained = json.loads(raw)
@@ -198,7 +235,7 @@ def test_symbolic_test_transition_preserves_original_selection_bytes() -> None:
     from scripts.precision_profile_test_admission import OWNER as PROFILE_OWNER
 
     assert set(added) == {FOUNDATION_OWNER, PROFILE_OWNER, OWNER}
-    selected = sharding.behavioral_selection(ROOT)
+    selected = sharding.behavioral_selection(snapshot)
     assert set(selected.active_files) == set(retained["active_files"]) | set(added)
     assert selected.manifest_sha256 == hashlib.sha256(raw + b"\0" + provenance).hexdigest()
 
@@ -240,7 +277,7 @@ def test_symbolic_test_transition_rejects_source_record_and_identity_drift(
     for name in names:
         target = tmp_path / name
         target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_bytes((ROOT / name).read_bytes())
+        target.write_bytes(git_bytes(ROOT, SUCCESSOR_BASE, name))
     retained = RETAINED_CUTOVER_SHA256
     if change in {"source", "test", "record", "foundation", "profile"}:
         name = {

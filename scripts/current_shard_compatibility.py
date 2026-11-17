@@ -123,6 +123,7 @@ NEW_NODES |= frozenset(
 
 
 def enabled(directory: Path, summary: dict[str, object] | None = None) -> bool:
+    from scripts.canonical_polygon_shard_admission import BASELINE_FILE as POLYGON_BASELINE_FILE
     from scripts.linux_authority_shard_admission import BASELINE_FILE as AUTHORITY_BASELINE_FILE
     from scripts.milli_inch_shard_admission import BASELINE_FILE as MILLI_BASELINE_FILE
     from scripts.precision_profile_shard_admission import BASELINE_FILE as PROFILE_BASELINE_FILE
@@ -135,6 +136,7 @@ def enabled(directory: Path, summary: dict[str, object] | None = None) -> bool:
         or (directory / MILLI_BASELINE_FILE).is_file()
         or (directory / PROFILE_BASELINE_FILE).is_file()
         or (directory / SYMBOLIC_BASELINE_FILE).is_file()
+        or (directory / POLYGON_BASELINE_FILE).is_file()
         or (
             summary is not None
             and (
@@ -151,6 +153,10 @@ def enabled(directory: Path, summary: dict[str, object] | None = None) -> bool:
 def _baseline(
     root: Path, directory: Path, descriptor: dict[str, object], history: HistoricalSnapshot
 ) -> dict[str, object]:
+    from scripts.canonical_polygon_shard_admission import BASELINE_FILE as POLYGON_BASELINE_FILE
+    from scripts.canonical_polygon_shard_admission import NODES as POLYGON_NODES
+    from scripts.canonical_polygon_shard_admission import OWNER as POLYGON_OWNER
+    from scripts.canonical_polygon_shard_admission import SCHEMA as POLYGON_SCHEMA
     from scripts.linux_authority_shard_admission import (
         BASELINE_FILE as AUTHORITY_BASELINE_FILE,
     )
@@ -179,17 +185,21 @@ def _baseline(
     from scripts.symbolic_milli_inch_shard_admission import OWNER as SYMBOLIC_OWNER
     from scripts.symbolic_milli_inch_shard_admission import SCHEMA as SYMBOLIC_SCHEMA
 
-    symbolic = descriptor["schema"] == SYMBOLIC_SCHEMA
-    profile = descriptor["schema"] in {PROFILE_SCHEMA, SYMBOLIC_SCHEMA}
-    milli = descriptor["schema"] in {MILLI_SCHEMA, PROFILE_SCHEMA, SYMBOLIC_SCHEMA}
+    polygon = descriptor["schema"] == POLYGON_SCHEMA
+    symbolic = descriptor["schema"] in {SYMBOLIC_SCHEMA, POLYGON_SCHEMA}
+    profile = descriptor["schema"] in {PROFILE_SCHEMA, SYMBOLIC_SCHEMA, POLYGON_SCHEMA}
+    milli = descriptor["schema"] in {MILLI_SCHEMA, PROFILE_SCHEMA, SYMBOLIC_SCHEMA, POLYGON_SCHEMA}
     authority = descriptor["schema"] in {
         AUTHORITY_SCHEMA,
         MILLI_SCHEMA,
         PROFILE_SCHEMA,
         SYMBOLIC_SCHEMA,
+        POLYGON_SCHEMA,
     }
     filename = (
-        SYMBOLIC_BASELINE_FILE
+        POLYGON_BASELINE_FILE
+        if polygon
+        else SYMBOLIC_BASELINE_FILE
         if symbolic
         else PROFILE_BASELINE_FILE
         if profile
@@ -270,6 +280,9 @@ def _baseline(
     if symbolic:
         expected_additions |= SYMBOLIC_NODES
         expected_owners.add(SYMBOLIC_OWNER)
+    if polygon:
+        expected_additions |= POLYGON_NODES
+        expected_owners.add(POLYGON_OWNER)
     if (
         cases.keys() != history.baseline.keys() | expected_additions
         or not history.baseline.keys() < cases.keys()
@@ -385,6 +398,7 @@ class Plan:
 
 def plan(root: Path, directory: Path, cases: dict[str, float]) -> Plan:
     from scripts.boolean_los_admission import SCHEMA as BOOLEAN_SCHEMA
+    from scripts.canonical_polygon_shard_admission import SCHEMA as POLYGON_SCHEMA
     from scripts.extended_shard_allocation import partial_projection
     from scripts.linux_authority_shard_admission import SCHEMA as AUTHORITY_SCHEMA
     from scripts.milli_inch_shard_admission import SCHEMA as MILLI_SCHEMA
@@ -397,6 +411,7 @@ def plan(root: Path, directory: Path, cases: dict[str, float]) -> Plan:
     milli = isinstance(declared, dict) and declared.get("schema") == MILLI_SCHEMA
     profile = isinstance(declared, dict) and declared.get("schema") == PROFILE_SCHEMA
     symbolic = isinstance(declared, dict) and declared.get("schema") == SYMBOLIC_SCHEMA
+    polygon = isinstance(declared, dict) and declared.get("schema") == POLYGON_SCHEMA
 
     descriptor = _object(
         declared,
@@ -410,7 +425,11 @@ def plan(root: Path, directory: Path, cases: dict[str, float]) -> Plan:
             "native_serial_role",
             "planning_policy",
         }
-        | ({"fresh_evidence"} if fresh or authority or milli or profile or symbolic else set()),
+        | (
+            {"fresh_evidence"}
+            if fresh or authority or milli or profile or symbolic or polygon
+            else set()
+        ),
         "runtime compatibility",
     )
     from scripts.current_shard_assignment import current_planning_policy
@@ -424,6 +443,7 @@ def plan(root: Path, directory: Path, cases: dict[str, float]) -> Plan:
             MILLI_SCHEMA,
             PROFILE_SCHEMA,
             SYMBOLIC_SCHEMA,
+            POLYGON_SCHEMA,
         }
         or descriptor["historical_revision"] != HISTORICAL_REVISION
     ):
@@ -442,7 +462,17 @@ def plan(root: Path, directory: Path, cases: dict[str, float]) -> Plan:
         expected_native = frozenset(
             node for node in NEW_NODES if node.startswith(NATIVE_PREFIX_OWNER + "::")
         )
-        if symbolic:
+        if polygon:
+            from scripts.canonical_polygon_shard_admission import (
+                current_native_role as polygon_role,
+            )
+            from scripts.current_native_serial_role import NativeSerialRole
+
+            seconds, native_metadata = polygon_role(
+                root, directory, descriptor, data, expected_native
+            )
+            native_role = NativeSerialRole(None, seconds, native_metadata)
+        elif symbolic:
             from scripts.current_native_serial_role import NativeSerialRole
             from scripts.symbolic_milli_inch_shard_admission import (
                 current_native_role as symbolic_role,
@@ -536,6 +566,12 @@ def plan(root: Path, directory: Path, cases: dict[str, float]) -> Plan:
         from scripts.current_shard_assignment import load_assignment, require_planning_limits
 
         groups, assignment = load_assignment(directory, descriptor, history)
+        if polygon:
+            from scripts.canonical_polygon_shard_admission import (
+                require_frozen_assignment as require_polygon_assignment,
+            )
+
+            require_polygon_assignment(root, groups)
         if symbolic:
             from scripts.symbolic_milli_inch_shard_admission import (
                 require_frozen_assignment as require_symbolic_assignment,
