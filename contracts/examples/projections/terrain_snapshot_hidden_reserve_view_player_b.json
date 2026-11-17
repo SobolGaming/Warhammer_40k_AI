@@ -6973,7 +6973,7 @@
         }
       }
     },
-    "authoritative_geometry_hash": "84c63dc1ffd24327abc645117a0fdd539446a63bde8ffa944b8a9dd4a6e13c03",
+    "authoritative_geometry_hash": "250eb678552b096f637e4478066b3dcb741c5abf7e4bd914d20db9e07cb695fa",
     "battlefield_id": "ui-contract-terrain-snapshot-hidden-reserve:take-and-hold-vs-purge-the-foe-layout-3-deployment:battlefield",
     "bounds": {
       "max_x_inches": 44.0,
@@ -15005,7 +15005,7 @@
     }
   ],
   "projection_schema": "game-view-v14-viewer-identities",
-  "projection_state_hash": "17d75bb30e1ba99467cc030fc4b8c20723071f8ca6efa9b6ee4ed593b6f042e7",
+  "projection_state_hash": "9c8477c91d03d71570f9cbf72b395adacd4e0995a87b6945bf25f2b207626399",
   "public_army_rosters": [
     {
       "army_id": "army-alpha",

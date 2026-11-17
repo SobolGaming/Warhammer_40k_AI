@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass, field
-from typing import Self, TypedDict
+from typing import Self, TypedDict, cast
 
 
 class GeometryError(ValueError):
@@ -56,6 +56,10 @@ class Point3:
 
     @classmethod
     def from_payload(cls, payload: Point3Payload) -> Self:
+        if type(cast(object, payload)) is not dict or set(payload) != {"x", "y", "z"}:
+            raise GeometryError(
+                "Point3 requires its legacy coordinate payload; incompatible fields are forbidden."
+            )
         return cls(x=payload["x"], y=payload["y"], z=payload["z"])
 
 
@@ -79,6 +83,10 @@ class Facing:
 
     @classmethod
     def from_payload(cls, payload: FacingPayload) -> Self:
+        if type(cast(object, payload)) is not dict or set(payload) != {"degrees"}:
+            raise GeometryError(
+                "Facing requires its legacy coordinate payload; incompatible fields are forbidden."
+            )
         return cls(degrees=payload["degrees"])
 
 
@@ -114,6 +122,10 @@ class Pose:
 
     @classmethod
     def from_payload(cls, payload: PosePayload) -> Self:
+        if type(cast(object, payload)) is not dict or set(payload) != {"position", "facing"}:
+            raise GeometryError(
+                "Pose requires its legacy coordinate payload; incompatible fields are forbidden."
+            )
         return cls(
             position=Point3.from_payload(payload["position"]),
             facing=Facing.from_payload(payload["facing"]),

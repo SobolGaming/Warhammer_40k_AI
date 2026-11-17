@@ -55,7 +55,9 @@ from warhammer40k_core.engine.replay import (
     replay_event_log_hash,
 )
 
-LOCAL_GAME_SESSION_PERSISTENCE_SCHEMA_VERSION = "local-game-session-persistence-v2-private-rng"
+LOCAL_GAME_SESSION_PERSISTENCE_SCHEMA_VERSION = (
+    "local-game-session-persistence-v3-numerical-identity"
+)
 
 
 class LocalGameSessionPersistencePayload(TypedDict):

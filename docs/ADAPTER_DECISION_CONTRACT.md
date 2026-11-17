@@ -8212,3 +8212,14 @@ Battlefield typed entity-map keys and contained identifiers share the issued
 viewer namespace. The battlefield geometry commitment is computed from the
 emitted public bounds and authoritative entity payload; an identity translation
 must not leave a commitment to different, unprojected identifiers.
+
+## Numerical identity admission
+
+External contract 47.0.0 binds the legacy numerical policy and coordinate
+representation in config/state and replay identity. Current persistence uses
+local-game-session-persistence-v3-numerical-identity; replay uses
+replay-artifact-v38-numerical-identity. No player choice or new precision mode is
+added. Legacy pose/path proposals retain their schema and reject unknown numerical
+labels at every pose and model-path boundary before accepted engine mutation.
+Old unbound histories require their retained compatible executor; loading never
+inserts a numerical identity into an old history.

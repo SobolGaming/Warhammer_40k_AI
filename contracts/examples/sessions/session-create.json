@@ -5721,6 +5721,11 @@
       ],
       "terrain_layout_id": "take-and-hold-vs-purge-the-foe-layout-3"
     },
+    "numerical_identity": {
+      "coordinate_representation_id": "binary-float-pose-v1",
+      "numerical_policy_id": "legacy-binary-inch-v1",
+      "version": "engine-numerical-identity-v1"
+    },
     "player_ids": [
       "player-a",
       "player-b"
@@ -6380,5 +6385,5 @@
       "player-b"
     ]
   },
-  "schema_version": "session-create-v5-private-rng"
+  "schema_version": "session-create-v6-numerical-identity"
 }

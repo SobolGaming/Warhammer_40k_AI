@@ -469,11 +469,18 @@ def behavioral_selection(root: Path) -> BehavioralSelection:
     from scripts.canonical_polygon_pairs_test_admission import polygon_pairs_test_transition
     from scripts.canonical_polygon_queries_test_admission import polygon_queries_test_transition
     from scripts.canonical_polygon_test_admission import polygon_test_transition
+    from scripts.engine_numerical_identity_test_admission import (
+        engine_numerical_identity_test_transition,
+    )
     from scripts.exact_contact_test_admission import exact_contact_test_transition
     from scripts.precision_profile_test_admission import profile_test_transition
     from scripts.symbolic_milli_inch_test_admission import symbolic_test_transition
 
-    profile_transition = exact_contact_test_transition(root, hashlib.sha256(raw).hexdigest())
+    profile_transition = engine_numerical_identity_test_transition(
+        root, hashlib.sha256(raw).hexdigest()
+    )
+    if profile_transition is None:
+        profile_transition = exact_contact_test_transition(root, hashlib.sha256(raw).hexdigest())
     if profile_transition is None:
         profile_transition = polygon_pairs_test_transition(root, hashlib.sha256(raw).hexdigest())
     if profile_transition is None:

@@ -195,6 +195,7 @@ class LinuxAuthorityDispatcher:
                     payload_bytes=canonical_json(inner).encode("utf-8"),
                     profile=self.profile,
                     provenance=owned.provenance,
+                    payload_schema=LOCAL_GAME_SESSION_PERSISTENCE_SCHEMA_VERSION,
                 )
                 owned.checkpoint_cache_identity = cache_identity
             return copy.deepcopy(owned.checkpoint)

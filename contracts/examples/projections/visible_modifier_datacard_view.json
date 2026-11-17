@@ -7101,7 +7101,7 @@
         }
       }
     },
-    "authoritative_geometry_hash": "18e905ef8e983065918b645b30135a47e28b71a80775ac98ec07c79ed9613950",
+    "authoritative_geometry_hash": "a686f44ffafb8a8f68cea3dc3e7492904ac3c2fc549d8687d9e446d7b886b9f8",
     "battlefield_id": "ui-contract-visible-modifier:take-and-hold-vs-purge-the-foe-layout-3-deployment:battlefield",
     "bounds": {
       "max_x_inches": 44.0,
@@ -15156,7 +15156,7 @@
     }
   ],
   "projection_schema": "game-view-v14-viewer-identities",
-  "projection_state_hash": "3da58c06b16a456a04b93d6bfe57fa919cb8d8fe744fd2fa9da7aa571cf87faf",
+  "projection_state_hash": "e4b208ac7b9d21734c30b07745e1752c0a9f7040b0023cdc59afd7db96473532",
   "public_army_rosters": [
     {
       "army_id": "army-alpha",

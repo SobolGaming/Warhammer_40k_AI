@@ -869,7 +869,7 @@
       "type": "string"
     },
     "mission_setup": {
-      "$ref": "https://warhammer40k-core.local/contracts/v4/create-session.schema.json#/properties/config/properties/mission_setup"
+      "$ref": "https://warhammer40k-core.local/contracts/v5/create-session.schema.json#/properties/config/properties/mission_setup"
     },
     "model_display_by_id": {
       "additionalProperties": {

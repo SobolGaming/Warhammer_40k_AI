@@ -18,7 +18,7 @@ def historical_checkpoint_bytes() -> bytes:
 
 @lru_cache(maxsize=1)
 def recovered_checkpoint_bytes() -> bytes:
-    from warhammer40k_core.adapters.checkpoint_reconstruction import (
+    from warhammer40k_core.adapters.numerical_checkpoint_reconstruction import (
         PROFILE_ID,
         reconstruct_local_checkpoint,
     )

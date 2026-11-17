@@ -1,5 +1,46 @@
 # Distance precision contract and rollout status
 
+## Active inner numerical identity
+
+New native and registered Linux sessions bind `engine-numerical-identity-v1` in
+both `GameConfig` and `GameState`. The only admitted combination is
+`legacy-binary-inch-v1` with `binary-float-pose-v1`. Construction, restoration and
+config/state consistency reject other identities; missing identity requires the
+retained compatible executor. Replay config hashes bind this identity, and current
+visibility context cache keys and authoritative geometry hashes include the complete
+contract. Serialized legacy spatial revision tokens retain their original encoding,
+so cache metadata does not perturb recorded witnesses or RNG history. Lower-level
+legacy geometry/reachability caches still require review before another policy is
+admitted.
+Legacy pose and path payloads retain their shape but reject unknown fields at the
+pose, point, facing, witness and model-path boundaries. An exact-coordinate label
+cannot disappear while its coordinates are interpreted as legacy floats.
+
+The native persistence format is `local-game-session-persistence-v3-numerical-identity`
+and replay format is `replay-artifact-v38-numerical-identity`, under external contract
+47.0.0. Original histories, envelopes, hashes, producer records and reconstruction
+recipes retain their original bytes and require their original compatible runtime;
+there is no automatic migration or re-labeling. New envelopes carry their actual
+new inner schema. The generic historical byte envelope utility retains its original
+default and does not admit an old checkpoint on a current executor.
+
+The separate operator profile
+`local-checkpoint:legacy-model-completion:2026-10-14:numerical-identity-v1`
+uses reconstruction recipe v4 for the one authenticated October 14 audit input.
+It explicitly adds the legacy identity at the declared config/state/history
+anchors and records their new config and setup-state hashes. The original v3
+recipe, source bytes and all original events, decisions, RNG history/draw count,
+dice faces and gameplay outcomes remain preserved. Current positive reconstruction,
+continuation, fork, persistence/replay and tamper controls use the explicit v4
+profile. No loader automatically selects it after a failed restore.
+
+This slice activates identity enforcement and strict legacy path decoding. It does
+not activate milli-inch measurement or rational/quadratic poses. Authoritative
+`Pose`, physical models, spatial state, terrain/backend predicates and solver
+witnesses still require a coordinated exact representation before exact movement
+can be admitted. No exact shadow state, rounding conversion or approximate fallback
+is used. Linux remains authoritative.
+
 ## Explicit legacy policy binding
 
 New registered Linux executors use `linux-execution-profile-v2-numerical-policy`
@@ -19,9 +60,9 @@ inner checkpoint hash. Profiles are detached from caller-owned dictionaries so a
 caller cannot relabel an existing session or cached envelope. Restoration and
 replay require the exact registered profile before decoding the inner payload.
 
-This is the outer identity slice. Inner `GameConfig`, lifecycle, decision/event
-streams, replay artifacts, geometry/spatial witness hashes and the native
-`LocalGameSession` persistence format retain their existing bytes and semantics.
+This is the outer identity slice. The active inner identity section above supersedes the earlier unbound config,
+state, spatial keys, geometry hash and native persistence/replay format. Numerical
+arithmetic and decision/event semantics remain legacy.
 The unprofiled native API remains the existing legacy path; it does not accept a
 new numerical mode. Retained profile-v1 envelopes require their original compatible
 executor. The generic envelope byte utility can preserve those original bytes,
@@ -235,8 +276,9 @@ are preserved. No native Windows/Linux engine equivalence is established.
 
 ## Finite activation checklist and next contact decision
 
-The implemented arithmetic, outer policy binding and canonical circle/polygon
-queries remain inactive prerequisites. New-mode gameplay may be admitted only
+The implemented arithmetic and canonical circle/polygon queries remain inactive
+prerequisites. Outer policy binding and the legacy-only inner identity/cache/path
+admission described above are active. New-mode gameplay may be admitted only
 after all of these concrete obligations are completed and independently reviewed:
 
 1. **Primitive geometry:** complete the supported circle/polygon and oval/rotated
@@ -247,7 +289,10 @@ after all of these concrete obligations are completed and independently reviewed
    through an explicit owner decision, then implement the chosen complete contact
    representation. Demonstrate ordinary legal contact-required moves, multi-contact
    formations and mandatory full-path witnesses without tolerances or overlap.
-3. **Inner identity and retention:** carry numerical policy through GameConfig,
+3. **Inner identity and retention:** legacy config/state, replay identity,
+   authoritative geometry hashes and visibility context caches are now bound.
+   Extend that integration deliberately to exact authoritative poses and all
+   affected consumers/caches before admitting another policy. Carry it through GameConfig,
    lifecycle, decisions/events, replay identity, geometry/spatial hashes and all
    dependent cache keys. Reject unknown/mixed policies and stale cross-policy
    caches. Qualify engine-generated valid-state save/load/full replay while retaining
@@ -267,8 +312,9 @@ after all of these concrete obligations are completed and independently reviewed
    hosted checks, and verified main CI. Keep 1,620-second inclusive approval,
    termination only above 1,800 seconds, and all other existing limits unchanged.
 
-The next dependency-blocking question is the representation of exact contact
-placements. The user's requirement rounds distances and distance-related values
+The next blocking integration is exact authoritative poses and mandatory engine
+path witnesses; the finite geometric contact representation above remains inactive.
+The original representation conflict motivating that design is retained below. The user's requirement rounds distances and distance-related values
 to 0.001 inch; it does not explicitly require stored coordinates to lie on a
 0.001-inch grid. The staged contract above imposes that stronger integer-coordinate
 choice. Exact derived authoritative poses are a candidate amendment to that
@@ -476,6 +522,6 @@ conversion, squared and algebraic measurements, strict/inclusive thresholds,
 contact versus overlap, path subdivision and accumulation, collapsed topology,
 profile/hash/cache separation, valid-state persistence/full replay, and both OS
 clients. Until those gates pass, this section specifies the target semantics and
-the implemented pure foundation, symbolic measurement prerequisite and outer
-legacy-policy binding only; it makes no
+the implemented pure foundation, symbolic measurement prerequisite and active
+outer/inner legacy identity enforcement only; it makes no
 project-wide rollout claim.

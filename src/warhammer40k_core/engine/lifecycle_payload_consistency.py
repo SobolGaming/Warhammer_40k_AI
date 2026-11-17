@@ -34,6 +34,8 @@ def validate_config_state_payload_consistency(
 ) -> None:
     if config is None:
         return
+    if state.numerical_identity != config.numerical_identity:
+        raise GameLifecycleError("Lifecycle numerical identity does not match config.")
     if state.game_id != config.game_id:
         raise GameLifecycleError("Lifecycle state game_id does not match config.")
     validate_private_rng_seed_pair(

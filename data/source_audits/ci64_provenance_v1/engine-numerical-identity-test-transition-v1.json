@@ -1,0 +1,54 @@
+{
+  "added_cases": 26,
+  "added_files": {
+    "tests/rules/section01/test_engine_numerical_identity.py": {
+      "blob_sha1": "abe8eb9f28eb6f7167b5e5d4501af4197140fd51",
+      "bytes": 16127,
+      "mode": "100644",
+      "sha256": "98bcc81ce10207fed2af8f4dc0a75e47640e22df411047bc4134753111b33f95"
+    }
+  },
+  "retained_circle_sha256": "a82643598fb01025704bd9d222643fce81e9f772d938a968f1b6568bd9542f19",
+  "retained_contact_sha256": "0c8e58ab3a4feb1f6525ac490e18e518869326a53e1a42a8ccd9e8cb15a8b61d",
+  "retained_cutover_sha256": "4cd1f0b062fad661e1c71fe27d2e9f8279c3c21d2a9f7bea9e3b053db79afce3",
+  "retained_foundation_sha256": "9ebbf6d4cf39d25a60c78a4312e0a128c5b43b6c79c64ed91fa41e4387366e07",
+  "retained_pairs_sha256": "06a2fe4f9fb0b1803412f058d41b37d41272b5db18c039481c9926053142c46e",
+  "retained_polygon_sha256": "56253b70e4c56a6c6b9dd3a053b127211811fc1ec79e3a5097285feaf023c263",
+  "retained_profile_sha256": "020dcec99278aa79f2215762a525c0c029231cdb9c64f1e988d4a1719e0fbb74",
+  "retained_queries_sha256": "46e4cd2b9e1045991a52c4361e4fe61ddaf230c07c8437a46a574e9eecf97820",
+  "retained_symbolic_sha256": "23943a7fb56ba7b6e3da0888667d15959b4b1ae4e2148be0b6e6ab3d1aeeb9cb",
+  "runtime_fingerprint": "0f222a365137d66682ff402cf08891e4231dab67c52f464196b2b611d2e52a5b",
+  "schema": "finite-engine-numerical-identity-test-transition-v1",
+  "sources": {
+    "contracts/schemas/create-session.schema.json": "d31d970da328c065dc444a4bf92208615499c72b6fc5c7c8e18f72b4b06d1657",
+    "contracts/schemas/game-view.schema.json": "6de66cddb19389465e148ddeec41f07e62b5826fa6cfa42b2a1e333a7f43622a",
+    "contracts/schemas/replay-metadata.schema.json": "c58997bf59ab3002e165de8bf11b261d4015d7a18d6a8833f3e6b20b2f6a171b",
+    "contracts/schemas/session-command-outcome.schema.json": "c0daaf53e1c66aed65c491a8f80a5a5bf04f4337954629719f0891de1cb629ad",
+    "contracts/schemas/session-command-result.schema.json": "3fde2e244d4328f78f2c0c38fb59ff64b0dc02f4b0e1d7a20bc1047c282159a7",
+    "contracts/schemas/session-create.schema.json": "4c7167c56cb2771100c61e956a08040aab7dc9a2d694aeadc7c1bc4aaf5ec5be",
+    "contracts/schemas/session-metadata.schema.json": "49dd08a1496d1d2a52bd627daf72c930f5c0c5f15758baeea7ea2d6251c5b5a5",
+    "contracts/schemas/session-persistence.schema.json": "98d8b361188108cfcdefcd7b689764fc5b1cfbdd8cc0434439633732f9aa3def",
+    "src/warhammer40k_core/adapters/battlefield_projection.py": "632e82480b3a8d72ee5c5a503bee034779bddf7c7d102c00e1fb128d9784f8ea",
+    "src/warhammer40k_core/adapters/external_contract.py": "a9fd66f2f03fe8d05485c0b48f3672f548a182044ade32c191f985f490bc8eb1",
+    "src/warhammer40k_core/adapters/linux_authority_worker.py": "c0904a8daec7f2fc836fdfcde6dae5e66e611bec017c96a8b97866588eb28f2c",
+    "src/warhammer40k_core/adapters/local_session.py": "fab4f30a4e83ba327fcecb3e23c829541a3ad337f2856634c0e17163d5f4f080",
+    "src/warhammer40k_core/adapters/numerical_checkpoint_reconstruction.py": "934c5d24fdff7781ffa199cbc370ea0cb970b27eed611b76afd07307e551b4ba",
+    "src/warhammer40k_core/core/visibility.py": "86b7f154e5c5f30f20844491a9f61a2be685bfab42bd5d2a6e1d6a051a86502a",
+    "src/warhammer40k_core/engine/game_state.py": "ca645341d6340ca2596fd6f0881e66e83525fd2aab5cd311273593f2f048b5e9",
+    "src/warhammer40k_core/engine/game_state_payloads.py": "fc66a7e43a45666048e2d6889faef0e1cdc2fd20cdf9b2e43fdbfcd31f484041",
+    "src/warhammer40k_core/engine/lifecycle_payload_consistency.py": "f2e3cf88dc5accb103d8f2aa244f68960034366af42e46dc31c533dbff505af6",
+    "src/warhammer40k_core/engine/numerical_identity.py": "cde0b845aec00f9e76e0b7a06394c74eb22668918cfa8c8033e8d89a1d84de0e",
+    "src/warhammer40k_core/engine/replay.py": "a47d3588f5f073347ca2096fc038c06027bbd6d1c3050e0f418aaa01825efbcc",
+    "src/warhammer40k_core/geometry/numerical_identity.py": "73b101b47264c6c2a7f1db9597247b89b6f9c3170b7c3208254ce73ebaf51462",
+    "src/warhammer40k_core/geometry/pathing.py": "3a7525e05305855ac8b3a1ef930878a4f19a84ceb07ce7687f16306dc825b265",
+    "src/warhammer40k_core/geometry/pose.py": "04a0e752e05f381fd7adc836a19438907cd9b2626032d434fc6d142f4579fa86"
+  },
+  "updated_files": {
+    "tests/rules/section18/test_facade.py": {
+      "blob_sha1": "c531f184d6e5c21bb18344609889fe6dd40fb992",
+      "bytes": 34026,
+      "mode": "100644",
+      "sha256": "e57eed3325fdb9ff1e4e4e85682f7db56a012c5a77a071f3ebbfdb1609553457"
+    }
+  }
+}

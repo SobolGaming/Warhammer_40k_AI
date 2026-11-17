@@ -47,6 +47,10 @@ def load_assignment(
     from scripts.canonical_polygon_queries_shard_admission import SCHEMA as QUERIES_SCHEMA
     from scripts.canonical_polygon_shard_admission import ASSIGNMENT_FILE as POLYGON_ASSIGNMENT_FILE
     from scripts.canonical_polygon_shard_admission import SCHEMA as POLYGON_SCHEMA
+    from scripts.engine_numerical_identity_shard_admission import (
+        ASSIGNMENT_FILE as IDENTITY_ASSIGNMENT_FILE,
+    )
+    from scripts.engine_numerical_identity_shard_admission import SCHEMA as IDENTITY_SCHEMA
     from scripts.exact_contact_shard_admission import ASSIGNMENT_FILE as CONTACT_ASSIGNMENT_FILE
     from scripts.exact_contact_shard_admission import SCHEMA as CONTACT_SCHEMA
     from scripts.linux_authority_shard_admission import (
@@ -64,6 +68,7 @@ def load_assignment(
     )
     from scripts.symbolic_milli_inch_shard_admission import SCHEMA as SYMBOLIC_SCHEMA
 
+    identity = descriptor["schema"] == IDENTITY_SCHEMA
     contact = descriptor["schema"] == CONTACT_SCHEMA
     pairs = descriptor["schema"] == PAIRS_SCHEMA
     queries = descriptor["schema"] == QUERIES_SCHEMA
@@ -74,7 +79,9 @@ def load_assignment(
     authority = descriptor["schema"] == AUTHORITY_SCHEMA
     milli = descriptor["schema"] == MILLI_SCHEMA
     filename = (
-        CONTACT_ASSIGNMENT_FILE
+        IDENTITY_ASSIGNMENT_FILE
+        if identity
+        else CONTACT_ASSIGNMENT_FILE
         if contact
         else PAIRS_ASSIGNMENT_FILE
         if pairs
@@ -140,7 +147,9 @@ def load_assignment(
     expected.update(owners)
     selected = Counter(selector for group in groups for selector in group)
     if selected != expected or len(selected) != (
-        517
+        518
+        if identity
+        else 517
         if contact
         else 516
         if pairs

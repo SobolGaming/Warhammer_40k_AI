@@ -409,12 +409,12 @@ def test_a32_oct14_explicit_recovery_restores_continues_forks_and_replays() -> N
 
     from tests.support.a32_recovery import historical_checkpoint_bytes, recovered_payload
     from tests.support.a32_transport import PASSENGER, emergency_payload
-    from warhammer40k_core.adapters.checkpoint_reconstruction import (
-        verify_checkpoint_reconstruction,
-    )
     from warhammer40k_core.adapters.local_session import (
         LocalGameSession,
         LocalGameSessionPersistenceError,
+    )
+    from warhammer40k_core.adapters.numerical_checkpoint_reconstruction import (
+        verify_checkpoint_reconstruction,
     )
     from warhammer40k_core.engine.replay import ReplayRunner, ReplayRunStatus
 
@@ -460,7 +460,7 @@ def test_a32_oct14_reconstruction_is_deterministic_and_keeps_original_outcomes(
     import hashlib
 
     from tests.support.a32_recovery import historical_checkpoint_bytes, recovered_payload
-    from warhammer40k_core.adapters.checkpoint_reconstruction import (
+    from warhammer40k_core.adapters.numerical_checkpoint_reconstruction import (
         PROFILE_ID,
         reconstruct_local_checkpoint,
     )
@@ -486,6 +486,11 @@ def test_a32_oct14_reconstruction_is_deterministic_and_keeps_original_outcomes(
             == hashlib.sha256(b"a32-exact-artifact-reconstruction-v3:3223").hexdigest()
         )
         assert payload.pop("tactical_secondary_draw_sequence") == 0
+        assert payload.pop("numerical_identity") == {
+            "version": "engine-numerical-identity-v1",
+            "numerical_policy_id": "legacy-binary-inch-v1",
+            "coordinate_representation_id": "binary-float-pose-v1",
+        }
         field = (
             "pre_battle_checkpoint"
             if checkpoint_kind == "pre_battle_start"
@@ -543,7 +548,7 @@ def test_a32_oct14_reconstruction_is_deterministic_and_keeps_original_outcomes(
     assert provenance["reconstructed_event_count"] == 138
     assert provenance["decision_count"] == 18
     assert provenance["original_byte_replay_claimed"] is False
-    assert provenance["recipe_version"] == "recorded-decision-reconstruction-v3-audit-rng"
+    assert provenance["recipe_version"] == "recorded-decision-reconstruction-v4-numerical-identity"
     assert provenance["original_decisions_and_gameplay_outcomes_preserved"] is True
     assert provenance["original_rng_metadata_preserved"] is False
     assert provenance["secret_competitive_rng_suitable"] is False
@@ -563,7 +568,7 @@ def test_a32_oct14_reconstruction_is_deterministic_and_keeps_original_outcomes(
     assert isinstance(reconstructed_identity, dict)
     assert mapping["reconstructed"] == reconstructed_identity["mission_source_package_hash"]
     assert mapping["added_scoring_value"] == "player_turn"
-    assert second["schema_version"] == "local-checkpoint-reconstruction-v3-audit-rng"
+    assert second["schema_version"] == "local-checkpoint-reconstruction-v4-numerical-identity"
 
 
 @pytest.mark.parametrize(
@@ -594,7 +599,7 @@ def test_a32_oct14_recovery_rejects_inconsistent_reconstructions(change: str) ->
     import hashlib
 
     from tests.support.a32_recovery import historical_checkpoint_bytes, recovered_payload
-    from warhammer40k_core.adapters.checkpoint_reconstruction import (
+    from warhammer40k_core.adapters.numerical_checkpoint_reconstruction import (
         CheckpointReconstructionError,
         verify_checkpoint_reconstruction,
     )
@@ -700,7 +705,7 @@ def test_a32_oct14_recovery_rejects_inconsistent_reconstructions(change: str) ->
 
 def test_a32_oct14_recovery_rejects_different_or_underdetermined_source() -> None:
     from tests.support.a32_recovery import historical_checkpoint_bytes
-    from warhammer40k_core.adapters.checkpoint_reconstruction import (
+    from warhammer40k_core.adapters.numerical_checkpoint_reconstruction import (
         PROFILE_ID,
         CheckpointReconstructionError,
         reconstruct_local_checkpoint,
@@ -722,7 +727,7 @@ def test_a32_oct14_cli_never_overwrites_original_or_existing_output(
     import sys
 
     from tests.support.a32_recovery import historical_checkpoint_bytes
-    from warhammer40k_core.adapters.checkpoint_reconstruction import PROFILE_ID
+    from warhammer40k_core.adapters.numerical_checkpoint_reconstruction import PROFILE_ID
 
     source = tmp_path / "original.json"
     raw = historical_checkpoint_bytes()
