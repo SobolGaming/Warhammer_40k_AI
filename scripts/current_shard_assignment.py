@@ -45,12 +45,19 @@ def load_assignment(
     from scripts.milli_inch_shard_admission import SCHEMA as MILLI_SCHEMA
     from scripts.precision_profile_shard_admission import ASSIGNMENT_FILE as PROFILE_ASSIGNMENT_FILE
     from scripts.precision_profile_shard_admission import SCHEMA as PROFILE_SCHEMA
+    from scripts.symbolic_milli_inch_shard_admission import (
+        ASSIGNMENT_FILE as SYMBOLIC_ASSIGNMENT_FILE,
+    )
+    from scripts.symbolic_milli_inch_shard_admission import SCHEMA as SYMBOLIC_SCHEMA
 
+    symbolic = descriptor["schema"] == SYMBOLIC_SCHEMA
     profile = descriptor["schema"] == PROFILE_SCHEMA
     authority = descriptor["schema"] == AUTHORITY_SCHEMA
     milli = descriptor["schema"] == MILLI_SCHEMA
     filename = (
-        PROFILE_ASSIGNMENT_FILE
+        SYMBOLIC_ASSIGNMENT_FILE
+        if symbolic
+        else PROFILE_ASSIGNMENT_FILE
         if profile
         else MILLI_ASSIGNMENT_FILE
         if milli
@@ -104,7 +111,7 @@ def load_assignment(
     expected.update(owners)
     selected = Counter(selector for group in groups for selector in group)
     if selected != expected or len(selected) != (
-        511 if profile else 510 if milli else 509 if authority else 508
+        512 if symbolic else 511 if profile else 510 if milli else 509 if authority else 508
     ):
         raise SystemExit("Derived current assignment selector inventory differs.")
     extension = history.scope.extension

@@ -1,16 +1,16 @@
 {
   "assignment": {
-    "file": "precision-profile-derived-assignment.json",
-    "sha256": "f75635997801c90697532b1cbaaea3519915c1ae644553decd9301ee7ec60c65"
+    "file": "symbolic-milli-inch-derived-assignment.json",
+    "sha256": "10f22c92520ef7c226e386a14940207ccef957a8082911386cd137d413121ba2"
   },
   "baseline": {
-    "file": "precision-profile-covered-baseline.json",
-    "sha256": "a0e490d404a3bea831f0e44bcb2ca65874e33138c766fdcf1f6f757b37616fff"
+    "file": "symbolic-milli-inch-covered-baseline.json",
+    "sha256": "1c3eed80a26137a90d73a77f537631d42459d065155535655c8ea07c814dccc6"
   },
-  "current_runtime_fingerprint": "ae914a56833e43a3bbf086730b354c7a18673ccc15ca93e4b474347b95380f19",
+  "current_runtime_fingerprint": "c241ac72aad5f0fd846d950f733dbaee36795d3e8990f252f7f064df86af6efc",
   "fresh_evidence": {
-    "file": "precision-profile-covered-evidence.json",
-    "sha256": "2ad92b6436a4e6ab7b14613cbeb55addca453b40748d1581dbd47684bb45557f"
+    "file": "symbolic-milli-inch-covered-evidence.json",
+    "sha256": "8faff70771c70f413d1424a7f340a5fac88416645ff0b0daf4a3d23f4dd9f974"
   },
   "historical_revision": "008be8a8cb0b50b232fe022452762b3906489b49",
   "native_serial_role": {
@@ -22,6 +22,7 @@
     "tests/infrastructure/adapters/unit/test_linux_authority.py": "9d8abade332100121766655881547a6e0bf1813fe416414a022127605b988ec7",
     "tests/infrastructure/adapters/unit/test_numerical_policy.py": "73c17636cf2fb3b2977d0bf050990199095aa4c4597c5c5b03bcf2f2dccf115e",
     "tests/rules/section01/test_milli_inch.py": "6fad7bf3bc123c2f217bb0ae46b96971d8591f1cda712a0d88ba4b1f0f5edb37",
+    "tests/rules/section01/test_milli_inch_symbolic.py": "94813e259b6316d4cd87ec10ba976d419a44a3b357f0d8316df1eeade7f2ade4",
     "tests/rules/section03/test_terrain_path_preparation.py": "869ce37ba5d43d7a1c5558c94fceaf33eb81bfff62c2e5f13019551f2c071438",
     "tests/rules/section09/test_escape_survivor_persistence.py": "b70029a1609ac6996755d24254744cd3e37af955f81188e5f9062a5afb9c1e68",
     "tests/rules/section11/test_connected_endpoints.py": "78272e696bf5f3d7c977c379efe763fe80211067c06cc6e7d8be61d8c2775591"
@@ -33,5 +34,5 @@
     "rounding_seconds": 30,
     "version": "native-serial-current-planning-v2"
   },
-  "schema": "historical-snapshot-precision-profile-binding-v1"
+  "schema": "historical-snapshot-milli-inch-symbolic-v1"
 }

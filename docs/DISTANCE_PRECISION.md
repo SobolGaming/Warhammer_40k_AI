@@ -36,6 +36,50 @@ historical explicit reconstruction recipe. The paused Fight evidence remains
 historical and unmodified. Linux remains authoritative; native Windows numerical
 equivalence and project-wide milli-inch rounding are not established by this slice.
 
+## Staged symbolic measurement prerequisite
+
+`geometry.milli_inch_symbolic` now supplies a separate, inactive exact path
+measurement API. `symbolic_squared_path_inches_to_ticks` accepts nonnegative
+rational squared segment lengths, certifies every irrational square root with
+exact nonnegative dyadic enclosures, and locates the complete sum's half-tick
+bin with bounded exact solver checks. Integer square roots supply the enclosures;
+live rational squared inequalities certify them. The solver disproves the bin's
+complement over every value in those bounds using linear real arithmetic.
+Individual segments are never rounded into the measured result.
+Rational-only paths retain exact total-first rounding, including exact ties.
+Subdivision and segment order do not change a successfully certified result.
+The retained `squared_path_inches_to_ticks` API still explicitly rejects
+irrational roots; callers must deliberately select the new API.
+
+`rounded_length_constraint` encodes all four strict/inclusive scalar comparisons
+against nonnegative integer-tick thresholds. It includes the nonnegative length
+domain and the distinct upper/lower midpoint inclusion rules, including a zero
+threshold. Its input is a length expression, never a squared distance or area.
+Free-variable declarations and geometric certificates remain the caller's duty.
+These scalar constraints do not establish contact, overlap or collision topology.
+
+The path API has a shared bounded deadline (10 seconds by default); exhausted
+time or an unknown solver result raises `UnresolvedDistanceMeasurementError`.
+An unresolved calculation never returns an approximate measurement or legality
+answer. It supports sums of square roots of rational squared lengths, not arbitrary
+algebraic expressions or unbounded future gameplay workloads.
+
+No production gameplay caller imports this module. Inner identity, canonical
+geometry inputs, geometry/spatial hashes and caches, ordinary contact
+representability and coordinated rule consumers remain activation prerequisites.
+Only the existing legacy numerical policy remains executable. Historical saves,
+replays, evidence and profiles retain their original bytes and semantics, and
+Linux remains authoritative. This slice does not claim native OS equivalence.
+
+Scheduling admits this exact symbolic module/test source tuple through a finite
+successor to the precision-profile admission. The prior covered baselines,
+evidence, source transitions and selector placements remain unchanged. Fresh
+source-bound Linux covered evidence supplies current observations; twelve shards,
+67% full-package coverage with branch measurement enabled, 1,620-second inclusive
+approval and termination only above
+1,800 seconds remain required. Scheduling admission does not activate a numerical
+policy or qualify native OS equivalence.
+
 ## Staged milli-inch numerical policy
 
 `milli-inch-half-away-v1` defines the new distance arithmetic foundation. It is
@@ -78,8 +122,9 @@ Dimensional rules for activation:
   relationships.
 - Measure an entire path before quantizing its total once. Never sum rounded
   segment lengths or repeatedly round a running total. The foundation supports
-  exact rational segment lengths and rational square roots. General algebraic
-  path sums still require solver-backed certification of the final rounding bin;
+  exact rational segment lengths and rational square roots. The staged symbolic
+  API now certifies sums of rational square roots at the final rounding bin;
+  other algebraic path sums still require their own certified implementation;
   an unsupported calculation must raise an explicit error. Subdividing the same
   geometric path must not change its measured total. Continue validating every
   segment and mandatory path witness.
@@ -135,5 +180,6 @@ conversion, squared and algebraic measurements, strict/inclusive thresholds,
 contact versus overlap, path subdivision and accumulation, collapsed topology,
 profile/hash/cache separation, valid-state persistence/full replay, and both OS
 clients. Until those gates pass, this section specifies the target semantics and
-the implemented pure foundation and outer legacy-policy binding only; it makes no
+the implemented pure foundation, symbolic measurement prerequisite and outer
+legacy-policy binding only; it makes no
 project-wide rollout claim.
