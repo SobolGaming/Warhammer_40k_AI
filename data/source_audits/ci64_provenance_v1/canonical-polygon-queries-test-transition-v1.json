@@ -1,0 +1,22 @@
+{
+  "added_cases": 8,
+  "added_files": {
+    "tests/rules/section01/test_milli_inch_polygon_queries.py": {
+      "blob_sha1": "2207729e872ee2c7abbb391f9722e8893c277606",
+      "bytes": 6792,
+      "mode": "100644",
+      "sha256": "2d3a04000d6c2c02e471d95fe97da22ef23ef58ee40fc7b6d50f7a10ec7dfe34"
+    }
+  },
+  "retained_circle_sha256": "a82643598fb01025704bd9d222643fce81e9f772d938a968f1b6568bd9542f19",
+  "retained_cutover_sha256": "4cd1f0b062fad661e1c71fe27d2e9f8279c3c21d2a9f7bea9e3b053db79afce3",
+  "retained_foundation_sha256": "9ebbf6d4cf39d25a60c78a4312e0a128c5b43b6c79c64ed91fa41e4387366e07",
+  "retained_polygon_sha256": "56253b70e4c56a6c6b9dd3a053b127211811fc1ec79e3a5097285feaf023c263",
+  "retained_profile_sha256": "020dcec99278aa79f2215762a525c0c029231cdb9c64f1e988d4a1719e0fbb74",
+  "retained_symbolic_sha256": "23943a7fb56ba7b6e3da0888667d15959b4b1ae4e2148be0b6e6ab3d1aeeb9cb",
+  "runtime_fingerprint": "5ae984fe33c70e708ed920a2e06b228edbe9e042e79c322bdd9c84b196313d86",
+  "schema": "finite-canonical-polygon-queries-test-transition-v1",
+  "sources": {
+    "src/warhammer40k_core/geometry/milli_inch_polygon_queries.py": "768c92d7942f430c6be5a1d820a45302b6f1f802ac02150da850f758c9f1126a"
+  }
+}

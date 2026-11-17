@@ -37,6 +37,10 @@ def load_assignment(
     from scripts.build_test_shards import SERIAL_BEHAVIORAL_CASE
     from scripts.canonical_circle_shard_admission import ASSIGNMENT_FILE as CIRCLE_ASSIGNMENT_FILE
     from scripts.canonical_circle_shard_admission import SCHEMA as CIRCLE_SCHEMA
+    from scripts.canonical_polygon_queries_shard_admission import (
+        ASSIGNMENT_FILE as QUERIES_ASSIGNMENT_FILE,
+    )
+    from scripts.canonical_polygon_queries_shard_admission import SCHEMA as QUERIES_SCHEMA
     from scripts.canonical_polygon_shard_admission import ASSIGNMENT_FILE as POLYGON_ASSIGNMENT_FILE
     from scripts.canonical_polygon_shard_admission import SCHEMA as POLYGON_SCHEMA
     from scripts.linux_authority_shard_admission import (
@@ -54,6 +58,7 @@ def load_assignment(
     )
     from scripts.symbolic_milli_inch_shard_admission import SCHEMA as SYMBOLIC_SCHEMA
 
+    queries = descriptor["schema"] == QUERIES_SCHEMA
     circle = descriptor["schema"] == CIRCLE_SCHEMA
     polygon = descriptor["schema"] == POLYGON_SCHEMA
     symbolic = descriptor["schema"] == SYMBOLIC_SCHEMA
@@ -61,7 +66,9 @@ def load_assignment(
     authority = descriptor["schema"] == AUTHORITY_SCHEMA
     milli = descriptor["schema"] == MILLI_SCHEMA
     filename = (
-        CIRCLE_ASSIGNMENT_FILE
+        QUERIES_ASSIGNMENT_FILE
+        if queries
+        else CIRCLE_ASSIGNMENT_FILE
         if circle
         else POLYGON_ASSIGNMENT_FILE
         if polygon
@@ -121,7 +128,9 @@ def load_assignment(
     expected.update(owners)
     selected = Counter(selector for group in groups for selector in group)
     if selected != expected or len(selected) != (
-        514
+        515
+        if queries
+        else 514
         if circle
         else 513
         if polygon
