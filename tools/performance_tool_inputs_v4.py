@@ -106,8 +106,8 @@ _SCOPES = (
     ReviewedScope(
         NUMERICAL_IDENTITY_BASE,
         NUMERICAL_IDENTITY_SPEC_PATH,
-        "af4667df30fa55840b0ac643f3336c14d88fb4adcbb5928482e2d85ce3639950",
-        "d24014710c798dbf137d2e3e2f4ff2863dd6bb7f621c294123547d46e287384b",
+        "5e25f3da9242053a216417fde60f1a89d7d1996a8507e150af34a327a5493470",
+        "87863d0b5586eb605125944393801dc3703b63c4ee0ab74e6f15f0928d3e4c65",
         NUMERICAL_IDENTITY_REPORT_PATH,
         frozenset(
             [
@@ -211,6 +211,7 @@ _SCOPES = (
                 "tests/code_quality/test_exact_contact_shard_admission.py",
                 "tests/code_quality/test_registered_source_scopes.py",
                 "tests/daemons_native_source_preservation.py",
+                "tests/rules/section07/coverage.json",
                 "tests/rules/section18/coverage.json",
                 "tools/performance_tool_inputs_v4.py",
                 "tools/source_scope_provenance.py",
