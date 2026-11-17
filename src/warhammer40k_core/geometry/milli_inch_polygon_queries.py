@@ -17,6 +17,7 @@ from warhammer40k_core.geometry.milli_inch_polygon import (
     MIN_COORDINATE_TICKS,
     CanonicalPolygon,
     CanonicalPolygonError,
+    ExactVertex,
     TickVertex,
 )
 
@@ -63,7 +64,9 @@ def _validate_query(polygon: CanonicalPolygon, point: TickVertex) -> None:
         raise CanonicalPolygonError("Query coordinates must fit signed 64-bit ticks.")
 
 
-def _point_location(polygon: CanonicalPolygon, point: TickVertex) -> PolygonPointLocation:
+def _point_location(
+    polygon: CanonicalPolygon, point: TickVertex | ExactVertex
+) -> PolygonPointLocation:
     inside = False
     for a, b in zip(polygon.vertices, (*polygon.vertices[1:], polygon.vertices[0]), strict=True):
         cross = (b[0] - a[0]) * (point[1] - a[1]) - (b[1] - a[1]) * (point[0] - a[0])

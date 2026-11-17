@@ -124,6 +124,7 @@ NEW_NODES |= frozenset(
 
 def enabled(directory: Path, summary: dict[str, object] | None = None) -> bool:
     from scripts.canonical_circle_shard_admission import BASELINE_FILE as CIRCLE_BASELINE_FILE
+    from scripts.canonical_polygon_pairs_shard_admission import BASELINE_FILE as PAIRS_BASELINE_FILE
     from scripts.canonical_polygon_queries_shard_admission import (
         BASELINE_FILE as QUERIES_BASELINE_FILE,
     )
@@ -143,6 +144,7 @@ def enabled(directory: Path, summary: dict[str, object] | None = None) -> bool:
         or (directory / POLYGON_BASELINE_FILE).is_file()
         or (directory / CIRCLE_BASELINE_FILE).is_file()
         or (directory / QUERIES_BASELINE_FILE).is_file()
+        or (directory / PAIRS_BASELINE_FILE).is_file()
         or (
             summary is not None
             and (
@@ -163,6 +165,10 @@ def _baseline(
     from scripts.canonical_circle_shard_admission import NODES as CIRCLE_NODES
     from scripts.canonical_circle_shard_admission import OWNER as CIRCLE_OWNER
     from scripts.canonical_circle_shard_admission import SCHEMA as CIRCLE_SCHEMA
+    from scripts.canonical_polygon_pairs_shard_admission import BASELINE_FILE as PAIRS_BASELINE_FILE
+    from scripts.canonical_polygon_pairs_shard_admission import NODES as PAIRS_NODES
+    from scripts.canonical_polygon_pairs_shard_admission import OWNER as PAIRS_OWNER
+    from scripts.canonical_polygon_pairs_shard_admission import SCHEMA as PAIRS_SCHEMA
     from scripts.canonical_polygon_queries_shard_admission import (
         BASELINE_FILE as QUERIES_BASELINE_FILE,
     )
@@ -201,14 +207,16 @@ def _baseline(
     from scripts.symbolic_milli_inch_shard_admission import OWNER as SYMBOLIC_OWNER
     from scripts.symbolic_milli_inch_shard_admission import SCHEMA as SYMBOLIC_SCHEMA
 
-    queries = descriptor["schema"] == QUERIES_SCHEMA
-    circle = descriptor["schema"] in {CIRCLE_SCHEMA, QUERIES_SCHEMA}
-    polygon = descriptor["schema"] in {POLYGON_SCHEMA, CIRCLE_SCHEMA, QUERIES_SCHEMA}
+    pairs = descriptor["schema"] == PAIRS_SCHEMA
+    queries = descriptor["schema"] in {QUERIES_SCHEMA, PAIRS_SCHEMA}
+    circle = descriptor["schema"] in {CIRCLE_SCHEMA, QUERIES_SCHEMA, PAIRS_SCHEMA}
+    polygon = descriptor["schema"] in {POLYGON_SCHEMA, CIRCLE_SCHEMA, QUERIES_SCHEMA, PAIRS_SCHEMA}
     symbolic = descriptor["schema"] in {
         SYMBOLIC_SCHEMA,
         POLYGON_SCHEMA,
         CIRCLE_SCHEMA,
         QUERIES_SCHEMA,
+        PAIRS_SCHEMA,
     }
     profile = descriptor["schema"] in {
         PROFILE_SCHEMA,
@@ -216,6 +224,7 @@ def _baseline(
         POLYGON_SCHEMA,
         CIRCLE_SCHEMA,
         QUERIES_SCHEMA,
+        PAIRS_SCHEMA,
     }
     milli = descriptor["schema"] in {
         MILLI_SCHEMA,
@@ -224,6 +233,7 @@ def _baseline(
         POLYGON_SCHEMA,
         CIRCLE_SCHEMA,
         QUERIES_SCHEMA,
+        PAIRS_SCHEMA,
     }
     authority = descriptor["schema"] in {
         AUTHORITY_SCHEMA,
@@ -233,9 +243,12 @@ def _baseline(
         POLYGON_SCHEMA,
         CIRCLE_SCHEMA,
         QUERIES_SCHEMA,
+        PAIRS_SCHEMA,
     }
     filename = (
-        QUERIES_BASELINE_FILE
+        PAIRS_BASELINE_FILE
+        if pairs
+        else QUERIES_BASELINE_FILE
         if queries
         else CIRCLE_BASELINE_FILE
         if circle
@@ -325,6 +338,9 @@ def _baseline(
     if circle:
         expected_additions |= CIRCLE_NODES
         expected_owners.add(CIRCLE_OWNER)
+    if pairs:
+        expected_additions |= PAIRS_NODES
+        expected_owners.add(PAIRS_OWNER)
     if queries:
         expected_additions |= QUERIES_NODES
         expected_owners.add(QUERIES_OWNER)
@@ -447,6 +463,7 @@ class Plan:
 def plan(root: Path, directory: Path, cases: dict[str, float]) -> Plan:
     from scripts.boolean_los_admission import SCHEMA as BOOLEAN_SCHEMA
     from scripts.canonical_circle_shard_admission import SCHEMA as CIRCLE_SCHEMA
+    from scripts.canonical_polygon_pairs_shard_admission import SCHEMA as PAIRS_SCHEMA
     from scripts.canonical_polygon_queries_shard_admission import SCHEMA as QUERIES_SCHEMA
     from scripts.canonical_polygon_shard_admission import SCHEMA as POLYGON_SCHEMA
     from scripts.extended_shard_allocation import partial_projection
@@ -462,6 +479,7 @@ def plan(root: Path, directory: Path, cases: dict[str, float]) -> Plan:
     profile = isinstance(declared, dict) and declared.get("schema") == PROFILE_SCHEMA
     symbolic = isinstance(declared, dict) and declared.get("schema") == SYMBOLIC_SCHEMA
     circle = isinstance(declared, dict) and declared.get("schema") == CIRCLE_SCHEMA
+    pairs = isinstance(declared, dict) and declared.get("schema") == PAIRS_SCHEMA
     queries = isinstance(declared, dict) and declared.get("schema") == QUERIES_SCHEMA
     polygon = isinstance(declared, dict) and declared.get("schema") == POLYGON_SCHEMA
 
@@ -479,7 +497,15 @@ def plan(root: Path, directory: Path, cases: dict[str, float]) -> Plan:
         }
         | (
             {"fresh_evidence"}
-            if fresh or authority or milli or profile or symbolic or polygon or circle or queries
+            if fresh
+            or authority
+            or milli
+            or profile
+            or symbolic
+            or polygon
+            or circle
+            or queries
+            or pairs
             else set()
         ),
         "runtime compatibility",
@@ -498,6 +524,7 @@ def plan(root: Path, directory: Path, cases: dict[str, float]) -> Plan:
             POLYGON_SCHEMA,
             CIRCLE_SCHEMA,
             QUERIES_SCHEMA,
+            PAIRS_SCHEMA,
         }
         or descriptor["historical_revision"] != HISTORICAL_REVISION
     ):
@@ -516,7 +543,17 @@ def plan(root: Path, directory: Path, cases: dict[str, float]) -> Plan:
         expected_native = frozenset(
             node for node in NEW_NODES if node.startswith(NATIVE_PREFIX_OWNER + "::")
         )
-        if queries:
+        if pairs:
+            from scripts.canonical_polygon_pairs_shard_admission import (
+                current_native_role as pairs_role,
+            )
+            from scripts.current_native_serial_role import NativeSerialRole
+
+            seconds, native_metadata = pairs_role(
+                root, directory, descriptor, data, expected_native
+            )
+            native_role = NativeSerialRole(None, seconds, native_metadata)
+        elif queries:
             from scripts.canonical_polygon_queries_shard_admission import (
                 current_native_role as queries_role,
             )
@@ -640,6 +677,12 @@ def plan(root: Path, directory: Path, cases: dict[str, float]) -> Plan:
         from scripts.current_shard_assignment import load_assignment, require_planning_limits
 
         groups, assignment = load_assignment(directory, descriptor, history)
+        if pairs:
+            from scripts.canonical_polygon_pairs_shard_admission import (
+                require_frozen_assignment as require_pairs_assignment,
+            )
+
+            require_pairs_assignment(root, groups)
         if queries:
             from scripts.canonical_polygon_queries_shard_admission import (
                 require_frozen_assignment as require_queries_assignment,
