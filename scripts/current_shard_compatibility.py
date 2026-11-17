@@ -129,6 +129,7 @@ def enabled(directory: Path, summary: dict[str, object] | None = None) -> bool:
         BASELINE_FILE as QUERIES_BASELINE_FILE,
     )
     from scripts.canonical_polygon_shard_admission import BASELINE_FILE as POLYGON_BASELINE_FILE
+    from scripts.exact_contact_shard_admission import BASELINE_FILE as CONTACT_BASELINE_FILE
     from scripts.linux_authority_shard_admission import BASELINE_FILE as AUTHORITY_BASELINE_FILE
     from scripts.milli_inch_shard_admission import BASELINE_FILE as MILLI_BASELINE_FILE
     from scripts.precision_profile_shard_admission import BASELINE_FILE as PROFILE_BASELINE_FILE
@@ -145,6 +146,7 @@ def enabled(directory: Path, summary: dict[str, object] | None = None) -> bool:
         or (directory / CIRCLE_BASELINE_FILE).is_file()
         or (directory / QUERIES_BASELINE_FILE).is_file()
         or (directory / PAIRS_BASELINE_FILE).is_file()
+        or (directory / CONTACT_BASELINE_FILE).is_file()
         or (
             summary is not None
             and (
@@ -179,6 +181,10 @@ def _baseline(
     from scripts.canonical_polygon_shard_admission import NODES as POLYGON_NODES
     from scripts.canonical_polygon_shard_admission import OWNER as POLYGON_OWNER
     from scripts.canonical_polygon_shard_admission import SCHEMA as POLYGON_SCHEMA
+    from scripts.exact_contact_shard_admission import BASELINE_FILE as CONTACT_BASELINE_FILE
+    from scripts.exact_contact_shard_admission import NODES as CONTACT_NODES
+    from scripts.exact_contact_shard_admission import OWNER as CONTACT_OWNER
+    from scripts.exact_contact_shard_admission import SCHEMA as CONTACT_SCHEMA
     from scripts.linux_authority_shard_admission import (
         BASELINE_FILE as AUTHORITY_BASELINE_FILE,
     )
@@ -207,16 +213,24 @@ def _baseline(
     from scripts.symbolic_milli_inch_shard_admission import OWNER as SYMBOLIC_OWNER
     from scripts.symbolic_milli_inch_shard_admission import SCHEMA as SYMBOLIC_SCHEMA
 
-    pairs = descriptor["schema"] == PAIRS_SCHEMA
-    queries = descriptor["schema"] in {QUERIES_SCHEMA, PAIRS_SCHEMA}
-    circle = descriptor["schema"] in {CIRCLE_SCHEMA, QUERIES_SCHEMA, PAIRS_SCHEMA}
-    polygon = descriptor["schema"] in {POLYGON_SCHEMA, CIRCLE_SCHEMA, QUERIES_SCHEMA, PAIRS_SCHEMA}
+    contact = descriptor["schema"] == CONTACT_SCHEMA
+    pairs = descriptor["schema"] in {PAIRS_SCHEMA, CONTACT_SCHEMA}
+    queries = descriptor["schema"] in {QUERIES_SCHEMA, PAIRS_SCHEMA, CONTACT_SCHEMA}
+    circle = descriptor["schema"] in {CIRCLE_SCHEMA, QUERIES_SCHEMA, PAIRS_SCHEMA, CONTACT_SCHEMA}
+    polygon = descriptor["schema"] in {
+        POLYGON_SCHEMA,
+        CIRCLE_SCHEMA,
+        QUERIES_SCHEMA,
+        PAIRS_SCHEMA,
+        CONTACT_SCHEMA,
+    }
     symbolic = descriptor["schema"] in {
         SYMBOLIC_SCHEMA,
         POLYGON_SCHEMA,
         CIRCLE_SCHEMA,
         QUERIES_SCHEMA,
         PAIRS_SCHEMA,
+        CONTACT_SCHEMA,
     }
     profile = descriptor["schema"] in {
         PROFILE_SCHEMA,
@@ -225,6 +239,7 @@ def _baseline(
         CIRCLE_SCHEMA,
         QUERIES_SCHEMA,
         PAIRS_SCHEMA,
+        CONTACT_SCHEMA,
     }
     milli = descriptor["schema"] in {
         MILLI_SCHEMA,
@@ -234,6 +249,7 @@ def _baseline(
         CIRCLE_SCHEMA,
         QUERIES_SCHEMA,
         PAIRS_SCHEMA,
+        CONTACT_SCHEMA,
     }
     authority = descriptor["schema"] in {
         AUTHORITY_SCHEMA,
@@ -244,9 +260,12 @@ def _baseline(
         CIRCLE_SCHEMA,
         QUERIES_SCHEMA,
         PAIRS_SCHEMA,
+        CONTACT_SCHEMA,
     }
     filename = (
-        PAIRS_BASELINE_FILE
+        CONTACT_BASELINE_FILE
+        if contact
+        else PAIRS_BASELINE_FILE
         if pairs
         else QUERIES_BASELINE_FILE
         if queries
@@ -338,6 +357,9 @@ def _baseline(
     if circle:
         expected_additions |= CIRCLE_NODES
         expected_owners.add(CIRCLE_OWNER)
+    if contact:
+        expected_additions |= CONTACT_NODES
+        expected_owners.add(CONTACT_OWNER)
     if pairs:
         expected_additions |= PAIRS_NODES
         expected_owners.add(PAIRS_OWNER)
@@ -466,6 +488,7 @@ def plan(root: Path, directory: Path, cases: dict[str, float]) -> Plan:
     from scripts.canonical_polygon_pairs_shard_admission import SCHEMA as PAIRS_SCHEMA
     from scripts.canonical_polygon_queries_shard_admission import SCHEMA as QUERIES_SCHEMA
     from scripts.canonical_polygon_shard_admission import SCHEMA as POLYGON_SCHEMA
+    from scripts.exact_contact_shard_admission import SCHEMA as CONTACT_SCHEMA
     from scripts.extended_shard_allocation import partial_projection
     from scripts.linux_authority_shard_admission import SCHEMA as AUTHORITY_SCHEMA
     from scripts.milli_inch_shard_admission import SCHEMA as MILLI_SCHEMA
@@ -479,6 +502,7 @@ def plan(root: Path, directory: Path, cases: dict[str, float]) -> Plan:
     profile = isinstance(declared, dict) and declared.get("schema") == PROFILE_SCHEMA
     symbolic = isinstance(declared, dict) and declared.get("schema") == SYMBOLIC_SCHEMA
     circle = isinstance(declared, dict) and declared.get("schema") == CIRCLE_SCHEMA
+    contact = isinstance(declared, dict) and declared.get("schema") == CONTACT_SCHEMA
     pairs = isinstance(declared, dict) and declared.get("schema") == PAIRS_SCHEMA
     queries = isinstance(declared, dict) and declared.get("schema") == QUERIES_SCHEMA
     polygon = isinstance(declared, dict) and declared.get("schema") == POLYGON_SCHEMA
@@ -506,6 +530,7 @@ def plan(root: Path, directory: Path, cases: dict[str, float]) -> Plan:
             or circle
             or queries
             or pairs
+            or contact
             else set()
         ),
         "runtime compatibility",
@@ -525,6 +550,7 @@ def plan(root: Path, directory: Path, cases: dict[str, float]) -> Plan:
             CIRCLE_SCHEMA,
             QUERIES_SCHEMA,
             PAIRS_SCHEMA,
+            CONTACT_SCHEMA,
         }
         or descriptor["historical_revision"] != HISTORICAL_REVISION
     ):
@@ -543,7 +569,15 @@ def plan(root: Path, directory: Path, cases: dict[str, float]) -> Plan:
         expected_native = frozenset(
             node for node in NEW_NODES if node.startswith(NATIVE_PREFIX_OWNER + "::")
         )
-        if pairs:
+        if contact:
+            from scripts.current_native_serial_role import NativeSerialRole
+            from scripts.exact_contact_shard_admission import current_native_role as contact_role
+
+            seconds, native_metadata = contact_role(
+                root, directory, descriptor, data, expected_native
+            )
+            native_role = NativeSerialRole(None, seconds, native_metadata)
+        elif pairs:
             from scripts.canonical_polygon_pairs_shard_admission import (
                 current_native_role as pairs_role,
             )
@@ -677,6 +711,12 @@ def plan(root: Path, directory: Path, cases: dict[str, float]) -> Plan:
         from scripts.current_shard_assignment import load_assignment, require_planning_limits
 
         groups, assignment = load_assignment(directory, descriptor, history)
+        if contact:
+            from scripts.exact_contact_shard_admission import (
+                require_frozen_assignment as require_contact_assignment,
+            )
+
+            require_contact_assignment(root, groups)
         if pairs:
             from scripts.canonical_polygon_pairs_shard_admission import (
                 require_frozen_assignment as require_pairs_assignment,

@@ -1,0 +1,25 @@
+{
+  "added_cases": 10,
+  "added_files": {
+    "tests/rules/section01/test_exact_contact.py": {
+      "blob_sha1": "e285ee5315244714d322a50b7ef5cdfc92acdc4a",
+      "bytes": 11122,
+      "mode": "100644",
+      "sha256": "c78a6eec8d4669b6b358a1230e6c5835e765c5b312060ebd5a631b5eb42b2d74"
+    }
+  },
+  "retained_circle_sha256": "a82643598fb01025704bd9d222643fce81e9f772d938a968f1b6568bd9542f19",
+  "retained_cutover_sha256": "4cd1f0b062fad661e1c71fe27d2e9f8279c3c21d2a9f7bea9e3b053db79afce3",
+  "retained_foundation_sha256": "9ebbf6d4cf39d25a60c78a4312e0a128c5b43b6c79c64ed91fa41e4387366e07",
+  "retained_pairs_sha256": "06a2fe4f9fb0b1803412f058d41b37d41272b5db18c039481c9926053142c46e",
+  "retained_polygon_sha256": "56253b70e4c56a6c6b9dd3a053b127211811fc1ec79e3a5097285feaf023c263",
+  "retained_profile_sha256": "020dcec99278aa79f2215762a525c0c029231cdb9c64f1e988d4a1719e0fbb74",
+  "retained_queries_sha256": "46e4cd2b9e1045991a52c4361e4fe61ddaf230c07c8437a46a574e9eecf97820",
+  "retained_symbolic_sha256": "23943a7fb56ba7b6e3da0888667d15959b4b1ae4e2148be0b6e6ab3d1aeeb9cb",
+  "runtime_fingerprint": "f0392def5f2e2935d26f026628b439e90f0f6303fb282ac41a27d1b575a7024e",
+  "schema": "finite-exact-contact-test-transition-v1",
+  "sources": {
+    "src/warhammer40k_core/geometry/exact_contact.py": "b34603e9ba1a1a253b029e87c049bd8dfb182d93c39b89a5ce33813d2205647a",
+    "src/warhammer40k_core/geometry/exact_coordinate.py": "b055e39a1dd733a17f3de952203b2163dff630bf26b2170d515aa0418a4277c0"
+  }
+}

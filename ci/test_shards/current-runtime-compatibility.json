@@ -1,16 +1,16 @@
 {
   "assignment": {
-    "file": "canonical-polygon-pairs-derived-assignment.json",
-    "sha256": "d30a466a55ecbdce65b548aa8f1d6439e77fbade0c7fef9c3a489e0e639e2f4c"
+    "file": "exact-contact-derived-assignment.json",
+    "sha256": "0dbbfe1d15d617ac0ca25245d373e5ef104fd6a28658227452d277e5eace84e9"
   },
   "baseline": {
-    "file": "canonical-polygon-pairs-covered-baseline.json",
-    "sha256": "c52e18cc7da96aa874270a6e2ff464978e83d5888321e08992d51831b9cdd76a"
+    "file": "exact-contact-covered-baseline.json",
+    "sha256": "fc85dac0c8efa58eb3f0577a1db11711ea35734ec9cb9fcbc93d7ca5ecf34ded"
   },
-  "current_runtime_fingerprint": "1f19514910b3cb312aa6561567af9e725f9220d872c89c2710e7df9bd14e2cfb",
+  "current_runtime_fingerprint": "f0392def5f2e2935d26f026628b439e90f0f6303fb282ac41a27d1b575a7024e",
   "fresh_evidence": {
-    "file": "canonical-polygon-pairs-covered-evidence.json",
-    "sha256": "d9e5bca324e039bf02b8ee12029f06ad8a3ee3aef10878bfda57512e14f5f7a7"
+    "file": "exact-contact-covered-evidence.json",
+    "sha256": "613a845d8ccb82df355c2508bc6d41be7b0b531d14fb59c7590294c4fef7f2ae"
   },
   "historical_revision": "008be8a8cb0b50b232fe022452762b3906489b49",
   "native_serial_role": {
@@ -21,6 +21,7 @@
     "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py": "26467cfb68d1e4464c5f926a1278bd67433f5ac99699ebdc9666deb7ab1255ed",
     "tests/infrastructure/adapters/unit/test_linux_authority.py": "9d8abade332100121766655881547a6e0bf1813fe416414a022127605b988ec7",
     "tests/infrastructure/adapters/unit/test_numerical_policy.py": "73c17636cf2fb3b2977d0bf050990199095aa4c4597c5c5b03bcf2f2dccf115e",
+    "tests/rules/section01/test_exact_contact.py": "c78a6eec8d4669b6b358a1230e6c5835e765c5b312060ebd5a631b5eb42b2d74",
     "tests/rules/section01/test_milli_inch.py": "6fad7bf3bc123c2f217bb0ae46b96971d8591f1cda712a0d88ba4b1f0f5edb37",
     "tests/rules/section01/test_milli_inch_circle.py": "108a7edcaff877484ed35ffa21ac685b0b848703b7f65e8ef2fb00a620594194",
     "tests/rules/section01/test_milli_inch_polygon.py": "b36418144aa411b9a39797d191058430d9c8bba3e4e3d5a6dd3ce6f093ea6ee0",
@@ -38,5 +39,5 @@
     "rounding_seconds": 30,
     "version": "native-serial-current-planning-v2"
   },
-  "schema": "historical-snapshot-canonical-polygon-pairs-v1"
+  "schema": "historical-snapshot-exact-contact-v1"
 }

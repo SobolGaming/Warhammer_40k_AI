@@ -36253,6 +36253,34 @@
       "families": [],
       "sensitive": false,
       "mandatory": true
+    },
+    "exact-contact-admission": {
+      "paths": [
+        "scripts/exact_contact_test_admission.py",
+        "scripts/exact_contact_shard_admission.py",
+        "tests/code_quality/test_exact_contact_shard_admission.py",
+        "ci/test_shards/exact-contact-covered-baseline.json",
+        "ci/test_shards/exact-contact-covered-evidence.json",
+        "ci/test_shards/exact-contact-derived-assignment.json",
+        "data/source_audits/ci64_provenance_v1/exact-contact-test-transition-v1.json"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "exact-contact-regressions": {
+      "paths": [
+        "tests/rules/section01/test_exact_contact.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

@@ -1,560 +1,660 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "dd10b801673296efe1f8122a2cf0f86b4c4df7b9",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:1f19514910b3cb312aa6561567af9e725f9220d872c89c2710e7df9bd14e2cfb",
-  "operation_map_sha256": "6de3857e20c2a8e1230112c69f7e2d09ac8b304ddb522f37b181b81e80d5578a",
+  "base": "4ad0a8e653959a8597f958286e1c5483fc058d87",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:f0392def5f2e2935d26f026628b439e90f0f6303fb282ac41a27d1b575a7024e",
+  "operation_map_sha256": "bea0b03acea2f1632526c44ca23eeb5abfbae86552cfead7c5d44db7c3b59bf9",
   "changes": {
     "ci/quality_shards/all.txt": {
-      "before_sha256": "0218227a0d55534937097d0a1421d0ab64ddc4148d1acac0932f31fee4014edb",
-      "after_sha256": "96c25b8b6b43aeb822cddbe287660e78cc42a1099b4bf2b644be070b1bf84871",
+      "before_sha256": "96c25b8b6b43aeb822cddbe287660e78cc42a1099b4bf2b644be070b1bf84871",
+      "after_sha256": "e869a34c6b2e6b007833c5af9ced1650e3afab560fa1793e1fab6e4c39c464f7",
       "owners": {
         "@document": {
-          "before": "0218227a0d55534937097d0a1421d0ab64ddc4148d1acac0932f31fee4014edb",
-          "after": "96c25b8b6b43aeb822cddbe287660e78cc42a1099b4bf2b644be070b1bf84871"
+          "before": "96c25b8b6b43aeb822cddbe287660e78cc42a1099b4bf2b644be070b1bf84871",
+          "after": "e869a34c6b2e6b007833c5af9ced1650e3afab560fa1793e1fab6e4c39c464f7"
         }
       }
     },
     "ci/quality_shards/shard-4-modules.txt": {
-      "before_sha256": "f0e489094717a118bd4614736fc914b3337957bd45b548f2e31f7aef9f568a4d",
-      "after_sha256": "052db867d63c1b505e5bd6389f6164ce627c121bc6dfd6280dc2ab0f43ba8824",
+      "before_sha256": "052db867d63c1b505e5bd6389f6164ce627c121bc6dfd6280dc2ab0f43ba8824",
+      "after_sha256": "13812166121eccb4ca238732cdd244ca6f081a4a044f6628a9b007e9a58b4e96",
       "owners": {
         "@document": {
-          "before": "f0e489094717a118bd4614736fc914b3337957bd45b548f2e31f7aef9f568a4d",
-          "after": "052db867d63c1b505e5bd6389f6164ce627c121bc6dfd6280dc2ab0f43ba8824"
+          "before": "052db867d63c1b505e5bd6389f6164ce627c121bc6dfd6280dc2ab0f43ba8824",
+          "after": "13812166121eccb4ca238732cdd244ca6f081a4a044f6628a9b007e9a58b4e96"
         }
       }
     },
     "ci/quality_shards/shard-4.txt": {
-      "before_sha256": "ec26ea7700959e0cc94ce3606c1c0a0aa7e44d20bafdcc59328525b23c19a2ee",
-      "after_sha256": "ba54471497605b8e22e2a4811ce45770837d8e764dee3ebe9dc65caabe077e09",
+      "before_sha256": "ba54471497605b8e22e2a4811ce45770837d8e764dee3ebe9dc65caabe077e09",
+      "after_sha256": "cfcbde56ef1c9982449c3c97331435b6a0629e30f4b82c97507fc3f1fa9a4e4f",
       "owners": {
         "@document": {
-          "before": "ec26ea7700959e0cc94ce3606c1c0a0aa7e44d20bafdcc59328525b23c19a2ee",
-          "after": "ba54471497605b8e22e2a4811ce45770837d8e764dee3ebe9dc65caabe077e09"
-        }
-      }
-    },
-    "ci/test_shards/canonical-polygon-pairs-covered-baseline.json": {
-      "before_sha256": null,
-      "after_sha256": "c52e18cc7da96aa874270a6e2ff464978e83d5888321e08992d51831b9cdd76a",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "c52e18cc7da96aa874270a6e2ff464978e83d5888321e08992d51831b9cdd76a"
-        }
-      }
-    },
-    "ci/test_shards/canonical-polygon-pairs-covered-evidence.json": {
-      "before_sha256": null,
-      "after_sha256": "d9e5bca324e039bf02b8ee12029f06ad8a3ee3aef10878bfda57512e14f5f7a7",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "d9e5bca324e039bf02b8ee12029f06ad8a3ee3aef10878bfda57512e14f5f7a7"
-        }
-      }
-    },
-    "ci/test_shards/canonical-polygon-pairs-derived-assignment.json": {
-      "before_sha256": null,
-      "after_sha256": "d30a466a55ecbdce65b548aa8f1d6439e77fbade0c7fef9c3a489e0e639e2f4c",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "d30a466a55ecbdce65b548aa8f1d6439e77fbade0c7fef9c3a489e0e639e2f4c"
+          "before": "ba54471497605b8e22e2a4811ce45770837d8e764dee3ebe9dc65caabe077e09",
+          "after": "cfcbde56ef1c9982449c3c97331435b6a0629e30f4b82c97507fc3f1fa9a4e4f"
         }
       }
     },
     "ci/test_shards/current-runtime-compatibility.json": {
-      "before_sha256": "cff41068bd488e06a77dfe131034cae5d8fd2840b6c7cf8851747b1d331d8906",
-      "after_sha256": "b3400390f2181a0d0ae744541c35cccac87e7e9f826769176e9d41f229b48b11",
+      "before_sha256": "b3400390f2181a0d0ae744541c35cccac87e7e9f826769176e9d41f229b48b11",
+      "after_sha256": "8c395f235ee2384215a4ced1a6cf38d70a2336a52477b7672fbb86cc4641e407",
       "owners": {
         "@document": {
-          "before": "cff41068bd488e06a77dfe131034cae5d8fd2840b6c7cf8851747b1d331d8906",
-          "after": "b3400390f2181a0d0ae744541c35cccac87e7e9f826769176e9d41f229b48b11"
+          "before": "b3400390f2181a0d0ae744541c35cccac87e7e9f826769176e9d41f229b48b11",
+          "after": "8c395f235ee2384215a4ced1a6cf38d70a2336a52477b7672fbb86cc4641e407"
         }
       }
     },
     "ci/test_shards/durations.json": {
-      "before_sha256": "0298e4d9add56fd190cbe421282ec72d5c9f9c6cbe4ff06523faa1489ebd1e71",
-      "after_sha256": "7990062a25bf7bcd29ada4e3ff885c07ecd7e7afaf3ac7e03191ec44de5fe6c6",
+      "before_sha256": "7990062a25bf7bcd29ada4e3ff885c07ecd7e7afaf3ac7e03191ec44de5fe6c6",
+      "after_sha256": "91401bf789ea19276e0aa8363b8856cd6dc772a286cc8f79a55ca5ad924c3ba2",
       "owners": {
         "@document": {
-          "before": "0298e4d9add56fd190cbe421282ec72d5c9f9c6cbe4ff06523faa1489ebd1e71",
-          "after": "7990062a25bf7bcd29ada4e3ff885c07ecd7e7afaf3ac7e03191ec44de5fe6c6"
+          "before": "7990062a25bf7bcd29ada4e3ff885c07ecd7e7afaf3ac7e03191ec44de5fe6c6",
+          "after": "91401bf789ea19276e0aa8363b8856cd6dc772a286cc8f79a55ca5ad924c3ba2"
+        }
+      }
+    },
+    "ci/test_shards/exact-contact-covered-baseline.json": {
+      "before_sha256": null,
+      "after_sha256": "fc85dac0c8efa58eb3f0577a1db11711ea35734ec9cb9fcbc93d7ca5ecf34ded",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "fc85dac0c8efa58eb3f0577a1db11711ea35734ec9cb9fcbc93d7ca5ecf34ded"
+        }
+      }
+    },
+    "ci/test_shards/exact-contact-covered-evidence.json": {
+      "before_sha256": null,
+      "after_sha256": "613a845d8ccb82df355c2508bc6d41be7b0b531d14fb59c7590294c4fef7f2ae",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "613a845d8ccb82df355c2508bc6d41be7b0b531d14fb59c7590294c4fef7f2ae"
+        }
+      }
+    },
+    "ci/test_shards/exact-contact-derived-assignment.json": {
+      "before_sha256": null,
+      "after_sha256": "0dbbfe1d15d617ac0ca25245d373e5ef104fd6a28658227452d277e5eace84e9",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "0dbbfe1d15d617ac0ca25245d373e5ef104fd6a28658227452d277e5eace84e9"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
-      "before_sha256": "ba0af313719726213657f6c22e31387191acc0447031c45f89621a86e45c5868",
-      "after_sha256": "0eae17c591e5ea7b9e234a90c20e7ddd8313a37d2dd4139cfb8f08bff7765b74",
+      "before_sha256": "0eae17c591e5ea7b9e234a90c20e7ddd8313a37d2dd4139cfb8f08bff7765b74",
+      "after_sha256": "9f1e7521b12f4773e3b917bbe7b17919a2ad2ce1e9072758ed1282197fc03e2c",
       "owners": {
         "@document": {
-          "before": "ba0af313719726213657f6c22e31387191acc0447031c45f89621a86e45c5868",
-          "after": "0eae17c591e5ea7b9e234a90c20e7ddd8313a37d2dd4139cfb8f08bff7765b74"
+          "before": "0eae17c591e5ea7b9e234a90c20e7ddd8313a37d2dd4139cfb8f08bff7765b74",
+          "after": "9f1e7521b12f4773e3b917bbe7b17919a2ad2ce1e9072758ed1282197fc03e2c"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "907db663da87f2b777ea6cdf461c197cc08948317449e55dd34fd09d586dd941",
-      "after_sha256": "974c3de4d764176b8e7eee855e96e1ffb7f56485e687736e0db650011385b700",
+      "before_sha256": "974c3de4d764176b8e7eee855e96e1ffb7f56485e687736e0db650011385b700",
+      "after_sha256": "6000eaad97c2b865e15a07f6f921b288c6727891588012ec8b13b72be1fd8c4c",
       "owners": {
         "@document": {
-          "before": "907db663da87f2b777ea6cdf461c197cc08948317449e55dd34fd09d586dd941",
-          "after": "974c3de4d764176b8e7eee855e96e1ffb7f56485e687736e0db650011385b700"
+          "before": "974c3de4d764176b8e7eee855e96e1ffb7f56485e687736e0db650011385b700",
+          "after": "6000eaad97c2b865e15a07f6f921b288c6727891588012ec8b13b72be1fd8c4c"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "6d889c41418e38a8184900bc4d28cf18a3bad9bb56c7fad643cbe56eea5f9a8e",
-      "after_sha256": "25f7177a4d7c1a5ab2f9c504e839a195130d3961443ec6f4a30917e8dad07802",
+      "before_sha256": "25f7177a4d7c1a5ab2f9c504e839a195130d3961443ec6f4a30917e8dad07802",
+      "after_sha256": "f3203c2642e2b8129c81ca983ee2ecc7eaa36baecb2d1347fbbf90210e9aac23",
       "owners": {
         "@document": {
-          "before": "6d889c41418e38a8184900bc4d28cf18a3bad9bb56c7fad643cbe56eea5f9a8e",
-          "after": "25f7177a4d7c1a5ab2f9c504e839a195130d3961443ec6f4a30917e8dad07802"
+          "before": "25f7177a4d7c1a5ab2f9c504e839a195130d3961443ec6f4a30917e8dad07802",
+          "after": "f3203c2642e2b8129c81ca983ee2ecc7eaa36baecb2d1347fbbf90210e9aac23"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "8c32e50ab2a94d28f988a28bca312c3cbb6a41a003ee5e6e04390d5a65628db4",
-      "after_sha256": "cbad078ec07b6514868a39f28f15973097567c24e572e106733a775c0c329577",
+      "before_sha256": "cbad078ec07b6514868a39f28f15973097567c24e572e106733a775c0c329577",
+      "after_sha256": "2966303c66190f30aeda306ab437f8a140e12e9a7f3609155c370da58d99240b",
       "owners": {
         "@document": {
-          "before": "8c32e50ab2a94d28f988a28bca312c3cbb6a41a003ee5e6e04390d5a65628db4",
-          "after": "cbad078ec07b6514868a39f28f15973097567c24e572e106733a775c0c329577"
+          "before": "cbad078ec07b6514868a39f28f15973097567c24e572e106733a775c0c329577",
+          "after": "2966303c66190f30aeda306ab437f8a140e12e9a7f3609155c370da58d99240b"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "a4b1976cf6a9f86b88e77cca332247fe295b12cd530afc371e485b861c4e61ac",
-      "after_sha256": "d7b274f5923401b485c95a24048248d3bdeadb377aaa50c82013d4b66cebfacc",
+      "before_sha256": "d7b274f5923401b485c95a24048248d3bdeadb377aaa50c82013d4b66cebfacc",
+      "after_sha256": "059fb24def6e06d6f6ee3cf6762740d36bd6b861768e2284023e36567443aa53",
       "owners": {
         "@document": {
-          "before": "a4b1976cf6a9f86b88e77cca332247fe295b12cd530afc371e485b861c4e61ac",
-          "after": "d7b274f5923401b485c95a24048248d3bdeadb377aaa50c82013d4b66cebfacc"
+          "before": "d7b274f5923401b485c95a24048248d3bdeadb377aaa50c82013d4b66cebfacc",
+          "after": "059fb24def6e06d6f6ee3cf6762740d36bd6b861768e2284023e36567443aa53"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "6b2c6e26062f29c676169a5429161fe6b23c234bf6176ce3b6a2aa91362be0c4",
-      "after_sha256": "9a151ec1c9fd9a00fde7cfddba91163f1a62a3a142e043c2afdf2fb355e8c1b7",
+      "before_sha256": "9a151ec1c9fd9a00fde7cfddba91163f1a62a3a142e043c2afdf2fb355e8c1b7",
+      "after_sha256": "2ada2586e9ed269d7c17c7665e54d9b61311d063e1b92ba9b5bd1ebb772304c8",
       "owners": {
         "@document": {
-          "before": "6b2c6e26062f29c676169a5429161fe6b23c234bf6176ce3b6a2aa91362be0c4",
-          "after": "9a151ec1c9fd9a00fde7cfddba91163f1a62a3a142e043c2afdf2fb355e8c1b7"
+          "before": "9a151ec1c9fd9a00fde7cfddba91163f1a62a3a142e043c2afdf2fb355e8c1b7",
+          "after": "2ada2586e9ed269d7c17c7665e54d9b61311d063e1b92ba9b5bd1ebb772304c8"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "0e4c951785657bbf47be7b67c3d6cdb97e7dd1e549acb8cbb0168f868cf9b53e",
-      "after_sha256": "72c39fb84eec4c67528143fcb1de36a69ba8c824737697d3e99e854f7f4f2b1d",
+      "before_sha256": "72c39fb84eec4c67528143fcb1de36a69ba8c824737697d3e99e854f7f4f2b1d",
+      "after_sha256": "f6584dc35dd08777f70dda571a6812624dd33eb7abab6476583487b01464868a",
       "owners": {
         "@document": {
-          "before": "0e4c951785657bbf47be7b67c3d6cdb97e7dd1e549acb8cbb0168f868cf9b53e",
-          "after": "72c39fb84eec4c67528143fcb1de36a69ba8c824737697d3e99e854f7f4f2b1d"
+          "before": "72c39fb84eec4c67528143fcb1de36a69ba8c824737697d3e99e854f7f4f2b1d",
+          "after": "f6584dc35dd08777f70dda571a6812624dd33eb7abab6476583487b01464868a"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "d69defda2a217b8cdb7570dded60717d74935dd80ea50a18d2b9d92434aaa850",
-      "after_sha256": "a531c4ddef0326155af485e1587c237ec93a1232393d8ebaef0121c36a258c93",
+      "before_sha256": "a531c4ddef0326155af485e1587c237ec93a1232393d8ebaef0121c36a258c93",
+      "after_sha256": "3b4f16dedcc940dab822dae6914836d14fc69cd066a2246ed0d3efba1cd65cfe",
       "owners": {
         "@document": {
-          "before": "d69defda2a217b8cdb7570dded60717d74935dd80ea50a18d2b9d92434aaa850",
-          "after": "a531c4ddef0326155af485e1587c237ec93a1232393d8ebaef0121c36a258c93"
+          "before": "a531c4ddef0326155af485e1587c237ec93a1232393d8ebaef0121c36a258c93",
+          "after": "3b4f16dedcc940dab822dae6914836d14fc69cd066a2246ed0d3efba1cd65cfe"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "f1424aa56ebf047f252c6c584f7aa9908ac87c86f692714c9f73c36349168213",
-      "after_sha256": "e35718fb1e51c401f84cd720b5ff12c936bfb0c46ecff433b9fba90d9826f639",
+      "before_sha256": "e35718fb1e51c401f84cd720b5ff12c936bfb0c46ecff433b9fba90d9826f639",
+      "after_sha256": "26c06b9195a1d2d132732106943cb7bf2cb31347e657b92119a11348af306a76",
       "owners": {
         "@document": {
-          "before": "f1424aa56ebf047f252c6c584f7aa9908ac87c86f692714c9f73c36349168213",
-          "after": "e35718fb1e51c401f84cd720b5ff12c936bfb0c46ecff433b9fba90d9826f639"
+          "before": "e35718fb1e51c401f84cd720b5ff12c936bfb0c46ecff433b9fba90d9826f639",
+          "after": "26c06b9195a1d2d132732106943cb7bf2cb31347e657b92119a11348af306a76"
         }
       }
     },
-    "data/source_audits/ci64_provenance_v1/canonical-polygon-pairs-test-transition-v1.json": {
+    "data/source_audits/ci64_provenance_v1/exact-contact-test-transition-v1.json": {
       "before_sha256": null,
-      "after_sha256": "06a2fe4f9fb0b1803412f058d41b37d41272b5db18c039481c9926053142c46e",
+      "after_sha256": "0c8e58ab3a4feb1f6525ac490e18e518869326a53e1a42a8ccd9e8cb15a8b61d",
       "owners": {
         "@document": {
           "before": null,
-          "after": "06a2fe4f9fb0b1803412f058d41b37d41272b5db18c039481c9926053142c46e"
+          "after": "0c8e58ab3a4feb1f6525ac490e18e518869326a53e1a42a8ccd9e8cb15a8b61d"
         }
       }
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
-      "before_sha256": "238db51651089e38332b4671daf369a9257d36bc18b89a8626a50ea6648c67bd",
-      "after_sha256": "89ced27bef8f49ab6f12ae85bcd8af9f957d424a9fd96d815e08a6b334539026",
+      "before_sha256": "89ced27bef8f49ab6f12ae85bcd8af9f957d424a9fd96d815e08a6b334539026",
+      "after_sha256": "16b94533fe7742c1e1857e7d1cb179297bedf6afd2e65a7db4bcd5197c557589",
       "owners": {
         "@document": {
-          "before": "238db51651089e38332b4671daf369a9257d36bc18b89a8626a50ea6648c67bd",
-          "after": "89ced27bef8f49ab6f12ae85bcd8af9f957d424a9fd96d815e08a6b334539026"
+          "before": "89ced27bef8f49ab6f12ae85bcd8af9f957d424a9fd96d815e08a6b334539026",
+          "after": "16b94533fe7742c1e1857e7d1cb179297bedf6afd2e65a7db4bcd5197c557589"
         }
       }
     },
     "docs/DISTANCE_PRECISION.md": {
-      "before_sha256": "edeac69820cfbd60fee16c9c239b681a16949cfaef8680e7d0aa148436463a53",
-      "after_sha256": "52f91671c1db30ef9fe6ef7337ad79321cae83e2c72b87fd8afc767318f032b5",
+      "before_sha256": "52f91671c1db30ef9fe6ef7337ad79321cae83e2c72b87fd8afc767318f032b5",
+      "after_sha256": "30dfc5ec66815bbc728555d3e1b06fef692cf5514ca61df8561f1b953005487d",
       "owners": {
         "@document": {
-          "before": "edeac69820cfbd60fee16c9c239b681a16949cfaef8680e7d0aa148436463a53",
-          "after": "52f91671c1db30ef9fe6ef7337ad79321cae83e2c72b87fd8afc767318f032b5"
+          "before": "52f91671c1db30ef9fe6ef7337ad79321cae83e2c72b87fd8afc767318f032b5",
+          "after": "30dfc5ec66815bbc728555d3e1b06fef692cf5514ca61df8561f1b953005487d"
         }
       }
     },
-    "docs/performance/current/polygon-pairs-movement.json": {
+    "docs/performance/current/exact-contact-movement.json": {
       "before_sha256": null,
-      "after_sha256": "33422cb3f37716946db93f26293fdc44049f91300d53e5f0b12f70f6c8dffd2b",
+      "after_sha256": "42f1eb4806d3728389a25aecf54e92b32f50bb6bee64ed2cf13a97b9527c6f4a",
       "owners": {
         "@document": {
           "before": null,
-          "after": "33422cb3f37716946db93f26293fdc44049f91300d53e5f0b12f70f6c8dffd2b"
+          "after": "42f1eb4806d3728389a25aecf54e92b32f50bb6bee64ed2cf13a97b9527c6f4a"
         }
       }
     },
-    "docs/performance/current/polygon-pairs-setup.json": {
+    "docs/performance/current/exact-contact-setup.json": {
       "before_sha256": null,
-      "after_sha256": "ea5003540e780ee482294c773e9d93308612c439c8f221127a3ea6ee6ee31872",
+      "after_sha256": "34070b4cd208ec6ecda3a695d466937e718b37762de26d41c6518c9ca65af8c5",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ea5003540e780ee482294c773e9d93308612c439c8f221127a3ea6ee6ee31872"
+          "after": "34070b4cd208ec6ecda3a695d466937e718b37762de26d41c6518c9ca65af8c5"
         }
       }
     },
-    "docs/performance/current/polygon-pairs-visibility.json": {
+    "docs/performance/current/exact-contact-visibility.json": {
       "before_sha256": null,
-      "after_sha256": "8aff5654ef5c8d2c5d13357234e7409bf6c82527995eaa5ae86fbd479a0407e1",
+      "after_sha256": "0d7b71c7dbf8b956e1e8c0b01a20dde9d830b28a7e800e5edebefd1af88491e3",
       "owners": {
         "@document": {
           "before": null,
-          "after": "8aff5654ef5c8d2c5d13357234e7409bf6c82527995eaa5ae86fbd479a0407e1"
+          "after": "0d7b71c7dbf8b956e1e8c0b01a20dde9d830b28a7e800e5edebefd1af88491e3"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "e8c6e4e4db08b723fe7a3209df9c440d16ff8fe788e7244a35ca1ec74ec866a3",
-      "after_sha256": "981650cf0f6285fd5c66456d693db973c1622896d80dfebad21a0cd7807e3d12",
+      "before_sha256": "981650cf0f6285fd5c66456d693db973c1622896d80dfebad21a0cd7807e3d12",
+      "after_sha256": "93112d2a4fe59bade0e9a605a79c43365a8d5a1d4107cd2841e6cfd45e456ce7",
       "owners": {
         "@document": {
-          "before": "e8c6e4e4db08b723fe7a3209df9c440d16ff8fe788e7244a35ca1ec74ec866a3",
-          "after": "981650cf0f6285fd5c66456d693db973c1622896d80dfebad21a0cd7807e3d12"
+          "before": "981650cf0f6285fd5c66456d693db973c1622896d80dfebad21a0cd7807e3d12",
+          "after": "93112d2a4fe59bade0e9a605a79c43365a8d5a1d4107cd2841e6cfd45e456ce7"
         }
       }
     },
     "scripts/build_test_shards.py": {
-      "before_sha256": "47b45fa127d260425fc92c4b3c39acfedd3660333d1de06e868ead77b20475b3",
-      "after_sha256": "d7b55756bafa16390d12c13c40b5cf088d0e59f5c5076da90bb60d2fcbe45ebe",
+      "before_sha256": "d7b55756bafa16390d12c13c40b5cf088d0e59f5c5076da90bb60d2fcbe45ebe",
+      "after_sha256": "3fdc4ab17104678d7f6d4c946b7fb284d11320b458c82a327f0f3b91ed2bf0bd",
       "owners": {
         "behavioral_selection": {
-          "before": "1b9c0d8d6ad01e8e934b307cc389bb45cb936b8fc864c17b5ead08f85503de30",
-          "after": "388ceb1576d29baeeaee96d8b3127a4874f9918350f832fd427ab5f55a67b78e"
-        }
-      }
-    },
-    "scripts/canonical_polygon_pairs_shard_admission.py": {
-      "before_sha256": null,
-      "after_sha256": "5accac08ad8a45611a85d913461f965c73957358f683773b2a8f5d0ce98e687d",
-      "owners": {
-        "@module": {
-          "before": null,
-          "after": "d6eab4abbc6af15b31ddd521b6030e8f5bbf6675d2eb3739d53e58383ce340c1"
-        },
-        "current_native_role": {
-          "before": null,
-          "after": "4c2a813d0d1ef7d685637d1f58679012a6ffd870a12ec42cf14622bda6a2c9d0"
-        },
-        "producer_inputs": {
-          "before": null,
-          "after": "1f30190316554b48b97a99043b2b913bc04c59b8f651e3d0c8c52de0f1818b24"
-        },
-        "require_frozen_assignment": {
-          "before": null,
-          "after": "bfc9ff16cbc9b1718499d1a6c4fcfb44430fea78232d806413e125a4fa583616"
-        },
-        "require_test_sources": {
-          "before": null,
-          "after": "bc9f5cc72d8551c5d69ac5b480423c732c9f360e008a27b6dbd5f69f3dd2e87a"
-        },
-        "retained_authority_artifacts": {
-          "before": null,
-          "after": "4fe575e85dbd2a10e84f72df6fc31819b486f4b95b67dd1a2d9e460fafc9ac56"
-        },
-        "validate_runtime_transition": {
-          "before": null,
-          "after": "c3c39ae7085b435180358fdd512c1f0d5da8376bf01ff1b368650702f7b88703"
-        }
-      }
-    },
-    "scripts/canonical_polygon_pairs_test_admission.py": {
-      "before_sha256": null,
-      "after_sha256": "e7df5f9237ef07382d2bdf1acb3a7d1953177fec54ad2618b5e8952164d0ab9b",
-      "owners": {
-        "@module": {
-          "before": null,
-          "after": "bf2e41b27de78c6b2e731d648dba108f1001b40e4e990aee99a6c1282f9ec679"
-        },
-        "_checked_bytes": {
-          "before": null,
-          "after": "98d85d002c504f376899e1ba727cda2636a6172a3bb1ed369156ef2e9dd1fe2b"
-        },
-        "polygon_pairs_test_transition": {
-          "before": null,
-          "after": "ddc34cb2eb7b556b4b63c5e0f464657c1b8b734b22d2e68741e5c76fcc20e0c5"
+          "before": "388ceb1576d29baeeaee96d8b3127a4874f9918350f832fd427ab5f55a67b78e",
+          "after": "3696ca30b9bf843f31661397164adf740a9bba12eb0af1b6fb81baccd950d235"
         }
       }
     },
     "scripts/current_shard_assignment.py": {
-      "before_sha256": "c86c390f522446d50cc81c83d789b45f389bd30ed903bc0c10196258e0be54bb",
-      "after_sha256": "96852dbaaf423fcb6fed9c427c2fbf08903fef967ddb95cd5eecc2b84be30537",
+      "before_sha256": "96852dbaaf423fcb6fed9c427c2fbf08903fef967ddb95cd5eecc2b84be30537",
+      "after_sha256": "2143efda0b5ce1a9d8bf7ba497d6b761c8938317498fd65b93a66ecbaff1666a",
       "owners": {
         "load_assignment": {
-          "before": "0705e4688e5e8219b72f13a5136ca9e449bde415aee24ec466887fc5ce5875af",
-          "after": "5c7c84bd34000d9be63336c5460a3019c4a5cbc74bb3a9c0b95dffc3179ffc7d"
+          "before": "5c7c84bd34000d9be63336c5460a3019c4a5cbc74bb3a9c0b95dffc3179ffc7d",
+          "after": "8082cb0ba908f2c2f25eb9c0c4658a24a1a10bd7469cf34d9acd9b28f18a251d"
         }
       }
     },
     "scripts/current_shard_compatibility.py": {
-      "before_sha256": "1b40dff63d80a44095340e9feaea7e2b67a58f5b51a45de11c0ee84f8d2ebf76",
-      "after_sha256": "b521867d558ca627db4634f2426413be6440cc846a0883201a404e1ced4c6eb9",
+      "before_sha256": "b521867d558ca627db4634f2426413be6440cc846a0883201a404e1ced4c6eb9",
+      "after_sha256": "cd7c3e7c2b5e2e1630594e6ac2684cb91004604f361cb55140051ea62a5377a1",
       "owners": {
         "_baseline": {
-          "before": "0807839f2a4cf18baa03c7e0b329039f00d6d110b81b7e3daf1d71d361b1baaf",
-          "after": "29785ddebae9776fca49ee4631ca47a06a8dafcfcc2268a59b9d3eb3cdbffdd2"
+          "before": "29785ddebae9776fca49ee4631ca47a06a8dafcfcc2268a59b9d3eb3cdbffdd2",
+          "after": "bcac385c9bda618b604aa3cda1440bcb9116320164ce811576669be1bb32b42a"
         },
         "enabled": {
-          "before": "c4b46ee554ceb00d43d9d8b2116f8a9dab014dfe819f7eeef588d364a4adff5d",
-          "after": "f41e01b7f2486762f615c6301377d4d78a2316be7ee9c09d78b7dc384c619ba8"
+          "before": "f41e01b7f2486762f615c6301377d4d78a2316be7ee9c09d78b7dc384c619ba8",
+          "after": "9b42b08f2009a28ff7405aebd4191635df633ff82990977548ed5bb444691e7f"
         },
         "plan": {
-          "before": "15d4682f049f4ad53272fa89768dc3f1a15650e28866a6e0b1a62ca3e8cc67b2",
-          "after": "976340db96ea51ce146e09f6ca8b83d6094b3fa8a7b64928fd9eff291a75a58b"
+          "before": "976340db96ea51ce146e09f6ca8b83d6094b3fa8a7b64928fd9eff291a75a58b",
+          "after": "061ea1b78aacea01d2992e1d73c1b2228c4b6dbcd716cd4c1c9b4b39a7e4279c"
+        }
+      }
+    },
+    "scripts/exact_contact_shard_admission.py": {
+      "before_sha256": null,
+      "after_sha256": "6926a296a31c521987fb6e16ed3f488a98dae44b7c469882a0314d654734dae6",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "88975df866b0a8ab5f2dd5af8aebac7967d2969d35ca7a12692460677b2a13a0"
+        },
+        "current_native_role": {
+          "before": null,
+          "after": "76cbbdb9d680945ad35a43f74bcb2ceae5ae5ddeeecfb7066f043613d1d77c4a"
+        },
+        "producer_inputs": {
+          "before": null,
+          "after": "aa357203d668c647300eca36ce7c2c8967238afb5830e9b34905575d8a483af0"
+        },
+        "require_frozen_assignment": {
+          "before": null,
+          "after": "6ba34ced00c90469aa86aa31a5ea36fa941f10314b8a2e2d8893d691727a2a09"
+        },
+        "require_test_sources": {
+          "before": null,
+          "after": "e3566e79cfe5dcebd5aba860fc131d5522b274904f2f527e7f514af9107aa7b1"
+        },
+        "retained_authority_artifacts": {
+          "before": null,
+          "after": "06a3005a7fb92a6f5fa4f21d05561d10f3fa93a984949f4292552deca919e0c1"
+        },
+        "validate_runtime_transition": {
+          "before": null,
+          "after": "2c1047cde0cee196cc7d0b187e90237bba90c53ee6f116f57c504f6ed919a090"
+        }
+      }
+    },
+    "scripts/exact_contact_test_admission.py": {
+      "before_sha256": null,
+      "after_sha256": "107edd97bb551e2f55a1114237ad03105b164397ae45c1e11b43adc974cabb60",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "4fbe2b89338b063b4799f8ecde529eb62ea4a04c6b01994acca934be54362997"
+        },
+        "_checked_bytes": {
+          "before": null,
+          "after": "c7362895006762279eb0f896efc04b8cf9447b7b0d52578defe38b0089a14c0d"
+        },
+        "exact_contact_test_transition": {
+          "before": null,
+          "after": "2d8146c9fb3ea4c61f827f98920101a23aa344b707bd9fb53993e75c862f06a5"
         }
       }
     },
     "scripts/fetch_scheduling_sources.py": {
-      "before_sha256": "f51a953f1078e3af7c37b2dee1c4dd24d53f3d96f45267a94863cdf1f8e99cf0",
-      "after_sha256": "e87b0af39ca51f400bd5c54f027d3649bbee35bc155e74e831ec6ad1b9bcf6cc",
+      "before_sha256": "e87b0af39ca51f400bd5c54f027d3649bbee35bc155e74e831ec6ad1b9bcf6cc",
+      "after_sha256": "04b2f08db351f9a0082c76c23620aa8a39f4342abecfaabd70931dc5c9794690",
       "owners": {
         "revisions": {
-          "before": "439a9d9783c1ce8d89e00255b9939e704393a39a1d9fb8c252b8796356a07ce1",
-          "after": "4bd389051823919a33a81b0cc2acb4cf956d4a7a76282151d43c7bc041d89570"
+          "before": "4bd389051823919a33a81b0cc2acb4cf956d4a7a76282151d43c7bc041d89570",
+          "after": "f80f55baf308f3b65ec6d3f929bf5f96d8bcdd1030f5b3b0aa2078301a40c7f6"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "77d3174c3d2697188ed7782436e2f769a99d5610be8b63a7d8134d94674b9855",
-      "after_sha256": "b9b3036a6289c9a7b07c5d3dc1e34e80c31a381b0ae79291ad0eda3ad3ff1cc2",
+      "before_sha256": "b9b3036a6289c9a7b07c5d3dc1e34e80c31a381b0ae79291ad0eda3ad3ff1cc2",
+      "after_sha256": "0f7efeec1479737bfb0280e8fe9136517146b808bdbb6bc10ad5ee39e7ea3cf0",
       "owners": {
         "@document": {
-          "before": "77d3174c3d2697188ed7782436e2f769a99d5610be8b63a7d8134d94674b9855",
-          "after": "b9b3036a6289c9a7b07c5d3dc1e34e80c31a381b0ae79291ad0eda3ad3ff1cc2"
+          "before": "b9b3036a6289c9a7b07c5d3dc1e34e80c31a381b0ae79291ad0eda3ad3ff1cc2",
+          "after": "0f7efeec1479737bfb0280e8fe9136517146b808bdbb6bc10ad5ee39e7ea3cf0"
         }
       }
     },
-    "src/warhammer40k_core/geometry/milli_inch_polygon_pairs.py": {
+    "src/warhammer40k_core/geometry/exact_contact.py": {
       "before_sha256": null,
-      "after_sha256": "017deaaed1a2ccbc07888c4719de3815757164e1483275456e8fd585463d88a1",
+      "after_sha256": "b34603e9ba1a1a253b029e87c049bd8dfb182d93c39b89a5ce33813d2205647a",
       "owners": {
         "@module": {
           "before": null,
-          "after": "3eb803b179fc3df8519013f5dade8909c794c81dd17e1fbfd0b35e2cca431a16"
+          "after": "944de27a912acd96b2946eb63c2394f99a807f08cdb140bc6ccce05c1ec0d8e8"
         },
-        "PolygonRelation": {
+        "ExactDisk": {
           "before": null,
-          "after": "3124780bca4ca8bcdd4ad45745a1963a9ffa3c6e90a9df714634780c8d0438ad"
+          "after": "db0dcd326fa7b6901113af9c292c50f1a419a20f374d06d95d10670c270e5bea"
         },
-        "_area": {
+        "ExactDisk.__post_init__": {
           "before": null,
-          "after": "b0be6374f5d623fd6c08cfa62c2cc557c58b65fd0b0f03ae1143c5d294aa5785"
+          "after": "4d73c04eab0ad6c786400a46a445edbd98af4a63e61f9a0c192325794d09a728"
         },
-        "_between": {
+        "ExactDisk.content_hash": {
           "before": null,
-          "after": "a32bd7d1cfe63fda59d0ed3536f20443b9274dd9f972a8e5ae245b289b2f7869"
+          "after": "df0711efefc13c7138f632ec0a5312ddacc42e2b9ecc6efb044192d128e82135"
         },
-        "_cross": {
+        "ExactDisk.from_payload": {
           "before": null,
-          "after": "992c8b27dd49aa98e28413408a5bcdb086281a630d05d4a3c62b2f7a27220343"
+          "after": "564138c0789469f9edf9b7839064d46b21727e6f5448eafbb60cf25d798e213e"
         },
-        "_edges": {
+        "ExactDisk.relation_to": {
           "before": null,
-          "after": "11ea764099d9d1a122e6ae6c40a0ddb8221f5c01256a1e68ac6371a2d8032365"
+          "after": "ad6c2d3bcafe1cb852b726a4a7676ce2ca41ade3097aafeacd052508150bc7fe"
         },
-        "_positive_overlap": {
+        "ExactDisk.to_payload": {
           "before": null,
-          "after": "ca8eb0ee9438b3c94a0a9d39e6895b2e5996d5781e36fe4996f2e26c071755ee"
+          "after": "a8a4b8c1cad43db54c8bbf5ec9d2cb0da9065900bbc0b25171e19a8492b9a1c7"
         },
-        "_validate_pair": {
+        "ExactDiskPayload": {
           "before": null,
-          "after": "7868091d92c69d6f3e0663749a60f4e18c203fe4ca3fa4ba93f12813259a921e"
+          "after": "8496604af2a97b0cf6699f264816a6575d10e4f21ce67da256b6d524fc1c7c25"
         },
-        "polygon_polygon_distance_ticks": {
+        "StraightContactCertificate": {
           "before": null,
-          "after": "7633a6ad2245886f52001804c76d07b1052afc778a5192154349773bafe744b8"
+          "after": "7f3fb26be90d57c55ce00a74b767f9e3f502648a4a578f87dab0031d8e50bff3"
         },
-        "polygon_polygon_relation": {
+        "_point": {
           "before": null,
-          "after": "5b2a6dcd59051164c99e09456e54982560897480c76e333fe0021515d855b20e"
+          "after": "2278bc519e497d2529aeebdf1ce418f13582d4abcf34a178985c0653e146a17c"
+        },
+        "_squared": {
+          "before": null,
+          "after": "7dafab25b563d1c7315a0bc06176c3b1f25134a484210acb649c350642650233"
+        },
+        "certify_straight_contact": {
+          "before": null,
+          "after": "86fa060e3891ca5a5a468fb6d001f7ffafab271f149252be8fe2a6da65ea17a0"
+        },
+        "rational_anchor_contact_centers": {
+          "before": null,
+          "after": "9bb526879c7b9355871a7ac68c2d99b2d1a620bb69d12015fa288b0e00bad35c"
+        },
+        "squared_exact_inches_to_ticks": {
+          "before": null,
+          "after": "9f265aeae467748fedae1c996fdf79cf17cb3847e2b2c3339c46a4a0f9d9ec3f"
         }
       }
     },
-    "src/warhammer40k_core/geometry/milli_inch_polygon_queries.py": {
-      "before_sha256": "768c92d7942f430c6be5a1d820a45302b6f1f802ac02150da850f758c9f1126a",
-      "after_sha256": "e46fe8e9738786931c565c5ea5a2dc2921132e3690b420632bfcb8a00c362cc5",
+    "src/warhammer40k_core/geometry/exact_coordinate.py": {
+      "before_sha256": null,
+      "after_sha256": "b055e39a1dd733a17f3de952203b2163dff630bf26b2170d515aa0418a4277c0",
       "owners": {
         "@module": {
-          "before": "51f4758d47bfe1be4051a1e25d497fcf4d0aa1e3315da667f0d107ee29bd93ab",
-          "after": "23c39f5de6ff500d77ff1c753a9b25431e809d1d3980140a4dbab4b2d69dc159"
+          "before": null,
+          "after": "162c36992d0c3e69824acdf165d7654a50db5f16ac5748651eb04efa69ecce25"
         },
-        "_point_location": {
-          "before": "646b5f5964dd9472da9b2908f5df17b2488471430cd0070238cdff311fa1b76a",
-          "after": "5506a4d22b92bac4df7643283c3567f8a2466780000adc43d3b941cf23a2c12b"
+        "CoordinatePayload": {
+          "before": null,
+          "after": "83038a288cfd5ac7a327c4beada654582c511e19b71790d386a7607574bcef11"
+        },
+        "ExactCoordinate": {
+          "before": null,
+          "after": "dc6873f3ba5f838a351ece4ea4dd8dc9d6e0b9c6d63eed512a1d6e4c2b3330b7"
+        },
+        "ExactCoordinate.__add__": {
+          "before": null,
+          "after": "8ad70c39b04bbaade5737c1389847e45532256a439b5a3162575ce1bf407d6c3"
+        },
+        "ExactCoordinate.__mul__": {
+          "before": null,
+          "after": "ad5aee50b51ada2d1deeba150d4a9f528f05d9e2455a2c75f5556d37136ee135"
+        },
+        "ExactCoordinate.__neg__": {
+          "before": null,
+          "after": "cd22325028d5e74708cc8d4a71262a6e9ed7c6cd7b84442b98c9126318c77733"
+        },
+        "ExactCoordinate.__post_init__": {
+          "before": null,
+          "after": "c01f48d84520d7e8d497b744b76f86ede3b2bbdcbc430fa1233d309f4c703ae7"
+        },
+        "ExactCoordinate.__sub__": {
+          "before": null,
+          "after": "682d5b30fb31fac59242d90a89c0d0be96e730ff4654d4fdc290be1e3afa2fff"
+        },
+        "ExactCoordinate.__truediv__": {
+          "before": null,
+          "after": "8aed4906021acf2f31d343c2525e061f23962366956d706b475806c4a4f15ab4"
+        },
+        "ExactCoordinate._field": {
+          "before": null,
+          "after": "4fa56c4ea7e801e5089f12b93a8a1fdf3cf928445b90319e615c00b7cbdce590"
+        },
+        "ExactCoordinate.compare_rational": {
+          "before": null,
+          "after": "e9a3faebf8bac9d082f7262e00878cb91fc8e234ca4ab53068fffd4069975553"
+        },
+        "ExactCoordinate.from_payload": {
+          "before": null,
+          "after": "ee631558da9e57aec8bcbc26f9e654c44c15eb2c00748ba22ed5995958658654"
+        },
+        "ExactCoordinate.from_root": {
+          "before": null,
+          "after": "48644c78091350c0825a1963ad93a077bcc0379b24f0ef6e3aca87c841c52400"
+        },
+        "ExactCoordinate.reciprocal": {
+          "before": null,
+          "after": "6dfdc7d35e0e8f0f24dfb9ab2edab7464d5e7ee005704b88bd502f9c9a4de606"
+        },
+        "ExactCoordinate.sign": {
+          "before": null,
+          "after": "f8372de2958a4cabdbeed94c1937a4780574d2a2af1df0c60bc8d8c044b790e3"
+        },
+        "ExactCoordinate.to_payload": {
+          "before": null,
+          "after": "d4233544fc68a5f045352aa0b7de751adcfc21d6b6fe4b868dbc776837ce48e6"
+        },
+        "ExactCoordinateError": {
+          "before": null,
+          "after": "cd0b888e094b7f87de879459e5eaa975d46ccb89efd953e367d4131c49766698"
+        },
+        "UnsupportedExactCoordinateError": {
+          "before": null,
+          "after": "9ad55e158423d089a58526fbde02da02e44e8b625f7103f77a0f60e9dd40d87e"
+        },
+        "_fraction": {
+          "before": null,
+          "after": "e0ab3aab7b17b0667ebbb1d13c694d784d4fb6ff400c7ab3073601f87b4456b8"
+        },
+        "_read_fraction": {
+          "before": null,
+          "after": "98b8c6f64588e17b440ffd3a1874a9626b3a585a7762b6b661a38e8fa4a8affb"
+        },
+        "_sqrt_fraction": {
+          "before": null,
+          "after": "e2a7e167ea79be72b76399415bd33e83ba75aaf3d63452a9c057722c5f3ee2ec"
+        },
+        "rational_coordinate": {
+          "before": null,
+          "after": "3390a57113bb7f7ccabcbcbbe6f46f6941ce81c3a0d8ec9a969f610d41ab1ea4"
         }
       }
     },
     "tests/code_quality/test_canonical_polygon_pairs_shard_admission.py": {
-      "before_sha256": null,
-      "after_sha256": "7e7dc651402e400cfcfc55dcee2c62db0c952eed3664ec1e9957fb771f0369ab",
+      "before_sha256": "7e7dc651402e400cfcfc55dcee2c62db0c952eed3664ec1e9957fb771f0369ab",
+      "after_sha256": "975321f14e59cf2cf16b7d94a7f98911a11ef9503beb76bde5ee344e1d5d6957",
       "owners": {
         "@module": {
-          "before": null,
-          "after": "f5749b4463dfb965b81876d73070210923eb0387cf821b1cca735d0fd19081a6"
+          "before": "f5749b4463dfb965b81876d73070210923eb0387cf821b1cca735d0fd19081a6",
+          "after": "f93b60417509401edf46aa4cf335211c1e2ad1b81c165c21c1a06374023c127b"
         },
         "test_polygon_pairs_binding_admits_only_its_exact_runtime_transition": {
-          "before": null,
-          "after": "f0de4ae1d4406511c6bca373972850f59a0405fd0a6b548e4d6ec803a0abb108"
-        },
-        "test_polygon_pairs_binding_fetches_both_current_and_retained_producers": {
-          "before": null,
-          "after": "10a3ac55835ca60b596b30138218c6b615f8248045ce490e7dc17ae0c8fca8f4"
-        },
-        "test_polygon_pairs_binding_preserves_all_existing_performance_obligations": {
-          "before": null,
-          "after": "e09bf9e3bc6d677958556f78024bc99c3f289543aae7d6ccefd68d74b9311049"
-        },
-        "test_polygon_pairs_binding_preserves_retained_sources_and_evidence": {
-          "before": null,
-          "after": "df903496237ff48180014e3603a2399c44dfed342ad8e0c3650a0ef84c1eb3ea"
+          "before": "f0de4ae1d4406511c6bca373972850f59a0405fd0a6b548e4d6ec803a0abb108",
+          "after": "dc5e3f88e7e6b97525dad7ba4c42040e62f81a9871cde611a317af9a1dbb5b05"
         },
         "test_polygon_pairs_binding_requires_complete_fresh_evidence_and_fixed_inventory": {
-          "before": null,
-          "after": "044633f292a9b34c1efe80ea1a297958088212613103da4961f24362b1cfd69e"
+          "before": "044633f292a9b34c1efe80ea1a297958088212613103da4961f24362b1cfd69e",
+          "after": "b3ed0d8ec966e59d9cc6e63b24f81572368cfceb1d285ced1ab8960a8cb21cbb"
         },
         "test_polygon_pairs_binding_requires_its_complete_measured_producer": {
-          "before": null,
-          "after": "f209b2b686e429ff3cb9406e30f34ef033fa2bf28ab04833e323c561323523b2"
-        },
-        "test_polygon_pairs_binding_retains_twelve_shards_and_every_prior_selector": {
-          "before": null,
-          "after": "3587730a1fe53e1bb05c096a05455efecbec60a205418b635110ce56aa5dd479"
-        },
-        "test_polygon_pairs_test_transition_leaves_historical_source_selection_closed": {
-          "before": null,
-          "after": "477273b5eb5e7f17d6a511cefd9de4e359f1a5ec504641fc2dd731a1ebda9773"
+          "before": "f209b2b686e429ff3cb9406e30f34ef033fa2bf28ab04833e323c561323523b2",
+          "after": "3aae28d28ec255b9066bb43cf81326ecfff146d9ef6bbca3e1dc296f138ff460"
         },
         "test_polygon_pairs_test_transition_preserves_original_selection_bytes": {
-          "before": null,
-          "after": "31bfb8234a2d6fe0755622e6954379e26d9ed03a0c1a1a2cae5631254a850c6f"
+          "before": "31bfb8234a2d6fe0755622e6954379e26d9ed03a0c1a1a2cae5631254a850c6f",
+          "after": "680b3d101f889f2e788cbc1081d16fac196bc757b5f942e70a39d73d404d92ac"
         },
         "test_polygon_pairs_test_transition_rejects_source_record_and_identity_drift": {
-          "before": null,
-          "after": "7610ed315cef159c931138eed176f6aa2e960934775d36b8b0d4621af79c78a2"
-        }
-      }
-    },
-    "tests/code_quality/test_canonical_polygon_queries_shard_admission.py": {
-      "before_sha256": "3eaf42966e2883ec259d40ca761e7189b75f786d677f7ea3ad946b5b6aab8a7a",
-      "after_sha256": "2ca17bd35419972d8ab72372396d6f049914d304cb9c472f8dba5b17b97d85cc",
-      "owners": {
-        "@module": {
-          "before": "c944ca26ec469398a9a80cc073aa140f34b8789599d0aa7d2149db2b8437258c",
-          "after": "e41b606ae90df79d51efdb1ae9f53981072fcef29259aa25e6bd01d4f66d5b67"
-        },
-        "test_polygon_queries_binding_admits_only_its_exact_runtime_transition": {
-          "before": "f2943fef7f7ae5712982a5ca1e6598bca11c1f69b7eebeabcddaf4a05fda5462",
-          "after": "9e1cfcb29e2a9b0ecefac30b8c36e72a4f777552797fb11540a89252cdc0290f"
-        },
-        "test_polygon_queries_binding_requires_complete_fresh_evidence_and_fixed_inventory": {
-          "before": "7a7d3f17dfe66244ae40b3a9d3435d2a5238213033a47a524051af94c8b663a0",
-          "after": "097e5243e855e8986a0e4356f682256a713eaa5e54657ddc21ae4985c6e84b2e"
-        },
-        "test_polygon_queries_binding_requires_its_complete_measured_producer": {
-          "before": "7efc7bb054948ee2f6ed4798c3e8b3f8b1f9d593438f46be71dbb79958c14241",
-          "after": "0e5578bb5128eb04363428277dc627c4fb4e9d571cc9e07e779dbbe59500bd02"
-        },
-        "test_polygon_queries_test_transition_preserves_original_selection_bytes": {
-          "before": "afb53ed9ab104b924e785aa0b49b4d2393ab804e9da64f9d4d139ede06d9b456",
-          "after": "93a38839350945db2868ab35e8cd3fcb8bb1501affd25f7ed44f0ce44ba1e68c"
-        },
-        "test_polygon_queries_test_transition_rejects_source_record_and_identity_drift": {
-          "before": "3ce7720e1f93b1824dfeba9809a1a754025417d1ef01c1313276093d049fdc40",
-          "after": "76b73931d51f283f025248d426285e75953517d8c57f93ab7ccd03090e9d9375"
+          "before": "7610ed315cef159c931138eed176f6aa2e960934775d36b8b0d4621af79c78a2",
+          "after": "42a6125b7ed35a44d2805ced43d0454796339b5582e1dc6081ccc698fa6b4c91"
         }
       }
     },
     "tests/code_quality/test_ci_performance_gates.py": {
-      "before_sha256": "cc73a34761cecb39c349a30841fe10503b6ae79241cb5b703ad255ecd0b74d05",
-      "after_sha256": "c6f09b57a96532d599932a8c69c755fc7c26eaa923166ef2ab75b3800bb7f543",
+      "before_sha256": "c6f09b57a96532d599932a8c69c755fc7c26eaa923166ef2ab75b3800bb7f543",
+      "after_sha256": "adfa1a34a85e47f6e56716de856fcdf695d001faa62293e3a5727e127091eeb2",
       "owners": {
         "test_cutover_real_cli_rejects_naming_override": {
-          "before": "c45c203fb727b733c028f478a473b0c2d943f56a4abf6409eb64b6dd58a05f3a",
-          "after": "87bb0887f6595cd31bd91657c5fbf1411a450f9ea4645e5d24cecaf45a761d18"
+          "before": "87bb0887f6595cd31bd91657c5fbf1411a450f9ea4645e5d24cecaf45a761d18",
+          "after": "a0e7b9c05905c47207cd5c6d153191ed665002f04a6a708e1ef7dfa2bd51f339"
         },
         "test_cutover_real_pytest_cli_does_not_bypass_explicit_file_guard": {
-          "before": "9798de20d50004465c313ba2ead2b5d6bf35b59b684782913b90ed56ccbf1ec2",
-          "after": "a14e91bd1d7c9adcaaaf5c274e47b68b211618a9911fe175d34454c34014e61f"
+          "before": "a14e91bd1d7c9adcaaaf5c274e47b68b211618a9911fe175d34454c34014e61f",
+          "after": "c21f0ea8b2acdb6a5378f6fbd3c1eeece12df237f3b4df84ed11c1316fdfdb03"
         }
       }
     },
-    "tests/rules/section01/test_milli_inch_polygon_pairs.py": {
+    "tests/code_quality/test_exact_contact_shard_admission.py": {
       "before_sha256": null,
-      "after_sha256": "1ba7d2c874dd479a62ac393dc5c08f35f21d589fc77f5dd1e8292ef9452b67f8",
+      "after_sha256": "5cec00cf43b2fbc58e5086aaa7215929fb6e6958644e1ad1665d4e70fd7eb6e0",
       "owners": {
         "@module": {
           "before": null,
-          "after": "f1982f2e7c7c166659260e0a874b201aeac822e0ed49f13c2c9950752104acd2"
+          "after": "1db5565736372f620d2cdbf29351f51020b5b155fbc98e695d2149ddccea39d9"
         },
-        "_assert_pair": {
+        "test_exact_contact_binding_admits_only_its_exact_runtime_transition": {
           "before": null,
-          "after": "53fc77e020a1a58786bc13817e45958f1693b2f715e66fe726b9713c83cf9419"
+          "after": "e92cc374c231c5f67087be679b136583bab16307992e8b5e2354a4ea0b26779f"
         },
-        "test_polygon_pair_boundary_vertices_do_not_hide_interior_overlap": {
+        "test_exact_contact_binding_fetches_both_current_and_retained_producers": {
           "before": null,
-          "after": "682a1f3e11bb03ff67c118e24f0b3cfb31a4d93823f4efb2f1466dd1b8028103"
+          "after": "a8276b0a4b5a8bbd85c629ba699816c4fc18e12258cfb545285359c5e5ad08ef"
         },
-        "test_polygon_pair_distance_uses_exact_minimum_and_squared_rounding": {
+        "test_exact_contact_binding_preserves_all_existing_performance_obligations": {
           "before": null,
-          "after": "c9f058c0ea0bcbefd5d7ea4e7e95426764bf857141c9d66e849d269c0f3d1b6e"
+          "after": "298be47ce9cc221eb02d38b72931433de8975413f916650d2c254a8e78f14af9"
         },
-        "test_polygon_pair_queries_reject_noncanonical_inputs": {
+        "test_exact_contact_binding_preserves_retained_sources_and_evidence": {
           "before": null,
-          "after": "9e40fda346d41f933be79739072c12080db7dfceb3a41b3452d0a28a71f78f0f"
+          "after": "828913c1e8a604da566edc0cd79fe8f7388487c906e939c5b5c74ab238442fb7"
         },
-        "test_polygon_pair_zero_rounded_gap_does_not_establish_contact": {
+        "test_exact_contact_binding_requires_complete_fresh_evidence_and_fixed_inventory": {
           "before": null,
-          "after": "b76faaced0a8a6a13378e2eaf9fe76cabf1000d47de1a40eeeec06f72c543686"
+          "after": "f8e5432327b0259c313c5766bbe34b6a2b19e7c2c640d8d6d98f78ab5f57e550"
         },
-        "test_polygon_pairs_classify_shared_edges_by_interior_side": {
+        "test_exact_contact_binding_requires_its_complete_measured_producer": {
           "before": null,
-          "after": "31bdba506dc511fc1ad21db52082b43a6fb4e8aa76c04f247093c62076e827e0"
+          "after": "460e84612e2f273a27bb5482a2fe7d037d9d4dc216235da22ef91fbfca762adb"
         },
-        "test_polygon_pairs_coordinate_extremes_keep_unbounded_derived_lengths": {
+        "test_exact_contact_binding_retains_twelve_shards_and_every_prior_selector": {
           "before": null,
-          "after": "172f736a7e6f33ede121cff469d6a6e2631f5146899f9d147ee56aabc5d5e24d"
+          "after": "a928291ce0bc43f2ee2f5d1551ae405901618c57ecf40f2634ed7dd76793914b"
         },
-        "test_polygon_pairs_distinguish_separation_contact_and_overlap": {
+        "test_exact_contact_test_transition_leaves_historical_source_selection_closed": {
           "before": null,
-          "after": "056fb35d75e73a9af7040b14493599319b3be564b6ee5abf91a7069b1ce14e42"
+          "after": "eb5607b2434f32b6ac8e2232d1b68978104fa7202c12ff8c949e84aca071dbfa"
         },
-        "test_polygon_pairs_handle_concavity_t_junctions_and_split_boundary_edges": {
+        "test_exact_contact_test_transition_preserves_original_selection_bytes": {
           "before": null,
-          "after": "fff3d81d0d4f270060c0d1d8edfd881804dddcaca2d9a6719198dd46f42d71d4"
+          "after": "3c95a5748a87087ce6d004fbf896aef3de46c787fc25f2820aeeab976a6aa17b"
         },
-        "test_polygon_pairs_preserve_translation_ring_order_payload_and_hash": {
+        "test_exact_contact_test_transition_rejects_source_record_and_identity_drift": {
           "before": null,
-          "after": "0db98f556eaa108534eb8dca3261757cb08a32d1b2a32b112de6bfd5a052a448"
+          "after": "310eca8ddf3779e452cbba1dcc8b0bee9fa0f7d49de865370913c1a818cc2f95"
+        }
+      }
+    },
+    "tests/rules/section01/test_exact_contact.py": {
+      "before_sha256": null,
+      "after_sha256": "c78a6eec8d4669b6b358a1230e6c5835e765c5b312060ebd5a631b5eb42b2d74",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "133241adb235aa0ff9485ce6a31ba1fe238b60075c2456279e963acbf1475523"
+        },
+        "disk": {
+          "before": null,
+          "after": "2827441f871a9a2191c5cc3466d4832210859d112b843c361f5b105b69c769a0"
+        },
+        "test_exact_contact_irrational_and_simultaneous_contacts_have_full_segment_proofs": {
+          "before": null,
+          "after": "debafdc7589912e3e762982d1b1e17b72bafc1a73e83473924bc9149bd0a21ed"
+        },
+        "test_exact_contact_rational_tangency_and_once_rounded_approach_controls": {
+          "before": null,
+          "after": "fc066fd0cdf9d463cad940d78bc10d6f9a4d52bbb6a55c5f6a254410cd9b001c"
+        },
+        "test_exact_contact_rejects_endpoint_only_path_and_illegal_endpoint": {
+          "before": null,
+          "after": "a9559f903f071aea4accbc412bc4ee2da6b083cad44cb32ff6a5df0524b25f21"
+        },
+        "test_exact_coordinate_mixed_fields_fail_closed_without_approximation": {
+          "before": null,
+          "after": "0eaaba13f06115dceeb71d495b2e8c0ce845bf2b69e51f3749921ca7444f238a"
+        },
+        "test_exact_coordinate_normalizes_equivalent_constructions_and_exact_arithmetic": {
+          "before": null,
+          "after": "84fd2ae3caaf2ef69484615fc7ea024c1bba63ec58843431c8f5c91e89308250"
+        },
+        "test_exact_coordinate_rejects_noncanonical_malformed_and_unbounded_inputs": {
+          "before": null,
+          "after": "99a52afe73b7bc02bb75bf8df7fdd2115212f303f1b1cf58bc87104ee7a71527"
+        },
+        "test_exact_coordinate_root_selection_sign_and_midpoint_measurement_are_exact": {
+          "before": null,
+          "after": "697a074795a13143c5ee0e2582e77bd9508f5158cf5520fc6d14179e894c72d5"
+        },
+        "test_exact_disk_queries_validate_types_and_keep_topology_separate_from_rounding": {
+          "before": null,
+          "after": "ee6c340ba63f898b374d04f951837457342247311e1588a1a5af273454a53a88"
+        },
+        "test_exact_disk_restore_preserves_witness_identity_and_rejects_cross_profiles": {
+          "before": null,
+          "after": "654e4b475a4d09aaf7b8a113208726907b00fc5960f75f56a332dd7d9cca088f"
+        },
+        "test_rational_contact_constructor_handles_rational_roots_degeneracy_and_rotation": {
+          "before": null,
+          "after": "ea5b35230c3666d710b4b6aed7132b0239637531b0f8ca9f3d85e0bac4a75a5c"
         }
       }
     }
@@ -564,58 +664,25 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Add an inactive exact canonical polygon pair topology and once-rounded surface-gap queries with strict signed 64-bit tick input validation. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
-      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: classify two closed filled simple rings as separated, boundary contact or interior overlap using exact integer/rational predicates and measure their minimum exact rational squared boundary gap before one final quantization. Retain historical source/evidence/runtime profiles without migration.",
-      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
+      "rationale": "Add inactive canonical rational/quadratic coordinates, exact disk contact construction and complete straight-segment clearance with final-only travel rounding. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Resolve exact contact representability for finite rational/quadratic poses, including 1.0005-inch tangency, irrational and simultaneous contacts; certify complete straight approaches with exact arithmetic. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy geometry source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
     "ci/quality_shards/shard-4-modules.txt": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Add an inactive exact canonical polygon pair topology and once-rounded surface-gap queries with strict signed 64-bit tick input validation. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
-      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: classify two closed filled simple rings as separated, boundary contact or interior overlap using exact integer/rational predicates and measure their minimum exact rational squared boundary gap before one final quantization. Retain historical source/evidence/runtime profiles without migration.",
-      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
+      "rationale": "Add inactive canonical rational/quadratic coordinates, exact disk contact construction and complete straight-segment clearance with final-only travel rounding. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Resolve exact contact representability for finite rational/quadratic poses, including 1.0005-inch tangency, irrational and simultaneous contacts; certify complete straight approaches with exact arithmetic. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy geometry source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
     "ci/quality_shards/shard-4.txt": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Add an inactive exact canonical polygon pair topology and once-rounded surface-gap queries with strict signed 64-bit tick input validation. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
-      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: classify two closed filled simple rings as separated, boundary contact or interior overlap using exact integer/rational predicates and measure their minimum exact rational squared boundary gap before one final quantization. Retain historical source/evidence/runtime profiles without migration.",
-      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
-    },
-    "ci/test_shards/canonical-polygon-pairs-covered-baseline.json": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile",
-        "canonical-polygon-pairs-admission"
-      ],
-      "selected_families": [],
-      "rationale": "Add an inactive exact canonical polygon pair topology and once-rounded surface-gap queries with strict signed 64-bit tick input validation. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
-      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: classify two closed filled simple rings as separated, boundary contact or interior overlap using exact integer/rational predicates and measure their minimum exact rational squared boundary gap before one final quantization. Retain historical source/evidence/runtime profiles without migration.",
-      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
-    },
-    "ci/test_shards/canonical-polygon-pairs-covered-evidence.json": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile",
-        "canonical-polygon-pairs-admission"
-      ],
-      "selected_families": [],
-      "rationale": "Add an inactive exact canonical polygon pair topology and once-rounded surface-gap queries with strict signed 64-bit tick input validation. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
-      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: classify two closed filled simple rings as separated, boundary contact or interior overlap using exact integer/rational predicates and measure their minimum exact rational squared boundary gap before one final quantization. Retain historical source/evidence/runtime profiles without migration.",
-      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
-    },
-    "ci/test_shards/canonical-polygon-pairs-derived-assignment.json": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile",
-        "canonical-polygon-pairs-admission"
-      ],
-      "selected_families": [],
-      "rationale": "Add an inactive exact canonical polygon pair topology and once-rounded surface-gap queries with strict signed 64-bit tick input validation. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
-      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: classify two closed filled simple rings as separated, boundary contact or interior overlap using exact integer/rational predicates and measure their minimum exact rational squared boundary gap before one final quantization. Retain historical source/evidence/runtime profiles without migration.",
-      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
+      "rationale": "Add inactive canonical rational/quadratic coordinates, exact disk contact construction and complete straight-segment clearance with final-only travel rounding. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Resolve exact contact representability for finite rational/quadratic poses, including 1.0005-inch tangency, irrational and simultaneous contacts; certify complete straight approaches with exact arithmetic. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy geometry source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
     "ci/test_shards/current-runtime-compatibility.json": {
       "category": "measured_workload",
@@ -624,9 +691,9 @@
         "scoped-shard-allocation"
       ],
       "selected_families": [],
-      "rationale": "Add an inactive exact canonical polygon pair topology and once-rounded surface-gap queries with strict signed 64-bit tick input validation. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
-      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: classify two closed filled simple rings as separated, boundary contact or interior overlap using exact integer/rational predicates and measure their minimum exact rational squared boundary gap before one final quantization. Retain historical source/evidence/runtime profiles without migration.",
-      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
+      "rationale": "Add inactive canonical rational/quadratic coordinates, exact disk contact construction and complete straight-segment clearance with final-only travel rounding. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Resolve exact contact representability for finite rational/quadratic poses, including 1.0005-inch tangency, irrational and simultaneous contacts; certify complete straight approaches with exact arithmetic. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy geometry source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
     "ci/test_shards/durations.json": {
       "category": "measured_workload",
@@ -634,9 +701,42 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Add an inactive exact canonical polygon pair topology and once-rounded surface-gap queries with strict signed 64-bit tick input validation. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
-      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: classify two closed filled simple rings as separated, boundary contact or interior overlap using exact integer/rational predicates and measure their minimum exact rational squared boundary gap before one final quantization. Retain historical source/evidence/runtime profiles without migration.",
-      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
+      "rationale": "Add inactive canonical rational/quadratic coordinates, exact disk contact construction and complete straight-segment clearance with final-only travel rounding. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Resolve exact contact representability for finite rational/quadratic poses, including 1.0005-inch tangency, irrational and simultaneous contacts; certify complete straight approaches with exact arithmetic. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy geometry source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
+    },
+    "ci/test_shards/exact-contact-covered-baseline.json": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile",
+        "exact-contact-admission"
+      ],
+      "selected_families": [],
+      "rationale": "Add inactive canonical rational/quadratic coordinates, exact disk contact construction and complete straight-segment clearance with final-only travel rounding. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Resolve exact contact representability for finite rational/quadratic poses, including 1.0005-inch tangency, irrational and simultaneous contacts; certify complete straight approaches with exact arithmetic. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy geometry source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
+    },
+    "ci/test_shards/exact-contact-covered-evidence.json": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile",
+        "exact-contact-admission"
+      ],
+      "selected_families": [],
+      "rationale": "Add inactive canonical rational/quadratic coordinates, exact disk contact construction and complete straight-segment clearance with final-only travel rounding. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Resolve exact contact representability for finite rational/quadratic poses, including 1.0005-inch tangency, irrational and simultaneous contacts; certify complete straight approaches with exact arithmetic. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy geometry source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
+    },
+    "ci/test_shards/exact-contact-derived-assignment.json": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile",
+        "exact-contact-admission"
+      ],
+      "selected_families": [],
+      "rationale": "Add inactive canonical rational/quadratic coordinates, exact disk contact construction and complete straight-segment clearance with final-only travel rounding. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Resolve exact contact representability for finite rational/quadratic poses, including 1.0005-inch tangency, irrational and simultaneous contacts; certify complete straight approaches with exact arithmetic. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy geometry source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
     "ci/test_shards/shard-12.txt": {
       "category": "measured_workload",
@@ -644,9 +744,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Add an inactive exact canonical polygon pair topology and once-rounded surface-gap queries with strict signed 64-bit tick input validation. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
-      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: classify two closed filled simple rings as separated, boundary contact or interior overlap using exact integer/rational predicates and measure their minimum exact rational squared boundary gap before one final quantization. Retain historical source/evidence/runtime profiles without migration.",
-      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
+      "rationale": "Add inactive canonical rational/quadratic coordinates, exact disk contact construction and complete straight-segment clearance with final-only travel rounding. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Resolve exact contact representability for finite rational/quadratic poses, including 1.0005-inch tangency, irrational and simultaneous contacts; certify complete straight approaches with exact arithmetic. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy geometry source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
@@ -728,63 +828,63 @@
       "source_obligation": "Current generated session, persistence and support-profile examples must publish the verified current engine identity. This is generation of current examples, not migration or relabeling of archived user saves or replay evidence.",
       "unchanged_work": "The generator, schemas, complete measured runtime/test/tool inputs, runtime algorithms and historical artifacts are unchanged. No new numerical policy, gameplay consumer, public shape, source recipe or native OS equivalence is admitted."
     },
-    "data/source_audits/ci64_provenance_v1/canonical-polygon-pairs-test-transition-v1.json": {
+    "data/source_audits/ci64_provenance_v1/exact-contact-test-transition-v1.json": {
       "category": "measured_workload",
       "operations": [
-        "canonical-polygon-pairs-admission"
+        "exact-contact-admission"
       ],
       "selected_families": [],
-      "rationale": "Add an inactive exact canonical polygon pair topology and once-rounded surface-gap queries with strict signed 64-bit tick input validation. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
-      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: classify two closed filled simple rings as separated, boundary contact or interior overlap using exact integer/rational predicates and measure their minimum exact rational squared boundary gap before one final quantization. Retain historical source/evidence/runtime profiles without migration.",
-      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
+      "rationale": "Add inactive canonical rational/quadratic coordinates, exact disk contact construction and complete straight-segment clearance with final-only travel rounding. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Resolve exact contact representability for finite rational/quadratic poses, including 1.0005-inch tangency, irrational and simultaneous contacts; certify complete straight approaches with exact arithmetic. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy geometry source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Add an inactive exact canonical polygon pair topology and once-rounded surface-gap queries with strict signed 64-bit tick input validation. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
-      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: classify two closed filled simple rings as separated, boundary contact or interior overlap using exact integer/rational predicates and measure their minimum exact rational squared boundary gap before one final quantization. Retain historical source/evidence/runtime profiles without migration.",
-      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
+      "rationale": "Add inactive canonical rational/quadratic coordinates, exact disk contact construction and complete straight-segment clearance with final-only travel rounding. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Resolve exact contact representability for finite rational/quadratic poses, including 1.0005-inch tangency, irrational and simultaneous contacts; certify complete straight approaches with exact arithmetic. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy geometry source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
     "docs/DISTANCE_PRECISION.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Add an inactive exact canonical polygon pair topology and once-rounded surface-gap queries with strict signed 64-bit tick input validation. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
-      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: classify two closed filled simple rings as separated, boundary contact or interior overlap using exact integer/rational predicates and measure their minimum exact rational squared boundary gap before one final quantization. Retain historical source/evidence/runtime profiles without migration.",
-      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
+      "rationale": "Add inactive canonical rational/quadratic coordinates, exact disk contact construction and complete straight-segment clearance with final-only travel rounding. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Resolve exact contact representability for finite rational/quadratic poses, including 1.0005-inch tangency, irrational and simultaneous contacts; certify complete straight approaches with exact arithmetic. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy geometry source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
-    "docs/performance/current/polygon-pairs-movement.json": {
+    "docs/performance/current/exact-contact-movement.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Add an inactive exact canonical polygon pair topology and once-rounded surface-gap queries with strict signed 64-bit tick input validation. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
-      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: classify two closed filled simple rings as separated, boundary contact or interior overlap using exact integer/rational predicates and measure their minimum exact rational squared boundary gap before one final quantization. Retain historical source/evidence/runtime profiles without migration.",
-      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
+      "rationale": "Add inactive canonical rational/quadratic coordinates, exact disk contact construction and complete straight-segment clearance with final-only travel rounding. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Resolve exact contact representability for finite rational/quadratic poses, including 1.0005-inch tangency, irrational and simultaneous contacts; certify complete straight approaches with exact arithmetic. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy geometry source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
-    "docs/performance/current/polygon-pairs-setup.json": {
+    "docs/performance/current/exact-contact-setup.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Add an inactive exact canonical polygon pair topology and once-rounded surface-gap queries with strict signed 64-bit tick input validation. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
-      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: classify two closed filled simple rings as separated, boundary contact or interior overlap using exact integer/rational predicates and measure their minimum exact rational squared boundary gap before one final quantization. Retain historical source/evidence/runtime profiles without migration.",
-      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
+      "rationale": "Add inactive canonical rational/quadratic coordinates, exact disk contact construction and complete straight-segment clearance with final-only travel rounding. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Resolve exact contact representability for finite rational/quadratic poses, including 1.0005-inch tangency, irrational and simultaneous contacts; certify complete straight approaches with exact arithmetic. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy geometry source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
-    "docs/performance/current/polygon-pairs-visibility.json": {
+    "docs/performance/current/exact-contact-visibility.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Add an inactive exact canonical polygon pair topology and once-rounded surface-gap queries with strict signed 64-bit tick input validation. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
-      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: classify two closed filled simple rings as separated, boundary contact or interior overlap using exact integer/rational predicates and measure their minimum exact rational squared boundary gap before one final quantization. Retain historical source/evidence/runtime profiles without migration.",
-      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
+      "rationale": "Add inactive canonical rational/quadratic coordinates, exact disk contact construction and complete straight-segment clearance with final-only travel rounding. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Resolve exact contact representability for finite rational/quadratic poses, including 1.0005-inch tangency, irrational and simultaneous contacts; certify complete straight approaches with exact arithmetic. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy geometry source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Add an inactive exact canonical polygon pair topology and once-rounded surface-gap queries with strict signed 64-bit tick input validation. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
-      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: classify two closed filled simple rings as separated, boundary contact or interior overlap using exact integer/rational predicates and measure their minimum exact rational squared boundary gap before one final quantization. Retain historical source/evidence/runtime profiles without migration.",
-      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
+      "rationale": "Add inactive canonical rational/quadratic coordinates, exact disk contact construction and complete straight-segment clearance with final-only travel rounding. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Resolve exact contact representability for finite rational/quadratic poses, including 1.0005-inch tangency, irrational and simultaneous contacts; certify complete straight approaches with exact arithmetic. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy geometry source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
     "scripts/build_test_shards.py": {
       "category": "rule_semantics",
@@ -792,29 +892,9 @@
         "ci78-cutover-owners-83cd0803bcde80cbfc805d2a110f3274d501da3bc2230de8cc7f95cc0cbd608f"
       ],
       "selected_families": [],
-      "rationale": "Add an inactive exact canonical polygon pair topology and once-rounded surface-gap queries with strict signed 64-bit tick input validation. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
-      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: classify two closed filled simple rings as separated, boundary contact or interior overlap using exact integer/rational predicates and measure their minimum exact rational squared boundary gap before one final quantization. Retain historical source/evidence/runtime profiles without migration.",
-      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
-    },
-    "scripts/canonical_polygon_pairs_shard_admission.py": {
-      "category": "measured_workload",
-      "operations": [
-        "canonical-polygon-pairs-admission"
-      ],
-      "selected_families": [],
-      "rationale": "Add an inactive exact canonical polygon pair topology and once-rounded surface-gap queries with strict signed 64-bit tick input validation. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
-      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: classify two closed filled simple rings as separated, boundary contact or interior overlap using exact integer/rational predicates and measure their minimum exact rational squared boundary gap before one final quantization. Retain historical source/evidence/runtime profiles without migration.",
-      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
-    },
-    "scripts/canonical_polygon_pairs_test_admission.py": {
-      "category": "measured_workload",
-      "operations": [
-        "canonical-polygon-pairs-admission"
-      ],
-      "selected_families": [],
-      "rationale": "Add an inactive exact canonical polygon pair topology and once-rounded surface-gap queries with strict signed 64-bit tick input validation. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
-      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: classify two closed filled simple rings as separated, boundary contact or interior overlap using exact integer/rational predicates and measure their minimum exact rational squared boundary gap before one final quantization. Retain historical source/evidence/runtime profiles without migration.",
-      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
+      "rationale": "Add inactive canonical rational/quadratic coordinates, exact disk contact construction and complete straight-segment clearance with final-only travel rounding. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Resolve exact contact representability for finite rational/quadratic poses, including 1.0005-inch tangency, irrational and simultaneous contacts; certify complete straight approaches with exact arithmetic. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy geometry source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
     "scripts/current_shard_assignment.py": {
       "category": "measured_workload",
@@ -822,9 +902,9 @@
         "scoped-shard-allocation"
       ],
       "selected_families": [],
-      "rationale": "Add an inactive exact canonical polygon pair topology and once-rounded surface-gap queries with strict signed 64-bit tick input validation. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
-      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: classify two closed filled simple rings as separated, boundary contact or interior overlap using exact integer/rational predicates and measure their minimum exact rational squared boundary gap before one final quantization. Retain historical source/evidence/runtime profiles without migration.",
-      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
+      "rationale": "Add inactive canonical rational/quadratic coordinates, exact disk contact construction and complete straight-segment clearance with final-only travel rounding. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Resolve exact contact representability for finite rational/quadratic poses, including 1.0005-inch tangency, irrational and simultaneous contacts; certify complete straight approaches with exact arithmetic. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy geometry source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
     "scripts/current_shard_compatibility.py": {
       "category": "measured_workload",
@@ -832,9 +912,29 @@
         "scoped-shard-allocation"
       ],
       "selected_families": [],
-      "rationale": "Add an inactive exact canonical polygon pair topology and once-rounded surface-gap queries with strict signed 64-bit tick input validation. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
-      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: classify two closed filled simple rings as separated, boundary contact or interior overlap using exact integer/rational predicates and measure their minimum exact rational squared boundary gap before one final quantization. Retain historical source/evidence/runtime profiles without migration.",
-      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
+      "rationale": "Add inactive canonical rational/quadratic coordinates, exact disk contact construction and complete straight-segment clearance with final-only travel rounding. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Resolve exact contact representability for finite rational/quadratic poses, including 1.0005-inch tangency, irrational and simultaneous contacts; certify complete straight approaches with exact arithmetic. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy geometry source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
+    },
+    "scripts/exact_contact_shard_admission.py": {
+      "category": "measured_workload",
+      "operations": [
+        "exact-contact-admission"
+      ],
+      "selected_families": [],
+      "rationale": "Add inactive canonical rational/quadratic coordinates, exact disk contact construction and complete straight-segment clearance with final-only travel rounding. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Resolve exact contact representability for finite rational/quadratic poses, including 1.0005-inch tangency, irrational and simultaneous contacts; certify complete straight approaches with exact arithmetic. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy geometry source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
+    },
+    "scripts/exact_contact_test_admission.py": {
+      "category": "measured_workload",
+      "operations": [
+        "exact-contact-admission"
+      ],
+      "selected_families": [],
+      "rationale": "Add inactive canonical rational/quadratic coordinates, exact disk contact construction and complete straight-segment clearance with final-only travel rounding. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Resolve exact contact representability for finite rational/quadratic poses, including 1.0005-inch tangency, irrational and simultaneous contacts; certify complete straight approaches with exact arithmetic. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy geometry source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
     "scripts/fetch_scheduling_sources.py": {
       "category": "measured_workload",
@@ -842,9 +942,9 @@
         "scoped-shard-allocation"
       ],
       "selected_families": [],
-      "rationale": "Add an inactive exact canonical polygon pair topology and once-rounded surface-gap queries with strict signed 64-bit tick input validation. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
-      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: classify two closed filled simple rings as separated, boundary contact or interior overlap using exact integer/rational predicates and measure their minimum exact rational squared boundary gap before one final quantization. Retain historical source/evidence/runtime profiles without migration.",
-      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
+      "rationale": "Add inactive canonical rational/quadratic coordinates, exact disk contact construction and complete straight-segment clearance with final-only travel rounding. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Resolve exact contact representability for finite rational/quadratic poses, including 1.0005-inch tangency, irrational and simultaneous contacts; certify complete straight approaches with exact arithmetic. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy geometry source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
@@ -852,11 +952,11 @@
         "source-record"
       ],
       "selected_families": [],
-      "rationale": "Add an inactive exact canonical polygon pair topology and once-rounded surface-gap queries with strict signed 64-bit tick input validation. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
-      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: classify two closed filled simple rings as separated, boundary contact or interior overlap using exact integer/rational predicates and measure their minimum exact rational squared boundary gap before one final quantization. Retain historical source/evidence/runtime profiles without migration.",
-      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
+      "rationale": "Add inactive canonical rational/quadratic coordinates, exact disk contact construction and complete straight-segment clearance with final-only travel rounding. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Resolve exact contact representability for finite rational/quadratic poses, including 1.0005-inch tangency, irrational and simultaneous contacts; certify complete straight approaches with exact arithmetic. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy geometry source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
-    "src/warhammer40k_core/geometry/milli_inch_polygon_pairs.py": {
+    "src/warhammer40k_core/geometry/exact_contact.py": {
       "category": "rule_semantics",
       "operations": [
         "geometry-search"
@@ -866,11 +966,11 @@
         "setup",
         "visibility"
       ],
-      "rationale": "Add an inactive exact canonical polygon pair topology and once-rounded surface-gap queries with strict signed 64-bit tick input validation. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
-      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: classify two closed filled simple rings as separated, boundary contact or interior overlap using exact integer/rational predicates and measure their minimum exact rational squared boundary gap before one final quantization. Retain historical source/evidence/runtime profiles without migration.",
-      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
+      "rationale": "Add inactive canonical rational/quadratic coordinates, exact disk contact construction and complete straight-segment clearance with final-only travel rounding. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Resolve exact contact representability for finite rational/quadratic poses, including 1.0005-inch tangency, irrational and simultaneous contacts; certify complete straight approaches with exact arithmetic. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy geometry source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
-    "src/warhammer40k_core/geometry/milli_inch_polygon_queries.py": {
+    "src/warhammer40k_core/geometry/exact_coordinate.py": {
       "category": "rule_semantics",
       "operations": [
         "geometry-search"
@@ -880,9 +980,9 @@
         "setup",
         "visibility"
       ],
-      "rationale": "Add an inactive exact canonical polygon pair topology and once-rounded surface-gap queries with strict signed 64-bit tick input validation. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
-      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: classify two closed filled simple rings as separated, boundary contact or interior overlap using exact integer/rational predicates and measure their minimum exact rational squared boundary gap before one final quantization. Retain historical source/evidence/runtime profiles without migration.",
-      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
+      "rationale": "Add inactive canonical rational/quadratic coordinates, exact disk contact construction and complete straight-segment clearance with final-only travel rounding. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Resolve exact contact representability for finite rational/quadratic poses, including 1.0005-inch tangency, irrational and simultaneous contacts; certify complete straight approaches with exact arithmetic. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy geometry source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
     "tests/code_quality/test_canonical_polygon_pairs_shard_admission.py": {
       "category": "measured_workload",
@@ -890,19 +990,9 @@
         "canonical-polygon-pairs-admission"
       ],
       "selected_families": [],
-      "rationale": "Add an inactive exact canonical polygon pair topology and once-rounded surface-gap queries with strict signed 64-bit tick input validation. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
-      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: classify two closed filled simple rings as separated, boundary contact or interior overlap using exact integer/rational predicates and measure their minimum exact rational squared boundary gap before one final quantization. Retain historical source/evidence/runtime profiles without migration.",
-      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
-    },
-    "tests/code_quality/test_canonical_polygon_queries_shard_admission.py": {
-      "category": "measured_workload",
-      "operations": [
-        "canonical-polygon-queries-admission"
-      ],
-      "selected_families": [],
-      "rationale": "Add an inactive exact canonical polygon pair topology and once-rounded surface-gap queries with strict signed 64-bit tick input validation. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
-      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: classify two closed filled simple rings as separated, boundary contact or interior overlap using exact integer/rational predicates and measure their minimum exact rational squared boundary gap before one final quantization. Retain historical source/evidence/runtime profiles without migration.",
-      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
+      "rationale": "Add inactive canonical rational/quadratic coordinates, exact disk contact construction and complete straight-segment clearance with final-only travel rounding. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Resolve exact contact representability for finite rational/quadratic poses, including 1.0005-inch tangency, irrational and simultaneous contacts; certify complete straight approaches with exact arithmetic. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy geometry source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
     "tests/code_quality/test_ci_performance_gates.py": {
       "category": "rule_semantics",
@@ -911,26 +1001,36 @@
         "milli-inch-test-admission"
       ],
       "selected_families": [],
-      "rationale": "Include the new imported finite pair-admission helper in both isolated CLI fixture source lists, so the positive active-file collection and negative inactive/naming guards execute their intended boundary.",
+      "rationale": "Include the new imported finite exact-contact admission helper in both isolated CLI fixture source lists, so the positive active-file collection and negative inactive/naming guards execute their intended boundary.",
       "source_obligation": "Preserve all existing collected CLI controls and their expected results by completing their required fixture dependencies; no validator, selection policy or test count is weakened.",
       "unchanged_work": "No engine runtime change, new test case, selector move, budget change or deferred control. The full exact-source quality suite still runs after covered qualification."
     },
-    "tests/rules/section01/test_milli_inch_polygon_pairs.py": {
+    "tests/code_quality/test_exact_contact_shard_admission.py": {
       "category": "measured_workload",
       "operations": [
-        "canonical-polygon-pairs-regressions"
+        "exact-contact-admission"
       ],
       "selected_families": [],
-      "rationale": "Add an inactive exact canonical polygon pair topology and once-rounded surface-gap queries with strict signed 64-bit tick input validation. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
-      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: classify two closed filled simple rings as separated, boundary contact or interior overlap using exact integer/rational predicates and measure their minimum exact rational squared boundary gap before one final quantization. Retain historical source/evidence/runtime profiles without migration.",
-      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
+      "rationale": "Add inactive canonical rational/quadratic coordinates, exact disk contact construction and complete straight-segment clearance with final-only travel rounding. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Resolve exact contact representability for finite rational/quadratic poses, including 1.0005-inch tangency, irrational and simultaneous contacts; certify complete straight approaches with exact arithmetic. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy geometry source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
+    },
+    "tests/rules/section01/test_exact_contact.py": {
+      "category": "measured_workload",
+      "operations": [
+        "exact-contact-regressions"
+      ],
+      "selected_families": [],
+      "rationale": "Add inactive canonical rational/quadratic coordinates, exact disk contact construction and complete straight-segment clearance with final-only travel rounding. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
+      "source_obligation": "Resolve exact contact representability for finite rational/quadratic poses, including 1.0005-inch tangency, irrational and simultaneous contacts; certify complete straight approaches with exact arithmetic. Retain historical source/evidence/runtime profiles without migration.",
+      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy geometry source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     }
   },
   "milestone": "ordinary",
   "comparisons": {
-    "visibility": "docs/performance/current/polygon-pairs-visibility.json",
-    "movement": "docs/performance/current/polygon-pairs-movement.json",
-    "setup": "docs/performance/current/polygon-pairs-setup.json"
+    "visibility": "docs/performance/current/exact-contact-visibility.json",
+    "movement": "docs/performance/current/exact-contact-movement.json",
+    "setup": "docs/performance/current/exact-contact-setup.json"
   },
   "full_game": null
 }
