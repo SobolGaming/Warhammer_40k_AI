@@ -13,9 +13,9 @@
   "retained_polygon_sha256": "56253b70e4c56a6c6b9dd3a053b127211811fc1ec79e3a5097285feaf023c263",
   "retained_profile_sha256": "020dcec99278aa79f2215762a525c0c029231cdb9c64f1e988d4a1719e0fbb74",
   "retained_symbolic_sha256": "23943a7fb56ba7b6e3da0888667d15959b4b1ae4e2148be0b6e6ab3d1aeeb9cb",
-  "runtime_fingerprint": "1cb73d542ea420362617555657c8575271a77542f954fc64bbf6a75387bae065",
+  "runtime_fingerprint": "9155e14c9c2ebf6932f47fff50f573bb7ee02b6573d76779ae538bedc8f33137",
   "schema": "finite-canonical-circle-test-transition-v1",
   "sources": {
-    "src/warhammer40k_core/geometry/milli_inch_circle.py": "1c3775f87025c2ed3f8d044f25134b9ce00a934b18e66d531f1f842606963a2d"
+    "src/warhammer40k_core/geometry/milli_inch_circle.py": "90c753b7d8ca9fdd03f52d17b7d59a758b2257a86a2610a0e527be43485192a4"
   }
 }

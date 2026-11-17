@@ -13,12 +13,12 @@ from scripts.linux_authority_shard_admission import (
 
 SCHEMA = "historical-snapshot-canonical-circle-v1"
 BASE = "20fe1ac0150a46ef5bedad6d42d8dd55f0c8e989"
-RUNTIME = "1cb73d542ea420362617555657c8575271a77542f954fc64bbf6a75387bae065"
+RUNTIME = "9155e14c9c2ebf6932f47fff50f573bb7ee02b6573d76779ae538bedc8f33137"
 BASELINE_FILE = "canonical-circle-covered-baseline.json"
 EVIDENCE_FILE = "canonical-circle-covered-evidence.json"
 ASSIGNMENT_FILE = "canonical-circle-derived-assignment.json"
 MODULE = "src/warhammer40k_core/geometry/milli_inch_circle.py"
-MODULE_SHA256 = "1c3775f87025c2ed3f8d044f25134b9ce00a934b18e66d531f1f842606963a2d"
+MODULE_SHA256 = "90c753b7d8ca9fdd03f52d17b7d59a758b2257a86a2610a0e527be43485192a4"
 OWNER = "tests/rules/section01/test_milli_inch_circle.py"
 TEST_SHA256 = "108a7edcaff877484ed35ffa21ac685b0b848703b7f65e8ef2fb00a620594194"
 NODES: frozenset[str] = frozenset(

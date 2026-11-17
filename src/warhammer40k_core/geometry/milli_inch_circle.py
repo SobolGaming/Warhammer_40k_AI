@@ -115,7 +115,7 @@ class CanonicalCircle:
         return lower + int(4 * squared_distance >= (diameter_sum + 2 * lower + 1) ** 2)
 
     def _squared_center_distance(self, other: CanonicalCircle) -> int:
-        if not isinstance(other, CanonicalCircle):
+        if not isinstance(cast(object, other), CanonicalCircle):
             raise CanonicalCircleError("Circle queries require a canonical circle.")
         return (self.center[0] - other.center[0]) ** 2 + (self.center[1] - other.center[1]) ** 2
 

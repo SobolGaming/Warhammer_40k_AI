@@ -35,8 +35,8 @@ from scripts.symbolic_milli_inch_test_admission import ADDITION as SYMBOLIC_ADDI
 from scripts.symbolic_milli_inch_test_admission import ADDITION_SHA256 as SYMBOLIC_SHA256
 
 ADDITION = "data/source_audits/ci64_provenance_v1/canonical-circle-test-transition-v1.json"
-ADDITION_SHA256 = "7c30baba638a0f3a1142880a8634d8018f5f2feb43400ea26f97f3758c488961"
-RUNTIME = "1cb73d542ea420362617555657c8575271a77542f954fc64bbf6a75387bae065"
+ADDITION_SHA256 = "a82643598fb01025704bd9d222643fce81e9f772d938a968f1b6568bd9542f19"
+RUNTIME = "9155e14c9c2ebf6932f47fff50f573bb7ee02b6573d76779ae538bedc8f33137"
 SOURCE = "src/warhammer40k_core/geometry/milli_inch_circle.py"
 OWNER = "tests/rules/section01/test_milli_inch_circle.py"
 
