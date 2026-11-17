@@ -188,20 +188,68 @@ after all of these concrete obligations are completed and independently reviewed
    hosted checks, and verified main CI. Keep 1,620-second inclusive approval,
    termination only above 1,800 seconds, and all other existing limits unchanged.
 
-The next dependency-blocking design question is exact-contact representability.
-The 1.000/1.001-inch circular diameters require 1.0005-inch centre separation, which
-cannot be represented by integer milli-inch coplanar centres. A half-tick grid
-solves that example only; it does not establish arbitrary rotated or multi-contact
-placement representability.
+The next dependency-blocking question is the representation of exact contact
+placements. The user's requirement rounds distances and distance-related values
+to 0.001 inch; it does not explicitly require stored coordinates to lie on a
+0.001-inch grid. The staged contract above imposes that stronger integer-coordinate
+choice. Exact derived authoritative poses are a candidate amendment to that
+representation contract, while retaining the same half-away rounding of measured
+lengths. The candidate requires a deliberate contract decision and finite proofs;
+it is neither implemented nor admitted here.
 
-The recommended next step is to investigate and propose exact rational/algebraic
-**internal derived placement coordinates**, while preserving canonical source
-dimensions and once-rounded 0.001-inch measured lengths, with strict witness
-serialization and identity. This would amend the authoritative coordinate contract
-and requires an explicit owner decision **before** implementation or activation of
-off-grid authoritative centres. This PR implements no such amendment. The existing
-rounding semantics remain unchanged: no fuzzy contact, overlap allowance, dimension
-inflation, independently re-rounded radius or silent snapped fallback is permitted.
+For canonical full diameters of 1.000 and 1.001 inches, retain the exact derived
+radii 0.500 and 0.5005 inches. Centres `(0, 0)` and `(2001/2000, 0)` inches are
+exactly tangent: their 1.0005-inch separation equals the radius sum. The rounded
+centre-separation measurement is 1.001 inches, while the exact surface gap is zero.
+Centre separation illustrates the arithmetic; it is not a generic rules-range
+metric. Each rule must use its specified geometric distance and comparison.
+
+Two source-valid geometric approach controls make the movement boundary concrete.
+Keep the 1.000-inch circle stationary at the origin and approach on the positive
+X axis with the 1.001-inch circle:
+
+| Moving centre initially | Exact final centre | Exact straight travel | Once-rounded travel | Inclusive 1.000-inch budget |
+|---|---|---|---|---|
+| `(2.000, 0)` inches | `(1.0005, 0)` inches | 0.9995 inches | 1.000 inches | Passes this distance condition |
+| `(2.001, 0)` inches | `(1.0005, 0)` inches | 1.0005 inches | 1.001 inches | Fails this distance condition |
+
+Both initial pairs are separated, and both straight approaches remain nonoverlapping
+until exact endpoint tangency. These are finite geometric controls, not terrain,
+phase or ordinary engine-admission proofs. Real moves still require their complete
+mandatory path witnesses and every applicable legality condition. Measure the
+complete path before its one rounding step, rather than summing rounded segments.
+
+Exact topology must consume the exact poses. For scalar distances, with nonnegative
+distance `d` in ticks and integer threshold `T`, preserve the distinct midpoint
+boundaries: `Q(d) <= T` iff `d < T + 1/2`; `Q(d) < T` iff `d < T - 1/2`;
+`Q(d) >= T` iff `d >= T - 1/2`; and `Q(d) > T` iff `d >= T + 1/2`.
+The nonnegative domain remains required, including zero thresholds. These are
+length comparisons, not squared-distance or topology predicates. A positive gap
+below half a tick rounds to zero and still does not establish contact.
+
+A finer fixed grid is not a general solution. A half-tick grid represents the
+horizontal example, but with the same radius sum and a horizontal centre difference
+constrained to exactly 1 inch, tangency requires vertical difference
+`sqrt(4001)/2000` inches. That value is irrational, so no finite decimal grid or
+rational-only coordinate representation captures it exactly. Arbitrary rotations,
+multiple simultaneous contacts, backend conversion and solver agreement remain
+unqualified; a rational/algebraic candidate must declare its supported domain.
+
+The recommended next slice is a deliberate coordinate-contract proposal plus
+inactive finite witness proofs, before authoritative-state integration or policy
+admission. Specify strict typed rational numerator/positive-denominator forms and
+algebraic witnesses with validated root selection, canonical identity, deterministic
+serialization and bounded unresolved-result handling. Preserve an accepted exact
+witness on restoration; never round it again as though it were new source input.
+Explicitly bind the representation version through the numerical execution profile,
+pose/geometry/spatial hashes, caches, persistence and replay. Choose that versioning
+design deliberately: changing the coordinate representation does not by itself
+require changing the scalar rounding semantics or their policy ID, but all affected
+identity boundaries must distinguish incompatible representations. The staged mode
+remains unadmitted, and the current legacy-only authority/native paths cannot
+silently accept it. Retain original legacy bytes, hashes, producers and compatible
+runtimes. No fuzzy contact, overlap allowance, dimension inflation, independently
+re-rounded radius or silent snapped fallback is permitted.
 
 ## Staged symbolic measurement prerequisite
 

@@ -1,16 +1,16 @@
 {
   "assignment": {
-    "file": "canonical-polygon-queries-derived-assignment.json",
-    "sha256": "ccfc8df486b11007ef66d72f7d6d8091d104173cfb70a13748bd9ea112ad875c"
+    "file": "canonical-polygon-pairs-derived-assignment.json",
+    "sha256": "d30a466a55ecbdce65b548aa8f1d6439e77fbade0c7fef9c3a489e0e639e2f4c"
   },
   "baseline": {
-    "file": "canonical-polygon-queries-covered-baseline.json",
-    "sha256": "cc0428da858d8a0181d5f18b4b3ac3d6fe3f74e7bd47ec8181ff23f7f59e1ec5"
+    "file": "canonical-polygon-pairs-covered-baseline.json",
+    "sha256": "c52e18cc7da96aa874270a6e2ff464978e83d5888321e08992d51831b9cdd76a"
   },
-  "current_runtime_fingerprint": "5ae984fe33c70e708ed920a2e06b228edbe9e042e79c322bdd9c84b196313d86",
+  "current_runtime_fingerprint": "1f19514910b3cb312aa6561567af9e725f9220d872c89c2710e7df9bd14e2cfb",
   "fresh_evidence": {
-    "file": "canonical-polygon-queries-covered-evidence.json",
-    "sha256": "a1c69058c3eda1914e7a621064f0589742a6f803f5d4a3afea11794523acba37"
+    "file": "canonical-polygon-pairs-covered-evidence.json",
+    "sha256": "d9e5bca324e039bf02b8ee12029f06ad8a3ee3aef10878bfda57512e14f5f7a7"
   },
   "historical_revision": "008be8a8cb0b50b232fe022452762b3906489b49",
   "native_serial_role": {
@@ -24,6 +24,7 @@
     "tests/rules/section01/test_milli_inch.py": "6fad7bf3bc123c2f217bb0ae46b96971d8591f1cda712a0d88ba4b1f0f5edb37",
     "tests/rules/section01/test_milli_inch_circle.py": "108a7edcaff877484ed35ffa21ac685b0b848703b7f65e8ef2fb00a620594194",
     "tests/rules/section01/test_milli_inch_polygon.py": "b36418144aa411b9a39797d191058430d9c8bba3e4e3d5a6dd3ce6f093ea6ee0",
+    "tests/rules/section01/test_milli_inch_polygon_pairs.py": "1ba7d2c874dd479a62ac393dc5c08f35f21d589fc77f5dd1e8292ef9452b67f8",
     "tests/rules/section01/test_milli_inch_polygon_queries.py": "2d3a04000d6c2c02e471d95fe97da22ef23ef58ee40fc7b6d50f7a10ec7dfe34",
     "tests/rules/section01/test_milli_inch_symbolic.py": "94813e259b6316d4cd87ec10ba976d419a44a3b357f0d8316df1eeade7f2ade4",
     "tests/rules/section03/test_terrain_path_preparation.py": "869ce37ba5d43d7a1c5558c94fceaf33eb81bfff62c2e5f13019551f2c071438",
@@ -37,5 +38,5 @@
     "rounding_seconds": 30,
     "version": "native-serial-current-planning-v2"
   },
-  "schema": "historical-snapshot-canonical-polygon-queries-v1"
+  "schema": "historical-snapshot-canonical-polygon-pairs-v1"
 }
