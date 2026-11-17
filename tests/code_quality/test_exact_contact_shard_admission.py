@@ -112,8 +112,10 @@ def test_exact_contact_binding_requires_its_complete_measured_producer(tmp_path:
 
 def test_exact_contact_binding_preserves_retained_sources_and_evidence(tmp_path: Path) -> None:
     prior = json.loads(
-        git_bytes(ROOT, BASE, "ci/test_shards/canonical-polygon-queries-covered-baseline.json")
+        git_bytes(ROOT, BASE, "ci/test_shards/canonical-polygon-pairs-covered-baseline.json")
     )
+    assert len(prior["case_seconds"]) == 6417
+    assert "tests/rules/section01/test_milli_inch_polygon_pairs.py" in prior["test_sources"]
     sources = {**prior["test_sources"], **TEST_SOURCES}
     require_test_sources(ROOT, sources)
     for changed in (
@@ -167,8 +169,9 @@ def test_exact_contact_binding_preserves_retained_sources_and_evidence(tmp_path:
 
 def test_exact_contact_binding_retains_twelve_shards_and_every_prior_selector() -> None:
     old = json.loads(
-        git_bytes(ROOT, BASE, "ci/test_shards/canonical-polygon-queries-derived-assignment.json")
+        git_bytes(ROOT, BASE, "ci/test_shards/canonical-polygon-pairs-derived-assignment.json")
     )
+    assert sum(len(group) for group in old["shards"].values()) == 516
     groups = [list(old["shards"][str(index)]) for index in range(1, 13)]
     groups[-1] = sorted([*groups[-1], OWNER])
     require_frozen_assignment(ROOT, tuple(tuple(group) for group in groups))

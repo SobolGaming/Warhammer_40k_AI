@@ -149,7 +149,7 @@ def retained_authority_artifacts(root: Path, directory: Path) -> None:
 def require_test_sources(root: Path, sources: object) -> None:
     """Retain every old behavioral source and admit precisely the reviewed new file."""
     previous = json.loads(
-        git_bytes(root, BASE, "ci/test_shards/canonical-polygon-queries-covered-baseline.json")
+        git_bytes(root, BASE, "ci/test_shards/canonical-polygon-pairs-covered-baseline.json")
     )
     if sources != {**previous["test_sources"], OWNER: TEST_SHA256}:
         raise SystemExit(
@@ -207,7 +207,7 @@ def current_native_role(
 
 def require_frozen_assignment(root: Path, groups: tuple[tuple[str, ...], ...]) -> None:
     previous = json.loads(
-        git_bytes(root, BASE, "ci/test_shards/canonical-polygon-queries-derived-assignment.json")
+        git_bytes(root, BASE, "ci/test_shards/canonical-polygon-pairs-derived-assignment.json")
     )
     if len(groups) != 12:
         raise SystemExit("Canonical exact contacts admission preserves twelve shards.")
