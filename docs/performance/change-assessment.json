@@ -6,11 +6,11 @@
   "changes": {
     "ci/quality_shards/all.txt": {
       "before_sha256": "c945772b532535857ce8583c545fdf1aac5543bcfce6dd7d4eae6a09576509e4",
-      "after_sha256": "815d064559767b9447b1c0f9bd257697255b83ac76a36dcfaab4cb865f5e461a",
+      "after_sha256": "0218227a0d55534937097d0a1421d0ab64ddc4148d1acac0932f31fee4014edb",
       "owners": {
         "@document": {
           "before": "c945772b532535857ce8583c545fdf1aac5543bcfce6dd7d4eae6a09576509e4",
-          "after": "815d064559767b9447b1c0f9bd257697255b83ac76a36dcfaab4cb865f5e461a"
+          "after": "0218227a0d55534937097d0a1421d0ab64ddc4148d1acac0932f31fee4014edb"
         }
       }
     },
@@ -558,9 +558,9 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Add an inactive exact canonical polygon point classification and once-rounded point distance queries with strict signed 64-bit tick input validation. Retain all gameplay consumers and existing sensitive geometry mappings; actual matched visibility, movement and setup comparisons preserve the required performance assessment. Finite admission binds only this exact source/test successor and actual fresh covered observations.",
-      "source_obligation": "Implement the owner-directed nearest 0.001-inch canonical polygon input prerequisite: classify canonical points as interior, boundary or exterior using exact integer predicates and measure distance to the closed filled polygon from exact rational squared segment distances before one final quantization. Retain historical source/evidence/runtime profiles without migration.",
-      "unchanged_work": "No gameplay activation, legacy geometry snapping, contact tolerance, inner history migration or native OS equivalence claim. The new query API is inactive; existing legacy polygon source and consumers are unchanged. Preserve32 local workers,12 hosted shards,67percent complete package coverage floor with branch measurement,1620second inclusive approval and timing termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
+      "rationale": "Sort the global complete quality inventory lexicographically as required by the unchanged quality-evidence validator. The final quality run reproduced an ordering failure after all 2658 other active controls passed; correcting only the global order restores that required inventory boundary.",
+      "source_obligation": "Preserve the exact 2919-node membership, 2659 active quality cases and 260 explicit deferrals. Keep every shard inventory byte unchanged, including shard 4 declaration and parameter order, and preserve the prior failed quality result with its original outcome.",
+      "unchanged_work": "This is data-only ordering plus its exact-diff assessment. No runtime, script, test, operation-map, measured source input, coverage denominator, test membership, worker count or timing gate changes. The approved complete covered producer remains source-identical; final-head reviews and remaining gates must be refreshed."
     },
     "ci/quality_shards/shard-4-modules.txt": {
       "category": "governance",
