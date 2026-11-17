@@ -37,6 +37,10 @@ def load_assignment(
     from scripts.build_test_shards import SERIAL_BEHAVIORAL_CASE
     from scripts.canonical_circle_shard_admission import ASSIGNMENT_FILE as CIRCLE_ASSIGNMENT_FILE
     from scripts.canonical_circle_shard_admission import SCHEMA as CIRCLE_SCHEMA
+    from scripts.canonical_polygon_pairs_shard_admission import (
+        ASSIGNMENT_FILE as PAIRS_ASSIGNMENT_FILE,
+    )
+    from scripts.canonical_polygon_pairs_shard_admission import SCHEMA as PAIRS_SCHEMA
     from scripts.canonical_polygon_queries_shard_admission import (
         ASSIGNMENT_FILE as QUERIES_ASSIGNMENT_FILE,
     )
@@ -58,6 +62,7 @@ def load_assignment(
     )
     from scripts.symbolic_milli_inch_shard_admission import SCHEMA as SYMBOLIC_SCHEMA
 
+    pairs = descriptor["schema"] == PAIRS_SCHEMA
     queries = descriptor["schema"] == QUERIES_SCHEMA
     circle = descriptor["schema"] == CIRCLE_SCHEMA
     polygon = descriptor["schema"] == POLYGON_SCHEMA
@@ -66,7 +71,9 @@ def load_assignment(
     authority = descriptor["schema"] == AUTHORITY_SCHEMA
     milli = descriptor["schema"] == MILLI_SCHEMA
     filename = (
-        QUERIES_ASSIGNMENT_FILE
+        PAIRS_ASSIGNMENT_FILE
+        if pairs
+        else QUERIES_ASSIGNMENT_FILE
         if queries
         else CIRCLE_ASSIGNMENT_FILE
         if circle
@@ -128,7 +135,9 @@ def load_assignment(
     expected.update(owners)
     selected = Counter(selector for group in groups for selector in group)
     if selected != expected or len(selected) != (
-        515
+        516
+        if pairs
+        else 515
         if queries
         else 514
         if circle

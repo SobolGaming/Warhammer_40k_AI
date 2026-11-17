@@ -124,11 +124,84 @@ lengths may exceed the signed coordinate bound. Exterior points can also have a
 rounded zero distance, so the measurement never establishes contact or containment.
 
 These functions leave canonical polygon payloads and hashes unchanged and have no
-gameplay callers. Polygon-to-polygon relations, other primitive pairs, off-grid
+gameplay callers. Other primitive pairs, off-grid
 contact placement, rotation/backend/solver agreement, inner identity and caches,
 and coordinated rules remain activation prerequisites. The legacy-only session
 policy, Linux authority, historical replay evidence and paused Fight experiment
 retain their existing semantics and bytes.
+
+## Staged canonical polygon-pair queries
+
+`geometry.milli_inch_polygon_pairs` adds inactive exact queries between closed,
+filled `CanonicalPolygon` rings. `polygon_polygon_relation` separates disjoint
+sets, boundary-only contact and interior overlap. Containment and coincidence are
+interior overlap. Proper crossings, winding-aware shared edges and rational
+midpoints of boundary intervals handle concavity, collinear continuation and rings
+whose vertices all lie on the other boundary. The existing internal point locator
+accepts exact rational samples; its public point API still requires integer ticks.
+
+`polygon_polygon_distance_ticks` returns zero for contact or interior overlap.
+For separated rings it selects the minimum exact rational squared endpoint-to-
+segment distance across all edge pairs, then rounds the derived length once.
+Projections and interval samples remain exact and off-grid. A separated pair can
+have a rounded zero gap; that measurement never establishes contact. Inputs must
+be canonical polygons, and derived lengths may exceed the signed coordinate bound.
+Queries preserve polygon payloads and identities and use no epsilon or backend.
+
+This is a prerequisite, with no gameplay callers or newly admitted session mode.
+Other primitive pairs, contact-attainable placement, rotations/backend/solver
+agreement, inner policy/replay identity, caches and coordinated rules still block
+activation. Original source producers, payloads and historical evidence remain
+unchanged. Linux remains authoritative; native OS equivalence is not established.
+
+## Finite activation checklist and next contact decision
+
+The implemented arithmetic, outer policy binding and canonical circle/polygon
+queries remain inactive prerequisites. New-mode gameplay may be admitted only
+after all of these concrete obligations are completed and independently reviewed:
+
+1. **Primitive geometry:** complete the supported circle/polygon and oval/rotated
+   shape queries, including exact contact/overlap and once-rounded derived lengths.
+   Establish agreement between analytic predicates, geometry backend operations
+   and exact/symbolic solver witnesses, including concave and degenerate boundaries.
+2. **Attainable legal placement:** resolve the coordinate-contract conflict below
+   through an explicit owner decision, then implement the chosen complete contact
+   representation. Demonstrate ordinary legal contact-required moves, multi-contact
+   formations and mandatory full-path witnesses without tolerances or overlap.
+3. **Inner identity and retention:** carry numerical policy through GameConfig,
+   lifecycle, decisions/events, replay identity, geometry/spatial hashes and all
+   dependent cache keys. Reject unknown/mixed policies and stale cross-policy
+   caches. Qualify engine-generated valid-state save/load/full replay while retaining
+   original legacy bytes, producers, compatible runtimes and explicit enrollment.
+4. **Coordinated rule consumers:** switch each owning movement, range, engagement,
+   coherency, placement and contact consumer together with its strict/inclusive
+   threshold contract. Quantize complete derived lengths once; keep topological
+   contact, intersection and overlap separate from rounded zero measurements.
+5. **Shared adapter authority:** version source-number decoding and canonical input
+   boundaries, route ordinary UI/headless/network decisions to the same Linux
+   authority, and prove Windows and Linux clients preserve its canonical payloads,
+   witnessed decisions, checkpoints and replay. Do not infer native OS equivalence.
+6. **Explicit admission and qualification:** admit the completed policy only after
+   exact-final-head coding and supervisory reviews, applicable source/generated/
+   contract/performance checks, complete covered behavioral qualification with 32
+   local workers (meeting the at-least-twelve requirement) and 67% full-package branch coverage, all required
+   hosted checks, and verified main CI. Keep 1,620-second inclusive approval,
+   termination only above 1,800 seconds, and all other existing limits unchanged.
+
+The next dependency-blocking design question is exact-contact representability.
+The 1.000/1.001-inch circular diameters require 1.0005-inch centre separation, which
+cannot be represented by integer milli-inch coplanar centres. A half-tick grid
+solves that example only; it does not establish arbitrary rotated or multi-contact
+placement representability.
+
+The recommended next step is to investigate and propose exact rational/algebraic
+**internal derived placement coordinates**, while preserving canonical source
+dimensions and once-rounded 0.001-inch measured lengths, with strict witness
+serialization and identity. This would amend the authoritative coordinate contract
+and requires an explicit owner decision **before** implementation or activation of
+off-grid authoritative centres. This PR implements no such amendment. The existing
+rounding semantics remain unchanged: no fuzzy contact, overlap allowance, dimension
+inflation, independently re-rounded radius or silent snapped fallback is permitted.
 
 ## Staged symbolic measurement prerequisite
 
