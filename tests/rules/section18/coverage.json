@@ -3876,7 +3876,7 @@
     "tests/rules/section18/test_embark.py": "52a6932ef18fe93ae8fbba796aa9d0af79842884ed3cfd5c337aa13a15949261",
     "tests/rules/section18/test_emergency.py": "dd10071fe5d07adf4d5960320ce0dba5bda9f58187e5d52df08f1ef2e0871416",
     "tests/rules/section18/test_emergency_status.py": "b3c40d4c04b92f0fcc2c6be9d96b2a38c418e39cce5a83a8ae4e9b7f4e98a8ff",
-    "tests/rules/section18/test_facade.py": "5cce4a67e50969eb7e3565903b22cc04f0b42f3ec8705398003935c8dbdfd71a",
+    "tests/rules/section18/test_facade.py": "e57eed3325fdb9ff1e4e4e85682f7db56a012c5a77a071f3ebbfdb1609553457",
     "tests/rules/section18/test_faqs.py": "8897688f2eaaeb5a19c1e90f0f52994b276ded51ee36b67aa1031c0c70673178",
     "tests/rules/section18/test_formations.py": "1e64f5f3a7bd354f572af4d5796ecac0b85c5e48390acc7be94bbd368ee374ad",
     "tests/support/section18_fixtures.py": "322ca252066382ad5f0dd2548427ef8ba9ec6f055bfd7f99a4be9173d8531e46",
@@ -3905,7 +3905,10 @@
       "tests/rules/section18/test_facade.py::test_a32_oct14_recovery_rejects_inconsistent_reconstructions",
       "tests/rules/section18/test_facade.py::test_a32_oct14_recovery_rejects_different_or_underdetermined_source",
       "tests/rules/section18/test_facade.py::test_a32_oct14_cli_never_overwrites_original_or_existing_output"
-    ]
+    ],
+    "current_reconstruction_profile_id": "local-checkpoint:legacy-model-completion:2026-10-14:numerical-identity-v1",
+    "current_reconstruction_recipe_version": "recorded-decision-reconstruction-v4-numerical-identity",
+    "qualification": "Original profile and source bytes remain historical; current named tests explicitly exercise the separately selected numerical-identity successor."
   },
   "cutover_qualification": "Literal/source inventory remains complete. Current behavioral evidence is partial after the approved legacy-test cutover. Only selected active tests are live semantic bindings; historical_nonselected_evidence preserves former records without current gameplay or coverage credit. Explicit gaps remain for unselected checks; archives are historical evidence, never current test sources.",
   "historical_authenticated_inputs": {

@@ -44,7 +44,9 @@ from warhammer40k_core.engine.weapon_declaration import (
 from warhammer40k_core.geometry.pathing import ModelPathEndpoint, PathWitness
 from warhammer40k_core.geometry.pose import Pose, PosePayload
 
-OPPOSING_SHOOTER_ID = "canonical-opposing-shooter-v1"
+OPPOSING_SHOOTER_ID = "canonical-opposing-shooter-v2-numerical-identity"
+# Receipt versions do not relabel the original ordinary decision identifiers.
+OPPOSING_SHOOTER_EXECUTION_ID = "canonical-opposing-shooter-v1"
 _VEHICLE = "army-alpha:strategic-reserve-unit"
 _TARGETS = (EXPLOITER_UNIT_ID, SCREEN_UNIT_ID, _VEHICLE)
 _GAPS = (
@@ -166,7 +168,7 @@ def _submit(
     )
     index = session.decision_record_count()
     viewer = ViewerContext.for_player(request.actor_id)
-    result_id = f"{OPPOSING_SHOOTER_ID}:{index}"
+    result_id = f"{OPPOSING_SHOOTER_EXECUTION_ID}:{index}"
     if option is not None:
         status = session.submit_viewer_option(
             viewer=viewer,
@@ -509,7 +511,7 @@ class OpposingShooterQualification:
         )
         payload = validate_json_value(
             {
-                "schema_version": "opposing-shooter-qualification-v1",
+                "schema_version": "opposing-shooter-qualification-v2-numerical-identity",
                 "definition": opposing_shooter_definition(),
                 "definition_hash": payload_digest(opposing_shooter_definition()),
                 "configuration": canonical_deployment_config().to_payload(),

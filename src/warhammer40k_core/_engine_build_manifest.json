@@ -1,7 +1,7 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0f222a365137d66682ff402cf08891e4231dab67c52f464196b2b611d2e52a5b",
-  "fingerprint": "0f222a365137d66682ff402cf08891e4231dab67c52f464196b2b611d2e52a5b",
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:db8c8f733112410866770bcd2d3231a9e2a348e2de0514f5fc0b5ffe95b7b9cd",
+  "fingerprint": "db8c8f733112410866770bcd2d3231a9e2a348e2de0514f5fc0b5ffe95b7b9cd",
   "resource_count": 3266,
   "resources": [
     {
@@ -85,9 +85,9 @@
       "sha256": "c55acedc575241e590baa70ec6e1a6b3d64559bc460e03d37e49319e2d141f80"
     },
     {
-      "byte_length": 10490,
+      "byte_length": 10814,
       "path": "warhammer40k_core/adapters/linux_authority_transport.py",
-      "sha256": "ba509b5a63c48cc31af44e70a2bd9e8e86567b5e367e2734fa3ddadb224e71dc"
+      "sha256": "9ebd2028fe972d7614508bd1aef898fd4e6c7a33d53fb4437e976acec5bfba38"
     },
     {
       "byte_length": 17159,
@@ -225,9 +225,9 @@
       "sha256": "4534a55d83812fdb5545313757dc7749e3d17d74d3dc9275923336d64226f249"
     },
     {
-      "byte_length": 17113,
+      "byte_length": 17367,
       "path": "warhammer40k_core/ai/canonical_deployment.py",
-      "sha256": "d8dc60654a1da1d61b6b640c1480fae5bc8c6721a662c78a6837f1a618bd39ae"
+      "sha256": "f0ebfbed8d80011bd46d741b240fd23c096d47d4bcb81a3f222f9c2ee8fd6f1d"
     },
     {
       "byte_length": 15378,
@@ -270,9 +270,9 @@
       "sha256": "e1038173d8385d9fbc95615744757818ee551a904a403b5fab8e6e220379780d"
     },
     {
-      "byte_length": 9242,
+      "byte_length": 9343,
       "path": "warhammer40k_core/ai/deployment_reference_suite.py",
-      "sha256": "cb2e04cc945ddafc76639615e0ed88c39f1a31eb1c97346a57c59fa3112fbd71"
+      "sha256": "abef6cdd0fbf9ed3d6e2f479a62749480828c7ce476495ab164b72b63c67b34d"
     },
     {
       "byte_length": 9899,
@@ -285,24 +285,24 @@
       "sha256": "17a4026598e575fa76882cdca27eaad1b3384807d438e504d5d18ee7235cd0e5"
     },
     {
-      "byte_length": 19765,
+      "byte_length": 19976,
       "path": "warhammer40k_core/ai/followthrough_scenario.py",
-      "sha256": "2b34da3d67644e1d47fa1f7f5833d0c9bf00dbc20942a1667fe6a36bb28bb675"
+      "sha256": "ad4c440f1ea05fb4d4d5dc14590d9d1d0bfb873bcb1fc2ac2325f2ee63117c6f"
     },
     {
-      "byte_length": 14021,
+      "byte_length": 14059,
       "path": "warhammer40k_core/ai/matched_attack_scenario.py",
-      "sha256": "bbf9f5124a3dc6e3842ee0b39798c86bcfa44ff6510b48047bda5803c32d5789"
+      "sha256": "0c68725b55e3dd7f8e3b25ebcde22d3e497ab95ac1e3a862eeb8f2b33a7a1834"
     },
     {
-      "byte_length": 16247,
+      "byte_length": 16429,
       "path": "warhammer40k_core/ai/normal_move_scenario.py",
-      "sha256": "e16b78680d7fb5d31a7ef2cde5c780d9d63418bfe6806b000c1c219f694eb81c"
+      "sha256": "d2d8dffc43461eec0cc4db3db8923893b7ba59ad65e4df45c9a2cce3611692db"
     },
     {
-      "byte_length": 24575,
+      "byte_length": 24765,
       "path": "warhammer40k_core/ai/opposing_shooter_scenario.py",
-      "sha256": "240d92e95a494efdc711e57cf414c45d1f29b2cb500cbd5223fa473a7233ef66"
+      "sha256": "1d31f56e93543705def0e3c700e90e77e1cfdd5bf6a793f2b6ef190d4821b6e7"
     },
     {
       "byte_length": 16932,
@@ -320,9 +320,9 @@
       "sha256": "d20d51af9e8748232f03a3973137f800b3637e336b3f5d9e3284df20d5ed5d09"
     },
     {
-      "byte_length": 15042,
+      "byte_length": 15214,
       "path": "warhammer40k_core/ai/preserve_scenario.py",
-      "sha256": "11c72270ae766a4059387d8d348f5e50f6e0c94f7a5b57b1b8ad6cc9f88f7427"
+      "sha256": "8b4a51aa0078c157f6f6eabc4f975a58c7a3ffffbd7199d3f99d4e32a0d92551"
     },
     {
       "byte_length": 16900,
@@ -13905,9 +13905,9 @@
       "sha256": "63a88ff8c9338e63f78c8f769fb31120a1c43aca3e0482a52f3faf206b42af52"
     },
     {
-      "byte_length": 95387,
+      "byte_length": 95401,
       "path": "warhammer40k_core/geometry/pathing.py",
-      "sha256": "e6acac3ce9c0fbc117a2a3382cc1a8223244505cdea9687af8af132ea9d9bf48"
+      "sha256": "1daa281264c34acf7719e0ae342fc67f26d9d8d1780cfa41e6a0e931a081df35"
     },
     {
       "byte_length": 5976,

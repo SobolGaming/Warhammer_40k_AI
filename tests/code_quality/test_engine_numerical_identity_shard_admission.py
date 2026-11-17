@@ -78,14 +78,12 @@ def test_identity_selection_binds_exact_test_and_updated_recipe_assertions() -> 
     updated, added, _ = transition
     assert admission.OWNER in added
     assert "tests/rules/section18/test_facade.py" in updated
-    previous = git_bytes(ROOT, admission.BASE, "tests/rules/section18/test_facade.py")
-    current = (ROOT / "tests/rules/section18/test_facade.py").read_bytes()
-    assert admission.transitioned_test(
-        ROOT, "tests/rules/section18/test_facade.py", current, previous
-    )
-    assert not admission.transitioned_test(
-        ROOT, "tests/rules/section18/test_facade.py", current + b"\n", previous
-    )
+    assert set(admission.UPDATED_TEST_HASHES) <= set(updated)
+    for name in admission.UPDATED_TEST_HASHES:
+        previous = git_bytes(ROOT, admission.BASE, name)
+        current = (ROOT / name).read_bytes()
+        assert admission.transitioned_test(ROOT, name, current, previous)
+        assert not admission.transitioned_test(ROOT, name, current + b"\n", previous)
 
 
 def test_identity_current_profile_requires_complete_actual_source_bound_evidence() -> None:

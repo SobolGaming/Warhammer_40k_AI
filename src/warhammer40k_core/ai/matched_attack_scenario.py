@@ -30,7 +30,7 @@ from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_f
 from warhammer40k_core.engine.event_log import JsonValue, canonical_json, validate_json_value
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 
-MATCHED_ATTACK_ID = "canonical-matched-opposing-attack-v1"
+MATCHED_ATTACK_ID = "canonical-matched-opposing-attack-v2-numerical-identity"
 
 
 def matched_attack_definition() -> dict[str, JsonValue]:
@@ -262,7 +262,7 @@ class MatchedAttackComparison:
         }
         payload = validate_json_value(
             {
-                "schema_version": "matched-attack-comparison-v1",
+                "schema_version": "matched-attack-comparison-v2-numerical-identity",
                 "definition": matched_attack_definition(),
                 "definition_hash": payload_digest(matched_attack_definition()),
                 "configuration": canonical_deployment_config().to_payload(),

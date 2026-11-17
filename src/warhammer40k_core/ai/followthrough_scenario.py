@@ -35,8 +35,10 @@ from warhammer40k_core.engine.phase import LifecycleStatusKind
 from warhammer40k_core.geometry.pathing import ModelPathEndpoint, PathWitness
 from warhammer40k_core.geometry.pose import Pose, PosePayload
 
-FOLLOWTHROUGH_ID = "canonical-paired-followthrough-v1"
-FOLLOWTHROUGH_SCHEMA = "paired-followthrough-admission-v1"
+FOLLOWTHROUGH_ID = "canonical-paired-followthrough-v2-numerical-identity"
+# Receipt versions do not relabel the original ordinary decision identifiers.
+FOLLOWTHROUGH_EXECUTION_ID = "canonical-paired-followthrough-v1"
+FOLLOWTHROUGH_SCHEMA = "paired-followthrough-admission-v2-numerical-identity"
 _SELECT = PolicyRoute("player-a", "select_movement_unit", "battle", None, "movement", None)
 _ACTION = PolicyRoute("player-a", "select_movement_action", "battle", None, "movement", None)
 _MOVE = PolicyRoute(
@@ -99,7 +101,7 @@ def followthrough_definition() -> dict[str, JsonValue]:
     )
 
 
-FOLLOWTHROUGH_DEFINITION_HASH = "ab9d979f84349259decf176864e7e35a0ddb46ca21fa72ab7bebd72e3ed2a9d9"
+FOLLOWTHROUGH_DEFINITION_HASH = "a0f47b8fb5bbf697f725b35cb34cb21a6c895d9d594d2a3b77485501da923437"
 
 
 def _definition() -> dict[str, JsonValue]:
@@ -163,7 +165,7 @@ def _continue(session: LocalGameSession) -> list[dict[str, JsonValue]]:
                 viewer=ViewerContext.for_player("player-a"),
                 request_id=context.request["request_id"],
                 option_id=option,
-                result_id=f"{FOLLOWTHROUGH_ID}:{index}",
+                result_id=f"{FOLLOWTHROUGH_EXECUTION_ID}:{index}",
             )
         else:
             assert proposal is not None
@@ -171,7 +173,7 @@ def _continue(session: LocalGameSession) -> list[dict[str, JsonValue]]:
                 viewer=ViewerContext.for_player("player-a"),
                 request_id=context.request["request_id"],
                 payload=validate_json_value(proposal.to_payload()),
-                result_id=f"{FOLLOWTHROUGH_ID}:{index}",
+                result_id=f"{FOLLOWTHROUGH_EXECUTION_ID}:{index}",
             )
         if status.status_kind is LifecycleStatusKind.ADVANCED:
             status = session.advance_until_decision_or_terminal()
@@ -265,7 +267,7 @@ def _opponent_probe(session: LocalGameSession) -> dict[str, JsonValue]:
         viewer=ViewerContext.for_player("player-b"),
         request_id=context.request["request_id"],
         payload=validate_json_value({"proposal": proposal}),
-        result_id=f"{FOLLOWTHROUGH_ID}:opponent-probe",
+        result_id=f"{FOLLOWTHROUGH_EXECUTION_ID}:opponent-probe",
     )
     _require(
         status.status_kind is LifecycleStatusKind.INVALID

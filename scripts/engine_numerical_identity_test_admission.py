@@ -21,7 +21,6 @@ from scripts.canonical_polygon_queries_test_admission import (
 )
 from scripts.canonical_polygon_test_admission import ADDITION as POLYGON_ADDITION
 from scripts.canonical_polygon_test_admission import ADDITION_SHA256 as POLYGON_SHA256
-from scripts.engine_numerical_identity_shard_admission import SOURCE_HASHES
 from scripts.exact_contact_test_admission import ADDITION as CONTACT_ADDITION
 from scripts.exact_contact_test_admission import ADDITION_SHA256 as CONTACT_ADDITION_SHA256
 from scripts.milli_inch_test_admission import (
@@ -46,8 +45,8 @@ from scripts.symbolic_milli_inch_test_admission import ADDITION as SYMBOLIC_ADDI
 from scripts.symbolic_milli_inch_test_admission import ADDITION_SHA256 as SYMBOLIC_SHA256
 
 ADDITION = "data/source_audits/ci64_provenance_v1/engine-numerical-identity-test-transition-v1.json"
-ADDITION_SHA256 = "1d8114be6886f4f25d9fe14812187e37d16f19a48ffca0ab129eac022b28b1ff"
-RUNTIME = "0f222a365137d66682ff402cf08891e4231dab67c52f464196b2b611d2e52a5b"
+ADDITION_SHA256 = "518f0e1f92177fe2fe0f218fcecdacac7445cb500fa22942e28c89351af54912"
+RUNTIME = "db8c8f733112410866770bcd2d3231a9e2a348e2de0514f5fc0b5ffe95b7b9cd"
 COORDINATES = "src/warhammer40k_core/geometry/numerical_identity.py"
 QUERIES = "src/warhammer40k_core/geometry/milli_inch_polygon_queries.py"
 QUERIES_SHA256 = "e46fe8e9738786931c565c5ea5a2dc2921132e3690b420632bfcb8a00c362cc5"
@@ -86,6 +85,13 @@ def engine_numerical_identity_test_transition(
         raise SystemExit(
             "Numerical identity test transition requires its retained cutover and runtime."
         )
+    # Retained cutover-only CLI probes do not activate this runtime profile.
+    # Import its full evidence validators only after exact current-profile admission.
+    from scripts.engine_numerical_identity_shard_admission import (
+        SOURCE_HASHES,
+        UPDATED_TEST_HASHES,
+    )
+
     raw = _checked_bytes(root, ADDITION, ADDITION_SHA256)
     record = json.loads(raw, object_pairs_hook=_selection_object)
     if (
@@ -109,6 +115,7 @@ def engine_numerical_identity_test_transition(
         }
         or set(record["added_files"]) != {OWNER}
         or record["sources"] != SOURCE_HASHES
+        or set(record["updated_files"]) != set(UPDATED_TEST_HASHES)
     ):
         raise SystemExit("Numerical identity test transition membership differs.")
     for name, digest in record["sources"].items():
@@ -146,8 +153,9 @@ def engine_numerical_identity_test_transition(
         _checked_bytes(root, name, digest)
     for name, digest in profile["sources"].items():
         _checked_bytes(root, name, SOURCE_HASHES.get(name, digest))
-    updated = _selection_members(profile["updated_files"], root)
-    updated.update(_selection_members(record["updated_files"], root))
+    current_updated = _selection_members(record["updated_files"], root)
+    updated = _selection_members(profile["updated_files"], root, current=current_updated)
+    updated.update(current_updated)
     retained = _selection_members(foundation["added_files"], root)
     retained.update(_selection_members(profile["added_files"], root))
     retained.update(_selection_members(symbolic["added_files"], root))

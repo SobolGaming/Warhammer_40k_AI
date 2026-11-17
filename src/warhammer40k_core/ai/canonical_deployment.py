@@ -23,11 +23,14 @@ from warhammer40k_core.engine.event_log import JsonValue, canonical_json, valida
 from warhammer40k_core.engine.game_state import GameConfig
 from warhammer40k_core.engine.phase import LifecycleStatusKind
 
-CANONICAL_DEPLOYMENT_ID = "canonical-deployment-v1"
+CANONICAL_DEPLOYMENT_ID = "canonical-deployment-v2-numerical-identity"
+# Preserve the fixture game ID and seed; version its newly bound config encoding.
+CANONICAL_DEPLOYMENT_GAME_ID = "canonical-deployment-v1"
+CANONICAL_DEPLOYMENT_EXECUTION_ID = "canonical-deployment-v1"
 CANONICAL_DEPLOYMENT_CONFIG_HASH = (
-    "adfdb1ee885d9de34ddbe6ef7fe1be64c728f86d3529dc2e82b7523132926409"
+    "618cefc49cc612e4e42ae5abedc9df8178a7ba94774652aa531942ffbd856463"
 )
-CANONICAL_DEPLOYMENT_SCHEMA = "canonical-deployment-admission-v1"
+CANONICAL_DEPLOYMENT_SCHEMA = "canonical-deployment-admission-v2-numerical-identity"
 
 
 def _require(condition: bool, message: str) -> None:
@@ -144,7 +147,7 @@ _STEPS = (
 
 def canonical_deployment_config() -> GameConfig:
     """Reconstruct the exact published test configuration, including its fixed seed."""
-    config = canonical_setup_prebattle_smoke_config(game_id=CANONICAL_DEPLOYMENT_ID)
+    config = canonical_setup_prebattle_smoke_config(game_id=CANONICAL_DEPLOYMENT_GAME_ID)
     _require(
         payload_digest(config.to_payload()) == CANONICAL_DEPLOYMENT_CONFIG_HASH,
         "Canonical deployment configuration drifted; review and version the fixture.",
@@ -227,7 +230,7 @@ def reproduce_canonical_deployment() -> tuple[LocalGameSession, RunReport]:
     Timing in the returned diagnostic report is not component-cost qualification.
     No input checkpoint, caller policy, state mutation or alternate recipe is admitted.
     """
-    return _reproduce_recipe(_STEPS, recipe_id=CANONICAL_DEPLOYMENT_ID)
+    return _reproduce_recipe(_STEPS, recipe_id=CANONICAL_DEPLOYMENT_EXECUTION_ID)
 
 
 def _reproduce_recipe(

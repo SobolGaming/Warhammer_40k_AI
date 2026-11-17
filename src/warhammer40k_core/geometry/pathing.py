@@ -681,7 +681,7 @@ class PathWitness:
         if type(cast(object, payload)) is not dict or set(payload) != {"model_paths"}:
             raise GeometryError("PathWitness requires the legacy path payload.")
         if any(
-            type(path) is not dict or set(path) != {"model_id", "poses"}
+            type(cast(object, path)) is not dict or set(path) != {"model_id", "poses"}
             for path in payload["model_paths"]
         ):
             raise GeometryError("PathWitness model path has incompatible fields.")

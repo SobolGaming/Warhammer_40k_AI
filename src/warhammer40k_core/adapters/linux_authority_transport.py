@@ -214,10 +214,17 @@ class LinuxAuthority:
             return LinuxGameSession.from_authority_result(self, self.call(None, "restore", payload))
 
     def enroll_legacy(self, payload_bytes: bytes, *, provenance: JsonValue) -> LinuxGameSession:
+        """Enroll current native legacy-float bytes; obsolete formats remain unsupported."""
         from warhammer40k_core.adapters.execution_profile import checkpoint_envelope
+        from warhammer40k_core.adapters.local_session import (
+            LOCAL_GAME_SESSION_PERSISTENCE_SCHEMA_VERSION,
+        )
 
         envelope = checkpoint_envelope(
-            payload_bytes=payload_bytes, profile=self._profile, provenance=provenance
+            payload_bytes=payload_bytes,
+            profile=self._profile,
+            provenance=provenance,
+            payload_schema=LOCAL_GAME_SESSION_PERSISTENCE_SCHEMA_VERSION,
         )
         return self.restore(validate_json_value(envelope))
 

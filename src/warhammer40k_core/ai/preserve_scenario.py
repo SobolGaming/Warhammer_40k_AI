@@ -21,8 +21,10 @@ from warhammer40k_core.ai.training_admission import TrainingAdmissionError, Veri
 from warhammer40k_core.engine.event_log import JsonValue, canonical_json, validate_json_value
 from warhammer40k_core.engine.phase import LifecycleStatusKind
 
-PRESERVE_SCENARIO_ID = "canonical-preserve-prefix-v1"
-PRESERVE_SCENARIO_SCHEMA = "preserve-scenario-admission-v1"
+PRESERVE_SCENARIO_ID = "canonical-preserve-prefix-v2-numerical-identity"
+# Receipt versions do not relabel the original ordinary decision identifiers.
+PRESERVE_EXECUTION_ID = "canonical-preserve-prefix-v1"
+PRESERVE_SCENARIO_SCHEMA = "preserve-scenario-admission-v2-numerical-identity"
 SCREEN_UNIT_ID = "army-alpha:scout-redeploy-unit"
 EXPLOITER_UNIT_ID = "army-alpha:deep-strike-unit"
 OPPONENT_UNIT_ID = "army-beta:scout-redeploy-unit"
@@ -140,7 +142,7 @@ def preserve_scenario_definition() -> dict[str, JsonValue]:
 
 
 PRESERVE_SCENARIO_DEFINITION_HASH = (
-    "fc3cbc047c8f63aeaf39322456e7c7f75927c8de170911a0c8456a06b15f9043"
+    "9826e75e5f08d056235ff2a2d8ea2118bb3b078c7a3448b12fb0e5cf6a8c2111"
 )
 
 
@@ -178,7 +180,7 @@ def _continue_preservation(
             viewer=ViewerContext.for_player(choice.route.actor_id),
             request_id=context.request["request_id"],
             option_id=choice.option_id,
-            result_id=f"{PRESERVE_SCENARIO_ID}:{index}",
+            result_id=f"{PRESERVE_EXECUTION_ID}:{index}",
         )
         if status.status_kind is LifecycleStatusKind.ADVANCED:
             status = session.advance_until_decision_or_terminal()

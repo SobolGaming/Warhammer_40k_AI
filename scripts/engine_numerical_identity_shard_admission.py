@@ -14,7 +14,7 @@ from scripts.linux_authority_shard_admission import (
 
 SCHEMA = "historical-snapshot-engine-numerical-identity-v1"
 BASE = "9747b9b0873b4f442d3cd81f72280b24810d952c"
-RUNTIME = "0f222a365137d66682ff402cf08891e4231dab67c52f464196b2b611d2e52a5b"
+RUNTIME = "db8c8f733112410866770bcd2d3231a9e2a348e2de0514f5fc0b5ffe95b7b9cd"
 BASELINE_FILE = "engine-numerical-identity-covered-baseline.json"
 EVIDENCE_FILE = "engine-numerical-identity-covered-evidence.json"
 ASSIGNMENT_FILE = "engine-numerical-identity-derived-assignment.json"
@@ -55,6 +55,9 @@ SOURCE_HASHES = {
     "src/warhammer40k_core/adapters/external_contract.py": (
         "a9fd66f2f03fe8d05485c0b48f3672f548a182044ade32c191f985f490bc8eb1"
     ),
+    "src/warhammer40k_core/adapters/linux_authority_transport.py": (
+        "9ebd2028fe972d7614508bd1aef898fd4e6c7a33d53fb4437e976acec5bfba38"
+    ),
     "src/warhammer40k_core/adapters/linux_authority_worker.py": (
         "c0904a8daec7f2fc836fdfcde6dae5e66e611bec017c96a8b97866588eb28f2c"
     ),
@@ -63,6 +66,27 @@ SOURCE_HASHES = {
     ),
     "src/warhammer40k_core/adapters/numerical_checkpoint_reconstruction.py": (
         "934c5d24fdff7781ffa199cbc370ea0cb970b27eed611b76afd07307e551b4ba"
+    ),
+    "src/warhammer40k_core/ai/canonical_deployment.py": (
+        "f0ebfbed8d80011bd46d741b240fd23c096d47d4bcb81a3f222f9c2ee8fd6f1d"
+    ),
+    "src/warhammer40k_core/ai/deployment_reference_suite.py": (
+        "abef6cdd0fbf9ed3d6e2f479a62749480828c7ce476495ab164b72b63c67b34d"
+    ),
+    "src/warhammer40k_core/ai/followthrough_scenario.py": (
+        "ad4c440f1ea05fb4d4d5dc14590d9d1d0bfb873bcb1fc2ac2325f2ee63117c6f"
+    ),
+    "src/warhammer40k_core/ai/matched_attack_scenario.py": (
+        "0c68725b55e3dd7f8e3b25ebcde22d3e497ab95ac1e3a862eeb8f2b33a7a1834"
+    ),
+    "src/warhammer40k_core/ai/normal_move_scenario.py": (
+        "d2d8dffc43461eec0cc4db3db8923893b7ba59ad65e4df45c9a2cce3611692db"
+    ),
+    "src/warhammer40k_core/ai/opposing_shooter_scenario.py": (
+        "1d31f56e93543705def0e3c700e90e77e1cfdd5bf6a793f2b6ef190d4821b6e7"
+    ),
+    "src/warhammer40k_core/ai/preserve_scenario.py": (
+        "8b4a51aa0078c157f6f6eabc4f975a58c7a3ffffbd7199d3f99d4e32a0d92551"
     ),
     "src/warhammer40k_core/core/visibility.py": (
         "86b7f154e5c5f30f20844491a9f61a2be685bfab42bd5d2a6e1d6a051a86502a"
@@ -86,7 +110,7 @@ SOURCE_HASHES = {
         "73b101b47264c6c2a7f1db9597247b89b6f9c3170b7c3208254ce73ebaf51462"
     ),
     "src/warhammer40k_core/geometry/pathing.py": (
-        "3a7525e05305855ac8b3a1ef930878a4f19a84ceb07ce7687f16306dc825b265"
+        "f3cc92cb86a600c899000fb8d5d46b920c58ea32045137c155764822886823fd"
     ),
     "src/warhammer40k_core/geometry/pose.py": (
         "04a0e752e05f381fd7adc836a19438907cd9b2626032d434fc6d142f4579fa86"
@@ -95,6 +119,12 @@ SOURCE_HASHES = {
 UPDATED_TEST_HASHES = {
     "tests/rules/section18/test_facade.py": (
         "e57eed3325fdb9ff1e4e4e85682f7db56a012c5a77a071f3ebbfdb1609553457"
+    ),
+    "tests/infrastructure/adapters/unit/test_linux_authority.py": (
+        "597d629a87432390b94fb91e788eeb6c5cc517f6adac98af4f0a915274aa195c"
+    ),
+    "tests/infrastructure/adapters/test_canonical_deployment_coverage.py": (
+        "8ea704f9980ec99cbe3bcf84814d31f657eb6f969c3944c132382bd5c0b2e279"
     ),
 }
 NODES: frozenset[str] = frozenset(

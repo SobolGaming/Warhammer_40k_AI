@@ -34,6 +34,7 @@ from warhammer40k_core.adapters.linux_authority_transport import (
 )
 from warhammer40k_core.adapters.linux_authority_worker import LinuxAuthorityDispatcher
 from warhammer40k_core.adapters.linux_session import viewer_payload
+from warhammer40k_core.adapters.local_session import LOCAL_GAME_SESSION_PERSISTENCE_SCHEMA_VERSION
 from warhammer40k_core.adapters.numerical_policy import LEGACY_NUMERICAL_POLICY_ID
 from warhammer40k_core.adapters.server import AdapterGameServer
 from warhammer40k_core.adapters.session_persistence import SQLiteSessionPersistenceStore
@@ -140,7 +141,10 @@ def test_dispatcher_real_native_roster_restore_fork_viewers_and_exact_replay() -
 
     raw = json.dumps(original.to_persistence_payload(), indent=2).encode()
     envelope = checkpoint_envelope(
-        payload_bytes=raw, profile=profile, provenance={"kind": "explicit-host-fixture"}
+        payload_bytes=raw,
+        profile=profile,
+        provenance={"kind": "explicit-host-fixture"},
+        payload_schema=LOCAL_GAME_SESSION_PERSISTENCE_SCHEMA_VERSION,
     )
     identity = cast(str, call(None, "restore", validate_json_value(envelope)))
     retained.append(identity)
@@ -155,6 +159,7 @@ def test_dispatcher_real_native_roster_restore_fork_viewers_and_exact_replay() -
         payload_bytes=raw,
         profile=exported_profile,
         provenance={"kind": "incompatible-policy-control"},
+        payload_schema=LOCAL_GAME_SESSION_PERSISTENCE_SCHEMA_VERSION,
     )
     rejected = call(None, "restore", validate_json_value(incompatible), expected_error=True)
     assert isinstance(rejected, dict)
@@ -254,6 +259,30 @@ def test_selected_linux_process_implements_adapter_session_and_roundtrips(tmp_pa
         session.advance_until_decision_or_terminal()
         assert session.authoritative_history_payload() == original.authoritative_history_payload()
         checkpoint = session.to_persistence_payload()
+        bare = json.dumps(original.to_persistence_payload(), indent=2).encode()
+        enrolled = authority.enroll_legacy(
+            bare, provenance={"kind": "current-native-checkpoint-enrollment"}
+        )
+        enrolled_checkpoint = enrolled.to_persistence_payload()
+        assert isinstance(enrolled_checkpoint, dict)
+        assert (
+            enrolled_checkpoint["payload_schema"] == LOCAL_GAME_SESSION_PERSISTENCE_SCHEMA_VERSION
+        )
+        assert checkpoint_bytes(enrolled_checkpoint, profile=profile) == bare
+        assert enrolled.authoritative_history_payload() == original.authoritative_history_payload()
+        for player in ("player-a", "player-b"):
+            assert enrolled.view(viewer_player_id=player) == original.view(viewer_player_id=player)
+        assert enrolled.verify_replay(artifact_id="enrolled") == session.verify_replay(
+            artifact_id="enrolled"
+        )
+        obsolete = copy.deepcopy(original.to_persistence_payload())
+        assert isinstance(obsolete, dict)
+        obsolete["schema_version"] = "local-game-session-persistence-v2-private-rng"
+        with pytest.raises(ExecutionProfileError, match="schema"):
+            authority.enroll_legacy(
+                json.dumps(obsolete).encode(), provenance={"kind": "obsolete-format-control"}
+            )
+        assert enrolled.event_record_count() == original.event_record_count()
         recovered = authority.restore(copy.deepcopy(checkpoint))
         assert recovered.to_persistence_payload() == checkpoint
         assert recovered.view(viewer_player_id="player-a") == session.view(
