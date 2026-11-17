@@ -154,6 +154,85 @@ agreement, inner policy/replay identity, caches and coordinated rules still bloc
 activation. Original source producers, payloads and historical evidence remain
 unchanged. Linux remains authoritative; native OS equivalence is not established.
 
+## Selected exact-coordinate contact slice
+
+The next representation contract is `rational-quadratic-coordinate-v1`, implemented
+by `geometry.exact_coordinate` and `geometry.exact_contact` as inactive geometric
+APIs. Scalar measurement retains `milli-inch-half-away-v1`. This deliberately
+amends the candidate integer-coordinate restriction for derived contact poses;
+it does not admit a new numerical execution profile or change source-number
+decoding. Existing `CanonicalCircle`, `CanonicalPolygon`, authoritative `Pose`,
+legacy sessions, adapters, saves and replays keep their original contracts.
+
+An exact coordinate in inches is either a reduced rational or `a + s*sqrt(q)`:
+`a` and positive nonsquare `q` are reduced rationals and `s` is exactly -1 or +1.
+The sign selects the positive or negative real root, and rational square roots
+are folded into the rational form. Rational zero has numerator 0 and denominator
+1, root sign 0 and radicand 0. Numerators and positive denominators are strict
+integers with at most 256 bits; booleans, floats, unreduced payloads, unknown keys
+and noncanonical roots fail with typed errors. The constructor absorbs a rational
+root coefficient into its squared radicand, so `2*sqrt(3/5)/3` and `sqrt(4/15)`
+have identical payloads. A quadratic irrational's conjugate trace fixes `a`,
+after which the signed radicand is unique. Root expressions, isolating intervals
+or arbitrary polynomial syntax alone would not provide this numerical identity.
+
+This choice is smaller than general minimal-polynomial real algebraic numbers
+while handling the next concrete dependency. A finer fixed grid still misses
+irrational contacts; rational coordinates alone still miss `sqrt(4001)/2000`.
+Floating-point poses or rational approximations cannot supply exact topology.
+General real algebraic coordinates could handle repeated higher-degree derived
+placements, but require minimal-polynomial normalization, certified root ordering,
+resource bounds and agreement with existing solver/backend consumers. No such
+generality or workload qualification is claimed here.
+
+Exact arithmetic is closed within one quadratic field and includes rational
+translations, products, reciprocals and sign comparisons. Radicand ratios with
+rational square roots identify the same field without integer factorization.
+Mixed fields and intermediate canonical values exceeding the 256-bit component
+contract raise `UnsupportedExactCoordinateError`; no approximation or snapped
+answer follows. These deterministic finite resource bounds replace an unbounded
+symbolic search for this API. They are operational limits, not proof that every
+ordinary contact formation is represented. Comparisons against derived rational
+measurement boundaries use exact temporary fractions without imposing stored
+coordinate limits on those boundaries.
+
+`ExactDisk` retains a canonical full integer-tick diameter and derives the radius
+exactly. Its strict envelope and SHA-256 identity bind the scalar policy,
+coordinate representation version, exact center and diameter. Restoration
+revalidates the selected witness and preserves its original exact value; it does
+not pass it through source quantization. This is local primitive identity only.
+Execution profiles, authoritative poses, geometry/spatial caches, decision/event
+identity, persistence and full replay must bind the representation version before
+integration. This slice does not create or reuse an authoritative cache.
+
+The finite two-rational-anchor constructor returns zero, one or two selected
+simultaneous-contact centers in a deterministic oriented order. Coincident or
+nonrational anchors are explicitly unsupported. Returned disks establish only
+the specified pair contacts; they do not establish terrain clearance, other
+model clearance, mutual anchor legality or an ordinary legal placement.
+
+Direct regressions establish the 1.0005-inch rational tangency and both documented
+source-valid approach controls, off-axis irrational tangency, and simultaneous
+contact with diameter-1000 anchors at `(-1,0)` and `(1,0)` by a diameter-1001 disk
+at `(0,sqrt(4001)/2000)`. From `(0,2)`, the whole straight descent is nonoverlapping.
+The analytic certificate minimizes squared center distance over every parameter
+of the segment; an endpoint-legal path through a disk is rejected. Its immutable
+result binds start/end hashes, contacts and both policy/representation IDs.
+It is not an engine `PathWitness` and is not accepted by any gameplay validator.
+Complete straight travel is rounded once by exact squared half-tick comparisons,
+even when the travel's square root would have degree four. No intermediate point,
+radius or segment is independently rounded. Arbitrary polyline sums require
+their own certified measurement path and are not supplied by this API.
+
+Activation checklist item 2 is partially discharged for these finite constructions
+only. General supported primitive queries, rotated/oval and backend/solver
+agreement, repeated derived placements, mandatory engine full-path witnesses,
+inner profiles/hashes/caches, coordinated rules, persistence/replay and shared
+adapter qualification remain open. Only `legacy-binary-inch-v1` remains executable;
+Linux remains authoritative. Historical bytes, producers and paused Fight work
+are preserved. No native Windows/Linux engine equivalence is established.
+
+
 ## Finite activation checklist and next contact decision
 
 The implemented arithmetic, outer policy binding and canonical circle/polygon
@@ -194,8 +273,9 @@ to 0.001 inch; it does not explicitly require stored coordinates to lie on a
 0.001-inch grid. The staged contract above imposes that stronger integer-coordinate
 choice. Exact derived authoritative poses are a candidate amendment to that
 representation contract, while retaining the same half-away rounding of measured
-lengths. The candidate requires a deliberate contract decision and finite proofs;
-it is neither implemented nor admitted here.
+lengths. The selected inactive quadratic contract and finite proofs are implemented in
+the preceding section. Authoritative-state integration and gameplay admission
+remain incomplete.
 
 For canonical full diameters of 1.000 and 1.001 inches, retain the exact derived
 radii 0.500 and 0.5005 inches. Centres `(0, 0)` and `(2001/2000, 0)` inches are
@@ -231,15 +311,16 @@ A finer fixed grid is not a general solution. A half-tick grid represents the
 horizontal example, but with the same radius sum and a horizontal centre difference
 constrained to exactly 1 inch, tangency requires vertical difference
 `sqrt(4001)/2000` inches. That value is irrational, so no finite decimal grid or
-rational-only coordinate representation captures it exactly. Arbitrary rotations,
-multiple simultaneous contacts, backend conversion and solver agreement remain
-unqualified; a rational/algebraic candidate must declare its supported domain.
+rational-only coordinate representation captures it exactly. Arbitrary rotations, general multiple-contact formations, backend conversion and
+solver agreement remain unqualified. The preceding section declares the finite
+rational/quadratic domain and its simultaneous-contact controls.
 
-The recommended next slice is a deliberate coordinate-contract proposal plus
-inactive finite witness proofs, before authoritative-state integration or policy
-admission. Specify strict typed rational numerator/positive-denominator forms and
-algebraic witnesses with validated root selection, canonical identity, deterministic
-serialization and bounded unresolved-result handling. Preserve an accepted exact
+The implemented inactive quadratic slice supplies strict typed rational
+numerator/positive-denominator forms, validated quadratic root selection, canonical
+identity, deterministic serialization and bounded typed unsupported results.
+The next dependency is integration of that explicit domain with authoritative
+state and mandatory engine witnesses; general algebraic representations remain
+a separate unresolved scope. Preserve an accepted exact
 witness on restoration; never round it again as though it were new source input.
 Explicitly bind the representation version through the numerical execution profile,
 pose/geometry/spatial hashes, caches, persistence and replay. Choose that versioning
@@ -367,8 +448,8 @@ coordinate quantization with legal contact placements and prove ordinary
 contact-required moves remain attainable, without inventing a contact tolerance,
 treating rounded zero as touching, or permitting overlap. Source-defined proximity
 and deemed-contact rules remain separate predicates with their own thresholds and
-evidence; they are not a general substitute for true contact. This foundation does
-not choose or activate that representation.
+evidence; they are not a general substitute for true contact. The selected inactive quadratic slice above resolves these finite contact
+examples; authoritative-state integration and activation remain incomplete.
 
 Activation is dependency ordered: first this tested arithmetic foundation; then
 the explicit outer policy binding described above; then coordinated inner identity,

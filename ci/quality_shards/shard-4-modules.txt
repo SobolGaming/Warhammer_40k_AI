@@ -49,3 +49,4 @@ tests/code_quality/test_extended_shard_allocation.py
 tests/code_quality/test_canonical_polygon_queries_shard_admission.py
 tests/code_quality/test_complete_covered_reporting.py
 tests/code_quality/test_canonical_polygon_pairs_shard_admission.py
+tests/code_quality/test_exact_contact_shard_admission.py
