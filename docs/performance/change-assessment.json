@@ -6,31 +6,31 @@
   "changes": {
     ".github/workflows/ci.yml": {
       "before_sha256": "f6d8a0e8fdb593bae7ce96a03bf90d87e3915832896300de86752ad2f2aaaade",
-      "after_sha256": "03cbac372478940e5c00ab6a49f9d2f2409a738c414724a4583b5d63b8e6d9d9",
+      "after_sha256": "6bfaabbef9ba9bb43cd86117ca951dfc5ad393ee220bc458ece2526cf136f765",
       "owners": {
         "@document": {
           "before": "f6d8a0e8fdb593bae7ce96a03bf90d87e3915832896300de86752ad2f2aaaade",
-          "after": "03cbac372478940e5c00ab6a49f9d2f2409a738c414724a4583b5d63b8e6d9d9"
+          "after": "6bfaabbef9ba9bb43cd86117ca951dfc5ad393ee220bc458ece2526cf136f765"
         }
       }
     },
     "AGENTS.md": {
       "before_sha256": "3c1772a4a11f2beddb83546013a66c0555841affa52abf0451c2584e28430967",
-      "after_sha256": "8a25b2c4ea8d57da587e014d007d730f60ca5853a066bfafb178a06302f70d46",
+      "after_sha256": "3dd13e40789802d0e82e1a83a60494849c8128880a2c7c53484818579a73ab4d",
       "owners": {
         "@document": {
           "before": "3c1772a4a11f2beddb83546013a66c0555841affa52abf0451c2584e28430967",
-          "after": "8a25b2c4ea8d57da587e014d007d730f60ca5853a066bfafb178a06302f70d46"
+          "after": "3dd13e40789802d0e82e1a83a60494849c8128880a2c7c53484818579a73ab4d"
         }
       }
     },
     "README.md": {
       "before_sha256": "680bc413522e41731e495b0a8bdb689d993607241bf73be05db26ab7d16a0b24",
-      "after_sha256": "180147423d339072bf0c19d4f750f45b455e04697ac07bb24bb5e1ad9a2e16f5",
+      "after_sha256": "ee6588b5d4b63ac85b183d2e23e118421c2caebdeacc50c3f9389d1a826077d4",
       "owners": {
         "@document": {
           "before": "680bc413522e41731e495b0a8bdb689d993607241bf73be05db26ab7d16a0b24",
-          "after": "180147423d339072bf0c19d4f750f45b455e04697ac07bb24bb5e1ad9a2e16f5"
+          "after": "ee6588b5d4b63ac85b183d2e23e118421c2caebdeacc50c3f9389d1a826077d4"
         }
       }
     },
@@ -1480,7 +1480,7 @@
     },
     "tests/code_quality/test_quality_runtime.py": {
       "before_sha256": "014f6e1473c6d35e8a497be75780c73c7bad395417ddab669f2b3a3d4b3cb132",
-      "after_sha256": "53c43ea46769fa14047978a18ca4186d9977e0910a03972b948f6e9e1c4da25b",
+      "after_sha256": "d5ecc9072ddeb63687562ed6ee9e37401df79c21270bd1f1da302b49bbb2c771",
       "owners": {
         "execution": {
           "before": "4a18fdcb1ac3fb41541073e49bb352f8f223fc7b1d8348d16c7bd32ff3817548",
@@ -1492,7 +1492,7 @@
         },
         "test_live_workflow_preserves_required_names_and_all_four_producer_controls": {
           "before": "392b2e90242bc784b51badc0f41ca7dcfa89263b90e6d612237ae68754d19e77",
-          "after": "1865f98f39696b187caaab8e3b5ab43bf5560d04b80f7f9e3f73883ceea27130"
+          "after": "b7e1fda2bb2c2b661660c7e1074d76e37bd38dcbbefca3c988db8971359fb752"
         }
       }
     },
@@ -1536,7 +1536,7 @@
     },
     "tests/code_quality/test_speedup_shard_governance.py": {
       "before_sha256": null,
-      "after_sha256": "b3b35fb83a05f9071c091692363baca11214ba254f2c17951d4e20596ba75711",
+      "after_sha256": "60474188744a053b70b1f9abc5b1fb4ea8eddaa5aa88d1f1f29bcee3c242174f",
       "owners": {
         "@module": {
           "before": null,
@@ -1544,7 +1544,7 @@
         },
         "test_ci_workflow_has_preflight_caches_and_adaptive_runner_label": {
           "before": null,
-          "after": "775523d09293962dae59dfaaa20d94c6292476838ac6efdc4ab1e666c76cff30"
+          "after": "dc66964aea14bb630db3a66dffe7a5c7955fb04a36ef416ed4121d853223007a"
         },
         "test_cross_worker_fixture_cache_builds_once_and_rejects_corruption": {
           "before": null,
@@ -1806,11 +1806,11 @@
     },
     "tests/rules/section07/coverage.json": {
       "before_sha256": "cea06c79ed546cda088d51118fabdda6fdc97993d7a3b5c680ee92cacc1c36f4",
-      "after_sha256": "a5acb88319b1769e7e022477b8b4219436226b4ac0942c79f24308207561dd00",
+      "after_sha256": "a5661fa412a15b1decc15c827476ce621a58e028e63e030d02e7a586be7fce87",
       "owners": {
         "@document": {
           "before": "cea06c79ed546cda088d51118fabdda6fdc97993d7a3b5c680ee92cacc1c36f4",
-          "after": "a5acb88319b1769e7e022477b8b4219436226b4ac0942c79f24308207561dd00"
+          "after": "a5661fa412a15b1decc15c827476ce621a58e028e63e030d02e7a586be7fce87"
         }
       }
     },
