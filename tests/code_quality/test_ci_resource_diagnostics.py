@@ -132,8 +132,9 @@ def test_bounded_setup_lane_preserves_selection_coverage_and_failure(
         selectors.extend([mirror_owner, SERIAL_BEHAVIORAL_CASE])
         serial_selectors.append(SERIAL_BEHAVIORAL_CASE)
     if selection in {"native", "both", "native-only"}:
+        # Native screen-prefix cases now run in the parallel worksteal lane; only
+        # the 78-model mirror roster remains isolated on -n 1.
         selectors.append(NATIVE_PREFIX_OWNER)
-        serial_selectors.append(NATIVE_PREFIX_OWNER)
     selectors.sort()  # Real manifests put the native filename before the mirror node.
     parallel_selectors = [item for item in selectors if item not in serial_selectors]
     executable = tmp_path / "uv"

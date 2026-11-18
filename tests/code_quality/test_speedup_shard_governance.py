@@ -133,8 +133,11 @@ def test_cross_worker_fixture_cache_builds_once_and_rejects_corruption(
     cache_dir = tmp_path_factory.getbasetemp().parent / "xdist-fixture-cache-speedup-unit-uid"
     entries = list(cache_dir.glob("*.json"))
     assert len(entries) == 2
-    entries[0].write_text('{"schema": "wrong"}', encoding="utf-8")
-    source_probe.write_text("VERSION = 1\n", encoding="utf-8")
+    # Corrupt the active VERSION=2 digest entry in place so the next lookup hits
+    # the bad envelope instead of an older sibling digest.
+    source_probe.write_text("VERSION = 2\n", encoding="utf-8")
+    for entry in entries:
+        entry.write_text('{"schema": "wrong"}', encoding="utf-8")
     with pytest.raises(ValueError, match="Corrupted cross-worker fixture cache"):
         load_or_build_json_fixture(
             key="unit-cache-probe",

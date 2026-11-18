@@ -6808,9 +6808,7 @@
       ],
       "owners": [
         "@module",
-        "native_profile_request",
-        "_cached_s25_mission_and_catalog",
-        "_s25_base_config"
+        "native_profile_request"
       ],
       "families": [],
       "sensitive": false,
@@ -17584,9 +17582,7 @@
       "owners": [
         "@module",
         "pytest_addoption",
-        "selected_army_source_index",
-        "_auto_local_source_index",
-        "_tree_stat_fingerprint"
+        "selected_army_source_index"
       ],
       "families": [],
       "sensitive": false,
@@ -34226,9 +34222,7 @@
         "_add_allocation_summary",
         "_scoped_evidence",
         "_behavioral_shard_selectors",
-        "_partitioned_durations",
-        "_auto_local_source_index",
-        "_tree_stat_fingerprint"
+        "_partitioned_durations"
       ],
       "families": [],
       "sensitive": false,
@@ -35580,8 +35574,7 @@
     "hosted-timing-calibration": {
       "paths": [
         "scripts/hosted_timing_calibration.py",
-        "tests/code_quality/test_hosted_timing_calibration.py",
-        "ci/test_shards/hosted-calibration.json"
+        "tests/code_quality/test_hosted_timing_calibration.py"
       ],
       "owners": [
         "@document",
@@ -35843,7 +35836,6 @@
     "coherent-shard-allocation": {
       "paths": [
         "scripts/shard_execution_model.py",
-        "ci/test_shards/allocation-cohorts.json",
         "tests/code_quality/test_hosted_timing_calibration.py"
       ],
       "owners": [
@@ -35858,49 +35850,23 @@
         "scripts/scoped_shard_allocation.py",
         "scripts/scoped_shard_evidence.py",
         "scripts/preflight_case_partition.py",
-        "ci/test_shards/allocation-scope.json",
-        "ci/test_shards/scoped-worker-evidence.json",
         "ci/test_shards/preflight-case-partition.json",
-        "tests/code_quality/test_scoped_shard_allocation.py",
         "scripts/scoped_shard_extension.py",
         "scripts/extended_shard_allocation.py",
         "scripts/finite_case_partitions.py",
-        "ci/test_shards/scoped-worker-extension.json",
-        "ci/test_shards/allocation-stress.json",
         "ci/test_shards/step5g-case-partitions.json",
-        "tests/code_quality/test_extended_shard_allocation.py",
         "scripts/historical_shard_snapshot.py",
         "scripts/current_shard_compatibility.py",
         "scripts/current_shard_assignment.py",
         "scripts/fetch_scheduling_sources.py",
-        "ci/test_shards/current-covered-baseline.json",
-        "ci/test_shards/current-runtime-compatibility.json",
-        "ci/test_shards/current-derived-assignment.json",
-        "tests/code_quality/test_current_shard_compatibility.py",
         "scripts/current_native_serial_role.py",
-        "ci/test_shards/current-native-serial-role.json",
         "scripts/boolean_los_admission.py",
-        "ci/test_shards/current-covered-evidence.json",
-        "ci/test_shards/native-charge-source-successor.json",
         "scripts/complete_covered_evidence.py",
         "scripts/linux_authority_shard_admission.py",
         "scripts/run_complete_covered_profile.py",
         "tests/support/retained_authority_sources.py",
-        "tests/code_quality/test_linux_authority_shard_admission.py",
-        "ci/test_shards/linux-authority-covered-baseline.json",
-        "ci/test_shards/linux-authority-covered-evidence.json",
-        "ci/test_shards/linux-authority-derived-assignment.json",
-        "ci/test_shards/linux-authority-e2094d9c/*",
         "scripts/milli_inch_shard_admission.py",
-        "tests/code_quality/test_milli_inch_shard_admission.py",
-        "ci/test_shards/milli-inch-covered-baseline.json",
-        "ci/test_shards/milli-inch-covered-evidence.json",
-        "ci/test_shards/milli-inch-derived-assignment.json",
         "scripts/precision_profile_shard_admission.py",
-        "tests/code_quality/test_precision_profile_shard_admission.py",
-        "ci/test_shards/precision-profile-covered-baseline.json",
-        "ci/test_shards/precision-profile-covered-evidence.json",
-        "ci/test_shards/precision-profile-derived-assignment.json",
         "tests/code_quality/test_complete_covered_reporting.py"
       ],
       "owners": [
@@ -36124,10 +36090,6 @@
       "paths": [
         "scripts/symbolic_milli_inch_test_admission.py",
         "scripts/symbolic_milli_inch_shard_admission.py",
-        "tests/code_quality/test_symbolic_milli_inch_shard_admission.py",
-        "ci/test_shards/symbolic-milli-inch-covered-baseline.json",
-        "ci/test_shards/symbolic-milli-inch-covered-evidence.json",
-        "ci/test_shards/symbolic-milli-inch-derived-assignment.json",
         "data/source_audits/ci64_provenance_v1/symbolic-milli-inch-test-transition-v1.json"
       ],
       "owners": [
@@ -36152,10 +36114,6 @@
       "paths": [
         "scripts/canonical_polygon_test_admission.py",
         "scripts/canonical_polygon_shard_admission.py",
-        "tests/code_quality/test_canonical_polygon_shard_admission.py",
-        "ci/test_shards/canonical-polygon-covered-baseline.json",
-        "ci/test_shards/canonical-polygon-covered-evidence.json",
-        "ci/test_shards/canonical-polygon-derived-assignment.json",
         "data/source_audits/ci64_provenance_v1/canonical-polygon-test-transition-v1.json"
       ],
       "owners": [
@@ -36180,10 +36138,6 @@
       "paths": [
         "scripts/canonical_circle_test_admission.py",
         "scripts/canonical_circle_shard_admission.py",
-        "tests/code_quality/test_canonical_circle_shard_admission.py",
-        "ci/test_shards/canonical-circle-covered-baseline.json",
-        "ci/test_shards/canonical-circle-covered-evidence.json",
-        "ci/test_shards/canonical-circle-derived-assignment.json",
         "data/source_audits/ci64_provenance_v1/canonical-circle-test-transition-v1.json"
       ],
       "owners": [
@@ -36208,10 +36162,6 @@
       "paths": [
         "scripts/canonical_polygon_queries_test_admission.py",
         "scripts/canonical_polygon_queries_shard_admission.py",
-        "tests/code_quality/test_canonical_polygon_queries_shard_admission.py",
-        "ci/test_shards/canonical-polygon-queries-covered-baseline.json",
-        "ci/test_shards/canonical-polygon-queries-covered-evidence.json",
-        "ci/test_shards/canonical-polygon-queries-derived-assignment.json",
         "data/source_audits/ci64_provenance_v1/canonical-polygon-queries-test-transition-v1.json"
       ],
       "owners": [
@@ -36236,10 +36186,6 @@
       "paths": [
         "scripts/canonical_polygon_pairs_test_admission.py",
         "scripts/canonical_polygon_pairs_shard_admission.py",
-        "tests/code_quality/test_canonical_polygon_pairs_shard_admission.py",
-        "ci/test_shards/canonical-polygon-pairs-covered-baseline.json",
-        "ci/test_shards/canonical-polygon-pairs-covered-evidence.json",
-        "ci/test_shards/canonical-polygon-pairs-derived-assignment.json",
         "data/source_audits/ci64_provenance_v1/canonical-polygon-pairs-test-transition-v1.json"
       ],
       "owners": [
@@ -36264,10 +36210,6 @@
       "paths": [
         "scripts/exact_contact_test_admission.py",
         "scripts/exact_contact_shard_admission.py",
-        "tests/code_quality/test_exact_contact_shard_admission.py",
-        "ci/test_shards/exact-contact-covered-baseline.json",
-        "ci/test_shards/exact-contact-covered-evidence.json",
-        "ci/test_shards/exact-contact-derived-assignment.json",
         "data/source_audits/ci64_provenance_v1/exact-contact-test-transition-v1.json"
       ],
       "owners": [
@@ -36292,7 +36234,9 @@
       "paths": [
         "scripts/speedup_test_admission.py",
         "data/source_audits/ci64_provenance_v1/speedup-test-transition-v1.json",
-        "tests/support/cross_worker_fixture_cache.py"
+        "tests/support/cross_worker_fixture_cache.py",
+        "tests/conftest.py",
+        "tests/s25_native_profile_helpers.py"
       ],
       "owners": [
         "*"

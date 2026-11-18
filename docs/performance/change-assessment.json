@@ -2,7 +2,7 @@
   "policy": "rules-engine-performance-v3",
   "base": "9747b9b0873b4f442d3cd81f72280b24810d952c",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:f0392def5f2e2935d26f026628b439e90f0f6303fb282ac41a27d1b575a7024e",
-  "operation_map_sha256": "46f1a728c4aa6a0523ff6880d51effb484323a9f99bb45122d7eab342b2c484c",
+  "operation_map_sha256": "c0c6bb882c4c6ffcedfd9ec5de80d556791f275f9b2bb5dda7ef5c978a14fef9",
   "changes": {
     ".github/workflows/ci.yml": {
       "before_sha256": "f6d8a0e8fdb593bae7ce96a03bf90d87e3915832896300de86752ad2f2aaaade",
@@ -706,11 +706,11 @@
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "93112d2a4fe59bade0e9a605a79c43365a8d5a1d4107cd2841e6cfd45e456ce7",
-      "after_sha256": "379099f54b6551726a59657163dd208808a2be9c0bd12bce621b04df1c15a98e",
+      "after_sha256": "fd37d66454484b96137d804ce24acee075dc67eb2ff1840371c3cc35fbc5dcbc",
       "owners": {
         "@document": {
           "before": "93112d2a4fe59bade0e9a605a79c43365a8d5a1d4107cd2841e6cfd45e456ce7",
-          "after": "379099f54b6551726a59657163dd208808a2be9c0bd12bce621b04df1c15a98e"
+          "after": "fd37d66454484b96137d804ce24acee075dc67eb2ff1840371c3cc35fbc5dcbc"
         }
       }
     },
@@ -1050,15 +1050,33 @@
     },
     "tests/code_quality/test_ci_performance_gates.py": {
       "before_sha256": "adfa1a34a85e47f6e56716de856fcdf695d001faa62293e3a5727e127091eeb2",
-      "after_sha256": "e2301dbe0f5129b4343577688b87c4497cde8b79ec833ed374d3822d1540d365",
+      "after_sha256": "667fa8967297cf0dc725c02eba6f354f88b1c5d9c61751b6242139402e407d9f",
       "owners": {
         "test_cold_source_index_overlaps_startup_inside_the_unchanged_deadline": {
           "before": "5f137fabcfb00f288dae812748d071713eb06a3bfc7ec1d2bcee5c91abbacdfb",
           "after": "a65fe765edcdc728a7900d4b84cceefc2a95698542bdccd317ef0862c601aaa7"
         },
+        "test_cutover_real_cli_rejects_naming_override": {
+          "before": "a0e7b9c05905c47207cd5c6d153191ed665002f04a6a708e1ef7dfa2bd51f339",
+          "after": "cecc6c0f01740616565c51998478596da464a4d19180b00ded7848eedc5128c5"
+        },
+        "test_cutover_real_pytest_cli_does_not_bypass_explicit_file_guard": {
+          "before": "c21f0ea8b2acdb6a5378f6fbd3c1eeece12df237f3b4df84ed11c1316fdfdb03",
+          "after": "653f3defb281c495d38031ac27450013b5cc67b2396ba74bf1930721c1f0f15a"
+        },
         "test_quality_gate_requires_every_independent_lane_even_when_skipped": {
           "before": "f35b294cd1e092eca21ba8e5c17a324aeaa7539a91db6aa97bed0ae88e9ed0f0",
           "after": "019e7950106db6b8a1310391eef4dc5196aec8336cd48aa8ae586abb08844f1c"
+        }
+      }
+    },
+    "tests/code_quality/test_ci_resource_diagnostics.py": {
+      "before_sha256": "1731de73328cdf26074891439a69b620a862a37c29a237066ff71f18a185bb64",
+      "after_sha256": "24844492bcb93eb52cda8a42ba29fe0c888f769eb47f2f763bc8c70339408ae2",
+      "owners": {
+        "test_bounded_setup_lane_preserves_selection_coverage_and_failure": {
+          "before": "8ee1a50f39fa8d79ea3d6f7d5335f535e838ebbec950c6ad02d614a631849a42",
+          "after": "87aae4cae952be4e0e4cd0636017c21c6700ded2f2438f5894e5109277eb226e"
         }
       }
     },
@@ -1514,7 +1532,7 @@
     },
     "tests/code_quality/test_speedup_shard_governance.py": {
       "before_sha256": null,
-      "after_sha256": "776f5187cb6e5e06ca453205c6f92351f2db2d5ea183066e7697108b2aa7d4c9",
+      "after_sha256": "b3b35fb83a05f9071c091692363baca11214ba254f2c17951d4e20596ba75711",
       "owners": {
         "@module": {
           "before": null,
@@ -1526,7 +1544,7 @@
         },
         "test_cross_worker_fixture_cache_builds_once_and_rejects_corruption": {
           "before": null,
-          "after": "7216e1d30a537d439563929a3ba4ceeb71b0292d3d2d8db2939c14c77cb25b6f"
+          "after": "50fbf7abc4f1015138ca454410fa2093866c333aaf3ad2799aa2698537000a05"
         },
         "test_multi_worker_worksteal_relevance_spreads_heavy_s25_cases": {
           "before": null,
@@ -1535,6 +1553,16 @@
         "test_shard_directory_is_free_of_historical_calibration_bloat": {
           "before": null,
           "after": "b5f17f7e014f6a998e5dcce431b756b215db840b3a62f2786750b4dd99f37946"
+        }
+      }
+    },
+    "tests/code_quality/test_starfang_source_policy.py": {
+      "before_sha256": "97763346eef174681290c53e9423e74ac4ea0791a8b2030c092943cc1da41a62",
+      "after_sha256": "1b953315ec4c413374e2166663481ed3843100c11c1257764de2feb41b494366",
+      "owners": {
+        "test_starfang_source_smoke_binding_and_predecessor_are_exact": {
+          "before": "a36ae69a7f11944e3d02e098215a29c9f9ce63eb2ff9ea8d52f09cade848f33e",
+          "after": "4a456025af7ba7020f9c9dceb86957fd3156b07cd5321cfabe1a8c55a5d6eb80"
         }
       }
     },
@@ -1904,7 +1932,6 @@
     "ci/test_shards/allocation-cohorts.json": {
       "category": "measured_workload",
       "operations": [
-        "coherent-shard-allocation",
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
@@ -1915,8 +1942,7 @@
     "ci/test_shards/allocation-scope.json": {
       "category": "measured_workload",
       "operations": [
-        "mfm-current-behavior-profile",
-        "scoped-shard-allocation"
+        "mfm-current-behavior-profile"
       ],
       "selected_families": [],
       "rationale": "Accelerate local and hosted behavioral/quality execution by retiring the historical shard-calibration evidence chain, adding ci-preflight caches, single-pass quality execution, cross-worker fixture checkpoints, and duration-aware worksteal dispatch. No gameplay mutation, geometry algorithm, or authoritative decision path changes.",
@@ -1926,8 +1952,7 @@
     "ci/test_shards/allocation-stress.json": {
       "category": "measured_workload",
       "operations": [
-        "mfm-current-behavior-profile",
-        "scoped-shard-allocation"
+        "mfm-current-behavior-profile"
       ],
       "selected_families": [],
       "rationale": "Accelerate local and hosted behavioral/quality execution by retiring the historical shard-calibration evidence chain, adding ci-preflight caches, single-pass quality execution, cross-worker fixture checkpoints, and duration-aware worksteal dispatch. No gameplay mutation, geometry algorithm, or authoritative decision path changes.",
@@ -1937,7 +1962,6 @@
     "ci/test_shards/canonical-circle-covered-baseline.json": {
       "category": "measured_workload",
       "operations": [
-        "canonical-circle-admission",
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
@@ -1948,7 +1972,6 @@
     "ci/test_shards/canonical-circle-covered-evidence.json": {
       "category": "measured_workload",
       "operations": [
-        "canonical-circle-admission",
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
@@ -1959,7 +1982,6 @@
     "ci/test_shards/canonical-circle-derived-assignment.json": {
       "category": "measured_workload",
       "operations": [
-        "canonical-circle-admission",
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
@@ -1970,7 +1992,6 @@
     "ci/test_shards/canonical-polygon-covered-baseline.json": {
       "category": "measured_workload",
       "operations": [
-        "canonical-polygon-admission",
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
@@ -1981,7 +2002,6 @@
     "ci/test_shards/canonical-polygon-covered-evidence.json": {
       "category": "measured_workload",
       "operations": [
-        "canonical-polygon-admission",
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
@@ -1992,7 +2012,6 @@
     "ci/test_shards/canonical-polygon-derived-assignment.json": {
       "category": "measured_workload",
       "operations": [
-        "canonical-polygon-admission",
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
@@ -2003,7 +2022,6 @@
     "ci/test_shards/canonical-polygon-pairs-covered-baseline.json": {
       "category": "measured_workload",
       "operations": [
-        "canonical-polygon-pairs-admission",
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
@@ -2014,7 +2032,6 @@
     "ci/test_shards/canonical-polygon-pairs-covered-evidence.json": {
       "category": "measured_workload",
       "operations": [
-        "canonical-polygon-pairs-admission",
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
@@ -2025,7 +2042,6 @@
     "ci/test_shards/canonical-polygon-pairs-derived-assignment.json": {
       "category": "measured_workload",
       "operations": [
-        "canonical-polygon-pairs-admission",
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
@@ -2036,7 +2052,6 @@
     "ci/test_shards/canonical-polygon-queries-covered-baseline.json": {
       "category": "measured_workload",
       "operations": [
-        "canonical-polygon-queries-admission",
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
@@ -2047,7 +2062,6 @@
     "ci/test_shards/canonical-polygon-queries-covered-evidence.json": {
       "category": "measured_workload",
       "operations": [
-        "canonical-polygon-queries-admission",
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
@@ -2058,7 +2072,6 @@
     "ci/test_shards/canonical-polygon-queries-derived-assignment.json": {
       "category": "measured_workload",
       "operations": [
-        "canonical-polygon-queries-admission",
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
@@ -2080,8 +2093,7 @@
     "ci/test_shards/current-covered-baseline.json": {
       "category": "measured_workload",
       "operations": [
-        "mfm-current-behavior-profile",
-        "scoped-shard-allocation"
+        "mfm-current-behavior-profile"
       ],
       "selected_families": [],
       "rationale": "Accelerate local and hosted behavioral/quality execution by retiring the historical shard-calibration evidence chain, adding ci-preflight caches, single-pass quality execution, cross-worker fixture checkpoints, and duration-aware worksteal dispatch. No gameplay mutation, geometry algorithm, or authoritative decision path changes.",
@@ -2091,8 +2103,7 @@
     "ci/test_shards/current-covered-evidence.json": {
       "category": "measured_workload",
       "operations": [
-        "mfm-current-behavior-profile",
-        "scoped-shard-allocation"
+        "mfm-current-behavior-profile"
       ],
       "selected_families": [],
       "rationale": "Accelerate local and hosted behavioral/quality execution by retiring the historical shard-calibration evidence chain, adding ci-preflight caches, single-pass quality execution, cross-worker fixture checkpoints, and duration-aware worksteal dispatch. No gameplay mutation, geometry algorithm, or authoritative decision path changes.",
@@ -2102,8 +2113,7 @@
     "ci/test_shards/current-derived-assignment.json": {
       "category": "measured_workload",
       "operations": [
-        "mfm-current-behavior-profile",
-        "scoped-shard-allocation"
+        "mfm-current-behavior-profile"
       ],
       "selected_families": [],
       "rationale": "Accelerate local and hosted behavioral/quality execution by retiring the historical shard-calibration evidence chain, adding ci-preflight caches, single-pass quality execution, cross-worker fixture checkpoints, and duration-aware worksteal dispatch. No gameplay mutation, geometry algorithm, or authoritative decision path changes.",
@@ -2113,8 +2123,7 @@
     "ci/test_shards/current-native-serial-role.json": {
       "category": "measured_workload",
       "operations": [
-        "mfm-current-behavior-profile",
-        "scoped-shard-allocation"
+        "mfm-current-behavior-profile"
       ],
       "selected_families": [],
       "rationale": "Accelerate local and hosted behavioral/quality execution by retiring the historical shard-calibration evidence chain, adding ci-preflight caches, single-pass quality execution, cross-worker fixture checkpoints, and duration-aware worksteal dispatch. No gameplay mutation, geometry algorithm, or authoritative decision path changes.",
@@ -2124,8 +2133,7 @@
     "ci/test_shards/current-runtime-compatibility.json": {
       "category": "measured_workload",
       "operations": [
-        "mfm-current-behavior-profile",
-        "scoped-shard-allocation"
+        "mfm-current-behavior-profile"
       ],
       "selected_families": [],
       "rationale": "Accelerate local and hosted behavioral/quality execution by retiring the historical shard-calibration evidence chain, adding ci-preflight caches, single-pass quality execution, cross-worker fixture checkpoints, and duration-aware worksteal dispatch. No gameplay mutation, geometry algorithm, or authoritative decision path changes.",
@@ -2145,7 +2153,6 @@
     "ci/test_shards/exact-contact-covered-baseline.json": {
       "category": "measured_workload",
       "operations": [
-        "exact-contact-admission",
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
@@ -2156,7 +2163,6 @@
     "ci/test_shards/exact-contact-covered-evidence.json": {
       "category": "measured_workload",
       "operations": [
-        "exact-contact-admission",
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
@@ -2167,7 +2173,6 @@
     "ci/test_shards/exact-contact-derived-assignment.json": {
       "category": "measured_workload",
       "operations": [
-        "exact-contact-admission",
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
@@ -2178,7 +2183,6 @@
     "ci/test_shards/hosted-calibration.json": {
       "category": "measured_workload",
       "operations": [
-        "hosted-timing-calibration",
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
@@ -2189,8 +2193,7 @@
     "ci/test_shards/linux-authority-covered-baseline.json": {
       "category": "measured_workload",
       "operations": [
-        "mfm-current-behavior-profile",
-        "scoped-shard-allocation"
+        "mfm-current-behavior-profile"
       ],
       "selected_families": [],
       "rationale": "Accelerate local and hosted behavioral/quality execution by retiring the historical shard-calibration evidence chain, adding ci-preflight caches, single-pass quality execution, cross-worker fixture checkpoints, and duration-aware worksteal dispatch. No gameplay mutation, geometry algorithm, or authoritative decision path changes.",
@@ -2200,8 +2203,7 @@
     "ci/test_shards/linux-authority-covered-evidence.json": {
       "category": "measured_workload",
       "operations": [
-        "mfm-current-behavior-profile",
-        "scoped-shard-allocation"
+        "mfm-current-behavior-profile"
       ],
       "selected_families": [],
       "rationale": "Accelerate local and hosted behavioral/quality execution by retiring the historical shard-calibration evidence chain, adding ci-preflight caches, single-pass quality execution, cross-worker fixture checkpoints, and duration-aware worksteal dispatch. No gameplay mutation, geometry algorithm, or authoritative decision path changes.",
@@ -2211,8 +2213,7 @@
     "ci/test_shards/linux-authority-derived-assignment.json": {
       "category": "measured_workload",
       "operations": [
-        "mfm-current-behavior-profile",
-        "scoped-shard-allocation"
+        "mfm-current-behavior-profile"
       ],
       "selected_families": [],
       "rationale": "Accelerate local and hosted behavioral/quality execution by retiring the historical shard-calibration evidence chain, adding ci-preflight caches, single-pass quality execution, cross-worker fixture checkpoints, and duration-aware worksteal dispatch. No gameplay mutation, geometry algorithm, or authoritative decision path changes.",
@@ -2222,8 +2223,7 @@
     "ci/test_shards/linux-authority-e2094d9c/current-runtime-compatibility.json": {
       "category": "measured_workload",
       "operations": [
-        "mfm-current-behavior-profile",
-        "scoped-shard-allocation"
+        "mfm-current-behavior-profile"
       ],
       "selected_families": [],
       "rationale": "Accelerate local and hosted behavioral/quality execution by retiring the historical shard-calibration evidence chain, adding ci-preflight caches, single-pass quality execution, cross-worker fixture checkpoints, and duration-aware worksteal dispatch. No gameplay mutation, geometry algorithm, or authoritative decision path changes.",
@@ -2233,8 +2233,7 @@
     "ci/test_shards/linux-authority-e2094d9c/durations.json": {
       "category": "measured_workload",
       "operations": [
-        "mfm-current-behavior-profile",
-        "scoped-shard-allocation"
+        "mfm-current-behavior-profile"
       ],
       "selected_families": [],
       "rationale": "Accelerate local and hosted behavioral/quality execution by retiring the historical shard-calibration evidence chain, adding ci-preflight caches, single-pass quality execution, cross-worker fixture checkpoints, and duration-aware worksteal dispatch. No gameplay mutation, geometry algorithm, or authoritative decision path changes.",
@@ -2244,8 +2243,7 @@
     "ci/test_shards/linux-authority-e2094d9c/linux-authority-covered-baseline.json": {
       "category": "measured_workload",
       "operations": [
-        "mfm-current-behavior-profile",
-        "scoped-shard-allocation"
+        "mfm-current-behavior-profile"
       ],
       "selected_families": [],
       "rationale": "Accelerate local and hosted behavioral/quality execution by retiring the historical shard-calibration evidence chain, adding ci-preflight caches, single-pass quality execution, cross-worker fixture checkpoints, and duration-aware worksteal dispatch. No gameplay mutation, geometry algorithm, or authoritative decision path changes.",
@@ -2255,8 +2253,7 @@
     "ci/test_shards/linux-authority-e2094d9c/linux-authority-covered-evidence.json": {
       "category": "measured_workload",
       "operations": [
-        "mfm-current-behavior-profile",
-        "scoped-shard-allocation"
+        "mfm-current-behavior-profile"
       ],
       "selected_families": [],
       "rationale": "Accelerate local and hosted behavioral/quality execution by retiring the historical shard-calibration evidence chain, adding ci-preflight caches, single-pass quality execution, cross-worker fixture checkpoints, and duration-aware worksteal dispatch. No gameplay mutation, geometry algorithm, or authoritative decision path changes.",
@@ -2266,8 +2263,7 @@
     "ci/test_shards/linux-authority-e2094d9c/linux-authority-derived-assignment.json": {
       "category": "measured_workload",
       "operations": [
-        "mfm-current-behavior-profile",
-        "scoped-shard-allocation"
+        "mfm-current-behavior-profile"
       ],
       "selected_families": [],
       "rationale": "Accelerate local and hosted behavioral/quality execution by retiring the historical shard-calibration evidence chain, adding ci-preflight caches, single-pass quality execution, cross-worker fixture checkpoints, and duration-aware worksteal dispatch. No gameplay mutation, geometry algorithm, or authoritative decision path changes.",
@@ -2277,8 +2273,7 @@
     "ci/test_shards/linux-authority-e2094d9c/provenance.json": {
       "category": "measured_workload",
       "operations": [
-        "mfm-current-behavior-profile",
-        "scoped-shard-allocation"
+        "mfm-current-behavior-profile"
       ],
       "selected_families": [],
       "rationale": "Accelerate local and hosted behavioral/quality execution by retiring the historical shard-calibration evidence chain, adding ci-preflight caches, single-pass quality execution, cross-worker fixture checkpoints, and duration-aware worksteal dispatch. No gameplay mutation, geometry algorithm, or authoritative decision path changes.",
@@ -2288,8 +2283,7 @@
     "ci/test_shards/linux-authority-e2094d9c/shard-12.txt": {
       "category": "measured_workload",
       "operations": [
-        "mfm-current-behavior-profile",
-        "scoped-shard-allocation"
+        "mfm-current-behavior-profile"
       ],
       "selected_families": [],
       "rationale": "Accelerate local and hosted behavioral/quality execution by retiring the historical shard-calibration evidence chain, adding ci-preflight caches, single-pass quality execution, cross-worker fixture checkpoints, and duration-aware worksteal dispatch. No gameplay mutation, geometry algorithm, or authoritative decision path changes.",
@@ -2299,8 +2293,7 @@
     "ci/test_shards/milli-inch-covered-baseline.json": {
       "category": "measured_workload",
       "operations": [
-        "mfm-current-behavior-profile",
-        "scoped-shard-allocation"
+        "mfm-current-behavior-profile"
       ],
       "selected_families": [],
       "rationale": "Accelerate local and hosted behavioral/quality execution by retiring the historical shard-calibration evidence chain, adding ci-preflight caches, single-pass quality execution, cross-worker fixture checkpoints, and duration-aware worksteal dispatch. No gameplay mutation, geometry algorithm, or authoritative decision path changes.",
@@ -2310,8 +2303,7 @@
     "ci/test_shards/milli-inch-covered-evidence.json": {
       "category": "measured_workload",
       "operations": [
-        "mfm-current-behavior-profile",
-        "scoped-shard-allocation"
+        "mfm-current-behavior-profile"
       ],
       "selected_families": [],
       "rationale": "Accelerate local and hosted behavioral/quality execution by retiring the historical shard-calibration evidence chain, adding ci-preflight caches, single-pass quality execution, cross-worker fixture checkpoints, and duration-aware worksteal dispatch. No gameplay mutation, geometry algorithm, or authoritative decision path changes.",
@@ -2321,8 +2313,7 @@
     "ci/test_shards/milli-inch-derived-assignment.json": {
       "category": "measured_workload",
       "operations": [
-        "mfm-current-behavior-profile",
-        "scoped-shard-allocation"
+        "mfm-current-behavior-profile"
       ],
       "selected_families": [],
       "rationale": "Accelerate local and hosted behavioral/quality execution by retiring the historical shard-calibration evidence chain, adding ci-preflight caches, single-pass quality execution, cross-worker fixture checkpoints, and duration-aware worksteal dispatch. No gameplay mutation, geometry algorithm, or authoritative decision path changes.",
@@ -2332,8 +2323,7 @@
     "ci/test_shards/native-charge-source-successor.json": {
       "category": "measured_workload",
       "operations": [
-        "mfm-current-behavior-profile",
-        "scoped-shard-allocation"
+        "mfm-current-behavior-profile"
       ],
       "selected_families": [],
       "rationale": "Accelerate local and hosted behavioral/quality execution by retiring the historical shard-calibration evidence chain, adding ci-preflight caches, single-pass quality execution, cross-worker fixture checkpoints, and duration-aware worksteal dispatch. No gameplay mutation, geometry algorithm, or authoritative decision path changes.",
@@ -2343,8 +2333,7 @@
     "ci/test_shards/precision-profile-covered-baseline.json": {
       "category": "measured_workload",
       "operations": [
-        "mfm-current-behavior-profile",
-        "scoped-shard-allocation"
+        "mfm-current-behavior-profile"
       ],
       "selected_families": [],
       "rationale": "Accelerate local and hosted behavioral/quality execution by retiring the historical shard-calibration evidence chain, adding ci-preflight caches, single-pass quality execution, cross-worker fixture checkpoints, and duration-aware worksteal dispatch. No gameplay mutation, geometry algorithm, or authoritative decision path changes.",
@@ -2354,8 +2343,7 @@
     "ci/test_shards/precision-profile-covered-evidence.json": {
       "category": "measured_workload",
       "operations": [
-        "mfm-current-behavior-profile",
-        "scoped-shard-allocation"
+        "mfm-current-behavior-profile"
       ],
       "selected_families": [],
       "rationale": "Accelerate local and hosted behavioral/quality execution by retiring the historical shard-calibration evidence chain, adding ci-preflight caches, single-pass quality execution, cross-worker fixture checkpoints, and duration-aware worksteal dispatch. No gameplay mutation, geometry algorithm, or authoritative decision path changes.",
@@ -2365,8 +2353,7 @@
     "ci/test_shards/precision-profile-derived-assignment.json": {
       "category": "measured_workload",
       "operations": [
-        "mfm-current-behavior-profile",
-        "scoped-shard-allocation"
+        "mfm-current-behavior-profile"
       ],
       "selected_families": [],
       "rationale": "Accelerate local and hosted behavioral/quality execution by retiring the historical shard-calibration evidence chain, adding ci-preflight caches, single-pass quality execution, cross-worker fixture checkpoints, and duration-aware worksteal dispatch. No gameplay mutation, geometry algorithm, or authoritative decision path changes.",
@@ -2387,8 +2374,7 @@
     "ci/test_shards/scoped-worker-evidence.json": {
       "category": "measured_workload",
       "operations": [
-        "mfm-current-behavior-profile",
-        "scoped-shard-allocation"
+        "mfm-current-behavior-profile"
       ],
       "selected_families": [],
       "rationale": "Accelerate local and hosted behavioral/quality execution by retiring the historical shard-calibration evidence chain, adding ci-preflight caches, single-pass quality execution, cross-worker fixture checkpoints, and duration-aware worksteal dispatch. No gameplay mutation, geometry algorithm, or authoritative decision path changes.",
@@ -2398,8 +2384,7 @@
     "ci/test_shards/scoped-worker-extension.json": {
       "category": "measured_workload",
       "operations": [
-        "mfm-current-behavior-profile",
-        "scoped-shard-allocation"
+        "mfm-current-behavior-profile"
       ],
       "selected_families": [],
       "rationale": "Accelerate local and hosted behavioral/quality execution by retiring the historical shard-calibration evidence chain, adding ci-preflight caches, single-pass quality execution, cross-worker fixture checkpoints, and duration-aware worksteal dispatch. No gameplay mutation, geometry algorithm, or authoritative decision path changes.",
@@ -2529,8 +2514,7 @@
     "ci/test_shards/symbolic-milli-inch-covered-baseline.json": {
       "category": "measured_workload",
       "operations": [
-        "mfm-current-behavior-profile",
-        "symbolic-milli-inch-admission"
+        "mfm-current-behavior-profile"
       ],
       "selected_families": [],
       "rationale": "Accelerate local and hosted behavioral/quality execution by retiring the historical shard-calibration evidence chain, adding ci-preflight caches, single-pass quality execution, cross-worker fixture checkpoints, and duration-aware worksteal dispatch. No gameplay mutation, geometry algorithm, or authoritative decision path changes.",
@@ -2540,8 +2524,7 @@
     "ci/test_shards/symbolic-milli-inch-covered-evidence.json": {
       "category": "measured_workload",
       "operations": [
-        "mfm-current-behavior-profile",
-        "symbolic-milli-inch-admission"
+        "mfm-current-behavior-profile"
       ],
       "selected_families": [],
       "rationale": "Accelerate local and hosted behavioral/quality execution by retiring the historical shard-calibration evidence chain, adding ci-preflight caches, single-pass quality execution, cross-worker fixture checkpoints, and duration-aware worksteal dispatch. No gameplay mutation, geometry algorithm, or authoritative decision path changes.",
@@ -2551,8 +2534,7 @@
     "ci/test_shards/symbolic-milli-inch-derived-assignment.json": {
       "category": "measured_workload",
       "operations": [
-        "mfm-current-behavior-profile",
-        "symbolic-milli-inch-admission"
+        "mfm-current-behavior-profile"
       ],
       "selected_families": [],
       "rationale": "Accelerate local and hosted behavioral/quality execution by retiring the historical shard-calibration evidence chain, adding ci-preflight caches, single-pass quality execution, cross-worker fixture checkpoints, and duration-aware worksteal dispatch. No gameplay mutation, geometry algorithm, or authoritative decision path changes.",
@@ -2666,40 +2648,32 @@
       "unchanged_work": "No engine rules mutation, no PathWitness weakening, no coverage-floor change, and no replacement of gameplay validators. Mirror 120s, smoke 180s, quality 600s, twelve shards, and the 67 percent branch floor remain mandatory."
     },
     "tests/code_quality/test_canonical_circle_shard_admission.py": {
-      "category": "measured_workload",
-      "operations": [
-        "canonical-circle-admission"
-      ],
+      "category": "governance",
+      "operations": [],
       "selected_families": [],
       "rationale": "Accelerate local and hosted behavioral/quality execution by retiring the historical shard-calibration evidence chain, adding ci-preflight caches, single-pass quality execution, cross-worker fixture checkpoints, and duration-aware worksteal dispatch. No gameplay mutation, geometry algorithm, or authoritative decision path changes.",
       "source_obligation": "Preserve deterministic sharding over durations.json, fail-closed quality evidence, and the shared DecisionRequest path while removing superseded calibration artifacts.",
       "unchanged_work": "No engine rules mutation, no PathWitness weakening, no coverage-floor change, and no replacement of gameplay validators. Mirror 120s, smoke 180s, quality 600s, twelve shards, and the 67 percent branch floor remain mandatory."
     },
     "tests/code_quality/test_canonical_polygon_pairs_shard_admission.py": {
-      "category": "measured_workload",
-      "operations": [
-        "canonical-polygon-pairs-admission"
-      ],
+      "category": "governance",
+      "operations": [],
       "selected_families": [],
       "rationale": "Accelerate local and hosted behavioral/quality execution by retiring the historical shard-calibration evidence chain, adding ci-preflight caches, single-pass quality execution, cross-worker fixture checkpoints, and duration-aware worksteal dispatch. No gameplay mutation, geometry algorithm, or authoritative decision path changes.",
       "source_obligation": "Preserve deterministic sharding over durations.json, fail-closed quality evidence, and the shared DecisionRequest path while removing superseded calibration artifacts.",
       "unchanged_work": "No engine rules mutation, no PathWitness weakening, no coverage-floor change, and no replacement of gameplay validators. Mirror 120s, smoke 180s, quality 600s, twelve shards, and the 67 percent branch floor remain mandatory."
     },
     "tests/code_quality/test_canonical_polygon_queries_shard_admission.py": {
-      "category": "measured_workload",
-      "operations": [
-        "canonical-polygon-queries-admission"
-      ],
+      "category": "governance",
+      "operations": [],
       "selected_families": [],
       "rationale": "Accelerate local and hosted behavioral/quality execution by retiring the historical shard-calibration evidence chain, adding ci-preflight caches, single-pass quality execution, cross-worker fixture checkpoints, and duration-aware worksteal dispatch. No gameplay mutation, geometry algorithm, or authoritative decision path changes.",
       "source_obligation": "Preserve deterministic sharding over durations.json, fail-closed quality evidence, and the shared DecisionRequest path while removing superseded calibration artifacts.",
       "unchanged_work": "No engine rules mutation, no PathWitness weakening, no coverage-floor change, and no replacement of gameplay validators. Mirror 120s, smoke 180s, quality 600s, twelve shards, and the 67 percent branch floor remain mandatory."
     },
     "tests/code_quality/test_canonical_polygon_shard_admission.py": {
-      "category": "measured_workload",
-      "operations": [
-        "canonical-polygon-admission"
-      ],
+      "category": "governance",
+      "operations": [],
       "selected_families": [],
       "rationale": "Accelerate local and hosted behavioral/quality execution by retiring the historical shard-calibration evidence chain, adding ci-preflight caches, single-pass quality execution, cross-worker fixture checkpoints, and duration-aware worksteal dispatch. No gameplay mutation, geometry algorithm, or authoritative decision path changes.",
       "source_obligation": "Preserve deterministic sharding over durations.json, fail-closed quality evidence, and the shared DecisionRequest path while removing superseded calibration artifacts.",
@@ -2717,51 +2691,51 @@
       "source_obligation": "Preserve deterministic sharding over durations.json, fail-closed quality evidence, and the shared DecisionRequest path while removing superseded calibration artifacts.",
       "unchanged_work": "No engine rules mutation, no PathWitness weakening, no coverage-floor change, and no replacement of gameplay validators. Mirror 120s, smoke 180s, quality 600s, twelve shards, and the 67 percent branch floor remain mandatory."
     },
-    "tests/code_quality/test_current_shard_compatibility.py": {
+    "tests/code_quality/test_ci_resource_diagnostics.py": {
       "category": "measured_workload",
       "operations": [
-        "scoped-shard-allocation"
+        "covered-resource-diagnostics"
       ],
+      "selected_families": [],
+      "rationale": "Accelerate local and hosted behavioral/quality execution by retiring the historical shard-calibration evidence chain, adding ci-preflight caches, single-pass quality execution, cross-worker fixture checkpoints, and duration-aware worksteal dispatch. No gameplay mutation, geometry algorithm, or authoritative decision path changes.",
+      "source_obligation": "Preserve deterministic sharding over durations.json, fail-closed quality evidence, and the shared DecisionRequest path while removing superseded calibration artifacts.",
+      "unchanged_work": "No engine rules mutation, no PathWitness weakening, no coverage-floor change, and no replacement of gameplay validators. Mirror 120s, smoke 180s, quality 600s, twelve shards, and the 67 percent branch floor remain mandatory."
+    },
+    "tests/code_quality/test_current_shard_compatibility.py": {
+      "category": "governance",
+      "operations": [],
       "selected_families": [],
       "rationale": "Accelerate local and hosted behavioral/quality execution by retiring the historical shard-calibration evidence chain, adding ci-preflight caches, single-pass quality execution, cross-worker fixture checkpoints, and duration-aware worksteal dispatch. No gameplay mutation, geometry algorithm, or authoritative decision path changes.",
       "source_obligation": "Preserve deterministic sharding over durations.json, fail-closed quality evidence, and the shared DecisionRequest path while removing superseded calibration artifacts.",
       "unchanged_work": "No engine rules mutation, no PathWitness weakening, no coverage-floor change, and no replacement of gameplay validators. Mirror 120s, smoke 180s, quality 600s, twelve shards, and the 67 percent branch floor remain mandatory."
     },
     "tests/code_quality/test_exact_contact_shard_admission.py": {
-      "category": "measured_workload",
-      "operations": [
-        "exact-contact-admission"
-      ],
+      "category": "governance",
+      "operations": [],
       "selected_families": [],
       "rationale": "Accelerate local and hosted behavioral/quality execution by retiring the historical shard-calibration evidence chain, adding ci-preflight caches, single-pass quality execution, cross-worker fixture checkpoints, and duration-aware worksteal dispatch. No gameplay mutation, geometry algorithm, or authoritative decision path changes.",
       "source_obligation": "Preserve deterministic sharding over durations.json, fail-closed quality evidence, and the shared DecisionRequest path while removing superseded calibration artifacts.",
       "unchanged_work": "No engine rules mutation, no PathWitness weakening, no coverage-floor change, and no replacement of gameplay validators. Mirror 120s, smoke 180s, quality 600s, twelve shards, and the 67 percent branch floor remain mandatory."
     },
     "tests/code_quality/test_extended_shard_allocation.py": {
-      "category": "measured_workload",
-      "operations": [
-        "scoped-shard-allocation"
-      ],
+      "category": "governance",
+      "operations": [],
       "selected_families": [],
       "rationale": "Accelerate local and hosted behavioral/quality execution by retiring the historical shard-calibration evidence chain, adding ci-preflight caches, single-pass quality execution, cross-worker fixture checkpoints, and duration-aware worksteal dispatch. No gameplay mutation, geometry algorithm, or authoritative decision path changes.",
       "source_obligation": "Preserve deterministic sharding over durations.json, fail-closed quality evidence, and the shared DecisionRequest path while removing superseded calibration artifacts.",
       "unchanged_work": "No engine rules mutation, no PathWitness weakening, no coverage-floor change, and no replacement of gameplay validators. Mirror 120s, smoke 180s, quality 600s, twelve shards, and the 67 percent branch floor remain mandatory."
     },
     "tests/code_quality/test_linux_authority_shard_admission.py": {
-      "category": "measured_workload",
-      "operations": [
-        "scoped-shard-allocation"
-      ],
+      "category": "governance",
+      "operations": [],
       "selected_families": [],
       "rationale": "Accelerate local and hosted behavioral/quality execution by retiring the historical shard-calibration evidence chain, adding ci-preflight caches, single-pass quality execution, cross-worker fixture checkpoints, and duration-aware worksteal dispatch. No gameplay mutation, geometry algorithm, or authoritative decision path changes.",
       "source_obligation": "Preserve deterministic sharding over durations.json, fail-closed quality evidence, and the shared DecisionRequest path while removing superseded calibration artifacts.",
       "unchanged_work": "No engine rules mutation, no PathWitness weakening, no coverage-floor change, and no replacement of gameplay validators. Mirror 120s, smoke 180s, quality 600s, twelve shards, and the 67 percent branch floor remain mandatory."
     },
     "tests/code_quality/test_milli_inch_shard_admission.py": {
-      "category": "measured_workload",
-      "operations": [
-        "scoped-shard-allocation"
-      ],
+      "category": "governance",
+      "operations": [],
       "selected_families": [],
       "rationale": "Accelerate local and hosted behavioral/quality execution by retiring the historical shard-calibration evidence chain, adding ci-preflight caches, single-pass quality execution, cross-worker fixture checkpoints, and duration-aware worksteal dispatch. No gameplay mutation, geometry algorithm, or authoritative decision path changes.",
       "source_obligation": "Preserve deterministic sharding over durations.json, fail-closed quality evidence, and the shared DecisionRequest path while removing superseded calibration artifacts.",
@@ -2779,10 +2753,8 @@
       "unchanged_work": "No engine rules mutation, no PathWitness weakening, no coverage-floor change, and no replacement of gameplay validators. Mirror 120s, smoke 180s, quality 600s, twelve shards, and the 67 percent branch floor remain mandatory."
     },
     "tests/code_quality/test_precision_profile_shard_admission.py": {
-      "category": "measured_workload",
-      "operations": [
-        "scoped-shard-allocation"
-      ],
+      "category": "governance",
+      "operations": [],
       "selected_families": [],
       "rationale": "Accelerate local and hosted behavioral/quality execution by retiring the historical shard-calibration evidence chain, adding ci-preflight caches, single-pass quality execution, cross-worker fixture checkpoints, and duration-aware worksteal dispatch. No gameplay mutation, geometry algorithm, or authoritative decision path changes.",
       "source_obligation": "Preserve deterministic sharding over durations.json, fail-closed quality evidence, and the shared DecisionRequest path while removing superseded calibration artifacts.",
@@ -2799,10 +2771,8 @@
       "unchanged_work": "No engine rules mutation, no PathWitness weakening, no coverage-floor change, and no replacement of gameplay validators. Mirror 120s, smoke 180s, quality 600s, twelve shards, and the 67 percent branch floor remain mandatory."
     },
     "tests/code_quality/test_scoped_shard_allocation.py": {
-      "category": "measured_workload",
-      "operations": [
-        "scoped-shard-allocation"
-      ],
+      "category": "governance",
+      "operations": [],
       "selected_families": [],
       "rationale": "Accelerate local and hosted behavioral/quality execution by retiring the historical shard-calibration evidence chain, adding ci-preflight caches, single-pass quality execution, cross-worker fixture checkpoints, and duration-aware worksteal dispatch. No gameplay mutation, geometry algorithm, or authoritative decision path changes.",
       "source_obligation": "Preserve deterministic sharding over durations.json, fail-closed quality evidence, and the shared DecisionRequest path while removing superseded calibration artifacts.",
@@ -2816,11 +2786,17 @@
       "source_obligation": "Preserve deterministic sharding over durations.json, fail-closed quality evidence, and the shared DecisionRequest path while removing superseded calibration artifacts.",
       "unchanged_work": "No engine rules mutation, no PathWitness weakening, no coverage-floor change, and no replacement of gameplay validators. Mirror 120s, smoke 180s, quality 600s, twelve shards, and the 67 percent branch floor remain mandatory."
     },
+    "tests/code_quality/test_starfang_source_policy.py": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Accelerate local and hosted behavioral/quality execution by retiring the historical shard-calibration evidence chain, adding ci-preflight caches, single-pass quality execution, cross-worker fixture checkpoints, and duration-aware worksteal dispatch. No gameplay mutation, geometry algorithm, or authoritative decision path changes.",
+      "source_obligation": "Preserve deterministic sharding over durations.json, fail-closed quality evidence, and the shared DecisionRequest path while removing superseded calibration artifacts.",
+      "unchanged_work": "No engine rules mutation, no PathWitness weakening, no coverage-floor change, and no replacement of gameplay validators. Mirror 120s, smoke 180s, quality 600s, twelve shards, and the 67 percent branch floor remain mandatory."
+    },
     "tests/code_quality/test_symbolic_milli_inch_shard_admission.py": {
-      "category": "measured_workload",
-      "operations": [
-        "symbolic-milli-inch-admission"
-      ],
+      "category": "governance",
+      "operations": [],
       "selected_families": [],
       "rationale": "Accelerate local and hosted behavioral/quality execution by retiring the historical shard-calibration evidence chain, adding ci-preflight caches, single-pass quality execution, cross-worker fixture checkpoints, and duration-aware worksteal dispatch. No gameplay mutation, geometry algorithm, or authoritative decision path changes.",
       "source_obligation": "Preserve deterministic sharding over durations.json, fail-closed quality evidence, and the shared DecisionRequest path while removing superseded calibration artifacts.",
@@ -2832,7 +2808,8 @@
         "behavioral-worksteal-dispatch",
         "ci78-cutover-owners-e52e4ddd58b7ef887ab03c04116e676f6280b824ab7469d5d3080e5cba4f2128",
         "ci79-ordering-e52e4ddd58b7ef887ab03c04116e676f6280b824ab7469d5d3080e5cba4f2128",
-        "qualification40-exact-e52e4ddd58b7ef88"
+        "qualification40-exact-e52e4ddd58b7ef88",
+        "speedup-test-admission"
       ],
       "selected_families": [],
       "rationale": "Accelerate local and hosted behavioral/quality execution by retiring the historical shard-calibration evidence chain, adding ci-preflight caches, single-pass quality execution, cross-worker fixture checkpoints, and duration-aware worksteal dispatch. No gameplay mutation, geometry algorithm, or authoritative decision path changes.",
@@ -2944,7 +2921,7 @@
     "tests/s25_native_profile_helpers.py": {
       "category": "measured_workload",
       "operations": [
-        "s25-tests-s25_native_profile_helpers"
+        "speedup-test-admission"
       ],
       "selected_families": [],
       "rationale": "Accelerate local and hosted behavioral/quality execution by retiring the historical shard-calibration evidence chain, adding ci-preflight caches, single-pass quality execution, cross-worker fixture checkpoints, and duration-aware worksteal dispatch. No gameplay mutation, geometry algorithm, or authoritative decision path changes.",
