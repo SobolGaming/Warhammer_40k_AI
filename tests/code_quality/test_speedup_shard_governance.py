@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import ast
 import hashlib
 import subprocess
 import sys
@@ -58,6 +59,19 @@ def test_ci_workflow_has_preflight_caches_and_adaptive_runner_label() -> None:
     assert "venv-test-v1-" in workflow
     assert 'WH40K_SOURCE_HISTORY_PREVALIDATED: "1"' in workflow
     assert "fetch_scheduling_sources.py" not in workflow
+    # The quality reporter requires pytest's exact declaration order, not sorting.
+    module = Path(__file__).relative_to(ROOT).as_posix()
+    declared = [
+        f"{module}::{node.name}"
+        for node in ast.parse(Path(__file__).read_text()).body
+        if isinstance(node, ast.FunctionDef) and node.name.startswith("test_")
+    ]
+    assigned = [
+        node
+        for node in (ROOT / "ci/quality_shards/shard-4.txt").read_text().splitlines()
+        if node.startswith(module + "::")
+    ]
+    assert assigned == declared
     groups = tomllib.loads((ROOT / "pyproject.toml").read_text())["dependency-groups"]
     for group in ("test", "typecheck"):
         assert any(dep.startswith("filelock>=") for dep in groups[group])

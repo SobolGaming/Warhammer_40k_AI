@@ -76,11 +76,11 @@
     },
     "ci/quality_shards/shard-4.txt": {
       "before_sha256": "cfcbde56ef1c9982449c3c97331435b6a0629e30f4b82c97507fc3f1fa9a4e4f",
-      "after_sha256": "0ba02e5b931de64a4b886437d8e6395453ebfeb96cc7c0285bee21c321e84901",
+      "after_sha256": "016841eb24e9d3c22972aff205181b5f4d9f773bd186777d44b9f1243e87c0ae",
       "owners": {
         "@document": {
           "before": "cfcbde56ef1c9982449c3c97331435b6a0629e30f4b82c97507fc3f1fa9a4e4f",
-          "after": "0ba02e5b931de64a4b886437d8e6395453ebfeb96cc7c0285bee21c321e84901"
+          "after": "016841eb24e9d3c22972aff205181b5f4d9f773bd186777d44b9f1243e87c0ae"
         }
       }
     },
@@ -1546,15 +1546,15 @@
     },
     "tests/code_quality/test_speedup_shard_governance.py": {
       "before_sha256": null,
-      "after_sha256": "c93fc5ac4f50311c3698586fe58109b0185eed595273208ce80d6d9468887d8a",
+      "after_sha256": "10e3250d0eb4963a9bd1dc833a15eb9effdace0cfb0a58a2ff0a6adcb16571d7",
       "owners": {
         "@module": {
           "before": null,
-          "after": "5447000e3cab479dbc0c0d4a210cf5a19433ad0339e88c39aae96d4739a20ab9"
+          "after": "0d402aae52e41ea9df27a2ecf5e53d0100896c14c56ad719466b932ac3833c0d"
         },
         "test_ci_workflow_has_preflight_caches_and_adaptive_runner_label": {
           "before": null,
-          "after": "e3b3ae0d1ace3ff7584e405257f204ecd367aa296f80c0583c0e3edafeb5be61"
+          "after": "c83b8541f1eee1a7badd35ae47614ae07f4c5e932bdb956e2a675dd9487a01ca"
         },
         "test_cross_worker_fixture_cache_builds_once_and_rejects_corruption": {
           "before": null,
