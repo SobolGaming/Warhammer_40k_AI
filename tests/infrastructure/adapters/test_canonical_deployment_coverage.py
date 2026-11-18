@@ -6,6 +6,7 @@ from typing import cast
 
 import pytest
 
+from tests.support.cross_worker_fixture_cache import load_or_measure_canonical_coverage
 from warhammer40k_core.adapters.access_control import ViewerContext
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.ai.canonical_deployment import (
@@ -25,10 +26,22 @@ from warhammer40k_core.engine.phase import LifecycleStatusKind
 from warhammer40k_core.engine.replay import ReplayRunner
 
 
-def test_complete_canonical_coverage_reconciles_reproduces_and_rejects_false_denominator() -> None:
-    session, _ = reproduce_canonical_deployment()
+@pytest.fixture(scope="module")
+def canonical_coverage_measured(
+    tmp_path_factory: pytest.TempPathFactory,
+    pytestconfig: pytest.Config,
+) -> tuple[LocalGameSession, CanonicalDeploymentCoverage]:
+    return load_or_measure_canonical_coverage(
+        tmp_path_factory=tmp_path_factory,
+        pytestconfig=pytestconfig,
+    )
+
+
+def test_complete_canonical_coverage_reconciles_reproduces_and_rejects_false_denominator(
+    canonical_coverage_measured: tuple[LocalGameSession, CanonicalDeploymentCoverage],
+) -> None:
+    session, report = canonical_coverage_measured
     before = canonical_json(session.to_persistence_payload())
-    report = CanonicalDeploymentCoverage.measure(session=session)
     payload = report.to_payload()
     rows = cast(list[dict[str, JsonValue]], payload["rows"])
     assert [row["index"] for row in rows] == list(range(11))

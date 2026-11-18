@@ -265,8 +265,8 @@ uv run ruff check .
 uv run ruff format --check .
 uv run mypy src tests
 uv run pyright
-PATH="${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}" uv run pytest tests --ignore=tests/code_quality -n auto --dist=worksteal --cov=warhammer40k_core --cov-report=term-missing --cov-fail-under=67
-uv run pytest tests/code_quality -q -n auto --dist=worksteal --no-cov @ci/quality_shards/prototype-comparison-deferred.args
+PATH="${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}" uv run python -B -m scripts.run_complete_covered_profile --output ../covered-final-run
+PYTEST_XDIST_AUTO_NUM_WORKERS=32 timeout --signal=TERM --kill-after=30 600 uv run pytest tests/code_quality -q -n auto --dist=worksteal --no-cov @ci/quality_shards/prototype-comparison-deferred.args
 uv run --no-sync python scripts/build_test_shards.py --check --shard-count 12
 uv run lint-imports
 uv run pre-commit run --all-files
@@ -377,7 +377,7 @@ uv run pytest tests/rules/section04/test_completion_boundaries.py -k attack_mort
 Architecture and source-shape audits run independently without behavioral coverage:
 
 ```bash
-uv run pytest tests/code_quality -q -n auto --dist=worksteal --no-cov @ci/quality_shards/prototype-comparison-deferred.args
+PYTEST_XDIST_AUTO_NUM_WORKERS=32 timeout --signal=TERM --kill-after=30 600 uv run pytest tests/code_quality -q -n auto --dist=worksteal --no-cov @ci/quality_shards/prototype-comparison-deferred.args
 ```
 
 For final validation, run the behavioral suite once with coverage and the code-quality
@@ -386,10 +386,14 @@ Focused subsets and `--lf` are for iteration, never replacements for this final 
 
 ```bash
 PATH="${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}" \
-  uv run pytest tests --ignore=tests/code_quality \
-  -n auto --dist=worksteal \
-  --cov=warhammer40k_core --cov-report=term-missing --cov-fail-under=67
+  uv run python -B -m scripts.run_complete_covered_profile \
+  --output ../covered-final-run
 ```
+
+Choose a new output path for each qualification; the controller refuses to overwrite
+an earlier run. It performs cold source-history/index checks, the isolated mirror,
+all remaining cases on 32 workers, combined branch-enabled coverage and the
+unchanged 1,620/1,800-second supervisor. Run the quality command above once afterward.
 
 The `PATH` prefix exposes the Node.js runtime bundled with Codex desktop to the executable
 viewer-renderer regressions. It is safe when that directory is absent: an independently installed
@@ -436,27 +440,71 @@ omissions or exclusions. This policy change does not claim either threshold has 
 all required tests and other gates must still succeed. See the
 [active review policy](docs/SEQUENTIAL_REMEDIATION_REVIEW_POLICY.md).
 
-The twelve behavioral manifests in `ci/test_shards/` currently use an explicitly
-reviewed derived assignment, admitted by `current-runtime-compatibility.json`.
-The strict historical allocator remains available when that descriptor is absent:
-it seeds the isolated mirror, then uses largest selectors and improving moves.
-The
-source-bound S25 module retains its twenty exact cases; canonical coverage
-preflight retains its twelve-case partition. Two finite step5g modules add source-bound
-partitions of 32 and 30 exact cases. The bounded mirror setup case is a separate
-selector; its file selector denotes the remaining cases. CI always deselects that
-node from parallel work and runs it once on its owning shard. All other files remain
-intact. The resulting 509 selectors select exactly 6,341 cases, including eighteen
-terrain-preparation/cache regressions, nineteen connected-endpoint/ordered-history
-controls, six Desperate Escape survivor persistence controls in the natural
-Section 09 owner `test_escape_survivor_persistence.py`, and six native equipment,
-battle-prefix and named-weapon choice controls, plus ten Linux-authority session/profile controls. The required guards verify the exact
-selected inventory and partition.
+The twelve behavioral manifests in `ci/test_shards/` use deterministic LPT
+duration balancing over `ci/test_shards/durations.json`, seeding the isolated
+bounded mirror case first and assigning the lightest modeled shard to `shard-1`.
+On 17 November 2026, the ~483 MB stacked historical shard-calibration chain was
+retired from the live working tree (remaining preserved in Git history at
+`9747b9b0873b4f442d3cd81f72280b24810d952c`), while `ci-preflight` validates
+source history and builds/caches the selected-source index once per CI push and
+Linux lanes use `${{ vars.CI_LINUX_RUNNER || 'ubuntu-24.04' }}`.
 Verify that every selected file or declared case appears exactly once:
 
 ```bash
 uv run --no-sync python scripts/build_test_shards.py --check --shard-count 12
 ```
+
+Current scheduling uses only the complete measurements recorded in
+`durations.json` and the twelve generated manifests. Grouped LPT keeps the isolated
+mirror and native screening module in one shard. The mirror always builds cold
+under the original 42-decision/120-second runner, completes all its assertions and
+publishes its source-bound command checkpoint. Native test bodies then run with
+ordinary work stealing and require that checkpoint; a missing or mismatched
+producer fails. Both stages share only their current covered controller's fresh
+temporary root and generation nonce. Other ad-hoc reuse is scoped to the current
+pytest invocation; later controller and developer runs rebuild their inputs.
+`ci-preflight` validates source history and shard membership and performs the
+mandatory cold source-index build before dependent lanes run. Every behavioral
+shard may restore that exact-key index, including shard 1. The local complete
+profile retains its own cold construction stage and unchanged 1,620/1,800-second
+approval/execution supervisor.
+
+Every supplied JUnit profile must cover the complete current behavioral inventory
+with unique cases and passing setup, call and teardown. Missing, failed, skipped,
+incomplete or invalid-duration cases fail admission. New or changed cases require
+a fresh complete profile. Preserve raw report hashes, source labels, environments,
+worker counts and original failed timing outcomes. Planning weights never establish
+hosted approval; every exact-head shard and combined coverage gate must pass.
+
+Download the `behavior-report-*` artifacts from each chosen complete behavioral
+run into a separate directory outside the checkout, then regenerate (repeat both
+options for additional runs). Each profile must contain every selected case with
+passed setup, call and teardown, including the isolated mirror. A complete
+all-passed behavioral JUnit profile may supply scheduling measurements even when
+the enclosing CI run failed its timing approval; its source description must
+retain that failed outcome, run/attempt, tested checkout, source head, runtime,
+host and worker topology. It is not an approved CI run or passing coverage gate.
+Missing, failed, skipped or incomplete cases remain inadmissible. Authenticate
+artifact bytes and attempts independently before use; worker JSON alone does not
+identify the attempt. Downloaded profiles are supplied inputs, not generated source:
+
+```bash
+uv run --no-sync python scripts/build_test_shards.py \
+  --junit ../behavior-reports/run-one \
+  --profile-source "RUN_URL; commit SHA; ubuntu-latest; 4 workers per shard" \
+  --junit ../behavior-reports/run-two \
+  --profile-source "RUN_URL; commit SHA; ubuntu-latest; 4 workers per shard" \
+  --shard-count 12
+```
+
+### Retired calibration history
+
+The narrative below describes the retired calibration system and its historical
+outcomes. Its compatibility files, sidecars, fixed assignments, cold-shard role,
+planning algorithms and earlier timing limits are not current setup instructions.
+The source records remain preserved at
+[`9747b9b0`](https://github.com/SobolGaming/Warhammer_40k_AI/tree/9747b9b0873b4f442d3cd81f72280b24810d952c/ci/test_shards).
+Current generation and validation use the commands above.
 
 The compatibility descriptor pins the original scheduling snapshot at
 `008be8a8cb0b50b232fe022452762b3906489b49`, a complete current covered local baseline,
@@ -494,27 +542,6 @@ PR671 local covered supervisor recorded 1,149.154 seconds with 67.47% coverage;
 the subsequent PR672 supervisor recorded 1,219.895 seconds with 67.48% coverage. These are
 historical observations, not qualification of a later head. Every new head still
 requires fresh local and hosted gates under the unchanged approval limits.
-
-Download the `behavior-report-*` artifacts from each chosen complete behavioral
-run into a separate directory outside the checkout, then regenerate (repeat both
-options for additional runs). Each profile must contain every selected case with
-passed setup, call and teardown, including the isolated mirror. A complete
-all-passed behavioral JUnit profile may supply scheduling measurements even when
-the enclosing CI run failed its timing approval; its source description must
-retain that failed outcome, run/attempt, tested checkout, source head, runtime,
-host and worker topology. It is not an approved CI run or passing coverage gate.
-Missing, failed, skipped or incomplete cases remain inadmissible. Authenticate
-artifact bytes and attempts independently before use; worker JSON alone does not
-identify the attempt. Downloaded profiles are supplied inputs, not generated source:
-
-```bash
-uv run --no-sync python scripts/build_test_shards.py \
-  --junit ../behavior-reports/run-one \
-  --profile-source "RUN_URL; commit SHA; ubuntu-latest; 4 workers per shard" \
-  --junit ../behavior-reports/run-two \
-  --profile-source "RUN_URL; commit SHA; ubuntu-latest; 4 workers per shard" \
-  --shard-count 12
-```
 
 The initial measurements are the complete covered hosted runs
 [40872329113](https://github.com/SobolGaming/Warhammer_40k_AI/actions/runs/40872329113)
@@ -1070,6 +1097,8 @@ unchanged. These conditional estimates and preserved per-shard regressions do no
 certify robust future headroom or passing CI. All real exact-head gates and independent
 reviews remain required; the earlier worker-loss cause is still unknown.
 
+### Current CI diagnostics and quality lanes
+
 The inner covered-workload shell also captures separate before/after resource
 JSON files. Linux host OOM counters and available cgroup-v2 events/current/peak
 readings are read without resetting counters or changing worker behavior. Host
@@ -1087,7 +1116,7 @@ not substitute file averages for missing case costs. Shard assignment separately
 accounts for the mirror's serial execution, retaining measured times unchanged
 and recording the four-worker execution model. Missing, negative, nonfinite or
 boolean weights fail closed; measurements rounded to zero remain valid. Finite S25 case validation,
-the complete selected inventory and the eighteen-minute approval deadline remain mandatory.
+the complete selected inventory and the 27-minute approval deadline remain mandatory.
 
 Behavioral lanes log keyed cold-index start/completion and elapsed construction time.
 A case exceeding three minutes emits thread stacks and continues under the existing

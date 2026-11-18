@@ -18,6 +18,7 @@ from warhammer40k_core.ai.player_policy import (
     PolicyRouter,
     payload_digest,
 )
+from warhammer40k_core.ai.runner import BoundedPolicyRunner, RunBoundary, RunLimits, RunReport
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.engine.battlefield_state import ModelPlacement, ModelPlacementPayload
 from warhammer40k_core.engine.deployment import (
@@ -173,3 +174,19 @@ def mirror_router(fixture: _DeploymentFixture) -> PolicyRouter:
                 )
             )
     return PolicyRouter(tuple(registrations))
+
+
+def run_mirror_to_command() -> tuple[LocalGameSession, RunReport]:
+    """Execute the authentic cold 42-decision setup under its original runner budget."""
+    session = strict_mirror_session()
+    fixture = deployment_fixture()
+    assert fixture["mission_pool_entry_id"] == "mission-purge-the-foe-vs-purge-the-foe-layout-1"
+    report = BoundedPolicyRunner(
+        session=session,
+        router=mirror_router(fixture),
+        limits=RunLimits(policy_seed=19, max_decisions=42, max_seconds=120),
+    ).run(stop_at=RunBoundary("battle", "command"))
+    assert report.stop_reason == "requested_boundary"
+    assert len(report.decisions) == 42
+    assert all(decision.accepted for decision in report.decisions)
+    return session, report

@@ -1,7 +1,7 @@
 {
   "schema": "finite-preflight-case-partition-v1",
   "source_file": "tests/infrastructure/adapters/test_canonical_coverage_preflight.py",
-  "source_sha256": "90b2fbdcaa950cfa3002dc7c1b3172473639b66c94fd9192839162f95d148068",
+  "source_sha256": "7255fbfdb63ca8c8d3bfde842c88541ce784cef728f2cb0645dafb14da0f13bb",
   "nodes": [
     "tests/infrastructure/adapters/test_canonical_coverage_preflight.py::test_consistent_tampering_still_reproduces_the_real_engine",
     "tests/infrastructure/adapters/test_canonical_coverage_preflight.py::test_coverage_totals_derive_each_kind_without_fixed_fixture_counts",

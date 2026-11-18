@@ -675,8 +675,17 @@ def test_quality_gate_requires_every_independent_lane_even_when_skipped(
     workflow = WORKFLOW_PATH.read_text(encoding="utf-8")
     aggregate = workflow.partition("\n  quality-fast:\n")[2].partition("\n  lint:\n")[0]
     assert "if: always()" in aggregate
-    assert "needs: [lint, contract-conformance, code-quality, semantic-audit-macos]" in aggregate
-    for lane in ("lint", "contract-conformance", "code-quality", "semantic-audit-macos"):
+    assert (
+        "needs: [ci-preflight, lint, contract-conformance, code-quality, semantic-audit-macos]"
+        in aggregate
+    )
+    for lane in (
+        "ci-preflight",
+        "lint",
+        "contract-conformance",
+        "code-quality",
+        "semantic-audit-macos",
+    ):
         assert f"needs.{lane}.result != 'success'" in aggregate
     assert "exit 1" in aggregate
     assert "run: npm run test:unit" in workflow
@@ -958,6 +967,7 @@ def test_cutover_real_pytest_cli_does_not_bypass_explicit_file_guard(
         "scripts/canonical_polygon_queries_test_admission.py",
         "scripts/canonical_polygon_pairs_test_admission.py",
         "scripts/exact_contact_test_admission.py",
+        "scripts/speedup_test_admission.py",
         "tests/conftest.py",
         "tests/timing_plugin.py",
         "tests/__init__.py",
@@ -1015,6 +1025,7 @@ def test_cutover_real_cli_rejects_naming_override(cutover_root: Path) -> None:
         "scripts/canonical_polygon_queries_test_admission.py",
         "scripts/canonical_polygon_pairs_test_admission.py",
         "scripts/exact_contact_test_admission.py",
+        "scripts/speedup_test_admission.py",
         "tests/conftest.py",
         "tests/timing_plugin.py",
         "tests/__init__.py",
@@ -1485,12 +1496,15 @@ def test_failed_real_source_builder_stops_pytest_before_dispatch(
 
 def test_cold_source_index_overlaps_startup_inside_the_unchanged_deadline() -> None:
     workflow = WORKFLOW_PATH.read_text(encoding="utf-8")
+    preflight = workflow.split("  ci-preflight:\n", 1)[1].split("  quality-fast:\n", 1)[0]
+    assert "scripts.ci_source_index" in preflight
+    assert "scripts.validate_source_history" in preflight
     restore = workflow.split("- name: Restore exact selected-source index", 1)[1].split(
         "- name: Run behavioral coverage shard", 1
     )[0]
-    assert "if: ${{ matrix.shard_id != '1' }}" in restore
+    assert "needs.ci-preflight.outputs.source_index_key" in restore
     step = workflow.split("- name: Run behavioral coverage shard", 1)[1].split(
-        "- name: Save completed selected-source index", 1
+        "- name: Upload shard test report", 1
     )[0]
     assert "timeout-minutes: 32" in step
     step = (ROOT / "scripts/run_behavioral_coverage.sh").read_text()

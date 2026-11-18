@@ -26,34 +26,14 @@ env:
   UV_VERSION: "0.11.29"
 
 jobs:
-  quality-fast:
-    name: quality-fast
-    if: always()
-    needs: [lint, contract-conformance, code-quality, semantic-audit-macos]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Require successful quality lanes
-        if: >-
-          ${{
-            needs.lint.result != 'success' ||
-            needs.contract-conformance.result != 'success' ||
-            needs.code-quality.result != 'success' ||
-            needs.semantic-audit-macos.result != 'success'
-          }}
-        run: |
-          echo "One or more quality lanes did not succeed."
-          exit 1
-
-  lint:
-    runs-on: ubuntu-latest
+  ci-preflight:
+    name: ci-preflight
+    runs-on: ${{ vars.CI_LINUX_RUNNER || 'ubuntu-24.04' }}
+    outputs:
+      source_index_key: ${{ steps.source-inputs.outputs.key }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
-        with:
-          fetch-depth: 0
-
-      - name: Fetch exact scheduling source objects
-        run: python3 -B scripts/fetch_scheduling_sources.py
 
       - name: Set up Python
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
@@ -65,6 +45,109 @@ jobs:
         with:
           version: ${{ env.UV_VERSION }}
           enable-cache: true
+
+      - name: Restore test virtualenv
+        id: venv-cache
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        with:
+          path: .venv
+          key: venv-test-v1-${{ runner.os }}-${{ runner.arch }}-${{ env.PYTHON_VERSION }}-${{ hashFiles('uv.lock', 'pyproject.toml') }}
+
+      - name: Sync test dependencies
+        run: uv sync --locked --no-default-groups --group test
+
+      - name: Save test virtualenv
+        if: steps.venv-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        with:
+          path: .venv
+          key: venv-test-v1-${{ runner.os }}-${{ runner.arch }}-${{ env.PYTHON_VERSION }}-${{ hashFiles('uv.lock', 'pyproject.toml') }}
+
+      - name: Validate historical source closure once
+        run: uv run --no-sync python -B -m scripts.validate_source_history
+
+      - name: Verify behavioral shard manifests
+        run: uv run --no-sync python -B scripts/build_test_shards.py --check --shard-count 12
+
+      - name: Identify selected-source inputs
+        id: source-inputs
+        run: |
+          uv run --no-sync python -B - <<'PY'
+          import hashlib, json, os, sys
+          from pathlib import Path
+          from tools.ability_support_sources import ability_support_index_inputs
+          from warhammer40k_core.rules.selected_source_index import source_input_hashes
+          source = Path("data/source_snapshots/wahapedia/10th-edition/2026-06-14/json")
+          identity = {"python": sys.version, "inputs": source_input_hashes(ability_support_index_inputs(source))}
+          digest = hashlib.sha256(json.dumps(identity, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+          with open(os.environ["GITHUB_OUTPUT"], "a") as output:
+              output.write(f"key=selected-source-index-v1-{digest}\n")
+          PY
+
+      - name: Check existing selected-source index cache
+        id: source-index-probe
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        with:
+          path: ${{ runner.temp }}/selected-army-source-index-probe
+          key: ${{ steps.source-inputs.outputs.key }}
+          lookup-only: true
+
+      - name: Build cold selected-source index once
+        run: >-
+          uv run --no-sync python -B -m scripts.ci_source_index
+          data/source_snapshots/wahapedia/10th-edition/2026-06-14/json
+          "${{ runner.temp }}/selected-army-source-index"
+          "${{ runner.temp }}/selected-army-source-index-result.json"
+          "${{ steps.source-inputs.outputs.key }}"
+
+      - name: Save completed selected-source index
+        if: steps.source-index-probe.outputs.cache-hit != 'true'
+        uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        with:
+          path: ${{ runner.temp }}/selected-army-source-index
+          key: ${{ steps.source-inputs.outputs.key }}
+
+  quality-fast:
+    name: quality-fast
+    if: always()
+    needs: [ci-preflight, lint, contract-conformance, code-quality, semantic-audit-macos]
+    runs-on: ${{ vars.CI_LINUX_RUNNER || 'ubuntu-24.04' }}
+    steps:
+      - name: Require successful quality lanes
+        if: >-
+          ${{
+            needs.ci-preflight.result != 'success' ||
+            needs.lint.result != 'success' ||
+            needs.contract-conformance.result != 'success' ||
+            needs.code-quality.result != 'success' ||
+            needs.semantic-audit-macos.result != 'success'
+          }}
+        run: |
+          echo "One or more quality lanes did not succeed."
+          exit 1
+
+  lint:
+    runs-on: ${{ vars.CI_LINUX_RUNNER || 'ubuntu-24.04' }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6
+        with:
+          version: ${{ env.UV_VERSION }}
+          enable-cache: true
+
+      - name: Cache lint virtualenv
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        with:
+          path: .venv
+          key: venv-lint-v1-${{ runner.os }}-${{ runner.arch }}-${{ env.PYTHON_VERSION }}-${{ hashFiles('uv.lock', 'pyproject.toml') }}
 
       - name: Sync lint dependencies
         run: uv sync --locked --no-default-groups --group lint
@@ -82,7 +165,8 @@ jobs:
         run: uv run --no-sync python scripts/build_test_shards.py --check --shard-count 12
 
   contract-conformance:
-    runs-on: ubuntu-latest
+    needs: [ci-preflight]
+    runs-on: ${{ vars.CI_LINUX_RUNNER || 'ubuntu-24.04' }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
@@ -99,6 +183,12 @@ jobs:
         with:
           version: ${{ env.UV_VERSION }}
           enable-cache: true
+
+      - name: Restore test virtualenv
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        with:
+          path: .venv
+          key: venv-test-v1-${{ runner.os }}-${{ runner.arch }}-${{ env.PYTHON_VERSION }}-${{ hashFiles('uv.lock', 'pyproject.toml') }}
 
       - name: Set up Node.js
         uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
@@ -143,7 +233,7 @@ jobs:
     name: code-quality
     if: always()
     needs: [quality-policy, quality-shards]
-    runs-on: ubuntu-latest
+    runs-on: ${{ vars.CI_LINUX_RUNNER || 'ubuntu-24.04' }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
@@ -185,15 +275,12 @@ jobs:
           exit 1
 
   quality-policy:
-    runs-on: ubuntu-latest
+    runs-on: ${{ vars.CI_LINUX_RUNNER || 'ubuntu-24.04' }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
           fetch-depth: 0
-
-      - name: Fetch exact scheduling source objects
-        run: python3 -B scripts/fetch_scheduling_sources.py
 
       - name: Set up Python
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
@@ -205,9 +292,6 @@ jobs:
 
       - name: Fetch original historical validation inputs
         run: git fetch --no-tags --no-recurse-submodules origin 4a8fb3c10cbf9c6ce1766f048508b8a16f8f24e8
-
-      - name: Fetch pre-squash calibration validation input
-        run: git fetch --no-tags --no-recurse-submodules origin b9b1c97a6a2da6fca624c7f30c471d6cfab56320
 
       - name: Set up uv
         uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6
@@ -259,7 +343,7 @@ jobs:
 
   quality-shards:
     name: quality-shard-${{ matrix.shard }}
-    runs-on: ubuntu-latest
+    runs-on: ${{ vars.CI_LINUX_RUNNER || 'ubuntu-24.04' }}
     strategy:
       fail-fast: false
       matrix:
@@ -269,9 +353,6 @@ jobs:
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
           fetch-depth: 0
-
-      - name: Fetch exact scheduling source objects
-        run: python3 -B scripts/fetch_scheduling_sources.py
 
       - name: Set up Python
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
@@ -283,9 +364,6 @@ jobs:
 
       - name: Fetch original historical validation inputs
         run: git fetch --no-tags --no-recurse-submodules origin 4a8fb3c10cbf9c6ce1766f048508b8a16f8f24e8
-
-      - name: Fetch pre-squash calibration validation input
-        run: git fetch --no-tags --no-recurse-submodules origin b9b1c97a6a2da6fca624c7f30c471d6cfab56320
 
       - name: Set up uv
         uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6
@@ -343,7 +421,7 @@ jobs:
 
   mypy:
     name: mypy
-    runs-on: ubuntu-latest
+    runs-on: ${{ vars.CI_LINUX_RUNNER || 'ubuntu-24.04' }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
@@ -358,6 +436,20 @@ jobs:
         with:
           version: ${{ env.UV_VERSION }}
           enable-cache: true
+
+      - name: Cache typecheck virtualenv
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        with:
+          path: .venv
+          key: venv-typecheck-v1-${{ runner.os }}-${{ runner.arch }}-${{ env.PYTHON_VERSION }}-${{ hashFiles('uv.lock', 'pyproject.toml') }}
+
+      - name: Cache mypy incremental database
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        with:
+          path: .mypy_cache
+          key: mypy-cache-v1-${{ runner.os }}-${{ env.PYTHON_VERSION }}-${{ hashFiles('uv.lock', 'pyproject.toml') }}-${{ github.sha }}
+          restore-keys: |
+            mypy-cache-v1-${{ runner.os }}-${{ env.PYTHON_VERSION }}-${{ hashFiles('uv.lock', 'pyproject.toml') }}-
 
       - name: Sync type-check dependencies
         run: uv sync --locked --no-default-groups --group typecheck
@@ -367,7 +459,7 @@ jobs:
 
   pyright:
     name: pyright
-    runs-on: ubuntu-latest
+    runs-on: ${{ vars.CI_LINUX_RUNNER || 'ubuntu-24.04' }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
@@ -383,6 +475,12 @@ jobs:
           version: ${{ env.UV_VERSION }}
           enable-cache: true
 
+      - name: Restore typecheck virtualenv
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        with:
+          path: .venv
+          key: venv-typecheck-v1-${{ runner.os }}-${{ runner.arch }}-${{ env.PYTHON_VERSION }}-${{ hashFiles('uv.lock', 'pyproject.toml') }}
+
       - name: Sync type-check dependencies
         run: uv sync --locked --no-default-groups --group typecheck
 
@@ -391,12 +489,13 @@ jobs:
 
   behavior-tests:
     name: behavior-shard-${{ matrix.shard_id }}
+    needs: [ci-preflight]
     if: >-
       ${{
         github.event_name != 'pull_request' ||
         github.event.pull_request.draft == false
       }}
-    runs-on: ubuntu-latest
+    runs-on: ${{ vars.CI_LINUX_RUNNER || 'ubuntu-24.04' }}
     strategy:
       fail-fast: false
       matrix:
@@ -432,9 +531,6 @@ jobs:
       - name: Fetch retained Core description baseline
         run: git fetch --depth=1 --no-tags --no-recurse-submodules origin b27c5d4e5f75dd7f89353a968a88d1b24b2681a4
 
-      - name: Fetch exact scheduling source objects
-        run: python3 -B scripts/fetch_scheduling_sources.py
-
       - name: Set up Python
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
@@ -446,6 +542,12 @@ jobs:
           version: ${{ env.UV_VERSION }}
           enable-cache: true
 
+      - name: Restore test virtualenv
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        with:
+          path: .venv
+          key: venv-test-v1-${{ runner.os }}-${{ runner.arch }}-${{ env.PYTHON_VERSION }}-${{ hashFiles('uv.lock', 'pyproject.toml') }}
+
       - name: Set up Node.js
         uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
         with:
@@ -454,29 +556,12 @@ jobs:
       - name: Sync test dependencies
         run: uv sync --locked --no-default-groups --group test
 
-      - name: Identify selected-source inputs
-        id: source-inputs
-        run: |
-          uv run --no-sync python -B - <<'PY'
-          import hashlib, json, os, sys
-          from pathlib import Path
-          from tools.ability_support_sources import ability_support_index_inputs
-          from warhammer40k_core.rules.selected_source_index import source_input_hashes
-          source = Path("data/source_snapshots/wahapedia/10th-edition/2026-06-14/json")
-          identity = {"python": sys.version, "inputs": source_input_hashes(ability_support_index_inputs(source))}
-          digest = hashlib.sha256(json.dumps(identity, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
-          with open(os.environ["GITHUB_OUTPUT"], "a") as output:
-              output.write(f"key=selected-source-index-v1-{digest}\n")
-          PY
-
       - name: Restore exact selected-source index
-        # Keep one real shard cold on PRs and main; a warm retry is not cold qualification.
-        if: ${{ matrix.shard_id != '1' }}
         id: source-index-cache
         uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
           path: ${{ runner.temp }}/selected-army-source-index
-          key: ${{ steps.source-inputs.outputs.key }}
+          key: ${{ needs.ci-preflight.outputs.source_index_key }}
 
       - name: Run behavioral coverage shard
         id: behavior
@@ -492,18 +577,12 @@ jobs:
           BEHAVIORAL_DISPATCH_PROFILE: ci/test_shards/durations.json
           SELECTED_ARMY_SOURCE_INDEX: ${{ runner.temp }}/selected-army-source-index
           SELECTED_INDEX_CACHE_HIT: ${{ steps.source-index-cache.outputs.cache-hit }}
-          SELECTED_INDEX_INPUT_KEY: ${{ steps.source-inputs.outputs.key }}
+          SELECTED_INDEX_INPUT_KEY: ${{ needs.ci-preflight.outputs.source_index_key }}
+          WH40K_SOURCE_HISTORY_PREVALIDATED: "1"
         run: >-
           uv run --no-sync python -B -m scripts.behavioral_deadline
           --approval-seconds 1620 --execution-seconds 1800
           -- bash scripts/run_behavioral_coverage.sh
-
-      - name: Save completed selected-source index
-        if: ${{ always() && matrix.shard_id != '1' && steps.behavior.outputs.source_index_built == 'true' }}
-        uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
-        with:
-          path: ${{ runner.temp }}/selected-army-source-index
-          key: ${{ steps.source-inputs.outputs.key }}
 
       - name: Upload shard test report
         if: always()
@@ -534,7 +613,7 @@ jobs:
         )
       }}
     needs: behavior-tests
-    runs-on: ubuntu-latest
+    runs-on: ${{ vars.CI_LINUX_RUNNER || 'ubuntu-24.04' }}
     steps:
       - name: Require successful behavioral shards
         if: needs.behavior-tests.result != 'success'
@@ -555,6 +634,12 @@ jobs:
         with:
           version: ${{ env.UV_VERSION }}
           enable-cache: true
+
+      - name: Restore test virtualenv
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        with:
+          path: .venv
+          key: venv-test-v1-${{ runner.os }}-${{ runner.arch }}-${{ env.PYTHON_VERSION }}-${{ hashFiles('uv.lock', 'pyproject.toml') }}
 
       - name: Sync coverage dependencies
         run: uv sync --locked --no-default-groups --group test

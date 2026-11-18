@@ -173,7 +173,17 @@ def test_retained_canonical_cost_evidence_reconciles_exact_report_and_attempts()
         capture_output=True,
     ).stdout
     assert environment["harness_sha256"] == hashlib.sha256(measured_harness).hexdigest()
-    assert environment["lock_sha256"] == costs.digest(root / "uv.lock")
+    # Authenticate the immutable measurement against its producer's lockfile.
+    # Current development-group metadata is not part of this historical campaign.
+    producer = "bc12417dddf4cd5cc0d0b17a2a78eaf950bd0e5a"
+    assert environment["source_commit"] == producer
+    measured_lock = subprocess.run(
+        ["git", "show", f"{producer}:uv.lock"],
+        cwd=root,
+        check=True,
+        capture_output=True,
+    ).stdout
+    assert environment["lock_sha256"] == hashlib.sha256(measured_lock).hexdigest()
     assert environment["cpu_affinity"]
     assert environment["cpuinfo"]
     assert environment["meminfo"]

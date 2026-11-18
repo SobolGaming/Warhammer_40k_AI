@@ -2,10 +2,15 @@ from __future__ import annotations
 
 import json
 from dataclasses import replace
+from pathlib import Path
 from typing import cast
 
 import pytest
 
+from tests.support.cross_worker_fixture_cache import (
+    load_or_build_json_fixture,
+    rehydrate_payload_receipt,
+)
 from warhammer40k_core.adapters.access_control import ViewerContext
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.adapters.replay import submit_replay_record
@@ -32,9 +37,33 @@ from warhammer40k_core.engine.replay import ReplayRunner
 
 
 @pytest.fixture(scope="module")
-def moved() -> tuple[LocalGameSession, NormalMoveScenarioAdmission]:
-    session = reproduce_normal_move_scenario()
-    return session, NormalMoveScenarioAdmission.from_session(session)
+def moved(
+    tmp_path_factory: pytest.TempPathFactory,
+    pytestconfig: pytest.Config,
+) -> tuple[LocalGameSession, NormalMoveScenarioAdmission]:
+    def _build() -> JsonValue:
+        session = reproduce_normal_move_scenario()
+        admission = NormalMoveScenarioAdmission.from_session(session)
+        return {
+            "session": session.to_persistence_payload(),
+            "admission": admission.to_payload(),
+        }
+
+    def _restore(raw: JsonValue) -> tuple[LocalGameSession, NormalMoveScenarioAdmission]:
+        data = cast(dict[str, JsonValue], raw)
+        return (
+            LocalGameSession.from_persistence_payload(data["session"]),
+            rehydrate_payload_receipt(NormalMoveScenarioAdmission, data["admission"]),
+        )
+
+    return load_or_build_json_fixture(
+        key="normal-move-scenario-v1",
+        source_files=(Path(__file__),),
+        tmp_path_factory=tmp_path_factory,
+        pytestconfig=pytestconfig,
+        build_payload=_build,
+        restore_value=_restore,
+    )
 
 
 def _prefix(session: LocalGameSession, count: int) -> LocalGameSession:

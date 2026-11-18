@@ -1,10 +1,11 @@
 """Synthetic profiles declared before ordinary Core setup, for physical rules controls."""
 
 from dataclasses import replace
+from functools import cache
 from typing import cast
 
 from tests.deployment_submission_helpers import deployment_placement_payload_for_request
-from tests.phase11c_command_phase_helpers import phase11c_config, unit_selection
+from tests.phase11c_command_phase_helpers import army_muster_request, mission_setup, unit_selection
 from tests.s25_declared_rule_helpers import (
     declared_activated_reroll_ability,
     declared_activated_variant_ability,
@@ -19,10 +20,13 @@ from tests.s25_permission_relevance_helpers import (
     declared_passive_invulnerable_provider_ability,
 )
 from tests.s25_shared_unit_permission_helpers import declared_shared_unit_permission_ability
+from tests.support.private_randomness import fixture_private_rng_seed
 from warhammer40k_core.adapters.local_session import LocalGameSession
+from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.dice import DiceExpression
 from warhammer40k_core.core.random_profile_values import RandomProfileValue
+from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.core.weapon_profiles import (
     AttackProfile,
     DamageProfile,
@@ -31,13 +35,62 @@ from warhammer40k_core.core.weapon_profiles import (
 )
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.event_log import JsonValue
-from warhammer40k_core.engine.list_validation import AttachmentDeclaration
+from warhammer40k_core.engine.game_state import GameConfig
+from warhammer40k_core.engine.list_validation import AttachmentDeclaration, UnitMusterSelection
+from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.mission_state_validation import (
     runtime_ruleset_descriptor_for_mission_setup,
 )
 from warhammer40k_core.engine.phase import LifecycleStatusKind
 from warhammer40k_core.engine.stratagems import stratagem_decline_payload
 from warhammer40k_core.geometry.pose import Pose
+
+
+@cache
+def _cached_s25_mission_and_catalog() -> tuple[ArmyCatalog, MissionSetup, RulesetDescriptor]:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    mission = replace(mission_setup(), terrain_features=())
+    descriptor = runtime_ruleset_descriptor_for_mission_setup(mission, rules_overlay_ids=())
+    return catalog, mission, descriptor
+
+
+def _s25_base_config(
+    *,
+    game_id: str,
+    player_a_units: tuple[UnitMusterSelection, ...],
+    player_b_units: tuple[UnitMusterSelection, ...],
+    player_a_attachment_declarations: tuple[AttachmentDeclaration, ...],
+    player_b_attachment_declarations: tuple[AttachmentDeclaration, ...],
+) -> tuple[GameConfig, MissionSetup, RulesetDescriptor]:
+    catalog, mission, descriptor = _cached_s25_mission_and_catalog()
+    config = GameConfig(
+        private_rng_seed=fixture_private_rng_seed(game_id),
+        game_id=game_id,
+        allow_legacy_non_strict_rosters=True,
+        ruleset_descriptor=descriptor,
+        army_catalog=catalog,
+        army_muster_requests=(
+            army_muster_request(
+                catalog=catalog,
+                player_id="player-a",
+                army_id="army-alpha",
+                unit_selections=player_a_units,
+                attachment_declarations=player_a_attachment_declarations,
+            ),
+            army_muster_request(
+                catalog=catalog,
+                player_id="player-b",
+                army_id="army-beta",
+                unit_selections=player_b_units,
+                attachment_declarations=player_b_attachment_declarations,
+            ),
+        ),
+        player_ids=("player-a", "player-b"),
+        turn_order=("player-a", "player-b"),
+        fixed_secondary_mission_ids=("assassination", "bring_it_down", "cleanse"),
+        mission_setup=mission,
+    )
+    return config, mission, descriptor
 
 
 def native_profile_request(*, player: str, mode: str) -> tuple[LocalGameSession, DecisionRequest]:
@@ -90,7 +143,7 @@ def native_profile_request(*, player: str, mode: str) -> tuple[LocalGameSession,
         if cover
         else units
     )
-    config = phase11c_config(
+    config, mission, descriptor = _s25_base_config(
         game_id=f"s25-native:{player}:{mode}",
         player_a_units=own_units if player == "player-a" else cover_targets,
         player_b_units=own_units if player == "player-b" else cover_targets,
@@ -101,7 +154,6 @@ def native_profile_request(*, player: str, mode: str) -> tuple[LocalGameSession,
         if attached and player == "player-b"
         else (),
     )
-    assert config.mission_setup is not None
     own_hit_ability = (
         declared_shared_damage_permission(
             chooser=True, qualified_roll=mode == "shared-unit-qualified-damage"
@@ -283,7 +335,6 @@ def native_profile_request(*, player: str, mode: str) -> tuple[LocalGameSession,
                 for item in catalog.datasheets
             ),
         )
-    mission = replace(config.mission_setup, terrain_features=())
     session = LocalGameSession()
     session.start(
         replace(
@@ -291,9 +342,7 @@ def native_profile_request(*, player: str, mode: str) -> tuple[LocalGameSession,
             army_catalog=catalog,
             mission_setup=mission,
             turn_order=(player, other),
-            ruleset_descriptor=runtime_ruleset_descriptor_for_mission_setup(
-                mission, rules_overlay_ids=()
-            ),
+            ruleset_descriptor=descriptor,
         )
     )
 

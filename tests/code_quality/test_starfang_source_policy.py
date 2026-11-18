@@ -81,12 +81,52 @@ def test_starfang_source_smoke_binding_and_predecessor_are_exact() -> None:
         ).splitlines()
         if path.endswith(".md") and not (ROOT / path).exists()
     }
+    # Owner-authorized retirement of the historical shard-calibration chain and
+    # its blob-pinning quality modules must not keep dead selectors live.
+    retired_shard_artifacts = {
+        path
+        for path in subprocess.check_output(
+            [
+                "git",
+                "diff",
+                "--name-only",
+                "--diff-filter=D",
+                BASE,
+                "HEAD",
+                "--",
+                "ci/test_shards/",
+                "tests/code_quality/",
+            ],
+            cwd=ROOT,
+            text=True,
+        ).splitlines()
+        if not (ROOT / path).exists()
+        and (
+            path.startswith("ci/test_shards/")
+            or (
+                path.startswith("tests/code_quality/")
+                and path.endswith(
+                    (
+                        "_shard_admission.py",
+                        "_shard_compatibility.py",
+                        "_shard_allocation.py",
+                    )
+                )
+            )
+        )
+    }
+    retired_paths = retired_docs | retired_shard_artifacts
     for name, operation in old_operations.items():
         expected_operation = object_value(operation).copy()
         expected_operation["paths"] = [
             path
             for path in cast(list[str], expected_operation["paths"])
-            if path not in retired_docs
+            if path not in retired_paths
+            and not (
+                path.startswith("ci/test_shards/")
+                and any(character in path for character in "*?[")
+                and not any(ROOT.glob(path))
+            )
         ]
         assert object_value(mapping["operations"])[name] == expected_operation
 

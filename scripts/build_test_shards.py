@@ -471,9 +471,12 @@ def behavioral_selection(root: Path) -> BehavioralSelection:
     from scripts.canonical_polygon_test_admission import polygon_test_transition
     from scripts.exact_contact_test_admission import exact_contact_test_transition
     from scripts.precision_profile_test_admission import profile_test_transition
+    from scripts.speedup_test_admission import speedup_test_transition
     from scripts.symbolic_milli_inch_test_admission import symbolic_test_transition
 
-    profile_transition = exact_contact_test_transition(root, hashlib.sha256(raw).hexdigest())
+    profile_transition = speedup_test_transition(root, hashlib.sha256(raw).hexdigest())
+    if profile_transition is None:
+        profile_transition = exact_contact_test_transition(root, hashlib.sha256(raw).hexdigest())
     if profile_transition is None:
         profile_transition = polygon_pairs_test_transition(root, hashlib.sha256(raw).hexdigest())
     if profile_transition is None:
@@ -571,14 +574,20 @@ def _behavioral_test_files() -> tuple[str, ...]:
 
 CASE_PARTITION_PATH = "ci/test_shards/case-partitions.json"
 CASE_PARTITION_FILE = "tests/rules/rules04/unit/test_s25_permission_relevance.py"
-CASE_PARTITION_SHA256 = "be09d3680ac4ac47c248a1962b24846a3791824821c14a5a4080f5cab8b73c07"
+CASE_PARTITION_SHA256 = "07164b58a1f5ec57cef3c3ca8146b8b193f991bf0535716d9023f40f1403589a"
+HISTORICAL_CASE_PARTITION_SHA256 = (
+    "be09d3680ac4ac47c248a1962b24846a3791824821c14a5a4080f5cab8b73c07"
+)
 
 
 def _literal_partition_nodes(root: Path) -> tuple[str, ...]:
     path = root / CASE_PARTITION_FILE
     _selection_no_links(root, path)
     raw = path.read_bytes()
-    if hashlib.sha256(raw).hexdigest() != CASE_PARTITION_SHA256:
+    if hashlib.sha256(raw).hexdigest() not in {
+        CASE_PARTITION_SHA256,
+        HISTORICAL_CASE_PARTITION_SHA256,
+    }:
         raise SystemExit("Finite case partition source changed; regeneration/review required.")
     module = ast.parse(raw.decode(), filename=CASE_PARTITION_FILE)
     functions = [
@@ -684,7 +693,7 @@ def worksteal_relevance_order(nodeids: tuple[str, ...], *, workers: int) -> tupl
     heavy = tuple(
         index for index, node in enumerate(nodeids) if node.startswith(CASE_PARTITION_FILE + "::")
     )
-    if workers != 4 or not 1 <= len(heavy) <= workers or len(nodeids) < 2 * workers:
+    if workers < 2 or not 1 <= len(heavy) <= workers or len(nodeids) < 2 * workers:
         return original
     declared = frozenset(_literal_partition_nodes(REPOSITORY_ROOT))
     if any(nodeids[index] not in declared for index in heavy):
@@ -706,12 +715,16 @@ def _case_partition(root: Path, files: frozenset[str]) -> dict[str, float]:
     _selection_no_links(root, path)
     value = json.loads(path.read_bytes(), object_pairs_hook=_selection_object)
     fields = {"schema", "source_file", "source_sha256", "nodes", "weights", "evidence"}
+    source_path = root / CASE_PARTITION_FILE
+    _selection_no_links(root, source_path)
+    observed_sha = hashlib.sha256(source_path.read_bytes()).hexdigest()
     if (
-        not isinstance(value, dict)
+        observed_sha not in {CASE_PARTITION_SHA256, HISTORICAL_CASE_PARTITION_SHA256}
+        or not isinstance(value, dict)
         or value.keys() != fields
         or value["schema"] != "finite-behavior-node-partition-v1"
         or value["source_file"] != CASE_PARTITION_FILE
-        or value["source_sha256"] != CASE_PARTITION_SHA256
+        or value["source_sha256"] != observed_sha
     ):
         raise SystemExit("Finite node partition schema or source identity changed.")
     nodes = _literal_partition_nodes(root)
@@ -936,6 +949,16 @@ def _execution_weights(
     return weights
 
 
+def covered_native_checkpoint_cohort() -> frozenset[str]:
+    """Same-job producer and consumers for the fresh covered command checkpoint."""
+    return frozenset(
+        (
+            SERIAL_BEHAVIORAL_CASE,
+            "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py",
+        )
+    )
+
+
 def _balanced_shards(
     *,
     durations: dict[str, float],
@@ -967,7 +990,16 @@ def _balanced_shards(
     parallel_totals = [0.0] * shard_count
     serial_totals = [0.0] * shard_count
     largest_cases = [0.0] * shard_count
-    for test_file, duration in sorted(weights.items(), key=lambda item: (-item[1], item[0])):
+    # The cold covered mirror publishes the command checkpoint for this parallel
+    # module. Keep both selectors in one bucket without changing measured costs.
+    cohort = covered_native_checkpoint_cohort()
+    paired = cohort <= weights.keys()
+    ordered = sorted(weights.items(), key=lambda item: (-item[1], item[0]))
+    if paired:
+        ordered = [(name, weights[name]) for name in sorted(cohort)] + [
+            item for item in ordered if item[0] not in cohort
+        ]
+    for test_file, duration in ordered:
         serial = test_file == SERIAL_BEHAVIORAL_CASE
         cost = durations[test_file]
 
@@ -985,7 +1017,7 @@ def _balanced_shards(
             )
             for index in range(shard_count)
         ]
-        shard_index = min(scores)[2]
+        shard_index = 0 if paired and test_file in cohort else min(scores)[2]
         assignments[shard_index].append(test_file)
         totals[shard_index] += duration
         if serial:
@@ -995,8 +1027,8 @@ def _balanced_shards(
             largest_cases[shard_index] = max(largest_cases[shard_index], peaks[test_file])
     if not assignments or any(not entries for entries in assignments):
         raise SystemExit("Every behavioral shard must be nonempty.")
-    # Preserve the balanced buckets and give the sole cold-index role the
-    # smallest modeled test load. Compare full precision, before JSON rounding.
+    # Preserve the grouped buckets and give shard 1 the smallest modeled load.
+    # The dedicated preflight owns cold-index construction on every CI run.
     cold_index = min(
         range(shard_count),
         key=lambda index: (

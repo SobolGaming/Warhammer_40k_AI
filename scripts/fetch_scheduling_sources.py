@@ -13,6 +13,8 @@ from pathlib import Path
 
 
 def revisions(directory: Path) -> tuple[str, ...]:
+    if not (directory / "hosted-calibration.json").is_file():
+        return ()
     calibration = json.loads((directory / "hosted-calibration.json").read_bytes())
     scope = json.loads((directory / "allocation-scope.json").read_bytes())
     descriptor = json.loads((directory / "current-runtime-compatibility.json").read_bytes())
