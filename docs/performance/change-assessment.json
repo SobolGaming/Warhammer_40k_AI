@@ -1652,7 +1652,7 @@
     },
     "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py": {
       "before_sha256": "26467cfb68d1e4464c5f926a1278bd67433f5ac99699ebdc9666deb7ab1255ed",
-      "after_sha256": "36728f2356ff4794228dc71020dab7350940e6d4a50389c322e89fff07589934",
+      "after_sha256": "cf6eb8388c42518372b0181d370856f0c9e1dc80498f974bded277bc46832997",
       "owners": {
         "@module": {
           "before": "a09180df5cf5874fcf670eb8597c0c0f526de105220d5a869886a9eff3e7e6f4",
@@ -1660,7 +1660,17 @@
         },
         "native_command_checkpoint": {
           "before": "8c36019c2907be3cf18a6bcfc64c79c9acac81141ae553fa69addc4ff3b8c1f9",
-          "after": "f79d0e55cdec51bf3bdc41f4747afcc68a50d5a5f3d1acf8332b1216ac695414"
+          "after": "474f582ece08e577ff77a1003e512b48a52804ff1f84992edfe5641aefe6ab3a"
+        }
+      }
+    },
+    "tests/factions/chaos_daemons/integration/test_cavalcade_v995_roster.py": {
+      "before_sha256": "80c4a0fa688274d2e1aa2df1eb617364cce620725cc6c49b8003cb936595f2e1",
+      "after_sha256": "eb93afa30913273437435fe96fb0488693e62bc9c9396494e748ab5bc4b948d3",
+      "owners": {
+        "test_exact_mirror_deploys_all_78_models_and_replays_to_battle": {
+          "before": "a9d3eb75d6ccaa5790b36410bfd379614600f9c8177865bba31b7b7ac1696bfb",
+          "after": "42341ffbe2f98e3524f9e4a1a387fa367f761429f6ecd673177c65d4a5c2fdbd"
         }
       }
     },
@@ -1794,6 +1804,16 @@
         }
       }
     },
+    "tests/rules/section07/coverage.json": {
+      "before_sha256": "cea06c79ed546cda088d51118fabdda6fdc97993d7a3b5c680ee92cacc1c36f4",
+      "after_sha256": "a5acb88319b1769e7e022477b8b4219436226b4ac0942c79f24308207561dd00",
+      "owners": {
+        "@document": {
+          "before": "cea06c79ed546cda088d51118fabdda6fdc97993d7a3b5c680ee92cacc1c36f4",
+          "after": "a5acb88319b1769e7e022477b8b4219436226b4ac0942c79f24308207561dd00"
+        }
+      }
+    },
     "tests/s25_native_profile_helpers.py": {
       "before_sha256": "67e97721a46d8ade727b3378137be47fe1bab30decbc16beb91037318a553e3a",
       "after_sha256": "ae4b8558adcb2249e38c8d1e9761913a327918139a5109458abc277f0be7c9a0",
@@ -1831,6 +1851,16 @@
         "terminal": {
           "before": "0769c86d8dbbcfedde5850f9e8145c74e66468d82f964185dd74005f48d0efc5",
           "after": "e39cfd466a5ecc9579ec19a34e6d473b71ca6f2d1f600db8b283be9d3cefb6f6"
+        }
+      }
+    },
+    "tests/support/cavalcade_native_approach.py": {
+      "before_sha256": "12f24c56788071fd34eb81c53f53206288a833621680c6c720f65f525b251648",
+      "after_sha256": "7b3797cda93a2867c214820ea4cc6be3b3ad9399a52f35318ffd09f2461c75f3",
+      "owners": {
+        "reproduce_native_common": {
+          "before": "99663fb07098267a076d237f7387680b6addd9437b1b0c6744faa208f2282e72",
+          "after": "a39e0d4024cc10cad393436b9b15f3e59db15e3f94dad31685d3b285d5daaef0"
         }
       }
     },
@@ -2831,6 +2861,16 @@
       "source_obligation": "Preserve deterministic sharding over durations.json, fail-closed quality evidence, and the shared DecisionRequest path while removing superseded calibration artifacts.",
       "unchanged_work": "No engine rules mutation, no PathWitness weakening, no coverage-floor change, and no replacement of gameplay validators. Mirror 120s, smoke 180s, quality 600s, twelve shards, and the 67 percent branch floor remain mandatory."
     },
+    "tests/factions/chaos_daemons/integration/test_cavalcade_v995_roster.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "cavalcade-v995-roster-admission"
+      ],
+      "selected_families": [],
+      "rationale": "Accelerate local and hosted behavioral/quality execution by retiring the historical shard-calibration evidence chain, adding ci-preflight caches, single-pass quality execution, cross-worker fixture checkpoints, and duration-aware worksteal dispatch. No gameplay mutation, geometry algorithm, or authoritative decision path changes.",
+      "source_obligation": "Preserve deterministic sharding over durations.json, fail-closed quality evidence, and the shared DecisionRequest path while removing superseded calibration artifacts.",
+      "unchanged_work": "No engine rules mutation, no PathWitness weakening, no coverage-floor change, and no replacement of gameplay validators. Mirror 120s, smoke 180s, quality 600s, twelve shards, and the 67 percent branch floor remain mandatory."
+    },
     "tests/infrastructure/adapters/test_canonical_coverage_preflight.py": {
       "category": "rule_semantics",
       "operations": [
@@ -2923,6 +2963,16 @@
       "source_obligation": "Preserve deterministic sharding over durations.json, fail-closed quality evidence, and the shared DecisionRequest path while removing superseded calibration artifacts.",
       "unchanged_work": "No engine rules mutation, no PathWitness weakening, no coverage-floor change, and no replacement of gameplay validators. Mirror 120s, smoke 180s, quality 600s, twelve shards, and the 67 percent branch floor remain mandatory."
     },
+    "tests/rules/section07/coverage.json": {
+      "category": "measured_workload",
+      "operations": [
+        "qualification40-exact-b6886d3bc2fb1ca4"
+      ],
+      "selected_families": [],
+      "rationale": "Accelerate local and hosted behavioral/quality execution by retiring the historical shard-calibration evidence chain, adding ci-preflight caches, single-pass quality execution, cross-worker fixture checkpoints, and duration-aware worksteal dispatch. No gameplay mutation, geometry algorithm, or authoritative decision path changes.",
+      "source_obligation": "Preserve deterministic sharding over durations.json, fail-closed quality evidence, and the shared DecisionRequest path while removing superseded calibration artifacts.",
+      "unchanged_work": "No engine rules mutation, no PathWitness weakening, no coverage-floor change, and no replacement of gameplay validators. Mirror 120s, smoke 180s, quality 600s, twelve shards, and the 67 percent branch floor remain mandatory."
+    },
     "tests/s25_native_profile_helpers.py": {
       "category": "measured_workload",
       "operations": [
@@ -2937,6 +2987,16 @@
       "category": "measured_workload",
       "operations": [
         "deployment-candidate-row-linkage"
+      ],
+      "selected_families": [],
+      "rationale": "Accelerate local and hosted behavioral/quality execution by retiring the historical shard-calibration evidence chain, adding ci-preflight caches, single-pass quality execution, cross-worker fixture checkpoints, and duration-aware worksteal dispatch. No gameplay mutation, geometry algorithm, or authoritative decision path changes.",
+      "source_obligation": "Preserve deterministic sharding over durations.json, fail-closed quality evidence, and the shared DecisionRequest path while removing superseded calibration artifacts.",
+      "unchanged_work": "No engine rules mutation, no PathWitness weakening, no coverage-floor change, and no replacement of gameplay validators. Mirror 120s, smoke 180s, quality 600s, twelve shards, and the 67 percent branch floor remain mandatory."
+    },
+    "tests/support/cavalcade_native_approach.py": {
+      "category": "measured_workload",
+      "operations": [
+        "native-v995-approach-operator"
       ],
       "selected_families": [],
       "rationale": "Accelerate local and hosted behavioral/quality execution by retiring the historical shard-calibration evidence chain, adding ci-preflight caches, single-pass quality execution, cross-worker fixture checkpoints, and duration-aware worksteal dispatch. No gameplay mutation, geometry algorithm, or authoritative decision path changes.",
