@@ -226,7 +226,7 @@ def reproduce_native_common(output: Path) -> LocalGameSession:
     setup = BoundedPolicyRunner(
         session=session,
         router=mirror_router(deployment_fixture()),
-        limits=RunLimits(policy_seed=19, max_decisions=42, max_seconds=180),
+        limits=RunLimits(policy_seed=19, max_decisions=42, max_seconds=120),
     ).run(stop_at=RunBoundary("battle", "command"))
     assert len(setup.decisions) == 42
     assert all(decision.accepted for decision in setup.decisions)

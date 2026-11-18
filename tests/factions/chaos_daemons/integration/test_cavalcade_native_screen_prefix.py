@@ -45,7 +45,7 @@ def native_command_checkpoint(
         report = BoundedPolicyRunner(
             session=session,
             router=mirror_router(deployment_fixture()),
-            limits=RunLimits(policy_seed=19, max_decisions=42, max_seconds=180),
+            limits=RunLimits(policy_seed=19, max_decisions=42, max_seconds=120),
         ).run(stop_at=RunBoundary("battle", "command"))
         assert len(report.decisions) == 42
         assert all(d.accepted for d in report.decisions)

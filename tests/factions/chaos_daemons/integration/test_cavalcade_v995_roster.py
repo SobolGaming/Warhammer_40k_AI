@@ -887,7 +887,7 @@ def test_exact_mirror_deploys_all_78_models_and_replays_to_battle() -> None:
     report = BoundedPolicyRunner(
         session=session,
         router=router,
-        limits=RunLimits(policy_seed=19, max_decisions=42, max_seconds=180),
+        limits=RunLimits(policy_seed=19, max_decisions=42, max_seconds=120),
     ).run(stop_at=RunBoundary("battle", "command"))
     assert report.stop_reason == "requested_boundary"
     assert len(report.decisions) == 42

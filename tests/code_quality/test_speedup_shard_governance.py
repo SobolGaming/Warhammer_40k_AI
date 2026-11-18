@@ -2,14 +2,17 @@
 
 from __future__ import annotations
 
+import hashlib
 import subprocess
 import sys
+import tomllib
 from pathlib import Path
 
 import pytest
 import scripts.build_test_shards as sharding
 
 from tests.support.cross_worker_fixture_cache import (
+    _cache_directory,  # pyright: ignore[reportPrivateUsage]
     load_or_build_json_fixture,
     rehydrate_payload_receipt,
 )
@@ -55,6 +58,18 @@ def test_ci_workflow_has_preflight_caches_and_adaptive_runner_label() -> None:
     assert "venv-test-v1-" in workflow
     assert 'WH40K_SOURCE_HISTORY_PREVALIDATED: "1"' in workflow
     assert "fetch_scheduling_sources.py" not in workflow
+    groups = tomllib.loads((ROOT / "pyproject.toml").read_text())["dependency-groups"]
+    for group in ("test", "typecheck"):
+        assert any(dep.startswith("filelock>=") for dep in groups[group])
+        assert any(dep.startswith("coverage[toml]>=") for dep in groups[group])
+    for name in (
+        "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py",
+        "tests/factions/chaos_daemons/integration/test_cavalcade_v995_roster.py",
+        "tests/support/cavalcade_native_approach.py",
+    ):
+        source = (ROOT / name).read_text()
+        assert "max_decisions=42, max_seconds=120" in source
+        assert "max_decisions=42, max_seconds=180" not in source
 
 
 def test_multi_worker_worksteal_relevance_spreads_heavy_s25_cases() -> None:
@@ -84,10 +99,21 @@ def test_cross_worker_fixture_cache_builds_once_and_rejects_corruption(
     pytestconfig: pytest.Config,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    monkeypatch.setenv("PYTEST_XDIST_TESTRUNUID", "speedup-unit-uid")
+    run_uid = hashlib.sha256(str(tmp_path).encode()).hexdigest()
+    monkeypatch.setenv("PYTEST_XDIST_TESTRUNUID", run_uid)
     monkeypatch.setenv("PYTEST_XDIST_WORKER", "gw0")
     source_probe = tmp_path / "fixture_owner.py"
     source_probe.write_text("VERSION = 1\n", encoding="utf-8")
+    # Separate ordinary pytest invocations cannot reuse stale helper/data inputs.
+    monkeypatch.delenv("PYTEST_XDIST_TESTRUNUID", raising=False)
+    monkeypatch.delenv("PYTEST_XDIST_WORKER", raising=False)
+    first_run = _cache_directory(basetemp=tmp_path / "run1", build_id="same-engine")
+    second_run = _cache_directory(basetemp=tmp_path / "run2", build_id="same-engine")
+    assert first_run is not None
+    assert second_run is not None
+    assert first_run != second_run
+    monkeypatch.setenv("PYTEST_XDIST_TESTRUNUID", run_uid)
+    monkeypatch.setenv("PYTEST_XDIST_WORKER", "gw0")
     builds = 0
 
     def _build() -> JsonValue:
@@ -130,7 +156,7 @@ def test_cross_worker_fixture_cache_builds_once_and_rejects_corruption(
     receipt = rehydrate_payload_receipt(CanonicalDeploymentAdmission, {"ok": True})
     assert receipt.to_payload() == {"ok": True}
 
-    cache_dir = tmp_path_factory.getbasetemp().parent / "xdist-fixture-cache-speedup-unit-uid"
+    cache_dir = tmp_path_factory.getbasetemp().parent / f"xdist-fixture-cache-{run_uid}"
     entries = list(cache_dir.glob("*.json"))
     assert len(entries) == 2
     # Corrupt the active VERSION=2 digest entry in place so the next lookup hits

@@ -26,11 +26,11 @@
     },
     "README.md": {
       "before_sha256": "680bc413522e41731e495b0a8bdb689d993607241bf73be05db26ab7d16a0b24",
-      "after_sha256": "ee6588b5d4b63ac85b183d2e23e118421c2caebdeacc50c3f9389d1a826077d4",
+      "after_sha256": "5aafaf8b5076229b1918e91d88ecbc565df2e00be70b40b322cf1ac7c1091bc2",
       "owners": {
         "@document": {
           "before": "680bc413522e41731e495b0a8bdb689d993607241bf73be05db26ab7d16a0b24",
-          "after": "ee6588b5d4b63ac85b183d2e23e118421c2caebdeacc50c3f9389d1a826077d4"
+          "after": "5aafaf8b5076229b1918e91d88ecbc565df2e00be70b40b322cf1ac7c1091bc2"
         }
       }
     },
@@ -696,11 +696,11 @@
     },
     "data/source_audits/ci64_provenance_v1/speedup-test-transition-v1.json": {
       "before_sha256": null,
-      "after_sha256": "b4baf8e87128f1a19bf2b499c23d3ef5027c1abe6a5e4686015277498eb68dad",
+      "after_sha256": "d48c33bc4cdb7db1b6bdef1a1914c51eb4ff63af7d2fd778c04091e60a63bf44",
       "owners": {
         "@document": {
           "before": null,
-          "after": "b4baf8e87128f1a19bf2b499c23d3ef5027c1abe6a5e4686015277498eb68dad"
+          "after": "d48c33bc4cdb7db1b6bdef1a1914c51eb4ff63af7d2fd778c04091e60a63bf44"
         }
       }
     },
@@ -711,6 +711,16 @@
         "@document": {
           "before": "93112d2a4fe59bade0e9a605a79c43365a8d5a1d4107cd2841e6cfd45e456ce7",
           "after": "a11d2caa218d7810620179ba3f68758cbecdab27eb8a89bc5ff05b8f1b99f91e"
+        }
+      }
+    },
+    "pyproject.toml": {
+      "before_sha256": "9105612cdd8e91d028b9818440df96fab254bf707609e0e71317a6ae19db87c8",
+      "after_sha256": "870d9e83747f1e4cd8e3092103c71faf319caa5ca10c11bcb1f4e5b03e51da71",
+      "owners": {
+        "@document": {
+          "before": "9105612cdd8e91d028b9818440df96fab254bf707609e0e71317a6ae19db87c8",
+          "after": "870d9e83747f1e4cd8e3092103c71faf319caa5ca10c11bcb1f4e5b03e51da71"
         }
       }
     },
@@ -826,11 +836,11 @@
     },
     "scripts/speedup_test_admission.py": {
       "before_sha256": null,
-      "after_sha256": "68fa1448fd9a3edfb88a895b2b6c91517ab9cd568f996d8047a24fb0f9b96e48",
+      "after_sha256": "96236da9cc1e3856ee81df56ab20edf1d0001b0ae44daca07fb2564fa755741c",
       "owners": {
         "@module": {
           "before": null,
-          "after": "1cdc183ca39d980caec3a0958846b290e89992fb2fcbb92d724db43d4da62c73"
+          "after": "302499afec2a4210415c8db43082ad1a44930b2782beacbb8c8629117ae993a5"
         },
         "speedup_test_transition": {
           "before": null,
@@ -1536,19 +1546,19 @@
     },
     "tests/code_quality/test_speedup_shard_governance.py": {
       "before_sha256": null,
-      "after_sha256": "60474188744a053b70b1f9abc5b1fb4ea8eddaa5aa88d1f1f29bcee3c242174f",
+      "after_sha256": "c93fc5ac4f50311c3698586fe58109b0185eed595273208ce80d6d9468887d8a",
       "owners": {
         "@module": {
           "before": null,
-          "after": "004ee7ebbb27e75fb9ebc04806756b669639a67b618061c5354b5567663d7be7"
+          "after": "5447000e3cab479dbc0c0d4a210cf5a19433ad0339e88c39aae96d4739a20ab9"
         },
         "test_ci_workflow_has_preflight_caches_and_adaptive_runner_label": {
           "before": null,
-          "after": "dc66964aea14bb630db3a66dffe7a5c7955fb04a36ef416ed4121d853223007a"
+          "after": "e3b3ae0d1ace3ff7584e405257f204ecd367aa296f80c0583c0e3edafeb5be61"
         },
         "test_cross_worker_fixture_cache_builds_once_and_rejects_corruption": {
           "before": null,
-          "after": "50fbf7abc4f1015138ca454410fa2093866c333aaf3ad2799aa2698537000a05"
+          "after": "db70ebfb3480f0ebbec715c26c2fd9c30aeb531edf17fafef06001b9102f6998"
         },
         "test_multi_worker_worksteal_relevance_spreads_heavy_s25_cases": {
           "before": null,
@@ -1652,7 +1662,7 @@
     },
     "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py": {
       "before_sha256": "26467cfb68d1e4464c5f926a1278bd67433f5ac99699ebdc9666deb7ab1255ed",
-      "after_sha256": "cf6eb8388c42518372b0181d370856f0c9e1dc80498f974bded277bc46832997",
+      "after_sha256": "36728f2356ff4794228dc71020dab7350940e6d4a50389c322e89fff07589934",
       "owners": {
         "@module": {
           "before": "a09180df5cf5874fcf670eb8597c0c0f526de105220d5a869886a9eff3e7e6f4",
@@ -1660,17 +1670,7 @@
         },
         "native_command_checkpoint": {
           "before": "8c36019c2907be3cf18a6bcfc64c79c9acac81141ae553fa69addc4ff3b8c1f9",
-          "after": "474f582ece08e577ff77a1003e512b48a52804ff1f84992edfe5641aefe6ab3a"
-        }
-      }
-    },
-    "tests/factions/chaos_daemons/integration/test_cavalcade_v995_roster.py": {
-      "before_sha256": "80c4a0fa688274d2e1aa2df1eb617364cce620725cc6c49b8003cb936595f2e1",
-      "after_sha256": "eb93afa30913273437435fe96fb0488693e62bc9c9396494e748ab5bc4b948d3",
-      "owners": {
-        "test_exact_mirror_deploys_all_78_models_and_replays_to_battle": {
-          "before": "a9d3eb75d6ccaa5790b36410bfd379614600f9c8177865bba31b7b7ac1696bfb",
-          "after": "42341ffbe2f98e3524f9e4a1a387fa367f761429f6ecd673177c65d4a5c2fdbd"
+          "after": "f79d0e55cdec51bf3bdc41f4747afcc68a50d5a5f3d1acf8332b1216ac695414"
         }
       }
     },
@@ -1806,11 +1806,11 @@
     },
     "tests/rules/section07/coverage.json": {
       "before_sha256": "cea06c79ed546cda088d51118fabdda6fdc97993d7a3b5c680ee92cacc1c36f4",
-      "after_sha256": "a5661fa412a15b1decc15c827476ce621a58e028e63e030d02e7a586be7fce87",
+      "after_sha256": "4c85f1379f9d377b508d7da6a5c540731b49315302006635f390a13dba43d054",
       "owners": {
         "@document": {
           "before": "cea06c79ed546cda088d51118fabdda6fdc97993d7a3b5c680ee92cacc1c36f4",
-          "after": "a5661fa412a15b1decc15c827476ce621a58e028e63e030d02e7a586be7fce87"
+          "after": "4c85f1379f9d377b508d7da6a5c540731b49315302006635f390a13dba43d054"
         }
       }
     },
@@ -1854,27 +1854,17 @@
         }
       }
     },
-    "tests/support/cavalcade_native_approach.py": {
-      "before_sha256": "12f24c56788071fd34eb81c53f53206288a833621680c6c720f65f525b251648",
-      "after_sha256": "7b3797cda93a2867c214820ea4cc6be3b3ad9399a52f35318ffd09f2461c75f3",
-      "owners": {
-        "reproduce_native_common": {
-          "before": "99663fb07098267a076d237f7387680b6addd9437b1b0c6744faa208f2282e72",
-          "after": "a39e0d4024cc10cad393436b9b15f3e59db15e3f94dad31685d3b285d5daaef0"
-        }
-      }
-    },
     "tests/support/cross_worker_fixture_cache.py": {
       "before_sha256": null,
-      "after_sha256": "81c9263a843be7c9da23090b7a62dfa96e2e249fd8391ce13c2de216da7eb551",
+      "after_sha256": "f054d44c480022fa698e3dcbaceb37b79afc052849984766cf1a66dbc2712b39",
       "owners": {
         "@module": {
           "before": null,
-          "after": "8fc7455b675017a153f65fef454a0975aaaca863d22ca213d1cd05a4d1f1a69a"
+          "after": "5d20946d46b83e1b406463a64b775d29480eec27761e63cc489d3fb9780349ba"
         },
         "_cache_directory": {
           "before": null,
-          "after": "d190b8df6890aa8864ffe9f0588d384adc956534b47c4cf9d0d5688c74918b6f"
+          "after": "43314d357d3f2691e0f6071919373fa9860e257a779ce4bacd81968137138ffc"
         },
         "_coverage_active": {
           "before": null,
@@ -1882,7 +1872,7 @@
         },
         "load_or_build_json_fixture": {
           "before": null,
-          "after": "4fcc592b994ed516576118e6fe696c1fcca4e5971f1cd138c8d1dd1243c83887"
+          "after": "68c72d8493e23b0062ccc48ea192375c4ee6fbd4646e621b20bcc5e0b9ac9cd6"
         },
         "load_or_measure_canonical_coverage": {
           "before": null,
@@ -1891,6 +1881,16 @@
         "rehydrate_payload_receipt": {
           "before": null,
           "after": "1d7f77e7d7cdb60eb33d83ecc4d3984d962c0a19b9fead163f479298b2351be1"
+        }
+      }
+    },
+    "uv.lock": {
+      "before_sha256": "57ae3e52c3fb40898614ec3375a4aeff907e2ea1c96263401104152246b22d75",
+      "after_sha256": "659a2d81e02176d23168861529651506ac87a4eab1982109f144cd62a63fce71",
+      "owners": {
+        "@document": {
+          "before": "57ae3e52c3fb40898614ec3375a4aeff907e2ea1c96263401104152246b22d75",
+          "after": "659a2d81e02176d23168861529651506ac87a4eab1982109f144cd62a63fce71"
         }
       }
     }
@@ -2861,16 +2861,6 @@
       "source_obligation": "Preserve deterministic sharding over durations.json, fail-closed quality evidence, and the shared DecisionRequest path while removing superseded calibration artifacts.",
       "unchanged_work": "No engine rules mutation, no PathWitness weakening, no coverage-floor change, and no replacement of gameplay validators. Mirror 120s, smoke 180s, quality 600s, twelve shards, and the 67 percent branch floor remain mandatory."
     },
-    "tests/factions/chaos_daemons/integration/test_cavalcade_v995_roster.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "cavalcade-v995-roster-admission"
-      ],
-      "selected_families": [],
-      "rationale": "Accelerate local and hosted behavioral/quality execution by retiring the historical shard-calibration evidence chain, adding ci-preflight caches, single-pass quality execution, cross-worker fixture checkpoints, and duration-aware worksteal dispatch. No gameplay mutation, geometry algorithm, or authoritative decision path changes.",
-      "source_obligation": "Preserve deterministic sharding over durations.json, fail-closed quality evidence, and the shared DecisionRequest path while removing superseded calibration artifacts.",
-      "unchanged_work": "No engine rules mutation, no PathWitness weakening, no coverage-floor change, and no replacement of gameplay validators. Mirror 120s, smoke 180s, quality 600s, twelve shards, and the 67 percent branch floor remain mandatory."
-    },
     "tests/infrastructure/adapters/test_canonical_coverage_preflight.py": {
       "category": "rule_semantics",
       "operations": [
@@ -2993,16 +2983,6 @@
       "source_obligation": "Preserve deterministic sharding over durations.json, fail-closed quality evidence, and the shared DecisionRequest path while removing superseded calibration artifacts.",
       "unchanged_work": "No engine rules mutation, no PathWitness weakening, no coverage-floor change, and no replacement of gameplay validators. Mirror 120s, smoke 180s, quality 600s, twelve shards, and the 67 percent branch floor remain mandatory."
     },
-    "tests/support/cavalcade_native_approach.py": {
-      "category": "measured_workload",
-      "operations": [
-        "native-v995-approach-operator"
-      ],
-      "selected_families": [],
-      "rationale": "Accelerate local and hosted behavioral/quality execution by retiring the historical shard-calibration evidence chain, adding ci-preflight caches, single-pass quality execution, cross-worker fixture checkpoints, and duration-aware worksteal dispatch. No gameplay mutation, geometry algorithm, or authoritative decision path changes.",
-      "source_obligation": "Preserve deterministic sharding over durations.json, fail-closed quality evidence, and the shared DecisionRequest path while removing superseded calibration artifacts.",
-      "unchanged_work": "No engine rules mutation, no PathWitness weakening, no coverage-floor change, and no replacement of gameplay validators. Mirror 120s, smoke 180s, quality 600s, twelve shards, and the 67 percent branch floor remain mandatory."
-    },
     "tests/support/cross_worker_fixture_cache.py": {
       "category": "measured_workload",
       "operations": [
@@ -3012,6 +2992,26 @@
       "rationale": "Accelerate local and hosted behavioral/quality execution by retiring the historical shard-calibration evidence chain, adding ci-preflight caches, single-pass quality execution, cross-worker fixture checkpoints, and duration-aware worksteal dispatch. No gameplay mutation, geometry algorithm, or authoritative decision path changes.",
       "source_obligation": "Preserve deterministic sharding over durations.json, fail-closed quality evidence, and the shared DecisionRequest path while removing superseded calibration artifacts.",
       "unchanged_work": "No engine rules mutation, no PathWitness weakening, no coverage-floor change, and no replacement of gameplay validators. Mirror 120s, smoke 180s, quality 600s, twelve shards, and the 67 percent branch floor remain mandatory."
+    },
+    "uv.lock": {
+      "category": "dependency_environment",
+      "operations": [
+        "development-dependency"
+      ],
+      "selected_families": [],
+      "rationale": "Declare the fixture checkpoint lock and coverage imports directly in their test/typecheck dependency groups. Production requirements and every resolved package version remain unchanged.",
+      "source_obligation": "Clean locked test and typecheck environments must import their required fixture and tracing dependencies.",
+      "unchanged_work": "No gameplay runtime dependency changes; preserve full covered behavioral inventory, mirror120, smoke180, quality600 and 67 percent full-package branch coverage."
+    },
+    "pyproject.toml": {
+      "category": "dependency_environment",
+      "operations": [
+        "development-dependency"
+      ],
+      "selected_families": [],
+      "rationale": "Declare the fixture checkpoint lock and coverage imports directly in their test/typecheck dependency groups. Production requirements and every resolved package version remain unchanged.",
+      "source_obligation": "Clean locked test and typecheck environments must import their required fixture and tracing dependencies.",
+      "unchanged_work": "No gameplay runtime dependency changes; preserve full covered behavioral inventory, mirror120, smoke180, quality600 and 67 percent full-package branch coverage."
     }
   },
   "milestone": "ordinary",

@@ -10,10 +10,10 @@ This helper coordinates construction through a `filelock.FileLock`:
   inside the shared per-testrun temporary root (`basetemp.parent`), so the first
   worker in the current pytest invocation executes the full builder under active
   coverage tracing and sibling workers deserialize the verified JSON payload.
-- When running standalone without coverage (`--no-cov`), entries live under
-  `<cache_dir>/fixture-checkpoints-v1/<engine_build_id>/` keyed by the caller
-  source digest so repeated local developer runs reuse verified checkpoints
-  automatically and invalidate immediately on any engine or fixture edit.
+- Standalone non-coverage runs reuse checkpoints only within their current
+  pytest invocation's temporary root. A later invocation always rebuilds fixture
+  inputs, including imported helper code, source data and numerical dependencies.
+- Standalone covered runs build directly under active tracing.
 """
 
 from __future__ import annotations
@@ -51,7 +51,6 @@ def _coverage_active() -> bool:
 def _cache_directory(
     *,
     basetemp: Path,
-    cache_root: Path,
     build_id: str,
 ) -> Path | None:
     testrun_uid = os.environ.get("PYTEST_XDIST_TESTRUNUID")
@@ -61,7 +60,7 @@ def _cache_directory(
     if _coverage_active():
         return None
     build_digest = hashlib.sha256(build_id.encode("utf-8")).hexdigest()[:24]
-    return cache_root / "fixture-checkpoints-v1" / build_digest
+    return basetemp / "fixture-checkpoints-v1" / build_digest
 
 
 def rehydrate_payload_receipt[R](cls: type[R], payload: JsonValue) -> R:
@@ -83,10 +82,8 @@ def load_or_build_json_fixture[T](
 ) -> T:
     """Build a JSON-serializable fixture once per scope and restore it cleanly."""
     build_id = verified_engine_build_identity().build_id
-    cache_dir_opt = pytestconfig.cache._cachedir  # pyright: ignore[reportPrivateUsage]
     directory = _cache_directory(
         basetemp=tmp_path_factory.getbasetemp(),
-        cache_root=Path(cache_dir_opt),
         build_id=build_id,
     )
     if directory is None:

@@ -1,5 +1,5 @@
 version = 1
-revision = 5
+revision = 3
 requires-python = "==3.14.*"
 
 [[package]]
@@ -926,6 +926,7 @@ dependencies = [
 [package.dev-dependencies]
 benchmark = [
     { name = "coverage" },
+    { name = "filelock" },
     { name = "hypothesis" },
     { name = "jsonschema" },
     { name = "pytest" },
@@ -936,6 +937,7 @@ benchmark = [
 dev = [
     { name = "coverage" },
     { name = "deptry" },
+    { name = "filelock" },
     { name = "hypothesis" },
     { name = "import-linter" },
     { name = "jsonschema" },
@@ -959,6 +961,7 @@ precommit = [
 ]
 test = [
     { name = "coverage" },
+    { name = "filelock" },
     { name = "hypothesis" },
     { name = "jsonschema" },
     { name = "pytest" },
@@ -967,6 +970,8 @@ test = [
     { name = "pytest-xdist" },
 ]
 typecheck = [
+    { name = "coverage" },
+    { name = "filelock" },
     { name = "hypothesis" },
     { name = "jsonschema" },
     { name = "mypy" },
@@ -990,6 +995,7 @@ requires-dist = [
 [package.metadata.requires-dev]
 benchmark = [
     { name = "coverage", extras = ["toml"], specifier = ">=7.9" },
+    { name = "filelock", specifier = ">=4.2.1" },
     { name = "hypothesis", specifier = ">=6.135" },
     { name = "jsonschema", specifier = ">=4.23" },
     { name = "pytest", specifier = ">=8.4" },
@@ -1000,6 +1006,7 @@ benchmark = [
 dev = [
     { name = "coverage", extras = ["toml"], specifier = ">=7.9" },
     { name = "deptry", specifier = ">=0.23" },
+    { name = "filelock", specifier = ">=4.2.1" },
     { name = "hypothesis", specifier = ">=6.135" },
     { name = "import-linter", specifier = ">=2.3" },
     { name = "jsonschema", specifier = ">=4.23" },
@@ -1021,6 +1028,7 @@ lint = [
 precommit = [{ name = "pre-commit", specifier = ">=4.2" }]
 test = [
     { name = "coverage", extras = ["toml"], specifier = ">=7.9" },
+    { name = "filelock", specifier = ">=4.2.1" },
     { name = "hypothesis", specifier = ">=6.135" },
     { name = "jsonschema", specifier = ">=4.23" },
     { name = "pytest", specifier = ">=8.4" },
@@ -1029,6 +1037,8 @@ test = [
     { name = "pytest-xdist", specifier = ">=3.7" },
 ]
 typecheck = [
+    { name = "coverage", extras = ["toml"], specifier = ">=7.9" },
+    { name = "filelock", specifier = ">=4.2.1" },
     { name = "hypothesis", specifier = ">=6.135" },
     { name = "jsonschema", specifier = ">=4.23" },
     { name = "mypy", specifier = ">=1.16" },
