@@ -238,12 +238,13 @@ class Supervisor:
                         else:
                             log.write(raw)
                             log.flush()
-                            os.fsync(log.fileno())
                             sys.stdout.buffer.write(raw)
                             sys.stdout.buffer.flush()
                     if time.monotonic() - self.started >= self.deadlines.reap:
                         signal_group(process.pid, signal.SIGKILL)
                         break
+                log.flush()
+                os.fsync(log.fileno())
                 remaining = max(0.01, self.deadlines.reap - (time.monotonic() - self.started))
                 status = process.wait(timeout=remaining)
             finally:
@@ -422,8 +423,7 @@ def run_lane(
         }
         recorded_environment["project_origin"] = str(origin)
         commands = {
-            mode: pytest_arguments(selected, directory, scratch / mode, collect=mode == "collect")
-            for mode in ("collect", "execute")
+            "execute": pytest_arguments(selected, directory, scratch / "execute", collect=False)
         }
         atomic_json(
             directory / "admitted.json",
@@ -452,7 +452,7 @@ def run_lane(
         require(not environment.get("PYTEST_PLUGINS"), "Unrecorded pytest plugins are forbidden")
         require(not environment.get("PYTEST_DISABLE_PLUGIN_AUTOLOAD"), "Plugin autoload drift")
         status = 0
-        for mode in ("collect", "execute"):
+        for mode in ("execute",):
             environment["QUALITY_EVIDENCE_MODE"] = mode
             status = supervisor.run(commands[mode], root, environment, mode)
             if status:

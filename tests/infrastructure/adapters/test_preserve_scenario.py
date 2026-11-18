@@ -2,10 +2,15 @@ from __future__ import annotations
 
 import json
 from dataclasses import replace
+from pathlib import Path
 from typing import cast
 
 import pytest
 
+from tests.support.cross_worker_fixture_cache import (
+    load_or_build_json_fixture,
+    rehydrate_payload_receipt,
+)
 from warhammer40k_core.adapters.access_control import ViewerContext
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.ai.canonical_deployment import (
@@ -30,14 +35,48 @@ from warhammer40k_core.engine.replay import ReplayRunner
 
 
 @pytest.fixture(scope="module")
-def canonical() -> LocalGameSession:
-    return reproduce_canonical_deployment()[0]
+def canonical(
+    tmp_path_factory: pytest.TempPathFactory,
+    pytestconfig: pytest.Config,
+) -> LocalGameSession:
+    return load_or_build_json_fixture(
+        key="canonical-deployment-session-v1",
+        source_files=(Path(__file__),),
+        tmp_path_factory=tmp_path_factory,
+        pytestconfig=pytestconfig,
+        build_payload=lambda: reproduce_canonical_deployment()[0].to_persistence_payload(),
+        restore_value=LocalGameSession.from_persistence_payload,
+    )
 
 
 @pytest.fixture(scope="module")
-def preserve() -> tuple[LocalGameSession, PreserveScenarioAdmission]:
-    session = reproduce_preserve_scenario()
-    return session, PreserveScenarioAdmission.from_session(session)
+def preserve(
+    tmp_path_factory: pytest.TempPathFactory,
+    pytestconfig: pytest.Config,
+) -> tuple[LocalGameSession, PreserveScenarioAdmission]:
+    def _build() -> JsonValue:
+        session = reproduce_preserve_scenario()
+        admission = PreserveScenarioAdmission.from_session(session)
+        return {
+            "session": session.to_persistence_payload(),
+            "admission": admission.to_payload(),
+        }
+
+    def _restore(raw: JsonValue) -> tuple[LocalGameSession, PreserveScenarioAdmission]:
+        data = cast(dict[str, JsonValue], raw)
+        return (
+            LocalGameSession.from_persistence_payload(data["session"]),
+            rehydrate_payload_receipt(PreserveScenarioAdmission, data["admission"]),
+        )
+
+    return load_or_build_json_fixture(
+        key="preserve-scenario-v1",
+        source_files=(Path(__file__),),
+        tmp_path_factory=tmp_path_factory,
+        pytestconfig=pytestconfig,
+        build_payload=_build,
+        restore_value=_restore,
+    )
 
 
 def test_preserve_prefix_has_exact_routes_candidates_and_scoped_tactical_gaps(

@@ -1,7 +1,8 @@
 """One cold complete local profile, supervised at the unchanged 1620/1800 limits.
 
-This measures all selected behavior once with coverage: one ordered mirror/native
-worker, then 32 work-stealing workers. It does not search or change allocations.
+This measures all selected behavior once with coverage: one cold mirror producer,
+then 32 work-stealing workers sharing its source-bound command checkpoint.
+It does not search or change allocations.
 """
 
 from __future__ import annotations
@@ -13,6 +14,7 @@ import os
 import subprocess
 import sys
 import time
+import uuid
 from pathlib import Path
 
 from scripts.behavioral_deadline import supervise
@@ -90,7 +92,6 @@ def run_worker(output: Path) -> int:
     from tools.ability_support_sources import ability_support_index_inputs
 
     from scripts.build_test_shards import SERIAL_BEHAVIORAL_CASE, behavioral_selection
-    from scripts.current_shard_compatibility import NATIVE_PREFIX_OWNER
     from warhammer40k_core.rules.selected_source_index import source_input_hashes
 
     with (output / "run-started.json").open("x", encoding="utf-8") as marker:
@@ -103,6 +104,8 @@ def run_worker(output: Path) -> int:
     # can be promoted as current or used to invent costs for the new cases.
     environment.pop("BEHAVIORAL_DISPATCH_PROFILE", None)
     environment["COVERAGE_FILE"] = str(output / ".coverage")
+    environment["WH40K_COVERED_FIXTURE_CACHE"] = str(output / "fixture-checkpoints")
+    environment["WH40K_COVERED_FIXTURE_RUN_ID"] = uuid.uuid4().hex
     pre = _source()
     _write(output / "source-preflight.json", pre)
     stages: list[dict[str, object]] = []
@@ -176,7 +179,6 @@ def run_worker(output: Path) -> int:
             [
                 *common,
                 SERIAL_BEHAVIORAL_CASE,
-                NATIVE_PREFIX_OWNER,
                 "-n",
                 "1",
                 "--junitxml=" + str(output / "serial.xml"),
@@ -188,12 +190,11 @@ def run_worker(output: Path) -> int:
     )
     if status != 0:
         return status
-    selected = behavioral_selection(ROOT).active_files
-    parallel = [name for name in selected if name != NATIVE_PREFIX_OWNER]
+    parallel = list(behavioral_selection(ROOT).active_files)
     _write(
         output / "selected-files.json",
         {
-            "serial": [SERIAL_BEHAVIORAL_CASE, NATIVE_PREFIX_OWNER],
+            "serial": [SERIAL_BEHAVIORAL_CASE],
             "parallel": parallel,
             "parallel_deselect": [SERIAL_BEHAVIORAL_CASE],
         },

@@ -13,6 +13,8 @@ from pathlib import Path
 
 
 def revisions(directory: Path) -> tuple[str, ...]:
+    if not (directory / "hosted-calibration.json").is_file():
+        return ()
     calibration = json.loads((directory / "hosted-calibration.json").read_bytes())
     scope = json.loads((directory / "allocation-scope.json").read_bytes())
     descriptor = json.loads((directory / "current-runtime-compatibility.json").read_bytes())
@@ -31,7 +33,6 @@ def revisions(directory: Path) -> tuple[str, ...]:
         "historical-snapshot-canonical-polygon-queries-v1",
         "historical-snapshot-canonical-polygon-pairs-v1",
         "historical-snapshot-exact-contact-v1",
-        "historical-snapshot-engine-numerical-identity-v1",
     }:
         current = json.loads((directory / "linux-authority-covered-baseline.json").read_bytes())
         values.update((current["source_head"], "e2d7a899d162cc1972d8a158fc02978e54301cc2"))
@@ -44,7 +45,6 @@ def revisions(directory: Path) -> tuple[str, ...]:
         "historical-snapshot-canonical-polygon-queries-v1",
         "historical-snapshot-canonical-polygon-pairs-v1",
         "historical-snapshot-exact-contact-v1",
-        "historical-snapshot-engine-numerical-identity-v1",
     }:
         current = json.loads((directory / "milli-inch-covered-baseline.json").read_bytes())
         values.update((current["source_head"], "22f3fde616758008100bdf37d87edd671ed90d9a"))
@@ -56,7 +56,6 @@ def revisions(directory: Path) -> tuple[str, ...]:
         "historical-snapshot-canonical-polygon-queries-v1",
         "historical-snapshot-canonical-polygon-pairs-v1",
         "historical-snapshot-exact-contact-v1",
-        "historical-snapshot-engine-numerical-identity-v1",
     }:
         current = json.loads((directory / "precision-profile-covered-baseline.json").read_bytes())
         values.update((current["source_head"], "13a8cad365b00fd9a96157dd029ee4db8121210f"))
@@ -67,7 +66,6 @@ def revisions(directory: Path) -> tuple[str, ...]:
         "historical-snapshot-canonical-polygon-queries-v1",
         "historical-snapshot-canonical-polygon-pairs-v1",
         "historical-snapshot-exact-contact-v1",
-        "historical-snapshot-engine-numerical-identity-v1",
     }:
         current = json.loads((directory / "symbolic-milli-inch-covered-baseline.json").read_bytes())
         values.update((current["source_head"], "fc52e9166ff6380b606269ce362f4f1cbc6a2835"))
@@ -77,7 +75,6 @@ def revisions(directory: Path) -> tuple[str, ...]:
         "historical-snapshot-canonical-polygon-queries-v1",
         "historical-snapshot-canonical-polygon-pairs-v1",
         "historical-snapshot-exact-contact-v1",
-        "historical-snapshot-engine-numerical-identity-v1",
     }:
         current = json.loads((directory / "canonical-polygon-covered-baseline.json").read_bytes())
         values.update((current["source_head"], "99dcf4adb983a0f968c536b16e9d960182e63afe"))
@@ -86,7 +83,6 @@ def revisions(directory: Path) -> tuple[str, ...]:
         "historical-snapshot-canonical-polygon-queries-v1",
         "historical-snapshot-canonical-polygon-pairs-v1",
         "historical-snapshot-exact-contact-v1",
-        "historical-snapshot-engine-numerical-identity-v1",
     }:
         current = json.loads((directory / "canonical-circle-covered-baseline.json").read_bytes())
         values.update((current["source_head"], "20fe1ac0150a46ef5bedad6d42d8dd55f0c8e989"))
@@ -94,7 +90,6 @@ def revisions(directory: Path) -> tuple[str, ...]:
         "historical-snapshot-canonical-polygon-queries-v1",
         "historical-snapshot-canonical-polygon-pairs-v1",
         "historical-snapshot-exact-contact-v1",
-        "historical-snapshot-engine-numerical-identity-v1",
     }:
         current = json.loads(
             (directory / "canonical-polygon-queries-covered-baseline.json").read_bytes()
@@ -103,23 +98,14 @@ def revisions(directory: Path) -> tuple[str, ...]:
     if descriptor.get("schema") in {
         "historical-snapshot-canonical-polygon-pairs-v1",
         "historical-snapshot-exact-contact-v1",
-        "historical-snapshot-engine-numerical-identity-v1",
     }:
         current = json.loads(
             (directory / "canonical-polygon-pairs-covered-baseline.json").read_bytes()
         )
         values.update((current["source_head"], "dd10b801673296efe1f8122a2cf0f86b4c4df7b9"))
-    if descriptor.get("schema") in {
-        "historical-snapshot-exact-contact-v1",
-        "historical-snapshot-engine-numerical-identity-v1",
-    }:
+    if descriptor.get("schema") == "historical-snapshot-exact-contact-v1":
         current = json.loads((directory / "exact-contact-covered-baseline.json").read_bytes())
         values.update((current["source_head"], "4ad0a8e653959a8597f958286e1c5483fc058d87"))
-    if descriptor.get("schema") == "historical-snapshot-engine-numerical-identity-v1":
-        current = json.loads(
-            (directory / "engine-numerical-identity-covered-baseline.json").read_bytes()
-        )
-        values.update((current["source_head"], "9747b9b0873b4f442d3cd81f72280b24810d952c"))
     values.update(
         native["observations"][context]["source_head"] for context in ("standalone", "with_mirror")
     )

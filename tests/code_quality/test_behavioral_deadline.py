@@ -174,7 +174,7 @@ def test_hosted_workload_uses_supervisor_and_preserves_diagnostics() -> None:
     root = Path(__file__).resolve().parents[2]
     workflow = (root / ".github/workflows/ci.yml").read_text()
     step = workflow.split("- name: Run behavioral coverage shard", 1)[1].split(
-        "- name: Save completed selected-source index", 1
+        "- name: Upload shard test report", 1
     )[0]
     assert "timeout-minutes: 32" in step
     assert "scripts.behavioral_deadline" in step

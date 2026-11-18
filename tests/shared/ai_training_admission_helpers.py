@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass, replace
+from pathlib import Path
 from typing import cast
 
 import pytest
@@ -12,6 +13,7 @@ from tests.shared.category_migration.phase18f_session_commands import (
     _deployment_payload_from_proposal,
     _terminal_progress_option_id,
 )
+from tests.support.cross_worker_fixture_cache import load_or_build_json_fixture
 from warhammer40k_core.adapters.access_control import ViewerContext
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.adapters.setup_smoke import canonical_setup_prebattle_smoke_config
@@ -189,67 +191,129 @@ def step(before: LocalGameSession, chosen: str | None = None) -> AdmissionCase:
 
 
 @pytest.fixture(scope="module")
-def continuing() -> AdmissionCase:
-    session = LocalGameSession()
-    session.start(canonical_setup_prebattle_smoke_config())
-    session.advance_until_decision_or_terminal()
-    return step(session)
+def continuing(
+    tmp_path_factory: pytest.TempPathFactory,
+    pytestconfig: pytest.Config,
+) -> AdmissionCase:
+    def _build() -> JsonValue:
+        session = LocalGameSession()
+        session.start(canonical_setup_prebattle_smoke_config())
+        session.advance_until_decision_or_terminal()
+        case = step(session)
+        return {
+            "before": case.before.to_persistence_payload(),
+            "after": case.after.to_persistence_payload(),
+            "chosen": case.row.chosen_action_id,
+        }
+
+    def _restore(raw: JsonValue) -> AdmissionCase:
+        data = cast(dict[str, JsonValue], raw)
+        before = LocalGameSession.from_persistence_payload(data["before"])
+        after = LocalGameSession.from_persistence_payload(data["after"])
+        request = before.lifecycle.pending_decision_request()
+        assert request is not None
+        assert request.actor_id is not None
+        context = PlayerDecisionContext.from_view(
+            before.view(viewer_player_id=request.actor_id), choice_seed=7
+        )
+        chosen = cast(str, data["chosen"])
+        return AdmissionCase(before, after, context, _row(before, after, context, chosen))
+
+    return load_or_build_json_fixture(
+        key="training-admission-continuing-v1",
+        source_files=(Path(__file__),),
+        tmp_path_factory=tmp_path_factory,
+        pytestconfig=pytestconfig,
+        build_payload=_build,
+        restore_value=_restore,
+    )
 
 
 @pytest.fixture(scope="module")
-def terminal() -> AdmissionCase:
-    compact = _compact_terminal_config(game_id="admission-terminal")
-    config = replace(
-        compact,
-        ruleset_descriptor=replace(
-            compact.ruleset_descriptor,
-            descriptor_hash="",
-            battle_phase_sequence=BattlePhaseSequenceDescriptor(
-                phases=(BattlePhaseKind.COMMAND, BattlePhaseKind.SHOOTING, BattlePhaseKind.FIGHT)
+def terminal(
+    tmp_path_factory: pytest.TempPathFactory,
+    pytestconfig: pytest.Config,
+) -> AdmissionCase:
+    def _build() -> JsonValue:
+        compact = _compact_terminal_config(game_id="admission-terminal")
+        config = replace(
+            compact,
+            ruleset_descriptor=replace(
+                compact.ruleset_descriptor,
+                descriptor_hash="",
+                battle_phase_sequence=BattlePhaseSequenceDescriptor(
+                    phases=(
+                        BattlePhaseKind.COMMAND,
+                        BattlePhaseKind.SHOOTING,
+                        BattlePhaseKind.FIGHT,
+                    )
+                ),
             ),
-        ),
-    )
-    session = LocalGameSession()
-    session.start(config)
-    status = session.advance_until_decision_or_terminal()
-    for index in range(100):
-        request = status.decision_request
-        assert request is not None
-        assert request.actor_id is not None
-        view = session.view(viewer_player_id=request.actor_id)
-        if request.is_parameterized_submission_request():
-            assert request.decision_type == "submit_deployment_placement"
-            pending = view["pending_decision"]
-            assert pending is not None
-            status = session.submit_viewer_parameterized_payload(
-                viewer=ViewerContext.for_player(request.actor_id),
-                request_id=pending["request_id"],
-                payload=_deployment_payload_from_proposal(view["pending_proposal"]),
-                result_id=f"admission-placement-{index}",
-            )
-        else:
-            context = PlayerDecisionContext.from_view(view, choice_seed=7)
-            chosen = _terminal_progress_option_id(cast(dict[str, JsonValue], context.request))
-            # Prefix choices need ordinary commits, not two full lifecycle
-            # reconstructions and a discarded training row per decision.
-            before_checkpoint = session.to_persistence_payload()
-            status = session.submit_viewer_option(
-                viewer=ViewerContext.for_player(request.actor_id),
-                request_id=context.request["request_id"],
-                option_id=chosen,
-                result_id=f"admission-{session.decision_record_count()}",
-            )
+        )
+        session = LocalGameSession()
+        session.start(config)
+        status = session.advance_until_decision_or_terminal()
+        for index in range(100):
+            request = status.decision_request
+            assert request is not None
+            assert request.actor_id is not None
+            view = session.view(viewer_player_id=request.actor_id)
+            if request.is_parameterized_submission_request():
+                assert request.decision_type == "submit_deployment_placement"
+                pending = view["pending_decision"]
+                assert pending is not None
+                status = session.submit_viewer_parameterized_payload(
+                    viewer=ViewerContext.for_player(request.actor_id),
+                    request_id=pending["request_id"],
+                    payload=_deployment_payload_from_proposal(view["pending_proposal"]),
+                    result_id=f"admission-placement-{index}",
+                )
+            else:
+                context = PlayerDecisionContext.from_view(view, choice_seed=7)
+                chosen = _terminal_progress_option_id(cast(dict[str, JsonValue], context.request))
+                # Prefix choices need ordinary commits, not two full lifecycle
+                # reconstructions and a discarded training row per decision.
+                before_checkpoint = session.to_persistence_payload()
+                status = session.submit_viewer_option(
+                    viewer=ViewerContext.for_player(request.actor_id),
+                    request_id=context.request["request_id"],
+                    option_id=chosen,
+                    result_id=f"admission-{session.decision_record_count()}",
+                )
+                if status.status_kind is LifecycleStatusKind.ADVANCED:
+                    status = session.advance_until_decision_or_terminal()
+                if status.status_kind is LifecycleStatusKind.TERMINAL:
+                    return {
+                        "before": before_checkpoint,
+                        "after": session.to_persistence_payload(),
+                        "chosen": chosen,
+                    }
             if status.status_kind is LifecycleStatusKind.ADVANCED:
                 status = session.advance_until_decision_or_terminal()
-            if status.status_kind is LifecycleStatusKind.TERMINAL:
-                before = LocalGameSession.from_persistence_payload(before_checkpoint)
-                return AdmissionCase(
-                    before, session, context, _row(before, session, context, chosen)
-                )
-        if status.status_kind is LifecycleStatusKind.ADVANCED:
-            status = session.advance_until_decision_or_terminal()
-        assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
-    pytest.fail("Terminal admission fixture exceeded its explicit decision budget.")
+            assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+        pytest.fail("Terminal admission fixture exceeded its explicit decision budget.")
+
+    def _restore(raw: JsonValue) -> AdmissionCase:
+        data = cast(dict[str, JsonValue], raw)
+        before = LocalGameSession.from_persistence_payload(data["before"])
+        after = LocalGameSession.from_persistence_payload(data["after"])
+        request = before.lifecycle.pending_decision_request()
+        assert request is not None
+        assert request.actor_id is not None
+        context = PlayerDecisionContext.from_view(
+            before.view(viewer_player_id=request.actor_id), choice_seed=7
+        )
+        chosen = cast(str, data["chosen"])
+        return AdmissionCase(before, after, context, _row(before, after, context, chosen))
+
+    return load_or_build_json_fixture(
+        key="training-admission-terminal-v1",
+        source_files=(Path(__file__),),
+        tmp_path_factory=tmp_path_factory,
+        pytestconfig=pytestconfig,
+        build_payload=_build,
+        restore_value=_restore,
+    )
 
 
 def target(

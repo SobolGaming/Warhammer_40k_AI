@@ -1,7 +1,7 @@
 {
   "schema": "finite-behavior-node-partition-v1",
   "source_file": "tests/rules/rules04/unit/test_s25_permission_relevance.py",
-  "source_sha256": "be09d3680ac4ac47c248a1962b24846a3791824821c14a5a4080f5cab8b73c07",
+  "source_sha256": "07164b58a1f5ec57cef3c3ca8146b8b193f991bf0535716d9023f40f1403589a",
   "nodes": [
     "tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[unused-wound-player-a]",
     "tests/rules/rules04/unit/test_s25_permission_relevance.py::test_normal_native_relevant_operations_and_owned_selected_sources[unused-wound-player-b]",

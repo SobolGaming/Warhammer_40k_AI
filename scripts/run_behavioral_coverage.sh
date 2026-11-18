@@ -17,7 +17,9 @@ trap finish_resources EXIT
 capture_resources before
 mapfile -t shard_paths < "$SHARD_MANIFEST"
 source_index_deadline="$BEHAVIOR_EXECUTION_DEADLINE"
-uv run --no-sync python -B -m scripts.validate_source_history
+if [[ "${WH40K_SOURCE_HISTORY_PREVALIDATED:-0}" != "1" ]]; then
+  uv run --no-sync python -B -m scripts.validate_source_history
+fi
 source_index_pid=""
 source_index_args=()
 finish_source_index_build() {
@@ -47,18 +49,29 @@ fi
 isolated_status=0
 parallel_timing_dir="$TEST_TIMING_DIR"
 isolated_case="tests/factions/chaos_daemons/integration/test_cavalcade_v995_roster.py::test_exact_mirror_deploys_all_78_models_and_replays_to_battle"
-isolated_module="tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py"
 isolated_selectors=()
 parallel_paths=()
 for selector in "${shard_paths[@]}"; do
   if [[ "$selector" == "$isolated_case" ]]; then
-    isolated_selectors=("$selector" "${isolated_selectors[@]}")
-  elif [[ "$selector" == "$isolated_module" ]]; then
     isolated_selectors+=("$selector")
   else
     parallel_paths+=("$selector")
   fi
 done
+native_owner="tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py"
+native_count=0
+for selector in "${shard_paths[@]}"; do
+  if [[ "$selector" == "$native_owner" ]]; then
+    native_count=$((native_count + 1))
+  fi
+done
+if (( ${#isolated_selectors[@]} != native_count || native_count > 1 )); then
+  echo "Mirror/native checkpoint cohort must be selected together exactly once." >&2
+  exit 1
+fi
+export WH40K_COVERED_FIXTURE_CACHE
+WH40K_COVERED_FIXTURE_CACHE=$(mktemp -d "${RUNNER_TEMP:-$PWD/reports}/fixture-checkpoints.XXXXXX")
+export WH40K_COVERED_FIXTURE_RUN_ID="${WH40K_COVERED_FIXTURE_CACHE##*/}"
 isolation_args=(--deselect "$isolated_case")
 if (( ${#isolated_selectors[@]} )); then
   # Keep bounded full-roster setup separate from concurrent coverage work.

@@ -639,7 +639,7 @@ def test_current_smoke_is_in_the_required_serial_ci_lane() -> None:
     assert "--base-ref" in quality
     assert "performance-smoke.json" in quality
     assert "quality-fast" in workflow
-    assert "needs: [lint, contract-conformance, code-quality" in workflow
+    assert "needs: [ci-preflight, lint, contract-conformance, code-quality" in workflow
 
 
 def test_smoke_outputs_do_not_change_assessed_inputs_or_hide_unrelated_reports() -> None:
@@ -1451,21 +1451,52 @@ def test_milli_inch_map_retains_every_existing_sensitive_operation() -> None:
             "mandatory": True,
         }
     scope = object_value(operations["scoped-shard-allocation"])
+    assert "scripts/milli_inch_shard_admission.py" in set(cast(list[str], scope["paths"]))
+    # Historical milli-inch calibration blobs and their blob-pinning quality module
+    # were owner-retired with the shard-calibration chain; keep only live selectors.
     assert {
-        "scripts/milli_inch_shard_admission.py",
         "tests/code_quality/test_milli_inch_shard_admission.py",
         "ci/test_shards/milli-inch-covered-baseline.json",
         "ci/test_shards/milli-inch-covered-evidence.json",
         "ci/test_shards/milli-inch-derived-assignment.json",
-    } <= set(cast(list[str], scope["paths"]))
+    }.isdisjoint(set(cast(list[str], scope["paths"])))
+    retired_shard_selectors = {
+        path
+        for path in subprocess.check_output(
+            [
+                "git",
+                "diff",
+                "--name-only",
+                "--diff-filter=D",
+                "22f3fde616758008100bdf37d87edd671ed90d9a",
+                "HEAD",
+                "--",
+                "ci/test_shards/",
+                "tests/code_quality/",
+            ],
+            cwd=ROOT,
+            text=True,
+        ).splitlines()
+        if not (ROOT / path).exists()
+    }
     for name, old in object_value(prior["operations"]).items():
         previous = object_value(old)
         if previous["sensitive"] is True or previous["mandatory"] is True:
             retained = object_value(operations[name])
             for field in ("paths", "owners", "families"):
-                assert set(cast(list[str], previous[field])) <= set(
-                    cast(list[str], retained[field])
-                )
+                expected = set(cast(list[str], previous[field]))
+                if field == "paths":
+                    expected -= retired_shard_selectors
+                    expected = {
+                        path
+                        for path in expected
+                        if not (
+                            path.startswith("ci/test_shards/")
+                            and any(character in path for character in "*?[")
+                            and not any(ROOT.glob(path))
+                        )
+                    }
+                assert expected <= set(cast(list[str], retained[field]))
             for field in ("sensitive", "mandatory"):
                 if previous[field] is True:
                     assert retained[field] is True

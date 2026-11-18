@@ -8,6 +8,10 @@
       "sha256": "98bcc81ce10207fed2af8f4dc0a75e47640e22df411047bc4134753111b33f95"
     }
   },
+  "case_id_successors": {
+    "tests/factions/chaos_daemons/integration/test_cavalcade_v995_roster.py::test_exact_mirror_config_passes_network_admission[/games-create-session-v4-private-rng]": "tests/factions/chaos_daemons/integration/test_cavalcade_v995_roster.py::test_exact_mirror_config_passes_network_admission[/games-create-session-v5-numerical-identity]",
+    "tests/factions/chaos_daemons/integration/test_cavalcade_v995_roster.py::test_exact_mirror_config_passes_network_admission[/sessions-session-create-v5-private-rng]": "tests/factions/chaos_daemons/integration/test_cavalcade_v995_roster.py::test_exact_mirror_config_passes_network_admission[/sessions-session-create-v6-numerical-identity]"
+  },
   "retained_circle_sha256": "a82643598fb01025704bd9d222643fce81e9f772d938a968f1b6568bd9542f19",
   "retained_contact_sha256": "0c8e58ab3a4feb1f6525ac490e18e518869326a53e1a42a8ccd9e8cb15a8b61d",
   "retained_cutover_sha256": "4cd1f0b062fad661e1c71fe27d2e9f8279c3c21d2a9f7bea9e3b053db79afce3",
@@ -53,10 +57,10 @@
   },
   "updated_files": {
     "tests/infrastructure/adapters/test_canonical_deployment_coverage.py": {
-      "blob_sha1": "98d23fad47aa12f20f4b7eecf252870425bc72c0",
-      "bytes": 21213,
+      "blob_sha1": "8824a16eadbc6f8c04730791167f29f98db68c23",
+      "bytes": 21659,
       "mode": "100644",
-      "sha256": "8ea704f9980ec99cbe3bcf84814d31f657eb6f969c3944c132382bd5c0b2e279"
+      "sha256": "85ee831abc89f48e139a45956d797876a4c16ebdee6657e7d502c6da27874f52"
     },
     "tests/infrastructure/adapters/unit/test_linux_authority.py": {
       "blob_sha1": "a24396f9d72e159097394be696587fab3781554d",

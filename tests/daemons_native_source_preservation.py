@@ -94,6 +94,21 @@ def before_daemons_registry(value: dict[str, Any]) -> dict[str, Any]:
 def before_pr2_comparison_provenance(raw: bytes) -> bytes:
     """Authenticate only the additive PR2 comparison registration before older proofs."""
     # Source-data projection only: preserve every original PR2 and older proof.
+    # The post692 registration is an exact additive source-data projection.
+    if b"scopes.NUMERICAL_IDENTITY_MAIN692_BASE" in raw:
+        addition = b"    scopes.NUMERICAL_IDENTITY_MAIN692_BASE,\n"
+        if (
+            sha256(raw).hexdigest()
+            != "a2aa483416d8989c08858c7303daba3dece1b4d1e9db84b02199b12340c45714"
+            or raw.count(addition) != 1
+        ):
+            raise ValueError("Exact registered edition provenance inputs changed.")
+        raw = raw.replace(addition, b"", 1)
+        if (
+            sha256(raw).hexdigest()
+            != "03070ad06f7cdb63be600372b2d629d5059864cff391352ee430c28bc0a0297d"
+        ):
+            raise ValueError("Exact registered edition provenance inputs changed.")
     if b"scopes.NUMERICAL_IDENTITY_BASE" in raw:
         addition = (
             b"\n"

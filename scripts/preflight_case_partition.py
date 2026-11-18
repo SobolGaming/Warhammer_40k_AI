@@ -10,7 +10,8 @@ from typing import cast
 from scripts.hosted_timing_calibration import read_json
 
 OWNER = "tests/infrastructure/adapters/test_canonical_coverage_preflight.py"
-SOURCE_SHA256 = "90b2fbdcaa950cfa3002dc7c1b3172473639b66c94fd9192839162f95d148068"
+SOURCE_SHA256 = "7255fbfdb63ca8c8d3bfde842c88541ce784cef728f2cb0645dafb14da0f13bb"
+HISTORICAL_SOURCE_SHA256 = "90b2fbdcaa950cfa3002dc7c1b3172473639b66c94fd9192839162f95d148068"
 FILENAME = "preflight-case-partition.json"
 SCHEMA = "finite-preflight-case-partition-v1"
 NODES = tuple(
@@ -42,13 +43,15 @@ def partition(root: Path, files: frozenset[str]) -> dict[str, float]:
     _selection_no_links(root, source)
     _selection_no_links(root, path)
     value = read_json(path)
+    observed_sha = hashlib.sha256(source.read_bytes()).hexdigest()
+    admitted_shas = {SOURCE_SHA256, HISTORICAL_SOURCE_SHA256}
     if (
-        hashlib.sha256(source.read_bytes()).hexdigest() != SOURCE_SHA256
+        observed_sha not in admitted_shas
         or not isinstance(value, dict)
         or value.keys() != {"schema", "source_file", "source_sha256", "nodes", "weights", "role"}
         or value["schema"] != SCHEMA
         or value["source_file"] != OWNER
-        or value["source_sha256"] != SOURCE_SHA256
+        or value["source_sha256"] != observed_sha
         or value["nodes"] != list(NODES)
         or value["role"] != "Derived ratios preserve baseline file totals; not new measurements"
         or not isinstance(value["weights"], dict)

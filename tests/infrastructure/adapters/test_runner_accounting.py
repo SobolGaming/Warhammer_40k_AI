@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import FrozenInstanceError, replace
+from pathlib import Path
 from typing import cast
 
 import pytest
@@ -12,6 +13,10 @@ from tests.shared.category_migration.phase18f_session_commands import (
     _deployment_payload_from_proposal,
     _invalid_distance_witness,
     _terminal_progress_option_id,
+)
+from tests.support.cross_worker_fixture_cache import (
+    load_or_build_json_fixture,
+    rehydrate_payload_receipt,
 )
 from warhammer40k_core.adapters.access_control import ViewerContext
 from warhammer40k_core.adapters.local_session import LocalGameSession
@@ -424,30 +429,47 @@ def admit(report: RunReport, before: LocalGameSession, after: LocalGameSession) 
 
 
 @pytest.fixture(scope="module")
-def split_datasets() -> tuple[DeploymentDatasetAdmission, ...]:
-    datasets: list[DeploymentDatasetAdmission] = []
-    for index in range(4):
-        session = LocalGameSession()
-        session.start(
-            replace(
-                canonical_setup_prebattle_smoke_config(),
-                private_rng_seed=f"{index % 3 + 1:02x}" * 32,
+def split_datasets(
+    tmp_path_factory: pytest.TempPathFactory,
+    pytestconfig: pytest.Config,
+) -> tuple[DeploymentDatasetAdmission, ...]:
+    def _build() -> JsonValue:
+        datasets: list[DeploymentDatasetAdmission] = []
+        for index in range(4):
+            session = LocalGameSession()
+            session.start(
+                replace(
+                    canonical_setup_prebattle_smoke_config(),
+                    private_rng_seed=f"{index % 3 + 1:02x}" * 32,
+                )
             )
-        )
-        session.advance_until_decision_or_terminal()
-        if index == 3:
-            # Same ordinary startup as dataset 0, but a different replayed prefix.
-            session = step(session).after
-        before = session.fork()
-        with pytest.raises(RunnerError) as caught:
-            BoundedPolicyRunner(
-                session=session,
-                router=PolicyRouter(()),
-                limits=RunLimits(13 + index, 1, 1e-12 if index == 2 else 120),
-            ).run()
-        receipt = admit(caught.value.report, before, session)
-        datasets.append(DeploymentDatasetAdmission.from_runs((receipt,)))
-    return tuple(datasets)
+            session.advance_until_decision_or_terminal()
+            if index == 3:
+                # Same ordinary startup as dataset 0, but a different replayed prefix.
+                session = step(session).after
+            before = session.fork()
+            with pytest.raises(RunnerError) as caught:
+                BoundedPolicyRunner(
+                    session=session,
+                    router=PolicyRouter(()),
+                    limits=RunLimits(13 + index, 1, 1e-12 if index == 2 else 120),
+                ).run()
+            receipt = admit(caught.value.report, before, session)
+            datasets.append(DeploymentDatasetAdmission.from_runs((receipt,)))
+        return [dataset.to_payload() for dataset in datasets]
+
+    def _restore(raw: JsonValue) -> tuple[DeploymentDatasetAdmission, ...]:
+        items = cast(list[JsonValue], raw)
+        return tuple(rehydrate_payload_receipt(DeploymentDatasetAdmission, item) for item in items)
+
+    return load_or_build_json_fixture(
+        key="runner-accounting-split-datasets-v1",
+        source_files=(Path(__file__),),
+        tmp_path_factory=tmp_path_factory,
+        pytestconfig=pytestconfig,
+        build_payload=_build,
+        restore_value=_restore,
+    )
 
 
 def _split_assignments() -> tuple[DeploymentSplitAssignment, ...]:

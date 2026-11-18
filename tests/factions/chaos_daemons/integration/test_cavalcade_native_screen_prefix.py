@@ -13,15 +13,11 @@ from tests.support.cavalcade_native_prefix import (
     complete_native_prefix,
     native_ranged_audit,
 )
-from tests.support.cavalcade_v995 import (
-    deployment_fixture,
-    mirror_router,
-    strict_mirror_session,
-)
+from tests.support.cavalcade_v995 import strict_mirror_session
+from tests.support.cross_worker_fixture_cache import load_native_command_checkpoint
 from warhammer40k_core.adapters.access_control import ViewerContext
 from warhammer40k_core.adapters.event_stream import EventStreamCursor
 from warhammer40k_core.adapters.local_session import LocalGameSession
-from warhammer40k_core.ai.runner import BoundedPolicyRunner, RunBoundary, RunLimits
 from warhammer40k_core.core.weapon_profiles import WeaponKeyword
 from warhammer40k_core.engine.catalog_named_weapon_profiles import equipped_named_weapon_profile_ids
 from warhammer40k_core.engine.event_log import JsonValue
@@ -34,16 +30,14 @@ from warhammer40k_core.engine.runtime_modifiers import (
 
 
 @pytest.fixture(scope="module")
-def native_command_checkpoint() -> JsonValue:
-    session = strict_mirror_session()
-    report = BoundedPolicyRunner(
-        session=session,
-        router=mirror_router(deployment_fixture()),
-        limits=RunLimits(policy_seed=19, max_decisions=42, max_seconds=120),
-    ).run(stop_at=RunBoundary("battle", "command"))
-    assert len(report.decisions) == 42
-    assert all(d.accepted for d in report.decisions)
-    return session.to_persistence_payload()
+def native_command_checkpoint(
+    tmp_path_factory: pytest.TempPathFactory,
+    pytestconfig: pytest.Config,
+) -> JsonValue:
+    return load_native_command_checkpoint(
+        tmp_path_factory=tmp_path_factory,
+        pytestconfig=pytestconfig,
+    )
 
 
 @pytest.fixture(scope="module")

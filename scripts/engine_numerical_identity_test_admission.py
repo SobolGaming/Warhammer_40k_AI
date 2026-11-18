@@ -1,4 +1,4 @@
-"""Finite additive polygon query selection; prior transition bytes retain their meaning."""
+"""Finite numerical-identity source admission over the retained speedup transition."""
 
 from __future__ import annotations
 
@@ -45,7 +45,7 @@ from scripts.symbolic_milli_inch_test_admission import ADDITION as SYMBOLIC_ADDI
 from scripts.symbolic_milli_inch_test_admission import ADDITION_SHA256 as SYMBOLIC_SHA256
 
 ADDITION = "data/source_audits/ci64_provenance_v1/engine-numerical-identity-test-transition-v1.json"
-ADDITION_SHA256 = "518f0e1f92177fe2fe0f218fcecdacac7445cb500fa22942e28c89351af54912"
+ADDITION_SHA256 = "0bfcaf73d1d7c75d86c687ee0ab108d897e65b1d8f8aaaa69efea399774fe7a3"
 RUNTIME = "db8c8f733112410866770bcd2d3231a9e2a348e2de0514f5fc0b5ffe95b7b9cd"
 COORDINATES = "src/warhammer40k_core/geometry/numerical_identity.py"
 QUERIES = "src/warhammer40k_core/geometry/milli_inch_polygon_queries.py"
@@ -85,13 +85,6 @@ def engine_numerical_identity_test_transition(
         raise SystemExit(
             "Numerical identity test transition requires its retained cutover and runtime."
         )
-    # Retained cutover-only CLI probes do not activate this runtime profile.
-    # Import its full evidence validators only after exact current-profile admission.
-    from scripts.engine_numerical_identity_shard_admission import (
-        SOURCE_HASHES,
-        UPDATED_TEST_HASHES,
-    )
-
     raw = _checked_bytes(root, ADDITION, ADDITION_SHA256)
     record = json.loads(raw, object_pairs_hook=_selection_object)
     if (
@@ -111,11 +104,16 @@ def engine_numerical_identity_test_transition(
             "sources": record["sources"],
             "added_files": record["added_files"],
             "added_cases": record["added_cases"],
+            "case_id_successors": record["case_id_successors"],
             "updated_files": record["updated_files"],
         }
         or set(record["added_files"]) != {OWNER}
-        or record["sources"] != SOURCE_HASHES
-        or set(record["updated_files"]) != set(UPDATED_TEST_HASHES)
+        or set(record["updated_files"])
+        != {
+            "tests/rules/section18/test_facade.py",
+            "tests/infrastructure/adapters/unit/test_linux_authority.py",
+            "tests/infrastructure/adapters/test_canonical_deployment_coverage.py",
+        }
     ):
         raise SystemExit("Numerical identity test transition membership differs.")
     for name, digest in record["sources"].items():
@@ -152,9 +150,23 @@ def engine_numerical_identity_test_transition(
     for name, digest in symbolic["sources"].items():
         _checked_bytes(root, name, digest)
     for name, digest in profile["sources"].items():
-        _checked_bytes(root, name, SOURCE_HASHES.get(name, digest))
+        _checked_bytes(root, name, record["sources"].get(name, digest))
     current_updated = _selection_members(record["updated_files"], root)
     updated = _selection_members(profile["updated_files"], root, current=current_updated)
+    from scripts.speedup_test_admission import ADDITION as SPEEDUP_ADDITION
+    from scripts.speedup_test_admission import ADDITION_SHA256 as SPEEDUP_SHA256
+
+    speedup_raw = _checked_bytes(root, SPEEDUP_ADDITION, SPEEDUP_SHA256)
+    speedup = json.loads(speedup_raw, object_pairs_hook=_selection_object)
+    if speedup != {
+        "schema": "finite-speedup-test-transition-v1",
+        "retained_cutover_sha256": RETAINED_CUTOVER_SHA256,
+        "retained_exact_contact_sha256": CONTACT_ADDITION_SHA256,
+        "runtime_fingerprint": contact["runtime_fingerprint"],
+        "updated_files": speedup["updated_files"],
+    }:
+        raise SystemExit("Numerical identity predecessor speedup metadata differs.")
+    updated.update(_selection_members(speedup["updated_files"], root, current=current_updated))
     updated.update(current_updated)
     retained = _selection_members(foundation["added_files"], root)
     retained.update(_selection_members(profile["added_files"], root))
@@ -185,6 +197,8 @@ def engine_numerical_identity_test_transition(
         + pairs_raw
         + b"\0"
         + contact_raw
+        + b"\0"
+        + speedup_raw
         + b"\0"
         + raw,
     )

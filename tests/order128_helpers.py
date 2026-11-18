@@ -199,30 +199,38 @@ def deployment_session(
 
 def assert_checkpoint(session: LocalGameSession) -> None:
     checkpoint = session.to_persistence_payload()
+    expected_lifecycle = session.lifecycle.to_payload()
+    cursor = EventStreamCursor()
+    viewer_expectations = tuple(
+        (
+            viewer,
+            session.view_for_context(viewer=viewer),
+            session.events_since_for_context(cursor, viewer=viewer),
+        )
+        for role in PrincipalRole
+        for player in (
+            ("player-a", "player-b")
+            if role in {PrincipalRole.PLAYER, PrincipalRole.COACH}
+            else (None,)
+        )
+        for viewer in (
+            ViewerContext(
+                principal_id=f"order128:{role}:{player}",
+                role=role,
+                viewer_player_id=player,
+                policy=ROLE_POLICY_BY_ROLE[role],
+            ),
+        )
+    )
     for recovered in (
         LocalGameSession.from_persistence_payload(json.loads(json.dumps(checkpoint))),
         session.fork(),
     ):
-        assert recovered.lifecycle.to_payload() == session.lifecycle.to_payload()
+        assert recovered.lifecycle.to_payload() == expected_lifecycle
         assert recovered.to_persistence_payload() == checkpoint
-        for role in PrincipalRole:
-            for player in (
-                ("player-a", "player-b")
-                if role in {PrincipalRole.PLAYER, PrincipalRole.COACH}
-                else (None,)
-            ):
-                viewer = ViewerContext(
-                    principal_id=f"order128:{role}:{player}",
-                    role=role,
-                    viewer_player_id=player,
-                    policy=ROLE_POLICY_BY_ROLE[role],
-                )
-                assert recovered.view_for_context(viewer=viewer) == session.view_for_context(
-                    viewer=viewer
-                )
-                assert recovered.events_since_for_context(
-                    EventStreamCursor(), viewer=viewer
-                ) == session.events_since_for_context(EventStreamCursor(), viewer=viewer)
+        for viewer, expected_view, expected_events in viewer_expectations:
+            assert recovered.view_for_context(viewer=viewer) == expected_view
+            assert recovered.events_since_for_context(cursor, viewer=viewer) == expected_events
     assert (
         ReplayRunner.from_payload(session.replay_artifact(artifact_id="order128-setup"))
         .run()

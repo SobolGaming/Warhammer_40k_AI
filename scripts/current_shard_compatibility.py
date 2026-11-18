@@ -129,9 +129,6 @@ def enabled(directory: Path, summary: dict[str, object] | None = None) -> bool:
         BASELINE_FILE as QUERIES_BASELINE_FILE,
     )
     from scripts.canonical_polygon_shard_admission import BASELINE_FILE as POLYGON_BASELINE_FILE
-    from scripts.engine_numerical_identity_shard_admission import (
-        BASELINE_FILE as IDENTITY_BASELINE_FILE,
-    )
     from scripts.exact_contact_shard_admission import BASELINE_FILE as CONTACT_BASELINE_FILE
     from scripts.linux_authority_shard_admission import BASELINE_FILE as AUTHORITY_BASELINE_FILE
     from scripts.milli_inch_shard_admission import BASELINE_FILE as MILLI_BASELINE_FILE
@@ -150,7 +147,6 @@ def enabled(directory: Path, summary: dict[str, object] | None = None) -> bool:
         or (directory / QUERIES_BASELINE_FILE).is_file()
         or (directory / PAIRS_BASELINE_FILE).is_file()
         or (directory / CONTACT_BASELINE_FILE).is_file()
-        or (directory / IDENTITY_BASELINE_FILE).is_file()
         or (
             summary is not None
             and (
@@ -185,12 +181,6 @@ def _baseline(
     from scripts.canonical_polygon_shard_admission import NODES as POLYGON_NODES
     from scripts.canonical_polygon_shard_admission import OWNER as POLYGON_OWNER
     from scripts.canonical_polygon_shard_admission import SCHEMA as POLYGON_SCHEMA
-    from scripts.engine_numerical_identity_shard_admission import (
-        BASELINE_FILE as IDENTITY_BASELINE_FILE,
-    )
-    from scripts.engine_numerical_identity_shard_admission import NODES as IDENTITY_NODES
-    from scripts.engine_numerical_identity_shard_admission import OWNER as IDENTITY_OWNER
-    from scripts.engine_numerical_identity_shard_admission import SCHEMA as IDENTITY_SCHEMA
     from scripts.exact_contact_shard_admission import BASELINE_FILE as CONTACT_BASELINE_FILE
     from scripts.exact_contact_shard_admission import NODES as CONTACT_NODES
     from scripts.exact_contact_shard_admission import OWNER as CONTACT_OWNER
@@ -223,29 +213,16 @@ def _baseline(
     from scripts.symbolic_milli_inch_shard_admission import OWNER as SYMBOLIC_OWNER
     from scripts.symbolic_milli_inch_shard_admission import SCHEMA as SYMBOLIC_SCHEMA
 
-    identity = descriptor["schema"] == IDENTITY_SCHEMA
-    contact = descriptor["schema"] in {CONTACT_SCHEMA, IDENTITY_SCHEMA}
-    pairs = descriptor["schema"] in {PAIRS_SCHEMA, CONTACT_SCHEMA, IDENTITY_SCHEMA}
-    queries = descriptor["schema"] in {
-        QUERIES_SCHEMA,
-        PAIRS_SCHEMA,
-        CONTACT_SCHEMA,
-        IDENTITY_SCHEMA,
-    }
-    circle = descriptor["schema"] in {
-        CIRCLE_SCHEMA,
-        QUERIES_SCHEMA,
-        PAIRS_SCHEMA,
-        CONTACT_SCHEMA,
-        IDENTITY_SCHEMA,
-    }
+    contact = descriptor["schema"] == CONTACT_SCHEMA
+    pairs = descriptor["schema"] in {PAIRS_SCHEMA, CONTACT_SCHEMA}
+    queries = descriptor["schema"] in {QUERIES_SCHEMA, PAIRS_SCHEMA, CONTACT_SCHEMA}
+    circle = descriptor["schema"] in {CIRCLE_SCHEMA, QUERIES_SCHEMA, PAIRS_SCHEMA, CONTACT_SCHEMA}
     polygon = descriptor["schema"] in {
         POLYGON_SCHEMA,
         CIRCLE_SCHEMA,
         QUERIES_SCHEMA,
         PAIRS_SCHEMA,
         CONTACT_SCHEMA,
-        IDENTITY_SCHEMA,
     }
     symbolic = descriptor["schema"] in {
         SYMBOLIC_SCHEMA,
@@ -254,7 +231,6 @@ def _baseline(
         QUERIES_SCHEMA,
         PAIRS_SCHEMA,
         CONTACT_SCHEMA,
-        IDENTITY_SCHEMA,
     }
     profile = descriptor["schema"] in {
         PROFILE_SCHEMA,
@@ -264,7 +240,6 @@ def _baseline(
         QUERIES_SCHEMA,
         PAIRS_SCHEMA,
         CONTACT_SCHEMA,
-        IDENTITY_SCHEMA,
     }
     milli = descriptor["schema"] in {
         MILLI_SCHEMA,
@@ -275,7 +250,6 @@ def _baseline(
         QUERIES_SCHEMA,
         PAIRS_SCHEMA,
         CONTACT_SCHEMA,
-        IDENTITY_SCHEMA,
     }
     authority = descriptor["schema"] in {
         AUTHORITY_SCHEMA,
@@ -287,12 +261,9 @@ def _baseline(
         QUERIES_SCHEMA,
         PAIRS_SCHEMA,
         CONTACT_SCHEMA,
-        IDENTITY_SCHEMA,
     }
     filename = (
-        IDENTITY_BASELINE_FILE
-        if identity
-        else CONTACT_BASELINE_FILE
+        CONTACT_BASELINE_FILE
         if contact
         else PAIRS_BASELINE_FILE
         if pairs
@@ -386,9 +357,6 @@ def _baseline(
     if circle:
         expected_additions |= CIRCLE_NODES
         expected_owners.add(CIRCLE_OWNER)
-    if identity:
-        expected_additions |= IDENTITY_NODES
-        expected_owners.add(IDENTITY_OWNER)
     if contact:
         expected_additions |= CONTACT_NODES
         expected_owners.add(CONTACT_OWNER)
@@ -433,21 +401,12 @@ def _baseline(
         elif current != (history.root / owner).read_bytes():
             from scripts.boolean_los_admission import SCHEMA as BOOLEAN_SCHEMA
             from scripts.boolean_los_admission import transitioned_test
-            from scripts.engine_numerical_identity_shard_admission import (
-                transitioned_test as identity_transitioned_test,
-            )
             from scripts.precision_profile_shard_admission import (
                 transitioned_test as profile_transitioned_test,
             )
 
-            accepted = identity and identity_transitioned_test(
+            accepted = profile and profile_transitioned_test(
                 root, owner, current, (history.root / owner).read_bytes()
-            )
-            accepted = accepted or (
-                profile
-                and profile_transitioned_test(
-                    root, owner, current, (history.root / owner).read_bytes()
-                )
             )
             accepted = accepted or (
                 retained_test_transition(root, owner, current, (history.root / owner).read_bytes())
@@ -529,7 +488,6 @@ def plan(root: Path, directory: Path, cases: dict[str, float]) -> Plan:
     from scripts.canonical_polygon_pairs_shard_admission import SCHEMA as PAIRS_SCHEMA
     from scripts.canonical_polygon_queries_shard_admission import SCHEMA as QUERIES_SCHEMA
     from scripts.canonical_polygon_shard_admission import SCHEMA as POLYGON_SCHEMA
-    from scripts.engine_numerical_identity_shard_admission import SCHEMA as IDENTITY_SCHEMA
     from scripts.exact_contact_shard_admission import SCHEMA as CONTACT_SCHEMA
     from scripts.extended_shard_allocation import partial_projection
     from scripts.linux_authority_shard_admission import SCHEMA as AUTHORITY_SCHEMA
@@ -544,7 +502,6 @@ def plan(root: Path, directory: Path, cases: dict[str, float]) -> Plan:
     profile = isinstance(declared, dict) and declared.get("schema") == PROFILE_SCHEMA
     symbolic = isinstance(declared, dict) and declared.get("schema") == SYMBOLIC_SCHEMA
     circle = isinstance(declared, dict) and declared.get("schema") == CIRCLE_SCHEMA
-    identity = isinstance(declared, dict) and declared.get("schema") == IDENTITY_SCHEMA
     contact = isinstance(declared, dict) and declared.get("schema") == CONTACT_SCHEMA
     pairs = isinstance(declared, dict) and declared.get("schema") == PAIRS_SCHEMA
     queries = isinstance(declared, dict) and declared.get("schema") == QUERIES_SCHEMA
@@ -574,7 +531,6 @@ def plan(root: Path, directory: Path, cases: dict[str, float]) -> Plan:
             or queries
             or pairs
             or contact
-            or identity
             else set()
         ),
         "runtime compatibility",
@@ -595,7 +551,6 @@ def plan(root: Path, directory: Path, cases: dict[str, float]) -> Plan:
             QUERIES_SCHEMA,
             PAIRS_SCHEMA,
             CONTACT_SCHEMA,
-            IDENTITY_SCHEMA,
         }
         or descriptor["historical_revision"] != HISTORICAL_REVISION
     ):
@@ -614,17 +569,7 @@ def plan(root: Path, directory: Path, cases: dict[str, float]) -> Plan:
         expected_native = frozenset(
             node for node in NEW_NODES if node.startswith(NATIVE_PREFIX_OWNER + "::")
         )
-        if identity:
-            from scripts.current_native_serial_role import NativeSerialRole
-            from scripts.engine_numerical_identity_shard_admission import (
-                current_native_role as identity_role,
-            )
-
-            seconds, native_metadata = identity_role(
-                root, directory, descriptor, data, expected_native
-            )
-            native_role = NativeSerialRole(None, seconds, native_metadata)
-        elif contact:
+        if contact:
             from scripts.current_native_serial_role import NativeSerialRole
             from scripts.exact_contact_shard_admission import current_native_role as contact_role
 
@@ -766,12 +711,6 @@ def plan(root: Path, directory: Path, cases: dict[str, float]) -> Plan:
         from scripts.current_shard_assignment import load_assignment, require_planning_limits
 
         groups, assignment = load_assignment(directory, descriptor, history)
-        if identity:
-            from scripts.engine_numerical_identity_shard_admission import (
-                require_frozen_assignment as require_identity_assignment,
-            )
-
-            require_identity_assignment(root, groups)
         if contact:
             from scripts.exact_contact_shard_admission import (
                 require_frozen_assignment as require_contact_assignment,
