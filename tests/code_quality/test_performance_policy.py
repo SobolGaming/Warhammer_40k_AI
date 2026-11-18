@@ -639,7 +639,7 @@ def test_current_smoke_is_in_the_required_serial_ci_lane() -> None:
     assert "--base-ref" in quality
     assert "performance-smoke.json" in quality
     assert "quality-fast" in workflow
-    assert "needs: [lint, contract-conformance, code-quality" in workflow
+    assert "needs: [ci-preflight, lint, contract-conformance, code-quality" in workflow
 
 
 def test_smoke_outputs_do_not_change_assessed_inputs_or_hide_unrelated_reports() -> None:

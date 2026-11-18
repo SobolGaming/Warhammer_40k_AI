@@ -6808,7 +6808,9 @@
       ],
       "owners": [
         "@module",
-        "native_profile_request"
+        "native_profile_request",
+        "_cached_s25_mission_and_catalog",
+        "_s25_base_config"
       ],
       "families": [],
       "sensitive": false,
@@ -17582,7 +17584,9 @@
       "owners": [
         "@module",
         "pytest_addoption",
-        "selected_army_source_index"
+        "selected_army_source_index",
+        "_auto_local_source_index",
+        "_tree_stat_fingerprint"
       ],
       "families": [],
       "sensitive": false,
@@ -34222,7 +34226,9 @@
         "_add_allocation_summary",
         "_scoped_evidence",
         "_behavioral_shard_selectors",
-        "_partitioned_durations"
+        "_partitioned_durations",
+        "_auto_local_source_index",
+        "_tree_stat_fingerprint"
       ],
       "families": [],
       "sensitive": false,
@@ -36274,6 +36280,19 @@
     "exact-contact-regressions": {
       "paths": [
         "tests/rules/section01/test_exact_contact.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "speedup-test-admission": {
+      "paths": [
+        "scripts/speedup_test_admission.py",
+        "data/source_audits/ci64_provenance_v1/speedup-test-transition-v1.json",
+        "tests/support/cross_worker_fixture_cache.py"
       ],
       "owners": [
         "*"

@@ -29,10 +29,21 @@ def test_live_workflow_preserves_required_names_and_all_four_producer_controls()
         ["git", "show", "5396b557fd90a67e0c097da1020959b58724a7ec:.github/workflows/ci.yml"],
         cwd=ROOT,
     ).decode()
+    fast = workflow.split("  quality-fast:\n")[1].split("  lint:\n")[0]
+    assert "if: always()" in fast
     assert (
-        workflow.split("  quality-fast:\n")[1].split("  lint:\n")[0]
-        == (before.split("  quality-fast:\n")[1].split("  lint:\n")[0])
+        "needs: [ci-preflight, lint, contract-conformance, code-quality, semantic-audit-macos]"
+        in fast
     )
+    for lane_name in (
+        "ci-preflight",
+        "lint",
+        "contract-conformance",
+        "code-quality",
+        "semantic-audit-macos",
+    ):
+        assert f"needs.{lane_name}.result != 'success'" in fast
+    assert "runs-on: ${{ vars.CI_LINUX_RUNNER || 'ubuntu-latest' }}" in fast
     assert workflow.split("  semantic-audit-macos:\n")[1].split("  mypy:\n")[0] == before.split(
         "  semantic-audit-macos:\n"
     )[1].split("  mypy:\n")[0].replace("runs-on: macos-latest", "runs-on: macos-15-intel")
@@ -310,7 +321,6 @@ def execution(tmp_path: Path) -> tuple[Path, list[str]]:
     """A complete causal trace; actual pytest transport is qualified separately."""
     selected = [f"tests/code_quality/test_sample.py::test_{i}" for i in range(4)]
     binding = "expected-binding"
-    evidence.Journal(tmp_path, "collect-controller", binding).emit("session_start")
     controller = evidence.Journal(tmp_path, "execute-controller", binding)
     controller.emit("session_start")
     for worker in evidence.WORKERS:
@@ -348,7 +358,7 @@ def execution(tmp_path: Path) -> tuple[Path, list[str]]:
     guard.emit(
         "watchdog_start", deadlines={"interrupt": 570, "terminate": 585, "kill": 590, "reap": 595}
     )
-    for group in (100, 101):
+    for group in (100,):
         guard.emit("group", pgid=group)
         guard.emit("closed", pgid=group)
     guard.emit("watchdog_end", exit_status=0)
@@ -502,10 +512,9 @@ def lane(
     scratch = directory / "scratch"
     output_directory = ROOT / "reports/quality-timing/fixture-producer"
     commands = {
-        mode: evidence.pytest_arguments(
-            inventories["shards"]["4"], output_directory, scratch / mode, collect=mode == "collect"
+        "execute": evidence.pytest_arguments(
+            inventories["shards"]["4"], output_directory, scratch / "execute", collect=False
         )
-        for mode in ("collect", "execute")
     }
     dependencies: dict[str, Any] = {
         "python": "3.14.5",

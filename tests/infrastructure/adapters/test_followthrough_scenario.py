@@ -2,10 +2,15 @@ from __future__ import annotations
 
 import json
 from dataclasses import replace
+from pathlib import Path
 from typing import cast
 
 import pytest
 
+from tests.support.cross_worker_fixture_cache import (
+    load_or_build_json_fixture,
+    rehydrate_payload_receipt,
+)
 from warhammer40k_core.adapters.access_control import ViewerContext
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.ai.canonical_deployment import canonical_deployment_config
@@ -24,9 +29,37 @@ from warhammer40k_core.engine.replay import ReplayRunner
 
 
 @pytest.fixture(scope="module")
-def pair() -> tuple[LocalGameSession, LocalGameSession, FollowthroughPairAdmission]:
-    stationary, moved = reproduce_followthrough_pair()
-    return stationary, moved, FollowthroughPairAdmission.from_sessions(stationary, moved)
+def pair(
+    tmp_path_factory: pytest.TempPathFactory,
+    pytestconfig: pytest.Config,
+) -> tuple[LocalGameSession, LocalGameSession, FollowthroughPairAdmission]:
+    def _build() -> JsonValue:
+        stationary, moved = reproduce_followthrough_pair()
+        admission = FollowthroughPairAdmission.from_sessions(stationary, moved)
+        return {
+            "stationary": stationary.to_persistence_payload(),
+            "moved": moved.to_persistence_payload(),
+            "admission": admission.to_payload(),
+        }
+
+    def _restore(
+        raw: JsonValue,
+    ) -> tuple[LocalGameSession, LocalGameSession, FollowthroughPairAdmission]:
+        data = cast(dict[str, JsonValue], raw)
+        return (
+            LocalGameSession.from_persistence_payload(data["stationary"]),
+            LocalGameSession.from_persistence_payload(data["moved"]),
+            rehydrate_payload_receipt(FollowthroughPairAdmission, data["admission"]),
+        )
+
+    return load_or_build_json_fixture(
+        key="followthrough-pair-v1",
+        source_files=(Path(__file__),),
+        tmp_path_factory=tmp_path_factory,
+        pytestconfig=pytestconfig,
+        build_payload=_build,
+        restore_value=_restore,
+    )
 
 
 def test_matched_exploiter_movement_and_engine_rejected_opponent_shooter(

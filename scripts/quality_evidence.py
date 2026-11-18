@@ -128,7 +128,8 @@ class Journal:
             with self.path.open("ab") as handle:
                 handle.write(raw)
                 handle.flush()
-                os.fsync(handle.fileno())
+                if "failure" in values or kind in {"session_finish", "watchdog_end"}:
+                    os.fsync(handle.fileno())
         except (OSError, TypeError, ValueError, UnicodeError) as error:
             print(
                 f"QUALITY JOURNAL FAILURE {self.role} {kind}: {error}",
@@ -460,7 +461,10 @@ def validate_invocations(
     lock_root: Path,
 ) -> None:
     commands = admitted["commands"]
-    require(set(commands) == {"collect", "execute"}, "Unexpected pytest invocation")
+    require(
+        set(commands) in ({"execute"}, {"collect", "execute"}),
+        "Unexpected pytest invocation",
+    )
     configuration = tomllib.loads((lock_root / "pyproject.toml").read_text())["tool"]["pytest"][
         "ini_options"
     ]
@@ -479,7 +483,8 @@ def validate_invocations(
         "project_origin": str(output.parents[2] / "src/warhammer40k_core/__init__.py"),
     }
     require(admitted["environment"] == expected_environment, "Cache or project import origin drift")
-    for mode in ("collect", "execute"):
+    reference_role = "collect-controller" if "collect" in commands else "execute-controller"
+    for mode in sorted(commands):
         command = commands[mode]
         expected = pytest_arguments(selected, output, scratch / mode, collect=mode == "collect")
         require(
@@ -499,7 +504,7 @@ def validate_invocations(
         roles = [mode + "-controller"]
         if mode == "execute":
             roles += ["execute-" + worker for worker in WORKERS]
-        reference = journal_events(directory, "collect-controller", binding)[0]
+        reference = journal_events(directory, reference_role, binding)[0]
         for role in roles:
             event = journal_events(directory, role, binding)[0]
             require(
@@ -575,14 +580,23 @@ def validate_lane(
         "Unlocked dependencies",
     )
     require(admitted["dependencies"]["python"] == "3.14.5", "Wrong Python runtime")
-    collection = journal_events(directory, "collect-controller", binding)
-    require(
-        [e["kind"] for e in collection] == ["session_start", "collection", "session_finish"]
-        and sorted(collection[1]["nodes"]) == inventories["full_all"]
-        and collection[1]["deferred"] == []
-        and collection[-1]["exit_status"] == 0,
-        "Independent full collection failed",
-    )
+    if "collect" in admitted["commands"]:
+        collection = journal_events(directory, "collect-controller", binding)
+        require(
+            [e["kind"] for e in collection] == ["session_start", "collection", "session_finish"]
+            and sorted(collection[1]["nodes"]) == inventories["full_all"]
+            and collection[1]["deferred"] == []
+            and collection[-1]["exit_status"] == 0,
+            "Independent full collection failed",
+        )
+    else:
+        shard_union = set(inventories["shards"][shard]["nodes"]) | set(
+            inventories["shards"][shard]["deferred"]
+        )
+        require(
+            shard_union <= set(inventories["full_all"]),
+            "Shard inventory escaped full quality inventory",
+        )
     validate_execution(
         directory,
         binding,
@@ -736,10 +750,12 @@ def validate_execution(
         len(junit_nodes) == len(set(junit_nodes)) and set(junit_nodes) == set(selected),
         "JUnit execution inventory differs",
     )
+    expected_journals = {"execute-controller.jsonl", "watchdog.jsonl"} | {
+        "execute-" + worker + ".jsonl" for worker in WORKERS
+    }
+    observed_journals = {path.name for path in directory.glob("*.jsonl")}
     require(
-        {path.name for path in directory.glob("*.jsonl")}
-        == {"collect-controller.jsonl", "execute-controller.jsonl", "watchdog.jsonl"}
-        | {"execute-" + worker + ".jsonl" for worker in WORKERS},
+        observed_journals - {"collect-controller.jsonl"} == expected_journals,
         "Unexpected journal generation",
     )
     guard = journal_events(directory, "watchdog", binding)
@@ -752,12 +768,18 @@ def validate_execution(
         "Watchdog missing, cancelled, timed out, or left child processes",
     )
     require(
-        [e["kind"] for e in guard[1:-1]] == ["group", "closed", "group", "closed"],
-        "Expected collection and execution process groups",
+        [e["kind"] for e in guard[1:-1]]
+        in (["group", "closed"], ["group", "closed", "group", "closed"]),
+        "Expected execution process group",
     )
 
 
 def seal(directory: Path) -> None:
+    for journal_path in sorted(directory.glob("*.jsonl")):
+        with journal_path.open("ab") as handle:
+            handle.flush()
+            os.fsync(handle.fileno())
+    sync_directory(directory)
     files = {
         path.relative_to(directory).as_posix(): sha(path.read_bytes())
         for path in sorted(directory.rglob("*"))

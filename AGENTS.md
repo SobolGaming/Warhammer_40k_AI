@@ -477,3 +477,15 @@ only for the seven obsolete diagnostics named in
 `docs/performance/PERFORMANCE_POLICY.md#retired-diagnostic-entry-points`.
 Preserve the Order 32 probe's retained reference consumer, all historical evidence
 and inventories, current benchmarks, semantic controls, budgets and delivery gates.
+
+On 17 November 2026, the owner authorized retiring the superseded ~483 MB
+`ci/test_shards/` historical calibration/compatibility chain and its 12
+live-blob shard-admission quality modules in favor of clean LPT sharding over
+`ci/test_shards/durations.json`, single-pass `quality_runner.py` execution, a
+dedicated `ci-preflight` workflow job, and adaptive
+`${{ vars.CI_LINUX_RUNNER || 'ubuntu-latest' }}` runner support. The retired
+calibration artifacts remain preserved in Git history at revision
+`9747b9b0873b4f442d3cd81f72280b24810d952c`. Keep all twelve behavioral shards,
+all selected behavioral cases, the 67% full-package branch-coverage floor, the
+120-second bounded mirror runner, the 180-second serial smoke, and the
+600-second quality limits unchanged.

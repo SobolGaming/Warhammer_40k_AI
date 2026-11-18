@@ -1,0 +1,62 @@
+{
+  "retained_cutover_sha256": "4cd1f0b062fad661e1c71fe27d2e9f8279c3c21d2a9f7bea9e3b053db79afce3",
+  "retained_exact_contact_sha256": "0c8e58ab3a4feb1f6525ac490e18e518869326a53e1a42a8ccd9e8cb15a8b61d",
+  "runtime_fingerprint": "f0392def5f2e2935d26f026628b439e90f0f6303fb282ac41a27d1b575a7024e",
+  "schema": "finite-speedup-test-transition-v1",
+  "updated_files": {
+    "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py": {
+      "blob_sha1": "007e4cfcca3e76e7b64a986a3b11455223853177",
+      "bytes": 14827,
+      "mode": "100644",
+      "sha256": "36728f2356ff4794228dc71020dab7350940e6d4a50389c322e89fff07589934"
+    },
+    "tests/infrastructure/adapters/test_canonical_coverage_preflight.py": {
+      "blob_sha1": "dae24ce3ca5cb000dbaca373dbadbe7442ff8a37",
+      "bytes": 4705,
+      "mode": "100644",
+      "sha256": "7255fbfdb63ca8c8d3bfde842c88541ce784cef728f2cb0645dafb14da0f13bb"
+    },
+    "tests/infrastructure/adapters/test_canonical_deployment_coverage.py": {
+      "blob_sha1": "aeb3e203330676fd3afc778f8fef5322cd898971",
+      "bytes": 21659,
+      "mode": "100644",
+      "sha256": "2e9a8b208eab7afbb5f1c0e5681a88914a29c2c868ed00f329a972ca56e56b8e"
+    },
+    "tests/infrastructure/adapters/test_followthrough_scenario.py": {
+      "blob_sha1": "4b27e64512a2cb150a9b4b99f64ccafd26c9164a",
+      "bytes": 8755,
+      "mode": "100644",
+      "sha256": "f76e58072c95b6dcdcdac1b6dab3028a0d70b735f618a1033761ef596344498e"
+    },
+    "tests/infrastructure/adapters/test_matched_attack_scenario.py": {
+      "blob_sha1": "8125f4e678bce9fc8bc226504bd0905167f28edd",
+      "bytes": 11556,
+      "mode": "100644",
+      "sha256": "08adc52f5440a638181c13070b3afff5f8009c05b8700fd21c6af825e87d5c8f"
+    },
+    "tests/infrastructure/adapters/test_normal_move_scenario.py": {
+      "blob_sha1": "0e205aef9bc8ecc77525f8537c44524c3d2cb372",
+      "bytes": 11075,
+      "mode": "100644",
+      "sha256": "8d3cb98312380fb4f7cb4f4d56d8f73471cadaec4d0ba334845cdee08080d2d5"
+    },
+    "tests/infrastructure/adapters/test_preserve_scenario.py": {
+      "blob_sha1": "5a9911466b6ac775fc5a8f723ab8a5f9356f9715",
+      "bytes": 8741,
+      "mode": "100644",
+      "sha256": "fd710411152773650f6b302401aa74bd28edcfffcb57199ef0bf330aa518bfdf"
+    },
+    "tests/infrastructure/adapters/test_runner_accounting.py": {
+      "blob_sha1": "7a2779c1597b735bf169b691a6a4d8aefe7d7a62",
+      "bytes": 43150,
+      "mode": "100644",
+      "sha256": "2d7a77f555b698b302c5a43cf78ac6710e33785220e3e2d8b0febb79f2db3168"
+    },
+    "tests/rules/rules04/unit/test_s25_permission_relevance.py": {
+      "blob_sha1": "ef66d6e52b64e707707045c9c5daead2ca3b60d9",
+      "bytes": 13173,
+      "mode": "100644",
+      "sha256": "07164b58a1f5ec57cef3c3ca8146b8b193f991bf0535716d9023f40f1403589a"
+    }
+  }
+}

@@ -2,10 +2,15 @@ from __future__ import annotations
 
 import json
 from dataclasses import replace
+from pathlib import Path
 from typing import cast
 
 import pytest
 
+from tests.support.cross_worker_fixture_cache import (
+    load_or_build_json_fixture,
+    rehydrate_payload_receipt,
+)
 from warhammer40k_core.adapters.access_control import ViewerContext
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.ai.canonical_deployment import canonical_deployment_config
@@ -23,12 +28,41 @@ from warhammer40k_core.engine.replay import ReplayArtifactPayload, ReplayRunner
 
 
 @pytest.fixture(scope="module")
-def comparison() -> tuple[LocalGameSession, LocalGameSession, MatchedAttackComparison]:
-    stationary, moved = reproduce_followthrough_pair()
-    before = [canonical_json(item.to_persistence_payload()) for item in (stationary, moved)]
-    report = MatchedAttackComparison.from_sessions(stationary, moved)
-    assert before == [canonical_json(item.to_persistence_payload()) for item in (stationary, moved)]
-    return stationary, moved, report
+def comparison(
+    tmp_path_factory: pytest.TempPathFactory,
+    pytestconfig: pytest.Config,
+) -> tuple[LocalGameSession, LocalGameSession, MatchedAttackComparison]:
+    def _build() -> JsonValue:
+        stationary, moved = reproduce_followthrough_pair()
+        before = [canonical_json(item.to_persistence_payload()) for item in (stationary, moved)]
+        report = MatchedAttackComparison.from_sessions(stationary, moved)
+        assert before == [
+            canonical_json(item.to_persistence_payload()) for item in (stationary, moved)
+        ]
+        return {
+            "stationary": stationary.to_persistence_payload(),
+            "moved": moved.to_persistence_payload(),
+            "report": report.to_payload(),
+        }
+
+    def _restore(
+        raw: JsonValue,
+    ) -> tuple[LocalGameSession, LocalGameSession, MatchedAttackComparison]:
+        data = cast(dict[str, JsonValue], raw)
+        return (
+            LocalGameSession.from_persistence_payload(data["stationary"]),
+            LocalGameSession.from_persistence_payload(data["moved"]),
+            rehydrate_payload_receipt(MatchedAttackComparison, data["report"]),
+        )
+
+    return load_or_build_json_fixture(
+        key="matched-attack-comparison-v1",
+        source_files=(Path(__file__),),
+        tmp_path_factory=tmp_path_factory,
+        pytestconfig=pytestconfig,
+        build_payload=_build,
+        restore_value=_restore,
+    )
 
 
 def test_both_ordinary_attacks_have_matched_timing_cooperation_and_local_outcomes(

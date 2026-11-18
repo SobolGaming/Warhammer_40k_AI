@@ -240,7 +240,7 @@ def test_normal_native_relevant_operations_and_owned_selected_sources(
             result_id="s25-relevance-invalid",
         )
     assert session.to_persistence_payload() == before
-    assert_checkpoint(session)
+    assert session.fork().to_persistence_payload() == before
     for _ in range(100):
         if any(
             event.event_type == "attack_sequence_completed"

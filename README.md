@@ -436,22 +436,14 @@ omissions or exclusions. This policy change does not claim either threshold has 
 all required tests and other gates must still succeed. See the
 [active review policy](docs/SEQUENTIAL_REMEDIATION_REVIEW_POLICY.md).
 
-The twelve behavioral manifests in `ci/test_shards/` currently use an explicitly
-reviewed derived assignment, admitted by `current-runtime-compatibility.json`.
-The strict historical allocator remains available when that descriptor is absent:
-it seeds the isolated mirror, then uses largest selectors and improving moves.
-The
-source-bound S25 module retains its twenty exact cases; canonical coverage
-preflight retains its twelve-case partition. Two finite step5g modules add source-bound
-partitions of 32 and 30 exact cases. The bounded mirror setup case is a separate
-selector; its file selector denotes the remaining cases. CI always deselects that
-node from parallel work and runs it once on its owning shard. All other files remain
-intact. The resulting 509 selectors select exactly 6,341 cases, including eighteen
-terrain-preparation/cache regressions, nineteen connected-endpoint/ordered-history
-controls, six Desperate Escape survivor persistence controls in the natural
-Section 09 owner `test_escape_survivor_persistence.py`, and six native equipment,
-battle-prefix and named-weapon choice controls, plus ten Linux-authority session/profile controls. The required guards verify the exact
-selected inventory and partition.
+The twelve behavioral manifests in `ci/test_shards/` use deterministic LPT
+duration balancing over `ci/test_shards/durations.json`, seeding the isolated
+bounded mirror case first and assigning the lightest modeled shard to `shard-1`.
+On 17 November 2026, the ~483 MB stacked historical shard-calibration chain was
+retired from the live working tree (remaining preserved in Git history at
+`9747b9b0873b4f442d3cd81f72280b24810d952c`), while `ci-preflight` validates
+source history and builds/caches the selected-source index once per CI push and
+Linux lanes use `${{ vars.CI_LINUX_RUNNER || 'ubuntu-latest' }}`.
 Verify that every selected file or declared case appears exactly once:
 
 ```bash

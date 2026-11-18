@@ -2,6 +2,7 @@
 
 import json
 from dataclasses import replace
+from pathlib import Path
 from typing import Literal
 
 import pytest
@@ -18,6 +19,7 @@ from tests.support.cavalcade_v995 import (
     mirror_router,
     strict_mirror_session,
 )
+from tests.support.cross_worker_fixture_cache import load_or_build_json_fixture
 from warhammer40k_core.adapters.access_control import ViewerContext
 from warhammer40k_core.adapters.event_stream import EventStreamCursor
 from warhammer40k_core.adapters.local_session import LocalGameSession
@@ -34,16 +36,29 @@ from warhammer40k_core.engine.runtime_modifiers import (
 
 
 @pytest.fixture(scope="module")
-def native_command_checkpoint() -> JsonValue:
-    session = strict_mirror_session()
-    report = BoundedPolicyRunner(
-        session=session,
-        router=mirror_router(deployment_fixture()),
-        limits=RunLimits(policy_seed=19, max_decisions=42, max_seconds=120),
-    ).run(stop_at=RunBoundary("battle", "command"))
-    assert len(report.decisions) == 42
-    assert all(d.accepted for d in report.decisions)
-    return session.to_persistence_payload()
+def native_command_checkpoint(
+    tmp_path_factory: pytest.TempPathFactory,
+    pytestconfig: pytest.Config,
+) -> JsonValue:
+    def _build() -> JsonValue:
+        session = strict_mirror_session()
+        report = BoundedPolicyRunner(
+            session=session,
+            router=mirror_router(deployment_fixture()),
+            limits=RunLimits(policy_seed=19, max_decisions=42, max_seconds=120),
+        ).run(stop_at=RunBoundary("battle", "command"))
+        assert len(report.decisions) == 42
+        assert all(d.accepted for d in report.decisions)
+        return session.to_persistence_payload()
+
+    return load_or_build_json_fixture(
+        key="cavalcade-native-command-checkpoint-v1",
+        source_files=(Path(__file__),),
+        tmp_path_factory=tmp_path_factory,
+        pytestconfig=pytestconfig,
+        build_payload=_build,
+        restore_value=lambda payload: payload,
+    )
 
 
 @pytest.fixture(scope="module")

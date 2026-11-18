@@ -4,8 +4,8 @@ from typing import cast
 
 import pytest
 
+from tests.support.cross_worker_fixture_cache import load_or_measure_canonical_coverage
 from warhammer40k_core.adapters.local_session import LocalGameSession
-from warhammer40k_core.ai.canonical_deployment import reproduce_canonical_deployment
 from warhammer40k_core.ai.canonical_deployment_coverage import (
     CanonicalDeploymentCoverage,
     _coverage_totals,  # pyright: ignore[reportPrivateUsage]
@@ -67,11 +67,22 @@ def test_coverage_totals_require_typed_rows(rows: object) -> None:
         _coverage_totals(rows)
 
 
+@pytest.fixture(scope="module")
+def preflight_canonical_coverage(
+    tmp_path_factory: pytest.TempPathFactory,
+    pytestconfig: pytest.Config,
+) -> tuple[LocalGameSession, CanonicalDeploymentCoverage]:
+    return load_or_measure_canonical_coverage(
+        tmp_path_factory=tmp_path_factory,
+        pytestconfig=pytestconfig,
+    )
+
+
 def test_consistent_tampering_still_reproduces_the_real_engine(
     monkeypatch: pytest.MonkeyPatch,
+    preflight_canonical_coverage: tuple[LocalGameSession, CanonicalDeploymentCoverage],
 ) -> None:
-    session, _ = reproduce_canonical_deployment()
-    report = CanonicalDeploymentCoverage.measure(session=session)
+    session, report = preflight_canonical_coverage
     checkpoint = canonical_json(session.to_persistence_payload())
     original = CanonicalDeploymentCoverage.measure
     measured_sessions: list[LocalGameSession] = []
