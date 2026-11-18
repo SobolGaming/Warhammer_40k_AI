@@ -1558,11 +1558,11 @@
     },
     "tests/code_quality/test_starfang_source_policy.py": {
       "before_sha256": "97763346eef174681290c53e9423e74ac4ea0791a8b2030c092943cc1da41a62",
-      "after_sha256": "1b953315ec4c413374e2166663481ed3843100c11c1257764de2feb41b494366",
+      "after_sha256": "23fdaef03ad0779f49ab4c37df4dc334141d37e713a9b0a6935b13d0d0fc83ec",
       "owners": {
         "test_starfang_source_smoke_binding_and_predecessor_are_exact": {
           "before": "a36ae69a7f11944e3d02e098215a29c9f9ce63eb2ff9ea8d52f09cade848f33e",
-          "after": "4a456025af7ba7020f9c9dceb86957fd3156b07cd5321cfabe1a8c55a5d6eb80"
+          "after": "dd6cd5b4600f42c0a439dc69c2da00651d5ff45e45a43da4de01a64c7012277e"
         }
       }
     },
