@@ -191,9 +191,9 @@ def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item
             )
             order = tuple(order[index] for index in weighted)
     elif len(items) >= 2 * workers and default_profile.is_file():
-        summary: object = json.loads(default_profile.read_text(encoding="utf-8"))
-        if isinstance(summary, dict) and "case_seconds" in summary:
-            selector_seconds = summary_case_seconds(cast(object, summary))
+        default_summary: object = json.loads(default_profile.read_text(encoding="utf-8"))
+        if isinstance(default_summary, dict) and "case_seconds" in default_summary:
+            selector_seconds = summary_case_seconds(cast(object, default_summary))
             ordered_nodes = tuple(items[index].nodeid for index in order)
             if all(
                 node in selector_seconds or node.split("::", 1)[0] in selector_seconds
