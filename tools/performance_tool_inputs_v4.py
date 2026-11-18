@@ -114,8 +114,8 @@ _SCOPES = (
     ReviewedScope(
         NUMERICAL_IDENTITY_MAIN692_BASE,
         NUMERICAL_IDENTITY_MAIN692_SPEC_PATH,
-        "892cc2a8ef738be62ac7945adc6025b26bf2527d60d1053d362f117f52e73067",
-        "ff039fd4d206c3c2160ef81cb4600b98be3115c3c936c7688af251a7f48f9cda",
+        "0c643bf07f4a7b7c96274f4545b6872a76cc4910b37dcb7d9c82b6f5d4bf53f5",
+        "d4b459d606fbe0f6358dcb059feababc332b2eda1ae49ecd66ea6bb82b9608a5",
         NUMERICAL_IDENTITY_MAIN692_REPORT_PATH,
         frozenset(
             [
