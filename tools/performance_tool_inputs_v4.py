@@ -114,8 +114,8 @@ _SCOPES = (
     ReviewedScope(
         NUMERICAL_IDENTITY_MAIN692_BASE,
         NUMERICAL_IDENTITY_MAIN692_SPEC_PATH,
-        "8d5cf2484e5529c96c68f33abc6fdd7ff46e9fa7fe10a6b65d82c3165751261e",
-        "60263197415410d4329ad53b2e3cbd61bcba8bad6d4184d077831dcc0d3c37aa",
+        "892cc2a8ef738be62ac7945adc6025b26bf2527d60d1053d362f117f52e73067",
+        "ff039fd4d206c3c2160ef81cb4600b98be3115c3c936c7688af251a7f48f9cda",
         NUMERICAL_IDENTITY_MAIN692_REPORT_PATH,
         frozenset(
             [
@@ -218,6 +218,7 @@ _SCOPES = (
                 "scripts/reconstruct_local_checkpoint.py",
                 "tests/code_quality/test_ci_performance_gates.py",
                 "tests/code_quality/test_engine_numerical_identity_admission.py",
+                "tests/code_quality/test_qualification40_measurements.py",
                 "tests/code_quality/test_registered_source_scopes.py",
                 "tests/daemons_native_source_preservation.py",
                 "tests/rules/section07/coverage.json",

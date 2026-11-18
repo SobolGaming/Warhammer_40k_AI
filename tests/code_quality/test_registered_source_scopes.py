@@ -920,6 +920,7 @@ def test_numerical_identity_scope_routes_current_base_without_replacing_history(
     )
     assert "contracts/compatibility/47.0.0-shape.json" in scope.new_treatment
     assert "src/warhammer40k_core/adapters/server_sync.py" in scope.treatment
+    assert "tests/code_quality/test_qualification40_measurements.py" in scope.control
     assert not any(name.startswith("src/") for name in scope.control)
     assert scopes.read_role_spec(ROOT, scope_base=scope.base)["base"] == scope.base
     monkeypatch.setattr(sys.modules[__name__], "SCOPE", scope)

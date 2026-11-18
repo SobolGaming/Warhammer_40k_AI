@@ -59,7 +59,9 @@ def test_current_comparison_samples_equal_every_raw_case_and_original_profile() 
     proof: dict[str, Any] = policy.read_object(
         ROOT / stage.NAMESPACE / "measurement-provenance.json"
     )
-    mapping: dict[str, Any] = policy.read_object(ROOT / policy.MAP)
+    # This immutable cohort predates the current audit-operator case. The owning
+    # accessor authenticates its original families, sample counts and budgets.
+    mapping: dict[str, Any] = stage.accepted_operation_map(ROOT)
     for family, row in proof.items():
         comparison: dict[str, Any] = policy.read_object(
             ROOT / ("docs/performance/current/qualification40-" + family + ".json")
