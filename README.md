@@ -265,8 +265,8 @@ uv run ruff check .
 uv run ruff format --check .
 uv run mypy src tests
 uv run pyright
-PATH="${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}" uv run pytest tests --ignore=tests/code_quality -n auto --dist=worksteal --cov=warhammer40k_core --cov-report=term-missing --cov-fail-under=67
-uv run pytest tests/code_quality -q -n auto --dist=worksteal --no-cov @ci/quality_shards/prototype-comparison-deferred.args
+PATH="${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}" uv run python -B -m scripts.run_complete_covered_profile --output ../covered-final-run
+PYTEST_XDIST_AUTO_NUM_WORKERS=32 timeout --signal=TERM --kill-after=30 600 uv run pytest tests/code_quality -q -n auto --dist=worksteal --no-cov @ci/quality_shards/prototype-comparison-deferred.args
 uv run --no-sync python scripts/build_test_shards.py --check --shard-count 12
 uv run lint-imports
 uv run pre-commit run --all-files
@@ -377,7 +377,7 @@ uv run pytest tests/rules/section04/test_completion_boundaries.py -k attack_mort
 Architecture and source-shape audits run independently without behavioral coverage:
 
 ```bash
-uv run pytest tests/code_quality -q -n auto --dist=worksteal --no-cov @ci/quality_shards/prototype-comparison-deferred.args
+PYTEST_XDIST_AUTO_NUM_WORKERS=32 timeout --signal=TERM --kill-after=30 600 uv run pytest tests/code_quality -q -n auto --dist=worksteal --no-cov @ci/quality_shards/prototype-comparison-deferred.args
 ```
 
 For final validation, run the behavioral suite once with coverage and the code-quality
@@ -386,10 +386,14 @@ Focused subsets and `--lf` are for iteration, never replacements for this final 
 
 ```bash
 PATH="${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}" \
-  uv run pytest tests --ignore=tests/code_quality \
-  -n auto --dist=worksteal \
-  --cov=warhammer40k_core --cov-report=term-missing --cov-fail-under=67
+  uv run python -B -m scripts.run_complete_covered_profile \
+  --output ../covered-final-run
 ```
+
+Choose a new output path for each qualification; the controller refuses to overwrite
+an earlier run. It performs cold source-history/index checks, the isolated mirror,
+all remaining cases on 32 workers, combined branch-enabled coverage and the
+unchanged 1,620/1,800-second supervisor. Run the quality command above once afterward.
 
 The `PATH` prefix exposes the Node.js runtime bundled with Codex desktop to the executable
 viewer-renderer regressions. It is safe when that directory is absent: an independently installed
@@ -451,8 +455,14 @@ uv run --no-sync python scripts/build_test_shards.py --check --shard-count 12
 ```
 
 Current scheduling uses only the complete measurements recorded in
-`durations.json` and the twelve generated manifests. Fixture checkpoints are
-shared only within the current pytest invocation; later runs rebuild their inputs.
+`durations.json` and the twelve generated manifests. Grouped LPT keeps the isolated
+mirror and native screening module in one shard. The mirror always builds cold
+under the original 42-decision/120-second runner, completes all its assertions and
+publishes its source-bound command checkpoint. Native test bodies then run with
+ordinary work stealing and require that checkpoint; a missing or mismatched
+producer fails. Both stages share only their current covered controller's fresh
+temporary root and generation nonce. Other ad-hoc reuse is scoped to the current
+pytest invocation; later controller and developer runs rebuild their inputs.
 `ci-preflight` validates source history and shard membership and performs the
 mandatory cold source-index build before dependent lanes run. Every behavioral
 shard may restore that exact-key index, including shard 1. The local complete

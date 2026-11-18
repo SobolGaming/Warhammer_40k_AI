@@ -2,7 +2,7 @@
   "policy": "rules-engine-performance-v3",
   "base": "9747b9b0873b4f442d3cd81f72280b24810d952c",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:f0392def5f2e2935d26f026628b439e90f0f6303fb282ac41a27d1b575a7024e",
-  "operation_map_sha256": "c2cbff5f0b40a440f690bb8c3cee2b081edade32f8c323871ed1e2b5eb02ce1c",
+  "operation_map_sha256": "686efa04847f87736b169e8947fa6f5398a743523fdaee85913851b95976dba2",
   "changes": {
     ".github/workflows/ci.yml": {
       "before_sha256": "f6d8a0e8fdb593bae7ce96a03bf90d87e3915832896300de86752ad2f2aaaade",
@@ -16,21 +16,21 @@
     },
     "AGENTS.md": {
       "before_sha256": "3c1772a4a11f2beddb83546013a66c0555841affa52abf0451c2584e28430967",
-      "after_sha256": "3dd13e40789802d0e82e1a83a60494849c8128880a2c7c53484818579a73ab4d",
+      "after_sha256": "6eb5fe2d3285c56c74a6b0fa219dcf99df42d20a057a7b50fdc6d9a7b2114cd7",
       "owners": {
         "@document": {
           "before": "3c1772a4a11f2beddb83546013a66c0555841affa52abf0451c2584e28430967",
-          "after": "3dd13e40789802d0e82e1a83a60494849c8128880a2c7c53484818579a73ab4d"
+          "after": "6eb5fe2d3285c56c74a6b0fa219dcf99df42d20a057a7b50fdc6d9a7b2114cd7"
         }
       }
     },
     "README.md": {
       "before_sha256": "680bc413522e41731e495b0a8bdb689d993607241bf73be05db26ab7d16a0b24",
-      "after_sha256": "5aafaf8b5076229b1918e91d88ecbc565df2e00be70b40b322cf1ac7c1091bc2",
+      "after_sha256": "956ad6bb8eb9f8d9b0fa84a7fe84bb3e91c4dd2d9efc397725014689bc4940c5",
       "owners": {
         "@document": {
           "before": "680bc413522e41731e495b0a8bdb689d993607241bf73be05db26ab7d16a0b24",
-          "after": "5aafaf8b5076229b1918e91d88ecbc565df2e00be70b40b322cf1ac7c1091bc2"
+          "after": "956ad6bb8eb9f8d9b0fa84a7fe84bb3e91c4dd2d9efc397725014689bc4940c5"
         }
       }
     },
@@ -296,11 +296,11 @@
     },
     "ci/test_shards/durations.json": {
       "before_sha256": "91401bf789ea19276e0aa8363b8856cd6dc772a286cc8f79a55ca5ad924c3ba2",
-      "after_sha256": "cfd1010014d23bf8befe84f705c6a2f12da21f67d2743fcfd3eddea9d0c03b25",
+      "after_sha256": "6983352c0b09e27dfb6ef6496395136e786cf679564f86a6fa6d5e201cb62ea8",
       "owners": {
         "@document": {
           "before": "91401bf789ea19276e0aa8363b8856cd6dc772a286cc8f79a55ca5ad924c3ba2",
-          "after": "cfd1010014d23bf8befe84f705c6a2f12da21f67d2743fcfd3eddea9d0c03b25"
+          "after": "6983352c0b09e27dfb6ef6496395136e786cf679564f86a6fa6d5e201cb62ea8"
         }
       }
     },
@@ -546,121 +546,121 @@
     },
     "ci/test_shards/shard-1.txt": {
       "before_sha256": "59a309fab257a27e9e89c320dbface40a4d7ef4eebd15394bcd4f06bce879603",
-      "after_sha256": "861ee056988c07913b5725eae83b2476b15f290d142ead35356067e43dc1881b",
+      "after_sha256": "b391aad635f490b97de46a84da20360fb870625f1c107139882dbd66a88c92b6",
       "owners": {
         "@document": {
           "before": "59a309fab257a27e9e89c320dbface40a4d7ef4eebd15394bcd4f06bce879603",
-          "after": "861ee056988c07913b5725eae83b2476b15f290d142ead35356067e43dc1881b"
+          "after": "b391aad635f490b97de46a84da20360fb870625f1c107139882dbd66a88c92b6"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
       "before_sha256": "08df1baa7250c78286a197a07333e21ae684508d85a56048251feac120b9d784",
-      "after_sha256": "f3c555c752d38705691bfe949d096b4a55b668b491594eba615426f500b1e1c1",
+      "after_sha256": "0a43d3214df0da0458d21aa0399e62c85186dd93ef80103b4fef45825184cd9b",
       "owners": {
         "@document": {
           "before": "08df1baa7250c78286a197a07333e21ae684508d85a56048251feac120b9d784",
-          "after": "f3c555c752d38705691bfe949d096b4a55b668b491594eba615426f500b1e1c1"
+          "after": "0a43d3214df0da0458d21aa0399e62c85186dd93ef80103b4fef45825184cd9b"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
       "before_sha256": "6622e1ea6a70cb1fceabc3d925fb2c0c126e0c8237ef1b514269cfe30fafe47d",
-      "after_sha256": "50435bf40dcea27b0c6f04528dd8bdf9c5defc3e287f2676d0270872e4d6ad27",
+      "after_sha256": "276ecc10072a6c47be88d86695cfb22748d5f022fd38b0318ec6ddf16275295d",
       "owners": {
         "@document": {
           "before": "6622e1ea6a70cb1fceabc3d925fb2c0c126e0c8237ef1b514269cfe30fafe47d",
-          "after": "50435bf40dcea27b0c6f04528dd8bdf9c5defc3e287f2676d0270872e4d6ad27"
+          "after": "276ecc10072a6c47be88d86695cfb22748d5f022fd38b0318ec6ddf16275295d"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
       "before_sha256": "9f1e7521b12f4773e3b917bbe7b17919a2ad2ce1e9072758ed1282197fc03e2c",
-      "after_sha256": "38e99f1072f05e985402de440374c19cee4d91147394c04c59c38c65dce6ab37",
+      "after_sha256": "287c31772aebbd642d6aaeebb8e0f0fe771b95b08993817f4438246372df189c",
       "owners": {
         "@document": {
           "before": "9f1e7521b12f4773e3b917bbe7b17919a2ad2ce1e9072758ed1282197fc03e2c",
-          "after": "38e99f1072f05e985402de440374c19cee4d91147394c04c59c38c65dce6ab37"
+          "after": "287c31772aebbd642d6aaeebb8e0f0fe771b95b08993817f4438246372df189c"
         }
       }
     },
     "ci/test_shards/shard-2.txt": {
       "before_sha256": "f4785cbf29ad8a7a498732defaeedd0a99ca81860cf25cdfd05e58cca4098ba1",
-      "after_sha256": "d3c897d9791081ae1ab2cc07356b1851ea0fc054a25766d12e1b3946e631ffd0",
+      "after_sha256": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
       "owners": {
         "@document": {
           "before": "f4785cbf29ad8a7a498732defaeedd0a99ca81860cf25cdfd05e58cca4098ba1",
-          "after": "d3c897d9791081ae1ab2cc07356b1851ea0fc054a25766d12e1b3946e631ffd0"
+          "after": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
       "before_sha256": "0b2b4f526da4ad4ba6f32a94e6bb0f3fcc05cefeb505db053911fbae9fb45c6e",
-      "after_sha256": "bc925020164adff441e7f64503a81f6727ba14a591ca077f3a836dba8fb321df",
+      "after_sha256": "5ee38b92c7e8c2c466be0da60315842aa04318e0853ddcac965464a7cb0c656d",
       "owners": {
         "@document": {
           "before": "0b2b4f526da4ad4ba6f32a94e6bb0f3fcc05cefeb505db053911fbae9fb45c6e",
-          "after": "bc925020164adff441e7f64503a81f6727ba14a591ca077f3a836dba8fb321df"
+          "after": "5ee38b92c7e8c2c466be0da60315842aa04318e0853ddcac965464a7cb0c656d"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
       "before_sha256": "8a088a124d7f32b92894d17656527af742565a19c241f39934f3c8c2730a300a",
-      "after_sha256": "9f1cf15a7ce99bcbf892e0c3484d769c661c8d601e130d2387cf700cb6726a31",
+      "after_sha256": "759404f3db8a0e634e7d7e3891cd8f5082e4d6bc7de3a441d303e8e56ce73f87",
       "owners": {
         "@document": {
           "before": "8a088a124d7f32b92894d17656527af742565a19c241f39934f3c8c2730a300a",
-          "after": "9f1cf15a7ce99bcbf892e0c3484d769c661c8d601e130d2387cf700cb6726a31"
+          "after": "759404f3db8a0e634e7d7e3891cd8f5082e4d6bc7de3a441d303e8e56ce73f87"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
       "before_sha256": "27b37dc45c94b3c49769b2348e91744791095022660b06e2cf8b5a9d0f990e75",
-      "after_sha256": "267ed6fea121a1964633c79be2abc22838b77820e50362be58c41f410dc27754",
+      "after_sha256": "8a998943350e8a0560166c77d2c101f869d364f3248acbe807acde557b9ec851",
       "owners": {
         "@document": {
           "before": "27b37dc45c94b3c49769b2348e91744791095022660b06e2cf8b5a9d0f990e75",
-          "after": "267ed6fea121a1964633c79be2abc22838b77820e50362be58c41f410dc27754"
+          "after": "8a998943350e8a0560166c77d2c101f869d364f3248acbe807acde557b9ec851"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
       "before_sha256": "90d4cdfb11e56b6acbca56b093130b69492fd75aa0367df3228336a9ac56821a",
-      "after_sha256": "c1c6e4fbde3fe29378bae277cbf78ed0841d780be6ba9a6c2d4d1ed8661f5ffa",
+      "after_sha256": "ce91c5f9e8a379f1c3a86b51d482003330866457e462c4b0e85818da59e5d7a6",
       "owners": {
         "@document": {
           "before": "90d4cdfb11e56b6acbca56b093130b69492fd75aa0367df3228336a9ac56821a",
-          "after": "c1c6e4fbde3fe29378bae277cbf78ed0841d780be6ba9a6c2d4d1ed8661f5ffa"
+          "after": "ce91c5f9e8a379f1c3a86b51d482003330866457e462c4b0e85818da59e5d7a6"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
       "before_sha256": "0c0b4d1399171c785d03c606eec0df32d54a1c936607d5350acdcee65355404a",
-      "after_sha256": "4be23747108153f6e9d88645b00c7fd9496a4d4226dbd6799a96d961d16f0826",
+      "after_sha256": "a8906aebfc953943d3373234a11d14a2d6978bd55fa917a0f1288e78787f7eaa",
       "owners": {
         "@document": {
           "before": "0c0b4d1399171c785d03c606eec0df32d54a1c936607d5350acdcee65355404a",
-          "after": "4be23747108153f6e9d88645b00c7fd9496a4d4226dbd6799a96d961d16f0826"
+          "after": "a8906aebfc953943d3373234a11d14a2d6978bd55fa917a0f1288e78787f7eaa"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
       "before_sha256": "9e514d9bfb1cf4ccfec70dc4a80089c0499c32763657c48b946459e54a49543a",
-      "after_sha256": "69899ee2ae8dcb0efe949ce7eb0500566f8f76ca92877961eefe3ea9b06e557a",
+      "after_sha256": "61bac983b45539980d543ac3c2a352f126acbc28a63e600031541d12bb963764",
       "owners": {
         "@document": {
           "before": "9e514d9bfb1cf4ccfec70dc4a80089c0499c32763657c48b946459e54a49543a",
-          "after": "69899ee2ae8dcb0efe949ce7eb0500566f8f76ca92877961eefe3ea9b06e557a"
+          "after": "61bac983b45539980d543ac3c2a352f126acbc28a63e600031541d12bb963764"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
       "before_sha256": "ed69ecdec06873840694c5a3a011ae0bef2aa8ae8639006d54e499e8c4835b4f",
-      "after_sha256": "b61a7ef9ba93b4f5f3a55f25fd0aa52f018adcc4104e649eb5b6bb23f40b804a",
+      "after_sha256": "3a41dbf6c433de1548caf9b05e191da4db79c308845a3a8183d267880be24b59",
       "owners": {
         "@document": {
           "before": "ed69ecdec06873840694c5a3a011ae0bef2aa8ae8639006d54e499e8c4835b4f",
-          "after": "b61a7ef9ba93b4f5f3a55f25fd0aa52f018adcc4104e649eb5b6bb23f40b804a"
+          "after": "3a41dbf6c433de1548caf9b05e191da4db79c308845a3a8183d267880be24b59"
         }
       }
     },
@@ -696,21 +696,21 @@
     },
     "data/source_audits/ci64_provenance_v1/speedup-test-transition-v1.json": {
       "before_sha256": null,
-      "after_sha256": "d48c33bc4cdb7db1b6bdef1a1914c51eb4ff63af7d2fd778c04091e60a63bf44",
+      "after_sha256": "42fab552f9d14cf7f17d45060c0f3363a840575948969e6e77d165f276801ed1",
       "owners": {
         "@document": {
           "before": null,
-          "after": "d48c33bc4cdb7db1b6bdef1a1914c51eb4ff63af7d2fd778c04091e60a63bf44"
+          "after": "42fab552f9d14cf7f17d45060c0f3363a840575948969e6e77d165f276801ed1"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "93112d2a4fe59bade0e9a605a79c43365a8d5a1d4107cd2841e6cfd45e456ce7",
-      "after_sha256": "a11d2caa218d7810620179ba3f68758cbecdab27eb8a89bc5ff05b8f1b99f91e",
+      "after_sha256": "387e7d15611125faded9c53563e7e63a97c91eac4cbe920c7dbb9b1b9e73a1ee",
       "owners": {
         "@document": {
           "before": "93112d2a4fe59bade0e9a605a79c43365a8d5a1d4107cd2841e6cfd45e456ce7",
-          "after": "a11d2caa218d7810620179ba3f68758cbecdab27eb8a89bc5ff05b8f1b99f91e"
+          "after": "387e7d15611125faded9c53563e7e63a97c91eac4cbe920c7dbb9b1b9e73a1ee"
         }
       }
     },
@@ -726,11 +726,15 @@
     },
     "scripts/build_test_shards.py": {
       "before_sha256": "3fdc4ab17104678d7f6d4c946b7fb284d11320b458c82a327f0f3b91ed2bf0bd",
-      "after_sha256": "dc796a7ab752a381682ad46cc40f3e07e9ea95811d524d8f7455125a90dce6ac",
+      "after_sha256": "adba328b2d1a94d154238f3d9ec698169288b875672f17c15b84bc4018482eef",
       "owners": {
         "@module": {
           "before": "24f653357a80b7d6592ba9b1a7c6a0da8c3f7d0e5adcbd80480ab613d862cba2",
           "after": "957fb159dcb8bd0c0895ed19cf274bde956b057a8891a65de43b955bfe2586c3"
+        },
+        "_balanced_shards": {
+          "before": "f867498f72afe979707de6d0d7c2052d3c41961bc468774e3c4d40a082271dde",
+          "after": "2ba84d4025483ae86337b9c5d8ecbd32fee2e58be1ba78f2057613eee0606107"
         },
         "_case_partition": {
           "before": "ebf897006f432a5804e7e6a0b27889f1a42ae7dea13cf3d94205b773254a8532",
@@ -743,6 +747,10 @@
         "behavioral_selection": {
           "before": "3696ca30b9bf843f31661397164adf740a9bba12eb0af1b6fb81baccd950d235",
           "after": "83e5418c79f17e372b99ed6690b1561bc54829ed7838394485dd9447a82b6692"
+        },
+        "covered_native_checkpoint_cohort": {
+          "before": null,
+          "after": "ca48f7216b5c680f866422ec6ff6aff2556f7f69532495b7ad84ea69b14e9a4a"
         },
         "worksteal_relevance_order": {
           "before": "3971cfbfbe7cc0a13613db8aa06236f2ee7a4940ca8be15e830ab398b7b98119",
@@ -816,31 +824,35 @@
     },
     "scripts/run_behavioral_coverage.sh": {
       "before_sha256": "4ed1c4fa8288101f1a31cff822fbc901a8ab29566107112cfb683896250c20bc",
-      "after_sha256": "396641e8f283af42a75ee145b93b1b63047fca34132e574310cd1590f335900a",
+      "after_sha256": "ae2425b5b7fb5966fb9d3e603674055ea61953ac95deca60fef05db4574466da",
       "owners": {
         "@document": {
           "before": "4ed1c4fa8288101f1a31cff822fbc901a8ab29566107112cfb683896250c20bc",
-          "after": "396641e8f283af42a75ee145b93b1b63047fca34132e574310cd1590f335900a"
+          "after": "ae2425b5b7fb5966fb9d3e603674055ea61953ac95deca60fef05db4574466da"
         }
       }
     },
     "scripts/run_complete_covered_profile.py": {
       "before_sha256": "89811ac8f2066d8bb5c8b168b2a156a2d2c82f146bfa707f159504c622bbbf39",
-      "after_sha256": "a580a33d8962f44a07648f10b6d75303ccb60c1afa19e7081f11a578bd8f4b71",
+      "after_sha256": "e4ffa7949651975770217f544de8a98f18b79b8797311925dd892dd99a47d93c",
       "owners": {
+        "@module": {
+          "before": "b6d5fb58b4e3831aabe6bc0664d5b390bc337cc143885f6a087dd5b2ddd0ee60",
+          "after": "f332279cae5c536ab67c5bc62b36c145c68c9c3b1c3ce7567b11374e46f23c4a"
+        },
         "run_worker": {
           "before": "ed7d0816d443aa3f7ced481c847efcd33a59bef1dec08c1d56b7960697bf3942",
-          "after": "0c5b53435022502906ac92512549b7b35d44249e06c61df63d2d12c7f0cbfe06"
+          "after": "b7bcf25967bdfbfff3446ea5ab03a96c8931b6a425b42172bde4bbd8101d7761"
         }
       }
     },
     "scripts/speedup_test_admission.py": {
       "before_sha256": null,
-      "after_sha256": "96236da9cc1e3856ee81df56ab20edf1d0001b0ae44daca07fb2564fa755741c",
+      "after_sha256": "6d4278c39884c438477ee588c52b9fc45ad045effbe7e915c706001f1e6ecede",
       "owners": {
         "@module": {
           "before": null,
-          "after": "302499afec2a4210415c8db43082ad1a44930b2782beacbb8c8629117ae993a5"
+          "after": "35a1a1c9f04488f374ab9188fa867c13b3d1cfa81073bd2279f5c93775d8b1be"
         },
         "speedup_test_transition": {
           "before": null,
@@ -1092,11 +1104,11 @@
     },
     "tests/code_quality/test_ci_resource_diagnostics.py": {
       "before_sha256": "1731de73328cdf26074891439a69b620a862a37c29a237066ff71f18a185bb64",
-      "after_sha256": "24844492bcb93eb52cda8a42ba29fe0c888f769eb47f2f763bc8c70339408ae2",
+      "after_sha256": "b9a53e5564ffc3999318bab66ab12c0970b507d549f0fdfc572c0ae5d0e9f2d3",
       "owners": {
         "test_bounded_setup_lane_preserves_selection_coverage_and_failure": {
           "before": "8ee1a50f39fa8d79ea3d6f7d5335f535e838ebbec950c6ad02d614a631849a42",
-          "after": "87aae4cae952be4e0e4cd0636017c21c6700ded2f2438f5894e5109277eb226e"
+          "after": "51d2dc66f7eea549b6271347db53953025c81fb2b9f47a0f5af7a311c2158941"
         }
       }
     },
@@ -1556,19 +1568,19 @@
     },
     "tests/code_quality/test_speedup_shard_governance.py": {
       "before_sha256": null,
-      "after_sha256": "10e3250d0eb4963a9bd1dc833a15eb9effdace0cfb0a58a2ff0a6adcb16571d7",
+      "after_sha256": "ed837a7653c6c54af8e03e67beb4e0ef732bc2b414c59eea718e69e3a90ff75a",
       "owners": {
         "@module": {
           "before": null,
-          "after": "0d402aae52e41ea9df27a2ecf5e53d0100896c14c56ad719466b932ac3833c0d"
+          "after": "1a9859e0d308af3a1855b99e1f1241095b780b6f49df5f4ca588ea3e4e0be1eb"
         },
         "test_ci_workflow_has_preflight_caches_and_adaptive_runner_label": {
           "before": null,
-          "after": "c83b8541f1eee1a7badd35ae47614ae07f4c5e932bdb956e2a675dd9487a01ca"
+          "after": "194615a6bcd77212d512f5d6d7d3ddb9b5a8014c5e10a55c6b228050cdaec264"
         },
         "test_cross_worker_fixture_cache_builds_once_and_rejects_corruption": {
           "before": null,
-          "after": "db70ebfb3480f0ebbec715c26c2fd9c30aeb531edf17fafef06001b9102f6998"
+          "after": "bf1778776922f7ea3e4b0f4df5a5ba66235e9f4bc46adf0b584cf7dd645e6c14"
         },
         "test_multi_worker_worksteal_relevance_spreads_heavy_s25_cases": {
           "before": null,
@@ -1576,7 +1588,7 @@
         },
         "test_shard_directory_is_free_of_historical_calibration_bloat": {
           "before": null,
-          "after": "b5f17f7e014f6a998e5dcce431b756b215db840b3a62f2786750b4dd99f37946"
+          "after": "bf5f24d71b7fa4277796c9a5bc50978dfd455cc0882666c711b0843c6ea9ef54"
         }
       }
     },
@@ -1672,15 +1684,29 @@
     },
     "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py": {
       "before_sha256": "26467cfb68d1e4464c5f926a1278bd67433f5ac99699ebdc9666deb7ab1255ed",
-      "after_sha256": "36728f2356ff4794228dc71020dab7350940e6d4a50389c322e89fff07589934",
+      "after_sha256": "dabe086eb39cc08293080d631b3ba036900056d1df0794e260d39cf2def0df4e",
       "owners": {
         "@module": {
           "before": "a09180df5cf5874fcf670eb8597c0c0f526de105220d5a869886a9eff3e7e6f4",
-          "after": "e0d8bb7367bff14793302a1e22f65436be798d8c8514945f369c2d9a0999ef18"
+          "after": "7a35b49a282d0e86a4a3b1d5fe60c43f4c6d6e64c57b8ad8467b2e1dc2d29d66"
         },
         "native_command_checkpoint": {
           "before": "8c36019c2907be3cf18a6bcfc64c79c9acac81141ae553fa69addc4ff3b8c1f9",
-          "after": "f79d0e55cdec51bf3bdc41f4747afcc68a50d5a5f3d1acf8332b1216ac695414"
+          "after": "bff0ad657793fa558cf16c685d594dafef6b6017fe8d04bf40af09253f5c430e"
+        }
+      }
+    },
+    "tests/factions/chaos_daemons/integration/test_cavalcade_v995_roster.py": {
+      "before_sha256": "80c4a0fa688274d2e1aa2df1eb617364cce620725cc6c49b8003cb936595f2e1",
+      "after_sha256": "17e55e2ddeccca6917f20a6a6737f8bafa8e21fea1a2e37e0ef93279797bf4fd",
+      "owners": {
+        "@module": {
+          "before": "467c46283759b3f61015c0a22e69f84a9a074da80fd69f8a226aba007e16ded2",
+          "after": "ec4574007de6ea17b9209d8c67be2607881f89939e0c769ade978a95d0524b64"
+        },
+        "test_exact_mirror_deploys_all_78_models_and_replays_to_battle": {
+          "before": "a9d3eb75d6ccaa5790b36410bfd379614600f9c8177865bba31b7b7ac1696bfb",
+          "after": "a8a75e078ae532a5c575e2fc5d557f7623c5b28566a692099fc1c931f3fea9b3"
         }
       }
     },
@@ -1816,11 +1842,11 @@
     },
     "tests/rules/section07/coverage.json": {
       "before_sha256": "cea06c79ed546cda088d51118fabdda6fdc97993d7a3b5c680ee92cacc1c36f4",
-      "after_sha256": "4c85f1379f9d377b508d7da6a5c540731b49315302006635f390a13dba43d054",
+      "after_sha256": "d7cec8dcb959a1505324b18c9e172f534cab4cde7151cb6b886d9d18e561a0c2",
       "owners": {
         "@document": {
           "before": "cea06c79ed546cda088d51118fabdda6fdc97993d7a3b5c680ee92cacc1c36f4",
-          "after": "4c85f1379f9d377b508d7da6a5c540731b49315302006635f390a13dba43d054"
+          "after": "d7cec8dcb959a1505324b18c9e172f534cab4cde7151cb6b886d9d18e561a0c2"
         }
       }
     },
@@ -1864,29 +1890,59 @@
         }
       }
     },
+    "tests/support/cavalcade_v995.py": {
+      "before_sha256": "3da5b81a9b714a0b4ce04a6ddc17cc9775fdb3697980145c4b80200faee6fc82",
+      "after_sha256": "b93db7dd662489af2924c15be69b8fee911628ed0106089807184433d3079534",
+      "owners": {
+        "@module": {
+          "before": "dc083ca2888e43dacb7321779a17f4c7686cf6a7ec1275ba2e6d22f10feb7124",
+          "after": "5bba345fe18d32f5b5666ac863a2eba0030425512177d681d2526d33117eb628"
+        },
+        "run_mirror_to_command": {
+          "before": null,
+          "after": "0096cb0b65116c06328a0359e73c05a0b60ee91dd45f718cd1b36f9480032ee4"
+        }
+      }
+    },
     "tests/support/cross_worker_fixture_cache.py": {
       "before_sha256": null,
-      "after_sha256": "f054d44c480022fa698e3dcbaceb37b79afc052849984766cf1a66dbc2712b39",
+      "after_sha256": "b736e7ae442f4acdeb3af9d1c60509dd38291ecdfd2704eb111f391b03b7287a",
       "owners": {
         "@module": {
           "before": null,
-          "after": "5d20946d46b83e1b406463a64b775d29480eec27761e63cc489d3fb9780349ba"
+          "after": "dbf75047b1a676ec73c018175a5cff917bdd650d98e9e8468871fbee43c0cbba"
         },
         "_cache_directory": {
           "before": null,
-          "after": "43314d357d3f2691e0f6071919373fa9860e257a779ce4bacd81968137138ffc"
+          "after": "10910e4c63346f51c4697fdb8b91c74d99f10d9f86e04ae124b4524f20a09f43"
         },
         "_coverage_active": {
           "before": null,
           "after": "a6c21277e968e41dee79c12a9241c2c8c069304869f99c7e290ac43ddbf6d8be"
         },
+        "_covered_controller_directory": {
+          "before": null,
+          "after": "7b3e7feecf7c23b4bc5d1143557de5e04dc4099f6f20d94a97f98f72e675d431"
+        },
+        "_native_command_sources": {
+          "before": null,
+          "after": "4791c8bf94ceff5bb6fc70284934682065259f69117fd8b0501b1399e269989d"
+        },
+        "load_native_command_checkpoint": {
+          "before": null,
+          "after": "38c566d7305aaa3eb07f6785aeeb150d38df49136923e29cc0a58d3b007e8776"
+        },
         "load_or_build_json_fixture": {
           "before": null,
-          "after": "68c72d8493e23b0062ccc48ea192375c4ee6fbd4646e621b20bcc5e0b9ac9cd6"
+          "after": "43eb11f86187746baaf1072716000fcaff6efee36933978a2d3c3785b42e6e3d"
         },
         "load_or_measure_canonical_coverage": {
           "before": null,
           "after": "c7855f2e4633327d13d0a1f818c9ae18ba632aac2d67ba37424206a5ac519c78"
+        },
+        "publish_native_command_checkpoint": {
+          "before": null,
+          "after": "6e06d6a7dc46f9ac65159bf41a8974ee04454f4a36f0f124eed1738e9c939207"
         },
         "rehydrate_payload_receipt": {
           "before": null,
@@ -2607,11 +2663,13 @@
       "category": "rule_semantics",
       "operations": [
         "ci78-cutover-owners-83cd0803bcde80cbfc805d2a110f3274d501da3bc2230de8cc7f95cc0cbd608f",
-        "ci79-ordering-83cd0803bcde80cbfc805d2a110f3274d501da3bc2230de8cc7f95cc0cbd608f"
+        "ci79-ordering-83cd0803bcde80cbfc805d2a110f3274d501da3bc2230de8cc7f95cc0cbd608f",
+        "covered-native-checkpoint-cohort",
+        "behavioral-worksteal-dispatch"
       ],
       "selected_families": [],
-      "rationale": "Accelerate local and hosted behavioral/quality execution by retiring the historical shard-calibration evidence chain, adding ci-preflight caches, single-pass quality execution, cross-worker fixture checkpoints, and duration-aware worksteal dispatch. No gameplay mutation, geometry algorithm, or authoritative decision path changes.",
-      "source_obligation": "Preserve deterministic sharding over durations.json, fail-closed quality evidence, and the shared DecisionRequest path while removing superseded calibration artifacts.",
+      "rationale": "Keep the existing covered mirror producer and its parallel native checkpoint consumers in one deterministic grouped-LPT bucket, reusing an authentic same-controller checkpoint instead of repeating timing-sensitive cold setup.",
+      "source_obligation": "Preserve every selector and raw measured cost, one cold 42-decision/120-second mirror, fail-closed source/generation binding and all native bodies on the ordinary worksteal remainder.",
       "unchanged_work": "No engine rules mutation, no PathWitness weakening, no coverage-floor change, and no replacement of gameplay validators. Mirror 120s, smoke 180s, quality 600s, twelve shards, and the 67 percent branch floor remain mandatory."
     },
     "scripts/fetch_scheduling_sources.py": {
@@ -3030,6 +3088,26 @@
       "rationale": "Authenticate the retained canonical cost campaign against its recorded exact producer lockfile instead of the current development dependency metadata.",
       "source_obligation": "Keep every historical report, timing, dependency record and original outcome immutable and validate their authentic producer bytes from Git.",
       "unchanged_work": "No campaign remeasurement, numerical threshold change, omitted assertion or runtime dependency alteration. Current smoke and complete coverage gates remain mandatory."
+    },
+    "tests/factions/chaos_daemons/integration/test_cavalcade_v995_roster.py": {
+      "category": "measured_workload",
+      "operations": [
+        "covered-native-checkpoint-cohort"
+      ],
+      "selected_families": [],
+      "rationale": "Extract the identical authentic cold mirror builder for its existing benchmark and native fixture, preserving the same declared policy identity, decision path and original 42-decision/120-second runner boundaries.",
+      "source_obligation": "The isolated covered mirror always executes cold and publishes only its fully asserted command checkpoint. Parallel native consumers require that same-source producer within the fresh controller generation.",
+      "unchanged_work": "Preserve every gameplay assertion, strict checkpoint/replay validation, four hosted workers, local32, twelve shards, 67 percent full-package branch coverage and all timing limits. No historical report or measured cost is rewritten."
+    },
+    "tests/support/cavalcade_v995.py": {
+      "category": "measured_workload",
+      "operations": [
+        "speedup-test-admission"
+      ],
+      "selected_families": [],
+      "rationale": "Extract the identical authentic cold mirror builder for its existing benchmark and native fixture, preserving the same declared policy identity, decision path and original 42-decision/120-second runner boundaries.",
+      "source_obligation": "The isolated covered mirror always executes cold and publishes only its fully asserted command checkpoint. Parallel native consumers require that same-source producer within the fresh controller generation.",
+      "unchanged_work": "Preserve every gameplay assertion, strict checkpoint/replay validation, four hosted workers, local32, twelve shards, 67 percent full-package branch coverage and all timing limits. No historical report or measured cost is rewritten."
     }
   },
   "milestone": "ordinary",

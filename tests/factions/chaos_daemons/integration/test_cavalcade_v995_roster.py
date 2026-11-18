@@ -14,6 +14,8 @@ from tests.phase13b_shooting_declaration_helpers import (
     _select_shooting_unit_and_type,
 )
 from tests.setup_completion_helpers import enter_battle_for_fixture
+from tests.support.cavalcade_v995 import run_mirror_to_command
+from tests.support.cross_worker_fixture_cache import publish_native_command_checkpoint
 from tests.support.faction_batch01 import unit_placement
 from tests.support.viewer_identity_fixtures import ordinal_identity_config_payload
 from warhammer40k_core.adapters.access_control import (
@@ -870,25 +872,11 @@ def test_player_runner_preserves_engine_auto_selection_records_after_a_legal_act
     )
 
 
-def test_exact_mirror_deploys_all_78_models_and_replays_to_battle() -> None:
+def test_exact_mirror_deploys_all_78_models_and_replays_to_battle(
+    tmp_path_factory: pytest.TempPathFactory, pytestconfig: pytest.Config
+) -> None:
     """Explicit legal setup recipe, submitted through the shared adapter authority."""
-    session = _strict_mirror_session()
-    fixture = cast(
-        _DeploymentFixture,
-        json.loads(
-            Path(__file__)
-            .with_name("fixtures")
-            .joinpath("cavalcade_v995_deployment.json")
-            .read_text()
-        ),
-    )
-    assert fixture["mission_pool_entry_id"] == "mission-purge-the-foe-vs-purge-the-foe-layout-1"
-    router = _mirror_router(fixture)
-    report = BoundedPolicyRunner(
-        session=session,
-        router=router,
-        limits=RunLimits(policy_seed=19, max_decisions=42, max_seconds=120),
-    ).run(stop_at=RunBoundary("battle", "command"))
+    session, report = run_mirror_to_command()
     assert report.stop_reason == "requested_boundary"
     assert len(report.decisions) == 42
     assert all(t.accepted for t in report.decisions)
@@ -937,6 +925,11 @@ def test_exact_mirror_deploys_all_78_models_and_replays_to_battle() -> None:
         session.replay_artifact(artifact_id="cavalcade-native-setup")
     )
     assert replay.run().reproduced_exactly
+    publish_native_command_checkpoint(
+        session.to_persistence_payload(),
+        tmp_path_factory=tmp_path_factory,
+        pytestconfig=pytestconfig,
+    )
 
 
 @pytest.mark.parametrize("engaged_when_selected", [True, False])

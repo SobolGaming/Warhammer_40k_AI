@@ -197,7 +197,8 @@ and test reporting. A longer outer safety guard is cleanup grace, not approval.
 Keep twelve shards, existing tests, the 67% branch floor, mirror 120-second bound,
 serial smoke 180-second bound and quality 600-second limits unchanged.
 
-Final validation runs the complete behavioral suite **once with coverage**, then
+Final validation uses `scripts.run_complete_covered_profile` with a fresh output
+directory to run the complete behavioral suite **once with coverage** on 32 workers, then
 all code-quality tests once without coverage, using the commands below. Do not
 repeat the behavioral suite without coverage as a second final gate. Both suites
 use xdist work stealing by default. The Node.js `PATH` prefix is required for
@@ -419,8 +420,8 @@ uv run ruff check .
 uv run ruff format --check .
 uv run mypy src tests
 uv run pyright
-PATH="${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}" uv run pytest tests --ignore=tests/code_quality -n auto --dist=worksteal --cov=warhammer40k_core --cov-report=term-missing --cov-fail-under=67
-uv run pytest tests/code_quality -q -n auto --dist=worksteal --no-cov @ci/quality_shards/prototype-comparison-deferred.args
+PATH="${HOME}/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:${PATH}" uv run python -B -m scripts.run_complete_covered_profile --output ../covered-final-run
+PYTEST_XDIST_AUTO_NUM_WORKERS=32 timeout --signal=TERM --kill-after=30 600 uv run pytest tests/code_quality -q -n auto --dist=worksteal --no-cov @ci/quality_shards/prototype-comparison-deferred.args
 uv run --no-sync python scripts/build_test_shards.py --check --shard-count 12
 uv run lint-imports
 uv run pre-commit run --all-files

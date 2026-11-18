@@ -949,6 +949,16 @@ def _execution_weights(
     return weights
 
 
+def covered_native_checkpoint_cohort() -> frozenset[str]:
+    """Same-job producer and consumers for the fresh covered command checkpoint."""
+    return frozenset(
+        (
+            SERIAL_BEHAVIORAL_CASE,
+            "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py",
+        )
+    )
+
+
 def _balanced_shards(
     *,
     durations: dict[str, float],
@@ -980,7 +990,16 @@ def _balanced_shards(
     parallel_totals = [0.0] * shard_count
     serial_totals = [0.0] * shard_count
     largest_cases = [0.0] * shard_count
-    for test_file, duration in sorted(weights.items(), key=lambda item: (-item[1], item[0])):
+    # The cold covered mirror publishes the command checkpoint for this parallel
+    # module. Keep both selectors in one bucket without changing measured costs.
+    cohort = covered_native_checkpoint_cohort()
+    paired = cohort <= weights.keys()
+    ordered = sorted(weights.items(), key=lambda item: (-item[1], item[0]))
+    if paired:
+        ordered = [(name, weights[name]) for name in sorted(cohort)] + [
+            item for item in ordered if item[0] not in cohort
+        ]
+    for test_file, duration in ordered:
         serial = test_file == SERIAL_BEHAVIORAL_CASE
         cost = durations[test_file]
 
@@ -998,7 +1017,7 @@ def _balanced_shards(
             )
             for index in range(shard_count)
         ]
-        shard_index = min(scores)[2]
+        shard_index = 0 if paired and test_file in cohort else min(scores)[2]
         assignments[shard_index].append(test_file)
         totals[shard_index] += duration
         if serial:
@@ -1008,8 +1027,8 @@ def _balanced_shards(
             largest_cases[shard_index] = max(largest_cases[shard_index], peaks[test_file])
     if not assignments or any(not entries for entries in assignments):
         raise SystemExit("Every behavioral shard must be nonempty.")
-    # Preserve the balanced buckets and give the sole cold-index role the
-    # smallest modeled test load. Compare full precision, before JSON rounding.
+    # Preserve the grouped buckets and give shard 1 the smallest modeled load.
+    # The dedicated preflight owns cold-index construction on every CI run.
     cold_index = min(
         range(shard_count),
         key=lambda index: (

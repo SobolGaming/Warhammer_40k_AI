@@ -10,6 +10,8 @@ This helper coordinates construction through a `filelock.FileLock`:
   inside the shared per-testrun temporary root (`basetemp.parent`), so the first
   worker in the current pytest invocation executes the full builder under active
   coverage tracing and sibling workers deserialize the verified JSON payload.
+- A covered controller may explicitly supply a fresh root and generation nonce
+  for its serial producer and parallel consumers. This scope never crosses runs.
 - Standalone non-coverage runs reuse checkpoints only within their current
   pytest invocation's temporary root. A later invocation always rebuilds fixture
   inputs, including imported helper code, source data and numerical dependencies.
@@ -36,6 +38,7 @@ from warhammer40k_core.build_identity import verified_engine_build_identity
 from warhammer40k_core.engine.event_log import JsonValue, canonical_json, validate_json_value
 
 SCHEMA = "cross-worker-fixture-checkpoint-v1"
+NATIVE_COMMAND_KEY = "cavalcade-native-command-checkpoint-v2"
 
 
 def _coverage_active() -> bool:
@@ -48,11 +51,37 @@ def _coverage_active() -> bool:
     return coverage.Coverage.current() is not None
 
 
+def _covered_controller_directory() -> Path | None:
+    root = os.environ.get("WH40K_COVERED_FIXTURE_CACHE")
+    generation = os.environ.get("WH40K_COVERED_FIXTURE_RUN_ID")
+    if root is None and generation is None:
+        return None
+    if (
+        not root
+        or not Path(root).is_absolute()
+        or not generation
+        or generation in {".", ".."}
+        or not generation.isascii()
+        or any(not (character.isalnum() or character in "-_.") for character in generation)
+    ):
+        raise ValueError(
+            "Covered fixture cache requires an absolute root, nonce and active tracing."
+        )
+    import coverage
+
+    if coverage.Coverage.current() is None:
+        raise ValueError("Covered fixture cache requires active tracing, not environment hints.")
+    return Path(root) / generation
+
+
 def _cache_directory(
     *,
     basetemp: Path,
     build_id: str,
 ) -> Path | None:
+    controller = _covered_controller_directory()
+    if controller is not None:
+        return controller
     testrun_uid = os.environ.get("PYTEST_XDIST_TESTRUNUID")
     if testrun_uid:
         shared_root = basetemp.parent if os.environ.get("PYTEST_XDIST_WORKER") else basetemp
@@ -79,6 +108,7 @@ def load_or_build_json_fixture[T](
     pytestconfig: pytest.Config,
     build_payload: Callable[[], JsonValue],
     restore_value: Callable[[JsonValue], T],
+    require_cached: bool = False,
 ) -> T:
     """Build a JSON-serializable fixture once per scope and restore it cleanly."""
     build_id = verified_engine_build_identity().build_id
@@ -87,6 +117,8 @@ def load_or_build_json_fixture[T](
         build_id=build_id,
     )
     if directory is None:
+        if require_cached:
+            raise ValueError("Required fixture checkpoint has no cache scope.")
         return restore_value(validate_json_value(build_payload()))
 
     hasher = hashlib.sha256()
@@ -119,6 +151,8 @@ def load_or_build_json_fixture[T](
                 raise ValueError(f"Corrupted cross-worker fixture cache entry: {target}")
             return restore_value(validate_json_value(envelope["payload"]))
 
+        if require_cached:
+            raise ValueError(f"Required covered fixture checkpoint is missing: {key}")
         payload = validate_json_value(build_payload())
         encoded = canonical_json(
             {
@@ -166,4 +200,58 @@ def load_or_measure_canonical_coverage(
         pytestconfig=pytestconfig,
         build_payload=_build,
         restore_value=_restore,
+    )
+
+
+def _native_command_sources() -> tuple[Path, ...]:
+    root = Path(__file__).resolve().parents[2]
+    return (
+        Path(__file__),
+        root / "tests/support/cavalcade_v995.py",
+        root / "data/army_lists/cavalcade-shadow-bloodthirster.json",
+        root / "tests/factions/chaos_daemons/integration/test_cavalcade_v995_roster.py",
+        root / "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py",
+        root / "tests/factions/chaos_daemons/integration/fixtures/cavalcade_v995_deployment.json",
+    )
+
+
+def publish_native_command_checkpoint(
+    payload: JsonValue,
+    *,
+    tmp_path_factory: pytest.TempPathFactory,
+    pytestconfig: pytest.Config,
+) -> None:
+    """Publish only the mirror's real payload after all original assertions succeed."""
+    observed = load_or_build_json_fixture(
+        key=NATIVE_COMMAND_KEY,
+        source_files=_native_command_sources(),
+        tmp_path_factory=tmp_path_factory,
+        pytestconfig=pytestconfig,
+        build_payload=lambda: payload,
+        restore_value=lambda raw: raw,
+    )
+    if observed != payload:
+        raise ValueError("Published native checkpoint differs from the authentic mirror.")
+
+
+def load_native_command_checkpoint(
+    *,
+    tmp_path_factory: pytest.TempPathFactory,
+    pytestconfig: pytest.Config,
+) -> JsonValue:
+    """Covered consumers require the producer; independent ad-hoc runs build normally."""
+    from tests.support.cavalcade_v995 import run_mirror_to_command
+
+    def build() -> JsonValue:
+        session, _ = run_mirror_to_command()
+        return session.to_persistence_payload()
+
+    return load_or_build_json_fixture(
+        key=NATIVE_COMMAND_KEY,
+        source_files=_native_command_sources(),
+        tmp_path_factory=tmp_path_factory,
+        pytestconfig=pytestconfig,
+        build_payload=build,
+        restore_value=lambda raw: raw,
+        require_cached=_covered_controller_directory() is not None,
     )

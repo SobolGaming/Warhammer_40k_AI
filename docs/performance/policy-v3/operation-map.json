@@ -36237,10 +36237,26 @@
         "tests/support/cross_worker_fixture_cache.py",
         "tests/conftest.py",
         "tests/s25_native_profile_helpers.py",
-        "tests/code_quality/test_performance_policy.py"
+        "tests/code_quality/test_performance_policy.py",
+        "tests/support/cavalcade_v995.py"
       ],
       "owners": [
         "*"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "covered-native-checkpoint-cohort": {
+      "paths": [
+        "scripts/build_test_shards.py",
+        "tests/factions/chaos_daemons/integration/test_cavalcade_v995_roster.py"
+      ],
+      "owners": [
+        "_balanced_shards",
+        "covered_native_checkpoint_cohort",
+        "test_exact_mirror_deploys_all_78_models_and_replays_to_battle",
+        "@module"
       ],
       "families": [],
       "sensitive": false,

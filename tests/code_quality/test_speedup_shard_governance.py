@@ -9,6 +9,7 @@ import sys
 import tomllib
 from pathlib import Path
 
+import coverage
 import pytest
 import scripts.build_test_shards as sharding
 
@@ -41,6 +42,11 @@ def test_shard_directory_is_free_of_historical_calibration_bloat() -> None:
     }
     assert set(files) == expected
     assert sum(files.values()) < MAX_SHARD_DIRECTORY_BYTES
+    cohort = sharding.covered_native_checkpoint_cohort()
+    memberships = [
+        set((SHARD_DIR / f"shard-{index}.txt").read_text().splitlines()) for index in range(1, 13)
+    ]
+    assert sum(cohort <= names for names in memberships) == 1
     completed = subprocess.run(
         [sys.executable, "-B", "scripts/build_test_shards.py", "--check", "--shard-count", "12"],
         cwd=ROOT,
@@ -77,8 +83,7 @@ def test_ci_workflow_has_preflight_caches_and_adaptive_runner_label() -> None:
         assert any(dep.startswith("filelock>=") for dep in groups[group])
         assert any(dep.startswith("coverage[toml]>=") for dep in groups[group])
     for name in (
-        "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py",
-        "tests/factions/chaos_daemons/integration/test_cavalcade_v995_roster.py",
+        "tests/support/cavalcade_v995.py",
         "tests/support/cavalcade_native_approach.py",
     ):
         source = (ROOT / name).read_text()
@@ -187,3 +192,43 @@ def test_cross_worker_fixture_cache_builds_once_and_rejects_corruption(
             build_payload=_build,
             restore_value=lambda raw: raw,
         )
+
+    controller = tmp_path / "covered-controller"
+    monkeypatch.setenv("WH40K_COVERED_FIXTURE_CACHE", str(controller))
+    monkeypatch.setenv("WH40K_COVERED_FIXTURE_RUN_ID", "generation-one")
+    monkeypatch.setenv("COV_CORE_SOURCE", "cache-scope-unit-probe")
+
+    def controller_load(*, require_cached: bool = False) -> JsonValue:
+        return load_or_build_json_fixture(
+            key="required-controller-probe",
+            source_files=(source_probe,),
+            tmp_path_factory=tmp_path_factory,
+            pytestconfig=pytestconfig,
+            build_payload=_build,
+            restore_value=lambda raw: raw,
+            require_cached=require_cached,
+        )
+
+    # Environment hints alone cannot authorize a supposedly covered producer.
+    with pytest.raises(ValueError, match="active tracing, not environment hints"):
+        controller_load()
+    tracer = coverage.Coverage(data_file=None)
+    tracer.start()
+    try:
+        with pytest.raises(ValueError, match="Required covered fixture checkpoint is missing"):
+            controller_load(require_cached=True)
+        assert builds == 2
+        assert controller_load() == {"value": 42}
+        assert builds == 3
+        monkeypatch.setenv("PYTEST_XDIST_TESTRUNUID", "another-stage-in-the-same-controller")
+        assert controller_load(require_cached=True) == {"value": 42}
+        assert builds == 3
+        monkeypatch.setenv("WH40K_COVERED_FIXTURE_RUN_ID", "generation-two")
+        with pytest.raises(ValueError, match="Required covered fixture checkpoint is missing"):
+            controller_load(require_cached=True)
+        assert builds == 3
+        monkeypatch.delenv("WH40K_COVERED_FIXTURE_RUN_ID")
+        with pytest.raises(ValueError, match="absolute root, nonce and active tracing"):
+            controller_load()
+    finally:
+        tracer.stop()

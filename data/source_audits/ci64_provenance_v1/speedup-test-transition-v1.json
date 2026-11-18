@@ -5,16 +5,16 @@
   "schema": "finite-speedup-test-transition-v1",
   "updated_files": {
     "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py": {
-      "blob_sha1": "007e4cfcca3e76e7b64a986a3b11455223853177",
-      "bytes": 14827,
+      "blob_sha1": "071b932b61adab90bc3fdd302e2758a41ce5eeb1",
+      "bytes": 14021,
       "mode": "100644",
-      "sha256": "36728f2356ff4794228dc71020dab7350940e6d4a50389c322e89fff07589934"
+      "sha256": "dabe086eb39cc08293080d631b3ba036900056d1df0794e260d39cf2def0df4e"
     },
     "tests/factions/chaos_daemons/integration/test_cavalcade_v995_roster.py": {
-      "blob_sha1": "e34b65d3e9af4b3a9ee0b60896b799b18fe1fe12",
-      "bytes": 67730,
+      "blob_sha1": "e7c682e61c1c15a490e5a7cc5a51b523763c362b",
+      "bytes": 67554,
       "mode": "100644",
-      "sha256": "80c4a0fa688274d2e1aa2df1eb617364cce620725cc6c49b8003cb936595f2e1"
+      "sha256": "17e55e2ddeccca6917f20a6a6737f8bafa8e21fea1a2e37e0ef93279797bf4fd"
     },
     "tests/infrastructure/adapters/test_canonical_coverage_preflight.py": {
       "blob_sha1": "dae24ce3ca5cb000dbaca373dbadbe7442ff8a37",

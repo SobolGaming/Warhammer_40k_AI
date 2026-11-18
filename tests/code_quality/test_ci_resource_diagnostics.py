@@ -146,7 +146,9 @@ def test_bounded_setup_lane_preserves_selection_coverage_and_failure(
         "if 'pytest' in args:\n"
         "    with Path('pytest-calls.jsonl').open('a') as stream:\n"
         "        stream.write(json.dumps({'args': args, "
-        "'timing': os.environ['TEST_TIMING_DIR']}) + '\\n')\n"
+        "'timing': os.environ['TEST_TIMING_DIR'], "
+        "'fixture_root': os.environ['WH40K_COVERED_FIXTURE_CACHE'], "
+        "'fixture_run': os.environ['WH40K_COVERED_FIXTURE_RUN_ID']}) + '\\n')\n"
         "    lane = 'SERIAL_STATUS' if args[args.index('-n') + 1] == '1' "
         "else 'PARALLEL_STATUS'\n"
         "    sys.exit(int(os.environ[lane]))\n"
@@ -179,6 +181,11 @@ def test_bounded_setup_lane_preserves_selection_coverage_and_failure(
         capture_output=True,
         check=False,
     )
+    if selection in {"mirror", "native", "native-only"}:
+        assert result.returncode == 1
+        assert "Mirror/native checkpoint cohort must be selected together" in result.stderr
+        assert not (tmp_path / "pytest-calls.jsonl").exists()
+        return
     expected_failure = bool(
         (serial_selectors and serial_status) or (parallel_selectors and parallel_status)
     )
@@ -188,6 +195,9 @@ def test_bounded_setup_lane_preserves_selection_coverage_and_failure(
         for line in (tmp_path / "pytest-calls.jsonl").read_text().splitlines()
     ]
     assert len(calls) == bool(serial_selectors) + bool(parallel_selectors)
+    assert len({str(call["fixture_root"]) for call in calls}) == 1
+    assert len({str(call["fixture_run"]) for call in calls}) == 1
+    assert all(call["fixture_run"] for call in calls)
     observed_selection: list[str] = []
     for index, call in enumerate(calls):
         args = cast(list[str], call["args"])
