@@ -1525,8 +1525,8 @@
   ],
   "unadopted_gaps": [],
   "authenticated_inputs": {
-    "AGENTS.md": "3c1772a4a11f2beddb83546013a66c0555841affa52abf0451c2584e28430967",
-    "README.md": "680bc413522e41731e495b0a8bdb689d993607241bf73be05db26ab7d16a0b24",
+    "AGENTS.md": "8a25b2c4ea8d57da587e014d007d730f60ca5853a066bfafb178a06302f70d46",
+    "README.md": "180147423d339072bf0c19d4f750f45b455e04697ac07bb24bb5e1ad9a2e16f5",
     "pyproject.toml": "9105612cdd8e91d028b9818440df96fab254bf707609e0e71317a6ae19db87c8",
     "data/source_audits/order97/selected-sources.json": "1b6a31629e6e004e5386842608af953e96113d6fd3eb5ffd2ad6fa349ca26464",
     "data/source_audits/order97/categories/07.json": "52a349cc268a3c3e9cb0348ac9bb101a2c9a4d83ccde60f99a3d2ad071adc80d",
@@ -1572,5 +1572,5 @@
     "README.md": "ad52bc7e7e40aa9a7e2296f20c8726fcf63a5b92bd087100e09238572901a583",
     "pyproject.toml": "b0fed8cc1f2a25bec5821a96f50e0d7da47ec5e9e8e17df528cd6f69c6d67192"
   },
-  "authenticated_inputs_maintenance": "Three current governance/configuration inputs are refreshed for the reviewed CI and 67% coverage settings. Historical authenticated inputs, literal capture authorities and gameplay bindings remain unchanged; this metadata update alone claims no qualification pass. The current README hash is also refreshed for the explicitly selected Linux-authority execution guide; original authenticated history, literal source captures and gameplay obligation mappings remain unchanged."
+  "authenticated_inputs_maintenance": "Three current governance/configuration inputs are refreshed for the reviewed CI speedup, shard-calibration retirement, and 67% coverage settings. Historical authenticated inputs, literal capture authorities and gameplay bindings remain unchanged; this metadata update alone claims no qualification pass. The current README and AGENTS hashes are refreshed for the owner-authorized LPT sharding and ci-preflight guidance; original authenticated history, literal source captures and gameplay obligation mappings remain unchanged."
 }
