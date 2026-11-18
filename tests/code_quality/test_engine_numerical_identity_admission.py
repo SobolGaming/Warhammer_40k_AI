@@ -6,7 +6,7 @@ import hashlib
 import json
 import subprocess
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import pytest
 from scripts import build_test_shards as sharding
@@ -27,7 +27,7 @@ BASE = "b231d7cedea54e123a9211fd775e2910c87d2f18"
 
 
 def _record(name: str) -> dict[str, Any]:
-    return json.loads((ROOT / name).read_bytes())  # type: ignore[no-any-return]
+    return cast(dict[str, Any], json.loads((ROOT / name).read_bytes()))
 
 
 def _transition(
