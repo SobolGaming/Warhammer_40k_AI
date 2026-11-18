@@ -114,8 +114,8 @@ _SCOPES = (
     ReviewedScope(
         NUMERICAL_IDENTITY_MAIN692_BASE,
         NUMERICAL_IDENTITY_MAIN692_SPEC_PATH,
-        "fd0dc387fb2ee28e17eb79048c90c16602b2a59b7de9fa01b4eb77e00aae63ab",
-        "775fedafe6857743b9ee1c0a56ca1c7b63481a41ad8ff7db85fa20632f43bf22",
+        "8d5cf2484e5529c96c68f33abc6fdd7ff46e9fa7fe10a6b65d82c3165751261e",
+        "60263197415410d4329ad53b2e3cbd61bcba8bad6d4184d077831dcc0d3c37aa",
         NUMERICAL_IDENTITY_MAIN692_REPORT_PATH,
         frozenset(
             [
@@ -149,6 +149,7 @@ _SCOPES = (
                 "src/warhammer40k_core/adapters/linux_authority_worker.py",
                 "src/warhammer40k_core/adapters/local_session.py",
                 "src/warhammer40k_core/adapters/numerical_checkpoint_reconstruction.py",
+                "src/warhammer40k_core/adapters/server_sync.py",
                 "src/warhammer40k_core/ai/canonical_deployment.py",
                 "src/warhammer40k_core/ai/deployment_reference_suite.py",
                 "src/warhammer40k_core/ai/followthrough_scenario.py",

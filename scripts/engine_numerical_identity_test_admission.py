@@ -45,8 +45,8 @@ from scripts.symbolic_milli_inch_test_admission import ADDITION as SYMBOLIC_ADDI
 from scripts.symbolic_milli_inch_test_admission import ADDITION_SHA256 as SYMBOLIC_SHA256
 
 ADDITION = "data/source_audits/ci64_provenance_v1/engine-numerical-identity-test-transition-v1.json"
-ADDITION_SHA256 = "0bfcaf73d1d7c75d86c687ee0ab108d897e65b1d8f8aaaa69efea399774fe7a3"
-RUNTIME = "db8c8f733112410866770bcd2d3231a9e2a348e2de0514f5fc0b5ffe95b7b9cd"
+ADDITION_SHA256 = "4ab08b326285715c00a3bd10aabca1f6572da4fdfa55958309a2e2a215668bb8"
+RUNTIME = "d60a6871e475632bdf930a80251f39e7bae5b5f40c35960b6ed1790750f62fa0"
 COORDINATES = "src/warhammer40k_core/geometry/numerical_identity.py"
 QUERIES = "src/warhammer40k_core/geometry/milli_inch_polygon_queries.py"
 QUERIES_SHA256 = "e46fe8e9738786931c565c5ea5a2dc2921132e3690b420632bfcb8a00c362cc5"

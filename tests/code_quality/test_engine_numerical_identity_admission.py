@@ -114,7 +114,7 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
     )
     previous = sharding.summary_case_seconds(prior)
     added = {node for node in current if node.startswith(selection.OWNER + "::")}
-    assert len(added) == 26
+    assert len(added) == 28
     successors = _record(selection.ADDITION)["case_id_successors"]
     retained = {successors.get(node, node) for node in previous}
     assert len(retained) == len(previous)

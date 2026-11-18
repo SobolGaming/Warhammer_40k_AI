@@ -392,3 +392,233 @@ def test_retained_recipe_requires_its_original_executor_and_source_stays_unchang
     with pytest.raises(CheckpointReconstructionError):
         reconstruct_local_checkpoint(raw, profile_id=PROFILE_ID)
     assert historical_checkpoint_bytes() == raw
+
+
+def test_event_delta_projection_reuse_is_request_and_identity_local(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from dataclasses import replace
+
+    from tests.shared.category_migration.phase18g_18h_session_security import (
+        _create_session,
+        _events,
+        _projection,
+        _string,
+        _submit_lifecycle_command,
+    )
+    from warhammer40k_core.adapters import server_sync
+    from warhammer40k_core.adapters.access_control import (
+        DEV_PLAYER_A_TOKEN,
+        DEV_PLAYER_B_TOKEN,
+        DEV_SPECTATOR_TOKEN,
+        ViewerContext,
+    )
+    from warhammer40k_core.adapters.projection import GameViewPayload
+    from warhammer40k_core.adapters.server import AdapterGameServer
+    from warhammer40k_core.adapters.session_events import CursorValidationError
+    from warhammer40k_core.adapters.session_protocol import SessionRevisionSnapshot
+
+    server = AdapterGameServer()
+    session_id = _create_session(server, game_id="numerical-request-projection")
+    initial = _projection(server, session_id=session_id, token=DEV_PLAYER_A_TOKEN)
+    cursor = _string(initial, "event_cursor")
+    record = server._sessions[session_id]  # pyright: ignore[reportPrivateUsage]
+    viewer = ViewerContext.for_player("player-a")
+    snapshot = record.snapshot_for_viewer(viewer)
+    original = LocalGameSession.view_for_context
+    observed: list[LocalGameSession] = []
+
+    def observe(self: LocalGameSession, *, viewer: ViewerContext) -> GameViewPayload:
+        observed.append(self)
+        return original(self, viewer=viewer)
+
+    monkeypatch.setattr(LocalGameSession, "view_for_context", observe)
+    empty = _events(server, session_id=session_id, token=DEV_PLAYER_A_TOKEN, cursor=cursor)
+    assert empty["resync_required"] is False
+    assert empty["events"] == []
+    assert empty["projection_state_hash"] == initial["projection_state_hash"]
+    assert len(observed) == 1
+    observed.clear()
+    assert _events(server, session_id=session_id, token=DEV_PLAYER_A_TOKEN, cursor=cursor) == empty
+    assert len(observed) == 1  # No hash survives a request boundary.
+
+    observed.clear()
+    memo: list[tuple[SessionRevisionSnapshot, ViewerContext, str]] = []
+    project = server_sync._snapshot_projection_hash  # pyright: ignore[reportPrivateUsage]
+    expected = project(snapshot, viewer=viewer, memo=memo)
+    assert project(snapshot, viewer=viewer, memo=memo) == expected
+    assert len(observed) == 1
+    equivalent_snapshot = replace(snapshot)
+    equivalent_viewer = ViewerContext.for_player("player-a")
+    assert equivalent_snapshot is not snapshot
+    assert equivalent_viewer is not viewer
+    assert project(equivalent_snapshot, viewer=viewer, memo=memo) == expected
+    assert project(snapshot, viewer=equivalent_viewer, memo=memo) == expected
+    assert len(observed) == 3
+    assert len(memo) == 3
+
+    binding = server.cursor_codec.decode(cursor)
+    with pytest.raises(CursorValidationError):
+        server_sync.validate_cursor_projection_anchor(
+            record=record,
+            viewer=viewer,
+            cursor=replace(binding, projection_state_hash="0" * 64),
+            _projection_memo=memo,
+        )
+    assert len(observed) == 3  # A memo hit still compares the authenticated hash.
+    server_sync.validate_cursor_projection_anchor(record=record, viewer=viewer, cursor=binding)
+    server_sync.validate_cursor_projection_anchor(record=record, viewer=viewer, cursor=binding)
+    assert len(observed) == 5  # Durable callers keep independent fresh validation.
+
+    _submit_lifecycle_command(
+        server,
+        session_id=session_id,
+        command_id="numerical-request-start",
+        expected_revision=0,
+        submission_kind="start_session",
+    )
+    current = _projection(server, session_id=session_id, token=DEV_PLAYER_A_TOKEN)
+    assert current["projection_state_hash"] != initial["projection_state_hash"]
+    observed.clear()
+    first = _events(server, session_id=session_id, token=DEV_PLAYER_A_TOKEN, cursor=cursor, limit=1)
+    assert first["resync_required"] is False
+    assert first["has_more"] is True
+    assert first["projection_state_hash"] == initial["projection_state_hash"]
+    # Target is new; the historical anchor and paginated boundary are the same stored snapshot.
+    assert len(observed) == 2
+    record = server._sessions[session_id]  # pyright: ignore[reportPrivateUsage]
+    assert observed[0] is record.current_snapshot().adapter_session
+    assert observed[1] is snapshot.adapter_session
+    resumed = _string(first, "next_cursor")
+    while True:
+        page = _events(server, session_id=session_id, token=DEV_PLAYER_A_TOKEN, cursor=resumed)
+        assert page["resync_required"] is False
+        resumed = _string(page, "next_cursor")
+        if page["has_more"] is False:
+            break
+    assert resumed == current["event_cursor"]
+    assert page["projection_state_hash"] == current["projection_state_hash"]
+
+    # Each viewer keeps its own freshly projected authority, including delayed history.
+    for token in (DEV_PLAYER_B_TOKEN, DEV_SPECTATOR_TOKEN):
+        own_projection = _projection(server, session_id=session_id, token=token)
+        observed.clear()
+        own_page = _events(
+            server,
+            session_id=session_id,
+            token=token,
+            cursor=_string(own_projection, "event_cursor"),
+        )
+        assert own_page["resync_required"] is False
+        assert own_page["projection_state_hash"] == own_projection["projection_state_hash"]
+        assert len(observed) == 1
+        wrong_viewer = _events(server, session_id=session_id, token=token, cursor=resumed)
+        assert wrong_viewer["resync_required"] is True
+    malformed = _events(server, session_id=session_id, token=DEV_PLAYER_A_TOKEN, cursor="forged")
+    assert malformed["resync_required"] is True
+    assert malformed["resync_reason"] == "malformed"
+
+
+def test_projection_envelope_validates_and_detaches_once(monkeypatch: pytest.MonkeyPatch) -> None:
+    from tests.shared.category_migration.phase18g_18h_session_security import _create_session
+    from warhammer40k_core.adapters import server_sync
+    from warhammer40k_core.adapters.access_control import DEV_PLAYER_A_TOKEN, ViewerContext
+    from warhammer40k_core.adapters.projection import GameViewPayload
+    from warhammer40k_core.adapters.server import AdapterGameServer
+    from warhammer40k_core.engine.event_log import EventLogError, JsonValue, validate_json_value
+
+    server = AdapterGameServer()
+    session_id = _create_session(server, game_id="numerical-projection-detachment")
+    record = server._sessions[session_id]  # pyright: ignore[reportPrivateUsage]
+    viewer = ViewerContext.for_player("player-a")
+    original_view = LocalGameSession.view_for_context
+    raw_views: list[GameViewPayload] = []
+    probe: object = {"values": (True, 1, 1.0, -0.0, {"mutable": cast(list[JsonValue], [])})}
+    normalizations = 0
+
+    def observed_view(self: LocalGameSession, *, viewer: ViewerContext) -> GameViewPayload:
+        view = original_view(self, viewer=viewer)
+        # Fault injection retains the complete native view and all engine decisions.
+        cast(dict[str, object], cast(object, view))["validation_probe"] = probe
+        raw_views.append(view)
+        return view
+
+    def observed_validation(value: object) -> JsonValue:
+        nonlocal normalizations
+        normalizations += 1
+        return validate_json_value(value)
+
+    monkeypatch.setattr(LocalGameSession, "view_for_context", observed_view)
+    monkeypatch.setattr(server_sync, "validate_json_value", observed_validation)
+
+    def project() -> dict[str, JsonValue]:
+        return cast(
+            dict[str, JsonValue],
+            server_sync.session_projection_payload(
+                record=record,
+                viewer=viewer,
+                cursor_codec=server.cursor_codec,
+                retention_limit=server.event_retention_limit,
+            ),
+        )
+
+    payload = project()
+    assert normalizations == 1  # One full recursive normalization, no discarded clone.
+    raw = cast(JsonValue, raw_views[-1])
+    assert payload["projection"] == validate_json_value(raw)
+    assert payload["session_id"] == session_id
+    assert payload["projection_state_hash"] == raw_views[-1]["projection_state_hash"]
+
+    def detached(source: JsonValue, result: JsonValue) -> None:
+        if isinstance(source, dict):
+            assert type(result) is dict
+            assert result is not source
+            assert source.keys() == result.keys()
+            for key, value in source.items():
+                detached(value, result[key])
+        elif isinstance(source, (list, tuple)):
+            assert type(result) is list
+            assert result is not source
+            for before, after in zip(source, result, strict=True):
+                detached(before, after)
+        else:
+            assert type(result) is type(source)
+            assert result == source
+
+    detached(raw, payload["projection"])
+    returned_view = payload["projection"]
+    assert isinstance(returned_view, dict)
+    returned_view.clear()
+    assert raw_views[-1]
+    assert project()["projection"] == validate_json_value(cast(JsonValue, raw_views[-1]))
+    for invalid in (
+        float("nan"),
+        float("inf"),
+        {1: "bad-key"},
+        "<object object at 0x1234>",
+        object(),
+    ):
+        probe = invalid
+        with pytest.raises(EventLogError):
+            project()
+
+        response = server.handle(
+            method="GET",
+            path=f"/sessions/{session_id}/projection",
+            authorization=f"Bearer {DEV_PLAYER_A_TOKEN}",
+        )
+        assert response.status_code == 400
+        assert "malformed_json_payload" in json.dumps(response.payload)
+    # Wrapper-only and combined malformed values retain the same typed public rejection.
+    monkeypatch.setattr(record, "game_id", cast(str, object()))
+    for wrapper_probe in ({"valid": True}, object()):
+        probe = wrapper_probe
+        with pytest.raises(EventLogError):
+            project()
+        response = server.handle(
+            method="GET",
+            path=f"/sessions/{session_id}/projection",
+            authorization=f"Bearer {DEV_PLAYER_A_TOKEN}",
+        )
+        assert response.status_code == 400
+        assert "malformed_json_payload" in json.dumps(response.payload)

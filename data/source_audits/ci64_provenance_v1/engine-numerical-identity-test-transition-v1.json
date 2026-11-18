@@ -1,11 +1,11 @@
 {
-  "added_cases": 26,
+  "added_cases": 28,
   "added_files": {
     "tests/rules/section01/test_engine_numerical_identity.py": {
-      "blob_sha1": "abe8eb9f28eb6f7167b5e5d4501af4197140fd51",
-      "bytes": 16127,
+      "blob_sha1": "e02f6c3a3a3aa532f6fac6e8f2adf6977054b6a7",
+      "bytes": 26496,
       "mode": "100644",
-      "sha256": "98bcc81ce10207fed2af8f4dc0a75e47640e22df411047bc4134753111b33f95"
+      "sha256": "50ae93f0d27ab2ff25b7fe8dd185044188ec2c5ddfea17cd259e027476c0cc3d"
     }
   },
   "case_id_successors": {
@@ -21,7 +21,7 @@
   "retained_profile_sha256": "020dcec99278aa79f2215762a525c0c029231cdb9c64f1e988d4a1719e0fbb74",
   "retained_queries_sha256": "46e4cd2b9e1045991a52c4361e4fe61ddaf230c07c8437a46a574e9eecf97820",
   "retained_symbolic_sha256": "23943a7fb56ba7b6e3da0888667d15959b4b1ae4e2148be0b6e6ab3d1aeeb9cb",
-  "runtime_fingerprint": "db8c8f733112410866770bcd2d3231a9e2a348e2de0514f5fc0b5ffe95b7b9cd",
+  "runtime_fingerprint": "d60a6871e475632bdf930a80251f39e7bae5b5f40c35960b6ed1790750f62fa0",
   "schema": "finite-engine-numerical-identity-test-transition-v1",
   "sources": {
     "contracts/schemas/create-session.schema.json": "d31d970da328c065dc444a4bf92208615499c72b6fc5c7c8e18f72b4b06d1657",
@@ -38,6 +38,7 @@
     "src/warhammer40k_core/adapters/linux_authority_worker.py": "c0904a8daec7f2fc836fdfcde6dae5e66e611bec017c96a8b97866588eb28f2c",
     "src/warhammer40k_core/adapters/local_session.py": "fab4f30a4e83ba327fcecb3e23c829541a3ad337f2856634c0e17163d5f4f080",
     "src/warhammer40k_core/adapters/numerical_checkpoint_reconstruction.py": "934c5d24fdff7781ffa199cbc370ea0cb970b27eed611b76afd07307e551b4ba",
+    "src/warhammer40k_core/adapters/server_sync.py": "b7876bc070764cf6f24bb60a7903ee9e2f0e9fb6fcbfcca9adabfa0d6634b0a9",
     "src/warhammer40k_core/ai/canonical_deployment.py": "f0ebfbed8d80011bd46d741b240fd23c096d47d4bcb81a3f222f9c2ee8fd6f1d",
     "src/warhammer40k_core/ai/deployment_reference_suite.py": "abef6cdd0fbf9ed3d6e2f479a62749480828c7ce476495ab164b72b63c67b34d",
     "src/warhammer40k_core/ai/followthrough_scenario.py": "ad4c440f1ea05fb4d4d5dc14590d9d1d0bfb873bcb1fc2ac2325f2ee63117c6f",

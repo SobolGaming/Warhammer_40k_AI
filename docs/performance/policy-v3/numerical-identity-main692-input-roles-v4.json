@@ -97,6 +97,7 @@
     "src/warhammer40k_core/adapters/linux_authority_worker.py",
     "src/warhammer40k_core/adapters/local_session.py",
     "src/warhammer40k_core/adapters/numerical_checkpoint_reconstruction.py",
+    "src/warhammer40k_core/adapters/server_sync.py",
     "src/warhammer40k_core/ai/canonical_deployment.py",
     "src/warhammer40k_core/ai/deployment_reference_suite.py",
     "src/warhammer40k_core/ai/followthrough_scenario.py",
