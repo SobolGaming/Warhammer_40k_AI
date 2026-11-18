@@ -51,6 +51,11 @@ def _binding(before: dict[str, str], after: dict[str, str]) -> dict[str, Any]:
 def _report() -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
     binding = _binding(*_inventories())
     specification = json.loads((ROOT / inputs.MAP_PATH).read_bytes())["families"][inputs.FAMILY]
+    # Historical scope controls use their original detached declaration.
+    specification["input_binding"] = {
+        "schema": scopes.SCHEMA,
+        "role_specification": SCOPE.spec_path,
+    }
     side = {
         "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:" + "a" * 64,
         "host": {
@@ -890,3 +895,51 @@ def test_pr2_provenance_addition_preserves_exact_prior_bytes_and_rejects_drift()
         with pytest.raises(ValueError, match="Exact registered edition provenance inputs changed"):
             before_pr2_comparison_provenance(changed)
     assert before_pr2_comparison_provenance(raw) == prior
+
+
+def test_numerical_identity_scope_routes_current_base_without_replacing_history(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import sys
+
+    scope = scopes.registered_scope(scopes.NUMERICAL_IDENTITY_MAIN692_BASE)
+    assert scope.base == "b231d7cedea54e123a9211fd775e2910c87d2f18"
+    historical = scopes.registered_scope(scopes.NUMERICAL_IDENTITY_BASE)
+    assert historical.base == "9747b9b0873b4f442d3cd81f72280b24810d952c"
+    assert scopes.read_role_spec(ROOT, scope_base=historical.base)["base"] == historical.base
+    current = json.loads((ROOT / inputs.MAP_PATH).read_bytes())["families"][inputs.FAMILY]
+    assert current["input_binding"] == {
+        "schema": scopes.SCHEMA,
+        "role_specification": scope.spec_path,
+    }
+    assert scope.harness == scopes.registered_scope(scopes.PR2_BASE).harness
+    assert scope.required == scopes.registered_scope(scopes.PR2_BASE).required
+    assert (
+        "src/warhammer40k_core/adapters/numerical_checkpoint_reconstruction.py"
+        in scope.new_treatment
+    )
+    assert "contracts/compatibility/47.0.0-shape.json" in scope.new_treatment
+    assert "src/warhammer40k_core/adapters/server_sync.py" in scope.treatment
+    assert "tests/code_quality/test_qualification40_measurements.py" in scope.control
+    assert not any(name.startswith("src/") for name in scope.control)
+    assert scopes.read_role_spec(ROOT, scope_base=scope.base)["base"] == scope.base
+    monkeypatch.setattr(sys.modules[__name__], "SCOPE", scope)
+    report, specification, binding = _report()
+    _validate(report, specification, binding)
+    assert provenance.registered_provenance_context(scope.spec_path) is not None
+
+
+def test_numerical_comparison_context_inverse_rejects_partial_and_duplicate_source() -> None:
+    from tests.daemons_native_source_preservation import before_pr2_comparison_provenance
+
+    raw = (ROOT / "tools/source_scope_provenance.py").read_bytes()
+    assert before_pr2_comparison_provenance(raw) != raw
+    for changed in (
+        raw + b"\n",
+        raw.replace(b"scopes.NUMERICAL_IDENTITY_BASE", b"scopes.PR2_BASE"),
+        raw.replace(
+            b"    scopes.NUMERICAL_IDENTITY_BASE,\n", b"    scopes.NUMERICAL_IDENTITY_BASE,\n" * 2
+        ),
+    ):
+        with pytest.raises(ValueError, match="Exact registered edition provenance"):
+            before_pr2_comparison_provenance(changed)

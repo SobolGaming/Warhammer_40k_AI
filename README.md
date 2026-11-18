@@ -360,7 +360,11 @@ Bare legacy checkpoints/replays require deliberate `enroll_legacy(...)` or
 `replay_legacy(...)` with a nonempty provenance receipt. Enrollment preserves the
 original bytes and still requires complete strict reconstruction/replay. A
 compatible executor is not proof of an unknown artifact's original producer.
-Existing v2 checkpoint/v37 replay data and exact comparisons remain unchanged.
+Current bare native checkpoints use v3-numerical-identity and replays use
+v38-numerical-identity. These APIs admit the current legacy-float numerical
+contract; they preserve input bytes and reject obsolete inner formats. Existing
+v2 checkpoint/v37 replay data and exact comparisons remain unchanged and require
+their retained compatible executor. No format is inferred or migrated.
 
 ## Test commands
 

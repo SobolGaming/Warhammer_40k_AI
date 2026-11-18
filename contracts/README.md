@@ -1,11 +1,17 @@
 # CORE V2 external contract
 
-The current language-neutral bundle is Contract **46.0.0**. Start with
+The current language-neutral bundle is Contract **47.0.0**. Start with
 `openapi.yaml`, the canonical schemas and schema-validated examples. The
 [adapter decision contract](../docs/ADAPTER_DECISION_CONTRACT.md) defines current
 choice, projection, visibility and replay semantics. The
 [compatibility policy](compatibility-policy.md) preserves released baselines and
 all deployment-retention obligations.
+
+Contract 47 requires the explicit legacy numerical identity in new config and
+saved state, rejects incompatible pose/path fields, and versions native
+persistence and replay accordingly. The [46-to-47 contract guidance](migrations/46-to-47.md)
+defines retained-runtime requirements and the separately selected finite audit
+reconstruction profile. Exact coordinates and milli-inch gameplay remain unadmitted.
 
 Contract 46 adds required operator-only `private_rng_seed` to game configuration
 and authoritative saved state. Creation clients must supply private 256-bit

@@ -1194,7 +1194,7 @@
       "terrain_areas_by_id": {},
       "terrain_features_by_id": {}
     },
-    "authoritative_geometry_hash": "f4f48294b508e7a53d8fde56c6bfe0ec0e520b4ab7100329148f02560ceff47c",
+    "authoritative_geometry_hash": "5b877343076d105abcbe1c7754454a0111bcce27c8cc8ae183ff4d8aa5176513",
     "battlefield_id": "phase15a-battlefield",
     "bounds": {
       "max_x_inches": 100.0,
@@ -5988,7 +5988,7 @@
   },
   "primary_rules_unit_turn_start_snapshots": [],
   "projection_schema": "game-view-v14-viewer-identities",
-  "projection_state_hash": "6afb186105fbb6fe7b80b4c869e8c8c20bac0faaa7e4a3c863994c973f73db67",
+  "projection_state_hash": "4d8e03eec275dc416c446749c95094060b2a9cc3e53a73867898b4c7777e27ac",
   "public_army_rosters": [
     {
       "army_id": "army-alpha",

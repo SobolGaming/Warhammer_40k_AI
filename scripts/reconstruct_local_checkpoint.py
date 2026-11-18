@@ -11,7 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT / "src") not in sys.path:
     sys.path.insert(0, str(ROOT / "src"))
 
-from warhammer40k_core.adapters.checkpoint_reconstruction import (  # noqa: E402
+from warhammer40k_core.adapters.numerical_checkpoint_reconstruction import (  # noqa: E402
     PROFILE_ID,
     reconstruct_local_checkpoint,
     verify_checkpoint_reconstruction,

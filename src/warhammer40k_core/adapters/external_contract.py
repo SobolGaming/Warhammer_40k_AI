@@ -12,9 +12,9 @@ from referencing.jsonschema import Schema
 
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 
-EXTERNAL_CONTRACT_VERSION = "46.0.0"
+EXTERNAL_CONTRACT_VERSION = "47.0.0"
 
-CREATE_SESSION_SCHEMA_VERSION = "create-session-v4-private-rng"
+CREATE_SESSION_SCHEMA_VERSION = "create-session-v5-numerical-identity"
 DECISION_FAMILY_COVERAGE_SCHEMA_VERSION = "decision-family-coverage-v2-interactions"
 DECISION_REQUEST_VIEW_SCHEMA_VERSION = "decision-request-view-v6-viewer-identities"
 ERROR_ENVELOPE_SCHEMA_VERSION = "error-envelope-v2-diagnostics"
@@ -22,13 +22,13 @@ EVENT_STREAM_DELTA_SCHEMA_VERSION = "event-delta-v6-viewer-identities"
 FINITE_SUBMISSION_SCHEMA_VERSION = "finite-submission-v1"
 LIFECYCLE_STATUS_SCHEMA_VERSION = "lifecycle-status-v5-viewer-identities"
 PARAMETERIZED_SUBMISSION_SCHEMA_VERSION = "parameterized-submission-v2-weapon-instances"
-SESSION_COMMAND_RESULT_SCHEMA_VERSION = "session-command-result-v46-contract"
+SESSION_COMMAND_RESULT_SCHEMA_VERSION = "session-command-result-v47-contract"
 SESSION_COMMAND_ENVELOPE_SCHEMA_VERSION = "session-command-envelope-v3-viewer-identities"
-SESSION_COMMAND_OUTCOME_SCHEMA_VERSION = "session-command-outcome-v46-contract"
-SESSION_CREATE_SCHEMA_VERSION = "session-create-v5-private-rng"
-SESSION_METADATA_SCHEMA_VERSION = "session-metadata-v46-contract"
-SESSION_PERSISTENCE_CONTRACT_VERSION = "46.0.0"
-SESSION_PERSISTENCE_SCHEMA_VERSION = "session-persistence-v37-contract46"
+SESSION_COMMAND_OUTCOME_SCHEMA_VERSION = "session-command-outcome-v47-contract"
+SESSION_CREATE_SCHEMA_VERSION = "session-create-v6-numerical-identity"
+SESSION_METADATA_SCHEMA_VERSION = "session-metadata-v47-contract"
+SESSION_PERSISTENCE_CONTRACT_VERSION = "47.0.0"
+SESSION_PERSISTENCE_SCHEMA_VERSION = "session-persistence-v38-contract47"
 SESSION_PROJECTION_SCHEMA_VERSION = "session-projection-v10-viewer-identities"
 
 CREATE_SESSION_SCHEMA_NAME = "create-session.schema.json"

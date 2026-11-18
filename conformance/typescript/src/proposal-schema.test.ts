@@ -84,4 +84,11 @@ test("HTTP client accepts both current 422 outcome and error union branches", as
     assert.deepEqual(actual.body, expected);
     fetch.mock.restore();
   }
+  const fetch = context.mock.method(globalThis, "fetch", async () => new Response(
+    JSON.stringify({...outcome, schema_version: "session-command-outcome-v46-contract"}),
+    {status: 422, headers: {"Content-Type": "application/json"}},
+  ));
+  await assert.rejects(client.executeCommand({session_id: command.session_id}, command),
+    /unknown schema version/);
+  fetch.mock.restore();
 });

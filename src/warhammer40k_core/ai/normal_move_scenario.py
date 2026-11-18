@@ -35,8 +35,10 @@ from warhammer40k_core.engine.phase import LifecycleStatusKind
 from warhammer40k_core.geometry.pathing import ModelPathEndpoint, PathWitness
 from warhammer40k_core.geometry.pose import Pose, PosePayload
 
-NORMAL_MOVE_SCENARIO_ID = "canonical-witnessed-normal-move-v1"
-NORMAL_MOVE_SCENARIO_SCHEMA = "normal-move-scenario-admission-v1"
+NORMAL_MOVE_SCENARIO_ID = "canonical-witnessed-normal-move-v2-numerical-identity"
+# Receipt versions do not relabel the original ordinary decision identifiers.
+NORMAL_MOVE_EXECUTION_ID = "canonical-witnessed-normal-move-v1"
+NORMAL_MOVE_SCENARIO_SCHEMA = "normal-move-scenario-admission-v2-numerical-identity"
 _SELECT_UNIT = PolicyRoute("player-a", "select_movement_unit", "battle", None, "movement", None)
 _SELECT_ACTION = PolicyRoute("player-a", "select_movement_action", "battle", None, "movement", None)
 _PROPOSE = PolicyRoute(
@@ -91,7 +93,7 @@ def normal_move_scenario_definition() -> dict[str, JsonValue]:
 
 
 NORMAL_MOVE_SCENARIO_DEFINITION_HASH = (
-    "12c50a37c861dbf138e8e89e90fbdd1931283d31ccff3442872582846eaa7c81"
+    "b934a82a8fc290d942256a3edc6bb707136a85ab58e85bf8231d408e2cc3bc31"
 )
 
 
@@ -153,7 +155,7 @@ def _continue_normal_move(
             viewer=ViewerContext.for_player("player-a"),
             request_id=context.request["request_id"],
             option_id=option,
-            result_id=f"{NORMAL_MOVE_SCENARIO_ID}:{index}",
+            result_id=f"{NORMAL_MOVE_EXECUTION_ID}:{index}",
         )
         _require(
             status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
@@ -184,7 +186,7 @@ def _continue_normal_move(
         viewer=ViewerContext.for_player("player-a"),
         request_id=context.request["request_id"],
         payload=validate_json_value(proposal.to_payload()),
-        result_id=f"{NORMAL_MOVE_SCENARIO_ID}:17",
+        result_id=f"{NORMAL_MOVE_EXECUTION_ID}:17",
     )
     if status.status_kind is LifecycleStatusKind.ADVANCED:
         status = session.advance_until_decision_or_terminal()

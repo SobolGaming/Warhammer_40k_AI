@@ -254,12 +254,20 @@ export interface components {
             model_geometries?: components["schemas"]["create-session--model_geometry_catalog_record.schema"][];
             player_ids: string[]; reserve_unit_points: Record<string, never>[]; ruleset_descriptor: Record<string, never>;
             tactical_secondary_draw_count: number; turn_order: string[];
+            numerical_identity: {
+                /** @constant */
+                version: "engine-numerical-identity-v1";
+                /** @constant */
+                numerical_policy_id: "legacy-binary-inch-v1";
+                /** @constant */
+                coordinate_representation_id: "binary-float-pose-v1";
+            };
         };
         /** CORE V2 Authenticated SessionCreatePayload */
         "session-create.schema": {
             config: components["schemas"]["config"];
             /** @constant */
-            schema_version: "session-create-v5-private-rng";
+            schema_version: "session-create-v6-numerical-identity";
         };
         "lifecycle-status--json_value.schema": null | boolean | number | string | components["schemas"]["lifecycle-status--json_value.schema"][] | {
             [key: string]: components["schemas"]["lifecycle-status--json_value.schema"];
@@ -292,7 +300,7 @@ export interface components {
             projection_state_hash: string; rules_overlay_ids: string[]; ruleset_descriptor_hash: string;
             ruleset_id: Record<string, never>;
             /** @constant */
-            schema_version: "session-metadata-v46-contract"; server_contract_version: string; session_id: string;
+            schema_version: "session-metadata-v47-contract"; server_contract_version: string; session_id: string;
             session_revision: number;
             /** @enum {string} */
             session_state: "created" | "active" | "terminal" | "closed"; source_hash: string; source_package_id: string;
@@ -699,7 +707,7 @@ export interface components {
             /** @enum {string} */
             outcome_code: "command_committed" | "proposal_invalid" | "rule_path_unsupported";
             /** @constant */
-            schema_version: "session-command-outcome-v46-contract"; session: components["schemas"]["session-metadata.schema"];
+            schema_version: "session-command-outcome-v47-contract"; session: components["schemas"]["session-metadata.schema"];
         } & ({
             /** @constant */
             accepted?: true;
@@ -1374,7 +1382,7 @@ export interface components {
             initial_rng_state: Record<string, never>;
             projection_checkpoints: components["schemas"]["replay-metadata--projection_checkpoint.schema"][];
             /** @constant */
-            schema_version: "replay-artifact-v37-private-rng";
+            schema_version: "replay-artifact-v38-numerical-identity";
             source_identity: components["schemas"]["replay-metadata--source_identity.schema"];
         };
         /** CORE V2 FiniteOptionSubmissionPayload */

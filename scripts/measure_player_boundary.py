@@ -1,7 +1,7 @@
 """Matched native player projection, command, retention and server restore costs.
 
 The fixed config is public test data, not secret competitive entropy. Both runtime
-arms decode its identical bytes with their own GameConfig.from_payload. This is
+arms explicitly encode its retained semantic bytes for their own config schema. This is
 a component measurement; retained-cursor outcomes are recorded without claiming
 the baseline implements the head's privacy guarantees.
 """
@@ -26,7 +26,7 @@ if TYPE_CHECKING:
 
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "tests/support/fixtures/player_boundary_config.json"
-WORKLOAD_ID = "native-player-boundary-v2"
+WORKLOAD_ID = "native-player-boundary-numerical-identity-v3"
 CASES = (
     "projection",
     "visible_events",
@@ -211,8 +211,23 @@ def main() -> None:
     parser.add_argument("--runtime-src", type=Path, default=ROOT / "src")
     parser.add_argument("--revision", required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument(
+        "--config-encoding",
+        choices=("unbound-legacy-v2", "engine-numerical-identity-v1"),
+        default="engine-numerical-identity-v1",
+    )
     args = parser.parse_args()
     _select_runtime_src(args.runtime_src)
+    from warhammer40k_core.adapters.local_session import (
+        LOCAL_GAME_SESSION_PERSISTENCE_SCHEMA_VERSION,
+    )
+
+    expected_schema = {
+        "unbound-legacy-v2": "local-game-session-persistence-v2-private-rng",
+        "engine-numerical-identity-v1": "local-game-session-persistence-v3-numerical-identity",
+    }[args.config_encoding]
+    if expected_schema != LOCAL_GAME_SESSION_PERSISTENCE_SCHEMA_VERSION:
+        raise ValueError("Benchmark encoding does not match the selected runtime schema.")
     from tests.support.viewer_identity_fixtures import ordinal_identity_config_payload
 
     from warhammer40k_core.adapters.access_control import DEV_PLAYER_A_TOKEN, DEV_PLAYER_B_TOKEN
@@ -227,7 +242,17 @@ def main() -> None:
 
     times: dict[str, list[float]] = {case: [] for case in CASES}
     outcomes: dict[str, list[dict[str, JsonValue]]] = {case: [] for case in CASES}
-    config_bytes = FIXTURE.read_bytes()
+    source_config_bytes = FIXTURE.read_bytes()
+    config_payload = json.loads(source_config_bytes)
+    if "numerical_identity" in config_payload:
+        raise ValueError("Retained source fixture unexpectedly contains numerical identity.")
+    if args.config_encoding == "engine-numerical-identity-v1":
+        config_payload["numerical_identity"] = {
+            "version": "engine-numerical-identity-v1",
+            "numerical_policy_id": "legacy-binary-inch-v1",
+            "coordinate_representation_id": "binary-float-pose-v1",
+        }
+    config_bytes = json.dumps(config_payload, sort_keys=True).encode()
     ordinal_bytes = json.dumps(
         ordinal_identity_config_payload(json.loads(config_bytes)), sort_keys=True
     ).encode()
@@ -363,6 +388,8 @@ def main() -> None:
     report = {
         "workload_id": WORKLOAD_ID,
         "revision": args.revision,
+        "config_encoding": args.config_encoding,
+        "source_fixture_sha256": hashlib.sha256(source_config_bytes).hexdigest(),
         "runtime_build_id": verified_engine_build_identity().build_id,
         "fixture_sha256": hashlib.sha256(config_bytes).hexdigest(),
         "ordinal_fixture_sha256": hashlib.sha256(ordinal_bytes).hexdigest(),

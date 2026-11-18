@@ -13,14 +13,14 @@
     },
     "engine_version": {"minLength": 1, "type": "string"},
     "event_retention_limit": {"minimum": 1, "type": "integer"},
-    "external_contract_version": {"const": "46.0.0", "type": "string"},
+    "external_contract_version": {"const": "47.0.0", "type": "string"},
     "game_session_index": {
       "items": {"$ref": "#/$defs/game_session_index_entry"},
       "type": "array",
       "uniqueItems": true
     },
     "schema_version": {
-      "const": "session-persistence-v37-contract46",
+      "const": "session-persistence-v38-contract47",
       "type": "string"
     },
     "sessions": {
@@ -316,7 +316,7 @@
       "additionalProperties": true,
       "properties": {
         "config": {
-          "$ref": "https://warhammer40k-core.local/contracts/v4/create-session.schema.json#/properties/config"
+          "$ref": "https://warhammer40k-core.local/contracts/v5/create-session.schema.json#/properties/config"
         },
         "state": {"type": ["object", "null"]}
       },
@@ -343,7 +343,7 @@
         "rng_state": {"$ref": "#/$defs/rng_state"},
         "rng_state_hash": {"$ref": "#/$defs/sha256"},
         "schema_version": {
-          "const": "local-game-session-persistence-v2-private-rng",
+          "const": "local-game-session-persistence-v3-numerical-identity",
           "type": "string"
         },
         "source_identity": {

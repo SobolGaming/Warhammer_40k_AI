@@ -1,0 +1,79 @@
+{
+  "added_cases": 28,
+  "added_files": {
+    "tests/rules/section01/test_engine_numerical_identity.py": {
+      "blob_sha1": "e02f6c3a3a3aa532f6fac6e8f2adf6977054b6a7",
+      "bytes": 26496,
+      "mode": "100644",
+      "sha256": "50ae93f0d27ab2ff25b7fe8dd185044188ec2c5ddfea17cd259e027476c0cc3d"
+    }
+  },
+  "case_id_successors": {
+    "tests/factions/chaos_daemons/integration/test_cavalcade_v995_roster.py::test_exact_mirror_config_passes_network_admission[/games-create-session-v4-private-rng]": "tests/factions/chaos_daemons/integration/test_cavalcade_v995_roster.py::test_exact_mirror_config_passes_network_admission[/games-create-session-v5-numerical-identity]",
+    "tests/factions/chaos_daemons/integration/test_cavalcade_v995_roster.py::test_exact_mirror_config_passes_network_admission[/sessions-session-create-v5-private-rng]": "tests/factions/chaos_daemons/integration/test_cavalcade_v995_roster.py::test_exact_mirror_config_passes_network_admission[/sessions-session-create-v6-numerical-identity]"
+  },
+  "retained_circle_sha256": "a82643598fb01025704bd9d222643fce81e9f772d938a968f1b6568bd9542f19",
+  "retained_contact_sha256": "0c8e58ab3a4feb1f6525ac490e18e518869326a53e1a42a8ccd9e8cb15a8b61d",
+  "retained_cutover_sha256": "4cd1f0b062fad661e1c71fe27d2e9f8279c3c21d2a9f7bea9e3b053db79afce3",
+  "retained_foundation_sha256": "9ebbf6d4cf39d25a60c78a4312e0a128c5b43b6c79c64ed91fa41e4387366e07",
+  "retained_pairs_sha256": "06a2fe4f9fb0b1803412f058d41b37d41272b5db18c039481c9926053142c46e",
+  "retained_polygon_sha256": "56253b70e4c56a6c6b9dd3a053b127211811fc1ec79e3a5097285feaf023c263",
+  "retained_profile_sha256": "020dcec99278aa79f2215762a525c0c029231cdb9c64f1e988d4a1719e0fbb74",
+  "retained_queries_sha256": "46e4cd2b9e1045991a52c4361e4fe61ddaf230c07c8437a46a574e9eecf97820",
+  "retained_symbolic_sha256": "23943a7fb56ba7b6e3da0888667d15959b4b1ae4e2148be0b6e6ab3d1aeeb9cb",
+  "runtime_fingerprint": "d60a6871e475632bdf930a80251f39e7bae5b5f40c35960b6ed1790750f62fa0",
+  "schema": "finite-engine-numerical-identity-test-transition-v1",
+  "sources": {
+    "contracts/schemas/create-session.schema.json": "d31d970da328c065dc444a4bf92208615499c72b6fc5c7c8e18f72b4b06d1657",
+    "contracts/schemas/game-view.schema.json": "6de66cddb19389465e148ddeec41f07e62b5826fa6cfa42b2a1e333a7f43622a",
+    "contracts/schemas/replay-metadata.schema.json": "c58997bf59ab3002e165de8bf11b261d4015d7a18d6a8833f3e6b20b2f6a171b",
+    "contracts/schemas/session-command-outcome.schema.json": "c0daaf53e1c66aed65c491a8f80a5a5bf04f4337954629719f0891de1cb629ad",
+    "contracts/schemas/session-command-result.schema.json": "3fde2e244d4328f78f2c0c38fb59ff64b0dc02f4b0e1d7a20bc1047c282159a7",
+    "contracts/schemas/session-create.schema.json": "4c7167c56cb2771100c61e956a08040aab7dc9a2d694aeadc7c1bc4aaf5ec5be",
+    "contracts/schemas/session-metadata.schema.json": "49dd08a1496d1d2a52bd627daf72c930f5c0c5f15758baeea7ea2d6251c5b5a5",
+    "contracts/schemas/session-persistence.schema.json": "98d8b361188108cfcdefcd7b689764fc5b1cfbdd8cc0434439633732f9aa3def",
+    "src/warhammer40k_core/adapters/battlefield_projection.py": "632e82480b3a8d72ee5c5a503bee034779bddf7c7d102c00e1fb128d9784f8ea",
+    "src/warhammer40k_core/adapters/external_contract.py": "a9fd66f2f03fe8d05485c0b48f3672f548a182044ade32c191f985f490bc8eb1",
+    "src/warhammer40k_core/adapters/linux_authority_transport.py": "9ebd2028fe972d7614508bd1aef898fd4e6c7a33d53fb4437e976acec5bfba38",
+    "src/warhammer40k_core/adapters/linux_authority_worker.py": "c0904a8daec7f2fc836fdfcde6dae5e66e611bec017c96a8b97866588eb28f2c",
+    "src/warhammer40k_core/adapters/local_session.py": "fab4f30a4e83ba327fcecb3e23c829541a3ad337f2856634c0e17163d5f4f080",
+    "src/warhammer40k_core/adapters/numerical_checkpoint_reconstruction.py": "934c5d24fdff7781ffa199cbc370ea0cb970b27eed611b76afd07307e551b4ba",
+    "src/warhammer40k_core/adapters/server_sync.py": "b7876bc070764cf6f24bb60a7903ee9e2f0e9fb6fcbfcca9adabfa0d6634b0a9",
+    "src/warhammer40k_core/ai/canonical_deployment.py": "f0ebfbed8d80011bd46d741b240fd23c096d47d4bcb81a3f222f9c2ee8fd6f1d",
+    "src/warhammer40k_core/ai/deployment_reference_suite.py": "abef6cdd0fbf9ed3d6e2f479a62749480828c7ce476495ab164b72b63c67b34d",
+    "src/warhammer40k_core/ai/followthrough_scenario.py": "ad4c440f1ea05fb4d4d5dc14590d9d1d0bfb873bcb1fc2ac2325f2ee63117c6f",
+    "src/warhammer40k_core/ai/matched_attack_scenario.py": "0c68725b55e3dd7f8e3b25ebcde22d3e497ab95ac1e3a862eeb8f2b33a7a1834",
+    "src/warhammer40k_core/ai/normal_move_scenario.py": "d2d8dffc43461eec0cc4db3db8923893b7ba59ad65e4df45c9a2cce3611692db",
+    "src/warhammer40k_core/ai/opposing_shooter_scenario.py": "1d31f56e93543705def0e3c700e90e77e1cfdd5bf6a793f2b6ef190d4821b6e7",
+    "src/warhammer40k_core/ai/preserve_scenario.py": "8b4a51aa0078c157f6f6eabc4f975a58c7a3ffffbd7199d3f99d4e32a0d92551",
+    "src/warhammer40k_core/core/visibility.py": "86b7f154e5c5f30f20844491a9f61a2be685bfab42bd5d2a6e1d6a051a86502a",
+    "src/warhammer40k_core/engine/game_state.py": "ca645341d6340ca2596fd6f0881e66e83525fd2aab5cd311273593f2f048b5e9",
+    "src/warhammer40k_core/engine/game_state_payloads.py": "fc66a7e43a45666048e2d6889faef0e1cdc2fd20cdf9b2e43fdbfcd31f484041",
+    "src/warhammer40k_core/engine/lifecycle_payload_consistency.py": "f2e3cf88dc5accb103d8f2aa244f68960034366af42e46dc31c533dbff505af6",
+    "src/warhammer40k_core/engine/numerical_identity.py": "cde0b845aec00f9e76e0b7a06394c74eb22668918cfa8c8033e8d89a1d84de0e",
+    "src/warhammer40k_core/engine/replay.py": "a47d3588f5f073347ca2096fc038c06027bbd6d1c3050e0f418aaa01825efbcc",
+    "src/warhammer40k_core/geometry/numerical_identity.py": "73b101b47264c6c2a7f1db9597247b89b6f9c3170b7c3208254ce73ebaf51462",
+    "src/warhammer40k_core/geometry/pathing.py": "f3cc92cb86a600c899000fb8d5d46b920c58ea32045137c155764822886823fd",
+    "src/warhammer40k_core/geometry/pose.py": "04a0e752e05f381fd7adc836a19438907cd9b2626032d434fc6d142f4579fa86"
+  },
+  "updated_files": {
+    "tests/infrastructure/adapters/test_canonical_deployment_coverage.py": {
+      "blob_sha1": "8824a16eadbc6f8c04730791167f29f98db68c23",
+      "bytes": 21659,
+      "mode": "100644",
+      "sha256": "85ee831abc89f48e139a45956d797876a4c16ebdee6657e7d502c6da27874f52"
+    },
+    "tests/infrastructure/adapters/unit/test_linux_authority.py": {
+      "blob_sha1": "a24396f9d72e159097394be696587fab3781554d",
+      "bytes": 15317,
+      "mode": "100644",
+      "sha256": "597d629a87432390b94fb91e788eeb6c5cc517f6adac98af4f0a915274aa195c"
+    },
+    "tests/rules/section18/test_facade.py": {
+      "blob_sha1": "c531f184d6e5c21bb18344609889fe6dd40fb992",
+      "bytes": 34026,
+      "mode": "100644",
+      "sha256": "e57eed3325fdb9ff1e4e4e85682f7db56a012c5a77a071f3ebbfdb1609553457"
+    }
+  }
+}

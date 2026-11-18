@@ -1,6 +1,8 @@
 """Current actual-base measurements cannot inherit old samples or omit hard outputs."""
 
 import copy
+import hashlib
+import json
 from pathlib import Path
 from typing import Any, cast
 
@@ -9,6 +11,7 @@ from tools import performance_policy as policy
 from tools import performance_qualification_measurements as measured
 from tools import performance_qualification_successor as stage
 from tools import performance_tool_inputs_v3 as roles
+from tools.performance_preflight_successor import read_frozen_blobs
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -59,8 +62,16 @@ def test_current_comparison_samples_equal_every_raw_case_and_original_profile() 
     proof: dict[str, Any] = policy.read_object(
         ROOT / stage.NAMESPACE / "measurement-provenance.json"
     )
-    mapping: dict[str, Any] = policy.read_object(ROOT / policy.MAP)
+    # Bind this immutable cohort to its actual producer, not today's expanded
+    # workload. Reading historical specifications creates no current-run credit.
+    producing = policy.read_object(ROOT / stage.NAMESPACE / "producing-inputs.json")
+    assert policy.canonical_digest(producing) == stage.PRODUCING_INPUT_DIGEST
+    original_map = read_frozen_blobs(ROOT, stage.PRODUCING_COMMIT, [policy.MAP])[policy.MAP]
+    assert hashlib.sha256(original_map).hexdigest() == producing[policy.MAP]
+    mapping: dict[str, Any] = json.loads(original_map)
     for family, row in proof.items():
+        assert row["producing_head"] == stage.PRODUCING_COMMIT
+        assert row["head_input_digest"] == stage.PRODUCING_INPUT_DIGEST
         comparison: dict[str, Any] = policy.read_object(
             ROOT / ("docs/performance/current/qualification40-" + family + ".json")
         )

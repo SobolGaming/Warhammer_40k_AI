@@ -27,11 +27,12 @@
         "rapid_disembark/restore",
         "rapid_disembark/fork",
         "later_decision/restore",
-        "later_decision/fork"
+        "later_decision/fork",
+        "audit_operator/reconstruct"
       ],
       "samples_per_case": 7,
       "budget_profile": "current-change-relative-v1",
-      "workload_id": "loaded-ingress-private-rng-reconstruction-v2"
+      "workload_id": "loaded-ingress-numerical-identity-reconstruction-v3"
     },
     "setup": {
       "driver": "scripts/measure_order101.py",
@@ -198,7 +199,7 @@
       "workload_id": "external-contract-orphan-write-independent-check-v1",
       "input_binding": {
         "schema": "tool-input-roles-v4",
-        "role_specification": "docs/performance/policy-v3/pr2-player-boundary-input-roles-v4.json"
+        "role_specification": "docs/performance/policy-v3/numerical-identity-main692-input-roles-v4.json"
       }
     },
     "session_command_fork": {
@@ -238,10 +239,10 @@
       ],
       "samples_per_case": 7,
       "budget_profile": "current-change-relative-v1",
-      "workload_id": "native-player-boundary-v2"
+      "workload_id": "native-player-boundary-numerical-identity-v3"
     },
     "canonical_coverage_preflight": {
-      "driver": "scripts/measure_canonical_coverage_preflight.py",
+      "driver": "scripts/measure_numerical_identity_canonical_preflight.py",
       "historical_workload_reference": "docs/performance/canonical-coverage-preflight/workload.json",
       "cases": [
         "valid_reload",
@@ -249,7 +250,7 @@
       ],
       "samples_per_case": 1,
       "budget_profile": "current-change-relative-v1",
-      "workload_id": "canonical-coverage-preflight-v1"
+      "workload_id": "numerical-identity-canonical-preflight-v2"
     }
   },
   "operations": {
@@ -36260,6 +36261,127 @@
       ],
       "families": [],
       "sensitive": false,
+      "mandatory": true
+    },
+    "engine-numerical-identity-contract": {
+      "paths": [
+        "src/warhammer40k_core/engine/numerical_identity.py",
+        "src/warhammer40k_core/geometry/numerical_identity.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [
+        "reconstruction",
+        "visibility",
+        "movement",
+        "setup"
+      ],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "numerical-identity-payload-types": {
+      "paths": [
+        "src/warhammer40k_core/engine/game_state_payloads.py"
+      ],
+      "owners": [
+        "@module"
+      ],
+      "families": [
+        "reconstruction"
+      ],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "engine-numerical-identity-canonical-workload": {
+      "paths": [
+        "scripts/measure_numerical_identity_canonical_preflight.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [
+        "canonical_coverage_preflight"
+      ],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "numerical-identity-contract-release": {
+      "paths": [
+        "contracts/compatibility/47.0.0-shape.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "engine-numerical-identity-regressions": {
+      "paths": [
+        "tests/rules/section01/test_engine_numerical_identity.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "numerical-identity-authoritative-geometry-hash": {
+      "paths": [
+        "src/warhammer40k_core/adapters/battlefield_projection.py"
+      ],
+      "owners": [
+        "authoritative_geometry_hash"
+      ],
+      "families": [
+        "visibility",
+        "external_contract_source_reuse"
+      ],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "engine-numerical-identity-reconstruction": {
+      "paths": [
+        "src/warhammer40k_core/adapters/numerical_checkpoint_reconstruction.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [
+        "reconstruction"
+      ],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "engine-numerical-identity-admission": {
+      "paths": [
+        "scripts/engine_numerical_identity_test_admission.py",
+        "tests/code_quality/test_engine_numerical_identity_admission.py",
+        "data/source_audits/ci64_provenance_v1/engine-numerical-identity-test-transition-v1.json"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "engine-numerical-identity-scope-controls": {
+      "paths": [
+        "tests/code_quality/test_registered_source_scopes.py"
+      ],
+      "owners": [
+        "test_numerical_comparison_context_inverse_rejects_partial_and_duplicate_source",
+        "test_numerical_identity_scope_routes_current_base_without_replacing_history"
+      ],
+      "families": [
+        "external_contract_source_reuse"
+      ],
+      "sensitive": true,
       "mandatory": true
     }
   },

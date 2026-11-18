@@ -8,6 +8,7 @@ tests/code_quality/test_ci_resource_diagnostics.py
 tests/code_quality/test_complete_covered_reporting.py
 tests/code_quality/test_decision_submission_catalog.py
 tests/code_quality/test_embarked_ability_authority.py
+tests/code_quality/test_engine_numerical_identity_admission.py
 tests/code_quality/test_generated_ability_support_artifacts.py
 tests/code_quality/test_later_ir_icon_source.py
 tests/code_quality/test_off_battlefield_battle_shock_authority.py

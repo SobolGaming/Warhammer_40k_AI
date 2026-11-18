@@ -256,7 +256,7 @@ def test_reference_suite_definition_is_pinned_and_closed() -> None:
     assert (
         payload_digest(definition)
         == REFERENCE_SUITE_DEFINITION_HASH
-        == ("7f8b9428acb03cfdce6b86396c520f487bc38369aacd90ce9d4d377dd9e8fa00")
+        == ("1d9fc09c69fac90196bd77c3ac468c2dbd6af223396353810d475dbdd6f18c12")
     )
     with pytest.raises(TrainingAdmissionError, match="Unknown deployment reference case"):
         reference_case_steps("unregistered-order")

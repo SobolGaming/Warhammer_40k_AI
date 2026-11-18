@@ -147,6 +147,10 @@ from warhammer40k_core.engine.model_movement_history import (
     validate_history_state,
 )
 from warhammer40k_core.engine.normal_move_history import NormalMoveState
+from warhammer40k_core.engine.numerical_identity import (
+    numerical_identity_from_payload,
+    validate_numerical_identity,
+)
 from warhammer40k_core.engine.objective_control import (
     ObjectiveControlContext,
     ObjectiveControlRecord,
@@ -363,6 +367,10 @@ from warhammer40k_core.engine.victory_point_policy_validation import (
     validate_victory_point_ledgers,
 )
 from warhammer40k_core.engine.weapon_instances import equipped_weapon_instance_by_id
+from warhammer40k_core.geometry.numerical_identity import (
+    LEGACY_NUMERICAL_IDENTITY,
+    NumericalIdentity,
+)
 
 
 class SecondaryMissionMode(StrEnum):
@@ -587,8 +595,10 @@ class GameConfig:
     reserve_unit_points: tuple[ReserveUnitPointValue, ...] = ()
     allow_legacy_non_strict_rosters: bool = False
     model_geometries: tuple[ModelGeometryCatalogRecord, ...] | None = None
+    numerical_identity: NumericalIdentity = LEGACY_NUMERICAL_IDENTITY
 
     def __post_init__(self) -> None:
+        validate_numerical_identity(self.numerical_identity)
         object.__setattr__(
             self,
             "game_id",
@@ -691,6 +701,7 @@ class GameConfig:
 
     def to_payload(self) -> GameConfigPayload:
         payload: GameConfigPayload = {
+            "numerical_identity": validate_numerical_identity(self.numerical_identity).to_payload(),
             "game_id": self.game_id,
             "private_rng_seed": self.private_rng_seed,
             "ruleset_descriptor": self.ruleset_descriptor.to_payload(),
@@ -713,7 +724,10 @@ class GameConfig:
 
     @classmethod
     def from_payload(cls, payload: GameConfigPayload) -> Self:
+        if set(payload) - GameConfigPayload.__annotations__.keys():
+            raise GameLifecycleError("GameConfig payload has unknown fields.")
         return cls(
+            numerical_identity=numerical_identity_from_payload(payload.get("numerical_identity")),
             game_id=payload["game_id"],
             private_rng_seed=private_rng_seed_from_payload(payload),
             ruleset_descriptor=RulesetDescriptor.from_payload(payload["ruleset_descriptor"]),
@@ -1119,6 +1133,7 @@ class GameState:
     player_ids: tuple[str, ...]
     turn_order: tuple[str, ...]
     tactical_secondary_draw_count: int
+    numerical_identity: NumericalIdentity = LEGACY_NUMERICAL_IDENTITY
     private_rng_seed: str = field(default_factory=new_private_rng_seed, repr=False)
     tactical_secondary_draw_sequence: int = field(default=0, repr=False)
     rules_overlay_ids: tuple[str, ...] = ()
@@ -1298,6 +1313,7 @@ class GameState:
     )
 
     def __post_init__(self) -> None:
+        validate_numerical_identity(self.numerical_identity)
         validate_private_rng_seed(self.private_rng_seed, game_id=self.game_id)
         validate_tactical_draw_sequence(self.tactical_secondary_draw_sequence)
         self.game_id = _validate_identifier("GameState game_id", self.game_id)
@@ -1715,6 +1731,7 @@ class GameState:
     def from_config(cls, config: GameConfig) -> Self:
         return cls(
             game_id=config.game_id,
+            numerical_identity=config.numerical_identity,
             private_rng_seed=config.private_rng_seed,
             ruleset_descriptor_hash=config.ruleset_descriptor.descriptor_hash,
             rules_overlay_ids=config.ruleset_descriptor.rules_overlay_ids,
@@ -4679,6 +4696,7 @@ class GameState:
 
     def to_payload(self) -> GameStatePayload:
         payload: GameStatePayload = {
+            "numerical_identity": validate_numerical_identity(self.numerical_identity).to_payload(),
             "game_id": self.game_id,
             "private_rng_seed": self.private_rng_seed,
             "tactical_secondary_draw_sequence": self.tactical_secondary_draw_sequence,
@@ -5009,12 +5027,16 @@ class GameState:
 
     @classmethod
     def from_payload(cls, payload: GameStatePayload) -> Self:
+        identity = numerical_identity_from_payload(payload.get("numerical_identity"))
         if "hover_mode_states" in payload:
             raise GameLifecycleError(
                 "Retired Hover mode state requires the Order 66 contract migration."
             )
+        if set(payload) - GameStatePayload.__annotations__.keys():
+            raise GameLifecycleError("GameState payload has unknown fields.")
         return cls(
             game_id=payload["game_id"],
+            numerical_identity=identity,
             private_rng_seed=private_rng_seed_from_payload(payload),
             ruleset_descriptor_hash=payload["ruleset_descriptor_hash"],
             tactical_secondary_draw_sequence=tactical_draw_sequence_from_payload(payload),

@@ -3,9 +3,12 @@
 from __future__ import annotations
 
 import argparse
+import gzip
+import hashlib
 import json
 import os
 import platform
+import time
 from pathlib import Path
 from typing import cast
 
@@ -13,7 +16,7 @@ from scripts.measure_ingress_reconstruction import CHECKPOINTS, OPERATIONS, samp
 from scripts.measure_order63 import _host_inventory, _select_runtime_src
 
 ROOT = Path(__file__).resolve().parents[1]
-WORKLOAD_ID = "loaded-ingress-private-rng-reconstruction-v2"
+WORKLOAD_ID = "loaded-ingress-numerical-identity-reconstruction-v3"
 FIXTURE = ROOT / "tests/support/fixtures/private_rng_reconstruction_config.json"
 
 
@@ -22,8 +25,23 @@ def main() -> None:
     parser.add_argument("--runtime-src", type=Path, default=ROOT / "src")
     parser.add_argument("--revision", required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument(
+        "--config-encoding",
+        choices=("unbound-legacy-v2", "engine-numerical-identity-v1"),
+        default="engine-numerical-identity-v1",
+    )
     args = parser.parse_args()
     _select_runtime_src(args.runtime_src)
+    from warhammer40k_core.adapters.local_session import (
+        LOCAL_GAME_SESSION_PERSISTENCE_SCHEMA_VERSION,
+    )
+
+    expected_schema = {
+        "unbound-legacy-v2": "local-game-session-persistence-v2-private-rng",
+        "engine-numerical-identity-v1": "local-game-session-persistence-v3-numerical-identity",
+    }[args.config_encoding]
+    if expected_schema != LOCAL_GAME_SESSION_PERSISTENCE_SCHEMA_VERSION:
+        raise ValueError("Benchmark encoding does not match the selected runtime schema.")
     from tests.order63_reserve_transport_helpers import (
         rapid_disembark,
         reserve_transport_session,
@@ -37,10 +55,23 @@ def main() -> None:
     from warhammer40k_core.engine.phase import LifecycleStatusKind
 
     rows = []
+    effective_config_hashes: set[str] = set()
     for checkpoint in CHECKPOINTS:
-        # Each arm decodes exactly these bytes using its own native loader.
-        # V45 ignores the new seed field; V46 consumes it. This workload rolls no dice.
-        config = GameConfig.from_payload(cast(GameConfigPayload, json.loads(FIXTURE.read_bytes())))
+        # Same semantic source fixture, explicitly encoded for each arm's schema.
+        # The retained source bytes are never rewritten; this workload rolls no dice.
+        config_payload = json.loads(FIXTURE.read_bytes())
+        if "numerical_identity" in config_payload:
+            raise ValueError("Retained source fixture unexpectedly contains numerical identity.")
+        if args.config_encoding == "engine-numerical-identity-v1":
+            config_payload["numerical_identity"] = {
+                "version": "engine-numerical-identity-v1",
+                "numerical_policy_id": "legacy-binary-inch-v1",
+                "coordinate_representation_id": "binary-float-pose-v1",
+            }
+        effective_config_hashes.add(
+            hashlib.sha256(json.dumps(config_payload, sort_keys=True).encode()).hexdigest()
+        )
+        config = GameConfig.from_payload(cast(GameConfigPayload, config_payload))
         session = reserve_transport_session(config=config)
         submit_ingress(session)
         if checkpoint != "ingress":
@@ -73,10 +104,47 @@ def main() -> None:
                 }
             )
             print(f"Completed {checkpoint}/{operation}", flush=True)
+    if args.config_encoding == "unbound-legacy-v2":
+        from warhammer40k_core.adapters.checkpoint_reconstruction import (
+            PROFILE_ID,
+            reconstruct_local_checkpoint,
+        )
+    else:
+        from warhammer40k_core.adapters.numerical_checkpoint_reconstruction import (
+            PROFILE_ID,
+            reconstruct_local_checkpoint,
+        )
+    original = gzip.decompress(
+        (ROOT / "data/source_audits/a32_recovery/oct14-post-exception.json.gz").read_bytes()
+    )
+    operator_samples = []
+    for _ in range(7):
+        started = time.perf_counter()
+        package = reconstruct_local_checkpoint(original, profile_id=PROFILE_ID)
+        operator_samples.append(time.perf_counter() - started)
+        provenance = package["provenance"]
+        assert isinstance(provenance, dict)
+        assert provenance["original_event_count"] == 137
+        assert provenance["reconstructed_event_count"] == 138
+        assert provenance["decision_count"] == 18
+        assert provenance["original_decisions_and_gameplay_outcomes_preserved"] is True
+    rows.append(
+        {
+            "case": "audit_operator/reconstruct",
+            "samples_seconds": operator_samples,
+            "complete": True,
+            "source_sha256": hashlib.sha256(original).hexdigest(),
+            "recipe_profile_id": PROFILE_ID,
+        }
+    )
+    assert len(effective_config_hashes) == 1
     cpu, memory = _host_inventory()
     report = {
         "workload_id": WORKLOAD_ID,
         "revision": args.revision,
+        "config_encoding": args.config_encoding,
+        "source_fixture_sha256": hashlib.sha256(FIXTURE.read_bytes()).hexdigest(),
+        "effective_fixture_sha256": next(iter(effective_config_hashes)),
         "runtime_build_id": verified_engine_build_identity().build_id,
         "cpu": cpu,
         "memory_bytes": memory,

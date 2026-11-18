@@ -10,6 +10,7 @@ from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.ai.canonical_deployment import (
     _STEPS,  # pyright: ignore[reportPrivateUsage]
     CANONICAL_DEPLOYMENT_CONFIG_HASH,
+    CANONICAL_DEPLOYMENT_EXECUTION_ID,
     CanonicalDeploymentAdmission,
     _recipe_prefixes,  # pyright: ignore[reportPrivateUsage]
     _reproduce_recipe,  # pyright: ignore[reportPrivateUsage]
@@ -23,8 +24,9 @@ from warhammer40k_core.ai.runner import RunReport
 from warhammer40k_core.ai.training_admission import TrainingAdmissionError, VerifiedEpisodeOrigin
 from warhammer40k_core.engine.event_log import JsonValue, canonical_json, validate_json_value
 
-REFERENCE_SUITE_ID = "deployment-order-diagonal-reference-suite-v2"
-REFERENCE_SUITE_SCHEMA = "deployment-reference-suite-v1"
+REFERENCE_SUITE_ID = "deployment-order-diagonal-reference-suite-v3-numerical-identity"
+REFERENCE_SUITE_EXECUTION_ID = "deployment-order-diagonal-reference-suite-v2"
+REFERENCE_SUITE_SCHEMA = "deployment-reference-suite-v2-numerical-identity"
 # Fixed before engine measurement. Reordering only complete select/place pairs
 # changes occupied-prefix geometry without editing a lifecycle or its history.
 REFERENCE_CASES = (
@@ -46,10 +48,9 @@ SUITE_REFERENCE_TRANSLATIONS = (
     (-1.0, -1.0),
     (100.0, 100.0),
 )
-# V2 changes only suite identity and generated budget; the historical v1 pin and
-# evidence remain under docs/performance/deployment-reference-suite-v1. Set before
-# measuring v2; definition drift requires deliberate versioning.
-REFERENCE_SUITE_DEFINITION_HASH = "7f8b9428acb03cfdce6b86396c520f487bc38369aacd90ce9d4d377dd9e8fa00"
+# V3 binds current numerical identity. Historical v1/v2 evidence remains at its
+# original paths under docs/performance; no archived definition is repinned.
+REFERENCE_SUITE_DEFINITION_HASH = "1d9fc09c69fac90196bd77c3ac468c2dbd6af223396353810d475dbdd6f18c12"
 
 
 def reference_case_steps(case_id: str) -> tuple[_Step, ...]:
@@ -109,7 +110,7 @@ def require_reference_suite_definition() -> dict[str, JsonValue]:
 def reproduce_reference_case(case_id: str) -> tuple[LocalGameSession, RunReport]:
     require_reference_suite_definition()
     return _reproduce_recipe(
-        reference_case_steps(case_id), recipe_id=REFERENCE_SUITE_ID + ":" + case_id
+        reference_case_steps(case_id), recipe_id=REFERENCE_SUITE_EXECUTION_ID + ":" + case_id
     )
 
 
@@ -151,7 +152,7 @@ class DeploymentReferenceSuite:
     def measure(cls) -> DeploymentReferenceSuite:
         definition = require_reference_suite_definition()
         # Preserve the original canonical admission and its source limitations.
-        canonical, _ = _reproduce_recipe(_STEPS, recipe_id="canonical-deployment-v1")
+        canonical, _ = _reproduce_recipe(_STEPS, recipe_id=CANONICAL_DEPLOYMENT_EXECUTION_ID)
         admission = CanonicalDeploymentAdmission.from_session(canonical)
         cases = [measure_reference_case(case_id) for case_id, _ in REFERENCE_CASES]
         totals: dict[str, JsonValue] = {}

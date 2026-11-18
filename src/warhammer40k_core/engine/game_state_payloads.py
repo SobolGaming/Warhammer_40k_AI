@@ -103,7 +103,11 @@ if TYPE_CHECKING:
     )
 
 
+from warhammer40k_core.geometry.numerical_identity import NumericalIdentityPayload
+
+
 class GameConfigPayload(TypedDict):
+    numerical_identity: NumericalIdentityPayload
     game_id: str
     private_rng_seed: str
     ruleset_descriptor: RulesetDescriptorPayload
@@ -163,6 +167,7 @@ class RangedAttackHistoryRecordPayload(TypedDict):
 
 
 class GameStatePayload(TypedDict):
+    numerical_identity: NumericalIdentityPayload
     random_weapon_ranges: NotRequired[list[WeaponRangeEvaluationPayload]]
     game_id: str
     private_rng_seed: str

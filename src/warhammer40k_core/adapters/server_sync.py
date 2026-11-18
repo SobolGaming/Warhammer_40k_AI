@@ -33,6 +33,8 @@ from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 
 REDACTED_INVALID_CURSOR = "invalid-cursor"
 
+type _ProjectionHashMemo = list[tuple[SessionRevisionSnapshot, ViewerContext, str]]
+
 
 def session_projection_payload(
     *,
@@ -65,10 +67,10 @@ def session_projection_payload(
         "event_cursor": cursor,
         "retention_limit": retained,
         "revision_retention_limit": record.revision_retention_limit,
-        "projection": validate_json_value(cast(JsonValue, view)),
+        "projection": cast(JsonValue, view),
     }
-    validate_json_value(cast(JsonValue, payload))
-    return payload
+    # Validate, normalize and detach the whole response in one complete pass.
+    return cast(SessionProjectionPayload, validate_json_value(cast(JsonValue, payload)))
 
 
 def session_checkpoint(
@@ -129,8 +131,9 @@ def session_event_delta_payload(
     limit = validate_page_limit(page_limit)
     retained = _validated_record_retention(record=record, retention_limit=retention_limit)
     target = record.snapshot_for_viewer(viewer)
-    target_view = target.adapter_session.view_for_context(viewer=viewer)
-    target_hash = target_view["projection_state_hash"]
+    # Snapshots own forked authority; this memo lives only for this locked request.
+    projection_memo: _ProjectionHashMemo = []
+    target_hash = _snapshot_projection_hash(target, viewer=viewer, memo=projection_memo)
     try:
         cursor = cursor_codec.decode(supplied_cursor)
         cursor_codec.validate_binding(cursor, session_id=record.session_id, viewer=viewer)
@@ -140,6 +143,7 @@ def session_event_delta_payload(
             cursor=cursor,
             target=target,
             retention_limit=retained,
+            _projection_memo=projection_memo,
         )
     except CursorValidationError as exc:
         return _resync_payload(
@@ -186,8 +190,7 @@ def session_event_delta_payload(
         offset=next_offset,
         maximum_revision=target.session_revision,
     )
-    boundary_view = boundary.adapter_session.view_for_context(viewer=viewer)
-    boundary_hash = boundary_view["projection_state_hash"]
+    boundary_hash = _snapshot_projection_hash(boundary, viewer=viewer, memo=projection_memo)
     next_cursor = _issue_cursor(
         record=record,
         viewer=viewer,
@@ -232,6 +235,7 @@ def validate_cursor_position(
     cursor: SessionCursor,
     target: SessionRevisionSnapshot,
     retention_limit: int,
+    _projection_memo: _ProjectionHashMemo | None = None,
 ) -> None:
     floor = retention_floor(
         event_count=_visible_event_count(target, viewer=viewer),
@@ -249,11 +253,17 @@ def validate_cursor_position(
     )
     if cursor.visible_sequence != visible_sequence:
         raise CursorValidationError(CursorResyncReason.PROJECTION_HASH_MISMATCH)
-    validate_cursor_projection_anchor(record=record, viewer=viewer, cursor=cursor)
+    validate_cursor_projection_anchor(
+        record=record, viewer=viewer, cursor=cursor, _projection_memo=_projection_memo
+    )
 
 
 def validate_cursor_projection_anchor(
-    *, record: AuthoritativeSession, viewer: ViewerContext, cursor: SessionCursor
+    *,
+    record: AuthoritativeSession,
+    viewer: ViewerContext,
+    cursor: SessionCursor,
+    _projection_memo: _ProjectionHashMemo | None = None,
 ) -> None:
     """Check a retained anchor independently of live polling expiry.
 
@@ -266,9 +276,27 @@ def validate_cursor_projection_anchor(
         )
     except SessionProtocolError as exc:
         raise CursorValidationError(CursorResyncReason.EXPIRED) from exc
-    cursor_view = cursor_snapshot.adapter_session.view_for_context(viewer=viewer)
-    if cursor.projection_state_hash != cursor_view["projection_state_hash"]:
+    cursor_hash = _snapshot_projection_hash(cursor_snapshot, viewer=viewer, memo=_projection_memo)
+    if cursor.projection_state_hash != cursor_hash:
         raise CursorValidationError(CursorResyncReason.PROJECTION_HASH_MISMATCH)
+
+
+def _snapshot_projection_hash(
+    snapshot: SessionRevisionSnapshot,
+    *,
+    viewer: ViewerContext,
+    memo: _ProjectionHashMemo | None,
+) -> str:
+    if memo is not None:
+        for observed_snapshot, observed_viewer, projection_hash in memo:
+            if observed_snapshot is snapshot and observed_viewer is viewer:
+                return projection_hash
+    projection_hash = snapshot.adapter_session.view_for_context(viewer=viewer)[
+        "projection_state_hash"
+    ]
+    if memo is not None:
+        memo.append((snapshot, viewer, projection_hash))
+    return projection_hash
 
 
 def _resync_payload(

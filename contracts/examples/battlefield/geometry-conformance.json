@@ -400,7 +400,7 @@
       }
     }
   },
-  "authoritative_geometry_hash": "0942e024170b5375393f7f1aaa239072e704adb959483ce92a987c44a85205df",
+  "authoritative_geometry_hash": "3fffed2cc98fadf30d5ecda5436a49f53472b914a6c821f8ba3cef76e1aa5d46",
   "battlefield_id": "geometry-conformance-battlefield",
   "bounds": {
     "max_x_inches": 60.0,

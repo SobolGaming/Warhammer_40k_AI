@@ -678,6 +678,13 @@ class PathWitness:
 
     @classmethod
     def from_payload(cls, payload: PathWitnessPayload) -> Self:
+        if type(cast(object, payload)) is not dict or set(payload) != {"model_paths"}:
+            raise GeometryError("PathWitness requires the legacy path payload.")
+        if any(
+            type(cast(object, path)) is not dict or set(path) != {"model_id", "poses"}
+            for path in payload["model_paths"]
+        ):
+            raise GeometryError("PathWitness model path has incompatible fields.")
         return cls(
             model_paths=tuple(
                 (
