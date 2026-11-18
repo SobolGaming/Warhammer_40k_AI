@@ -443,7 +443,7 @@ On 17 November 2026, the ~483 MB stacked historical shard-calibration chain was
 retired from the live working tree (remaining preserved in Git history at
 `9747b9b0873b4f442d3cd81f72280b24810d952c`), while `ci-preflight` validates
 source history and builds/caches the selected-source index once per CI push and
-Linux lanes use `${{ vars.CI_LINUX_RUNNER || 'ubuntu-latest' }}`.
+Linux lanes use `${{ vars.CI_LINUX_RUNNER || 'ubuntu-24.04' }}`.
 Verify that every selected file or declared case appears exactly once:
 
 ```bash

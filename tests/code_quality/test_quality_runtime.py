@@ -43,7 +43,7 @@ def test_live_workflow_preserves_required_names_and_all_four_producer_controls()
         "semantic-audit-macos",
     ):
         assert f"needs.{lane_name}.result != 'success'" in fast
-    assert "runs-on: ${{ vars.CI_LINUX_RUNNER || 'ubuntu-latest' }}" in fast
+    assert "runs-on: ${{ vars.CI_LINUX_RUNNER || 'ubuntu-24.04' }}" in fast
     assert workflow.split("  semantic-audit-macos:\n")[1].split("  mypy:\n")[0] == before.split(
         "  semantic-audit-macos:\n"
     )[1].split("  mypy:\n")[0].replace("runs-on: macos-latest", "runs-on: macos-15-intel")

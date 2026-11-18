@@ -50,7 +50,7 @@ def test_shard_directory_is_free_of_historical_calibration_bloat() -> None:
 def test_ci_workflow_has_preflight_caches_and_adaptive_runner_label() -> None:
     workflow = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
     assert "ci-preflight:" in workflow
-    assert "runs-on: ${{ vars.CI_LINUX_RUNNER || 'ubuntu-latest' }}" in workflow
+    assert "runs-on: ${{ vars.CI_LINUX_RUNNER || 'ubuntu-24.04' }}" in workflow
     assert "path: .mypy_cache" in workflow
     assert "venv-test-v1-" in workflow
     assert 'WH40K_SOURCE_HISTORY_PREVALIDATED: "1"' in workflow

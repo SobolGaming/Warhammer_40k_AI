@@ -483,7 +483,7 @@ On 17 November 2026, the owner authorized retiring the superseded ~483 MB
 live-blob shard-admission quality modules in favor of clean LPT sharding over
 `ci/test_shards/durations.json`, single-pass `quality_runner.py` execution, a
 dedicated `ci-preflight` workflow job, and adaptive
-`${{ vars.CI_LINUX_RUNNER || 'ubuntu-latest' }}` runner support. The retired
+`${{ vars.CI_LINUX_RUNNER || 'ubuntu-24.04' }}` runner support. The retired
 calibration artifacts remain preserved in Git history at revision
 `9747b9b0873b4f442d3cd81f72280b24810d952c`. Keep all twelve behavioral shards,
 all selected behavioral cases, the 67% full-package branch-coverage floor, the

@@ -28,7 +28,7 @@ env:
 jobs:
   ci-preflight:
     name: ci-preflight
-    runs-on: ${{ vars.CI_LINUX_RUNNER || 'ubuntu-latest' }}
+    runs-on: ${{ vars.CI_LINUX_RUNNER || 'ubuntu-24.04' }}
     outputs:
       source_index_key: ${{ steps.source-inputs.outputs.key }}
     steps:
@@ -111,7 +111,7 @@ jobs:
     name: quality-fast
     if: always()
     needs: [ci-preflight, lint, contract-conformance, code-quality, semantic-audit-macos]
-    runs-on: ${{ vars.CI_LINUX_RUNNER || 'ubuntu-latest' }}
+    runs-on: ${{ vars.CI_LINUX_RUNNER || 'ubuntu-24.04' }}
     steps:
       - name: Require successful quality lanes
         if: >-
@@ -127,7 +127,7 @@ jobs:
           exit 1
 
   lint:
-    runs-on: ${{ vars.CI_LINUX_RUNNER || 'ubuntu-latest' }}
+    runs-on: ${{ vars.CI_LINUX_RUNNER || 'ubuntu-24.04' }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
@@ -166,7 +166,7 @@ jobs:
 
   contract-conformance:
     needs: [ci-preflight]
-    runs-on: ${{ vars.CI_LINUX_RUNNER || 'ubuntu-latest' }}
+    runs-on: ${{ vars.CI_LINUX_RUNNER || 'ubuntu-24.04' }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
@@ -233,7 +233,7 @@ jobs:
     name: code-quality
     if: always()
     needs: [quality-policy, quality-shards]
-    runs-on: ${{ vars.CI_LINUX_RUNNER || 'ubuntu-latest' }}
+    runs-on: ${{ vars.CI_LINUX_RUNNER || 'ubuntu-24.04' }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
@@ -275,7 +275,7 @@ jobs:
           exit 1
 
   quality-policy:
-    runs-on: ${{ vars.CI_LINUX_RUNNER || 'ubuntu-latest' }}
+    runs-on: ${{ vars.CI_LINUX_RUNNER || 'ubuntu-24.04' }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
@@ -343,7 +343,7 @@ jobs:
 
   quality-shards:
     name: quality-shard-${{ matrix.shard }}
-    runs-on: ${{ vars.CI_LINUX_RUNNER || 'ubuntu-latest' }}
+    runs-on: ${{ vars.CI_LINUX_RUNNER || 'ubuntu-24.04' }}
     strategy:
       fail-fast: false
       matrix:
@@ -421,7 +421,7 @@ jobs:
 
   mypy:
     name: mypy
-    runs-on: ${{ vars.CI_LINUX_RUNNER || 'ubuntu-latest' }}
+    runs-on: ${{ vars.CI_LINUX_RUNNER || 'ubuntu-24.04' }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
@@ -459,7 +459,7 @@ jobs:
 
   pyright:
     name: pyright
-    runs-on: ${{ vars.CI_LINUX_RUNNER || 'ubuntu-latest' }}
+    runs-on: ${{ vars.CI_LINUX_RUNNER || 'ubuntu-24.04' }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
@@ -495,7 +495,7 @@ jobs:
         github.event_name != 'pull_request' ||
         github.event.pull_request.draft == false
       }}
-    runs-on: ${{ vars.CI_LINUX_RUNNER || 'ubuntu-latest' }}
+    runs-on: ${{ vars.CI_LINUX_RUNNER || 'ubuntu-24.04' }}
     strategy:
       fail-fast: false
       matrix:
@@ -613,7 +613,7 @@ jobs:
         )
       }}
     needs: behavior-tests
-    runs-on: ${{ vars.CI_LINUX_RUNNER || 'ubuntu-latest' }}
+    runs-on: ${{ vars.CI_LINUX_RUNNER || 'ubuntu-24.04' }}
     steps:
       - name: Require successful behavioral shards
         if: needs.behavior-tests.result != 'success'
