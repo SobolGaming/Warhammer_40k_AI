@@ -5,10 +5,10 @@
   "schema": "finite-speedup-test-transition-v1",
   "updated_files": {
     "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py": {
-      "blob_sha1": "007e4cfcca3e76e7b64a986a3b11455223853177",
+      "blob_sha1": "5c3d229fe288eab83ef61424ea115132ed4a6462",
       "bytes": 14827,
       "mode": "100644",
-      "sha256": "36728f2356ff4794228dc71020dab7350940e6d4a50389c322e89fff07589934"
+      "sha256": "cf6eb8388c42518372b0181d370856f0c9e1dc80498f974bded277bc46832997"
     },
     "tests/infrastructure/adapters/test_canonical_coverage_preflight.py": {
       "blob_sha1": "dae24ce3ca5cb000dbaca373dbadbe7442ff8a37",
@@ -57,6 +57,12 @@
       "bytes": 13173,
       "mode": "100644",
       "sha256": "07164b58a1f5ec57cef3c3ca8146b8b193f991bf0535716d9023f40f1403589a"
+    },
+    "tests/factions/chaos_daemons/integration/test_cavalcade_v995_roster.py": {
+      "blob_sha1": "adfcc7966142295fa04f75b0e887e06e63381ff1",
+      "bytes": 67730,
+      "mode": "100644",
+      "sha256": "eb93afa30913273437435fe96fb0488693e62bc9c9396494e748ab5bc4b948d3"
     }
   }
 }

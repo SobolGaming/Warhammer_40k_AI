@@ -21,7 +21,7 @@ from scripts.exact_contact_test_admission import (
 from scripts.milli_inch_test_admission import RETAINED_CUTOVER_SHA256
 
 ADDITION = "data/source_audits/ci64_provenance_v1/speedup-test-transition-v1.json"
-ADDITION_SHA256 = "909c9b765d8de3e107c1608e86de8e208947b1bc78344b2edf25fb38bc93890c"
+ADDITION_SHA256 = "b4baf8e87128f1a19bf2b499c23d3ef5027c1abe6a5e4686015277498eb68dad"
 
 
 def speedup_test_transition(
