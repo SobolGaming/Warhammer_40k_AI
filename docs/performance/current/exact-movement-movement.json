@@ -1,0 +1,68 @@
+{
+  "policy": "rules-engine-performance-v3",
+  "family": "movement",
+  "workload_id": "order80-normal-move-occurrence-v1",
+  "base_revision": "d81dc3fd9fd9625205dcc91282fd89f588a75bfb",
+  "head_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:d77dd33911b10ede682bead7be294d4c1899fe306316371d7969c01087c71e85",
+  "head_input_digest": "0cf881348241faa99e69a49bf2e594c0bac08b50f2c0362c0b1f01fae6f5c893",
+  "budget_profile": "current-change-relative-v1",
+  "base": {
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:d60a6871e475632bdf930a80251f39e7bae5b5f40c35960b6ed1790750f62fa0",
+    "host": {
+      "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+      "memory_bytes": 67359379456,
+      "logical_cpus": 64,
+      "platform": "Linux-6.18.58.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "659a2d81e02176d23168861529651506ac87a4eab1982109f144cd62a63fce71",
+    "workload_sha256": "1af0bb7fa3733e4e31b8fa73f35839956e2ef5d2e952e6e378c2639ea9dd0427",
+    "fixture_sha256": "0bbf71515e8913762e7c118544ca773e8cc92ce8f8c7942e2ece9b1bd3731c9c",
+    "samples": {
+      "finite": [
+        2.75917989200002,
+        2.722815981999929,
+        2.725977223999962
+      ],
+      "parameterized": [
+        2.564222104999999,
+        2.6012094459999844,
+        2.5348119380000753
+      ]
+    },
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false
+  },
+  "head": {
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:d77dd33911b10ede682bead7be294d4c1899fe306316371d7969c01087c71e85",
+    "host": {
+      "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+      "memory_bytes": 67359379456,
+      "logical_cpus": 64,
+      "platform": "Linux-6.18.58.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "659a2d81e02176d23168861529651506ac87a4eab1982109f144cd62a63fce71",
+    "workload_sha256": "1af0bb7fa3733e4e31b8fa73f35839956e2ef5d2e952e6e378c2639ea9dd0427",
+    "fixture_sha256": "0bbf71515e8913762e7c118544ca773e8cc92ce8f8c7942e2ece9b1bd3731c9c",
+    "samples": {
+      "finite": [
+        2.7163255989999016,
+        2.7079849399999603,
+        2.727808103999905
+      ],
+      "parameterized": [
+        2.5581477099999574,
+        2.5598942100000386,
+        2.559306258000106
+      ]
+    },
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false
+  },
+  "historical_failures": []
+}

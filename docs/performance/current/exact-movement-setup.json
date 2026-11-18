@@ -1,0 +1,102 @@
+{
+  "policy": "rules-engine-performance-v3",
+  "family": "setup",
+  "workload_id": "order101-failed-setup-restore-view-replay-v1",
+  "base_revision": "d81dc3fd9fd9625205dcc91282fd89f588a75bfb",
+  "head_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:d77dd33911b10ede682bead7be294d4c1899fe306316371d7969c01087c71e85",
+  "head_input_digest": "0cf881348241faa99e69a49bf2e594c0bac08b50f2c0362c0b1f01fae6f5c893",
+  "budget_profile": "current-change-relative-v1",
+  "base": {
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:d60a6871e475632bdf930a80251f39e7bae5b5f40c35960b6ed1790750f62fa0",
+    "host": {
+      "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+      "memory_bytes": 67359379456,
+      "logical_cpus": 64,
+      "platform": "Linux-6.18.58.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "659a2d81e02176d23168861529651506ac87a4eab1982109f144cd62a63fce71",
+    "workload_sha256": "aa2a5bdaaaf26d8746cb800c482e3403092d7fa37741809abe5caba1741b6069",
+    "fixture_sha256": "0bbf71515e8913762e7c118544ca773e8cc92ce8f8c7942e2ece9b1bd3731c9c",
+    "samples": {
+      "cargo-5": [
+        1.5332555770000909,
+        1.5722264149999319,
+        1.4949880359999952,
+        1.5852456579998488,
+        1.487764640000023,
+        1.4986644360001264,
+        1.5934696559997974
+      ],
+      "cargo-100": [
+        1.4991158939999423,
+        1.599535676999949,
+        1.4995295080000233,
+        1.4864795900000445,
+        1.6010897930000283,
+        1.4913821500001632,
+        1.5993157289999544
+      ],
+      "loaded-deep-strike": [
+        2.4919652260000476,
+        2.5038324829999965,
+        2.4976009639999575,
+        2.492258971999945,
+        2.4947653290000744,
+        2.4951207980000163,
+        2.4878448980000485
+      ]
+    },
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false
+  },
+  "head": {
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:d77dd33911b10ede682bead7be294d4c1899fe306316371d7969c01087c71e85",
+    "host": {
+      "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+      "memory_bytes": 67359379456,
+      "logical_cpus": 64,
+      "platform": "Linux-6.18.58.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "659a2d81e02176d23168861529651506ac87a4eab1982109f144cd62a63fce71",
+    "workload_sha256": "aa2a5bdaaaf26d8746cb800c482e3403092d7fa37741809abe5caba1741b6069",
+    "fixture_sha256": "0bbf71515e8913762e7c118544ca773e8cc92ce8f8c7942e2ece9b1bd3731c9c",
+    "samples": {
+      "cargo-5": [
+        1.5188322300000436,
+        1.578698662000079,
+        1.4870789239998885,
+        1.5888521370000035,
+        1.4889515859999847,
+        1.4838191629999073,
+        1.5832476660000339
+      ],
+      "cargo-100": [
+        1.4914981910001188,
+        1.593122067999957,
+        1.4960887890001686,
+        1.4926979239999127,
+        1.5896781030000966,
+        1.491116196999883,
+        1.5966790589998254
+      ],
+      "loaded-deep-strike": [
+        2.5052259730000515,
+        2.4984393609997824,
+        2.4874434470000324,
+        2.504439202999947,
+        2.4904882480000197,
+        2.5008854310001425,
+        2.490165159000071
+      ]
+    },
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false
+  },
+  "historical_failures": []
+}

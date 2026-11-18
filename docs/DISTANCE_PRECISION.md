@@ -41,6 +41,39 @@ witnesses still require a coordinated exact representation before exact movement
 can be admitted. No exact shadow state, rounding conversion or approximate fallback
 is used. Linux remains authoritative.
 
+## Staged exact poses and full-path authority
+
+The engine's `ExactBattlefieldState` owns `ExactPose` values for circular models
+on a rectangular, terrain-free plane. The pose stores exact X, Y and Z coordinates
+in inches and a rational facing in degrees. In this slice, one disk may translate
+with fixed facing at Z = 0 while the other disks remain stationary. The state,
+pose and `ExactPathWitness` payloads identify the milli-inch numerical policy and
+rational/quadratic representation. Loaded positions keep their exact coordinates,
+including off-grid and irrational endpoints.
+
+The movement authority takes the moving model, budget and required contacts from
+its caller. It requires the full ordered path, checks its source state and
+authoritative starting pose, and validates every segment against the board and
+every other disk. Each segment is a continuous linear translation. Two waypoints
+are sufficient for a straight path because its entire swept disk is checked.
+The path must establish exact required contacts at the end. An accepted result
+includes the retained witness and a new state containing its exact endpoint.
+Restoring the source state and witness allows the same transition to be checked
+again against the same authority parameters.
+
+Travel is rounded once for the whole path. Supported paths have rational squared
+segment lengths, or follow a single straight segment in the supported quadratic
+field. Forward subdivision of a straight segment preserves both legality and
+travel. Mixed-field arithmetic, bent paths with quadratic squared lengths and
+unsupported elevation or facing changes raise typed errors. The finite tests
+cover the 1.0005-inch contact boundary, simultaneous irrational contact,
+obstructed paths with clear endpoints, stale witnesses and restoration.
+
+This is a staged engine boundary. Registered and native gameplay sessions still
+admit only the legacy float profile. Integration with the ordinary decision
+lifecycle, terrain and model groups, lower geometry caches, solver/backend
+agreement, and whole-session save/replay qualification remain activation work.
+
 ## Explicit legacy policy binding
 
 New registered Linux executors use `linux-execution-profile-v2-numerical-policy`
@@ -312,8 +345,8 @@ after all of these concrete obligations are completed and independently reviewed
    hosted checks, and verified main CI. Keep 1,620-second inclusive approval,
    termination only above 1,800 seconds, and all other existing limits unchanged.
 
-The next blocking integration is exact authoritative poses and mandatory engine
-path witnesses; the finite geometric contact representation above remains inactive.
+The staged flat-disk engine boundary now owns exact poses and requires full
+paths. Ordinary gameplay integration remains a blocking step before admission.
 The original representation conflict motivating that design is retained below. The user's requirement rounds distances and distance-related values
 to 0.001 inch; it does not explicitly require stored coordinates to lie on a
 0.001-inch grid. The staged contract above imposes that stronger integer-coordinate
@@ -364,10 +397,10 @@ rational/quadratic domain and its simultaneous-contact controls.
 The implemented inactive quadratic slice supplies strict typed rational
 numerator/positive-denominator forms, validated quadratic root selection, canonical
 identity, deterministic serialization and bounded typed unsupported results.
-The next dependency is integration of that explicit domain with authoritative
-state and mandatory engine witnesses; general algebraic representations remain
-a separate unresolved scope. Preserve an accepted exact
-witness on restoration; never round it again as though it were new source input.
+The flat-disk state establishes the first engine boundary for that domain.
+Ordinary game state and movement still need to adopt it before admission.
+General algebraic representations remain a separate unresolved scope.
+Restoration preserves an accepted exact witness without rounding it again.
 Explicitly bind the representation version through the numerical execution profile,
 pose/geometry/spatial hashes, caches, persistence and replay. Choose that versioning
 design deliberately: changing the coordinate representation does not by itself

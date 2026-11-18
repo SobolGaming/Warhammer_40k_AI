@@ -1,8 +1,8 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:d60a6871e475632bdf930a80251f39e7bae5b5f40c35960b6ed1790750f62fa0",
-  "fingerprint": "d60a6871e475632bdf930a80251f39e7bae5b5f40c35960b6ed1790750f62fa0",
-  "resource_count": 3266,
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:d77dd33911b10ede682bead7be294d4c1899fe306316371d7969c01087c71e85",
+  "fingerprint": "d77dd33911b10ede682bead7be294d4c1899fe306316371d7969c01087c71e85",
+  "resource_count": 3269,
   "resources": [
     {
       "byte_length": 113,
@@ -2598,6 +2598,11 @@
       "byte_length": 7684,
       "path": "warhammer40k_core/engine/event_log.py",
       "sha256": "2060961ba0ae8b05fee864c88cced5d5bf5ad2f1854581037891bddc37db578c"
+    },
+    {
+      "byte_length": 10691,
+      "path": "warhammer40k_core/engine/exact_movement.py",
+      "sha256": "c1194d8c74cfe6743bc04dc9c7e86de43457b3fc9aaaf44fbb773fee3613f539"
     },
     {
       "byte_length": 3756,
@@ -13808,6 +13813,16 @@
       "byte_length": 8063,
       "path": "warhammer40k_core/geometry/exact_coordinate.py",
       "sha256": "b055e39a1dd733a17f3de952203b2163dff630bf26b2170d515aa0418a4277c0"
+    },
+    {
+      "byte_length": 8369,
+      "path": "warhammer40k_core/geometry/exact_path.py",
+      "sha256": "826b19bcf9d412cdda3b876481d121eb78a37631261cb898de553c0ff162c745"
+    },
+    {
+      "byte_length": 3046,
+      "path": "warhammer40k_core/geometry/exact_pose.py",
+      "sha256": "fd18da932294826165f3a668f8fd78ea21ad3314ec22792c30c446d70c1ada6d"
     },
     {
       "byte_length": 40411,
