@@ -1,6 +1,11 @@
 {
   "base": "b231d7cedea54e123a9211fd775e2910c87d2f18",
   "control_plane": {
+    "conformance/typescript/src/client.ts": "Untimed TypeScript release/conformance controls consume this SDK file; bind actual per-arm bytes. The timed Python contract builder and engine/schema treatment are not substituted.",
+    "conformance/typescript/src/contract.ts": "Untimed TypeScript release/conformance controls consume this SDK file; bind actual per-arm bytes. The timed Python contract builder and engine/schema treatment are not substituted.",
+    "conformance/typescript/src/generated/openapi.operations.ts": "Untimed TypeScript release/conformance controls consume this SDK file; bind actual per-arm bytes. The timed Python contract builder and engine/schema treatment are not substituted.",
+    "conformance/typescript/src/generated/openapi.ts": "Untimed TypeScript release/conformance controls consume this SDK file; bind actual per-arm bytes. The timed Python contract builder and engine/schema treatment are not substituted.",
+    "conformance/typescript/src/proposal-schema.test.ts": "Untimed TypeScript release/conformance controls consume this SDK file; bind actual per-arm bytes. The timed Python contract builder and engine/schema treatment are not substituted.",
     "docs/performance/policy-v3/numerical-identity-input-roles-v4.json": "Exact-base finite source/quality/benchmark control; preserve per-arm bytes and existing budgets. Executed runtime, schemas and fixture owners remain treatment.",
     "docs/performance/policy-v3/numerical-identity-main692-input-roles-v4.json": "Exact-base finite source/quality/benchmark control; preserve per-arm bytes and existing budgets. Executed runtime, schemas and fixture owners remain treatment.",
     "docs/performance/policy-v3/operation-map.json": "Exact-base finite source/quality/benchmark control; preserve per-arm bytes and existing budgets. Executed runtime, schemas and fixture owners remain treatment.",

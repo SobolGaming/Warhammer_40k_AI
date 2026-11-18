@@ -114,8 +114,8 @@ _SCOPES = (
     ReviewedScope(
         NUMERICAL_IDENTITY_MAIN692_BASE,
         NUMERICAL_IDENTITY_MAIN692_SPEC_PATH,
-        "5f7fd9bcd7c32ef76d381f4f6935583dc76ef547ab253b30f948742e76bae792",
-        "a79c507471da3bd829783fcf27868d6f17500aa6333c86a9705e03c6aa6eb723",
+        "fd0dc387fb2ee28e17eb79048c90c16602b2a59b7de9fa01b4eb77e00aae63ab",
+        "775fedafe6857743b9ee1c0a56ca1c7b63481a41ad8ff7db85fa20632f43bf22",
         NUMERICAL_IDENTITY_MAIN692_REPORT_PATH,
         frozenset(
             [
@@ -201,6 +201,11 @@ _SCOPES = (
         ),
         frozenset(
             [
+                "conformance/typescript/src/client.ts",
+                "conformance/typescript/src/contract.ts",
+                "conformance/typescript/src/generated/openapi.operations.ts",
+                "conformance/typescript/src/generated/openapi.ts",
+                "conformance/typescript/src/proposal-schema.test.ts",
                 "docs/performance/policy-v3/numerical-identity-input-roles-v4.json",
                 "docs/performance/policy-v3/numerical-identity-main692-input-roles-v4.json",
                 "docs/performance/policy-v3/operation-map.json",
