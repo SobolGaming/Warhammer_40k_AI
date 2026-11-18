@@ -2,7 +2,7 @@
   "policy": "rules-engine-performance-v3",
   "base": "9747b9b0873b4f442d3cd81f72280b24810d952c",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:f0392def5f2e2935d26f026628b439e90f0f6303fb282ac41a27d1b575a7024e",
-  "operation_map_sha256": "2d6faf03fbf90c6a43b40aaeb13ad68d2128985c2e1af57420d2b87088b073b6",
+  "operation_map_sha256": "c2cbff5f0b40a440f690bb8c3cee2b081edade32f8c323871ed1e2b5eb02ce1c",
   "changes": {
     ".github/workflows/ci.yml": {
       "before_sha256": "f6d8a0e8fdb593bae7ce96a03bf90d87e3915832896300de86752ad2f2aaaade",
@@ -706,11 +706,11 @@
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "93112d2a4fe59bade0e9a605a79c43365a8d5a1d4107cd2841e6cfd45e456ce7",
-      "after_sha256": "ff3cfb303af492477cbb5cdfb58a667a169c43842224565a22dc4ec9205ae68c",
+      "after_sha256": "a11d2caa218d7810620179ba3f68758cbecdab27eb8a89bc5ff05b8f1b99f91e",
       "owners": {
         "@document": {
           "before": "93112d2a4fe59bade0e9a605a79c43365a8d5a1d4107cd2841e6cfd45e456ce7",
-          "after": "ff3cfb303af492477cbb5cdfb58a667a169c43842224565a22dc4ec9205ae68c"
+          "after": "a11d2caa218d7810620179ba3f68758cbecdab27eb8a89bc5ff05b8f1b99f91e"
         }
       }
     },
@@ -2749,7 +2749,8 @@
       "category": "measured_workload",
       "operations": [
         "ci64-provenance-c8a1c41e8f12a86f5176cb3116bad5fc710ca45c9bc40c0f0a8e9230613ff960",
-        "ci67-transaction-c8a1c41e8f12a86f5176cb3116bad5fc710ca45c9bc40c0f0a8e9230613ff960"
+        "ci67-transaction-c8a1c41e8f12a86f5176cb3116bad5fc710ca45c9bc40c0f0a8e9230613ff960",
+        "speedup-test-admission"
       ],
       "selected_families": [],
       "rationale": "Accelerate local and hosted behavioral/quality execution by retiring the historical shard-calibration evidence chain, adding ci-preflight caches, single-pass quality execution, cross-worker fixture checkpoints, and duration-aware worksteal dispatch. No gameplay mutation, geometry algorithm, or authoritative decision path changes.",
