@@ -1,0 +1,70 @@
+{
+  "policy": "rules-engine-performance-v3",
+  "family": "movement",
+  "workload_id": "order80-normal-move-occurrence-v1",
+  "base_revision": "b231d7cedea54e123a9211fd775e2910c87d2f18",
+  "head_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:d60a6871e475632bdf930a80251f39e7bae5b5f40c35960b6ed1790750f62fa0",
+  "head_input_digest": "a57f392c3099f8949844b3a78c5ee1a0eca6b83f8c4909b60487843eeaa6a34a",
+  "budget_profile": "current-change-relative-v1",
+  "base": {
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:f0392def5f2e2935d26f026628b439e90f0f6303fb282ac41a27d1b575a7024e",
+    "host": {
+      "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+      "memory_bytes": 67359363072,
+      "logical_cpus": 64,
+      "platform": "Linux-6.18.58.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "659a2d81e02176d23168861529651506ac87a4eab1982109f144cd62a63fce71",
+    "workload_sha256": "1af0bb7fa3733e4e31b8fa73f35839956e2ef5d2e952e6e378c2639ea9dd0427",
+    "fixture_sha256": "e4e51e7cb86ff1f4bfb6a0d7cae99635551bcf59bea2cafd81959cea6fc7bc8e",
+    "samples": {
+      "finite": [
+        2.6049299270000574,
+        2.5689657140001145,
+        2.5817245329999423
+      ],
+      "parameterized": [
+        2.4005191700000523,
+        2.3928851999999097,
+        2.3937994279999657
+      ]
+    },
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false
+  },
+  "head": {
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:d60a6871e475632bdf930a80251f39e7bae5b5f40c35960b6ed1790750f62fa0",
+    "host": {
+      "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+      "memory_bytes": 67359363072,
+      "logical_cpus": 64,
+      "platform": "Linux-6.18.58.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "659a2d81e02176d23168861529651506ac87a4eab1982109f144cd62a63fce71",
+    "workload_sha256": "1af0bb7fa3733e4e31b8fa73f35839956e2ef5d2e952e6e378c2639ea9dd0427",
+    "fixture_sha256": "e4e51e7cb86ff1f4bfb6a0d7cae99635551bcf59bea2cafd81959cea6fc7bc8e",
+    "samples": {
+      "finite": [
+        2.5928447169999345,
+        2.5695214160000432,
+        2.5771813030000885
+      ],
+      "parameterized": [
+        2.5079684400000133,
+        2.454141424999989,
+        2.4092821060000915
+      ]
+    },
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false
+  },
+  "historical_failures": [
+    "Historical measurements and superseded diagnostics retain their original outcomes. This integrated legacy identity slice does not certify exact-coordinate gameplay or full-game performance."
+  ]
+}
