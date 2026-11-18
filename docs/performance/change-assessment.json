@@ -908,6 +908,16 @@
         }
       }
     },
+    "tests/code_quality/test_canonical_deployment_costs.py": {
+      "before_sha256": "4b084b6defbd8ab1bcc870bdc0b3837304eea461668f4849444033653ece3955",
+      "after_sha256": "897f2c209ca82130761942ff55be211e711563b8ae01575a84b73c6e69578ddc",
+      "owners": {
+        "test_retained_canonical_cost_evidence_reconciles_exact_report_and_attempts": {
+          "before": "e38e9b2c634f57764feb1176598592d3301129e6c4400d456c78e500afa2627d",
+          "after": "10dcd6a6408ab7dd7c339bd89f87c0a9ce764c5b8092403f876a33cd30f26e65"
+        }
+      }
+    },
     "tests/code_quality/test_canonical_polygon_pairs_shard_admission.py": {
       "before_sha256": "975321f14e59cf2cf16b7d94a7f98911a11ef9503beb76bde5ee344e1d5d6957",
       "after_sha256": null,
@@ -3012,6 +3022,14 @@
       "rationale": "Declare the fixture checkpoint lock and coverage imports directly in their test/typecheck dependency groups. Production requirements and every resolved package version remain unchanged.",
       "source_obligation": "Clean locked test and typecheck environments must import their required fixture and tracing dependencies.",
       "unchanged_work": "No gameplay runtime dependency changes; preserve full covered behavioral inventory, mirror120, smoke180, quality600 and 67 percent full-package branch coverage."
+    },
+    "tests/code_quality/test_canonical_deployment_costs.py": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Authenticate the retained canonical cost campaign against its recorded exact producer lockfile instead of the current development dependency metadata.",
+      "source_obligation": "Keep every historical report, timing, dependency record and original outcome immutable and validate their authentic producer bytes from Git.",
+      "unchanged_work": "No campaign remeasurement, numerical threshold change, omitted assertion or runtime dependency alteration. Current smoke and complete coverage gates remain mandatory."
     }
   },
   "milestone": "ordinary",
