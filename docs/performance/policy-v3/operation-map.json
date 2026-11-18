@@ -26574,7 +26574,6 @@
         "test_full_game_evidence_rejects_null_qualification_and_stale_workload",
         "test_governance_and_ordinary_rule_changes_do_not_refresh_all_history",
         "test_historical_evidence_is_immutable_and_unknown_inputs_never_fall_back",
-        "test_milli_inch_map_retains_every_existing_sensitive_operation",
         "test_operation_map_uses_real_driver_and_owner_paths",
         "test_order108_scope_preserves_other_assessment_obligations",
         "test_order108_smoke_scope_authenticates_complete_semantic_rows",
@@ -27246,7 +27245,6 @@
         "test_full_game_evidence_rejects_null_qualification_and_stale_workload",
         "test_governance_and_ordinary_rule_changes_do_not_refresh_all_history",
         "test_historical_evidence_is_immutable_and_unknown_inputs_never_fall_back",
-        "test_milli_inch_map_retains_every_existing_sensitive_operation",
         "test_operation_map_uses_real_driver_and_owner_paths",
         "test_order108_scope_preserves_other_assessment_obligations",
         "test_order108_smoke_scope_authenticates_complete_semantic_rows",
@@ -36238,7 +36236,8 @@
         "data/source_audits/ci64_provenance_v1/speedup-test-transition-v1.json",
         "tests/support/cross_worker_fixture_cache.py",
         "tests/conftest.py",
-        "tests/s25_native_profile_helpers.py"
+        "tests/s25_native_profile_helpers.py",
+        "tests/code_quality/test_performance_policy.py"
       ],
       "owners": [
         "*"
