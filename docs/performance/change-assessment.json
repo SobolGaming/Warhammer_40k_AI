@@ -2,7 +2,7 @@
   "policy": "rules-engine-performance-v3",
   "base": "9747b9b0873b4f442d3cd81f72280b24810d952c",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:f0392def5f2e2935d26f026628b439e90f0f6303fb282ac41a27d1b575a7024e",
-  "operation_map_sha256": "c0c6bb882c4c6ffcedfd9ec5de80d556791f275f9b2bb5dda7ef5c978a14fef9",
+  "operation_map_sha256": "2d6faf03fbf90c6a43b40aaeb13ad68d2128985c2e1af57420d2b87088b073b6",
   "changes": {
     ".github/workflows/ci.yml": {
       "before_sha256": "f6d8a0e8fdb593bae7ce96a03bf90d87e3915832896300de86752ad2f2aaaade",
@@ -706,11 +706,11 @@
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "93112d2a4fe59bade0e9a605a79c43365a8d5a1d4107cd2841e6cfd45e456ce7",
-      "after_sha256": "fd37d66454484b96137d804ce24acee075dc67eb2ff1840371c3cc35fbc5dcbc",
+      "after_sha256": "ff3cfb303af492477cbb5cdfb58a667a169c43842224565a22dc4ec9205ae68c",
       "owners": {
         "@document": {
           "before": "93112d2a4fe59bade0e9a605a79c43365a8d5a1d4107cd2841e6cfd45e456ce7",
-          "after": "fd37d66454484b96137d804ce24acee075dc67eb2ff1840371c3cc35fbc5dcbc"
+          "after": "ff3cfb303af492477cbb5cdfb58a667a169c43842224565a22dc4ec9205ae68c"
         }
       }
     },
@@ -1416,11 +1416,15 @@
     },
     "tests/code_quality/test_performance_policy.py": {
       "before_sha256": "c75d9785768bd0d37751667ab0ae04856b4a70dc1ac8bcd90859991ed29a3084",
-      "after_sha256": "a47734703ce8262508b428d009cf7a0e76c31d4a4143c20169c8fb171760f803",
+      "after_sha256": "0702b2a540c904e06a55d6f7a543e1cef4d8f73211990dbacb514c7ae58141dc",
       "owners": {
         "test_current_smoke_is_in_the_required_serial_ci_lane": {
           "before": "c2f729ec583bdd3cbfe85a31e37ca5ae92f17ebc90268b964fb3868c4e2a4c17",
           "after": "c7efc94249a7ed612c23711e0b4b079921bcf3602fa6cf4078b181652cb20d76"
+        },
+        "test_milli_inch_map_retains_every_existing_sensitive_operation": {
+          "before": "18e70a897f66abd0554bc64934592d1d32491f0ca3f07ebf4c8c520f3dc3c11d",
+          "after": "da3caa625d0f90a0e1456220a0e259323c9ced7063cbec1fbf0df5b2a5131dc4"
         }
       }
     },
