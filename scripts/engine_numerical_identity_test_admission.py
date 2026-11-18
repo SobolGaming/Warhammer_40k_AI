@@ -52,6 +52,18 @@ QUERIES = "src/warhammer40k_core/geometry/milli_inch_polygon_queries.py"
 QUERIES_SHA256 = "e46fe8e9738786931c565c5ea5a2dc2921132e3690b420632bfcb8a00c362cc5"
 SOURCE = "src/warhammer40k_core/engine/numerical_identity.py"
 OWNER = "tests/rules/section01/test_engine_numerical_identity.py"
+EXACT_MOVEMENT_ADDITION = (
+    "data/source_audits/ci64_provenance_v1/exact-movement-test-transition-v1.json"
+)
+EXACT_MOVEMENT_SHA256 = "ada2ae25f047f949b9faf3b2c33d7cc590b4c6bc9f22911dc8acb8b5ec5e4b2b"
+EXACT_MOVEMENT_OWNER = "tests/rules/section01/test_exact_movement.py"
+_EXACT_MOVEMENT_SOURCES = (
+    "src/warhammer40k_core/engine/exact_movement.py",
+    "src/warhammer40k_core/geometry/exact_path.py",
+    "src/warhammer40k_core/geometry/exact_pose.py",
+)
+
+type TestTransition = tuple[dict[str, dict[str, object]], dict[str, dict[str, object]], bytes]
 
 
 def _checked_bytes(root: Path, name: str, digest: str) -> bytes:
@@ -66,8 +78,50 @@ def _checked_bytes(root: Path, name: str, digest: str) -> bytes:
 
 def engine_numerical_identity_test_transition(
     root: Path, retained_cutover_sha256: str
-) -> tuple[dict[str, dict[str, object]], dict[str, dict[str, object]], bytes] | None:
+) -> TestTransition | None:
     """Admit one exact owner while retaining every predecessor source inventory."""
+    return _identity_test_transition(root, retained_cutover_sha256, runtime=RUNTIME)
+
+
+def exact_movement_test_transition(
+    root: Path, retained_cutover_sha256: str
+) -> TestTransition | None:
+    """Admit the flat-disk movement cases without modifying predecessor evidence."""
+    paths = (EXACT_MOVEMENT_ADDITION, EXACT_MOVEMENT_OWNER, *_EXACT_MOVEMENT_SOURCES)
+    for path in paths:
+        _selection_no_links(root, root / path)
+    if not any((root / path).exists() for path in paths):
+        return None
+    raw = _checked_bytes(root, EXACT_MOVEMENT_ADDITION, EXACT_MOVEMENT_SHA256)
+    record = json.loads(raw, object_pairs_hook=_selection_object)
+    if (
+        record.keys()
+        != {"schema", "retained_identity_sha256", "runtime_fingerprint", "sources", "added_files"}
+        or record["schema"] != "finite-exact-movement-test-transition-v1"
+        or record["retained_identity_sha256"] != ADDITION_SHA256
+        or set(record["sources"]) != set(_EXACT_MOVEMENT_SOURCES)
+        or set(record["added_files"]) != {EXACT_MOVEMENT_OWNER}
+    ):
+        raise SystemExit("Exact movement test transition membership differs.")
+    for name, digest in record["sources"].items():
+        _checked_bytes(root, name, digest)
+    retained = _identity_test_transition(
+        root, retained_cutover_sha256, runtime=record["runtime_fingerprint"]
+    )
+    if retained is None:
+        raise SystemExit(
+            "Exact movement test transition requires the numerical identity predecessor."
+        )
+    updated, added, retained_raw = retained
+    additions = _selection_members(record["added_files"], root)
+    if additions.keys() & (updated.keys() | added.keys()):
+        raise SystemExit("Exact movement test cases overlap the predecessor selection.")
+    return updated, {**added, **additions}, retained_raw + b"\0" + raw
+
+
+def _identity_test_transition(
+    root: Path, retained_cutover_sha256: str, *, runtime: str
+) -> TestTransition | None:
     for name in (ADDITION, MANIFEST, SOURCE, OWNER):
         _selection_no_links(root, root / name)
     manifest = (
@@ -78,10 +132,10 @@ def engine_numerical_identity_test_transition(
     fingerprint = manifest.get("fingerprint") if isinstance(manifest, dict) else None
     if (
         not any((root / name).exists() for name in (ADDITION, SOURCE, OWNER))
-        and fingerprint != RUNTIME
+        and fingerprint != runtime
     ):
         return None
-    if retained_cutover_sha256 != RETAINED_CUTOVER_SHA256 or fingerprint != RUNTIME:
+    if retained_cutover_sha256 != RETAINED_CUTOVER_SHA256 or fingerprint != runtime:
         raise SystemExit(
             "Numerical identity test transition requires its retained cutover and runtime."
         )

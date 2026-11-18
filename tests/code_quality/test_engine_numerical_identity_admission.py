@@ -24,6 +24,7 @@ from scripts.symbolic_milli_inch_test_admission import ADDITION as SYMBOLIC_ADDI
 
 ROOT = Path(__file__).resolve().parents[2]
 BASE = "b231d7cedea54e123a9211fd775e2910c87d2f18"
+IDENTITY_REVISION = "d81dc3fd9fd9625205dcc91282fd89f588a75bfb"
 
 
 def _record(name: str) -> dict[str, Any]:
@@ -63,7 +64,12 @@ def transition_snapshot(tmp_path: Path) -> Path:
     for name in names:
         destination = tmp_path / name
         destination.parent.mkdir(parents=True, exist_ok=True)
-        destination.write_bytes((ROOT / name).read_bytes())
+        contents = (
+            subprocess.check_output(["git", "show", IDENTITY_REVISION + ":" + name], cwd=ROOT)
+            if name == MANIFEST
+            else (ROOT / name).read_bytes()
+        )
+        destination.write_bytes(contents)
     _transition(tmp_path)
     return tmp_path
 
@@ -85,15 +91,39 @@ def test_identity_transition_rejects_every_changed_runtime_source(
     with pytest.raises(SystemExit, match="retained cutover and runtime"):
         _transition(transition_snapshot)
 
+    record = _record(selection.EXACT_MOVEMENT_ADDITION)
+    for name in (
+        MANIFEST,
+        selection.EXACT_MOVEMENT_ADDITION,
+        selection.EXACT_MOVEMENT_OWNER,
+        *record["sources"],
+    ):
+        destination = transition_snapshot / name
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        destination.write_bytes((ROOT / name).read_bytes())
+    cutover_digest = hashlib.sha256((ROOT / sharding.CUTOVER_PATH).read_bytes()).hexdigest()
+    accepted = selection.exact_movement_test_transition(transition_snapshot, cutover_digest)
+    assert accepted is not None
+    assert selection.EXACT_MOVEMENT_OWNER in accepted[1]
+    for name in record["sources"]:
+        target = transition_snapshot / name
+        original = target.read_bytes()
+        target.write_bytes(original + b"\n")
+        with pytest.raises(SystemExit, match="source bytes differ"):
+            selection.exact_movement_test_transition(transition_snapshot, cutover_digest)
+        target.write_bytes(original)
 
-def test_identity_transition_preserves_original_recipe_and_speedup_evidence() -> None:
+
+def test_identity_transition_preserves_original_recipe_and_speedup_evidence(
+    transition_snapshot: Path,
+) -> None:
     for name in (
         "src/warhammer40k_core/adapters/checkpoint_reconstruction.py",
         "data/source_audits/ci64_provenance_v1/speedup-test-transition-v1.json",
     ):
         original = subprocess.check_output(["git", "show", BASE + ":" + name], cwd=ROOT)
         assert (ROOT / name).read_bytes() == original
-    updated, added, _ = _transition(ROOT)
+    updated, added, _ = _transition(transition_snapshot)
     speedup = _record("data/source_audits/ci64_provenance_v1/speedup-test-transition-v1.json")
     assert set(speedup["updated_files"]) <= set(updated)
     assert selection.OWNER in added
@@ -118,11 +148,14 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
     successors = _record(selection.ADDITION)["case_id_successors"]
     retained = {successors.get(node, node) for node in previous}
     assert len(retained) == len(previous)
-    assert current.keys() == retained | added
+    staged = {node for node in current if node.startswith(selection.EXACT_MOVEMENT_OWNER + "::")}
+    assert staged
+    assert sum(selection.EXACT_MOVEMENT_OWNER in group for group in groups) == 1
+    assert current.keys() == retained | added | staged
 
 
 def test_identity_selection_rejects_drift_in_each_updated_test(transition_snapshot: Path) -> None:
-    updated, _, _ = _transition(ROOT)
+    updated, _, _ = _transition(transition_snapshot)
     changed = _record(selection.ADDITION)["updated_files"]
     assert set(changed) <= set(updated)
     for name in changed:

@@ -1,0 +1,18 @@
+{
+  "added_files": {
+    "tests/rules/section01/test_exact_movement.py": {
+      "blob_sha1": "a8f6f77aa87a2b88b69959543048429c51882ba1",
+      "bytes": 11510,
+      "mode": "100644",
+      "sha256": "f55adb754c59d07a75e2ba6c5fc09c176fe8f3b5078135f6609596500f6cb3ee"
+    }
+  },
+  "retained_identity_sha256": "4ab08b326285715c00a3bd10aabca1f6572da4fdfa55958309a2e2a215668bb8",
+  "runtime_fingerprint": "d77dd33911b10ede682bead7be294d4c1899fe306316371d7969c01087c71e85",
+  "schema": "finite-exact-movement-test-transition-v1",
+  "sources": {
+    "src/warhammer40k_core/engine/exact_movement.py": "c1194d8c74cfe6743bc04dc9c7e86de43457b3fc9aaaf44fbb773fee3613f539",
+    "src/warhammer40k_core/geometry/exact_path.py": "826b19bcf9d412cdda3b876481d121eb78a37631261cb898de553c0ff162c745",
+    "src/warhammer40k_core/geometry/exact_pose.py": "fd18da932294826165f3a668f8fd78ea21ad3314ec22792c30c446d70c1ada6d"
+  }
+}
