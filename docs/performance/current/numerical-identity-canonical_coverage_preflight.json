@@ -4,13 +4,13 @@
   "workload_id": "numerical-identity-canonical-preflight-v2",
   "base_revision": "b231d7cedea54e123a9211fd775e2910c87d2f18",
   "head_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:d60a6871e475632bdf930a80251f39e7bae5b5f40c35960b6ed1790750f62fa0",
-  "head_input_digest": "a57f392c3099f8949844b3a78c5ee1a0eca6b83f8c4909b60487843eeaa6a34a",
+  "head_input_digest": "c5c2b0e5a688c9e94109c47d28ec3b5a00c2c981ee50f94666351d2a37b7f517",
   "budget_profile": "current-change-relative-v1",
   "base": {
     "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:f0392def5f2e2935d26f026628b439e90f0f6303fb282ac41a27d1b575a7024e",
     "host": {
       "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
-      "memory_bytes": 67359363072,
+      "memory_bytes": 67359375360,
       "logical_cpus": 64,
       "platform": "Linux-6.18.58.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
       "python": "3.14.5",
@@ -21,10 +21,10 @@
     "fixture_sha256": "e4e51e7cb86ff1f4bfb6a0d7cae99635551bcf59bea2cafd81959cea6fc7bc8e",
     "samples": {
       "valid_reload": [
-        173.4440359549999
+        174.34072752400016
       ],
       "inconsistent_totals_rejection": [
-        0.010334321999835083
+        0.010384079999766982
       ]
     },
     "completed": true,
@@ -35,7 +35,7 @@
     "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:d60a6871e475632bdf930a80251f39e7bae5b5f40c35960b6ed1790750f62fa0",
     "host": {
       "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
-      "memory_bytes": 67359363072,
+      "memory_bytes": 67359375360,
       "logical_cpus": 64,
       "platform": "Linux-6.18.58.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
       "python": "3.14.5",
@@ -46,10 +46,10 @@
     "fixture_sha256": "e4e51e7cb86ff1f4bfb6a0d7cae99635551bcf59bea2cafd81959cea6fc7bc8e",
     "samples": {
       "valid_reload": [
-        173.2293150280002
+        173.73999345799984
       ],
       "inconsistent_totals_rejection": [
-        0.01090476600029433
+        0.011193533999630745
       ]
     },
     "completed": true,

@@ -3,11 +3,11 @@
     "completed": true,
     "concurrency": 1,
     "coverage": false,
-    "fixture_sha256": "514a5041311643ed472ddb63413ec08ed72c6285da1303fb1a27d3425599b522",
+    "fixture_sha256": "75615f2f320eae46437f52433f8a72366fa69abb9b0cd48dadc3a1b27f500494",
     "host": {
       "cpu": "x86_64",
       "logical_cpus": 64,
-      "memory_bytes": 67359363072,
+      "memory_bytes": 67359375360,
       "platform": "Linux-6.18.58.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
       "python": "3.14.5",
       "role": "provisional"
@@ -16,9 +16,9 @@
     "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:f0392def5f2e2935d26f026628b439e90f0f6303fb282ac41a27d1b575a7024e",
     "samples": {
       "orphan-write-independent-check": [
-        95.279,
-        95.23,
-        94.856
+        94.632,
+        94.796,
+        94.947
       ]
     },
     "workload_sha256": "f17e5933472c77b9fe096a698ed083c6e1574490882e6422c6ec70f08db288be"
@@ -1122,11 +1122,11 @@
     "completed": true,
     "concurrency": 1,
     "coverage": false,
-    "fixture_sha256": "514a5041311643ed472ddb63413ec08ed72c6285da1303fb1a27d3425599b522",
+    "fixture_sha256": "75615f2f320eae46437f52433f8a72366fa69abb9b0cd48dadc3a1b27f500494",
     "host": {
       "cpu": "x86_64",
       "logical_cpus": 64,
-      "memory_bytes": 67359363072,
+      "memory_bytes": 67359375360,
       "platform": "Linux-6.18.58.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
       "python": "3.14.5",
       "role": "provisional"
@@ -1135,14 +1135,14 @@
     "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:d60a6871e475632bdf930a80251f39e7bae5b5f40c35960b6ed1790750f62fa0",
     "samples": {
       "orphan-write-independent-check": [
-        95.08,
-        94.795,
-        94.957
+        94.605,
+        94.679,
+        94.924
       ]
     },
     "workload_sha256": "f17e5933472c77b9fe096a698ed083c6e1574490882e6422c6ec70f08db288be"
   },
-  "head_input_digest": "a57f392c3099f8949844b3a78c5ee1a0eca6b83f8c4909b60487843eeaa6a34a",
+  "head_input_digest": "c5c2b0e5a688c9e94109c47d28ec3b5a00c2c981ee50f94666351d2a37b7f517",
   "head_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:d60a6871e475632bdf930a80251f39e7bae5b5f40c35960b6ed1790750f62fa0",
   "historical_failures": [],
   "input_binding": {
@@ -5980,7 +5980,6 @@
       "tests/code_quality/test_physical_history_anchor_provenance.py": "6127acc269ac2d374256e89950f21a0e48e00ab08082302734997e076555f963",
       "tests/code_quality/test_physical_proposal_prevalidation.py": "57a848f0aa95797da179fd78d0449a9976697a02943d936ac5a630eeb255f595",
       "tests/code_quality/test_proposal_source_index.py": "c0c7cdde98eb4d228147fabca586b18c65e7b27d886aec087030e0fc311345e8",
-      "tests/code_quality/test_qualification40_measurements.py": "b6f774971c06d7071f1acf0f5e41f256b97733cde3e1e4c51ea7f7540472badc",
       "tests/code_quality/test_qualification40_successor.py": "5e02d7d2b6cef002453451de51f8c5c470d434f063948ea9c766359e9061c6e4",
       "tests/code_quality/test_quality_runtime.py": "d5ecc9072ddeb63687562ed6ee9e37401df79c21270bd1f1da302b49bbb2c771",
       "tests/code_quality/test_quality_runtime_process.py": "85983adf995327d62d50680f9c68beaf6834987b9795bf42b4fc684346f1be9b",
@@ -7452,7 +7451,7 @@
       "tools/wahapedia_fetch.py": "9c605d9c3af086dc92e0663a4783dfdb426ac3268701a007fbe6f23fa503f7d3",
       "uv.lock": "659a2d81e02176d23168861529651506ac87a4eab1982109f144cd62a63fce71"
     },
-    "common_sha256": "514a5041311643ed472ddb63413ec08ed72c6285da1303fb1a27d3425599b522",
+    "common_sha256": "75615f2f320eae46437f52433f8a72366fa69abb9b0cd48dadc3a1b27f500494",
     "family": "external_contract_source_reuse",
     "harness": {
       "base": {
@@ -7475,8 +7474,8 @@
       },
       "sha256": "e97c2a680c270c05ce91b2cf61349e5a225c8b6aa9acf6cecfd402b32475f60e"
     },
-    "head_input_digest": "a57f392c3099f8949844b3a78c5ee1a0eca6b83f8c4909b60487843eeaa6a34a",
-    "role_spec_sha256": "60263197415410d4329ad53b2e3cbd61bcba8bad6d4184d077831dcc0d3c37aa",
+    "head_input_digest": "c5c2b0e5a688c9e94109c47d28ec3b5a00c2c981ee50f94666351d2a37b7f517",
+    "role_spec_sha256": "d4b459d606fbe0f6358dcb059feababc332b2eda1ae49ecd66ea6bb82b9608a5",
     "schema": "tool-input-roles-v4",
     "sides": {
       "base": {
@@ -7497,6 +7496,7 @@
           "scripts/reconstruct_local_checkpoint.py": "a7a89eadef0f68f1f9b4c3eb1c069647e97240f0d798b233a2bbc9bb8ed150ae",
           "tests/code_quality/test_ci_performance_gates.py": "667fa8967297cf0dc725c02eba6f354f88b1c5d9c61751b6242139402e407d9f",
           "tests/code_quality/test_engine_numerical_identity_admission.py": null,
+          "tests/code_quality/test_qualification40_measurements.py": "b6f774971c06d7071f1acf0f5e41f256b97733cde3e1e4c51ea7f7540472badc",
           "tests/code_quality/test_registered_source_scopes.py": "e27af0922ed20582a304dad2b4a4007f2d456e77d659af76214191c606248f1b",
           "tests/daemons_native_source_preservation.py": "d1504d495927df45cb45dd85bed5daf6c8af8a9d8c5a4683f8cbcdad5edb80e1",
           "tests/rules/section07/coverage.json": "d7cec8dcb959a1505324b18c9e172f534cab4cde7151cb6b886d9d18e561a0c2",
@@ -13963,7 +13963,7 @@
           "conformance/typescript/src/generated/openapi.ts": "ecc2bdfb424f250dcc00c7ec041235e95a02de6dbf0f16613c1e4dede43065b0",
           "conformance/typescript/src/proposal-schema.test.ts": "46c23c44c0782cf1eca2615646935f53630450d6a6dd003c72359112cb6b19b0",
           "docs/performance/policy-v3/numerical-identity-input-roles-v4.json": "5e25f3da9242053a216417fde60f1a89d7d1996a8507e150af34a327a5493470",
-          "docs/performance/policy-v3/numerical-identity-main692-input-roles-v4.json": "8d5cf2484e5529c96c68f33abc6fdd7ff46e9fa7fe10a6b65d82c3165751261e",
+          "docs/performance/policy-v3/numerical-identity-main692-input-roles-v4.json": "0c643bf07f4a7b7c96274f4545b6872a76cc4910b37dcb7d9c82b6f5d4bf53f5",
           "docs/performance/policy-v3/operation-map.json": "e2f20edf33ddf7fe0bd0a0c85f4e4254d2fb64517124799375caa34c4f868ebd",
           "scripts/build_test_shards.py": "72f5af63f5a77a4d3027248c1e2dae643dff6d391b013912808a9d08eef107a2",
           "scripts/engine_numerical_identity_test_admission.py": "a01896a7692c3338e1fc32452a9320d1fa0ea5e9f0820eef51fef34f17c074e8",
@@ -13973,11 +13973,12 @@
           "scripts/reconstruct_local_checkpoint.py": "a26ed7e2a34a1cceadefa69db5a67415b86f3a2fc07ca27c6e5f857ad3a3b946",
           "tests/code_quality/test_ci_performance_gates.py": "81627b24dcf61799c29f771a88ae6d92d61e2010aabda2fbcc2f4ba6716cbc4e",
           "tests/code_quality/test_engine_numerical_identity_admission.py": "9f86ea9e5b5ee8ddfc4ae206517f18ac06c7610af1e8b104228cbb63694c72a7",
-          "tests/code_quality/test_registered_source_scopes.py": "f36d4c58e21e1dd508960c9d5d44421e8334945c123a0297f9b5e9c42fcea33a",
+          "tests/code_quality/test_qualification40_measurements.py": "50a2f9e048e9dc356ce6aaff2a0eec711ea951415b6b947a5720bdc0be4f538c",
+          "tests/code_quality/test_registered_source_scopes.py": "304ab57ba633eae2dce1332781ba8f3a0422248aaf422d161261c52af9353c03",
           "tests/daemons_native_source_preservation.py": "db9c144307721ca22a5839e67cb893808f99ac609920ba151251dfa4ac5637de",
           "tests/rules/section07/coverage.json": "090d141d9b99b0310c5a48ffe2dbb52a387531326957906ff11374f51224b449",
           "tests/rules/section18/coverage.json": "508d6249d24630d2468bea7ff7380b5df3daa3fc43dfa12eded31951500c7060",
-          "tools/performance_tool_inputs_v4.py": "a15769f001987aecc0ee60b564db99a36b0de5a12786dba7f7cf5710c17438b1",
+          "tools/performance_tool_inputs_v4.py": "420b6eef3af201f993aa2fa797054c66f7bc98e6d585873e01a4bc1ae031ce8f",
           "tools/source_scope_provenance.py": "a2aa483416d8989c08858c7303daba3dece1b4d1e9db84b02199b12340c45714"
         },
         "derived_outputs": {
@@ -15382,7 +15383,7 @@
           "data/source_snapshots/wahapedia/10th-edition/2026-06-14/json/source_package_manifest.json": "cb2f1c5c7f658c428faffe8bc599fc4739ec0cd95534b1ba256d238288770f32",
           "data/source_snapshots/wahapedia/10th-edition/2026-06-14/raw/source_snapshot.json": "19a1a84df2a31224604db2dfb2fb22d9af7636a18ac7cce5560c0ee99fe798dc",
           "docs/performance/policy-v3/numerical-identity-input-roles-v4.json": "5e25f3da9242053a216417fde60f1a89d7d1996a8507e150af34a327a5493470",
-          "docs/performance/policy-v3/numerical-identity-main692-input-roles-v4.json": "8d5cf2484e5529c96c68f33abc6fdd7ff46e9fa7fe10a6b65d82c3165751261e",
+          "docs/performance/policy-v3/numerical-identity-main692-input-roles-v4.json": "0c643bf07f4a7b7c96274f4545b6872a76cc4910b37dcb7d9c82b6f5d4bf53f5",
           "docs/performance/policy-v3/operation-map.json": "e2f20edf33ddf7fe0bd0a0c85f4e4254d2fb64517124799375caa34c4f868ebd",
           "docs/source_rules/faq-warhammer-open-tacoma-2026-dtb3ingprd-cvcl2agtfd.pdf": "5beadb2c29e100a31bb7ee54f429498555e07430997063111aa4694556568f97",
           "docs/source_rules/tacoma-open-2026-source-package.json": "6723634f13a3ccb0239c1238fef7847163550a532fb9ff0dc7578ada0ea14e38",
@@ -18957,12 +18958,12 @@
           "tests/code_quality/test_physical_history_anchor_provenance.py": "6127acc269ac2d374256e89950f21a0e48e00ab08082302734997e076555f963",
           "tests/code_quality/test_physical_proposal_prevalidation.py": "57a848f0aa95797da179fd78d0449a9976697a02943d936ac5a630eeb255f595",
           "tests/code_quality/test_proposal_source_index.py": "c0c7cdde98eb4d228147fabca586b18c65e7b27d886aec087030e0fc311345e8",
-          "tests/code_quality/test_qualification40_measurements.py": "b6f774971c06d7071f1acf0f5e41f256b97733cde3e1e4c51ea7f7540472badc",
+          "tests/code_quality/test_qualification40_measurements.py": "50a2f9e048e9dc356ce6aaff2a0eec711ea951415b6b947a5720bdc0be4f538c",
           "tests/code_quality/test_qualification40_successor.py": "5e02d7d2b6cef002453451de51f8c5c470d434f063948ea9c766359e9061c6e4",
           "tests/code_quality/test_quality_runtime.py": "d5ecc9072ddeb63687562ed6ee9e37401df79c21270bd1f1da302b49bbb2c771",
           "tests/code_quality/test_quality_runtime_process.py": "85983adf995327d62d50680f9c68beaf6834987b9795bf42b4fc684346f1be9b",
           "tests/code_quality/test_random_profile_attack_authority.py": "c1dc055261e3936bbc37f17c9b2aeee25f2c7a8418ed8a16adf5415a4c49ba6f",
-          "tests/code_quality/test_registered_source_scopes.py": "f36d4c58e21e1dd508960c9d5d44421e8334945c123a0297f9b5e9c42fcea33a",
+          "tests/code_quality/test_registered_source_scopes.py": "304ab57ba633eae2dce1332781ba8f3a0422248aaf422d161261c52af9353c03",
           "tests/code_quality/test_reserve_transport_authority.py": "df918db3f57b4f2393e357ed7208bd49251148d7f8379c62408d36fbf501c5b5",
           "tests/code_quality/test_rule_text_boundary.py": "16c79922c05c067b0f61be221e1c41e10bbd671adba7993d0d9f6bc3f2104fac",
           "tests/code_quality/test_runtime_manifest_reuse.py": "122cb79b2f6d72990919d415b3dea078707ad9bc7e2fd16f72b1057dd16cc53d",
@@ -20428,7 +20429,7 @@
           "tools/performance_tool_inputs.py": "680831bb5fab213eeca71df99ebc6a7800beeb6492a5691fc592fe21ad970255",
           "tools/performance_tool_inputs_v2.py": "e32fbfcd15747522f64bfefde20318defe397e2c152a2d80743ada8ff68568b0",
           "tools/performance_tool_inputs_v3.py": "5572c99bec3b6002dfb9922faec51f0948a3a893425ae3bfa01609d648c686cf",
-          "tools/performance_tool_inputs_v4.py": "a15769f001987aecc0ee60b564db99a36b0de5a12786dba7f7cf5710c17438b1",
+          "tools/performance_tool_inputs_v4.py": "420b6eef3af201f993aa2fa797054c66f7bc98e6d585873e01a4bc1ae031ce8f",
           "tools/performance_wave_frame.py": "8e5c6daec312da5b8982e015df90a9785d3a54545355a629313d4d9e3ac0fd0c",
           "tools/promote_july_faction_packs.py": "d864a6e5df27a4f3be9714838e3109ff36189140664109ff5365eac5a58062d6",
           "tools/quality_runtime_successor.py": "de0d1a9ed29b0efe9dffa15667c03854204fe390588f81a55817acea841f2c80",
@@ -20440,8 +20441,8 @@
           "tools/wahapedia_fetch.py": "9c605d9c3af086dc92e0663a4783dfdb426ac3268701a007fbe6f23fa503f7d3",
           "uv.lock": "659a2d81e02176d23168861529651506ac87a4eab1982109f144cd62a63fce71"
         },
-        "inventory_sha256": "1130ccafff51d7db1f7d5e9779dd71e3450e2f6f8806db8ea62f5ba57011ba7a",
-        "revision": "18df99c76d180704de1ff60103674144dd202d06"
+        "inventory_sha256": "72a4617a4287b4d3198ac1c196ee931fc62b67799711149a37b5a00bab30d75c",
+        "revision": "b2994346264925572329468125b973de0c09123b"
       }
     }
   },

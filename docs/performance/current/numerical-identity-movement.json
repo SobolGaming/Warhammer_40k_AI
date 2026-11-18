@@ -4,13 +4,13 @@
   "workload_id": "order80-normal-move-occurrence-v1",
   "base_revision": "b231d7cedea54e123a9211fd775e2910c87d2f18",
   "head_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:d60a6871e475632bdf930a80251f39e7bae5b5f40c35960b6ed1790750f62fa0",
-  "head_input_digest": "a57f392c3099f8949844b3a78c5ee1a0eca6b83f8c4909b60487843eeaa6a34a",
+  "head_input_digest": "c5c2b0e5a688c9e94109c47d28ec3b5a00c2c981ee50f94666351d2a37b7f517",
   "budget_profile": "current-change-relative-v1",
   "base": {
     "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:f0392def5f2e2935d26f026628b439e90f0f6303fb282ac41a27d1b575a7024e",
     "host": {
       "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
-      "memory_bytes": 67359363072,
+      "memory_bytes": 67359375360,
       "logical_cpus": 64,
       "platform": "Linux-6.18.58.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
       "python": "3.14.5",
@@ -21,14 +21,14 @@
     "fixture_sha256": "e4e51e7cb86ff1f4bfb6a0d7cae99635551bcf59bea2cafd81959cea6fc7bc8e",
     "samples": {
       "finite": [
-        2.6049299270000574,
-        2.5689657140001145,
-        2.5817245329999423
+        2.6476687599999877,
+        2.613035243000013,
+        2.6225029869999616
       ],
       "parameterized": [
-        2.4005191700000523,
-        2.3928851999999097,
-        2.3937994279999657
+        2.4378128250000373,
+        2.449437366999973,
+        2.419350952000059
       ]
     },
     "completed": true,
@@ -39,7 +39,7 @@
     "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:d60a6871e475632bdf930a80251f39e7bae5b5f40c35960b6ed1790750f62fa0",
     "host": {
       "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
-      "memory_bytes": 67359363072,
+      "memory_bytes": 67359375360,
       "logical_cpus": 64,
       "platform": "Linux-6.18.58.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
       "python": "3.14.5",
@@ -50,14 +50,14 @@
     "fixture_sha256": "e4e51e7cb86ff1f4bfb6a0d7cae99635551bcf59bea2cafd81959cea6fc7bc8e",
     "samples": {
       "finite": [
-        2.5928447169999345,
-        2.5695214160000432,
-        2.5771813030000885
+        2.633677069999976,
+        2.5999701779999214,
+        2.5988445710001997
       ],
       "parameterized": [
-        2.5079684400000133,
-        2.454141424999989,
-        2.4092821060000915
+        2.431997443,
+        2.4417519799999354,
+        2.4272803369999565
       ]
     },
     "completed": true,

@@ -46,131 +46,121 @@
     },
     "ci/test_shards/durations.json": {
       "before_sha256": "6983352c0b09e27dfb6ef6496395136e786cf679564f86a6fa6d5e201cb62ea8",
-      "after_sha256": "c7eff6ab386d1173a32f075dbe62595465bc94160b17f811baaf3fafea4d7c6e",
+      "after_sha256": "fa97291c931bc1b1e03ae80438678edc4439eda58e89fcf4c424c6152e01d937",
       "owners": {
         "@document": {
           "before": "6983352c0b09e27dfb6ef6496395136e786cf679564f86a6fa6d5e201cb62ea8",
-          "after": "c7eff6ab386d1173a32f075dbe62595465bc94160b17f811baaf3fafea4d7c6e"
+          "after": "fa97291c931bc1b1e03ae80438678edc4439eda58e89fcf4c424c6152e01d937"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
       "before_sha256": "b391aad635f490b97de46a84da20360fb870625f1c107139882dbd66a88c92b6",
-      "after_sha256": "2391b580f1e75739239915b6c4ccc626b2ec8e1edeb03990119c821ce6fd80ac",
+      "after_sha256": "cbf48c92d8a2f28f685eae705a281154c1c55730f6dbfc954b31cd9708053e78",
       "owners": {
         "@document": {
           "before": "b391aad635f490b97de46a84da20360fb870625f1c107139882dbd66a88c92b6",
-          "after": "2391b580f1e75739239915b6c4ccc626b2ec8e1edeb03990119c821ce6fd80ac"
+          "after": "cbf48c92d8a2f28f685eae705a281154c1c55730f6dbfc954b31cd9708053e78"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
       "before_sha256": "0a43d3214df0da0458d21aa0399e62c85186dd93ef80103b4fef45825184cd9b",
-      "after_sha256": "9de07210ec486fb09351f4ec0d3bd982492ec2fcda8946652319488fb088e5da",
+      "after_sha256": "079253cddad68a5f0fda56350c8d705bd62e188d1fac881581515ede2f1d8c07",
       "owners": {
         "@document": {
           "before": "0a43d3214df0da0458d21aa0399e62c85186dd93ef80103b4fef45825184cd9b",
-          "after": "9de07210ec486fb09351f4ec0d3bd982492ec2fcda8946652319488fb088e5da"
+          "after": "079253cddad68a5f0fda56350c8d705bd62e188d1fac881581515ede2f1d8c07"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
       "before_sha256": "276ecc10072a6c47be88d86695cfb22748d5f022fd38b0318ec6ddf16275295d",
-      "after_sha256": "e4f47f8dcedbdeec58a786af527d621ea0ebf1a92c40ca47eb8aa99ddfb04926",
+      "after_sha256": "321bf017c7c51a24c3348a8f74b146d7604193469dac266f68c144a05807f0af",
       "owners": {
         "@document": {
           "before": "276ecc10072a6c47be88d86695cfb22748d5f022fd38b0318ec6ddf16275295d",
-          "after": "e4f47f8dcedbdeec58a786af527d621ea0ebf1a92c40ca47eb8aa99ddfb04926"
+          "after": "321bf017c7c51a24c3348a8f74b146d7604193469dac266f68c144a05807f0af"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
       "before_sha256": "287c31772aebbd642d6aaeebb8e0f0fe771b95b08993817f4438246372df189c",
-      "after_sha256": "fcca96710f8b32cced440bbbe246cb1209740dd2ba7d9241b5d48196aac991ad",
+      "after_sha256": "65430c57cf73bff95a6d42a8824baa4b66d3371c69a7a1b10adf1ea2221c4252",
       "owners": {
         "@document": {
           "before": "287c31772aebbd642d6aaeebb8e0f0fe771b95b08993817f4438246372df189c",
-          "after": "fcca96710f8b32cced440bbbe246cb1209740dd2ba7d9241b5d48196aac991ad"
-        }
-      }
-    },
-    "ci/test_shards/shard-2.txt": {
-      "before_sha256": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
-      "after_sha256": "809d4ebff2c30451f23ef1a47fa5e9a6fd39be56246f014c6144eaa35ad12644",
-      "owners": {
-        "@document": {
-          "before": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
-          "after": "809d4ebff2c30451f23ef1a47fa5e9a6fd39be56246f014c6144eaa35ad12644"
+          "after": "65430c57cf73bff95a6d42a8824baa4b66d3371c69a7a1b10adf1ea2221c4252"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
       "before_sha256": "5ee38b92c7e8c2c466be0da60315842aa04318e0853ddcac965464a7cb0c656d",
-      "after_sha256": "cc694beceee5b56a6c89ec15c44e9039c5c46bff3c3328970ec9b5d6ccab9219",
+      "after_sha256": "ed8b2de4f896240a0d1fb02f3619cf22c5a51a118cc241c105470311b8b39d28",
       "owners": {
         "@document": {
           "before": "5ee38b92c7e8c2c466be0da60315842aa04318e0853ddcac965464a7cb0c656d",
-          "after": "cc694beceee5b56a6c89ec15c44e9039c5c46bff3c3328970ec9b5d6ccab9219"
+          "after": "ed8b2de4f896240a0d1fb02f3619cf22c5a51a118cc241c105470311b8b39d28"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
       "before_sha256": "759404f3db8a0e634e7d7e3891cd8f5082e4d6bc7de3a441d303e8e56ce73f87",
-      "after_sha256": "5409094bcd1c29474d28d19c10b6af43323d8a13819a46ebcef258f6288adf22",
+      "after_sha256": "9edea9261574237a9fba599996ae3c4f07f8d7a0755a69ba0f67659ed6a83174",
       "owners": {
         "@document": {
           "before": "759404f3db8a0e634e7d7e3891cd8f5082e4d6bc7de3a441d303e8e56ce73f87",
-          "after": "5409094bcd1c29474d28d19c10b6af43323d8a13819a46ebcef258f6288adf22"
+          "after": "9edea9261574237a9fba599996ae3c4f07f8d7a0755a69ba0f67659ed6a83174"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
       "before_sha256": "8a998943350e8a0560166c77d2c101f869d364f3248acbe807acde557b9ec851",
-      "after_sha256": "a498ec55a3b3278949e2c2fce71243d89ec36d3fb8d663394a128cb8951827fd",
+      "after_sha256": "c3aa68844dd9333e4adc02452f9e65045000835e57b98198b291ab2cbd35605e",
       "owners": {
         "@document": {
           "before": "8a998943350e8a0560166c77d2c101f869d364f3248acbe807acde557b9ec851",
-          "after": "a498ec55a3b3278949e2c2fce71243d89ec36d3fb8d663394a128cb8951827fd"
+          "after": "c3aa68844dd9333e4adc02452f9e65045000835e57b98198b291ab2cbd35605e"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
       "before_sha256": "ce91c5f9e8a379f1c3a86b51d482003330866457e462c4b0e85818da59e5d7a6",
-      "after_sha256": "12267707e6b5f67a95785082a05f6868c5739e2ebec8647a9e3fa70e20ddeadb",
+      "after_sha256": "13d428ac533ef16341bb6d67be38b3e111c9d19213a810397134565a1ee18b3c",
       "owners": {
         "@document": {
           "before": "ce91c5f9e8a379f1c3a86b51d482003330866457e462c4b0e85818da59e5d7a6",
-          "after": "12267707e6b5f67a95785082a05f6868c5739e2ebec8647a9e3fa70e20ddeadb"
+          "after": "13d428ac533ef16341bb6d67be38b3e111c9d19213a810397134565a1ee18b3c"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
       "before_sha256": "a8906aebfc953943d3373234a11d14a2d6978bd55fa917a0f1288e78787f7eaa",
-      "after_sha256": "b90beaa21f119ca4e872c2557f28d14ab0b971745e214785bc480aa4f5724078",
+      "after_sha256": "210f6bbbfe6a523556bc265937e7ab0e0f28619d583b8005b71da48c8dd4f9d8",
       "owners": {
         "@document": {
           "before": "a8906aebfc953943d3373234a11d14a2d6978bd55fa917a0f1288e78787f7eaa",
-          "after": "b90beaa21f119ca4e872c2557f28d14ab0b971745e214785bc480aa4f5724078"
+          "after": "210f6bbbfe6a523556bc265937e7ab0e0f28619d583b8005b71da48c8dd4f9d8"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
       "before_sha256": "61bac983b45539980d543ac3c2a352f126acbc28a63e600031541d12bb963764",
-      "after_sha256": "a13f0efa32aef32f0e563d10fa3298c9c5d31481120f7cbd159e8f5a088c9c06",
+      "after_sha256": "97dc77c338975b0f1c44f82c718d627bc533d64435a88027d28db8d8ebefe326",
       "owners": {
         "@document": {
           "before": "61bac983b45539980d543ac3c2a352f126acbc28a63e600031541d12bb963764",
-          "after": "a13f0efa32aef32f0e563d10fa3298c9c5d31481120f7cbd159e8f5a088c9c06"
+          "after": "97dc77c338975b0f1c44f82c718d627bc533d64435a88027d28db8d8ebefe326"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
       "before_sha256": "3a41dbf6c433de1548caf9b05e191da4db79c308845a3a8183d267880be24b59",
-      "after_sha256": "9a249584679f7a5164983f58e2ffb47c75e101386d4781c3e47450217eddc620",
+      "after_sha256": "68cb34222d434f1bcee8f71fe41daad01febde6006bbb819090a83a88979354c",
       "owners": {
         "@document": {
           "before": "3a41dbf6c433de1548caf9b05e191da4db79c308845a3a8183d267880be24b59",
-          "after": "9a249584679f7a5164983f58e2ffb47c75e101386d4781c3e47450217eddc620"
+          "after": "68cb34222d434f1bcee8f71fe41daad01febde6006bbb819090a83a88979354c"
         }
       }
     },
@@ -586,71 +576,71 @@
     },
     "docs/performance/current/numerical-identity-canonical_coverage_preflight.json": {
       "before_sha256": null,
-      "after_sha256": "bf52a5081a8ca39b0b695bc69b9914c2af2e7e2b397e5ef23966a06623b13f49",
+      "after_sha256": "38021177a943d9e2b2c2e986e4d826f667eb49d414505d95b18f523223363ee9",
       "owners": {
         "@document": {
           "before": null,
-          "after": "bf52a5081a8ca39b0b695bc69b9914c2af2e7e2b397e5ef23966a06623b13f49"
+          "after": "38021177a943d9e2b2c2e986e4d826f667eb49d414505d95b18f523223363ee9"
         }
       }
     },
     "docs/performance/current/numerical-identity-movement.json": {
       "before_sha256": null,
-      "after_sha256": "4e55f841e86d71c1d40a0b3c976b9bf579ea9fe1d9d69d84a140004c80b33953",
+      "after_sha256": "1d137bf8d83a50583412d8823948ca670a98140a379b347557cd615da165dc35",
       "owners": {
         "@document": {
           "before": null,
-          "after": "4e55f841e86d71c1d40a0b3c976b9bf579ea9fe1d9d69d84a140004c80b33953"
+          "after": "1d137bf8d83a50583412d8823948ca670a98140a379b347557cd615da165dc35"
         }
       }
     },
     "docs/performance/current/numerical-identity-player_boundary.json": {
       "before_sha256": null,
-      "after_sha256": "6f382f9ec4aac37a1389acfe53064dfb9c62413bf19de1435bb0acf4ac71440c",
+      "after_sha256": "ed802883a77cec91dc9c1d3aecbc6de0666873e475a1194e0cc63231c0b6526d",
       "owners": {
         "@document": {
           "before": null,
-          "after": "6f382f9ec4aac37a1389acfe53064dfb9c62413bf19de1435bb0acf4ac71440c"
+          "after": "ed802883a77cec91dc9c1d3aecbc6de0666873e475a1194e0cc63231c0b6526d"
         }
       }
     },
     "docs/performance/current/numerical-identity-reconstruction.json": {
       "before_sha256": null,
-      "after_sha256": "63883bb40ab41ce54e987ee3f68a03704340eca1d0be945b473a10d887c32a0f",
+      "after_sha256": "3a4858b4e0d12f517c12d1ca0c9e025483e8196b42a1f299b2105e3574ac7f29",
       "owners": {
         "@document": {
           "before": null,
-          "after": "63883bb40ab41ce54e987ee3f68a03704340eca1d0be945b473a10d887c32a0f"
+          "after": "3a4858b4e0d12f517c12d1ca0c9e025483e8196b42a1f299b2105e3574ac7f29"
         }
       }
     },
     "docs/performance/current/numerical-identity-setup.json": {
       "before_sha256": null,
-      "after_sha256": "aa730b3712a01c3718816b7bbe6cbeb2c2d12a693a8b9535250d92995bd7bd96",
+      "after_sha256": "6a0b9fa13d40f5f5e439ffab55d64cc66770b246322d71f3950cb094b85e69f8",
       "owners": {
         "@document": {
           "before": null,
-          "after": "aa730b3712a01c3718816b7bbe6cbeb2c2d12a693a8b9535250d92995bd7bd96"
+          "after": "6a0b9fa13d40f5f5e439ffab55d64cc66770b246322d71f3950cb094b85e69f8"
         }
       }
     },
     "docs/performance/current/numerical-identity-source-reuse-b231-v4.json": {
       "before_sha256": null,
-      "after_sha256": "dd8afc4dc20820dd406165167c15054fcc908b8dd7d9c7f8979ebb9bf0daf3bf",
+      "after_sha256": "8f93d34dab6da5be858580ac736242ec9a1cb3e2d3d8e6933a39b9caea705f98",
       "owners": {
         "@document": {
           "before": null,
-          "after": "dd8afc4dc20820dd406165167c15054fcc908b8dd7d9c7f8979ebb9bf0daf3bf"
+          "after": "8f93d34dab6da5be858580ac736242ec9a1cb3e2d3d8e6933a39b9caea705f98"
         }
       }
     },
     "docs/performance/current/numerical-identity-visibility.json": {
       "before_sha256": null,
-      "after_sha256": "5e13e59e29404093d530926c0e517e4546230ef007494a1d899833069d046904",
+      "after_sha256": "fb857110e79ba4a95591d76f445800888861298a26a919bc69df586b0e0d84c9",
       "owners": {
         "@document": {
           "before": null,
-          "after": "5e13e59e29404093d530926c0e517e4546230ef007494a1d899833069d046904"
+          "after": "fb857110e79ba4a95591d76f445800888861298a26a919bc69df586b0e0d84c9"
         }
       }
     },
@@ -666,11 +656,11 @@
     },
     "docs/performance/policy-v3/numerical-identity-main692-input-roles-v4.json": {
       "before_sha256": null,
-      "after_sha256": "8d5cf2484e5529c96c68f33abc6fdd7ff46e9fa7fe10a6b65d82c3165751261e",
+      "after_sha256": "0c643bf07f4a7b7c96274f4545b6872a76cc4910b37dcb7d9c82b6f5d4bf53f5",
       "owners": {
         "@document": {
           "before": null,
-          "after": "8d5cf2484e5529c96c68f33abc6fdd7ff46e9fa7fe10a6b65d82c3165751261e"
+          "after": "0c643bf07f4a7b7c96274f4545b6872a76cc4910b37dcb7d9c82b6f5d4bf53f5"
         }
       }
     },
@@ -1256,9 +1246,23 @@
         }
       }
     },
+    "tests/code_quality/test_qualification40_measurements.py": {
+      "before_sha256": "b6f774971c06d7071f1acf0f5e41f256b97733cde3e1e4c51ea7f7540472badc",
+      "after_sha256": "50a2f9e048e9dc356ce6aaff2a0eec711ea951415b6b947a5720bdc0be4f538c",
+      "owners": {
+        "@module": {
+          "before": "3487b0bd7e64cfa7e7fb6a4713a862a3a02ad274d444e619d5b1c02bc491a6e4",
+          "after": "3aa4a879fe30ffe2995e6169e063a65219cf29897be63798ba0913924313fccf"
+        },
+        "test_current_comparison_samples_equal_every_raw_case_and_original_profile": {
+          "before": "9dd50f9b52ea5a418666fb4a76850e9108863f5b27fac614b22120cc9f23e67f",
+          "after": "e0e614bbab895930a0c5bd7e66582c638482dc40dcc70dc232a98b9c5427c7e3"
+        }
+      }
+    },
     "tests/code_quality/test_registered_source_scopes.py": {
       "before_sha256": "e27af0922ed20582a304dad2b4a4007f2d456e77d659af76214191c606248f1b",
-      "after_sha256": "f36d4c58e21e1dd508960c9d5d44421e8334945c123a0297f9b5e9c42fcea33a",
+      "after_sha256": "304ab57ba633eae2dce1332781ba8f3a0422248aaf422d161261c52af9353c03",
       "owners": {
         "_report": {
           "before": "1068b2b2fc4da0d5b3445b73c449a7633532c8a4de974b526899370eb022b274",
@@ -1270,7 +1274,7 @@
         },
         "test_numerical_identity_scope_routes_current_base_without_replacing_history": {
           "before": null,
-          "after": "c1a73db11291be45eaa88b29841bf257c2ca2d7d3cd69e98e19363ab53e68f97"
+          "after": "8ff6c5765bd0a4c1ba27a5c372bbdac023b57551ddf506318d32a5a9e97c9b8e"
         }
       }
     },
@@ -1428,11 +1432,11 @@
     },
     "tools/performance_tool_inputs_v4.py": {
       "before_sha256": "7ffa31a137cabd22be5ccbd6086f067fc4e6b0885bd609b1f6c25cd9964afab7",
-      "after_sha256": "a15769f001987aecc0ee60b564db99a36b0de5a12786dba7f7cf5710c17438b1",
+      "after_sha256": "420b6eef3af201f993aa2fa797054c66f7bc98e6d585873e01a4bc1ae031ce8f",
       "owners": {
         "@module": {
           "before": "8a5caea68139368db4e029ee4eec02fd861e8a98b78c47beb8866d3005f70cd8",
-          "after": "510163674626e83f05f605e64e3744f76fbbc87c42c40d1b66741f97072561ea"
+          "after": "658f20a34ac867726062f37d7bfe996535fa8fae0b030a90343fedfbbf62d66f"
         }
       }
     },
@@ -1521,16 +1525,6 @@
       "unchanged_work": "Exact rational/quadratic gameplay remains unadmitted pending authoritative exact poses and complete exact movement acceptance. Preserve32 local workers,12 hosted shards,67percent aggregate coverage floor with branch measurement enabled,1620second approval and termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
     },
     "ci/test_shards/shard-12.txt": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Activate strict inner legacy numerical identity across authoritative configuration/state, native persistence, replay, pose/path decoding and visibility-context cache identity. Bind current47 contracts and explicit source-authenticated checkpoint reconstruction to this executable contract.",
-      "source_obligation": "Reject unbound or unsupported numerical labels before gameplay mutation and preserve legacy witness keys, recorded decisions and RNG history. Retain original executors, checkpoint recipe, released contracts and source evidence unchanged. Matched comparisons include native restore/fork, actual operator reconstruction, player boundaries and six independent generated contract processes.",
-      "unchanged_work": "Exact rational/quadratic gameplay remains unadmitted pending authoritative exact poses and complete exact movement acceptance. Preserve32 local workers,12 hosted shards,67percent aggregate coverage floor with branch measurement enabled,1620second approval and termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
-    },
-    "ci/test_shards/shard-2.txt": {
       "category": "measured_workload",
       "operations": [
         "mfm-current-behavior-profile"
@@ -2462,6 +2456,14 @@
       "operations": [
         "engine-numerical-identity-admission"
       ],
+      "selected_families": [],
+      "rationale": "Activate strict inner legacy numerical identity across authoritative configuration/state, native persistence, replay, pose/path decoding and visibility-context cache identity. Bind current47 contracts and explicit source-authenticated checkpoint reconstruction to this executable contract.",
+      "source_obligation": "Reject unbound or unsupported numerical labels before gameplay mutation and preserve legacy witness keys, recorded decisions and RNG history. Retain original executors, checkpoint recipe, released contracts and source evidence unchanged. Matched comparisons include native restore/fork, actual operator reconstruction, player boundaries and six independent generated contract processes.",
+      "unchanged_work": "Exact rational/quadratic gameplay remains unadmitted pending authoritative exact poses and complete exact movement acceptance. Preserve32 local workers,12 hosted shards,67percent aggregate coverage floor with branch measurement enabled,1620second approval and termination only above1800seconds; mirror120, smoke180 and quality600 remain mandatory."
+    },
+    "tests/code_quality/test_qualification40_measurements.py": {
+      "category": "governance",
+      "operations": [],
       "selected_families": [],
       "rationale": "Activate strict inner legacy numerical identity across authoritative configuration/state, native persistence, replay, pose/path decoding and visibility-context cache identity. Bind current47 contracts and explicit source-authenticated checkpoint reconstruction to this executable contract.",
       "source_obligation": "Reject unbound or unsupported numerical labels before gameplay mutation and preserve legacy witness keys, recorded decisions and RNG history. Retain original executors, checkpoint recipe, released contracts and source evidence unchanged. Matched comparisons include native restore/fork, actual operator reconstruction, player boundaries and six independent generated contract processes.",
