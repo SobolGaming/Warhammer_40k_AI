@@ -696,11 +696,11 @@
     },
     "data/source_audits/ci64_provenance_v1/speedup-test-transition-v1.json": {
       "before_sha256": null,
-      "after_sha256": "909c9b765d8de3e107c1608e86de8e208947b1bc78344b2edf25fb38bc93890c",
+      "after_sha256": "b4baf8e87128f1a19bf2b499c23d3ef5027c1abe6a5e4686015277498eb68dad",
       "owners": {
         "@document": {
           "before": null,
-          "after": "909c9b765d8de3e107c1608e86de8e208947b1bc78344b2edf25fb38bc93890c"
+          "after": "b4baf8e87128f1a19bf2b499c23d3ef5027c1abe6a5e4686015277498eb68dad"
         }
       }
     },
@@ -826,11 +826,11 @@
     },
     "scripts/speedup_test_admission.py": {
       "before_sha256": null,
-      "after_sha256": "4c53e145ae83177fdf3f0895e081c6bb240ae09347be44e720f1db16ff2b6f6a",
+      "after_sha256": "68fa1448fd9a3edfb88a895b2b6c91517ab9cd568f996d8047a24fb0f9b96e48",
       "owners": {
         "@module": {
           "before": null,
-          "after": "22932d44ce50a06e78af812acb2a5b5e78b8224a09e098d5eda404473efb5a3d"
+          "after": "1cdc183ca39d980caec3a0958846b290e89992fb2fcbb92d724db43d4da62c73"
         },
         "speedup_test_transition": {
           "before": null,
