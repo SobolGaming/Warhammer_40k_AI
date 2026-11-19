@@ -24,6 +24,7 @@ from scripts.symbolic_milli_inch_test_admission import ADDITION as SYMBOLIC_ADDI
 
 ROOT = Path(__file__).resolve().parents[2]
 BASE = "b231d7cedea54e123a9211fd775e2910c87d2f18"
+EXACT_MOVEMENT_REVISION = "250c5f655851f523a8932a1233e72ab4eace56ce"
 IDENTITY_REVISION = "d81dc3fd9fd9625205dcc91282fd89f588a75bfb"
 
 
@@ -100,7 +101,12 @@ def test_identity_transition_rejects_every_changed_runtime_source(
     ):
         destination = transition_snapshot / name
         destination.parent.mkdir(parents=True, exist_ok=True)
-        destination.write_bytes((ROOT / name).read_bytes())
+        contents = (
+            subprocess.check_output(["git", "show", EXACT_MOVEMENT_REVISION + ":" + name], cwd=ROOT)
+            if name == MANIFEST
+            else (ROOT / name).read_bytes()
+        )
+        destination.write_bytes(contents)
     cutover_digest = hashlib.sha256((ROOT / sharding.CUTOVER_PATH).read_bytes()).hexdigest()
     accepted = selection.exact_movement_test_transition(transition_snapshot, cutover_digest)
     assert accepted is not None
@@ -151,7 +157,10 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
     staged = {node for node in current if node.startswith(selection.EXACT_MOVEMENT_OWNER + "::")}
     assert staged
     assert sum(selection.EXACT_MOVEMENT_OWNER in group for group in groups) == 1
-    assert current.keys() == retained | added | staged
+    mixed = {node for node in current if node.startswith(selection.CIRCLE_POLYGON_OWNER + "::")}
+    assert mixed
+    assert sum(selection.CIRCLE_POLYGON_OWNER in group for group in groups) == 1
+    assert current.keys() == retained | added | staged | mixed
 
 
 def test_identity_selection_rejects_drift_in_each_updated_test(transition_snapshot: Path) -> None:

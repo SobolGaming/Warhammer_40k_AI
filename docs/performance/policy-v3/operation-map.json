@@ -36400,7 +36400,9 @@
     "exact-movement-test-admission": {
       "paths": [
         "tests/rules/section01/test_exact_movement.py",
-        "data/source_audits/ci64_provenance_v1/exact-movement-test-transition-v1.json"
+        "data/source_audits/ci64_provenance_v1/exact-movement-test-transition-v1.json",
+        "tests/rules/section01/test_milli_inch_circle_polygon.py",
+        "data/source_audits/ci64_provenance_v1/circle-polygon-test-addition-v1.json"
       ],
       "owners": [
         "*"

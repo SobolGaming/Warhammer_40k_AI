@@ -1,578 +1,370 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "d81dc3fd9fd9625205dcc91282fd89f588a75bfb",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:d77dd33911b10ede682bead7be294d4c1899fe306316371d7969c01087c71e85",
-  "operation_map_sha256": "a330b91362adab69cbd47b41be04ee01830eb8d35c7d2d7a3703d3b533108572",
+  "base": "250c5f655851f523a8932a1233e72ab4eace56ce",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0f369e5c9eeb571b62522207dcf6b4ea0645f5c724c27ad69daad944257f6595",
+  "operation_map_sha256": "81319dffd0d756872df4e4b0cab939c40e6da2d5433eac82522b8fd7ce41a99a",
   "changes": {
     "ci/test_shards/durations.json": {
-      "before_sha256": "fa97291c931bc1b1e03ae80438678edc4439eda58e89fcf4c424c6152e01d937",
-      "after_sha256": "21dc933a49f7c615ef31068ab0e11c4817171dc604542359b2dccf6f8d056a6e",
+      "before_sha256": "21dc933a49f7c615ef31068ab0e11c4817171dc604542359b2dccf6f8d056a6e",
+      "after_sha256": "f274d583d877722f22952ed33b60078a830520de209f9159a87050988122abb0",
       "owners": {
         "@document": {
-          "before": "fa97291c931bc1b1e03ae80438678edc4439eda58e89fcf4c424c6152e01d937",
-          "after": "21dc933a49f7c615ef31068ab0e11c4817171dc604542359b2dccf6f8d056a6e"
+          "before": "21dc933a49f7c615ef31068ab0e11c4817171dc604542359b2dccf6f8d056a6e",
+          "after": "f274d583d877722f22952ed33b60078a830520de209f9159a87050988122abb0"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
-      "before_sha256": "cbf48c92d8a2f28f685eae705a281154c1c55730f6dbfc954b31cd9708053e78",
-      "after_sha256": "a2c296418534c3b291b8822858b4e32cfe8951c4e8fbb8897ad3d0f59a6b5e39",
+      "before_sha256": "a2c296418534c3b291b8822858b4e32cfe8951c4e8fbb8897ad3d0f59a6b5e39",
+      "after_sha256": "002a1b13b9081f03cf42d84b2160953bae6332001fb83ae5d3288d07b6445fe5",
       "owners": {
         "@document": {
-          "before": "cbf48c92d8a2f28f685eae705a281154c1c55730f6dbfc954b31cd9708053e78",
-          "after": "a2c296418534c3b291b8822858b4e32cfe8951c4e8fbb8897ad3d0f59a6b5e39"
+          "before": "a2c296418534c3b291b8822858b4e32cfe8951c4e8fbb8897ad3d0f59a6b5e39",
+          "after": "002a1b13b9081f03cf42d84b2160953bae6332001fb83ae5d3288d07b6445fe5"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
-      "before_sha256": "079253cddad68a5f0fda56350c8d705bd62e188d1fac881581515ede2f1d8c07",
-      "after_sha256": "09b8fad381b03db1e86670541dea990e7c72e3ebfc5c179cfbec9731f03063c1",
+      "before_sha256": "09b8fad381b03db1e86670541dea990e7c72e3ebfc5c179cfbec9731f03063c1",
+      "after_sha256": "9970de6ef77596f1334e0d29f60d7ae78a8c940b0b694b5ac800569334497093",
       "owners": {
         "@document": {
-          "before": "079253cddad68a5f0fda56350c8d705bd62e188d1fac881581515ede2f1d8c07",
-          "after": "09b8fad381b03db1e86670541dea990e7c72e3ebfc5c179cfbec9731f03063c1"
+          "before": "09b8fad381b03db1e86670541dea990e7c72e3ebfc5c179cfbec9731f03063c1",
+          "after": "9970de6ef77596f1334e0d29f60d7ae78a8c940b0b694b5ac800569334497093"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
-      "before_sha256": "321bf017c7c51a24c3348a8f74b146d7604193469dac266f68c144a05807f0af",
-      "after_sha256": "54b57413931b961e760ec73c0a7135f9c68d910668b3eeb3a0f893f529ed925d",
+      "before_sha256": "54b57413931b961e760ec73c0a7135f9c68d910668b3eeb3a0f893f529ed925d",
+      "after_sha256": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20",
       "owners": {
         "@document": {
-          "before": "321bf017c7c51a24c3348a8f74b146d7604193469dac266f68c144a05807f0af",
-          "after": "54b57413931b961e760ec73c0a7135f9c68d910668b3eeb3a0f893f529ed925d"
+          "before": "54b57413931b961e760ec73c0a7135f9c68d910668b3eeb3a0f893f529ed925d",
+          "after": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
-      "before_sha256": "65430c57cf73bff95a6d42a8824baa4b66d3371c69a7a1b10adf1ea2221c4252",
-      "after_sha256": "7dc8a5a76a66fbff2c3dd0fc86d98ffad1d7f00ecaedad3eabd6919221275127",
+      "before_sha256": "7dc8a5a76a66fbff2c3dd0fc86d98ffad1d7f00ecaedad3eabd6919221275127",
+      "after_sha256": "5d520fdb1e0cc80f61e9ab848c4ac33d03697f5202f70944d68a7f64edc00be9",
       "owners": {
         "@document": {
-          "before": "65430c57cf73bff95a6d42a8824baa4b66d3371c69a7a1b10adf1ea2221c4252",
-          "after": "7dc8a5a76a66fbff2c3dd0fc86d98ffad1d7f00ecaedad3eabd6919221275127"
+          "before": "7dc8a5a76a66fbff2c3dd0fc86d98ffad1d7f00ecaedad3eabd6919221275127",
+          "after": "5d520fdb1e0cc80f61e9ab848c4ac33d03697f5202f70944d68a7f64edc00be9"
         }
       }
     },
     "ci/test_shards/shard-2.txt": {
-      "before_sha256": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
-      "after_sha256": "66c33ea7deb2162125878ce7ea3365e6d9dc7631f1be3a0bdc6fe95e21704ed5",
+      "before_sha256": "66c33ea7deb2162125878ce7ea3365e6d9dc7631f1be3a0bdc6fe95e21704ed5",
+      "after_sha256": "db43b30168ef70612d069990775d9cc6e9482dc84877b058dd857609c8d7ab41",
       "owners": {
         "@document": {
-          "before": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
-          "after": "66c33ea7deb2162125878ce7ea3365e6d9dc7631f1be3a0bdc6fe95e21704ed5"
+          "before": "66c33ea7deb2162125878ce7ea3365e6d9dc7631f1be3a0bdc6fe95e21704ed5",
+          "after": "db43b30168ef70612d069990775d9cc6e9482dc84877b058dd857609c8d7ab41"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
-      "before_sha256": "ed8b2de4f896240a0d1fb02f3619cf22c5a51a118cc241c105470311b8b39d28",
-      "after_sha256": "3c039e6529ffd68ae15cdb7b8f646b61f6d5a3f2afbbcbe08417c0a29cab8ad4",
+      "before_sha256": "3c039e6529ffd68ae15cdb7b8f646b61f6d5a3f2afbbcbe08417c0a29cab8ad4",
+      "after_sha256": "1584d23d585b8685560409ce26fed7b46236884aec0ed3e6895b1a0a24e298bd",
       "owners": {
         "@document": {
-          "before": "ed8b2de4f896240a0d1fb02f3619cf22c5a51a118cc241c105470311b8b39d28",
-          "after": "3c039e6529ffd68ae15cdb7b8f646b61f6d5a3f2afbbcbe08417c0a29cab8ad4"
+          "before": "3c039e6529ffd68ae15cdb7b8f646b61f6d5a3f2afbbcbe08417c0a29cab8ad4",
+          "after": "1584d23d585b8685560409ce26fed7b46236884aec0ed3e6895b1a0a24e298bd"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
-      "before_sha256": "9edea9261574237a9fba599996ae3c4f07f8d7a0755a69ba0f67659ed6a83174",
-      "after_sha256": "9f0bc60a839d3648e1fe649aea6883d9455e1b0c448b2ae573e67d3961a27b93",
+      "before_sha256": "9f0bc60a839d3648e1fe649aea6883d9455e1b0c448b2ae573e67d3961a27b93",
+      "after_sha256": "846d0791d2a9ccfc6329882486b682b6319dfd1c04b41811a891f5312f518a64",
       "owners": {
         "@document": {
-          "before": "9edea9261574237a9fba599996ae3c4f07f8d7a0755a69ba0f67659ed6a83174",
-          "after": "9f0bc60a839d3648e1fe649aea6883d9455e1b0c448b2ae573e67d3961a27b93"
+          "before": "9f0bc60a839d3648e1fe649aea6883d9455e1b0c448b2ae573e67d3961a27b93",
+          "after": "846d0791d2a9ccfc6329882486b682b6319dfd1c04b41811a891f5312f518a64"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
-      "before_sha256": "c3aa68844dd9333e4adc02452f9e65045000835e57b98198b291ab2cbd35605e",
-      "after_sha256": "fe0aa03751a2ae3aab9d84d19da06ece41fd6468ad1d1f4600802c0f9b697ca6",
+      "before_sha256": "fe0aa03751a2ae3aab9d84d19da06ece41fd6468ad1d1f4600802c0f9b697ca6",
+      "after_sha256": "f642858a071f3a574f09d2ba938188ff672edf0384d3e5a88ee5b92f94394bdd",
       "owners": {
         "@document": {
-          "before": "c3aa68844dd9333e4adc02452f9e65045000835e57b98198b291ab2cbd35605e",
-          "after": "fe0aa03751a2ae3aab9d84d19da06ece41fd6468ad1d1f4600802c0f9b697ca6"
+          "before": "fe0aa03751a2ae3aab9d84d19da06ece41fd6468ad1d1f4600802c0f9b697ca6",
+          "after": "f642858a071f3a574f09d2ba938188ff672edf0384d3e5a88ee5b92f94394bdd"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
-      "before_sha256": "13d428ac533ef16341bb6d67be38b3e111c9d19213a810397134565a1ee18b3c",
-      "after_sha256": "089466ba74a636bee3862ccaaed6c20cdbe6ddf880dbb1cd2e5ebec3a603ac1c",
+      "before_sha256": "089466ba74a636bee3862ccaaed6c20cdbe6ddf880dbb1cd2e5ebec3a603ac1c",
+      "after_sha256": "13be34b55775f1d17b058d636dc0b2a51b07363389ea7037b890ccb3b4b0987d",
       "owners": {
         "@document": {
-          "before": "13d428ac533ef16341bb6d67be38b3e111c9d19213a810397134565a1ee18b3c",
-          "after": "089466ba74a636bee3862ccaaed6c20cdbe6ddf880dbb1cd2e5ebec3a603ac1c"
+          "before": "089466ba74a636bee3862ccaaed6c20cdbe6ddf880dbb1cd2e5ebec3a603ac1c",
+          "after": "13be34b55775f1d17b058d636dc0b2a51b07363389ea7037b890ccb3b4b0987d"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
-      "before_sha256": "210f6bbbfe6a523556bc265937e7ab0e0f28619d583b8005b71da48c8dd4f9d8",
-      "after_sha256": "08c9d537b4482ff6ba655df7556e671cf56a5da1630bc7c0a9c36e1b67b3ac61",
+      "before_sha256": "08c9d537b4482ff6ba655df7556e671cf56a5da1630bc7c0a9c36e1b67b3ac61",
+      "after_sha256": "cc48ae958206a1d03085f63a2f90f6ebe7fa79a647d623eefb3ee94e188d3a53",
       "owners": {
         "@document": {
-          "before": "210f6bbbfe6a523556bc265937e7ab0e0f28619d583b8005b71da48c8dd4f9d8",
-          "after": "08c9d537b4482ff6ba655df7556e671cf56a5da1630bc7c0a9c36e1b67b3ac61"
+          "before": "08c9d537b4482ff6ba655df7556e671cf56a5da1630bc7c0a9c36e1b67b3ac61",
+          "after": "cc48ae958206a1d03085f63a2f90f6ebe7fa79a647d623eefb3ee94e188d3a53"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
-      "before_sha256": "97dc77c338975b0f1c44f82c718d627bc533d64435a88027d28db8d8ebefe326",
-      "after_sha256": "2023e12b98159947c31cd96408c74c8d66e9ade9f8b4357852eb04f64f5b0df9",
+      "before_sha256": "2023e12b98159947c31cd96408c74c8d66e9ade9f8b4357852eb04f64f5b0df9",
+      "after_sha256": "bd652293d4fd6d1567cd00d4fbb335f896ec96cd6e86f2d2ed8174a05203f2b2",
       "owners": {
         "@document": {
-          "before": "97dc77c338975b0f1c44f82c718d627bc533d64435a88027d28db8d8ebefe326",
-          "after": "2023e12b98159947c31cd96408c74c8d66e9ade9f8b4357852eb04f64f5b0df9"
+          "before": "2023e12b98159947c31cd96408c74c8d66e9ade9f8b4357852eb04f64f5b0df9",
+          "after": "bd652293d4fd6d1567cd00d4fbb335f896ec96cd6e86f2d2ed8174a05203f2b2"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
-      "before_sha256": "68cb34222d434f1bcee8f71fe41daad01febde6006bbb819090a83a88979354c",
-      "after_sha256": "30bf6a279555ca7637da1c514976059dc31f410c87eb99b34ee0c2e6239eb555",
+      "before_sha256": "30bf6a279555ca7637da1c514976059dc31f410c87eb99b34ee0c2e6239eb555",
+      "after_sha256": "7d56fcdb5140cdba58721e97562669847620c92d5e7e1471211ceb6acbed6bd3",
       "owners": {
         "@document": {
-          "before": "68cb34222d434f1bcee8f71fe41daad01febde6006bbb819090a83a88979354c",
-          "after": "30bf6a279555ca7637da1c514976059dc31f410c87eb99b34ee0c2e6239eb555"
+          "before": "30bf6a279555ca7637da1c514976059dc31f410c87eb99b34ee0c2e6239eb555",
+          "after": "7d56fcdb5140cdba58721e97562669847620c92d5e7e1471211ceb6acbed6bd3"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "5cfb60dde965b11ffb0ef7c0c937db98b2b8512e45853a7fe2720889ef8c1d06",
-      "after_sha256": "1c5cf80c3945c01da21021c372f5c5fd08c33a799a57af79a827c09a8f68615d",
+      "before_sha256": "1c5cf80c3945c01da21021c372f5c5fd08c33a799a57af79a827c09a8f68615d",
+      "after_sha256": "72916ac4952c849c65f50364aa19e72565d6808ff0371c4c55f8707d091dbdf7",
       "owners": {
         "@document": {
-          "before": "5cfb60dde965b11ffb0ef7c0c937db98b2b8512e45853a7fe2720889ef8c1d06",
-          "after": "1c5cf80c3945c01da21021c372f5c5fd08c33a799a57af79a827c09a8f68615d"
+          "before": "1c5cf80c3945c01da21021c372f5c5fd08c33a799a57af79a827c09a8f68615d",
+          "after": "72916ac4952c849c65f50364aa19e72565d6808ff0371c4c55f8707d091dbdf7"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "88d38026a3b041f73bb8ce019bd6bfd4ea2aa5cb694e62939ceac76687389613",
-      "after_sha256": "20062af0fe50f8b0d3b10c60722278cc93434d5d215ba53d9e216486b76ee794",
+      "before_sha256": "20062af0fe50f8b0d3b10c60722278cc93434d5d215ba53d9e216486b76ee794",
+      "after_sha256": "9726509f5213c1c9fffa57901e53c38a061f7b0f745eede7c37abd7e730fbca5",
       "owners": {
         "@document": {
-          "before": "88d38026a3b041f73bb8ce019bd6bfd4ea2aa5cb694e62939ceac76687389613",
-          "after": "20062af0fe50f8b0d3b10c60722278cc93434d5d215ba53d9e216486b76ee794"
+          "before": "20062af0fe50f8b0d3b10c60722278cc93434d5d215ba53d9e216486b76ee794",
+          "after": "9726509f5213c1c9fffa57901e53c38a061f7b0f745eede7c37abd7e730fbca5"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "0091b7e20436e8024b90b40d0fcb788376bd0994aa5e4c74d160c7d04b43349a",
-      "after_sha256": "184b378dd9ca787f25f4c1e16af8c2e28e2d3919f1c5315e1944d8935cb0dd8b",
+      "before_sha256": "184b378dd9ca787f25f4c1e16af8c2e28e2d3919f1c5315e1944d8935cb0dd8b",
+      "after_sha256": "e29af10417fce560f70430e0204e8af8049e4364e0aedf440e7523122744b23f",
       "owners": {
         "@document": {
-          "before": "0091b7e20436e8024b90b40d0fcb788376bd0994aa5e4c74d160c7d04b43349a",
-          "after": "184b378dd9ca787f25f4c1e16af8c2e28e2d3919f1c5315e1944d8935cb0dd8b"
+          "before": "184b378dd9ca787f25f4c1e16af8c2e28e2d3919f1c5315e1944d8935cb0dd8b",
+          "after": "e29af10417fce560f70430e0204e8af8049e4364e0aedf440e7523122744b23f"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "b82e9da143821814077c5a6f344c5747143125b4baa17cfa3086ecad16fb9a1b",
-      "after_sha256": "00b7d044f1a71dce7c64c1e1fd10aadf3cb91054267f3a14b12553ba91e53e07",
+      "before_sha256": "00b7d044f1a71dce7c64c1e1fd10aadf3cb91054267f3a14b12553ba91e53e07",
+      "after_sha256": "8e04c527a2a8e3b20f9c600e02a749506dcf66f8a21e780a05ad9af53a0a25b4",
       "owners": {
         "@document": {
-          "before": "b82e9da143821814077c5a6f344c5747143125b4baa17cfa3086ecad16fb9a1b",
-          "after": "00b7d044f1a71dce7c64c1e1fd10aadf3cb91054267f3a14b12553ba91e53e07"
+          "before": "00b7d044f1a71dce7c64c1e1fd10aadf3cb91054267f3a14b12553ba91e53e07",
+          "after": "8e04c527a2a8e3b20f9c600e02a749506dcf66f8a21e780a05ad9af53a0a25b4"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "5c90dad11ca15fe5da95e59a73a85451c1ae4c836d956d227ba86a5c093a7b06",
-      "after_sha256": "a0558f1cb4464a06c30e989714e294812c9efd88c3af9c0cf1852767db99b6f9",
+      "before_sha256": "a0558f1cb4464a06c30e989714e294812c9efd88c3af9c0cf1852767db99b6f9",
+      "after_sha256": "adde2c8234371f5bec606d8861964fe7ebf21050db83d59c49593e258e252e50",
       "owners": {
         "@document": {
-          "before": "5c90dad11ca15fe5da95e59a73a85451c1ae4c836d956d227ba86a5c093a7b06",
-          "after": "a0558f1cb4464a06c30e989714e294812c9efd88c3af9c0cf1852767db99b6f9"
+          "before": "a0558f1cb4464a06c30e989714e294812c9efd88c3af9c0cf1852767db99b6f9",
+          "after": "adde2c8234371f5bec606d8861964fe7ebf21050db83d59c49593e258e252e50"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "a64e88773ab810f46e56396c03aa8a055da09e1ac1298b89069b6d3565c14076",
-      "after_sha256": "2b86504ddded61efcacac5d17711f5294223d9e865dba356af41a1dec13eece1",
+      "before_sha256": "2b86504ddded61efcacac5d17711f5294223d9e865dba356af41a1dec13eece1",
+      "after_sha256": "c6bf02a41081fa6ba1b88552fec811de04531be6d5ed03a766c4220f3bd416d8",
       "owners": {
         "@document": {
-          "before": "a64e88773ab810f46e56396c03aa8a055da09e1ac1298b89069b6d3565c14076",
-          "after": "2b86504ddded61efcacac5d17711f5294223d9e865dba356af41a1dec13eece1"
+          "before": "2b86504ddded61efcacac5d17711f5294223d9e865dba356af41a1dec13eece1",
+          "after": "c6bf02a41081fa6ba1b88552fec811de04531be6d5ed03a766c4220f3bd416d8"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "0f07c4902a9270c6e1dc2663e1265ea91f2ec007b898521ca92512f714992a95",
-      "after_sha256": "6af417c4d381ba3953be138b37c647272e63da14004de36d750dfdcd0c426d0b",
+      "before_sha256": "6af417c4d381ba3953be138b37c647272e63da14004de36d750dfdcd0c426d0b",
+      "after_sha256": "a06b0418cd4e5dbe21db92df82f5da29ff71579cb06412c8741935c57256c986",
       "owners": {
         "@document": {
-          "before": "0f07c4902a9270c6e1dc2663e1265ea91f2ec007b898521ca92512f714992a95",
-          "after": "6af417c4d381ba3953be138b37c647272e63da14004de36d750dfdcd0c426d0b"
+          "before": "6af417c4d381ba3953be138b37c647272e63da14004de36d750dfdcd0c426d0b",
+          "after": "a06b0418cd4e5dbe21db92df82f5da29ff71579cb06412c8741935c57256c986"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "ecc586b1e2c1500f43c8b0861a36b1bba092f167af87fc45425b1849095d158a",
-      "after_sha256": "0ce86d88de8669fe078a8aca880f4148af470883e5e5dddb1ccb6afb36171229",
+      "before_sha256": "0ce86d88de8669fe078a8aca880f4148af470883e5e5dddb1ccb6afb36171229",
+      "after_sha256": "f5545a8ffb41b36481bf64a55ba2355d13b4d747a58b9bfb012d23588158fe4e",
       "owners": {
         "@document": {
-          "before": "ecc586b1e2c1500f43c8b0861a36b1bba092f167af87fc45425b1849095d158a",
-          "after": "0ce86d88de8669fe078a8aca880f4148af470883e5e5dddb1ccb6afb36171229"
+          "before": "0ce86d88de8669fe078a8aca880f4148af470883e5e5dddb1ccb6afb36171229",
+          "after": "f5545a8ffb41b36481bf64a55ba2355d13b4d747a58b9bfb012d23588158fe4e"
         }
       }
     },
-    "data/source_audits/ci64_provenance_v1/exact-movement-test-transition-v1.json": {
+    "data/source_audits/ci64_provenance_v1/circle-polygon-test-addition-v1.json": {
       "before_sha256": null,
-      "after_sha256": "ada2ae25f047f949b9faf3b2c33d7cc590b4c6bc9f22911dc8acb8b5ec5e4b2b",
+      "after_sha256": "617f67340b0d7e5cd8f1d2786faa193a96bbc7f2fa18f3b8b7988bc263458a91",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ada2ae25f047f949b9faf3b2c33d7cc590b4c6bc9f22911dc8acb8b5ec5e4b2b"
-        }
-      }
-    },
-    "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
-      "before_sha256": "16b94533fe7742c1e1857e7d1cb179297bedf6afd2e65a7db4bcd5197c557589",
-      "after_sha256": "1705ffd6456c94d549464f856e6116d4c158807ac178689449d4d07823ba0aed",
-      "owners": {
-        "@document": {
-          "before": "16b94533fe7742c1e1857e7d1cb179297bedf6afd2e65a7db4bcd5197c557589",
-          "after": "1705ffd6456c94d549464f856e6116d4c158807ac178689449d4d07823ba0aed"
+          "after": "617f67340b0d7e5cd8f1d2786faa193a96bbc7f2fa18f3b8b7988bc263458a91"
         }
       }
     },
     "docs/DISTANCE_PRECISION.md": {
-      "before_sha256": "8880e133d1ba68701c7e31ce916f9f0e04890973af4ca7df8e2fdbf2b56e2bed",
-      "after_sha256": "ffb869011389fbcc90f0482ae823978d02c13e34fa4c377dec4b35fc8027e77a",
+      "before_sha256": "ffb869011389fbcc90f0482ae823978d02c13e34fa4c377dec4b35fc8027e77a",
+      "after_sha256": "ab19736a5da62e2468e902052513281f8ec7a1acbe81c3dcaf5e9bef55aeba1c",
       "owners": {
         "@document": {
-          "before": "8880e133d1ba68701c7e31ce916f9f0e04890973af4ca7df8e2fdbf2b56e2bed",
-          "after": "ffb869011389fbcc90f0482ae823978d02c13e34fa4c377dec4b35fc8027e77a"
+          "before": "ffb869011389fbcc90f0482ae823978d02c13e34fa4c377dec4b35fc8027e77a",
+          "after": "ab19736a5da62e2468e902052513281f8ec7a1acbe81c3dcaf5e9bef55aeba1c"
         }
       }
     },
-    "docs/performance/current/exact-movement-movement.json": {
+    "docs/performance/current/circle-polygon-movement.json": {
       "before_sha256": null,
-      "after_sha256": "9d52dffc6a54dcf43b1c38f08b69e36f206a51df733aa763f580336af7b8fcd1",
+      "after_sha256": "225bf3694cce0b9544cfe500c69dfc3c0d391afc42a5b7466f1a8080bec27e6b",
       "owners": {
         "@document": {
           "before": null,
-          "after": "9d52dffc6a54dcf43b1c38f08b69e36f206a51df733aa763f580336af7b8fcd1"
+          "after": "225bf3694cce0b9544cfe500c69dfc3c0d391afc42a5b7466f1a8080bec27e6b"
         }
       }
     },
-    "docs/performance/current/exact-movement-setup.json": {
+    "docs/performance/current/circle-polygon-setup.json": {
       "before_sha256": null,
-      "after_sha256": "2764a9169e595706c19da824e3c08d2ab69ad8149ac0d93a36877acf5351de63",
+      "after_sha256": "7dc4b713427922ee3ddfe56366f5ea249a6d799fe7bc9069065ab5a53351723f",
       "owners": {
         "@document": {
           "before": null,
-          "after": "2764a9169e595706c19da824e3c08d2ab69ad8149ac0d93a36877acf5351de63"
+          "after": "7dc4b713427922ee3ddfe56366f5ea249a6d799fe7bc9069065ab5a53351723f"
         }
       }
     },
-    "docs/performance/current/exact-movement-visibility.json": {
+    "docs/performance/current/circle-polygon-visibility.json": {
       "before_sha256": null,
-      "after_sha256": "149ec03aa1fe7865e11d68f02a3394fbd659fd7f5f0e4fe5e7ac7dd7e878ac92",
+      "after_sha256": "ccfd66c664610caa62fccb18a69cc8cf78e82687cb0225601dce15df07c24ec4",
       "owners": {
         "@document": {
           "before": null,
-          "after": "149ec03aa1fe7865e11d68f02a3394fbd659fd7f5f0e4fe5e7ac7dd7e878ac92"
+          "after": "ccfd66c664610caa62fccb18a69cc8cf78e82687cb0225601dce15df07c24ec4"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "e2f20edf33ddf7fe0bd0a0c85f4e4254d2fb64517124799375caa34c4f868ebd",
-      "after_sha256": "529973302cf861cd50e088ecfdc118686433d5d674995b1b7a8437387b84c1d9",
+      "before_sha256": "529973302cf861cd50e088ecfdc118686433d5d674995b1b7a8437387b84c1d9",
+      "after_sha256": "f51cc3b592c42a9a5903319d04f5b3542f12fc3f21eb9346161899bffa2b81bb",
       "owners": {
         "@document": {
-          "before": "e2f20edf33ddf7fe0bd0a0c85f4e4254d2fb64517124799375caa34c4f868ebd",
-          "after": "529973302cf861cd50e088ecfdc118686433d5d674995b1b7a8437387b84c1d9"
-        }
-      }
-    },
-    "scripts/build_test_shards.py": {
-      "before_sha256": "72f5af63f5a77a4d3027248c1e2dae643dff6d391b013912808a9d08eef107a2",
-      "after_sha256": "f6bdc64e9f82da55b3b4e011eeba84d5643ca061507a34d9c23061e8af0ddb0a",
-      "owners": {
-        "behavioral_selection": {
-          "before": "8a066ec5a4fdc82886bb09ad50e86c507cdaf31552dac1faccdd07e7ce7202ab",
-          "after": "5f8776a0b49339dffc07ffa15da12d1bf847442022a487a23179a1e02a901271"
+          "before": "529973302cf861cd50e088ecfdc118686433d5d674995b1b7a8437387b84c1d9",
+          "after": "f51cc3b592c42a9a5903319d04f5b3542f12fc3f21eb9346161899bffa2b81bb"
         }
       }
     },
     "scripts/engine_numerical_identity_test_admission.py": {
-      "before_sha256": "a01896a7692c3338e1fc32452a9320d1fa0ea5e9f0820eef51fef34f17c074e8",
-      "after_sha256": "9a24e345cef35dc9da9a7f6218ac924859a05ef9b30955ed1672b32e215833bc",
+      "before_sha256": "9a24e345cef35dc9da9a7f6218ac924859a05ef9b30955ed1672b32e215833bc",
+      "after_sha256": "f0cf7b81ac17c511aa1ade068820464572fff5412fbdeb4ece1d2a9a3b866ff5",
       "owners": {
         "@module": {
-          "before": "97dd1a552f9ab8fbf66e47ac9557659a6d0e9d6fa94cd71e453ef0b4cad18386",
-          "after": "d55d618961d7f559371d72ea41356c0a227c6e10981dfa6445272fd153ebd9fe"
-        },
-        "_identity_test_transition": {
-          "before": null,
-          "after": "a549958891490ace3cfb5893c9f88743efa59b3fda25e8c71160908dd38e6bda"
-        },
-        "engine_numerical_identity_test_transition": {
-          "before": "ee6a493b5afe205e8c81564992dd500cf5a7aee8fdc94f859ae74e3488dc5ff4",
-          "after": "0590f0ed1bc57c575aad2d7662bf2b35a4cf3b0db1a97f4ff91727d83a1bc332"
+          "before": "d55d618961d7f559371d72ea41356c0a227c6e10981dfa6445272fd153ebd9fe",
+          "after": "db13f7e8a3553c55ba688d96ed0e748e1683532b61b319bb16e0611d54d828e7"
         },
         "exact_movement_test_transition": {
-          "before": null,
-          "after": "4077c318709a5bf4243fe2728224c439efa5769dafec1dd40ff1fef8974e4000"
+          "before": "4077c318709a5bf4243fe2728224c439efa5769dafec1dd40ff1fef8974e4000",
+          "after": "a78cc75405ed0d08f1e56ea2221b0588c06a2a96a465440762f01f778d089beb"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "31fa983fa3feb5edf6c9770abb4f751337daff6ee77fff876cf45dfb5d029c7f",
-      "after_sha256": "41443d2b2658f34e6504b11699ecec6b7c2fa878364e81669cffd9ce0e47f26d",
+      "before_sha256": "41443d2b2658f34e6504b11699ecec6b7c2fa878364e81669cffd9ce0e47f26d",
+      "after_sha256": "0e415ea6f86e8bba511d6904c36542934cc17f21465056af516d643b762a2947",
       "owners": {
         "@document": {
-          "before": "31fa983fa3feb5edf6c9770abb4f751337daff6ee77fff876cf45dfb5d029c7f",
-          "after": "41443d2b2658f34e6504b11699ecec6b7c2fa878364e81669cffd9ce0e47f26d"
+          "before": "41443d2b2658f34e6504b11699ecec6b7c2fa878364e81669cffd9ce0e47f26d",
+          "after": "0e415ea6f86e8bba511d6904c36542934cc17f21465056af516d643b762a2947"
         }
       }
     },
-    "src/warhammer40k_core/engine/exact_movement.py": {
+    "src/warhammer40k_core/geometry/milli_inch_circle_polygon.py": {
       "before_sha256": null,
-      "after_sha256": "c1194d8c74cfe6743bc04dc9c7e86de43457b3fc9aaaf44fbb773fee3613f539",
+      "after_sha256": "cc1862f25f61ac0f002229f4975ffac7224b1c6e2f7efd32fc9cc30d66abbbf6",
       "owners": {
         "@module": {
           "before": null,
-          "after": "f5fba2981ac3ded68f8d6d462ba7c29574d842527f1f2ea80d9a4374e1b2ed01"
+          "after": "afffe8dd9aeda46d05a90b6a01e5d2aaa726a63370c908d01b56025911f4e9c4"
         },
-        "ExactBattlefieldPayload": {
+        "_squared_center_distance": {
           "before": null,
-          "after": "aebc27ddb8bdb8397c29f346fb475dac884ed85f135d71d12b0f1cd50dd41cb1"
+          "after": "243c764f3d9da078cfbedc2206f0790392611044f901c8a4ee177acb1b45142b"
         },
-        "ExactBattlefieldState": {
+        "circle_polygon_distance_ticks": {
           "before": null,
-          "after": "cf008e126239a649e3b6624ea75a7bb3c6576249b2e248e608c0adfd1d9a0c9d"
+          "after": "b1c5582124cda699418c5b66c51adf6710df0d1b64f81978cf4dc515bbb7846e"
         },
-        "ExactBattlefieldState.__post_init__": {
+        "circle_polygon_relation": {
           "before": null,
-          "after": "da70ad9e955f72d906336dce2a2a7ae3b54eb7784d9b172668d06ef2b45ea768"
-        },
-        "ExactBattlefieldState.content_hash": {
-          "before": null,
-          "after": "df0711efefc13c7138f632ec0a5312ddacc42e2b9ecc6efb044192d128e82135"
-        },
-        "ExactBattlefieldState.from_payload": {
-          "before": null,
-          "after": "e6144d589215bf8af420078b8d2ffc3db0bf86cd23477479e8f47e7ec6007982"
-        },
-        "ExactBattlefieldState.to_payload": {
-          "before": null,
-          "after": "1edab4cf1d9fe1dd087b2d52b20faa8580d3f39109a0ef7f4e047fac335ccd8d"
-        },
-        "ExactModelPlacement": {
-          "before": null,
-          "after": "65cc6639cad3971ad302736bd074509c5438ee60e2ca0c1ffc1f74c0fd68cfbc"
-        },
-        "ExactModelPlacement.__post_init__": {
-          "before": null,
-          "after": "f13b1a1502e07ae6ed5aa44167a81e99f8407692749cef415f59da574c3e061a"
-        },
-        "ExactModelPlacement.disk": {
-          "before": null,
-          "after": "17e8522a3ecd57d65ccdbfe345f5b7cd5e10fcd73fc5e6bdc48c01c0133444c1"
-        },
-        "ExactModelPlacement.from_payload": {
-          "before": null,
-          "after": "a893eacad15e85ab20821300d7455c0121b9f10328e5043718c59cc29228077e"
-        },
-        "ExactModelPlacement.to_payload": {
-          "before": null,
-          "after": "e75e28a894b4d8b458a3256cb09308cb3938b79f444ba473918c72bc08ab11ec"
-        },
-        "ExactModelPlacementPayload": {
-          "before": null,
-          "after": "c43bdbc8bdfafbbd2e652c28fe1f502d412481edf61593b742402388f6a9c8fd"
-        },
-        "ExactMovementError": {
-          "before": null,
-          "after": "84e6bdc5e76833c5312794ed303d1e04abf3631e0868a8860910da0d1e178d3b"
-        },
-        "ExactMovementResult": {
-          "before": null,
-          "after": "9a120039a101d9e5dbac8e3bb2eabfd0b075971d31ae7689cde05beb49e15d52"
-        },
-        "_check_board_footprint": {
-          "before": null,
-          "after": "9c73ddd11ba26815c335ac12d16b02ea3d526e4d9435efb75d1ea7accd46a179"
-        },
-        "apply_exact_movement": {
-          "before": null,
-          "after": "b4495bceea57fd5db26377916a2e92e10906cdf9803fbd6d70bfb11686deeb21"
-        }
-      }
-    },
-    "src/warhammer40k_core/geometry/exact_path.py": {
-      "before_sha256": null,
-      "after_sha256": "826b19bcf9d412cdda3b876481d121eb78a37631261cb898de553c0ff162c745",
-      "owners": {
-        "@module": {
-          "before": null,
-          "after": "1419dfa71dcb7471c0c0922f1fb59b036df92db91dc4147ee2f65f92dc4aeaed"
-        },
-        "ExactDiskSweep": {
-          "before": null,
-          "after": "b4e52ac9fa00d0ccd4afa98a75512b217b9935b360a372f9ff240a8b3bbbeee9"
-        },
-        "ExactDiskSweep.__post_init__": {
-          "before": null,
-          "after": "ee901297ee7e57fed4404fa6428d4ba825bca357050afab747f995e86c656d67"
-        },
-        "ExactDiskSweep.clears": {
-          "before": null,
-          "after": "bead155abba2ced0fee183ece0e6df3ed4c73405bc1f86a7db1953b0117b6024"
-        },
-        "ExactPathWitness": {
-          "before": null,
-          "after": "12dcfb49e9788ac5aa01c1431f326362c4d9096ebba92d707f0182211398ae03"
-        },
-        "ExactPathWitness.__post_init__": {
-          "before": null,
-          "after": "6af467b8fd7993e221da2c9c784118a73e9e8c736a6e41df908eb4d2d816e57f"
-        },
-        "ExactPathWitness.from_payload": {
-          "before": null,
-          "after": "259b5480e27478611eb54609ca0e26efa38cdb7489a7f2f51696db3815eba92b"
-        },
-        "ExactPathWitness.sweeps": {
-          "before": null,
-          "after": "f3168118e2c3d580cd9f6ea952bc920439034620bf9720c7ba1befc4a79e3267"
-        },
-        "ExactPathWitness.to_payload": {
-          "before": null,
-          "after": "e7b1d8b6804fd5b0e3564fcd20b7a44fd6582dc6d453fd25003e3de238087676"
-        },
-        "ExactPathWitnessPayload": {
-          "before": null,
-          "after": "ab627dfb255f262b3883d5d871105f59c1a4cb6682f57f9dc771e040dd7f7ceb"
-        },
-        "exact_path_travel_ticks": {
-          "before": null,
-          "after": "638dcccdd31f8678204bd5e27b8d922f54a297728dde826faab637d01a3c282c"
-        }
-      }
-    },
-    "src/warhammer40k_core/geometry/exact_pose.py": {
-      "before_sha256": null,
-      "after_sha256": "fd18da932294826165f3a668f8fd78ea21ad3314ec22792c30c446d70c1ada6d",
-      "owners": {
-        "@module": {
-          "before": null,
-          "after": "a41837ffe38d48675533de7446c13132a11e232b98bb24ba9c79ea87972cc166"
-        },
-        "ExactPose": {
-          "before": null,
-          "after": "8370260145d6cd5c1e97502bc574f84ce53bbf3efcedfc4614a48ac6b243d698"
-        },
-        "ExactPose.__post_init__": {
-          "before": null,
-          "after": "7bab0e8057b58d3e8a09223088c1c0e8ea64fca49a7673b2a8f70cd22a746cb3"
-        },
-        "ExactPose.from_payload": {
-          "before": null,
-          "after": "d337559255f8b974702cd485aa139aad40c4bc16bc125e2f7ed6fb3ab4aa85ba"
-        },
-        "ExactPose.to_payload": {
-          "before": null,
-          "after": "c01686be6cd21efad1025b9c0923cb4af45d0537c82b8de298dcbfe9ea8934a7"
-        },
-        "ExactPosePayload": {
-          "before": null,
-          "after": "3af9bad38028dbbaeabf38daa1879064f9ac605b8e0246d7b5f4c4f8203cf7d0"
+          "after": "722de6e2826a2be51de46ff2fc0237c61e7dcbf2f21dc4155a702756f55a4fbc"
         }
       }
     },
     "tests/code_quality/test_engine_numerical_identity_admission.py": {
-      "before_sha256": "9f86ea9e5b5ee8ddfc4ae206517f18ac06c7610af1e8b104228cbb63694c72a7",
-      "after_sha256": "b4ad931f31bc4cbc87c8d19114e42092180c34765e416b8465762031b9596a94",
+      "before_sha256": "b4ad931f31bc4cbc87c8d19114e42092180c34765e416b8465762031b9596a94",
+      "after_sha256": "00f6da9f47c723c815a63bb2b5b1d70e49b8b3dfdfc5fc5b14a808fe1246c9f1",
       "owners": {
         "@module": {
-          "before": "d246d290fb8b609ba1158ff9e0e987615664e3317ed910bb11170c35fe432071",
-          "after": "3363a7a801ea77baf7e04a4d3b9577557547cff4040949c7bf4273c4e7d922e7"
+          "before": "3363a7a801ea77baf7e04a4d3b9577557547cff4040949c7bf4273c4e7d922e7",
+          "after": "c7c379be499c781ccd351d6e1f20b252c64811d2a5e0526f4acf674bf91f6cba"
         },
         "test_identity_inventory_uses_current_twelve_shards_and_native_cohort": {
-          "before": "07616c312bea881ad5a67212b577e8d155452a8ba417e4293e39e51aef6e9709",
-          "after": "33aa44587bfe3c895fbdfb1f774d666f536ff77995435757a24a9f540078ab4d"
-        },
-        "test_identity_selection_rejects_drift_in_each_updated_test": {
-          "before": "69328fe21db38a1a635f243c9bfaa5ba6ff32050ee6dafc3889ce7e1559b4956",
-          "after": "3114cdbdd8cac0282700d104be73569cb164ef3cce9f84c96692d19b6c3fec3f"
-        },
-        "test_identity_transition_preserves_original_recipe_and_speedup_evidence": {
-          "before": "46bbee80b61bea350731d1ad74f0de4bab1061e3743cf8be2e309b9e6a7305cf",
-          "after": "24c305ea3fefee486c6344a01a40d60c38fbe83ecb822c6c4f16617d5478f107"
+          "before": "33aa44587bfe3c895fbdfb1f774d666f536ff77995435757a24a9f540078ab4d",
+          "after": "50902a98b23785cfc74aa693d98d90a837fd1fae464a3034034ea05f71289b53"
         },
         "test_identity_transition_rejects_every_changed_runtime_source": {
-          "before": "ff98833f687b25071811c08fe709164da5536279bf3f2554b704046b6bb6592c",
-          "after": "c447a7edf5855470f1a1f2c97ef5f8e85c74bd083aed513b6a034793823e9890"
-        },
-        "transition_snapshot": {
-          "before": "1e393dce45634650543b988e29b85c527e092ce3bd8f0a39e028f677d10be551",
-          "after": "7d6fb969dd94d8d907da8316479be572ec6096b417e2bbf9d545beaac62b9f6b"
+          "before": "c447a7edf5855470f1a1f2c97ef5f8e85c74bd083aed513b6a034793823e9890",
+          "after": "609f4a039e840331c622134120a91ec5681ea635e8bc64658dd290239f700959"
         }
       }
     },
-    "tests/rules/section01/test_exact_movement.py": {
+    "tests/rules/section01/test_milli_inch_circle_polygon.py": {
       "before_sha256": null,
-      "after_sha256": "f55adb754c59d07a75e2ba6c5fc09c176fe8f3b5078135f6609596500f6cb3ee",
+      "after_sha256": "e5bf0ab82ffba8d45690fd9485d450149de34acf9d93d6d509e5b086c7e0aa9b",
       "owners": {
         "@module": {
           "before": null,
-          "after": "5afdda969745635f52420c059d165029a1c09581a0511a8c79fe3df632e21017"
+          "after": "caf9f69ed889c4fa5d5c64f0e072efb97213fd370d4a2a35e2870ce2e1fa5df2"
         },
-        "battlefield": {
+        "test_circle_polygon_concavity_is_independent_of_ring_order": {
           "before": null,
-          "after": "6d3f3548e0a2f05c0548899cc13a6c4c55f852415b455e9eb941f4a93489f368"
+          "after": "a6c7b8a50a9a8871c765e2503c8341c6a6f476814a05fe088d38c5810c86a9ab"
         },
-        "pose": {
+        "test_circle_polygon_gap_preserves_exact_rounding_at_large_coordinates": {
           "before": null,
-          "after": "b67806e5b9f13f3a3750619e31910e945fc68e51ffa5556c2542047022413c39"
+          "after": "7773d0f16653ec3c3e2dd5334452e0e53bb0637c4f65c3f63d826b739e732efb"
         },
-        "test_board_clearance_uses_all_waypoints_and_radii": {
+        "test_circle_polygon_gap_uses_exact_projection_before_subtracting_radius": {
           "before": null,
-          "after": "968e65ab87e534e1d5e1f863d677ceb3232cfb85fe7fc140325601d789466224"
+          "after": "87e6cfa3bd27f4705974619c3986cd479784c351025043ac9a104fe0e89054fa"
         },
-        "test_clear_endpoints_cannot_authorize_a_blocked_path": {
+        "test_circle_polygon_queries_require_canonical_inputs": {
           "before": null,
-          "after": "f2207f265543ddce1d5f09f2f903b0c47c475eec87c104a0274d3a8590815f04"
+          "after": "928f626a8600360fcd11f445e6b943797b76744c4d8ea242e2b71bc148437d62"
         },
-        "test_exact_payloads_reject_mixed_identity_missing_path_and_legacy_pose": {
+        "test_circle_polygon_topology_and_surface_gap": {
           "before": null,
-          "after": "1d279bdd2cbd4fe80610c2cafe8807fa9855ec88fc494ce25d0503ead1284fa9"
-        },
-        "test_exact_travel_rejects_empty_and_disconnected_sweeps": {
-          "before": null,
-          "after": "8fa2917fa7344f92b88412f856a00d960c9f5c498b64ea1212e9f105104d3679"
-        },
-        "test_half_tick_above_inclusive_budget_is_rejected": {
-          "before": null,
-          "after": "9a36c28a9d3ce8905ddc85d1a062570d660d072ed5d9806c582844e3f896b319"
-        },
-        "test_half_tick_contact_commits_authoritative_pose_and_preserves_replay_input": {
-          "before": null,
-          "after": "04b78ed4c14df5013c70562e6c8f423ba0db729f4f2b77020c25b7f2a04055d4"
-        },
-        "test_length_uses_the_complete_path_once_and_counts_backtracking": {
-          "before": null,
-          "after": "ae75c428be062dc6cfaf4ee59cb2ba3fc3673e971dafea63917d00ced2e8040c"
-        },
-        "test_movement_rejects_missing_wrong_model_stale_and_wrong_start_witnesses": {
-          "before": null,
-          "after": "011fcb8c6239e168d091379f284d3af348774f26365afb58870d5e0e4b19fe5b"
-        },
-        "test_quadratic_simultaneous_contact_survives_subdivision_and_restoration": {
-          "before": null,
-          "after": "0fb2e1df77e12fef491e34409aee59a110bc01a792d98b7ec7ad9175ca361450"
-        },
-        "test_rounded_zero_gap_does_not_establish_required_contact": {
-          "before": null,
-          "after": "b06c57bdad723289de6acc4cc496ef44bc2cb20200367fc026be7dbfe896811f"
-        },
-        "test_unsupported_bent_quadratic_and_vertical_paths_fail_closed": {
-          "before": null,
-          "after": "a463c398e09b94944a795b1bcdd2703cf7d25cbf023a184eeb66f54da4563793"
-        },
-        "witness": {
-          "before": null,
-          "after": "9dab6e1637946b749f73fb674921e61126aa2a6740e9b2e4b82734047fe2a102"
+          "after": "ce0d7732696ab114060a40768307e56a2ec8310825ff11d650b5ebaca067a46b"
         }
       }
     }
@@ -584,9 +376,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit additive movement regressions and rebuild twelve shards from the complete covered profile.",
-      "source_obligation": "Keep prior source-bound test membership and validate the new exact movement case owner.",
-      "unchanged_work": "Keep all existing cases and the 32-worker, 67% branch, 1620/1800-second coverage gate."
+      "rationale": "Admit the circle\u2013polygon regressions and schedule the full selected behavioral workload.",
+      "source_obligation": "Authenticate the added cases and use measured durations for the twelve-shard inventory.",
+      "unchanged_work": "Retain existing tests, the 67% branch coverage floor and established timing limits."
     },
     "ci/test_shards/shard-1.txt": {
       "category": "rule_semantics",
@@ -594,9 +386,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit additive movement regressions and rebuild twelve shards from the complete covered profile.",
-      "source_obligation": "Keep prior source-bound test membership and validate the new exact movement case owner.",
-      "unchanged_work": "Keep all existing cases and the 32-worker, 67% branch, 1620/1800-second coverage gate."
+      "rationale": "Admit the circle\u2013polygon regressions and schedule the full selected behavioral workload.",
+      "source_obligation": "Authenticate the added cases and use measured durations for the twelve-shard inventory.",
+      "unchanged_work": "Retain existing tests, the 67% branch coverage floor and established timing limits."
     },
     "ci/test_shards/shard-10.txt": {
       "category": "rule_semantics",
@@ -604,9 +396,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit additive movement regressions and rebuild twelve shards from the complete covered profile.",
-      "source_obligation": "Keep prior source-bound test membership and validate the new exact movement case owner.",
-      "unchanged_work": "Keep all existing cases and the 32-worker, 67% branch, 1620/1800-second coverage gate."
+      "rationale": "Admit the circle\u2013polygon regressions and schedule the full selected behavioral workload.",
+      "source_obligation": "Authenticate the added cases and use measured durations for the twelve-shard inventory.",
+      "unchanged_work": "Retain existing tests, the 67% branch coverage floor and established timing limits."
     },
     "ci/test_shards/shard-11.txt": {
       "category": "rule_semantics",
@@ -614,9 +406,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit additive movement regressions and rebuild twelve shards from the complete covered profile.",
-      "source_obligation": "Keep prior source-bound test membership and validate the new exact movement case owner.",
-      "unchanged_work": "Keep all existing cases and the 32-worker, 67% branch, 1620/1800-second coverage gate."
+      "rationale": "Admit the circle\u2013polygon regressions and schedule the full selected behavioral workload.",
+      "source_obligation": "Authenticate the added cases and use measured durations for the twelve-shard inventory.",
+      "unchanged_work": "Retain existing tests, the 67% branch coverage floor and established timing limits."
     },
     "ci/test_shards/shard-12.txt": {
       "category": "rule_semantics",
@@ -624,9 +416,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit additive movement regressions and rebuild twelve shards from the complete covered profile.",
-      "source_obligation": "Keep prior source-bound test membership and validate the new exact movement case owner.",
-      "unchanged_work": "Keep all existing cases and the 32-worker, 67% branch, 1620/1800-second coverage gate."
+      "rationale": "Admit the circle\u2013polygon regressions and schedule the full selected behavioral workload.",
+      "source_obligation": "Authenticate the added cases and use measured durations for the twelve-shard inventory.",
+      "unchanged_work": "Retain existing tests, the 67% branch coverage floor and established timing limits."
     },
     "ci/test_shards/shard-2.txt": {
       "category": "rule_semantics",
@@ -634,9 +426,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit additive movement regressions and rebuild twelve shards from the complete covered profile.",
-      "source_obligation": "Keep prior source-bound test membership and validate the new exact movement case owner.",
-      "unchanged_work": "Keep all existing cases and the 32-worker, 67% branch, 1620/1800-second coverage gate."
+      "rationale": "Admit the circle\u2013polygon regressions and schedule the full selected behavioral workload.",
+      "source_obligation": "Authenticate the added cases and use measured durations for the twelve-shard inventory.",
+      "unchanged_work": "Retain existing tests, the 67% branch coverage floor and established timing limits."
     },
     "ci/test_shards/shard-3.txt": {
       "category": "rule_semantics",
@@ -644,9 +436,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit additive movement regressions and rebuild twelve shards from the complete covered profile.",
-      "source_obligation": "Keep prior source-bound test membership and validate the new exact movement case owner.",
-      "unchanged_work": "Keep all existing cases and the 32-worker, 67% branch, 1620/1800-second coverage gate."
+      "rationale": "Admit the circle\u2013polygon regressions and schedule the full selected behavioral workload.",
+      "source_obligation": "Authenticate the added cases and use measured durations for the twelve-shard inventory.",
+      "unchanged_work": "Retain existing tests, the 67% branch coverage floor and established timing limits."
     },
     "ci/test_shards/shard-4.txt": {
       "category": "rule_semantics",
@@ -654,9 +446,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit additive movement regressions and rebuild twelve shards from the complete covered profile.",
-      "source_obligation": "Keep prior source-bound test membership and validate the new exact movement case owner.",
-      "unchanged_work": "Keep all existing cases and the 32-worker, 67% branch, 1620/1800-second coverage gate."
+      "rationale": "Admit the circle\u2013polygon regressions and schedule the full selected behavioral workload.",
+      "source_obligation": "Authenticate the added cases and use measured durations for the twelve-shard inventory.",
+      "unchanged_work": "Retain existing tests, the 67% branch coverage floor and established timing limits."
     },
     "ci/test_shards/shard-5.txt": {
       "category": "rule_semantics",
@@ -664,9 +456,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit additive movement regressions and rebuild twelve shards from the complete covered profile.",
-      "source_obligation": "Keep prior source-bound test membership and validate the new exact movement case owner.",
-      "unchanged_work": "Keep all existing cases and the 32-worker, 67% branch, 1620/1800-second coverage gate."
+      "rationale": "Admit the circle\u2013polygon regressions and schedule the full selected behavioral workload.",
+      "source_obligation": "Authenticate the added cases and use measured durations for the twelve-shard inventory.",
+      "unchanged_work": "Retain existing tests, the 67% branch coverage floor and established timing limits."
     },
     "ci/test_shards/shard-6.txt": {
       "category": "rule_semantics",
@@ -674,9 +466,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit additive movement regressions and rebuild twelve shards from the complete covered profile.",
-      "source_obligation": "Keep prior source-bound test membership and validate the new exact movement case owner.",
-      "unchanged_work": "Keep all existing cases and the 32-worker, 67% branch, 1620/1800-second coverage gate."
+      "rationale": "Admit the circle\u2013polygon regressions and schedule the full selected behavioral workload.",
+      "source_obligation": "Authenticate the added cases and use measured durations for the twelve-shard inventory.",
+      "unchanged_work": "Retain existing tests, the 67% branch coverage floor and established timing limits."
     },
     "ci/test_shards/shard-7.txt": {
       "category": "rule_semantics",
@@ -684,9 +476,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit additive movement regressions and rebuild twelve shards from the complete covered profile.",
-      "source_obligation": "Keep prior source-bound test membership and validate the new exact movement case owner.",
-      "unchanged_work": "Keep all existing cases and the 32-worker, 67% branch, 1620/1800-second coverage gate."
+      "rationale": "Admit the circle\u2013polygon regressions and schedule the full selected behavioral workload.",
+      "source_obligation": "Authenticate the added cases and use measured durations for the twelve-shard inventory.",
+      "unchanged_work": "Retain existing tests, the 67% branch coverage floor and established timing limits."
     },
     "ci/test_shards/shard-8.txt": {
       "category": "rule_semantics",
@@ -694,9 +486,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit additive movement regressions and rebuild twelve shards from the complete covered profile.",
-      "source_obligation": "Keep prior source-bound test membership and validate the new exact movement case owner.",
-      "unchanged_work": "Keep all existing cases and the 32-worker, 67% branch, 1620/1800-second coverage gate."
+      "rationale": "Admit the circle\u2013polygon regressions and schedule the full selected behavioral workload.",
+      "source_obligation": "Authenticate the added cases and use measured durations for the twelve-shard inventory.",
+      "unchanged_work": "Retain existing tests, the 67% branch coverage floor and established timing limits."
     },
     "ci/test_shards/shard-9.txt": {
       "category": "rule_semantics",
@@ -704,9 +496,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit additive movement regressions and rebuild twelve shards from the complete covered profile.",
-      "source_obligation": "Keep prior source-bound test membership and validate the new exact movement case owner.",
-      "unchanged_work": "Keep all existing cases and the 32-worker, 67% branch, 1620/1800-second coverage gate."
+      "rationale": "Admit the circle\u2013polygon regressions and schedule the full selected behavioral workload.",
+      "source_obligation": "Authenticate the added cases and use measured durations for the twelve-shard inventory.",
+      "unchanged_work": "Retain existing tests, the 67% branch coverage floor and established timing limits."
     },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
@@ -788,73 +580,55 @@
       "source_obligation": "Advertise the actual runtime build in the current synthetic release fixtures.",
       "unchanged_work": "Historical executors, schemas, checkpoints and gameplay policy retain their original semantics."
     },
-    "data/source_audits/ci64_provenance_v1/exact-movement-test-transition-v1.json": {
+    "data/source_audits/ci64_provenance_v1/circle-polygon-test-addition-v1.json": {
       "category": "rule_semantics",
       "operations": [
         "exact-movement-test-admission"
       ],
       "selected_families": [],
-      "rationale": "Admit additive movement regressions and rebuild twelve shards from the complete covered profile.",
-      "source_obligation": "Keep prior source-bound test membership and validate the new exact movement case owner.",
-      "unchanged_work": "Keep all existing cases and the 32-worker, 67% branch, 1620/1800-second coverage gate."
-    },
-    "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Record scoped exact-disk movement findings and the repository-required evidence.",
-      "source_obligation": "Describe the extent of this staged implementation and its exact-base validation.",
-      "unchanged_work": "Ordinary gameplay activation and any wider terrain or model group work remain future scope."
+      "rationale": "Admit the circle\u2013polygon regressions and schedule the full selected behavioral workload.",
+      "source_obligation": "Authenticate the added cases and use measured durations for the twelve-shard inventory.",
+      "unchanged_work": "Retain existing tests, the 67% branch coverage floor and established timing limits."
     },
     "docs/DISTANCE_PRECISION.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Record scoped exact-disk movement findings and the repository-required evidence.",
-      "source_obligation": "Describe the extent of this staged implementation and its exact-base validation.",
-      "unchanged_work": "Ordinary gameplay activation and any wider terrain or model group work remain future scope."
+      "rationale": "Record the staged circle\u2013polygon geometry scope and applicable checks.",
+      "source_obligation": "Document the implemented primitive pair and record the required exact-base work.",
+      "unchanged_work": "The published gameplay policy, budgets and historical comparisons retain their semantics."
     },
-    "docs/performance/current/exact-movement-movement.json": {
+    "docs/performance/current/circle-polygon-movement.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Record scoped exact-disk movement findings and the repository-required evidence.",
-      "source_obligation": "Describe the extent of this staged implementation and its exact-base validation.",
-      "unchanged_work": "Ordinary gameplay activation and any wider terrain or model group work remain future scope."
+      "rationale": "Record the staged circle\u2013polygon geometry scope and applicable checks.",
+      "source_obligation": "Document the implemented primitive pair and record the required exact-base work.",
+      "unchanged_work": "The published gameplay policy, budgets and historical comparisons retain their semantics."
     },
-    "docs/performance/current/exact-movement-setup.json": {
+    "docs/performance/current/circle-polygon-setup.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Record scoped exact-disk movement findings and the repository-required evidence.",
-      "source_obligation": "Describe the extent of this staged implementation and its exact-base validation.",
-      "unchanged_work": "Ordinary gameplay activation and any wider terrain or model group work remain future scope."
+      "rationale": "Record the staged circle\u2013polygon geometry scope and applicable checks.",
+      "source_obligation": "Document the implemented primitive pair and record the required exact-base work.",
+      "unchanged_work": "The published gameplay policy, budgets and historical comparisons retain their semantics."
     },
-    "docs/performance/current/exact-movement-visibility.json": {
+    "docs/performance/current/circle-polygon-visibility.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Record scoped exact-disk movement findings and the repository-required evidence.",
-      "source_obligation": "Describe the extent of this staged implementation and its exact-base validation.",
-      "unchanged_work": "Ordinary gameplay activation and any wider terrain or model group work remain future scope."
+      "rationale": "Record the staged circle\u2013polygon geometry scope and applicable checks.",
+      "source_obligation": "Document the implemented primitive pair and record the required exact-base work.",
+      "unchanged_work": "The published gameplay policy, budgets and historical comparisons retain their semantics."
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Record scoped exact-disk movement findings and the repository-required evidence.",
-      "source_obligation": "Describe the extent of this staged implementation and its exact-base validation.",
-      "unchanged_work": "Ordinary gameplay activation and any wider terrain or model group work remain future scope."
-    },
-    "scripts/build_test_shards.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "ci78-cutover-owners-83cd0803bcde80cbfc805d2a110f3274d501da3bc2230de8cc7f95cc0cbd608f"
-      ],
-      "selected_families": [],
-      "rationale": "Admit additive movement regressions and rebuild twelve shards from the complete covered profile.",
-      "source_obligation": "Keep prior source-bound test membership and validate the new exact movement case owner.",
-      "unchanged_work": "Keep all existing cases and the 32-worker, 67% branch, 1620/1800-second coverage gate."
+      "rationale": "Record the staged circle\u2013polygon geometry scope and applicable checks.",
+      "source_obligation": "Document the implemented primitive pair and record the required exact-base work.",
+      "unchanged_work": "The published gameplay policy, budgets and historical comparisons retain their semantics."
     },
     "scripts/engine_numerical_identity_test_admission.py": {
       "category": "rule_semantics",
@@ -862,9 +636,9 @@
         "engine-numerical-identity-admission"
       ],
       "selected_families": [],
-      "rationale": "Admit additive movement regressions and rebuild twelve shards from the complete covered profile.",
-      "source_obligation": "Keep prior source-bound test membership and validate the new exact movement case owner.",
-      "unchanged_work": "Keep all existing cases and the 32-worker, 67% branch, 1620/1800-second coverage gate."
+      "rationale": "Admit the circle\u2013polygon regressions and schedule the full selected behavioral workload.",
+      "source_obligation": "Authenticate the added cases and use measured durations for the twelve-shard inventory.",
+      "unchanged_work": "Retain existing tests, the 67% branch coverage floor and established timing limits."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
@@ -876,20 +650,8 @@
       "source_obligation": "Advertise the actual runtime build in the current synthetic release fixtures.",
       "unchanged_work": "Historical executors, schemas, checkpoints and gameplay policy retain their original semantics."
     },
-    "src/warhammer40k_core/engine/exact_movement.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "exact-movement-authority"
-      ],
-      "selected_families": [
-        "movement"
-      ],
-      "rationale": "Add exact pose ownership and continuous clearance for a staged disk translation.",
-      "source_obligation": "Prove all swept segments, exact contacts and total-first distance before applying a pose.",
-      "unchanged_work": "Admitted live movement, setup and visibility still use the established legacy engine."
-    },
-    "src/warhammer40k_core/geometry/exact_path.py": {
-      "category": "rule_semantics",
+    "src/warhammer40k_core/geometry/milli_inch_circle_polygon.py": {
+      "category": "algorithm_or_search",
       "operations": [
         "geometry-search"
       ],
@@ -898,23 +660,9 @@
         "setup",
         "visibility"
       ],
-      "rationale": "Add exact pose ownership and continuous clearance for a staged disk translation.",
-      "source_obligation": "Prove all swept segments, exact contacts and total-first distance before applying a pose.",
-      "unchanged_work": "Admitted live movement, setup and visibility still use the established legacy engine."
-    },
-    "src/warhammer40k_core/geometry/exact_pose.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "geometry-search"
-      ],
-      "selected_families": [
-        "movement",
-        "setup",
-        "visibility"
-      ],
-      "rationale": "Add exact pose ownership and continuous clearance for a staged disk translation.",
-      "source_obligation": "Prove all swept segments, exact contacts and total-first distance before applying a pose.",
-      "unchanged_work": "Admitted live movement, setup and visibility still use the established legacy engine."
+      "rationale": "Add exact topology and single-rounding surface gaps for canonical disks and filled rings.",
+      "source_obligation": "Classify from minimum squared center distance and exact diameter-derived radius.",
+      "unchanged_work": "Legacy movement, setup and visibility continue to use their existing geometry."
     },
     "tests/code_quality/test_engine_numerical_identity_admission.py": {
       "category": "rule_semantics",
@@ -922,26 +670,26 @@
         "engine-numerical-identity-admission"
       ],
       "selected_families": [],
-      "rationale": "Admit additive movement regressions and rebuild twelve shards from the complete covered profile.",
-      "source_obligation": "Keep prior source-bound test membership and validate the new exact movement case owner.",
-      "unchanged_work": "Keep all existing cases and the 32-worker, 67% branch, 1620/1800-second coverage gate."
+      "rationale": "Admit the circle\u2013polygon regressions and schedule the full selected behavioral workload.",
+      "source_obligation": "Authenticate the added cases and use measured durations for the twelve-shard inventory.",
+      "unchanged_work": "Retain existing tests, the 67% branch coverage floor and established timing limits."
     },
-    "tests/rules/section01/test_exact_movement.py": {
+    "tests/rules/section01/test_milli_inch_circle_polygon.py": {
       "category": "rule_semantics",
       "operations": [
         "exact-movement-test-admission"
       ],
       "selected_families": [],
-      "rationale": "Admit additive movement regressions and rebuild twelve shards from the complete covered profile.",
-      "source_obligation": "Keep prior source-bound test membership and validate the new exact movement case owner.",
-      "unchanged_work": "Keep all existing cases and the 32-worker, 67% branch, 1620/1800-second coverage gate."
+      "rationale": "Admit the circle\u2013polygon regressions and schedule the full selected behavioral workload.",
+      "source_obligation": "Authenticate the added cases and use measured durations for the twelve-shard inventory.",
+      "unchanged_work": "Retain existing tests, the 67% branch coverage floor and established timing limits."
     }
   },
   "milestone": "ordinary",
   "comparisons": {
-    "visibility": "docs/performance/current/exact-movement-visibility.json",
-    "movement": "docs/performance/current/exact-movement-movement.json",
-    "setup": "docs/performance/current/exact-movement-setup.json"
+    "movement": "docs/performance/current/circle-polygon-movement.json",
+    "setup": "docs/performance/current/circle-polygon-setup.json",
+    "visibility": "docs/performance/current/circle-polygon-visibility.json"
   },
   "full_game": null
 }

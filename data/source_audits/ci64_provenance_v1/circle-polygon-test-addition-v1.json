@@ -1,0 +1,13 @@
+{
+  "added_files": {
+    "tests/rules/section01/test_milli_inch_circle_polygon.py": {
+      "blob_sha1": "bee2847dd8182bfbe95558beeb55fa9e21e126ca",
+      "bytes": 3961,
+      "mode": "100644",
+      "sha256": "e5bf0ab82ffba8d45690fd9485d450149de34acf9d93d6d509e5b086c7e0aa9b"
+    }
+  },
+  "runtime_fingerprint": "0f369e5c9eeb571b62522207dcf6b4ea0645f5c724c27ad69daad944257f6595",
+  "schema": "finite-circle-polygon-test-addition-v1",
+  "source_sha256": "cc1862f25f61ac0f002229f4975ffac7224b1c6e2f7efd32fc9cc30d66abbbf6"
+}
