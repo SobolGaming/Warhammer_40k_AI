@@ -69,6 +69,11 @@ CIRCLE_POLYGON_SHA256 = "617f67340b0d7e5cd8f1d2786faa193a96bbc7f2fa18f3b8b7988bc
 CIRCLE_POLYGON_OWNER = "tests/rules/section01/test_milli_inch_circle_polygon.py"
 _CIRCLE_POLYGON_SOURCE = "src/warhammer40k_core/geometry/milli_inch_circle_polygon.py"
 
+OVAL_POINT_ADDITION = "data/source_audits/ci64_provenance_v1/oval-point-test-addition-v1.json"
+OVAL_POINT_SHA256 = "c90a008c3d213364cfa9085b27d864b301543b7a35dabb94175870cb1c42cbd9"
+OVAL_POINT_OWNER = "tests/rules/section01/test_milli_inch_oval.py"
+_OVAL_POINT_SOURCE = "src/warhammer40k_core/geometry/milli_inch_oval.py"
+
 
 type TestTransition = tuple[dict[str, dict[str, object]], dict[str, dict[str, object]], bytes]
 
@@ -101,6 +106,12 @@ def exact_movement_test_transition(
     for path in successor_paths:
         _selection_no_links(root, root / path)
     has_circle_polygon = any((root / path).exists() for path in successor_paths)
+    oval_paths = (OVAL_POINT_ADDITION, OVAL_POINT_OWNER, _OVAL_POINT_SOURCE)
+    for path in oval_paths:
+        _selection_no_links(root, root / path)
+    has_oval_point = any((root / path).exists() for path in oval_paths)
+    if has_oval_point and not has_circle_polygon:
+        raise SystemExit("Oval point test addition requires its circle-polygon predecessor.")
     if not has_circle_polygon and not any((root / path).exists() for path in paths):
         return None
     raw = _checked_bytes(root, EXACT_MOVEMENT_ADDITION, EXACT_MOVEMENT_SHA256)
@@ -131,6 +142,19 @@ def exact_movement_test_transition(
         additions.update(_selection_members(successor["added_files"], root))
         runtime = successor["runtime_fingerprint"]
         raw += b"\0" + next_raw
+    if has_oval_point:
+        oval_raw = _checked_bytes(root, OVAL_POINT_ADDITION, OVAL_POINT_SHA256)
+        oval = json.loads(oval_raw, object_pairs_hook=_selection_object)
+        if (
+            oval.keys() != {"schema", "runtime_fingerprint", "source_sha256", "added_files"}
+            or oval["schema"] != "finite-oval-point-test-addition-v1"
+            or set(oval["added_files"]) != {OVAL_POINT_OWNER}
+        ):
+            raise SystemExit("Oval point test addition membership differs.")
+        _checked_bytes(root, _OVAL_POINT_SOURCE, oval["source_sha256"])
+        additions.update(_selection_members(oval["added_files"], root))
+        runtime = oval["runtime_fingerprint"]
+        raw += b"\0" + oval_raw
     retained = _identity_test_transition(root, retained_cutover_sha256, runtime=runtime)
     if retained is None:
         raise SystemExit(
