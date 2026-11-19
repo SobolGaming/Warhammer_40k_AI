@@ -1,394 +1,224 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "ded5d0ec6cd2dbade17dfacd2891d9320c32207c",
+  "base": "079c4fcd92b31410f96ce52ed10de7828c482008",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:f2b7f6522f0f9c9b3520f635332964abb877a1a127ed2c8902c5c56290c30c69",
-  "operation_map_sha256": "f4658636b735337273b9a677f7caf35262353307dce67617f1287308d0eca8a1",
+  "operation_map_sha256": "0cc6e5f2aa1a3857f09cccfb7e60741284f3bc48daa32b5b27669bc35a266f50",
   "changes": {
     "ci/test_shards/durations.json": {
-      "before_sha256": "19c7b5131b9f6a67f3f406addf34d120df7b866aff795f2982ed63dc62b6e431",
-      "after_sha256": "bf26335cd34794acea8ff51ed17eec406a822ca87279bbd2e8858248e105c207",
+      "before_sha256": "bf26335cd34794acea8ff51ed17eec406a822ca87279bbd2e8858248e105c207",
+      "after_sha256": "2ab095972955e67eed8c40b16e74201828d44f304fa81b7d9aec3988a4a655e8",
       "owners": {
         "@document": {
-          "before": "19c7b5131b9f6a67f3f406addf34d120df7b866aff795f2982ed63dc62b6e431",
-          "after": "bf26335cd34794acea8ff51ed17eec406a822ca87279bbd2e8858248e105c207"
+          "before": "bf26335cd34794acea8ff51ed17eec406a822ca87279bbd2e8858248e105c207",
+          "after": "2ab095972955e67eed8c40b16e74201828d44f304fa81b7d9aec3988a4a655e8"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
-      "before_sha256": "a951b04220c1ad4c7728a4211af12e82d2f74e3079d54877342bc051dd2d4ad1",
-      "after_sha256": "ad54421764d194c07b47456e9ffcf93937802736661a29d3e2fa29038a7be594",
+      "before_sha256": "ad54421764d194c07b47456e9ffcf93937802736661a29d3e2fa29038a7be594",
+      "after_sha256": "40472d51dc718656159522b167da86ef3bc820b6adc9012ba589d4682df325d9",
       "owners": {
         "@document": {
-          "before": "a951b04220c1ad4c7728a4211af12e82d2f74e3079d54877342bc051dd2d4ad1",
-          "after": "ad54421764d194c07b47456e9ffcf93937802736661a29d3e2fa29038a7be594"
+          "before": "ad54421764d194c07b47456e9ffcf93937802736661a29d3e2fa29038a7be594",
+          "after": "40472d51dc718656159522b167da86ef3bc820b6adc9012ba589d4682df325d9"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
-      "before_sha256": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20",
-      "after_sha256": "46ae708bd8e2108cb94a84ae6b19e37c98a7317aee98eb4c3ff85e45fa31907c",
+      "before_sha256": "46ae708bd8e2108cb94a84ae6b19e37c98a7317aee98eb4c3ff85e45fa31907c",
+      "after_sha256": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20",
       "owners": {
         "@document": {
-          "before": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20",
-          "after": "46ae708bd8e2108cb94a84ae6b19e37c98a7317aee98eb4c3ff85e45fa31907c"
+          "before": "46ae708bd8e2108cb94a84ae6b19e37c98a7317aee98eb4c3ff85e45fa31907c",
+          "after": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
-      "before_sha256": "e8cb85cae6493d43d41ad3188fa4c0f2fbaabec94dfb5d9aad7d151886802944",
-      "after_sha256": "c2f9dc4f6821d7fc7de53a2b181ebbeb8bcf8d2b27d297dc1887f44dbf8d860b",
+      "before_sha256": "c2f9dc4f6821d7fc7de53a2b181ebbeb8bcf8d2b27d297dc1887f44dbf8d860b",
+      "after_sha256": "09cf07dcedda5314b2a1b0d4d49b991b3364fa5b1c9664097bc56fd03dee1cb4",
       "owners": {
         "@document": {
-          "before": "e8cb85cae6493d43d41ad3188fa4c0f2fbaabec94dfb5d9aad7d151886802944",
-          "after": "c2f9dc4f6821d7fc7de53a2b181ebbeb8bcf8d2b27d297dc1887f44dbf8d860b"
+          "before": "c2f9dc4f6821d7fc7de53a2b181ebbeb8bcf8d2b27d297dc1887f44dbf8d860b",
+          "after": "09cf07dcedda5314b2a1b0d4d49b991b3364fa5b1c9664097bc56fd03dee1cb4"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
-      "before_sha256": "b12d11ed0609c7ee24a9b43ebe100c579ef52b7ffc7a58c63d2f062c8fb216f8",
-      "after_sha256": "9a5c547afe83815cb7ee25905a24901b89bc282aac7097685d2cbe91abd481a8",
+      "before_sha256": "9a5c547afe83815cb7ee25905a24901b89bc282aac7097685d2cbe91abd481a8",
+      "after_sha256": "3d9c7ecfc4ac1d74cd61cb9ae579b971f705aff7b5262d23e5e68560ab803c63",
       "owners": {
         "@document": {
-          "before": "b12d11ed0609c7ee24a9b43ebe100c579ef52b7ffc7a58c63d2f062c8fb216f8",
-          "after": "9a5c547afe83815cb7ee25905a24901b89bc282aac7097685d2cbe91abd481a8"
+          "before": "9a5c547afe83815cb7ee25905a24901b89bc282aac7097685d2cbe91abd481a8",
+          "after": "3d9c7ecfc4ac1d74cd61cb9ae579b971f705aff7b5262d23e5e68560ab803c63"
         }
       }
     },
     "ci/test_shards/shard-2.txt": {
-      "before_sha256": "e17254db53356a40f2a217585b0a76c2b63ab253f1b6abe64e96b71df83cb4fa",
-      "after_sha256": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
+      "before_sha256": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
+      "after_sha256": "7222a59f6b668248e34e87d9131d98c2f27db77c831d125a2b2f58124b90eeff",
       "owners": {
         "@document": {
-          "before": "e17254db53356a40f2a217585b0a76c2b63ab253f1b6abe64e96b71df83cb4fa",
-          "after": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c"
+          "before": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
+          "after": "7222a59f6b668248e34e87d9131d98c2f27db77c831d125a2b2f58124b90eeff"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
-      "before_sha256": "24736ed3338410d962c7fe4805f771a4fbd33e2cf7eb5d3631c09d977e70d070",
-      "after_sha256": "ed8b2de4f896240a0d1fb02f3619cf22c5a51a118cc241c105470311b8b39d28",
+      "before_sha256": "ed8b2de4f896240a0d1fb02f3619cf22c5a51a118cc241c105470311b8b39d28",
+      "after_sha256": "2babfb5db4d81f951009a71d834e9a1c7683245d0ba57ad6799e8b9685592cd7",
       "owners": {
         "@document": {
-          "before": "24736ed3338410d962c7fe4805f771a4fbd33e2cf7eb5d3631c09d977e70d070",
-          "after": "ed8b2de4f896240a0d1fb02f3619cf22c5a51a118cc241c105470311b8b39d28"
+          "before": "ed8b2de4f896240a0d1fb02f3619cf22c5a51a118cc241c105470311b8b39d28",
+          "after": "2babfb5db4d81f951009a71d834e9a1c7683245d0ba57ad6799e8b9685592cd7"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
-      "before_sha256": "975a21e867bb4b90e12f154d02872771c5167ae40746a19b9332659a5d0eee96",
-      "after_sha256": "cab6765c0fcd2ad7e5d0f7c301465b7445a0ba2161b30c82d1838e6cd746b610",
+      "before_sha256": "cab6765c0fcd2ad7e5d0f7c301465b7445a0ba2161b30c82d1838e6cd746b610",
+      "after_sha256": "1efd18f627c5dec3bacdacaeb2507bc068820fc6a86e649c9f5737a5e9f23f6c",
       "owners": {
         "@document": {
-          "before": "975a21e867bb4b90e12f154d02872771c5167ae40746a19b9332659a5d0eee96",
-          "after": "cab6765c0fcd2ad7e5d0f7c301465b7445a0ba2161b30c82d1838e6cd746b610"
+          "before": "cab6765c0fcd2ad7e5d0f7c301465b7445a0ba2161b30c82d1838e6cd746b610",
+          "after": "1efd18f627c5dec3bacdacaeb2507bc068820fc6a86e649c9f5737a5e9f23f6c"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
-      "before_sha256": "1661ee8caa6259848c165dd61a33d89086e75650d669fae1a3924f90707e1f8e",
-      "after_sha256": "3cc9bd308b8a4ae6c9f91ebd10864a193f14c7a90fd03bb68c06c18c19a5a29e",
+      "before_sha256": "3cc9bd308b8a4ae6c9f91ebd10864a193f14c7a90fd03bb68c06c18c19a5a29e",
+      "after_sha256": "fcbec260370eee3427631c023742ca05bda418acf73a20b3285e4a09c2be6b48",
       "owners": {
         "@document": {
-          "before": "1661ee8caa6259848c165dd61a33d89086e75650d669fae1a3924f90707e1f8e",
-          "after": "3cc9bd308b8a4ae6c9f91ebd10864a193f14c7a90fd03bb68c06c18c19a5a29e"
+          "before": "3cc9bd308b8a4ae6c9f91ebd10864a193f14c7a90fd03bb68c06c18c19a5a29e",
+          "after": "fcbec260370eee3427631c023742ca05bda418acf73a20b3285e4a09c2be6b48"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
-      "before_sha256": "36e5b4fcb72a7d52e90aafdd7ebb611c0aa3428f2877cb6ad48dc698fe62fe3e",
-      "after_sha256": "c06ad180f0571329cd5818192e0f75971ab116e9cecfba3bb523b00d2c89b9f3",
+      "before_sha256": "c06ad180f0571329cd5818192e0f75971ab116e9cecfba3bb523b00d2c89b9f3",
+      "after_sha256": "f187c3c8ff358090d55acc68ea4c77f2eee79d84b76e2835c257cc058ffc927f",
       "owners": {
         "@document": {
-          "before": "36e5b4fcb72a7d52e90aafdd7ebb611c0aa3428f2877cb6ad48dc698fe62fe3e",
-          "after": "c06ad180f0571329cd5818192e0f75971ab116e9cecfba3bb523b00d2c89b9f3"
+          "before": "c06ad180f0571329cd5818192e0f75971ab116e9cecfba3bb523b00d2c89b9f3",
+          "after": "f187c3c8ff358090d55acc68ea4c77f2eee79d84b76e2835c257cc058ffc927f"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
-      "before_sha256": "b8c61dd1a9190ea3e6604df6481e88e0da85616e5b31ba53dd13b451ae5130dc",
-      "after_sha256": "fe386716501d21f2f22fe0878a1a571d6e124d8dea0b201bc4199591ecf300f3",
+      "before_sha256": "fe386716501d21f2f22fe0878a1a571d6e124d8dea0b201bc4199591ecf300f3",
+      "after_sha256": "e726af41c23780669ac968f6507a166ebf1270cd6b1d01299f6ddd084775cf46",
       "owners": {
         "@document": {
-          "before": "b8c61dd1a9190ea3e6604df6481e88e0da85616e5b31ba53dd13b451ae5130dc",
-          "after": "fe386716501d21f2f22fe0878a1a571d6e124d8dea0b201bc4199591ecf300f3"
+          "before": "fe386716501d21f2f22fe0878a1a571d6e124d8dea0b201bc4199591ecf300f3",
+          "after": "e726af41c23780669ac968f6507a166ebf1270cd6b1d01299f6ddd084775cf46"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
-      "before_sha256": "423f01362e840d5cea203b39a35b33e319e28042584853da996623004b0fe5ac",
-      "after_sha256": "abce9eb6c1df108a0a9fc516ab14f4f5e618fe9fcac05a9eaf3f44e93f1f4166",
+      "before_sha256": "abce9eb6c1df108a0a9fc516ab14f4f5e618fe9fcac05a9eaf3f44e93f1f4166",
+      "after_sha256": "56fca1678ded8e178c66ea08d793db8d44fa13ec4353f8980b079464fa1a1ce8",
       "owners": {
         "@document": {
-          "before": "423f01362e840d5cea203b39a35b33e319e28042584853da996623004b0fe5ac",
-          "after": "abce9eb6c1df108a0a9fc516ab14f4f5e618fe9fcac05a9eaf3f44e93f1f4166"
+          "before": "abce9eb6c1df108a0a9fc516ab14f4f5e618fe9fcac05a9eaf3f44e93f1f4166",
+          "after": "56fca1678ded8e178c66ea08d793db8d44fa13ec4353f8980b079464fa1a1ce8"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
-      "before_sha256": "acc2884546e2a2a051bf65bcd31ecfb4b9fbcc5465024526250145d674f630c3",
-      "after_sha256": "981af8c4831f485f65e714721543590a1d42468bc532ec991ddb80d29767e466",
+      "before_sha256": "981af8c4831f485f65e714721543590a1d42468bc532ec991ddb80d29767e466",
+      "after_sha256": "dca4daa26f340f52ded31ac8b211e8898e7d78b11868d25916f472cd5a799594",
       "owners": {
         "@document": {
-          "before": "acc2884546e2a2a051bf65bcd31ecfb4b9fbcc5465024526250145d674f630c3",
-          "after": "981af8c4831f485f65e714721543590a1d42468bc532ec991ddb80d29767e466"
+          "before": "981af8c4831f485f65e714721543590a1d42468bc532ec991ddb80d29767e466",
+          "after": "dca4daa26f340f52ded31ac8b211e8898e7d78b11868d25916f472cd5a799594"
         }
       }
     },
-    "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "f09725fbbee8438a5a603ed44311bc8bb536d16e10c29b29d3c02297ed1b4930",
-      "after_sha256": "6fd3ad0100e228e362691c5babb74dd3c64a82132e4d42704274ffe034b6e0b2",
-      "owners": {
-        "@document": {
-          "before": "f09725fbbee8438a5a603ed44311bc8bb536d16e10c29b29d3c02297ed1b4930",
-          "after": "6fd3ad0100e228e362691c5babb74dd3c64a82132e4d42704274ffe034b6e0b2"
-        }
-      }
-    },
-    "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "d0323d3e08a56be6437b002a7e3dad459e91b46de5293e4decdc9aa3d29e8dac",
-      "after_sha256": "45e38166725bc04bd50636f04246719facb9b3e16bf076155c21b3db54dba536",
-      "owners": {
-        "@document": {
-          "before": "d0323d3e08a56be6437b002a7e3dad459e91b46de5293e4decdc9aa3d29e8dac",
-          "after": "45e38166725bc04bd50636f04246719facb9b3e16bf076155c21b3db54dba536"
-        }
-      }
-    },
-    "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "6768b3459a6f84335ecde27528200e43cf3fc1e2455f10a1d0d3d994e7ff9367",
-      "after_sha256": "1ca92de502af870a2c3c72529233fd9704ba86c5e0e1392180e32087c8b5126a",
-      "owners": {
-        "@document": {
-          "before": "6768b3459a6f84335ecde27528200e43cf3fc1e2455f10a1d0d3d994e7ff9367",
-          "after": "1ca92de502af870a2c3c72529233fd9704ba86c5e0e1392180e32087c8b5126a"
-        }
-      }
-    },
-    "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "b73a40e8cf31aaa6a0553abae92cf9f9990a81494173555bad954fdc1a6216ae",
-      "after_sha256": "567412e986c7642d09a0b510bd0da2ae331ac2521a4aba580988221078331e69",
-      "owners": {
-        "@document": {
-          "before": "b73a40e8cf31aaa6a0553abae92cf9f9990a81494173555bad954fdc1a6216ae",
-          "after": "567412e986c7642d09a0b510bd0da2ae331ac2521a4aba580988221078331e69"
-        }
-      }
-    },
-    "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "f845774d2f48fbfdaa39b6c8a34471682410e1e64530349880580bcd9645bb84",
-      "after_sha256": "b7c5a4c51d59013d1bf3333ff79a571effe93f20ed784597cea4a111eb40295a",
-      "owners": {
-        "@document": {
-          "before": "f845774d2f48fbfdaa39b6c8a34471682410e1e64530349880580bcd9645bb84",
-          "after": "b7c5a4c51d59013d1bf3333ff79a571effe93f20ed784597cea4a111eb40295a"
-        }
-      }
-    },
-    "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "d64c2d36607172aac5ac0e038bb8128b75fa4c28d7b301d84d66baa16e9ed83d",
-      "after_sha256": "48f40f8c0c571a5dff70869da12c0e074e6a7b973ab495eb9ca9d1e53d853f49",
-      "owners": {
-        "@document": {
-          "before": "d64c2d36607172aac5ac0e038bb8128b75fa4c28d7b301d84d66baa16e9ed83d",
-          "after": "48f40f8c0c571a5dff70869da12c0e074e6a7b973ab495eb9ca9d1e53d853f49"
-        }
-      }
-    },
-    "contracts/examples/support-profile.json": {
-      "before_sha256": "077ae7872fef38e76dd2280f2452908544874f74b16f196e094563aeb1754718",
-      "after_sha256": "8e893cb89a977ff1cc1d2d23916523af1ae621d341ba99c34bc73297cd0300d4",
-      "owners": {
-        "@document": {
-          "before": "077ae7872fef38e76dd2280f2452908544874f74b16f196e094563aeb1754718",
-          "after": "8e893cb89a977ff1cc1d2d23916523af1ae621d341ba99c34bc73297cd0300d4"
-        }
-      }
-    },
-    "contracts/manifest.json": {
-      "before_sha256": "cd920bb67be927ff7dd931c71e954e1cf48a4e8c736011e789ca15f7248c7173",
-      "after_sha256": "2e908adf27f60cd03db48252ad2263a2eea86690def389659302ee6d23739726",
-      "owners": {
-        "@document": {
-          "before": "cd920bb67be927ff7dd931c71e954e1cf48a4e8c736011e789ca15f7248c7173",
-          "after": "2e908adf27f60cd03db48252ad2263a2eea86690def389659302ee6d23739726"
-        }
-      }
-    },
-    "data/source_audits/ci64_provenance_v1/oval-oval-gap-test-transition-v1.json": {
+    "data/source_audits/ci64_provenance_v1/oval-oval-witness-test-addition-v1.json": {
       "before_sha256": null,
-      "after_sha256": "1a454ad230db5f586d952b1b362038a6ef36ced48e13434e9871ee97c75eed10",
+      "after_sha256": "b55763903095916ca0082e36ce7a24ac2515a4a0e53516dbd86028af5687aa0d",
       "owners": {
         "@document": {
           "before": null,
-          "after": "1a454ad230db5f586d952b1b362038a6ef36ced48e13434e9871ee97c75eed10"
+          "after": "b55763903095916ca0082e36ce7a24ac2515a4a0e53516dbd86028af5687aa0d"
         }
       }
     },
     "docs/DISTANCE_PRECISION.md": {
-      "before_sha256": "2326ab62ac83a4ae90773de97e8aa6152c3868eee1f47f038b7a826f8c783c4d",
-      "after_sha256": "2443890ea86fd0b7b82336814cebef62ac3a6d39ad8d4f4e7827441031a62908",
+      "before_sha256": "2443890ea86fd0b7b82336814cebef62ac3a6d39ad8d4f4e7827441031a62908",
+      "after_sha256": "9abe192d7562d02c0b0e2436a3802426ba4292d6fa0fdbac7aa7ed327749a2da",
       "owners": {
         "@document": {
-          "before": "2326ab62ac83a4ae90773de97e8aa6152c3868eee1f47f038b7a826f8c783c4d",
-          "after": "2443890ea86fd0b7b82336814cebef62ac3a6d39ad8d4f4e7827441031a62908"
-        }
-      }
-    },
-    "docs/performance/current/oval-oval-gap-movement.json": {
-      "before_sha256": null,
-      "after_sha256": "88f6a7614db239d79f09685bf6119df77192f3ab5e19e3e3fafaa875df45ed92",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "88f6a7614db239d79f09685bf6119df77192f3ab5e19e3e3fafaa875df45ed92"
-        }
-      }
-    },
-    "docs/performance/current/oval-oval-gap-setup.json": {
-      "before_sha256": null,
-      "after_sha256": "1430980e476939d89f0c4193a113b66a2aa7de970e955777a0a68dbda65bb738",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "1430980e476939d89f0c4193a113b66a2aa7de970e955777a0a68dbda65bb738"
-        }
-      }
-    },
-    "docs/performance/current/oval-oval-gap-visibility.json": {
-      "before_sha256": null,
-      "after_sha256": "a74b57c580d2186fff304f1a2e7773b9597b8f1642db3b805f73f4df5fcb3085",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "a74b57c580d2186fff304f1a2e7773b9597b8f1642db3b805f73f4df5fcb3085"
+          "before": "2443890ea86fd0b7b82336814cebef62ac3a6d39ad8d4f4e7827441031a62908",
+          "after": "9abe192d7562d02c0b0e2436a3802426ba4292d6fa0fdbac7aa7ed327749a2da"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "753eb3727c1ebac1014c1747709b4cec00a046adb28c7aa691814e7c91b19756",
-      "after_sha256": "c4f7a41fe1ff4f3a92e358d2ee3af49c421f168ec23947e770b80b9e901ffce5",
+      "before_sha256": "c4f7a41fe1ff4f3a92e358d2ee3af49c421f168ec23947e770b80b9e901ffce5",
+      "after_sha256": "c6993a15eb0a6bcd737965761d8e8269015930d8c15c9f5fc1790f373a5e909e",
       "owners": {
         "@document": {
-          "before": "753eb3727c1ebac1014c1747709b4cec00a046adb28c7aa691814e7c91b19756",
-          "after": "c4f7a41fe1ff4f3a92e358d2ee3af49c421f168ec23947e770b80b9e901ffce5"
+          "before": "c4f7a41fe1ff4f3a92e358d2ee3af49c421f168ec23947e770b80b9e901ffce5",
+          "after": "c6993a15eb0a6bcd737965761d8e8269015930d8c15c9f5fc1790f373a5e909e"
         }
       }
     },
     "scripts/engine_numerical_identity_test_admission.py": {
-      "before_sha256": "db1ce9b26d9a298f8fda4f775d38a800babd8968c7cf36ff3d2aec14782e740c",
-      "after_sha256": "306fc036a66f0ac84057d584227da0924dce56dc3a7be6811f9992a4bc9286ae",
+      "before_sha256": "306fc036a66f0ac84057d584227da0924dce56dc3a7be6811f9992a4bc9286ae",
+      "after_sha256": "58b720db746b3c8dfa33186b090a5ee4e17c95999113042a0327bb50005520de",
       "owners": {
         "@module": {
-          "before": "2e2204ee35bde62862f465e9c3a046e3eb3f05a55c5927adcaa1123382dcff9e",
-          "after": "3f4798faf234b0bf8d008accaaa7cf83b4ee0a6a40edfcc66659f310c7a0b007"
+          "before": "3f4798faf234b0bf8d008accaaa7cf83b4ee0a6a40edfcc66659f310c7a0b007",
+          "after": "3c50c8ae25205d70149da49edc12223ec80f6af23c639739e9d2ff298cf42f76"
         },
         "exact_movement_test_transition": {
-          "before": "3099794c7c30d5f35f23d4e960f4e0e175706aaf346772a0ebb5c9464b727a89",
-          "after": "4ded5d56214f2cfc636328660e81817d4732c69bfa80e68d423316febbb2e528"
-        }
-      }
-    },
-    "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "e7cf280b1edb6207530a297474e2b212c0a8a7d016f77195557eeda8e71c9e62",
-      "after_sha256": "755a4473de9a6d432d4eeb0e4274baec1ffdde1345106852517307c8fc4fc09a",
-      "owners": {
-        "@document": {
-          "before": "e7cf280b1edb6207530a297474e2b212c0a8a7d016f77195557eeda8e71c9e62",
-          "after": "755a4473de9a6d432d4eeb0e4274baec1ffdde1345106852517307c8fc4fc09a"
-        }
-      }
-    },
-    "src/warhammer40k_core/geometry/milli_inch_oval_oval_distance.py": {
-      "before_sha256": null,
-      "after_sha256": "600189bb38f74d213ffa5a1a0202810f5822e4748d63d8d427935c4b0d6ab4f7",
-      "owners": {
-        "@module": {
-          "before": null,
-          "after": "7368b7a7e2561777647ef2e66597fb8f47095b18d069c6d3fa0af01dcc61d0ea"
-        },
-        "_add": {
-          "before": null,
-          "after": "eab0e332075fed9756a8d1c10d68592fbd9dc4477481d681fcecd8e604dd5031"
-        },
-        "_cauchy_index": {
-          "before": null,
-          "after": "b0aa52791b8abee701f6907bdb4caf2e0e7e520322e5ceecbba9f67aba956adb"
-        },
-        "_gap_at_least": {
-          "before": null,
-          "after": "a0b143a4277e3661c54edee568bd0f19f075601cc82198657b4df0bf5d113843"
-        },
-        "_multiply": {
-          "before": null,
-          "after": "378874c0a16e3716069af71cef524f2d4226e1b1b8b94c3bfdf6122ca7021d49"
-        },
-        "_remainder": {
-          "before": null,
-          "after": "25c10ed9a9f6c698e2360161e34f24f5e59ba235001aa6fa8e6ae2e0e785a3bc"
-        },
-        "_scale": {
-          "before": null,
-          "after": "6ed6db3e839395fced53758387c04154ae8dd928884d4727ed874cda78430b9f"
-        },
-        "_support_squared": {
-          "before": null,
-          "after": "4c8e9f529a7aace9b7acddf4e59bb942b9a85e6d32a158737ae1967691ea9996"
-        },
-        "_trim": {
-          "before": null,
-          "after": "66075fb1f936113ff6d476eb084710ac4b261345c476ac7e1a676e9981c824b9"
-        },
-        "oval_oval_distance_ticks": {
-          "before": null,
-          "after": "3e4d4fd322ae60a5f52d8db5ded0b786d6341448f17703e77c167f3e449ca214"
+          "before": "4ded5d56214f2cfc636328660e81817d4732c69bfa80e68d423316febbb2e528",
+          "after": "bd8dcd2a3633439b65e37e2a6042bddd14b0d2c62dfdad2abd4fb9043ef666af"
         }
       }
     },
     "tests/code_quality/test_engine_numerical_identity_admission.py": {
-      "before_sha256": "f802cff33c7627ba9bdbbcb9a470d9a96e961bba240b4144af1c52d911b23517",
-      "after_sha256": "ea42f9981f4a676b7eac55ffbbfa72f98ab9b617962d7a7b42feefefc123bad8",
+      "before_sha256": "ea42f9981f4a676b7eac55ffbbfa72f98ab9b617962d7a7b42feefefc123bad8",
+      "after_sha256": "c3f23ac1a4cd4b87d696741e4faf49291a2e905b72c46b1a7b0efb4b05842656",
       "owners": {
         "test_identity_inventory_uses_current_twelve_shards_and_native_cohort": {
-          "before": "be3f3d958ac1afdce21888a4cc4d13ac2246aff18440080fa8e20b0ce4c3a153",
-          "after": "89d1865af298af5e12992f369095237245b55f388be63ac3c953e57efbd32a53"
+          "before": "89d1865af298af5e12992f369095237245b55f388be63ac3c953e57efbd32a53",
+          "after": "02bf58ab4500c505114d2d6c49895c45b58eca5676991bcd0386c3d80e2262dc"
         }
       }
     },
-    "tests/rules/section01/test_milli_inch_oval_oval_distance.py": {
+    "tests/rules/section01/test_milli_inch_oval_oval_witnesses.py": {
       "before_sha256": null,
-      "after_sha256": "9dd647a35dde63af51ca2b37e453193241ce24fd10507a1b5e6260fb9bda752f",
+      "after_sha256": "e250b5ffb30db779fbb95acd4b2c3da96a7bb7e3bb1815bf79cb6d890e9ed8fc",
       "owners": {
         "@module": {
           "before": null,
-          "after": "900a42d307cdfd1e6c17fb66833b05a47b8c921e87190371abea906f57992a2b"
+          "after": "7e5eb64b44fd1b0a405263656b328b906122f12727132a5c6cdf6f6481f2f9a9"
         },
-        "test_oval_pair_accepts_extreme_coordinate_differences": {
+        "_assert_oval_pair": {
           "before": null,
-          "after": "4ea05535228f27a231a0cd26339f7ee07a3c7f5eab6a9510135191ca802a4f0e"
+          "after": "b6999b854eb3939245f429eb95074e76e7faf91c3a0a3741ab5e3aca253a95d0"
         },
-        "test_oval_pair_distance_rejects_noncanonical_operands": {
+        "_ellipse_level": {
           "before": null,
-          "after": "3b973a98a8e941b96fe4d8f4bd7916b758856d63d49d3e294ae0709b69941810"
+          "after": "c31ca20061e83becb930bfa725e87ed9f4d7646fd56603b12fa7d1f92c092e18"
         },
-        "test_oval_pair_measures_gap_for_every_facing_pair": {
+        "_prove_gap_bin": {
           "before": null,
-          "after": "47801043d81afbfa8e781435b7fb2f58564ff024291c1d7970a3d2e2bb9a0f2d"
+          "after": "4e7dac8a1005c2b8f78bbf0a1958f326146e45fc5e407c9caac642b3c1b58287"
         },
-        "test_oval_pair_resolves_a_pell_offset_from_half_a_tick": {
+        "_quarter_turn": {
           "before": null,
-          "after": "ce2b2a08a0d729efdbe108a8992867621f29236d03b62e061c144dbd90821846"
+          "after": "b3742ae0f87ab238ebc1391901556ad6de21106552333a1d456b9b8c1a998c60"
         },
-        "test_oval_pair_resolves_near_contact_at_large_coordinates": {
+        "test_symbolic_oval_pair_rounds_across_off_axis_midpoint": {
           "before": null,
-          "after": "42793334b977e20c22be1304192d17eece368c16197d0ec01b3fef721d77ff70"
+          "after": "ff4b1336d79caf8dc79efb5fddda093931b023f7889cf5763e410b78a8e88936"
         },
-        "test_oval_pair_rounds_off_axis_gap_at_mixed_facings": {
+        "test_symbolic_oval_pair_topology": {
           "before": null,
-          "after": "38182ede0c89b490bc85e6e57108e8fa4f820dc4194e296a502c60307d9853e9"
-        },
-        "test_oval_pair_shared_interior": {
-          "before": null,
-          "after": "2cfc959e71e1ff42c393343323b5b2a51dacb5e0356516fdd804098550fb078b"
+          "after": "d7d7b356cfe3783f05e69456e716586ca22b342dd1e9d904d0c6d81ec9d892fd"
         }
       }
     }
@@ -400,9 +230,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit the new oval-pair gap tests into the complete measured behavioral workload.",
-      "source_obligation": "Generate the twelve shard manifests from the fresh covered JUnit profile.",
-      "unchanged_work": "Preserve all earlier cases, branch measurement, the 67% floor and timing limits."
+      "rationale": "Balance the current behavioral workload including seven exact oval witness cases.",
+      "source_obligation": "Regenerate all twelve shards from the complete covered JUnit reports.",
+      "unchanged_work": "Preserve prior behavioral cases, full-package branch coverage, and timing limits."
     },
     "ci/test_shards/shard-1.txt": {
       "category": "rule_semantics",
@@ -410,9 +240,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit the new oval-pair gap tests into the complete measured behavioral workload.",
-      "source_obligation": "Generate the twelve shard manifests from the fresh covered JUnit profile.",
-      "unchanged_work": "Preserve all earlier cases, branch measurement, the 67% floor and timing limits."
+      "rationale": "Balance the current behavioral workload including seven exact oval witness cases.",
+      "source_obligation": "Regenerate all twelve shards from the complete covered JUnit reports.",
+      "unchanged_work": "Preserve prior behavioral cases, full-package branch coverage, and timing limits."
     },
     "ci/test_shards/shard-10.txt": {
       "category": "rule_semantics",
@@ -420,9 +250,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit the new oval-pair gap tests into the complete measured behavioral workload.",
-      "source_obligation": "Generate the twelve shard manifests from the fresh covered JUnit profile.",
-      "unchanged_work": "Preserve all earlier cases, branch measurement, the 67% floor and timing limits."
+      "rationale": "Balance the current behavioral workload including seven exact oval witness cases.",
+      "source_obligation": "Regenerate all twelve shards from the complete covered JUnit reports.",
+      "unchanged_work": "Preserve prior behavioral cases, full-package branch coverage, and timing limits."
     },
     "ci/test_shards/shard-11.txt": {
       "category": "rule_semantics",
@@ -430,9 +260,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit the new oval-pair gap tests into the complete measured behavioral workload.",
-      "source_obligation": "Generate the twelve shard manifests from the fresh covered JUnit profile.",
-      "unchanged_work": "Preserve all earlier cases, branch measurement, the 67% floor and timing limits."
+      "rationale": "Balance the current behavioral workload including seven exact oval witness cases.",
+      "source_obligation": "Regenerate all twelve shards from the complete covered JUnit reports.",
+      "unchanged_work": "Preserve prior behavioral cases, full-package branch coverage, and timing limits."
     },
     "ci/test_shards/shard-12.txt": {
       "category": "rule_semantics",
@@ -440,9 +270,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit the new oval-pair gap tests into the complete measured behavioral workload.",
-      "source_obligation": "Generate the twelve shard manifests from the fresh covered JUnit profile.",
-      "unchanged_work": "Preserve all earlier cases, branch measurement, the 67% floor and timing limits."
+      "rationale": "Balance the current behavioral workload including seven exact oval witness cases.",
+      "source_obligation": "Regenerate all twelve shards from the complete covered JUnit reports.",
+      "unchanged_work": "Preserve prior behavioral cases, full-package branch coverage, and timing limits."
     },
     "ci/test_shards/shard-2.txt": {
       "category": "rule_semantics",
@@ -450,9 +280,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit the new oval-pair gap tests into the complete measured behavioral workload.",
-      "source_obligation": "Generate the twelve shard manifests from the fresh covered JUnit profile.",
-      "unchanged_work": "Preserve all earlier cases, branch measurement, the 67% floor and timing limits."
+      "rationale": "Balance the current behavioral workload including seven exact oval witness cases.",
+      "source_obligation": "Regenerate all twelve shards from the complete covered JUnit reports.",
+      "unchanged_work": "Preserve prior behavioral cases, full-package branch coverage, and timing limits."
     },
     "ci/test_shards/shard-3.txt": {
       "category": "rule_semantics",
@@ -460,9 +290,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit the new oval-pair gap tests into the complete measured behavioral workload.",
-      "source_obligation": "Generate the twelve shard manifests from the fresh covered JUnit profile.",
-      "unchanged_work": "Preserve all earlier cases, branch measurement, the 67% floor and timing limits."
+      "rationale": "Balance the current behavioral workload including seven exact oval witness cases.",
+      "source_obligation": "Regenerate all twelve shards from the complete covered JUnit reports.",
+      "unchanged_work": "Preserve prior behavioral cases, full-package branch coverage, and timing limits."
     },
     "ci/test_shards/shard-4.txt": {
       "category": "rule_semantics",
@@ -470,9 +300,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit the new oval-pair gap tests into the complete measured behavioral workload.",
-      "source_obligation": "Generate the twelve shard manifests from the fresh covered JUnit profile.",
-      "unchanged_work": "Preserve all earlier cases, branch measurement, the 67% floor and timing limits."
+      "rationale": "Balance the current behavioral workload including seven exact oval witness cases.",
+      "source_obligation": "Regenerate all twelve shards from the complete covered JUnit reports.",
+      "unchanged_work": "Preserve prior behavioral cases, full-package branch coverage, and timing limits."
     },
     "ci/test_shards/shard-5.txt": {
       "category": "rule_semantics",
@@ -480,9 +310,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit the new oval-pair gap tests into the complete measured behavioral workload.",
-      "source_obligation": "Generate the twelve shard manifests from the fresh covered JUnit profile.",
-      "unchanged_work": "Preserve all earlier cases, branch measurement, the 67% floor and timing limits."
+      "rationale": "Balance the current behavioral workload including seven exact oval witness cases.",
+      "source_obligation": "Regenerate all twelve shards from the complete covered JUnit reports.",
+      "unchanged_work": "Preserve prior behavioral cases, full-package branch coverage, and timing limits."
     },
     "ci/test_shards/shard-6.txt": {
       "category": "rule_semantics",
@@ -490,9 +320,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit the new oval-pair gap tests into the complete measured behavioral workload.",
-      "source_obligation": "Generate the twelve shard manifests from the fresh covered JUnit profile.",
-      "unchanged_work": "Preserve all earlier cases, branch measurement, the 67% floor and timing limits."
+      "rationale": "Balance the current behavioral workload including seven exact oval witness cases.",
+      "source_obligation": "Regenerate all twelve shards from the complete covered JUnit reports.",
+      "unchanged_work": "Preserve prior behavioral cases, full-package branch coverage, and timing limits."
     },
     "ci/test_shards/shard-7.txt": {
       "category": "rule_semantics",
@@ -500,9 +330,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit the new oval-pair gap tests into the complete measured behavioral workload.",
-      "source_obligation": "Generate the twelve shard manifests from the fresh covered JUnit profile.",
-      "unchanged_work": "Preserve all earlier cases, branch measurement, the 67% floor and timing limits."
+      "rationale": "Balance the current behavioral workload including seven exact oval witness cases.",
+      "source_obligation": "Regenerate all twelve shards from the complete covered JUnit reports.",
+      "unchanged_work": "Preserve prior behavioral cases, full-package branch coverage, and timing limits."
     },
     "ci/test_shards/shard-8.txt": {
       "category": "rule_semantics",
@@ -510,9 +340,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit the new oval-pair gap tests into the complete measured behavioral workload.",
-      "source_obligation": "Generate the twelve shard manifests from the fresh covered JUnit profile.",
-      "unchanged_work": "Preserve all earlier cases, branch measurement, the 67% floor and timing limits."
+      "rationale": "Balance the current behavioral workload including seven exact oval witness cases.",
+      "source_obligation": "Regenerate all twelve shards from the complete covered JUnit reports.",
+      "unchanged_work": "Preserve prior behavioral cases, full-package branch coverage, and timing limits."
     },
     "ci/test_shards/shard-9.txt": {
       "category": "rule_semantics",
@@ -520,139 +350,35 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit the new oval-pair gap tests into the complete measured behavioral workload.",
-      "source_obligation": "Generate the twelve shard manifests from the fresh covered JUnit profile.",
-      "unchanged_work": "Preserve all earlier cases, branch measurement, the 67% floor and timing limits."
+      "rationale": "Balance the current behavioral workload including seven exact oval witness cases.",
+      "source_obligation": "Regenerate all twelve shards from the complete covered JUnit reports.",
+      "unchanged_work": "Preserve prior behavioral cases, full-package branch coverage, and timing limits."
     },
-    "contracts/examples/persistence/session-persistence.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerate the current build identity and dependent synthetic contract examples.",
-      "source_obligation": "Advertise the actual runtime build in the current synthetic release fixtures.",
-      "unchanged_work": "Historical executors, schemas, checkpoints and gameplay policy retain their original semantics."
-    },
-    "contracts/examples/sessions/session-command-outcome.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerate the current build identity and dependent synthetic contract examples.",
-      "source_obligation": "Advertise the actual runtime build in the current synthetic release fixtures.",
-      "unchanged_work": "Historical executors, schemas, checkpoints and gameplay policy retain their original semantics."
-    },
-    "contracts/examples/sessions/session-command-started.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerate the current build identity and dependent synthetic contract examples.",
-      "source_obligation": "Advertise the actual runtime build in the current synthetic release fixtures.",
-      "unchanged_work": "Historical executors, schemas, checkpoints and gameplay policy retain their original semantics."
-    },
-    "contracts/examples/sessions/session-metadata-created.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerate the current build identity and dependent synthetic contract examples.",
-      "source_obligation": "Advertise the actual runtime build in the current synthetic release fixtures.",
-      "unchanged_work": "Historical executors, schemas, checkpoints and gameplay policy retain their original semantics."
-    },
-    "contracts/examples/support-profile-player-a-redacted.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerate the current build identity and dependent synthetic contract examples.",
-      "source_obligation": "Advertise the actual runtime build in the current synthetic release fixtures.",
-      "unchanged_work": "Historical executors, schemas, checkpoints and gameplay policy retain their original semantics."
-    },
-    "contracts/examples/support-profile-player-b-redacted.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerate the current build identity and dependent synthetic contract examples.",
-      "source_obligation": "Advertise the actual runtime build in the current synthetic release fixtures.",
-      "unchanged_work": "Historical executors, schemas, checkpoints and gameplay policy retain their original semantics."
-    },
-    "contracts/examples/support-profile.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerate the current build identity and dependent synthetic contract examples.",
-      "source_obligation": "Advertise the actual runtime build in the current synthetic release fixtures.",
-      "unchanged_work": "Historical executors, schemas, checkpoints and gameplay policy retain their original semantics."
-    },
-    "contracts/manifest.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerate the current build identity and dependent synthetic contract examples.",
-      "source_obligation": "Advertise the actual runtime build in the current synthetic release fixtures.",
-      "unchanged_work": "Historical executors, schemas, checkpoints and gameplay policy retain their original semantics."
-    },
-    "data/source_audits/ci64_provenance_v1/oval-oval-gap-test-transition-v1.json": {
+    "data/source_audits/ci64_provenance_v1/oval-oval-witness-test-addition-v1.json": {
       "category": "rule_semantics",
       "operations": [
         "exact-movement-test-admission"
       ],
       "selected_families": [],
-      "rationale": "Admit the focused distance tests and authenticate the added geometry source.",
-      "source_obligation": "Bind the new tests and helper to the successor runtime and predecessor admission.",
-      "unchanged_work": "Preserve previous geometry regressions and the complete behavioral selection."
+      "rationale": "Certify finite off-axis oval contact and rounded gap cases independently.",
+      "source_obligation": "Check real-arithmetic topology and rational bounds for the declared witnesses.",
+      "unchanged_work": "The witnesses run only during tests and leave runtime workloads unchanged."
     },
     "docs/DISTANCE_PRECISION.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Document the staged oval-pair gap and its required current evidence.",
-      "source_obligation": "Specify the exact supported facing domain and guarded half-tick comparison.",
-      "unchanged_work": "The existing comparison workloads and historical evidence are preserved."
-    },
-    "docs/performance/current/oval-oval-gap-movement.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Document the staged oval-pair gap and its required current evidence.",
-      "source_obligation": "Specify the exact supported facing domain and guarded half-tick comparison.",
-      "unchanged_work": "The existing comparison workloads and historical evidence are preserved."
-    },
-    "docs/performance/current/oval-oval-gap-setup.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Document the staged oval-pair gap and its required current evidence.",
-      "source_obligation": "Specify the exact supported facing domain and guarded half-tick comparison.",
-      "unchanged_work": "The existing comparison workloads and historical evidence are preserved."
-    },
-    "docs/performance/current/oval-oval-gap-visibility.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Document the staged oval-pair gap and its required current evidence.",
-      "source_obligation": "Specify the exact supported facing domain and guarded half-tick comparison.",
-      "unchanged_work": "The existing comparison workloads and historical evidence are preserved."
+      "rationale": "Record the witness method, its limits, and the required test operation ownership.",
+      "source_obligation": "Describe the exact certificates and map their test-only admission inputs.",
+      "unchanged_work": "The existing runtime comparison workloads and historical evidence are preserved."
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Document the staged oval-pair gap and its required current evidence.",
-      "source_obligation": "Specify the exact supported facing domain and guarded half-tick comparison.",
-      "unchanged_work": "The existing comparison workloads and historical evidence are preserved."
+      "rationale": "Record the witness method, its limits, and the required test operation ownership.",
+      "source_obligation": "Describe the exact certificates and map their test-only admission inputs.",
+      "unchanged_work": "The existing runtime comparison workloads and historical evidence are preserved."
     },
     "scripts/engine_numerical_identity_test_admission.py": {
       "category": "rule_semantics",
@@ -660,33 +386,9 @@
         "engine-numerical-identity-admission"
       ],
       "selected_families": [],
-      "rationale": "Record the finite oval-pair distance successor in the selected source and case inventory.",
-      "source_obligation": "Verify the predecessor digest and new helper and test bytes before admission.",
-      "unchanged_work": "Previous admission records and tests retain their bytes and selection."
-    },
-    "src/warhammer40k_core/_engine_build_manifest.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "source-record"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerate the current build identity and dependent synthetic contract examples.",
-      "source_obligation": "Advertise the actual runtime build in the current synthetic release fixtures.",
-      "unchanged_work": "Historical executors, schemas, checkpoints and gameplay policy retain their original semantics."
-    },
-    "src/warhammer40k_core/geometry/milli_inch_oval_oval_distance.py": {
-      "category": "algorithm_or_search",
-      "operations": [
-        "geometry-search"
-      ],
-      "selected_families": [
-        "movement",
-        "setup",
-        "visibility"
-      ],
-      "rationale": "Compute the once-rounded Euclidean gap for two filled canonical ovals.",
-      "source_obligation": "Certify each half-tick midpoint with guarded integer polynomial sign queries.",
-      "unchanged_work": "The query is staged and no existing gameplay or geometry caller uses it."
+      "rationale": "Admit the witness test module as a finite successor to the oval gap cases.",
+      "source_obligation": "Bind the exact witness bytes, predecessor digest, and same runtime fingerprint.",
+      "unchanged_work": "Preserve every prior test admission and the current engine build identity."
     },
     "tests/code_quality/test_engine_numerical_identity_admission.py": {
       "category": "rule_semantics",
@@ -694,26 +396,22 @@
         "engine-numerical-identity-admission"
       ],
       "selected_families": [],
-      "rationale": "Record the finite oval-pair distance successor in the selected source and case inventory.",
-      "source_obligation": "Verify the predecessor digest and new helper and test bytes before admission.",
-      "unchanged_work": "Previous admission records and tests retain their bytes and selection."
+      "rationale": "Admit the witness test module as a finite successor to the oval gap cases.",
+      "source_obligation": "Bind the exact witness bytes, predecessor digest, and same runtime fingerprint.",
+      "unchanged_work": "Preserve every prior test admission and the current engine build identity."
     },
-    "tests/rules/section01/test_milli_inch_oval_oval_distance.py": {
+    "tests/rules/section01/test_milli_inch_oval_oval_witnesses.py": {
       "category": "rule_semantics",
       "operations": [
         "exact-movement-test-admission"
       ],
       "selected_families": [],
-      "rationale": "Admit the focused distance tests and authenticate the added geometry source.",
-      "source_obligation": "Bind the new tests and helper to the successor runtime and predecessor admission.",
-      "unchanged_work": "Preserve previous geometry regressions and the complete behavioral selection."
+      "rationale": "Certify finite off-axis oval contact and rounded gap cases independently.",
+      "source_obligation": "Check real-arithmetic topology and rational bounds for the declared witnesses.",
+      "unchanged_work": "The witnesses run only during tests and leave runtime workloads unchanged."
     }
   },
   "milestone": "ordinary",
-  "comparisons": {
-    "movement": "docs/performance/current/oval-oval-gap-movement.json",
-    "setup": "docs/performance/current/oval-oval-gap-setup.json",
-    "visibility": "docs/performance/current/oval-oval-gap-visibility.json"
-  },
+  "comparisons": {},
   "full_game": null
 }
