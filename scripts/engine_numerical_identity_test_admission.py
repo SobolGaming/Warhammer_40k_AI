@@ -62,6 +62,13 @@ _EXACT_MOVEMENT_SOURCES = (
     "src/warhammer40k_core/geometry/exact_path.py",
     "src/warhammer40k_core/geometry/exact_pose.py",
 )
+CIRCLE_POLYGON_ADDITION = (
+    "data/source_audits/ci64_provenance_v1/circle-polygon-test-addition-v1.json"
+)
+CIRCLE_POLYGON_SHA256 = "617f67340b0d7e5cd8f1d2786faa193a96bbc7f2fa18f3b8b7988bc263458a91"
+CIRCLE_POLYGON_OWNER = "tests/rules/section01/test_milli_inch_circle_polygon.py"
+_CIRCLE_POLYGON_SOURCE = "src/warhammer40k_core/geometry/milli_inch_circle_polygon.py"
+
 
 type TestTransition = tuple[dict[str, dict[str, object]], dict[str, dict[str, object]], bytes]
 
@@ -90,7 +97,11 @@ def exact_movement_test_transition(
     paths = (EXACT_MOVEMENT_ADDITION, EXACT_MOVEMENT_OWNER, *_EXACT_MOVEMENT_SOURCES)
     for path in paths:
         _selection_no_links(root, root / path)
-    if not any((root / path).exists() for path in paths):
+    successor_paths = (CIRCLE_POLYGON_ADDITION, CIRCLE_POLYGON_OWNER, _CIRCLE_POLYGON_SOURCE)
+    for path in successor_paths:
+        _selection_no_links(root, root / path)
+    has_circle_polygon = any((root / path).exists() for path in successor_paths)
+    if not has_circle_polygon and not any((root / path).exists() for path in paths):
         return None
     raw = _checked_bytes(root, EXACT_MOVEMENT_ADDITION, EXACT_MOVEMENT_SHA256)
     record = json.loads(raw, object_pairs_hook=_selection_object)
@@ -105,15 +116,27 @@ def exact_movement_test_transition(
         raise SystemExit("Exact movement test transition membership differs.")
     for name, digest in record["sources"].items():
         _checked_bytes(root, name, digest)
-    retained = _identity_test_transition(
-        root, retained_cutover_sha256, runtime=record["runtime_fingerprint"]
-    )
+    runtime = record["runtime_fingerprint"]
+    additions = _selection_members(record["added_files"], root)
+    if has_circle_polygon:
+        next_raw = _checked_bytes(root, CIRCLE_POLYGON_ADDITION, CIRCLE_POLYGON_SHA256)
+        successor = json.loads(next_raw, object_pairs_hook=_selection_object)
+        if (
+            successor.keys() != {"schema", "runtime_fingerprint", "source_sha256", "added_files"}
+            or successor["schema"] != "finite-circle-polygon-test-addition-v1"
+            or set(successor["added_files"]) != {CIRCLE_POLYGON_OWNER}
+        ):
+            raise SystemExit("Circle-polygon test addition membership differs.")
+        _checked_bytes(root, _CIRCLE_POLYGON_SOURCE, successor["source_sha256"])
+        additions.update(_selection_members(successor["added_files"], root))
+        runtime = successor["runtime_fingerprint"]
+        raw += b"\0" + next_raw
+    retained = _identity_test_transition(root, retained_cutover_sha256, runtime=runtime)
     if retained is None:
         raise SystemExit(
             "Exact movement test transition requires the numerical identity predecessor."
         )
     updated, added, retained_raw = retained
-    additions = _selection_members(record["added_files"], root)
     if additions.keys() & (updated.keys() | added.keys()):
         raise SystemExit("Exact movement test cases overlap the predecessor selection.")
     return updated, {**added, **additions}, retained_raw + b"\0" + raw

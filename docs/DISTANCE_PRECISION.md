@@ -228,6 +228,22 @@ agreement, inner policy/replay identity, caches and coordinated rules still bloc
 activation. Original source producers, payloads and historical evidence remain
 unchanged. Linux remains authoritative; native OS equivalence is not established.
 
+## Staged canonical circle–polygon queries
+
+`geometry.milli_inch_circle_polygon` classifies a canonical disk and filled simple
+ring as separated, in boundary-only contact or overlapping in their interiors.
+It measures the exact squared distance from the disk's center to the filled ring
+and compares it with the exact squared radius. A center inside or on the ring has
+zero distance, so any positive-radius disk there overlaps the interior. Exterior
+centers use the closest point on any closed edge, including off-grid projections,
+vertices and edges of concave rings.
+
+The gap subtracts the diameter-derived radius before rounding once. The squared
+midpoint comparison handles odd diameters, irrational distances and half-tick ties.
+A separated pair can have a rounded gap of zero. These staged queries complete
+the canonical circle–polygon pair in checklist item 1. Oval and rotated shapes,
+and backend and solver agreement, remain part of that item.
+
 ## Selected exact-coordinate contact slice
 
 The next representation contract is `rational-quadratic-coordinate-v1`, implemented
