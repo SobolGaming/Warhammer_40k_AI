@@ -347,8 +347,56 @@ distance bounds the gap, giving at most 65 midpoint iterations. Exact half
 ticks round up and a separated pair can round to zero.
 
 This completes the staged canonical circle–oval pair in checklist item 1.
-Oval–oval queries, arbitrary oval facings, backend agreement, serialization and
-gameplay activation remain follow-up work.
+
+## Staged canonical oval–oval topology
+
+`geometry.milli_inch_oval_oval.oval_oval_relation` classifies two filled
+`CanonicalOval` values as separated, in boundary-only external contact, or
+sharing interior. Each oval independently selects one of the four canonical
+facings. The integer ellipse coefficients preserve unequal and odd full axes,
+signed 64-bit centers and the exact 45-degree rotations. Containment, internal
+tangency and coincidence all share interior.
+
+Write the first ellipse residual as `q₁(x) = xᵀ A x - a` and the second as
+`q₂(x) = (x-d)ᵀ B (x-d) - b`, with center offset `d`, positive definite
+quadratic matrices `A, B` and positive bounds `a, b`. Each filled oval is
+the set where its residual is nonpositive. For `t > 0`, the spatial part
+`A + tB` is positive definite. Completing the square shows that the sign
+of the minimum of `q₁ + t q₂` equals the sign of its homogeneous conic
+determinant. Its expansion is
+`-(a + t b) det(A + t B) + t det(A) dᵀ B d + t² det(B) dᵀ A d`.
+The displacement terms follow from
+`B adj(A + t B) A = det(A) B + t det(B) A` for these two-dimensional matrices.
+
+A point in both interiors makes every weighted minimum negative. Otherwise,
+the convex function `max(q₁, q₂)` attains a minimum of zero for external
+contact and a positive minimum for separation. Both residuals must be active
+at the minimizer. If only one were active, it would have zero gradient there
+and take its negative center value. The convex hull of the two active gradients
+contains zero, and neither gradient vanishes at a nonnegative residual.
+Thus positive weights make the same point minimize their weighted sum. For
+external contact every weighted minimum is at most zero by evaluating at the
+contact point. For separation there is a strictly positive weighted minimum.
+
+The implementation negates the determinant. The resulting cubic has positive
+leading and constant coefficients, so it is positive at zero and at positive
+infinity. Separation makes it negative somewhere on that half-line, yielding
+two distinct positive roots. External contact gives a positive double root
+without a sign change. Shared interior gives no positive root. The two end
+coefficients stay strictly positive for the whole input domain, excluding
+degree loss and zero roots. If both middle coefficients are nonnegative,
+there is no positive root. Otherwise, three real roots counted with
+multiplicity must consist of one negative and two positive roots. The product
+is negative and three negative roots would give all positive coefficients.
+A positive discriminant gives two distinct positive roots and a zero
+discriminant gives the positive double root. A negative discriminant leaves
+only the negative real root. Repeated negative roots, including the triple
+root at coincidence, therefore classify as shared interior. This is a fixed
+sequence of integer arithmetic and comparisons without root approximation.
+
+This stages the oval–oval topology portion of checklist item 1. The
+once-rounded oval–oval surface gap, arbitrary oval facings, backend agreement,
+serialization and gameplay activation remain follow-up work.
 
 ## Selected exact-coordinate contact slice
 
