@@ -36417,6 +36417,18 @@
       "sensitive": false,
       "mandatory": true
     },
+    "gameplay-movement-budget-facade-tests": {
+      "paths": [
+        "tests/rules/section03/test_facade.py"
+      ],
+      "owners": [
+        "_add_spare_mover",
+        "test_normal_move_facade_budgets_once_rounded_complete_paths"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
     "gameplay-movement-budget-contract": {
       "paths": [
         "contracts/compatibility/48.0.0-shape.json"
