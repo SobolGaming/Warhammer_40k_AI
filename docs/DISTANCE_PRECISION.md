@@ -445,8 +445,34 @@ above the gap. Exact halves round up. A separated pair can have a
 rounded gap of zero. Use `oval_oval_relation` to classify topology.
 
 This completes the staged canonical oval–oval pair in checklist item 1.
-Arbitrary oval facings, backend agreement, serialization and gameplay
-activation remain follow-up work.
+
+The finite checks in `tests/rules/section01/test_milli_inch_oval_oval_witnesses.py`
+use the existing exact real-arithmetic solver with the local-frame ellipse
+inequalities. Feasibility for two closed ellipses and then for their two
+interiors distinguishes separation, external contact and shared interior.
+For gap rounding, the solver proves each supplied rational projection bound
+on its own ellipse. The projected clearance divided by the normal length
+gives a lower bound on the gap. Rational substitution checks that
+a concrete pair of points lies in the filled ellipses. Their squared
+distance below the squared upper midpoint proves the other end of the bin.
+
+For the 9-by-2 and 23-by-17 ovals at 0 and 45 degrees, respectively, tangent
+center offset `(10, 10)` is the sum of the two support offsets in direction
+`(5, 12)`, namely `(135/34, 8/17)` and `(205/34, 162/17)`.
+One-tick offset changes exercise overlap and separation, including a positive
+gap that rounds to zero. For the 14-by-10 and 41-by-7 pair at the same facings,
+the support offsets in direction `(3, 4)` are `(147/29, 100/29)`
+and `(837/58, 422/29)`. At center offset `(21, 20)`, the two closest
+points differ by `(3/2, 2)` and the exact gap is 2.5 ticks.
+Changing the second center's y-coordinate to 19 or 21 brackets the tie.
+Each case also checks operand reversal and a translated quarter-turn,
+which carries the same exact witnesses to the 90- and 135-degree facings.
+
+For one clear overlap and one clear separation, the legacy Shapely
+footprints agree on intersection. The legacy footprints approximate the
+ellipses with polygons, so the comparison covers those two classifications
+only. General backend agreement, broader symbolic coverage, arbitrary
+oval facings, serialization and gameplay activation remain open.
 
 ## Selected exact-coordinate contact slice
 

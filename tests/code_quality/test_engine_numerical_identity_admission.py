@@ -186,6 +186,11 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
     }
     assert len(oval_oval_gap) == 27
     assert sum(selection.OVAL_OVAL_GAP_OWNER in group for group in groups) == 1
+    oval_oval_witnesses = {
+        node for node in current if node.startswith(selection.OVAL_OVAL_WITNESS_OWNER + "::")
+    }
+    assert len(oval_oval_witnesses) == 7
+    assert sum(selection.OVAL_OVAL_WITNESS_OWNER in group for group in groups) == 1
     assert current.keys() == (
         retained
         | added
@@ -197,6 +202,7 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         | circle_oval
         | oval_oval
         | oval_oval_gap
+        | oval_oval_witnesses
     )
 
 

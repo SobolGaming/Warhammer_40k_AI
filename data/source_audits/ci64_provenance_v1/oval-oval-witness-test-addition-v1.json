@@ -1,0 +1,13 @@
+{
+  "added_files": {
+    "tests/rules/section01/test_milli_inch_oval_oval_witnesses.py": {
+      "blob_sha1": "07c3996590052d18e8ab541726bf657d2d8472ea",
+      "bytes": 6072,
+      "mode": "100644",
+      "sha256": "e250b5ffb30db779fbb95acd4b2c3da96a7bb7e3bb1815bf79cb6d890e9ed8fc"
+    }
+  },
+  "retained_oval_oval_gap_sha256": "1a454ad230db5f586d952b1b362038a6ef36ced48e13434e9871ee97c75eed10",
+  "runtime_fingerprint": "f2b7f6522f0f9c9b3520f635332964abb877a1a127ed2c8902c5c56290c30c69",
+  "schema": "finite-oval-oval-witness-test-addition-v1"
+}

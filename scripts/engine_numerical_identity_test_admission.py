@@ -107,6 +107,13 @@ OVAL_OVAL_GAP_OWNER = "tests/rules/section01/test_milli_inch_oval_oval_distance.
 _OVAL_OVAL_GAP_SOURCE = "src/warhammer40k_core/geometry/milli_inch_oval_oval_distance.py"
 
 
+OVAL_OVAL_WITNESS_ADDITION = (
+    "data/source_audits/ci64_provenance_v1/oval-oval-witness-test-addition-v1.json"
+)
+OVAL_OVAL_WITNESS_SHA256 = "b55763903095916ca0082e36ce7a24ac2515a4a0e53516dbd86028af5687aa0d"
+OVAL_OVAL_WITNESS_OWNER = "tests/rules/section01/test_milli_inch_oval_oval_witnesses.py"
+
+
 type TestTransition = tuple[dict[str, dict[str, object]], dict[str, dict[str, object]], bytes]
 
 
@@ -166,6 +173,12 @@ def exact_movement_test_transition(
     for path in oval_gap_paths:
         _selection_no_links(root, root / path)
     has_oval_gap = any((root / path).exists() for path in oval_gap_paths)
+    witness_paths = (OVAL_OVAL_WITNESS_ADDITION, OVAL_OVAL_WITNESS_OWNER)
+    for path in witness_paths:
+        _selection_no_links(root, root / path)
+    has_witnesses = any((root / path).exists() for path in witness_paths)
+    if has_witnesses and not has_oval_gap:
+        raise SystemExit("Oval-oval witness tests require their oval-oval gap predecessor.")
     if has_oval_gap and not has_oval_oval:
         raise SystemExit("Oval-oval gap tests require their oval-oval topology predecessor.")
     if has_oval_oval and not has_circle_oval:
@@ -331,6 +344,20 @@ def exact_movement_test_transition(
         additions.update(_selection_members(oval_gap["added_files"], root))
         runtime = oval_gap["runtime_fingerprint"]
         raw += b"\0" + oval_gap_raw
+    if has_witnesses:
+        witness_raw = _checked_bytes(root, OVAL_OVAL_WITNESS_ADDITION, OVAL_OVAL_WITNESS_SHA256)
+        witness = json.loads(witness_raw, object_pairs_hook=_selection_object)
+        if (
+            witness.keys()
+            != {"schema", "runtime_fingerprint", "retained_oval_oval_gap_sha256", "added_files"}
+            or witness["schema"] != "finite-oval-oval-witness-test-addition-v1"
+            or witness["retained_oval_oval_gap_sha256"] != OVAL_OVAL_GAP_SHA256
+            or witness["runtime_fingerprint"] != runtime
+            or set(witness["added_files"]) != {OVAL_OVAL_WITNESS_OWNER}
+        ):
+            raise SystemExit("Oval-oval witness test addition membership differs.")
+        additions.update(_selection_members(witness["added_files"], root))
+        raw += b"\0" + witness_raw
     retained = _identity_test_transition(root, retained_cutover_sha256, runtime=runtime)
     if retained is None:
         raise SystemExit(
