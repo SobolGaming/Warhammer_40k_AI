@@ -163,7 +163,12 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
     oval = {node for node in current if node.startswith(selection.OVAL_POINT_OWNER + "::")}
     assert oval
     assert sum(selection.OVAL_POINT_OWNER in group for group in groups) == 1
-    assert current.keys() == retained | added | staged | mixed | oval
+    oval_polygon = {
+        node for node in current if node.startswith(selection.OVAL_POLYGON_OWNER + "::")
+    }
+    assert oval_polygon
+    assert sum(selection.OVAL_POLYGON_OWNER in group for group in groups) == 1
+    assert current.keys() == retained | added | staged | mixed | oval | oval_polygon
 
 
 def test_identity_selection_rejects_drift_in_each_updated_test(transition_snapshot: Path) -> None:

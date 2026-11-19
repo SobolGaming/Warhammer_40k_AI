@@ -74,6 +74,11 @@ OVAL_POINT_SHA256 = "c90a008c3d213364cfa9085b27d864b301543b7a35dabb94175870cb1c4
 OVAL_POINT_OWNER = "tests/rules/section01/test_milli_inch_oval.py"
 _OVAL_POINT_SOURCE = "src/warhammer40k_core/geometry/milli_inch_oval.py"
 
+OVAL_POLYGON_ADDITION = "data/source_audits/ci64_provenance_v1/oval-polygon-test-addition-v1.json"
+OVAL_POLYGON_SHA256 = "bada04a93ba349277cb172ca65d1caec1ccf59f7ea943b3eb08b6efb8e3f9b87"
+OVAL_POLYGON_OWNER = "tests/rules/section01/test_milli_inch_oval_polygon.py"
+_OVAL_POLYGON_SOURCE = "src/warhammer40k_core/geometry/milli_inch_oval_polygon.py"
+
 
 type TestTransition = tuple[dict[str, dict[str, object]], dict[str, dict[str, object]], bytes]
 
@@ -110,6 +115,12 @@ def exact_movement_test_transition(
     for path in oval_paths:
         _selection_no_links(root, root / path)
     has_oval_point = any((root / path).exists() for path in oval_paths)
+    oval_polygon_paths = (OVAL_POLYGON_ADDITION, OVAL_POLYGON_OWNER, _OVAL_POLYGON_SOURCE)
+    for path in oval_polygon_paths:
+        _selection_no_links(root, root / path)
+    has_oval_polygon = any((root / path).exists() for path in oval_polygon_paths)
+    if has_oval_polygon and not has_oval_point:
+        raise SystemExit("Oval-polygon test addition requires its oval point predecessor.")
     if has_oval_point and not has_circle_polygon:
         raise SystemExit("Oval point test addition requires its circle-polygon predecessor.")
     if not has_circle_polygon and not any((root / path).exists() for path in paths):
@@ -155,6 +166,19 @@ def exact_movement_test_transition(
         additions.update(_selection_members(oval["added_files"], root))
         runtime = oval["runtime_fingerprint"]
         raw += b"\0" + oval_raw
+    if has_oval_polygon:
+        polygon_raw = _checked_bytes(root, OVAL_POLYGON_ADDITION, OVAL_POLYGON_SHA256)
+        polygon = json.loads(polygon_raw, object_pairs_hook=_selection_object)
+        if (
+            polygon.keys() != {"schema", "runtime_fingerprint", "source_sha256", "added_files"}
+            or polygon["schema"] != "finite-oval-polygon-test-addition-v1"
+            or set(polygon["added_files"]) != {OVAL_POLYGON_OWNER}
+        ):
+            raise SystemExit("Oval-polygon test addition membership differs.")
+        _checked_bytes(root, _OVAL_POLYGON_SOURCE, polygon["source_sha256"])
+        additions.update(_selection_members(polygon["added_files"], root))
+        runtime = polygon["runtime_fingerprint"]
+        raw += b"\0" + polygon_raw
     retained = _identity_test_transition(root, retained_cutover_sha256, runtime=runtime)
     if retained is None:
         raise SystemExit(
