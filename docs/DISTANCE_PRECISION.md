@@ -486,7 +486,7 @@ For one clear overlap and one clear separation, the legacy Shapely
 footprints agree on intersection. The legacy footprints approximate the
 ellipses with polygons, so the comparison covers those two classifications
 only. General backend agreement, broader symbolic coverage, arbitrary
-oval facings, serialization and gameplay activation remain open.
+oval facings, engine save/replay integration and gameplay activation remain open.
 
 ## Selected exact-coordinate contact slice
 
