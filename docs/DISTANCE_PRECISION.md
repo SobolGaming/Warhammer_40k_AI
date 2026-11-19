@@ -260,7 +260,7 @@ coordinate. At the multiplier where `a*u/(a+t)^2 + b*v/(b+t)^2 = 1`, its
 minimizer lies on the ellipse and attains that lower bound. The left side
 decreases continuously from above one to zero for exterior points.
 
-To compare the maximum of the lower bound with a positive squared midpoint
+To compare the maximum of the lower bound with a positive squared threshold
 `m²`, subtract `m²` and clear the positive denominator `(a+t)(b+t)`. The
 resulting cubic is negative at zero and tends to negative infinity. It attains
 a nonnegative value on the positive half-line exactly when its larger
@@ -319,8 +319,35 @@ is an upper bound, so the integer Manhattan bound takes at most 65 midpoint
 iterations. Each pass uses fixed-degree integer arithmetic on signed 64-bit
 inputs and visits at most the vertices and edges of the ring. A separated
 pair can round to zero. Use the relation query to establish contact. This
-completes the staged canonical oval–polygon pair in checklist item 1. Other
-oval pairs, arbitrary oval facings, backend agreement, serialization and
+completes the staged canonical oval–polygon pair in checklist item 1.
+
+## Staged canonical circle–oval queries
+
+`geometry.milli_inch_circle_oval.circle_oval_relation` compares the Euclidean
+distance from the disk center to the filled oval with the disk radius. The
+shapes are separated when the distance is greater than the radius. Equality
+gives external tangency. A strictly smaller distance gives shared interior
+because interior oval points can approach any point in the closed oval. This
+includes containment and internal tangency. The query returns `CircleRelation`
+and uses the same four facings and signed 64-bit coordinate domain as oval point
+queries.
+
+The point comparator preserves all three signs at a positive threshold,
+including equality. In doubled ticks the radius is exactly the circle diameter,
+even for odd diameters. When the center is in the oval, the squared-distance
+lower bound has maximum zero at multiplier zero, so every positive threshold
+is strictly greater.
+
+`circle_oval_distance_ticks` returns the nonnegative surface gap, rounded once.
+In a separated pair, the nearest oval point and the point on the disk toward
+it attain the center-to-oval distance minus the radius. For every candidate
+rounding midpoint, the search compares the exact center-to-oval distance with
+the sum of the radius and that midpoint. The center-to-center Manhattan
+distance bounds the gap, giving at most 65 midpoint iterations. Exact half
+ticks round up and a separated pair can round to zero.
+
+This completes the staged canonical circle–oval pair in checklist item 1.
+Oval–oval queries, arbitrary oval facings, backend agreement, serialization and
 gameplay activation remain follow-up work.
 
 ## Selected exact-coordinate contact slice

@@ -89,10 +89,16 @@ def _doubled_local_squares(oval: CanonicalOval, offset: TickVertex) -> TickVerte
 def _oval_point_below_midpoint(
     squared_axes: TickVertex, local_squares: TickVertex, midpoint: int
 ) -> bool:
-    """Compare a doubled point distance with a positive doubled midpoint exactly."""
+    return _compare_oval_point_distance(squared_axes, local_squares, midpoint) < 0
+
+
+def _compare_oval_point_distance(
+    squared_axes: TickVertex, local_squares: TickVertex, threshold: int
+) -> int:
+    """Return -1, 0 or 1 against a positive distance threshold in doubled ticks."""
     a, b = squared_axes
     u, v = local_squares
-    target = midpoint**2
+    target = threshold**2
     # The squared-distance dual is t*u/(a+t) + t*v/(b+t) - t for t >= 0.
     # Its maximum equals the primal minimum. Clear the positive denominator
     # of dual(t) - target to obtain -t³ + quadratic*t² + linear*t - constant.
@@ -104,13 +110,15 @@ def _oval_point_below_midpoint(
     # larger stationary point can attain zero on the positive half-line.
     discriminant = quadratic**2 + 3 * linear
     if discriminant <= 0 or (quadratic < 0 and discriminant <= quadratic**2):
-        return True
+        return -1
 
     # At that point, 27 times the cubic equals
     # 2*discriminant**(3/2) + 2*quadratic**3 + 9*quadratic*linear - 27*constant.
-    # A zero is a true midpoint tie and must not count as strictly below it.
     negative_part = 27 * constant - 2 * quadratic**3 - 9 * quadratic * linear
-    return negative_part > 0 and negative_part**2 > 4 * discriminant**3
+    if negative_part <= 0:
+        return 1
+    difference = 4 * discriminant**3 - negative_part**2
+    return (difference > 0) - (difference < 0)
 
 
 def _round_distance_ticks(upper_bound: int, below_midpoint: Callable[[int], bool]) -> int:

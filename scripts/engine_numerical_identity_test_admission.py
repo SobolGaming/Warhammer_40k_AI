@@ -85,6 +85,11 @@ OVAL_POLYGON_GAP_TRANSITION = (
 OVAL_POLYGON_GAP_SHA256 = "aa14d37c70228c1369c6a534b0ba1e982513dc3bd0fff6bf2a6edcddef403ad5"
 OVAL_POLYGON_GAP_OWNER = "tests/rules/section01/test_milli_inch_oval_polygon_distance.py"
 
+CIRCLE_OVAL_TRANSITION = "data/source_audits/ci64_provenance_v1/circle-oval-test-transition-v1.json"
+CIRCLE_OVAL_SHA256 = "8145f8eae6477e8e702b7804d770974f6337e6855940d7468eba3c1ec0e0d6b5"
+CIRCLE_OVAL_OWNER = "tests/rules/section01/test_milli_inch_circle_oval.py"
+_CIRCLE_OVAL_SOURCE = "src/warhammer40k_core/geometry/milli_inch_circle_oval.py"
+
 
 type TestTransition = tuple[dict[str, dict[str, object]], dict[str, dict[str, object]], bytes]
 
@@ -129,6 +134,12 @@ def exact_movement_test_transition(
     for path in gap_paths:
         _selection_no_links(root, root / path)
     has_gap = any((root / path).exists() for path in gap_paths)
+    circle_oval_paths = (CIRCLE_OVAL_TRANSITION, CIRCLE_OVAL_OWNER, _CIRCLE_OVAL_SOURCE)
+    for path in circle_oval_paths:
+        _selection_no_links(root, root / path)
+    has_circle_oval = any((root / path).exists() for path in circle_oval_paths)
+    if has_circle_oval and not has_gap:
+        raise SystemExit("Circle-oval tests require their oval-polygon gap predecessor.")
     if has_gap and not has_oval_polygon:
         raise SystemExit("Oval-polygon gap tests require their topology predecessor.")
     if has_oval_polygon and not has_oval_point:
@@ -212,10 +223,34 @@ def exact_movement_test_transition(
         ):
             raise SystemExit("Oval-polygon gap test transition membership differs.")
         for name, digest in gap["sources"].items():
-            _checked_bytes(root, name, digest)
+            if name != _OVAL_POINT_SOURCE or not has_circle_oval:
+                _checked_bytes(root, name, digest)
         additions.update(_selection_members(gap["added_files"], root))
         runtime = gap["runtime_fingerprint"]
         raw += b"\0" + gap_raw
+    if has_circle_oval:
+        circle_oval_raw = _checked_bytes(root, CIRCLE_OVAL_TRANSITION, CIRCLE_OVAL_SHA256)
+        circle_oval = json.loads(circle_oval_raw, object_pairs_hook=_selection_object)
+        if (
+            circle_oval.keys()
+            != {
+                "schema",
+                "runtime_fingerprint",
+                "retained_oval_polygon_gap_sha256",
+                "sources",
+                "added_files",
+            }
+            or circle_oval["schema"] != "finite-circle-oval-test-transition-v1"
+            or circle_oval["retained_oval_polygon_gap_sha256"] != OVAL_POLYGON_GAP_SHA256
+            or set(circle_oval["sources"]) != {_OVAL_POINT_SOURCE, _CIRCLE_OVAL_SOURCE}
+            or set(circle_oval["added_files"]) != {CIRCLE_OVAL_OWNER}
+        ):
+            raise SystemExit("Circle-oval test transition membership differs.")
+        for name, digest in circle_oval["sources"].items():
+            _checked_bytes(root, name, digest)
+        additions.update(_selection_members(circle_oval["added_files"], root))
+        runtime = circle_oval["runtime_fingerprint"]
+        raw += b"\0" + circle_oval_raw
     retained = _identity_test_transition(root, retained_cutover_sha256, runtime=runtime)
     if retained is None:
         raise SystemExit(

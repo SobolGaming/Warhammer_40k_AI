@@ -173,8 +173,12 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
     }
     assert oval_polygon_gap
     assert sum(selection.OVAL_POLYGON_GAP_OWNER in group for group in groups) == 1
+    circle_oval = {node for node in current if node.startswith(selection.CIRCLE_OVAL_OWNER + "::")}
+    assert circle_oval
+    assert sum(selection.CIRCLE_OVAL_OWNER in group for group in groups) == 1
     assert (
-        current.keys() == retained | added | staged | mixed | oval | oval_polygon | oval_polygon_gap
+        current.keys()
+        == retained | added | staged | mixed | oval | oval_polygon | oval_polygon_gap | circle_oval
     )
 
 
