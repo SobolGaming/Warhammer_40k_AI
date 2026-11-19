@@ -1,224 +1,370 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "079c4fcd92b31410f96ce52ed10de7828c482008",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:f2b7f6522f0f9c9b3520f635332964abb877a1a127ed2c8902c5c56290c30c69",
-  "operation_map_sha256": "0cc6e5f2aa1a3857f09cccfb7e60741284f3bc48daa32b5b27669bc35a266f50",
+  "base": "566fec420a1a7471bbbf354ba41123ef7d32ac2d",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:7ba104452c12a3985e8500622a9e9ed09527ad12cd42913e77b8ef2dcf728eb3",
+  "operation_map_sha256": "dad8484753a754421db0fb525ec0e01b1b99021dc9a3127cf70d98758794a08a",
   "changes": {
     "ci/test_shards/durations.json": {
-      "before_sha256": "bf26335cd34794acea8ff51ed17eec406a822ca87279bbd2e8858248e105c207",
-      "after_sha256": "2ab095972955e67eed8c40b16e74201828d44f304fa81b7d9aec3988a4a655e8",
+      "before_sha256": "2ab095972955e67eed8c40b16e74201828d44f304fa81b7d9aec3988a4a655e8",
+      "after_sha256": "ebde274e037ce1bbb3caaf33394de084173517b24fb349ef33d7a03a07d10b08",
       "owners": {
         "@document": {
-          "before": "bf26335cd34794acea8ff51ed17eec406a822ca87279bbd2e8858248e105c207",
-          "after": "2ab095972955e67eed8c40b16e74201828d44f304fa81b7d9aec3988a4a655e8"
+          "before": "2ab095972955e67eed8c40b16e74201828d44f304fa81b7d9aec3988a4a655e8",
+          "after": "ebde274e037ce1bbb3caaf33394de084173517b24fb349ef33d7a03a07d10b08"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
-      "before_sha256": "ad54421764d194c07b47456e9ffcf93937802736661a29d3e2fa29038a7be594",
-      "after_sha256": "40472d51dc718656159522b167da86ef3bc820b6adc9012ba589d4682df325d9",
+      "before_sha256": "40472d51dc718656159522b167da86ef3bc820b6adc9012ba589d4682df325d9",
+      "after_sha256": "3c1652a5248227fd2ec20d43413cb8d6859d87258b64c73b78f88e38ec5ee62f",
       "owners": {
         "@document": {
-          "before": "ad54421764d194c07b47456e9ffcf93937802736661a29d3e2fa29038a7be594",
-          "after": "40472d51dc718656159522b167da86ef3bc820b6adc9012ba589d4682df325d9"
+          "before": "40472d51dc718656159522b167da86ef3bc820b6adc9012ba589d4682df325d9",
+          "after": "3c1652a5248227fd2ec20d43413cb8d6859d87258b64c73b78f88e38ec5ee62f"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
-      "before_sha256": "46ae708bd8e2108cb94a84ae6b19e37c98a7317aee98eb4c3ff85e45fa31907c",
-      "after_sha256": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20",
+      "before_sha256": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20",
+      "after_sha256": "d1be43628b5a934357294c2e00403f4d99ec3f5228a905d6a8d8cc111726719a",
       "owners": {
         "@document": {
-          "before": "46ae708bd8e2108cb94a84ae6b19e37c98a7317aee98eb4c3ff85e45fa31907c",
-          "after": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20"
+          "before": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20",
+          "after": "d1be43628b5a934357294c2e00403f4d99ec3f5228a905d6a8d8cc111726719a"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
-      "before_sha256": "c2f9dc4f6821d7fc7de53a2b181ebbeb8bcf8d2b27d297dc1887f44dbf8d860b",
-      "after_sha256": "09cf07dcedda5314b2a1b0d4d49b991b3364fa5b1c9664097bc56fd03dee1cb4",
+      "before_sha256": "09cf07dcedda5314b2a1b0d4d49b991b3364fa5b1c9664097bc56fd03dee1cb4",
+      "after_sha256": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20",
       "owners": {
         "@document": {
-          "before": "c2f9dc4f6821d7fc7de53a2b181ebbeb8bcf8d2b27d297dc1887f44dbf8d860b",
-          "after": "09cf07dcedda5314b2a1b0d4d49b991b3364fa5b1c9664097bc56fd03dee1cb4"
+          "before": "09cf07dcedda5314b2a1b0d4d49b991b3364fa5b1c9664097bc56fd03dee1cb4",
+          "after": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
-      "before_sha256": "9a5c547afe83815cb7ee25905a24901b89bc282aac7097685d2cbe91abd481a8",
-      "after_sha256": "3d9c7ecfc4ac1d74cd61cb9ae579b971f705aff7b5262d23e5e68560ab803c63",
+      "before_sha256": "3d9c7ecfc4ac1d74cd61cb9ae579b971f705aff7b5262d23e5e68560ab803c63",
+      "after_sha256": "b006b9dae2bc5a68dc0db63eefcffc24afcf7f6d9ef6232be77e49735238d05d",
       "owners": {
         "@document": {
-          "before": "9a5c547afe83815cb7ee25905a24901b89bc282aac7097685d2cbe91abd481a8",
-          "after": "3d9c7ecfc4ac1d74cd61cb9ae579b971f705aff7b5262d23e5e68560ab803c63"
+          "before": "3d9c7ecfc4ac1d74cd61cb9ae579b971f705aff7b5262d23e5e68560ab803c63",
+          "after": "b006b9dae2bc5a68dc0db63eefcffc24afcf7f6d9ef6232be77e49735238d05d"
         }
       }
     },
     "ci/test_shards/shard-2.txt": {
-      "before_sha256": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
-      "after_sha256": "7222a59f6b668248e34e87d9131d98c2f27db77c831d125a2b2f58124b90eeff",
+      "before_sha256": "7222a59f6b668248e34e87d9131d98c2f27db77c831d125a2b2f58124b90eeff",
+      "after_sha256": "250863dd384ff4bd49694c66bd9c51c6b8bc90468254d60b3834818ddb9cf51a",
       "owners": {
         "@document": {
-          "before": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
-          "after": "7222a59f6b668248e34e87d9131d98c2f27db77c831d125a2b2f58124b90eeff"
+          "before": "7222a59f6b668248e34e87d9131d98c2f27db77c831d125a2b2f58124b90eeff",
+          "after": "250863dd384ff4bd49694c66bd9c51c6b8bc90468254d60b3834818ddb9cf51a"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
-      "before_sha256": "ed8b2de4f896240a0d1fb02f3619cf22c5a51a118cc241c105470311b8b39d28",
-      "after_sha256": "2babfb5db4d81f951009a71d834e9a1c7683245d0ba57ad6799e8b9685592cd7",
+      "before_sha256": "2babfb5db4d81f951009a71d834e9a1c7683245d0ba57ad6799e8b9685592cd7",
+      "after_sha256": "5c32cd0227e892cf82ae0f1573f22be7355a4b899f3fad5e57e3c70d8954b0d7",
       "owners": {
         "@document": {
-          "before": "ed8b2de4f896240a0d1fb02f3619cf22c5a51a118cc241c105470311b8b39d28",
-          "after": "2babfb5db4d81f951009a71d834e9a1c7683245d0ba57ad6799e8b9685592cd7"
+          "before": "2babfb5db4d81f951009a71d834e9a1c7683245d0ba57ad6799e8b9685592cd7",
+          "after": "5c32cd0227e892cf82ae0f1573f22be7355a4b899f3fad5e57e3c70d8954b0d7"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
-      "before_sha256": "cab6765c0fcd2ad7e5d0f7c301465b7445a0ba2161b30c82d1838e6cd746b610",
-      "after_sha256": "1efd18f627c5dec3bacdacaeb2507bc068820fc6a86e649c9f5737a5e9f23f6c",
+      "before_sha256": "1efd18f627c5dec3bacdacaeb2507bc068820fc6a86e649c9f5737a5e9f23f6c",
+      "after_sha256": "e35f49df6670f39c3ad52f3a74417b5418b3ee1c5934ef86f95f605ffe6bf9f4",
       "owners": {
         "@document": {
-          "before": "cab6765c0fcd2ad7e5d0f7c301465b7445a0ba2161b30c82d1838e6cd746b610",
-          "after": "1efd18f627c5dec3bacdacaeb2507bc068820fc6a86e649c9f5737a5e9f23f6c"
+          "before": "1efd18f627c5dec3bacdacaeb2507bc068820fc6a86e649c9f5737a5e9f23f6c",
+          "after": "e35f49df6670f39c3ad52f3a74417b5418b3ee1c5934ef86f95f605ffe6bf9f4"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
-      "before_sha256": "3cc9bd308b8a4ae6c9f91ebd10864a193f14c7a90fd03bb68c06c18c19a5a29e",
-      "after_sha256": "fcbec260370eee3427631c023742ca05bda418acf73a20b3285e4a09c2be6b48",
+      "before_sha256": "fcbec260370eee3427631c023742ca05bda418acf73a20b3285e4a09c2be6b48",
+      "after_sha256": "168bb07012b419ea0322ebacce0006724e65fc4e1c1cf0ebc6da3b369fe98f35",
       "owners": {
         "@document": {
-          "before": "3cc9bd308b8a4ae6c9f91ebd10864a193f14c7a90fd03bb68c06c18c19a5a29e",
-          "after": "fcbec260370eee3427631c023742ca05bda418acf73a20b3285e4a09c2be6b48"
+          "before": "fcbec260370eee3427631c023742ca05bda418acf73a20b3285e4a09c2be6b48",
+          "after": "168bb07012b419ea0322ebacce0006724e65fc4e1c1cf0ebc6da3b369fe98f35"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
-      "before_sha256": "c06ad180f0571329cd5818192e0f75971ab116e9cecfba3bb523b00d2c89b9f3",
-      "after_sha256": "f187c3c8ff358090d55acc68ea4c77f2eee79d84b76e2835c257cc058ffc927f",
+      "before_sha256": "f187c3c8ff358090d55acc68ea4c77f2eee79d84b76e2835c257cc058ffc927f",
+      "after_sha256": "90010a5e083a7e576252ad088747538a599cf1f38588cbed096d3ff27857b819",
       "owners": {
         "@document": {
-          "before": "c06ad180f0571329cd5818192e0f75971ab116e9cecfba3bb523b00d2c89b9f3",
-          "after": "f187c3c8ff358090d55acc68ea4c77f2eee79d84b76e2835c257cc058ffc927f"
+          "before": "f187c3c8ff358090d55acc68ea4c77f2eee79d84b76e2835c257cc058ffc927f",
+          "after": "90010a5e083a7e576252ad088747538a599cf1f38588cbed096d3ff27857b819"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
-      "before_sha256": "fe386716501d21f2f22fe0878a1a571d6e124d8dea0b201bc4199591ecf300f3",
-      "after_sha256": "e726af41c23780669ac968f6507a166ebf1270cd6b1d01299f6ddd084775cf46",
+      "before_sha256": "e726af41c23780669ac968f6507a166ebf1270cd6b1d01299f6ddd084775cf46",
+      "after_sha256": "48dd331c6ccefab9a64938522dd6e940ab42c1f610d379a23f84c1fd34556cbc",
       "owners": {
         "@document": {
-          "before": "fe386716501d21f2f22fe0878a1a571d6e124d8dea0b201bc4199591ecf300f3",
-          "after": "e726af41c23780669ac968f6507a166ebf1270cd6b1d01299f6ddd084775cf46"
+          "before": "e726af41c23780669ac968f6507a166ebf1270cd6b1d01299f6ddd084775cf46",
+          "after": "48dd331c6ccefab9a64938522dd6e940ab42c1f610d379a23f84c1fd34556cbc"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
-      "before_sha256": "abce9eb6c1df108a0a9fc516ab14f4f5e618fe9fcac05a9eaf3f44e93f1f4166",
-      "after_sha256": "56fca1678ded8e178c66ea08d793db8d44fa13ec4353f8980b079464fa1a1ce8",
+      "before_sha256": "56fca1678ded8e178c66ea08d793db8d44fa13ec4353f8980b079464fa1a1ce8",
+      "after_sha256": "de21badada4ce9cd071630a4b88c5c6e51d0ffd8a939065050bf03b19b4a13b6",
       "owners": {
         "@document": {
-          "before": "abce9eb6c1df108a0a9fc516ab14f4f5e618fe9fcac05a9eaf3f44e93f1f4166",
-          "after": "56fca1678ded8e178c66ea08d793db8d44fa13ec4353f8980b079464fa1a1ce8"
+          "before": "56fca1678ded8e178c66ea08d793db8d44fa13ec4353f8980b079464fa1a1ce8",
+          "after": "de21badada4ce9cd071630a4b88c5c6e51d0ffd8a939065050bf03b19b4a13b6"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
-      "before_sha256": "981af8c4831f485f65e714721543590a1d42468bc532ec991ddb80d29767e466",
-      "after_sha256": "dca4daa26f340f52ded31ac8b211e8898e7d78b11868d25916f472cd5a799594",
+      "before_sha256": "dca4daa26f340f52ded31ac8b211e8898e7d78b11868d25916f472cd5a799594",
+      "after_sha256": "5957da868854554f4f8ee75fb0b7ef1a63700d1a6f04c88e07254893998c09c5",
       "owners": {
         "@document": {
-          "before": "981af8c4831f485f65e714721543590a1d42468bc532ec991ddb80d29767e466",
-          "after": "dca4daa26f340f52ded31ac8b211e8898e7d78b11868d25916f472cd5a799594"
+          "before": "dca4daa26f340f52ded31ac8b211e8898e7d78b11868d25916f472cd5a799594",
+          "after": "5957da868854554f4f8ee75fb0b7ef1a63700d1a6f04c88e07254893998c09c5"
         }
       }
     },
-    "data/source_audits/ci64_provenance_v1/oval-oval-witness-test-addition-v1.json": {
+    "contracts/examples/persistence/session-persistence.json": {
+      "before_sha256": "6fd3ad0100e228e362691c5babb74dd3c64a82132e4d42704274ffe034b6e0b2",
+      "after_sha256": "75721f7c4728a097bf34e632b28261cb219f9182da6a5e4ba7fcf1d16a663ecc",
+      "owners": {
+        "@document": {
+          "before": "6fd3ad0100e228e362691c5babb74dd3c64a82132e4d42704274ffe034b6e0b2",
+          "after": "75721f7c4728a097bf34e632b28261cb219f9182da6a5e4ba7fcf1d16a663ecc"
+        }
+      }
+    },
+    "contracts/examples/sessions/session-command-outcome.json": {
+      "before_sha256": "45e38166725bc04bd50636f04246719facb9b3e16bf076155c21b3db54dba536",
+      "after_sha256": "fe0623bb662a1338ec0b9058ac2ccd35a9c9d0680d6104b828c3d0a69d36018c",
+      "owners": {
+        "@document": {
+          "before": "45e38166725bc04bd50636f04246719facb9b3e16bf076155c21b3db54dba536",
+          "after": "fe0623bb662a1338ec0b9058ac2ccd35a9c9d0680d6104b828c3d0a69d36018c"
+        }
+      }
+    },
+    "contracts/examples/sessions/session-command-started.json": {
+      "before_sha256": "1ca92de502af870a2c3c72529233fd9704ba86c5e0e1392180e32087c8b5126a",
+      "after_sha256": "42f336fff04c1bfdc5e48dd40592ec7d1359f7dc0693ff76700c4ff8539215a9",
+      "owners": {
+        "@document": {
+          "before": "1ca92de502af870a2c3c72529233fd9704ba86c5e0e1392180e32087c8b5126a",
+          "after": "42f336fff04c1bfdc5e48dd40592ec7d1359f7dc0693ff76700c4ff8539215a9"
+        }
+      }
+    },
+    "contracts/examples/sessions/session-metadata-created.json": {
+      "before_sha256": "567412e986c7642d09a0b510bd0da2ae331ac2521a4aba580988221078331e69",
+      "after_sha256": "9a3facd2886148dc1606107698b9e92f005bc326bb122884264d0c2b482bbf51",
+      "owners": {
+        "@document": {
+          "before": "567412e986c7642d09a0b510bd0da2ae331ac2521a4aba580988221078331e69",
+          "after": "9a3facd2886148dc1606107698b9e92f005bc326bb122884264d0c2b482bbf51"
+        }
+      }
+    },
+    "contracts/examples/support-profile-player-a-redacted.json": {
+      "before_sha256": "b7c5a4c51d59013d1bf3333ff79a571effe93f20ed784597cea4a111eb40295a",
+      "after_sha256": "0b877101128a3b2755c745dc943c8f232b3a9f78d98dcebbd0251264b2f85561",
+      "owners": {
+        "@document": {
+          "before": "b7c5a4c51d59013d1bf3333ff79a571effe93f20ed784597cea4a111eb40295a",
+          "after": "0b877101128a3b2755c745dc943c8f232b3a9f78d98dcebbd0251264b2f85561"
+        }
+      }
+    },
+    "contracts/examples/support-profile-player-b-redacted.json": {
+      "before_sha256": "48f40f8c0c571a5dff70869da12c0e074e6a7b973ab495eb9ca9d1e53d853f49",
+      "after_sha256": "d9bbb9f58a46066fffe40354ded37cb2eed954a0ab6c958d58e709a9d027cc78",
+      "owners": {
+        "@document": {
+          "before": "48f40f8c0c571a5dff70869da12c0e074e6a7b973ab495eb9ca9d1e53d853f49",
+          "after": "d9bbb9f58a46066fffe40354ded37cb2eed954a0ab6c958d58e709a9d027cc78"
+        }
+      }
+    },
+    "contracts/examples/support-profile.json": {
+      "before_sha256": "8e893cb89a977ff1cc1d2d23916523af1ae621d341ba99c34bc73297cd0300d4",
+      "after_sha256": "531a4f63dc401f0b54f5c5681579202c6235d988b573243ae860dfa46dbed489",
+      "owners": {
+        "@document": {
+          "before": "8e893cb89a977ff1cc1d2d23916523af1ae621d341ba99c34bc73297cd0300d4",
+          "after": "531a4f63dc401f0b54f5c5681579202c6235d988b573243ae860dfa46dbed489"
+        }
+      }
+    },
+    "contracts/manifest.json": {
+      "before_sha256": "2e908adf27f60cd03db48252ad2263a2eea86690def389659302ee6d23739726",
+      "after_sha256": "4590fff68117edb518199d2f0e8ecb6610d281e65784dfe7e8c4f546b5fd557b",
+      "owners": {
+        "@document": {
+          "before": "2e908adf27f60cd03db48252ad2263a2eea86690def389659302ee6d23739726",
+          "after": "4590fff68117edb518199d2f0e8ecb6610d281e65784dfe7e8c4f546b5fd557b"
+        }
+      }
+    },
+    "data/source_audits/ci64_provenance_v1/oval-codec-test-transition-v1.json": {
       "before_sha256": null,
-      "after_sha256": "b55763903095916ca0082e36ce7a24ac2515a4a0e53516dbd86028af5687aa0d",
+      "after_sha256": "b7bdb26dd433d2b87d0f488ffd054f6bb41592f6ac23865c66c5ccd0ec273057",
       "owners": {
         "@document": {
           "before": null,
-          "after": "b55763903095916ca0082e36ce7a24ac2515a4a0e53516dbd86028af5687aa0d"
+          "after": "b7bdb26dd433d2b87d0f488ffd054f6bb41592f6ac23865c66c5ccd0ec273057"
         }
       }
     },
     "docs/DISTANCE_PRECISION.md": {
-      "before_sha256": "2443890ea86fd0b7b82336814cebef62ac3a6d39ad8d4f4e7827441031a62908",
-      "after_sha256": "9abe192d7562d02c0b0e2436a3802426ba4292d6fa0fdbac7aa7ed327749a2da",
+      "before_sha256": "9abe192d7562d02c0b0e2436a3802426ba4292d6fa0fdbac7aa7ed327749a2da",
+      "after_sha256": "d8d196c76261176a28a08b0d207eb20e793aef0e5d8b73a6b9ab1d6955b55036",
       "owners": {
         "@document": {
-          "before": "2443890ea86fd0b7b82336814cebef62ac3a6d39ad8d4f4e7827441031a62908",
-          "after": "9abe192d7562d02c0b0e2436a3802426ba4292d6fa0fdbac7aa7ed327749a2da"
+          "before": "9abe192d7562d02c0b0e2436a3802426ba4292d6fa0fdbac7aa7ed327749a2da",
+          "after": "d8d196c76261176a28a08b0d207eb20e793aef0e5d8b73a6b9ab1d6955b55036"
+        }
+      }
+    },
+    "docs/performance/current/oval-codec-movement.json": {
+      "before_sha256": null,
+      "after_sha256": "65bdc96bc7dee8027f844e3dcba7f8d6786da0a1161294e99ff0d904b76ecd14",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "65bdc96bc7dee8027f844e3dcba7f8d6786da0a1161294e99ff0d904b76ecd14"
+        }
+      }
+    },
+    "docs/performance/current/oval-codec-setup.json": {
+      "before_sha256": null,
+      "after_sha256": "12e58c4c40b9f31b3903c96ac987cc9a797aed98df9ee2d04b866d90aac0fb38",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "12e58c4c40b9f31b3903c96ac987cc9a797aed98df9ee2d04b866d90aac0fb38"
+        }
+      }
+    },
+    "docs/performance/current/oval-codec-visibility.json": {
+      "before_sha256": null,
+      "after_sha256": "5ff615c9fa11bac0461ad4a3f2a5c32621003cab577e9fe6c38fe0c1b49a4215",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "5ff615c9fa11bac0461ad4a3f2a5c32621003cab577e9fe6c38fe0c1b49a4215"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "c4f7a41fe1ff4f3a92e358d2ee3af49c421f168ec23947e770b80b9e901ffce5",
-      "after_sha256": "c6993a15eb0a6bcd737965761d8e8269015930d8c15c9f5fc1790f373a5e909e",
+      "before_sha256": "c6993a15eb0a6bcd737965761d8e8269015930d8c15c9f5fc1790f373a5e909e",
+      "after_sha256": "c0a3838b5c4d3315608fa6cb547cb78a6f7ac3345f9b5df6a79d88fb8474d6b8",
       "owners": {
         "@document": {
-          "before": "c4f7a41fe1ff4f3a92e358d2ee3af49c421f168ec23947e770b80b9e901ffce5",
-          "after": "c6993a15eb0a6bcd737965761d8e8269015930d8c15c9f5fc1790f373a5e909e"
+          "before": "c6993a15eb0a6bcd737965761d8e8269015930d8c15c9f5fc1790f373a5e909e",
+          "after": "c0a3838b5c4d3315608fa6cb547cb78a6f7ac3345f9b5df6a79d88fb8474d6b8"
         }
       }
     },
     "scripts/engine_numerical_identity_test_admission.py": {
-      "before_sha256": "306fc036a66f0ac84057d584227da0924dce56dc3a7be6811f9992a4bc9286ae",
-      "after_sha256": "58b720db746b3c8dfa33186b090a5ee4e17c95999113042a0327bb50005520de",
+      "before_sha256": "58b720db746b3c8dfa33186b090a5ee4e17c95999113042a0327bb50005520de",
+      "after_sha256": "20828aac0243d34670bbace19710507e447b6e233300dedb237dc4b42b865f9c",
       "owners": {
         "@module": {
-          "before": "3f4798faf234b0bf8d008accaaa7cf83b4ee0a6a40edfcc66659f310c7a0b007",
-          "after": "3c50c8ae25205d70149da49edc12223ec80f6af23c639739e9d2ff298cf42f76"
+          "before": "3c50c8ae25205d70149da49edc12223ec80f6af23c639739e9d2ff298cf42f76",
+          "after": "11956c54ddb2cb5453dfd8a4c35c2df85223940513b914404656be61d8b285e3"
         },
         "exact_movement_test_transition": {
-          "before": "4ded5d56214f2cfc636328660e81817d4732c69bfa80e68d423316febbb2e528",
-          "after": "bd8dcd2a3633439b65e37e2a6042bddd14b0d2c62dfdad2abd4fb9043ef666af"
+          "before": "bd8dcd2a3633439b65e37e2a6042bddd14b0d2c62dfdad2abd4fb9043ef666af",
+          "after": "e796e75c4ef41803947376c02003de1dab507814e73ae4ab137573e0f91b9492"
+        }
+      }
+    },
+    "src/warhammer40k_core/_engine_build_manifest.json": {
+      "before_sha256": "755a4473de9a6d432d4eeb0e4274baec1ffdde1345106852517307c8fc4fc09a",
+      "after_sha256": "b73870cdbc1fe92d6165a4e94102a3b1ff93b2fc0acdf53c67cdde3506eaea2e",
+      "owners": {
+        "@document": {
+          "before": "755a4473de9a6d432d4eeb0e4274baec1ffdde1345106852517307c8fc4fc09a",
+          "after": "b73870cdbc1fe92d6165a4e94102a3b1ff93b2fc0acdf53c67cdde3506eaea2e"
+        }
+      }
+    },
+    "src/warhammer40k_core/geometry/milli_inch_oval.py": {
+      "before_sha256": "deed486bbc8b302df38ce1dfcdca1524f0a9d748b28cb7d0691d4c85205f7db5",
+      "after_sha256": "9046573f9c05a1c3ea985ee20f12df4dcf8d73bb621e092bd80b71d29ad0c9ee",
+      "owners": {
+        "@module": {
+          "before": "52759632fc6334ffaddbc516a5eb56d0dfc5c76580f464586c85d6498a6467ac",
+          "after": "f7f4fda26c00e893be8060a66997d661bc9e941bd3e65e51d08a99a90b6c6226"
+        },
+        "CanonicalOval.content_hash": {
+          "before": null,
+          "after": "a4bd1aa3de463dfd74ae2b4300efe6fe6f41dda87162905a00107ae1513b39af"
+        },
+        "CanonicalOval.from_payload": {
+          "before": null,
+          "after": "722fd39e38157de5ea08c4e2b4da0f273574db228819819c910657b0c3e08dab"
+        },
+        "CanonicalOval.to_payload": {
+          "before": null,
+          "after": "c97c505ebbb696dec0fd0b276ae7d67a052fe30ac577e0629c4bfaf126328582"
+        },
+        "CanonicalOvalError": {
+          "before": "e52d80d8a32c24ae4903dc1e8f1e4c47fad0614bb10dba28e2addefe55e6e032",
+          "after": "6d4a1856faa870efd2674cce3380897ab68a28b64b132963b6e76be7fa0e3810"
+        },
+        "CanonicalOvalPayload": {
+          "before": null,
+          "after": "4c7d518401a2744f18dab435200baba338edafa6320fc93867b8846e27e5596e"
         }
       }
     },
     "tests/code_quality/test_engine_numerical_identity_admission.py": {
-      "before_sha256": "ea42f9981f4a676b7eac55ffbbfa72f98ab9b617962d7a7b42feefefc123bad8",
-      "after_sha256": "c3f23ac1a4cd4b87d696741e4faf49291a2e905b72c46b1a7b0efb4b05842656",
+      "before_sha256": "c3f23ac1a4cd4b87d696741e4faf49291a2e905b72c46b1a7b0efb4b05842656",
+      "after_sha256": "ecb1a5a8d0063afdb86e3feefb587d97eed26e21a1a97fed13e4c7981ac0fd11",
       "owners": {
         "test_identity_inventory_uses_current_twelve_shards_and_native_cohort": {
-          "before": "89d1865af298af5e12992f369095237245b55f388be63ac3c953e57efbd32a53",
-          "after": "02bf58ab4500c505114d2d6c49895c45b58eca5676991bcd0386c3d80e2262dc"
+          "before": "02bf58ab4500c505114d2d6c49895c45b58eca5676991bcd0386c3d80e2262dc",
+          "after": "584c8bbc889ed2b3e2099d9ae07ae2d3c07efbadb2aaa47af793c3efb49ead1f"
         }
       }
     },
-    "tests/rules/section01/test_milli_inch_oval_oval_witnesses.py": {
+    "tests/rules/section01/test_milli_inch_oval_payload.py": {
       "before_sha256": null,
-      "after_sha256": "e250b5ffb30db779fbb95acd4b2c3da96a7bb7e3bb1815bf79cb6d890e9ed8fc",
+      "after_sha256": "369c328334f35fd46cef208ac34d46dec2517708acf4364c814eeab9949b942c",
       "owners": {
         "@module": {
           "before": null,
-          "after": "7e5eb64b44fd1b0a405263656b328b906122f12727132a5c6cdf6f6481f2f9a9"
+          "after": "379362d08d3bf76e6905ab57bac30afa55734f0ca901921626b93ac2428e39e2"
         },
-        "_assert_oval_pair": {
+        "test_canonical_oval_payload_detaches_center_and_retains_equal_axis_facing": {
           "before": null,
-          "after": "b6999b854eb3939245f429eb95074e76e7faf91c3a0a3741ab5e3aca253a95d0"
+          "after": "f64b2b175c66f08ef577645b7fa3684b628370d8eb944da8d9ca45e0a17f4c90"
         },
-        "_ellipse_level": {
+        "test_canonical_oval_payload_rejects_noncanonical_values": {
           "before": null,
-          "after": "c31ca20061e83becb930bfa725e87ed9f4d7646fd56603b12fa7d1f92c092e18"
+          "after": "5b14a690f7c36a01c53447f0ecad3a4b553b66cc4131840affbb678728678479"
         },
-        "_prove_gap_bin": {
+        "test_canonical_oval_payload_requires_an_exact_object_shape": {
           "before": null,
-          "after": "4e7dac8a1005c2b8f78bbf0a1958f326146e45fc5e407c9caac642b3c1b58287"
+          "after": "8f056d250a9289aa9e583644dad5fd1c41de433ef987da68d2e123dae54e9a00"
         },
-        "_quarter_turn": {
+        "test_canonical_oval_payload_round_trips_exactly": {
           "before": null,
-          "after": "b3742ae0f87ab238ebc1391901556ad6de21106552333a1d456b9b8c1a998c60"
+          "after": "f6317dea1044fc37f81d33d29faa35c0a6636338952e08287727809caabd46fb"
         },
-        "test_symbolic_oval_pair_rounds_across_off_axis_midpoint": {
+        "test_restored_ovals_preserve_relation_and_rounded_gap": {
           "before": null,
-          "after": "ff4b1336d79caf8dc79efb5fddda093931b023f7889cf5763e410b78a8e88936"
-        },
-        "test_symbolic_oval_pair_topology": {
-          "before": null,
-          "after": "d7d7b356cfe3783f05e69456e716586ca22b342dd1e9d904d0c6d81ec9d892fd"
+          "after": "5da2e843e856763cd1a988dbbf3948a7ce05e8eaa23022c0c236cde7383d8f5b"
         }
       }
     }
@@ -230,9 +376,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Balance the current behavioral workload including seven exact oval witness cases.",
-      "source_obligation": "Regenerate all twelve shards from the complete covered JUnit reports.",
-      "unchanged_work": "Preserve prior behavioral cases, full-package branch coverage, and timing limits."
+      "rationale": "Record the measured full behavioral profile and regenerate the twelve shard manifests.",
+      "source_obligation": "Use complete source-bound covered timings and keep every selected case in the inventory.",
+      "unchanged_work": "The twelve lanes, existing test cases, timing supervision and branch-coverage floor are retained."
     },
     "ci/test_shards/shard-1.txt": {
       "category": "rule_semantics",
@@ -240,9 +386,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Balance the current behavioral workload including seven exact oval witness cases.",
-      "source_obligation": "Regenerate all twelve shards from the complete covered JUnit reports.",
-      "unchanged_work": "Preserve prior behavioral cases, full-package branch coverage, and timing limits."
+      "rationale": "Record the measured full behavioral profile and regenerate the twelve shard manifests.",
+      "source_obligation": "Use complete source-bound covered timings and keep every selected case in the inventory.",
+      "unchanged_work": "The twelve lanes, existing test cases, timing supervision and branch-coverage floor are retained."
     },
     "ci/test_shards/shard-10.txt": {
       "category": "rule_semantics",
@@ -250,9 +396,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Balance the current behavioral workload including seven exact oval witness cases.",
-      "source_obligation": "Regenerate all twelve shards from the complete covered JUnit reports.",
-      "unchanged_work": "Preserve prior behavioral cases, full-package branch coverage, and timing limits."
+      "rationale": "Record the measured full behavioral profile and regenerate the twelve shard manifests.",
+      "source_obligation": "Use complete source-bound covered timings and keep every selected case in the inventory.",
+      "unchanged_work": "The twelve lanes, existing test cases, timing supervision and branch-coverage floor are retained."
     },
     "ci/test_shards/shard-11.txt": {
       "category": "rule_semantics",
@@ -260,9 +406,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Balance the current behavioral workload including seven exact oval witness cases.",
-      "source_obligation": "Regenerate all twelve shards from the complete covered JUnit reports.",
-      "unchanged_work": "Preserve prior behavioral cases, full-package branch coverage, and timing limits."
+      "rationale": "Record the measured full behavioral profile and regenerate the twelve shard manifests.",
+      "source_obligation": "Use complete source-bound covered timings and keep every selected case in the inventory.",
+      "unchanged_work": "The twelve lanes, existing test cases, timing supervision and branch-coverage floor are retained."
     },
     "ci/test_shards/shard-12.txt": {
       "category": "rule_semantics",
@@ -270,9 +416,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Balance the current behavioral workload including seven exact oval witness cases.",
-      "source_obligation": "Regenerate all twelve shards from the complete covered JUnit reports.",
-      "unchanged_work": "Preserve prior behavioral cases, full-package branch coverage, and timing limits."
+      "rationale": "Record the measured full behavioral profile and regenerate the twelve shard manifests.",
+      "source_obligation": "Use complete source-bound covered timings and keep every selected case in the inventory.",
+      "unchanged_work": "The twelve lanes, existing test cases, timing supervision and branch-coverage floor are retained."
     },
     "ci/test_shards/shard-2.txt": {
       "category": "rule_semantics",
@@ -280,9 +426,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Balance the current behavioral workload including seven exact oval witness cases.",
-      "source_obligation": "Regenerate all twelve shards from the complete covered JUnit reports.",
-      "unchanged_work": "Preserve prior behavioral cases, full-package branch coverage, and timing limits."
+      "rationale": "Record the measured full behavioral profile and regenerate the twelve shard manifests.",
+      "source_obligation": "Use complete source-bound covered timings and keep every selected case in the inventory.",
+      "unchanged_work": "The twelve lanes, existing test cases, timing supervision and branch-coverage floor are retained."
     },
     "ci/test_shards/shard-3.txt": {
       "category": "rule_semantics",
@@ -290,9 +436,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Balance the current behavioral workload including seven exact oval witness cases.",
-      "source_obligation": "Regenerate all twelve shards from the complete covered JUnit reports.",
-      "unchanged_work": "Preserve prior behavioral cases, full-package branch coverage, and timing limits."
+      "rationale": "Record the measured full behavioral profile and regenerate the twelve shard manifests.",
+      "source_obligation": "Use complete source-bound covered timings and keep every selected case in the inventory.",
+      "unchanged_work": "The twelve lanes, existing test cases, timing supervision and branch-coverage floor are retained."
     },
     "ci/test_shards/shard-4.txt": {
       "category": "rule_semantics",
@@ -300,9 +446,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Balance the current behavioral workload including seven exact oval witness cases.",
-      "source_obligation": "Regenerate all twelve shards from the complete covered JUnit reports.",
-      "unchanged_work": "Preserve prior behavioral cases, full-package branch coverage, and timing limits."
+      "rationale": "Record the measured full behavioral profile and regenerate the twelve shard manifests.",
+      "source_obligation": "Use complete source-bound covered timings and keep every selected case in the inventory.",
+      "unchanged_work": "The twelve lanes, existing test cases, timing supervision and branch-coverage floor are retained."
     },
     "ci/test_shards/shard-5.txt": {
       "category": "rule_semantics",
@@ -310,9 +456,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Balance the current behavioral workload including seven exact oval witness cases.",
-      "source_obligation": "Regenerate all twelve shards from the complete covered JUnit reports.",
-      "unchanged_work": "Preserve prior behavioral cases, full-package branch coverage, and timing limits."
+      "rationale": "Record the measured full behavioral profile and regenerate the twelve shard manifests.",
+      "source_obligation": "Use complete source-bound covered timings and keep every selected case in the inventory.",
+      "unchanged_work": "The twelve lanes, existing test cases, timing supervision and branch-coverage floor are retained."
     },
     "ci/test_shards/shard-6.txt": {
       "category": "rule_semantics",
@@ -320,9 +466,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Balance the current behavioral workload including seven exact oval witness cases.",
-      "source_obligation": "Regenerate all twelve shards from the complete covered JUnit reports.",
-      "unchanged_work": "Preserve prior behavioral cases, full-package branch coverage, and timing limits."
+      "rationale": "Record the measured full behavioral profile and regenerate the twelve shard manifests.",
+      "source_obligation": "Use complete source-bound covered timings and keep every selected case in the inventory.",
+      "unchanged_work": "The twelve lanes, existing test cases, timing supervision and branch-coverage floor are retained."
     },
     "ci/test_shards/shard-7.txt": {
       "category": "rule_semantics",
@@ -330,9 +476,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Balance the current behavioral workload including seven exact oval witness cases.",
-      "source_obligation": "Regenerate all twelve shards from the complete covered JUnit reports.",
-      "unchanged_work": "Preserve prior behavioral cases, full-package branch coverage, and timing limits."
+      "rationale": "Record the measured full behavioral profile and regenerate the twelve shard manifests.",
+      "source_obligation": "Use complete source-bound covered timings and keep every selected case in the inventory.",
+      "unchanged_work": "The twelve lanes, existing test cases, timing supervision and branch-coverage floor are retained."
     },
     "ci/test_shards/shard-8.txt": {
       "category": "rule_semantics",
@@ -340,9 +486,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Balance the current behavioral workload including seven exact oval witness cases.",
-      "source_obligation": "Regenerate all twelve shards from the complete covered JUnit reports.",
-      "unchanged_work": "Preserve prior behavioral cases, full-package branch coverage, and timing limits."
+      "rationale": "Record the measured full behavioral profile and regenerate the twelve shard manifests.",
+      "source_obligation": "Use complete source-bound covered timings and keep every selected case in the inventory.",
+      "unchanged_work": "The twelve lanes, existing test cases, timing supervision and branch-coverage floor are retained."
     },
     "ci/test_shards/shard-9.txt": {
       "category": "rule_semantics",
@@ -350,35 +496,139 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Balance the current behavioral workload including seven exact oval witness cases.",
-      "source_obligation": "Regenerate all twelve shards from the complete covered JUnit reports.",
-      "unchanged_work": "Preserve prior behavioral cases, full-package branch coverage, and timing limits."
+      "rationale": "Record the measured full behavioral profile and regenerate the twelve shard manifests.",
+      "source_obligation": "Use complete source-bound covered timings and keep every selected case in the inventory.",
+      "unchanged_work": "The twelve lanes, existing test cases, timing supervision and branch-coverage floor are retained."
     },
-    "data/source_audits/ci64_provenance_v1/oval-oval-witness-test-addition-v1.json": {
+    "contracts/examples/persistence/session-persistence.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate the existing contract fixtures for the packaged build identity.",
+      "source_obligation": "Publish the actual current build ID in the generated current contract examples and inventory.",
+      "unchanged_work": "The existing adapter schemas, session settings, checkpoint structure and replay semantics are preserved."
+    },
+    "contracts/examples/sessions/session-command-outcome.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate the existing contract fixtures for the packaged build identity.",
+      "source_obligation": "Publish the actual current build ID in the generated current contract examples and inventory.",
+      "unchanged_work": "The existing adapter schemas, session settings, checkpoint structure and replay semantics are preserved."
+    },
+    "contracts/examples/sessions/session-command-started.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate the existing contract fixtures for the packaged build identity.",
+      "source_obligation": "Publish the actual current build ID in the generated current contract examples and inventory.",
+      "unchanged_work": "The existing adapter schemas, session settings, checkpoint structure and replay semantics are preserved."
+    },
+    "contracts/examples/sessions/session-metadata-created.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate the existing contract fixtures for the packaged build identity.",
+      "source_obligation": "Publish the actual current build ID in the generated current contract examples and inventory.",
+      "unchanged_work": "The existing adapter schemas, session settings, checkpoint structure and replay semantics are preserved."
+    },
+    "contracts/examples/support-profile-player-a-redacted.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate the existing contract fixtures for the packaged build identity.",
+      "source_obligation": "Publish the actual current build ID in the generated current contract examples and inventory.",
+      "unchanged_work": "The existing adapter schemas, session settings, checkpoint structure and replay semantics are preserved."
+    },
+    "contracts/examples/support-profile-player-b-redacted.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate the existing contract fixtures for the packaged build identity.",
+      "source_obligation": "Publish the actual current build ID in the generated current contract examples and inventory.",
+      "unchanged_work": "The existing adapter schemas, session settings, checkpoint structure and replay semantics are preserved."
+    },
+    "contracts/examples/support-profile.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate the existing contract fixtures for the packaged build identity.",
+      "source_obligation": "Publish the actual current build ID in the generated current contract examples and inventory.",
+      "unchanged_work": "The existing adapter schemas, session settings, checkpoint structure and replay semantics are preserved."
+    },
+    "contracts/manifest.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate the existing contract fixtures for the packaged build identity.",
+      "source_obligation": "Publish the actual current build ID in the generated current contract examples and inventory.",
+      "unchanged_work": "The existing adapter schemas, session settings, checkpoint structure and replay semantics are preserved."
+    },
+    "data/source_audits/ci64_provenance_v1/oval-codec-test-transition-v1.json": {
       "category": "rule_semantics",
       "operations": [
         "exact-movement-test-admission"
       ],
       "selected_families": [],
-      "rationale": "Certify finite off-axis oval contact and rounded gap cases independently.",
-      "source_obligation": "Check real-arithmetic topology and rational bounds for the declared witnesses.",
-      "unchanged_work": "The witnesses run only during tests and leave runtime workloads unchanged."
+      "rationale": "Enroll the focused oval codec controls in the existing measured behavioral tests.",
+      "source_obligation": "Verify the exact codec source and test bytes bound by the finite successor admission.",
+      "unchanged_work": "All previously selected source and tests retain their established semantics and cases."
     },
     "docs/DISTANCE_PRECISION.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Record the witness method, its limits, and the required test operation ownership.",
-      "source_obligation": "Describe the exact certificates and map their test-only admission inputs.",
-      "unchanged_work": "The existing runtime comparison workloads and historical evidence are preserved."
+      "rationale": "Document the staged codec contract and register the finite test admission record.",
+      "source_obligation": "Specify canonical fields and strict restoration using the existing staged geometry representation.",
+      "unchanged_work": "The supported shape and facing domain and the active gameplay numerical policy are preserved."
+    },
+    "docs/performance/current/oval-codec-movement.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Record matched exact-base and current-runtime evidence from the registered component driver.",
+      "source_obligation": "Retain the original workload and input identity with all required serial samples.",
+      "unchanged_work": "The work cases, criteria and historical timing evidence retain their original meaning."
+    },
+    "docs/performance/current/oval-codec-setup.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Record matched exact-base and current-runtime evidence from the registered component driver.",
+      "source_obligation": "Retain the original workload and input identity with all required serial samples.",
+      "unchanged_work": "The work cases, criteria and historical timing evidence retain their original meaning."
+    },
+    "docs/performance/current/oval-codec-visibility.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Record matched exact-base and current-runtime evidence from the registered component driver.",
+      "source_obligation": "Retain the original workload and input identity with all required serial samples.",
+      "unchanged_work": "The work cases, criteria and historical timing evidence retain their original meaning."
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Record the witness method, its limits, and the required test operation ownership.",
-      "source_obligation": "Describe the exact certificates and map their test-only admission inputs.",
-      "unchanged_work": "The existing runtime comparison workloads and historical evidence are preserved."
+      "rationale": "Document the staged codec contract and register the finite test admission record.",
+      "source_obligation": "Specify canonical fields and strict restoration using the existing staged geometry representation.",
+      "unchanged_work": "The supported shape and facing domain and the active gameplay numerical policy are preserved."
     },
     "scripts/engine_numerical_identity_test_admission.py": {
       "category": "rule_semantics",
@@ -386,9 +636,33 @@
         "engine-numerical-identity-admission"
       ],
       "selected_families": [],
-      "rationale": "Admit the witness test module as a finite successor to the oval gap cases.",
-      "source_obligation": "Bind the exact witness bytes, predecessor digest, and same runtime fingerprint.",
-      "unchanged_work": "Preserve every prior test admission and the current engine build identity."
+      "rationale": "Pin the successor source and its codec tests in the existing behavioral admission.",
+      "source_obligation": "Check the retained witness predecessor, exact new source and additional case inventory.",
+      "unchanged_work": "The previous Oval point, pair, polygon and solver evidence continues to apply to the retained tests."
+    },
+    "src/warhammer40k_core/_engine_build_manifest.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "source-record"
+      ],
+      "selected_families": [],
+      "rationale": "Record the build identity of the packaged staged codec.",
+      "source_obligation": "Bind the packaged primitive source in the generated runtime inventory.",
+      "unchanged_work": "Retained executors retain their own identities and semantics."
+    },
+    "src/warhammer40k_core/geometry/milli_inch_oval.py": {
+      "category": "serialization_or_replay_work",
+      "operations": [
+        "geometry-search"
+      ],
+      "selected_families": [
+        "movement",
+        "setup",
+        "visibility"
+      ],
+      "rationale": "Serialize and restore a staged oval at its existing integer tick and facing boundary.",
+      "source_obligation": "Require exact payload fields, signed integer coordinates, full axes, supported normalized facing, and versioned numerical policy.",
+      "unchanged_work": "Existing topology, gap arithmetic, gameplay and replay callers retain their prior behavior."
     },
     "tests/code_quality/test_engine_numerical_identity_admission.py": {
       "category": "rule_semantics",
@@ -396,22 +670,26 @@
         "engine-numerical-identity-admission"
       ],
       "selected_families": [],
-      "rationale": "Admit the witness test module as a finite successor to the oval gap cases.",
-      "source_obligation": "Bind the exact witness bytes, predecessor digest, and same runtime fingerprint.",
-      "unchanged_work": "Preserve every prior test admission and the current engine build identity."
+      "rationale": "Pin the successor source and its codec tests in the existing behavioral admission.",
+      "source_obligation": "Check the retained witness predecessor, exact new source and additional case inventory.",
+      "unchanged_work": "The previous Oval point, pair, polygon and solver evidence continues to apply to the retained tests."
     },
-    "tests/rules/section01/test_milli_inch_oval_oval_witnesses.py": {
+    "tests/rules/section01/test_milli_inch_oval_payload.py": {
       "category": "rule_semantics",
       "operations": [
         "exact-movement-test-admission"
       ],
       "selected_families": [],
-      "rationale": "Certify finite off-axis oval contact and rounded gap cases independently.",
-      "source_obligation": "Check real-arithmetic topology and rational bounds for the declared witnesses.",
-      "unchanged_work": "The witnesses run only during tests and leave runtime workloads unchanged."
+      "rationale": "Enroll the focused oval codec controls in the existing measured behavioral tests.",
+      "source_obligation": "Verify the exact codec source and test bytes bound by the finite successor admission.",
+      "unchanged_work": "All previously selected source and tests retain their established semantics and cases."
     }
   },
   "milestone": "ordinary",
-  "comparisons": {},
+  "comparisons": {
+    "movement": "docs/performance/current/oval-codec-movement.json",
+    "setup": "docs/performance/current/oval-codec-setup.json",
+    "visibility": "docs/performance/current/oval-codec-visibility.json"
+  },
   "full_game": null
 }
