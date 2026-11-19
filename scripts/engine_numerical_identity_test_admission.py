@@ -113,6 +113,10 @@ OVAL_OVAL_WITNESS_ADDITION = (
 OVAL_OVAL_WITNESS_SHA256 = "b55763903095916ca0082e36ce7a24ac2515a4a0e53516dbd86028af5687aa0d"
 OVAL_OVAL_WITNESS_OWNER = "tests/rules/section01/test_milli_inch_oval_oval_witnesses.py"
 
+OVAL_CODEC_TRANSITION = "data/source_audits/ci64_provenance_v1/oval-codec-test-transition-v1.json"
+OVAL_CODEC_SHA256 = "b7bdb26dd433d2b87d0f488ffd054f6bb41592f6ac23865c66c5ccd0ec273057"
+OVAL_CODEC_OWNER = "tests/rules/section01/test_milli_inch_oval_payload.py"
+
 
 type TestTransition = tuple[dict[str, dict[str, object]], dict[str, dict[str, object]], bytes]
 
@@ -177,6 +181,12 @@ def exact_movement_test_transition(
     for path in witness_paths:
         _selection_no_links(root, root / path)
     has_witnesses = any((root / path).exists() for path in witness_paths)
+    codec_paths = (OVAL_CODEC_TRANSITION, OVAL_CODEC_OWNER)
+    for path in codec_paths:
+        _selection_no_links(root, root / path)
+    has_codec = any((root / path).exists() for path in codec_paths)
+    if has_codec and not has_witnesses:
+        raise SystemExit("Oval codec tests require the oval-oval witness predecessor.")
     if has_witnesses and not has_oval_gap:
         raise SystemExit("Oval-oval witness tests require their oval-oval gap predecessor.")
     if has_oval_gap and not has_oval_oval:
@@ -292,7 +302,8 @@ def exact_movement_test_transition(
         ):
             raise SystemExit("Circle-oval test transition membership differs.")
         for name, digest in circle_oval["sources"].items():
-            _checked_bytes(root, name, digest)
+            if name != _OVAL_POINT_SOURCE or not has_codec:
+                _checked_bytes(root, name, digest)
         additions.update(_selection_members(circle_oval["added_files"], root))
         runtime = circle_oval["runtime_fingerprint"]
         raw += b"\0" + circle_oval_raw
@@ -358,6 +369,28 @@ def exact_movement_test_transition(
             raise SystemExit("Oval-oval witness test addition membership differs.")
         additions.update(_selection_members(witness["added_files"], root))
         raw += b"\0" + witness_raw
+    if has_codec:
+        codec_raw = _checked_bytes(root, OVAL_CODEC_TRANSITION, OVAL_CODEC_SHA256)
+        codec = json.loads(codec_raw, object_pairs_hook=_selection_object)
+        if (
+            codec.keys()
+            != {
+                "schema",
+                "runtime_fingerprint",
+                "retained_oval_oval_witness_sha256",
+                "sources",
+                "added_files",
+            }
+            or codec["schema"] != "finite-oval-codec-test-transition-v1"
+            or codec["retained_oval_oval_witness_sha256"] != OVAL_OVAL_WITNESS_SHA256
+            or set(codec["sources"]) != {_OVAL_POINT_SOURCE}
+            or set(codec["added_files"]) != {OVAL_CODEC_OWNER}
+        ):
+            raise SystemExit("Oval codec test transition membership differs.")
+        _checked_bytes(root, _OVAL_POINT_SOURCE, codec["sources"][_OVAL_POINT_SOURCE])
+        additions.update(_selection_members(codec["added_files"], root))
+        runtime = codec["runtime_fingerprint"]
+        raw += b"\0" + codec_raw
     retained = _identity_test_transition(root, retained_cutover_sha256, runtime=runtime)
     if retained is None:
         raise SystemExit(

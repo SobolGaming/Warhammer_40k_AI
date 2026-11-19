@@ -2,27 +2,40 @@
 
 from __future__ import annotations
 
+import hashlib
+import json
 from collections.abc import Callable
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import cast
+from typing import Self, TypedDict, cast
 
-from warhammer40k_core.geometry.milli_inch import DistancePrecisionError
+from warhammer40k_core.geometry.milli_inch import DISTANCE_POLICY_ID, DistancePrecisionError
 from warhammer40k_core.geometry.milli_inch_polygon import (
     MAX_COORDINATE_TICKS,
     MIN_COORDINATE_TICKS,
     TickVertex,
 )
 
+OVAL_SCHEMA = "milli-inch-oval-v1"
+
 
 class CanonicalOvalError(DistancePrecisionError):
-    """An oval or point is outside the staged canonical input domain."""
+    """An oval, point or serialized representation is invalid."""
 
 
 class OvalPointLocation(StrEnum):
     EXTERIOR = "exterior"
     BOUNDARY = "boundary"
     INTERIOR = "interior"
+
+
+class CanonicalOvalPayload(TypedDict):
+    schema_version: str
+    numerical_policy_id: str
+    center: list[int]
+    length_ticks: int
+    width_ticks: int
+    facing_degrees: int
 
 
 @dataclass(frozen=True, slots=True)
@@ -45,6 +58,58 @@ class CanonicalOval:
         if type(self.facing_degrees) is not int or self.facing_degrees % 45:
             raise CanonicalOvalError("Oval facing requires an integer multiple of 45 degrees.")
         object.__setattr__(self, "facing_degrees", self.facing_degrees % 180)
+
+    def to_payload(self) -> CanonicalOvalPayload:
+        return {
+            "schema_version": OVAL_SCHEMA,
+            "numerical_policy_id": DISTANCE_POLICY_ID,
+            "center": list(self.center),
+            "length_ticks": self.length_ticks,
+            "width_ticks": self.width_ticks,
+            "facing_degrees": self.facing_degrees,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: object) -> Self:
+        if type(payload) is not dict:
+            raise CanonicalOvalError("A canonical oval payload must be an object.")
+        value = cast(dict[object, object], payload)
+        if (
+            any(type(key) is not str for key in value)
+            or set(value)
+            != {
+                "schema_version",
+                "numerical_policy_id",
+                "center",
+                "length_ticks",
+                "width_ticks",
+                "facing_degrees",
+            }
+            or type(value["schema_version"]) is not str
+            or type(value["numerical_policy_id"]) is not str
+            or value["schema_version"] != OVAL_SCHEMA
+            or value["numerical_policy_id"] != DISTANCE_POLICY_ID
+        ):
+            raise CanonicalOvalError("Canonical oval fields, schema or numerical policy drifted.")
+        center = value["center"]
+        if type(center) is not list:
+            raise CanonicalOvalError("A canonical center payload requires an integer tick pair.")
+        pair = cast(list[object], center)
+        if len(pair) != 2 or any(type(coordinate) is not int for coordinate in pair):
+            raise CanonicalOvalError("A canonical center payload requires an integer tick pair.")
+        length, width = value["length_ticks"], value["width_ticks"]
+        if type(length) is not int or type(width) is not int:
+            raise CanonicalOvalError("Canonical oval axes require integer ticks.")
+        facing = value["facing_degrees"]
+        if type(facing) is not int or not 0 <= facing < 180:
+            raise CanonicalOvalError("A canonical facing payload requires normalized degrees.")
+        return cls((cast(int, pair[0]), cast(int, pair[1])), length, width, facing)
+
+    @property
+    def content_hash(self) -> str:
+        """Hash the complete versioned payload, including the normalized facing."""
+        raw = json.dumps(self.to_payload(), sort_keys=True, separators=(",", ":")).encode()
+        return hashlib.sha256(raw).hexdigest()
 
 
 def oval_point_location(oval: CanonicalOval, point: TickVertex) -> OvalPointLocation:

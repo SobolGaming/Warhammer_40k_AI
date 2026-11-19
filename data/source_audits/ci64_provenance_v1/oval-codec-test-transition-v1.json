@@ -1,0 +1,16 @@
+{
+  "added_files": {
+    "tests/rules/section01/test_milli_inch_oval_payload.py": {
+      "blob_sha1": "affac8fc94303e80fac85c7a519f83d85ea10c4d",
+      "bytes": 4774,
+      "mode": "100644",
+      "sha256": "369c328334f35fd46cef208ac34d46dec2517708acf4364c814eeab9949b942c"
+    }
+  },
+  "retained_oval_oval_witness_sha256": "b55763903095916ca0082e36ce7a24ac2515a4a0e53516dbd86028af5687aa0d",
+  "runtime_fingerprint": "7ba104452c12a3985e8500622a9e9ed09527ad12cd42913e77b8ef2dcf728eb3",
+  "schema": "finite-oval-codec-test-transition-v1",
+  "sources": {
+    "src/warhammer40k_core/geometry/milli_inch_oval.py": "9046573f9c05a1c3ea985ee20f12df4dcf8d73bb621e092bd80b71d29ad0c9ee"
+  }
+}
