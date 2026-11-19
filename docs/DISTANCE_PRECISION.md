@@ -241,9 +241,28 @@ vertices and edges of concave rings.
 The gap subtracts the diameter-derived radius before rounding once. The squared
 midpoint comparison handles odd diameters, irrational distances and half-tick ties.
 A separated pair can have a rounded gap of zero. These staged queries complete
-the canonical circle–polygon pair in checklist item 1. Oval and rotated shapes,
-and backend and solver agreement, remain part of that item.
+the canonical circle–polygon pair in checklist item 1.
 
+## Staged canonical oval point queries
+`geometry.milli_inch_oval` queries a filled ellipse using a signed 64-bit
+integer tick center, positive signed 64-bit full axes with length at least
+width, and an integer facing in 45-degree increments modulo 180 degrees.
+Query points are signed 64-bit integer tick pairs. The positive axes preserve
+odd full lengths exactly. The squared ellipse equation uses integer
+coefficients for all four facings, including the two diagonal rotations.
+Its value determines exterior, boundary or interior exactly.
+
+For an exterior point, an exact real-polynomial query asks whether the ellipse
+intersects the open disk centered on the point at a candidate half-tick radius.
+Binary search selects the first integer tick whose upper midpoint is strictly
+above the Euclidean distance. This rounds exact half-tick ties up and permits
+an exterior point to have a rounded distance of zero. Interior and boundary
+points return zero. Derived lengths may exceed the coordinate bound.
+
+This is a query-only contribution to checklist item 1. Arbitrary facings and
+noncanonical inputs raise typed errors. Shape-pair queries involving ovals,
+backend agreement, serialization, and gameplay activation remain outside this
+slice.
 ## Selected exact-coordinate contact slice
 
 The next representation contract is `rational-quadratic-coordinate-v1`, implemented

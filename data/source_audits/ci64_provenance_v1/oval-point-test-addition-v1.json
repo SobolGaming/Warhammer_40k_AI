@@ -1,0 +1,13 @@
+{
+  "added_files": {
+    "tests/rules/section01/test_milli_inch_oval.py": {
+      "blob_sha1": "603dcd29748c52581749abbbd3c0612ce5d21c69",
+      "bytes": 4047,
+      "mode": "100644",
+      "sha256": "c4ed56e9390254b760f617931f8b2a4b60936f61700fa4e6645c48bab711e2e0"
+    }
+  },
+  "runtime_fingerprint": "4ca812022df14f3852abfd580ce9f21d877510fd49e99cb513faffbf2c1f95b4",
+  "schema": "finite-oval-point-test-addition-v1",
+  "source_sha256": "3b2986ab0751fbb52ed49494973e42e43d9982feaab8642fc1822a6e42bd175c"
+}
