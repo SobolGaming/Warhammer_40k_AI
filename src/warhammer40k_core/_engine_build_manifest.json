@@ -1,8 +1,8 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:4ca812022df14f3852abfd580ce9f21d877510fd49e99cb513faffbf2c1f95b4",
-  "fingerprint": "4ca812022df14f3852abfd580ce9f21d877510fd49e99cb513faffbf2c1f95b4",
-  "resource_count": 3271,
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:ba2fd9ea28020348d853c2631b340dcb2d0924973484dcc3e30b3ad343a74c83",
+  "fingerprint": "ba2fd9ea28020348d853c2631b340dcb2d0924973484dcc3e30b3ad343a74c83",
+  "resource_count": 3272,
   "resources": [
     {
       "byte_length": 113,
@@ -13848,6 +13848,11 @@
       "byte_length": 4920,
       "path": "warhammer40k_core/geometry/milli_inch_oval.py",
       "sha256": "3b2986ab0751fbb52ed49494973e42e43d9982feaab8642fc1822a6e42bd175c"
+    },
+    {
+      "byte_length": 2861,
+      "path": "warhammer40k_core/geometry/milli_inch_oval_polygon.py",
+      "sha256": "fc3016f7b8b6a2f2c15ea646608b28b586e5e885ca75aae883eab0d0f4a5e3b2"
     },
     {
       "byte_length": 7340,

@@ -1,0 +1,13 @@
+{
+  "added_files": {
+    "tests/rules/section01/test_milli_inch_oval_polygon.py": {
+      "blob_sha1": "e2bc18596e41de6177add13a6bc16c12c937c920",
+      "bytes": 4142,
+      "mode": "100644",
+      "sha256": "7fa90f42ae5c12d83c7b52e645846aeb4f33b072e652ed9c836a073a99b758ae"
+    }
+  },
+  "runtime_fingerprint": "ba2fd9ea28020348d853c2631b340dcb2d0924973484dcc3e30b3ad343a74c83",
+  "schema": "finite-oval-polygon-test-addition-v1",
+  "source_sha256": "fc3016f7b8b6a2f2c15ea646608b28b586e5e885ca75aae883eab0d0f4a5e3b2"
+}

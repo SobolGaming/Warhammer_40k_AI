@@ -259,10 +259,30 @@ above the Euclidean distance. This rounds exact half-tick ties up and permits
 an exterior point to have a rounded distance of zero. Interior and boundary
 points return zero. Derived lengths may exceed the coordinate bound.
 
-This is a query-only contribution to checklist item 1. Arbitrary facings and
-noncanonical inputs raise typed errors. Shape-pair queries involving ovals,
-backend agreement, serialization, and gameplay activation remain outside this
-slice.
+Arbitrary facings and noncanonical inputs raise typed errors.
+
+## Staged canonical oval–polygon topology
+
+`geometry.milli_inch_oval_polygon.oval_polygon_relation` classifies a filled
+`CanonicalOval` and a filled `CanonicalPolygon` as separated, in boundary-only
+contact, or sharing interior. It supports the same four ellipse facings and
+signed 64-bit tick coordinates as the point query and uses the existing closed
+simple-ring domain, including concave rings.
+
+If the polygon contains the oval center or touches it on its boundary, the two
+shapes share interior. Otherwise, the minimum of the ellipse's quadratic
+residual on each closed polygon edge determines the relation. A negative
+minimum anywhere gives shared interior. If all minima are nonnegative, zero
+gives boundary-only contact and strictly positive minima give separation. The
+edge parameter can be rational and off-grid. Its comparison uses integer
+arithmetic throughout, without rounding.
+
+This stages the topology part of this pair in checklist item 1. The scaled
+ellipse residual measures position relative to the oval boundary. Computing a
+once-rounded Euclidean surface gap requires a separate nearest-point calculation.
+That gap, other oval pairs, arbitrary oval facings, backend agreement,
+serialization and gameplay activation remain follow-up work.
+
 ## Selected exact-coordinate contact slice
 
 The next representation contract is `rational-quadratic-coordinate-v1`, implemented
