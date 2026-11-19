@@ -1,352 +1,416 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "dea5d747f4abb937afebe630a9744058bcd6928f",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:ba2fd9ea28020348d853c2631b340dcb2d0924973484dcc3e30b3ad343a74c83",
-  "operation_map_sha256": "76309efcd451536ecd163bb79ca15d5d615bf985cdda8822a91199eeff31e5a5",
+  "base": "8cdfeb204027b2158928256c614acd8e5609d7d7",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:97070623acaf2026340f91ed0149246e46eb1eeb19a384d80d9d34043bf9ba86",
+  "operation_map_sha256": "74993b850a353de565ad7f9cc037f214393570226240ca39002c01cd7bb003f4",
   "changes": {
     "ci/test_shards/durations.json": {
-      "before_sha256": "3c7bf1248f8e932d8c042b201214f9ef35c69dedac28570fdbabcedc27e2b791",
-      "after_sha256": "c87d0c31a9c9402072134301c7aa7a2eba11fb8b48978a20f799153c0118bb0f",
+      "before_sha256": "c87d0c31a9c9402072134301c7aa7a2eba11fb8b48978a20f799153c0118bb0f",
+      "after_sha256": "5c32fa9052fc488ad4d8efccd2a69f3e93dc02fa3bf854165cdc39bb3a47f2d9",
       "owners": {
         "@document": {
-          "before": "3c7bf1248f8e932d8c042b201214f9ef35c69dedac28570fdbabcedc27e2b791",
-          "after": "c87d0c31a9c9402072134301c7aa7a2eba11fb8b48978a20f799153c0118bb0f"
+          "before": "c87d0c31a9c9402072134301c7aa7a2eba11fb8b48978a20f799153c0118bb0f",
+          "after": "5c32fa9052fc488ad4d8efccd2a69f3e93dc02fa3bf854165cdc39bb3a47f2d9"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
-      "before_sha256": "33f4da5e4764c208d9e55d2f76a167849418e1fb6805c1e6251a2bfdf3cc475c",
-      "after_sha256": "db541373fa38a4fb09994f46c00c8f7c9563bbfbdb2babbfc674cde597768324",
+      "before_sha256": "db541373fa38a4fb09994f46c00c8f7c9563bbfbdb2babbfc674cde597768324",
+      "after_sha256": "d86e2887470d3804efde6b8a92294d00cb5d1c2ef5c533ff35ef4466bd97c725",
       "owners": {
         "@document": {
-          "before": "33f4da5e4764c208d9e55d2f76a167849418e1fb6805c1e6251a2bfdf3cc475c",
-          "after": "db541373fa38a4fb09994f46c00c8f7c9563bbfbdb2babbfc674cde597768324"
+          "before": "db541373fa38a4fb09994f46c00c8f7c9563bbfbdb2babbfc674cde597768324",
+          "after": "d86e2887470d3804efde6b8a92294d00cb5d1c2ef5c533ff35ef4466bd97c725"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
-      "before_sha256": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20",
-      "after_sha256": "5fe2bb230021242de177917772cd3217df75a929a837cf4a802c13e31e64aa56",
+      "before_sha256": "5fe2bb230021242de177917772cd3217df75a929a837cf4a802c13e31e64aa56",
+      "after_sha256": "24d19598912ba07a0806d8c4d70836713db0d79dbca40fd1c6701d9e72a8686d",
       "owners": {
         "@document": {
-          "before": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20",
-          "after": "5fe2bb230021242de177917772cd3217df75a929a837cf4a802c13e31e64aa56"
+          "before": "5fe2bb230021242de177917772cd3217df75a929a837cf4a802c13e31e64aa56",
+          "after": "24d19598912ba07a0806d8c4d70836713db0d79dbca40fd1c6701d9e72a8686d"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
-      "before_sha256": "386fa75a357fc6485de4979f9e1c835e36ee577253067d861b302da2488b5b8a",
-      "after_sha256": "1f465998c265fdd2d47f1d7045f2980ed3f3dae89409db130878d61c3d4fcc5b",
+      "before_sha256": "1f465998c265fdd2d47f1d7045f2980ed3f3dae89409db130878d61c3d4fcc5b",
+      "after_sha256": "cc70e8d30f6ae467dd301982db9b0f5f9c4710d5656ea2b04f44a23aaa0427d4",
       "owners": {
         "@document": {
-          "before": "386fa75a357fc6485de4979f9e1c835e36ee577253067d861b302da2488b5b8a",
-          "after": "1f465998c265fdd2d47f1d7045f2980ed3f3dae89409db130878d61c3d4fcc5b"
+          "before": "1f465998c265fdd2d47f1d7045f2980ed3f3dae89409db130878d61c3d4fcc5b",
+          "after": "cc70e8d30f6ae467dd301982db9b0f5f9c4710d5656ea2b04f44a23aaa0427d4"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
-      "before_sha256": "d555b95a821c52245a8373890f0382b2724b9b77b0c6d4c51c28efd459193293",
-      "after_sha256": "96a7313ea7e3c4b5196f305277ea83718c54b3dc41d10caad438a9921aa82909",
+      "before_sha256": "96a7313ea7e3c4b5196f305277ea83718c54b3dc41d10caad438a9921aa82909",
+      "after_sha256": "ddbe9a65bd6c7748388a22e6ccb7144ae4b3ba77cf3d9371ad9120c58e72e955",
       "owners": {
         "@document": {
-          "before": "d555b95a821c52245a8373890f0382b2724b9b77b0c6d4c51c28efd459193293",
-          "after": "96a7313ea7e3c4b5196f305277ea83718c54b3dc41d10caad438a9921aa82909"
+          "before": "96a7313ea7e3c4b5196f305277ea83718c54b3dc41d10caad438a9921aa82909",
+          "after": "ddbe9a65bd6c7748388a22e6ccb7144ae4b3ba77cf3d9371ad9120c58e72e955"
+        }
+      }
+    },
+    "ci/test_shards/shard-2.txt": {
+      "before_sha256": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
+      "after_sha256": "1ea1267cd2202a11458de626477678f0306b0add4b2b167927aaf9e72d5f43f1",
+      "owners": {
+        "@document": {
+          "before": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
+          "after": "1ea1267cd2202a11458de626477678f0306b0add4b2b167927aaf9e72d5f43f1"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
-      "before_sha256": "75bc287df3fc906b14019027640d22b2f5dd8e7d055c70a1ea634da5266d5193",
-      "after_sha256": "0396c0c77bf5e2b7147d4b631e73c6ec1900b18b67beec98ee1f424346b0af90",
+      "before_sha256": "0396c0c77bf5e2b7147d4b631e73c6ec1900b18b67beec98ee1f424346b0af90",
+      "after_sha256": "06e3659747e9f637f87c64fb40c18ed5d6dac4dfa82aeb164e085a9bb2f39001",
       "owners": {
         "@document": {
-          "before": "75bc287df3fc906b14019027640d22b2f5dd8e7d055c70a1ea634da5266d5193",
-          "after": "0396c0c77bf5e2b7147d4b631e73c6ec1900b18b67beec98ee1f424346b0af90"
+          "before": "0396c0c77bf5e2b7147d4b631e73c6ec1900b18b67beec98ee1f424346b0af90",
+          "after": "06e3659747e9f637f87c64fb40c18ed5d6dac4dfa82aeb164e085a9bb2f39001"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
-      "before_sha256": "fbbc62b239fc8419d04f4c8cf14c7c5d36b915ec888171a8fd5f1fc6c5e35277",
-      "after_sha256": "e1b6b5cb578b5820cbc2403c189a22c890e5fce1f5f65716c852606e29f6945f",
+      "before_sha256": "e1b6b5cb578b5820cbc2403c189a22c890e5fce1f5f65716c852606e29f6945f",
+      "after_sha256": "2d22f8f37a6b4736e6303a478dcd9eaab679cf2ec90802d2a4874b7f5ec9c2d1",
       "owners": {
         "@document": {
-          "before": "fbbc62b239fc8419d04f4c8cf14c7c5d36b915ec888171a8fd5f1fc6c5e35277",
-          "after": "e1b6b5cb578b5820cbc2403c189a22c890e5fce1f5f65716c852606e29f6945f"
+          "before": "e1b6b5cb578b5820cbc2403c189a22c890e5fce1f5f65716c852606e29f6945f",
+          "after": "2d22f8f37a6b4736e6303a478dcd9eaab679cf2ec90802d2a4874b7f5ec9c2d1"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
-      "before_sha256": "e2b474162aa109c4e11e7ea0962dca6afbddcdac1c873bc44d8e191da6470449",
-      "after_sha256": "8e6ab12e47b07f72d7a654584b142e678b60dcc760181fc91114a359e6b80231",
+      "before_sha256": "8e6ab12e47b07f72d7a654584b142e678b60dcc760181fc91114a359e6b80231",
+      "after_sha256": "1ebe6bc09b967163bec8574b9bd3449b6593f4a8c17361cff833f896a2035ac3",
       "owners": {
         "@document": {
-          "before": "e2b474162aa109c4e11e7ea0962dca6afbddcdac1c873bc44d8e191da6470449",
-          "after": "8e6ab12e47b07f72d7a654584b142e678b60dcc760181fc91114a359e6b80231"
+          "before": "8e6ab12e47b07f72d7a654584b142e678b60dcc760181fc91114a359e6b80231",
+          "after": "1ebe6bc09b967163bec8574b9bd3449b6593f4a8c17361cff833f896a2035ac3"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
-      "before_sha256": "7163aab769ec9b440383bd3b0d3948dfd39a10145ba1de96d9b17416f1fcc099",
-      "after_sha256": "dc95968040cc8cb21185c0b6fc6b904c782d14d5c10fd992e7a2bcbe0e355feb",
+      "before_sha256": "dc95968040cc8cb21185c0b6fc6b904c782d14d5c10fd992e7a2bcbe0e355feb",
+      "after_sha256": "b2f2360c54e9621a1b2e661ec1e92c68893020c03133956a1c46b3b3ce0d0687",
       "owners": {
         "@document": {
-          "before": "7163aab769ec9b440383bd3b0d3948dfd39a10145ba1de96d9b17416f1fcc099",
-          "after": "dc95968040cc8cb21185c0b6fc6b904c782d14d5c10fd992e7a2bcbe0e355feb"
+          "before": "dc95968040cc8cb21185c0b6fc6b904c782d14d5c10fd992e7a2bcbe0e355feb",
+          "after": "b2f2360c54e9621a1b2e661ec1e92c68893020c03133956a1c46b3b3ce0d0687"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
-      "before_sha256": "141b8c80a5dfbff93ea9f19559971bb7e619d86574d6e12f6c98edc8f7e3580f",
-      "after_sha256": "4c8d403f9a067e1bdb667281e86909f68b3269768bf670d2a0d4fab83980c12c",
+      "before_sha256": "4c8d403f9a067e1bdb667281e86909f68b3269768bf670d2a0d4fab83980c12c",
+      "after_sha256": "131ecd6c9192715b9f1b2884609832322586d0de16a0e219aa8ccace269aeb0d",
       "owners": {
         "@document": {
-          "before": "141b8c80a5dfbff93ea9f19559971bb7e619d86574d6e12f6c98edc8f7e3580f",
-          "after": "4c8d403f9a067e1bdb667281e86909f68b3269768bf670d2a0d4fab83980c12c"
+          "before": "4c8d403f9a067e1bdb667281e86909f68b3269768bf670d2a0d4fab83980c12c",
+          "after": "131ecd6c9192715b9f1b2884609832322586d0de16a0e219aa8ccace269aeb0d"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
-      "before_sha256": "a7fa97547edf413f30dd790670167469565995e25ab8dcdb58ef0be9a393b705",
-      "after_sha256": "0e5f6e954c10456149195e05acfe7761e6402307224c8562ee47be0c9f0405a1",
+      "before_sha256": "0e5f6e954c10456149195e05acfe7761e6402307224c8562ee47be0c9f0405a1",
+      "after_sha256": "fbfc1c69f7cc4a88dafe153b5691f8b1efbcea538e0aecfdb7761c65ec70985c",
       "owners": {
         "@document": {
-          "before": "a7fa97547edf413f30dd790670167469565995e25ab8dcdb58ef0be9a393b705",
-          "after": "0e5f6e954c10456149195e05acfe7761e6402307224c8562ee47be0c9f0405a1"
+          "before": "0e5f6e954c10456149195e05acfe7761e6402307224c8562ee47be0c9f0405a1",
+          "after": "fbfc1c69f7cc4a88dafe153b5691f8b1efbcea538e0aecfdb7761c65ec70985c"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
-      "before_sha256": "61518e56b632a3efc7b05520236e6c8c68beff89fabc788b5bba593158fceec2",
-      "after_sha256": "afab98b9536c0bf50396d1b62aebfe8b143cee91e7464267bf34a02ea8423083",
+      "before_sha256": "afab98b9536c0bf50396d1b62aebfe8b143cee91e7464267bf34a02ea8423083",
+      "after_sha256": "1161787b271a28a896a7c9581c60613c238311740016ab699c6c3fb95daa20f0",
       "owners": {
         "@document": {
-          "before": "61518e56b632a3efc7b05520236e6c8c68beff89fabc788b5bba593158fceec2",
-          "after": "afab98b9536c0bf50396d1b62aebfe8b143cee91e7464267bf34a02ea8423083"
+          "before": "afab98b9536c0bf50396d1b62aebfe8b143cee91e7464267bf34a02ea8423083",
+          "after": "1161787b271a28a896a7c9581c60613c238311740016ab699c6c3fb95daa20f0"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "6b090252122376939e06b42a673bee62f1c5d2a6acf464d9fddc30bc7785bffd",
-      "after_sha256": "eb9933923eae3dfb841c9192897d4a769ffdb6e54f16c5f50e318c35542d30af",
+      "before_sha256": "eb9933923eae3dfb841c9192897d4a769ffdb6e54f16c5f50e318c35542d30af",
+      "after_sha256": "df9a96d0d99a46543a77b2fc11e68ffa7cd25591ad987c3467fa86323c0e5ad1",
       "owners": {
         "@document": {
-          "before": "6b090252122376939e06b42a673bee62f1c5d2a6acf464d9fddc30bc7785bffd",
-          "after": "eb9933923eae3dfb841c9192897d4a769ffdb6e54f16c5f50e318c35542d30af"
+          "before": "eb9933923eae3dfb841c9192897d4a769ffdb6e54f16c5f50e318c35542d30af",
+          "after": "df9a96d0d99a46543a77b2fc11e68ffa7cd25591ad987c3467fa86323c0e5ad1"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "a650aafcda3c1c1e4c7cbd6e93359a85fa715a3959f52620e6f38446d61510ea",
-      "after_sha256": "80e3718216343f8fa687880bd9a5daeaf4c5a2fef8bcfb8d005d30b65c247aa2",
+      "before_sha256": "80e3718216343f8fa687880bd9a5daeaf4c5a2fef8bcfb8d005d30b65c247aa2",
+      "after_sha256": "087e2e913c5ae301bc49bbfe82bd780bfc3c1ddccdff1b0004f86596c001d92f",
       "owners": {
         "@document": {
-          "before": "a650aafcda3c1c1e4c7cbd6e93359a85fa715a3959f52620e6f38446d61510ea",
-          "after": "80e3718216343f8fa687880bd9a5daeaf4c5a2fef8bcfb8d005d30b65c247aa2"
+          "before": "80e3718216343f8fa687880bd9a5daeaf4c5a2fef8bcfb8d005d30b65c247aa2",
+          "after": "087e2e913c5ae301bc49bbfe82bd780bfc3c1ddccdff1b0004f86596c001d92f"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "96faf19143e5547ffa44e70f7fe54af78c03aa916fc61000e51c37a780b0b377",
-      "after_sha256": "dc75bcd8f65208927a9b4c3ce52b995d8960f0a26d744eef3ed6d23f8bd4ceb4",
+      "before_sha256": "dc75bcd8f65208927a9b4c3ce52b995d8960f0a26d744eef3ed6d23f8bd4ceb4",
+      "after_sha256": "1858de1b436126a55f5684ae182cc3c9f01bba1cd839e2770af7a645e7410471",
       "owners": {
         "@document": {
-          "before": "96faf19143e5547ffa44e70f7fe54af78c03aa916fc61000e51c37a780b0b377",
-          "after": "dc75bcd8f65208927a9b4c3ce52b995d8960f0a26d744eef3ed6d23f8bd4ceb4"
+          "before": "dc75bcd8f65208927a9b4c3ce52b995d8960f0a26d744eef3ed6d23f8bd4ceb4",
+          "after": "1858de1b436126a55f5684ae182cc3c9f01bba1cd839e2770af7a645e7410471"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "d0f2fb7ab3c3dd5875329d3179cce94862631bac0075a6943d4b3880df622101",
-      "after_sha256": "a10abbcd9f16665c7f0657fbf4a1727eb09372983496696b5ffadd7bc009d90e",
+      "before_sha256": "a10abbcd9f16665c7f0657fbf4a1727eb09372983496696b5ffadd7bc009d90e",
+      "after_sha256": "d3c16a9a25b30adfabf7a7b34e6563f1535b29f42a21baea09e04b52c52f36e6",
       "owners": {
         "@document": {
-          "before": "d0f2fb7ab3c3dd5875329d3179cce94862631bac0075a6943d4b3880df622101",
-          "after": "a10abbcd9f16665c7f0657fbf4a1727eb09372983496696b5ffadd7bc009d90e"
+          "before": "a10abbcd9f16665c7f0657fbf4a1727eb09372983496696b5ffadd7bc009d90e",
+          "after": "d3c16a9a25b30adfabf7a7b34e6563f1535b29f42a21baea09e04b52c52f36e6"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "c1a02e01d39e305a26a8aff50c6a2da74c9b075d27f4545a4e7748ffa456390d",
-      "after_sha256": "8b34c153d3cc5b9d6be3bcab9aff983ffa6a3662b22c931c3985247a6d2fbc5a",
+      "before_sha256": "8b34c153d3cc5b9d6be3bcab9aff983ffa6a3662b22c931c3985247a6d2fbc5a",
+      "after_sha256": "de47c01863fc8e52ff99e074f814b18a9f4278aa1e28b8625b4a2de0de771ca5",
       "owners": {
         "@document": {
-          "before": "c1a02e01d39e305a26a8aff50c6a2da74c9b075d27f4545a4e7748ffa456390d",
-          "after": "8b34c153d3cc5b9d6be3bcab9aff983ffa6a3662b22c931c3985247a6d2fbc5a"
+          "before": "8b34c153d3cc5b9d6be3bcab9aff983ffa6a3662b22c931c3985247a6d2fbc5a",
+          "after": "de47c01863fc8e52ff99e074f814b18a9f4278aa1e28b8625b4a2de0de771ca5"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "eb3b30dc06a2271ae3e66b691c6a9ff9b2223dc7be82088b682810ae64df5fbb",
-      "after_sha256": "3daa0bb25e42244ec09e54793ec325ffc3fdf90429336d0a77f36d75570343bd",
+      "before_sha256": "3daa0bb25e42244ec09e54793ec325ffc3fdf90429336d0a77f36d75570343bd",
+      "after_sha256": "808eccc537a7bc19025f67bb52185395326f2431d1249be6557c29692a4ad967",
       "owners": {
         "@document": {
-          "before": "eb3b30dc06a2271ae3e66b691c6a9ff9b2223dc7be82088b682810ae64df5fbb",
-          "after": "3daa0bb25e42244ec09e54793ec325ffc3fdf90429336d0a77f36d75570343bd"
+          "before": "3daa0bb25e42244ec09e54793ec325ffc3fdf90429336d0a77f36d75570343bd",
+          "after": "808eccc537a7bc19025f67bb52185395326f2431d1249be6557c29692a4ad967"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "b0606903c31a818b088c130c73be7062d5ed73fa76b93ebbbe817b9ccb3f129f",
-      "after_sha256": "ad7c0138d82bfe33bf757165181a41d3bffa9bc41fb49d326112c68ed8413c40",
+      "before_sha256": "ad7c0138d82bfe33bf757165181a41d3bffa9bc41fb49d326112c68ed8413c40",
+      "after_sha256": "d8c634d002305cd7a3f04131bb26dc1e7baef85075d0fd8fd12da0ed66698de0",
       "owners": {
         "@document": {
-          "before": "b0606903c31a818b088c130c73be7062d5ed73fa76b93ebbbe817b9ccb3f129f",
-          "after": "ad7c0138d82bfe33bf757165181a41d3bffa9bc41fb49d326112c68ed8413c40"
+          "before": "ad7c0138d82bfe33bf757165181a41d3bffa9bc41fb49d326112c68ed8413c40",
+          "after": "d8c634d002305cd7a3f04131bb26dc1e7baef85075d0fd8fd12da0ed66698de0"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "f576057dd4004a4e99213e1eedc48e380b0ec5a6f3eed438eea502a4c704b9db",
-      "after_sha256": "ecdc75d2639bb41cbde564f54810a7edfc31866343ff077032a7e60f8385c6c8",
+      "before_sha256": "ecdc75d2639bb41cbde564f54810a7edfc31866343ff077032a7e60f8385c6c8",
+      "after_sha256": "30824cf49312045b6bda46a29f35cb0d49113d246f2603186143ca2280792dec",
       "owners": {
         "@document": {
-          "before": "f576057dd4004a4e99213e1eedc48e380b0ec5a6f3eed438eea502a4c704b9db",
-          "after": "ecdc75d2639bb41cbde564f54810a7edfc31866343ff077032a7e60f8385c6c8"
+          "before": "ecdc75d2639bb41cbde564f54810a7edfc31866343ff077032a7e60f8385c6c8",
+          "after": "30824cf49312045b6bda46a29f35cb0d49113d246f2603186143ca2280792dec"
         }
       }
     },
-    "data/source_audits/ci64_provenance_v1/oval-polygon-test-addition-v1.json": {
+    "data/source_audits/ci64_provenance_v1/oval-polygon-gap-test-transition-v1.json": {
       "before_sha256": null,
-      "after_sha256": "bada04a93ba349277cb172ca65d1caec1ccf59f7ea943b3eb08b6efb8e3f9b87",
+      "after_sha256": "aa14d37c70228c1369c6a534b0ba1e982513dc3bd0fff6bf2a6edcddef403ad5",
       "owners": {
         "@document": {
           "before": null,
-          "after": "bada04a93ba349277cb172ca65d1caec1ccf59f7ea943b3eb08b6efb8e3f9b87"
+          "after": "aa14d37c70228c1369c6a534b0ba1e982513dc3bd0fff6bf2a6edcddef403ad5"
         }
       }
     },
     "docs/DISTANCE_PRECISION.md": {
-      "before_sha256": "db3a337380eee525651c6ee2e3a98c383a44982cf68fbed56bc84a02fdbc81ea",
-      "after_sha256": "6ff4e70981d30cf0ba2f3f72de403cfbb43799a63a88f17fb4c484791e8275d8",
+      "before_sha256": "6ff4e70981d30cf0ba2f3f72de403cfbb43799a63a88f17fb4c484791e8275d8",
+      "after_sha256": "35112689c73981a062e657830b107983e3297bae30ffcfbb3bc3820906d319fc",
       "owners": {
         "@document": {
-          "before": "db3a337380eee525651c6ee2e3a98c383a44982cf68fbed56bc84a02fdbc81ea",
-          "after": "6ff4e70981d30cf0ba2f3f72de403cfbb43799a63a88f17fb4c484791e8275d8"
+          "before": "6ff4e70981d30cf0ba2f3f72de403cfbb43799a63a88f17fb4c484791e8275d8",
+          "after": "35112689c73981a062e657830b107983e3297bae30ffcfbb3bc3820906d319fc"
         }
       }
     },
-    "docs/performance/current/oval-polygon-movement.json": {
+    "docs/performance/current/oval-polygon-gap-movement.json": {
       "before_sha256": null,
-      "after_sha256": "dd51de86330f558b77d3d70916aa22a611c35d3dc4386bdb538581c2791df175",
+      "after_sha256": "adc85078f43ee373bcd87b443e0a3373f5e55c35217f0a5e84512202ce718464",
       "owners": {
         "@document": {
           "before": null,
-          "after": "dd51de86330f558b77d3d70916aa22a611c35d3dc4386bdb538581c2791df175"
+          "after": "adc85078f43ee373bcd87b443e0a3373f5e55c35217f0a5e84512202ce718464"
         }
       }
     },
-    "docs/performance/current/oval-polygon-setup.json": {
+    "docs/performance/current/oval-polygon-gap-setup.json": {
       "before_sha256": null,
-      "after_sha256": "1edcfebfe200c29a3d836d0a182d0356b524a56a1aab3dae5c5ed83752daacfa",
+      "after_sha256": "20e70a42678547384830c15197889a98e6082531d0cd39b0bbaffe963c118c58",
       "owners": {
         "@document": {
           "before": null,
-          "after": "1edcfebfe200c29a3d836d0a182d0356b524a56a1aab3dae5c5ed83752daacfa"
+          "after": "20e70a42678547384830c15197889a98e6082531d0cd39b0bbaffe963c118c58"
         }
       }
     },
-    "docs/performance/current/oval-polygon-visibility.json": {
+    "docs/performance/current/oval-polygon-gap-visibility.json": {
       "before_sha256": null,
-      "after_sha256": "f8bc134dc5aafc2bfd42cecc45def227d6947c17f8753c475cbbc8fad2917b1c",
+      "after_sha256": "6380beaca2c9de5d957127edd696ceb5bc59927e15fdeb46ab047570f90e77b8",
       "owners": {
         "@document": {
           "before": null,
-          "after": "f8bc134dc5aafc2bfd42cecc45def227d6947c17f8753c475cbbc8fad2917b1c"
+          "after": "6380beaca2c9de5d957127edd696ceb5bc59927e15fdeb46ab047570f90e77b8"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "5c0bf5a2449027b167f219de507d730d9584f5a62dcbb20e9c37d378a8d09306",
-      "after_sha256": "38485d4dd6c54548b88f0c0e5f0a9d61dbf988e8e69993dc4a0efd9c44337b9b",
+      "before_sha256": "38485d4dd6c54548b88f0c0e5f0a9d61dbf988e8e69993dc4a0efd9c44337b9b",
+      "after_sha256": "27b222c9c1bafbd4ef450dd2a1cae3aebe89ceb1dcfbc834e0136d8f2fd57e87",
       "owners": {
         "@document": {
-          "before": "5c0bf5a2449027b167f219de507d730d9584f5a62dcbb20e9c37d378a8d09306",
-          "after": "38485d4dd6c54548b88f0c0e5f0a9d61dbf988e8e69993dc4a0efd9c44337b9b"
+          "before": "38485d4dd6c54548b88f0c0e5f0a9d61dbf988e8e69993dc4a0efd9c44337b9b",
+          "after": "27b222c9c1bafbd4ef450dd2a1cae3aebe89ceb1dcfbc834e0136d8f2fd57e87"
         }
       }
     },
     "scripts/engine_numerical_identity_test_admission.py": {
-      "before_sha256": "635cd249f3b555a7dc3a0c022410ed533c622bc5b8e95c80129544ffb1d80b09",
-      "after_sha256": "5daf8fb3f4e2083f7e10e4b1ed5557442b1333eb1cfb72e14da312c3ffb3399b",
+      "before_sha256": "5daf8fb3f4e2083f7e10e4b1ed5557442b1333eb1cfb72e14da312c3ffb3399b",
+      "after_sha256": "a377cfd89fbd82bc1affd0f66b06df6b702a22e01f4f1a9d92ce82fc7abafc57",
       "owners": {
         "@module": {
-          "before": "b145e044226b4a951bdf5629ac5d6f12517419c9518787773bc3f30bb2132e34",
-          "after": "5e223c93f0f0ea085d7a94c21507e8a6110164c22f215722a1d50b429263417a"
+          "before": "5e223c93f0f0ea085d7a94c21507e8a6110164c22f215722a1d50b429263417a",
+          "after": "a4f447452f7e2e999d26b189ebf717559bf0c6ca88ccbe8ad9561ee5a77cac77"
         },
         "exact_movement_test_transition": {
-          "before": "5ce64eae16b351a116e7b6a996ed65b3db3770c760f6c4f7f1d8c50d366fa3b1",
-          "after": "141efba1c32bd2b3f9dc205700b4f635ab03ecb05d206cc051a683ea2c93d200"
+          "before": "141efba1c32bd2b3f9dc205700b4f635ab03ecb05d206cc051a683ea2c93d200",
+          "after": "61744974ab31bb55cd1a701cd63fc875c1ee8045caf86dc86862886e3e31e2ae"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "7e5d9e5cc33dbc26073e65fb1858daa64fdad44c7be21f3a1567ab9750425c58",
-      "after_sha256": "9935686a7392cf85336e071d809e1905b5853a34a6e70ad8cc42a16b4c9d1f62",
+      "before_sha256": "9935686a7392cf85336e071d809e1905b5853a34a6e70ad8cc42a16b4c9d1f62",
+      "after_sha256": "5cb563b176bc3f4b952ea12d1948df4ce04c5acf54557ae88699ec97a66cb372",
       "owners": {
         "@document": {
-          "before": "7e5d9e5cc33dbc26073e65fb1858daa64fdad44c7be21f3a1567ab9750425c58",
-          "after": "9935686a7392cf85336e071d809e1905b5853a34a6e70ad8cc42a16b4c9d1f62"
+          "before": "9935686a7392cf85336e071d809e1905b5853a34a6e70ad8cc42a16b4c9d1f62",
+          "after": "5cb563b176bc3f4b952ea12d1948df4ce04c5acf54557ae88699ec97a66cb372"
+        }
+      }
+    },
+    "src/warhammer40k_core/geometry/milli_inch_oval.py": {
+      "before_sha256": "3b2986ab0751fbb52ed49494973e42e43d9982feaab8642fc1822a6e42bd175c",
+      "after_sha256": "908c69e9b275187c5700e901cedc7ef5a57b1c5ec6fee407645e059bca03b694",
+      "owners": {
+        "@module": {
+          "before": "92917556eafaeb5d36c30e432559bb296ff412b67783d8fb200441accbd68488",
+          "after": "52759632fc6334ffaddbc516a5eb56d0dfc5c76580f464586c85d6498a6467ac"
+        },
+        "_doubled_local_squares": {
+          "before": null,
+          "after": "61a40042eef63aa7276ed2c8ae2f8d13711258fe80318d0fc409a293a0d5baa9"
+        },
+        "_oval_point_below_midpoint": {
+          "before": null,
+          "after": "ff31c00bf82719692d70cc74b4d7230f3c7927ab178a598df0d8c1f49eaf63d7"
+        },
+        "_round_distance_ticks": {
+          "before": null,
+          "after": "fb28eae1c0f4d20093715712d3749b6974b396f5790f9b71197f91ab8a6f8161"
+        },
+        "oval_point_distance_ticks": {
+          "before": "b61bc20189ef90d699725c40f8221706b990c0e8fd4f05c38335fc84565096b8",
+          "after": "052773df7d0c9e53aff29c33e842c8d046bcd2b2666d550cef48de2b55f37821"
         }
       }
     },
     "src/warhammer40k_core/geometry/milli_inch_oval_polygon.py": {
-      "before_sha256": null,
-      "after_sha256": "fc3016f7b8b6a2f2c15ea646608b28b586e5e885ca75aae883eab0d0f4a5e3b2",
+      "before_sha256": "fc3016f7b8b6a2f2c15ea646608b28b586e5e885ca75aae883eab0d0f4a5e3b2",
+      "after_sha256": "dd6aea5ef2fe9fc29542ea69dcbcae72f2cf6d6030519fc71ea78fe51a6b3e10",
       "owners": {
         "@module": {
-          "before": null,
-          "after": "e700c0b5744afa796d7757a979ba992cb190c9142b9dfafdf126f10b12c273d7"
+          "before": "e700c0b5744afa796d7757a979ba992cb190c9142b9dfafdf126f10b12c273d7",
+          "after": "a03bfff64fb51e1a8c3e78ff98307e92681c046b7dfbf8772e788a279661cf76"
         },
-        "_edge_minimum_residual": {
+        "_EdgeProjection": {
           "before": null,
-          "after": "c2cd935831fad0936409422a9f2d4bf2b46ee33eb5fd6471449d3808b79f47c6"
+          "after": "255646e9c545038260866876ec100c902e8998398196319768f1a787e1c9d912"
         },
-        "oval_polygon_relation": {
+        "_EdgeProjection.below_midpoint": {
           "before": null,
-          "after": "fe769f9dca631ca718126c901c5f0c52f1f3bf77fbef9b20440d0cecd5bb034d"
+          "after": "380bc63329a2b1149b98f925ff3d9a34dba0870b2dde5891b14b7abc0baa39c8"
+        },
+        "_at_most_scaled_root": {
+          "before": null,
+          "after": "2611983f12978b6b2bc5a35a2d11a227a5dbcb3523e7632cfe1e62610d83aef9"
+        },
+        "_edge_projection": {
+          "before": null,
+          "after": "e40045ead525ce0bdf2f43dea4ed754b13612bc88a850f5d226d32f8c19f292b"
+        },
+        "oval_polygon_distance_ticks": {
+          "before": null,
+          "after": "a1e0d2b1bd2ad2791885eb4159f73d08e86be947e03adfe1e355bcc293b4fb73"
         }
       }
     },
     "tests/code_quality/test_engine_numerical_identity_admission.py": {
-      "before_sha256": "dab90eb2794f36e0cd75ea3358bc48e0257fbec8e50303bfc995ae02f7348aa4",
-      "after_sha256": "49a612155ffab173a1a381b33ce33fba19c7637d9ef3212b7f46ba0010057163",
+      "before_sha256": "49a612155ffab173a1a381b33ce33fba19c7637d9ef3212b7f46ba0010057163",
+      "after_sha256": "18bea4c6117233a3df96916a78d8c0d35b3f4c56638d5fdf501df9e072abad22",
       "owners": {
         "test_identity_inventory_uses_current_twelve_shards_and_native_cohort": {
-          "before": "c1ee0d136a918f2737ec24321ef5c959db62475b846faecb0aa2ffe8f28452d3",
-          "after": "9e3f5fa79abbd94aa99166fa13df7d30733dd0f35486bc22fe65c44774c4bc1b"
+          "before": "9e3f5fa79abbd94aa99166fa13df7d30733dd0f35486bc22fe65c44774c4bc1b",
+          "after": "9003f2903ef63e53356ae752064a3dc92c20d5283b401852e4bd12a152d0c6c0"
         }
       }
     },
-    "tests/rules/section01/test_milli_inch_oval_polygon.py": {
+    "tests/rules/section01/test_milli_inch_oval_polygon_distance.py": {
       "before_sha256": null,
-      "after_sha256": "7fa90f42ae5c12d83c7b52e645846aeb4f33b072e652ed9c836a073a99b758ae",
+      "after_sha256": "bfa4fab613c80dff22c61a5fda982bee8ac0d90c7a6392ab499ff668e4192871",
       "owners": {
         "@module": {
           "before": null,
-          "after": "04da6a9eadfed255580ec25ef71a0f960c9023db898c0566c1697c8a82c15e41"
+          "after": "2d9a1c7e02eb4f211dea2370a0c6798823384c54fedd5877037b1b60c7a39976"
         },
-        "test_oval_polygon_concave_notch_and_ring_order": {
+        "test_oval_polygon_gap_can_exceed_the_coordinate_bound": {
           "before": null,
-          "after": "98f1bdab7811b6edd91a5aa9803336b34ca977172911921bc5f2106d32e50cc5"
+          "after": "5f34ae8bb6c0bd058eb97b0ee5a19714993b69ff6da2ffe79cc156d525d0989e"
         },
-        "test_oval_polygon_contact_at_an_off_grid_point": {
+        "test_oval_polygon_gap_just_below_a_half_tick_with_large_axes": {
           "before": null,
-          "after": "bf25711cd9083ff32fefdee8c6e107bc7001d1058630a99a92f27d769db324c3"
+          "after": "d0eea5daaf9481bcc47bf86c997c4e58bbba567aabd9990500ec86699eb5a32a"
         },
-        "test_oval_polygon_preserves_signed_tick_limits_and_thin_differences": {
+        "test_oval_polygon_gap_requires_canonical_shapes": {
           "before": null,
-          "after": "dea752c6823b9bf3009357da6769a78b083ffdabf4802129862b849bac57d10d"
+          "after": "3a22025cb116b9d393e058eab8a64373a704b3f2fcce357bacfd890a402090af"
         },
-        "test_oval_polygon_relation": {
+        "test_oval_polygon_gap_to_a_concave_notch_is_invariant_to_ring_order": {
           "before": null,
-          "after": "f3bf757336aed208ef6d3d4997eb77480c042c4ba9ef7ae4249a23360055423f"
+          "after": "8aee4acc1bb443b18a8672685f553150025efeb1eb9ab399ecaf14060b3019ea"
         },
-        "test_oval_polygon_relation_requires_canonical_shapes": {
+        "test_oval_polygon_oblique_projection_at_an_exact_half_tick": {
           "before": null,
-          "after": "d4016c24bb97a7a846e9ca78d527d87ef46e26c8600e03550cc4add52284206b"
+          "after": "01eb3509792427c4178e537d4c6278c85803f551f78c1c9a0536b4c6aa99a8d4"
         },
-        "test_oval_polygon_uses_euclidean_diagonal_facing": {
+        "test_oval_polygon_oblique_projection_on_each_side_of_a_near_tie": {
           "before": null,
-          "after": "9ee304aba92c8ee448b23169118505b43d44901f321f96fec01e69e3331f18f5"
+          "after": "49595d90dfd9948b80c50d645f20e8588db042dfadede1480191f9c243ffc5a2"
+        },
+        "test_oval_polygon_projection_uses_rotated_ellipse_support": {
+          "before": null,
+          "after": "d874814549eef0a31c3f426abffd23d91b6880e5390cf07d3f03b42c12721de3"
+        },
+        "test_oval_polygon_uses_vertices_when_line_projections_are_outside": {
+          "before": null,
+          "after": "c87310b2128ad545a3ba9a0a61eddb4c4687790eb8531e96fb9ba694d917dd03"
+        },
+        "test_oval_polygon_vertex_tie_and_almost_tie": {
+          "before": null,
+          "after": "d103fd59689435009693ee858ccbb5ed4fda7956a794e405033c202209d951fc"
+        },
+        "test_oval_polygon_zero_gap_preserves_exact_topology": {
+          "before": null,
+          "after": "1e13255ccaf4f103e04274be2bfd07e19ee19b0294863a1c284ee09f48b89805"
         }
       }
     }
@@ -358,7 +422,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit the oval-polygon regressions and schedule the full selected behavioral workload.",
+      "rationale": "Admit oval-polygon gap regressions and schedule the full selected behavioral workload.",
       "source_obligation": "Authenticate the added cases and use measured durations for the twelve-shard inventory.",
       "unchanged_work": "Retain existing tests, the 67% branch coverage floor and established timing limits."
     },
@@ -368,7 +432,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit the oval-polygon regressions and schedule the full selected behavioral workload.",
+      "rationale": "Admit oval-polygon gap regressions and schedule the full selected behavioral workload.",
       "source_obligation": "Authenticate the added cases and use measured durations for the twelve-shard inventory.",
       "unchanged_work": "Retain existing tests, the 67% branch coverage floor and established timing limits."
     },
@@ -378,7 +442,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit the oval-polygon regressions and schedule the full selected behavioral workload.",
+      "rationale": "Admit oval-polygon gap regressions and schedule the full selected behavioral workload.",
       "source_obligation": "Authenticate the added cases and use measured durations for the twelve-shard inventory.",
       "unchanged_work": "Retain existing tests, the 67% branch coverage floor and established timing limits."
     },
@@ -388,7 +452,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit the oval-polygon regressions and schedule the full selected behavioral workload.",
+      "rationale": "Admit oval-polygon gap regressions and schedule the full selected behavioral workload.",
       "source_obligation": "Authenticate the added cases and use measured durations for the twelve-shard inventory.",
       "unchanged_work": "Retain existing tests, the 67% branch coverage floor and established timing limits."
     },
@@ -398,7 +462,17 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit the oval-polygon regressions and schedule the full selected behavioral workload.",
+      "rationale": "Admit oval-polygon gap regressions and schedule the full selected behavioral workload.",
+      "source_obligation": "Authenticate the added cases and use measured durations for the twelve-shard inventory.",
+      "unchanged_work": "Retain existing tests, the 67% branch coverage floor and established timing limits."
+    },
+    "ci/test_shards/shard-2.txt": {
+      "category": "rule_semantics",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Admit oval-polygon gap regressions and schedule the full selected behavioral workload.",
       "source_obligation": "Authenticate the added cases and use measured durations for the twelve-shard inventory.",
       "unchanged_work": "Retain existing tests, the 67% branch coverage floor and established timing limits."
     },
@@ -408,7 +482,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit the oval-polygon regressions and schedule the full selected behavioral workload.",
+      "rationale": "Admit oval-polygon gap regressions and schedule the full selected behavioral workload.",
       "source_obligation": "Authenticate the added cases and use measured durations for the twelve-shard inventory.",
       "unchanged_work": "Retain existing tests, the 67% branch coverage floor and established timing limits."
     },
@@ -418,7 +492,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit the oval-polygon regressions and schedule the full selected behavioral workload.",
+      "rationale": "Admit oval-polygon gap regressions and schedule the full selected behavioral workload.",
       "source_obligation": "Authenticate the added cases and use measured durations for the twelve-shard inventory.",
       "unchanged_work": "Retain existing tests, the 67% branch coverage floor and established timing limits."
     },
@@ -428,7 +502,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit the oval-polygon regressions and schedule the full selected behavioral workload.",
+      "rationale": "Admit oval-polygon gap regressions and schedule the full selected behavioral workload.",
       "source_obligation": "Authenticate the added cases and use measured durations for the twelve-shard inventory.",
       "unchanged_work": "Retain existing tests, the 67% branch coverage floor and established timing limits."
     },
@@ -438,7 +512,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit the oval-polygon regressions and schedule the full selected behavioral workload.",
+      "rationale": "Admit oval-polygon gap regressions and schedule the full selected behavioral workload.",
       "source_obligation": "Authenticate the added cases and use measured durations for the twelve-shard inventory.",
       "unchanged_work": "Retain existing tests, the 67% branch coverage floor and established timing limits."
     },
@@ -448,7 +522,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit the oval-polygon regressions and schedule the full selected behavioral workload.",
+      "rationale": "Admit oval-polygon gap regressions and schedule the full selected behavioral workload.",
       "source_obligation": "Authenticate the added cases and use measured durations for the twelve-shard inventory.",
       "unchanged_work": "Retain existing tests, the 67% branch coverage floor and established timing limits."
     },
@@ -458,7 +532,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit the oval-polygon regressions and schedule the full selected behavioral workload.",
+      "rationale": "Admit oval-polygon gap regressions and schedule the full selected behavioral workload.",
       "source_obligation": "Authenticate the added cases and use measured durations for the twelve-shard inventory.",
       "unchanged_work": "Retain existing tests, the 67% branch coverage floor and established timing limits."
     },
@@ -468,7 +542,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit the oval-polygon regressions and schedule the full selected behavioral workload.",
+      "rationale": "Admit oval-polygon gap regressions and schedule the full selected behavioral workload.",
       "source_obligation": "Authenticate the added cases and use measured durations for the twelve-shard inventory.",
       "unchanged_work": "Retain existing tests, the 67% branch coverage floor and established timing limits."
     },
@@ -552,13 +626,13 @@
       "source_obligation": "Advertise the actual runtime build in the current synthetic release fixtures.",
       "unchanged_work": "Historical executors, schemas, checkpoints and gameplay policy retain their original semantics."
     },
-    "data/source_audits/ci64_provenance_v1/oval-polygon-test-addition-v1.json": {
+    "data/source_audits/ci64_provenance_v1/oval-polygon-gap-test-transition-v1.json": {
       "category": "rule_semantics",
       "operations": [
         "exact-movement-test-admission"
       ],
       "selected_families": [],
-      "rationale": "Admit the oval-polygon regressions and schedule the full selected behavioral workload.",
+      "rationale": "Admit focused exact oval-polygon gap regressions and successor source hashes.",
       "source_obligation": "Authenticate the added cases and use measured durations for the twelve-shard inventory.",
       "unchanged_work": "Retain existing tests, the 67% branch coverage floor and established timing limits."
     },
@@ -566,41 +640,41 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Record staged oval-polygon topology and its required exact-base evidence.",
-      "source_obligation": "Document the supported topology domain and the limit on Euclidean gap queries.",
-      "unchanged_work": "The published gameplay policy, budgets and historical comparisons retain their semantics."
+      "rationale": "Document the exact gap proof and bind the required current performance evidence.",
+      "source_obligation": "Preserve the staged geometry domain, topology semantics and CI timing policy.",
+      "unchanged_work": "Historical comparisons keep their original measured inputs."
     },
-    "docs/performance/current/oval-polygon-movement.json": {
+    "docs/performance/current/oval-polygon-gap-movement.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Record staged oval-polygon topology and its required exact-base evidence.",
-      "source_obligation": "Document the supported topology domain and the limit on Euclidean gap queries.",
-      "unchanged_work": "The published gameplay policy, budgets and historical comparisons retain their semantics."
+      "rationale": "Document the exact gap proof and bind the required current performance evidence.",
+      "source_obligation": "Preserve the staged geometry domain, topology semantics and CI timing policy.",
+      "unchanged_work": "Historical comparisons keep their original measured inputs."
     },
-    "docs/performance/current/oval-polygon-setup.json": {
+    "docs/performance/current/oval-polygon-gap-setup.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Record staged oval-polygon topology and its required exact-base evidence.",
-      "source_obligation": "Document the supported topology domain and the limit on Euclidean gap queries.",
-      "unchanged_work": "The published gameplay policy, budgets and historical comparisons retain their semantics."
+      "rationale": "Document the exact gap proof and bind the required current performance evidence.",
+      "source_obligation": "Preserve the staged geometry domain, topology semantics and CI timing policy.",
+      "unchanged_work": "Historical comparisons keep their original measured inputs."
     },
-    "docs/performance/current/oval-polygon-visibility.json": {
+    "docs/performance/current/oval-polygon-gap-visibility.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Record staged oval-polygon topology and its required exact-base evidence.",
-      "source_obligation": "Document the supported topology domain and the limit on Euclidean gap queries.",
-      "unchanged_work": "The published gameplay policy, budgets and historical comparisons retain their semantics."
+      "rationale": "Document the exact gap proof and bind the required current performance evidence.",
+      "source_obligation": "Preserve the staged geometry domain, topology semantics and CI timing policy.",
+      "unchanged_work": "Historical comparisons keep their original measured inputs."
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Record staged oval-polygon topology and its required exact-base evidence.",
-      "source_obligation": "Document the supported topology domain and the limit on Euclidean gap queries.",
-      "unchanged_work": "The published gameplay policy, budgets and historical comparisons retain their semantics."
+      "rationale": "Document the exact gap proof and bind the required current performance evidence.",
+      "source_obligation": "Preserve the staged geometry domain, topology semantics and CI timing policy.",
+      "unchanged_work": "Historical comparisons keep their original measured inputs."
     },
     "scripts/engine_numerical_identity_test_admission.py": {
       "category": "rule_semantics",
@@ -608,7 +682,7 @@
         "engine-numerical-identity-admission"
       ],
       "selected_families": [],
-      "rationale": "Admit the oval-polygon regressions and schedule the full selected behavioral workload.",
+      "rationale": "Bind the gap cases and current oval sources to the existing finite test inventory.",
       "source_obligation": "Authenticate the added cases and use measured durations for the twelve-shard inventory.",
       "unchanged_work": "Retain existing tests, the 67% branch coverage floor and established timing limits."
     },
@@ -622,6 +696,20 @@
       "source_obligation": "Advertise the actual runtime build in the current synthetic release fixtures.",
       "unchanged_work": "Historical executors, schemas, checkpoints and gameplay policy retain their original semantics."
     },
+    "src/warhammer40k_core/geometry/milli_inch_oval.py": {
+      "category": "algorithm_or_search",
+      "operations": [
+        "geometry-search"
+      ],
+      "selected_families": [
+        "movement",
+        "setup",
+        "visibility"
+      ],
+      "rationale": "Certify Euclidean oval distances through exact integer midpoint comparisons.",
+      "source_obligation": "Use the minimum of the vertex distances and valid edge support projections.",
+      "unchanged_work": "The staged queries have no gameplay callers."
+    },
     "src/warhammer40k_core/geometry/milli_inch_oval_polygon.py": {
       "category": "algorithm_or_search",
       "operations": [
@@ -632,9 +720,9 @@
         "setup",
         "visibility"
       ],
-      "rationale": "Add exact filled-ellipse and simple-polygon topology.",
-      "source_obligation": "Compare integer quadratic edge minima and account for center containment.",
-      "unchanged_work": "The staged queries have no gameplay callers. Existing movement, setup and visibility use their prior geometry."
+      "rationale": "Certify Euclidean oval distances through exact integer midpoint comparisons.",
+      "source_obligation": "Use the minimum of the vertex distances and valid edge support projections.",
+      "unchanged_work": "The staged queries have no gameplay callers."
     },
     "tests/code_quality/test_engine_numerical_identity_admission.py": {
       "category": "rule_semantics",
@@ -642,26 +730,26 @@
         "engine-numerical-identity-admission"
       ],
       "selected_families": [],
-      "rationale": "Admit the oval-polygon regressions and schedule the full selected behavioral workload.",
+      "rationale": "Bind the gap cases and current oval sources to the existing finite test inventory.",
       "source_obligation": "Authenticate the added cases and use measured durations for the twelve-shard inventory.",
       "unchanged_work": "Retain existing tests, the 67% branch coverage floor and established timing limits."
     },
-    "tests/rules/section01/test_milli_inch_oval_polygon.py": {
+    "tests/rules/section01/test_milli_inch_oval_polygon_distance.py": {
       "category": "rule_semantics",
       "operations": [
         "exact-movement-test-admission"
       ],
       "selected_families": [],
-      "rationale": "Admit the oval-polygon regressions and schedule the full selected behavioral workload.",
+      "rationale": "Admit focused exact oval-polygon gap regressions and successor source hashes.",
       "source_obligation": "Authenticate the added cases and use measured durations for the twelve-shard inventory.",
       "unchanged_work": "Retain existing tests, the 67% branch coverage floor and established timing limits."
     }
   },
   "milestone": "ordinary",
   "comparisons": {
-    "movement": "docs/performance/current/oval-polygon-movement.json",
-    "setup": "docs/performance/current/oval-polygon-setup.json",
-    "visibility": "docs/performance/current/oval-polygon-visibility.json"
+    "movement": "docs/performance/current/oval-polygon-gap-movement.json",
+    "setup": "docs/performance/current/oval-polygon-gap-setup.json",
+    "visibility": "docs/performance/current/oval-polygon-gap-visibility.json"
   },
   "full_game": null
 }
