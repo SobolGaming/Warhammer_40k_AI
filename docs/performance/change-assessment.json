@@ -1,384 +1,362 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "3b4b7ce633c282d71b6214ca82e0dc2be51dae75",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:f5dc3a20fba287a715f6681da70759a0e3f47ce4c0198a642ccdaafe956581e5",
-  "operation_map_sha256": "f07373576202fe2a70a55397674c981f4c14619b11b631f286050e605c426adf",
+  "base": "bfa76c1b7ccee90853dc6a147e68d2ce077100bc",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:1e1f9e8d160c8acf75f4a0cff3c9d5099ef18e3c05a9d4b20522258ae6e7b5b5",
+  "operation_map_sha256": "5bb861fc4b8fca9eeeaae2f0ee9e7f4d9687fab7901fb7ce8c4c932682b8f9d6",
   "changes": {
     "ci/test_shards/durations.json": {
-      "before_sha256": "5c32fa9052fc488ad4d8efccd2a69f3e93dc02fa3bf854165cdc39bb3a47f2d9",
-      "after_sha256": "bf7cd7bc7eabc53e64b82b5368b5f67925a3ea0e1aab776b63b127694976248c",
+      "before_sha256": "bf7cd7bc7eabc53e64b82b5368b5f67925a3ea0e1aab776b63b127694976248c",
+      "after_sha256": "19c7b5131b9f6a67f3f406addf34d120df7b866aff795f2982ed63dc62b6e431",
       "owners": {
         "@document": {
-          "before": "5c32fa9052fc488ad4d8efccd2a69f3e93dc02fa3bf854165cdc39bb3a47f2d9",
-          "after": "bf7cd7bc7eabc53e64b82b5368b5f67925a3ea0e1aab776b63b127694976248c"
+          "before": "bf7cd7bc7eabc53e64b82b5368b5f67925a3ea0e1aab776b63b127694976248c",
+          "after": "19c7b5131b9f6a67f3f406addf34d120df7b866aff795f2982ed63dc62b6e431"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
-      "before_sha256": "d86e2887470d3804efde6b8a92294d00cb5d1c2ef5c533ff35ef4466bd97c725",
-      "after_sha256": "e06337d9ee3d8f9812b5dc040bdd80c118ad7ddec265fabdc42a05993efb2636",
+      "before_sha256": "e06337d9ee3d8f9812b5dc040bdd80c118ad7ddec265fabdc42a05993efb2636",
+      "after_sha256": "a951b04220c1ad4c7728a4211af12e82d2f74e3079d54877342bc051dd2d4ad1",
       "owners": {
         "@document": {
-          "before": "d86e2887470d3804efde6b8a92294d00cb5d1c2ef5c533ff35ef4466bd97c725",
-          "after": "e06337d9ee3d8f9812b5dc040bdd80c118ad7ddec265fabdc42a05993efb2636"
+          "before": "e06337d9ee3d8f9812b5dc040bdd80c118ad7ddec265fabdc42a05993efb2636",
+          "after": "a951b04220c1ad4c7728a4211af12e82d2f74e3079d54877342bc051dd2d4ad1"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
-      "before_sha256": "24d19598912ba07a0806d8c4d70836713db0d79dbca40fd1c6701d9e72a8686d",
-      "after_sha256": "3809b49dc741d43683a99050325be18cfecb0f9235831c575ad50967a41c0eae",
-      "owners": {
-        "@document": {
-          "before": "24d19598912ba07a0806d8c4d70836713db0d79dbca40fd1c6701d9e72a8686d",
-          "after": "3809b49dc741d43683a99050325be18cfecb0f9235831c575ad50967a41c0eae"
-        }
-      }
-    },
-    "ci/test_shards/shard-11.txt": {
-      "before_sha256": "cc70e8d30f6ae467dd301982db9b0f5f9c4710d5656ea2b04f44a23aaa0427d4",
+      "before_sha256": "3809b49dc741d43683a99050325be18cfecb0f9235831c575ad50967a41c0eae",
       "after_sha256": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20",
       "owners": {
         "@document": {
-          "before": "cc70e8d30f6ae467dd301982db9b0f5f9c4710d5656ea2b04f44a23aaa0427d4",
+          "before": "3809b49dc741d43683a99050325be18cfecb0f9235831c575ad50967a41c0eae",
           "after": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20"
         }
       }
     },
-    "ci/test_shards/shard-12.txt": {
-      "before_sha256": "ddbe9a65bd6c7748388a22e6ccb7144ae4b3ba77cf3d9371ad9120c58e72e955",
-      "after_sha256": "138b4b3b06835a54c452b6aa3d1c57f26826e79898efc20583f94e7fa31fe117",
+    "ci/test_shards/shard-11.txt": {
+      "before_sha256": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20",
+      "after_sha256": "e8cb85cae6493d43d41ad3188fa4c0f2fbaabec94dfb5d9aad7d151886802944",
       "owners": {
         "@document": {
-          "before": "ddbe9a65bd6c7748388a22e6ccb7144ae4b3ba77cf3d9371ad9120c58e72e955",
-          "after": "138b4b3b06835a54c452b6aa3d1c57f26826e79898efc20583f94e7fa31fe117"
+          "before": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20",
+          "after": "e8cb85cae6493d43d41ad3188fa4c0f2fbaabec94dfb5d9aad7d151886802944"
+        }
+      }
+    },
+    "ci/test_shards/shard-12.txt": {
+      "before_sha256": "138b4b3b06835a54c452b6aa3d1c57f26826e79898efc20583f94e7fa31fe117",
+      "after_sha256": "b12d11ed0609c7ee24a9b43ebe100c579ef52b7ffc7a58c63d2f062c8fb216f8",
+      "owners": {
+        "@document": {
+          "before": "138b4b3b06835a54c452b6aa3d1c57f26826e79898efc20583f94e7fa31fe117",
+          "after": "b12d11ed0609c7ee24a9b43ebe100c579ef52b7ffc7a58c63d2f062c8fb216f8"
         }
       }
     },
     "ci/test_shards/shard-2.txt": {
-      "before_sha256": "1ea1267cd2202a11458de626477678f0306b0add4b2b167927aaf9e72d5f43f1",
-      "after_sha256": "d1f2493b7338be291da4bbf8ddf2dd2ffe01c39411cb12e581681d490c346551",
+      "before_sha256": "d1f2493b7338be291da4bbf8ddf2dd2ffe01c39411cb12e581681d490c346551",
+      "after_sha256": "e17254db53356a40f2a217585b0a76c2b63ab253f1b6abe64e96b71df83cb4fa",
       "owners": {
         "@document": {
-          "before": "1ea1267cd2202a11458de626477678f0306b0add4b2b167927aaf9e72d5f43f1",
-          "after": "d1f2493b7338be291da4bbf8ddf2dd2ffe01c39411cb12e581681d490c346551"
+          "before": "d1f2493b7338be291da4bbf8ddf2dd2ffe01c39411cb12e581681d490c346551",
+          "after": "e17254db53356a40f2a217585b0a76c2b63ab253f1b6abe64e96b71df83cb4fa"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
-      "before_sha256": "06e3659747e9f637f87c64fb40c18ed5d6dac4dfa82aeb164e085a9bb2f39001",
-      "after_sha256": "0514533ba57a88462c45119dceddc1ec504e39deba7802a14c9b2585d23949b0",
+      "before_sha256": "0514533ba57a88462c45119dceddc1ec504e39deba7802a14c9b2585d23949b0",
+      "after_sha256": "24736ed3338410d962c7fe4805f771a4fbd33e2cf7eb5d3631c09d977e70d070",
       "owners": {
         "@document": {
-          "before": "06e3659747e9f637f87c64fb40c18ed5d6dac4dfa82aeb164e085a9bb2f39001",
-          "after": "0514533ba57a88462c45119dceddc1ec504e39deba7802a14c9b2585d23949b0"
+          "before": "0514533ba57a88462c45119dceddc1ec504e39deba7802a14c9b2585d23949b0",
+          "after": "24736ed3338410d962c7fe4805f771a4fbd33e2cf7eb5d3631c09d977e70d070"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
-      "before_sha256": "2d22f8f37a6b4736e6303a478dcd9eaab679cf2ec90802d2a4874b7f5ec9c2d1",
-      "after_sha256": "12b8a509bab84d9ea5f1c7c5a98f676b58d023619867f887c7ffdce7db824510",
+      "before_sha256": "12b8a509bab84d9ea5f1c7c5a98f676b58d023619867f887c7ffdce7db824510",
+      "after_sha256": "975a21e867bb4b90e12f154d02872771c5167ae40746a19b9332659a5d0eee96",
       "owners": {
         "@document": {
-          "before": "2d22f8f37a6b4736e6303a478dcd9eaab679cf2ec90802d2a4874b7f5ec9c2d1",
-          "after": "12b8a509bab84d9ea5f1c7c5a98f676b58d023619867f887c7ffdce7db824510"
+          "before": "12b8a509bab84d9ea5f1c7c5a98f676b58d023619867f887c7ffdce7db824510",
+          "after": "975a21e867bb4b90e12f154d02872771c5167ae40746a19b9332659a5d0eee96"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
-      "before_sha256": "1ebe6bc09b967163bec8574b9bd3449b6593f4a8c17361cff833f896a2035ac3",
-      "after_sha256": "84ed0c0d43c4924011886c30cd77c8f81b67b51e42b6d8565ef4fd378f00f211",
+      "before_sha256": "84ed0c0d43c4924011886c30cd77c8f81b67b51e42b6d8565ef4fd378f00f211",
+      "after_sha256": "1661ee8caa6259848c165dd61a33d89086e75650d669fae1a3924f90707e1f8e",
       "owners": {
         "@document": {
-          "before": "1ebe6bc09b967163bec8574b9bd3449b6593f4a8c17361cff833f896a2035ac3",
-          "after": "84ed0c0d43c4924011886c30cd77c8f81b67b51e42b6d8565ef4fd378f00f211"
+          "before": "84ed0c0d43c4924011886c30cd77c8f81b67b51e42b6d8565ef4fd378f00f211",
+          "after": "1661ee8caa6259848c165dd61a33d89086e75650d669fae1a3924f90707e1f8e"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
-      "before_sha256": "b2f2360c54e9621a1b2e661ec1e92c68893020c03133956a1c46b3b3ce0d0687",
-      "after_sha256": "6f44efc5711460e15b2360398e20559671e966b8b695fd33ca1172f369801bc6",
+      "before_sha256": "6f44efc5711460e15b2360398e20559671e966b8b695fd33ca1172f369801bc6",
+      "after_sha256": "36e5b4fcb72a7d52e90aafdd7ebb611c0aa3428f2877cb6ad48dc698fe62fe3e",
       "owners": {
         "@document": {
-          "before": "b2f2360c54e9621a1b2e661ec1e92c68893020c03133956a1c46b3b3ce0d0687",
-          "after": "6f44efc5711460e15b2360398e20559671e966b8b695fd33ca1172f369801bc6"
+          "before": "6f44efc5711460e15b2360398e20559671e966b8b695fd33ca1172f369801bc6",
+          "after": "36e5b4fcb72a7d52e90aafdd7ebb611c0aa3428f2877cb6ad48dc698fe62fe3e"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
-      "before_sha256": "131ecd6c9192715b9f1b2884609832322586d0de16a0e219aa8ccace269aeb0d",
-      "after_sha256": "764e517027a7e7bc8e0c9dbf945aec0b446725fc16d08bc7fcfec01bff88b4d2",
+      "before_sha256": "764e517027a7e7bc8e0c9dbf945aec0b446725fc16d08bc7fcfec01bff88b4d2",
+      "after_sha256": "b8c61dd1a9190ea3e6604df6481e88e0da85616e5b31ba53dd13b451ae5130dc",
       "owners": {
         "@document": {
-          "before": "131ecd6c9192715b9f1b2884609832322586d0de16a0e219aa8ccace269aeb0d",
-          "after": "764e517027a7e7bc8e0c9dbf945aec0b446725fc16d08bc7fcfec01bff88b4d2"
+          "before": "764e517027a7e7bc8e0c9dbf945aec0b446725fc16d08bc7fcfec01bff88b4d2",
+          "after": "b8c61dd1a9190ea3e6604df6481e88e0da85616e5b31ba53dd13b451ae5130dc"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
-      "before_sha256": "fbfc1c69f7cc4a88dafe153b5691f8b1efbcea538e0aecfdb7761c65ec70985c",
-      "after_sha256": "91b5a4e76cda38a14ce6e34a0857d078b78ad1293f00f0d9f4e6d17638f3f0d9",
+      "before_sha256": "91b5a4e76cda38a14ce6e34a0857d078b78ad1293f00f0d9f4e6d17638f3f0d9",
+      "after_sha256": "423f01362e840d5cea203b39a35b33e319e28042584853da996623004b0fe5ac",
       "owners": {
         "@document": {
-          "before": "fbfc1c69f7cc4a88dafe153b5691f8b1efbcea538e0aecfdb7761c65ec70985c",
-          "after": "91b5a4e76cda38a14ce6e34a0857d078b78ad1293f00f0d9f4e6d17638f3f0d9"
+          "before": "91b5a4e76cda38a14ce6e34a0857d078b78ad1293f00f0d9f4e6d17638f3f0d9",
+          "after": "423f01362e840d5cea203b39a35b33e319e28042584853da996623004b0fe5ac"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
-      "before_sha256": "1161787b271a28a896a7c9581c60613c238311740016ab699c6c3fb95daa20f0",
-      "after_sha256": "f9c60a7ec0a30f738410d3f9d11e301ad8d4e01ac6c07ed6a15de241734e3f94",
+      "before_sha256": "f9c60a7ec0a30f738410d3f9d11e301ad8d4e01ac6c07ed6a15de241734e3f94",
+      "after_sha256": "acc2884546e2a2a051bf65bcd31ecfb4b9fbcc5465024526250145d674f630c3",
       "owners": {
         "@document": {
-          "before": "1161787b271a28a896a7c9581c60613c238311740016ab699c6c3fb95daa20f0",
-          "after": "f9c60a7ec0a30f738410d3f9d11e301ad8d4e01ac6c07ed6a15de241734e3f94"
+          "before": "f9c60a7ec0a30f738410d3f9d11e301ad8d4e01ac6c07ed6a15de241734e3f94",
+          "after": "acc2884546e2a2a051bf65bcd31ecfb4b9fbcc5465024526250145d674f630c3"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "df9a96d0d99a46543a77b2fc11e68ffa7cd25591ad987c3467fa86323c0e5ad1",
-      "after_sha256": "457c42e88258c5a24dce370a7cdc37cd41df9e66db22cd6a6bc1409b085b2505",
+      "before_sha256": "457c42e88258c5a24dce370a7cdc37cd41df9e66db22cd6a6bc1409b085b2505",
+      "after_sha256": "f09725fbbee8438a5a603ed44311bc8bb536d16e10c29b29d3c02297ed1b4930",
       "owners": {
         "@document": {
-          "before": "df9a96d0d99a46543a77b2fc11e68ffa7cd25591ad987c3467fa86323c0e5ad1",
-          "after": "457c42e88258c5a24dce370a7cdc37cd41df9e66db22cd6a6bc1409b085b2505"
+          "before": "457c42e88258c5a24dce370a7cdc37cd41df9e66db22cd6a6bc1409b085b2505",
+          "after": "f09725fbbee8438a5a603ed44311bc8bb536d16e10c29b29d3c02297ed1b4930"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "087e2e913c5ae301bc49bbfe82bd780bfc3c1ddccdff1b0004f86596c001d92f",
-      "after_sha256": "ee46eb45f1978fe0ed9a76af9f123021151a27d03c1d5ed8d95d01f301056e0c",
+      "before_sha256": "ee46eb45f1978fe0ed9a76af9f123021151a27d03c1d5ed8d95d01f301056e0c",
+      "after_sha256": "d0323d3e08a56be6437b002a7e3dad459e91b46de5293e4decdc9aa3d29e8dac",
       "owners": {
         "@document": {
-          "before": "087e2e913c5ae301bc49bbfe82bd780bfc3c1ddccdff1b0004f86596c001d92f",
-          "after": "ee46eb45f1978fe0ed9a76af9f123021151a27d03c1d5ed8d95d01f301056e0c"
+          "before": "ee46eb45f1978fe0ed9a76af9f123021151a27d03c1d5ed8d95d01f301056e0c",
+          "after": "d0323d3e08a56be6437b002a7e3dad459e91b46de5293e4decdc9aa3d29e8dac"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "1858de1b436126a55f5684ae182cc3c9f01bba1cd839e2770af7a645e7410471",
-      "after_sha256": "644d88d5b86beb90a66320dc45281464bf04820af4d1e9df380fe2b070537082",
+      "before_sha256": "644d88d5b86beb90a66320dc45281464bf04820af4d1e9df380fe2b070537082",
+      "after_sha256": "6768b3459a6f84335ecde27528200e43cf3fc1e2455f10a1d0d3d994e7ff9367",
       "owners": {
         "@document": {
-          "before": "1858de1b436126a55f5684ae182cc3c9f01bba1cd839e2770af7a645e7410471",
-          "after": "644d88d5b86beb90a66320dc45281464bf04820af4d1e9df380fe2b070537082"
+          "before": "644d88d5b86beb90a66320dc45281464bf04820af4d1e9df380fe2b070537082",
+          "after": "6768b3459a6f84335ecde27528200e43cf3fc1e2455f10a1d0d3d994e7ff9367"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "d3c16a9a25b30adfabf7a7b34e6563f1535b29f42a21baea09e04b52c52f36e6",
-      "after_sha256": "d0452d9ce4a3dcd4ba53a7e7dd4d04f4e7fbe7c1a875682a55f1ee209f2a05f4",
+      "before_sha256": "d0452d9ce4a3dcd4ba53a7e7dd4d04f4e7fbe7c1a875682a55f1ee209f2a05f4",
+      "after_sha256": "b73a40e8cf31aaa6a0553abae92cf9f9990a81494173555bad954fdc1a6216ae",
       "owners": {
         "@document": {
-          "before": "d3c16a9a25b30adfabf7a7b34e6563f1535b29f42a21baea09e04b52c52f36e6",
-          "after": "d0452d9ce4a3dcd4ba53a7e7dd4d04f4e7fbe7c1a875682a55f1ee209f2a05f4"
+          "before": "d0452d9ce4a3dcd4ba53a7e7dd4d04f4e7fbe7c1a875682a55f1ee209f2a05f4",
+          "after": "b73a40e8cf31aaa6a0553abae92cf9f9990a81494173555bad954fdc1a6216ae"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "de47c01863fc8e52ff99e074f814b18a9f4278aa1e28b8625b4a2de0de771ca5",
-      "after_sha256": "d23d90cd88f399702749c39791a3d12a1b772b59a2666c7122e81dd4c9d528e2",
+      "before_sha256": "d23d90cd88f399702749c39791a3d12a1b772b59a2666c7122e81dd4c9d528e2",
+      "after_sha256": "f845774d2f48fbfdaa39b6c8a34471682410e1e64530349880580bcd9645bb84",
       "owners": {
         "@document": {
-          "before": "de47c01863fc8e52ff99e074f814b18a9f4278aa1e28b8625b4a2de0de771ca5",
-          "after": "d23d90cd88f399702749c39791a3d12a1b772b59a2666c7122e81dd4c9d528e2"
+          "before": "d23d90cd88f399702749c39791a3d12a1b772b59a2666c7122e81dd4c9d528e2",
+          "after": "f845774d2f48fbfdaa39b6c8a34471682410e1e64530349880580bcd9645bb84"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "808eccc537a7bc19025f67bb52185395326f2431d1249be6557c29692a4ad967",
-      "after_sha256": "53cee6b5179e28b3a5eb3c5d6e1029cc30b1a18aa4b80d1bc02b4e119e0b9be7",
+      "before_sha256": "53cee6b5179e28b3a5eb3c5d6e1029cc30b1a18aa4b80d1bc02b4e119e0b9be7",
+      "after_sha256": "d64c2d36607172aac5ac0e038bb8128b75fa4c28d7b301d84d66baa16e9ed83d",
       "owners": {
         "@document": {
-          "before": "808eccc537a7bc19025f67bb52185395326f2431d1249be6557c29692a4ad967",
-          "after": "53cee6b5179e28b3a5eb3c5d6e1029cc30b1a18aa4b80d1bc02b4e119e0b9be7"
+          "before": "53cee6b5179e28b3a5eb3c5d6e1029cc30b1a18aa4b80d1bc02b4e119e0b9be7",
+          "after": "d64c2d36607172aac5ac0e038bb8128b75fa4c28d7b301d84d66baa16e9ed83d"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "d8c634d002305cd7a3f04131bb26dc1e7baef85075d0fd8fd12da0ed66698de0",
-      "after_sha256": "f7baf5b4545e34972f61d157d553169f7ece770a4780dbaed56299fd1f494f4b",
+      "before_sha256": "f7baf5b4545e34972f61d157d553169f7ece770a4780dbaed56299fd1f494f4b",
+      "after_sha256": "077ae7872fef38e76dd2280f2452908544874f74b16f196e094563aeb1754718",
       "owners": {
         "@document": {
-          "before": "d8c634d002305cd7a3f04131bb26dc1e7baef85075d0fd8fd12da0ed66698de0",
-          "after": "f7baf5b4545e34972f61d157d553169f7ece770a4780dbaed56299fd1f494f4b"
+          "before": "f7baf5b4545e34972f61d157d553169f7ece770a4780dbaed56299fd1f494f4b",
+          "after": "077ae7872fef38e76dd2280f2452908544874f74b16f196e094563aeb1754718"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "30824cf49312045b6bda46a29f35cb0d49113d246f2603186143ca2280792dec",
-      "after_sha256": "fefc28d1fcdfc754ff2c042fea5af4c4e230abb25e08288c2bbf9b63e36ec673",
+      "before_sha256": "fefc28d1fcdfc754ff2c042fea5af4c4e230abb25e08288c2bbf9b63e36ec673",
+      "after_sha256": "cd920bb67be927ff7dd931c71e954e1cf48a4e8c736011e789ca15f7248c7173",
       "owners": {
         "@document": {
-          "before": "30824cf49312045b6bda46a29f35cb0d49113d246f2603186143ca2280792dec",
-          "after": "fefc28d1fcdfc754ff2c042fea5af4c4e230abb25e08288c2bbf9b63e36ec673"
+          "before": "fefc28d1fcdfc754ff2c042fea5af4c4e230abb25e08288c2bbf9b63e36ec673",
+          "after": "cd920bb67be927ff7dd931c71e954e1cf48a4e8c736011e789ca15f7248c7173"
         }
       }
     },
-    "data/source_audits/ci64_provenance_v1/circle-oval-test-transition-v1.json": {
+    "data/source_audits/ci64_provenance_v1/oval-oval-topology-test-transition-v1.json": {
       "before_sha256": null,
-      "after_sha256": "8145f8eae6477e8e702b7804d770974f6337e6855940d7468eba3c1ec0e0d6b5",
+      "after_sha256": "82797a1bb5efb5b3928a51d7f09fb631bba56267f32b26cd3c1685dd0ac5fbb7",
       "owners": {
         "@document": {
           "before": null,
-          "after": "8145f8eae6477e8e702b7804d770974f6337e6855940d7468eba3c1ec0e0d6b5"
+          "after": "82797a1bb5efb5b3928a51d7f09fb631bba56267f32b26cd3c1685dd0ac5fbb7"
         }
       }
     },
     "docs/DISTANCE_PRECISION.md": {
-      "before_sha256": "35112689c73981a062e657830b107983e3297bae30ffcfbb3bc3820906d319fc",
-      "after_sha256": "c0f54e7a9301352a83633ba673886f8110285c78335a0b5ea67d3db485b07596",
+      "before_sha256": "c0f54e7a9301352a83633ba673886f8110285c78335a0b5ea67d3db485b07596",
+      "after_sha256": "2326ab62ac83a4ae90773de97e8aa6152c3868eee1f47f038b7a826f8c783c4d",
       "owners": {
         "@document": {
-          "before": "35112689c73981a062e657830b107983e3297bae30ffcfbb3bc3820906d319fc",
-          "after": "c0f54e7a9301352a83633ba673886f8110285c78335a0b5ea67d3db485b07596"
+          "before": "c0f54e7a9301352a83633ba673886f8110285c78335a0b5ea67d3db485b07596",
+          "after": "2326ab62ac83a4ae90773de97e8aa6152c3868eee1f47f038b7a826f8c783c4d"
         }
       }
     },
-    "docs/performance/current/circle-oval-movement.json": {
+    "docs/performance/current/oval-oval-topology-movement.json": {
       "before_sha256": null,
-      "after_sha256": "4e15089febb0b62b2b4382296bf25550e1c2ba5ed9773e1a6a60e1ff6b2435bb",
+      "after_sha256": "68cd14e0f8e0794759c2af127b846ae965fa99aa2c1bdd3fb4b2af4d4c747e1b",
       "owners": {
         "@document": {
           "before": null,
-          "after": "4e15089febb0b62b2b4382296bf25550e1c2ba5ed9773e1a6a60e1ff6b2435bb"
+          "after": "68cd14e0f8e0794759c2af127b846ae965fa99aa2c1bdd3fb4b2af4d4c747e1b"
         }
       }
     },
-    "docs/performance/current/circle-oval-setup.json": {
+    "docs/performance/current/oval-oval-topology-setup.json": {
       "before_sha256": null,
-      "after_sha256": "a6cd78a50ffee7cb38af5dd82b35f3a75f9dfcd250e6609e620d73384e92952e",
+      "after_sha256": "6a033bfae792d60977ae4c8ab7bc7b70d334731297e2ee00de80f0e9dc52472c",
       "owners": {
         "@document": {
           "before": null,
-          "after": "a6cd78a50ffee7cb38af5dd82b35f3a75f9dfcd250e6609e620d73384e92952e"
+          "after": "6a033bfae792d60977ae4c8ab7bc7b70d334731297e2ee00de80f0e9dc52472c"
         }
       }
     },
-    "docs/performance/current/circle-oval-visibility.json": {
+    "docs/performance/current/oval-oval-topology-visibility.json": {
       "before_sha256": null,
-      "after_sha256": "d68231dea5b9963c5fb14e3c8a84c51bbe259b6be43b1201d5848c0be1d9ebc1",
+      "after_sha256": "4b0c1cde8a51b8ecf88af4ac283a5761838705d0fbcc8bca7e18f96cd0c38ed4",
       "owners": {
         "@document": {
           "before": null,
-          "after": "d68231dea5b9963c5fb14e3c8a84c51bbe259b6be43b1201d5848c0be1d9ebc1"
+          "after": "4b0c1cde8a51b8ecf88af4ac283a5761838705d0fbcc8bca7e18f96cd0c38ed4"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "27b222c9c1bafbd4ef450dd2a1cae3aebe89ceb1dcfbc834e0136d8f2fd57e87",
-      "after_sha256": "f9f2e1c8e01786cfb8fde27a20c2b2475faf17ff72db1e356d10d3a1e3481df8",
+      "before_sha256": "f9f2e1c8e01786cfb8fde27a20c2b2475faf17ff72db1e356d10d3a1e3481df8",
+      "after_sha256": "753eb3727c1ebac1014c1747709b4cec00a046adb28c7aa691814e7c91b19756",
       "owners": {
         "@document": {
-          "before": "27b222c9c1bafbd4ef450dd2a1cae3aebe89ceb1dcfbc834e0136d8f2fd57e87",
-          "after": "f9f2e1c8e01786cfb8fde27a20c2b2475faf17ff72db1e356d10d3a1e3481df8"
+          "before": "f9f2e1c8e01786cfb8fde27a20c2b2475faf17ff72db1e356d10d3a1e3481df8",
+          "after": "753eb3727c1ebac1014c1747709b4cec00a046adb28c7aa691814e7c91b19756"
         }
       }
     },
     "scripts/engine_numerical_identity_test_admission.py": {
-      "before_sha256": "a377cfd89fbd82bc1affd0f66b06df6b702a22e01f4f1a9d92ce82fc7abafc57",
-      "after_sha256": "3c4c85194fe0b3c26851da581084e9c78b1c7840310d7c8280d0ad895c1c8e5f",
+      "before_sha256": "3c4c85194fe0b3c26851da581084e9c78b1c7840310d7c8280d0ad895c1c8e5f",
+      "after_sha256": "db1ce9b26d9a298f8fda4f775d38a800babd8968c7cf36ff3d2aec14782e740c",
       "owners": {
         "@module": {
-          "before": "a4f447452f7e2e999d26b189ebf717559bf0c6ca88ccbe8ad9561ee5a77cac77",
-          "after": "9001fbcb376eb45b63c180111af0143cb41b20f3da94fd7745629c805c7d6794"
+          "before": "9001fbcb376eb45b63c180111af0143cb41b20f3da94fd7745629c805c7d6794",
+          "after": "2e2204ee35bde62862f465e9c3a046e3eb3f05a55c5927adcaa1123382dcff9e"
         },
         "exact_movement_test_transition": {
-          "before": "61744974ab31bb55cd1a701cd63fc875c1ee8045caf86dc86862886e3e31e2ae",
-          "after": "9b809a7b600a5a5e5aed0cfff21de7fc0668be9faaa5f6510cc18aaf8e910e67"
+          "before": "9b809a7b600a5a5e5aed0cfff21de7fc0668be9faaa5f6510cc18aaf8e910e67",
+          "after": "3099794c7c30d5f35f23d4e960f4e0e175706aaf346772a0ebb5c9464b727a89"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "5cb563b176bc3f4b952ea12d1948df4ce04c5acf54557ae88699ec97a66cb372",
-      "after_sha256": "48efc5117b0f585c8621a49982c782bd23000e042a693540b052df68aa002ffc",
+      "before_sha256": "48efc5117b0f585c8621a49982c782bd23000e042a693540b052df68aa002ffc",
+      "after_sha256": "e7cf280b1edb6207530a297474e2b212c0a8a7d016f77195557eeda8e71c9e62",
       "owners": {
         "@document": {
-          "before": "5cb563b176bc3f4b952ea12d1948df4ce04c5acf54557ae88699ec97a66cb372",
-          "after": "48efc5117b0f585c8621a49982c782bd23000e042a693540b052df68aa002ffc"
+          "before": "48efc5117b0f585c8621a49982c782bd23000e042a693540b052df68aa002ffc",
+          "after": "e7cf280b1edb6207530a297474e2b212c0a8a7d016f77195557eeda8e71c9e62"
         }
       }
     },
-    "src/warhammer40k_core/geometry/milli_inch_circle_oval.py": {
+    "src/warhammer40k_core/geometry/milli_inch_oval_oval.py": {
       "before_sha256": null,
-      "after_sha256": "88b8401a5edff1b0f528ae0a0368759a725e9dbb478adcb5f7924f17bba820e1",
+      "after_sha256": "100bf1e4586e47d4c391dd2bbbce39e8ae13e9f82a9c6b65ae6bd367bcd6b76a",
       "owners": {
         "@module": {
           "before": null,
-          "after": "0f3a5d1ce3248068aed22a6bfac29f4c5688bf274c446bf55d3a8e22005b3fe0"
+          "after": "45cff1c10e0a8cabab4d78e91f89a749ec59a96b2058e5b207ab740bfebcdfca"
         },
-        "_circle_center_distance_terms": {
+        "oval_oval_relation": {
           "before": null,
-          "after": "7b2d2e2442dc9f6e4ead9453da1b1eb1afd5e5342534084208de1b7577bef391"
-        },
-        "circle_oval_distance_ticks": {
-          "before": null,
-          "after": "1939aaf19db8291003b6c1cf2c0bc6c1a24a4969fbd037fae0c2dff5507e771f"
-        },
-        "circle_oval_relation": {
-          "before": null,
-          "after": "940f8e460c506a5633f4eab9ffa7737e6b74cf7f3ae003bca3e2b7a18553d7ed"
-        }
-      }
-    },
-    "src/warhammer40k_core/geometry/milli_inch_oval.py": {
-      "before_sha256": "908c69e9b275187c5700e901cedc7ef5a57b1c5ec6fee407645e059bca03b694",
-      "after_sha256": "deed486bbc8b302df38ce1dfcdca1524f0a9d748b28cb7d0691d4c85205f7db5",
-      "owners": {
-        "_compare_oval_point_distance": {
-          "before": null,
-          "after": "b3b0fbd701b6a934a8ef2c0e79f7eebf799a3c3c07a9096c6ac1884fbdd26cd0"
-        },
-        "_oval_point_below_midpoint": {
-          "before": "ff31c00bf82719692d70cc74b4d7230f3c7927ab178a598df0d8c1f49eaf63d7",
-          "after": "3e6ebc97a61327da0e216ba60f63cf8c9605deac03f68eeb2de2a72b74a2a93f"
+          "after": "28abd10b3e5a57eb172f07d653576f06759c4d34a48eb297ef76d416321d4b0c"
         }
       }
     },
     "tests/code_quality/test_engine_numerical_identity_admission.py": {
-      "before_sha256": "18bea4c6117233a3df96916a78d8c0d35b3f4c56638d5fdf501df9e072abad22",
-      "after_sha256": "1ed3c350c32f7c739c029d2fd0dcf77269b3db009b85f2430deb01741bacf919",
+      "before_sha256": "1ed3c350c32f7c739c029d2fd0dcf77269b3db009b85f2430deb01741bacf919",
+      "after_sha256": "f802cff33c7627ba9bdbbcb9a470d9a96e961bba240b4144af1c52d911b23517",
       "owners": {
         "test_identity_inventory_uses_current_twelve_shards_and_native_cohort": {
-          "before": "9003f2903ef63e53356ae752064a3dc92c20d5283b401852e4bd12a152d0c6c0",
-          "after": "da700fc31bea4af941105ecf857280b2e5a473033e7ec84060b9cebd7b3280a2"
+          "before": "da700fc31bea4af941105ecf857280b2e5a473033e7ec84060b9cebd7b3280a2",
+          "after": "be3f3d958ac1afdce21888a4cc4d13ac2246aff18440080fa8e20b0ce4c3a153"
         }
       }
     },
-    "tests/rules/section01/test_milli_inch_circle_oval.py": {
+    "tests/rules/section01/test_milli_inch_oval_oval.py": {
       "before_sha256": null,
-      "after_sha256": "21808326fb7a5b46ada03c63c4645eadb21a26f07513b95f1e5e48d6eaa13545",
+      "after_sha256": "1b0b67c84bd3eaf704e372834f2d4c59569f6686ce8eafd3494ac7ee9be7fbac",
       "owners": {
         "@module": {
           "before": null,
-          "after": "4bb2050a1fb6a0979a92faae675df806ef6257a39f89331cba4d7dd6f535c185"
+          "after": "1a1fc67c148826ed44c32af3c7d5735144aea7f3913bff62585a44392f0e9f7c"
         },
-        "test_circle_oval_accepts_both_coordinate_extremes": {
+        "test_oval_pair_accepts_extreme_coordinate_differences": {
           "before": null,
-          "after": "3511f0a7ab3e9e09a137caa19338432816644f76021fdf6430403c2d01d95493"
+          "after": "9a53429c9c3363baebf28a1ecdf69f335637962bb02122d8cdf7bb14aa4f733e"
         },
-        "test_circle_oval_axis_contact_preserves_half_tick_radii": {
+        "test_oval_pair_classifies_contact_for_every_facing_pair": {
           "before": null,
-          "after": "8e5936c32abfc23838c57a64e62aedfea5fedb90939383e9eb2b89be79890a19"
+          "after": "29ee5d4cd7ba9921e0edb4350ae87cedd764a8d05e34e4839fa5d6a2b06cbb5e"
         },
-        "test_circle_oval_certifies_off_axis_tangency": {
+        "test_oval_pair_classifies_off_axis_contact": {
           "before": null,
-          "after": "b831bd84ffddea0c521b88410dd3a6d8c6c97e067363ea099ea4e519419dd531"
+          "after": "3cb26ef6c0ade74dc002859572940b28e796dd5ce3d4c4660993df18fbb6c604"
         },
-        "test_circle_oval_containment_and_center_on_boundary": {
+        "test_oval_pair_preserves_odd_axes_at_mixed_facings": {
           "before": null,
-          "after": "57d6da04207f19a20e152b8003c4665b22500aa22f8bf9c4f85ffa9ebe6ce976"
+          "after": "f29a3a0c0b3afa9d5cdd6ef97757cef58247d3e57f30047acb0169d9661c695f"
         },
-        "test_circle_oval_diagonal_rounding_preserves_exact_separation": {
+        "test_oval_pair_rejects_noncanonical_operands": {
           "before": null,
-          "after": "31b759d9ae6d7f958c6d41f191478d9b75023f59f8b1ff98ac1e2735a204c2ac"
+          "after": "d0f10680dc489ca931f068db6c4c4f4ce8f53532839a84de75e6aec20b84c55c"
         },
-        "test_circle_oval_midpoint_both_sides_at_large_scale": {
+        "test_oval_pair_resolves_near_contact_at_large_coordinates": {
           "before": null,
-          "after": "475282f3c7a9fb5a7158f0a249954aaf18d06bdb7f98822cbf519c592b9161d3"
+          "after": "37a363e3b9de569d9627580ad7ad5013adbab10dcbda1326263a8d95f8bb1702"
         },
-        "test_circle_oval_queries_reject_noncanonical_operands": {
+        "test_oval_pair_shared_interior": {
           "before": null,
-          "after": "8c0825a3c47a003a5480cdc24c493a9135ec8830c62dcc56129b0f30ddc30890"
+          "after": "b56510ae268ddc833405a1fe1b2a6c07d46f867c3420b6e630f0f36dbac50677"
         }
       }
     }
@@ -390,9 +368,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit the new circle\u2013oval tests into the complete measured behavioral workload.",
-      "source_obligation": "Generate all twelve shard manifests from the fresh covered JUnit profile.",
-      "unchanged_work": "Retain all earlier cases, the 67% branch floor and the existing timing limits."
+      "rationale": "Admit the new oval pair tests into the complete measured behavioral workload.",
+      "source_obligation": "Generate the twelve shard manifests from the fresh covered JUnit profile.",
+      "unchanged_work": "Preserve all earlier cases, branch measurement, the 67% floor and timing limits."
     },
     "ci/test_shards/shard-1.txt": {
       "category": "rule_semantics",
@@ -400,9 +378,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit the new circle\u2013oval tests into the complete measured behavioral workload.",
-      "source_obligation": "Generate all twelve shard manifests from the fresh covered JUnit profile.",
-      "unchanged_work": "Retain all earlier cases, the 67% branch floor and the existing timing limits."
+      "rationale": "Admit the new oval pair tests into the complete measured behavioral workload.",
+      "source_obligation": "Generate the twelve shard manifests from the fresh covered JUnit profile.",
+      "unchanged_work": "Preserve all earlier cases, branch measurement, the 67% floor and timing limits."
     },
     "ci/test_shards/shard-10.txt": {
       "category": "rule_semantics",
@@ -410,9 +388,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit the new circle\u2013oval tests into the complete measured behavioral workload.",
-      "source_obligation": "Generate all twelve shard manifests from the fresh covered JUnit profile.",
-      "unchanged_work": "Retain all earlier cases, the 67% branch floor and the existing timing limits."
+      "rationale": "Admit the new oval pair tests into the complete measured behavioral workload.",
+      "source_obligation": "Generate the twelve shard manifests from the fresh covered JUnit profile.",
+      "unchanged_work": "Preserve all earlier cases, branch measurement, the 67% floor and timing limits."
     },
     "ci/test_shards/shard-11.txt": {
       "category": "rule_semantics",
@@ -420,9 +398,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit the new circle\u2013oval tests into the complete measured behavioral workload.",
-      "source_obligation": "Generate all twelve shard manifests from the fresh covered JUnit profile.",
-      "unchanged_work": "Retain all earlier cases, the 67% branch floor and the existing timing limits."
+      "rationale": "Admit the new oval pair tests into the complete measured behavioral workload.",
+      "source_obligation": "Generate the twelve shard manifests from the fresh covered JUnit profile.",
+      "unchanged_work": "Preserve all earlier cases, branch measurement, the 67% floor and timing limits."
     },
     "ci/test_shards/shard-12.txt": {
       "category": "rule_semantics",
@@ -430,9 +408,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit the new circle\u2013oval tests into the complete measured behavioral workload.",
-      "source_obligation": "Generate all twelve shard manifests from the fresh covered JUnit profile.",
-      "unchanged_work": "Retain all earlier cases, the 67% branch floor and the existing timing limits."
+      "rationale": "Admit the new oval pair tests into the complete measured behavioral workload.",
+      "source_obligation": "Generate the twelve shard manifests from the fresh covered JUnit profile.",
+      "unchanged_work": "Preserve all earlier cases, branch measurement, the 67% floor and timing limits."
     },
     "ci/test_shards/shard-2.txt": {
       "category": "rule_semantics",
@@ -440,9 +418,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit the new circle\u2013oval tests into the complete measured behavioral workload.",
-      "source_obligation": "Generate all twelve shard manifests from the fresh covered JUnit profile.",
-      "unchanged_work": "Retain all earlier cases, the 67% branch floor and the existing timing limits."
+      "rationale": "Admit the new oval pair tests into the complete measured behavioral workload.",
+      "source_obligation": "Generate the twelve shard manifests from the fresh covered JUnit profile.",
+      "unchanged_work": "Preserve all earlier cases, branch measurement, the 67% floor and timing limits."
     },
     "ci/test_shards/shard-3.txt": {
       "category": "rule_semantics",
@@ -450,9 +428,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit the new circle\u2013oval tests into the complete measured behavioral workload.",
-      "source_obligation": "Generate all twelve shard manifests from the fresh covered JUnit profile.",
-      "unchanged_work": "Retain all earlier cases, the 67% branch floor and the existing timing limits."
+      "rationale": "Admit the new oval pair tests into the complete measured behavioral workload.",
+      "source_obligation": "Generate the twelve shard manifests from the fresh covered JUnit profile.",
+      "unchanged_work": "Preserve all earlier cases, branch measurement, the 67% floor and timing limits."
     },
     "ci/test_shards/shard-4.txt": {
       "category": "rule_semantics",
@@ -460,9 +438,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit the new circle\u2013oval tests into the complete measured behavioral workload.",
-      "source_obligation": "Generate all twelve shard manifests from the fresh covered JUnit profile.",
-      "unchanged_work": "Retain all earlier cases, the 67% branch floor and the existing timing limits."
+      "rationale": "Admit the new oval pair tests into the complete measured behavioral workload.",
+      "source_obligation": "Generate the twelve shard manifests from the fresh covered JUnit profile.",
+      "unchanged_work": "Preserve all earlier cases, branch measurement, the 67% floor and timing limits."
     },
     "ci/test_shards/shard-5.txt": {
       "category": "rule_semantics",
@@ -470,9 +448,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit the new circle\u2013oval tests into the complete measured behavioral workload.",
-      "source_obligation": "Generate all twelve shard manifests from the fresh covered JUnit profile.",
-      "unchanged_work": "Retain all earlier cases, the 67% branch floor and the existing timing limits."
+      "rationale": "Admit the new oval pair tests into the complete measured behavioral workload.",
+      "source_obligation": "Generate the twelve shard manifests from the fresh covered JUnit profile.",
+      "unchanged_work": "Preserve all earlier cases, branch measurement, the 67% floor and timing limits."
     },
     "ci/test_shards/shard-6.txt": {
       "category": "rule_semantics",
@@ -480,9 +458,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit the new circle\u2013oval tests into the complete measured behavioral workload.",
-      "source_obligation": "Generate all twelve shard manifests from the fresh covered JUnit profile.",
-      "unchanged_work": "Retain all earlier cases, the 67% branch floor and the existing timing limits."
+      "rationale": "Admit the new oval pair tests into the complete measured behavioral workload.",
+      "source_obligation": "Generate the twelve shard manifests from the fresh covered JUnit profile.",
+      "unchanged_work": "Preserve all earlier cases, branch measurement, the 67% floor and timing limits."
     },
     "ci/test_shards/shard-7.txt": {
       "category": "rule_semantics",
@@ -490,9 +468,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit the new circle\u2013oval tests into the complete measured behavioral workload.",
-      "source_obligation": "Generate all twelve shard manifests from the fresh covered JUnit profile.",
-      "unchanged_work": "Retain all earlier cases, the 67% branch floor and the existing timing limits."
+      "rationale": "Admit the new oval pair tests into the complete measured behavioral workload.",
+      "source_obligation": "Generate the twelve shard manifests from the fresh covered JUnit profile.",
+      "unchanged_work": "Preserve all earlier cases, branch measurement, the 67% floor and timing limits."
     },
     "ci/test_shards/shard-8.txt": {
       "category": "rule_semantics",
@@ -500,9 +478,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit the new circle\u2013oval tests into the complete measured behavioral workload.",
-      "source_obligation": "Generate all twelve shard manifests from the fresh covered JUnit profile.",
-      "unchanged_work": "Retain all earlier cases, the 67% branch floor and the existing timing limits."
+      "rationale": "Admit the new oval pair tests into the complete measured behavioral workload.",
+      "source_obligation": "Generate the twelve shard manifests from the fresh covered JUnit profile.",
+      "unchanged_work": "Preserve all earlier cases, branch measurement, the 67% floor and timing limits."
     },
     "ci/test_shards/shard-9.txt": {
       "category": "rule_semantics",
@@ -510,9 +488,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit the new circle\u2013oval tests into the complete measured behavioral workload.",
-      "source_obligation": "Generate all twelve shard manifests from the fresh covered JUnit profile.",
-      "unchanged_work": "Retain all earlier cases, the 67% branch floor and the existing timing limits."
+      "rationale": "Admit the new oval pair tests into the complete measured behavioral workload.",
+      "source_obligation": "Generate the twelve shard manifests from the fresh covered JUnit profile.",
+      "unchanged_work": "Preserve all earlier cases, branch measurement, the 67% floor and timing limits."
     },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
@@ -594,55 +572,55 @@
       "source_obligation": "Advertise the actual runtime build in the current synthetic release fixtures.",
       "unchanged_work": "Historical executors, schemas, checkpoints and gameplay policy retain their original semantics."
     },
-    "data/source_audits/ci64_provenance_v1/circle-oval-test-transition-v1.json": {
+    "data/source_audits/ci64_provenance_v1/oval-oval-topology-test-transition-v1.json": {
       "category": "rule_semantics",
       "operations": [
         "exact-movement-test-admission"
       ],
       "selected_families": [],
-      "rationale": "Admit focused circle\u2013oval tests and authenticate the successor geometry source.",
-      "source_obligation": "Bind the staged source and tests while preserving all predecessor inventories.",
-      "unchanged_work": "Previous geometry regressions and the complete covered suite retain their selection."
+      "rationale": "Admit the focused topology tests and authenticate the added geometry source.",
+      "source_obligation": "Bind the new tests and helper to the successor runtime and predecessor admission.",
+      "unchanged_work": "Preserve previous geometry regressions and the complete behavioral selection."
     },
     "docs/DISTANCE_PRECISION.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Describe the staged circle\u2013oval query contract and record its required current evidence.",
-      "source_obligation": "Preserve supported facings, exact topology and one final rounding step.",
-      "unchanged_work": "The existing measurement workloads and their historical evaluations are preserved."
+      "rationale": "Document the staged oval pair topology and its required current evidence.",
+      "source_obligation": "Specify the exact supported facing domain and root sign and multiplicity proof.",
+      "unchanged_work": "The existing comparison workloads and historical evidence are preserved."
     },
-    "docs/performance/current/circle-oval-movement.json": {
+    "docs/performance/current/oval-oval-topology-movement.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Describe the staged circle\u2013oval query contract and record its required current evidence.",
-      "source_obligation": "Preserve supported facings, exact topology and one final rounding step.",
-      "unchanged_work": "The existing measurement workloads and their historical evaluations are preserved."
+      "rationale": "Document the staged oval pair topology and its required current evidence.",
+      "source_obligation": "Specify the exact supported facing domain and root sign and multiplicity proof.",
+      "unchanged_work": "The existing comparison workloads and historical evidence are preserved."
     },
-    "docs/performance/current/circle-oval-setup.json": {
+    "docs/performance/current/oval-oval-topology-setup.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Describe the staged circle\u2013oval query contract and record its required current evidence.",
-      "source_obligation": "Preserve supported facings, exact topology and one final rounding step.",
-      "unchanged_work": "The existing measurement workloads and their historical evaluations are preserved."
+      "rationale": "Document the staged oval pair topology and its required current evidence.",
+      "source_obligation": "Specify the exact supported facing domain and root sign and multiplicity proof.",
+      "unchanged_work": "The existing comparison workloads and historical evidence are preserved."
     },
-    "docs/performance/current/circle-oval-visibility.json": {
+    "docs/performance/current/oval-oval-topology-visibility.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Describe the staged circle\u2013oval query contract and record its required current evidence.",
-      "source_obligation": "Preserve supported facings, exact topology and one final rounding step.",
-      "unchanged_work": "The existing measurement workloads and their historical evaluations are preserved."
+      "rationale": "Document the staged oval pair topology and its required current evidence.",
+      "source_obligation": "Specify the exact supported facing domain and root sign and multiplicity proof.",
+      "unchanged_work": "The existing comparison workloads and historical evidence are preserved."
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Describe the staged circle\u2013oval query contract and record its required current evidence.",
-      "source_obligation": "Preserve supported facings, exact topology and one final rounding step.",
-      "unchanged_work": "The existing measurement workloads and their historical evaluations are preserved."
+      "rationale": "Document the staged oval pair topology and its required current evidence.",
+      "source_obligation": "Specify the exact supported facing domain and root sign and multiplicity proof.",
+      "unchanged_work": "The existing comparison workloads and historical evidence are preserved."
     },
     "scripts/engine_numerical_identity_test_admission.py": {
       "category": "rule_semantics",
@@ -650,9 +628,9 @@
         "engine-numerical-identity-admission"
       ],
       "selected_families": [],
-      "rationale": "Add the finite circle\u2013oval successor to the selected source and case inventory.",
-      "source_obligation": "Check the predecessor digest and both current geometry source hashes before admission.",
-      "unchanged_work": "Previous admission records retain their original bytes and tests remain selected."
+      "rationale": "Record the finite oval pair successor in the selected source and case inventory.",
+      "source_obligation": "Verify the predecessor digest and new helper and test bytes before admission.",
+      "unchanged_work": "Previous admission records and tests retain their bytes and selection."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
@@ -664,7 +642,7 @@
       "source_obligation": "Advertise the actual runtime build in the current synthetic release fixtures.",
       "unchanged_work": "Historical executors, schemas, checkpoints and gameplay policy retain their original semantics."
     },
-    "src/warhammer40k_core/geometry/milli_inch_circle_oval.py": {
+    "src/warhammer40k_core/geometry/milli_inch_oval_oval.py": {
       "category": "algorithm_or_search",
       "operations": [
         "geometry-search"
@@ -674,23 +652,9 @@
         "setup",
         "visibility"
       ],
-      "rationale": "Expose the exact three-way oval distance comparison for staged disk queries.",
-      "source_obligation": "Certify contact and every rounding threshold with the exact radius in doubled ticks.",
-      "unchanged_work": "Legacy gameplay retains its existing geometry path and staged point rounding is preserved."
-    },
-    "src/warhammer40k_core/geometry/milli_inch_oval.py": {
-      "category": "algorithm_or_search",
-      "operations": [
-        "geometry-search"
-      ],
-      "selected_families": [
-        "movement",
-        "setup",
-        "visibility"
-      ],
-      "rationale": "Expose the exact three-way oval distance comparison for staged disk queries.",
-      "source_obligation": "Certify contact and every rounding threshold with the exact radius in doubled ticks.",
-      "unchanged_work": "Legacy gameplay retains its existing geometry path and staged point rounding is preserved."
+      "rationale": "Classify two filled canonical ovals with a fixed integer conic-pencil criterion.",
+      "source_obligation": "Determine positive cubic root signs and multiplicities exactly for all canonical facings.",
+      "unchanged_work": "The query is staged and no existing gameplay or geometry caller uses it."
     },
     "tests/code_quality/test_engine_numerical_identity_admission.py": {
       "category": "rule_semantics",
@@ -698,26 +662,26 @@
         "engine-numerical-identity-admission"
       ],
       "selected_families": [],
-      "rationale": "Add the finite circle\u2013oval successor to the selected source and case inventory.",
-      "source_obligation": "Check the predecessor digest and both current geometry source hashes before admission.",
-      "unchanged_work": "Previous admission records retain their original bytes and tests remain selected."
+      "rationale": "Record the finite oval pair successor in the selected source and case inventory.",
+      "source_obligation": "Verify the predecessor digest and new helper and test bytes before admission.",
+      "unchanged_work": "Previous admission records and tests retain their bytes and selection."
     },
-    "tests/rules/section01/test_milli_inch_circle_oval.py": {
+    "tests/rules/section01/test_milli_inch_oval_oval.py": {
       "category": "rule_semantics",
       "operations": [
         "exact-movement-test-admission"
       ],
       "selected_families": [],
-      "rationale": "Admit focused circle\u2013oval tests and authenticate the successor geometry source.",
-      "source_obligation": "Bind the staged source and tests while preserving all predecessor inventories.",
-      "unchanged_work": "Previous geometry regressions and the complete covered suite retain their selection."
+      "rationale": "Admit the focused topology tests and authenticate the added geometry source.",
+      "source_obligation": "Bind the new tests and helper to the successor runtime and predecessor admission.",
+      "unchanged_work": "Preserve previous geometry regressions and the complete behavioral selection."
     }
   },
   "milestone": "ordinary",
   "comparisons": {
-    "movement": "docs/performance/current/circle-oval-movement.json",
-    "setup": "docs/performance/current/circle-oval-setup.json",
-    "visibility": "docs/performance/current/circle-oval-visibility.json"
+    "movement": "docs/performance/current/oval-oval-topology-movement.json",
+    "setup": "docs/performance/current/oval-oval-topology-setup.json",
+    "visibility": "docs/performance/current/oval-oval-topology-visibility.json"
   },
   "full_game": null
 }

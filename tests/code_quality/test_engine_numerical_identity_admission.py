@@ -176,9 +176,21 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
     circle_oval = {node for node in current if node.startswith(selection.CIRCLE_OVAL_OWNER + "::")}
     assert circle_oval
     assert sum(selection.CIRCLE_OVAL_OWNER in group for group in groups) == 1
-    assert (
-        current.keys()
-        == retained | added | staged | mixed | oval | oval_polygon | oval_polygon_gap | circle_oval
+    oval_oval = {
+        node for node in current if node.startswith(selection.OVAL_OVAL_TOPOLOGY_OWNER + "::")
+    }
+    assert len(oval_oval) == 24
+    assert sum(selection.OVAL_OVAL_TOPOLOGY_OWNER in group for group in groups) == 1
+    assert current.keys() == (
+        retained
+        | added
+        | staged
+        | mixed
+        | oval
+        | oval_polygon
+        | oval_polygon_gap
+        | circle_oval
+        | oval_oval
     )
 
 

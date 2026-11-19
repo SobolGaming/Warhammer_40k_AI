@@ -1,0 +1,16 @@
+{
+  "added_files": {
+    "tests/rules/section01/test_milli_inch_oval_oval.py": {
+      "blob_sha1": "3621f38a3ac50e0591d34b354475f2adcc9b7841",
+      "bytes": 5130,
+      "mode": "100644",
+      "sha256": "1b0b67c84bd3eaf704e372834f2d4c59569f6686ce8eafd3494ac7ee9be7fbac"
+    }
+  },
+  "retained_circle_oval_sha256": "8145f8eae6477e8e702b7804d770974f6337e6855940d7468eba3c1ec0e0d6b5",
+  "runtime_fingerprint": "1e1f9e8d160c8acf75f4a0cff3c9d5099ef18e3c05a9d4b20522258ae6e7b5b5",
+  "schema": "finite-oval-oval-topology-test-transition-v1",
+  "sources": {
+    "src/warhammer40k_core/geometry/milli_inch_oval_oval.py": "100bf1e4586e47d4c391dd2bbbce39e8ae13e9f82a9c6b65ae6bd367bcd6b76a"
+  }
+}
