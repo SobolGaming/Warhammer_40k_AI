@@ -198,7 +198,13 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
     )
     gameplay = {
         gameplay_prefix + "[" + case + "]"
-        for case in ("below-budget-midpoint", "exact-midpoint", "above-budget-midpoint", "blocked")
+        for case in (
+            "below-budget-midpoint",
+            "exact-midpoint",
+            "above-budget-midpoint",
+            "blocked",
+            "timeout-then-retry",
+        )
     }
     assert current.keys() == (
         retained

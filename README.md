@@ -361,10 +361,10 @@ Bare legacy checkpoints/replays require deliberate `enroll_legacy(...)` or
 original bytes and still requires complete strict reconstruction/replay. A
 compatible executor is not proof of an unknown artifact's original producer.
 Current bare native checkpoints use v3-numerical-identity and replays use
-v38-numerical-identity. These APIs admit the current legacy-float numerical
-contract; they preserve input bytes and reject obsolete inner formats. Existing
-v2 checkpoint/v37 replay data and exact comparisons remain unchanged and require
-their retained compatible executor. No format is inferred or migrated.
+v38-numerical-identity. New games use binary-float poses with the
+`binary-inch-milli-inch-movement-budget-v1` policy. Movement budgets use the
+complete path rounded once to the nearest 0.001 inch. See the
+[distance precision contract](docs/DISTANCE_PRECISION.md) for the scope of this rule.
 
 ## Test commands
 

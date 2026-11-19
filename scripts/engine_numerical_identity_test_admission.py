@@ -121,7 +121,7 @@ OVAL_CODEC_OWNER = "tests/rules/section01/test_milli_inch_oval_payload.py"
 GAMEPLAY_BUDGET_TRANSITION = (
     "data/source_audits/ci64_provenance_v1/gameplay-movement-budget-test-transition-v1.json"
 )
-GAMEPLAY_BUDGET_SHA256 = "ae54861a9004999856925cb8174ff850ad116448dbb2054f56adce46741e99a1"
+GAMEPLAY_BUDGET_SHA256 = "f6e1c4e3ce7975fe1b49ba1ce4e1e58d1c89a0a667a79e6497367f58e5d1d174"
 GAMEPLAY_BUDGET_OWNER = "tests/rules/section03/test_facade.py"
 GAMEPLAY_SORCERER_OWNER = "tests/factions/emperors_children/test_selected_consumers.py"
 

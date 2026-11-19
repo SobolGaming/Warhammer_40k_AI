@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import math
-from dataclasses import InitVar, dataclass, field
+from dataclasses import dataclass, field
 from fractions import Fraction
 from itertools import pairwise
 from typing import Self, TypedDict, cast
@@ -13,7 +13,6 @@ from warhammer40k_core.geometry.milli_inch import (
     squared_inches_to_ticks,
     ticks_to_inches,
 )
-from warhammer40k_core.geometry.milli_inch_symbolic import symbolic_squared_path_inches_to_ticks
 from warhammer40k_core.geometry.pose import (
     Facing,
     GeometryError,
@@ -26,6 +25,10 @@ from warhammer40k_core.geometry.pose import (
 from warhammer40k_core.geometry.volume import Model
 
 _SEGMENT_MEASUREMENT_POINT = "pose_anchor"
+
+
+class MovementDistanceUnresolvedError(GeometryError):
+    """A bounded full-path measurement could not certify its budget value."""
 
 
 class MovementSegmentPayload(TypedDict):
@@ -319,6 +322,20 @@ class MovementDistanceBudget:
 
     @classmethod
     def from_payload(cls, payload: MovementDistanceBudgetPayload) -> Self:
+        budget = cls._from_payload_fields(payload)
+        if budget != cls.from_totals(
+            max_distance_inches=budget.max_distance_inches,
+            straight_line_distance_inches=budget.straight_line_distance_inches,
+        ):
+            raise GeometryError("MovementDistanceBudget total does not match the scalar distance.")
+        return budget
+
+    @classmethod
+    def _from_payload_fields(cls, payload: MovementDistanceBudgetPayload) -> Self:
+        if type(cast(object, payload)) is not dict or set(payload) != set(
+            MovementDistanceBudgetPayload.__annotations__
+        ):
+            raise GeometryError("MovementDistanceBudget has incompatible fields.")
         return cls(
             max_distance_inches=payload["max_distance_inches"],
             straight_line_distance_inches=payload["straight_line_distance_inches"],
@@ -333,10 +350,10 @@ class MovementDistanceWitness:
     model_id: str
     segments: tuple[MovementSegment, ...]
     rotation_events: tuple[RotationEvent, ...] = ()
-    max_distance_inches: InitVar[float | None] = None
+    max_distance_inches: float | None = None
     budget: MovementDistanceBudget | None = field(init=False)
 
-    def __post_init__(self, max_distance_inches: float | None) -> None:
+    def __post_init__(self) -> None:
         model_id = _validate_identifier("MovementDistanceWitness model_id", self.model_id)
         segments = _validate_movement_segments("MovementDistanceWitness segments", self.segments)
         rotation_events = _validate_rotation_events(
@@ -364,10 +381,13 @@ class MovementDistanceWitness:
         )
         budget = (
             None
-            if max_distance_inches is None
+            if self.max_distance_inches is None
             else MovementDistanceBudget.for_segments(
-                max_distance_inches=max_distance_inches, segments=segments
+                max_distance_inches=self.max_distance_inches, segments=segments
             )
+        )
+        object.__setattr__(
+            self, "max_distance_inches", None if budget is None else budget.max_distance_inches
         )
         object.__setattr__(self, "budget", budget)
         object.__setattr__(self, "model_id", model_id)
@@ -455,7 +475,7 @@ class MovementDistanceWitness:
         )
         if (
             budget_payload is not None
-            and MovementDistanceBudget.from_payload(budget_payload) != witness.budget
+            and MovementDistanceBudget._from_payload_fields(budget_payload) != witness.budget
         ):
             raise GeometryError("MovementDistanceWitness budget does not match the measured path.")
         return witness
@@ -473,15 +493,21 @@ def _rounded_path_inches(segments: tuple[MovementSegment, ...]) -> float:
             squares.append(dx * dx + dy * dy + dz * dz)
     if not squares:
         return 0.0
+    if len(squares) == 1:
+        return float(ticks_to_inches(squared_inches_to_ticks(squares[0])))
+    from warhammer40k_core.geometry.milli_inch_symbolic import (
+        UnresolvedDistanceMeasurementError,
+        symbolic_squared_path_inches_to_ticks,
+    )
+
     try:
-        ticks = (
-            squared_inches_to_ticks(squares[0])
-            if len(squares) == 1
-            else symbolic_squared_path_inches_to_ticks(squares)
-        )
+        return float(ticks_to_inches(symbolic_squared_path_inches_to_ticks(squares)))
+    except UnresolvedDistanceMeasurementError as exc:
+        raise MovementDistanceUnresolvedError(
+            "Could not certify the whole-path movement budget distance."
+        ) from exc
     except DistancePrecisionError as exc:
         raise GeometryError("Could not certify the whole-path movement budget distance.") from exc
-    return float(ticks_to_inches(ticks))
 
 
 @dataclass(frozen=True, slots=True)

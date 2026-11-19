@@ -2,6 +2,8 @@
 
 from dataclasses import replace
 from math import isclose
+from types import SimpleNamespace
+from typing import cast
 
 import pytest
 
@@ -20,8 +22,14 @@ from warhammer40k_core.engine.movement_proposals import (
 )
 from warhammer40k_core.engine.phase import LifecycleStatusKind
 from warhammer40k_core.engine.phases.movement_handler import MovementPhaseHandler
+from warhammer40k_core.geometry import milli_inch_symbolic
+from warhammer40k_core.geometry.movement_envelope import (
+    MovementDistanceBudget,
+    MovementDistanceWitness,
+    MovementDistanceWitnessPayload,
+)
 from warhammer40k_core.geometry.pathing import PathWitness
-from warhammer40k_core.geometry.pose import Pose
+from warhammer40k_core.geometry.pose import GeometryError, Pose
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition, TerrainWallDefinition
 
 
@@ -147,14 +155,21 @@ def test_native_facade_rejects_swap_then_applies_legal_witness(
 
 
 @pytest.mark.parametrize(
-    ("offset", "rounded_offset", "blocked", "violation"),
+    ("offset", "rounded_offset", "blocked", "violation", "timeout_then_retry"),
     [
-        (0.00049, 0.0, False, None),
-        (-0.9375, -0.937, False, None),
-        (0.00051, 0.001, False, "movement_distance_exceeded"),
-        (0.00049, 0.0, True, "terrain_feature_transit_forbidden"),
+        (0.00049, 0.0, False, None, False),
+        (-0.9375, -0.937, False, None, False),
+        (0.00051, 0.001, False, "movement_distance_exceeded", False),
+        (0.00049, 0.0, True, "terrain_feature_transit_forbidden", False),
+        (0.00049, 0.0, False, None, True),
     ],
-    ids=("below-budget-midpoint", "exact-midpoint", "above-budget-midpoint", "blocked"),
+    ids=(
+        "below-budget-midpoint",
+        "exact-midpoint",
+        "above-budget-midpoint",
+        "blocked",
+        "timeout-then-retry",
+    ),
 )
 def test_normal_move_facade_budgets_once_rounded_complete_paths(
     section03_definitions: Section02Definitions,
@@ -163,6 +178,8 @@ def test_normal_move_facade_budgets_once_rounded_complete_paths(
     rounded_offset: float,
     blocked: bool,
     violation: str | None,
+    timeout_then_retry: bool,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     unit = section03_definitions.unit(CHAOS_SPAWN)
     budget = model_movement_characteristic(unit.own_models[0]).final
@@ -221,19 +238,38 @@ def test_normal_move_facade_budgets_once_rounded_complete_paths(
             for model_id, start, end in zip(unit.own_model_ids(), starts, ends, strict=True)
         )
     )
+    payload = validate_json_value(
+        MovementProposalPayload(
+            proposal_request_id=request.request_id,
+            proposal_kind=proposal.proposal_kind,
+            unit_instance_id=unit.unit_instance_id,
+            movement_phase_action="normal_move",
+            movement_mode="normal",
+            witness=witness,
+        ).to_payload()
+    )
+    if timeout_then_retry:
+        state_before = lifecycle.to_payload()
+        # Run the real certificate with a clock that expires during measurement.
+        clock = iter((0.0, 11.0))
+        with monkeypatch.context() as patch:
+            patch.setattr(milli_inch_symbolic, "time", SimpleNamespace(monotonic=clock.__next__))
+            failed = session.submit_parameterized_payload(
+                request_id=request.request_id, result_id="budget-path", payload=payload
+            )
+        assert failed.status_kind is LifecycleStatusKind.INVALID
+        assert isinstance(failed.payload, dict)
+        validation = failed.payload["proposal_validation"]
+        assert isinstance(validation, dict)
+        violations = validation["violations"]
+        assert isinstance(violations, list)
+        assert len(violations) == 1
+        assert isinstance(violations[0], dict)
+        assert violations[0]["violation_code"] == "movement_distance_unresolved"
+        assert lifecycle.to_payload() == state_before
+        assert lifecycle.pending_decision_request() == request
     status = session.submit_parameterized_payload(
-        request_id=request.request_id,
-        result_id="budget-path",
-        payload=validate_json_value(
-            MovementProposalPayload(
-                proposal_request_id=request.request_id,
-                proposal_kind=proposal.proposal_kind,
-                unit_instance_id=unit.unit_instance_id,
-                movement_phase_action="normal_move",
-                movement_mode="normal",
-                witness=witness,
-            ).to_payload()
-        ),
+        request_id=request.request_id, result_id="budget-path", payload=payload
     )
     assert state.battlefield_state is not None
     if violation is not None:
@@ -245,11 +281,20 @@ def test_normal_move_facade_budgets_once_rounded_complete_paths(
         assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()
         placement_after = state.battlefield_state.unit_placement_by_id(unit.unit_instance_id)
         assert tuple(model.pose for model in placement_after.model_placements) == ends
-        completed = next(
+        completed_events = [
             event.payload
             for event in lifecycle.decision_controller.event_log.records
             if event.event_type == "movement_activation_completed"
+        ]
+        assert len(completed_events) == 1
+        assert (
+            sum(
+                record.result.result_id == "budget-path"
+                for record in lifecycle.decision_controller.records
+            )
+            == 1
         )
+        completed = completed_events[0]
         assert isinstance(completed, dict)
         results = completed["path_validation_results"]
         assert isinstance(results, list)
@@ -266,3 +311,13 @@ def test_normal_move_facade_budgets_once_rounded_complete_paths(
             assert type(raw_total) is float
             assert isclose(total, budget + rounded_offset, rel_tol=0, abs_tol=1e-12)
             assert isclose(raw_total, travel, rel_tol=0, abs_tol=1e-12)
+            if timeout_then_retry:
+                restored = MovementDistanceWitness.from_payload(
+                    cast(MovementDistanceWitnessPayload, distance)
+                )
+                assert replace(restored).budget == restored.budget
+                assert restored.budget is not None
+                forged = restored.budget.to_payload()
+                forged["straight_line_distance_inches"] = 100.0
+                with pytest.raises(GeometryError, match="does not match the scalar distance"):
+                    MovementDistanceBudget.from_payload(forged)

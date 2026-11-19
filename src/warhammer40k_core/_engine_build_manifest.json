@@ -1,7 +1,7 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:8624506eafe05bceb990737ec27e5108130945a04ad132c33e74de0a61c7c250",
-  "fingerprint": "8624506eafe05bceb990737ec27e5108130945a04ad132c33e74de0a61c7c250",
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:930415d5b1b1eeeb0a6c7d2c5f1055ef6409b7867f16fad6ababb7434488a4a4",
+  "fingerprint": "930415d5b1b1eeeb0a6c7d2c5f1055ef6409b7867f16fad6ababb7434488a4a4",
   "resource_count": 3275,
   "resources": [
     {
@@ -10845,9 +10845,9 @@
       "sha256": "cfcdf98b8b1f49bd4b075afbe9b45bb8d2a83ef5a05787b2f508f565187e8d59"
     },
     {
-      "byte_length": 148530,
+      "byte_length": 151501,
       "path": "warhammer40k_core/engine/lifecycle.py",
-      "sha256": "ad306763e7956360870a0fff49e6d3cb0b82ad5d8737d6ed024bee5284e24f57"
+      "sha256": "55695963eb2c908b1945bfa946998ed5496aaeb9975b4cc7d7999850732c7237"
     },
     {
       "byte_length": 4931,
@@ -11660,9 +11660,9 @@
       "sha256": "ac552517c6f7ccd6e478cd54539a84a7dd29e4b17b9691b460cbe99d67300c9b"
     },
     {
-      "byte_length": 47793,
+      "byte_length": 48480,
       "path": "warhammer40k_core/engine/phases/movement_handler.py",
-      "sha256": "ea0935d48b649aa5beadb0ccd567dbe830fbae96da666c8d7a09856a37692e79"
+      "sha256": "3235645fff5568d7ef352b968b532c7d99fe831fdade32149d92164ef23835d5"
     },
     {
       "byte_length": 18647,
@@ -11695,9 +11695,9 @@
       "sha256": "26ccd8afd2ff8024d185b24acd30b1815b7c00b45e6bcce47db99911e903eaf6"
     },
     {
-      "byte_length": 59446,
+      "byte_length": 59584,
       "path": "warhammer40k_core/engine/phases/movement_resolution_flow.py",
-      "sha256": "8a1ea6668fd135bbb053189ad65868cb86bd4c460aa0ff666c0874840092806b"
+      "sha256": "1ed236e52046c264390569cc0024dad4f5467190739eb17dc08d194be059bcf5"
     },
     {
       "byte_length": 45908,
@@ -13905,9 +13905,9 @@
       "sha256": "722a259dcc5f52f4b64a2dca45c4cdcac543cd79f81e4e80db83940af339a1b8"
     },
     {
-      "byte_length": 31113,
+      "byte_length": 32268,
       "path": "warhammer40k_core/geometry/movement_envelope.py",
-      "sha256": "cb7903d7b342b1082e716c719081b4bdcdad13075a328326d52e7c18c98db4f3"
+      "sha256": "c0125dc59db54f90aa0631ff5e03f608a2a16ba66721544c62ca68c52886b60f"
     },
     {
       "byte_length": 6042,
