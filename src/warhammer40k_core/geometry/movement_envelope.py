@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 import math
+from collections.abc import Iterator
+from contextlib import contextmanager
+from contextvars import ContextVar
 from dataclasses import dataclass, field
 from fractions import Fraction
 from itertools import pairwise
@@ -404,6 +407,16 @@ class MovementDistanceWitness:
     ) -> Self:
         valid_model = _validate_model("MovementDistanceWitness model", model)
         path = _validate_pose_path("MovementDistanceWitness poses", poses)
+        scope = _CERTIFICATES.get() if len(path) > 2 else None
+        cache = None if scope is None else scope.witnesses
+        key = None
+        if cache is not None and max_distance_inches is not None:
+            limit = _validate_non_negative_number(
+                "MovementDistanceWitness max_distance_inches", max_distance_inches
+            )
+            key = (valid_model.model_id, path, limit)
+            if key in cache:
+                return cast(Self, cache[key])
         segments = tuple(
             MovementSegment.from_poses(
                 model_id=valid_model.model_id,
@@ -426,12 +439,15 @@ class MovementDistanceWitness:
                     facing_delta_degrees=_facing_delta_degrees(start_pose, end_pose),
                 )
             )
-        return cls(
+        witness = cls(
             model_id=valid_model.model_id,
             segments=segments,
             rotation_events=tuple(rotation_events),
             max_distance_inches=max_distance_inches,
         )
+        if cache is not None and key is not None:
+            cache[key] = witness
+        return witness
 
     @property
     def straight_line_distance_inches(self) -> float:
@@ -481,11 +497,45 @@ class MovementDistanceWitness:
         return witness
 
 
+@dataclass(slots=True)
+class _MovementCertificates:
+    witnesses: dict[tuple[str, tuple[Pose, ...], float], MovementDistanceWitness] = field(
+        default_factory=dict
+    )
+    lengths: dict[tuple[Point3, ...], float] = field(default_factory=dict)
+
+
+_CERTIFICATES: ContextVar[_MovementCertificates | None] = ContextVar(
+    "movement_certificates", default=None
+)
+
+
+@contextmanager
+def reuse_movement_certificates() -> Iterator[None]:
+    """Reuse successful certificates only within one prospective decision."""
+    token = _CERTIFICATES.set(_MovementCertificates())
+    try:
+        yield
+    finally:
+        _CERTIFICATES.reset(token)
+
+
 def _rounded_path_inches(segments: tuple[MovementSegment, ...]) -> float:
+    positions = (
+        segments[0].start_pose.position,
+        *(segment.end_pose.position for segment in segments),
+    )
+    scope = _CERTIFICATES.get() if len(segments) > 1 else None
+    if scope is None:
+        return _measure_path_inches(positions)
+    if positions not in scope.lengths:
+        scope.lengths[positions] = _measure_path_inches(positions)
+    return scope.lengths[positions]
+
+
+def _measure_path_inches(positions: tuple[Point3, ...]) -> float:
     squares: list[Fraction] = []
-    for segment in segments:
-        start = segment.start_pose.position
-        end = segment.end_pose.position
+    for start, end in pairwise(positions):
         if start != end:
             dx = Fraction(end.x) - Fraction(start.x)
             dy = Fraction(end.y) - Fraction(start.y)

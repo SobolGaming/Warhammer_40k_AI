@@ -36417,6 +36417,47 @@
       "sensitive": false,
       "mandatory": true
     },
+    "gameplay-movement-decision-staging": {
+      "paths": ["src/warhammer40k_core/engine/decision_controller.py"],
+      "owners": [
+        "@module",
+        "DecisionController",
+        "DecisionController.commit_movement_result",
+        "DecisionController.prepare_movement_result",
+        "DecisionController.movement_request_for_result",
+        "_PreparedMovementResult"
+      ],
+      "families": ["player_boundary", "reconstruction"],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "gameplay-charge-certificate-commit": {
+      "paths": [
+        "src/warhammer40k_core/engine/catalog_setup_reactive_charge_move.py",
+        "src/warhammer40k_core/engine/phases/charge_proposal_flow.py"
+      ],
+      "owners": [
+        "_apply_charge_move_proposal_decision",
+        "apply_catalog_setup_reactive_charge_move"
+      ],
+      "families": ["movement"],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "gameplay-scout-certificate-commit": {
+      "paths": ["src/warhammer40k_core/engine/setup_flow.py"],
+      "owners": ["SetupFlow.apply_decision"],
+      "families": ["movement", "setup"],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "gameplay-native-charge-retry-test": {
+      "paths": ["tests/rules/section11/test_moves.py"],
+      "owners": ["test_native_charge_certification_timeout_leaves_the_same_proposal_retryable"],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
     "gameplay-movement-budget-facade-tests": {
       "paths": [
         "tests/rules/section03/test_facade.py"

@@ -116,8 +116,8 @@ _SCOPES = (
     ReviewedScope(
         GAMEPLAY_MOVEMENT_BUDGET_BASE,
         "docs/performance/policy-v3/gameplay-movement-budget-input-roles-v4.json",
-        "dc1db39e0556479d2b8ce0ea7555f9ad58fb12d4bb09d8eec94c69ad497e2eca",
-        "77bdf20dec6a6e5f84489192cbafaa69f6708d7f8c45475ba2e33e75c90424e2",
+        "98c145cdafc7feea439b984448515eaf8792b4bc6d28bb720c53736b48d5a6e4",
+        "431b4d496ed63c19be48c3e9ce7317bc063577858ac4146b8189fcf0db3c5573",
         "docs/performance/current/gameplay-movement-budget-external-contract.json",
         frozenset(
             (
@@ -149,7 +149,16 @@ _SCOPES = (
                 "src/warhammer40k_core/ai/opposing_shooter_scenario.py",
                 "src/warhammer40k_core/ai/preserve_scenario.py",
                 "src/warhammer40k_core/core/visibility.py",
+                "src/warhammer40k_core/engine/catalog_setup_reactive_charge_move.py",
+                "src/warhammer40k_core/engine/decision_controller.py",
                 "src/warhammer40k_core/engine/game_state.py",
+                "src/warhammer40k_core/engine/lifecycle.py",
+                "src/warhammer40k_core/engine/phases/charge_proposal_flow.py",
+                "src/warhammer40k_core/engine/phases/fight_movement_lifecycle.py",
+                "src/warhammer40k_core/engine/phases/movement_resolution_flow.py",
+                "src/warhammer40k_core/engine/scout_movement.py",
+                "src/warhammer40k_core/engine/setup_flow.py",
+                "src/warhammer40k_core/engine/triggered_movement_handler_impl.py",
                 "src/warhammer40k_core/geometry/milli_inch_symbolic.py",
                 "src/warhammer40k_core/geometry/movement_envelope.py",
                 "src/warhammer40k_core/geometry/numerical_identity.py",
@@ -159,6 +168,7 @@ _SCOPES = (
                 "tests/infrastructure/adapters/unit/test_numerical_policy.py",
                 "tests/rules/section01/test_engine_numerical_identity.py",
                 "tests/rules/section03/test_facade.py",
+                "tests/rules/section11/test_moves.py",
                 "tests/rules/section18/test_facade.py",
             )
         ),

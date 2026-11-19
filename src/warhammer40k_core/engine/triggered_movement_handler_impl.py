@@ -212,6 +212,7 @@ def apply_decision(
     )
     _validate_reaction_window_matches_state(state=state, descriptor=descriptor)
     if _payload_optional_bool(request_payload, "requires_movement_proposal"):
+        decisions.commit_movement_result(result)
         return _apply_triggered_movement_unit_selection_decision(
             state=state,
             result=result,
@@ -239,6 +240,7 @@ def apply_decision(
             descriptor=descriptor,
             unit_instance_id=unit_instance_id,
         )
+        decisions.commit_movement_result(result)
         decisions.event_log.append(
             "triggered_movement_declined",
             _triggered_movement_declined_payload(
@@ -270,6 +272,7 @@ def apply_decision(
         decisions=decisions, result=result
     ):
         drift_code = "triggered_movement_witness_drift"
+    decisions.commit_movement_result(result)
     if drift_code is not None:
         invalid_payload = _triggered_movement_invalid_payload(
             state=state,
@@ -402,6 +405,7 @@ def apply_proposal_decision(
         battle_shocked_unit_ids=tuple(state.battle_shocked_unit_ids),
         normal_move_states=tuple(state.normal_move_states),
     )
+    decisions.commit_movement_result(result)
     if not resolution.is_valid:
         violation_code = _triggered_movement_violation_code(resolution)
         invalid_payload = _triggered_movement_invalid_payload(

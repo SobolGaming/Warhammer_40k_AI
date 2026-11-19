@@ -382,6 +382,13 @@ _MOVEMENT_DECISION_TYPES = frozenset(
     )
 )
 _TRIGGERED_MOVEMENT_DECISION_TYPES = frozenset((SELECT_TRIGGERED_MOVEMENT_DECISION_TYPE,))
+_CERTIFIED_MOVEMENT_DECISION_TYPES = frozenset(
+    (
+        MOVEMENT_PROPOSAL_DECISION_TYPE,
+        SELECT_TRIGGERED_MOVEMENT_DECISION_TYPE,
+        SUBMIT_SCOUT_MOVE_DECISION_TYPE,
+    )
+)
 _SHOOTING_DECISION_TYPES = frozenset(
     (
         SELECT_SHOOTING_UNIT_DECISION_TYPE,
@@ -716,6 +723,35 @@ class GameLifecycle:
     def submit_decision(self, result: DecisionResult) -> LifecycleStatus:
         state = self._require_state()
         pending_request = self._pending_decision_request()
+        if (
+            type(result) is DecisionResult
+            and pending_request is not None
+            and pending_request.decision_type in _CERTIFIED_MOVEMENT_DECISION_TYPES
+        ):
+            from warhammer40k_core.geometry.movement_envelope import (
+                MovementDistanceUnresolvedError,
+                reuse_movement_certificates,
+            )
+
+            with reuse_movement_certificates():
+                try:
+                    return self._apply_submitted_decision(
+                        state, pending_request, result, certify=True
+                    )
+                except MovementDistanceUnresolvedError:
+                    if self._pending_decision_request() != pending_request:
+                        raise
+                    return self._unresolved_movement_status(state, pending_request, result)
+        return self._apply_submitted_decision(state, pending_request, result)
+
+    def _apply_submitted_decision(
+        self,
+        state: GameState,
+        pending_request: DecisionRequest | None,
+        result: DecisionResult,
+        *,
+        certify: bool = False,
+    ) -> LifecycleStatus:
         if type(result) is DecisionResult and pending_request is not None:
             from warhammer40k_core.engine.rule_trigger_runtime import validate_rule_trigger_history
 
@@ -793,27 +829,18 @@ class GameLifecycle:
                 request=pending_request,
                 runtime_content_bundle=self._runtime_content_bundle,
             )
-        if (
-            type(result) is DecisionResult
-            and pending_request is not None
-            and pending_request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
-            and state.current_battle_phase is BattlePhase.MOVEMENT
-            and not is_setup_reactive_lifecycle_request(pending_request)
-            and not is_triggered_movement_proposal_request(pending_request)
-            and not _is_charge_move_proposal_request(pending_request)
-            and not _is_fight_movement_proposal_request(pending_request)
-        ):
-            status = self._apply_ordinary_movement_proposal(pending_request, result)
-            if self._pending_decision_request() == pending_request:
-                return status
+        if certify:
+            with self.decision_controller.prepare_movement_result(
+                result, lambda: self._record_submitted_decision(pending_request, result)
+            ) as record:
+                status = self._decision_dispatch_registry.handler_for(
+                    record.request.decision_type
+                ).applier(record, result)
         else:
             record = self._record_submitted_decision(pending_request, result)
             status = self._decision_dispatch_registry.handler_for(
                 record.request.decision_type
-            ).applier(
-                record,
-                result,
-            )
+            ).applier(record, result)
         from warhammer40k_core.engine.rule_trigger_runtime import (
             record_loaded_model_destruction_occurrences,
         )
@@ -855,9 +882,23 @@ class GameLifecycle:
         self._modifier_evaluation_history_origin = modifier_origin
         return record
 
-    def _apply_ordinary_movement_proposal(
-        self, request: DecisionRequest, result: DecisionResult
+    def _unresolved_movement_status(
+        self, state: GameState, request: DecisionRequest, result: DecisionResult
     ) -> LifecycleStatus:
+        message = "The movement path distance could not be certified. Retry the pending move."
+        if (
+            request.decision_type != MOVEMENT_PROPOSAL_DECISION_TYPE
+            or state.current_battle_phase is None
+        ):
+            return LifecycleStatus.invalid(
+                stage=state.stage,
+                message=message,
+                payload={
+                    "invalid_reason": "movement_distance_unresolved",
+                    "request_id": request.request_id,
+                    "result_id": result.result_id,
+                },
+            )
         from warhammer40k_core.engine.movement_proposals import (
             MovementProposalRequest,
             ProposalValidationResult,
@@ -865,41 +906,20 @@ class GameLifecycle:
         from warhammer40k_core.engine.physical_proposal_validation import (
             physical_proposal_invalid_status,
         )
-        from warhammer40k_core.geometry.movement_envelope import MovementDistanceUnresolvedError
 
-        def commit_submission() -> None:
-            self._record_submitted_decision(request, result)
-
-        state = self._require_state()
-        try:
-            status = self._movement_phase_handler.apply_movement_proposal(
-                state=state,
-                request=request,
-                result=result,
-                decisions=self.decision_controller,
-                reaction_queue=self.reaction_queue,
-                commit_submission=commit_submission,
-            )
-        except MovementDistanceUnresolvedError:
-            if self._pending_decision_request() != request:
-                raise
-            proposal = MovementProposalRequest.from_decision_request_payload(request.payload)
-            message = "The movement path distance could not be certified. Retry the pending move."
-            return physical_proposal_invalid_status(
-                state=state,
-                result=result,
-                proposal_validation=ProposalValidationResult.invalid(
-                    proposal_request_id=proposal.request_id,
-                    proposal_kind=proposal.proposal_kind,
-                    violation_code="movement_distance_unresolved",
-                    message=message,
-                    field="witness",
-                ),
+        proposal = MovementProposalRequest.from_decision_request_payload(request.payload)
+        return physical_proposal_invalid_status(
+            state=state,
+            result=result,
+            proposal_validation=ProposalValidationResult.invalid(
+                proposal_request_id=proposal.request_id,
+                proposal_kind=proposal.proposal_kind,
+                violation_code="movement_distance_unresolved",
                 message=message,
-            )
-        if status is not None:
-            return status
-        return self.advance_until_decision_or_terminal()
+                field="witness",
+            ),
+            message=message,
+        )
 
     def to_payload(self) -> GameLifecyclePayload:
         state = self._require_state()

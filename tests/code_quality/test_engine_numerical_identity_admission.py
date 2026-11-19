@@ -206,6 +206,10 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
             "timeout-then-retry",
         )
     }
+    gameplay.add(
+        selection.GAMEPLAY_CHARGE_OWNER
+        + "::test_native_charge_certification_timeout_leaves_the_same_proposal_retryable"
+    )
     assert current.keys() == (
         retained
         | added

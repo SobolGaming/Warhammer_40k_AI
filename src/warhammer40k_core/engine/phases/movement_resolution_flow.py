@@ -7,7 +7,6 @@ from warhammer40k_core.engine.physical_proposal_validation import (
 )
 
 
-from collections.abc import Callable
 from typing import TYPE_CHECKING, cast
 
 from warhammer40k_core.engine.battle_shock_resolution import (
@@ -81,9 +80,7 @@ __all__ = (
 def _apply_movement_proposal_decision(
     *,
     state: GameState,
-    request: DecisionRequest,
     result: DecisionResult,
-    commit_submission: Callable[[], None],
     decisions: DecisionController,
     ruleset_descriptor: RulesetDescriptor,
     reaction_queue: ReactionQueue | None,
@@ -103,6 +100,7 @@ def _apply_movement_proposal_decision(
     if movement_state is None or movement_state.active_selection is None:
         raise GameLifecycleError("Movement proposal requires active movement selection.")
 
+    request = decisions.movement_request_for_result(result)
     parsed = _parse_movement_proposal_submission_or_invalid(
         state=state,
         request=request,
@@ -176,7 +174,7 @@ def _apply_movement_proposal_decision(
                 ),
             ),
         )
-        commit_submission()
+        decisions.commit_movement_result(result)
         if not resolution.is_valid:
             return _reject_invalid_movement_resolution(
                 state=state,
@@ -263,7 +261,7 @@ def _apply_movement_proposal_decision(
                 for grant in _advance_move_grants_from_context(proposal_request.context or {})
             ),
         )
-        commit_submission()
+        decisions.commit_movement_result(result)
         if not advance_resolution.is_valid:
             violation_code = _normal_move_violation_code(advance_resolution)
             return _reject_invalid_movement_resolution(
@@ -461,7 +459,7 @@ def _apply_movement_proposal_decision(
                 proposal_request=proposal_request,
                 field="fall_back_mode",
             )
-        commit_submission()
+        decisions.commit_movement_result(result)
         if not fall_back_resolution.is_valid:
             violation_code = _normal_move_violation_code(fall_back_resolution)
             return _reject_invalid_movement_resolution(

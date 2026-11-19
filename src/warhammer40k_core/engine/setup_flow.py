@@ -596,7 +596,7 @@ class SetupFlow:
         if result.decision_type == SUBMIT_SCOUT_MOVE_DECISION_TYPE:
             apply_scout_move(
                 state=state,
-                request=decisions.record_for_result(result).request,
+                request=decisions.movement_request_for_result(result),
                 result=result,
                 decisions=decisions,
                 ruleset_descriptor=config.ruleset_descriptor,

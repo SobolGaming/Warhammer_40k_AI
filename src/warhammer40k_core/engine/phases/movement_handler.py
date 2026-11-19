@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from warhammer40k_core.engine.move_completion_rule_hooks import MoveCompletionRuleRegistry
 
-from collections.abc import Callable
 from functools import partial
 
 from typing import TYPE_CHECKING
@@ -541,36 +540,6 @@ class MovementPhaseHandler:
             )
         raise GameLifecycleError("Movement proposal prevalidation received unsupported request.")
 
-    def apply_movement_proposal(
-        self,
-        *,
-        state: GameState,
-        request: DecisionRequest,
-        result: DecisionResult,
-        decisions: DecisionController,
-        reaction_queue: ReactionQueue | None,
-        commit_submission: Callable[[], None],
-    ) -> LifecycleStatus | None:
-        return _apply_movement_proposal_decision(
-            request=request,
-            commit_submission=commit_submission,
-            state=state,
-            result=result,
-            decisions=decisions,
-            ruleset_descriptor=_ruleset_descriptor_for_handler(self),
-            reaction_queue=reaction_queue,
-            stratagem_index=self.stratagem_index,
-            advance_move_hooks=self.advance_move_hooks,
-            advance_eligibility_hooks=self.advance_eligibility_hooks,
-            fall_back_hooks=self.fall_back_hooks,
-            ability_index=_ability_index_for_player(
-                self.ability_indexes_by_player_id,
-                player_id=_active_player_id(state),
-            ),
-            runtime_modifier_registry=self.runtime_modifier_registry,
-            battle_shock_hooks=self.battle_shock_hooks,
-        )
-
     def apply_decision(
         self,
         *,
@@ -703,13 +672,22 @@ class MovementPhaseHandler:
                 runtime_modifier_registry=self.runtime_modifier_registry,
             )
         if result.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE:
-            return self.apply_movement_proposal(
+            return _apply_movement_proposal_decision(
                 state=state,
-                request=decisions.record_for_result(result).request,
                 result=result,
                 decisions=decisions,
+                ruleset_descriptor=_ruleset_descriptor_for_handler(self),
                 reaction_queue=reaction_queue,
-                commit_submission=lambda: None,
+                stratagem_index=self.stratagem_index,
+                advance_move_hooks=self.advance_move_hooks,
+                advance_eligibility_hooks=self.advance_eligibility_hooks,
+                fall_back_hooks=self.fall_back_hooks,
+                ability_index=_ability_index_for_player(
+                    self.ability_indexes_by_player_id,
+                    player_id=_active_player_id(state),
+                ),
+                runtime_modifier_registry=self.runtime_modifier_registry,
+                battle_shock_hooks=self.battle_shock_hooks,
             )
         if result.decision_type == PLACEMENT_PROPOSAL_DECISION_TYPE:
             return _apply_placement_proposal_decision(

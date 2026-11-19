@@ -1,6 +1,6 @@
 {
   "retained_oval_codec_sha256": "b7bdb26dd433d2b87d0f488ffd054f6bb41592f6ac23865c66c5ccd0ec273057",
-  "runtime_fingerprint": "930415d5b1b1eeeb0a6c7d2c5f1055ef6409b7867f16fad6ababb7434488a4a4",
+  "runtime_fingerprint": "52681e428253039630478eb38a7ab060bcec80b25c362b1ac15e45b30a0dd4f2",
   "schema": "finite-gameplay-movement-budget-test-transition-v1",
   "sources": {
     "contracts/schemas/create-session.schema.json": {
@@ -67,28 +67,52 @@
       "after": "8f9b4061489016292b7a24f9f32d924b02b792e786fa25b8db3d9b6dbecd28d5",
       "before": "86b7f154e5c5f30f20844491a9f61a2be685bfab42bd5d2a6e1d6a051a86502a"
     },
+    "src/warhammer40k_core/engine/catalog_setup_reactive_charge_move.py": {
+      "after": "e8eff3ec8c8ea6a1a71b28c0c5c2dd27f0a591aa416305797b611dfc9188ebe2",
+      "before": "ed72ed7aa730eb3838f9e61ab30bd5ac819dfa3f4990443961d714267f748bc1"
+    },
+    "src/warhammer40k_core/engine/decision_controller.py": {
+      "after": "0c4172857bb6d0216eff82ce04fa65679aacc3aca054fd7e664369c851d09158",
+      "before": "83f099ed2dbf8262b594fcec57b1566e6e5a83d00172fc007b44b6ae43d60bc8"
+    },
     "src/warhammer40k_core/engine/game_state.py": {
       "after": "2eef7264dfcba837690a48b393d19b62a6e4787cb7abacc05e8ef385afb6ec8f",
       "before": "ca645341d6340ca2596fd6f0881e66e83525fd2aab5cd311273593f2f048b5e9"
     },
     "src/warhammer40k_core/engine/lifecycle.py": {
-      "after": "55695963eb2c908b1945bfa946998ed5496aaeb9975b4cc7d7999850732c7237",
+      "after": "a7f24423afeb0bd1f72cdd7b8437dbd1ee914d0cdadc0a6cdd0025f2c59a201f",
       "before": "ad306763e7956360870a0fff49e6d3cb0b82ad5d8737d6ed024bee5284e24f57"
     },
-    "src/warhammer40k_core/engine/phases/movement_handler.py": {
-      "after": "3235645fff5568d7ef352b968b532c7d99fe831fdade32149d92164ef23835d5",
-      "before": "ea0935d48b649aa5beadb0ccd567dbe830fbae96da666c8d7a09856a37692e79"
+    "src/warhammer40k_core/engine/phases/charge_proposal_flow.py": {
+      "after": "3778b4293b28d4bd12badff2b58f46c461ffffd6e5ecafee85cdd484960295f6",
+      "before": "15f5dc1f481207647d5b0f2fc2542e9dc2c6751b94c186e8e75f2383492163f8"
+    },
+    "src/warhammer40k_core/engine/phases/fight_movement_lifecycle.py": {
+      "after": "2db29e2bdaf465c55d1cd51e31e87aca9b73fc2200c2e75b2765dfbdd71518ad",
+      "before": "f9594d37b0dab239db36a469c26e362989d4b344cde07f0cbcf1400c11f7a20f"
     },
     "src/warhammer40k_core/engine/phases/movement_resolution_flow.py": {
-      "after": "1ed236e52046c264390569cc0024dad4f5467190739eb17dc08d194be059bcf5",
+      "after": "ac3fa50a7352f6cd0145662d2eb209786b521c830e33cfd3bd9eed9b03d39a9d",
       "before": "8a1ea6668fd135bbb053189ad65868cb86bd4c460aa0ff666c0874840092806b"
+    },
+    "src/warhammer40k_core/engine/scout_movement.py": {
+      "after": "1631362a7bf4923e5328765955a83fd97679f8bc25fb9f6002ddbf3e4867ed86",
+      "before": "0cf110b016418fed43deb9b78cfa7dc6ac540a711d469caae40bbe1c64d519ce"
+    },
+    "src/warhammer40k_core/engine/setup_flow.py": {
+      "after": "fe52ce89d57c54497ce2b0e7b4fe94add682bfa6ee6ebe83b35df4651ce156bc",
+      "before": "7de206d914d7111046c9f25072f5c09cdc9fc23829b7c0a7c515c7542454a183"
+    },
+    "src/warhammer40k_core/engine/triggered_movement_handler_impl.py": {
+      "after": "4e209248219fc720baf69d77dbd69b77137f12d8a46af2b9ad2bd0810c74bec4",
+      "before": "b98481ea3501feb6b424f3ffa4fd1e4d399d980045d1592cda78b7cd7f5efeef"
     },
     "src/warhammer40k_core/geometry/milli_inch_symbolic.py": {
       "after": "465a14682fd4bc710889307f943df4718be9437dd289053480a2470df07ca9b0",
       "before": "52b91e3e84a68737562a874410510c69ccad13065535b0475d4e9d716015a7a4"
     },
     "src/warhammer40k_core/geometry/movement_envelope.py": {
-      "after": "c0125dc59db54f90aa0631ff5e03f608a2a16ba66721544c62ca68c52886b60f",
+      "after": "656b864cf978449206c8454302a2ff6f5223ce0e2c4e70c06f8c40670fb26c21",
       "before": "b86598c419c603de2c18c6bbf08a17f0ce2069283ae5ecbda3fd9968180cba76"
     },
     "src/warhammer40k_core/geometry/numerical_identity.py": {
@@ -132,6 +156,12 @@
       "bytes": 14234,
       "mode": "100644",
       "sha256": "4a6e89ee189d2bcd9167ee482ff0d2e440c1cf25227ae9fa1ab68d36ef587a75"
+    },
+    "tests/rules/section11/test_moves.py": {
+      "blob_sha1": "8a7fdfc93af549f1158c5a17193003d41a67d12f",
+      "bytes": 14814,
+      "mode": "100644",
+      "sha256": "c3a1301d6a858865509aa33542ec4a87d50bf978b81743cbe07965f7d29bb26f"
     },
     "tests/rules/section18/test_facade.py": {
       "blob_sha1": "1fdff4f6b3c87a9714f0b541f678296a3f31d1d7",
