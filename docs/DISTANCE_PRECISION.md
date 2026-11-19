@@ -456,6 +456,11 @@ gives a lower bound on the gap. Rational substitution checks that
 a concrete pair of points lies in the filled ellipses. Their squared
 distance below the squared upper midpoint proves the other end of the bin.
 
+The support offsets follow by scaling and rotating the unit disk into each
+ellipse. In disk coordinates, Cauchy-Schwarz maximizes the projection along the
+normal scaled by the semiaxes. Map that maximizing unit vector back to the
+ellipse to obtain the offsets below.
+
 For the 9-by-2 and 23-by-17 ovals at 0 and 45 degrees, respectively, tangent
 center offset `(10, 10)` is the sum of the two support offsets in direction
 `(5, 12)`, namely `(135/34, 8/17)` and `(205/34, 162/17)`.
