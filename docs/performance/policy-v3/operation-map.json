@@ -36412,7 +36412,9 @@
         "tests/rules/section01/test_milli_inch_circle_oval.py",
         "data/source_audits/ci64_provenance_v1/circle-oval-test-transition-v1.json",
         "tests/rules/section01/test_milli_inch_oval_oval.py",
-        "data/source_audits/ci64_provenance_v1/oval-oval-topology-test-transition-v1.json"
+        "data/source_audits/ci64_provenance_v1/oval-oval-topology-test-transition-v1.json",
+        "tests/rules/section01/test_milli_inch_oval_oval_distance.py",
+        "data/source_audits/ci64_provenance_v1/oval-oval-gap-test-transition-v1.json"
       ],
       "owners": [
         "*"

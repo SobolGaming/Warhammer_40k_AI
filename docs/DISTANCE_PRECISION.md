@@ -348,7 +348,7 @@ ticks round up and a separated pair can round to zero.
 
 This completes the staged canonical circle–oval pair in checklist item 1.
 
-## Staged canonical oval–oval topology
+## Staged canonical oval–oval queries
 
 `geometry.milli_inch_oval_oval.oval_oval_relation` classifies two filled
 `CanonicalOval` values as separated, in boundary-only external contact, or
@@ -394,9 +394,59 @@ only the negative real root. Repeated negative roots, including the triple
 root at coincidence, therefore classify as shared interior. This is a fixed
 sequence of integer arithmetic and comparisons without root approximation.
 
-This stages the oval–oval topology portion of checklist item 1. The
-once-rounded oval–oval surface gap, arbitrary oval facings, backend agreement,
-serialization and gameplay activation remain follow-up work.
+`geometry.milli_inch_oval_oval_distance.oval_oval_distance_ticks` returns
+zero for contact or shared interior. For separated ovals let `K` be the
+Minkowski sum of their centered filled shapes. Central symmetry makes the
+gap the distance from `d` to `K`. If `k` is the closest point of `K` to
+`d`, the normal `d-k` exposes `k` by the convex projection inequality.
+For any unit normal, the center projection minus both support radii is a
+lower bound on the gap. The normal `(d-k)/|d-k|` attains it.
+
+For each positive half-tick midpoint `t`, the gap is at least `t` exactly
+when some nonzero normal `n` satisfies
+`d·n >= h₁(n) + h₂(n) + t|n|`. The projection must be positive, so
+scale `n` to `d + s*(-d_y,d_x)` with real `s`. Its projection is
+constant. Multiply both sides by `2 sqrt(2)`. Denote the scaled projection
+by `L > 0` and the squared terms on the right by `A, B, C`. The
+squared ellipse supports use the inverse of their normalized quadratic
+matrices. All three squared terms are integer quadratics in `s`, positive at
+every real `s` and with positive leading coefficients. Their square-root
+sum is continuous and diverges at both ends of the real line, so a feasible
+normal exists exactly when the sum equals `L` somewhere. This includes a
+single feasible normal at an exact tie.
+
+Set `D = L² + C - A - B`, `E = D² - 4L²C - 4AB`, and
+`F = E² - 64L²ABC`. Squaring the equality in stages gives `F = 0`.
+Conversely, the strict guards `L²-C > 0`, `D > 0` and `E > 0`
+recover the positive square roots in reverse order and recover the original
+equality. The same guards with `F >= 0` certify the weak inequality at a
+specific normal. The polynomial `F` has degree at most eight. It is the
+product of the eight signed variants of `L ± sqrt(A) ± sqrt(B) ± sqrt(C)`.
+An identically zero product would require an identically zero analytic
+factor. Each quadratic root has a leading term proportional to `|s|` and
+opposite constant terms at positive and negative infinity. A signed sum of
+these roots that is constant must therefore be zero, whereas `L > 0`.
+
+The implementation counts distinct real roots of `F` that pass all three
+guards. At a root, `(sign(g) + sign(g²))/2` is the indicator that guard
+`g` is positive. Expanding the product of three indicators gives eight
+Sturm–Tarski sign queries. Each is the Cauchy index of `F' W / F` for
+the corresponding guard product `W`. A real zero of `F` of multiplicity
+`m` contributes `sign(W)` because the pole residue is `m W`. A zero
+weight contributes zero. Signed polynomial remainders with positive
+rescaling compute the index at the two infinities using only integers.
+Each remainder lowers the degree. The threshold result follows entirely from
+exact integer arithmetic. See the [Sturm–Tarski theorem](https://isa-afp.org/entries/Sturm_Tarski.html)
+for the signed remainder identity.
+
+Inscribed and circumscribed disks give integer bounds for the rounded
+gap. Binary search finds the first tick with an upper midpoint strictly
+above the gap. Exact halves round up. A separated pair can have a
+rounded gap of zero. Use `oval_oval_relation` to classify topology.
+
+This completes the staged canonical oval–oval pair in checklist item 1.
+Arbitrary oval facings, backend agreement, serialization and gameplay
+activation remain follow-up work.
 
 ## Selected exact-coordinate contact slice
 

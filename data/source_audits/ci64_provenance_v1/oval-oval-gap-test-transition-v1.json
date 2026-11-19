@@ -1,0 +1,16 @@
+{
+  "added_files": {
+    "tests/rules/section01/test_milli_inch_oval_oval_distance.py": {
+      "blob_sha1": "ae6a325fbb3a09e32bab989a95060437fdb6dfc2",
+      "bytes": 6514,
+      "mode": "100644",
+      "sha256": "9dd647a35dde63af51ca2b37e453193241ce24fd10507a1b5e6260fb9bda752f"
+    }
+  },
+  "retained_oval_oval_topology_sha256": "82797a1bb5efb5b3928a51d7f09fb631bba56267f32b26cd3c1685dd0ac5fbb7",
+  "runtime_fingerprint": "f2b7f6522f0f9c9b3520f635332964abb877a1a127ed2c8902c5c56290c30c69",
+  "schema": "finite-oval-oval-gap-test-transition-v1",
+  "sources": {
+    "src/warhammer40k_core/geometry/milli_inch_oval_oval_distance.py": "600189bb38f74d213ffa5a1a0202810f5822e4748d63d8d427935c4b0d6ab4f7"
+  }
+}

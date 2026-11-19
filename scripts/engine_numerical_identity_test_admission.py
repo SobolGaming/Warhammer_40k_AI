@@ -99,6 +99,14 @@ OVAL_OVAL_TOPOLOGY_OWNER = "tests/rules/section01/test_milli_inch_oval_oval.py"
 _OVAL_OVAL_TOPOLOGY_SOURCE = "src/warhammer40k_core/geometry/milli_inch_oval_oval.py"
 
 
+OVAL_OVAL_GAP_TRANSITION = (
+    "data/source_audits/ci64_provenance_v1/oval-oval-gap-test-transition-v1.json"
+)
+OVAL_OVAL_GAP_SHA256 = "1a454ad230db5f586d952b1b362038a6ef36ced48e13434e9871ee97c75eed10"
+OVAL_OVAL_GAP_OWNER = "tests/rules/section01/test_milli_inch_oval_oval_distance.py"
+_OVAL_OVAL_GAP_SOURCE = "src/warhammer40k_core/geometry/milli_inch_oval_oval_distance.py"
+
+
 type TestTransition = tuple[dict[str, dict[str, object]], dict[str, dict[str, object]], bytes]
 
 
@@ -154,6 +162,12 @@ def exact_movement_test_transition(
     for path in oval_oval_paths:
         _selection_no_links(root, root / path)
     has_oval_oval = any((root / path).exists() for path in oval_oval_paths)
+    oval_gap_paths = (OVAL_OVAL_GAP_TRANSITION, OVAL_OVAL_GAP_OWNER, _OVAL_OVAL_GAP_SOURCE)
+    for path in oval_gap_paths:
+        _selection_no_links(root, root / path)
+    has_oval_gap = any((root / path).exists() for path in oval_gap_paths)
+    if has_oval_gap and not has_oval_oval:
+        raise SystemExit("Oval-oval gap tests require their oval-oval topology predecessor.")
     if has_oval_oval and not has_circle_oval:
         raise SystemExit("Oval-oval topology tests require their circle-oval predecessor.")
     if has_circle_oval and not has_gap:
@@ -295,6 +309,28 @@ def exact_movement_test_transition(
         additions.update(_selection_members(oval_oval["added_files"], root))
         runtime = oval_oval["runtime_fingerprint"]
         raw += b"\0" + oval_oval_raw
+    if has_oval_gap:
+        oval_gap_raw = _checked_bytes(root, OVAL_OVAL_GAP_TRANSITION, OVAL_OVAL_GAP_SHA256)
+        oval_gap = json.loads(oval_gap_raw, object_pairs_hook=_selection_object)
+        if (
+            oval_gap.keys()
+            != {
+                "schema",
+                "runtime_fingerprint",
+                "retained_oval_oval_topology_sha256",
+                "sources",
+                "added_files",
+            }
+            or oval_gap["schema"] != "finite-oval-oval-gap-test-transition-v1"
+            or oval_gap["retained_oval_oval_topology_sha256"] != OVAL_OVAL_TOPOLOGY_SHA256
+            or set(oval_gap["sources"]) != {_OVAL_OVAL_GAP_SOURCE}
+            or set(oval_gap["added_files"]) != {OVAL_OVAL_GAP_OWNER}
+        ):
+            raise SystemExit("Oval-oval gap test transition membership differs.")
+        _checked_bytes(root, _OVAL_OVAL_GAP_SOURCE, oval_gap["sources"][_OVAL_OVAL_GAP_SOURCE])
+        additions.update(_selection_members(oval_gap["added_files"], root))
+        runtime = oval_gap["runtime_fingerprint"]
+        raw += b"\0" + oval_gap_raw
     retained = _identity_test_transition(root, retained_cutover_sha256, runtime=runtime)
     if retained is None:
         raise SystemExit(
