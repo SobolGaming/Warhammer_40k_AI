@@ -252,6 +252,15 @@ odd full lengths exactly. The squared ellipse equation uses integer
 coefficients for all four facings, including the two diagonal rotations.
 Its value determines exterior, boundary or interior exactly.
 
+The oval's `milli-inch-oval-v1` payload binds `milli-inch-half-away-v1` and
+stores the two integer center coordinates, both full axis lengths, and the
+normalized facing (0, 45, 90 or 135 degrees). Restoration requires the exact
+fields and canonical values. Noncanonical facing aliases, out-of-range
+dimensions and unsupported versions or policies raise `CanonicalOvalError`.
+Payload lists are detached, and the content hash covers the entire canonical
+payload. Facing remains part of the stored identity even for equal axes.
+This codec is available at the staged primitive boundary.
+
 For an exterior point, the midpoint test works in doubled ticks with squared
 semiaxes `a, b` and squared local point coordinates `u, v`. A nonnegative
 Lagrange multiplier `t` for the ellipse constraint gives the squared-distance
@@ -477,7 +486,7 @@ For one clear overlap and one clear separation, the legacy Shapely
 footprints agree on intersection. The legacy footprints approximate the
 ellipses with polygons, so the comparison covers those two classifications
 only. General backend agreement, broader symbolic coverage, arbitrary
-oval facings, serialization and gameplay activation remain open.
+oval facings, engine save/replay integration and gameplay activation remain open.
 
 ## Selected exact-coordinate contact slice
 
