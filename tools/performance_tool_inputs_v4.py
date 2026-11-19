@@ -114,8 +114,8 @@ _SCOPES = (
     ReviewedScope(
         "59959e71d95a68a4af8935d2897fd2280a8b76c2",
         "docs/performance/policy-v3/gameplay-movement-budget-input-roles-v4.json",
-        "e13db2b31052b8c0d4b95e12a49b69a9df6df788b9cde4d9d7cb490be2e7b58a",
-        "400a3c0fb35774e826eeeff4daf2a0e4348597d8c7a195b91b448171af5e17c2",
+        "497c63163cd2f9bacf8a1e43807d4b7b0e25e7e2d26078a5058a9cb4d1e84807",
+        "59432179ad03dfd4ab5d7d6cfefbdf9e36ece543901ee27b078a2979260fa864",
         "docs/performance/current/gameplay-movement-budget-external-contract.json",
         frozenset(
             (
@@ -152,6 +152,7 @@ _SCOPES = (
                 "src/warhammer40k_core/geometry/movement_envelope.py",
                 "src/warhammer40k_core/geometry/numerical_identity.py",
                 "tests/factions/emperors_children/test_selected_consumers.py",
+                "tests/infrastructure/adapters/test_canonical_deployment_coverage.py",
                 "tests/infrastructure/adapters/unit/test_linux_authority.py",
                 "tests/infrastructure/adapters/unit/test_numerical_policy.py",
                 "tests/rules/section01/test_engine_numerical_identity.py",

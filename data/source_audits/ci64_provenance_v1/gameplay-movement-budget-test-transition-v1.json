@@ -1,6 +1,6 @@
 {
   "retained_oval_codec_sha256": "b7bdb26dd433d2b87d0f488ffd054f6bb41592f6ac23865c66c5ccd0ec273057",
-  "runtime_fingerprint": "893b560f1bfa505a326cd0602bebffd3fc983290b36f335a21db0009fcfe2bc7",
+  "runtime_fingerprint": "8624506eafe05bceb990737ec27e5108130945a04ad132c33e74de0a61c7c250",
   "schema": "finite-gameplay-movement-budget-test-transition-v1",
   "sources": {
     "contracts/schemas/create-session.schema.json": {
@@ -48,7 +48,7 @@
       "before": "ad4c440f1ea05fb4d4d5dc14590d9d1d0bfb873bcb1fc2ac2325f2ee63117c6f"
     },
     "src/warhammer40k_core/ai/matched_attack_scenario.py": {
-      "after": "059562e708177944177dc21b23877474673ab3db668730516027fe02ff51e7d6",
+      "after": "c4e55dc81d2f1221be2f2cb8c1883c1ba6a2b20e204a3fdd5840ec5815b0c164",
       "before": "0c68725b55e3dd7f8e3b25ebcde22d3e497ab95ac1e3a862eeb8f2b33a7a1834"
     },
     "src/warhammer40k_core/ai/normal_move_scenario.py": {
@@ -56,7 +56,7 @@
       "before": "d2d8dffc43461eec0cc4db3db8923893b7ba59ad65e4df45c9a2cce3611692db"
     },
     "src/warhammer40k_core/ai/opposing_shooter_scenario.py": {
-      "after": "88b617e65f61b17de6a3cd1ca437825b723c7c61f5d2ac6f410e4050c4de9313",
+      "after": "e501eaaa4ea2c241273b1c1b3b41a79e55e82e8a4317cc81abaed05e2071f630",
       "before": "1d31f56e93543705def0e3c700e90e77e1cfdd5bf6a793f2b6ef190d4821b6e7"
     },
     "src/warhammer40k_core/ai/preserve_scenario.py": {
@@ -90,6 +90,12 @@
       "bytes": 77597,
       "mode": "100644",
       "sha256": "e2d52c29b3d13feb04a26fa731d7cceb260e6b6bf4fbf3337f39fc0df34d69ed"
+    },
+    "tests/infrastructure/adapters/test_canonical_deployment_coverage.py": {
+      "blob_sha1": "f0535cd3fd6b1c7c283ab569132155685a18bcad",
+      "bytes": 21659,
+      "mode": "100644",
+      "sha256": "7acf91360330c853c43f58cf4b03696d8b8cddaa2108d09daca508b0475b3113"
     },
     "tests/infrastructure/adapters/unit/test_linux_authority.py": {
       "blob_sha1": "62c7744e11030a75e0182d0372a0d474392b17e3",

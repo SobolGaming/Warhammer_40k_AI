@@ -92,6 +92,7 @@
     "src/warhammer40k_core/geometry/movement_envelope.py",
     "src/warhammer40k_core/geometry/numerical_identity.py",
     "tests/factions/emperors_children/test_selected_consumers.py",
+    "tests/infrastructure/adapters/test_canonical_deployment_coverage.py",
     "tests/infrastructure/adapters/unit/test_linux_authority.py",
     "tests/infrastructure/adapters/unit/test_numerical_policy.py",
     "tests/rules/section01/test_engine_numerical_identity.py",

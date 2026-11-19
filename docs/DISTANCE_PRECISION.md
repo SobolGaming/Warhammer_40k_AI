@@ -26,7 +26,7 @@ A separate compatibility mode is unnecessary during current development.
 ## Previous numerical identity rollout
 
 The previous native and registered Linux sessions bound `engine-numerical-identity-v1` in
-both `GameConfig` and `GameState`. The only admitted combination is
+both `GameConfig` and `GameState`. The admitted combination at that revision was
 `legacy-binary-inch-v1` with `binary-float-pose-v1`. Construction, restoration and
 config/state consistency reject other identities; missing identity requires the
 retained compatible executor. Replay config hashes bind this identity, and current
@@ -94,7 +94,8 @@ obstructed paths with clear endpoints, stale witnesses and restoration.
 
 This is a staged engine boundary. Registered and native gameplay sessions use binary-float poses. Integration with the ordinary decision
 lifecycle, terrain and model groups, lower geometry caches, solver/backend
-agreement, and whole-session save/replay qualification remain activation work.
+agreement, and whole-session save and replay qualification remain part of the
+canonical-pose rollout.
 
 ## Previous explicit legacy policy binding
 
@@ -115,9 +116,9 @@ inner checkpoint hash. Profiles are detached from caller-owned dictionaries so a
 caller cannot relabel an existing session or cached envelope. Restoration and
 replay require the exact registered profile before decoding the inner payload.
 
-This is the outer identity slice. The active inner identity section above supersedes the earlier unbound config,
-state, spatial keys, geometry hash and native persistence/replay format. Numerical
-arithmetic and decision/event semantics remain legacy.
+That outer identity slice preceded binding the configuration, state, spatial
+keys, geometry hash and native persistence and replay to the numerical identity.
+The arithmetic and decision and event semantics at that revision used legacy rules.
 The unprofiled native API at that revision used the same legacy arithmetic.
 Retained profile-v1 envelopes require their original compatible
 executor. The generic envelope byte utility can preserve those original bytes,
@@ -590,10 +591,8 @@ are preserved. No native Windows/Linux engine equivalence is established.
 
 ## Finite activation checklist and next contact decision
 
-The implemented arithmetic and canonical circle/polygon queries remain inactive
-prerequisites. Outer policy binding and the legacy-only inner identity/cache/path
-admission described above are active. The broader canonical-geometry rollout requires the following obligations.
-The active movement-budget measurement above has its own bounded scope:
+The broader canonical geometry rollout requires the following work. The active
+movement budget uses the staged path arithmetic with the original binary poses.
 
 1. **Primitive geometry:** complete the supported circle/polygon and oval/rotated
    shape queries, including exact contact/overlap and once-rounded derived lengths.

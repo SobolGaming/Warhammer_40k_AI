@@ -31,6 +31,9 @@ from warhammer40k_core.engine.event_log import JsonValue, canonical_json, valida
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 
 MATCHED_ATTACK_ID = "canonical-matched-opposing-attack-v3-movement-budget"
+# The declaration ID participates in the game RNG history. Use one fixed
+# scope for both arms of the sample under the current numerical policy.
+MATCHED_ATTACK_DECLARATION_SCOPE = f"{MATCHED_ATTACK_ID}:sample-124"
 
 
 def matched_attack_definition() -> dict[str, JsonValue]:
@@ -45,7 +48,8 @@ def matched_attack_definition() -> dict[str, JsonValue]:
                     opposing_shooter_definition()
                 ),
                 "initial_record_counts": [22, 23],
-                "continuation": "unchanged-opposing-shooter-approach-and-attack-both-branches",
+                "continuation": "opposing-shooter-approach-and-attack-both-branches",
+                "attack_declaration_scope": MATCHED_ATTACK_DECLARATION_SCOPE,
                 "cooperation": (
                     "A-stationary-rounds-two-three-A-skips-shooting-all-movement-reactions-"
                     "and-command-rerolls-declined-fixed-E-model-001-allocation"
@@ -197,7 +201,9 @@ class MatchedAttackComparison:
             trace = _approach(session)
             attack_boundary = _boundary(session)
             before_attack = _exploiter_state(session)
-            trace.extend(_finish_attack(session))
+            trace.extend(
+                _finish_attack(session, declaration_scope=MATCHED_ATTACK_DECLARATION_SCOPE)
+            )
             final = _exploiter_state(session)
             origin = VerifiedEpisodeOrigin.from_session(
                 session, config=canonical_deployment_config()
