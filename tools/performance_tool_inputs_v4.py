@@ -110,12 +110,14 @@ NUMERICAL_IDENTITY_MAIN692_REPORT_PATH = (
     "docs/performance/current/numerical-identity-source-reuse-b231-v4.json"
 )
 
+GAMEPLAY_MOVEMENT_BUDGET_BASE = "59959e71d95a68a4af8935d2897fd2280a8b76c2"
+
 _SCOPES = (
     ReviewedScope(
-        "59959e71d95a68a4af8935d2897fd2280a8b76c2",
+        GAMEPLAY_MOVEMENT_BUDGET_BASE,
         "docs/performance/policy-v3/gameplay-movement-budget-input-roles-v4.json",
-        "497c63163cd2f9bacf8a1e43807d4b7b0e25e7e2d26078a5058a9cb4d1e84807",
-        "59432179ad03dfd4ab5d7d6cfefbdf9e36ece543901ee27b078a2979260fa864",
+        "dc1db39e0556479d2b8ce0ea7555f9ad58fb12d4bb09d8eec94c69ad497e2eca",
+        "77bdf20dec6a6e5f84489192cbafaa69f6708d7f8c45475ba2e33e75c90424e2",
         "docs/performance/current/gameplay-movement-budget-external-contract.json",
         frozenset(
             (
@@ -197,8 +199,11 @@ _SCOPES = (
                 "scripts/measure_player_boundary.py",
                 "scripts/measure_private_rng_reconstruction.py",
                 "tests/code_quality/test_engine_numerical_identity_admission.py",
+                "tests/code_quality/test_registered_source_scopes.py",
+                "tests/daemons_native_source_preservation.py",
                 "tests/rules/section18/coverage.json",
                 "tools/performance_tool_inputs_v4.py",
+                "tools/source_scope_provenance.py",
             )
         ),
         REQUIRED,

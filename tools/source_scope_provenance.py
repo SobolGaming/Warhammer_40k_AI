@@ -55,6 +55,7 @@ COMPARISON_ONLY_SCOPE_BASES = (
     scopes.PR2_BASE,
     scopes.NUMERICAL_IDENTITY_BASE,
     scopes.NUMERICAL_IDENTITY_MAIN692_BASE,
+    scopes.GAMEPLAY_MOVEMENT_BUDGET_BASE,
 )
 
 # Current source-only admission: historical base metadata remains exact and immutable.

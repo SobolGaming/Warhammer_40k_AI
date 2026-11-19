@@ -9,8 +9,11 @@
     "scripts/measure_player_boundary.py": "The separate player-boundary driver encodes the actual arm identity from that arm; it is not the timed contract workload.",
     "scripts/measure_private_rng_reconstruction.py": "The separate reconstruction driver encodes the actual arm identity from that arm; it is not the timed contract workload.",
     "tests/code_quality/test_engine_numerical_identity_admission.py": "Untimed source-admission regressions verify historical snapshots and exact current case inventory per arm.",
+    "tests/code_quality/test_registered_source_scopes.py": "Untimed registration tests authenticate the old scopes and the current comparison.",
+    "tests/daemons_native_source_preservation.py": "Untimed inverse projection authenticates the prior historical source registration.",
     "tests/rules/section18/coverage.json": "Untimed retained assertion coverage authenticates the byte-exact test for both arms.",
-    "tools/performance_tool_inputs_v4.py": "Finite role registration pins the exact base and reviewed byte roles without changing benchmark execution."
+    "tools/performance_tool_inputs_v4.py": "Finite role registration pins the exact base and reviewed byte roles without changing benchmark execution.",
+    "tools/source_scope_provenance.py": "Untimed exact archival edition provenance registration for the existing comparison."
   },
   "derived_outputs": [
     "contracts/examples/battlefield/geometry-conformance.json",
