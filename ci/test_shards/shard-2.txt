@@ -1,1 +1,13 @@
 tests/infrastructure/adapters/test_training_admission.py
+tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_layout_a_scores_through_lifecycle_views_and_replay[player-b-purge-the-foe-vs-disruption-layout-1]
+tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_layout_a_scores_through_lifecycle_views_and_replay[player-b-purge-the-foe-vs-purge-the-foe-layout-1]
+tests/infrastructure/missions/unit/test_step5g_pairing_certification.py::test_phase17n_step5g_layout_a_scores_through_lifecycle_views_and_replay[player-b-take-and-hold-vs-priority-assets-layout-1]
+tests/rules/section01/test_milli_inch_oval_polygon_distance.py
+tests/rules/section04/test_visibility.py
+tests/rules/section05/test_saves.py
+tests/rules/section09/test_focused_checkpoint.py
+tests/rules/section11/test_connected_endpoints.py
+tests/rules/section16/test_facade.py
+tests/rules/section16/test_movement.py
+tests/rules/section20/test_reposition.py
+tests/rules/section21/test_terrain_facade.py

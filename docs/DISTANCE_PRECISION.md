@@ -252,16 +252,29 @@ odd full lengths exactly. The squared ellipse equation uses integer
 coefficients for all four facings, including the two diagonal rotations.
 Its value determines exterior, boundary or interior exactly.
 
-For an exterior point, an exact real-polynomial query asks whether the ellipse
-intersects the open disk centered on the point at a candidate half-tick radius.
-Binary search selects the first integer tick whose upper midpoint is strictly
-above the Euclidean distance. This rounds exact half-tick ties up and permits
-an exterior point to have a rounded distance of zero. Interior and boundary
-points return zero. Derived lengths may exceed the coordinate bound.
+For an exterior point, the midpoint test works in doubled ticks with squared
+semiaxes `a, b` and squared local point coordinates `u, v`. A nonnegative
+Lagrange multiplier `t` for the ellipse constraint gives the squared-distance
+lower bound `t*u/(a+t) + t*v/(b+t) - t` by minimizing the Lagrangian in each
+coordinate. At the multiplier where `a*u/(a+t)^2 + b*v/(b+t)^2 = 1`, its
+minimizer lies on the ellipse and attains that lower bound. The left side
+decreases continuously from above one to zero for exterior points.
 
-Arbitrary facings and noncanonical inputs raise typed errors.
+To compare the maximum of the lower bound with a positive squared midpoint
+`m²`, subtract `m²` and clear the positive denominator `(a+t)(b+t)`. The
+resulting cubic is negative at zero and tends to negative infinity. It attains
+a nonnegative value on the positive half-line exactly when its larger
+stationary point is positive and the cubic is nonnegative there. The sign at
+that point has one square root. Integer sign and squared comparisons preserve
+exact equality, including a stationary maximum of zero.
 
-## Staged canonical oval–polygon topology
+Binary search finds the first integer tick whose upper midpoint is strictly
+above the distance. Exact half ticks round up. An exterior point can have a
+rounded distance of zero. Interior and boundary points return zero. Derived
+lengths may exceed signed coordinate bounds. Arbitrary facings and noncanonical
+inputs raise typed errors.
+
+## Staged canonical oval–polygon queries
 
 `geometry.milli_inch_oval_polygon.oval_polygon_relation` classifies a filled
 `CanonicalOval` and a filled `CanonicalPolygon` as separated, in boundary-only
@@ -277,11 +290,38 @@ gives boundary-only contact and strictly positive minima give separation. The
 edge parameter can be rational and off-grid. Its comparison uses integer
 arithmetic throughout, without rounding.
 
-This stages the topology part of this pair in checklist item 1. The scaled
-ellipse residual measures position relative to the oval boundary. Computing a
-once-rounded Euclidean surface gap requires a separate nearest-point calculation.
-That gap, other oval pairs, arbitrary oval facings, backend agreement,
-serialization and gameplay activation remain follow-up work.
+`oval_polygon_distance_ticks` returns zero for contact or interior overlap.
+For disjoint shapes, a closest polygon point lies on the boundary. Moving an
+interior polygon point slightly toward its ellipse partner would reduce the
+distance. The candidate at a vertex uses the point-to-ellipse midpoint test.
+If the closest polygon point is interior to an edge, the displacement from the
+ellipse is perpendicular to that edge because the polygon point can move
+locally in either edge direction. Moving the ellipse point toward any other
+ellipse point cannot reduce the squared distance, so the displacement exposes
+the ellipse support point in that direction. The edge's line is then strictly
+outside the ellipse, and the perpendicular projection of the support point
+lands on the closed edge. Conversely, an eligible support projection attains
+the line's lower bound on the edge. Testing every edge applies to concave rings
+as well as convex rings.
+
+With the line written as `n·x = c` in ellipse-centered coordinates and `c ≥ 0`,
+let `S` be the positive definite shape matrix defining `xᵀ S⁻¹ x ≤ 1`.
+The support point is `S n / sqrt(nᵀ S n)`; its dot product with the edge
+direction gives the projection limits, using sign-aware squaring. An eligible
+line gap is `(c - sqrt(nᵀ S n)) / |n|`. Comparing that gap with a positive
+midpoint amounts to comparing `sqrt(nᵀ S n) + midpoint*|n|` with `c`.
+Squaring and checking the residual's sign before squaring again preserves
+the strict comparison, including exact ties.
+
+The search compares the exact minimum of all candidates to each midpoint,
+rounding the final gap once. The distance from the ellipse center to any vertex
+is an upper bound, so the integer Manhattan bound takes at most 65 midpoint
+iterations. Each pass uses fixed-degree integer arithmetic on signed 64-bit
+inputs and visits at most the vertices and edges of the ring. A separated
+pair can round to zero. Use the relation query to establish contact. This
+completes the staged canonical oval–polygon pair in checklist item 1. Other
+oval pairs, arbitrary oval facings, backend agreement, serialization and
+gameplay activation remain follow-up work.
 
 ## Selected exact-coordinate contact slice
 

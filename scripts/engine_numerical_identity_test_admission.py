@@ -79,6 +79,12 @@ OVAL_POLYGON_SHA256 = "bada04a93ba349277cb172ca65d1caec1ccf59f7ea943b3eb08b6efb8
 OVAL_POLYGON_OWNER = "tests/rules/section01/test_milli_inch_oval_polygon.py"
 _OVAL_POLYGON_SOURCE = "src/warhammer40k_core/geometry/milli_inch_oval_polygon.py"
 
+OVAL_POLYGON_GAP_TRANSITION = (
+    "data/source_audits/ci64_provenance_v1/oval-polygon-gap-test-transition-v1.json"
+)
+OVAL_POLYGON_GAP_SHA256 = "aa14d37c70228c1369c6a534b0ba1e982513dc3bd0fff6bf2a6edcddef403ad5"
+OVAL_POLYGON_GAP_OWNER = "tests/rules/section01/test_milli_inch_oval_polygon_distance.py"
+
 
 type TestTransition = tuple[dict[str, dict[str, object]], dict[str, dict[str, object]], bytes]
 
@@ -119,6 +125,12 @@ def exact_movement_test_transition(
     for path in oval_polygon_paths:
         _selection_no_links(root, root / path)
     has_oval_polygon = any((root / path).exists() for path in oval_polygon_paths)
+    gap_paths = (OVAL_POLYGON_GAP_TRANSITION, OVAL_POLYGON_GAP_OWNER)
+    for path in gap_paths:
+        _selection_no_links(root, root / path)
+    has_gap = any((root / path).exists() for path in gap_paths)
+    if has_gap and not has_oval_polygon:
+        raise SystemExit("Oval-polygon gap tests require their topology predecessor.")
     if has_oval_polygon and not has_oval_point:
         raise SystemExit("Oval-polygon test addition requires its oval point predecessor.")
     if has_oval_point and not has_circle_polygon:
@@ -162,7 +174,8 @@ def exact_movement_test_transition(
             or set(oval["added_files"]) != {OVAL_POINT_OWNER}
         ):
             raise SystemExit("Oval point test addition membership differs.")
-        _checked_bytes(root, _OVAL_POINT_SOURCE, oval["source_sha256"])
+        if not has_gap:
+            _checked_bytes(root, _OVAL_POINT_SOURCE, oval["source_sha256"])
         additions.update(_selection_members(oval["added_files"], root))
         runtime = oval["runtime_fingerprint"]
         raw += b"\0" + oval_raw
@@ -175,10 +188,34 @@ def exact_movement_test_transition(
             or set(polygon["added_files"]) != {OVAL_POLYGON_OWNER}
         ):
             raise SystemExit("Oval-polygon test addition membership differs.")
-        _checked_bytes(root, _OVAL_POLYGON_SOURCE, polygon["source_sha256"])
+        if not has_gap:
+            _checked_bytes(root, _OVAL_POLYGON_SOURCE, polygon["source_sha256"])
         additions.update(_selection_members(polygon["added_files"], root))
         runtime = polygon["runtime_fingerprint"]
         raw += b"\0" + polygon_raw
+    if has_gap:
+        gap_raw = _checked_bytes(root, OVAL_POLYGON_GAP_TRANSITION, OVAL_POLYGON_GAP_SHA256)
+        gap = json.loads(gap_raw, object_pairs_hook=_selection_object)
+        if (
+            gap.keys()
+            != {
+                "schema",
+                "runtime_fingerprint",
+                "retained_oval_polygon_sha256",
+                "sources",
+                "added_files",
+            }
+            or gap["schema"] != "finite-oval-polygon-gap-test-transition-v1"
+            or gap["retained_oval_polygon_sha256"] != OVAL_POLYGON_SHA256
+            or set(gap["sources"]) != {_OVAL_POINT_SOURCE, _OVAL_POLYGON_SOURCE}
+            or set(gap["added_files"]) != {OVAL_POLYGON_GAP_OWNER}
+        ):
+            raise SystemExit("Oval-polygon gap test transition membership differs.")
+        for name, digest in gap["sources"].items():
+            _checked_bytes(root, name, digest)
+        additions.update(_selection_members(gap["added_files"], root))
+        runtime = gap["runtime_fingerprint"]
+        raw += b"\0" + gap_raw
     retained = _identity_test_transition(root, retained_cutover_sha256, runtime=runtime)
     if retained is None:
         raise SystemExit(
