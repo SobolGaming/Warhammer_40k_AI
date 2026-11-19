@@ -114,8 +114,8 @@ _SCOPES = (
     ReviewedScope(
         "59959e71d95a68a4af8935d2897fd2280a8b76c2",
         "docs/performance/policy-v3/gameplay-movement-budget-input-roles-v4.json",
-        "803b127414ab3cb6a3bfb0986e923fa56b9fddacc4358473304e3930190089cd",
-        "651fbfbb728bc0559505741bdce6627b725d3deeb19331d7115849ca7d448e22",
+        "e13db2b31052b8c0d4b95e12a49b69a9df6df788b9cde4d9d7cb490be2e7b58a",
+        "400a3c0fb35774e826eeeff4daf2a0e4348597d8c7a195b91b448171af5e17c2",
         "docs/performance/current/gameplay-movement-budget-external-contract.json",
         frozenset(
             (
@@ -139,11 +139,19 @@ _SCOPES = (
                 "src/warhammer40k_core/adapters/linux_authority_transport.py",
                 "src/warhammer40k_core/adapters/numerical_checkpoint_reconstruction.py",
                 "src/warhammer40k_core/adapters/numerical_policy.py",
+                "src/warhammer40k_core/ai/canonical_deployment.py",
+                "src/warhammer40k_core/ai/deployment_reference_suite.py",
+                "src/warhammer40k_core/ai/followthrough_scenario.py",
+                "src/warhammer40k_core/ai/matched_attack_scenario.py",
+                "src/warhammer40k_core/ai/normal_move_scenario.py",
+                "src/warhammer40k_core/ai/opposing_shooter_scenario.py",
+                "src/warhammer40k_core/ai/preserve_scenario.py",
                 "src/warhammer40k_core/core/visibility.py",
                 "src/warhammer40k_core/engine/game_state.py",
                 "src/warhammer40k_core/geometry/milli_inch_symbolic.py",
                 "src/warhammer40k_core/geometry/movement_envelope.py",
                 "src/warhammer40k_core/geometry/numerical_identity.py",
+                "tests/factions/emperors_children/test_selected_consumers.py",
                 "tests/infrastructure/adapters/unit/test_linux_authority.py",
                 "tests/infrastructure/adapters/unit/test_numerical_policy.py",
                 "tests/rules/section01/test_engine_numerical_identity.py",
@@ -188,6 +196,7 @@ _SCOPES = (
                 "scripts/measure_player_boundary.py",
                 "scripts/measure_private_rng_reconstruction.py",
                 "tests/code_quality/test_engine_numerical_identity_admission.py",
+                "tests/rules/section18/coverage.json",
                 "tools/performance_tool_inputs_v4.py",
             )
         ),

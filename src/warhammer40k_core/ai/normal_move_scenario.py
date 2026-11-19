@@ -35,7 +35,7 @@ from warhammer40k_core.engine.phase import LifecycleStatusKind
 from warhammer40k_core.geometry.pathing import ModelPathEndpoint, PathWitness
 from warhammer40k_core.geometry.pose import Pose, PosePayload
 
-NORMAL_MOVE_SCENARIO_ID = "canonical-witnessed-normal-move-v2-numerical-identity"
+NORMAL_MOVE_SCENARIO_ID = "canonical-witnessed-normal-move-v3-movement-budget"
 # Receipt versions do not relabel the original ordinary decision identifiers.
 NORMAL_MOVE_EXECUTION_ID = "canonical-witnessed-normal-move-v1"
 NORMAL_MOVE_SCENARIO_SCHEMA = "normal-move-scenario-admission-v2-numerical-identity"
@@ -93,7 +93,7 @@ def normal_move_scenario_definition() -> dict[str, JsonValue]:
 
 
 NORMAL_MOVE_SCENARIO_DEFINITION_HASH = (
-    "b934a82a8fc290d942256a3edc6bb707136a85ab58e85bf8231d408e2cc3bc31"
+    "81fc8dd72147454ab8a65d808d7da8abafdbaec0a0ab4cae6cd082c315ce50b4"
 )
 
 

@@ -63,6 +63,7 @@ def test_native_facade_rejects_swap_then_applies_legal_witness(
         enemy_poses=(Pose.at(10, 13.8), Pose.at(12.5, 13.8)) if action == "fall_back" else None,
     )
     state.mission_setup = section03_setup_mission
+    assert state.battlefield_state is not None
     _add_spare_mover(section03_definitions, state)
     handler = MovementPhaseHandler(
         ruleset_descriptor=state.runtime_ruleset_descriptor(),

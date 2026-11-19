@@ -35,7 +35,7 @@ from warhammer40k_core.engine.phase import LifecycleStatusKind
 from warhammer40k_core.geometry.pathing import ModelPathEndpoint, PathWitness
 from warhammer40k_core.geometry.pose import Pose, PosePayload
 
-FOLLOWTHROUGH_ID = "canonical-paired-followthrough-v2-numerical-identity"
+FOLLOWTHROUGH_ID = "canonical-paired-followthrough-v3-movement-budget"
 # Receipt versions do not relabel the original ordinary decision identifiers.
 FOLLOWTHROUGH_EXECUTION_ID = "canonical-paired-followthrough-v1"
 FOLLOWTHROUGH_SCHEMA = "paired-followthrough-admission-v2-numerical-identity"
@@ -101,7 +101,7 @@ def followthrough_definition() -> dict[str, JsonValue]:
     )
 
 
-FOLLOWTHROUGH_DEFINITION_HASH = "a0f47b8fb5bbf697f725b35cb34cb21a6c895d9d594d2a3b77485501da923437"
+FOLLOWTHROUGH_DEFINITION_HASH = "bd2ff705cf44ddaac693db904ab2394e3fb2e2305caf7f63320fee1445d38bd8"
 
 
 def _definition() -> dict[str, JsonValue]:

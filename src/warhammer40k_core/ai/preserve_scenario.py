@@ -21,7 +21,7 @@ from warhammer40k_core.ai.training_admission import TrainingAdmissionError, Veri
 from warhammer40k_core.engine.event_log import JsonValue, canonical_json, validate_json_value
 from warhammer40k_core.engine.phase import LifecycleStatusKind
 
-PRESERVE_SCENARIO_ID = "canonical-preserve-prefix-v2-numerical-identity"
+PRESERVE_SCENARIO_ID = "canonical-preserve-prefix-v3-movement-budget"
 # Receipt versions do not relabel the original ordinary decision identifiers.
 PRESERVE_EXECUTION_ID = "canonical-preserve-prefix-v1"
 PRESERVE_SCENARIO_SCHEMA = "preserve-scenario-admission-v2-numerical-identity"
@@ -142,7 +142,7 @@ def preserve_scenario_definition() -> dict[str, JsonValue]:
 
 
 PRESERVE_SCENARIO_DEFINITION_HASH = (
-    "9826e75e5f08d056235ff2a2d8ea2118bb3b078c7a3448b12fb0e5cf6a8c2111"
+    "ab2b3858d3747851c8a1d86bee36a72a36fdcb7d123ae978924d165f6754901b"
 )
 
 

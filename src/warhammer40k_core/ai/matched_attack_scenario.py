@@ -30,7 +30,7 @@ from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_f
 from warhammer40k_core.engine.event_log import JsonValue, canonical_json, validate_json_value
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 
-MATCHED_ATTACK_ID = "canonical-matched-opposing-attack-v2-numerical-identity"
+MATCHED_ATTACK_ID = "canonical-matched-opposing-attack-v3-movement-budget"
 
 
 def matched_attack_definition() -> dict[str, JsonValue]:

@@ -44,7 +44,7 @@ from warhammer40k_core.engine.weapon_declaration import (
 from warhammer40k_core.geometry.pathing import ModelPathEndpoint, PathWitness
 from warhammer40k_core.geometry.pose import Pose, PosePayload
 
-OPPOSING_SHOOTER_ID = "canonical-opposing-shooter-v2-numerical-identity"
+OPPOSING_SHOOTER_ID = "canonical-opposing-shooter-v3-movement-budget"
 # Receipt versions do not relabel the original ordinary decision identifiers.
 OPPOSING_SHOOTER_EXECUTION_ID = "canonical-opposing-shooter-v1"
 _VEHICLE = "army-alpha:strategic-reserve-unit"

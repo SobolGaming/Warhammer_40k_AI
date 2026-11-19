@@ -23,12 +23,12 @@ from warhammer40k_core.engine.event_log import JsonValue, canonical_json, valida
 from warhammer40k_core.engine.game_state import GameConfig
 from warhammer40k_core.engine.phase import LifecycleStatusKind
 
-CANONICAL_DEPLOYMENT_ID = "canonical-deployment-v2-numerical-identity"
+CANONICAL_DEPLOYMENT_ID = "canonical-deployment-v3-movement-budget"
 # Preserve the fixture game ID and seed; version its newly bound config encoding.
 CANONICAL_DEPLOYMENT_GAME_ID = "canonical-deployment-v1"
 CANONICAL_DEPLOYMENT_EXECUTION_ID = "canonical-deployment-v1"
 CANONICAL_DEPLOYMENT_CONFIG_HASH = (
-    "618cefc49cc612e4e42ae5abedc9df8178a7ba94774652aa531942ffbd856463"
+    "5136262ee77475d6695df53774501168c90ab88cc4827c4b271bbf52ef543e9b"
 )
 CANONICAL_DEPLOYMENT_SCHEMA = "canonical-deployment-admission-v2-numerical-identity"
 

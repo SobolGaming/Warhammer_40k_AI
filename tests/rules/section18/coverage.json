@@ -3876,7 +3876,7 @@
     "tests/rules/section18/test_embark.py": "52a6932ef18fe93ae8fbba796aa9d0af79842884ed3cfd5c337aa13a15949261",
     "tests/rules/section18/test_emergency.py": "dd10071fe5d07adf4d5960320ce0dba5bda9f58187e5d52df08f1ef2e0871416",
     "tests/rules/section18/test_emergency_status.py": "b3c40d4c04b92f0fcc2c6be9d96b2a38c418e39cce5a83a8ae4e9b7f4e98a8ff",
-    "tests/rules/section18/test_facade.py": "e57eed3325fdb9ff1e4e4e85682f7db56a012c5a77a071f3ebbfdb1609553457",
+    "tests/rules/section18/test_facade.py": "90df3670ef2acdca6f3dae7f879b62e9e8bd399a54402864d4c895e767c5f2f6",
     "tests/rules/section18/test_faqs.py": "8897688f2eaaeb5a19c1e90f0f52994b276ded51ee36b67aa1031c0c70673178",
     "tests/rules/section18/test_formations.py": "1e64f5f3a7bd354f572af4d5796ecac0b85c5e48390acc7be94bbd368ee374ad",
     "tests/support/section18_fixtures.py": "322ca252066382ad5f0dd2548427ef8ba9ec6f055bfd7f99a4be9173d8531e46",
