@@ -1,362 +1,394 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "bfa76c1b7ccee90853dc6a147e68d2ce077100bc",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:1e1f9e8d160c8acf75f4a0cff3c9d5099ef18e3c05a9d4b20522258ae6e7b5b5",
-  "operation_map_sha256": "5bb861fc4b8fca9eeeaae2f0ee9e7f4d9687fab7901fb7ce8c4c932682b8f9d6",
+  "base": "ded5d0ec6cd2dbade17dfacd2891d9320c32207c",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:f2b7f6522f0f9c9b3520f635332964abb877a1a127ed2c8902c5c56290c30c69",
+  "operation_map_sha256": "f4658636b735337273b9a677f7caf35262353307dce67617f1287308d0eca8a1",
   "changes": {
     "ci/test_shards/durations.json": {
-      "before_sha256": "bf7cd7bc7eabc53e64b82b5368b5f67925a3ea0e1aab776b63b127694976248c",
-      "after_sha256": "19c7b5131b9f6a67f3f406addf34d120df7b866aff795f2982ed63dc62b6e431",
+      "before_sha256": "19c7b5131b9f6a67f3f406addf34d120df7b866aff795f2982ed63dc62b6e431",
+      "after_sha256": "bf26335cd34794acea8ff51ed17eec406a822ca87279bbd2e8858248e105c207",
       "owners": {
         "@document": {
-          "before": "bf7cd7bc7eabc53e64b82b5368b5f67925a3ea0e1aab776b63b127694976248c",
-          "after": "19c7b5131b9f6a67f3f406addf34d120df7b866aff795f2982ed63dc62b6e431"
+          "before": "19c7b5131b9f6a67f3f406addf34d120df7b866aff795f2982ed63dc62b6e431",
+          "after": "bf26335cd34794acea8ff51ed17eec406a822ca87279bbd2e8858248e105c207"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
-      "before_sha256": "e06337d9ee3d8f9812b5dc040bdd80c118ad7ddec265fabdc42a05993efb2636",
-      "after_sha256": "a951b04220c1ad4c7728a4211af12e82d2f74e3079d54877342bc051dd2d4ad1",
+      "before_sha256": "a951b04220c1ad4c7728a4211af12e82d2f74e3079d54877342bc051dd2d4ad1",
+      "after_sha256": "ad54421764d194c07b47456e9ffcf93937802736661a29d3e2fa29038a7be594",
       "owners": {
         "@document": {
-          "before": "e06337d9ee3d8f9812b5dc040bdd80c118ad7ddec265fabdc42a05993efb2636",
-          "after": "a951b04220c1ad4c7728a4211af12e82d2f74e3079d54877342bc051dd2d4ad1"
+          "before": "a951b04220c1ad4c7728a4211af12e82d2f74e3079d54877342bc051dd2d4ad1",
+          "after": "ad54421764d194c07b47456e9ffcf93937802736661a29d3e2fa29038a7be594"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
-      "before_sha256": "3809b49dc741d43683a99050325be18cfecb0f9235831c575ad50967a41c0eae",
-      "after_sha256": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20",
+      "before_sha256": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20",
+      "after_sha256": "46ae708bd8e2108cb94a84ae6b19e37c98a7317aee98eb4c3ff85e45fa31907c",
       "owners": {
         "@document": {
-          "before": "3809b49dc741d43683a99050325be18cfecb0f9235831c575ad50967a41c0eae",
-          "after": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20"
+          "before": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20",
+          "after": "46ae708bd8e2108cb94a84ae6b19e37c98a7317aee98eb4c3ff85e45fa31907c"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
-      "before_sha256": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20",
-      "after_sha256": "e8cb85cae6493d43d41ad3188fa4c0f2fbaabec94dfb5d9aad7d151886802944",
+      "before_sha256": "e8cb85cae6493d43d41ad3188fa4c0f2fbaabec94dfb5d9aad7d151886802944",
+      "after_sha256": "c2f9dc4f6821d7fc7de53a2b181ebbeb8bcf8d2b27d297dc1887f44dbf8d860b",
       "owners": {
         "@document": {
-          "before": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20",
-          "after": "e8cb85cae6493d43d41ad3188fa4c0f2fbaabec94dfb5d9aad7d151886802944"
+          "before": "e8cb85cae6493d43d41ad3188fa4c0f2fbaabec94dfb5d9aad7d151886802944",
+          "after": "c2f9dc4f6821d7fc7de53a2b181ebbeb8bcf8d2b27d297dc1887f44dbf8d860b"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
-      "before_sha256": "138b4b3b06835a54c452b6aa3d1c57f26826e79898efc20583f94e7fa31fe117",
-      "after_sha256": "b12d11ed0609c7ee24a9b43ebe100c579ef52b7ffc7a58c63d2f062c8fb216f8",
+      "before_sha256": "b12d11ed0609c7ee24a9b43ebe100c579ef52b7ffc7a58c63d2f062c8fb216f8",
+      "after_sha256": "9a5c547afe83815cb7ee25905a24901b89bc282aac7097685d2cbe91abd481a8",
       "owners": {
         "@document": {
-          "before": "138b4b3b06835a54c452b6aa3d1c57f26826e79898efc20583f94e7fa31fe117",
-          "after": "b12d11ed0609c7ee24a9b43ebe100c579ef52b7ffc7a58c63d2f062c8fb216f8"
+          "before": "b12d11ed0609c7ee24a9b43ebe100c579ef52b7ffc7a58c63d2f062c8fb216f8",
+          "after": "9a5c547afe83815cb7ee25905a24901b89bc282aac7097685d2cbe91abd481a8"
         }
       }
     },
     "ci/test_shards/shard-2.txt": {
-      "before_sha256": "d1f2493b7338be291da4bbf8ddf2dd2ffe01c39411cb12e581681d490c346551",
-      "after_sha256": "e17254db53356a40f2a217585b0a76c2b63ab253f1b6abe64e96b71df83cb4fa",
+      "before_sha256": "e17254db53356a40f2a217585b0a76c2b63ab253f1b6abe64e96b71df83cb4fa",
+      "after_sha256": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
       "owners": {
         "@document": {
-          "before": "d1f2493b7338be291da4bbf8ddf2dd2ffe01c39411cb12e581681d490c346551",
-          "after": "e17254db53356a40f2a217585b0a76c2b63ab253f1b6abe64e96b71df83cb4fa"
+          "before": "e17254db53356a40f2a217585b0a76c2b63ab253f1b6abe64e96b71df83cb4fa",
+          "after": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
-      "before_sha256": "0514533ba57a88462c45119dceddc1ec504e39deba7802a14c9b2585d23949b0",
-      "after_sha256": "24736ed3338410d962c7fe4805f771a4fbd33e2cf7eb5d3631c09d977e70d070",
+      "before_sha256": "24736ed3338410d962c7fe4805f771a4fbd33e2cf7eb5d3631c09d977e70d070",
+      "after_sha256": "ed8b2de4f896240a0d1fb02f3619cf22c5a51a118cc241c105470311b8b39d28",
       "owners": {
         "@document": {
-          "before": "0514533ba57a88462c45119dceddc1ec504e39deba7802a14c9b2585d23949b0",
-          "after": "24736ed3338410d962c7fe4805f771a4fbd33e2cf7eb5d3631c09d977e70d070"
+          "before": "24736ed3338410d962c7fe4805f771a4fbd33e2cf7eb5d3631c09d977e70d070",
+          "after": "ed8b2de4f896240a0d1fb02f3619cf22c5a51a118cc241c105470311b8b39d28"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
-      "before_sha256": "12b8a509bab84d9ea5f1c7c5a98f676b58d023619867f887c7ffdce7db824510",
-      "after_sha256": "975a21e867bb4b90e12f154d02872771c5167ae40746a19b9332659a5d0eee96",
+      "before_sha256": "975a21e867bb4b90e12f154d02872771c5167ae40746a19b9332659a5d0eee96",
+      "after_sha256": "cab6765c0fcd2ad7e5d0f7c301465b7445a0ba2161b30c82d1838e6cd746b610",
       "owners": {
         "@document": {
-          "before": "12b8a509bab84d9ea5f1c7c5a98f676b58d023619867f887c7ffdce7db824510",
-          "after": "975a21e867bb4b90e12f154d02872771c5167ae40746a19b9332659a5d0eee96"
+          "before": "975a21e867bb4b90e12f154d02872771c5167ae40746a19b9332659a5d0eee96",
+          "after": "cab6765c0fcd2ad7e5d0f7c301465b7445a0ba2161b30c82d1838e6cd746b610"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
-      "before_sha256": "84ed0c0d43c4924011886c30cd77c8f81b67b51e42b6d8565ef4fd378f00f211",
-      "after_sha256": "1661ee8caa6259848c165dd61a33d89086e75650d669fae1a3924f90707e1f8e",
+      "before_sha256": "1661ee8caa6259848c165dd61a33d89086e75650d669fae1a3924f90707e1f8e",
+      "after_sha256": "3cc9bd308b8a4ae6c9f91ebd10864a193f14c7a90fd03bb68c06c18c19a5a29e",
       "owners": {
         "@document": {
-          "before": "84ed0c0d43c4924011886c30cd77c8f81b67b51e42b6d8565ef4fd378f00f211",
-          "after": "1661ee8caa6259848c165dd61a33d89086e75650d669fae1a3924f90707e1f8e"
+          "before": "1661ee8caa6259848c165dd61a33d89086e75650d669fae1a3924f90707e1f8e",
+          "after": "3cc9bd308b8a4ae6c9f91ebd10864a193f14c7a90fd03bb68c06c18c19a5a29e"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
-      "before_sha256": "6f44efc5711460e15b2360398e20559671e966b8b695fd33ca1172f369801bc6",
-      "after_sha256": "36e5b4fcb72a7d52e90aafdd7ebb611c0aa3428f2877cb6ad48dc698fe62fe3e",
+      "before_sha256": "36e5b4fcb72a7d52e90aafdd7ebb611c0aa3428f2877cb6ad48dc698fe62fe3e",
+      "after_sha256": "c06ad180f0571329cd5818192e0f75971ab116e9cecfba3bb523b00d2c89b9f3",
       "owners": {
         "@document": {
-          "before": "6f44efc5711460e15b2360398e20559671e966b8b695fd33ca1172f369801bc6",
-          "after": "36e5b4fcb72a7d52e90aafdd7ebb611c0aa3428f2877cb6ad48dc698fe62fe3e"
+          "before": "36e5b4fcb72a7d52e90aafdd7ebb611c0aa3428f2877cb6ad48dc698fe62fe3e",
+          "after": "c06ad180f0571329cd5818192e0f75971ab116e9cecfba3bb523b00d2c89b9f3"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
-      "before_sha256": "764e517027a7e7bc8e0c9dbf945aec0b446725fc16d08bc7fcfec01bff88b4d2",
-      "after_sha256": "b8c61dd1a9190ea3e6604df6481e88e0da85616e5b31ba53dd13b451ae5130dc",
+      "before_sha256": "b8c61dd1a9190ea3e6604df6481e88e0da85616e5b31ba53dd13b451ae5130dc",
+      "after_sha256": "fe386716501d21f2f22fe0878a1a571d6e124d8dea0b201bc4199591ecf300f3",
       "owners": {
         "@document": {
-          "before": "764e517027a7e7bc8e0c9dbf945aec0b446725fc16d08bc7fcfec01bff88b4d2",
-          "after": "b8c61dd1a9190ea3e6604df6481e88e0da85616e5b31ba53dd13b451ae5130dc"
+          "before": "b8c61dd1a9190ea3e6604df6481e88e0da85616e5b31ba53dd13b451ae5130dc",
+          "after": "fe386716501d21f2f22fe0878a1a571d6e124d8dea0b201bc4199591ecf300f3"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
-      "before_sha256": "91b5a4e76cda38a14ce6e34a0857d078b78ad1293f00f0d9f4e6d17638f3f0d9",
-      "after_sha256": "423f01362e840d5cea203b39a35b33e319e28042584853da996623004b0fe5ac",
+      "before_sha256": "423f01362e840d5cea203b39a35b33e319e28042584853da996623004b0fe5ac",
+      "after_sha256": "abce9eb6c1df108a0a9fc516ab14f4f5e618fe9fcac05a9eaf3f44e93f1f4166",
       "owners": {
         "@document": {
-          "before": "91b5a4e76cda38a14ce6e34a0857d078b78ad1293f00f0d9f4e6d17638f3f0d9",
-          "after": "423f01362e840d5cea203b39a35b33e319e28042584853da996623004b0fe5ac"
+          "before": "423f01362e840d5cea203b39a35b33e319e28042584853da996623004b0fe5ac",
+          "after": "abce9eb6c1df108a0a9fc516ab14f4f5e618fe9fcac05a9eaf3f44e93f1f4166"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
-      "before_sha256": "f9c60a7ec0a30f738410d3f9d11e301ad8d4e01ac6c07ed6a15de241734e3f94",
-      "after_sha256": "acc2884546e2a2a051bf65bcd31ecfb4b9fbcc5465024526250145d674f630c3",
+      "before_sha256": "acc2884546e2a2a051bf65bcd31ecfb4b9fbcc5465024526250145d674f630c3",
+      "after_sha256": "981af8c4831f485f65e714721543590a1d42468bc532ec991ddb80d29767e466",
       "owners": {
         "@document": {
-          "before": "f9c60a7ec0a30f738410d3f9d11e301ad8d4e01ac6c07ed6a15de241734e3f94",
-          "after": "acc2884546e2a2a051bf65bcd31ecfb4b9fbcc5465024526250145d674f630c3"
+          "before": "acc2884546e2a2a051bf65bcd31ecfb4b9fbcc5465024526250145d674f630c3",
+          "after": "981af8c4831f485f65e714721543590a1d42468bc532ec991ddb80d29767e466"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "457c42e88258c5a24dce370a7cdc37cd41df9e66db22cd6a6bc1409b085b2505",
-      "after_sha256": "f09725fbbee8438a5a603ed44311bc8bb536d16e10c29b29d3c02297ed1b4930",
+      "before_sha256": "f09725fbbee8438a5a603ed44311bc8bb536d16e10c29b29d3c02297ed1b4930",
+      "after_sha256": "6fd3ad0100e228e362691c5babb74dd3c64a82132e4d42704274ffe034b6e0b2",
       "owners": {
         "@document": {
-          "before": "457c42e88258c5a24dce370a7cdc37cd41df9e66db22cd6a6bc1409b085b2505",
-          "after": "f09725fbbee8438a5a603ed44311bc8bb536d16e10c29b29d3c02297ed1b4930"
+          "before": "f09725fbbee8438a5a603ed44311bc8bb536d16e10c29b29d3c02297ed1b4930",
+          "after": "6fd3ad0100e228e362691c5babb74dd3c64a82132e4d42704274ffe034b6e0b2"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "ee46eb45f1978fe0ed9a76af9f123021151a27d03c1d5ed8d95d01f301056e0c",
-      "after_sha256": "d0323d3e08a56be6437b002a7e3dad459e91b46de5293e4decdc9aa3d29e8dac",
+      "before_sha256": "d0323d3e08a56be6437b002a7e3dad459e91b46de5293e4decdc9aa3d29e8dac",
+      "after_sha256": "45e38166725bc04bd50636f04246719facb9b3e16bf076155c21b3db54dba536",
       "owners": {
         "@document": {
-          "before": "ee46eb45f1978fe0ed9a76af9f123021151a27d03c1d5ed8d95d01f301056e0c",
-          "after": "d0323d3e08a56be6437b002a7e3dad459e91b46de5293e4decdc9aa3d29e8dac"
+          "before": "d0323d3e08a56be6437b002a7e3dad459e91b46de5293e4decdc9aa3d29e8dac",
+          "after": "45e38166725bc04bd50636f04246719facb9b3e16bf076155c21b3db54dba536"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "644d88d5b86beb90a66320dc45281464bf04820af4d1e9df380fe2b070537082",
-      "after_sha256": "6768b3459a6f84335ecde27528200e43cf3fc1e2455f10a1d0d3d994e7ff9367",
+      "before_sha256": "6768b3459a6f84335ecde27528200e43cf3fc1e2455f10a1d0d3d994e7ff9367",
+      "after_sha256": "1ca92de502af870a2c3c72529233fd9704ba86c5e0e1392180e32087c8b5126a",
       "owners": {
         "@document": {
-          "before": "644d88d5b86beb90a66320dc45281464bf04820af4d1e9df380fe2b070537082",
-          "after": "6768b3459a6f84335ecde27528200e43cf3fc1e2455f10a1d0d3d994e7ff9367"
+          "before": "6768b3459a6f84335ecde27528200e43cf3fc1e2455f10a1d0d3d994e7ff9367",
+          "after": "1ca92de502af870a2c3c72529233fd9704ba86c5e0e1392180e32087c8b5126a"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "d0452d9ce4a3dcd4ba53a7e7dd4d04f4e7fbe7c1a875682a55f1ee209f2a05f4",
-      "after_sha256": "b73a40e8cf31aaa6a0553abae92cf9f9990a81494173555bad954fdc1a6216ae",
+      "before_sha256": "b73a40e8cf31aaa6a0553abae92cf9f9990a81494173555bad954fdc1a6216ae",
+      "after_sha256": "567412e986c7642d09a0b510bd0da2ae331ac2521a4aba580988221078331e69",
       "owners": {
         "@document": {
-          "before": "d0452d9ce4a3dcd4ba53a7e7dd4d04f4e7fbe7c1a875682a55f1ee209f2a05f4",
-          "after": "b73a40e8cf31aaa6a0553abae92cf9f9990a81494173555bad954fdc1a6216ae"
+          "before": "b73a40e8cf31aaa6a0553abae92cf9f9990a81494173555bad954fdc1a6216ae",
+          "after": "567412e986c7642d09a0b510bd0da2ae331ac2521a4aba580988221078331e69"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "d23d90cd88f399702749c39791a3d12a1b772b59a2666c7122e81dd4c9d528e2",
-      "after_sha256": "f845774d2f48fbfdaa39b6c8a34471682410e1e64530349880580bcd9645bb84",
+      "before_sha256": "f845774d2f48fbfdaa39b6c8a34471682410e1e64530349880580bcd9645bb84",
+      "after_sha256": "b7c5a4c51d59013d1bf3333ff79a571effe93f20ed784597cea4a111eb40295a",
       "owners": {
         "@document": {
-          "before": "d23d90cd88f399702749c39791a3d12a1b772b59a2666c7122e81dd4c9d528e2",
-          "after": "f845774d2f48fbfdaa39b6c8a34471682410e1e64530349880580bcd9645bb84"
+          "before": "f845774d2f48fbfdaa39b6c8a34471682410e1e64530349880580bcd9645bb84",
+          "after": "b7c5a4c51d59013d1bf3333ff79a571effe93f20ed784597cea4a111eb40295a"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "53cee6b5179e28b3a5eb3c5d6e1029cc30b1a18aa4b80d1bc02b4e119e0b9be7",
-      "after_sha256": "d64c2d36607172aac5ac0e038bb8128b75fa4c28d7b301d84d66baa16e9ed83d",
+      "before_sha256": "d64c2d36607172aac5ac0e038bb8128b75fa4c28d7b301d84d66baa16e9ed83d",
+      "after_sha256": "48f40f8c0c571a5dff70869da12c0e074e6a7b973ab495eb9ca9d1e53d853f49",
       "owners": {
         "@document": {
-          "before": "53cee6b5179e28b3a5eb3c5d6e1029cc30b1a18aa4b80d1bc02b4e119e0b9be7",
-          "after": "d64c2d36607172aac5ac0e038bb8128b75fa4c28d7b301d84d66baa16e9ed83d"
+          "before": "d64c2d36607172aac5ac0e038bb8128b75fa4c28d7b301d84d66baa16e9ed83d",
+          "after": "48f40f8c0c571a5dff70869da12c0e074e6a7b973ab495eb9ca9d1e53d853f49"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "f7baf5b4545e34972f61d157d553169f7ece770a4780dbaed56299fd1f494f4b",
-      "after_sha256": "077ae7872fef38e76dd2280f2452908544874f74b16f196e094563aeb1754718",
+      "before_sha256": "077ae7872fef38e76dd2280f2452908544874f74b16f196e094563aeb1754718",
+      "after_sha256": "8e893cb89a977ff1cc1d2d23916523af1ae621d341ba99c34bc73297cd0300d4",
       "owners": {
         "@document": {
-          "before": "f7baf5b4545e34972f61d157d553169f7ece770a4780dbaed56299fd1f494f4b",
-          "after": "077ae7872fef38e76dd2280f2452908544874f74b16f196e094563aeb1754718"
+          "before": "077ae7872fef38e76dd2280f2452908544874f74b16f196e094563aeb1754718",
+          "after": "8e893cb89a977ff1cc1d2d23916523af1ae621d341ba99c34bc73297cd0300d4"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "fefc28d1fcdfc754ff2c042fea5af4c4e230abb25e08288c2bbf9b63e36ec673",
-      "after_sha256": "cd920bb67be927ff7dd931c71e954e1cf48a4e8c736011e789ca15f7248c7173",
+      "before_sha256": "cd920bb67be927ff7dd931c71e954e1cf48a4e8c736011e789ca15f7248c7173",
+      "after_sha256": "2e908adf27f60cd03db48252ad2263a2eea86690def389659302ee6d23739726",
       "owners": {
         "@document": {
-          "before": "fefc28d1fcdfc754ff2c042fea5af4c4e230abb25e08288c2bbf9b63e36ec673",
-          "after": "cd920bb67be927ff7dd931c71e954e1cf48a4e8c736011e789ca15f7248c7173"
+          "before": "cd920bb67be927ff7dd931c71e954e1cf48a4e8c736011e789ca15f7248c7173",
+          "after": "2e908adf27f60cd03db48252ad2263a2eea86690def389659302ee6d23739726"
         }
       }
     },
-    "data/source_audits/ci64_provenance_v1/oval-oval-topology-test-transition-v1.json": {
+    "data/source_audits/ci64_provenance_v1/oval-oval-gap-test-transition-v1.json": {
       "before_sha256": null,
-      "after_sha256": "82797a1bb5efb5b3928a51d7f09fb631bba56267f32b26cd3c1685dd0ac5fbb7",
+      "after_sha256": "1a454ad230db5f586d952b1b362038a6ef36ced48e13434e9871ee97c75eed10",
       "owners": {
         "@document": {
           "before": null,
-          "after": "82797a1bb5efb5b3928a51d7f09fb631bba56267f32b26cd3c1685dd0ac5fbb7"
+          "after": "1a454ad230db5f586d952b1b362038a6ef36ced48e13434e9871ee97c75eed10"
         }
       }
     },
     "docs/DISTANCE_PRECISION.md": {
-      "before_sha256": "c0f54e7a9301352a83633ba673886f8110285c78335a0b5ea67d3db485b07596",
-      "after_sha256": "2326ab62ac83a4ae90773de97e8aa6152c3868eee1f47f038b7a826f8c783c4d",
+      "before_sha256": "2326ab62ac83a4ae90773de97e8aa6152c3868eee1f47f038b7a826f8c783c4d",
+      "after_sha256": "2443890ea86fd0b7b82336814cebef62ac3a6d39ad8d4f4e7827441031a62908",
       "owners": {
         "@document": {
-          "before": "c0f54e7a9301352a83633ba673886f8110285c78335a0b5ea67d3db485b07596",
-          "after": "2326ab62ac83a4ae90773de97e8aa6152c3868eee1f47f038b7a826f8c783c4d"
+          "before": "2326ab62ac83a4ae90773de97e8aa6152c3868eee1f47f038b7a826f8c783c4d",
+          "after": "2443890ea86fd0b7b82336814cebef62ac3a6d39ad8d4f4e7827441031a62908"
         }
       }
     },
-    "docs/performance/current/oval-oval-topology-movement.json": {
+    "docs/performance/current/oval-oval-gap-movement.json": {
       "before_sha256": null,
-      "after_sha256": "68cd14e0f8e0794759c2af127b846ae965fa99aa2c1bdd3fb4b2af4d4c747e1b",
+      "after_sha256": "88f6a7614db239d79f09685bf6119df77192f3ab5e19e3e3fafaa875df45ed92",
       "owners": {
         "@document": {
           "before": null,
-          "after": "68cd14e0f8e0794759c2af127b846ae965fa99aa2c1bdd3fb4b2af4d4c747e1b"
+          "after": "88f6a7614db239d79f09685bf6119df77192f3ab5e19e3e3fafaa875df45ed92"
         }
       }
     },
-    "docs/performance/current/oval-oval-topology-setup.json": {
+    "docs/performance/current/oval-oval-gap-setup.json": {
       "before_sha256": null,
-      "after_sha256": "6a033bfae792d60977ae4c8ab7bc7b70d334731297e2ee00de80f0e9dc52472c",
+      "after_sha256": "1430980e476939d89f0c4193a113b66a2aa7de970e955777a0a68dbda65bb738",
       "owners": {
         "@document": {
           "before": null,
-          "after": "6a033bfae792d60977ae4c8ab7bc7b70d334731297e2ee00de80f0e9dc52472c"
+          "after": "1430980e476939d89f0c4193a113b66a2aa7de970e955777a0a68dbda65bb738"
         }
       }
     },
-    "docs/performance/current/oval-oval-topology-visibility.json": {
+    "docs/performance/current/oval-oval-gap-visibility.json": {
       "before_sha256": null,
-      "after_sha256": "4b0c1cde8a51b8ecf88af4ac283a5761838705d0fbcc8bca7e18f96cd0c38ed4",
+      "after_sha256": "a74b57c580d2186fff304f1a2e7773b9597b8f1642db3b805f73f4df5fcb3085",
       "owners": {
         "@document": {
           "before": null,
-          "after": "4b0c1cde8a51b8ecf88af4ac283a5761838705d0fbcc8bca7e18f96cd0c38ed4"
+          "after": "a74b57c580d2186fff304f1a2e7773b9597b8f1642db3b805f73f4df5fcb3085"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "f9f2e1c8e01786cfb8fde27a20c2b2475faf17ff72db1e356d10d3a1e3481df8",
-      "after_sha256": "753eb3727c1ebac1014c1747709b4cec00a046adb28c7aa691814e7c91b19756",
+      "before_sha256": "753eb3727c1ebac1014c1747709b4cec00a046adb28c7aa691814e7c91b19756",
+      "after_sha256": "c4f7a41fe1ff4f3a92e358d2ee3af49c421f168ec23947e770b80b9e901ffce5",
       "owners": {
         "@document": {
-          "before": "f9f2e1c8e01786cfb8fde27a20c2b2475faf17ff72db1e356d10d3a1e3481df8",
-          "after": "753eb3727c1ebac1014c1747709b4cec00a046adb28c7aa691814e7c91b19756"
+          "before": "753eb3727c1ebac1014c1747709b4cec00a046adb28c7aa691814e7c91b19756",
+          "after": "c4f7a41fe1ff4f3a92e358d2ee3af49c421f168ec23947e770b80b9e901ffce5"
         }
       }
     },
     "scripts/engine_numerical_identity_test_admission.py": {
-      "before_sha256": "3c4c85194fe0b3c26851da581084e9c78b1c7840310d7c8280d0ad895c1c8e5f",
-      "after_sha256": "db1ce9b26d9a298f8fda4f775d38a800babd8968c7cf36ff3d2aec14782e740c",
+      "before_sha256": "db1ce9b26d9a298f8fda4f775d38a800babd8968c7cf36ff3d2aec14782e740c",
+      "after_sha256": "306fc036a66f0ac84057d584227da0924dce56dc3a7be6811f9992a4bc9286ae",
       "owners": {
         "@module": {
-          "before": "9001fbcb376eb45b63c180111af0143cb41b20f3da94fd7745629c805c7d6794",
-          "after": "2e2204ee35bde62862f465e9c3a046e3eb3f05a55c5927adcaa1123382dcff9e"
+          "before": "2e2204ee35bde62862f465e9c3a046e3eb3f05a55c5927adcaa1123382dcff9e",
+          "after": "3f4798faf234b0bf8d008accaaa7cf83b4ee0a6a40edfcc66659f310c7a0b007"
         },
         "exact_movement_test_transition": {
-          "before": "9b809a7b600a5a5e5aed0cfff21de7fc0668be9faaa5f6510cc18aaf8e910e67",
-          "after": "3099794c7c30d5f35f23d4e960f4e0e175706aaf346772a0ebb5c9464b727a89"
+          "before": "3099794c7c30d5f35f23d4e960f4e0e175706aaf346772a0ebb5c9464b727a89",
+          "after": "4ded5d56214f2cfc636328660e81817d4732c69bfa80e68d423316febbb2e528"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "48efc5117b0f585c8621a49982c782bd23000e042a693540b052df68aa002ffc",
-      "after_sha256": "e7cf280b1edb6207530a297474e2b212c0a8a7d016f77195557eeda8e71c9e62",
+      "before_sha256": "e7cf280b1edb6207530a297474e2b212c0a8a7d016f77195557eeda8e71c9e62",
+      "after_sha256": "755a4473de9a6d432d4eeb0e4274baec1ffdde1345106852517307c8fc4fc09a",
       "owners": {
         "@document": {
-          "before": "48efc5117b0f585c8621a49982c782bd23000e042a693540b052df68aa002ffc",
-          "after": "e7cf280b1edb6207530a297474e2b212c0a8a7d016f77195557eeda8e71c9e62"
+          "before": "e7cf280b1edb6207530a297474e2b212c0a8a7d016f77195557eeda8e71c9e62",
+          "after": "755a4473de9a6d432d4eeb0e4274baec1ffdde1345106852517307c8fc4fc09a"
         }
       }
     },
-    "src/warhammer40k_core/geometry/milli_inch_oval_oval.py": {
+    "src/warhammer40k_core/geometry/milli_inch_oval_oval_distance.py": {
       "before_sha256": null,
-      "after_sha256": "100bf1e4586e47d4c391dd2bbbce39e8ae13e9f82a9c6b65ae6bd367bcd6b76a",
+      "after_sha256": "600189bb38f74d213ffa5a1a0202810f5822e4748d63d8d427935c4b0d6ab4f7",
       "owners": {
         "@module": {
           "before": null,
-          "after": "45cff1c10e0a8cabab4d78e91f89a749ec59a96b2058e5b207ab740bfebcdfca"
+          "after": "7368b7a7e2561777647ef2e66597fb8f47095b18d069c6d3fa0af01dcc61d0ea"
         },
-        "oval_oval_relation": {
+        "_add": {
           "before": null,
-          "after": "28abd10b3e5a57eb172f07d653576f06759c4d34a48eb297ef76d416321d4b0c"
+          "after": "eab0e332075fed9756a8d1c10d68592fbd9dc4477481d681fcecd8e604dd5031"
+        },
+        "_cauchy_index": {
+          "before": null,
+          "after": "b0aa52791b8abee701f6907bdb4caf2e0e7e520322e5ceecbba9f67aba956adb"
+        },
+        "_gap_at_least": {
+          "before": null,
+          "after": "a0b143a4277e3661c54edee568bd0f19f075601cc82198657b4df0bf5d113843"
+        },
+        "_multiply": {
+          "before": null,
+          "after": "378874c0a16e3716069af71cef524f2d4226e1b1b8b94c3bfdf6122ca7021d49"
+        },
+        "_remainder": {
+          "before": null,
+          "after": "25c10ed9a9f6c698e2360161e34f24f5e59ba235001aa6fa8e6ae2e0e785a3bc"
+        },
+        "_scale": {
+          "before": null,
+          "after": "6ed6db3e839395fced53758387c04154ae8dd928884d4727ed874cda78430b9f"
+        },
+        "_support_squared": {
+          "before": null,
+          "after": "4c8e9f529a7aace9b7acddf4e59bb942b9a85e6d32a158737ae1967691ea9996"
+        },
+        "_trim": {
+          "before": null,
+          "after": "66075fb1f936113ff6d476eb084710ac4b261345c476ac7e1a676e9981c824b9"
+        },
+        "oval_oval_distance_ticks": {
+          "before": null,
+          "after": "3e4d4fd322ae60a5f52d8db5ded0b786d6341448f17703e77c167f3e449ca214"
         }
       }
     },
     "tests/code_quality/test_engine_numerical_identity_admission.py": {
-      "before_sha256": "1ed3c350c32f7c739c029d2fd0dcf77269b3db009b85f2430deb01741bacf919",
-      "after_sha256": "f802cff33c7627ba9bdbbcb9a470d9a96e961bba240b4144af1c52d911b23517",
+      "before_sha256": "f802cff33c7627ba9bdbbcb9a470d9a96e961bba240b4144af1c52d911b23517",
+      "after_sha256": "ea42f9981f4a676b7eac55ffbbfa72f98ab9b617962d7a7b42feefefc123bad8",
       "owners": {
         "test_identity_inventory_uses_current_twelve_shards_and_native_cohort": {
-          "before": "da700fc31bea4af941105ecf857280b2e5a473033e7ec84060b9cebd7b3280a2",
-          "after": "be3f3d958ac1afdce21888a4cc4d13ac2246aff18440080fa8e20b0ce4c3a153"
+          "before": "be3f3d958ac1afdce21888a4cc4d13ac2246aff18440080fa8e20b0ce4c3a153",
+          "after": "89d1865af298af5e12992f369095237245b55f388be63ac3c953e57efbd32a53"
         }
       }
     },
-    "tests/rules/section01/test_milli_inch_oval_oval.py": {
+    "tests/rules/section01/test_milli_inch_oval_oval_distance.py": {
       "before_sha256": null,
-      "after_sha256": "1b0b67c84bd3eaf704e372834f2d4c59569f6686ce8eafd3494ac7ee9be7fbac",
+      "after_sha256": "9dd647a35dde63af51ca2b37e453193241ce24fd10507a1b5e6260fb9bda752f",
       "owners": {
         "@module": {
           "before": null,
-          "after": "1a1fc67c148826ed44c32af3c7d5735144aea7f3913bff62585a44392f0e9f7c"
+          "after": "900a42d307cdfd1e6c17fb66833b05a47b8c921e87190371abea906f57992a2b"
         },
         "test_oval_pair_accepts_extreme_coordinate_differences": {
           "before": null,
-          "after": "9a53429c9c3363baebf28a1ecdf69f335637962bb02122d8cdf7bb14aa4f733e"
+          "after": "4ea05535228f27a231a0cd26339f7ee07a3c7f5eab6a9510135191ca802a4f0e"
         },
-        "test_oval_pair_classifies_contact_for_every_facing_pair": {
+        "test_oval_pair_distance_rejects_noncanonical_operands": {
           "before": null,
-          "after": "29ee5d4cd7ba9921e0edb4350ae87cedd764a8d05e34e4839fa5d6a2b06cbb5e"
+          "after": "3b973a98a8e941b96fe4d8f4bd7916b758856d63d49d3e294ae0709b69941810"
         },
-        "test_oval_pair_classifies_off_axis_contact": {
+        "test_oval_pair_measures_gap_for_every_facing_pair": {
           "before": null,
-          "after": "3cb26ef6c0ade74dc002859572940b28e796dd5ce3d4c4660993df18fbb6c604"
+          "after": "47801043d81afbfa8e781435b7fb2f58564ff024291c1d7970a3d2e2bb9a0f2d"
         },
-        "test_oval_pair_preserves_odd_axes_at_mixed_facings": {
+        "test_oval_pair_resolves_a_pell_offset_from_half_a_tick": {
           "before": null,
-          "after": "f29a3a0c0b3afa9d5cdd6ef97757cef58247d3e57f30047acb0169d9661c695f"
-        },
-        "test_oval_pair_rejects_noncanonical_operands": {
-          "before": null,
-          "after": "d0f10680dc489ca931f068db6c4c4f4ce8f53532839a84de75e6aec20b84c55c"
+          "after": "ce2b2a08a0d729efdbe108a8992867621f29236d03b62e061c144dbd90821846"
         },
         "test_oval_pair_resolves_near_contact_at_large_coordinates": {
           "before": null,
-          "after": "37a363e3b9de569d9627580ad7ad5013adbab10dcbda1326263a8d95f8bb1702"
+          "after": "42793334b977e20c22be1304192d17eece368c16197d0ec01b3fef721d77ff70"
+        },
+        "test_oval_pair_rounds_off_axis_gap_at_mixed_facings": {
+          "before": null,
+          "after": "38182ede0c89b490bc85e6e57108e8fa4f820dc4194e296a502c60307d9853e9"
         },
         "test_oval_pair_shared_interior": {
           "before": null,
-          "after": "b56510ae268ddc833405a1fe1b2a6c07d46f867c3420b6e630f0f36dbac50677"
+          "after": "2cfc959e71e1ff42c393343323b5b2a51dacb5e0356516fdd804098550fb078b"
         }
       }
     }
@@ -368,7 +400,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit the new oval pair tests into the complete measured behavioral workload.",
+      "rationale": "Admit the new oval-pair gap tests into the complete measured behavioral workload.",
       "source_obligation": "Generate the twelve shard manifests from the fresh covered JUnit profile.",
       "unchanged_work": "Preserve all earlier cases, branch measurement, the 67% floor and timing limits."
     },
@@ -378,7 +410,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit the new oval pair tests into the complete measured behavioral workload.",
+      "rationale": "Admit the new oval-pair gap tests into the complete measured behavioral workload.",
       "source_obligation": "Generate the twelve shard manifests from the fresh covered JUnit profile.",
       "unchanged_work": "Preserve all earlier cases, branch measurement, the 67% floor and timing limits."
     },
@@ -388,7 +420,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit the new oval pair tests into the complete measured behavioral workload.",
+      "rationale": "Admit the new oval-pair gap tests into the complete measured behavioral workload.",
       "source_obligation": "Generate the twelve shard manifests from the fresh covered JUnit profile.",
       "unchanged_work": "Preserve all earlier cases, branch measurement, the 67% floor and timing limits."
     },
@@ -398,7 +430,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit the new oval pair tests into the complete measured behavioral workload.",
+      "rationale": "Admit the new oval-pair gap tests into the complete measured behavioral workload.",
       "source_obligation": "Generate the twelve shard manifests from the fresh covered JUnit profile.",
       "unchanged_work": "Preserve all earlier cases, branch measurement, the 67% floor and timing limits."
     },
@@ -408,7 +440,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit the new oval pair tests into the complete measured behavioral workload.",
+      "rationale": "Admit the new oval-pair gap tests into the complete measured behavioral workload.",
       "source_obligation": "Generate the twelve shard manifests from the fresh covered JUnit profile.",
       "unchanged_work": "Preserve all earlier cases, branch measurement, the 67% floor and timing limits."
     },
@@ -418,7 +450,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit the new oval pair tests into the complete measured behavioral workload.",
+      "rationale": "Admit the new oval-pair gap tests into the complete measured behavioral workload.",
       "source_obligation": "Generate the twelve shard manifests from the fresh covered JUnit profile.",
       "unchanged_work": "Preserve all earlier cases, branch measurement, the 67% floor and timing limits."
     },
@@ -428,7 +460,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit the new oval pair tests into the complete measured behavioral workload.",
+      "rationale": "Admit the new oval-pair gap tests into the complete measured behavioral workload.",
       "source_obligation": "Generate the twelve shard manifests from the fresh covered JUnit profile.",
       "unchanged_work": "Preserve all earlier cases, branch measurement, the 67% floor and timing limits."
     },
@@ -438,7 +470,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit the new oval pair tests into the complete measured behavioral workload.",
+      "rationale": "Admit the new oval-pair gap tests into the complete measured behavioral workload.",
       "source_obligation": "Generate the twelve shard manifests from the fresh covered JUnit profile.",
       "unchanged_work": "Preserve all earlier cases, branch measurement, the 67% floor and timing limits."
     },
@@ -448,7 +480,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit the new oval pair tests into the complete measured behavioral workload.",
+      "rationale": "Admit the new oval-pair gap tests into the complete measured behavioral workload.",
       "source_obligation": "Generate the twelve shard manifests from the fresh covered JUnit profile.",
       "unchanged_work": "Preserve all earlier cases, branch measurement, the 67% floor and timing limits."
     },
@@ -458,7 +490,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit the new oval pair tests into the complete measured behavioral workload.",
+      "rationale": "Admit the new oval-pair gap tests into the complete measured behavioral workload.",
       "source_obligation": "Generate the twelve shard manifests from the fresh covered JUnit profile.",
       "unchanged_work": "Preserve all earlier cases, branch measurement, the 67% floor and timing limits."
     },
@@ -468,7 +500,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit the new oval pair tests into the complete measured behavioral workload.",
+      "rationale": "Admit the new oval-pair gap tests into the complete measured behavioral workload.",
       "source_obligation": "Generate the twelve shard manifests from the fresh covered JUnit profile.",
       "unchanged_work": "Preserve all earlier cases, branch measurement, the 67% floor and timing limits."
     },
@@ -478,7 +510,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit the new oval pair tests into the complete measured behavioral workload.",
+      "rationale": "Admit the new oval-pair gap tests into the complete measured behavioral workload.",
       "source_obligation": "Generate the twelve shard manifests from the fresh covered JUnit profile.",
       "unchanged_work": "Preserve all earlier cases, branch measurement, the 67% floor and timing limits."
     },
@@ -488,7 +520,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit the new oval pair tests into the complete measured behavioral workload.",
+      "rationale": "Admit the new oval-pair gap tests into the complete measured behavioral workload.",
       "source_obligation": "Generate the twelve shard manifests from the fresh covered JUnit profile.",
       "unchanged_work": "Preserve all earlier cases, branch measurement, the 67% floor and timing limits."
     },
@@ -572,13 +604,13 @@
       "source_obligation": "Advertise the actual runtime build in the current synthetic release fixtures.",
       "unchanged_work": "Historical executors, schemas, checkpoints and gameplay policy retain their original semantics."
     },
-    "data/source_audits/ci64_provenance_v1/oval-oval-topology-test-transition-v1.json": {
+    "data/source_audits/ci64_provenance_v1/oval-oval-gap-test-transition-v1.json": {
       "category": "rule_semantics",
       "operations": [
         "exact-movement-test-admission"
       ],
       "selected_families": [],
-      "rationale": "Admit the focused topology tests and authenticate the added geometry source.",
+      "rationale": "Admit the focused distance tests and authenticate the added geometry source.",
       "source_obligation": "Bind the new tests and helper to the successor runtime and predecessor admission.",
       "unchanged_work": "Preserve previous geometry regressions and the complete behavioral selection."
     },
@@ -586,40 +618,40 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Document the staged oval pair topology and its required current evidence.",
-      "source_obligation": "Specify the exact supported facing domain and root sign and multiplicity proof.",
+      "rationale": "Document the staged oval-pair gap and its required current evidence.",
+      "source_obligation": "Specify the exact supported facing domain and guarded half-tick comparison.",
       "unchanged_work": "The existing comparison workloads and historical evidence are preserved."
     },
-    "docs/performance/current/oval-oval-topology-movement.json": {
+    "docs/performance/current/oval-oval-gap-movement.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Document the staged oval pair topology and its required current evidence.",
-      "source_obligation": "Specify the exact supported facing domain and root sign and multiplicity proof.",
+      "rationale": "Document the staged oval-pair gap and its required current evidence.",
+      "source_obligation": "Specify the exact supported facing domain and guarded half-tick comparison.",
       "unchanged_work": "The existing comparison workloads and historical evidence are preserved."
     },
-    "docs/performance/current/oval-oval-topology-setup.json": {
+    "docs/performance/current/oval-oval-gap-setup.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Document the staged oval pair topology and its required current evidence.",
-      "source_obligation": "Specify the exact supported facing domain and root sign and multiplicity proof.",
+      "rationale": "Document the staged oval-pair gap and its required current evidence.",
+      "source_obligation": "Specify the exact supported facing domain and guarded half-tick comparison.",
       "unchanged_work": "The existing comparison workloads and historical evidence are preserved."
     },
-    "docs/performance/current/oval-oval-topology-visibility.json": {
+    "docs/performance/current/oval-oval-gap-visibility.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Document the staged oval pair topology and its required current evidence.",
-      "source_obligation": "Specify the exact supported facing domain and root sign and multiplicity proof.",
+      "rationale": "Document the staged oval-pair gap and its required current evidence.",
+      "source_obligation": "Specify the exact supported facing domain and guarded half-tick comparison.",
       "unchanged_work": "The existing comparison workloads and historical evidence are preserved."
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Document the staged oval pair topology and its required current evidence.",
-      "source_obligation": "Specify the exact supported facing domain and root sign and multiplicity proof.",
+      "rationale": "Document the staged oval-pair gap and its required current evidence.",
+      "source_obligation": "Specify the exact supported facing domain and guarded half-tick comparison.",
       "unchanged_work": "The existing comparison workloads and historical evidence are preserved."
     },
     "scripts/engine_numerical_identity_test_admission.py": {
@@ -628,7 +660,7 @@
         "engine-numerical-identity-admission"
       ],
       "selected_families": [],
-      "rationale": "Record the finite oval pair successor in the selected source and case inventory.",
+      "rationale": "Record the finite oval-pair distance successor in the selected source and case inventory.",
       "source_obligation": "Verify the predecessor digest and new helper and test bytes before admission.",
       "unchanged_work": "Previous admission records and tests retain their bytes and selection."
     },
@@ -642,7 +674,7 @@
       "source_obligation": "Advertise the actual runtime build in the current synthetic release fixtures.",
       "unchanged_work": "Historical executors, schemas, checkpoints and gameplay policy retain their original semantics."
     },
-    "src/warhammer40k_core/geometry/milli_inch_oval_oval.py": {
+    "src/warhammer40k_core/geometry/milli_inch_oval_oval_distance.py": {
       "category": "algorithm_or_search",
       "operations": [
         "geometry-search"
@@ -652,8 +684,8 @@
         "setup",
         "visibility"
       ],
-      "rationale": "Classify two filled canonical ovals with a fixed integer conic-pencil criterion.",
-      "source_obligation": "Determine positive cubic root signs and multiplicities exactly for all canonical facings.",
+      "rationale": "Compute the once-rounded Euclidean gap for two filled canonical ovals.",
+      "source_obligation": "Certify each half-tick midpoint with guarded integer polynomial sign queries.",
       "unchanged_work": "The query is staged and no existing gameplay or geometry caller uses it."
     },
     "tests/code_quality/test_engine_numerical_identity_admission.py": {
@@ -662,26 +694,26 @@
         "engine-numerical-identity-admission"
       ],
       "selected_families": [],
-      "rationale": "Record the finite oval pair successor in the selected source and case inventory.",
+      "rationale": "Record the finite oval-pair distance successor in the selected source and case inventory.",
       "source_obligation": "Verify the predecessor digest and new helper and test bytes before admission.",
       "unchanged_work": "Previous admission records and tests retain their bytes and selection."
     },
-    "tests/rules/section01/test_milli_inch_oval_oval.py": {
+    "tests/rules/section01/test_milli_inch_oval_oval_distance.py": {
       "category": "rule_semantics",
       "operations": [
         "exact-movement-test-admission"
       ],
       "selected_families": [],
-      "rationale": "Admit the focused topology tests and authenticate the added geometry source.",
+      "rationale": "Admit the focused distance tests and authenticate the added geometry source.",
       "source_obligation": "Bind the new tests and helper to the successor runtime and predecessor admission.",
       "unchanged_work": "Preserve previous geometry regressions and the complete behavioral selection."
     }
   },
   "milestone": "ordinary",
   "comparisons": {
-    "movement": "docs/performance/current/oval-oval-topology-movement.json",
-    "setup": "docs/performance/current/oval-oval-topology-setup.json",
-    "visibility": "docs/performance/current/oval-oval-topology-visibility.json"
+    "movement": "docs/performance/current/oval-oval-gap-movement.json",
+    "setup": "docs/performance/current/oval-oval-gap-setup.json",
+    "visibility": "docs/performance/current/oval-oval-gap-visibility.json"
   },
   "full_game": null
 }
