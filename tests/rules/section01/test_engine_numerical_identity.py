@@ -5,6 +5,7 @@ from __future__ import annotations
 import copy
 import hashlib
 import json
+from math import isclose
 from typing import cast
 
 import pytest
@@ -21,7 +22,7 @@ from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.replay import ReplayRunner, ReplayRunStatus
 from warhammer40k_core.engine.spatial_index_state import SpatialIndexState
 from warhammer40k_core.geometry.numerical_identity import (
-    LEGACY_NUMERICAL_IDENTITY,
+    CURRENT_NUMERICAL_IDENTITY,
     NumericalIdentity,
 )
 from warhammer40k_core.geometry.pathing import PathWitness, PathWitnessPayload
@@ -31,11 +32,18 @@ from warhammer40k_core.geometry.pose import GeometryError, Pose, PosePayload
 def test_inner_identity_survives_ordinary_move_persistence_and_replay() -> None:
     session = heavy_session(fly=True)
     session.advance_until_decision_or_terminal()
-    move_heavy_unit(session, advance=False, distance=2, flying=True)
+    move_heavy_unit(session, advance=False, distance=2.00049, flying=True)
+    state = session.lifecycle.state
+    assert state is not None
+    assert state.model_movement_history
+    assert all(
+        isclose(row.distance_inches, 2.00049, rel_tol=0, abs_tol=1e-12)
+        for row in state.model_movement_history
+    )
     payload = session.lifecycle.to_payload()
     assert payload["config"] is not None
     assert payload["state"] is not None
-    identity = LEGACY_NUMERICAL_IDENTITY.to_payload()
+    identity = CURRENT_NUMERICAL_IDENTITY.to_payload()
     assert payload["config"]["numerical_identity"] == identity
     assert payload["state"]["numerical_identity"] == identity
     restored = LocalGameSession.from_persistence_payload(
@@ -63,7 +71,7 @@ def test_inner_payload_rejects_unbound_or_incompatible_identity(owner: str, chan
     if change == "missing":
         del altered["numerical_identity"]
     elif change == "policy":
-        identity["numerical_policy_id"] = "milli-inch-half-away-v1"
+        identity["numerical_policy_id"] = "legacy-binary-inch-v1"
     elif change == "coordinates":
         identity["coordinate_representation_id"] = "rational-quadratic-coordinate-v1"
     elif change == "version":
@@ -129,7 +137,7 @@ def test_current_context_cache_binds_contract_without_changing_legacy_witness_by
         target_models=(target,),
         target_model_keywords=(("target", ()),),
     )
-    assert context.numerical_identity == LEGACY_NUMERICAL_IDENTITY
+    assert context.numerical_identity == CURRENT_NUMERICAL_IDENTITY
     witness = context.resolve_line_of_sight()
     restored = TerrainVisibilityContext.from_payload(context.to_payload())
     assert restored == context
@@ -137,7 +145,7 @@ def test_current_context_cache_binds_contract_without_changing_legacy_witness_by
     payload = context.to_payload()
     assert "numerical_identity" not in payload
     malformed = cast(dict[str, object], copy.deepcopy(payload))
-    malformed["numerical_identity"] = LEGACY_NUMERICAL_IDENTITY.to_payload()
+    malformed["numerical_identity"] = CURRENT_NUMERICAL_IDENTITY.to_payload()
     with pytest.raises(GeometryError, match="incompatible"):
         TerrainVisibilityContext.from_payload(cast(TerrainVisibilityContextPayload, malformed))
     with pytest.raises(GeometryError, match="NumericalIdentity"):
@@ -171,7 +179,10 @@ def test_linux_dispatcher_rejects_inner_policy_without_losing_session() -> None:
     from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 
     dispatcher = LinuxAuthorityDispatcher(
-        {"schema_version": PROFILE_SCHEMA, "numerical_policy_id": "legacy-binary-inch-v1"}
+        {
+            "schema_version": PROFILE_SCHEMA,
+            "numerical_policy_id": "binary-inch-milli-inch-movement-budget-v1",
+        }
     )
     created = dispatcher.dispatch(
         {
@@ -225,7 +236,10 @@ def test_current_authority_checkpoint_envelope_restores_on_same_profile() -> Non
     from warhammer40k_core.engine.event_log import validate_json_value
 
     dispatcher = LinuxAuthorityDispatcher(
-        {"schema_version": PROFILE_SCHEMA, "numerical_policy_id": "legacy-binary-inch-v1"}
+        {
+            "schema_version": PROFILE_SCHEMA,
+            "numerical_policy_id": "binary-inch-milli-inch-movement-budget-v1",
+        }
     )
     created = dispatcher.dispatch(
         {

@@ -488,7 +488,7 @@ def test_a32_oct14_reconstruction_is_deterministic_and_keeps_original_outcomes(
         assert payload.pop("tactical_secondary_draw_sequence") == 0
         assert payload.pop("numerical_identity") == {
             "version": "engine-numerical-identity-v1",
-            "numerical_policy_id": "legacy-binary-inch-v1",
+            "numerical_policy_id": "binary-inch-milli-inch-movement-budget-v1",
             "coordinate_representation_id": "binary-float-pose-v1",
         }
         field = (

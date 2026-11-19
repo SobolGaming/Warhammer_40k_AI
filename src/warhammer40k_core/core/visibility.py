@@ -80,7 +80,7 @@ from warhammer40k_core.geometry.continuous_visibility import (
     resolve_visibility_pair_uncached,
 )
 from warhammer40k_core.geometry.numerical_identity import (
-    LEGACY_NUMERICAL_IDENTITY,
+    CURRENT_NUMERICAL_IDENTITY,
     NumericalIdentity,
     validate_numerical_identity,
 )
@@ -179,7 +179,7 @@ class TerrainVisibilityContext:
     dynamic_model_blockers: tuple[Model, ...] = ()
     observer_keywords: tuple[str, ...] = ()
     battlefield_bounds: BattlefieldVisibilityBounds | None = None
-    numerical_identity: NumericalIdentity = LEGACY_NUMERICAL_IDENTITY
+    numerical_identity: NumericalIdentity = CURRENT_NUMERICAL_IDENTITY
 
     def __post_init__(self) -> None:
         validate_numerical_identity(self.numerical_identity)

@@ -199,7 +199,7 @@
       "workload_id": "external-contract-orphan-write-independent-check-v1",
       "input_binding": {
         "schema": "tool-input-roles-v4",
-        "role_specification": "docs/performance/policy-v3/numerical-identity-main692-input-roles-v4.json"
+        "role_specification": "docs/performance/policy-v3/gameplay-movement-budget-input-roles-v4.json"
       }
     },
     "session_command_fork": {
@@ -36406,6 +36406,24 @@
         "movement"
       ],
       "sensitive": true,
+      "mandatory": true
+    },
+    "gameplay-movement-budget-test-admission": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/gameplay-movement-budget-test-transition-v1.json"
+      ],
+      "owners": ["*"],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "gameplay-movement-budget-contract": {
+      "paths": [
+        "contracts/compatibility/48.0.0-shape.json"
+      ],
+      "owners": ["*"],
+      "families": [],
+      "sensitive": false,
       "mandatory": true
     },
     "exact-movement-test-admission": {

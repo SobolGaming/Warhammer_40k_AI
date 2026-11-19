@@ -247,11 +247,9 @@ def main() -> None:
     if "numerical_identity" in config_payload:
         raise ValueError("Retained source fixture unexpectedly contains numerical identity.")
     if args.config_encoding == "engine-numerical-identity-v1":
-        config_payload["numerical_identity"] = {
-            "version": "engine-numerical-identity-v1",
-            "numerical_policy_id": "legacy-binary-inch-v1",
-            "coordinate_representation_id": "binary-float-pose-v1",
-        }
+        from warhammer40k_core.geometry.numerical_identity import NumericalIdentity
+
+        config_payload["numerical_identity"] = NumericalIdentity().to_payload()
     config_bytes = json.dumps(config_payload, sort_keys=True).encode()
     ordinal_bytes = json.dumps(
         ordinal_identity_config_payload(json.loads(config_bytes)), sort_keys=True

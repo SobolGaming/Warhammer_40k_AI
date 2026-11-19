@@ -22,7 +22,7 @@ from warhammer40k_core.engine.unit_factory import ModelInstance
 from warhammer40k_core.engine.unit_ownership import SplitUnitOriginPayload
 from warhammer40k_core.geometry.measurement import millimeters_to_inches
 from warhammer40k_core.geometry.model_geometry import BaseFootprintKind
-from warhammer40k_core.geometry.numerical_identity import LEGACY_NUMERICAL_IDENTITY
+from warhammer40k_core.geometry.numerical_identity import CURRENT_NUMERICAL_IDENTITY
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
 
@@ -739,7 +739,7 @@ def authoritative_geometry_hash(
     payload = validate_json_value(
         {
             "coordinate_spec_version": BATTLEFIELD_COORDINATE_SPEC_VERSION,
-            "numerical_identity": cast(JsonValue, LEGACY_NUMERICAL_IDENTITY.to_payload()),
+            "numerical_identity": cast(JsonValue, CURRENT_NUMERICAL_IDENTITY.to_payload()),
             "bounds": cast(JsonValue, bounds),
             "authoritative": cast(JsonValue, authoritative),
         }

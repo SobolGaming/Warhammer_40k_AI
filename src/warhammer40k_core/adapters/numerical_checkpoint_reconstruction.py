@@ -26,7 +26,7 @@ from warhammer40k_core.engine.replay import (
     ReplayRunner,
     ReplayRunStatus,
 )
-from warhammer40k_core.geometry.numerical_identity import LEGACY_NUMERICAL_IDENTITY
+from warhammer40k_core.geometry.numerical_identity import CURRENT_NUMERICAL_IDENTITY
 
 PROFILE_ID = "local-checkpoint:legacy-model-completion:2026-10-14:numerical-identity-v1"
 RECOVERY_SCHEMA = "local-checkpoint-reconstruction-v4-numerical-identity"
@@ -36,10 +36,10 @@ CheckpointReconstructionError = retained.CheckpointReconstructionError
 # SetupReplayCheckpoint owner. No arbitrary source hash is admitted.
 SETUP_HASH_SUCCESSOR = {
     "995d3bcaa86cb70be1ee62e106fd847257cd083718ea31cda4db674ad2a95640": (
-        "903922c601f9f3cfbd68e6dec71347318a97f02ba8b28dcbb053047ae4055db1"
+        "3b2787abfbe80d7c77912f5526808805991bc5d3846e25fa7532c722bc30f4c9"
     ),
     "30b25e7df9cbf541a5838a49b2bf0cf7dfaed74accd9238060dd726d578f43d6": (
-        "9ed1a83f9c0ba23477530791731addb1fa1c7626eff02e003e17d0d145ca93de"
+        "e6c1ebd4b5897da0df61e0886be5acb3bffb5f4f3e967123b26b5b364d4d950d"
     ),
 }
 
@@ -69,7 +69,7 @@ def _add_identity(value: JsonValue, *, final: bool) -> dict[str, JsonValue]:
             target = retained._object(anchor[owner])
             if "numerical_identity" in target:
                 raise CheckpointReconstructionError("Historical numerical anchor drifted.")
-            target["numerical_identity"] = cast(JsonValue, LEGACY_NUMERICAL_IDENTITY.to_payload())
+            target["numerical_identity"] = cast(JsonValue, CURRENT_NUMERICAL_IDENTITY.to_payload())
         decisions = retained._object(anchor["decisions"])
         decisions["event_log"] = _setup_hashes(decisions["event_log"])
     return mapped
@@ -84,7 +84,7 @@ def _remove_identity(value: JsonValue, *, final: bool) -> dict[str, JsonValue]:
             anchor = retained._object(anchor[key])
         for owner in ("config", "state"):
             target = retained._object(anchor[owner])
-            if target.get("numerical_identity") != LEGACY_NUMERICAL_IDENTITY.to_payload():
+            if target.get("numerical_identity") != CURRENT_NUMERICAL_IDENTITY.to_payload():
                 raise CheckpointReconstructionError("Reconstructed numerical identity drifted.")
             del target["numerical_identity"]
         decisions = retained._object(anchor["decisions"])
@@ -123,7 +123,7 @@ def _mapping(
                 "reconstructed": REPLAY_ARTIFACT_SCHEMA_VERSION,
             },
             "numerical_identity_mapping": {
-                "identity": cast(JsonValue, LEGACY_NUMERICAL_IDENTITY.to_payload()),
+                "identity": cast(JsonValue, CURRENT_NUMERICAL_IDENTITY.to_payload()),
                 "initial_anchor_paths": [
                     "/" + "/".join(path) for path in retained._INITIAL_RNG_ANCHORS
                 ],
@@ -151,7 +151,7 @@ def _mapping(
                     "path": f"/payload/{field}/state_hash",
                     "original": before,
                     "reconstructed": SETUP_HASH_SUCCESSOR[v3_hash],
-                    "reason": "Explicit audit RNG and legacy numerical identity.",
+                    "reason": "Explicit audit RNG and current numerical identity.",
                 }
                 for event_id, field, before, v3_hash in retained._SETUP_HASH_MAPPINGS
             ],

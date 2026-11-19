@@ -1,4 +1,4 @@
-"""Policy admission and envelope identity; no claim of milli-inch gameplay."""
+"""Movement-budget policy admission and Linux envelope identity."""
 
 from __future__ import annotations
 
@@ -19,7 +19,7 @@ from warhammer40k_core.adapters.execution_profile import (
 from warhammer40k_core.adapters.linux_authority_transport import LinuxAuthority
 from warhammer40k_core.adapters.linux_authority_worker import LinuxAuthorityDispatcher
 from warhammer40k_core.adapters.numerical_policy import (
-    LEGACY_NUMERICAL_POLICY_ID,
+    CURRENT_NUMERICAL_POLICY_ID,
     NumericalPolicyConfiguration,
     NumericalPolicyError,
 )
@@ -65,13 +65,13 @@ def test_missing_policy_and_retained_profile_require_their_original_executor() -
 
 def test_policy_configuration_and_checkpoint_cache_identity_are_explicit() -> None:
     policy = NumericalPolicyConfiguration()
-    assert policy.numerical_policy_id == LEGACY_NUMERICAL_POLICY_ID
+    assert policy.numerical_policy_id == CURRENT_NUMERICAL_POLICY_ID
     with pytest.raises(FrozenInstanceError):
         policy.__setattr__("numerical_policy_id", "milli-inch-half-away-v1")
     first = policy.checkpoint_cache_identity(
         execution_profile_hash="profile-a", inner_checkpoint_hash="state-a"
     )
-    assert first == (LEGACY_NUMERICAL_POLICY_ID, "profile-a", "state-a")
+    assert first == (CURRENT_NUMERICAL_POLICY_ID, "profile-a", "state-a")
     assert first != policy.checkpoint_cache_identity(
         execution_profile_hash="profile-b", inner_checkpoint_hash="state-a"
     )
@@ -80,7 +80,7 @@ def test_policy_configuration_and_checkpoint_cache_identity_are_explicit() -> No
     )
     profile: dict[str, JsonValue] = {
         "schema_version": PROFILE_SCHEMA,
-        "numerical_policy_id": LEGACY_NUMERICAL_POLICY_ID,
+        "numerical_policy_id": CURRENT_NUMERICAL_POLICY_ID,
     }
     dispatcher = LinuxAuthorityDispatcher(profile)
     before = dispatcher.profile

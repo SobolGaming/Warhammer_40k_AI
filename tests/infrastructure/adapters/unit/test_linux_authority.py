@@ -35,7 +35,7 @@ from warhammer40k_core.adapters.linux_authority_transport import (
 from warhammer40k_core.adapters.linux_authority_worker import LinuxAuthorityDispatcher
 from warhammer40k_core.adapters.linux_session import viewer_payload
 from warhammer40k_core.adapters.local_session import LOCAL_GAME_SESSION_PERSISTENCE_SCHEMA_VERSION
-from warhammer40k_core.adapters.numerical_policy import LEGACY_NUMERICAL_POLICY_ID
+from warhammer40k_core.adapters.numerical_policy import CURRENT_NUMERICAL_POLICY_ID
 from warhammer40k_core.adapters.server import AdapterGameServer
 from warhammer40k_core.adapters.session_persistence import SQLiteSessionPersistenceStore
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
@@ -81,7 +81,7 @@ def test_executor_registration_requires_the_registered_profile_and_same_engine()
     selected: JsonValue = {
         "schema_version": PROFILE_SCHEMA,
         "engine_build_id": "selected-build",
-        "numerical_policy_id": LEGACY_NUMERICAL_POLICY_ID,
+        "numerical_policy_id": CURRENT_NUMERICAL_POLICY_ID,
     }
     validate_executor_profile(selected, expected=selected, engine_build_id="selected-build")
     with pytest.raises(ExecutionProfileError, match="same engine build"):
@@ -111,7 +111,7 @@ def test_dispatcher_real_native_roster_restore_fork_viewers_and_exact_replay() -
     # host's numerical behavior is a registered Linux execution profile.
     profile: dict[str, JsonValue] = {
         "schema_version": PROFILE_SCHEMA,
-        "numerical_policy_id": LEGACY_NUMERICAL_POLICY_ID,
+        "numerical_policy_id": CURRENT_NUMERICAL_POLICY_ID,
         "dispatcher-contract-fixture": "host-native",
     }
     dispatcher = LinuxAuthorityDispatcher(profile)
@@ -251,7 +251,7 @@ def test_selected_linux_process_implements_adapter_session_and_roundtrips(tmp_pa
         cast(GameConfigPayload, original.lifecycle.to_payload()["config"])
     )
     with LinuxAuthority(command, expected_profile=profile) as authority:
-        assert authority.numerical_policy.numerical_policy_id == LEGACY_NUMERICAL_POLICY_ID
+        assert authority.numerical_policy.numerical_policy_id == CURRENT_NUMERICAL_POLICY_ID
         session = authority.session()
         assert session.numerical_policy == authority.numerical_policy
         assert isinstance(session, AdapterGameSession)

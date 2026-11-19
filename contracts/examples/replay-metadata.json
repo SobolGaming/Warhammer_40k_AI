@@ -5727,7 +5727,7 @@
       },
       "numerical_identity": {
         "coordinate_representation_id": "binary-float-pose-v1",
-        "numerical_policy_id": "legacy-binary-inch-v1",
+        "numerical_policy_id": "binary-inch-milli-inch-movement-budget-v1",
         "version": "engine-numerical-identity-v1"
       },
       "player_ids": [
@@ -12401,7 +12401,7 @@
         },
         "numerical_identity": {
           "coordinate_representation_id": "binary-float-pose-v1",
-          "numerical_policy_id": "legacy-binary-inch-v1",
+          "numerical_policy_id": "binary-inch-milli-inch-movement-budget-v1",
           "version": "engine-numerical-identity-v1"
         },
         "player_ids": [
@@ -17338,7 +17338,7 @@
         "normal_move_states": [],
         "numerical_identity": {
           "coordinate_representation_id": "binary-float-pose-v1",
-          "numerical_policy_id": "legacy-binary-inch-v1",
+          "numerical_policy_id": "binary-inch-milli-inch-movement-budget-v1",
           "version": "engine-numerical-identity-v1"
         },
         "objective_control_record_authorities": [],
@@ -26683,7 +26683,7 @@
       "normal_move_states": [],
       "numerical_identity": {
         "coordinate_representation_id": "binary-float-pose-v1",
-        "numerical_policy_id": "legacy-binary-inch-v1",
+        "numerical_policy_id": "binary-inch-milli-inch-movement-budget-v1",
         "version": "engine-numerical-identity-v1"
       },
       "objective_control_record_authorities": [],
@@ -26821,7 +26821,7 @@
   "source_identity": {
     "catalog_hash": "d919008fb1caec80042499fc0dc728c71330c5e38f4976fb8cc630bb49aee3de",
     "catalog_id": "phase9a-canonical",
-    "game_config_hash": "baff260b7f8a364660e96ed508fa405cdb601b5838d3b5f3d4bfb2f292ff2f03",
+    "game_config_hash": "783909b064ddbe2f13bad214e046403fc6d523ede0c24afefafbbd16aece3ff2",
     "game_id": "phase18d-contract-session",
     "mission_pack_id": "11e-warhammer-event-companion-2026-07",
     "mission_source_package_hash": "4832f73e470caa4d0906fef06af3f05f53b00a68bbfdbb3d2c639eec6e323fb0",

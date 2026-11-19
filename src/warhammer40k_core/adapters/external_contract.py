@@ -12,7 +12,7 @@ from referencing.jsonschema import Schema
 
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 
-EXTERNAL_CONTRACT_VERSION = "47.0.0"
+EXTERNAL_CONTRACT_VERSION = "48.0.0"
 
 CREATE_SESSION_SCHEMA_VERSION = "create-session-v5-numerical-identity"
 DECISION_FAMILY_COVERAGE_SCHEMA_VERSION = "decision-family-coverage-v2-interactions"
@@ -27,8 +27,8 @@ SESSION_COMMAND_ENVELOPE_SCHEMA_VERSION = "session-command-envelope-v3-viewer-id
 SESSION_COMMAND_OUTCOME_SCHEMA_VERSION = "session-command-outcome-v47-contract"
 SESSION_CREATE_SCHEMA_VERSION = "session-create-v6-numerical-identity"
 SESSION_METADATA_SCHEMA_VERSION = "session-metadata-v47-contract"
-SESSION_PERSISTENCE_CONTRACT_VERSION = "47.0.0"
-SESSION_PERSISTENCE_SCHEMA_VERSION = "session-persistence-v38-contract47"
+SESSION_PERSISTENCE_CONTRACT_VERSION = "48.0.0"
+SESSION_PERSISTENCE_SCHEMA_VERSION = "session-persistence-v39-contract48"
 SESSION_PROJECTION_SCHEMA_VERSION = "session-projection-v10-viewer-identities"
 
 CREATE_SESSION_SCHEMA_NAME = "create-session.schema.json"

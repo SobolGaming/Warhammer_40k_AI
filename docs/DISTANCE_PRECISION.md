@@ -1,8 +1,31 @@
 # Distance precision contract and rollout status
 
-## Active inner numerical identity
+## Active whole-path movement budgets
 
-New native and registered Linux sessions bind `engine-numerical-identity-v1` in
+The shared movement distance witness measures each submitted path from its
+original binary-float waypoints. It adds the complete geometric length, then
+rounds once to the nearest 0.001 inch with exact half-ticks rounded up.
+Each waypoint denotes its exact stored binary ratio. For a budget of six
+inches, lengths below 6.0005 inches can round to six inches. A mathematical
+length of 6.0005 inches rounds to 6.001 and exceeds that budget.
+
+The witness retains the unrounded segment measurements and their sum.
+`budget.total_distance_inches` is the once-rounded value compared with the
+existing rules budget. Normal Move and the other callers of the shared path
+validator use this comparison. The path, facing, contact and overlap
+predicates, terrain traversal, and vertical measurement rules remain owned by
+their existing validators. Range, coherency and other geometric queries
+continue to apply their own measurement rules.
+
+The executable policy is `binary-inch-milli-inch-movement-budget-v1` with
+`binary-float-pose-v1`. It is the default for new games. Contract 48 records the
+current policy for native and registered Linux execution. The full coordinated
+canonical-geometry rollout described below concerns broader geometry changes.
+A separate compatibility mode is unnecessary during current development.
+
+## Previous numerical identity rollout
+
+The previous native and registered Linux sessions bound `engine-numerical-identity-v1` in
 both `GameConfig` and `GameState`. The only admitted combination is
 `legacy-binary-inch-v1` with `binary-float-pose-v1`. Construction, restoration and
 config/state consistency reject other identities; missing identity requires the
@@ -34,8 +57,8 @@ dice faces and gameplay outcomes remain preserved. Current positive reconstructi
 continuation, fork, persistence/replay and tamper controls use the explicit v4
 profile. No loader automatically selects it after a failed restore.
 
-This slice activates identity enforcement and strict legacy path decoding. It does
-not activate milli-inch measurement or rational/quadratic poses. Authoritative
+That slice established identity enforcement and strict binary-float path decoding.
+Rational and quadratic poses remain staged. Authoritative
 `Pose`, physical models, spatial state, terrain/backend predicates and solver
 witnesses still require a coordinated exact representation before exact movement
 can be admitted. No exact shadow state, rounding conversion or approximate fallback
@@ -69,14 +92,13 @@ unsupported elevation or facing changes raise typed errors. The finite tests
 cover the 1.0005-inch contact boundary, simultaneous irrational contact,
 obstructed paths with clear endpoints, stale witnesses and restoration.
 
-This is a staged engine boundary. Registered and native gameplay sessions still
-admit only the legacy float profile. Integration with the ordinary decision
+This is a staged engine boundary. Registered and native gameplay sessions use binary-float poses. Integration with the ordinary decision
 lifecycle, terrain and model groups, lower geometry caches, solver/backend
 agreement, and whole-session save/replay qualification remain activation work.
 
-## Explicit legacy policy binding
+## Previous explicit legacy policy binding
 
-New registered Linux executors use `linux-execution-profile-v2-numerical-policy`
+The previous registered Linux executors used `linux-execution-profile-v2-numerical-policy`
 and explicitly declare `legacy-binary-inch-v1`. This ID names the existing
 unrounded binary-inch execution semantics; it does not claim that every internal
 calculation is floating point. `NumericalPolicyConfiguration` is immutable, and
@@ -96,8 +118,8 @@ replay require the exact registered profile before decoding the inner payload.
 This is the outer identity slice. The active inner identity section above supersedes the earlier unbound config,
 state, spatial keys, geometry hash and native persistence/replay format. Numerical
 arithmetic and decision/event semantics remain legacy.
-The unprofiled native API remains the existing legacy path; it does not accept a
-new numerical mode. Retained profile-v1 envelopes require their original compatible
+The unprofiled native API at that revision used the same legacy arithmetic.
+Retained profile-v1 envelopes require their original compatible
 executor. The generic envelope byte utility can preserve those original bytes,
 but that preservation does not admit them on a new profile-v2 executor. Explicit
 legacy enrollment retains its required provenance receipt and strict inner
@@ -562,8 +584,7 @@ Activation checklist item 2 is partially discharged for these finite constructio
 only. General supported primitive queries, rotated/oval and backend/solver
 agreement, repeated derived placements, mandatory engine full-path witnesses,
 inner profiles/hashes/caches, coordinated rules, persistence/replay and shared
-adapter qualification remain open. Only `legacy-binary-inch-v1` remains executable;
-Linux remains authoritative. Historical bytes, producers and paused Fight work
+adapter qualification remain open. Linux remains authoritative. Historical bytes, producers and paused Fight work
 are preserved. No native Windows/Linux engine equivalence is established.
 
 
@@ -571,8 +592,8 @@ are preserved. No native Windows/Linux engine equivalence is established.
 
 The implemented arithmetic and canonical circle/polygon queries remain inactive
 prerequisites. Outer policy binding and the legacy-only inner identity/cache/path
-admission described above are active. New-mode gameplay may be admitted only
-after all of these concrete obligations are completed and independently reviewed:
+admission described above are active. The broader canonical-geometry rollout requires the following obligations.
+The active movement-budget measurement above has its own bounded scope:
 
 1. **Primitive geometry:** complete the supported circle/polygon and oval/rotated
    shape queries, including exact contact/overlap and once-rounded derived lengths.
@@ -699,12 +720,10 @@ An unresolved calculation never returns an approximate measurement or legality
 answer. It supports sums of square roots of rational squared lengths, not arbitrary
 algebraic expressions or unbounded future gameplay workloads.
 
-No production gameplay caller imports this module. Inner identity, canonical
+The shared movement budget uses the scalar path measurement. Canonical
 geometry inputs, geometry/spatial hashes and caches, ordinary contact
 representability and coordinated rule consumers remain activation prerequisites.
-Only the existing legacy numerical policy remains executable. Historical saves,
-replays, evidence and profiles retain their original bytes and semantics, and
-Linux remains authoritative. This slice does not claim native OS equivalence.
+The executable movement-budget policy is described above. Linux remains authoritative. This slice does not claim native OS equivalence.
 
 Scheduling admits this exact symbolic module/test source tuple through a finite
 successor to the precision-profile admission. The prior covered baselines,
@@ -718,12 +737,9 @@ policy or qualify native OS equivalence.
 ## Staged milli-inch numerical policy
 
 `milli-inch-half-away-v1` defines the new distance arithmetic foundation. It is
-**not active gameplay or a replacement for `battlefield-coordinate-v1`** in this
-slice. Existing sessions, proposals, legality predicates, persistence and clients
-continue under their registered runtime. Importing the new pure arithmetic module
-does not opt a session into new semantics. Activation requires the remaining coordinated
-inner identity and geometry changes below; clients must never opt in by
-rounding an existing payload themselves.
+used as arithmetic for the active movement budget. Its canonical coordinate
+specification is staged and does not replace `battlefield-coordinate-v1`.
+Clients submit the original path and preserve the engine's geometry payloads.
 
 The policy quantum is exactly `1/1000 inch`. A canonical length or signed
 coordinate is an integer number of ticks. Round to the nearest tick; an exact
@@ -810,11 +826,8 @@ same ordinary viewer-scoped decisions and preserve the authority's canonical
 payloads. Integer arithmetic portability alone does not prove native geometry,
 solver or whole-game cross-platform equivalence.
 
-Before activation, qualification must cover signed and unsigned ties, exact unit
-conversion, squared and algebraic measurements, strict/inclusive thresholds,
+Qualification of the broader rollout covers signed and unsigned ties, exact unit
+conversion, squared and algebraic measurements, strict and inclusive thresholds,
 contact versus overlap, path subdivision and accumulation, collapsed topology,
-profile/hash/cache separation, valid-state persistence/full replay, and both OS
-clients. Until those gates pass, this section specifies the target semantics and
-the implemented pure foundation, symbolic measurement prerequisite and active
-outer/inner legacy identity enforcement only; it makes no
-project-wide rollout claim.
+profile and cache identity, valid-state persistence and replay, and both OS
+clients. The active scope today is the shared movement-budget measurement.

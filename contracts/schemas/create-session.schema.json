@@ -604,7 +604,7 @@
             },
             "numerical_policy_id": {
               "type": "string",
-              "const": "legacy-binary-inch-v1"
+              "const": "binary-inch-milli-inch-movement-budget-v1"
             },
             "coordinate_representation_id": {
               "type": "string",
