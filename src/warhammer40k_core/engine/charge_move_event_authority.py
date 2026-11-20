@@ -145,9 +145,10 @@ def validate_charge_move_completed_event_authority(
     payload: dict[str, JsonValue],
     ruleset_descriptor: RulesetDescriptor,
     configured_ruleset_descriptor_hash: str,
-    verify_path_budgets: bool = True,
 ) -> ChargeMoveCompletedEventAuthority:
     """Authenticate a charge completion against its exact decision and path chain."""
+    from warhammer40k_core.engine.movement_decision_authority import is_live_movement_history
+
     if type(event_index) is not int or not 0 <= event_index < len(event_records):
         raise GameLifecycleError("Charge move-completed event index is invalid.")
     if type(ruleset_descriptor) is not RulesetDescriptor:
@@ -238,7 +239,7 @@ def validate_charge_move_completed_event_authority(
         witness=witness,
         ruleset_descriptor=ruleset_descriptor,
         configured_ruleset_descriptor_hash=configured_ruleset_descriptor_hash,
-        verify_path_budgets=verify_path_budgets,
+        verify_path_budgets=not is_live_movement_history(event_index, event),
     )
     from warhammer40k_core.engine.interrupted_charge import charge_turn_owner_at_event
 

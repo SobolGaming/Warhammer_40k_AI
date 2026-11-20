@@ -36465,13 +36465,10 @@
       "sensitive": false,
       "mandatory": true
     },
-    "gameplay-movement-linked-battle-shock-reroll": {
-      "paths": ["src/warhammer40k_core/engine/battle_shock_pending_authority.py"],
-      "owners": [
-        "invalid_live_pending_battle_shock_reroll_status",
-        "validate_live_pending_battle_shock_reroll_authority"
-      ],
-      "families": ["movement", "reconstruction", "shock_reconstruction", "dice"],
+    "gameplay-live-movement-history-occurrence": {
+      "paths": ["src/warhammer40k_core/engine/event_log.py"],
+      "owners": ["EventLog.owns_record_at"],
+      "families": ["movement", "player_boundary", "reconstruction"],
       "sensitive": true,
       "mandatory": true
     },

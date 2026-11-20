@@ -46,7 +46,6 @@ def validate_live_pending_battle_shock_reroll_authority(
     decision_records: tuple[DecisionRecord, ...],
     pending_request: DecisionRequest,
     runtime_content_bundle: RuntimeContentBundle,
-    verify_charge_path_budgets: bool = True,
 ) -> PendingBattleShockRerollAuthority:
     authority = parse_pending_battle_shock_reroll_authority(pending_request)
     if (
@@ -113,7 +112,6 @@ def validate_live_pending_battle_shock_reroll_authority(
         request_event_index=request_event_index,
         authority=authority,
         runtime_content_bundle=runtime_content_bundle,
-        verify_charge_path_budgets=verify_charge_path_budgets,
     )
     expected_permission = runtime_content_bundle.battle_shock_hook_registry.reroll_permission_for(
         BattleShockRerollPermissionContext(
@@ -142,8 +140,6 @@ def invalid_live_pending_battle_shock_reroll_status(
         and "battle_shock_context" in pending_request.payload
     ):
         return None
-    # This submission uses the engine's existing Charge completion event.
-    # Restoring the same pending request still uses exact path verification.
     try:
         validate_live_pending_battle_shock_reroll_authority(
             state=state,
@@ -151,7 +147,6 @@ def invalid_live_pending_battle_shock_reroll_status(
             decision_records=decisions.records,
             pending_request=pending_request,
             runtime_content_bundle=runtime_content_bundle,
-            verify_charge_path_budgets=False,
         )
         result.validate_for_request(pending_request)
     except (

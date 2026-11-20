@@ -717,32 +717,37 @@ class GameLifecycle:
 
     def _advance_once(self) -> LifecycleStatus:
         from warhammer40k_core.engine.lifecycle_advancement import advance_once
+        from warhammer40k_core.engine.movement_decision_authority import reuse_live_movement_history
 
-        return advance_once(self)
+        with reuse_live_movement_history(self.decision_controller.event_log):
+            return advance_once(self)
 
     def submit_decision(self, result: DecisionResult) -> LifecycleStatus:
-        state = self._require_state()
-        pending_request = self._pending_decision_request()
-        if (
-            type(result) is DecisionResult
-            and pending_request is not None
-            and pending_request.decision_type in _CERTIFIED_MOVEMENT_DECISION_TYPES
-        ):
-            from warhammer40k_core.geometry.movement_envelope import (
-                MovementDistanceUnresolvedError,
-                reuse_movement_certificates,
-            )
+        from warhammer40k_core.engine.movement_decision_authority import reuse_live_movement_history
 
-            with reuse_movement_certificates():
-                try:
-                    return self._apply_submitted_decision(
-                        state, pending_request, result, certify=True
-                    )
-                except MovementDistanceUnresolvedError:
-                    if self._pending_decision_request() != pending_request:
-                        raise
-                    return self._unresolved_movement_status(state, pending_request, result)
-        return self._apply_submitted_decision(state, pending_request, result)
+        with reuse_live_movement_history(self.decision_controller.event_log):
+            state = self._require_state()
+            pending_request = self._pending_decision_request()
+            if (
+                type(result) is DecisionResult
+                and pending_request is not None
+                and pending_request.decision_type in _CERTIFIED_MOVEMENT_DECISION_TYPES
+            ):
+                from warhammer40k_core.geometry.movement_envelope import (
+                    MovementDistanceUnresolvedError,
+                    reuse_movement_certificates,
+                )
+
+                with reuse_movement_certificates():
+                    try:
+                        return self._apply_submitted_decision(
+                            state, pending_request, result, certify=True
+                        )
+                    except MovementDistanceUnresolvedError:
+                        if self._pending_decision_request() != pending_request:
+                            raise
+                        return self._unresolved_movement_status(state, pending_request, result)
+            return self._apply_submitted_decision(state, pending_request, result)
 
     def _apply_submitted_decision(
         self,

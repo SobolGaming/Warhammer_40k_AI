@@ -19,8 +19,15 @@ from tests.support.section11_fixtures import (
     witness,
 )
 from warhammer40k_core.engine.charge_model_endpoints import ChargeModelEndpointWitness
+from warhammer40k_core.engine.charge_move_event_authority import (
+    ChargeMoveCompletedEventAuthority,
+    validate_charge_move_completed_event_authority,
+)
+from warhammer40k_core.engine.event_log import EventRecord
+from warhammer40k_core.engine.movement_decision_authority import reuse_live_movement_history
 from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatusKind
 from warhammer40k_core.geometry import milli_inch_symbolic
+from warhammer40k_core.geometry.movement_envelope import MovementDistanceUnresolvedError
 from warhammer40k_core.geometry.path_measurement import interpolate_pose
 from warhammer40k_core.geometry.pathing import PathWitness
 from warhammer40k_core.geometry.pose import Pose
@@ -357,3 +364,46 @@ def test_native_charge_certification_timeout_leaves_the_same_proposal_retryable(
         )
         == 1
     )
+
+    decisions = session.lifecycle.decision_controller
+    event_records = decisions.event_log.records
+    (event_index,) = tuple(
+        index
+        for index, event in enumerate(event_records)
+        if event.event_type == "charge_move_completed"
+    )
+
+    descriptor = session.lifecycle.config.ruleset_descriptor
+
+    def charge_authority(history: tuple[EventRecord, ...]) -> ChargeMoveCompletedEventAuthority:
+        payload = history[event_index].payload
+        assert isinstance(payload, dict)
+        return validate_charge_move_completed_event_authority(
+            event_records=history,
+            decision_records=decisions.records,
+            event_index=event_index,
+            payload=payload,
+            ruleset_descriptor=descriptor,
+            configured_ruleset_descriptor_hash=descriptor.descriptor_hash,
+        )
+
+    expected_authority = charge_authority(event_records)
+    copied_charge = EventRecord.from_payload(event_records[event_index].to_payload())
+    reloaded_history = (
+        *event_records[:event_index],
+        copied_charge,
+        *event_records[event_index + 1 :],
+    )
+
+    def expire(*_args: object, **_kwargs: object) -> int:
+        raise milli_inch_symbolic.UnresolvedDistanceMeasurementError("test clock expired")
+
+    with monkeypatch.context() as patch:
+        patch.setattr(milli_inch_symbolic, "symbolic_squared_path_inches_to_ticks", expire)
+        with reuse_live_movement_history(decisions.event_log):
+            assert charge_authority(event_records) == expected_authority
+            assert charge_authority(event_records[: event_index + 1]) == expected_authority
+            with pytest.raises(MovementDistanceUnresolvedError):
+                charge_authority(reloaded_history)
+        with pytest.raises(MovementDistanceUnresolvedError):
+            charge_authority(event_records)

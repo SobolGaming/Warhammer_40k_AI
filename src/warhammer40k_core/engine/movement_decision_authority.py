@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+from collections.abc import Generator
+from contextlib import contextmanager
+from contextvars import ContextVar
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, cast
 
@@ -16,7 +19,7 @@ from warhammer40k_core.engine.battlefield_transition_history import (
 from warhammer40k_core.engine.decision_record import DecisionRecord
 from warhammer40k_core.engine.decision_request import DecisionRequest, DecisionRequestPayload
 from warhammer40k_core.engine.decision_result import DecisionResult
-from warhammer40k_core.engine.event_log import EventRecord, JsonValue
+from warhammer40k_core.engine.event_log import EventLog, EventRecord, JsonValue
 from warhammer40k_core.engine.flight_decision_authority import (
     invalid_flight_authority,
     validate_restored_flight,
@@ -46,6 +49,26 @@ from warhammer40k_core.geometry.pathing import PathWitness
 if TYPE_CHECKING:
     from warhammer40k_core.engine.decision_controller import DecisionController
     from warhammer40k_core.engine.game_state import GameState
+
+
+_LIVE_MOVEMENT_HISTORY: ContextVar[EventLog | None] = ContextVar(
+    "live_movement_history", default=None
+)
+
+
+@contextmanager
+def reuse_live_movement_history(event_log: EventLog) -> Generator[None]:
+    """Reuse certificates from the engine-owned event log during live play."""
+    token = _LIVE_MOVEMENT_HISTORY.set(event_log)
+    try:
+        yield
+    finally:
+        _LIVE_MOVEMENT_HISTORY.reset(token)
+
+
+def is_live_movement_history(index: int, event: EventRecord) -> bool:
+    event_log = _LIVE_MOVEMENT_HISTORY.get()
+    return event_log is not None and event_log.owns_record_at(index, event)
 
 
 def invalid_movement_authority(

@@ -27,11 +27,16 @@ from warhammer40k_core.core.datasheet import (
 from warhammer40k_core.core.modifiers import RollModifier
 from warhammer40k_core.engine.abilities import AbilityCatalogIndex
 from warhammer40k_core.engine.ability_catalog import catalog_ability_records_from_catalog
+from warhammer40k_core.engine.battle_shock import BattleShockResult, BattleShockResultPayload
+from warhammer40k_core.engine.battle_shock_event_authority import (
+    validate_battle_shock_resolution_event_authority,
+)
 from warhammer40k_core.engine.catalog_desperate_escape import (
     battle_shocked_roll_modifiers_for_record,
 )
 from warhammer40k_core.engine.dice import DICE_REROLL_DECISION_TYPE, DiceRollManager
 from warhammer40k_core.engine.event_log import validate_json_value
+from warhammer40k_core.engine.movement_decision_authority import reuse_live_movement_history
 from warhammer40k_core.engine.movement_proposals import (
     MovementProposalPayload,
     MovementProposalRequest,
@@ -457,6 +462,29 @@ def test_native_escape_battle_shock_reroll_reuses_certified_path(
             option_id=option_id,
             result_id="escape-reroll",
         )
+        decisions = session.lifecycle.decision_controller
+        history = decisions.event_log.records
+        ((resolved_index, resolved_event),) = tuple(
+            (index, event)
+            for index, event in enumerate(history)
+            if event.event_type == "battle_shock_test_resolved"
+        )
+        resolved_payload = resolved_event.payload
+        assert isinstance(resolved_payload, dict)
+        result = BattleShockResult.from_payload(
+            cast(BattleShockResultPayload, resolved_payload["battle_shock_result"])
+        )
+        with reuse_live_movement_history(decisions.event_log):
+            assert (
+                validate_battle_shock_resolution_event_authority(
+                    event_records=history,
+                    decision_records=decisions.records,
+                    resolved_index=resolved_index,
+                    resolved_payload=resolved_payload,
+                    result=result,
+                ).result
+                == result
+            )
     assert completed.status_kind is not LifecycleStatusKind.INVALID, completed.to_payload()
     records = session.lifecycle.decision_controller.records
     rerolls = [
