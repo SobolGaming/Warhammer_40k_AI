@@ -16,11 +16,11 @@
     },
     "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
       "before_sha256": "bbc748ab6da88928b848a9063d419469ef8bee56b3f27dcc0fae8f3858cd9a3d",
-      "after_sha256": "7b7adc198b0ba618d649eea04a9381b4f0e60557c78d0fa166ae1970be45ff4c",
+      "after_sha256": "0b7e71a88bc1ee0c8a1010126cc5ccbb0fe1209d038579615f1cebb645b9de34",
       "owners": {
         "@document": {
           "before": "bbc748ab6da88928b848a9063d419469ef8bee56b3f27dcc0fae8f3858cd9a3d",
-          "after": "7b7adc198b0ba618d649eea04a9381b4f0e60557c78d0fa166ae1970be45ff4c"
+          "after": "0b7e71a88bc1ee0c8a1010126cc5ccbb0fe1209d038579615f1cebb645b9de34"
         }
       }
     },
