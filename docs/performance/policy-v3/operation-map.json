@@ -36387,10 +36387,22 @@
         "data/source_audits/ci64_provenance_v1/stage2-fight-cover-test-transition-v1.json",
         "data/source_audits/ci64_provenance_v1/stage2-counteroffensive-test-transition-v1.json",
         "data/source_audits/ci64_provenance_v1/stage2-melee-restore-test-transition-v1.json",
-        "data/source_audits/ci64_provenance_v1/stage2-fight-reroll-test-transition-v1.json"
+        "data/source_audits/ci64_provenance_v1/stage2-fight-reroll-test-transition-v1.json",
+        "data/source_audits/ci64_provenance_v1/terminal-normal-move-restore-test-transition-v1.json"
       ],
       "owners": [
         "*"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "terminal-normal-move-restore": {
+      "paths": [
+        "src/warhammer40k_core/engine/normal_move_history.py"
+      ],
+      "owners": [
+        "validate_normal_move_state_consistency"
       ],
       "families": [],
       "sensitive": false,

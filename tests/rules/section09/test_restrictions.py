@@ -1,5 +1,6 @@
 """09.05.01/06/07: movement history reaches charge, shooting and Action consumers."""
 
+from copy import deepcopy
 from dataclasses import replace
 
 import pytest
@@ -11,8 +12,12 @@ from warhammer40k_core.engine.charge_phase_state import ChargePhaseState
 from warhammer40k_core.engine.mission_action_eligibility import (
     mission_action_unit_ineligibility_reason,
 )
-from warhammer40k_core.engine.normal_move_history import NormalMoveSourceKind, NormalMoveState
-from warhammer40k_core.engine.phase import BattlePhase
+from warhammer40k_core.engine.normal_move_history import (
+    NormalMoveSourceKind,
+    NormalMoveState,
+    validate_normal_move_state_consistency,
+)
+from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, GameLifecycleStage
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.shooting_eligibility_state import shooting_state_restriction_reason
@@ -124,6 +129,34 @@ def test_normal_move_completion_records_actual_once_per_phase_history(
 
     begin(session)
     assert tuple(state.normal_move_states) == before
+
+    decisions = session.lifecycle.decision_controller
+    events = decisions.event_log.records
+
+    # Check the restore validator at each stage with the same accepted move evidence.
+    checkpoint = deepcopy(state)
+    for stage in (GameLifecycleStage.BATTLE, GameLifecycleStage.COMPLETE):
+        checkpoint.stage = stage
+        if stage is GameLifecycleStage.COMPLETE:
+            checkpoint.active_player_id = None
+            checkpoint.battle_phase_index = None
+        validate_normal_move_state_consistency(
+            state=checkpoint, event_records=events, decision_records=decisions.records
+        )
+        assert checkpoint.normal_move_states == [record]
+
+        checkpoint.normal_move_states[:] = [replace(record, result_id="unknown")]
+        with pytest.raises(GameLifecycleError, match="differs from accepted completion evidence"):
+            validate_normal_move_state_consistency(
+                state=checkpoint, event_records=events, decision_records=decisions.records
+            )
+        checkpoint.normal_move_states[:] = [record]
+
+    checkpoint.stage = GameLifecycleStage.SETUP
+    with pytest.raises(GameLifecycleError, match="require battle or complete stage"):
+        validate_normal_move_state_consistency(
+            state=checkpoint, event_records=events, decision_records=decisions.records
+        )
 
 
 @pytest.mark.parametrize("action", ["advance", "fall_back:ordered_retreat"])

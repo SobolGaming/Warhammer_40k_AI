@@ -1,230 +1,168 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "ca0da3d36731986ed55b623d9f82c05e6eda5560",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:537db5b1f44db04fdf2a19ffc38fa1155e808f88229ac4116982a11939975732",
-  "operation_map_sha256": "76e14c8f116591d0e2d3186862edab0212cc1a7e29f307f27669cf6a2959d4a1",
+  "base": "545d5556c279f88ffaaa897941245ca093e8e9f6",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:9fc32bcf93350bede0cc1433f278aa5a17d142581bff8f7c60ebce3faca72db3",
+  "operation_map_sha256": "0a26a1497712c0b3c15c61632372f4625838853ce90f439b5c6a64e0b8f1e42b",
   "changes": {
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "663256edd524562f6f287dcf6a981f9e5161c4026c018892748ec122fc75af8a",
-      "after_sha256": "9f28a50f8840409dae91f060dd84a90631e24026ffdbc52b47b987ee456d3e30",
+      "before_sha256": "9f28a50f8840409dae91f060dd84a90631e24026ffdbc52b47b987ee456d3e30",
+      "after_sha256": "167a2422a28e72c3e1917b5e97a567d5186ac2baea69089f90face5ff05aeb48",
       "owners": {
         "@document": {
-          "before": "663256edd524562f6f287dcf6a981f9e5161c4026c018892748ec122fc75af8a",
-          "after": "9f28a50f8840409dae91f060dd84a90631e24026ffdbc52b47b987ee456d3e30"
+          "before": "9f28a50f8840409dae91f060dd84a90631e24026ffdbc52b47b987ee456d3e30",
+          "after": "167a2422a28e72c3e1917b5e97a567d5186ac2baea69089f90face5ff05aeb48"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "bdcdd6135af52683f1ed5dc80223f28d7b354ba02635cfa8ac39427f3c21f07c",
-      "after_sha256": "5e1f18822fb16bff13a9f03bc7c293d8b882318a058349f7e2c356055f23bfac",
+      "before_sha256": "5e1f18822fb16bff13a9f03bc7c293d8b882318a058349f7e2c356055f23bfac",
+      "after_sha256": "fb5f70d694d6686874c8dc93fa26a4c8ccaa7d8fb9aba693749aa7a9e7293140",
       "owners": {
         "@document": {
-          "before": "bdcdd6135af52683f1ed5dc80223f28d7b354ba02635cfa8ac39427f3c21f07c",
-          "after": "5e1f18822fb16bff13a9f03bc7c293d8b882318a058349f7e2c356055f23bfac"
+          "before": "5e1f18822fb16bff13a9f03bc7c293d8b882318a058349f7e2c356055f23bfac",
+          "after": "fb5f70d694d6686874c8dc93fa26a4c8ccaa7d8fb9aba693749aa7a9e7293140"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "e7069161e0d373d25b2e2282dfc96fde8d1c698cb00a5944c7579d91a6b3a069",
-      "after_sha256": "fd76df718929d4e9371417bf073302517aef86cdeaf7675fa31e80691d1eaec0",
+      "before_sha256": "fd76df718929d4e9371417bf073302517aef86cdeaf7675fa31e80691d1eaec0",
+      "after_sha256": "7a98e6ac0bd076927c9fcb775ef7b4250a756c39bcd029602a65be55017e1233",
       "owners": {
         "@document": {
-          "before": "e7069161e0d373d25b2e2282dfc96fde8d1c698cb00a5944c7579d91a6b3a069",
-          "after": "fd76df718929d4e9371417bf073302517aef86cdeaf7675fa31e80691d1eaec0"
+          "before": "fd76df718929d4e9371417bf073302517aef86cdeaf7675fa31e80691d1eaec0",
+          "after": "7a98e6ac0bd076927c9fcb775ef7b4250a756c39bcd029602a65be55017e1233"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "db752afcee15ea9dd236beea30e6bb5e74d89cc369a9ad3780def756c31de240",
-      "after_sha256": "d587a011798ee3e87c753a9e3885e17649e88f85f4478bcd6fe0d73a7da14c7b",
+      "before_sha256": "d587a011798ee3e87c753a9e3885e17649e88f85f4478bcd6fe0d73a7da14c7b",
+      "after_sha256": "fdbbebf988b03372f91e24ad403beac3248506b7dfc26adafc0fd5f21d56ddbf",
       "owners": {
         "@document": {
-          "before": "db752afcee15ea9dd236beea30e6bb5e74d89cc369a9ad3780def756c31de240",
-          "after": "d587a011798ee3e87c753a9e3885e17649e88f85f4478bcd6fe0d73a7da14c7b"
+          "before": "d587a011798ee3e87c753a9e3885e17649e88f85f4478bcd6fe0d73a7da14c7b",
+          "after": "fdbbebf988b03372f91e24ad403beac3248506b7dfc26adafc0fd5f21d56ddbf"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "138528ce1e91b4ef53c8ea0168a1bb6e20abffd07a905b85221a9b3ca0453d97",
-      "after_sha256": "34097e22c98c821d0fc85faedb88608cc0f685aa920b5cf56eb3b2f5dc6b6103",
+      "before_sha256": "34097e22c98c821d0fc85faedb88608cc0f685aa920b5cf56eb3b2f5dc6b6103",
+      "after_sha256": "c2910fa4e365ebcb00444b97d912248db82a54c176cf7cfe3fbca846baad7646",
       "owners": {
         "@document": {
-          "before": "138528ce1e91b4ef53c8ea0168a1bb6e20abffd07a905b85221a9b3ca0453d97",
-          "after": "34097e22c98c821d0fc85faedb88608cc0f685aa920b5cf56eb3b2f5dc6b6103"
+          "before": "34097e22c98c821d0fc85faedb88608cc0f685aa920b5cf56eb3b2f5dc6b6103",
+          "after": "c2910fa4e365ebcb00444b97d912248db82a54c176cf7cfe3fbca846baad7646"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "2f281b7407210fe025c4b1d971cd7b1b2d6d33a94900d1efd33ab12e67376b80",
-      "after_sha256": "923eb8a8fc60f4c0008a7a354cc7b7ab9e14da41d4651bfbcdbf5cf5441dfcb3",
+      "before_sha256": "923eb8a8fc60f4c0008a7a354cc7b7ab9e14da41d4651bfbcdbf5cf5441dfcb3",
+      "after_sha256": "26bc10c97f1790b3c7e626693b9b329e7a0a56856c36fb1225fc404d6e31202d",
       "owners": {
         "@document": {
-          "before": "2f281b7407210fe025c4b1d971cd7b1b2d6d33a94900d1efd33ab12e67376b80",
-          "after": "923eb8a8fc60f4c0008a7a354cc7b7ab9e14da41d4651bfbcdbf5cf5441dfcb3"
+          "before": "923eb8a8fc60f4c0008a7a354cc7b7ab9e14da41d4651bfbcdbf5cf5441dfcb3",
+          "after": "26bc10c97f1790b3c7e626693b9b329e7a0a56856c36fb1225fc404d6e31202d"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "8aa6cbd92404ce97f0a0636ef3400fbb9d40cc7a0cdc1970dc35b2fe971e1e97",
-      "after_sha256": "9013435d780b99f4a1a4bd42277c340404d96b699bf194416f782a0317162403",
+      "before_sha256": "9013435d780b99f4a1a4bd42277c340404d96b699bf194416f782a0317162403",
+      "after_sha256": "1c10d6027ae1c12224e38d322859437cf7b33edeae0036423f48be66415790d7",
       "owners": {
         "@document": {
-          "before": "8aa6cbd92404ce97f0a0636ef3400fbb9d40cc7a0cdc1970dc35b2fe971e1e97",
-          "after": "9013435d780b99f4a1a4bd42277c340404d96b699bf194416f782a0317162403"
+          "before": "9013435d780b99f4a1a4bd42277c340404d96b699bf194416f782a0317162403",
+          "after": "1c10d6027ae1c12224e38d322859437cf7b33edeae0036423f48be66415790d7"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "de046b3ff7fce57354219a72fb26d9e5babcd72ec45afaf990ab5f9185573f0c",
-      "after_sha256": "e3833e5542763b51d9024e32ee71261612ceb543daef29de7f8a7c781bf2c55c",
+      "before_sha256": "e3833e5542763b51d9024e32ee71261612ceb543daef29de7f8a7c781bf2c55c",
+      "after_sha256": "e75fde41a317c9177dd2adf7cca43a5dfffb51cca25476468137f14ab5e5ecfd",
       "owners": {
         "@document": {
-          "before": "de046b3ff7fce57354219a72fb26d9e5babcd72ec45afaf990ab5f9185573f0c",
-          "after": "e3833e5542763b51d9024e32ee71261612ceb543daef29de7f8a7c781bf2c55c"
+          "before": "e3833e5542763b51d9024e32ee71261612ceb543daef29de7f8a7c781bf2c55c",
+          "after": "e75fde41a317c9177dd2adf7cca43a5dfffb51cca25476468137f14ab5e5ecfd"
         }
       }
     },
-    "data/source_audits/ci64_provenance_v1/stage2-fight-reroll-test-transition-v1.json": {
+    "data/source_audits/ci64_provenance_v1/terminal-normal-move-restore-test-transition-v1.json": {
       "before_sha256": null,
-      "after_sha256": "9b48614e7f5b8831a1e1b5ba21d1791b9cbc0ddc5055d9de3a14bf6d053c5ab6",
+      "after_sha256": "f7a2e27629b7b05f08462f105e9159694e55179a3fddc2b6e8ef726f2be281c6",
       "owners": {
         "@document": {
           "before": null,
-          "after": "9b48614e7f5b8831a1e1b5ba21d1791b9cbc0ddc5055d9de3a14bf6d053c5ab6"
-        }
-      }
-    },
-    "docs/performance/current/stage2-fight-reroll-dice.json": {
-      "before_sha256": null,
-      "after_sha256": "6f2ba640ca151e5560734f3f608cb11b945126d815b563dcb8c65d0cfe22a1eb",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "6f2ba640ca151e5560734f3f608cb11b945126d815b563dcb8c65d0cfe22a1eb"
-        }
-      }
-    },
-    "docs/performance/current/stage2-fight-reroll-dice_sustained.json": {
-      "before_sha256": null,
-      "after_sha256": "222dacd77eec86c29dfa77aba6cdf30ce144ccfa54f98dbd58378a272f2caf91",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "222dacd77eec86c29dfa77aba6cdf30ce144ccfa54f98dbd58378a272f2caf91"
+          "after": "f7a2e27629b7b05f08462f105e9159694e55179a3fddc2b6e8ef726f2be281c6"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "cfe42ad3f10f23e5cad6ed24fdcf8c37b13f20f550f3696a901b489e84c86105",
-      "after_sha256": "c49d1634403ddca16c8d36dfa2428854dda33e11f64af899f94aeb95ed67da5f",
+      "before_sha256": "c49d1634403ddca16c8d36dfa2428854dda33e11f64af899f94aeb95ed67da5f",
+      "after_sha256": "8f195635a804a2b1e14a669ad1186bff8d090ac071aaa0b03ea01abb12264eaa",
       "owners": {
         "@document": {
-          "before": "cfe42ad3f10f23e5cad6ed24fdcf8c37b13f20f550f3696a901b489e84c86105",
-          "after": "c49d1634403ddca16c8d36dfa2428854dda33e11f64af899f94aeb95ed67da5f"
+          "before": "c49d1634403ddca16c8d36dfa2428854dda33e11f64af899f94aeb95ed67da5f",
+          "after": "8f195635a804a2b1e14a669ad1186bff8d090ac071aaa0b03ea01abb12264eaa"
         }
       }
     },
     "scripts/engine_numerical_identity_test_admission.py": {
-      "before_sha256": "75ae0c9e6a0ab4d5b58ae4e1d7d90773be57084365817eeb3d0a64551a227b63",
-      "after_sha256": "376629fc78c98275622996470aa01a9a41eff58e77a1a0ece4024681dc5902db",
+      "before_sha256": "376629fc78c98275622996470aa01a9a41eff58e77a1a0ece4024681dc5902db",
+      "after_sha256": "93d091fc8410b26192544b2bf4c86b183314cb90377d010dfc0bd096b4bb5be5",
       "owners": {
         "@module": {
-          "before": "7c879ad513edb75ecacd8f8cd2d7ddd0714407906f67ac3aa660f7a99ab3ef5f",
-          "after": "3a16521743f2d53558a2763b99b59b7293d95ca17dd671e3e2d8401176008b0a"
+          "before": "3a16521743f2d53558a2763b99b59b7293d95ca17dd671e3e2d8401176008b0a",
+          "after": "796659fecb3d13881ab4059ec03b03c086ca0e5b7db389199070483e103c95f9"
         },
-        "_gameplay_budget_successor": {
-          "before": "a23e75b4dcf12df446627cbc54d7ce75a566f4034863f1a29074cebe9c2c77d6",
-          "after": "fecfad2bf7be31451e97cfc5d5b193865785e863b5b6694105712a45ca9a5f24"
-        },
-        "_stage2_fight_reroll_successor": {
+        "_terminal_restore_successor": {
           "before": null,
-          "after": "73579d98ed6ba884c4404cee1be7166c123197ed2c25d279130b2a8e67b45c65"
-        },
-        "_stage2_melee_restore_successor": {
-          "before": "3e7b25758011cc7cfa2abce9b9b029a7faf4c7339b2e098c98df7c0a3826ea2a",
-          "after": "30cfb3a88427a6e19a2c8ecdebd98480fcf4a6427eb22a67da65b33d19c331ab"
+          "after": "7071aa7106277a8b5ec62a02a970e0818307a96b520da2ac2c6c6e87b24b79e5"
         },
         "exact_movement_test_transition": {
-          "before": "274e9d2b07c5749bc22385bf5f361b06fafe33323fa60408fa0a91ec87521159",
-          "after": "b8b189fb1654b535512261f46f24c98a4bc32abf732869b0639e5378dad0afad"
+          "before": "b8b189fb1654b535512261f46f24c98a4bc32abf732869b0639e5378dad0afad",
+          "after": "c7d67ebd8ef80d5196d300a315f12b2243e1d33afb7000a6d2ed0aa5267e7ba1"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "cc9e6271dd048311458728c23cc6ca064230b2d6014bed904d7f31f22510b28c",
-      "after_sha256": "ab74497450767aa27f13968680b181f195b1bdc58b51b8e14a741a7472137bba",
+      "before_sha256": "ab74497450767aa27f13968680b181f195b1bdc58b51b8e14a741a7472137bba",
+      "after_sha256": "b4b77218cc321004ef4ba59690f1db47c94fc619c00e97974122a5927f6f8f20",
       "owners": {
         "@document": {
-          "before": "cc9e6271dd048311458728c23cc6ca064230b2d6014bed904d7f31f22510b28c",
-          "after": "ab74497450767aa27f13968680b181f195b1bdc58b51b8e14a741a7472137bba"
+          "before": "ab74497450767aa27f13968680b181f195b1bdc58b51b8e14a741a7472137bba",
+          "after": "b4b77218cc321004ef4ba59690f1db47c94fc619c00e97974122a5927f6f8f20"
         }
       }
     },
-    "src/warhammer40k_core/engine/lifecycle.py": {
-      "before_sha256": "dad3d285d328c036123b816bf47c9a0bf09fc005a9b5084f70f696d6af39c77b",
-      "after_sha256": "a80adb9f48af7338f9acb7c325490964129545521bc99b456d09cc19a55f028f",
+    "src/warhammer40k_core/engine/normal_move_history.py": {
+      "before_sha256": "b0a075244d93ce53a63aec7601d011c6a3c56dd00ec8481a5ca15b6a10b3be97",
+      "after_sha256": "fa0ca4f925d84710129b1a3cfd0486d26a81198c79c9a2e95cf48db196440136",
       "owners": {
-        "GameLifecycle._apply_stratagem_decision": {
-          "before": "9dfbb4f1d83da602a516b2066f4ad8db2998c4df082c182900a170cb34168ee4",
-          "after": "ddc9de3b91916bc695c5ea0875e4c82ff943fda1e601e37e005cd084cceff0e2"
-        },
-        "GameLifecycle._apply_stratagem_target_proposal_decision": {
-          "before": "77254a2c03b7efe3a9863a0b159c320798d14c51d00007e3822eaac4f37539ff",
-          "after": "5e39f912575e8f92878734962752080680e5d81aea4d981d951dcd22e6958a38"
-        },
-        "GameLifecycle._apply_stratagem_window_decline": {
-          "before": null,
-          "after": "cb1bec0facac34282fb65f73c637db8fc78b8a140565034afd8435c0dbd77c19"
-        },
-        "GameLifecycle._record_stratagem_window_declined": {
-          "before": "a355330c0a403bc7a928416a3fabfe3ba515fa22452f980abbe4a8c34a52ad0b",
-          "after": null
+        "validate_normal_move_state_consistency": {
+          "before": "acfa9eff672e9e5292cb223caf65510a1fdf76a812d6b94bda8382fa1df0b7cb",
+          "after": "f2ca1c7733405b5e87e5cdf79e136a73bd92996d6af8117be270a2f39917d104"
         }
       }
     },
     "tests/code_quality/test_engine_numerical_identity_admission.py": {
-      "before_sha256": "8ffd2c13541cb9739ff9142d76056438ed863f2097cccfe81cf2c85b34457234",
-      "after_sha256": "1a0d2bd660aad45cd3c4b89198f182288d41ce9616572a21dedd92c7e920fefa",
+      "before_sha256": "1a0d2bd660aad45cd3c4b89198f182288d41ce9616572a21dedd92c7e920fefa",
+      "after_sha256": "0c30dcd1d341bf725df2c5c2ccdbd972e626bd7dfb00cfc6ff823d85c5cb0a82",
       "owners": {
         "test_identity_inventory_uses_current_twelve_shards_and_native_cohort": {
-          "before": "68389521544f30e6f7c0ddfa02c7012fb5503748e50b3098baac338774f04d70",
-          "after": "161621c788a53703f6f6f2938c524e20a0b7195186ded51885b21eea759ac4a5"
-        },
-        "test_identity_transition_requires_its_exact_record": {
-          "before": "e6a8bb86adb33991c349502b2419568334da9147b43fa00822d751e6d396ebf3",
-          "after": "a133673f0eb5ebd563ba84d927c79f8e105f37cef38d4ead4b14edabd552b416"
+          "before": "161621c788a53703f6f6f2938c524e20a0b7195186ded51885b21eea759ac4a5",
+          "after": "a061b9bdd6df03d8ea328c140d53152f571dd3b033c7d9c7cb62ee9179604fc4"
         }
       }
     },
-    "tests/order135_counteroffensive_helpers.py": {
-      "before_sha256": "d3048320c8ece594ab05175d1b8eb8b5a92315ab402f1ab0612b524ced03d61a",
-      "after_sha256": "71000dd4884d43da2172677d9273dc9cb0f3cfb6d9c2ab9a20aa746f4a7a788d",
+    "tests/rules/section09/test_restrictions.py": {
+      "before_sha256": "ed2a8c06d93ebf22826ae3f8a28845dfc3cc9f6d369b4139a1f1cffd0a4c1b4d",
+      "after_sha256": "a78e29afa1b6b79118a8deb2e212a19038e7103fa44dcfaed01d545ef5426a99",
       "owners": {
         "@module": {
-          "before": "637c71d291dbfc1b627f502956c6a7fb0349bb28b37eed77a63d3758655c4bba",
-          "after": "055d63f01db110f8676dc8f00e81d01e9175d46a63a5fd834f57b1f1ffc2ef8a"
+          "before": "7547415bce795d695e28e245e1d3c4e926e8dfae20397278234c8499968ec241",
+          "after": "bfeff8c8c3bfa64b77b40b789df2b9e3f607957e09eeffb39151c671610a7484"
         },
-        "native_combat_session": {
-          "before": "3a93c018201378c77d3e52e2d8af06685492d0737dfcd95973f78f904f3fa34e",
-          "after": "cad31fded6ca5b6e5d60e6e54cad01c1a6f7b54faa85318daff06f5fd874d5d5"
-        }
-      }
-    },
-    "tests/rules/section15/test_reactions.py": {
-      "before_sha256": "9842238a777aa3a0bf92bf25059453de7a7f3c3201f6cfe76d1aa74c9cdad014",
-      "after_sha256": "dcf6ad6c252e5a18628b0ca549ea24f2e1abbcbcc0c5ede01526ff52b46b5ac3",
-      "owners": {
-        "@module": {
-          "before": "e9cd16f5e3a3ad40d7730e302770b5af4d31a94366fd549b8f253b312de55030",
-          "after": "80bc9a7dd164a0eeb1378f286d1620e2360ec90e6d549ba51e243971e0dcbcea"
-        },
-        "_assert_counteroffensive_defender_reroll_decline": {
-          "before": null,
-          "after": "2b0c030163d5b2697d5c2168c8921fe231244b65f84b5cb333bc98f2def34a5d"
-        },
-        "_assert_counteroffensive_melee_restore": {
-          "before": "62cd66f8103a09d0f60c40f0343405d79f804f3c5ff6c5f1d42679fe80f2c99e",
-          "after": "61d6b43c9b5dd2f9012e7b26f43ec0f093f3cf0cde1c358e11928714eaa93644"
+        "test_normal_move_completion_records_actual_once_per_phase_history": {
+          "before": "a65649ed79e5f064231f6702c0029113485171aa992508fece7be654e511f2ff",
+          "after": "c54da804ea49ba93382d8026b77db9c603ff00b729bbdfffd36b12089781f0a9"
         }
       }
     }
@@ -236,9 +174,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate the published synthetic fixtures and manifest for the verified runtime identity.",
-      "source_obligation": "Core 15.12 permits the interrupted unit to fight. Its full Fight activation stays authoritative until its attack resolution and damage allocation finish.",
-      "unchanged_work": "Both decline forms share the existing Fight advancement path. The ordinary decision workload, dice rules, and save and replay formats retain their existing definitions."
+      "rationale": "Regenerate contract examples and manifest with the changed engine build identity.",
+      "source_obligation": "A completed game preserves accepted Normal Move occurrences and their decision and event provenance.",
+      "unchanged_work": "Restore uses the existing history scanner and authority checks with the same payload, replay loop and live movement path."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
@@ -246,9 +184,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate the published synthetic fixtures and manifest for the verified runtime identity.",
-      "source_obligation": "Core 15.12 permits the interrupted unit to fight. Its full Fight activation stays authoritative until its attack resolution and damage allocation finish.",
-      "unchanged_work": "Both decline forms share the existing Fight advancement path. The ordinary decision workload, dice rules, and save and replay formats retain their existing definitions."
+      "rationale": "Regenerate contract examples and manifest with the changed engine build identity.",
+      "source_obligation": "A completed game preserves accepted Normal Move occurrences and their decision and event provenance.",
+      "unchanged_work": "Restore uses the existing history scanner and authority checks with the same payload, replay loop and live movement path."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
@@ -256,9 +194,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate the published synthetic fixtures and manifest for the verified runtime identity.",
-      "source_obligation": "Core 15.12 permits the interrupted unit to fight. Its full Fight activation stays authoritative until its attack resolution and damage allocation finish.",
-      "unchanged_work": "Both decline forms share the existing Fight advancement path. The ordinary decision workload, dice rules, and save and replay formats retain their existing definitions."
+      "rationale": "Regenerate contract examples and manifest with the changed engine build identity.",
+      "source_obligation": "A completed game preserves accepted Normal Move occurrences and their decision and event provenance.",
+      "unchanged_work": "Restore uses the existing history scanner and authority checks with the same payload, replay loop and live movement path."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
@@ -266,9 +204,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate the published synthetic fixtures and manifest for the verified runtime identity.",
-      "source_obligation": "Core 15.12 permits the interrupted unit to fight. Its full Fight activation stays authoritative until its attack resolution and damage allocation finish.",
-      "unchanged_work": "Both decline forms share the existing Fight advancement path. The ordinary decision workload, dice rules, and save and replay formats retain their existing definitions."
+      "rationale": "Regenerate contract examples and manifest with the changed engine build identity.",
+      "source_obligation": "A completed game preserves accepted Normal Move occurrences and their decision and event provenance.",
+      "unchanged_work": "Restore uses the existing history scanner and authority checks with the same payload, replay loop and live movement path."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
@@ -276,9 +214,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate the published synthetic fixtures and manifest for the verified runtime identity.",
-      "source_obligation": "Core 15.12 permits the interrupted unit to fight. Its full Fight activation stays authoritative until its attack resolution and damage allocation finish.",
-      "unchanged_work": "Both decline forms share the existing Fight advancement path. The ordinary decision workload, dice rules, and save and replay formats retain their existing definitions."
+      "rationale": "Regenerate contract examples and manifest with the changed engine build identity.",
+      "source_obligation": "A completed game preserves accepted Normal Move occurrences and their decision and event provenance.",
+      "unchanged_work": "Restore uses the existing history scanner and authority checks with the same payload, replay loop and live movement path."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
@@ -286,9 +224,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate the published synthetic fixtures and manifest for the verified runtime identity.",
-      "source_obligation": "Core 15.12 permits the interrupted unit to fight. Its full Fight activation stays authoritative until its attack resolution and damage allocation finish.",
-      "unchanged_work": "Both decline forms share the existing Fight advancement path. The ordinary decision workload, dice rules, and save and replay formats retain their existing definitions."
+      "rationale": "Regenerate contract examples and manifest with the changed engine build identity.",
+      "source_obligation": "A completed game preserves accepted Normal Move occurrences and their decision and event provenance.",
+      "unchanged_work": "Restore uses the existing history scanner and authority checks with the same payload, replay loop and live movement path."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
@@ -296,9 +234,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate the published synthetic fixtures and manifest for the verified runtime identity.",
-      "source_obligation": "Core 15.12 permits the interrupted unit to fight. Its full Fight activation stays authoritative until its attack resolution and damage allocation finish.",
-      "unchanged_work": "Both decline forms share the existing Fight advancement path. The ordinary decision workload, dice rules, and save and replay formats retain their existing definitions."
+      "rationale": "Regenerate contract examples and manifest with the changed engine build identity.",
+      "source_obligation": "A completed game preserves accepted Normal Move occurrences and their decision and event provenance.",
+      "unchanged_work": "Restore uses the existing history scanner and authority checks with the same payload, replay loop and live movement path."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
@@ -306,43 +244,27 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate the published synthetic fixtures and manifest for the verified runtime identity.",
-      "source_obligation": "Core 15.12 permits the interrupted unit to fight. Its full Fight activation stays authoritative until its attack resolution and damage allocation finish.",
-      "unchanged_work": "Both decline forms share the existing Fight advancement path. The ordinary decision workload, dice rules, and save and replay formats retain their existing definitions."
+      "rationale": "Regenerate contract examples and manifest with the changed engine build identity.",
+      "source_obligation": "A completed game preserves accepted Normal Move occurrences and their decision and event provenance.",
+      "unchanged_work": "Restore uses the existing history scanner and authority checks with the same payload, replay loop and live movement path."
     },
-    "data/source_audits/ci64_provenance_v1/stage2-fight-reroll-test-transition-v1.json": {
+    "data/source_audits/ci64_provenance_v1/terminal-normal-move-restore-test-transition-v1.json": {
       "category": "rule_semantics",
       "operations": [
         "engine-numerical-identity-admission"
       ],
       "selected_families": [],
-      "rationale": "Verify one exact scheduled test successor, two byte-bound inputs and the previous transition.",
-      "source_obligation": "Core 15.12 permits the interrupted unit to fight. Its full Fight activation stays authoritative until its attack resolution and damage allocation finish.",
-      "unchanged_work": "Both decline forms share the existing Fight advancement path. The ordinary decision workload, dice rules, and save and replay formats retain their existing definitions."
-    },
-    "docs/performance/current/stage2-fight-reroll-dice.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Record same-host exact-base and candidate measurements for the mapped attack sequence workload.",
-      "source_obligation": "Core 15.12 permits the interrupted unit to fight. Its full Fight activation stays authoritative until its attack resolution and damage allocation finish.",
-      "unchanged_work": "Both decline forms share the existing Fight advancement path. The ordinary decision workload, dice rules, and save and replay formats retain their existing definitions."
-    },
-    "docs/performance/current/stage2-fight-reroll-dice_sustained.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Record same-host exact-base and candidate measurements for the mapped attack sequence workload.",
-      "source_obligation": "Core 15.12 permits the interrupted unit to fight. Its full Fight activation stays authoritative until its attack resolution and damage allocation finish.",
-      "unchanged_work": "Both decline forms share the existing Fight advancement path. The ordinary decision workload, dice rules, and save and replay formats retain their existing definitions."
+      "rationale": "Admit one byte-bound scheduled regression successor against the verified runtime and exact PR base.",
+      "source_obligation": "A completed game preserves accepted Normal Move occurrences and their decision and event provenance.",
+      "unchanged_work": "Restore uses the existing history scanner and authority checks with the same payload, replay loop and live movement path."
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Register the changed Fight continuation, scheduled regression and finite source admission owners.",
-      "source_obligation": "Core 15.12 permits the interrupted unit to fight. Its full Fight activation stays authoritative until its attack resolution and damage allocation finish.",
-      "unchanged_work": "Both decline forms share the existing Fight advancement path. The ordinary decision workload, dice rules, and save and replay formats retain their existing definitions."
+      "rationale": "Register the Normal Move terminal-stage validation owner and the existing test admission artifact.",
+      "source_obligation": "A completed game preserves accepted Normal Move occurrences and their decision and event provenance.",
+      "unchanged_work": "Restore uses the existing history scanner and authority checks with the same payload, replay loop and live movement path."
     },
     "scripts/engine_numerical_identity_test_admission.py": {
       "category": "rule_semantics",
@@ -350,9 +272,9 @@
         "engine-numerical-identity-admission"
       ],
       "selected_families": [],
-      "rationale": "Verify one exact scheduled test successor, two byte-bound inputs and the previous transition.",
-      "source_obligation": "Core 15.12 permits the interrupted unit to fight. Its full Fight activation stays authoritative until its attack resolution and damage allocation finish.",
-      "unchanged_work": "Both decline forms share the existing Fight advancement path. The ordinary decision workload, dice rules, and save and replay formats retain their existing definitions."
+      "rationale": "Admit one byte-bound scheduled regression successor against the verified runtime and exact PR base.",
+      "source_obligation": "A completed game preserves accepted Normal Move occurrences and their decision and event provenance.",
+      "unchanged_work": "Restore uses the existing history scanner and authority checks with the same payload, replay loop and live movement path."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
@@ -360,23 +282,19 @@
         "source-record"
       ],
       "selected_families": [],
-      "rationale": "Regenerate the packaged runtime build identity from the current checked sources and schemas.",
-      "source_obligation": "Core 15.12 permits the interrupted unit to fight. Its full Fight activation stays authoritative until its attack resolution and damage allocation finish.",
-      "unchanged_work": "Both decline forms share the existing Fight advancement path. The ordinary decision workload, dice rules, and save and replay formats retain their existing definitions."
+      "rationale": "Regenerate the packaged build identity against the authoritative runtime source tree.",
+      "source_obligation": "A completed game preserves accepted Normal Move occurrences and their decision and event provenance.",
+      "unchanged_work": "Restore uses the existing history scanner and authority checks with the same payload, replay loop and live movement path."
     },
-    "src/warhammer40k_core/engine/lifecycle.py": {
+    "src/warhammer40k_core/engine/normal_move_history.py": {
       "category": "rule_semantics",
       "operations": [
-        "order135-gathered-attack-steps",
-        "stage2-fight-stratagem-decline"
+        "terminal-normal-move-restore"
       ],
-      "selected_families": [
-        "dice",
-        "dice_sustained"
-      ],
-      "rationale": "Use the existing Fight continuation when a finite decline owns the interrupted activation's reaction frame.",
-      "source_obligation": "Core 15.12 permits the interrupted unit to fight. Its full Fight activation stays authoritative until its attack resolution and damage allocation finish.",
-      "unchanged_work": "Both decline forms share the existing Fight advancement path. The ordinary decision workload, dice rules, and save and replay formats retain their existing definitions."
+      "selected_families": [],
+      "rationale": "Admit history at the completed battle stage and still validate against accepted completion evidence.",
+      "source_obligation": "A completed game preserves accepted Normal Move occurrences and their decision and event provenance.",
+      "unchanged_work": "Restore uses the existing history scanner and authority checks with the same payload, replay loop and live movement path."
     },
     "tests/code_quality/test_engine_numerical_identity_admission.py": {
       "category": "rule_semantics",
@@ -384,36 +302,22 @@
         "engine-numerical-identity-admission"
       ],
       "selected_families": [],
-      "rationale": "Verify one exact scheduled test successor, two byte-bound inputs and the previous transition.",
-      "source_obligation": "Core 15.12 permits the interrupted unit to fight. Its full Fight activation stays authoritative until its attack resolution and damage allocation finish.",
-      "unchanged_work": "Both decline forms share the existing Fight advancement path. The ordinary decision workload, dice rules, and save and replay formats retain their existing definitions."
+      "rationale": "Admit one byte-bound scheduled regression successor against the verified runtime and exact PR base.",
+      "source_obligation": "A completed game preserves accepted Normal Move occurrences and their decision and event provenance.",
+      "unchanged_work": "Restore uses the existing history scanner and authority checks with the same payload, replay loop and live movement path."
     },
-    "tests/order135_counteroffensive_helpers.py": {
+    "tests/rules/section09/test_restrictions.py": {
       "category": "rule_semantics",
       "operations": [
-        "order135-regressions"
+        "qualification40-exact-b2bacf5b1eaae8f1"
       ],
       "selected_families": [],
-      "rationale": "Tune the synthetic melee weapon to produce a deterministic failed defence save during the interrupted activation.",
-      "source_obligation": "Core 15.12 permits the interrupted unit to fight. Its full Fight activation stays authoritative until its attack resolution and damage allocation finish.",
-      "unchanged_work": "Both decline forms share the existing Fight advancement path. The ordinary decision workload, dice rules, and save and replay formats retain their existing definitions."
-    },
-    "tests/rules/section15/test_reactions.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "qualification40-exact-afb0a05689c2d5fd",
-        "stage2-counteroffensive-viewer"
-      ],
-      "selected_families": [],
-      "rationale": "Cover the defender's pending Command Re-roll and the event order of damage, activation completion, and frame release.",
-      "source_obligation": "Core 15.12 permits the interrupted unit to fight. Its full Fight activation stays authoritative until its attack resolution and damage allocation finish.",
-      "unchanged_work": "Both decline forms share the existing Fight advancement path. The ordinary decision workload, dice rules, and save and replay formats retain their existing definitions."
+      "rationale": "Check that native Normal Move completion evidence remains valid on terminal restore and tampering fails.",
+      "source_obligation": "A completed game preserves accepted Normal Move occurrences and their decision and event provenance.",
+      "unchanged_work": "Restore uses the existing history scanner and authority checks with the same payload, replay loop and live movement path."
     }
   },
   "milestone": "ordinary",
-  "comparisons": {
-    "dice": "docs/performance/current/stage2-fight-reroll-dice.json",
-    "dice_sustained": "docs/performance/current/stage2-fight-reroll-dice_sustained.json"
-  },
+  "comparisons": {},
   "full_game": null
 }
