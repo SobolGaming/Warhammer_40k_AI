@@ -80,8 +80,9 @@ def validate_melee_commitment_history(host: GameLifecycle) -> None:
         frames = host.reaction_queue.frames
         validate_melee_reaction_continuation(
             request_id=pending_requests[0].request_id,
-            frame=frames[-1] if frames else None,
+            frames=frames,
             event_records=event_records,
+            decision_records=decisions.records,
         )
     if (
         not any(

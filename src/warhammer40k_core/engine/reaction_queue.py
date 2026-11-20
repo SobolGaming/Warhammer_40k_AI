@@ -17,7 +17,7 @@ from warhammer40k_core.engine.decision_request import (
     DecisionRequestPayload,
 )
 from warhammer40k_core.engine.decision_result import DecisionResult
-from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.event_log import JsonValue, canonical_json, validate_json_value
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.timing_windows import ReactionWindow, ReactionWindowPayload
 
@@ -106,13 +106,17 @@ class ReactionQueueFrame:
 
     @classmethod
     def from_payload(cls, payload: ReactionQueueFramePayload) -> Self:
-        return cls(
+        frame = cls(
             reaction_window=ReactionWindow.from_payload(payload["reaction_window"]),
             parent_phase=battle_phase_kind_from_token(payload["parent_phase"]),
             parent_step=payload["parent_step"],
             resume_token=payload["resume_token"],
             request_id=payload["request_id"],
         )
+        # Parsing identifiers and eligible players can discard differences in the raw frame.
+        if canonical_json(payload) != canonical_json(frame.to_payload()):
+            raise GameLifecycleError("ReactionQueueFrame payload did not round-trip exactly.")
+        return frame
 
 
 @dataclass(frozen=True, slots=True)

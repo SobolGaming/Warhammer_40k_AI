@@ -489,6 +489,47 @@ def _assert_counteroffensive_melee_restore(
     with pytest.raises(GameLifecycleError, match="active frame request_id drift"):
         GameLifecycle.from_payload(drifted_frame)
 
+    retained_predecessor = session.lifecycle.to_payload()
+    retained_predecessor["reaction_queue"]["frames"].insert(0, original_frame.to_payload())
+    with pytest.raises(
+        GameLifecycleError, match="melee reaction continuation frame was not replaced"
+    ):
+        GameLifecycle.from_payload(retained_predecessor)
+
+    duplicated_window = session.lifecycle.to_payload()
+    lower = original_frame.with_request_id("other-reaction-request").to_payload()
+    duplicated_window["reaction_queue"]["frames"].insert(0, lower)
+    with pytest.raises(
+        GameLifecycleError, match="melee reaction continuation frame was not replaced"
+    ):
+        GameLifecycle.from_payload(duplicated_window)
+
+    # A distinct nested window beneath the transferred frame is outside this handoff.
+    lower["reaction_window"]["timing_window"]["window_id"] = "other-timing-window"
+    lower["resume_token"] = "other-resume-token"
+    assert GameLifecycle.from_payload(duplicated_window).to_payload() == duplicated_window
+
+    substituted_source = deepcopy(session.lifecycle.to_payload())
+    events = substituted_source["decisions"]["event_log"]
+    source = obj(events[-1]["payload"])
+    earlier = next(
+        event for event in reversed(events[:-1]) if event["event_type"] == "decision_recorded"
+    )
+    assert source["decision_record"] == earlier["payload"]
+    obj(obj(source["decision_record"])["result"])["result_id"] = "other-reaction-result"
+    with pytest.raises(
+        GameLifecycleError, match="melee reaction continuation source decision drift"
+    ):
+        GameLifecycle.from_payload(substituted_source)
+
+    substituted_frame = deepcopy(session.lifecycle.to_payload())
+    substituted_frame["reaction_queue"]["frames"][-1]["resume_token"] = "other-resume-token"
+    obj(substituted_frame["decisions"]["event_log"][-1]["payload"])["resume_token"] = (
+        "other-resume-token"
+    )
+    with pytest.raises(GameLifecycleError, match="melee reaction continuation source frame drift"):
+        GameLifecycle.from_payload(substituted_frame)
+
     drifted_source = deepcopy(session.lifecycle.to_payload())
     (pending,) = drifted_source["decisions"]["queue"]["pending_requests"]
     obj(obj(pending["payload"])["proposal_request"])["source_decision_result_id"] = (
@@ -496,6 +537,12 @@ def _assert_counteroffensive_melee_restore(
     )
     with pytest.raises(GameLifecycleError, match="pending decision_type drift"):
         GameLifecycle.from_payload(drifted_source)
+
+    drifted_outer_type = session.lifecycle.to_payload()
+    (pending,) = drifted_outer_type["decisions"]["queue"]["pending_requests"]
+    pending["decision_type"] = "submit_stratagem_target_proposal"
+    with pytest.raises(GameLifecycleError, match="requires one exact decision_requested event"):
+        GameLifecycle.from_payload(drifted_outer_type)
 
     for field, value in (("phase", "shooting"), ("decision_type", "submit_shooting_declaration")):
         drifted_request = deepcopy(session.lifecycle.to_payload())
@@ -528,6 +575,21 @@ def _assert_counteroffensive_melee_restore(
     assert canonical_json(fought_selection["battle_round"]) != canonical_json(battle_round)
     with pytest.raises(GameLifecycleError, match="melee reaction continuation drift"):
         GameLifecycle.from_payload(drifted_window_type)
+
+    drifted_window_shape = session.lifecycle.to_payload()
+    window = obj(
+        cast(JsonValue, drifted_window_shape["reaction_queue"]["frames"][-1]["reaction_window"])
+    )
+    assert window["eligible_player_ids"] == ["player-a"]
+    window["eligible_player_ids"] = {"player-a": None}
+    with pytest.raises(GameLifecycleError, match="ReactionQueueFrame payload did not round-trip"):
+        GameLifecycle.from_payload(drifted_window_shape)
+
+    normalized_token = session.lifecycle.to_payload()
+    frame = normalized_token["reaction_queue"]["frames"][-1]
+    frame["resume_token"] += " "
+    with pytest.raises(GameLifecycleError, match="ReactionQueueFrame payload did not round-trip"):
+        GameLifecycle.from_payload(normalized_token)
 
     restored = LocalGameSession.from_persistence_payload(json.loads(json.dumps(checkpoint)))
     assert restored.to_persistence_payload() == checkpoint

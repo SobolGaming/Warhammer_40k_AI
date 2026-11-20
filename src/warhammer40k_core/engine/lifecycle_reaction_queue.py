@@ -11,8 +11,9 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
 from warhammer40k_core.engine.catalog_setup_reactive_charge_move import (
     is_catalog_setup_reactive_charge_move_request,
 )
+from warhammer40k_core.engine.decision_record import DecisionRecord
 from warhammer40k_core.engine.decision_request import DecisionRequest
-from warhammer40k_core.engine.event_log import EventRecord, canonical_json
+from warhammer40k_core.engine.event_log import EventRecord, JsonValue, canonical_json
 from warhammer40k_core.engine.fight_activation_units import active_fight_activation_rules_unit
 from warhammer40k_core.engine.fight_resolution import (
     SUBMIT_MELEE_DECLARATION_DECISION_TYPE,
@@ -31,6 +32,7 @@ from warhammer40k_core.engine.reaction_queue import (
     REACTION_DECISION_TYPE,
     ReactionQueue,
     ReactionQueueFrame,
+    ReactionQueueFramePayload,
 )
 from warhammer40k_core.engine.sequencing import SEQUENCING_DECISION_TYPE
 from warhammer40k_core.engine.stratagems import (
@@ -140,27 +142,86 @@ def _is_interrupted_fight_melee_request(state: GameState, request: DecisionReque
 
 
 def validate_melee_reaction_continuation(
-    *, request_id: str, frame: ReactionQueueFrame | None, event_records: tuple[EventRecord, ...]
+    *,
+    request_id: str,
+    frames: tuple[ReactionQueueFrame, ...],
+    event_records: tuple[EventRecord, ...],
+    decision_records: tuple[DecisionRecord, ...],
 ) -> None:
-    for event in reversed(event_records):
-        # The continuation is recorded after issuing the declaration in the same submission.
+    """Restore the single frame transfer into a pending Fight declaration."""
+    events = reversed(event_records)
+    handoff: dict[str, JsonValue] | None = None
+    source_event: JsonValue = None
+    for event in events:
+        # Only the submission that issued the pending declaration can transfer its frame.
         if event.event_type == "decision_recorded":
+            source_event = event.payload
             break
         if event.event_type == "reaction_window_continued":
-            payload = event.payload
-            if not isinstance(payload, dict) or payload.get("next_request_id") != request_id:
-                break
-            if frame is None:
-                raise GameLifecycleError("Lifecycle melee reaction continuation requires a frame.")
-            if (
-                frame.request_id == request_id
-                and payload.get("resume_token") == frame.resume_token
-                and payload.get("parent_phase") == frame.parent_phase.value
-                and payload.get("parent_step") == frame.parent_step
-                and canonical_json(payload.get("reaction_window"))
-                == canonical_json(frame.reaction_window.to_payload())
-            ):
+            if handoff is not None or not isinstance(event.payload, dict):
+                raise GameLifecycleError("Lifecycle melee reaction continuation drift.")
+            handoff = event.payload
+    if handoff is None:
+        if frames:
+            raise GameLifecycleError("Lifecycle melee reaction continuation drift.")
+        return
+    if handoff.get("next_request_id") != request_id:
+        raise GameLifecycleError("Lifecycle melee reaction continuation drift.")
+    if not frames:
+        raise GameLifecycleError("Lifecycle melee reaction continuation requires a frame.")
+    frame = frames[-1]
+    if frame.request_id != request_id or not _matches_frame_event(
+        frame.to_payload(), handoff, request_field="next_request_id"
+    ):
+        raise GameLifecycleError("Lifecycle melee reaction continuation drift.")
+
+    if not decision_records or not isinstance(source_event, dict):
+        raise GameLifecycleError("Lifecycle melee reaction continuation source decision drift.")
+    source = decision_records[-1]
+    source_payload = source.to_payload()
+    canonical_source = canonical_json(source_payload)
+    if (
+        canonical_json(handoff.get("decision_record")) != canonical_source
+        or canonical_json({key: source_event[key] for key in source_payload.keys() & source_event})
+        != canonical_source
+    ):
+        raise GameLifecycleError("Lifecycle melee reaction continuation source decision drift.")
+
+    # Continue replaces the source request's existing frame. Earlier frames in the
+    # stack may belong to other windows, but this window may occur only once.
+    source_request_id = source.request.request_id
+    window_id = frame.reaction_window.timing_window.window_id
+    if source_request_id == request_id or any(
+        lower.request_id == source_request_id
+        or lower.reaction_window.timing_window.window_id == window_id
+        for lower in frames[:-1]
+    ):
+        raise GameLifecycleError("Lifecycle melee reaction continuation frame was not replaced.")
+
+    # Opening or continuing the source set the previous request ID. The handoff
+    # must preserve every other field from that assignment.
+    source_frame = frame.with_request_id(source_request_id).to_payload()
+    for event in events:
+        if event.event_type == "reaction_window_opened":
+            request_field = "request_id"
+        elif event.event_type == "reaction_window_continued":
+            request_field = "next_request_id"
+        else:
+            continue
+        payload = event.payload
+        if isinstance(payload, dict) and payload.get(request_field) == source_request_id:
+            if _matches_frame_event(source_frame, payload, request_field=request_field):
                 return
             break
-    if frame is not None:
-        raise GameLifecycleError("Lifecycle melee reaction continuation drift.")
+    raise GameLifecycleError("Lifecycle melee reaction continuation source frame drift.")
+
+
+def _matches_frame_event(
+    frame: ReactionQueueFramePayload, event: dict[str, JsonValue], *, request_field: str
+) -> bool:
+    # Compare all serialized frame fields; the event also carries decision and visibility data.
+    fields = frame.keys() - {"request_id"}
+    return canonical_json(frame) == canonical_json(
+        {"request_id": event.get(request_field)}
+        | {key: event[key] for key in fields & event.keys()}
+    )
