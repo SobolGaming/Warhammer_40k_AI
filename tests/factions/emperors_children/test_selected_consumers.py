@@ -50,7 +50,12 @@ from warhammer40k_core.geometry.pose import Pose
     ("seed", "expected_passed", "capped"),
     [
         ("faction-batch01-ec-fight-2-private-1", True, False),
-        ("faction-batch01-ec-fight-3-private-13", False, False),
+        pytest.param(
+            "faction-batch01-ec-fight-stage2-infractors-1",
+            False,
+            False,
+            id="faction-batch01-ec-fight-3-private-13-False-False",
+        ),
         ("faction-batch01-ec-fight-3", True, True),
     ],
 )
@@ -1555,9 +1560,9 @@ def test_icon_native_either_players_fight_restores_real_destruction_boundary(
         active=active,
         seed={
             ("owner", INFRACTORS): "faction-batch01-ec-fight-2-private-1",
-            ("owner", TORMENTORS): "faction-batch01-ec-fight-2-private-3",
+            ("owner", TORMENTORS): "faction-batch01-ec-fight-stage2-owner-1",
             ("opponent", INFRACTORS): "faction-batch01-ec-fight-3",
-            ("opponent", TORMENTORS): "faction-batch01-ec-fight-2-private-5",
+            ("opponent", TORMENTORS): "faction-batch01-ec-fight-stage2-opponent-6",
         }[(active, sheet)],
     )
     unit, target = s.units["own:infractors"], s.units["foe:target"]

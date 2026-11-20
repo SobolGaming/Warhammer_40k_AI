@@ -130,7 +130,7 @@ GAMEPLAY_SORCERER_OWNER = "tests/factions/emperors_children/test_selected_consum
 STAGE2_FIGHT_TRANSITION = (
     "data/source_audits/ci64_provenance_v1/stage2-fight-cover-test-transition-v1.json"
 )
-STAGE2_FIGHT_SHA256 = "23c95ee96c45787bf9c17ef4f03598cf50888f77ba6db8695610e2fd4c6183a2"
+STAGE2_FIGHT_SHA256 = "0a5a29ce7741dc63e2c70633fbc672c34d95e6668f6ec81cf6a0b65238619b79"
 STAGE2_FIGHT_BASE = "292bf8a55e184392f7d62d245707c8c1b7c0f9db"
 STAGE2_FIGHT_SOURCE = "src/warhammer40k_core/engine/attack_sequence_damage_resolution.py"
 STAGE2_FIGHT_OWNER = "tests/rules/section05/test_allocation_choices.py"
@@ -155,6 +155,8 @@ def _checked_bytes(root: Path, name: str, digest: str) -> bytes:
 
 def _gameplay_budget_successor(
     root: Path,
+    *,
+    current_tests: TestSuccessors,
 ) -> tuple[str, SourceSuccessors, TestSuccessors, bytes]:
     raw = _checked_bytes(root, GAMEPLAY_BUDGET_TRANSITION, GAMEPLAY_BUDGET_SHA256)
     record = json.loads(raw, object_pairs_hook=_selection_object)
@@ -181,7 +183,7 @@ def _gameplay_budget_successor(
         if set(change) != {"before", "after"}:
             raise SystemExit("Gameplay budget transition requires exact before and after digests.")
         _checked_bytes(root, name, change["after"])
-    successors = _selection_members(record["tests"], root)
+    successors = _selection_members(record["tests"], root, current=current_tests)
     return record["runtime_fingerprint"], record["sources"], successors, raw
 
 
@@ -202,13 +204,11 @@ def _stage2_fight_successor(root: Path) -> tuple[str, TestSuccessors, bytes]:
         or record["base"] != STAGE2_FIGHT_BASE
         or record["retained_gameplay_budget_sha256"] != GAMEPLAY_BUDGET_SHA256
         or set(record["source"]) != {STAGE2_FIGHT_SOURCE}
-        or set(record["test"]) != {STAGE2_FIGHT_OWNER}
+        or set(record["test"]) != {STAGE2_FIGHT_OWNER, GAMEPLAY_SORCERER_OWNER}
     ):
         raise SystemExit("Stage 2 Fight Cover test transition membership differs.")
     _checked_bytes(root, STAGE2_FIGHT_SOURCE, record["source"][STAGE2_FIGHT_SOURCE]["after"])
-    tests = _selection_members(
-        {STAGE2_FIGHT_OWNER: record["test"][STAGE2_FIGHT_OWNER]["after"]}, root
-    )
+    tests = _selection_members({name: row["after"] for name, row in record["test"].items()}, root)
     return record["runtime_fingerprint"], tests, raw
 
 
@@ -492,16 +492,17 @@ def exact_movement_test_transition(
         raw += b"\0" + codec_raw
     source_successors: SourceSuccessors = {}
     test_successors: TestSuccessors = {}
+    fight_successor = _stage2_fight_successor(root) if has_stage2_fight else None
+    stage2_fight_tests = {} if fight_successor is None else fight_successor[1]
     if has_gameplay_budget:
         if not has_codec:
             raise SystemExit("Gameplay movement budget tests require the oval codec predecessor.")
         runtime, source_successors, test_successors, successor_raw = _gameplay_budget_successor(
-            root
+            root, current_tests=stage2_fight_tests
         )
         raw += b"\0" + successor_raw
-    stage2_fight_tests: TestSuccessors = {}
-    if has_stage2_fight:
-        runtime, stage2_fight_tests, successor_raw = _stage2_fight_successor(root)
+    if fight_successor is not None:
+        runtime, _, successor_raw = fight_successor
         raw += b"\0" + successor_raw
     retained = _identity_test_transition(
         root,

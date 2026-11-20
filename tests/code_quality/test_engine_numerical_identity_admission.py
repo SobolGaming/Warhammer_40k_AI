@@ -159,6 +159,10 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         fight["test"][selection.STAGE2_FIGHT_OWNER]["before"]
         == _record(sharding.CUTOVER_PATH)["active_files"][selection.STAGE2_FIGHT_OWNER]
     )
+    assert (
+        fight["test"][selection.GAMEPLAY_SORCERER_OWNER]["before"]
+        == _record(selection.GAMEPLAY_BUDGET_TRANSITION)["tests"][selection.GAMEPLAY_SORCERER_OWNER]
+    )
     assert sum(selection.STAGE2_FIGHT_OWNER in group for group in groups) == 1
     prior = json.loads(
         subprocess.check_output(["git", "show", BASE + ":ci/test_shards/durations.json"], cwd=ROOT)

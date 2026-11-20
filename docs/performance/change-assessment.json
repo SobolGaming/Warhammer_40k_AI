@@ -86,11 +86,11 @@
     },
     "data/source_audits/ci64_provenance_v1/stage2-fight-cover-test-transition-v1.json": {
       "before_sha256": null,
-      "after_sha256": "23c95ee96c45787bf9c17ef4f03598cf50888f77ba6db8695610e2fd4c6183a2",
+      "after_sha256": "0a5a29ce7741dc63e2c70633fbc672c34d95e6668f6ec81cf6a0b65238619b79",
       "owners": {
         "@document": {
           "before": null,
-          "after": "23c95ee96c45787bf9c17ef4f03598cf50888f77ba6db8695610e2fd4c6183a2"
+          "after": "0a5a29ce7741dc63e2c70633fbc672c34d95e6668f6ec81cf6a0b65238619b79"
         }
       }
     },
@@ -106,19 +106,23 @@
     },
     "scripts/engine_numerical_identity_test_admission.py": {
       "before_sha256": "374db1c51122a62cc2b50d353e721a394499e6c961558949d216ba95837a055a",
-      "after_sha256": "6041f44f9f99bd0beb4818f4e83049170eabdccaa89bc2b1c8f3ad7864b64c5a",
+      "after_sha256": "a1aa9f0221c46093fe28841f9740c13d719c717a9a974811e0b3fbf68db02842",
       "owners": {
         "@module": {
           "before": "b8b4481660332d45dafb27db0b8e4c7073647a3e493896fd8329532938e44312",
-          "after": "87e47b23c0e13b2474f3bec0d85eadf5255306fad40e333fa3355fd50e361144"
+          "after": "71c3b2d2a06d6cd5b0099455f2c590cd06de94d797489777baa7abafb2b03647"
+        },
+        "_gameplay_budget_successor": {
+          "before": "e73889fcfc8bde06d7a0387b891d63a52b59e0bc34e72f8bff140fbf5da5a58c",
+          "after": "a23e75b4dcf12df446627cbc54d7ce75a566f4034863f1a29074cebe9c2c77d6"
         },
         "_stage2_fight_successor": {
           "before": null,
-          "after": "a9d85e63914581fa8790bab6d3e929850207c69220addb81dbfe67cbff592d65"
+          "after": "1a690eb71fbe76fc430de78d0c8afb94290f4a4d89447dcfc6e4f435e7cec0ae"
         },
         "exact_movement_test_transition": {
           "before": "e24109ea30d123bcc9c7d9231b94c347fb765668262219fc74f0f131b34d77c7",
-          "after": "ff63076c3499ecf5956e91312d3f6c3e3fe8bcf7e284e8fec0e70c4d3ba17e3e"
+          "after": "6913f889b98fb5c0b42fbfdfc4321736628ce66fb8329f22619aaf7d33760dd5"
         }
       }
     },
@@ -144,15 +148,29 @@
     },
     "tests/code_quality/test_engine_numerical_identity_admission.py": {
       "before_sha256": "c65ddb7b2faa85b7d3ab5762de17e874fc670953289b9613f563de33b2431036",
-      "after_sha256": "346e5545b9595a752d5de3943e9d2ba8679283c3a38938b65062cf27f8526bc2",
+      "after_sha256": "b4cb7b3eb9ae18c1e25cbf284dde54e45e3859e678ef805d3ecc14fe184c1462",
       "owners": {
         "test_identity_inventory_uses_current_twelve_shards_and_native_cohort": {
           "before": "e53caa72047673bf4e5268b41eec28bbbe601c91350eb82376ed28e8ad94a82e",
-          "after": "6607fd7d2703b5765501cb4921d9459b14a5b9fd007a4be72ee6e93223c48302"
+          "after": "76891819167df531587cebad274fc2ca32aef665427c99ca6fe622f61565675f"
         },
         "test_identity_transition_requires_its_exact_record": {
           "before": "07607599b6569385579b0581032026536d20757d68ccb85a321c645e9230a09a",
           "after": "f9c40837d54c767613dce46afb2c6e4494d701c0620155c0195220b979b4600e"
+        }
+      }
+    },
+    "tests/factions/emperors_children/test_selected_consumers.py": {
+      "before_sha256": "e2d52c29b3d13feb04a26fa731d7cceb260e6b6bf4fbf3337f39fc0df34d69ed",
+      "after_sha256": "2061271c9ff1ef95c9b1c12b2ad9771e57890ead2be9eafa27286a1ec4618876",
+      "owners": {
+        "test_icon_native_either_players_fight_restores_real_destruction_boundary": {
+          "before": "c0f178106b4d73e0fcb247f8b72ae26c8ecb2af234beddd6307ddb6579c924a2",
+          "after": "c5bc4212606a2be37fd245820fe97902d79465e8be8edb69671a9f63abf0fd34"
+        },
+        "test_infractors_native_melee_rerolls_destroy_enemy_then_icon_uses_own_bearer": {
+          "before": "f5560afe900d2a1beac4360bfd1717782ec47d7e6f6867c923cb6152089fe23a",
+          "after": "9a58a546402f6a85d6eec2854d7204b2082d7b9bcdbaa1616c44b72c9b1d00c8"
         }
       }
     },
@@ -303,6 +321,18 @@
       ],
       "selected_families": [],
       "rationale": "Admit one byte-pinned regression owner for the exact successor runtime and validate its retained preimages and shard membership.",
+      "source_obligation": "Apply retained Core 13.08 terrain Cover to ranged attacks at shared save preparation, preserving fail-closed runtime and test identity.",
+      "unchanged_work": "The existing ranged terrain and LOS algorithms, cache policies, saving throw and reroll rules, path validation, serialization and replay implementations, workload inventories, and budgets are preserved. The corrected melee rule branch bypasses a terrain query outside its scope."
+    },
+    "tests/factions/emperors_children/test_selected_consumers.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "qualification40-exact-43d80a5328081a25",
+        "supported-ec-profile-regression-controls",
+        "later-ir-icon-exact-43d80a5328081a25"
+      ],
+      "selected_families": [],
+      "rationale": "Requalify the fixed native Fight fixture seeds after the corrected melee save payload changes the deterministic event-history input to later rolls. Preserve the full destruction, reroll, leadership, persistence and replay assertions.",
       "source_obligation": "Apply retained Core 13.08 terrain Cover to ranged attacks at shared save preparation, preserving fail-closed runtime and test identity.",
       "unchanged_work": "The existing ranged terrain and LOS algorithms, cache policies, saving throw and reroll rules, path validation, serialization and replay implementations, workload inventories, and budgets are preserved. The corrected melee rule branch bypasses a terrain query outside its scope."
     },

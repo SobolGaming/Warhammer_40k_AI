@@ -23,6 +23,20 @@
         "sha256": "fce257529859ae2e17a8cefa3ba01142380ca783d267bb56bedbaad5dfe84a16",
         "bytes": 14203
       }
+    },
+    "tests/factions/emperors_children/test_selected_consumers.py": {
+      "before": {
+        "mode": "100644",
+        "blob_sha1": "43322a74e3ada5e84fc3f6a529ac17957050b04c",
+        "sha256": "e2d52c29b3d13feb04a26fa731d7cceb260e6b6bf4fbf3337f39fc0df34d69ed",
+        "bytes": 77597
+      },
+      "after": {
+        "mode": "100644",
+        "blob_sha1": "5256991d298bd644962f09315c19df816ee5fca0",
+        "sha256": "2061271c9ff1ef95c9b1c12b2ad9771e57890ead2be9eafa27286a1ec4618876",
+        "bytes": 77740
+      }
     }
   }
 }
