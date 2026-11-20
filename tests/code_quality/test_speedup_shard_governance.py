@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import ast
 import hashlib
+import json
 import subprocess
 import sys
 import tomllib
@@ -232,3 +233,86 @@ def test_cross_worker_fixture_cache_builds_once_and_rejects_corruption(
             controller_load()
     finally:
         tracer.stop()
+
+
+def test_quality_policy_fetches_exact_measurement_from_squashed_pull_request(
+    tmp_path: Path,
+) -> None:
+    helper = ".github/scripts/fetch_performance_revisions.py"
+    workflow = (ROOT / ".github/workflows/ci.yml").read_text()
+    lane = workflow.split("  quality-policy:\n")[1].split("  quality-shards:\n")[0]
+    assert lane.index("python -B " + helper) < lane.index("scripts.check_performance_policy")
+
+    origin = tmp_path / "origin"
+    origin.mkdir()
+
+    def git(cwd: Path, *args: str) -> str:
+        return subprocess.check_output(
+            ["git", "-c", "user.name=CI history", "-c", "user.email=ci@example.invalid", *args],
+            cwd=cwd,
+            stderr=subprocess.PIPE,
+            text=True,
+            timeout=30,
+        ).strip()
+
+    git(origin, "init", "--quiet")
+    git(origin, "symbolic-ref", "HEAD", "refs/heads/main")
+    git(origin, "config", "core.autocrlf", "false")
+    git(origin, "config", "uploadpack.allowReachableSHA1InWant", "true")
+    source = origin / "measurement.txt"
+    source.write_text("base\n")
+    git(origin, "add", ".")
+    git(origin, "commit", "-m", "Base")
+    git(origin, "checkout", "-b", "topic")
+    source.write_text("measured bytes\n")
+    git(origin, "commit", "-am", "Measured inputs")
+    measured = git(origin, "rev-parse", "HEAD")
+    source.write_text("later bytes\n")
+    assessment = "docs/performance/change-assessment.json"
+    report = "docs/performance/current/example.json"
+    (origin / report).parent.mkdir(parents=True)
+    (origin / assessment).write_text(json.dumps({"comparisons": {"example": report}}))
+
+    def write_report(cwd: Path, revision: str) -> None:
+        binding = {"schema": "tool-input-roles-v4", "sides": {"head": {"revision": revision}}}
+        (cwd / report).write_text(json.dumps({"input_binding": binding}))
+
+    write_report(origin, measured)
+    git(origin, "add", ".")
+    git(origin, "commit", "-m", "Commit evidence")
+    git(origin, "update-ref", "refs/pull/1/head", "HEAD")
+    git(origin, "checkout", "main")
+    git(origin, "merge", "--squash", "topic")
+    git(origin, "commit", "-m", "Squash")
+    git(origin, "branch", "-D", "topic")
+
+    checkout = tmp_path / "checkout"
+    git(
+        tmp_path,
+        "clone",
+        "--no-local",
+        "--single-branch",
+        "--branch",
+        "main",
+        str(origin),
+        str(checkout),
+    )
+    head = git(checkout, "rev-parse", "HEAD")
+    with pytest.raises(subprocess.CalledProcessError):
+        git(checkout, "show", f"{measured}:measurement.txt")
+    command = [sys.executable, "-B", str(ROOT / helper)]
+    subprocess.run(command, cwd=checkout, check=True, timeout=30)
+    assert git(checkout, "show", f"{measured}:measurement.txt") == "measured bytes"
+    assert git(checkout, "show", "HEAD:measurement.txt") == "later bytes"
+    assert git(checkout, "rev-parse", "HEAD") == head
+    assert git(checkout, "status", "--porcelain") == ""
+
+    for invalid, message in (
+        ("0" * 39 + "1", "0" * 39 + "1"),
+        ("HEAD", "Expected a full measured commit ID"),
+    ):
+        write_report(checkout, invalid)
+        git(checkout, "commit", "-am", "Invalid evidence")
+        failed = subprocess.run(command, cwd=checkout, capture_output=True, text=True, timeout=30)
+        assert failed.returncode != 0
+        assert message in failed.stderr
