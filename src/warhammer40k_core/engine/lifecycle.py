@@ -2616,13 +2616,7 @@ class GameLifecycle:
     ) -> LifecycleStatus:
         state = self._require_state()
         if is_stratagem_window_decline_result(result):
-            self._record_stratagem_window_declined(result)
-            if self._result_resolves_active_reaction_frame(result):
-                self.reaction_queue.resolve_reaction(
-                    result=result,
-                    decisions=self.decision_controller,
-                )
-            return self.advance_until_decision_or_terminal()
+            return self._apply_stratagem_window_decline(result)
         cost_choice_status = self._request_stratagem_cost_choice_if_available(
             source_request=record.request,
             source_result=result,
@@ -2704,20 +2698,7 @@ class GameLifecycle:
         state = self._require_state()
         resolves_reaction_frame = self._result_resolves_active_reaction_frame(result)
         if is_stratagem_window_decline_result(result):
-            self._record_stratagem_window_declined(result)
-            if resolves_reaction_frame:
-                if self._fight_interrupt_activation_is_active():
-                    advanced_status = self.advance_until_decision_or_terminal()
-                    self._continue_or_resolve_fight_reaction(
-                        result=result,
-                        status=advanced_status,
-                    )
-                    return advanced_status
-                self.reaction_queue.resolve_reaction(
-                    result=result,
-                    decisions=self.decision_controller,
-                )
-            return self.advance_until_decision_or_terminal()
+            return self._apply_stratagem_window_decline(result)
         cost_choice_status = self._request_stratagem_cost_choice_if_available(
             source_request=record.request,
             source_result=result,
@@ -3263,12 +3244,22 @@ class GameLifecycle:
         activation = fight_state.active_activation
         return activation is not None and activation.interrupt_id is not None
 
-    def _record_stratagem_window_declined(self, result: DecisionResult) -> None:
+    def _apply_stratagem_window_decline(self, result: DecisionResult) -> LifecycleStatus:
         record = self.decision_controller.record_for_result(result)
         self.decision_controller.event_log.append(
             STRATAGEM_WINDOW_DECLINED_EVENT_TYPE,
             stratagem_window_decline_event_payload(request=record.request, result=result),
         )
+        if self._result_resolves_active_reaction_frame(result):
+            if self._fight_interrupt_activation_is_active():
+                status = self.advance_until_decision_or_terminal()
+                self._continue_or_resolve_fight_reaction(result=result, status=status)
+                return status
+            self.reaction_queue.resolve_reaction(
+                result=result,
+                decisions=self.decision_controller,
+            )
+        return self.advance_until_decision_or_terminal()
 
     def _opportunity_boundary_state_hash(
         self,

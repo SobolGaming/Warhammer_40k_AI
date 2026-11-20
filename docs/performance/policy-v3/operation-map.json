@@ -36386,7 +36386,8 @@
         "data/source_audits/ci64_provenance_v1/engine-numerical-identity-test-transition-v1.json",
         "data/source_audits/ci64_provenance_v1/stage2-fight-cover-test-transition-v1.json",
         "data/source_audits/ci64_provenance_v1/stage2-counteroffensive-test-transition-v1.json",
-        "data/source_audits/ci64_provenance_v1/stage2-melee-restore-test-transition-v1.json"
+        "data/source_audits/ci64_provenance_v1/stage2-melee-restore-test-transition-v1.json",
+        "data/source_audits/ci64_provenance_v1/stage2-fight-reroll-test-transition-v1.json"
       ],
       "owners": [
         "*"
@@ -36413,7 +36414,22 @@
       "owners": [
         "_assert_counteroffensive_viewer_branches",
         "_assert_counteroffensive_continuation",
-        "_assert_counteroffensive_melee_restore"
+        "_assert_counteroffensive_melee_restore",
+        "_assert_counteroffensive_defender_reroll_decline"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "stage2-fight-stratagem-decline": {
+      "paths": [
+        "src/warhammer40k_core/engine/lifecycle.py"
+      ],
+      "owners": [
+        "GameLifecycle._apply_stratagem_decision",
+        "GameLifecycle._apply_stratagem_target_proposal_decision",
+        "GameLifecycle._apply_stratagem_window_decline",
+        "GameLifecycle._record_stratagem_window_declined"
       ],
       "families": [],
       "sensitive": false,
