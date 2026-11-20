@@ -147,6 +147,8 @@ def validate_charge_move_completed_event_authority(
     configured_ruleset_descriptor_hash: str,
 ) -> ChargeMoveCompletedEventAuthority:
     """Authenticate a charge completion against its exact decision and path chain."""
+    from warhammer40k_core.engine.movement_decision_authority import is_live_movement_history
+
     if type(event_index) is not int or not 0 <= event_index < len(event_records):
         raise GameLifecycleError("Charge move-completed event index is invalid.")
     if type(ruleset_descriptor) is not RulesetDescriptor:
@@ -237,6 +239,7 @@ def validate_charge_move_completed_event_authority(
         witness=witness,
         ruleset_descriptor=ruleset_descriptor,
         configured_ruleset_descriptor_hash=configured_ruleset_descriptor_hash,
+        verify_path_budgets=not is_live_movement_history(event_index, event),
     )
     from warhammer40k_core.engine.interrupted_charge import charge_turn_owner_at_event
 
@@ -565,6 +568,7 @@ def _validate_transition_and_result_payload(
     witness: PathWitness,
     ruleset_descriptor: RulesetDescriptor,
     configured_ruleset_descriptor_hash: str,
+    verify_path_budgets: bool,
 ) -> BattlefieldTransitionBatch:
     raw_transition = _object(payload.get("transition_batch"), "transition batch")
     transition = BattlefieldTransitionBatch.from_payload(
@@ -596,6 +600,11 @@ def _validate_transition_and_result_payload(
             "Charge move-completed maximum distance must be finite and nonnegative."
         )
     maximum_distance = float(cast(float, raw_maximum))
+    decode_path = (
+        PathValidationResult.from_payload
+        if verify_path_budgets
+        else PathValidationResult.from_certified_payload
+    )
     movement_ids: list[str] = []
     displaced_ids: list[str] = []
     for movement, raw_path, raw_terrain in zip(
@@ -611,7 +620,7 @@ def _validate_transition_and_result_payload(
             raise GameLifecycleError("Charge move-completed model movement is duplicated.")
         movement_ids.append(model_id)
         poses = witness.poses_for_model(model_id)
-        path_result = PathValidationResult.from_payload(cast(PathValidationResultPayload, raw_path))
+        path_result = decode_path(cast(PathValidationResultPayload, raw_path))
         terrain_result = TerrainPathLegalityResult.from_payload(
             cast(TerrainPathLegalityResultPayload, raw_terrain)
         )

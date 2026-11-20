@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+from collections.abc import Generator
+from contextlib import contextmanager
+from contextvars import ContextVar
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, cast
 
@@ -16,7 +19,7 @@ from warhammer40k_core.engine.battlefield_transition_history import (
 from warhammer40k_core.engine.decision_record import DecisionRecord
 from warhammer40k_core.engine.decision_request import DecisionRequest, DecisionRequestPayload
 from warhammer40k_core.engine.decision_result import DecisionResult
-from warhammer40k_core.engine.event_log import EventRecord, JsonValue
+from warhammer40k_core.engine.event_log import EventLog, EventRecord, JsonValue
 from warhammer40k_core.engine.flight_decision_authority import (
     invalid_flight_authority,
     validate_restored_flight,
@@ -48,6 +51,26 @@ if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
 
 
+_LIVE_MOVEMENT_HISTORY: ContextVar[EventLog | None] = ContextVar(
+    "live_movement_history", default=None
+)
+
+
+@contextmanager
+def reuse_live_movement_history(event_log: EventLog) -> Generator[None]:
+    """Reuse certificates from the engine-owned event log during live play."""
+    token = _LIVE_MOVEMENT_HISTORY.set(event_log)
+    try:
+        yield
+    finally:
+        _LIVE_MOVEMENT_HISTORY.reset(token)
+
+
+def is_live_movement_history(index: int, event: EventRecord) -> bool:
+    event_log = _LIVE_MOVEMENT_HISTORY.get()
+    return event_log is not None and event_log.owns_record_at(index, event)
+
+
 def invalid_movement_authority(
     *,
     state: GameState,
@@ -71,6 +94,44 @@ def validate_restored_movement(*, state: GameState, decisions: DecisionControlle
     from warhammer40k_core.engine.move_keyword_completion import validate_move_keyword_history
 
     validate_move_keyword_history(state=state, decisions=decisions)
+    _validate_deferred_movement_budgets(decisions)
+
+
+def _validate_deferred_movement_budgets(decisions: DecisionController) -> None:
+    from warhammer40k_core.engine.desperate_escape_mortal_wounds import RESOLVED, STARTED
+    from warhammer40k_core.engine.phases.movement_model import (
+        SELECT_DESPERATE_ESCAPE_MODEL_DECISION_TYPE,
+        SELECT_EMBARK_TRANSPORT_DECISION_TYPE,
+    )
+    from warhammer40k_core.geometry.movement_envelope import reuse_movement_certificates
+    from warhammer40k_core.geometry.path_validation_result import (
+        PathValidationResult,
+        PathValidationResultPayload,
+    )
+
+    path_sources: list[JsonValue] = []
+    for request in decisions.queue.pending_requests:
+        if not isinstance(request.payload, dict):
+            continue
+        if request.decision_type == SELECT_EMBARK_TRANSPORT_DECISION_TYPE:
+            context = request.payload.get("movement_context")
+            if isinstance(context, dict):
+                path_sources.append(context.get("movement_payload"))
+        elif request.decision_type == SELECT_DESPERATE_ESCAPE_MODEL_DECISION_TYPE:
+            context = request.payload.get("fall_back_context")
+            if isinstance(context, dict):
+                path_sources.append(context.get("fall_back_result"))
+    for event in decisions.event_log.records:
+        if event.event_type in {STARTED, RESOLVED} and isinstance(event.payload, dict):
+            path_sources.append(event.payload.get("fall_back_result"))
+    with reuse_movement_certificates():
+        for source in path_sources:
+            if not isinstance(source, dict) or not isinstance(
+                results := source.get("path_validation_results"), list
+            ):
+                raise GameLifecycleError("Deferred movement is missing certified path evidence.")
+            for result in results:
+                PathValidationResult.from_payload(cast(PathValidationResultPayload, result))
 
 
 _MOVING_ACTION_KINDS = frozenset({"normal_move", "advance", "fall_back"})

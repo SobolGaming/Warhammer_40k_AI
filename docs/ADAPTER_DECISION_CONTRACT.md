@@ -1,16 +1,12 @@
 # Adapter Decision Contract
 
-## Distance precision foundation (inactive)
+## Whole-path movement budgets (Contract 48)
 
-The tested `milli-inch-half-away-v1` arithmetic foundation does not change any
-decision family, proposal payload, projection, submission validation or session
-default in this slice. Existing clients preserve engine-emitted geometry under
-`battlefield-coordinate-v1`; they must not snap an old session's inputs or infer
-new legality from rounded presentation. The [distance precision contract](DISTANCE_PRECISION.md)
-defines the explicit tie rule, dimensional semantics and coordinated profile,
-persistence, hash/cache, geometry-predicate and replay work required before
-activation. Linux remains the execution authority. Isolated arithmetic tests on
-two operating systems do not qualify native geometry or client equivalence.
+Submit the original path waypoints and facings. The shared engine validator
+rounds the full measured length once to 0.001 inch at the budget check.
+Terrain, collision and contact still use the submitted geometry. Session
+configuration declares the active binary-pose movement-budget policy. See the
+[distance precision contract](DISTANCE_PRECISION.md) for the tie rule and scope.
 
 ## Private game randomness (Contract 46)
 
@@ -8215,11 +8211,8 @@ must not leave a commitment to different, unprojected identifiers.
 
 ## Numerical identity admission
 
-External contract 47.0.0 binds the legacy numerical policy and coordinate
-representation in config/state and replay identity. Current persistence uses
-local-game-session-persistence-v3-numerical-identity; replay uses
-replay-artifact-v38-numerical-identity. No player choice or new precision mode is
-added. Legacy pose/path proposals retain their schema and reject unknown numerical
-labels at every pose and model-path boundary before accepted engine mutation.
-Old unbound histories require their retained compatible executor; loading never
-inserts a numerical identity into an old history.
+External contract 48.0.0 binds the movement-budget policy and binary coordinate
+representation in config, state and replay identity. Native persistence uses
+`local-game-session-persistence-v3-numerical-identity` and replay uses
+`replay-artifact-v38-numerical-identity`. Pose and path proposals reject unknown
+numerical labels at every pose and model-path boundary before engine mutation.

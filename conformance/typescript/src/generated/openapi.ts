@@ -258,7 +258,7 @@ export interface components {
                 /** @constant */
                 version: "engine-numerical-identity-v1";
                 /** @constant */
-                numerical_policy_id: "legacy-binary-inch-v1";
+                numerical_policy_id: "binary-inch-milli-inch-movement-budget-v1";
                 /** @constant */
                 coordinate_representation_id: "binary-float-pose-v1";
             };

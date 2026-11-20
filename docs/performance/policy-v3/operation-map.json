@@ -199,7 +199,7 @@
       "workload_id": "external-contract-orphan-write-independent-check-v1",
       "input_binding": {
         "schema": "tool-input-roles-v4",
-        "role_specification": "docs/performance/policy-v3/numerical-identity-main692-input-roles-v4.json"
+        "role_specification": "docs/performance/policy-v3/gameplay-movement-budget-input-roles-v4.json"
       }
     },
     "session_command_fork": {
@@ -36406,6 +36406,116 @@
         "movement"
       ],
       "sensitive": true,
+      "mandatory": true
+    },
+    "gameplay-movement-budget-test-admission": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/gameplay-movement-budget-test-transition-v1.json"
+      ],
+      "owners": ["*"],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "gameplay-movement-decision-staging": {
+      "paths": ["src/warhammer40k_core/engine/decision_controller.py"],
+      "owners": [
+        "@module",
+        "DecisionController",
+        "DecisionController.commit_movement_result",
+        "DecisionController.prepare_movement_result",
+        "DecisionController.movement_request_for_result",
+        "_PreparedMovementResult"
+      ],
+      "families": ["player_boundary", "reconstruction"],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "gameplay-charge-certificate-commit": {
+      "paths": [
+        "src/warhammer40k_core/engine/catalog_setup_reactive_charge_move.py",
+        "src/warhammer40k_core/engine/phases/charge_proposal_flow.py"
+      ],
+      "owners": [
+        "_apply_charge_move_proposal_decision",
+        "apply_catalog_setup_reactive_charge_move"
+      ],
+      "families": ["movement"],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "gameplay-scout-certificate-commit": {
+      "paths": ["src/warhammer40k_core/engine/setup_flow.py"],
+      "owners": ["SetupFlow.apply_decision"],
+      "families": ["movement", "setup"],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "gameplay-native-charge-retry-test": {
+      "paths": ["tests/rules/section11/test_moves.py"],
+      "owners": ["test_native_charge_certification_timeout_leaves_the_same_proposal_retryable"],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "gameplay-live-movement-history-occurrence": {
+      "paths": ["src/warhammer40k_core/engine/event_log.py"],
+      "owners": ["EventLog.owns_record_at"],
+      "families": ["movement", "player_boundary", "reconstruction"],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "gameplay-escape-battle-shock-source-authority": {
+      "paths": [
+        "src/warhammer40k_core/engine/battle_shock_source_family_authority.py"
+      ],
+      "owners": [
+        "@module",
+        "_fall_back_source",
+        "_validate_forced_desperate_escape_source",
+        "_validate_loaded_forced_desperate_escape_source_history",
+        "_validate_pending_forced_desperate_escape_source",
+        "validate_battle_shock_source_family_authority",
+        "validate_pending_battle_shock_source_family_authority"
+      ],
+      "families": [
+        "movement",
+        "shock_reconstruction",
+        "reconstruction",
+        "dice"
+      ],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "gameplay-native-escape-reroll-test": {
+      "paths": ["tests/rules/section09/test_fall_back.py"],
+      "owners": [
+        "escape_reroll_definitions",
+        "test_native_escape_battle_shock_reroll_reuses_certified_path"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "gameplay-movement-budget-facade-tests": {
+      "paths": [
+        "tests/rules/section03/test_facade.py"
+      ],
+      "owners": [
+        "_add_spare_mover",
+        "test_normal_move_facade_budgets_once_rounded_complete_paths"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "gameplay-movement-budget-contract": {
+      "paths": [
+        "contracts/compatibility/48.0.0-shape.json"
+      ],
+      "owners": ["*"],
+      "families": [],
+      "sensitive": false,
       "mandatory": true
     },
     "exact-movement-test-admission": {

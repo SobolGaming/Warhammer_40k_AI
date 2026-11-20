@@ -3,6 +3,7 @@
 import json
 from dataclasses import replace
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -15,6 +16,7 @@ from warhammer40k_core.engine.battlefield_state import BattlefieldPlacementKind
 from warhammer40k_core.engine.effects import EffectExpiration
 from warhammer40k_core.engine.event_log import validate_json_value
 from warhammer40k_core.engine.movement_proposals import (
+    MovementProposalPayload,
     MovementProposalRequest,
     PlacementProposalPayload,
     ProposalKind,
@@ -23,6 +25,8 @@ from warhammer40k_core.engine.phase import BattlePhase, LifecycleStatusKind
 from warhammer40k_core.engine.rules_units import rules_unit_is_battle_shocked
 from warhammer40k_core.engine.shock_disembark import shock_disembark_permission_effect
 from warhammer40k_core.engine.transports import DisembarkModeKind, TransportMovementStatus
+from warhammer40k_core.geometry import milli_inch_symbolic
+from warhammer40k_core.geometry.pathing import PathWitness
 from warhammer40k_core.geometry.pose import Pose
 
 
@@ -188,6 +192,7 @@ def test_native_facade_disembark_mode_and_aftermath_are_engine_owned_and_json_sa
 
 def test_native_normal_move_offers_and_commits_embark_after_actual_witness(
     section18_definitions: Section02Definitions,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     s = transport_scene(section18_definitions, embarked=False, passenger_poses=(Pose.at(23, 20),))
     request = begin(s.session)
@@ -199,17 +204,43 @@ def test_native_normal_move_offers_and_commits_embark_after_actual_witness(
         request_id=status.decision_request.request_id, result_id="normal", option_id="normal_move"
     )
     assert status.decision_request is not None
-    status = propose(
-        s.session, status.decision_request, s.passenger, (Pose.at(23.1, 20),), result_id="path"
+    request = status.decision_request
+    proposal = MovementProposalRequest.from_decision_request_payload(request.payload)
+    (model_id,) = s.passenger.own_model_ids()
+    witness = PathWitness.for_paths(
+        ((model_id, (Pose.at(23, 20), Pose.at(23.05, 20), Pose.at(23.1, 20))),)
+    )
+    status = s.session.submit_parameterized_payload(
+        request_id=request.request_id,
+        result_id="path",
+        payload=validate_json_value(
+            MovementProposalPayload(
+                proposal_request_id=request.request_id,
+                proposal_kind=proposal.proposal_kind,
+                unit_instance_id=s.passenger.unit_instance_id,
+                movement_phase_action="normal_move",
+                movement_mode="normal",
+                witness=witness,
+            ).to_payload()
+        ),
     )
     assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()
     assert status.decision_request is not None
     request = status.decision_request
     assert request.decision_type == "select_embark_transport"
     assert s.transport.unit_instance_id in {o.option_id for o in request.options}
-    status = s.session.submit_option(
-        request_id=request.request_id, result_id="embark", option_id=s.transport.unit_instance_id
-    )
+
+    def reject_remeasurement() -> float:
+        pytest.fail("Embark must reuse the certified distance from the completed move.")
+
+    with monkeypatch.context() as patch:
+        patch.setattr(milli_inch_symbolic, "time", SimpleNamespace(monotonic=reject_remeasurement))
+        status = s.session.submit_option(
+            request_id=request.request_id,
+            result_id="embark",
+            option_id=s.transport.unit_instance_id,
+        )
+    assert len(events(s.session, "movement_activation_completed")) == 1
     assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()
     assert s.cargo.embarked_unit_instance_ids == (s.passenger.unit_instance_id,)
     assert s.state.battlefield_state is not None
@@ -488,7 +519,7 @@ def test_a32_oct14_reconstruction_is_deterministic_and_keeps_original_outcomes(
         assert payload.pop("tactical_secondary_draw_sequence") == 0
         assert payload.pop("numerical_identity") == {
             "version": "engine-numerical-identity-v1",
-            "numerical_policy_id": "legacy-binary-inch-v1",
+            "numerical_policy_id": "binary-inch-milli-inch-movement-budget-v1",
             "coordinate_representation_id": "binary-float-pose-v1",
         }
         field = (

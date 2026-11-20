@@ -1,8 +1,4 @@
-"""Executable inner geometry identity; unsupported representations fail closed.
-
-This is the current legacy executor contract, not admission of staged arithmetic.
-Historical unbound payloads require their retained compatible executor.
-"""
+"""Executable inner identity for binary poses and once-rounded movement budgets."""
 
 from __future__ import annotations
 
@@ -11,8 +7,8 @@ from typing import Self, TypedDict, cast
 
 from warhammer40k_core.geometry.pose import GeometryError
 
-LEGACY_NUMERICAL_POLICY_ID = "legacy-binary-inch-v1"
-LEGACY_COORDINATE_REPRESENTATION_ID = "binary-float-pose-v1"
+CURRENT_NUMERICAL_POLICY_ID = "binary-inch-milli-inch-movement-budget-v1"
+COORDINATE_REPRESENTATION_ID = "binary-float-pose-v1"
 NUMERICAL_IDENTITY_VERSION = "engine-numerical-identity-v1"
 
 
@@ -24,15 +20,15 @@ class NumericalIdentityPayload(TypedDict):
 
 @dataclass(frozen=True, slots=True)
 class NumericalIdentity:
-    numerical_policy_id: str = LEGACY_NUMERICAL_POLICY_ID
-    coordinate_representation_id: str = LEGACY_COORDINATE_REPRESENTATION_ID
+    numerical_policy_id: str = CURRENT_NUMERICAL_POLICY_ID
+    coordinate_representation_id: str = COORDINATE_REPRESENTATION_ID
 
     def __post_init__(self) -> None:
         if (
             type(self.numerical_policy_id) is not str
-            or self.numerical_policy_id != LEGACY_NUMERICAL_POLICY_ID
+            or self.numerical_policy_id != CURRENT_NUMERICAL_POLICY_ID
             or type(self.coordinate_representation_id) is not str
-            or self.coordinate_representation_id != LEGACY_COORDINATE_REPRESENTATION_ID
+            or self.coordinate_representation_id != COORDINATE_REPRESENTATION_ID
         ):
             raise GeometryError("Unsupported engine numerical identity.")
 
@@ -62,7 +58,7 @@ class NumericalIdentity:
         return cls(numerical_policy_id=policy, coordinate_representation_id=coordinates)
 
 
-LEGACY_NUMERICAL_IDENTITY = NumericalIdentity()
+CURRENT_NUMERICAL_IDENTITY = NumericalIdentity()
 
 
 def validate_numerical_identity(value: object) -> NumericalIdentity:

@@ -44,7 +44,7 @@ from warhammer40k_core.engine.weapon_declaration import (
 from warhammer40k_core.geometry.pathing import ModelPathEndpoint, PathWitness
 from warhammer40k_core.geometry.pose import Pose, PosePayload
 
-OPPOSING_SHOOTER_ID = "canonical-opposing-shooter-v2-numerical-identity"
+OPPOSING_SHOOTER_ID = "canonical-opposing-shooter-v3-movement-budget"
 # Receipt versions do not relabel the original ordinary decision identifiers.
 OPPOSING_SHOOTER_EXECUTION_ID = "canonical-opposing-shooter-v1"
 _VEHICLE = "army-alpha:strategic-reserve-unit"
@@ -151,6 +151,7 @@ def _submit(
     route: tuple[str, str, str],
     option: str | None = None,
     payload: JsonValue | None = None,
+    result_scope: str = OPPOSING_SHOOTER_EXECUTION_ID,
 ) -> dict[str, JsonValue]:
     request = session.lifecycle.pending_decision_request()
     _require(request is not None, "Opposing witness requires a pending decision.")
@@ -168,7 +169,7 @@ def _submit(
     )
     index = session.decision_record_count()
     viewer = ViewerContext.for_player(request.actor_id)
-    result_id = f"{OPPOSING_SHOOTER_EXECUTION_ID}:{index}"
+    result_id = f"{result_scope}:{index}"
     if option is not None:
         status = session.submit_viewer_option(
             viewer=viewer,
@@ -391,7 +392,9 @@ def _declaration(context: PlayerDecisionContext) -> JsonValue:
     )
 
 
-def _finish_attack(session: LocalGameSession) -> list[dict[str, JsonValue]]:
+def _finish_attack(
+    session: LocalGameSession, *, declaration_scope: str = OPPOSING_SHOOTER_EXECUTION_ID
+) -> list[dict[str, JsonValue]]:
     context = PlayerDecisionContext.from_view(
         session.view(viewer_player_id="player-b"), choice_seed=7
     )
@@ -400,6 +403,7 @@ def _finish_attack(session: LocalGameSession) -> list[dict[str, JsonValue]]:
             session,
             route=("player-b", "shooting", "submit_shooting_declaration"),
             payload=_declaration(context),
+            result_scope=declaration_scope,
         )
     ]
     for _ in range(4):

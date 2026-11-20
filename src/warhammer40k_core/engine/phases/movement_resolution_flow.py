@@ -100,10 +100,10 @@ def _apply_movement_proposal_decision(
     if movement_state is None or movement_state.active_selection is None:
         raise GameLifecycleError("Movement proposal requires active movement selection.")
 
-    record = decisions.record_for_result(result)
+    request = decisions.movement_request_for_result(result)
     parsed = _parse_movement_proposal_submission_or_invalid(
         state=state,
-        request=record.request,
+        request=request,
         result=result,
         decisions=decisions,
     )
@@ -174,6 +174,7 @@ def _apply_movement_proposal_decision(
                 ),
             ),
         )
+        decisions.commit_movement_result(result)
         if not resolution.is_valid:
             return _reject_invalid_movement_resolution(
                 state=state,
@@ -260,6 +261,7 @@ def _apply_movement_proposal_decision(
                 for grant in _advance_move_grants_from_context(proposal_request.context or {})
             ),
         )
+        decisions.commit_movement_result(result)
         if not advance_resolution.is_valid:
             violation_code = _normal_move_violation_code(advance_resolution)
             return _reject_invalid_movement_resolution(
@@ -443,6 +445,7 @@ def _apply_movement_proposal_decision(
             resolution=fall_back_resolution,
             fall_back_mode=fall_back_mode,
         )
+        decisions.commit_movement_result(result)
         if mode_violation_code is not None:
             return _reject_invalid_movement_resolution(
                 state=state,

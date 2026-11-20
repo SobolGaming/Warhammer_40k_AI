@@ -1,5 +1,6 @@
 """09.07 and both 09.07.01 nodes: modes, hazard consequences and FAQ13."""
 
+from dataclasses import replace
 from typing import cast
 
 import pytest
@@ -9,6 +10,7 @@ from tests.support.section02_fixtures import Section02Definitions
 from tests.support.section03_fixtures import grid, native_state, paths, scenario
 from tests.support.section03_session import movement_session
 from tests.support.section09_fixtures import (
+    add_unit,
     choose,
     events,
     finish_hazard_choices,
@@ -16,21 +18,48 @@ from tests.support.section09_fixtures import (
     propose,
     select,
 )
+from warhammer40k_core.core.datasheet import (
+    CatalogAbilitySourceKind,
+    CatalogAbilitySupport,
+    CatalogJsonObject,
+    DatasheetAbilityDescriptor,
+)
 from warhammer40k_core.core.modifiers import RollModifier
 from warhammer40k_core.engine.abilities import AbilityCatalogIndex
 from warhammer40k_core.engine.ability_catalog import catalog_ability_records_from_catalog
+from warhammer40k_core.engine.battle_shock import BattleShockResult, BattleShockResultPayload
+from warhammer40k_core.engine.battle_shock_event_authority import (
+    validate_battle_shock_resolution_event_authority,
+)
 from warhammer40k_core.engine.catalog_desperate_escape import (
     battle_shocked_roll_modifiers_for_record,
 )
-from warhammer40k_core.engine.dice import DiceRollManager
+from warhammer40k_core.engine.dice import DICE_REROLL_DECISION_TYPE, DiceRollManager
+from warhammer40k_core.engine.event_log import validate_json_value
+from warhammer40k_core.engine.movement_decision_authority import reuse_live_movement_history
+from warhammer40k_core.engine.movement_proposals import (
+    MovementProposalPayload,
+    MovementProposalRequest,
+)
+from warhammer40k_core.engine.phase import LifecycleStatusKind
 from warhammer40k_core.engine.phases.movement import (
     DesperateEscapeRoll,
     DesperateEscapeRollPayload,
     FallBackModeKind,
     resolve_fall_back_move,
 )
+from warhammer40k_core.engine.phases.movement_state import MovementPhaseState
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+from warhammer40k_core.geometry import milli_inch_symbolic
+from warhammer40k_core.geometry.movement_envelope import MovementDistanceUnresolvedError
+from warhammer40k_core.geometry.pathing import PathWitness
 from warhammer40k_core.geometry.pose import Pose
+from warhammer40k_core.rules.objective_terminology import ObjectiveRuleScope
+from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
+from warhammer40k_core.rules.source_data import RuleSourceText
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    datasheet_keyword_lexicon_2026_06_14,
+)
 
 
 @pytest.mark.parametrize("shocked", [False, True])
@@ -316,3 +345,156 @@ def test_voluntary_escape_tests_battle_shock_after_moving_only_if_not_already_sh
             < types.index("desperate_escape_battle_shock_resolved")
             < types.index("movement_activation_completed")
         )
+
+
+@pytest.fixture(scope="module")
+def escape_reroll_definitions(section09_definitions: Section02Definitions) -> Section02Definitions:
+    # A narrow catalog fixture grants the genuine rule-IR reroll to the native
+    # movement scene without depending on an unadmitted fortification footprint.
+    source = RuleSourceText.from_raw(
+        objective_scope=ObjectiveRuleScope.CORE_RULES,
+        source_id="section09:desperate-escape-reroll",
+        raw_text=(
+            'While a friendly Khorne Legiones Daemonica unit is within 6" of this '
+            "FORTIFICATION, each time you take a Battle-shock test for that unit, you can "
+            "re-roll that test."
+        ),
+    )
+    rule_ir = compile_rule_source_text(
+        source,
+        source_keyword_sequence_parts=(
+            datasheet_keyword_lexicon_2026_06_14.canonical_datasheet_keyword_sequence_parts()
+        ),
+    ).rule_ir
+    ability = DatasheetAbilityDescriptor(
+        ability_id=source.source_id,
+        name="Battle-shock Reroll",
+        source_id=source.source_id,
+        support=CatalogAbilitySupport.GENERIC_RULE_IR,
+        source_kind=CatalogAbilitySourceKind.DATASHEET,
+        effect_description=source.raw_text,
+        rule_ir_payload=cast(CatalogJsonObject, rule_ir.to_payload()),
+    )
+    package = section09_definitions.package
+    catalog = package.army_catalog
+    mover = catalog.datasheet_by_id("000004090")
+    provider = catalog.datasheet_by_id("000000599")
+    mover = replace(
+        mover,
+        keywords=replace(
+            mover.keywords,
+            keywords=(*mover.keywords.keywords, "KHORNE"),
+            faction_keywords=(*mover.keywords.faction_keywords, "LEGIONES DAEMONICA"),
+        ),
+    )
+    provider = replace(
+        provider,
+        keywords=replace(
+            provider.keywords, keywords=(*provider.keywords.keywords, "FORTIFICATION")
+        ),
+        abilities=(*provider.abilities, ability),
+        source_ids=tuple(sorted({*provider.source_ids, source.source_id})),
+    )
+    updated = {mover.datasheet_id: mover, provider.datasheet_id: provider}
+    catalog = replace(
+        catalog,
+        datasheets=tuple(updated.get(row.datasheet_id, row) for row in catalog.datasheets),
+        source_ids=tuple(sorted({*catalog.source_ids, source.source_id})),
+    )
+    return Section02Definitions(replace(package, army_catalog=catalog), 0.0)
+
+
+@pytest.mark.parametrize("option_id", ["decline", "reroll:0,1"])
+def test_native_escape_battle_shock_reroll_reuses_certified_path(
+    escape_reroll_definitions: Section02Definitions,
+    option_id: str,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    definitions = escape_reroll_definitions
+    _, state, unit = movement_case(definitions, engaged=True)
+    provider = definitions.unit("000000599", identity="reroll-provider")
+    state.game_id = "section09-hazard-consequence"
+    state.private_rng_seed = fixture_private_rng_seed("section09-hazard-consequence:private-0")
+    add_unit(state, provider, (Pose.at(17, 7),))
+    session = movement_session(definitions, state)
+    request = choose(session, select(session, unit), "fall_back:desperate_escape")
+    proposal = MovementProposalRequest.from_decision_request_payload(request.payload)
+    (first_id, second_id) = unit.own_model_ids()
+    witness = PathWitness.for_paths(
+        (
+            (first_id, (Pose.at(10, 10), Pose.at(10, 8), Pose.at(10, 6))),
+            (second_id, (Pose.at(12, 10), Pose.at(12.25, 8), Pose.at(12.5, 6))),
+        )
+    )
+    status = session.submit_parameterized_payload(
+        request_id=request.request_id,
+        result_id="escape-path",
+        payload=validate_json_value(
+            MovementProposalPayload(
+                proposal_request_id=request.request_id,
+                proposal_kind=proposal.proposal_kind,
+                unit_instance_id=unit.unit_instance_id,
+                movement_phase_action="fall_back",
+                movement_mode="fall_back",
+                fall_back_mode="desperate_escape",
+                witness=witness,
+            ).to_payload()
+        ),
+    )
+    status = finish_hazard_choices(session, status)
+    reroll_request = status.decision_request
+    assert reroll_request is not None, status.to_payload()
+    assert reroll_request.decision_type == DICE_REROLL_DECISION_TYPE
+    assert option_id in {option.option_id for option in reroll_request.options}
+    assert state.movement_phase_state is not None
+    saved_state = state.movement_phase_state.to_payload()
+    assert MovementPhaseState.from_payload(saved_state).to_payload() == saved_state
+
+    def unresolved(*_args: object, **_kwargs: object) -> int:
+        raise milli_inch_symbolic.UnresolvedDistanceMeasurementError("test clock expired")
+
+    with monkeypatch.context() as patch:
+        patch.setattr(milli_inch_symbolic, "symbolic_squared_path_inches_to_ticks", unresolved)
+        with pytest.raises(MovementDistanceUnresolvedError):
+            MovementPhaseState.from_payload(saved_state)
+        completed = session.submit_option(
+            request_id=reroll_request.request_id,
+            option_id=option_id,
+            result_id="escape-reroll",
+        )
+        decisions = session.lifecycle.decision_controller
+        history = decisions.event_log.records
+        ((resolved_index, resolved_event),) = tuple(
+            (index, event)
+            for index, event in enumerate(history)
+            if event.event_type == "battle_shock_test_resolved"
+        )
+        resolved_payload = resolved_event.payload
+        assert isinstance(resolved_payload, dict)
+        result = BattleShockResult.from_payload(
+            cast(BattleShockResultPayload, resolved_payload["battle_shock_result"])
+        )
+        with reuse_live_movement_history(decisions.event_log):
+            assert (
+                validate_battle_shock_resolution_event_authority(
+                    event_records=history,
+                    decision_records=decisions.records,
+                    resolved_index=resolved_index,
+                    resolved_payload=resolved_payload,
+                    result=result,
+                ).result
+                == result
+            )
+    assert completed.status_kind is not LifecycleStatusKind.INVALID, completed.to_payload()
+    records = session.lifecycle.decision_controller.records
+    rerolls = [
+        record.result
+        for record in records
+        if record.request.request_id == reroll_request.request_id
+    ]
+    assert [(result.result_id, result.selected_option_id) for result in rerolls] == [
+        ("escape-reroll", option_id)
+    ]
+    assert len(events(session, "fall_back_move_applied")) == 1
+    assert len(events(session, "desperate_escape_battle_shock_resolved")) == 1
+    assert len(events(session, "movement_activation_completed")) == 1

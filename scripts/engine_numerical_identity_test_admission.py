@@ -118,6 +118,20 @@ OVAL_CODEC_SHA256 = "b7bdb26dd433d2b87d0f488ffd054f6bb41592f6ac23865c66c5ccd0ec2
 OVAL_CODEC_OWNER = "tests/rules/section01/test_milli_inch_oval_payload.py"
 
 
+GAMEPLAY_BUDGET_TRANSITION = (
+    "data/source_audits/ci64_provenance_v1/gameplay-movement-budget-test-transition-v1.json"
+)
+GAMEPLAY_BUDGET_SHA256 = "16fea4c0dd316cc1a1499e31ae211d7f172696bc8e74deee857f27ed388ea962"
+GAMEPLAY_BUDGET_OWNER = "tests/rules/section03/test_facade.py"
+GAMEPLAY_CHARGE_OWNER = "tests/rules/section11/test_moves.py"
+GAMEPLAY_ESCAPE_OWNER = "tests/rules/section09/test_fall_back.py"
+GAMEPLAY_SORCERER_OWNER = "tests/factions/emperors_children/test_selected_consumers.py"
+
+
+type SourceSuccessors = dict[str, dict[str, str]]
+type TestSuccessors = dict[str, dict[str, object]]
+
+
 type TestTransition = tuple[dict[str, dict[str, object]], dict[str, dict[str, object]], bytes]
 
 
@@ -129,6 +143,46 @@ def _checked_bytes(root: Path, name: str, digest: str) -> bytes:
     if hashlib.sha256(raw).hexdigest() != digest:
         raise SystemExit("Numerical identity test transition source bytes differ: " + name)
     return raw
+
+
+def _gameplay_budget_successor(
+    root: Path,
+) -> tuple[str, SourceSuccessors, TestSuccessors, bytes]:
+    raw = _checked_bytes(root, GAMEPLAY_BUDGET_TRANSITION, GAMEPLAY_BUDGET_SHA256)
+    record = json.loads(raw, object_pairs_hook=_selection_object)
+    if (
+        record.keys()
+        != {"schema", "retained_oval_codec_sha256", "runtime_fingerprint", "sources", "tests"}
+        or record["schema"] != "finite-gameplay-movement-budget-test-transition-v1"
+        or record["retained_oval_codec_sha256"] != OVAL_CODEC_SHA256
+        or set(record["tests"])
+        != {
+            GAMEPLAY_BUDGET_OWNER,
+            GAMEPLAY_CHARGE_OWNER,
+            GAMEPLAY_ESCAPE_OWNER,
+            GAMEPLAY_SORCERER_OWNER,
+            "tests/infrastructure/adapters/test_canonical_deployment_coverage.py",
+            OWNER,
+            "tests/infrastructure/adapters/unit/test_linux_authority.py",
+            "tests/infrastructure/adapters/unit/test_numerical_policy.py",
+            "tests/rules/section18/test_facade.py",
+        }
+    ):
+        raise SystemExit("Gameplay movement budget test transition membership differs.")
+    for name, change in record["sources"].items():
+        if set(change) != {"before", "after"}:
+            raise SystemExit("Gameplay budget transition requires exact before and after digests.")
+        _checked_bytes(root, name, change["after"])
+    successors = _selection_members(record["tests"], root)
+    return record["runtime_fingerprint"], record["sources"], successors, raw
+
+
+def _retained_source(root: Path, name: str, digest: str, successors: SourceSuccessors) -> None:
+    if name in successors:
+        if successors[name]["before"] != digest:
+            raise SystemExit("Gameplay movement budget source preimage differs: " + name)
+        return
+    _checked_bytes(root, name, digest)
 
 
 def engine_numerical_identity_test_transition(
@@ -391,7 +445,23 @@ def exact_movement_test_transition(
         additions.update(_selection_members(codec["added_files"], root))
         runtime = codec["runtime_fingerprint"]
         raw += b"\0" + codec_raw
-    retained = _identity_test_transition(root, retained_cutover_sha256, runtime=runtime)
+    source_successors: SourceSuccessors = {}
+    test_successors: TestSuccessors = {}
+    _selection_no_links(root, root / GAMEPLAY_BUDGET_TRANSITION)
+    if (root / GAMEPLAY_BUDGET_TRANSITION).exists():
+        if not has_codec:
+            raise SystemExit("Gameplay movement budget tests require the oval codec predecessor.")
+        runtime, source_successors, test_successors, successor_raw = _gameplay_budget_successor(
+            root
+        )
+        raw += b"\0" + successor_raw
+    retained = _identity_test_transition(
+        root,
+        retained_cutover_sha256,
+        runtime=runtime,
+        source_successors=source_successors,
+        test_successors=test_successors,
+    )
     if retained is None:
         raise SystemExit(
             "Exact movement test transition requires the numerical identity predecessor."
@@ -399,12 +469,27 @@ def exact_movement_test_transition(
     updated, added, retained_raw = retained
     if additions.keys() & (updated.keys() | added.keys()):
         raise SystemExit("Exact movement test cases overlap the predecessor selection.")
+    if test_successors:
+        for name in (
+            GAMEPLAY_BUDGET_OWNER,
+            GAMEPLAY_CHARGE_OWNER,
+            GAMEPLAY_ESCAPE_OWNER,
+            GAMEPLAY_SORCERER_OWNER,
+        ):
+            updated[name] = test_successors[name]
     return updated, {**added, **additions}, retained_raw + b"\0" + raw
 
 
 def _identity_test_transition(
-    root: Path, retained_cutover_sha256: str, *, runtime: str
+    root: Path,
+    retained_cutover_sha256: str,
+    *,
+    runtime: str,
+    source_successors: SourceSuccessors | None = None,
+    test_successors: TestSuccessors | None = None,
 ) -> TestTransition | None:
+    sources = {} if source_successors is None else source_successors
+    tests = {} if test_successors is None else test_successors
     for name in (ADDITION, MANIFEST, SOURCE, OWNER):
         _selection_no_links(root, root / name)
     manifest = (
@@ -454,15 +539,15 @@ def _identity_test_transition(
     ):
         raise SystemExit("Numerical identity test transition membership differs.")
     for name, digest in record["sources"].items():
-        _checked_bytes(root, name, digest)
+        _retained_source(root, name, digest, sources)
     contact_raw = _checked_bytes(root, CONTACT_ADDITION, CONTACT_ADDITION_SHA256)
     contact = json.loads(contact_raw, object_pairs_hook=_selection_object)
     for name, digest in contact["sources"].items():
-        _checked_bytes(root, name, digest)
+        _retained_source(root, name, digest, sources)
     pairs_raw = _checked_bytes(root, PAIRS_ADDITION, PAIRS_ADDITION_SHA256)
     pairs = json.loads(pairs_raw, object_pairs_hook=_selection_object)
     for name, digest in pairs["sources"].items():
-        _checked_bytes(root, name, digest)
+        _retained_source(root, name, digest, sources)
     queries_raw = _checked_bytes(root, QUERIES_ADDITION, QUERIES_ADDITION_SHA256)
     queries = json.loads(queries_raw, object_pairs_hook=_selection_object)
     # The hash-pinned original transition retains its original point-query source.
@@ -481,14 +566,15 @@ def _identity_test_transition(
     circle_raw = _checked_bytes(root, CIRCLE_ADDITION, CIRCLE_SHA256)
     circle = json.loads(circle_raw, object_pairs_hook=_selection_object)
     for name, digest in circle["sources"].items():
-        _checked_bytes(root, name, digest)
+        _retained_source(root, name, digest, sources)
     for name, digest in polygon["sources"].items():
-        _checked_bytes(root, name, digest)
+        _retained_source(root, name, digest, sources)
     for name, digest in symbolic["sources"].items():
-        _checked_bytes(root, name, digest)
+        _retained_source(root, name, digest, sources)
     for name, digest in profile["sources"].items():
-        _checked_bytes(root, name, record["sources"].get(name, digest))
-    current_updated = _selection_members(record["updated_files"], root)
+        _retained_source(root, name, record["sources"].get(name, digest), sources)
+    current_updated = _selection_members(record["updated_files"], root, current=tests)
+    current_updated = {name: tests.get(name, row) for name, row in current_updated.items()}
     updated = _selection_members(profile["updated_files"], root, current=current_updated)
     from scripts.speedup_test_admission import ADDITION as SPEEDUP_ADDITION
     from scripts.speedup_test_admission import ADDITION_SHA256 as SPEEDUP_SHA256
@@ -506,19 +592,19 @@ def _identity_test_transition(
     updated.update(_selection_members(speedup["updated_files"], root, current=current_updated))
     updated.update(current_updated)
     retained = _selection_members(foundation["added_files"], root)
-    retained.update(_selection_members(profile["added_files"], root))
+    retained.update(_selection_members(profile["added_files"], root, current=tests))
     retained.update(_selection_members(symbolic["added_files"], root))
     retained.update(_selection_members(polygon["added_files"], root))
     retained.update(_selection_members(circle["added_files"], root))
     retained.update(_selection_members(queries["added_files"], root))
     retained.update(_selection_members(pairs["added_files"], root))
     retained.update(_selection_members(contact["added_files"], root))
-    additions = _selection_members(record["added_files"], root)
+    additions = _selection_members(record["added_files"], root, current=tests)
     if additions.keys() & (updated.keys() | retained.keys()):
         raise SystemExit("Numerical identity test transition source memberships overlap.")
     return (
         updated,
-        {**retained, **additions},
+        {name: tests.get(name, row) for name, row in (retained | additions).items()},
         foundation_raw
         + b"\0"
         + profile_raw

@@ -1,7 +1,7 @@
-"""Inactive milli-inch measurement boundaries for exact real-polynomial consumers.
+"""Milli-inch measurement boundaries for exact real-polynomial consumers.
 
 Lengths are nonnegative; squared segment sources are square inches. No predicate
-here defines contact, intersection or overlap, and no gameplay caller opts in.
+here defines contact, intersection or overlap.
 """
 
 from __future__ import annotations

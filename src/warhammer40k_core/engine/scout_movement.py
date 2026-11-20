@@ -76,6 +76,7 @@ def apply_scout_move(
     )
     current = RulesUnitPlacement.from_battlefield(view=view, battlefield_state=battlefield)
     attempted = _scout_endpoint_placement(current, proposal.witness)
+    decisions.commit_movement_result(result)
     for component in attempted.component_unit_placements:
         battlefield = battlefield.with_unit_placement(component)
     state.replace_battlefield_state(battlefield)

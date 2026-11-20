@@ -1,6 +1,6 @@
 # CORE V2 external contract
 
-The current language-neutral bundle is Contract **47.0.0**. Start with
+The current language-neutral bundle is Contract **48.0.0**. Start with
 `openapi.yaml`, the canonical schemas and schema-validated examples. The
 [adapter decision contract](../docs/ADAPTER_DECISION_CONTRACT.md) defines current
 choice, projection, visibility and replay semantics. The

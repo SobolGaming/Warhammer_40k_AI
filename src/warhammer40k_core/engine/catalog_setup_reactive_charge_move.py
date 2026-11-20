@@ -203,6 +203,7 @@ def apply_catalog_setup_reactive_charge_move(
             message="Setup-reactive Charge Move proposal does not match the pending request.",
         )
     if proposal.is_no_move_choice:
+        decisions.commit_movement_result(result)
         decisions.event_log.append(
             "catalog_setup_reactive_charge_move_declined",
             validate_json_value(
@@ -254,6 +255,7 @@ def apply_catalog_setup_reactive_charge_move(
         unit_persisting_effects=tuple(state.persisting_effects_for_unit(proposal.unit_instance_id)),
         ability_index=ability_index,
     )
+    decisions.commit_movement_result(result)
     violation_code = charge_move_violation_code(
         resolution=resolution,
         ruleset_descriptor=ruleset_descriptor,

@@ -209,8 +209,8 @@ def apply_fight_movement_proposal(
     )
 
     del handler
-    record = decisions.record_for_result(result)
-    proposal_request = MovementProposalRequest.from_decision_request_payload(record.request.payload)
+    request = decisions.movement_request_for_result(result)
+    proposal_request = MovementProposalRequest.from_decision_request_payload(request.payload)
     proposal = fight_movement_proposal_from_payload(result.payload)
     target_authority_witness = build_fight_movement_target_authority_witness(
         state=state,
@@ -223,6 +223,7 @@ def apply_fight_movement_proposal(
             _ENDPOINT_ONLY_PATH_VIOLATION_CODE,
         ):
             raise GameLifecycleError("Recorded fight movement proposal drifted before application.")
+        decisions.commit_movement_result(result)
         return reject_recorded_invalid_fight_movement(
             state=state,
             decisions=decisions,
@@ -254,6 +255,7 @@ def apply_fight_movement_proposal(
         ruleset_descriptor=state.runtime_ruleset_descriptor(),
         state=state,
     )
+    decisions.commit_movement_result(result)
     if resolution_violation is not None:
         violation_code = _first_proposal_violation_code(resolution_violation)
         return reject_recorded_invalid_fight_movement(
@@ -327,7 +329,7 @@ def apply_fight_movement_proposal(
         event_type="fight_movement_completed",
         payload=validate_json_value(completed_payload),
     )
-    end_fight_move(state=state, decisions=decisions, request=record.request, result=result)
+    end_fight_move(state=state, decisions=decisions, request=request, result=result)
     from warhammer40k_core.engine.consolidation_fight_queue import start_consolidation_fight_queue
 
     start_consolidation_fight_queue(

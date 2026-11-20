@@ -66,6 +66,10 @@ class EventLog:
     def records(self) -> tuple[EventRecord, ...]:
         return tuple(self._records)
 
+    def owns_record_at(self, index: int, event: EventRecord) -> bool:
+        """Check the identity of an event occurrence, including newly appended records."""
+        return 0 <= index < len(self._records) and self._records[index] is event
+
     def records_since(self, start_index: int) -> tuple[EventRecord, ...]:
         """Return a validated append suffix for engine-owned history consumers."""
         if type(start_index) is not int or start_index < 0 or start_index > len(self._records):

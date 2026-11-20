@@ -1321,7 +1321,7 @@ def test_two_native_sorcerers_wrack_the_same_target_without_stacking_movement() 
         translate_native,
     )
 
-    session = native_session(second_sorcerer=True, seed="ec-double-0")
+    session = native_session(second_sorcerer=True, seed="ec-double-1")
     deploy_native(session)
     translate_native(session, "attached-unit:owner:bodyguard", 7.0)
     translate_native(session, "owner:second-sorcerer", 6.2)

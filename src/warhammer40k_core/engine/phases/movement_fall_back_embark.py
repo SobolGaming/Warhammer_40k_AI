@@ -108,7 +108,9 @@ def _apply_desperate_escape_model_selection_decision(
         FallBackActionResultPayload,
         _payload_object(context_payload, key="fall_back_result"),
     )
-    fall_back_result = FallBackActionResult.from_payload(fall_back_result_payload)
+    fall_back_result = FallBackActionResult.from_payload(
+        fall_back_result_payload, certified_paths=True
+    )
     destroyed_model_ids = tuple(
         cast(
             list[str],

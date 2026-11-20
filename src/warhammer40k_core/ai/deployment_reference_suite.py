@@ -24,7 +24,7 @@ from warhammer40k_core.ai.runner import RunReport
 from warhammer40k_core.ai.training_admission import TrainingAdmissionError, VerifiedEpisodeOrigin
 from warhammer40k_core.engine.event_log import JsonValue, canonical_json, validate_json_value
 
-REFERENCE_SUITE_ID = "deployment-order-diagonal-reference-suite-v3-numerical-identity"
+REFERENCE_SUITE_ID = "deployment-order-diagonal-reference-suite-v4-movement-budget"
 REFERENCE_SUITE_EXECUTION_ID = "deployment-order-diagonal-reference-suite-v2"
 REFERENCE_SUITE_SCHEMA = "deployment-reference-suite-v2-numerical-identity"
 # Fixed before engine measurement. Reordering only complete select/place pairs
@@ -50,7 +50,7 @@ SUITE_REFERENCE_TRANSLATIONS = (
 )
 # V3 binds current numerical identity. Historical v1/v2 evidence remains at its
 # original paths under docs/performance; no archived definition is repinned.
-REFERENCE_SUITE_DEFINITION_HASH = "1d9fc09c69fac90196bd77c3ac468c2dbd6af223396353810d475dbdd6f18c12"
+REFERENCE_SUITE_DEFINITION_HASH = "353e43aaad65fcc3b245735690e8b276a870cd9fa1d4ff052d210bb00f1ed25a"
 
 
 def reference_case_steps(case_id: str) -> tuple[_Step, ...]:

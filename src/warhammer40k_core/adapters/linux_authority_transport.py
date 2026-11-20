@@ -22,7 +22,7 @@ from warhammer40k_core.adapters.execution_profile import (
     validate_executor_profile,
 )
 from warhammer40k_core.adapters.numerical_policy import (
-    LEGACY_NUMERICAL_POLICY,
+    CURRENT_NUMERICAL_POLICY,
     NumericalPolicyConfiguration,
 )
 from warhammer40k_core.build_identity import verified_engine_build_identity
@@ -64,7 +64,7 @@ class LinuxAuthority:
         command: Sequence[str],
         *,
         expected_profile: JsonValue,
-        numerical_policy: NumericalPolicyConfiguration = LEGACY_NUMERICAL_POLICY,
+        numerical_policy: NumericalPolicyConfiguration = CURRENT_NUMERICAL_POLICY,
         timeout_seconds: float = 900.0,
     ) -> None:
         if type(numerical_policy) is not NumericalPolicyConfiguration:

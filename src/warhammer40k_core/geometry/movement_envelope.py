@@ -1,11 +1,21 @@
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass
+from collections.abc import Generator
+from contextlib import contextmanager
+from contextvars import ContextVar
+from dataclasses import dataclass, field
+from fractions import Fraction
 from itertools import pairwise
 from typing import Self, TypedDict, cast
 
 from warhammer40k_core.core.validation import IdentifierValidator
+from warhammer40k_core.geometry.milli_inch import (
+    DistancePrecisionError,
+    inches_to_ticks,
+    squared_inches_to_ticks,
+    ticks_to_inches,
+)
 from warhammer40k_core.geometry.pose import (
     Facing,
     GeometryError,
@@ -18,7 +28,10 @@ from warhammer40k_core.geometry.pose import (
 from warhammer40k_core.geometry.volume import Model
 
 _SEGMENT_MEASUREMENT_POINT = "pose_anchor"
-_MOVEMENT_DISTANCE_EPSILON = 1e-9
+
+
+class MovementDistanceUnresolvedError(GeometryError):
+    """A bounded full-path measurement could not certify its budget value."""
 
 
 class MovementSegmentPayload(TypedDict):
@@ -68,12 +81,7 @@ def _movement_budget_components(
     max_distance: float,
     total_distance: float,
 ) -> tuple[float, float]:
-    remaining = max_distance - total_distance
-    exceeded = total_distance - max_distance
-    return (
-        remaining if remaining > _MOVEMENT_DISTANCE_EPSILON else 0.0,
-        exceeded if exceeded > _MOVEMENT_DISTANCE_EPSILON else 0.0,
-    )
+    return max(0.0, max_distance - total_distance), max(0.0, total_distance - max_distance)
 
 
 @dataclass(frozen=True, slots=True)
@@ -240,20 +248,20 @@ class MovementDistanceBudget:
             "MovementDistanceBudget exceeded_by_inches",
             self.exceeded_by_inches,
         )
-        if not math.isclose(
-            total_distance,
-            straight_line_distance,
-            rel_tol=0.0,
-            abs_tol=1e-9,
-        ):
-            raise GeometryError("MovementDistanceBudget total must equal segment distance.")
+        if total_distance != float(ticks_to_inches(inches_to_ticks(total_distance))):
+            raise GeometryError("MovementDistanceBudget total must be in whole milli-inches.")
+        # A rounded path budget can straddle a midpoint with its raw float sum.
+        # Allow float error from the component differences, norms and sum here.
+        tolerance = 4 * max(math.ulp(straight_line_distance), math.ulp(total_distance))
+        if abs(straight_line_distance - total_distance) > 0.0005 + tolerance:
+            raise GeometryError("MovementDistanceBudget total does not match the scalar distance.")
         expected_remaining, expected_exceeded = _movement_budget_components(
             max_distance=max_distance,
             total_distance=total_distance,
         )
-        if not math.isclose(remaining, expected_remaining, rel_tol=0.0, abs_tol=1e-9):
+        if remaining != expected_remaining:
             raise GeometryError("MovementDistanceBudget remaining distance is inconsistent.")
-        if not math.isclose(exceeded_by, expected_exceeded, rel_tol=0.0, abs_tol=1e-9):
+        if exceeded_by != expected_exceeded:
             raise GeometryError("MovementDistanceBudget exceeded distance is inconsistent.")
         object.__setattr__(self, "max_distance_inches", max_distance)
         object.__setattr__(self, "straight_line_distance_inches", straight_line_distance)
@@ -262,21 +270,47 @@ class MovementDistanceBudget:
         object.__setattr__(self, "exceeded_by_inches", exceeded_by)
 
     @classmethod
+    def for_segments(
+        cls,
+        *,
+        max_distance_inches: float,
+        segments: tuple[MovementSegment, ...],
+    ) -> Self:
+        return cls._from_measurement(
+            max_distance_inches=max_distance_inches,
+            straight_line_distance_inches=sum(segment.distance_inches for segment in segments),
+            total_distance_inches=_rounded_path_inches(segments),
+        )
+
+    @classmethod
     def from_totals(
+        cls, *, max_distance_inches: float, straight_line_distance_inches: float
+    ) -> Self:
+        """Build a budget from a supplied complete scalar measurement."""
+        return cls._from_measurement(
+            max_distance_inches=max_distance_inches,
+            straight_line_distance_inches=straight_line_distance_inches,
+            total_distance_inches=float(
+                ticks_to_inches(inches_to_ticks(straight_line_distance_inches))
+            ),
+        )
+
+    @classmethod
+    def _from_measurement(
         cls,
         *,
         max_distance_inches: float,
         straight_line_distance_inches: float,
+        total_distance_inches: float,
     ) -> Self:
-        total_distance = straight_line_distance_inches
         remaining, exceeded = _movement_budget_components(
             max_distance=max_distance_inches,
-            total_distance=total_distance,
+            total_distance=total_distance_inches,
         )
         return cls(
             max_distance_inches=max_distance_inches,
             straight_line_distance_inches=straight_line_distance_inches,
-            total_distance_inches=total_distance,
+            total_distance_inches=total_distance_inches,
             remaining_distance_inches=remaining,
             exceeded_by_inches=exceeded,
         )
@@ -296,6 +330,10 @@ class MovementDistanceBudget:
 
     @classmethod
     def from_payload(cls, payload: MovementDistanceBudgetPayload) -> Self:
+        if type(cast(object, payload)) is not dict or set(payload) != set(
+            MovementDistanceBudgetPayload.__annotations__
+        ):
+            raise GeometryError("MovementDistanceBudget has incompatible fields.")
         return cls(
             max_distance_inches=payload["max_distance_inches"],
             straight_line_distance_inches=payload["straight_line_distance_inches"],
@@ -310,7 +348,8 @@ class MovementDistanceWitness:
     model_id: str
     segments: tuple[MovementSegment, ...]
     rotation_events: tuple[RotationEvent, ...] = ()
-    budget: MovementDistanceBudget | None = None
+    max_distance_inches: float | None = None
+    budget: MovementDistanceBudget | None = field(init=False)
 
     def __post_init__(self) -> None:
         model_id = _validate_identifier("MovementDistanceWitness model_id", self.model_id)
@@ -338,16 +377,17 @@ class MovementDistanceWitness:
             segments=segments,
             rotation_events=rotation_events,
         )
-        if self.budget is not None:
-            if type(self.budget) is not MovementDistanceBudget:
-                raise GeometryError("MovementDistanceWitness budget must be a budget.")
-            if not math.isclose(
-                self.budget.straight_line_distance_inches,
-                sum(segment.distance_inches for segment in segments),
-                rel_tol=0.0,
-                abs_tol=1e-9,
-            ):
-                raise GeometryError("MovementDistanceWitness budget segment distance drift.")
+        budget = (
+            None
+            if self.max_distance_inches is None
+            else MovementDistanceBudget.for_segments(
+                max_distance_inches=self.max_distance_inches, segments=segments
+            )
+        )
+        object.__setattr__(
+            self, "max_distance_inches", None if budget is None else budget.max_distance_inches
+        )
+        object.__setattr__(self, "budget", budget)
         object.__setattr__(self, "model_id", model_id)
         object.__setattr__(self, "segments", segments)
         object.__setattr__(self, "rotation_events", rotation_events)
@@ -362,6 +402,16 @@ class MovementDistanceWitness:
     ) -> Self:
         valid_model = _validate_model("MovementDistanceWitness model", model)
         path = _validate_pose_path("MovementDistanceWitness poses", poses)
+        scope = _CERTIFICATES.get() if len(path) > 2 else None
+        cache = None if scope is None else scope.witnesses
+        key = None
+        if cache is not None and max_distance_inches is not None:
+            limit = _validate_non_negative_number(
+                "MovementDistanceWitness max_distance_inches", max_distance_inches
+            )
+            key = (valid_model.model_id, path, limit)
+            if key in cache:
+                return cast(Self, cache[key])
         segments = tuple(
             MovementSegment.from_poses(
                 model_id=valid_model.model_id,
@@ -384,21 +434,15 @@ class MovementDistanceWitness:
                     facing_delta_degrees=_facing_delta_degrees(start_pose, end_pose),
                 )
             )
-        straight_line_distance = sum(segment.distance_inches for segment in segments)
-        budget = (
-            None
-            if max_distance_inches is None
-            else MovementDistanceBudget.from_totals(
-                max_distance_inches=max_distance_inches,
-                straight_line_distance_inches=straight_line_distance,
-            )
-        )
-        return cls(
+        witness = cls(
             model_id=valid_model.model_id,
             segments=segments,
             rotation_events=tuple(rotation_events),
-            budget=budget,
+            max_distance_inches=max_distance_inches,
         )
+        if cache is not None and key is not None:
+            cache[key] = witness
+        return witness
 
     @property
     def straight_line_distance_inches(self) -> float:
@@ -422,8 +466,17 @@ class MovementDistanceWitness:
 
     @classmethod
     def from_payload(cls, payload: MovementDistanceWitnessPayload) -> Self:
-        budget_payload = payload["budget"]
-        return cls(
+        witness = cls.from_certified_payload(payload)
+        if witness.budget is not None and witness.budget != MovementDistanceBudget.for_segments(
+            max_distance_inches=witness.budget.max_distance_inches, segments=witness.segments
+        ):
+            raise GeometryError("MovementDistanceWitness budget does not match the measured path.")
+        return witness
+
+    @classmethod
+    def from_certified_payload(cls, payload: MovementDistanceWitnessPayload) -> Self:
+        """Read an engine-certified witness from a live continuation or event."""
+        witness = cls(
             model_id=payload["model_id"],
             segments=tuple(
                 MovementSegment.from_payload(segment) for segment in payload["segments"]
@@ -431,12 +484,77 @@ class MovementDistanceWitness:
             rotation_events=tuple(
                 RotationEvent.from_payload(event) for event in payload["rotation_events"]
             ),
-            budget=(
-                None
-                if budget_payload is None
-                else MovementDistanceBudget.from_payload(budget_payload)
-            ),
         )
+        if (budget_payload := payload["budget"]) is not None:
+            budget = MovementDistanceBudget.from_payload(budget_payload)
+            if budget.straight_line_distance_inches != witness.straight_line_distance_inches:
+                raise GeometryError(
+                    "MovementDistanceWitness budget does not match the segment sum."
+                )
+            object.__setattr__(witness, "max_distance_inches", budget.max_distance_inches)
+            object.__setattr__(witness, "budget", budget)
+        return witness
+
+
+class _MovementCertificates:
+    def __init__(self) -> None:
+        self.witnesses: dict[tuple[str, tuple[Pose, ...], float], MovementDistanceWitness] = {}
+        self.lengths: dict[tuple[Point3, ...], float] = {}
+
+
+_CERTIFICATES: ContextVar[_MovementCertificates | None] = ContextVar(
+    "movement_certificates", default=None
+)
+
+
+@contextmanager
+def reuse_movement_certificates() -> Generator[None]:
+    """Reuse successful certificates only within one prospective decision."""
+    token = _CERTIFICATES.set(_MovementCertificates())
+    try:
+        yield
+    finally:
+        _CERTIFICATES.reset(token)
+
+
+def _rounded_path_inches(segments: tuple[MovementSegment, ...]) -> float:
+    positions = (
+        segments[0].start_pose.position,
+        *(segment.end_pose.position for segment in segments),
+    )
+    scope = _CERTIFICATES.get() if len(segments) > 1 else None
+    if scope is None:
+        return _measure_path_inches(positions)
+    if positions not in scope.lengths:
+        scope.lengths[positions] = _measure_path_inches(positions)
+    return scope.lengths[positions]
+
+
+def _measure_path_inches(positions: tuple[Point3, ...]) -> float:
+    squares: list[Fraction] = []
+    for start, end in pairwise(positions):
+        if start != end:
+            dx = Fraction(end.x) - Fraction(start.x)
+            dy = Fraction(end.y) - Fraction(start.y)
+            dz = Fraction(end.z) - Fraction(start.z)
+            squares.append(dx * dx + dy * dy + dz * dz)
+    if not squares:
+        return 0.0
+    if len(squares) == 1:
+        return float(ticks_to_inches(squared_inches_to_ticks(squares[0])))
+    from warhammer40k_core.geometry.milli_inch_symbolic import (
+        UnresolvedDistanceMeasurementError,
+        symbolic_squared_path_inches_to_ticks,
+    )
+
+    try:
+        return float(ticks_to_inches(symbolic_squared_path_inches_to_ticks(squares)))
+    except UnresolvedDistanceMeasurementError as exc:
+        raise MovementDistanceUnresolvedError(
+            "Could not certify the whole-path movement budget distance."
+        ) from exc
+    except DistancePrecisionError as exc:
+        raise GeometryError("Could not certify the whole-path movement budget distance.") from exc
 
 
 @dataclass(frozen=True, slots=True)

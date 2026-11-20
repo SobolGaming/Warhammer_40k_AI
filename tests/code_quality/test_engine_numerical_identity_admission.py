@@ -65,10 +65,8 @@ def transition_snapshot(tmp_path: Path) -> Path:
     for name in names:
         destination = tmp_path / name
         destination.parent.mkdir(parents=True, exist_ok=True)
-        contents = (
-            subprocess.check_output(["git", "show", IDENTITY_REVISION + ":" + name], cwd=ROOT)
-            if name == MANIFEST
-            else (ROOT / name).read_bytes()
+        contents = subprocess.check_output(
+            ["git", "show", IDENTITY_REVISION + ":" + name], cwd=ROOT
         )
         destination.write_bytes(contents)
     _transition(tmp_path)
@@ -194,6 +192,30 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
     oval_codec = {node for node in current if node.startswith(selection.OVAL_CODEC_OWNER + "::")}
     assert len(oval_codec) == 32
     assert sum(selection.OVAL_CODEC_OWNER in group for group in groups) == 1
+    gameplay_prefix = (
+        selection.GAMEPLAY_BUDGET_OWNER
+        + "::test_normal_move_facade_budgets_once_rounded_complete_paths"
+    )
+    gameplay = {
+        gameplay_prefix + "[" + case + "]"
+        for case in (
+            "below-budget-midpoint",
+            "exact-midpoint",
+            "above-budget-midpoint",
+            "blocked",
+            "timeout-then-retry",
+        )
+    }
+    gameplay.add(
+        selection.GAMEPLAY_CHARGE_OWNER
+        + "::test_native_charge_certification_timeout_leaves_the_same_proposal_retryable"
+    )
+    gameplay.update(
+        selection.GAMEPLAY_ESCAPE_OWNER
+        + "::test_native_escape_battle_shock_reroll_reuses_certified_path"
+        + f"[{choice}]"
+        for choice in ("decline", "reroll:0,1")
+    )
     assert current.keys() == (
         retained
         | added
@@ -207,6 +229,7 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         | oval_oval_gap
         | oval_oval_witnesses
         | oval_codec
+        | gameplay
     )
 
 

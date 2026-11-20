@@ -907,11 +907,17 @@ def test_numerical_identity_scope_routes_current_base_without_replacing_history(
     historical = scopes.registered_scope(scopes.NUMERICAL_IDENTITY_BASE)
     assert historical.base == "9747b9b0873b4f442d3cd81f72280b24810d952c"
     assert scopes.read_role_spec(ROOT, scope_base=historical.base)["base"] == historical.base
+    active = scopes.registered_scope(scopes.GAMEPLAY_MOVEMENT_BUDGET_BASE)
     current = json.loads((ROOT / inputs.MAP_PATH).read_bytes())["families"][inputs.FAMILY]
     assert current["input_binding"] == {
         "schema": scopes.SCHEMA,
-        "role_specification": scope.spec_path,
+        "role_specification": active.spec_path,
     }
+    assert scopes.read_role_spec(ROOT, scope_base=active.base)["base"] == active.base
+    assert active.required == scope.required
+    assert active.harness == scope.harness
+    assert "contracts/compatibility/48.0.0-shape.json" in active.new_treatment
+    assert provenance.registered_provenance_context(active.spec_path) is not None
     assert scope.harness == scopes.registered_scope(scopes.PR2_BASE).harness
     assert scope.required == scopes.registered_scope(scopes.PR2_BASE).required
     assert (

@@ -1,6 +1,7 @@
 """11.04 physical producer, endpoint obligations, rejection and continuation."""
 
 import json
+from types import SimpleNamespace
 
 import pytest
 
@@ -18,7 +19,16 @@ from tests.support.section11_fixtures import (
     witness,
 )
 from warhammer40k_core.engine.charge_model_endpoints import ChargeModelEndpointWitness
+from warhammer40k_core.engine.charge_move_event_authority import (
+    ChargeMoveCompletedEventAuthority,
+    validate_charge_move_completed_event_authority,
+)
+from warhammer40k_core.engine.event_log import EventRecord
+from warhammer40k_core.engine.movement_decision_authority import reuse_live_movement_history
 from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatusKind
+from warhammer40k_core.geometry import milli_inch_symbolic
+from warhammer40k_core.geometry.movement_envelope import MovementDistanceUnresolvedError
+from warhammer40k_core.geometry.path_measurement import interpolate_pose
 from warhammer40k_core.geometry.pathing import PathWitness
 from warhammer40k_core.geometry.pose import Pose
 
@@ -292,3 +302,108 @@ def test_one_inch_obligation_is_unreachable_when_real_budget_stops_at_engagement
     row = result.endpoint_witness.model_endpoints[0]
     assert row.preferred_reachability.status == "unreachable"
     assert row.engagement_reachability.status == "satisfied"
+
+
+def test_native_charge_certification_timeout_leaves_the_same_proposal_retryable(
+    section11_definitions: Section02Definitions,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    state, unit, enemy = state_case(section11_definitions)
+    modifier(state, unit.unit_instance_id, 12)
+    session = session_for(section11_definitions, state)
+    select(session, unit)
+    selected_targets = (enemy.unit_instance_id,)
+    request = targets(session, selected_targets)
+    legal = witness(state, unit.unit_instance_id, 4.25)
+    two_segments = PathWitness.for_paths(
+        tuple(
+            (model_id, (start, interpolate_pose(start, end, 0.5), end))
+            for model_id, (start, end) in legal.model_paths
+        )
+    )
+    before = session.lifecycle.to_payload()
+    clock = iter((0.0, 11.0))
+    with monkeypatch.context() as patch:
+        patch.setattr(milli_inch_symbolic, "time", SimpleNamespace(monotonic=clock.__next__))
+        expired = propose(
+            session, unit.unit_instance_id, selected_targets, two_segments, result_id="retry-charge"
+        )
+    assert expired.status_kind is LifecycleStatusKind.INVALID
+    assert isinstance(expired.payload, dict)
+    validation = expired.payload["proposal_validation"]
+    assert isinstance(validation, dict)
+    violations = validation["violations"]
+    assert isinstance(violations, list)
+    assert len(violations) == 1
+    assert isinstance(violations[0], dict)
+    assert violations[0]["violation_code"] == "movement_distance_unresolved"
+    assert pending(session) == request
+    assert session.lifecycle.to_payload() == before
+
+    record_count = session.decision_record_count()
+    measured = False
+
+    def clock_before_commit() -> float:
+        nonlocal measured
+        assert session.decision_record_count() == record_count
+        measured = True
+        return 0.0
+
+    with monkeypatch.context() as patch:
+        patch.setattr(milli_inch_symbolic, "time", SimpleNamespace(monotonic=clock_before_commit))
+        accepted = propose(
+            session, unit.unit_instance_id, selected_targets, two_segments, result_id="retry-charge"
+        )
+    assert measured
+    assert accepted.status_kind is not LifecycleStatusKind.INVALID
+    assert len(events(session, "charge_move_completed")) == 1
+    assert (
+        sum(
+            record.result.result_id == "retry-charge"
+            for record in session.lifecycle.decision_controller.records
+        )
+        == 1
+    )
+
+    decisions = session.lifecycle.decision_controller
+    event_records = decisions.event_log.records
+    (event_index,) = tuple(
+        index
+        for index, event in enumerate(event_records)
+        if event.event_type == "charge_move_completed"
+    )
+
+    descriptor = session.lifecycle.config.ruleset_descriptor
+
+    def charge_authority(history: tuple[EventRecord, ...]) -> ChargeMoveCompletedEventAuthority:
+        payload = history[event_index].payload
+        assert isinstance(payload, dict)
+        return validate_charge_move_completed_event_authority(
+            event_records=history,
+            decision_records=decisions.records,
+            event_index=event_index,
+            payload=payload,
+            ruleset_descriptor=descriptor,
+            configured_ruleset_descriptor_hash=descriptor.descriptor_hash,
+        )
+
+    expected_authority = charge_authority(event_records)
+    copied_charge = EventRecord.from_payload(event_records[event_index].to_payload())
+    reloaded_history = (
+        *event_records[:event_index],
+        copied_charge,
+        *event_records[event_index + 1 :],
+    )
+
+    def expire(*_args: object, **_kwargs: object) -> int:
+        raise milli_inch_symbolic.UnresolvedDistanceMeasurementError("test clock expired")
+
+    with monkeypatch.context() as patch:
+        patch.setattr(milli_inch_symbolic, "symbolic_squared_path_inches_to_ticks", expire)
+        with reuse_live_movement_history(decisions.event_log):
+            assert charge_authority(event_records) == expected_authority
+            assert charge_authority(event_records[: event_index + 1]) == expected_authority
+            with pytest.raises(MovementDistanceUnresolvedError):
+                charge_authority(reloaded_history)
+        with pytest.raises(MovementDistanceUnresolvedError):
+            charge_authority(event_records)

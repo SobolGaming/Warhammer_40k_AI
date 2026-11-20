@@ -368,7 +368,7 @@ from warhammer40k_core.engine.victory_point_policy_validation import (
 )
 from warhammer40k_core.engine.weapon_instances import equipped_weapon_instance_by_id
 from warhammer40k_core.geometry.numerical_identity import (
-    LEGACY_NUMERICAL_IDENTITY,
+    CURRENT_NUMERICAL_IDENTITY,
     NumericalIdentity,
 )
 
@@ -595,7 +595,7 @@ class GameConfig:
     reserve_unit_points: tuple[ReserveUnitPointValue, ...] = ()
     allow_legacy_non_strict_rosters: bool = False
     model_geometries: tuple[ModelGeometryCatalogRecord, ...] | None = None
-    numerical_identity: NumericalIdentity = LEGACY_NUMERICAL_IDENTITY
+    numerical_identity: NumericalIdentity = CURRENT_NUMERICAL_IDENTITY
 
     def __post_init__(self) -> None:
         validate_numerical_identity(self.numerical_identity)
@@ -1133,7 +1133,7 @@ class GameState:
     player_ids: tuple[str, ...]
     turn_order: tuple[str, ...]
     tactical_secondary_draw_count: int
-    numerical_identity: NumericalIdentity = LEGACY_NUMERICAL_IDENTITY
+    numerical_identity: NumericalIdentity = CURRENT_NUMERICAL_IDENTITY
     private_rng_seed: str = field(default_factory=new_private_rng_seed, repr=False)
     tactical_secondary_draw_sequence: int = field(default=0, repr=False)
     rules_overlay_ids: tuple[str, ...] = ()

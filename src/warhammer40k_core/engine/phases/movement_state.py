@@ -1042,7 +1042,14 @@ class FallBackActionResult:
         return payload
 
     @classmethod
-    def from_payload(cls, payload: FallBackActionResultPayload) -> Self:
+    def from_payload(
+        cls, payload: FallBackActionResultPayload, *, certified_paths: bool = False
+    ) -> Self:
+        decode_path = (
+            PathValidationResult.from_certified_payload
+            if certified_paths
+            else PathValidationResult.from_payload
+        )
         rollback_payload = payload["rollback_record"]
         physical_payload = payload.get("attempted_placement")
         rules_unit_payload = payload.get("attempted_rules_unit_placement")
@@ -1068,8 +1075,7 @@ class FallBackActionResult:
                 DesperateEscapeRoll.from_payload(roll) for roll in payload["desperate_escape_rolls"]
             ),
             path_validation_results=tuple(
-                PathValidationResult.from_payload(result)
-                for result in payload["path_validation_results"]
+                decode_path(result) for result in payload["path_validation_results"]
             ),
             terrain_path_legality_results=tuple(
                 TerrainPathLegalityResult.from_payload(result)

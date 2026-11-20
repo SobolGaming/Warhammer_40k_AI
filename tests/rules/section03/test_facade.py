@@ -1,40 +1,42 @@
 """Small movement facade integration: no setup phases or game startup."""
 
 from dataclasses import replace
+from math import isclose
+from types import SimpleNamespace
+from typing import cast
 
 import pytest
 
 from tests.support.section02_fixtures import CHAOS_SPAWN, Section02Definitions
 from tests.support.section03_fixtures import grid, native_state, paths, placement
 from tests.support.section03_session import movement_session
+from warhammer40k_core.core.ruleset_descriptor import TerrainFeatureKind
+from warhammer40k_core.core.terrain_display import TerrainDisplayGeometry
 from warhammer40k_core.engine.event_log import validate_json_value
+from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.mission_setup import MissionSetup
+from warhammer40k_core.engine.movement_budget_modifiers import model_movement_characteristic
 from warhammer40k_core.engine.movement_proposals import (
     MovementProposalPayload,
     MovementProposalRequest,
 )
 from warhammer40k_core.engine.phase import LifecycleStatusKind
 from warhammer40k_core.engine.phases.movement_handler import MovementPhaseHandler
-from warhammer40k_core.geometry.pose import Pose
+from warhammer40k_core.geometry import milli_inch_symbolic
+from warhammer40k_core.geometry.movement_envelope import (
+    MovementDistanceBudget,
+    MovementDistanceWitness,
+    MovementDistanceWitnessPayload,
+    MovementSegment,
+)
+from warhammer40k_core.geometry.pathing import PathWitness
+from warhammer40k_core.geometry.pose import GeometryError, Pose
+from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition, TerrainWallDefinition
 
 
-@pytest.mark.parametrize("action", ["normal_move", "fall_back"])
-def test_native_facade_rejects_swap_then_applies_legal_witness(
-    section03_definitions: Section02Definitions, section03_setup_mission: MissionSetup, action: str
-) -> None:
-    unit = section03_definitions.unit(CHAOS_SPAWN)
-    starts = (Pose.at(10, 10), Pose.at(12.5, 10))
-    enemy = section03_definitions.unit(CHAOS_SPAWN, identity="enemy", army_id="enemy")
-    state = native_state(
-        section03_definitions,
-        unit,
-        starts,
-        enemy=enemy,
-        enemy_poses=(Pose.at(10, 13.8), Pose.at(12.5, 13.8)) if action == "fall_back" else None,
-    )
-    state.mission_setup = section03_setup_mission
+def _add_spare_mover(definitions: Section02Definitions, state: GameState) -> None:
     # A second eligible native unit keeps the facade at this movement boundary.
-    spare = section03_definitions.unit(CHAOS_SPAWN, identity="spare")
+    spare = definitions.unit(CHAOS_SPAWN, identity="spare")
     owner = next(a for a in state.army_definitions if a.player_id == "owner")
     state.army_definitions = [
         replace(a, units=(*a.units, spare)) if a == owner else a for a in state.army_definitions
@@ -53,6 +55,25 @@ def test_native_facade_rejects_swap_then_applies_legal_witness(
             ),
         )
     )
+
+
+@pytest.mark.parametrize("action", ["normal_move", "fall_back"])
+def test_native_facade_rejects_swap_then_applies_legal_witness(
+    section03_definitions: Section02Definitions, section03_setup_mission: MissionSetup, action: str
+) -> None:
+    unit = section03_definitions.unit(CHAOS_SPAWN)
+    starts = (Pose.at(10, 10), Pose.at(12.5, 10))
+    enemy = section03_definitions.unit(CHAOS_SPAWN, identity="enemy", army_id="enemy")
+    state = native_state(
+        section03_definitions,
+        unit,
+        starts,
+        enemy=enemy,
+        enemy_poses=(Pose.at(10, 13.8), Pose.at(12.5, 13.8)) if action == "fall_back" else None,
+    )
+    state.mission_setup = section03_setup_mission
+    assert state.battlefield_state is not None
+    _add_spare_mover(section03_definitions, state)
     handler = MovementPhaseHandler(
         ruleset_descriptor=state.runtime_ruleset_descriptor(),
         army_catalog=section03_definitions.package.army_catalog,
@@ -132,3 +153,188 @@ def test_native_facade_rejects_swap_then_applies_legal_witness(
         assert not restriction.can_shoot
         assert not restriction.can_declare_charge
         assert restriction.cleanup_point == "end_of_turn"
+
+
+@pytest.mark.parametrize(
+    ("offset", "rounded_offset", "blocked", "violation", "timeout_then_retry"),
+    [
+        (0.00049, 0.0, False, None, False),
+        (-0.9375, -0.937, False, None, False),
+        (0.00051, 0.001, False, "movement_distance_exceeded", False),
+        (0.00049, 0.0, True, "terrain_feature_transit_forbidden", False),
+        (0.00049, 0.0, False, None, True),
+    ],
+    ids=(
+        "below-budget-midpoint",
+        "exact-midpoint",
+        "above-budget-midpoint",
+        "blocked",
+        "timeout-then-retry",
+    ),
+)
+def test_normal_move_facade_budgets_once_rounded_complete_paths(
+    section03_definitions: Section02Definitions,
+    section03_setup_mission: MissionSetup,
+    offset: float,
+    rounded_offset: float,
+    blocked: bool,
+    violation: str | None,
+    timeout_then_retry: bool,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    unit = section03_definitions.unit(CHAOS_SPAWN)
+    budget = model_movement_characteristic(unit.own_models[0]).final
+    starts = (Pose.at(10, 10), Pose.at(10, 13))
+    enemy = section03_definitions.unit(CHAOS_SPAWN, identity="enemy", army_id="enemy")
+    state = native_state(section03_definitions, unit, starts, enemy=enemy)
+    state.mission_setup = section03_setup_mission
+    _add_spare_mover(section03_definitions, state)
+    assert state.battlefield_state is not None
+    if blocked:
+        display = TerrainDisplayGeometry.axis_aligned_rectangle(
+            center_x_inches=13,
+            center_y_inches=10,
+            width_inches=2,
+            depth_inches=2,
+            display_template_id=None,
+        )
+        wall = TerrainFeatureDefinition(
+            "budget-obstruction",
+            TerrainFeatureKind.SEALED_BUILDINGS,
+            13,
+            10,
+            2,
+            2,
+            display.footprint_polygon,
+            display,
+            walls=(TerrainWallDefinition("wall", 13, 10, 0, 0.5, 2, 5),),
+        )
+        state.mission_setup = replace(section03_setup_mission, terrain_features=(wall,))
+        state.replace_battlefield_state(replace(state.battlefield_state, terrain_features=(wall,)))
+    before = state.battlefield_state
+    session = movement_session(section03_definitions, state)
+    lifecycle = session.lifecycle
+    handler = MovementPhaseHandler(
+        ruleset_descriptor=state.runtime_ruleset_descriptor(),
+        army_catalog=section03_definitions.package.army_catalog,
+    )
+    request = handler.begin_phase(
+        state=state, decisions=lifecycle.decision_controller
+    ).decision_request
+    assert request is not None
+    request = session.submit_option(
+        request_id=request.request_id, option_id=unit.unit_instance_id, result_id="budget-unit"
+    ).decision_request
+    assert request is not None
+    request = session.submit_option(
+        request_id=request.request_id, option_id="normal_move", result_id="budget-action"
+    ).decision_request
+    assert request is not None
+    proposal = MovementProposalRequest.from_decision_request_payload(request.payload)
+    travel = budget + offset
+    ends = tuple(Pose.at(10 + travel, start.position.y, facing_degrees=12.125) for start in starts)
+    witness = PathWitness.for_paths(
+        tuple(
+            (model_id, (start, Pose.at(10 + travel / 2, start.position.y), end))
+            for model_id, start, end in zip(unit.own_model_ids(), starts, ends, strict=True)
+        )
+    )
+    payload = validate_json_value(
+        MovementProposalPayload(
+            proposal_request_id=request.request_id,
+            proposal_kind=proposal.proposal_kind,
+            unit_instance_id=unit.unit_instance_id,
+            movement_phase_action="normal_move",
+            movement_mode="normal",
+            witness=witness,
+        ).to_payload()
+    )
+    if timeout_then_retry:
+        state_before = lifecycle.to_payload()
+        # Run the real certificate with a clock that expires during measurement.
+        clock = iter((0.0, 11.0))
+        with monkeypatch.context() as patch:
+            patch.setattr(milli_inch_symbolic, "time", SimpleNamespace(monotonic=clock.__next__))
+            failed = session.submit_parameterized_payload(
+                request_id=request.request_id, result_id="budget-path", payload=payload
+            )
+        assert failed.status_kind is LifecycleStatusKind.INVALID
+        assert isinstance(failed.payload, dict)
+        validation = failed.payload["proposal_validation"]
+        assert isinstance(validation, dict)
+        violations = validation["violations"]
+        assert isinstance(violations, list)
+        assert len(violations) == 1
+        assert isinstance(violations[0], dict)
+        assert violations[0]["violation_code"] == "movement_distance_unresolved"
+        assert lifecycle.to_payload() == state_before
+        assert lifecycle.pending_decision_request() == request
+    status = session.submit_parameterized_payload(
+        request_id=request.request_id, result_id="budget-path", payload=payload
+    )
+    assert state.battlefield_state is not None
+    if violation is not None:
+        assert status.status_kind is LifecycleStatusKind.INVALID, status.to_payload()
+        assert isinstance(status.payload, dict)
+        assert status.payload["violation_code"] == violation, status.to_payload()
+        assert state.battlefield_state == before
+    else:
+        assert status.status_kind is not LifecycleStatusKind.INVALID, status.to_payload()
+        placement_after = state.battlefield_state.unit_placement_by_id(unit.unit_instance_id)
+        assert tuple(model.pose for model in placement_after.model_placements) == ends
+        completed_events = [
+            event.payload
+            for event in lifecycle.decision_controller.event_log.records
+            if event.event_type == "movement_activation_completed"
+        ]
+        assert len(completed_events) == 1
+        assert (
+            sum(
+                record.result.result_id == "budget-path"
+                for record in lifecycle.decision_controller.records
+            )
+            == 1
+        )
+        completed = completed_events[0]
+        assert isinstance(completed, dict)
+        results = completed["path_validation_results"]
+        assert isinstance(results, list)
+        assert len(results) == len(unit.own_models)
+        for result in results:
+            assert isinstance(result, dict)
+            distance = result["movement_distance_witness"]
+            assert isinstance(distance, dict)
+            consumed = distance["budget"]
+            assert isinstance(consumed, dict)
+            total = consumed["total_distance_inches"]
+            raw_total = consumed["straight_line_distance_inches"]
+            assert type(total) is float
+            assert type(raw_total) is float
+            assert isclose(total, budget + rounded_offset, rel_tol=0, abs_tol=1e-12)
+            assert isclose(raw_total, travel, rel_tol=0, abs_tol=1e-12)
+            if timeout_then_retry:
+                restored = MovementDistanceWitness.from_payload(
+                    cast(MovementDistanceWitnessPayload, distance)
+                )
+                assert replace(restored).budget == restored.budget
+                assert restored.budget is not None
+                forged = restored.budget.to_payload()
+                forged["straight_line_distance_inches"] = 100.0
+                with pytest.raises(GeometryError, match="does not match the scalar distance"):
+                    MovementDistanceBudget.from_payload(forged)
+                with pytest.raises(GeometryError, match="does not match the scalar distance"):
+                    replace(restored.budget, straight_line_distance_inches=100.0)
+
+                segment = MovementSegment.from_poses(
+                    model_id=restored.model_id,
+                    segment_index=0,
+                    start_pose=Pose.at(1e-20, 0),
+                    end_pose=Pose.at(1.0625, 0),
+                )
+                near_tie = MovementDistanceWitness(
+                    model_id=restored.model_id, segments=(segment,), max_distance_inches=2.0
+                ).budget
+                assert near_tie is not None
+                assert near_tie.straight_line_distance_inches == 1.0625
+                assert near_tie.total_distance_inches == 1.062
+                assert MovementDistanceBudget.from_payload(near_tie.to_payload()) == near_tie

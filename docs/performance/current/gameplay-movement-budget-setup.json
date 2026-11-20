@@ -1,0 +1,102 @@
+{
+  "base": {
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false,
+    "fixture_sha256": "84e0776542fda6447243d17423f9592db3dd2aef0121937f1496eee7c656fa54",
+    "host": {
+      "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+      "logical_cpus": 64,
+      "memory_bytes": 67359363072,
+      "platform": "Linux-6.18.58.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "659a2d81e02176d23168861529651506ac87a4eab1982109f144cd62a63fce71",
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:7ba104452c12a3985e8500622a9e9ed09527ad12cd42913e77b8ef2dcf728eb3",
+    "samples": {
+      "cargo-100": [
+        1.4149511570012692,
+        1.5050326969994785,
+        1.412005952999607,
+        1.4126378820001264,
+        1.50772557900018,
+        1.4158607279987336,
+        1.508777547000136
+      ],
+      "cargo-5": [
+        1.4406188659995678,
+        1.4902365649995772,
+        1.4041271250007412,
+        1.5080580939993524,
+        1.4083250509993377,
+        1.4186447849988326,
+        1.5022199679988262
+      ],
+      "loaded-deep-strike": [
+        2.3647072410003602,
+        2.366313374999663,
+        2.3655448030003754,
+        2.3662665110005037,
+        2.3632374050012004,
+        2.384600504001355,
+        2.3605443830001605
+      ]
+    },
+    "workload_sha256": "aa2a5bdaaaf26d8746cb800c482e3403092d7fa37741809abe5caba1741b6069"
+  },
+  "base_revision": "59959e71d95a68a4af8935d2897fd2280a8b76c2",
+  "budget_profile": "current-change-relative-v1",
+  "family": "setup",
+  "head": {
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false,
+    "fixture_sha256": "84e0776542fda6447243d17423f9592db3dd2aef0121937f1496eee7c656fa54",
+    "host": {
+      "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+      "logical_cpus": 64,
+      "memory_bytes": 67359363072,
+      "platform": "Linux-6.18.58.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "659a2d81e02176d23168861529651506ac87a4eab1982109f144cd62a63fce71",
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0db5d76c980e2ba3b29d964b6890a6057878290b3aad06a3a518a67d9a529cc2",
+    "samples": {
+      "cargo-100": [
+        1.4079478029998427,
+        1.5085210870001902,
+        1.4072814840001229,
+        1.426488696000888,
+        1.5100071690012555,
+        1.41128588599895,
+        1.5118594710002071
+      ],
+      "cargo-5": [
+        1.4329898439991666,
+        1.4824532530001306,
+        1.4021782290001283,
+        1.4930514499992569,
+        1.4116519330000301,
+        1.4095877460003976,
+        1.4965972699992562
+      ],
+      "loaded-deep-strike": [
+        2.377665538000656,
+        2.376967263999177,
+        2.36152075300015,
+        2.3673096900001838,
+        2.363247618999594,
+        2.371967871000379,
+        2.3641693019999366
+      ]
+    },
+    "workload_sha256": "aa2a5bdaaaf26d8746cb800c482e3403092d7fa37741809abe5caba1741b6069"
+  },
+  "head_input_digest": "961000ebd3c413f37c2111b9bf5ee0b680b7e49e19293dcdf9edfa8987162927",
+  "head_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0db5d76c980e2ba3b29d964b6890a6057878290b3aad06a3a518a67d9a529cc2",
+  "historical_failures": [],
+  "policy": "rules-engine-performance-v3",
+  "workload_id": "order101-failed-setup-restore-view-replay-v1"
+}

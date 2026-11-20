@@ -340,9 +340,9 @@ def _apply_charge_move_proposal_decision(
     charge_state = state.charge_phase_state
     if charge_state is None or charge_state.active_selection is None:
         raise GameLifecycleError("Charge Move proposal requires active_selection.")
-    record = decisions.record_for_result(result)
+    request = decisions.movement_request_for_result(result)
     parsed = _charge._parse_charge_move_proposal_submission_or_invalid(
-        state=state, request=record.request, result=result, decisions=decisions
+        state=state, request=request, result=result, decisions=decisions
     )
     if isinstance(parsed, LifecycleStatus):
         return parsed
@@ -360,6 +360,7 @@ def _apply_charge_move_proposal_decision(
         raise GameLifecycleError("Charge Move proposal requires pending distance state.")
     budget = ChargeMovementBudget.from_payload((proposal_request.context or {})["movement_budget"])
     if proposal.is_no_move_choice:
+        decisions.commit_movement_result(result)
         state.replace_charge_phase_state(
             charge_state.with_charge_move_resolved(proposal.unit_instance_id)
         )
@@ -398,6 +399,7 @@ def _apply_charge_move_proposal_decision(
         unit_persisting_effects=tuple(state.persisting_effects_for_unit(proposal.unit_instance_id)),
         ability_index=ability_index,
     )
+    decisions.commit_movement_result(result)
     violation_code = _charge._charge_move_violation_code(
         resolution=resolution,
         ruleset_descriptor=ruleset_descriptor,
