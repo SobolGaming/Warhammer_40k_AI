@@ -190,11 +190,13 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
     assert sum(owner in group for group in groups) == 1
     melee_restore = _record(selection.STAGE2_MELEE_RESTORE_TRANSITION)
     assert melee_restore["test"][owner]["before"] == counteroffensive["test"][owner]["after"]
-    source = selection.STAGE2_MELEE_RESTORE_SOURCE
-    source_before = subprocess.check_output(
-        ["git", "show", selection.STAGE2_MELEE_RESTORE_BASE + ":" + source], cwd=ROOT
-    )
-    assert melee_restore["source"][source]["before"] == hashlib.sha256(source_before).hexdigest()
+    for source in (selection.STAGE2_MELEE_RESTORE_SOURCE, selection.STAGE2_MELEE_HISTORY_SOURCE):
+        source_before = subprocess.check_output(
+            ["git", "show", selection.STAGE2_MELEE_RESTORE_BASE + ":" + source], cwd=ROOT
+        )
+        assert (
+            melee_restore["source"][source]["before"] == hashlib.sha256(source_before).hexdigest()
+        )
     assert melee_restore["runtime_fingerprint"] == _record(MANIFEST)["fingerprint"]
     prior = json.loads(
         subprocess.check_output(["git", "show", BASE + ":ci/test_shards/durations.json"], cwd=ROOT)

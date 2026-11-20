@@ -15,6 +15,7 @@ from warhammer40k_core.engine.fight_resolution import (
     SUBMIT_MELEE_DECLARATION_DECISION_TYPE,
     melee_declaration_proposal_from_payload,
 )
+from warhammer40k_core.engine.lifecycle_reaction_queue import validate_melee_reaction_continuation
 from warhammer40k_core.engine.melee_commitment_dispatch import (
     current_selection_request,
     validate_declaration_commitment,
@@ -70,22 +71,28 @@ def _inventory(rows: tuple[JsonValue, ...], host: GameLifecycle) -> None:
 
 def validate_melee_commitment_history(host: GameLifecycle) -> None:
     decisions = host.decision_controller
+    pending_requests = decisions.queue.pending_requests
+    event_records = decisions.event_log.records
+    if (
+        pending_requests
+        and pending_requests[0].decision_type == SUBMIT_MELEE_DECLARATION_DECISION_TYPE
+        and (frames := host.reaction_queue.frames)
+    ):
+        validate_melee_reaction_continuation(frame=frames[-1], event_records=event_records)
     if (
         not any(
             record.request.decision_type == SELECT_MELEE_WEAPON_DECISION_TYPE
             for record in decisions.records
         )
-        and not any(
-            event.event_type == MELEE_COMMITMENT_EVENT for event in decisions.event_log.records
-        )
+        and not any(event.event_type == MELEE_COMMITMENT_EVENT for event in event_records)
         and not any(
             request.decision_type == SELECT_MELEE_WEAPON_DECISION_TYPE
-            for request in decisions.queue.pending_requests
+            for request in pending_requests
         )
     ):
         if any(
             COMMITMENT_KEY in object_payload(request.payload)
-            for request in decisions.queue.pending_requests
+            for request in pending_requests
             if request.decision_type == SUBMIT_MELEE_DECLARATION_DECISION_TYPE
         ):
             raise GameLifecycleError("Pending melee declaration has an orphan commitment.")
@@ -101,7 +108,7 @@ def validate_melee_commitment_history(host: GameLifecycle) -> None:
     melee_dice: set[str] = set()
     completed_declarations: set[str] = set()
     initial_pools: dict[str, tuple[RangedAttackPool, ...]] = {}
-    for event in decisions.event_log.records:
+    for event in event_records:
         body = event.payload
         if not isinstance(body, dict):
             continue
@@ -280,7 +287,7 @@ def validate_melee_commitment_history(host: GameLifecycle) -> None:
             and activation_id not in commitments
         ):
             raise GameLifecycleError("Complete melee weapon selection lost its attack budget.")
-    for request in decisions.queue.pending_requests:
+    for request in pending_requests:
         if request.decision_type == SELECT_MELEE_WEAPON_DECISION_TYPE:
             if request != current_selection_request(host, request.request_id):
                 raise GameLifecycleError("Pending melee weapon selection drifted.")
@@ -309,7 +316,7 @@ def validate_melee_commitment_history(host: GameLifecycle) -> None:
                     and isinstance(event.payload, dict)
                     and event.payload.get("result_id") == record.result.result_id
                     and event.payload.get("attack_sequence_id") == sequence.sequence_id
-                    for event in decisions.event_log.records
+                    for event in event_records
                 )
             )
             validate_sequence_authority(decisions, declaration_record, sequence)

@@ -2,11 +2,15 @@
   "schema": "finite-stage2-melee-restore-test-transition-v1",
   "base": "7dd6fc770ce122a1a42b601eabeaf44e14bc8c82",
   "retained_counteroffensive_sha256": "cf6787bd0b721d025478c6126e3dccbc9d5b3bb8822fce331313d9ce5dd62ad3",
-  "runtime_fingerprint": "b6978439fc69d7994c677df31cb6e8b36cc77dabd676b23c1876069f707e5d32",
+  "runtime_fingerprint": "ad44db03903b9428af4e6cb09e0ff0933290929677e24e045ac8208ea3da2d2e",
   "source": {
     "src/warhammer40k_core/engine/lifecycle_reaction_queue.py": {
       "before": "edd80a3b4b85b9ea75007425f41e369ba14b538ba8a9180d091f91b45826d1b9",
-      "after": "d4ed0ce9c45eb934ef74bfe60263c42d591d84426cd3df14247324a5149655ff"
+      "after": "684f143f9a8ff844169f26c4bca054e95d6045aa47baffa47488aa5fb6c3820f"
+    },
+    "src/warhammer40k_core/engine/melee_commitment_history.py": {
+      "before": "5cdee04a89a2f00c206c4eb22b50cd13a1cef78e3e5bb7b740612d1fee3f2322",
+      "after": "3f292dcc766a4d9acc10e72378953660ce100094720acd1218b8e4eef3675134"
     }
   },
   "test": {
@@ -18,10 +22,10 @@
         "sha256": "44cf2a6b02eb1df66599b24b23b35450ac7a83dd881eada2bb26f492e1b6e9bb"
       },
       "after": {
-        "blob_sha1": "b731f7f24f4983d38680e38d7015d586ea38471e",
-        "bytes": 23588,
+        "blob_sha1": "3322c2952aa2ac7d448f2919b016a0fe8e8a6359",
+        "bytes": 24664,
         "mode": "100644",
-        "sha256": "0131d4df97c799b877e437576941867dd1341d2e9cec83661f3f6aa4f287e69a"
+        "sha256": "190bced0dea6092ae458542ddd900cf0de334caafc80d06f69826175076380e8"
       }
     }
   }

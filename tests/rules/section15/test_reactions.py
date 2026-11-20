@@ -477,6 +477,25 @@ def _assert_counteroffensive_melee_restore(
     with pytest.raises(GameLifecycleError, match="pending decision_type drift"):
         GameLifecycle.from_payload(drifted_source)
 
+    for field, value in (("phase", "shooting"), ("decision_type", "submit_shooting_declaration")):
+        drifted_request = deepcopy(session.lifecycle.to_payload())
+        (pending,) = drifted_request["decisions"]["queue"]["pending_requests"]
+        obj(obj(pending["payload"])["proposal_request"])[field] = value
+        with pytest.raises(GameLifecycleError, match=f"melee proposal_request {field} drift"):
+            GameLifecycle.from_payload(drifted_request)
+
+    drifted_token = session.lifecycle.to_payload()
+    drifted_token["reaction_queue"]["frames"][-1]["resume_token"] = "other-resume-token"
+    with pytest.raises(GameLifecycleError, match="melee reaction continuation drift"):
+        GameLifecycle.from_payload(drifted_token)
+
+    drifted_window = session.lifecycle.to_payload()
+    drifted_window["reaction_queue"]["frames"][-1]["reaction_window"]["timing_window"][
+        "window_id"
+    ] = "other-timing-window"
+    with pytest.raises(GameLifecycleError, match="melee reaction continuation drift"):
+        GameLifecycle.from_payload(drifted_window)
+
     restored = LocalGameSession.from_persistence_payload(json.loads(json.dumps(checkpoint)))
     assert restored.to_persistence_payload() == checkpoint
     assert restored.lifecycle.reaction_queue.frames == session.lifecycle.reaction_queue.frames

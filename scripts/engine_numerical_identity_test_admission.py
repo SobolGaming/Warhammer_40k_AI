@@ -143,9 +143,10 @@ COUNTEROFFENSIVE_OWNER = "tests/rules/section15/test_reactions.py"
 STAGE2_MELEE_RESTORE_TRANSITION = (
     "data/source_audits/ci64_provenance_v1/stage2-melee-restore-test-transition-v1.json"
 )
-STAGE2_MELEE_RESTORE_SHA256 = "1ac15be35b33b467298aa9ab7086e12bd879fc1810918c4610951589816b0663"
+STAGE2_MELEE_RESTORE_SHA256 = "7044afa3acae20c0d340acc13827d8a8f3061ec4717ae34a2ca300f2c4dfc699"
 STAGE2_MELEE_RESTORE_BASE = "7dd6fc770ce122a1a42b601eabeaf44e14bc8c82"
 STAGE2_MELEE_RESTORE_SOURCE = "src/warhammer40k_core/engine/lifecycle_reaction_queue.py"
+STAGE2_MELEE_HISTORY_SOURCE = "src/warhammer40k_core/engine/melee_commitment_history.py"
 
 
 type SourceSuccessors = dict[str, dict[str, str]]
@@ -263,13 +264,16 @@ def _stage2_melee_restore_successor(root: Path) -> tuple[str, TestSuccessors, by
         or record["schema"] != "finite-stage2-melee-restore-test-transition-v1"
         or record["base"] != STAGE2_MELEE_RESTORE_BASE
         or record["retained_counteroffensive_sha256"] != COUNTEROFFENSIVE_SHA256
-        or set(record["source"]) != {STAGE2_MELEE_RESTORE_SOURCE}
+        or set(record["source"]) != {STAGE2_MELEE_RESTORE_SOURCE, STAGE2_MELEE_HISTORY_SOURCE}
         or set(record["test"]) != {COUNTEROFFENSIVE_OWNER}
     ):
         raise SystemExit("Stage 2 melee restore test transition membership differs.")
-    _checked_bytes(
-        root, STAGE2_MELEE_RESTORE_SOURCE, record["source"][STAGE2_MELEE_RESTORE_SOURCE]["after"]
-    )
+    for name, change in record["source"].items():
+        if set(change) != {"before", "after"}:
+            raise SystemExit(
+                "Stage 2 melee restore requires exact before and after source digests."
+            )
+        _checked_bytes(root, name, change["after"])
     tests = _selection_members({name: row["after"] for name, row in record["test"].items()}, root)
     return record["runtime_fingerprint"], tests, raw
 

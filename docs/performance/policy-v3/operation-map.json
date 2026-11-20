@@ -36421,11 +36421,14 @@
     },
     "stage2-melee-reaction-restore": {
       "paths": [
-        "src/warhammer40k_core/engine/lifecycle_reaction_queue.py"
+        "src/warhammer40k_core/engine/lifecycle_reaction_queue.py",
+        "src/warhammer40k_core/engine/melee_commitment_history.py"
       ],
       "owners": [
         "@module",
         "_is_interrupted_fight_melee_request",
+        "validate_melee_commitment_history",
+        "validate_melee_reaction_continuation",
         "validate_reaction_queue_consistency"
       ],
       "families": [],

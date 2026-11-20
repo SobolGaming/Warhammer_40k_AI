@@ -12,6 +12,7 @@ from warhammer40k_core.engine.catalog_setup_reactive_charge_move import (
     is_catalog_setup_reactive_charge_move_request,
 )
 from warhammer40k_core.engine.decision_request import DecisionRequest
+from warhammer40k_core.engine.event_log import EventRecord
 from warhammer40k_core.engine.fight_activation_units import active_fight_activation_rules_unit
 from warhammer40k_core.engine.fight_resolution import (
     SUBMIT_MELEE_DECLARATION_DECISION_TYPE,
@@ -26,7 +27,11 @@ from warhammer40k_core.engine.movement_proposals import (
     PLACEMENT_PROPOSAL_DECISION_TYPE,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, GameLifecycleStage
-from warhammer40k_core.engine.reaction_queue import REACTION_DECISION_TYPE, ReactionQueue
+from warhammer40k_core.engine.reaction_queue import (
+    REACTION_DECISION_TYPE,
+    ReactionQueue,
+    ReactionQueueFrame,
+)
 from warhammer40k_core.engine.sequencing import SEQUENCING_DECISION_TYPE
 from warhammer40k_core.engine.stratagems import (
     is_stratagem_placement_proposal_request,
@@ -111,6 +116,13 @@ def _is_interrupted_fight_melee_request(state: GameState, request: DecisionReque
         or request.actor_id != activation.player_id
     ):
         return False
+    proposal = (
+        request.payload.get("proposal_request") if isinstance(request.payload, dict) else None
+    )
+    if not isinstance(proposal, dict) or proposal.get("phase") != BattlePhase.FIGHT.value:
+        raise GameLifecycleError("Lifecycle melee proposal_request phase drift.")
+    if proposal.get("decision_type") != request.decision_type:
+        raise GameLifecycleError("Lifecycle melee proposal_request decision_type drift.")
     melee = MeleeDeclarationProposalRequest.from_decision_request(request)
     rules_unit = active_fight_activation_rules_unit(state=state, activation=activation)
     return (
@@ -125,3 +137,25 @@ def _is_interrupted_fight_melee_request(state: GameState, request: DecisionReque
         and melee.source_decision_request_id == activation.request_id
         and melee.source_decision_result_id == activation.result_id
     )
+
+
+def validate_melee_reaction_continuation(
+    *, frame: ReactionQueueFrame, event_records: tuple[EventRecord, ...]
+) -> None:
+    for event in reversed(event_records):
+        # The continuation is recorded after issuing the declaration in the same submission.
+        if event.event_type == "decision_recorded":
+            break
+        if event.event_type == "reaction_window_continued":
+            payload = event.payload
+            if (
+                isinstance(payload, dict)
+                and payload.get("next_request_id") == frame.request_id
+                and payload.get("resume_token") == frame.resume_token
+                and payload.get("parent_phase") == frame.parent_phase.value
+                and payload.get("parent_step") == frame.parent_step
+                and payload.get("reaction_window") == frame.reaction_window.to_payload()
+            ):
+                return
+            break
+    raise GameLifecycleError("Lifecycle melee reaction continuation drift.")
