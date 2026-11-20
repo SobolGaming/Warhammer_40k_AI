@@ -2,7 +2,7 @@
   "policy": "rules-engine-performance-v3",
   "base": "545d5556c279f88ffaaa897941245ca093e8e9f6",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:9fc32bcf93350bede0cc1433f278aa5a17d142581bff8f7c60ebce3faca72db3",
-  "operation_map_sha256": "f6b6b73ea9d2d4eac6e521ea1d5f00cf7b1155c139ba684210e2f1909d56258b",
+  "operation_map_sha256": "0a26a1497712c0b3c15c61632372f4625838853ce90f439b5c6a64e0b8f1e42b",
   "changes": {
     "contracts/examples/persistence/session-persistence.json": {
       "before_sha256": "9f28a50f8840409dae91f060dd84a90631e24026ffdbc52b47b987ee456d3e30",
@@ -86,31 +86,31 @@
     },
     "data/source_audits/ci64_provenance_v1/terminal-normal-move-restore-test-transition-v1.json": {
       "before_sha256": null,
-      "after_sha256": "838c62b30b427daac96342cb65837c19e765533d715b32a2795138a9e54549cc",
+      "after_sha256": "f7a2e27629b7b05f08462f105e9159694e55179a3fddc2b6e8ef726f2be281c6",
       "owners": {
         "@document": {
           "before": null,
-          "after": "838c62b30b427daac96342cb65837c19e765533d715b32a2795138a9e54549cc"
+          "after": "f7a2e27629b7b05f08462f105e9159694e55179a3fddc2b6e8ef726f2be281c6"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "c49d1634403ddca16c8d36dfa2428854dda33e11f64af899f94aeb95ed67da5f",
-      "after_sha256": "3470a36a8c55257985e9a150ef2678b04f5553af738ce0106fe2279eb40cddc7",
+      "after_sha256": "8f195635a804a2b1e14a669ad1186bff8d090ac071aaa0b03ea01abb12264eaa",
       "owners": {
         "@document": {
           "before": "c49d1634403ddca16c8d36dfa2428854dda33e11f64af899f94aeb95ed67da5f",
-          "after": "3470a36a8c55257985e9a150ef2678b04f5553af738ce0106fe2279eb40cddc7"
+          "after": "8f195635a804a2b1e14a669ad1186bff8d090ac071aaa0b03ea01abb12264eaa"
         }
       }
     },
     "scripts/engine_numerical_identity_test_admission.py": {
       "before_sha256": "376629fc78c98275622996470aa01a9a41eff58e77a1a0ece4024681dc5902db",
-      "after_sha256": "d61d74f56dee0284beccd4243e6afd492e9feff415cf3a80c1d6211fc88db417",
+      "after_sha256": "93d091fc8410b26192544b2bf4c86b183314cb90377d010dfc0bd096b4bb5be5",
       "owners": {
         "@module": {
           "before": "3a16521743f2d53558a2763b99b59b7293d95ca17dd671e3e2d8401176008b0a",
-          "after": "e1f696f9527b838aa30d8db44f6896457bcab79ab919af34ae1eade04914d241"
+          "after": "796659fecb3d13881ab4059ec03b03c086ca0e5b7db389199070483e103c95f9"
         },
         "_terminal_restore_successor": {
           "before": null,
@@ -152,17 +152,27 @@
         }
       }
     },
+    "tests/rules/section09/coverage.json": {
+      "before_sha256": "bc03df52276ac1772cd2a4df94c73b77aa5ceeca2235656e2edea2345e7b0cd4",
+      "after_sha256": "f21a8888803c6d3cf9d707f033a5c78dd132520355a159f1334414fb918356ee",
+      "owners": {
+        "@document": {
+          "before": "bc03df52276ac1772cd2a4df94c73b77aa5ceeca2235656e2edea2345e7b0cd4",
+          "after": "f21a8888803c6d3cf9d707f033a5c78dd132520355a159f1334414fb918356ee"
+        }
+      }
+    },
     "tests/rules/section09/test_restrictions.py": {
       "before_sha256": "ed2a8c06d93ebf22826ae3f8a28845dfc3cc9f6d369b4139a1f1cffd0a4c1b4d",
-      "after_sha256": "4544957dbcad507c28e89f016297dda87aa19e9f6566eedba5150f117c3833f3",
+      "after_sha256": "a78e29afa1b6b79118a8deb2e212a19038e7103fa44dcfaed01d545ef5426a99",
       "owners": {
         "@module": {
           "before": "7547415bce795d695e28e245e1d3c4e926e8dfae20397278234c8499968ec241",
           "after": "bfeff8c8c3bfa64b77b40b789df2b9e3f607957e09eeffb39151c671610a7484"
         },
-        "test_normal_move_restore_preserves_completed_history_and_validates_authority": {
-          "before": null,
-          "after": "cdc1a47d926f5b89dc8d9b5e50d8631ecfba890c38f4757d07c2bb9e61d92ff0"
+        "test_normal_move_completion_records_actual_once_per_phase_history": {
+          "before": "a65649ed79e5f064231f6702c0029113485171aa992508fece7be654e511f2ff",
+          "after": "c54da804ea49ba93382d8026b77db9c603ff00b729bbdfffd36b12089781f0a9"
         }
       }
     }
@@ -303,6 +313,16 @@
       ],
       "selected_families": [],
       "rationale": "Admit one byte-bound scheduled regression successor against the verified runtime and exact PR base.",
+      "source_obligation": "A completed game preserves accepted Normal Move occurrences and their decision and event provenance.",
+      "unchanged_work": "Restore uses the existing history scanner and authority checks with the same payload, replay loop and live movement path."
+    },
+    "tests/rules/section09/coverage.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "qualification40-exact-9ffa8f9efb249582"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh the live assertion binding for the existing Normal Move case and preserve all retained source inputs.",
       "source_obligation": "A completed game preserves accepted Normal Move occurrences and their decision and event provenance.",
       "unchanged_work": "Restore uses the existing history scanner and authority checks with the same payload, replay loop and live movement path."
     },

@@ -161,7 +161,7 @@ STAGE2_FIGHT_REROLL_FIXTURE = "tests/order135_counteroffensive_helpers.py"
 TERMINAL_RESTORE_TRANSITION = (
     "data/source_audits/ci64_provenance_v1/terminal-normal-move-restore-test-transition-v1.json"
 )
-TERMINAL_RESTORE_SHA256 = "838c62b30b427daac96342cb65837c19e765533d715b32a2795138a9e54549cc"
+TERMINAL_RESTORE_SHA256 = "f7a2e27629b7b05f08462f105e9159694e55179a3fddc2b6e8ef726f2be281c6"
 TERMINAL_RESTORE_BASE = "545d5556c279f88ffaaa897941245ca093e8e9f6"
 TERMINAL_RESTORE_SOURCE = "src/warhammer40k_core/engine/normal_move_history.py"
 TERMINAL_RESTORE_OWNER = "tests/rules/section09/test_restrictions.py"

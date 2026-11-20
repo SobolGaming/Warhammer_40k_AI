@@ -130,14 +130,6 @@ def test_normal_move_completion_records_actual_once_per_phase_history(
     begin(session)
     assert tuple(state.normal_move_states) == before
 
-
-def test_normal_move_restore_preserves_completed_history_and_validates_authority(
-    section09_definitions: Section02Definitions,
-) -> None:
-    session, state, unit = movement_case(section09_definitions)
-    request = choose(session, select(session, unit), "normal_move")
-    propose(session, request, unit, (Pose.at(10, 11), Pose.at(12.5, 11)))
-    (record,) = state.normal_move_states
     decisions = session.lifecycle.decision_controller
     events = decisions.event_log.records
 
