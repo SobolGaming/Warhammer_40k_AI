@@ -264,8 +264,20 @@
   },
   "operations": {
     "cavalcade-comparison-fixture-binding": {
-      "paths": ["tools/performance_policy.py"],
-      "owners": ["validate_comparison"],
+      "paths": [
+        "tools/performance_policy.py",
+        "tools/performance_private_randomness.py",
+        "tools/performance_cavalcade_policy_successor.py"
+      ],
+      "owners": [
+        "@module",
+        "_scope",
+        "_digest",
+        "private_randomness_policy_predecessor",
+        "cavalcade_policy_predecessor",
+        "cavalcade_private_rng_predecessor",
+        "validate_comparison"
+      ],
       "families": [],
       "mandatory": true,
       "sensitive": false

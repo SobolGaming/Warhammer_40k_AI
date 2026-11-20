@@ -215,7 +215,16 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         )
     )
     assert reroll["runtime_fingerprint"] == terminal_base_manifest["fingerprint"]
-    assert terminal["runtime_fingerprint"] == _record(MANIFEST)["fingerprint"]
+    cavalcade_base_manifest = json.loads(
+        subprocess.check_output(
+            ["git", "show", "77b6f8f6fdcd88bb5eaff21495b28a2972213cbf:" + MANIFEST],
+            cwd=ROOT,
+        )
+    )
+    assert terminal["runtime_fingerprint"] == cavalcade_base_manifest["fingerprint"]
+    assert _record(MANIFEST)["fingerprint"] == selection.CAVALCADE_AUTHORITY_RUNTIME
+    for name, digest in selection.CAVALCADE_AUTHORITY_SOURCES.items():
+        assert hashlib.sha256((ROOT / name).read_bytes()).hexdigest() == digest
     for terminal_owner in selection.TERMINAL_RESTORE_OWNERS:
         assert (
             terminal["test"][terminal_owner]["before"]
