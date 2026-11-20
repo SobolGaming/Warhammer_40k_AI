@@ -12,6 +12,11 @@ from warhammer40k_core.engine.catalog_setup_reactive_charge_move import (
     is_catalog_setup_reactive_charge_move_request,
 )
 from warhammer40k_core.engine.decision_request import DecisionRequest
+from warhammer40k_core.engine.fight_activation_units import active_fight_activation_rules_unit
+from warhammer40k_core.engine.fight_resolution import (
+    SUBMIT_MELEE_DECLARATION_DECISION_TYPE,
+    MeleeDeclarationProposalRequest,
+)
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.move_completion_effects import (
     SELECT_MOVE_COMPLETION_EFFECT_DECISION_TYPE,
@@ -20,7 +25,7 @@ from warhammer40k_core.engine.movement_proposals import (
     MOVEMENT_PROPOSAL_DECISION_TYPE,
     PLACEMENT_PROPOSAL_DECISION_TYPE,
 )
-from warhammer40k_core.engine.phase import GameLifecycleError, GameLifecycleStage
+from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, GameLifecycleStage
 from warhammer40k_core.engine.reaction_queue import REACTION_DECISION_TYPE, ReactionQueue
 from warhammer40k_core.engine.sequencing import SEQUENCING_DECISION_TYPE
 from warhammer40k_core.engine.stratagems import (
@@ -58,8 +63,10 @@ def validate_reaction_queue_consistency(
         SELECT_MOVE_COMPLETION_EFFECT_DECISION_TYPE,
         SEQUENCING_DECISION_TYPE,
     }
-    if pending_request.decision_type not in reaction_frame_decision_types and not (
-        charge_active and pending_request.decision_type in charge_types
+    if (
+        pending_request.decision_type not in reaction_frame_decision_types
+        and not (charge_active and pending_request.decision_type in charge_types)
+        and not _is_interrupted_fight_melee_request(state, pending_request)
     ):
         raise GameLifecycleError("Lifecycle reaction queue pending decision_type drift.")
     if (
@@ -87,3 +94,34 @@ def validate_reaction_queue_consistency(
             raise GameLifecycleError("Lifecycle reaction queue frame phase drift.")
     if frames[-1].request_id != pending_request.request_id:
         raise GameLifecycleError("Lifecycle reaction queue active frame request_id drift.")
+
+
+def _is_interrupted_fight_melee_request(state: GameState, request: DecisionRequest) -> bool:
+    fight = state.fight_phase_state
+    if (
+        request.decision_type != SUBMIT_MELEE_DECLARATION_DECISION_TYPE
+        or state.current_battle_phase is not BattlePhase.FIGHT
+        or fight is None
+    ):
+        return False
+    activation = fight.active_activation
+    if (
+        activation is None
+        or activation.interrupt_id is None
+        or request.actor_id != activation.player_id
+    ):
+        return False
+    melee = MeleeDeclarationProposalRequest.from_decision_request(request)
+    rules_unit = active_fight_activation_rules_unit(state=state, activation=activation)
+    return (
+        rules_unit is not None
+        and melee.unit_instance_id == rules_unit.unit_instance_id
+        and melee.request_id == request.request_id
+        and melee.actor_id == activation.player_id
+        and melee.game_id == state.game_id
+        and melee.battle_round == state.battle_round
+        and melee.active_player_id == fight.active_player_id
+        and melee.ruleset_descriptor_hash == state.ruleset_descriptor_hash
+        and melee.source_decision_request_id == activation.request_id
+        and melee.source_decision_result_id == activation.result_id
+    )

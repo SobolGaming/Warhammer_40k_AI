@@ -146,7 +146,12 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
     summary = _record("ci/test_shards/durations.json")
     current = sharding.summary_case_seconds(summary)
     fight = _record(selection.STAGE2_FIGHT_TRANSITION)
-    assert fight["runtime_fingerprint"] == _record(MANIFEST)["fingerprint"]
+    base_manifest = json.loads(
+        subprocess.check_output(
+            ["git", "show", selection.STAGE2_MELEE_RESTORE_BASE + ":" + MANIFEST], cwd=ROOT
+        )
+    )
+    assert fight["runtime_fingerprint"] == base_manifest["fingerprint"]
     source_before = subprocess.check_output(
         ["git", "show", selection.STAGE2_FIGHT_BASE + ":" + selection.STAGE2_FIGHT_SOURCE],
         cwd=ROOT,
@@ -183,6 +188,14 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
     )
     assert owner in active_files
     assert sum(owner in group for group in groups) == 1
+    melee_restore = _record(selection.STAGE2_MELEE_RESTORE_TRANSITION)
+    assert melee_restore["test"][owner]["before"] == counteroffensive["test"][owner]["after"]
+    source = selection.STAGE2_MELEE_RESTORE_SOURCE
+    source_before = subprocess.check_output(
+        ["git", "show", selection.STAGE2_MELEE_RESTORE_BASE + ":" + source], cwd=ROOT
+    )
+    assert melee_restore["source"][source]["before"] == hashlib.sha256(source_before).hexdigest()
+    assert melee_restore["runtime_fingerprint"] == _record(MANIFEST)["fingerprint"]
     prior = json.loads(
         subprocess.check_output(["git", "show", BASE + ":ci/test_shards/durations.json"], cwd=ROOT)
     )
@@ -289,6 +302,11 @@ def test_identity_selection_rejects_drift_in_each_updated_test(transition_snapsh
 def test_identity_transition_requires_its_exact_record(transition_snapshot: Path) -> None:
     cutover_digest = hashlib.sha256((ROOT / sharding.CUTOVER_PATH).read_bytes()).hexdigest()
     assert selection.exact_movement_test_transition(transition_snapshot, cutover_digest) is None
+    melee_restore = transition_snapshot / selection.STAGE2_MELEE_RESTORE_TRANSITION
+    melee_restore.write_bytes((ROOT / selection.STAGE2_MELEE_RESTORE_TRANSITION).read_bytes())
+    with pytest.raises(SystemExit, match="melee restore tests require the Counteroffensive"):
+        selection.exact_movement_test_transition(transition_snapshot, cutover_digest)
+    melee_restore.unlink()
     counteroffensive = transition_snapshot / selection.COUNTEROFFENSIVE_TRANSITION
     counteroffensive.write_bytes((ROOT / selection.COUNTEROFFENSIVE_TRANSITION).read_bytes())
     with pytest.raises(SystemExit, match="Counteroffensive tests require the Fight Cover"):

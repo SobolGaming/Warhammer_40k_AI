@@ -1,0 +1,28 @@
+{
+  "schema": "finite-stage2-melee-restore-test-transition-v1",
+  "base": "7dd6fc770ce122a1a42b601eabeaf44e14bc8c82",
+  "retained_counteroffensive_sha256": "cf6787bd0b721d025478c6126e3dccbc9d5b3bb8822fce331313d9ce5dd62ad3",
+  "runtime_fingerprint": "b6978439fc69d7994c677df31cb6e8b36cc77dabd676b23c1876069f707e5d32",
+  "source": {
+    "src/warhammer40k_core/engine/lifecycle_reaction_queue.py": {
+      "before": "edd80a3b4b85b9ea75007425f41e369ba14b538ba8a9180d091f91b45826d1b9",
+      "after": "d4ed0ce9c45eb934ef74bfe60263c42d591d84426cd3df14247324a5149655ff"
+    }
+  },
+  "test": {
+    "tests/rules/section15/test_reactions.py": {
+      "before": {
+        "blob_sha1": "60ceb2658ca160224b3675cf0a945a2f021266d2",
+        "bytes": 18039,
+        "mode": "100644",
+        "sha256": "44cf2a6b02eb1df66599b24b23b35450ac7a83dd881eada2bb26f492e1b6e9bb"
+      },
+      "after": {
+        "blob_sha1": "b731f7f24f4983d38680e38d7015d586ea38471e",
+        "bytes": 23588,
+        "mode": "100644",
+        "sha256": "0131d4df97c799b877e437576941867dd1341d2e9cec83661f3f6aa4f287e69a"
+      }
+    }
+  }
+}
