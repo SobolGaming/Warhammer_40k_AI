@@ -21026,6 +21026,7 @@
         "test_completed_move_blocks_charge_and_actions_through_the_rest_of_turn",
         "test_explicit_charge_permission_is_consumed_by_shared_charge_owner",
         "test_normal_move_completion_records_actual_once_per_phase_history",
+        "test_normal_move_restore_preserves_completed_history_and_validates_authority",
         "test_prior_normal_move_in_same_phase_blocks_another_normal_only"
       ],
       "families": [],
