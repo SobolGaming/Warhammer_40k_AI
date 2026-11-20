@@ -1,6 +1,8 @@
 """15.07/15.11/15.12 at their existing interruption and target decision owners."""
 
 import json
+from copy import deepcopy
+from typing import cast
 
 import pytest
 
@@ -24,8 +26,16 @@ from warhammer40k_core.adapters.access_control import ViewerContext
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.core.ruleset_descriptor import FightPhaseStepKind
 from warhammer40k_core.engine.charge_phase_state import ChargePhaseState
-from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.decision_request import DecisionRequest, DecisionRequestPayload
+from warhammer40k_core.engine.event_log import JsonValue, canonical_json, validate_json_value
 from warhammer40k_core.engine.fight_order import FightPhaseState, FightsFirstRegistry
+from warhammer40k_core.engine.fight_resolution import (
+    MeleeDeclarationProposal,
+    MeleeDeclarationProposalRequest,
+    MeleeTargetAllocation,
+    MeleeWeaponDeclaration,
+)
+from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatusKind
 from warhammer40k_core.engine.reserves import ReserveKind, ReserveState
 from warhammer40k_core.engine.stratagem_catalog import eleventh_edition_core_stratagem_index
@@ -286,6 +296,7 @@ def test_counteroffensive_own_turn_denial_and_opponent_turn_fights_first_activat
 
 def _assert_counteroffensive_viewer_branches() -> None:
     session = native_combat_session(first_player="player-a")
+    ordinary_melee_restored = False
     for _ in range(100):
         pending = request(session.advance_until_decision_or_terminal())
         if (
@@ -293,9 +304,15 @@ def _assert_counteroffensive_viewer_branches() -> None:
             and proposal_from_native_request(pending).stratagem_id == "counteroffensive"
         ):
             break
+        if pending.decision_type == "submit_melee_declaration" and not ordinary_melee_restored:
+            assert not session.lifecycle.reaction_queue.frames
+            snapshot = session.lifecycle.to_payload()
+            assert GameLifecycle.from_payload(snapshot).to_payload() == snapshot
+            ordinary_melee_restored = True
         submit_native_combat_choice(session, pending, first_player="player-a")
     else:
         raise AssertionError("Native Counteroffensive reaction was not reached.")
+    assert ordinary_melee_restored
 
     viewer = ViewerContext.for_player("player-a")
     opponent = ViewerContext.for_player("player-b")
@@ -423,3 +440,222 @@ def _assert_counteroffensive_continuation(
     assert restored.to_persistence_payload() == checkpoint
     for player in state.player_ids:
         assert view_evidence(restored, player) == view_evidence(session, player)
+    if use:
+        _assert_counteroffensive_melee_restore(restored, viewer=viewer)
+
+
+def _assert_counteroffensive_melee_restore(
+    session: LocalGameSession, *, viewer: ViewerContext
+) -> None:
+    epic = session.view_for_context(viewer=viewer)["pending_decision"]
+    assert epic is not None
+    prior = session.to_persistence_payload()
+    original_frame = session.lifecycle.reaction_queue.frames[-1]
+    status = session.submit_viewer_parameterized_payload(
+        viewer=viewer,
+        request_id=epic["request_id"],
+        payload=stratagem_decline_payload(),
+        result_id="counteroffensive:decline-epic-challenge",
+    )
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    melee = request(status)
+    assert melee.decision_type == "submit_melee_declaration"
+    assert session.lifecycle.reaction_queue.frames == (
+        original_frame.with_request_id(melee.request_id),
+    )
+    checkpoint = session.to_persistence_payload()
+    assert obj(checkpoint)["source_identity"] == obj(prior)["source_identity"]
+    rng_before = obj(obj(prior)["rng_state"])
+    rng_after = obj(obj(checkpoint)["rng_state"])
+    assert rng_after["seed"] == rng_before["seed"]
+    assert rng_after["draw_count"] == rng_before["draw_count"]
+    assert rng_after["history"][: len(rng_before["history"])] == rng_before["history"]
+
+    missing_frame = session.lifecycle.to_payload()
+    missing_frame["reaction_queue"]["frames"].clear()
+    with pytest.raises(GameLifecycleError, match="melee reaction continuation requires a frame"):
+        GameLifecycle.from_payload(missing_frame)
+
+    drifted_handoff = deepcopy(session.lifecycle.to_payload())
+    handoff = drifted_handoff["decisions"]["event_log"][-1]
+    assert handoff["event_type"] == "reaction_window_continued"
+    assert obj(handoff["payload"])["next_request_id"] == melee.request_id
+    obj(handoff["payload"])["next_request_id"] = original_frame.request_id
+    with pytest.raises(GameLifecycleError, match="melee reaction continuation drift"):
+        GameLifecycle.from_payload(drifted_handoff)
+
+    drifted_frame = session.lifecycle.to_payload()
+    drifted_frame["reaction_queue"]["frames"][-1]["request_id"] = original_frame.request_id
+    with pytest.raises(GameLifecycleError, match="active frame request_id drift"):
+        GameLifecycle.from_payload(drifted_frame)
+
+    retained_predecessor = session.lifecycle.to_payload()
+    retained_predecessor["reaction_queue"]["frames"].insert(0, original_frame.to_payload())
+    with pytest.raises(
+        GameLifecycleError, match="melee reaction continuation frame was not replaced"
+    ):
+        GameLifecycle.from_payload(retained_predecessor)
+
+    duplicated_window = session.lifecycle.to_payload()
+    lower = original_frame.with_request_id("other-reaction-request").to_payload()
+    duplicated_window["reaction_queue"]["frames"].insert(0, lower)
+    with pytest.raises(
+        GameLifecycleError, match="melee reaction continuation frame was not replaced"
+    ):
+        GameLifecycle.from_payload(duplicated_window)
+
+    # A distinct nested window beneath the transferred frame is outside this handoff.
+    lower["reaction_window"]["timing_window"]["window_id"] = "other-timing-window"
+    lower["resume_token"] = "other-resume-token"
+    assert GameLifecycle.from_payload(duplicated_window).to_payload() == duplicated_window
+
+    substituted_source = deepcopy(session.lifecycle.to_payload())
+    events = substituted_source["decisions"]["event_log"]
+    source = obj(events[-1]["payload"])
+    earlier = next(
+        event for event in reversed(events[:-1]) if event["event_type"] == "decision_recorded"
+    )
+    assert source["decision_record"] == earlier["payload"]
+    obj(obj(source["decision_record"])["result"])["result_id"] = "other-reaction-result"
+    with pytest.raises(
+        GameLifecycleError, match="melee reaction continuation source decision drift"
+    ):
+        GameLifecycle.from_payload(substituted_source)
+
+    substituted_frame = deepcopy(session.lifecycle.to_payload())
+    substituted_frame["reaction_queue"]["frames"][-1]["resume_token"] = "other-resume-token"
+    obj(substituted_frame["decisions"]["event_log"][-1]["payload"])["resume_token"] = (
+        "other-resume-token"
+    )
+    with pytest.raises(GameLifecycleError, match="melee reaction continuation source frame drift"):
+        GameLifecycle.from_payload(substituted_frame)
+
+    drifted_source = deepcopy(session.lifecycle.to_payload())
+    (pending,) = drifted_source["decisions"]["queue"]["pending_requests"]
+    obj(obj(pending["payload"])["proposal_request"])["source_decision_result_id"] = (
+        "other-fight-activation"
+    )
+    with pytest.raises(GameLifecycleError, match="pending decision_type drift"):
+        GameLifecycle.from_payload(drifted_source)
+
+    drifted_outer_type = session.lifecycle.to_payload()
+    (pending,) = drifted_outer_type["decisions"]["queue"]["pending_requests"]
+    pending["decision_type"] = "submit_stratagem_target_proposal"
+    with pytest.raises(GameLifecycleError, match="requires one exact decision_requested event"):
+        GameLifecycle.from_payload(drifted_outer_type)
+
+    for field, value in (("phase", "shooting"), ("decision_type", "submit_shooting_declaration")):
+        drifted_request = deepcopy(session.lifecycle.to_payload())
+        (pending,) = drifted_request["decisions"]["queue"]["pending_requests"]
+        obj(obj(pending["payload"])["proposal_request"])[field] = value
+        with pytest.raises(GameLifecycleError, match=f"melee proposal_request {field} drift"):
+            GameLifecycle.from_payload(drifted_request)
+
+    drifted_token = session.lifecycle.to_payload()
+    drifted_token["reaction_queue"]["frames"][-1]["resume_token"] = "other-resume-token"
+    with pytest.raises(GameLifecycleError, match="melee reaction continuation drift"):
+        GameLifecycle.from_payload(drifted_token)
+
+    drifted_window = session.lifecycle.to_payload()
+    drifted_window["reaction_queue"]["frames"][-1]["reaction_window"]["timing_window"][
+        "window_id"
+    ] = "other-timing-window"
+    with pytest.raises(GameLifecycleError, match="melee reaction continuation drift"):
+        GameLifecycle.from_payload(drifted_window)
+
+    drifted_window_type = deepcopy(session.lifecycle.to_payload())
+    descriptor = drifted_window_type["reaction_queue"]["frames"][-1]["reaction_window"][
+        "timing_window"
+    ]["descriptor"]
+    fought_selection = obj(obj(descriptor["metadata"])["fought_selection"])
+    battle_round = fought_selection["battle_round"]
+    assert type(battle_round) is int
+    fought_selection["battle_round"] = float(battle_round)
+    assert fought_selection["battle_round"] == battle_round
+    assert canonical_json(fought_selection["battle_round"]) != canonical_json(battle_round)
+    with pytest.raises(GameLifecycleError, match="melee reaction continuation drift"):
+        GameLifecycle.from_payload(drifted_window_type)
+
+    drifted_window_shape = session.lifecycle.to_payload()
+    window = obj(
+        cast(JsonValue, drifted_window_shape["reaction_queue"]["frames"][-1]["reaction_window"])
+    )
+    assert window["eligible_player_ids"] == ["player-a"]
+    window["eligible_player_ids"] = {"player-a": None}
+    with pytest.raises(GameLifecycleError, match="ReactionQueueFrame payload did not round-trip"):
+        GameLifecycle.from_payload(drifted_window_shape)
+
+    normalized_token = session.lifecycle.to_payload()
+    frame = normalized_token["reaction_queue"]["frames"][-1]
+    frame["resume_token"] += " "
+    with pytest.raises(GameLifecycleError, match="ReactionQueueFrame payload did not round-trip"):
+        GameLifecycle.from_payload(normalized_token)
+
+    restored = LocalGameSession.from_persistence_payload(json.loads(json.dumps(checkpoint)))
+    assert restored.to_persistence_payload() == checkpoint
+    assert restored.lifecycle.reaction_queue.frames == session.lifecycle.reaction_queue.frames
+    for player in ("player-a", "player-b"):
+        assert view_evidence(restored, player) == view_evidence(session, player)
+
+    issued = restored.view_for_context(viewer=viewer)["pending_decision"]
+    assert issued is not None
+    opponent = ViewerContext.for_player("player-b")
+    opponent_issued = restored.view_for_context(viewer=opponent)["pending_decision"]
+    assert opponent_issued is not None
+    assert opponent_issued["actor_id"] == "player-a"
+    assert len({issued["request_id"], opponent_issued["request_id"], melee.request_id}) == 3
+    with pytest.raises(GameLifecycleError, match="Viewer does not own the pending decision"):
+        restored.submit_viewer_parameterized_payload(
+            viewer=opponent,
+            request_id=opponent_issued["request_id"],
+            payload=None,
+            result_id="counteroffensive:opponent-declares-melee",
+        )
+    assert restored.to_persistence_payload() == checkpoint
+
+    proposal = MeleeDeclarationProposalRequest.from_decision_request(
+        DecisionRequest.from_payload(cast(DecisionRequestPayload, issued))
+    )
+    assert proposal.unit_instance_id == "army-alpha:one"
+    weapon = obj(proposal.available_weapons[0])
+    target = proposal.target_unit_instance_ids[0]
+    model_id, gear_id, profile_id, instance_id = (
+        weapon[key]
+        for key in ("model_instance_id", "wargear_id", "weapon_profile_id", "weapon_instance_id")
+    )
+    assert isinstance(model_id, str)
+    assert isinstance(gear_id, str)
+    assert isinstance(profile_id, str)
+    assert isinstance(instance_id, str)
+    payload = validate_json_value(
+        MeleeDeclarationProposal(
+            proposal.request_id,
+            proposal.proposal_kind,
+            proposal.actor_id,
+            proposal.battle_round,
+            proposal.unit_instance_id,
+            proposal.source_decision_request_id,
+            proposal.source_decision_result_id,
+            (
+                MeleeWeaponDeclaration(
+                    model_id,
+                    gear_id,
+                    profile_id,
+                    (MeleeTargetAllocation(target),),
+                    weapon_instance_id=instance_id,
+                ),
+            ),
+        ).to_payload()
+    )
+    result_id = "counteroffensive:declare-melee"
+    for game in (session, restored):
+        status = game.submit_viewer_parameterized_payload(
+            viewer=viewer, request_id=issued["request_id"], payload=payload, result_id=result_id
+        )
+        assert status.status_kind is not LifecycleStatusKind.INVALID
+        assert any(
+            event.event_type == "melee_declaration_accepted"
+            for event in game.lifecycle.decision_controller.event_log.records
+            if isinstance(event.payload, dict) and event.payload.get("result_id") == result_id
+        )
+    assert restored.to_persistence_payload() == session.to_persistence_payload()

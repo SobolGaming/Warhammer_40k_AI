@@ -140,6 +140,14 @@ COUNTEROFFENSIVE_TRANSITION = (
 COUNTEROFFENSIVE_SHA256 = "cf6787bd0b721d025478c6126e3dccbc9d5b3bb8822fce331313d9ce5dd62ad3"
 COUNTEROFFENSIVE_BASE = "d190560f0291479429ae92c222109259a43533df"
 COUNTEROFFENSIVE_OWNER = "tests/rules/section15/test_reactions.py"
+STAGE2_MELEE_RESTORE_TRANSITION = (
+    "data/source_audits/ci64_provenance_v1/stage2-melee-restore-test-transition-v1.json"
+)
+STAGE2_MELEE_RESTORE_SHA256 = "51e236eb87282d6c27ac2c59fb33f4cece708babac87ab4f1a181ee9b16a8b31"
+STAGE2_MELEE_RESTORE_BASE = "7dd6fc770ce122a1a42b601eabeaf44e14bc8c82"
+STAGE2_MELEE_RESTORE_SOURCE = "src/warhammer40k_core/engine/lifecycle_reaction_queue.py"
+STAGE2_MELEE_HISTORY_SOURCE = "src/warhammer40k_core/engine/melee_commitment_history.py"
+STAGE2_MELEE_FRAME_SOURCE = "src/warhammer40k_core/engine/reaction_queue.py"
 
 
 type SourceSuccessors = dict[str, dict[str, str]]
@@ -218,7 +226,9 @@ def _stage2_fight_successor(root: Path) -> tuple[str, TestSuccessors, bytes]:
     return record["runtime_fingerprint"], tests, raw
 
 
-def _counteroffensive_test_successor(root: Path, runtime: str) -> tuple[TestSuccessors, bytes]:
+def _counteroffensive_test_successor(
+    root: Path, runtime: str, *, current_tests: TestSuccessors | None
+) -> tuple[TestSuccessors, bytes]:
     raw = _checked_bytes(root, COUNTEROFFENSIVE_TRANSITION, COUNTEROFFENSIVE_SHA256)
     record = json.loads(raw, object_pairs_hook=_selection_object)
     if (
@@ -231,8 +241,43 @@ def _counteroffensive_test_successor(root: Path, runtime: str) -> tuple[TestSucc
         or set(record["test"]) != {COUNTEROFFENSIVE_OWNER}
     ):
         raise SystemExit("Stage 2 Counteroffensive test transition membership differs.")
-    tests = _selection_members({name: row["after"] for name, row in record["test"].items()}, root)
+    tests = _selection_members(
+        {name: row["after"] for name, row in record["test"].items()},
+        root,
+        current=current_tests,
+    )
     return tests, raw
+
+
+def _stage2_melee_restore_successor(root: Path) -> tuple[str, TestSuccessors, bytes]:
+    raw = _checked_bytes(root, STAGE2_MELEE_RESTORE_TRANSITION, STAGE2_MELEE_RESTORE_SHA256)
+    record = json.loads(raw, object_pairs_hook=_selection_object)
+    if (
+        record.keys()
+        != {
+            "schema",
+            "base",
+            "retained_counteroffensive_sha256",
+            "runtime_fingerprint",
+            "source",
+            "test",
+        }
+        or record["schema"] != "finite-stage2-melee-restore-test-transition-v1"
+        or record["base"] != STAGE2_MELEE_RESTORE_BASE
+        or record["retained_counteroffensive_sha256"] != COUNTEROFFENSIVE_SHA256
+        or set(record["source"])
+        != {STAGE2_MELEE_RESTORE_SOURCE, STAGE2_MELEE_HISTORY_SOURCE, STAGE2_MELEE_FRAME_SOURCE}
+        or set(record["test"]) != {COUNTEROFFENSIVE_OWNER}
+    ):
+        raise SystemExit("Stage 2 melee restore test transition membership differs.")
+    for name, change in record["source"].items():
+        if set(change) != {"before", "after"}:
+            raise SystemExit(
+                "Stage 2 melee restore requires exact before and after source digests."
+            )
+        _checked_bytes(root, name, change["after"])
+    tests = _selection_members({name: row["after"] for name, row in record["test"].items()}, root)
+    return record["runtime_fingerprint"], tests, raw
 
 
 def _retained_source(root: Path, name: str, digest: str, successors: SourceSuccessors) -> None:
@@ -300,12 +345,17 @@ def exact_movement_test_transition(
     budget_path = root / GAMEPLAY_BUDGET_TRANSITION
     fight_path = root / STAGE2_FIGHT_TRANSITION
     counteroffensive_path = root / COUNTEROFFENSIVE_TRANSITION
+    melee_restore_path = root / STAGE2_MELEE_RESTORE_TRANSITION
     _selection_no_links(root, budget_path)
     _selection_no_links(root, fight_path)
     _selection_no_links(root, counteroffensive_path)
+    _selection_no_links(root, melee_restore_path)
     has_gameplay_budget = budget_path.exists()
     has_stage2_fight = fight_path.exists()
     has_counteroffensive = counteroffensive_path.exists()
+    has_melee_restore = melee_restore_path.exists()
+    if has_melee_restore and not has_counteroffensive:
+        raise SystemExit("Stage 2 melee restore tests require the Counteroffensive predecessor.")
     if has_counteroffensive and not has_stage2_fight:
         raise SystemExit("Stage 2 Counteroffensive tests require the Fight Cover predecessor.")
     if has_stage2_fight and not (has_gameplay_budget and has_codec):
@@ -532,6 +582,11 @@ def exact_movement_test_transition(
     if fight_successor is not None:
         runtime, _, successor_raw = fight_successor
         raw += b"\0" + successor_raw
+    counteroffensive_runtime = runtime
+    melee_restore_tests = None
+    melee_restore_raw = None
+    if has_melee_restore:
+        runtime, melee_restore_tests, melee_restore_raw = _stage2_melee_restore_successor(root)
     retained = _identity_test_transition(
         root,
         retained_cutover_sha256,
@@ -556,11 +611,16 @@ def exact_movement_test_transition(
             updated[name] = test_successors[name]
     updated.update(stage2_fight_tests)
     if has_counteroffensive:
-        tests, counteroffensive_raw = _counteroffensive_test_successor(root, runtime)
+        tests, counteroffensive_raw = _counteroffensive_test_successor(
+            root, counteroffensive_runtime, current_tests=melee_restore_tests
+        )
         if tests.keys() & (updated.keys() | added.keys() | additions.keys()):
             raise SystemExit("Stage 2 Counteroffensive tests overlap the predecessor selection.")
         updated.update(tests)
         raw += b"\0" + counteroffensive_raw
+    if melee_restore_tests is not None and melee_restore_raw is not None:
+        updated.update(melee_restore_tests)
+        raw += b"\0" + melee_restore_raw
     return updated, {**added, **additions}, retained_raw + b"\0" + raw
 
 

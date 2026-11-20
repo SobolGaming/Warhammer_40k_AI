@@ -1,122 +1,330 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "d190560f0291479429ae92c222109259a43533df",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0289337d6418f72592110b1af66eddd31e8662c8c1f128d134ce60951382d4d0",
-  "operation_map_sha256": "4a6ec67a112de282da4c18a7e43ee520989439705cd9559992afd3298b822b0d",
+  "base": "7dd6fc770ce122a1a42b601eabeaf44e14bc8c82",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:1576e69dfa1da62bb0b3337e3b04ae6fc46ffb2bf9ddb6c47dbe03ec27be2803",
+  "operation_map_sha256": "c1f9245b645b64a315afe4dc0e81f1842c6b0e591c632173cc8d217441d81611",
   "changes": {
-    "data/source_audits/ci64_provenance_v1/stage2-counteroffensive-test-transition-v1.json": {
+    "contracts/examples/persistence/session-persistence.json": {
+      "before_sha256": "05dfef825054a444f7cf14e1a5b712dd305812e6ebedea7b3c3ea302124e5639",
+      "after_sha256": "663256edd524562f6f287dcf6a981f9e5161c4026c018892748ec122fc75af8a",
+      "owners": {
+        "@document": {
+          "before": "05dfef825054a444f7cf14e1a5b712dd305812e6ebedea7b3c3ea302124e5639",
+          "after": "663256edd524562f6f287dcf6a981f9e5161c4026c018892748ec122fc75af8a"
+        }
+      }
+    },
+    "contracts/examples/sessions/session-command-outcome.json": {
+      "before_sha256": "3a7e6f7e65ee306efb6c6b9d284ebdcd725c3987b3b72bdf536c1772a9a922fb",
+      "after_sha256": "bdcdd6135af52683f1ed5dc80223f28d7b354ba02635cfa8ac39427f3c21f07c",
+      "owners": {
+        "@document": {
+          "before": "3a7e6f7e65ee306efb6c6b9d284ebdcd725c3987b3b72bdf536c1772a9a922fb",
+          "after": "bdcdd6135af52683f1ed5dc80223f28d7b354ba02635cfa8ac39427f3c21f07c"
+        }
+      }
+    },
+    "contracts/examples/sessions/session-command-started.json": {
+      "before_sha256": "b68067c03d34d802866a1c83454f6b2daa6579e30ae10825744d638067cb8ee6",
+      "after_sha256": "e7069161e0d373d25b2e2282dfc96fde8d1c698cb00a5944c7579d91a6b3a069",
+      "owners": {
+        "@document": {
+          "before": "b68067c03d34d802866a1c83454f6b2daa6579e30ae10825744d638067cb8ee6",
+          "after": "e7069161e0d373d25b2e2282dfc96fde8d1c698cb00a5944c7579d91a6b3a069"
+        }
+      }
+    },
+    "contracts/examples/sessions/session-metadata-created.json": {
+      "before_sha256": "9fcd1ffd7b8a2ca1b7561f7324d65aaf4023f9c9e3584462d8dd5ea91fdd7980",
+      "after_sha256": "db752afcee15ea9dd236beea30e6bb5e74d89cc369a9ad3780def756c31de240",
+      "owners": {
+        "@document": {
+          "before": "9fcd1ffd7b8a2ca1b7561f7324d65aaf4023f9c9e3584462d8dd5ea91fdd7980",
+          "after": "db752afcee15ea9dd236beea30e6bb5e74d89cc369a9ad3780def756c31de240"
+        }
+      }
+    },
+    "contracts/examples/support-profile-player-a-redacted.json": {
+      "before_sha256": "eb8ce6a11839727a84270abcb7437f3c2ee1c85380f1e281f45a421584856fd7",
+      "after_sha256": "138528ce1e91b4ef53c8ea0168a1bb6e20abffd07a905b85221a9b3ca0453d97",
+      "owners": {
+        "@document": {
+          "before": "eb8ce6a11839727a84270abcb7437f3c2ee1c85380f1e281f45a421584856fd7",
+          "after": "138528ce1e91b4ef53c8ea0168a1bb6e20abffd07a905b85221a9b3ca0453d97"
+        }
+      }
+    },
+    "contracts/examples/support-profile-player-b-redacted.json": {
+      "before_sha256": "d1bfcbed7b13ef9989c10a60a942cd0e5f2692e6ba9958ce2797baa229468ceb",
+      "after_sha256": "2f281b7407210fe025c4b1d971cd7b1b2d6d33a94900d1efd33ab12e67376b80",
+      "owners": {
+        "@document": {
+          "before": "d1bfcbed7b13ef9989c10a60a942cd0e5f2692e6ba9958ce2797baa229468ceb",
+          "after": "2f281b7407210fe025c4b1d971cd7b1b2d6d33a94900d1efd33ab12e67376b80"
+        }
+      }
+    },
+    "contracts/examples/support-profile.json": {
+      "before_sha256": "6061aa66dc9fa1cb35bad57b73ea281e29f1bd2ce8c6b77fa1bf4bc3aa348f16",
+      "after_sha256": "8aa6cbd92404ce97f0a0636ef3400fbb9d40cc7a0cdc1970dc35b2fe971e1e97",
+      "owners": {
+        "@document": {
+          "before": "6061aa66dc9fa1cb35bad57b73ea281e29f1bd2ce8c6b77fa1bf4bc3aa348f16",
+          "after": "8aa6cbd92404ce97f0a0636ef3400fbb9d40cc7a0cdc1970dc35b2fe971e1e97"
+        }
+      }
+    },
+    "contracts/manifest.json": {
+      "before_sha256": "7f55b3a96312fefd96da89a6d22b4e6f6d116355066081924fefce716d2d60a9",
+      "after_sha256": "de046b3ff7fce57354219a72fb26d9e5babcd72ec45afaf990ab5f9185573f0c",
+      "owners": {
+        "@document": {
+          "before": "7f55b3a96312fefd96da89a6d22b4e6f6d116355066081924fefce716d2d60a9",
+          "after": "de046b3ff7fce57354219a72fb26d9e5babcd72ec45afaf990ab5f9185573f0c"
+        }
+      }
+    },
+    "data/source_audits/ci64_provenance_v1/stage2-melee-restore-test-transition-v1.json": {
       "before_sha256": null,
-      "after_sha256": "cf6787bd0b721d025478c6126e3dccbc9d5b3bb8822fce331313d9ce5dd62ad3",
+      "after_sha256": "51e236eb87282d6c27ac2c59fb33f4cece708babac87ab4f1a181ee9b16a8b31",
       "owners": {
         "@document": {
           "before": null,
-          "after": "cf6787bd0b721d025478c6126e3dccbc9d5b3bb8822fce331313d9ce5dd62ad3"
+          "after": "51e236eb87282d6c27ac2c59fb33f4cece708babac87ab4f1a181ee9b16a8b31"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "c60dbffcab2c82c1a99ca812d23096221f4ae80963c10f578c86d40eb19c68e5",
-      "after_sha256": "a282744e125ef8dd949c87d9ac6a441e7a1c90186fdcfa4b577b3fd7621183c9",
+      "before_sha256": "a282744e125ef8dd949c87d9ac6a441e7a1c90186fdcfa4b577b3fd7621183c9",
+      "after_sha256": "cfe42ad3f10f23e5cad6ed24fdcf8c37b13f20f550f3696a901b489e84c86105",
       "owners": {
         "@document": {
-          "before": "c60dbffcab2c82c1a99ca812d23096221f4ae80963c10f578c86d40eb19c68e5",
-          "after": "a282744e125ef8dd949c87d9ac6a441e7a1c90186fdcfa4b577b3fd7621183c9"
+          "before": "a282744e125ef8dd949c87d9ac6a441e7a1c90186fdcfa4b577b3fd7621183c9",
+          "after": "cfe42ad3f10f23e5cad6ed24fdcf8c37b13f20f550f3696a901b489e84c86105"
         }
       }
     },
     "scripts/engine_numerical_identity_test_admission.py": {
-      "before_sha256": "a1aa9f0221c46093fe28841f9740c13d719c717a9a974811e0b3fbf68db02842",
-      "after_sha256": "1357481767b4be93fb0f3c82f1175d109c8a0f5d9517ca588eba2e997a244c9e",
+      "before_sha256": "1357481767b4be93fb0f3c82f1175d109c8a0f5d9517ca588eba2e997a244c9e",
+      "after_sha256": "75ae0c9e6a0ab4d5b58ae4e1d7d90773be57084365817eeb3d0a64551a227b63",
       "owners": {
         "@module": {
-          "before": "71c3b2d2a06d6cd5b0099455f2c590cd06de94d797489777baa7abafb2b03647",
-          "after": "78fbd34a5bcdffe6568aaed565143ee40e66c325b4efb7a34cc1c5108476f75b"
+          "before": "78fbd34a5bcdffe6568aaed565143ee40e66c325b4efb7a34cc1c5108476f75b",
+          "after": "7c879ad513edb75ecacd8f8cd2d7ddd0714407906f67ac3aa660f7a99ab3ef5f"
         },
         "_counteroffensive_test_successor": {
+          "before": "dba6e2a28044cf77f8f00555ab66ec0f1d5de3f1966f8aae2af2082ae669c083",
+          "after": "6d297a28d3fcb58cfba852be52a5aee05eff7b6016a9af33650c4c2ec0f03715"
+        },
+        "_stage2_melee_restore_successor": {
           "before": null,
-          "after": "dba6e2a28044cf77f8f00555ab66ec0f1d5de3f1966f8aae2af2082ae669c083"
+          "after": "3e7b25758011cc7cfa2abce9b9b029a7faf4c7339b2e098c98df7c0a3826ea2a"
         },
         "exact_movement_test_transition": {
-          "before": "6913f889b98fb5c0b42fbfdfc4321736628ce66fb8329f22619aaf7d33760dd5",
-          "after": "207ba4a67538729907ef19ed9d46e732a4271c27bfb3b0e786448034dca18edd"
+          "before": "207ba4a67538729907ef19ed9d46e732a4271c27bfb3b0e786448034dca18edd",
+          "after": "274e9d2b07c5749bc22385bf5f361b06fafe33323fa60408fa0a91ec87521159"
+        }
+      }
+    },
+    "src/warhammer40k_core/_engine_build_manifest.json": {
+      "before_sha256": "449e63be8993cc8b6823f815374034f24f06ad8007704a1cb8b54950f0fd7d55",
+      "after_sha256": "cc9e6271dd048311458728c23cc6ca064230b2d6014bed904d7f31f22510b28c",
+      "owners": {
+        "@document": {
+          "before": "449e63be8993cc8b6823f815374034f24f06ad8007704a1cb8b54950f0fd7d55",
+          "after": "cc9e6271dd048311458728c23cc6ca064230b2d6014bed904d7f31f22510b28c"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/lifecycle_reaction_queue.py": {
+      "before_sha256": "edd80a3b4b85b9ea75007425f41e369ba14b538ba8a9180d091f91b45826d1b9",
+      "after_sha256": "91b8ae84f3b83578014182e34eea39d37c6d96e2e2457fee12d105b092307960",
+      "owners": {
+        "@module": {
+          "before": "aa04e369fe25b07a21f478b8d11f6e12b61f6f94bb6f6f074b24e83b01018e48",
+          "after": "d7d99887f0a735d2a653ade6fa5b440508e4311499abdf0a39ce4788f11dda6a"
+        },
+        "_is_interrupted_fight_melee_request": {
+          "before": null,
+          "after": "b26c695f91afed7a22cb23ec477e57661558e179182d7a89fa261b12987d3b50"
+        },
+        "_matches_frame_event": {
+          "before": null,
+          "after": "6f5a47b9141d769dc29b96dbf7c30415661dc3a8fe8200bfdb7cf16694f1cc28"
+        },
+        "validate_melee_reaction_continuation": {
+          "before": null,
+          "after": "75f0a3b4fb44e9e5796a6b1fbcfe1aea81e47bb7e31e788544a511520b569681"
+        },
+        "validate_reaction_queue_consistency": {
+          "before": "9bf47536e493f1066ccf81b50605a4b27c95b3fbdb3d0652cd1a0f43228a75b8",
+          "after": "46d976562efc3da69b5f078f66d3e5f7b01fa02a42f1ac1439dc60a7df82d9a1"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/melee_commitment_history.py": {
+      "before_sha256": "5cdee04a89a2f00c206c4eb22b50cd13a1cef78e3e5bb7b740612d1fee3f2322",
+      "after_sha256": "5a23fe021ac85253007057de96e92cd41bee3fa64f95ff5bb47068d5c38faaad",
+      "owners": {
+        "@module": {
+          "before": "040eda016796550d2d7305cba49440b3a1a56f96b1e80115880de20da3d5108c",
+          "after": "36f48452e58ba9280c91c3ab8c5be14ddfa34d38b5d204ef460aab169f86e462"
+        },
+        "validate_melee_commitment_history": {
+          "before": "1d5e3b5314af5942e206dd2ca09f8cb78f75dea1a7f344c4f1dc9a2c23b8db52",
+          "after": "308a248d3802bdb6fe5ac4347a096589852b39aace346be1d0fcc42f642001b4"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/reaction_queue.py": {
+      "before_sha256": "3cbfb2b701374c3284851239449d9f7eb0fc01c5c152a236312220a78521b9fe",
+      "after_sha256": "0c535b24960ad796af51bb88dd99c887f90c738bed7c8869d5856cf524d7bad1",
+      "owners": {
+        "@module": {
+          "before": "48faf88e88628cd518b2bce7879efd7475c8a00e5204f22f4bb4babaab43d254",
+          "after": "bd4385e23aec9c70bf494d9fabf80cefa2cb705a322c7c7d259bb2db4de830cb"
+        },
+        "ReactionQueueFrame.from_payload": {
+          "before": "fb27f52776fdbdd91aa889c913eab775e3e6f0afc06af46773f06ccf641e3392",
+          "after": "977dde46c42b70d8da8f95fc637f64529573264c5fc12f4666ba0db6ce7dbec6"
         }
       }
     },
     "tests/code_quality/test_engine_numerical_identity_admission.py": {
-      "before_sha256": "b4cb7b3eb9ae18c1e25cbf284dde54e45e3859e678ef805d3ecc14fe184c1462",
-      "after_sha256": "ccb55d4ee7cef1501b0e6e8d6ca7c0df6765ec81e58abdc8ec29afa75623b44e",
+      "before_sha256": "ccb55d4ee7cef1501b0e6e8d6ca7c0df6765ec81e58abdc8ec29afa75623b44e",
+      "after_sha256": "8ffd2c13541cb9739ff9142d76056438ed863f2097cccfe81cf2c85b34457234",
       "owners": {
         "test_identity_inventory_uses_current_twelve_shards_and_native_cohort": {
-          "before": "76891819167df531587cebad274fc2ca32aef665427c99ca6fe622f61565675f",
-          "after": "c9899e3c169e8e318873a570198d128f698960946fa2befb18df4cbafb244cbb"
+          "before": "c9899e3c169e8e318873a570198d128f698960946fa2befb18df4cbafb244cbb",
+          "after": "68389521544f30e6f7c0ddfa02c7012fb5503748e50b3098baac338774f04d70"
         },
         "test_identity_transition_requires_its_exact_record": {
-          "before": "f9c40837d54c767613dce46afb2c6e4494d701c0620155c0195220b979b4600e",
-          "after": "55e231dc5882fc4f52a254cd811399a838c923bf30021c4219305a76e6317f72"
-        }
-      }
-    },
-    "tests/rules/section15/README.md": {
-      "before_sha256": "cdc59adf31601d4f35db03f5f77f684d225b3b6725b769f6b62ebc9f4da15327",
-      "after_sha256": "86ebd2cd411a7ae8d4721fc8b9cab6230ad9232a968670d57615b75886b07d96",
-      "owners": {
-        "@document": {
-          "before": "cdc59adf31601d4f35db03f5f77f684d225b3b6725b769f6b62ebc9f4da15327",
-          "after": "86ebd2cd411a7ae8d4721fc8b9cab6230ad9232a968670d57615b75886b07d96"
-        }
-      }
-    },
-    "tests/rules/section15/coverage.json": {
-      "before_sha256": "f355401d2bff6db71ddd23fedcdf80e1daeb89a3f80dbef126cc9bab83a15f85",
-      "after_sha256": "f0ec199ad3e771dfeac5f346dbbfa7814ff5a6ce8933903a85f9c6cad7ee11ac",
-      "owners": {
-        "@document": {
-          "before": "f355401d2bff6db71ddd23fedcdf80e1daeb89a3f80dbef126cc9bab83a15f85",
-          "after": "f0ec199ad3e771dfeac5f346dbbfa7814ff5a6ce8933903a85f9c6cad7ee11ac"
+          "before": "55e231dc5882fc4f52a254cd811399a838c923bf30021c4219305a76e6317f72",
+          "after": "e6a8bb86adb33991c349502b2419568334da9147b43fa00822d751e6d396ebf3"
         }
       }
     },
     "tests/rules/section15/test_reactions.py": {
-      "before_sha256": "907dfbefca3cfba251d180d59c6022c8e6c929855c10b64a0fcda9c6458cb49a",
-      "after_sha256": "44cf2a6b02eb1df66599b24b23b35450ac7a83dd881eada2bb26f492e1b6e9bb",
+      "before_sha256": "44cf2a6b02eb1df66599b24b23b35450ac7a83dd881eada2bb26f492e1b6e9bb",
+      "after_sha256": "9842238a777aa3a0bf92bf25059453de7a7f3c3201f6cfe76d1aa74c9cdad014",
       "owners": {
         "@module": {
-          "before": "b056e185033d9f0f912ebba6fef50ac21cdb237938b3d2368269037d86365675",
-          "after": "3b9a0a87f6dc4e5157dcfc3782eb69fa25f62faeb8db273fe29fc825ef4c220c"
+          "before": "3b9a0a87f6dc4e5157dcfc3782eb69fa25f62faeb8db273fe29fc825ef4c220c",
+          "after": "e9cd16f5e3a3ad40d7730e302770b5af4d31a94366fd549b8f253b312de55030"
         },
         "_assert_counteroffensive_continuation": {
+          "before": "10a4e2916a1c0324a5b880edb2944ce3c10d786b76ca366d03cd4f9b78f79ae2",
+          "after": "704ed61f42a27479899265980c04411dc216f6151a90714cf11f31a60e6d7b80"
+        },
+        "_assert_counteroffensive_melee_restore": {
           "before": null,
-          "after": "10a4e2916a1c0324a5b880edb2944ce3c10d786b76ca366d03cd4f9b78f79ae2"
+          "after": "62cd66f8103a09d0f60c40f0343405d79f804f3c5ff6c5f1d42679fe80f2c99e"
         },
         "_assert_counteroffensive_viewer_branches": {
-          "before": null,
-          "after": "246219fc5c16b6264631ca65cc71efcc9c7b8e830f8f13cdf682defbde4bfa72"
-        },
-        "test_counteroffensive_own_turn_denial_and_opponent_turn_fights_first_activation": {
-          "before": "9a33c4aa46a5461dec967e64efd7a4cabc1e4899f80fcbe2bed5517e3b849bec",
-          "after": "d7dd4d8775a84cae68da9b2f2023ae3475fa1c03cd96e92ad06b1e7d05ffeea5"
+          "before": "246219fc5c16b6264631ca65cc71efcc9c7b8e830f8f13cdf682defbde4bfa72",
+          "after": "d23dcc36885ca891e26a85871b03b642111f420b137d02ebfd763b761f06699c"
         }
       }
     }
   },
   "rows": {
-    "data/source_audits/ci64_provenance_v1/stage2-counteroffensive-test-transition-v1.json": {
+    "contracts/examples/persistence/session-persistence.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate published synthetic fixtures and their manifest for the new runtime tree fingerprint.",
+      "source_obligation": "The existing Fight decision contract binds melee proposals to the active rules unit and source activation, including units selected by Counteroffensive under Core 15.12.",
+      "unchanged_work": "Only the restored interrupted melee declaration checks the recorded continuation. The existing melee history snapshot supplies the event suffix and accepted decision. The frame decoder checks its existing serialized shape. Live dispatch, emitted payloads, replay execution, and search and cache work are unchanged."
+    },
+    "contracts/examples/sessions/session-command-outcome.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate published synthetic fixtures and their manifest for the new runtime tree fingerprint.",
+      "source_obligation": "The existing Fight decision contract binds melee proposals to the active rules unit and source activation, including units selected by Counteroffensive under Core 15.12.",
+      "unchanged_work": "Only the restored interrupted melee declaration checks the recorded continuation. The existing melee history snapshot supplies the event suffix and accepted decision. The frame decoder checks its existing serialized shape. Live dispatch, emitted payloads, replay execution, and search and cache work are unchanged."
+    },
+    "contracts/examples/sessions/session-command-started.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate published synthetic fixtures and their manifest for the new runtime tree fingerprint.",
+      "source_obligation": "The existing Fight decision contract binds melee proposals to the active rules unit and source activation, including units selected by Counteroffensive under Core 15.12.",
+      "unchanged_work": "Only the restored interrupted melee declaration checks the recorded continuation. The existing melee history snapshot supplies the event suffix and accepted decision. The frame decoder checks its existing serialized shape. Live dispatch, emitted payloads, replay execution, and search and cache work are unchanged."
+    },
+    "contracts/examples/sessions/session-metadata-created.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate published synthetic fixtures and their manifest for the new runtime tree fingerprint.",
+      "source_obligation": "The existing Fight decision contract binds melee proposals to the active rules unit and source activation, including units selected by Counteroffensive under Core 15.12.",
+      "unchanged_work": "Only the restored interrupted melee declaration checks the recorded continuation. The existing melee history snapshot supplies the event suffix and accepted decision. The frame decoder checks its existing serialized shape. Live dispatch, emitted payloads, replay execution, and search and cache work are unchanged."
+    },
+    "contracts/examples/support-profile-player-a-redacted.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate published synthetic fixtures and their manifest for the new runtime tree fingerprint.",
+      "source_obligation": "The existing Fight decision contract binds melee proposals to the active rules unit and source activation, including units selected by Counteroffensive under Core 15.12.",
+      "unchanged_work": "Only the restored interrupted melee declaration checks the recorded continuation. The existing melee history snapshot supplies the event suffix and accepted decision. The frame decoder checks its existing serialized shape. Live dispatch, emitted payloads, replay execution, and search and cache work are unchanged."
+    },
+    "contracts/examples/support-profile-player-b-redacted.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate published synthetic fixtures and their manifest for the new runtime tree fingerprint.",
+      "source_obligation": "The existing Fight decision contract binds melee proposals to the active rules unit and source activation, including units selected by Counteroffensive under Core 15.12.",
+      "unchanged_work": "Only the restored interrupted melee declaration checks the recorded continuation. The existing melee history snapshot supplies the event suffix and accepted decision. The frame decoder checks its existing serialized shape. Live dispatch, emitted payloads, replay execution, and search and cache work are unchanged."
+    },
+    "contracts/examples/support-profile.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate published synthetic fixtures and their manifest for the new runtime tree fingerprint.",
+      "source_obligation": "The existing Fight decision contract binds melee proposals to the active rules unit and source activation, including units selected by Counteroffensive under Core 15.12.",
+      "unchanged_work": "Only the restored interrupted melee declaration checks the recorded continuation. The existing melee history snapshot supplies the event suffix and accepted decision. The frame decoder checks its existing serialized shape. Live dispatch, emitted payloads, replay execution, and search and cache work are unchanged."
+    },
+    "contracts/manifest.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate published synthetic fixtures and their manifest for the new runtime tree fingerprint.",
+      "source_obligation": "The existing Fight decision contract binds melee proposals to the active rules unit and source activation, including units selected by Counteroffensive under Core 15.12.",
+      "unchanged_work": "Only the restored interrupted melee declaration checks the recorded continuation. The existing melee history snapshot supplies the event suffix and accepted decision. The frame decoder checks its existing serialized shape. Live dispatch, emitted payloads, replay execution, and search and cache work are unchanged."
+    },
+    "data/source_audits/ci64_provenance_v1/stage2-melee-restore-test-transition-v1.json": {
       "category": "rule_semantics",
       "operations": [
         "engine-numerical-identity-admission"
       ],
       "selected_families": [],
-      "rationale": "Bind one scheduled Section 15 test file to its original bytes, approved successor, Fight Cover predecessor and the verified squash runtime.",
-      "source_obligation": "Core 15.12 allows the opponent of the active player to spend two CP immediately after an enemy unit fights, selecting an eligible friendly unit to fight next.",
-      "unchanged_work": "The exact base runtime fingerprint, dependency lock, and workload selectors are used to verify the existing adapter, Fight, and replay behavior. The Section 15 opponent-turn case now exercises both decisions on a four-unit fixture."
+      "rationale": "Admit three exact runtime source revisions and one existing scheduled test successor, with predecessor and current runtime identity binding.",
+      "source_obligation": "The existing Fight decision contract binds melee proposals to the active rules unit and source activation, including units selected by Counteroffensive under Core 15.12.",
+      "unchanged_work": "Only the restored interrupted melee declaration checks the recorded continuation. The existing melee history snapshot supplies the event suffix and accepted decision. The frame decoder checks its existing serialized shape. Live dispatch, emitted payloads, replay execution, and search and cache work are unchanged."
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Register the two viewer regression helpers and the finite test admission record.",
-      "source_obligation": "Core 15.12 allows the opponent of the active player to spend two CP immediately after an enemy unit fights, selecting an eligible friendly unit to fight next.",
-      "unchanged_work": "The exact base runtime fingerprint, dependency lock, and workload selectors are used to verify the existing adapter, Fight, and replay behavior. The Section 15 opponent-turn case now exercises both decisions on a four-unit fixture."
+      "rationale": "Register the exact changed restoration, test, and finite source admission owners.",
+      "source_obligation": "The existing Fight decision contract binds melee proposals to the active rules unit and source activation, including units selected by Counteroffensive under Core 15.12.",
+      "unchanged_work": "Only the restored interrupted melee declaration checks the recorded continuation. The existing melee history snapshot supplies the event suffix and accepted decision. The frame decoder checks its existing serialized shape. Live dispatch, emitted payloads, replay execution, and search and cache work are unchanged."
     },
     "scripts/engine_numerical_identity_test_admission.py": {
       "category": "rule_semantics",
@@ -124,9 +332,49 @@
         "engine-numerical-identity-admission"
       ],
       "selected_families": [],
-      "rationale": "Validate the new Section 15 test successor with the existing exact-byte membership checker after authenticating its Fight Cover predecessor.",
-      "source_obligation": "Core 15.12 allows the opponent of the active player to spend two CP immediately after an enemy unit fights, selecting an eligible friendly unit to fight next.",
-      "unchanged_work": "The exact base runtime fingerprint, dependency lock, and workload selectors are used to verify the existing adapter, Fight, and replay behavior. The Section 15 opponent-turn case now exercises both decisions on a four-unit fixture."
+      "rationale": "Admit three exact runtime source revisions and one existing scheduled test successor, with predecessor and current runtime identity binding.",
+      "source_obligation": "The existing Fight decision contract binds melee proposals to the active rules unit and source activation, including units selected by Counteroffensive under Core 15.12.",
+      "unchanged_work": "Only the restored interrupted melee declaration checks the recorded continuation. The existing melee history snapshot supplies the event suffix and accepted decision. The frame decoder checks its existing serialized shape. Live dispatch, emitted payloads, replay execution, and search and cache work are unchanged."
+    },
+    "src/warhammer40k_core/_engine_build_manifest.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "source-record"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate verified build identity from packaged runtime sources and schemas.",
+      "source_obligation": "The existing Fight decision contract binds melee proposals to the active rules unit and source activation, including units selected by Counteroffensive under Core 15.12.",
+      "unchanged_work": "Only the restored interrupted melee declaration checks the recorded continuation. The existing melee history snapshot supplies the event suffix and accepted decision. The frame decoder checks its existing serialized shape. Live dispatch, emitted payloads, replay execution, and search and cache work are unchanged."
+    },
+    "src/warhammer40k_core/engine/lifecycle_reaction_queue.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "stage2-melee-reaction-restore"
+      ],
+      "selected_families": [],
+      "rationale": "Bind the issued interrupted declaration to its accepted source decision and prior frame assignment. Require one transferred window at the top and verify the full raw frame at decode.",
+      "source_obligation": "The existing Fight decision contract binds melee proposals to the active rules unit and source activation, including units selected by Counteroffensive under Core 15.12.",
+      "unchanged_work": "Only the restored interrupted melee declaration checks the recorded continuation. The existing melee history snapshot supplies the event suffix and accepted decision. The frame decoder checks its existing serialized shape. Live dispatch, emitted payloads, replay execution, and search and cache work are unchanged."
+    },
+    "src/warhammer40k_core/engine/melee_commitment_history.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "stage2-melee-reaction-restore"
+      ],
+      "selected_families": [],
+      "rationale": "Bind the issued interrupted declaration to its accepted source decision and prior frame assignment. Require one transferred window at the top and verify the full raw frame at decode.",
+      "source_obligation": "The existing Fight decision contract binds melee proposals to the active rules unit and source activation, including units selected by Counteroffensive under Core 15.12.",
+      "unchanged_work": "Only the restored interrupted melee declaration checks the recorded continuation. The existing melee history snapshot supplies the event suffix and accepted decision. The frame decoder checks its existing serialized shape. Live dispatch, emitted payloads, replay execution, and search and cache work are unchanged."
+    },
+    "src/warhammer40k_core/engine/reaction_queue.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "stage2-melee-reaction-restore"
+      ],
+      "selected_families": [],
+      "rationale": "Bind the issued interrupted declaration to its accepted source decision and prior frame assignment. Require one transferred window at the top and verify the full raw frame at decode.",
+      "source_obligation": "The existing Fight decision contract binds melee proposals to the active rules unit and source activation, including units selected by Counteroffensive under Core 15.12.",
+      "unchanged_work": "Only the restored interrupted melee declaration checks the recorded continuation. The existing melee history snapshot supplies the event suffix and accepted decision. The frame decoder checks its existing serialized shape. Live dispatch, emitted payloads, replay execution, and search and cache work are unchanged."
     },
     "tests/code_quality/test_engine_numerical_identity_admission.py": {
       "category": "rule_semantics",
@@ -134,29 +382,9 @@
         "engine-numerical-identity-admission"
       ],
       "selected_families": [],
-      "rationale": "Verify that the Section 15 successor is confined to the existing shard and authenticate the original file and required predecessor.",
-      "source_obligation": "Core 15.12 allows the opponent of the active player to spend two CP immediately after an enemy unit fights, selecting an eligible friendly unit to fight next.",
-      "unchanged_work": "The exact base runtime fingerprint, dependency lock, and workload selectors are used to verify the existing adapter, Fight, and replay behavior. The Section 15 opponent-turn case now exercises both decisions on a four-unit fixture."
-    },
-    "tests/rules/section15/README.md": {
-      "category": "rule_semantics",
-      "operations": [
-        "qualification40-exact-05d1838dfedd3985"
-      ],
-      "selected_families": [],
-      "rationale": "Describe the bounded four-unit viewer fixture and its setup-to-Fight scope.",
-      "source_obligation": "Core 15.12 allows the opponent of the active player to spend two CP immediately after an enemy unit fights, selecting an eligible friendly unit to fight next.",
-      "unchanged_work": "The exact base runtime fingerprint, dependency lock, and workload selectors are used to verify the existing adapter, Fight, and replay behavior. The Section 15 opponent-turn case now exercises both decisions on a four-unit fixture."
-    },
-    "tests/rules/section15/coverage.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "qualification40-exact-abe77ef9fc242550"
-      ],
-      "selected_families": [],
-      "rationale": "Refresh the sixteen exact AST references to the extended Counteroffensive case while preserving each adopted source assertion.",
-      "source_obligation": "Core 15.12 allows the opponent of the active player to spend two CP immediately after an enemy unit fights, selecting an eligible friendly unit to fight next.",
-      "unchanged_work": "The exact base runtime fingerprint, dependency lock, and workload selectors are used to verify the existing adapter, Fight, and replay behavior. The Section 15 opponent-turn case now exercises both decisions on a four-unit fixture."
+      "rationale": "Admit three exact runtime source revisions and one existing scheduled test successor, with predecessor and current runtime identity binding.",
+      "source_obligation": "The existing Fight decision contract binds melee proposals to the active rules unit and source activation, including units selected by Counteroffensive under Core 15.12.",
+      "unchanged_work": "Only the restored interrupted melee declaration checks the recorded continuation. The existing melee history snapshot supplies the event suffix and accepted decision. The frame decoder checks its existing serialized shape. Live dispatch, emitted payloads, replay execution, and search and cache work are unchanged."
     },
     "tests/rules/section15/test_reactions.py": {
       "category": "rule_semantics",
@@ -165,9 +393,9 @@
         "stage2-counteroffensive-viewer"
       ],
       "selected_families": [],
-      "rationale": "Exercise decline, use, and invalid submissions through the Player A viewer facade on a genuine opponent-turn reaction and verify persistence and both streams.",
-      "source_obligation": "Core 15.12 allows the opponent of the active player to spend two CP immediately after an enemy unit fights, selecting an eligible friendly unit to fight next.",
-      "unchanged_work": "The exact base runtime fingerprint, dependency lock, and workload selectors are used to verify the existing adapter, Fight, and replay behavior. The Section 15 opponent-turn case now exercises both decisions on a four-unit fixture."
+      "rationale": "Extend the scheduled viewer fixture through Epic Challenge decline, strict melee save and restore, independent source and raw frame drift rejection, nesting, and legal melee submission.",
+      "source_obligation": "The existing Fight decision contract binds melee proposals to the active rules unit and source activation, including units selected by Counteroffensive under Core 15.12.",
+      "unchanged_work": "Only the restored interrupted melee declaration checks the recorded continuation. The existing melee history snapshot supplies the event suffix and accepted decision. The frame decoder checks its existing serialized shape. Live dispatch, emitted payloads, replay execution, and search and cache work are unchanged."
     }
   },
   "milestone": "ordinary",

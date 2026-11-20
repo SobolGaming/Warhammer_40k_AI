@@ -36385,7 +36385,8 @@
         "tests/code_quality/test_engine_numerical_identity_admission.py",
         "data/source_audits/ci64_provenance_v1/engine-numerical-identity-test-transition-v1.json",
         "data/source_audits/ci64_provenance_v1/stage2-fight-cover-test-transition-v1.json",
-        "data/source_audits/ci64_provenance_v1/stage2-counteroffensive-test-transition-v1.json"
+        "data/source_audits/ci64_provenance_v1/stage2-counteroffensive-test-transition-v1.json",
+        "data/source_audits/ci64_provenance_v1/stage2-melee-restore-test-transition-v1.json"
       ],
       "owners": [
         "*"
@@ -36411,7 +36412,27 @@
       ],
       "owners": [
         "_assert_counteroffensive_viewer_branches",
-        "_assert_counteroffensive_continuation"
+        "_assert_counteroffensive_continuation",
+        "_assert_counteroffensive_melee_restore"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "stage2-melee-reaction-restore": {
+      "paths": [
+        "src/warhammer40k_core/engine/lifecycle_reaction_queue.py",
+        "src/warhammer40k_core/engine/melee_commitment_history.py",
+        "src/warhammer40k_core/engine/reaction_queue.py"
+      ],
+      "owners": [
+        "@module",
+        "ReactionQueueFrame.from_payload",
+        "_is_interrupted_fight_melee_request",
+        "_matches_frame_event",
+        "validate_melee_commitment_history",
+        "validate_melee_reaction_continuation",
+        "validate_reaction_queue_consistency"
       ],
       "families": [],
       "sensitive": false,
