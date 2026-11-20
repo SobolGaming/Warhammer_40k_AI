@@ -149,6 +149,14 @@ STAGE2_MELEE_RESTORE_SOURCE = "src/warhammer40k_core/engine/lifecycle_reaction_q
 STAGE2_MELEE_HISTORY_SOURCE = "src/warhammer40k_core/engine/melee_commitment_history.py"
 STAGE2_MELEE_FRAME_SOURCE = "src/warhammer40k_core/engine/reaction_queue.py"
 
+STAGE2_FIGHT_REROLL_TRANSITION = (
+    "data/source_audits/ci64_provenance_v1/stage2-fight-reroll-test-transition-v1.json"
+)
+STAGE2_FIGHT_REROLL_SHA256 = "9b48614e7f5b8831a1e1b5ba21d1791b9cbc0ddc5055d9de3a14bf6d053c5ab6"
+STAGE2_FIGHT_REROLL_BASE = "ca0da3d36731986ed55b623d9f82c05e6eda5560"
+STAGE2_FIGHT_REROLL_SOURCE = "src/warhammer40k_core/engine/lifecycle.py"
+STAGE2_FIGHT_REROLL_FIXTURE = "tests/order135_counteroffensive_helpers.py"
+
 
 type SourceSuccessors = dict[str, dict[str, str]]
 type TestSuccessors = dict[str, dict[str, object]]
@@ -171,6 +179,7 @@ def _gameplay_budget_successor(
     root: Path,
     *,
     current_tests: TestSuccessors,
+    current_sources: SourceSuccessors,
 ) -> tuple[str, SourceSuccessors, TestSuccessors, bytes]:
     raw = _checked_bytes(root, GAMEPLAY_BUDGET_TRANSITION, GAMEPLAY_BUDGET_SHA256)
     record = json.loads(raw, object_pairs_hook=_selection_object)
@@ -196,7 +205,7 @@ def _gameplay_budget_successor(
     for name, change in record["sources"].items():
         if set(change) != {"before", "after"}:
             raise SystemExit("Gameplay budget transition requires exact before and after digests.")
-        _checked_bytes(root, name, change["after"])
+        _retained_source(root, name, change["after"], current_sources)
     successors = _selection_members(record["tests"], root, current=current_tests)
     return record["runtime_fingerprint"], record["sources"], successors, raw
 
@@ -249,7 +258,9 @@ def _counteroffensive_test_successor(
     return tests, raw
 
 
-def _stage2_melee_restore_successor(root: Path) -> tuple[str, TestSuccessors, bytes]:
+def _stage2_melee_restore_successor(
+    root: Path, *, current_tests: TestSuccessors | None
+) -> tuple[str, TestSuccessors, bytes]:
     raw = _checked_bytes(root, STAGE2_MELEE_RESTORE_TRANSITION, STAGE2_MELEE_RESTORE_SHA256)
     record = json.loads(raw, object_pairs_hook=_selection_object)
     if (
@@ -276,8 +287,57 @@ def _stage2_melee_restore_successor(root: Path) -> tuple[str, TestSuccessors, by
                 "Stage 2 melee restore requires exact before and after source digests."
             )
         _checked_bytes(root, name, change["after"])
-    tests = _selection_members({name: row["after"] for name, row in record["test"].items()}, root)
+    tests = _selection_members(
+        {name: row["after"] for name, row in record["test"].items()},
+        root,
+        current=current_tests,
+    )
     return record["runtime_fingerprint"], tests, raw
+
+
+def _stage2_fight_reroll_successor(
+    root: Path,
+) -> tuple[str, TestSuccessors, bytes, SourceSuccessors]:
+    raw = _checked_bytes(root, STAGE2_FIGHT_REROLL_TRANSITION, STAGE2_FIGHT_REROLL_SHA256)
+    record = json.loads(raw, object_pairs_hook=_selection_object)
+    if (
+        record.keys()
+        != {
+            "schema",
+            "base",
+            "retained_melee_restore_sha256",
+            "runtime_fingerprint",
+            "source",
+            "test",
+        }
+        or record["schema"] != "finite-stage2-fight-reroll-test-transition-v1"
+        or record["base"] != STAGE2_FIGHT_REROLL_BASE
+        or record["retained_melee_restore_sha256"] != STAGE2_MELEE_RESTORE_SHA256
+        or set(record["source"]) != {STAGE2_FIGHT_REROLL_SOURCE, STAGE2_FIGHT_REROLL_FIXTURE}
+        or set(record["test"]) != {COUNTEROFFENSIVE_OWNER}
+    ):
+        raise SystemExit("Stage 2 Fight reroll test transition membership differs.")
+    for name, change in record["source"].items():
+        if set(change) != {"before", "after"}:
+            raise SystemExit("Stage 2 Fight reroll requires exact before and after source digests.")
+        _checked_bytes(root, name, change["after"])
+    melee_restore = json.loads(
+        _checked_bytes(root, STAGE2_MELEE_RESTORE_TRANSITION, STAGE2_MELEE_RESTORE_SHA256),
+        object_pairs_hook=_selection_object,
+    )
+    test = record["test"][COUNTEROFFENSIVE_OWNER]
+    if (
+        set(test) != {"before", "after"}
+        or test["before"] != (melee_restore["test"][COUNTEROFFENSIVE_OWNER]["after"])
+    ):
+        raise SystemExit("Stage 2 Fight reroll test predecessor differs.")
+    tests = _selection_members({COUNTEROFFENSIVE_OWNER: test["after"]}, root)
+    return (
+        record["runtime_fingerprint"],
+        tests,
+        raw,
+        {STAGE2_FIGHT_REROLL_SOURCE: record["source"][STAGE2_FIGHT_REROLL_SOURCE]},
+    )
 
 
 def _retained_source(root: Path, name: str, digest: str, successors: SourceSuccessors) -> None:
@@ -346,14 +406,19 @@ def exact_movement_test_transition(
     fight_path = root / STAGE2_FIGHT_TRANSITION
     counteroffensive_path = root / COUNTEROFFENSIVE_TRANSITION
     melee_restore_path = root / STAGE2_MELEE_RESTORE_TRANSITION
+    fight_reroll_path = root / STAGE2_FIGHT_REROLL_TRANSITION
     _selection_no_links(root, budget_path)
     _selection_no_links(root, fight_path)
     _selection_no_links(root, counteroffensive_path)
     _selection_no_links(root, melee_restore_path)
+    _selection_no_links(root, fight_reroll_path)
     has_gameplay_budget = budget_path.exists()
     has_stage2_fight = fight_path.exists()
     has_counteroffensive = counteroffensive_path.exists()
     has_melee_restore = melee_restore_path.exists()
+    has_fight_reroll = fight_reroll_path.exists()
+    if has_fight_reroll and not has_melee_restore:
+        raise SystemExit("Stage 2 Fight reroll tests require the melee restore predecessor.")
     if has_melee_restore and not has_counteroffensive:
         raise SystemExit("Stage 2 melee restore tests require the Counteroffensive predecessor.")
     if has_counteroffensive and not has_stage2_fight:
@@ -568,6 +633,7 @@ def exact_movement_test_transition(
         additions.update(_selection_members(codec["added_files"], root))
         runtime = codec["runtime_fingerprint"]
         raw += b"\0" + codec_raw
+    fight_reroll = _stage2_fight_reroll_successor(root) if has_fight_reroll else None
     source_successors: SourceSuccessors = {}
     test_successors: TestSuccessors = {}
     fight_successor = _stage2_fight_successor(root) if has_stage2_fight else None
@@ -576,7 +642,9 @@ def exact_movement_test_transition(
         if not has_codec:
             raise SystemExit("Gameplay movement budget tests require the oval codec predecessor.")
         runtime, source_successors, test_successors, successor_raw = _gameplay_budget_successor(
-            root, current_tests=stage2_fight_tests
+            root,
+            current_tests=stage2_fight_tests,
+            current_sources={} if fight_reroll is None else fight_reroll[3],
         )
         raw += b"\0" + successor_raw
     if fight_successor is not None:
@@ -586,7 +654,11 @@ def exact_movement_test_transition(
     melee_restore_tests = None
     melee_restore_raw = None
     if has_melee_restore:
-        runtime, melee_restore_tests, melee_restore_raw = _stage2_melee_restore_successor(root)
+        runtime, melee_restore_tests, melee_restore_raw = _stage2_melee_restore_successor(
+            root, current_tests=None if fight_reroll is None else fight_reroll[1]
+        )
+    if fight_reroll is not None:
+        runtime = fight_reroll[0]
     retained = _identity_test_transition(
         root,
         retained_cutover_sha256,
@@ -612,7 +684,9 @@ def exact_movement_test_transition(
     updated.update(stage2_fight_tests)
     if has_counteroffensive:
         tests, counteroffensive_raw = _counteroffensive_test_successor(
-            root, counteroffensive_runtime, current_tests=melee_restore_tests
+            root,
+            counteroffensive_runtime,
+            current_tests=melee_restore_tests if fight_reroll is None else fight_reroll[1],
         )
         if tests.keys() & (updated.keys() | added.keys() | additions.keys()):
             raise SystemExit("Stage 2 Counteroffensive tests overlap the predecessor selection.")
@@ -621,6 +695,10 @@ def exact_movement_test_transition(
     if melee_restore_tests is not None and melee_restore_raw is not None:
         updated.update(melee_restore_tests)
         raw += b"\0" + melee_restore_raw
+    if fight_reroll is not None:
+        _, tests, reroll_raw, _ = fight_reroll
+        updated.update(tests)
+        raw += b"\0" + reroll_raw
     return updated, {**added, **additions}, retained_raw + b"\0" + raw
 
 

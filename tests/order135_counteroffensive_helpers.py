@@ -1,6 +1,6 @@
 """Pregame-declared combat scenes driven only by public decisions and real dice.
 
-M12 and A1/WS6/S1/D1 are bounded synthetic catalog choices, not provider or
+M12 and A1/WS2/S12/D1 are bounded synthetic catalog choices, not provider or
 whole-faction certification. No started state, history or RNG is replaced.
 """
 
@@ -82,8 +82,8 @@ def native_combat_session(*, first_player: str) -> LocalGameSession:
                     replace(
                         profile,
                         attack_profile=AttackProfile.fixed(1),
-                        skill=CharacteristicValue.from_raw(Characteristic.WEAPON_SKILL, 6),
-                        strength=CharacteristicValue.from_raw(Characteristic.STRENGTH, 1),
+                        skill=CharacteristicValue.from_raw(Characteristic.WEAPON_SKILL, 2),
+                        strength=CharacteristicValue.from_raw(Characteristic.STRENGTH, 12),
                         damage_profile=DamageProfile.fixed(1),
                     )
                     for profile in wargear.weapon_profiles

@@ -40,6 +40,7 @@ from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, Life
 from warhammer40k_core.engine.reserves import ReserveKind, ReserveState
 from warhammer40k_core.engine.stratagem_catalog import eleventh_edition_core_stratagem_index
 from warhammer40k_core.engine.stratagems import (
+    DECLINE_STRATAGEM_WINDOW_OPTION_ID,
     StratagemTargetProposal,
     stratagem_decline_payload,
     stratagem_target_proposal_from_index,
@@ -659,3 +660,53 @@ def _assert_counteroffensive_melee_restore(
             if isinstance(event.payload, dict) and event.payload.get("result_id") == result_id
         )
     assert restored.to_persistence_payload() == session.to_persistence_payload()
+    _assert_counteroffensive_defender_reroll_decline(restored)
+
+
+def _assert_counteroffensive_defender_reroll_decline(session: LocalGameSession) -> None:
+    lifecycle = session.lifecycle
+    state = lifecycle.state
+    assert state is not None
+    defender = ViewerContext.for_player("player-b")
+    reroll = lifecycle.pending_decision_request()
+    assert reroll is not None
+    assert (reroll.actor_id, reroll.decision_type) == ("player-b", "use_stratagem")
+    trigger = obj(obj(reroll.payload)["stratagem_context"])["trigger_payload"]
+    assert trigger["affected_unit_instance_id"] == "army-beta:one"
+    assert trigger["roll_type"] == "attack_sequence.save.armour"
+    (frame,) = lifecycle.reaction_queue.frames
+    assert frame.request_id == reroll.request_id
+
+    log = lifecycle.decision_controller.event_log
+    cursor = len(log.records)
+    before_cp = state.command_point_total("player-b")
+    issued = session.view_for_context(viewer=defender)["pending_decision"]
+    assert issued is not None
+    status = session.submit_viewer_option(
+        viewer=defender,
+        request_id=issued["request_id"],
+        option_id=DECLINE_STRATAGEM_WINDOW_OPTION_ID,
+        result_id="counteroffensive:defender-declines-command-reroll",
+    )
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert request(status).decision_type == "select_fight_activation"
+    assert state.command_point_total("player-b") == before_cp
+    assert lifecycle.reaction_queue.frames == ()
+    events = log.records_since(cursor)
+    event_types = [event.event_type for event in events]
+    (damage_index,) = (
+        index
+        for index, event in enumerate(events)
+        if event.event_type == "attack_sequence_step" and obj(event.payload)["step"] == "damage"
+    )
+    (resume_index,) = (
+        index for index, event in enumerate(events) if event.event_type == "reaction_parent_resumed"
+    )
+    assert event_types.index("stratagem_window_declined") < damage_index
+    assert damage_index < event_types.index("fight_activation_completed")
+    assert (
+        event_types.index("fight_activation_completed")
+        < event_types.index("reaction_window_resolved")
+        < resume_index
+    )
+    assert obj(events[resume_index].payload)["resume_token"] == frame.resume_token

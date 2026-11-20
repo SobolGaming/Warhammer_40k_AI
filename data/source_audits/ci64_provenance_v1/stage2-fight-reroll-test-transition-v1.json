@@ -1,0 +1,32 @@
+{
+  "schema": "finite-stage2-fight-reroll-test-transition-v1",
+  "base": "ca0da3d36731986ed55b623d9f82c05e6eda5560",
+  "retained_melee_restore_sha256": "51e236eb87282d6c27ac2c59fb33f4cece708babac87ab4f1a181ee9b16a8b31",
+  "runtime_fingerprint": "537db5b1f44db04fdf2a19ffc38fa1155e808f88229ac4116982a11939975732",
+  "source": {
+    "src/warhammer40k_core/engine/lifecycle.py": {
+      "before": "dad3d285d328c036123b816bf47c9a0bf09fc005a9b5084f70f696d6af39c77b",
+      "after": "a80adb9f48af7338f9acb7c325490964129545521bc99b456d09cc19a55f028f"
+    },
+    "tests/order135_counteroffensive_helpers.py": {
+      "before": "d3048320c8ece594ab05175d1b8eb8b5a92315ab402f1ab0612b524ced03d61a",
+      "after": "71000dd4884d43da2172677d9273dc9cb0f3cfb6d9c2ab9a20aa746f4a7a788d"
+    }
+  },
+  "test": {
+    "tests/rules/section15/test_reactions.py": {
+      "before": {
+        "mode": "100644",
+        "blob_sha1": "aff56dbe93a1477235835269b9017bf91b2d47f6",
+        "sha256": "9842238a777aa3a0bf92bf25059453de7a7f3c3201f6cfe76d1aa74c9cdad014",
+        "bytes": 29695
+      },
+      "after": {
+        "mode": "100644",
+        "blob_sha1": "858c7ec48a46ed536bac2e2fce9e76da1658263d",
+        "sha256": "dcf6ad6c252e5a18628b0ca549ea24f2e1abbcbcc0c5ede01526ff52b46b5ac3",
+        "bytes": 32036
+      }
+    }
+  }
+}
