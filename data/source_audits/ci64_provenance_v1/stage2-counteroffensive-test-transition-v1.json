@@ -1,0 +1,22 @@
+{
+  "schema": "finite-stage2-counteroffensive-test-transition-v1",
+  "base": "d190560f0291479429ae92c222109259a43533df",
+  "retained_stage2_fight_cover_sha256": "0a5a29ce7741dc63e2c70633fbc672c34d95e6668f6ec81cf6a0b65238619b79",
+  "runtime_fingerprint": "0289337d6418f72592110b1af66eddd31e8662c8c1f128d134ce60951382d4d0",
+  "test": {
+    "tests/rules/section15/test_reactions.py": {
+      "before": {
+        "blob_sha1": "55a938b885b0b69bf23257b36d617e73990deeae",
+        "bytes": 11186,
+        "mode": "100644",
+        "sha256": "907dfbefca3cfba251d180d59c6022c8e6c929855c10b64a0fcda9c6458cb49a"
+      },
+      "after": {
+        "mode": "100644",
+        "blob_sha1": "60ceb2658ca160224b3675cf0a945a2f021266d2",
+        "sha256": "44cf2a6b02eb1df66599b24b23b35450ac7a83dd881eada2bb26f492e1b6e9bb",
+        "bytes": 18039
+      }
+    }
+  }
+}

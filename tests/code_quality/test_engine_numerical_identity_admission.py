@@ -164,6 +164,25 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         == _record(selection.GAMEPLAY_BUDGET_TRANSITION)["tests"][selection.GAMEPLAY_SORCERER_OWNER]
     )
     assert sum(selection.STAGE2_FIGHT_OWNER in group for group in groups) == 1
+    counteroffensive = _record(selection.COUNTEROFFENSIVE_TRANSITION)
+    assert counteroffensive["runtime_fingerprint"] == fight["runtime_fingerprint"]
+    assert (
+        counteroffensive["retained_stage2_fight_cover_sha256"]
+        == hashlib.sha256((ROOT / selection.STAGE2_FIGHT_TRANSITION).read_bytes()).hexdigest()
+    )
+    owner = selection.COUNTEROFFENSIVE_OWNER
+    preimage = subprocess.check_output(
+        ["git", "show", selection.COUNTEROFFENSIVE_BASE + ":" + owner], cwd=ROOT
+    )
+    assert (
+        counteroffensive["test"][owner]["before"]
+        == _record(sharding.CUTOVER_PATH)["active_files"][owner]
+    )
+    assert (
+        counteroffensive["test"][owner]["before"]["sha256"] == hashlib.sha256(preimage).hexdigest()
+    )
+    assert owner in active_files
+    assert sum(owner in group for group in groups) == 1
     prior = json.loads(
         subprocess.check_output(["git", "show", BASE + ":ci/test_shards/durations.json"], cwd=ROOT)
     )
@@ -270,6 +289,11 @@ def test_identity_selection_rejects_drift_in_each_updated_test(transition_snapsh
 def test_identity_transition_requires_its_exact_record(transition_snapshot: Path) -> None:
     cutover_digest = hashlib.sha256((ROOT / sharding.CUTOVER_PATH).read_bytes()).hexdigest()
     assert selection.exact_movement_test_transition(transition_snapshot, cutover_digest) is None
+    counteroffensive = transition_snapshot / selection.COUNTEROFFENSIVE_TRANSITION
+    counteroffensive.write_bytes((ROOT / selection.COUNTEROFFENSIVE_TRANSITION).read_bytes())
+    with pytest.raises(SystemExit, match="Counteroffensive tests require the Fight Cover"):
+        selection.exact_movement_test_transition(transition_snapshot, cutover_digest)
+    counteroffensive.unlink()
     fight_record = transition_snapshot / selection.STAGE2_FIGHT_TRANSITION
     fight_record.write_bytes((ROOT / selection.STAGE2_FIGHT_TRANSITION).read_bytes())
     with pytest.raises(SystemExit, match="Stage 2 Fight Cover tests require the gameplay"):

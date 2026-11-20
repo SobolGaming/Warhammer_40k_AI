@@ -1,17 +1,39 @@
 """15.07/15.11/15.12 at their existing interruption and target decision owners."""
 
+import json
+
 import pytest
 
+from tests.order135_counteroffensive_helpers import (
+    native_combat_session,
+    proposal_from_native_request,
+    submit_native_combat_choice,
+)
+from tests.support.cavalcade_native_fight import view_evidence
 from tests.support.section02_fixtures import Section02Definitions
-from tests.support.section15_fixtures import binding, checkpoint, context, offer, request, submit
+from tests.support.section15_fixtures import (
+    binding,
+    checkpoint,
+    context,
+    obj,
+    offer,
+    request,
+    submit,
+)
+from warhammer40k_core.adapters.access_control import ViewerContext
+from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.core.ruleset_descriptor import FightPhaseStepKind
 from warhammer40k_core.engine.charge_phase_state import ChargePhaseState
-from warhammer40k_core.engine.event_log import validate_json_value
+from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.fight_order import FightPhaseState, FightsFirstRegistry
-from warhammer40k_core.engine.phase import BattlePhase, LifecycleStatusKind
+from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatusKind
 from warhammer40k_core.engine.reserves import ReserveKind, ReserveState
 from warhammer40k_core.engine.stratagem_catalog import eleventh_edition_core_stratagem_index
-from warhammer40k_core.engine.stratagems import stratagem_target_proposal_from_index
+from warhammer40k_core.engine.stratagems import (
+    StratagemTargetProposal,
+    stratagem_decline_payload,
+    stratagem_target_proposal_from_index,
+)
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 
 
@@ -259,3 +281,145 @@ def test_counteroffensive_own_turn_denial_and_opponent_turn_fights_first_activat
             and e.effect_payload.get("effect_kind") == "fights_first"
             for e in state.persisting_effects
         )
+        _assert_counteroffensive_viewer_branches()
+
+
+def _assert_counteroffensive_viewer_branches() -> None:
+    session = native_combat_session(first_player="player-a")
+    for _ in range(100):
+        pending = request(session.advance_until_decision_or_terminal())
+        if (
+            pending.decision_type == "submit_stratagem_target_proposal"
+            and proposal_from_native_request(pending).stratagem_id == "counteroffensive"
+        ):
+            break
+        submit_native_combat_choice(session, pending, first_player="player-a")
+    else:
+        raise AssertionError("Native Counteroffensive reaction was not reached.")
+
+    viewer = ViewerContext.for_player("player-a")
+    opponent = ViewerContext.for_player("player-b")
+    issued = session.view_for_context(viewer=viewer)["pending_decision"]
+    assert issued is not None
+    assert issued["actor_id"] == "player-a"
+    assert issued["request_id"] != pending.request_id
+    assert [option["option_id"] for option in issued["options"]] == ["submit_parameterized_payload"]
+    body = obj(issued["payload"])
+    assert body["declinable"] is True
+    assert body["interrupts_parent"] is True
+    proposal = StratagemTargetProposal.from_payload(body["proposal_request"])
+    assert proposal.context.active_player_id == "player-b"
+    assert proposal.catalog_record.definition.command_point_cost == 2
+    trigger = obj(proposal.context.trigger_payload)
+    assert trigger["fought_unit_instance_id"] == "army-beta:one"
+    assert trigger["eligible_unit_instance_ids"] == ["army-alpha:one", "army-alpha:two"]
+
+    decline = stratagem_decline_payload()
+    before = session.lifecycle.to_payload()
+    with pytest.raises(GameLifecycleError, match="Viewer does not own the pending decision"):
+        session.submit_viewer_parameterized_payload(
+            viewer=opponent,
+            request_id=issued["request_id"],
+            payload=decline,
+            result_id="counteroffensive:wrong-viewer",
+        )
+    with pytest.raises(GameLifecycleError, match="request is stale or unissued"):
+        session.submit_viewer_parameterized_payload(
+            viewer=viewer,
+            request_id=pending.request_id,
+            payload=decline,
+            result_id="counteroffensive:unissued-request",
+        )
+    assert session.lifecycle.to_payload() == before
+    legal = proposal.with_binding(binding("army-alpha:one", "player-a"))
+    drifted = legal.to_payload()
+    drifted["context"]["active_player_id"] = "player-a"
+    for payload, reason in (
+        ({"proposal": None}, "malformed_payload"),
+        ({"proposal": drifted}, "wrong_context"),
+        (
+            {"proposal": proposal.with_binding(binding("army-beta:one", "player-a")).to_payload()},
+            "counteroffensive_target_not_eligible_to_fight",
+        ),
+    ):
+        invalid = session.submit_viewer_parameterized_payload(
+            viewer=viewer,
+            request_id=issued["request_id"],
+            payload=validate_json_value(payload),
+            result_id=f"counteroffensive:invalid:{reason}",
+        )
+        assert invalid.status_kind is LifecycleStatusKind.INVALID
+        assert invalid.payload == {"invalid_reason": reason}
+        assert session.lifecycle.to_payload() == before
+    assert session.view_for_context(viewer=viewer)["pending_decision"] == issued
+
+    _assert_counteroffensive_continuation(
+        session.fork(),
+        viewer=viewer,
+        request_id=issued["request_id"],
+        payload=decline,
+        use=False,
+    )
+    _assert_counteroffensive_continuation(
+        session.fork(),
+        viewer=viewer,
+        request_id=issued["request_id"],
+        payload=validate_json_value({"proposal": legal.to_payload()}),
+        use=True,
+    )
+    assert session.lifecycle.to_payload() == before
+
+
+def _assert_counteroffensive_continuation(
+    session: LocalGameSession,
+    *,
+    viewer: ViewerContext,
+    request_id: str,
+    payload: JsonValue,
+    use: bool,
+) -> None:
+    state = session.lifecycle.state
+    assert state is not None
+    cp = state.command_point_total("player-a")
+    opponent_cp = state.command_point_total("player-b")
+    controller = session.lifecycle.decision_controller
+    event_count = len(controller.event_log.records)
+    status = session.submit_viewer_parameterized_payload(
+        viewer=viewer,
+        request_id=request_id,
+        payload=payload,
+        result_id="counteroffensive:use" if use else "counteroffensive:decline",
+    )
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    next_request = request(status)
+    events = [e.event_type for e in controller.event_log.records_since(event_count)]
+    assert state.command_point_total("player-b") == opponent_cp
+    assert state.fight_phase_state is not None
+    if use:
+        assert state.command_point_total("player-a") == cp - 2
+        (record,) = state.stratagem_use_records
+        assert record.command_point_cost == 2
+        assert record.targeted_unit_instance_ids == ("army-alpha:one",)
+        activation = state.fight_phase_state.active_activation
+        assert activation is not None
+        assert activation.unit_instance_id == "army-alpha:one"
+        assert activation.interrupt_id == f"counteroffensive:{record.use_id}"
+        assert events.index("stratagem_used") < events.index("counteroffensive_activation_selected")
+        assert next_request.actor_id == "player-a"
+        assert proposal_from_native_request(next_request).stratagem_id == "epic-challenge"
+    else:
+        assert state.command_point_total("player-a") == cp
+        assert not state.stratagem_use_records
+        assert state.fight_phase_state.active_activation is None
+        assert events.index("stratagem_window_declined") < events.index("reaction_parent_resumed")
+        assert next_request.decision_type == "select_fight_activation"
+        assert next_request.actor_id == "player-b"
+        assert [option.option_id for option in next_request.options] == [
+            "fight:normal:army-beta:two"
+        ]
+
+    checkpoint = session.to_persistence_payload()
+    restored = LocalGameSession.from_persistence_payload(json.loads(json.dumps(checkpoint)))
+    assert restored.to_persistence_payload() == checkpoint
+    for player in state.player_ids:
+        assert view_evidence(restored, player) == view_evidence(session, player)

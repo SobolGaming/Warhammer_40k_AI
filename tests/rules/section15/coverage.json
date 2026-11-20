@@ -4951,7 +4951,7 @@
             },
             {
               "node": "tests/rules/section15/test_reactions.py::test_counteroffensive_own_turn_denial_and_opponent_turn_fights_first_activation",
-              "function_ast_sha256": "9a33c4aa46a5461dec967e64efd7a4cabc1e4899f80fcbe2bed5517e3b849bec",
+              "function_ast_sha256": "d7dd4d8775a84cae68da9b2f2023ae3475fa1c03cd96e92ad06b1e7d05ffeea5",
               "assertions": [
                 "assert (proposal is not None) is (active == 'opponent')",
                 "assert status.status_kind is not LifecycleStatusKind.INVALID",
@@ -5033,7 +5033,7 @@
             },
             {
               "node": "tests/rules/section15/test_reactions.py::test_counteroffensive_own_turn_denial_and_opponent_turn_fights_first_activation",
-              "function_ast_sha256": "9a33c4aa46a5461dec967e64efd7a4cabc1e4899f80fcbe2bed5517e3b849bec",
+              "function_ast_sha256": "d7dd4d8775a84cae68da9b2f2023ae3475fa1c03cd96e92ad06b1e7d05ffeea5",
               "assertions": [
                 "assert (proposal is not None) is (active == 'opponent')",
                 "assert status.status_kind is not LifecycleStatusKind.INVALID",
@@ -5156,7 +5156,7 @@
             },
             {
               "node": "tests/rules/section15/test_reactions.py::test_counteroffensive_own_turn_denial_and_opponent_turn_fights_first_activation",
-              "function_ast_sha256": "9a33c4aa46a5461dec967e64efd7a4cabc1e4899f80fcbe2bed5517e3b849bec",
+              "function_ast_sha256": "d7dd4d8775a84cae68da9b2f2023ae3475fa1c03cd96e92ad06b1e7d05ffeea5",
               "assertions": [
                 "assert (proposal is not None) is (active == 'opponent')",
                 "assert status.status_kind is not LifecycleStatusKind.INVALID",
@@ -5238,7 +5238,7 @@
             },
             {
               "node": "tests/rules/section15/test_reactions.py::test_counteroffensive_own_turn_denial_and_opponent_turn_fights_first_activation",
-              "function_ast_sha256": "9a33c4aa46a5461dec967e64efd7a4cabc1e4899f80fcbe2bed5517e3b849bec",
+              "function_ast_sha256": "d7dd4d8775a84cae68da9b2f2023ae3475fa1c03cd96e92ad06b1e7d05ffeea5",
               "assertions": [
                 "assert (proposal is not None) is (active == 'opponent')",
                 "assert status.status_kind is not LifecycleStatusKind.INVALID",
@@ -6594,7 +6594,7 @@
             },
             {
               "node": "tests/rules/section15/test_reactions.py::test_counteroffensive_own_turn_denial_and_opponent_turn_fights_first_activation",
-              "function_ast_sha256": "9a33c4aa46a5461dec967e64efd7a4cabc1e4899f80fcbe2bed5517e3b849bec",
+              "function_ast_sha256": "d7dd4d8775a84cae68da9b2f2023ae3475fa1c03cd96e92ad06b1e7d05ffeea5",
               "assertions": [
                 "assert (proposal is not None) is (active == 'opponent')",
                 "assert status.status_kind is not LifecycleStatusKind.INVALID",
@@ -6726,7 +6726,7 @@
             },
             {
               "node": "tests/rules/section15/test_reactions.py::test_counteroffensive_own_turn_denial_and_opponent_turn_fights_first_activation",
-              "function_ast_sha256": "9a33c4aa46a5461dec967e64efd7a4cabc1e4899f80fcbe2bed5517e3b849bec",
+              "function_ast_sha256": "d7dd4d8775a84cae68da9b2f2023ae3475fa1c03cd96e92ad06b1e7d05ffeea5",
               "assertions": [
                 "assert (proposal is not None) is (active == 'opponent')",
                 "assert status.status_kind is not LifecycleStatusKind.INVALID",
@@ -6858,7 +6858,7 @@
             },
             {
               "node": "tests/rules/section15/test_reactions.py::test_counteroffensive_own_turn_denial_and_opponent_turn_fights_first_activation",
-              "function_ast_sha256": "9a33c4aa46a5461dec967e64efd7a4cabc1e4899f80fcbe2bed5517e3b849bec",
+              "function_ast_sha256": "d7dd4d8775a84cae68da9b2f2023ae3475fa1c03cd96e92ad06b1e7d05ffeea5",
               "assertions": [
                 "assert (proposal is not None) is (active == 'opponent')",
                 "assert status.status_kind is not LifecycleStatusKind.INVALID",
@@ -6990,7 +6990,7 @@
             },
             {
               "node": "tests/rules/section15/test_reactions.py::test_counteroffensive_own_turn_denial_and_opponent_turn_fights_first_activation",
-              "function_ast_sha256": "9a33c4aa46a5461dec967e64efd7a4cabc1e4899f80fcbe2bed5517e3b849bec",
+              "function_ast_sha256": "d7dd4d8775a84cae68da9b2f2023ae3475fa1c03cd96e92ad06b1e7d05ffeea5",
               "assertions": [
                 "assert (proposal is not None) is (active == 'opponent')",
                 "assert status.status_kind is not LifecycleStatusKind.INVALID",
@@ -7122,7 +7122,7 @@
             },
             {
               "node": "tests/rules/section15/test_reactions.py::test_counteroffensive_own_turn_denial_and_opponent_turn_fights_first_activation",
-              "function_ast_sha256": "9a33c4aa46a5461dec967e64efd7a4cabc1e4899f80fcbe2bed5517e3b849bec",
+              "function_ast_sha256": "d7dd4d8775a84cae68da9b2f2023ae3475fa1c03cd96e92ad06b1e7d05ffeea5",
               "assertions": [
                 "assert (proposal is not None) is (active == 'opponent')",
                 "assert status.status_kind is not LifecycleStatusKind.INVALID",
@@ -7254,7 +7254,7 @@
             },
             {
               "node": "tests/rules/section15/test_reactions.py::test_counteroffensive_own_turn_denial_and_opponent_turn_fights_first_activation",
-              "function_ast_sha256": "9a33c4aa46a5461dec967e64efd7a4cabc1e4899f80fcbe2bed5517e3b849bec",
+              "function_ast_sha256": "d7dd4d8775a84cae68da9b2f2023ae3475fa1c03cd96e92ad06b1e7d05ffeea5",
               "assertions": [
                 "assert (proposal is not None) is (active == 'opponent')",
                 "assert status.status_kind is not LifecycleStatusKind.INVALID",
@@ -7386,7 +7386,7 @@
             },
             {
               "node": "tests/rules/section15/test_reactions.py::test_counteroffensive_own_turn_denial_and_opponent_turn_fights_first_activation",
-              "function_ast_sha256": "9a33c4aa46a5461dec967e64efd7a4cabc1e4899f80fcbe2bed5517e3b849bec",
+              "function_ast_sha256": "d7dd4d8775a84cae68da9b2f2023ae3475fa1c03cd96e92ad06b1e7d05ffeea5",
               "assertions": [
                 "assert (proposal is not None) is (active == 'opponent')",
                 "assert status.status_kind is not LifecycleStatusKind.INVALID",
@@ -7518,7 +7518,7 @@
             },
             {
               "node": "tests/rules/section15/test_reactions.py::test_counteroffensive_own_turn_denial_and_opponent_turn_fights_first_activation",
-              "function_ast_sha256": "9a33c4aa46a5461dec967e64efd7a4cabc1e4899f80fcbe2bed5517e3b849bec",
+              "function_ast_sha256": "d7dd4d8775a84cae68da9b2f2023ae3475fa1c03cd96e92ad06b1e7d05ffeea5",
               "assertions": [
                 "assert (proposal is not None) is (active == 'opponent')",
                 "assert status.status_kind is not LifecycleStatusKind.INVALID",
@@ -7684,7 +7684,7 @@
             },
             {
               "node": "tests/rules/section15/test_reactions.py::test_counteroffensive_own_turn_denial_and_opponent_turn_fights_first_activation",
-              "function_ast_sha256": "9a33c4aa46a5461dec967e64efd7a4cabc1e4899f80fcbe2bed5517e3b849bec",
+              "function_ast_sha256": "d7dd4d8775a84cae68da9b2f2023ae3475fa1c03cd96e92ad06b1e7d05ffeea5",
               "assertions": [
                 "assert (proposal is not None) is (active == 'opponent')",
                 "assert status.status_kind is not LifecycleStatusKind.INVALID",
@@ -7766,7 +7766,7 @@
             },
             {
               "node": "tests/rules/section15/test_reactions.py::test_counteroffensive_own_turn_denial_and_opponent_turn_fights_first_activation",
-              "function_ast_sha256": "9a33c4aa46a5461dec967e64efd7a4cabc1e4899f80fcbe2bed5517e3b849bec",
+              "function_ast_sha256": "d7dd4d8775a84cae68da9b2f2023ae3475fa1c03cd96e92ad06b1e7d05ffeea5",
               "assertions": [
                 "assert (proposal is not None) is (active == 'opponent')",
                 "assert status.status_kind is not LifecycleStatusKind.INVALID",
@@ -7848,7 +7848,7 @@
             },
             {
               "node": "tests/rules/section15/test_reactions.py::test_counteroffensive_own_turn_denial_and_opponent_turn_fights_first_activation",
-              "function_ast_sha256": "9a33c4aa46a5461dec967e64efd7a4cabc1e4899f80fcbe2bed5517e3b849bec",
+              "function_ast_sha256": "d7dd4d8775a84cae68da9b2f2023ae3475fa1c03cd96e92ad06b1e7d05ffeea5",
               "assertions": [
                 "assert (proposal is not None) is (active == 'opponent')",
                 "assert status.status_kind is not LifecycleStatusKind.INVALID",
@@ -7930,7 +7930,7 @@
             },
             {
               "node": "tests/rules/section15/test_reactions.py::test_counteroffensive_own_turn_denial_and_opponent_turn_fights_first_activation",
-              "function_ast_sha256": "9a33c4aa46a5461dec967e64efd7a4cabc1e4899f80fcbe2bed5517e3b849bec",
+              "function_ast_sha256": "d7dd4d8775a84cae68da9b2f2023ae3475fa1c03cd96e92ad06b1e7d05ffeea5",
               "assertions": [
                 "assert (proposal is not None) is (active == 'opponent')",
                 "assert status.status_kind is not LifecycleStatusKind.INVALID",

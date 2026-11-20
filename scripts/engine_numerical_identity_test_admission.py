@@ -134,6 +134,12 @@ STAGE2_FIGHT_SHA256 = "0a5a29ce7741dc63e2c70633fbc672c34d95e6668f6ec81cf6a0b6523
 STAGE2_FIGHT_BASE = "292bf8a55e184392f7d62d245707c8c1b7c0f9db"
 STAGE2_FIGHT_SOURCE = "src/warhammer40k_core/engine/attack_sequence_damage_resolution.py"
 STAGE2_FIGHT_OWNER = "tests/rules/section05/test_allocation_choices.py"
+COUNTEROFFENSIVE_TRANSITION = (
+    "data/source_audits/ci64_provenance_v1/stage2-counteroffensive-test-transition-v1.json"
+)
+COUNTEROFFENSIVE_SHA256 = "cf6787bd0b721d025478c6126e3dccbc9d5b3bb8822fce331313d9ce5dd62ad3"
+COUNTEROFFENSIVE_BASE = "d190560f0291479429ae92c222109259a43533df"
+COUNTEROFFENSIVE_OWNER = "tests/rules/section15/test_reactions.py"
 
 
 type SourceSuccessors = dict[str, dict[str, str]]
@@ -212,6 +218,23 @@ def _stage2_fight_successor(root: Path) -> tuple[str, TestSuccessors, bytes]:
     return record["runtime_fingerprint"], tests, raw
 
 
+def _counteroffensive_test_successor(root: Path, runtime: str) -> tuple[TestSuccessors, bytes]:
+    raw = _checked_bytes(root, COUNTEROFFENSIVE_TRANSITION, COUNTEROFFENSIVE_SHA256)
+    record = json.loads(raw, object_pairs_hook=_selection_object)
+    if (
+        record.keys()
+        != {"schema", "base", "retained_stage2_fight_cover_sha256", "runtime_fingerprint", "test"}
+        or record["schema"] != "finite-stage2-counteroffensive-test-transition-v1"
+        or record["base"] != COUNTEROFFENSIVE_BASE
+        or record["retained_stage2_fight_cover_sha256"] != STAGE2_FIGHT_SHA256
+        or record["runtime_fingerprint"] != runtime
+        or set(record["test"]) != {COUNTEROFFENSIVE_OWNER}
+    ):
+        raise SystemExit("Stage 2 Counteroffensive test transition membership differs.")
+    tests = _selection_members({name: row["after"] for name, row in record["test"].items()}, root)
+    return tests, raw
+
+
 def _retained_source(root: Path, name: str, digest: str, successors: SourceSuccessors) -> None:
     if name in successors:
         if successors[name]["before"] != digest:
@@ -276,10 +299,15 @@ def exact_movement_test_transition(
     has_codec = any((root / path).exists() for path in codec_paths)
     budget_path = root / GAMEPLAY_BUDGET_TRANSITION
     fight_path = root / STAGE2_FIGHT_TRANSITION
+    counteroffensive_path = root / COUNTEROFFENSIVE_TRANSITION
     _selection_no_links(root, budget_path)
     _selection_no_links(root, fight_path)
+    _selection_no_links(root, counteroffensive_path)
     has_gameplay_budget = budget_path.exists()
     has_stage2_fight = fight_path.exists()
+    has_counteroffensive = counteroffensive_path.exists()
+    if has_counteroffensive and not has_stage2_fight:
+        raise SystemExit("Stage 2 Counteroffensive tests require the Fight Cover predecessor.")
     if has_stage2_fight and not (has_gameplay_budget and has_codec):
         raise SystemExit(
             "Stage 2 Fight Cover tests require the gameplay movement budget predecessor."
@@ -527,6 +555,12 @@ def exact_movement_test_transition(
         ):
             updated[name] = test_successors[name]
     updated.update(stage2_fight_tests)
+    if has_counteroffensive:
+        tests, counteroffensive_raw = _counteroffensive_test_successor(root, runtime)
+        if tests.keys() & (updated.keys() | added.keys() | additions.keys()):
+            raise SystemExit("Stage 2 Counteroffensive tests overlap the predecessor selection.")
+        updated.update(tests)
+        raw += b"\0" + counteroffensive_raw
     return updated, {**added, **additions}, retained_raw + b"\0" + raw
 
 
