@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from collections.abc import Callable, Iterator
+from collections.abc import Callable, Generator
 from contextlib import contextmanager
 from dataclasses import dataclass, field
 from typing import Self, TypedDict
@@ -67,7 +67,7 @@ class DecisionController:
     @contextmanager
     def prepare_movement_result(
         self, result: DecisionResult, commit: Callable[[], DecisionRecord]
-    ) -> Iterator[DecisionRecord]:
+    ) -> Generator[DecisionRecord]:
         if self._prepared_movement is not None:
             raise DecisionError("A movement result is already being prepared.")
         request = self.queue.peek_next()

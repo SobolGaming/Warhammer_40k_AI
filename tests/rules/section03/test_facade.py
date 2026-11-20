@@ -27,6 +27,7 @@ from warhammer40k_core.geometry.movement_envelope import (
     MovementDistanceBudget,
     MovementDistanceWitness,
     MovementDistanceWitnessPayload,
+    MovementSegment,
 )
 from warhammer40k_core.geometry.pathing import PathWitness
 from warhammer40k_core.geometry.pose import GeometryError, Pose
@@ -321,3 +322,19 @@ def test_normal_move_facade_budgets_once_rounded_complete_paths(
                 forged["straight_line_distance_inches"] = 100.0
                 with pytest.raises(GeometryError, match="does not match the scalar distance"):
                     MovementDistanceBudget.from_payload(forged)
+                with pytest.raises(GeometryError, match="does not match the scalar distance"):
+                    replace(restored.budget, straight_line_distance_inches=100.0)
+
+                segment = MovementSegment.from_poses(
+                    model_id=restored.model_id,
+                    segment_index=0,
+                    start_pose=Pose.at(1e-20, 0),
+                    end_pose=Pose.at(1.0625, 0),
+                )
+                near_tie = MovementDistanceWitness(
+                    model_id=restored.model_id, segments=(segment,), max_distance_inches=2.0
+                ).budget
+                assert near_tie is not None
+                assert near_tie.straight_line_distance_inches == 1.0625
+                assert near_tie.total_distance_inches == 1.062
+                assert MovementDistanceBudget.from_payload(near_tie.to_payload()) == near_tie

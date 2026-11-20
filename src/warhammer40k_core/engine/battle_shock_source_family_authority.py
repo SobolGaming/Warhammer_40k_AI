@@ -122,6 +122,7 @@ def validate_battle_shock_source_family_authority(
     request_context: dict[str, JsonValue],
     request_base: dict[str, JsonValue],
     result: BattleShockResult,
+    certified_fall_back_paths: bool = False,
 ) -> None:
     """Bind one structurally complete resolution to its exact producer family."""
     source_kind = request_base.get("source_kind")
@@ -207,6 +208,7 @@ def validate_battle_shock_source_family_authority(
             request=result.request,
             request_context=request_context,
             base=request_base,
+            certified_paths=certified_fall_back_paths,
         )
         return
     if source_kind == _DESPERATE_ESCAPE_SOURCE:
@@ -216,6 +218,7 @@ def validate_battle_shock_source_family_authority(
             mutation_index=resolved_index,
             request=result.request,
             base=request_base,
+            certified_paths=certified_fall_back_paths,
         )
         return
     raise GameLifecycleError("Battle-shock result source kind is unsupported.")
@@ -911,6 +914,7 @@ def _validate_desperate_escape_source(
     mutation_index: int,
     request: object,
     base: dict[str, JsonValue],
+    certified_paths: bool = False,
 ) -> DecisionRecord:
     from warhammer40k_core.engine.battle_shock import BattleShockTestRequest
     from warhammer40k_core.engine.decision_result import DecisionResult, DecisionResultPayload
@@ -933,7 +937,8 @@ def _validate_desperate_escape_source(
             cast(
                 FallBackActionResultPayload,
                 _object(base.get("fall_back_result"), "Fall Back result"),
-            )
+            ),
+            certified_paths=certified_paths,
         )
         action_result = DecisionResult.from_payload(
             cast(
@@ -1072,6 +1077,7 @@ def _validate_forced_desperate_escape_source(
     request: object,
     request_context: dict[str, JsonValue],
     base: dict[str, JsonValue],
+    certified_paths: bool = False,
 ) -> DecisionRecord:
     from warhammer40k_core.engine.battle_shock import BattleShockTestRequest
     from warhammer40k_core.engine.decision_result import DecisionResult, DecisionResultPayload
@@ -1092,7 +1098,7 @@ def _validate_forced_desperate_escape_source(
     raw_action_result = _object(base.get("action_result"), "movement action result")
     try:
         fall_back = FallBackActionResult.from_payload(
-            cast(FallBackActionResultPayload, raw_fall_back)
+            cast(FallBackActionResultPayload, raw_fall_back), certified_paths=certified_paths
         )
         action_result = DecisionResult.from_payload(cast(DecisionResultPayload, raw_action_result))
     except KeyError as exc:

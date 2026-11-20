@@ -63,7 +63,7 @@ class ModelMovementDistance(msgspec.Struct, frozen=True, forbid_unknown_fields=T
 
 
 def distances_from_completion(
-    event: EventRecord, *, turn_player_id: str
+    event: EventRecord, *, turn_player_id: str, verify_budget: bool = False
 ) -> tuple[ModelMovementDistance, ...]:
     """Consume each completion once; setup and stationary choices have no traveled path."""
     from warhammer40k_core.engine.move_completion_triggers import MOVE_COMPLETION_EVENT_TYPES
@@ -85,6 +85,11 @@ def distances_from_completion(
     results = source.get("path_validation_results")
     if not isinstance(results, list):
         raise GameLifecycleError("Movement distance source lacks path results.")
+    decode_witness = (
+        MovementDistanceWitness.from_payload
+        if verify_budget
+        else MovementDistanceWitness.from_certified_payload
+    )
     rows: list[ModelMovementDistance] = []
     for result in results:
         if not isinstance(result, dict):
@@ -92,7 +97,7 @@ def distances_from_completion(
         raw = result.get("movement_distance_witness")
         if not isinstance(raw, dict):
             raise GameLifecycleError("Accepted movement requires model distance evidence.")
-        witness = MovementDistanceWitness.from_payload(cast(MovementDistanceWitnessPayload, raw))
+        witness = decode_witness(cast(MovementDistanceWitnessPayload, raw))
         rows.append(
             ModelMovementDistance(
                 event_id=event.event_id,
@@ -136,7 +141,7 @@ def validate_model_movement_history(
             owner = charge_turn_owner_at_event(
                 event_records=events, event_index=index, actor_id=owner
             )
-        expected.extend(distances_from_completion(event, turn_player_id=owner))
+        expected.extend(distances_from_completion(event, turn_player_id=owner, verify_budget=True))
     if state.model_movement_history != expected:
         raise GameLifecycleError("Model movement history differs from accepted movement evidence.")
     from warhammer40k_core.engine.base_contact_history import validate_base_contact_history

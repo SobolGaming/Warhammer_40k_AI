@@ -223,9 +223,23 @@ class PathValidationResult:
 
     @classmethod
     def from_payload(cls, payload: PathValidationResultPayload) -> Self:
+        return cls._from_payload(payload, verify_budget=True)
+
+    @classmethod
+    def from_certified_payload(cls, payload: PathValidationResultPayload) -> Self:
+        """Read path evidence from a live continuation that already certified its budget."""
+        return cls._from_payload(payload, verify_budget=False)
+
+    @classmethod
+    def _from_payload(cls, payload: PathValidationResultPayload, *, verify_budget: bool) -> Self:
         from warhammer40k_core.geometry.base_contact import DeemedBaseContact
         from warhammer40k_core.geometry.movement_query_payloads import query_from_payload
 
+        decode_witness = (
+            MovementDistanceWitness.from_payload
+            if verify_budget
+            else MovementDistanceWitness.from_certified_payload
+        )
         result = cls(
             base_contact_query=None
             if "base_contact_query" not in payload
@@ -244,7 +258,7 @@ class PathValidationResult:
             movement_distance_witness=(
                 None
                 if payload["movement_distance_witness"] is None
-                else MovementDistanceWitness.from_payload(payload["movement_distance_witness"])
+                else decode_witness(payload["movement_distance_witness"])
             ),
         )
         if result.is_valid != payload["is_valid"]:

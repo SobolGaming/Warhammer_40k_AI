@@ -295,6 +295,10 @@ def _validate_resolved_continuation_authority(
         resolved_payload=resolved_payload,
         result=result,
     )
+    _validate_resolution_matches_continuation(
+        continuation=continuation,
+        authority=authority,
+    )
     validate_battle_shock_source_family_authority(
         event_records=decisions.event_log.records,
         decision_records=decisions.records,
@@ -305,10 +309,7 @@ def _validate_resolved_continuation_authority(
         request_context=authority.request_context,
         request_base=authority.base_payload,
         result=result,
-    )
-    _validate_resolution_matches_continuation(
-        continuation=continuation,
-        authority=authority,
+        certified_fall_back_paths=True,
     )
     return authority
 

@@ -14797,7 +14797,9 @@
         "src/warhammer40k_core/engine/battle_shock_source_family_authority.py"
       ],
       "owners": [
-        "_validate_desperate_escape_source"
+        "_validate_desperate_escape_source",
+        "_validate_forced_desperate_escape_source",
+        "validate_battle_shock_source_family_authority"
       ],
       "families": [
         "movement",

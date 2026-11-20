@@ -45,7 +45,8 @@ def resume_escape_movement(
     if source is None:
         raise GameLifecycleError("Desperate Escape has no completed hazard packet to resume.")
     resolution = FallBackActionResult.from_payload(
-        cast(FallBackActionResultPayload, _object(source, "fall_back_result"))
+        cast(FallBackActionResultPayload, _object(source, "fall_back_result")),
+        certified_paths=True,
     )
     action = DecisionResult.from_payload(
         cast(DecisionResultPayload, _object(source, "action_result"))
@@ -204,7 +205,8 @@ def completed_escape_retry(
         raise GameLifecycleError("Hazard survivor retry lacks a unique completed packet.")
     source = sources[0]
     original = FallBackActionResult.from_payload(
-        cast(FallBackActionResultPayload, _object(source, "fall_back_result"))
+        cast(FallBackActionResultPayload, _object(source, "fall_back_result")),
+        certified_paths=True,
     )
     action = DecisionResult.from_payload(
         cast(DecisionResultPayload, _object(source, "action_result"))

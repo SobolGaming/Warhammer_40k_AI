@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import math
-from collections.abc import Iterator
+from collections.abc import Generator
 from contextlib import contextmanager
 from contextvars import ContextVar
 from dataclasses import dataclass, field
@@ -250,6 +250,11 @@ class MovementDistanceBudget:
         )
         if total_distance != float(ticks_to_inches(inches_to_ticks(total_distance))):
             raise GeometryError("MovementDistanceBudget total must be in whole milli-inches.")
+        # A rounded path budget can straddle a midpoint with its raw float sum.
+        # Allow float error from the component differences, norms and sum here.
+        tolerance = 4 * max(math.ulp(straight_line_distance), math.ulp(total_distance))
+        if abs(straight_line_distance - total_distance) > 0.0005 + tolerance:
+            raise GeometryError("MovementDistanceBudget total does not match the scalar distance.")
         expected_remaining, expected_exceeded = _movement_budget_components(
             max_distance=max_distance,
             total_distance=total_distance,
@@ -325,16 +330,6 @@ class MovementDistanceBudget:
 
     @classmethod
     def from_payload(cls, payload: MovementDistanceBudgetPayload) -> Self:
-        budget = cls._from_payload_fields(payload)
-        if budget != cls.from_totals(
-            max_distance_inches=budget.max_distance_inches,
-            straight_line_distance_inches=budget.straight_line_distance_inches,
-        ):
-            raise GeometryError("MovementDistanceBudget total does not match the scalar distance.")
-        return budget
-
-    @classmethod
-    def _from_payload_fields(cls, payload: MovementDistanceBudgetPayload) -> Self:
         if type(cast(object, payload)) is not dict or set(payload) != set(
             MovementDistanceBudgetPayload.__annotations__
         ):
@@ -471,12 +466,16 @@ class MovementDistanceWitness:
 
     @classmethod
     def from_payload(cls, payload: MovementDistanceWitnessPayload) -> Self:
-        budget_payload = payload["budget"]
-        if budget_payload is not None and (
-            type(cast(object, budget_payload)) is not dict
-            or set(budget_payload) != set(MovementDistanceBudgetPayload.__annotations__)
+        witness = cls.from_certified_payload(payload)
+        if witness.budget is not None and witness.budget != MovementDistanceBudget.for_segments(
+            max_distance_inches=witness.budget.max_distance_inches, segments=witness.segments
         ):
-            raise GeometryError("MovementDistanceWitness budget has incompatible fields.")
+            raise GeometryError("MovementDistanceWitness budget does not match the measured path.")
+        return witness
+
+    @classmethod
+    def from_certified_payload(cls, payload: MovementDistanceWitnessPayload) -> Self:
+        """Read an engine-certified witness from a live continuation or event."""
         witness = cls(
             model_id=payload["model_id"],
             segments=tuple(
@@ -485,24 +484,22 @@ class MovementDistanceWitness:
             rotation_events=tuple(
                 RotationEvent.from_payload(event) for event in payload["rotation_events"]
             ),
-            max_distance_inches=(
-                None if budget_payload is None else budget_payload["max_distance_inches"]
-            ),
         )
-        if (
-            budget_payload is not None
-            and MovementDistanceBudget._from_payload_fields(budget_payload) != witness.budget
-        ):
-            raise GeometryError("MovementDistanceWitness budget does not match the measured path.")
+        if (budget_payload := payload["budget"]) is not None:
+            budget = MovementDistanceBudget.from_payload(budget_payload)
+            if budget.straight_line_distance_inches != witness.straight_line_distance_inches:
+                raise GeometryError(
+                    "MovementDistanceWitness budget does not match the segment sum."
+                )
+            object.__setattr__(witness, "max_distance_inches", budget.max_distance_inches)
+            object.__setattr__(witness, "budget", budget)
         return witness
 
 
-@dataclass(slots=True)
 class _MovementCertificates:
-    witnesses: dict[tuple[str, tuple[Pose, ...], float], MovementDistanceWitness] = field(
-        default_factory=dict
-    )
-    lengths: dict[tuple[Point3, ...], float] = field(default_factory=dict)
+    def __init__(self) -> None:
+        self.witnesses: dict[tuple[str, tuple[Pose, ...], float], MovementDistanceWitness] = {}
+        self.lengths: dict[tuple[Point3, ...], float] = {}
 
 
 _CERTIFICATES: ContextVar[_MovementCertificates | None] = ContextVar(
@@ -511,7 +508,7 @@ _CERTIFICATES: ContextVar[_MovementCertificates | None] = ContextVar(
 
 
 @contextmanager
-def reuse_movement_certificates() -> Iterator[None]:
+def reuse_movement_certificates() -> Generator[None]:
     """Reuse successful certificates only within one prospective decision."""
     token = _CERTIFICATES.set(_MovementCertificates())
     try:

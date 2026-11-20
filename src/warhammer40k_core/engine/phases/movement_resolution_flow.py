@@ -445,6 +445,7 @@ def _apply_movement_proposal_decision(
             resolution=fall_back_resolution,
             fall_back_mode=fall_back_mode,
         )
+        decisions.commit_movement_result(result)
         if mode_violation_code is not None:
             return _reject_invalid_movement_resolution(
                 state=state,
@@ -459,7 +460,6 @@ def _apply_movement_proposal_decision(
                 proposal_request=proposal_request,
                 field="fall_back_mode",
             )
-        decisions.commit_movement_result(result)
         if not fall_back_resolution.is_valid:
             violation_code = _normal_move_violation_code(fall_back_resolution)
             return _reject_invalid_movement_resolution(

@@ -71,6 +71,44 @@ def validate_restored_movement(*, state: GameState, decisions: DecisionControlle
     from warhammer40k_core.engine.move_keyword_completion import validate_move_keyword_history
 
     validate_move_keyword_history(state=state, decisions=decisions)
+    _validate_deferred_movement_budgets(decisions)
+
+
+def _validate_deferred_movement_budgets(decisions: DecisionController) -> None:
+    from warhammer40k_core.engine.desperate_escape_mortal_wounds import RESOLVED, STARTED
+    from warhammer40k_core.engine.phases.movement_model import (
+        SELECT_DESPERATE_ESCAPE_MODEL_DECISION_TYPE,
+        SELECT_EMBARK_TRANSPORT_DECISION_TYPE,
+    )
+    from warhammer40k_core.geometry.movement_envelope import reuse_movement_certificates
+    from warhammer40k_core.geometry.path_validation_result import (
+        PathValidationResult,
+        PathValidationResultPayload,
+    )
+
+    path_sources: list[JsonValue] = []
+    for request in decisions.queue.pending_requests:
+        if not isinstance(request.payload, dict):
+            continue
+        if request.decision_type == SELECT_EMBARK_TRANSPORT_DECISION_TYPE:
+            context = request.payload.get("movement_context")
+            if isinstance(context, dict):
+                path_sources.append(context.get("movement_payload"))
+        elif request.decision_type == SELECT_DESPERATE_ESCAPE_MODEL_DECISION_TYPE:
+            context = request.payload.get("fall_back_context")
+            if isinstance(context, dict):
+                path_sources.append(context.get("fall_back_result"))
+    for event in decisions.event_log.records:
+        if event.event_type in {STARTED, RESOLVED} and isinstance(event.payload, dict):
+            path_sources.append(event.payload.get("fall_back_result"))
+    with reuse_movement_certificates():
+        for source in path_sources:
+            if not isinstance(source, dict) or not isinstance(
+                results := source.get("path_validation_results"), list
+            ):
+                raise GameLifecycleError("Deferred movement is missing certified path evidence.")
+            for result in results:
+                PathValidationResult.from_payload(cast(PathValidationResultPayload, result))
 
 
 _MOVING_ACTION_KINDS = frozenset({"normal_move", "advance", "fall_back"})
