@@ -36,6 +36,7 @@ if TYPE_CHECKING:
     )
     from warhammer40k_core.engine.faction_content.bundle import RuntimeContentBundle
     from warhammer40k_core.engine.game_state import GameState
+    from warhammer40k_core.engine.phases.movement_state import FallBackActionResult
 
 
 _COMMAND_SOURCE = "command_battle_shock"
@@ -122,7 +123,7 @@ def validate_battle_shock_source_family_authority(
     request_context: dict[str, JsonValue],
     request_base: dict[str, JsonValue],
     result: BattleShockResult,
-    certified_fall_back_paths: bool = False,
+    certified_fall_back: FallBackActionResult | None = None,
 ) -> None:
     """Bind one structurally complete resolution to its exact producer family."""
     source_kind = request_base.get("source_kind")
@@ -208,7 +209,7 @@ def validate_battle_shock_source_family_authority(
             request=result.request,
             request_context=request_context,
             base=request_base,
-            certified_paths=certified_fall_back_paths,
+            certified_fall_back=certified_fall_back,
         )
         return
     if source_kind == _DESPERATE_ESCAPE_SOURCE:
@@ -218,7 +219,7 @@ def validate_battle_shock_source_family_authority(
             mutation_index=resolved_index,
             request=result.request,
             base=request_base,
-            certified_paths=certified_fall_back_paths,
+            certified_fall_back=certified_fall_back,
         )
         return
     raise GameLifecycleError("Battle-shock result source kind is unsupported.")
@@ -232,6 +233,7 @@ def validate_pending_battle_shock_source_family_authority(
     request_event_index: int,
     authority: PendingBattleShockRerollAuthority,
     runtime_content_bundle: RuntimeContentBundle,
+    verify_charge_path_budgets: bool = True,
 ) -> None:
     """Bind one live reroll to the exact producer that requested its test."""
     source_kind = authority.source_kind
@@ -333,8 +335,18 @@ def validate_pending_battle_shock_source_family_authority(
             phase=authority.phase,
             phase_start_battle_shocked_unit_ids=(authority.phase_start_battle_shocked_unit_ids),
             runtime_content_bundle=runtime_content_bundle,
+            verify_charge_path_budgets=verify_charge_path_budgets,
         )
         return
+    from warhammer40k_core.engine.phases.movement_battle_shock_continuation import (
+        pending_desperate_escape_battle_shock_continuation,
+        validate_pending_escape_reroll_matches_continuation,
+    )
+
+    continuation = pending_desperate_escape_battle_shock_continuation(state)
+    validate_pending_escape_reroll_matches_continuation(
+        continuation=continuation, pending_authority=authority
+    )
     if source_kind == _DESPERATE_ESCAPE_SOURCE:
         _validate_desperate_escape_source(
             event_records=event_records,
@@ -342,6 +354,7 @@ def validate_pending_battle_shock_source_family_authority(
             mutation_index=request_event_index,
             request=authority.test_request,
             base=authority.base_payload,
+            certified_fall_back=continuation.fall_back_result,
         )
         return
     _validate_pending_forced_desperate_escape_source(
@@ -351,6 +364,7 @@ def validate_pending_battle_shock_source_family_authority(
         request_event_index=request_event_index,
         authority=authority,
         runtime_content_bundle=runtime_content_bundle,
+        certified_fall_back=continuation.fall_back_result,
     )
 
 
@@ -629,6 +643,7 @@ def _validate_pending_forced_desperate_escape_source(
     request_event_index: int,
     authority: PendingBattleShockRerollAuthority,
     runtime_content_bundle: RuntimeContentBundle,
+    certified_fall_back: FallBackActionResult,
 ) -> None:
     movement_record = _validate_forced_desperate_escape_source(
         event_records=event_records,
@@ -642,6 +657,7 @@ def _validate_pending_forced_desperate_escape_source(
             ),
         },
         base=authority.base_payload,
+        certified_fall_back=certified_fall_back,
     )
     _validate_loaded_forced_desperate_escape_source_history(
         state=state,
@@ -651,6 +667,7 @@ def _validate_pending_forced_desperate_escape_source(
         request=authority.test_request,
         movement_record=movement_record,
         base=authority.base_payload,
+        certified_fall_back=certified_fall_back,
         runtime_content_bundle=runtime_content_bundle,
     )
 
@@ -665,24 +682,16 @@ def _validate_loaded_forced_desperate_escape_source_history(
     movement_record: DecisionRecord,
     base: dict[str, JsonValue],
     runtime_content_bundle: RuntimeContentBundle,
+    certified_fall_back: FallBackActionResult | None = None,
 ) -> None:
     from warhammer40k_core.engine.battle_shock import BattleShockTestRequest
     from warhammer40k_core.engine.forced_desperate_escape_history_authority import (
         validate_forced_desperate_escape_loaded_source_authority,
     )
-    from warhammer40k_core.engine.phases.movement_state import (
-        FallBackActionResult,
-        FallBackActionResultPayload,
-    )
 
     if type(request) is not BattleShockTestRequest:
         raise GameLifecycleError("Desperate Escape Battle-shock request is invalid.")
-    fall_back = FallBackActionResult.from_payload(
-        cast(
-            FallBackActionResultPayload,
-            _object(base.get("fall_back_result"), "Fall Back result"),
-        )
-    )
+    fall_back = _fall_back_source(base, certified_fall_back)
     raw_sources = fall_back.movement_payload.get("forced_desperate_escape_sources")
     if not isinstance(raw_sources, list) or any(
         not isinstance(source, dict) for source in raw_sources
@@ -914,7 +923,7 @@ def _validate_desperate_escape_source(
     mutation_index: int,
     request: object,
     base: dict[str, JsonValue],
-    certified_paths: bool = False,
+    certified_fall_back: FallBackActionResult | None = None,
 ) -> DecisionRecord:
     from warhammer40k_core.engine.battle_shock import BattleShockTestRequest
     from warhammer40k_core.engine.decision_result import DecisionResult, DecisionResultPayload
@@ -923,23 +932,13 @@ def _validate_desperate_escape_source(
         DesperateEscapeRequirementReason,
         FallBackModeKind,
     )
-    from warhammer40k_core.engine.phases.movement_state import (
-        FallBackActionResult,
-        FallBackActionResultPayload,
-    )
 
     if type(request) is not BattleShockTestRequest:
         raise GameLifecycleError("Desperate Escape Battle-shock request is invalid.")
     if frozenset(base) != _DESPERATE_ESCAPE_BASE_KEYS:
         raise GameLifecycleError("Desperate Escape Battle-shock source shape drifted.")
     try:
-        fall_back = FallBackActionResult.from_payload(
-            cast(
-                FallBackActionResultPayload,
-                _object(base.get("fall_back_result"), "Fall Back result"),
-            ),
-            certified_paths=certified_paths,
-        )
+        fall_back = _fall_back_source(base, certified_fall_back)
         action_result = DecisionResult.from_payload(
             cast(
                 DecisionResultPayload,
@@ -1077,7 +1076,7 @@ def _validate_forced_desperate_escape_source(
     request: object,
     request_context: dict[str, JsonValue],
     base: dict[str, JsonValue],
-    certified_paths: bool = False,
+    certified_fall_back: FallBackActionResult | None = None,
 ) -> DecisionRecord:
     from warhammer40k_core.engine.battle_shock import BattleShockTestRequest
     from warhammer40k_core.engine.decision_result import DecisionResult, DecisionResultPayload
@@ -1085,21 +1084,14 @@ def _validate_forced_desperate_escape_source(
     from warhammer40k_core.engine.phases.movement_options_dice import (
         FORCED_DESPERATE_ESCAPE_BATTLE_SHOCK_SOURCE_RULE_ID,
     )
-    from warhammer40k_core.engine.phases.movement_state import (
-        FallBackActionResult,
-        FallBackActionResultPayload,
-    )
 
     if type(request) is not BattleShockTestRequest:
         raise GameLifecycleError("Desperate Escape Battle-shock request is invalid.")
     if frozenset(base) != _FORCED_DESPERATE_ESCAPE_BASE_KEYS:
         raise GameLifecycleError("Desperate Escape Battle-shock source shape drifted.")
-    raw_fall_back = _object(base.get("fall_back_result"), "Fall Back result")
     raw_action_result = _object(base.get("action_result"), "movement action result")
     try:
-        fall_back = FallBackActionResult.from_payload(
-            cast(FallBackActionResultPayload, raw_fall_back), certified_paths=certified_paths
-        )
+        fall_back = _fall_back_source(base, certified_fall_back)
         action_result = DecisionResult.from_payload(cast(DecisionResultPayload, raw_action_result))
     except KeyError as exc:
         raise GameLifecycleError("Desperate Escape source payload is incomplete.") from exc
@@ -1198,6 +1190,22 @@ def _validate_forced_desperate_escape_source(
         result_id=proposal_record.result.result_id,
     )
     return proposal_record
+
+
+def _fall_back_source(
+    base: dict[str, JsonValue], certified: FallBackActionResult | None
+) -> FallBackActionResult:
+    from warhammer40k_core.engine.phases.movement_state import (
+        FallBackActionResult,
+        FallBackActionResultPayload,
+    )
+
+    payload = _object(base.get("fall_back_result"), "Fall Back result")
+    if certified is None:
+        return FallBackActionResult.from_payload(cast(FallBackActionResultPayload, payload))
+    if payload != certified.to_payload():
+        raise GameLifecycleError("Desperate Escape certified Fall Back result drifted.")
+    return certified
 
 
 def _object(value: JsonValue, context: str) -> dict[str, JsonValue]:

@@ -873,6 +873,7 @@ def validate_unit_move_completed_battle_shock_request_authority(
     phase: BattlePhase,
     phase_start_battle_shocked_unit_ids: tuple[str, ...],
     runtime_content_bundle: RuntimeContentBundle,
+    verify_charge_path_budgets: bool = True,
 ) -> None:
     from warhammer40k_core.engine.catalog_unit_move_completed_battle_shock_runtime import (
         historical_catalog_unit_move_completed_battle_shock_effects,
@@ -950,6 +951,7 @@ def validate_unit_move_completed_battle_shock_request_authority(
         payload=trigger_payload,
         ruleset_descriptor=state.runtime_ruleset_descriptor(),
         configured_ruleset_descriptor_hash=state.ruleset_descriptor_hash,
+        verify_path_budgets=verify_charge_path_budgets,
     )
     triggering_unit_id = _required_identifier(
         trigger_payload.get("unit_instance_id"),

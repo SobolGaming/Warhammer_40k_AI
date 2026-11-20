@@ -116,8 +116,8 @@ _SCOPES = (
     ReviewedScope(
         GAMEPLAY_MOVEMENT_BUDGET_BASE,
         "docs/performance/policy-v3/gameplay-movement-budget-input-roles-v4.json",
-        "fb3ae2b9d05f26bc00feef11ba8f6aee3b95960dbbf11d86fbf459c368f7a2c3",
-        "feea97dda9ae71d68c1f8cfaf997378985a1ee51d27012503f55138e11dff131",
+        "5aee5e59922302a1dd6d9330b02e29b84ac387b98b0943e56ee9411c8f41bd9a",
+        "790b254c2b82c8b3481df0047a38ae43f0bf7b20f1bc148c8cfcfc1420f2d467",
         "docs/performance/current/gameplay-movement-budget-external-contract.json",
         frozenset(
             (
@@ -149,8 +149,11 @@ _SCOPES = (
                 "src/warhammer40k_core/ai/opposing_shooter_scenario.py",
                 "src/warhammer40k_core/ai/preserve_scenario.py",
                 "src/warhammer40k_core/core/visibility.py",
+                "src/warhammer40k_core/engine/battle_shock_event_authority.py",
+                "src/warhammer40k_core/engine/battle_shock_pending_authority.py",
                 "src/warhammer40k_core/engine/battle_shock_source_family_authority.py",
                 "src/warhammer40k_core/engine/catalog_setup_reactive_charge_move.py",
+                "src/warhammer40k_core/engine/charge_move_event_authority.py",
                 "src/warhammer40k_core/engine/decision_controller.py",
                 "src/warhammer40k_core/engine/game_state.py",
                 "src/warhammer40k_core/engine/lifecycle.py",
@@ -176,6 +179,7 @@ _SCOPES = (
                 "tests/infrastructure/adapters/unit/test_numerical_policy.py",
                 "tests/rules/section01/test_engine_numerical_identity.py",
                 "tests/rules/section03/test_facade.py",
+                "tests/rules/section09/test_fall_back.py",
                 "tests/rules/section11/test_moves.py",
                 "tests/rules/section18/test_facade.py",
             )

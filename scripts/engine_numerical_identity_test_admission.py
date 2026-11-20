@@ -121,9 +121,10 @@ OVAL_CODEC_OWNER = "tests/rules/section01/test_milli_inch_oval_payload.py"
 GAMEPLAY_BUDGET_TRANSITION = (
     "data/source_audits/ci64_provenance_v1/gameplay-movement-budget-test-transition-v1.json"
 )
-GAMEPLAY_BUDGET_SHA256 = "a141412f156aa2de829fb1ace50673ff4a57073007480c669a78f2f2f99e213c"
+GAMEPLAY_BUDGET_SHA256 = "5504d4338cff81c4ca5cc40f0815b432338ba1d4c414acc658490957b364f3c7"
 GAMEPLAY_BUDGET_OWNER = "tests/rules/section03/test_facade.py"
 GAMEPLAY_CHARGE_OWNER = "tests/rules/section11/test_moves.py"
+GAMEPLAY_ESCAPE_OWNER = "tests/rules/section09/test_fall_back.py"
 GAMEPLAY_SORCERER_OWNER = "tests/factions/emperors_children/test_selected_consumers.py"
 
 
@@ -158,6 +159,7 @@ def _gameplay_budget_successor(
         != {
             GAMEPLAY_BUDGET_OWNER,
             GAMEPLAY_CHARGE_OWNER,
+            GAMEPLAY_ESCAPE_OWNER,
             GAMEPLAY_SORCERER_OWNER,
             "tests/infrastructure/adapters/test_canonical_deployment_coverage.py",
             OWNER,
@@ -468,7 +470,12 @@ def exact_movement_test_transition(
     if additions.keys() & (updated.keys() | added.keys()):
         raise SystemExit("Exact movement test cases overlap the predecessor selection.")
     if test_successors:
-        for name in (GAMEPLAY_BUDGET_OWNER, GAMEPLAY_CHARGE_OWNER, GAMEPLAY_SORCERER_OWNER):
+        for name in (
+            GAMEPLAY_BUDGET_OWNER,
+            GAMEPLAY_CHARGE_OWNER,
+            GAMEPLAY_ESCAPE_OWNER,
+            GAMEPLAY_SORCERER_OWNER,
+        ):
             updated[name] = test_successors[name]
     return updated, {**added, **additions}, retained_raw + b"\0" + raw
 

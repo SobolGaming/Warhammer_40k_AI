@@ -210,6 +210,12 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         selection.GAMEPLAY_CHARGE_OWNER
         + "::test_native_charge_certification_timeout_leaves_the_same_proposal_retryable"
     )
+    gameplay.update(
+        selection.GAMEPLAY_ESCAPE_OWNER
+        + "::test_native_escape_battle_shock_reroll_reuses_certified_path"
+        + f"[{choice}]"
+        for choice in ("decline", "reroll:0,1")
+    )
     assert current.keys() == (
         retained
         | added

@@ -71,7 +71,7 @@ def record_desperate_escape_battle_shock_resolution(
         if _validate_modifier_preflight(continuation=continuation, request=status.decision_request):
             return status
         pending_authority = parse_pending_battle_shock_reroll_authority(status.decision_request)
-        _validate_pending_reroll_matches_continuation(
+        validate_pending_escape_reroll_matches_continuation(
             continuation=continuation,
             pending_authority=pending_authority,
         )
@@ -140,7 +140,7 @@ def validate_pending_desperate_escape_battle_shock_continuation(
         if _validate_modifier_preflight(continuation=continuation, request=pending_requests[0]):
             return
         pending_reroll_authority = parse_pending_battle_shock_reroll_authority(pending_requests[0])
-        _validate_pending_reroll_matches_continuation(
+        validate_pending_escape_reroll_matches_continuation(
             continuation=continuation,
             pending_authority=pending_reroll_authority,
         )
@@ -309,7 +309,7 @@ def _validate_resolved_continuation_authority(
         request_context=authority.request_context,
         request_base=authority.base_payload,
         result=result,
-        certified_fall_back_paths=True,
+        certified_fall_back=continuation.fall_back_result,
     )
     return authority
 
@@ -358,7 +358,7 @@ def _validate_resolution_matches_continuation(
         raise GameLifecycleError("Desperate Escape continuation reroll authority drifted.")
 
 
-def _validate_pending_reroll_matches_continuation(
+def validate_pending_escape_reroll_matches_continuation(
     *,
     continuation: PendingDesperateEscapeBattleShockContinuation,
     pending_authority: object,
@@ -444,6 +444,7 @@ __all__ = (
     "pending_desperate_escape_battle_shock_continuation",
     "record_desperate_escape_battle_shock_resolution",
     "validate_pending_desperate_escape_battle_shock_continuation",
+    "validate_pending_escape_reroll_matches_continuation",
     "validate_restored_desperate_escape_battle_shock_continuation",
 )
 
