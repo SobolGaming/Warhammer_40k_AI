@@ -76,9 +76,13 @@ def validate_melee_commitment_history(host: GameLifecycle) -> None:
     if (
         pending_requests
         and pending_requests[0].decision_type == SUBMIT_MELEE_DECLARATION_DECISION_TYPE
-        and (frames := host.reaction_queue.frames)
     ):
-        validate_melee_reaction_continuation(frame=frames[-1], event_records=event_records)
+        frames = host.reaction_queue.frames
+        validate_melee_reaction_continuation(
+            request_id=pending_requests[0].request_id,
+            frame=frames[-1] if frames else None,
+            event_records=event_records,
+        )
     if (
         not any(
             record.request.decision_type == SELECT_MELEE_WEAPON_DECISION_TYPE

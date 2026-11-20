@@ -143,7 +143,7 @@ COUNTEROFFENSIVE_OWNER = "tests/rules/section15/test_reactions.py"
 STAGE2_MELEE_RESTORE_TRANSITION = (
     "data/source_audits/ci64_provenance_v1/stage2-melee-restore-test-transition-v1.json"
 )
-STAGE2_MELEE_RESTORE_SHA256 = "7044afa3acae20c0d340acc13827d8a8f3061ec4717ae34a2ca300f2c4dfc699"
+STAGE2_MELEE_RESTORE_SHA256 = "2b884b342f878c5a28d483104cf7ecc2e0bea9b1f12df1241ca4e97d1308f792"
 STAGE2_MELEE_RESTORE_BASE = "7dd6fc770ce122a1a42b601eabeaf44e14bc8c82"
 STAGE2_MELEE_RESTORE_SOURCE = "src/warhammer40k_core/engine/lifecycle_reaction_queue.py"
 STAGE2_MELEE_HISTORY_SOURCE = "src/warhammer40k_core/engine/melee_commitment_history.py"

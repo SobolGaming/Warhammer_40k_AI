@@ -12,7 +12,7 @@ from warhammer40k_core.engine.catalog_setup_reactive_charge_move import (
     is_catalog_setup_reactive_charge_move_request,
 )
 from warhammer40k_core.engine.decision_request import DecisionRequest
-from warhammer40k_core.engine.event_log import EventRecord
+from warhammer40k_core.engine.event_log import EventRecord, canonical_json
 from warhammer40k_core.engine.fight_activation_units import active_fight_activation_rules_unit
 from warhammer40k_core.engine.fight_resolution import (
     SUBMIT_MELEE_DECLARATION_DECISION_TYPE,
@@ -140,7 +140,7 @@ def _is_interrupted_fight_melee_request(state: GameState, request: DecisionReque
 
 
 def validate_melee_reaction_continuation(
-    *, frame: ReactionQueueFrame, event_records: tuple[EventRecord, ...]
+    *, request_id: str, frame: ReactionQueueFrame | None, event_records: tuple[EventRecord, ...]
 ) -> None:
     for event in reversed(event_records):
         # The continuation is recorded after issuing the declaration in the same submission.
@@ -148,14 +148,19 @@ def validate_melee_reaction_continuation(
             break
         if event.event_type == "reaction_window_continued":
             payload = event.payload
+            if not isinstance(payload, dict) or payload.get("next_request_id") != request_id:
+                break
+            if frame is None:
+                raise GameLifecycleError("Lifecycle melee reaction continuation requires a frame.")
             if (
-                isinstance(payload, dict)
-                and payload.get("next_request_id") == frame.request_id
+                frame.request_id == request_id
                 and payload.get("resume_token") == frame.resume_token
                 and payload.get("parent_phase") == frame.parent_phase.value
                 and payload.get("parent_step") == frame.parent_step
-                and payload.get("reaction_window") == frame.reaction_window.to_payload()
+                and canonical_json(payload.get("reaction_window"))
+                == canonical_json(frame.reaction_window.to_payload())
             ):
                 return
             break
-    raise GameLifecycleError("Lifecycle melee reaction continuation drift.")
+    if frame is not None:
+        raise GameLifecycleError("Lifecycle melee reaction continuation drift.")

@@ -27,7 +27,7 @@ from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.core.ruleset_descriptor import FightPhaseStepKind
 from warhammer40k_core.engine.charge_phase_state import ChargePhaseState
 from warhammer40k_core.engine.decision_request import DecisionRequest, DecisionRequestPayload
-from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.event_log import JsonValue, canonical_json, validate_json_value
 from warhammer40k_core.engine.fight_order import FightPhaseState, FightsFirstRegistry
 from warhammer40k_core.engine.fight_resolution import (
     MeleeDeclarationProposal,
@@ -296,6 +296,7 @@ def test_counteroffensive_own_turn_denial_and_opponent_turn_fights_first_activat
 
 def _assert_counteroffensive_viewer_branches() -> None:
     session = native_combat_session(first_player="player-a")
+    ordinary_melee_restored = False
     for _ in range(100):
         pending = request(session.advance_until_decision_or_terminal())
         if (
@@ -303,9 +304,15 @@ def _assert_counteroffensive_viewer_branches() -> None:
             and proposal_from_native_request(pending).stratagem_id == "counteroffensive"
         ):
             break
+        if pending.decision_type == "submit_melee_declaration" and not ordinary_melee_restored:
+            assert not session.lifecycle.reaction_queue.frames
+            snapshot = session.lifecycle.to_payload()
+            assert GameLifecycle.from_payload(snapshot).to_payload() == snapshot
+            ordinary_melee_restored = True
         submit_native_combat_choice(session, pending, first_player="player-a")
     else:
         raise AssertionError("Native Counteroffensive reaction was not reached.")
+    assert ordinary_melee_restored
 
     viewer = ViewerContext.for_player("player-a")
     opponent = ViewerContext.for_player("player-b")
@@ -464,6 +471,19 @@ def _assert_counteroffensive_melee_restore(
     assert rng_after["draw_count"] == rng_before["draw_count"]
     assert rng_after["history"][: len(rng_before["history"])] == rng_before["history"]
 
+    missing_frame = session.lifecycle.to_payload()
+    missing_frame["reaction_queue"]["frames"].clear()
+    with pytest.raises(GameLifecycleError, match="melee reaction continuation requires a frame"):
+        GameLifecycle.from_payload(missing_frame)
+
+    drifted_handoff = deepcopy(session.lifecycle.to_payload())
+    handoff = drifted_handoff["decisions"]["event_log"][-1]
+    assert handoff["event_type"] == "reaction_window_continued"
+    assert obj(handoff["payload"])["next_request_id"] == melee.request_id
+    obj(handoff["payload"])["next_request_id"] = original_frame.request_id
+    with pytest.raises(GameLifecycleError, match="melee reaction continuation drift"):
+        GameLifecycle.from_payload(drifted_handoff)
+
     drifted_frame = session.lifecycle.to_payload()
     drifted_frame["reaction_queue"]["frames"][-1]["request_id"] = original_frame.request_id
     with pytest.raises(GameLifecycleError, match="active frame request_id drift"):
@@ -495,6 +515,19 @@ def _assert_counteroffensive_melee_restore(
     ] = "other-timing-window"
     with pytest.raises(GameLifecycleError, match="melee reaction continuation drift"):
         GameLifecycle.from_payload(drifted_window)
+
+    drifted_window_type = deepcopy(session.lifecycle.to_payload())
+    descriptor = drifted_window_type["reaction_queue"]["frames"][-1]["reaction_window"][
+        "timing_window"
+    ]["descriptor"]
+    fought_selection = obj(obj(descriptor["metadata"])["fought_selection"])
+    battle_round = fought_selection["battle_round"]
+    assert type(battle_round) is int
+    fought_selection["battle_round"] = float(battle_round)
+    assert fought_selection["battle_round"] == battle_round
+    assert canonical_json(fought_selection["battle_round"]) != canonical_json(battle_round)
+    with pytest.raises(GameLifecycleError, match="melee reaction continuation drift"):
+        GameLifecycle.from_payload(drifted_window_type)
 
     restored = LocalGameSession.from_persistence_payload(json.loads(json.dumps(checkpoint)))
     assert restored.to_persistence_payload() == checkpoint
