@@ -33,6 +33,7 @@ from warhammer40k_core.engine.phase import GameLifecycleStage, LifecycleStatusKi
 
 if TYPE_CHECKING:
     from warhammer40k_core.adapters.local_session import LocalGameSession
+    from warhammer40k_core.engine.event_log import EventRecord
 
 ROOT = Path(__file__).resolve().parents[1]
 DRIVER = "scripts/measure_cavalcade_full_game.py"
@@ -160,6 +161,30 @@ def _play(workload: dict[str, object]) -> LocalGameSession:
     return session
 
 
+def _completed_phases(
+    events: tuple[EventRecord, ...],
+) -> list[tuple[object, object, object]]:
+    completed: list[tuple[object, object, object]] = []
+    for event in events:
+        if event.event_type == "fight_phase_completed":
+            # The generic Fight boundary carries the incoming turn's player and round.
+            payload = object_value(event.payload)
+            completed.append(
+                (payload["battle_round"], payload["active_player_id"], payload["phase"])
+            )
+        elif event.event_type == "battle_phase_completed":
+            payload = object_value(event.payload)
+            if payload["completed_phase"] != "fight":
+                completed.append(
+                    (
+                        payload["battle_round"],
+                        payload["active_player_id"],
+                        payload["completed_phase"],
+                    )
+                )
+    return completed
+
+
 def _terminal_evidence(
     session: LocalGameSession, workload: dict[str, object]
 ) -> tuple[dict[str, object], dict[str, object]]:
@@ -178,14 +203,8 @@ def _terminal_evidence(
     rounds = expected["battle_rounds"]
     if type(rounds) is not int:
         raise WorkloadError("The expected battle round count must be an integer.")
-    completed_phases = [
-        (payload["battle_round"], payload["active_player_id"], payload["completed_phase"])
-        for event in events
-        if event.event_type == "battle_phase_completed"
-        for payload in [object_value(event.payload)]
-    ]
     _require(
-        completed_phases
+        _completed_phases(events)
         == [
             (round_id, player, phase.value)
             for round_id in range(1, rounds + 1)
@@ -215,6 +234,7 @@ def _terminal_evidence(
         "event_count": len(events),
         "final_event_id": terminal_event.event_id,
         "lifecycle_sha256": checkpoint["lifecycle_hash"],
+        "checkpoint_content_sha256": checkpoint["content_hash"],
         "event_log_sha256": checkpoint["event_log_hash"],
         "result": result,
     }

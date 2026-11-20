@@ -46,15 +46,19 @@
     },
     "scripts/measure_cavalcade_full_game.py": {
       "before_sha256": null,
-      "after_sha256": "802bb3747050d314f26a18b08d7b062f3d135ff89a0226cce1f653a78901cad6",
+      "after_sha256": "77088906d4126c489a14f8260b95c032685f66294daeed3ed74bd23cd360b004",
       "owners": {
         "@module": {
           "before": null,
-          "after": "a73b6d7a47bb6ce5be51297e996f133b9f116e85275c50297980e78ef39a9b87"
+          "after": "32c4cce06c7e73f5ecc87ea914e2f0b515a0383ac3781661b4f32b11858eda76"
         },
         "WorkloadError": {
           "before": null,
           "after": "946ba0e0d67d9004369627bc1ee30c7c5913d973631aedab7de4b76f0fcfab1b"
+        },
+        "_completed_phases": {
+          "before": null,
+          "after": "caf2e7dcf3f1f43c74acc44caf93fe2c458cb243749e97dfb2c969c55e08f01d"
         },
         "_load_workload": {
           "before": null,
@@ -78,7 +82,7 @@
         },
         "_terminal_evidence": {
           "before": null,
-          "after": "5311ef2665422fe47d30c8d1075341903a34eeacbadca0729a568f43e11659a5"
+          "after": "b2d79ad42277c36cd4719b38623a9cecee9333bcc90a3233a7536ef3a13aabd0"
         },
         "_verify": {
           "before": null,
