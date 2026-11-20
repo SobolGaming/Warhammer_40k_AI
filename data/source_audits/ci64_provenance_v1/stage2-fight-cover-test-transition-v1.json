@@ -1,0 +1,42 @@
+{
+  "schema": "finite-stage2-fight-cover-test-transition-v1",
+  "base": "292bf8a55e184392f7d62d245707c8c1b7c0f9db",
+  "retained_gameplay_budget_sha256": "16fea4c0dd316cc1a1499e31ae211d7f172696bc8e74deee857f27ed388ea962",
+  "runtime_fingerprint": "0289337d6418f72592110b1af66eddd31e8662c8c1f128d134ce60951382d4d0",
+  "source": {
+    "src/warhammer40k_core/engine/attack_sequence_damage_resolution.py": {
+      "before": "9f0087e3b4ac269e0f9bcc7c8c41526932395268612cc28bb5dfbcc00b5adb06",
+      "after": "c95ba2e149e781ccfe452836411646715ed3009fc0e7e497b9a727be9a87d4e6"
+    }
+  },
+  "test": {
+    "tests/rules/section05/test_allocation_choices.py": {
+      "before": {
+        "mode": "100644",
+        "blob_sha1": "bd3f90bfea5cd88d23d51fd0fa7b4ed630aa4eaf",
+        "sha256": "70ac36cba184c58160afaa7022a827aedbd3babd3e03499e9c69ac4af057a08c",
+        "bytes": 13665
+      },
+      "after": {
+        "mode": "100644",
+        "blob_sha1": "49fba84a1854970a7d352195314dff1c21781ef6",
+        "sha256": "fce257529859ae2e17a8cefa3ba01142380ca783d267bb56bedbaad5dfe84a16",
+        "bytes": 14203
+      }
+    },
+    "tests/factions/emperors_children/test_selected_consumers.py": {
+      "before": {
+        "mode": "100644",
+        "blob_sha1": "43322a74e3ada5e84fc3f6a529ac17957050b04c",
+        "sha256": "e2d52c29b3d13feb04a26fa731d7cceb260e6b6bf4fbf3337f39fc0df34d69ed",
+        "bytes": 77597
+      },
+      "after": {
+        "mode": "100644",
+        "blob_sha1": "5256991d298bd644962f09315c19df816ee5fca0",
+        "sha256": "2061271c9ff1ef95c9b1c12b2ad9771e57890ead2be9eafa27286a1ec4618876",
+        "bytes": 77740
+      }
+    }
+  }
+}

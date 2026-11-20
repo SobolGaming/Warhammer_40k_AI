@@ -134,7 +134,9 @@ def test_identity_transition_preserves_original_recipe_and_speedup_evidence(
 
 
 def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> None:
-    assert selection.OWNER in sharding.behavioral_selection(ROOT).active_files
+    active_files = sharding.behavioral_selection(ROOT).active_files
+    assert selection.OWNER in active_files
+    assert selection.STAGE2_FIGHT_OWNER in active_files
     groups = [
         set((ROOT / f"ci/test_shards/shard-{index}.txt").read_text().splitlines())
         for index in range(1, 13)
@@ -143,6 +145,25 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
     assert sum(sharding.covered_native_checkpoint_cohort() <= group for group in groups) == 1
     summary = _record("ci/test_shards/durations.json")
     current = sharding.summary_case_seconds(summary)
+    fight = _record(selection.STAGE2_FIGHT_TRANSITION)
+    assert fight["runtime_fingerprint"] == _record(MANIFEST)["fingerprint"]
+    source_before = subprocess.check_output(
+        ["git", "show", selection.STAGE2_FIGHT_BASE + ":" + selection.STAGE2_FIGHT_SOURCE],
+        cwd=ROOT,
+    )
+    assert (
+        fight["source"][selection.STAGE2_FIGHT_SOURCE]["before"]
+        == hashlib.sha256(source_before).hexdigest()
+    )
+    assert (
+        fight["test"][selection.STAGE2_FIGHT_OWNER]["before"]
+        == _record(sharding.CUTOVER_PATH)["active_files"][selection.STAGE2_FIGHT_OWNER]
+    )
+    assert (
+        fight["test"][selection.GAMEPLAY_SORCERER_OWNER]["before"]
+        == _record(selection.GAMEPLAY_BUDGET_TRANSITION)["tests"][selection.GAMEPLAY_SORCERER_OWNER]
+    )
+    assert sum(selection.STAGE2_FIGHT_OWNER in group for group in groups) == 1
     prior = json.loads(
         subprocess.check_output(["git", "show", BASE + ":ci/test_shards/durations.json"], cwd=ROOT)
     )
@@ -247,6 +268,13 @@ def test_identity_selection_rejects_drift_in_each_updated_test(transition_snapsh
 
 
 def test_identity_transition_requires_its_exact_record(transition_snapshot: Path) -> None:
+    cutover_digest = hashlib.sha256((ROOT / sharding.CUTOVER_PATH).read_bytes()).hexdigest()
+    assert selection.exact_movement_test_transition(transition_snapshot, cutover_digest) is None
+    fight_record = transition_snapshot / selection.STAGE2_FIGHT_TRANSITION
+    fight_record.write_bytes((ROOT / selection.STAGE2_FIGHT_TRANSITION).read_bytes())
+    with pytest.raises(SystemExit, match="Stage 2 Fight Cover tests require the gameplay"):
+        selection.exact_movement_test_transition(transition_snapshot, cutover_digest)
+
     target = transition_snapshot / selection.ADDITION
     target.write_bytes(target.read_bytes() + b"\n")
     with pytest.raises(SystemExit, match="source bytes differ"):
