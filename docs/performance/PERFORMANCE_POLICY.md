@@ -108,9 +108,10 @@ reconstruction and replay gates remain unconditional.
    complete-game driver or missing complete-game evidence is incomplete, not a
    passing substitute. Full-game goals remain mean below 60 seconds and no
    measured game above 300 seconds on declared reference hardware.
-   The full-game driver registry is currently empty: a future supported driver
-   and its workload must be registered and independently reviewed before this
-   milestone can pass. Merely setting a completion/support flag is insufficient.
+   The [full-game registry](#cavalcade-setup-to-terminal-workload) now has a
+   provisional Cavalcade mirror. Milestone review still requires independent
+   qualification of the driver and workload, complete-game measurements on
+   declared reference hardware, and support for the milestone's claimed scope.
 
 ## Objective applicability and review
 
@@ -419,3 +420,39 @@ restore regression. The extra case verifies model key/identifier joins and the
 emitted public geometry commitment, exercising identity translation and its
 conditional hash reconstruction. Original v1 diagnostics retain their original
 meaning and are not reclassified as completed timing reports.
+
+## Cavalcade setup-to-terminal workload
+
+The [full-game registry](policy-v3/operation-map.json) includes
+`cavalcade-v995-setup-to-complete-v1`. The fixture pins both legal 2,000-point
+Cavalcade v995 rosters, 78 models, Purge the Foe Layout 1, a fixed seed and the
+recorded decisions of one played game. The native in-process driver constructs
+the existing mirror setup and submits each finite choice or parameterized
+proposal through `LocalGameSession`. The engine resolves automatic choices and
+runs all five phases for both players in all five rounds. The trace includes
+witnessed moves, a charge, melee and scoring. Three historically rejected
+movement proposals exercise the ordinary rule diagnostics and their retries.
+Player B's 8–0 score and the 3,105 events identify this exact trace.
+
+Run on a quiet native Linux host with the locked environment and a clean checkout.
+Use a fresh output directory and pass the exact base SHA as `PR_BASE`.
+
+```sh
+uv run --no-sync python -B -m scripts.measure_cavalcade_full_game \
+  measure ../cavalcade-measurement --base "$PR_BASE" --samples 1
+uv run --no-sync python -B -m scripts.measure_cavalcade_full_game \
+  verify ../cavalcade-measurement/sample-001/checkpoint.json ../cavalcade-verification
+```
+
+The game clock starts before the mirror session is constructed and stops at
+`game_completed`. The runner records startup separately and leaves checkpoint
+export and verification outside that clock. Each sample runs in a fresh process.
+The report records all attempts, including any failure or timeout. Use at least
+three serial samples when assessing the existing mean and observed maximum
+targets. The separate verification reopens the terminal session and uses the
+setup-origin replay, exact event and lifecycle hashes, both player projections
+and both viewer event streams.
+
+This registration supports an operator-run in-process baseline for the roadmap.
+Transport, inference and search measurements have their own later scope.
+The standard serial CI smoke and required coverage and quality gates still apply.

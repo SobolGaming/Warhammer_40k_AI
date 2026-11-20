@@ -1,388 +1,144 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "545d5556c279f88ffaaa897941245ca093e8e9f6",
+  "base": "6484364bfa29e408cf116bf5c7fd614bf7bd3919",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:d25f92885e6ee2ccfd086327b911104a7c1daa1c4ec5810e0760bd81942b6d99",
-  "operation_map_sha256": "0287a52a0e0185afe5bb2cdb0b6162ab993d1fec7aa836773fc0a11795475c24",
+  "operation_map_sha256": "2e068439011c6824afd2de8bcdeae205e2f3d172034d56386b68ee8c9f8fab0f",
   "changes": {
-    "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "9f28a50f8840409dae91f060dd84a90631e24026ffdbc52b47b987ee456d3e30",
-      "after_sha256": "3cedfe44196eb54fb3666ae2d9006312f575c29fdb86ba94cbe56280f68c1750",
+    "docs/AI_IMPLEMENTATION_PLAN.md": {
+      "before_sha256": "2c7ef367c9a6dda96bea85213736e853f7e09ddc91dca3c55f01eca2512ba4d9",
+      "after_sha256": "19cf438925ec02d24c3abde14fa017b02763ee40432390ff4322f03dee3b0a76",
       "owners": {
         "@document": {
-          "before": "9f28a50f8840409dae91f060dd84a90631e24026ffdbc52b47b987ee456d3e30",
-          "after": "3cedfe44196eb54fb3666ae2d9006312f575c29fdb86ba94cbe56280f68c1750"
+          "before": "2c7ef367c9a6dda96bea85213736e853f7e09ddc91dca3c55f01eca2512ba4d9",
+          "after": "19cf438925ec02d24c3abde14fa017b02763ee40432390ff4322f03dee3b0a76"
         }
       }
     },
-    "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "5e1f18822fb16bff13a9f03bc7c293d8b882318a058349f7e2c356055f23bfac",
-      "after_sha256": "7aae2d9a36ede67cf5a206738684313f509e161d72b482c2b675b17eef5a57d7",
+    "docs/performance/PERFORMANCE_POLICY.md": {
+      "before_sha256": "0f7685378c58fba81db09a5b66e525f03ea55f3cbf05e4ed10da76d937cf5514",
+      "after_sha256": "6b861f84d3a3b224746782fe4137809df395f33724533294ef210b59bdf8b0e3",
       "owners": {
         "@document": {
-          "before": "5e1f18822fb16bff13a9f03bc7c293d8b882318a058349f7e2c356055f23bfac",
-          "after": "7aae2d9a36ede67cf5a206738684313f509e161d72b482c2b675b17eef5a57d7"
-        }
-      }
-    },
-    "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "fd76df718929d4e9371417bf073302517aef86cdeaf7675fa31e80691d1eaec0",
-      "after_sha256": "6c4e23c98fa7e398e525d0275b21a14f56e5f87f117c57e42fdc9d2002bf22bd",
-      "owners": {
-        "@document": {
-          "before": "fd76df718929d4e9371417bf073302517aef86cdeaf7675fa31e80691d1eaec0",
-          "after": "6c4e23c98fa7e398e525d0275b21a14f56e5f87f117c57e42fdc9d2002bf22bd"
-        }
-      }
-    },
-    "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "d587a011798ee3e87c753a9e3885e17649e88f85f4478bcd6fe0d73a7da14c7b",
-      "after_sha256": "ca0d1f7f792517cb408b85db343be26ae786d16d8023a89ba6e83b8290d228e0",
-      "owners": {
-        "@document": {
-          "before": "d587a011798ee3e87c753a9e3885e17649e88f85f4478bcd6fe0d73a7da14c7b",
-          "after": "ca0d1f7f792517cb408b85db343be26ae786d16d8023a89ba6e83b8290d228e0"
-        }
-      }
-    },
-    "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "34097e22c98c821d0fc85faedb88608cc0f685aa920b5cf56eb3b2f5dc6b6103",
-      "after_sha256": "8418ed02a579b80cbaee83461786a0ebedfd8231134b151cbd402253b6a4799e",
-      "owners": {
-        "@document": {
-          "before": "34097e22c98c821d0fc85faedb88608cc0f685aa920b5cf56eb3b2f5dc6b6103",
-          "after": "8418ed02a579b80cbaee83461786a0ebedfd8231134b151cbd402253b6a4799e"
-        }
-      }
-    },
-    "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "923eb8a8fc60f4c0008a7a354cc7b7ab9e14da41d4651bfbcdbf5cf5441dfcb3",
-      "after_sha256": "b54a80b45c89150875924e69e29da3fe844b8d1691f54e4efb752ef5085b5247",
-      "owners": {
-        "@document": {
-          "before": "923eb8a8fc60f4c0008a7a354cc7b7ab9e14da41d4651bfbcdbf5cf5441dfcb3",
-          "after": "b54a80b45c89150875924e69e29da3fe844b8d1691f54e4efb752ef5085b5247"
-        }
-      }
-    },
-    "contracts/examples/support-profile.json": {
-      "before_sha256": "9013435d780b99f4a1a4bd42277c340404d96b699bf194416f782a0317162403",
-      "after_sha256": "83fae62a7fced89b818270df6e7442d73030be5c991f7b67f85b2d719cb0fc11",
-      "owners": {
-        "@document": {
-          "before": "9013435d780b99f4a1a4bd42277c340404d96b699bf194416f782a0317162403",
-          "after": "83fae62a7fced89b818270df6e7442d73030be5c991f7b67f85b2d719cb0fc11"
-        }
-      }
-    },
-    "contracts/manifest.json": {
-      "before_sha256": "e3833e5542763b51d9024e32ee71261612ceb543daef29de7f8a7c781bf2c55c",
-      "after_sha256": "932b5b4c12f1ae7374ddea735a91c87cc08fe47db6ca36e30611939fa8835088",
-      "owners": {
-        "@document": {
-          "before": "e3833e5542763b51d9024e32ee71261612ceb543daef29de7f8a7c781bf2c55c",
-          "after": "932b5b4c12f1ae7374ddea735a91c87cc08fe47db6ca36e30611939fa8835088"
-        }
-      }
-    },
-    "data/source_audits/ci64_provenance_v1/terminal-restore-test-transition-v1.json": {
-      "before_sha256": null,
-      "after_sha256": "58f3ce92764f2dce0a62d5a00b0cb6bf820aebddd690e817bdcc8641707f27ce",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "58f3ce92764f2dce0a62d5a00b0cb6bf820aebddd690e817bdcc8641707f27ce"
+          "before": "0f7685378c58fba81db09a5b66e525f03ea55f3cbf05e4ed10da76d937cf5514",
+          "after": "6b861f84d3a3b224746782fe4137809df395f33724533294ef210b59bdf8b0e3"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "c49d1634403ddca16c8d36dfa2428854dda33e11f64af899f94aeb95ed67da5f",
-      "after_sha256": "5a03790213959313fd3629b5c4d5f79dab39f606480705c9c3f0657d32bed602",
+      "before_sha256": "5a03790213959313fd3629b5c4d5f79dab39f606480705c9c3f0657d32bed602",
+      "after_sha256": "a3068b83137a69f97ce3713aecde444fd83b169b26fdf681ad9d38f87404d936",
       "owners": {
         "@document": {
-          "before": "c49d1634403ddca16c8d36dfa2428854dda33e11f64af899f94aeb95ed67da5f",
-          "after": "5a03790213959313fd3629b5c4d5f79dab39f606480705c9c3f0657d32bed602"
+          "before": "5a03790213959313fd3629b5c4d5f79dab39f606480705c9c3f0657d32bed602",
+          "after": "a3068b83137a69f97ce3713aecde444fd83b169b26fdf681ad9d38f87404d936"
         }
       }
     },
-    "scripts/engine_numerical_identity_test_admission.py": {
-      "before_sha256": "376629fc78c98275622996470aa01a9a41eff58e77a1a0ece4024681dc5902db",
-      "after_sha256": "5984fda471cd71cd0278807512eb066982fbd537c2819c6a7e979907d6aec7c5",
+    "scripts/fixtures/cavalcade_full_game_v1.json": {
+      "before_sha256": null,
+      "after_sha256": "930e74087ff77de425873dfec5f397c7b3cc7b3837b5971983cc463552fd8593",
       "owners": {
-        "@module": {
-          "before": "3a16521743f2d53558a2763b99b59b7293d95ca17dd671e3e2d8401176008b0a",
-          "after": "64138d25617c1685fc5b57739da731d8432a85530eacad85abc53791a9960988"
-        },
-        "_terminal_restore_successor": {
+        "@document": {
           "before": null,
-          "after": "08296a3af0c2e6ad303fb01488e1848dbfe570c22026fc4383f1822da54c8bf6"
-        },
-        "exact_movement_test_transition": {
-          "before": "b8b189fb1654b535512261f46f24c98a4bc32abf732869b0639e5378dad0afad",
-          "after": "8e8289ac11066ca2b8dd0b8cad868690a080fd67ebef6e9605b7c8f7d7b6e7d9"
+          "after": "930e74087ff77de425873dfec5f397c7b3cc7b3837b5971983cc463552fd8593"
         }
       }
     },
-    "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "ab74497450767aa27f13968680b181f195b1bdc58b51b8e14a741a7472137bba",
-      "after_sha256": "ae823dce51ae57a7e4dae4ed1fa2ab5e4d6626f23a537c11d00c464234aed1f6",
-      "owners": {
-        "@document": {
-          "before": "ab74497450767aa27f13968680b181f195b1bdc58b51b8e14a741a7472137bba",
-          "after": "ae823dce51ae57a7e4dae4ed1fa2ab5e4d6626f23a537c11d00c464234aed1f6"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/enhancement_effects.py": {
-      "before_sha256": "f9d57d77e23986663afd819c2c02dad4efa9d968df84f2049e13ee78125351fe",
-      "after_sha256": "eec6375fa971380343c49cc32d6870076905fe63fa6eb73e2fd490156dd4e730",
+    "scripts/measure_cavalcade_full_game.py": {
+      "before_sha256": null,
+      "after_sha256": "802bb3747050d314f26a18b08d7b062f3d135ff89a0226cce1f653a78901cad6",
       "owners": {
         "@module": {
-          "before": "2fa6b5d70c335d289d28d7b1ca53ef7d2a223ead0ad76028397585b2624353c2",
-          "after": "e92de0823bdc251882f15b405df287953489d881ab20c602bd2a294552a20894"
+          "before": null,
+          "after": "a73b6d7a47bb6ce5be51297e996f133b9f116e85275c50297980e78ef39a9b87"
         },
-        "apply_enhancement_effects": {
-          "before": "884bca1b16816ed73cfa219919bcee1e26d0d20d86655e4763d60c5e6ecab675",
-          "after": "7e0662346508233016205ed5031299884ae397e737de0f9abddefa760179d43e"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/normal_move_history.py": {
-      "before_sha256": "b0a075244d93ce53a63aec7601d011c6a3c56dd00ec8481a5ca15b6a10b3be97",
-      "after_sha256": "fa0ca4f925d84710129b1a3cfd0486d26a81198c79c9a2e95cf48db196440136",
-      "owners": {
-        "validate_normal_move_state_consistency": {
-          "before": "acfa9eff672e9e5292cb223caf65510a1fdf76a812d6b94bda8382fa1df0b7cb",
-          "after": "f2ca1c7733405b5e87e5cdf79e136a73bd92996d6af8117be270a2f39917d104"
-        }
-      }
-    },
-    "tests/code_quality/test_engine_numerical_identity_admission.py": {
-      "before_sha256": "1a0d2bd660aad45cd3c4b89198f182288d41ce9616572a21dedd92c7e920fefa",
-      "after_sha256": "9f7f875c170bf61b2b0d1c38b187befc3d0e02c46aea657ca2efcaf1ff44cdf8",
-      "owners": {
-        "test_identity_inventory_uses_current_twelve_shards_and_native_cohort": {
-          "before": "161621c788a53703f6f6f2938c524e20a0b7195186ded51885b21eea759ac4a5",
-          "after": "1343d0dbe2cf8c108dea4f1afad97167319e3097a4424b31e7a2d0a117be3622"
-        }
-      }
-    },
-    "tests/rules/rules01/unit/test_unit_splitting.py": {
-      "before_sha256": "420e8bc06b39dd925e10a9b7797b1f075c2c71be504fbaf5610aaa94c5ee4ff8",
-      "after_sha256": "0aac1b3c7ea735442fc8380700e2b7ffdbb04aa22a6fb586cc89f8dd40b9c06c",
-      "owners": {
-        "@module": {
-          "before": "7c2f250cef43282bc04642575a5052290d60560444e807dc697d04518765e7b4",
-          "after": "4528b5cc95cafcd1ecc2705484cb222c6f24723b8a82816c54f70939a0f0c57e"
+        "WorkloadError": {
+          "before": null,
+          "after": "946ba0e0d67d9004369627bc1ee30c7c5913d973631aedab7de4b76f0fcfab1b"
         },
-        "test_split_enhancement_follows_live_bearer_and_restores": {
-          "before": "9bdc982ee75a26d14527b4ad0d3ed2209d9d71bf24215691e97bab0df43c442b",
-          "after": "303e3913b394e7b1a1f1c14c35b5c7e8792dbbb39e2e2b62dd19a94ca2cf1021"
-        }
-      }
-    },
-    "tests/rules/section09/coverage.json": {
-      "before_sha256": "bc03df52276ac1772cd2a4df94c73b77aa5ceeca2235656e2edea2345e7b0cd4",
-      "after_sha256": "f21a8888803c6d3cf9d707f033a5c78dd132520355a159f1334414fb918356ee",
-      "owners": {
-        "@document": {
-          "before": "bc03df52276ac1772cd2a4df94c73b77aa5ceeca2235656e2edea2345e7b0cd4",
-          "after": "f21a8888803c6d3cf9d707f033a5c78dd132520355a159f1334414fb918356ee"
-        }
-      }
-    },
-    "tests/rules/section09/test_restrictions.py": {
-      "before_sha256": "ed2a8c06d93ebf22826ae3f8a28845dfc3cc9f6d369b4139a1f1cffd0a4c1b4d",
-      "after_sha256": "a78e29afa1b6b79118a8deb2e212a19038e7103fa44dcfaed01d545ef5426a99",
-      "owners": {
-        "@module": {
-          "before": "7547415bce795d695e28e245e1d3c4e926e8dfae20397278234c8499968ec241",
-          "after": "bfeff8c8c3bfa64b77b40b789df2b9e3f607957e09eeffb39151c671610a7484"
+        "_load_workload": {
+          "before": null,
+          "after": "938781c9bf88cd56da7170ace6e33961731ec657ad1898401be26691eb330564"
         },
-        "test_normal_move_completion_records_actual_once_per_phase_history": {
-          "before": "a65649ed79e5f064231f6702c0029113485171aa992508fece7be654e511f2ff",
-          "after": "c54da804ea49ba93382d8026b77db9c603ff00b729bbdfffd36b12089781f0a9"
+        "_measure": {
+          "before": null,
+          "after": "3963b10e7cccca32299eec00680c5b54b4e51be8270227eaf1c57e30555dc38f"
+        },
+        "_play": {
+          "before": null,
+          "after": "becdfe5bcfb3385351c40c8afdc909d507671c13ca47d2f633ce01f61da2a7e5"
+        },
+        "_require": {
+          "before": null,
+          "after": "37f4dd38e909da023b23b7284ce027c018f7337f12e09850b6a4db1597afa1ed"
+        },
+        "_sample": {
+          "before": null,
+          "after": "586088281ca297d76b38270512df7fd2a6196569403d8805c2a99d901bfad526"
+        },
+        "_terminal_evidence": {
+          "before": null,
+          "after": "5311ef2665422fe47d30c8d1075341903a34eeacbadca0729a568f43e11659a5"
+        },
+        "_verify": {
+          "before": null,
+          "after": "30671574665b97d54488a0fca1ab46315b1960975da78c93a000509d7b0e0c76"
+        },
+        "_write": {
+          "before": null,
+          "after": "f71dcff0c7704af4e79b0a31755953468b2c3da61500a39a62cca022867da53c"
+        },
+        "main": {
+          "before": null,
+          "after": "9150c48b03fdb825182ed9692d014174059a37b5f7db7705b1f3b8638e79206a"
         }
       }
     }
   },
   "rows": {
-    "contracts/examples/persistence/session-persistence.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue588-contract-publication"
-      ],
+    "docs/AI_IMPLEMENTATION_PLAN.md": {
+      "category": "governance",
+      "operations": [],
       "selected_families": [],
-      "rationale": "Regenerate contract examples and manifest with the changed engine build identity.",
-      "source_obligation": "A completed game preserves accepted movement and enhancement history, with battle-end effects expired.",
-      "unchanged_work": "The existing restore, replay, scoring, and live enhancement execution paths retain their algorithms and payloads."
+      "rationale": "Registers and documents the operator-run setup-to-terminal baseline and its scope.",
+      "source_obligation": null,
+      "unchanged_work": null
     },
-    "contracts/examples/sessions/session-command-outcome.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue588-contract-publication"
-      ],
+    "docs/performance/PERFORMANCE_POLICY.md": {
+      "category": "governance",
+      "operations": [],
       "selected_families": [],
-      "rationale": "Regenerate contract examples and manifest with the changed engine build identity.",
-      "source_obligation": "A completed game preserves accepted movement and enhancement history, with battle-end effects expired.",
-      "unchanged_work": "The existing restore, replay, scoring, and live enhancement execution paths retain their algorithms and payloads."
-    },
-    "contracts/examples/sessions/session-command-started.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerate contract examples and manifest with the changed engine build identity.",
-      "source_obligation": "A completed game preserves accepted movement and enhancement history, with battle-end effects expired.",
-      "unchanged_work": "The existing restore, replay, scoring, and live enhancement execution paths retain their algorithms and payloads."
-    },
-    "contracts/examples/sessions/session-metadata-created.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerate contract examples and manifest with the changed engine build identity.",
-      "source_obligation": "A completed game preserves accepted movement and enhancement history, with battle-end effects expired.",
-      "unchanged_work": "The existing restore, replay, scoring, and live enhancement execution paths retain their algorithms and payloads."
-    },
-    "contracts/examples/support-profile-player-a-redacted.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerate contract examples and manifest with the changed engine build identity.",
-      "source_obligation": "A completed game preserves accepted movement and enhancement history, with battle-end effects expired.",
-      "unchanged_work": "The existing restore, replay, scoring, and live enhancement execution paths retain their algorithms and payloads."
-    },
-    "contracts/examples/support-profile-player-b-redacted.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerate contract examples and manifest with the changed engine build identity.",
-      "source_obligation": "A completed game preserves accepted movement and enhancement history, with battle-end effects expired.",
-      "unchanged_work": "The existing restore, replay, scoring, and live enhancement execution paths retain their algorithms and payloads."
-    },
-    "contracts/examples/support-profile.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerate contract examples and manifest with the changed engine build identity.",
-      "source_obligation": "A completed game preserves accepted movement and enhancement history, with battle-end effects expired.",
-      "unchanged_work": "The existing restore, replay, scoring, and live enhancement execution paths retain their algorithms and payloads."
-    },
-    "contracts/manifest.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerate contract examples and manifest with the changed engine build identity.",
-      "source_obligation": "A completed game preserves accepted movement and enhancement history, with battle-end effects expired.",
-      "unchanged_work": "The existing restore, replay, scoring, and live enhancement execution paths retain their algorithms and payloads."
-    },
-    "data/source_audits/ci64_provenance_v1/terminal-restore-test-transition-v1.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "engine-numerical-identity-admission"
-      ],
-      "selected_families": [],
-      "rationale": "Admit the two byte-bound scheduled regression successors against the verified runtime and exact PR base.",
-      "source_obligation": "A completed game preserves accepted movement and enhancement history, with battle-end effects expired.",
-      "unchanged_work": "The existing restore, replay, scoring, and live enhancement execution paths retain their algorithms and payloads."
+      "rationale": "Registers and documents the operator-run setup-to-terminal baseline and its scope.",
+      "source_obligation": null,
+      "unchanged_work": null
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Register the two terminal-stage owners and the exact scheduled test admission artifact.",
-      "source_obligation": "A completed game preserves accepted movement and enhancement history, with battle-end effects expired.",
-      "unchanged_work": "The existing restore, replay, scoring, and live enhancement execution paths retain their algorithms and payloads."
+      "rationale": "Registers and documents the operator-run setup-to-terminal baseline and its scope.",
+      "source_obligation": null,
+      "unchanged_work": null
     },
-    "scripts/engine_numerical_identity_test_admission.py": {
-      "category": "rule_semantics",
+    "scripts/fixtures/cavalcade_full_game_v1.json": {
+      "category": "measured_workload",
       "operations": [
-        "engine-numerical-identity-admission"
+        "cavalcade-full-game-measurement"
       ],
       "selected_families": [],
-      "rationale": "Admit the two byte-bound scheduled regression successors against the verified runtime and exact PR base.",
-      "source_obligation": "A completed game preserves accepted movement and enhancement history, with battle-end effects expired.",
-      "unchanged_work": "The existing restore, replay, scoring, and live enhancement execution paths retain their algorithms and payloads."
+      "rationale": "Admits the first fixed Cavalcade full-game measurement workload and adds no prior measurement family or engine behavior change.",
+      "source_obligation": null,
+      "unchanged_work": null
     },
-    "src/warhammer40k_core/_engine_build_manifest.json": {
-      "category": "rule_semantics",
+    "scripts/measure_cavalcade_full_game.py": {
+      "category": "measured_workload",
       "operations": [
-        "source-record"
+        "cavalcade-full-game-measurement"
       ],
       "selected_families": [],
-      "rationale": "Regenerate the packaged build identity against the authoritative runtime source tree.",
-      "source_obligation": "A completed game preserves accepted movement and enhancement history, with battle-end effects expired.",
-      "unchanged_work": "The existing restore, replay, scoring, and live enhancement execution paths retain their algorithms and payloads."
-    },
-    "src/warhammer40k_core/engine/enhancement_effects.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "terminal-enhancement-restore"
-      ],
-      "selected_families": [],
-      "rationale": "Keep expired effects inactive on terminal restore and preserve the existing live installation path.",
-      "source_obligation": "A completed game preserves accepted movement and enhancement history, with battle-end effects expired.",
-      "unchanged_work": "The existing restore, replay, scoring, and live enhancement execution paths retain their algorithms and payloads."
-    },
-    "src/warhammer40k_core/engine/normal_move_history.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "terminal-normal-move-restore"
-      ],
-      "selected_families": [],
-      "rationale": "Admit history at the completed battle stage and still validate against accepted completion evidence.",
-      "source_obligation": "A completed game preserves accepted movement and enhancement history, with battle-end effects expired.",
-      "unchanged_work": "The existing restore, replay, scoring, and live enhancement execution paths retain their algorithms and payloads."
-    },
-    "tests/code_quality/test_engine_numerical_identity_admission.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "engine-numerical-identity-admission"
-      ],
-      "selected_families": [],
-      "rationale": "Admit the two byte-bound scheduled regression successors against the verified runtime and exact PR base.",
-      "source_obligation": "A completed game preserves accepted movement and enhancement history, with battle-end effects expired.",
-      "unchanged_work": "The existing restore, replay, scoring, and live enhancement execution paths retain their algorithms and payloads."
-    },
-    "tests/rules/rules01/unit/test_unit_splitting.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "ci-restructure-tests-rules-rules01-unit-test_unit_splitting.py"
-      ],
-      "selected_families": [],
-      "rationale": "Verify live enhancement restoration, native end-of-battle expiry and unchanged terminal state and grant history.",
-      "source_obligation": "A completed game preserves accepted movement and enhancement history, with battle-end effects expired.",
-      "unchanged_work": "The existing restore, replay, scoring, and live enhancement execution paths retain their algorithms and payloads."
-    },
-    "tests/rules/section09/coverage.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "qualification40-exact-9ffa8f9efb249582"
-      ],
-      "selected_families": [],
-      "rationale": "Refresh the live assertion binding for the existing Normal Move case and preserve all retained source inputs.",
-      "source_obligation": "A completed game preserves accepted movement and enhancement history, with battle-end effects expired.",
-      "unchanged_work": "The existing restore, replay, scoring, and live enhancement execution paths retain their algorithms and payloads."
-    },
-    "tests/rules/section09/test_restrictions.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "qualification40-exact-b2bacf5b1eaae8f1"
-      ],
-      "selected_families": [],
-      "rationale": "Check that native Normal Move completion evidence remains valid on terminal restore and tampering fails.",
-      "source_obligation": "A completed game preserves accepted movement and enhancement history, with battle-end effects expired.",
-      "unchanged_work": "The existing restore, replay, scoring, and live enhancement execution paths retain their algorithms and payloads."
+      "rationale": "Admits the first fixed Cavalcade full-game measurement workload and adds no prior measurement family or engine behavior change.",
+      "source_obligation": null,
+      "unchanged_work": null
     }
   },
   "milestone": "ordinary",

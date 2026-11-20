@@ -164,6 +164,13 @@ Stage labels below are work-package names within existing phases, not new produc
 
 This replaces the old sequence's "learning only after every full-game stage" with supported local experiments, and brings measurement earlier. It does not relax AGENTS' requirement for trustworthy deterministic core, decision records, replay and movement/shooting/fight slices before AI/training. Full-faction implementation remains governed by Gate 0; unsupported fixture mechanics are not bypassed.
 
+### Cavalcade setup-to-terminal workload
+
+The performance workload registry records the versioned
+[`cavalcade-v995-setup-to-complete-v1`](performance/PERFORMANCE_POLICY.md#cavalcade-setup-to-terminal-workload)
+for provisional native in-process measurements. This fixed Cavalcade mirror
+covers ordinary setup, all five rounds, and terminal scoring.
+
 ### Selected Stage 1 contract audit and endpoint
 
 The selected workload for this slice is **bounded setup/deployment contract
