@@ -2833,3 +2833,64 @@ failed attempts and qualification outcomes retain their original meaning.
 Required local/hosted gates and both exact-final-head independent reviews remain
 delivery prerequisites. These observations do not qualify complete-game timing,
 tactical benefit or learning eligibility.
+
+## Native preserve Fight continuation
+
+`tests.support.cavalcade_native_fight` extends the real round-four Cavalcade
+preserve arm from its first pending Fight decision. Reproduce the common
+checkpoint and run the retained `cavalcade_native_charge` recipe on the current
+runtime for the preserve arm. Use the resulting `preserve-checkpoint.json` as
+input. The earlier two-arm continuations and their eight rejected
+Charge proposals per arm retain their original provenance and stopping point.
+
+At base `ad68d40e951ca75267974f73a19c163cfba08177`, the common checkpoint
+has 212 decisions and 1,268 events. The regenerated preserve branch rolls 5
+and 3, with Instrument of Chaos adding 1 for a 9-inch Charge budget. The retained
+recipe selects the packed arc and all six witnessed paths pass on the first
+attempt. Brass Stampede inflicts 7 mortal wounds in three
+applications, leaving the Lord of Change on 11 wounds. The 269-decision,
+1,609-event Fight input retains all 78 roster models and the current numerical
+identity. Its checkpoint hash is
+`b7bf4ce914588be9ca850a5b4385d0e697674eb4a24c2ce67048442c8e1b52d8`.
+
+The operator submits the engine's explicit no-move Pile In proposals for both
+units, selects the Bloodcrushers' normal Fight activation, and submits the
+Hellblade and Extra Attacks horn for each model the engine offers against the
+Lord of Change. It declines optional effects and selects issued attack order
+options. The bounded continuation stops after the initial melee Hit and Wound
+steps, at the pending wound-roll Command Re-roll request. The existing movement,
+Fight activation, melee declaration and attack choice contracts cover these
+submissions.
+
+The response accepts 40 viewer submissions plus two automatic selection
+records. Four Bloodcrushers declare both equipped profiles. The engine records
+29 Hit-step and 11 Wound-step events, including critical results. The endpoint
+has 311 decisions, 1,829 events and 46 RNG draws. All 78 models survive, all
+positions and resource ledgers match the Fight input, and the Lord of Change
+has 11 wounds. Player B's pending `use_stratagem` window offers Command Re-roll
+for a Wound roll of 4. The checkpoint hash is
+`ab5ba352e33c0e729f10e3555da5a77f07c2ff240e49dbeb8f992b488cfd2d8d`.
+
+```sh
+uv run --no-sync python -m tests.support.cavalcade_native_fight \
+  --charge-checkpoint reports/native-charge/preserve-checkpoint.json \
+  --output reports/native-preserve-fight
+uv run --no-sync python -m tests.support.cavalcade_native_fight \
+  --charge-checkpoint reports/native-charge/preserve-checkpoint.json \
+  --output reports/native-preserve-fight --qualify-saved
+```
+
+The private receipt binds the source identity, input checkpoint and submitted
+choices. Qualification restores the final JSON checkpoint and uses the
+engine's ReplayRunner to reproduce the Fight decisions and event tail from the
+current-version Charge checkpoint. Both viewer projections and event streams
+and the complete final lifecycle must match. The remaining melee sequence,
+Stage 2 completion, learning eligibility and complete-game qualification remain
+open.
+
+A continuation past the pending wound-roll window exceeded its 300-second
+response allowance. Re-submitting the identical prefix and tracing that window
+located the unresolved query in melee save preparation. The shared allocation
+path requests exact terrain visibility for Cover, whose retained Core 13.08
+source applies to ranged attacks. A runtime repair requires its own
+runtime-bound behavioral admission and qualification.

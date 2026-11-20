@@ -237,6 +237,10 @@ remain explicit in [current rules](CURRENT_RULES.md).
 
 ## Compliance claim
 
+The [native preserve Fight continuation](AI_POLICY_INTERFACE.md#native-preserve-fight-continuation)
+tracks the operator workload beyond the earlier native Charge stopping point.
+Core and Stage 2 acceptance still follow the gates above.
+
 The project may claim Core Rules categories 01–25 compliant only after every implementation PR, `S-MIRRORS`, and `PFINAL` are merged, including any further PR the audit inserts, and a fresh 25-category audit on `main` finds no new gap. The claim names the selected snapshot, provider, and observation date, and it excludes factions and every scope `AGENTS.md` prohibits.
 
 `PFINAL` requires a clause and FAQ inventory mapped to an immutable source observation, an engine owner, and a facade regression. Loaded source rows, passing tests, and merged orders are not that inventory. Complete-game performance remains a separate [performance policy](performance/PERFORMANCE_POLICY.md) and is not certified here.

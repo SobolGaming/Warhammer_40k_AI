@@ -1,111 +1,124 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "34018bd86909be362d43865f22b649d59131282a",
+  "base": "ad68d40e951ca75267974f73a19c163cfba08177",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0db5d76c980e2ba3b29d964b6890a6057878290b3aad06a3a518a67d9a529cc2",
-  "operation_map_sha256": "bc568d50f2e1f7003963ee1dfeae29bc5b7bbaaf9d0e1655a696316d3f44f45a",
+  "operation_map_sha256": "af528b5a5ead3f2316256e022963135f47345e5964ebba10f8f7587b2643e2b6",
   "changes": {
-    ".github/scripts/fetch_performance_revisions.py": {
+    "docs/AI_POLICY_INTERFACE.md": {
+      "before_sha256": "fde8cca6226e6d3c06846eeb4fb5e0369e1e34e86d11a4081ad67012a4b45ebe",
+      "after_sha256": "90deb29323e88c3b495f59b436c740b09f400018f58d5966e6930f71b8e612cd",
+      "owners": {
+        "@document": {
+          "before": "fde8cca6226e6d3c06846eeb4fb5e0369e1e34e86d11a4081ad67012a4b45ebe",
+          "after": "90deb29323e88c3b495f59b436c740b09f400018f58d5966e6930f71b8e612cd"
+        }
+      }
+    },
+    "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
+      "before_sha256": "bbc748ab6da88928b848a9063d419469ef8bee56b3f27dcc0fae8f3858cd9a3d",
+      "after_sha256": "7b7adc198b0ba618d649eea04a9381b4f0e60557c78d0fa166ae1970be45ff4c",
+      "owners": {
+        "@document": {
+          "before": "bbc748ab6da88928b848a9063d419469ef8bee56b3f27dcc0fae8f3858cd9a3d",
+          "after": "7b7adc198b0ba618d649eea04a9381b4f0e60557c78d0fa166ae1970be45ff4c"
+        }
+      }
+    },
+    "docs/performance/policy-v3/operation-map.json": {
+      "before_sha256": "4e7d27d2e2e72dc0d1df879bd91b261c3c745f8c5de701f4ba81f4d6ae627726",
+      "after_sha256": "bfc19a87224779edfe907667e1934e3e23cf5d6f8875bdd1ed53711fc9924ae4",
+      "owners": {
+        "@document": {
+          "before": "4e7d27d2e2e72dc0d1df879bd91b261c3c745f8c5de701f4ba81f4d6ae627726",
+          "after": "bfc19a87224779edfe907667e1934e3e23cf5d6f8875bdd1ed53711fc9924ae4"
+        }
+      }
+    },
+    "tests/support/cavalcade_native_fight.py": {
       "before_sha256": null,
-      "after_sha256": "c6161d01a4ee91856e14bf914d142f0356721ef0d5101edeff3cd79fc22f07ad",
+      "after_sha256": "314eba5f6c3a83684daede4fcf10a5178c35625da468c5d1d90903e8ea319254",
       "owners": {
         "@module": {
           "before": null,
-          "after": "c9a6ae305f000b7345d3068dcbbae42fc4967397f2cd67319878d768eba699ca"
+          "after": "43cdc27c102c96febe9979dc94b9cffba221c3d63c5fad394251a9920543734c"
+        },
+        "attack_evidence": {
+          "before": null,
+          "after": "495caf8d5abf7630f6d48769518e818792490dfc4e549223bc421829d1c0c996"
+        },
+        "fight_choice": {
+          "before": null,
+          "after": "cbabe27e121ca5867e20b28e4c6a44bcbf5d7afd4f96ad6d95a8713bb743ed7f"
         },
         "main": {
           "before": null,
-          "after": "384291addaccb5c1a9f963795ecbf7d9e557d84064062201b9ede8e2b70fa4ae"
-        }
-      }
-    },
-    ".github/workflows/ci.yml": {
-      "before_sha256": "6bfaabbef9ba9bb43cd86117ca951dfc5ad393ee220bc458ece2526cf136f765",
-      "after_sha256": "0bd44a0fd7227489c7cd41b9391ae2d4d6b47cbe7e5dd8c8b8b1fa06b35707f7",
-      "owners": {
-        "@document": {
-          "before": "6bfaabbef9ba9bb43cd86117ca951dfc5ad393ee220bc458ece2526cf136f765",
-          "after": "0bd44a0fd7227489c7cd41b9391ae2d4d6b47cbe7e5dd8c8b8b1fa06b35707f7"
-        }
-      }
-    },
-    "ci/quality_shards/all.txt": {
-      "before_sha256": "ac9e96b187411b853ea50ea354f37d61368ba854de1b4cf6b2f0be9cb53d6930",
-      "after_sha256": "e7f4976b613f0aca0b83cc574db654a6fcd9068600b8673708bfdacce46f81e2",
-      "owners": {
-        "@document": {
-          "before": "ac9e96b187411b853ea50ea354f37d61368ba854de1b4cf6b2f0be9cb53d6930",
-          "after": "e7f4976b613f0aca0b83cc574db654a6fcd9068600b8673708bfdacce46f81e2"
-        }
-      }
-    },
-    "ci/quality_shards/shard-4.txt": {
-      "before_sha256": "8e0a0ddfd8ab0ff76f4632a96a0fc70686648bd3e9a9c6057273d6c137a90715",
-      "after_sha256": "07d8a91d735ae655cbfeb6033f65000391c3363dc74cbde557b8631edb8e0550",
-      "owners": {
-        "@document": {
-          "before": "8e0a0ddfd8ab0ff76f4632a96a0fc70686648bd3e9a9c6057273d6c137a90715",
-          "after": "07d8a91d735ae655cbfeb6033f65000391c3363dc74cbde557b8631edb8e0550"
-        }
-      }
-    },
-    "tests/code_quality/test_speedup_shard_governance.py": {
-      "before_sha256": "ed837a7653c6c54af8e03e67beb4e0ef732bc2b414c59eea718e69e3a90ff75a",
-      "after_sha256": "4f8f97dda94adc960963aa61084f5a885e4969d8ba4a0739b325b7a5e2f2078f",
-      "owners": {
-        "@module": {
-          "before": "1a9859e0d308af3a1855b99e1f1241095b780b6f49df5f4ca588ea3e4e0be1eb",
-          "after": "79c1b3efffe22b33f6cafb71759f45ccbe34212c619eceb98983e2faed8269a7"
+          "after": "01cbf75e799879b83aeed4e682e75dc7144bb749239b4af5b0056480b347414e"
         },
-        "test_quality_policy_fetches_exact_measurement_from_squashed_pull_request": {
+        "melee_proposal": {
           "before": null,
-          "after": "505ad86bcae7d8593e0e0ada5fef52896cca8ce3712f58a0f951462e2c43e542"
+          "after": "046052d42456eb8b2ad2a8ec6291e0f796af77926f7704c22893538f62e65503"
+        },
+        "model_outcomes": {
+          "before": null,
+          "after": "191c2ba29c1465dbd673f2c00fca870f76a0348d5190938e6030c74584a1ad66"
+        },
+        "object_payload": {
+          "before": null,
+          "after": "7570d0bc9711ca2781359f1b6890a82367935d94ce24e3072a7b5af7c6b51f2e"
+        },
+        "qualify": {
+          "before": null,
+          "after": "5353af0a36245b1711b99047ffc221d07be62fe9be3e44f5923cda56dc5d7d09"
+        },
+        "require_charge_boundary": {
+          "before": null,
+          "after": "f21c8b60be696d2bbfd130d8174eec10013f80edd85eb8f0b174ff7dfe24a0b2"
+        },
+        "respond": {
+          "before": null,
+          "after": "a045349a6957cf14ccae2be4a387c3f2db6f9d2636487e85ab069e9ee5d6ff21"
+        },
+        "view_evidence": {
+          "before": null,
+          "after": "4e30ad995f184c96c0fc6b545118189fee7cedf980c8832a016ebcc541970ba3"
         }
       }
     }
   },
   "rows": {
-    ".github/scripts/fetch_performance_revisions.py": {
+    "docs/AI_POLICY_INTERFACE.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Provision exact measured commits in the quality-policy checkout when their pull request history is absent after a squash merge.",
-      "source_obligation": "Recover only the committed comparison's full Git object ID from origin before the existing performance policy verifies the comparison inputs.",
-      "unchanged_work": "The benchmark inputs, engine and behavioral tests are unchanged. The current performance validator, serial smoke and CI thresholds still run."
+      "rationale": "Document the bounded native preserve Fight procedure, its proof and the remaining gameplay boundary.",
+      "source_obligation": "Use the native source-backed roster, equipped profiles, retained approach and whole-formation Charge, then bind the actual Fight response and current replay to the input checkpoint.",
+      "unchanged_work": "Packaged runtime, rules, catalogs, solver and cache policies, serialization and replay implementations, collected behavioral suite, retained measurement inputs and timing gates are unchanged. The operator uses the existing adapter and engine without a performance or full-game qualification claim."
     },
-    ".github/workflows/ci.yml": {
-      "category": "rule_semantics",
+    "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Link the new operator evidence from the current acceptance inventory without changing certification prerequisites.",
+      "source_obligation": "Use the native source-backed roster, equipped profiles, retained approach and whole-formation Charge, then bind the actual Fight response and current replay to the input checkpoint.",
+      "unchanged_work": "Packaged runtime, rules, catalogs, solver and cache policies, serialization and replay implementations, collected behavioral suite, retained measurement inputs and timing gates are unchanged. The operator uses the existing adapter and engine without a performance or full-game qualification claim."
+    },
+    "docs/performance/policy-v3/operation-map.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Register the finite native Fight operator while preserving the existing Charge and approach operation.",
+      "source_obligation": "Use the native source-backed roster, equipped profiles, retained approach and whole-formation Charge, then bind the actual Fight response and current replay to the input checkpoint.",
+      "unchanged_work": "Packaged runtime, rules, catalogs, solver and cache policies, serialization and replay implementations, collected behavioral suite, retained measurement inputs and timing gates are unchanged. The operator uses the existing adapter and engine without a performance or full-game qualification claim."
+    },
+    "tests/support/cavalcade_native_fight.py": {
+      "category": "measured_workload",
       "operations": [
-        "behavioral-worker-progress",
-        "covered-shard-workload"
+        "native-v995-fight-operator"
       ],
       "selected_families": [],
-      "rationale": "Provision exact measured commits in the quality-policy checkout when their pull request history is absent after a squash merge.",
-      "source_obligation": "Recover only the committed comparison's full Git object ID from origin before the existing performance policy verifies the comparison inputs.",
-      "unchanged_work": "The benchmark inputs, engine and behavioral tests are unchanged. The current performance validator, serial smoke and CI thresholds still run."
-    },
-    "ci/quality_shards/all.txt": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Provision exact measured commits in the quality-policy checkout when their pull request history is absent after a squash merge.",
-      "source_obligation": "Recover only the committed comparison's full Git object ID from origin before the existing performance policy verifies the comparison inputs.",
-      "unchanged_work": "The benchmark inputs, engine and behavioral tests are unchanged. The current performance validator, serial smoke and CI thresholds still run."
-    },
-    "ci/quality_shards/shard-4.txt": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Provision exact measured commits in the quality-policy checkout when their pull request history is absent after a squash merge.",
-      "source_obligation": "Recover only the committed comparison's full Git object ID from origin before the existing performance policy verifies the comparison inputs.",
-      "unchanged_work": "The benchmark inputs, engine and behavioral tests are unchanged. The current performance validator, serial smoke and CI thresholds still run."
-    },
-    "tests/code_quality/test_speedup_shard_governance.py": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Provision exact measured commits in the quality-policy checkout when their pull request history is absent after a squash merge.",
-      "source_obligation": "Recover only the committed comparison's full Git object ID from origin before the existing performance policy verifies the comparison inputs.",
-      "unchanged_work": "The benchmark inputs, engine and behavioral tests are unchanged. The current performance validator, serial smoke and CI thresholds still run."
+      "rationale": "Exercise a separate, uncollected preserve-arm operation through ordinary viewer submissions and exact current-version replay.",
+      "source_obligation": "Use the native source-backed roster, equipped profiles, retained approach and whole-formation Charge, then bind the actual Fight response and current replay to the input checkpoint.",
+      "unchanged_work": "Packaged runtime, rules, catalogs, solver and cache policies, serialization and replay implementations, collected behavioral suite, retained measurement inputs and timing gates are unchanged. The operator uses the existing adapter and engine without a performance or full-game qualification claim."
     }
   },
   "milestone": "ordinary",
