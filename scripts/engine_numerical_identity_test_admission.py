@@ -159,12 +159,18 @@ STAGE2_FIGHT_REROLL_FIXTURE = "tests/order135_counteroffensive_helpers.py"
 
 
 TERMINAL_RESTORE_TRANSITION = (
-    "data/source_audits/ci64_provenance_v1/terminal-normal-move-restore-test-transition-v1.json"
+    "data/source_audits/ci64_provenance_v1/terminal-restore-test-transition-v1.json"
 )
-TERMINAL_RESTORE_SHA256 = "f7a2e27629b7b05f08462f105e9159694e55179a3fddc2b6e8ef726f2be281c6"
+TERMINAL_RESTORE_SHA256 = "58f3ce92764f2dce0a62d5a00b0cb6bf820aebddd690e817bdcc8641707f27ce"
 TERMINAL_RESTORE_BASE = "545d5556c279f88ffaaa897941245ca093e8e9f6"
-TERMINAL_RESTORE_SOURCE = "src/warhammer40k_core/engine/normal_move_history.py"
-TERMINAL_RESTORE_OWNER = "tests/rules/section09/test_restrictions.py"
+TERMINAL_RESTORE_SOURCES = (
+    "src/warhammer40k_core/engine/normal_move_history.py",
+    "src/warhammer40k_core/engine/enhancement_effects.py",
+)
+TERMINAL_RESTORE_OWNERS = (
+    "tests/rules/section09/test_restrictions.py",
+    "tests/rules/rules01/unit/test_unit_splitting.py",
+)
 
 
 type SourceSuccessors = dict[str, dict[str, str]]
@@ -362,19 +368,20 @@ def _terminal_restore_successor(root: Path) -> tuple[str, TestSuccessors, bytes]
             "source",
             "test",
         }
-        or record["schema"] != "finite-terminal-normal-move-restore-test-transition-v1"
+        or record["schema"] != "finite-terminal-restore-test-transition-v1"
         or record["base"] != TERMINAL_RESTORE_BASE
         or record["retained_fight_reroll_sha256"] != STAGE2_FIGHT_REROLL_SHA256
-        or set(record["source"]) != {TERMINAL_RESTORE_SOURCE}
-        or set(record["test"]) != {TERMINAL_RESTORE_OWNER}
+        or set(record["source"]) != set(TERMINAL_RESTORE_SOURCES)
+        or set(record["test"]) != set(TERMINAL_RESTORE_OWNERS)
     ):
-        raise SystemExit("Terminal Normal Move restore test transition membership differs.")
-    source = record["source"][TERMINAL_RESTORE_SOURCE]
-    test = record["test"][TERMINAL_RESTORE_OWNER]
-    if set(source) != {"before", "after"} or set(test) != {"before", "after"}:
-        raise SystemExit("Terminal Normal Move restore requires exact before and after digests.")
-    _checked_bytes(root, TERMINAL_RESTORE_SOURCE, source["after"])
-    tests = _selection_members({TERMINAL_RESTORE_OWNER: test["after"]}, root)
+        raise SystemExit("Terminal restore test transition membership differs.")
+    for name, source in record["source"].items():
+        if set(source) != {"before", "after"}:
+            raise SystemExit("Terminal restore requires exact before and after source digests.")
+        _checked_bytes(root, name, source["after"])
+    if any(set(test) != {"before", "after"} for test in record["test"].values()):
+        raise SystemExit("Terminal restore requires exact before and after test digests.")
+    tests = _selection_members({name: test["after"] for name, test in record["test"].items()}, root)
     return record["runtime_fingerprint"], tests, raw
 
 
@@ -459,7 +466,7 @@ def exact_movement_test_transition(
     _selection_no_links(root, terminal_restore_path)
     has_terminal_restore = terminal_restore_path.exists()
     if has_terminal_restore and not has_fight_reroll:
-        raise SystemExit("Terminal Normal Move restore tests require the Fight reroll predecessor.")
+        raise SystemExit("Terminal restore tests require the Fight reroll predecessor.")
     if has_fight_reroll and not has_melee_restore:
         raise SystemExit("Stage 2 Fight reroll tests require the melee restore predecessor.")
     if has_melee_restore and not has_counteroffensive:
@@ -748,9 +755,7 @@ def exact_movement_test_transition(
     if terminal_restore is not None:
         _, tests, terminal_restore_raw = terminal_restore
         if tests.keys() & (updated.keys() | added.keys() | additions.keys()):
-            raise SystemExit(
-                "Terminal Normal Move restore tests overlap the predecessor selection."
-            )
+            raise SystemExit("Terminal restore tests overlap the predecessor selection.")
         updated.update(tests)
         raw += b"\0" + terminal_restore_raw
     return updated, {**added, **additions}, retained_raw + b"\0" + raw

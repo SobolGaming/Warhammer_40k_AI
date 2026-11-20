@@ -85,6 +85,10 @@ from tests.shared.category_migration.unit_splitting import (
     validate_attached_rules_unit_identity_after_destruction,
     validate_json_value,
 )
+from warhammer40k_core.engine.decision_controller import DecisionController
+from warhammer40k_core.engine.effects import EffectExpirationBoundary
+from warhammer40k_core.engine.enhancement_effects import apply_enhancement_effects
+from warhammer40k_core.engine.game_state import GameState
 
 
 @pytest.mark.parametrize("attached", [False, True])
@@ -438,6 +442,7 @@ def test_split_enhancement_follows_live_bearer_and_restores(aura: bool) -> None:
     for current in (session, restored, replayed):
         state = current.lifecycle.state
         assert state is not None
+        assert state.stage is GameLifecycleStage.BATTLE
         assert state.army_definitions[0].enhancement_assignments == original_assignment
         bundle = object.__getattribute__(current.lifecycle, "_runtime_content_bundle")
         assert type(bundle) is RuntimeContentBundle
@@ -522,6 +527,38 @@ def test_split_enhancement_follows_live_bearer_and_restores(aura: bool) -> None:
                 )
             )
             assert WeaponKeyword.LANCE not in modified.keywords
+    else:
+        # Targetin Squigs adds a persisting grant. The aura is a different runtime hook.
+        live = replayed.lifecycle.state
+        assert live is not None
+        live_effects = [effect.to_payload() for effect in live.persisting_effects]
+        assert original_effects
+        assert all(effect in live_effects for effect in original_effects)
+
+        # Isolate the enhancement application boundary after real battle-end expiry.
+        terminal = GameState.from_payload(live.to_payload())
+        expired = terminal.expire_persisting_effects_at_boundary(
+            EffectExpirationBoundary.battle_end()
+        )
+        expired_payloads = [effect.to_payload() for effect in expired]
+        assert all(effect in expired_payloads for effect in original_effects)
+        terminal.stage = GameLifecycleStage.COMPLETE
+        terminal.active_player_id = None
+        terminal.battle_phase_index = None
+        decisions = DecisionController.from_payload(
+            replayed.lifecycle.decision_controller.to_payload()
+        )
+        before = terminal.to_payload()
+        history = decisions.to_payload()
+        assert any(
+            event.event_type == "enhancement_effects_applied"
+            for event in decisions.event_log.records
+        )
+        apply_enhancement_effects(
+            state=terminal, registry=bundle.enhancement_effect_registry, decisions=decisions
+        )
+        assert terminal.to_payload() == before
+        assert decisions.to_payload() == history
 
 
 def test_split_deadly_demise_enhancement_keeps_source_and_current_model_ownership() -> None:

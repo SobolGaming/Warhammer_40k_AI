@@ -29,7 +29,7 @@ from warhammer40k_core.engine.effects import PersistingEffect
 from warhammer40k_core.engine.enhancement_bearers import enhancement_bearer_unit
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.model_keyword_grants import grant_unit_keywords
-from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.phase import GameLifecycleError, GameLifecycleStage
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 
 if TYPE_CHECKING:
@@ -449,7 +449,7 @@ def apply_enhancement_effects(
         raise GameLifecycleError("Enhancement effect application requires a registry.")
     if type(decisions) is not DecisionController:
         raise GameLifecycleError("Enhancement effect application requires DecisionController.")
-    if not registry.bindings:
+    if state.stage is GameLifecycleStage.COMPLETE or not registry.bindings:
         return
 
     updated_armies: list[ArmyDefinition] = []

@@ -36388,10 +36388,22 @@
         "data/source_audits/ci64_provenance_v1/stage2-counteroffensive-test-transition-v1.json",
         "data/source_audits/ci64_provenance_v1/stage2-melee-restore-test-transition-v1.json",
         "data/source_audits/ci64_provenance_v1/stage2-fight-reroll-test-transition-v1.json",
-        "data/source_audits/ci64_provenance_v1/terminal-normal-move-restore-test-transition-v1.json"
+        "data/source_audits/ci64_provenance_v1/terminal-restore-test-transition-v1.json"
       ],
       "owners": [
         "*"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "terminal-enhancement-restore": {
+      "paths": [
+        "src/warhammer40k_core/engine/enhancement_effects.py"
+      ],
+      "owners": [
+        "@module",
+        "apply_enhancement_effects"
       ],
       "families": [],
       "sensitive": false,
