@@ -1,0 +1,46 @@
+{
+  "schema": "finite-terminal-restore-test-transition-v1",
+  "base": "545d5556c279f88ffaaa897941245ca093e8e9f6",
+  "retained_fight_reroll_sha256": "9b48614e7f5b8831a1e1b5ba21d1791b9cbc0ddc5055d9de3a14bf6d053c5ab6",
+  "runtime_fingerprint": "d25f92885e6ee2ccfd086327b911104a7c1daa1c4ec5810e0760bd81942b6d99",
+  "source": {
+    "src/warhammer40k_core/engine/normal_move_history.py": {
+      "before": "b0a075244d93ce53a63aec7601d011c6a3c56dd00ec8481a5ca15b6a10b3be97",
+      "after": "fa0ca4f925d84710129b1a3cfd0486d26a81198c79c9a2e95cf48db196440136"
+    },
+    "src/warhammer40k_core/engine/enhancement_effects.py": {
+      "before": "f9d57d77e23986663afd819c2c02dad4efa9d968df84f2049e13ee78125351fe",
+      "after": "eec6375fa971380343c49cc32d6870076905fe63fa6eb73e2fd490156dd4e730"
+    }
+  },
+  "test": {
+    "tests/rules/section09/test_restrictions.py": {
+      "before": {
+        "mode": "100644",
+        "blob_sha1": "d99a8ed9fd756e2f2d20cea5b348a461d7866c85",
+        "sha256": "ed2a8c06d93ebf22826ae3f8a28845dfc3cc9f6d369b4139a1f1cffd0a4c1b4d",
+        "bytes": 7315
+      },
+      "after": {
+        "mode": "100644",
+        "blob_sha1": "a54e3811b40d5609aa58d8346dedc11b6abc3576",
+        "sha256": "a78e29afa1b6b79118a8deb2e212a19038e7103fa44dcfaed01d545ef5426a99",
+        "bytes": 8813
+      }
+    },
+    "tests/rules/rules01/unit/test_unit_splitting.py": {
+      "before": {
+        "mode": "100644",
+        "blob_sha1": "377d8c71af28c3a81a361d43e32ffc47811d2c8e",
+        "sha256": "420e8bc06b39dd925e10a9b7797b1f075c2c71be504fbaf5610aaa94c5ee4ff8",
+        "bytes": 26331
+      },
+      "after": {
+        "mode": "100644",
+        "blob_sha1": "d3c92a7a026e1385ebf7a4bb7c0d6adc8501504d",
+        "sha256": "0aac1b3c7ea735442fc8380700e2b7ffdbb04aa22a6fb586cc89f8dd40b9c06c",
+        "bytes": 28216
+      }
+    }
+  }
+}

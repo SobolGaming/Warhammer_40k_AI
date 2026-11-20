@@ -150,8 +150,11 @@ def validate_normal_move_state_consistency(
     event_records: tuple[EventRecord, ...],
     decision_records: tuple[DecisionRecord, ...],
 ) -> None:
-    if state.normal_move_states and state.stage is not GameLifecycleStage.BATTLE:
-        raise GameLifecycleError("normal_move_states require battle stage.")
+    if state.normal_move_states and state.stage not in (
+        GameLifecycleStage.BATTLE,
+        GameLifecycleStage.COMPLETE,
+    ):
+        raise GameLifecycleError("normal_move_states require battle or complete stage.")
     for normal_move_state in state.normal_move_states:
         views = current_rules_unit_views_for_canonical_identity(
             state=state,

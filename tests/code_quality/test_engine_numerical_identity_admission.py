@@ -208,7 +208,29 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         )
     )
     assert melee_restore["runtime_fingerprint"] == reroll_base_manifest["fingerprint"]
-    assert reroll["runtime_fingerprint"] == _record(MANIFEST)["fingerprint"]
+    terminal = _record(selection.TERMINAL_RESTORE_TRANSITION)
+    terminal_base_manifest = json.loads(
+        subprocess.check_output(
+            ["git", "show", selection.TERMINAL_RESTORE_BASE + ":" + MANIFEST], cwd=ROOT
+        )
+    )
+    assert reroll["runtime_fingerprint"] == terminal_base_manifest["fingerprint"]
+    assert terminal["runtime_fingerprint"] == _record(MANIFEST)["fingerprint"]
+    for terminal_owner in selection.TERMINAL_RESTORE_OWNERS:
+        assert (
+            terminal["test"][terminal_owner]["before"]
+            == _record(sharding.CUTOVER_PATH)["active_files"][terminal_owner]
+        )
+        assert terminal_owner in active_files
+        assert sum(terminal_owner in group for group in groups) == 1
+    for terminal_source in selection.TERMINAL_RESTORE_SOURCES:
+        terminal_source_before = subprocess.check_output(
+            ["git", "show", selection.TERMINAL_RESTORE_BASE + ":" + terminal_source], cwd=ROOT
+        )
+        assert (
+            terminal["source"][terminal_source]["before"]
+            == hashlib.sha256(terminal_source_before).hexdigest()
+        )
     assert reroll["test"][owner]["before"] == melee_restore["test"][owner]["after"]
     for source in (selection.STAGE2_FIGHT_REROLL_SOURCE, selection.STAGE2_FIGHT_REROLL_FIXTURE):
         source_before = subprocess.check_output(

@@ -952,13 +952,14 @@
             },
             {
               "node": "tests/rules/section09/test_restrictions.py::test_normal_move_completion_records_actual_once_per_phase_history",
-              "function_ast_sha256": "a65649ed79e5f064231f6702c0029113485171aa992508fece7be654e511f2ff",
+              "function_ast_sha256": "c54da804ea49ba93382d8026b77db9c603ff00b729bbdfffd36b12089781f0a9",
               "assertions": [
                 "assert len(state.normal_move_states) == 1",
                 "assert record.unit_instance_id == unit.unit_instance_id",
                 "assert record.phase is BattlePhase.MOVEMENT",
                 "assert record.source_kind is NormalMoveSourceKind.MOVEMENT_PHASE_ACTION",
-                "assert tuple(state.normal_move_states) == before"
+                "assert tuple(state.normal_move_states) == before",
+                "assert checkpoint.normal_move_states == [record]"
               ]
             }
           ],
