@@ -7,8 +7,16 @@ Sixteen authentication cases are bookkeeping, separate from semantic cases.
 
 Definitions are selected native supported datasheets, prepared once and checked
 for mutation. Scenarios always create fresh mutable units, ledgers, battlefield
-and decisions. Tests begin at the existing target, cost, roll, attack or movement
-owner. They do not play mustering, setup, preceding phases or a complete game.
+and decisions. The native datasheet scenarios begin at the existing target,
+cost, roll, attack or movement owner.
+
+The Counteroffensive viewer regression is the exception. It starts a four-unit
+session with synthetic profiles and drives setup, deployment, Movement, Charge
+and the opening Fight activation through the session facade. It checks decline
+and use at the viewer-issued request, then restores and replays each branch.
+The separate native Cavalcade qualification starts from an archived round-four
+Fight checkpoint.
+
 SMOKE/TITANIC, cost grants, critical thresholds and retention permissions are
 explicit constructed supplements when used. Native data, geometry and producer
 admission are distinguished from those contracts.

@@ -56,6 +56,26 @@
         }
       }
     },
+    "tests/rules/section15/README.md": {
+      "before_sha256": "cdc59adf31601d4f35db03f5f77f684d225b3b6725b769f6b62ebc9f4da15327",
+      "after_sha256": "86ebd2cd411a7ae8d4721fc8b9cab6230ad9232a968670d57615b75886b07d96",
+      "owners": {
+        "@document": {
+          "before": "cdc59adf31601d4f35db03f5f77f684d225b3b6725b769f6b62ebc9f4da15327",
+          "after": "86ebd2cd411a7ae8d4721fc8b9cab6230ad9232a968670d57615b75886b07d96"
+        }
+      }
+    },
+    "tests/rules/section15/coverage.json": {
+      "before_sha256": "f355401d2bff6db71ddd23fedcdf80e1daeb89a3f80dbef126cc9bab83a15f85",
+      "after_sha256": "f0ec199ad3e771dfeac5f346dbbfa7814ff5a6ce8933903a85f9c6cad7ee11ac",
+      "owners": {
+        "@document": {
+          "before": "f355401d2bff6db71ddd23fedcdf80e1daeb89a3f80dbef126cc9bab83a15f85",
+          "after": "f0ec199ad3e771dfeac5f346dbbfa7814ff5a6ce8933903a85f9c6cad7ee11ac"
+        }
+      }
+    },
     "tests/rules/section15/test_reactions.py": {
       "before_sha256": "907dfbefca3cfba251d180d59c6022c8e6c929855c10b64a0fcda9c6458cb49a",
       "after_sha256": "44cf2a6b02eb1df66599b24b23b35450ac7a83dd881eada2bb26f492e1b6e9bb",
@@ -115,6 +135,26 @@
       ],
       "selected_families": [],
       "rationale": "Verify that the Section 15 successor is confined to the existing shard and authenticate the original file and required predecessor.",
+      "source_obligation": "Core 15.12 allows the opponent of the active player to spend two CP immediately after an enemy unit fights, selecting an eligible friendly unit to fight next.",
+      "unchanged_work": "The exact base runtime fingerprint, dependency lock, and workload selectors are used to verify the existing adapter, Fight, and replay behavior. The Section 15 opponent-turn case now exercises both decisions on a four-unit fixture."
+    },
+    "tests/rules/section15/README.md": {
+      "category": "rule_semantics",
+      "operations": [
+        "qualification40-exact-05d1838dfedd3985"
+      ],
+      "selected_families": [],
+      "rationale": "Describe the bounded four-unit viewer fixture and its setup-to-Fight scope.",
+      "source_obligation": "Core 15.12 allows the opponent of the active player to spend two CP immediately after an enemy unit fights, selecting an eligible friendly unit to fight next.",
+      "unchanged_work": "The exact base runtime fingerprint, dependency lock, and workload selectors are used to verify the existing adapter, Fight, and replay behavior. The Section 15 opponent-turn case now exercises both decisions on a four-unit fixture."
+    },
+    "tests/rules/section15/coverage.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "qualification40-exact-abe77ef9fc242550"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh the sixteen exact AST references to the extended Counteroffensive case while preserving each adopted source assertion.",
       "source_obligation": "Core 15.12 allows the opponent of the active player to spend two CP immediately after an enemy unit fights, selecting an eligible friendly unit to fight next.",
       "unchanged_work": "The exact base runtime fingerprint, dependency lock, and workload selectors are used to verify the existing adapter, Fight, and replay behavior. The Section 15 opponent-turn case now exercises both decisions on a four-unit fixture."
     },
