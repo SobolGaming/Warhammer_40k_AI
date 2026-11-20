@@ -36383,10 +36383,22 @@
       "paths": [
         "scripts/engine_numerical_identity_test_admission.py",
         "tests/code_quality/test_engine_numerical_identity_admission.py",
-        "data/source_audits/ci64_provenance_v1/engine-numerical-identity-test-transition-v1.json"
+        "data/source_audits/ci64_provenance_v1/engine-numerical-identity-test-transition-v1.json",
+        "data/source_audits/ci64_provenance_v1/stage2-fight-cover-test-transition-v1.json"
       ],
       "owners": [
         "*"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "stage2-fight-terrain-cover": {
+      "paths": [
+        "src/warhammer40k_core/engine/attack_sequence_damage_resolution.py"
+      ],
+      "owners": [
+        "_save_options_for_allocation"
       ],
       "families": [],
       "sensitive": false,

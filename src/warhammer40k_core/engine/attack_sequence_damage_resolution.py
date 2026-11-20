@@ -138,11 +138,15 @@ def _save_options_for_allocation(
         player_id=attack_context["attacker_player_id"],
         characteristics=(Characteristic.ARMOR_PENETRATION,),
     )
-    cover_result = _cover_for_allocated_model(
-        state=state,
-        ruleset_descriptor=ruleset_descriptor,
-        pool=pool,
-        allocated_model_id=allocated_model_id,
+    cover_result = (
+        _cover_for_allocated_model(
+            state=state,
+            ruleset_descriptor=ruleset_descriptor,
+            pool=pool,
+            allocated_model_id=allocated_model_id,
+        )
+        if pool.weapon_profile.range_profile.kind is RangeProfileKind.DISTANCE
+        else None
     )
     if has_weapon_keyword(
         pool.weapon_profile,

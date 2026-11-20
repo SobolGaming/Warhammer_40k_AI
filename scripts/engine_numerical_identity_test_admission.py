@@ -127,6 +127,14 @@ GAMEPLAY_CHARGE_OWNER = "tests/rules/section11/test_moves.py"
 GAMEPLAY_ESCAPE_OWNER = "tests/rules/section09/test_fall_back.py"
 GAMEPLAY_SORCERER_OWNER = "tests/factions/emperors_children/test_selected_consumers.py"
 
+STAGE2_FIGHT_TRANSITION = (
+    "data/source_audits/ci64_provenance_v1/stage2-fight-cover-test-transition-v1.json"
+)
+STAGE2_FIGHT_SHA256 = "23c95ee96c45787bf9c17ef4f03598cf50888f77ba6db8695610e2fd4c6183a2"
+STAGE2_FIGHT_BASE = "292bf8a55e184392f7d62d245707c8c1b7c0f9db"
+STAGE2_FIGHT_SOURCE = "src/warhammer40k_core/engine/attack_sequence_damage_resolution.py"
+STAGE2_FIGHT_OWNER = "tests/rules/section05/test_allocation_choices.py"
+
 
 type SourceSuccessors = dict[str, dict[str, str]]
 type TestSuccessors = dict[str, dict[str, object]]
@@ -175,6 +183,33 @@ def _gameplay_budget_successor(
         _checked_bytes(root, name, change["after"])
     successors = _selection_members(record["tests"], root)
     return record["runtime_fingerprint"], record["sources"], successors, raw
+
+
+def _stage2_fight_successor(root: Path) -> tuple[str, TestSuccessors, bytes]:
+    raw = _checked_bytes(root, STAGE2_FIGHT_TRANSITION, STAGE2_FIGHT_SHA256)
+    record = json.loads(raw, object_pairs_hook=_selection_object)
+    if (
+        record.keys()
+        != {
+            "schema",
+            "base",
+            "retained_gameplay_budget_sha256",
+            "runtime_fingerprint",
+            "source",
+            "test",
+        }
+        or record["schema"] != "finite-stage2-fight-cover-test-transition-v1"
+        or record["base"] != STAGE2_FIGHT_BASE
+        or record["retained_gameplay_budget_sha256"] != GAMEPLAY_BUDGET_SHA256
+        or set(record["source"]) != {STAGE2_FIGHT_SOURCE}
+        or set(record["test"]) != {STAGE2_FIGHT_OWNER}
+    ):
+        raise SystemExit("Stage 2 Fight Cover test transition membership differs.")
+    _checked_bytes(root, STAGE2_FIGHT_SOURCE, record["source"][STAGE2_FIGHT_SOURCE]["after"])
+    tests = _selection_members(
+        {STAGE2_FIGHT_OWNER: record["test"][STAGE2_FIGHT_OWNER]["after"]}, root
+    )
+    return record["runtime_fingerprint"], tests, raw
 
 
 def _retained_source(root: Path, name: str, digest: str, successors: SourceSuccessors) -> None:
@@ -455,6 +490,15 @@ def exact_movement_test_transition(
             root
         )
         raw += b"\0" + successor_raw
+    stage2_fight_tests: TestSuccessors = {}
+    _selection_no_links(root, root / STAGE2_FIGHT_TRANSITION)
+    if (root / STAGE2_FIGHT_TRANSITION).exists():
+        if not test_successors:
+            raise SystemExit(
+                "Stage 2 Fight Cover tests require the gameplay movement budget predecessor."
+            )
+        runtime, stage2_fight_tests, successor_raw = _stage2_fight_successor(root)
+        raw += b"\0" + successor_raw
     retained = _identity_test_transition(
         root,
         retained_cutover_sha256,
@@ -477,6 +521,7 @@ def exact_movement_test_transition(
             GAMEPLAY_SORCERER_OWNER,
         ):
             updated[name] = test_successors[name]
+    updated.update(stage2_fight_tests)
     return updated, {**added, **additions}, retained_raw + b"\0" + raw
 
 

@@ -1,124 +1,316 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "ad68d40e951ca75267974f73a19c163cfba08177",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0db5d76c980e2ba3b29d964b6890a6057878290b3aad06a3a518a67d9a529cc2",
-  "operation_map_sha256": "af528b5a5ead3f2316256e022963135f47345e5964ebba10f8f7587b2643e2b6",
+  "base": "292bf8a55e184392f7d62d245707c8c1b7c0f9db",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0289337d6418f72592110b1af66eddd31e8662c8c1f128d134ce60951382d4d0",
+  "operation_map_sha256": "34e584aae01ec14ab56adb8472817e3d6761558879df4fd9c8983a400f7d61e7",
   "changes": {
-    "docs/AI_POLICY_INTERFACE.md": {
-      "before_sha256": "fde8cca6226e6d3c06846eeb4fb5e0369e1e34e86d11a4081ad67012a4b45ebe",
-      "after_sha256": "90deb29323e88c3b495f59b436c740b09f400018f58d5966e6930f71b8e612cd",
+    "contracts/examples/persistence/session-persistence.json": {
+      "before_sha256": "2e5a5d3841f885585b5b9d565cef7ad27bf4fa977cbd05be2d41f5bb697408fb",
+      "after_sha256": "05dfef825054a444f7cf14e1a5b712dd305812e6ebedea7b3c3ea302124e5639",
       "owners": {
         "@document": {
-          "before": "fde8cca6226e6d3c06846eeb4fb5e0369e1e34e86d11a4081ad67012a4b45ebe",
-          "after": "90deb29323e88c3b495f59b436c740b09f400018f58d5966e6930f71b8e612cd"
+          "before": "2e5a5d3841f885585b5b9d565cef7ad27bf4fa977cbd05be2d41f5bb697408fb",
+          "after": "05dfef825054a444f7cf14e1a5b712dd305812e6ebedea7b3c3ea302124e5639"
         }
       }
     },
-    "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
-      "before_sha256": "bbc748ab6da88928b848a9063d419469ef8bee56b3f27dcc0fae8f3858cd9a3d",
-      "after_sha256": "0b7e71a88bc1ee0c8a1010126cc5ccbb0fe1209d038579615f1cebb645b9de34",
+    "contracts/examples/sessions/session-command-outcome.json": {
+      "before_sha256": "6ac46bc9a57e19309a80aaed98aa0578a2392a18094ead2a93271753cfae2bbd",
+      "after_sha256": "3a7e6f7e65ee306efb6c6b9d284ebdcd725c3987b3b72bdf536c1772a9a922fb",
       "owners": {
         "@document": {
-          "before": "bbc748ab6da88928b848a9063d419469ef8bee56b3f27dcc0fae8f3858cd9a3d",
-          "after": "0b7e71a88bc1ee0c8a1010126cc5ccbb0fe1209d038579615f1cebb645b9de34"
+          "before": "6ac46bc9a57e19309a80aaed98aa0578a2392a18094ead2a93271753cfae2bbd",
+          "after": "3a7e6f7e65ee306efb6c6b9d284ebdcd725c3987b3b72bdf536c1772a9a922fb"
+        }
+      }
+    },
+    "contracts/examples/sessions/session-command-started.json": {
+      "before_sha256": "0d17630997afa6832b4dfcf4cbfdfd7a31262889f5dc72debdb535ef20a33b6c",
+      "after_sha256": "b68067c03d34d802866a1c83454f6b2daa6579e30ae10825744d638067cb8ee6",
+      "owners": {
+        "@document": {
+          "before": "0d17630997afa6832b4dfcf4cbfdfd7a31262889f5dc72debdb535ef20a33b6c",
+          "after": "b68067c03d34d802866a1c83454f6b2daa6579e30ae10825744d638067cb8ee6"
+        }
+      }
+    },
+    "contracts/examples/sessions/session-metadata-created.json": {
+      "before_sha256": "671cb879e2fbe32b3e547c48323ae073c280ea4c58ff48f54315b571f7a24b76",
+      "after_sha256": "9fcd1ffd7b8a2ca1b7561f7324d65aaf4023f9c9e3584462d8dd5ea91fdd7980",
+      "owners": {
+        "@document": {
+          "before": "671cb879e2fbe32b3e547c48323ae073c280ea4c58ff48f54315b571f7a24b76",
+          "after": "9fcd1ffd7b8a2ca1b7561f7324d65aaf4023f9c9e3584462d8dd5ea91fdd7980"
+        }
+      }
+    },
+    "contracts/examples/support-profile-player-a-redacted.json": {
+      "before_sha256": "21306e8b5a0eb4a8588b10df76d8b27af42371bd68125ec58f4e30c75e5a5dc2",
+      "after_sha256": "eb8ce6a11839727a84270abcb7437f3c2ee1c85380f1e281f45a421584856fd7",
+      "owners": {
+        "@document": {
+          "before": "21306e8b5a0eb4a8588b10df76d8b27af42371bd68125ec58f4e30c75e5a5dc2",
+          "after": "eb8ce6a11839727a84270abcb7437f3c2ee1c85380f1e281f45a421584856fd7"
+        }
+      }
+    },
+    "contracts/examples/support-profile-player-b-redacted.json": {
+      "before_sha256": "8ee579e790ecb08798edec9715293de0f5fb16a0b05261fcb64071ebbadc4a98",
+      "after_sha256": "d1bfcbed7b13ef9989c10a60a942cd0e5f2692e6ba9958ce2797baa229468ceb",
+      "owners": {
+        "@document": {
+          "before": "8ee579e790ecb08798edec9715293de0f5fb16a0b05261fcb64071ebbadc4a98",
+          "after": "d1bfcbed7b13ef9989c10a60a942cd0e5f2692e6ba9958ce2797baa229468ceb"
+        }
+      }
+    },
+    "contracts/examples/support-profile.json": {
+      "before_sha256": "cdcfab639cec2a24d3f9c920be32372572946ffbce17dedf100723504b712270",
+      "after_sha256": "6061aa66dc9fa1cb35bad57b73ea281e29f1bd2ce8c6b77fa1bf4bc3aa348f16",
+      "owners": {
+        "@document": {
+          "before": "cdcfab639cec2a24d3f9c920be32372572946ffbce17dedf100723504b712270",
+          "after": "6061aa66dc9fa1cb35bad57b73ea281e29f1bd2ce8c6b77fa1bf4bc3aa348f16"
+        }
+      }
+    },
+    "contracts/manifest.json": {
+      "before_sha256": "673c9873c8c649dc052f0d4307098eca57070e16fdfb67d06db6e32ae5b10d5b",
+      "after_sha256": "7f55b3a96312fefd96da89a6d22b4e6f6d116355066081924fefce716d2d60a9",
+      "owners": {
+        "@document": {
+          "before": "673c9873c8c649dc052f0d4307098eca57070e16fdfb67d06db6e32ae5b10d5b",
+          "after": "7f55b3a96312fefd96da89a6d22b4e6f6d116355066081924fefce716d2d60a9"
+        }
+      }
+    },
+    "data/source_audits/ci64_provenance_v1/stage2-fight-cover-test-transition-v1.json": {
+      "before_sha256": null,
+      "after_sha256": "23c95ee96c45787bf9c17ef4f03598cf50888f77ba6db8695610e2fd4c6183a2",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "23c95ee96c45787bf9c17ef4f03598cf50888f77ba6db8695610e2fd4c6183a2"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "4e7d27d2e2e72dc0d1df879bd91b261c3c745f8c5de701f4ba81f4d6ae627726",
-      "after_sha256": "bfc19a87224779edfe907667e1934e3e23cf5d6f8875bdd1ed53711fc9924ae4",
+      "before_sha256": "bfc19a87224779edfe907667e1934e3e23cf5d6f8875bdd1ed53711fc9924ae4",
+      "after_sha256": "c60dbffcab2c82c1a99ca812d23096221f4ae80963c10f578c86d40eb19c68e5",
       "owners": {
         "@document": {
-          "before": "4e7d27d2e2e72dc0d1df879bd91b261c3c745f8c5de701f4ba81f4d6ae627726",
-          "after": "bfc19a87224779edfe907667e1934e3e23cf5d6f8875bdd1ed53711fc9924ae4"
+          "before": "bfc19a87224779edfe907667e1934e3e23cf5d6f8875bdd1ed53711fc9924ae4",
+          "after": "c60dbffcab2c82c1a99ca812d23096221f4ae80963c10f578c86d40eb19c68e5"
         }
       }
     },
-    "tests/support/cavalcade_native_fight.py": {
-      "before_sha256": null,
-      "after_sha256": "314eba5f6c3a83684daede4fcf10a5178c35625da468c5d1d90903e8ea319254",
+    "scripts/engine_numerical_identity_test_admission.py": {
+      "before_sha256": "374db1c51122a62cc2b50d353e721a394499e6c961558949d216ba95837a055a",
+      "after_sha256": "9464d089daa18c4a23538a254426e35e36fe7b452d2b4e32439f65d66d6e29a2",
       "owners": {
         "@module": {
-          "before": null,
-          "after": "43cdc27c102c96febe9979dc94b9cffba221c3d63c5fad394251a9920543734c"
+          "before": "b8b4481660332d45dafb27db0b8e4c7073647a3e493896fd8329532938e44312",
+          "after": "87e47b23c0e13b2474f3bec0d85eadf5255306fad40e333fa3355fd50e361144"
         },
-        "attack_evidence": {
+        "_stage2_fight_successor": {
           "before": null,
-          "after": "495caf8d5abf7630f6d48769518e818792490dfc4e549223bc421829d1c0c996"
+          "after": "a9d85e63914581fa8790bab6d3e929850207c69220addb81dbfe67cbff592d65"
         },
-        "fight_choice": {
-          "before": null,
-          "after": "cbabe27e121ca5867e20b28e4c6a44bcbf5d7afd4f96ad6d95a8713bb743ed7f"
-        },
-        "main": {
-          "before": null,
-          "after": "01cbf75e799879b83aeed4e682e75dc7144bb749239b4af5b0056480b347414e"
-        },
-        "melee_proposal": {
-          "before": null,
-          "after": "046052d42456eb8b2ad2a8ec6291e0f796af77926f7704c22893538f62e65503"
-        },
-        "model_outcomes": {
-          "before": null,
-          "after": "191c2ba29c1465dbd673f2c00fca870f76a0348d5190938e6030c74584a1ad66"
-        },
-        "object_payload": {
-          "before": null,
-          "after": "7570d0bc9711ca2781359f1b6890a82367935d94ce24e3072a7b5af7c6b51f2e"
-        },
-        "qualify": {
-          "before": null,
-          "after": "5353af0a36245b1711b99047ffc221d07be62fe9be3e44f5923cda56dc5d7d09"
-        },
-        "require_charge_boundary": {
-          "before": null,
-          "after": "f21c8b60be696d2bbfd130d8174eec10013f80edd85eb8f0b174ff7dfe24a0b2"
-        },
-        "respond": {
-          "before": null,
-          "after": "a045349a6957cf14ccae2be4a387c3f2db6f9d2636487e85ab069e9ee5d6ff21"
-        },
-        "view_evidence": {
-          "before": null,
-          "after": "4e30ad995f184c96c0fc6b545118189fee7cedf980c8832a016ebcc541970ba3"
+        "exact_movement_test_transition": {
+          "before": "e24109ea30d123bcc9c7d9231b94c347fb765668262219fc74f0f131b34d77c7",
+          "after": "527eec95496e2b5c6a9f81f8bc246e3bf176624b0f8d1923ad1a583098b3b69a"
+        }
+      }
+    },
+    "src/warhammer40k_core/_engine_build_manifest.json": {
+      "before_sha256": "d2169a688fcea8ba925945f264f6d7d9f839d8bcdbc12c51cf9b987f79705200",
+      "after_sha256": "449e63be8993cc8b6823f815374034f24f06ad8007704a1cb8b54950f0fd7d55",
+      "owners": {
+        "@document": {
+          "before": "d2169a688fcea8ba925945f264f6d7d9f839d8bcdbc12c51cf9b987f79705200",
+          "after": "449e63be8993cc8b6823f815374034f24f06ad8007704a1cb8b54950f0fd7d55"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/attack_sequence_damage_resolution.py": {
+      "before_sha256": "9f0087e3b4ac269e0f9bcc7c8c41526932395268612cc28bb5dfbcc00b5adb06",
+      "after_sha256": "c95ba2e149e781ccfe452836411646715ed3009fc0e7e497b9a727be9a87d4e6",
+      "owners": {
+        "_save_options_for_allocation": {
+          "before": "ed96a37a4eee5728abc3be11b9a7188a17a314d25c1f5d50bafd7808b5d77f24",
+          "after": "1d768066f1327f2e188a4c3df1f223705a5cec82016130b6086567761a566fb4"
+        }
+      }
+    },
+    "tests/code_quality/test_engine_numerical_identity_admission.py": {
+      "before_sha256": "c65ddb7b2faa85b7d3ab5762de17e874fc670953289b9613f563de33b2431036",
+      "after_sha256": "5ac72a7e7e9240b3ebaef1b10a189dc9f2ba3ccc1606949165c21ad1163afbee",
+      "owners": {
+        "test_identity_inventory_uses_current_twelve_shards_and_native_cohort": {
+          "before": "e53caa72047673bf4e5268b41eec28bbbe601c91350eb82376ed28e8ad94a82e",
+          "after": "6607fd7d2703b5765501cb4921d9459b14a5b9fd007a4be72ee6e93223c48302"
+        }
+      }
+    },
+    "tests/rules/section05/test_allocation_choices.py": {
+      "before_sha256": "70ac36cba184c58160afaa7022a827aedbd3babd3e03499e9c69ac4af057a08c",
+      "after_sha256": "fce257529859ae2e17a8cefa3ba01142380ca783d267bb56bedbaad5dfe84a16",
+      "owners": {
+        "test_native_save7_facade_completes_attack": {
+          "before": "9e4b5dc90484752e12147c9fe3f54c2d4445b99ca6634972db090af3f56eb674",
+          "after": "3cf64a0e204140d9954a048017aa726d1e5a02b52eb2db8b66015c6de3e437c1"
         }
       }
     }
   },
   "rows": {
-    "docs/AI_POLICY_INTERFACE.md": {
-      "category": "governance",
-      "operations": [],
+    "contracts/examples/persistence/session-persistence.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
       "selected_families": [],
-      "rationale": "Document the bounded native preserve Fight procedure, its proof and the remaining gameplay boundary.",
-      "source_obligation": "Use the native source-backed roster, equipped profiles, retained approach and whole-formation Charge, then bind the actual Fight response and current replay to the input checkpoint.",
-      "unchanged_work": "Packaged runtime, rules, catalogs, solver and cache policies, serialization and replay implementations, collected behavioral suite, retained measurement inputs and timing gates are unchanged. The operator uses the existing adapter and engine without a performance or full-game qualification claim."
+      "rationale": "Regenerate the contract example and bundle commitments affected by the published runtime identity.",
+      "source_obligation": "Apply retained Core 13.08 terrain Cover to ranged attacks at shared save preparation, preserving fail-closed runtime and test identity.",
+      "unchanged_work": "The existing ranged terrain and LOS algorithms, cache policies, saving throw and reroll rules, path validation, serialization and replay implementations, workload inventories, and budgets are preserved. The corrected melee rule branch bypasses a terrain query outside its scope."
     },
-    "docs/CORE_RULES_REMEDIATION_ROADMAP.md": {
-      "category": "governance",
-      "operations": [],
+    "contracts/examples/sessions/session-command-outcome.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
       "selected_families": [],
-      "rationale": "Link the new operator evidence from the current acceptance inventory without changing certification prerequisites.",
-      "source_obligation": "Use the native source-backed roster, equipped profiles, retained approach and whole-formation Charge, then bind the actual Fight response and current replay to the input checkpoint.",
-      "unchanged_work": "Packaged runtime, rules, catalogs, solver and cache policies, serialization and replay implementations, collected behavioral suite, retained measurement inputs and timing gates are unchanged. The operator uses the existing adapter and engine without a performance or full-game qualification claim."
+      "rationale": "Regenerate the contract example and bundle commitments affected by the published runtime identity.",
+      "source_obligation": "Apply retained Core 13.08 terrain Cover to ranged attacks at shared save preparation, preserving fail-closed runtime and test identity.",
+      "unchanged_work": "The existing ranged terrain and LOS algorithms, cache policies, saving throw and reroll rules, path validation, serialization and replay implementations, workload inventories, and budgets are preserved. The corrected melee rule branch bypasses a terrain query outside its scope."
+    },
+    "contracts/examples/sessions/session-command-started.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate the contract example and bundle commitments affected by the published runtime identity.",
+      "source_obligation": "Apply retained Core 13.08 terrain Cover to ranged attacks at shared save preparation, preserving fail-closed runtime and test identity.",
+      "unchanged_work": "The existing ranged terrain and LOS algorithms, cache policies, saving throw and reroll rules, path validation, serialization and replay implementations, workload inventories, and budgets are preserved. The corrected melee rule branch bypasses a terrain query outside its scope."
+    },
+    "contracts/examples/sessions/session-metadata-created.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate the contract example and bundle commitments affected by the published runtime identity.",
+      "source_obligation": "Apply retained Core 13.08 terrain Cover to ranged attacks at shared save preparation, preserving fail-closed runtime and test identity.",
+      "unchanged_work": "The existing ranged terrain and LOS algorithms, cache policies, saving throw and reroll rules, path validation, serialization and replay implementations, workload inventories, and budgets are preserved. The corrected melee rule branch bypasses a terrain query outside its scope."
+    },
+    "contracts/examples/support-profile-player-a-redacted.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate the contract example and bundle commitments affected by the published runtime identity.",
+      "source_obligation": "Apply retained Core 13.08 terrain Cover to ranged attacks at shared save preparation, preserving fail-closed runtime and test identity.",
+      "unchanged_work": "The existing ranged terrain and LOS algorithms, cache policies, saving throw and reroll rules, path validation, serialization and replay implementations, workload inventories, and budgets are preserved. The corrected melee rule branch bypasses a terrain query outside its scope."
+    },
+    "contracts/examples/support-profile-player-b-redacted.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate the contract example and bundle commitments affected by the published runtime identity.",
+      "source_obligation": "Apply retained Core 13.08 terrain Cover to ranged attacks at shared save preparation, preserving fail-closed runtime and test identity.",
+      "unchanged_work": "The existing ranged terrain and LOS algorithms, cache policies, saving throw and reroll rules, path validation, serialization and replay implementations, workload inventories, and budgets are preserved. The corrected melee rule branch bypasses a terrain query outside its scope."
+    },
+    "contracts/examples/support-profile.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate the contract example and bundle commitments affected by the published runtime identity.",
+      "source_obligation": "Apply retained Core 13.08 terrain Cover to ranged attacks at shared save preparation, preserving fail-closed runtime and test identity.",
+      "unchanged_work": "The existing ranged terrain and LOS algorithms, cache policies, saving throw and reroll rules, path validation, serialization and replay implementations, workload inventories, and budgets are preserved. The corrected melee rule branch bypasses a terrain query outside its scope."
+    },
+    "contracts/manifest.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate the contract example and bundle commitments affected by the published runtime identity.",
+      "source_obligation": "Apply retained Core 13.08 terrain Cover to ranged attacks at shared save preparation, preserving fail-closed runtime and test identity.",
+      "unchanged_work": "The existing ranged terrain and LOS algorithms, cache policies, saving throw and reroll rules, path validation, serialization and replay implementations, workload inventories, and budgets are preserved. The corrected melee rule branch bypasses a terrain query outside its scope."
+    },
+    "data/source_audits/ci64_provenance_v1/stage2-fight-cover-test-transition-v1.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "engine-numerical-identity-admission"
+      ],
+      "selected_families": [],
+      "rationale": "Admit one byte-pinned regression owner for the exact successor runtime and validate its retained preimages and shard membership.",
+      "source_obligation": "Apply retained Core 13.08 terrain Cover to ranged attacks at shared save preparation, preserving fail-closed runtime and test identity.",
+      "unchanged_work": "The existing ranged terrain and LOS algorithms, cache policies, saving throw and reroll rules, path validation, serialization and replay implementations, workload inventories, and budgets are preserved. The corrected melee rule branch bypasses a terrain query outside its scope."
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Register the finite native Fight operator while preserving the existing Charge and approach operation.",
-      "source_obligation": "Use the native source-backed roster, equipped profiles, retained approach and whole-formation Charge, then bind the actual Fight response and current replay to the input checkpoint.",
-      "unchanged_work": "Packaged runtime, rules, catalogs, solver and cache policies, serialization and replay implementations, collected behavioral suite, retained measurement inputs and timing gates are unchanged. The operator uses the existing adapter and engine without a performance or full-game qualification claim."
+      "rationale": "Register the shared save-preparation owner and finite admission artifact for performance applicability.",
+      "source_obligation": "Apply retained Core 13.08 terrain Cover to ranged attacks at shared save preparation, preserving fail-closed runtime and test identity.",
+      "unchanged_work": "The existing ranged terrain and LOS algorithms, cache policies, saving throw and reroll rules, path validation, serialization and replay implementations, workload inventories, and budgets are preserved. The corrected melee rule branch bypasses a terrain query outside its scope."
     },
-    "tests/support/cavalcade_native_fight.py": {
-      "category": "measured_workload",
+    "scripts/engine_numerical_identity_test_admission.py": {
+      "category": "rule_semantics",
       "operations": [
-        "native-v995-fight-operator"
+        "engine-numerical-identity-admission"
       ],
       "selected_families": [],
-      "rationale": "Exercise a separate, uncollected preserve-arm operation through ordinary viewer submissions and exact current-version replay.",
-      "source_obligation": "Use the native source-backed roster, equipped profiles, retained approach and whole-formation Charge, then bind the actual Fight response and current replay to the input checkpoint.",
-      "unchanged_work": "Packaged runtime, rules, catalogs, solver and cache policies, serialization and replay implementations, collected behavioral suite, retained measurement inputs and timing gates are unchanged. The operator uses the existing adapter and engine without a performance or full-game qualification claim."
+      "rationale": "Admit one byte-pinned regression owner for the exact successor runtime and validate its retained preimages and shard membership.",
+      "source_obligation": "Apply retained Core 13.08 terrain Cover to ranged attacks at shared save preparation, preserving fail-closed runtime and test identity.",
+      "unchanged_work": "The existing ranged terrain and LOS algorithms, cache policies, saving throw and reroll rules, path validation, serialization and replay implementations, workload inventories, and budgets are preserved. The corrected melee rule branch bypasses a terrain query outside its scope."
+    },
+    "src/warhammer40k_core/_engine_build_manifest.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "source-record"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate runtime resource byte commitments for the bounded Core 13.08 guard.",
+      "source_obligation": "Apply retained Core 13.08 terrain Cover to ranged attacks at shared save preparation, preserving fail-closed runtime and test identity.",
+      "unchanged_work": "The existing ranged terrain and LOS algorithms, cache policies, saving throw and reroll rules, path validation, serialization and replay implementations, workload inventories, and budgets are preserved. The corrected melee rule branch bypasses a terrain query outside its scope."
+    },
+    "src/warhammer40k_core/engine/attack_sequence_damage_resolution.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "stage2-fight-terrain-cover"
+      ],
+      "selected_families": [],
+      "rationale": "Gate the existing terrain query at shared allocation save preparation on the weapon range kind.",
+      "source_obligation": "Apply retained Core 13.08 terrain Cover to ranged attacks at shared save preparation, preserving fail-closed runtime and test identity.",
+      "unchanged_work": "The existing ranged terrain and LOS algorithms, cache policies, saving throw and reroll rules, path validation, serialization and replay implementations, workload inventories, and budgets are preserved. The corrected melee rule branch bypasses a terrain query outside its scope."
+    },
+    "tests/code_quality/test_engine_numerical_identity_admission.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "engine-numerical-identity-admission"
+      ],
+      "selected_families": [],
+      "rationale": "Admit one byte-pinned regression owner for the exact successor runtime and validate its retained preimages and shard membership.",
+      "source_obligation": "Apply retained Core 13.08 terrain Cover to ranged attacks at shared save preparation, preserving fail-closed runtime and test identity.",
+      "unchanged_work": "The existing ranged terrain and LOS algorithms, cache policies, saving throw and reroll rules, path validation, serialization and replay implementations, workload inventories, and budgets are preserved. The corrected melee rule branch bypasses a terrain query outside its scope."
+    },
+    "tests/rules/section05/test_allocation_choices.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "save7-exact-14272f7eb5f29567"
+      ],
+      "selected_families": [],
+      "rationale": "Extend the existing native Fight and Shooting facade save cases to observe whether they invoke the real terrain query.",
+      "source_obligation": "Apply retained Core 13.08 terrain Cover to ranged attacks at shared save preparation, preserving fail-closed runtime and test identity.",
+      "unchanged_work": "The existing ranged terrain and LOS algorithms, cache policies, saving throw and reroll rules, path validation, serialization and replay implementations, workload inventories, and budgets are preserved. The corrected melee rule branch bypasses a terrain query outside its scope."
     }
   },
   "milestone": "ordinary",

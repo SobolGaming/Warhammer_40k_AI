@@ -186,16 +186,27 @@ def test_native_bloodletters_unit_and_allocation_roundtrip(
 def test_native_save7_facade_completes_attack(
     selected_army_source_index: Path | None, phase: str, target_sheet: str
 ) -> None:
+    from unittest.mock import patch
+
     from tests.save7_allocation_helpers import native_attack_session
     from tests.support.section04_fixtures import finish_attacks
     from tests.support.section05_sequence import payloads
+    from warhammer40k_core.engine import attack_sequence_damage_resolution
+    from warhammer40k_core.engine.attack_sequence_hazardous import _cover_for_allocated_model
     from warhammer40k_core.engine.damage_allocation import unit_by_id
     from warhammer40k_core.engine.phase import BattlePhase
 
-    session, original = native_attack_session(
-        selected_army_source_index, BattlePhase(phase), target_sheet=target_sheet
-    )
-    finish_attacks(session)
+    # Observe the real terrain query at the shared save preparation boundary.
+    with patch.object(
+        attack_sequence_damage_resolution,
+        "_cover_for_allocated_model",
+        wraps=_cover_for_allocated_model,
+    ) as terrain_cover:
+        session, original = native_attack_session(
+            selected_army_source_index, BattlePhase(phase), target_sheet=target_sheet
+        )
+        finish_attacks(session)
+    assert terrain_cover.called is (phase == "shooting")
     decisions = session.lifecycle.decision_controller
     assert payloads(decisions, "attack_sequence_completed")
     steps = payloads(decisions, "attack_sequence_step")
