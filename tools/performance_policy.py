@@ -1249,6 +1249,31 @@ def validate_comparison(
 ) -> list[dict[str, object]]:
     from tools import performance_reconstruction_campaign as campaign
 
+    registered_fixture = specification.get("registered_full_game_fixture")
+    if registered_fixture is not None:
+        root = Path(__file__).resolve().parents[1]
+        profiles = object_value(read_object(root / MAP)["full_game_profiles"])
+        driver = specification["driver"]
+        if not isinstance(registered_fixture, str) or not isinstance(driver, str):
+            raise ValueError("Compared full-game workload lacks a typed registered fixture.")
+        profile = object_value(profiles.get(driver))
+        fixture_path = root / registered_fixture
+        if (
+            profile["fixture"] != registered_fixture
+            or profile["workload_id"] != specification["workload_id"]
+            or fixture_path.is_symlink()
+            or not fixture_path.is_file()
+            or not fixture_path.resolve().is_relative_to(root)
+        ):
+            raise ValueError("Compared full-game workload lacks its registered fixture.")
+        fixture_sha256 = digest(fixture_path.read_bytes())
+        if (
+            digest(git(root, "show", f"{base}:{registered_fixture}")) != fixture_sha256
+            or digest(git(root, "show", f"{base}:{driver}")) != expected_inputs["workload_sha256"]
+        ):
+            raise ValueError("Registered full-game fixture or driver differs between revisions.")
+        expected_inputs = {**expected_inputs, "fixture_sha256": fixture_sha256}
+
     if campaign.required(base=base, runtime_id=runtime_id, family=family) or (
         report.get("schema") == campaign.SCHEMA or "ordered_pairs" in report
     ):

@@ -508,28 +508,16 @@ def _validate_current(root: Path, base_ref: str, *, pr_head: str | None) -> dict
                 else None
             )
         )
-        registered_profile = object_value(operation_map.get("full_game_profiles", {})).get(driver)
+        fixture_digest = canonical_digest(
+            {
+                name: value
+                for name, value in measured_inputs.items()
+                if name.startswith(("tests/", "scripts/"))
+                and not name.startswith("tests/code_quality/")
+            }
+        )
         if tool_inputs is not None:
             fixture_digest = str(tool_inputs["common_sha256"])
-        elif registered_profile is not None:
-            profile = object_value(registered_profile)
-            fixture = profile["fixture"]
-            if (
-                profile["workload_id"] != specification["workload_id"]
-                or not isinstance(fixture, str)
-                or fixture not in measured_inputs
-            ):
-                raise ValueError("Compared full-game workload lacks its registered fixture.")
-            fixture_digest = measured_inputs[fixture]
-        else:
-            fixture_digest = canonical_digest(
-                {
-                    name: value
-                    for name, value in measured_inputs.items()
-                    if name.startswith(("tests/", "scripts/"))
-                    and not name.startswith("tests/code_quality/")
-                }
-            )
         approved_failures.extend(
             validate_comparison(
                 comparison,

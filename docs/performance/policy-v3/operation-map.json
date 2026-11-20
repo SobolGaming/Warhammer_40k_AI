@@ -5,6 +5,7 @@
     "cavalcade-authority-comparison": {
       "driver": "scripts/measure_cavalcade_full_game.py",
       "historical_workload_reference": "scripts/fixtures/cavalcade_full_game_v1.json",
+      "registered_full_game_fixture": "scripts/fixtures/cavalcade_full_game_v1.json",
       "cases": ["setup-to-game-completed"],
       "samples_per_case": 1,
       "budget_profile": "current-change-relative-v1",
@@ -262,6 +263,13 @@
     }
   },
   "operations": {
+    "cavalcade-comparison-fixture-binding": {
+      "paths": ["tools/performance_policy.py"],
+      "owners": ["validate_comparison"],
+      "families": [],
+      "mandatory": true,
+      "sensitive": false
+    },
     "cavalcade-authority-admission": {
       "paths": [
         "scripts/engine_numerical_identity_test_admission.py",
