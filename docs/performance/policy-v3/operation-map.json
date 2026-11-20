@@ -36001,6 +36001,17 @@
       "sensitive": false,
       "mandatory": true
     },
+    "native-v995-fight-operator": {
+      "paths": [
+        "tests/support/cavalcade_native_fight.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
     "native-v995-prefix-regressions": {
       "paths": [
         "tests/support/cavalcade_v995.py",
