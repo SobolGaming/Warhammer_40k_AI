@@ -24,7 +24,7 @@ from warhammer40k_core.engine.battle_shock_outcome_history import outcome_activa
 from warhammer40k_core.engine.battle_shock_resolution_authority import (
     parse_battle_shock_resolution_authority,
 )
-from warhammer40k_core.engine.decision_record import DecisionRecord
+from warhammer40k_core.engine.decision_record import DecisionRecord, DecisionRecordPayload
 from warhammer40k_core.engine.decision_request import (
     DecisionOption,
     DecisionRequest,
@@ -55,6 +55,7 @@ from warhammer40k_core.engine.mortal_wound_model_allocation import (
     mortal_wound_resolution_source_context,
 )
 from warhammer40k_core.engine.mutation_decision_authority import (
+    decision_event_payload_matches,
     validate_mutation_decision_closure,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
@@ -620,21 +621,34 @@ def _placement_producer_identifies_provider(
 ) -> bool:
     """Authenticate a placement from its recorded selection producer, not child routing."""
 
+    records = context.decisions.records
+    producers_by_id: dict[str, list[tuple[DecisionRecord, DecisionRecordPayload]]] = {}
+    for record in records:
+        if record.request.decision_type == SELECT_HEALING_MODEL_DECISION_TYPE:
+            producers_by_id.setdefault(record.record_id, []).append((record, record.to_payload()))
+    if not producers_by_id:
+        return False
+
     events = context.decisions.event_log.records
     claims = 0
     for producer_index, producer_event in enumerate(events):
-        if producer_event.event_type != "decision_recorded":
+        if producer_event.event_type != "decision_recorded" or not isinstance(
+            producer_event.payload, dict
+        ):
             continue
+        record_id = producer_event.payload.get("record_id")
+        if not isinstance(record_id, str):
+            continue
+        # IDs narrow the join. Full payload equality and exactly one match still
+        # authenticate the candidate, even if a malformed ledger repeats an ID.
         producer_records = tuple(
             record
-            for record in context.decisions.records
-            if record.to_payload() == producer_event.payload
+            for record, payload in producers_by_id.get(record_id, ())
+            if decision_event_payload_matches(producer_event.payload, payload)
         )
         if len(producer_records) != 1:
             continue
         producer = producer_records[0]
-        if producer.request.decision_type != SELECT_HEALING_MODEL_DECISION_TYPE:
-            continue
         root_effect = healing_effect_from_request(request=producer.request)
         initial_effect_payload = root_effect.to_payload() | {"resolved_steps": []}
         marker_matches = tuple(
@@ -690,7 +704,7 @@ def _placement_producer_identifies_provider(
             raise GameLifecycleError("Daemonic Manifestation pending evidence drifted.")
         validate_mutation_decision_closure(
             event_records=events,
-            decision_records=context.decisions.records,
+            decision_records=records,
             mutation_index=producer_index + 1,
             request_id=producer.request.request_id,
             result_id=producer.result.result_id,
@@ -708,7 +722,7 @@ def _placement_producer_identifies_provider(
         if child_event.event_type == "healing_step_resolved":
             _validate_completed_selection_step(
                 events=events,
-                decision_records=context.decisions.records,
+                decision_records=records,
                 event_index=producer_index + 1,
                 event=child_event,
                 effect=root_effect,
@@ -729,9 +743,7 @@ def _placement_producer_identifies_provider(
             for pending in context.decisions.queue.pending_requests
             if pending == child_request
         )
-        completed_matches = tuple(
-            record for record in context.decisions.records if record.request == child_request
-        )
+        completed_matches = tuple(record for record in records if record.request == child_request)
         if completed_matches:
             if len(completed_matches) != 1 or pending_matches:
                 raise GameLifecycleError("Daemonic Manifestation pending descendant drifted.")
@@ -748,7 +760,7 @@ def _placement_producer_identifies_provider(
                 phase_start=revival_phase_start_evidence(
                     state=context.state,
                     event_records=events,
-                    decision_records=context.decisions.records,
+                    decision_records=records,
                     target_unit_instance_id=root_effect.target_unit_instance_id,
                     before_event_index=producer_index + 1,
                 ),
@@ -759,7 +771,7 @@ def _placement_producer_identifies_provider(
                 )
             _validate_completed_placement_step(
                 events=events,
-                decision_records=context.decisions.records,
+                decision_records=records,
                 effect=root_effect,
                 model_id=model_id,
                 child_request=child_request,
@@ -787,7 +799,7 @@ def _placement_producer_identifies_provider(
             phase_start=revival_phase_start_evidence(
                 state=context.state,
                 event_records=events,
-                decision_records=context.decisions.records,
+                decision_records=records,
                 target_unit_instance_id=root_effect.target_unit_instance_id,
                 before_event_index=producer_index + 1,
             ),
