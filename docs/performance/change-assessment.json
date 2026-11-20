@@ -492,111 +492,111 @@
       }
     },
     "docs/performance/current/gameplay-movement-budget-dice-sustained.json": {
-      "after_sha256": "369180e448a186ff69e7d21f496232f2afea0263c26749a4273737f52416e293",
+      "after_sha256": "d7014d22d6bb1cc421deb20902ccac683a0abd21d9eb196fe9cb06622ae567d3",
       "before_sha256": null,
       "owners": {
         "@document": {
-          "after": "369180e448a186ff69e7d21f496232f2afea0263c26749a4273737f52416e293",
+          "after": "d7014d22d6bb1cc421deb20902ccac683a0abd21d9eb196fe9cb06622ae567d3",
           "before": null
         }
       }
     },
     "docs/performance/current/gameplay-movement-budget-dice.json": {
-      "after_sha256": "ce654e0015a8b850f27a124fc763289d92b74820a22625f29a96a81e1730e59f",
+      "after_sha256": "4c05e381e55a567a7f32e7c25ec91bf050e9dbbd88ae391d27392499120fbdc3",
       "before_sha256": null,
       "owners": {
         "@document": {
-          "after": "ce654e0015a8b850f27a124fc763289d92b74820a22625f29a96a81e1730e59f",
+          "after": "4c05e381e55a567a7f32e7c25ec91bf050e9dbbd88ae391d27392499120fbdc3",
           "before": null
         }
       }
     },
     "docs/performance/current/gameplay-movement-budget-external-contract.json": {
-      "after_sha256": "c9ef582bded476f48fca5424dbbf7d322f620182363f1b1632c8102e1e00b19c",
+      "after_sha256": "bbf27416e0019a68c5507118eb1b38c3cfe17b2738b2dbbf886fa499beaf7d6b",
       "before_sha256": null,
       "owners": {
         "@document": {
-          "after": "c9ef582bded476f48fca5424dbbf7d322f620182363f1b1632c8102e1e00b19c",
+          "after": "bbf27416e0019a68c5507118eb1b38c3cfe17b2738b2dbbf886fa499beaf7d6b",
           "before": null
         }
       }
     },
     "docs/performance/current/gameplay-movement-budget-movement.json": {
-      "after_sha256": "36e95866953d4c5e5cbcde5bd00c8524cfccbcd988a22ab3a67245e2938e6ae1",
+      "after_sha256": "c20f7977f07de1a07c2d61788cb6ad7a6880b77aa8da04d54910a727593e3d50",
       "before_sha256": null,
       "owners": {
         "@document": {
-          "after": "36e95866953d4c5e5cbcde5bd00c8524cfccbcd988a22ab3a67245e2938e6ae1",
+          "after": "c20f7977f07de1a07c2d61788cb6ad7a6880b77aa8da04d54910a727593e3d50",
           "before": null
         }
       }
     },
     "docs/performance/current/gameplay-movement-budget-player-boundary.json": {
-      "after_sha256": "296bbfa5268b33192120335343e09a664ea46386cbd17a21768ab0f6497678c2",
+      "after_sha256": "f891342ee5952e2d61ce39cd89e79ef81b6196625d15c0f9b63a81b127564dc1",
       "before_sha256": null,
       "owners": {
         "@document": {
-          "after": "296bbfa5268b33192120335343e09a664ea46386cbd17a21768ab0f6497678c2",
+          "after": "f891342ee5952e2d61ce39cd89e79ef81b6196625d15c0f9b63a81b127564dc1",
           "before": null
         }
       }
     },
     "docs/performance/current/gameplay-movement-budget-reconstruction.json": {
-      "after_sha256": "892e74b39e28db6ecc0ac6019e8bfa5c0e3828f324d935df0f28098bbfbcd4db",
+      "after_sha256": "90c06cfb62923a17fc2caca6cc14f30e0b54138b1ddf6f1f842daf42724f5aa2",
       "before_sha256": null,
       "owners": {
         "@document": {
-          "after": "892e74b39e28db6ecc0ac6019e8bfa5c0e3828f324d935df0f28098bbfbcd4db",
+          "after": "90c06cfb62923a17fc2caca6cc14f30e0b54138b1ddf6f1f842daf42724f5aa2",
           "before": null
         }
       }
     },
     "docs/performance/current/gameplay-movement-budget-setup.json": {
-      "after_sha256": "dfdf6c9ee9f83f3dca60848c2388256f89e70c21e2fc0bbb18c347258dc9bb77",
+      "after_sha256": "32aeb63572f3774a4485948d815b349aa39631de2915fcbc2cec7e547c556cb6",
       "before_sha256": null,
       "owners": {
         "@document": {
-          "after": "dfdf6c9ee9f83f3dca60848c2388256f89e70c21e2fc0bbb18c347258dc9bb77",
+          "after": "32aeb63572f3774a4485948d815b349aa39631de2915fcbc2cec7e547c556cb6",
           "before": null
         }
       }
     },
     "docs/performance/current/gameplay-movement-budget-shock-reconstruction.json": {
-      "after_sha256": "ef83b03c2adb0975ed929a6bf530bf37d9f929c06f742a279883c745fdb6a4e3",
+      "after_sha256": "d25e99cb8d508a805159055c882c5254f600099dc3594dbc31678110ae70d5bd",
       "before_sha256": null,
       "owners": {
         "@document": {
-          "after": "ef83b03c2adb0975ed929a6bf530bf37d9f929c06f742a279883c745fdb6a4e3",
+          "after": "d25e99cb8d508a805159055c882c5254f600099dc3594dbc31678110ae70d5bd",
           "before": null
         }
       }
     },
     "docs/performance/current/gameplay-movement-budget-visibility.json": {
-      "after_sha256": "11a34eaca088095a625cfdf734d9b295b0e6a774e3a4aaf37188acf8f4f75ed0",
+      "after_sha256": "8237bf8fb91092d59af608c9c647285b04a789d63343eb084134134a9cd5459c",
       "before_sha256": null,
       "owners": {
         "@document": {
-          "after": "11a34eaca088095a625cfdf734d9b295b0e6a774e3a4aaf37188acf8f4f75ed0",
+          "after": "8237bf8fb91092d59af608c9c647285b04a789d63343eb084134134a9cd5459c",
           "before": null
         }
       }
     },
     "docs/performance/policy-v3/gameplay-movement-budget-input-roles-v4.json": {
-      "after_sha256": "0ab5d2723559dfdf9b37de2eb967f4418d5c498fb35287e703729fe02d120653",
+      "after_sha256": "86f038384eb0dd98692caf908c48d6f5e847c4afbd2e4381b5ab99a6eff2df68",
       "before_sha256": null,
       "owners": {
         "@document": {
-          "after": "0ab5d2723559dfdf9b37de2eb967f4418d5c498fb35287e703729fe02d120653",
+          "after": "86f038384eb0dd98692caf908c48d6f5e847c4afbd2e4381b5ab99a6eff2df68",
           "before": null
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "after_sha256": "ce7033048f0fadd8f9460ab455a6a3f86a7d2a78bd4e73e58072adf4885636c3",
+      "after_sha256": "4e7d27d2e2e72dc0d1df879bd91b261c3c745f8c5de701f4ba81f4d6ae627726",
       "before_sha256": "a294bff4f8f64a700bc733b0d271ea41894395c4987fea4d7820834dcaa13af9",
       "owners": {
         "@document": {
-          "after": "ce7033048f0fadd8f9460ab455a6a3f86a7d2a78bd4e73e58072adf4885636c3",
+          "after": "4e7d27d2e2e72dc0d1df879bd91b261c3c745f8c5de701f4ba81f4d6ae627726",
           "before": "a294bff4f8f64a700bc733b0d271ea41894395c4987fea4d7820834dcaa13af9"
         }
       }
@@ -1277,6 +1277,16 @@
         }
       }
     },
+    "tests/code_quality/test_d07_geometry_containment.py": {
+      "after_sha256": "ec8082b0da104c49fed89455d9a85d49e14d8026c28bda1c56573981bcd8a4ae",
+      "before_sha256": "90aea0b53005e6f928a92eb9a9794f27402c51186a35c8a9b1ffc1d3aa4ddcc7",
+      "owners": {
+        "_changed_geometry": {
+          "after": "ed4eb45b509a72c34251f24cb71b406dadcb504ae7b4a116abc10d724902d653",
+          "before": "cb5ae30d96d8612884bd844380ab881972a597a0f56626d7d6d49ec63c8acc0e"
+        }
+      }
+    },
     "tests/code_quality/test_engine_numerical_identity_admission.py": {
       "after_sha256": "c65ddb7b2faa85b7d3ab5762de17e874fc670953289b9613f563de33b2431036",
       "before_sha256": "ecb1a5a8d0063afdb86e3feefb587d97eed26e21a1a97fed13e4c7981ac0fd11",
@@ -1490,11 +1500,11 @@
       }
     },
     "tools/performance_tool_inputs_v4.py": {
-      "after_sha256": "16a535331d48579236b5cc76f8649bfb870ce58ea067cad0d5d29c0276b5bfea",
+      "after_sha256": "865c65a51733d819d5fbf153d764b8758674828aaf48c92ff0cafe79125d3c80",
       "before_sha256": "420b6eef3af201f993aa2fa797054c66f7bc98e6d585873e01a4bc1ae031ce8f",
       "owners": {
         "@module": {
-          "after": "32b1bce391abbfe3afe30ceeca63380dca2f13eb5488d6b5ca3859ca99970bb0",
+          "after": "b8beaffc1c22741c580b06ec0018ef98e756f86eccfb590249021fc637eff087",
           "before": "658f20a34ac867726062f37d7bfe996535fa8fae0b030a90343fedfbbf62d66f"
         }
       }
@@ -1523,7 +1533,7 @@
   },
   "full_game": null,
   "milestone": "ordinary",
-  "operation_map_sha256": "e58d70312b731cda222e77b101e266b337353ea12396e180db83889cbdb79f5c",
+  "operation_map_sha256": "bc568d50f2e1f7003963ee1dfeae29bc5b7bbaaf9d0e1655a696316d3f44f45a",
   "policy": "rules-engine-performance-v3",
   "rows": {
     "README.md": {
@@ -2281,7 +2291,8 @@
     "src/warhammer40k_core/engine/battle_shock_source_family_authority.py": {
       "category": "rule_semantics",
       "operations": [
-        "cumulative-exact-013"
+        "cumulative-exact-013",
+        "gameplay-escape-battle-shock-source-authority"
       ],
       "rationale": "Use or qualify the active once-rounded budget and the numerical identity that binds its replay.",
       "selected_families": [
@@ -2553,6 +2564,16 @@
         "setup",
         "visibility"
       ],
+      "source_obligation": "Measure the submitted whole path once and compare it with the existing movement budget.",
+      "unchanged_work": "The same normal decision path, collision checks, terrain traversal and contact predicates run on the submitted geometry."
+    },
+    "tests/code_quality/test_d07_geometry_containment.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "ci69-qualification-e709350c1a267aaebeb5ffe034def0b7f25722eff69f7007f3bdbf993d1320f1"
+      ],
+      "rationale": "Pin and qualify the exact movement boundary and current behavior with the existing test suite.",
+      "selected_families": [],
       "source_obligation": "Measure the submitted whole path once and compare it with the existing movement budget.",
       "unchanged_work": "The same normal decision path, collision checks, terrain traversal and contact predicates run on the submitted geometry."
     },
