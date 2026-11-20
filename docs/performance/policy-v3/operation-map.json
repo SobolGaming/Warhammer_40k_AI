@@ -2,6 +2,14 @@
   "policy": "rules-engine-performance-v3",
   "schema": "reviewed-operation-map-v1",
   "families": {
+    "cavalcade-authority-comparison": {
+      "driver": "scripts/measure_cavalcade_full_game.py",
+      "historical_workload_reference": "scripts/fixtures/cavalcade_full_game_v1.json",
+      "cases": ["setup-to-game-completed"],
+      "samples_per_case": 1,
+      "budget_profile": "current-change-relative-v1",
+      "workload_id": "cavalcade-v995-setup-to-complete-v1"
+    },
     "visibility": {
       "driver": "scripts/measure_order78.py",
       "historical_workload_reference": "docs/performance/order78/head.json",
@@ -254,6 +262,43 @@
     }
   },
   "operations": {
+    "cavalcade-authority-admission": {
+      "paths": [
+        "scripts/engine_numerical_identity_test_admission.py",
+        "src/warhammer40k_core/_engine_build_manifest.json"
+      ],
+      "owners": ["@module", "@document", "exact_movement_test_transition"],
+      "families": [],
+      "mandatory": true,
+      "sensitive": false
+    },
+    "cavalcade-hot-authority": {
+      "paths": [
+        "src/warhammer40k_core/engine/battle_shock_hooks.py",
+        "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/battle_shock_outcome_authority.py",
+        "src/warhammer40k_core/engine/mutation_decision_authority.py",
+        "src/warhammer40k_core/engine/runtime_read_only.py",
+        "src/warhammer40k_core/engine/turn_end_hooks.py"
+      ],
+      "owners": [
+        "@module",
+        "BattleShockHookRegistry.pending_outcome_authority_for",
+        "BattleShockHookRegistry.validate_completed_outcome_authority",
+        "_placement_producer_identifies_provider",
+        "decision_event_payload_matches",
+        "_SnapshotReducers",
+        "_SnapshotReducers.__missing__",
+        "_typed_snapshot",
+        "RuntimeReadOnlySnapshot",
+        "RuntimeReadOnlySnapshot.__eq__",
+        "runtime_read_only_snapshot",
+        "TurnEndHookRegistry.candidates_for",
+        "validate_record_event_closure"
+      ],
+      "families": ["cavalcade-authority-comparison"],
+      "mandatory": true,
+      "sensitive": true
+    },
     "cavalcade-full-game-measurement": {
       "paths": [
         "scripts/measure_cavalcade_full_game.py",

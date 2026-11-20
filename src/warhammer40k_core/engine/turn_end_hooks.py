@@ -19,10 +19,8 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatus,
 )
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
-from warhammer40k_core.engine.timing_rule_candidates import (
-    TimingRuleCandidate,
-    rule_discovery_snapshot,
-)
+from warhammer40k_core.engine.runtime_read_only import runtime_read_only_snapshot
+from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 
 if TYPE_CHECKING:
@@ -152,7 +150,7 @@ class TurnEndHookRegistry:
 
     def candidates_for(self, context: TurnEndRequestContext) -> tuple[TimingRuleCandidate, ...]:
         candidates: list[TimingRuleCandidate] = []
-        before = rule_discovery_snapshot(context.state, context.decisions)
+        before: object | None = None
         for binding in self.bindings:
             if binding.trigger_kind is not context.trigger_kind:
                 continue
@@ -160,8 +158,14 @@ class TurnEndHookRegistry:
                 continue
             if binding.candidate_handler is None:
                 raise GameLifecycleError("End-rule providers require pure candidate discovery.")
+            if before is None:
+                before = runtime_read_only_snapshot(
+                    context.state, context.decisions, context.reaction_queue
+                )
             discovered = binding.candidate_handler(context)
-            if before != rule_discovery_snapshot(context.state, context.decisions):
+            if before != runtime_read_only_snapshot(
+                context.state, context.decisions, context.reaction_queue
+            ):
                 raise GameLifecycleError("End-rule discovery mutated engine state.")
             if type(discovered) is not tuple or any(
                 type(item) is not TimingRuleCandidate for item in discovered

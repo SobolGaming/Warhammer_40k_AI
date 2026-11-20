@@ -173,6 +173,27 @@ TERMINAL_RESTORE_OWNERS = (
 )
 
 
+CAVALCADE_AUTHORITY_RUNTIME = "4a144491e2ca85593c31db4a5a6318ccb32b4247c5d873b8d21471e0c019d64f"
+CAVALCADE_AUTHORITY_SOURCES = {
+    "src/warhammer40k_core/engine/battle_shock_hooks.py": (
+        "4f149f2664ac363aa9034c3924c43c7f1356c82dc27cdd2c32467b163ec4f99b"
+    ),
+    (
+        "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/"
+        "chaos_daemons/battle_shock_outcome_authority.py"
+    ): "15e25a9bc3587826c6a4be6928cb33ddcfa4a32460273aa7a7ae8ce9cccd76ba",
+    "src/warhammer40k_core/engine/mutation_decision_authority.py": (
+        "571fc86485651347b5ef326e8682c9d614db8a2b203a9cd61ec2f827da669ce7"
+    ),
+    "src/warhammer40k_core/engine/runtime_read_only.py": (
+        "9e10d35c6941da7e3bcdea3ec2efb4239a0a403763776c9dbddc5e6051984630"
+    ),
+    "src/warhammer40k_core/engine/turn_end_hooks.py": (
+        "83b66ad158b37385914be58f5a0c20365e0a1a852aab60fcec6f62ab05aa4bbc"
+    ),
+}
+
+
 type SourceSuccessors = dict[str, dict[str, str]]
 type TestSuccessors = dict[str, dict[str, object]]
 
@@ -712,6 +733,14 @@ def exact_movement_test_transition(
     terminal_restore = _terminal_restore_successor(root) if has_terminal_restore else None
     if terminal_restore is not None:
         runtime = terminal_restore[0]
+        # This successor changes runtime sources only. It uses the same
+        # authenticated behavioral selection as the terminal restore build.
+        authority_guard = root / "src/warhammer40k_core/engine/runtime_read_only.py"
+        _selection_no_links(root, authority_guard)
+        if authority_guard.exists():
+            for name, digest in CAVALCADE_AUTHORITY_SOURCES.items():
+                _checked_bytes(root, name, digest)
+            runtime = CAVALCADE_AUTHORITY_RUNTIME
     retained = _identity_test_transition(
         root,
         retained_cutover_sha256,
