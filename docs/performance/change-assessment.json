@@ -2,7 +2,7 @@
   "policy": "rules-engine-performance-v3",
   "base": "77b6f8f6fdcd88bb5eaff21495b28a2972213cbf",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:4a144491e2ca85593c31db4a5a6318ccb32b4247c5d873b8d21471e0c019d64f",
-  "operation_map_sha256": "2acbd3c39961fd64ebf85d149a4e0538bb9dc4cc5c0cf1b67c70fb4db3b64c6b",
+  "operation_map_sha256": "ece376d06f535fb5d87650b2858af5a06390627e911ef5cef37616443746a117",
   "changes": {
     "ci/quality_shards/all.txt": {
       "before_sha256": "e7f4976b613f0aca0b83cc574db654a6fcd9068600b8673708bfdacce46f81e2",
@@ -116,21 +116,21 @@
     },
     "docs/performance/current/cavalcade-authority-20261120.json": {
       "before_sha256": null,
-      "after_sha256": "5fb1c09fb10903145b8b2af2069d3907080118f75bafa068d9c6288db0db7b89",
+      "after_sha256": "4302e1e6a8d94535186fbc7cf971fc6cb93fa6694c2124e6b8b8860fa8dab962",
       "owners": {
         "@document": {
           "before": null,
-          "after": "5fb1c09fb10903145b8b2af2069d3907080118f75bafa068d9c6288db0db7b89"
+          "after": "4302e1e6a8d94535186fbc7cf971fc6cb93fa6694c2124e6b8b8860fa8dab962"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "a3068b83137a69f97ce3713aecde444fd83b169b26fdf681ad9d38f87404d936",
-      "after_sha256": "9243fc6ebe881cb0a13c45f8f40e1831294b0ffdcb6b4e9566502ca198ed76f1",
+      "after_sha256": "51f4962a9f381dc88fccf9f96ec2392791505395543a0ec4270a503f1de36cc9",
       "owners": {
         "@document": {
           "before": "a3068b83137a69f97ce3713aecde444fd83b169b26fdf681ad9d38f87404d936",
-          "after": "9243fc6ebe881cb0a13c45f8f40e1831294b0ffdcb6b4e9566502ca198ed76f1"
+          "after": "51f4962a9f381dc88fccf9f96ec2392791505395543a0ec4270a503f1de36cc9"
         }
       }
     },
@@ -274,6 +274,38 @@
         }
       }
     },
+    "tests/code_quality/test_engine_numerical_identity_admission.py": {
+      "before_sha256": "9f7f875c170bf61b2b0d1c38b187befc3d0e02c46aea657ca2efcaf1ff44cdf8",
+      "after_sha256": "0fbfabac41beec5aaee3c33b3d060514b358d7e697d70cc41761e58e1da14df1",
+      "owners": {
+        "test_identity_inventory_uses_current_twelve_shards_and_native_cohort": {
+          "before": "1343d0dbe2cf8c108dea4f1afad97167319e3097a4424b31e7a2d0a117be3622",
+          "after": "a994cc5ab64bbea15c38b224ce5a607160754911004ccd2027720b01f8c5c752"
+        }
+      }
+    },
+    "tools/performance_cavalcade_policy_successor.py": {
+      "before_sha256": null,
+      "after_sha256": "e9ac899110ec2e8e6e2815d9388f36d574f747e2796986606e71b932cb17fe39",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "922f110b29d4d9fb20c96bbc63dca5147acebf9c8abfacc880a8ae2753908c5a"
+        },
+        "_digest": {
+          "before": null,
+          "after": "f9f007bf7617289b42066986b9dd4c2d2b505b463ee1484c9f07cc8618636df0"
+        },
+        "cavalcade_policy_predecessor": {
+          "before": null,
+          "after": "4c9aae7e0b21869d46c83abc1858bccfda31c47e1e8ba5543fffa5ecb3449c6c"
+        },
+        "cavalcade_private_rng_predecessor": {
+          "before": null,
+          "after": "8c9239f760ea68e672995bae76c6b575af1a9652e7deb5444c798d6a18e2e275"
+        }
+      }
+    },
     "tools/performance_policy.py": {
       "before_sha256": "1f08fa40369b152857671482a20772bbbb94fdcb09a3b1f158435de1e649a67a",
       "after_sha256": "6da5eb9e49bb2e521afe322cae620dde2e40162fbdc7605326cde2d28f0dbf6c",
@@ -281,6 +313,24 @@
         "validate_comparison": {
           "before": "8740187761a62eda42176c5fd622a05702b10e780448b3c19125bd7c5ea8a17f",
           "after": "bb77936241350961e8970e2e53ae893c814c01a047bf5c94382b77a21c6c3fe8"
+        }
+      }
+    },
+    "tools/performance_private_randomness.py": {
+      "before_sha256": "62db9db823b80edcdcfa911ebb9008aa273da65534066292bef8fc183201837d",
+      "after_sha256": "13c53fe42ddfd21f6dad80a0e93c0e58afe5fb99b32ccfdb860ace0c4856ba71",
+      "owners": {
+        "@module": {
+          "before": "0a0339369a633007a2de7647868d49cc643a1d80e39483c8d392a7f90a5c1447",
+          "after": "72dab2650656e4a525a8169e861635360c4c0c5bd2645fc9449aa7c6b821afd6"
+        },
+        "_scope": {
+          "before": "45a1e6f4180d996493329212aef4a43b864c0440a2c877d90567c87f8ea8830d",
+          "after": "ac050f9ee485edd62bf0e3bf10195d1de296453b0bd2365f813019ca723f5083"
+        },
+        "private_randomness_policy_predecessor": {
+          "before": "52c806caa40f3607e312dd01668847f234459f160474f5e06df1aee7683391f8",
+          "after": "f1dd831d916a4dc106aa1aa526152acca35845284927e68bfb0a2014e7aae89c"
         }
       }
     }
@@ -495,6 +545,26 @@
       "source_obligation": null,
       "unchanged_work": null
     },
+    "tests/code_quality/test_engine_numerical_identity_admission.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "engine-numerical-identity-admission"
+      ],
+      "selected_families": [],
+      "rationale": "Verifies the historical terminal fingerprint and current covered runtime independently.",
+      "source_obligation": "Preserve the pinned historical runtime and active behavioral case inventory.",
+      "unchanged_work": "The behavioral selection, fixtures, and runtime sources are identical to the measured engine."
+    },
+    "tools/performance_cavalcade_policy_successor.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "cavalcade-comparison-fixture-binding"
+      ],
+      "selected_families": [],
+      "rationale": "Authenticate this precise successor while reusing the original historical policy bytes.",
+      "source_obligation": "Require the exact preimage already pinned by the private RNG comparison scope.",
+      "unchanged_work": "All previously registered historical hashes and failure conditions remain in force."
+    },
     "tools/performance_policy.py": {
       "category": "rule_semantics",
       "operations": [
@@ -506,6 +576,16 @@
       "rationale": "Checks the registered full-game fixture and matching driver directly at both revisions.",
       "source_obligation": "Preserve the full-game registry's fixture identity and the existing relative comparison contract.",
       "unchanged_work": "Existing comparison families retain their original input definitions and validation paths."
+    },
+    "tools/performance_private_randomness.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "cavalcade-comparison-fixture-binding"
+      ],
+      "selected_families": [],
+      "rationale": "Authenticate this precise successor while reusing the original historical policy bytes.",
+      "source_obligation": "Require the exact preimage already pinned by the private RNG comparison scope.",
+      "unchanged_work": "All previously registered historical hashes and failure conditions remain in force."
     }
   },
   "milestone": "ordinary",

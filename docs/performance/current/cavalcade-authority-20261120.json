@@ -4,7 +4,7 @@
   "workload_id": "cavalcade-v995-setup-to-complete-v1",
   "base_revision": "77b6f8f6fdcd88bb5eaff21495b28a2972213cbf",
   "head_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:4a144491e2ca85593c31db4a5a6318ccb32b4247c5d873b8d21471e0c019d64f",
-  "head_input_digest": "092015ea6c494f24b9640141116c542414250d31705e4f2de9556cdeecef2222",
+  "head_input_digest": "19b4722af219d2b57e99e594a83233873cd020992d8c2a8f18dcac9c2bc3eb78",
   "budget_profile": "current-change-relative-v1",
   "base": {
     "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:d25f92885e6ee2ccfd086327b911104a7c1daa1c4ec5810e0760bd81942b6d99",
@@ -43,7 +43,7 @@
     "fixture_sha256": "930e74087ff77de425873dfec5f397c7b3cc7b3837b5971983cc463552fd8593",
     "samples": {
       "setup-to-game-completed": [
-        684.8822619100001
+        686.0930760669999
       ]
     },
     "completed": true,
