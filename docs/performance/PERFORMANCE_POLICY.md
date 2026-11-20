@@ -453,6 +453,12 @@ targets. The separate verification reopens the terminal session and uses the
 setup-origin replay, exact event and lifecycle hashes, both player projections
 and both viewer event streams.
 
+The `cavalcade-authority-comparison` family uses one matched sample per revision
+for the Battle-shock ledger lookup and read-only authority checks. It applies
+the existing relative PR comparison budget and binds the actual registered fixture
+digest. Full-game throughput qualification
+still requires at least three serial samples and its existing absolute targets.
+
 This registration supports an operator-run in-process baseline for the roadmap.
 Transport, inference and search measurements have their own later scope.
 The standard serial CI smoke and required coverage and quality gates still apply.

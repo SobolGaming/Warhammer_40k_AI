@@ -7,6 +7,11 @@ import json
 from pathlib import Path
 from typing import Any, cast
 
+from tools.performance_cavalcade_policy_successor import (
+    cavalcade_policy_predecessor,
+    cavalcade_private_rng_predecessor,
+)
+
 BASE = "2b640ffca912f72d74e3b08cec0c0c4b12ce776a"
 SCOPE = "docs/performance/policy-v3/private-rng-smoke-scope.json"
 OPERATIONS: dict[str, list[str]] = {
@@ -78,11 +83,12 @@ def _scope() -> dict[str, Any]:
     }:
         raise ValueError("Private RNG applicability fields drifted.")
     scope = cast("dict[str, Any]", value)
+    module_bytes = cavalcade_private_rng_predecessor(Path(__file__).read_bytes())
     if (
         scope["base"] != BASE
         or scope["smoke_operations"] != OPERATIONS
         or set(scope["changes"]) != set(OPERATIONS)
-        or scope["module_sha256"] != _hash(Path(__file__).read_bytes())
+        or scope["module_sha256"] != _hash(module_bytes)
         or scope["policy_before_sha256"] != PRIOR_POLICY_SHA256
         or any(
             "cache" in key or "serialization" in key for keys in OPERATIONS.values() for key in keys
@@ -94,6 +100,7 @@ def _scope() -> dict[str, Any]:
 
 def private_randomness_policy_predecessor(raw: bytes) -> bytes:
     """Strip only this authenticated insertion before existing historical proofs."""
+    raw = cavalcade_policy_predecessor(raw)
     if not any(part in raw for part in INSERTIONS):
         return raw
     scope = _scope()

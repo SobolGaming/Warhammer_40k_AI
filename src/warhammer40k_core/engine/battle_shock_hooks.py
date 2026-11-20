@@ -18,6 +18,7 @@ from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.lifecycle_hooks import LifecycleHookEvent, validate_hook_bindings
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatus
+from warhammer40k_core.engine.runtime_read_only import runtime_read_only_snapshot
 from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 
 if TYPE_CHECKING:
@@ -783,31 +784,29 @@ class BattleShockHookRegistry:
 
         if type(context) is not BattleShockPendingOutcomeAuthorityContext:
             raise GameLifecycleError("Pending Battle-shock outcome hooks require context.")
+        validators = tuple(
+            binding.pending_outcome_authority_validator
+            for binding in self.bindings
+            if binding.pending_outcome_authority_validator is not None
+        )
+        if not validators:
+            return None
+        before = runtime_read_only_snapshot(context.state, context.decisions, context.request)
         claims: list[BattleShockPendingOutcomeAuthority] = []
-        for binding in self.bindings:
-            validator = binding.pending_outcome_authority_validator
-            if validator is None:
-                continue
-            before_state = context.state.to_payload()
-            before_queue = context.decisions.queue.pending_requests
-            before_record_count = len(context.decisions.records)
-            before_events = context.decisions.event_log.records
+        for validator in validators:
             claim = validator(context)
             if claim is not None and type(claim) is not BattleShockPendingOutcomeAuthority:
                 raise GameLifecycleError(
                     "Pending Battle-shock outcome validators must return typed authority or None."
                 )
-            if (
-                context.state.to_payload() != before_state
-                or context.decisions.queue.pending_requests != before_queue
-                or len(context.decisions.records) != before_record_count
-                or context.decisions.event_log.records != before_events
+            if before != runtime_read_only_snapshot(
+                context.state, context.decisions, context.request
             ):
                 raise GameLifecycleError(
                     "Pending Battle-shock outcome authority validation mutated runtime state."
                 )
             if claim is not None:
-                if claim.resolved_event_index >= len(before_events):
+                if claim.resolved_event_index >= len(context.decisions.event_log.records):
                     raise GameLifecycleError(
                         "Pending Battle-shock outcome resolved-event index is out of bounds."
                     )
@@ -833,21 +832,17 @@ class BattleShockHookRegistry:
 
         if type(context) is not BattleShockCompletedOutcomeAuthorityContext:
             raise GameLifecycleError("Completed Battle-shock outcome hooks require context.")
-        for binding in self.bindings:
-            validator = binding.completed_outcome_authority_validator
-            if validator is None:
-                continue
-            before_state = context.state.to_payload()
-            before_queue = context.decisions.queue.pending_requests
-            before_records = context.decisions.records
-            before_events = context.decisions.event_log.records
+        validators = tuple(
+            binding.completed_outcome_authority_validator
+            for binding in self.bindings
+            if binding.completed_outcome_authority_validator is not None
+        )
+        if not validators:
+            return
+        before = runtime_read_only_snapshot(context.state, context.decisions)
+        for validator in validators:
             validator(context)
-            if (
-                context.state.to_payload() != before_state
-                or context.decisions.queue.pending_requests != before_queue
-                or context.decisions.records != before_records
-                or context.decisions.event_log.records != before_events
-            ):
+            if before != runtime_read_only_snapshot(context.state, context.decisions):
                 raise GameLifecycleError(
                     "Completed Battle-shock outcome authority validation mutated runtime state."
                 )
