@@ -1,0 +1,104 @@
+{
+  "base": {
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false,
+    "fixture_sha256": "84e0776542fda6447243d17423f9592db3dd2aef0121937f1496eee7c656fa54",
+    "host": {
+      "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+      "logical_cpus": 64,
+      "memory_bytes": 67359363072,
+      "platform": "Linux-6.18.58.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "659a2d81e02176d23168861529651506ac87a4eab1982109f144cd62a63fce71",
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:7ba104452c12a3985e8500622a9e9ed09527ad12cd42913e77b8ef2dcf728eb3",
+    "samples": {
+      "fight/false": [
+        0.8793849820003743,
+        0.8782038450008258,
+        0.8744016620003094,
+        0.8795065049998811,
+        0.8728976419997707
+      ],
+      "fight/true": [
+        0.919049909000023,
+        0.9012441309996575,
+        0.9101650570000857,
+        0.9054275770004097,
+        0.9124549809994278
+      ],
+      "shooting/false": [
+        1.280605156999627,
+        1.3220585419994677,
+        1.3391500440002346,
+        1.2373047659993972,
+        1.248664746999566
+      ],
+      "shooting/true": [
+        1.2897865389995786,
+        1.3719268450004165,
+        1.3798237829996651,
+        1.288191213000573,
+        1.3059461029997692
+      ]
+    },
+    "workload_sha256": "fc4fe1423d4864d251bf8f5b2c1eaf305b4f21a358cc668c8b5a20c166f75daf"
+  },
+  "base_revision": "59959e71d95a68a4af8935d2897fd2280a8b76c2",
+  "budget_profile": "current-change-relative-v1",
+  "family": "dice",
+  "head": {
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false,
+    "fixture_sha256": "84e0776542fda6447243d17423f9592db3dd2aef0121937f1496eee7c656fa54",
+    "host": {
+      "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+      "logical_cpus": 64,
+      "memory_bytes": 67359363072,
+      "platform": "Linux-6.18.58.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "659a2d81e02176d23168861529651506ac87a4eab1982109f144cd62a63fce71",
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0db5d76c980e2ba3b29d964b6890a6057878290b3aad06a3a518a67d9a529cc2",
+    "samples": {
+      "fight/false": [
+        0.8689102870002898,
+        0.8767054519994417,
+        0.8662495859998671,
+        0.8690490460003275,
+        0.8695165550007005
+      ],
+      "fight/true": [
+        0.895233038000697,
+        0.893539177999628,
+        0.8916100559999904,
+        0.8977184359991952,
+        0.9101819680008703
+      ],
+      "shooting/false": [
+        1.2385277189996486,
+        1.3143943289996969,
+        1.321796268000071,
+        1.2369913160000579,
+        1.2506763649998902
+      ],
+      "shooting/true": [
+        1.2785615259999759,
+        1.3763911779997215,
+        1.356569875999412,
+        1.2745559439999852,
+        1.2776445709996551
+      ]
+    },
+    "workload_sha256": "fc4fe1423d4864d251bf8f5b2c1eaf305b4f21a358cc668c8b5a20c166f75daf"
+  },
+  "head_input_digest": "f1fce8032561838440b6a8d63a67c6628aafc1eca56c1b36d0e724932929d9aa",
+  "head_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0db5d76c980e2ba3b29d964b6890a6057878290b3aad06a3a518a67d9a529cc2",
+  "historical_failures": [],
+  "policy": "rules-engine-performance-v3",
+  "workload_id": "order96-optional-wound-rerolls-v1"
+}

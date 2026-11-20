@@ -1,0 +1,88 @@
+{
+  "base": {
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false,
+    "fixture_sha256": "84e0776542fda6447243d17423f9592db3dd2aef0121937f1496eee7c656fa54",
+    "host": {
+      "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+      "logical_cpus": 64,
+      "memory_bytes": 67359363072,
+      "platform": "Linux-6.18.58.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "659a2d81e02176d23168861529651506ac87a4eab1982109f144cd62a63fce71",
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:7ba104452c12a3985e8500622a9e9ed09527ad12cd42913e77b8ef2dcf728eb3",
+    "samples": {
+      "active_shock/replay": [
+        0.37111375399945246,
+        0.2687726300000577,
+        0.2697360949996437
+      ],
+      "active_shock/restore": [
+        1.4890138470000238,
+        1.4968298570001934,
+        1.4993218610006807
+      ],
+      "expired_shock/replay": [
+        0.669139981000626,
+        0.7615894689997731,
+        0.6572562579995065
+      ],
+      "expired_shock/restore": [
+        2.0422747279999385,
+        2.0507651019997866,
+        2.057405585000197
+      ]
+    },
+    "workload_sha256": "f9a750bddeacecac6dca0a3d3e4c5c03a3ac6347596fa4d8ae827d0b5f5638d5"
+  },
+  "base_revision": "59959e71d95a68a4af8935d2897fd2280a8b76c2",
+  "budget_profile": "current-change-relative-v1",
+  "family": "shock_reconstruction",
+  "head": {
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false,
+    "fixture_sha256": "84e0776542fda6447243d17423f9592db3dd2aef0121937f1496eee7c656fa54",
+    "host": {
+      "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+      "logical_cpus": 64,
+      "memory_bytes": 67359363072,
+      "platform": "Linux-6.18.58.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "659a2d81e02176d23168861529651506ac87a4eab1982109f144cd62a63fce71",
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0db5d76c980e2ba3b29d964b6890a6057878290b3aad06a3a518a67d9a529cc2",
+    "samples": {
+      "active_shock/replay": [
+        0.36226261199954024,
+        0.268411455000205,
+        0.2705069400008142
+      ],
+      "active_shock/restore": [
+        1.4759012139993501,
+        1.4944173069998214,
+        1.4925047470005666
+      ],
+      "expired_shock/replay": [
+        0.6567738819994702,
+        0.752291860000696,
+        0.6590034780001588
+      ],
+      "expired_shock/restore": [
+        2.030800814000031,
+        2.04186508300063,
+        2.0438540180002747
+      ]
+    },
+    "workload_sha256": "f9a750bddeacecac6dca0a3d3e4c5c03a3ac6347596fa4d8ae827d0b5f5638d5"
+  },
+  "head_input_digest": "f1fce8032561838440b6a8d63a67c6628aafc1eca56c1b36d0e724932929d9aa",
+  "head_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0db5d76c980e2ba3b29d964b6890a6057878290b3aad06a3a518a67d9a529cc2",
+  "historical_failures": [],
+  "policy": "rules-engine-performance-v3",
+  "workload_id": "v963-shock-reconstruction-v1"
+}
