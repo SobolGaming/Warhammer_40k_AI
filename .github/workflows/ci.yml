@@ -302,6 +302,10 @@ jobs:
       - name: Sync test dependencies
         run: uv sync --locked --no-default-groups --group test
 
+      - name: Fetch exact current performance measurement revisions
+        timeout-minutes: 2
+        run: python -B .github/scripts/fetch_performance_revisions.py
+
       - name: Current performance assessment and serial smoke
         timeout-minutes: 3
         env:
