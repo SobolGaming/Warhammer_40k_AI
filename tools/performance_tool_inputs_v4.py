@@ -116,8 +116,8 @@ _SCOPES = (
     ReviewedScope(
         GAMEPLAY_MOVEMENT_BUDGET_BASE,
         "docs/performance/policy-v3/gameplay-movement-budget-input-roles-v4.json",
-        "0ab5d2723559dfdf9b37de2eb967f4418d5c498fb35287e703729fe02d120653",
-        "b06679465d0295fac86eb1bacb0b131ffc7d45bd0be69b92927412dfb4d05e54",
+        "86f038384eb0dd98692caf908c48d6f5e847c4afbd2e4381b5ab99a6eff2df68",
+        "033e8384e523829b7b8325e1466c41f6b510e275373224e09ec1d1c45e0b646a",
         "docs/performance/current/gameplay-movement-budget-external-contract.json",
         frozenset(
             (
@@ -219,6 +219,7 @@ _SCOPES = (
                 "scripts/engine_numerical_identity_test_admission.py",
                 "scripts/measure_player_boundary.py",
                 "scripts/measure_private_rng_reconstruction.py",
+                "tests/code_quality/test_d07_geometry_containment.py",
                 "tests/code_quality/test_engine_numerical_identity_admission.py",
                 "tests/code_quality/test_registered_source_scopes.py",
                 "tests/daemons_native_source_preservation.py",

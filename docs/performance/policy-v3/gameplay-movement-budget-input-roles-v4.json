@@ -8,6 +8,7 @@
     "scripts/engine_numerical_identity_test_admission.py": "Untimed source-admission validation binds all selected behavior and the exact build independently per arm.",
     "scripts/measure_player_boundary.py": "The separate player-boundary driver encodes the actual arm identity from that arm; it is not the timed contract workload.",
     "scripts/measure_private_rng_reconstruction.py": "The separate reconstruction driver encodes the actual arm identity from that arm; it is not the timed contract workload.",
+    "tests/code_quality/test_d07_geometry_containment.py": "Untimed mutation coverage locates the existing Escape retry guard after certification moved its statement position.",
     "tests/code_quality/test_engine_numerical_identity_admission.py": "Untimed source-admission regressions verify historical snapshots and exact current case inventory per arm.",
     "tests/code_quality/test_registered_source_scopes.py": "Untimed registration tests authenticate the old scopes and the current comparison.",
     "tests/daemons_native_source_preservation.py": "Untimed inverse projection authenticates the prior historical source registration.",

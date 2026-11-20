@@ -14797,14 +14797,7 @@
         "src/warhammer40k_core/engine/battle_shock_source_family_authority.py"
       ],
       "owners": [
-        "@module",
-        "_fall_back_source",
-        "_validate_desperate_escape_source",
-        "_validate_forced_desperate_escape_source",
-        "_validate_loaded_forced_desperate_escape_source_history",
-        "_validate_pending_forced_desperate_escape_source",
-        "validate_battle_shock_source_family_authority",
-        "validate_pending_battle_shock_source_family_authority"
+        "_validate_desperate_escape_source"
       ],
       "families": [
         "movement",
@@ -36469,6 +36462,28 @@
       "paths": ["src/warhammer40k_core/engine/event_log.py"],
       "owners": ["EventLog.owns_record_at"],
       "families": ["movement", "player_boundary", "reconstruction"],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "gameplay-escape-battle-shock-source-authority": {
+      "paths": [
+        "src/warhammer40k_core/engine/battle_shock_source_family_authority.py"
+      ],
+      "owners": [
+        "@module",
+        "_fall_back_source",
+        "_validate_forced_desperate_escape_source",
+        "_validate_loaded_forced_desperate_escape_source_history",
+        "_validate_pending_forced_desperate_escape_source",
+        "validate_battle_shock_source_family_authority",
+        "validate_pending_battle_shock_source_family_authority"
+      ],
+      "families": [
+        "movement",
+        "shock_reconstruction",
+        "reconstruction",
+        "dice"
+      ],
       "sensitive": true,
       "mandatory": true
     },

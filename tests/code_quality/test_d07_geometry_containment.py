@@ -109,8 +109,12 @@ def _changed_geometry(kind: str) -> bytes:
             ).body[0],
         )
     elif kind == "retry_condition":
-        retry = branch.body[15]
-        assert isinstance(retry, ast.If)
+        (retry,) = (
+            statement
+            for statement in branch.body
+            if isinstance(statement, ast.If)
+            and ast.unparse(statement.test) == "completed_retry is not None"
+        )
         retry.test = ast.Constant(value=True)
     elif kind == "other_geometry_branch":
         # A preexisting geometry rejection condition outside the three additions.
