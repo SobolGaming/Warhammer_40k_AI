@@ -274,6 +274,16 @@ def exact_movement_test_transition(
     for path in codec_paths:
         _selection_no_links(root, root / path)
     has_codec = any((root / path).exists() for path in codec_paths)
+    budget_path = root / GAMEPLAY_BUDGET_TRANSITION
+    fight_path = root / STAGE2_FIGHT_TRANSITION
+    _selection_no_links(root, budget_path)
+    _selection_no_links(root, fight_path)
+    has_gameplay_budget = budget_path.exists()
+    has_stage2_fight = fight_path.exists()
+    if has_stage2_fight and not (has_gameplay_budget and has_codec):
+        raise SystemExit(
+            "Stage 2 Fight Cover tests require the gameplay movement budget predecessor."
+        )
     if has_codec and not has_witnesses:
         raise SystemExit("Oval codec tests require the oval-oval witness predecessor.")
     if has_witnesses and not has_oval_gap:
@@ -482,8 +492,7 @@ def exact_movement_test_transition(
         raw += b"\0" + codec_raw
     source_successors: SourceSuccessors = {}
     test_successors: TestSuccessors = {}
-    _selection_no_links(root, root / GAMEPLAY_BUDGET_TRANSITION)
-    if (root / GAMEPLAY_BUDGET_TRANSITION).exists():
+    if has_gameplay_budget:
         if not has_codec:
             raise SystemExit("Gameplay movement budget tests require the oval codec predecessor.")
         runtime, source_successors, test_successors, successor_raw = _gameplay_budget_successor(
@@ -491,12 +500,7 @@ def exact_movement_test_transition(
         )
         raw += b"\0" + successor_raw
     stage2_fight_tests: TestSuccessors = {}
-    _selection_no_links(root, root / STAGE2_FIGHT_TRANSITION)
-    if (root / STAGE2_FIGHT_TRANSITION).exists():
-        if not test_successors:
-            raise SystemExit(
-                "Stage 2 Fight Cover tests require the gameplay movement budget predecessor."
-            )
+    if has_stage2_fight:
         runtime, stage2_fight_tests, successor_raw = _stage2_fight_successor(root)
         raw += b"\0" + successor_raw
     retained = _identity_test_transition(

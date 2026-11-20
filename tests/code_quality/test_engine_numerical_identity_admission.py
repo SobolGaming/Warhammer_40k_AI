@@ -264,6 +264,13 @@ def test_identity_selection_rejects_drift_in_each_updated_test(transition_snapsh
 
 
 def test_identity_transition_requires_its_exact_record(transition_snapshot: Path) -> None:
+    cutover_digest = hashlib.sha256((ROOT / sharding.CUTOVER_PATH).read_bytes()).hexdigest()
+    assert selection.exact_movement_test_transition(transition_snapshot, cutover_digest) is None
+    fight_record = transition_snapshot / selection.STAGE2_FIGHT_TRANSITION
+    fight_record.write_bytes((ROOT / selection.STAGE2_FIGHT_TRANSITION).read_bytes())
+    with pytest.raises(SystemExit, match="Stage 2 Fight Cover tests require the gameplay"):
+        selection.exact_movement_test_transition(transition_snapshot, cutover_digest)
+
     target = transition_snapshot / selection.ADDITION
     target.write_bytes(target.read_bytes() + b"\n")
     with pytest.raises(SystemExit, match="source bytes differ"):

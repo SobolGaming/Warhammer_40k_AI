@@ -106,7 +106,7 @@
     },
     "scripts/engine_numerical_identity_test_admission.py": {
       "before_sha256": "374db1c51122a62cc2b50d353e721a394499e6c961558949d216ba95837a055a",
-      "after_sha256": "9464d089daa18c4a23538a254426e35e36fe7b452d2b4e32439f65d66d6e29a2",
+      "after_sha256": "6041f44f9f99bd0beb4818f4e83049170eabdccaa89bc2b1c8f3ad7864b64c5a",
       "owners": {
         "@module": {
           "before": "b8b4481660332d45dafb27db0b8e4c7073647a3e493896fd8329532938e44312",
@@ -118,7 +118,7 @@
         },
         "exact_movement_test_transition": {
           "before": "e24109ea30d123bcc9c7d9231b94c347fb765668262219fc74f0f131b34d77c7",
-          "after": "527eec95496e2b5c6a9f81f8bc246e3bf176624b0f8d1923ad1a583098b3b69a"
+          "after": "ff63076c3499ecf5956e91312d3f6c3e3fe8bcf7e284e8fec0e70c4d3ba17e3e"
         }
       }
     },
@@ -144,11 +144,15 @@
     },
     "tests/code_quality/test_engine_numerical_identity_admission.py": {
       "before_sha256": "c65ddb7b2faa85b7d3ab5762de17e874fc670953289b9613f563de33b2431036",
-      "after_sha256": "5ac72a7e7e9240b3ebaef1b10a189dc9f2ba3ccc1606949165c21ad1163afbee",
+      "after_sha256": "346e5545b9595a752d5de3943e9d2ba8679283c3a38938b65062cf27f8526bc2",
       "owners": {
         "test_identity_inventory_uses_current_twelve_shards_and_native_cohort": {
           "before": "e53caa72047673bf4e5268b41eec28bbbe601c91350eb82376ed28e8ad94a82e",
           "after": "6607fd7d2703b5765501cb4921d9459b14a5b9fd007a4be72ee6e93223c48302"
+        },
+        "test_identity_transition_requires_its_exact_record": {
+          "before": "07607599b6569385579b0581032026536d20757d68ccb85a321c645e9230a09a",
+          "after": "f9c40837d54c767613dce46afb2c6e4494d701c0620155c0195220b979b4600e"
         }
       }
     },
