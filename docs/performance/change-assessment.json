@@ -290,7 +290,7 @@
         "engine-numerical-identity-admission"
       ],
       "selected_families": [],
-      "rationale": "Admit one byte-pinned regression owner for the exact successor runtime and validate its retained preimages and shard membership.",
+      "rationale": "Authenticate the Stage 2 Fight Cover transition by its pinned digest, exact base, and source postimage, and verify the hashes, sizes, and modes of the two pinned successor test files, the Fight facade and Emperor's Children regressions. Require the digest-pinned gameplay movement budget predecessor and use the authenticated successor bytes for its overlapping Emperor's Children file.",
       "source_obligation": "Apply retained Core 13.08 terrain Cover to ranged attacks at shared save preparation, preserving fail-closed runtime and test identity.",
       "unchanged_work": "The existing ranged terrain and LOS algorithms, cache policies, saving throw and reroll rules, path validation, serialization and replay implementations, workload inventories, and budgets are preserved. The corrected melee rule branch bypasses a terrain query outside its scope."
     },
@@ -320,7 +320,7 @@
         "engine-numerical-identity-admission"
       ],
       "selected_families": [],
-      "rationale": "Admit one byte-pinned regression owner for the exact successor runtime and validate its retained preimages and shard membership.",
+      "rationale": "Check the successor runtime fingerprint and source preimage, and verify the preimages of the two byte-pinned test files. Check the Fight facade file against the original cutover and its single-shard membership, and check that the overlapping Emperor's Children file starts from the gameplay movement budget predecessor's recorded bytes. Exercise rejection when the required predecessor is missing.",
       "source_obligation": "Apply retained Core 13.08 terrain Cover to ranged attacks at shared save preparation, preserving fail-closed runtime and test identity.",
       "unchanged_work": "The existing ranged terrain and LOS algorithms, cache policies, saving throw and reroll rules, path validation, serialization and replay implementations, workload inventories, and budgets are preserved. The corrected melee rule branch bypasses a terrain query outside its scope."
     },
