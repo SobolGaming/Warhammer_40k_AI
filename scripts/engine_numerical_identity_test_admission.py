@@ -218,6 +218,15 @@ CLOSE_QUARTERS_SOURCES = (
 )
 
 
+STRICT_REPLAY_TRANSITION = (
+    "data/source_audits/ci64_provenance_v1/stage2-strict-replay-test-transition-v1.json"
+)
+STRICT_REPLAY_SHA256 = "c052fbc19a1647aa855cc26b0bfb909230ca485c63fb47c6425caf0ee46c4f89"
+STRICT_REPLAY_BASE = "a61e1b27ce13f87ebe4e2f1ae23eb6701c38ccf7"
+STRICT_REPLAY_OWNER = "tests/rules/section21/test_persistence.py"
+STRICT_REPLAY_SOURCES = ("src/warhammer40k_core/adapters/local_session.py",)
+
+
 type SourceSuccessors = dict[str, dict[str, str]]
 type TestSuccessors = dict[str, dict[str, object]]
 
@@ -783,6 +792,19 @@ def exact_movement_test_transition(
             root, retained_cutover_sha256=retained_cutover_sha256, predecessor_runtime=runtime
         )
         runtime = close_quarters[0]
+    strict_replay_path = root / STRICT_REPLAY_TRANSITION
+    _selection_no_links(root, strict_replay_path)
+    strict_replay = None
+    if strict_replay_path.exists():
+        if close_quarters is None:
+            raise SystemExit("Strict replay tests require the Close Quarters predecessor.")
+        strict_replay = _strict_replay_test_successor(
+            root, retained_cutover_sha256=retained_cutover_sha256, predecessor_runtime=runtime
+        )
+        runtime, _, _, strict_replay_sources = strict_replay
+        if strict_replay_sources.keys() & source_successors.keys():
+            raise SystemExit("Strict replay sources overlap the predecessor transition.")
+        source_successors.update(strict_replay_sources)
     retained = _identity_test_transition(
         root,
         retained_cutover_sha256,
@@ -841,6 +863,12 @@ def exact_movement_test_transition(
             raise SystemExit("Close Quarters tests overlap the predecessor selection.")
         updated.update(tests)
         raw += b"\0" + close_quarters_raw
+    if strict_replay is not None:
+        _, tests, strict_replay_raw, _ = strict_replay
+        if tests.keys() & (updated.keys() | added.keys() | additions.keys()):
+            raise SystemExit("Strict replay tests overlap the predecessor selection.")
+        updated.update(tests)
+        raw += b"\0" + strict_replay_raw
     return updated, {**added, **additions}, retained_raw + b"\0" + raw
 
 
@@ -932,6 +960,52 @@ def _close_quarters_test_successor(
         raise SystemExit("Close Quarters test predecessor differs.")
     members = _selection_members({CLOSE_QUARTERS_OWNER: test["after"]}, root)
     return record["runtime_fingerprint"], members, raw
+
+
+def _strict_replay_test_successor(
+    root: Path, *, retained_cutover_sha256: str, predecessor_runtime: str
+) -> tuple[str, TestSuccessors, bytes, SourceSuccessors]:
+    raw = _checked_bytes(root, STRICT_REPLAY_TRANSITION, STRICT_REPLAY_SHA256)
+    record = json.loads(raw, object_pairs_hook=_selection_object)
+    if (
+        record.keys()
+        != {
+            "schema",
+            "base",
+            "retained_close_quarters_sha256",
+            "retained_runtime_fingerprint",
+            "runtime_fingerprint",
+            "sources",
+            "test",
+        }
+        or record["schema"] != "finite-stage2-strict-replay-test-transition-v1"
+        or record["base"] != STRICT_REPLAY_BASE
+        or record["retained_close_quarters_sha256"] != CLOSE_QUARTERS_SHA256
+        or record["retained_runtime_fingerprint"] != predecessor_runtime
+        or set(record["sources"]) != set(STRICT_REPLAY_SOURCES)
+        or set(record["test"]) != {STRICT_REPLAY_OWNER}
+    ):
+        raise SystemExit("Strict replay test transition membership differs.")
+    for name, change in record["sources"].items():
+        if set(change) != {"before", "after"}:
+            raise SystemExit(
+                "Strict replay source transition requires exact before and after hashes."
+            )
+        _checked_bytes(root, name, change["after"])
+    from scripts.build_test_shards import CUTOVER_PATH
+
+    cutover = json.loads(
+        _checked_bytes(root, CUTOVER_PATH, retained_cutover_sha256),
+        object_pairs_hook=_selection_object,
+    )
+    test = record["test"][STRICT_REPLAY_OWNER]
+    if (
+        set(test) != {"before", "after"}
+        or test["before"] != cutover["active_files"][STRICT_REPLAY_OWNER]
+    ):
+        raise SystemExit("Strict replay test predecessor differs.")
+    members = _selection_members({STRICT_REPLAY_OWNER: test["after"]}, root)
+    return record["runtime_fingerprint"], members, raw, record["sources"]
 
 
 def _identity_test_transition(

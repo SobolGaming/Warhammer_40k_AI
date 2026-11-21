@@ -343,19 +343,11 @@ class LocalGameSession(AdapterGameSession):
             raise LocalGameSessionPersistenceError(
                 "LocalGameSession replay source identity drifted."
             )
-        try:
-            expected_replay_artifact = ReplayArtifact.capture(
-                artifact_id=f"session-persistence:{lifecycle.config.game_id}",
-                initial_lifecycle_payload=effective_initial_payload,
-                final_lifecycle=lifecycle,
-            )
-        except ReplayArtifactError as exc:
-            raise LocalGameSessionPersistenceError(
-                "LocalGameSession expected persistence replay could not be reconstructed."
-            ) from exc
-        if not _payloads_match_exactly(
-            cast(JsonValue, replay_artifact.to_payload()),
-            cast(JsonValue, expected_replay_artifact.to_payload()),
+        # Decoding already validated the schema, origin, RNG and record IDs.
+        # Native replay compares the exact tails before submitting any record.
+        if (
+            replay_artifact.artifact_id != f"session-persistence:{lifecycle.config.game_id}"
+            or replay_artifact.projection_checkpoints
         ):
             raise LocalGameSessionPersistenceError(
                 "LocalGameSession persistence replay artifact drifted."
@@ -723,6 +715,13 @@ def _verify_persistence_replay(
         replay_session = LocalGameSession(lifecycle=initial_lifecycle)
         initial_decision_count = len(initial_lifecycle.decision_controller.records)
         initial_event_count = len(initial_lifecycle.decision_controller.event_log.records)
+        if (
+            len(expected_lifecycle.decision_controller.records) < initial_decision_count
+            or len(expected_lifecycle.decision_controller.event_log.records) < initial_event_count
+        ):
+            raise LocalGameSessionPersistenceError(
+                "LocalGameSession persistence replay endpoint history predates its origin."
+            )
         expected_decision_tail = tuple(
             expected_lifecycle.decision_controller.records[initial_decision_count:]
         )

@@ -387,6 +387,28 @@
       "sensitive": true,
       "mandatory": true
     },
+    "stage2-strict-replay-regression": {
+      "paths": ["tests/rules/section21/test_persistence.py"],
+      "owners": ["test_strict_persistence_rejects_valid_artifact_with_mismatched_metadata_or_tails"],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "stage2-strict-replay-test-admission": {
+      "paths": [
+        "scripts/engine_numerical_identity_test_admission.py",
+        "data/source_audits/ci64_provenance_v1/stage2-strict-replay-test-transition-v1.json"
+      ],
+      "owners": [
+        "@document",
+        "@module",
+        "exact_movement_test_transition",
+        "_strict_replay_test_successor"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
     "close-quarters-test-admission": {
       "paths": [
         "scripts/engine_numerical_identity_test_admission.py",
