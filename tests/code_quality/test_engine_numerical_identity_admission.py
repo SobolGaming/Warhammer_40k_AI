@@ -246,7 +246,12 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
     )
     assert strict_replay_base_manifest["fingerprint"] == close_quarters["runtime_fingerprint"]
     assert strict_replay["retained_runtime_fingerprint"] == close_quarters["runtime_fingerprint"]
-    assert _record(MANIFEST)["fingerprint"] == strict_replay["runtime_fingerprint"]
+    allocation = _record(selection.ALLOCATION_COHERENCY_ADDITION)
+    assert allocation["retained_runtime_fingerprint"] == strict_replay["runtime_fingerprint"]
+    assert _record(MANIFEST)["fingerprint"] == allocation["runtime_fingerprint"]
+    allocation_owner = selection.ALLOCATION_COHERENCY_OWNER
+    assert allocation_owner in active_files
+    assert sum(allocation_owner in group for group in groups) == 1
     strict_replay_owner = selection.STRICT_REPLAY_OWNER
     assert (
         strict_replay["test"][strict_replay_owner]["before"]

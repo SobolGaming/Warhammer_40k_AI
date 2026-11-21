@@ -227,6 +227,14 @@ STRICT_REPLAY_OWNER = "tests/rules/section21/test_persistence.py"
 STRICT_REPLAY_SOURCES = ("src/warhammer40k_core/adapters/local_session.py",)
 
 
+ALLOCATION_COHERENCY_ADDITION = (
+    "data/source_audits/ci64_provenance_v1/stage2-allocation-coherency-test-addition-v1.json"
+)
+ALLOCATION_COHERENCY_SHA256 = "4dee9b64424aedb21324016b9f1e430847fdda5e2a409229b50e8a23f0fb8981"
+ALLOCATION_COHERENCY_OWNER = "tests/infrastructure/adapters/test_allocation_coherency.py"
+ALLOCATION_COHERENCY_POLICY = "src/warhammer40k_core/ai/allocation_coherency.py"
+
+
 type SourceSuccessors = dict[str, dict[str, str]]
 type TestSuccessors = dict[str, dict[str, object]]
 
@@ -805,6 +813,35 @@ def exact_movement_test_transition(
         if strict_replay_sources.keys() & source_successors.keys():
             raise SystemExit("Strict replay sources overlap the predecessor transition.")
         source_successors.update(strict_replay_sources)
+    allocation_path = root / ALLOCATION_COHERENCY_ADDITION
+    _selection_no_links(root, allocation_path)
+    allocation_raw = None
+    if allocation_path.exists():
+        if strict_replay is None:
+            raise SystemExit("Allocation coherency tests require the Strict Replay predecessor.")
+        allocation_raw = _checked_bytes(
+            root, ALLOCATION_COHERENCY_ADDITION, ALLOCATION_COHERENCY_SHA256
+        )
+        allocation = json.loads(allocation_raw, object_pairs_hook=_selection_object)
+        if (
+            allocation.keys()
+            != {
+                "schema",
+                "retained_strict_replay_sha256",
+                "retained_runtime_fingerprint",
+                "runtime_fingerprint",
+                "policy_sha256",
+                "added_files",
+            }
+            or allocation["schema"] != "finite-stage2-allocation-coherency-test-addition-v1"
+            or allocation["retained_strict_replay_sha256"] != STRICT_REPLAY_SHA256
+            or allocation["retained_runtime_fingerprint"] != runtime
+            or set(allocation["added_files"]) != {ALLOCATION_COHERENCY_OWNER}
+        ):
+            raise SystemExit("Allocation coherency test addition differs.")
+        _checked_bytes(root, ALLOCATION_COHERENCY_POLICY, allocation["policy_sha256"])
+        additions.update(_selection_members(allocation["added_files"], root))
+        runtime = allocation["runtime_fingerprint"]
     retained = _identity_test_transition(
         root,
         retained_cutover_sha256,
@@ -869,6 +906,8 @@ def exact_movement_test_transition(
             raise SystemExit("Strict replay tests overlap the predecessor selection.")
         updated.update(tests)
         raw += b"\0" + strict_replay_raw
+    if allocation_raw is not None:
+        raw += b"\0" + allocation_raw
     return updated, {**added, **additions}, retained_raw + b"\0" + raw
 
 

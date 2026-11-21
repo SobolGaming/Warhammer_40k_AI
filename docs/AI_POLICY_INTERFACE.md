@@ -103,6 +103,28 @@ substitute action. `TrainingRow` remains independently versioned; the companion
 contract below checks its finite candidate linkage. Candidate hashes and IDs
 are linkage metadata, not semantic policy features.
 
+## Stage 2 casualty allocation baseline
+
+`ai.allocation_coherency.AllocationCoherencyPolicy` is an opt-in finite policy
+for `select_damage_allocation_model` on a standalone defending unit. Register
+it on the desired exact route with policy ID `post-casualty-coherency-v1`, using
+the workload's public rules descriptor and recording its hash in the
+registration configuration. For each issued choice it removes that one model
+from the defender's projected formation and asks the canonical coherency
+validator about the unchanged survivor poses. It selects a coherent result
+ahead of a broken one and uses issued order for ties. The score is conditional
+on the selected model becoming a casualty. It uses no future rolls.
+
+At native Round 5 Screen Rod request 000396, the six issued choices included
+two removals that preserved coherency at the fork positions. The recorded
+alternative (003) retained five models through the first Player B Movement
+decision. The historical choice (001) retained four after mandatory cleanup.
+Both branches reached that boundary at 0–8 VP, with naturally divergent Fight
+rolls. The compact regression covers all six choices, a constrained singleton,
+and a tie. Native forced allocation resolves in the engine before a model
+choice is requested. The existing adapter decision contract covers the bound
+finite choice.
+
 ## Finite training candidate linkage
 
 `ai.training_candidates.FiniteTrainingCandidateLink.from_row(row, context=before)`
