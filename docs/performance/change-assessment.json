@@ -134,6 +134,86 @@
         }
       }
     },
+    "contracts/examples/persistence/session-persistence.json": {
+      "before_sha256": "b935a8b354ea6e3b816986d460de8b2dd39f85ac7bde295c765788c7ee23f830",
+      "after_sha256": "52640e1031a87e0e53b1c5f9a2fae1391fca257fad8737b24ec85e301047f399",
+      "owners": {
+        "@document": {
+          "before": "b935a8b354ea6e3b816986d460de8b2dd39f85ac7bde295c765788c7ee23f830",
+          "after": "52640e1031a87e0e53b1c5f9a2fae1391fca257fad8737b24ec85e301047f399"
+        }
+      }
+    },
+    "contracts/examples/sessions/session-command-outcome.json": {
+      "before_sha256": "2df6b2455423414ca5126bd52f676b0b13ba891211b612e2ae468f9b31bfb724",
+      "after_sha256": "0dfac2476131bdb9c9752d7bc4480fb6f038de617dbb4199900838d798e77036",
+      "owners": {
+        "@document": {
+          "before": "2df6b2455423414ca5126bd52f676b0b13ba891211b612e2ae468f9b31bfb724",
+          "after": "0dfac2476131bdb9c9752d7bc4480fb6f038de617dbb4199900838d798e77036"
+        }
+      }
+    },
+    "contracts/examples/sessions/session-command-started.json": {
+      "before_sha256": "f76d5f4f1a122e77c20ea8a82b92f9da8004d5709231887bcaf99fd6361824c3",
+      "after_sha256": "9683a60171ce68c29b7a645c7343370633a4393553535557b0a37e8084a41614",
+      "owners": {
+        "@document": {
+          "before": "f76d5f4f1a122e77c20ea8a82b92f9da8004d5709231887bcaf99fd6361824c3",
+          "after": "9683a60171ce68c29b7a645c7343370633a4393553535557b0a37e8084a41614"
+        }
+      }
+    },
+    "contracts/examples/sessions/session-metadata-created.json": {
+      "before_sha256": "790166070f5cc205ea1e63b62fc763faddc40c5656767f782f2f97f0bb2b6599",
+      "after_sha256": "a1d46ee3c3879fad9edc39f4af60be67af9029b0f302a0b61b11ffa1b4045741",
+      "owners": {
+        "@document": {
+          "before": "790166070f5cc205ea1e63b62fc763faddc40c5656767f782f2f97f0bb2b6599",
+          "after": "a1d46ee3c3879fad9edc39f4af60be67af9029b0f302a0b61b11ffa1b4045741"
+        }
+      }
+    },
+    "contracts/examples/support-profile-player-a-redacted.json": {
+      "before_sha256": "8ad6938caa55f1ba16cfe14cae38cb1a3353ac2b830e94980f50caf22c52445e",
+      "after_sha256": "ccd1b3b3e5d045cd8588e8c9cd482f8cc5922435838860668b16e03fae57ad7d",
+      "owners": {
+        "@document": {
+          "before": "8ad6938caa55f1ba16cfe14cae38cb1a3353ac2b830e94980f50caf22c52445e",
+          "after": "ccd1b3b3e5d045cd8588e8c9cd482f8cc5922435838860668b16e03fae57ad7d"
+        }
+      }
+    },
+    "contracts/examples/support-profile-player-b-redacted.json": {
+      "before_sha256": "a4c09f87886af258137d6d6ea1579ba4a6d16c54bdcc065c85c91cff5586fcde",
+      "after_sha256": "43d8cbe2fb2770d2dbcea83b9454e5e5c27c3dbad00f4b1f954111290aa02c57",
+      "owners": {
+        "@document": {
+          "before": "a4c09f87886af258137d6d6ea1579ba4a6d16c54bdcc065c85c91cff5586fcde",
+          "after": "43d8cbe2fb2770d2dbcea83b9454e5e5c27c3dbad00f4b1f954111290aa02c57"
+        }
+      }
+    },
+    "contracts/examples/support-profile.json": {
+      "before_sha256": "2673f54383e33f8c8be0a77c61f91e28d4f4c14cc960a571e02b738440493c26",
+      "after_sha256": "0c88505612cfaf22ff9c018ecae9e7b40ae3e51eebfeffda84e5b90103284d12",
+      "owners": {
+        "@document": {
+          "before": "2673f54383e33f8c8be0a77c61f91e28d4f4c14cc960a571e02b738440493c26",
+          "after": "0c88505612cfaf22ff9c018ecae9e7b40ae3e51eebfeffda84e5b90103284d12"
+        }
+      }
+    },
+    "contracts/manifest.json": {
+      "before_sha256": "0923e2a9498a3f010345eaeaf68e8ec8de9ce11a8869e2578c6bc47bfa9ff6a0",
+      "after_sha256": "535e40a52b5ce7997cf453738cf573031f106fa894a119bea72933af5cd7540a",
+      "owners": {
+        "@document": {
+          "before": "0923e2a9498a3f010345eaeaf68e8ec8de9ce11a8869e2578c6bc47bfa9ff6a0",
+          "after": "535e40a52b5ce7997cf453738cf573031f106fa894a119bea72933af5cd7540a"
+        }
+      }
+    },
     "data/source_audits/ci64_provenance_v1/stage2-allocation-coherency-test-addition-v1.json": {
       "before_sha256": null,
       "after_sha256": "4dee9b64424aedb21324016b9f1e430847fdda5e2a409229b50e8a23f0fb8981",
@@ -383,6 +463,86 @@
       ],
       "selected_families": [],
       "rationale": "Record fresh complete coverage timings and twelve-shard inventory including the allocation policy regression.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "contracts/examples/persistence/session-persistence.json": {
+      "category": "measured_workload",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Publish the regenerated runtime identity and dependent hashes for the opt-in policy source.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "contracts/examples/sessions/session-command-outcome.json": {
+      "category": "measured_workload",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Publish the regenerated runtime identity and dependent hashes for the opt-in policy source.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "contracts/examples/sessions/session-command-started.json": {
+      "category": "measured_workload",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Publish the regenerated runtime identity and dependent hashes for the opt-in policy source.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "contracts/examples/sessions/session-metadata-created.json": {
+      "category": "measured_workload",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Publish the regenerated runtime identity and dependent hashes for the opt-in policy source.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "contracts/examples/support-profile-player-a-redacted.json": {
+      "category": "measured_workload",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Publish the regenerated runtime identity and dependent hashes for the opt-in policy source.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "contracts/examples/support-profile-player-b-redacted.json": {
+      "category": "measured_workload",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Publish the regenerated runtime identity and dependent hashes for the opt-in policy source.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "contracts/examples/support-profile.json": {
+      "category": "measured_workload",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Publish the regenerated runtime identity and dependent hashes for the opt-in policy source.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "contracts/manifest.json": {
+      "category": "measured_workload",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Publish the regenerated runtime identity and dependent hashes for the opt-in policy source.",
       "source_obligation": null,
       "unchanged_work": null
     },
