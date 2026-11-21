@@ -197,9 +197,9 @@ CAVALCADE_AUTHORITY_SOURCES = {
 ROUND_FIVE_SHADOW_TRANSITION = (
     "data/source_audits/ci64_provenance_v1/round-five-shadow-test-transition-v1.json"
 )
-ROUND_FIVE_SHADOW_SHA256 = "e5da1677fa13dafc0506382e87e10946f15237d44ba0b7995c22b4e129bb80be"
+ROUND_FIVE_SHADOW_SHA256 = "b98c215658e87a400c6440d58ce5da0ec08f23d13ebc1c9345716f006b57d2ea"
 ROUND_FIVE_SHADOW_BASE = "7d8c559b9901c9ad2233b87cf3bf151cb4c35476"
-ROUND_FIVE_SHADOW_OWNER = "tests/factions/chaos_daemons/unit/test_chaos_daemons_army_rule.py"
+ROUND_FIVE_SHADOW_OWNER = "tests/factions/chaos_daemons/unit/test_bloodcrushers_abilities.py"
 ROUND_FIVE_SHADOW_SOURCES = (
     "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/army_rule.py",
     "src/warhammer40k_core/engine/rule_aura_resolution.py",

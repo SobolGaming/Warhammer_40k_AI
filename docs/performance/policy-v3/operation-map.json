@@ -286,7 +286,7 @@
       "mandatory": true,
       "sensitive": false,
       "paths": [
-        "tests/factions/chaos_daemons/unit/test_chaos_daemons_army_rule.py"
+        "tests/factions/chaos_daemons/unit/test_bloodcrushers_abilities.py"
       ],
       "owners": [
         "_v995_shadow_definitions",

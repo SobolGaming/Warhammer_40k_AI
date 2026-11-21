@@ -14,18 +14,18 @@
     }
   },
   "test": {
-    "tests/factions/chaos_daemons/unit/test_chaos_daemons_army_rule.py": {
+    "tests/factions/chaos_daemons/unit/test_bloodcrushers_abilities.py": {
       "before": {
         "mode": "100644",
-        "blob_sha1": "78e7d858ea3f06f76e7be034ac9feb8e45ab5a78",
-        "sha256": "dfeca2fa09c594e9d0274db16e8d74d1186d5f2e5dcfab7289d02d912c7d5285",
-        "bytes": 18365
+        "blob_sha1": "3a7dd63f628bb0dbd0980aeda215694eb5e27618",
+        "sha256": "b854af199b9f96b814b876b8005ff8a461d860e1a6beb6e5e626039be67b80f1",
+        "bytes": 9718
       },
       "after": {
         "mode": "100644",
-        "blob_sha1": "6edbb3c6694d82839430891f911a95e0c64f7c19",
-        "sha256": "89aebab4dded9b4343c2e35b4628b471816af191cd8472c7aee4ce2a5b04c959",
-        "bytes": 28296
+        "blob_sha1": "099413a22d7f6f607bdc99e5af6231ec2af4fb0d",
+        "sha256": "9449f782cf2e387dc9d6df3bf4b15355a007f29536731213d31edb15d92701c4",
+        "bytes": 19649
       }
     }
   }

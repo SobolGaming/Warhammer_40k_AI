@@ -2,7 +2,7 @@
   "policy": "rules-engine-performance-v3",
   "base": "7d8c559b9901c9ad2233b87cf3bf151cb4c35476",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:aa016bafd0895687abc9c872c11933ca27b12d4f7e147f29ad191ef40b5f2ca1",
-  "operation_map_sha256": "c1000e2f723f72e85f664dec04e68c49bc9bc53d9bb1cfbaa7e5c03e2140b645",
+  "operation_map_sha256": "6bc2112604293fb8f9da534f49126533790e912610747012770a721a070c9bfa",
   "changes": {
     "contracts/examples/persistence/session-persistence.json": {
       "before_sha256": "1cd58eb03bf85aa8969bc899f8060a1c4accd8b7e2bc6454fce816dec5ad5d0a",
@@ -86,31 +86,31 @@
     },
     "data/source_audits/ci64_provenance_v1/round-five-shadow-test-transition-v1.json": {
       "before_sha256": null,
-      "after_sha256": "e5da1677fa13dafc0506382e87e10946f15237d44ba0b7995c22b4e129bb80be",
+      "after_sha256": "b98c215658e87a400c6440d58ce5da0ec08f23d13ebc1c9345716f006b57d2ea",
       "owners": {
         "@document": {
           "before": null,
-          "after": "e5da1677fa13dafc0506382e87e10946f15237d44ba0b7995c22b4e129bb80be"
+          "after": "b98c215658e87a400c6440d58ce5da0ec08f23d13ebc1c9345716f006b57d2ea"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "51f4962a9f381dc88fccf9f96ec2392791505395543a0ec4270a503f1de36cc9",
-      "after_sha256": "d5eed64c0a62a39967c3826c7a9d66a32daf9c0b326726eb10df5c5702cb18ac",
+      "after_sha256": "ecad017a99eb6787463a551cf35484f493a7f33d6a3cfd3ab0ea052457ee0d46",
       "owners": {
         "@document": {
           "before": "51f4962a9f381dc88fccf9f96ec2392791505395543a0ec4270a503f1de36cc9",
-          "after": "d5eed64c0a62a39967c3826c7a9d66a32daf9c0b326726eb10df5c5702cb18ac"
+          "after": "ecad017a99eb6787463a551cf35484f493a7f33d6a3cfd3ab0ea052457ee0d46"
         }
       }
     },
     "scripts/engine_numerical_identity_test_admission.py": {
       "before_sha256": "7e738d85544f8ff9618989be91b074f115798c4ac0c2e49a3236f47396e36539",
-      "after_sha256": "77b7ed95c08e89b42e753431e2128855fee9a9adf3a9312325ff061668b5d774",
+      "after_sha256": "624ad0256eef4cab7799066ea9b3a262a159394776b9a34a190f6b359ffadea4",
       "owners": {
         "@module": {
           "before": "ae7cc471ea388e6dd52d704a8fa6124c8c4bd8cef7ff3ad42a4dc6a3d6707306",
-          "after": "0e654a70c19864d4aa7bf33ff4a306c59199aaf67dae2d7ed8c195d1891ac12c"
+          "after": "88c0fedf3b647600990fca504d0163e449d32cddfafc574beaa5d1c682378f0c"
         },
         "_round_five_shadow_successor": {
           "before": null,
@@ -186,9 +186,9 @@
         }
       }
     },
-    "tests/factions/chaos_daemons/unit/test_chaos_daemons_army_rule.py": {
-      "before_sha256": "dfeca2fa09c594e9d0274db16e8d74d1186d5f2e5dcfab7289d02d912c7d5285",
-      "after_sha256": "89aebab4dded9b4343c2e35b4628b471816af191cd8472c7aee4ce2a5b04c959",
+    "tests/factions/chaos_daemons/unit/test_bloodcrushers_abilities.py": {
+      "before_sha256": "b854af199b9f96b814b876b8005ff8a461d860e1a6beb6e5e626039be67b80f1",
+      "after_sha256": "9449f782cf2e387dc9d6df3bf4b15355a007f29536731213d31edb15d92701c4",
       "owners": {
         "_v995_shadow_definitions": {
           "before": null,
@@ -355,7 +355,7 @@
       "source_obligation": null,
       "unchanged_work": null
     },
-    "tests/factions/chaos_daemons/unit/test_chaos_daemons_army_rule.py": {
+    "tests/factions/chaos_daemons/unit/test_bloodcrushers_abilities.py": {
       "category": "measured_workload",
       "operations": [
         "cavalcade-round-five-contextual-shadow-regression"
