@@ -412,6 +412,15 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
             "test_ellipse_facing_search_leaves_unsupported_domains_to_existing_authority",
         )
     }
+    allocation_cases = {
+        allocation_owner + "::" + name
+        for name in (
+            "test_screen_rod_allocation_ranks_issued_choices_by_survivor_coherency",
+            "test_allocation_honors_only_option_and_retains_issued_order_on_tie[indices0-False]",
+            "test_allocation_honors_only_option_and_retains_issued_order_on_tie[indices1-True]",
+            "test_allocation_requires_defender_visible_formation",
+        )
+    }
     assert current.keys() == (
         retained
         | added
@@ -428,6 +437,7 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         | gameplay
         | shadow_cases
         | close_quarters_cases
+        | allocation_cases
         | {
             strict_replay_owner
             + "::test_strict_persistence_rejects_valid_artifact_with_mismatched_metadata_or_tails"
