@@ -1,0 +1,15 @@
+{
+  "schema": "finite-stage2-allocation-coherency-test-addition-v1",
+  "retained_strict_replay_sha256": "c052fbc19a1647aa855cc26b0bfb909230ca485c63fb47c6425caf0ee46c4f89",
+  "retained_runtime_fingerprint": "f520dd31aa79a8770d0e082eb615503f0e30da1c86839a2eb4173b2624279f98",
+  "runtime_fingerprint": "57932017a4e099dbdfff1ccd9c9231c4c2f5c38ea44562c22bdfae1dd2b9f6d1",
+  "policy_sha256": "5820cb446c37ff64eaf6d6da6034b041ff66aff4589436fe62fa4ba1d57c83ae",
+  "added_files": {
+    "tests/infrastructure/adapters/test_allocation_coherency.py": {
+      "blob_sha1": "63e67a33463f47d0b38eca1758d7574b532bf56c",
+      "bytes": 5926,
+      "mode": "100644",
+      "sha256": "b37bd57bedddfb2987d34de0ef1d8a0cc64f5e74384c6911934d401de7c1449f"
+    }
+  }
+}

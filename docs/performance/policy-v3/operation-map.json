@@ -34230,6 +34230,19 @@
       "sensitive": false,
       "mandatory": false
     },
+    "allocation-coherency-policy": {
+      "paths": [
+        "src/warhammer40k_core/ai/allocation_coherency.py",
+        "tests/infrastructure/adapters/test_allocation_coherency.py",
+        "data/source_audits/ci64_provenance_v1/stage2-allocation-coherency-test-addition-v1.json"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
     "player-policy-boundary": {
       "paths": [
         "src/warhammer40k_core/ai/player_policy.py",
