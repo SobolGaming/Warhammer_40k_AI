@@ -4,6 +4,136 @@
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:aa016bafd0895687abc9c872c11933ca27b12d4f7e147f29ad191ef40b5f2ca1",
   "operation_map_sha256": "6bc2112604293fb8f9da534f49126533790e912610747012770a721a070c9bfa",
   "changes": {
+    "ci/test_shards/durations.json": {
+      "before_sha256": "1be2ae920ae5340c312ee0323124eb10b0b5fc90d46b3e95349e91a8db6d4295",
+      "after_sha256": "fdacd2171161be84e1488632adf34bd1d64bebb3bf41d6c36c0f6f05f96eb90e",
+      "owners": {
+        "@document": {
+          "before": "1be2ae920ae5340c312ee0323124eb10b0b5fc90d46b3e95349e91a8db6d4295",
+          "after": "fdacd2171161be84e1488632adf34bd1d64bebb3bf41d6c36c0f6f05f96eb90e"
+        }
+      }
+    },
+    "ci/test_shards/shard-1.txt": {
+      "before_sha256": "e24796865b9cc700767303083e0a995575b0451a39853325b0ac579dca961641",
+      "after_sha256": "e5cded788a97f7fbbb8f9e6ec9dbc58acf3afc890066612b8d0a174e816ee4f6",
+      "owners": {
+        "@document": {
+          "before": "e24796865b9cc700767303083e0a995575b0451a39853325b0ac579dca961641",
+          "after": "e5cded788a97f7fbbb8f9e6ec9dbc58acf3afc890066612b8d0a174e816ee4f6"
+        }
+      }
+    },
+    "ci/test_shards/shard-10.txt": {
+      "before_sha256": "7bedb7f93f2bb324e353f7a0626bd31df1770f55fc12152fe96b6f2d550bc562",
+      "after_sha256": "670c723f49543dfabf06a091555a7d33aa240496ee8afa868245279ac0062af2",
+      "owners": {
+        "@document": {
+          "before": "7bedb7f93f2bb324e353f7a0626bd31df1770f55fc12152fe96b6f2d550bc562",
+          "after": "670c723f49543dfabf06a091555a7d33aa240496ee8afa868245279ac0062af2"
+        }
+      }
+    },
+    "ci/test_shards/shard-11.txt": {
+      "before_sha256": "6146f97fbe04bbcf58ac4c7b2fdce514db9edd531a494c5d36217538430e46af",
+      "after_sha256": "2b4bf56aa472b1d37f1094a7d79063a7f7b86da98b260c77b2392465b484668f",
+      "owners": {
+        "@document": {
+          "before": "6146f97fbe04bbcf58ac4c7b2fdce514db9edd531a494c5d36217538430e46af",
+          "after": "2b4bf56aa472b1d37f1094a7d79063a7f7b86da98b260c77b2392465b484668f"
+        }
+      }
+    },
+    "ci/test_shards/shard-12.txt": {
+      "before_sha256": "ee904596567846dde3e320a91cd2cf28740223b602b72863b5f3d4ae8250de0a",
+      "after_sha256": "49e711fa480a9e0140c9a8370ba241e794847b7d4353d20239a2da48de06732d",
+      "owners": {
+        "@document": {
+          "before": "ee904596567846dde3e320a91cd2cf28740223b602b72863b5f3d4ae8250de0a",
+          "after": "49e711fa480a9e0140c9a8370ba241e794847b7d4353d20239a2da48de06732d"
+        }
+      }
+    },
+    "ci/test_shards/shard-2.txt": {
+      "before_sha256": "03e8c83928b24c148310d4e6af3ef12156a1ac421c8e1739454b6e25715ff0e1",
+      "after_sha256": "d4f1bc88af54e75600aae70e054a90030e801699fe2e3705189155a88bf8cea7",
+      "owners": {
+        "@document": {
+          "before": "03e8c83928b24c148310d4e6af3ef12156a1ac421c8e1739454b6e25715ff0e1",
+          "after": "d4f1bc88af54e75600aae70e054a90030e801699fe2e3705189155a88bf8cea7"
+        }
+      }
+    },
+    "ci/test_shards/shard-3.txt": {
+      "before_sha256": "92ce265d3a49f45f37f83cc22a591db3cca8dff0c47b4954ac84f89ec87c34c3",
+      "after_sha256": "6e7616052e2a5e02f0af797d7dbbb358c50221a71efb5913d4166ebe53d37d43",
+      "owners": {
+        "@document": {
+          "before": "92ce265d3a49f45f37f83cc22a591db3cca8dff0c47b4954ac84f89ec87c34c3",
+          "after": "6e7616052e2a5e02f0af797d7dbbb358c50221a71efb5913d4166ebe53d37d43"
+        }
+      }
+    },
+    "ci/test_shards/shard-4.txt": {
+      "before_sha256": "e36a449a938a4e6f0479624cbb01a26953ca22305a5c90d5c28b6e4e1009b87d",
+      "after_sha256": "be56b208b918e8d1a81b8ef31b210bb5fb6343cac39c3ced393110f72670d869",
+      "owners": {
+        "@document": {
+          "before": "e36a449a938a4e6f0479624cbb01a26953ca22305a5c90d5c28b6e4e1009b87d",
+          "after": "be56b208b918e8d1a81b8ef31b210bb5fb6343cac39c3ced393110f72670d869"
+        }
+      }
+    },
+    "ci/test_shards/shard-5.txt": {
+      "before_sha256": "1d9b03b743347766be4edbf10714c3b483a0106f3731f1d0740225183e165e4e",
+      "after_sha256": "7c93e93b8761ba169a9440d15680342ea2ce71647048d30811a6c82dd46719f3",
+      "owners": {
+        "@document": {
+          "before": "1d9b03b743347766be4edbf10714c3b483a0106f3731f1d0740225183e165e4e",
+          "after": "7c93e93b8761ba169a9440d15680342ea2ce71647048d30811a6c82dd46719f3"
+        }
+      }
+    },
+    "ci/test_shards/shard-6.txt": {
+      "before_sha256": "1bc1c95a586927ba7ea5f5073e7fe32c8cc71aa4306d4f6293eee65962edfacd",
+      "after_sha256": "2fd94b3b1b64ef7927ceb464529f4308eba5dde9037124449a21ff7c8087c9f5",
+      "owners": {
+        "@document": {
+          "before": "1bc1c95a586927ba7ea5f5073e7fe32c8cc71aa4306d4f6293eee65962edfacd",
+          "after": "2fd94b3b1b64ef7927ceb464529f4308eba5dde9037124449a21ff7c8087c9f5"
+        }
+      }
+    },
+    "ci/test_shards/shard-7.txt": {
+      "before_sha256": "cb3b5ae17c30a8f80d6a448bef1101947d4d4f009ffdccb789c002570a2856cb",
+      "after_sha256": "9a5512f3683aaafbbb5edfd0810a246be8d60ffa37174e001c4bf187a55325eb",
+      "owners": {
+        "@document": {
+          "before": "cb3b5ae17c30a8f80d6a448bef1101947d4d4f009ffdccb789c002570a2856cb",
+          "after": "9a5512f3683aaafbbb5edfd0810a246be8d60ffa37174e001c4bf187a55325eb"
+        }
+      }
+    },
+    "ci/test_shards/shard-8.txt": {
+      "before_sha256": "9cadd4b95e21951e798e2b933111edd6d6be074b9e477e3e034e7d897187a92c",
+      "after_sha256": "59ef06f8badb5780256878ecca3785252035f8d98fccd8500ff78be32a686049",
+      "owners": {
+        "@document": {
+          "before": "9cadd4b95e21951e798e2b933111edd6d6be074b9e477e3e034e7d897187a92c",
+          "after": "59ef06f8badb5780256878ecca3785252035f8d98fccd8500ff78be32a686049"
+        }
+      }
+    },
+    "ci/test_shards/shard-9.txt": {
+      "before_sha256": "875ebaf4c0e41267b449cb285efa9411702255aa22d2fe8c1f5ae4d699bb1159",
+      "after_sha256": "320a6deac5d88597545752f8e0df5284543431a4a09172d2087b0084e7e8049e",
+      "owners": {
+        "@document": {
+          "before": "875ebaf4c0e41267b449cb285efa9411702255aa22d2fe8c1f5ae4d699bb1159",
+          "after": "320a6deac5d88597545752f8e0df5284543431a4a09172d2087b0084e7e8049e"
+        }
+      }
+    },
     "contracts/examples/persistence/session-persistence.json": {
       "before_sha256": "1cd58eb03bf85aa8969bc899f8060a1c4accd8b7e2bc6454fce816dec5ad5d0a",
       "after_sha256": "7f2587e3fdbc2caa179a8b12ed5ec8a8f3d65f20372e19290b8b059011c8fe7d",
@@ -206,6 +336,149 @@
     }
   },
   "rows": {
+    "ci/test_shards/durations.json": {
+      "category": "measured_workload",
+      "operations": [
+        "behavior-shard-inventory",
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate all twelve hosted manifests and complete measured scheduling weights for the three newly admitted regression cases.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-1.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "behavior-shard-inventory",
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate all twelve hosted manifests and complete measured scheduling weights for the three newly admitted regression cases.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-10.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "behavior-shard-inventory",
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate all twelve hosted manifests and complete measured scheduling weights for the three newly admitted regression cases.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-11.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "behavior-shard-inventory",
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate all twelve hosted manifests and complete measured scheduling weights for the three newly admitted regression cases.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-12.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "behavior-shard-inventory",
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate all twelve hosted manifests and complete measured scheduling weights for the three newly admitted regression cases.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-2.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "behavior-shard-inventory",
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate all twelve hosted manifests and complete measured scheduling weights for the three newly admitted regression cases.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-3.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "behavior-shard-inventory",
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate all twelve hosted manifests and complete measured scheduling weights for the three newly admitted regression cases.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-4.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "behavior-shard-inventory",
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate all twelve hosted manifests and complete measured scheduling weights for the three newly admitted regression cases.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-5.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "behavior-shard-inventory",
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate all twelve hosted manifests and complete measured scheduling weights for the three newly admitted regression cases.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-6.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "behavior-shard-inventory",
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate all twelve hosted manifests and complete measured scheduling weights for the three newly admitted regression cases.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-7.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "behavior-shard-inventory",
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate all twelve hosted manifests and complete measured scheduling weights for the three newly admitted regression cases.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-8.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "behavior-shard-inventory",
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate all twelve hosted manifests and complete measured scheduling weights for the three newly admitted regression cases.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-9.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "behavior-shard-inventory",
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate all twelve hosted manifests and complete measured scheduling weights for the three newly admitted regression cases.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "measured_workload",
       "operations": [
