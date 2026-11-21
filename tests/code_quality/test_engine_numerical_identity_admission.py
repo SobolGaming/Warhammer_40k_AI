@@ -343,6 +343,14 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         + f"[{choice}]"
         for choice in ("decline", "reroll:0,1")
     )
+    shadow_cases = {
+        shadow_owner
+        + "::test_v995_contextual_shadow_aura_applies_only_to_friendly_khorne_units_in_range",
+        shadow_owner
+        + "::test_v995_opposing_command_battle_shock_resolves_with_qualified_terror[False]",
+        shadow_owner
+        + "::test_v995_opposing_command_battle_shock_resolves_with_qualified_terror[True]",
+    }
     assert current.keys() == (
         retained
         | added
@@ -357,6 +365,7 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         | oval_oval_witnesses
         | oval_codec
         | gameplay
+        | shadow_cases
     )
 
 
