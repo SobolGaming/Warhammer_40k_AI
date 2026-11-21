@@ -24,6 +24,233 @@ from tests.factions.chaos_daemons.consumer_helpers import (
 )
 
 
+def test_v995_contextual_shadow_aura_applies_only_to_friendly_khorne_units_in_range() -> None:
+    from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons import (
+        army_rule,
+        datasheets,
+    )
+    from warhammer40k_core.engine.phase import GameLifecycleError
+    from warhammer40k_core.engine.rule_aura_resolution import aura_affected_unit_ids
+    from warhammer40k_core.rules.rule_ir import RuleConditionKind, RuleParameter
+
+    definitions = _v995_shadow_definitions()
+    s = scene(
+        definitions,
+        (
+            selection(definitions, "000002582", "bloodthirster"),
+            selection(definitions, CRUSHERS, "khorne"),
+            selection(definitions, CRUSHERS, "distant"),
+            selection(definitions, "000001120", "tzeentch"),
+        ),
+        (selection(definitions, CRUSHERS, "khorne"),),
+    )
+    locate(s, "own:bloodthirster", (Pose.at(22, 30),))
+    locate(s, "own:khorne", tuple(Pose.at(25, 27 + 3 * i) for i in range(3)))
+    locate(s, "own:distant", tuple(Pose.at(40, 27 + 3 * i) for i in range(3)))
+    locate(s, "own:tzeentch", (Pose.at(18, 30),))
+    locate(s, "foe:khorne", tuple(Pose.at(24, 35 + 3 * i) for i in range(3)))
+    before = s.state.to_payload()
+
+    expected = {
+        "foe:khorne": False,
+        "own:tzeentch": False,
+        "own:distant": False,
+        "own:khorne": True,
+    }
+    assert {
+        target: army_rule._unit_within_semantic_shadow_aura(  # pyright: ignore[reportPrivateUsage]
+            state=s.state, player_id="owner", unit_instance_id=target
+        )
+        for target in expected
+    } == expected
+    bloodthirster = s.units["own:bloodthirster"]
+    ability = next(
+        ability
+        for ability in bloodthirster.datasheet_abilities
+        if ability.ability_id == datasheets.BLOODTHIRSTER_GREATER_DAEMON_ABILITY_ID
+    )
+    rule_ir = army_rule._semantic_rule_ir_for_ability(ability)  # pyright: ignore[reportPrivateUsage]
+    [clause] = rule_ir.clauses
+    assert clause.target is not None
+    malformed_target = replace(
+        clause.target,
+        parameters=tuple(p for p in clause.target.parameters if p.key == "allegiance"),
+    )
+    with pytest.raises(GameLifecycleError, match="matching target and condition keywords"):
+        aura_affected_unit_ids(
+            clause=replace(clause, target=malformed_target),
+            state=s.state,
+            source_unit_instance_id=bloodthirster.unit_instance_id,
+            source_model_instance_id=bloodthirster.own_models[0].model_instance_id,
+            target_unit_instance_id="foe:khorne",
+        )
+    [distance] = (
+        condition
+        for condition in clause.conditions
+        if condition.kind is RuleConditionKind.DISTANCE_PREDICATE
+    )
+    for parameter in (
+        RuleParameter("object_allegiance", "enemy"),
+        RuleParameter("subject", "this_model"),
+    ):
+        malformed_distance = replace(distance, parameters=(*distance.parameters, parameter))
+        with pytest.raises(GameLifecycleError, match="positive, unqualified within range"):
+            aura_affected_unit_ids(
+                clause=replace(
+                    clause,
+                    conditions=tuple(
+                        malformed_distance if condition is distance else condition
+                        for condition in clause.conditions
+                    ),
+                ),
+                state=s.state,
+                source_unit_instance_id=bloodthirster.unit_instance_id,
+                source_model_instance_id=bloodthirster.own_models[0].model_instance_id,
+                target_unit_instance_id="foe:khorne",
+            )
+    first_gate = next(c for c in clause.conditions if c.kind is RuleConditionKind.KEYWORD_GATE)
+    malformed_gate = replace(first_gate, parameters=(RuleParameter("required_keyword", None),))
+    with pytest.raises(GameLifecycleError, match="matching target and condition keywords"):
+        aura_affected_unit_ids(
+            clause=replace(clause, conditions=(*clause.conditions, malformed_gate)),
+            state=s.state,
+            source_unit_instance_id=bloodthirster.unit_instance_id,
+            source_model_instance_id=bloodthirster.own_models[0].model_instance_id,
+            target_unit_instance_id="foe:khorne",
+        )
+    [effect] = clause.effects
+    malformed_effect = replace(
+        effect,
+        parameters=(*effect.parameters, RuleParameter("operation", "deny")),
+    )
+    with pytest.raises(GameLifecycleError, match="unsupported effect"):
+        army_rule._semantic_shadow_aura_targets(  # pyright: ignore[reportPrivateUsage]
+            rule_ir=replace(rule_ir, clauses=(replace(clause, effects=(malformed_effect,)),)),
+            state=s.state,
+            source_unit_instance_id=bloodthirster.unit_instance_id,
+            source_model_instance_id=bloodthirster.own_models[0].model_instance_id,
+            target_unit_instance_id="foe:khorne",
+        )
+    assert s.state.to_payload() == before
+
+
+@pytest.mark.parametrize("near_greater_daemon", [False, True])
+def test_v995_opposing_command_battle_shock_resolves_with_qualified_terror(
+    near_greater_daemon: bool,
+) -> None:
+    from tests.support.battle_shock_batch04 import health
+    from warhammer40k_core.adapters.access_control import ViewerContext
+    from warhammer40k_core.engine.destruction_provenance import DestructionSourceKind
+    from warhammer40k_core.engine.direct_mortal_wound_application import (
+        apply_direct_mortal_wounds_to_unit,
+    )
+    from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons import (
+        army_rule,
+    )
+    from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
+        MortalWoundDestructionEvidence,
+    )
+    from warhammer40k_core.engine.stratagems import stratagem_decline_payload
+
+    definitions = _v995_shadow_definitions()
+    s = scene(
+        definitions,
+        (selection(definitions, "000002582", "bloodthirster"),),
+        (selection(definitions, "000001120", "lord-of-change"),),
+        phase=BattlePhase.COMMAND,
+        active="opponent",
+        seed="v995-contextual-shadow",
+    )
+    target_id = "foe:lord-of-change"
+    locate(s, "own:bloodthirster", (Pose.at(23 if near_greater_daemon else 8, 33),))
+    locate(s, target_id, (Pose.at(28, 33),))
+    anchor(s)
+    apply_direct_mortal_wounds_to_unit(
+        state=s.state,
+        decisions=s.session.lifecycle.decision_controller,
+        application_id="fixture:v995-contextual-shadow-prior-wounds",
+        source_rule_id="fixture:v995-contextual-shadow-prior-wounds:source",
+        source_context={"source_kind": "fixture_preexisting_casualties"},
+        destruction_evidence=MortalWoundDestructionEvidence.for_non_attack_state(
+            state=s.state,
+            destroying_player_id="owner",
+            source_rules_unit_instance_id=None,
+            source_model_instance_id=None,
+            destruction_source_kind=DestructionSourceKind.ABILITY,
+            action_phase=BattlePhase.COMMAND,
+            source_step="fixture_preexisting_casualties",
+        ),
+        target_unit_instance_id=target_id,
+        mortal_wounds=10,
+    )
+    assert health(s.session, target_id) == 8
+    request(s.session.advance_until_decision_or_terminal(), "submit_stratagem_target_proposal")
+    view = s.session.view(viewer_player_id="opponent")
+    pending = view["pending_decision"]
+    assert pending is not None
+    assert pending["decision_type"] == "submit_stratagem_target_proposal"
+    status = s.session.submit_viewer_parameterized_payload(
+        viewer=ViewerContext.for_player("opponent"),
+        request_id=pending["request_id"],
+        payload=stratagem_decline_payload(),
+        result_id="v995-contextual-shadow:decline",
+    )
+    request(status, "select_movement_unit")
+    assert not army_rule.unit_within_shadow_of_chaos(
+        state=s.state, player_id="owner", unit_instance_id=target_id
+    )
+    [resolved] = events(s.session, "battle_shock_test_resolved")
+    result = resolved["battle_shock_result"]
+    assert isinstance(result, dict)
+    modified = result["modified_roll"]
+    assert isinstance(modified, dict)
+    modifiers = modified["modifiers"]
+    assert isinstance(modifiers, list)
+    assert [cast(dict[str, JsonValue], m)["operand"] for m in modifiers] == (
+        [-1] if near_greater_daemon else []
+    )
+    assert all(
+        cast(dict[str, JsonValue], m)["source_id"] == army_rule.JULY_SOURCE_RULE_ID
+        for m in modifiers
+    )
+    assert result["passed"] is (not near_greater_daemon)
+    reactions = events(s.session, "chaos_daemons_daemonic_terror_mortal_wounds_applied")
+    if near_greater_daemon:
+        [reaction] = reactions
+        assert reaction["source_rule_id"] == army_rule.JULY_SOURCE_RULE_ID
+        assert reaction["player_id"] == "owner"
+        assert reaction["target_unit_instance_id"] == target_id
+        d3 = reaction["d3_result"]
+        assert isinstance(d3, dict)
+        amount = d3["value"]
+        assert type(amount) is int
+        assert health(s.session, target_id) == 8 - amount
+    else:
+        assert reactions == []
+        assert health(s.session, target_id) == 8
+
+
+def _v995_shadow_definitions() -> Section02Definitions:
+    from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+        chaos_daemons_cavalcade_2026_11,
+    )
+
+    package = chaos_daemons_cavalcade_2026_11.catalog_package()
+    catalog = package.army_catalog
+    # The bounded fixture uses asymmetric force dispositions in a shared mission.
+    detachments = tuple(
+        replace(
+            d, force_disposition_ids=(*d.force_disposition_ids, "take-and-hold", "purge-the-foe")
+        )
+        if d.detachment_id == "cavalcade-of-chaos"
+        else d
+        for d in catalog.detachments
+    )
+    return Section02Definitions(
+        replace(package, army_catalog=replace(catalog, detachments=detachments)), 0.0
+    )
+
+
 @pytest.mark.parametrize("inside", [True, False])
 @pytest.mark.parametrize("seed", [0, 2])
 def test_batch04_native_shadow_terror_commits_damage_only_on_failed_test(

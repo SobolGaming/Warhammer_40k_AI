@@ -222,7 +222,31 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         )
     )
     assert terminal["runtime_fingerprint"] == cavalcade_base_manifest["fingerprint"]
-    assert _record(MANIFEST)["fingerprint"] == selection.CAVALCADE_AUTHORITY_RUNTIME
+    shadow = _record(selection.ROUND_FIVE_SHADOW_TRANSITION)
+    shadow_manifest = json.loads(
+        subprocess.check_output(
+            ["git", "show", selection.ROUND_FIVE_SHADOW_BASE + ":" + MANIFEST], cwd=ROOT
+        )
+    )
+    assert shadow_manifest["fingerprint"] == selection.CAVALCADE_AUTHORITY_RUNTIME
+    assert shadow["retained_runtime_fingerprint"] == selection.CAVALCADE_AUTHORITY_RUNTIME
+    assert _record(MANIFEST)["fingerprint"] == shadow["runtime_fingerprint"]
+    shadow_owner = selection.ROUND_FIVE_SHADOW_OWNER
+    assert (
+        shadow["test"][shadow_owner]["before"]
+        == _record(sharding.CUTOVER_PATH)["active_files"][shadow_owner]
+    )
+    assert shadow_owner in active_files
+    assert sum(shadow_owner in group for group in groups) == 1
+    for name in selection.ROUND_FIVE_SHADOW_SOURCES:
+        source_before = subprocess.check_output(
+            ["git", "show", selection.ROUND_FIVE_SHADOW_BASE + ":" + name], cwd=ROOT
+        )
+        assert shadow["sources"][name]["before"] == hashlib.sha256(source_before).hexdigest()
+        assert (
+            shadow["sources"][name]["after"]
+            == hashlib.sha256((ROOT / name).read_bytes()).hexdigest()
+        )
     for name, digest in selection.CAVALCADE_AUTHORITY_SOURCES.items():
         assert hashlib.sha256((ROOT / name).read_bytes()).hexdigest() == digest
     for terminal_owner in selection.TERMINAL_RESTORE_OWNERS:

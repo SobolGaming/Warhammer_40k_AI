@@ -42,7 +42,9 @@ def aura_affected_unit_ids(
     state: GameState,
     source_unit_instance_id: str,
     source_model_instance_id: str | None,
+    target_unit_instance_id: str | None = None,
 ) -> tuple[str, ...]:
+    """Resolve aura recipients, with an explicit recipient for a contextual unit target."""
     if type(clause) is not RuleClause:
         raise GameLifecycleError("Aura evaluation requires RuleClause.")
     if type(state) is not GameState:
@@ -54,19 +56,42 @@ def aura_affected_unit_ids(
         unit_instance_id=source_unit_instance_id,
     )
     distance_parameters = _aura_distance_parameters(clause)
+    anchor_kind = _aura_anchor_kind(distance_parameters)
     source_geometries = _aura_source_geometries(
         state=state,
         source_rules_unit=source_rules_unit,
         source_model_instance_id=source_model_instance_id,
-        anchor_kind=_aura_anchor_kind(distance_parameters),
+        anchor_kind=anchor_kind,
     )
     distance_inches = _aura_distance_inches(distance_parameters)
-    allegiance = _aura_allegiance(clause)
+    target = clause.target
+    if target is None or (
+        target.kind is not RuleTargetKind.AURA_UNITS
+        and (target.kind is not RuleTargetKind.FRIENDLY_UNIT or target_unit_instance_id is None)
+    ):
+        raise GameLifecycleError(
+            "Aura clause requires an aura_units or bound friendly_unit target."
+        )
+    target_parameters = parameter_payload(target.parameters)
+    allegiance = _aura_allegiance(target_parameters)
     required_keywords = _required_keywords(clause.conditions)
+    if target.kind is RuleTargetKind.FRIENDLY_UNIT:
+        _validate_contextual_friendly_aura(
+            clause=clause,
+            target_parameters=target_parameters,
+            distance_parameters=distance_parameters,
+            distance_inches=distance_inches,
+            required_keywords=required_keywords,
+        )
     excluded_keywords = _excluded_keywords(clause.conditions)
-    include_source_unit = _aura_includes_source_unit(clause)
+    include_source_unit = _aura_includes_source_unit(target_parameters)
+    target_rules_units = (
+        rules_unit_views_for_state(state=state)
+        if target_unit_instance_id is None
+        else (rules_unit_view_by_id(state=state, unit_instance_id=target_unit_instance_id),)
+    )
     affected: list[str] = []
-    for target_rules_unit in rules_unit_views_for_state(state=state):
+    for target_rules_unit in target_rules_units:
         if (
             target_rules_unit.unit_instance_id == source_rules_unit.unit_instance_id
             and not include_source_unit
@@ -99,9 +124,7 @@ def aura_affected_unit_ids(
             source=source_rules_unit,
             target=target_rules_unit,
             source_model_instance_id=(
-                source_model_instance_id
-                if _aura_anchor_kind(distance_parameters) == AURA_ANCHOR_MODEL
-                else None
+                source_model_instance_id if anchor_kind == AURA_ANCHOR_MODEL else None
             ),
         )
         if relationship is AbilitySpatialRelationship.OWN_ABILITY:
@@ -120,6 +143,67 @@ def aura_affected_unit_ids(
         ):
             affected.append(target_rules_unit.unit_instance_id)
     return tuple(sorted(affected))
+
+
+def _validate_contextual_friendly_aura(
+    *,
+    clause: RuleClause,
+    target_parameters: dict[str, RuleParameterValue],
+    distance_parameters: dict[str, RuleParameterValue],
+    distance_inches: float,
+    required_keywords: tuple[str, ...],
+) -> None:
+    if target_parameters.get("allegiance") != AURA_ALLEGIANCE_FRIENDLY:
+        raise GameLifecycleError("Contextual aura requires friendly allegiance.")
+    if (
+        clause.trigger is not None
+        or clause.duration is not None
+        or any(
+            condition.kind
+            not in {RuleConditionKind.KEYWORD_GATE, RuleConditionKind.DISTANCE_PREDICATE}
+            for condition in clause.conditions
+        )
+    ):
+        raise GameLifecycleError("Contextual aura contains an unsupported window or condition.")
+    if (
+        distance_parameters.keys()
+        != {
+            "distance_inches",
+            "negated",
+            "object_kind",
+            "object_reference",
+            "predicate",
+            "qualifier",
+            "range_kind",
+        }
+        or distance_parameters["object_reference"] != "this"
+        or distance_parameters["object_kind"] not in {"model", "unit"}
+        or distance_parameters["predicate"] != "within"
+        or distance_parameters.get("range_kind") != "numeric_range"
+        or distance_parameters.get("negated") is not False
+        or distance_parameters.get("qualifier") is not None
+        or distance_inches <= 0
+    ):
+        raise GameLifecycleError("Contextual aura requires a positive, unqualified within range.")
+    sequence = target_parameters.get("required_keyword_sequence")
+    keyword_gates = (
+        parameter_payload(condition.parameters)
+        for condition in clause.conditions
+        if condition.kind is RuleConditionKind.KEYWORD_GATE
+    )
+    if (
+        target_parameters.keys() != {"allegiance", "required_keyword_sequence"}
+        or type(sequence) is not tuple
+        or not sequence
+        or set(sequence) != set(required_keywords)
+        or any(
+            parameters.keys() != {"required_keyword"}
+            or not isinstance(keyword := parameters["required_keyword"], str)
+            or not keyword.strip()
+            for parameters in keyword_gates
+        )
+    ):
+        raise GameLifecycleError("Contextual aura requires matching target and condition keywords.")
 
 
 def _aura_source_geometries(
@@ -218,10 +302,8 @@ def _aura_anchor_kind(parameters: dict[str, RuleParameterValue]) -> str:
     raise GameLifecycleError("Aura distance predicate object_reference is unsupported.")
 
 
-def _aura_allegiance(clause: RuleClause) -> str:
-    if clause.target is None or clause.target.kind is not RuleTargetKind.AURA_UNITS:
-        raise GameLifecycleError("Aura clause requires an aura_units target.")
-    allegiance = parameter_payload(clause.target.parameters).get("allegiance")
+def _aura_allegiance(parameters: dict[str, RuleParameterValue]) -> str:
+    allegiance = parameters.get("allegiance")
     if type(allegiance) is not str:
         raise GameLifecycleError("Aura target requires structured allegiance.")
     if allegiance not in {
@@ -233,10 +315,8 @@ def _aura_allegiance(clause: RuleClause) -> str:
     return allegiance
 
 
-def _aura_includes_source_unit(clause: RuleClause) -> bool:
-    if clause.target is None or clause.target.kind is not RuleTargetKind.AURA_UNITS:
-        raise GameLifecycleError("Aura clause requires an aura_units target.")
-    value = parameter_payload(clause.target.parameters).get("include_source_unit", True)
+def _aura_includes_source_unit(parameters: dict[str, RuleParameterValue]) -> bool:
+    value = parameters.get("include_source_unit", True)
     if type(value) is not bool:
         raise GameLifecycleError("Aura include_source_unit must be a boolean.")
     return value

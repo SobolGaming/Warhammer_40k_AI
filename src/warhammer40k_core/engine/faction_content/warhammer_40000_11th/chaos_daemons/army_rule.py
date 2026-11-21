@@ -72,6 +72,7 @@ from warhammer40k_core.engine.phase import (
     GameLifecycleStage,
     LifecycleStatus,
 )
+from warhammer40k_core.engine.rule_aura_resolution import aura_affected_unit_ids
 from warhammer40k_core.engine.rule_execution import (
     RuleExecutionContext,
     RuleExecutionResult,
@@ -97,6 +98,7 @@ from warhammer40k_core.rules.rule_ir import (
     RuleIR,
     RuleIRError,
     RuleIRPayload,
+    RuleTargetKind,
     parameter_payload,
 )
 
@@ -1297,6 +1299,15 @@ def _unit_within_semantic_shadow_aura(
             for source_model_id in source_model_ids:
                 if source_model_id not in source_models_by_id:
                     continue
+                target_unit_ids = _semantic_shadow_aura_targets(
+                    rule_ir=rule_ir,
+                    state=state,
+                    source_unit_instance_id=source_unit.unit_instance_id,
+                    source_model_instance_id=source_model_id,
+                    target_unit_instance_id=target_rules_unit.unit_instance_id,
+                )
+                if target_unit_ids is None:
+                    continue
                 result = execute_rule_ir(
                     rule_ir=rule_ir,
                     context=RuleExecutionContext(
@@ -1308,7 +1319,7 @@ def _unit_within_semantic_shadow_aura(
                         timing_window_id="chaos-daemons-shadow-of-chaos-semantic-aura",
                         source_unit_instance_id=source_unit.unit_instance_id,
                         source_model_instance_id=source_model_id,
-                        target_unit_instance_ids=(),
+                        target_unit_instance_ids=target_unit_ids,
                         source_keywords=(
                             *source_unit.keywords,
                             *source_unit.faction_keywords,
@@ -1318,6 +1329,7 @@ def _unit_within_semantic_shadow_aura(
                             "target_unit_instance_id": target_rules_unit.unit_instance_id,
                         },
                         state=state,
+                        record_persisting_effects=False,
                     ),
                     registry=default_rule_execution_registry(),
                 )
@@ -1336,6 +1348,45 @@ def _unit_within_semantic_shadow_aura(
                 ):
                     return True
     return False
+
+
+def _semantic_shadow_aura_targets(
+    *,
+    rule_ir: RuleIR,
+    state: GameState,
+    source_unit_instance_id: str,
+    source_model_instance_id: str,
+    target_unit_instance_id: str,
+) -> tuple[str, ...] | None:
+    if not rule_ir.is_supported:
+        raise GameLifecycleError("Shadow of Chaos semantic aura RuleIR is unsupported.")
+    if all(
+        clause.target is not None and clause.target.kind is RuleTargetKind.AURA_UNITS
+        for clause in rule_ir.clauses
+    ):
+        return ()  # Bulk aura execution derives its own targets.
+    clause = rule_ir.clauses[0]
+    if (
+        len(rule_ir.clauses) != 1
+        or clause.target is None
+        or clause.target.kind is not RuleTargetKind.FRIENDLY_UNIT
+    ):
+        raise GameLifecycleError("Shadow of Chaos contextual aura has unsupported targeting.")
+    if (
+        len(clause.effects) != 1
+        or not _effect_sets_shadow_of_chaos_status(clause.effects[0])
+        or {parameter.key for parameter in clause.effects[0].parameters}
+        != {"owner", "rules_context", "status"}
+    ):
+        raise GameLifecycleError("Shadow of Chaos contextual aura has an unsupported effect.")
+    affected = aura_affected_unit_ids(
+        clause=clause,
+        state=state,
+        source_unit_instance_id=source_unit_instance_id,
+        source_model_instance_id=source_model_instance_id,
+        target_unit_instance_id=target_unit_instance_id,
+    )
+    return affected if affected else None
 
 
 def _semantic_shadow_aura_source_model_ids(
@@ -1383,7 +1434,7 @@ def _semantic_rule_ir_for_ability(ability: DatasheetAbilityDescriptor) -> RuleIR
 def _rule_ir_sets_shadow_of_chaos_status(rule_ir: RuleIR) -> bool:
     if type(rule_ir) is not RuleIR:
         raise GameLifecycleError("Shadow of Chaos semantic aura requires RuleIR.")
-    return rule_ir.is_supported and any(
+    return any(
         _effect_sets_shadow_of_chaos_status(effect)
         for clause in rule_ir.clauses
         for effect in clause.effects
