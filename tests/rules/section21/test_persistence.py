@@ -1,17 +1,30 @@
 """Strict persistence/replay belongs to separate supported Core checkpoints."""
 
+import hashlib
 import json
+from typing import cast
+
+import pytest
 
 from tests.d09_heavy_helpers import heavy_session, move_heavy_unit
 from tests.surge_helpers import SOURCE, TARGET, surge_descriptor, surge_lifecycle, surge_path
-from warhammer40k_core.adapters.local_session import LocalGameSession
-from warhammer40k_core.engine.event_log import validate_json_value
+from warhammer40k_core.adapters.local_session import (
+    LocalGameSession,
+    LocalGameSessionPersistenceError,
+    LocalGameSessionPersistencePayload,
+)
+from warhammer40k_core.engine.event_log import JsonValue, canonical_json, validate_json_value
 from warhammer40k_core.engine.movement_proposals import (
     MovementProposalPayload,
     MovementProposalRequest,
 )
 from warhammer40k_core.engine.phase import LifecycleStatusKind
-from warhammer40k_core.engine.replay import ReplayRunner, ReplayRunStatus
+from warhammer40k_core.engine.replay import (
+    ReplayArtifact,
+    ReplayArtifactPayload,
+    ReplayRunner,
+    ReplayRunStatus,
+)
 from warhammer40k_core.engine.triggered_movement import TriggeredMovementEligibleUnit
 from warhammer40k_core.engine.triggered_movement_selection import (
     triggered_movement_unit_selection_request,
@@ -35,6 +48,35 @@ def test_supported_core_flight_checkpoint_restores_and_replays() -> None:
         ReplayRunner.from_payload(json.loads(json.dumps(artifact))).run().status
         is ReplayRunStatus.REPRODUCED
     )
+
+
+def test_strict_persistence_rejects_valid_artifact_with_mismatched_metadata_or_tails() -> None:
+    session = heavy_session(fly=True)
+    session.advance_until_decision_or_terminal()
+    move_heavy_unit(session, advance=False, distance=2, flying=True)
+    saved = cast(LocalGameSessionPersistencePayload, session.to_persistence_payload())
+    artifact = saved["replay_artifact"]
+    assert artifact["decision_records"]
+    assert artifact["event_records"]
+
+    mismatched_artifacts: tuple[ReplayArtifactPayload, ...] = (
+        {**artifact, "artifact_id": "different-artifact"},
+        {**artifact, "decision_records": artifact["decision_records"][:-1]},
+        {**artifact, "event_records": artifact["event_records"][:-1]},
+    )
+    for mismatched in mismatched_artifacts:
+        ReplayArtifact.from_payload(mismatched)
+        payload: dict[str, JsonValue] = {
+            key: value
+            for key, value in cast(dict[str, JsonValue], saved).items()
+            if key != "content_hash"
+        }
+        payload["replay_artifact"] = cast(JsonValue, mismatched)
+        payload["content_hash"] = hashlib.sha256(
+            canonical_json(payload).encode("utf-8")
+        ).hexdigest()
+        with pytest.raises(LocalGameSessionPersistenceError, match="persistence replay"):
+            LocalGameSession.from_persistence_payload(payload)
 
 
 def test_supported_core_surge_wrong_inventory_retry_restore_and_exact_replay() -> None:
