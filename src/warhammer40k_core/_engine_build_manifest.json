@@ -1,7 +1,7 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:57932017a4e099dbdfff1ccd9c9231c4c2f5c38ea44562c22bdfae1dd2b9f6d1",
-  "fingerprint": "57932017a4e099dbdfff1ccd9c9231c4c2f5c38ea44562c22bdfae1dd2b9f6d1",
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:9c85fe2c2615775d5e7cd841d1f216a43634cdba1b213bde86ee9d3a40a11926",
+  "fingerprint": "9c85fe2c2615775d5e7cd841d1f216a43634cdba1b213bde86ee9d3a40a11926",
   "resource_count": 3277,
   "resources": [
     {
@@ -215,9 +215,9 @@
       "sha256": "a5e99ca273ba7a51d284edde66397d7d8a9327ae9008a4a7dd9658ff02efdefb"
     },
     {
-      "byte_length": 10954,
+      "byte_length": 11044,
       "path": "warhammer40k_core/adapters/viewer_identity.py",
-      "sha256": "ce5d0198caa098994cc427dccd51cc94f7e3703d4e8c5d5a6a71aa9d4dedc6ae"
+      "sha256": "50cb7565c984e288ba2b2fa9ffb1dbfe6c6a83c648e5de4522d239899032418f"
     },
     {
       "byte_length": 47,

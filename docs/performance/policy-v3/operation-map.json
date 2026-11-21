@@ -34230,6 +34230,18 @@
       "sensitive": false,
       "mandatory": false
     },
+    "cover-event-viewer-regression": {
+      "paths": [
+        "tests/infrastructure/adapters/test_cover_event_identity.py",
+        "data/source_audits/ci64_provenance_v1/stage2-cover-event-identity-test-addition-v1.json"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
     "allocation-coherency-policy": {
       "paths": [
         "src/warhammer40k_core/ai/allocation_coherency.py",

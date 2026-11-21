@@ -1,0 +1,18 @@
+{
+  "schema": "finite-stage2-cover-event-identity-test-addition-v1",
+  "retained_allocation_coherency_sha256": "4dee9b64424aedb21324016b9f1e430847fdda5e2a409229b50e8a23f0fb8981",
+  "retained_runtime_fingerprint": "57932017a4e099dbdfff1ccd9c9231c4c2f5c38ea44562c22bdfae1dd2b9f6d1",
+  "runtime_fingerprint": "9c85fe2c2615775d5e7cd841d1f216a43634cdba1b213bde86ee9d3a40a11926",
+  "source": {
+    "before": "ce5d0198caa098994cc427dccd51cc94f7e3703d4e8c5d5a6a71aa9d4dedc6ae",
+    "after": "50cb7565c984e288ba2b2fa9ffb1dbfe6c6a83c648e5de4522d239899032418f"
+  },
+  "added_files": {
+    "tests/infrastructure/adapters/test_cover_event_identity.py": {
+      "blob_sha1": "2440fbbb61deb69b5c49d4138661feec91f58bf2",
+      "bytes": 2631,
+      "mode": "100644",
+      "sha256": "7d0c11fd3e111996cb97b6554a3760988c6af02c635da70c775ad0187ea94d2d"
+    }
+  }
+}

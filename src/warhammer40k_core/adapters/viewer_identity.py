@@ -43,7 +43,8 @@ _IDENTITY_FIELDS = {
     "source_context_id": "source-context",
 }
 _REFERENCE_FIELD = re.compile(r"(?:^|_)(request|record|event|result|roll|window|opportunity)_ids?$")
-_DYNAMIC_REFERENCE_KEYS = frozenset({"source_key", "completion_key", "effect_key"})
+# Rule-granted Cover can derive its cache key from an attack context ID.
+_DYNAMIC_REFERENCE_KEYS = frozenset({"source_key", "completion_key", "effect_key", "los_cache_key"})
 _REFERENCE_TEXT_FIELDS = frozenset({"label", "message", "reason"})
 _VISIBLE_REFERENCE = re.compile(r"view-(request|record|event|roll)-[a-f0-9]{64}")
 _SEQUENCE_FIELDS = frozenset({"sequence_number", "created_sequence_number"})

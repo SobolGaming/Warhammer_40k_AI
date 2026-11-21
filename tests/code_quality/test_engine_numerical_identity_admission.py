@@ -248,7 +248,21 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
     assert strict_replay["retained_runtime_fingerprint"] == close_quarters["runtime_fingerprint"]
     allocation = _record(selection.ALLOCATION_COHERENCY_ADDITION)
     assert allocation["retained_runtime_fingerprint"] == strict_replay["runtime_fingerprint"]
-    assert _record(MANIFEST)["fingerprint"] == allocation["runtime_fingerprint"]
+    cover_event = _record(selection.COVER_EVENT_IDENTITY_ADDITION)
+    assert cover_event["retained_runtime_fingerprint"] == allocation["runtime_fingerprint"]
+    assert _record(MANIFEST)["fingerprint"] == cover_event["runtime_fingerprint"]
+    cover_source = selection.COVER_EVENT_IDENTITY_SOURCE
+    base_cover_source = subprocess.check_output(
+        ["git", "show", selection.COVER_EVENT_IDENTITY_BASE + ":" + cover_source], cwd=ROOT
+    )
+    assert cover_event["source"]["before"] == hashlib.sha256(base_cover_source).hexdigest()
+    assert (
+        cover_event["source"]["after"]
+        == hashlib.sha256((ROOT / cover_source).read_bytes()).hexdigest()
+    )
+    cover_owner = selection.COVER_EVENT_IDENTITY_OWNER
+    assert cover_owner in active_files
+    assert sum(cover_owner in group for group in groups) == 1
     allocation_owner = selection.ALLOCATION_COHERENCY_OWNER
     assert allocation_owner in active_files
     assert sum(allocation_owner in group for group in groups) == 1
@@ -438,6 +452,7 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         | shadow_cases
         | close_quarters_cases
         | allocation_cases
+        | {cover_owner + "::test_save_cover_cache_key_projects_embedded_request_reference"}
         | {
             strict_replay_owner
             + "::test_strict_persistence_rejects_valid_artifact_with_mismatched_metadata_or_tails"

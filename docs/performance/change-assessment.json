@@ -1,336 +1,318 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "7ceebdc839ea61cada3fd4e3bcc1da4d1589e0f6",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:57932017a4e099dbdfff1ccd9c9231c4c2f5c38ea44562c22bdfae1dd2b9f6d1",
-  "operation_map_sha256": "3abb5eda16719581c87e220c89684bcf989677d2759f4a10ac8efd941644ccf4",
+  "base": "7d0d2e320ff7b564b87aafbca368bbab00c325b6",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:9c85fe2c2615775d5e7cd841d1f216a43634cdba1b213bde86ee9d3a40a11926",
+  "operation_map_sha256": "6c7796e93109d6fa93b5c9dcfe2ad7e4bc0422533163b3dbdb5a651e0b245f7d",
   "changes": {
     "ci/test_shards/durations.json": {
-      "before_sha256": "dee4eb051ba210df34d33a78b8107149dc371b876c1b1772c827e5a90b1c6ea4",
-      "after_sha256": "c888e5e541d4a36213aa1017fc71b5be1046d865adf3af63f6996d3a7452de52",
+      "before_sha256": "c888e5e541d4a36213aa1017fc71b5be1046d865adf3af63f6996d3a7452de52",
+      "after_sha256": "eef998df6f802c8f96572db1130a88173a8d8fca578dc4e40bd9ee8662b7d263",
       "owners": {
         "@document": {
-          "before": "dee4eb051ba210df34d33a78b8107149dc371b876c1b1772c827e5a90b1c6ea4",
-          "after": "c888e5e541d4a36213aa1017fc71b5be1046d865adf3af63f6996d3a7452de52"
+          "before": "c888e5e541d4a36213aa1017fc71b5be1046d865adf3af63f6996d3a7452de52",
+          "after": "eef998df6f802c8f96572db1130a88173a8d8fca578dc4e40bd9ee8662b7d263"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
-      "before_sha256": "493801a570578fac52609dc4d0a429ebffd603ba08a3c70f4506c779ca39b656",
-      "after_sha256": "6209fb15dc9b3aa91d9e4d5fd7c5bb93105e2d5dd77d50c184d16b897a897b4d",
+      "before_sha256": "6209fb15dc9b3aa91d9e4d5fd7c5bb93105e2d5dd77d50c184d16b897a897b4d",
+      "after_sha256": "cc342484b6520a3f9c33e6071ff20049591874166b7fb81ba314d9bc9daeb449",
       "owners": {
         "@document": {
-          "before": "493801a570578fac52609dc4d0a429ebffd603ba08a3c70f4506c779ca39b656",
-          "after": "6209fb15dc9b3aa91d9e4d5fd7c5bb93105e2d5dd77d50c184d16b897a897b4d"
+          "before": "6209fb15dc9b3aa91d9e4d5fd7c5bb93105e2d5dd77d50c184d16b897a897b4d",
+          "after": "cc342484b6520a3f9c33e6071ff20049591874166b7fb81ba314d9bc9daeb449"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
-      "before_sha256": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20",
-      "after_sha256": "86e6f8c9d16edbc49c8268b147ad7b37a9f861e8470cc120aa62d85e6926b10e",
-      "owners": {
-        "@document": {
-          "before": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20",
-          "after": "86e6f8c9d16edbc49c8268b147ad7b37a9f861e8470cc120aa62d85e6926b10e"
-        }
-      }
-    },
-    "ci/test_shards/shard-11.txt": {
-      "before_sha256": "df601e705a6945c02a1fae187e19b57ae0023592ad4d54784eb22de8aaa2b23d",
-      "after_sha256": "550a133aefb74df196ad6e0d104526c26cf01ba9a0d225372b1523de55294560",
-      "owners": {
-        "@document": {
-          "before": "df601e705a6945c02a1fae187e19b57ae0023592ad4d54784eb22de8aaa2b23d",
-          "after": "550a133aefb74df196ad6e0d104526c26cf01ba9a0d225372b1523de55294560"
-        }
-      }
-    },
-    "ci/test_shards/shard-12.txt": {
-      "before_sha256": "154ad789f9421f770239d4aa723837b8daa157beb74f30568c948c6c6f084d77",
-      "after_sha256": "71c72302dc08550243de33f7ac2157968b4b8098851d8b0e5265099847b5ad41",
-      "owners": {
-        "@document": {
-          "before": "154ad789f9421f770239d4aa723837b8daa157beb74f30568c948c6c6f084d77",
-          "after": "71c72302dc08550243de33f7ac2157968b4b8098851d8b0e5265099847b5ad41"
-        }
-      }
-    },
-    "ci/test_shards/shard-2.txt": {
-      "before_sha256": "3999d188afde2811e40aa30432fcdaac325bbed8affad1bdbb75474b17218df4",
-      "after_sha256": "f63949c71766729d8b89935058e3c39118769682875a1b98e531df958e27ae82",
-      "owners": {
-        "@document": {
-          "before": "3999d188afde2811e40aa30432fcdaac325bbed8affad1bdbb75474b17218df4",
-          "after": "f63949c71766729d8b89935058e3c39118769682875a1b98e531df958e27ae82"
-        }
-      }
-    },
-    "ci/test_shards/shard-3.txt": {
-      "before_sha256": "a3e00298150047c5bbd55a50847703de702699d93ac4bdbd518565a68e2d817a",
-      "after_sha256": "5ca2f624bb8fbf051c12fbd475215ec7135aa18404f223d0fc89969807e07744",
-      "owners": {
-        "@document": {
-          "before": "a3e00298150047c5bbd55a50847703de702699d93ac4bdbd518565a68e2d817a",
-          "after": "5ca2f624bb8fbf051c12fbd475215ec7135aa18404f223d0fc89969807e07744"
-        }
-      }
-    },
-    "ci/test_shards/shard-4.txt": {
-      "before_sha256": "71b2aad01da8ef4af4184d6d35a4756a83f76d46b57fa42cb75042386948e371",
-      "after_sha256": "c9d1be443003e04bb42b4574aa45151b94a25165c045df3ce6c7bbbffcd8f42f",
-      "owners": {
-        "@document": {
-          "before": "71b2aad01da8ef4af4184d6d35a4756a83f76d46b57fa42cb75042386948e371",
-          "after": "c9d1be443003e04bb42b4574aa45151b94a25165c045df3ce6c7bbbffcd8f42f"
-        }
-      }
-    },
-    "ci/test_shards/shard-5.txt": {
-      "before_sha256": "6dc45adb97e966b1b553e26347a08be5e8e47c24464f4f3ed7c03b3a165b7fcb",
-      "after_sha256": "36cfdd0009ad7417a24698f0ebe2bc0b08164efe974b95af313c1651d3e811fa",
-      "owners": {
-        "@document": {
-          "before": "6dc45adb97e966b1b553e26347a08be5e8e47c24464f4f3ed7c03b3a165b7fcb",
-          "after": "36cfdd0009ad7417a24698f0ebe2bc0b08164efe974b95af313c1651d3e811fa"
-        }
-      }
-    },
-    "ci/test_shards/shard-6.txt": {
-      "before_sha256": "ee7badad0ac79eeb3c5b7b64d61e71a3f84ff321e6d43747327d412c50fbbae5",
-      "after_sha256": "4405ee7de582fd60b21ccf1a7b57a5ca27fb6eac2bf06cca153b0ef7db501e02",
-      "owners": {
-        "@document": {
-          "before": "ee7badad0ac79eeb3c5b7b64d61e71a3f84ff321e6d43747327d412c50fbbae5",
-          "after": "4405ee7de582fd60b21ccf1a7b57a5ca27fb6eac2bf06cca153b0ef7db501e02"
-        }
-      }
-    },
-    "ci/test_shards/shard-7.txt": {
-      "before_sha256": "55740c7063bc7e9e6bf51703ca6858462dc507496e221f5bb1599f903442aaa2",
-      "after_sha256": "d9c49673d6510211b705991a058ab17d1460db7b0082db79731bc67545188906",
-      "owners": {
-        "@document": {
-          "before": "55740c7063bc7e9e6bf51703ca6858462dc507496e221f5bb1599f903442aaa2",
-          "after": "d9c49673d6510211b705991a058ab17d1460db7b0082db79731bc67545188906"
-        }
-      }
-    },
-    "ci/test_shards/shard-8.txt": {
-      "before_sha256": "2da428178be1d8d54020291368a067917a2ad074031bbcb705de219d10b92ede",
-      "after_sha256": "3ca62f2e61da37e4eacf2be88fdc3208c5ee0662f6d58d57ff6e17a1b91e8bf9",
-      "owners": {
-        "@document": {
-          "before": "2da428178be1d8d54020291368a067917a2ad074031bbcb705de219d10b92ede",
-          "after": "3ca62f2e61da37e4eacf2be88fdc3208c5ee0662f6d58d57ff6e17a1b91e8bf9"
-        }
-      }
-    },
-    "ci/test_shards/shard-9.txt": {
-      "before_sha256": "f344f3e0a847e3c970aebee4bf8ac71238b093bb131a8e5826bed09c0f1a165d",
+      "before_sha256": "86e6f8c9d16edbc49c8268b147ad7b37a9f861e8470cc120aa62d85e6926b10e",
       "after_sha256": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20",
       "owners": {
         "@document": {
-          "before": "f344f3e0a847e3c970aebee4bf8ac71238b093bb131a8e5826bed09c0f1a165d",
+          "before": "86e6f8c9d16edbc49c8268b147ad7b37a9f861e8470cc120aa62d85e6926b10e",
           "after": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20"
         }
       }
     },
-    "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "b935a8b354ea6e3b816986d460de8b2dd39f85ac7bde295c765788c7ee23f830",
-      "after_sha256": "52640e1031a87e0e53b1c5f9a2fae1391fca257fad8737b24ec85e301047f399",
+    "ci/test_shards/shard-11.txt": {
+      "before_sha256": "550a133aefb74df196ad6e0d104526c26cf01ba9a0d225372b1523de55294560",
+      "after_sha256": "6cc0a98970e14cba567fe120df2c1492d3e9ad66b90e5fceb2afdf3b079475dc",
       "owners": {
         "@document": {
-          "before": "b935a8b354ea6e3b816986d460de8b2dd39f85ac7bde295c765788c7ee23f830",
-          "after": "52640e1031a87e0e53b1c5f9a2fae1391fca257fad8737b24ec85e301047f399"
+          "before": "550a133aefb74df196ad6e0d104526c26cf01ba9a0d225372b1523de55294560",
+          "after": "6cc0a98970e14cba567fe120df2c1492d3e9ad66b90e5fceb2afdf3b079475dc"
+        }
+      }
+    },
+    "ci/test_shards/shard-12.txt": {
+      "before_sha256": "71c72302dc08550243de33f7ac2157968b4b8098851d8b0e5265099847b5ad41",
+      "after_sha256": "130f4e124be616328742281df1b9a0d3c9ab125333b994be5127c03de32cf29c",
+      "owners": {
+        "@document": {
+          "before": "71c72302dc08550243de33f7ac2157968b4b8098851d8b0e5265099847b5ad41",
+          "after": "130f4e124be616328742281df1b9a0d3c9ab125333b994be5127c03de32cf29c"
+        }
+      }
+    },
+    "ci/test_shards/shard-2.txt": {
+      "before_sha256": "f63949c71766729d8b89935058e3c39118769682875a1b98e531df958e27ae82",
+      "after_sha256": "5f1ad5dd41e60165ac1033ddad58e51d04da120e7f2d442a7998abe87e6e75e6",
+      "owners": {
+        "@document": {
+          "before": "f63949c71766729d8b89935058e3c39118769682875a1b98e531df958e27ae82",
+          "after": "5f1ad5dd41e60165ac1033ddad58e51d04da120e7f2d442a7998abe87e6e75e6"
+        }
+      }
+    },
+    "ci/test_shards/shard-3.txt": {
+      "before_sha256": "5ca2f624bb8fbf051c12fbd475215ec7135aa18404f223d0fc89969807e07744",
+      "after_sha256": "548cbe7cd6a22f9987f61459bb3eb30667e06861515d3f6e4463669adeee8fea",
+      "owners": {
+        "@document": {
+          "before": "5ca2f624bb8fbf051c12fbd475215ec7135aa18404f223d0fc89969807e07744",
+          "after": "548cbe7cd6a22f9987f61459bb3eb30667e06861515d3f6e4463669adeee8fea"
+        }
+      }
+    },
+    "ci/test_shards/shard-4.txt": {
+      "before_sha256": "c9d1be443003e04bb42b4574aa45151b94a25165c045df3ce6c7bbbffcd8f42f",
+      "after_sha256": "43474871d3ca41b3459106f066159195d471bbde61706204d4795fbd90790de8",
+      "owners": {
+        "@document": {
+          "before": "c9d1be443003e04bb42b4574aa45151b94a25165c045df3ce6c7bbbffcd8f42f",
+          "after": "43474871d3ca41b3459106f066159195d471bbde61706204d4795fbd90790de8"
+        }
+      }
+    },
+    "ci/test_shards/shard-5.txt": {
+      "before_sha256": "36cfdd0009ad7417a24698f0ebe2bc0b08164efe974b95af313c1651d3e811fa",
+      "after_sha256": "549a952d24fceea4498bad9ad1063212ffbeebd1cf66cc96db13d6c75c154341",
+      "owners": {
+        "@document": {
+          "before": "36cfdd0009ad7417a24698f0ebe2bc0b08164efe974b95af313c1651d3e811fa",
+          "after": "549a952d24fceea4498bad9ad1063212ffbeebd1cf66cc96db13d6c75c154341"
+        }
+      }
+    },
+    "ci/test_shards/shard-6.txt": {
+      "before_sha256": "4405ee7de582fd60b21ccf1a7b57a5ca27fb6eac2bf06cca153b0ef7db501e02",
+      "after_sha256": "ce634489a6ab34c2ab0dabbd72f3f7a3f40090437f559792c722131cea1f1d35",
+      "owners": {
+        "@document": {
+          "before": "4405ee7de582fd60b21ccf1a7b57a5ca27fb6eac2bf06cca153b0ef7db501e02",
+          "after": "ce634489a6ab34c2ab0dabbd72f3f7a3f40090437f559792c722131cea1f1d35"
+        }
+      }
+    },
+    "ci/test_shards/shard-7.txt": {
+      "before_sha256": "d9c49673d6510211b705991a058ab17d1460db7b0082db79731bc67545188906",
+      "after_sha256": "16ba19836a1eba8e9b51e0cba884b2f451fbde78a1fcefb97cc17737fa44f1d9",
+      "owners": {
+        "@document": {
+          "before": "d9c49673d6510211b705991a058ab17d1460db7b0082db79731bc67545188906",
+          "after": "16ba19836a1eba8e9b51e0cba884b2f451fbde78a1fcefb97cc17737fa44f1d9"
+        }
+      }
+    },
+    "ci/test_shards/shard-8.txt": {
+      "before_sha256": "3ca62f2e61da37e4eacf2be88fdc3208c5ee0662f6d58d57ff6e17a1b91e8bf9",
+      "after_sha256": "1ec4c595ccfa4d6a253353c3b23bd4e495bc600ec57b784c0946023b431dea21",
+      "owners": {
+        "@document": {
+          "before": "3ca62f2e61da37e4eacf2be88fdc3208c5ee0662f6d58d57ff6e17a1b91e8bf9",
+          "after": "1ec4c595ccfa4d6a253353c3b23bd4e495bc600ec57b784c0946023b431dea21"
+        }
+      }
+    },
+    "ci/test_shards/shard-9.txt": {
+      "before_sha256": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20",
+      "after_sha256": "2990db95ae4bf6a4dabf539503756ec10ee5f57a99132408c40568457c05b121",
+      "owners": {
+        "@document": {
+          "before": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20",
+          "after": "2990db95ae4bf6a4dabf539503756ec10ee5f57a99132408c40568457c05b121"
+        }
+      }
+    },
+    "contracts/examples/persistence/session-persistence.json": {
+      "before_sha256": "52640e1031a87e0e53b1c5f9a2fae1391fca257fad8737b24ec85e301047f399",
+      "after_sha256": "2fd3fb57463cbd0f53e4c6912f964cb8b6d2d370476440c68898bdd8fb3b1b28",
+      "owners": {
+        "@document": {
+          "before": "52640e1031a87e0e53b1c5f9a2fae1391fca257fad8737b24ec85e301047f399",
+          "after": "2fd3fb57463cbd0f53e4c6912f964cb8b6d2d370476440c68898bdd8fb3b1b28"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "2df6b2455423414ca5126bd52f676b0b13ba891211b612e2ae468f9b31bfb724",
-      "after_sha256": "0dfac2476131bdb9c9752d7bc4480fb6f038de617dbb4199900838d798e77036",
+      "before_sha256": "0dfac2476131bdb9c9752d7bc4480fb6f038de617dbb4199900838d798e77036",
+      "after_sha256": "34493a5ab45e626f645d488e113ba9acd597a345b649f608d9a0b71ad8744bf0",
       "owners": {
         "@document": {
-          "before": "2df6b2455423414ca5126bd52f676b0b13ba891211b612e2ae468f9b31bfb724",
-          "after": "0dfac2476131bdb9c9752d7bc4480fb6f038de617dbb4199900838d798e77036"
+          "before": "0dfac2476131bdb9c9752d7bc4480fb6f038de617dbb4199900838d798e77036",
+          "after": "34493a5ab45e626f645d488e113ba9acd597a345b649f608d9a0b71ad8744bf0"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "f76d5f4f1a122e77c20ea8a82b92f9da8004d5709231887bcaf99fd6361824c3",
-      "after_sha256": "9683a60171ce68c29b7a645c7343370633a4393553535557b0a37e8084a41614",
+      "before_sha256": "9683a60171ce68c29b7a645c7343370633a4393553535557b0a37e8084a41614",
+      "after_sha256": "0f389e30e1464695b84fa7e26cf8b4b6419d4bff75eb88dbec2c6f01351499fc",
       "owners": {
         "@document": {
-          "before": "f76d5f4f1a122e77c20ea8a82b92f9da8004d5709231887bcaf99fd6361824c3",
-          "after": "9683a60171ce68c29b7a645c7343370633a4393553535557b0a37e8084a41614"
+          "before": "9683a60171ce68c29b7a645c7343370633a4393553535557b0a37e8084a41614",
+          "after": "0f389e30e1464695b84fa7e26cf8b4b6419d4bff75eb88dbec2c6f01351499fc"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "790166070f5cc205ea1e63b62fc763faddc40c5656767f782f2f97f0bb2b6599",
-      "after_sha256": "a1d46ee3c3879fad9edc39f4af60be67af9029b0f302a0b61b11ffa1b4045741",
+      "before_sha256": "a1d46ee3c3879fad9edc39f4af60be67af9029b0f302a0b61b11ffa1b4045741",
+      "after_sha256": "bb27ab1526e114e568177192e710424a71a5b08e539d4bb8ddf4ec7110b00813",
       "owners": {
         "@document": {
-          "before": "790166070f5cc205ea1e63b62fc763faddc40c5656767f782f2f97f0bb2b6599",
-          "after": "a1d46ee3c3879fad9edc39f4af60be67af9029b0f302a0b61b11ffa1b4045741"
+          "before": "a1d46ee3c3879fad9edc39f4af60be67af9029b0f302a0b61b11ffa1b4045741",
+          "after": "bb27ab1526e114e568177192e710424a71a5b08e539d4bb8ddf4ec7110b00813"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "8ad6938caa55f1ba16cfe14cae38cb1a3353ac2b830e94980f50caf22c52445e",
-      "after_sha256": "ccd1b3b3e5d045cd8588e8c9cd482f8cc5922435838860668b16e03fae57ad7d",
+      "before_sha256": "ccd1b3b3e5d045cd8588e8c9cd482f8cc5922435838860668b16e03fae57ad7d",
+      "after_sha256": "5e9106559d4a8f704dfa029b601dbda5c1c8731eab0c523749a486087706b189",
       "owners": {
         "@document": {
-          "before": "8ad6938caa55f1ba16cfe14cae38cb1a3353ac2b830e94980f50caf22c52445e",
-          "after": "ccd1b3b3e5d045cd8588e8c9cd482f8cc5922435838860668b16e03fae57ad7d"
+          "before": "ccd1b3b3e5d045cd8588e8c9cd482f8cc5922435838860668b16e03fae57ad7d",
+          "after": "5e9106559d4a8f704dfa029b601dbda5c1c8731eab0c523749a486087706b189"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "a4c09f87886af258137d6d6ea1579ba4a6d16c54bdcc065c85c91cff5586fcde",
-      "after_sha256": "43d8cbe2fb2770d2dbcea83b9454e5e5c27c3dbad00f4b1f954111290aa02c57",
+      "before_sha256": "43d8cbe2fb2770d2dbcea83b9454e5e5c27c3dbad00f4b1f954111290aa02c57",
+      "after_sha256": "060ef7a41f15a9c30537a89a13a0837adea368e26440cc27071fd8d9cfb89158",
       "owners": {
         "@document": {
-          "before": "a4c09f87886af258137d6d6ea1579ba4a6d16c54bdcc065c85c91cff5586fcde",
-          "after": "43d8cbe2fb2770d2dbcea83b9454e5e5c27c3dbad00f4b1f954111290aa02c57"
+          "before": "43d8cbe2fb2770d2dbcea83b9454e5e5c27c3dbad00f4b1f954111290aa02c57",
+          "after": "060ef7a41f15a9c30537a89a13a0837adea368e26440cc27071fd8d9cfb89158"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "2673f54383e33f8c8be0a77c61f91e28d4f4c14cc960a571e02b738440493c26",
-      "after_sha256": "0c88505612cfaf22ff9c018ecae9e7b40ae3e51eebfeffda84e5b90103284d12",
+      "before_sha256": "0c88505612cfaf22ff9c018ecae9e7b40ae3e51eebfeffda84e5b90103284d12",
+      "after_sha256": "928682f1d14eecd277e263e98558e1d6603b379d90292e865e871649003f3fb9",
       "owners": {
         "@document": {
-          "before": "2673f54383e33f8c8be0a77c61f91e28d4f4c14cc960a571e02b738440493c26",
-          "after": "0c88505612cfaf22ff9c018ecae9e7b40ae3e51eebfeffda84e5b90103284d12"
+          "before": "0c88505612cfaf22ff9c018ecae9e7b40ae3e51eebfeffda84e5b90103284d12",
+          "after": "928682f1d14eecd277e263e98558e1d6603b379d90292e865e871649003f3fb9"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "0923e2a9498a3f010345eaeaf68e8ec8de9ce11a8869e2578c6bc47bfa9ff6a0",
-      "after_sha256": "535e40a52b5ce7997cf453738cf573031f106fa894a119bea72933af5cd7540a",
+      "before_sha256": "535e40a52b5ce7997cf453738cf573031f106fa894a119bea72933af5cd7540a",
+      "after_sha256": "1c028ce1ce5554ab822484880d2657a6f85180287f47f66c14058d0296d48dad",
       "owners": {
         "@document": {
-          "before": "0923e2a9498a3f010345eaeaf68e8ec8de9ce11a8869e2578c6bc47bfa9ff6a0",
-          "after": "535e40a52b5ce7997cf453738cf573031f106fa894a119bea72933af5cd7540a"
+          "before": "535e40a52b5ce7997cf453738cf573031f106fa894a119bea72933af5cd7540a",
+          "after": "1c028ce1ce5554ab822484880d2657a6f85180287f47f66c14058d0296d48dad"
         }
       }
     },
-    "data/source_audits/ci64_provenance_v1/stage2-allocation-coherency-test-addition-v1.json": {
+    "data/source_audits/ci64_provenance_v1/stage2-cover-event-identity-test-addition-v1.json": {
       "before_sha256": null,
-      "after_sha256": "4dee9b64424aedb21324016b9f1e430847fdda5e2a409229b50e8a23f0fb8981",
+      "after_sha256": "cb6b967544fb2b54878b8021dbcb26d47a7625c12158f77aabb16a1bdd31801f",
       "owners": {
         "@document": {
           "before": null,
-          "after": "4dee9b64424aedb21324016b9f1e430847fdda5e2a409229b50e8a23f0fb8981"
+          "after": "cb6b967544fb2b54878b8021dbcb26d47a7625c12158f77aabb16a1bdd31801f"
         }
       }
     },
-    "docs/AI_POLICY_INTERFACE.md": {
-      "before_sha256": "90deb29323e88c3b495f59b436c740b09f400018f58d5966e6930f71b8e612cd",
-      "after_sha256": "f7459c1650d4aac78eedab7633e70f22d047e5475a01f986819fa417ce086bed",
+    "docs/ADAPTER_DECISION_CONTRACT.md": {
+      "before_sha256": "6908e7edbe55c61a52cab6d5644b50bba32f2514474bb50bfebc3fb7d8c68d73",
+      "after_sha256": "1f92e6dbae8c131b7c15952d0e42ce3c31e9cad49e5499f157fe7a6b85d7df63",
       "owners": {
         "@document": {
-          "before": "90deb29323e88c3b495f59b436c740b09f400018f58d5966e6930f71b8e612cd",
-          "after": "f7459c1650d4aac78eedab7633e70f22d047e5475a01f986819fa417ce086bed"
+          "before": "6908e7edbe55c61a52cab6d5644b50bba32f2514474bb50bfebc3fb7d8c68d73",
+          "after": "1f92e6dbae8c131b7c15952d0e42ce3c31e9cad49e5499f157fe7a6b85d7df63"
+        }
+      }
+    },
+    "docs/performance/current/stage2-cover-event-player-boundary.json": {
+      "before_sha256": null,
+      "after_sha256": "2856e45a2f675efbd7bf13f555e712820bf997fa11d50d0268f4d85981eba760",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "2856e45a2f675efbd7bf13f555e712820bf997fa11d50d0268f4d85981eba760"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "f16a773e859d02153104f950027a3b1e39f51d34ecedc65d1c54ee5f2d698808",
-      "after_sha256": "effee6def0368969e537196dff6ff5e3704dfaf33551b5c94583550887a48f3e",
+      "before_sha256": "effee6def0368969e537196dff6ff5e3704dfaf33551b5c94583550887a48f3e",
+      "after_sha256": "08655a41f83c6b29d3b97221f48e92491dd75aeca4144ea27625ae23ab849e53",
       "owners": {
         "@document": {
-          "before": "f16a773e859d02153104f950027a3b1e39f51d34ecedc65d1c54ee5f2d698808",
-          "after": "effee6def0368969e537196dff6ff5e3704dfaf33551b5c94583550887a48f3e"
+          "before": "effee6def0368969e537196dff6ff5e3704dfaf33551b5c94583550887a48f3e",
+          "after": "08655a41f83c6b29d3b97221f48e92491dd75aeca4144ea27625ae23ab849e53"
         }
       }
     },
     "scripts/engine_numerical_identity_test_admission.py": {
-      "before_sha256": "5c1dc7514ddcbfbab2b6aa6f65bd5210d355d65a9cf323d32c37004161fafc04",
-      "after_sha256": "8591912046e0f3f92e37e50221d1f0f62534ddf480f1eda453fa9f6b6767efe2",
+      "before_sha256": "8591912046e0f3f92e37e50221d1f0f62534ddf480f1eda453fa9f6b6767efe2",
+      "after_sha256": "4d417f31fd69c8a9a75c31f355344a7d9519d196aa53cf4057f87fdfe0e9609b",
       "owners": {
         "@module": {
-          "before": "4396f9281f95655e080458f2e8bd01e5c91d2452165a8e4cac0d0d42825455ba",
-          "after": "5743e1af8782726cc5e8014670f3b150307854d03ae70c77fdb0b8ed2136fe18"
+          "before": "5743e1af8782726cc5e8014670f3b150307854d03ae70c77fdb0b8ed2136fe18",
+          "after": "dfb5fdc06399212bff3799139d58d46a422c2b7eafc629905d27c139e801a57d"
         },
         "exact_movement_test_transition": {
-          "before": "cd8fbfcbda5635b7721c0df99e455a6e80dc2fb22f1c6b7f3bb0a5397adb8bef",
-          "after": "f81ca2b7a2e3c2b5e133c4e1e6b112be0690ace99f2f0fd7cf59f183e517a5d5"
+          "before": "f81ca2b7a2e3c2b5e133c4e1e6b112be0690ace99f2f0fd7cf59f183e517a5d5",
+          "after": "f6cdb0f2c04cb00919dd10c4aae0bb3075939c9119eaf506248a76b28d21a8c6"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "78dba60170812b2b1736a122d30b09939e7ed499b9a8b62e32646f5c401663dd",
-      "after_sha256": "889babe61cfe09519f33832878b4e5d39740ac9d25ee54e28317900d70c3767d",
+      "before_sha256": "889babe61cfe09519f33832878b4e5d39740ac9d25ee54e28317900d70c3767d",
+      "after_sha256": "2740c4e27efa3730d0484a4899eae4160429194e643d5d92e384ed7978fcdc8e",
       "owners": {
         "@document": {
-          "before": "78dba60170812b2b1736a122d30b09939e7ed499b9a8b62e32646f5c401663dd",
-          "after": "889babe61cfe09519f33832878b4e5d39740ac9d25ee54e28317900d70c3767d"
+          "before": "889babe61cfe09519f33832878b4e5d39740ac9d25ee54e28317900d70c3767d",
+          "after": "2740c4e27efa3730d0484a4899eae4160429194e643d5d92e384ed7978fcdc8e"
         }
       }
     },
-    "src/warhammer40k_core/ai/allocation_coherency.py": {
-      "before_sha256": null,
-      "after_sha256": "5820cb446c37ff64eaf6d6da6034b041ff66aff4589436fe62fa4ba1d57c83ae",
+    "src/warhammer40k_core/adapters/viewer_identity.py": {
+      "before_sha256": "ce5d0198caa098994cc427dccd51cc94f7e3703d4e8c5d5a6a71aa9d4dedc6ae",
+      "after_sha256": "50cb7565c984e288ba2b2fa9ffb1dbfe6c6a83c648e5de4522d239899032418f",
       "owners": {
         "@module": {
-          "before": null,
-          "after": "f7a9555fb237fbb069ece0f1f1745dab57e1b0f5cce16bdab3496d7494e7f974"
-        },
-        "AllocationCoherencyPolicy": {
-          "before": null,
-          "after": "363f53a0c26c17e168ce81b1eb8e37ba4eeb90c188c5a78513fa735688fb384a"
-        },
-        "AllocationCoherencyPolicy.choose": {
-          "before": null,
-          "after": "000b7ab1b6affc44c957a8754ff1c5dd42294df1f34ffa25614d7ebb00a88ac8"
-        },
-        "AllocationCoherencyPolicy.score_options": {
-          "before": null,
-          "after": "1dbd2565a03d4c84469dfc5ed03ddca1721feb96738163e8fc47ff1a9f4caf7a"
-        },
-        "_model_id": {
-          "before": null,
-          "after": "e69af5e2c59e7fb60b26dd4a1004344d54e7ef5371224f8ac4e434d8e8609e09"
-        },
-        "_visible_formation": {
-          "before": null,
-          "after": "b5922b92de192a84e1f576b80c9529e3dee3140ee9b7fc2f335ca0fe985fcac1"
+          "before": "d00a0957a4c4c303d219c422e324921f287994aba858bc202b08d9809ab50294",
+          "after": "711d3f07abf7d463624ea3c382a4dde68a0609f5d43995631f6a6277c435baef"
         }
       }
     },
     "tests/code_quality/test_engine_numerical_identity_admission.py": {
-      "before_sha256": "6805f8058f0c0694babffd9de2aa1515af435a601ea259a6975c32dd75032fc6",
-      "after_sha256": "34ce74f02a8526f863dd2d9484b97503a69a264dc50e47808fe3c3406da4cbb6",
+      "before_sha256": "34ce74f02a8526f863dd2d9484b97503a69a264dc50e47808fe3c3406da4cbb6",
+      "after_sha256": "3a321e527bdf39ea2ff6e3152deb6e7830ef172d4f261b37af2e2ffdd95737cb",
       "owners": {
         "test_identity_inventory_uses_current_twelve_shards_and_native_cohort": {
-          "before": "49413bb479102f05927b4acc3522d4bfb9f816d8b393fe00c8b99aa07ee4cb3d",
-          "after": "9925a88afc55d54e3ed806109937dd211ba296873ecace0b5e9857bb30ef08ea"
+          "before": "9925a88afc55d54e3ed806109937dd211ba296873ecace0b5e9857bb30ef08ea",
+          "after": "b44d7db881d60d24e64d84179715f3f9cb8d6c0f953b947ba29cd10a29a50141"
         }
       }
     },
-    "tests/infrastructure/adapters/test_allocation_coherency.py": {
+    "tests/infrastructure/adapters/test_cover_event_identity.py": {
       "before_sha256": null,
-      "after_sha256": "b37bd57bedddfb2987d34de0ef1d8a0cc64f5e74384c6911934d401de7c1449f",
+      "after_sha256": "7d0c11fd3e111996cb97b6554a3760988c6af02c635da70c775ad0187ea94d2d",
       "owners": {
         "@module": {
           "before": null,
-          "after": "d825b1708758ff3a77d817cd9ba53f9b1b608c1d7c82a5c2a197525b64d14995"
+          "after": "72f30d084c996b63c766c6be998bc82de021f7905a9e9f9c47819828a76c9a3b"
         },
-        "_screen_rod_view": {
+        "_cover_keys": {
           "before": null,
-          "after": "4c186f4eda4af50aab646b2a94228fe44cb0571d4180d85d986c24515fd30240"
+          "after": "74d4d7536742e17a15859915bafa59f022554db746782c4890ac63daad55ae47"
         },
-        "test_allocation_honors_only_option_and_retains_issued_order_on_tie": {
+        "test_save_cover_cache_key_projects_embedded_request_reference": {
           "before": null,
-          "after": "f84f5f3f88078fce07421ce8038922d47ba2a24c331266122fbb3b369cc8b39e"
-        },
-        "test_allocation_requires_defender_visible_formation": {
-          "before": null,
-          "after": "5e8eb71ab613163291ef3123e6d51d945216f3912d6cbae103372c384afe4efe"
-        },
-        "test_screen_rod_allocation_ranks_issued_choices_by_survivor_coherency": {
-          "before": null,
-          "after": "25e36bd08b792d1d896854c2712447ca95418b97fd698eaf100679daa6442220"
+          "after": "94c70658cef7ac9ac3e7bfbaac3ab3525789111457c5d08881cd68454e228ed9"
         }
       }
     }
@@ -342,7 +324,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Record fresh complete coverage timings and twelve-shard inventory including the allocation policy regression.",
+      "rationale": "Record the complete covered profile with the Cover event regression.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -352,7 +334,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Record fresh complete coverage timings and twelve-shard inventory including the allocation policy regression.",
+      "rationale": "Record the complete covered profile with the Cover event regression.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -362,7 +344,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Record fresh complete coverage timings and twelve-shard inventory including the allocation policy regression.",
+      "rationale": "Record the complete covered profile with the Cover event regression.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -372,7 +354,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Record fresh complete coverage timings and twelve-shard inventory including the allocation policy regression.",
+      "rationale": "Record the complete covered profile with the Cover event regression.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -382,7 +364,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Record fresh complete coverage timings and twelve-shard inventory including the allocation policy regression.",
+      "rationale": "Record the complete covered profile with the Cover event regression.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -392,7 +374,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Record fresh complete coverage timings and twelve-shard inventory including the allocation policy regression.",
+      "rationale": "Record the complete covered profile with the Cover event regression.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -402,7 +384,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Record fresh complete coverage timings and twelve-shard inventory including the allocation policy regression.",
+      "rationale": "Record the complete covered profile with the Cover event regression.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -412,7 +394,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Record fresh complete coverage timings and twelve-shard inventory including the allocation policy regression.",
+      "rationale": "Record the complete covered profile with the Cover event regression.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -422,7 +404,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Record fresh complete coverage timings and twelve-shard inventory including the allocation policy regression.",
+      "rationale": "Record the complete covered profile with the Cover event regression.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -432,7 +414,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Record fresh complete coverage timings and twelve-shard inventory including the allocation policy regression.",
+      "rationale": "Record the complete covered profile with the Cover event regression.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -442,7 +424,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Record fresh complete coverage timings and twelve-shard inventory including the allocation policy regression.",
+      "rationale": "Record the complete covered profile with the Cover event regression.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -452,7 +434,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Record fresh complete coverage timings and twelve-shard inventory including the allocation policy regression.",
+      "rationale": "Record the complete covered profile with the Cover event regression.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -462,7 +444,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Record fresh complete coverage timings and twelve-shard inventory including the allocation policy regression.",
+      "rationale": "Record the complete covered profile with the Cover event regression.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -472,7 +454,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Publish the regenerated runtime identity and dependent hashes for the opt-in policy source.",
+      "rationale": "Regenerate the runtime fingerprint and dependent contract examples.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -482,7 +464,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Publish the regenerated runtime identity and dependent hashes for the opt-in policy source.",
+      "rationale": "Regenerate the runtime fingerprint and dependent contract examples.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -492,7 +474,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Publish the regenerated runtime identity and dependent hashes for the opt-in policy source.",
+      "rationale": "Regenerate the runtime fingerprint and dependent contract examples.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -502,7 +484,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Publish the regenerated runtime identity and dependent hashes for the opt-in policy source.",
+      "rationale": "Regenerate the runtime fingerprint and dependent contract examples.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -512,7 +494,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Publish the regenerated runtime identity and dependent hashes for the opt-in policy source.",
+      "rationale": "Regenerate the runtime fingerprint and dependent contract examples.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -522,7 +504,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Publish the regenerated runtime identity and dependent hashes for the opt-in policy source.",
+      "rationale": "Regenerate the runtime fingerprint and dependent contract examples.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -532,7 +514,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Publish the regenerated runtime identity and dependent hashes for the opt-in policy source.",
+      "rationale": "Regenerate the runtime fingerprint and dependent contract examples.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -542,25 +524,33 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Publish the regenerated runtime identity and dependent hashes for the opt-in policy source.",
+      "rationale": "Regenerate the runtime fingerprint and dependent contract examples.",
       "source_obligation": null,
       "unchanged_work": null
     },
-    "data/source_audits/ci64_provenance_v1/stage2-allocation-coherency-test-addition-v1.json": {
+    "data/source_audits/ci64_provenance_v1/stage2-cover-event-identity-test-addition-v1.json": {
       "category": "measured_workload",
       "operations": [
-        "allocation-coherency-policy"
+        "cover-event-viewer-regression"
       ],
       "selected_families": [],
-      "rationale": "Admit the exact allocation policy and regression bytes while retaining predecessor selection evidence.",
+      "rationale": "Admit the focused viewer regression and bind it to the exact source.",
       "source_obligation": null,
       "unchanged_work": null
     },
-    "docs/AI_POLICY_INTERFACE.md": {
+    "docs/ADAPTER_DECISION_CONTRACT.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Document the opt-in finite allocation criterion, route and native evidence boundary.",
+      "rationale": "Record the viewer visibility-key contract and map the narrow verification scope.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/performance/current/stage2-cover-event-player-boundary.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Record the viewer visibility-key contract and map the narrow verification scope.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -568,7 +558,7 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Record operation ownership for the opt-in policy and its bounded regression.",
+      "rationale": "Record the viewer visibility-key contract and map the narrow verification scope.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -581,7 +571,7 @@
         "engine-numerical-identity-admission"
       ],
       "selected_families": [],
-      "rationale": "Admit the exact allocation policy and regression bytes while retaining predecessor selection evidence.",
+      "rationale": "Admit the focused viewer regression and bind it to the exact source.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -591,17 +581,19 @@
         "cavalcade-authority-admission"
       ],
       "selected_families": [],
-      "rationale": "Publish the regenerated runtime identity and dependent hashes for the opt-in policy source.",
+      "rationale": "Regenerate the runtime fingerprint and dependent contract examples.",
       "source_obligation": null,
       "unchanged_work": null
     },
-    "src/warhammer40k_core/ai/allocation_coherency.py": {
-      "category": "algorithm_or_search",
+    "src/warhammer40k_core/adapters/viewer_identity.py": {
+      "category": "serialization_or_replay_work",
       "operations": [
-        "allocation-coherency-policy"
+        "player-visible-boundary"
       ],
-      "selected_families": [],
-      "rationale": "Add one canonical coherency check per already-issued option using detached defender geometry in the opt-in player policy. Existing rules workloads do not register it.",
+      "selected_families": [
+        "player_boundary"
+      ],
+      "rationale": "Project source-granted Cover keys that embed authoritative request identifiers using the existing derived viewer identity mapping.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -611,22 +603,24 @@
         "engine-numerical-identity-admission"
       ],
       "selected_families": [],
-      "rationale": "Admit the exact allocation policy and regression bytes while retaining predecessor selection evidence.",
+      "rationale": "Admit the focused viewer regression and bind it to the exact source.",
       "source_obligation": null,
       "unchanged_work": null
     },
-    "tests/infrastructure/adapters/test_allocation_coherency.py": {
+    "tests/infrastructure/adapters/test_cover_event_identity.py": {
       "category": "measured_workload",
       "operations": [
-        "allocation-coherency-policy"
+        "cover-event-viewer-regression"
       ],
       "selected_families": [],
-      "rationale": "Measure the compact fork-derived six-choice regression with forced, tie and visibility controls.",
+      "rationale": "Admit the focused viewer regression and bind it to the exact source.",
       "source_obligation": null,
       "unchanged_work": null
     }
   },
   "milestone": "ordinary",
-  "comparisons": {},
+  "comparisons": {
+    "player_boundary": "docs/performance/current/stage2-cover-event-player-boundary.json"
+  },
   "full_game": null
 }

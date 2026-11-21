@@ -2381,6 +2381,10 @@ authoritative records. Blocker records identify applicable source geometry and
 policy; they do not independently establish terrain-caused Cover. Adapters must
 consume engine-owned visibility and Cover results. Restored or submitted
 evidence must match the current complete context, not just a reused cache key.
+An attack save's Cover cache key can embed an authoritative request reference
+when a rule grants Cover. The viewer identity projection issues an opaque
+viewer-scoped alias for that key. Authoritative events and replay retain the
+original key, and ordinary geometry cache digests keep their values.
 
 The engine converts source `PlacedTerrainArea` values into geometry-owned `TerrainVisibilityArea` descriptors. Dense, Light, and Mixed terrain areas use `LineOfSightPolicy.AREA_OBSCURING`; Dense and Mixed areas are Solid, while Light areas are not. Hidden eligibility is engine-derived per model from that model's component-unit keywords and Light, Dense, or Mixed terrain-area occupancy, together with authoritative unit-scoped current/previous-turn ranged-attack history. An Unknown classification does not establish the Light/Dense feature required by Hidden. During the first turn, the previous-turn no-ranged-attacks condition is true. Detection-range filtering is likewise model-scoped. Benefit of Cover is granted only when every alive model in the target rules unit independently qualifies: an `INFANTRY`/`BEASTS`/`SWARM` model is within any terrain area regardless of classification, or that model is not fully visible because of intervening terrain. A within-area Cover record for an Unknown area carries `WITHIN_TERRAIN_AREA` evidence without claiming that the area is Obscuring or Hidden-qualifying. Adapters must consume line-of-sight witnesses and target candidates rather than locally interpreting terrain-area polygons, classifications, openings, cover, Hidden status, or Solid detection penalties. Phase 13C attack allocation therefore evaluates cover against the entire alive target rules unit even though damage remains allocated to one model.
 
