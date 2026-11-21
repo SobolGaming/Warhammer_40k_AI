@@ -572,3 +572,126 @@ def test_facing_witness_requires_a_horizontal_origin_at_exact_tangency(displaced
     point = (F(1), F(0), F(5, 2))
     assert point_has_self_visible_origin(origin, destination, point) is displaced
     assert decide_target_part_visible(origin, destination, point, ()) is displaced
+
+
+def _ellipse_facing_scene() -> tuple[VisibilityPrism, VisibilityPrism, VisibilityPrism]:
+    from fractions import Fraction as F
+
+    from warhammer40k_core.geometry.visibility_exact import RationalEllipse
+
+    observer = VisibilityPrism(
+        RationalEllipse((F(0), F(0)), (F(1), F(0)), (F(0), F(1))),
+        F(0),
+        F(1),
+        (F(-1), F(-1), F(1), F(1)),
+    )
+    target = VisibilityPrism(
+        RationalEllipse((F(10), F(0)), (F(1), F(0)), (F(0), F(2))),
+        F(0),
+        F(1),
+        (F(9), F(-2), F(11), F(2)),
+    )
+    left, right = F(499, 100), F(501, 100)
+    bottom, top = F(148, 100), F(152, 100)
+    blocker = VisibilityPrism(
+        ((left, bottom), (right, bottom), (right, top), (left, top)),
+        F(0),
+        F(1),
+        (left, bottom, right, top),
+    )
+    return observer, target, blocker
+
+
+def test_ellipse_facing_search_proves_hidden_part_from_narrow_origin_cap() -> None:
+    from fractions import Fraction as F
+
+    from warhammer40k_core.geometry.continuous_visibility import resolve_visibility_pair_uncached
+    from warhammer40k_core.geometry.visibility_exact import CORRIDOR_RADIUS
+    from warhammer40k_core.geometry.visibility_formulas import (
+        ModelDomain,
+        decide_target_part_visible,
+    )
+    from warhammer40k_core.geometry.visibility_occlusion import source_group_obscures
+    from warhammer40k_core.geometry.visibility_witnesses import (
+        ellipse_facing_boundary_candidates,
+        point_has_self_visible_origin,
+        self_visible_corridors_blocked,
+        target_part_candidates,
+    )
+
+    observer, target, blocker = _ellipse_facing_scene()
+    origin, destination = ModelDomain.from_prism(observer), ModelDomain.from_prism(target)
+    blockers = (blocker,)
+    existing = target_part_candidates(origin, destination, blockers)
+    assert not any(
+        point_has_self_visible_origin(origin, destination, point)
+        and self_visible_corridors_blocked(observer, destination, point, blockers)
+        for point in existing
+    )
+    candidates = tuple(ellipse_facing_boundary_candidates(origin, destination, blockers))
+    assert candidates
+    assert all(point_has_self_visible_origin(origin, destination, point) for point in candidates)
+    assert all(point[2] == F(1, 2) for point in candidates)
+
+    partial = resolve_visibility_pair_uncached(observer, target, blockers, blockers)
+    assert partial.model_visible
+    assert not partial.model_fully_visible
+    assert partial.clear_corridor is not None
+    assert not blocker.intersects_corridor(*partial.clear_corridor)
+    assert partial.full_visibility_proof == "hidden_target_part"
+    assert partial.hidden_target_part is not None
+    assert partial.hidden_target_part in candidates
+    assert not decide_target_part_visible(origin, destination, partial.hidden_target_part, blockers)
+    assert decide_target_part_visible(origin, destination, partial.hidden_target_part, ())
+    assert source_group_obscures(observer, target, blockers, ())
+
+    clear = resolve_visibility_pair_uncached(observer, target, (), ())
+    assert clear.model_visible
+    assert clear.model_fully_visible
+    assert not source_group_obscures(observer, target, (), ())
+
+    x0, y0, x1, y1 = target.bounds
+    enclosure = VisibilityPrism(
+        ((x0, y0), (x1, y0), (x1, y1), (x0, y1)),
+        target.lower,
+        target.upper,
+        target.bounds,
+    )
+    occluded = resolve_visibility_pair_uncached(observer, target, (enclosure,), (enclosure,))
+    assert not occluded.model_visible
+    assert not occluded.model_fully_visible
+
+    ray = ((F(0), F(0), F(1, 2)), (F(9), F(0), F(1, 2)))
+    for sign in (-1, 0, 1):
+        edge = CORRIDOR_RADIUS + F(sign, 10**9)
+        contact = replace(
+            blocker,
+            footprint=((F(4), edge), (F(5), edge), (F(5), edge + 1), (F(4), edge + 1)),
+            bounds=(F(4), edge, F(5), edge + 1),
+        )
+        assert contact.intersects_corridor(*ray) is (sign <= 0)
+
+
+def test_ellipse_facing_search_leaves_unsupported_domains_to_existing_authority() -> None:
+    from fractions import Fraction as F
+
+    from warhammer40k_core.geometry.visibility_formulas import ModelDomain
+    from warhammer40k_core.geometry.visibility_witnesses import ellipse_facing_boundary_candidates
+
+    observer, target, blocker = _ellipse_facing_scene()
+    origin, destination = ModelDomain.from_prism(observer), ModelDomain.from_prism(target)
+    assert tuple(ellipse_facing_boundary_candidates(origin, destination, (blocker,)))
+    for source, target_domain, blockers in (
+        (origin, destination, ()),
+        (origin, destination, (blocker, blocker)),
+        (origin, destination, (replace(blocker, upper=F(99, 100)),)),
+        (origin, destination, (replace(blocker, lower=F(1, 100)),)),
+        (origin, destination, (target,)),
+        (origin, replace(destination, upper=destination.lower), (blocker,)),
+        (origin, replace(destination, curved=False), (blocker,)),
+        (replace(origin, curved=False), destination, (blocker,)),
+        (replace(origin, axes=destination.axes), destination, (blocker,)),
+        (origin, replace(destination, axes=origin.axes), (blocker,)),
+        (origin, replace(destination, axes=((F(3), F(4)), (F(-4), F(3)))), (blocker,)),
+    ):
+        assert not tuple(ellipse_facing_boundary_candidates(source, target_domain, blockers))

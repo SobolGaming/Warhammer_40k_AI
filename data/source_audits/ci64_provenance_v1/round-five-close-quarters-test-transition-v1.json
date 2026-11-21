@@ -1,0 +1,33 @@
+{
+  "schema": "finite-close-quarters-test-transition-v1",
+  "base": "466071748906e366c2a4aac73231728ea4123c20",
+  "retained_shadow_sha256": "b98c215658e87a400c6440d58ce5da0ec08f23d13ebc1c9345716f006b57d2ea",
+  "retained_runtime_fingerprint": "aa016bafd0895687abc9c872c11933ca27b12d4f7e147f29ad191ef40b5f2ca1",
+  "runtime_fingerprint": "b6b1148d7f49af8317243d19a71f3c1941482575d573d42e242115d1634cc909",
+  "sources": {
+    "src/warhammer40k_core/geometry/continuous_visibility.py": {
+      "before": "98bef87230485f553433bc80034e93d0911ef92c8244008cabc84b45a866f6dc",
+      "after": "9b460af054119c59e1f829ebb762f6cf6effd751d24970f54c99a3ecb8e93008"
+    },
+    "src/warhammer40k_core/geometry/visibility_witnesses.py": {
+      "before": "fdce5f1135b6ece5ec80eabeeef9a8df4a5bd1edc8faa69ec76d568c62a4783a",
+      "after": "7b447437c1a9dc7aa2a8331bbe9805e02ba100fb70898c9686d8eeb84c1d2d4d"
+    }
+  },
+  "test": {
+    "tests/rules/section06/test_visibility.py": {
+      "before": {
+        "blob_sha1": "2c0e05e71e20ec92b3d323cb9dc7fc35bc63af31",
+        "bytes": 22941,
+        "mode": "100644",
+        "sha256": "5ae3fa685a0d75855d550b78107b4fe6b810e61d518b880b69ffbe8ed1c935ee"
+      },
+      "after": {
+        "blob_sha1": "57e77f5c6aa7460a7f2ea8d64de13bf1e4ddd666",
+        "bytes": 28302,
+        "mode": "100644",
+        "sha256": "0a22103cc696bc714dc9cf20883ef70ff12fb12031e68431b99dc4a4f570eaed"
+      }
+    }
+  }
+}

@@ -230,7 +230,33 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
     )
     assert shadow_manifest["fingerprint"] == selection.CAVALCADE_AUTHORITY_RUNTIME
     assert shadow["retained_runtime_fingerprint"] == selection.CAVALCADE_AUTHORITY_RUNTIME
-    assert _record(MANIFEST)["fingerprint"] == shadow["runtime_fingerprint"]
+    close_quarters = _record(selection.CLOSE_QUARTERS_TRANSITION)
+    close_quarters_base = json.loads(
+        subprocess.check_output(
+            ["git", "show", selection.CLOSE_QUARTERS_BASE + ":" + MANIFEST], cwd=ROOT
+        )
+    )
+    assert close_quarters_base["fingerprint"] == shadow["runtime_fingerprint"]
+    assert close_quarters["retained_runtime_fingerprint"] == shadow["runtime_fingerprint"]
+    assert _record(MANIFEST)["fingerprint"] == close_quarters["runtime_fingerprint"]
+    close_quarters_owner = selection.CLOSE_QUARTERS_OWNER
+    assert (
+        close_quarters["test"][close_quarters_owner]["before"]
+        == _record(sharding.CUTOVER_PATH)["active_files"][close_quarters_owner]
+    )
+    assert close_quarters_owner in active_files
+    assert sum(close_quarters_owner in group for group in groups) == 1
+    for name in selection.CLOSE_QUARTERS_SOURCES:
+        source_before = subprocess.check_output(
+            ["git", "show", selection.CLOSE_QUARTERS_BASE + ":" + name], cwd=ROOT
+        )
+        assert (
+            close_quarters["sources"][name]["before"] == hashlib.sha256(source_before).hexdigest()
+        )
+        assert (
+            close_quarters["sources"][name]["after"]
+            == hashlib.sha256((ROOT / name).read_bytes()).hexdigest()
+        )
     shadow_owner = selection.ROUND_FIVE_SHADOW_OWNER
     assert (
         shadow["test"][shadow_owner]["before"]
@@ -351,6 +377,13 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         shadow_owner
         + "::test_v995_opposing_command_battle_shock_resolves_with_qualified_terror[True]",
     }
+    close_quarters_cases = {
+        close_quarters_owner + "::" + name
+        for name in (
+            "test_ellipse_facing_search_proves_hidden_part_from_narrow_origin_cap",
+            "test_ellipse_facing_search_leaves_unsupported_domains_to_existing_authority",
+        )
+    }
     assert current.keys() == (
         retained
         | added
@@ -366,6 +399,7 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         | oval_codec
         | gameplay
         | shadow_cases
+        | close_quarters_cases
     )
 
 
