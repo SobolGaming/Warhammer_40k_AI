@@ -263,6 +263,49 @@
     }
   },
   "operations": {
+    "cavalcade-round-five-contextual-shadow-rule": {
+      "mandatory": true,
+      "sensitive": false,
+      "paths": [
+        "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/army_rule.py",
+        "src/warhammer40k_core/engine/rule_aura_resolution.py"
+      ],
+      "owners": [
+        "@module",
+        "_aura_allegiance",
+        "_aura_includes_source_unit",
+        "_rule_ir_sets_shadow_of_chaos_status",
+        "_semantic_shadow_aura_targets",
+        "_unit_within_semantic_shadow_aura",
+        "_validate_contextual_friendly_aura",
+        "aura_affected_unit_ids"
+      ],
+      "families": []
+    },
+    "cavalcade-round-five-contextual-shadow-regression": {
+      "mandatory": true,
+      "sensitive": false,
+      "paths": [
+        "tests/factions/chaos_daemons/unit/test_bloodcrushers_abilities.py"
+      ],
+      "owners": [
+        "_v995_shadow_definitions",
+        "test_v995_contextual_shadow_aura_applies_only_to_friendly_khorne_units_in_range",
+        "test_v995_opposing_command_battle_shock_resolves_with_qualified_terror"
+      ],
+      "families": []
+    },
+    "cavalcade-round-five-shadow-test-admission": {
+      "mandatory": true,
+      "sensitive": false,
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/round-five-shadow-test-transition-v1.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": []
+    },
     "cavalcade-comparison-fixture-binding": {
       "paths": [
         "tools/performance_policy.py",

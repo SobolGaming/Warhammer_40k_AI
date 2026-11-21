@@ -1,0 +1,32 @@
+{
+  "schema": "finite-round-five-shadow-test-transition-v1",
+  "base": "7d8c559b9901c9ad2233b87cf3bf151cb4c35476",
+  "retained_runtime_fingerprint": "4a144491e2ca85593c31db4a5a6318ccb32b4247c5d873b8d21471e0c019d64f",
+  "runtime_fingerprint": "aa016bafd0895687abc9c872c11933ca27b12d4f7e147f29ad191ef40b5f2ca1",
+  "sources": {
+    "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/army_rule.py": {
+      "before": "cae763c079d0aacf647837d874ce01858018d2fe5ee8812148054ee444b21677",
+      "after": "762e898b60d7740855120a0cd9bb0f73cde6bf3319816623ec7e25cc0b18bf01"
+    },
+    "src/warhammer40k_core/engine/rule_aura_resolution.py": {
+      "before": "3f6cb5154331a943fb4796fce6d48e15f34f98e444de691de7b816562cf71f5e",
+      "after": "08eee84e77fb24cf1d3dc1c78bab8c9f2f05ef99678481c1b51849398974e5f3"
+    }
+  },
+  "test": {
+    "tests/factions/chaos_daemons/unit/test_bloodcrushers_abilities.py": {
+      "before": {
+        "mode": "100644",
+        "blob_sha1": "3a7dd63f628bb0dbd0980aeda215694eb5e27618",
+        "sha256": "b854af199b9f96b814b876b8005ff8a461d860e1a6beb6e5e626039be67b80f1",
+        "bytes": 9718
+      },
+      "after": {
+        "mode": "100644",
+        "blob_sha1": "099413a22d7f6f607bdc99e5af6231ec2af4fb0d",
+        "sha256": "9449f782cf2e387dc9d6df3bf4b15355a007f29536731213d31edb15d92701c4",
+        "bytes": 19649
+      }
+    }
+  }
+}

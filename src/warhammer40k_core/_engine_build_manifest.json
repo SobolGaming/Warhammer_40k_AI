@@ -1,7 +1,7 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:4a144491e2ca85593c31db4a5a6318ccb32b4247c5d873b8d21471e0c019d64f",
-  "fingerprint": "4a144491e2ca85593c31db4a5a6318ccb32b4247c5d873b8d21471e0c019d64f",
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:aa016bafd0895687abc9c872c11933ca27b12d4f7e147f29ad191ef40b5f2ca1",
+  "fingerprint": "aa016bafd0895687abc9c872c11933ca27b12d4f7e147f29ad191ef40b5f2ca1",
   "resource_count": 3276,
   "resources": [
     {
@@ -4625,9 +4625,9 @@
       "sha256": "7b86867238e107650cfa8606cdbbd17df8037f98856a45f850ff6839b441b9f3"
     },
     {
-      "byte_length": 66270,
+      "byte_length": 68323,
       "path": "warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/army_rule.py",
-      "sha256": "cae763c079d0aacf647837d874ce01858018d2fe5ee8812148054ee444b21677"
+      "sha256": "762e898b60d7740855120a0cd9bb0f73cde6bf3319816623ec7e25cc0b18bf01"
     },
     {
       "byte_length": 55363,
@@ -12655,9 +12655,9 @@
       "sha256": "c9dcdf6e25b0fff2909ae28c17344b2a78a07066bd5933bc11fdfa5388fac757"
     },
     {
-      "byte_length": 11605,
+      "byte_length": 14666,
       "path": "warhammer40k_core/engine/rule_aura_resolution.py",
-      "sha256": "3f6cb5154331a943fb4796fce6d48e15f34f98e444de691de7b816562cf71f5e"
+      "sha256": "08eee84e77fb24cf1d3dc1c78bab8c9f2f05ef99678481c1b51849398974e5f3"
     },
     {
       "byte_length": 15055,

@@ -194,6 +194,18 @@ CAVALCADE_AUTHORITY_SOURCES = {
 }
 
 
+ROUND_FIVE_SHADOW_TRANSITION = (
+    "data/source_audits/ci64_provenance_v1/round-five-shadow-test-transition-v1.json"
+)
+ROUND_FIVE_SHADOW_SHA256 = "b98c215658e87a400c6440d58ce5da0ec08f23d13ebc1c9345716f006b57d2ea"
+ROUND_FIVE_SHADOW_BASE = "7d8c559b9901c9ad2233b87cf3bf151cb4c35476"
+ROUND_FIVE_SHADOW_OWNER = "tests/factions/chaos_daemons/unit/test_bloodcrushers_abilities.py"
+ROUND_FIVE_SHADOW_SOURCES = (
+    "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/army_rule.py",
+    "src/warhammer40k_core/engine/rule_aura_resolution.py",
+)
+
+
 type SourceSuccessors = dict[str, dict[str, str]]
 type TestSuccessors = dict[str, dict[str, object]]
 
@@ -741,6 +753,14 @@ def exact_movement_test_transition(
             for name, digest in CAVALCADE_AUTHORITY_SOURCES.items():
                 _checked_bytes(root, name, digest)
             runtime = CAVALCADE_AUTHORITY_RUNTIME
+    shadow_path = root / ROUND_FIVE_SHADOW_TRANSITION
+    _selection_no_links(root, shadow_path)
+    shadow = None
+    if shadow_path.exists():
+        if runtime != CAVALCADE_AUTHORITY_RUNTIME:
+            raise SystemExit("Round-five Shadow tests require the Cavalcade authority predecessor.")
+        shadow = _round_five_shadow_successor(root, retained_cutover_sha256=retained_cutover_sha256)
+        runtime = shadow[0]
     retained = _identity_test_transition(
         root,
         retained_cutover_sha256,
@@ -787,7 +807,57 @@ def exact_movement_test_transition(
             raise SystemExit("Terminal restore tests overlap the predecessor selection.")
         updated.update(tests)
         raw += b"\0" + terminal_restore_raw
+    if shadow is not None:
+        _, tests, shadow_raw = shadow
+        if tests.keys() & (updated.keys() | added.keys() | additions.keys()):
+            raise SystemExit("Round-five Shadow tests overlap the predecessor selection.")
+        updated.update(tests)
+        raw += b"\0" + shadow_raw
     return updated, {**added, **additions}, retained_raw + b"\0" + raw
+
+
+def _round_five_shadow_successor(
+    root: Path, *, retained_cutover_sha256: str
+) -> tuple[str, TestSuccessors, bytes]:
+    raw = _checked_bytes(root, ROUND_FIVE_SHADOW_TRANSITION, ROUND_FIVE_SHADOW_SHA256)
+    record = json.loads(raw, object_pairs_hook=_selection_object)
+    if (
+        record.keys()
+        != {
+            "schema",
+            "base",
+            "retained_runtime_fingerprint",
+            "runtime_fingerprint",
+            "sources",
+            "test",
+        }
+        or record["schema"] != "finite-round-five-shadow-test-transition-v1"
+        or record["base"] != ROUND_FIVE_SHADOW_BASE
+        or record["retained_runtime_fingerprint"] != CAVALCADE_AUTHORITY_RUNTIME
+        or set(record["sources"]) != set(ROUND_FIVE_SHADOW_SOURCES)
+        or set(record["test"]) != {ROUND_FIVE_SHADOW_OWNER}
+    ):
+        raise SystemExit("Round-five Shadow test transition membership differs.")
+    for name, change in record["sources"].items():
+        if set(change) != {"before", "after"}:
+            raise SystemExit(
+                "Round-five Shadow source transition requires exact before and after hashes."
+            )
+        _checked_bytes(root, name, change["after"])
+    from scripts.build_test_shards import CUTOVER_PATH
+
+    cutover = json.loads(
+        _checked_bytes(root, CUTOVER_PATH, retained_cutover_sha256),
+        object_pairs_hook=_selection_object,
+    )
+    test = record["test"][ROUND_FIVE_SHADOW_OWNER]
+    if (
+        set(test) != {"before", "after"}
+        or test["before"] != cutover["active_files"][ROUND_FIVE_SHADOW_OWNER]
+    ):
+        raise SystemExit("Round-five Shadow test predecessor differs.")
+    members = _selection_members({ROUND_FIVE_SHADOW_OWNER: test["after"]}, root)
+    return record["runtime_fingerprint"], members, raw
 
 
 def _identity_test_transition(
