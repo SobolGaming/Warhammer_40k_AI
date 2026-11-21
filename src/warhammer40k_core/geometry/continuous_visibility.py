@@ -12,6 +12,7 @@ import json
 from dataclasses import dataclass
 from fractions import Fraction
 from functools import lru_cache
+from itertools import chain
 from typing import TypedDict, cast
 
 from warhammer40k_core.geometry.pose import GeometryError
@@ -37,6 +38,7 @@ from warhammer40k_core.geometry.visibility_planar import (
     planar_line_reduction_applies,
 )
 from warhammer40k_core.geometry.visibility_witnesses import (
+    ellipse_facing_boundary_candidates,
     point_has_self_visible_origin,
     positive_ray_candidates,
     self_visible_corridors_blocked,
@@ -369,7 +371,10 @@ def resolve_visibility_pair_uncached(
         return ContinuousVisibilityEvidence(
             fingerprint, True, True, any_proof, "clear_enclosure", checked, clear_ray
         )
-    for point in target_part_candidates(origin, destination, every_blockers):
+    for point in chain(
+        target_part_candidates(origin, destination, every_blockers),
+        ellipse_facing_boundary_candidates(origin, destination, every_blockers),
+    ):
         if point_has_self_visible_origin(
             origin, destination, point
         ) and self_visible_corridors_blocked(observer, destination, point, every_blockers):

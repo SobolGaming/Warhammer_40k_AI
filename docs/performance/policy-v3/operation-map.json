@@ -387,6 +387,34 @@
       "sensitive": true,
       "mandatory": true
     },
+    "close-quarters-test-admission": {
+      "paths": [
+        "scripts/engine_numerical_identity_test_admission.py",
+        "data/source_audits/ci64_provenance_v1/round-five-close-quarters-test-transition-v1.json"
+      ],
+      "owners": [
+        "@document",
+        "@module",
+        "exact_movement_test_transition",
+        "_close_quarters_test_successor"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "ellipse-facing-witness-regression": {
+      "paths": [
+        "tests/rules/section06/test_visibility.py"
+      ],
+      "owners": [
+        "_ellipse_facing_scene",
+        "test_ellipse_facing_search_proves_hidden_part_from_narrow_origin_cap",
+        "test_ellipse_facing_search_leaves_unsupported_domains_to_existing_authority"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
     "visibility-query": {
       "paths": [
         "src/warhammer40k_core/core/visibility*",

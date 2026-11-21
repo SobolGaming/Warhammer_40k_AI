@@ -206,6 +206,18 @@ ROUND_FIVE_SHADOW_SOURCES = (
 )
 
 
+CLOSE_QUARTERS_TRANSITION = (
+    "data/source_audits/ci64_provenance_v1/round-five-close-quarters-test-transition-v1.json"
+)
+CLOSE_QUARTERS_SHA256 = "12198bd19d8c8fc191525cee5499a579a1018a599590a31897551e8679527b91"
+CLOSE_QUARTERS_BASE = "466071748906e366c2a4aac73231728ea4123c20"
+CLOSE_QUARTERS_OWNER = "tests/rules/section06/test_visibility.py"
+CLOSE_QUARTERS_SOURCES = (
+    "src/warhammer40k_core/geometry/continuous_visibility.py",
+    "src/warhammer40k_core/geometry/visibility_witnesses.py",
+)
+
+
 type SourceSuccessors = dict[str, dict[str, str]]
 type TestSuccessors = dict[str, dict[str, object]]
 
@@ -761,6 +773,16 @@ def exact_movement_test_transition(
             raise SystemExit("Round-five Shadow tests require the Cavalcade authority predecessor.")
         shadow = _round_five_shadow_successor(root, retained_cutover_sha256=retained_cutover_sha256)
         runtime = shadow[0]
+    close_quarters_path = root / CLOSE_QUARTERS_TRANSITION
+    _selection_no_links(root, close_quarters_path)
+    close_quarters = None
+    if close_quarters_path.exists():
+        if shadow is None:
+            raise SystemExit("Close Quarters tests require the Round-five Shadow predecessor.")
+        close_quarters = _close_quarters_test_successor(
+            root, retained_cutover_sha256=retained_cutover_sha256, predecessor_runtime=runtime
+        )
+        runtime = close_quarters[0]
     retained = _identity_test_transition(
         root,
         retained_cutover_sha256,
@@ -813,6 +835,12 @@ def exact_movement_test_transition(
             raise SystemExit("Round-five Shadow tests overlap the predecessor selection.")
         updated.update(tests)
         raw += b"\0" + shadow_raw
+    if close_quarters is not None:
+        _, tests, close_quarters_raw = close_quarters
+        if tests.keys() & (updated.keys() | added.keys() | additions.keys()):
+            raise SystemExit("Close Quarters tests overlap the predecessor selection.")
+        updated.update(tests)
+        raw += b"\0" + close_quarters_raw
     return updated, {**added, **additions}, retained_raw + b"\0" + raw
 
 
@@ -857,6 +885,52 @@ def _round_five_shadow_successor(
     ):
         raise SystemExit("Round-five Shadow test predecessor differs.")
     members = _selection_members({ROUND_FIVE_SHADOW_OWNER: test["after"]}, root)
+    return record["runtime_fingerprint"], members, raw
+
+
+def _close_quarters_test_successor(
+    root: Path, *, retained_cutover_sha256: str, predecessor_runtime: str
+) -> tuple[str, TestSuccessors, bytes]:
+    raw = _checked_bytes(root, CLOSE_QUARTERS_TRANSITION, CLOSE_QUARTERS_SHA256)
+    record = json.loads(raw, object_pairs_hook=_selection_object)
+    if (
+        record.keys()
+        != {
+            "schema",
+            "base",
+            "retained_shadow_sha256",
+            "retained_runtime_fingerprint",
+            "runtime_fingerprint",
+            "sources",
+            "test",
+        }
+        or record["schema"] != "finite-close-quarters-test-transition-v1"
+        or record["base"] != CLOSE_QUARTERS_BASE
+        or record["retained_shadow_sha256"] != ROUND_FIVE_SHADOW_SHA256
+        or record["retained_runtime_fingerprint"] != predecessor_runtime
+        or set(record["sources"]) != set(CLOSE_QUARTERS_SOURCES)
+        or set(record["test"]) != {CLOSE_QUARTERS_OWNER}
+    ):
+        raise SystemExit("Close Quarters test transition membership differs.")
+    for name, change in record["sources"].items():
+        if set(change) != {"before", "after"}:
+            raise SystemExit(
+                "Close Quarters source transition requires exact before and after hashes."
+            )
+        _checked_bytes(root, name, change["after"])
+    from scripts.build_test_shards import CUTOVER_PATH
+
+    cutover = json.loads(
+        _checked_bytes(root, CUTOVER_PATH, retained_cutover_sha256),
+        object_pairs_hook=_selection_object,
+    )
+    test = record["test"][CLOSE_QUARTERS_OWNER]
+    if (
+        set(test) != {"before", "after"}
+        or test["before"] != cutover["active_files"][CLOSE_QUARTERS_OWNER]
+    ):
+        raise SystemExit("Close Quarters test predecessor differs.")
+    members = _selection_members({CLOSE_QUARTERS_OWNER: test["after"]}, root)
     return record["runtime_fingerprint"], members, raw
 
 

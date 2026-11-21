@@ -29,6 +29,10 @@ from warhammer40k_core.geometry.visibility_exact import (
 )
 from warhammer40k_core.geometry.visibility_formulas import ModelDomain
 
+_COARSE_ELLIPSE_PARAMETERS = tuple(
+    map(Fraction, ("0", "-1/2", "1/2", "-1/5", "1/5", "-4/5", "4/5", "-1", "1"))
+)
+
 
 def local_point(domain: ModelDomain, point: RationalPoint3) -> RationalPoint2:
     x, y = point[0] - domain.center[0], point[1] - domain.center[1]
@@ -310,9 +314,7 @@ def target_part_candidates(
                 ((Fraction(-1), v), (Fraction(1), v), (u, Fraction(-1)), (u, Fraction(1)))
             )
     if target.curved:
-        for sign, parameter in product(
-            (-1, 1), map(Fraction, ("0", "-1/2", "1/2", "-1/5", "1/5", "-4/5", "4/5", "-1", "1"))
-        ):
+        for sign, parameter in product((-1, 1), _COARSE_ELLIPSE_PARAMETERS):
             d = 1 + parameter * parameter
             local_candidates.append((sign * (1 - parameter * parameter) / d, 2 * parameter / d))
     else:
@@ -324,6 +326,70 @@ def target_part_candidates(
     ]
     points.extend(_world(target, Fraction(0), Fraction(0), z) for z in (target.lower, target.upper))
     return tuple(dict.fromkeys(points))
+
+
+def _circular_domain(domain: ModelDomain) -> bool:
+    a, b = domain.axes
+    return (
+        domain.curved
+        and a[0] * b[0] + a[1] * b[1] == 0
+        and a[0] ** 2 + a[1] ** 2 == b[0] ** 2 + b[1] ** 2
+    )
+
+
+def _ellipse_chart_point(
+    target: ModelDomain, side: int, parameter: Fraction, height: Fraction
+) -> RationalPoint3:
+    square = parameter * parameter
+    return _world(target, side * (1 - square) / (1 + square), 2 * parameter / (1 + square), height)
+
+
+def ellipse_facing_boundary_candidates(
+    observer: ModelDomain, target: ModelDomain, blockers: tuple[VisibilityPrism, ...]
+) -> Iterator[RationalPoint3]:
+    """Propose rational side points with narrow self-visible origin caps."""
+    if not (
+        _circular_domain(observer)
+        and target.curved
+        and not _circular_domain(target)
+        and target.lower < target.upper
+        and len(blockers) == 1
+    ):
+        return
+    (blocker,) = blockers
+    if (
+        isinstance(blocker.footprint, RationalEllipse)
+        or blocker.lower > min(observer.lower, target.lower)
+        or blocker.upper < max(observer.upper, target.upper)
+    ):
+        return
+
+    height = (target.lower + target.upper) / 2
+    parameters = sorted(_COARSE_ELLIPSE_PARAMETERS)
+    for side in (-1, 1):
+        facing = [
+            point_has_self_visible_origin(
+                observer, target, _ellipse_chart_point(target, side, parameter, height)
+            )
+            for parameter in parameters
+        ]
+        for (left, left_faces), (right, right_faces) in pairwise(
+            zip(parameters, facing, strict=True)
+        ):
+            if left_faces == right_faces:
+                continue
+            # Retain opposite exact facing predicates at the bracket endpoints.
+            # Intervals and facing alone establish no claim about occlusion.
+            for _ in range(24):
+                middle = (left + right) / 2
+                faces = point_has_self_visible_origin(
+                    observer, target, _ellipse_chart_point(target, side, middle, height)
+                )
+                if faces == left_faces:
+                    left = middle
+                else:
+                    right = middle
+            yield _ellipse_chart_point(target, side, left if left_faces else right, height)
 
 
 def positive_ray_candidates(
