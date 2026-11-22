@@ -255,6 +255,16 @@ OPENING_SHADOW_FORM_OWNER = (
 )
 
 
+OPENING_MOVEMENT_UNIT_ADDITION = (
+    "data/source_audits/ci64_provenance_v1/stage2-opening-movement-unit-test-addition-v1.json"
+)
+OPENING_MOVEMENT_UNIT_SHA256 = "6c821e5ea1fe9933539d8b63d63bc1d3777766b68581e66ae664fc76caebf15e"
+OPENING_MOVEMENT_UNIT_POLICY = "src/warhammer40k_core/ai/opening_movement_unit.py"
+OPENING_MOVEMENT_UNIT_OWNER = (
+    "tests/factions/chaos_daemons/integration/test_cavalcade_opening_movement_unit.py"
+)
+
+
 type SourceSuccessors = dict[str, dict[str, str]]
 type TestSuccessors = dict[str, dict[str, object]]
 
@@ -904,6 +914,35 @@ def exact_movement_test_transition(
                 "Opening Shadow Form tests require the Cover event identity predecessor."
             )
         runtime, opening_tests, opening_raw = _opening_shadow_form_test_successor(root, runtime)
+    movement_path = root / OPENING_MOVEMENT_UNIT_ADDITION
+    _selection_no_links(root, movement_path)
+    movement_raw = None
+    if movement_path.exists():
+        if opening_raw is None:
+            raise SystemExit("Opening Movement tests require the Shadow Form predecessor.")
+        movement_raw = _checked_bytes(
+            root, OPENING_MOVEMENT_UNIT_ADDITION, OPENING_MOVEMENT_UNIT_SHA256
+        )
+        movement = json.loads(movement_raw, object_pairs_hook=_selection_object)
+        if (
+            movement.keys()
+            != {
+                "schema",
+                "retained_opening_shadow_form_sha256",
+                "retained_runtime_fingerprint",
+                "runtime_fingerprint",
+                "policy_sha256",
+                "added_files",
+            }
+            or movement["schema"] != "finite-stage2-opening-movement-unit-test-addition-v1"
+            or movement["retained_opening_shadow_form_sha256"] != OPENING_SHADOW_FORM_SHA256
+            or movement["retained_runtime_fingerprint"] != runtime
+            or set(movement["added_files"]) != {OPENING_MOVEMENT_UNIT_OWNER}
+        ):
+            raise SystemExit("Opening Movement unit test addition differs.")
+        _checked_bytes(root, OPENING_MOVEMENT_UNIT_POLICY, movement["policy_sha256"])
+        additions.update(_selection_members(movement["added_files"], root))
+        runtime = movement["runtime_fingerprint"]
     retained = _identity_test_transition(
         root,
         retained_cutover_sha256,
@@ -977,6 +1016,8 @@ def exact_movement_test_transition(
             raise SystemExit("Opening Shadow Form must extend an existing active test owner.")
         updated.update(opening_tests)
         raw += b"\0" + opening_raw
+    if movement_raw is not None:
+        raw += b"\0" + movement_raw
     return updated, {**added, **additions}, retained_raw + b"\0" + raw
 
 

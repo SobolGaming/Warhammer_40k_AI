@@ -312,3 +312,12 @@ Historical constants, source snapshots, costs, observations, memberships and out
 retain their original meaning. The maximum-of-current-and-pinned-historical dispatch
 rule is unchanged; no prior local dispatch floors or retrospective passing outcomes
 are introduced by this alignment.
+
+## Combined coverage floor amendment - 22 November 2026
+
+The owner raised the required combined full-package coverage floor to 68%.
+The ready pull-request `coverage-gate` and the complete local covered profile
+enforce 68% with branch measurement and two-decimal reporting. The measured
+package, selected behavioral cases, exclusions, twelve shards and existing
+timing limits remain in force. The earlier 67% threshold and its recorded
+results retain their original meaning.

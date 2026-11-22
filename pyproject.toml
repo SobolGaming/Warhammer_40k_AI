@@ -118,7 +118,7 @@ source = ["warhammer40k_core"]
 show_missing = true
 skip_covered = true
 # Temporary owner-approved floor; restore 85 after post-merge coverage work.
-fail_under = 67
+fail_under = 68
 precision = 2
 
 [tool.importlinter]

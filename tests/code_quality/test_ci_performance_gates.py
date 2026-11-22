@@ -703,14 +703,14 @@ def test_quality_gate_requires_every_independent_lane_even_when_skipped(
         assert workflow.count(f"manifest: ci/test_shards/shard-{shard}.txt") == 1
     coverage = workflow.partition("\n  coverage-gate:\n")[2]
     assert "scripts/check_shard_coverage.py coverage-data --shard-count 12" in coverage
-    assert "uv run --no-sync coverage report --fail-under=67" in coverage
+    assert "uv run --no-sync coverage report --fail-under=68" in coverage
     configuration = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
     coverage_config = configuration["tool"]["coverage"]
     assert coverage_config["run"] == {"branch": True, "source": ["warhammer40k_core"]}
     assert coverage_config["report"] == {
         "show_missing": True,
         "skip_covered": True,
-        "fail_under": 67,
+        "fail_under": 68,
         "precision": 2,
     }
     assert "scripts/build_test_shards.py --check --shard-count 12" in workflow
@@ -730,7 +730,7 @@ def test_quality_gate_requires_every_independent_lane_even_when_skipped(
         "prefix = ''.join(source.read_text().splitlines(keepends=True)[:int(sys.argv[2])])\n"
         "exec(compile(prefix, str(source), 'exec'))\n"
     )
-    for covered, expected_status in ((6699, 2), (6700, 0)):
+    for covered, expected_status in ((6799, 2), (6800, 0)):
         data_file = tmp_path / f".coverage.{covered}"
         executed = subprocess.run(
             [
@@ -753,7 +753,7 @@ def test_quality_gate_requires_every_independent_lane_even_when_skipped(
         )
         assert executed.returncode == 0, executed.stdout + executed.stderr
         # Exercise both config-default local reporting and CI's explicit override.
-        for override in ([], ["--fail-under=67"]):
+        for override in ([], ["--fail-under=68"]):
             result = subprocess.run(
                 [
                     sys.executable,
@@ -1517,4 +1517,4 @@ def test_cold_source_index_overlaps_startup_inside_the_unchanged_deadline() -> N
     assert step.count('"${source_index_args[@]}"') == 2
     assert step.index("source_index_pid=$!") < step.index("uv run --no-sync python -m pytest")
     assert "finish_source_index_build" in step
-    assert "coverage report --fail-under=67" in workflow
+    assert "coverage report --fail-under=68" in workflow

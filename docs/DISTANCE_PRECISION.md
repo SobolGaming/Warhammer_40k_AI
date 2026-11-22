@@ -621,7 +621,7 @@ movement budget uses the staged path arithmetic with the original binary poses.
 6. **Explicit admission and qualification:** admit the completed policy only after
    exact-final-head coding and supervisory reviews, applicable source/generated/
    contract/performance checks, complete covered behavioral qualification with 32
-   local workers (meeting the at-least-twelve requirement) and 67% full-package branch coverage, all required
+   local workers (meeting the at-least-twelve requirement) and 68% full-package branch coverage, all required
    hosted checks, and verified main CI. Keep 1,620-second inclusive approval,
    termination only above 1,800 seconds, and all other existing limits unchanged.
 
@@ -728,7 +728,7 @@ Scheduling admits this exact symbolic module/test source tuple through a finite
 successor to the precision-profile admission. The prior covered baselines,
 evidence, source transitions and selector placements remain unchanged. Fresh
 source-bound Linux covered evidence supplies current observations; twelve shards,
-67% full-package coverage with branch measurement enabled, 1,620-second inclusive
+68% full-package coverage with branch measurement enabled, 1,620-second inclusive
 approval and termination only above
 1,800 seconds remain required. Scheduling admission does not activate a numerical
 policy or qualify native OS equivalence.

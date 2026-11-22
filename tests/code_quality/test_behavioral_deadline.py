@@ -187,7 +187,7 @@ def test_hosted_workload_uses_supervisor_and_preserves_diagnostics() -> None:
     assert "include-hidden-files: true" in upload
     gate = workflow.split("  coverage-gate:", 1)[1]
     assert "if: needs.behavior-tests.result != 'success'" in gate
-    assert "coverage report --fail-under=67" in gate
+    assert "coverage report --fail-under=68" in gate
     workload = (root / "scripts/run_behavioral_coverage.sh").read_text()
     assert "BEHAVIOR_EXECUTION_DEADLINE" in workload
     assert workload.index("scripts.validate_source_history") < workload.index(

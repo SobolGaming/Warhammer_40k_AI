@@ -82,7 +82,7 @@ def coverage_report_command(output: Path) -> list[str]:
         "-m",
         "coverage",
         "json",
-        "--fail-under=67",
+        "--fail-under=68",
         "-o",
         str(output / "coverage.json"),
     ]
@@ -95,7 +95,7 @@ def run_worker(output: Path) -> int:
     from warhammer40k_core.rules.selected_source_index import source_input_hashes
 
     with (output / "run-started.json").open("x", encoding="utf-8") as marker:
-        json.dump({"workers": 32, "mirror_workers": 1, "coverage_floor": 67}, marker)
+        json.dump({"workers": 32, "mirror_workers": 1, "coverage_floor": 68}, marker)
     environment = dict(os.environ)
     environment["PYTHONDONTWRITEBYTECODE"] = "1"
     environment["PYTEST_XDIST_AUTO_NUM_WORKERS"] = "32"

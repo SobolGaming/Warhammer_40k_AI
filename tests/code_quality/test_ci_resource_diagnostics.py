@@ -123,6 +123,7 @@ def test_bounded_setup_lane_preserves_selection_coverage_and_failure(
 ) -> None:
     from scripts.build_test_shards import SERIAL_BEHAVIORAL_CASE
     from scripts.current_shard_compatibility import NATIVE_PREFIX_OWNER, NEW_NODES
+    from scripts.engine_numerical_identity_test_admission import OPENING_MOVEMENT_UNIT_OWNER
 
     mirror_owner = SERIAL_BEHAVIORAL_CASE.split("::", 1)[0]
     ordinary = "tests/ordinary.py"
@@ -131,10 +132,10 @@ def test_bounded_setup_lane_preserves_selection_coverage_and_failure(
     if selection in {"mirror", "both"}:
         selectors.extend([mirror_owner, SERIAL_BEHAVIORAL_CASE])
         serial_selectors.append(SERIAL_BEHAVIORAL_CASE)
-    if selection in {"native", "both", "native-only"}:
-        # Native screen-prefix cases now run in the parallel worksteal lane; only
-        # the 78-model mirror roster remains isolated on -n 1.
+    if selection in {"native", "both"}:
         selectors.append(NATIVE_PREFIX_OWNER)
+    if selection in {"both", "native-only"}:
+        selectors.append(OPENING_MOVEMENT_UNIT_OWNER)
     selectors.sort()  # Real manifests put the native filename before the mirror node.
     parallel_selectors = [item for item in selectors if item not in serial_selectors]
     executable = tmp_path / "uv"

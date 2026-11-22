@@ -194,7 +194,7 @@ time exceeds 30 minutes (1,800 seconds). Preserve complete results for late pass
 workloads but fail approval; preserve available partial diagnostics on termination.
 The controller includes source history, index construction, mirror, parallel tests
 and test reporting. A longer outer safety guard is cleanup grace, not approval.
-Keep twelve shards, existing tests, the 67% branch floor, mirror 120-second bound,
+Keep twelve shards, existing tests, the 68% branch floor, mirror 120-second bound,
 serial smoke 180-second bound and quality 600-second limits unchanged.
 
 Final validation uses `scripts.run_complete_covered_profile` with a fresh output
@@ -410,7 +410,7 @@ canonical complete covered command below remains the required CI workload.
 
 ## Required commands before PR
 
-The temporary owner-approved coverage floor is 67%; post-merge coverage work must restore
+The temporary owner-approved coverage floor is 68%; post-merge coverage work must restore
 85%. Keep full-package branch coverage and all other required gates. See
 docs/SEQUENTIAL_REMEDIATION_REVIEW_POLICY.md.
 
@@ -487,6 +487,6 @@ dedicated `ci-preflight` workflow job, and adaptive
 `${{ vars.CI_LINUX_RUNNER || 'ubuntu-24.04' }}` runner support. The retired
 calibration artifacts remain preserved in Git history at revision
 `9747b9b0873b4f442d3cd81f72280b24810d952c`. Keep all twelve behavioral shards,
-all selected behavioral cases, the 67% full-package branch-coverage floor, the
+all selected behavioral cases, the 68% full-package branch-coverage floor, the
 120-second bounded mirror runner, the 180-second serial smoke, and the
 600-second quality limits unchanged.
