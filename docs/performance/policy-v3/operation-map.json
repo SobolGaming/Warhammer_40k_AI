@@ -34255,6 +34255,18 @@
       "sensitive": false,
       "mandatory": true
     },
+    "opening-shadow-form-policy": {
+      "paths": [
+        "src/warhammer40k_core/ai/opening_shadow_form.py",
+        "data/source_audits/ci64_provenance_v1/stage2-opening-shadow-form-test-transition-v1.json"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
     "player-policy-boundary": {
       "paths": [
         "src/warhammer40k_core/ai/player_policy.py",

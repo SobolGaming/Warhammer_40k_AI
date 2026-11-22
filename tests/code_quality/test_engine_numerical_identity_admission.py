@@ -250,7 +250,18 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
     assert allocation["retained_runtime_fingerprint"] == strict_replay["runtime_fingerprint"]
     cover_event = _record(selection.COVER_EVENT_IDENTITY_ADDITION)
     assert cover_event["retained_runtime_fingerprint"] == allocation["runtime_fingerprint"]
-    assert _record(MANIFEST)["fingerprint"] == cover_event["runtime_fingerprint"]
+    opening = _record(selection.OPENING_SHADOW_FORM_TRANSITION)
+    opening_base_manifest = json.loads(
+        subprocess.check_output(
+            ["git", "show", selection.OPENING_SHADOW_FORM_BASE + ":" + MANIFEST], cwd=ROOT
+        )
+    )
+    assert cover_event["runtime_fingerprint"] == opening_base_manifest["fingerprint"]
+    assert opening["retained_runtime_fingerprint"] == cover_event["runtime_fingerprint"]
+    assert _record(MANIFEST)["fingerprint"] == opening["runtime_fingerprint"]
+    opening_owner = selection.OPENING_SHADOW_FORM_OWNER
+    assert opening_owner in active_files
+    assert sum(opening_owner in group for group in groups) == 1
     cover_source = selection.COVER_EVENT_IDENTITY_SOURCE
     base_cover_source = subprocess.check_output(
         ["git", "show", selection.COVER_EVENT_IDENTITY_BASE + ":" + cover_source], cwd=ROOT
@@ -453,6 +464,7 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         | close_quarters_cases
         | allocation_cases
         | {cover_owner + "::test_save_cover_cache_key_projects_embedded_request_reference"}
+        | {opening_owner + "::test_opening_shadow_form_policy_reaches_native_movement"}
         | {
             strict_replay_owner
             + "::test_strict_persistence_rejects_valid_artifact_with_mismatched_metadata_or_tails"

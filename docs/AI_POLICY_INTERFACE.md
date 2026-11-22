@@ -103,6 +103,27 @@ substitute action. `TrainingRow` remains independently versioned; the companion
 contract below checks its finite candidate linkage. Candidate hashes and IDs
 are linkage metadata, not semantic policy features.
 
+## Round-one Shadow Form policy
+
+`ai.opening_shadow_form.opening_shadow_form_registration(actor_id)` registers
+`opening-shadow-form-initiative-v1` on the actor's exact battle Command route.
+The policy uses public opening initiative. It selects Shadow Lord for the player
+acting first, prioritizing its Hit rerolls, and Wreathed in Shadows for the
+player acting second, prioritizing protection from ranged attacks beyond
+18 inches. It requires Be'lakor's round-one Shadow Form request and its three
+source-backed options. It selects by stable source ID using the ordinary finite
+candidate set and viewer submission. Other rounds and faction choices still
+require an explicitly supported policy.
+
+In the native Cavalcade mirror, the fixed 42-choice setup recipe reaches
+`decision-request-000043`, Player A's mandatory Shadow Form choice. With the
+two opt-in registrations the runner resolves both players' Shadow Forms and
+reaches Player A's first Movement unit-selection request. The focused regression
+checks the accepted records and exact replay of the two-decision continuation.
+The setup recipe remains scripted. The opening policy supplies a bounded
+heuristic baseline with no tactical comparison or learning admission. The
+existing adapter decision contract covers the finite selection.
+
 ## Stage 2 casualty allocation baseline
 
 `ai.allocation_coherency.AllocationCoherencyPolicy` is an opt-in finite policy

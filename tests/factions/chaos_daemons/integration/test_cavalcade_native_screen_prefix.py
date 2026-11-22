@@ -18,12 +18,18 @@ from tests.support.cross_worker_fixture_cache import load_native_command_checkpo
 from warhammer40k_core.adapters.access_control import ViewerContext
 from warhammer40k_core.adapters.event_stream import EventStreamCursor
 from warhammer40k_core.adapters.local_session import LocalGameSession
+from warhammer40k_core.ai.opening_shadow_form import (
+    OPENING_SHADOW_FORM_POLICY_ID,
+    opening_shadow_form_registration,
+)
+from warhammer40k_core.ai.player_policy import PolicyRouter
+from warhammer40k_core.ai.runner import BoundedPolicyRunner, RunLimits, RunnerError
 from warhammer40k_core.core.weapon_profiles import WeaponKeyword
 from warhammer40k_core.engine.catalog_named_weapon_profiles import equipped_named_weapon_profile_ids
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.faction_content.runtime import build_runtime_content_bundle_for_armies
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatusKind
-from warhammer40k_core.engine.replay import ReplayRunner
+from warhammer40k_core.engine.replay import ReplayArtifact, ReplayRunner
 from warhammer40k_core.engine.runtime_modifiers import (
     WeaponProfileModifierContext,
 )
@@ -307,3 +313,55 @@ def test_native_prefix_preserves_real_rules_terrain_and_exact_history(
     ).run()
     assert replay.reproduced_exactly
     assert session.to_persistence_payload() == checkpoint
+
+
+def test_opening_shadow_form_policy_reaches_native_movement(
+    native_command_checkpoint: JsonValue,
+) -> None:
+    session = LocalGameSession.from_persistence_payload(native_command_checkpoint)
+    initial = session.lifecycle.to_payload()
+    initial_count = session.decision_record_count()
+    limits = RunLimits(policy_seed=19, max_decisions=8, max_seconds=60)
+
+    with pytest.raises(RunnerError, match="Unsupported exact policy route") as before:
+        BoundedPolicyRunner(session=session, router=PolicyRouter(()), limits=limits).run()
+
+    (missing,) = before.value.report.decisions
+    assert missing.request_id == "decision-request-000043"
+    assert missing.route.actor_id == "player-a"
+    assert missing.route.decision_type == "select_faction_rule_battle_round_option"
+    assert missing.failure_stage == "routing"
+    assert session.decision_record_count() == initial_count == 42
+
+    router = PolicyRouter(
+        tuple(opening_shadow_form_registration(actor) for actor in ("player-a", "player-b"))
+    )
+    with pytest.raises(RunnerError, match="Unsupported exact policy route") as after:
+        BoundedPolicyRunner(session=session, router=router, limits=limits).run()
+
+    first, second, movement = after.value.report.decisions
+    assert [
+        (attempt.route.actor_id, attempt.policy_id, attempt.accepted) for attempt in (first, second)
+    ] == [
+        ("player-a", OPENING_SHADOW_FORM_POLICY_ID, True),
+        ("player-b", OPENING_SHADOW_FORM_POLICY_ID, True),
+    ]
+    assert movement.route.actor_id == "player-a"
+    assert movement.route.battle_phase == "movement"
+    assert movement.route.decision_type == "select_movement_unit"
+    assert movement.failure_stage == "routing"
+    assert session.decision_record_count() == initial_count + 2
+    records = session.lifecycle.decision_controller.records[initial_count:]
+    assert [record.result.selected_option_id for record in records] == [
+        "catalog-shadow-form:201675cb390e5562",  # Shadow Lord
+        "catalog-shadow-form:08a0b31ed26719ce",  # Wreathed in Shadows
+    ]
+
+    artifact = ReplayArtifact.capture(
+        artifact_id="native-opening-shadow-form",
+        initial_lifecycle_payload=initial,
+        final_lifecycle=session.lifecycle,
+    )
+    replay = ReplayRunner.from_payload(json.loads(json.dumps(artifact.to_payload()))).run()
+    assert replay.reproduced_exactly
+    assert replay.reproduced_decision_count == 2
