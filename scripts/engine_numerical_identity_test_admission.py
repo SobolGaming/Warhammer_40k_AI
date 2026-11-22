@@ -265,6 +265,25 @@ OPENING_MOVEMENT_UNIT_OWNER = (
 )
 
 
+MONSTER_MASH_ADDITION = (
+    "data/source_audits/ci64_provenance_v1/monster-mash-v995-test-addition-v1.json"
+)
+MONSTER_MASH_SHA256 = "2f17e1f6876138c519d6c15d9eb5729275b19b0be0ee9d89ecb60be6fd2c0f84"
+MONSTER_MASH_OWNER = "tests/factions/chaos_daemons/integration/test_monster_mash_v995_roster.py"
+MONSTER_MASH_SOURCES = (
+    "data/army_lists/monster-mash.json",
+    "tests/support/monster_mash_v995.py",
+    (
+        "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/"
+        "chaos_daemons_monster_mash_2026_11/__init__.py"
+    ),
+    (
+        "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/"
+        "chaos_daemons_monster_mash_2026_11/artifacts/catalog.json"
+    ),
+)
+
+
 type SourceSuccessors = dict[str, dict[str, str]]
 type TestSuccessors = dict[str, dict[str, object]]
 
@@ -943,6 +962,14 @@ def exact_movement_test_transition(
         _checked_bytes(root, OPENING_MOVEMENT_UNIT_POLICY, movement["policy_sha256"])
         additions.update(_selection_members(movement["added_files"], root))
         runtime = movement["runtime_fingerprint"]
+    monster_mash_path = root / MONSTER_MASH_ADDITION
+    _selection_no_links(root, monster_mash_path)
+    monster_mash_raw = None
+    if monster_mash_path.exists():
+        if movement_raw is None:
+            raise SystemExit("Monster Mash tests require the Opening Movement predecessor.")
+        runtime, monster_mash_tests, monster_mash_raw = _monster_mash_addition(root, runtime)
+        additions.update(monster_mash_tests)
     retained = _identity_test_transition(
         root,
         retained_cutover_sha256,
@@ -1018,7 +1045,36 @@ def exact_movement_test_transition(
         raw += b"\0" + opening_raw
     if movement_raw is not None:
         raw += b"\0" + movement_raw
+    if monster_mash_raw is not None:
+        raw += b"\0" + monster_mash_raw
     return updated, {**added, **additions}, retained_raw + b"\0" + raw
+
+
+def _monster_mash_addition(
+    root: Path, predecessor_runtime: str
+) -> tuple[str, TestSuccessors, bytes]:
+    raw = _checked_bytes(root, MONSTER_MASH_ADDITION, MONSTER_MASH_SHA256)
+    record = json.loads(raw, object_pairs_hook=_selection_object)
+    if (
+        record.keys()
+        != {
+            "schema",
+            "retained_opening_movement_sha256",
+            "retained_runtime_fingerprint",
+            "runtime_fingerprint",
+            "source_sha256",
+            "added_files",
+        }
+        or record["schema"] != "finite-monster-mash-v995-test-addition-v1"
+        or record["retained_opening_movement_sha256"] != OPENING_MOVEMENT_UNIT_SHA256
+        or record["retained_runtime_fingerprint"] != predecessor_runtime
+        or set(record["source_sha256"]) != set(MONSTER_MASH_SOURCES)
+        or set(record["added_files"]) != {MONSTER_MASH_OWNER}
+    ):
+        raise SystemExit("Monster Mash v995 test addition differs.")
+    for name, digest in record["source_sha256"].items():
+        _checked_bytes(root, name, digest)
+    return record["runtime_fingerprint"], _selection_members(record["added_files"], root), raw
 
 
 def _opening_shadow_form_test_successor(

@@ -1,0 +1,65 @@
+{
+  "schema": "monster-mash-v995-provisional-geometry-v1",
+  "policy": "docs/FACTION_RULES_SOURCE_POLICY.md#geometry-authority",
+  "origin": "Bottom of the support base at the table surface",
+  "footprints": "Official Warhammer Event Companion p.65 Chaos Daemons base-size table",
+  "uncertainty": "Agent-selected nominal approximations for these assemblies. Pose, assembly and decorations affect height. No calibrated scale, physical measurement, independent validation or error bound.",
+  "replacement_policy": "Supersede each provisional record when a reviewed measurement of its exact build is available. Retain original identities and review status in historical artifacts.",
+  "heights": [
+    {
+      "datasheet_id": "000001105",
+      "model_name": "Skarbrand - EPIC HERO",
+      "height_mm": 165,
+      "configuration": "Plastic Skarbrand on 100 mm round base with both axes and tattered wings",
+      "endpoint": "highest intact wing or axe",
+      "reference": "Chaos Daemons Faction Pack pp. 14–15, illustrated assembly",
+      "method": "Nominal physical-height estimate for the identified sculpt; illustration used to identify pose and endpoint.",
+      "evidence_kind": "unverified_estimate",
+      "reviewer_status": "provisional_estimate"
+    },
+    {
+      "datasheet_id": "000001125",
+      "model_name": "Pyrocaster",
+      "height_mm": 55,
+      "configuration": "Plastic Pyrocaster build with the flame head on a 32 mm round base",
+      "endpoint": "highest flame tip",
+      "reference": "Chaos Daemons Faction Pack pp. 56–57, illustrated assembly",
+      "method": "Nominal physical-height estimate for the identified sculpt; illustration used to identify pose and endpoint.",
+      "evidence_kind": "unverified_estimate",
+      "reviewer_status": "provisional_estimate"
+    },
+    {
+      "datasheet_id": "000001125",
+      "model_name": "Flamers",
+      "height_mm": 50,
+      "configuration": "Representative standard plastic Flamer build on a 32 mm round base",
+      "endpoint": "highest integral flame or limb",
+      "reference": "Chaos Daemons Faction Pack pp. 56–57, illustrated assembly",
+      "method": "Nominal physical-height estimate for the identified sculpt; illustration used to identify pose and endpoint.",
+      "evidence_kind": "unverified_estimate",
+      "reviewer_status": "provisional_estimate"
+    },
+    {
+      "datasheet_id": "000001465",
+      "model_name": "Rotigus - EPIC HERO",
+      "height_mm": 145,
+      "configuration": "Plastic Rotigus build with raised Gnarlrod on a 130 mm round base",
+      "endpoint": "top of the staff or intact horn",
+      "reference": "Chaos Daemons Faction Pack pp. 64–65, illustrated assembly",
+      "method": "Nominal physical-height estimate for the identified sculpt; illustration used to identify pose and endpoint.",
+      "evidence_kind": "unverified_estimate",
+      "reviewer_status": "provisional_estimate"
+    },
+    {
+      "datasheet_id": "000001648",
+      "model_name": "Shalaxi Helbane - EPIC HERO",
+      "height_mm": 160,
+      "configuration": "Plastic Shalaxi Helbane build with Soulpiercer and snapping claws on a 100 mm round base",
+      "endpoint": "top of the spear or headdress",
+      "reference": "Chaos Daemons Faction Pack pp. 88–89, illustrated assembly",
+      "method": "Nominal physical-height estimate for the identified sculpt; illustration used to identify pose and endpoint.",
+      "evidence_kind": "unverified_estimate",
+      "reviewer_status": "provisional_estimate"
+    }
+  ]
+}

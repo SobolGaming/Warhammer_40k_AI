@@ -1,541 +1,464 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "6d7e7c2d978913c0d3322f987c3668db4f6fe74a",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:3b01212a43eda6a5911846e8a52c6b0ede4963d9414f2b55ab2db78d725b25d8",
-  "operation_map_sha256": "f8f7043597db9ab5659902d9cf477b273d9b86d5326315454df370634768bc09",
+  "base": "778b25302de97a998e1c66cdde2cbbca12518af8",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:e5e0ccfa536375c25875dfb3ca261970dc5d8c2895aebe94b4c19cbed1aa7255",
+  "operation_map_sha256": "60ade7551ea76a269393ca5f4df46eb84362a6f2503f7091781d59e01684a5d4",
   "changes": {
-    ".github/pull_request_template.md": {
-      "before_sha256": "d18b413216ec3ec76edb2737b42872b6bd1179f929b5eb7c4c5528b898c554f9",
-      "after_sha256": "0383a08524167143bedd6996d215706b384d7bc5d7341c5c58e9748e9820338a",
-      "owners": {
-        "@document": {
-          "before": "d18b413216ec3ec76edb2737b42872b6bd1179f929b5eb7c4c5528b898c554f9",
-          "after": "0383a08524167143bedd6996d215706b384d7bc5d7341c5c58e9748e9820338a"
-        }
-      }
-    },
-    ".github/workflows/ci.yml": {
-      "before_sha256": "0bd44a0fd7227489c7cd41b9391ae2d4d6b47cbe7e5dd8c8b8b1fa06b35707f7",
-      "after_sha256": "3fff6d9b8ede9e1aa8d778e5f99c19044df2632cf1191670b2a4ac8fc57ab1c2",
-      "owners": {
-        "@document": {
-          "before": "0bd44a0fd7227489c7cd41b9391ae2d4d6b47cbe7e5dd8c8b8b1fa06b35707f7",
-          "after": "3fff6d9b8ede9e1aa8d778e5f99c19044df2632cf1191670b2a4ac8fc57ab1c2"
-        }
-      }
-    },
-    "AGENTS.md": {
-      "before_sha256": "6eb5fe2d3285c56c74a6b0fa219dcf99df42d20a057a7b50fdc6d9a7b2114cd7",
-      "after_sha256": "f2ab3bb5243b06c9b892575c972da5f498fc59e2d3372b70e9912cf235f4eed6",
-      "owners": {
-        "@document": {
-          "before": "6eb5fe2d3285c56c74a6b0fa219dcf99df42d20a057a7b50fdc6d9a7b2114cd7",
-          "after": "f2ab3bb5243b06c9b892575c972da5f498fc59e2d3372b70e9912cf235f4eed6"
-        }
-      }
-    },
-    "README.md": {
-      "before_sha256": "02ae11b46451f9057e2e489ef93b01ddfed26d77ea77309061ec1d794166505c",
-      "after_sha256": "a3cd8197a690f5832a4bf47d66713ea75485121e003698a036950f3562585c17",
-      "owners": {
-        "@document": {
-          "before": "02ae11b46451f9057e2e489ef93b01ddfed26d77ea77309061ec1d794166505c",
-          "after": "a3cd8197a690f5832a4bf47d66713ea75485121e003698a036950f3562585c17"
-        }
-      }
-    },
     "ci/test_shards/durations.json": {
-      "before_sha256": "0eec036aaa39fc936eb18e0016efb3853420de9dd5ca57dc025cebe6d654a27b",
-      "after_sha256": "e2a1a724bd57e673a0728a6cb3986228ecc6361669e620b01cad530b0b560b51",
+      "before_sha256": "e2a1a724bd57e673a0728a6cb3986228ecc6361669e620b01cad530b0b560b51",
+      "after_sha256": "881748564e42b707210fe14aa2374222a4adc4872e1720984d429a9afe4cf0b7",
       "owners": {
         "@document": {
-          "before": "0eec036aaa39fc936eb18e0016efb3853420de9dd5ca57dc025cebe6d654a27b",
-          "after": "e2a1a724bd57e673a0728a6cb3986228ecc6361669e620b01cad530b0b560b51"
+          "before": "e2a1a724bd57e673a0728a6cb3986228ecc6361669e620b01cad530b0b560b51",
+          "after": "881748564e42b707210fe14aa2374222a4adc4872e1720984d429a9afe4cf0b7"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
-      "before_sha256": "551266fefc30bee3e01745a6b1e4e3355ea32728c91a3441cd8c16ab46419d9c",
-      "after_sha256": "09935b1310706a2f2889a1214a062db3c1a797b0cd73629798bd5e7ca4a0115e",
+      "before_sha256": "09935b1310706a2f2889a1214a062db3c1a797b0cd73629798bd5e7ca4a0115e",
+      "after_sha256": "0160c365a84fcb504d9c75de94191ba58fae6bd0c08004e82f78a5267f8d4d06",
       "owners": {
         "@document": {
-          "before": "551266fefc30bee3e01745a6b1e4e3355ea32728c91a3441cd8c16ab46419d9c",
-          "after": "09935b1310706a2f2889a1214a062db3c1a797b0cd73629798bd5e7ca4a0115e"
+          "before": "09935b1310706a2f2889a1214a062db3c1a797b0cd73629798bd5e7ca4a0115e",
+          "after": "0160c365a84fcb504d9c75de94191ba58fae6bd0c08004e82f78a5267f8d4d06"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
-      "before_sha256": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20",
-      "after_sha256": "f30c4684079efb34c0d55c1e9892d750f23bd411acaf2fd2d76ed9f7182cbc55",
+      "before_sha256": "f30c4684079efb34c0d55c1e9892d750f23bd411acaf2fd2d76ed9f7182cbc55",
+      "after_sha256": "1ba71f9244fb7ee1095c7022ad67e5ff026227901f38de062e00bcc92d0ed009",
       "owners": {
         "@document": {
-          "before": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20",
-          "after": "f30c4684079efb34c0d55c1e9892d750f23bd411acaf2fd2d76ed9f7182cbc55"
+          "before": "f30c4684079efb34c0d55c1e9892d750f23bd411acaf2fd2d76ed9f7182cbc55",
+          "after": "1ba71f9244fb7ee1095c7022ad67e5ff026227901f38de062e00bcc92d0ed009"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
-      "before_sha256": "73f5967ad71f590e373a3361b2216dbe1bf365913ef05b57745b910a791edd6c",
-      "after_sha256": "92aa05e63bdda1bd156d46a8fecac5afb9c0e9dfd7d12e0e3fa94756c0556878",
+      "before_sha256": "92aa05e63bdda1bd156d46a8fecac5afb9c0e9dfd7d12e0e3fa94756c0556878",
+      "after_sha256": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20",
       "owners": {
         "@document": {
-          "before": "73f5967ad71f590e373a3361b2216dbe1bf365913ef05b57745b910a791edd6c",
-          "after": "92aa05e63bdda1bd156d46a8fecac5afb9c0e9dfd7d12e0e3fa94756c0556878"
+          "before": "92aa05e63bdda1bd156d46a8fecac5afb9c0e9dfd7d12e0e3fa94756c0556878",
+          "after": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
-      "before_sha256": "9af989a5701adb92debb873e46ba82002f5912b4230c0fc8b21458c59daf0933",
-      "after_sha256": "0971e76a3d46c6055d2aee952f8a73e5620b9bf2d8dd0ac0e53ba4702faa7a90",
+      "before_sha256": "0971e76a3d46c6055d2aee952f8a73e5620b9bf2d8dd0ac0e53ba4702faa7a90",
+      "after_sha256": "684633f5047b3f18d69996072d1aa5d8e71a6018b22e2dd462bac4172ca179de",
       "owners": {
         "@document": {
-          "before": "9af989a5701adb92debb873e46ba82002f5912b4230c0fc8b21458c59daf0933",
-          "after": "0971e76a3d46c6055d2aee952f8a73e5620b9bf2d8dd0ac0e53ba4702faa7a90"
+          "before": "0971e76a3d46c6055d2aee952f8a73e5620b9bf2d8dd0ac0e53ba4702faa7a90",
+          "after": "684633f5047b3f18d69996072d1aa5d8e71a6018b22e2dd462bac4172ca179de"
         }
       }
     },
     "ci/test_shards/shard-2.txt": {
-      "before_sha256": "f15853915deec2e4b2128ab4989556e6b9faf3f9432e3c897d0a7fa0a507db4c",
-      "after_sha256": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
+      "before_sha256": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
+      "after_sha256": "6b86753bc716c3629aa3a0cbd296463009602287e242cdda7c4a6d2a8b0227bd",
       "owners": {
         "@document": {
-          "before": "f15853915deec2e4b2128ab4989556e6b9faf3f9432e3c897d0a7fa0a507db4c",
-          "after": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c"
+          "before": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
+          "after": "6b86753bc716c3629aa3a0cbd296463009602287e242cdda7c4a6d2a8b0227bd"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
-      "before_sha256": "fc2ac721672f6a358881fc8db0959abca176828c55f556fd6f62541d93994cf0",
-      "after_sha256": "ed8b2de4f896240a0d1fb02f3619cf22c5a51a118cc241c105470311b8b39d28",
+      "before_sha256": "ed8b2de4f896240a0d1fb02f3619cf22c5a51a118cc241c105470311b8b39d28",
+      "after_sha256": "77d90cb56a044dc333e8ca41cb5b11fddf143d6152398b5e5b53195ddf55495d",
       "owners": {
         "@document": {
-          "before": "fc2ac721672f6a358881fc8db0959abca176828c55f556fd6f62541d93994cf0",
-          "after": "ed8b2de4f896240a0d1fb02f3619cf22c5a51a118cc241c105470311b8b39d28"
+          "before": "ed8b2de4f896240a0d1fb02f3619cf22c5a51a118cc241c105470311b8b39d28",
+          "after": "77d90cb56a044dc333e8ca41cb5b11fddf143d6152398b5e5b53195ddf55495d"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
-      "before_sha256": "ace9a628e6c41aa5d66fb82520a277236758904c316846a2fb2cd111d81d3e97",
-      "after_sha256": "ae8d2c98dfe00df4b140e72685af6159f079f8032dfca4036ca9bd82493fe30a",
+      "before_sha256": "ae8d2c98dfe00df4b140e72685af6159f079f8032dfca4036ca9bd82493fe30a",
+      "after_sha256": "38827653ec6193c7cdced52f65b3c24390acac4d2efb1236846e40f488b9cbdd",
       "owners": {
         "@document": {
-          "before": "ace9a628e6c41aa5d66fb82520a277236758904c316846a2fb2cd111d81d3e97",
-          "after": "ae8d2c98dfe00df4b140e72685af6159f079f8032dfca4036ca9bd82493fe30a"
+          "before": "ae8d2c98dfe00df4b140e72685af6159f079f8032dfca4036ca9bd82493fe30a",
+          "after": "38827653ec6193c7cdced52f65b3c24390acac4d2efb1236846e40f488b9cbdd"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
-      "before_sha256": "8fe8c4476b60f6264b2ff688bc1ffb855b34378e7483df50d445e7aed01d1f1e",
-      "after_sha256": "82d51e1bece2f747490db546611118f9b489a8a1ed5eb682b10a3f4fa346807b",
+      "before_sha256": "82d51e1bece2f747490db546611118f9b489a8a1ed5eb682b10a3f4fa346807b",
+      "after_sha256": "f245c806705508140668a392b9151d5514effef94bae9f876fab5d377db1403d",
       "owners": {
         "@document": {
-          "before": "8fe8c4476b60f6264b2ff688bc1ffb855b34378e7483df50d445e7aed01d1f1e",
-          "after": "82d51e1bece2f747490db546611118f9b489a8a1ed5eb682b10a3f4fa346807b"
+          "before": "82d51e1bece2f747490db546611118f9b489a8a1ed5eb682b10a3f4fa346807b",
+          "after": "f245c806705508140668a392b9151d5514effef94bae9f876fab5d377db1403d"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
-      "before_sha256": "f26b42289a1c352e67662c560d863dc4b30a6118f35803334f294e4d78439ed3",
-      "after_sha256": "157debdc01f19c893f3af5b6dd5ca0b5ad9fd3708cc969d95a57d649d6675b4a",
+      "before_sha256": "157debdc01f19c893f3af5b6dd5ca0b5ad9fd3708cc969d95a57d649d6675b4a",
+      "after_sha256": "c03fb194fb54fe481aa90dfa0cc5053b6c85e6395520763c2a1b9e8b68d27504",
       "owners": {
         "@document": {
-          "before": "f26b42289a1c352e67662c560d863dc4b30a6118f35803334f294e4d78439ed3",
-          "after": "157debdc01f19c893f3af5b6dd5ca0b5ad9fd3708cc969d95a57d649d6675b4a"
+          "before": "157debdc01f19c893f3af5b6dd5ca0b5ad9fd3708cc969d95a57d649d6675b4a",
+          "after": "c03fb194fb54fe481aa90dfa0cc5053b6c85e6395520763c2a1b9e8b68d27504"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
-      "before_sha256": "78f9fee39ecf930d389003ae0abc67c7eae03cc6ebefff190c7f3659534dfc26",
-      "after_sha256": "a2bef08a8a61e9f93b8dcc7208a4d55fbbd8dd85147ede29140f93b26efa5fb6",
+      "before_sha256": "a2bef08a8a61e9f93b8dcc7208a4d55fbbd8dd85147ede29140f93b26efa5fb6",
+      "after_sha256": "5849b8991abbe1b798d39847670ca00cc6a667bee7858f87bf45b3efe57a2d8e",
       "owners": {
         "@document": {
-          "before": "78f9fee39ecf930d389003ae0abc67c7eae03cc6ebefff190c7f3659534dfc26",
-          "after": "a2bef08a8a61e9f93b8dcc7208a4d55fbbd8dd85147ede29140f93b26efa5fb6"
+          "before": "a2bef08a8a61e9f93b8dcc7208a4d55fbbd8dd85147ede29140f93b26efa5fb6",
+          "after": "5849b8991abbe1b798d39847670ca00cc6a667bee7858f87bf45b3efe57a2d8e"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
-      "before_sha256": "a268fbb9e8510c4de0c667fc486fef47d18a6779ce726ce79358fab040196ddd",
-      "after_sha256": "073955dba5088a855d86ceded2733a5489a816bc8ec1f339761e4c236960145f",
+      "before_sha256": "073955dba5088a855d86ceded2733a5489a816bc8ec1f339761e4c236960145f",
+      "after_sha256": "777e1f9c5f43fb4c1239bcce0b7bc2cce421b0ebaf606781de7fda7369dbdd9b",
       "owners": {
         "@document": {
-          "before": "a268fbb9e8510c4de0c667fc486fef47d18a6779ce726ce79358fab040196ddd",
-          "after": "073955dba5088a855d86ceded2733a5489a816bc8ec1f339761e4c236960145f"
+          "before": "073955dba5088a855d86ceded2733a5489a816bc8ec1f339761e4c236960145f",
+          "after": "777e1f9c5f43fb4c1239bcce0b7bc2cce421b0ebaf606781de7fda7369dbdd9b"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
-      "before_sha256": "25b5ad1b0c3f5f5013d66766ef74818aaf78063eadeefbc9f920e8bb925c5786",
-      "after_sha256": "a827cce35bf4367821e1a66be466e1e5059b998639bcb96102b5b4ef0c45154e",
+      "before_sha256": "a827cce35bf4367821e1a66be466e1e5059b998639bcb96102b5b4ef0c45154e",
+      "after_sha256": "b83cec4a5c79ab2dc43a772cce6f62b059abf83231133a996eb0e2c129e92279",
       "owners": {
         "@document": {
-          "before": "25b5ad1b0c3f5f5013d66766ef74818aaf78063eadeefbc9f920e8bb925c5786",
-          "after": "a827cce35bf4367821e1a66be466e1e5059b998639bcb96102b5b4ef0c45154e"
+          "before": "a827cce35bf4367821e1a66be466e1e5059b998639bcb96102b5b4ef0c45154e",
+          "after": "b83cec4a5c79ab2dc43a772cce6f62b059abf83231133a996eb0e2c129e92279"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "61539e2537c28719fa04150a4d5ddf55d058b2b118f7bea7c84c211a2c5ef1fa",
-      "after_sha256": "bbe19e8657599e490da5d916d7ab27088f6a51e2ef06d78bd9da96340b1b0939",
+      "before_sha256": "bbe19e8657599e490da5d916d7ab27088f6a51e2ef06d78bd9da96340b1b0939",
+      "after_sha256": "9722ad557d2c7676c9f836b34498958ad8668aa1cffead5cc307249355e27025",
       "owners": {
         "@document": {
-          "before": "61539e2537c28719fa04150a4d5ddf55d058b2b118f7bea7c84c211a2c5ef1fa",
-          "after": "bbe19e8657599e490da5d916d7ab27088f6a51e2ef06d78bd9da96340b1b0939"
+          "before": "bbe19e8657599e490da5d916d7ab27088f6a51e2ef06d78bd9da96340b1b0939",
+          "after": "9722ad557d2c7676c9f836b34498958ad8668aa1cffead5cc307249355e27025"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "fd9f1ccfa05f53f1e0c4bea6619bc83c94c580e357a05a996873b9d8684af2d9",
-      "after_sha256": "b507da72643f92a2415ea0637a298a68b31a2436953227da23d9c43bb9255f70",
+      "before_sha256": "b507da72643f92a2415ea0637a298a68b31a2436953227da23d9c43bb9255f70",
+      "after_sha256": "dba0d11db2b942296f82bdc78601be468133013a20912fdad85982bb05a9b2f2",
       "owners": {
         "@document": {
-          "before": "fd9f1ccfa05f53f1e0c4bea6619bc83c94c580e357a05a996873b9d8684af2d9",
-          "after": "b507da72643f92a2415ea0637a298a68b31a2436953227da23d9c43bb9255f70"
+          "before": "b507da72643f92a2415ea0637a298a68b31a2436953227da23d9c43bb9255f70",
+          "after": "dba0d11db2b942296f82bdc78601be468133013a20912fdad85982bb05a9b2f2"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "03618406e2c6856636d0b29c9c924f078d3eee4c3fd9ba8bd64638e430c3cd4f",
-      "after_sha256": "955f925d6cd6da0b678bd2b2ace057beb384815dbebbfd4b1156702b932dff2c",
+      "before_sha256": "955f925d6cd6da0b678bd2b2ace057beb384815dbebbfd4b1156702b932dff2c",
+      "after_sha256": "7875b86caeb2e2dbf4de4c518767d51315d2455133892be01ee42a3305a338f6",
       "owners": {
         "@document": {
-          "before": "03618406e2c6856636d0b29c9c924f078d3eee4c3fd9ba8bd64638e430c3cd4f",
-          "after": "955f925d6cd6da0b678bd2b2ace057beb384815dbebbfd4b1156702b932dff2c"
+          "before": "955f925d6cd6da0b678bd2b2ace057beb384815dbebbfd4b1156702b932dff2c",
+          "after": "7875b86caeb2e2dbf4de4c518767d51315d2455133892be01ee42a3305a338f6"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "38edf6ab7840a773ff3da1aaaf1daefb76fa755fdf4b915dcaef1fa7b774c01a",
-      "after_sha256": "2059a7fbeabeb948fc884f79b40e5e287d732b492ba613b3ec2b6218ad37b222",
+      "before_sha256": "2059a7fbeabeb948fc884f79b40e5e287d732b492ba613b3ec2b6218ad37b222",
+      "after_sha256": "d160620a892759ff5d0bf026ad37759861f088aafca9b1d14c8084b69069f50f",
       "owners": {
         "@document": {
-          "before": "38edf6ab7840a773ff3da1aaaf1daefb76fa755fdf4b915dcaef1fa7b774c01a",
-          "after": "2059a7fbeabeb948fc884f79b40e5e287d732b492ba613b3ec2b6218ad37b222"
+          "before": "2059a7fbeabeb948fc884f79b40e5e287d732b492ba613b3ec2b6218ad37b222",
+          "after": "d160620a892759ff5d0bf026ad37759861f088aafca9b1d14c8084b69069f50f"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "b1144d69a5f0e603043bf8395f7cb5bcee771ef3ad5b04570ad89b31d74c2d20",
-      "after_sha256": "1dc7c88d53ca5b487160257077dac7ae66726d58e57850ce489afe6a25500a44",
+      "before_sha256": "1dc7c88d53ca5b487160257077dac7ae66726d58e57850ce489afe6a25500a44",
+      "after_sha256": "7577bb5d71ef9ca3709735d044d7e5e123ccd2f1b07a4d4e75035a4d2f4a413b",
       "owners": {
         "@document": {
-          "before": "b1144d69a5f0e603043bf8395f7cb5bcee771ef3ad5b04570ad89b31d74c2d20",
-          "after": "1dc7c88d53ca5b487160257077dac7ae66726d58e57850ce489afe6a25500a44"
+          "before": "1dc7c88d53ca5b487160257077dac7ae66726d58e57850ce489afe6a25500a44",
+          "after": "7577bb5d71ef9ca3709735d044d7e5e123ccd2f1b07a4d4e75035a4d2f4a413b"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "24541d867e33f92683cb2fc75009f7c5ee4c4eac4b49d6beb6199726c92ed98b",
-      "after_sha256": "0b6f94812853b6474368b1f45e51a2883a6c10fa09c2d7d0fac99e9e365466af",
+      "before_sha256": "0b6f94812853b6474368b1f45e51a2883a6c10fa09c2d7d0fac99e9e365466af",
+      "after_sha256": "21bc28328436905ae3bb623d12d596cf695d3a5538b2f49b57ca252917ccf10b",
       "owners": {
         "@document": {
-          "before": "24541d867e33f92683cb2fc75009f7c5ee4c4eac4b49d6beb6199726c92ed98b",
-          "after": "0b6f94812853b6474368b1f45e51a2883a6c10fa09c2d7d0fac99e9e365466af"
+          "before": "0b6f94812853b6474368b1f45e51a2883a6c10fa09c2d7d0fac99e9e365466af",
+          "after": "21bc28328436905ae3bb623d12d596cf695d3a5538b2f49b57ca252917ccf10b"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "164f038ef6327145fcf30ba417429883aa19e40e6d28eb113bd7a8004279fa96",
-      "after_sha256": "fe1ec027c003a0b6a423b100d06762f8dc7c2b87cdc184c76be4ec39a2dad96c",
+      "before_sha256": "fe1ec027c003a0b6a423b100d06762f8dc7c2b87cdc184c76be4ec39a2dad96c",
+      "after_sha256": "448ccd2dd807ec2cb6a9ae499c3abefba8ac0559a3b05fefcfecf9669b992128",
       "owners": {
         "@document": {
-          "before": "164f038ef6327145fcf30ba417429883aa19e40e6d28eb113bd7a8004279fa96",
-          "after": "fe1ec027c003a0b6a423b100d06762f8dc7c2b87cdc184c76be4ec39a2dad96c"
+          "before": "fe1ec027c003a0b6a423b100d06762f8dc7c2b87cdc184c76be4ec39a2dad96c",
+          "after": "448ccd2dd807ec2cb6a9ae499c3abefba8ac0559a3b05fefcfecf9669b992128"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "172f75311a4e5528871166c4e2105fe0c998aa94029a1fdbe7ee3768c0edf892",
-      "after_sha256": "3c3e1818e49c33d95c6d6ee8e394cadfb570e9a117db86d9dd5fb867dae06c33",
+      "before_sha256": "3c3e1818e49c33d95c6d6ee8e394cadfb570e9a117db86d9dd5fb867dae06c33",
+      "after_sha256": "f346bf62765022b04611006592204bbb1d6643a9df6dac52a071e03833bcf5d0",
       "owners": {
         "@document": {
-          "before": "172f75311a4e5528871166c4e2105fe0c998aa94029a1fdbe7ee3768c0edf892",
-          "after": "3c3e1818e49c33d95c6d6ee8e394cadfb570e9a117db86d9dd5fb867dae06c33"
+          "before": "3c3e1818e49c33d95c6d6ee8e394cadfb570e9a117db86d9dd5fb867dae06c33",
+          "after": "f346bf62765022b04611006592204bbb1d6643a9df6dac52a071e03833bcf5d0"
         }
       }
     },
-    "data/source_audits/ci64_provenance_v1/stage2-opening-movement-unit-test-addition-v1.json": {
+    "data/army_lists/monster-mash.json": {
       "before_sha256": null,
-      "after_sha256": "6c821e5ea1fe9933539d8b63d63bc1d3777766b68581e66ae664fc76caebf15e",
+      "after_sha256": "d16a155571081197fd8d213421e968093aead18cee78ff2cdc9c1540fe365fd5",
       "owners": {
         "@document": {
           "before": null,
-          "after": "6c821e5ea1fe9933539d8b63d63bc1d3777766b68581e66ae664fc76caebf15e"
+          "after": "d16a155571081197fd8d213421e968093aead18cee78ff2cdc9c1540fe365fd5"
         }
       }
     },
-    "docs/AI_IMPLEMENTATION_PLAN.md": {
-      "before_sha256": "459719a881dcc416f7f790c8f327c5edc5ad4fbc0d06b51d591b730b9b76e60a",
-      "after_sha256": "3c874cdf08e2c21db30ce9c4b3554b64829df8760e602f36ee9cb990577d2d6c",
+    "data/source_audits/ci64_provenance_v1/monster-mash-v995-test-addition-v1.json": {
+      "before_sha256": null,
+      "after_sha256": "2f17e1f6876138c519d6c15d9eb5729275b19b0be0ee9d89ecb60be6fd2c0f84",
       "owners": {
         "@document": {
-          "before": "459719a881dcc416f7f790c8f327c5edc5ad4fbc0d06b51d591b730b9b76e60a",
-          "after": "3c874cdf08e2c21db30ce9c4b3554b64829df8760e602f36ee9cb990577d2d6c"
+          "before": null,
+          "after": "2f17e1f6876138c519d6c15d9eb5729275b19b0be0ee9d89ecb60be6fd2c0f84"
         }
       }
     },
     "docs/AI_POLICY_INTERFACE.md": {
-      "before_sha256": "f79ce37e0c010f4e662d4249e54dc78dd21b68b453b2d3732388e9f20a43437b",
-      "after_sha256": "a4c6047dd495e630b10af9c6e6f8cea510c3a066556faa71a205b954d529d006",
+      "before_sha256": "a4c6047dd495e630b10af9c6e6f8cea510c3a066556faa71a205b954d529d006",
+      "after_sha256": "11776bafdf82a081034709b3890c479db3b82a5c272893992d681705634a64a6",
       "owners": {
         "@document": {
-          "before": "f79ce37e0c010f4e662d4249e54dc78dd21b68b453b2d3732388e9f20a43437b",
-          "after": "a4c6047dd495e630b10af9c6e6f8cea510c3a066556faa71a205b954d529d006"
-        }
-      }
-    },
-    "docs/DISTANCE_PRECISION.md": {
-      "before_sha256": "eec7a2d15372a9ae0ca5358608e2770429f845c662470509f6433af42c31dbf0",
-      "after_sha256": "5bf9fe4d8adf71f7d525ee11768d7dd1a1801e95b96e49891ecf66445c8c569e",
-      "owners": {
-        "@document": {
-          "before": "eec7a2d15372a9ae0ca5358608e2770429f845c662470509f6433af42c31dbf0",
-          "after": "5bf9fe4d8adf71f7d525ee11768d7dd1a1801e95b96e49891ecf66445c8c569e"
-        }
-      }
-    },
-    "docs/SEQUENTIAL_REMEDIATION_REVIEW_POLICY.md": {
-      "before_sha256": "c19ddc0924576aba254bccf002fec8760edaedfaaeca97df41ea02e01e79b062",
-      "after_sha256": "6157a076ab034085e5ce008e68c13a0affea03a67600f74cfa283f313989b805",
-      "owners": {
-        "@document": {
-          "before": "c19ddc0924576aba254bccf002fec8760edaedfaaeca97df41ea02e01e79b062",
-          "after": "6157a076ab034085e5ce008e68c13a0affea03a67600f74cfa283f313989b805"
-        }
-      }
-    },
-    "docs/SOURCE_FIXTURE_HASH_BOUNDARIES.md": {
-      "before_sha256": "f23a44a7952bb374b06d03c7b54ade360860c60db2c3447001372621b62bf120",
-      "after_sha256": "104c3785978970891a02eba97764a42b5dbecbbd8fccc1386fe71c7760c058e7",
-      "owners": {
-        "@document": {
-          "before": "f23a44a7952bb374b06d03c7b54ade360860c60db2c3447001372621b62bf120",
-          "after": "104c3785978970891a02eba97764a42b5dbecbbd8fccc1386fe71c7760c058e7"
+          "before": "a4c6047dd495e630b10af9c6e6f8cea510c3a066556faa71a205b954d529d006",
+          "after": "11776bafdf82a081034709b3890c479db3b82a5c272893992d681705634a64a6"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "929b3fa2d61880719464f19c7126fbc5ce054639a85a8e0f6ad35dcfd3e07e25",
-      "after_sha256": "641f0f9c9f1009797bb91e13583326dbed4cc252074dd410df29c1c479bc90dd",
+      "before_sha256": "641f0f9c9f1009797bb91e13583326dbed4cc252074dd410df29c1c479bc90dd",
+      "after_sha256": "1eae7de9a942689841ccac50281c8ad4cedf5eaaf0758ab89393810549ae26c7",
       "owners": {
         "@document": {
-          "before": "929b3fa2d61880719464f19c7126fbc5ce054639a85a8e0f6ad35dcfd3e07e25",
-          "after": "641f0f9c9f1009797bb91e13583326dbed4cc252074dd410df29c1c479bc90dd"
-        }
-      }
-    },
-    "pyproject.toml": {
-      "before_sha256": "870d9e83747f1e4cd8e3092103c71faf319caa5ca10c11bcb1f4e5b03e51da71",
-      "after_sha256": "0b89fb869936bbcd49baef572380029840a75fee75071cc5339e4415d9939b80",
-      "owners": {
-        "@document": {
-          "before": "870d9e83747f1e4cd8e3092103c71faf319caa5ca10c11bcb1f4e5b03e51da71",
-          "after": "0b89fb869936bbcd49baef572380029840a75fee75071cc5339e4415d9939b80"
-        }
-      }
-    },
-    "scripts/build_test_shards.py": {
-      "before_sha256": "f6bdc64e9f82da55b3b4e011eeba84d5643ca061507a34d9c23061e8af0ddb0a",
-      "after_sha256": "8843ed051f815f81584bd8cb3b8f50ed2c0ef74308ebb3c4695e8db9eec66aaa",
-      "owners": {
-        "covered_native_checkpoint_cohort": {
-          "before": "ca48f7216b5c680f866422ec6ff6aff2556f7f69532495b7ad84ea69b14e9a4a",
-          "after": "b1d19d0b044ab7ab7fcbdc536e7f011bdf6a4270fd21c5e94196f4fadf599be4"
+          "before": "641f0f9c9f1009797bb91e13583326dbed4cc252074dd410df29c1c479bc90dd",
+          "after": "1eae7de9a942689841ccac50281c8ad4cedf5eaaf0758ab89393810549ae26c7"
         }
       }
     },
     "scripts/engine_numerical_identity_test_admission.py": {
-      "before_sha256": "9eb94e1dbf42308df4478f1c80951a41be96be595bd1760ed46458ed88d29825",
-      "after_sha256": "2495415f1c683f2a954f1688e7307d507f5be193655b74c24f33c9ae0d816806",
+      "before_sha256": "2495415f1c683f2a954f1688e7307d507f5be193655b74c24f33c9ae0d816806",
+      "after_sha256": "c225f936341ffd71d69ea44ed20205ab222af1b1915957e458043f6d9c674d3a",
       "owners": {
         "@module": {
-          "before": "1e53eec926b71f40ab06a6f94bc1c20342acc63a08302d2dcba5daf2a36e81dc",
-          "after": "5247f30447ebf4f93d7b8289fc8f00a033753cd05405c95d0bc0c039dbc7d70c"
+          "before": "5247f30447ebf4f93d7b8289fc8f00a033753cd05405c95d0bc0c039dbc7d70c",
+          "after": "88c529a4d08c92b16c10725f781ae220c5adbd4b2de3ef3e79a59253dc1365dc"
+        },
+        "_monster_mash_addition": {
+          "before": null,
+          "after": "836fc152ce07dcf0672d8021f1d2e03083556436f4c2cd944d94ffc74314212a"
         },
         "exact_movement_test_transition": {
-          "before": "24780f969561382a43e0997f04024c118172749dea6aef0748b62c615ad827af",
-          "after": "c046d71d6993e54c4c52fd7aae7e101b3e2774367349ea42d4fe8581e8f98c54"
-        }
-      }
-    },
-    "scripts/run_behavioral_coverage.sh": {
-      "before_sha256": "ae2425b5b7fb5966fb9d3e603674055ea61953ac95deca60fef05db4574466da",
-      "after_sha256": "6e68531258b05f32645a1c73a47f46b3f13adceab459e3a2f0cc68a579e7daca",
-      "owners": {
-        "@document": {
-          "before": "ae2425b5b7fb5966fb9d3e603674055ea61953ac95deca60fef05db4574466da",
-          "after": "6e68531258b05f32645a1c73a47f46b3f13adceab459e3a2f0cc68a579e7daca"
-        }
-      }
-    },
-    "scripts/run_complete_covered_profile.py": {
-      "before_sha256": "e4ffa7949651975770217f544de8a98f18b79b8797311925dd892dd99a47d93c",
-      "after_sha256": "49d08d9c2f2a7c6fd0730ce219f05ae763f1782b0c878ce1d7f777d5685a4147",
-      "owners": {
-        "coverage_report_command": {
-          "before": "03c49f351873d0e16794745990b73ce1f9c50e61318e312f56a81ff6da17a088",
-          "after": "e3dfc138e65eb5e516f9b6beff1210bc3815ff6e2fbd681294fef9972766bfac"
-        },
-        "run_worker": {
-          "before": "b7bcf25967bdfbfff3446ea5ab03a96c8931b6a425b42172bde4bbd8101d7761",
-          "after": "aedc7573e4418dd6bbdf2429befafa6c931b17f7655a9adb68486beece6d90c7"
+          "before": "c046d71d6993e54c4c52fd7aae7e101b3e2774367349ea42d4fe8581e8f98c54",
+          "after": "c4f77226d622d25d2266cfff7b618e6b9e07aa58a8bcfdd23ddcedb4a7a1543f"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "398bda5d38784fee5e2d0b122a0bce5d7c5840ef7d194a97aa2cd6d297790369",
-      "after_sha256": "d81e626a9787c7118e07ab216f7f2557972b26dc495384fb3f66b42c0bb1ff09",
+      "before_sha256": "d81e626a9787c7118e07ab216f7f2557972b26dc495384fb3f66b42c0bb1ff09",
+      "after_sha256": "4581d1a6857d75dfb25e11b0a3ef2112123a9e90584c8ca529b4cc656c4e1b7f",
       "owners": {
         "@document": {
-          "before": "398bda5d38784fee5e2d0b122a0bce5d7c5840ef7d194a97aa2cd6d297790369",
-          "after": "d81e626a9787c7118e07ab216f7f2557972b26dc495384fb3f66b42c0bb1ff09"
+          "before": "d81e626a9787c7118e07ab216f7f2557972b26dc495384fb3f66b42c0bb1ff09",
+          "after": "4581d1a6857d75dfb25e11b0a3ef2112123a9e90584c8ca529b4cc656c4e1b7f"
         }
       }
     },
-    "src/warhammer40k_core/ai/opening_movement_unit.py": {
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/chaos_daemons_monster_mash_2026_11/__init__.py": {
       "before_sha256": null,
-      "after_sha256": "16b0d8c6c0afb74ddd73d9e9395529c57bfeb44c26df26034cf28cdca31de0eb",
+      "after_sha256": "a3bf70c7980adb004488e1e085b70ef8e25548d0a3a228819693c46b8ebb547d",
       "owners": {
         "@module": {
           "before": null,
-          "after": "a65141972dab0af2cc2baca92cd06fdd8c80cb9cfa627458798ba5fa6cfb04cb"
+          "after": "a72a1e65dd81ee714b659d8586d9f600f103faaf4dd3cf00cffbd5bab798e401"
         },
-        "OpeningMovementUnitPolicy": {
+        "MonsterMashCatalogError": {
           "before": null,
-          "after": "1dc4628ced947e01ebe98ffaaaf7a04858e99bf4b0f31b718cf9082325dc9172"
+          "after": "b4488ba08aa029b928f5c31da28715348c5fb56bcd7659fde0c9c2f727058781"
         },
-        "OpeningMovementUnitPolicy.choose": {
+        "catalog_package": {
           "before": null,
-          "after": "f0a60c4644c9c688de67239dfd0c74fcf23b2e14fc89428e5a11bd14aaac8f34"
-        },
-        "opening_movement_unit_registration": {
+          "after": "3b5ba80f60931e45dbb5c6ee3114c8bd3dbdb84dc728b242b80f909243ace765"
+        }
+      }
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/chaos_daemons_monster_mash_2026_11/artifacts/catalog.json": {
+      "before_sha256": null,
+      "after_sha256": "a990509b4ec88a69909aa673c12a40b54322d67730484539f5d22f1e27f0ae64",
+      "owners": {
+        "@document": {
           "before": null,
-          "after": "28d4c274ccbf14dd77b9bef94e2ad1394f19aca495312e56ac7b129fee8a487e"
+          "after": "a990509b4ec88a69909aa673c12a40b54322d67730484539f5d22f1e27f0ae64"
         }
       }
     },
-    "tests/code_quality/test_behavioral_deadline.py": {
-      "before_sha256": "9eada250b5f922243eca209fb8a39eaee23f279d6667a606a4c75222e9583bda",
-      "after_sha256": "d9d0b0f9feaafcc81dbd80639cb31242b7b4fcc8657c0bafc4d459395588b0d2",
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/chaos_daemons_monster_mash_2026_11/artifacts/geometry.json": {
+      "before_sha256": null,
+      "after_sha256": "e5292f8dc7c0e2961ed57a826e74ea684e114095fa20dee88e558d626930769e",
       "owners": {
-        "test_hosted_workload_uses_supervisor_and_preserves_diagnostics": {
-          "before": "4987e236b584f336f392ec5c25b18b6f54128621c85bc973a4bc822c647a2c9e",
-          "after": "ec4a05a4abfcfc15eb5acb111a74d39d7128402631d01eb57db1a00ff1cd46c7"
+        "@document": {
+          "before": null,
+          "after": "e5292f8dc7c0e2961ed57a826e74ea684e114095fa20dee88e558d626930769e"
         }
       }
     },
-    "tests/code_quality/test_ci_performance_gates.py": {
-      "before_sha256": "81627b24dcf61799c29f771a88ae6d92d61e2010aabda2fbcc2f4ba6716cbc4e",
-      "after_sha256": "f3c7eb06b38a09ce25f9d5b4c7bd733ad8ff60365b9a649adee47812dd58f096",
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/chaos_daemons_monster_mash_2026_11/artifacts/source-review.json": {
+      "before_sha256": null,
+      "after_sha256": "9af8967bc6c7900381fe639a6f3164ae1ba1ee8264811b046fc3ccda64366412",
       "owners": {
-        "test_cold_source_index_overlaps_startup_inside_the_unchanged_deadline": {
-          "before": "a65fe765edcdc728a7900d4b84cceefc2a95698542bdccd317ef0862c601aaa7",
-          "after": "c351b1730890f627b0ef64f3b514dbad5f23a0cbe8a981e70e8650f4e30f3734"
-        },
-        "test_quality_gate_requires_every_independent_lane_even_when_skipped": {
-          "before": "019e7950106db6b8a1310391eef4dc5196aec8336cd48aa8ae586abb08844f1c",
-          "after": "0356d72bde7cb6396d7faa886331ac3da1706f68fe5fc4ed1ba9ae88e79769a4"
-        }
-      }
-    },
-    "tests/code_quality/test_ci_resource_diagnostics.py": {
-      "before_sha256": "b9a53e5564ffc3999318bab66ab12c0970b507d549f0fdfc572c0ae5d0e9f2d3",
-      "after_sha256": "a61c958b4b863eef33c61ebad9ada1224dd3d3742b4bb96f3def63adb45b0076",
-      "owners": {
-        "test_bounded_setup_lane_preserves_selection_coverage_and_failure": {
-          "before": "51d2dc66f7eea549b6271347db53953025c81fb2b9f47a0f5af7a311c2158941",
-          "after": "44f8a5a00e89a7a49f26a6676c1f592092ca1a957e14eb9615500bfeb51b2c24"
-        }
-      }
-    },
-    "tests/code_quality/test_complete_covered_reporting.py": {
-      "before_sha256": "6efc2f56b5ce976980e8e897eae2fefe4e497bfecc93d62bbf4cf53d73b8fa0c",
-      "after_sha256": "b5dd7cb62516f11ae3f9bbf90bba465888d319b4ed419589e8c61a50e20d37a2",
-      "owners": {
-        "test_complete_json_reporting_preserves_floor_evidence_and_failure_propagation": {
-          "before": "4cc33c546dbf3a74e50b16306ff6111ac27dd2ed32344cb38e38e39133b3865e",
-          "after": "b0806a1af2ba7e7c5f4c335ea23443bbc265832246941e7cdc4eba0682307648"
+        "@document": {
+          "before": null,
+          "after": "9af8967bc6c7900381fe639a6f3164ae1ba1ee8264811b046fc3ccda64366412"
         }
       }
     },
     "tests/code_quality/test_engine_numerical_identity_admission.py": {
-      "before_sha256": "5e6a1a75c62829bd58d092190d62fc7fb756d93682972cbc221e142545d0035e",
-      "after_sha256": "f824f7b1315a4cc34e5155a0ddea80d0d2b660ee280d63132f73b7792bf60778",
+      "before_sha256": "f824f7b1315a4cc34e5155a0ddea80d0d2b660ee280d63132f73b7792bf60778",
+      "after_sha256": "16fb602a45c6af1f4b064e0db7cc2267a1b4f4e64ae65558d2bba5f1e87a51ee",
       "owners": {
         "test_identity_inventory_uses_current_twelve_shards_and_native_cohort": {
-          "before": "0bcfc90898b063f03b9326cbfc8d9a63a84778cbb4869456e716181d003bde3b",
-          "after": "ac287eb3e7ef906e4edec268d16b26cb1d65b888cef9acac290c59767409f5b7"
+          "before": "ac287eb3e7ef906e4edec268d16b26cb1d65b888cef9acac290c59767409f5b7",
+          "after": "9109437f3ceb1567993cf24310153fa696c732fbf943aab41f0dc18ab69eefdb"
         }
       }
     },
-    "tests/factions/chaos_daemons/integration/test_cavalcade_opening_movement_unit.py": {
+    "tests/code_quality/test_ws12_generated_data_artifacts.py": {
+      "before_sha256": "fa4f094d73c08b236fc892c92614f48f2a7f62f8fb4cd9202ecf67a5af26e2c8",
+      "after_sha256": "6566e21fc91623be1309fb7230fe6707aa616a89a0c1db1d319e909722f104d0",
+      "owners": {
+        "@module": {
+          "before": "1af657fffe2e0039df5f64408529cb25098158a51a0fa14ae9a778a961169863",
+          "after": "10343e9630f333e880e47ab7b0cb3875dc32f826c7b405de4e351fc36a940af7"
+        }
+      }
+    },
+    "tests/factions/chaos_daemons/integration/test_monster_mash_v995_roster.py": {
       "before_sha256": null,
-      "after_sha256": "ef2b63d73a6e9ba906547c2b98920d84ae98280111015e5a8f594ab832089dd5",
+      "after_sha256": "ea1f07773b522191ac0e55f7b3c56f8cef23035ccc7adf5fcb30d17201dd0999",
       "owners": {
         "@module": {
           "before": null,
-          "after": "14ca69eed28244d25ca338253d643662a4ec30165e49c98e4289609a53d3b897"
+          "after": "17e96c4d40b58e68c7edff363c1ccbf362179ce656962aa6979dbfc338e2d9b0"
         },
-        "test_opening_movement_selects_an_issued_unit_before_any_action": {
+        "_assert_monster_mash_export": {
           "before": null,
-          "after": "7748f1ceaf9ff9ee89110137a1febeeee5e24765c95746922712b6a33b213bd0"
+          "after": "b1dc8f27551b1c8f76a321a701b319802f07bc858b66d3962c17f8b70a0c62b1"
+        },
+        "_assert_retained_cavalcade_rows_and_geometry": {
+          "before": null,
+          "after": "afefd73c0a1ac79ae7c8989067a2f7cd86a9607f6f7b8b3c65d9ba8cb06d9336"
+        },
+        "test_exact_monster_mash_admission_deployment_and_replay": {
+          "before": null,
+          "after": "1516389cb56d23547a833a8781df3751872bf9a630f6fafafdfe678679a38a33"
         }
       }
     },
-    "tests/rules/section07/coverage.json": {
-      "before_sha256": "84f7c606bb3617a8a9ebda27f72378eafc048b28e0c747764d76b29003bae165",
-      "after_sha256": "cf9dd472bb92aeb3c87b2feb9aee436a51ade9ad6271ee6dcb2c803b96b06c6b",
+    "tests/support/monster_mash_v995.py": {
+      "before_sha256": null,
+      "after_sha256": "c294ca764360aa32e9ee42ce1d9f788cad3f0273ca5cdc525b5319e22368e5d6",
       "owners": {
-        "@document": {
-          "before": "84f7c606bb3617a8a9ebda27f72378eafc048b28e0c747764d76b29003bae165",
-          "after": "cf9dd472bb92aeb3c87b2feb9aee436a51ade9ad6271ee6dcb2c803b96b06c6b"
+        "@module": {
+          "before": null,
+          "after": "e8c8819e271e5ae30fc34f53fbfef80972194562e43aa32c4508411a4dfeea37"
+        },
+        "_submit_option": {
+          "before": null,
+          "after": "e26c28b4766aff5e9156d003c2d3812c14cfc96873aaa66d8927884cac008616"
+        },
+        "begin_staged_deployment": {
+          "before": null,
+          "after": "acc6ecda3c10777df1ccd726711b6ed98ac07166db852cd9ddab733d6c761831"
+        },
+        "monster_mash_vs_cavalcade_config": {
+          "before": null,
+          "after": "46dff585d82205be19a95e34431a1edfacc3b13a09c840433ae61f1fb3fe18a0"
+        }
+      }
+    },
+    "tools/generate_cavalcade_v995_catalog.py": {
+      "before_sha256": "f4eed2e0a778e264d3873bcdc2e63ea00417fef22d383dd10da7565f785b2c3b",
+      "after_sha256": "f34ce9e7170c648b5000773e639c262cc249dd47395a2c57aad2478eb1084364",
+      "owners": {
+        "_additional_catalog": {
+          "before": "4e70339ff624f7cb23c8d757b7e5dc814b01e518c0aa33336d20012eb4d35c78",
+          "after": null
+        },
+        "_promote": {
+          "before": "0574489ec2ef16634589a26aa9a39a9249ce567b9cc617ad25590d6b3b88dba4",
+          "after": "ba02317b366d6177f1638af5d2febbf9d08dcfe1e065181e1bd2e99f0d1f3bdb"
+        },
+        "build_catalog_package": {
+          "before": "60bc63f6ba26dd412f70aed1dd7bcd8017da9275fa8f9d9152069e327d8e8852",
+          "after": "bd47b8a130ff2bddb406f5cd68674476dc54f1a28efb8c4b1a124a57f6e6bfe1"
+        },
+        "build_reviewed_datasheets": {
+          "before": null,
+          "after": "3a6a7695dceb816b6ef613ee4aa3d9492c0615fae03be00e9b919a076e73dddf"
+        }
+      }
+    },
+    "tools/generate_monster_mash_v995_catalog.py": {
+      "before_sha256": null,
+      "after_sha256": "dae0a554992d894cd4240a28f64acdf8e7eae327a30059ebd64549c71b19c69b",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "982c0f2d697f2c32a64e70fa2f3269b4e847d5429c35f2c1e2d716867a47e7a4"
+        },
+        "_check_base_evidence": {
+          "before": null,
+          "after": "413cb1e49d09885b0422bd60fbe3d1054e4346a7e659f8504f7bf7dafc9061dd"
+        },
+        "_current_ability_descriptions": {
+          "before": null,
+          "after": "edcc1c9300aa49544a1cb505eb3cce0e9e3b2e19d71130faa2a231cdb40897fa"
+        },
+        "_incursion_definitions": {
+          "before": null,
+          "after": "b5263f1df48079f2edb2e98dbaa199ec45501ec4aa3429df97582b3dfde5508a"
+        },
+        "_reviewed_heights": {
+          "before": null,
+          "after": "8b7a525a5b579a1cfae6c20711fde2ba64e46d7942343396025d0e59848e46b1"
+        },
+        "build_catalog_package": {
+          "before": null,
+          "after": "cf0d6605c2920bf5ddc99683b24cec41d07e6e2b821d23c0693d942a036b9fb9"
+        },
+        "main": {
+          "before": null,
+          "after": "71545da5d46b48309cb4bf7300cc9b6c07ffec2fd284b80e4803436f9e7f0a8a"
         }
       }
     }
   },
   "rows": {
-    ".github/pull_request_template.md": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Document the owner-approved 68 percent combined coverage floor and retain historical thresholds and results.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    ".github/workflows/ci.yml": {
-      "category": "rule_semantics",
-      "operations": [
-        "behavioral-worker-progress",
-        "covered-shard-workload"
-      ],
-      "selected_families": [],
-      "rationale": "Apply and test the 68 percent combined branch-measured reporting threshold and authenticate the current settings.",
-      "source_obligation": "The owner authorized raising the combined full-package coverage floor to 68 percent.",
-      "unchanged_work": "Preserve branch and package measurement, exclusions, all selected behavioral cases, timing limits and historical receipts."
-    },
-    "AGENTS.md": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Document the owner-approved 68 percent combined coverage floor and retain historical thresholds and results.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "README.md": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Document the owner-approved 68 percent combined coverage floor and retain historical thresholds and results.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
     "ci/test_shards/durations.json": {
       "category": "measured_workload",
       "operations": [
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Refresh the twelve-shard scheduling inventory from the complete passing branch-covered behavioral profile.",
+      "rationale": "Regenerate twelve scheduling shards from the complete measured branch-covered profile.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -545,7 +468,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Refresh the twelve-shard scheduling inventory from the complete passing branch-covered behavioral profile.",
+      "rationale": "Regenerate twelve scheduling shards from the complete measured branch-covered profile.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -555,7 +478,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Refresh the twelve-shard scheduling inventory from the complete passing branch-covered behavioral profile.",
+      "rationale": "Regenerate twelve scheduling shards from the complete measured branch-covered profile.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -565,7 +488,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Refresh the twelve-shard scheduling inventory from the complete passing branch-covered behavioral profile.",
+      "rationale": "Regenerate twelve scheduling shards from the complete measured branch-covered profile.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -575,7 +498,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Refresh the twelve-shard scheduling inventory from the complete passing branch-covered behavioral profile.",
+      "rationale": "Regenerate twelve scheduling shards from the complete measured branch-covered profile.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -585,7 +508,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Refresh the twelve-shard scheduling inventory from the complete passing branch-covered behavioral profile.",
+      "rationale": "Regenerate twelve scheduling shards from the complete measured branch-covered profile.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -595,7 +518,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Refresh the twelve-shard scheduling inventory from the complete passing branch-covered behavioral profile.",
+      "rationale": "Regenerate twelve scheduling shards from the complete measured branch-covered profile.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -605,7 +528,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Refresh the twelve-shard scheduling inventory from the complete passing branch-covered behavioral profile.",
+      "rationale": "Regenerate twelve scheduling shards from the complete measured branch-covered profile.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -615,7 +538,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Refresh the twelve-shard scheduling inventory from the complete passing branch-covered behavioral profile.",
+      "rationale": "Regenerate twelve scheduling shards from the complete measured branch-covered profile.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -625,7 +548,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Refresh the twelve-shard scheduling inventory from the complete passing branch-covered behavioral profile.",
+      "rationale": "Regenerate twelve scheduling shards from the complete measured branch-covered profile.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -635,7 +558,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Refresh the twelve-shard scheduling inventory from the complete passing branch-covered behavioral profile.",
+      "rationale": "Regenerate twelve scheduling shards from the complete measured branch-covered profile.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -645,7 +568,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Refresh the twelve-shard scheduling inventory from the complete passing branch-covered behavioral profile.",
+      "rationale": "Regenerate twelve scheduling shards from the complete measured branch-covered profile.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -655,7 +578,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Refresh the twelve-shard scheduling inventory from the complete passing branch-covered behavioral profile.",
+      "rationale": "Regenerate twelve scheduling shards from the complete measured branch-covered profile.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -665,7 +588,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate identity-dependent contract examples with unchanged decision types, wire schemas, and validation.",
+      "rationale": "Regenerate external contract examples that expose the packaged build identity.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -675,7 +598,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate identity-dependent contract examples with unchanged decision types, wire schemas, and validation.",
+      "rationale": "Regenerate external contract examples that expose the packaged build identity.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -685,7 +608,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate identity-dependent contract examples with unchanged decision types, wire schemas, and validation.",
+      "rationale": "Regenerate external contract examples that expose the packaged build identity.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -695,7 +618,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate identity-dependent contract examples with unchanged decision types, wire schemas, and validation.",
+      "rationale": "Regenerate external contract examples that expose the packaged build identity.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -705,7 +628,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate identity-dependent contract examples with unchanged decision types, wire schemas, and validation.",
+      "rationale": "Regenerate external contract examples that expose the packaged build identity.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -715,7 +638,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate identity-dependent contract examples with unchanged decision types, wire schemas, and validation.",
+      "rationale": "Regenerate external contract examples that expose the packaged build identity.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -725,7 +648,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate identity-dependent contract examples with unchanged decision types, wire schemas, and validation.",
+      "rationale": "Regenerate external contract examples that expose the packaged build identity.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -735,25 +658,27 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate identity-dependent contract examples with unchanged decision types, wire schemas, and validation.",
+      "rationale": "Regenerate external contract examples that expose the packaged build identity.",
       "source_obligation": null,
       "unchanged_work": null
     },
-    "data/source_audits/ci64_provenance_v1/stage2-opening-movement-unit-test-addition-v1.json": {
-      "category": "measured_workload",
+    "data/army_lists/monster-mash.json": {
+      "category": "rule_semantics",
       "operations": [
-        "opening-movement-unit-policy"
+        "monster-mash-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Admit one native regression for ordinary unit selection, the action handoff, and exact continuation replay.",
-      "source_obligation": null,
-      "unchanged_work": null
+      "rationale": "Replay the ordinary mixed setup and validate the source-closed native roster, equipment and geometry.",
+      "source_obligation": "Reconcile the six selected datasheets, authorized base dimensions and Daemonic Incursion against the retained official source and October MFM.",
+      "unchanged_work": "Catalog decoding and normal setup, battle, geometry queries and replay decision algorithms use their existing paths."
     },
-    "docs/AI_IMPLEMENTATION_PLAN.md": {
-      "category": "governance",
-      "operations": [],
+    "data/source_audits/ci64_provenance_v1/monster-mash-v995-test-addition-v1.json": {
+      "category": "measured_workload",
+      "operations": [
+        "monster-mash-v995-roster-admission"
+      ],
       "selected_families": [],
-      "rationale": "Document the owner-approved 68 percent combined coverage floor and retain historical thresholds and results.",
+      "rationale": "Replay the ordinary mixed setup and validate the source-closed native roster, equipment and geometry.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -761,31 +686,7 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Document the explicit development policy and register the exact new operation owners.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "docs/DISTANCE_PRECISION.md": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Document the owner-approved 68 percent combined coverage floor and retain historical thresholds and results.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "docs/SEQUENTIAL_REMEDIATION_REVIEW_POLICY.md": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Document the owner-approved 68 percent combined coverage floor and retain historical thresholds and results.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "docs/SOURCE_FIXTURE_HASH_BOUNDARIES.md": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Document the owner-approved 68 percent combined coverage floor and retain historical thresholds and results.",
+      "rationale": "Document mixed setup handoff and record the reviewed roster admission operation owners.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -793,27 +694,7 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Document the explicit development policy and register the exact new operation owners.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "pyproject.toml": {
-      "category": "dependency_environment",
-      "operations": [
-        "development-dependency"
-      ],
-      "selected_families": [],
-      "rationale": "Set the coverage reporting minimum to 68 percent while retaining the source, branch measurement and precision.",
-      "source_obligation": null,
-      "unchanged_work": "The configuration changes only a coverage reporting threshold. Dependency declarations and the lock retain their existing values."
-    },
-    "scripts/build_test_shards.py": {
-      "category": "measured_workload",
-      "operations": [
-        "covered-native-checkpoint-cohort"
-      ],
-      "selected_families": [],
-      "rationale": "Keep the isolated Cavalcade mirror and both checkpoint consumers in one hosted shard and enforce that membership before invoking pytest.",
+      "rationale": "Document mixed setup handoff and record the reviewed roster admission operation owners.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -823,33 +704,13 @@
         "cavalcade-authority-admission",
         "stage2-strict-replay-test-admission",
         "close-quarters-test-admission",
-        "engine-numerical-identity-admission"
+        "engine-numerical-identity-admission",
+        "monster-mash-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Bind the new native regression to its policy bytes and runtime fingerprint while preserving prior admissions.",
+      "rationale": "Replay the ordinary mixed setup and validate the source-closed native roster, equipment and geometry.",
       "source_obligation": null,
       "unchanged_work": null
-    },
-    "scripts/run_behavioral_coverage.sh": {
-      "category": "measured_workload",
-      "operations": [
-        "covered-shard-workload",
-        "covered-resource-diagnostics"
-      ],
-      "selected_families": [],
-      "rationale": "Keep the isolated Cavalcade mirror and both checkpoint consumers in one hosted shard and enforce that membership before invoking pytest.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "scripts/run_complete_covered_profile.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "scoped-shard-allocation"
-      ],
-      "selected_families": [],
-      "rationale": "Apply and test the 68 percent combined branch-measured reporting threshold and authenticate the current settings.",
-      "source_obligation": "The owner authorized raising the combined full-package coverage floor to 68 percent.",
-      "unchanged_work": "Preserve branch and package measurement, exclusions, all selected behavioral cases, timing limits and historical receipts."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "measured_workload",
@@ -857,61 +718,49 @@
         "cavalcade-authority-admission"
       ],
       "selected_families": [],
-      "rationale": "Regenerate the packaged runtime fingerprint after adding the opt-in policy module.",
+      "rationale": "Bind the new versioned roster catalog and its provenance to packaged runtime identity.",
       "source_obligation": null,
       "unchanged_work": null
     },
-    "src/warhammer40k_core/ai/opening_movement_unit.py": {
-      "category": "measured_workload",
-      "operations": [
-        "opening-movement-unit-policy"
-      ],
-      "selected_families": [],
-      "rationale": "Add one opt-in native opening choice that scans a finite actor-visible set. Engine rules, pathing, and replay implementation are untouched.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "tests/code_quality/test_behavioral_deadline.py": {
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/chaos_daemons_monster_mash_2026_11/__init__.py": {
       "category": "rule_semantics",
       "operations": [
-        "covered-shard-deadline-regression"
+        "monster-mash-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Apply and test the 68 percent combined branch-measured reporting threshold and authenticate the current settings.",
-      "source_obligation": "The owner authorized raising the combined full-package coverage floor to 68 percent.",
-      "unchanged_work": "Preserve branch and package measurement, exclusions, all selected behavioral cases, timing limits and historical receipts."
+      "rationale": "Replay the ordinary mixed setup and validate the source-closed native roster, equipment and geometry.",
+      "source_obligation": "Reconcile the six selected datasheets, authorized base dimensions and Daemonic Incursion against the retained official source and October MFM.",
+      "unchanged_work": "Catalog decoding and normal setup, battle, geometry queries and replay decision algorithms use their existing paths."
     },
-    "tests/code_quality/test_ci_performance_gates.py": {
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/chaos_daemons_monster_mash_2026_11/artifacts/catalog.json": {
       "category": "rule_semantics",
       "operations": [
-        "ci78-cutover-owners-2bec45eb6ecc7574f5395711c9381e101ae612cb57b1a0e433c8a508aa991453",
-        "ci-source-index-deadline-guard",
-        "milli-inch-test-admission"
+        "monster-mash-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Apply and test the 68 percent combined branch-measured reporting threshold and authenticate the current settings.",
-      "source_obligation": "The owner authorized raising the combined full-package coverage floor to 68 percent.",
-      "unchanged_work": "Preserve branch and package measurement, exclusions, all selected behavioral cases, timing limits and historical receipts."
+      "rationale": "Replay the ordinary mixed setup and validate the source-closed native roster, equipment and geometry.",
+      "source_obligation": "Reconcile the six selected datasheets, authorized base dimensions and Daemonic Incursion against the retained official source and October MFM.",
+      "unchanged_work": "Catalog decoding and normal setup, battle, geometry queries and replay decision algorithms use their existing paths."
     },
-    "tests/code_quality/test_ci_resource_diagnostics.py": {
-      "category": "measured_workload",
-      "operations": [
-        "covered-resource-diagnostics"
-      ],
-      "selected_families": [],
-      "rationale": "Keep the isolated Cavalcade mirror and both checkpoint consumers in one hosted shard and enforce that membership before invoking pytest.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "tests/code_quality/test_complete_covered_reporting.py": {
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/chaos_daemons_monster_mash_2026_11/artifacts/geometry.json": {
       "category": "rule_semantics",
       "operations": [
-        "scoped-shard-allocation"
+        "monster-mash-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Apply and test the 68 percent combined branch-measured reporting threshold and authenticate the current settings.",
-      "source_obligation": "The owner authorized raising the combined full-package coverage floor to 68 percent.",
-      "unchanged_work": "Preserve branch and package measurement, exclusions, all selected behavioral cases, timing limits and historical receipts."
+      "rationale": "Replay the ordinary mixed setup and validate the source-closed native roster, equipment and geometry.",
+      "source_obligation": "Reconcile the six selected datasheets, authorized base dimensions and Daemonic Incursion against the retained official source and October MFM.",
+      "unchanged_work": "Catalog decoding and normal setup, battle, geometry queries and replay decision algorithms use their existing paths."
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/chaos_daemons_monster_mash_2026_11/artifacts/source-review.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "monster-mash-v995-roster-admission"
+      ],
+      "selected_families": [],
+      "rationale": "Replay the ordinary mixed setup and validate the source-closed native roster, equipment and geometry.",
+      "source_obligation": "Reconcile the six selected datasheets, authorized base dimensions and Daemonic Incursion against the retained official source and October MFM.",
+      "unchanged_work": "Catalog decoding and normal setup, battle, geometry queries and replay decision algorithms use their existing paths."
     },
     "tests/code_quality/test_engine_numerical_identity_admission.py": {
       "category": "measured_workload",
@@ -919,29 +768,59 @@
         "engine-numerical-identity-admission"
       ],
       "selected_families": [],
-      "rationale": "Verify the new native case and runtime successor while retaining existing inventory assertions.",
+      "rationale": "Classify reviewed source packages and validate exact-source successor admission.",
       "source_obligation": null,
       "unchanged_work": null
     },
-    "tests/factions/chaos_daemons/integration/test_cavalcade_opening_movement_unit.py": {
+    "tests/code_quality/test_ws12_generated_data_artifacts.py": {
       "category": "measured_workload",
       "operations": [
-        "opening-movement-unit-policy"
+        "supported-vyper-source-regression-controls"
       ],
       "selected_families": [],
-      "rationale": "Admit one native regression for ordinary unit selection, the action handoff, and exact continuation replay.",
+      "rationale": "Classify reviewed source packages and validate exact-source successor admission.",
       "source_obligation": null,
       "unchanged_work": null
     },
-    "tests/rules/section07/coverage.json": {
-      "category": "rule_semantics",
+    "tests/factions/chaos_daemons/integration/test_monster_mash_v995_roster.py": {
+      "category": "measured_workload",
       "operations": [
-        "qualification40-exact-b6886d3bc2fb1ca4"
+        "monster-mash-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Apply and test the 68 percent combined branch-measured reporting threshold and authenticate the current settings.",
-      "source_obligation": "The owner authorized raising the combined full-package coverage floor to 68 percent.",
-      "unchanged_work": "Preserve branch and package measurement, exclusions, all selected behavioral cases, timing limits and historical receipts."
+      "rationale": "Replay the ordinary mixed setup and validate the source-closed native roster, equipment and geometry.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "tests/support/monster_mash_v995.py": {
+      "category": "measured_workload",
+      "operations": [
+        "monster-mash-v995-roster-admission"
+      ],
+      "selected_families": [],
+      "rationale": "Replay the ordinary mixed setup and validate the source-closed native roster, equipment and geometry.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "tools/generate_cavalcade_v995_catalog.py": {
+      "category": "measured_workload",
+      "operations": [
+        "monster-mash-v995-roster-admission"
+      ],
+      "selected_families": [],
+      "rationale": "Replay the ordinary mixed setup and validate the source-closed native roster, equipment and geometry.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "tools/generate_monster_mash_v995_catalog.py": {
+      "category": "measured_workload",
+      "operations": [
+        "monster-mash-v995-roster-admission"
+      ],
+      "selected_families": [],
+      "rationale": "Replay the ordinary mixed setup and validate the source-closed native roster, equipment and geometry.",
+      "source_obligation": null,
+      "unchanged_work": null
     }
   },
   "milestone": "ordinary",

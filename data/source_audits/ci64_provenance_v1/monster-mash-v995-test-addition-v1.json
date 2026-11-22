@@ -1,0 +1,20 @@
+{
+  "schema": "finite-monster-mash-v995-test-addition-v1",
+  "retained_opening_movement_sha256": "6c821e5ea1fe9933539d8b63d63bc1d3777766b68581e66ae664fc76caebf15e",
+  "retained_runtime_fingerprint": "3b01212a43eda6a5911846e8a52c6b0ede4963d9414f2b55ab2db78d725b25d8",
+  "runtime_fingerprint": "e5e0ccfa536375c25875dfb3ca261970dc5d8c2895aebe94b4c19cbed1aa7255",
+  "source_sha256": {
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/chaos_daemons_monster_mash_2026_11/__init__.py": "a3bf70c7980adb004488e1e085b70ef8e25548d0a3a228819693c46b8ebb547d",
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/chaos_daemons_monster_mash_2026_11/artifacts/catalog.json": "a990509b4ec88a69909aa673c12a40b54322d67730484539f5d22f1e27f0ae64",
+    "data/army_lists/monster-mash.json": "d16a155571081197fd8d213421e968093aead18cee78ff2cdc9c1540fe365fd5",
+    "tests/support/monster_mash_v995.py": "c294ca764360aa32e9ee42ce1d9f788cad3f0273ca5cdc525b5319e22368e5d6"
+  },
+  "added_files": {
+    "tests/factions/chaos_daemons/integration/test_monster_mash_v995_roster.py": {
+      "blob_sha1": "e7f5454ec150c2ab8398ec7218722262cafb6c1c",
+      "bytes": 7348,
+      "mode": "100644",
+      "sha256": "ea1f07773b522191ac0e55f7b3c56f8cef23035ccc7adf5fcb30d17201dd0999"
+    }
+  }
+}
