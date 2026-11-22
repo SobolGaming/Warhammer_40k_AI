@@ -292,16 +292,20 @@ SHOOTING_VISIBILITY_BASE = "d1af6721e1f544898ce25ef7fdd611110b31b6fc"
 SHOOTING_VISIBILITY_SOURCE = "src/warhammer40k_core/geometry/visibility_witnesses.py"
 
 
-MONSTER_MASH_FIGHT_REROLL_TRANSITION = (
-    "data/source_audits/ci64_provenance_v1/monster-mash-fight-reroll-test-transition-v1.json"
+MONSTER_MASH_ATTACK_REROLL_TRANSITION = (
+    "data/source_audits/ci64_provenance_v1/monster-mash-attack-reroll-test-transition-v1.json"
 )
-MONSTER_MASH_FIGHT_REROLL_SHA256 = (
-    "16308a5deeb04ef4bf0c4edeb33ea23086b1d16a14b8db3ad0a3ac14ed5737fd"
+MONSTER_MASH_ATTACK_REROLL_SHA256 = (
+    "27bc3311f7f63b94ab566a377c37648b89dd666422a6e8c000c09068243f9ea5"
 )
-MONSTER_MASH_FIGHT_REROLL_BASE = "0b8eb690cc0b5e3b724c3e3e8fb754f72fcc6330"
-MONSTER_MASH_FIGHT_REROLL_OWNER = "tests/rules/section04/test_fight_facade.py"
-MONSTER_MASH_FIGHT_REROLL_SOURCES = (
+MONSTER_MASH_ATTACK_REROLL_BASE = "0b8eb690cc0b5e3b724c3e3e8fb754f72fcc6330"
+MONSTER_MASH_ATTACK_REROLL_OWNERS = (
+    "tests/rules/section04/test_facade.py",
+    "tests/rules/section04/test_fight_facade.py",
+)
+MONSTER_MASH_ATTACK_REROLL_SOURCES = (
     "src/warhammer40k_core/engine/command_reroll_windows.py",
+    "src/warhammer40k_core/engine/critical_wounds.py",
     STAGE2_FIGHT_REROLL_SOURCE,
     "src/warhammer40k_core/engine/rule_trigger_runtime.py",
 )
@@ -819,16 +823,16 @@ def exact_movement_test_transition(
         additions.update(_selection_members(codec["added_files"], root))
         runtime = codec["runtime_fingerprint"]
         raw += b"\0" + codec_raw
-    fight_reroll_order_path = root / MONSTER_MASH_FIGHT_REROLL_TRANSITION
-    _selection_no_links(root, fight_reroll_order_path)
-    fight_reroll_order = (
-        _monster_mash_fight_reroll_successor(root, retained_cutover_sha256)
-        if fight_reroll_order_path.exists()
+    attack_reroll_order_path = root / MONSTER_MASH_ATTACK_REROLL_TRANSITION
+    _selection_no_links(root, attack_reroll_order_path)
+    attack_reroll_order = (
+        _monster_mash_attack_reroll_successor(root, retained_cutover_sha256)
+        if attack_reroll_order_path.exists()
         else None
     )
     fight_reroll = (
         _stage2_fight_reroll_successor(
-            root, current_sources={} if fight_reroll_order is None else fight_reroll_order[2]
+            root, current_sources={} if attack_reroll_order is None else attack_reroll_order[2]
         )
         if has_fight_reroll
         else None
@@ -1021,10 +1025,10 @@ def exact_movement_test_transition(
         if monster_mash_raw is None or shooting_visibility[0] != runtime:
             raise SystemExit("Shooting visibility requires the exact Monster Mash predecessor.")
         runtime = shooting_visibility[1]
-    if fight_reroll_order is not None:
-        if shooting_visibility is None or fight_reroll_order[0] != runtime:
-            raise SystemExit("Monster Mash Fight reroll requires the exact Shooting predecessor.")
-        runtime = fight_reroll_order[1]
+    if attack_reroll_order is not None:
+        if shooting_visibility is None or attack_reroll_order[0] != runtime:
+            raise SystemExit("Monster Mash attack reroll requires the exact Shooting predecessor.")
+        runtime = attack_reroll_order[1]
     retained = _identity_test_transition(
         root,
         retained_cutover_sha256,
@@ -1105,19 +1109,19 @@ def exact_movement_test_transition(
     if shooting_visibility is not None:
         updated.update(shooting_visibility[3])
         raw += b"\0" + shooting_visibility[4]
-    if fight_reroll_order is not None:
-        updated.update(fight_reroll_order[3])
-        raw += b"\0" + fight_reroll_order[4]
+    if attack_reroll_order is not None:
+        updated.update(attack_reroll_order[3])
+        raw += b"\0" + attack_reroll_order[4]
     return updated, {**added, **additions}, retained_raw + b"\0" + raw
 
 
-def _monster_mash_fight_reroll_successor(
+def _monster_mash_attack_reroll_successor(
     root: Path, retained_cutover_sha256: str
 ) -> tuple[str, str, SourceSuccessors, TestSuccessors, bytes]:
     from scripts.build_test_shards import CUTOVER_PATH
 
     raw = _checked_bytes(
-        root, MONSTER_MASH_FIGHT_REROLL_TRANSITION, MONSTER_MASH_FIGHT_REROLL_SHA256
+        root, MONSTER_MASH_ATTACK_REROLL_TRANSITION, MONSTER_MASH_ATTACK_REROLL_SHA256
     )
     record = json.loads(raw, object_pairs_hook=_selection_object)
     if (
@@ -1129,30 +1133,32 @@ def _monster_mash_fight_reroll_successor(
             "retained_runtime_fingerprint",
             "runtime_fingerprint",
             "source",
-            "test",
+            "tests",
         }
-        or record["schema"] != "finite-monster-mash-fight-reroll-test-transition-v1"
-        or record["base"] != MONSTER_MASH_FIGHT_REROLL_BASE
+        or record["schema"] != "finite-monster-mash-attack-reroll-test-transition-v1"
+        or record["base"] != MONSTER_MASH_ATTACK_REROLL_BASE
         or record["retained_shooting_visibility_sha256"] != SHOOTING_VISIBILITY_SHA256
-        or set(record["source"]) != set(MONSTER_MASH_FIGHT_REROLL_SOURCES)
-        or set(record["test"]) != {"before", "after"}
+        or set(record["source"]) != set(MONSTER_MASH_ATTACK_REROLL_SOURCES)
+        or set(record["tests"]) != set(MONSTER_MASH_ATTACK_REROLL_OWNERS)
     ):
-        raise SystemExit("Monster Mash Fight reroll test transition differs.")
+        raise SystemExit("Monster Mash attack reroll test transition differs.")
     cutover = json.loads(
         _checked_bytes(root, CUTOVER_PATH, retained_cutover_sha256),
         object_pairs_hook=_selection_object,
     )
-    if record["test"]["before"] != cutover["active_files"][MONSTER_MASH_FIGHT_REROLL_OWNER]:
-        raise SystemExit("Monster Mash Fight reroll test predecessor differs.")
+    tests = record["tests"]
+    for owner, change in tests.items():
+        if set(change) != {"before", "after"} or change["before"] != cutover["active_files"][owner]:
+            raise SystemExit("Monster Mash attack reroll test predecessor differs.")
     for name, change in record["source"].items():
         if set(change) != {"before", "after"}:
-            raise SystemExit("Monster Mash Fight reroll requires exact source digests.")
+            raise SystemExit("Monster Mash attack reroll requires exact source digests.")
         _checked_bytes(root, name, change["after"])
     return (
         record["retained_runtime_fingerprint"],
         record["runtime_fingerprint"],
         record["source"],
-        _selection_members({MONSTER_MASH_FIGHT_REROLL_OWNER: record["test"]["after"]}, root),
+        _selection_members({name: change["after"] for name, change in tests.items()}, root),
         raw,
     )
 

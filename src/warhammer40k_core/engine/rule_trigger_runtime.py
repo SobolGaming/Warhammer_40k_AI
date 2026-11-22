@@ -369,14 +369,17 @@ def use_loaded_destruction_runtime(
         _loaded_destruction_runtime.reset(token)
 
 
-def record_destruction_before_fight_opportunity(
+def record_destruction_before_attack_opportunity(
     *, state: GameState, decisions: DecisionController
-) -> None:
+) -> bool:
     runtime = _loaded_destruction_runtime.get()
-    if runtime is not None and runtime[0] is decisions:
-        record_loaded_model_destruction_occurrences(
+    return (
+        runtime is not None
+        and runtime[0] is decisions
+        and record_loaded_model_destruction_occurrences(
             state=state, decisions=decisions, runtime_bundle_provider=runtime[1]
         )
+    )
 
 
 def record_loaded_model_destruction_occurrences(
@@ -384,7 +387,7 @@ def record_loaded_model_destruction_occurrences(
     state: GameState,
     decisions: DecisionController,
     runtime_bundle_provider: Callable[[], RuntimeContentBundle],
-) -> None:
+) -> bool:
     from warhammer40k_core.engine.model_destruction_triggers import (
         record_model_destruction_occurrences,
         recorded_model_destruction_occurrences,
@@ -400,3 +403,5 @@ def record_loaded_model_destruction_occurrences(
             decisions=decisions,
             registry=runtime_bundle_provider().unit_destroyed_hook_registry,
         )
+        return True
+    return False

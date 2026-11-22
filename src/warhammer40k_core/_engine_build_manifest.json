@@ -1,7 +1,7 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:9afdfab78d011964bb19d68fee1e0eac7fad0bc34d6c150e4f59e82851c3f33c",
-  "fingerprint": "9afdfab78d011964bb19d68fee1e0eac7fad0bc34d6c150e4f59e82851c3f33c",
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:ab1579cadb6dc2ef448612d197a985d8d25ea32f7b42b9daaa9eb1223b93d02f",
+  "fingerprint": "ab1579cadb6dc2ef448612d197a985d8d25ea32f7b42b9daaa9eb1223b93d02f",
   "resource_count": 3283,
   "resources": [
     {
@@ -2240,9 +2240,9 @@
       "sha256": "87051873e4800f5b58002f83252ee0d1eafb12a90555918110e90a17e6c39d49"
     },
     {
-      "byte_length": 14229,
+      "byte_length": 14448,
       "path": "warhammer40k_core/engine/command_reroll_windows.py",
-      "sha256": "7504f4eb04955076a36624cc4d7535576462407c2ab3771f4ca2c50c2ab31766"
+      "sha256": "908bee8441dbd1c627866c7a2fab74f4b3b739bf855d5b3f9756fd87e0db76e4"
     },
     {
       "byte_length": 1221,
@@ -2330,9 +2330,9 @@
       "sha256": "231f0c9d7fedcca96ad8b4a9101810f8fcc8156117793e1fe3f91e22df11b86e"
     },
     {
-      "byte_length": 4684,
+      "byte_length": 4606,
       "path": "warhammer40k_core/engine/critical_wounds.py",
-      "sha256": "fa0a53710a64d07561cc900ad809010993e2ef3b3134f2abb7af21f7ae16610f"
+      "sha256": "18d8e1ca4535c70da8f43c1bef2de62bfa10ada185c8ecccd2101e0166773052"
     },
     {
       "byte_length": 3593,
@@ -12745,9 +12745,9 @@
       "sha256": "c4085f624151c8b7bea10b67dcf2165fa99751140db87ec862751aebab79573e"
     },
     {
-      "byte_length": 17272,
+      "byte_length": 17341,
       "path": "warhammer40k_core/engine/rule_trigger_runtime.py",
-      "sha256": "c04a38dc1f047f10b578e7874c60dd6aebeb6af9b62cc3ee8519e68c9918f1bd"
+      "sha256": "9091e5c5b7ac64122158ed6c7e7c181af9beb42119b8ed37dedf35f41a821524"
     },
     {
       "byte_length": 13562,

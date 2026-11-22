@@ -1,0 +1,55 @@
+{
+  "schema": "finite-monster-mash-attack-reroll-test-transition-v1",
+  "base": "0b8eb690cc0b5e3b724c3e3e8fb754f72fcc6330",
+  "retained_shooting_visibility_sha256": "4cdd4f407bd7e96e0f3ca446bc5faa005eb49ded60e9b409fe4a6bc06b3da631",
+  "retained_runtime_fingerprint": "3c883d7208521038f93c65528444109ba0a3a953ed15e3002b309028992af9b6",
+  "runtime_fingerprint": "ab1579cadb6dc2ef448612d197a985d8d25ea32f7b42b9daaa9eb1223b93d02f",
+  "source": {
+    "src/warhammer40k_core/engine/command_reroll_windows.py": {
+      "before": "864e76eb335205b30805592e8d03887e1f1236d0ce72b93b4b9095e5a5613a40",
+      "after": "908bee8441dbd1c627866c7a2fab74f4b3b739bf855d5b3f9756fd87e0db76e4"
+    },
+    "src/warhammer40k_core/engine/critical_wounds.py": {
+      "before": "fa0a53710a64d07561cc900ad809010993e2ef3b3134f2abb7af21f7ae16610f",
+      "after": "18d8e1ca4535c70da8f43c1bef2de62bfa10ada185c8ecccd2101e0166773052"
+    },
+    "src/warhammer40k_core/engine/lifecycle.py": {
+      "before": "a80adb9f48af7338f9acb7c325490964129545521bc99b456d09cc19a55f028f",
+      "after": "819f9a321f68af59893616f72139ab72c09e23d5e26f252f3e64dedfaa91f6e9"
+    },
+    "src/warhammer40k_core/engine/rule_trigger_runtime.py": {
+      "before": "802d1e6dea431ce14542cabf646c3739c96be22c5a78fb5f61ee61026fe26b65",
+      "after": "9091e5c5b7ac64122158ed6c7e7c181af9beb42119b8ed37dedf35f41a821524"
+    }
+  },
+  "tests": {
+    "tests/rules/section04/test_facade.py": {
+      "before": {
+        "mode": "100644",
+        "blob_sha1": "4d939386aa2a42a192c14ab92deab16447aed352",
+        "sha256": "e20e421482e22e0d04be8eeea2a58ea0f078ee2c15abe9d9ea508d23c22618fd",
+        "bytes": 7525
+      },
+      "after": {
+        "mode": "100644",
+        "blob_sha1": "d6b04fde0742dce80cb8ccd127ccbd562d091aea",
+        "sha256": "689624b3f1b7bd8dc144e2086f71b272cbc38bb4406348949e971b6e5e6ffbda",
+        "bytes": 14881
+      }
+    },
+    "tests/rules/section04/test_fight_facade.py": {
+      "before": {
+        "mode": "100644",
+        "blob_sha1": "cd05c867b6f8f543186ab8ece0149d7598801b1a",
+        "sha256": "69e6529641c9ff2abbf9a87ea3a02701a1f01c1bc2412ab548e02b2028d7293d",
+        "bytes": 3755
+      },
+      "after": {
+        "mode": "100644",
+        "blob_sha1": "4ca8b117ee4ee3f967ef07554c585ee677cdf8f7",
+        "sha256": "1a9e51fb6d3c068adfaf535589c20c862fd5dc77101abd6a9c655883fb1e8538",
+        "bytes": 10643
+      }
+    }
+  }
+}
