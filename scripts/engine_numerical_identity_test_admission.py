@@ -258,7 +258,7 @@ OPENING_SHADOW_FORM_OWNER = (
 OPENING_MOVEMENT_UNIT_ADDITION = (
     "data/source_audits/ci64_provenance_v1/stage2-opening-movement-unit-test-addition-v1.json"
 )
-OPENING_MOVEMENT_UNIT_SHA256 = "62b9bffa7efdab844e89feeb0cace6ae8bde482197f5ebb65090724704d0656e"
+OPENING_MOVEMENT_UNIT_SHA256 = "6c821e5ea1fe9933539d8b63d63bc1d3777766b68581e66ae664fc76caebf15e"
 OPENING_MOVEMENT_UNIT_POLICY = "src/warhammer40k_core/ai/opening_movement_unit.py"
 OPENING_MOVEMENT_UNIT_OWNER = (
     "tests/factions/chaos_daemons/integration/test_cavalcade_opening_movement_unit.py"

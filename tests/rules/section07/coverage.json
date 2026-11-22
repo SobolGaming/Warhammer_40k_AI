@@ -1525,9 +1525,9 @@
   ],
   "unadopted_gaps": [],
   "authenticated_inputs": {
-    "AGENTS.md": "6eb5fe2d3285c56c74a6b0fa219dcf99df42d20a057a7b50fdc6d9a7b2114cd7",
-    "README.md": "02ae11b46451f9057e2e489ef93b01ddfed26d77ea77309061ec1d794166505c",
-    "pyproject.toml": "870d9e83747f1e4cd8e3092103c71faf319caa5ca10c11bcb1f4e5b03e51da71",
+    "AGENTS.md": "f2ab3bb5243b06c9b892575c972da5f498fc59e2d3372b70e9912cf235f4eed6",
+    "README.md": "a3cd8197a690f5832a4bf47d66713ea75485121e003698a036950f3562585c17",
+    "pyproject.toml": "0b89fb869936bbcd49baef572380029840a75fee75071cc5339e4415d9939b80",
     "data/source_audits/order97/selected-sources.json": "1b6a31629e6e004e5386842608af953e96113d6fd3eb5ffd2ad6fa349ca26464",
     "data/source_audits/order97/categories/07.json": "52a349cc268a3c3e9cb0348ac9bb101a2c9a4d83ccde60f99a3d2ad071adc80d",
     "data/source_audits/order135/retained-current-sources.json": "a473e270f76d9556c25e68477abf040bc8a7f1a6c21c1fd9d9a0fa960edd627f",
@@ -1572,5 +1572,5 @@
     "README.md": "ad52bc7e7e40aa9a7e2296f20c8726fcf63a5b92bd087100e09238572901a583",
     "pyproject.toml": "b0fed8cc1f2a25bec5821a96f50e0d7da47ec5e9e8e17df528cd6f69c6d67192"
   },
-  "authenticated_inputs_maintenance": "Three current governance/configuration inputs are refreshed for the reviewed CI speedup, shard-calibration retirement, and 67% coverage settings. Historical authenticated inputs, literal capture authorities and gameplay bindings remain unchanged; this metadata update alone claims no qualification pass. The current README and AGENTS hashes are refreshed for the owner-authorized LPT sharding and ci-preflight guidance; original authenticated history, literal source captures and gameplay obligation mappings remain unchanged."
+  "authenticated_inputs_maintenance": "Three current governance/configuration inputs are refreshed for the reviewed CI speedup, shard-calibration retirement, and 67% coverage settings. Historical authenticated inputs, literal capture authorities and gameplay bindings remain unchanged; this metadata update alone claims no qualification pass. The current README and AGENTS hashes are refreshed for the owner-authorized LPT sharding and ci-preflight guidance; original authenticated history, literal source captures and gameplay obligation mappings remain unchanged. The three live governance/configuration hashes now bind the approved 68% coverage floor."
 }

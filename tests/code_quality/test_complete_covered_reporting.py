@@ -23,11 +23,11 @@ def test_complete_json_reporting_preserves_floor_evidence_and_failure_propagatio
         executed_lines = 5
     else:
         source.write_text("".join(f"value_{line} = {line}\n" for line in range(10000)))
-        executed_lines = 6700 if case == "at_floor" else 6699
+        executed_lines = 6800 if case == "at_floor" else 6799
     (tmp_path / "pyproject.toml").write_text(
         "[tool.coverage.run]\nbranch = true\nsource = "
         + json.dumps([str(package)])
-        + "\n[tool.coverage.report]\nfail_under = 67\nprecision = 2\n"
+        + "\n[tool.coverage.report]\nfail_under = 68\nprecision = 2\n"
     )
     driver = tmp_path / "driver.py"
     driver.write_text(
@@ -56,7 +56,7 @@ def test_complete_json_reporting_preserves_floor_evidence_and_failure_propagatio
         "-m",
         "coverage",
         "json",
-        "--fail-under=67",
+        "--fail-under=68",
         "-o",
         str(output / "coverage.json"),
     ]

@@ -4,133 +4,173 @@
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:3b01212a43eda6a5911846e8a52c6b0ede4963d9414f2b55ab2db78d725b25d8",
   "operation_map_sha256": "f8f7043597db9ab5659902d9cf477b273d9b86d5326315454df370634768bc09",
   "changes": {
+    ".github/pull_request_template.md": {
+      "before_sha256": "d18b413216ec3ec76edb2737b42872b6bd1179f929b5eb7c4c5528b898c554f9",
+      "after_sha256": "0383a08524167143bedd6996d215706b384d7bc5d7341c5c58e9748e9820338a",
+      "owners": {
+        "@document": {
+          "before": "d18b413216ec3ec76edb2737b42872b6bd1179f929b5eb7c4c5528b898c554f9",
+          "after": "0383a08524167143bedd6996d215706b384d7bc5d7341c5c58e9748e9820338a"
+        }
+      }
+    },
+    ".github/workflows/ci.yml": {
+      "before_sha256": "0bd44a0fd7227489c7cd41b9391ae2d4d6b47cbe7e5dd8c8b8b1fa06b35707f7",
+      "after_sha256": "3fff6d9b8ede9e1aa8d778e5f99c19044df2632cf1191670b2a4ac8fc57ab1c2",
+      "owners": {
+        "@document": {
+          "before": "0bd44a0fd7227489c7cd41b9391ae2d4d6b47cbe7e5dd8c8b8b1fa06b35707f7",
+          "after": "3fff6d9b8ede9e1aa8d778e5f99c19044df2632cf1191670b2a4ac8fc57ab1c2"
+        }
+      }
+    },
+    "AGENTS.md": {
+      "before_sha256": "6eb5fe2d3285c56c74a6b0fa219dcf99df42d20a057a7b50fdc6d9a7b2114cd7",
+      "after_sha256": "f2ab3bb5243b06c9b892575c972da5f498fc59e2d3372b70e9912cf235f4eed6",
+      "owners": {
+        "@document": {
+          "before": "6eb5fe2d3285c56c74a6b0fa219dcf99df42d20a057a7b50fdc6d9a7b2114cd7",
+          "after": "f2ab3bb5243b06c9b892575c972da5f498fc59e2d3372b70e9912cf235f4eed6"
+        }
+      }
+    },
+    "README.md": {
+      "before_sha256": "02ae11b46451f9057e2e489ef93b01ddfed26d77ea77309061ec1d794166505c",
+      "after_sha256": "a3cd8197a690f5832a4bf47d66713ea75485121e003698a036950f3562585c17",
+      "owners": {
+        "@document": {
+          "before": "02ae11b46451f9057e2e489ef93b01ddfed26d77ea77309061ec1d794166505c",
+          "after": "a3cd8197a690f5832a4bf47d66713ea75485121e003698a036950f3562585c17"
+        }
+      }
+    },
     "ci/test_shards/durations.json": {
       "before_sha256": "0eec036aaa39fc936eb18e0016efb3853420de9dd5ca57dc025cebe6d654a27b",
-      "after_sha256": "63003fe7b791b399ced1b358d0b1800a72ab008af9ba2ada20b131e939b91a19",
+      "after_sha256": "60395a8c1103e9cfaf9107dae4ba2dcfda9ee5b1bad11ddf2dd7858f2c978839",
       "owners": {
         "@document": {
           "before": "0eec036aaa39fc936eb18e0016efb3853420de9dd5ca57dc025cebe6d654a27b",
-          "after": "63003fe7b791b399ced1b358d0b1800a72ab008af9ba2ada20b131e939b91a19"
+          "after": "60395a8c1103e9cfaf9107dae4ba2dcfda9ee5b1bad11ddf2dd7858f2c978839"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
       "before_sha256": "551266fefc30bee3e01745a6b1e4e3355ea32728c91a3441cd8c16ab46419d9c",
-      "after_sha256": "6a74135a8babe94074c2e785388f35fdb312423efd9fe8f987f80ddac5d86583",
+      "after_sha256": "62004046c858e2a45030216c7e2fc83d16482cb3a280de3f7ec4d9d7b8f00540",
       "owners": {
         "@document": {
           "before": "551266fefc30bee3e01745a6b1e4e3355ea32728c91a3441cd8c16ab46419d9c",
-          "after": "6a74135a8babe94074c2e785388f35fdb312423efd9fe8f987f80ddac5d86583"
+          "after": "62004046c858e2a45030216c7e2fc83d16482cb3a280de3f7ec4d9d7b8f00540"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
       "before_sha256": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20",
-      "after_sha256": "e712b87e1afd0bd6bc005f44533b1ecca2345a7b02de4f8206b050dffa4e24d7",
+      "after_sha256": "0d481f32b0f14900869b4683931f7f2953f1b953a3eee78658ca98c5664ca95b",
       "owners": {
         "@document": {
           "before": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20",
-          "after": "e712b87e1afd0bd6bc005f44533b1ecca2345a7b02de4f8206b050dffa4e24d7"
+          "after": "0d481f32b0f14900869b4683931f7f2953f1b953a3eee78658ca98c5664ca95b"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
       "before_sha256": "73f5967ad71f590e373a3361b2216dbe1bf365913ef05b57745b910a791edd6c",
-      "after_sha256": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20",
+      "after_sha256": "ff6298e8149b45c150a7dee299bbc1398d1fd4ba3ca0067ff76f023d59c3975b",
       "owners": {
         "@document": {
           "before": "73f5967ad71f590e373a3361b2216dbe1bf365913ef05b57745b910a791edd6c",
-          "after": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20"
+          "after": "ff6298e8149b45c150a7dee299bbc1398d1fd4ba3ca0067ff76f023d59c3975b"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
       "before_sha256": "9af989a5701adb92debb873e46ba82002f5912b4230c0fc8b21458c59daf0933",
-      "after_sha256": "ec3c142fcc969a095f55d7d909f16293fd35530240471eddfe657ca40c4b065a",
+      "after_sha256": "faf3995a90c119150dadbd3af6e64be5e5391047e79c8ff667e11b04a5541754",
       "owners": {
         "@document": {
           "before": "9af989a5701adb92debb873e46ba82002f5912b4230c0fc8b21458c59daf0933",
-          "after": "ec3c142fcc969a095f55d7d909f16293fd35530240471eddfe657ca40c4b065a"
+          "after": "faf3995a90c119150dadbd3af6e64be5e5391047e79c8ff667e11b04a5541754"
         }
       }
     },
     "ci/test_shards/shard-2.txt": {
       "before_sha256": "f15853915deec2e4b2128ab4989556e6b9faf3f9432e3c897d0a7fa0a507db4c",
-      "after_sha256": "3cb530f65a428df294ec30dce19781c250d9d6704a3fdebdf3ff5d80f0ad7ccf",
+      "after_sha256": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
       "owners": {
         "@document": {
           "before": "f15853915deec2e4b2128ab4989556e6b9faf3f9432e3c897d0a7fa0a507db4c",
-          "after": "3cb530f65a428df294ec30dce19781c250d9d6704a3fdebdf3ff5d80f0ad7ccf"
+          "after": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
       "before_sha256": "fc2ac721672f6a358881fc8db0959abca176828c55f556fd6f62541d93994cf0",
-      "after_sha256": "35404c71bf429779b79b35f38274bf7877f6a9167cbecdc072928acb2570165f",
+      "after_sha256": "ed8b2de4f896240a0d1fb02f3619cf22c5a51a118cc241c105470311b8b39d28",
       "owners": {
         "@document": {
           "before": "fc2ac721672f6a358881fc8db0959abca176828c55f556fd6f62541d93994cf0",
-          "after": "35404c71bf429779b79b35f38274bf7877f6a9167cbecdc072928acb2570165f"
+          "after": "ed8b2de4f896240a0d1fb02f3619cf22c5a51a118cc241c105470311b8b39d28"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
       "before_sha256": "ace9a628e6c41aa5d66fb82520a277236758904c316846a2fb2cd111d81d3e97",
-      "after_sha256": "11c598b40fd41de596c311c73d34a2dee7df2f41f42010f1ea01464553b6e7f5",
+      "after_sha256": "b34b4b6235f87be84d602bbe239188d5bfc6e4fc57cd0cee0afcd64ca419f057",
       "owners": {
         "@document": {
           "before": "ace9a628e6c41aa5d66fb82520a277236758904c316846a2fb2cd111d81d3e97",
-          "after": "11c598b40fd41de596c311c73d34a2dee7df2f41f42010f1ea01464553b6e7f5"
+          "after": "b34b4b6235f87be84d602bbe239188d5bfc6e4fc57cd0cee0afcd64ca419f057"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
       "before_sha256": "8fe8c4476b60f6264b2ff688bc1ffb855b34378e7483df50d445e7aed01d1f1e",
-      "after_sha256": "c55dafa784fa627adc6156337cd6b2b096a8350238506ab06d93d58810eb1056",
+      "after_sha256": "0e75bd11d9fa4d8aacc4d1aead61352fb0c1dede78d8d7499fc609934486533e",
       "owners": {
         "@document": {
           "before": "8fe8c4476b60f6264b2ff688bc1ffb855b34378e7483df50d445e7aed01d1f1e",
-          "after": "c55dafa784fa627adc6156337cd6b2b096a8350238506ab06d93d58810eb1056"
+          "after": "0e75bd11d9fa4d8aacc4d1aead61352fb0c1dede78d8d7499fc609934486533e"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
       "before_sha256": "f26b42289a1c352e67662c560d863dc4b30a6118f35803334f294e4d78439ed3",
-      "after_sha256": "07f2305ab030ab4f8aab9c58603cd573d44b2eb98b1e41a22e79788820174f8a",
+      "after_sha256": "aac8762f8e6a1de5e411e058fc3ef528ca2bc0e191f88cd2a16687948bdc3854",
       "owners": {
         "@document": {
           "before": "f26b42289a1c352e67662c560d863dc4b30a6118f35803334f294e4d78439ed3",
-          "after": "07f2305ab030ab4f8aab9c58603cd573d44b2eb98b1e41a22e79788820174f8a"
+          "after": "aac8762f8e6a1de5e411e058fc3ef528ca2bc0e191f88cd2a16687948bdc3854"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
       "before_sha256": "78f9fee39ecf930d389003ae0abc67c7eae03cc6ebefff190c7f3659534dfc26",
-      "after_sha256": "007bfcdbc87dca1d373ed5b117ec498f182a9e67f95d2b22eea644de1f27c41d",
+      "after_sha256": "7cd65a5d058917ddbc3c703af58606e9b430feac61a5c9e4989d60ce7e894c26",
       "owners": {
         "@document": {
           "before": "78f9fee39ecf930d389003ae0abc67c7eae03cc6ebefff190c7f3659534dfc26",
-          "after": "007bfcdbc87dca1d373ed5b117ec498f182a9e67f95d2b22eea644de1f27c41d"
+          "after": "7cd65a5d058917ddbc3c703af58606e9b430feac61a5c9e4989d60ce7e894c26"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
       "before_sha256": "a268fbb9e8510c4de0c667fc486fef47d18a6779ce726ce79358fab040196ddd",
-      "after_sha256": "ddc7abad423e3d015c031661233e73d971d32018f0029d3bcefff0156eca8e54",
+      "after_sha256": "3a8767f7b4d047fad7854dcb893cc66ef918b9555fe4aedcc2a70f5dcf3d2174",
       "owners": {
         "@document": {
           "before": "a268fbb9e8510c4de0c667fc486fef47d18a6779ce726ce79358fab040196ddd",
-          "after": "ddc7abad423e3d015c031661233e73d971d32018f0029d3bcefff0156eca8e54"
+          "after": "3a8767f7b4d047fad7854dcb893cc66ef918b9555fe4aedcc2a70f5dcf3d2174"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
       "before_sha256": "25b5ad1b0c3f5f5013d66766ef74818aaf78063eadeefbc9f920e8bb925c5786",
-      "after_sha256": "499a3f0e8ca1e15efab15e2c7253031177caeb8bc3a3cf7037dd269d545da192",
+      "after_sha256": "4c6cd4afa6bc7d39988d268f71401f38f909c381b2c6af57f9765dbe5f8a220b",
       "owners": {
         "@document": {
           "before": "25b5ad1b0c3f5f5013d66766ef74818aaf78063eadeefbc9f920e8bb925c5786",
-          "after": "499a3f0e8ca1e15efab15e2c7253031177caeb8bc3a3cf7037dd269d545da192"
+          "after": "4c6cd4afa6bc7d39988d268f71401f38f909c381b2c6af57f9765dbe5f8a220b"
         }
       }
     },
@@ -216,11 +256,21 @@
     },
     "data/source_audits/ci64_provenance_v1/stage2-opening-movement-unit-test-addition-v1.json": {
       "before_sha256": null,
-      "after_sha256": "62b9bffa7efdab844e89feeb0cace6ae8bde482197f5ebb65090724704d0656e",
+      "after_sha256": "6c821e5ea1fe9933539d8b63d63bc1d3777766b68581e66ae664fc76caebf15e",
       "owners": {
         "@document": {
           "before": null,
-          "after": "62b9bffa7efdab844e89feeb0cace6ae8bde482197f5ebb65090724704d0656e"
+          "after": "6c821e5ea1fe9933539d8b63d63bc1d3777766b68581e66ae664fc76caebf15e"
+        }
+      }
+    },
+    "docs/AI_IMPLEMENTATION_PLAN.md": {
+      "before_sha256": "459719a881dcc416f7f790c8f327c5edc5ad4fbc0d06b51d591b730b9b76e60a",
+      "after_sha256": "3c874cdf08e2c21db30ce9c4b3554b64829df8760e602f36ee9cb990577d2d6c",
+      "owners": {
+        "@document": {
+          "before": "459719a881dcc416f7f790c8f327c5edc5ad4fbc0d06b51d591b730b9b76e60a",
+          "after": "3c874cdf08e2c21db30ce9c4b3554b64829df8760e602f36ee9cb990577d2d6c"
         }
       }
     },
@@ -234,6 +284,36 @@
         }
       }
     },
+    "docs/DISTANCE_PRECISION.md": {
+      "before_sha256": "eec7a2d15372a9ae0ca5358608e2770429f845c662470509f6433af42c31dbf0",
+      "after_sha256": "5bf9fe4d8adf71f7d525ee11768d7dd1a1801e95b96e49891ecf66445c8c569e",
+      "owners": {
+        "@document": {
+          "before": "eec7a2d15372a9ae0ca5358608e2770429f845c662470509f6433af42c31dbf0",
+          "after": "5bf9fe4d8adf71f7d525ee11768d7dd1a1801e95b96e49891ecf66445c8c569e"
+        }
+      }
+    },
+    "docs/SEQUENTIAL_REMEDIATION_REVIEW_POLICY.md": {
+      "before_sha256": "c19ddc0924576aba254bccf002fec8760edaedfaaeca97df41ea02e01e79b062",
+      "after_sha256": "6157a076ab034085e5ce008e68c13a0affea03a67600f74cfa283f313989b805",
+      "owners": {
+        "@document": {
+          "before": "c19ddc0924576aba254bccf002fec8760edaedfaaeca97df41ea02e01e79b062",
+          "after": "6157a076ab034085e5ce008e68c13a0affea03a67600f74cfa283f313989b805"
+        }
+      }
+    },
+    "docs/SOURCE_FIXTURE_HASH_BOUNDARIES.md": {
+      "before_sha256": "f23a44a7952bb374b06d03c7b54ade360860c60db2c3447001372621b62bf120",
+      "after_sha256": "104c3785978970891a02eba97764a42b5dbecbbd8fccc1386fe71c7760c058e7",
+      "owners": {
+        "@document": {
+          "before": "f23a44a7952bb374b06d03c7b54ade360860c60db2c3447001372621b62bf120",
+          "after": "104c3785978970891a02eba97764a42b5dbecbbd8fccc1386fe71c7760c058e7"
+        }
+      }
+    },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "929b3fa2d61880719464f19c7126fbc5ce054639a85a8e0f6ad35dcfd3e07e25",
       "after_sha256": "641f0f9c9f1009797bb91e13583326dbed4cc252074dd410df29c1c479bc90dd",
@@ -244,17 +324,41 @@
         }
       }
     },
+    "pyproject.toml": {
+      "before_sha256": "870d9e83747f1e4cd8e3092103c71faf319caa5ca10c11bcb1f4e5b03e51da71",
+      "after_sha256": "0b89fb869936bbcd49baef572380029840a75fee75071cc5339e4415d9939b80",
+      "owners": {
+        "@document": {
+          "before": "870d9e83747f1e4cd8e3092103c71faf319caa5ca10c11bcb1f4e5b03e51da71",
+          "after": "0b89fb869936bbcd49baef572380029840a75fee75071cc5339e4415d9939b80"
+        }
+      }
+    },
     "scripts/engine_numerical_identity_test_admission.py": {
       "before_sha256": "9eb94e1dbf42308df4478f1c80951a41be96be595bd1760ed46458ed88d29825",
-      "after_sha256": "33286fe4b0534a077818624c89537c53f31bf5534f07d10793b43539054fddc7",
+      "after_sha256": "2495415f1c683f2a954f1688e7307d507f5be193655b74c24f33c9ae0d816806",
       "owners": {
         "@module": {
           "before": "1e53eec926b71f40ab06a6f94bc1c20342acc63a08302d2dcba5daf2a36e81dc",
-          "after": "8a927d62369bc1e34ab471572c689f947799416c8c241071ab4167b147cf1c9e"
+          "after": "5247f30447ebf4f93d7b8289fc8f00a033753cd05405c95d0bc0c039dbc7d70c"
         },
         "exact_movement_test_transition": {
           "before": "24780f969561382a43e0997f04024c118172749dea6aef0748b62c615ad827af",
           "after": "c046d71d6993e54c4c52fd7aae7e101b3e2774367349ea42d4fe8581e8f98c54"
+        }
+      }
+    },
+    "scripts/run_complete_covered_profile.py": {
+      "before_sha256": "e4ffa7949651975770217f544de8a98f18b79b8797311925dd892dd99a47d93c",
+      "after_sha256": "49d08d9c2f2a7c6fd0730ce219f05ae763f1782b0c878ce1d7f777d5685a4147",
+      "owners": {
+        "coverage_report_command": {
+          "before": "03c49f351873d0e16794745990b73ce1f9c50e61318e312f56a81ff6da17a088",
+          "after": "e3dfc138e65eb5e516f9b6beff1210bc3815ff6e2fbd681294fef9972766bfac"
+        },
+        "run_worker": {
+          "before": "b7bcf25967bdfbfff3446ea5ab03a96c8931b6a425b42172bde4bbd8101d7761",
+          "after": "aedc7573e4418dd6bbdf2429befafa6c931b17f7655a9adb68486beece6d90c7"
         }
       }
     },
@@ -290,6 +394,40 @@
         }
       }
     },
+    "tests/code_quality/test_behavioral_deadline.py": {
+      "before_sha256": "9eada250b5f922243eca209fb8a39eaee23f279d6667a606a4c75222e9583bda",
+      "after_sha256": "d9d0b0f9feaafcc81dbd80639cb31242b7b4fcc8657c0bafc4d459395588b0d2",
+      "owners": {
+        "test_hosted_workload_uses_supervisor_and_preserves_diagnostics": {
+          "before": "4987e236b584f336f392ec5c25b18b6f54128621c85bc973a4bc822c647a2c9e",
+          "after": "ec4a05a4abfcfc15eb5acb111a74d39d7128402631d01eb57db1a00ff1cd46c7"
+        }
+      }
+    },
+    "tests/code_quality/test_ci_performance_gates.py": {
+      "before_sha256": "81627b24dcf61799c29f771a88ae6d92d61e2010aabda2fbcc2f4ba6716cbc4e",
+      "after_sha256": "f3c7eb06b38a09ce25f9d5b4c7bd733ad8ff60365b9a649adee47812dd58f096",
+      "owners": {
+        "test_cold_source_index_overlaps_startup_inside_the_unchanged_deadline": {
+          "before": "a65fe765edcdc728a7900d4b84cceefc2a95698542bdccd317ef0862c601aaa7",
+          "after": "c351b1730890f627b0ef64f3b514dbad5f23a0cbe8a981e70e8650f4e30f3734"
+        },
+        "test_quality_gate_requires_every_independent_lane_even_when_skipped": {
+          "before": "019e7950106db6b8a1310391eef4dc5196aec8336cd48aa8ae586abb08844f1c",
+          "after": "0356d72bde7cb6396d7faa886331ac3da1706f68fe5fc4ed1ba9ae88e79769a4"
+        }
+      }
+    },
+    "tests/code_quality/test_complete_covered_reporting.py": {
+      "before_sha256": "6efc2f56b5ce976980e8e897eae2fefe4e497bfecc93d62bbf4cf53d73b8fa0c",
+      "after_sha256": "b5dd7cb62516f11ae3f9bbf90bba465888d319b4ed419589e8c61a50e20d37a2",
+      "owners": {
+        "test_complete_json_reporting_preserves_floor_evidence_and_failure_propagation": {
+          "before": "4cc33c546dbf3a74e50b16306ff6111ac27dd2ed32344cb38e38e39133b3865e",
+          "after": "b0806a1af2ba7e7c5f4c335ea23443bbc265832246941e7cdc4eba0682307648"
+        }
+      }
+    },
     "tests/code_quality/test_engine_numerical_identity_admission.py": {
       "before_sha256": "5e6a1a75c62829bd58d092190d62fc7fb756d93682972cbc221e142545d0035e",
       "after_sha256": "833cbe5e526f2d90d0d5fed540a6fb67316a412acf26557308c923dac72b6cb0",
@@ -302,20 +440,65 @@
     },
     "tests/factions/chaos_daemons/integration/test_cavalcade_opening_movement_unit.py": {
       "before_sha256": null,
-      "after_sha256": "97a64055d9809e5051e1cd442774f4ae9fdac1834cb3e04c11a73b2810b08d45",
+      "after_sha256": "ef2b63d73a6e9ba906547c2b98920d84ae98280111015e5a8f594ab832089dd5",
       "owners": {
         "@module": {
           "before": null,
-          "after": "92b620dcff2bf390360c4f1b2f78e64abe33dbf9d89101037fb46c7e28270d85"
+          "after": "14ca69eed28244d25ca338253d643662a4ec30165e49c98e4289609a53d3b897"
         },
         "test_opening_movement_selects_an_issued_unit_before_any_action": {
           "before": null,
-          "after": "dc3ee1f38e3f6503a651f1858592610c63e94a91f490919a49645b0f3e965d87"
+          "after": "7748f1ceaf9ff9ee89110137a1febeeee5e24765c95746922712b6a33b213bd0"
+        }
+      }
+    },
+    "tests/rules/section07/coverage.json": {
+      "before_sha256": "84f7c606bb3617a8a9ebda27f72378eafc048b28e0c747764d76b29003bae165",
+      "after_sha256": "cf9dd472bb92aeb3c87b2feb9aee436a51ade9ad6271ee6dcb2c803b96b06c6b",
+      "owners": {
+        "@document": {
+          "before": "84f7c606bb3617a8a9ebda27f72378eafc048b28e0c747764d76b29003bae165",
+          "after": "cf9dd472bb92aeb3c87b2feb9aee436a51ade9ad6271ee6dcb2c803b96b06c6b"
         }
       }
     }
   },
   "rows": {
+    ".github/pull_request_template.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Document the owner-approved 68 percent combined coverage floor and retain historical thresholds and results.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    ".github/workflows/ci.yml": {
+      "category": "rule_semantics",
+      "operations": [
+        "behavioral-worker-progress",
+        "covered-shard-workload"
+      ],
+      "selected_families": [],
+      "rationale": "Apply and test the 68 percent combined branch-measured reporting threshold and authenticate the current settings.",
+      "source_obligation": "The owner authorized raising the combined full-package coverage floor to 68 percent.",
+      "unchanged_work": "Preserve branch and package measurement, exclusions, all selected behavioral cases, timing limits and historical receipts."
+    },
+    "AGENTS.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Document the owner-approved 68 percent combined coverage floor and retain historical thresholds and results.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "README.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Document the owner-approved 68 percent combined coverage floor and retain historical thresholds and results.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
     "ci/test_shards/durations.json": {
       "category": "measured_workload",
       "operations": [
@@ -536,11 +719,43 @@
       "source_obligation": null,
       "unchanged_work": null
     },
+    "docs/AI_IMPLEMENTATION_PLAN.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Document the owner-approved 68 percent combined coverage floor and retain historical thresholds and results.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
     "docs/AI_POLICY_INTERFACE.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
       "rationale": "Document the explicit development policy and register the exact new operation owners.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/DISTANCE_PRECISION.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Document the owner-approved 68 percent combined coverage floor and retain historical thresholds and results.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/SEQUENTIAL_REMEDIATION_REVIEW_POLICY.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Document the owner-approved 68 percent combined coverage floor and retain historical thresholds and results.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/SOURCE_FIXTURE_HASH_BOUNDARIES.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Document the owner-approved 68 percent combined coverage floor and retain historical thresholds and results.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -551,6 +766,16 @@
       "rationale": "Document the explicit development policy and register the exact new operation owners.",
       "source_obligation": null,
       "unchanged_work": null
+    },
+    "pyproject.toml": {
+      "category": "dependency_environment",
+      "operations": [
+        "development-dependency"
+      ],
+      "selected_families": [],
+      "rationale": "Set the coverage reporting minimum to 68 percent while retaining the source, branch measurement and precision.",
+      "source_obligation": null,
+      "unchanged_work": "The configuration changes only a coverage reporting threshold. Dependency declarations and the lock retain their existing values."
     },
     "scripts/engine_numerical_identity_test_admission.py": {
       "category": "measured_workload",
@@ -564,6 +789,16 @@
       "rationale": "Bind the new native regression to its policy bytes and runtime fingerprint while preserving prior admissions.",
       "source_obligation": null,
       "unchanged_work": null
+    },
+    "scripts/run_complete_covered_profile.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "scoped-shard-allocation"
+      ],
+      "selected_families": [],
+      "rationale": "Apply and test the 68 percent combined branch-measured reporting threshold and authenticate the current settings.",
+      "source_obligation": "The owner authorized raising the combined full-package coverage floor to 68 percent.",
+      "unchanged_work": "Preserve branch and package measurement, exclusions, all selected behavioral cases, timing limits and historical receipts."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "measured_workload",
@@ -585,6 +820,38 @@
       "source_obligation": null,
       "unchanged_work": null
     },
+    "tests/code_quality/test_behavioral_deadline.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "covered-shard-deadline-regression"
+      ],
+      "selected_families": [],
+      "rationale": "Apply and test the 68 percent combined branch-measured reporting threshold and authenticate the current settings.",
+      "source_obligation": "The owner authorized raising the combined full-package coverage floor to 68 percent.",
+      "unchanged_work": "Preserve branch and package measurement, exclusions, all selected behavioral cases, timing limits and historical receipts."
+    },
+    "tests/code_quality/test_ci_performance_gates.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "ci78-cutover-owners-2bec45eb6ecc7574f5395711c9381e101ae612cb57b1a0e433c8a508aa991453",
+        "ci-source-index-deadline-guard",
+        "milli-inch-test-admission"
+      ],
+      "selected_families": [],
+      "rationale": "Apply and test the 68 percent combined branch-measured reporting threshold and authenticate the current settings.",
+      "source_obligation": "The owner authorized raising the combined full-package coverage floor to 68 percent.",
+      "unchanged_work": "Preserve branch and package measurement, exclusions, all selected behavioral cases, timing limits and historical receipts."
+    },
+    "tests/code_quality/test_complete_covered_reporting.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "scoped-shard-allocation"
+      ],
+      "selected_families": [],
+      "rationale": "Apply and test the 68 percent combined branch-measured reporting threshold and authenticate the current settings.",
+      "source_obligation": "The owner authorized raising the combined full-package coverage floor to 68 percent.",
+      "unchanged_work": "Preserve branch and package measurement, exclusions, all selected behavioral cases, timing limits and historical receipts."
+    },
     "tests/code_quality/test_engine_numerical_identity_admission.py": {
       "category": "measured_workload",
       "operations": [
@@ -604,6 +871,16 @@
       "rationale": "Admit one native regression for ordinary unit selection, the action handoff, and exact continuation replay.",
       "source_obligation": null,
       "unchanged_work": null
+    },
+    "tests/rules/section07/coverage.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "qualification40-exact-b6886d3bc2fb1ca4"
+      ],
+      "selected_families": [],
+      "rationale": "Apply and test the 68 percent combined branch-measured reporting threshold and authenticate the current settings.",
+      "source_obligation": "The owner authorized raising the combined full-package coverage floor to 68 percent.",
+      "unchanged_work": "Preserve branch and package measurement, exclusions, all selected behavioral cases, timing limits and historical receipts."
     }
   },
   "milestone": "ordinary",

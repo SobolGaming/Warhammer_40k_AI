@@ -13,6 +13,7 @@ from warhammer40k_core.ai.opening_movement_unit import (
 from warhammer40k_core.ai.opening_shadow_form import opening_shadow_form_registration
 from warhammer40k_core.ai.player_policy import PlayerDecisionContext, PolicyError, PolicyRouter
 from warhammer40k_core.ai.runner import BoundedPolicyRunner, RunBoundary, RunLimits, RunnerError
+from warhammer40k_core.engine.decision_request import DecisionOptionPayload
 from warhammer40k_core.engine.replay import ReplayArtifact, ReplayRunner
 
 
@@ -43,7 +44,7 @@ def test_opening_movement_selects_an_issued_unit_before_any_action(
     context = PlayerDecisionContext.from_view(before, choice_seed=19)
     assert context.route.decision_type == "select_movement_unit"
     request = context.request
-    battlefield_options = []
+    battlefield_options: list[tuple[int, DecisionOptionPayload]] = []
     for option in request["options"]:
         payload = option["payload"]
         assert isinstance(payload, dict)

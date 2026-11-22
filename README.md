@@ -404,7 +404,7 @@ viewer-renderer regressions. It is safe when that directory is absent: an indepe
 `node` later on the existing `PATH` remains available. Keep this prefix on full-suite runs so those
 tests do not fail only because the desktop shell omitted the bundled runtime.
 
-CI shards this same behavioral suite, combines branch coverage, and applies the temporary 67%
+CI shards this same behavioral suite, combines branch coverage, and applies the temporary 68%
 gate after every shard succeeds. Full type checking and architecture checks also remain required
 in CI and run on the `pre-push` pre-commit stage; commit-time hooks are limited to Ruff check and
 format for a shorter edit/commit loop.
@@ -433,12 +433,12 @@ files. Missing complete coverage and any late/failed shard keep the combined gat
 failed. No complete result is fabricated for a terminated process.
 
 The isolated mirror's existing 120-second bound, separate 180-second performance
-command, 600-second quality limits, twelve shards, and 67% branch floor remain
-unchanged. Record actual observed completion times separately from configured
+command, 600-second quality limits, twelve shards, and 68% branch floor remain
+in force. Record actual observed completion times separately from configured
 limits. Historical fifteen-minute timeout receipts remain historical failures;
 their configured limit is not an unobserved test completion duration.
 
-The current owner-approved coverage floor is 67%; later coverage work must restore 85%. The full
+The current owner-approved coverage floor is 68%; later coverage work must restore 85%. The full
 warhammer40k_core package and branch metric remain unchanged, with no added coverage
 omissions or exclusions. This policy change does not claim either threshold has passed;
 all required tests and other gates must still succeed. See the

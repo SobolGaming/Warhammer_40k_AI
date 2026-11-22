@@ -6,10 +6,10 @@
   "policy_sha256": "16b0d8c6c0afb74ddd73d9e9395529c57bfeb44c26df26034cf28cdca31de0eb",
   "added_files": {
     "tests/factions/chaos_daemons/integration/test_cavalcade_opening_movement_unit.py": {
-      "blob_sha1": "0b3d0359f61417940eec1c9abacf3fdf7ac50112",
-      "bytes": 4417,
+      "blob_sha1": "331383e320210b9110b1c02155b05a1730c5eb37",
+      "bytes": 4534,
       "mode": "100644",
-      "sha256": "97a64055d9809e5051e1cd442774f4ae9fdac1834cb3e04c11a73b2810b08d45"
+      "sha256": "ef2b63d73a6e9ba906547c2b98920d84ae98280111015e5a8f594ab832089dd5"
     }
   }
 }
