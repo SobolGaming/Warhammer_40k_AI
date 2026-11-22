@@ -1,452 +1,346 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "778b25302de97a998e1c66cdde2cbbca12518af8",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:e5e0ccfa536375c25875dfb3ca261970dc5d8c2895aebe94b4c19cbed1aa7255",
-  "operation_map_sha256": "60ade7551ea76a269393ca5f4df46eb84362a6f2503f7091781d59e01684a5d4",
+  "base": "d1af6721e1f544898ce25ef7fdd611110b31b6fc",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:3c883d7208521038f93c65528444109ba0a3a953ed15e3002b309028992af9b6",
+  "operation_map_sha256": "9bd348c32f4570a0608710ff669e69007f102526a01ce7b6e90af055b1b194b9",
   "changes": {
     "ci/test_shards/durations.json": {
-      "before_sha256": "e2a1a724bd57e673a0728a6cb3986228ecc6361669e620b01cad530b0b560b51",
-      "after_sha256": "881748564e42b707210fe14aa2374222a4adc4872e1720984d429a9afe4cf0b7",
+      "before_sha256": "881748564e42b707210fe14aa2374222a4adc4872e1720984d429a9afe4cf0b7",
+      "after_sha256": "ab65e89ea57fb93880f56fc2a98e50d8fed81eda03683c83606aaefefca34ced",
       "owners": {
         "@document": {
-          "before": "e2a1a724bd57e673a0728a6cb3986228ecc6361669e620b01cad530b0b560b51",
-          "after": "881748564e42b707210fe14aa2374222a4adc4872e1720984d429a9afe4cf0b7"
+          "before": "881748564e42b707210fe14aa2374222a4adc4872e1720984d429a9afe4cf0b7",
+          "after": "ab65e89ea57fb93880f56fc2a98e50d8fed81eda03683c83606aaefefca34ced"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
-      "before_sha256": "09935b1310706a2f2889a1214a062db3c1a797b0cd73629798bd5e7ca4a0115e",
-      "after_sha256": "0160c365a84fcb504d9c75de94191ba58fae6bd0c08004e82f78a5267f8d4d06",
+      "before_sha256": "0160c365a84fcb504d9c75de94191ba58fae6bd0c08004e82f78a5267f8d4d06",
+      "after_sha256": "d178e2b1a8bace7bc14c58396fd5a9a1bdf0dca47d20934968f4e7d50f6ced68",
       "owners": {
         "@document": {
-          "before": "09935b1310706a2f2889a1214a062db3c1a797b0cd73629798bd5e7ca4a0115e",
-          "after": "0160c365a84fcb504d9c75de94191ba58fae6bd0c08004e82f78a5267f8d4d06"
+          "before": "0160c365a84fcb504d9c75de94191ba58fae6bd0c08004e82f78a5267f8d4d06",
+          "after": "d178e2b1a8bace7bc14c58396fd5a9a1bdf0dca47d20934968f4e7d50f6ced68"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
-      "before_sha256": "f30c4684079efb34c0d55c1e9892d750f23bd411acaf2fd2d76ed9f7182cbc55",
-      "after_sha256": "1ba71f9244fb7ee1095c7022ad67e5ff026227901f38de062e00bcc92d0ed009",
-      "owners": {
-        "@document": {
-          "before": "f30c4684079efb34c0d55c1e9892d750f23bd411acaf2fd2d76ed9f7182cbc55",
-          "after": "1ba71f9244fb7ee1095c7022ad67e5ff026227901f38de062e00bcc92d0ed009"
-        }
-      }
-    },
-    "ci/test_shards/shard-11.txt": {
-      "before_sha256": "92aa05e63bdda1bd156d46a8fecac5afb9c0e9dfd7d12e0e3fa94756c0556878",
+      "before_sha256": "1ba71f9244fb7ee1095c7022ad67e5ff026227901f38de062e00bcc92d0ed009",
       "after_sha256": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20",
       "owners": {
         "@document": {
-          "before": "92aa05e63bdda1bd156d46a8fecac5afb9c0e9dfd7d12e0e3fa94756c0556878",
+          "before": "1ba71f9244fb7ee1095c7022ad67e5ff026227901f38de062e00bcc92d0ed009",
           "after": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20"
         }
       }
     },
-    "ci/test_shards/shard-12.txt": {
-      "before_sha256": "0971e76a3d46c6055d2aee952f8a73e5620b9bf2d8dd0ac0e53ba4702faa7a90",
-      "after_sha256": "684633f5047b3f18d69996072d1aa5d8e71a6018b22e2dd462bac4172ca179de",
+    "ci/test_shards/shard-11.txt": {
+      "before_sha256": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20",
+      "after_sha256": "76ea4757054e583768b45fd1a7887e65fd5a31759febdfa94928e73a92342276",
       "owners": {
         "@document": {
-          "before": "0971e76a3d46c6055d2aee952f8a73e5620b9bf2d8dd0ac0e53ba4702faa7a90",
-          "after": "684633f5047b3f18d69996072d1aa5d8e71a6018b22e2dd462bac4172ca179de"
+          "before": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20",
+          "after": "76ea4757054e583768b45fd1a7887e65fd5a31759febdfa94928e73a92342276"
+        }
+      }
+    },
+    "ci/test_shards/shard-12.txt": {
+      "before_sha256": "684633f5047b3f18d69996072d1aa5d8e71a6018b22e2dd462bac4172ca179de",
+      "after_sha256": "2fecc0acb7f66655d8167ed2fd5e3fbc71d8cd09306d02bb5ecf2861ac8c46f1",
+      "owners": {
+        "@document": {
+          "before": "684633f5047b3f18d69996072d1aa5d8e71a6018b22e2dd462bac4172ca179de",
+          "after": "2fecc0acb7f66655d8167ed2fd5e3fbc71d8cd09306d02bb5ecf2861ac8c46f1"
         }
       }
     },
     "ci/test_shards/shard-2.txt": {
-      "before_sha256": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
-      "after_sha256": "6b86753bc716c3629aa3a0cbd296463009602287e242cdda7c4a6d2a8b0227bd",
+      "before_sha256": "6b86753bc716c3629aa3a0cbd296463009602287e242cdda7c4a6d2a8b0227bd",
+      "after_sha256": "934ef4ae3b3b54dffdffd6e488ff0c0ff53a5885a120bf906a60a591e74aa267",
       "owners": {
         "@document": {
-          "before": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
-          "after": "6b86753bc716c3629aa3a0cbd296463009602287e242cdda7c4a6d2a8b0227bd"
+          "before": "6b86753bc716c3629aa3a0cbd296463009602287e242cdda7c4a6d2a8b0227bd",
+          "after": "934ef4ae3b3b54dffdffd6e488ff0c0ff53a5885a120bf906a60a591e74aa267"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
-      "before_sha256": "ed8b2de4f896240a0d1fb02f3619cf22c5a51a118cc241c105470311b8b39d28",
-      "after_sha256": "77d90cb56a044dc333e8ca41cb5b11fddf143d6152398b5e5b53195ddf55495d",
+      "before_sha256": "77d90cb56a044dc333e8ca41cb5b11fddf143d6152398b5e5b53195ddf55495d",
+      "after_sha256": "2a770c3d03108e1d5162ed5a0fdcd81c77b66d3fcc9e02d605290c98ea5fc407",
       "owners": {
         "@document": {
-          "before": "ed8b2de4f896240a0d1fb02f3619cf22c5a51a118cc241c105470311b8b39d28",
-          "after": "77d90cb56a044dc333e8ca41cb5b11fddf143d6152398b5e5b53195ddf55495d"
+          "before": "77d90cb56a044dc333e8ca41cb5b11fddf143d6152398b5e5b53195ddf55495d",
+          "after": "2a770c3d03108e1d5162ed5a0fdcd81c77b66d3fcc9e02d605290c98ea5fc407"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
-      "before_sha256": "ae8d2c98dfe00df4b140e72685af6159f079f8032dfca4036ca9bd82493fe30a",
-      "after_sha256": "38827653ec6193c7cdced52f65b3c24390acac4d2efb1236846e40f488b9cbdd",
+      "before_sha256": "38827653ec6193c7cdced52f65b3c24390acac4d2efb1236846e40f488b9cbdd",
+      "after_sha256": "0bebf14d779ba171d17a66704029798575c0aef2e92379463371a012092bd4a6",
       "owners": {
         "@document": {
-          "before": "ae8d2c98dfe00df4b140e72685af6159f079f8032dfca4036ca9bd82493fe30a",
-          "after": "38827653ec6193c7cdced52f65b3c24390acac4d2efb1236846e40f488b9cbdd"
+          "before": "38827653ec6193c7cdced52f65b3c24390acac4d2efb1236846e40f488b9cbdd",
+          "after": "0bebf14d779ba171d17a66704029798575c0aef2e92379463371a012092bd4a6"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
-      "before_sha256": "82d51e1bece2f747490db546611118f9b489a8a1ed5eb682b10a3f4fa346807b",
-      "after_sha256": "f245c806705508140668a392b9151d5514effef94bae9f876fab5d377db1403d",
+      "before_sha256": "f245c806705508140668a392b9151d5514effef94bae9f876fab5d377db1403d",
+      "after_sha256": "bc86f3642d37d12cd14d4bfea3a1cd11754c3fd62980792c78c1eebadb7073fb",
       "owners": {
         "@document": {
-          "before": "82d51e1bece2f747490db546611118f9b489a8a1ed5eb682b10a3f4fa346807b",
-          "after": "f245c806705508140668a392b9151d5514effef94bae9f876fab5d377db1403d"
+          "before": "f245c806705508140668a392b9151d5514effef94bae9f876fab5d377db1403d",
+          "after": "bc86f3642d37d12cd14d4bfea3a1cd11754c3fd62980792c78c1eebadb7073fb"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
-      "before_sha256": "157debdc01f19c893f3af5b6dd5ca0b5ad9fd3708cc969d95a57d649d6675b4a",
-      "after_sha256": "c03fb194fb54fe481aa90dfa0cc5053b6c85e6395520763c2a1b9e8b68d27504",
+      "before_sha256": "c03fb194fb54fe481aa90dfa0cc5053b6c85e6395520763c2a1b9e8b68d27504",
+      "after_sha256": "738801e98d644049e7f0c7302e85e8c8ca555a28a63be86ed78e9b19ae42748c",
       "owners": {
         "@document": {
-          "before": "157debdc01f19c893f3af5b6dd5ca0b5ad9fd3708cc969d95a57d649d6675b4a",
-          "after": "c03fb194fb54fe481aa90dfa0cc5053b6c85e6395520763c2a1b9e8b68d27504"
+          "before": "c03fb194fb54fe481aa90dfa0cc5053b6c85e6395520763c2a1b9e8b68d27504",
+          "after": "738801e98d644049e7f0c7302e85e8c8ca555a28a63be86ed78e9b19ae42748c"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
-      "before_sha256": "a2bef08a8a61e9f93b8dcc7208a4d55fbbd8dd85147ede29140f93b26efa5fb6",
-      "after_sha256": "5849b8991abbe1b798d39847670ca00cc6a667bee7858f87bf45b3efe57a2d8e",
+      "before_sha256": "5849b8991abbe1b798d39847670ca00cc6a667bee7858f87bf45b3efe57a2d8e",
+      "after_sha256": "11da7c060430b5b60b37e34d02ded670f67ae69b5584f0a8f516bde94984740d",
       "owners": {
         "@document": {
-          "before": "a2bef08a8a61e9f93b8dcc7208a4d55fbbd8dd85147ede29140f93b26efa5fb6",
-          "after": "5849b8991abbe1b798d39847670ca00cc6a667bee7858f87bf45b3efe57a2d8e"
+          "before": "5849b8991abbe1b798d39847670ca00cc6a667bee7858f87bf45b3efe57a2d8e",
+          "after": "11da7c060430b5b60b37e34d02ded670f67ae69b5584f0a8f516bde94984740d"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
-      "before_sha256": "073955dba5088a855d86ceded2733a5489a816bc8ec1f339761e4c236960145f",
-      "after_sha256": "777e1f9c5f43fb4c1239bcce0b7bc2cce421b0ebaf606781de7fda7369dbdd9b",
+      "before_sha256": "777e1f9c5f43fb4c1239bcce0b7bc2cce421b0ebaf606781de7fda7369dbdd9b",
+      "after_sha256": "ef409bf2b81164e8a8deb7c5a4082c795af1c77fb960c23c92fcfd5c5c5f59b1",
       "owners": {
         "@document": {
-          "before": "073955dba5088a855d86ceded2733a5489a816bc8ec1f339761e4c236960145f",
-          "after": "777e1f9c5f43fb4c1239bcce0b7bc2cce421b0ebaf606781de7fda7369dbdd9b"
+          "before": "777e1f9c5f43fb4c1239bcce0b7bc2cce421b0ebaf606781de7fda7369dbdd9b",
+          "after": "ef409bf2b81164e8a8deb7c5a4082c795af1c77fb960c23c92fcfd5c5c5f59b1"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
-      "before_sha256": "a827cce35bf4367821e1a66be466e1e5059b998639bcb96102b5b4ef0c45154e",
-      "after_sha256": "b83cec4a5c79ab2dc43a772cce6f62b059abf83231133a996eb0e2c129e92279",
+      "before_sha256": "b83cec4a5c79ab2dc43a772cce6f62b059abf83231133a996eb0e2c129e92279",
+      "after_sha256": "a5703a7ed77101b3222a256c3e221b34583c2e26a77d601007d5053177d41c9b",
       "owners": {
         "@document": {
-          "before": "a827cce35bf4367821e1a66be466e1e5059b998639bcb96102b5b4ef0c45154e",
-          "after": "b83cec4a5c79ab2dc43a772cce6f62b059abf83231133a996eb0e2c129e92279"
+          "before": "b83cec4a5c79ab2dc43a772cce6f62b059abf83231133a996eb0e2c129e92279",
+          "after": "a5703a7ed77101b3222a256c3e221b34583c2e26a77d601007d5053177d41c9b"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "bbe19e8657599e490da5d916d7ab27088f6a51e2ef06d78bd9da96340b1b0939",
-      "after_sha256": "9722ad557d2c7676c9f836b34498958ad8668aa1cffead5cc307249355e27025",
+      "before_sha256": "9722ad557d2c7676c9f836b34498958ad8668aa1cffead5cc307249355e27025",
+      "after_sha256": "0311e38a99526eb07a879e424586c1a5f6c3cae0bd4ada7b1c1914f0ec94f1fc",
       "owners": {
         "@document": {
-          "before": "bbe19e8657599e490da5d916d7ab27088f6a51e2ef06d78bd9da96340b1b0939",
-          "after": "9722ad557d2c7676c9f836b34498958ad8668aa1cffead5cc307249355e27025"
+          "before": "9722ad557d2c7676c9f836b34498958ad8668aa1cffead5cc307249355e27025",
+          "after": "0311e38a99526eb07a879e424586c1a5f6c3cae0bd4ada7b1c1914f0ec94f1fc"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "b507da72643f92a2415ea0637a298a68b31a2436953227da23d9c43bb9255f70",
-      "after_sha256": "dba0d11db2b942296f82bdc78601be468133013a20912fdad85982bb05a9b2f2",
+      "before_sha256": "dba0d11db2b942296f82bdc78601be468133013a20912fdad85982bb05a9b2f2",
+      "after_sha256": "bc9a237af973e6710657468cc0b36064e63a46c746d3a0574787d53fc8e3ca25",
       "owners": {
         "@document": {
-          "before": "b507da72643f92a2415ea0637a298a68b31a2436953227da23d9c43bb9255f70",
-          "after": "dba0d11db2b942296f82bdc78601be468133013a20912fdad85982bb05a9b2f2"
+          "before": "dba0d11db2b942296f82bdc78601be468133013a20912fdad85982bb05a9b2f2",
+          "after": "bc9a237af973e6710657468cc0b36064e63a46c746d3a0574787d53fc8e3ca25"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "955f925d6cd6da0b678bd2b2ace057beb384815dbebbfd4b1156702b932dff2c",
-      "after_sha256": "7875b86caeb2e2dbf4de4c518767d51315d2455133892be01ee42a3305a338f6",
+      "before_sha256": "7875b86caeb2e2dbf4de4c518767d51315d2455133892be01ee42a3305a338f6",
+      "after_sha256": "6037ff8211eee3f4ac00f3ebd7d2760d2af5ff9f1cb40b44b8d0c7a46400a8f9",
       "owners": {
         "@document": {
-          "before": "955f925d6cd6da0b678bd2b2ace057beb384815dbebbfd4b1156702b932dff2c",
-          "after": "7875b86caeb2e2dbf4de4c518767d51315d2455133892be01ee42a3305a338f6"
+          "before": "7875b86caeb2e2dbf4de4c518767d51315d2455133892be01ee42a3305a338f6",
+          "after": "6037ff8211eee3f4ac00f3ebd7d2760d2af5ff9f1cb40b44b8d0c7a46400a8f9"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "2059a7fbeabeb948fc884f79b40e5e287d732b492ba613b3ec2b6218ad37b222",
-      "after_sha256": "d160620a892759ff5d0bf026ad37759861f088aafca9b1d14c8084b69069f50f",
+      "before_sha256": "d160620a892759ff5d0bf026ad37759861f088aafca9b1d14c8084b69069f50f",
+      "after_sha256": "273c2dd806d8d76232c1d1bad0c7ed6b4f5cb0c900bbefb25decef6634e1a05e",
       "owners": {
         "@document": {
-          "before": "2059a7fbeabeb948fc884f79b40e5e287d732b492ba613b3ec2b6218ad37b222",
-          "after": "d160620a892759ff5d0bf026ad37759861f088aafca9b1d14c8084b69069f50f"
+          "before": "d160620a892759ff5d0bf026ad37759861f088aafca9b1d14c8084b69069f50f",
+          "after": "273c2dd806d8d76232c1d1bad0c7ed6b4f5cb0c900bbefb25decef6634e1a05e"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "1dc7c88d53ca5b487160257077dac7ae66726d58e57850ce489afe6a25500a44",
-      "after_sha256": "7577bb5d71ef9ca3709735d044d7e5e123ccd2f1b07a4d4e75035a4d2f4a413b",
+      "before_sha256": "7577bb5d71ef9ca3709735d044d7e5e123ccd2f1b07a4d4e75035a4d2f4a413b",
+      "after_sha256": "bb08c9fd88e7ec33070f9643b49f7ee29bf86fdd14ebf9ed83f6b8fe337aa1d9",
       "owners": {
         "@document": {
-          "before": "1dc7c88d53ca5b487160257077dac7ae66726d58e57850ce489afe6a25500a44",
-          "after": "7577bb5d71ef9ca3709735d044d7e5e123ccd2f1b07a4d4e75035a4d2f4a413b"
+          "before": "7577bb5d71ef9ca3709735d044d7e5e123ccd2f1b07a4d4e75035a4d2f4a413b",
+          "after": "bb08c9fd88e7ec33070f9643b49f7ee29bf86fdd14ebf9ed83f6b8fe337aa1d9"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "0b6f94812853b6474368b1f45e51a2883a6c10fa09c2d7d0fac99e9e365466af",
-      "after_sha256": "21bc28328436905ae3bb623d12d596cf695d3a5538b2f49b57ca252917ccf10b",
+      "before_sha256": "21bc28328436905ae3bb623d12d596cf695d3a5538b2f49b57ca252917ccf10b",
+      "after_sha256": "9dcadae8d07c64bd37b3d749479413ea1466b1744d6f0c1b9d16a8c9a2750cdc",
       "owners": {
         "@document": {
-          "before": "0b6f94812853b6474368b1f45e51a2883a6c10fa09c2d7d0fac99e9e365466af",
-          "after": "21bc28328436905ae3bb623d12d596cf695d3a5538b2f49b57ca252917ccf10b"
+          "before": "21bc28328436905ae3bb623d12d596cf695d3a5538b2f49b57ca252917ccf10b",
+          "after": "9dcadae8d07c64bd37b3d749479413ea1466b1744d6f0c1b9d16a8c9a2750cdc"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "fe1ec027c003a0b6a423b100d06762f8dc7c2b87cdc184c76be4ec39a2dad96c",
-      "after_sha256": "448ccd2dd807ec2cb6a9ae499c3abefba8ac0559a3b05fefcfecf9669b992128",
+      "before_sha256": "448ccd2dd807ec2cb6a9ae499c3abefba8ac0559a3b05fefcfecf9669b992128",
+      "after_sha256": "01439bc583096e09c03cdb11975a250c758f48a5d836681ab80fd2479f9db471",
       "owners": {
         "@document": {
-          "before": "fe1ec027c003a0b6a423b100d06762f8dc7c2b87cdc184c76be4ec39a2dad96c",
-          "after": "448ccd2dd807ec2cb6a9ae499c3abefba8ac0559a3b05fefcfecf9669b992128"
+          "before": "448ccd2dd807ec2cb6a9ae499c3abefba8ac0559a3b05fefcfecf9669b992128",
+          "after": "01439bc583096e09c03cdb11975a250c758f48a5d836681ab80fd2479f9db471"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "3c3e1818e49c33d95c6d6ee8e394cadfb570e9a117db86d9dd5fb867dae06c33",
-      "after_sha256": "f346bf62765022b04611006592204bbb1d6643a9df6dac52a071e03833bcf5d0",
+      "before_sha256": "f346bf62765022b04611006592204bbb1d6643a9df6dac52a071e03833bcf5d0",
+      "after_sha256": "3fb82f4f245cd9e58e6ab2b128b2afbdb47702a070808a9c287773d7f09b302c",
       "owners": {
         "@document": {
-          "before": "3c3e1818e49c33d95c6d6ee8e394cadfb570e9a117db86d9dd5fb867dae06c33",
-          "after": "f346bf62765022b04611006592204bbb1d6643a9df6dac52a071e03833bcf5d0"
+          "before": "f346bf62765022b04611006592204bbb1d6643a9df6dac52a071e03833bcf5d0",
+          "after": "3fb82f4f245cd9e58e6ab2b128b2afbdb47702a070808a9c287773d7f09b302c"
         }
       }
     },
-    "data/army_lists/monster-mash.json": {
+    "data/source_audits/ci64_provenance_v1/monster-mash-shooting-visibility-test-transition-v1.json": {
       "before_sha256": null,
-      "after_sha256": "d16a155571081197fd8d213421e968093aead18cee78ff2cdc9c1540fe365fd5",
+      "after_sha256": "4cdd4f407bd7e96e0f3ca446bc5faa005eb49ded60e9b409fe4a6bc06b3da631",
       "owners": {
         "@document": {
           "before": null,
-          "after": "d16a155571081197fd8d213421e968093aead18cee78ff2cdc9c1540fe365fd5"
+          "after": "4cdd4f407bd7e96e0f3ca446bc5faa005eb49ded60e9b409fe4a6bc06b3da631"
         }
       }
     },
-    "data/source_audits/ci64_provenance_v1/monster-mash-v995-test-addition-v1.json": {
+    "docs/DECISION_SUBMISSION_CATALOG.md": {
+      "before_sha256": "aac1ff538554c2d6c08ad85f4e80ac8122d27281f22b8382ed22e988abe3c9ec",
+      "after_sha256": "d1dfd0ac2b2024478d52aa418d4effeff2225a360808de9e96b83595caca9a79",
+      "owners": {
+        "@document": {
+          "before": "aac1ff538554c2d6c08ad85f4e80ac8122d27281f22b8382ed22e988abe3c9ec",
+          "after": "d1dfd0ac2b2024478d52aa418d4effeff2225a360808de9e96b83595caca9a79"
+        }
+      }
+    },
+    "docs/performance/current/monster-mash-shooting-movement.json": {
       "before_sha256": null,
-      "after_sha256": "2f17e1f6876138c519d6c15d9eb5729275b19b0be0ee9d89ecb60be6fd2c0f84",
+      "after_sha256": "b4cb4953caf3ab9a1b15ebdf8ffd0708c8e826532fd2c5160eed20c6db223246",
       "owners": {
         "@document": {
           "before": null,
-          "after": "2f17e1f6876138c519d6c15d9eb5729275b19b0be0ee9d89ecb60be6fd2c0f84"
+          "after": "b4cb4953caf3ab9a1b15ebdf8ffd0708c8e826532fd2c5160eed20c6db223246"
         }
       }
     },
-    "docs/AI_POLICY_INTERFACE.md": {
-      "before_sha256": "a4c6047dd495e630b10af9c6e6f8cea510c3a066556faa71a205b954d529d006",
-      "after_sha256": "11776bafdf82a081034709b3890c479db3b82a5c272893992d681705634a64a6",
+    "docs/performance/current/monster-mash-shooting-setup.json": {
+      "before_sha256": null,
+      "after_sha256": "acf79bbab0ae835e8c5ee69854ac7648943d198958b6fa99bc44a69b6a7d4a95",
       "owners": {
         "@document": {
-          "before": "a4c6047dd495e630b10af9c6e6f8cea510c3a066556faa71a205b954d529d006",
-          "after": "11776bafdf82a081034709b3890c479db3b82a5c272893992d681705634a64a6"
+          "before": null,
+          "after": "acf79bbab0ae835e8c5ee69854ac7648943d198958b6fa99bc44a69b6a7d4a95"
+        }
+      }
+    },
+    "docs/performance/current/monster-mash-shooting-visibility.json": {
+      "before_sha256": null,
+      "after_sha256": "b62b3ff904d3b7af09cc9a769dc4db9141e7d52e077a9ffd463016760bf2eac9",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "b62b3ff904d3b7af09cc9a769dc4db9141e7d52e077a9ffd463016760bf2eac9"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "641f0f9c9f1009797bb91e13583326dbed4cc252074dd410df29c1c479bc90dd",
-      "after_sha256": "1eae7de9a942689841ccac50281c8ad4cedf5eaaf0758ab89393810549ae26c7",
+      "before_sha256": "1eae7de9a942689841ccac50281c8ad4cedf5eaaf0758ab89393810549ae26c7",
+      "after_sha256": "a16156e87d0f3cb5a9050ee363c0b43d5c337d6b18c7501b4524621c6e9403be",
       "owners": {
         "@document": {
-          "before": "641f0f9c9f1009797bb91e13583326dbed4cc252074dd410df29c1c479bc90dd",
-          "after": "1eae7de9a942689841ccac50281c8ad4cedf5eaaf0758ab89393810549ae26c7"
+          "before": "1eae7de9a942689841ccac50281c8ad4cedf5eaaf0758ab89393810549ae26c7",
+          "after": "a16156e87d0f3cb5a9050ee363c0b43d5c337d6b18c7501b4524621c6e9403be"
         }
       }
     },
     "scripts/engine_numerical_identity_test_admission.py": {
-      "before_sha256": "2495415f1c683f2a954f1688e7307d507f5be193655b74c24f33c9ae0d816806",
-      "after_sha256": "c225f936341ffd71d69ea44ed20205ab222af1b1915957e458043f6d9c674d3a",
+      "before_sha256": "c225f936341ffd71d69ea44ed20205ab222af1b1915957e458043f6d9c674d3a",
+      "after_sha256": "28627f9371d3deb4e58a1dc01d1c6ded619072609278703e019a7530d74eac78",
       "owners": {
         "@module": {
-          "before": "5247f30447ebf4f93d7b8289fc8f00a033753cd05405c95d0bc0c039dbc7d70c",
-          "after": "88c529a4d08c92b16c10725f781ae220c5adbd4b2de3ef3e79a59253dc1365dc"
+          "before": "88c529a4d08c92b16c10725f781ae220c5adbd4b2de3ef3e79a59253dc1365dc",
+          "after": "bfe68f2045e02e67c68ba03747c028306771c0bcdd44bd51a28dd40fe8de92eb"
         },
-        "_monster_mash_addition": {
+        "_close_quarters_test_successor": {
+          "before": "803e87d9800e358a1874a3bd62048ac78df7767778323e9a49c6e589ee69ff73",
+          "after": "1b3a5a74251a485fc79ff8edfdc2853f58061ecea126304160ce77fe4e10a707"
+        },
+        "_shooting_visibility_successor": {
           "before": null,
-          "after": "836fc152ce07dcf0672d8021f1d2e03083556436f4c2cd944d94ffc74314212a"
+          "after": "fbd07ecfcbd7025e3b1020c71dc2dfe30631085059fb4fd915a6c53941061015"
         },
         "exact_movement_test_transition": {
-          "before": "c046d71d6993e54c4c52fd7aae7e101b3e2774367349ea42d4fe8581e8f98c54",
-          "after": "c4f77226d622d25d2266cfff7b618e6b9e07aa58a8bcfdd23ddcedb4a7a1543f"
+          "before": "c4f77226d622d25d2266cfff7b618e6b9e07aa58a8bcfdd23ddcedb4a7a1543f",
+          "after": "774980dfc2c29d959c56b2c71b136981ac5d909964b05a9a8bf34fe1a42d6e8e"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "d81e626a9787c7118e07ab216f7f2557972b26dc495384fb3f66b42c0bb1ff09",
-      "after_sha256": "4581d1a6857d75dfb25e11b0a3ef2112123a9e90584c8ca529b4cc656c4e1b7f",
+      "before_sha256": "4581d1a6857d75dfb25e11b0a3ef2112123a9e90584c8ca529b4cc656c4e1b7f",
+      "after_sha256": "403310765d15b3e37ad0f0899cb9ffcbe375e474035ae78a6ea71c4ce7389c9b",
       "owners": {
         "@document": {
-          "before": "d81e626a9787c7118e07ab216f7f2557972b26dc495384fb3f66b42c0bb1ff09",
-          "after": "4581d1a6857d75dfb25e11b0a3ef2112123a9e90584c8ca529b4cc656c4e1b7f"
+          "before": "4581d1a6857d75dfb25e11b0a3ef2112123a9e90584c8ca529b4cc656c4e1b7f",
+          "after": "403310765d15b3e37ad0f0899cb9ffcbe375e474035ae78a6ea71c4ce7389c9b"
         }
       }
     },
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/chaos_daemons_monster_mash_2026_11/__init__.py": {
-      "before_sha256": null,
-      "after_sha256": "a3bf70c7980adb004488e1e085b70ef8e25548d0a3a228819693c46b8ebb547d",
+    "src/warhammer40k_core/geometry/visibility_witnesses.py": {
+      "before_sha256": "7b447437c1a9dc7aa2a8331bbe9805e02ba100fb70898c9686d8eeb84c1d2d4d",
+      "after_sha256": "a1537c34b8a6682acee8a1028bbd29b3ea0c753443f98e957648fd27607092eb",
       "owners": {
-        "@module": {
-          "before": null,
-          "after": "a72a1e65dd81ee714b659d8586d9f600f103faaf4dd3cf00cffbd5bab798e401"
-        },
-        "MonsterMashCatalogError": {
-          "before": null,
-          "after": "b4488ba08aa029b928f5c31da28715348c5fb56bcd7659fde0c9c2f727058781"
-        },
-        "catalog_package": {
-          "before": null,
-          "after": "3b5ba80f60931e45dbb5c6ee3114c8bd3dbdb84dc728b242b80f909243ace765"
-        }
-      }
-    },
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/chaos_daemons_monster_mash_2026_11/artifacts/catalog.json": {
-      "before_sha256": null,
-      "after_sha256": "a990509b4ec88a69909aa673c12a40b54322d67730484539f5d22f1e27f0ae64",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "a990509b4ec88a69909aa673c12a40b54322d67730484539f5d22f1e27f0ae64"
-        }
-      }
-    },
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/chaos_daemons_monster_mash_2026_11/artifacts/geometry.json": {
-      "before_sha256": null,
-      "after_sha256": "e5292f8dc7c0e2961ed57a826e74ea684e114095fa20dee88e558d626930769e",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "e5292f8dc7c0e2961ed57a826e74ea684e114095fa20dee88e558d626930769e"
-        }
-      }
-    },
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/chaos_daemons_monster_mash_2026_11/artifacts/source-review.json": {
-      "before_sha256": null,
-      "after_sha256": "9af8967bc6c7900381fe639a6f3164ae1ba1ee8264811b046fc3ccda64366412",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "9af8967bc6c7900381fe639a6f3164ae1ba1ee8264811b046fc3ccda64366412"
+        "ellipse_facing_boundary_candidates": {
+          "before": "e0854fb23c876009027af81f678d6c4225fbc170086fcfa8ae6b438b3c0a448e",
+          "after": "a6321925b265ee3a43ce9eb67f70e7198f5ae197820d713af41d9b6824ede022"
         }
       }
     },
     "tests/code_quality/test_engine_numerical_identity_admission.py": {
-      "before_sha256": "f824f7b1315a4cc34e5155a0ddea80d0d2b660ee280d63132f73b7792bf60778",
-      "after_sha256": "16fb602a45c6af1f4b064e0db7cc2267a1b4f4e64ae65558d2bba5f1e87a51ee",
+      "before_sha256": "16fb602a45c6af1f4b064e0db7cc2267a1b4f4e64ae65558d2bba5f1e87a51ee",
+      "after_sha256": "b32f3a4165c38a1e76891342c71a5d6e03c2318c79a68446239c29563f576eaa",
       "owners": {
         "test_identity_inventory_uses_current_twelve_shards_and_native_cohort": {
-          "before": "ac287eb3e7ef906e4edec268d16b26cb1d65b888cef9acac290c59767409f5b7",
-          "after": "9109437f3ceb1567993cf24310153fa696c732fbf943aab41f0dc18ab69eefdb"
+          "before": "9109437f3ceb1567993cf24310153fa696c732fbf943aab41f0dc18ab69eefdb",
+          "after": "09dac1d6121ff3f73d635139fdaa49acfbd53baeea0eedc724113e594dc051fc"
         }
       }
     },
-    "tests/code_quality/test_ws12_generated_data_artifacts.py": {
-      "before_sha256": "fa4f094d73c08b236fc892c92614f48f2a7f62f8fb4cd9202ecf67a5af26e2c8",
-      "after_sha256": "6566e21fc91623be1309fb7230fe6707aa616a89a0c1db1d319e909722f104d0",
+    "tests/rules/section06/test_visibility.py": {
+      "before_sha256": "0a22103cc696bc714dc9cf20883ef70ff12fb12031e68431b99dc4a4f570eaed",
+      "after_sha256": "24824fa7af6421486ef5043cd39633f01e8665e29acca4ee6cb2222cd28d981d",
       "owners": {
-        "@module": {
-          "before": "1af657fffe2e0039df5f64408529cb25098158a51a0fa14ae9a778a961169863",
-          "after": "10343e9630f333e880e47ab7b0cb3875dc32f826c7b405de4e351fc36a940af7"
-        }
-      }
-    },
-    "tests/factions/chaos_daemons/integration/test_monster_mash_v995_roster.py": {
-      "before_sha256": null,
-      "after_sha256": "ea1f07773b522191ac0e55f7b3c56f8cef23035ccc7adf5fcb30d17201dd0999",
-      "owners": {
-        "@module": {
+        "_axis_aligned_ellipse_prism": {
           "before": null,
-          "after": "17e96c4d40b58e68c7edff363c1ccbf362179ce656962aa6979dbfc338e2d9b0"
+          "after": "b8ae76d71f946b84e7f5b92a61a94033ac84ee68f462e99b6bd60e629190eaa3"
         },
-        "_assert_monster_mash_export": {
+        "test_ellipse_facing_search_checks_base_edge_behind_low_models": {
           "before": null,
-          "after": "b1dc8f27551b1c8f76a321a701b319802f07bc858b66d3962c17f8b70a0c62b1"
+          "after": "491cff71252fb6cafb4bedb1b5c0006f7782c708bb0fca01a45bc4b3b467c1d9"
         },
-        "_assert_retained_cavalcade_rows_and_geometry": {
+        "test_ellipse_facing_search_checks_base_edge_with_multiple_terrain_walls": {
           "before": null,
-          "after": "afefd73c0a1ac79ae7c8989067a2f7cd86a9607f6f7b8b3c65d9ba8cb06d9336"
-        },
-        "test_exact_monster_mash_admission_deployment_and_replay": {
-          "before": null,
-          "after": "1516389cb56d23547a833a8781df3751872bf9a630f6fafafdfe678679a38a33"
-        }
-      }
-    },
-    "tests/support/monster_mash_v995.py": {
-      "before_sha256": null,
-      "after_sha256": "c294ca764360aa32e9ee42ce1d9f788cad3f0273ca5cdc525b5319e22368e5d6",
-      "owners": {
-        "@module": {
-          "before": null,
-          "after": "e8c8819e271e5ae30fc34f53fbfef80972194562e43aa32c4508411a4dfeea37"
-        },
-        "_submit_option": {
-          "before": null,
-          "after": "e26c28b4766aff5e9156d003c2d3812c14cfc96873aaa66d8927884cac008616"
-        },
-        "begin_staged_deployment": {
-          "before": null,
-          "after": "acc6ecda3c10777df1ccd726711b6ed98ac07166db852cd9ddab733d6c761831"
-        },
-        "monster_mash_vs_cavalcade_config": {
-          "before": null,
-          "after": "46dff585d82205be19a95e34431a1edfacc3b13a09c840433ae61f1fb3fe18a0"
-        }
-      }
-    },
-    "tools/generate_cavalcade_v995_catalog.py": {
-      "before_sha256": "f4eed2e0a778e264d3873bcdc2e63ea00417fef22d383dd10da7565f785b2c3b",
-      "after_sha256": "f34ce9e7170c648b5000773e639c262cc249dd47395a2c57aad2478eb1084364",
-      "owners": {
-        "_additional_catalog": {
-          "before": "4e70339ff624f7cb23c8d757b7e5dc814b01e518c0aa33336d20012eb4d35c78",
-          "after": null
-        },
-        "_promote": {
-          "before": "0574489ec2ef16634589a26aa9a39a9249ce567b9cc617ad25590d6b3b88dba4",
-          "after": "ba02317b366d6177f1638af5d2febbf9d08dcfe1e065181e1bd2e99f0d1f3bdb"
-        },
-        "build_catalog_package": {
-          "before": "60bc63f6ba26dd412f70aed1dd7bcd8017da9275fa8f9d9152069e327d8e8852",
-          "after": "bd47b8a130ff2bddb406f5cd68674476dc54f1a28efb8c4b1a124a57f6e6bfe1"
-        },
-        "build_reviewed_datasheets": {
-          "before": null,
-          "after": "3a6a7695dceb816b6ef613ee4aa3d9492c0615fae03be00e9b919a076e73dddf"
-        }
-      }
-    },
-    "tools/generate_monster_mash_v995_catalog.py": {
-      "before_sha256": null,
-      "after_sha256": "dae0a554992d894cd4240a28f64acdf8e7eae327a30059ebd64549c71b19c69b",
-      "owners": {
-        "@module": {
-          "before": null,
-          "after": "982c0f2d697f2c32a64e70fa2f3269b4e847d5429c35f2c1e2d716867a47e7a4"
-        },
-        "_check_base_evidence": {
-          "before": null,
-          "after": "413cb1e49d09885b0422bd60fbe3d1054e4346a7e659f8504f7bf7dafc9061dd"
-        },
-        "_current_ability_descriptions": {
-          "before": null,
-          "after": "edcc1c9300aa49544a1cb505eb3cce0e9e3b2e19d71130faa2a231cdb40897fa"
-        },
-        "_incursion_definitions": {
-          "before": null,
-          "after": "b5263f1df48079f2edb2e98dbaa199ec45501ec4aa3429df97582b3dfde5508a"
-        },
-        "_reviewed_heights": {
-          "before": null,
-          "after": "8b7a525a5b579a1cfae6c20711fde2ba64e46d7942343396025d0e59848e46b1"
-        },
-        "build_catalog_package": {
-          "before": null,
-          "after": "cf0d6605c2920bf5ddc99683b24cec41d07e6e2b821d23c0693d942a036b9fb9"
-        },
-        "main": {
-          "before": null,
-          "after": "71545da5d46b48309cb4bf7300cc9b6c07ffec2fd284b80e4803436f9e7f0a8a"
+          "after": "5141625fca46dfa1b493e988d131372ce7cddf53d4a7d1ed8703da3062a2a5aa"
         }
       }
     }
@@ -458,7 +352,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Regenerate twelve scheduling shards from the complete measured branch-covered profile.",
+      "rationale": "Authenticate the admitted regressions, fresh current build identity, and full covered workload without modifying the historical evidence.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -468,7 +362,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Regenerate twelve scheduling shards from the complete measured branch-covered profile.",
+      "rationale": "Authenticate the admitted regressions, fresh current build identity, and full covered workload without modifying the historical evidence.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -478,7 +372,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Regenerate twelve scheduling shards from the complete measured branch-covered profile.",
+      "rationale": "Authenticate the admitted regressions, fresh current build identity, and full covered workload without modifying the historical evidence.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -488,7 +382,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Regenerate twelve scheduling shards from the complete measured branch-covered profile.",
+      "rationale": "Authenticate the admitted regressions, fresh current build identity, and full covered workload without modifying the historical evidence.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -498,7 +392,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Regenerate twelve scheduling shards from the complete measured branch-covered profile.",
+      "rationale": "Authenticate the admitted regressions, fresh current build identity, and full covered workload without modifying the historical evidence.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -508,7 +402,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Regenerate twelve scheduling shards from the complete measured branch-covered profile.",
+      "rationale": "Authenticate the admitted regressions, fresh current build identity, and full covered workload without modifying the historical evidence.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -518,7 +412,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Regenerate twelve scheduling shards from the complete measured branch-covered profile.",
+      "rationale": "Authenticate the admitted regressions, fresh current build identity, and full covered workload without modifying the historical evidence.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -528,7 +422,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Regenerate twelve scheduling shards from the complete measured branch-covered profile.",
+      "rationale": "Authenticate the admitted regressions, fresh current build identity, and full covered workload without modifying the historical evidence.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -538,7 +432,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Regenerate twelve scheduling shards from the complete measured branch-covered profile.",
+      "rationale": "Authenticate the admitted regressions, fresh current build identity, and full covered workload without modifying the historical evidence.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -548,7 +442,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Regenerate twelve scheduling shards from the complete measured branch-covered profile.",
+      "rationale": "Authenticate the admitted regressions, fresh current build identity, and full covered workload without modifying the historical evidence.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -558,7 +452,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Regenerate twelve scheduling shards from the complete measured branch-covered profile.",
+      "rationale": "Authenticate the admitted regressions, fresh current build identity, and full covered workload without modifying the historical evidence.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -568,7 +462,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Regenerate twelve scheduling shards from the complete measured branch-covered profile.",
+      "rationale": "Authenticate the admitted regressions, fresh current build identity, and full covered workload without modifying the historical evidence.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -578,7 +472,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Regenerate twelve scheduling shards from the complete measured branch-covered profile.",
+      "rationale": "Authenticate the admitted regressions, fresh current build identity, and full covered workload without modifying the historical evidence.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -588,7 +482,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate external contract examples that expose the packaged build identity.",
+      "rationale": "Authenticate the admitted regressions, fresh current build identity, and full covered workload without modifying the historical evidence.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -598,7 +492,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate external contract examples that expose the packaged build identity.",
+      "rationale": "Authenticate the admitted regressions, fresh current build identity, and full covered workload without modifying the historical evidence.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -608,7 +502,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate external contract examples that expose the packaged build identity.",
+      "rationale": "Authenticate the admitted regressions, fresh current build identity, and full covered workload without modifying the historical evidence.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -618,7 +512,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate external contract examples that expose the packaged build identity.",
+      "rationale": "Authenticate the admitted regressions, fresh current build identity, and full covered workload without modifying the historical evidence.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -628,7 +522,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate external contract examples that expose the packaged build identity.",
+      "rationale": "Authenticate the admitted regressions, fresh current build identity, and full covered workload without modifying the historical evidence.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -638,7 +532,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate external contract examples that expose the packaged build identity.",
+      "rationale": "Authenticate the admitted regressions, fresh current build identity, and full covered workload without modifying the historical evidence.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -648,7 +542,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate external contract examples that expose the packaged build identity.",
+      "rationale": "Authenticate the admitted regressions, fresh current build identity, and full covered workload without modifying the historical evidence.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -658,35 +552,49 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate external contract examples that expose the packaged build identity.",
+      "rationale": "Authenticate the admitted regressions, fresh current build identity, and full covered workload without modifying the historical evidence.",
       "source_obligation": null,
       "unchanged_work": null
     },
-    "data/army_lists/monster-mash.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "monster-mash-v995-roster-admission"
-      ],
-      "selected_families": [],
-      "rationale": "Replay the ordinary mixed setup and validate the source-closed native roster, equipment and geometry.",
-      "source_obligation": "Reconcile the six selected datasheets, authorized base dimensions and Daemonic Incursion against the retained official source and October MFM.",
-      "unchanged_work": "Catalog decoding and normal setup, battle, geometry queries and replay decision algorithms use their existing paths."
-    },
-    "data/source_audits/ci64_provenance_v1/monster-mash-v995-test-addition-v1.json": {
+    "data/source_audits/ci64_provenance_v1/monster-mash-shooting-visibility-test-transition-v1.json": {
       "category": "measured_workload",
       "operations": [
-        "monster-mash-v995-roster-admission"
+        "engine-numerical-identity-admission"
       ],
       "selected_families": [],
-      "rationale": "Replay the ordinary mixed setup and validate the source-closed native roster, equipment and geometry.",
+      "rationale": "Authenticate the admitted regressions, fresh current build identity, and full covered workload without modifying the historical evidence.",
       "source_obligation": null,
       "unchanged_work": null
     },
-    "docs/AI_POLICY_INTERFACE.md": {
+    "docs/DECISION_SUBMISSION_CATALOG.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Document mixed setup handoff and record the reviewed roster admission operation owners.",
+      "rationale": "Distinguish eligibility to be selected from later declaration legality and document the existing no-attack outcome.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/performance/current/monster-mash-shooting-movement.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Bind the exact changed owners and record fresh matched measurements for the scoped visibility repair.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/performance/current/monster-mash-shooting-setup.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Bind the exact changed owners and record fresh matched measurements for the scoped visibility repair.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/performance/current/monster-mash-shooting-visibility.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Bind the exact changed owners and record fresh matched measurements for the scoped visibility repair.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -694,7 +602,7 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Document mixed setup handoff and record the reviewed roster admission operation owners.",
+      "rationale": "Bind the exact changed owners and record fresh matched measurements for the scoped visibility repair.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -702,13 +610,12 @@
       "category": "measured_workload",
       "operations": [
         "cavalcade-authority-admission",
-        "stage2-strict-replay-test-admission",
         "close-quarters-test-admission",
         "engine-numerical-identity-admission",
-        "monster-mash-v995-roster-admission"
+        "stage2-strict-replay-test-admission"
       ],
       "selected_families": [],
-      "rationale": "Replay the ordinary mixed setup and validate the source-closed native roster, equipment and geometry.",
+      "rationale": "Authenticate the admitted regressions, fresh current build identity, and full covered workload without modifying the historical evidence.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -718,49 +625,23 @@
         "cavalcade-authority-admission"
       ],
       "selected_families": [],
-      "rationale": "Bind the new versioned roster catalog and its provenance to packaged runtime identity.",
+      "rationale": "Authenticate the admitted regressions, fresh current build identity, and full covered workload without modifying the historical evidence.",
       "source_obligation": null,
       "unchanged_work": null
     },
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/chaos_daemons_monster_mash_2026_11/__init__.py": {
-      "category": "rule_semantics",
+    "src/warhammer40k_core/geometry/visibility_witnesses.py": {
+      "category": "algorithm_or_search",
       "operations": [
-        "monster-mash-v995-roster-admission"
+        "geometry-search"
       ],
-      "selected_families": [],
-      "rationale": "Replay the ordinary mixed setup and validate the source-closed native roster, equipment and geometry.",
-      "source_obligation": "Reconcile the six selected datasheets, authorized base dimensions and Daemonic Incursion against the retained official source and October MFM.",
-      "unchanged_work": "Catalog decoding and normal setup, battle, geometry queries and replay decision algorithms use their existing paths."
-    },
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/chaos_daemons_monster_mash_2026_11/artifacts/catalog.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "monster-mash-v995-roster-admission"
+      "selected_families": [
+        "movement",
+        "setup",
+        "visibility"
       ],
-      "selected_families": [],
-      "rationale": "Replay the ordinary mixed setup and validate the source-closed native roster, equipment and geometry.",
-      "source_obligation": "Reconcile the six selected datasheets, authorized base dimensions and Daemonic Incursion against the retained official source and October MFM.",
-      "unchanged_work": "Catalog decoding and normal setup, battle, geometry queries and replay decision algorithms use their existing paths."
-    },
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/chaos_daemons_monster_mash_2026_11/artifacts/geometry.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "monster-mash-v995-roster-admission"
-      ],
-      "selected_families": [],
-      "rationale": "Replay the ordinary mixed setup and validate the source-closed native roster, equipment and geometry.",
-      "source_obligation": "Reconcile the six selected datasheets, authorized base dimensions and Daemonic Incursion against the retained official source and October MFM.",
-      "unchanged_work": "Catalog decoding and normal setup, battle, geometry queries and replay decision algorithms use their existing paths."
-    },
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/chaos_daemons_monster_mash_2026_11/artifacts/source-review.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "monster-mash-v995-roster-admission"
-      ],
-      "selected_families": [],
-      "rationale": "Replay the ordinary mixed setup and validate the source-closed native roster, equipment and geometry.",
-      "source_obligation": "Reconcile the six selected datasheets, authorized base dimensions and Daemonic Incursion against the retained official source and October MFM.",
-      "unchanged_work": "Catalog decoding and normal setup, battle, geometry queries and replay decision algorithms use their existing paths."
+      "rationale": "Use bounded rational base-edge witnesses when proof search reaches the existing ellipse facing boundary. Exact LOS and cover predicates retain authority.",
+      "source_obligation": null,
+      "unchanged_work": null
     },
     "tests/code_quality/test_engine_numerical_identity_admission.py": {
       "category": "measured_workload",
@@ -768,62 +649,26 @@
         "engine-numerical-identity-admission"
       ],
       "selected_families": [],
-      "rationale": "Classify reviewed source packages and validate exact-source successor admission.",
+      "rationale": "Authenticate the admitted regressions, fresh current build identity, and full covered workload without modifying the historical evidence.",
       "source_obligation": null,
       "unchanged_work": null
     },
-    "tests/code_quality/test_ws12_generated_data_artifacts.py": {
+    "tests/rules/section06/test_visibility.py": {
       "category": "measured_workload",
       "operations": [
-        "supported-vyper-source-regression-controls"
+        "ellipse-facing-witness-regression"
       ],
       "selected_families": [],
-      "rationale": "Classify reviewed source packages and validate exact-source successor admission.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "tests/factions/chaos_daemons/integration/test_monster_mash_v995_roster.py": {
-      "category": "measured_workload",
-      "operations": [
-        "monster-mash-v995-roster-admission"
-      ],
-      "selected_families": [],
-      "rationale": "Replay the ordinary mixed setup and validate the source-closed native roster, equipment and geometry.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "tests/support/monster_mash_v995.py": {
-      "category": "measured_workload",
-      "operations": [
-        "monster-mash-v995-roster-admission"
-      ],
-      "selected_families": [],
-      "rationale": "Replay the ordinary mixed setup and validate the source-closed native roster, equipment and geometry.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "tools/generate_cavalcade_v995_catalog.py": {
-      "category": "measured_workload",
-      "operations": [
-        "monster-mash-v995-roster-admission"
-      ],
-      "selected_families": [],
-      "rationale": "Replay the ordinary mixed setup and validate the source-closed native roster, equipment and geometry.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "tools/generate_monster_mash_v995_catalog.py": {
-      "category": "measured_workload",
-      "operations": [
-        "monster-mash-v995-roster-admission"
-      ],
-      "selected_families": [],
-      "rationale": "Replay the ordinary mixed setup and validate the source-closed native roster, equipment and geometry.",
+      "rationale": "Authenticate the admitted regressions, fresh current build identity, and full covered workload without modifying the historical evidence.",
       "source_obligation": null,
       "unchanged_work": null
     }
   },
   "milestone": "ordinary",
-  "comparisons": {},
+  "comparisons": {
+    "visibility": "docs/performance/current/monster-mash-shooting-visibility.json",
+    "movement": "docs/performance/current/monster-mash-shooting-movement.json",
+    "setup": "docs/performance/current/monster-mash-shooting-setup.json"
+  },
   "full_game": null
 }
