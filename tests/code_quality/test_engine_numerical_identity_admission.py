@@ -268,7 +268,17 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
     assert movement["retained_runtime_fingerprint"] == opening["runtime_fingerprint"]
     monster_mash = _record(selection.MONSTER_MASH_ADDITION)
     assert monster_mash["retained_runtime_fingerprint"] == movement["runtime_fingerprint"]
-    assert _record(MANIFEST)["fingerprint"] == monster_mash["runtime_fingerprint"]
+    shooting_visibility = _record(selection.SHOOTING_VISIBILITY_TRANSITION)
+    shooting_base = json.loads(
+        subprocess.check_output(
+            ["git", "show", selection.SHOOTING_VISIBILITY_BASE + ":" + MANIFEST], cwd=ROOT
+        )
+    )
+    assert shooting_base["fingerprint"] == monster_mash["runtime_fingerprint"]
+    assert (
+        shooting_visibility["retained_runtime_fingerprint"] == monster_mash["runtime_fingerprint"]
+    )
+    assert _record(MANIFEST)["fingerprint"] == shooting_visibility["runtime_fingerprint"]
     monster_mash_owner = selection.MONSTER_MASH_OWNER
     assert monster_mash_owner in active_files
     assert sum(monster_mash_owner in group for group in groups) == 1
@@ -322,10 +332,31 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         assert (
             close_quarters["sources"][name]["before"] == hashlib.sha256(source_before).hexdigest()
         )
+        close_quarters_after = subprocess.check_output(
+            ["git", "show", selection.SHOOTING_VISIBILITY_BASE + ":" + name], cwd=ROOT
+        )
         assert (
             close_quarters["sources"][name]["after"]
-            == hashlib.sha256((ROOT / name).read_bytes()).hexdigest()
+            == hashlib.sha256(close_quarters_after).hexdigest()
         )
+        current_source_digest = hashlib.sha256((ROOT / name).read_bytes()).hexdigest()
+        if name == selection.SHOOTING_VISIBILITY_SOURCE:
+            assert (
+                shooting_visibility["source"]["before"] == close_quarters["sources"][name]["after"]
+            )
+            assert shooting_visibility["source"]["after"] == current_source_digest
+        else:
+            assert close_quarters["sources"][name]["after"] == current_source_digest
+    assert (
+        shooting_visibility["test"]["before"]
+        == close_quarters["test"][close_quarters_owner]["after"]
+    )
+    shooting_test_bytes = (ROOT / close_quarters_owner).read_bytes()
+    assert shooting_visibility["test"]["after"]["bytes"] == len(shooting_test_bytes)
+    assert (
+        shooting_visibility["test"]["after"]["sha256"]
+        == hashlib.sha256(shooting_test_bytes).hexdigest()
+    )
     shadow_owner = selection.ROUND_FIVE_SHADOW_OWNER
     assert (
         shadow["test"][shadow_owner]["before"]
@@ -451,6 +482,8 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         for name in (
             "test_ellipse_facing_search_proves_hidden_part_from_narrow_origin_cap",
             "test_ellipse_facing_search_leaves_unsupported_domains_to_existing_authority",
+            "test_ellipse_facing_search_checks_base_edge_behind_low_models",
+            "test_ellipse_facing_search_checks_base_edge_with_multiple_terrain_walls",
         )
     }
     allocation_cases = {

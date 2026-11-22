@@ -284,6 +284,14 @@ MONSTER_MASH_SOURCES = (
 )
 
 
+SHOOTING_VISIBILITY_TRANSITION = (
+    "data/source_audits/ci64_provenance_v1/monster-mash-shooting-visibility-test-transition-v1.json"
+)
+SHOOTING_VISIBILITY_SHA256 = "4cdd4f407bd7e96e0f3ca446bc5faa005eb49ded60e9b409fe4a6bc06b3da631"
+SHOOTING_VISIBILITY_BASE = "d1af6721e1f544898ce25ef7fdd611110b31b6fc"
+SHOOTING_VISIBILITY_SOURCE = "src/warhammer40k_core/geometry/visibility_witnesses.py"
+
+
 type SourceSuccessors = dict[str, dict[str, str]]
 type TestSuccessors = dict[str, dict[str, object]]
 
@@ -839,6 +847,11 @@ def exact_movement_test_transition(
             raise SystemExit("Round-five Shadow tests require the Cavalcade authority predecessor.")
         shadow = _round_five_shadow_successor(root, retained_cutover_sha256=retained_cutover_sha256)
         runtime = shadow[0]
+    shooting_visibility_path = root / SHOOTING_VISIBILITY_TRANSITION
+    _selection_no_links(root, shooting_visibility_path)
+    shooting_visibility = (
+        _shooting_visibility_successor(root) if shooting_visibility_path.exists() else None
+    )
     close_quarters_path = root / CLOSE_QUARTERS_TRANSITION
     _selection_no_links(root, close_quarters_path)
     close_quarters = None
@@ -846,7 +859,11 @@ def exact_movement_test_transition(
         if shadow is None:
             raise SystemExit("Close Quarters tests require the Round-five Shadow predecessor.")
         close_quarters = _close_quarters_test_successor(
-            root, retained_cutover_sha256=retained_cutover_sha256, predecessor_runtime=runtime
+            root,
+            retained_cutover_sha256=retained_cutover_sha256,
+            predecessor_runtime=runtime,
+            current_sources={} if shooting_visibility is None else shooting_visibility[2],
+            current_tests=None if shooting_visibility is None else shooting_visibility[3],
         )
         runtime = close_quarters[0]
     strict_replay_path = root / STRICT_REPLAY_TRANSITION
@@ -970,6 +987,10 @@ def exact_movement_test_transition(
             raise SystemExit("Monster Mash tests require the Opening Movement predecessor.")
         runtime, monster_mash_tests, monster_mash_raw = _monster_mash_addition(root, runtime)
         additions.update(monster_mash_tests)
+    if shooting_visibility is not None:
+        if monster_mash_raw is None or shooting_visibility[0] != runtime:
+            raise SystemExit("Shooting visibility requires the exact Monster Mash predecessor.")
+        runtime = shooting_visibility[1]
     retained = _identity_test_transition(
         root,
         retained_cutover_sha256,
@@ -1047,7 +1068,52 @@ def exact_movement_test_transition(
         raw += b"\0" + movement_raw
     if monster_mash_raw is not None:
         raw += b"\0" + monster_mash_raw
+    if shooting_visibility is not None:
+        updated.update(shooting_visibility[3])
+        raw += b"\0" + shooting_visibility[4]
     return updated, {**added, **additions}, retained_raw + b"\0" + raw
+
+
+def _shooting_visibility_successor(
+    root: Path,
+) -> tuple[str, str, SourceSuccessors, TestSuccessors, bytes]:
+    raw = _checked_bytes(root, SHOOTING_VISIBILITY_TRANSITION, SHOOTING_VISIBILITY_SHA256)
+    record = json.loads(raw, object_pairs_hook=_selection_object)
+    if (
+        record.keys()
+        != {
+            "schema",
+            "base",
+            "retained_close_quarters_sha256",
+            "retained_monster_mash_sha256",
+            "retained_runtime_fingerprint",
+            "runtime_fingerprint",
+            "source",
+            "test",
+        }
+        or record["schema"] != "finite-monster-mash-shooting-visibility-test-transition-v1"
+        or record["base"] != SHOOTING_VISIBILITY_BASE
+        or record["retained_close_quarters_sha256"] != CLOSE_QUARTERS_SHA256
+        or record["retained_monster_mash_sha256"] != MONSTER_MASH_SHA256
+        or set(record["source"]) != {"before", "after"}
+        or set(record["test"]) != {"before", "after"}
+    ):
+        raise SystemExit("Monster Mash Shooting visibility test transition differs.")
+    previous = json.loads(
+        _checked_bytes(root, CLOSE_QUARTERS_TRANSITION, CLOSE_QUARTERS_SHA256),
+        object_pairs_hook=_selection_object,
+    )
+    if record["test"]["before"] != previous["test"][CLOSE_QUARTERS_OWNER]["after"]:
+        raise SystemExit("Monster Mash Shooting visibility test predecessor differs.")
+    _checked_bytes(root, SHOOTING_VISIBILITY_SOURCE, record["source"]["after"])
+    members = _selection_members({CLOSE_QUARTERS_OWNER: record["test"]["after"]}, root)
+    return (
+        record["retained_runtime_fingerprint"],
+        record["runtime_fingerprint"],
+        {SHOOTING_VISIBILITY_SOURCE: record["source"]},
+        members,
+        raw,
+    )
 
 
 def _monster_mash_addition(
@@ -1156,7 +1222,12 @@ def _round_five_shadow_successor(
 
 
 def _close_quarters_test_successor(
-    root: Path, *, retained_cutover_sha256: str, predecessor_runtime: str
+    root: Path,
+    *,
+    retained_cutover_sha256: str,
+    predecessor_runtime: str,
+    current_sources: SourceSuccessors,
+    current_tests: TestSuccessors | None,
 ) -> tuple[str, TestSuccessors, bytes]:
     raw = _checked_bytes(root, CLOSE_QUARTERS_TRANSITION, CLOSE_QUARTERS_SHA256)
     record = json.loads(raw, object_pairs_hook=_selection_object)
@@ -1184,7 +1255,7 @@ def _close_quarters_test_successor(
             raise SystemExit(
                 "Close Quarters source transition requires exact before and after hashes."
             )
-        _checked_bytes(root, name, change["after"])
+        _retained_source(root, name, change["after"], current_sources)
     from scripts.build_test_shards import CUTOVER_PATH
 
     cutover = json.loads(
@@ -1197,7 +1268,7 @@ def _close_quarters_test_successor(
         or test["before"] != cutover["active_files"][CLOSE_QUARTERS_OWNER]
     ):
         raise SystemExit("Close Quarters test predecessor differs.")
-    members = _selection_members({CLOSE_QUARTERS_OWNER: test["after"]}, root)
+    members = _selection_members({CLOSE_QUARTERS_OWNER: test["after"]}, root, current=current_tests)
     return record["runtime_fingerprint"], members, raw
 
 

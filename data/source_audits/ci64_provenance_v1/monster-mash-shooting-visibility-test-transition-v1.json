@@ -1,0 +1,26 @@
+{
+  "schema": "finite-monster-mash-shooting-visibility-test-transition-v1",
+  "base": "d1af6721e1f544898ce25ef7fdd611110b31b6fc",
+  "retained_close_quarters_sha256": "12198bd19d8c8fc191525cee5499a579a1018a599590a31897551e8679527b91",
+  "retained_monster_mash_sha256": "2f17e1f6876138c519d6c15d9eb5729275b19b0be0ee9d89ecb60be6fd2c0f84",
+  "retained_runtime_fingerprint": "e5e0ccfa536375c25875dfb3ca261970dc5d8c2895aebe94b4c19cbed1aa7255",
+  "runtime_fingerprint": "3c883d7208521038f93c65528444109ba0a3a953ed15e3002b309028992af9b6",
+  "source": {
+    "before": "7b447437c1a9dc7aa2a8331bbe9805e02ba100fb70898c9686d8eeb84c1d2d4d",
+    "after": "a1537c34b8a6682acee8a1028bbd29b3ea0c753443f98e957648fd27607092eb"
+  },
+  "test": {
+    "before": {
+      "blob_sha1": "57e77f5c6aa7460a7f2ea8d64de13bf1e4ddd666",
+      "bytes": 28302,
+      "mode": "100644",
+      "sha256": "0a22103cc696bc714dc9cf20883ef70ff12fb12031e68431b99dc4a4f570eaed"
+    },
+    "after": {
+      "blob_sha1": "6483b3987817dfe52e95f4027a55b49b746702cc",
+      "bytes": 32677,
+      "mode": "100644",
+      "sha256": "24824fa7af6421486ef5043cd39633f01e8665e29acca4ee6cb2222cd28d981d"
+    }
+  }
+}

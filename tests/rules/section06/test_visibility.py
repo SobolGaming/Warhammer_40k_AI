@@ -695,3 +695,104 @@ def test_ellipse_facing_search_leaves_unsupported_domains_to_existing_authority(
         (origin, replace(destination, axes=((F(3), F(4)), (F(-4), F(3)))), (blocker,)),
     ):
         assert not tuple(ellipse_facing_boundary_candidates(source, target_domain, blockers))
+
+
+def _axis_aligned_ellipse_prism(
+    center: tuple[float, float], radii: tuple[float, float], height: float
+) -> VisibilityPrism:
+    from fractions import Fraction
+
+    from warhammer40k_core.geometry.visibility_exact import RationalEllipse
+
+    x, y = map(Fraction, center)
+    a, b = map(Fraction, radii)
+    zero = Fraction(0)
+    return VisibilityPrism(
+        RationalEllipse((x, y), (a, zero), (zero, b)),
+        zero,
+        Fraction(height),
+        (x - a, y - b, x + a, y + b),
+    )
+
+
+def test_ellipse_facing_search_checks_base_edge_behind_low_models() -> None:
+    from warhammer40k_core.geometry.continuous_visibility import resolve_visibility_pair_uncached
+    from warhammer40k_core.geometry.visibility_formulas import ModelDomain
+    from warhammer40k_core.geometry.visibility_witnesses import (
+        point_has_self_visible_origin,
+        self_visible_corridors_blocked,
+        target_part_candidates,
+    )
+
+    # The first blocked scalar query retained from the native #722 Shooting request.
+    observer = _axis_aligned_ellipse_prism(
+        (14.995707, 2.679047), (1.968503937007874, 1.968503937007874), 7
+    )
+    target = _axis_aligned_ellipse_prism(
+        (38.463346, 1.098071), (1.7716535433070868, 1.033464566929134), 2.75
+    )
+    seeker_radii = (1.1811023622047245, 0.6988188976377954)
+    blockers = (
+        _axis_aligned_ellipse_prism((24.467222999999997, 2.42563), seeker_radii, 2.952755905511811),
+        _axis_aligned_ellipse_prism(
+            (26.969427000000003, 2.42563), seeker_radii, 3.7401574803149606
+        ),
+        _axis_aligned_ellipse_prism(
+            (24.467222999999997, 3.9632680000000002), seeker_radii, 3.7401574803149606
+        ),
+        _axis_aligned_ellipse_prism(
+            (26.969427000000003, 3.9632680000000002), seeker_radii, 3.7401574803149606
+        ),
+    )
+    origin, destination = ModelDomain.from_prism(observer), ModelDomain.from_prism(target)
+    assert not any(
+        point_has_self_visible_origin(origin, destination, point)
+        and self_visible_corridors_blocked(observer, destination, point, blockers)
+        for point in target_part_candidates(origin, destination, blockers)
+    )
+
+    partial = resolve_visibility_pair_uncached(observer, target, blockers, blockers)
+    assert partial.model_visible
+    assert not partial.model_fully_visible
+    assert partial.full_visibility_proof == "hidden_target_part"
+    assert partial.hidden_target_part is not None
+    assert partial.hidden_target_part[2] == target.lower
+    assert point_has_self_visible_origin(origin, destination, partial.hidden_target_part)
+    assert self_visible_corridors_blocked(
+        observer, destination, partial.hidden_target_part, (blockers[3],)
+    )
+    assert partial.clear_corridor is not None
+    assert all(not blocker.intersects_corridor(*partial.clear_corridor) for blocker in blockers)
+
+
+def test_ellipse_facing_search_checks_base_edge_with_multiple_terrain_walls() -> None:
+    from warhammer40k_core.geometry.visibility_footprints import polygon_visibility_prism
+    from warhammer40k_core.geometry.visibility_formulas import ModelDomain
+    from warhammer40k_core.geometry.visibility_witnesses import (
+        ellipse_facing_boundary_candidates,
+        point_has_self_visible_origin,
+        self_visible_corridors_blocked,
+    )
+
+    observer = _axis_aligned_ellipse_prism(
+        (16.275775, 20.272137999999998), (1.968503937007874, 1.968503937007874), 6.299212598425197
+    )
+    target = _axis_aligned_ellipse_prism(
+        (24.467222999999997, 2.42563), (1.1811023622047245, 0.6988188976377954), 2.952755905511811
+    )
+    west = polygon_visibility_prism(
+        ((15.0, 14.0), (16.9, 14.0), (16.9, 16.4), (15.0, 16.4)), target.lower, observer.upper
+    )
+    east = polygon_visibility_prism(
+        ((23.0, 10.0), (24.0, 10.0), (24.0, 12.0), (23.0, 12.0)), target.lower, observer.upper
+    )
+
+    origin, destination = ModelDomain.from_prism(observer), ModelDomain.from_prism(target)
+    candidates = tuple(ellipse_facing_boundary_candidates(origin, destination, (east, west)))
+    assert candidates
+    assert all(point[2] == target.lower for point in candidates)
+    assert any(
+        point_has_self_visible_origin(origin, destination, point)
+        and self_visible_corridors_blocked(observer, destination, point, (west,))
+        for point in candidates
+    )

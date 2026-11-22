@@ -431,7 +431,10 @@
       "owners": [
         "_ellipse_facing_scene",
         "test_ellipse_facing_search_proves_hidden_part_from_narrow_origin_cap",
-        "test_ellipse_facing_search_leaves_unsupported_domains_to_existing_authority"
+        "test_ellipse_facing_search_leaves_unsupported_domains_to_existing_authority",
+        "_axis_aligned_ellipse_prism",
+        "test_ellipse_facing_search_checks_base_edge_behind_low_models",
+        "test_ellipse_facing_search_checks_base_edge_with_multiple_terrain_walls"
       ],
       "families": [],
       "sensitive": false,
@@ -36624,7 +36627,8 @@
         "data/source_audits/ci64_provenance_v1/stage2-counteroffensive-test-transition-v1.json",
         "data/source_audits/ci64_provenance_v1/stage2-melee-restore-test-transition-v1.json",
         "data/source_audits/ci64_provenance_v1/stage2-fight-reroll-test-transition-v1.json",
-        "data/source_audits/ci64_provenance_v1/terminal-restore-test-transition-v1.json"
+        "data/source_audits/ci64_provenance_v1/terminal-restore-test-transition-v1.json",
+        "data/source_audits/ci64_provenance_v1/monster-mash-shooting-visibility-test-transition-v1.json"
       ],
       "owners": [
         "*"

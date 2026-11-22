@@ -353,18 +353,34 @@ def ellipse_facing_boundary_candidates(
         and target.curved
         and not _circular_domain(target)
         and target.lower < target.upper
-        and len(blockers) == 1
     ):
         return
-    (blocker,) = blockers
-    if (
-        isinstance(blocker.footprint, RationalEllipse)
-        or blocker.lower > min(observer.lower, target.lower)
-        or blocker.upper < max(observer.upper, target.upper)
+    spanning_wall = any(
+        not isinstance(blocker.footprint, RationalEllipse)
+        and blocker.lower <= min(observer.lower, target.lower)
+        and blocker.upper >= max(observer.upper, target.upper)
+        for blocker in blockers
+    )
+    if len(blockers) == 1 and spanning_wall:
+        height = (target.lower + target.upper) / 2
+    elif (
+        observer.lower == target.lower
+        and observer.upper > target.upper
+        and (
+            spanning_wall
+            or any(
+                isinstance(blocker.footprint, RationalEllipse)
+                and blocker.lower <= target.lower < blocker.upper < observer.upper
+                for blocker in blockers
+            )
+        )
     ):
+        # The narrow visible-origin cap may admit elevated corridors while
+        # every ray to the corresponding ground-level target edge is blocked.
+        height = target.lower
+    else:
         return
 
-    height = (target.lower + target.upper) / 2
     parameters = sorted(_COARSE_ELLIPSE_PARAMETERS)
     for side in (-1, 1):
         facing = [
