@@ -101,6 +101,14 @@ def request_command_reroll_if_available(
     )
     if stratagem_window_declined_for_context(decisions=decisions, context=context):
         return None
+    if source_phase is BattlePhase.FIGHT:
+        from warhammer40k_core.engine.rule_trigger_runtime import (
+            record_destruction_before_fight_opportunity,
+        )
+
+        # A preceding attack can destroy a model in the same continuation.
+        # Record its occurrence before capturing the decision's event boundary.
+        record_destruction_before_fight_opportunity(state=state, decisions=decisions)
     options = stratagem_use_options_for_handler_from_index(
         state=state,
         index=stratagem_index,

@@ -278,7 +278,27 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
     assert (
         shooting_visibility["retained_runtime_fingerprint"] == monster_mash["runtime_fingerprint"]
     )
-    assert _record(MANIFEST)["fingerprint"] == shooting_visibility["runtime_fingerprint"]
+    fight_reroll = _record(selection.MONSTER_MASH_FIGHT_REROLL_TRANSITION)
+    fight_reroll_base = json.loads(
+        subprocess.check_output(
+            ["git", "show", selection.MONSTER_MASH_FIGHT_REROLL_BASE + ":" + MANIFEST], cwd=ROOT
+        )
+    )
+    assert fight_reroll_base["fingerprint"] == shooting_visibility["runtime_fingerprint"]
+    assert fight_reroll["retained_runtime_fingerprint"] == fight_reroll_base["fingerprint"]
+    assert _record(MANIFEST)["fingerprint"] == fight_reroll["runtime_fingerprint"]
+    for source in selection.MONSTER_MASH_FIGHT_REROLL_SOURCES:
+        source_before = subprocess.check_output(
+            ["git", "show", selection.MONSTER_MASH_FIGHT_REROLL_BASE + ":" + source], cwd=ROOT
+        )
+        assert fight_reroll["source"][source]["before"] == hashlib.sha256(source_before).hexdigest()
+        assert (
+            fight_reroll["source"][source]["after"]
+            == hashlib.sha256((ROOT / source).read_bytes()).hexdigest()
+        )
+    fight_reroll_owner = selection.MONSTER_MASH_FIGHT_REROLL_OWNER
+    assert fight_reroll_owner in active_files
+    assert sum(fight_reroll_owner in group for group in groups) == 1
     monster_mash_owner = selection.MONSTER_MASH_OWNER
     assert monster_mash_owner in active_files
     assert sum(monster_mash_owner in group for group in groups) == 1
@@ -512,6 +532,12 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         | shadow_cases
         | close_quarters_cases
         | allocation_cases
+        | {
+            fight_reroll_owner
+            + "::test_fight_damage_reroll_stays_fresh_after_previous_attack_destroys_model"
+            + f"[{reroll}]"
+            for reroll in (False, True)
+        }
         | {cover_owner + "::test_save_cover_cache_key_projects_embedded_request_reference"}
         | {opening_owner + "::test_opening_shadow_form_policy_reaches_native_movement"}
         | {movement_owner + "::test_opening_movement_selects_an_issued_unit_before_any_action"}

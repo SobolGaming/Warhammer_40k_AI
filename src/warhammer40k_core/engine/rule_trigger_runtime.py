@@ -1,6 +1,8 @@
 from __future__ import annotations
 
-from collections.abc import Callable
+from collections.abc import Callable, Generator
+from contextlib import contextmanager
+from contextvars import ContextVar
 from functools import partial
 from typing import TYPE_CHECKING, cast
 
@@ -347,6 +349,34 @@ def _loaded_move_reactions(
         cost_modifiers=bundle.stratagem_cost_modifier_registry,
     )
     return (*bundle.move_completion_rule_registry.candidates_for(context), *reactions)
+
+
+_loaded_destruction_runtime: ContextVar[
+    tuple[DecisionController, Callable[[], RuntimeContentBundle]] | None
+] = ContextVar("loaded_destruction_runtime", default=None)
+
+
+@contextmanager
+def use_loaded_destruction_runtime(
+    *,
+    decisions: DecisionController,
+    runtime_bundle_provider: Callable[[], RuntimeContentBundle],
+) -> Generator[None]:
+    token = _loaded_destruction_runtime.set((decisions, runtime_bundle_provider))
+    try:
+        yield
+    finally:
+        _loaded_destruction_runtime.reset(token)
+
+
+def record_destruction_before_fight_opportunity(
+    *, state: GameState, decisions: DecisionController
+) -> None:
+    runtime = _loaded_destruction_runtime.get()
+    if runtime is not None and runtime[0] is decisions:
+        record_loaded_model_destruction_occurrences(
+            state=state, decisions=decisions, runtime_bundle_provider=runtime[1]
+        )
 
 
 def record_loaded_model_destruction_occurrences(

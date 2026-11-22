@@ -1,488 +1,236 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "d1af6721e1f544898ce25ef7fdd611110b31b6fc",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:3c883d7208521038f93c65528444109ba0a3a953ed15e3002b309028992af9b6",
-  "operation_map_sha256": "9bd348c32f4570a0608710ff669e69007f102526a01ce7b6e90af055b1b194b9",
+  "base": "0b8eb690cc0b5e3b724c3e3e8fb754f72fcc6330",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:9afdfab78d011964bb19d68fee1e0eac7fad0bc34d6c150e4f59e82851c3f33c",
+  "operation_map_sha256": "fcb34bc73dabbfb6832ba43d4fddfb15f8091e792ea28af19f9ff3c384dac3c7",
   "changes": {
-    "ci/test_shards/durations.json": {
-      "before_sha256": "881748564e42b707210fe14aa2374222a4adc4872e1720984d429a9afe4cf0b7",
-      "after_sha256": "ab65e89ea57fb93880f56fc2a98e50d8fed81eda03683c83606aaefefca34ced",
-      "owners": {
-        "@document": {
-          "before": "881748564e42b707210fe14aa2374222a4adc4872e1720984d429a9afe4cf0b7",
-          "after": "ab65e89ea57fb93880f56fc2a98e50d8fed81eda03683c83606aaefefca34ced"
-        }
-      }
-    },
-    "ci/test_shards/shard-1.txt": {
-      "before_sha256": "0160c365a84fcb504d9c75de94191ba58fae6bd0c08004e82f78a5267f8d4d06",
-      "after_sha256": "d178e2b1a8bace7bc14c58396fd5a9a1bdf0dca47d20934968f4e7d50f6ced68",
-      "owners": {
-        "@document": {
-          "before": "0160c365a84fcb504d9c75de94191ba58fae6bd0c08004e82f78a5267f8d4d06",
-          "after": "d178e2b1a8bace7bc14c58396fd5a9a1bdf0dca47d20934968f4e7d50f6ced68"
-        }
-      }
-    },
-    "ci/test_shards/shard-10.txt": {
-      "before_sha256": "1ba71f9244fb7ee1095c7022ad67e5ff026227901f38de062e00bcc92d0ed009",
-      "after_sha256": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20",
-      "owners": {
-        "@document": {
-          "before": "1ba71f9244fb7ee1095c7022ad67e5ff026227901f38de062e00bcc92d0ed009",
-          "after": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20"
-        }
-      }
-    },
-    "ci/test_shards/shard-11.txt": {
-      "before_sha256": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20",
-      "after_sha256": "76ea4757054e583768b45fd1a7887e65fd5a31759febdfa94928e73a92342276",
-      "owners": {
-        "@document": {
-          "before": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20",
-          "after": "76ea4757054e583768b45fd1a7887e65fd5a31759febdfa94928e73a92342276"
-        }
-      }
-    },
-    "ci/test_shards/shard-12.txt": {
-      "before_sha256": "684633f5047b3f18d69996072d1aa5d8e71a6018b22e2dd462bac4172ca179de",
-      "after_sha256": "2fecc0acb7f66655d8167ed2fd5e3fbc71d8cd09306d02bb5ecf2861ac8c46f1",
-      "owners": {
-        "@document": {
-          "before": "684633f5047b3f18d69996072d1aa5d8e71a6018b22e2dd462bac4172ca179de",
-          "after": "2fecc0acb7f66655d8167ed2fd5e3fbc71d8cd09306d02bb5ecf2861ac8c46f1"
-        }
-      }
-    },
-    "ci/test_shards/shard-2.txt": {
-      "before_sha256": "6b86753bc716c3629aa3a0cbd296463009602287e242cdda7c4a6d2a8b0227bd",
-      "after_sha256": "934ef4ae3b3b54dffdffd6e488ff0c0ff53a5885a120bf906a60a591e74aa267",
-      "owners": {
-        "@document": {
-          "before": "6b86753bc716c3629aa3a0cbd296463009602287e242cdda7c4a6d2a8b0227bd",
-          "after": "934ef4ae3b3b54dffdffd6e488ff0c0ff53a5885a120bf906a60a591e74aa267"
-        }
-      }
-    },
-    "ci/test_shards/shard-3.txt": {
-      "before_sha256": "77d90cb56a044dc333e8ca41cb5b11fddf143d6152398b5e5b53195ddf55495d",
-      "after_sha256": "2a770c3d03108e1d5162ed5a0fdcd81c77b66d3fcc9e02d605290c98ea5fc407",
-      "owners": {
-        "@document": {
-          "before": "77d90cb56a044dc333e8ca41cb5b11fddf143d6152398b5e5b53195ddf55495d",
-          "after": "2a770c3d03108e1d5162ed5a0fdcd81c77b66d3fcc9e02d605290c98ea5fc407"
-        }
-      }
-    },
-    "ci/test_shards/shard-4.txt": {
-      "before_sha256": "38827653ec6193c7cdced52f65b3c24390acac4d2efb1236846e40f488b9cbdd",
-      "after_sha256": "0bebf14d779ba171d17a66704029798575c0aef2e92379463371a012092bd4a6",
-      "owners": {
-        "@document": {
-          "before": "38827653ec6193c7cdced52f65b3c24390acac4d2efb1236846e40f488b9cbdd",
-          "after": "0bebf14d779ba171d17a66704029798575c0aef2e92379463371a012092bd4a6"
-        }
-      }
-    },
-    "ci/test_shards/shard-5.txt": {
-      "before_sha256": "f245c806705508140668a392b9151d5514effef94bae9f876fab5d377db1403d",
-      "after_sha256": "bc86f3642d37d12cd14d4bfea3a1cd11754c3fd62980792c78c1eebadb7073fb",
-      "owners": {
-        "@document": {
-          "before": "f245c806705508140668a392b9151d5514effef94bae9f876fab5d377db1403d",
-          "after": "bc86f3642d37d12cd14d4bfea3a1cd11754c3fd62980792c78c1eebadb7073fb"
-        }
-      }
-    },
-    "ci/test_shards/shard-6.txt": {
-      "before_sha256": "c03fb194fb54fe481aa90dfa0cc5053b6c85e6395520763c2a1b9e8b68d27504",
-      "after_sha256": "738801e98d644049e7f0c7302e85e8c8ca555a28a63be86ed78e9b19ae42748c",
-      "owners": {
-        "@document": {
-          "before": "c03fb194fb54fe481aa90dfa0cc5053b6c85e6395520763c2a1b9e8b68d27504",
-          "after": "738801e98d644049e7f0c7302e85e8c8ca555a28a63be86ed78e9b19ae42748c"
-        }
-      }
-    },
-    "ci/test_shards/shard-7.txt": {
-      "before_sha256": "5849b8991abbe1b798d39847670ca00cc6a667bee7858f87bf45b3efe57a2d8e",
-      "after_sha256": "11da7c060430b5b60b37e34d02ded670f67ae69b5584f0a8f516bde94984740d",
-      "owners": {
-        "@document": {
-          "before": "5849b8991abbe1b798d39847670ca00cc6a667bee7858f87bf45b3efe57a2d8e",
-          "after": "11da7c060430b5b60b37e34d02ded670f67ae69b5584f0a8f516bde94984740d"
-        }
-      }
-    },
-    "ci/test_shards/shard-8.txt": {
-      "before_sha256": "777e1f9c5f43fb4c1239bcce0b7bc2cce421b0ebaf606781de7fda7369dbdd9b",
-      "after_sha256": "ef409bf2b81164e8a8deb7c5a4082c795af1c77fb960c23c92fcfd5c5c5f59b1",
-      "owners": {
-        "@document": {
-          "before": "777e1f9c5f43fb4c1239bcce0b7bc2cce421b0ebaf606781de7fda7369dbdd9b",
-          "after": "ef409bf2b81164e8a8deb7c5a4082c795af1c77fb960c23c92fcfd5c5c5f59b1"
-        }
-      }
-    },
-    "ci/test_shards/shard-9.txt": {
-      "before_sha256": "b83cec4a5c79ab2dc43a772cce6f62b059abf83231133a996eb0e2c129e92279",
-      "after_sha256": "a5703a7ed77101b3222a256c3e221b34583c2e26a77d601007d5053177d41c9b",
-      "owners": {
-        "@document": {
-          "before": "b83cec4a5c79ab2dc43a772cce6f62b059abf83231133a996eb0e2c129e92279",
-          "after": "a5703a7ed77101b3222a256c3e221b34583c2e26a77d601007d5053177d41c9b"
-        }
-      }
-    },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "9722ad557d2c7676c9f836b34498958ad8668aa1cffead5cc307249355e27025",
-      "after_sha256": "0311e38a99526eb07a879e424586c1a5f6c3cae0bd4ada7b1c1914f0ec94f1fc",
+      "before_sha256": "0311e38a99526eb07a879e424586c1a5f6c3cae0bd4ada7b1c1914f0ec94f1fc",
+      "after_sha256": "ab014b6aea30d55b791bb8ec51ac372caeac5fa81fd6cc78ec25e1e2f3433d13",
       "owners": {
         "@document": {
-          "before": "9722ad557d2c7676c9f836b34498958ad8668aa1cffead5cc307249355e27025",
-          "after": "0311e38a99526eb07a879e424586c1a5f6c3cae0bd4ada7b1c1914f0ec94f1fc"
+          "before": "0311e38a99526eb07a879e424586c1a5f6c3cae0bd4ada7b1c1914f0ec94f1fc",
+          "after": "ab014b6aea30d55b791bb8ec51ac372caeac5fa81fd6cc78ec25e1e2f3433d13"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "dba0d11db2b942296f82bdc78601be468133013a20912fdad85982bb05a9b2f2",
-      "after_sha256": "bc9a237af973e6710657468cc0b36064e63a46c746d3a0574787d53fc8e3ca25",
+      "before_sha256": "bc9a237af973e6710657468cc0b36064e63a46c746d3a0574787d53fc8e3ca25",
+      "after_sha256": "b947bdb60c02fd5ad91d97e0b6b8ea5dfe0ca30771a490aacdeeae5d38341853",
       "owners": {
         "@document": {
-          "before": "dba0d11db2b942296f82bdc78601be468133013a20912fdad85982bb05a9b2f2",
-          "after": "bc9a237af973e6710657468cc0b36064e63a46c746d3a0574787d53fc8e3ca25"
+          "before": "bc9a237af973e6710657468cc0b36064e63a46c746d3a0574787d53fc8e3ca25",
+          "after": "b947bdb60c02fd5ad91d97e0b6b8ea5dfe0ca30771a490aacdeeae5d38341853"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "7875b86caeb2e2dbf4de4c518767d51315d2455133892be01ee42a3305a338f6",
-      "after_sha256": "6037ff8211eee3f4ac00f3ebd7d2760d2af5ff9f1cb40b44b8d0c7a46400a8f9",
+      "before_sha256": "6037ff8211eee3f4ac00f3ebd7d2760d2af5ff9f1cb40b44b8d0c7a46400a8f9",
+      "after_sha256": "072d9387b1c57f1b2875f5249a2e8c2aa9c485d36e0e602f6dadbceda8212f7d",
       "owners": {
         "@document": {
-          "before": "7875b86caeb2e2dbf4de4c518767d51315d2455133892be01ee42a3305a338f6",
-          "after": "6037ff8211eee3f4ac00f3ebd7d2760d2af5ff9f1cb40b44b8d0c7a46400a8f9"
+          "before": "6037ff8211eee3f4ac00f3ebd7d2760d2af5ff9f1cb40b44b8d0c7a46400a8f9",
+          "after": "072d9387b1c57f1b2875f5249a2e8c2aa9c485d36e0e602f6dadbceda8212f7d"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "d160620a892759ff5d0bf026ad37759861f088aafca9b1d14c8084b69069f50f",
-      "after_sha256": "273c2dd806d8d76232c1d1bad0c7ed6b4f5cb0c900bbefb25decef6634e1a05e",
+      "before_sha256": "273c2dd806d8d76232c1d1bad0c7ed6b4f5cb0c900bbefb25decef6634e1a05e",
+      "after_sha256": "af1b81c0a0f4875aa64b361e8c8e7e7a7b4bd95f4c500847716e6c93961659a5",
       "owners": {
         "@document": {
-          "before": "d160620a892759ff5d0bf026ad37759861f088aafca9b1d14c8084b69069f50f",
-          "after": "273c2dd806d8d76232c1d1bad0c7ed6b4f5cb0c900bbefb25decef6634e1a05e"
+          "before": "273c2dd806d8d76232c1d1bad0c7ed6b4f5cb0c900bbefb25decef6634e1a05e",
+          "after": "af1b81c0a0f4875aa64b361e8c8e7e7a7b4bd95f4c500847716e6c93961659a5"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "7577bb5d71ef9ca3709735d044d7e5e123ccd2f1b07a4d4e75035a4d2f4a413b",
-      "after_sha256": "bb08c9fd88e7ec33070f9643b49f7ee29bf86fdd14ebf9ed83f6b8fe337aa1d9",
+      "before_sha256": "bb08c9fd88e7ec33070f9643b49f7ee29bf86fdd14ebf9ed83f6b8fe337aa1d9",
+      "after_sha256": "2f5751389b14c0d9f48b3bac5047fd069ad0c4375a791c3283f065ac1b78f58e",
       "owners": {
         "@document": {
-          "before": "7577bb5d71ef9ca3709735d044d7e5e123ccd2f1b07a4d4e75035a4d2f4a413b",
-          "after": "bb08c9fd88e7ec33070f9643b49f7ee29bf86fdd14ebf9ed83f6b8fe337aa1d9"
+          "before": "bb08c9fd88e7ec33070f9643b49f7ee29bf86fdd14ebf9ed83f6b8fe337aa1d9",
+          "after": "2f5751389b14c0d9f48b3bac5047fd069ad0c4375a791c3283f065ac1b78f58e"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "21bc28328436905ae3bb623d12d596cf695d3a5538b2f49b57ca252917ccf10b",
-      "after_sha256": "9dcadae8d07c64bd37b3d749479413ea1466b1744d6f0c1b9d16a8c9a2750cdc",
+      "before_sha256": "9dcadae8d07c64bd37b3d749479413ea1466b1744d6f0c1b9d16a8c9a2750cdc",
+      "after_sha256": "9745c40e54c42058aa2d00ab86b3ae6c4c47f534fa5a0616c6a371b4ce785b56",
       "owners": {
         "@document": {
-          "before": "21bc28328436905ae3bb623d12d596cf695d3a5538b2f49b57ca252917ccf10b",
-          "after": "9dcadae8d07c64bd37b3d749479413ea1466b1744d6f0c1b9d16a8c9a2750cdc"
+          "before": "9dcadae8d07c64bd37b3d749479413ea1466b1744d6f0c1b9d16a8c9a2750cdc",
+          "after": "9745c40e54c42058aa2d00ab86b3ae6c4c47f534fa5a0616c6a371b4ce785b56"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "448ccd2dd807ec2cb6a9ae499c3abefba8ac0559a3b05fefcfecf9669b992128",
-      "after_sha256": "01439bc583096e09c03cdb11975a250c758f48a5d836681ab80fd2479f9db471",
+      "before_sha256": "01439bc583096e09c03cdb11975a250c758f48a5d836681ab80fd2479f9db471",
+      "after_sha256": "776e7373c68b936b1f44eaa9e0f9339bf0443b86189932b487fcff2bde22ed6f",
       "owners": {
         "@document": {
-          "before": "448ccd2dd807ec2cb6a9ae499c3abefba8ac0559a3b05fefcfecf9669b992128",
-          "after": "01439bc583096e09c03cdb11975a250c758f48a5d836681ab80fd2479f9db471"
+          "before": "01439bc583096e09c03cdb11975a250c758f48a5d836681ab80fd2479f9db471",
+          "after": "776e7373c68b936b1f44eaa9e0f9339bf0443b86189932b487fcff2bde22ed6f"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "f346bf62765022b04611006592204bbb1d6643a9df6dac52a071e03833bcf5d0",
-      "after_sha256": "3fb82f4f245cd9e58e6ab2b128b2afbdb47702a070808a9c287773d7f09b302c",
+      "before_sha256": "3fb82f4f245cd9e58e6ab2b128b2afbdb47702a070808a9c287773d7f09b302c",
+      "after_sha256": "9389cd0792e68c52c6473c770ee120f26bce08df4205a6e816f722017ec0737f",
       "owners": {
         "@document": {
-          "before": "f346bf62765022b04611006592204bbb1d6643a9df6dac52a071e03833bcf5d0",
-          "after": "3fb82f4f245cd9e58e6ab2b128b2afbdb47702a070808a9c287773d7f09b302c"
+          "before": "3fb82f4f245cd9e58e6ab2b128b2afbdb47702a070808a9c287773d7f09b302c",
+          "after": "9389cd0792e68c52c6473c770ee120f26bce08df4205a6e816f722017ec0737f"
         }
       }
     },
-    "data/source_audits/ci64_provenance_v1/monster-mash-shooting-visibility-test-transition-v1.json": {
+    "data/source_audits/ci64_provenance_v1/monster-mash-fight-reroll-test-transition-v1.json": {
       "before_sha256": null,
-      "after_sha256": "4cdd4f407bd7e96e0f3ca446bc5faa005eb49ded60e9b409fe4a6bc06b3da631",
+      "after_sha256": "16308a5deeb04ef4bf0c4edeb33ea23086b1d16a14b8db3ad0a3ac14ed5737fd",
       "owners": {
         "@document": {
           "before": null,
-          "after": "4cdd4f407bd7e96e0f3ca446bc5faa005eb49ded60e9b409fe4a6bc06b3da631"
+          "after": "16308a5deeb04ef4bf0c4edeb33ea23086b1d16a14b8db3ad0a3ac14ed5737fd"
         }
       }
     },
-    "docs/DECISION_SUBMISSION_CATALOG.md": {
-      "before_sha256": "aac1ff538554c2d6c08ad85f4e80ac8122d27281f22b8382ed22e988abe3c9ec",
-      "after_sha256": "d1dfd0ac2b2024478d52aa418d4effeff2225a360808de9e96b83595caca9a79",
-      "owners": {
-        "@document": {
-          "before": "aac1ff538554c2d6c08ad85f4e80ac8122d27281f22b8382ed22e988abe3c9ec",
-          "after": "d1dfd0ac2b2024478d52aa418d4effeff2225a360808de9e96b83595caca9a79"
-        }
-      }
-    },
-    "docs/performance/current/monster-mash-shooting-movement.json": {
+    "docs/performance/current/monster-mash-fight-reroll-dice-sustained.json": {
       "before_sha256": null,
-      "after_sha256": "b4cb4953caf3ab9a1b15ebdf8ffd0708c8e826532fd2c5160eed20c6db223246",
+      "after_sha256": "6641303393765337c1c3951934fe1f828e82e16cae69a21a9bd0038012c59130",
       "owners": {
         "@document": {
           "before": null,
-          "after": "b4cb4953caf3ab9a1b15ebdf8ffd0708c8e826532fd2c5160eed20c6db223246"
+          "after": "6641303393765337c1c3951934fe1f828e82e16cae69a21a9bd0038012c59130"
         }
       }
     },
-    "docs/performance/current/monster-mash-shooting-setup.json": {
+    "docs/performance/current/monster-mash-fight-reroll-dice.json": {
       "before_sha256": null,
-      "after_sha256": "acf79bbab0ae835e8c5ee69854ac7648943d198958b6fa99bc44a69b6a7d4a95",
+      "after_sha256": "7f7577245eca572594b64ab1c60103588229023b31dbb0d9cd03c3741f867eb1",
       "owners": {
         "@document": {
           "before": null,
-          "after": "acf79bbab0ae835e8c5ee69854ac7648943d198958b6fa99bc44a69b6a7d4a95"
-        }
-      }
-    },
-    "docs/performance/current/monster-mash-shooting-visibility.json": {
-      "before_sha256": null,
-      "after_sha256": "b62b3ff904d3b7af09cc9a769dc4db9141e7d52e077a9ffd463016760bf2eac9",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "b62b3ff904d3b7af09cc9a769dc4db9141e7d52e077a9ffd463016760bf2eac9"
+          "after": "7f7577245eca572594b64ab1c60103588229023b31dbb0d9cd03c3741f867eb1"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "1eae7de9a942689841ccac50281c8ad4cedf5eaaf0758ab89393810549ae26c7",
-      "after_sha256": "a16156e87d0f3cb5a9050ee363c0b43d5c337d6b18c7501b4524621c6e9403be",
+      "before_sha256": "a16156e87d0f3cb5a9050ee363c0b43d5c337d6b18c7501b4524621c6e9403be",
+      "after_sha256": "417bcbc2b073e43ee8e2999f53261364253efa278d216f3d928354a09f60540d",
       "owners": {
         "@document": {
-          "before": "1eae7de9a942689841ccac50281c8ad4cedf5eaaf0758ab89393810549ae26c7",
-          "after": "a16156e87d0f3cb5a9050ee363c0b43d5c337d6b18c7501b4524621c6e9403be"
+          "before": "a16156e87d0f3cb5a9050ee363c0b43d5c337d6b18c7501b4524621c6e9403be",
+          "after": "417bcbc2b073e43ee8e2999f53261364253efa278d216f3d928354a09f60540d"
         }
       }
     },
     "scripts/engine_numerical_identity_test_admission.py": {
-      "before_sha256": "c225f936341ffd71d69ea44ed20205ab222af1b1915957e458043f6d9c674d3a",
-      "after_sha256": "28627f9371d3deb4e58a1dc01d1c6ded619072609278703e019a7530d74eac78",
+      "before_sha256": "28627f9371d3deb4e58a1dc01d1c6ded619072609278703e019a7530d74eac78",
+      "after_sha256": "7067b534b764a7b6d86c711a5e4b7d69a70fdb91159aa772d3e669cd2d429247",
       "owners": {
         "@module": {
-          "before": "88c529a4d08c92b16c10725f781ae220c5adbd4b2de3ef3e79a59253dc1365dc",
-          "after": "bfe68f2045e02e67c68ba03747c028306771c0bcdd44bd51a28dd40fe8de92eb"
+          "before": "bfe68f2045e02e67c68ba03747c028306771c0bcdd44bd51a28dd40fe8de92eb",
+          "after": "398091f475071305f5c9da7fdabd38ead9dc729366398d5bec76e723fb9c4b62"
         },
-        "_close_quarters_test_successor": {
-          "before": "803e87d9800e358a1874a3bd62048ac78df7767778323e9a49c6e589ee69ff73",
-          "after": "1b3a5a74251a485fc79ff8edfdc2853f58061ecea126304160ce77fe4e10a707"
-        },
-        "_shooting_visibility_successor": {
+        "_monster_mash_fight_reroll_successor": {
           "before": null,
-          "after": "fbd07ecfcbd7025e3b1020c71dc2dfe30631085059fb4fd915a6c53941061015"
+          "after": "49608be28a34e68ae3e6efc973eb28c57df22decea8ae242041278b9468aad88"
+        },
+        "_stage2_fight_reroll_successor": {
+          "before": "73579d98ed6ba884c4404cee1be7166c123197ed2c25d279130b2a8e67b45c65",
+          "after": "a5fd161fc407b3cb37ff52d9626acf41adf651c8bcf55b35d66d7cc1f49a7f3e"
         },
         "exact_movement_test_transition": {
-          "before": "c4f77226d622d25d2266cfff7b618e6b9e07aa58a8bcfdd23ddcedb4a7a1543f",
-          "after": "774980dfc2c29d959c56b2c71b136981ac5d909964b05a9a8bf34fe1a42d6e8e"
+          "before": "774980dfc2c29d959c56b2c71b136981ac5d909964b05a9a8bf34fe1a42d6e8e",
+          "after": "ea7d35cc84c22d3a2324c8d3d1901eb7b218b0fcb690004658f159741728bc14"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "4581d1a6857d75dfb25e11b0a3ef2112123a9e90584c8ca529b4cc656c4e1b7f",
-      "after_sha256": "403310765d15b3e37ad0f0899cb9ffcbe375e474035ae78a6ea71c4ce7389c9b",
+      "before_sha256": "403310765d15b3e37ad0f0899cb9ffcbe375e474035ae78a6ea71c4ce7389c9b",
+      "after_sha256": "2110b0225e5d4cb7601de83efebf979fe1194ac738df3e361f9c15f6635a378f",
       "owners": {
         "@document": {
-          "before": "4581d1a6857d75dfb25e11b0a3ef2112123a9e90584c8ca529b4cc656c4e1b7f",
-          "after": "403310765d15b3e37ad0f0899cb9ffcbe375e474035ae78a6ea71c4ce7389c9b"
+          "before": "403310765d15b3e37ad0f0899cb9ffcbe375e474035ae78a6ea71c4ce7389c9b",
+          "after": "2110b0225e5d4cb7601de83efebf979fe1194ac738df3e361f9c15f6635a378f"
         }
       }
     },
-    "src/warhammer40k_core/geometry/visibility_witnesses.py": {
-      "before_sha256": "7b447437c1a9dc7aa2a8331bbe9805e02ba100fb70898c9686d8eeb84c1d2d4d",
-      "after_sha256": "a1537c34b8a6682acee8a1028bbd29b3ea0c753443f98e957648fd27607092eb",
+    "src/warhammer40k_core/engine/command_reroll_windows.py": {
+      "before_sha256": "864e76eb335205b30805592e8d03887e1f1236d0ce72b93b4b9095e5a5613a40",
+      "after_sha256": "7504f4eb04955076a36624cc4d7535576462407c2ab3771f4ca2c50c2ab31766",
       "owners": {
-        "ellipse_facing_boundary_candidates": {
-          "before": "e0854fb23c876009027af81f678d6c4225fbc170086fcfa8ae6b438b3c0a448e",
-          "after": "a6321925b265ee3a43ce9eb67f70e7198f5ae197820d713af41d9b6824ede022"
+        "request_command_reroll_if_available": {
+          "before": "420a520131f107af41d15c5db4286d5bb82f7403bd5d71da4201b8a0a3d1259a",
+          "after": "2ea95af49443099eae898c0bb478ee52c46fc93d91be86c6e51b775b36324764"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/lifecycle.py": {
+      "before_sha256": "a80adb9f48af7338f9acb7c325490964129545521bc99b456d09cc19a55f028f",
+      "after_sha256": "819f9a321f68af59893616f72139ab72c09e23d5e26f252f3e64dedfaa91f6e9",
+      "owners": {
+        "GameLifecycle._advance_once": {
+          "before": "5d48eadccbbe767dd2029005aaf7559cde56249ee5ad01d2697121370a673bd1",
+          "after": "780214ab6e06b9f85903b42b771eb281b9dae6e29ba2d139129cbbc3b78bd4ed"
+        },
+        "GameLifecycle.submit_decision": {
+          "before": "9a220140b3e18167a249ec25fd5848caee8f0295d2d8382998f4677481d4b9b1",
+          "after": "31d795d37939ba6a36123a8367c0232f5e8f83a7bbce2d4880ddef853a92869c"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/rule_trigger_runtime.py": {
+      "before_sha256": "802d1e6dea431ce14542cabf646c3739c96be22c5a78fb5f61ee61026fe26b65",
+      "after_sha256": "c04a38dc1f047f10b578e7874c60dd6aebeb6af9b62cc3ee8519e68c9918f1bd",
+      "owners": {
+        "@module": {
+          "before": "25dc83e4a2f111e8455318c07f0f86c09d9363033728a61c244a75e92e4cdfb8",
+          "after": "dbc6bb304b1967be82d09c02a3f3488b13e6a3b06d82c1bc25def734f18f92df"
+        },
+        "record_destruction_before_fight_opportunity": {
+          "before": null,
+          "after": "1e866820679f7801983d99e0fb0ce82c758e2e9d65fd693e250798ad4902eddf"
+        },
+        "use_loaded_destruction_runtime": {
+          "before": null,
+          "after": "211b466161901744a196e1e4792e510cb2ac48a9c96726028a6a11ec2ffb3bc9"
         }
       }
     },
     "tests/code_quality/test_engine_numerical_identity_admission.py": {
-      "before_sha256": "16fb602a45c6af1f4b064e0db7cc2267a1b4f4e64ae65558d2bba5f1e87a51ee",
-      "after_sha256": "b32f3a4165c38a1e76891342c71a5d6e03c2318c79a68446239c29563f576eaa",
+      "before_sha256": "b32f3a4165c38a1e76891342c71a5d6e03c2318c79a68446239c29563f576eaa",
+      "after_sha256": "cd9af388e3076c5b1f9940a2515a7c4c9af63a85de9d6ab4c56aa9d0c7cb42e2",
       "owners": {
         "test_identity_inventory_uses_current_twelve_shards_and_native_cohort": {
-          "before": "9109437f3ceb1567993cf24310153fa696c732fbf943aab41f0dc18ab69eefdb",
-          "after": "09dac1d6121ff3f73d635139fdaa49acfbd53baeea0eedc724113e594dc051fc"
+          "before": "09dac1d6121ff3f73d635139fdaa49acfbd53baeea0eedc724113e594dc051fc",
+          "after": "b9d3f154e51134d57d9f442551c0a737a71de47b5beaa585f2f7f4d7e1800dc6"
         }
       }
     },
-    "tests/rules/section06/test_visibility.py": {
-      "before_sha256": "0a22103cc696bc714dc9cf20883ef70ff12fb12031e68431b99dc4a4f570eaed",
-      "after_sha256": "24824fa7af6421486ef5043cd39633f01e8665e29acca4ee6cb2222cd28d981d",
+    "tests/rules/section04/test_fight_facade.py": {
+      "before_sha256": "69e6529641c9ff2abbf9a87ea3a02701a1f01c1bc2412ab548e02b2028d7293d",
+      "after_sha256": "1a9e51fb6d3c068adfaf535589c20c862fd5dc77101abd6a9c655883fb1e8538",
       "owners": {
-        "_axis_aligned_ellipse_prism": {
-          "before": null,
-          "after": "b8ae76d71f946b84e7f5b92a61a94033ac84ee68f462e99b6bd60e629190eaa3"
+        "@module": {
+          "before": "1277a97a27815db757547fb1c546c6dd1555a2dca3569f765743a5c38619aa27",
+          "after": "b2540ef846df0ffaeeb9ceb148b184bd7cba0476d02f86b1fc6d96f837253530"
         },
-        "test_ellipse_facing_search_checks_base_edge_behind_low_models": {
+        "test_fight_damage_reroll_stays_fresh_after_previous_attack_destroys_model": {
           "before": null,
-          "after": "491cff71252fb6cafb4bedb1b5c0006f7782c708bb0fca01a45bc4b3b467c1d9"
-        },
-        "test_ellipse_facing_search_checks_base_edge_with_multiple_terrain_walls": {
-          "before": null,
-          "after": "5141625fca46dfa1b493e988d131372ce7cddf53d4a7d1ed8703da3062a2a5aa"
+          "after": "908512c478486cd5a741cb34f831dc4038295541703982f1770439be5ba53db6"
         }
       }
     }
   },
   "rows": {
-    "ci/test_shards/durations.json": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Authenticate the admitted regressions, fresh current build identity, and full covered workload without modifying the historical evidence.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "ci/test_shards/shard-1.txt": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Authenticate the admitted regressions, fresh current build identity, and full covered workload without modifying the historical evidence.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "ci/test_shards/shard-10.txt": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Authenticate the admitted regressions, fresh current build identity, and full covered workload without modifying the historical evidence.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "ci/test_shards/shard-11.txt": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Authenticate the admitted regressions, fresh current build identity, and full covered workload without modifying the historical evidence.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "ci/test_shards/shard-12.txt": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Authenticate the admitted regressions, fresh current build identity, and full covered workload without modifying the historical evidence.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "ci/test_shards/shard-2.txt": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Authenticate the admitted regressions, fresh current build identity, and full covered workload without modifying the historical evidence.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "ci/test_shards/shard-3.txt": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Authenticate the admitted regressions, fresh current build identity, and full covered workload without modifying the historical evidence.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "ci/test_shards/shard-4.txt": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Authenticate the admitted regressions, fresh current build identity, and full covered workload without modifying the historical evidence.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "ci/test_shards/shard-5.txt": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Authenticate the admitted regressions, fresh current build identity, and full covered workload without modifying the historical evidence.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "ci/test_shards/shard-6.txt": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Authenticate the admitted regressions, fresh current build identity, and full covered workload without modifying the historical evidence.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "ci/test_shards/shard-7.txt": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Authenticate the admitted regressions, fresh current build identity, and full covered workload without modifying the historical evidence.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "ci/test_shards/shard-8.txt": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Authenticate the admitted regressions, fresh current build identity, and full covered workload without modifying the historical evidence.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "ci/test_shards/shard-9.txt": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Authenticate the admitted regressions, fresh current build identity, and full covered workload without modifying the historical evidence.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "measured_workload",
       "operations": [
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Authenticate the admitted regressions, fresh current build identity, and full covered workload without modifying the historical evidence.",
+      "rationale": "Bind the regenerated engine fingerprint and external examples to the current runtime for live contract checks.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -492,7 +240,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Authenticate the admitted regressions, fresh current build identity, and full covered workload without modifying the historical evidence.",
+      "rationale": "Bind the regenerated engine fingerprint and external examples to the current runtime for live contract checks.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -502,7 +250,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Authenticate the admitted regressions, fresh current build identity, and full covered workload without modifying the historical evidence.",
+      "rationale": "Bind the regenerated engine fingerprint and external examples to the current runtime for live contract checks.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -512,7 +260,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Authenticate the admitted regressions, fresh current build identity, and full covered workload without modifying the historical evidence.",
+      "rationale": "Bind the regenerated engine fingerprint and external examples to the current runtime for live contract checks.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -522,7 +270,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Authenticate the admitted regressions, fresh current build identity, and full covered workload without modifying the historical evidence.",
+      "rationale": "Bind the regenerated engine fingerprint and external examples to the current runtime for live contract checks.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -532,7 +280,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Authenticate the admitted regressions, fresh current build identity, and full covered workload without modifying the historical evidence.",
+      "rationale": "Bind the regenerated engine fingerprint and external examples to the current runtime for live contract checks.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -542,7 +290,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Authenticate the admitted regressions, fresh current build identity, and full covered workload without modifying the historical evidence.",
+      "rationale": "Bind the regenerated engine fingerprint and external examples to the current runtime for live contract checks.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -552,49 +300,33 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Authenticate the admitted regressions, fresh current build identity, and full covered workload without modifying the historical evidence.",
+      "rationale": "Bind the regenerated engine fingerprint and external examples to the current runtime for live contract checks.",
       "source_obligation": null,
       "unchanged_work": null
     },
-    "data/source_audits/ci64_provenance_v1/monster-mash-shooting-visibility-test-transition-v1.json": {
+    "data/source_audits/ci64_provenance_v1/monster-mash-fight-reroll-test-transition-v1.json": {
       "category": "measured_workload",
       "operations": [
         "engine-numerical-identity-admission"
       ],
       "selected_families": [],
-      "rationale": "Authenticate the admitted regressions, fresh current build identity, and full covered workload without modifying the historical evidence.",
+      "rationale": "Bind the native regression, its exact runtime and test transition, and the existing behavioral inventory.",
       "source_obligation": null,
       "unchanged_work": null
     },
-    "docs/DECISION_SUBMISSION_CATALOG.md": {
+    "docs/performance/current/monster-mash-fight-reroll-dice-sustained.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Distinguish eligibility to be selected from later declaration legality and document the existing no-attack outcome.",
+      "rationale": "Record operation ownership and matched serial measurements for the exact Fight change.",
       "source_obligation": null,
       "unchanged_work": null
     },
-    "docs/performance/current/monster-mash-shooting-movement.json": {
+    "docs/performance/current/monster-mash-fight-reroll-dice.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bind the exact changed owners and record fresh matched measurements for the scoped visibility repair.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "docs/performance/current/monster-mash-shooting-setup.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Bind the exact changed owners and record fresh matched measurements for the scoped visibility repair.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "docs/performance/current/monster-mash-shooting-visibility.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Bind the exact changed owners and record fresh matched measurements for the scoped visibility repair.",
+      "rationale": "Record operation ownership and matched serial measurements for the exact Fight change.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -602,7 +334,7 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bind the exact changed owners and record fresh matched measurements for the scoped visibility repair.",
+      "rationale": "Record operation ownership and matched serial measurements for the exact Fight change.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -615,7 +347,7 @@
         "stage2-strict-replay-test-admission"
       ],
       "selected_families": [],
-      "rationale": "Authenticate the admitted regressions, fresh current build identity, and full covered workload without modifying the historical evidence.",
+      "rationale": "Bind the native regression, its exact runtime and test transition, and the existing behavioral inventory.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -625,23 +357,43 @@
         "cavalcade-authority-admission"
       ],
       "selected_families": [],
-      "rationale": "Authenticate the admitted regressions, fresh current build identity, and full covered workload without modifying the historical evidence.",
+      "rationale": "Bind the regenerated engine fingerprint and external examples to the current runtime for live contract checks.",
       "source_obligation": null,
       "unchanged_work": null
     },
-    "src/warhammer40k_core/geometry/visibility_witnesses.py": {
-      "category": "algorithm_or_search",
+    "src/warhammer40k_core/engine/command_reroll_windows.py": {
+      "category": "rule_semantics",
       "operations": [
-        "geometry-search"
+        "fight-reroll-casualty-order"
+      ],
+      "selected_families": [],
+      "rationale": "Publish Fight Command Re-roll choices only after the preceding attack casualty is recorded.",
+      "source_obligation": "The decision boundary must include all destruction bookkeeping already caused by the previous attack before optional reroll eligibility and freshness are determined.",
+      "unchanged_work": "The existing casualty recorder runs at the earlier decision boundary as needed. Dice draws, attack allocation, reaction release, replay encoding, and search algorithms use their existing authority."
+    },
+    "src/warhammer40k_core/engine/lifecycle.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "fight-reroll-casualty-order",
+        "order135-gathered-attack-steps"
       ],
       "selected_families": [
-        "movement",
-        "setup",
-        "visibility"
+        "dice",
+        "dice_sustained"
       ],
-      "rationale": "Use bounded rational base-edge witnesses when proof search reaches the existing ellipse facing boundary. Exact LOS and cover predicates retain authority.",
-      "source_obligation": null,
-      "unchanged_work": null
+      "rationale": "Publish Fight Command Re-roll choices only after the preceding attack casualty is recorded.",
+      "source_obligation": "The decision boundary must include all destruction bookkeeping already caused by the previous attack before optional reroll eligibility and freshness are determined.",
+      "unchanged_work": "The existing casualty recorder runs at the earlier decision boundary as needed. Dice draws, attack allocation, reaction release, replay encoding, and search algorithms use their existing authority."
+    },
+    "src/warhammer40k_core/engine/rule_trigger_runtime.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "fight-reroll-casualty-order"
+      ],
+      "selected_families": [],
+      "rationale": "Publish Fight Command Re-roll choices only after the preceding attack casualty is recorded.",
+      "source_obligation": "The decision boundary must include all destruction bookkeeping already caused by the previous attack before optional reroll eligibility and freshness are determined.",
+      "unchanged_work": "The existing casualty recorder runs at the earlier decision boundary as needed. Dice draws, attack allocation, reaction release, replay encoding, and search algorithms use their existing authority."
     },
     "tests/code_quality/test_engine_numerical_identity_admission.py": {
       "category": "measured_workload",
@@ -649,26 +401,26 @@
         "engine-numerical-identity-admission"
       ],
       "selected_families": [],
-      "rationale": "Authenticate the admitted regressions, fresh current build identity, and full covered workload without modifying the historical evidence.",
+      "rationale": "Bind the native regression, its exact runtime and test transition, and the existing behavioral inventory.",
       "source_obligation": null,
       "unchanged_work": null
     },
-    "tests/rules/section06/test_visibility.py": {
+    "tests/rules/section04/test_fight_facade.py": {
       "category": "measured_workload",
       "operations": [
-        "ellipse-facing-witness-regression"
+        "fight-reroll-casualty-order",
+        "qualification40-exact-eff1da10fe5a6290"
       ],
       "selected_families": [],
-      "rationale": "Authenticate the admitted regressions, fresh current build identity, and full covered workload without modifying the historical evidence.",
+      "rationale": "Bind the native regression, its exact runtime and test transition, and the existing behavioral inventory.",
       "source_obligation": null,
       "unchanged_work": null
     }
   },
   "milestone": "ordinary",
   "comparisons": {
-    "visibility": "docs/performance/current/monster-mash-shooting-visibility.json",
-    "movement": "docs/performance/current/monster-mash-shooting-movement.json",
-    "setup": "docs/performance/current/monster-mash-shooting-setup.json"
+    "dice": "docs/performance/current/monster-mash-fight-reroll-dice.json",
+    "dice_sustained": "docs/performance/current/monster-mash-fight-reroll-dice-sustained.json"
   },
   "full_game": null
 }
