@@ -244,6 +244,17 @@ COVER_EVENT_IDENTITY_SOURCE = "src/warhammer40k_core/adapters/viewer_identity.py
 COVER_EVENT_IDENTITY_OWNER = "tests/infrastructure/adapters/test_cover_event_identity.py"
 
 
+OPENING_SHADOW_FORM_TRANSITION = (
+    "data/source_audits/ci64_provenance_v1/stage2-opening-shadow-form-test-transition-v1.json"
+)
+OPENING_SHADOW_FORM_SHA256 = "a69c8069b46b70ef3e9afe0bea2c16f54d2d152fe9dbf72fcaa70951ff58b9d0"
+OPENING_SHADOW_FORM_BASE = "a7752da914356a43c144b8b4ea1dfd522cd0c0c5"
+OPENING_SHADOW_FORM_POLICY = "src/warhammer40k_core/ai/opening_shadow_form.py"
+OPENING_SHADOW_FORM_OWNER = (
+    "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py"
+)
+
+
 type SourceSuccessors = dict[str, dict[str, str]]
 type TestSuccessors = dict[str, dict[str, object]]
 
@@ -883,12 +894,22 @@ def exact_movement_test_transition(
         _checked_bytes(root, COVER_EVENT_IDENTITY_SOURCE, cover_event["source"]["after"])
         additions.update(_selection_members(cover_event["added_files"], root))
         runtime = cover_event["runtime_fingerprint"]
+    opening_path = root / OPENING_SHADOW_FORM_TRANSITION
+    _selection_no_links(root, opening_path)
+    opening_raw = None
+    opening_tests: TestSuccessors = {}
+    if opening_path.exists():
+        if cover_event_raw is None:
+            raise SystemExit(
+                "Opening Shadow Form tests require the Cover event identity predecessor."
+            )
+        runtime, opening_tests, opening_raw = _opening_shadow_form_test_successor(root, runtime)
     retained = _identity_test_transition(
         root,
         retained_cutover_sha256,
         runtime=runtime,
         source_successors=source_successors,
-        test_successors=test_successors,
+        test_successors={**test_successors, **opening_tests},
     )
     if retained is None:
         raise SystemExit(
@@ -951,7 +972,46 @@ def exact_movement_test_transition(
         raw += b"\0" + allocation_raw
     if cover_event_raw is not None:
         raw += b"\0" + cover_event_raw
+    if opening_raw is not None:
+        if not opening_tests.keys() <= updated.keys():
+            raise SystemExit("Opening Shadow Form must extend an existing active test owner.")
+        updated.update(opening_tests)
+        raw += b"\0" + opening_raw
     return updated, {**added, **additions}, retained_raw + b"\0" + raw
+
+
+def _opening_shadow_form_test_successor(
+    root: Path, predecessor_runtime: str
+) -> tuple[str, TestSuccessors, bytes]:
+    from scripts.speedup_test_admission import ADDITION as SPEEDUP_ADDITION
+    from scripts.speedup_test_admission import ADDITION_SHA256 as SPEEDUP_SHA256
+
+    raw = _checked_bytes(root, OPENING_SHADOW_FORM_TRANSITION, OPENING_SHADOW_FORM_SHA256)
+    record = json.loads(raw, object_pairs_hook=_selection_object)
+    speedup_raw = _checked_bytes(root, SPEEDUP_ADDITION, SPEEDUP_SHA256)
+    retained_owner = json.loads(speedup_raw, object_pairs_hook=_selection_object)["updated_files"][
+        OPENING_SHADOW_FORM_OWNER
+    ]
+    if (
+        record.keys()
+        != {
+            "schema",
+            "retained_cover_event_identity_sha256",
+            "retained_runtime_fingerprint",
+            "runtime_fingerprint",
+            "policy_sha256",
+            "test",
+        }
+        or record["schema"] != "finite-stage2-opening-shadow-form-test-transition-v1"
+        or record["retained_cover_event_identity_sha256"] != COVER_EVENT_IDENTITY_SHA256
+        or record["retained_runtime_fingerprint"] != predecessor_runtime
+        or record["test"].keys() != {"before", "after"}
+        or record["test"]["before"] != retained_owner
+    ):
+        raise SystemExit("Opening Shadow Form test transition differs.")
+    _checked_bytes(root, OPENING_SHADOW_FORM_POLICY, record["policy_sha256"])
+    tests = _selection_members({OPENING_SHADOW_FORM_OWNER: record["test"]["after"]}, root)
+    return record["runtime_fingerprint"], tests, raw
 
 
 def _round_five_shadow_successor(
@@ -1199,7 +1259,9 @@ def _identity_test_transition(
         "updated_files": speedup["updated_files"],
     }:
         raise SystemExit("Numerical identity predecessor speedup metadata differs.")
-    updated.update(_selection_members(speedup["updated_files"], root, current=current_updated))
+    updated.update(
+        _selection_members(speedup["updated_files"], root, current={**current_updated, **tests})
+    )
     updated.update(current_updated)
     retained = _selection_members(foundation["added_files"], root)
     retained.update(_selection_members(profile["added_files"], root, current=tests))

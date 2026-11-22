@@ -1,0 +1,21 @@
+{
+  "schema": "finite-stage2-opening-shadow-form-test-transition-v1",
+  "retained_cover_event_identity_sha256": "cb6b967544fb2b54878b8021dbcb26d47a7625c12158f77aabb16a1bdd31801f",
+  "retained_runtime_fingerprint": "9c85fe2c2615775d5e7cd841d1f216a43634cdba1b213bde86ee9d3a40a11926",
+  "runtime_fingerprint": "280b3dd7f7066af917a2a522034ff92fb0191ea89e9eb3ab9030dd0d95ac9d64",
+  "policy_sha256": "07aa5c6e90b6890502f071e0817748b07307962e956160f80db62ae5911c324d",
+  "test": {
+    "before": {
+      "blob_sha1": "071b932b61adab90bc3fdd302e2758a41ce5eeb1",
+      "bytes": 14021,
+      "mode": "100644",
+      "sha256": "dabe086eb39cc08293080d631b3ba036900056d1df0794e260d39cf2def0df4e"
+    },
+    "after": {
+      "blob_sha1": "f540ba80200d29353f5dd788b46cb6e1314d3069",
+      "bytes": 16740,
+      "mode": "100644",
+      "sha256": "f2b8af1494ef3037d082cb72ed1428ec3ebb2351a27eca4fc639bb735de496da"
+    }
+  }
+}
