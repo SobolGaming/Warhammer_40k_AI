@@ -233,6 +233,72 @@ def test_batch04_manifestation_native_healing_consumes_shadow_and_health_boundar
     assert events(s.session, "chaos_daemons_daemonic_terror_mortal_wounds_applied") == []
 
 
+def test_manifestation_history_survives_the_tested_units_later_destruction(
+    faction_definitions: Section02Definitions,
+) -> None:
+    from tests.phase11c_command_phase_helpers import destroy_models_with_recorded_mortal_wounds
+    from tests.support.battle_shock_batch04 import command_scene, decline_bravery, health
+    from warhammer40k_core.engine.battle_shock_event_authority import (
+        validate_battle_shock_runtime_content_authority,
+    )
+    from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons import (
+        army_rule,
+    )
+    from warhammer40k_core.engine.phase import GameLifecycleError
+    from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+
+    s = command_scene(
+        faction_definitions,
+        manifestation=True,
+        seed=2,
+        rng_seed_label="b04-2:manifestation:private-11",
+    )
+    unit_id = "own:daemon"
+    assert health(s.session, unit_id) == 1
+    request(decline_bravery(s), "select_movement_unit")
+    tested = rules_unit_view_by_id(state=s.state, unit_instance_id=unit_id)
+    assert army_rule.LEGIONES_DAEMONICA in tested.faction_keywords
+    (survivor,) = tested.alive_models()
+    bundle = s.session.lifecycle._require_runtime_content_bundle()  # pyright: ignore[reportPrivateUsage]
+    decisions = s.session.lifecycle.decision_controller
+    destroy_models_with_recorded_mortal_wounds(
+        state=s.state,
+        decisions=decisions,
+        unit_instance_id=unit_id,
+        model_instance_ids=(survivor.model_instance_id,),
+        application_id="fixture:later-casualty",
+        destroying_player_id="opponent",
+    )
+    assert health(s.session, unit_id) == 0
+    assert not rules_unit_view_by_id(state=s.state, unit_instance_id=unit_id).faction_keywords
+
+    events = decisions.event_log.records
+    validate_battle_shock_runtime_content_authority(
+        state=s.state,
+        event_records=events,
+        decision_records=decisions.records,
+        runtime_content_bundle=bundle,
+    )
+
+    (recorded,) = (
+        event
+        for event in events
+        if event.event_type == "battle_shock_modifier_applications_recorded"
+    )
+    assert isinstance(recorded.payload, dict)
+    assert recorded.payload["battle_shock_modifier_applications"]
+    tampered = replace(
+        recorded, payload={**recorded.payload, "battle_shock_modifier_applications": []}
+    )
+    with pytest.raises(GameLifecycleError, match="modifier application authority drifted"):
+        validate_battle_shock_runtime_content_authority(
+            state=s.state,
+            event_records=tuple(tampered if event is recorded else event for event in events),
+            decision_records=decisions.records,
+            runtime_content_bundle=bundle,
+        )
+
+
 def test_batch04_command_start_bravery_validates_owner_phase_target_before_spend(
     faction_definitions: Section02Definitions,
 ) -> None:

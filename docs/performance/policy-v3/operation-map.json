@@ -36693,6 +36693,30 @@
       "sensitive": false,
       "mandatory": true
     },
+    "round4-battle-shock-event-wounds": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/monster-mash-round4-battle-shock-test-transition-v1.json",
+        "scripts/engine_numerical_identity_test_admission.py",
+        "src/warhammer40k_core/engine/battle_shock_historical_authority.py",
+        "src/warhammer40k_core/engine/catalog_unit_move_completed_battle_shock_runtime.py",
+        "tests/factions/chaos_daemons/unit/test_chaos_daemons_army_rule.py"
+      ],
+      "owners": [
+        "@document",
+        "@module",
+        "HistoricalBattleShockAuthorityContext",
+        "_armies_with_historical_wounds",
+        "_round4_battle_shock_successor",
+        "_rules_unit_with_historical_wounds",
+        "exact_movement_test_transition",
+        "historical_battle_shock_authority_context",
+        "historical_catalog_unit_move_completed_battle_shock_effects",
+        "test_manifestation_history_survives_the_tested_units_later_destruction"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
     "attack-reroll-casualty-order": {
       "paths": [
         "src/warhammer40k_core/engine/command_reroll_windows.py",

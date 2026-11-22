@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.core.attributes import Characteristic
@@ -47,8 +47,8 @@ class HistoricalBattleShockAuthorityContext:
     """Typed, event-bound facts used to authenticate one Battle-shock test.
 
     This context is internal and is never serialized. Physical facts come from
-    the shared authenticated transition/damage history. Unit definitions and
-    starting-strength rows are immutable mustered authority. Mutable faction
+    the shared authenticated transition/damage history. Mustered model profiles
+    carry the wounds remaining at this boundary. Mutable faction
     state and effects are deliberately absent: source providers must establish
     those from their exact causal event families.
     """
@@ -431,10 +431,13 @@ def historical_battle_shock_authority_context(
         player_ids=tuple(state.player_ids),
         turn_order=tuple(state.turn_order),
         battle_phase_sequence=tuple(state.battle_phase_sequence),
-        armies=armies_with_historical_random_profiles(
-            armies=tuple(state.army_definitions),
-            prior_events=event_records[:boundary_event_index],
-            characteristics=(Characteristic.LEADERSHIP,),
+        armies=_armies_with_historical_wounds(
+            armies=armies_with_historical_random_profiles(
+                armies=tuple(state.army_definitions),
+                prior_events=event_records[:boundary_event_index],
+                characteristics=(Characteristic.LEADERSHIP,),
+            ),
+            physical_models=physical,
         ),
         mission_setup=state.mission_setup,
         battlefield_width_inches=state.battlefield_state.battlefield_width_inches,
@@ -452,6 +455,34 @@ def historical_battle_shock_authority_context(
         phase=phase,
         phase_start_battle_shocked_unit_ids=phase_start_battle_shocked_unit_ids,
     )
+
+
+def _armies_with_historical_wounds(
+    *,
+    armies: tuple[ArmyDefinition, ...],
+    physical_models: tuple[PhysicalModelAuthority, ...],
+) -> tuple[ArmyDefinition, ...]:
+    wounds_by_model = {row.model_instance_id: row.wounds_remaining for row in physical_models}
+
+    def model_at_boundary(model: ModelInstance) -> ModelInstance:
+        wounds = wounds_by_model.get(model.model_instance_id)
+        if wounds is None:
+            raise GameLifecycleError("Historical Battle-shock model wound authority is missing.")
+        if wounds == model.wounds_remaining:
+            return model
+        return replace(model, wounds_remaining=wounds)
+
+    historical_armies: list[ArmyDefinition] = []
+    for army in armies:
+        units: list[UnitInstance] = []
+        for unit in army.units:
+            models = tuple(model_at_boundary(model) for model in unit.own_models)
+            units.append(unit if models == unit.own_models else replace(unit, own_models=models))
+        historical_units = tuple(units)
+        historical_armies.append(
+            army if historical_units == army.units else replace(army, units=historical_units)
+        )
+    return tuple(historical_armies)
 
 
 __all__ = (
