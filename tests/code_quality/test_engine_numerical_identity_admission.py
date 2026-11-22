@@ -482,6 +482,7 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         | {cover_owner + "::test_save_cover_cache_key_projects_embedded_request_reference"}
         | {opening_owner + "::test_opening_shadow_form_policy_reaches_native_movement"}
         | {movement_owner + "::test_opening_movement_selects_an_issued_unit_before_any_action"}
+        | {monster_mash_owner + "::test_exact_monster_mash_admission_deployment_and_replay"}
         | {
             strict_replay_owner
             + "::test_strict_persistence_rejects_valid_artifact_with_mismatched_metadata_or_tails"
