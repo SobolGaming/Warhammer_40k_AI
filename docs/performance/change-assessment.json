@@ -4,6 +4,136 @@
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:9afdfab78d011964bb19d68fee1e0eac7fad0bc34d6c150e4f59e82851c3f33c",
   "operation_map_sha256": "fcb34bc73dabbfb6832ba43d4fddfb15f8091e792ea28af19f9ff3c384dac3c7",
   "changes": {
+    "ci/test_shards/durations.json": {
+      "before_sha256": "ab65e89ea57fb93880f56fc2a98e50d8fed81eda03683c83606aaefefca34ced",
+      "after_sha256": "5b99ed64df411c903892d84bc9a27ab94992974b11d2250fb6a9c5253e9a62b1",
+      "owners": {
+        "@document": {
+          "before": "ab65e89ea57fb93880f56fc2a98e50d8fed81eda03683c83606aaefefca34ced",
+          "after": "5b99ed64df411c903892d84bc9a27ab94992974b11d2250fb6a9c5253e9a62b1"
+        }
+      }
+    },
+    "ci/test_shards/shard-1.txt": {
+      "before_sha256": "d178e2b1a8bace7bc14c58396fd5a9a1bdf0dca47d20934968f4e7d50f6ced68",
+      "after_sha256": "14a711929834cb070a7cd199d3f3aa1655f61aeaa86fb3eb0c1d5432600fad8b",
+      "owners": {
+        "@document": {
+          "before": "d178e2b1a8bace7bc14c58396fd5a9a1bdf0dca47d20934968f4e7d50f6ced68",
+          "after": "14a711929834cb070a7cd199d3f3aa1655f61aeaa86fb3eb0c1d5432600fad8b"
+        }
+      }
+    },
+    "ci/test_shards/shard-10.txt": {
+      "before_sha256": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20",
+      "after_sha256": "bc0b10467c0f961a442262e16a3c53c735d3ad2c930cbbcbbe3a30349e88e666",
+      "owners": {
+        "@document": {
+          "before": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20",
+          "after": "bc0b10467c0f961a442262e16a3c53c735d3ad2c930cbbcbbe3a30349e88e666"
+        }
+      }
+    },
+    "ci/test_shards/shard-11.txt": {
+      "before_sha256": "76ea4757054e583768b45fd1a7887e65fd5a31759febdfa94928e73a92342276",
+      "after_sha256": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20",
+      "owners": {
+        "@document": {
+          "before": "76ea4757054e583768b45fd1a7887e65fd5a31759febdfa94928e73a92342276",
+          "after": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20"
+        }
+      }
+    },
+    "ci/test_shards/shard-12.txt": {
+      "before_sha256": "2fecc0acb7f66655d8167ed2fd5e3fbc71d8cd09306d02bb5ecf2861ac8c46f1",
+      "after_sha256": "bccf32b1641a28e8eff5f6fe04059da6cf8bd263a7e5dbea7a1e414c0dc87a96",
+      "owners": {
+        "@document": {
+          "before": "2fecc0acb7f66655d8167ed2fd5e3fbc71d8cd09306d02bb5ecf2861ac8c46f1",
+          "after": "bccf32b1641a28e8eff5f6fe04059da6cf8bd263a7e5dbea7a1e414c0dc87a96"
+        }
+      }
+    },
+    "ci/test_shards/shard-2.txt": {
+      "before_sha256": "934ef4ae3b3b54dffdffd6e488ff0c0ff53a5885a120bf906a60a591e74aa267",
+      "after_sha256": "b1bdb7b66357d1ce8e89244d20a5610ab730f71dbd4531ec4dda941fb12e5a42",
+      "owners": {
+        "@document": {
+          "before": "934ef4ae3b3b54dffdffd6e488ff0c0ff53a5885a120bf906a60a591e74aa267",
+          "after": "b1bdb7b66357d1ce8e89244d20a5610ab730f71dbd4531ec4dda941fb12e5a42"
+        }
+      }
+    },
+    "ci/test_shards/shard-3.txt": {
+      "before_sha256": "2a770c3d03108e1d5162ed5a0fdcd81c77b66d3fcc9e02d605290c98ea5fc407",
+      "after_sha256": "63d7ac145b8d2c6be4bf3d7e9362f482293d09f811fc04612bd2990bb3288d69",
+      "owners": {
+        "@document": {
+          "before": "2a770c3d03108e1d5162ed5a0fdcd81c77b66d3fcc9e02d605290c98ea5fc407",
+          "after": "63d7ac145b8d2c6be4bf3d7e9362f482293d09f811fc04612bd2990bb3288d69"
+        }
+      }
+    },
+    "ci/test_shards/shard-4.txt": {
+      "before_sha256": "0bebf14d779ba171d17a66704029798575c0aef2e92379463371a012092bd4a6",
+      "after_sha256": "bd951251afb526253cc0ae2e48d4015536fa994eac7adc6af5c03b0b5f4152c8",
+      "owners": {
+        "@document": {
+          "before": "0bebf14d779ba171d17a66704029798575c0aef2e92379463371a012092bd4a6",
+          "after": "bd951251afb526253cc0ae2e48d4015536fa994eac7adc6af5c03b0b5f4152c8"
+        }
+      }
+    },
+    "ci/test_shards/shard-5.txt": {
+      "before_sha256": "bc86f3642d37d12cd14d4bfea3a1cd11754c3fd62980792c78c1eebadb7073fb",
+      "after_sha256": "ea3f1cbe52d06af2750b88378b273530c3913c149a3ae6f687335135d1ed4e2e",
+      "owners": {
+        "@document": {
+          "before": "bc86f3642d37d12cd14d4bfea3a1cd11754c3fd62980792c78c1eebadb7073fb",
+          "after": "ea3f1cbe52d06af2750b88378b273530c3913c149a3ae6f687335135d1ed4e2e"
+        }
+      }
+    },
+    "ci/test_shards/shard-6.txt": {
+      "before_sha256": "738801e98d644049e7f0c7302e85e8c8ca555a28a63be86ed78e9b19ae42748c",
+      "after_sha256": "5d63b7ae5fc015a7faf6cd9200775efdf78c349fa3f6316ab172a74de720175e",
+      "owners": {
+        "@document": {
+          "before": "738801e98d644049e7f0c7302e85e8c8ca555a28a63be86ed78e9b19ae42748c",
+          "after": "5d63b7ae5fc015a7faf6cd9200775efdf78c349fa3f6316ab172a74de720175e"
+        }
+      }
+    },
+    "ci/test_shards/shard-7.txt": {
+      "before_sha256": "11da7c060430b5b60b37e34d02ded670f67ae69b5584f0a8f516bde94984740d",
+      "after_sha256": "4f0221ff89289017f9fb9d26b87c7a2b9854a3b7c1925b16b404c94b1196decc",
+      "owners": {
+        "@document": {
+          "before": "11da7c060430b5b60b37e34d02ded670f67ae69b5584f0a8f516bde94984740d",
+          "after": "4f0221ff89289017f9fb9d26b87c7a2b9854a3b7c1925b16b404c94b1196decc"
+        }
+      }
+    },
+    "ci/test_shards/shard-8.txt": {
+      "before_sha256": "ef409bf2b81164e8a8deb7c5a4082c795af1c77fb960c23c92fcfd5c5c5f59b1",
+      "after_sha256": "c38294cd73248a303407104b5c71da256c884b7628e63459391b4f1fe8cd435a",
+      "owners": {
+        "@document": {
+          "before": "ef409bf2b81164e8a8deb7c5a4082c795af1c77fb960c23c92fcfd5c5c5f59b1",
+          "after": "c38294cd73248a303407104b5c71da256c884b7628e63459391b4f1fe8cd435a"
+        }
+      }
+    },
+    "ci/test_shards/shard-9.txt": {
+      "before_sha256": "a5703a7ed77101b3222a256c3e221b34583c2e26a77d601007d5053177d41c9b",
+      "after_sha256": "55a91d1efae64527d26a93a3a361e1f4c2c2ca5dc5aca6efea0fe3d3ff3a0a45",
+      "owners": {
+        "@document": {
+          "before": "a5703a7ed77101b3222a256c3e221b34583c2e26a77d601007d5053177d41c9b",
+          "after": "55a91d1efae64527d26a93a3a361e1f4c2c2ca5dc5aca6efea0fe3d3ff3a0a45"
+        }
+      }
+    },
     "contracts/examples/persistence/session-persistence.json": {
       "before_sha256": "0311e38a99526eb07a879e424586c1a5f6c3cae0bd4ada7b1c1914f0ec94f1fc",
       "after_sha256": "ab014b6aea30d55b791bb8ec51ac372caeac5fa81fd6cc78ec25e1e2f3433d13",
@@ -224,6 +354,136 @@
     }
   },
   "rows": {
+    "ci/test_shards/durations.json": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Bind the native regression, its exact runtime and test transition, and the existing behavioral inventory.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-1.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Bind the native regression, its exact runtime and test transition, and the existing behavioral inventory.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-10.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Bind the native regression, its exact runtime and test transition, and the existing behavioral inventory.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-11.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Bind the native regression, its exact runtime and test transition, and the existing behavioral inventory.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-12.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Bind the native regression, its exact runtime and test transition, and the existing behavioral inventory.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-2.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Bind the native regression, its exact runtime and test transition, and the existing behavioral inventory.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-3.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Bind the native regression, its exact runtime and test transition, and the existing behavioral inventory.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-4.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Bind the native regression, its exact runtime and test transition, and the existing behavioral inventory.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-5.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Bind the native regression, its exact runtime and test transition, and the existing behavioral inventory.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-6.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Bind the native regression, its exact runtime and test transition, and the existing behavioral inventory.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-7.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Bind the native regression, its exact runtime and test transition, and the existing behavioral inventory.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-8.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Bind the native regression, its exact runtime and test transition, and the existing behavioral inventory.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-9.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Bind the native regression, its exact runtime and test transition, and the existing behavioral inventory.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "measured_workload",
       "operations": [
