@@ -175,6 +175,9 @@ _EDITION_SOURCE_PACKAGE_CLASSIFICATION = {
     "chaos_daemons_cavalcade_2026_11": (
         "reviewed_roster_catalog_with_official_pdf_mfm_and_provisional_geometry"
     ),
+    "chaos_daemons_monster_mash_2026_11": (
+        "reviewed_roster_catalog_with_official_pdf_mfm_and_provisional_geometry"
+    ),
     "chaos_daemons_roster_2026_07": "official_roster_source",
     "court_of_slaughter_anvanth_2026_08": "official_roster_source",
     "core_stratagems_2026_08": (

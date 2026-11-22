@@ -1,0 +1,272 @@
+{
+  "artifact_schema": "core-v2-player-army-list-v2-model-bearers",
+  "army_list_id": "monster-mash",
+  "name": "Monster Mash",
+  "faction_id": "chaos-daemons",
+  "detachment_selection": {
+    "faction_id": "chaos-daemons",
+    "detachment_ids": [
+      "daemonic-incursion"
+    ],
+    "enhancement_ids": [],
+    "stratagem_ids": []
+  },
+  "force_disposition_id": "take-and-hold",
+  "battle_size": "strike_force",
+  "declared_total_points": 1995,
+  "units": [
+    {
+      "selection": {
+        "unit_selection_id": "belakor",
+        "datasheet_id": "000001148",
+        "model_profile_selections": [
+          {
+            "model_profile_id": "000001148:belakor-epic-hero",
+            "model_count": 1
+          }
+        ],
+        "wargear_selections": [],
+        "mustering_option_selections": []
+      },
+      "declared_points": 390
+    },
+    {
+      "selection": {
+        "unit_selection_id": "kairos-fateweaver",
+        "datasheet_id": "000001117",
+        "model_profile_selections": [
+          {
+            "model_profile_id": "000001117:kairos-fateweaver-epic-hero",
+            "model_count": 1
+          }
+        ],
+        "wargear_selections": [],
+        "mustering_option_selections": []
+      },
+      "declared_points": 305
+    },
+    {
+      "selection": {
+        "unit_selection_id": "rotigus",
+        "datasheet_id": "000001465",
+        "model_profile_selections": [
+          {
+            "model_profile_id": "000001465:rotigus-epic-hero",
+            "model_count": 1
+          }
+        ],
+        "wargear_selections": [],
+        "mustering_option_selections": []
+      },
+      "declared_points": 280
+    },
+    {
+      "selection": {
+        "unit_selection_id": "shalaxi-helbane",
+        "datasheet_id": "000001648",
+        "model_profile_selections": [
+          {
+            "model_profile_id": "000001648:shalaxi-helbane-epic-hero",
+            "model_count": 1
+          }
+        ],
+        "wargear_selections": [],
+        "mustering_option_selections": []
+      },
+      "declared_points": 315
+    },
+    {
+      "selection": {
+        "unit_selection_id": "skarbrand",
+        "datasheet_id": "000001105",
+        "model_profile_selections": [
+          {
+            "model_profile_id": "000001105:skarbrand-epic-hero",
+            "model_count": 1
+          }
+        ],
+        "wargear_selections": [],
+        "mustering_option_selections": []
+      },
+      "declared_points": 330
+    },
+    {
+      "selection": {
+        "unit_selection_id": "bloodletters",
+        "datasheet_id": "000001114",
+        "model_profile_selections": [
+          {
+            "model_profile_id": "000001114:bloodreaper",
+            "model_count": 1
+          },
+          {
+            "model_profile_id": "000001114:bloodletters",
+            "model_count": 9
+          }
+        ],
+        "wargear_selections": [
+          {
+            "option_id": "000001114:daemonic-icon:option-2",
+            "model_profile_id": "000001114:bloodletters",
+            "wargear_ids": [
+              "000001114:daemonic-icon"
+            ],
+            "bearer_assignments": [
+              {
+                "wargear_id": "000001114:daemonic-icon",
+                "model_ordinal": 1,
+                "selection_count": 1
+              }
+            ]
+          },
+          {
+            "option_id": "000001114:instrument-of-chaos:option-1",
+            "model_profile_id": "000001114:bloodletters",
+            "wargear_ids": [
+              "000001114:instrument-of-chaos"
+            ],
+            "bearer_assignments": [
+              {
+                "wargear_id": "000001114:instrument-of-chaos",
+                "model_ordinal": 2,
+                "selection_count": 1
+              }
+            ]
+          }
+        ],
+        "mustering_option_selections": []
+      },
+      "declared_points": 110
+    },
+    {
+      "selection": {
+        "unit_selection_id": "plaguebearers",
+        "datasheet_id": "000001132",
+        "model_profile_selections": [
+          {
+            "model_profile_id": "000001132:plagueridden",
+            "model_count": 1
+          },
+          {
+            "model_profile_id": "000001132:plaguebearers",
+            "model_count": 9
+          }
+        ],
+        "wargear_selections": [
+          {
+            "option_id": "000001132:daemonic-icon:option-2",
+            "model_profile_id": "000001132:plaguebearers",
+            "wargear_ids": [
+              "000001132:daemonic-icon"
+            ],
+            "bearer_assignments": [
+              {
+                "wargear_id": "000001132:daemonic-icon",
+                "model_ordinal": 1,
+                "selection_count": 1
+              }
+            ]
+          },
+          {
+            "option_id": "000001132:instrument-of-chaos:option-1",
+            "model_profile_id": "000001132:plaguebearers",
+            "wargear_ids": [
+              "000001132:instrument-of-chaos"
+            ],
+            "bearer_assignments": [
+              {
+                "wargear_id": "000001132:instrument-of-chaos",
+                "model_ordinal": 2,
+                "selection_count": 1
+              }
+            ]
+          }
+        ],
+        "mustering_option_selections": []
+      },
+      "declared_points": 115
+    },
+    {
+      "selection": {
+        "unit_selection_id": "flamers",
+        "datasheet_id": "000001125",
+        "model_profile_selections": [
+          {
+            "model_profile_id": "000001125:pyrocaster",
+            "model_count": 1
+          },
+          {
+            "model_profile_id": "000001125:flamers",
+            "model_count": 2
+          }
+        ],
+        "wargear_selections": [],
+        "mustering_option_selections": []
+      },
+      "declared_points": 65
+    },
+    {
+      "selection": {
+        "unit_selection_id": "seekers",
+        "datasheet_id": "000001145",
+        "model_profile_selections": [
+          {
+            "model_profile_id": "000001145:heartseeker",
+            "model_count": 1
+          },
+          {
+            "model_profile_id": "000001145:seekers",
+            "model_count": 4
+          }
+        ],
+        "wargear_selections": [
+          {
+            "option_id": "000001145:daemonic-icon:option-2",
+            "model_profile_id": "000001145:seekers",
+            "wargear_ids": [
+              "000001145:daemonic-icon"
+            ],
+            "bearer_assignments": [
+              {
+                "wargear_id": "000001145:daemonic-icon",
+                "model_ordinal": 1,
+                "selection_count": 1
+              }
+            ]
+          },
+          {
+            "option_id": "000001145:instrument-of-chaos:option-1",
+            "model_profile_id": "000001145:seekers",
+            "wargear_ids": [
+              "000001145:instrument-of-chaos"
+            ],
+            "bearer_assignments": [
+              {
+                "wargear_id": "000001145:instrument-of-chaos",
+                "model_ordinal": 2,
+                "selection_count": 1
+              }
+            ]
+          }
+        ],
+        "mustering_option_selections": []
+      },
+      "declared_points": 85
+    }
+  ],
+  "attachment_declarations": [],
+  "enhancement_assignments": [],
+  "warlord_selection": {
+    "unit_selection_id": "belakor",
+    "source_id": "player-army-list:monster-mash:warlord",
+    "model_profile_id": "000001148:belakor-epic-hero",
+    "model_index": 1
+  },
+  "dedicated_transport_manifests": [],
+  "provenance": {
+    "source_format": "warhammer-40000-app-text",
+    "app_version": "v2.8.1 (1)",
+    "data_version": "v995",
+    "points_source_package_id": "gw-11e-mfm-2026-10"
+  }
+}

@@ -108,7 +108,16 @@ def build_catalog_package() -> CanonicalCatalogPackage:
         height_overrides=heights,
     )
     old_geometry = _catalog_from_bridge(old_bridge)
-    added = _additional_catalog(review, heights)
+    added = _current_additional_core_descriptions(
+        build_reviewed_datasheets(
+            review=review,
+            datasheet_ids=ADDITIONAL_IDS,
+            reviewed_package=REVIEWED,
+            output_package=PACKAGE,
+            output_version=VERSION,
+            heights=heights,
+        )
+    )
     catalog = old.army_catalog
     datasheets = tuple(
         sorted((*catalog.datasheets, *added.army_catalog.datasheets), key=lambda d: d.datasheet_id)
@@ -189,9 +198,16 @@ def _catalog_from_bridge(artifacts: tuple[WahapediaJsonArtifact, ...]) -> Canoni
     return report.package
 
 
-def _additional_catalog(
-    review: dict[str, object], heights: tuple[ModelHeightOverride, ...]
+def build_reviewed_datasheets(
+    *,
+    review: dict[str, object],
+    datasheet_ids: tuple[str, ...],
+    reviewed_package: DataPackageId,
+    output_package: DataPackageId,
+    output_version: CatalogVersion,
+    heights: tuple[ModelHeightOverride, ...],
 ) -> CanonicalCatalogPackage:
+    """Build the closed set of PDF-reviewed Daemon datasheets from pinned rows."""
     originals = tuple(
         WahapediaJsonArtifact.from_payload(
             cast(
@@ -206,27 +222,27 @@ def _additional_catalog(
             artifact.artifact_hash()
             != dict(historical.EXPECTED_GENERATOR_INPUT_ARTIFACT_HASHES)[artifact.source_table]
         ):
-            raise ValueError("Cavalcade historical bridge input hash drifted.")
+            raise ValueError("Daemon historical bridge input hash drifted.")
     reviews = cast(list[dict[str, object]], review["datasheets"])
-    if tuple(r["datasheet_id"] for r in reviews) != ADDITIONAL_IDS:
-        raise ValueError("Cavalcade additional PDF review closure drifted.")
+    if tuple(r["datasheet_id"] for r in reviews) != datasheet_ids:
+        raise ValueError("Daemon PDF review closure drifted.")
     for row in reviews:
         digest = historical_generator._generator_input_datasheet_payload_hash(  # pyright: ignore[reportPrivateUsage]
             source_artifacts=originals, datasheet_id=cast(str, row["datasheet_id"])
         )
         if digest != row["input_payload_sha256"]:
-            raise ValueError("Cavalcade reviewed generator input drifted.")
+            raise ValueError("Daemon reviewed generator input drifted.")
         if (
             hashlib.sha256(cast(str, row["official_text"]).encode()).hexdigest()
             != row["official_text_sha256"]
         ):
-            raise ValueError("Cavalcade retained official text drifted.")
+            raise ValueError("Daemon retained official text drifted.")
     linked = {
         r.runtime_fields_payload()["ability_id"]
         for a in originals
         if a.source_table == "Datasheets_abilities"
         for r in a.rows
-        if r.runtime_fields_payload().get("datasheet_id") in ADDITIONAL_IDS
+        if r.runtime_fields_payload().get("datasheet_id") in datasheet_ids
         and r.runtime_fields_payload().get("ability_id")
     }
     selected: list[WahapediaJsonArtifact] = []
@@ -235,8 +251,8 @@ def _additional_catalog(
         for r in artifact.rows:
             f = r.runtime_fields_payload()
             include = (
-                f.get("datasheet_id") in ADDITIONAL_IDS
-                or (artifact.source_table == "Datasheets" and f.get("id") in ADDITIONAL_IDS)
+                f.get("datasheet_id") in datasheet_ids
+                or (artifact.source_table == "Datasheets" and f.get("id") in datasheet_ids)
                 or (artifact.source_table == "Factions" and f.get("id") == "CD")
                 or (artifact.source_table == "Abilities" and f.get("id") in linked)
             )
@@ -245,11 +261,13 @@ def _additional_catalog(
                 and f.get("keyword", "").upper() == "SHADOW LEGION"
             ):
                 continue
-            payload = _promote(r.to_payload(), artifact.source_package_id.stable_identity())
+            payload = _promote(
+                r.to_payload(), artifact.source_package_id.stable_identity(), reviewed_package
+            )
             rows.append(NormalizedSourceRow.from_payload(cast(NormalizedSourceRowPayload, payload)))
         selected.append(
             WahapediaJsonArtifact(
-                source_package_id=REVIEWED,
+                source_package_id=reviewed_package,
                 source_table=artifact.source_table,
                 source_checksum_sha256=historical.OFFICIAL_PDF_SHA256,
                 rows=tuple(rows),
@@ -270,12 +288,17 @@ def _additional_catalog(
     )
     bridge = build_wahapedia_canonical_bridge_artifacts(
         source_artifacts=tuple(selected),
-        bridge_package_id=REVIEWED,
-        datasheet_ids=ADDITIONAL_IDS,
+        bridge_package_id=reviewed_package,
+        datasheet_ids=datasheet_ids,
         pdf_corrections=corrections,
         height_overrides=heights,
     )
-    return _current_additional_core_descriptions(_catalog_from_bridge(bridge))
+    report = build_canonical_catalog_report(
+        package_id=output_package, catalog_version=output_version, source_artifacts=bridge
+    )
+    if report.package is None:
+        raise ValueError("Daemon source rows could not preserve physical model profiles.")
+    return report.package
 
 
 def _current_additional_core_descriptions(
@@ -341,15 +364,15 @@ def _current_additional_core_descriptions(
     )
 
 
-def _promote(value: object, old_identity: str) -> object:
+def _promote(value: object, old_identity: str, package: DataPackageId) -> object:
     if isinstance(value, str):
-        return value.replace(old_identity, REVIEWED.stable_identity())
+        return value.replace(old_identity, package.stable_identity())
     if isinstance(value, list):
-        return [_promote(v, old_identity) for v in value]
+        return [_promote(v, old_identity, package) for v in value]
     if isinstance(value, dict):
-        result = {k: _promote(v, old_identity) for k, v in value.items()}
+        result = {k: _promote(v, old_identity, package) for k, v in value.items()}
         if "source_package_id" in result:
-            result["source_package_id"] = REVIEWED.to_payload()
+            result["source_package_id"] = package.to_payload()
         return result
     return value
 

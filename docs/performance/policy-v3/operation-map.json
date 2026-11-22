@@ -34219,6 +34219,24 @@
       "sensitive": false,
       "mandatory": false
     },
+    "monster-mash-v995-roster-admission": {
+      "paths": [
+        "data/army_lists/monster-mash.json",
+        "data/source_audits/ci64_provenance_v1/monster-mash-v995-test-addition-v1.json",
+        "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/chaos_daemons_monster_mash_2026_11/*",
+        "scripts/engine_numerical_identity_test_admission.py",
+        "tests/factions/chaos_daemons/integration/test_monster_mash_v995_roster.py",
+        "tests/support/monster_mash_v995.py",
+        "tools/generate_cavalcade_v995_catalog.py",
+        "tools/generate_monster_mash_v995_catalog.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
     "cavalcade-v995-support-report": {
       "paths": [
         "tools/generate_ability_support_matrix.py"

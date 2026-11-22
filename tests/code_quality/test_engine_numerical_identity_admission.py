@@ -266,7 +266,12 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
     assert opening["retained_runtime_fingerprint"] == cover_event["runtime_fingerprint"]
     movement = _record(selection.OPENING_MOVEMENT_UNIT_ADDITION)
     assert movement["retained_runtime_fingerprint"] == opening["runtime_fingerprint"]
-    assert _record(MANIFEST)["fingerprint"] == movement["runtime_fingerprint"]
+    monster_mash = _record(selection.MONSTER_MASH_ADDITION)
+    assert monster_mash["retained_runtime_fingerprint"] == movement["runtime_fingerprint"]
+    assert _record(MANIFEST)["fingerprint"] == monster_mash["runtime_fingerprint"]
+    monster_mash_owner = selection.MONSTER_MASH_OWNER
+    assert monster_mash_owner in active_files
+    assert sum(monster_mash_owner in group for group in groups) == 1
     movement_owner = selection.OPENING_MOVEMENT_UNIT_OWNER
     assert movement_owner in active_files
     assert sum(movement_owner in group for group in groups) == 1

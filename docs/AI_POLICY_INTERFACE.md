@@ -2959,3 +2959,36 @@ located the unresolved query in melee save preparation. The shared allocation
 path requests exact terrain visibility for Cover, whose retained Core 13.08
 source applies to ranged attacks. A runtime repair requires its own
 runtime-bound behavioral admission and qualification.
+
+## Monster Mash versus Cavalcade setup
+
+The [Monster Mash army list](../data/army_lists/monster-mash.json) records the
+v2.8.1 (1), data v995 export. Its nine units and 33 models cost 1,995 points under
+the pinned October MFM. It selects Daemonic Incursion for 3 Detachment Points,
+Take and Hold, and Be'lakor as Warlord. The ordinary list loader resolves the
+three pairs of icon and instrument bearers to different regular models.
+
+For the mixed setup, use
+`chaos_daemons_monster_mash_2026_11.catalog_package()` with
+`army_muster_request_from_player_army_list` for both the Monster Mash export and
+the [existing Cavalcade list](../data/army_lists/cavalcade-shadow-bloodthirster.json).
+In GameConfig use the package's army catalog and model geometries, and select
+`mission-take-and-hold-vs-purge-the-foe-layout-1` with Monster Mash as the
+Take and Hold player and Cavalcade as the Purge the Foe player. The official
+pairing gives those players Immovable Object and Unstoppable Force, respectively.
+[Warhammer Event Companion pp. 12–14](https://assets.warhammer-community.com/eng_12-06_warhammer40000_event_companion-s3bfb5f9s1-ivswuij3fo.pdf#page=12)
+
+The [bounded setup fixture](../tests/support/monster_mash_v995.py) submits eight
+decisions through the ordinary player-view adapter. It places Cavalcade's
+Be'lakor and Monster Mash's Kairos, then hands off at Cavalcade's next
+`select_deployment_unit` request. The regression round-trips both player views
+through a checkpoint and replays all eight decisions exactly. Continuing the
+matchup starts from that deployment request.
+
+The catalog retains Cavalcade's existing geometry and the reviewed
+Bloodletters and Kairos heights. Five new height values are provisional estimates with source and assembly
+details in the mixed catalog's `artifacts/geometry.json`. The source review and
+this fixture establish native roster admission and the staged setup boundary.
+Bloodletters' 7+ armour and 5+ invulnerable save have a separate component
+allocation regression from PR #618. Combat in this mixed matchup has yet to be
+exercised.

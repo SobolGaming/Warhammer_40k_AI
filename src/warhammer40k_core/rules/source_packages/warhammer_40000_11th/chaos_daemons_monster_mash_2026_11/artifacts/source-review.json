@@ -1,0 +1,165 @@
+{
+  "schema": "monster-mash-v995-source-review-v1",
+  "official_pdf": "data/raw/faction_packs/eng_22-07_warhammer_40,000_faction_pack_chaos_daemons-lycqqrymwe-qogh4b5yly.pdf",
+  "official_pdf_sha256": "818f7ef144691b9eef6b3c5b5d0a39793690af5a958037b7055215e6675e6a2c",
+  "points_source_package_id": "gw-11e-mfm-2026-10",
+  "base_source": "Warhammer Event Companion p.65, retained Chaos Daemons base-size rows",
+  "datasheets": [
+    {
+      "datasheet_id": "000001105",
+      "name": "Skarbrand",
+      "pages": [
+        14,
+        15
+      ],
+      "official_text": "SKARBRAND\nKEYWORDS: \u0007Monster, Character, Epic Hero, Chaos, Daemon, Khorne, \nSkarbrand\nRANGED WEAPONS\nRANGE\nA\nBS\nS\nAP\nD\nBellow of endless fury [IGNORES COVER, TORRENT]\n12\"\n2D6\nN/A\n8\n-1\n1\nMELEE WEAPONS\nRANGE\nA\nWS\nS\nAP\nD\nSlaughter and Carnage – strike\nMelee\n8\n2+\n16\n-4\n6\nSlaughter and Carnage – sweep \nMelee\n16\n2+\n8\n-2\n2\nDAMAGED: 1-7 WOUNDS REMAINING\nWhile this model has 1-7 wounds remaining, add 2 to the Attacks characteristic of this model’s \nSlaughter and Carnage.\nFACTION KEYWORDS: \nLegiones Daemonica\nABILITIES\nCORE: Deadly Demise D6, Deep Strike\nFACTION: The Shadow of Chaos\nGreater Daemon of Khorne (Aura): While a friendly Khorne \nLegiones Daemonica unit is within 6\" of this model, that unit \nis within your army’s Shadow of Chaos.\nRage Embodied (Aura): While a friendly Khorne Legiones \nDaemonica unit is within 6\" of this model, add 1 to the Attacks \ncharacteristic of melee weapons equipped by models in \nthat unit.\nMurderlust: This unit is eligible to declare a charge in a turn in \nwhich it Advanced.\nINVULNERABLE SAVE\n4+\nM\nT\nSV\nW\nLD\nOC\n10\"\n11\n3+\n20\n6+\n5\n Before selecting targets for this weapon, select one of its profiles to make attacks with.\n\nWARGEAR OPTIONS\n\t■\u0007None\nUNIT COMPOSITION\n\t■ 1 Skarbrand – Epic Hero\nThis model is equipped with: bellow of endless fury; \nSlaughter and Carnage.\nSKARBRAND\nNever pausing, never relenting, Skarbrand storms across realspace \nhacking apart every luckless foe that stands in its path. Worse, all \nwho find themselves in the daemon’s presence are seized by its feral \nmurderlust, a madness that sees elegant strategies collapse into \norgies of primal savagery.\nKEYWORDS: \u0007Monster, Character, Epic Hero, Chaos, Daemon, Khorne, \nSkarbrand\nFACTION KEYWORDS: \nLegiones Daemonica\n",
+      "official_text_sha256": "1f1c661f8d4b58bd48b3db5fff50bdc7fdca3f0e356965dd09ce8931b31470de",
+      "input_payload_sha256": "82badf7c56c52d6da17fcd36f3fef531280e59a92078a278882c291ddf043780",
+      "base_dimensions": "100mm",
+      "reviewed_fields": [
+        "abilities",
+        "composition",
+        "datasheet_keywords",
+        "faction_keywords",
+        "model_characteristics",
+        "mustering_options",
+        "wargear_options",
+        "weapon_profiles",
+        "damaged_profile",
+        "invulnerable_save"
+      ],
+      "corrections": []
+    },
+    {
+      "datasheet_id": "000001114",
+      "name": "Bloodletters",
+      "pages": [
+        28,
+        29
+      ],
+      "official_text": "BLOODLETTERS\nKEYWORDS: Infantry, Battleline, Chaos, Daemon, Khorne, Bloodletters\nMELEE WEAPONS\nRANGE\nA\nWS\nS\nAP\nD\nHellblade\nMelee\n2\n3+\n5\n-2\n2\nFACTION KEYWORDS: \nLegiones Daemonica\nABILITIES\nCORE: Deep Strike\nFACTION: The Shadow of Chaos\nBane of Cowards: Each time an enemy unit (excluding \nMonsters and Vehicles) within Engagement Range of one or \nmore units from your army with this ability Falls Back, models \nin that enemy unit must take Desperate Escape tests. When \ndoing so, if that enemy unit is also Battle‑shocked, subtract 1 \nfrom each of those Desperate Escape tests.\nWARGEAR ABILITIES\nDaemonic Icon: Models in the bearer’s unit have a Leadership \ncharacteristic of 6+.\nInstrument of Chaos: Add 1 to Charge rolls made for the \nbearer’s unit.\nINVULNERABLE SAVE\n5+\nM\nT\nSV\nW\nLD\nOC\n8\"\n4\n7+\n1\n7+\n2\n\nWARGEAR OPTIONS\n\t■\u00071 Bloodletter that is not equipped with a daemonic icon can be equipped with 1 instrument of Chaos. \n\t■\u00071 Bloodletter that is not equipped with an instrument of Chaos can be equipped with 1 daemonic icon. \nUNIT COMPOSITION\n\t■1 Bloodreaper\n\t■9 Bloodletters\nEvery model is equipped with: hellblade.\nBLOODLETTERS\nBloodletters are hate and violence made manifest. Attacking in berserk \npacks or in martial, marching ranks, they hack apart their victims with \nmonstrous hellblades. These weapons glow red-hot with the fury of \ntheir wielders, and even the slightest wound they inflict can see the \nvictim bled dry in seconds.\nKEYWORDS: Infantry, Battleline, Chaos, Daemon, Khorne, Bloodletters\nFACTION KEYWORDS: \nLegiones Daemonica\n",
+      "official_text_sha256": "965ee356601f1bf45c4265c7cf709da18d82221b3ea381a53f95c3af1975973f",
+      "input_payload_sha256": "fc240bdca78257c408c7d5d202b028b16621653c9293a89486baf74758b820e9",
+      "base_dimensions": "32mm",
+      "reviewed_fields": [
+        "abilities",
+        "composition",
+        "datasheet_keywords",
+        "faction_keywords",
+        "model_characteristics",
+        "mustering_options",
+        "wargear_options",
+        "weapon_profiles",
+        "damaged_profile",
+        "invulnerable_save"
+      ],
+      "corrections": [
+        "Remove historical conditional Shadow Legion keyword from the ordinary datasheet."
+      ]
+    },
+    {
+      "datasheet_id": "000001117",
+      "name": "Kairos Fateweaver",
+      "pages": [
+        38,
+        39
+      ],
+      "official_text": "KAIROS FATEWEAVER\nKEYWORDS: \u0007Monster, Character, Epic Hero, Fly, Psyker, Chaos, Daemon, \nTzeentch, Kairos Fateweaver\nRANGED WEAPONS\nRANGE\nA\nBS\nS\nAP\nD\nInfernal Gateway – witchfire\n [BLAST, INDIRECT FIRE, PSYCHIC]\n24\"\nD6+3\n2+\n9\n-2\nD3\nInfernal Gateway – focused witchfire\n[BLAST, INDIRECT FIRE, HAZARDOUS, PSYCHIC]\n24\"\nD3+6\n2+\n9\n-2\n3\nMELEE WEAPONS\nRANGE\nA\nWS\nS\nAP\nD\nStaff of Tomorrow [PSYCHIC]\nMelee\n5\n3+\n8\n-2\n2D3\nDAMAGED: 1-7 WOUNDS REMAINING\nWhile this model has 1-7 wounds remaining, each time this model makes an attack, subtract 1 from the \nHit roll.\nFACTION KEYWORDS: \nLegiones Daemonica\nABILITIES\nCORE: Deadly Demise D6, Deep Strike\nFACTION: The Shadow of Chaos\nGreater Daemon of Tzeentch (Aura): While a friendly \nTzeentch Legiones Daemonica unit is within 6\" of this \nmodel, that unit is within your army’s Shadow of Chaos.\nOne Head Looks Forward: At the end of your Command phase, \nif this model is on the battlefield, take a Leadership test for \nthis model; if that test is passed, you gain 1CP.\nOne Head Looks Back: Once per turn, when your opponent \ntargets a unit from their army within 12\" of this model with a \nstratagem, you can use this ability. If you do, increase the CP \ncost of that use of that stratagem by 1CP.\nINVULNERABLE SAVE\n4+\nM\nT\nSV\nW\nLD\nOC\n12\"\n10\n6+\n20\n6+\n5\n Before selecting targets for this weapon, select one of its profiles to make attacks with.\n\nWARGEAR OPTIONS\n\t■\u0007None\nUNIT COMPOSITION\n\t■1 Kairos Fateweaver – Epic Hero\nThis model is equipped with: Infernal Gateway; \nStaff of Tomorrow.\nKAIROS FATEWEAVER\nWielding the warp-forged Staff of Tomorrow, and with the ability to \npredict all that may come to pass while knowing all that has already \ntranspired, Kairos Fateweaver is amongst the galaxy’s most canny \nstrategists. What the daemon lacks in physical and martial prowess, it \nmore than makes up for in pure Tzeentchian cunning.\nKEYWORDS: \u0007Monster, Character, Epic Hero, Fly, Psyker, Chaos, Daemon, \nTzeentch, Kairos Fateweaver\nFACTION KEYWORDS: \nLegiones Daemonica\n",
+      "official_text_sha256": "844cf604cfdf144915fc7cc5564388da38d523f213c980b4f1d3c2d048783d58",
+      "input_payload_sha256": "9ec0fc2c6805a2f38c22c74094147221e92b322d19496b5326186eb869c2d717",
+      "base_dimensions": "100mm",
+      "reviewed_fields": [
+        "abilities",
+        "composition",
+        "datasheet_keywords",
+        "faction_keywords",
+        "model_characteristics",
+        "mustering_options",
+        "wargear_options",
+        "weapon_profiles",
+        "damaged_profile",
+        "invulnerable_save"
+      ],
+      "corrections": [
+        "Apply the July One Head Looks Back text and non-Aura name under the existing canonical ability identity."
+      ]
+    },
+    {
+      "datasheet_id": "000001125",
+      "name": "Flamers",
+      "pages": [
+        56,
+        57
+      ],
+      "official_text": "FLAMERS\nKEYWORDS: Infantry, Fly, Chaos, Daemon, Tzeentch, Flamers\nRANGED WEAPONS\nRANGE\nA\nBS\nS\nAP\nD\nFlickering Flames [IGNORES COVER, PSYCHIC, TORRENT]\n12\"\nD6\nN/A\n4\n-1\n1\nMELEE WEAPONS\nRANGE\nA\nWS\nS\nAP\nD\nFlamer mouths \nMelee\n3\n4+\n4\n0\n1\nFACTION KEYWORDS: \nLegiones Daemonica\nABILITIES\nCORE: Deep Strike\nFACTION: The Shadow of Chaos\nBounding Leaps: This unit is eligible to shoot in a turn in \nwhich it Fell Back.\nINVULNERABLE SAVE\n4+\nM\nT\nSV\nW\nLD\nOC\n9\"\n4\n7+\n3\n7+\n1\n\nWARGEAR OPTIONS\n\t■\u0007None\nUNIT COMPOSITION\n\t■1 Pyrocaster\n\t■2-5 Flamers\nEvery model is equipped with: Flickering Flames; \nFlamer mouths.\nFLAMERS\nThese bizarre daemons bound through the air in convulsive leaps. \nThe warpflame that drools from their many maws seethes with the \nraw power of change. When spat forth in roaring sheets, it sends its \nvictims into agonies of mutation, their forms altering again and again \nbefore collapsing into distorted ruin.\nKEYWORDS: Infantry, Fly, Chaos, Daemon, Tzeentch, Flamers\nFACTION KEYWORDS: \nLegiones Daemonica\n",
+      "official_text_sha256": "40ce9d764917fca665042315f326e0a88c99a3240ac9d74bfe151c05fa85708c",
+      "input_payload_sha256": "7300830fdb258cb32dd686c05dede37a454364a89b46252101fd8e1e4a36344c",
+      "base_dimensions": "32mm",
+      "reviewed_fields": [
+        "abilities",
+        "composition",
+        "datasheet_keywords",
+        "faction_keywords",
+        "model_characteristics",
+        "mustering_options",
+        "wargear_options",
+        "weapon_profiles",
+        "damaged_profile",
+        "invulnerable_save"
+      ],
+      "corrections": [
+        "Remove historical conditional Shadow Legion keyword from the ordinary datasheet."
+      ]
+    },
+    {
+      "datasheet_id": "000001465",
+      "name": "Rotigus",
+      "pages": [
+        64,
+        65
+      ],
+      "official_text": "ROTIGUS\nKEYWORDS: \u0007Monster, Character, Epic Hero, Psyker, Chaos, Daemon, Nurgle, \nRotigus\nRANGED WEAPONS\nRANGE\nA\nBS\nS\nAP\nD\nStreams of brackish filth\n[DEVASTATING WOUNDS, IGNORES COVER, TORRENT]\n12\"\n2D6\nN/A\n8\n-2\n1\nMELEE WEAPONS\nRANGE\nA\nWS\nS\nAP\nD\nGnarlrod – strike [LETHAL HITS, PSYCHIC]\nMelee\n7\n2+\n10\n-3\n3\nGnarlrod – sweep [LETHAL HITS, PSYCHIC]\nMelee\n14\n2+\n8\n-1\n1\nDAMAGED: 1-7 WOUNDS REMAINING\nWhile this model has 1-7 wounds remaining, each time this model makes an attack, subtract 1 from the \nHit roll.\nFACTION KEYWORDS: \nLegiones Daemonica\nABILITIES\nCORE: Deadly Demise D6, Deep Strike, Feel No Pain 6+\nFACTION: The Shadow of Chaos\nGreater Daemon of Nurgle (Aura): While a friendly Nurgle \nLegiones Daemonica unit is within 6\" of this model, that unit \nis within your army’s Shadow of Chaos.\nVirulent Blessing (Psychic): At the start of the Fight phase, \nyou can select one enemy unit within 24\" and visible to this \nmodel. Until the end of the phase, each time an attack made \nby a Nurgle Legiones Daemonica model is allocated to \na model in that unit, add 1 to the Damage characteristic of \nthat attack.\nDeluge of Nurgle (Aura):While an enemy unit is within 6\" \nof this model, subtract 2 from the Move characteristic and \nsubtract 1 from the Objective Control characteristic of models \nin that unit.\nINVULNERABLE SAVE\n4+\nM\nT\nSV\nW\nLD\nOC\n7\"\n12\n5+\n22\n6+\n5\n Before selecting targets for this weapon, select one of its profiles to make attacks with.\n\nWARGEAR OPTIONS\n\t■\u0007None\nUNIT COMPOSITION\n\t■1 Rotigus – Epic Hero\nThis model is equipped with: streams of brackish \nfilth; gnarlrod.\nROTIGUS\nRotigus Rainfather lumbers into battle vomiting jetting rivers of \ncorrosive, plague-laden filth across all who stand in its path. In its \nbloated fist it clutches a gnarlrod, while an endless and infectious \ndownpour accompanies the daemon, a fecund flood fit to drown, \ncorrupt and mutate all it touches.\nKEYWORDS: \u0007Monster, Character, Epic Hero, Psyker, Chaos, Daemon, Nurgle, \nRotigus\nFACTION KEYWORDS: \nLegiones Daemonica\n",
+      "official_text_sha256": "5ada07e76e165ae597efe4e64f4ad7f8d1b48c8bfc32d17a7e63e7893eee3f3f",
+      "input_payload_sha256": "df46cc606f2accb97293b050a2130c637660045bc29271a563c91460235d51d9",
+      "base_dimensions": "130mm",
+      "reviewed_fields": [
+        "abilities",
+        "composition",
+        "datasheet_keywords",
+        "faction_keywords",
+        "model_characteristics",
+        "mustering_options",
+        "wargear_options",
+        "weapon_profiles",
+        "damaged_profile",
+        "invulnerable_save"
+      ],
+      "corrections": []
+    },
+    {
+      "datasheet_id": "000001648",
+      "name": "Shalaxi Helbane",
+      "pages": [
+        88,
+        89
+      ],
+      "official_text": "SHALAXI HELBANE\nKEYWORDS: \u0007Monster, Character, Epic Hero, Psyker, Chaos, Daemon, \nSlaanesh, Shalaxi Helbane\nRANGED WEAPONS\nRANGE\nA\nBS\nS\nAP\nD\nLash of Slaanesh [ASSAULT]\n12\"\n6\n2+\n6\n-1\n2\nPavane of Slaanesh – witchfire\n[DEVASTATING WOUNDS, PSYCHIC]\n18\"\nD6\n2+\n9\n-1\nD3\nPavane of Slaanesh – focused witchfire\n[HAZARDOUS, DEVASTATING WOUNDS, PSYCHIC, SUSTAINED HITS 3]\n18\"\nD6\n2+\n9\n-2\nD3\nMELEE WEAPONS\nRANGE\nA\nWS\nS\nAP\nD\nSnapping claws [DEVASTATING WOUNDS, EXTRA ATTACKS]\nMelee\n4\n2+\n6\n-2\n3\nSoulpiercer [PRECISION]\nMelee\n6\n2+\n12\n-3\nD6+2\nDAMAGED: 1-7 WOUNDS REMAINING\nWhile this model has 1-7 wounds remaining, each time this model makes an attack, subtract 1 from the \nHit roll.\nFACTION KEYWORDS: \nLegiones Daemonica\nABILITIES\nCORE: Deadly Demise D6, Deep Strike\nFACTION: The Shadow of Chaos\nGreater Daemon of Slaanesh (Aura): While a friendly \nSlaanesh Legiones Daemonica unit is within 6\" of this \nmodel, that unit is within your army’s Shadow of Chaos.\nNo Prey Can Evade: You can re‑roll Advance and Charge rolls \nmade for this model.\nMonarch of the Hunt: At the start of the first battle round, \nselect one enemy unit to be this model’s quarry. Each time \nthis model makes a melee attack that targets its quarry, you \ncan re‑roll the Hit roll and you can re‑roll the Wound roll. Each \ntime this model’s quarry is destroyed, select one new enemy \nunit to be this model’s quarry.\nINVULNERABLE SAVE\n4+\nM\nT\nSV\nW\nLD\nOC\n14\"\n10\n3+\n20\n6+\n5\n Before selecting targets for this weapon, select one of its profiles to make attacks with.\n\nWARGEAR OPTIONS\n\t■\u0007None\nUNIT COMPOSITION\n\t■1 Shalaxi Helbane – Epic Hero\nThis model is equipped with: lash of Slaanesh; Pavane of \nSlaanesh; snapping claws; soulpiercer.\nSHALAXI HELBANE\nCloven hooves pounding against broken earth, Shalaxi Helbane bears \ndown upon its doomed quarry with the Soulpiercer gleaming in its \ngrip. No prey can evade the Monarch of the Hunt, for the daemon’s \nobsession with its victim is so singular and so powerful that no mortal \nmeans of flight could ever escape it.\nKEYWORDS: \u0007Monster, Character, Epic Hero, Psyker, Chaos, Daemon, \nSlaanesh, Shalaxi Helbane\nFACTION KEYWORDS: \nLegiones Daemonica\n",
+      "official_text_sha256": "d2c8474c722d94d1748d939afdf26fb4be7253dcd0343ec6d685543d35ab841d",
+      "input_payload_sha256": "837faed4d323195c188c1053a05ae586d7fbf1658eafe443118fdd5a3aeb8b9a",
+      "base_dimensions": "100mm",
+      "reviewed_fields": [
+        "abilities",
+        "composition",
+        "datasheet_keywords",
+        "faction_keywords",
+        "model_characteristics",
+        "mustering_options",
+        "wargear_options",
+        "weapon_profiles",
+        "damaged_profile",
+        "invulnerable_save"
+      ],
+      "corrections": []
+    }
+  ]
+}
