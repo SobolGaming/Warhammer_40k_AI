@@ -258,7 +258,12 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
     )
     assert cover_event["runtime_fingerprint"] == opening_base_manifest["fingerprint"]
     assert opening["retained_runtime_fingerprint"] == cover_event["runtime_fingerprint"]
-    assert _record(MANIFEST)["fingerprint"] == opening["runtime_fingerprint"]
+    movement = _record(selection.OPENING_MOVEMENT_UNIT_ADDITION)
+    assert movement["retained_runtime_fingerprint"] == opening["runtime_fingerprint"]
+    assert _record(MANIFEST)["fingerprint"] == movement["runtime_fingerprint"]
+    movement_owner = selection.OPENING_MOVEMENT_UNIT_OWNER
+    assert movement_owner in active_files
+    assert sum(movement_owner in group for group in groups) == 1
     opening_owner = selection.OPENING_SHADOW_FORM_OWNER
     assert opening_owner in active_files
     assert sum(opening_owner in group for group in groups) == 1
@@ -465,6 +470,7 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         | allocation_cases
         | {cover_owner + "::test_save_cover_cache_key_projects_embedded_request_reference"}
         | {opening_owner + "::test_opening_shadow_form_policy_reaches_native_movement"}
+        | {movement_owner + "::test_opening_movement_selects_an_issued_unit_before_any_action"}
         | {
             strict_replay_owner
             + "::test_strict_persistence_rejects_valid_artifact_with_mismatched_metadata_or_tails"

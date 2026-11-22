@@ -1,0 +1,15 @@
+{
+  "schema": "finite-stage2-opening-movement-unit-test-addition-v1",
+  "retained_opening_shadow_form_sha256": "a69c8069b46b70ef3e9afe0bea2c16f54d2d152fe9dbf72fcaa70951ff58b9d0",
+  "retained_runtime_fingerprint": "280b3dd7f7066af917a2a522034ff92fb0191ea89e9eb3ab9030dd0d95ac9d64",
+  "runtime_fingerprint": "3b01212a43eda6a5911846e8a52c6b0ede4963d9414f2b55ab2db78d725b25d8",
+  "policy_sha256": "16b0d8c6c0afb74ddd73d9e9395529c57bfeb44c26df26034cf28cdca31de0eb",
+  "added_files": {
+    "tests/factions/chaos_daemons/integration/test_cavalcade_opening_movement_unit.py": {
+      "blob_sha1": "0b3d0359f61417940eec1c9abacf3fdf7ac50112",
+      "bytes": 4417,
+      "mode": "100644",
+      "sha256": "97a64055d9809e5051e1cd442774f4ae9fdac1834cb3e04c11a73b2810b08d45"
+    }
+  }
+}

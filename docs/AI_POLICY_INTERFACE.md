@@ -124,6 +124,28 @@ The setup recipe remains scripted. The opening policy supplies a bounded
 heuristic baseline with no tactical comparison or learning admission. The
 existing adapter decision contract covers the finite selection.
 
+## Opening Cavalcade Movement unit policy
+
+After both opted-in Shadow Form choices, the native Cavalcade runner can stop
+at the start of Player A's first Movement phase. Pass that pending actor-view
+request ID to `ai.opening_movement_unit.opening_movement_unit_registration`
+and register it explicitly for the continuation. The
+`opening-movement-unit-battlefield-size-v1` policy is bound to that one request
+on Player A's round-one Movement route.
+
+The development heuristic chooses the battlefield option with the largest
+issued living-model count and breaks ties in engine-issued order. Each option
+represents one canonical rules unit, so Attached Unit components contribute to
+the same option. Embarked and Strategic Reserve options lie outside this
+heuristic. An empty battlefield candidate set stops the policy.
+
+The ordinary finite viewer submission records the selected unit and exposes
+`select_movement_action` for that unit. Movement-action selection and path
+generation remain separate routes. The existing adapter decision contract
+covers the request and submission. The native regression verifies the unit
+selection, the unchanged battlefield state, and exact replay through both Shadow
+Forms and the selection.
+
 ## Stage 2 casualty allocation baseline
 
 `ai.allocation_coherency.AllocationCoherencyPolicy` is an opt-in finite policy

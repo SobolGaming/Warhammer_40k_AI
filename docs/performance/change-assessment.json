@@ -1,318 +1,316 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "a7752da914356a43c144b8b4ea1dfd522cd0c0c5",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:280b3dd7f7066af917a2a522034ff92fb0191ea89e9eb3ab9030dd0d95ac9d64",
-  "operation_map_sha256": "c22448bbd436b52875d6f6edc17e98b70d36d2e078af1183507cf9a40e8e9e80",
+  "base": "6d7e7c2d978913c0d3322f987c3668db4f6fe74a",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:3b01212a43eda6a5911846e8a52c6b0ede4963d9414f2b55ab2db78d725b25d8",
+  "operation_map_sha256": "f8f7043597db9ab5659902d9cf477b273d9b86d5326315454df370634768bc09",
   "changes": {
     "ci/test_shards/durations.json": {
-      "before_sha256": "eef998df6f802c8f96572db1130a88173a8d8fca578dc4e40bd9ee8662b7d263",
-      "after_sha256": "0eec036aaa39fc936eb18e0016efb3853420de9dd5ca57dc025cebe6d654a27b",
+      "before_sha256": "0eec036aaa39fc936eb18e0016efb3853420de9dd5ca57dc025cebe6d654a27b",
+      "after_sha256": "63003fe7b791b399ced1b358d0b1800a72ab008af9ba2ada20b131e939b91a19",
       "owners": {
         "@document": {
-          "before": "eef998df6f802c8f96572db1130a88173a8d8fca578dc4e40bd9ee8662b7d263",
-          "after": "0eec036aaa39fc936eb18e0016efb3853420de9dd5ca57dc025cebe6d654a27b"
+          "before": "0eec036aaa39fc936eb18e0016efb3853420de9dd5ca57dc025cebe6d654a27b",
+          "after": "63003fe7b791b399ced1b358d0b1800a72ab008af9ba2ada20b131e939b91a19"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
-      "before_sha256": "cc342484b6520a3f9c33e6071ff20049591874166b7fb81ba314d9bc9daeb449",
-      "after_sha256": "551266fefc30bee3e01745a6b1e4e3355ea32728c91a3441cd8c16ab46419d9c",
+      "before_sha256": "551266fefc30bee3e01745a6b1e4e3355ea32728c91a3441cd8c16ab46419d9c",
+      "after_sha256": "6a74135a8babe94074c2e785388f35fdb312423efd9fe8f987f80ddac5d86583",
       "owners": {
         "@document": {
-          "before": "cc342484b6520a3f9c33e6071ff20049591874166b7fb81ba314d9bc9daeb449",
-          "after": "551266fefc30bee3e01745a6b1e4e3355ea32728c91a3441cd8c16ab46419d9c"
+          "before": "551266fefc30bee3e01745a6b1e4e3355ea32728c91a3441cd8c16ab46419d9c",
+          "after": "6a74135a8babe94074c2e785388f35fdb312423efd9fe8f987f80ddac5d86583"
+        }
+      }
+    },
+    "ci/test_shards/shard-10.txt": {
+      "before_sha256": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20",
+      "after_sha256": "e712b87e1afd0bd6bc005f44533b1ecca2345a7b02de4f8206b050dffa4e24d7",
+      "owners": {
+        "@document": {
+          "before": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20",
+          "after": "e712b87e1afd0bd6bc005f44533b1ecca2345a7b02de4f8206b050dffa4e24d7"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
-      "before_sha256": "6cc0a98970e14cba567fe120df2c1492d3e9ad66b90e5fceb2afdf3b079475dc",
-      "after_sha256": "73f5967ad71f590e373a3361b2216dbe1bf365913ef05b57745b910a791edd6c",
+      "before_sha256": "73f5967ad71f590e373a3361b2216dbe1bf365913ef05b57745b910a791edd6c",
+      "after_sha256": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20",
       "owners": {
         "@document": {
-          "before": "6cc0a98970e14cba567fe120df2c1492d3e9ad66b90e5fceb2afdf3b079475dc",
-          "after": "73f5967ad71f590e373a3361b2216dbe1bf365913ef05b57745b910a791edd6c"
+          "before": "73f5967ad71f590e373a3361b2216dbe1bf365913ef05b57745b910a791edd6c",
+          "after": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
-      "before_sha256": "130f4e124be616328742281df1b9a0d3c9ab125333b994be5127c03de32cf29c",
-      "after_sha256": "9af989a5701adb92debb873e46ba82002f5912b4230c0fc8b21458c59daf0933",
+      "before_sha256": "9af989a5701adb92debb873e46ba82002f5912b4230c0fc8b21458c59daf0933",
+      "after_sha256": "ec3c142fcc969a095f55d7d909f16293fd35530240471eddfe657ca40c4b065a",
       "owners": {
         "@document": {
-          "before": "130f4e124be616328742281df1b9a0d3c9ab125333b994be5127c03de32cf29c",
-          "after": "9af989a5701adb92debb873e46ba82002f5912b4230c0fc8b21458c59daf0933"
+          "before": "9af989a5701adb92debb873e46ba82002f5912b4230c0fc8b21458c59daf0933",
+          "after": "ec3c142fcc969a095f55d7d909f16293fd35530240471eddfe657ca40c4b065a"
         }
       }
     },
     "ci/test_shards/shard-2.txt": {
-      "before_sha256": "5f1ad5dd41e60165ac1033ddad58e51d04da120e7f2d442a7998abe87e6e75e6",
-      "after_sha256": "f15853915deec2e4b2128ab4989556e6b9faf3f9432e3c897d0a7fa0a507db4c",
+      "before_sha256": "f15853915deec2e4b2128ab4989556e6b9faf3f9432e3c897d0a7fa0a507db4c",
+      "after_sha256": "3cb530f65a428df294ec30dce19781c250d9d6704a3fdebdf3ff5d80f0ad7ccf",
       "owners": {
         "@document": {
-          "before": "5f1ad5dd41e60165ac1033ddad58e51d04da120e7f2d442a7998abe87e6e75e6",
-          "after": "f15853915deec2e4b2128ab4989556e6b9faf3f9432e3c897d0a7fa0a507db4c"
+          "before": "f15853915deec2e4b2128ab4989556e6b9faf3f9432e3c897d0a7fa0a507db4c",
+          "after": "3cb530f65a428df294ec30dce19781c250d9d6704a3fdebdf3ff5d80f0ad7ccf"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
-      "before_sha256": "548cbe7cd6a22f9987f61459bb3eb30667e06861515d3f6e4463669adeee8fea",
-      "after_sha256": "fc2ac721672f6a358881fc8db0959abca176828c55f556fd6f62541d93994cf0",
+      "before_sha256": "fc2ac721672f6a358881fc8db0959abca176828c55f556fd6f62541d93994cf0",
+      "after_sha256": "35404c71bf429779b79b35f38274bf7877f6a9167cbecdc072928acb2570165f",
       "owners": {
         "@document": {
-          "before": "548cbe7cd6a22f9987f61459bb3eb30667e06861515d3f6e4463669adeee8fea",
-          "after": "fc2ac721672f6a358881fc8db0959abca176828c55f556fd6f62541d93994cf0"
+          "before": "fc2ac721672f6a358881fc8db0959abca176828c55f556fd6f62541d93994cf0",
+          "after": "35404c71bf429779b79b35f38274bf7877f6a9167cbecdc072928acb2570165f"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
-      "before_sha256": "43474871d3ca41b3459106f066159195d471bbde61706204d4795fbd90790de8",
-      "after_sha256": "ace9a628e6c41aa5d66fb82520a277236758904c316846a2fb2cd111d81d3e97",
+      "before_sha256": "ace9a628e6c41aa5d66fb82520a277236758904c316846a2fb2cd111d81d3e97",
+      "after_sha256": "11c598b40fd41de596c311c73d34a2dee7df2f41f42010f1ea01464553b6e7f5",
       "owners": {
         "@document": {
-          "before": "43474871d3ca41b3459106f066159195d471bbde61706204d4795fbd90790de8",
-          "after": "ace9a628e6c41aa5d66fb82520a277236758904c316846a2fb2cd111d81d3e97"
+          "before": "ace9a628e6c41aa5d66fb82520a277236758904c316846a2fb2cd111d81d3e97",
+          "after": "11c598b40fd41de596c311c73d34a2dee7df2f41f42010f1ea01464553b6e7f5"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
-      "before_sha256": "549a952d24fceea4498bad9ad1063212ffbeebd1cf66cc96db13d6c75c154341",
-      "after_sha256": "8fe8c4476b60f6264b2ff688bc1ffb855b34378e7483df50d445e7aed01d1f1e",
+      "before_sha256": "8fe8c4476b60f6264b2ff688bc1ffb855b34378e7483df50d445e7aed01d1f1e",
+      "after_sha256": "c55dafa784fa627adc6156337cd6b2b096a8350238506ab06d93d58810eb1056",
       "owners": {
         "@document": {
-          "before": "549a952d24fceea4498bad9ad1063212ffbeebd1cf66cc96db13d6c75c154341",
-          "after": "8fe8c4476b60f6264b2ff688bc1ffb855b34378e7483df50d445e7aed01d1f1e"
+          "before": "8fe8c4476b60f6264b2ff688bc1ffb855b34378e7483df50d445e7aed01d1f1e",
+          "after": "c55dafa784fa627adc6156337cd6b2b096a8350238506ab06d93d58810eb1056"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
-      "before_sha256": "ce634489a6ab34c2ab0dabbd72f3f7a3f40090437f559792c722131cea1f1d35",
-      "after_sha256": "f26b42289a1c352e67662c560d863dc4b30a6118f35803334f294e4d78439ed3",
+      "before_sha256": "f26b42289a1c352e67662c560d863dc4b30a6118f35803334f294e4d78439ed3",
+      "after_sha256": "07f2305ab030ab4f8aab9c58603cd573d44b2eb98b1e41a22e79788820174f8a",
       "owners": {
         "@document": {
-          "before": "ce634489a6ab34c2ab0dabbd72f3f7a3f40090437f559792c722131cea1f1d35",
-          "after": "f26b42289a1c352e67662c560d863dc4b30a6118f35803334f294e4d78439ed3"
+          "before": "f26b42289a1c352e67662c560d863dc4b30a6118f35803334f294e4d78439ed3",
+          "after": "07f2305ab030ab4f8aab9c58603cd573d44b2eb98b1e41a22e79788820174f8a"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
-      "before_sha256": "16ba19836a1eba8e9b51e0cba884b2f451fbde78a1fcefb97cc17737fa44f1d9",
-      "after_sha256": "78f9fee39ecf930d389003ae0abc67c7eae03cc6ebefff190c7f3659534dfc26",
+      "before_sha256": "78f9fee39ecf930d389003ae0abc67c7eae03cc6ebefff190c7f3659534dfc26",
+      "after_sha256": "007bfcdbc87dca1d373ed5b117ec498f182a9e67f95d2b22eea644de1f27c41d",
       "owners": {
         "@document": {
-          "before": "16ba19836a1eba8e9b51e0cba884b2f451fbde78a1fcefb97cc17737fa44f1d9",
-          "after": "78f9fee39ecf930d389003ae0abc67c7eae03cc6ebefff190c7f3659534dfc26"
+          "before": "78f9fee39ecf930d389003ae0abc67c7eae03cc6ebefff190c7f3659534dfc26",
+          "after": "007bfcdbc87dca1d373ed5b117ec498f182a9e67f95d2b22eea644de1f27c41d"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
-      "before_sha256": "1ec4c595ccfa4d6a253353c3b23bd4e495bc600ec57b784c0946023b431dea21",
-      "after_sha256": "a268fbb9e8510c4de0c667fc486fef47d18a6779ce726ce79358fab040196ddd",
+      "before_sha256": "a268fbb9e8510c4de0c667fc486fef47d18a6779ce726ce79358fab040196ddd",
+      "after_sha256": "ddc7abad423e3d015c031661233e73d971d32018f0029d3bcefff0156eca8e54",
       "owners": {
         "@document": {
-          "before": "1ec4c595ccfa4d6a253353c3b23bd4e495bc600ec57b784c0946023b431dea21",
-          "after": "a268fbb9e8510c4de0c667fc486fef47d18a6779ce726ce79358fab040196ddd"
+          "before": "a268fbb9e8510c4de0c667fc486fef47d18a6779ce726ce79358fab040196ddd",
+          "after": "ddc7abad423e3d015c031661233e73d971d32018f0029d3bcefff0156eca8e54"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
-      "before_sha256": "2990db95ae4bf6a4dabf539503756ec10ee5f57a99132408c40568457c05b121",
-      "after_sha256": "25b5ad1b0c3f5f5013d66766ef74818aaf78063eadeefbc9f920e8bb925c5786",
+      "before_sha256": "25b5ad1b0c3f5f5013d66766ef74818aaf78063eadeefbc9f920e8bb925c5786",
+      "after_sha256": "499a3f0e8ca1e15efab15e2c7253031177caeb8bc3a3cf7037dd269d545da192",
       "owners": {
         "@document": {
-          "before": "2990db95ae4bf6a4dabf539503756ec10ee5f57a99132408c40568457c05b121",
-          "after": "25b5ad1b0c3f5f5013d66766ef74818aaf78063eadeefbc9f920e8bb925c5786"
+          "before": "25b5ad1b0c3f5f5013d66766ef74818aaf78063eadeefbc9f920e8bb925c5786",
+          "after": "499a3f0e8ca1e15efab15e2c7253031177caeb8bc3a3cf7037dd269d545da192"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "2fd3fb57463cbd0f53e4c6912f964cb8b6d2d370476440c68898bdd8fb3b1b28",
-      "after_sha256": "61539e2537c28719fa04150a4d5ddf55d058b2b118f7bea7c84c211a2c5ef1fa",
+      "before_sha256": "61539e2537c28719fa04150a4d5ddf55d058b2b118f7bea7c84c211a2c5ef1fa",
+      "after_sha256": "bbe19e8657599e490da5d916d7ab27088f6a51e2ef06d78bd9da96340b1b0939",
       "owners": {
         "@document": {
-          "before": "2fd3fb57463cbd0f53e4c6912f964cb8b6d2d370476440c68898bdd8fb3b1b28",
-          "after": "61539e2537c28719fa04150a4d5ddf55d058b2b118f7bea7c84c211a2c5ef1fa"
+          "before": "61539e2537c28719fa04150a4d5ddf55d058b2b118f7bea7c84c211a2c5ef1fa",
+          "after": "bbe19e8657599e490da5d916d7ab27088f6a51e2ef06d78bd9da96340b1b0939"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "34493a5ab45e626f645d488e113ba9acd597a345b649f608d9a0b71ad8744bf0",
-      "after_sha256": "fd9f1ccfa05f53f1e0c4bea6619bc83c94c580e357a05a996873b9d8684af2d9",
+      "before_sha256": "fd9f1ccfa05f53f1e0c4bea6619bc83c94c580e357a05a996873b9d8684af2d9",
+      "after_sha256": "b507da72643f92a2415ea0637a298a68b31a2436953227da23d9c43bb9255f70",
       "owners": {
         "@document": {
-          "before": "34493a5ab45e626f645d488e113ba9acd597a345b649f608d9a0b71ad8744bf0",
-          "after": "fd9f1ccfa05f53f1e0c4bea6619bc83c94c580e357a05a996873b9d8684af2d9"
+          "before": "fd9f1ccfa05f53f1e0c4bea6619bc83c94c580e357a05a996873b9d8684af2d9",
+          "after": "b507da72643f92a2415ea0637a298a68b31a2436953227da23d9c43bb9255f70"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "0f389e30e1464695b84fa7e26cf8b4b6419d4bff75eb88dbec2c6f01351499fc",
-      "after_sha256": "03618406e2c6856636d0b29c9c924f078d3eee4c3fd9ba8bd64638e430c3cd4f",
+      "before_sha256": "03618406e2c6856636d0b29c9c924f078d3eee4c3fd9ba8bd64638e430c3cd4f",
+      "after_sha256": "955f925d6cd6da0b678bd2b2ace057beb384815dbebbfd4b1156702b932dff2c",
       "owners": {
         "@document": {
-          "before": "0f389e30e1464695b84fa7e26cf8b4b6419d4bff75eb88dbec2c6f01351499fc",
-          "after": "03618406e2c6856636d0b29c9c924f078d3eee4c3fd9ba8bd64638e430c3cd4f"
+          "before": "03618406e2c6856636d0b29c9c924f078d3eee4c3fd9ba8bd64638e430c3cd4f",
+          "after": "955f925d6cd6da0b678bd2b2ace057beb384815dbebbfd4b1156702b932dff2c"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "bb27ab1526e114e568177192e710424a71a5b08e539d4bb8ddf4ec7110b00813",
-      "after_sha256": "38edf6ab7840a773ff3da1aaaf1daefb76fa755fdf4b915dcaef1fa7b774c01a",
+      "before_sha256": "38edf6ab7840a773ff3da1aaaf1daefb76fa755fdf4b915dcaef1fa7b774c01a",
+      "after_sha256": "2059a7fbeabeb948fc884f79b40e5e287d732b492ba613b3ec2b6218ad37b222",
       "owners": {
         "@document": {
-          "before": "bb27ab1526e114e568177192e710424a71a5b08e539d4bb8ddf4ec7110b00813",
-          "after": "38edf6ab7840a773ff3da1aaaf1daefb76fa755fdf4b915dcaef1fa7b774c01a"
+          "before": "38edf6ab7840a773ff3da1aaaf1daefb76fa755fdf4b915dcaef1fa7b774c01a",
+          "after": "2059a7fbeabeb948fc884f79b40e5e287d732b492ba613b3ec2b6218ad37b222"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "5e9106559d4a8f704dfa029b601dbda5c1c8731eab0c523749a486087706b189",
-      "after_sha256": "b1144d69a5f0e603043bf8395f7cb5bcee771ef3ad5b04570ad89b31d74c2d20",
+      "before_sha256": "b1144d69a5f0e603043bf8395f7cb5bcee771ef3ad5b04570ad89b31d74c2d20",
+      "after_sha256": "1dc7c88d53ca5b487160257077dac7ae66726d58e57850ce489afe6a25500a44",
       "owners": {
         "@document": {
-          "before": "5e9106559d4a8f704dfa029b601dbda5c1c8731eab0c523749a486087706b189",
-          "after": "b1144d69a5f0e603043bf8395f7cb5bcee771ef3ad5b04570ad89b31d74c2d20"
+          "before": "b1144d69a5f0e603043bf8395f7cb5bcee771ef3ad5b04570ad89b31d74c2d20",
+          "after": "1dc7c88d53ca5b487160257077dac7ae66726d58e57850ce489afe6a25500a44"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "060ef7a41f15a9c30537a89a13a0837adea368e26440cc27071fd8d9cfb89158",
-      "after_sha256": "24541d867e33f92683cb2fc75009f7c5ee4c4eac4b49d6beb6199726c92ed98b",
+      "before_sha256": "24541d867e33f92683cb2fc75009f7c5ee4c4eac4b49d6beb6199726c92ed98b",
+      "after_sha256": "0b6f94812853b6474368b1f45e51a2883a6c10fa09c2d7d0fac99e9e365466af",
       "owners": {
         "@document": {
-          "before": "060ef7a41f15a9c30537a89a13a0837adea368e26440cc27071fd8d9cfb89158",
-          "after": "24541d867e33f92683cb2fc75009f7c5ee4c4eac4b49d6beb6199726c92ed98b"
+          "before": "24541d867e33f92683cb2fc75009f7c5ee4c4eac4b49d6beb6199726c92ed98b",
+          "after": "0b6f94812853b6474368b1f45e51a2883a6c10fa09c2d7d0fac99e9e365466af"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "928682f1d14eecd277e263e98558e1d6603b379d90292e865e871649003f3fb9",
-      "after_sha256": "164f038ef6327145fcf30ba417429883aa19e40e6d28eb113bd7a8004279fa96",
+      "before_sha256": "164f038ef6327145fcf30ba417429883aa19e40e6d28eb113bd7a8004279fa96",
+      "after_sha256": "fe1ec027c003a0b6a423b100d06762f8dc7c2b87cdc184c76be4ec39a2dad96c",
       "owners": {
         "@document": {
-          "before": "928682f1d14eecd277e263e98558e1d6603b379d90292e865e871649003f3fb9",
-          "after": "164f038ef6327145fcf30ba417429883aa19e40e6d28eb113bd7a8004279fa96"
+          "before": "164f038ef6327145fcf30ba417429883aa19e40e6d28eb113bd7a8004279fa96",
+          "after": "fe1ec027c003a0b6a423b100d06762f8dc7c2b87cdc184c76be4ec39a2dad96c"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "1c028ce1ce5554ab822484880d2657a6f85180287f47f66c14058d0296d48dad",
-      "after_sha256": "172f75311a4e5528871166c4e2105fe0c998aa94029a1fdbe7ee3768c0edf892",
+      "before_sha256": "172f75311a4e5528871166c4e2105fe0c998aa94029a1fdbe7ee3768c0edf892",
+      "after_sha256": "3c3e1818e49c33d95c6d6ee8e394cadfb570e9a117db86d9dd5fb867dae06c33",
       "owners": {
         "@document": {
-          "before": "1c028ce1ce5554ab822484880d2657a6f85180287f47f66c14058d0296d48dad",
-          "after": "172f75311a4e5528871166c4e2105fe0c998aa94029a1fdbe7ee3768c0edf892"
+          "before": "172f75311a4e5528871166c4e2105fe0c998aa94029a1fdbe7ee3768c0edf892",
+          "after": "3c3e1818e49c33d95c6d6ee8e394cadfb570e9a117db86d9dd5fb867dae06c33"
         }
       }
     },
-    "data/source_audits/ci64_provenance_v1/stage2-opening-shadow-form-test-transition-v1.json": {
+    "data/source_audits/ci64_provenance_v1/stage2-opening-movement-unit-test-addition-v1.json": {
       "before_sha256": null,
-      "after_sha256": "a69c8069b46b70ef3e9afe0bea2c16f54d2d152fe9dbf72fcaa70951ff58b9d0",
+      "after_sha256": "62b9bffa7efdab844e89feeb0cace6ae8bde482197f5ebb65090724704d0656e",
       "owners": {
         "@document": {
           "before": null,
-          "after": "a69c8069b46b70ef3e9afe0bea2c16f54d2d152fe9dbf72fcaa70951ff58b9d0"
+          "after": "62b9bffa7efdab844e89feeb0cace6ae8bde482197f5ebb65090724704d0656e"
         }
       }
     },
     "docs/AI_POLICY_INTERFACE.md": {
-      "before_sha256": "f7459c1650d4aac78eedab7633e70f22d047e5475a01f986819fa417ce086bed",
-      "after_sha256": "f79ce37e0c010f4e662d4249e54dc78dd21b68b453b2d3732388e9f20a43437b",
+      "before_sha256": "f79ce37e0c010f4e662d4249e54dc78dd21b68b453b2d3732388e9f20a43437b",
+      "after_sha256": "a4c6047dd495e630b10af9c6e6f8cea510c3a066556faa71a205b954d529d006",
       "owners": {
         "@document": {
-          "before": "f7459c1650d4aac78eedab7633e70f22d047e5475a01f986819fa417ce086bed",
-          "after": "f79ce37e0c010f4e662d4249e54dc78dd21b68b453b2d3732388e9f20a43437b"
+          "before": "f79ce37e0c010f4e662d4249e54dc78dd21b68b453b2d3732388e9f20a43437b",
+          "after": "a4c6047dd495e630b10af9c6e6f8cea510c3a066556faa71a205b954d529d006"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "08655a41f83c6b29d3b97221f48e92491dd75aeca4144ea27625ae23ab849e53",
-      "after_sha256": "929b3fa2d61880719464f19c7126fbc5ce054639a85a8e0f6ad35dcfd3e07e25",
+      "before_sha256": "929b3fa2d61880719464f19c7126fbc5ce054639a85a8e0f6ad35dcfd3e07e25",
+      "after_sha256": "641f0f9c9f1009797bb91e13583326dbed4cc252074dd410df29c1c479bc90dd",
       "owners": {
         "@document": {
-          "before": "08655a41f83c6b29d3b97221f48e92491dd75aeca4144ea27625ae23ab849e53",
-          "after": "929b3fa2d61880719464f19c7126fbc5ce054639a85a8e0f6ad35dcfd3e07e25"
+          "before": "929b3fa2d61880719464f19c7126fbc5ce054639a85a8e0f6ad35dcfd3e07e25",
+          "after": "641f0f9c9f1009797bb91e13583326dbed4cc252074dd410df29c1c479bc90dd"
         }
       }
     },
     "scripts/engine_numerical_identity_test_admission.py": {
-      "before_sha256": "4d417f31fd69c8a9a75c31f355344a7d9519d196aa53cf4057f87fdfe0e9609b",
-      "after_sha256": "9eb94e1dbf42308df4478f1c80951a41be96be595bd1760ed46458ed88d29825",
+      "before_sha256": "9eb94e1dbf42308df4478f1c80951a41be96be595bd1760ed46458ed88d29825",
+      "after_sha256": "33286fe4b0534a077818624c89537c53f31bf5534f07d10793b43539054fddc7",
       "owners": {
         "@module": {
-          "before": "dfb5fdc06399212bff3799139d58d46a422c2b7eafc629905d27c139e801a57d",
-          "after": "1e53eec926b71f40ab06a6f94bc1c20342acc63a08302d2dcba5daf2a36e81dc"
-        },
-        "_identity_test_transition": {
-          "before": "399c4505d6f3a58d8c2c5e3a80164364ae00f1ab48f90a6a2ad8a01ce59d01de",
-          "after": "9608193b2dd37c376ba5a011033eace81f9125efae9ca34af77ca1e9c7e205fe"
-        },
-        "_opening_shadow_form_test_successor": {
-          "before": null,
-          "after": "52e1bc2a178b107325098c8b9851ace2b6a22d3f3c8a630cbc35c4edeed7e6ba"
+          "before": "1e53eec926b71f40ab06a6f94bc1c20342acc63a08302d2dcba5daf2a36e81dc",
+          "after": "8a927d62369bc1e34ab471572c689f947799416c8c241071ab4167b147cf1c9e"
         },
         "exact_movement_test_transition": {
-          "before": "f6cdb0f2c04cb00919dd10c4aae0bb3075939c9119eaf506248a76b28d21a8c6",
-          "after": "24780f969561382a43e0997f04024c118172749dea6aef0748b62c615ad827af"
+          "before": "24780f969561382a43e0997f04024c118172749dea6aef0748b62c615ad827af",
+          "after": "c046d71d6993e54c4c52fd7aae7e101b3e2774367349ea42d4fe8581e8f98c54"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "2740c4e27efa3730d0484a4899eae4160429194e643d5d92e384ed7978fcdc8e",
-      "after_sha256": "398bda5d38784fee5e2d0b122a0bce5d7c5840ef7d194a97aa2cd6d297790369",
+      "before_sha256": "398bda5d38784fee5e2d0b122a0bce5d7c5840ef7d194a97aa2cd6d297790369",
+      "after_sha256": "d81e626a9787c7118e07ab216f7f2557972b26dc495384fb3f66b42c0bb1ff09",
       "owners": {
         "@document": {
-          "before": "2740c4e27efa3730d0484a4899eae4160429194e643d5d92e384ed7978fcdc8e",
-          "after": "398bda5d38784fee5e2d0b122a0bce5d7c5840ef7d194a97aa2cd6d297790369"
+          "before": "398bda5d38784fee5e2d0b122a0bce5d7c5840ef7d194a97aa2cd6d297790369",
+          "after": "d81e626a9787c7118e07ab216f7f2557972b26dc495384fb3f66b42c0bb1ff09"
         }
       }
     },
-    "src/warhammer40k_core/ai/opening_shadow_form.py": {
+    "src/warhammer40k_core/ai/opening_movement_unit.py": {
       "before_sha256": null,
-      "after_sha256": "07aa5c6e90b6890502f071e0817748b07307962e956160f80db62ae5911c324d",
+      "after_sha256": "16b0d8c6c0afb74ddd73d9e9395529c57bfeb44c26df26034cf28cdca31de0eb",
       "owners": {
         "@module": {
           "before": null,
-          "after": "4cbbec5afa40b30688773f5f67f4fd8322d434bae876c80f18c5e27a7271ca1d"
+          "after": "a65141972dab0af2cc2baca92cd06fdd8c80cb9cfa627458798ba5fa6cfb04cb"
         },
-        "OpeningShadowFormPolicy": {
+        "OpeningMovementUnitPolicy": {
           "before": null,
-          "after": "1780e8df411554f53107c95308b2a67fb804f1df332eac200758b6155a7c9fb3"
+          "after": "1dc4628ced947e01ebe98ffaaaf7a04858e99bf4b0f31b718cf9082325dc9172"
         },
-        "OpeningShadowFormPolicy.choose": {
+        "OpeningMovementUnitPolicy.choose": {
           "before": null,
-          "after": "c94a7de04565c752cb8d8c8869b12e3243972e7c850ac07c67f6abb6bacabcfc"
+          "after": "f0a60c4644c9c688de67239dfd0c74fcf23b2e14fc89428e5a11bd14aaac8f34"
         },
-        "_route": {
+        "opening_movement_unit_registration": {
           "before": null,
-          "after": "c2da82a595b844ce6e73efc11d58686a4c2e0e9519671b65d6089133144c25d2"
-        },
-        "opening_shadow_form_registration": {
-          "before": null,
-          "after": "06f4fe9dcee0e895c1e181512463bd805a0ecfd42975b59daa5e45c11495af53"
+          "after": "28d4c274ccbf14dd77b9bef94e2ad1394f19aca495312e56ac7b129fee8a487e"
         }
       }
     },
     "tests/code_quality/test_engine_numerical_identity_admission.py": {
-      "before_sha256": "3a321e527bdf39ea2ff6e3152deb6e7830ef172d4f261b37af2e2ffdd95737cb",
-      "after_sha256": "5e6a1a75c62829bd58d092190d62fc7fb756d93682972cbc221e142545d0035e",
+      "before_sha256": "5e6a1a75c62829bd58d092190d62fc7fb756d93682972cbc221e142545d0035e",
+      "after_sha256": "833cbe5e526f2d90d0d5fed540a6fb67316a412acf26557308c923dac72b6cb0",
       "owners": {
         "test_identity_inventory_uses_current_twelve_shards_and_native_cohort": {
-          "before": "b44d7db881d60d24e64d84179715f3f9cb8d6c0f953b947ba29cd10a29a50141",
-          "after": "0bcfc90898b063f03b9326cbfc8d9a63a84778cbb4869456e716181d003bde3b"
+          "before": "0bcfc90898b063f03b9326cbfc8d9a63a84778cbb4869456e716181d003bde3b",
+          "after": "6b1f274fd4eb4fed48fab350f67291864c2c3fc827fd4dbb6380d49ee2742800"
         }
       }
     },
-    "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py": {
-      "before_sha256": "dabe086eb39cc08293080d631b3ba036900056d1df0794e260d39cf2def0df4e",
-      "after_sha256": "f2b8af1494ef3037d082cb72ed1428ec3ebb2351a27eca4fc639bb735de496da",
+    "tests/factions/chaos_daemons/integration/test_cavalcade_opening_movement_unit.py": {
+      "before_sha256": null,
+      "after_sha256": "97a64055d9809e5051e1cd442774f4ae9fdac1834cb3e04c11a73b2810b08d45",
       "owners": {
         "@module": {
-          "before": "7a35b49a282d0e86a4a3b1d5fe60c43f4c6d6e64c57b8ad8467b2e1dc2d29d66",
-          "after": "faa10ab5142fafe5088b00859e3d2ccb09396ca8bb885b44623f5719fac4abe9"
-        },
-        "test_opening_shadow_form_policy_reaches_native_movement": {
           "before": null,
-          "after": "42ac1dad78fada05dec3e752f714f6ccdf6b2710cfbf2c7ed01f75e57bf094bc"
+          "after": "92b620dcff2bf390360c4f1b2f78e64abe33dbf9d89101037fb46c7e28270d85"
+        },
+        "test_opening_movement_selects_an_issued_unit_before_any_action": {
+          "before": null,
+          "after": "dc3ee1f38e3f6503a651f1858592610c63e94a91f490919a49645b0f3e965d87"
         }
       }
     }
@@ -324,7 +322,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Regenerate duration weights and all twelve manifests from the complete 32-worker covered run.",
+      "rationale": "Refresh the twelve-shard scheduling inventory from the complete passing branch-covered behavioral profile.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -334,7 +332,17 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Regenerate duration weights and all twelve manifests from the complete 32-worker covered run.",
+      "rationale": "Refresh the twelve-shard scheduling inventory from the complete passing branch-covered behavioral profile.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-10.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh the twelve-shard scheduling inventory from the complete passing branch-covered behavioral profile.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -344,7 +352,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Regenerate duration weights and all twelve manifests from the complete 32-worker covered run.",
+      "rationale": "Refresh the twelve-shard scheduling inventory from the complete passing branch-covered behavioral profile.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -354,7 +362,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Regenerate duration weights and all twelve manifests from the complete 32-worker covered run.",
+      "rationale": "Refresh the twelve-shard scheduling inventory from the complete passing branch-covered behavioral profile.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -364,7 +372,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Regenerate duration weights and all twelve manifests from the complete 32-worker covered run.",
+      "rationale": "Refresh the twelve-shard scheduling inventory from the complete passing branch-covered behavioral profile.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -374,7 +382,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Regenerate duration weights and all twelve manifests from the complete 32-worker covered run.",
+      "rationale": "Refresh the twelve-shard scheduling inventory from the complete passing branch-covered behavioral profile.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -384,7 +392,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Regenerate duration weights and all twelve manifests from the complete 32-worker covered run.",
+      "rationale": "Refresh the twelve-shard scheduling inventory from the complete passing branch-covered behavioral profile.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -394,7 +402,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Regenerate duration weights and all twelve manifests from the complete 32-worker covered run.",
+      "rationale": "Refresh the twelve-shard scheduling inventory from the complete passing branch-covered behavioral profile.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -404,7 +412,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Regenerate duration weights and all twelve manifests from the complete 32-worker covered run.",
+      "rationale": "Refresh the twelve-shard scheduling inventory from the complete passing branch-covered behavioral profile.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -414,7 +422,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Regenerate duration weights and all twelve manifests from the complete 32-worker covered run.",
+      "rationale": "Refresh the twelve-shard scheduling inventory from the complete passing branch-covered behavioral profile.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -424,7 +432,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Regenerate duration weights and all twelve manifests from the complete 32-worker covered run.",
+      "rationale": "Refresh the twelve-shard scheduling inventory from the complete passing branch-covered behavioral profile.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -434,7 +442,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Regenerate duration weights and all twelve manifests from the complete 32-worker covered run.",
+      "rationale": "Refresh the twelve-shard scheduling inventory from the complete passing branch-covered behavioral profile.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -444,7 +452,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate runtime identity and dependent examples after adding the opt-in policy module.",
+      "rationale": "Regenerate identity-dependent contract examples with unchanged decision types, wire schemas, and validation.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -454,7 +462,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate runtime identity and dependent examples after adding the opt-in policy module.",
+      "rationale": "Regenerate identity-dependent contract examples with unchanged decision types, wire schemas, and validation.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -464,7 +472,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate runtime identity and dependent examples after adding the opt-in policy module.",
+      "rationale": "Regenerate identity-dependent contract examples with unchanged decision types, wire schemas, and validation.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -474,7 +482,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate runtime identity and dependent examples after adding the opt-in policy module.",
+      "rationale": "Regenerate identity-dependent contract examples with unchanged decision types, wire schemas, and validation.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -484,7 +492,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate runtime identity and dependent examples after adding the opt-in policy module.",
+      "rationale": "Regenerate identity-dependent contract examples with unchanged decision types, wire schemas, and validation.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -494,7 +502,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate runtime identity and dependent examples after adding the opt-in policy module.",
+      "rationale": "Regenerate identity-dependent contract examples with unchanged decision types, wire schemas, and validation.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -504,7 +512,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate runtime identity and dependent examples after adding the opt-in policy module.",
+      "rationale": "Regenerate identity-dependent contract examples with unchanged decision types, wire schemas, and validation.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -514,17 +522,17 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate runtime identity and dependent examples after adding the opt-in policy module.",
+      "rationale": "Regenerate identity-dependent contract examples with unchanged decision types, wire schemas, and validation.",
       "source_obligation": null,
       "unchanged_work": null
     },
-    "data/source_audits/ci64_provenance_v1/stage2-opening-shadow-form-test-transition-v1.json": {
+    "data/source_audits/ci64_provenance_v1/stage2-opening-movement-unit-test-addition-v1.json": {
       "category": "measured_workload",
       "operations": [
-        "opening-shadow-form-policy"
+        "opening-movement-unit-policy"
       ],
       "selected_families": [],
-      "rationale": "Exercise the two round-one choices through the finite viewer policy seam and preserve all previous behavioral cases.",
+      "rationale": "Admit one native regression for ordinary unit selection, the action handoff, and exact continuation replay.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -532,7 +540,7 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Document the opening heuristic and register the exact policy and admission owners.",
+      "rationale": "Document the explicit development policy and register the exact new operation owners.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -540,7 +548,7 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Document the opening heuristic and register the exact policy and admission owners.",
+      "rationale": "Document the explicit development policy and register the exact new operation owners.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -553,7 +561,7 @@
         "engine-numerical-identity-admission"
       ],
       "selected_families": [],
-      "rationale": "Exercise the two round-one choices through the finite viewer policy seam and preserve all previous behavioral cases.",
+      "rationale": "Bind the new native regression to its policy bytes and runtime fingerprint while preserving prior admissions.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -563,17 +571,17 @@
         "cavalcade-authority-admission"
       ],
       "selected_families": [],
-      "rationale": "Regenerate runtime identity and dependent examples after adding the opt-in policy module.",
+      "rationale": "Regenerate the packaged runtime fingerprint after adding the opt-in policy module.",
       "source_obligation": null,
       "unchanged_work": null
     },
-    "src/warhammer40k_core/ai/opening_shadow_form.py": {
+    "src/warhammer40k_core/ai/opening_movement_unit.py": {
       "category": "measured_workload",
       "operations": [
-        "opening-shadow-form-policy"
+        "opening-movement-unit-policy"
       ],
       "selected_families": [],
-      "rationale": "Exercise the two round-one choices through the finite viewer policy seam and preserve all previous behavioral cases.",
+      "rationale": "Add one opt-in native opening choice that scans a finite actor-visible set. Engine rules, pathing, and replay implementation are untouched.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -583,17 +591,17 @@
         "engine-numerical-identity-admission"
       ],
       "selected_families": [],
-      "rationale": "Exercise the two round-one choices through the finite viewer policy seam and preserve all previous behavioral cases.",
+      "rationale": "Verify the new native case and runtime successor while retaining existing inventory assertions.",
       "source_obligation": null,
       "unchanged_work": null
     },
-    "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py": {
+    "tests/factions/chaos_daemons/integration/test_cavalcade_opening_movement_unit.py": {
       "category": "measured_workload",
       "operations": [
-        "native-v995-prefix-regressions"
+        "opening-movement-unit-policy"
       ],
       "selected_families": [],
-      "rationale": "Exercise the two round-one choices through the finite viewer policy seam and preserve all previous behavioral cases.",
+      "rationale": "Admit one native regression for ordinary unit selection, the action handoff, and exact continuation replay.",
       "source_obligation": null,
       "unchanged_work": null
     }
