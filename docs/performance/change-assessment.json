@@ -2,7 +2,7 @@
   "policy": "rules-engine-performance-v3",
   "base": "1629879b409fbbd29addf062abd30359ca923986",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:5d14c2d7a9c5d80aeb24292daf45c184a16ea93363437f30653efc13865e9917",
-  "operation_map_sha256": "1fe7fe8bd0bb4169ee1ab746a3950f00c7b6e6c1157930c302d232caf9538901",
+  "operation_map_sha256": "263c186654c939ff63aed483d66a0990678aa78c54ae84f2914b98dbc3ecb58e",
   "changes": {
     "contracts/examples/persistence/session-persistence.json": {
       "before_sha256": "f238d1eaff2aad9608d770351382419164efa94577cdafa107e91d861a5d7a08",
@@ -96,11 +96,11 @@
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "ea56d2299fe6a9a77e0970f7d9ce1e126797687b205be7db385a207feeb3871e",
-      "after_sha256": "5c06d5f8edd845c963d11fda6a0eb198aa100a0896819375369770d7d2906ccc",
+      "after_sha256": "86525c59215f568c563aedbd88d9f32a9800d2131eb687070c60e3a793b1612c",
       "owners": {
         "@document": {
           "before": "ea56d2299fe6a9a77e0970f7d9ce1e126797687b205be7db385a207feeb3871e",
-          "after": "5c06d5f8edd845c963d11fda6a0eb198aa100a0896819375369770d7d2906ccc"
+          "after": "86525c59215f568c563aedbd88d9f32a9800d2131eb687070c60e3a793b1612c"
         }
       }
     },
@@ -169,6 +169,26 @@
         "historical_catalog_unit_move_completed_battle_shock_effects": {
           "before": "8df30071c9cc4b31692e8a85d8c48549d0f3ffa8ace66786e4175e4712f29fdc",
           "after": "cadf22093595b2c12187e22c8a91a394eb613ce8968ab0e050a402a2c4759f55"
+        }
+      }
+    },
+    "tests/code_quality/test_category_migration_preservation.py": {
+      "before_sha256": "d22c9979685fb10741afd2fd7e32ce8578e79fe1adf2a78f9e17378a9c906bca",
+      "after_sha256": "6adfc3c245ee6625444fec58c638cac4382c6637ec91765cf8ec64d4a00d4863",
+      "owners": {
+        "test_private_seed_inactive_api_maintenance_preserves_native_source": {
+          "before": "f730665ffc38979431f6fdd55c7a24d45b35accd3e8c819a2e13c867df669294",
+          "after": "0637f303290d117386739d16c7d2e52b9977e87900dc296d1553259ef93a97d3"
+        }
+      }
+    },
+    "tests/code_quality/test_engine_numerical_identity_admission.py": {
+      "before_sha256": "bd0a35e0abfb9421a3ed3c131c54ce14ead42d3538a8a5cc0c47c51790d337c4",
+      "after_sha256": "2a4043a22f59b21f2bdfd824bd5799584425b5d964e83fc63de1918f4ed5f339",
+      "owners": {
+        "test_identity_inventory_uses_current_twelve_shards_and_native_cohort": {
+          "before": "dac9b24c3748395577b8accbc974820bca8784535cb38fb090c0dfd1b88f7f79",
+          "after": "e9980e5687e2d191062d7f305e282cbcada40887a871d909bdb47e65feb767d4"
         }
       }
     },
@@ -325,6 +345,28 @@
       "rationale": "Project authenticated test-boundary wounds into the historical rules model inventory.",
       "source_obligation": "Use the recorded test boundary to derive model eligibility for historical Battle-shock validation.",
       "unchanged_work": "Reuse the existing physical reconstruction and live eligibility rules. Copy wound changes once per history context and reuse matching models. No new event scan, geometry query, or RNG draw."
+    },
+    "tests/code_quality/test_category_migration_preservation.py": {
+      "category": "measured_workload",
+      "operations": [
+        "private-rng-owner-ba23d3523caa6166",
+        "round4-battle-shock-event-wounds"
+      ],
+      "selected_families": [],
+      "rationale": "Bind the focused Battle-shock corruption and later-casualty regression to its exact source.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "tests/code_quality/test_engine_numerical_identity_admission.py": {
+      "category": "measured_workload",
+      "operations": [
+        "engine-numerical-identity-admission",
+        "round4-battle-shock-event-wounds"
+      ],
+      "selected_families": [],
+      "rationale": "Bind the focused Battle-shock corruption and later-casualty regression to its exact source.",
+      "source_obligation": null,
+      "unchanged_work": null
     },
     "tests/factions/chaos_daemons/unit/test_chaos_daemons_army_rule.py": {
       "category": "measured_workload",

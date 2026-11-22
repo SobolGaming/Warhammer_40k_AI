@@ -23,7 +23,13 @@ ORIGINAL = "tests/unit/test_phase11e_mission_scoring_cleanup.py"
 
 
 def test_private_seed_inactive_api_maintenance_preserves_native_source(tmp_path: Path) -> None:
+    import subprocess
+
     from scripts.build_test_shards import validate_private_rng_inactive_source
+    from scripts.engine_numerical_identity_test_admission import (
+        ROUND4_BATTLE_SHOCK_BASE,
+        ROUND4_BATTLE_SHOCK_OWNER,
+    )
 
     native = b"native_test_body = 1\r\n"
     added = b'        private_rng_seed="f0" * 32,\r\n        draw_id="fixture-draw",\r\n'
@@ -48,7 +54,13 @@ def test_private_seed_inactive_api_maintenance_preserves_native_source(tmp_path:
     )
 
     for relative, fixture_record in private_rng_fixture_records().items():
-        current = (ROOT / relative).read_bytes()
+        if relative == ROUND4_BATTLE_SHOCK_OWNER:
+            # The Round 4 test-inventory audit binds the live successor separately.
+            current = subprocess.check_output(
+                ["git", "show", f"{ROUND4_BATTLE_SHOCK_BASE}:{relative}"], cwd=ROOT
+            )
+        else:
+            current = (ROOT / relative).read_bytes()
         preimage = private_rng_fixture_predecessor(relative, current)
         assert hashlib.sha256(preimage).hexdigest() == fixture_record["before_sha256"]
         assert private_rng_fixture_predecessor(relative, preimage) == preimage

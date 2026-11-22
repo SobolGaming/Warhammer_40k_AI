@@ -286,7 +286,31 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
     )
     assert fight_reroll_base["fingerprint"] == shooting_visibility["runtime_fingerprint"]
     assert fight_reroll["retained_runtime_fingerprint"] == fight_reroll_base["fingerprint"]
-    assert _record(MANIFEST)["fingerprint"] == fight_reroll["runtime_fingerprint"]
+    round4 = _record(selection.ROUND4_BATTLE_SHOCK_TRANSITION)
+    round4_base = json.loads(
+        subprocess.check_output(
+            ["git", "show", selection.ROUND4_BATTLE_SHOCK_BASE + ":" + MANIFEST], cwd=ROOT
+        )
+    )
+    assert round4_base["fingerprint"] == fight_reroll["runtime_fingerprint"]
+    assert round4["retained_runtime_fingerprint"] == round4_base["fingerprint"]
+    assert _record(MANIFEST)["fingerprint"] == round4["runtime_fingerprint"]
+    for source in selection.ROUND4_BATTLE_SHOCK_SOURCES:
+        base_source = subprocess.check_output(
+            ["git", "show", selection.ROUND4_BATTLE_SHOCK_BASE + ":" + source], cwd=ROOT
+        )
+        assert round4["source"][source]["before"] == hashlib.sha256(base_source).hexdigest()
+        assert (
+            round4["source"][source]["after"]
+            == hashlib.sha256((ROOT / source).read_bytes()).hexdigest()
+        )
+    round4_owner = selection.ROUND4_BATTLE_SHOCK_OWNER
+    assert round4_owner in active_files
+    assert sum(round4_owner in group for group in groups) == 1
+    assert (
+        round4["test"]["after"]["sha256"]
+        == hashlib.sha256((ROOT / round4_owner).read_bytes()).hexdigest()
+    )
     for source in selection.MONSTER_MASH_ATTACK_REROLL_SOURCES:
         source_before = subprocess.check_output(
             ["git", "show", selection.MONSTER_MASH_ATTACK_REROLL_BASE + ":" + source], cwd=ROOT

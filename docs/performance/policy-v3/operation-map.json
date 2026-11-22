@@ -36699,6 +36699,8 @@
         "scripts/engine_numerical_identity_test_admission.py",
         "src/warhammer40k_core/engine/battle_shock_historical_authority.py",
         "src/warhammer40k_core/engine/catalog_unit_move_completed_battle_shock_runtime.py",
+        "tests/code_quality/test_category_migration_preservation.py",
+        "tests/code_quality/test_engine_numerical_identity_admission.py",
         "tests/factions/chaos_daemons/unit/test_chaos_daemons_army_rule.py"
       ],
       "owners": [
@@ -36711,7 +36713,9 @@
         "exact_movement_test_transition",
         "historical_battle_shock_authority_context",
         "historical_catalog_unit_move_completed_battle_shock_effects",
-        "test_manifestation_history_survives_the_tested_units_later_destruction"
+        "test_identity_inventory_uses_current_twelve_shards_and_native_cohort",
+        "test_manifestation_history_survives_the_tested_units_later_destruction",
+        "test_private_seed_inactive_api_maintenance_preserves_native_source"
       ],
       "families": [],
       "sensitive": false,
