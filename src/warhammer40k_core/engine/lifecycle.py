@@ -718,14 +718,28 @@ class GameLifecycle:
     def _advance_once(self) -> LifecycleStatus:
         from warhammer40k_core.engine.lifecycle_advancement import advance_once
         from warhammer40k_core.engine.movement_decision_authority import reuse_live_movement_history
+        from warhammer40k_core.engine.rule_trigger_runtime import use_loaded_destruction_runtime
 
-        with reuse_live_movement_history(self.decision_controller.event_log):
+        with (
+            reuse_live_movement_history(self.decision_controller.event_log),
+            use_loaded_destruction_runtime(
+                decisions=self.decision_controller,
+                runtime_bundle_provider=self._require_runtime_content_bundle,
+            ),
+        ):
             return advance_once(self)
 
     def submit_decision(self, result: DecisionResult) -> LifecycleStatus:
         from warhammer40k_core.engine.movement_decision_authority import reuse_live_movement_history
+        from warhammer40k_core.engine.rule_trigger_runtime import use_loaded_destruction_runtime
 
-        with reuse_live_movement_history(self.decision_controller.event_log):
+        with (
+            reuse_live_movement_history(self.decision_controller.event_log),
+            use_loaded_destruction_runtime(
+                decisions=self.decision_controller,
+                runtime_bundle_provider=self._require_runtime_content_bundle,
+            ),
+        ):
             state = self._require_state()
             pending_request = self._pending_decision_request()
             if (

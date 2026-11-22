@@ -36628,7 +36628,8 @@
         "data/source_audits/ci64_provenance_v1/stage2-melee-restore-test-transition-v1.json",
         "data/source_audits/ci64_provenance_v1/stage2-fight-reroll-test-transition-v1.json",
         "data/source_audits/ci64_provenance_v1/terminal-restore-test-transition-v1.json",
-        "data/source_audits/ci64_provenance_v1/monster-mash-shooting-visibility-test-transition-v1.json"
+        "data/source_audits/ci64_provenance_v1/monster-mash-shooting-visibility-test-transition-v1.json",
+        "data/source_audits/ci64_provenance_v1/monster-mash-attack-reroll-test-transition-v1.json"
       ],
       "owners": [
         "*"
@@ -36680,6 +36681,36 @@
         "_assert_counteroffensive_continuation",
         "_assert_counteroffensive_melee_restore",
         "_assert_counteroffensive_defender_reroll_decline"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "critical-wounds-export-type-checking": {
+      "paths": ["src/warhammer40k_core/engine/critical_wounds.py"],
+      "owners": ["@text"],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "attack-reroll-casualty-order": {
+      "paths": [
+        "src/warhammer40k_core/engine/command_reroll_windows.py",
+        "src/warhammer40k_core/engine/lifecycle.py",
+        "src/warhammer40k_core/engine/rule_trigger_runtime.py",
+        "tests/rules/section04/test_facade.py",
+        "tests/rules/section04/test_fight_facade.py"
+      ],
+      "owners": [
+        "@module",
+        "GameLifecycle._advance_once",
+        "GameLifecycle.submit_decision",
+        "record_destruction_before_attack_opportunity",
+        "record_loaded_model_destruction_occurrences",
+        "request_command_reroll_if_available",
+        "test_fight_damage_reroll_stays_fresh_after_previous_attack_destroys_model",
+        "test_shooting_damage_window_stays_fresh_after_previous_attack_casualty",
+        "use_loaded_destruction_runtime"
       ],
       "families": [],
       "sensitive": false,

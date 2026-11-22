@@ -101,15 +101,29 @@ def request_command_reroll_if_available(
     )
     if stratagem_window_declined_for_context(decisions=decisions, context=context):
         return None
-    options = stratagem_use_options_for_handler_from_index(
-        state=state,
-        index=stratagem_index,
-        context=context,
-        handler_id=CORE_COMMAND_REROLL_HANDLER_ID,
-        stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
-    )
+
+    def available_options(index: StratagemCatalogIndex) -> tuple[DecisionOption, ...]:
+        return stratagem_use_options_for_handler_from_index(
+            state=state,
+            index=index,
+            context=context,
+            handler_id=CORE_COMMAND_REROLL_HANDLER_ID,
+            stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
+        )
+
+    options = available_options(stratagem_index)
     if not options:
         return None
+    if source_phase in (BattlePhase.SHOOTING, BattlePhase.FIGHT):
+        from warhammer40k_core.engine.rule_trigger_runtime import (
+            record_destruction_before_attack_opportunity,
+        )
+
+        # Record a preceding attack's casualty before publishing this window.
+        if record_destruction_before_attack_opportunity(state=state, decisions=decisions):
+            options = available_options(stratagem_index)
+            if not options:
+                return None
     from warhammer40k_core.engine.stratagems_selection import (
         _require_stratagem_selection,
         _selected_command_point_cost,
