@@ -46,51 +46,51 @@
     },
     "ci/test_shards/durations.json": {
       "before_sha256": "0eec036aaa39fc936eb18e0016efb3853420de9dd5ca57dc025cebe6d654a27b",
-      "after_sha256": "60395a8c1103e9cfaf9107dae4ba2dcfda9ee5b1bad11ddf2dd7858f2c978839",
+      "after_sha256": "e2a1a724bd57e673a0728a6cb3986228ecc6361669e620b01cad530b0b560b51",
       "owners": {
         "@document": {
           "before": "0eec036aaa39fc936eb18e0016efb3853420de9dd5ca57dc025cebe6d654a27b",
-          "after": "60395a8c1103e9cfaf9107dae4ba2dcfda9ee5b1bad11ddf2dd7858f2c978839"
+          "after": "e2a1a724bd57e673a0728a6cb3986228ecc6361669e620b01cad530b0b560b51"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
       "before_sha256": "551266fefc30bee3e01745a6b1e4e3355ea32728c91a3441cd8c16ab46419d9c",
-      "after_sha256": "62004046c858e2a45030216c7e2fc83d16482cb3a280de3f7ec4d9d7b8f00540",
+      "after_sha256": "09935b1310706a2f2889a1214a062db3c1a797b0cd73629798bd5e7ca4a0115e",
       "owners": {
         "@document": {
           "before": "551266fefc30bee3e01745a6b1e4e3355ea32728c91a3441cd8c16ab46419d9c",
-          "after": "62004046c858e2a45030216c7e2fc83d16482cb3a280de3f7ec4d9d7b8f00540"
+          "after": "09935b1310706a2f2889a1214a062db3c1a797b0cd73629798bd5e7ca4a0115e"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
       "before_sha256": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20",
-      "after_sha256": "0d481f32b0f14900869b4683931f7f2953f1b953a3eee78658ca98c5664ca95b",
+      "after_sha256": "f30c4684079efb34c0d55c1e9892d750f23bd411acaf2fd2d76ed9f7182cbc55",
       "owners": {
         "@document": {
           "before": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20",
-          "after": "0d481f32b0f14900869b4683931f7f2953f1b953a3eee78658ca98c5664ca95b"
+          "after": "f30c4684079efb34c0d55c1e9892d750f23bd411acaf2fd2d76ed9f7182cbc55"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
       "before_sha256": "73f5967ad71f590e373a3361b2216dbe1bf365913ef05b57745b910a791edd6c",
-      "after_sha256": "ff6298e8149b45c150a7dee299bbc1398d1fd4ba3ca0067ff76f023d59c3975b",
+      "after_sha256": "92aa05e63bdda1bd156d46a8fecac5afb9c0e9dfd7d12e0e3fa94756c0556878",
       "owners": {
         "@document": {
           "before": "73f5967ad71f590e373a3361b2216dbe1bf365913ef05b57745b910a791edd6c",
-          "after": "ff6298e8149b45c150a7dee299bbc1398d1fd4ba3ca0067ff76f023d59c3975b"
+          "after": "92aa05e63bdda1bd156d46a8fecac5afb9c0e9dfd7d12e0e3fa94756c0556878"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
       "before_sha256": "9af989a5701adb92debb873e46ba82002f5912b4230c0fc8b21458c59daf0933",
-      "after_sha256": "faf3995a90c119150dadbd3af6e64be5e5391047e79c8ff667e11b04a5541754",
+      "after_sha256": "0971e76a3d46c6055d2aee952f8a73e5620b9bf2d8dd0ac0e53ba4702faa7a90",
       "owners": {
         "@document": {
           "before": "9af989a5701adb92debb873e46ba82002f5912b4230c0fc8b21458c59daf0933",
-          "after": "faf3995a90c119150dadbd3af6e64be5e5391047e79c8ff667e11b04a5541754"
+          "after": "0971e76a3d46c6055d2aee952f8a73e5620b9bf2d8dd0ac0e53ba4702faa7a90"
         }
       }
     },
@@ -116,61 +116,61 @@
     },
     "ci/test_shards/shard-4.txt": {
       "before_sha256": "ace9a628e6c41aa5d66fb82520a277236758904c316846a2fb2cd111d81d3e97",
-      "after_sha256": "b34b4b6235f87be84d602bbe239188d5bfc6e4fc57cd0cee0afcd64ca419f057",
+      "after_sha256": "ae8d2c98dfe00df4b140e72685af6159f079f8032dfca4036ca9bd82493fe30a",
       "owners": {
         "@document": {
           "before": "ace9a628e6c41aa5d66fb82520a277236758904c316846a2fb2cd111d81d3e97",
-          "after": "b34b4b6235f87be84d602bbe239188d5bfc6e4fc57cd0cee0afcd64ca419f057"
+          "after": "ae8d2c98dfe00df4b140e72685af6159f079f8032dfca4036ca9bd82493fe30a"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
       "before_sha256": "8fe8c4476b60f6264b2ff688bc1ffb855b34378e7483df50d445e7aed01d1f1e",
-      "after_sha256": "0e75bd11d9fa4d8aacc4d1aead61352fb0c1dede78d8d7499fc609934486533e",
+      "after_sha256": "82d51e1bece2f747490db546611118f9b489a8a1ed5eb682b10a3f4fa346807b",
       "owners": {
         "@document": {
           "before": "8fe8c4476b60f6264b2ff688bc1ffb855b34378e7483df50d445e7aed01d1f1e",
-          "after": "0e75bd11d9fa4d8aacc4d1aead61352fb0c1dede78d8d7499fc609934486533e"
+          "after": "82d51e1bece2f747490db546611118f9b489a8a1ed5eb682b10a3f4fa346807b"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
       "before_sha256": "f26b42289a1c352e67662c560d863dc4b30a6118f35803334f294e4d78439ed3",
-      "after_sha256": "aac8762f8e6a1de5e411e058fc3ef528ca2bc0e191f88cd2a16687948bdc3854",
+      "after_sha256": "157debdc01f19c893f3af5b6dd5ca0b5ad9fd3708cc969d95a57d649d6675b4a",
       "owners": {
         "@document": {
           "before": "f26b42289a1c352e67662c560d863dc4b30a6118f35803334f294e4d78439ed3",
-          "after": "aac8762f8e6a1de5e411e058fc3ef528ca2bc0e191f88cd2a16687948bdc3854"
+          "after": "157debdc01f19c893f3af5b6dd5ca0b5ad9fd3708cc969d95a57d649d6675b4a"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
       "before_sha256": "78f9fee39ecf930d389003ae0abc67c7eae03cc6ebefff190c7f3659534dfc26",
-      "after_sha256": "7cd65a5d058917ddbc3c703af58606e9b430feac61a5c9e4989d60ce7e894c26",
+      "after_sha256": "a2bef08a8a61e9f93b8dcc7208a4d55fbbd8dd85147ede29140f93b26efa5fb6",
       "owners": {
         "@document": {
           "before": "78f9fee39ecf930d389003ae0abc67c7eae03cc6ebefff190c7f3659534dfc26",
-          "after": "7cd65a5d058917ddbc3c703af58606e9b430feac61a5c9e4989d60ce7e894c26"
+          "after": "a2bef08a8a61e9f93b8dcc7208a4d55fbbd8dd85147ede29140f93b26efa5fb6"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
       "before_sha256": "a268fbb9e8510c4de0c667fc486fef47d18a6779ce726ce79358fab040196ddd",
-      "after_sha256": "3a8767f7b4d047fad7854dcb893cc66ef918b9555fe4aedcc2a70f5dcf3d2174",
+      "after_sha256": "073955dba5088a855d86ceded2733a5489a816bc8ec1f339761e4c236960145f",
       "owners": {
         "@document": {
           "before": "a268fbb9e8510c4de0c667fc486fef47d18a6779ce726ce79358fab040196ddd",
-          "after": "3a8767f7b4d047fad7854dcb893cc66ef918b9555fe4aedcc2a70f5dcf3d2174"
+          "after": "073955dba5088a855d86ceded2733a5489a816bc8ec1f339761e4c236960145f"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
       "before_sha256": "25b5ad1b0c3f5f5013d66766ef74818aaf78063eadeefbc9f920e8bb925c5786",
-      "after_sha256": "4c6cd4afa6bc7d39988d268f71401f38f909c381b2c6af57f9765dbe5f8a220b",
+      "after_sha256": "a827cce35bf4367821e1a66be466e1e5059b998639bcb96102b5b4ef0c45154e",
       "owners": {
         "@document": {
           "before": "25b5ad1b0c3f5f5013d66766ef74818aaf78063eadeefbc9f920e8bb925c5786",
-          "after": "4c6cd4afa6bc7d39988d268f71401f38f909c381b2c6af57f9765dbe5f8a220b"
+          "after": "a827cce35bf4367821e1a66be466e1e5059b998639bcb96102b5b4ef0c45154e"
         }
       }
     },
@@ -334,6 +334,16 @@
         }
       }
     },
+    "scripts/build_test_shards.py": {
+      "before_sha256": "f6bdc64e9f82da55b3b4e011eeba84d5643ca061507a34d9c23061e8af0ddb0a",
+      "after_sha256": "8843ed051f815f81584bd8cb3b8f50ed2c0ef74308ebb3c4695e8db9eec66aaa",
+      "owners": {
+        "covered_native_checkpoint_cohort": {
+          "before": "ca48f7216b5c680f866422ec6ff6aff2556f7f69532495b7ad84ea69b14e9a4a",
+          "after": "b1d19d0b044ab7ab7fcbdc536e7f011bdf6a4270fd21c5e94196f4fadf599be4"
+        }
+      }
+    },
     "scripts/engine_numerical_identity_test_admission.py": {
       "before_sha256": "9eb94e1dbf42308df4478f1c80951a41be96be595bd1760ed46458ed88d29825",
       "after_sha256": "2495415f1c683f2a954f1688e7307d507f5be193655b74c24f33c9ae0d816806",
@@ -345,6 +355,16 @@
         "exact_movement_test_transition": {
           "before": "24780f969561382a43e0997f04024c118172749dea6aef0748b62c615ad827af",
           "after": "c046d71d6993e54c4c52fd7aae7e101b3e2774367349ea42d4fe8581e8f98c54"
+        }
+      }
+    },
+    "scripts/run_behavioral_coverage.sh": {
+      "before_sha256": "ae2425b5b7fb5966fb9d3e603674055ea61953ac95deca60fef05db4574466da",
+      "after_sha256": "6e68531258b05f32645a1c73a47f46b3f13adceab459e3a2f0cc68a579e7daca",
+      "owners": {
+        "@document": {
+          "before": "ae2425b5b7fb5966fb9d3e603674055ea61953ac95deca60fef05db4574466da",
+          "after": "6e68531258b05f32645a1c73a47f46b3f13adceab459e3a2f0cc68a579e7daca"
         }
       }
     },
@@ -418,6 +438,16 @@
         }
       }
     },
+    "tests/code_quality/test_ci_resource_diagnostics.py": {
+      "before_sha256": "b9a53e5564ffc3999318bab66ab12c0970b507d549f0fdfc572c0ae5d0e9f2d3",
+      "after_sha256": "a61c958b4b863eef33c61ebad9ada1224dd3d3742b4bb96f3def63adb45b0076",
+      "owners": {
+        "test_bounded_setup_lane_preserves_selection_coverage_and_failure": {
+          "before": "51d2dc66f7eea549b6271347db53953025c81fb2b9f47a0f5af7a311c2158941",
+          "after": "44f8a5a00e89a7a49f26a6676c1f592092ca1a957e14eb9615500bfeb51b2c24"
+        }
+      }
+    },
     "tests/code_quality/test_complete_covered_reporting.py": {
       "before_sha256": "6efc2f56b5ce976980e8e897eae2fefe4e497bfecc93d62bbf4cf53d73b8fa0c",
       "after_sha256": "b5dd7cb62516f11ae3f9bbf90bba465888d319b4ed419589e8c61a50e20d37a2",
@@ -430,11 +460,11 @@
     },
     "tests/code_quality/test_engine_numerical_identity_admission.py": {
       "before_sha256": "5e6a1a75c62829bd58d092190d62fc7fb756d93682972cbc221e142545d0035e",
-      "after_sha256": "833cbe5e526f2d90d0d5fed540a6fb67316a412acf26557308c923dac72b6cb0",
+      "after_sha256": "f824f7b1315a4cc34e5155a0ddea80d0d2b660ee280d63132f73b7792bf60778",
       "owners": {
         "test_identity_inventory_uses_current_twelve_shards_and_native_cohort": {
           "before": "0bcfc90898b063f03b9326cbfc8d9a63a84778cbb4869456e716181d003bde3b",
-          "after": "6b1f274fd4eb4fed48fab350f67291864c2c3fc827fd4dbb6380d49ee2742800"
+          "after": "ac287eb3e7ef906e4edec268d16b26cb1d65b888cef9acac290c59767409f5b7"
         }
       }
     },
@@ -777,6 +807,16 @@
       "source_obligation": null,
       "unchanged_work": "The configuration changes only a coverage reporting threshold. Dependency declarations and the lock retain their existing values."
     },
+    "scripts/build_test_shards.py": {
+      "category": "measured_workload",
+      "operations": [
+        "covered-native-checkpoint-cohort"
+      ],
+      "selected_families": [],
+      "rationale": "Keep the isolated Cavalcade mirror and both checkpoint consumers in one hosted shard and enforce that membership before invoking pytest.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
     "scripts/engine_numerical_identity_test_admission.py": {
       "category": "measured_workload",
       "operations": [
@@ -787,6 +827,17 @@
       ],
       "selected_families": [],
       "rationale": "Bind the new native regression to its policy bytes and runtime fingerprint while preserving prior admissions.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "scripts/run_behavioral_coverage.sh": {
+      "category": "measured_workload",
+      "operations": [
+        "covered-shard-workload",
+        "covered-resource-diagnostics"
+      ],
+      "selected_families": [],
+      "rationale": "Keep the isolated Cavalcade mirror and both checkpoint consumers in one hosted shard and enforce that membership before invoking pytest.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -841,6 +892,16 @@
       "rationale": "Apply and test the 68 percent combined branch-measured reporting threshold and authenticate the current settings.",
       "source_obligation": "The owner authorized raising the combined full-package coverage floor to 68 percent.",
       "unchanged_work": "Preserve branch and package measurement, exclusions, all selected behavioral cases, timing limits and historical receipts."
+    },
+    "tests/code_quality/test_ci_resource_diagnostics.py": {
+      "category": "measured_workload",
+      "operations": [
+        "covered-resource-diagnostics"
+      ],
+      "selected_families": [],
+      "rationale": "Keep the isolated Cavalcade mirror and both checkpoint consumers in one hosted shard and enforce that membership before invoking pytest.",
+      "source_obligation": null,
+      "unchanged_work": null
     },
     "tests/code_quality/test_complete_covered_reporting.py": {
       "category": "rule_semantics",

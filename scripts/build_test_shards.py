@@ -964,6 +964,7 @@ def covered_native_checkpoint_cohort() -> frozenset[str]:
         (
             SERIAL_BEHAVIORAL_CASE,
             "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py",
+            "tests/factions/chaos_daemons/integration/test_cavalcade_opening_movement_unit.py",
         )
     )
 
@@ -999,8 +1000,8 @@ def _balanced_shards(
     parallel_totals = [0.0] * shard_count
     serial_totals = [0.0] * shard_count
     largest_cases = [0.0] * shard_count
-    # The cold covered mirror publishes the command checkpoint for this parallel
-    # module. Keep both selectors in one bucket without changing measured costs.
+    # The cold covered mirror publishes the checkpoint for the parallel consumers.
+    # Keep the whole cohort in one bucket without changing measured costs.
     cohort = covered_native_checkpoint_cohort()
     paired = cohort <= weights.keys()
     ordered = sorted(weights.items(), key=lambda item: (-item[1], item[0]))

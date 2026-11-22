@@ -6667,15 +6667,15 @@
       "1": 583.495,
       "10": 583.496,
       "11": 583.496,
-      "12": 583.496,
+      "12": 583.495,
       "2": 680.27,
       "3": 626.803,
       "4": 583.496,
       "5": 583.497,
       "6": 583.497,
-      "7": 583.496,
-      "8": 583.495,
-      "9": 583.496
+      "7": 583.497,
+      "8": 583.496,
+      "9": 583.495
     },
     "cold_shard_assignment": "minimum-unrounded-modeled-test-load-existing-bucket-v1",
     "cold_shard_id": 1,
@@ -6684,18 +6684,18 @@
       "tests/factions/chaos_daemons/integration/test_cavalcade_v995_roster.py::test_exact_mirror_deploys_all_78_models_and_replays_to_battle"
     ],
     "shard_worker_seconds": {
-      "1": 2333.982,
-      "10": 2333.983,
-      "11": 2333.983,
-      "12": 2333.986,
+      "1": 2333.981,
+      "10": 2333.986,
+      "11": 2333.986,
+      "12": 2333.982,
       "2": 2721.081,
       "3": 2507.213,
-      "4": 2333.986,
+      "4": 2333.984,
       "5": 2333.989,
       "6": 2333.989,
-      "7": 2333.986,
-      "8": 2333.982,
-      "9": 2333.986
+      "7": 2333.989,
+      "8": 2333.985,
+      "9": 2333.981
     }
   },
   "files": {
@@ -7249,9 +7249,9 @@
   "shard_count": 12,
   "shards": [
     {
-      "duration_seconds": 2333.982,
+      "duration_seconds": 2333.981,
       "shard_id": 1,
-      "test_file_count": 49
+      "test_file_count": 51
     },
     {
       "duration_seconds": 2721.081,
@@ -7264,49 +7264,49 @@
       "test_file_count": 1
     },
     {
-      "duration_seconds": 2333.986,
+      "duration_seconds": 2333.984,
       "shard_id": 4,
       "test_file_count": 46
     },
     {
       "duration_seconds": 2333.989,
       "shard_id": 5,
-      "test_file_count": 88
+      "test_file_count": 86
     },
     {
-      "duration_seconds": 1833.904,
+      "duration_seconds": 2333.989,
       "shard_id": 6,
       "test_file_count": 47
     },
     {
-      "duration_seconds": 2333.986,
+      "duration_seconds": 2333.989,
       "shard_id": 7,
       "test_file_count": 48
     },
     {
-      "duration_seconds": 2333.982,
+      "duration_seconds": 1833.9,
       "shard_id": 8,
-      "test_file_count": 50
+      "test_file_count": 48
     },
     {
-      "duration_seconds": 2333.986,
+      "duration_seconds": 2333.981,
       "shard_id": 9,
-      "test_file_count": 48
-    },
-    {
-      "duration_seconds": 2333.983,
-      "shard_id": 10,
-      "test_file_count": 50
-    },
-    {
-      "duration_seconds": 2333.983,
-      "shard_id": 11,
-      "test_file_count": 55
+      "test_file_count": 51
     },
     {
       "duration_seconds": 2333.986,
-      "shard_id": 12,
+      "shard_id": 10,
       "test_file_count": 48
+    },
+    {
+      "duration_seconds": 2333.986,
+      "shard_id": 11,
+      "test_file_count": 52
+    },
+    {
+      "duration_seconds": 2333.982,
+      "shard_id": 12,
+      "test_file_count": 52
     }
   ],
   "step5g_partitions": {

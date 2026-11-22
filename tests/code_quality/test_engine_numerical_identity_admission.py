@@ -142,7 +142,13 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         for index in range(1, 13)
     ]
     assert sum(selection.OWNER in group for group in groups) == 1
-    assert sum(sharding.covered_native_checkpoint_cohort() <= group for group in groups) == 1
+    cohort = sharding.covered_native_checkpoint_cohort()
+    assert {
+        sharding.SERIAL_BEHAVIORAL_CASE,
+        selection.OPENING_SHADOW_FORM_OWNER,
+        selection.OPENING_MOVEMENT_UNIT_OWNER,
+    } <= cohort
+    assert sum(cohort <= group for group in groups) == 1
     summary = _record("ci/test_shards/durations.json")
     current = sharding.summary_case_seconds(summary)
     fight = _record(selection.STAGE2_FIGHT_TRANSITION)

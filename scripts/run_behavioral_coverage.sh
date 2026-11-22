@@ -58,24 +58,29 @@ for selector in "${shard_paths[@]}"; do
     parallel_paths+=("$selector")
   fi
 done
-native_owner="tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py"
-native_count=0
-for selector in "${shard_paths[@]}"; do
-  if [[ "$selector" == "$native_owner" ]]; then
-    native_count=$((native_count + 1))
+native_owners=(
+  "tests/factions/chaos_daemons/integration/test_cavalcade_native_screen_prefix.py"
+  "tests/factions/chaos_daemons/integration/test_cavalcade_opening_movement_unit.py"
+)
+for native_owner in "${native_owners[@]}"; do
+  native_count=0
+  for selector in "${shard_paths[@]}"; do
+    if [[ "$selector" == "$native_owner" ]]; then
+      native_count=$((native_count + 1))
+    fi
+  done
+  if (( ${#isolated_selectors[@]} != native_count || native_count > 1 )); then
+    echo "Mirror/native checkpoint cohort must be selected together exactly once." >&2
+    exit 1
   fi
 done
-if (( ${#isolated_selectors[@]} != native_count || native_count > 1 )); then
-  echo "Mirror/native checkpoint cohort must be selected together exactly once." >&2
-  exit 1
-fi
 export WH40K_COVERED_FIXTURE_CACHE
 WH40K_COVERED_FIXTURE_CACHE=$(mktemp -d "${RUNNER_TEMP:-$PWD/reports}/fixture-checkpoints.XXXXXX")
 export WH40K_COVERED_FIXTURE_RUN_ID="${WH40K_COVERED_FIXTURE_CACHE##*/}"
 isolation_args=(--deselect "$isolated_case")
 if (( ${#isolated_selectors[@]} )); then
   # Keep bounded full-roster setup separate from concurrent coverage work.
-  # The native module shares its ordinary setup checkpoint in this one worker.
+  # The isolated mirror publishes the ordinary setup checkpoint for the native modules.
   if TEST_TIMING_DIR="$TEST_TIMING_DIR/isolated-mirror" \
     uv run --no-sync python -m pytest "${isolated_selectors[@]}" \
         "${source_index_args[@]}" \
