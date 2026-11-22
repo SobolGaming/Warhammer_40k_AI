@@ -4,6 +4,136 @@
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:e5e0ccfa536375c25875dfb3ca261970dc5d8c2895aebe94b4c19cbed1aa7255",
   "operation_map_sha256": "60ade7551ea76a269393ca5f4df46eb84362a6f2503f7091781d59e01684a5d4",
   "changes": {
+    "ci/test_shards/durations.json": {
+      "before_sha256": "e2a1a724bd57e673a0728a6cb3986228ecc6361669e620b01cad530b0b560b51",
+      "after_sha256": "881748564e42b707210fe14aa2374222a4adc4872e1720984d429a9afe4cf0b7",
+      "owners": {
+        "@document": {
+          "before": "e2a1a724bd57e673a0728a6cb3986228ecc6361669e620b01cad530b0b560b51",
+          "after": "881748564e42b707210fe14aa2374222a4adc4872e1720984d429a9afe4cf0b7"
+        }
+      }
+    },
+    "ci/test_shards/shard-1.txt": {
+      "before_sha256": "09935b1310706a2f2889a1214a062db3c1a797b0cd73629798bd5e7ca4a0115e",
+      "after_sha256": "0160c365a84fcb504d9c75de94191ba58fae6bd0c08004e82f78a5267f8d4d06",
+      "owners": {
+        "@document": {
+          "before": "09935b1310706a2f2889a1214a062db3c1a797b0cd73629798bd5e7ca4a0115e",
+          "after": "0160c365a84fcb504d9c75de94191ba58fae6bd0c08004e82f78a5267f8d4d06"
+        }
+      }
+    },
+    "ci/test_shards/shard-10.txt": {
+      "before_sha256": "f30c4684079efb34c0d55c1e9892d750f23bd411acaf2fd2d76ed9f7182cbc55",
+      "after_sha256": "1ba71f9244fb7ee1095c7022ad67e5ff026227901f38de062e00bcc92d0ed009",
+      "owners": {
+        "@document": {
+          "before": "f30c4684079efb34c0d55c1e9892d750f23bd411acaf2fd2d76ed9f7182cbc55",
+          "after": "1ba71f9244fb7ee1095c7022ad67e5ff026227901f38de062e00bcc92d0ed009"
+        }
+      }
+    },
+    "ci/test_shards/shard-11.txt": {
+      "before_sha256": "92aa05e63bdda1bd156d46a8fecac5afb9c0e9dfd7d12e0e3fa94756c0556878",
+      "after_sha256": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20",
+      "owners": {
+        "@document": {
+          "before": "92aa05e63bdda1bd156d46a8fecac5afb9c0e9dfd7d12e0e3fa94756c0556878",
+          "after": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20"
+        }
+      }
+    },
+    "ci/test_shards/shard-12.txt": {
+      "before_sha256": "0971e76a3d46c6055d2aee952f8a73e5620b9bf2d8dd0ac0e53ba4702faa7a90",
+      "after_sha256": "684633f5047b3f18d69996072d1aa5d8e71a6018b22e2dd462bac4172ca179de",
+      "owners": {
+        "@document": {
+          "before": "0971e76a3d46c6055d2aee952f8a73e5620b9bf2d8dd0ac0e53ba4702faa7a90",
+          "after": "684633f5047b3f18d69996072d1aa5d8e71a6018b22e2dd462bac4172ca179de"
+        }
+      }
+    },
+    "ci/test_shards/shard-2.txt": {
+      "before_sha256": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
+      "after_sha256": "6b86753bc716c3629aa3a0cbd296463009602287e242cdda7c4a6d2a8b0227bd",
+      "owners": {
+        "@document": {
+          "before": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
+          "after": "6b86753bc716c3629aa3a0cbd296463009602287e242cdda7c4a6d2a8b0227bd"
+        }
+      }
+    },
+    "ci/test_shards/shard-3.txt": {
+      "before_sha256": "ed8b2de4f896240a0d1fb02f3619cf22c5a51a118cc241c105470311b8b39d28",
+      "after_sha256": "77d90cb56a044dc333e8ca41cb5b11fddf143d6152398b5e5b53195ddf55495d",
+      "owners": {
+        "@document": {
+          "before": "ed8b2de4f896240a0d1fb02f3619cf22c5a51a118cc241c105470311b8b39d28",
+          "after": "77d90cb56a044dc333e8ca41cb5b11fddf143d6152398b5e5b53195ddf55495d"
+        }
+      }
+    },
+    "ci/test_shards/shard-4.txt": {
+      "before_sha256": "ae8d2c98dfe00df4b140e72685af6159f079f8032dfca4036ca9bd82493fe30a",
+      "after_sha256": "38827653ec6193c7cdced52f65b3c24390acac4d2efb1236846e40f488b9cbdd",
+      "owners": {
+        "@document": {
+          "before": "ae8d2c98dfe00df4b140e72685af6159f079f8032dfca4036ca9bd82493fe30a",
+          "after": "38827653ec6193c7cdced52f65b3c24390acac4d2efb1236846e40f488b9cbdd"
+        }
+      }
+    },
+    "ci/test_shards/shard-5.txt": {
+      "before_sha256": "82d51e1bece2f747490db546611118f9b489a8a1ed5eb682b10a3f4fa346807b",
+      "after_sha256": "f245c806705508140668a392b9151d5514effef94bae9f876fab5d377db1403d",
+      "owners": {
+        "@document": {
+          "before": "82d51e1bece2f747490db546611118f9b489a8a1ed5eb682b10a3f4fa346807b",
+          "after": "f245c806705508140668a392b9151d5514effef94bae9f876fab5d377db1403d"
+        }
+      }
+    },
+    "ci/test_shards/shard-6.txt": {
+      "before_sha256": "157debdc01f19c893f3af5b6dd5ca0b5ad9fd3708cc969d95a57d649d6675b4a",
+      "after_sha256": "c03fb194fb54fe481aa90dfa0cc5053b6c85e6395520763c2a1b9e8b68d27504",
+      "owners": {
+        "@document": {
+          "before": "157debdc01f19c893f3af5b6dd5ca0b5ad9fd3708cc969d95a57d649d6675b4a",
+          "after": "c03fb194fb54fe481aa90dfa0cc5053b6c85e6395520763c2a1b9e8b68d27504"
+        }
+      }
+    },
+    "ci/test_shards/shard-7.txt": {
+      "before_sha256": "a2bef08a8a61e9f93b8dcc7208a4d55fbbd8dd85147ede29140f93b26efa5fb6",
+      "after_sha256": "5849b8991abbe1b798d39847670ca00cc6a667bee7858f87bf45b3efe57a2d8e",
+      "owners": {
+        "@document": {
+          "before": "a2bef08a8a61e9f93b8dcc7208a4d55fbbd8dd85147ede29140f93b26efa5fb6",
+          "after": "5849b8991abbe1b798d39847670ca00cc6a667bee7858f87bf45b3efe57a2d8e"
+        }
+      }
+    },
+    "ci/test_shards/shard-8.txt": {
+      "before_sha256": "073955dba5088a855d86ceded2733a5489a816bc8ec1f339761e4c236960145f",
+      "after_sha256": "777e1f9c5f43fb4c1239bcce0b7bc2cce421b0ebaf606781de7fda7369dbdd9b",
+      "owners": {
+        "@document": {
+          "before": "073955dba5088a855d86ceded2733a5489a816bc8ec1f339761e4c236960145f",
+          "after": "777e1f9c5f43fb4c1239bcce0b7bc2cce421b0ebaf606781de7fda7369dbdd9b"
+        }
+      }
+    },
+    "ci/test_shards/shard-9.txt": {
+      "before_sha256": "a827cce35bf4367821e1a66be466e1e5059b998639bcb96102b5b4ef0c45154e",
+      "after_sha256": "b83cec4a5c79ab2dc43a772cce6f62b059abf83231133a996eb0e2c129e92279",
+      "owners": {
+        "@document": {
+          "before": "a827cce35bf4367821e1a66be466e1e5059b998639bcb96102b5b4ef0c45154e",
+          "after": "b83cec4a5c79ab2dc43a772cce6f62b059abf83231133a996eb0e2c129e92279"
+        }
+      }
+    },
     "contracts/examples/persistence/session-persistence.json": {
       "before_sha256": "bbe19e8657599e490da5d916d7ab27088f6a51e2ef06d78bd9da96340b1b0939",
       "after_sha256": "9722ad557d2c7676c9f836b34498958ad8668aa1cffead5cc307249355e27025",
@@ -322,6 +452,136 @@
     }
   },
   "rows": {
+    "ci/test_shards/durations.json": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate twelve scheduling shards from the complete measured branch-covered profile.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-1.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate twelve scheduling shards from the complete measured branch-covered profile.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-10.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate twelve scheduling shards from the complete measured branch-covered profile.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-11.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate twelve scheduling shards from the complete measured branch-covered profile.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-12.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate twelve scheduling shards from the complete measured branch-covered profile.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-2.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate twelve scheduling shards from the complete measured branch-covered profile.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-3.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate twelve scheduling shards from the complete measured branch-covered profile.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-4.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate twelve scheduling shards from the complete measured branch-covered profile.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-5.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate twelve scheduling shards from the complete measured branch-covered profile.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-6.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate twelve scheduling shards from the complete measured branch-covered profile.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-7.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate twelve scheduling shards from the complete measured branch-covered profile.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-8.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate twelve scheduling shards from the complete measured branch-covered profile.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-9.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate twelve scheduling shards from the complete measured branch-covered profile.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "measured_workload",
       "operations": [
