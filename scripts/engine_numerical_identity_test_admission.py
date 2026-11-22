@@ -235,6 +235,15 @@ ALLOCATION_COHERENCY_OWNER = "tests/infrastructure/adapters/test_allocation_cohe
 ALLOCATION_COHERENCY_POLICY = "src/warhammer40k_core/ai/allocation_coherency.py"
 
 
+COVER_EVENT_IDENTITY_ADDITION = (
+    "data/source_audits/ci64_provenance_v1/stage2-cover-event-identity-test-addition-v1.json"
+)
+COVER_EVENT_IDENTITY_SHA256 = "cb6b967544fb2b54878b8021dbcb26d47a7625c12158f77aabb16a1bdd31801f"
+COVER_EVENT_IDENTITY_BASE = "7d0d2e320ff7b564b87aafbca368bbab00c325b6"
+COVER_EVENT_IDENTITY_SOURCE = "src/warhammer40k_core/adapters/viewer_identity.py"
+COVER_EVENT_IDENTITY_OWNER = "tests/infrastructure/adapters/test_cover_event_identity.py"
+
+
 type SourceSuccessors = dict[str, dict[str, str]]
 type TestSuccessors = dict[str, dict[str, object]]
 
@@ -842,6 +851,38 @@ def exact_movement_test_transition(
         _checked_bytes(root, ALLOCATION_COHERENCY_POLICY, allocation["policy_sha256"])
         additions.update(_selection_members(allocation["added_files"], root))
         runtime = allocation["runtime_fingerprint"]
+    cover_event_path = root / COVER_EVENT_IDENTITY_ADDITION
+    _selection_no_links(root, cover_event_path)
+    cover_event_raw = None
+    if cover_event_path.exists():
+        if allocation_raw is None:
+            raise SystemExit(
+                "Cover event identity tests require the allocation coherency predecessor."
+            )
+        cover_event_raw = _checked_bytes(
+            root, COVER_EVENT_IDENTITY_ADDITION, COVER_EVENT_IDENTITY_SHA256
+        )
+        cover_event = json.loads(cover_event_raw, object_pairs_hook=_selection_object)
+        if (
+            cover_event.keys()
+            != {
+                "schema",
+                "retained_allocation_coherency_sha256",
+                "retained_runtime_fingerprint",
+                "runtime_fingerprint",
+                "source",
+                "added_files",
+            }
+            or cover_event["schema"] != "finite-stage2-cover-event-identity-test-addition-v1"
+            or cover_event["retained_allocation_coherency_sha256"] != ALLOCATION_COHERENCY_SHA256
+            or cover_event["retained_runtime_fingerprint"] != runtime
+            or set(cover_event["source"]) != {"before", "after"}
+            or set(cover_event["added_files"]) != {COVER_EVENT_IDENTITY_OWNER}
+        ):
+            raise SystemExit("Cover event identity test addition differs.")
+        _checked_bytes(root, COVER_EVENT_IDENTITY_SOURCE, cover_event["source"]["after"])
+        additions.update(_selection_members(cover_event["added_files"], root))
+        runtime = cover_event["runtime_fingerprint"]
     retained = _identity_test_transition(
         root,
         retained_cutover_sha256,
@@ -908,6 +949,8 @@ def exact_movement_test_transition(
         raw += b"\0" + strict_replay_raw
     if allocation_raw is not None:
         raw += b"\0" + allocation_raw
+    if cover_event_raw is not None:
+        raw += b"\0" + cover_event_raw
     return updated, {**added, **additions}, retained_raw + b"\0" + raw
 
 
