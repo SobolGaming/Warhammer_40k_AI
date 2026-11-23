@@ -1,7 +1,7 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:bc2ce5165f872793b204fa9669e61fd19d8daef543242132616dab424b9b2986",
-  "fingerprint": "bc2ce5165f872793b204fa9669e61fd19d8daef543242132616dab424b9b2986",
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:c47044084edb8c4ff5324998079574868d50a45ec9cca46b7633ec6bb6b5a353",
+  "fingerprint": "c47044084edb8c4ff5324998079574868d50a45ec9cca46b7633ec6bb6b5a353",
   "resource_count": 3284,
   "resources": [
     {
@@ -4860,9 +4860,9 @@
       "sha256": "4a09d1c65ab5155756f1eb75e3348ecfa087465a2c4069dfca0c79da73397f1c"
     },
     {
-      "byte_length": 4926,
+      "byte_length": 5511,
       "path": "warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/detachments/shadow_legion/fight_sequencing.py",
-      "sha256": "947cd01e6b26c57ff06d198ffda7e84d25cb9c4cb9ee468dca0675a5e5fe0e63"
+      "sha256": "c632b7188599561b19fc4c9878800884dfc4dde1352e51d032c421a73bcf9d77"
     },
     {
       "byte_length": 925,

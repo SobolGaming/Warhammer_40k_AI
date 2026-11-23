@@ -36693,6 +36693,30 @@
       "sensitive": false,
       "mandatory": true
     },
+    "round4-malice-bearer-liveness": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/monster-mash-round4-malice-bearer-test-transition-v1.json",
+        "scripts/engine_numerical_identity_test_admission.py",
+        "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/detachments/shadow_legion/fight_sequencing.py",
+        "tests/category_migration_preservation.py",
+        "tests/code_quality/test_engine_numerical_identity_admission.py",
+        "tests/factions/chaos_daemons/unit/test_generic_rule_ability_registry.py"
+      ],
+      "owners": [
+        "@document",
+        "@module",
+        "_malice_bearer_migration_predecessor",
+        "_round4_malice_bearer_successor",
+        "exact_movement_test_transition",
+        "malice_made_manifest_candidates",
+        "test_default_generic_rule_ability_registry_maps_shadow_legion_enhancement_grants",
+        "test_identity_inventory_uses_current_twelve_shards_and_native_cohort",
+        "verify_migrated_test"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
     "round4-battle-shock-event-wounds": {
       "paths": [
         "data/source_audits/ci64_provenance_v1/monster-mash-round4-battle-shock-test-transition-v1.json",

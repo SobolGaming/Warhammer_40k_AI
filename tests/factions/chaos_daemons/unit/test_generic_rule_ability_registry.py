@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import cast
 
+from tests.phase11c_command_phase_helpers import battle_state
 from tests.shared.category_migration.generic_rule_ability_registry import (
     _ENEMY_UNIT_ID,
     _RANGERS_UNIT_ID,
@@ -128,6 +129,10 @@ from tests.shared.category_migration.generic_rule_ability_registry import (
     validate_json_value,
     warptide_ir,
     with_unit_keywords,
+)
+from warhammer40k_core.core.faction_aliases import CHAOS_DAEMONS_FACTION_ID
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons.detachments.shadow_legion import (  # noqa: E501
+    enhancements as shadow_legion_enhancements,
 )
 
 
@@ -412,6 +417,50 @@ def test_default_generic_rule_ability_registry_maps_shadow_legion_enhancement_gr
         "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:"
         "enhancement:malice_made_manifest"
     )
+
+    state = battle_state()
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    army = state.army_definition_for_player("player-a")
+    assert army is not None
+    bearer = army.units[0]
+    assignment = EnhancementAssignment(
+        model_profile_id=bearer.own_models[0].model_profile_id,
+        model_index=1,
+        enhancement_id=shadow_legion_ir.MALICE_MADE_MANIFEST_ENHANCEMENT_ID,
+        target_unit_selection_id=bearer.unit_instance_id.removeprefix(f"{army.army_id}:"),
+        source_id=shadow_legion_enhancements.MALICE_MADE_MANIFEST_SOURCE_RULE_ID,
+    )
+    army = replace(
+        army,
+        detachment_selection=DetachmentSelection(
+            faction_id=CHAOS_DAEMONS_FACTION_ID,
+            detachment_ids=(shadow_legion_enhancements.DETACHMENT_ID,),
+        ),
+        enhancement_assignments=(assignment,),
+    )
+    state.army_definitions[0] = army
+    context = FightPhaseStartRequestContext(state=state, decisions=DecisionController())
+
+    with pytest.raises(GameLifecycleError, match=r"requires a Shadow Legion model"):
+        fight_start.candidate_builder(context, malice_source)
+
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    shadow_bearer = with_unit_keywords(
+        bearer,
+        keywords=(*bearer.keywords, shadow_legion_ir.SHADOW_LEGION_KEYWORD),
+        faction_keywords=bearer.faction_keywords,
+    )
+    destroyed_bearer = replace(
+        shadow_bearer,
+        own_models=tuple(replace(model, wounds_remaining=0) for model in shadow_bearer.own_models),
+    )
+    state.army_definitions[0] = replace(army, units=(destroyed_bearer, *army.units[1:]))
+    state.battlefield_state = battlefield.with_removed_models(bearer.own_model_ids())
+    assert fight_start.candidate_builder(context, malice_source) == ()
+
+    state.army_definitions[0] = army
+    assert fight_start.candidate_builder(context, malice_source) == ()
 
     malice_fnp = next(
         descriptor

@@ -507,6 +507,32 @@ def _integration_migration_predecessor(root: Path, path: str, current: bytes) ->
     return before
 
 
+def _malice_bearer_migration_predecessor(root: Path, path: str, current: bytes) -> bytes:
+    import subprocess
+
+    from scripts.engine_numerical_identity_test_admission import (
+        ROUND4_MALICE_BEARER_BASE,
+        ROUND4_MALICE_BEARER_OWNER,
+        ROUND4_MALICE_BEARER_SHA256,
+        ROUND4_MALICE_BEARER_TRANSITION,
+    )
+
+    if path != ROUND4_MALICE_BEARER_OWNER or not (root / ROUND4_MALICE_BEARER_TRANSITION).exists():
+        return current
+    transition = _read(root, ROUND4_MALICE_BEARER_TRANSITION)
+    if hashlib.sha256(transition).hexdigest() != ROUND4_MALICE_BEARER_SHA256:
+        raise ValueError("Exact Malice bearer test transition drifted.")
+    change = json.loads(transition)["test"]
+    if hashlib.sha256(current).hexdigest() != change["after"]["sha256"]:
+        raise ValueError("Live migration successor bytes drifted: " + path)
+    predecessor = subprocess.check_output(
+        ["git", "show", f"{ROUND4_MALICE_BEARER_BASE}:{path}"], cwd=root
+    )
+    if hashlib.sha256(predecessor).hexdigest() != change["before"]["sha256"]:
+        raise ValueError("Malice bearer test predecessor bytes drifted.")
+    return predecessor
+
+
 def verify_migrated_test(root: Path, relative: str) -> tuple[bytes, MigrationRecord]:
     """Read live successors or explicitly retired native history; never claim retired execution."""
     if relative not in MIGRATED_PATHS:
@@ -518,11 +544,12 @@ def verify_migrated_test(root: Path, relative: str) -> tuple[bytes, MigrationRec
         raise ValueError("Original migrated test archive drifted: " + relative)
     current: dict[str, bytes] = {}
     for path, expected in record["successors"].items():
+        live = _malice_bearer_migration_predecessor(root, path, _read(root, path))
         raw = preserved_section13_golden_bytes(
             root,
             path,
             _integration_migration_predecessor(
-                root, path, private_rng_fixture_predecessor(path, _read(root, path))
+                root, path, private_rng_fixture_predecessor(path, live)
             ),
         )
         raw = acts_predecessor(root, path, raw)
