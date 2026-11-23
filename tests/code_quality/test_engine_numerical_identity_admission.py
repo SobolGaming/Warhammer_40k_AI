@@ -294,7 +294,30 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
     )
     assert round4_base["fingerprint"] == fight_reroll["runtime_fingerprint"]
     assert round4["retained_runtime_fingerprint"] == round4_base["fingerprint"]
-    assert _record(MANIFEST)["fingerprint"] == round4["runtime_fingerprint"]
+    malice = _record(selection.ROUND4_MALICE_BEARER_TRANSITION)
+    malice_base = selection.ROUND4_MALICE_BEARER_BASE
+    malice_base_manifest = json.loads(
+        subprocess.check_output(["git", "show", malice_base + ":" + MANIFEST], cwd=ROOT)
+    )
+    assert malice_base_manifest["fingerprint"] == round4["runtime_fingerprint"]
+    assert malice["retained_runtime_fingerprint"] == malice_base_manifest["fingerprint"]
+    assert _record(MANIFEST)["fingerprint"] == malice["runtime_fingerprint"]
+    malice_source = selection.ROUND4_MALICE_BEARER_SOURCE
+    malice_source_before = subprocess.check_output(
+        ["git", "show", malice_base + ":" + malice_source], cwd=ROOT
+    )
+    assert malice["source"]["before"] == hashlib.sha256(malice_source_before).hexdigest()
+    assert (
+        malice["source"]["after"] == hashlib.sha256((ROOT / malice_source).read_bytes()).hexdigest()
+    )
+    malice_owner = selection.ROUND4_MALICE_BEARER_OWNER
+    assert malice_owner in active_files
+    malice_selector = (
+        malice_owner
+        + "::test_default_generic_rule_ability_registry_maps_shadow_legion_enhancement_grants"
+    )
+    assert sum(malice_owner in group for group in groups) == 1
+    assert malice_selector in _record("ci/test_shards/durations.json")["case_seconds"]
     for source in selection.ROUND4_BATTLE_SHOCK_SOURCES:
         if source == selection.ROUND4_BATTLE_SHOCK_TERRITORY_SOURCE:
             assert not subprocess.check_output(

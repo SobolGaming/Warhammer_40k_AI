@@ -2,6 +2,7 @@ from __future__ import annotations
 
 # pyright: reportPrivateUsage=false
 from warhammer40k_core.engine.decision_request import DecisionRequest
+from warhammer40k_core.engine.enhancement_bearers import enhancement_bearer_model
 from warhammer40k_core.engine.fight_phase_start_hooks import (
     SELECT_FACTION_RULE_FIGHT_PHASE_START_OPTION_DECISION_TYPE,
     FightPhaseStartRequestContext,
@@ -37,10 +38,20 @@ def malice_made_manifest_candidates(
     candidates: list[TimingRuleCandidate] = []
     active_player_id = _active_player_id(context.state)
     for army in _shadow_legion_armies(context.state):
-        for _assignment, unit in _assigned_units(
+        for assignment, unit in _assigned_units(
             army,
             enhancement_id=MALICE_MADE_MANIFEST_ENHANCEMENT_ID,
         ):
+            bearer_model = enhancement_bearer_model(army, assignment=assignment)
+            if not bearer_model.is_alive:
+                continue
+            battlefield = context.state.battlefield_state
+            if battlefield is None:
+                raise GameLifecycleError(
+                    "Malice Made Manifest target lookup requires battlefield_state."
+                )
+            if battlefield.model_placement_or_none(bearer_model.model_instance_id) is None:
+                continue
             if not _unit_has_keyword(unit, SHADOW_LEGION_KEYWORD):
                 raise GameLifecycleError("Malice Made Manifest requires a Shadow Legion model.")
             bearer_rules_unit = rules_unit_view_by_id(

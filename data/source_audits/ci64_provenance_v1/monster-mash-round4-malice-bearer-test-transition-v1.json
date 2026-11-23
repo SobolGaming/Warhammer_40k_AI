@@ -1,0 +1,26 @@
+{
+  "schema": "finite-monster-mash-round4-malice-bearer-test-transition-v1",
+  "base": "fb84de924d1e105d68321075d9eee5f705878a62",
+  "retained_round4_battle_shock_sha256": "88eca67f3513357bad3f35bb68fe8d3607e374f360485dd4c3ca3c06b0a7eaf3",
+  "retained_runtime_fingerprint": "bc2ce5165f872793b204fa9669e61fd19d8daef543242132616dab424b9b2986",
+  "runtime_fingerprint": "c47044084edb8c4ff5324998079574868d50a45ec9cca46b7633ec6bb6b5a353",
+  "source": {
+    "before": "947cd01e6b26c57ff06d198ffda7e84d25cb9c4cb9ee468dca0675a5e5fe0e63",
+    "after": "c632b7188599561b19fc4c9878800884dfc4dde1352e51d032c421a73bcf9d77"
+  },
+  "test": {
+    "path": "tests/factions/chaos_daemons/unit/test_generic_rule_ability_registry.py",
+    "before": {
+      "blob_sha1": "3c9ba871fb2d93512c7bb2bc27f07bd98444d1b6",
+      "bytes": 21161,
+      "mode": "100644",
+      "sha256": "330da381d4fc22016bc38612c9a5c98905a3bd7398275e6100d68afc30a6adce"
+    },
+    "after": {
+      "mode": "100644",
+      "blob_sha1": "8246d6ca14183efe1bbf736b65509eccf75452c6",
+      "sha256": "8901ff75b652675d0ce253424d5da1d251b09d2f7a67b0be02061c5da9aeea18",
+      "bytes": 23460
+    }
+  }
+}

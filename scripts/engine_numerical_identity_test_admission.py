@@ -330,6 +330,21 @@ ROUND4_BATTLE_SHOCK_SOURCES = (
 )
 
 
+ROUND4_MALICE_BEARER_TRANSITION = (
+    "data/source_audits/ci64_provenance_v1/"
+    "monster-mash-round4-malice-bearer-test-transition-v1.json"
+)
+ROUND4_MALICE_BEARER_SHA256 = "61b11c5be2d8c47a84d0155e555ee600bdb5f6439676152cffb53a4e19c42ae1"
+ROUND4_MALICE_BEARER_BASE = "fb84de924d1e105d68321075d9eee5f705878a62"
+ROUND4_MALICE_BEARER_SOURCE = (
+    "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/"
+    "chaos_daemons/detachments/shadow_legion/fight_sequencing.py"
+)
+ROUND4_MALICE_BEARER_OWNER = (
+    "tests/factions/chaos_daemons/unit/test_generic_rule_ability_registry.py"
+)
+
+
 type SourceSuccessors = dict[str, dict[str, str]]
 type TestSuccessors = dict[str, dict[str, object]]
 
@@ -1063,6 +1078,14 @@ def exact_movement_test_transition(
         runtime = attack_reroll_order[1]
     if round4 is not None:
         runtime = round4[0]
+    malice_path = root / ROUND4_MALICE_BEARER_TRANSITION
+    _selection_no_links(root, malice_path)
+    malice = None
+    if malice_path.exists():
+        if round4 is None:
+            raise SystemExit("Round 4 Malice bearer tests require the Battle-shock predecessor.")
+        malice = _round4_malice_bearer_successor(root, retained_cutover_sha256, runtime)
+        runtime = malice[0]
     retained = _identity_test_transition(
         root,
         retained_cutover_sha256,
@@ -1152,7 +1175,56 @@ def exact_movement_test_transition(
             raise SystemExit("Round 4 Battle-shock tests overlap the predecessor selection.")
         updated.update(round4_battle_shock)
         raw += b"\0" + round4_raw
+    if malice is not None:
+        _, malice_bearer, malice_raw = malice
+        if malice_bearer.keys() & (updated.keys() | added.keys() | additions.keys()):
+            raise SystemExit("Round 4 Malice bearer tests overlap the predecessor selection.")
+        updated.update(malice_bearer)
+        raw += b"\0" + malice_raw
     return updated, {**added, **additions}, retained_raw + b"\0" + raw
+
+
+def _round4_malice_bearer_successor(
+    root: Path, retained_cutover_sha256: str, retained_runtime: str
+) -> tuple[str, TestSuccessors, bytes]:
+    from scripts.build_test_shards import CUTOVER_PATH
+
+    raw = _checked_bytes(root, ROUND4_MALICE_BEARER_TRANSITION, ROUND4_MALICE_BEARER_SHA256)
+    record = json.loads(raw, object_pairs_hook=_selection_object)
+    if (
+        record.keys()
+        != {
+            "schema",
+            "base",
+            "retained_round4_battle_shock_sha256",
+            "retained_runtime_fingerprint",
+            "runtime_fingerprint",
+            "source",
+            "test",
+        }
+        or record["schema"] != "finite-monster-mash-round4-malice-bearer-test-transition-v1"
+        or record["base"] != ROUND4_MALICE_BEARER_BASE
+        or record["retained_round4_battle_shock_sha256"] != ROUND4_BATTLE_SHOCK_SHA256
+        or record["retained_runtime_fingerprint"] != retained_runtime
+    ):
+        raise SystemExit("Round 4 Malice bearer test transition differs.")
+    cutover = json.loads(
+        _checked_bytes(root, CUTOVER_PATH, retained_cutover_sha256),
+        object_pairs_hook=_selection_object,
+    )
+    change = record["test"]
+    if (
+        set(change) != {"path", "before", "after"}
+        or change["path"] != ROUND4_MALICE_BEARER_OWNER
+        or change["before"] != cutover["active_files"][ROUND4_MALICE_BEARER_OWNER]
+    ):
+        raise SystemExit("Round 4 Malice bearer test predecessor differs.")
+    _checked_bytes(root, ROUND4_MALICE_BEARER_SOURCE, record["source"]["after"])
+    return (
+        record["runtime_fingerprint"],
+        _selection_members({ROUND4_MALICE_BEARER_OWNER: change["after"]}, root),
+        raw,
+    )
 
 
 def _round4_battle_shock_successor(
