@@ -2899,6 +2899,36 @@ Required local/hosted gates and both exact-final-head independent reviews remain
 delivery prerequisites. These observations do not qualify complete-game timing,
 tactical benefit or learning eligibility.
 
+## Opt-in six-model ground Charge Move
+
+`ai.ground_charge_candidates.generate_ground_charge_candidates` takes the pending
+actor's `PlayerDecisionContext` on the exact battle Charge / movement proposal /
+`charge_move` route. It uses the issued target and distance, visible model poses
+and footprints, and visible terrain. The scoped formation has six grounded
+movers and one grounded model in the selected opposing unit. Search keeps each
+mover's facing and elevation, samples endpoints around the target, and tries
+direct paths and paths with one lateral waypoint per model. The placement and
+clearance screens are bounded geometric heuristics. The ordinary engine still
+decides path, terrain, endpoint and coherency legality.
+
+Call `ai.ground_charge_policy.prepare_ground_charge_policy` with the matching
+actor context and an exclusively owned `LocalGameSession` in a single-threaded,
+fork-capable host. Native probe processes inherit the exact pending occurrence,
+each submit one ordinary viewer-bound proposal, and exit or are killed at the
+probe deadline. Preparation verifies that the live lifecycle is unchanged.
+Add the returned registration to a `PolicyRouter` to opt in for that occurrence.
+The runner rechecks the actor/request/observation binding and commits through the
+existing viewer submission. This uses the existing [adapter decision contract](ADAPTER_DECISION_CONTRACT.md).
+
+Preparation caps generation at 32 proposals and 600,000 geometry work units,
+then checks at most 32 proposals and retains at most 16 accepts. A probe defaults
+to 15 seconds, is capped at 30 seconds, and shares a 300-second native deadline
+with the other probes. The operator receipt separates generation and validation
+time, accepts, engine rejections and timeouts. Selection orders only completed
+native accepts by shortest longest model path, then shortest total, with stable
+generated order for ties. A search with no accepted proposal raises typed
+exhaustion. This is a single decision policy with explicit registration.
+
 ## Native preserve Fight continuation
 
 `tests.support.cavalcade_native_fight` extends the real round-four Cavalcade

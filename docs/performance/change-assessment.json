@@ -1,414 +1,508 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "1e5d53a3a8a09eac3752073ed0fd7d3247789248",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:77160f03d452969c67dbdb72249b0ffdf32f3be6b485e799abaeae380668cfaa",
-  "operation_map_sha256": "fa3ebd14467bf5f2033eedbab798cb23bf45619b0ec8ab18c770d8eff2f15fc9",
+  "base": "2addab80a74e9369b8b0b653954318bf58eec0e5",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:331c7f5ba83db0dfeeb99bfd72297b31e512ebc0864e2c205f36046e74a0043c",
+  "operation_map_sha256": "617bd6fa4476f863f6b4b86c7c7ad15b4dae83a87657b5e49accfdc878115e8d",
   "changes": {
     "ci/test_shards/durations.json": {
-      "before_sha256": "3460e308c5532120b9352099d8f7cff2978e279c088a9eaa959c49264f08aab6",
-      "after_sha256": "868f561c32c0ca71be48d50d1458a086e518e5c8ec635ad60afece22a166b06f",
+      "before_sha256": "868f561c32c0ca71be48d50d1458a086e518e5c8ec635ad60afece22a166b06f",
+      "after_sha256": "7ffbdf968eaa51b3303fb160ecb1e918bcca1794a0cec3adb33f7fcd42a43380",
       "owners": {
         "@document": {
-          "before": "3460e308c5532120b9352099d8f7cff2978e279c088a9eaa959c49264f08aab6",
-          "after": "868f561c32c0ca71be48d50d1458a086e518e5c8ec635ad60afece22a166b06f"
+          "before": "868f561c32c0ca71be48d50d1458a086e518e5c8ec635ad60afece22a166b06f",
+          "after": "7ffbdf968eaa51b3303fb160ecb1e918bcca1794a0cec3adb33f7fcd42a43380"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
-      "before_sha256": "21204e558d7be31221662c7bced8f4e5ce5c99dcff8ab0ca05c26e83e4121bd1",
-      "after_sha256": "ad7ea6fa3ea34c1a1dc2d2fe85f09386929af3f0dacdff5096827e436c8c4879",
+      "before_sha256": "ad7ea6fa3ea34c1a1dc2d2fe85f09386929af3f0dacdff5096827e436c8c4879",
+      "after_sha256": "ceba701628db61fbc18b93a5c192bbb8db0b17e09753f4bee646c8ad855dbda2",
       "owners": {
         "@document": {
-          "before": "21204e558d7be31221662c7bced8f4e5ce5c99dcff8ab0ca05c26e83e4121bd1",
-          "after": "ad7ea6fa3ea34c1a1dc2d2fe85f09386929af3f0dacdff5096827e436c8c4879"
+          "before": "ad7ea6fa3ea34c1a1dc2d2fe85f09386929af3f0dacdff5096827e436c8c4879",
+          "after": "ceba701628db61fbc18b93a5c192bbb8db0b17e09753f4bee646c8ad855dbda2"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
-      "before_sha256": "14dbb443fc2bfc293e7493dbc1fbbfa91cb91d8719171d9e13aa22448d08fe17",
-      "after_sha256": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20",
+      "before_sha256": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20",
+      "after_sha256": "ef0124b20e35c11185c4225865d7c7f2d9291d381b47874520db9c5a2f34e92b",
       "owners": {
         "@document": {
-          "before": "14dbb443fc2bfc293e7493dbc1fbbfa91cb91d8719171d9e13aa22448d08fe17",
-          "after": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20"
+          "before": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20",
+          "after": "ef0124b20e35c11185c4225865d7c7f2d9291d381b47874520db9c5a2f34e92b"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
-      "before_sha256": "bac4c7af8103ed488bbaf8fb67f56e953d1acb3ca3f49fc06422215d4fe5075a",
-      "after_sha256": "12092599a7c28d9d2c86ddfb1014e4b55af45d22a15895668d888803181131d5",
+      "before_sha256": "12092599a7c28d9d2c86ddfb1014e4b55af45d22a15895668d888803181131d5",
+      "after_sha256": "a4f931561509f5f3cf625be80acc12a790f1daafb6ebc65512c8e078b92e716d",
       "owners": {
         "@document": {
-          "before": "bac4c7af8103ed488bbaf8fb67f56e953d1acb3ca3f49fc06422215d4fe5075a",
-          "after": "12092599a7c28d9d2c86ddfb1014e4b55af45d22a15895668d888803181131d5"
+          "before": "12092599a7c28d9d2c86ddfb1014e4b55af45d22a15895668d888803181131d5",
+          "after": "a4f931561509f5f3cf625be80acc12a790f1daafb6ebc65512c8e078b92e716d"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
-      "before_sha256": "f82d4661c9c6c099e0844d3125c40246aed20272142bbc6b5188e6f41ae22a7f",
-      "after_sha256": "b34095fc6c0ae92aacca1037f3160c6382c0ae5935fd24221f8facbe90ab38f9",
+      "before_sha256": "b34095fc6c0ae92aacca1037f3160c6382c0ae5935fd24221f8facbe90ab38f9",
+      "after_sha256": "0c61ec7d4f1fb94b3bfce4cb282e74b1359da462501aeb702e1e3576aec3b749",
       "owners": {
         "@document": {
-          "before": "f82d4661c9c6c099e0844d3125c40246aed20272142bbc6b5188e6f41ae22a7f",
-          "after": "b34095fc6c0ae92aacca1037f3160c6382c0ae5935fd24221f8facbe90ab38f9"
+          "before": "b34095fc6c0ae92aacca1037f3160c6382c0ae5935fd24221f8facbe90ab38f9",
+          "after": "0c61ec7d4f1fb94b3bfce4cb282e74b1359da462501aeb702e1e3576aec3b749"
         }
       }
     },
     "ci/test_shards/shard-2.txt": {
-      "before_sha256": "2a225de363550d9c9d25829caa50e8944a63e424cfde26baebcb4ae06b9361de",
-      "after_sha256": "7e2b78daeb1ac337007999e8e6d70f0f6fc31e46934adac7ced335788272751e",
+      "before_sha256": "7e2b78daeb1ac337007999e8e6d70f0f6fc31e46934adac7ced335788272751e",
+      "after_sha256": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
       "owners": {
         "@document": {
-          "before": "2a225de363550d9c9d25829caa50e8944a63e424cfde26baebcb4ae06b9361de",
-          "after": "7e2b78daeb1ac337007999e8e6d70f0f6fc31e46934adac7ced335788272751e"
+          "before": "7e2b78daeb1ac337007999e8e6d70f0f6fc31e46934adac7ced335788272751e",
+          "after": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
-      "before_sha256": "73b507a3922ff9a6c3384aa342d052b7be1878a6d7afb03bacdac2dd6ac6eeb8",
-      "after_sha256": "dca003fdc57fcc3c202958bb8b1abad24de89000a94f6ea3a6fdade1f9f69bfa",
+      "before_sha256": "dca003fdc57fcc3c202958bb8b1abad24de89000a94f6ea3a6fdade1f9f69bfa",
+      "after_sha256": "275ec2e93ca4378bbd8426c5c7410426492044fd5e59158b7371103c66f7396b",
       "owners": {
         "@document": {
-          "before": "73b507a3922ff9a6c3384aa342d052b7be1878a6d7afb03bacdac2dd6ac6eeb8",
-          "after": "dca003fdc57fcc3c202958bb8b1abad24de89000a94f6ea3a6fdade1f9f69bfa"
+          "before": "dca003fdc57fcc3c202958bb8b1abad24de89000a94f6ea3a6fdade1f9f69bfa",
+          "after": "275ec2e93ca4378bbd8426c5c7410426492044fd5e59158b7371103c66f7396b"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
-      "before_sha256": "a79a50e62379b70a384ebf8a61a1a28f205ffe12b2dfc7137adf41d66377a474",
-      "after_sha256": "5e8507341b7ebdc4512006aebe5cae2c30487a78628d94803c9d222e191ccde9",
+      "before_sha256": "5e8507341b7ebdc4512006aebe5cae2c30487a78628d94803c9d222e191ccde9",
+      "after_sha256": "273203701d0b687ca92ad3659ef537d1f1731a47c05fb9cc7080abf6b2dce067",
       "owners": {
         "@document": {
-          "before": "a79a50e62379b70a384ebf8a61a1a28f205ffe12b2dfc7137adf41d66377a474",
-          "after": "5e8507341b7ebdc4512006aebe5cae2c30487a78628d94803c9d222e191ccde9"
+          "before": "5e8507341b7ebdc4512006aebe5cae2c30487a78628d94803c9d222e191ccde9",
+          "after": "273203701d0b687ca92ad3659ef537d1f1731a47c05fb9cc7080abf6b2dce067"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
-      "before_sha256": "66202c1bf449594af6f4669b4767b3b6571d9207e9d67dca584e53859d8bdbcc",
-      "after_sha256": "a6398d62a41cf2ac17cfcb154a809f983a099a984fafe517714be120db15f77b",
+      "before_sha256": "a6398d62a41cf2ac17cfcb154a809f983a099a984fafe517714be120db15f77b",
+      "after_sha256": "a4084dcadd58db05c774767a3c3d75b7038f3cd9a135b5143a1fa1fbb836ae8b",
       "owners": {
         "@document": {
-          "before": "66202c1bf449594af6f4669b4767b3b6571d9207e9d67dca584e53859d8bdbcc",
-          "after": "a6398d62a41cf2ac17cfcb154a809f983a099a984fafe517714be120db15f77b"
+          "before": "a6398d62a41cf2ac17cfcb154a809f983a099a984fafe517714be120db15f77b",
+          "after": "a4084dcadd58db05c774767a3c3d75b7038f3cd9a135b5143a1fa1fbb836ae8b"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
-      "before_sha256": "f9f5e0aceef13a076d1b189d7ae791b48cca89a82eb5b3f87926d2c4cde22bff",
-      "after_sha256": "28d89930ef0b169c09db8de71828b0f08d54cee6b1f2b7ed6b18106f4fb684e0",
+      "before_sha256": "28d89930ef0b169c09db8de71828b0f08d54cee6b1f2b7ed6b18106f4fb684e0",
+      "after_sha256": "48f22dfdae22f59fbd55c5f91f33b137f4eb78941fd64379290ea0f31aed7890",
       "owners": {
         "@document": {
-          "before": "f9f5e0aceef13a076d1b189d7ae791b48cca89a82eb5b3f87926d2c4cde22bff",
-          "after": "28d89930ef0b169c09db8de71828b0f08d54cee6b1f2b7ed6b18106f4fb684e0"
+          "before": "28d89930ef0b169c09db8de71828b0f08d54cee6b1f2b7ed6b18106f4fb684e0",
+          "after": "48f22dfdae22f59fbd55c5f91f33b137f4eb78941fd64379290ea0f31aed7890"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
-      "before_sha256": "ae859be27b95f99650400ac5d183ea6d8cd5c6411c00ab713f07d684e67a05d6",
-      "after_sha256": "2287c331a7e6116a1aa6ef1dc74f6c7235e8410d549ef317547cc80d5f1b2952",
+      "before_sha256": "2287c331a7e6116a1aa6ef1dc74f6c7235e8410d549ef317547cc80d5f1b2952",
+      "after_sha256": "82532542114e325af3dcdf45bb745992da264a83eeaea9f8afdf43743222cebf",
       "owners": {
         "@document": {
-          "before": "ae859be27b95f99650400ac5d183ea6d8cd5c6411c00ab713f07d684e67a05d6",
-          "after": "2287c331a7e6116a1aa6ef1dc74f6c7235e8410d549ef317547cc80d5f1b2952"
+          "before": "2287c331a7e6116a1aa6ef1dc74f6c7235e8410d549ef317547cc80d5f1b2952",
+          "after": "82532542114e325af3dcdf45bb745992da264a83eeaea9f8afdf43743222cebf"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
-      "before_sha256": "a6a3b05bf211017b1aecf987dfe7f31b8e9f2149dad834278460d88274687453",
-      "after_sha256": "300dd8fc14e8ea6d2aaa3f62308b70176d5a872db82f50debfe32c89153555d4",
+      "before_sha256": "300dd8fc14e8ea6d2aaa3f62308b70176d5a872db82f50debfe32c89153555d4",
+      "after_sha256": "067afbffc1a435aa03237f1699e6cb83d6265f25351e90947eb492e3566048d6",
       "owners": {
         "@document": {
-          "before": "a6a3b05bf211017b1aecf987dfe7f31b8e9f2149dad834278460d88274687453",
-          "after": "300dd8fc14e8ea6d2aaa3f62308b70176d5a872db82f50debfe32c89153555d4"
+          "before": "300dd8fc14e8ea6d2aaa3f62308b70176d5a872db82f50debfe32c89153555d4",
+          "after": "067afbffc1a435aa03237f1699e6cb83d6265f25351e90947eb492e3566048d6"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
-      "before_sha256": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20",
-      "after_sha256": "b1ea54000b98ae134d7b2e48e15c06bc57762c718524086c530ced9bedbfd182",
+      "before_sha256": "b1ea54000b98ae134d7b2e48e15c06bc57762c718524086c530ced9bedbfd182",
+      "after_sha256": "796f88c2fb5a3ba40305c5236c17861652870d25c27d9bf5017009896d82ab0b",
       "owners": {
         "@document": {
-          "before": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20",
-          "after": "b1ea54000b98ae134d7b2e48e15c06bc57762c718524086c530ced9bedbfd182"
+          "before": "b1ea54000b98ae134d7b2e48e15c06bc57762c718524086c530ced9bedbfd182",
+          "after": "796f88c2fb5a3ba40305c5236c17861652870d25c27d9bf5017009896d82ab0b"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "6617eefcaa8c56560083dea9864e2d1bcbf2c7847aa3173a99cc76ee2bf2923c",
-      "after_sha256": "74c4d265f7e7b42e76c00d6a6404321f5362c50930f0239b4d270c3319a12d4d",
+      "before_sha256": "74c4d265f7e7b42e76c00d6a6404321f5362c50930f0239b4d270c3319a12d4d",
+      "after_sha256": "74399c500a816188c41a9a9a1840f4b78979cbf17a568ab121a4593659adb9f3",
       "owners": {
         "@document": {
-          "before": "6617eefcaa8c56560083dea9864e2d1bcbf2c7847aa3173a99cc76ee2bf2923c",
-          "after": "74c4d265f7e7b42e76c00d6a6404321f5362c50930f0239b4d270c3319a12d4d"
+          "before": "74c4d265f7e7b42e76c00d6a6404321f5362c50930f0239b4d270c3319a12d4d",
+          "after": "74399c500a816188c41a9a9a1840f4b78979cbf17a568ab121a4593659adb9f3"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "7b38a88ed88de735f91db628ccd9f05018420d7f81504b220f06305da4dbb674",
-      "after_sha256": "90001c801d610d3c6bbab9320b2c80078bcd27080f1bf386fca3963dc5d37cbf",
+      "before_sha256": "90001c801d610d3c6bbab9320b2c80078bcd27080f1bf386fca3963dc5d37cbf",
+      "after_sha256": "d2a9edd669cd871e79d656bba9710b93cc257994d7e57faa8e00c8b7f1f9ed1a",
       "owners": {
         "@document": {
-          "before": "7b38a88ed88de735f91db628ccd9f05018420d7f81504b220f06305da4dbb674",
-          "after": "90001c801d610d3c6bbab9320b2c80078bcd27080f1bf386fca3963dc5d37cbf"
+          "before": "90001c801d610d3c6bbab9320b2c80078bcd27080f1bf386fca3963dc5d37cbf",
+          "after": "d2a9edd669cd871e79d656bba9710b93cc257994d7e57faa8e00c8b7f1f9ed1a"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "eaf2215eea2019d2cf20eaed4e71e42505a5f56cb301c779c8f8305531438d57",
-      "after_sha256": "440e8625aa249f95577c16749152730fb373ec76d83ca6725efa01de939cfb7f",
+      "before_sha256": "440e8625aa249f95577c16749152730fb373ec76d83ca6725efa01de939cfb7f",
+      "after_sha256": "83342331d8e53b24b46c3fcbfef5783623f28def4bccd1a454324b756b6d5125",
       "owners": {
         "@document": {
-          "before": "eaf2215eea2019d2cf20eaed4e71e42505a5f56cb301c779c8f8305531438d57",
-          "after": "440e8625aa249f95577c16749152730fb373ec76d83ca6725efa01de939cfb7f"
+          "before": "440e8625aa249f95577c16749152730fb373ec76d83ca6725efa01de939cfb7f",
+          "after": "83342331d8e53b24b46c3fcbfef5783623f28def4bccd1a454324b756b6d5125"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "769a69c1bfd925d02a655f851247eb5907fec743fbaed74c88ad0a35db5f5bc1",
-      "after_sha256": "d6cb53eedf665c06ed278483abf8602f04c314f3e255c7450ee68624e284d263",
+      "before_sha256": "d6cb53eedf665c06ed278483abf8602f04c314f3e255c7450ee68624e284d263",
+      "after_sha256": "5d8834d18364058ea400f3e129694872915306d3bc96d78bc39391f848ff1e3d",
       "owners": {
         "@document": {
-          "before": "769a69c1bfd925d02a655f851247eb5907fec743fbaed74c88ad0a35db5f5bc1",
-          "after": "d6cb53eedf665c06ed278483abf8602f04c314f3e255c7450ee68624e284d263"
+          "before": "d6cb53eedf665c06ed278483abf8602f04c314f3e255c7450ee68624e284d263",
+          "after": "5d8834d18364058ea400f3e129694872915306d3bc96d78bc39391f848ff1e3d"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "434de77a7c0b099a1811184a65595aa585f46b64d7702750c54aea53e27f4fc0",
-      "after_sha256": "a86402324d7add602736e75d2532e002f7ab36865538732f83939a33e35321b4",
+      "before_sha256": "a86402324d7add602736e75d2532e002f7ab36865538732f83939a33e35321b4",
+      "after_sha256": "4910e237600d25b01ea17f954baafd7029cca54649a7140caaff59ebcc4ab0dc",
       "owners": {
         "@document": {
-          "before": "434de77a7c0b099a1811184a65595aa585f46b64d7702750c54aea53e27f4fc0",
-          "after": "a86402324d7add602736e75d2532e002f7ab36865538732f83939a33e35321b4"
+          "before": "a86402324d7add602736e75d2532e002f7ab36865538732f83939a33e35321b4",
+          "after": "4910e237600d25b01ea17f954baafd7029cca54649a7140caaff59ebcc4ab0dc"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "c8715f789638541c45da515a95052239f5346d5421b2f37becf8f9c60c037b79",
-      "after_sha256": "d8e5ba96fa9975ef2e9ab7b04d33c6ea71de9d0df5f7d662dadfb6404ae4678b",
+      "before_sha256": "d8e5ba96fa9975ef2e9ab7b04d33c6ea71de9d0df5f7d662dadfb6404ae4678b",
+      "after_sha256": "9b33a282ebb4854483e18d567e9a44d61ffff59c692f915dd42fdf63de77128e",
       "owners": {
         "@document": {
-          "before": "c8715f789638541c45da515a95052239f5346d5421b2f37becf8f9c60c037b79",
-          "after": "d8e5ba96fa9975ef2e9ab7b04d33c6ea71de9d0df5f7d662dadfb6404ae4678b"
+          "before": "d8e5ba96fa9975ef2e9ab7b04d33c6ea71de9d0df5f7d662dadfb6404ae4678b",
+          "after": "9b33a282ebb4854483e18d567e9a44d61ffff59c692f915dd42fdf63de77128e"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "f434a17a7121b83661f691a6ca5c8e810384acf2cca2f864be157c011dfea5ea",
-      "after_sha256": "55a76d43fe90a1c7a463f920ac46b0f063491836e5f46a4f49841bf9aa3cf09d",
+      "before_sha256": "55a76d43fe90a1c7a463f920ac46b0f063491836e5f46a4f49841bf9aa3cf09d",
+      "after_sha256": "fc6cec5af94c444cec4754b02b20fa9d3e79b25566f544caa7c2e7f34a0c698f",
       "owners": {
         "@document": {
-          "before": "f434a17a7121b83661f691a6ca5c8e810384acf2cca2f864be157c011dfea5ea",
-          "after": "55a76d43fe90a1c7a463f920ac46b0f063491836e5f46a4f49841bf9aa3cf09d"
+          "before": "55a76d43fe90a1c7a463f920ac46b0f063491836e5f46a4f49841bf9aa3cf09d",
+          "after": "fc6cec5af94c444cec4754b02b20fa9d3e79b25566f544caa7c2e7f34a0c698f"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "e3c8cf2e8a54e90642425dbbd66c928785697b56e2ad0ab401e3f13287bfed31",
-      "after_sha256": "0f10b79ab437ba81ecba13ef01bc935dfb87faf080a386bf9330b0cc6bf20734",
+      "before_sha256": "0f10b79ab437ba81ecba13ef01bc935dfb87faf080a386bf9330b0cc6bf20734",
+      "after_sha256": "32ea16a1b9c25eb1d2bb70ecc310e2975f1c13313f678f182c4ca84b90180f15",
       "owners": {
         "@document": {
-          "before": "e3c8cf2e8a54e90642425dbbd66c928785697b56e2ad0ab401e3f13287bfed31",
-          "after": "0f10b79ab437ba81ecba13ef01bc935dfb87faf080a386bf9330b0cc6bf20734"
+          "before": "0f10b79ab437ba81ecba13ef01bc935dfb87faf080a386bf9330b0cc6bf20734",
+          "after": "32ea16a1b9c25eb1d2bb70ecc310e2975f1c13313f678f182c4ca84b90180f15"
         }
       }
     },
-    "data/source_audits/ci64_provenance_v1/monster-mash-round3-shalaxi-test-transition-v1.json": {
+    "data/source_audits/ci64_provenance_v1/stage2-ground-charge-test-addition-v1.json": {
       "before_sha256": null,
-      "after_sha256": "a9e2413b2d06ece74221a364cbcaa17525e7995100b725517f31902c7a1edf43",
+      "after_sha256": "0daba6ba89667453f30c8f658b260a4dc94656bf9ff008159156f20ea31f4be5",
       "owners": {
         "@document": {
           "before": null,
-          "after": "a9e2413b2d06ece74221a364cbcaa17525e7995100b725517f31902c7a1edf43"
+          "after": "0daba6ba89667453f30c8f658b260a4dc94656bf9ff008159156f20ea31f4be5"
         }
       }
     },
-    "docs/performance/current/monster-mash-round3-shalaxi-movement.json": {
-      "before_sha256": null,
-      "after_sha256": "cf58fde4ed8eaece2e4a8657f1b3c164e893a53c80fe7a1a9b8d22f3b59ef8c7",
+    "docs/AI_POLICY_INTERFACE.md": {
+      "before_sha256": "11776bafdf82a081034709b3890c479db3b82a5c272893992d681705634a64a6",
+      "after_sha256": "99cfc49bef1a31a2be0e2b229e2abb333c5b8e11e91d6a9c47e63d4256245ab0",
       "owners": {
         "@document": {
-          "before": null,
-          "after": "cf58fde4ed8eaece2e4a8657f1b3c164e893a53c80fe7a1a9b8d22f3b59ef8c7"
-        }
-      }
-    },
-    "docs/performance/current/monster-mash-round3-shalaxi-setup.json": {
-      "before_sha256": null,
-      "after_sha256": "e101747f59a6ec4507e8a3c046f8d6506a3bacfc74efeebc70b9cc462a9fed94",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "e101747f59a6ec4507e8a3c046f8d6506a3bacfc74efeebc70b9cc462a9fed94"
-        }
-      }
-    },
-    "docs/performance/current/monster-mash-round3-shalaxi-visibility.json": {
-      "before_sha256": null,
-      "after_sha256": "0f0955811a7120a25d11d0241e5ed98917da6e1c9ef1da892d7a2994ae069753",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "0f0955811a7120a25d11d0241e5ed98917da6e1c9ef1da892d7a2994ae069753"
+          "before": "11776bafdf82a081034709b3890c479db3b82a5c272893992d681705634a64a6",
+          "after": "99cfc49bef1a31a2be0e2b229e2abb333c5b8e11e91d6a9c47e63d4256245ab0"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "ee1b5d43300edc57594d3c126bdd105d6e183a7beac469bb9913836d28ba34df",
-      "after_sha256": "12a9f7f06e044021cbb37c7edb83756f86dfdd16b3a8b4963a14be79e9b2490e",
+      "before_sha256": "12a9f7f06e044021cbb37c7edb83756f86dfdd16b3a8b4963a14be79e9b2490e",
+      "after_sha256": "07dfb51eb903bd7c9cc1b9fb73674052c783b88a59eec53df3cba0acae5e88fd",
       "owners": {
         "@document": {
-          "before": "ee1b5d43300edc57594d3c126bdd105d6e183a7beac469bb9913836d28ba34df",
-          "after": "12a9f7f06e044021cbb37c7edb83756f86dfdd16b3a8b4963a14be79e9b2490e"
+          "before": "12a9f7f06e044021cbb37c7edb83756f86dfdd16b3a8b4963a14be79e9b2490e",
+          "after": "07dfb51eb903bd7c9cc1b9fb73674052c783b88a59eec53df3cba0acae5e88fd"
         }
       }
     },
     "scripts/engine_numerical_identity_test_admission.py": {
-      "before_sha256": "521fdca5c2d6fd74120b43ef2c14639e2cf677610adecb3c58b1085d27175891",
-      "after_sha256": "1faebdb22e94422e7d69b2ab84a7f93505321021c0f107a5c2a26178a0d52c24",
+      "before_sha256": "1faebdb22e94422e7d69b2ab84a7f93505321021c0f107a5c2a26178a0d52c24",
+      "after_sha256": "b6bfc62055b10be8c9560937de1a837c0904e8262a90ad453aec24e6753b2d1f",
       "owners": {
         "@module": {
-          "before": "b6a5112e6ba1d88baa39a8b92da61a79dd781c39d293640c9b8a161aaabb0a70",
-          "after": "565dfeead0a1ccc8b175cf5faf83edb7084fb0c51555784cb89e225fdea75dbb"
-        },
-        "_round3_shalaxi_successor": {
-          "before": null,
-          "after": "3829c00e105c536b4bc3080ae4d35a6eb383ee85ee63b16ce53b816f7faad8f8"
-        },
-        "_shooting_visibility_successor": {
-          "before": "fbd07ecfcbd7025e3b1020c71dc2dfe30631085059fb4fd915a6c53941061015",
-          "after": "13b5dcda941c6fcfd5e2a1bdc51e98ece7c609031a3ccaa421f18aea338201dc"
+          "before": "565dfeead0a1ccc8b175cf5faf83edb7084fb0c51555784cb89e225fdea75dbb",
+          "after": "aa6cb27b10bde9301827674d266ce2f384eb71a070987fd3774b3286493ee517"
         },
         "exact_movement_test_transition": {
-          "before": "8891dee52b96e547bd2bd4a2c45a5612d077942fd9304b8c354796c7405e2c36",
-          "after": "cf79b603d4afda7d7cd1575ec00895de5bee122bedc51853a8ca2b49f1d4dc1a"
+          "before": "cf79b603d4afda7d7cd1575ec00895de5bee122bedc51853a8ca2b49f1d4dc1a",
+          "after": "3865367c46effebae533273dfa1651c2095e6665816a021673d3d69bdb50b80d"
+        }
+      }
+    },
+    "scripts/stage2_ground_charge_test_admission.py": {
+      "before_sha256": null,
+      "after_sha256": "045bed42ed189642542140ffec7970059648e183971af69f128d29ab71348b1b",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "873588d511a61685f7f7bdf85389ce2dc95a2c26f3da0faaf8a5b91f16a1f620"
+        },
+        "ground_charge_test_successor": {
+          "before": null,
+          "after": "8d52328c10f3edc4ed51fa732677e6e18dc3b4255ec10248f822942d99e8a784"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "3cba50c9b0bd61f119521774098fae29e712560d8982eee600f1c2cc11d3fbb8",
-      "after_sha256": "42a0ea6ff6dd6f744a6fe156313fa8c46f99aa4cf822088c19663318b1c0b13a",
+      "before_sha256": "42a0ea6ff6dd6f744a6fe156313fa8c46f99aa4cf822088c19663318b1c0b13a",
+      "after_sha256": "d5e3d3493522c1ab20e52df97b3b471a7180e311b6b733e3a01e56c04b807311",
       "owners": {
         "@document": {
-          "before": "3cba50c9b0bd61f119521774098fae29e712560d8982eee600f1c2cc11d3fbb8",
-          "after": "42a0ea6ff6dd6f744a6fe156313fa8c46f99aa4cf822088c19663318b1c0b13a"
+          "before": "42a0ea6ff6dd6f744a6fe156313fa8c46f99aa4cf822088c19663318b1c0b13a",
+          "after": "d5e3d3493522c1ab20e52df97b3b471a7180e311b6b733e3a01e56c04b807311"
         }
       }
     },
-    "src/warhammer40k_core/geometry/continuous_visibility.py": {
-      "before_sha256": "9b460af054119c59e1f829ebb762f6cf6effd751d24970f54c99a3ecb8e93008",
-      "after_sha256": "95c2bf4dbeb9ac673f892b3ec91c97102090eacb9c756308ce99bbeacda2d2e7",
-      "owners": {
-        "@module": {
-          "before": "0d71d553092235af09b25a077f6d74824c1a3aa70ad868bb1735c10fab0ff2d5",
-          "after": "1fb260f21f55df07c187deb6ea2a91fe60a5d52d8d52e46db21c44d4fcb4a3f3"
-        },
-        "_resolve_any_part": {
-          "before": "c181791e57e11b1c06d6eec3faf021e17034c3b5b536b7fda8d9031d6362bf4f",
-          "after": "da3e18d6a86f17ea85d1815c5657e3cb391d17b319aef148d7efdb5e39b18b20"
-        }
-      }
-    },
-    "src/warhammer40k_core/geometry/visibility_axis_shadow.py": {
+    "src/warhammer40k_core/ai/ground_charge_candidates.py": {
       "before_sha256": null,
-      "after_sha256": "31f02ba38810653c5fb78cad8b852e049ad3ecde64405a635b333777874fa9f6",
+      "after_sha256": "f581c6f6f7bc17b611f8bab05d5dbb1a788e2c49f6a2cec0603c3a8adc6f83f7",
       "owners": {
         "@module": {
           "before": null,
-          "after": "30de31bad435da313b80c37e1a18406efd7e8758376c520a51657bb719375abf"
+          "after": "be6435f84ca66fac209bbc3ca99e2d8e2974e7f5d4f45cc9d393b980fc920485"
         },
-        "_axis_shadow_clauses": {
+        "ChargeSearchCounts": {
           "before": null,
-          "after": "162115fc9d90f2839d1ba348eacbd23b70a36d568bcf7374627e11794cae786e"
+          "after": "b603c782d743fb73336d591789850c2f565ac4b4ffc5f70feced9aca58e8c70b"
         },
-        "_clip_at": {
+        "ChargeSearchStop": {
           "before": null,
-          "after": "6a5c5358383b7aaf095222a711f7702eebdceaf563ea4e419d8f8f457e051a2e"
+          "after": "4249e7b24bda23c7ce814e95f02a97d5d1b39c30a00c088e3575716a358a5882"
         },
-        "_ellipse_line_offset": {
+        "GroundChargeCandidate": {
           "before": null,
-          "after": "054b1a193819410d0d4a238f2c622c21634d9522bb018d5fba3f61c62791ca3f"
+          "after": "9b49fe6b745b670d73dae6a622ce175e00fef2a83a8cfbea1ba6890e243a8477"
         },
-        "_joined_height_intervals": {
+        "GroundChargeCandidate.candidate_id": {
           "before": null,
-          "after": "cac4fa890a9e71fc25a63670523b792210c1b341f175dc1dc0c0963959231a8a"
+          "after": "d8e50e96c188e650a7ce63623502b55b2379396311361a8fa6e0b8b0f139c0fc"
         },
-        "all_corridors_blocked_by_axis_shadow": {
+        "GroundChargeCandidates": {
           "before": null,
-          "after": "0518a90e87c663f560a6168a92eb26c8e20a5907cbe8d84d956f4629619ab3dd"
+          "after": "d34955a5c77ff1e1125b4ecd594e4d3552605b6ddbfeea04f10eb401f9bffbf0"
+        },
+        "GroundChargeExhaustedError": {
+          "before": null,
+          "after": "d2305117ffa7511e0b44821be9909ffeb87fe7046d8bb54d22649581b472c6a3"
+        },
+        "GroundChargeExhaustedError.__init__": {
+          "before": null,
+          "after": "1ecbc9b23d1b2f70794be0c451b7d8efeec9516f82e46c5f6f2fe9b01022d411"
+        },
+        "_HullGeometry": {
+          "before": null,
+          "after": "2c8e6c5c4c2080f13cf1f83bfba041e1092d0e5a075c69b45db6ec784c0340fe"
+        },
+        "_HullGeometry.convex_hull": {
+          "before": null,
+          "after": "40de689ad57d0a458942319e2875d6191c545eb2856ff35cfbc00770a8e9bc99"
+        },
+        "_Path": {
+          "before": null,
+          "after": "1a400f94b8133897f788b123d4634507c412443a4a2ee08deb867fe11579dc0d"
+        },
+        "_Placed": {
+          "before": null,
+          "after": "62ab681835099c683fd3fec140e6f0d092c0d28b620909aba273e3ce83951fae"
+        },
+        "_Work": {
+          "before": null,
+          "after": "ed8c6163db9dc736d3e64e5a54631bf6cf4c7f33143878ab9987a3de26ea9f36"
+        },
+        "_Work.__init__": {
+          "before": null,
+          "after": "c4cc6dc682f33b39ea36fa35b6ef0f0e0a2b81a295efc93c8b0a184a8c0fb47a"
+        },
+        "_Work.step": {
+          "before": null,
+          "after": "a61788ebb3067d634b8cc8cd06a521c5bbbc437c60facafee4be5695c2fa2848"
+        },
+        "_at": {
+          "before": null,
+          "after": "e861a3476cb9dce2ccaa3cc0a233c3e52d1ebec544aaee829bea677e3c2d6be2"
+        },
+        "_blocked": {
+          "before": null,
+          "after": "ae96565815126e8e7878972bacfc407e9f11a52936fa4a39da358ccbd69406fd"
+        },
+        "_bounded_int": {
+          "before": null,
+          "after": "8975479477552951508dae0b4520eb5b66e082bef2769257411f05180ad2cd36"
+        },
+        "_feature_bounds": {
+          "before": null,
+          "after": "9f0da1e92fa33825cdba7cb857fc4abaeefd85dba489211c14977297d19831c1"
+        },
+        "_formation_stage": {
+          "before": null,
+          "after": "fb12cd69c1d529461447514daf08dad150994831ed757262deefe8470adc07fd"
+        },
+        "_formations": {
+          "before": null,
+          "after": "5b22b445b038cba6540c6cf16949aebf1bda461b8a20a604453d70845b592493"
+        },
+        "_identifier": {
+          "before": null,
+          "after": "5b49f1719d3eccc4b23c9ef4086e89e0e1f2a884b6b84aa5270cd973aad8761f"
+        },
+        "_interleave": {
+          "before": null,
+          "after": "5a035955cf595fa9dc6fb6ad0e9e000e0d6e1999dc281c18835c2251df7ea150"
+        },
+        "_items": {
+          "before": null,
+          "after": "9a1486d9fa8fff61d3eb62086fa782d0b2466eaa829d70941af55fb5bd1d3489"
+        },
+        "_near_solid_endpoint": {
+          "before": null,
+          "after": "1b830db3b946dd3126abf1c49a8592002a154e824ef10c567db26be3d24a468e"
+        },
+        "_number": {
+          "before": null,
+          "after": "2143eddfc0ab5f1c202214a396e90ea0167e6f01d53611989fec19725ec23799"
+        },
+        "_object": {
+          "before": null,
+          "after": "0dd3bcdc6ef42eed5d2790ab50b481954e3eaf058f45a9e4a8ad2530f20d843c"
+        },
+        "_paths": {
+          "before": null,
+          "after": "8771004f34d4c49eb19e92df1b0d89ceea5cb9888513a2bb5abb5706b14faa7b"
+        },
+        "_placed_models": {
+          "before": null,
+          "after": "6b371513aadbca842e5189ea786a96f456461feba465a8a32c9f0c017eb9e2ed"
+        },
+        "_waypoints": {
+          "before": null,
+          "after": "8c9468c674540f387ed778f6fe83b3d20b7843b49ad447e5c87a315d368bfab9"
+        },
+        "generate_ground_charge_candidates": {
+          "before": null,
+          "after": "ba1694e836555b7b9c764d4dad30e903b9dcb6fb91360a57f332659831d9a596"
+        },
+        "ground_charge_route": {
+          "before": null,
+          "after": "2d46186637b9d2db3f3c8acc22c1012848c532848cf9f2ecf88f157c7bd1d031"
         }
       }
     },
-    "src/warhammer40k_core/geometry/visibility_certificates.py": {
-      "before_sha256": "ddee3df9e4a5c7bbb060738f88eb6b3c5533ed336535e86ca7bef9fe36810ecb",
-      "after_sha256": "4402b2f956a1e12872916348a2dc50533be5748ec019c74aa76af3511e1ed509",
+    "src/warhammer40k_core/ai/ground_charge_policy.py": {
+      "before_sha256": null,
+      "after_sha256": "8821aa05044a3041e1a529c148b234cbd42ceb3a96878ba96833be04a2a4a3fa",
       "owners": {
         "@module": {
-          "before": "1ae2e976bf57dabf71a7556e1a33cdf2b87ef4d1f9f0bfdaa1179be24fc0d07c",
-          "after": "87d979c0960d2ba5ff8241da007b8d98e7f2bee7a2ab68642b656f1ffd4522ab"
-        },
-        "_segment_hits_convex_prism": {
           "before": null,
-          "after": "af642beeb033d0514e84d9eea5e7e676a5c767f0a99b88a867fba2b552d38ab9"
+          "after": "fdc18d9ebfddd23a64143d90336d9a7fe31db96990ec70d0fd37891c861d847f"
         },
-        "all_box_corridors_blocked_by_convex_wall": {
+        "ChargeCandidateValidation": {
           "before": null,
-          "after": "8c79ba6f7e5b76452ddb28255ba6afca269cbfe0ff7dfee9a6265025f71a03c9"
-        }
-      }
-    },
-    "src/warhammer40k_core/geometry/visibility_witnesses.py": {
-      "before_sha256": "a1537c34b8a6682acee8a1028bbd29b3ea0c753443f98e957648fd27607092eb",
-      "after_sha256": "873b5068ffee60e39a5a08e277cd12a75d8ce68ed8c562bfdcb22254ecf819a7",
-      "owners": {
-        "@module": {
-          "before": "ec09a834caf45993fa44a8fdfa721afe1ee7493e0934eeb7da44c03deaae17d3",
-          "after": "206e5b5093718ab4e0db4c8400a856a4a2e63b03788f56720d5039f9e32c1857"
+          "after": "c2ad2442106f00856d50438fc731e34eb207283fb3b42e487df4fbddbb6988a9"
         },
-        "_nearby_polygon_vertex_gap_candidates": {
+        "GroundChargeValidationExhaustedError": {
           "before": null,
-          "after": "3f552ed7b0635bef47211cc1a68bce5bf36b810d3b7f250a12f41b773581b3f5"
+          "after": "8ae99cceee15b74fe63ec6179406ec074063aeed2d1f47e1ce5f6b59d75e0942"
         },
-        "positive_ray_candidates": {
-          "before": "98c47b3c6df186ee19df56edf0ce86e0341acfb8e171f07fec0db1862870bde0",
-          "after": "71ada7b7a5244d745c025da2cc4b288d1ff549ba29c61c2ad9f7760cd28fff58"
+        "GroundChargeValidationExhaustedError.__init__": {
+          "before": null,
+          "after": "5786698b81e498f7c2302985ecd0d0c337ddf74d3ca4a8e828c970c64cc25cda"
         },
-        "self_visible_corridors_blocked": {
-          "before": "337a7785bffb8fefa726ce609d756a7d61177c620bff1746086603848b4127f6",
-          "after": "5baa9510aaaf58a9754b1b38ffc3a4393ea89b6c511c2d2fb1759f192bbbedbd"
+        "PreparedGroundCharge": {
+          "before": null,
+          "after": "eeddc9e1ff468790463e9cf161ff261a198e98d985f0b6e7f9cd5d6faa4a0feb"
+        },
+        "_PreparedGroundChargePolicy": {
+          "before": null,
+          "after": "21b39edc14a4a764302a3b56d630bc9b3c7dcae11852481a94c27c8cfac0f490"
+        },
+        "_PreparedGroundChargePolicy.choose": {
+          "before": null,
+          "after": "3b95f78916c12589c8496d0ac71350e98978cc60d8d75438013383202442965a"
+        },
+        "_checkpoint_hash": {
+          "before": null,
+          "after": "b1fc9b63878bf1e8b7963170a60cd2c6cb624d54b834ded5f476a9439b214c4a"
+        },
+        "_probe": {
+          "before": null,
+          "after": "86efd91f257fbf54abb14d971fd168c5957cf992b4f395dea75ae35968c3dd39"
+        },
+        "_require_limit": {
+          "before": null,
+          "after": "7a6debfa69367571dacdb5852bc53c1af98240bc6382a72b8488a306ff2b65b3"
+        },
+        "_validate_candidate": {
+          "before": null,
+          "after": "b0863f3ddcb46ecbdd0365d59c605bd9605a6c1826f799e79a0b510a91234f8a"
+        },
+        "prepare_ground_charge_policy": {
+          "before": null,
+          "after": "d5e507026ce02ed50bc876b24b0324d2c64f8e98c5836616da8171883da896ae"
         }
       }
     },
     "tests/code_quality/test_engine_numerical_identity_admission.py": {
-      "before_sha256": "1f3da7952effa0731592575cae494effe47d05b0b0358ae98d188bf4526fe2f5",
-      "after_sha256": "d6804c6e821cae6fff1ea72a8edb0eb52455e6736f525a7337cc5fb0fd7c27ee",
+      "before_sha256": "d6804c6e821cae6fff1ea72a8edb0eb52455e6736f525a7337cc5fb0fd7c27ee",
+      "after_sha256": "a8fdb4676977175a64c2fd8ec4c164d505bb121146a252fd6a17677681b18b5c",
       "owners": {
+        "@module": {
+          "before": "c7c379be499c781ccd351d6e1f20b252c64811d2a5e0526f4acf674bf91f6cba",
+          "after": "875cc71086df25ce6dcdecd230985b6ea905641d7a240566bc48b3a08b849da3"
+        },
         "test_identity_inventory_uses_current_twelve_shards_and_native_cohort": {
-          "before": "ae80bf6211212bb5cb09581688aabce6851328a8bc8d6c8a4b4d1a1403f98a00",
-          "after": "fe87ef83179dc7a4fffabe98355ee117fa62a478c44fe8574aa130265336ecff"
+          "before": "fe87ef83179dc7a4fffabe98355ee117fa62a478c44fe8574aa130265336ecff",
+          "after": "4ad262e1fa6b6b7ac50deb6e308f555281199af3ee1479b397a8ed454af4decb"
         }
       }
     },
-    "tests/rules/section06/test_visibility.py": {
-      "before_sha256": "24824fa7af6421486ef5043cd39633f01e8665e29acca4ee6cb2222cd28d981d",
-      "after_sha256": "5cb521df4aa6d29d97e9794c10dba5dd30cae9100969df2c82fbf2347e1dc574",
+    "tests/infrastructure/adapters/test_ground_charge_policy.py": {
+      "before_sha256": null,
+      "after_sha256": "34cfd90e73d1e81dadc2111e49f83b9f4c5b9a2eb133f6a122ce88c3f4ff601c",
       "owners": {
-        "test_axis_shadow_joins_touching_heights_but_leaves_vertical_openings": {
+        "@module": {
           "before": null,
-          "after": "b797b2a98b4757424edcf640029480ac088b4d8f77d45b3e2ccb2a50f262e1fd"
+          "after": "87ea681533b4e6191dbb4c18ab3d2b4bb64431da44124a3854d6f1438fc85e20"
         },
-        "test_axis_shadow_matches_exact_visibility_at_closed_corridor_boundary": {
+        "selected_ground_charge": {
           "before": null,
-          "after": "b5fb6f4a2c23e933570bca2d6a7ab8b3e0db6859f5584a1cf450c35e6dbecc1f"
+          "after": "712d891246c26c5617f2e155817b92d0ce6df7e70106c8c583d9286d5e7928dd"
         },
-        "test_polygon_gap_suggests_checked_ray_between_unequal_ellipses": {
+        "test_ground_charge_generation_is_stable_and_limits_are_typed": {
           "before": null,
-          "after": "f95ba243e390e275e53dd1d7919abd079bdfc72004c99a070706936b094bf783"
+          "after": "17d2819f19be200dc350b5b1a94a51e83ce0943f4c099db4a46c613d7bea7110"
         },
-        "test_rotated_wall_shadow_agrees_with_fixed_part_visibility": {
+        "test_ground_charge_ranks_only_native_accepts_and_checks_binding": {
           "before": null,
-          "after": "ef7168605060d60401ac80f9d5695586494da736599fc63ced7b8b967a2e483e"
+          "after": "b295344c4cd89e05f98db2d7fac3006092696dff6c755b8a11ade45f41eae180"
         }
       }
     }
@@ -420,7 +514,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Bind the new covered cases and generated artifacts to the verified source and test inventories.",
+      "rationale": "Bind the two focused behavior cases, historical admission chain, twelve-shard schedule and exact generated runtime/contract examples to the current code.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -430,7 +524,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Bind the new covered cases and generated artifacts to the verified source and test inventories.",
+      "rationale": "Bind the two focused behavior cases, historical admission chain, twelve-shard schedule and exact generated runtime/contract examples to the current code.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -440,7 +534,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Bind the new covered cases and generated artifacts to the verified source and test inventories.",
+      "rationale": "Bind the two focused behavior cases, historical admission chain, twelve-shard schedule and exact generated runtime/contract examples to the current code.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -450,7 +544,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Bind the new covered cases and generated artifacts to the verified source and test inventories.",
+      "rationale": "Bind the two focused behavior cases, historical admission chain, twelve-shard schedule and exact generated runtime/contract examples to the current code.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -460,7 +554,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Bind the new covered cases and generated artifacts to the verified source and test inventories.",
+      "rationale": "Bind the two focused behavior cases, historical admission chain, twelve-shard schedule and exact generated runtime/contract examples to the current code.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -470,7 +564,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Bind the new covered cases and generated artifacts to the verified source and test inventories.",
+      "rationale": "Bind the two focused behavior cases, historical admission chain, twelve-shard schedule and exact generated runtime/contract examples to the current code.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -480,7 +574,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Bind the new covered cases and generated artifacts to the verified source and test inventories.",
+      "rationale": "Bind the two focused behavior cases, historical admission chain, twelve-shard schedule and exact generated runtime/contract examples to the current code.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -490,7 +584,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Bind the new covered cases and generated artifacts to the verified source and test inventories.",
+      "rationale": "Bind the two focused behavior cases, historical admission chain, twelve-shard schedule and exact generated runtime/contract examples to the current code.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -500,7 +594,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Bind the new covered cases and generated artifacts to the verified source and test inventories.",
+      "rationale": "Bind the two focused behavior cases, historical admission chain, twelve-shard schedule and exact generated runtime/contract examples to the current code.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -510,7 +604,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Bind the new covered cases and generated artifacts to the verified source and test inventories.",
+      "rationale": "Bind the two focused behavior cases, historical admission chain, twelve-shard schedule and exact generated runtime/contract examples to the current code.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -520,7 +614,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Bind the new covered cases and generated artifacts to the verified source and test inventories.",
+      "rationale": "Bind the two focused behavior cases, historical admission chain, twelve-shard schedule and exact generated runtime/contract examples to the current code.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -530,7 +624,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Bind the new covered cases and generated artifacts to the verified source and test inventories.",
+      "rationale": "Bind the two focused behavior cases, historical admission chain, twelve-shard schedule and exact generated runtime/contract examples to the current code.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -540,7 +634,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Bind the new covered cases and generated artifacts to the verified source and test inventories.",
+      "rationale": "Bind the two focused behavior cases, historical admission chain, twelve-shard schedule and exact generated runtime/contract examples to the current code.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -550,7 +644,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bind the new covered cases and generated artifacts to the verified source and test inventories.",
+      "rationale": "Bind the two focused behavior cases, historical admission chain, twelve-shard schedule and exact generated runtime/contract examples to the current code.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -560,7 +654,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bind the new covered cases and generated artifacts to the verified source and test inventories.",
+      "rationale": "Bind the two focused behavior cases, historical admission chain, twelve-shard schedule and exact generated runtime/contract examples to the current code.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -570,7 +664,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bind the new covered cases and generated artifacts to the verified source and test inventories.",
+      "rationale": "Bind the two focused behavior cases, historical admission chain, twelve-shard schedule and exact generated runtime/contract examples to the current code.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -580,7 +674,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bind the new covered cases and generated artifacts to the verified source and test inventories.",
+      "rationale": "Bind the two focused behavior cases, historical admission chain, twelve-shard schedule and exact generated runtime/contract examples to the current code.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -590,7 +684,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bind the new covered cases and generated artifacts to the verified source and test inventories.",
+      "rationale": "Bind the two focused behavior cases, historical admission chain, twelve-shard schedule and exact generated runtime/contract examples to the current code.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -600,7 +694,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bind the new covered cases and generated artifacts to the verified source and test inventories.",
+      "rationale": "Bind the two focused behavior cases, historical admission chain, twelve-shard schedule and exact generated runtime/contract examples to the current code.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -610,7 +704,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bind the new covered cases and generated artifacts to the verified source and test inventories.",
+      "rationale": "Bind the two focused behavior cases, historical admission chain, twelve-shard schedule and exact generated runtime/contract examples to the current code.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -620,41 +714,25 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bind the new covered cases and generated artifacts to the verified source and test inventories.",
+      "rationale": "Bind the two focused behavior cases, historical admission chain, twelve-shard schedule and exact generated runtime/contract examples to the current code.",
       "source_obligation": null,
       "unchanged_work": null
     },
-    "data/source_audits/ci64_provenance_v1/monster-mash-round3-shalaxi-test-transition-v1.json": {
+    "data/source_audits/ci64_provenance_v1/stage2-ground-charge-test-addition-v1.json": {
       "category": "measured_workload",
       "operations": [
         "engine-numerical-identity-admission"
       ],
       "selected_families": [],
-      "rationale": "Bind the new covered cases and generated artifacts to the verified source and test inventories.",
+      "rationale": "Bind the two focused behavior cases, historical admission chain, twelve-shard schedule and exact generated runtime/contract examples to the current code.",
       "source_obligation": null,
       "unchanged_work": null
     },
-    "docs/performance/current/monster-mash-round3-shalaxi-movement.json": {
+    "docs/AI_POLICY_INTERFACE.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bind the exact changed owners and record fresh matched measurements for the scoped visibility repair.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "docs/performance/current/monster-mash-round3-shalaxi-setup.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Bind the exact changed owners and record fresh matched measurements for the scoped visibility repair.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "docs/performance/current/monster-mash-round3-shalaxi-visibility.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Bind the exact changed owners and record fresh matched measurements for the scoped visibility repair.",
+      "rationale": "Document and bind the scoped opt-in Stage 2 operator and policy interface.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -662,7 +740,7 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Bind the exact changed owners and record fresh matched measurements for the scoped visibility repair.",
+      "rationale": "Document and bind the scoped opt-in Stage 2 operator and policy interface.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -677,7 +755,17 @@
         "stage2-strict-replay-test-admission"
       ],
       "selected_families": [],
-      "rationale": "Bind the new covered cases and generated artifacts to the verified source and test inventories.",
+      "rationale": "Bind the two focused behavior cases, historical admission chain, twelve-shard schedule and exact generated runtime/contract examples to the current code.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "scripts/stage2_ground_charge_test_admission.py": {
+      "category": "measured_workload",
+      "operations": [
+        "engine-numerical-identity-admission"
+      ],
+      "selected_families": [],
+      "rationale": "Bind the two focused behavior cases, historical admission chain, twelve-shard schedule and exact generated runtime/contract examples to the current code.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -687,63 +775,27 @@
         "cavalcade-authority-admission"
       ],
       "selected_families": [],
-      "rationale": "Bind the new covered cases and generated artifacts to the verified source and test inventories.",
+      "rationale": "Bind the two focused behavior cases, historical admission chain, twelve-shard schedule and exact generated runtime/contract examples to the current code.",
       "source_obligation": null,
       "unchanged_work": null
     },
-    "src/warhammer40k_core/geometry/continuous_visibility.py": {
+    "src/warhammer40k_core/ai/ground_charge_candidates.py": {
       "category": "algorithm_or_search",
       "operations": [
-        "geometry-search"
+        "stage2-ground-charge-policy"
       ],
-      "selected_families": [
-        "movement",
-        "setup",
-        "visibility"
-      ],
-      "rationale": "Prove blocked projected corridors, verify candidate rays through narrow gaps, and certify hidden target parts with convex wall shadows. All inputs and proofs use the existing exact geometry.",
+      "selected_families": [],
+      "rationale": "New opt-in actor-side Charge Move search with measured finite work, raw proposal, accepted candidate and fork wall-time limits. Existing engine validation is reused. The base has no registered generator at this route. The shared native reference controls the exact submission path on both runtime identities.",
       "source_obligation": null,
       "unchanged_work": null
     },
-    "src/warhammer40k_core/geometry/visibility_axis_shadow.py": {
+    "src/warhammer40k_core/ai/ground_charge_policy.py": {
       "category": "algorithm_or_search",
       "operations": [
-        "geometry-search"
+        "stage2-ground-charge-policy"
       ],
-      "selected_families": [
-        "movement",
-        "setup",
-        "visibility"
-      ],
-      "rationale": "Prove blocked projected corridors, verify candidate rays through narrow gaps, and certify hidden target parts with convex wall shadows. All inputs and proofs use the existing exact geometry.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "src/warhammer40k_core/geometry/visibility_certificates.py": {
-      "category": "algorithm_or_search",
-      "operations": [
-        "geometry-search"
-      ],
-      "selected_families": [
-        "movement",
-        "setup",
-        "visibility"
-      ],
-      "rationale": "Prove blocked projected corridors, verify candidate rays through narrow gaps, and certify hidden target parts with convex wall shadows. All inputs and proofs use the existing exact geometry.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "src/warhammer40k_core/geometry/visibility_witnesses.py": {
-      "category": "algorithm_or_search",
-      "operations": [
-        "geometry-search"
-      ],
-      "selected_families": [
-        "movement",
-        "setup",
-        "visibility"
-      ],
-      "rationale": "Prove blocked projected corridors, verify candidate rays through narrow gaps, and certify hidden target parts with convex wall shadows. All inputs and proofs use the existing exact geometry.",
+      "selected_families": [],
+      "rationale": "New opt-in actor-side Charge Move search with measured finite work, raw proposal, accepted candidate and fork wall-time limits. Existing engine validation is reused. The base has no registered generator at this route. The shared native reference controls the exact submission path on both runtime identities.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -755,26 +807,22 @@
         "round4-malice-bearer-liveness"
       ],
       "selected_families": [],
-      "rationale": "Bind the new covered cases and generated artifacts to the verified source and test inventories.",
+      "rationale": "Bind the two focused behavior cases, historical admission chain, twelve-shard schedule and exact generated runtime/contract examples to the current code.",
       "source_obligation": null,
       "unchanged_work": null
     },
-    "tests/rules/section06/test_visibility.py": {
+    "tests/infrastructure/adapters/test_ground_charge_policy.py": {
       "category": "measured_workload",
       "operations": [
-        "ellipse-facing-witness-regression"
+        "stage2-ground-charge-policy"
       ],
       "selected_families": [],
-      "rationale": "Bind the new covered cases and generated artifacts to the verified source and test inventories.",
+      "rationale": "Bind the two focused behavior cases, historical admission chain, twelve-shard schedule and exact generated runtime/contract examples to the current code.",
       "source_obligation": null,
       "unchanged_work": null
     }
   },
   "milestone": "ordinary",
-  "comparisons": {
-    "visibility": "docs/performance/current/monster-mash-round3-shalaxi-visibility.json",
-    "movement": "docs/performance/current/monster-mash-round3-shalaxi-movement.json",
-    "setup": "docs/performance/current/monster-mash-round3-shalaxi-setup.json"
-  },
+  "comparisons": {},
   "full_game": null
 }

@@ -358,6 +358,11 @@ ROUND3_SHALAXI_SOURCES = (
 )
 
 
+GROUND_CHARGE_TEST_TRANSITION = (
+    "data/source_audits/ci64_provenance_v1/stage2-ground-charge-test-addition-v1.json"
+)
+
+
 type SourceSuccessors = dict[str, dict[str, str]]
 type TestSuccessors = dict[str, dict[str, object]]
 
@@ -1119,6 +1124,21 @@ def exact_movement_test_transition(
         if malice is None or shooting_visibility is None or shalaxi[0] != runtime:
             raise SystemExit("Round 3 Shalaxi tests require the exact Malice bearer predecessor.")
         runtime = shalaxi[1]
+    ground_charge = None
+    ground_charge_path = root / GROUND_CHARGE_TEST_TRANSITION
+    _selection_no_links(root, ground_charge_path)
+    if ground_charge_path.exists():
+        if shalaxi is None:
+            raise SystemExit("Ground charge tests require the Shalaxi predecessor.")
+        from scripts.stage2_ground_charge_test_admission import ground_charge_test_successor
+
+        ground_charge = ground_charge_test_successor(
+            root,
+            transition_path=ground_charge_path,
+            previous_runtime=runtime,
+            previous_transition_sha256=ROUND3_SHALAXI_SHA256,
+        )
+        runtime = ground_charge[0]
     retained = _identity_test_transition(
         root,
         retained_cutover_sha256,
@@ -1217,6 +1237,12 @@ def exact_movement_test_transition(
     if shalaxi is not None:
         updated.update(shalaxi[3])
         raw += b"\0" + shalaxi[4]
+    if ground_charge is not None:
+        _, ground_charge_tests, ground_charge_raw = ground_charge
+        if ground_charge_tests.keys() & (updated.keys() | added.keys() | additions.keys()):
+            raise SystemExit("Ground charge tests overlap the predecessor selection.")
+        additions.update(ground_charge_tests)
+        raw += b"\0" + ground_charge_raw
     return updated, {**added, **additions}, retained_raw + b"\0" + raw
 
 

@@ -11,6 +11,7 @@ from typing import Any, cast
 import pytest
 from scripts import build_test_shards as sharding
 from scripts import engine_numerical_identity_test_admission as selection
+from scripts import stage2_ground_charge_test_admission as ground_charge
 from scripts.canonical_circle_test_admission import ADDITION as CIRCLE_ADDITION
 from scripts.canonical_polygon_pairs_test_admission import ADDITION as PAIRS_ADDITION
 from scripts.canonical_polygon_queries_test_admission import ADDITION as QUERIES_ADDITION
@@ -308,7 +309,17 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
     )
     assert shalaxi_base_manifest["fingerprint"] == malice["runtime_fingerprint"]
     assert shalaxi["retained_runtime_fingerprint"] == malice["runtime_fingerprint"]
-    assert _record(MANIFEST)["fingerprint"] == shalaxi["runtime_fingerprint"]
+    charge = _record(selection.GROUND_CHARGE_TEST_TRANSITION)
+    assert charge["retained_runtime_fingerprint"] == shalaxi["runtime_fingerprint"]
+    assert _record(MANIFEST)["fingerprint"] == charge["runtime_fingerprint"]
+    assert sum(ground_charge.OWNER in group for group in groups) == 1
+    charge_cases = {
+        ground_charge.OWNER + "::" + name
+        for name in (
+            "test_ground_charge_generation_is_stable_and_limits_are_typed",
+            "test_ground_charge_ranks_only_native_accepts_and_checks_binding",
+        )
+    }
     assert shalaxi["test"]["before"] == shooting_visibility["test"]["after"]
     for source in selection.ROUND3_SHALAXI_SOURCES:
         present = subprocess.check_output(["git", "ls-tree", shalaxi_base, "--", source], cwd=ROOT)
@@ -638,6 +649,7 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         | shadow_cases
         | close_quarters_cases
         | shalaxi_cases
+        | charge_cases
         | allocation_cases
         | round4_cases
         | {

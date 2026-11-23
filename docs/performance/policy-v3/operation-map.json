@@ -35754,6 +35754,19 @@
       "sensitive": false,
       "mandatory": true
     },
+    "stage2-ground-charge-policy": {
+      "paths": [
+        "src/warhammer40k_core/ai/ground_charge_candidates.py",
+        "src/warhammer40k_core/ai/ground_charge_policy.py",
+        "tests/infrastructure/adapters/test_ground_charge_policy.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [],
+      "sensitive": true,
+      "mandatory": true
+    },
     "deployment-bounded-candidates": {
       "paths": [
         "src/warhammer40k_core/ai/deployment_candidate_search.py",
@@ -36634,7 +36647,9 @@
         "data/source_audits/ci64_provenance_v1/terminal-restore-test-transition-v1.json",
         "data/source_audits/ci64_provenance_v1/monster-mash-shooting-visibility-test-transition-v1.json",
         "data/source_audits/ci64_provenance_v1/monster-mash-attack-reroll-test-transition-v1.json",
-        "data/source_audits/ci64_provenance_v1/monster-mash-round3-shalaxi-test-transition-v1.json"
+        "data/source_audits/ci64_provenance_v1/monster-mash-round3-shalaxi-test-transition-v1.json",
+        "data/source_audits/ci64_provenance_v1/stage2-ground-charge-test-addition-v1.json",
+        "scripts/stage2_ground_charge_test_admission.py"
       ],
       "owners": [
         "*"

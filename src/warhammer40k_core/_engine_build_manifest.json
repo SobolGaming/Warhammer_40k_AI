@@ -1,8 +1,8 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:77160f03d452969c67dbdb72249b0ffdf32f3be6b485e799abaeae380668cfaa",
-  "fingerprint": "77160f03d452969c67dbdb72249b0ffdf32f3be6b485e799abaeae380668cfaa",
-  "resource_count": 3285,
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:331c7f5ba83db0dfeeb99bfd72297b31e512ebc0864e2c205f36046e74a0043c",
+  "fingerprint": "331c7f5ba83db0dfeeb99bfd72297b31e512ebc0864e2c205f36046e74a0043c",
+  "resource_count": 3287,
   "resources": [
     {
       "byte_length": 113,
@@ -293,6 +293,16 @@
       "byte_length": 19973,
       "path": "warhammer40k_core/ai/followthrough_scenario.py",
       "sha256": "fb55bc50b76af052ea926b42869ac2495ec015152172879b9730f9225c662ea4"
+    },
+    {
+      "byte_length": 22030,
+      "path": "warhammer40k_core/ai/ground_charge_candidates.py",
+      "sha256": "f581c6f6f7bc17b611f8bab05d5dbb1a788e2c49f6a2cec0603c3a8adc6f83f7"
+    },
+    {
+      "byte_length": 10903,
+      "path": "warhammer40k_core/ai/ground_charge_policy.py",
+      "sha256": "8821aa05044a3041e1a529c148b234cbd42ceb3a96878ba96833be04a2a4a3fa"
     },
     {
       "byte_length": 14420,
