@@ -4,7 +4,7 @@
   "workload_id": "order78-gone-to-ground-v2",
   "base_revision": "1e5d53a3a8a09eac3752073ed0fd7d3247789248",
   "head_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:77160f03d452969c67dbdb72249b0ffdf32f3be6b485e799abaeae380668cfaa",
-  "head_input_digest": "64bffd43e3046ba06a87fa355217f1bc6f68a7affa6f514330984cb0c1a55a3a",
+  "head_input_digest": "ea3869a04e4f9ee51e1e0c7f2b5560f49004b4f8c4f9d5855d87a9bfef634f69",
   "budget_profile": "current-change-relative-v1",
   "base": {
     "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:c47044084edb8c4ff5324998079574868d50a45ec9cca46b7633ec6bb6b5a353",
