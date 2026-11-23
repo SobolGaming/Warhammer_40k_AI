@@ -1,198 +1,556 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "fb84de924d1e105d68321075d9eee5f705878a62",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:c47044084edb8c4ff5324998079574868d50a45ec9cca46b7633ec6bb6b5a353",
-  "operation_map_sha256": "57321b95d3e50c8245d1400399a1a3b3b5255bd3d8ffce6378d8c9717013734d",
+  "base": "1e5d53a3a8a09eac3752073ed0fd7d3247789248",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:77160f03d452969c67dbdb72249b0ffdf32f3be6b485e799abaeae380668cfaa",
+  "operation_map_sha256": "fa3ebd14467bf5f2033eedbab798cb23bf45619b0ec8ab18c770d8eff2f15fc9",
   "changes": {
-    "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "73daf99389d81b06a07207bd7392d8d80b634332aaf1d9954e20a7f2417689df",
-      "after_sha256": "6617eefcaa8c56560083dea9864e2d1bcbf2c7847aa3173a99cc76ee2bf2923c",
+    "ci/test_shards/durations.json": {
+      "before_sha256": "3460e308c5532120b9352099d8f7cff2978e279c088a9eaa959c49264f08aab6",
+      "after_sha256": "868f561c32c0ca71be48d50d1458a086e518e5c8ec635ad60afece22a166b06f",
       "owners": {
         "@document": {
-          "before": "73daf99389d81b06a07207bd7392d8d80b634332aaf1d9954e20a7f2417689df",
-          "after": "6617eefcaa8c56560083dea9864e2d1bcbf2c7847aa3173a99cc76ee2bf2923c"
+          "before": "3460e308c5532120b9352099d8f7cff2978e279c088a9eaa959c49264f08aab6",
+          "after": "868f561c32c0ca71be48d50d1458a086e518e5c8ec635ad60afece22a166b06f"
+        }
+      }
+    },
+    "ci/test_shards/shard-1.txt": {
+      "before_sha256": "21204e558d7be31221662c7bced8f4e5ce5c99dcff8ab0ca05c26e83e4121bd1",
+      "after_sha256": "ad7ea6fa3ea34c1a1dc2d2fe85f09386929af3f0dacdff5096827e436c8c4879",
+      "owners": {
+        "@document": {
+          "before": "21204e558d7be31221662c7bced8f4e5ce5c99dcff8ab0ca05c26e83e4121bd1",
+          "after": "ad7ea6fa3ea34c1a1dc2d2fe85f09386929af3f0dacdff5096827e436c8c4879"
+        }
+      }
+    },
+    "ci/test_shards/shard-10.txt": {
+      "before_sha256": "14dbb443fc2bfc293e7493dbc1fbbfa91cb91d8719171d9e13aa22448d08fe17",
+      "after_sha256": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20",
+      "owners": {
+        "@document": {
+          "before": "14dbb443fc2bfc293e7493dbc1fbbfa91cb91d8719171d9e13aa22448d08fe17",
+          "after": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20"
+        }
+      }
+    },
+    "ci/test_shards/shard-11.txt": {
+      "before_sha256": "bac4c7af8103ed488bbaf8fb67f56e953d1acb3ca3f49fc06422215d4fe5075a",
+      "after_sha256": "12092599a7c28d9d2c86ddfb1014e4b55af45d22a15895668d888803181131d5",
+      "owners": {
+        "@document": {
+          "before": "bac4c7af8103ed488bbaf8fb67f56e953d1acb3ca3f49fc06422215d4fe5075a",
+          "after": "12092599a7c28d9d2c86ddfb1014e4b55af45d22a15895668d888803181131d5"
+        }
+      }
+    },
+    "ci/test_shards/shard-12.txt": {
+      "before_sha256": "f82d4661c9c6c099e0844d3125c40246aed20272142bbc6b5188e6f41ae22a7f",
+      "after_sha256": "b34095fc6c0ae92aacca1037f3160c6382c0ae5935fd24221f8facbe90ab38f9",
+      "owners": {
+        "@document": {
+          "before": "f82d4661c9c6c099e0844d3125c40246aed20272142bbc6b5188e6f41ae22a7f",
+          "after": "b34095fc6c0ae92aacca1037f3160c6382c0ae5935fd24221f8facbe90ab38f9"
+        }
+      }
+    },
+    "ci/test_shards/shard-2.txt": {
+      "before_sha256": "2a225de363550d9c9d25829caa50e8944a63e424cfde26baebcb4ae06b9361de",
+      "after_sha256": "7e2b78daeb1ac337007999e8e6d70f0f6fc31e46934adac7ced335788272751e",
+      "owners": {
+        "@document": {
+          "before": "2a225de363550d9c9d25829caa50e8944a63e424cfde26baebcb4ae06b9361de",
+          "after": "7e2b78daeb1ac337007999e8e6d70f0f6fc31e46934adac7ced335788272751e"
+        }
+      }
+    },
+    "ci/test_shards/shard-3.txt": {
+      "before_sha256": "73b507a3922ff9a6c3384aa342d052b7be1878a6d7afb03bacdac2dd6ac6eeb8",
+      "after_sha256": "dca003fdc57fcc3c202958bb8b1abad24de89000a94f6ea3a6fdade1f9f69bfa",
+      "owners": {
+        "@document": {
+          "before": "73b507a3922ff9a6c3384aa342d052b7be1878a6d7afb03bacdac2dd6ac6eeb8",
+          "after": "dca003fdc57fcc3c202958bb8b1abad24de89000a94f6ea3a6fdade1f9f69bfa"
+        }
+      }
+    },
+    "ci/test_shards/shard-4.txt": {
+      "before_sha256": "a79a50e62379b70a384ebf8a61a1a28f205ffe12b2dfc7137adf41d66377a474",
+      "after_sha256": "5e8507341b7ebdc4512006aebe5cae2c30487a78628d94803c9d222e191ccde9",
+      "owners": {
+        "@document": {
+          "before": "a79a50e62379b70a384ebf8a61a1a28f205ffe12b2dfc7137adf41d66377a474",
+          "after": "5e8507341b7ebdc4512006aebe5cae2c30487a78628d94803c9d222e191ccde9"
+        }
+      }
+    },
+    "ci/test_shards/shard-5.txt": {
+      "before_sha256": "66202c1bf449594af6f4669b4767b3b6571d9207e9d67dca584e53859d8bdbcc",
+      "after_sha256": "a6398d62a41cf2ac17cfcb154a809f983a099a984fafe517714be120db15f77b",
+      "owners": {
+        "@document": {
+          "before": "66202c1bf449594af6f4669b4767b3b6571d9207e9d67dca584e53859d8bdbcc",
+          "after": "a6398d62a41cf2ac17cfcb154a809f983a099a984fafe517714be120db15f77b"
+        }
+      }
+    },
+    "ci/test_shards/shard-6.txt": {
+      "before_sha256": "f9f5e0aceef13a076d1b189d7ae791b48cca89a82eb5b3f87926d2c4cde22bff",
+      "after_sha256": "28d89930ef0b169c09db8de71828b0f08d54cee6b1f2b7ed6b18106f4fb684e0",
+      "owners": {
+        "@document": {
+          "before": "f9f5e0aceef13a076d1b189d7ae791b48cca89a82eb5b3f87926d2c4cde22bff",
+          "after": "28d89930ef0b169c09db8de71828b0f08d54cee6b1f2b7ed6b18106f4fb684e0"
+        }
+      }
+    },
+    "ci/test_shards/shard-7.txt": {
+      "before_sha256": "ae859be27b95f99650400ac5d183ea6d8cd5c6411c00ab713f07d684e67a05d6",
+      "after_sha256": "2287c331a7e6116a1aa6ef1dc74f6c7235e8410d549ef317547cc80d5f1b2952",
+      "owners": {
+        "@document": {
+          "before": "ae859be27b95f99650400ac5d183ea6d8cd5c6411c00ab713f07d684e67a05d6",
+          "after": "2287c331a7e6116a1aa6ef1dc74f6c7235e8410d549ef317547cc80d5f1b2952"
+        }
+      }
+    },
+    "ci/test_shards/shard-8.txt": {
+      "before_sha256": "a6a3b05bf211017b1aecf987dfe7f31b8e9f2149dad834278460d88274687453",
+      "after_sha256": "300dd8fc14e8ea6d2aaa3f62308b70176d5a872db82f50debfe32c89153555d4",
+      "owners": {
+        "@document": {
+          "before": "a6a3b05bf211017b1aecf987dfe7f31b8e9f2149dad834278460d88274687453",
+          "after": "300dd8fc14e8ea6d2aaa3f62308b70176d5a872db82f50debfe32c89153555d4"
+        }
+      }
+    },
+    "ci/test_shards/shard-9.txt": {
+      "before_sha256": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20",
+      "after_sha256": "b1ea54000b98ae134d7b2e48e15c06bc57762c718524086c530ced9bedbfd182",
+      "owners": {
+        "@document": {
+          "before": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20",
+          "after": "b1ea54000b98ae134d7b2e48e15c06bc57762c718524086c530ced9bedbfd182"
+        }
+      }
+    },
+    "contracts/examples/persistence/session-persistence.json": {
+      "before_sha256": "6617eefcaa8c56560083dea9864e2d1bcbf2c7847aa3173a99cc76ee2bf2923c",
+      "after_sha256": "74c4d265f7e7b42e76c00d6a6404321f5362c50930f0239b4d270c3319a12d4d",
+      "owners": {
+        "@document": {
+          "before": "6617eefcaa8c56560083dea9864e2d1bcbf2c7847aa3173a99cc76ee2bf2923c",
+          "after": "74c4d265f7e7b42e76c00d6a6404321f5362c50930f0239b4d270c3319a12d4d"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "f41cb0024709ac1ea7ddc09eb774c30e1726c68550ccf90964921f2ad38eb6e3",
-      "after_sha256": "7b38a88ed88de735f91db628ccd9f05018420d7f81504b220f06305da4dbb674",
+      "before_sha256": "7b38a88ed88de735f91db628ccd9f05018420d7f81504b220f06305da4dbb674",
+      "after_sha256": "90001c801d610d3c6bbab9320b2c80078bcd27080f1bf386fca3963dc5d37cbf",
       "owners": {
         "@document": {
-          "before": "f41cb0024709ac1ea7ddc09eb774c30e1726c68550ccf90964921f2ad38eb6e3",
-          "after": "7b38a88ed88de735f91db628ccd9f05018420d7f81504b220f06305da4dbb674"
+          "before": "7b38a88ed88de735f91db628ccd9f05018420d7f81504b220f06305da4dbb674",
+          "after": "90001c801d610d3c6bbab9320b2c80078bcd27080f1bf386fca3963dc5d37cbf"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "827562d5d3c537da5d63a8fc0600afc20fa6235a5a6edbb01f06d9106d885bce",
-      "after_sha256": "eaf2215eea2019d2cf20eaed4e71e42505a5f56cb301c779c8f8305531438d57",
+      "before_sha256": "eaf2215eea2019d2cf20eaed4e71e42505a5f56cb301c779c8f8305531438d57",
+      "after_sha256": "440e8625aa249f95577c16749152730fb373ec76d83ca6725efa01de939cfb7f",
       "owners": {
         "@document": {
-          "before": "827562d5d3c537da5d63a8fc0600afc20fa6235a5a6edbb01f06d9106d885bce",
-          "after": "eaf2215eea2019d2cf20eaed4e71e42505a5f56cb301c779c8f8305531438d57"
+          "before": "eaf2215eea2019d2cf20eaed4e71e42505a5f56cb301c779c8f8305531438d57",
+          "after": "440e8625aa249f95577c16749152730fb373ec76d83ca6725efa01de939cfb7f"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "3ab98d361102a3913600e5008866e70dfb6b04e641784d54dc167e41c530a03f",
-      "after_sha256": "769a69c1bfd925d02a655f851247eb5907fec743fbaed74c88ad0a35db5f5bc1",
+      "before_sha256": "769a69c1bfd925d02a655f851247eb5907fec743fbaed74c88ad0a35db5f5bc1",
+      "after_sha256": "d6cb53eedf665c06ed278483abf8602f04c314f3e255c7450ee68624e284d263",
       "owners": {
         "@document": {
-          "before": "3ab98d361102a3913600e5008866e70dfb6b04e641784d54dc167e41c530a03f",
-          "after": "769a69c1bfd925d02a655f851247eb5907fec743fbaed74c88ad0a35db5f5bc1"
+          "before": "769a69c1bfd925d02a655f851247eb5907fec743fbaed74c88ad0a35db5f5bc1",
+          "after": "d6cb53eedf665c06ed278483abf8602f04c314f3e255c7450ee68624e284d263"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "347237f6cacc3ca434cb4bd33c6fa9335ae7743a21fc9197f19e88b06844711d",
-      "after_sha256": "434de77a7c0b099a1811184a65595aa585f46b64d7702750c54aea53e27f4fc0",
+      "before_sha256": "434de77a7c0b099a1811184a65595aa585f46b64d7702750c54aea53e27f4fc0",
+      "after_sha256": "a86402324d7add602736e75d2532e002f7ab36865538732f83939a33e35321b4",
       "owners": {
         "@document": {
-          "before": "347237f6cacc3ca434cb4bd33c6fa9335ae7743a21fc9197f19e88b06844711d",
-          "after": "434de77a7c0b099a1811184a65595aa585f46b64d7702750c54aea53e27f4fc0"
+          "before": "434de77a7c0b099a1811184a65595aa585f46b64d7702750c54aea53e27f4fc0",
+          "after": "a86402324d7add602736e75d2532e002f7ab36865538732f83939a33e35321b4"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "b4d739ab984f8ac4dac0db5ab4ab70bc85a8d5f01d4bd31534f9443b54db64a6",
-      "after_sha256": "c8715f789638541c45da515a95052239f5346d5421b2f37becf8f9c60c037b79",
+      "before_sha256": "c8715f789638541c45da515a95052239f5346d5421b2f37becf8f9c60c037b79",
+      "after_sha256": "d8e5ba96fa9975ef2e9ab7b04d33c6ea71de9d0df5f7d662dadfb6404ae4678b",
       "owners": {
         "@document": {
-          "before": "b4d739ab984f8ac4dac0db5ab4ab70bc85a8d5f01d4bd31534f9443b54db64a6",
-          "after": "c8715f789638541c45da515a95052239f5346d5421b2f37becf8f9c60c037b79"
+          "before": "c8715f789638541c45da515a95052239f5346d5421b2f37becf8f9c60c037b79",
+          "after": "d8e5ba96fa9975ef2e9ab7b04d33c6ea71de9d0df5f7d662dadfb6404ae4678b"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "663027706e961fc87e30b6cb6dea130dae44cb5a62b813510992530280790cc1",
-      "after_sha256": "f434a17a7121b83661f691a6ca5c8e810384acf2cca2f864be157c011dfea5ea",
+      "before_sha256": "f434a17a7121b83661f691a6ca5c8e810384acf2cca2f864be157c011dfea5ea",
+      "after_sha256": "55a76d43fe90a1c7a463f920ac46b0f063491836e5f46a4f49841bf9aa3cf09d",
       "owners": {
         "@document": {
-          "before": "663027706e961fc87e30b6cb6dea130dae44cb5a62b813510992530280790cc1",
-          "after": "f434a17a7121b83661f691a6ca5c8e810384acf2cca2f864be157c011dfea5ea"
+          "before": "f434a17a7121b83661f691a6ca5c8e810384acf2cca2f864be157c011dfea5ea",
+          "after": "55a76d43fe90a1c7a463f920ac46b0f063491836e5f46a4f49841bf9aa3cf09d"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "22e230b24d5c65e71cf5cdbcd51b52e420f0d5e426843812275131432a10f814",
-      "after_sha256": "e3c8cf2e8a54e90642425dbbd66c928785697b56e2ad0ab401e3f13287bfed31",
+      "before_sha256": "e3c8cf2e8a54e90642425dbbd66c928785697b56e2ad0ab401e3f13287bfed31",
+      "after_sha256": "0f10b79ab437ba81ecba13ef01bc935dfb87faf080a386bf9330b0cc6bf20734",
       "owners": {
         "@document": {
-          "before": "22e230b24d5c65e71cf5cdbcd51b52e420f0d5e426843812275131432a10f814",
-          "after": "e3c8cf2e8a54e90642425dbbd66c928785697b56e2ad0ab401e3f13287bfed31"
+          "before": "e3c8cf2e8a54e90642425dbbd66c928785697b56e2ad0ab401e3f13287bfed31",
+          "after": "0f10b79ab437ba81ecba13ef01bc935dfb87faf080a386bf9330b0cc6bf20734"
         }
       }
     },
-    "data/source_audits/ci64_provenance_v1/monster-mash-round4-malice-bearer-test-transition-v1.json": {
+    "data/source_audits/ci64_provenance_v1/monster-mash-round3-shalaxi-test-transition-v1.json": {
       "before_sha256": null,
-      "after_sha256": "61b11c5be2d8c47a84d0155e555ee600bdb5f6439676152cffb53a4e19c42ae1",
+      "after_sha256": "a9e2413b2d06ece74221a364cbcaa17525e7995100b725517f31902c7a1edf43",
       "owners": {
         "@document": {
           "before": null,
-          "after": "61b11c5be2d8c47a84d0155e555ee600bdb5f6439676152cffb53a4e19c42ae1"
+          "after": "a9e2413b2d06ece74221a364cbcaa17525e7995100b725517f31902c7a1edf43"
+        }
+      }
+    },
+    "docs/performance/current/monster-mash-round3-shalaxi-movement.json": {
+      "before_sha256": null,
+      "after_sha256": "cf58fde4ed8eaece2e4a8657f1b3c164e893a53c80fe7a1a9b8d22f3b59ef8c7",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "cf58fde4ed8eaece2e4a8657f1b3c164e893a53c80fe7a1a9b8d22f3b59ef8c7"
+        }
+      }
+    },
+    "docs/performance/current/monster-mash-round3-shalaxi-setup.json": {
+      "before_sha256": null,
+      "after_sha256": "e101747f59a6ec4507e8a3c046f8d6506a3bacfc74efeebc70b9cc462a9fed94",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "e101747f59a6ec4507e8a3c046f8d6506a3bacfc74efeebc70b9cc462a9fed94"
+        }
+      }
+    },
+    "docs/performance/current/monster-mash-round3-shalaxi-visibility.json": {
+      "before_sha256": null,
+      "after_sha256": "0f0955811a7120a25d11d0241e5ed98917da6e1c9ef1da892d7a2994ae069753",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "0f0955811a7120a25d11d0241e5ed98917da6e1c9ef1da892d7a2994ae069753"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "e82222f600640b76d50214535c2cb8855f35bffc256c099d7d771d83cd585da6",
-      "after_sha256": "ee1b5d43300edc57594d3c126bdd105d6e183a7beac469bb9913836d28ba34df",
+      "before_sha256": "ee1b5d43300edc57594d3c126bdd105d6e183a7beac469bb9913836d28ba34df",
+      "after_sha256": "12a9f7f06e044021cbb37c7edb83756f86dfdd16b3a8b4963a14be79e9b2490e",
       "owners": {
         "@document": {
-          "before": "e82222f600640b76d50214535c2cb8855f35bffc256c099d7d771d83cd585da6",
-          "after": "ee1b5d43300edc57594d3c126bdd105d6e183a7beac469bb9913836d28ba34df"
+          "before": "ee1b5d43300edc57594d3c126bdd105d6e183a7beac469bb9913836d28ba34df",
+          "after": "12a9f7f06e044021cbb37c7edb83756f86dfdd16b3a8b4963a14be79e9b2490e"
         }
       }
     },
     "scripts/engine_numerical_identity_test_admission.py": {
-      "before_sha256": "d8665f380a9857d9954f0789f8e4a7d91f15823a3564ca0758e6106eaf3abb2d",
-      "after_sha256": "521fdca5c2d6fd74120b43ef2c14639e2cf677610adecb3c58b1085d27175891",
+      "before_sha256": "521fdca5c2d6fd74120b43ef2c14639e2cf677610adecb3c58b1085d27175891",
+      "after_sha256": "1faebdb22e94422e7d69b2ab84a7f93505321021c0f107a5c2a26178a0d52c24",
       "owners": {
         "@module": {
-          "before": "6f0abe6e7f1962ff5cbd0b84e026f3909059367ea8b979b5646ef83c90e9d84d",
-          "after": "b6a5112e6ba1d88baa39a8b92da61a79dd781c39d293640c9b8a161aaabb0a70"
+          "before": "b6a5112e6ba1d88baa39a8b92da61a79dd781c39d293640c9b8a161aaabb0a70",
+          "after": "565dfeead0a1ccc8b175cf5faf83edb7084fb0c51555784cb89e225fdea75dbb"
         },
-        "_round4_malice_bearer_successor": {
+        "_round3_shalaxi_successor": {
           "before": null,
-          "after": "04bf62d1e975e979a1039b0ec4668d2fa71eae4944e7f2ddbaa49246f23f360c"
+          "after": "3829c00e105c536b4bc3080ae4d35a6eb383ee85ee63b16ce53b816f7faad8f8"
+        },
+        "_shooting_visibility_successor": {
+          "before": "fbd07ecfcbd7025e3b1020c71dc2dfe30631085059fb4fd915a6c53941061015",
+          "after": "13b5dcda941c6fcfd5e2a1bdc51e98ece7c609031a3ccaa421f18aea338201dc"
         },
         "exact_movement_test_transition": {
-          "before": "bd963d87b7b7fbaf7e1b4cd95e0f54bc01a69726cf0b1815db803e7a0add3c51",
-          "after": "8891dee52b96e547bd2bd4a2c45a5612d077942fd9304b8c354796c7405e2c36"
+          "before": "8891dee52b96e547bd2bd4a2c45a5612d077942fd9304b8c354796c7405e2c36",
+          "after": "cf79b603d4afda7d7cd1575ec00895de5bee122bedc51853a8ca2b49f1d4dc1a"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "7facee86c3d5d202df8ec5a6f2d9ab3587453d0bc2a2bca80621c076e3d80665",
-      "after_sha256": "3cba50c9b0bd61f119521774098fae29e712560d8982eee600f1c2cc11d3fbb8",
+      "before_sha256": "3cba50c9b0bd61f119521774098fae29e712560d8982eee600f1c2cc11d3fbb8",
+      "after_sha256": "42a0ea6ff6dd6f744a6fe156313fa8c46f99aa4cf822088c19663318b1c0b13a",
       "owners": {
         "@document": {
-          "before": "7facee86c3d5d202df8ec5a6f2d9ab3587453d0bc2a2bca80621c076e3d80665",
-          "after": "3cba50c9b0bd61f119521774098fae29e712560d8982eee600f1c2cc11d3fbb8"
+          "before": "3cba50c9b0bd61f119521774098fae29e712560d8982eee600f1c2cc11d3fbb8",
+          "after": "42a0ea6ff6dd6f744a6fe156313fa8c46f99aa4cf822088c19663318b1c0b13a"
         }
       }
     },
-    "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/detachments/shadow_legion/fight_sequencing.py": {
-      "before_sha256": "947cd01e6b26c57ff06d198ffda7e84d25cb9c4cb9ee468dca0675a5e5fe0e63",
-      "after_sha256": "c632b7188599561b19fc4c9878800884dfc4dde1352e51d032c421a73bcf9d77",
+    "src/warhammer40k_core/geometry/continuous_visibility.py": {
+      "before_sha256": "9b460af054119c59e1f829ebb762f6cf6effd751d24970f54c99a3ecb8e93008",
+      "after_sha256": "95c2bf4dbeb9ac673f892b3ec91c97102090eacb9c756308ce99bbeacda2d2e7",
       "owners": {
         "@module": {
-          "before": "b144d032a00721db62635325dfd4d86aa9cbc83d869794e2b28b157c143bdb0d",
-          "after": "6b2729d102eb23e021a135879bfe235391e3ed868c82678acb46411b95139f51"
+          "before": "0d71d553092235af09b25a077f6d74824c1a3aa70ad868bb1735c10fab0ff2d5",
+          "after": "1fb260f21f55df07c187deb6ea2a91fe60a5d52d8d52e46db21c44d4fcb4a3f3"
         },
-        "malice_made_manifest_candidates": {
-          "before": "4d2ecf119b19235d9e3d9a6d43b76615491263b3e2d8deda2a611bf656ff5c0f",
-          "after": "41c1535305fc81fc5a809b5c4502a3edc75e4d4008fe3d662fccabac98a16342"
+        "_resolve_any_part": {
+          "before": "c181791e57e11b1c06d6eec3faf021e17034c3b5b536b7fda8d9031d6362bf4f",
+          "after": "da3e18d6a86f17ea85d1815c5657e3cb391d17b319aef148d7efdb5e39b18b20"
         }
       }
     },
-    "tests/category_migration_preservation.py": {
-      "before_sha256": "16a44c1f6862cb2fd79e133002044d151363933f3a68cfdda46ecd267451aa4a",
-      "after_sha256": "4d6951aa3cb40989d8e2ca031cf5922380e37f90eb27cbe0f519f4e84fa518e7",
+    "src/warhammer40k_core/geometry/visibility_axis_shadow.py": {
+      "before_sha256": null,
+      "after_sha256": "31f02ba38810653c5fb78cad8b852e049ad3ecde64405a635b333777874fa9f6",
       "owners": {
-        "_malice_bearer_migration_predecessor": {
+        "@module": {
           "before": null,
-          "after": "a0e233e2b789bcda6724a6622cb5fab1462f6d490440cb847c74f34e9667e863"
+          "after": "30de31bad435da313b80c37e1a18406efd7e8758376c520a51657bb719375abf"
         },
-        "verify_migrated_test": {
-          "before": "4ad64f483bf3bc105c994184c8c86ef7aa3b7edfa4fb22d92c9eb9b00265f106",
-          "after": "8809742865eb5fb8c0f233e629177c91cb3a1297e0144775f2050c0330de9716"
+        "_axis_shadow_clauses": {
+          "before": null,
+          "after": "162115fc9d90f2839d1ba348eacbd23b70a36d568bcf7374627e11794cae786e"
+        },
+        "_clip_at": {
+          "before": null,
+          "after": "6a5c5358383b7aaf095222a711f7702eebdceaf563ea4e419d8f8f457e051a2e"
+        },
+        "_ellipse_line_offset": {
+          "before": null,
+          "after": "054b1a193819410d0d4a238f2c622c21634d9522bb018d5fba3f61c62791ca3f"
+        },
+        "_joined_height_intervals": {
+          "before": null,
+          "after": "cac4fa890a9e71fc25a63670523b792210c1b341f175dc1dc0c0963959231a8a"
+        },
+        "all_corridors_blocked_by_axis_shadow": {
+          "before": null,
+          "after": "0518a90e87c663f560a6168a92eb26c8e20a5907cbe8d84d956f4629619ab3dd"
+        }
+      }
+    },
+    "src/warhammer40k_core/geometry/visibility_certificates.py": {
+      "before_sha256": "ddee3df9e4a5c7bbb060738f88eb6b3c5533ed336535e86ca7bef9fe36810ecb",
+      "after_sha256": "4402b2f956a1e12872916348a2dc50533be5748ec019c74aa76af3511e1ed509",
+      "owners": {
+        "@module": {
+          "before": "1ae2e976bf57dabf71a7556e1a33cdf2b87ef4d1f9f0bfdaa1179be24fc0d07c",
+          "after": "87d979c0960d2ba5ff8241da007b8d98e7f2bee7a2ab68642b656f1ffd4522ab"
+        },
+        "_segment_hits_convex_prism": {
+          "before": null,
+          "after": "af642beeb033d0514e84d9eea5e7e676a5c767f0a99b88a867fba2b552d38ab9"
+        },
+        "all_box_corridors_blocked_by_convex_wall": {
+          "before": null,
+          "after": "8c79ba6f7e5b76452ddb28255ba6afca269cbfe0ff7dfee9a6265025f71a03c9"
+        }
+      }
+    },
+    "src/warhammer40k_core/geometry/visibility_witnesses.py": {
+      "before_sha256": "a1537c34b8a6682acee8a1028bbd29b3ea0c753443f98e957648fd27607092eb",
+      "after_sha256": "873b5068ffee60e39a5a08e277cd12a75d8ce68ed8c562bfdcb22254ecf819a7",
+      "owners": {
+        "@module": {
+          "before": "ec09a834caf45993fa44a8fdfa721afe1ee7493e0934eeb7da44c03deaae17d3",
+          "after": "206e5b5093718ab4e0db4c8400a856a4a2e63b03788f56720d5039f9e32c1857"
+        },
+        "_nearby_polygon_vertex_gap_candidates": {
+          "before": null,
+          "after": "3f552ed7b0635bef47211cc1a68bce5bf36b810d3b7f250a12f41b773581b3f5"
+        },
+        "positive_ray_candidates": {
+          "before": "98c47b3c6df186ee19df56edf0ce86e0341acfb8e171f07fec0db1862870bde0",
+          "after": "71ada7b7a5244d745c025da2cc4b288d1ff549ba29c61c2ad9f7760cd28fff58"
+        },
+        "self_visible_corridors_blocked": {
+          "before": "337a7785bffb8fefa726ce609d756a7d61177c620bff1746086603848b4127f6",
+          "after": "5baa9510aaaf58a9754b1b38ffc3a4393ea89b6c511c2d2fb1759f192bbbedbd"
         }
       }
     },
     "tests/code_quality/test_engine_numerical_identity_admission.py": {
-      "before_sha256": "29c5206e4028b1bdbb13df6fa094802436a0df6566bb229cd04bb1b0db953610",
-      "after_sha256": "1f3da7952effa0731592575cae494effe47d05b0b0358ae98d188bf4526fe2f5",
+      "before_sha256": "1f3da7952effa0731592575cae494effe47d05b0b0358ae98d188bf4526fe2f5",
+      "after_sha256": "d6804c6e821cae6fff1ea72a8edb0eb52455e6736f525a7337cc5fb0fd7c27ee",
       "owners": {
         "test_identity_inventory_uses_current_twelve_shards_and_native_cohort": {
-          "before": "7b092d15834d18ee24eee7c721c27ca31da5795b81fccbb1bc1faf6d87281cd6",
-          "after": "ae80bf6211212bb5cb09581688aabce6851328a8bc8d6c8a4b4d1a1403f98a00"
+          "before": "ae80bf6211212bb5cb09581688aabce6851328a8bc8d6c8a4b4d1a1403f98a00",
+          "after": "fe87ef83179dc7a4fffabe98355ee117fa62a478c44fe8574aa130265336ecff"
         }
       }
     },
-    "tests/factions/chaos_daemons/unit/test_generic_rule_ability_registry.py": {
-      "before_sha256": "330da381d4fc22016bc38612c9a5c98905a3bd7398275e6100d68afc30a6adce",
-      "after_sha256": "8901ff75b652675d0ce253424d5da1d251b09d2f7a67b0be02061c5da9aeea18",
+    "tests/rules/section06/test_visibility.py": {
+      "before_sha256": "24824fa7af6421486ef5043cd39633f01e8665e29acca4ee6cb2222cd28d981d",
+      "after_sha256": "5cb521df4aa6d29d97e9794c10dba5dd30cae9100969df2c82fbf2347e1dc574",
       "owners": {
-        "@module": {
-          "before": "75c3861ebeecabcb445a9e93bf66793db704a2ca0432db2f75b7949cd63f0baf",
-          "after": "3b17e8bab03f75fe38b36a441ea16da29cf6f9a329c2227db77b601c41cc0d62"
+        "test_axis_shadow_joins_touching_heights_but_leaves_vertical_openings": {
+          "before": null,
+          "after": "b797b2a98b4757424edcf640029480ac088b4d8f77d45b3e2ccb2a50f262e1fd"
         },
-        "test_default_generic_rule_ability_registry_maps_shadow_legion_enhancement_grants": {
-          "before": "2577e74f2eda22d0cfc7b2ed8d4dc00cf5fa030e9caf8575e6fadd12acc06494",
-          "after": "01c2c3e7d00717771c5afbd2cd4847b8768a62b7f117609b4feb2d32838b923b"
+        "test_axis_shadow_matches_exact_visibility_at_closed_corridor_boundary": {
+          "before": null,
+          "after": "b5fb6f4a2c23e933570bca2d6a7ab8b3e0db6859f5584a1cf450c35e6dbecc1f"
+        },
+        "test_polygon_gap_suggests_checked_ray_between_unequal_ellipses": {
+          "before": null,
+          "after": "f95ba243e390e275e53dd1d7919abd079bdfc72004c99a070706936b094bf783"
+        },
+        "test_rotated_wall_shadow_agrees_with_fixed_part_visibility": {
+          "before": null,
+          "after": "ef7168605060d60401ac80f9d5695586494da736599fc63ced7b8b967a2e483e"
         }
       }
     }
   },
   "rows": {
+    "ci/test_shards/durations.json": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Bind the new covered cases and generated artifacts to the verified source and test inventories.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-1.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Bind the new covered cases and generated artifacts to the verified source and test inventories.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-10.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Bind the new covered cases and generated artifacts to the verified source and test inventories.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-11.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Bind the new covered cases and generated artifacts to the verified source and test inventories.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-12.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Bind the new covered cases and generated artifacts to the verified source and test inventories.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-2.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Bind the new covered cases and generated artifacts to the verified source and test inventories.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-3.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Bind the new covered cases and generated artifacts to the verified source and test inventories.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-4.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Bind the new covered cases and generated artifacts to the verified source and test inventories.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-5.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Bind the new covered cases and generated artifacts to the verified source and test inventories.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-6.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Bind the new covered cases and generated artifacts to the verified source and test inventories.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-7.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Bind the new covered cases and generated artifacts to the verified source and test inventories.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-8.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Bind the new covered cases and generated artifacts to the verified source and test inventories.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-9.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Bind the new covered cases and generated artifacts to the verified source and test inventories.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "measured_workload",
       "operations": [
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bind the regenerated engine fingerprint and external examples to the current runtime for live contract checks.",
+      "rationale": "Bind the new covered cases and generated artifacts to the verified source and test inventories.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -202,7 +560,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bind the regenerated engine fingerprint and external examples to the current runtime for live contract checks.",
+      "rationale": "Bind the new covered cases and generated artifacts to the verified source and test inventories.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -212,7 +570,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bind the regenerated engine fingerprint and external examples to the current runtime for live contract checks.",
+      "rationale": "Bind the new covered cases and generated artifacts to the verified source and test inventories.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -222,7 +580,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bind the regenerated engine fingerprint and external examples to the current runtime for live contract checks.",
+      "rationale": "Bind the new covered cases and generated artifacts to the verified source and test inventories.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -232,7 +590,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bind the regenerated engine fingerprint and external examples to the current runtime for live contract checks.",
+      "rationale": "Bind the new covered cases and generated artifacts to the verified source and test inventories.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -242,7 +600,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bind the regenerated engine fingerprint and external examples to the current runtime for live contract checks.",
+      "rationale": "Bind the new covered cases and generated artifacts to the verified source and test inventories.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -252,7 +610,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bind the regenerated engine fingerprint and external examples to the current runtime for live contract checks.",
+      "rationale": "Bind the new covered cases and generated artifacts to the verified source and test inventories.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -262,17 +620,41 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bind the regenerated engine fingerprint and external examples to the current runtime for live contract checks.",
+      "rationale": "Bind the new covered cases and generated artifacts to the verified source and test inventories.",
       "source_obligation": null,
       "unchanged_work": null
     },
-    "data/source_audits/ci64_provenance_v1/monster-mash-round4-malice-bearer-test-transition-v1.json": {
+    "data/source_audits/ci64_provenance_v1/monster-mash-round3-shalaxi-test-transition-v1.json": {
       "category": "measured_workload",
       "operations": [
-        "round4-malice-bearer-liveness"
+        "engine-numerical-identity-admission"
       ],
       "selected_families": [],
-      "rationale": "Exercise and admit the covered Shadow Legion case with exact current and historical source identities.",
+      "rationale": "Bind the new covered cases and generated artifacts to the verified source and test inventories.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/performance/current/monster-mash-round3-shalaxi-movement.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Bind the exact changed owners and record fresh matched measurements for the scoped visibility repair.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/performance/current/monster-mash-round3-shalaxi-setup.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Bind the exact changed owners and record fresh matched measurements for the scoped visibility repair.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/performance/current/monster-mash-round3-shalaxi-visibility.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Bind the exact changed owners and record fresh matched measurements for the scoped visibility repair.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -280,7 +662,7 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Map the Malice bearer scan and its exact regression admission.",
+      "rationale": "Bind the exact changed owners and record fresh matched measurements for the scoped visibility repair.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -295,7 +677,7 @@
         "stage2-strict-replay-test-admission"
       ],
       "selected_families": [],
-      "rationale": "Exercise and admit the covered Shadow Legion case with exact current and historical source identities.",
+      "rationale": "Bind the new covered cases and generated artifacts to the verified source and test inventories.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -305,27 +687,63 @@
         "cavalcade-authority-admission"
       ],
       "selected_families": [],
-      "rationale": "Bind the regenerated engine fingerprint and external examples to the current runtime for live contract checks.",
+      "rationale": "Bind the new covered cases and generated artifacts to the verified source and test inventories.",
       "source_obligation": null,
       "unchanged_work": null
     },
-    "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/detachments/shadow_legion/fight_sequencing.py": {
-      "category": "rule_semantics",
+    "src/warhammer40k_core/geometry/continuous_visibility.py": {
+      "category": "algorithm_or_search",
       "operations": [
-        "round4-malice-bearer-liveness"
+        "geometry-search"
       ],
-      "selected_families": [],
-      "rationale": "Reject dead or unplaced Malice Made Manifest bearers before checking live eligibility.",
-      "source_obligation": "Resolve the assigned bearer model and require a living battlefield placement before Fight-start eligibility.",
-      "unchanged_work": "The eligibility gate reads the existing roster and battlefield presence. Live bearers use the existing engagement, sequencing and dice paths."
+      "selected_families": [
+        "movement",
+        "setup",
+        "visibility"
+      ],
+      "rationale": "Prove blocked projected corridors, verify candidate rays through narrow gaps, and certify hidden target parts with convex wall shadows. All inputs and proofs use the existing exact geometry.",
+      "source_obligation": null,
+      "unchanged_work": null
     },
-    "tests/category_migration_preservation.py": {
-      "category": "measured_workload",
+    "src/warhammer40k_core/geometry/visibility_axis_shadow.py": {
+      "category": "algorithm_or_search",
       "operations": [
-        "round4-malice-bearer-liveness"
+        "geometry-search"
       ],
-      "selected_families": [],
-      "rationale": "Exercise and admit the covered Shadow Legion case with exact current and historical source identities.",
+      "selected_families": [
+        "movement",
+        "setup",
+        "visibility"
+      ],
+      "rationale": "Prove blocked projected corridors, verify candidate rays through narrow gaps, and certify hidden target parts with convex wall shadows. All inputs and proofs use the existing exact geometry.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "src/warhammer40k_core/geometry/visibility_certificates.py": {
+      "category": "algorithm_or_search",
+      "operations": [
+        "geometry-search"
+      ],
+      "selected_families": [
+        "movement",
+        "setup",
+        "visibility"
+      ],
+      "rationale": "Prove blocked projected corridors, verify candidate rays through narrow gaps, and certify hidden target parts with convex wall shadows. All inputs and proofs use the existing exact geometry.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "src/warhammer40k_core/geometry/visibility_witnesses.py": {
+      "category": "algorithm_or_search",
+      "operations": [
+        "geometry-search"
+      ],
+      "selected_families": [
+        "movement",
+        "setup",
+        "visibility"
+      ],
+      "rationale": "Prove blocked projected corridors, verify candidate rays through narrow gaps, and certify hidden target parts with convex wall shadows. All inputs and proofs use the existing exact geometry.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -337,22 +755,26 @@
         "round4-malice-bearer-liveness"
       ],
       "selected_families": [],
-      "rationale": "Exercise and admit the covered Shadow Legion case with exact current and historical source identities.",
+      "rationale": "Bind the new covered cases and generated artifacts to the verified source and test inventories.",
       "source_obligation": null,
       "unchanged_work": null
     },
-    "tests/factions/chaos_daemons/unit/test_generic_rule_ability_registry.py": {
+    "tests/rules/section06/test_visibility.py": {
       "category": "measured_workload",
       "operations": [
-        "round4-malice-bearer-liveness"
+        "ellipse-facing-witness-regression"
       ],
       "selected_families": [],
-      "rationale": "Exercise and admit the covered Shadow Legion case with exact current and historical source identities.",
+      "rationale": "Bind the new covered cases and generated artifacts to the verified source and test inventories.",
       "source_obligation": null,
       "unchanged_work": null
     }
   },
   "milestone": "ordinary",
-  "comparisons": {},
+  "comparisons": {
+    "visibility": "docs/performance/current/monster-mash-round3-shalaxi-visibility.json",
+    "movement": "docs/performance/current/monster-mash-round3-shalaxi-movement.json",
+    "setup": "docs/performance/current/monster-mash-round3-shalaxi-setup.json"
+  },
   "full_game": null
 }

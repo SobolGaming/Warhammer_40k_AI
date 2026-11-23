@@ -301,7 +301,40 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
     )
     assert malice_base_manifest["fingerprint"] == round4["runtime_fingerprint"]
     assert malice["retained_runtime_fingerprint"] == malice_base_manifest["fingerprint"]
-    assert _record(MANIFEST)["fingerprint"] == malice["runtime_fingerprint"]
+    shalaxi = _record(selection.ROUND3_SHALAXI_TRANSITION)
+    shalaxi_base = selection.ROUND3_SHALAXI_BASE
+    shalaxi_base_manifest = json.loads(
+        subprocess.check_output(["git", "show", shalaxi_base + ":" + MANIFEST], cwd=ROOT)
+    )
+    assert shalaxi_base_manifest["fingerprint"] == malice["runtime_fingerprint"]
+    assert shalaxi["retained_runtime_fingerprint"] == malice["runtime_fingerprint"]
+    assert _record(MANIFEST)["fingerprint"] == shalaxi["runtime_fingerprint"]
+    assert shalaxi["test"]["before"] == shooting_visibility["test"]["after"]
+    for source in selection.ROUND3_SHALAXI_SOURCES:
+        present = subprocess.check_output(["git", "ls-tree", shalaxi_base, "--", source], cwd=ROOT)
+        before = (
+            subprocess.check_output(["git", "show", shalaxi_base + ":" + source], cwd=ROOT)
+            if present
+            else b""
+        )
+        assert shalaxi["sources"][source]["before"] == hashlib.sha256(before).hexdigest()
+        assert (
+            shalaxi["sources"][source]["after"]
+            == hashlib.sha256((ROOT / source).read_bytes()).hexdigest()
+        )
+    visibility_owner = selection.CLOSE_QUARTERS_OWNER
+    assert sum(visibility_owner in group for group in groups) == 1
+    timing_cases = _record("ci/test_shards/durations.json")["case_seconds"]
+    shalaxi_cases = {
+        visibility_owner + "::" + name
+        for name in (
+            "test_axis_shadow_matches_exact_visibility_at_closed_corridor_boundary",
+            "test_axis_shadow_joins_touching_heights_but_leaves_vertical_openings",
+            "test_rotated_wall_shadow_agrees_with_fixed_part_visibility",
+            "test_polygon_gap_suggests_checked_ray_between_unequal_ellipses",
+        )
+    }
+    assert shalaxi_cases <= timing_cases.keys()
     malice_source = selection.ROUND4_MALICE_BEARER_SOURCE
     malice_source_before = subprocess.check_output(
         ["git", "show", malice_base + ":" + malice_source], cwd=ROOT
@@ -413,19 +446,26 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
             close_quarters["sources"][name]["after"]
             == hashlib.sha256(close_quarters_after).hexdigest()
         )
-        current_source_digest = hashlib.sha256((ROOT / name).read_bytes()).hexdigest()
+        successor = shalaxi["sources"].get(name)
+        prior_source_digest = (
+            hashlib.sha256((ROOT / name).read_bytes()).hexdigest()
+            if successor is None
+            else successor["before"]
+        )
         if name == selection.SHOOTING_VISIBILITY_SOURCE:
             assert (
                 shooting_visibility["source"]["before"] == close_quarters["sources"][name]["after"]
             )
-            assert shooting_visibility["source"]["after"] == current_source_digest
+            assert shooting_visibility["source"]["after"] == prior_source_digest
         else:
-            assert close_quarters["sources"][name]["after"] == current_source_digest
+            assert close_quarters["sources"][name]["after"] == prior_source_digest
     assert (
         shooting_visibility["test"]["before"]
         == close_quarters["test"][close_quarters_owner]["after"]
     )
-    shooting_test_bytes = (ROOT / close_quarters_owner).read_bytes()
+    shooting_test_bytes = subprocess.check_output(
+        ["git", "show", shalaxi_base + ":" + close_quarters_owner], cwd=ROOT
+    )
     assert shooting_visibility["test"]["after"]["bytes"] == len(shooting_test_bytes)
     assert (
         shooting_visibility["test"]["after"]["sha256"]
@@ -597,6 +637,7 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         | gameplay
         | shadow_cases
         | close_quarters_cases
+        | shalaxi_cases
         | allocation_cases
         | round4_cases
         | {

@@ -16,6 +16,7 @@ from itertools import chain
 from typing import TypedDict, cast
 
 from warhammer40k_core.geometry.pose import GeometryError
+from warhammer40k_core.geometry.visibility_axis_shadow import all_corridors_blocked_by_axis_shadow
 from warhammer40k_core.geometry.visibility_certificates import (
     all_corridors_blocked_by_circle,
     all_corridors_blocked_by_endpoint_containment,
@@ -452,5 +453,7 @@ def _resolve_any_part(
         any_proof = "real_algebraic_planar_lines"
         visible = decide_planar_any(observer, target, any_blockers)
     else:
-        visible = decide_any(origin, destination, any_blockers)
+        visible = not all_corridors_blocked_by_axis_shadow(
+            observer, target, any_blockers
+        ) and decide_any(origin, destination, any_blockers)
     return AnyPartVisibilityEvidence(fingerprint, visible, any_proof, checked, clear_ray)

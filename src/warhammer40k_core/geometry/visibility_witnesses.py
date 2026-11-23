@@ -12,15 +12,17 @@ from __future__ import annotations
 import math
 from collections.abc import Iterator
 from fractions import Fraction
-from itertools import pairwise, product
+from itertools import combinations, pairwise, product
 
 from warhammer40k_core.geometry.visibility_certificates import (
     Bounds,
     Box,
     all_box_corridors_blocked_by_circle,
+    all_box_corridors_blocked_by_convex_wall,
     all_box_corridors_blocked_by_plane,
 )
 from warhammer40k_core.geometry.visibility_exact import (
+    CORRIDOR_RADIUS,
     RationalEllipse,
     RationalPoint2,
     RationalPoint3,
@@ -220,6 +222,7 @@ def self_visible_corridors_blocked(
         (
             all_box_corridors_blocked_by_circle(box, destination, blockers)
             or all_box_corridors_blocked_by_plane(box, destination, blockers)
+            or all_box_corridors_blocked_by_convex_wall(box, point, blockers)
         )
         for box in boxes
     )
@@ -492,3 +495,45 @@ def positive_ray_candidates(
             ):
                 seen.add(ray)
                 yield ray
+
+    yield from _nearby_polygon_vertex_gap_candidates(observer, target, blockers)
+
+
+def _nearby_polygon_vertex_gap_candidates(
+    observer: ModelDomain, target: ModelDomain, blockers: tuple[VisibilityPrism, ...]
+) -> Iterator[tuple[RationalPoint3, RationalPoint3]]:
+    """Propose top-cap corridors through gaps between nearly touching terrain corners."""
+    if not (observer.curved and target.curved):
+        return
+    axis = max(range(2), key=lambda i: abs(target.center[i] - observer.center[i]))
+    lateral = 1 - axis
+    first = observer.center[axis]
+    lower, upper = min(observer.lower, target.lower), max(observer.upper, target.upper)
+    footprints = tuple(
+        blocker.footprint
+        for blocker in blockers
+        if not isinstance(blocker.footprint, RationalEllipse)
+        and blocker.lower <= lower
+        and blocker.upper >= upper
+    )
+    gap_limit_squared = (4 * CORRIDOR_RADIUS) ** 2
+    for left, right in combinations(footprints, 2):
+        for a, b in product(left, right):
+            distance_squared = (a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2
+            if not 0 < distance_squared <= gap_limit_squared:
+                continue
+            gap = ((a[0] + b[0]) / 2, (a[1] + b[1]) / 2)
+            for side, parameter in product((-1, 1), _COARSE_ELLIPSE_PARAMETERS):
+                destination = _ellipse_chart_point(target, side, parameter, target.upper)
+                run = destination[axis] - gap[axis]
+                if not run or (first - gap[axis]) * run >= 0:
+                    continue
+                slope = (destination[lateral] - gap[lateral]) / run
+                second = gap[lateral] + (first - gap[axis]) * slope
+                origin = (
+                    (first, second, observer.upper)
+                    if axis == 0
+                    else (second, first, observer.upper)
+                )
+                if point_in_model(observer, origin):
+                    yield origin, destination

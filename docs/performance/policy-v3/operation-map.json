@@ -434,7 +434,11 @@
         "test_ellipse_facing_search_leaves_unsupported_domains_to_existing_authority",
         "_axis_aligned_ellipse_prism",
         "test_ellipse_facing_search_checks_base_edge_behind_low_models",
-        "test_ellipse_facing_search_checks_base_edge_with_multiple_terrain_walls"
+        "test_ellipse_facing_search_checks_base_edge_with_multiple_terrain_walls",
+        "test_axis_shadow_matches_exact_visibility_at_closed_corridor_boundary",
+        "test_axis_shadow_joins_touching_heights_but_leaves_vertical_openings",
+        "test_rotated_wall_shadow_agrees_with_fixed_part_visibility",
+        "test_polygon_gap_suggests_checked_ray_between_unequal_ellipses"
       ],
       "families": [],
       "sensitive": false,
@@ -36629,7 +36633,8 @@
         "data/source_audits/ci64_provenance_v1/stage2-fight-reroll-test-transition-v1.json",
         "data/source_audits/ci64_provenance_v1/terminal-restore-test-transition-v1.json",
         "data/source_audits/ci64_provenance_v1/monster-mash-shooting-visibility-test-transition-v1.json",
-        "data/source_audits/ci64_provenance_v1/monster-mash-attack-reroll-test-transition-v1.json"
+        "data/source_audits/ci64_provenance_v1/monster-mash-attack-reroll-test-transition-v1.json",
+        "data/source_audits/ci64_provenance_v1/monster-mash-round3-shalaxi-test-transition-v1.json"
       ],
       "owners": [
         "*"
