@@ -1,512 +1,372 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "2addab80a74e9369b8b0b653954318bf58eec0e5",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:e7042cdd0b8f68eaf73967b27b3e5b058fca3247f98340259499c0c4cf9e5606",
-  "operation_map_sha256": "617bd6fa4476f863f6b4b86c7c7ad15b4dae83a87657b5e49accfdc878115e8d",
+  "base": "ffd62f1b1cdcf81c2fbd4b99457482c1018d2eb8",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:f97e9d27b65a71c800a1a0b1a6f2b5731fd70c9572b9f818d6f721ab89f58357",
+  "operation_map_sha256": "46fcabf09ac7ba92d5c8a704df5b38facf6742dfc5faa8fcb5ffe893f9682b5f",
   "changes": {
     "ci/test_shards/durations.json": {
-      "before_sha256": "868f561c32c0ca71be48d50d1458a086e518e5c8ec635ad60afece22a166b06f",
-      "after_sha256": "771be076b2f4879fff8e262c765b4efd23ec1b62e3c4338f23aea2436f0c158c",
+      "before_sha256": "771be076b2f4879fff8e262c765b4efd23ec1b62e3c4338f23aea2436f0c158c",
+      "after_sha256": "003693d6ef7bb6ed5d3fc5daf54a8135a560bc1a576c0bd4bdf84af355237ce1",
       "owners": {
         "@document": {
-          "before": "868f561c32c0ca71be48d50d1458a086e518e5c8ec635ad60afece22a166b06f",
-          "after": "771be076b2f4879fff8e262c765b4efd23ec1b62e3c4338f23aea2436f0c158c"
+          "before": "771be076b2f4879fff8e262c765b4efd23ec1b62e3c4338f23aea2436f0c158c",
+          "after": "003693d6ef7bb6ed5d3fc5daf54a8135a560bc1a576c0bd4bdf84af355237ce1"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
-      "before_sha256": "ad7ea6fa3ea34c1a1dc2d2fe85f09386929af3f0dacdff5096827e436c8c4879",
-      "after_sha256": "1dca6f8f5ab63e762babc8cdca0538d3ab87c08aeb3d3ebd7a130b8bc8815f8b",
+      "before_sha256": "1dca6f8f5ab63e762babc8cdca0538d3ab87c08aeb3d3ebd7a130b8bc8815f8b",
+      "after_sha256": "9b64acaaedce8f36642c77b9fae79dc0a5dea423f87699408c570d8a7f4c70d1",
       "owners": {
         "@document": {
-          "before": "ad7ea6fa3ea34c1a1dc2d2fe85f09386929af3f0dacdff5096827e436c8c4879",
-          "after": "1dca6f8f5ab63e762babc8cdca0538d3ab87c08aeb3d3ebd7a130b8bc8815f8b"
+          "before": "1dca6f8f5ab63e762babc8cdca0538d3ab87c08aeb3d3ebd7a130b8bc8815f8b",
+          "after": "9b64acaaedce8f36642c77b9fae79dc0a5dea423f87699408c570d8a7f4c70d1"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
-      "before_sha256": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20",
-      "after_sha256": "63291248850ce5c2deec4728259b2cce52e52b33a683d35906bdbda2d878f6fa",
+      "before_sha256": "63291248850ce5c2deec4728259b2cce52e52b33a683d35906bdbda2d878f6fa",
+      "after_sha256": "398cfe84013248a441d072621f605d85db08bbf63147f361e5cedbc8e7ae19e5",
       "owners": {
         "@document": {
-          "before": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20",
-          "after": "63291248850ce5c2deec4728259b2cce52e52b33a683d35906bdbda2d878f6fa"
+          "before": "63291248850ce5c2deec4728259b2cce52e52b33a683d35906bdbda2d878f6fa",
+          "after": "398cfe84013248a441d072621f605d85db08bbf63147f361e5cedbc8e7ae19e5"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
-      "before_sha256": "12092599a7c28d9d2c86ddfb1014e4b55af45d22a15895668d888803181131d5",
-      "after_sha256": "62c5a1890f399be5b510eb504498434fd06e0ffae11003bfe6ad5ace264ac3ba",
+      "before_sha256": "62c5a1890f399be5b510eb504498434fd06e0ffae11003bfe6ad5ace264ac3ba",
+      "after_sha256": "7409c4f7b58da3c860c2c54903e793963ca39f271847ef510471ac76a176bc4d",
       "owners": {
         "@document": {
-          "before": "12092599a7c28d9d2c86ddfb1014e4b55af45d22a15895668d888803181131d5",
-          "after": "62c5a1890f399be5b510eb504498434fd06e0ffae11003bfe6ad5ace264ac3ba"
+          "before": "62c5a1890f399be5b510eb504498434fd06e0ffae11003bfe6ad5ace264ac3ba",
+          "after": "7409c4f7b58da3c860c2c54903e793963ca39f271847ef510471ac76a176bc4d"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
-      "before_sha256": "b34095fc6c0ae92aacca1037f3160c6382c0ae5935fd24221f8facbe90ab38f9",
-      "after_sha256": "4abf1c5c15e81278f542c41238679a2cb8d910c7eff749f0059d1bfc394d70d2",
+      "before_sha256": "4abf1c5c15e81278f542c41238679a2cb8d910c7eff749f0059d1bfc394d70d2",
+      "after_sha256": "522111b3d4cf21ce309d37e96d5bfa9be73434c873f29398615e3e23edef3666",
       "owners": {
         "@document": {
-          "before": "b34095fc6c0ae92aacca1037f3160c6382c0ae5935fd24221f8facbe90ab38f9",
-          "after": "4abf1c5c15e81278f542c41238679a2cb8d910c7eff749f0059d1bfc394d70d2"
-        }
-      }
-    },
-    "ci/test_shards/shard-2.txt": {
-      "before_sha256": "7e2b78daeb1ac337007999e8e6d70f0f6fc31e46934adac7ced335788272751e",
-      "after_sha256": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
-      "owners": {
-        "@document": {
-          "before": "7e2b78daeb1ac337007999e8e6d70f0f6fc31e46934adac7ced335788272751e",
-          "after": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c"
+          "before": "4abf1c5c15e81278f542c41238679a2cb8d910c7eff749f0059d1bfc394d70d2",
+          "after": "522111b3d4cf21ce309d37e96d5bfa9be73434c873f29398615e3e23edef3666"
         }
       }
     },
     "ci/test_shards/shard-3.txt": {
-      "before_sha256": "dca003fdc57fcc3c202958bb8b1abad24de89000a94f6ea3a6fdade1f9f69bfa",
-      "after_sha256": "84c43d5c0898ea82c465ba85bc135b2fd236b66101b216953d2e93b384ca546c",
+      "before_sha256": "84c43d5c0898ea82c465ba85bc135b2fd236b66101b216953d2e93b384ca546c",
+      "after_sha256": "77acbedf48c4a0233976f2856af0964f58d9382857b9f978489424b1b4c536ee",
       "owners": {
         "@document": {
-          "before": "dca003fdc57fcc3c202958bb8b1abad24de89000a94f6ea3a6fdade1f9f69bfa",
-          "after": "84c43d5c0898ea82c465ba85bc135b2fd236b66101b216953d2e93b384ca546c"
+          "before": "84c43d5c0898ea82c465ba85bc135b2fd236b66101b216953d2e93b384ca546c",
+          "after": "77acbedf48c4a0233976f2856af0964f58d9382857b9f978489424b1b4c536ee"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
-      "before_sha256": "5e8507341b7ebdc4512006aebe5cae2c30487a78628d94803c9d222e191ccde9",
-      "after_sha256": "216d0c8e56fda5bdab1cbb87d4b7f2846e559c6a3a5cccdde4aedbb7609cd054",
+      "before_sha256": "216d0c8e56fda5bdab1cbb87d4b7f2846e559c6a3a5cccdde4aedbb7609cd054",
+      "after_sha256": "12944861e373970c68e8b7f05a74dc9f8a525ade9760044f7d3b41258346bc92",
       "owners": {
         "@document": {
-          "before": "5e8507341b7ebdc4512006aebe5cae2c30487a78628d94803c9d222e191ccde9",
-          "after": "216d0c8e56fda5bdab1cbb87d4b7f2846e559c6a3a5cccdde4aedbb7609cd054"
+          "before": "216d0c8e56fda5bdab1cbb87d4b7f2846e559c6a3a5cccdde4aedbb7609cd054",
+          "after": "12944861e373970c68e8b7f05a74dc9f8a525ade9760044f7d3b41258346bc92"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
-      "before_sha256": "a6398d62a41cf2ac17cfcb154a809f983a099a984fafe517714be120db15f77b",
-      "after_sha256": "9188858d41eaab68a8c4fc3971bd59559489234e9896cc9be6090fbc56c9bed0",
+      "before_sha256": "9188858d41eaab68a8c4fc3971bd59559489234e9896cc9be6090fbc56c9bed0",
+      "after_sha256": "cab4b63ffefe0accc4c47c2d5c5a239a3c284ba7342e3339b27300c847d61641",
       "owners": {
         "@document": {
-          "before": "a6398d62a41cf2ac17cfcb154a809f983a099a984fafe517714be120db15f77b",
-          "after": "9188858d41eaab68a8c4fc3971bd59559489234e9896cc9be6090fbc56c9bed0"
+          "before": "9188858d41eaab68a8c4fc3971bd59559489234e9896cc9be6090fbc56c9bed0",
+          "after": "cab4b63ffefe0accc4c47c2d5c5a239a3c284ba7342e3339b27300c847d61641"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
-      "before_sha256": "28d89930ef0b169c09db8de71828b0f08d54cee6b1f2b7ed6b18106f4fb684e0",
-      "after_sha256": "fd2504be1874cfe4657fa21ab940d6878aaa502d8e23ff583cb5f514feb97c05",
+      "before_sha256": "fd2504be1874cfe4657fa21ab940d6878aaa502d8e23ff583cb5f514feb97c05",
+      "after_sha256": "adced6eac3c663990314f82949d9b249610ad56794b33345c52607f660e09ea9",
       "owners": {
         "@document": {
-          "before": "28d89930ef0b169c09db8de71828b0f08d54cee6b1f2b7ed6b18106f4fb684e0",
-          "after": "fd2504be1874cfe4657fa21ab940d6878aaa502d8e23ff583cb5f514feb97c05"
+          "before": "fd2504be1874cfe4657fa21ab940d6878aaa502d8e23ff583cb5f514feb97c05",
+          "after": "adced6eac3c663990314f82949d9b249610ad56794b33345c52607f660e09ea9"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
-      "before_sha256": "2287c331a7e6116a1aa6ef1dc74f6c7235e8410d549ef317547cc80d5f1b2952",
-      "after_sha256": "1aae005367c4c536ff9f6c5d8ef4db53e0268acbebf88ae164ebfe7fd7348cc0",
+      "before_sha256": "1aae005367c4c536ff9f6c5d8ef4db53e0268acbebf88ae164ebfe7fd7348cc0",
+      "after_sha256": "940c2b66fd8eb9667bf43b4a2533c924fef45d5bf03df3362153b117c49d0e55",
       "owners": {
         "@document": {
-          "before": "2287c331a7e6116a1aa6ef1dc74f6c7235e8410d549ef317547cc80d5f1b2952",
-          "after": "1aae005367c4c536ff9f6c5d8ef4db53e0268acbebf88ae164ebfe7fd7348cc0"
+          "before": "1aae005367c4c536ff9f6c5d8ef4db53e0268acbebf88ae164ebfe7fd7348cc0",
+          "after": "940c2b66fd8eb9667bf43b4a2533c924fef45d5bf03df3362153b117c49d0e55"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
-      "before_sha256": "300dd8fc14e8ea6d2aaa3f62308b70176d5a872db82f50debfe32c89153555d4",
-      "after_sha256": "1668ceac0ee8946628047cc95dbfc28dacae41e9aaa83bc02277505e96dbcd9b",
+      "before_sha256": "1668ceac0ee8946628047cc95dbfc28dacae41e9aaa83bc02277505e96dbcd9b",
+      "after_sha256": "47f134bb5eedb77e8c9dbc840aed643ed8ba3c810ff07425eb20e84f8c79eb05",
       "owners": {
         "@document": {
-          "before": "300dd8fc14e8ea6d2aaa3f62308b70176d5a872db82f50debfe32c89153555d4",
-          "after": "1668ceac0ee8946628047cc95dbfc28dacae41e9aaa83bc02277505e96dbcd9b"
+          "before": "1668ceac0ee8946628047cc95dbfc28dacae41e9aaa83bc02277505e96dbcd9b",
+          "after": "47f134bb5eedb77e8c9dbc840aed643ed8ba3c810ff07425eb20e84f8c79eb05"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
-      "before_sha256": "b1ea54000b98ae134d7b2e48e15c06bc57762c718524086c530ced9bedbfd182",
-      "after_sha256": "2c936d079be69cf30cf88e0ede0dc4790cab79bdec066460907408e91db40878",
+      "before_sha256": "2c936d079be69cf30cf88e0ede0dc4790cab79bdec066460907408e91db40878",
+      "after_sha256": "c3d084ad190e2ec479fc5ac54b5029064436806f155c0a977f7946bf389c6f29",
       "owners": {
         "@document": {
-          "before": "b1ea54000b98ae134d7b2e48e15c06bc57762c718524086c530ced9bedbfd182",
-          "after": "2c936d079be69cf30cf88e0ede0dc4790cab79bdec066460907408e91db40878"
+          "before": "2c936d079be69cf30cf88e0ede0dc4790cab79bdec066460907408e91db40878",
+          "after": "c3d084ad190e2ec479fc5ac54b5029064436806f155c0a977f7946bf389c6f29"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "74c4d265f7e7b42e76c00d6a6404321f5362c50930f0239b4d270c3319a12d4d",
-      "after_sha256": "a0c7f9dc25b7f2cf858b352686b0c9c2647c2cec9002f12ff9225da1e4bc69ef",
+      "before_sha256": "a0c7f9dc25b7f2cf858b352686b0c9c2647c2cec9002f12ff9225da1e4bc69ef",
+      "after_sha256": "fc35b879524ecedd78bbb0cb7c24d0e659b6f63d6caf16ae59dbb37ddee7edb5",
       "owners": {
         "@document": {
-          "before": "74c4d265f7e7b42e76c00d6a6404321f5362c50930f0239b4d270c3319a12d4d",
-          "after": "a0c7f9dc25b7f2cf858b352686b0c9c2647c2cec9002f12ff9225da1e4bc69ef"
+          "before": "a0c7f9dc25b7f2cf858b352686b0c9c2647c2cec9002f12ff9225da1e4bc69ef",
+          "after": "fc35b879524ecedd78bbb0cb7c24d0e659b6f63d6caf16ae59dbb37ddee7edb5"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "90001c801d610d3c6bbab9320b2c80078bcd27080f1bf386fca3963dc5d37cbf",
-      "after_sha256": "be8ea826353b3ac24853c74e309a9e984072918f182379c1fe5034f6e87a5dd8",
+      "before_sha256": "be8ea826353b3ac24853c74e309a9e984072918f182379c1fe5034f6e87a5dd8",
+      "after_sha256": "1d5b01ef09c65f6319e7831b5726c6fee2fa668ad7d52f95040bacf407079fc5",
       "owners": {
         "@document": {
-          "before": "90001c801d610d3c6bbab9320b2c80078bcd27080f1bf386fca3963dc5d37cbf",
-          "after": "be8ea826353b3ac24853c74e309a9e984072918f182379c1fe5034f6e87a5dd8"
+          "before": "be8ea826353b3ac24853c74e309a9e984072918f182379c1fe5034f6e87a5dd8",
+          "after": "1d5b01ef09c65f6319e7831b5726c6fee2fa668ad7d52f95040bacf407079fc5"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "440e8625aa249f95577c16749152730fb373ec76d83ca6725efa01de939cfb7f",
-      "after_sha256": "f60ee53a30218def5cd2d9450c5402982fa22ed55e726c29083c5e1b95a307bc",
+      "before_sha256": "f60ee53a30218def5cd2d9450c5402982fa22ed55e726c29083c5e1b95a307bc",
+      "after_sha256": "f03e8dea45526840eaaab86648ed8368e29e26f4c6c12c7c82542449a0355506",
       "owners": {
         "@document": {
-          "before": "440e8625aa249f95577c16749152730fb373ec76d83ca6725efa01de939cfb7f",
-          "after": "f60ee53a30218def5cd2d9450c5402982fa22ed55e726c29083c5e1b95a307bc"
+          "before": "f60ee53a30218def5cd2d9450c5402982fa22ed55e726c29083c5e1b95a307bc",
+          "after": "f03e8dea45526840eaaab86648ed8368e29e26f4c6c12c7c82542449a0355506"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "d6cb53eedf665c06ed278483abf8602f04c314f3e255c7450ee68624e284d263",
-      "after_sha256": "2bded53ab424c76c181b901f1cfabd10a75af69c5f6b2f0c8d6aa3e29cc1ab2f",
+      "before_sha256": "2bded53ab424c76c181b901f1cfabd10a75af69c5f6b2f0c8d6aa3e29cc1ab2f",
+      "after_sha256": "42bcd47e103fbf3255b36f13f67b66ac050f29e78916551ad7bb5bd0eb4b5a3f",
       "owners": {
         "@document": {
-          "before": "d6cb53eedf665c06ed278483abf8602f04c314f3e255c7450ee68624e284d263",
-          "after": "2bded53ab424c76c181b901f1cfabd10a75af69c5f6b2f0c8d6aa3e29cc1ab2f"
+          "before": "2bded53ab424c76c181b901f1cfabd10a75af69c5f6b2f0c8d6aa3e29cc1ab2f",
+          "after": "42bcd47e103fbf3255b36f13f67b66ac050f29e78916551ad7bb5bd0eb4b5a3f"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "a86402324d7add602736e75d2532e002f7ab36865538732f83939a33e35321b4",
-      "after_sha256": "2efcdde679a60f5e0ba5fdca0cf093a93c637cc068ab43b396e7f85984710a35",
+      "before_sha256": "2efcdde679a60f5e0ba5fdca0cf093a93c637cc068ab43b396e7f85984710a35",
+      "after_sha256": "0e559f0a6d7d7210bddfd213569a8c1ddd0c5ce632005dc943be2774781d1950",
       "owners": {
         "@document": {
-          "before": "a86402324d7add602736e75d2532e002f7ab36865538732f83939a33e35321b4",
-          "after": "2efcdde679a60f5e0ba5fdca0cf093a93c637cc068ab43b396e7f85984710a35"
+          "before": "2efcdde679a60f5e0ba5fdca0cf093a93c637cc068ab43b396e7f85984710a35",
+          "after": "0e559f0a6d7d7210bddfd213569a8c1ddd0c5ce632005dc943be2774781d1950"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "d8e5ba96fa9975ef2e9ab7b04d33c6ea71de9d0df5f7d662dadfb6404ae4678b",
-      "after_sha256": "f4606e26c02a4610ad7aa339517b91bbc3dc3b2aaad338c124fac2c19c4b8a14",
+      "before_sha256": "f4606e26c02a4610ad7aa339517b91bbc3dc3b2aaad338c124fac2c19c4b8a14",
+      "after_sha256": "7f68e33ad95543f4a0cf3381b575f5ae5f05523687aecbf21589b9988f8b2aba",
       "owners": {
         "@document": {
-          "before": "d8e5ba96fa9975ef2e9ab7b04d33c6ea71de9d0df5f7d662dadfb6404ae4678b",
-          "after": "f4606e26c02a4610ad7aa339517b91bbc3dc3b2aaad338c124fac2c19c4b8a14"
+          "before": "f4606e26c02a4610ad7aa339517b91bbc3dc3b2aaad338c124fac2c19c4b8a14",
+          "after": "7f68e33ad95543f4a0cf3381b575f5ae5f05523687aecbf21589b9988f8b2aba"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "55a76d43fe90a1c7a463f920ac46b0f063491836e5f46a4f49841bf9aa3cf09d",
-      "after_sha256": "576eb2dbe0dbbe753d6e83f4363a2ac0e530ccc17a1b0fbab852600b5b7a5834",
+      "before_sha256": "576eb2dbe0dbbe753d6e83f4363a2ac0e530ccc17a1b0fbab852600b5b7a5834",
+      "after_sha256": "3a7d9f00473794a34d0a928fd5c20b7eb94b238929080101084ee548945dddf5",
       "owners": {
         "@document": {
-          "before": "55a76d43fe90a1c7a463f920ac46b0f063491836e5f46a4f49841bf9aa3cf09d",
-          "after": "576eb2dbe0dbbe753d6e83f4363a2ac0e530ccc17a1b0fbab852600b5b7a5834"
+          "before": "576eb2dbe0dbbe753d6e83f4363a2ac0e530ccc17a1b0fbab852600b5b7a5834",
+          "after": "3a7d9f00473794a34d0a928fd5c20b7eb94b238929080101084ee548945dddf5"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "0f10b79ab437ba81ecba13ef01bc935dfb87faf080a386bf9330b0cc6bf20734",
-      "after_sha256": "72cfa2feb9ed1e2f94aea58b11b79a31fa9b5c8f976fd4d147ba350080228bf6",
+      "before_sha256": "72cfa2feb9ed1e2f94aea58b11b79a31fa9b5c8f976fd4d147ba350080228bf6",
+      "after_sha256": "505e5439257205e59cda86bdcad517d3759c6b69fe84c5441156e0dc2436346b",
       "owners": {
         "@document": {
-          "before": "0f10b79ab437ba81ecba13ef01bc935dfb87faf080a386bf9330b0cc6bf20734",
-          "after": "72cfa2feb9ed1e2f94aea58b11b79a31fa9b5c8f976fd4d147ba350080228bf6"
+          "before": "72cfa2feb9ed1e2f94aea58b11b79a31fa9b5c8f976fd4d147ba350080228bf6",
+          "after": "505e5439257205e59cda86bdcad517d3759c6b69fe84c5441156e0dc2436346b"
         }
       }
     },
-    "data/source_audits/ci64_provenance_v1/stage2-ground-charge-test-addition-v1.json": {
+    "data/source_audits/ci64_provenance_v1/stage2-group-ground-charge-test-v1.json": {
       "before_sha256": null,
-      "after_sha256": "0b1591280543a9952a3da9590a64dde5f6d6d5ebe1412ad333edac4234293001",
+      "after_sha256": "7feac07ddcf53deade2c78ec334ec282c84c32e3cd3e8c862ebbec0ef9c87cda",
       "owners": {
         "@document": {
           "before": null,
-          "after": "0b1591280543a9952a3da9590a64dde5f6d6d5ebe1412ad333edac4234293001"
+          "after": "7feac07ddcf53deade2c78ec334ec282c84c32e3cd3e8c862ebbec0ef9c87cda"
         }
       }
     },
     "docs/AI_POLICY_INTERFACE.md": {
-      "before_sha256": "11776bafdf82a081034709b3890c479db3b82a5c272893992d681705634a64a6",
-      "after_sha256": "dca78f16bd0de8af2ea610312bbf683ebac2ec236757fe93a4e6c1577b89606e",
+      "before_sha256": "dca78f16bd0de8af2ea610312bbf683ebac2ec236757fe93a4e6c1577b89606e",
+      "after_sha256": "acfd8e5b2eaccdc03dd0cb2bb749112b431d28b9bcc0c88d4ae6148175f619bd",
       "owners": {
         "@document": {
-          "before": "11776bafdf82a081034709b3890c479db3b82a5c272893992d681705634a64a6",
-          "after": "dca78f16bd0de8af2ea610312bbf683ebac2ec236757fe93a4e6c1577b89606e"
+          "before": "dca78f16bd0de8af2ea610312bbf683ebac2ec236757fe93a4e6c1577b89606e",
+          "after": "acfd8e5b2eaccdc03dd0cb2bb749112b431d28b9bcc0c88d4ae6148175f619bd"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "12a9f7f06e044021cbb37c7edb83756f86dfdd16b3a8b4963a14be79e9b2490e",
-      "after_sha256": "07dfb51eb903bd7c9cc1b9fb73674052c783b88a59eec53df3cba0acae5e88fd",
+      "before_sha256": "07dfb51eb903bd7c9cc1b9fb73674052c783b88a59eec53df3cba0acae5e88fd",
+      "after_sha256": "3640cfa461550d2c693bff3479f79b8b06556e1cc396f127e6c767a60c8e3878",
       "owners": {
         "@document": {
-          "before": "12a9f7f06e044021cbb37c7edb83756f86dfdd16b3a8b4963a14be79e9b2490e",
-          "after": "07dfb51eb903bd7c9cc1b9fb73674052c783b88a59eec53df3cba0acae5e88fd"
-        }
-      }
-    },
-    "scripts/engine_numerical_identity_test_admission.py": {
-      "before_sha256": "1faebdb22e94422e7d69b2ab84a7f93505321021c0f107a5c2a26178a0d52c24",
-      "after_sha256": "b6bfc62055b10be8c9560937de1a837c0904e8262a90ad453aec24e6753b2d1f",
-      "owners": {
-        "@module": {
-          "before": "565dfeead0a1ccc8b175cf5faf83edb7084fb0c51555784cb89e225fdea75dbb",
-          "after": "aa6cb27b10bde9301827674d266ce2f384eb71a070987fd3774b3286493ee517"
-        },
-        "exact_movement_test_transition": {
-          "before": "cf79b603d4afda7d7cd1575ec00895de5bee122bedc51853a8ca2b49f1d4dc1a",
-          "after": "3865367c46effebae533273dfa1651c2095e6665816a021673d3d69bdb50b80d"
+          "before": "07dfb51eb903bd7c9cc1b9fb73674052c783b88a59eec53df3cba0acae5e88fd",
+          "after": "3640cfa461550d2c693bff3479f79b8b06556e1cc396f127e6c767a60c8e3878"
         }
       }
     },
     "scripts/stage2_ground_charge_test_admission.py": {
-      "before_sha256": null,
-      "after_sha256": "5e7824a84397a7027929e0f846e34c8a4a41a4b2e907035417c1a5af1d8ee19d",
+      "before_sha256": "5e7824a84397a7027929e0f846e34c8a4a41a4b2e907035417c1a5af1d8ee19d",
+      "after_sha256": "eb33b3a2520b4485e16b8b4df0f6ffa901f94a88e69d4a2d09a8437727b975b6",
       "owners": {
         "@module": {
-          "before": null,
-          "after": "730af72d3836cc04a2f1d256a92f0129023e427df0b583ae63eb6f3530a7f398"
+          "before": "730af72d3836cc04a2f1d256a92f0129023e427df0b583ae63eb6f3530a7f398",
+          "after": "7068a9db0c0af63e62ad9e4e4f7547f5c3c28cec338a0969869128a9a808a770"
         },
         "ground_charge_test_successor": {
-          "before": null,
-          "after": "8d52328c10f3edc4ed51fa732677e6e18dc3b4255ec10248f822942d99e8a784"
+          "before": "8d52328c10f3edc4ed51fa732677e6e18dc3b4255ec10248f822942d99e8a784",
+          "after": "442ff5a883c3e122c42462bc20fa1efb6dbba7e7b81fa4c88aed217fe7976a9e"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "42a0ea6ff6dd6f744a6fe156313fa8c46f99aa4cf822088c19663318b1c0b13a",
-      "after_sha256": "25df81ea40fdbb5a8344e34b69608174819c68632e0e81d25b368dea0769ab83",
+      "before_sha256": "25df81ea40fdbb5a8344e34b69608174819c68632e0e81d25b368dea0769ab83",
+      "after_sha256": "af8004ef17b668e7a17c83ae528c5c9710745a1581a4900f69eedf964856512d",
       "owners": {
         "@document": {
-          "before": "42a0ea6ff6dd6f744a6fe156313fa8c46f99aa4cf822088c19663318b1c0b13a",
-          "after": "25df81ea40fdbb5a8344e34b69608174819c68632e0e81d25b368dea0769ab83"
+          "before": "25df81ea40fdbb5a8344e34b69608174819c68632e0e81d25b368dea0769ab83",
+          "after": "af8004ef17b668e7a17c83ae528c5c9710745a1581a4900f69eedf964856512d"
         }
       }
     },
     "src/warhammer40k_core/ai/ground_charge_candidates.py": {
-      "before_sha256": null,
-      "after_sha256": "f581c6f6f7bc17b611f8bab05d5dbb1a788e2c49f6a2cec0603c3a8adc6f83f7",
+      "before_sha256": "f581c6f6f7bc17b611f8bab05d5dbb1a788e2c49f6a2cec0603c3a8adc6f83f7",
+      "after_sha256": "e90994f4680b0b9521177b759f02fb8d1303e29c37c0d23a464146bd5ee2967c",
       "owners": {
         "@module": {
-          "before": null,
-          "after": "be6435f84ca66fac209bbc3ca99e2d8e2974e7f5d4f45cc9d393b980fc920485"
-        },
-        "ChargeSearchCounts": {
-          "before": null,
-          "after": "b603c782d743fb73336d591789850c2f565ac4b4ffc5f70feced9aca58e8c70b"
-        },
-        "ChargeSearchStop": {
-          "before": null,
-          "after": "4249e7b24bda23c7ce814e95f02a97d5d1b39c30a00c088e3575716a358a5882"
+          "before": "be6435f84ca66fac209bbc3ca99e2d8e2974e7f5d4f45cc9d393b980fc920485",
+          "after": "cce3e6fb875465e568c346effc289cf03fb05abccfa8d2a27f7a388fb7efa7fb"
         },
         "GroundChargeCandidate": {
-          "before": null,
-          "after": "9b49fe6b745b670d73dae6a622ce175e00fef2a83a8cfbea1ba6890e243a8477"
-        },
-        "GroundChargeCandidate.candidate_id": {
-          "before": null,
-          "after": "d8e50e96c188e650a7ce63623502b55b2379396311361a8fa6e0b8b0f139c0fc"
-        },
-        "GroundChargeCandidates": {
-          "before": null,
-          "after": "d34955a5c77ff1e1125b4ecd594e4d3552605b6ddbfeea04f10eb401f9bffbf0"
-        },
-        "GroundChargeExhaustedError": {
-          "before": null,
-          "after": "d2305117ffa7511e0b44821be9909ffeb87fe7046d8bb54d22649581b472c6a3"
-        },
-        "GroundChargeExhaustedError.__init__": {
-          "before": null,
-          "after": "1ecbc9b23d1b2f70794be0c451b7d8efeec9516f82e46c5f6f2fe9b01022d411"
-        },
-        "_HullGeometry": {
-          "before": null,
-          "after": "2c8e6c5c4c2080f13cf1f83bfba041e1092d0e5a075c69b45db6ec784c0340fe"
-        },
-        "_HullGeometry.convex_hull": {
-          "before": null,
-          "after": "40de689ad57d0a458942319e2875d6191c545eb2856ff35cfbc00770a8e9bc99"
+          "before": "9b49fe6b745b670d73dae6a622ce175e00fef2a83a8cfbea1ba6890e243a8477",
+          "after": "f60c3781ec51ab2863a605d6596c45ad0cdf646fbb05673b111d4931b7f89116"
         },
         "_Path": {
-          "before": null,
-          "after": "1a400f94b8133897f788b123d4634507c412443a4a2ee08deb867fe11579dc0d"
+          "before": "1a400f94b8133897f788b123d4634507c412443a4a2ee08deb867fe11579dc0d",
+          "after": "4747e71250578ce38a008d8aeda9a0dda07af02e5e4cf60efb810b7be5b0b949"
         },
-        "_Placed": {
+        "_candidate": {
           "before": null,
-          "after": "62ab681835099c683fd3fec140e6f0d092c0d28b620909aba273e3ce83951fae"
+          "after": "698a6c58a4332fa5fcd464b4530f457242551c34b0c5060f7b83f0e50c9ca169"
         },
-        "_Work": {
+        "_connected_group": {
           "before": null,
-          "after": "ed8c6163db9dc736d3e64e5a54631bf6cf4c7f33143878ab9987a3de26ea9f36"
+          "after": "2098ad4b0d8d6d41415a34d44a8034af2a34f2a63ab14c202502ce74019cdcd8"
         },
-        "_Work.__init__": {
+        "_five_model_candidates": {
           "before": null,
-          "after": "c4cc6dc682f33b39ea36fa35b6ef0f0e0a2b81a295efc93c8b0a184a8c0fb47a"
-        },
-        "_Work.step": {
-          "before": null,
-          "after": "a61788ebb3067d634b8cc8cd06a521c5bbbc437c60facafee4be5695c2fa2848"
-        },
-        "_at": {
-          "before": null,
-          "after": "e861a3476cb9dce2ccaa3cc0a233c3e52d1ebec544aaee829bea677e3c2d6be2"
-        },
-        "_blocked": {
-          "before": null,
-          "after": "ae96565815126e8e7878972bacfc407e9f11a52936fa4a39da358ccbd69406fd"
-        },
-        "_bounded_int": {
-          "before": null,
-          "after": "8975479477552951508dae0b4520eb5b66e082bef2769257411f05180ad2cd36"
-        },
-        "_feature_bounds": {
-          "before": null,
-          "after": "9f0da1e92fa33825cdba7cb857fc4abaeefd85dba489211c14977297d19831c1"
-        },
-        "_formation_stage": {
-          "before": null,
-          "after": "fb12cd69c1d529461447514daf08dad150994831ed757262deefe8470adc07fd"
+          "after": "c0bd5373c36b44749fc5ddb49152ce56ecf94c847723daac6dfe0548b93558c0"
         },
         "_formations": {
-          "before": null,
-          "after": "5b22b445b038cba6540c6cf16949aebf1bda461b8a20a604453d70845b592493"
+          "before": "5b22b445b038cba6540c6cf16949aebf1bda461b8a20a604453d70845b592493",
+          "after": "e94b4abeb3b2488cff0e4a2390df7e528864be8e22c3fcef66594f0414f635a6"
         },
-        "_identifier": {
+        "_group_endpoints": {
           "before": null,
-          "after": "5b49f1719d3eccc4b23c9ef4086e89e0e1f2a884b6b84aa5270cd973aad8761f"
+          "after": "240d9d88f3c213d0d37e14ca82b6ece8040e57d19c89193cc032a3b07b2d599d"
         },
-        "_interleave": {
+        "_group_formations": {
           "before": null,
-          "after": "5a035955cf595fa9dc6fb6ad0e9e000e0d6e1999dc281c18835c2251df7ea150"
+          "after": "c7d36c03399a04bc02b09af2324de432d8b6a3cce20297537293d6d8c9db47cc"
         },
-        "_items": {
+        "_group_paths": {
           "before": null,
-          "after": "9a1486d9fa8fff61d3eb62086fa782d0b2466eaa829d70941af55fb5bd1d3489"
+          "after": "ae3cc37ff9f586cd5b3c393e624690675fbeb28ef78a173d96576e540750605d"
         },
-        "_near_solid_endpoint": {
+        "_local_blockers": {
           "before": null,
-          "after": "1b830db3b946dd3126abf1c49a8592002a154e824ef10c567db26be3d24a468e"
+          "after": "126d13b29fe3fef6b77bab1e067f4f646d980b8d90e298ac32b82ca4f4c39fe6"
         },
-        "_number": {
+        "_objective_areas": {
           "before": null,
-          "after": "2143eddfc0ab5f1c202214a396e90ea0167e6f01d53611989fec19725ec23799"
-        },
-        "_object": {
-          "before": null,
-          "after": "0dd3bcdc6ef42eed5d2790ab50b481954e3eaf058f45a9e4a8ad2530f20d843c"
+          "after": "d8f1c26fadaa47e0b0df234314780d095de311e7b31cf9a8689219b021bc1d48"
         },
         "_paths": {
-          "before": null,
-          "after": "8771004f34d4c49eb19e92df1b0d89ceea5cb9888513a2bb5abb5706b14faa7b"
+          "before": "8771004f34d4c49eb19e92df1b0d89ceea5cb9888513a2bb5abb5706b14faa7b",
+          "after": "c21d20e4c8b3d1b93823631ecdc76c2295ac52997f16d942134e9ce1ef73add4"
         },
-        "_placed_models": {
+        "_within_board": {
           "before": null,
-          "after": "6b371513aadbca842e5189ea786a96f456461feba465a8a32c9f0c017eb9e2ed"
-        },
-        "_waypoints": {
-          "before": null,
-          "after": "8c9468c674540f387ed778f6fe83b3d20b7843b49ad447e5c87a315d368bfab9"
+          "after": "3569d56ec76cef7fc05b5a0529d4e45ef702f18f9969d7a52dae44db59a22142"
         },
         "generate_ground_charge_candidates": {
-          "before": null,
-          "after": "ba1694e836555b7b9c764d4dad30e903b9dcb6fb91360a57f332659831d9a596"
-        },
-        "ground_charge_route": {
-          "before": null,
-          "after": "2d46186637b9d2db3f3c8acc22c1012848c532848cf9f2ecf88f157c7bd1d031"
+          "before": "ba1694e836555b7b9c764d4dad30e903b9dcb6fb91360a57f332659831d9a596",
+          "after": "7b5499f07a884f8c902db6caa192fe354150235c4ab7d87543ab1c660e52b6c7"
         }
       }
     },
     "src/warhammer40k_core/ai/ground_charge_policy.py": {
-      "before_sha256": null,
-      "after_sha256": "b05be820adf733f7b74d27955fe22e625cd73a186ede3fb1372ecbaaa4d4720a",
+      "before_sha256": "b05be820adf733f7b74d27955fe22e625cd73a186ede3fb1372ecbaaa4d4720a",
+      "after_sha256": "aacc6a6ba17261eed94491d4705669177bcddfddc50306a0a7006f696fa931b9",
       "owners": {
-        "@module": {
-          "before": null,
-          "after": "8d3eeb5e7335f0d5eb69adfbdf342d4c487f638be366cbe1183f218d29a5ddcc"
-        },
-        "ChargeCandidateValidation": {
-          "before": null,
-          "after": "c2ad2442106f00856d50438fc731e34eb207283fb3b42e487df4fbddbb6988a9"
-        },
-        "GroundChargeValidationExhaustedError": {
-          "before": null,
-          "after": "7458af6830a8600657195b0dc61f437444e122e940a7042939ad91db8b715457"
-        },
-        "GroundChargeValidationExhaustedError.__init__": {
-          "before": null,
-          "after": "5786698b81e498f7c2302985ecd0d0c337ddf74d3ca4a8e828c970c64cc25cda"
-        },
         "PreparedGroundCharge": {
-          "before": null,
-          "after": "eeddc9e1ff468790463e9cf161ff261a198e98d985f0b6e7f9cd5d6faa4a0feb"
-        },
-        "_PreparedGroundChargePolicy": {
-          "before": null,
-          "after": "21b39edc14a4a764302a3b56d630bc9b3c7dcae11852481a94c27c8cfac0f490"
-        },
-        "_PreparedGroundChargePolicy.choose": {
-          "before": null,
-          "after": "3b95f78916c12589c8496d0ac71350e98978cc60d8d75438013383202442965a"
-        },
-        "_checkpoint_hash": {
-          "before": null,
-          "after": "b1fc9b63878bf1e8b7963170a60cd2c6cb624d54b834ded5f476a9439b214c4a"
-        },
-        "_probe": {
-          "before": null,
-          "after": "66eda76ca3da0e82b30bda1d8ed0d435b7c291a1c25faab094f913bd8b50caf9"
-        },
-        "_require_limit": {
-          "before": null,
-          "after": "7a6debfa69367571dacdb5852bc53c1af98240bc6382a72b8488a306ff2b65b3"
-        },
-        "_validate_candidate": {
-          "before": null,
-          "after": "44fcd645c3477623c3493b065c11a4a486521155b749b852982920b719be9dde"
+          "before": "eeddc9e1ff468790463e9cf161ff261a198e98d985f0b6e7f9cd5d6faa4a0feb",
+          "after": "acd5b4720fcfe8fb6f951544592a8dfb18c5b0d49dd7a32ae19571ac1e8c2e08"
         },
         "prepare_ground_charge_policy": {
-          "before": null,
-          "after": "3e3946f528ef9289b890ce3d7da19c101442c758d5545f9f4b527b932a8d44ae"
+          "before": "3e3946f528ef9289b890ce3d7da19c101442c758d5545f9f4b527b932a8d44ae",
+          "after": "ba9aaa81f7d64aaa2fb4ba09f495ecda56bfbfa7d4d6d69c5745fde7a551558d"
         }
       }
     },
     "tests/code_quality/test_engine_numerical_identity_admission.py": {
-      "before_sha256": "d6804c6e821cae6fff1ea72a8edb0eb52455e6736f525a7337cc5fb0fd7c27ee",
-      "after_sha256": "e1fb20f0ceb83bd098154f9d89660e712cdff8aeb2bac78b094acfa6c989c8f9",
+      "before_sha256": "e1fb20f0ceb83bd098154f9d89660e712cdff8aeb2bac78b094acfa6c989c8f9",
+      "after_sha256": "841b79c327ec32775bead176be57c39b2558f54455bdffdaeda6e3f855e0de5e",
       "owners": {
-        "@module": {
-          "before": "c7c379be499c781ccd351d6e1f20b252c64811d2a5e0526f4acf674bf91f6cba",
-          "after": "875cc71086df25ce6dcdecd230985b6ea905641d7a240566bc48b3a08b849da3"
-        },
         "test_identity_inventory_uses_current_twelve_shards_and_native_cohort": {
-          "before": "fe87ef83179dc7a4fffabe98355ee117fa62a478c44fe8574aa130265336ecff",
-          "after": "3d01e82c52feb6622e92397e4a73970f37a011221f3a5434723488cd9948d741"
+          "before": "3d01e82c52feb6622e92397e4a73970f37a011221f3a5434723488cd9948d741",
+          "after": "b8fa66da4d27ad4ecfbe0b7816beee853ee1c97c76443212beb20ad5ff3a2e4f"
         }
       }
     },
-    "tests/infrastructure/adapters/test_ground_charge_policy.py": {
+    "tests/infrastructure/adapters/test_group_ground_charge_policy.py": {
       "before_sha256": null,
-      "after_sha256": "52554e0c5024f45141c6026ddd28e7bb75fc5a748048c296bc5c849955cac37c",
+      "after_sha256": "28b91d2a13556c0904a3b12564ca485256725e4588e53ebed0c9c4e6c61617fc",
       "owners": {
         "@module": {
           "before": null,
-          "after": "8090c4a5ff1926368e19476275cde729a10ba6b455a7bc435c73c4f0031b78ce"
+          "after": "96fdf0492bd812d4523f03de3351c638e218797e22ac23bad118968593f77b18"
         },
-        "selected_ground_charge": {
+        "group_charge": {
           "before": null,
-          "after": "712d891246c26c5617f2e155817b92d0ce6df7e70106c8c583d9286d5e7928dd"
+          "after": "10b7fa8045806a26727ebf5ccdacb27abb95787bc5f2a9e3dcf4affeef7d9e1b"
         },
-        "test_ground_charge_generation_is_stable_and_limits_are_typed": {
+        "test_group_charge_commits_a_native_accept": {
           "before": null,
-          "after": "17d2819f19be200dc350b5b1a94a51e83ce0943f4c099db4a46c613d7bea7110"
+          "after": "af2a21d31b42eb6f8ce7cf7b1d6f0340713754068fa8deea25ade902b9384f79"
         },
-        "test_ground_charge_ranks_only_native_accepts_and_checks_binding": {
+        "test_group_charge_generates_distinct_complete_witnesses": {
           "before": null,
-          "after": "b295344c4cd89e05f98db2d7fac3006092696dff6c755b8a11ade45f41eae180"
-        },
-        "test_ground_charge_receipt_deadline_preserves_live_session": {
-          "before": null,
-          "after": "6af6bd48046e820413b9dbcee9dc21af0ba16e7309d64206f9ac46053675a6d9"
+          "after": "f303f994edd3deaf3d446c43224a04b1ce3caffbed25416a7e9891b057c75b40"
         }
       }
     }
@@ -518,7 +378,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Bind the two focused behavior cases, historical admission chain, twelve-shard schedule and exact generated runtime/contract examples to the current code.",
+      "rationale": "Bind the focused five-model behavior, historical test admission, twelve-shard inventory and generated runtime/contract examples to the current code.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -528,7 +388,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Bind the two focused behavior cases, historical admission chain, twelve-shard schedule and exact generated runtime/contract examples to the current code.",
+      "rationale": "Bind the focused five-model behavior, historical test admission, twelve-shard inventory and generated runtime/contract examples to the current code.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -538,7 +398,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Bind the two focused behavior cases, historical admission chain, twelve-shard schedule and exact generated runtime/contract examples to the current code.",
+      "rationale": "Bind the focused five-model behavior, historical test admission, twelve-shard inventory and generated runtime/contract examples to the current code.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -548,7 +408,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Bind the two focused behavior cases, historical admission chain, twelve-shard schedule and exact generated runtime/contract examples to the current code.",
+      "rationale": "Bind the focused five-model behavior, historical test admission, twelve-shard inventory and generated runtime/contract examples to the current code.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -558,17 +418,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Bind the two focused behavior cases, historical admission chain, twelve-shard schedule and exact generated runtime/contract examples to the current code.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "ci/test_shards/shard-2.txt": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Bind the two focused behavior cases, historical admission chain, twelve-shard schedule and exact generated runtime/contract examples to the current code.",
+      "rationale": "Bind the focused five-model behavior, historical test admission, twelve-shard inventory and generated runtime/contract examples to the current code.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -578,7 +428,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Bind the two focused behavior cases, historical admission chain, twelve-shard schedule and exact generated runtime/contract examples to the current code.",
+      "rationale": "Bind the focused five-model behavior, historical test admission, twelve-shard inventory and generated runtime/contract examples to the current code.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -588,7 +438,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Bind the two focused behavior cases, historical admission chain, twelve-shard schedule and exact generated runtime/contract examples to the current code.",
+      "rationale": "Bind the focused five-model behavior, historical test admission, twelve-shard inventory and generated runtime/contract examples to the current code.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -598,7 +448,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Bind the two focused behavior cases, historical admission chain, twelve-shard schedule and exact generated runtime/contract examples to the current code.",
+      "rationale": "Bind the focused five-model behavior, historical test admission, twelve-shard inventory and generated runtime/contract examples to the current code.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -608,7 +458,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Bind the two focused behavior cases, historical admission chain, twelve-shard schedule and exact generated runtime/contract examples to the current code.",
+      "rationale": "Bind the focused five-model behavior, historical test admission, twelve-shard inventory and generated runtime/contract examples to the current code.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -618,7 +468,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Bind the two focused behavior cases, historical admission chain, twelve-shard schedule and exact generated runtime/contract examples to the current code.",
+      "rationale": "Bind the focused five-model behavior, historical test admission, twelve-shard inventory and generated runtime/contract examples to the current code.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -628,7 +478,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Bind the two focused behavior cases, historical admission chain, twelve-shard schedule and exact generated runtime/contract examples to the current code.",
+      "rationale": "Bind the focused five-model behavior, historical test admission, twelve-shard inventory and generated runtime/contract examples to the current code.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -638,7 +488,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Bind the two focused behavior cases, historical admission chain, twelve-shard schedule and exact generated runtime/contract examples to the current code.",
+      "rationale": "Bind the focused five-model behavior, historical test admission, twelve-shard inventory and generated runtime/contract examples to the current code.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -648,7 +498,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bind the two focused behavior cases, historical admission chain, twelve-shard schedule and exact generated runtime/contract examples to the current code.",
+      "rationale": "Bind the focused five-model behavior, historical test admission, twelve-shard inventory and generated runtime/contract examples to the current code.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -658,7 +508,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bind the two focused behavior cases, historical admission chain, twelve-shard schedule and exact generated runtime/contract examples to the current code.",
+      "rationale": "Bind the focused five-model behavior, historical test admission, twelve-shard inventory and generated runtime/contract examples to the current code.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -668,7 +518,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bind the two focused behavior cases, historical admission chain, twelve-shard schedule and exact generated runtime/contract examples to the current code.",
+      "rationale": "Bind the focused five-model behavior, historical test admission, twelve-shard inventory and generated runtime/contract examples to the current code.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -678,7 +528,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bind the two focused behavior cases, historical admission chain, twelve-shard schedule and exact generated runtime/contract examples to the current code.",
+      "rationale": "Bind the focused five-model behavior, historical test admission, twelve-shard inventory and generated runtime/contract examples to the current code.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -688,7 +538,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bind the two focused behavior cases, historical admission chain, twelve-shard schedule and exact generated runtime/contract examples to the current code.",
+      "rationale": "Bind the focused five-model behavior, historical test admission, twelve-shard inventory and generated runtime/contract examples to the current code.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -698,7 +548,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bind the two focused behavior cases, historical admission chain, twelve-shard schedule and exact generated runtime/contract examples to the current code.",
+      "rationale": "Bind the focused five-model behavior, historical test admission, twelve-shard inventory and generated runtime/contract examples to the current code.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -708,7 +558,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bind the two focused behavior cases, historical admission chain, twelve-shard schedule and exact generated runtime/contract examples to the current code.",
+      "rationale": "Bind the focused five-model behavior, historical test admission, twelve-shard inventory and generated runtime/contract examples to the current code.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -718,17 +568,17 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bind the two focused behavior cases, historical admission chain, twelve-shard schedule and exact generated runtime/contract examples to the current code.",
+      "rationale": "Bind the focused five-model behavior, historical test admission, twelve-shard inventory and generated runtime/contract examples to the current code.",
       "source_obligation": null,
       "unchanged_work": null
     },
-    "data/source_audits/ci64_provenance_v1/stage2-ground-charge-test-addition-v1.json": {
+    "data/source_audits/ci64_provenance_v1/stage2-group-ground-charge-test-v1.json": {
       "category": "measured_workload",
       "operations": [
         "engine-numerical-identity-admission"
       ],
       "selected_families": [],
-      "rationale": "Bind the two focused behavior cases, historical admission chain, twelve-shard schedule and exact generated runtime/contract examples to the current code.",
+      "rationale": "Bind the focused five-model behavior, historical test admission, twelve-shard inventory and generated runtime/contract examples to the current code.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -748,28 +598,13 @@
       "source_obligation": null,
       "unchanged_work": null
     },
-    "scripts/engine_numerical_identity_test_admission.py": {
-      "category": "measured_workload",
-      "operations": [
-        "cavalcade-authority-admission",
-        "close-quarters-test-admission",
-        "engine-numerical-identity-admission",
-        "round4-battle-shock-event-wounds",
-        "round4-malice-bearer-liveness",
-        "stage2-strict-replay-test-admission"
-      ],
-      "selected_families": [],
-      "rationale": "Bind the two focused behavior cases, historical admission chain, twelve-shard schedule and exact generated runtime/contract examples to the current code.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
     "scripts/stage2_ground_charge_test_admission.py": {
       "category": "measured_workload",
       "operations": [
         "engine-numerical-identity-admission"
       ],
       "selected_families": [],
-      "rationale": "Bind the two focused behavior cases, historical admission chain, twelve-shard schedule and exact generated runtime/contract examples to the current code.",
+      "rationale": "Bind the focused five-model behavior, historical test admission, twelve-shard inventory and generated runtime/contract examples to the current code.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -779,7 +614,7 @@
         "cavalcade-authority-admission"
       ],
       "selected_families": [],
-      "rationale": "Bind the two focused behavior cases, historical admission chain, twelve-shard schedule and exact generated runtime/contract examples to the current code.",
+      "rationale": "Bind the focused five-model behavior, historical test admission, twelve-shard inventory and generated runtime/contract examples to the current code.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -789,7 +624,7 @@
         "stage2-ground-charge-policy"
       ],
       "selected_families": [],
-      "rationale": "New opt-in actor-side Charge Move search with measured finite work, raw proposal, accepted candidate and fork wall-time limits. Existing engine validation is reused. The base has no registered generator at this route. The shared native reference controls the exact submission path on both runtime identities.",
+      "rationale": "Extend the existing opt-in actor-side Charge Move search to five grounded movers and five models in the already selected unit. Use the issued budget, geometry and native submission authority with the existing work and native time limits. The exact-base B3 route declines this participant count.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -799,7 +634,7 @@
         "stage2-ground-charge-policy"
       ],
       "selected_families": [],
-      "rationale": "New opt-in actor-side Charge Move search with measured finite work, raw proposal, accepted candidate and fork wall-time limits. Existing engine validation is reused. The base has no registered generator at this route. The shared native reference controls the exact submission path on both runtime identities.",
+      "rationale": "Extend the existing opt-in actor-side Charge Move search to five grounded movers and five models in the already selected unit. Use the issued budget, geometry and native submission authority with the existing work and native time limits. The exact-base B3 route declines this participant count.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -811,17 +646,17 @@
         "round4-malice-bearer-liveness"
       ],
       "selected_families": [],
-      "rationale": "Bind the two focused behavior cases, historical admission chain, twelve-shard schedule and exact generated runtime/contract examples to the current code.",
+      "rationale": "Bind the focused five-model behavior, historical test admission, twelve-shard inventory and generated runtime/contract examples to the current code.",
       "source_obligation": null,
       "unchanged_work": null
     },
-    "tests/infrastructure/adapters/test_ground_charge_policy.py": {
+    "tests/infrastructure/adapters/test_group_ground_charge_policy.py": {
       "category": "measured_workload",
       "operations": [
         "stage2-ground-charge-policy"
       ],
       "selected_families": [],
-      "rationale": "Bind the two focused behavior cases, historical admission chain, twelve-shard schedule and exact generated runtime/contract examples to the current code.",
+      "rationale": "Bind the focused five-model behavior, historical test admission, twelve-shard inventory and generated runtime/contract examples to the current code.",
       "source_obligation": null,
       "unchanged_work": null
     }

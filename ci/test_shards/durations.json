@@ -993,6 +993,8 @@
     "tests/infrastructure/adapters/test_ground_charge_policy.py::test_ground_charge_ranks_only_native_accepts_and_checks_binding": 5.803,
     "tests/infrastructure/adapters/test_ground_charge_policy.py::test_ground_charge_receipt_deadline_preserves_live_session[receipt-before-exit]": 7.476,
     "tests/infrastructure/adapters/test_ground_charge_policy.py::test_ground_charge_receipt_deadline_preserves_live_session[unresolved-after-accept]": 22.377,
+    "tests/infrastructure/adapters/test_group_ground_charge_policy.py::test_group_charge_commits_a_native_accept": 2.913,
+    "tests/infrastructure/adapters/test_group_ground_charge_policy.py::test_group_charge_generates_distinct_complete_witnesses": 4.564,
     "tests/infrastructure/adapters/test_matched_attack_scenario.py::test_both_ordinary_attacks_have_matched_timing_cooperation_and_local_outcomes": 417.228,
     "tests/infrastructure/adapters/test_matched_attack_scenario.py::test_matched_report_rejects_same_count_endpoint_drift": 427.663,
     "tests/infrastructure/adapters/test_matched_attack_scenario.py::test_matched_report_rejects_wrong_config_unreached_and_extra_ordinary_decisions": 524.273,
@@ -6683,18 +6685,18 @@
   },
   "execution_model": {
     "assignment_wall_lower_bound_seconds": {
-      "1": 573.207,
-      "10": 573.208,
-      "11": 573.209,
-      "12": 573.207,
+      "1": 573.378,
+      "10": 573.378,
+      "11": 573.378,
+      "12": 573.379,
       "2": 630.312,
-      "3": 573.207,
-      "4": 573.209,
-      "5": 573.209,
-      "6": 573.207,
-      "7": 573.208,
-      "8": 573.209,
-      "9": 573.207
+      "3": 573.378,
+      "4": 573.378,
+      "5": 573.379,
+      "6": 573.378,
+      "7": 573.378,
+      "8": 573.378,
+      "9": 573.379
     },
     "cold_shard_assignment": "minimum-unrounded-modeled-test-load-existing-bucket-v1",
     "cold_shard_id": 1,
@@ -6703,18 +6705,18 @@
       "tests/factions/chaos_daemons/integration/test_cavalcade_v995_roster.py::test_exact_mirror_deploys_all_78_models_and_replays_to_battle"
     ],
     "shard_worker_seconds": {
-      "1": 2292.829,
-      "10": 2292.834,
-      "11": 2292.835,
-      "12": 2292.829,
+      "1": 2293.511,
+      "10": 2293.511,
+      "11": 2293.511,
+      "12": 2293.514,
       "2": 2521.249,
-      "3": 2292.83,
-      "4": 2292.837,
-      "5": 2292.835,
-      "6": 2292.83,
-      "7": 2292.833,
-      "8": 2292.836,
-      "9": 2292.83
+      "3": 2293.512,
+      "4": 2293.513,
+      "5": 2293.514,
+      "6": 2293.512,
+      "7": 2293.512,
+      "8": 2293.511,
+      "9": 2293.514
     }
   },
   "files": {
@@ -6781,6 +6783,7 @@
     "tests/infrastructure/adapters/test_finite_candidates.py": 504.424,
     "tests/infrastructure/adapters/test_followthrough_scenario.py": 280.859,
     "tests/infrastructure/adapters/test_ground_charge_policy.py": 45.297,
+    "tests/infrastructure/adapters/test_group_ground_charge_policy.py": 7.477,
     "tests/infrastructure/adapters/test_matched_attack_scenario.py": 1941.406,
     "tests/infrastructure/adapters/test_normal_move_scenario.py": 450.496,
     "tests/infrastructure/adapters/test_opposing_shooter_scenario.py": 299.601,
@@ -7261,17 +7264,18 @@
       "junit_sha256": [
         "236b2f6d71a87e487e5950c9dfac33c4c5143cfb325ecadb76e99bf886fbf8fb",
         "c1d877a4256e5118d1e1f9f3477dd926de012c2a7e16f59b90c917e4caba4914",
-        "87cfce5ffd364c28da3b96bf7429f28f50bb50c4acd304d00978c8789d888744"
+        "87cfce5ffd364c28da3b96bf7429f28f50bb50c4acd304d00978c8789d888744",
+        "b5e9a9646c8aa13064d4f06cb228a8870a936b9100b201dbb49475510a425f67"
       ],
-      "source": "Complete WSL local covered behavioral profile at cce095a8506d2d415f4f95e11ef3f9c0df63e8a3, approved in 1243.43 seconds, 6678 passed, 68.24% branch-enabled coverage, serial mirror and 32 work-stealing workers; scheduling extension with the two receipt/deadline regressions timed in the revised focused JUnit on the same host",
-      "test_cases": 6680,
-      "test_files": 442
+      "source": "Complete WSL local covered behavioral profile at cce095a8506d2d415f4f95e11ef3f9c0df63e8a3, approved in 1243.43 seconds, 6678 passed, 68.24% branch-enabled coverage, serial mirror and 32 work-stealing workers; scheduling extension with the two receipt/deadline regressions timed in the revised focused JUnit on the same host; provisional planning only with two focused five-versus-five cases from the current source, pending complete branch-enabled JUnit",
+      "test_cases": 6682,
+      "test_files": 443
     }
   ],
   "shard_count": 12,
   "shards": [
     {
-      "duration_seconds": 2292.829,
+      "duration_seconds": 2293.511,
       "shard_id": 1,
       "test_file_count": 132
     },
@@ -7281,54 +7285,54 @@
       "test_file_count": 1
     },
     {
-      "duration_seconds": 2292.83,
+      "duration_seconds": 2293.512,
       "shard_id": 3,
-      "test_file_count": 21
+      "test_file_count": 19
     },
     {
-      "duration_seconds": 1788.804,
+      "duration_seconds": 1789.48,
       "shard_id": 4,
       "test_file_count": 38
     },
     {
-      "duration_seconds": 2292.835,
+      "duration_seconds": 2293.514,
       "shard_id": 5,
       "test_file_count": 64
     },
     {
-      "duration_seconds": 2292.83,
+      "duration_seconds": 2293.512,
       "shard_id": 6,
-      "test_file_count": 38
+      "test_file_count": 39
     },
     {
-      "duration_seconds": 2292.833,
+      "duration_seconds": 2293.512,
       "shard_id": 7,
-      "test_file_count": 38
+      "test_file_count": 40
     },
     {
-      "duration_seconds": 2292.836,
+      "duration_seconds": 2293.511,
       "shard_id": 8,
       "test_file_count": 38
     },
     {
-      "duration_seconds": 2292.83,
+      "duration_seconds": 2293.514,
       "shard_id": 9,
-      "test_file_count": 40
-    },
-    {
-      "duration_seconds": 2292.834,
-      "shard_id": 10,
       "test_file_count": 38
     },
     {
-      "duration_seconds": 2292.835,
-      "shard_id": 11,
-      "test_file_count": 45
+      "duration_seconds": 2293.511,
+      "shard_id": 10,
+      "test_file_count": 40
     },
     {
-      "duration_seconds": 2292.829,
+      "duration_seconds": 2293.511,
+      "shard_id": 11,
+      "test_file_count": 47
+    },
+    {
+      "duration_seconds": 2293.514,
       "shard_id": 12,
-      "test_file_count": 40
+      "test_file_count": 38
     }
   ],
   "step5g_partitions": {
@@ -7336,5 +7340,5 @@
     "sha256": "b241b31651a8d5d903a2b851583186c276a5ac32fed26de1a1c69b4aa278b711"
   },
   "strategy": "largest-processing-time-by-derived-selector-weight",
-  "total_test_duration_seconds": 27238.374
+  "total_test_duration_seconds": 27245.851
 }
