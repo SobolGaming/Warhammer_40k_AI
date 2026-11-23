@@ -1,8 +1,8 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:5d14c2d7a9c5d80aeb24292daf45c184a16ea93363437f30653efc13865e9917",
-  "fingerprint": "5d14c2d7a9c5d80aeb24292daf45c184a16ea93363437f30653efc13865e9917",
-  "resource_count": 3283,
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:bc2ce5165f872793b204fa9669e61fd19d8daef543242132616dab424b9b2986",
+  "fingerprint": "bc2ce5165f872793b204fa9669e61fd19d8daef543242132616dab424b9b2986",
+  "resource_count": 3284,
   "resources": [
     {
       "byte_length": 113,
@@ -1320,9 +1320,9 @@
       "sha256": "dcc13a88581c80f1c24165ae380461185840173d26700faad3ebc3f2fa1967a6"
     },
     {
-      "byte_length": 21620,
+      "byte_length": 22863,
       "path": "warhammer40k_core/engine/battle_shock_historical_authority.py",
-      "sha256": "c2430a21e3dbc3a735c8e917c415b9c244eee29db27f180f1e5662911ebf84c2"
+      "sha256": "d33d5a29f29b470ceefe993e40d1433757fa97098ba0d05676b1eb547c3389f1"
     },
     {
       "byte_length": 37583,
@@ -4640,14 +4640,19 @@
       "sha256": "7b86867238e107650cfa8606cdbbd17df8037f98856a45f850ff6839b441b9f3"
     },
     {
-      "byte_length": 68323,
+      "byte_length": 75134,
       "path": "warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/army_rule.py",
-      "sha256": "762e898b60d7740855120a0cd9bb0f73cde6bf3319816623ec7e25cc0b18bf01"
+      "sha256": "2adb65d7afbe38c7d8b31bdfdc4c01e4233870b04fcdd1065371a3d6246c8684"
     },
     {
       "byte_length": 55363,
       "path": "warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/battle_shock_outcome_authority.py",
       "sha256": "15e25a9bc3587826c6a4be6928cb33ddcfa4a32460273aa7a7ae8ce9cccd76ba"
+    },
+    {
+      "byte_length": 8762,
+      "path": "warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/battle_shock_territory_authority.py",
+      "sha256": "4f110d54ff14ce4e2976ef551764f67a45ace8f2e74c51101d4cf41eca7a9886"
     },
     {
       "byte_length": 56022,
@@ -10585,9 +10590,9 @@
       "sha256": "26b042a4b0b3ef03ee0c99b51736ab364e8c0eeccc12cdc96e2c27896a7c77ad"
     },
     {
-      "byte_length": 22044,
+      "byte_length": 22268,
       "path": "warhammer40k_core/engine/generic_effect_history.py",
-      "sha256": "1daec6732346229e3775a512092f5feec11a2b8e0837d2ec4132f41db7b173cb"
+      "sha256": "5d8b7ba65b2e48f0003e0976624a32a5971f51429b92b20ac2e78581d1e00093"
     },
     {
       "byte_length": 35671,

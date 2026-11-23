@@ -79,15 +79,11 @@ class _HistoricalDurationContext:
     active_player_id: str | None
 
 
-def historical_generic_effect_inventory(
-    *,
-    historical: HistoricalEffectAuthority,
-    runtime_content_bundle: RuntimeContentBundle,
+def historical_generic_effect_may_match(
+    events: tuple[EventRecord, ...],
     matches_payload: Callable[[dict[str, JsonValue]], bool],
-) -> tuple[PersistingEffect, ...]:
-    """Never consult the restored state's current effect inventory."""
-    prior_events = historical.event_records[: historical.boundary_event_index]
-    if not any(
+) -> bool:
+    return any(
         isinstance(event.payload, dict)
         and (
             (event.event_type == "rule_execution_effect_applied" and matches_payload(event.payload))
@@ -96,8 +92,19 @@ def historical_generic_effect_inventory(
                 for effect in _installed_effects(event.event_type, event.payload)
             )
         )
-        for event in prior_events
-    ):
+        for event in events
+    )
+
+
+def historical_generic_effect_inventory(
+    *,
+    historical: HistoricalEffectAuthority,
+    runtime_content_bundle: RuntimeContentBundle,
+    matches_payload: Callable[[dict[str, JsonValue]], bool],
+) -> tuple[PersistingEffect, ...]:
+    """Never consult the restored state's current effect inventory."""
+    prior_events = historical.event_records[: historical.boundary_event_index]
+    if not historical_generic_effect_may_match(prior_events, matches_payload):
         return ()
     authority = RuntimeRuleIRAuthorityIndex.from_runtime_sources(
         ability_indexes_by_player_id=runtime_content_bundle.ability_indexes_by_player_id,

@@ -4,6 +4,7 @@ from dataclasses import dataclass, replace
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.core.attributes import Characteristic
+from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.engine.ability_presence import (
     AbilityPresence,
     AbilitySpatialRelationship,
@@ -36,6 +37,7 @@ from warhammer40k_core.engine.rules_units import (
 from warhammer40k_core.engine.starting_attached_units import StartingAttachedUnitRecord
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.engine.unit_state import BelowHalfStrengthContext, StartingStrengthRecord
+from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
 from warhammer40k_core.geometry.volume import Model as GeometryModel
 
 if TYPE_CHECKING:
@@ -61,6 +63,9 @@ class HistoricalBattleShockAuthorityContext:
     mission_setup: MissionSetup
     battlefield_width_inches: float
     battlefield_depth_inches: float
+    terrain_features: tuple[TerrainFeatureDefinition, ...]
+    ruleset_descriptor: RulesetDescriptor
+    later_destroyed_model_ids: frozenset[str]
     starting_strength_records: tuple[StartingStrengthRecord, ...]
     starting_attached_unit_records: tuple[StartingAttachedUnitRecord, ...]
     physical_models: tuple[PhysicalModelAuthority, ...]
@@ -261,14 +266,23 @@ class HistoricalBattleShockAuthorityContext:
             single_model_wounds_remaining=single_model_wounds_remaining,
         )
 
-    def geometry_models(self, unit_instance_id: str) -> tuple[GeometryModel, ...]:
+    def geometry_models(
+        self, unit_instance_id: str, *, include_retained: bool = False
+    ) -> tuple[GeometryModel, ...]:
+        retained_ids = (
+            self.rules_unit(unit_instance_id).retained_model_ids if include_retained else ()
+        )
         rows = {
             row.model_instance_id: row
             for row in self.physical_models
             if row.presence == "battlefield"
+            or (row.presence == "retained_destroyed" and row.model_instance_id in retained_ids)
         }
+        placed_ids = self.placed_alive_model_ids(unit_instance_id)
+        if retained_ids:
+            placed_ids = tuple(sorted(set(placed_ids).union(set(rows).intersection(retained_ids))))
         geometries: list[GeometryModel] = []
-        for model_id in self.placed_alive_model_ids(unit_instance_id):
+        for model_id in placed_ids:
             row = rows.get(model_id)
             if row is None or row.pose is None:
                 raise GameLifecycleError(
@@ -440,6 +454,18 @@ def historical_battle_shock_authority_context(
             physical_models=physical,
         ),
         mission_setup=state.mission_setup,
+        terrain_features=state.battlefield_state.terrain_features,
+        ruleset_descriptor=state.runtime_ruleset_descriptor(),
+        later_destroyed_model_ids=(
+            frozenset(row.model_instance_id for row in physical if row.wounds_remaining > 0)
+            & frozenset(
+                model.model_instance_id
+                for army in state.army_definitions
+                for unit in army.units
+                for model in unit.own_models
+                if not model.is_alive
+            )
+        ),
         battlefield_width_inches=state.battlefield_state.battlefield_width_inches,
         battlefield_depth_inches=state.battlefield_state.battlefield_depth_inches,
         starting_strength_records=tuple(state.starting_strength_records),

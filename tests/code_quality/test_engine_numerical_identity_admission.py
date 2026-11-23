@@ -296,9 +296,15 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
     assert round4["retained_runtime_fingerprint"] == round4_base["fingerprint"]
     assert _record(MANIFEST)["fingerprint"] == round4["runtime_fingerprint"]
     for source in selection.ROUND4_BATTLE_SHOCK_SOURCES:
-        base_source = subprocess.check_output(
-            ["git", "show", selection.ROUND4_BATTLE_SHOCK_BASE + ":" + source], cwd=ROOT
-        )
+        if source == selection.ROUND4_BATTLE_SHOCK_TERRITORY_SOURCE:
+            assert not subprocess.check_output(
+                ["git", "ls-tree", selection.ROUND4_BATTLE_SHOCK_BASE, "--", source], cwd=ROOT
+            )
+            base_source = b""
+        else:
+            base_source = subprocess.check_output(
+                ["git", "show", selection.ROUND4_BATTLE_SHOCK_BASE + ":" + source], cwd=ROOT
+            )
         assert round4["source"][source]["before"] == hashlib.sha256(base_source).hexdigest()
         assert (
             round4["source"][source]["after"]
@@ -414,10 +420,13 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
             ["git", "show", selection.ROUND_FIVE_SHADOW_BASE + ":" + name], cwd=ROOT
         )
         assert shadow["sources"][name]["before"] == hashlib.sha256(source_before).hexdigest()
-        assert (
-            shadow["sources"][name]["after"]
-            == hashlib.sha256((ROOT / name).read_bytes()).hexdigest()
-        )
+        if name in round4["source"]:
+            assert shadow["sources"][name]["after"] == round4["source"][name]["before"]
+        else:
+            assert (
+                shadow["sources"][name]["after"]
+                == hashlib.sha256((ROOT / name).read_bytes()).hexdigest()
+            )
     for name, digest in selection.CAVALCADE_AUTHORITY_SOURCES.items():
         assert hashlib.sha256((ROOT / name).read_bytes()).hexdigest() == digest
     for terminal_owner in selection.TERMINAL_RESTORE_OWNERS:

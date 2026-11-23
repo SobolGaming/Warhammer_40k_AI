@@ -68,6 +68,7 @@ A Stratagem is usable when it appears as `use_stratagem` at the right window wit
 | ID | Priority | Finding | Owner |
 |---|---|---|---|
 | F-ARMY-01 | 1 | Acts of Faith previously gained automatically at battle-round start. The bounded repair routes automatic gains through shared turn-start timing with distinct player/round identities; Triumph round selection remains separate; destruction-only eligibility now reads retained canonical physical-model keywords while living/spend eligibility remains unchanged. Exact-head qualification pending; this does not close FM0 or full-faction certification. | [Bounded timing maintenance](https://github.com/SobolGaming/Warhammer_40k_AI/blob/9fba7dc56d9093d76bdc65019859f8904a888c53/docs/ACTS_OF_FAITH_TIMING_2026_10.md); FM0 debt item 9 |
+| F-DAEMON-01 | 1 | Historical Battle-shock can miss Shadow of Chaos from territorial control. Reconstruct Objective Control at the test from persisted movement, casualties, phase-start Battle-shock, characteristic effects, and sticky control. Validate both modifier application and pending outcomes against those facts, including after ownership changes. | FM1-a |
 | F-ORK-01 | 1 | Orks v946 roster, DP, and inventory drift. Retired scaffold directories remain | FM0.5, then U5–U6 |
 | F-DATA-01 | 1 | Current costs and attachments differ from older records (Eldrad, Bloodcrushers, Exorcist) | S3a, FM1, FM3 |
 | F-EVID-01 | 1 | Status, source, execution, and component labels use different denominators | Q1 schema delivered. Live artifact is FM0 |

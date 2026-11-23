@@ -342,6 +342,123 @@ def test_batch04_command_start_bravery_validates_owner_phase_target_before_spend
 
 
 @pytest.mark.parametrize(
+    ("opposing_control", "omit_terror"),
+    [(False, False), (True, False), (True, True)],
+)
+def test_later_daemon_casualty_still_requires_historical_territorial_terror(
+    faction_definitions: Section02Definitions,
+    monkeypatch: pytest.MonkeyPatch,
+    opposing_control: bool,
+    omit_terror: bool,
+) -> None:
+    from tests.phase11c_command_phase_helpers import destroy_models_with_recorded_mortal_wounds
+    from tests.support.battle_shock_batch04 import decline_bravery
+    from warhammer40k_core.engine.destruction_provenance import DestructionSourceKind
+    from warhammer40k_core.engine.direct_mortal_wound_application import (
+        apply_direct_mortal_wounds_to_unit,
+    )
+    from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons import (
+        army_rule,
+    )
+    from warhammer40k_core.engine.lifecycle import GameLifecycle
+    from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
+        MortalWoundDestructionEvidence,
+    )
+    from warhammer40k_core.engine.phase import GameLifecycleError
+
+    d = faction_definitions
+    s = scene(
+        d,
+        (selection(d, CRUSHERS, "subject"),),
+        (selection(d, CRUSHERS, "controller"),),
+        phase=BattlePhase.COMMAND,
+        seed="b04-2",
+        rng_seed_label="b04-2:territory:private-2",
+    )
+    mission = s.state.mission_setup
+    assert mission is not None
+    (zone,) = (zone for zone in mission.deployment_zones if zone.player_id == "owner")
+    (marker,) = (
+        marker
+        for marker in mission.objective_markers
+        if zone.contains_point(marker.x_inches, marker.y_inches)
+    )
+    subject = s.units["own:subject"]
+    locate(
+        s,
+        subject.unit_instance_id,
+        tuple(Pose.at(marker.x_inches, marker.y_inches + 7 + 2.5 * index) for index in range(3)),
+    )
+    if opposing_control:
+        locate(
+            s,
+            "foe:controller",
+            tuple(
+                Pose.at(marker.x_inches, marker.y_inches + 2.5 * index - 2.5) for index in range(3)
+            ),
+        )
+    assert (
+        army_rule.unit_within_shadow_of_chaos(
+            state=s.state, player_id="opponent", unit_instance_id=subject.unit_instance_id
+        )
+        is opposing_control
+    )
+    anchor(s)
+    decisions = s.session.lifecycle.decision_controller
+    destroy_models_with_recorded_mortal_wounds(
+        state=s.state,
+        decisions=decisions,
+        unit_instance_id=subject.unit_instance_id,
+        model_instance_ids=subject.own_model_ids()[1:],
+        application_id="fixture:territorial-terror-prior-casualties",
+        destroying_player_id="opponent",
+    )
+    with monkeypatch.context() as patch:
+        if omit_terror:
+            # Generate every linked result and trigger identity through the native
+            # path so restore reaches the independent historical comparison.
+            def without_terror(**_kwargs: object) -> bool:
+                return False
+
+            patch.setattr(army_rule, "_daemonic_terror_applies", without_terror)
+        status = decline_bravery(s)
+    request(status, "select_movement_unit")
+    (event,) = events(s.session, "battle_shock_test_resolved")
+    result = cast(dict[str, JsonValue], event["battle_shock_result"])
+    assert result["passed"] is True
+    roll = cast(dict[str, JsonValue], result["modified_roll"])
+    modifiers = cast(list[dict[str, JsonValue]], roll["modifiers"])
+    assert [row["operand"] for row in modifiers] == (
+        [1, -1] if opposing_control and not omit_terror else [1]
+    )
+    casualties = apply_direct_mortal_wounds_to_unit(
+        state=s.state,
+        decisions=decisions,
+        application_id="fixture:territorial-terror-later-casualty",
+        source_rule_id="fixture:territorial-terror-later-casualty:source",
+        source_context={"source_kind": "fixture_preexisting_casualties"},
+        destruction_evidence=MortalWoundDestructionEvidence.for_non_attack_state(
+            state=s.state,
+            destroying_player_id="opponent",
+            source_rules_unit_instance_id="foe:controller",
+            source_model_instance_id=None,
+            destruction_source_kind=DestructionSourceKind.ABILITY,
+            action_phase=BattlePhase.MOVEMENT,
+            source_step="fixture_preexisting_casualties",
+        ),
+        target_unit_instance_id=subject.unit_instance_id,
+        mortal_wounds=subject.own_models[0].current_wounds,
+    )
+    assert casualties.applications[-1].destroyed
+    payload = s.session.lifecycle.to_payload()
+    if omit_terror:
+        with pytest.raises(GameLifecycleError, match="incomplete or context-invalid"):
+            GameLifecycle.from_payload(payload)
+    else:
+        assert GameLifecycle.from_payload(payload).to_payload() == payload
+
+
+@pytest.mark.parametrize(
     ("territory", "premise", "expected_shadow"),
     [
         ("no_mans_land", "one_of_three", False),

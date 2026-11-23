@@ -314,12 +314,19 @@ MONSTER_MASH_ATTACK_REROLL_SOURCES = (
 ROUND4_BATTLE_SHOCK_TRANSITION = (
     "data/source_audits/ci64_provenance_v1/monster-mash-round4-battle-shock-test-transition-v1.json"
 )
-ROUND4_BATTLE_SHOCK_SHA256 = "9a57f0a0f5c2fb8fe4943aac6b3bc95a2ca21ab28a7e78186f9870b210809f18"
+ROUND4_BATTLE_SHOCK_SHA256 = "88eca67f3513357bad3f35bb68fe8d3607e374f360485dd4c3ca3c06b0a7eaf3"
 ROUND4_BATTLE_SHOCK_BASE = "1629879b409fbbd29addf062abd30359ca923986"
 ROUND4_BATTLE_SHOCK_OWNER = "tests/factions/chaos_daemons/unit/test_chaos_daemons_army_rule.py"
+ROUND4_BATTLE_SHOCK_TERRITORY_SOURCE = (
+    "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/"
+    "chaos_daemons/battle_shock_territory_authority.py"
+)
 ROUND4_BATTLE_SHOCK_SOURCES = (
     "src/warhammer40k_core/engine/battle_shock_historical_authority.py",
     "src/warhammer40k_core/engine/catalog_unit_move_completed_battle_shock_runtime.py",
+    ROUND_FIVE_SHADOW_SOURCES[0],
+    "src/warhammer40k_core/engine/generic_effect_history.py",
+    ROUND4_BATTLE_SHOCK_TERRITORY_SOURCE,
 )
 
 
@@ -842,6 +849,15 @@ def exact_movement_test_transition(
         if attack_reroll_order_path.exists()
         else None
     )
+    round4_path = root / ROUND4_BATTLE_SHOCK_TRANSITION
+    _selection_no_links(root, round4_path)
+    round4 = None
+    if round4_path.exists():
+        if attack_reroll_order is None:
+            raise SystemExit("Round 4 Battle-shock tests require the attack reroll predecessor.")
+        round4 = _round4_battle_shock_successor(
+            root, retained_cutover_sha256, attack_reroll_order[1]
+        )
     fight_reroll = (
         _stage2_fight_reroll_successor(
             root, current_sources={} if attack_reroll_order is None else attack_reroll_order[2]
@@ -891,7 +907,11 @@ def exact_movement_test_transition(
     if shadow_path.exists():
         if runtime != CAVALCADE_AUTHORITY_RUNTIME:
             raise SystemExit("Round-five Shadow tests require the Cavalcade authority predecessor.")
-        shadow = _round_five_shadow_successor(root, retained_cutover_sha256=retained_cutover_sha256)
+        shadow = _round_five_shadow_successor(
+            root,
+            retained_cutover_sha256=retained_cutover_sha256,
+            current_sources={} if round4 is None else round4[1],
+        )
         runtime = shadow[0]
     shooting_visibility_path = root / SHOOTING_VISIBILITY_TRANSITION
     _selection_no_links(root, shooting_visibility_path)
@@ -1041,15 +1061,8 @@ def exact_movement_test_transition(
         if shooting_visibility is None or attack_reroll_order[0] != runtime:
             raise SystemExit("Monster Mash attack reroll requires the exact Shooting predecessor.")
         runtime = attack_reroll_order[1]
-    round4_path = root / ROUND4_BATTLE_SHOCK_TRANSITION
-    _selection_no_links(root, round4_path)
-    round4_battle_shock = None
-    if round4_path.exists():
-        if attack_reroll_order is None:
-            raise SystemExit("Round 4 Battle-shock tests require the attack reroll predecessor.")
-        runtime, round4_battle_shock, round4_raw = _round4_battle_shock_successor(
-            root, retained_cutover_sha256, runtime
-        )
+    if round4 is not None:
+        runtime = round4[0]
     retained = _identity_test_transition(
         root,
         retained_cutover_sha256,
@@ -1133,7 +1146,8 @@ def exact_movement_test_transition(
     if attack_reroll_order is not None:
         updated.update(attack_reroll_order[3])
         raw += b"\0" + attack_reroll_order[4]
-    if round4_battle_shock is not None:
+    if round4 is not None:
+        _, _, round4_battle_shock, round4_raw = round4
         if round4_battle_shock.keys() & (updated.keys() | added.keys() | additions.keys()):
             raise SystemExit("Round 4 Battle-shock tests overlap the predecessor selection.")
         updated.update(round4_battle_shock)
@@ -1143,7 +1157,7 @@ def exact_movement_test_transition(
 
 def _round4_battle_shock_successor(
     root: Path, retained_cutover_sha256: str, retained_runtime: str
-) -> tuple[str, TestSuccessors, bytes]:
+) -> tuple[str, SourceSuccessors, TestSuccessors, bytes]:
     from scripts.build_test_shards import CUTOVER_PATH
 
     raw = _checked_bytes(root, ROUND4_BATTLE_SHOCK_TRANSITION, ROUND4_BATTLE_SHOCK_SHA256)
@@ -1183,6 +1197,7 @@ def _round4_battle_shock_successor(
         _checked_bytes(root, name, source["after"])
     return (
         record["runtime_fingerprint"],
+        record["source"],
         _selection_members({ROUND4_BATTLE_SHOCK_OWNER: change["after"]}, root),
         raw,
     )
@@ -1340,7 +1355,7 @@ def _opening_shadow_form_test_successor(
 
 
 def _round_five_shadow_successor(
-    root: Path, *, retained_cutover_sha256: str
+    root: Path, *, retained_cutover_sha256: str, current_sources: SourceSuccessors
 ) -> tuple[str, TestSuccessors, bytes]:
     raw = _checked_bytes(root, ROUND_FIVE_SHADOW_TRANSITION, ROUND_FIVE_SHADOW_SHA256)
     record = json.loads(raw, object_pairs_hook=_selection_object)
@@ -1366,7 +1381,12 @@ def _round_five_shadow_successor(
             raise SystemExit(
                 "Round-five Shadow source transition requires exact before and after hashes."
             )
-        _checked_bytes(root, name, change["after"])
+        if name in current_sources:
+            if current_sources[name]["before"] != change["after"]:
+                raise SystemExit("Round-five Shadow source successor differs.")
+            # The current transition checks these successor bytes.
+        else:
+            _checked_bytes(root, name, change["after"])
     from scripts.build_test_shards import CUTOVER_PATH
 
     cutover = json.loads(
