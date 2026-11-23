@@ -549,6 +549,15 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
             "test_allocation_requires_defender_visible_formation",
         )
     }
+    round4_cases = {
+        round4_owner + "::" + name
+        for name in (
+            "test_manifestation_history_survives_the_tested_units_later_destruction",
+            "test_later_daemon_casualty_still_requires_historical_territorial_terror[False-False]",
+            "test_later_daemon_casualty_still_requires_historical_territorial_terror[True-False]",
+            "test_later_daemon_casualty_still_requires_historical_territorial_terror[True-True]",
+        )
+    }
     assert current.keys() == (
         retained
         | added
@@ -566,6 +575,7 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         | shadow_cases
         | close_quarters_cases
         | allocation_cases
+        | round4_cases
         | {
             owner + "::" + test + f"[{reroll}]"
             for owner, test in (
