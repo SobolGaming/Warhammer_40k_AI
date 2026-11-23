@@ -345,6 +345,19 @@ ROUND4_MALICE_BEARER_OWNER = (
 )
 
 
+ROUND3_SHALAXI_TRANSITION = (
+    "data/source_audits/ci64_provenance_v1/monster-mash-round3-shalaxi-test-transition-v1.json"
+)
+ROUND3_SHALAXI_SHA256 = "a9e2413b2d06ece74221a364cbcaa17525e7995100b725517f31902c7a1edf43"
+ROUND3_SHALAXI_BASE = "1e5d53a3a8a09eac3752073ed0fd7d3247789248"
+ROUND3_SHALAXI_SOURCES = (
+    "src/warhammer40k_core/geometry/continuous_visibility.py",
+    "src/warhammer40k_core/geometry/visibility_axis_shadow.py",
+    "src/warhammer40k_core/geometry/visibility_certificates.py",
+    "src/warhammer40k_core/geometry/visibility_witnesses.py",
+)
+
+
 type SourceSuccessors = dict[str, dict[str, str]]
 type TestSuccessors = dict[str, dict[str, object]]
 
@@ -928,10 +941,19 @@ def exact_movement_test_transition(
             current_sources={} if round4 is None else round4[1],
         )
         runtime = shadow[0]
+    shalaxi_path = root / ROUND3_SHALAXI_TRANSITION
+    _selection_no_links(root, shalaxi_path)
+    shalaxi = _round3_shalaxi_successor(root) if shalaxi_path.exists() else None
     shooting_visibility_path = root / SHOOTING_VISIBILITY_TRANSITION
     _selection_no_links(root, shooting_visibility_path)
     shooting_visibility = (
-        _shooting_visibility_successor(root) if shooting_visibility_path.exists() else None
+        _shooting_visibility_successor(
+            root,
+            current_sources={} if shalaxi is None else shalaxi[2],
+            current_tests=None if shalaxi is None else shalaxi[3],
+        )
+        if shooting_visibility_path.exists()
+        else None
     )
     close_quarters_path = root / CLOSE_QUARTERS_TRANSITION
     _selection_no_links(root, close_quarters_path)
@@ -943,8 +965,15 @@ def exact_movement_test_transition(
             root,
             retained_cutover_sha256=retained_cutover_sha256,
             predecessor_runtime=runtime,
-            current_sources={} if shooting_visibility is None else shooting_visibility[2],
-            current_tests=None if shooting_visibility is None else shooting_visibility[3],
+            current_sources={
+                **({} if shalaxi is None else shalaxi[2]),
+                **({} if shooting_visibility is None else shooting_visibility[2]),
+            },
+            current_tests=(
+                shalaxi[3]
+                if shalaxi is not None
+                else (None if shooting_visibility is None else shooting_visibility[3])
+            ),
         )
         runtime = close_quarters[0]
     strict_replay_path = root / STRICT_REPLAY_TRANSITION
@@ -1086,6 +1115,10 @@ def exact_movement_test_transition(
             raise SystemExit("Round 4 Malice bearer tests require the Battle-shock predecessor.")
         malice = _round4_malice_bearer_successor(root, retained_cutover_sha256, runtime)
         runtime = malice[0]
+    if shalaxi is not None:
+        if malice is None or shooting_visibility is None or shalaxi[0] != runtime:
+            raise SystemExit("Round 3 Shalaxi tests require the exact Malice bearer predecessor.")
+        runtime = shalaxi[1]
     retained = _identity_test_transition(
         root,
         retained_cutover_sha256,
@@ -1181,6 +1214,9 @@ def exact_movement_test_transition(
             raise SystemExit("Round 4 Malice bearer tests overlap the predecessor selection.")
         updated.update(malice_bearer)
         raw += b"\0" + malice_raw
+    if shalaxi is not None:
+        updated.update(shalaxi[3])
+        raw += b"\0" + shalaxi[4]
     return updated, {**added, **additions}, retained_raw + b"\0" + raw
 
 
@@ -1323,8 +1359,52 @@ def _monster_mash_attack_reroll_successor(
     )
 
 
-def _shooting_visibility_successor(
+def _round3_shalaxi_successor(
     root: Path,
+) -> tuple[str, str, SourceSuccessors, TestSuccessors, bytes]:
+    raw = _checked_bytes(root, ROUND3_SHALAXI_TRANSITION, ROUND3_SHALAXI_SHA256)
+    record = json.loads(raw, object_pairs_hook=_selection_object)
+    if (
+        record.keys()
+        != {
+            "schema",
+            "base",
+            "retained_round4_malice_bearer_sha256",
+            "retained_shooting_visibility_sha256",
+            "retained_runtime_fingerprint",
+            "runtime_fingerprint",
+            "sources",
+            "test",
+        }
+        or record["schema"] != "finite-monster-mash-round3-shalaxi-test-transition-v1"
+        or record["base"] != ROUND3_SHALAXI_BASE
+        or record["retained_round4_malice_bearer_sha256"] != ROUND4_MALICE_BEARER_SHA256
+        or record["retained_shooting_visibility_sha256"] != SHOOTING_VISIBILITY_SHA256
+        or set(record["sources"]) != set(ROUND3_SHALAXI_SOURCES)
+        or set(record["test"]) != {"before", "after"}
+    ):
+        raise SystemExit("Round 3 Shalaxi test transition differs.")
+    previous = json.loads(
+        _checked_bytes(root, SHOOTING_VISIBILITY_TRANSITION, SHOOTING_VISIBILITY_SHA256),
+        object_pairs_hook=_selection_object,
+    )
+    if record["test"]["before"] != previous["test"]["after"]:
+        raise SystemExit("Round 3 Shalaxi test predecessor differs.")
+    for name, change in record["sources"].items():
+        if set(change) != {"before", "after"}:
+            raise SystemExit("Round 3 Shalaxi sources require exact before and after digests.")
+        _checked_bytes(root, name, change["after"])
+    return (
+        record["retained_runtime_fingerprint"],
+        record["runtime_fingerprint"],
+        record["sources"],
+        _selection_members({CLOSE_QUARTERS_OWNER: record["test"]["after"]}, root),
+        raw,
+    )
+
+
+def _shooting_visibility_successor(
+    root: Path, *, current_sources: SourceSuccessors, current_tests: TestSuccessors | None
 ) -> tuple[str, str, SourceSuccessors, TestSuccessors, bytes]:
     raw = _checked_bytes(root, SHOOTING_VISIBILITY_TRANSITION, SHOOTING_VISIBILITY_SHA256)
     record = json.loads(raw, object_pairs_hook=_selection_object)
@@ -1354,8 +1434,10 @@ def _shooting_visibility_successor(
     )
     if record["test"]["before"] != previous["test"][CLOSE_QUARTERS_OWNER]["after"]:
         raise SystemExit("Monster Mash Shooting visibility test predecessor differs.")
-    _checked_bytes(root, SHOOTING_VISIBILITY_SOURCE, record["source"]["after"])
-    members = _selection_members({CLOSE_QUARTERS_OWNER: record["test"]["after"]}, root)
+    _retained_source(root, SHOOTING_VISIBILITY_SOURCE, record["source"]["after"], current_sources)
+    members = _selection_members(
+        {CLOSE_QUARTERS_OWNER: record["test"]["after"]}, root, current=current_tests
+    )
     return (
         record["retained_runtime_fingerprint"],
         record["runtime_fingerprint"],

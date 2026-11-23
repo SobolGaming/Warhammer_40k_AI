@@ -301,7 +301,37 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
     )
     assert malice_base_manifest["fingerprint"] == round4["runtime_fingerprint"]
     assert malice["retained_runtime_fingerprint"] == malice_base_manifest["fingerprint"]
-    assert _record(MANIFEST)["fingerprint"] == malice["runtime_fingerprint"]
+    shalaxi = _record(selection.ROUND3_SHALAXI_TRANSITION)
+    shalaxi_base = selection.ROUND3_SHALAXI_BASE
+    shalaxi_base_manifest = json.loads(
+        subprocess.check_output(["git", "show", shalaxi_base + ":" + MANIFEST], cwd=ROOT)
+    )
+    assert shalaxi_base_manifest["fingerprint"] == malice["runtime_fingerprint"]
+    assert shalaxi["retained_runtime_fingerprint"] == malice["runtime_fingerprint"]
+    assert _record(MANIFEST)["fingerprint"] == shalaxi["runtime_fingerprint"]
+    assert shalaxi["test"]["before"] == shooting_visibility["test"]["after"]
+    for source in selection.ROUND3_SHALAXI_SOURCES:
+        present = subprocess.check_output(["git", "ls-tree", shalaxi_base, "--", source], cwd=ROOT)
+        before = (
+            subprocess.check_output(["git", "show", shalaxi_base + ":" + source], cwd=ROOT)
+            if present
+            else b""
+        )
+        assert shalaxi["sources"][source]["before"] == hashlib.sha256(before).hexdigest()
+        assert (
+            shalaxi["sources"][source]["after"]
+            == hashlib.sha256((ROOT / source).read_bytes()).hexdigest()
+        )
+    visibility_owner = selection.CLOSE_QUARTERS_OWNER
+    assert sum(visibility_owner in group for group in groups) == 1
+    timing_cases = _record("ci/test_shards/durations.json")["case_seconds"]
+    for name in (
+        "test_axis_shadow_matches_exact_visibility_at_closed_corridor_boundary",
+        "test_axis_shadow_joins_touching_heights_but_leaves_vertical_openings",
+        "test_rotated_wall_shadow_agrees_with_fixed_part_visibility",
+        "test_polygon_gap_suggests_checked_ray_between_unequal_ellipses",
+    ):
+        assert visibility_owner + "::" + name in timing_cases
     malice_source = selection.ROUND4_MALICE_BEARER_SOURCE
     malice_source_before = subprocess.check_output(
         ["git", "show", malice_base + ":" + malice_source], cwd=ROOT

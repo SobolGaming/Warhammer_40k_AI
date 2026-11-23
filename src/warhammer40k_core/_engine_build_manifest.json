@@ -1,8 +1,8 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:c47044084edb8c4ff5324998079574868d50a45ec9cca46b7633ec6bb6b5a353",
-  "fingerprint": "c47044084edb8c4ff5324998079574868d50a45ec9cca46b7633ec6bb6b5a353",
-  "resource_count": 3284,
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:77160f03d452969c67dbdb72249b0ffdf32f3be6b485e799abaeae380668cfaa",
+  "fingerprint": "77160f03d452969c67dbdb72249b0ffdf32f3be6b485e799abaeae380668cfaa",
+  "resource_count": 3285,
   "resources": [
     {
       "byte_length": 113,
@@ -13810,9 +13810,9 @@
       "sha256": "a6a86e3543e6b9b68254de66901b990e3dffc718ac6d8e524008f984b6f5041d"
     },
     {
-      "byte_length": 19611,
+      "byte_length": 19809,
       "path": "warhammer40k_core/geometry/continuous_visibility.py",
-      "sha256": "9b460af054119c59e1f829ebb762f6cf6effd751d24970f54c99a3ecb8e93008"
+      "sha256": "95c2bf4dbeb9ac673f892b3ec91c97102090eacb9c756308ce99bbeacda2d2e7"
     },
     {
       "byte_length": 9366,
@@ -14095,9 +14095,14 @@
       "sha256": "51631bc2979f18f22730801b70a62d92db886dc976f93bac57bf384c5dfb8143"
     },
     {
-      "byte_length": 25939,
+      "byte_length": 6588,
+      "path": "warhammer40k_core/geometry/visibility_axis_shadow.py",
+      "sha256": "31f02ba38810653c5fb78cad8b852e049ad3ecde64405a635b333777874fa9f6"
+    },
+    {
+      "byte_length": 27932,
       "path": "warhammer40k_core/geometry/visibility_certificates.py",
-      "sha256": "ddee3df9e4a5c7bbb060738f88eb6b3c5533ed336535e86ca7bef9fe36810ecb"
+      "sha256": "4402b2f956a1e12872916348a2dc50533be5748ec019c74aa76af3511e1ed509"
     },
     {
       "byte_length": 3935,
@@ -14140,9 +14145,9 @@
       "sha256": "f42cb6e021ba8316d798cd25a136c02832a696dfc6cce832d0957499ba2b3d14"
     },
     {
-      "byte_length": 20280,
+      "byte_length": 22403,
       "path": "warhammer40k_core/geometry/visibility_witnesses.py",
-      "sha256": "a1537c34b8a6682acee8a1028bbd29b3ea0c753443f98e957648fd27607092eb"
+      "sha256": "873b5068ffee60e39a5a08e277cd12a75d8ce68ed8c562bfdcb22254ecf819a7"
     },
     {
       "byte_length": 11749,

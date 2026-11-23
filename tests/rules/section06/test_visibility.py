@@ -796,3 +796,119 @@ def test_ellipse_facing_search_checks_base_edge_with_multiple_terrain_walls() ->
         and self_visible_corridors_blocked(observer, destination, point, (west,))
         for point in candidates
     )
+
+
+def test_axis_shadow_matches_exact_visibility_at_closed_corridor_boundary() -> None:
+    from fractions import Fraction as F
+
+    from warhammer40k_core.geometry.continuous_visibility import (
+        resolve_any_visibility_pair_uncached,
+    )
+    from warhammer40k_core.geometry.visibility_axis_shadow import (
+        all_corridors_blocked_by_axis_shadow,
+    )
+    from warhammer40k_core.geometry.visibility_certificates import all_corridors_blocked_by_plane
+    from warhammer40k_core.geometry.visibility_exact import CORRIDOR_RADIUS, RationalEllipse
+
+    observer = _axis_aligned_ellipse_prism((-4, 0), (0.5, 0.5), 1)
+    target = VisibilityPrism(
+        RationalEllipse((F(4), F(0)), (F(0), F(-1, 2)), (F(1, 4), F(0))),
+        F(0),
+        F(1),
+        (F(15, 4), F(-1, 2), F(17, 4), F(1, 2)),
+    )
+    for half_gap, blocked in ((CORRIDOR_RADIUS, True), (2 * CORRIDOR_RADIUS, False)):
+        blockers = tuple(
+            VisibilityPrism(
+                ((F(-1), lo), (F(1), lo), (F(1), hi), (F(-1), hi)),
+                F(0),
+                F(1),
+                (F(-1), lo, F(1), hi),
+            )
+            for lo, hi in ((F(-2), -half_gap), (half_gap, F(2)))
+        )
+        assert all_corridors_blocked_by_axis_shadow(observer, target, blockers) is blocked
+        assert all_corridors_blocked_by_axis_shadow(target, observer, blockers) is blocked
+        assert all_corridors_blocked_by_plane(observer, target, blockers) is blocked
+        actual = resolve_any_visibility_pair_uncached(observer, target, blockers, blockers)
+        assert actual.model_visible is not blocked
+
+
+def test_axis_shadow_joins_touching_heights_but_leaves_vertical_openings() -> None:
+    from fractions import Fraction as F
+
+    from warhammer40k_core.geometry.visibility_axis_shadow import (
+        all_corridors_blocked_by_axis_shadow,
+    )
+
+    observer = _axis_aligned_ellipse_prism((-4, 0), (0.125, 0.125), 3)
+    target = _axis_aligned_ellipse_prism((4, 0), (0.125, 0.125), 1)
+    footprint = ((F(2), F(-2)), (F(3), F(-2)), (F(3), F(2)), (F(2), F(2)))
+    lower = VisibilityPrism(footprint, F(0), F(1, 2), (F(2), F(-2), F(3), F(2)))
+    upper = replace(lower, lower=F(1, 2), upper=F(2))
+    assert all_corridors_blocked_by_axis_shadow(observer, target, (upper, lower))
+    raised = replace(upper, lower=F(7, 4))
+    assert not all_corridors_blocked_by_axis_shadow(observer, target, (raised, lower))
+    ray = ((F(-4), F(0), F(2)), (F(4), F(0), F(1)))
+    assert not lower.intersects_corridor(*ray)
+    assert not raised.intersects_corridor(*ray)
+
+
+def test_rotated_wall_shadow_agrees_with_fixed_part_visibility() -> None:
+    from fractions import Fraction as F
+
+    from warhammer40k_core.geometry.visibility_certificates import (
+        all_box_corridors_blocked_by_convex_wall,
+    )
+    from warhammer40k_core.geometry.visibility_formulas import (
+        ModelDomain,
+        decide_target_part_visible,
+    )
+
+    source = _axis_aligned_ellipse_prism((-3, 0), (0.5, 0.5), 3)
+    destination = _axis_aligned_ellipse_prism((3, 0), (0.5, 0.5), 1)
+    wall = VisibilityPrism(
+        ((F(-1), F(-2)), (F(0), F(-2)), (F(1), F(2)), (F(0), F(2))),
+        F(0),
+        F(2),
+        (F(-1), F(-2), F(1), F(2)),
+    )
+    point = (F(5, 2), F(0), F(0))
+    cap = (source.bounds, source.lower, source.upper)
+    origin, target = map(ModelDomain.from_prism, (source, destination))
+    assert all_box_corridors_blocked_by_convex_wall(cap, point, (wall,))
+    assert not decide_target_part_visible(origin, target, point, (wall,))
+    short_wall = replace(wall, upper=F(1, 2))
+    assert not all_box_corridors_blocked_by_convex_wall(cap, point, (short_wall,))
+    assert decide_target_part_visible(origin, target, point, (short_wall,))
+
+
+def test_polygon_gap_suggests_checked_ray_between_unequal_ellipses() -> None:
+    from fractions import Fraction as F
+
+    from warhammer40k_core.geometry.visibility_exact import CORRIDOR_RADIUS
+    from warhammer40k_core.geometry.visibility_formulas import ModelDomain
+    from warhammer40k_core.geometry.visibility_witnesses import (
+        _nearby_polygon_vertex_gap_candidates,  # pyright: ignore[reportPrivateUsage]
+        point_in_model,
+    )
+
+    source = _axis_aligned_ellipse_prism((0, 0), (0.5, 0.5), 2)
+    destination = _axis_aligned_ellipse_prism((10, 2), (0.25, 0.5), 1)
+    half_gap = 3 * CORRIDOR_RADIUS / 2
+    blockers = tuple(
+        VisibilityPrism(
+            ((F(5), lo), (F(501, 100), lo), (F(501, 100), hi), (F(5), hi)),
+            F(0),
+            F(2),
+            (F(5), lo, F(501, 100), hi),
+        )
+        for lo, hi in ((F(-2), 1 - half_gap), (1 + half_gap, F(4)))
+    )
+    origin, target = map(ModelDomain.from_prism, (source, destination))
+    candidates = tuple(_nearby_polygon_vertex_gap_candidates(origin, target, blockers))
+    assert candidates
+    assert all(
+        point_in_model(origin, start) and point_in_model(target, end) for start, end in candidates
+    )
+    assert any(all(not wall.intersects_corridor(*ray) for wall in blockers) for ray in candidates)

@@ -1,0 +1,40 @@
+{
+  "schema": "finite-monster-mash-round3-shalaxi-test-transition-v1",
+  "base": "1e5d53a3a8a09eac3752073ed0fd7d3247789248",
+  "retained_round4_malice_bearer_sha256": "61b11c5be2d8c47a84d0155e555ee600bdb5f6439676152cffb53a4e19c42ae1",
+  "retained_shooting_visibility_sha256": "4cdd4f407bd7e96e0f3ca446bc5faa005eb49ded60e9b409fe4a6bc06b3da631",
+  "retained_runtime_fingerprint": "c47044084edb8c4ff5324998079574868d50a45ec9cca46b7633ec6bb6b5a353",
+  "runtime_fingerprint": "77160f03d452969c67dbdb72249b0ffdf32f3be6b485e799abaeae380668cfaa",
+  "sources": {
+    "src/warhammer40k_core/geometry/continuous_visibility.py": {
+      "before": "9b460af054119c59e1f829ebb762f6cf6effd751d24970f54c99a3ecb8e93008",
+      "after": "95c2bf4dbeb9ac673f892b3ec91c97102090eacb9c756308ce99bbeacda2d2e7"
+    },
+    "src/warhammer40k_core/geometry/visibility_axis_shadow.py": {
+      "before": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "after": "31f02ba38810653c5fb78cad8b852e049ad3ecde64405a635b333777874fa9f6"
+    },
+    "src/warhammer40k_core/geometry/visibility_certificates.py": {
+      "before": "ddee3df9e4a5c7bbb060738f88eb6b3c5533ed336535e86ca7bef9fe36810ecb",
+      "after": "4402b2f956a1e12872916348a2dc50533be5748ec019c74aa76af3511e1ed509"
+    },
+    "src/warhammer40k_core/geometry/visibility_witnesses.py": {
+      "before": "a1537c34b8a6682acee8a1028bbd29b3ea0c753443f98e957648fd27607092eb",
+      "after": "873b5068ffee60e39a5a08e277cd12a75d8ce68ed8c562bfdcb22254ecf819a7"
+    }
+  },
+  "test": {
+    "before": {
+      "mode": "100644",
+      "blob_sha1": "6483b3987817dfe52e95f4027a55b49b746702cc",
+      "bytes": 32677,
+      "sha256": "24824fa7af6421486ef5043cd39633f01e8665e29acca4ee6cb2222cd28d981d"
+    },
+    "after": {
+      "mode": "100644",
+      "blob_sha1": "dbbbc95a11a8e2e016ee70e35607cc48df40694d",
+      "bytes": 37736,
+      "sha256": "5cb521df4aa6d29d97e9794c10dba5dd30cae9100969df2c82fbf2347e1dc574"
+    }
+  }
+}

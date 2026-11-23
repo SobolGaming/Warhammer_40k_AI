@@ -17,6 +17,7 @@ from warhammer40k_core.geometry.visibility_exact import (
     RationalEllipse,
     RationalPoint2,
     RationalPoint3,
+    RationalPolygon,
     VisibilityPrism,
     convex_polygon_parts,
     footprint_intersects_polygon,
@@ -627,3 +628,57 @@ def all_box_corridors_blocked_by_plane(
             if _rectangle_covered(projection, rectangles):
                 return True
     return False
+
+
+def all_box_corridors_blocked_by_convex_wall(
+    observer_box: Box, target: RationalPoint3, blockers: tuple[VisibilityPrism, ...]
+) -> bool:
+    """Certify a point's entire origin box with one convex wall's central shadow.
+
+    The origins beyond a convex blocker along rays from a fixed target form
+    a convex set: they are p + scale * (b - p), for b in the blocker and scale >= 1.
+    If a single wall intersects every box vertex's centerline, its shadow
+    therefore contains the box, and the corridor width need not be checked.
+    """
+    vertices = _vertices(observer_box)
+    for blocker in blockers:
+        footprint = blocker.footprint
+        if isinstance(footprint, RationalEllipse) or len(footprint) != 4:
+            continue
+        parts = convex_polygon_parts(footprint)
+        if len(parts) != 1:
+            continue
+        (polygon,) = parts
+        if all(
+            _segment_hits_convex_prism(target, vertex, polygon, blocker.lower, blocker.upper)
+            for vertex in vertices
+        ):
+            return True
+    return False
+
+
+def _segment_hits_convex_prism(
+    start: RationalPoint3,
+    end: RationalPoint3,
+    polygon: RationalPolygon,
+    lower: Fraction,
+    upper: Fraction,
+) -> bool:
+    """Intersect the segment parameter interval with the prism's closed half-spaces."""
+    constraints = (
+        (start[2] - lower, end[2] - lower),
+        (upper - start[2], upper - end[2]),
+        *(
+            (_cross(a, b, start[:2]), _cross(a, b, end[:2]))
+            for a, b in zip(polygon, (*polygon[1:], polygon[0]), strict=True)
+        ),
+    )
+    first, last = Fraction(0), Fraction(1)
+    for start_slack, end_slack in constraints:
+        if start_slack < 0:
+            if end_slack < 0:
+                return False
+            first = max(first, start_slack / (start_slack - end_slack))
+        elif end_slack < 0:
+            last = min(last, start_slack / (start_slack - end_slack))
+    return first <= last
