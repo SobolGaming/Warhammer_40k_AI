@@ -1,56 +1,56 @@
 {
   "policy": "rules-engine-performance-v3",
   "base": "2addab80a74e9369b8b0b653954318bf58eec0e5",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:331c7f5ba83db0dfeeb99bfd72297b31e512ebc0864e2c205f36046e74a0043c",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:e7042cdd0b8f68eaf73967b27b3e5b058fca3247f98340259499c0c4cf9e5606",
   "operation_map_sha256": "617bd6fa4476f863f6b4b86c7c7ad15b4dae83a87657b5e49accfdc878115e8d",
   "changes": {
     "ci/test_shards/durations.json": {
       "before_sha256": "868f561c32c0ca71be48d50d1458a086e518e5c8ec635ad60afece22a166b06f",
-      "after_sha256": "7ffbdf968eaa51b3303fb160ecb1e918bcca1794a0cec3adb33f7fcd42a43380",
+      "after_sha256": "771be076b2f4879fff8e262c765b4efd23ec1b62e3c4338f23aea2436f0c158c",
       "owners": {
         "@document": {
           "before": "868f561c32c0ca71be48d50d1458a086e518e5c8ec635ad60afece22a166b06f",
-          "after": "7ffbdf968eaa51b3303fb160ecb1e918bcca1794a0cec3adb33f7fcd42a43380"
+          "after": "771be076b2f4879fff8e262c765b4efd23ec1b62e3c4338f23aea2436f0c158c"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
       "before_sha256": "ad7ea6fa3ea34c1a1dc2d2fe85f09386929af3f0dacdff5096827e436c8c4879",
-      "after_sha256": "ceba701628db61fbc18b93a5c192bbb8db0b17e09753f4bee646c8ad855dbda2",
+      "after_sha256": "1dca6f8f5ab63e762babc8cdca0538d3ab87c08aeb3d3ebd7a130b8bc8815f8b",
       "owners": {
         "@document": {
           "before": "ad7ea6fa3ea34c1a1dc2d2fe85f09386929af3f0dacdff5096827e436c8c4879",
-          "after": "ceba701628db61fbc18b93a5c192bbb8db0b17e09753f4bee646c8ad855dbda2"
+          "after": "1dca6f8f5ab63e762babc8cdca0538d3ab87c08aeb3d3ebd7a130b8bc8815f8b"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
       "before_sha256": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20",
-      "after_sha256": "ef0124b20e35c11185c4225865d7c7f2d9291d381b47874520db9c5a2f34e92b",
+      "after_sha256": "63291248850ce5c2deec4728259b2cce52e52b33a683d35906bdbda2d878f6fa",
       "owners": {
         "@document": {
           "before": "9e5936b45d67e066265dfaa8ea51d2d68a947eba41fa351d3b315cc662239c20",
-          "after": "ef0124b20e35c11185c4225865d7c7f2d9291d381b47874520db9c5a2f34e92b"
+          "after": "63291248850ce5c2deec4728259b2cce52e52b33a683d35906bdbda2d878f6fa"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
       "before_sha256": "12092599a7c28d9d2c86ddfb1014e4b55af45d22a15895668d888803181131d5",
-      "after_sha256": "a4f931561509f5f3cf625be80acc12a790f1daafb6ebc65512c8e078b92e716d",
+      "after_sha256": "62c5a1890f399be5b510eb504498434fd06e0ffae11003bfe6ad5ace264ac3ba",
       "owners": {
         "@document": {
           "before": "12092599a7c28d9d2c86ddfb1014e4b55af45d22a15895668d888803181131d5",
-          "after": "a4f931561509f5f3cf625be80acc12a790f1daafb6ebc65512c8e078b92e716d"
+          "after": "62c5a1890f399be5b510eb504498434fd06e0ffae11003bfe6ad5ace264ac3ba"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
       "before_sha256": "b34095fc6c0ae92aacca1037f3160c6382c0ae5935fd24221f8facbe90ab38f9",
-      "after_sha256": "0c61ec7d4f1fb94b3bfce4cb282e74b1359da462501aeb702e1e3576aec3b749",
+      "after_sha256": "4abf1c5c15e81278f542c41238679a2cb8d910c7eff749f0059d1bfc394d70d2",
       "owners": {
         "@document": {
           "before": "b34095fc6c0ae92aacca1037f3160c6382c0ae5935fd24221f8facbe90ab38f9",
-          "after": "0c61ec7d4f1fb94b3bfce4cb282e74b1359da462501aeb702e1e3576aec3b749"
+          "after": "4abf1c5c15e81278f542c41238679a2cb8d910c7eff749f0059d1bfc394d70d2"
         }
       }
     },
@@ -66,171 +66,171 @@
     },
     "ci/test_shards/shard-3.txt": {
       "before_sha256": "dca003fdc57fcc3c202958bb8b1abad24de89000a94f6ea3a6fdade1f9f69bfa",
-      "after_sha256": "275ec2e93ca4378bbd8426c5c7410426492044fd5e59158b7371103c66f7396b",
+      "after_sha256": "84c43d5c0898ea82c465ba85bc135b2fd236b66101b216953d2e93b384ca546c",
       "owners": {
         "@document": {
           "before": "dca003fdc57fcc3c202958bb8b1abad24de89000a94f6ea3a6fdade1f9f69bfa",
-          "after": "275ec2e93ca4378bbd8426c5c7410426492044fd5e59158b7371103c66f7396b"
+          "after": "84c43d5c0898ea82c465ba85bc135b2fd236b66101b216953d2e93b384ca546c"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
       "before_sha256": "5e8507341b7ebdc4512006aebe5cae2c30487a78628d94803c9d222e191ccde9",
-      "after_sha256": "273203701d0b687ca92ad3659ef537d1f1731a47c05fb9cc7080abf6b2dce067",
+      "after_sha256": "216d0c8e56fda5bdab1cbb87d4b7f2846e559c6a3a5cccdde4aedbb7609cd054",
       "owners": {
         "@document": {
           "before": "5e8507341b7ebdc4512006aebe5cae2c30487a78628d94803c9d222e191ccde9",
-          "after": "273203701d0b687ca92ad3659ef537d1f1731a47c05fb9cc7080abf6b2dce067"
+          "after": "216d0c8e56fda5bdab1cbb87d4b7f2846e559c6a3a5cccdde4aedbb7609cd054"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
       "before_sha256": "a6398d62a41cf2ac17cfcb154a809f983a099a984fafe517714be120db15f77b",
-      "after_sha256": "a4084dcadd58db05c774767a3c3d75b7038f3cd9a135b5143a1fa1fbb836ae8b",
+      "after_sha256": "9188858d41eaab68a8c4fc3971bd59559489234e9896cc9be6090fbc56c9bed0",
       "owners": {
         "@document": {
           "before": "a6398d62a41cf2ac17cfcb154a809f983a099a984fafe517714be120db15f77b",
-          "after": "a4084dcadd58db05c774767a3c3d75b7038f3cd9a135b5143a1fa1fbb836ae8b"
+          "after": "9188858d41eaab68a8c4fc3971bd59559489234e9896cc9be6090fbc56c9bed0"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
       "before_sha256": "28d89930ef0b169c09db8de71828b0f08d54cee6b1f2b7ed6b18106f4fb684e0",
-      "after_sha256": "48f22dfdae22f59fbd55c5f91f33b137f4eb78941fd64379290ea0f31aed7890",
+      "after_sha256": "fd2504be1874cfe4657fa21ab940d6878aaa502d8e23ff583cb5f514feb97c05",
       "owners": {
         "@document": {
           "before": "28d89930ef0b169c09db8de71828b0f08d54cee6b1f2b7ed6b18106f4fb684e0",
-          "after": "48f22dfdae22f59fbd55c5f91f33b137f4eb78941fd64379290ea0f31aed7890"
+          "after": "fd2504be1874cfe4657fa21ab940d6878aaa502d8e23ff583cb5f514feb97c05"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
       "before_sha256": "2287c331a7e6116a1aa6ef1dc74f6c7235e8410d549ef317547cc80d5f1b2952",
-      "after_sha256": "82532542114e325af3dcdf45bb745992da264a83eeaea9f8afdf43743222cebf",
+      "after_sha256": "1aae005367c4c536ff9f6c5d8ef4db53e0268acbebf88ae164ebfe7fd7348cc0",
       "owners": {
         "@document": {
           "before": "2287c331a7e6116a1aa6ef1dc74f6c7235e8410d549ef317547cc80d5f1b2952",
-          "after": "82532542114e325af3dcdf45bb745992da264a83eeaea9f8afdf43743222cebf"
+          "after": "1aae005367c4c536ff9f6c5d8ef4db53e0268acbebf88ae164ebfe7fd7348cc0"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
       "before_sha256": "300dd8fc14e8ea6d2aaa3f62308b70176d5a872db82f50debfe32c89153555d4",
-      "after_sha256": "067afbffc1a435aa03237f1699e6cb83d6265f25351e90947eb492e3566048d6",
+      "after_sha256": "1668ceac0ee8946628047cc95dbfc28dacae41e9aaa83bc02277505e96dbcd9b",
       "owners": {
         "@document": {
           "before": "300dd8fc14e8ea6d2aaa3f62308b70176d5a872db82f50debfe32c89153555d4",
-          "after": "067afbffc1a435aa03237f1699e6cb83d6265f25351e90947eb492e3566048d6"
+          "after": "1668ceac0ee8946628047cc95dbfc28dacae41e9aaa83bc02277505e96dbcd9b"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
       "before_sha256": "b1ea54000b98ae134d7b2e48e15c06bc57762c718524086c530ced9bedbfd182",
-      "after_sha256": "796f88c2fb5a3ba40305c5236c17861652870d25c27d9bf5017009896d82ab0b",
+      "after_sha256": "2c936d079be69cf30cf88e0ede0dc4790cab79bdec066460907408e91db40878",
       "owners": {
         "@document": {
           "before": "b1ea54000b98ae134d7b2e48e15c06bc57762c718524086c530ced9bedbfd182",
-          "after": "796f88c2fb5a3ba40305c5236c17861652870d25c27d9bf5017009896d82ab0b"
+          "after": "2c936d079be69cf30cf88e0ede0dc4790cab79bdec066460907408e91db40878"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
       "before_sha256": "74c4d265f7e7b42e76c00d6a6404321f5362c50930f0239b4d270c3319a12d4d",
-      "after_sha256": "74399c500a816188c41a9a9a1840f4b78979cbf17a568ab121a4593659adb9f3",
+      "after_sha256": "a0c7f9dc25b7f2cf858b352686b0c9c2647c2cec9002f12ff9225da1e4bc69ef",
       "owners": {
         "@document": {
           "before": "74c4d265f7e7b42e76c00d6a6404321f5362c50930f0239b4d270c3319a12d4d",
-          "after": "74399c500a816188c41a9a9a1840f4b78979cbf17a568ab121a4593659adb9f3"
+          "after": "a0c7f9dc25b7f2cf858b352686b0c9c2647c2cec9002f12ff9225da1e4bc69ef"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "before_sha256": "90001c801d610d3c6bbab9320b2c80078bcd27080f1bf386fca3963dc5d37cbf",
-      "after_sha256": "d2a9edd669cd871e79d656bba9710b93cc257994d7e57faa8e00c8b7f1f9ed1a",
+      "after_sha256": "be8ea826353b3ac24853c74e309a9e984072918f182379c1fe5034f6e87a5dd8",
       "owners": {
         "@document": {
           "before": "90001c801d610d3c6bbab9320b2c80078bcd27080f1bf386fca3963dc5d37cbf",
-          "after": "d2a9edd669cd871e79d656bba9710b93cc257994d7e57faa8e00c8b7f1f9ed1a"
+          "after": "be8ea826353b3ac24853c74e309a9e984072918f182379c1fe5034f6e87a5dd8"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
       "before_sha256": "440e8625aa249f95577c16749152730fb373ec76d83ca6725efa01de939cfb7f",
-      "after_sha256": "83342331d8e53b24b46c3fcbfef5783623f28def4bccd1a454324b756b6d5125",
+      "after_sha256": "f60ee53a30218def5cd2d9450c5402982fa22ed55e726c29083c5e1b95a307bc",
       "owners": {
         "@document": {
           "before": "440e8625aa249f95577c16749152730fb373ec76d83ca6725efa01de939cfb7f",
-          "after": "83342331d8e53b24b46c3fcbfef5783623f28def4bccd1a454324b756b6d5125"
+          "after": "f60ee53a30218def5cd2d9450c5402982fa22ed55e726c29083c5e1b95a307bc"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "before_sha256": "d6cb53eedf665c06ed278483abf8602f04c314f3e255c7450ee68624e284d263",
-      "after_sha256": "5d8834d18364058ea400f3e129694872915306d3bc96d78bc39391f848ff1e3d",
+      "after_sha256": "2bded53ab424c76c181b901f1cfabd10a75af69c5f6b2f0c8d6aa3e29cc1ab2f",
       "owners": {
         "@document": {
           "before": "d6cb53eedf665c06ed278483abf8602f04c314f3e255c7450ee68624e284d263",
-          "after": "5d8834d18364058ea400f3e129694872915306d3bc96d78bc39391f848ff1e3d"
+          "after": "2bded53ab424c76c181b901f1cfabd10a75af69c5f6b2f0c8d6aa3e29cc1ab2f"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "before_sha256": "a86402324d7add602736e75d2532e002f7ab36865538732f83939a33e35321b4",
-      "after_sha256": "4910e237600d25b01ea17f954baafd7029cca54649a7140caaff59ebcc4ab0dc",
+      "after_sha256": "2efcdde679a60f5e0ba5fdca0cf093a93c637cc068ab43b396e7f85984710a35",
       "owners": {
         "@document": {
           "before": "a86402324d7add602736e75d2532e002f7ab36865538732f83939a33e35321b4",
-          "after": "4910e237600d25b01ea17f954baafd7029cca54649a7140caaff59ebcc4ab0dc"
+          "after": "2efcdde679a60f5e0ba5fdca0cf093a93c637cc068ab43b396e7f85984710a35"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "before_sha256": "d8e5ba96fa9975ef2e9ab7b04d33c6ea71de9d0df5f7d662dadfb6404ae4678b",
-      "after_sha256": "9b33a282ebb4854483e18d567e9a44d61ffff59c692f915dd42fdf63de77128e",
+      "after_sha256": "f4606e26c02a4610ad7aa339517b91bbc3dc3b2aaad338c124fac2c19c4b8a14",
       "owners": {
         "@document": {
           "before": "d8e5ba96fa9975ef2e9ab7b04d33c6ea71de9d0df5f7d662dadfb6404ae4678b",
-          "after": "9b33a282ebb4854483e18d567e9a44d61ffff59c692f915dd42fdf63de77128e"
+          "after": "f4606e26c02a4610ad7aa339517b91bbc3dc3b2aaad338c124fac2c19c4b8a14"
         }
       }
     },
     "contracts/examples/support-profile.json": {
       "before_sha256": "55a76d43fe90a1c7a463f920ac46b0f063491836e5f46a4f49841bf9aa3cf09d",
-      "after_sha256": "fc6cec5af94c444cec4754b02b20fa9d3e79b25566f544caa7c2e7f34a0c698f",
+      "after_sha256": "576eb2dbe0dbbe753d6e83f4363a2ac0e530ccc17a1b0fbab852600b5b7a5834",
       "owners": {
         "@document": {
           "before": "55a76d43fe90a1c7a463f920ac46b0f063491836e5f46a4f49841bf9aa3cf09d",
-          "after": "fc6cec5af94c444cec4754b02b20fa9d3e79b25566f544caa7c2e7f34a0c698f"
+          "after": "576eb2dbe0dbbe753d6e83f4363a2ac0e530ccc17a1b0fbab852600b5b7a5834"
         }
       }
     },
     "contracts/manifest.json": {
       "before_sha256": "0f10b79ab437ba81ecba13ef01bc935dfb87faf080a386bf9330b0cc6bf20734",
-      "after_sha256": "32ea16a1b9c25eb1d2bb70ecc310e2975f1c13313f678f182c4ca84b90180f15",
+      "after_sha256": "72cfa2feb9ed1e2f94aea58b11b79a31fa9b5c8f976fd4d147ba350080228bf6",
       "owners": {
         "@document": {
           "before": "0f10b79ab437ba81ecba13ef01bc935dfb87faf080a386bf9330b0cc6bf20734",
-          "after": "32ea16a1b9c25eb1d2bb70ecc310e2975f1c13313f678f182c4ca84b90180f15"
+          "after": "72cfa2feb9ed1e2f94aea58b11b79a31fa9b5c8f976fd4d147ba350080228bf6"
         }
       }
     },
     "data/source_audits/ci64_provenance_v1/stage2-ground-charge-test-addition-v1.json": {
       "before_sha256": null,
-      "after_sha256": "0daba6ba89667453f30c8f658b260a4dc94656bf9ff008159156f20ea31f4be5",
+      "after_sha256": "0b1591280543a9952a3da9590a64dde5f6d6d5ebe1412ad333edac4234293001",
       "owners": {
         "@document": {
           "before": null,
-          "after": "0daba6ba89667453f30c8f658b260a4dc94656bf9ff008159156f20ea31f4be5"
+          "after": "0b1591280543a9952a3da9590a64dde5f6d6d5ebe1412ad333edac4234293001"
         }
       }
     },
     "docs/AI_POLICY_INTERFACE.md": {
       "before_sha256": "11776bafdf82a081034709b3890c479db3b82a5c272893992d681705634a64a6",
-      "after_sha256": "99cfc49bef1a31a2be0e2b229e2abb333c5b8e11e91d6a9c47e63d4256245ab0",
+      "after_sha256": "dca78f16bd0de8af2ea610312bbf683ebac2ec236757fe93a4e6c1577b89606e",
       "owners": {
         "@document": {
           "before": "11776bafdf82a081034709b3890c479db3b82a5c272893992d681705634a64a6",
-          "after": "99cfc49bef1a31a2be0e2b229e2abb333c5b8e11e91d6a9c47e63d4256245ab0"
+          "after": "dca78f16bd0de8af2ea610312bbf683ebac2ec236757fe93a4e6c1577b89606e"
         }
       }
     },
@@ -260,11 +260,11 @@
     },
     "scripts/stage2_ground_charge_test_admission.py": {
       "before_sha256": null,
-      "after_sha256": "045bed42ed189642542140ffec7970059648e183971af69f128d29ab71348b1b",
+      "after_sha256": "5e7824a84397a7027929e0f846e34c8a4a41a4b2e907035417c1a5af1d8ee19d",
       "owners": {
         "@module": {
           "before": null,
-          "after": "873588d511a61685f7f7bdf85389ce2dc95a2c26f3da0faaf8a5b91f16a1f620"
+          "after": "730af72d3836cc04a2f1d256a92f0129023e427df0b583ae63eb6f3530a7f398"
         },
         "ground_charge_test_successor": {
           "before": null,
@@ -274,11 +274,11 @@
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "before_sha256": "42a0ea6ff6dd6f744a6fe156313fa8c46f99aa4cf822088c19663318b1c0b13a",
-      "after_sha256": "d5e3d3493522c1ab20e52df97b3b471a7180e311b6b733e3a01e56c04b807311",
+      "after_sha256": "25df81ea40fdbb5a8344e34b69608174819c68632e0e81d25b368dea0769ab83",
       "owners": {
         "@document": {
           "before": "42a0ea6ff6dd6f744a6fe156313fa8c46f99aa4cf822088c19663318b1c0b13a",
-          "after": "d5e3d3493522c1ab20e52df97b3b471a7180e311b6b733e3a01e56c04b807311"
+          "after": "25df81ea40fdbb5a8344e34b69608174819c68632e0e81d25b368dea0769ab83"
         }
       }
     },
@@ -418,11 +418,11 @@
     },
     "src/warhammer40k_core/ai/ground_charge_policy.py": {
       "before_sha256": null,
-      "after_sha256": "8821aa05044a3041e1a529c148b234cbd42ceb3a96878ba96833be04a2a4a3fa",
+      "after_sha256": "b05be820adf733f7b74d27955fe22e625cd73a186ede3fb1372ecbaaa4d4720a",
       "owners": {
         "@module": {
           "before": null,
-          "after": "fdc18d9ebfddd23a64143d90336d9a7fe31db96990ec70d0fd37891c861d847f"
+          "after": "8d3eeb5e7335f0d5eb69adfbdf342d4c487f638be366cbe1183f218d29a5ddcc"
         },
         "ChargeCandidateValidation": {
           "before": null,
@@ -430,7 +430,7 @@
         },
         "GroundChargeValidationExhaustedError": {
           "before": null,
-          "after": "8ae99cceee15b74fe63ec6179406ec074063aeed2d1f47e1ce5f6b59d75e0942"
+          "after": "7458af6830a8600657195b0dc61f437444e122e940a7042939ad91db8b715457"
         },
         "GroundChargeValidationExhaustedError.__init__": {
           "before": null,
@@ -454,7 +454,7 @@
         },
         "_probe": {
           "before": null,
-          "after": "86efd91f257fbf54abb14d971fd168c5957cf992b4f395dea75ae35968c3dd39"
+          "after": "66eda76ca3da0e82b30bda1d8ed0d435b7c291a1c25faab094f913bd8b50caf9"
         },
         "_require_limit": {
           "before": null,
@@ -462,17 +462,17 @@
         },
         "_validate_candidate": {
           "before": null,
-          "after": "b0863f3ddcb46ecbdd0365d59c605bd9605a6c1826f799e79a0b510a91234f8a"
+          "after": "44fcd645c3477623c3493b065c11a4a486521155b749b852982920b719be9dde"
         },
         "prepare_ground_charge_policy": {
           "before": null,
-          "after": "d5e507026ce02ed50bc876b24b0324d2c64f8e98c5836616da8171883da896ae"
+          "after": "3e3946f528ef9289b890ce3d7da19c101442c758d5545f9f4b527b932a8d44ae"
         }
       }
     },
     "tests/code_quality/test_engine_numerical_identity_admission.py": {
       "before_sha256": "d6804c6e821cae6fff1ea72a8edb0eb52455e6736f525a7337cc5fb0fd7c27ee",
-      "after_sha256": "a8fdb4676977175a64c2fd8ec4c164d505bb121146a252fd6a17677681b18b5c",
+      "after_sha256": "e1fb20f0ceb83bd098154f9d89660e712cdff8aeb2bac78b094acfa6c989c8f9",
       "owners": {
         "@module": {
           "before": "c7c379be499c781ccd351d6e1f20b252c64811d2a5e0526f4acf674bf91f6cba",
@@ -480,17 +480,17 @@
         },
         "test_identity_inventory_uses_current_twelve_shards_and_native_cohort": {
           "before": "fe87ef83179dc7a4fffabe98355ee117fa62a478c44fe8574aa130265336ecff",
-          "after": "4ad262e1fa6b6b7ac50deb6e308f555281199af3ee1479b397a8ed454af4decb"
+          "after": "3d01e82c52feb6622e92397e4a73970f37a011221f3a5434723488cd9948d741"
         }
       }
     },
     "tests/infrastructure/adapters/test_ground_charge_policy.py": {
       "before_sha256": null,
-      "after_sha256": "34cfd90e73d1e81dadc2111e49f83b9f4c5b9a2eb133f6a122ce88c3f4ff601c",
+      "after_sha256": "52554e0c5024f45141c6026ddd28e7bb75fc5a748048c296bc5c849955cac37c",
       "owners": {
         "@module": {
           "before": null,
-          "after": "87ea681533b4e6191dbb4c18ab3d2b4bb64431da44124a3854d6f1438fc85e20"
+          "after": "8090c4a5ff1926368e19476275cde729a10ba6b455a7bc435c73c4f0031b78ce"
         },
         "selected_ground_charge": {
           "before": null,
@@ -503,6 +503,10 @@
         "test_ground_charge_ranks_only_native_accepts_and_checks_binding": {
           "before": null,
           "after": "b295344c4cd89e05f98db2d7fac3006092696dff6c755b8a11ade45f41eae180"
+        },
+        "test_ground_charge_receipt_deadline_preserves_live_session": {
+          "before": null,
+          "after": "6af6bd48046e820413b9dbcee9dc21af0ba16e7309d64206f9ac46053675a6d9"
         }
       }
     }

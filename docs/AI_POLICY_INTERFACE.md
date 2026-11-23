@@ -2914,8 +2914,9 @@ decides path, terrain, endpoint and coherency legality.
 Call `ai.ground_charge_policy.prepare_ground_charge_policy` with the matching
 actor context and an exclusively owned `LocalGameSession` in a single-threaded,
 fork-capable host. Native probe processes inherit the exact pending occurrence,
-each submit one ordinary viewer-bound proposal, and exit or are killed at the
-probe deadline. Preparation verifies that the live lifecycle is unchanged.
+and each submits one ordinary viewer-bound proposal. A complete receipt by
+the deadline resolves the probe. Worker teardown is separate, with a one-second
+reap limit after termination. Preparation verifies the live lifecycle snapshot.
 Add the returned registration to a `PolicyRouter` to opt in for that occurrence.
 The runner rechecks the actor/request/observation binding and commits through the
 existing viewer submission. This uses the existing [adapter decision contract](ADAPTER_DECISION_CONTRACT.md).
@@ -2926,8 +2927,9 @@ to 15 seconds, is capped at 30 seconds, and shares a 300-second native deadline
 with the other probes. The operator receipt separates generation and validation
 time, accepts, engine rejections and timeouts. Selection orders only completed
 native accepts by shortest longest model path, then shortest total, with stable
-generated order for ties. A search with no accepted proposal raises typed
-exhaustion. This is a single decision policy with explicit registration.
+generated order for ties. An unresolved timeout before a selection limit or
+a search with no accepted proposal raises typed exhaustion before registration.
+This is a single decision policy with explicit registration.
 
 ## Native preserve Fight continuation
 

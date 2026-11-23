@@ -318,6 +318,8 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         for name in (
             "test_ground_charge_generation_is_stable_and_limits_are_typed",
             "test_ground_charge_ranks_only_native_accepts_and_checks_binding",
+            "test_ground_charge_receipt_deadline_preserves_live_session[receipt-before-exit]",
+            "test_ground_charge_receipt_deadline_preserves_live_session[unresolved-after-accept]",
         )
     }
     assert shalaxi["test"]["before"] == shooting_visibility["test"]["after"]

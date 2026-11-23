@@ -3,6 +3,8 @@ from __future__ import annotations
 import json
 import multiprocessing
 from dataclasses import replace
+from multiprocessing.connection import Connection
+from threading import Event
 
 import pytest
 
@@ -20,13 +22,23 @@ from tests.setup_completion_helpers import (
 )
 from warhammer40k_core.adapters.access_control import ViewerContext
 from warhammer40k_core.adapters.local_session import LocalGameSession
+from warhammer40k_core.ai import ground_charge_policy
 from warhammer40k_core.ai.ground_charge_candidates import (
     ChargeSearchStop,
     GroundChargeExhaustedError,
     generate_ground_charge_candidates,
 )
-from warhammer40k_core.ai.ground_charge_policy import prepare_ground_charge_policy
-from warhammer40k_core.ai.player_policy import PlayerDecisionContext, PolicyError, payload_digest
+from warhammer40k_core.ai.ground_charge_policy import (
+    GroundChargeValidationExhaustedError,
+    prepare_ground_charge_policy,
+)
+from warhammer40k_core.ai.player_policy import (
+    PlayerDecisionContext,
+    PolicyAction,
+    PolicyError,
+    PolicyRouter,
+    payload_digest,
+)
 from warhammer40k_core.engine.game_state import (
     GameState,
     SecondaryMissionChoice,
@@ -38,6 +50,9 @@ from warhammer40k_core.engine.mission_state_validation import (
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleStage, LifecycleStatusKind
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
+from warhammer40k_core.engine.replay import (
+    _initial_rng_state_payload,  # pyright: ignore[reportPrivateUsage]
+)
 from warhammer40k_core.geometry.pose import Pose
 
 ACTOR = "player-a"
@@ -202,3 +217,71 @@ def test_ground_charge_ranks_only_native_accepts_and_checks_binding(
     stale = PlayerDecisionContext.from_view(view, choice_seed=0)
     with pytest.raises(PolicyError, match="stale"):
         prepared.registration.policy.choose(stale)
+
+
+@pytest.mark.skipif(
+    "fork" not in multiprocessing.get_all_start_methods(),
+    reason="Native ground charge preparation requires a fork-capable host.",
+)
+@pytest.mark.parametrize(
+    "unresolved", [False, True], ids=["receipt-before-exit", "unresolved-after-accept"]
+)
+def test_ground_charge_receipt_deadline_preserves_live_session(
+    selected_ground_charge: LocalGameSession,
+    monkeypatch: pytest.MonkeyPatch,
+    *,
+    unresolved: bool,
+) -> None:
+    session = selected_ground_charge
+    view = session.view(viewer_player_id=ACTOR)
+    context = PlayerDecisionContext.from_view(view, choice_seed=0)
+    before = payload_digest(session.lifecycle.to_payload())
+    rng = _initial_rng_state_payload(session.lifecycle)
+    children = set(multiprocessing.active_children())
+    native_probe = ground_charge_policy._probe  # pyright: ignore[reportPrivateUsage]
+    normal = prepare_ground_charge_policy(session, context, raw_limit=4, accepted_limit=2)
+    accepts = [
+        receipt
+        for receipt in normal.validations
+        if receipt.status is not LifecycleStatusKind.INVALID
+    ]
+    delayed_id = accepts[1].candidate_id if unresolved else normal.ranked_accepted_ids[0]
+    delayed_result = "ground-charge-probe:" + delayed_id
+
+    def controlled_probe(
+        probe_session: LocalGameSession, action: PolicyAction, result_id: str, send: Connection
+    ) -> None:
+        if result_id == delayed_result and unresolved:
+            Event().wait()
+        native_probe(probe_session, action, result_id, send)
+        if result_id == delayed_result:
+            Event().wait()
+
+    monkeypatch.setattr(ground_charge_policy, "_probe", controlled_probe)
+    if unresolved:
+        with pytest.raises(GroundChargeValidationExhaustedError) as caught:
+            prepare_ground_charge_policy(session, context, raw_limit=4, accepted_limit=2)
+        exhaustion = caught.value
+        assert exhaustion.reason is ChargeSearchStop.NATIVE_TIMEOUT
+        assert exhaustion.counts.accepted == exhaustion.counts.timed_out == 1
+        assert exhaustion.validations[-1].candidate_id == delayed_id
+        assert exhaustion.validations[-1].status is None
+        assert [receipt.candidate_id for receipt in exhaustion.validations] == [
+            receipt.candidate_id for receipt in normal.validations
+        ]
+    else:
+        prepared = prepare_ground_charge_policy(session, context, raw_limit=4, accepted_limit=2)
+        assert prepared.counts == normal.counts
+        assert prepared.ranked_accepted_ids == normal.ranked_accepted_ids
+        assert (
+            PolicyRouter((prepared.registration,)).identity
+            == PolicyRouter((normal.registration,)).identity
+        )
+        assert prepared.registration.policy.choose(context) == normal.registration.policy.choose(
+            context
+        )
+
+    assert payload_digest(session.lifecycle.to_payload()) == before
+    assert _initial_rng_state_payload(session.lifecycle) == rng
+    assert session.view(viewer_player_id=ACTOR) == view
+    assert set(multiprocessing.active_children()) == children

@@ -12,7 +12,7 @@ from scripts.behavioral_selection_members import (
     _selection_object,
 )
 
-TRANSITION_SHA256 = "0daba6ba89667453f30c8f658b260a4dc94656bf9ff008159156f20ea31f4be5"
+TRANSITION_SHA256 = "0b1591280543a9952a3da9590a64dde5f6d6d5ebe1412ad333edac4234293001"
 BASE = "2addab80a74e9369b8b0b653954318bf58eec0e5"
 OWNER = "tests/infrastructure/adapters/test_ground_charge_policy.py"
 SOURCES = (

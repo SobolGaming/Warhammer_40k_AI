@@ -36,6 +36,7 @@ from warhammer40k_core.engine.phase import LifecycleStatusKind
 MAX_NATIVE_SECONDS = 300
 MAX_PROBE_SECONDS = 30
 DEFAULT_PROBE_SECONDS = 15
+_PROBE_REAP_SECONDS = 1.0
 
 
 @dataclass(frozen=True, slots=True)
@@ -74,7 +75,7 @@ class PreparedGroundCharge:
 
 
 class GroundChargeValidationExhaustedError(GroundChargeExhaustedError):
-    """Validation finished without an accepted candidate, with operator diagnostics."""
+    """Bounded validation could not certify a selection, with operator diagnostics."""
 
     def __init__(
         self,
@@ -116,40 +117,46 @@ def _probe(
             and event.payload.get("result_id") == result_id
             for event in session.lifecycle.decision_controller.event_log.records[first_event:]
         )
-        message = None if status.message is None else status.message[:1_000]
-        send.send((status.status_kind.value, message, completed))
+        # Keep the pickled frame, including its header, within Linux PIPE_BUF.
+        # The verdict fits in one pipe write, so readability means a full frame.
+        message = None if status.message is None else status.message[:750]
+        send.send((status.status_kind.value, message, completed, monotonic()))
 
 
 def _validate_candidate(
-    session: LocalGameSession, candidate: GroundChargeCandidate, seconds: float
+    session: LocalGameSession, candidate: GroundChargeCandidate, deadline: float
 ) -> ChargeCandidateValidation | None:
+    started = monotonic()
     context = multiprocessing.get_context("fork")
     receive, send = context.Pipe(duplex=False)
     worker = context.Process(
         target=_probe,
         args=(session, candidate.action, "ground-charge-probe:" + candidate.candidate_id, send),
     )
-    started = monotonic()
     with receive, send:
         worker.start()
-        send.close()
         try:
-            if not receive.poll(max(0.0, seconds - (monotonic() - started))):
+            send.close()
+            if not receive.poll(max(0.0, deadline - monotonic())):
                 return None
             try:
-                status_token, message, completed = receive.recv()
+                status_token, message, completed, receipt_at = receive.recv()
             except EOFError as exc:
                 raise PolicyError("Native ground charge worker exited without a receipt.") from exc
-            worker.join(max(0.0, seconds - (monotonic() - started)))
-            if worker.exitcode is None:
-                return None
-            if worker.exitcode != 0:
-                raise PolicyError("Native ground charge worker exited unsuccessfully.")
         finally:
-            if worker.is_alive():
+            # A published verdict is final. Reap independently of its deadline
+            # and stop a child that has further teardown to do.
+            worker.join(timeout=0)
+            if worker.exitcode is None:
                 worker.kill()
-                worker.join()
+                worker.join(timeout=_PROBE_REAP_SECONDS)
+            if worker.exitcode is None:
+                raise PolicyError("Native ground charge worker exceeded its cleanup limit.")
             worker.close()
+    if type(receipt_at) is not float or not started <= receipt_at:
+        raise PolicyError("Native ground charge worker receipt has an invalid completion time.")
+    if receipt_at > deadline:
+        return None
     status = LifecycleStatusKind(status_token)
     if status not in (
         LifecycleStatusKind.ADVANCED,
@@ -160,7 +167,7 @@ def _validate_candidate(
         raise PolicyError(f"Native ground charge stopped with {status}: {message}")
     if completed != (status is not LifecycleStatusKind.INVALID):
         raise PolicyError("Native ground charge validation lacked a consistent completion record.")
-    return ChargeCandidateValidation(candidate.candidate_id, status, message, monotonic() - started)
+    return ChargeCandidateValidation(candidate.candidate_id, status, message, receipt_at - started)
 
 
 def _require_limit(value: int, maximum: int) -> None:
@@ -205,6 +212,7 @@ def prepare_ground_charge_policy(
     )
     generation_seconds = monotonic() - started
     started = monotonic()
+    deadline = started + native_seconds
     validations: list[ChargeCandidateValidation] = []
     accepted: list[GroundChargeCandidate] = []
     stop = generated.stop
@@ -215,12 +223,13 @@ def prepare_ground_charge_policy(
         if len(validations) == validation_limit:
             stop = ChargeSearchStop.VALIDATION_LIMIT
             break
-        remaining = native_seconds - (monotonic() - started)
-        if remaining <= 0:
+        probe_started = monotonic()
+        if probe_started >= deadline:
             stop = ChargeSearchStop.NATIVE_TIMEOUT
             break
-        probe_started = monotonic()
-        receipt = _validate_candidate(session, candidate, min(per_probe_seconds, remaining))
+        receipt = _validate_candidate(
+            session, candidate, min(probe_started + per_probe_seconds, deadline)
+        )
         if receipt is None:
             validations.append(
                 ChargeCandidateValidation(
@@ -230,7 +239,8 @@ def prepare_ground_charge_policy(
                     monotonic() - probe_started,
                 )
             )
-            continue
+            stop = ChargeSearchStop.NATIVE_TIMEOUT
+            break
         validations.append(receipt)
         if receipt.status is not LifecycleStatusKind.INVALID:
             accepted.append(candidate)
@@ -244,9 +254,7 @@ def prepare_ground_charge_policy(
         rejected=sum(probe.status is LifecycleStatusKind.INVALID for probe in validations),
         timed_out=sum(probe.status is None for probe in validations),
     )
-    if not accepted:
-        if counts.timed_out:
-            stop = ChargeSearchStop.NATIVE_TIMEOUT
+    if stop is ChargeSearchStop.NATIVE_TIMEOUT or not accepted:
         raise GroundChargeValidationExhaustedError(
             stop,
             counts,
