@@ -17,7 +17,7 @@ BASE = "2addab80a74e9369b8b0b653954318bf58eec0e5"
 OWNER = "tests/infrastructure/adapters/test_ground_charge_policy.py"
 GROUP_BASE = "ffd62f1b1cdcf81c2fbd4b99457482c1018d2eb8"
 GROUP_TRANSITION = "data/source_audits/ci64_provenance_v1/stage2-group-ground-charge-test-v1.json"
-GROUP_TRANSITION_SHA256 = "7feac07ddcf53deade2c78ec334ec282c84c32e3cd3e8c862ebbec0ef9c87cda"
+GROUP_TRANSITION_SHA256 = "f32f75b6d38120e8663fde79612493ff40922c5eff7459d3d7197787791ea601"
 GROUP_OWNER = "tests/infrastructure/adapters/test_group_ground_charge_policy.py"
 SOURCES = (
     "src/warhammer40k_core/ai/ground_charge_candidates.py",

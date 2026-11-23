@@ -333,6 +333,14 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         for name in (
             "test_group_charge_generates_distinct_complete_witnesses",
             "test_group_charge_commits_a_native_accept",
+            "test_group_charge_accepts_attached_target_with_four_surviving_bodyguards",
+            "test_group_charge_objective_preprocessing_exhausts_before_geometry[0]",
+            "test_group_charge_objective_preprocessing_exhausts_before_geometry[1]",
+            "test_group_charge_objective_preprocessing_exhausts_before_geometry[1000]",
+            "test_group_charge_objective_inventory_limits[areas]",
+            "test_group_charge_objective_inventory_limits[vertices]",
+            "test_group_charge_objective_inventory_limits[linked-vertices]",
+            "test_group_charge_ranks_objective_reach_ahead_of_shorter_accepted_travel",
         )
     )
     assert shalaxi["test"]["before"] == shooting_visibility["test"]["after"]

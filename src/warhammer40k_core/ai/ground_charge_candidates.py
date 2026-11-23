@@ -9,6 +9,7 @@ from enum import StrEnum
 from itertools import pairwise, zip_longest
 from typing import Protocol, cast
 
+from warhammer40k_core.adapters.projection import ModelDisplayPayload
 from warhammer40k_core.ai.player_policy import (
     CandidateExhaustedError,
     PlayerDecisionContext,
@@ -29,6 +30,7 @@ from warhammer40k_core.engine.phases.charge import ChargeMoveProposal
 from warhammer40k_core.geometry.base import BaseShape, CircularBase, OvalBase
 from warhammer40k_core.geometry.model_geometry import ModelGeometry, ModelGeometryPayload
 from warhammer40k_core.geometry.pathing import PathWitness
+from warhammer40k_core.geometry.polygons import Point2D
 from warhammer40k_core.geometry.pose import Point3, Pose, PosePayload
 from warhammer40k_core.geometry.shapely_backend import (
     FootprintGeometry,
@@ -52,6 +54,8 @@ _COHERENCY_GAP_INCHES = 2.0
 _ENDPOINT_TERRAIN_CLEARANCE_INCHES = 0.05
 _GROUP_GRID_STEP_INCHES = 0.5
 _GROUP_MAX_SPAN_INCHES = 9.0
+_MAX_OBJECTIVE_AREA_VERTICES = 256
+_MAX_OBJECTIVE_VERTICES = 4096
 
 type _Bounds = tuple[float, float, float, float]
 
@@ -136,12 +140,13 @@ class _Work:
         self.limit = limit
         self.used = 0
 
-    def step(self) -> None:
-        if self.used == self.limit:
+    def step(self, amount: int = 1) -> None:
+        if amount > self.limit - self.used:
+            self.used = self.limit
             raise GroundChargeExhaustedError(
                 ChargeSearchStop.GEOMETRY_LIMIT, ChargeSearchCounts(geometry_work=self.used)
             )
-        self.used += 1
+        self.used += amount
 
 
 def _object(value: JsonValue) -> dict[str, JsonValue]:
@@ -179,18 +184,21 @@ def _bounded_int(value: int, maximum: int) -> None:
         raise PolicyError(f"Ground charge count limit must be in [0, {maximum}].")
 
 
-def _placed_models(
-    battlefield: dict[str, JsonValue], context: PlayerDecisionContext
-) -> tuple[_Placed, ...]:
-    displays = context.observation["model_display_by_id"]
-    placed = [
+def _model_placements(battlefield: dict[str, JsonValue]) -> tuple[dict[str, JsonValue], ...]:
+    placed = tuple(
         _object(model)
         for army in _items(battlefield["placed_armies"])
         for unit in _items(_object(army)["unit_placements"])
         for model in _items(_object(unit)["model_placements"])
-    ]
+    )
     if len(placed) > _MAX_OBSTACLES:
         raise PolicyError("Ground charge visible model inventory exceeds its supported scope.")
+    return placed
+
+
+def _placed_models(
+    placed: tuple[dict[str, JsonValue], ...], displays: dict[str, ModelDisplayPayload]
+) -> tuple[_Placed, ...]:
     models: list[_Placed] = []
     for model in placed:
         model_id = _identifier(model["model_instance_id"])
@@ -423,24 +431,45 @@ def _connected_group(
         connected = next_connected
 
 
-def _objective_areas(context: PlayerDecisionContext) -> tuple[FootprintGeometry, ...]:
-    mission = _object(context.observation["mission_setup"])
+def _objective_areas(mission_payload: JsonValue, work: _Work) -> tuple[FootprintGeometry, ...]:
+    mission = _object(mission_payload)
     definitions = _items(mission["objective_terrain_areas"])
     areas = _items(mission["terrain_areas"])
+    message = "Ground charge objective inventory exceeds its supported scope."
     if max(len(definitions), len(areas)) > _MAX_OBSTACLES:
-        raise PolicyError("Ground charge objective inventory exceeds its supported scope.")
-    polygons = {
-        _identifier(area["terrain_area_id"]): tuple(
+        raise PolicyError(message)
+    polygons: dict[str, tuple[Point2D, ...]] = {}
+    vertex_count = 0
+    for area in map(_object, areas):
+        points = _items(area["footprint_polygon"])
+        vertex_count += len(points)
+        if len(points) > _MAX_OBJECTIVE_AREA_VERTICES or vertex_count > _MAX_OBJECTIVE_VERTICES:
+            raise PolicyError(message)
+        work.step(1 + len(points))
+        polygons[_identifier(area["terrain_area_id"])] = tuple(
             (_number(point["x_inches"]), _number(point["y_inches"]))
-            for point in map(_object, _items(area["footprint_polygon"]))
+            for point in map(_object, points)
         )
-        for area in map(_object, areas)
-    }
-    return tuple(
-        footprint_for_polygon_union(tuple(polygons[_identifier(key)] for key in keys))
-        for definition in map(_object, definitions)
-        if (keys := _items(definition["terrain_area_ids"]))
-    )
+    linked: list[tuple[tuple[Point2D, ...], ...]] = []
+    linked_vertices = 0
+    geometry_work = 0
+    for definition in map(_object, definitions):
+        keys = _items(definition["terrain_area_ids"])
+        if len(keys) > _MAX_OBSTACLES:
+            raise PolicyError(message)
+        work.step(1 + len(keys))
+        if not keys:
+            continue
+        footprints = tuple(polygons[_identifier(key)] for key in keys)
+        vertices = sum(map(len, footprints))
+        linked_vertices += vertices
+        if linked_vertices > _MAX_OBJECTIVE_VERTICES:
+            raise PolicyError(message)
+        geometry_work += vertices * vertices
+        linked.append(footprints)
+    # The footprint backend eagerly checks polygon edges pairwise before union.
+    work.step(geometry_work)
+    return tuple(footprint_for_polygon_union(footprints) for footprints in linked)
 
 
 def _group_endpoints(
@@ -592,15 +621,16 @@ def _candidate(
 def _five_model_candidates(
     context: PlayerDecisionContext,
     issued: MovementProposalRequest,
+    target_id: str,
     movers: tuple[_Placed, ...],
     targets: tuple[_Placed, ...],
     static: tuple[FootprintGeometry, ...],
+    objectives: tuple[FootprintGeometry, ...],
     board: tuple[float, float],
     budget: float,
     work: _Work,
     raw_limit: int,
 ) -> GroundChargeCandidates:
-    objectives = _objective_areas(context)
     candidates: list[GroundChargeCandidate] = []
     stop = ChargeSearchStop.COMPLETE
     try:
@@ -617,7 +647,7 @@ def _five_model_candidates(
             for index, model in enumerate(movers)
         }
         for formation in _group_formations(banks, work):
-            candidates.append(_candidate(context, issued, targets[0].unit_id, movers, formation))
+            candidates.append(_candidate(context, issued, target_id, movers, formation))
             if len(candidates) == raw_limit:
                 stop = ChargeSearchStop.RAW_LIMIT
                 break
@@ -690,10 +720,29 @@ def generate_ground_charge_candidates(
         raise PolicyError("Ground charge requires a positive issued distance.")
     if raw_limit == 0:
         raise GroundChargeExhaustedError(ChargeSearchStop.RAW_LIMIT, ChargeSearchCounts())
+    work = _Work(geometry_limit)
+    if not geometry_limit:
+        work.step()
     battlefield = _object(view["battlefield_state"])
-    models = _placed_models(battlefield, context)
+    placements = _model_placements(battlefield)
+    five_models = sum(row["unit_instance_id"] == issued.unit_instance_id for row in placements) == 5
+    objectives = _objective_areas(view["mission_setup"], work) if five_models else ()
+    models = _placed_models(placements, view["model_display_by_id"])
     movers = tuple(model for model in models if model.unit_id == issued.unit_instance_id)
-    targets = tuple(model for model in models if model.unit_id == target_id)
+    if five_models:
+        battlefield_view = view["battlefield_view"]
+        if battlefield_view is None:
+            raise PolicyError("Ground charge requires projected rules-unit identities.")
+        projected = battlefield_view["authoritative"]["models_by_id"]
+        targets = tuple(
+            model
+            for model in models
+            if (entity := projected.get(model.model_id)) is not None
+            and entity["rules_unit_instance_id"] == target_id
+            and entity["state"] == "placed"
+        )
+    else:
+        targets = tuple(model for model in models if model.unit_id == target_id)
     if (len(movers), len(targets)) not in ((6, 1), (5, 5)) or any(
         type(model.base) not in (CircularBase, OvalBase) or model.pose.position.z != 0
         for model in (*movers, *targets)
@@ -751,10 +800,19 @@ def generate_ground_charge_candidates(
     )
     width = _number(battlefield["battlefield_width_inches"])
     depth = _number(battlefield["battlefield_depth_inches"])
-    work = _Work(geometry_limit)
-    if len(targets) == 5:
+    if five_models:
         return _five_model_candidates(
-            context, issued, movers, targets, static, (width, depth), budget, work, raw_limit
+            context,
+            issued,
+            target_id,
+            movers,
+            targets,
+            static,
+            objectives,
+            (width, depth),
+            budget,
+            work,
+            raw_limit,
         )
     target = targets[0]
     direct: list[GroundChargeCandidate] = []

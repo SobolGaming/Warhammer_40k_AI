@@ -2907,11 +2907,14 @@ actor's `PlayerDecisionContext` on the exact battle Charge / movement proposal /
 and footprints, and visible terrain. The two supported formation sizes are
 six grounded movers against one grounded target model and five against five.
 Search keeps each mover's facing and elevation and tries direct paths and paths
-with one lateral waypoint per model. For five against five, each proposed
-endpoint is near at least one model of the selected unit. The search screens
-for connected coherency and samples different landing regions on objective
-terrain shown in the player view. The ordinary engine decides path, terrain,
-endpoint and coherency legality.
+with one lateral waypoint per model. For five against five, the policy groups
+visible placed target models by their projected rules-unit identity, including
+attached components. It keeps the issued target ID in the proposal. Each
+endpoint is near at least one target model. The search screens for connected
+coherency and samples landing regions on visible objective terrain. Objective
+preprocessing caps area and vertex inventory and charges the geometry work
+budget before building footprints. The engine decides path, terrain, endpoint
+and coherency legality.
 
 Call `ai.ground_charge_policy.prepare_ground_charge_policy` with the matching
 actor context and an exclusively owned `LocalGameSession` in a single-threaded,
