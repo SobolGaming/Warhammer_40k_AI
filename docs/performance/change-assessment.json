@@ -4,6 +4,16 @@
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:bc2ce5165f872793b204fa9669e61fd19d8daef543242132616dab424b9b2986",
   "operation_map_sha256": "15e5f2b394a00b8460fe6db17d732b2f86f13bb525c4246f4d60358628cc7c04",
   "changes": {
+    "ci/test_shards/durations.json": {
+      "before_sha256": "b47707f0c7f0612ffa16efb72b588d4e9aa84547e3bb2ca596e1d9495d5ad0e1",
+      "after_sha256": "3460e308c5532120b9352099d8f7cff2978e279c088a9eaa959c49264f08aab6",
+      "owners": {
+        "@document": {
+          "before": "b47707f0c7f0612ffa16efb72b588d4e9aa84547e3bb2ca596e1d9495d5ad0e1",
+          "after": "3460e308c5532120b9352099d8f7cff2978e279c088a9eaa959c49264f08aab6"
+        }
+      }
+    },
     "contracts/examples/persistence/session-persistence.json": {
       "before_sha256": "f238d1eaff2aad9608d770351382419164efa94577cdafa107e91d861a5d7a08",
       "after_sha256": "73daf99389d81b06a07207bd7392d8d80b634332aaf1d9954e20a7f2417689df",
@@ -316,6 +326,16 @@
     }
   },
   "rows": {
+    "ci/test_shards/durations.json": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Bind four exact measured Daemon Battle-shock case weights to the retained shard plan and complete strict dispatch inventory.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "measured_workload",
       "operations": [
