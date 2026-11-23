@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from copy import copy
+from dataclasses import replace
 from enum import StrEnum
 from typing import cast
 
@@ -44,11 +45,15 @@ from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentContribution
 from warhammer40k_core.engine.faction_content.common import canonical_keyword as _canonical_keyword
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons import (
+    battle_shock_territory_authority,
+)
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons import (
     datasheets as chaos_daemons_datasheets,
 )
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.healing import HealingEffect, resolve_healing_until_blocked
 from warhammer40k_core.engine.healing_geometry import healing_phase_start_model_ids
+from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
     MortalWoundDestructionEvidence,
 )
@@ -85,7 +90,10 @@ from warhammer40k_core.engine.rules_unit_geometry import (
     present_geometry_models_for_rules_unit,
 )
 from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_view_by_id
-from warhammer40k_core.engine.sticky_objective_control import apply_sticky_objective_control
+from warhammer40k_core.engine.sticky_objective_control import (
+    StickyObjectiveControlState,
+    apply_sticky_objective_control,
+)
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.geometry import shapely_backend
 from warhammer40k_core.geometry.measurement import DistanceMeasurementContext
@@ -385,7 +393,7 @@ def _historical_daemonic_terror_applies(
     daemon_army: ArmyDefinition,
     target: RulesUnitView,
 ) -> bool:
-    return _historical_unit_intersects_owner_deployment(
+    if _historical_unit_intersects_owner_deployment(
         context=context,
         player_id=daemon_army.player_id,
         target=target,
@@ -393,7 +401,158 @@ def _historical_daemonic_terror_applies(
         context=context,
         daemon_army=daemon_army,
         target=target,
+    ):
+        return True
+    if not _historical_manifestation_restored_by_wounds(context=context, target=target):
+        return False
+
+    player_id = daemon_army.player_id
+    mission = context.mission_setup
+    models = context.geometry_models(target.unit_instance_id, include_retained=True)
+    if target.retained_model_ids and (
+        _historical_unit_intersects_owner_deployment(
+            context=context, player_id=player_id, target=target, include_retained=True
+        )
+        or _historical_greater_daemon_terror(
+            context=context, daemon_army=daemon_army, target=target, include_retained=True
+        )
+    ):
+        return True
+    groups: list[tuple[str, ...]] = []
+    if _historical_unit_intersects_owner_deployment(
+        context=context, player_id=target.owner_player_id, target=target, include_retained=True
+    ):
+        groups.append(_opponent_deployment_objective_ids_for_mission(mission, player_id=player_id))
+    if any(
+        shapely_backend.base_footprint_intersects_no_mans_land(
+            model.base,
+            model.pose,
+            battlefield_bounds=(
+                0.0,
+                0.0,
+                context.battlefield_width_inches,
+                context.battlefield_depth_inches,
+            ),
+            deployment_zones=mission.deployment_zones,
+        )
+        for model in models
+    ):
+        groups.append(_no_mans_land_objective_ids_for_mission(mission))
+
+    sticky = battle_shock_territory_authority.prior_sticky_candidates(context, player_id)
+    territory = battle_shock_territory_authority.historical_territorial_control(
+        context=context,
+        player_id=player_id,
+        objective_groups=tuple(groups),
+        sticky_candidates=sticky,
     )
+    if territory is True:
+        return True
+    if (
+        territory is None
+        or _historical_corrupted_realspace_may_reach(mission, models, sticky)
+        or _historical_semantic_aura_may_target_enemy(context, daemon_army)
+    ):
+        raise GameLifecycleError(
+            "Historical Daemonic Terror eligibility cannot be established after a casualty."
+        )
+    return False
+
+
+def _historical_manifestation_restored_by_wounds(
+    *, context: HistoricalBattleShockAuthorityContext, target: RulesUnitView
+) -> bool:
+    # Narrow the check to the newly admitted cases. Reapply the old zero wounds
+    # only for the target's keyword check, retaining test-boundary geometry.
+    restored = context.later_destroyed_model_ids.intersection(
+        model.model_instance_id for model in target.own_models
+    )
+    if not restored:
+        return False
+    own_army = context.army_for_player(target.owner_player_id)
+    if own_army.detachment_selection.faction_id != CHAOS_DAEMONS_FACTION_ID:
+        return False
+    if not historical_daemonic_manifestation_applies(
+        context=context, daemon_army=own_army, target=target
+    ):
+        return False
+    before_fix = replace(
+        target,
+        components=tuple(
+            replace(
+                component,
+                unit=replace(
+                    component.unit,
+                    own_models=tuple(
+                        replace(model, wounds_remaining=0)
+                        if model.model_instance_id in restored
+                        else model
+                        for model in component.unit.own_models
+                    ),
+                ),
+            )
+            for component in target.components
+        ),
+    )
+    return not historical_daemonic_manifestation_applies(
+        context=context, daemon_army=own_army, target=before_fix
+    )
+
+
+def _historical_corrupted_realspace_may_reach(
+    mission: MissionSetup,
+    models: tuple[GeometryModel, ...],
+    sticky: tuple[StickyObjectiveControlState, ...],
+) -> bool:
+    markers = {
+        marker.objective_marker_id: marker.to_objective_marker()
+        for marker in mission.objective_markers
+    }
+    for state in sticky:
+        payload = state.replay_payload
+        if not isinstance(payload, dict):
+            raise GameLifecycleError("Corrupted Realspace sticky payload must be an object.")
+        if payload.get("effect_kind") != CORRUPTED_REALSPACE_STICKY_EFFECT_KIND:
+            continue
+        aura_inches = payload.get("shadow_of_chaos_aura_inches")
+        if type(aura_inches) not in (float, int):
+            raise GameLifecycleError("Corrupted Realspace aura payload must contain inches.")
+        marker = markers[state.objective_id]
+        if any(
+            DistanceMeasurementContext.from_objective_marker_to_model(
+                marker_id=marker.objective_marker_id,
+                marker_pose=Pose.at(marker.x_inches, marker.y_inches, marker.z_inches),
+                model=model,
+                marker_diameter_inches=marker.marker_diameter_inches,
+            ).horizontal_distance_inches()
+            <= float(cast(float | int, aura_inches))
+            for model in models
+        ):
+            return True
+    return False
+
+
+def _historical_semantic_aura_may_target_enemy(
+    context: HistoricalBattleShockAuthorityContext, daemon_army: ArmyDefinition
+) -> bool:
+    # Authored Shadow auras are friendly. Keep an enemy-capable source unresolved
+    # if a future package supplies one and its bearer was on the battlefield.
+    for unit in daemon_army.units:
+        placed = set(context.component_placed_alive_model_ids(unit.unit_instance_id))
+        for ability in unit.datasheet_abilities:
+            if not placed.intersection(
+                _semantic_shadow_aura_source_model_ids(unit=unit, ability=ability)
+            ):
+                continue
+            ir = _semantic_rule_ir_for_ability(ability)
+            if _rule_ir_sets_shadow_of_chaos_status(ir) and any(
+                clause.target is not None
+                and clause.target.kind is RuleTargetKind.AURA_UNITS
+                and parameter_payload(clause.target.parameters).get("allegiance") != "friendly"
+                for clause in ir.clauses
+            ):
+                return True
+    return False
 
 
 def _historical_unit_intersects_owner_deployment(
@@ -401,6 +560,7 @@ def _historical_unit_intersects_owner_deployment(
     context: HistoricalBattleShockAuthorityContext,
     player_id: str,
     target: RulesUnitView,
+    include_retained: bool = False,
 ) -> bool:
     zones = tuple(
         zone for zone in context.mission_setup.deployment_zones if zone.player_id == player_id
@@ -413,7 +573,9 @@ def _historical_unit_intersects_owner_deployment(
             model.pose,
             zone,
         )
-        for model in context.geometry_models(target.unit_instance_id)
+        for model in context.geometry_models(
+            target.unit_instance_id, include_retained=include_retained
+        )
         for zone in zones
     )
 
@@ -445,8 +607,11 @@ def _historical_greater_daemon_terror(
     context: HistoricalBattleShockAuthorityContext,
     daemon_army: ArmyDefinition,
     target: RulesUnitView,
+    include_retained: bool = False,
 ) -> bool:
-    target_models = context.geometry_models(target.unit_instance_id)
+    target_models = context.geometry_models(
+        target.unit_instance_id, include_retained=include_retained
+    )
     return any(
         source_model.base_distance_to(target_model) <= 6.0
         for unit in daemon_army.units
@@ -1596,13 +1761,17 @@ def _unit_geometry_models(
 def _no_mans_land_objective_ids(state: GameState) -> tuple[str, ...]:
     if state.mission_setup is None:
         raise GameLifecycleError("No Man's Land objective lookup requires MissionSetup.")
+    return _no_mans_land_objective_ids_for_mission(state.mission_setup)
+
+
+def _no_mans_land_objective_ids_for_mission(mission: MissionSetup) -> tuple[str, ...]:
     return tuple(
         sorted(
             marker.objective_marker_id
-            for marker in state.mission_setup.objective_markers
+            for marker in mission.objective_markers
             if not any(
                 zone.contains_point(marker.x_inches, marker.y_inches)
-                for zone in state.mission_setup.deployment_zones
+                for zone in mission.deployment_zones
             )
         )
     )
@@ -1615,16 +1784,22 @@ def _opponent_deployment_objective_ids(
 ) -> tuple[str, ...]:
     if state.mission_setup is None:
         raise GameLifecycleError("Opponent deployment objective lookup requires MissionSetup.")
+    return _opponent_deployment_objective_ids_for_mission(state.mission_setup, player_id=player_id)
+
+
+def _opponent_deployment_objective_ids_for_mission(
+    mission: MissionSetup,
+    *,
+    player_id: str,
+) -> tuple[str, ...]:
     requested_player_id = _validate_identifier("player_id", player_id)
     opponent_zones = tuple(
-        zone
-        for zone in state.mission_setup.deployment_zones
-        if zone.player_id != requested_player_id
+        zone for zone in mission.deployment_zones if zone.player_id != requested_player_id
     )
     return tuple(
         sorted(
             marker.objective_marker_id
-            for marker in state.mission_setup.objective_markers
+            for marker in mission.objective_markers
             if any(zone.contains_point(marker.x_inches, marker.y_inches) for zone in opponent_zones)
         )
     )

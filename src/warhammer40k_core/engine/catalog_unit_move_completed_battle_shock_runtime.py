@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from dataclasses import dataclass, replace
+from dataclasses import dataclass
 from types import MappingProxyType
 from typing import cast
 
@@ -217,10 +217,7 @@ def historical_catalog_unit_move_completed_battle_shock_effects(
         return ()
     return _catalog_unit_move_completed_battle_shock_effects_for_source(
         ability_index=index,
-        source_rules_unit=_rules_unit_with_historical_wounds(
-            historical=historical,
-            rules_unit=source_rules_unit,
-        ),
+        source_rules_unit=source_rules_unit,
         source_model_ids=source_model_ids,
         target_candidates=target_candidates,
         trigger_event_id=trigger_id,
@@ -491,38 +488,6 @@ def _source_model_instance_id_for_record(
     raise GameLifecycleError(
         "Catalog move-completed Battle-shock record lacks unit-scoped source authority."
     )
-
-
-def _rules_unit_with_historical_wounds(
-    *,
-    historical: HistoricalBattleShockAuthorityContext,
-    rules_unit: RulesUnitView,
-) -> RulesUnitView:
-    wounds_by_model_id = {
-        row.model_instance_id: row.wounds_remaining for row in historical.physical_models
-    }
-    try:
-        components = tuple(
-            replace(
-                component,
-                unit=replace(
-                    component.unit,
-                    own_models=tuple(
-                        replace(
-                            model,
-                            wounds_remaining=wounds_by_model_id[model.model_instance_id],
-                        )
-                        for model in component.unit.own_models
-                    ),
-                ),
-            )
-            for component in rules_unit.components
-        )
-        return replace(rules_unit, components=components)
-    except KeyError as exc:
-        raise GameLifecycleError(
-            "Historical catalog move-completed Battle-shock model inventory is incomplete."
-        ) from exc
 
 
 def _placed_alive_model_instance_ids_for_rules_unit(

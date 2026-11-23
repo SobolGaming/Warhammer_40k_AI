@@ -1,0 +1,44 @@
+{
+  "schema": "finite-monster-mash-round4-battle-shock-test-transition-v1",
+  "base": "1629879b409fbbd29addf062abd30359ca923986",
+  "retained_attack_reroll_sha256": "27bc3311f7f63b94ab566a377c37648b89dd666422a6e8c000c09068243f9ea5",
+  "retained_runtime_fingerprint": "ab1579cadb6dc2ef448612d197a985d8d25ea32f7b42b9daaa9eb1223b93d02f",
+  "runtime_fingerprint": "bc2ce5165f872793b204fa9669e61fd19d8daef543242132616dab424b9b2986",
+  "source": {
+    "src/warhammer40k_core/engine/battle_shock_historical_authority.py": {
+      "before": "84988583200ca46f30af57892feade1c59f3eaa49e660638d3798c59c3f3ec57",
+      "after": "d33d5a29f29b470ceefe993e40d1433757fa97098ba0d05676b1eb547c3389f1"
+    },
+    "src/warhammer40k_core/engine/catalog_unit_move_completed_battle_shock_runtime.py": {
+      "before": "b16b64936bffd7c8df11f49df931e72ce41df8868cf6865c3174ec0e85f32664",
+      "after": "a318ef40d87f617a99ef00689215a52dab4ef368b6a891ba771e4ed9b2aed4e3"
+    },
+    "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/army_rule.py": {
+      "before": "762e898b60d7740855120a0cd9bb0f73cde6bf3319816623ec7e25cc0b18bf01",
+      "after": "2adb65d7afbe38c7d8b31bdfdc4c01e4233870b04fcdd1065371a3d6246c8684"
+    },
+    "src/warhammer40k_core/engine/generic_effect_history.py": {
+      "before": "1daec6732346229e3775a512092f5feec11a2b8e0837d2ec4132f41db7b173cb",
+      "after": "5d8b7ba65b2e48f0003e0976624a32a5971f51429b92b20ac2e78581d1e00093"
+    },
+    "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/battle_shock_territory_authority.py": {
+      "before": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "after": "4f110d54ff14ce4e2976ef551764f67a45ace8f2e74c51101d4cf41eca7a9886"
+    }
+  },
+  "test": {
+    "path": "tests/factions/chaos_daemons/unit/test_chaos_daemons_army_rule.py",
+    "before": {
+      "blob_sha1": "78e7d858ea3f06f76e7be034ac9feb8e45ab5a78",
+      "bytes": 18365,
+      "mode": "100644",
+      "sha256": "dfeca2fa09c594e9d0274db16e8d74d1186d5f2e5dcfab7289d02d912c7d5285"
+    },
+    "after": {
+      "mode": "100644",
+      "blob_sha1": "ac5122f43baff2cbc0d7d08fef4b81e217811349",
+      "sha256": "9b80eb8e8b3975a9b75b8495cb4e8aece4b1ae7663ae0e991e839f796256d751",
+      "bytes": 25927
+    }
+  }
+}

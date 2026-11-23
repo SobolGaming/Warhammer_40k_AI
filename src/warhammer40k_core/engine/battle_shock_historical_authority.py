@@ -1,9 +1,10 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.core.attributes import Characteristic
+from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.engine.ability_presence import (
     AbilityPresence,
     AbilitySpatialRelationship,
@@ -36,6 +37,7 @@ from warhammer40k_core.engine.rules_units import (
 from warhammer40k_core.engine.starting_attached_units import StartingAttachedUnitRecord
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.engine.unit_state import BelowHalfStrengthContext, StartingStrengthRecord
+from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
 from warhammer40k_core.geometry.volume import Model as GeometryModel
 
 if TYPE_CHECKING:
@@ -47,8 +49,8 @@ class HistoricalBattleShockAuthorityContext:
     """Typed, event-bound facts used to authenticate one Battle-shock test.
 
     This context is internal and is never serialized. Physical facts come from
-    the shared authenticated transition/damage history. Unit definitions and
-    starting-strength rows are immutable mustered authority. Mutable faction
+    the shared authenticated transition/damage history. Mustered model profiles
+    carry the wounds remaining at this boundary. Mutable faction
     state and effects are deliberately absent: source providers must establish
     those from their exact causal event families.
     """
@@ -61,6 +63,9 @@ class HistoricalBattleShockAuthorityContext:
     mission_setup: MissionSetup
     battlefield_width_inches: float
     battlefield_depth_inches: float
+    terrain_features: tuple[TerrainFeatureDefinition, ...]
+    ruleset_descriptor: RulesetDescriptor
+    later_destroyed_model_ids: frozenset[str]
     starting_strength_records: tuple[StartingStrengthRecord, ...]
     starting_attached_unit_records: tuple[StartingAttachedUnitRecord, ...]
     physical_models: tuple[PhysicalModelAuthority, ...]
@@ -261,14 +266,23 @@ class HistoricalBattleShockAuthorityContext:
             single_model_wounds_remaining=single_model_wounds_remaining,
         )
 
-    def geometry_models(self, unit_instance_id: str) -> tuple[GeometryModel, ...]:
+    def geometry_models(
+        self, unit_instance_id: str, *, include_retained: bool = False
+    ) -> tuple[GeometryModel, ...]:
+        retained_ids = (
+            self.rules_unit(unit_instance_id).retained_model_ids if include_retained else ()
+        )
         rows = {
             row.model_instance_id: row
             for row in self.physical_models
             if row.presence == "battlefield"
+            or (row.presence == "retained_destroyed" and row.model_instance_id in retained_ids)
         }
+        placed_ids = self.placed_alive_model_ids(unit_instance_id)
+        if retained_ids:
+            placed_ids = tuple(sorted(set(placed_ids).union(set(rows).intersection(retained_ids))))
         geometries: list[GeometryModel] = []
-        for model_id in self.placed_alive_model_ids(unit_instance_id):
+        for model_id in placed_ids:
             row = rows.get(model_id)
             if row is None or row.pose is None:
                 raise GameLifecycleError(
@@ -431,12 +445,27 @@ def historical_battle_shock_authority_context(
         player_ids=tuple(state.player_ids),
         turn_order=tuple(state.turn_order),
         battle_phase_sequence=tuple(state.battle_phase_sequence),
-        armies=armies_with_historical_random_profiles(
-            armies=tuple(state.army_definitions),
-            prior_events=event_records[:boundary_event_index],
-            characteristics=(Characteristic.LEADERSHIP,),
+        armies=_armies_with_historical_wounds(
+            armies=armies_with_historical_random_profiles(
+                armies=tuple(state.army_definitions),
+                prior_events=event_records[:boundary_event_index],
+                characteristics=(Characteristic.LEADERSHIP,),
+            ),
+            physical_models=physical,
         ),
         mission_setup=state.mission_setup,
+        terrain_features=state.battlefield_state.terrain_features,
+        ruleset_descriptor=state.runtime_ruleset_descriptor(),
+        later_destroyed_model_ids=(
+            frozenset(row.model_instance_id for row in physical if row.wounds_remaining > 0)
+            & frozenset(
+                model.model_instance_id
+                for army in state.army_definitions
+                for unit in army.units
+                for model in unit.own_models
+                if not model.is_alive
+            )
+        ),
         battlefield_width_inches=state.battlefield_state.battlefield_width_inches,
         battlefield_depth_inches=state.battlefield_state.battlefield_depth_inches,
         starting_strength_records=tuple(state.starting_strength_records),
@@ -452,6 +481,34 @@ def historical_battle_shock_authority_context(
         phase=phase,
         phase_start_battle_shocked_unit_ids=phase_start_battle_shocked_unit_ids,
     )
+
+
+def _armies_with_historical_wounds(
+    *,
+    armies: tuple[ArmyDefinition, ...],
+    physical_models: tuple[PhysicalModelAuthority, ...],
+) -> tuple[ArmyDefinition, ...]:
+    wounds_by_model = {row.model_instance_id: row.wounds_remaining for row in physical_models}
+
+    def model_at_boundary(model: ModelInstance) -> ModelInstance:
+        wounds = wounds_by_model.get(model.model_instance_id)
+        if wounds is None:
+            raise GameLifecycleError("Historical Battle-shock model wound authority is missing.")
+        if wounds == model.wounds_remaining:
+            return model
+        return replace(model, wounds_remaining=wounds)
+
+    historical_armies: list[ArmyDefinition] = []
+    for army in armies:
+        units: list[UnitInstance] = []
+        for unit in army.units:
+            models = tuple(model_at_boundary(model) for model in unit.own_models)
+            units.append(unit if models == unit.own_models else replace(unit, own_models=models))
+        historical_units = tuple(units)
+        historical_armies.append(
+            army if historical_units == army.units else replace(army, units=historical_units)
+        )
+    return tuple(historical_armies)
 
 
 __all__ = (

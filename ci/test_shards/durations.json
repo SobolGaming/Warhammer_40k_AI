@@ -251,6 +251,10 @@
     "tests/factions/chaos_daemons/unit/test_chaos_daemons_army_rule.py::test_controlled_territory_drives_loaded_manifestation_roll[no_mans_land-two_of_three-True]": 1.179,
     "tests/factions/chaos_daemons/unit/test_chaos_daemons_army_rule.py::test_controlled_territory_drives_loaded_manifestation_roll[opponent_deployment_zone-controlled-True]": 1.114,
     "tests/factions/chaos_daemons/unit/test_chaos_daemons_army_rule.py::test_controlled_territory_drives_loaded_manifestation_roll[opponent_deployment_zone-enemy_controlled-False]": 1.256,
+    "tests/factions/chaos_daemons/unit/test_chaos_daemons_army_rule.py::test_later_daemon_casualty_still_requires_historical_territorial_terror[False-False]": 2.379,
+    "tests/factions/chaos_daemons/unit/test_chaos_daemons_army_rule.py::test_later_daemon_casualty_still_requires_historical_territorial_terror[True-False]": 1.755,
+    "tests/factions/chaos_daemons/unit/test_chaos_daemons_army_rule.py::test_later_daemon_casualty_still_requires_historical_territorial_terror[True-True]": 1.233,
+    "tests/factions/chaos_daemons/unit/test_chaos_daemons_army_rule.py::test_manifestation_history_survives_the_tested_units_later_destruction": 0.76,
     "tests/factions/chaos_daemons/unit/test_generic_ir_support_validation.py::test_shadow_and_blood_legion_detachment_validators_reject_drift": 0.001,
     "tests/factions/chaos_daemons/unit/test_generic_rule_ability_registry.py::test_default_generic_rule_ability_registry_maps_blood_legion_grants": 0.212,
     "tests/factions/chaos_daemons/unit/test_generic_rule_ability_registry.py::test_default_generic_rule_ability_registry_maps_shadow_legion_enhancement_grants": 1.43,
@@ -7247,10 +7251,12 @@
     {
       "junit_sha256": [
         "326c4811a2cc9f791043455e69db4eb3436bb3d12a967c2627e3395f5df45842",
-        "4787a5d458d1a8adb2790c1f1a27e946727d62bc04bdbfcf0033a4283f505b71"
+        "4787a5d458d1a8adb2790c1f1a27e946727d62bc04bdbfcf0033a4283f505b71",
+        "5db602bdb48b2adf56149bc0725b284a56267893c8aed641a94769b20102f3cb",
+        "b9619a09b2b045cbede9cba4a6be4660fc45fa566abc33c1baec391e967a4dfc"
       ],
-      "source": "WSL AMD Ryzen Threadripper 3970X covered profile at a9b40cace20ee496a7b54da24ae265fe39377c0b, bounded serial mirror and 32 work-stealing workers, 6668 passed and 68.18 percent, supervisor approved in 1139.886 seconds",
-      "test_cases": 6668,
+      "source": "WSL AMD Ryzen Threadripper 3970X covered profile at a9b40cace20ee496a7b54da24ae265fe39377c0b, bounded serial mirror and 32 work-stealing workers, 6668 passed and 68.18 percent, supervisor approved in 1139.886 seconds. Retained file totals, shard assignments and 6668 case weights. Four exact Daemon Battle-shock case weights are from the complete WSL covered profile at 12147cea06cbe5059390e08dd942b0efb6752d77, 6672 passed at 68.19 percent with a bounded serial mirror and 32 work-stealing workers.",
+      "test_cases": 6672,
       "test_files": 441
     }
   ],

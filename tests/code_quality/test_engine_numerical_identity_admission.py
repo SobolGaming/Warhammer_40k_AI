@@ -286,7 +286,37 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
     )
     assert fight_reroll_base["fingerprint"] == shooting_visibility["runtime_fingerprint"]
     assert fight_reroll["retained_runtime_fingerprint"] == fight_reroll_base["fingerprint"]
-    assert _record(MANIFEST)["fingerprint"] == fight_reroll["runtime_fingerprint"]
+    round4 = _record(selection.ROUND4_BATTLE_SHOCK_TRANSITION)
+    round4_base = json.loads(
+        subprocess.check_output(
+            ["git", "show", selection.ROUND4_BATTLE_SHOCK_BASE + ":" + MANIFEST], cwd=ROOT
+        )
+    )
+    assert round4_base["fingerprint"] == fight_reroll["runtime_fingerprint"]
+    assert round4["retained_runtime_fingerprint"] == round4_base["fingerprint"]
+    assert _record(MANIFEST)["fingerprint"] == round4["runtime_fingerprint"]
+    for source in selection.ROUND4_BATTLE_SHOCK_SOURCES:
+        if source == selection.ROUND4_BATTLE_SHOCK_TERRITORY_SOURCE:
+            assert not subprocess.check_output(
+                ["git", "ls-tree", selection.ROUND4_BATTLE_SHOCK_BASE, "--", source], cwd=ROOT
+            )
+            base_source = b""
+        else:
+            base_source = subprocess.check_output(
+                ["git", "show", selection.ROUND4_BATTLE_SHOCK_BASE + ":" + source], cwd=ROOT
+            )
+        assert round4["source"][source]["before"] == hashlib.sha256(base_source).hexdigest()
+        assert (
+            round4["source"][source]["after"]
+            == hashlib.sha256((ROOT / source).read_bytes()).hexdigest()
+        )
+    round4_owner = selection.ROUND4_BATTLE_SHOCK_OWNER
+    assert round4_owner in active_files
+    assert sum(round4_owner in group for group in groups) == 1
+    assert (
+        round4["test"]["after"]["sha256"]
+        == hashlib.sha256((ROOT / round4_owner).read_bytes()).hexdigest()
+    )
     for source in selection.MONSTER_MASH_ATTACK_REROLL_SOURCES:
         source_before = subprocess.check_output(
             ["git", "show", selection.MONSTER_MASH_ATTACK_REROLL_BASE + ":" + source], cwd=ROOT
@@ -390,10 +420,13 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
             ["git", "show", selection.ROUND_FIVE_SHADOW_BASE + ":" + name], cwd=ROOT
         )
         assert shadow["sources"][name]["before"] == hashlib.sha256(source_before).hexdigest()
-        assert (
-            shadow["sources"][name]["after"]
-            == hashlib.sha256((ROOT / name).read_bytes()).hexdigest()
-        )
+        if name in round4["source"]:
+            assert shadow["sources"][name]["after"] == round4["source"][name]["before"]
+        else:
+            assert (
+                shadow["sources"][name]["after"]
+                == hashlib.sha256((ROOT / name).read_bytes()).hexdigest()
+            )
     for name, digest in selection.CAVALCADE_AUTHORITY_SOURCES.items():
         assert hashlib.sha256((ROOT / name).read_bytes()).hexdigest() == digest
     for terminal_owner in selection.TERMINAL_RESTORE_OWNERS:
@@ -516,6 +549,15 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
             "test_allocation_requires_defender_visible_formation",
         )
     }
+    round4_cases = {
+        round4_owner + "::" + name
+        for name in (
+            "test_manifestation_history_survives_the_tested_units_later_destruction",
+            "test_later_daemon_casualty_still_requires_historical_territorial_terror[False-False]",
+            "test_later_daemon_casualty_still_requires_historical_territorial_terror[True-False]",
+            "test_later_daemon_casualty_still_requires_historical_territorial_terror[True-True]",
+        )
+    }
     assert current.keys() == (
         retained
         | added
@@ -533,6 +575,7 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         | shadow_cases
         | close_quarters_cases
         | allocation_cases
+        | round4_cases
         | {
             owner + "::" + test + f"[{reroll}]"
             for owner, test in (
