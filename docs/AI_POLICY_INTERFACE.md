@@ -2375,6 +2375,35 @@ This is a bounded candidate and ordering rule for the synthetic Stage 2 E
 shooting slice. Candidate membership, native acceptance, material and scoring
 through a declared local horizon, and exact replay are separate evidence.
 
+## Opt-in Hold and Fall Back candidates
+
+`ai.screen_movement_candidates` binds Remain Stationary and the offered
+ordinary Fall Back modes to the acting player's current movement-action request.
+After a Fall Back selection it uses the next actor view to preserve the issued
+mode and build full straight-line witnesses for a ground rules unit of up to five
+placed models. It tries two fractions of the shortest visible Move
+characteristic in sixteen directions, including shallow offsets from the axes,
+and discards translations whose model centers
+are off the board. It considers at most 256 visible model entities and emits at
+most 32 path proposals.
+
+The projected characteristic scales the search. Engine validation on the
+existing movement proposal route determines the effective movement budget,
+traversal, coherency and enemy engagement. Ordinary rules still determine
+Desperate Escape, casualties and Battle-shock. A missing offer, unsupported
+formation or exhausted translation set reports a typed candidate gap. The
+generator returns alternatives for an operator comparison and assigns no
+tactical ordering to Hold versus Fall Back.
+
+On the pinned synthetic control, the initial search exhausted eight native
+probes. A development probe on that same checkpoint found that the heading
+`(8, -3)` at `0.875 × Move` passed native validation. The shipped search uses
+that heading and distance in its second candidate on the pinned view. The
+generator receives the actor view and never receives the archived operator
+witness. The pinned acceptance demonstrates fixture-tuned feasibility.
+A withheld comparison requires committing to the search order, work limits
+and checkpoint selection before observing that comparison's outcomes.
+
 ## Proposed native v995 screening workload
 
 `cavalcade-v995-native-screen-follow-through-v1` is a separately versioned proposal,

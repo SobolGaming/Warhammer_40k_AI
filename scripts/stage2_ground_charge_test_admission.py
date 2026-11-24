@@ -135,3 +135,39 @@ def normal_shooting_test_successor(
     _checked_bytes(root, SHOOTING_SOURCE, record["policy_sha256"])
     tests = _selection_members({SHOOTING_OWNER: record["test"]["after"]}, root)
     return record["runtime_fingerprint"], tests, raw
+
+
+SCREEN_BASE = "a194e8f10d198f5560119cd1450aa597cae723c1"
+SCREEN_TRANSITION = "data/source_audits/ci64_provenance_v1/stage2-screen-movement-test-v1.json"
+SCREEN_TRANSITION_SHA256 = "7e0b32cb0f7a0ef8e7d05f9b0a4aa7bb965cb6644e5d42ffd035897a536deb94"
+SCREEN_OWNER = "tests/rules/section09/test_screen_movement_candidates.py"
+SCREEN_SOURCE = "src/warhammer40k_core/ai/screen_movement_candidates.py"
+
+
+def screen_movement_test_successor(
+    root: Path, *, previous_runtime: str
+) -> tuple[str, dict[str, dict[str, object]], bytes]:
+    from scripts.engine_numerical_identity_test_admission import _checked_bytes
+
+    raw = _checked_bytes(root, SCREEN_TRANSITION, SCREEN_TRANSITION_SHA256)
+    record = json.loads(raw, object_pairs_hook=_selection_object)
+    if (
+        record.keys()
+        != {
+            "schema",
+            "base",
+            "retained_normal_shooting_sha256",
+            "retained_runtime_fingerprint",
+            "runtime_fingerprint",
+            "policy_sha256",
+            "added_files",
+        }
+        or record["schema"] != "finite-stage2-screen-movement-test-v1"
+        or record["base"] != SCREEN_BASE
+        or record["retained_normal_shooting_sha256"] != SHOOTING_TRANSITION_SHA256
+        or record["retained_runtime_fingerprint"] != previous_runtime
+        or set(record["added_files"]) != {SCREEN_OWNER}
+    ):
+        raise SystemExit("Screen movement test transition membership differs.")
+    _checked_bytes(root, SCREEN_SOURCE, record["policy_sha256"])
+    return record["runtime_fingerprint"], _selection_members(record["added_files"], root), raw
