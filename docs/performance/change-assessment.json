@@ -1,408 +1,362 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "ffd62f1b1cdcf81c2fbd4b99457482c1018d2eb8",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:9093c4f4cf68af8485115fa985de7d02e2b36cb3c27e2a233e7388c31ab7e9d4",
-  "operation_map_sha256": "46fcabf09ac7ba92d5c8a704df5b38facf6742dfc5faa8fcb5ffe893f9682b5f",
+  "base": "153bb57bfd03a6b8bc8ca137dcd2f33e8648a9f8",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:80502a951d120f3f9fed19c66198b2918858c7da104d24ac812cf03c8ceabb27",
+  "operation_map_sha256": "cf196f9da999b24884914ca1e4564dab60f8e468a32ec8df71629a91eb575498",
   "changes": {
     "ci/test_shards/durations.json": {
-      "before_sha256": "771be076b2f4879fff8e262c765b4efd23ec1b62e3c4338f23aea2436f0c158c",
-      "after_sha256": "f8a2a89948fc50211af6b5015a6cff9c96ad754c8b98f13a4469a55f472bffe5",
+      "before_sha256": "f8a2a89948fc50211af6b5015a6cff9c96ad754c8b98f13a4469a55f472bffe5",
+      "after_sha256": "f482da51140e1c7a0ef9f815a116bd32a91d46c7f333a938ca8b53e9e897e011",
       "owners": {
         "@document": {
-          "before": "771be076b2f4879fff8e262c765b4efd23ec1b62e3c4338f23aea2436f0c158c",
-          "after": "f8a2a89948fc50211af6b5015a6cff9c96ad754c8b98f13a4469a55f472bffe5"
+          "before": "f8a2a89948fc50211af6b5015a6cff9c96ad754c8b98f13a4469a55f472bffe5",
+          "after": "f482da51140e1c7a0ef9f815a116bd32a91d46c7f333a938ca8b53e9e897e011"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
-      "before_sha256": "1dca6f8f5ab63e762babc8cdca0538d3ab87c08aeb3d3ebd7a130b8bc8815f8b",
-      "after_sha256": "d94cce703c80c90b708bdcd63b644154f52244249f220c189c80980880f75e66",
+      "before_sha256": "d94cce703c80c90b708bdcd63b644154f52244249f220c189c80980880f75e66",
+      "after_sha256": "2daa68a5c991a56f70e4a8b90c6830b50337df054fc221ff1577e5a6a154c331",
       "owners": {
         "@document": {
-          "before": "1dca6f8f5ab63e762babc8cdca0538d3ab87c08aeb3d3ebd7a130b8bc8815f8b",
-          "after": "d94cce703c80c90b708bdcd63b644154f52244249f220c189c80980880f75e66"
+          "before": "d94cce703c80c90b708bdcd63b644154f52244249f220c189c80980880f75e66",
+          "after": "2daa68a5c991a56f70e4a8b90c6830b50337df054fc221ff1577e5a6a154c331"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
-      "before_sha256": "63291248850ce5c2deec4728259b2cce52e52b33a683d35906bdbda2d878f6fa",
-      "after_sha256": "7260c593cb3f26514ea65c55c5b72d4127d81a20abbbe249bb79bea4bfd01cb5",
+      "before_sha256": "7260c593cb3f26514ea65c55c5b72d4127d81a20abbbe249bb79bea4bfd01cb5",
+      "after_sha256": "cd9a5ace4c60e58b00d162e3a3e0814fcc1d264dc6c4bd12123c7e10f720eb31",
       "owners": {
         "@document": {
-          "before": "63291248850ce5c2deec4728259b2cce52e52b33a683d35906bdbda2d878f6fa",
-          "after": "7260c593cb3f26514ea65c55c5b72d4127d81a20abbbe249bb79bea4bfd01cb5"
+          "before": "7260c593cb3f26514ea65c55c5b72d4127d81a20abbbe249bb79bea4bfd01cb5",
+          "after": "cd9a5ace4c60e58b00d162e3a3e0814fcc1d264dc6c4bd12123c7e10f720eb31"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
-      "before_sha256": "62c5a1890f399be5b510eb504498434fd06e0ffae11003bfe6ad5ace264ac3ba",
-      "after_sha256": "c1f80fae58d765664027359781c7f7378cdb26f625254f0a36aea656b9de53d0",
+      "before_sha256": "c1f80fae58d765664027359781c7f7378cdb26f625254f0a36aea656b9de53d0",
+      "after_sha256": "f3897982dd4c65a80ef52254d51dafda437c2b1f07f917c320b5b5aae2201484",
       "owners": {
         "@document": {
-          "before": "62c5a1890f399be5b510eb504498434fd06e0ffae11003bfe6ad5ace264ac3ba",
-          "after": "c1f80fae58d765664027359781c7f7378cdb26f625254f0a36aea656b9de53d0"
+          "before": "c1f80fae58d765664027359781c7f7378cdb26f625254f0a36aea656b9de53d0",
+          "after": "f3897982dd4c65a80ef52254d51dafda437c2b1f07f917c320b5b5aae2201484"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
-      "before_sha256": "4abf1c5c15e81278f542c41238679a2cb8d910c7eff749f0059d1bfc394d70d2",
-      "after_sha256": "8cca62d66a07e17aca3eb7a8765a47f00de950778a0b173663e44e4c9db22f4f",
+      "before_sha256": "8cca62d66a07e17aca3eb7a8765a47f00de950778a0b173663e44e4c9db22f4f",
+      "after_sha256": "26b6e83f6da28524aa629d2575bd67ddcc379b99d7ecbda87f1c702edb4a90f9",
       "owners": {
         "@document": {
-          "before": "4abf1c5c15e81278f542c41238679a2cb8d910c7eff749f0059d1bfc394d70d2",
-          "after": "8cca62d66a07e17aca3eb7a8765a47f00de950778a0b173663e44e4c9db22f4f"
-        }
-      }
-    },
-    "ci/test_shards/shard-3.txt": {
-      "before_sha256": "84c43d5c0898ea82c465ba85bc135b2fd236b66101b216953d2e93b384ca546c",
-      "after_sha256": "ed8b2de4f896240a0d1fb02f3619cf22c5a51a118cc241c105470311b8b39d28",
-      "owners": {
-        "@document": {
-          "before": "84c43d5c0898ea82c465ba85bc135b2fd236b66101b216953d2e93b384ca546c",
-          "after": "ed8b2de4f896240a0d1fb02f3619cf22c5a51a118cc241c105470311b8b39d28"
+          "before": "8cca62d66a07e17aca3eb7a8765a47f00de950778a0b173663e44e4c9db22f4f",
+          "after": "26b6e83f6da28524aa629d2575bd67ddcc379b99d7ecbda87f1c702edb4a90f9"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
-      "before_sha256": "216d0c8e56fda5bdab1cbb87d4b7f2846e559c6a3a5cccdde4aedbb7609cd054",
-      "after_sha256": "42ca7b47e4fe7a16f7bd32e382e9ac6e67448c847f04d53c60fab2b2dea61c19",
+      "before_sha256": "42ca7b47e4fe7a16f7bd32e382e9ac6e67448c847f04d53c60fab2b2dea61c19",
+      "after_sha256": "cb2a8e21cc02c51b124ddfcba1956468039d91d5884b059e30129a3a3a638c2f",
       "owners": {
         "@document": {
-          "before": "216d0c8e56fda5bdab1cbb87d4b7f2846e559c6a3a5cccdde4aedbb7609cd054",
-          "after": "42ca7b47e4fe7a16f7bd32e382e9ac6e67448c847f04d53c60fab2b2dea61c19"
+          "before": "42ca7b47e4fe7a16f7bd32e382e9ac6e67448c847f04d53c60fab2b2dea61c19",
+          "after": "cb2a8e21cc02c51b124ddfcba1956468039d91d5884b059e30129a3a3a638c2f"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
-      "before_sha256": "9188858d41eaab68a8c4fc3971bd59559489234e9896cc9be6090fbc56c9bed0",
-      "after_sha256": "abe356ec7591cc1e1d8ea7724a1c167e55cbf590f32877995463db7d396bcbf7",
+      "before_sha256": "abe356ec7591cc1e1d8ea7724a1c167e55cbf590f32877995463db7d396bcbf7",
+      "after_sha256": "c378b2d9e1ae588a1f9ec743fbc3c26d10af28800a74a79761f31169d6dfd82d",
       "owners": {
         "@document": {
-          "before": "9188858d41eaab68a8c4fc3971bd59559489234e9896cc9be6090fbc56c9bed0",
-          "after": "abe356ec7591cc1e1d8ea7724a1c167e55cbf590f32877995463db7d396bcbf7"
+          "before": "abe356ec7591cc1e1d8ea7724a1c167e55cbf590f32877995463db7d396bcbf7",
+          "after": "c378b2d9e1ae588a1f9ec743fbc3c26d10af28800a74a79761f31169d6dfd82d"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
-      "before_sha256": "fd2504be1874cfe4657fa21ab940d6878aaa502d8e23ff583cb5f514feb97c05",
-      "after_sha256": "74164df6dc5ae0a9f419a6af0980bfb3e48f6801374079d18f94f4eaf005975d",
+      "before_sha256": "74164df6dc5ae0a9f419a6af0980bfb3e48f6801374079d18f94f4eaf005975d",
+      "after_sha256": "37b0c07327b6c2d1526e4e7f4c9293151945a64b803b9397f68f4baaf08098f8",
       "owners": {
         "@document": {
-          "before": "fd2504be1874cfe4657fa21ab940d6878aaa502d8e23ff583cb5f514feb97c05",
-          "after": "74164df6dc5ae0a9f419a6af0980bfb3e48f6801374079d18f94f4eaf005975d"
+          "before": "74164df6dc5ae0a9f419a6af0980bfb3e48f6801374079d18f94f4eaf005975d",
+          "after": "37b0c07327b6c2d1526e4e7f4c9293151945a64b803b9397f68f4baaf08098f8"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
-      "before_sha256": "1aae005367c4c536ff9f6c5d8ef4db53e0268acbebf88ae164ebfe7fd7348cc0",
-      "after_sha256": "3a870d54f09d297ceadb56281939e7ab3a14df73c5d71db55222f0a958848c24",
+      "before_sha256": "3a870d54f09d297ceadb56281939e7ab3a14df73c5d71db55222f0a958848c24",
+      "after_sha256": "72121536bd38087cb67eb46100e2628ae7a05f8c5369f5248ffd662cd62212fe",
       "owners": {
         "@document": {
-          "before": "1aae005367c4c536ff9f6c5d8ef4db53e0268acbebf88ae164ebfe7fd7348cc0",
-          "after": "3a870d54f09d297ceadb56281939e7ab3a14df73c5d71db55222f0a958848c24"
+          "before": "3a870d54f09d297ceadb56281939e7ab3a14df73c5d71db55222f0a958848c24",
+          "after": "72121536bd38087cb67eb46100e2628ae7a05f8c5369f5248ffd662cd62212fe"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
-      "before_sha256": "1668ceac0ee8946628047cc95dbfc28dacae41e9aaa83bc02277505e96dbcd9b",
-      "after_sha256": "a8cdc968a20bb5a38ba26e05c86c850c4c112f14b22b2a2dfc118d8e501dae89",
+      "before_sha256": "a8cdc968a20bb5a38ba26e05c86c850c4c112f14b22b2a2dfc118d8e501dae89",
+      "after_sha256": "e53aa922eb0cdf53ad0d0b6755f13a6a4f3d964537fee9bbcdd9026876061365",
       "owners": {
         "@document": {
-          "before": "1668ceac0ee8946628047cc95dbfc28dacae41e9aaa83bc02277505e96dbcd9b",
-          "after": "a8cdc968a20bb5a38ba26e05c86c850c4c112f14b22b2a2dfc118d8e501dae89"
+          "before": "a8cdc968a20bb5a38ba26e05c86c850c4c112f14b22b2a2dfc118d8e501dae89",
+          "after": "e53aa922eb0cdf53ad0d0b6755f13a6a4f3d964537fee9bbcdd9026876061365"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
-      "before_sha256": "2c936d079be69cf30cf88e0ede0dc4790cab79bdec066460907408e91db40878",
-      "after_sha256": "2d232d4846e0152b5de632f382973826b8c7d154f954a73ae64d0f97aa36f2b7",
+      "before_sha256": "2d232d4846e0152b5de632f382973826b8c7d154f954a73ae64d0f97aa36f2b7",
+      "after_sha256": "e40378575fed6ce5484f55910d4a578987be93e431edfe2f75980fa97ce6bfa5",
       "owners": {
         "@document": {
-          "before": "2c936d079be69cf30cf88e0ede0dc4790cab79bdec066460907408e91db40878",
-          "after": "2d232d4846e0152b5de632f382973826b8c7d154f954a73ae64d0f97aa36f2b7"
+          "before": "2d232d4846e0152b5de632f382973826b8c7d154f954a73ae64d0f97aa36f2b7",
+          "after": "e40378575fed6ce5484f55910d4a578987be93e431edfe2f75980fa97ce6bfa5"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "a0c7f9dc25b7f2cf858b352686b0c9c2647c2cec9002f12ff9225da1e4bc69ef",
-      "after_sha256": "6b111e34c418b43c1cf33db275c912deee247ee4f16471163bc95cb94e9bf3c3",
+      "before_sha256": "6b111e34c418b43c1cf33db275c912deee247ee4f16471163bc95cb94e9bf3c3",
+      "after_sha256": "80ad1391df111e239537f89b2568a0341c9f91ed52783b15f8e2f5f1dac9fef9",
       "owners": {
         "@document": {
-          "before": "a0c7f9dc25b7f2cf858b352686b0c9c2647c2cec9002f12ff9225da1e4bc69ef",
-          "after": "6b111e34c418b43c1cf33db275c912deee247ee4f16471163bc95cb94e9bf3c3"
+          "before": "6b111e34c418b43c1cf33db275c912deee247ee4f16471163bc95cb94e9bf3c3",
+          "after": "80ad1391df111e239537f89b2568a0341c9f91ed52783b15f8e2f5f1dac9fef9"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "be8ea826353b3ac24853c74e309a9e984072918f182379c1fe5034f6e87a5dd8",
-      "after_sha256": "68e07ecc350360bd63623cefa646adfcd04a03d0f6bd5c0b714ca39db67eb017",
+      "before_sha256": "68e07ecc350360bd63623cefa646adfcd04a03d0f6bd5c0b714ca39db67eb017",
+      "after_sha256": "2251926d68b7f254480a70314f991fd9eabec61ba18930a993b2566f76fa05a7",
       "owners": {
         "@document": {
-          "before": "be8ea826353b3ac24853c74e309a9e984072918f182379c1fe5034f6e87a5dd8",
-          "after": "68e07ecc350360bd63623cefa646adfcd04a03d0f6bd5c0b714ca39db67eb017"
+          "before": "68e07ecc350360bd63623cefa646adfcd04a03d0f6bd5c0b714ca39db67eb017",
+          "after": "2251926d68b7f254480a70314f991fd9eabec61ba18930a993b2566f76fa05a7"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "f60ee53a30218def5cd2d9450c5402982fa22ed55e726c29083c5e1b95a307bc",
-      "after_sha256": "055bc70bd0821bbd0a642440fcfce8d032512a21048faa4c00eb689b6db71ec5",
+      "before_sha256": "055bc70bd0821bbd0a642440fcfce8d032512a21048faa4c00eb689b6db71ec5",
+      "after_sha256": "eef70dcde833aabe98ac6c280200d92af84232cff87de7ed5efbb0242937a9db",
       "owners": {
         "@document": {
-          "before": "f60ee53a30218def5cd2d9450c5402982fa22ed55e726c29083c5e1b95a307bc",
-          "after": "055bc70bd0821bbd0a642440fcfce8d032512a21048faa4c00eb689b6db71ec5"
+          "before": "055bc70bd0821bbd0a642440fcfce8d032512a21048faa4c00eb689b6db71ec5",
+          "after": "eef70dcde833aabe98ac6c280200d92af84232cff87de7ed5efbb0242937a9db"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "2bded53ab424c76c181b901f1cfabd10a75af69c5f6b2f0c8d6aa3e29cc1ab2f",
-      "after_sha256": "1d7ff16bbad29b0131d479984119769db927f8ff6ce8467a3685950545958ed7",
+      "before_sha256": "1d7ff16bbad29b0131d479984119769db927f8ff6ce8467a3685950545958ed7",
+      "after_sha256": "78156bffe1c546ce4c32d16c64da0aa9429082440f7b18bbbc6f6a7095a4667d",
       "owners": {
         "@document": {
-          "before": "2bded53ab424c76c181b901f1cfabd10a75af69c5f6b2f0c8d6aa3e29cc1ab2f",
-          "after": "1d7ff16bbad29b0131d479984119769db927f8ff6ce8467a3685950545958ed7"
+          "before": "1d7ff16bbad29b0131d479984119769db927f8ff6ce8467a3685950545958ed7",
+          "after": "78156bffe1c546ce4c32d16c64da0aa9429082440f7b18bbbc6f6a7095a4667d"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "2efcdde679a60f5e0ba5fdca0cf093a93c637cc068ab43b396e7f85984710a35",
-      "after_sha256": "04cee4d901ecdfe031c1e5d7834c2cdbf29aeeaf6370712796872ee7fd4fc674",
+      "before_sha256": "04cee4d901ecdfe031c1e5d7834c2cdbf29aeeaf6370712796872ee7fd4fc674",
+      "after_sha256": "bc39e18947113a30eb1c0243c1ae9cab70c90b29d15cfc8882baedc6b72ba61e",
       "owners": {
         "@document": {
-          "before": "2efcdde679a60f5e0ba5fdca0cf093a93c637cc068ab43b396e7f85984710a35",
-          "after": "04cee4d901ecdfe031c1e5d7834c2cdbf29aeeaf6370712796872ee7fd4fc674"
+          "before": "04cee4d901ecdfe031c1e5d7834c2cdbf29aeeaf6370712796872ee7fd4fc674",
+          "after": "bc39e18947113a30eb1c0243c1ae9cab70c90b29d15cfc8882baedc6b72ba61e"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "f4606e26c02a4610ad7aa339517b91bbc3dc3b2aaad338c124fac2c19c4b8a14",
-      "after_sha256": "7606f1737f7b00f11d32629a1a4c64d8265747f5ecc427f8fec743bf0120dd8c",
+      "before_sha256": "7606f1737f7b00f11d32629a1a4c64d8265747f5ecc427f8fec743bf0120dd8c",
+      "after_sha256": "08bf6b0a188d35f01c89b0309ddfe306ac26ae367a7b053430d45763a1182eca",
       "owners": {
         "@document": {
-          "before": "f4606e26c02a4610ad7aa339517b91bbc3dc3b2aaad338c124fac2c19c4b8a14",
-          "after": "7606f1737f7b00f11d32629a1a4c64d8265747f5ecc427f8fec743bf0120dd8c"
+          "before": "7606f1737f7b00f11d32629a1a4c64d8265747f5ecc427f8fec743bf0120dd8c",
+          "after": "08bf6b0a188d35f01c89b0309ddfe306ac26ae367a7b053430d45763a1182eca"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "576eb2dbe0dbbe753d6e83f4363a2ac0e530ccc17a1b0fbab852600b5b7a5834",
-      "after_sha256": "8a090fb882a3f92609729a470795fab772d4c94a9d36a30dc39da174e3875639",
+      "before_sha256": "8a090fb882a3f92609729a470795fab772d4c94a9d36a30dc39da174e3875639",
+      "after_sha256": "2362a09de210433bc54d715fa33885922f7896a4f7f3e591add690320d052465",
       "owners": {
         "@document": {
-          "before": "576eb2dbe0dbbe753d6e83f4363a2ac0e530ccc17a1b0fbab852600b5b7a5834",
-          "after": "8a090fb882a3f92609729a470795fab772d4c94a9d36a30dc39da174e3875639"
+          "before": "8a090fb882a3f92609729a470795fab772d4c94a9d36a30dc39da174e3875639",
+          "after": "2362a09de210433bc54d715fa33885922f7896a4f7f3e591add690320d052465"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "72cfa2feb9ed1e2f94aea58b11b79a31fa9b5c8f976fd4d147ba350080228bf6",
-      "after_sha256": "f81ae0f43e3109c4529627612cb39670559cc052a4c388bc4a2abe6c999dad88",
+      "before_sha256": "f81ae0f43e3109c4529627612cb39670559cc052a4c388bc4a2abe6c999dad88",
+      "after_sha256": "883357eb34e8cf4f4b8828386cb7b9cf4173c14045649b3ee49ba06a124faec3",
       "owners": {
         "@document": {
-          "before": "72cfa2feb9ed1e2f94aea58b11b79a31fa9b5c8f976fd4d147ba350080228bf6",
-          "after": "f81ae0f43e3109c4529627612cb39670559cc052a4c388bc4a2abe6c999dad88"
+          "before": "f81ae0f43e3109c4529627612cb39670559cc052a4c388bc4a2abe6c999dad88",
+          "after": "883357eb34e8cf4f4b8828386cb7b9cf4173c14045649b3ee49ba06a124faec3"
         }
       }
     },
-    "data/source_audits/ci64_provenance_v1/stage2-group-ground-charge-test-v1.json": {
+    "data/source_audits/ci64_provenance_v1/stage2-normal-shooting-test-v1.json": {
       "before_sha256": null,
-      "after_sha256": "f32f75b6d38120e8663fde79612493ff40922c5eff7459d3d7197787791ea601",
+      "after_sha256": "e52c9197bb04d1cd64c595f960d39f9cf6964971dc90f650575429d83fcf2862",
       "owners": {
         "@document": {
           "before": null,
-          "after": "f32f75b6d38120e8663fde79612493ff40922c5eff7459d3d7197787791ea601"
+          "after": "e52c9197bb04d1cd64c595f960d39f9cf6964971dc90f650575429d83fcf2862"
         }
       }
     },
     "docs/AI_POLICY_INTERFACE.md": {
-      "before_sha256": "dca78f16bd0de8af2ea610312bbf683ebac2ec236757fe93a4e6c1577b89606e",
-      "after_sha256": "7ca56ad085a073d45e371f04d5b96193b9af24d9c826155bca5eefbb2559c99e",
+      "before_sha256": "7ca56ad085a073d45e371f04d5b96193b9af24d9c826155bca5eefbb2559c99e",
+      "after_sha256": "b0a73cdadfb77ffe7b9da81884448cd72d142fad23d8527a46d4f4d6b2931a85",
       "owners": {
         "@document": {
-          "before": "dca78f16bd0de8af2ea610312bbf683ebac2ec236757fe93a4e6c1577b89606e",
-          "after": "7ca56ad085a073d45e371f04d5b96193b9af24d9c826155bca5eefbb2559c99e"
+          "before": "7ca56ad085a073d45e371f04d5b96193b9af24d9c826155bca5eefbb2559c99e",
+          "after": "b0a73cdadfb77ffe7b9da81884448cd72d142fad23d8527a46d4f4d6b2931a85"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "07dfb51eb903bd7c9cc1b9fb73674052c783b88a59eec53df3cba0acae5e88fd",
-      "after_sha256": "3640cfa461550d2c693bff3479f79b8b06556e1cc396f127e6c767a60c8e3878",
+      "before_sha256": "3640cfa461550d2c693bff3479f79b8b06556e1cc396f127e6c767a60c8e3878",
+      "after_sha256": "738c090ce17d81d32bd8588c2b10444a354c41fdf0589984894ac4d88d324c1f",
       "owners": {
         "@document": {
-          "before": "07dfb51eb903bd7c9cc1b9fb73674052c783b88a59eec53df3cba0acae5e88fd",
-          "after": "3640cfa461550d2c693bff3479f79b8b06556e1cc396f127e6c767a60c8e3878"
+          "before": "3640cfa461550d2c693bff3479f79b8b06556e1cc396f127e6c767a60c8e3878",
+          "after": "738c090ce17d81d32bd8588c2b10444a354c41fdf0589984894ac4d88d324c1f"
+        }
+      }
+    },
+    "scripts/engine_numerical_identity_test_admission.py": {
+      "before_sha256": "b6bfc62055b10be8c9560937de1a837c0904e8262a90ad453aec24e6753b2d1f",
+      "after_sha256": "e181f93ae1c15b74ca37290c29e47713f65497ddac6b15bb9495991e7d2f9fd0",
+      "owners": {
+        "exact_movement_test_transition": {
+          "before": "3865367c46effebae533273dfa1651c2095e6665816a021673d3d69bdb50b80d",
+          "after": "29bcd52b84e40210df760ef9f10f43d8b1f068f2e91817d300546514cfc8fc9a"
         }
       }
     },
     "scripts/stage2_ground_charge_test_admission.py": {
-      "before_sha256": "5e7824a84397a7027929e0f846e34c8a4a41a4b2e907035417c1a5af1d8ee19d",
-      "after_sha256": "85feec3f81c1b5c4dc286a127ea29aee96b3eaa1ecc994b6e1dbe632f2bcd641",
+      "before_sha256": "85feec3f81c1b5c4dc286a127ea29aee96b3eaa1ecc994b6e1dbe632f2bcd641",
+      "after_sha256": "7d0d8b0ab3dd6adf3e363558ef47a48f52440d1fee00b56c43bf85e92a1d879a",
       "owners": {
         "@module": {
-          "before": "730af72d3836cc04a2f1d256a92f0129023e427df0b583ae63eb6f3530a7f398",
-          "after": "4c1f3aa04209353aa9cc6116b1fbb41a8c392b4b8a0a25ab41c3a14e984b317e"
+          "before": "4c1f3aa04209353aa9cc6116b1fbb41a8c392b4b8a0a25ab41c3a14e984b317e",
+          "after": "60d2dac40de72644e4decb65060cefd8611ce47517a55233fb1f1e2e2bf4320b"
         },
-        "ground_charge_test_successor": {
-          "before": "8d52328c10f3edc4ed51fa732677e6e18dc3b4255ec10248f822942d99e8a784",
-          "after": "442ff5a883c3e122c42462bc20fa1efb6dbba7e7b81fa4c88aed217fe7976a9e"
+        "normal_shooting_test_successor": {
+          "before": null,
+          "after": "6b10a94453552d920a8343dbb6dc64bfdf99739fac39812898684ee2c1ef2a45"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "25df81ea40fdbb5a8344e34b69608174819c68632e0e81d25b368dea0769ab83",
-      "after_sha256": "81cf1f3d4d7482b0d0f38043b4f5c713f09d3801cc8a0895779ce707bb9cb480",
+      "before_sha256": "81cf1f3d4d7482b0d0f38043b4f5c713f09d3801cc8a0895779ce707bb9cb480",
+      "after_sha256": "cd62dfc43cce7afcac89e3b4b72cd0d1e35c2195f6db40888a3dce1bd1bc591a",
       "owners": {
         "@document": {
-          "before": "25df81ea40fdbb5a8344e34b69608174819c68632e0e81d25b368dea0769ab83",
-          "after": "81cf1f3d4d7482b0d0f38043b4f5c713f09d3801cc8a0895779ce707bb9cb480"
+          "before": "81cf1f3d4d7482b0d0f38043b4f5c713f09d3801cc8a0895779ce707bb9cb480",
+          "after": "cd62dfc43cce7afcac89e3b4b72cd0d1e35c2195f6db40888a3dce1bd1bc591a"
         }
       }
     },
-    "src/warhammer40k_core/ai/ground_charge_candidates.py": {
-      "before_sha256": "f581c6f6f7bc17b611f8bab05d5dbb1a788e2c49f6a2cec0603c3a8adc6f83f7",
-      "after_sha256": "119d2b422daa3154db2a703491fd14f4a946c9ddb9f47a97653c833a4837685f",
+    "src/warhammer40k_core/ai/normal_shooting_policy.py": {
+      "before_sha256": null,
+      "after_sha256": "55361db2bc54c81a0283644d3bf9e1a15ff420969a39d97d82481ed190bd6cdf",
       "owners": {
         "@module": {
-          "before": "be6435f84ca66fac209bbc3ca99e2d8e2974e7f5d4f45cc9d393b980fc920485",
-          "after": "5e7838747c2799922f4283ae9b7da63ac4dba2c2dc09010b8484bfb937de9c23"
-        },
-        "GroundChargeCandidate": {
-          "before": "9b49fe6b745b670d73dae6a622ce175e00fef2a83a8cfbea1ba6890e243a8477",
-          "after": "f60c3781ec51ab2863a605d6596c45ad0cdf646fbb05673b111d4931b7f89116"
-        },
-        "_Path": {
-          "before": "1a400f94b8133897f788b123d4634507c412443a4a2ee08deb867fe11579dc0d",
-          "after": "4747e71250578ce38a008d8aeda9a0dda07af02e5e4cf60efb810b7be5b0b949"
-        },
-        "_Work.step": {
-          "before": "a61788ebb3067d634b8cc8cd06a521c5bbbc437c60facafee4be5695c2fa2848",
-          "after": "185231d54cd3460e5fca50b42e5a60cb4685b86acbddcf69467359ee5aac681b"
-        },
-        "_candidate": {
           "before": null,
-          "after": "698a6c58a4332fa5fcd464b4530f457242551c34b0c5060f7b83f0e50c9ca169"
+          "after": "995600c7649bbc4272c8c2708ad8147225b941d5321594998236bda01a0e8c79"
         },
-        "_connected_group": {
+        "NormalShootingCandidate": {
           "before": null,
-          "after": "2098ad4b0d8d6d41415a34d44a8034af2a34f2a63ab14c202502ce74019cdcd8"
+          "after": "2985c8d03029be7c45273c21791b5d5c4edc655a832fdccc743465a136ff7758"
         },
-        "_five_model_candidates": {
+        "NormalShootingGap": {
           "before": null,
-          "after": "a2cea861d85ae29202afc9a7f86d1b8d18aea6fd7b6ec0c59a0f4c30f97e44d7"
+          "after": "8e658a1250116a3d8577a57d8f8d972d4de66153767d3f72aa277cf6bf692de3"
         },
-        "_formations": {
-          "before": "5b22b445b038cba6540c6cf16949aebf1bda461b8a20a604453d70845b592493",
-          "after": "e94b4abeb3b2488cff0e4a2390df7e528864be8e22c3fcef66594f0414f635a6"
-        },
-        "_group_endpoints": {
+        "NormalShootingGap.__init__": {
           "before": null,
-          "after": "240d9d88f3c213d0d37e14ca82b6ece8040e57d19c89193cc032a3b07b2d599d"
+          "after": "a354f096e103b83b3def6e0e93d191fbe0ce7d087b960afcb0a7e9ee03c91e50"
         },
-        "_group_formations": {
+        "NormalShootingGapReason": {
           "before": null,
-          "after": "c7d36c03399a04bc02b09af2324de432d8b6a3cce20297537293d6d8c9db47cc"
+          "after": "aaea9b513e5c22af65bbfbc55974d0fe0e4a0e5a54a0bac0c07e3e77047e9049"
         },
-        "_group_paths": {
+        "_DeclarationRequest": {
           "before": null,
-          "after": "ae3cc37ff9f586cd5b3c393e624690675fbeb28ef78a173d96576e540750605d"
+          "after": "cbf3e75413da537b358ad01b851e276539b2c9edb6a78caa5a69f748fe3f92c0"
         },
-        "_local_blockers": {
+        "_NormalShootingPolicy": {
           "before": null,
-          "after": "126d13b29fe3fef6b77bab1e067f4f646d980b8d90e298ac32b82ca4f4c39fe6"
+          "after": "4db15c62ab515da7b8dc38b15e84663464db46016cdabde9d7fe87c9e79fede5"
         },
-        "_model_placements": {
+        "_NormalShootingPolicy.choose": {
           "before": null,
-          "after": "d427491c263410f7c14aae52074bd98eca9bd865512e3c89f6c8fab9cdbf0ced"
+          "after": "6e8a5c628d6cc1284cf6b2888e9296d9bf08d18a6fa40ffbdf9d5a52037604c4"
         },
-        "_objective_areas": {
+        "_TargetRow": {
           "before": null,
-          "after": "410788791ffc0493505942ced405c0783d348af5bc96b01028e3c5a7e8f4785c"
+          "after": "6ead39610ec1f998cad70f72d3895ab4c9833eadae560acc825668d90d7c01f9"
         },
-        "_paths": {
-          "before": "8771004f34d4c49eb19e92df1b0d89ceea5cb9888513a2bb5abb5706b14faa7b",
-          "after": "c21d20e4c8b3d1b93823631ecdc76c2295ac52997f16d942134e9ce1ef73add4"
-        },
-        "_placed_models": {
-          "before": "6b371513aadbca842e5189ea786a96f456461feba465a8a32c9f0c017eb9e2ed",
-          "after": "98cb8cb8586db49e800d3ed0943379cc9f67de9a3469ef9640da965b3443794e"
-        },
-        "_within_board": {
+        "generate_normal_shooting_candidates": {
           "before": null,
-          "after": "3569d56ec76cef7fc05b5a0529d4e45ef702f18f9969d7a52dae44db59a22142"
+          "after": "475222ca080a04582eec6dca66775c378a0967f2a7adc970926adee4a0fd42ef"
         },
-        "generate_ground_charge_candidates": {
-          "before": "ba1694e836555b7b9c764d4dad30e903b9dcb6fb91360a57f332659831d9a596",
-          "after": "ff35d4046fa52ca0e1ad15ecffb9aa6ec692807dfb961af8a60ef8b019833795"
-        }
-      }
-    },
-    "src/warhammer40k_core/ai/ground_charge_policy.py": {
-      "before_sha256": "b05be820adf733f7b74d27955fe22e625cd73a186ede3fb1372ecbaaa4d4720a",
-      "after_sha256": "aacc6a6ba17261eed94491d4705669177bcddfddc50306a0a7006f696fa931b9",
-      "owners": {
-        "PreparedGroundCharge": {
-          "before": "eeddc9e1ff468790463e9cf161ff261a198e98d985f0b6e7f9cd5d6faa4a0feb",
-          "after": "acd5b4720fcfe8fb6f951544592a8dfb18c5b0d49dd7a32ae19571ac1e8c2e08"
+        "normal_shooting_registration": {
+          "before": null,
+          "after": "e9b8ad4d71cf2ef358f477fed517da35882a0e442c5a80675cc065a8f4f70a53"
         },
-        "prepare_ground_charge_policy": {
-          "before": "3e3946f528ef9289b890ce3d7da19c101442c758d5545f9f4b527b932a8d44ae",
-          "after": "ba9aaa81f7d64aaa2fb4ba09f495ecda56bfbfa7d4d6d69c5745fde7a551558d"
+        "normal_shooting_route": {
+          "before": null,
+          "after": "f852305fb84ddecea28f00a691edfff3d2a9cea8a045fc82b8893437b63f46a5"
+        },
+        "rank_normal_shooting_candidates": {
+          "before": null,
+          "after": "8d81d54bd9ae1d1fc4bfa325c09f18beee75e8ebc9ba131bac570dad164dda13"
         }
       }
     },
     "tests/code_quality/test_engine_numerical_identity_admission.py": {
-      "before_sha256": "e1fb20f0ceb83bd098154f9d89660e712cdff8aeb2bac78b094acfa6c989c8f9",
-      "after_sha256": "933cd41b5744bcb68aec487d89b0b9a986300ca7a4014b49ba7d56d19ddfbcff",
+      "before_sha256": "933cd41b5744bcb68aec487d89b0b9a986300ca7a4014b49ba7d56d19ddfbcff",
+      "after_sha256": "2b5c3c99bf49f6ac74ba784d69d4bb95a2aa7a021bad9c779f93f208fb79a4f0",
       "owners": {
         "test_identity_inventory_uses_current_twelve_shards_and_native_cohort": {
-          "before": "3d01e82c52feb6622e92397e4a73970f37a011221f3a5434723488cd9948d741",
-          "after": "336dfa6b65c33e29c53d56c96127bf927a70c30ea20cc22e97674a187a5ee1c3"
+          "before": "336dfa6b65c33e29c53d56c96127bf927a70c30ea20cc22e97674a187a5ee1c3",
+          "after": "86a47415f7760bc138fce053374668ce413cbd3c08dc5619b3af8b0778723942"
         }
       }
     },
-    "tests/infrastructure/adapters/test_group_ground_charge_policy.py": {
-      "before_sha256": null,
-      "after_sha256": "9e38771b24ab5df522f60d7b57353c30eb710595b2921a4b77d8cc76f9bb9825",
+    "tests/infrastructure/adapters/test_opposing_shooter_scenario.py": {
+      "before_sha256": "b194cc112d8218eac3c08c984cdfa2ecf0c78abf9db9edec61f0d9ad2a0a73d3",
+      "after_sha256": "c9583ee29d88826ac4b60ffa91edaee001a9f10a23f0e81132125214fd853b3c",
       "owners": {
         "@module": {
-          "before": null,
-          "after": "a74f9186460c8b965eb88360f33f07d62348046a409760be3acb5d397813feca"
+          "before": "09cc5b7e9d839b0d8575940f54fa90cba0ab05f7d997f70c4f5b234786fd5917",
+          "after": "a83b9ec07740fd5f73fe8ac90bd8e86f9f17155b60e0876ce89c80c8cdd495c2"
         },
-        "_select_target": {
+        "_expanded_normal_shooting_context": {
           "before": null,
-          "after": "d16e7e746776e4663c407188cc0d06c648e00ad7d2b0e2ddc5b26357d8464127"
+          "after": "15e5a6200f9aec2dfeca884c1d51be7a8ae2c07e770ce98c64548aacf0c01c08"
         },
-        "group_charge": {
+        "_normal_shooting_session": {
           "before": null,
-          "after": "c9920a8dfaf40f15a48109fb2a46bdba5df0cc370affef0ff844ba9db61d9f1b"
+          "after": "1f9264ed69c1720b5892a1e41f407367e6e1b81615a08c2a7e19d5bb133cbc12"
         },
-        "objective_charge": {
+        "test_normal_shooting_binds_all_candidates_after_one_observation_decode": {
           "before": null,
-          "after": "b8cc647de9aa72485f69c98cb1ba55cedf0a20fde659d3389d34980f8e8e3e71"
+          "after": "43f92ad8a42b34222ab5f26ba9516dc3db2e760fa711e58608888f8b427d0d38"
         },
-        "test_group_charge_accepts_attached_target_with_four_surviving_bodyguards": {
+        "test_normal_shooting_policy_uses_the_projected_offer_and_native_submission": {
           "before": null,
-          "after": "f63c3ba75e35a5a8a3a659ab43e708ac9ae0e08b6d10686a97f2e294e57faa65"
+          "after": "683d6cd7b4abb3ffdf0cb9a75c3dff850ee16e64d44a760de61383e33b010127"
         },
-        "test_group_charge_commits_a_native_accept": {
+        "test_normal_shooting_ranks_equal_legal_volleys_by_target_id_in_reverse_order": {
           "before": null,
-          "after": "af2a21d31b42eb6f8ce7cf7b1d6f0340713754068fa8deea25ade902b9384f79"
+          "after": "655bf628f2a8b3d10b6d9a97b235744914819b97050b7304b87e1f1789d7d0ea"
         },
-        "test_group_charge_generates_distinct_complete_witnesses": {
+        "test_normal_shooting_rejects_one_over_each_candidate_limit": {
           "before": null,
-          "after": "f303f994edd3deaf3d446c43224a04b1ce3caffbed25416a7e9891b057c75b40"
-        },
-        "test_group_charge_objective_inventory_limits": {
-          "before": null,
-          "after": "e2e930e889e67a7b8ee33906d2d974910808eb2fcdee4ab762760adfb8652229"
-        },
-        "test_group_charge_objective_preprocessing_exhausts_before_geometry": {
-          "before": null,
-          "after": "aa81970fc89c81c3273d665f4fab9ba35d6b86e9c8857e9f8db7d718da4d2428"
-        },
-        "test_group_charge_ranks_objective_reach_ahead_of_shorter_accepted_travel": {
-          "before": null,
-          "after": "735b654ac84d17f73c47aeb925235de85158b2d1e8f607fb0a8f2c4f9a520c22"
+          "after": "0f5867ee9b1ff515b42f87b40ee7103dc0876bfde4bc526d1356c1691f366c4a"
         }
       }
     }
@@ -414,7 +368,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Bind the focused five-model behavior, historical test admission, twelve-shard inventory and generated runtime/contract examples to the current code.",
+      "rationale": "Records the focused native shooting declaration tests and the generated runtime identity and public contract artifacts for the current build.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -424,7 +378,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Bind the focused five-model behavior, historical test admission, twelve-shard inventory and generated runtime/contract examples to the current code.",
+      "rationale": "Records the focused native shooting declaration tests and the generated runtime identity and public contract artifacts for the current build.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -434,7 +388,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Bind the focused five-model behavior, historical test admission, twelve-shard inventory and generated runtime/contract examples to the current code.",
+      "rationale": "Records the focused native shooting declaration tests and the generated runtime identity and public contract artifacts for the current build.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -444,7 +398,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Bind the focused five-model behavior, historical test admission, twelve-shard inventory and generated runtime/contract examples to the current code.",
+      "rationale": "Records the focused native shooting declaration tests and the generated runtime identity and public contract artifacts for the current build.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -454,17 +408,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Bind the focused five-model behavior, historical test admission, twelve-shard inventory and generated runtime/contract examples to the current code.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "ci/test_shards/shard-3.txt": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Bind the focused five-model behavior, historical test admission, twelve-shard inventory and generated runtime/contract examples to the current code.",
+      "rationale": "Records the focused native shooting declaration tests and the generated runtime identity and public contract artifacts for the current build.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -474,7 +418,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Bind the focused five-model behavior, historical test admission, twelve-shard inventory and generated runtime/contract examples to the current code.",
+      "rationale": "Records the focused native shooting declaration tests and the generated runtime identity and public contract artifacts for the current build.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -484,7 +428,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Bind the focused five-model behavior, historical test admission, twelve-shard inventory and generated runtime/contract examples to the current code.",
+      "rationale": "Records the focused native shooting declaration tests and the generated runtime identity and public contract artifacts for the current build.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -494,7 +438,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Bind the focused five-model behavior, historical test admission, twelve-shard inventory and generated runtime/contract examples to the current code.",
+      "rationale": "Records the focused native shooting declaration tests and the generated runtime identity and public contract artifacts for the current build.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -504,7 +448,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Bind the focused five-model behavior, historical test admission, twelve-shard inventory and generated runtime/contract examples to the current code.",
+      "rationale": "Records the focused native shooting declaration tests and the generated runtime identity and public contract artifacts for the current build.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -514,7 +458,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Bind the focused five-model behavior, historical test admission, twelve-shard inventory and generated runtime/contract examples to the current code.",
+      "rationale": "Records the focused native shooting declaration tests and the generated runtime identity and public contract artifacts for the current build.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -524,7 +468,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Bind the focused five-model behavior, historical test admission, twelve-shard inventory and generated runtime/contract examples to the current code.",
+      "rationale": "Records the focused native shooting declaration tests and the generated runtime identity and public contract artifacts for the current build.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -534,7 +478,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bind the focused five-model behavior, historical test admission, twelve-shard inventory and generated runtime/contract examples to the current code.",
+      "rationale": "Records the focused native shooting declaration tests and the generated runtime identity and public contract artifacts for the current build.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -544,7 +488,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bind the focused five-model behavior, historical test admission, twelve-shard inventory and generated runtime/contract examples to the current code.",
+      "rationale": "Records the focused native shooting declaration tests and the generated runtime identity and public contract artifacts for the current build.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -554,7 +498,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bind the focused five-model behavior, historical test admission, twelve-shard inventory and generated runtime/contract examples to the current code.",
+      "rationale": "Records the focused native shooting declaration tests and the generated runtime identity and public contract artifacts for the current build.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -564,7 +508,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bind the focused five-model behavior, historical test admission, twelve-shard inventory and generated runtime/contract examples to the current code.",
+      "rationale": "Records the focused native shooting declaration tests and the generated runtime identity and public contract artifacts for the current build.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -574,7 +518,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bind the focused five-model behavior, historical test admission, twelve-shard inventory and generated runtime/contract examples to the current code.",
+      "rationale": "Records the focused native shooting declaration tests and the generated runtime identity and public contract artifacts for the current build.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -584,7 +528,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bind the focused five-model behavior, historical test admission, twelve-shard inventory and generated runtime/contract examples to the current code.",
+      "rationale": "Records the focused native shooting declaration tests and the generated runtime identity and public contract artifacts for the current build.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -594,7 +538,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bind the focused five-model behavior, historical test admission, twelve-shard inventory and generated runtime/contract examples to the current code.",
+      "rationale": "Records the focused native shooting declaration tests and the generated runtime identity and public contract artifacts for the current build.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -604,17 +548,17 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Bind the focused five-model behavior, historical test admission, twelve-shard inventory and generated runtime/contract examples to the current code.",
+      "rationale": "Records the focused native shooting declaration tests and the generated runtime identity and public contract artifacts for the current build.",
       "source_obligation": null,
       "unchanged_work": null
     },
-    "data/source_audits/ci64_provenance_v1/stage2-group-ground-charge-test-v1.json": {
+    "data/source_audits/ci64_provenance_v1/stage2-normal-shooting-test-v1.json": {
       "category": "measured_workload",
       "operations": [
         "engine-numerical-identity-admission"
       ],
       "selected_families": [],
-      "rationale": "Bind the focused five-model behavior, historical test admission, twelve-shard inventory and generated runtime/contract examples to the current code.",
+      "rationale": "Records the focused native shooting declaration tests and the generated runtime identity and public contract artifacts for the current build.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -622,7 +566,7 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Document and bind the scoped opt-in Stage 2 operator and policy interface.",
+      "rationale": "Documents and maps the bounded Normal Shooting policy and existing adapter authority.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -630,7 +574,22 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Document and bind the scoped opt-in Stage 2 operator and policy interface.",
+      "rationale": "Documents and maps the bounded Normal Shooting policy and existing adapter authority.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "scripts/engine_numerical_identity_test_admission.py": {
+      "category": "measured_workload",
+      "operations": [
+        "cavalcade-authority-admission",
+        "close-quarters-test-admission",
+        "engine-numerical-identity-admission",
+        "round4-battle-shock-event-wounds",
+        "round4-malice-bearer-liveness",
+        "stage2-strict-replay-test-admission"
+      ],
+      "selected_families": [],
+      "rationale": "Records the focused native shooting declaration tests and the generated runtime identity and public contract artifacts for the current build.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -640,7 +599,7 @@
         "engine-numerical-identity-admission"
       ],
       "selected_families": [],
-      "rationale": "Bind the focused five-model behavior, historical test admission, twelve-shard inventory and generated runtime/contract examples to the current code.",
+      "rationale": "Records the focused native shooting declaration tests and the generated runtime identity and public contract artifacts for the current build.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -650,27 +609,17 @@
         "cavalcade-authority-admission"
       ],
       "selected_families": [],
-      "rationale": "Bind the focused five-model behavior, historical test admission, twelve-shard inventory and generated runtime/contract examples to the current code.",
+      "rationale": "Records the focused native shooting declaration tests and the generated runtime identity and public contract artifacts for the current build.",
       "source_obligation": null,
       "unchanged_work": null
     },
-    "src/warhammer40k_core/ai/ground_charge_candidates.py": {
+    "src/warhammer40k_core/ai/normal_shooting_policy.py": {
       "category": "algorithm_or_search",
       "operations": [
-        "stage2-ground-charge-policy"
+        "stage2-normal-shooting-policy"
       ],
       "selected_families": [],
-      "rationale": "Extend the existing opt-in actor-side Charge Move search to five grounded movers and five visible models grouped by their issued rules unit. Bound and charge objective preprocessing and use ordinary native submission authority with the existing time limits. The exact-base B3 route declines this participant count.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "src/warhammer40k_core/ai/ground_charge_policy.py": {
-      "category": "algorithm_or_search",
-      "operations": [
-        "stage2-ground-charge-policy"
-      ],
-      "selected_families": [],
-      "rationale": "Extend the existing opt-in actor-side Charge Move search to five grounded movers and five visible models grouped by their issued rules unit. Bound and charge objective preprocessing and use ordinary native submission authority with the existing time limits. The exact-base B3 route declines this participant count.",
+      "rationale": "Adds an explicitly registered actor-view shooting policy. It scans at most 256 issued target rows and emits at most 32 focus volleys plus omission. It uses existing proposal submission and adds no geometry or native probe work.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -682,17 +631,18 @@
         "round4-malice-bearer-liveness"
       ],
       "selected_families": [],
-      "rationale": "Bind the focused five-model behavior, historical test admission, twelve-shard inventory and generated runtime/contract examples to the current code.",
+      "rationale": "Records the focused native shooting declaration tests and the generated runtime identity and public contract artifacts for the current build.",
       "source_obligation": null,
       "unchanged_work": null
     },
-    "tests/infrastructure/adapters/test_group_ground_charge_policy.py": {
+    "tests/infrastructure/adapters/test_opposing_shooter_scenario.py": {
       "category": "measured_workload",
       "operations": [
-        "stage2-ground-charge-policy"
+        "opposing-shooter-qualification",
+        "stage2-normal-shooting-policy"
       ],
       "selected_families": [],
-      "rationale": "Bind the focused five-model behavior, historical test admission, twelve-shard inventory and generated runtime/contract examples to the current code.",
+      "rationale": "Records the focused native shooting declaration tests and the generated runtime identity and public contract artifacts for the current build.",
       "source_obligation": null,
       "unchanged_work": null
     }

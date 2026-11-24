@@ -1,8 +1,8 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:9093c4f4cf68af8485115fa985de7d02e2b36cb3c27e2a233e7388c31ab7e9d4",
-  "fingerprint": "9093c4f4cf68af8485115fa985de7d02e2b36cb3c27e2a233e7388c31ab7e9d4",
-  "resource_count": 3287,
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:80502a951d120f3f9fed19c66198b2918858c7da104d24ac812cf03c8ceabb27",
+  "fingerprint": "80502a951d120f3f9fed19c66198b2918858c7da104d24ac812cf03c8ceabb27",
+  "resource_count": 3288,
   "resources": [
     {
       "byte_length": 113,
@@ -313,6 +313,11 @@
       "byte_length": 16426,
       "path": "warhammer40k_core/ai/normal_move_scenario.py",
       "sha256": "6ab3e45b757954d5d8382236b3ba551c34beb971bae1dc0d88567205ad61b53c"
+    },
+    {
+      "byte_length": 7407,
+      "path": "warhammer40k_core/ai/normal_shooting_policy.py",
+      "sha256": "55361db2bc54c81a0283644d3bf9e1a15ff420969a39d97d82481ed190bd6cdf"
     },
     {
       "byte_length": 2980,

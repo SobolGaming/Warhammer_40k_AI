@@ -1,0 +1,22 @@
+{
+  "schema": "finite-stage2-normal-shooting-test-v1",
+  "base": "153bb57bfd03a6b8bc8ca137dcd2f33e8648a9f8",
+  "retained_group_charge_sha256": "f32f75b6d38120e8663fde79612493ff40922c5eff7459d3d7197787791ea601",
+  "retained_runtime_fingerprint": "9093c4f4cf68af8485115fa985de7d02e2b36cb3c27e2a233e7388c31ab7e9d4",
+  "runtime_fingerprint": "80502a951d120f3f9fed19c66198b2918858c7da104d24ac812cf03c8ceabb27",
+  "policy_sha256": "55361db2bc54c81a0283644d3bf9e1a15ff420969a39d97d82481ed190bd6cdf",
+  "test": {
+    "before": {
+      "blob_sha1": "bb20cc50fd3baa4b5075307c5bb670c86f09262e",
+      "bytes": 8047,
+      "mode": "100644",
+      "sha256": "b194cc112d8218eac3c08c984cdfa2ecf0c78abf9db9edec61f0d9ad2a0a73d3"
+    },
+    "after": {
+      "mode": "100644",
+      "bytes": 15896,
+      "sha256": "c9583ee29d88826ac4b60ffa91edaee001a9f10a23f0e81132125214fd853b3c",
+      "blob_sha1": "d3a679bd4bd1f04c739280ae54a31f549760afe2"
+    }
+  }
+}
