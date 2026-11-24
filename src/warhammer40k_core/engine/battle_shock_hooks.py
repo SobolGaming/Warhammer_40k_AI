@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Self, TypedDict, TypeGuard, cast
+from typing import TYPE_CHECKING, Self, TypedDict, cast
 
 from warhammer40k_core.core.dice import DiceExpression, RerollPermission
 from warhammer40k_core.core.modifiers import RollModifier, RollModifierPayload
@@ -520,36 +520,43 @@ class BattleShockPendingOutcomeRoute:
     ) -> BattleShockPendingOutcomeAuthority | None:
         return self.validator(context)
 
-    @staticmethod
-    def is_route(validator: object) -> TypeGuard[BattleShockPendingOutcomeRoute]:
-        return type(validator) is BattleShockPendingOutcomeRoute
-
     def needs_validation(self, context: BattleShockPendingOutcomeAuthorityContext) -> bool:
-        request_type = context.request.decision_type
-        if type(request_type) is not str or request_type in self.request_types:
-            return True
-        log = context.decisions.event_log
-        if type(log) is not EventLog:
-            return True
-        events = log._records  # pyright: ignore[reportPrivateUsage]
-        records = context.decisions._records  # pyright: ignore[reportPrivateUsage]
-        if type(events) is not list or type(records) is not list:
-            return True
-        # A marker or producer anywhere can carry authority even when the live
-        # request's discriminator has drifted. Inspect the live ledger without
-        # copying its rows or relying on a cached index or revision.
-        return any(
-            type(event) is not EventRecord
-            or type(event.event_type) is not str
-            or event.event_type in self.marker_event_types
-            for event in events
-        ) or any(
-            type(record) is not DecisionRecord
-            or type(record.request) is not DecisionRequest
-            or type(record.request.decision_type) is not str
-            or record.request.decision_type in self.producer_request_types
-            for record in records
+        return pending_outcome_provenance_requires_validation(
+            context, self.request_types, self.marker_event_types, self.producer_request_types
         )
+
+
+def pending_outcome_provenance_requires_validation(
+    context: BattleShockPendingOutcomeAuthorityContext,
+    request_types: frozenset[str],
+    marker_event_types: frozenset[str],
+    producer_request_types: frozenset[str],
+) -> bool:
+    request_type = context.request.decision_type
+    if type(request_type) is not str or request_type in request_types:
+        return True
+    log = context.decisions.event_log
+    if type(log) is not EventLog:
+        return True
+    events = log._records  # pyright: ignore[reportPrivateUsage]
+    records = context.decisions._records  # pyright: ignore[reportPrivateUsage]
+    if type(events) is not list or type(records) is not list:
+        return True
+    # A marker or producer anywhere can carry authority even when the live
+    # request's discriminator has drifted. Inspect the live ledger without
+    # copying its rows or relying on a cached index or revision.
+    return any(
+        type(event) is not EventRecord
+        or type(event.event_type) is not str
+        or event.event_type in marker_event_types
+        for event in events
+    ) or any(
+        type(record) is not DecisionRecord
+        or type(record.request) is not DecisionRequest
+        or type(record.request.decision_type) is not str
+        or record.request.decision_type in producer_request_types
+        for record in records
+    )
 
 
 @dataclass(frozen=True, slots=True)
@@ -849,14 +856,15 @@ class BattleShockHookRegistry:
 
         if type(context) is not BattleShockPendingOutcomeAuthorityContext:
             raise GameLifecycleError("Pending Battle-shock outcome hooks require context.")
+        from warhammer40k_core.engine.faction_content.pending_battle_shock_routes import (
+            pending_battle_shock_outcome_needs_validation,
+        )
+
         validators = tuple(
             validator
             for binding in self.bindings
             if (validator := binding.pending_outcome_authority_validator) is not None
-            and (
-                not BattleShockPendingOutcomeRoute.is_route(validator)
-                or validator.needs_validation(context)
-            )
+            and pending_battle_shock_outcome_needs_validation(validator, context)
         )
         if not validators:
             return None

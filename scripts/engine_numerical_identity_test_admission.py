@@ -601,7 +601,7 @@ def _pending_battle_shock_source_transition(
     if not path.exists():
         return None
     raw = _checked_bytes(
-        root, name, "b1e7e72fbd1cb729b2b08ec0253ed5d3b72f463c046238952c9c574c85e17849"
+        root, name, "1188532c9acbc0b9c4b19323e98458aeb64d7d51ad3c8bf3b889486230568a03"
     )
     record = json.loads(raw, object_pairs_hook=_selection_object)
     if (
@@ -624,7 +624,10 @@ def _pending_battle_shock_source_transition(
         path
         for path in CAVALCADE_AUTHORITY_SOURCES
         if path.endswith(("battle_shock_hooks.py", "battle_shock_outcome_authority.py"))
-    } | {ROUND_FIVE_SHADOW_SOURCES[0]}
+    } | {
+        ROUND_FIVE_SHADOW_SOURCES[0],
+        "src/warhammer40k_core/engine/faction_content/pending_battle_shock_routes.py",
+    }
     sources: SourceSuccessors = record["sources"]
     if sources.keys() != expected_sources:
         raise SystemExit("Pending Battle-shock source transition membership differs.")

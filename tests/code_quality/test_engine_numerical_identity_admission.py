@@ -382,7 +382,12 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
     assert _record(MANIFEST)["fingerprint"] == pending["runtime_fingerprint"]
     pending_before: dict[str, str] = {}
     for name, binding in pending["sources"].items():
-        predecessor = subprocess.check_output(["git", "show", pending_base + ":" + name], cwd=ROOT)
+        present = subprocess.check_output(["git", "ls-tree", pending_base, "--", name], cwd=ROOT)
+        predecessor = (
+            subprocess.check_output(["git", "show", pending_base + ":" + name], cwd=ROOT)
+            if present
+            else b""
+        )
         pending_before[name] = hashlib.sha256(predecessor).hexdigest()
         assert binding["before"] == pending_before[name]
         assert binding["after"] == hashlib.sha256((ROOT / name).read_bytes()).hexdigest()

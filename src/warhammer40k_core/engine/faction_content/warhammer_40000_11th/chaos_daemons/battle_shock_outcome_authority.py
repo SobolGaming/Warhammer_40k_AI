@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from functools import cache
 from typing import cast
 
 from warhammer40k_core.core.dice import (
@@ -21,6 +22,7 @@ from warhammer40k_core.engine.battle_shock_hooks import (
     BattleShockPendingOutcomeAuthorityContext,
     BattleShockPendingOutcomeAuthorityValidator,
     BattleShockPendingOutcomeRoute,
+    pending_outcome_provenance_requires_validation,
 )
 from warhammer40k_core.engine.battle_shock_outcome_history import outcome_activation_index
 from warhammer40k_core.engine.battle_shock_resolution_authority import (
@@ -107,21 +109,16 @@ _PENDING_EVENT_KEYS = frozenset(
 )
 
 
-def pending_outcome_route(
-    validator: BattleShockPendingOutcomeAuthorityValidator,
-) -> BattleShockPendingOutcomeRoute:
+@cache
+def _pending_outcome_provenance() -> tuple[frozenset[str], frozenset[str], frozenset[str]]:
     from warhammer40k_core.engine.damage_allocation import SELECT_FEEL_NO_PAIN_DECISION_TYPE
     from warhammer40k_core.engine.mortal_wound_model_allocation import (
         SELECT_MORTAL_WOUND_MODEL_DECISION_TYPE,
     )
 
-    # The Terror validator reads its marker and only parses mortal-wound
-    # requests. Manifestation also audits recorded healing producers, even
-    # when the live request looks unrelated. Retain that audit whenever a
-    # producer exists, including malformed or incomplete placement lineage.
-    return BattleShockPendingOutcomeRoute(
-        validator=validator,
-        request_types=frozenset(
+    # A healing producer anywhere can still authenticate a drifted request.
+    return (
+        frozenset(
             (
                 SELECT_FEEL_NO_PAIN_DECISION_TYPE,
                 SELECT_MORTAL_WOUND_MODEL_DECISION_TYPE,
@@ -129,9 +126,29 @@ def pending_outcome_route(
                 SUBMIT_HEALING_REVIVAL_PLACEMENT_DECISION_TYPE,
             )
         ),
-        marker_event_types=frozenset((_PENDING_EVENT_TYPE, _TERROR_PENDING_EVENT_TYPE)),
-        producer_request_types=frozenset((SELECT_HEALING_MODEL_DECISION_TYPE,)),
+        frozenset((_PENDING_EVENT_TYPE, _TERROR_PENDING_EVENT_TYPE)),
+        frozenset((SELECT_HEALING_MODEL_DECISION_TYPE,)),
     )
+
+
+def pending_outcome_route(
+    validator: BattleShockPendingOutcomeAuthorityValidator,
+) -> BattleShockPendingOutcomeRoute:
+    """Build an ordinary validator wrapper with the native provenance shape."""
+    return BattleShockPendingOutcomeRoute(validator, *_pending_outcome_provenance())
+
+
+def native_pending_outcome_needs_validation(
+    validator: BattleShockPendingOutcomeAuthorityValidator,
+    context: BattleShockPendingOutcomeAuthorityContext,
+) -> bool:
+    from . import army_rule
+
+    # Use the fixed scope only for the native functions themselves. No wrapper
+    # fields take part in admission or define the scope used by the engine.
+    if not any(validator is native for native in army_rule.NATIVE_PENDING_OUTCOME_VALIDATORS):
+        return True
+    return pending_outcome_provenance_requires_validation(context, *_pending_outcome_provenance())
 
 
 def validate_daemonic_terror_pending_outcome(

@@ -345,6 +345,7 @@
     "cavalcade-hot-authority": {
       "paths": [
         "src/warhammer40k_core/engine/battle_shock_hooks.py",
+        "src/warhammer40k_core/engine/faction_content/pending_battle_shock_routes.py",
         "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/army_rule.py",
         "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/battle_shock_outcome_authority.py",
         "src/warhammer40k_core/engine/mutation_decision_authority.py",
@@ -358,11 +359,14 @@
         "BattleShockPendingOutcomeRoute",
         "BattleShockPendingOutcomeRoute.__call__",
         "BattleShockPendingOutcomeRoute.__post_init__",
-        "BattleShockPendingOutcomeRoute.is_route",
         "BattleShockPendingOutcomeRoute.needs_validation",
         "_placement_producer_identifies_provider",
         "_runtime_contribution",
         "pending_outcome_route",
+        "_pending_outcome_provenance",
+        "pending_outcome_provenance_requires_validation",
+        "native_pending_outcome_needs_validation",
+        "pending_battle_shock_outcome_needs_validation",
         "decision_event_payload_matches",
         "_SnapshotReducers",
         "_SnapshotReducers.__missing__",
