@@ -96,7 +96,7 @@ def ground_charge_test_successor(
 
 SHOOTING_BASE = "153bb57bfd03a6b8bc8ca137dcd2f33e8648a9f8"
 SHOOTING_TRANSITION = "data/source_audits/ci64_provenance_v1/stage2-normal-shooting-test-v1.json"
-SHOOTING_TRANSITION_SHA256 = "9f1ae4b44e3563b8583932f182095bcf23364bc3fdfab183714aa2c3aa1fb79f"
+SHOOTING_TRANSITION_SHA256 = "e52c9197bb04d1cd64c595f960d39f9cf6964971dc90f650575429d83fcf2862"
 SHOOTING_OWNER = "tests/infrastructure/adapters/test_opposing_shooter_scenario.py"
 SHOOTING_SOURCE = "src/warhammer40k_core/ai/normal_shooting_policy.py"
 

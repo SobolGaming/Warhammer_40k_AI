@@ -327,6 +327,15 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         + f"::test_normal_shooting_policy_uses_the_projected_offer_and_native_submission[{fire}]"
         for fire in (False, True)
     }
+    shooting_cases.update(
+        ground_charge.SHOOTING_OWNER + "::" + name
+        for name in (
+            "test_normal_shooting_ranks_equal_legal_volleys_by_target_id_in_reverse_order",
+            "test_normal_shooting_rejects_one_over_each_candidate_limit[rows]",
+            "test_normal_shooting_rejects_one_over_each_candidate_limit[targets]",
+            "test_normal_shooting_binds_all_candidates_after_one_observation_decode",
+        )
+    )
     assert sum(ground_charge.GROUP_OWNER in group for group in groups) == 1
     for source, row in group_charge["sources"].items():
         assert row["before"] == charge["sources"][source]

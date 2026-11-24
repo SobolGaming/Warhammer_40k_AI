@@ -14,7 +14,7 @@ from warhammer40k_core.ai.player_policy import (
     PolicyRoute,
     payload_digest,
 )
-from warhammer40k_core.engine.event_log import validate_json_value
+from warhammer40k_core.engine.event_log import canonical_json
 from warhammer40k_core.engine.phases.shooting_model import ShootingDeclarationProposalRequestPayload
 from warhammer40k_core.engine.shooting_targets import ShootingTargetCandidatePayload
 from warhammer40k_core.engine.shooting_types import ShootingType
@@ -78,7 +78,8 @@ def generate_normal_shooting_candidates(
     actor = context.route.actor_id
     if context.route != normal_shooting_route(actor):
         raise NormalShootingGap(NormalShootingGapReason.NO_ORDINARY_DECLARATION)
-    offer = cast(_DeclarationRequest, context.request["payload"])["proposal_request"]
+    request = context.request
+    offer = cast(_DeclarationRequest, request["payload"])["proposal_request"]
     if (
         offer["actor_id"] != actor
         or offer["active_player_id"] != actor
@@ -130,6 +131,9 @@ def generate_normal_shooting_candidates(
     if len(targets) > MAX_TARGET_UNITS:
         raise NormalShootingGap(NormalShootingGapReason.CANDIDATE_LIMIT)
 
+    request_id = request["request_id"]
+    observation_hash = context.observation_hash
+
     def candidate(
         target_id: str | None, declarations: tuple[WeaponDeclaration, ...]
     ) -> NormalShootingCandidate:
@@ -151,7 +155,7 @@ def generate_normal_shooting_candidates(
             candidate_id,
             target_id,
             len(declarations),
-            context.propose(validate_json_value(proposal)),
+            PolicyAction(actor, request_id, observation_hash, None, canonical_json(proposal)),
         )
 
     return (

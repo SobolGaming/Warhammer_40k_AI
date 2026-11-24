@@ -1012,8 +1012,12 @@
     "tests/infrastructure/adapters/test_normal_move_scenario.py::test_normal_move_json_restore_exact_replay_and_closed_receipt": 328.83,
     "tests/infrastructure/adapters/test_normal_move_scenario.py::test_normal_move_rejects_incomplete_and_extra_ordinary_choices": 25.012,
     "tests/infrastructure/adapters/test_opposing_shooter_scenario.py::test_exact_pair_shooter_diagnostics_and_ordinary_opposing_attack_replay": 291.682,
-    "tests/infrastructure/adapters/test_opposing_shooter_scenario.py::test_normal_shooting_policy_uses_the_projected_offer_and_native_submission[False]": 3.788,
-    "tests/infrastructure/adapters/test_opposing_shooter_scenario.py::test_normal_shooting_policy_uses_the_projected_offer_and_native_submission[True]": 0.311,
+    "tests/infrastructure/adapters/test_opposing_shooter_scenario.py::test_normal_shooting_binds_all_candidates_after_one_observation_decode": 0.091,
+    "tests/infrastructure/adapters/test_opposing_shooter_scenario.py::test_normal_shooting_policy_uses_the_projected_offer_and_native_submission[False]": 3.631,
+    "tests/infrastructure/adapters/test_opposing_shooter_scenario.py::test_normal_shooting_policy_uses_the_projected_offer_and_native_submission[True]": 0.291,
+    "tests/infrastructure/adapters/test_opposing_shooter_scenario.py::test_normal_shooting_ranks_equal_legal_volleys_by_target_id_in_reverse_order": 0.152,
+    "tests/infrastructure/adapters/test_opposing_shooter_scenario.py::test_normal_shooting_rejects_one_over_each_candidate_limit[rows]": 0.288,
+    "tests/infrastructure/adapters/test_opposing_shooter_scenario.py::test_normal_shooting_rejects_one_over_each_candidate_limit[targets]": 0.183,
     "tests/infrastructure/adapters/test_opposing_shooter_scenario.py::test_opposing_qualification_rejects_unreached_and_wrong_configuration": 0.455,
     "tests/infrastructure/adapters/test_preserve_scenario.py::test_preserve_prefix_has_exact_routes_candidates_and_scoped_tactical_gaps": 24.476,
     "tests/infrastructure/adapters/test_preserve_scenario.py::test_preserve_prefix_persists_replays_and_rejects_changed_closed_evidence": 199.166,
@@ -6695,18 +6699,18 @@
   },
   "execution_model": {
     "assignment_wall_lower_bound_seconds": {
-      "1": 568.103,
-      "10": 568.103,
-      "11": 568.103,
-      "12": 568.103,
+      "1": 568.116,
+      "10": 568.116,
+      "11": 568.117,
+      "12": 568.117,
       "2": 795.547,
       "3": 609.537,
-      "4": 568.103,
-      "5": 568.103,
-      "6": 568.103,
-      "7": 568.103,
-      "8": 568.103,
-      "9": 568.104
+      "4": 568.117,
+      "5": 568.117,
+      "6": 568.117,
+      "7": 568.116,
+      "8": 568.117,
+      "9": 568.117
     },
     "cold_shard_assignment": "minimum-unrounded-modeled-test-load-existing-bucket-v1",
     "cold_shard_id": 1,
@@ -6715,18 +6719,18 @@
       "tests/factions/chaos_daemons/integration/test_cavalcade_v995_roster.py::test_exact_mirror_deploys_all_78_models_and_replays_to_battle"
     ],
     "shard_worker_seconds": {
-      "1": 2272.412,
-      "10": 2272.413,
-      "11": 2272.413,
-      "12": 2272.413,
+      "1": 2272.466,
+      "10": 2272.466,
+      "11": 2272.468,
+      "12": 2272.467,
       "2": 3182.186,
       "3": 2438.146,
-      "4": 2272.413,
-      "5": 2272.413,
-      "6": 2272.413,
-      "7": 2272.413,
-      "8": 2272.414,
-      "9": 2272.415
+      "4": 2272.468,
+      "5": 2272.467,
+      "6": 2272.467,
+      "7": 2272.466,
+      "8": 2272.467,
+      "9": 2272.467
     }
   },
   "files": {
@@ -6796,7 +6800,7 @@
     "tests/infrastructure/adapters/test_group_ground_charge_policy.py": 19.053,
     "tests/infrastructure/adapters/test_matched_attack_scenario.py": 1890.765,
     "tests/infrastructure/adapters/test_normal_move_scenario.py": 466.004,
-    "tests/infrastructure/adapters/test_opposing_shooter_scenario.py": 296.236,
+    "tests/infrastructure/adapters/test_opposing_shooter_scenario.py": 296.773,
     "tests/infrastructure/adapters/test_preserve_scenario.py": 238.409,
     "tests/infrastructure/adapters/test_runner_accounting.py": 626.885,
     "tests/infrastructure/adapters/test_training_admission.py": 3182.186,
@@ -7275,19 +7279,19 @@
         "431f84031f3029637fa3c74e55d1c8dede1e3fe1aa04f223da43a8cacdd7574d",
         "63db8ac24763535fbddc46142b0c99e6833b128bc40e674ff95ec735b05e1018",
         "708e2a7cdde4ec8155cc758efc538d7dc0dd4b5c25644c8a1c2d88652d6df8df",
-        "71ce066faf24039018e60d838f21f27be932aef9cf3e951a97068743965a2aa2"
+        "9dc1b70162325c830e81f4b6e06c9199b793ed7d7805d59287feb2a593be541d"
       ],
-      "source": "Retained #729 representative JUnit timing and the two measured Stage 2 Normal Shooting cases",
-      "test_cases": 6692,
+      "source": "Retained #729 representative JUnit timing and six measured Stage 2 Normal Shooting cases",
+      "test_cases": 6696,
       "test_files": 443
     }
   ],
   "shard_count": 12,
   "shards": [
     {
-      "duration_seconds": 2272.412,
+      "duration_seconds": 2272.466,
       "shard_id": 1,
-      "test_file_count": 50
+      "test_file_count": 43
     },
     {
       "duration_seconds": 3182.186,
@@ -7300,49 +7304,49 @@
       "test_file_count": 1
     },
     {
-      "duration_seconds": 2272.413,
+      "duration_seconds": 1771.234,
       "shard_id": 4,
-      "test_file_count": 43
+      "test_file_count": 48
     },
     {
-      "duration_seconds": 2272.413,
+      "duration_seconds": 2272.467,
       "shard_id": 5,
       "test_file_count": 49
     },
     {
-      "duration_seconds": 2272.413,
+      "duration_seconds": 2272.467,
       "shard_id": 6,
-      "test_file_count": 49
+      "test_file_count": 47
     },
     {
-      "duration_seconds": 2272.413,
+      "duration_seconds": 2272.466,
       "shard_id": 7,
-      "test_file_count": 48
+      "test_file_count": 50
     },
     {
-      "duration_seconds": 2272.414,
+      "duration_seconds": 2272.467,
       "shard_id": 8,
       "test_file_count": 48
     },
     {
-      "duration_seconds": 2272.415,
+      "duration_seconds": 2272.467,
       "shard_id": 9,
-      "test_file_count": 48
+      "test_file_count": 50
     },
     {
-      "duration_seconds": 1771.179,
+      "duration_seconds": 2272.466,
       "shard_id": 10,
-      "test_file_count": 51
+      "test_file_count": 50
     },
     {
-      "duration_seconds": 2272.413,
+      "duration_seconds": 2272.468,
       "shard_id": 11,
       "test_file_count": 99
     },
     {
-      "duration_seconds": 2272.413,
+      "duration_seconds": 2272.467,
       "shard_id": 12,
-      "test_file_count": 47
+      "test_file_count": 48
     }
   ],
   "step5g_partitions": {
@@ -7350,5 +7354,5 @@
     "sha256": "b241b31651a8d5d903a2b851583186c276a5ac32fed26de1a1c69b4aa278b711"
   },
   "strategy": "largest-processing-time-by-derived-selector-weight",
-  "total_test_duration_seconds": 27843.23
+  "total_test_duration_seconds": 27843.767
 }
