@@ -361,7 +361,10 @@ def generic_supported_stratagem_rule_ir_hash(
     if type(source_row) is not faction_subrules_2026_27.SourceStratagemRow:
         raise Phase17FGenericIrSupportError("Generic Stratagem support requires source row.")
     descriptor_id = f"phase17e:{source_row.source_row_id}"
-    if source_row.source_row_id in _SUPPORTED_ARMOUR_SAVE_SET_STRATAGEM_SOURCE_ROW_IDS:
+    if (
+        source_row.source_row_id in _SUPPORTED_ARMOUR_SAVE_SET_STRATAGEM_SOURCE_ROW_IDS
+        or source_row.source_row_id == blood_legion_ir.BLOOD_BEGETS_SKULLS_SOURCE_ROW_ID
+    ):
         return generic_rule_ir_hash_by_coverage_descriptor_id(descriptor_id)
     rule_ir_hash = daemonic_incursion_ir.coverage_rule_ir_hash_by_descriptor_id(descriptor_id)
     if rule_ir_hash is not None:
@@ -467,6 +470,7 @@ def _stratagem_activation_rule_ir_payload_by_descriptor_id(
         _SUPPORTED_HIT_TARGET_COVER_DENIAL_STRATAGEM_SOURCE_ROW_IDS
         | _SUPPORTED_INCOMING_AP_MODIFIER_STRATAGEM_SOURCE_ROW_IDS
         | _SUPPORTED_ARMOUR_SAVE_SET_STRATAGEM_SOURCE_ROW_IDS
+        | {blood_legion_ir.BLOOD_BEGETS_SKULLS_SOURCE_ROW_ID}
     ):
         return None
     for profile in stratagem_activation.stratagem_activation_profiles():

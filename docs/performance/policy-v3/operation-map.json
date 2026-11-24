@@ -37247,6 +37247,72 @@
       "sensitive": false,
       "mandatory": true
     },
+    "blood-begets-skulls-charge-preselection": {
+      "paths": [
+        "src/warhammer40k_core/engine/charge_phase_flow.py",
+        "src/warhammer40k_core/engine/charge_preselection_stratagems.py",
+        "src/warhammer40k_core/engine/stratagems.py",
+        "src/warhammer40k_core/engine/stratagems_model.py",
+        "src/warhammer40k_core/engine/stratagems_requests.py",
+        "src/warhammer40k_core/engine/stratagems_targeting.py"
+      ],
+      "owners": [
+        "@module",
+        "begin_phase",
+        "charge_preselection_context",
+        "request_charge_preselection_stratagem",
+        "_stratagem_use_options_for_records",
+        "_not_selected_to_charge_target_error",
+        "_target_binding_error"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "blood-begets-skulls-source-activation": {
+      "paths": [
+        "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_blood_legion_ir_support_2026_27.py",
+        "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_generic_ir_support_2026_27.py",
+        "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_stratagem_activation_2026_27.py",
+        "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_stratagem_activation_2026_27.json",
+        "tools/generate_faction_stratagem_activation_support.py"
+      ],
+      "owners": [
+        "@document",
+        "@module",
+        "_activation_profile_for_source_row",
+        "_stratagem_activation_rule_ir_payload_by_descriptor_id",
+        "generic_supported_stratagem_rule_ir_hash"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "blood-begets-skulls-test-admission": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/blood-begets-skulls-transition-v1.json",
+        "scripts/engine_numerical_identity_test_admission.py",
+        "tests/factions/chaos_daemons/integration/test_blood_begets_skulls.py"
+      ],
+      "owners": [
+        "@document",
+        "@module",
+        "_blood_begets_skulls_test_successor",
+        "_sheathed_in_brass_test_addition",
+        "_assert_grant",
+        "_reach_charge",
+        "_scene",
+        "_submit",
+        "_targets",
+        "skulls_definitions",
+        "test_blood_begets_skulls_offers_when_advance_prevents_all_charges",
+        "test_blood_begets_skulls_decline_then_offer_after_earlier_charge",
+        "test_blood_begets_skulls_unavailable_without_cp_or_outside_own_charge"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
     "stage3-ordinary-melee-profile-policy": {
       "paths": [
         "src/warhammer40k_core/ai/ordinary_melee_profile_policy.py",

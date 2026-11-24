@@ -1,9 +1,9 @@
 {
   "schema": "finite-stage3-melee-profile-test-v1",
-  "base": "c63a300c28fa772f59c75b66d50038e5e6241cd5",
-  "retained_transition_sha256": "eed47b44cae336c88c37fbde89a41f8f7b0224e63945ffd75526170bd0bb6a66",
-  "retained_runtime_fingerprint": "081b7dba5fd5f7e987a1a870dcece79a128507ddb62bd583f6971a3d9d9d7052",
-  "runtime_fingerprint": "f78e87fc9388b167f760592d4f06b6ebba8f31958af1131d7d20ca56c2a9124b",
+  "base": "5ebd32bf98f5313e7ef0790f601a88ee1a6eb8fe",
+  "retained_transition_sha256": "1555a7c7046c5ca5d266f7993e8862a5e85c08b2754cec1e340d04ca3cfe430b",
+  "retained_runtime_fingerprint": "0f9bc14dd7b611704595a5c72599170c33b31c6b83c535b9135b5a745321f77c",
+  "runtime_fingerprint": "6e3d09c81b37bb919dc6f92a43e656c6072706700fca6a5425dd0e117b2d4fd6",
   "added_files": {
     "tests/infrastructure/adapters/test_ordinary_melee_profile_policy.py": {
       "mode": "100644",

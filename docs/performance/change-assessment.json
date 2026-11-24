@@ -1,206 +1,206 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "c63a300c28fa772f59c75b66d50038e5e6241cd5",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:f78e87fc9388b167f760592d4f06b6ebba8f31958af1131d7d20ca56c2a9124b",
-  "operation_map_sha256": "54c3895ba70d6749c04740aabd59f1312789548d0638c5a2c410a3ddd7c8d64e",
+  "base": "5ebd32bf98f5313e7ef0790f601a88ee1a6eb8fe",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:6e3d09c81b37bb919dc6f92a43e656c6072706700fca6a5425dd0e117b2d4fd6",
+  "operation_map_sha256": "405fad33753ff1052e1a8b920452d0e1223422530e748c3b4c376b37e5cca19e",
   "changes": {
     "ci/test_shards/durations.json": {
-      "before_sha256": "7534394b2fe30ea17afa0d4ea423c334fcbcf45f32c7cbb5cac0d3c26ac80820",
-      "after_sha256": "ab70c0e4d39cdc847ad906ba25bd4266a44c3f9accacd059e3d3be189a3d0575",
+      "before_sha256": "a91648e5cbda4e21748e6a4b6cd6ebc61fa16913baa40d505990f09216192b4d",
+      "after_sha256": "6fe34c9466ad799d2bd67c4a50f5167bebe234d7d01b29093958546af6a5d23f",
       "owners": {
         "@document": {
-          "before": "7534394b2fe30ea17afa0d4ea423c334fcbcf45f32c7cbb5cac0d3c26ac80820",
-          "after": "ab70c0e4d39cdc847ad906ba25bd4266a44c3f9accacd059e3d3be189a3d0575"
+          "before": "a91648e5cbda4e21748e6a4b6cd6ebc61fa16913baa40d505990f09216192b4d",
+          "after": "6fe34c9466ad799d2bd67c4a50f5167bebe234d7d01b29093958546af6a5d23f"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
-      "before_sha256": "002063d8a34f0b6717ea7ac22a799ef969163dcf9d75ed058948afcb87b99423",
-      "after_sha256": "fd72567c71cb356c6f148e1d7e98c69a61f0d0c8701f3bf17ad221644880d900",
+      "before_sha256": "c5d14f312226b7dda6e8c6169b2571b3444a9b1268b36e9cfc259e8db462b567",
+      "after_sha256": "cbf6810456c26cbf49e788fdcfb25b1d4fa1daed054096cbfa16f9cdd654f7e2",
       "owners": {
         "@document": {
-          "before": "002063d8a34f0b6717ea7ac22a799ef969163dcf9d75ed058948afcb87b99423",
-          "after": "fd72567c71cb356c6f148e1d7e98c69a61f0d0c8701f3bf17ad221644880d900"
+          "before": "c5d14f312226b7dda6e8c6169b2571b3444a9b1268b36e9cfc259e8db462b567",
+          "after": "cbf6810456c26cbf49e788fdcfb25b1d4fa1daed054096cbfa16f9cdd654f7e2"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
-      "before_sha256": "a72f12617332d3a6f0f003c0a861e0b603dc33901fc455429c0017817ca2a4d4",
-      "after_sha256": "3a120caf52743805b43ad3bdf38f4f2f97cef08803537cebeb93487ff1280c3a",
+      "before_sha256": "28f952913d1be65c7bcc2a5457cf795e2a86ad49160f67ccb9cb259dde5b9a80",
+      "after_sha256": "66362dfa910995f8764b2aeb24e262ebe73288bc3e907b00c90ad6976c88e6ec",
       "owners": {
         "@document": {
-          "before": "a72f12617332d3a6f0f003c0a861e0b603dc33901fc455429c0017817ca2a4d4",
-          "after": "3a120caf52743805b43ad3bdf38f4f2f97cef08803537cebeb93487ff1280c3a"
+          "before": "28f952913d1be65c7bcc2a5457cf795e2a86ad49160f67ccb9cb259dde5b9a80",
+          "after": "66362dfa910995f8764b2aeb24e262ebe73288bc3e907b00c90ad6976c88e6ec"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
-      "before_sha256": "e37128ca9deb7236bdb7131b912cf660463e968b68a313f7f52d7f87331962f4",
-      "after_sha256": "0deff38e8734c4711cf6ed53139cf8cab8e4f8f068a13c4b237be33733d9b66a",
+      "before_sha256": "c68763c54a6746ecaf5c502278241f49f48a62444a888784a82e51ffb95c0df8",
+      "after_sha256": "a30ce1e58d6829ca37ab83252776e783e0ea89d0ab215532eb1d7e1e01b82098",
       "owners": {
         "@document": {
-          "before": "e37128ca9deb7236bdb7131b912cf660463e968b68a313f7f52d7f87331962f4",
-          "after": "0deff38e8734c4711cf6ed53139cf8cab8e4f8f068a13c4b237be33733d9b66a"
+          "before": "c68763c54a6746ecaf5c502278241f49f48a62444a888784a82e51ffb95c0df8",
+          "after": "a30ce1e58d6829ca37ab83252776e783e0ea89d0ab215532eb1d7e1e01b82098"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
-      "before_sha256": "96bf35507382c91b918baef9040ae0b736f1a2b8f855e7e79d4ec9316f22a5e9",
-      "after_sha256": "18ec604a71f87bce901c73a7e9a9c5a0efe06957ae1d9233c67847243067e817",
+      "before_sha256": "c8a09b39cd52eaa9f40115ff3591fe12c2c120d9824143c1a5c47b58b382f51a",
+      "after_sha256": "0331fba63244888d9c9c0eeb69b36ad40743a029f9055f7f8e3860da7afabd78",
       "owners": {
         "@document": {
-          "before": "96bf35507382c91b918baef9040ae0b736f1a2b8f855e7e79d4ec9316f22a5e9",
-          "after": "18ec604a71f87bce901c73a7e9a9c5a0efe06957ae1d9233c67847243067e817"
+          "before": "c8a09b39cd52eaa9f40115ff3591fe12c2c120d9824143c1a5c47b58b382f51a",
+          "after": "0331fba63244888d9c9c0eeb69b36ad40743a029f9055f7f8e3860da7afabd78"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
-      "before_sha256": "259b0ce1c3b1d5269bef345e6003cb2379fdfc9ad6e9c90eebf9dbdf663d45a3",
-      "after_sha256": "e91d06b2dac90433be9ab84e0f610e39442dc4c088b3366291b48c2c6eadac0b",
+      "before_sha256": "7531fc331fdc0eb1c324856adbb85743640a530812d1069345f0517684eaf42b",
+      "after_sha256": "8bde76a91d71c9fbb5f7ca49485f3d80b7f25ee1d4dae23b10f147a3362e0253",
       "owners": {
         "@document": {
-          "before": "259b0ce1c3b1d5269bef345e6003cb2379fdfc9ad6e9c90eebf9dbdf663d45a3",
-          "after": "e91d06b2dac90433be9ab84e0f610e39442dc4c088b3366291b48c2c6eadac0b"
+          "before": "7531fc331fdc0eb1c324856adbb85743640a530812d1069345f0517684eaf42b",
+          "after": "8bde76a91d71c9fbb5f7ca49485f3d80b7f25ee1d4dae23b10f147a3362e0253"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
-      "before_sha256": "bafaeff7cf219f23c90b071cc0df9149117ae34a5b9238d924aea69ca3223d6e",
-      "after_sha256": "0410aaf00afd40d984ed50d6614a2dbf1981205f5bd1c0f9fc280e79a53b894e",
+      "before_sha256": "46399ffacddd4a55d67fb92340d28d0a1a382bb1d1690f88e08af657b88eb2b7",
+      "after_sha256": "f3b44f3cee2466109c58c03645504014bf004fe9b6effd6049441637e15925dd",
       "owners": {
         "@document": {
-          "before": "bafaeff7cf219f23c90b071cc0df9149117ae34a5b9238d924aea69ca3223d6e",
-          "after": "0410aaf00afd40d984ed50d6614a2dbf1981205f5bd1c0f9fc280e79a53b894e"
+          "before": "46399ffacddd4a55d67fb92340d28d0a1a382bb1d1690f88e08af657b88eb2b7",
+          "after": "f3b44f3cee2466109c58c03645504014bf004fe9b6effd6049441637e15925dd"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
-      "before_sha256": "7bebdf9d2cbef35338538c19eaf6c15b665295b4a85a9b8face8ee9bf34c896e",
-      "after_sha256": "662062b3156a2b128b0e3128695f3ab4f74070d830db6e797b97f8c8f080a240",
+      "before_sha256": "ea806070089351aee7dac49a80c093d51912e1c8144e3ec86d82bbcdad487980",
+      "after_sha256": "b859a76c484dd68c6db9416ab6cf64fdba0107117102f32ea3c9e979f23a953a",
       "owners": {
         "@document": {
-          "before": "7bebdf9d2cbef35338538c19eaf6c15b665295b4a85a9b8face8ee9bf34c896e",
-          "after": "662062b3156a2b128b0e3128695f3ab4f74070d830db6e797b97f8c8f080a240"
+          "before": "ea806070089351aee7dac49a80c093d51912e1c8144e3ec86d82bbcdad487980",
+          "after": "b859a76c484dd68c6db9416ab6cf64fdba0107117102f32ea3c9e979f23a953a"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
-      "before_sha256": "fad0a705f8f532b582b78f21870f06c1519b40ee4854d0d4bedbc3b2b1f5b886",
-      "after_sha256": "6f53747bc98b48fafc2f06b6554e62a4ebb7c79dcb3c024cb779560575414d8c",
+      "before_sha256": "c65f18f94752568680acdb8e3a1509112a9d5dc2e059f6d75a287fb5f84a15a1",
+      "after_sha256": "888edaf6fef83335fbbc1a8462047c9b1e2d8986c4e6d7be7e3a14b9f2f86e7c",
       "owners": {
         "@document": {
-          "before": "fad0a705f8f532b582b78f21870f06c1519b40ee4854d0d4bedbc3b2b1f5b886",
-          "after": "6f53747bc98b48fafc2f06b6554e62a4ebb7c79dcb3c024cb779560575414d8c"
+          "before": "c65f18f94752568680acdb8e3a1509112a9d5dc2e059f6d75a287fb5f84a15a1",
+          "after": "888edaf6fef83335fbbc1a8462047c9b1e2d8986c4e6d7be7e3a14b9f2f86e7c"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
-      "before_sha256": "2ab517d0471f56b519b1e1bf90acf70a4a8bbddb71867f1e52b21f25dfb8b9ef",
-      "after_sha256": "c80d5f4a5ffdde791a8f4cf0b439efa06d19c722cbcd5f1b54749c18b4ae048d",
+      "before_sha256": "0453ced44765687768decd470d1cee3db8a9e5045af3ddede0c3665a395b8460",
+      "after_sha256": "93365b7f58ec33a3bedfe54885ef61c7ff0c624a7748cbd530118de7e80ccc9e",
       "owners": {
         "@document": {
-          "before": "2ab517d0471f56b519b1e1bf90acf70a4a8bbddb71867f1e52b21f25dfb8b9ef",
-          "after": "c80d5f4a5ffdde791a8f4cf0b439efa06d19c722cbcd5f1b54749c18b4ae048d"
+          "before": "0453ced44765687768decd470d1cee3db8a9e5045af3ddede0c3665a395b8460",
+          "after": "93365b7f58ec33a3bedfe54885ef61c7ff0c624a7748cbd530118de7e80ccc9e"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
-      "before_sha256": "655dcea9c311896bcc77f2dc555cdb392c26bf352afccca3571f37ffb5efa76b",
-      "after_sha256": "7bdb65d044b0df9c4235b596202431355b4e8ba00f300e514ddeb29b61ad3ed3",
+      "before_sha256": "e0c534eefbbe4dd969df6f43bbae5cf9af8b247a53f4da9da84ec5991bacba3e",
+      "after_sha256": "a6ec1d571b5b214968ed2a74aafae37d232996bed5815c5992d8ffd2c222b9c3",
       "owners": {
         "@document": {
-          "before": "655dcea9c311896bcc77f2dc555cdb392c26bf352afccca3571f37ffb5efa76b",
-          "after": "7bdb65d044b0df9c4235b596202431355b4e8ba00f300e514ddeb29b61ad3ed3"
+          "before": "e0c534eefbbe4dd969df6f43bbae5cf9af8b247a53f4da9da84ec5991bacba3e",
+          "after": "a6ec1d571b5b214968ed2a74aafae37d232996bed5815c5992d8ffd2c222b9c3"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "299e2432d6fe060508c9761c29019cd3ec07785806e4167f5240bc79f8483310",
-      "after_sha256": "061a6d61640c4f37f512b3c062dad8ad5b961488bd4d0911a793e2ad3d896cce",
+      "before_sha256": "e5f0d3e36fb6b01f476a98a81b89a71ea9e5e653e0f8e9f841d3bedc7250df0e",
+      "after_sha256": "04bb03c772ef73d28383a93568fe30fad784be237bc9964fd295d603978cbae8",
       "owners": {
         "@document": {
-          "before": "299e2432d6fe060508c9761c29019cd3ec07785806e4167f5240bc79f8483310",
-          "after": "061a6d61640c4f37f512b3c062dad8ad5b961488bd4d0911a793e2ad3d896cce"
+          "before": "e5f0d3e36fb6b01f476a98a81b89a71ea9e5e653e0f8e9f841d3bedc7250df0e",
+          "after": "04bb03c772ef73d28383a93568fe30fad784be237bc9964fd295d603978cbae8"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "b65dd5c551298f202e4b1989d0d4c3f22385bb1a98b41e70809ef754bfd4eb7e",
-      "after_sha256": "284a29c7d96908e9d01461d38324cff1b4c8095ac8603a01021dd30ac0243d8e",
+      "before_sha256": "38e1fc670dcfd0aa9561a922094bd4686eb3786be365498b882a0f30ebb3389d",
+      "after_sha256": "49c4460826e0682c5fe44fba775b267103342c652922ea95d9fa6528b2c53bc5",
       "owners": {
         "@document": {
-          "before": "b65dd5c551298f202e4b1989d0d4c3f22385bb1a98b41e70809ef754bfd4eb7e",
-          "after": "284a29c7d96908e9d01461d38324cff1b4c8095ac8603a01021dd30ac0243d8e"
+          "before": "38e1fc670dcfd0aa9561a922094bd4686eb3786be365498b882a0f30ebb3389d",
+          "after": "49c4460826e0682c5fe44fba775b267103342c652922ea95d9fa6528b2c53bc5"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "e8e657431b1a0e8c5ccf0e8b9d2affd9b3964693eba6354c934fd19cc4d34a57",
-      "after_sha256": "36df5ed223488ca2d65dc7ceab23bb4590c3a80386cde2d8110e1a926205014e",
+      "before_sha256": "21b82e68e1d6204b39c174ed8c723ecd01d97df2f4d6274d36a73cb51efa34fc",
+      "after_sha256": "0bbd90205275c46a41c5a021e3e8b215423f2a5d6d36cbfc331c1b979ce9b0a6",
       "owners": {
         "@document": {
-          "before": "e8e657431b1a0e8c5ccf0e8b9d2affd9b3964693eba6354c934fd19cc4d34a57",
-          "after": "36df5ed223488ca2d65dc7ceab23bb4590c3a80386cde2d8110e1a926205014e"
+          "before": "21b82e68e1d6204b39c174ed8c723ecd01d97df2f4d6274d36a73cb51efa34fc",
+          "after": "0bbd90205275c46a41c5a021e3e8b215423f2a5d6d36cbfc331c1b979ce9b0a6"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "0565c3029fc0c929348fd8cecf2f1b7d353e3599a2851458c1cb719d42783407",
-      "after_sha256": "c09a89116cd9a86a1b9e5624eb85cf076a3c755b6c7a276448f6b377d86c9e31",
+      "before_sha256": "acf9b1d0358aaa91b43bd4da82b66d9495391916f0c1f63f77914ad999f49c60",
+      "after_sha256": "c3135a0cbee8b213d7b911049c05a52bee25f73180dcd8c88d5352f1c20c490f",
       "owners": {
         "@document": {
-          "before": "0565c3029fc0c929348fd8cecf2f1b7d353e3599a2851458c1cb719d42783407",
-          "after": "c09a89116cd9a86a1b9e5624eb85cf076a3c755b6c7a276448f6b377d86c9e31"
+          "before": "acf9b1d0358aaa91b43bd4da82b66d9495391916f0c1f63f77914ad999f49c60",
+          "after": "c3135a0cbee8b213d7b911049c05a52bee25f73180dcd8c88d5352f1c20c490f"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "2a4ae3d295f0a6b7067f4e1bdd17387e9417203ff719f63e427941afa2b9bdc3",
-      "after_sha256": "b88dc26e8486fdd8d30f4a136f1a1c5dba59dfe4c8a204d3f7a65a94a109aff6",
+      "before_sha256": "db94dc7ae9b4bcb714a385885d4edbd23f77f762fee3c02f4b5bbcdda5e022e7",
+      "after_sha256": "b432487262315ade208322df6f58d5bb8b2d607ae49a959bf31ce7e46cdb7496",
       "owners": {
         "@document": {
-          "before": "2a4ae3d295f0a6b7067f4e1bdd17387e9417203ff719f63e427941afa2b9bdc3",
-          "after": "b88dc26e8486fdd8d30f4a136f1a1c5dba59dfe4c8a204d3f7a65a94a109aff6"
+          "before": "db94dc7ae9b4bcb714a385885d4edbd23f77f762fee3c02f4b5bbcdda5e022e7",
+          "after": "b432487262315ade208322df6f58d5bb8b2d607ae49a959bf31ce7e46cdb7496"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "2569b36f6720d6c5b77559870f580548510b16794c1d5d9fe4ced43305e5dbd1",
-      "after_sha256": "94193f4302eb4f784692e6de8719cb471bfbb7b92efff278f97646a463f1b135",
+      "before_sha256": "63d3537eb0bd848e9fa4a579deae7848468523ae0a664d51e43c382d042d8b66",
+      "after_sha256": "6b42d57ebb390d602fbd6b8559c3589d80291c244c75ce3e68a6a29d84625f0e",
       "owners": {
         "@document": {
-          "before": "2569b36f6720d6c5b77559870f580548510b16794c1d5d9fe4ced43305e5dbd1",
-          "after": "94193f4302eb4f784692e6de8719cb471bfbb7b92efff278f97646a463f1b135"
+          "before": "63d3537eb0bd848e9fa4a579deae7848468523ae0a664d51e43c382d042d8b66",
+          "after": "6b42d57ebb390d602fbd6b8559c3589d80291c244c75ce3e68a6a29d84625f0e"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "6170e84842b6ad9b026f29e62f77b9be89e21f3af0fa8d01a067c11a45ecdfa5",
-      "after_sha256": "89b17b37189987bc369877f5fe527c03bfe1e40d81b24054c185af85e562de1b",
+      "before_sha256": "0a2519a01d5c593fe4b862596e12d2cd6823a93c019a36eaec23dc7b6c53dbbc",
+      "after_sha256": "73345c733233bdbf0d392a613082861bfb4807232d960a4eb84c17699982d59f",
       "owners": {
         "@document": {
-          "before": "6170e84842b6ad9b026f29e62f77b9be89e21f3af0fa8d01a067c11a45ecdfa5",
-          "after": "89b17b37189987bc369877f5fe527c03bfe1e40d81b24054c185af85e562de1b"
+          "before": "0a2519a01d5c593fe4b862596e12d2cd6823a93c019a36eaec23dc7b6c53dbbc",
+          "after": "73345c733233bdbf0d392a613082861bfb4807232d960a4eb84c17699982d59f"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "a10fc448cad675e8598c5229aba6d91f348426a1c6cc5d5a5feb7ef5f40214eb",
-      "after_sha256": "0f5ba1ce8885d4964e2fe073ee9e1e69941d207dbf7e6e143614af111fc50c57",
+      "before_sha256": "8faa781f5324b267bf4d9cc9ecd719284d19210ae74a15de9e14c954aa984c30",
+      "after_sha256": "93e039d24d576031741afeaa9f35eaecf334345c677f8cb594efc1dd6139724f",
       "owners": {
         "@document": {
-          "before": "a10fc448cad675e8598c5229aba6d91f348426a1c6cc5d5a5feb7ef5f40214eb",
-          "after": "0f5ba1ce8885d4964e2fe073ee9e1e69941d207dbf7e6e143614af111fc50c57"
+          "before": "8faa781f5324b267bf4d9cc9ecd719284d19210ae74a15de9e14c954aa984c30",
+          "after": "93e039d24d576031741afeaa9f35eaecf334345c677f8cb594efc1dd6139724f"
         }
       }
     },
     "data/source_audits/ci64_provenance_v1/stage3-melee-profile-test-v1.json": {
       "before_sha256": null,
-      "after_sha256": "7649ef73344cafd2bed207e3a89c3ce47dcf10c5fc902f93cc6924adb0ab9ec4",
+      "after_sha256": "3b8cbd56b1137f2b64f63fa689d764d5bf689417f76f666f6171d66e8845848f",
       "owners": {
         "@document": {
           "before": null,
-          "after": "7649ef73344cafd2bed207e3a89c3ce47dcf10c5fc902f93cc6924adb0ab9ec4"
+          "after": "3b8cbd56b1137f2b64f63fa689d764d5bf689417f76f666f6171d66e8845848f"
         }
       }
     },
@@ -215,22 +215,22 @@
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "0a5164a6c50e074686f78b3d9c8d9278c26d7c2edec9910823a55f3e4f59d3e6",
-      "after_sha256": "b3c8f1302b13f6eef001dae6c4a2094f78576cbac5ca43f8d6135eabb59013a6",
+      "before_sha256": "f98368bc97f89fed5c61a27db5714cb3fb9ddb9386df8e701a9b698e66bae918",
+      "after_sha256": "e4cf88b33f28750e5a17f38107e17c01dd5984acf235e279f552f982320a157e",
       "owners": {
         "@document": {
-          "before": "0a5164a6c50e074686f78b3d9c8d9278c26d7c2edec9910823a55f3e4f59d3e6",
-          "after": "b3c8f1302b13f6eef001dae6c4a2094f78576cbac5ca43f8d6135eabb59013a6"
+          "before": "f98368bc97f89fed5c61a27db5714cb3fb9ddb9386df8e701a9b698e66bae918",
+          "after": "e4cf88b33f28750e5a17f38107e17c01dd5984acf235e279f552f982320a157e"
         }
       }
     },
     "scripts/engine_numerical_identity_test_admission.py": {
-      "before_sha256": "ad6250e7ca008c663700dc845bb40289a738b025b0aabd71441a17823daf9c04",
-      "after_sha256": "163afaab51b1d641bd4b32ccaff96959b67484b6a69b53699c4f4daf4049ba92",
+      "before_sha256": "11c826b92cc3421e71b230dcb2b41499bec360f8256dbafb607d93000f9b90dd",
+      "after_sha256": "d5315a897f5fa254ad85f4ddfbf97b29d73c8084a6e3a589595afe6bc033251e",
       "owners": {
         "_stage3_melee_profile_successor": {
           "before": null,
-          "after": "95df55c9e1041b5db176309025b39b79c44d73e5bebb4da65abe18b95ff1bc7c"
+          "after": "f28df66fe89099bf92c4a05bc300a622bd8b64a18902e7833e34e96ae5a91136"
         },
         "exact_movement_test_transition": {
           "before": "e1857cf0a73a77642453761cfea32b7d80b01c7baccc18cf3d6f35f65e1d86b0",
@@ -239,12 +239,12 @@
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "133a527c8e351c3f6d8cf3b9b7e769b548a8d08c816870543e646cbcdb80f7a6",
-      "after_sha256": "e7ec5d1611f46a9df74de85994aaf553da1d1fe5e2c709df1439c20f658618e1",
+      "before_sha256": "30456764e902dd2e31ac0f37b429882de8b60a24bfe17fe8f7dbd94f6be3b6d7",
+      "after_sha256": "4d81d04178caba19a64035c912d417061144682657f56db2f06d0ffe630e03f9",
       "owners": {
         "@document": {
-          "before": "133a527c8e351c3f6d8cf3b9b7e769b548a8d08c816870543e646cbcdb80f7a6",
-          "after": "e7ec5d1611f46a9df74de85994aaf553da1d1fe5e2c709df1439c20f658618e1"
+          "before": "30456764e902dd2e31ac0f37b429882de8b60a24bfe17fe8f7dbd94f6be3b6d7",
+          "after": "4d81d04178caba19a64035c912d417061144682657f56db2f06d0ffe630e03f9"
         }
       }
     },
@@ -359,12 +359,12 @@
       }
     },
     "tests/code_quality/test_engine_numerical_identity_admission.py": {
-      "before_sha256": "e45b9a2363839df58a0bfa1035ab1f6e46809135491443f34912cd9e9787055c",
-      "after_sha256": "6206b43d2ff070a50fdd32e6f2c8b951f47fde1da266093dd6d65cc02de043b7",
+      "before_sha256": "531fb773fd7c4abb19950f6e61b18f871b327caec5786d971c2f639e70c54324",
+      "after_sha256": "551846020fe7a4427909091e08515f2bbb9303ed0668154cdb1db37022eeebeb",
       "owners": {
         "test_identity_inventory_uses_current_twelve_shards_and_native_cohort": {
-          "before": "ac0a537f9c650d6bb628ecbe2ae4dcb9f41a50b55e94735fd0593b1843ee1b7d",
-          "after": "7ca12f0ef2a9ab006c14f4e483efa853065c86b51a1d4fa8747b3f17f54ae855"
+          "before": "ea50fe651fb03e0daabc33c9e17401695a9d4ac31fb2b5d2018b007f4987e238",
+          "after": "ad1c76b59bdd3e428876bbf62aebf76d95d16e80316aa7c5f489353b937ac431"
         }
       }
     },
@@ -407,7 +407,7 @@
       ],
       "selected_families": [],
       "rationale": "Preserve all inherited case weights and balance four Stage 3 cases across the existing twelve shards.",
-      "source_obligation": "Retain the wounded-Seekers analytical weight and record covered Linux JUnit durations for the two native controls and new checkpoint regression.",
+      "source_obligation": "Record covered Linux JUnit durations for the four added Stage 3 cases while preserving every selector and weight from current main.",
       "unchanged_work": "All retained cases, their weights, the coverage floor and the timing limits are preserved."
     },
     "ci/test_shards/shard-1.txt": {
@@ -417,7 +417,7 @@
       ],
       "selected_families": [],
       "rationale": "Preserve all inherited case weights and balance four Stage 3 cases across the existing twelve shards.",
-      "source_obligation": "Retain the wounded-Seekers analytical weight and record covered Linux JUnit durations for the two native controls and new checkpoint regression.",
+      "source_obligation": "Record covered Linux JUnit durations for the four added Stage 3 cases while preserving every selector and weight from current main.",
       "unchanged_work": "All retained cases, their weights, the coverage floor and the timing limits are preserved."
     },
     "ci/test_shards/shard-10.txt": {
@@ -427,7 +427,7 @@
       ],
       "selected_families": [],
       "rationale": "Preserve all inherited case weights and balance four Stage 3 cases across the existing twelve shards.",
-      "source_obligation": "Retain the wounded-Seekers analytical weight and record covered Linux JUnit durations for the two native controls and new checkpoint regression.",
+      "source_obligation": "Record covered Linux JUnit durations for the four added Stage 3 cases while preserving every selector and weight from current main.",
       "unchanged_work": "All retained cases, their weights, the coverage floor and the timing limits are preserved."
     },
     "ci/test_shards/shard-11.txt": {
@@ -437,7 +437,7 @@
       ],
       "selected_families": [],
       "rationale": "Preserve all inherited case weights and balance four Stage 3 cases across the existing twelve shards.",
-      "source_obligation": "Retain the wounded-Seekers analytical weight and record covered Linux JUnit durations for the two native controls and new checkpoint regression.",
+      "source_obligation": "Record covered Linux JUnit durations for the four added Stage 3 cases while preserving every selector and weight from current main.",
       "unchanged_work": "All retained cases, their weights, the coverage floor and the timing limits are preserved."
     },
     "ci/test_shards/shard-12.txt": {
@@ -447,7 +447,7 @@
       ],
       "selected_families": [],
       "rationale": "Preserve all inherited case weights and balance four Stage 3 cases across the existing twelve shards.",
-      "source_obligation": "Retain the wounded-Seekers analytical weight and record covered Linux JUnit durations for the two native controls and new checkpoint regression.",
+      "source_obligation": "Record covered Linux JUnit durations for the four added Stage 3 cases while preserving every selector and weight from current main.",
       "unchanged_work": "All retained cases, their weights, the coverage floor and the timing limits are preserved."
     },
     "ci/test_shards/shard-4.txt": {
@@ -457,7 +457,7 @@
       ],
       "selected_families": [],
       "rationale": "Preserve all inherited case weights and balance four Stage 3 cases across the existing twelve shards.",
-      "source_obligation": "Retain the wounded-Seekers analytical weight and record covered Linux JUnit durations for the two native controls and new checkpoint regression.",
+      "source_obligation": "Record covered Linux JUnit durations for the four added Stage 3 cases while preserving every selector and weight from current main.",
       "unchanged_work": "All retained cases, their weights, the coverage floor and the timing limits are preserved."
     },
     "ci/test_shards/shard-5.txt": {
@@ -467,7 +467,7 @@
       ],
       "selected_families": [],
       "rationale": "Preserve all inherited case weights and balance four Stage 3 cases across the existing twelve shards.",
-      "source_obligation": "Retain the wounded-Seekers analytical weight and record covered Linux JUnit durations for the two native controls and new checkpoint regression.",
+      "source_obligation": "Record covered Linux JUnit durations for the four added Stage 3 cases while preserving every selector and weight from current main.",
       "unchanged_work": "All retained cases, their weights, the coverage floor and the timing limits are preserved."
     },
     "ci/test_shards/shard-6.txt": {
@@ -477,7 +477,7 @@
       ],
       "selected_families": [],
       "rationale": "Preserve all inherited case weights and balance four Stage 3 cases across the existing twelve shards.",
-      "source_obligation": "Retain the wounded-Seekers analytical weight and record covered Linux JUnit durations for the two native controls and new checkpoint regression.",
+      "source_obligation": "Record covered Linux JUnit durations for the four added Stage 3 cases while preserving every selector and weight from current main.",
       "unchanged_work": "All retained cases, their weights, the coverage floor and the timing limits are preserved."
     },
     "ci/test_shards/shard-7.txt": {
@@ -487,7 +487,7 @@
       ],
       "selected_families": [],
       "rationale": "Preserve all inherited case weights and balance four Stage 3 cases across the existing twelve shards.",
-      "source_obligation": "Retain the wounded-Seekers analytical weight and record covered Linux JUnit durations for the two native controls and new checkpoint regression.",
+      "source_obligation": "Record covered Linux JUnit durations for the four added Stage 3 cases while preserving every selector and weight from current main.",
       "unchanged_work": "All retained cases, their weights, the coverage floor and the timing limits are preserved."
     },
     "ci/test_shards/shard-8.txt": {
@@ -497,7 +497,7 @@
       ],
       "selected_families": [],
       "rationale": "Preserve all inherited case weights and balance four Stage 3 cases across the existing twelve shards.",
-      "source_obligation": "Retain the wounded-Seekers analytical weight and record covered Linux JUnit durations for the two native controls and new checkpoint regression.",
+      "source_obligation": "Record covered Linux JUnit durations for the four added Stage 3 cases while preserving every selector and weight from current main.",
       "unchanged_work": "All retained cases, their weights, the coverage floor and the timing limits are preserved."
     },
     "ci/test_shards/shard-9.txt": {
@@ -507,7 +507,7 @@
       ],
       "selected_families": [],
       "rationale": "Preserve all inherited case weights and balance four Stage 3 cases across the existing twelve shards.",
-      "source_obligation": "Retain the wounded-Seekers analytical weight and record covered Linux JUnit durations for the two native controls and new checkpoint regression.",
+      "source_obligation": "Record covered Linux JUnit durations for the four added Stage 3 cases while preserving every selector and weight from current main.",
       "unchanged_work": "All retained cases, their weights, the coverage floor and the timing limits are preserved."
     },
     "contracts/examples/persistence/session-persistence.json": {

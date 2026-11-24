@@ -13,7 +13,9 @@ from warhammer40k_core.engine.stratagems_generic_metadata import (
     companion_effect_selections_for_binding,
     controlled_objective_effect_selections_for_binding,
 )
+from warhammer40k_core.engine.rules_units import rules_unit_views_for_state
 from warhammer40k_core.engine.stratagems_model import *
+from warhammer40k_core.engine.stratagems_model import NOT_SELECTED_TO_CHARGE_TARGET_POLICY_ID
 
 # fmt: off
 if TYPE_CHECKING:
@@ -385,12 +387,24 @@ def _stratagem_use_options_for_records(
         definition = record.definition
         if not definition.target_spec.enumerable:
             continue
-        bindings = _enumerated_target_bindings(
-            state=state,
-            player_id=context.player_id,
-            definition=definition,
-            context=context,
-        )
+        if definition.target_spec.target_policy_id == NOT_SELECTED_TO_CHARGE_TARGET_POLICY_ID:
+            # Charge selection uses canonical Rules Units, including attached units.
+            bindings = tuple(
+                StratagemTargetBinding(
+                    target_kind=definition.target_spec.target_kind,
+                    target_player_id=context.player_id,
+                    target_unit_instance_id=view.unit_instance_id,
+                )
+                for view in rules_unit_views_for_state(state=state)
+                if view.owner_player_id == context.player_id
+            )
+        else:
+            bindings = _enumerated_target_bindings(
+                state=state,
+                player_id=context.player_id,
+                definition=definition,
+                context=context,
+            )
         for binding in bindings:
             if (
                 _restriction_violation(

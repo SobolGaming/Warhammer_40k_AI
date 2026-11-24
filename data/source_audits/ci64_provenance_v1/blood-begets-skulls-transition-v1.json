@@ -1,0 +1,55 @@
+{
+  "schema": "finite-blood-begets-skulls-transition-v1",
+  "base": "c63a300c28fa772f59c75b66d50038e5e6241cd5",
+  "retained_transition_sha256": "eed47b44cae336c88c37fbde89a41f8f7b0224e63945ffd75526170bd0bb6a66",
+  "retained_runtime_fingerprint": "081b7dba5fd5f7e987a1a870dcece79a128507ddb62bd583f6971a3d9d9d7052",
+  "runtime_fingerprint": "0f9bc14dd7b611704595a5c72599170c33b31c6b83c535b9135b5a745321f77c",
+  "replaced_sources": {
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_generic_ir_support_2026_27.py": {
+      "before": "e8f5a65c4a9bc0209bb4eeae56df192c658cf3e00e73fe9d484a074047ad4fa3",
+      "after": "7a041b6113f905ab9f3662e345d27d70a06875f3f78f44c4a993d3956e11708a"
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_stratagem_activation_2026_27.json": {
+      "before": "a90f0804c3056547996fe35ffb355944ddf2992115f7da84dae124a055e90851",
+      "after": "336e02fa9554d73f82d88d3522eedff5bc62c27d1cdcbd2ef9b1dfc3e9fc3c3e"
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_stratagem_activation_2026_27.py": {
+      "before": "d64abaa77341080308d577dc260853f1fb9d58bb98988a05ccb2c1dcae35b7a6",
+      "after": "d08f2418c48818a928ba141fed3651583f17b2f3755937f7264e15e77c24b763"
+    }
+  },
+  "new_sources": {
+    "src/warhammer40k_core/engine/charge_phase_flow.py": "8555063eb6ba4ed24a714a474e0d439aca1368be35bde098320b1aec2bc21b3f",
+    "src/warhammer40k_core/engine/charge_preselection_stratagems.py": "369694145ac6b28019b4fd75fe90a6a482e63f66e06a4a710743e8f7b2b12083",
+    "src/warhammer40k_core/engine/stratagems.py": "48124618d293605c5e531f7e9bfe985da8a3fd0f14b6a0fd8e7a32fa45f18c04",
+    "src/warhammer40k_core/engine/stratagems_model.py": "7175d33102066ad7f8bc73302f8f5168b1313036e82d13b9809420e217a079a2",
+    "src/warhammer40k_core/engine/stratagems_requests.py": "b16d9b3a4b4c5cef3300d21a3da6f88d34acad2f2007831692de826e42c1a889",
+    "src/warhammer40k_core/engine/stratagems_targeting.py": "d8d0f553f5e422f6f154c8ea6b50250627340ad0e523e61fa29fc8a880f3d6e9",
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_blood_legion_ir_support_2026_27.py": "abd4f8cc3ca4ad1afa991021ae3ceac9cbd8a788b8822062aa1347c8c75b40a2",
+    "tools/generate_faction_stratagem_activation_support.py": "877319f1b69e8401af3e5060653d7580241df7fc5b4e5c54fbfecf22a03388dd"
+  },
+  "added_files": {
+    "tests/factions/chaos_daemons/integration/test_blood_begets_skulls.py": {
+      "mode": "100644",
+      "blob_sha1": "abd93ba35dffaddca54d214320fe7b780d62c692",
+      "sha256": "27f5617e3e182cd547caedee49c2383c291a96ed76b40ef71a26730f072a1c84",
+      "bytes": 12934
+    }
+  },
+  "updated_files": {
+    "tests/infrastructure/source_governance/unit/test_blocked_row_classification.py": {
+      "before": {
+        "mode": "100644",
+        "blob_sha1": "ed6d3901892a570326e6009795d1e414a88aeb09",
+        "sha256": "4d4509863793bd6190b639b7b221d66b84b3a52f4d21610cf6f14efdab479a4b",
+        "bytes": 9335
+      },
+      "after": {
+        "mode": "100644",
+        "blob_sha1": "70ea55352fcbe08509cf732e8b5bcc000828f800",
+        "sha256": "0a6d42a0ec9fd0bc7b539f8d6d51798f6e435308d6d16693385d83168b48f366",
+        "bytes": 9926
+      }
+    }
+  }
+}

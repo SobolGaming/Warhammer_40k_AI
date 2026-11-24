@@ -143,7 +143,7 @@ class ActivationArtifact(msgspec.Struct, frozen=True, forbid_unknown_fields=True
     effect_selection_kind_by_profile_id: dict[str, str]
 
 
-EXPECTED_ARTIFACT_SHA256 = "a90f0804c3056547996fe35ffb355944ddf2992115f7da84dae124a055e90851"
+EXPECTED_ARTIFACT_SHA256 = "336e02fa9554d73f82d88d3522eedff5bc62c27d1cdcbd2ef9b1dfc3e9fc3c3e"
 
 
 def validate_artifact_bytes(raw: bytes) -> ActivationArtifact:
