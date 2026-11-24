@@ -106,7 +106,7 @@ def bind_early_fight_reference(context, number, reference):
     """Classify a changed archived Fight offer before submitting any action."""
     try:
         return late.archived_action(context, reference)
-    except late.Blocker as error:
+    except late.ArchiveMismatch as error:
         raise Unmatchable(
             "early_fight_archive_unbindable",
             f"Archived Fight row {number} cannot bind at B2. "

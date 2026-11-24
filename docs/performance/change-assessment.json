@@ -6,11 +6,11 @@
   "changes": {
     "docs/AI_IMPLEMENTATION_PLAN.md": {
       "before_sha256": "21e66a9d3d6ab57b55723900e8886406fdf71d52abd6a6f1f002324b693392e4",
-      "after_sha256": "b6103d1c4ed36b58d8e9ef5bd40b1f8539d6ddee47dfe2c31e0872b38d6a1a42",
+      "after_sha256": "f9c5242b8cc1d5335ec90b9bcb2ba229a4a3d1e91f22f71890f0a81a0c6781f0",
       "owners": {
         "@document": {
           "before": "21e66a9d3d6ab57b55723900e8886406fdf71d52abd6a6f1f002324b693392e4",
-          "after": "b6103d1c4ed36b58d8e9ef5bd40b1f8539d6ddee47dfe2c31e0872b38d6a1a42"
+          "after": "f9c5242b8cc1d5335ec90b9bcb2ba229a4a3d1e91f22f71890f0a81a0c6781f0"
         }
       }
     },
@@ -36,7 +36,7 @@
     },
     "scripts/stage2_charge_timing.py": {
       "before_sha256": null,
-      "after_sha256": "523b99423e4b8cbc4d65e1041dd981460a707ca753adf1150a311567791d651e",
+      "after_sha256": "0f89614af7c6862e9f48c1867891d18eb0085155f9a953ef82cf8c5ff5a49590",
       "owners": {
         "@module": {
           "before": null,
@@ -140,7 +140,7 @@
         },
         "bind_early_fight_reference": {
           "before": null,
-          "after": "8cb68a07deb53f22c658b6bf3db7a0adbc438948fb7e82e5a72eb0fb42492a9e"
+          "after": "8a1035f8ea3bf8eef8056d61502b9ba71ef0482a760e6a612ce9c011f06b1bba"
         },
         "charge_history": {
           "before": null,
@@ -160,13 +160,31 @@
         }
       }
     },
+    "scripts/stage2_preservation_timing.py": {
+      "before_sha256": "80de96b1091916f371b0c3997a527888e1015926137990ca6c7ccfea521a2aef",
+      "after_sha256": "74ed021d783baffa209f15cdf56af633e79a1f88372d18e32b44140bbd9acc94",
+      "owners": {
+        "ArchiveMismatch": {
+          "before": null,
+          "after": "20a01b63241dd7951d00a46b7bf8aa2850342f2f448de582178917206c26fb3d"
+        },
+        "archived_action": {
+          "before": "4db111d60fc7293c2ba4983878d6f0dd4aa2093030802577adf230df66cdc6a1",
+          "after": "5f0a471c575d5907589b1376e067218ab9213da84ce22a237f893766865920fe"
+        }
+      }
+    },
     "scripts/tests/test_stage2_charge_timing.py": {
       "before_sha256": null,
-      "after_sha256": "bf6eef51a6d8e3f8d5289235f21a5d3cc1a5cc37a2f8e724623da596b8c307e8",
+      "after_sha256": "7ee0ddf9d793d4acc6314a4543df01bb01a069c80d22aa51301097097bd99139",
       "owners": {
         "@module": {
           "before": null,
           "after": "1a4f13bbc1e3ddd4084bbc07fa0e538c5813caeae7924e04d0cf63fbe692e227"
+        },
+        "matching_row_65": {
+          "before": null,
+          "after": "70fd4a50bce4749e83b530cb888fbf69add678e816c9797372bfbf300af46cce"
         },
         "test_early_charge_deadline_covers_generation_and_validation": {
           "before": null,
@@ -175,6 +193,14 @@
         "test_early_fight_round_drift_seals_typed_frontier": {
           "before": null,
           "after": "3424d41c1f1a970f2f99a73b9d33cfaa2dbbae9545286b799d1258e54dfddce5"
+        },
+        "test_matching_row_65_propagates_an_unrelated_blocker": {
+          "before": null,
+          "after": "8f1b3a4d7683f5e32865a60ee6e7c391582f9515745ff88a0edf9514022abcc6"
+        },
+        "test_matching_row_65_watchdog_remains_an_operational_blocker": {
+          "before": null,
+          "after": "3c363ae81e11ca75a51d03fd6da06b0ea94c16e05d68fe94d06eb65897aa5cd0"
         }
       }
     },
@@ -262,6 +288,16 @@
       "category": "measured_workload",
       "operations": [
         "stage2-b2-b3-charge-timing-reproducer"
+      ],
+      "selected_families": [],
+      "rationale": "Development-only native operator, focused tests, and sealed-receipt audit for the frozen B2/B3 comparison.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "scripts/stage2_preservation_timing.py": {
+      "category": "measured_workload",
+      "operations": [
+        "stage2-preservation-timing-reproducer"
       ],
       "selected_families": [],
       "rationale": "Development-only native operator, focused tests, and sealed-receipt audit for the frozen B2/B3 comparison.",

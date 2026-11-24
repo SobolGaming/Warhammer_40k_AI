@@ -1167,7 +1167,8 @@ preparation took 0.320 seconds. If a landed B2 Charge presents a Fight
 offer that cannot bind to the frozen B3 reference, the runner saves a
 typed unmatchable frontier describing the archive and issued rounds.
 The archived Fight rows 67 and 68 carry round 3. A new B2 Fight choice
-would require a separately declared reference.
+would require a separately declared reference. Watchdog expiry and other
+operational blockers propagate through their existing failure path.
 
 The focused operator checks run with
 `uv run --no-sync python -B -m pytest -q scripts/tests/test_stage2_charge_timing.py`.

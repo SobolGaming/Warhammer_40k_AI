@@ -83,3 +83,69 @@ def test_early_fight_round_drift_seals_typed_frontier(monkeypatch, tmp_path, num
     assert "Request drift: battle_round" in receipt["detail"]
     assert boundaries == [("early-frontier", True)]
     assert saved["report_stage"] == "unmatchable_frontier"
+
+
+@pytest.fixture
+def matching_row_65():
+    archived_id = "decision-request-000065"
+    movement = {
+        "proposal_kind": "pile_in",
+        "unit_instance_id": late.B,
+        "movement_phase_action": "pile_in",
+    }
+    request = {
+        "actor_id": "player-b",
+        "decision_type": late.PROPOSAL,
+        "payload": {"proposal_request": {"request_id": archived_id, **movement}},
+    }
+    result = {
+        "selected_option_id": late.PARAMETERIZED,
+        "payload": {"proposal_request_id": archived_id, "movement_mode": "pile_in", **movement},
+    }
+    return request, {"request": request, "result": result}
+
+
+@pytest.mark.stubbed
+@pytest.mark.skipif(not hasattr(signal, "setitimer"), reason="Requires the POSIX operator timer.")
+def test_matching_row_65_watchdog_remains_an_operational_blocker(matching_row_65):
+    request, reference = matching_row_65
+    proposals = []
+
+    def propose(payload):
+        proposals.append(payload)
+        sleep(3.0)
+
+    context = SimpleNamespace(request=request, propose=propose)
+    experiment = object.__new__(timing.TimingExperiment)
+    experiment.stage = "early"
+    experiment.t0 = monotonic()
+    experiment.preparation_deadline = experiment.t0 + 0.5
+    experiment.journal = StringIO()
+    previous_handler = signal.signal(signal.SIGALRM, late.stop_on_timeout)
+    try:
+        with pytest.raises(late.Blocker, match="Frozen per-call timeout") as raised:
+            experiment.call(
+                "bind_archived_action",
+                lambda: timing.bind_early_fight_reference(context, 65, reference),
+            )
+    finally:
+        signal.signal(signal.SIGALRM, previous_handler)
+
+    assert type(raised.value) is late.Blocker
+    assert proposals == [reference["result"]["payload"]]
+    assert json.loads(experiment.journal.getvalue().splitlines()[-1])["state"] == "interrupted"
+
+
+@pytest.mark.stubbed
+def test_matching_row_65_propagates_an_unrelated_blocker(matching_row_65):
+    request, reference = matching_row_65
+    failure = late.Blocker("Policy action preparation failed.")
+
+    def propose(_payload):
+        raise failure
+
+    context = SimpleNamespace(request=request, propose=propose)
+    with pytest.raises(late.Blocker, match="Policy action preparation failed") as raised:
+        timing.bind_early_fight_reference(context, 65, reference)
+
+    assert raised.value is failure
