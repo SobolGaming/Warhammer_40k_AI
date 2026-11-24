@@ -501,6 +501,15 @@ def _within_board(footprint: FootprintGeometry, width: float, depth: float) -> b
     return xmin >= 0 and ymin >= 0 and xmax <= width and ymax <= depth
 
 
+def _reached_objectives(
+    footprint: FootprintGeometry, objectives: tuple[FootprintGeometry, ...], work: _Work
+) -> frozenset[int]:
+    work.step(len(objectives))
+    return frozenset(
+        index for index, objective in enumerate(objectives) if footprint.intersects(objective)
+    )
+
+
 def _group_paths(
     model: _Placed,
     targets: tuple[_Placed, ...],
@@ -523,11 +532,7 @@ def _group_paths(
             continue
         if _blocked(footprint, local, work):
             continue
-        reached: set[int] = set()
-        for i, objective in enumerate(objectives):
-            work.step()
-            if footprint.intersects(objective):
-                reached.add(i)
+        reached = _reached_objectives(footprint, objectives, work)
         for waypoint in (None, *_waypoints(model, end)):
             work.step()
             poses = (model.pose, end) if waypoint is None else (model.pose, waypoint, end)
@@ -544,7 +549,7 @@ def _group_paths(
                 cast(_HullGeometry, a.union(b)).convex_hull for a, b in pairwise(footprints)
             )
             if not any(_blocked(sweep, local, work) for sweep in sweeps):
-                options.append(_Path(poses, footprint, sweeps, distance, gap, frozenset(reached)))
+                options.append(_Path(poses, footprint, sweeps, distance, gap, reached))
                 break
     return tuple(
         sorted(
@@ -586,6 +591,109 @@ def _group_formations(
     for formation in _formations(banks, {}, work, group=True):
         if tuple(p.poses for p in formation) not in seen:
             yield formation
+
+
+def _nearest_target_envelope(
+    model: _Placed, targets: tuple[_Placed, ...], work: _Work
+) -> tuple[float, _Placed]:
+    # Circumscribed disks give a lower bound even for oval bases.
+    work.step(len(targets))
+    return min(
+        (
+            (
+                model.pose.position.distance_2d_to(target.pose.position)
+                - model.base.max_radius()
+                - target.base.max_radius(),
+                target,
+            )
+            for target in targets
+        ),
+        key=lambda pair: (pair[0], pair[1].model_id),
+    )
+
+
+def _rigid_group_formation(
+    movers: tuple[_Placed, ...],
+    targets: tuple[_Placed, ...],
+    nearest: tuple[tuple[float, _Placed], ...],
+    static: tuple[FootprintGeometry, ...],
+    objectives: tuple[FootprintGeometry, ...],
+    board: tuple[float, float],
+    budget: float,
+    work: _Work,
+) -> Iterator[tuple[_Path, ...]]:
+    lead_index = min(range(len(nearest)), key=lambda index: nearest[index][0])
+    gap, target = nearest[lead_index]
+    step = _GROUP_GRID_STEP_INCHES
+    distance = math.floor(min(budget, gap - _MIN_TARGET_GAP_INCHES) / step) * step
+    if distance <= 0:
+        return
+    lead, aim = movers[lead_index].pose.position, target.pose.position
+    scale = distance / lead.distance_2d_to(aim)
+    dx, dy = (aim.x - lead.x) * scale, (aim.y - lead.y) * scale
+    banks: dict[int, tuple[_Path, ...]] = {}
+    for index, model in enumerate(movers):
+        start = model.pose.position
+        end = _at(model, start.x + dx, start.y + dy)
+        path_distance = model.pose.distance_3d_to(end)
+        if not 0 < path_distance <= budget:
+            return
+        work.step(1 + 2 * len(targets))
+        footprint = footprint_for_base(model.base, end)
+        if not _within_board(footprint, *board):
+            return
+        start_gap = min(model.footprint.distance(enemy.footprint) for enemy in targets)
+        end_gap = min(footprint.distance(enemy.footprint) for enemy in targets)
+        if not _MIN_TARGET_GAP_INCHES <= end_gap < start_gap:
+            return
+        blockers = (*static, *(later.footprint for later in movers[index + 1 :]))
+        local = _local_blockers(model, blockers, budget, work)
+        work.step()
+        sweep = cast(_HullGeometry, model.footprint.union(footprint)).convex_hull
+        if _blocked(sweep, local, work):
+            return
+        objectives_reached = _reached_objectives(footprint, objectives, work)
+        banks[index] = (
+            _Path(
+                (model.pose, end), footprint, (sweep,), path_distance, end_gap, objectives_reached
+            ),
+        )
+    # At least one model must reach the existing close band. The native engine
+    # decides which other models could have reached proximity or engagement.
+    if min(paths[0].gap for paths in banks.values()) <= _PREFERRED_GAP_INCHES:
+        yield from _formations(banks, {}, work, group=True)
+
+
+def _five_model_formations(
+    movers: tuple[_Placed, ...],
+    targets: tuple[_Placed, ...],
+    static: tuple[FootprintGeometry, ...],
+    objectives: tuple[FootprintGeometry, ...],
+    board: tuple[float, float],
+    budget: float,
+    work: _Work,
+) -> Iterator[tuple[_Path, ...]]:
+    nearest = tuple(_nearest_target_envelope(model, targets, work) for model in movers)
+    if any(gap > budget + _PREFERRED_GAP_INCHES for gap, _ in nearest):
+        # The old grid cannot fill every bank. Try one coherency-preserving
+        # translation with the same work counter and no extra search.
+        yield from _rigid_group_formation(
+            movers, targets, nearest, static, objectives, board, budget, work
+        )
+        return
+    banks = {
+        index: _group_paths(
+            model,
+            targets,
+            (*static, *(later.footprint for later in movers[index + 1 :])),
+            objectives,
+            board,
+            budget,
+            work,
+        )
+        for index, model in enumerate(movers)
+    }
+    yield from _group_formations(banks, work)
 
 
 def _candidate(
@@ -634,19 +742,9 @@ def _five_model_candidates(
     candidates: list[GroundChargeCandidate] = []
     stop = ChargeSearchStop.COMPLETE
     try:
-        banks = {
-            index: _group_paths(
-                model,
-                targets,
-                (*static, *(later.footprint for later in movers[index + 1 :])),
-                objectives,
-                board,
-                budget,
-                work,
-            )
-            for index, model in enumerate(movers)
-        }
-        for formation in _group_formations(banks, work):
+        for formation in _five_model_formations(
+            movers, targets, static, objectives, board, budget, work
+        ):
             candidates.append(_candidate(context, issued, target_id, movers, formation))
             if len(candidates) == raw_limit:
                 stop = ChargeSearchStop.RAW_LIMIT

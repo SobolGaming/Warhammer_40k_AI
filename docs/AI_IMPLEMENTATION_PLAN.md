@@ -1178,6 +1178,30 @@ native probes. Its coverage is outside the timing matrix. The local VP
 comparison leaves useful-reference status at `scoped_gap`, with a null
 reference target and learning excluded.
 
+### Landed B2 charge and A3 action availability
+
+The sealed #735 B2 offer at `decision-request-000047` restored from the same
+43-decision, 423-event common prefix. The 10-inch natural roll (6 + 4) was
+issued against a 9.540157-inch gap. Four of the five movers were beyond the
+old generator's per-model one-inch landing cutoff even with their full move.
+The base generator returned zero proposals with a completed search. A
+single 9.5-inch straight translation landed through the ordinary native
+submission and left two models engaged. The bounded five-model generator
+now tries that kind of formation only when a lower bound excludes an all-close
+formation. The normal grid, one-candidate alternate route, and native
+validation share the existing work and submission limits.
+
+The ordinary B2 Fight continuation reached `decision-request-000055` at
+54 decisions and 553 events. S could Remain Stationary or Fall Back by
+Ordered Retreat or Desperate Escape. Engagement removed Normal Move, which
+the original Spend branch requires. Strict restore and independent replay
+reproduced both the landed and A3 frontiers, with two natural draws in both.
+The bounded early-charge investigation closes with a typed
+`a3_choice_unmatchable` result. The selected fixture cannot supply a matched
+Hold/Spend scoring counterfactual for a landed early charge. Existing delayed
+controls retain their recorded scope. Stage 2 useful-reference qualification
+stays at `scoped_gap`, with a null reference target and learning excluded.
+
 ## 6. First delayed-tradeoff experiment
 
 **Status: proposed, not an existing certified benchmark.** Start from the earliest suitable canonical Core fixture/checkpoint. References: `tests/replay/test_phase18b_replay_runner.py`, `tests/shared/category_migration/primary_boundary_scoring_builders.py`, `tests/shared/category_migration/phase11f_game_end_scoring.py`, and `tests/support/selected_target_charge_fixtures.py`. Use real domain objects and normal engine decisions; do not import test modules into runtime or present a synthetic state alteration as an engine-generated checkpoint.

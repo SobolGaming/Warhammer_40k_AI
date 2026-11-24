@@ -35843,7 +35843,8 @@
         "src/warhammer40k_core/ai/ground_charge_candidates.py",
         "src/warhammer40k_core/ai/ground_charge_policy.py",
         "tests/infrastructure/adapters/test_ground_charge_policy.py",
-        "tests/infrastructure/adapters/test_group_ground_charge_policy.py"
+        "tests/infrastructure/adapters/test_group_ground_charge_policy.py",
+        "tests/infrastructure/adapters/test_rigid_group_ground_charge_policy.py"
       ],
       "owners": [
         "*"
@@ -36737,7 +36738,8 @@
         "scripts/stage2_ground_charge_test_admission.py",
         "data/source_audits/ci64_provenance_v1/stage2-group-ground-charge-test-v1.json",
         "data/source_audits/ci64_provenance_v1/stage2-normal-shooting-test-v1.json",
-        "data/source_audits/ci64_provenance_v1/stage2-screen-movement-test-v1.json"
+        "data/source_audits/ci64_provenance_v1/stage2-screen-movement-test-v1.json",
+        "data/source_audits/ci64_provenance_v1/stage2-rigid-ground-charge-test-v1.json"
       ],
       "owners": [
         "*"

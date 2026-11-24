@@ -336,9 +336,23 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         )
     )
     assert sum(ground_charge.GROUP_OWNER in group for group in groups) == 1
+    rigid_charge = _record(ground_charge.RIGID_TRANSITION)
+    assert rigid_charge["base"] == ground_charge.RIGID_BASE
+    assert rigid_charge["retained_group_charge_sha256"] == ground_charge.GROUP_TRANSITION_SHA256
+    assert set(rigid_charge["added_files"]) == {ground_charge.RIGID_OWNER}
+    assert ground_charge.RIGID_OWNER in active_files
+    assert sum(ground_charge.RIGID_OWNER in group for group in groups) == 1
     for source, row in group_charge["sources"].items():
         assert row["before"] == charge["sources"][source]
-        assert row["after"] == hashlib.sha256((ROOT / source).read_bytes()).hexdigest()
+        current_digest = row["after"]
+        if source == ground_charge.RIGID_SOURCE:
+            predecessor = subprocess.check_output(
+                ["git", "show", ground_charge.RIGID_BASE + ":" + source], cwd=ROOT
+            )
+            assert row["after"] == hashlib.sha256(predecessor).hexdigest()
+            assert rigid_charge["source"]["before"] == row["after"]
+            current_digest = rigid_charge["source"]["after"]
+        assert current_digest == hashlib.sha256((ROOT / source).read_bytes()).hexdigest()
     assert sum(ground_charge.OWNER in group for group in groups) == 1
     charge_cases = {
         ground_charge.OWNER + "::" + name
@@ -362,6 +376,13 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
             "test_group_charge_objective_inventory_limits[vertices]",
             "test_group_charge_objective_inventory_limits[linked-vertices]",
             "test_group_charge_ranks_objective_reach_ahead_of_shorter_accepted_travel",
+        )
+    )
+    charge_cases.update(
+        ground_charge.RIGID_OWNER + "::" + name
+        for name in (
+            "test_rigid_group_charge_certifies_the_exact_mixed_endpoint_witness",
+            "test_rigid_group_charge_native_rejects_a_column_that_stops_outside_engagement",
         )
     )
     screen = _record(ground_charge.SCREEN_TRANSITION)
@@ -394,7 +415,12 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         regeneration["retained_transition_sha256"]
         == hashlib.sha256((ROOT / pending_path).read_bytes()).hexdigest()
     )
-    assert _record(MANIFEST)["fingerprint"] == regeneration["runtime_fingerprint"]
+    rigid_base_manifest = json.loads(
+        subprocess.check_output(
+            ["git", "show", ground_charge.RIGID_BASE + ":" + MANIFEST], cwd=ROOT
+        )
+    )
+    assert rigid_base_manifest["fingerprint"] == regeneration["runtime_fingerprint"]
     healing_owner = "tests/rules/section02/test_02_02_04_healing.py"
     assert sum(healing_owner in group for group in groups) == 1
     assert (
@@ -405,6 +431,8 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         regeneration["test"]["after"]["sha256"]
         == hashlib.sha256((ROOT / healing_owner).read_bytes()).hexdigest()
     )
+    assert rigid_charge["retained_runtime_fingerprint"] == regeneration["runtime_fingerprint"]
+    assert _record(MANIFEST)["fingerprint"] == rigid_charge["runtime_fingerprint"]
     pending_before: dict[str, str] = {}
     for name, binding in pending["sources"].items():
         present = subprocess.check_output(["git", "ls-tree", pending_base, "--", name], cwd=ROOT)
