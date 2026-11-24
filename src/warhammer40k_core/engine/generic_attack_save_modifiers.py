@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from warhammer40k_core.core.attributes import Characteristic
+from warhammer40k_core.core.modifiers import ModifierOperation, ModifierTerm
 from warhammer40k_core.engine.generic_rule_effect_targets import GenericAttackEffect
 from warhammer40k_core.engine.generic_rule_save_modifiers import (
     generic_rule_save_option_with_roll_modifier,
@@ -10,8 +11,24 @@ from warhammer40k_core.engine.generic_rule_save_modifiers import (
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.runtime_modifiers import SaveOptionModifierContext
-from warhammer40k_core.engine.saves import SaveOption, save_option_with_armor_penetration_modifier
+from warhammer40k_core.engine.save_modifier_operations import save_option_with_characteristic_terms
+from warhammer40k_core.engine.saves import (
+    SaveKind,
+    SaveOption,
+    save_option_with_armor_penetration_modifier,
+)
 from warhammer40k_core.rules.rule_ir import RuleEffectKind, RuleTargetKind
+
+
+def is_unconditional_armour_save_set(effect: GenericAttackEffect) -> bool:
+    """Recognize a whole-unit Save SET without any attack or model restrictions."""
+    return (
+        effect.effect_kind is RuleEffectKind.SET_CHARACTERISTIC
+        and effect.target_kind is None
+        and not effect.conditions
+        and effect.parameters.keys() == {"characteristic", "value"}
+        and effect.parameters["characteristic"] == Characteristic.SAVE.value
+    )
 
 
 def generic_rule_modified_save_options(
@@ -42,7 +59,26 @@ def generic_rule_modified_save_options(
         unit_instance_id=context.target_unit_instance_id,
         effect_kind=RuleEffectKind.SET_CHARACTERISTIC,
     ):
-        if _characteristic_parameter(effect.parameters) is not Characteristic.INVULNERABLE_SAVE:
+        if is_unconditional_armour_save_set(effect):
+            source_id = generic_rule_modifier_source_id(effect)
+            term = ModifierTerm(
+                ModifierOperation.SET, _required_int_parameter(effect.parameters, key="value")
+            )
+            current = tuple(
+                save_option_with_characteristic_terms(
+                    option,
+                    characteristic=Characteristic.SAVE,
+                    terms=(term,),
+                    source_id=source_id,
+                    modifier_id=f"{effect.persisting_effect.effect_id}:save:{effect.effect_index}",
+                )
+                if option.save_kind is SaveKind.ARMOUR
+                else option
+                for option in current
+            )
+            continue
+        characteristic = _characteristic_parameter(effect.parameters)
+        if characteristic is not Characteristic.INVULNERABLE_SAVE:
             continue
         if context.allocated_model_instance_id is None:
             if not _generic_this_model_effect_targets_only_alive_model(

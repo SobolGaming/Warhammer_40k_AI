@@ -1,0 +1,39 @@
+{
+  "schema": "finite-sheathed-in-brass-transition-v1",
+  "base": "d137b5cc0c7557c8b6653a1aa36ee47260242945",
+  "retained_transition_sha256": "2345dd760e0b9786c2420a024beb30aa7b734e6ab7ef1c0a9cedd33b0e0b72f2",
+  "retained_runtime_fingerprint": "0620b70b0c2bbedd4c55fa2805ff698135009c695c3a6c8b390a2a76629f0666",
+  "runtime_fingerprint": "081b7dba5fd5f7e987a1a870dcece79a128507ddb62bd583f6971a3d9d9d7052",
+  "sources": {
+    "src/warhammer40k_core/engine/generic_attack_save_modifiers.py": "2e950fabdf699054b17909a329cf0b7afa0ac59db255d45118c17390afd446cd",
+    "src/warhammer40k_core/engine/native_attack_gathering.py": "e1185b69c849d918d79d5707829e434f0b3fce96abd9b4115a8554ea7e1ac0c8",
+    "src/warhammer40k_core/engine/native_gathering_permission_relevance.py": "85de2756d2b9282fc73093db7cb51dc8ef39c1ca9e5b921101c1ccd1981e5b04",
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_generic_ir_support_2026_27.py": "e8f5a65c4a9bc0209bb4eeae56df192c658cf3e00e73fe9d484a074047ad4fa3",
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_stratagem_activation_2026_27.json": "a90f0804c3056547996fe35ffb355944ddf2992115f7da84dae124a055e90851",
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_stratagem_activation_2026_27.py": "d64abaa77341080308d577dc260853f1fb9d58bb98988a05ccb2c1dcae35b7a6"
+  },
+  "added_files": {
+    "tests/factions/chaos_daemons/integration/test_sheathed_in_brass.py": {
+      "mode": "100644",
+      "blob_sha1": "4017ffe5e851802c5bf6ed81425e41dac9085622",
+      "sha256": "391ca1cdeb16a39278dcf7b982e8985e1c721ce137519f92a0a8c7fe5938f3be",
+      "bytes": 19463
+    }
+  },
+  "updated_files": {
+    "tests/infrastructure/source_governance/unit/test_blocked_row_classification.py": {
+      "before": {
+        "mode": "100644",
+        "blob_sha1": "df3410c8205c6381c11e823fffa94fce68ff9b91",
+        "sha256": "8dae54c9416de9a7e31c4d7a18616ed2f5a9f37b3923e8219319af3ac69fe59d",
+        "bytes": 8533
+      },
+      "after": {
+        "mode": "100644",
+        "blob_sha1": "ed6d3901892a570326e6009795d1e414a88aeb09",
+        "sha256": "4d4509863793bd6190b639b7b221d66b84b3a52f4d21610cf6f14efdab479a4b",
+        "bytes": 9335
+      }
+    }
+  }
+}

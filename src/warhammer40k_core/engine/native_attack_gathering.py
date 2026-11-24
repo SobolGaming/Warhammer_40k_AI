@@ -860,7 +860,11 @@ def _current_applicable_rules(
     semantic_target_sources: list[JsonValue] = []
     for model_id in candidates:
         for kind in target_permission_kinds_for_gathering(
-            state=state, registry=registry, pool=pool, model_instance_id=model_id
+            state=state,
+            registry=registry,
+            pool=pool,
+            model_instance_id=model_id,
+            generic_sources=generic_sources,
         ):
             sources = modifier_ignore_sources_for_gathering(
                 state=state,

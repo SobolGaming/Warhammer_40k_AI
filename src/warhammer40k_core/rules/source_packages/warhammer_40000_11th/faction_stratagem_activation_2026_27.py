@@ -58,13 +58,15 @@ class SourceStratagemActivationProfile:
             "activation_profile_id": self.profile_id,
             "activation_template_id": RULE_IR_TEMPLATE_ID,
         }
+        if self.profile_id in _OPPONENT_TURN_PROFILE_IDS:
+            payload["requires_opponent_turn"] = True
         effect_selection_kind = _EFFECT_SELECTION_KIND_BY_PROFILE_ID.get(self.profile_id)
         if effect_selection_kind is not None:
             payload["effect_selection_kind"] = effect_selection_kind
         return payload
 
     def to_payload(self) -> dict[str, object]:
-        return {
+        payload: dict[str, object] = {
             "profile_id": self.profile_id,
             "source_row_id": self.source_row_id,
             "source_id": self.source_id,
@@ -85,6 +87,9 @@ class SourceStratagemActivationProfile:
             "excluded_faction_keywords": list(self.excluded_faction_keywords),
             "rule_ir_hash": self.rule_ir_hash,
         }
+        if self.profile_id in _OPPONENT_TURN_PROFILE_IDS:
+            payload["requires_opponent_turn"] = True
+        return payload
 
 
 def stratagem_activation_profiles() -> tuple[SourceStratagemActivationProfile, ...]:
@@ -134,10 +139,11 @@ class ActivationArtifact(msgspec.Struct, frozen=True, forbid_unknown_fields=True
     source_snapshot_sha256: str
     profiles: tuple[SourceStratagemActivationProfile, ...]
     rule_ir_by_profile_id: dict[str, RuleIRPayload]
+    opponent_turn_profile_ids: tuple[str, ...]
     effect_selection_kind_by_profile_id: dict[str, str]
 
 
-EXPECTED_ARTIFACT_SHA256 = "c50e9b188744bff24359d8a0559556f1c47a59a48f32aae662822322ab58f67f"
+EXPECTED_ARTIFACT_SHA256 = "a90f0804c3056547996fe35ffb355944ddf2992115f7da84dae124a055e90851"
 
 
 def validate_artifact_bytes(raw: bytes) -> ActivationArtifact:
@@ -164,6 +170,8 @@ def validate_artifact_bytes(raw: bytes) -> ActivationArtifact:
         raise ValueError("Stratagem activation profile IDs must be unique.")
     if (
         set(artifact.rule_ir_by_profile_id) != profile_ids
+        or not set(artifact.opponent_turn_profile_ids) <= profile_ids
+        or len(set(artifact.opponent_turn_profile_ids)) != len(artifact.opponent_turn_profile_ids)
         or not set(artifact.effect_selection_kind_by_profile_id) <= profile_ids
     ):
         raise ValueError("Stratagem activation artifact contains foreign profiles.")
@@ -188,5 +196,6 @@ _ARTIFACT = validate_artifact_bytes(
 _STATIC_RULE_IR_PAYLOADS_BY_PROFILE_ID: dict[str, dict[str, object]] = {
     key: dict(value) for key, value in _ARTIFACT.rule_ir_by_profile_id.items()
 }
+_OPPONENT_TURN_PROFILE_IDS = frozenset(_ARTIFACT.opponent_turn_profile_ids)
 _EFFECT_SELECTION_KIND_BY_PROFILE_ID = _ARTIFACT.effect_selection_kind_by_profile_id
 _PROFILES = _validate_profiles(_ARTIFACT.profiles)

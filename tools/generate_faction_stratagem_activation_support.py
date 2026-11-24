@@ -10,7 +10,7 @@ from typing import cast
 
 from warhammer40k_core.rules.objective_terminology import ObjectiveRuleScope
 from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
-from warhammer40k_core.rules.rule_ir import RuleIR, RuleIRPayload
+from warhammer40k_core.rules.rule_ir import RuleEffectKind, RuleIR, RuleIRPayload
 from warhammer40k_core.rules.source_data import RuleSourceText
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     datasheet_keyword_lexicon_2026_06_14,
@@ -121,6 +121,8 @@ class SourceOnlyActivationMetadata:
     required_faction_keywords: tuple[str, ...] = ()
     excluded_keywords: tuple[str, ...] = ()
     excluded_faction_keywords: tuple[str, ...] = ()
+    compile_armour_save_set: bool = False
+    requires_opponent_turn: bool = False
 
 
 CURRENT_SOURCE_ACTIVATION_METADATA_BY_ROW_ID: dict[str, SourceOnlyActivationMetadata] = {
@@ -271,6 +273,27 @@ CURRENT_SOURCE_ACTIVATION_METADATA_BY_ROW_ID: dict[str, SourceOnlyActivationMeta
         required_keywords=("KHORNE",),
         required_faction_keywords=("LEGIONES DAEMONICA",),
     ),
+    # Games Workshop's retained July 2026 Chaos Daemons faction pack, physical page 124.
+    "stratagem:chaos-daemons:blood-legion:000009816007": SourceOnlyActivationMetadata(
+        when_descriptor=(
+            "Your opponent's Shooting phase, just after an enemy unit has selected its targets."
+        ),
+        target_descriptor=(
+            "One Legiones Daemonica Khorne unit from your army that was selected as the "
+            "target of one or more of the attacking unit's attacks."
+        ),
+        effect_descriptor=(
+            "Until the end of the phase, models in your unit have a Save characteristic of 3+."
+        ),
+        trigger_kind="after_unit_selected_as_target",
+        phase_tokens=("shooting",),
+        target_kind="friendly_unit",
+        target_policy_id="selected_target_unit",
+        required_keywords=("KHORNE",),
+        required_faction_keywords=("LEGIONES DAEMONICA",),
+        compile_armour_save_set=True,
+        requires_opponent_turn=True,
+    ),
     "stratagem:chaos-daemons:shadow-legion:000009979006": SourceOnlyActivationMetadata(
         when_descriptor="Start of your opponent's Charge phase.",
         target_descriptor="One friendly SHADOW LEGION unit.",
@@ -367,6 +390,7 @@ class ActivationProfile:
     rule_ir_hash: str
     compiled_rule_ir_payload: RuleIRPayload | None
     effect_selection_kind: str | None
+    requires_opponent_turn: bool = False
 
 
 def main() -> None:
@@ -471,14 +495,25 @@ def _activation_profile_from_current_source_metadata(
         target_kind=metadata.target_kind,
         target_policy_id=metadata.target_policy_id,
     )
+    source_id = (
+        "gw-11e-faction-packs-2026-07:"
+        f"stratagem:{source_row.faction_id}:{source_row.detachment_id}:{source_row.stratagem_id}"
+    )
+    compiled = None
+    if metadata.compile_armour_save_set:
+        compiled = _compiled_stratagem_rule_ir_payload_or_none(
+            profile_id=profile_id,
+            source_id=source_id,
+            rule_target_kind=rule_target_kind,
+            effect_descriptor=metadata.effect_descriptor,
+            normalize_armour_save_set=True,
+        )
+        if compiled is None:
+            raise ValueError(f"Current Stratagem effect did not compile: {profile_id}.")
     return ActivationProfile(
         profile_id=profile_id,
         source_row_id=source_row.source_row_id,
-        source_id=(
-            "gw-11e-faction-packs-2026-07:"
-            f"stratagem:{source_row.faction_id}:{source_row.detachment_id}:"
-            f"{source_row.stratagem_id}"
-        ),
+        source_id=source_id,
         faction_id=source_row.faction_id,
         detachment_id=source_row.detachment_id,
         stratagem_id=source_row.stratagem_id,
@@ -498,17 +533,16 @@ def _activation_profile_from_current_source_metadata(
         required_faction_keywords=metadata.required_faction_keywords,
         excluded_keywords=metadata.excluded_keywords,
         excluded_faction_keywords=metadata.excluded_faction_keywords,
-        rule_ir_hash=_rule_ir_hash(
-            profile_id=profile_id,
-            source_id=(
-                "gw-11e-faction-packs-2026-07:"
-                f"stratagem:{source_row.faction_id}:{source_row.detachment_id}:"
-                f"{source_row.stratagem_id}"
-            ),
-            rule_target_kind=rule_target_kind,
+        rule_ir_hash=(
+            _rule_ir_hash(
+                profile_id=profile_id, source_id=source_id, rule_target_kind=rule_target_kind
+            )
+            if compiled is None
+            else str(compiled["ir_hash"])
         ),
-        compiled_rule_ir_payload=None,
-        effect_selection_kind=None,
+        compiled_rule_ir_payload=compiled,
+        effect_selection_kind=_effect_selection_kind_from_rule_ir_payload(compiled),
+        requires_opponent_turn=metadata.requires_opponent_turn,
     )
 
 
@@ -822,6 +856,7 @@ def _compiled_stratagem_rule_ir_payload_or_none(
     source_id: str,
     rule_target_kind: str,
     effect_descriptor: str,
+    normalize_armour_save_set: bool = False,
 ) -> RuleIRPayload | None:
     compiled = compile_rule_source_text(
         RuleSourceText.from_raw(
@@ -836,6 +871,20 @@ def _compiled_stratagem_rule_ir_payload_or_none(
     if not compiled.is_supported or not any(clause.effects for clause in compiled.clauses):
         return None
     effect_payload = compiled.to_payload()
+    if normalize_armour_save_set:
+        (clause,) = effect_payload["clauses"]
+        (effect,) = clause["effects"]
+        characteristic, operand = effect["parameters"]
+        raw_value = operand["value"]
+        if (
+            effect["kind"] != RuleEffectKind.SET_CHARACTERISTIC.value
+            or characteristic != {"key": "characteristic", "value": "save"}
+            or operand["key"] != "value"
+            or not isinstance(raw_value, str)
+            or not re.fullmatch(r"[2-7]\+", raw_value)
+        ):
+            raise ValueError(f"Current Stratagem armour SET operand drift: {profile_id}.")
+        operand["value"] = int(raw_value.removesuffix("+"))
     activation_text = RULE_IR_NORMALIZED_TEXT
     effect_text = str(effect_payload["normalized_text"])
     normalized_text = f"{activation_text}\n{effect_text}"
@@ -1142,6 +1191,7 @@ def _artifact_payload(profiles: tuple[ActivationProfile, ...]) -> dict[str, obje
         row = asdict(profile)
         del row["compiled_rule_ir_payload"]
         del row["effect_selection_kind"]
+        del row["requires_opponent_turn"]
         rows.append(row)
         payload = _overlay_rule_ir_payload_or_none(profile.profile_id)
         if payload is None:
@@ -1165,6 +1215,9 @@ def _artifact_payload(profiles: tuple[ActivationProfile, ...]) -> dict[str, obje
         "source_snapshot_sha256": hashlib.sha256(RAW_STRATAGEMS_PATH.read_bytes()).hexdigest(),
         "profiles": rows,
         "rule_ir_by_profile_id": rule_irs,
+        "opponent_turn_profile_ids": [
+            profile.profile_id for profile in profiles if profile.requires_opponent_turn
+        ],
         "effect_selection_kind_by_profile_id": {
             profile.profile_id: profile.effect_selection_kind
             for profile in profiles

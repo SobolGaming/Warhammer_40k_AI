@@ -34,7 +34,7 @@ Open gates: F03 rule semantics, force-disposition eligibility, DP validation, be
 | Stratagem | Skulls Beget Blood | 1 CP | Source | source_only | Implement exact timing, eligibility, choice and effect through F03 |
 | Stratagem | Blood Begets Skulls | 1 CP | Source | source_only | Implement exact timing, eligibility, choice and effect through F03 |
 | Stratagem | Fool’s Flight | 2 CP | Source | source_only | Implement exact timing, eligibility, choice and effect through F03 |
-| Stratagem | Sheathed In Brass | 1 CP | Source | source_only | Implement exact timing, eligibility, choice and effect through F03 |
+| Stratagem | Sheathed In Brass | 1 CP | Source | source_only | Current generic RuleIR applies the phase-long 3+ armour Save to one eligible unit selected as a target. |
 
 Observation SHA-256: `ce63ef3711d6eb08ef9e568fdf44f004d491c4d22aeba92b28c96acbd6f784e4`.
 

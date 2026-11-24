@@ -682,6 +682,63 @@ def _grotesque_regeneration_test_successor(
     return record["runtime_fingerprint"], tests, raw
 
 
+def _sheathed_in_brass_test_addition(
+    root: Path, *, previous_runtime: str, previous_transition: bytes
+) -> tuple[str, TestSuccessors, TestSuccessors, bytes] | None:
+    from scripts.build_test_shards import CUTOVER_PATH
+
+    name = "data/source_audits/ci64_provenance_v1/sheathed-in-brass-transition-v1.json"
+    path = root / name
+    _selection_no_links(root, path)
+    if not path.exists():
+        return None
+    digest = "eed47b44cae336c88c37fbde89a41f8f7b0224e63945ffd75526170bd0bb6a66"
+    raw = _checked_bytes(root, name, digest)
+    record = json.loads(raw, object_pairs_hook=_selection_object)
+    owner = "tests/factions/chaos_daemons/integration/test_sheathed_in_brass.py"
+    classification_owner = (
+        "tests/infrastructure/source_governance/unit/test_blocked_row_classification.py"
+    )
+    cutover = json.loads(
+        _checked_bytes(root, CUTOVER_PATH, RETAINED_CUTOVER_SHA256),
+        object_pairs_hook=_selection_object,
+    )
+    if (
+        set(record)
+        != {
+            "schema",
+            "base",
+            "retained_transition_sha256",
+            "retained_runtime_fingerprint",
+            "runtime_fingerprint",
+            "sources",
+            "added_files",
+            "updated_files",
+        }
+        or record["schema"] != "finite-sheathed-in-brass-transition-v1"
+        or record["base"] != "d137b5cc0c7557c8b6653a1aa36ee47260242945"
+        or record["retained_transition_sha256"] != hashlib.sha256(previous_transition).hexdigest()
+        or record["retained_runtime_fingerprint"] != previous_runtime
+        or record["added_files"].keys() != {owner}
+        or record["updated_files"].keys() != {classification_owner}
+        or record["updated_files"][classification_owner].keys() != {"before", "after"}
+        or record["updated_files"][classification_owner]["before"]
+        != cutover["active_files"][classification_owner]
+    ):
+        raise SystemExit("Sheathed in Brass test transition differs.")
+    for source, digest in record["sources"].items():
+        _checked_bytes(root, source, digest)
+    updated = _selection_members(
+        {classification_owner: record["updated_files"][classification_owner]["after"]}, root
+    )
+    return (
+        record["runtime_fingerprint"],
+        updated,
+        _selection_members(record["added_files"], root),
+        raw,
+    )
+
+
 def exact_movement_test_transition(
     root: Path, retained_cutover_sha256: str
 ) -> TestTransition | None:
@@ -1281,10 +1338,16 @@ def exact_movement_test_transition(
         runtime = pending_battle_shock[1]
     if regeneration is not None:
         runtime = regeneration[0]
+    brass = None
     if rigid_charge is not None:
         if ground_charge is None:
             raise SystemExit("Rigid ground charge tests require the group charge predecessor.")
         runtime = rigid_charge[0]
+        brass = _sheathed_in_brass_test_addition(
+            root, previous_runtime=runtime, previous_transition=rigid_charge[3]
+        )
+        if brass is not None:
+            runtime = brass[0]
     retained = _identity_test_transition(
         root,
         retained_cutover_sha256,
@@ -1414,6 +1477,15 @@ def exact_movement_test_transition(
             raise SystemExit("Rigid ground charge tests overlap the predecessor selection.")
         additions.update(tests)
         raw += b"\0" + rigid_raw
+    if brass is not None:
+        _, brass_updates, brass_additions, brass_raw = brass
+        if (brass_updates.keys() | brass_additions.keys()) & (
+            updated.keys() | added.keys() | additions.keys()
+        ):
+            raise SystemExit("Sheathed in Brass tests overlap the predecessor selection.")
+        updated.update(brass_updates)
+        additions.update(brass_additions)
+        raw += b"\0" + brass_raw
     return updated, {**added, **additions}, retained_raw + b"\0" + raw
 
 
