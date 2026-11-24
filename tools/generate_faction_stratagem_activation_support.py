@@ -4,7 +4,7 @@ import argparse
 import hashlib
 import json
 import re
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, replace
 from pathlib import Path
 from typing import cast
 
@@ -15,6 +15,9 @@ from warhammer40k_core.rules.source_data import RuleSourceText
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     datasheet_keyword_lexicon_2026_06_14,
     faction_subrules_2026_27,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_blood_legion_ir_support_2026_27 as blood_legion_ir,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_court_of_the_phoenician_ir_support_2026_27 as court_ir,
@@ -469,7 +472,17 @@ def _activation_profile_for_source_row(
         )
     raw_row = raw_rows.get(source_row.stratagem_id)
     if raw_row is not None:
-        return _activation_profile(source_row=source_row, raw_row=raw_row)
+        profile = _activation_profile(source_row=source_row, raw_row=raw_row)
+        if source_row.source_row_id == blood_legion_ir.BLOOD_BEGETS_SKULLS_SOURCE_ROW_ID:
+            # Retained July 2026 Chaos Daemons faction pack, physical page 124.
+            return replace(
+                profile,
+                trigger_kind="during_phase",
+                target_policy_id="not_selected_to_charge_unit",
+                required_keywords=(blood_legion_ir.KHORNE_KEYWORD,),
+                required_faction_keywords=(blood_legion_ir.LEGIONES_DAEMONICA_KEYWORD,),
+            )
+        return profile
     metadata = SOURCE_ONLY_ACTIVATION_METADATA_BY_ROW_ID.get(source_row.source_row_id)
     if metadata is None:
         raise ValueError(

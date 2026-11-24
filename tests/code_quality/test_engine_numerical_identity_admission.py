@@ -443,7 +443,28 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         == hashlib.sha256((ROOT / ground_charge.RIGID_TRANSITION).read_bytes()).hexdigest()
     )
     assert brass["retained_runtime_fingerprint"] == rigid_charge["runtime_fingerprint"]
-    assert brass["runtime_fingerprint"] == _record(MANIFEST)["fingerprint"]
+    skulls = _record(selection.BLOOD_BEGETS_SKULLS_TRANSITION)
+    assert skulls["retained_runtime_fingerprint"] == brass["runtime_fingerprint"]
+    assert skulls["runtime_fingerprint"] == _record(MANIFEST)["fingerprint"]
+    assert (
+        skulls["retained_transition_sha256"]
+        == hashlib.sha256(
+            (
+                ROOT / "data/source_audits/ci64_provenance_v1/sheathed-in-brass-transition-v1.json"
+            ).read_bytes()
+        ).hexdigest()
+    )
+    for source, binding in skulls["replaced_sources"].items():
+        assert binding["before"] == brass["sources"][source]
+        assert binding["after"] == hashlib.sha256((ROOT / source).read_bytes()).hexdigest()
+    skulls_owner = selection.BLOOD_BEGETS_SKULLS_OWNER
+    assert set(skulls["added_files"]) == {skulls_owner}
+    assert skulls_owner in active_files
+    assert sum(skulls_owner in group for group in groups) == 1
+    assert (
+        skulls["added_files"][skulls_owner]["sha256"]
+        == hashlib.sha256((ROOT / skulls_owner).read_bytes()).hexdigest()
+    )
     brass_owner = "tests/factions/chaos_daemons/integration/test_sheathed_in_brass.py"
     assert set(brass["added_files"]) == {brass_owner}
     assert brass_owner in active_files
@@ -468,8 +489,11 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         classification_change["before"]["sha256"]
         == hashlib.sha256(classification_preimage).hexdigest()
     )
+    assert set(skulls["updated_files"]) == {classification_owner}
+    classification_successor = skulls["updated_files"][classification_owner]
+    assert classification_successor["before"] == classification_change["after"]
     assert (
-        classification_change["after"]["sha256"]
+        classification_successor["after"]["sha256"]
         == hashlib.sha256((ROOT / classification_owner).read_bytes()).hexdigest()
     )
     assert classification_owner in active_files
@@ -865,6 +889,14 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         | round4_cases
         | regeneration_cases
         | brass_cases
+        | {
+            selection.BLOOD_BEGETS_SKULLS_OWNER + "::" + case
+            for case in (
+                "test_blood_begets_skulls_offers_when_advance_prevents_all_charges",
+                "test_blood_begets_skulls_decline_then_offer_after_earlier_charge",
+                "test_blood_begets_skulls_unavailable_without_cp_or_outside_own_charge",
+            )
+        }
         | {
             owner + "::" + test + f"[{reroll}]"
             for owner, test in (

@@ -38,6 +38,7 @@ from warhammer40k_core.engine.rules_units import (
 from warhammer40k_core.engine.selected_target_context import selected_target_unit_ids_or_none
 from warhammer40k_core.engine.stratagems_imports import *
 from warhammer40k_core.engine.stratagems_model import *
+from warhammer40k_core.engine.stratagems_model import NOT_SELECTED_TO_CHARGE_TARGET_POLICY_ID
 from warhammer40k_core.engine.stratagems_requests import *
 from warhammer40k_core.engine.stratagems_apply import *
 from warhammer40k_core.engine.stratagems_selection import *
@@ -246,6 +247,12 @@ def _target_binding_error(
             requires_charge_move=(
                 target_spec.target_policy_id == SELECTED_TO_FIGHT_CHARGED_TARGET_POLICY_ID
             ),
+        )
+    if target_spec.target_policy_id == NOT_SELECTED_TO_CHARGE_TARGET_POLICY_ID:
+        return _not_selected_to_charge_target_error(
+            state=state,
+            context=context,
+            target_binding=target_binding,
         )
     if target_spec.target_policy_id == NOT_SELECTED_TO_SHOOT_TARGET_POLICY_ID:
         return _not_selected_to_shoot_target_error(
@@ -891,6 +898,28 @@ def _selected_target_unit_ids_or_none(
     context: StratagemEligibilityContext,
 ) -> tuple[str, ...] | None:
     return selected_target_unit_ids_or_none(context.trigger_payload)
+
+
+def _not_selected_to_charge_target_error(
+    *,
+    state: GameState,
+    context: StratagemEligibilityContext | None,
+    target_binding: StratagemTargetBinding,
+) -> str | None:
+    from warhammer40k_core.engine.charge_preselection_stratagems import charge_preselection_context
+
+    charge = state.charge_phase_state
+    if context is None or charge is None or context != charge_preselection_context(state):
+        return "not_selected_to_charge_requires_current_preselection"
+    unit_id = _require_target_unit_id(target_binding)
+    unit = rules_unit_view_by_id(state=state, unit_instance_id=unit_id)
+    if unit_id != unit.unit_instance_id:
+        return "target_not_canonical_rules_unit"
+    if unit_id in charge.selected_unit_ids:
+        return "unit_already_selected_to_charge"
+    if not unit.alive_models():
+        return "target_unit_destroyed"
+    return None
 
 
 def _not_selected_to_shoot_target_error(

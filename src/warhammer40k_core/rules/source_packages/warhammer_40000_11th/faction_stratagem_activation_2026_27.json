@@ -6651,15 +6651,19 @@
       "target_descriptor": "One Legiones Daemonica Khorne unit from your army that has not been selected to charge this phase.",
       "effect_descriptor": "Until the end of the phase, your unit is eligible to declare a charge in a turn in which it Advanced.",
       "restrictions_descriptor": "matched play same stratagem per phase",
-      "trigger_kind": "start_phase",
+      "trigger_kind": "during_phase",
       "phase_tokens": [
         "charge"
       ],
       "target_kind": "friendly_unit",
-      "target_policy_id": "friendly_unit",
-      "required_keywords": [],
+      "target_policy_id": "not_selected_to_charge_unit",
+      "required_keywords": [
+        "KHORNE"
+      ],
       "required_keywords_any": [],
-      "required_faction_keywords": [],
+      "required_faction_keywords": [
+        "LEGIONES DAEMONICA"
+      ],
       "excluded_keywords": [],
       "excluded_faction_keywords": [],
       "rule_ir_hash": "8477afd53ad9754e1f662fab6407f7aa0e63a1f9e6081f37784c3ffe4c33f730"
