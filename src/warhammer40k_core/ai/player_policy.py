@@ -177,6 +177,7 @@ class PolicyRegistration:
     policy_id: str
     configuration_json: str
     policy: PlayerPolicy
+    required_checkpoint_hash: str | None = None
 
     def __post_init__(self) -> None:
         if type(self.policy_id) is not str or not self.policy_id.strip():
@@ -188,6 +189,14 @@ class PolicyRegistration:
         if not isinstance(value, dict):
             raise PolicyError("Policy configuration must be an object.")
         validate_json_value(cast(dict[str, object], value))
+        checkpoint = self.required_checkpoint_hash
+        if checkpoint is not None and (
+            type(checkpoint) is not str
+            or len(checkpoint) != 64
+            or bool(set(checkpoint) - set("0123456789abcdef"))
+            or "required_checkpoint_hash" in value
+        ):
+            raise PolicyError("Policy checkpoint admission requires a separate SHA-256 binding.")
 
 
 class PolicyRouter:
@@ -207,7 +216,14 @@ class PolicyRouter:
                         r.proposal_kind,
                     ],
                     "policy_id": entry.policy_id,
-                    "configuration": json.loads(entry.configuration_json),
+                    "configuration": {
+                        **json.loads(entry.configuration_json),
+                        **(
+                            {}
+                            if entry.required_checkpoint_hash is None
+                            else {"required_checkpoint_hash": entry.required_checkpoint_hash}
+                        ),
+                    },
                 }
                 for r, entry in sorted(self._registrations.items(), key=lambda item: repr(item[0]))
             ]

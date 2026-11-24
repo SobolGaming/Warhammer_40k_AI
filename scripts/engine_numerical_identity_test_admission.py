@@ -748,10 +748,15 @@ def _stage3_melee_profile_successor(
     if not path.exists():
         return None
     raw = _checked_bytes(
-        root, name, "ac0d8abf3973d7b80b65eb4647b93f3855916461e47b120c5f558ceca350c53e"
+        root, name, "7649ef73344cafd2bed207e3a89c3ce47dcf10c5fc902f93cc6924adb0ab9ec4"
     )
     record = json.loads(raw, object_pairs_hook=_selection_object)
     owner = "tests/infrastructure/adapters/test_ordinary_melee_profile_policy.py"
+    sources = {
+        "src/warhammer40k_core/ai/ordinary_melee_profile_policy.py",
+        "src/warhammer40k_core/ai/player_policy.py",
+        "src/warhammer40k_core/ai/runner.py",
+    }
     if (
         record.keys()
         != {
@@ -760,19 +765,19 @@ def _stage3_melee_profile_successor(
             "retained_transition_sha256",
             "retained_runtime_fingerprint",
             "runtime_fingerprint",
-            "policy_sha256",
+            "sources",
             "added_files",
         }
         or record["schema"] != "finite-stage3-melee-profile-test-v1"
         or record["base"] != "c63a300c28fa772f59c75b66d50038e5e6241cd5"
         or record["retained_transition_sha256"] != hashlib.sha256(previous_transition).hexdigest()
         or record["retained_runtime_fingerprint"] != previous_runtime
+        or record["sources"].keys() != sources
         or record["added_files"].keys() != {owner}
     ):
         raise SystemExit("Stage 3 melee profile test transition differs.")
-    _checked_bytes(
-        root, "src/warhammer40k_core/ai/ordinary_melee_profile_policy.py", record["policy_sha256"]
-    )
+    for source in sorted(sources):
+        _checked_bytes(root, source, record["sources"][source])
     return record["runtime_fingerprint"], _selection_members(record["added_files"], root), raw
 
 

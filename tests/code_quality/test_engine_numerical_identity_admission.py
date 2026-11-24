@@ -471,6 +471,7 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         for name in (
             "test_great_axe_actor_offer_selects_applied_wounds_and_replays[seekers]",
             "test_great_axe_actor_offer_selects_applied_wounds_and_replays[bloodthirster]",
+            "test_great_axe_dispatch_rejects_identical_view_at_unadmitted_checkpoint",
             "test_wounded_seeker_first_changes_applied_wound_expectation",
         )
     }

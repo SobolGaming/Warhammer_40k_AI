@@ -12,6 +12,7 @@ from warhammer40k_core.adapters.access_control import ViewerContext
 from warhammer40k_core.adapters.contracts import AdapterGameSession
 from warhammer40k_core.adapters.projection import GameViewPayload
 from warhammer40k_core.ai.player_policy import (
+    CandidateExhaustedError,
     PlayerDecisionContext,
     PolicyAction,
     PolicyError,
@@ -130,6 +131,10 @@ class RunnerError(PolicyError):
     def __init__(self, message: str, *, report: RunReport) -> None:
         super().__init__(message)
         self.report = report
+
+
+class PolicyCheckpointGap(CandidateExhaustedError):
+    """The trusted runner could not bind this decision to its reviewed checkpoint."""
 
 
 class BoundedPolicyRunner:
@@ -276,6 +281,16 @@ class BoundedPolicyRunner:
         except (PolicyError, DecisionError, GameLifecycleError, EventLogError) as exc:
             raise self._fail(str(exc), self._failure_reason or "contract_error") from exc
 
+    def _require_checkpoint(self, required: str | None) -> None:
+        if (
+            required is not None
+            and payload_digest(self._session.to_persistence_payload()) != required
+        ):
+            self._failure_reason = "unadmitted_checkpoint"
+            raise PolicyCheckpointGap(
+                "Policy dispatch requires the exact admitted session checkpoint."
+            )
+
     def _attempt(
         self, context: PlayerDecisionContext, request_id: str, choice_identity: str
     ) -> LifecycleStatus:
@@ -292,6 +307,8 @@ class BoundedPolicyRunner:
                 self._failure_reason = "unsupported_route"
                 raise
             policy_id = entry.policy_id
+            stage = "validation"
+            self._require_checkpoint(entry.required_checkpoint_hash)
             stage = "choice"
             started = perf_counter()
             try:
@@ -306,6 +323,7 @@ class BoundedPolicyRunner:
                 context.observation_hash
             ):
                 raise self._fail("Policy observation became stale before submission.")
+            self._require_checkpoint(entry.required_checkpoint_hash)
             before = self._session.decision_record_count()
             stage = "submission"
             outcome = "unverified"

@@ -9,6 +9,7 @@ from typing import cast
 
 import pytest
 
+from tests.generic_modifier_helpers import generic_effect
 from tests.phase15c_fight_order_helpers import (
     fight_config,
     record_fights_first_effect,
@@ -28,10 +29,22 @@ from warhammer40k_core.ai.ordinary_melee_profile_policy import (
     generate_ordinary_melee_profile_candidates,
     ordinary_melee_profile_registration,
 )
-from warhammer40k_core.ai.player_policy import PlayerDecisionContext, PolicyError, PolicyRouter
+from warhammer40k_core.ai.player_policy import (
+    PlayerDecisionContext,
+    PolicyError,
+    PolicyRouter,
+    payload_digest,
+)
+from warhammer40k_core.ai.runner import (
+    BoundedPolicyRunner,
+    PolicyCheckpointGap,
+    RunLimits,
+    RunnerError,
+)
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.engine.army_mustering import muster_army
 from warhammer40k_core.engine.decision_controller import DecisionController
+from warhammer40k_core.engine.effects import EffectExpiration
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.fight_order import FIGHTS_FIRST_EFFECT_KIND
 from warhammer40k_core.engine.game_state import (
@@ -56,7 +69,9 @@ ACTOR = "player-a"
 DEFENDER = "player-b"
 
 
-def _fight_session(defender: str) -> LocalGameSession:
+def _fight_session(
+    defender: str, *, wounded: bool = False, wound_bonus: bool = False
+) -> LocalGameSession:
     package = chaos_daemons_cavalcade_2026_11.catalog_package()
     config = fight_config(
         game_id=f"stage3-profile-{defender}",
@@ -117,8 +132,12 @@ def _fight_session(defender: str) -> LocalGameSession:
     ).battlefield_state
     state = GameState.from_config(config)
     for army, placement in zip(armies, ((Pose.at(20, 20),), poses), strict=True):
-        state.record_army_definition(army)
         (unit,) = army.units
+        if wounded and army.player_id == DEFENDER:
+            (model,) = unit.own_models
+            unit = replace(unit, own_models=(replace(model, wounds_remaining=1),))
+            army = replace(army, units=(unit,))
+        state.record_army_definition(army)
         battlefield = battlefield.with_unit_placement(
             unit_placement_at(unit, army_id=army.army_id, player_id=army.player_id, poses=placement)
         )
@@ -140,6 +159,24 @@ def _fight_session(defender: str) -> LocalGameSession:
     record_fights_first_effect(
         state=state, unit=armies[0].units[0], effect_kind=FIGHTS_FIRST_EFFECT_KIND
     )
+    if wound_bonus:
+        effect = generic_effect(
+            effect_id="stage3-contextual-wound-bonus",
+            owner_player_id=ACTOR,
+            target_unit_instance_ids=(armies[0].units[0].unit_instance_id,),
+            target_kind="this_unit",
+            effect_kind="modify_dice_roll",
+            parameters={"roll_type": "wound", "delta": 1},
+        )
+        state.record_persisting_effect(
+            replace(
+                effect,
+                started_phase=BattlePhase.FIGHT,
+                expiration=EffectExpiration.end_phase(
+                    battle_round=1, phase=BattlePhase.FIGHT, player_id=ACTOR
+                ),
+            )
+        )
     return LocalGameSession(
         GameLifecycle.from_payload(
             {
@@ -151,6 +188,20 @@ def _fight_session(defender: str) -> LocalGameSession:
             }
         )
     )
+
+
+def _actor_offer(
+    session: LocalGameSession,
+) -> tuple[PlayerDecisionContext, MeleeProfileAdmission]:
+    context = PlayerDecisionContext.from_view(session.view(viewer_player_id=ACTOR), choice_seed=7)
+    body = cast(dict[str, JsonValue], context.request["payload"])
+    offer = cast(dict[str, JsonValue], body["proposal_request"])
+    rows = cast(list[dict[str, JsonValue]], offer["available_weapons"])
+    selection = cast(dict[str, JsonValue], rows[0]["weapon_ability_selection_context"])
+    source_id = selection["source_request_id"]
+    assert isinstance(source_id, str)
+    assert source_id != offer["source_decision_result_id"]
+    return context, MeleeProfileAdmission(context.observation_hash, source_id)
 
 
 @pytest.mark.parametrize(
@@ -167,17 +218,7 @@ def test_great_axe_actor_offer_selects_applied_wounds_and_replays(
     request = melee_boundary(session)
     assert request.decision_type == "submit_melee_declaration"
     assert request.actor_id == ACTOR
-    view = session.view(viewer_player_id=ACTOR)
-    context = PlayerDecisionContext.from_view(view, choice_seed=7)
-    observation_hash = context.observation_hash
-    body = cast(dict[str, JsonValue], context.request["payload"])
-    offer = cast(dict[str, JsonValue], body["proposal_request"])
-    rows = cast(list[dict[str, JsonValue]], offer["available_weapons"])
-    selection = cast(dict[str, JsonValue], rows[0]["weapon_ability_selection_context"])
-    source_id = selection["source_request_id"]
-    assert isinstance(source_id, str)
-    assert source_id != offer["source_decision_result_id"]
-    admission = MeleeProfileAdmission(observation_hash, source_id)
+    context, admission = _actor_offer(session)
     candidates = generate_ordinary_melee_profile_candidates(context, admission=admission)
     assert tuple(candidate.profile_id for candidate in candidates) == (
         f"{GREAT_AXE}:strike",
@@ -188,7 +229,7 @@ def test_great_axe_actor_offer_selects_applied_wounds_and_replays(
         for candidate, control in zip(candidates, expected, strict=True)
     )
     assert candidates[0].action != candidates[1].action
-    assert all(c.action.observation_hash == observation_hash for c in candidates)
+    assert all(c.action.observation_hash == context.observation_hash for c in candidates)
 
     with pytest.raises(PolicyError, match="own pending actor"):
         PlayerDecisionContext.from_view(session.view(viewer_player_id=DEFENDER), choice_seed=7)
@@ -204,7 +245,11 @@ def test_great_axe_actor_offer_selects_applied_wounds_and_replays(
         )
     assert wrong_source.value.reason is MeleeProfileGapReason.OFFER
 
-    entry = ordinary_melee_profile_registration(ACTOR, admission=admission)
+    entry = ordinary_melee_profile_registration(
+        ACTOR,
+        admission=admission,
+        admitted_checkpoint_hash=payload_digest(session.to_persistence_payload()),
+    )
     action = PolicyRouter((entry,)).resolve(context.route).policy.choose(context)
     assert action == next(c.action for c in candidates if c.profile_id == f"{GREAT_AXE}:{best}")
 
@@ -242,6 +287,110 @@ def test_great_axe_actor_offer_selects_applied_wounds_and_replays(
             replay = ReplayRunner(ReplayArtifact.from_payload(artifact.to_payload())).run()
             assert replay.reproduced_exactly, replay.to_payload()
     assert session.lifecycle.to_payload() == initial
+
+
+def test_great_axe_dispatch_rejects_identical_view_at_unadmitted_checkpoint() -> None:
+    ordinary = _fight_session(BLOODTHIRSTER, wounded=True)
+    modified = _fight_session(BLOODTHIRSTER, wounded=True, wound_bonus=True)
+    ordinary_request = melee_boundary(ordinary)
+    modified_request = melee_boundary(modified)
+    assert (
+        ordinary_request.decision_type
+        == modified_request.decision_type
+        == "submit_melee_declaration"
+    )
+
+    context, admission = _actor_offer(ordinary)
+    assert (context, admission) == _actor_offer(modified)
+    ordinary_checkpoint = payload_digest(ordinary.to_persistence_payload())
+    modified_checkpoint = modified.to_persistence_payload()
+    assert ordinary_checkpoint != payload_digest(modified_checkpoint)
+    (strike, sweep) = generate_ordinary_melee_profile_candidates(context, admission=admission)
+    assert (strike.profile_id, sweep.profile_id) == (f"{GREAT_AXE}:strike", f"{GREAT_AXE}:sweep")
+
+    # One wound remains, so positive damage amounts all kill. Compute the
+    # probability of at least one unsaved wound directly from D6 face counts.
+    def kill_chance(attacks: int, wound_faces: int) -> Fraction:
+        return 1 - (1 - Fraction(5, 6) * Fraction(wound_faces, 6) * Fraction(3, 6)) ** attacks
+
+    assert strike.expected_applied_wounds == kill_chance(7, 4)
+    assert sweep.expected_applied_wounds == kill_chance(14, 2)
+    assert strike.expected_applied_wounds > sweep.expected_applied_wounds
+    assert kill_chance(7, 5) < kill_chance(14, 3)
+
+    router = PolicyRouter(
+        (
+            ordinary_melee_profile_registration(
+                ACTOR, admission=admission, admitted_checkpoint_hash=ordinary_checkpoint
+            ),
+        )
+    )
+    limits = RunLimits(policy_seed=7, max_decisions=1, max_seconds=60.0)
+    with pytest.raises(RunnerError) as gap:
+        BoundedPolicyRunner(session=modified, router=router, limits=limits).run()
+    assert isinstance(gap.value.__cause__, PolicyCheckpointGap)
+    assert gap.value.report.failure_reason == "unadmitted_checkpoint"
+    (blocked,) = gap.value.report.decisions
+    assert blocked.failure_stage == "validation"
+    assert blocked.choice_seconds == 0
+    assert blocked.submission_outcome == "not_submitted"
+    assert blocked.recorded_decisions == 0
+    assert modified.to_persistence_payload() == modified_checkpoint
+
+    ordinary_initial = ordinary.lifecycle.to_payload()
+    modified_initial = modified.lifecycle.to_payload()
+    before = ordinary.decision_record_count()
+    direct = ordinary.fork()
+    with pytest.raises(RunnerError) as stopped:
+        BoundedPolicyRunner(session=ordinary, router=router, limits=limits).run()
+    assert stopped.value.report.failure_reason == "decision_limit"
+    (attempt,) = stopped.value.report.decisions
+    assert attempt.submission_outcome == "accepted"
+    assert attempt.observation_hash == blocked.observation_hash == context.observation_hash
+
+    for session, action, result_id in (
+        (direct, strike.action, f"ai:{attempt.choice_seed:064x}"),
+        (modified, sweep.action, "stage3:modified-sweep"),
+    ):
+        assert action.proposal_json is not None
+        status = session.submit_viewer_parameterized_payload(
+            viewer=ViewerContext.for_player(ACTOR),
+            request_id=action.request_id,
+            payload=cast(dict[str, JsonValue], json.loads(action.proposal_json)),
+            result_id=result_id,
+        )
+        assert status.status_kind in {
+            LifecycleStatusKind.ADVANCED,
+            LifecycleStatusKind.WAITING_FOR_DECISION,
+            LifecycleStatusKind.TERMINAL,
+        }
+        if status.status_kind is LifecycleStatusKind.ADVANCED:
+            session.advance_until_decision_or_terminal()
+
+    assert ordinary.lifecycle.to_payload() == direct.lifecycle.to_payload()
+    assert ordinary.lifecycle.decision_controller.records[before].request == ordinary_request
+    for session, initial in ((ordinary, ordinary_initial), (modified, modified_initial)):
+        artifact = ReplayArtifact.capture(
+            artifact_id="stage3-checkpoint-admission",
+            initial_lifecycle_payload=initial,
+            final_lifecycle=session.lifecycle,
+        )
+        replay = ReplayRunner(artifact).run()
+        assert replay.reproduced_exactly, replay.to_payload()
+
+    for session, expected_modifier in ((ordinary, 0), (modified, 1)):
+        modifiers: set[int] = set()
+        for event in session.lifecycle.decision_controller.event_log.records:
+            if (
+                event.event_type == "attack_sequence_step"
+                and isinstance(event.payload, dict)
+                and event.payload["step"] == "wound"
+            ):
+                roll = cast(dict[str, JsonValue], event.payload["payload"])
+                modifier = roll["capped_modifier"]
+                assert type(modifier) is int
+                modifiers.add(modifier)
+        assert modifiers == {expected_modifier}
 
 
 def test_wounded_seeker_first_changes_applied_wound_expectation() -> None:

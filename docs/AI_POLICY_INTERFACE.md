@@ -3098,16 +3098,21 @@ wounds from the actor's projection, along with each offered target-specific
 weapon profile. Registration pins the actor observation hash and the weapon
 selection's viewer-issued source reference. That nested reference has its own
 request namespace. The declaration carries the outer offer's source references
-through the ordinary viewer submission contract.
+through the ordinary viewer submission contract. The trusted runner binds the
+registration to the reviewed session checkpoint for that pending offer. It
+checks the full checkpoint digest before policy choice and again before
+submission. The digest stays in operator registration and dispatch evidence.
+The scorer receives the detached actor observation and its existing choice seed.
 
 This is a fixed-A declaration route. Activations that commit a profile earlier
 through `select_melee_weapon` are outside scope. Offers with multiple target
 units, Extra Attacks, unresolved weapon choices, target attachments,
 heterogeneous defenses or more than one wounded target model fall outside the
 calculation. Admission must qualify the ordinary hit, wound, save and damage
-path for the exact observation. The current actor projection does not establish
-that qualification for arbitrary fights, including external roll modifiers,
-rerolls and Feel No Pain. A missing or different admission fails explicitly.
+path for the exact checkpoint. Identical actor observations can correspond to
+different contextual roll modifiers, reroll permissions or Feel No Pain. A
+checkpoint mismatch stops dispatch with `unadmitted_checkpoint`. The actor-only
+candidate scores describe the ordinary baseline for the reviewed offer.
 
 The calculator assigns damage to the wounded model first when present, caps
 each attack at that model's remaining wounds, and carries no excess to the next
@@ -3129,8 +3134,12 @@ The native controls use a constructed Fight start with source-backed models and
 equipment. The full-health controls exercise both proposals through the actor's
 ordinary submission path and replay the chosen declaration from its checkpoint.
 The wounded-first row is an analytical control. It is independent of the dice
-rolled during these native submissions. Stage 2 useful-reference status is
-`scoped_gap`.
+rolled during these native submissions. A separate native regression uses a
+Bloodthirster with one wound remaining. An active +1 to wound reverses the
+analytical preference while preserving the actor observation and source
+reference. The runner accepts strike for the admitted ordinary checkpoint and
+reports the typed gap for the modified checkpoint. Both Fight states replay
+through the normal engine path. Stage 2 useful-reference status is `scoped_gap`.
 
 The retained [official Chaos Daemons Faction Pack](https://assets.warhammer-community.com/eng_22-07_warhammer_40%2C000_faction_pack_chaos_daemons-lycqqrymwe-qogh4b5yly.pdf)
 confirms the profiles and target defenses on PDF pages 16 and 110. The

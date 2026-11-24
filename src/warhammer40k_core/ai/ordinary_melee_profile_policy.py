@@ -13,6 +13,7 @@ from warhammer40k_core.ai.player_policy import (
     CandidateExhaustedError,
     PlayerDecisionContext,
     PolicyAction,
+    PolicyError,
     PolicyRegistration,
     PolicyRoute,
 )
@@ -35,7 +36,7 @@ from warhammer40k_core.engine.weapon_selection_context import (
     WeaponSelectionContextPayload,
 )
 
-ORDINARY_MELEE_PROFILE_POLICY_ID = "ordinary-melee-applied-wounds-v1"
+ORDINARY_MELEE_PROFILE_POLICY_ID = "ordinary-melee-applied-wounds-v2"
 _MAX_PROFILES = 8
 _MAX_TARGET_MODELS = 10
 _MAX_ATTACKS = 24
@@ -231,9 +232,8 @@ def generate_ordinary_melee_profile_candidates(
 ) -> tuple[MeleeProfileCandidate, ...]:
     """Compare the native alternatives of one previously qualified ordinary offer.
 
-    Admission must qualify the baseline hit/wound/save and damage mechanics for
-    this exact public observation. The projection cannot do that for arbitrary
-    fights (for example, it does not enumerate all later reroll permissions).
+    The actor-visible binding scopes candidate generation. Automated dispatch
+    also requires the trusted runner to match the reviewed session checkpoint.
     """
     actor = context.route.actor_id
     if context.route != ordinary_melee_profile_route(actor):
@@ -337,8 +337,11 @@ class _OrdinaryMeleeProfilePolicy:
 
 
 def ordinary_melee_profile_registration(
-    actor_id: str, *, admission: MeleeProfileAdmission
+    actor_id: str, *, admission: MeleeProfileAdmission, admitted_checkpoint_hash: str
 ) -> PolicyRegistration:
+    """Register a comparison qualified by a trusted operator at the pending offer."""
+    if type(admitted_checkpoint_hash) is not str:
+        raise PolicyError("Melee profile registration requires a reviewed session checkpoint.")
     return PolicyRegistration(
         ordinary_melee_profile_route(actor_id),
         ORDINARY_MELEE_PROFILE_POLICY_ID,
@@ -349,4 +352,5 @@ def ordinary_melee_profile_registration(
             }
         ),
         _OrdinaryMeleeProfilePolicy(admission),
+        required_checkpoint_hash=admitted_checkpoint_hash,
     )
