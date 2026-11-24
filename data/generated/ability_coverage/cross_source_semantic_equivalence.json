@@ -1757,26 +1757,6 @@
     {
       "content_kind": "datasheet_ability",
       "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "41018783686487b82233e94a8fc7ec394ccd9fc5a61534fca4d57d682fa6ee4f",
-      "execution_statuses": [
-        "blocked_structured_semantics"
-      ],
-      "faction_ids": [
-        "chaos-daemons",
-        "death-guard"
-      ],
-      "group_id": "semantic-equivalence:41018783686487b82233e94a8fc7ec394ccd9fc5a61534fca4d57d682fa6ee4f",
-      "member_ids": [
-        "datasheet-ability:000001134:5",
-        "datasheet-ability:000004115:5"
-      ],
-      "rules_surface": "datasheet",
-      "runtime_consumer_ids": [],
-      "support_transfer": "none"
-    },
-    {
-      "content_kind": "datasheet_ability",
-      "equivalence_basis": "exact_normalized_text",
       "equivalence_hash": "4286d865bc55fab3e5b8f07e5917b69d55605f6f1192cc295ee306994f449dd7",
       "execution_statuses": [
         "blocked_structured_semantics"
@@ -2663,6 +2643,28 @@
       "rules_surface": "datasheet",
       "runtime_consumer_ids": [],
       "support_transfer": "none"
+    },
+    {
+      "content_kind": "datasheet_ability",
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "6368f6b3c494f4a4cd1e3b2bec723cd8b2f087c3de2c075d1fa07b2cdd8380a9",
+      "execution_statuses": [
+        "engine_consumed"
+      ],
+      "faction_ids": [
+        "chaos-daemons",
+        "death-guard"
+      ],
+      "group_id": "semantic-equivalence:6368f6b3c494f4a4cd1e3b2bec723cd8b2f087c3de2c075d1fa07b2cdd8380a9",
+      "member_ids": [
+        "datasheet-ability:000001134:5",
+        "datasheet-ability:000004115:5"
+      ],
+      "rules_surface": "datasheet",
+      "runtime_consumer_ids": [
+        "catalog-ir:phase-end-self-healing"
+      ],
+      "support_transfer": "content_neutral_generic_ir"
     },
     {
       "content_kind": "datasheet_ability",
@@ -7011,7 +7013,7 @@
     }
   ],
   "equivalent_group_count": 322,
-  "exact_text_only_member_count": 3175,
+  "exact_text_only_member_count": 3173,
   "generated_by": "uv run python tools/generate_ability_support_matrix.py",
   "member_count": 4094,
   "members": [
@@ -29374,12 +29376,10 @@
     },
     {
       "content_kind": "datasheet_ability",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "41018783686487b82233e94a8fc7ec394ccd9fc5a61534fca4d57d682fa6ee4f",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "6368f6b3c494f4a4cd1e3b2bec723cd8b2f087c3de2c075d1fa07b2cdd8380a9",
+      "execution_status": "engine_consumed",
       "faction_id": "chaos-daemons",
       "faction_name": "Chaos Daemons",
       "member_id": "datasheet-ability:000001134:5",
@@ -29389,16 +29389,18 @@
       "rule_id": "000001134:5",
       "rule_name": "Grotesque Regeneration",
       "rules_surface": "datasheet",
-      "runtime_consumer_ids": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:phase-end-self-healing"
+      ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": null,
+      "semantic_hash": "0951e8aa43b76a09855bb845d22e496192335d6af6e97ba4eff6e75f65450f2d",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000001134:5"
       ],
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000001134:5:description"
       ],
-      "support_transfer": "none"
+      "support_transfer": "content_neutral_generic_ir"
     },
     {
       "content_kind": "datasheet_ability",
@@ -58717,12 +58719,10 @@
     },
     {
       "content_kind": "datasheet_ability",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "41018783686487b82233e94a8fc7ec394ccd9fc5a61534fca4d57d682fa6ee4f",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "6368f6b3c494f4a4cd1e3b2bec723cd8b2f087c3de2c075d1fa07b2cdd8380a9",
+      "execution_status": "engine_consumed",
       "faction_id": "death-guard",
       "faction_name": "Death Guard",
       "member_id": "datasheet-ability:000004115:5",
@@ -58732,16 +58732,18 @@
       "rule_id": "000004115:5",
       "rule_name": "Grotesque Regeneration",
       "rules_surface": "datasheet",
-      "runtime_consumer_ids": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:phase-end-self-healing"
+      ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": null,
+      "semantic_hash": "0951e8aa43b76a09855bb845d22e496192335d6af6e97ba4eff6e75f65450f2d",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000004115:5"
       ],
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000004115:5:description"
       ],
-      "support_transfer": "none"
+      "support_transfer": "content_neutral_generic_ir"
     },
     {
       "content_kind": "datasheet_ability",
@@ -121989,8 +121991,8 @@
     "Source": "be71483d32107f42173bc13bf191f2769a8d17279ebdb2bb24d2fca372a1826c",
     "Stratagems": "b13ffe800908d95adcb221fb28b653ae319b0a84bb88d17b0585bceb3d939958"
   },
-  "source_payload_checksum_sha256": "ff26dbec8d5808a9c676d65c9a8e9de68027e8fb3fb83543076895994045d025",
+  "source_payload_checksum_sha256": "21ca4bbd8535967fd4ab0aea8a1252d9480243a839ccb6b9986b57fa65407de3",
   "source_text_unavailable_member_count": 111,
-  "structured_member_count": 808,
+  "structured_member_count": 810,
   "upstream_execution_checksum_sha256": "6555b090a8828ec11c0de75dc2e2d1dc65dadaaaed1e75077337af6fbf67673c"
 }

@@ -3252,6 +3252,10 @@
     "tests/rules/section02/test_02_02_04_healing.py::test_02_02_wound_threshold_and_excess_damage[1-1-False-0]": 0.004,
     "tests/rules/section02/test_02_02_04_healing.py::test_02_02_wound_threshold_and_excess_damage[2-0-True-0]": 0.004,
     "tests/rules/section02/test_02_02_04_healing.py::test_02_02_wound_threshold_and_excess_damage[3-0-True-1]": 0.004,
+    "tests/rules/section02/test_02_02_04_healing.py::test_grotesque_regeneration_native_phase_end_and_replay[fight-chaos-daemons]": 1.756,
+    "tests/rules/section02/test_02_02_04_healing.py::test_grotesque_regeneration_native_phase_end_and_replay[fight-death-guard]": 1.755,
+    "tests/rules/section02/test_02_02_04_healing.py::test_grotesque_regeneration_native_phase_end_and_replay[shooting-chaos-daemons]": 24.011,
+    "tests/rules/section02/test_02_02_04_healing.py::test_grotesque_regeneration_native_phase_end_and_replay[shooting-death-guard]": 2.208,
     "tests/rules/section02/test_02_02_04_revival.py::test_02_02_04_core_unit_healing_cannot_revive_a_character": 0.049,
     "tests/rules/section02/test_02_02_04_revival.py::test_02_02_04_wounded_member_precedes_one_wound_revival[1]": 0.006,
     "tests/rules/section02/test_02_02_04_revival.py::test_02_02_04_wounded_member_precedes_one_wound_revival[2]": 0.1,
@@ -6702,18 +6706,18 @@
   },
   "execution_model": {
     "assignment_wall_lower_bound_seconds": {
-      "1": 568.292,
-      "10": 568.292,
-      "11": 568.292,
-      "12": 568.293,
+      "1": 569.035,
+      "10": 569.036,
+      "11": 569.035,
+      "12": 569.035,
       "2": 795.547,
       "3": 609.537,
-      "4": 568.292,
-      "5": 568.292,
-      "6": 568.292,
-      "7": 568.292,
-      "8": 568.292,
-      "9": 568.292
+      "4": 569.036,
+      "5": 569.035,
+      "6": 569.035,
+      "7": 569.035,
+      "8": 569.035,
+      "9": 569.036
     },
     "cold_shard_assignment": "minimum-unrounded-modeled-test-load-existing-bucket-v1",
     "cold_shard_id": 1,
@@ -6722,18 +6726,18 @@
       "tests/factions/chaos_daemons/integration/test_cavalcade_v995_roster.py::test_exact_mirror_deploys_all_78_models_and_replays_to_battle"
     ],
     "shard_worker_seconds": {
-      "1": 2273.167,
-      "10": 2273.168,
-      "11": 2273.168,
-      "12": 2273.17,
+      "1": 2276.139,
+      "10": 2276.144,
+      "11": 2276.142,
+      "12": 2276.141,
       "2": 3182.186,
       "3": 2438.146,
-      "4": 2273.168,
-      "5": 2273.168,
-      "6": 2273.168,
-      "7": 2273.168,
-      "8": 2273.168,
-      "9": 2273.168
+      "4": 2276.142,
+      "5": 2276.14,
+      "6": 2276.14,
+      "7": 2276.14,
+      "8": 2276.139,
+      "9": 2276.144
     }
   },
   "files": {
@@ -7018,7 +7022,7 @@
     "tests/rules/section02/test_02_02_03_attack_generation.py": 0.035,
     "tests/rules/section02/test_02_02_03_damage_timing.py": 0.12,
     "tests/rules/section02/test_02_02_03_random_characteristics.py": 0.036,
-    "tests/rules/section02/test_02_02_04_healing.py": 1.726,
+    "tests/rules/section02/test_02_02_04_healing.py": 31.456,
     "tests/rules/section02/test_02_02_04_revival.py": 0.207,
     "tests/rules/section02/test_02_02_constructed_contracts.py": 7.17,
     "tests/rules/section02/test_02_02_profiles.py": 2.329,
@@ -7284,19 +7288,20 @@
         "63db8ac24763535fbddc46142b0c99e6833b128bc40e674ff95ec735b05e1018",
         "708e2a7cdde4ec8155cc758efc538d7dc0dd4b5c25644c8a1c2d88652d6df8df",
         "7cded789191d3e9a531806a0b448b6347da9bd58f9f62af169b77cae998e0753",
+        "9a5f617751dd2ef273362bcbec3d532afb594c23b9d7c4576a1ba54a82305422",
         "9dc1b70162325c830e81f4b6e06c9199b793ed7d7805d59287feb2a593be541d"
       ],
-      "source": "Retained #730 representative timing profile and three measured Stage 2 screen movement cases",
-      "test_cases": 6699,
+      "source": "Retained #731 representative timing profile and four measured Grotesque Regeneration cases (serial WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only)",
+      "test_cases": 6703,
       "test_files": 444
     }
   ],
   "shard_count": 12,
   "shards": [
     {
-      "duration_seconds": 2273.167,
+      "duration_seconds": 2276.139,
       "shard_id": 1,
-      "test_file_count": 48
+      "test_file_count": 49
     },
     {
       "duration_seconds": 3182.186,
@@ -7309,47 +7314,47 @@
       "test_file_count": 1
     },
     {
-      "duration_seconds": 2273.168,
+      "duration_seconds": 2276.142,
       "shard_id": 4,
-      "test_file_count": 43
+      "test_file_count": 42
     },
     {
-      "duration_seconds": 1771.934,
+      "duration_seconds": 2276.14,
       "shard_id": 5,
-      "test_file_count": 50
+      "test_file_count": 51
     },
     {
-      "duration_seconds": 2273.168,
+      "duration_seconds": 1774.906,
       "shard_id": 6,
-      "test_file_count": 47
+      "test_file_count": 51
     },
     {
-      "duration_seconds": 2273.168,
+      "duration_seconds": 2276.14,
       "shard_id": 7,
-      "test_file_count": 50
-    },
-    {
-      "duration_seconds": 2273.168,
-      "shard_id": 8,
       "test_file_count": 48
     },
     {
-      "duration_seconds": 2273.168,
-      "shard_id": 9,
+      "duration_seconds": 2276.139,
+      "shard_id": 8,
       "test_file_count": 50
     },
     {
-      "duration_seconds": 2273.168,
+      "duration_seconds": 2276.144,
+      "shard_id": 9,
+      "test_file_count": 48
+    },
+    {
+      "duration_seconds": 2276.144,
       "shard_id": 10,
-      "test_file_count": 49
+      "test_file_count": 48
     },
     {
-      "duration_seconds": 2273.168,
+      "duration_seconds": 2276.142,
       "shard_id": 11,
-      "test_file_count": 100
+      "test_file_count": 98
     },
     {
-      "duration_seconds": 2273.17,
+      "duration_seconds": 2276.141,
       "shard_id": 12,
       "test_file_count": 48
     }
@@ -7359,5 +7364,5 @@
     "sha256": "b241b31651a8d5d903a2b851583186c276a5ac32fed26de1a1c69b4aa278b711"
   },
   "strategy": "largest-processing-time-by-derived-selector-weight",
-  "total_test_duration_seconds": 27850.779
+  "total_test_duration_seconds": 27880.509
 }

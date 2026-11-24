@@ -1,0 +1,32 @@
+{
+  "schema": "finite-grotesque-regeneration-transition-v1",
+  "base": "d9185cf53a2816ab666f3c1b16410b960a3d1cc7",
+  "retained_transition_sha256": "1188532c9acbc0b9c4b19323e98458aeb64d7d51ad3c8bf3b889486230568a03",
+  "retained_runtime_fingerprint": "bef24c387ca386c885fd7508796e065e0e6fb68efa2159f3aa8be6d8f41b1db1",
+  "runtime_fingerprint": "858c9136f8da02d92ff986bc6e54d7d608070f3a89df76de009cc655d0433bd0",
+  "sources": {
+    "src/warhammer40k_core/engine/catalog_datasheet_rule_extensions.py": "9821d45f786b2f3f7d007052ba89ae4ebced6059debec60594be093e19b0636d",
+    "src/warhammer40k_core/engine/catalog_datasheet_rule_support.py": "3c0cf1498fb977a122c3a62b3b15d765033e7930b587c769f46b39aaafaeaf20",
+    "src/warhammer40k_core/engine/catalog_phase_end_healing.py": "26b352631298b27d7a67e948a0e8a9cd14d64fde3bc8248ac3977810f923f244",
+    "src/warhammer40k_core/engine/faction_content/phase_end_hook_registries.py": "96353725dc12bd895572ccc4120d8659f9d09651d2d28589acd4cc8ec54f818d",
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_pack_rule_ir/__init__.py": "ba715ea27e2aaa018ca318a5a53f34f7fa2f8683a3293c610fc3d8edef85f9f7",
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_pack_rule_ir/_artifacts.py": "39f8c123613b7259cbf823a9f391502c13c0c6ff58c7b98ba11d0fc9b4e00737",
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_pack_rule_ir/artifacts/package.json": "dec2004a4a82de40ec87a38090b94b173fe540e54eaa4cf4e573619d6cd88cd8",
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_pack_rule_ir/artifacts/shards/chaos-daemons.json": "249e340591648a13a9246ca0170870500cb1c54318a105d6aa99bb78ae1eb8b0",
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_pack_rule_ir/artifacts/shards/death-guard.json": "2b2e54d59790f4422a1f5460dd7bb3ad695854881f1f6f770c136d6c4ba7d028"
+  },
+  "test": {
+    "before": {
+      "blob_sha1": "4aa913d97c432a5a2a5df71dfbf27bad8f440ebd",
+      "bytes": 5109,
+      "mode": "100644",
+      "sha256": "ab8d3b083fd47a02e0814f694e5b9122ff9cb1878d9a9f0ee4b3c75e44159cca"
+    },
+    "after": {
+      "mode": "100644",
+      "blob_sha1": "37e6ed945d51ef7828bffd939aaf6e92b54ba681",
+      "sha256": "2c699708adfe8cc60291893902fe702b316e7666c2cd2e8951468e259251990e",
+      "bytes": 17188
+    }
+  }
+}

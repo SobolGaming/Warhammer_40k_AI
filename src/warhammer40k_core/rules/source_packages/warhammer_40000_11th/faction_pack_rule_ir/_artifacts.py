@@ -358,6 +358,16 @@ _SOURCE_PACKAGE_DESCRIPTOR_BY_ID: Final = MappingProxyType(
                 wire_type=_PdfMultiDatasheetSourcePackageWire,
             )
         ),
+        "gw-11e-chaos-daemons-beasts-of-nurgle-datasheet-2026-07": _SourcePackageDescriptor(
+            artifact_schema="core-v2-chaos-daemons-beasts-of-nurgle-rule-ir-v1",
+            package_hash="0adce54e11577fc1a48b8757bef638cf1e24aaa36c043cf02b70f1af66d7ccef",
+            wire_type=_PdfSingleDatasheetSourcePackageWire,
+        ),
+        "gw-11e-death-guard-beasts-of-nurgle-datasheet-2026-07": _SourcePackageDescriptor(
+            artifact_schema="core-v2-death-guard-beasts-of-nurgle-rule-ir-v1",
+            package_hash="c1523740855c732461bd643938c53f7c24fa03fd2dc1284641edd2705780c65d",
+            wire_type=_ReviewedOfficialSnapshotSingleDatasheetWithoutOverlaySourcePackageWire,
+        ),
         "gw-11e-chaos-daemons-datasheet-ir-2026-27": _SourcePackageDescriptor(
             artifact_schema="core-v2-chaos-daemons-datasheet-rule-ir-v1",
             package_hash="b0a9d9c6e9d8bd96d578bb17751362b2a3cd9aff531940c59b35498668b72754",

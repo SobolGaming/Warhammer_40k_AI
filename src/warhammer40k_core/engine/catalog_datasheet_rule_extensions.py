@@ -20,6 +20,7 @@ CONDITIONAL_LEADING_CHARGE_AFTER_MOVEMENT_ACTION_TEMPLATE_ID = (
 )
 MOVEMENT_TARGET_PAIR_TEMPLATE_ID = "phase17n:movement-start-or-end-friendly-enemy-target-pair"
 COMMAND_RESTORATION_TEMPLATE_ID = "phase17n:command-phase-friendly-unit-restoration"
+PHASE_END_SELF_HEALING_TEMPLATE_ID = "phase17n:phase-end-self-healing"
 
 EXACT_EXTENDED_DATASHEET_TEMPLATE_IDS = frozenset(
     {
@@ -371,6 +372,33 @@ def command_restoration_descriptor_for_clause(
         required_keyword_sequence=("WRAITH CONSTRUCT",),
         heal_expression="D3",
         returned_models=1,
+    )
+
+
+def clause_is_phase_end_self_healing(clause: RuleClause) -> bool:
+    if (
+        not clause.is_supported
+        or clause.template_id != PHASE_END_SELF_HEALING_TEMPLATE_ID
+        or clause.trigger is None
+        or clause.trigger.kind is not RuleTriggerKind.TIMING_WINDOW
+        or parameter_payload(clause.trigger.parameters) != {"edge": "end", "phase": "any"}
+        or clause.target is None
+        or clause.target.kind is not RuleTargetKind.THIS_UNIT
+        or parameter_payload(clause.target.parameters) != {"scope": "own_models"}
+        or clause.duration is None
+        or clause.duration.kind is not RuleDurationKind.IMMEDIATE
+        or clause.duration.parameters
+        or len(clause.conditions) != 1
+        or len(clause.effects) != 1
+    ):
+        return False
+    condition = clause.conditions[0]
+    effect = clause.effects[0]
+    return (
+        condition.kind is RuleConditionKind.TARGET_CONSTRAINT
+        and parameter_payload(condition.parameters) == {"model_state": "living_and_wounded"}
+        and effect.kind is RuleEffectKind.RESTORE_LOST_WOUNDS
+        and parameter_payload(effect.parameters) == {"amount": "all", "target_scope": "that_model"}
     )
 
 

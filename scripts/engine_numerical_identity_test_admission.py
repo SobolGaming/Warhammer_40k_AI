@@ -638,6 +638,50 @@ def _pending_battle_shock_source_transition(
     return record["retained_runtime_fingerprint"], record["runtime_fingerprint"], sources, raw
 
 
+def _grotesque_regeneration_test_successor(
+    root: Path, *, previous_runtime: str, previous_transition: bytes
+) -> tuple[str, TestSuccessors, bytes] | None:
+    from scripts.build_test_shards import CUTOVER_PATH
+
+    name = "data/source_audits/ci64_provenance_v1/grotesque-regeneration-transition-v1.json"
+    path = root / name
+    _selection_no_links(root, path)
+    if not path.exists():
+        return None
+    raw = _checked_bytes(
+        root, name, "4e48442b32a20933c864a1f5e7c5d398233526c9d1d4a4aa720f0eb50af86581"
+    )
+    record = json.loads(raw, object_pairs_hook=_selection_object)
+    owner = "tests/rules/section02/test_02_02_04_healing.py"
+    cutover = json.loads(
+        _checked_bytes(root, CUTOVER_PATH, RETAINED_CUTOVER_SHA256),
+        object_pairs_hook=_selection_object,
+    )
+    if (
+        set(record)
+        != {
+            "schema",
+            "base",
+            "retained_transition_sha256",
+            "retained_runtime_fingerprint",
+            "runtime_fingerprint",
+            "sources",
+            "test",
+        }
+        or record["schema"] != "finite-grotesque-regeneration-transition-v1"
+        or record["base"] != "d9185cf53a2816ab666f3c1b16410b960a3d1cc7"
+        or record["retained_transition_sha256"] != hashlib.sha256(previous_transition).hexdigest()
+        or record["retained_runtime_fingerprint"] != previous_runtime
+        or set(record["test"]) != {"before", "after"}
+        or record["test"]["before"] != cutover["active_files"][owner]
+    ):
+        raise SystemExit("Grotesque Regeneration test transition differs.")
+    for source, digest in record["sources"].items():
+        _checked_bytes(root, source, digest)
+    tests = _selection_members({owner: record["test"]["after"]}, root)
+    return record["runtime_fingerprint"], tests, raw
+
+
 def exact_movement_test_transition(
     root: Path, retained_cutover_sha256: str
 ) -> TestTransition | None:
@@ -1219,6 +1263,13 @@ def exact_movement_test_transition(
         if screen is None or pending_battle_shock[0] != runtime:
             raise SystemExit("Pending Battle-shock requires the exact Screen movement predecessor.")
         runtime = pending_battle_shock[1]
+        regeneration = _grotesque_regeneration_test_successor(
+            root, previous_runtime=runtime, previous_transition=pending_battle_shock[3]
+        )
+    else:
+        regeneration = None
+    if regeneration is not None:
+        runtime = regeneration[0]
     retained = _identity_test_transition(
         root,
         retained_cutover_sha256,
@@ -1337,6 +1388,11 @@ def exact_movement_test_transition(
         raw += b"\0" + screen_raw
     if pending_battle_shock is not None:
         raw += b"\0" + pending_battle_shock[3]
+    if regeneration is not None:
+        if regeneration[1].keys() & (updated.keys() | added.keys() | additions.keys()):
+            raise SystemExit("Grotesque Regeneration test update overlaps a prior transition.")
+        updated.update(regeneration[1])
+        raw += b"\0" + regeneration[2]
     return updated, {**added, **additions}, retained_raw + b"\0" + raw
 
 

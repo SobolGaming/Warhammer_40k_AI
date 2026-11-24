@@ -30,7 +30,9 @@ from warhammer40k_core.engine.catalog_datasheet_rule_descriptors import (
     random_movement_attack_boost_descriptor_for_clause,
 )
 from warhammer40k_core.engine.catalog_datasheet_rule_extensions import (
+    PHASE_END_SELF_HEALING_TEMPLATE_ID,
     charge_after_movement_actions_descriptor_for_clause,
+    clause_is_phase_end_self_healing,
     clause_uses_exact_extended_datasheet_template,
     command_restoration_descriptor_for_clause,
     conditional_leading_charge_after_movement_action_descriptor_for_clause,
@@ -144,6 +146,7 @@ CATALOG_IR_CONDITIONAL_NOT_LEADING_FIGHTS_FIRST_CONSUMER_ID = (
 )
 CATALOG_IR_MOVEMENT_TARGET_PAIR_CONSUMER_ID = "catalog-ir:movement-friendly-enemy-target-pair"
 CATALOG_IR_COMMAND_RESTORATION_CONSUMER_ID = "catalog-ir:command-restoration"
+CATALOG_IR_PHASE_END_SELF_HEALING_CONSUMER_ID = "catalog-ir:phase-end-self-healing"
 CATALOG_IR_CLAUSE_WIDE_COMPOUND_CONSUMER_IDS = (
     CATALOG_IR_COMMAND_RESTORATION_CONSUMER_ID,
     CATALOG_IR_FIXED_ADVANCE_CONSUMER_ID,
@@ -192,6 +195,10 @@ def clause_has_invalid_exact_datasheet_runtime_shape(clause: RuleClause) -> bool
         or (
             clause_uses_exact_extended_datasheet_template(clause)
             and extended_datasheet_descriptor_for_clause(clause) is None
+        )
+        or (
+            clause.template_id == PHASE_END_SELF_HEALING_TEMPLATE_ID
+            and not clause_is_phase_end_self_healing(clause)
         )
         or clause_has_invalid_exact_tracked_target_weapon_grant_shape(clause)
         or clause_has_invalid_exact_tracked_target_selection_shape(clause)
@@ -281,6 +288,8 @@ def consumer_ids_for_clause(clause: RuleClause) -> tuple[str, ...]:
         consumer_ids.add(CATALOG_IR_CHARGE_AFTER_MOVEMENT_ACTION_CONSUMER_ID)
     if movement_target_pair_descriptor_for_clause(clause) is not None:
         consumer_ids.add(CATALOG_IR_MOVEMENT_TARGET_PAIR_CONSUMER_ID)
+    if clause_is_phase_end_self_healing(clause):
+        consumer_ids.add(CATALOG_IR_PHASE_END_SELF_HEALING_CONSUMER_ID)
     if command_restoration_descriptor_for_clause(clause) is not None:
         consumer_ids.add(CATALOG_IR_COMMAND_RESTORATION_CONSUMER_ID)
     if charge_after_movement_actions_descriptor_for_clause(clause) is not None:
@@ -383,6 +392,7 @@ def registered_consumer_ids() -> tuple[str, ...]:
                 CATALOG_IR_CHARGE_AFTER_MOVEMENT_ACTION_CONSUMER_ID,
                 CATALOG_IR_MOVEMENT_TARGET_PAIR_CONSUMER_ID,
                 CATALOG_IR_COMMAND_RESTORATION_CONSUMER_ID,
+                CATALOG_IR_PHASE_END_SELF_HEALING_CONSUMER_ID,
                 CATALOG_IR_CONDITIONAL_NOT_LEADING_FIGHTS_FIRST_CONSUMER_ID,
                 CATALOG_IR_COMMAND_END_STICKY_OBJECTIVE_CONSUMER_ID,
                 CATALOG_IR_MODEL_MATERIALIZATION_CONSUMER_ID,
