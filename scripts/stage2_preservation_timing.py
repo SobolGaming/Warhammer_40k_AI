@@ -27,6 +27,7 @@ CHARGE = "select_charging_unit"
 PROPOSAL = "submit_movement_proposal"
 OPTIONAL = "submit_stratagem_target_proposal"
 SHOOTING = "submit_shooting_declaration"
+REFERENCE_SHOOTING_POLICY_ID = "ordinary-normal-shooting-focus-v1"
 ANCHOR = "9cad766fcb5e277137e78267f986cf03ede57da3e33adce8fbb9f49f9b54b8e0"
 SEED = "0fda2ab092cec5bf66a11a4d130e40b9b0de3c246a93df5e3ebded4d284ca0e3"
 
@@ -120,6 +121,18 @@ def reference_bearers(context):
         for weapon in offer["available_weapons"]
         if (weapon["weapon_instance_id"], weapon["weapon_profile_id"]) in legal
     ]
+
+
+def verify_shooting_reference(candidate, reference):
+    """Verify the frozen declaration and its ID in the registered policy format."""
+    actual = orjson.loads(candidate.action.proposal_json)
+    need(
+        actual["declarations"] == reference,
+        "Generated E volley differs from the independent reference.",
+    )
+    reference_id = payload_digest([REFERENCE_SHOOTING_POLICY_ID, E, reference])
+    need(candidate.candidate_id == reference_id, "Generated E candidate ID differs from reference.")
+    return reference_id
 
 
 B = "army-beta:scout-redeploy-unit"
@@ -711,19 +724,16 @@ class Experiment:
             ]
             need(len(chosen) == 1, "Generated E action misses independent reference.")
             candidate = chosen[0]
-            actual = orjson.loads(candidate.action.proposal_json)
-            need(
-                actual["declarations"] == reference,
-                "Generated E volley differs from the independent reference.",
-            )
+            reference_id = verify_shooting_reference(candidate, reference)
             self.commit_action(
                 session,
                 candidate.action,
                 "timing:e:shoot" if shoot else "timing:e:omit",
             )
             self.result["coverage"][self.stage + ":E-shooting"] = {
-                "reference_id": payload_digest(reference),
+                "reference_id": reference_id,
                 "candidate_id": candidate.candidate_id,
+                "reference_declaration_digest": payload_digest(reference),
                 "native_accepted": True,
                 "weapons": len(reference),
             }
@@ -836,9 +846,13 @@ class Experiment:
                 expected.add(f"{prefix}-omit:E-shooting")
         accepted = {key for key, row in coverage.items() if row.get("native_accepted")}
         unavailable = {key for key, row in coverage.items() if row.get("availability")}
+        matched = accepted & expected
         self.result["core_coverage"] = {
             "declared_reference_steps": len(expected),
-            "native_accepted_generated_matches": len(accepted & expected),
+            "native_accepted_generated_matches": len(matched),
+            "distinct_accepted_reference_contents": len(
+                {coverage[key]["reference_id"] for key in matched}
+            ),
             "native_unissued": sorted(unavailable & expected),
             "unresolved_reference_steps": sorted(expected - accepted - unavailable),
         }

@@ -6,11 +6,11 @@
   "changes": {
     "docs/AI_IMPLEMENTATION_PLAN.md": {
       "before_sha256": "3c874cdf08e2c21db30ce9c4b3554b64829df8760e602f36ee9cb990577d2d6c",
-      "after_sha256": "541e540f2f70e51c0af4a4fabb9e47da9a6b262b68071bbecb52917a903c4a5c",
+      "after_sha256": "21e66a9d3d6ab57b55723900e8886406fdf71d52abd6a6f1f002324b693392e4",
       "owners": {
         "@document": {
           "before": "3c874cdf08e2c21db30ce9c4b3554b64829df8760e602f36ee9cb990577d2d6c",
-          "after": "541e540f2f70e51c0af4a4fabb9e47da9a6b262b68071bbecb52917a903c4a5c"
+          "after": "21e66a9d3d6ab57b55723900e8886406fdf71d52abd6a6f1f002324b693392e4"
         }
       }
     },
@@ -26,11 +26,11 @@
     },
     "scripts/stage2_preservation_timing.py": {
       "before_sha256": null,
-      "after_sha256": "0398d94c4919f33d1f500cd03c6b2b6cf83dc91a32bab94245ff83bdec86c434",
+      "after_sha256": "80de96b1091916f371b0c3997a527888e1015926137990ca6c7ccfea521a2aef",
       "owners": {
         "@module": {
           "before": null,
-          "after": "a3d09c97f216d8a888d384a583dcb8287ba5c798c3539bbd83ab9d87da7bab74"
+          "after": "f6ce3cace4935d4c7b7a9c98491d01075998f8e5790ccd99dd28a9ae7dfae9b0"
         },
         "Blocker": {
           "before": null,
@@ -78,7 +78,7 @@
         },
         "Experiment.e_shoot": {
           "before": null,
-          "after": "1c1d469fa6d25a584e33e03b204cd4d5101869ce8c13ea180fb44cba05c07f2e"
+          "after": "b4f77eeab1772b120857d019542887cd9e9040af70e90a9a9aa5dd4aaa2a2c33"
         },
         "Experiment.execute": {
           "before": null,
@@ -118,7 +118,7 @@
         },
         "Experiment.report_core_coverage": {
           "before": null,
-          "after": "3af6620f96630ca25df1a184416e0eb2904829b9bc41ed45e2e59cdafa743a8b"
+          "after": "520a78bc8dabd57eabe2934b2539ef58d9ed00acc245168c0979793bddba495b"
         },
         "Experiment.response": {
           "before": null,
@@ -211,6 +211,10 @@
         "verified_input": {
           "before": null,
           "after": "a9437c849fb05d84d3c375a08d52d229edd715c2f7617e74f7a00537c59d7d75"
+        },
+        "verify_shooting_reference": {
+          "before": null,
+          "after": "9c2aefb2d53b951d1a1ec8760e71afdc6612608a9cc1677f9d894265979cfff2"
         },
         "views": {
           "before": null,

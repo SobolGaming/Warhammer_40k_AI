@@ -1006,10 +1006,16 @@ three eligible carbines against B or submits the empty declaration from the same
 offer. Engaged S uses the archived Desperate Escape path to open E's shot in
 the charged Spend history. Unengaged S remains stationary. S's A3 choices,
 S's Spend path, the four E movement witnesses and the four pairs of E
-declarations form 15 core reference steps. The reproducer compares actor-bound
-candidate and reference IDs and records native acceptance, missing choices and
-unissued windows. The separately published +0.75-inch board produced zero
-acceptances in eight native Retreat probes and remains outside this denominator.
+declarations account for 15 core branch occurrences. All 15 matched and were
+accepted. The six distinct reference contents cover S's Hold and Normal Move
+selections, the S Spend witness, the shared E movement witness, and E's focused
+volley and empty declaration. The reproducer independently derives each
+expected shooting candidate ID from the frozen policy ID, E's unit ID and the
+reference declaration rows. It checks the rows and ID against the generated
+candidate and records a separate declaration digest. It also records native
+acceptance, missing choices and unissued windows. The separately published
++0.75-inch board accepted zero of eight native Retreat probes and remains
+outside this denominator.
 
 | S choice | B3 response | A / B VP after E omit or shoot | S models / wounds | B wounds, omit / shoot |
 |---|---|---:|---:|---:|
