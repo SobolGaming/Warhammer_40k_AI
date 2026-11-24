@@ -682,6 +682,83 @@ def _grotesque_regeneration_test_successor(
     return record["runtime_fingerprint"], tests, raw
 
 
+BLOOD_BEGETS_SKULLS_TRANSITION = (
+    "data/source_audits/ci64_provenance_v1/blood-begets-skulls-transition-v1.json"
+)
+BLOOD_BEGETS_SKULLS_TRANSITION_SHA256 = (
+    "60b75729404329a6d013b8b3cdd9e08527294ea2da50cfad43549473cf08dccf"
+)
+BLOOD_BEGETS_SKULLS_OWNER = "tests/factions/chaos_daemons/integration/test_blood_begets_skulls.py"
+
+
+def _blood_begets_skulls_test_successor(
+    root: Path,
+    *,
+    previous_runtime: str,
+    previous_transition: bytes,
+    previous_sources: dict[str, str],
+    previous_classification: object,
+    brass_additions: TestSuccessors,
+) -> tuple[str, TestSuccessors, TestSuccessors, bytes]:
+    raw = _checked_bytes(
+        root, BLOOD_BEGETS_SKULLS_TRANSITION, BLOOD_BEGETS_SKULLS_TRANSITION_SHA256
+    )
+    record = json.loads(raw, object_pairs_hook=_selection_object)
+    classification_owner = (
+        "tests/infrastructure/source_governance/unit/test_blocked_row_classification.py"
+    )
+    if (
+        record.keys()
+        != {
+            "schema",
+            "base",
+            "retained_transition_sha256",
+            "retained_runtime_fingerprint",
+            "runtime_fingerprint",
+            "replaced_sources",
+            "new_sources",
+            "added_files",
+            "updated_files",
+        }
+        or record["schema"] != "finite-blood-begets-skulls-transition-v1"
+        or record["base"] != "c63a300c28fa772f59c75b66d50038e5e6241cd5"
+        or record["retained_transition_sha256"] != hashlib.sha256(previous_transition).hexdigest()
+        or record["retained_runtime_fingerprint"] != previous_runtime
+        or record["added_files"].keys() != {BLOOD_BEGETS_SKULLS_OWNER}
+        or record["updated_files"].keys() != {classification_owner}
+        or record["updated_files"][classification_owner].keys() != {"before", "after"}
+        or record["updated_files"][classification_owner]["before"] != previous_classification
+    ):
+        raise SystemExit("Blood Begets Skulls test transition differs.")
+    replaced = record["replaced_sources"]
+    if (
+        not replaced.keys() <= previous_sources.keys()
+        or record["new_sources"].keys() & previous_sources.keys()
+    ):
+        raise SystemExit("Blood Begets Skulls source successor inventory differs.")
+    for source, digest in previous_sources.items():
+        if source in replaced:
+            binding = replaced[source]
+            if binding.keys() != {"before", "after"} or binding["before"] != digest:
+                raise SystemExit("Blood Begets Skulls source predecessor differs: " + source)
+            digest = binding["after"]
+        _checked_bytes(root, source, digest)
+    for source, digest in record["new_sources"].items():
+        _checked_bytes(root, source, digest)
+    added = _selection_members(record["added_files"], root)
+    if added.keys() & brass_additions.keys():
+        raise SystemExit("Blood Begets Skulls duplicates a Sheathed in Brass test owner.")
+    updated = _selection_members(
+        {classification_owner: record["updated_files"][classification_owner]["after"]}, root
+    )
+    return (
+        record["runtime_fingerprint"],
+        updated,
+        {**brass_additions, **added},
+        previous_transition + b"\0" + raw,
+    )
+
+
 def _sheathed_in_brass_test_addition(
     root: Path, *, previous_runtime: str, previous_transition: bytes
 ) -> tuple[str, TestSuccessors, TestSuccessors, bytes] | None:
@@ -726,6 +803,17 @@ def _sheathed_in_brass_test_addition(
         != cutover["active_files"][classification_owner]
     ):
         raise SystemExit("Sheathed in Brass test transition differs.")
+    successor_path = root / BLOOD_BEGETS_SKULLS_TRANSITION
+    _selection_no_links(root, successor_path)
+    if successor_path.exists():
+        return _blood_begets_skulls_test_successor(
+            root,
+            previous_runtime=record["runtime_fingerprint"],
+            previous_transition=raw,
+            previous_sources=record["sources"],
+            previous_classification=record["updated_files"][classification_owner]["after"],
+            brass_additions=_selection_members(record["added_files"], root),
+        )
     for source, digest in record["sources"].items():
         _checked_bytes(root, source, digest)
     updated = _selection_members(

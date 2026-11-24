@@ -6,6 +6,9 @@ if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
 
 # pyright: reportPrivateUsage=false
+from warhammer40k_core.engine.charge_preselection_stratagems import (
+    request_charge_preselection_stratagem,
+)
 from warhammer40k_core.engine.charge_roll_flow import continue_charge_roll
 from warhammer40k_core.engine.charge_target_continuation import continue_charge_move
 from warhammer40k_core.engine.charge_targets import (
@@ -56,6 +59,14 @@ def begin_phase(
         return _charge._complete_charge_phase_or_request_heroic_intervention(
             handler=self, state=state, decisions=decisions, reaction_queue=reaction_queue
         )
+    stratagem_status = request_charge_preselection_stratagem(
+        state=state,
+        decisions=decisions,
+        stratagem_index=self.stratagem_index,
+        cost_modifiers=self.stratagem_cost_modifier_registry,
+    )
+    if stratagem_status is not None:
+        return stratagem_status
     legal_unit_ids = _charge._legal_charging_unit_ids(
         state=state,
         charge_state=charge_state,

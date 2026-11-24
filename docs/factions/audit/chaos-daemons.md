@@ -32,7 +32,7 @@ Open gates: F03 rule semantics, force-disposition eligibility, DP validation, be
 | Stratagem | Wrath Undeniable | 1 CP | Source | source_only | Implement exact timing, eligibility, choice and effect through F03 |
 | Stratagem | Gore-hungry Onslaught | 1 CP | Source | source_only | Implement exact timing, eligibility, choice and effect through F03 |
 | Stratagem | Skulls Beget Blood | 1 CP | Source | source_only | Implement exact timing, eligibility, choice and effect through F03 |
-| Stratagem | Blood Begets Skulls | 1 CP | Source | source_only | Implement exact timing, eligibility, choice and effect through F03 |
+| Stratagem | Blood Begets Skulls | 1 CP | Source | source_only | Current generic RuleIR grants one eligible unselected unit permission to charge after Advancing until phase end. |
 | Stratagem | Fool’s Flight | 2 CP | Source | source_only | Implement exact timing, eligibility, choice and effect through F03 |
 | Stratagem | Sheathed In Brass | 1 CP | Source | source_only | Current generic RuleIR applies the phase-long 3+ armour Save to one eligible unit selected as a target. |
 

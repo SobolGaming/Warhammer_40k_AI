@@ -1,528 +1,540 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "d137b5cc0c7557c8b6653a1aa36ee47260242945",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:081b7dba5fd5f7e987a1a870dcece79a128507ddb62bd583f6971a3d9d9d7052",
-  "operation_map_sha256": "372f176743395b2567ff186ae6b5c6985207a7cb2079e7f32c817f58d7e28d32",
+  "base": "c63a300c28fa772f59c75b66d50038e5e6241cd5",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0f9bc14dd7b611704595a5c72599170c33b31c6b83c535b9135b5a745321f77c",
+  "operation_map_sha256": "5a2b9530f62d006d0065c4b9c77878cec77711924736ff84c4f036a98ddd09b5",
   "changes": {
     "FACTION_INTEGRATION.md": {
-      "before_sha256": "e6f4bea3922126dc1443915f2d404e80b307159b17c08a1f15c0dda496bbf510",
-      "after_sha256": "376bc20056232b480ef55675574ee79b530dec2878354ed4e823d75b7afbbc2c",
+      "before_sha256": "376bc20056232b480ef55675574ee79b530dec2878354ed4e823d75b7afbbc2c",
+      "after_sha256": "c1e5dc2af9496419f91057f3c983bc49a2512ea4059a19246d7633f3ff33f1e1",
       "owners": {
         "@document": {
-          "before": "e6f4bea3922126dc1443915f2d404e80b307159b17c08a1f15c0dda496bbf510",
-          "after": "376bc20056232b480ef55675574ee79b530dec2878354ed4e823d75b7afbbc2c"
+          "before": "376bc20056232b480ef55675574ee79b530dec2878354ed4e823d75b7afbbc2c",
+          "after": "c1e5dc2af9496419f91057f3c983bc49a2512ea4059a19246d7633f3ff33f1e1"
         }
       }
     },
     "ci/test_shards/durations.json": {
-      "before_sha256": "1c3803c11c20c30840fffa22ecaae47826475d8a9baf7a9706703e7aeec0cbcd",
-      "after_sha256": "7534394b2fe30ea17afa0d4ea423c334fcbcf45f32c7cbb5cac0d3c26ac80820",
+      "before_sha256": "7534394b2fe30ea17afa0d4ea423c334fcbcf45f32c7cbb5cac0d3c26ac80820",
+      "after_sha256": "a91648e5cbda4e21748e6a4b6cd6ebc61fa16913baa40d505990f09216192b4d",
       "owners": {
         "@document": {
-          "before": "1c3803c11c20c30840fffa22ecaae47826475d8a9baf7a9706703e7aeec0cbcd",
-          "after": "7534394b2fe30ea17afa0d4ea423c334fcbcf45f32c7cbb5cac0d3c26ac80820"
+          "before": "7534394b2fe30ea17afa0d4ea423c334fcbcf45f32c7cbb5cac0d3c26ac80820",
+          "after": "a91648e5cbda4e21748e6a4b6cd6ebc61fa16913baa40d505990f09216192b4d"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
-      "before_sha256": "762ce4622e90d203d405edf66e7efb7b459276f84b3607401119f8508f744dba",
-      "after_sha256": "002063d8a34f0b6717ea7ac22a799ef969163dcf9d75ed058948afcb87b99423",
+      "before_sha256": "002063d8a34f0b6717ea7ac22a799ef969163dcf9d75ed058948afcb87b99423",
+      "after_sha256": "c5d14f312226b7dda6e8c6169b2571b3444a9b1268b36e9cfc259e8db462b567",
       "owners": {
         "@document": {
-          "before": "762ce4622e90d203d405edf66e7efb7b459276f84b3607401119f8508f744dba",
-          "after": "002063d8a34f0b6717ea7ac22a799ef969163dcf9d75ed058948afcb87b99423"
+          "before": "002063d8a34f0b6717ea7ac22a799ef969163dcf9d75ed058948afcb87b99423",
+          "after": "c5d14f312226b7dda6e8c6169b2571b3444a9b1268b36e9cfc259e8db462b567"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
-      "before_sha256": "90944a81469ae49c211915798f66d97e9aff15fea64a7c1ad303dbdeaa42c071",
-      "after_sha256": "a72f12617332d3a6f0f003c0a861e0b603dc33901fc455429c0017817ca2a4d4",
+      "before_sha256": "a72f12617332d3a6f0f003c0a861e0b603dc33901fc455429c0017817ca2a4d4",
+      "after_sha256": "28f952913d1be65c7bcc2a5457cf795e2a86ad49160f67ccb9cb259dde5b9a80",
       "owners": {
         "@document": {
-          "before": "90944a81469ae49c211915798f66d97e9aff15fea64a7c1ad303dbdeaa42c071",
-          "after": "a72f12617332d3a6f0f003c0a861e0b603dc33901fc455429c0017817ca2a4d4"
+          "before": "a72f12617332d3a6f0f003c0a861e0b603dc33901fc455429c0017817ca2a4d4",
+          "after": "28f952913d1be65c7bcc2a5457cf795e2a86ad49160f67ccb9cb259dde5b9a80"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
-      "before_sha256": "584411d86e4a0934c58fd98cdcd8188d6489a568ae6b6cfcaf8046804df6a618",
-      "after_sha256": "e37128ca9deb7236bdb7131b912cf660463e968b68a313f7f52d7f87331962f4",
+      "before_sha256": "e37128ca9deb7236bdb7131b912cf660463e968b68a313f7f52d7f87331962f4",
+      "after_sha256": "c68763c54a6746ecaf5c502278241f49f48a62444a888784a82e51ffb95c0df8",
       "owners": {
         "@document": {
-          "before": "584411d86e4a0934c58fd98cdcd8188d6489a568ae6b6cfcaf8046804df6a618",
-          "after": "e37128ca9deb7236bdb7131b912cf660463e968b68a313f7f52d7f87331962f4"
+          "before": "e37128ca9deb7236bdb7131b912cf660463e968b68a313f7f52d7f87331962f4",
+          "after": "c68763c54a6746ecaf5c502278241f49f48a62444a888784a82e51ffb95c0df8"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
-      "before_sha256": "daccd424046b5d7cedec7ece9b3950a822d15b637f2446b74637dfdd2e5e195e",
-      "after_sha256": "96bf35507382c91b918baef9040ae0b736f1a2b8f855e7e79d4ec9316f22a5e9",
+      "before_sha256": "96bf35507382c91b918baef9040ae0b736f1a2b8f855e7e79d4ec9316f22a5e9",
+      "after_sha256": "c8a09b39cd52eaa9f40115ff3591fe12c2c120d9824143c1a5c47b58b382f51a",
       "owners": {
         "@document": {
-          "before": "daccd424046b5d7cedec7ece9b3950a822d15b637f2446b74637dfdd2e5e195e",
-          "after": "96bf35507382c91b918baef9040ae0b736f1a2b8f855e7e79d4ec9316f22a5e9"
+          "before": "96bf35507382c91b918baef9040ae0b736f1a2b8f855e7e79d4ec9316f22a5e9",
+          "after": "c8a09b39cd52eaa9f40115ff3591fe12c2c120d9824143c1a5c47b58b382f51a"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
-      "before_sha256": "f64f2ec1e9871560a99f2319d1d4932d7bbc88ed5f2c0a8baae0ae33de3fd616",
-      "after_sha256": "259b0ce1c3b1d5269bef345e6003cb2379fdfc9ad6e9c90eebf9dbdf663d45a3",
+      "before_sha256": "259b0ce1c3b1d5269bef345e6003cb2379fdfc9ad6e9c90eebf9dbdf663d45a3",
+      "after_sha256": "7531fc331fdc0eb1c324856adbb85743640a530812d1069345f0517684eaf42b",
       "owners": {
         "@document": {
-          "before": "f64f2ec1e9871560a99f2319d1d4932d7bbc88ed5f2c0a8baae0ae33de3fd616",
-          "after": "259b0ce1c3b1d5269bef345e6003cb2379fdfc9ad6e9c90eebf9dbdf663d45a3"
+          "before": "259b0ce1c3b1d5269bef345e6003cb2379fdfc9ad6e9c90eebf9dbdf663d45a3",
+          "after": "7531fc331fdc0eb1c324856adbb85743640a530812d1069345f0517684eaf42b"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
-      "before_sha256": "b399dc187b235771790c03f5422c6d8a4afe8ee42b390b0d2b1536f6fb1ffad0",
-      "after_sha256": "bafaeff7cf219f23c90b071cc0df9149117ae34a5b9238d924aea69ca3223d6e",
+      "before_sha256": "bafaeff7cf219f23c90b071cc0df9149117ae34a5b9238d924aea69ca3223d6e",
+      "after_sha256": "46399ffacddd4a55d67fb92340d28d0a1a382bb1d1690f88e08af657b88eb2b7",
       "owners": {
         "@document": {
-          "before": "b399dc187b235771790c03f5422c6d8a4afe8ee42b390b0d2b1536f6fb1ffad0",
-          "after": "bafaeff7cf219f23c90b071cc0df9149117ae34a5b9238d924aea69ca3223d6e"
+          "before": "bafaeff7cf219f23c90b071cc0df9149117ae34a5b9238d924aea69ca3223d6e",
+          "after": "46399ffacddd4a55d67fb92340d28d0a1a382bb1d1690f88e08af657b88eb2b7"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
-      "before_sha256": "b27bc2a259150fa891fcb9757b66e97429232dfd21ef66b285db12f196c0f78a",
-      "after_sha256": "7bebdf9d2cbef35338538c19eaf6c15b665295b4a85a9b8face8ee9bf34c896e",
+      "before_sha256": "7bebdf9d2cbef35338538c19eaf6c15b665295b4a85a9b8face8ee9bf34c896e",
+      "after_sha256": "ea806070089351aee7dac49a80c093d51912e1c8144e3ec86d82bbcdad487980",
       "owners": {
         "@document": {
-          "before": "b27bc2a259150fa891fcb9757b66e97429232dfd21ef66b285db12f196c0f78a",
-          "after": "7bebdf9d2cbef35338538c19eaf6c15b665295b4a85a9b8face8ee9bf34c896e"
+          "before": "7bebdf9d2cbef35338538c19eaf6c15b665295b4a85a9b8face8ee9bf34c896e",
+          "after": "ea806070089351aee7dac49a80c093d51912e1c8144e3ec86d82bbcdad487980"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
-      "before_sha256": "8bc3e9b05f12042612c3ef3f0a26ad0a319882919b849c88a8ddca75a4c32f01",
-      "after_sha256": "fad0a705f8f532b582b78f21870f06c1519b40ee4854d0d4bedbc3b2b1f5b886",
+      "before_sha256": "fad0a705f8f532b582b78f21870f06c1519b40ee4854d0d4bedbc3b2b1f5b886",
+      "after_sha256": "c65f18f94752568680acdb8e3a1509112a9d5dc2e059f6d75a287fb5f84a15a1",
       "owners": {
         "@document": {
-          "before": "8bc3e9b05f12042612c3ef3f0a26ad0a319882919b849c88a8ddca75a4c32f01",
-          "after": "fad0a705f8f532b582b78f21870f06c1519b40ee4854d0d4bedbc3b2b1f5b886"
+          "before": "fad0a705f8f532b582b78f21870f06c1519b40ee4854d0d4bedbc3b2b1f5b886",
+          "after": "c65f18f94752568680acdb8e3a1509112a9d5dc2e059f6d75a287fb5f84a15a1"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
-      "before_sha256": "cdff62407f243b8cf7fd9e3f1ba575719cb5065d3ff3bca8af4e247d44491c8c",
-      "after_sha256": "2ab517d0471f56b519b1e1bf90acf70a4a8bbddb71867f1e52b21f25dfb8b9ef",
+      "before_sha256": "2ab517d0471f56b519b1e1bf90acf70a4a8bbddb71867f1e52b21f25dfb8b9ef",
+      "after_sha256": "0453ced44765687768decd470d1cee3db8a9e5045af3ddede0c3665a395b8460",
       "owners": {
         "@document": {
-          "before": "cdff62407f243b8cf7fd9e3f1ba575719cb5065d3ff3bca8af4e247d44491c8c",
-          "after": "2ab517d0471f56b519b1e1bf90acf70a4a8bbddb71867f1e52b21f25dfb8b9ef"
+          "before": "2ab517d0471f56b519b1e1bf90acf70a4a8bbddb71867f1e52b21f25dfb8b9ef",
+          "after": "0453ced44765687768decd470d1cee3db8a9e5045af3ddede0c3665a395b8460"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
-      "before_sha256": "82b9b11a6d8567fe213c834f998aa7fe9e8ffe0e809de96680524de23858e0b7",
-      "after_sha256": "655dcea9c311896bcc77f2dc555cdb392c26bf352afccca3571f37ffb5efa76b",
+      "before_sha256": "655dcea9c311896bcc77f2dc555cdb392c26bf352afccca3571f37ffb5efa76b",
+      "after_sha256": "e0c534eefbbe4dd969df6f43bbae5cf9af8b247a53f4da9da84ec5991bacba3e",
       "owners": {
         "@document": {
-          "before": "82b9b11a6d8567fe213c834f998aa7fe9e8ffe0e809de96680524de23858e0b7",
-          "after": "655dcea9c311896bcc77f2dc555cdb392c26bf352afccca3571f37ffb5efa76b"
+          "before": "655dcea9c311896bcc77f2dc555cdb392c26bf352afccca3571f37ffb5efa76b",
+          "after": "e0c534eefbbe4dd969df6f43bbae5cf9af8b247a53f4da9da84ec5991bacba3e"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "1574bb1b479b631c17271ebac7224bb33493cc2194a05242ec907b913867da56",
-      "after_sha256": "299e2432d6fe060508c9761c29019cd3ec07785806e4167f5240bc79f8483310",
+      "before_sha256": "299e2432d6fe060508c9761c29019cd3ec07785806e4167f5240bc79f8483310",
+      "after_sha256": "e5f0d3e36fb6b01f476a98a81b89a71ea9e5e653e0f8e9f841d3bedc7250df0e",
       "owners": {
         "@document": {
-          "before": "1574bb1b479b631c17271ebac7224bb33493cc2194a05242ec907b913867da56",
-          "after": "299e2432d6fe060508c9761c29019cd3ec07785806e4167f5240bc79f8483310"
+          "before": "299e2432d6fe060508c9761c29019cd3ec07785806e4167f5240bc79f8483310",
+          "after": "e5f0d3e36fb6b01f476a98a81b89a71ea9e5e653e0f8e9f841d3bedc7250df0e"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "692af51c87fb5350b01bf93535d06960d635195368a003026dfbd019098d0be2",
-      "after_sha256": "b65dd5c551298f202e4b1989d0d4c3f22385bb1a98b41e70809ef754bfd4eb7e",
+      "before_sha256": "b65dd5c551298f202e4b1989d0d4c3f22385bb1a98b41e70809ef754bfd4eb7e",
+      "after_sha256": "38e1fc670dcfd0aa9561a922094bd4686eb3786be365498b882a0f30ebb3389d",
       "owners": {
         "@document": {
-          "before": "692af51c87fb5350b01bf93535d06960d635195368a003026dfbd019098d0be2",
-          "after": "b65dd5c551298f202e4b1989d0d4c3f22385bb1a98b41e70809ef754bfd4eb7e"
+          "before": "b65dd5c551298f202e4b1989d0d4c3f22385bb1a98b41e70809ef754bfd4eb7e",
+          "after": "38e1fc670dcfd0aa9561a922094bd4686eb3786be365498b882a0f30ebb3389d"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "f07544a360acc488307e474b128c3759e0be7c337f63def6731c11e11f6d85c8",
-      "after_sha256": "e8e657431b1a0e8c5ccf0e8b9d2affd9b3964693eba6354c934fd19cc4d34a57",
+      "before_sha256": "e8e657431b1a0e8c5ccf0e8b9d2affd9b3964693eba6354c934fd19cc4d34a57",
+      "after_sha256": "21b82e68e1d6204b39c174ed8c723ecd01d97df2f4d6274d36a73cb51efa34fc",
       "owners": {
         "@document": {
-          "before": "f07544a360acc488307e474b128c3759e0be7c337f63def6731c11e11f6d85c8",
-          "after": "e8e657431b1a0e8c5ccf0e8b9d2affd9b3964693eba6354c934fd19cc4d34a57"
+          "before": "e8e657431b1a0e8c5ccf0e8b9d2affd9b3964693eba6354c934fd19cc4d34a57",
+          "after": "21b82e68e1d6204b39c174ed8c723ecd01d97df2f4d6274d36a73cb51efa34fc"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "8c4be5ce5b8ee9252bb0054642c8f02e7f1821dc87fae5f30fdd757a1957e006",
-      "after_sha256": "0565c3029fc0c929348fd8cecf2f1b7d353e3599a2851458c1cb719d42783407",
+      "before_sha256": "0565c3029fc0c929348fd8cecf2f1b7d353e3599a2851458c1cb719d42783407",
+      "after_sha256": "acf9b1d0358aaa91b43bd4da82b66d9495391916f0c1f63f77914ad999f49c60",
       "owners": {
         "@document": {
-          "before": "8c4be5ce5b8ee9252bb0054642c8f02e7f1821dc87fae5f30fdd757a1957e006",
-          "after": "0565c3029fc0c929348fd8cecf2f1b7d353e3599a2851458c1cb719d42783407"
+          "before": "0565c3029fc0c929348fd8cecf2f1b7d353e3599a2851458c1cb719d42783407",
+          "after": "acf9b1d0358aaa91b43bd4da82b66d9495391916f0c1f63f77914ad999f49c60"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "773c790f9e45faa8cd43d0ebeffc2a16d8eed04fdbbd45c5e0ec12a9bd16a5b4",
-      "after_sha256": "2a4ae3d295f0a6b7067f4e1bdd17387e9417203ff719f63e427941afa2b9bdc3",
+      "before_sha256": "2a4ae3d295f0a6b7067f4e1bdd17387e9417203ff719f63e427941afa2b9bdc3",
+      "after_sha256": "db94dc7ae9b4bcb714a385885d4edbd23f77f762fee3c02f4b5bbcdda5e022e7",
       "owners": {
         "@document": {
-          "before": "773c790f9e45faa8cd43d0ebeffc2a16d8eed04fdbbd45c5e0ec12a9bd16a5b4",
-          "after": "2a4ae3d295f0a6b7067f4e1bdd17387e9417203ff719f63e427941afa2b9bdc3"
+          "before": "2a4ae3d295f0a6b7067f4e1bdd17387e9417203ff719f63e427941afa2b9bdc3",
+          "after": "db94dc7ae9b4bcb714a385885d4edbd23f77f762fee3c02f4b5bbcdda5e022e7"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "91e72b5b360e604dd80d89890e6eaed915cbf3f3f663518d71e7d41de2411e8f",
-      "after_sha256": "2569b36f6720d6c5b77559870f580548510b16794c1d5d9fe4ced43305e5dbd1",
+      "before_sha256": "2569b36f6720d6c5b77559870f580548510b16794c1d5d9fe4ced43305e5dbd1",
+      "after_sha256": "63d3537eb0bd848e9fa4a579deae7848468523ae0a664d51e43c382d042d8b66",
       "owners": {
         "@document": {
-          "before": "91e72b5b360e604dd80d89890e6eaed915cbf3f3f663518d71e7d41de2411e8f",
-          "after": "2569b36f6720d6c5b77559870f580548510b16794c1d5d9fe4ced43305e5dbd1"
+          "before": "2569b36f6720d6c5b77559870f580548510b16794c1d5d9fe4ced43305e5dbd1",
+          "after": "63d3537eb0bd848e9fa4a579deae7848468523ae0a664d51e43c382d042d8b66"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "e27c52ec4301ca96bdbc32de066ed56681b035871da546a3dcf96503149d6e4a",
-      "after_sha256": "6170e84842b6ad9b026f29e62f77b9be89e21f3af0fa8d01a067c11a45ecdfa5",
+      "before_sha256": "6170e84842b6ad9b026f29e62f77b9be89e21f3af0fa8d01a067c11a45ecdfa5",
+      "after_sha256": "0a2519a01d5c593fe4b862596e12d2cd6823a93c019a36eaec23dc7b6c53dbbc",
       "owners": {
         "@document": {
-          "before": "e27c52ec4301ca96bdbc32de066ed56681b035871da546a3dcf96503149d6e4a",
-          "after": "6170e84842b6ad9b026f29e62f77b9be89e21f3af0fa8d01a067c11a45ecdfa5"
+          "before": "6170e84842b6ad9b026f29e62f77b9be89e21f3af0fa8d01a067c11a45ecdfa5",
+          "after": "0a2519a01d5c593fe4b862596e12d2cd6823a93c019a36eaec23dc7b6c53dbbc"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "da5604bd2ba326902cde281896c819069593dcd00fe0a31146b1ea7ae19c6b1e",
-      "after_sha256": "a10fc448cad675e8598c5229aba6d91f348426a1c6cc5d5a5feb7ef5f40214eb",
+      "before_sha256": "a10fc448cad675e8598c5229aba6d91f348426a1c6cc5d5a5feb7ef5f40214eb",
+      "after_sha256": "8faa781f5324b267bf4d9cc9ecd719284d19210ae74a15de9e14c954aa984c30",
       "owners": {
         "@document": {
-          "before": "da5604bd2ba326902cde281896c819069593dcd00fe0a31146b1ea7ae19c6b1e",
-          "after": "a10fc448cad675e8598c5229aba6d91f348426a1c6cc5d5a5feb7ef5f40214eb"
+          "before": "a10fc448cad675e8598c5229aba6d91f348426a1c6cc5d5a5feb7ef5f40214eb",
+          "after": "8faa781f5324b267bf4d9cc9ecd719284d19210ae74a15de9e14c954aa984c30"
         }
       }
     },
     "data/generated/ability_coverage/cross_source_semantic_equivalence.json": {
-      "before_sha256": "6a243f769ad2dad1d478babe8e9a47ad9e255b606e41a21e2d163a7e894cf582",
-      "after_sha256": "a47c64ffdad2ebfa8e492167346f85d27692a99c28b4c9c55c9ef5322e71339b",
+      "before_sha256": "a47c64ffdad2ebfa8e492167346f85d27692a99c28b4c9c55c9ef5322e71339b",
+      "after_sha256": "2d1abe2ef6600c7a5712f7271d6c832423e904e7123bb6e29edb8e9760e5a554",
       "owners": {
         "@document": {
-          "before": "6a243f769ad2dad1d478babe8e9a47ad9e255b606e41a21e2d163a7e894cf582",
-          "after": "a47c64ffdad2ebfa8e492167346f85d27692a99c28b4c9c55c9ef5322e71339b"
+          "before": "a47c64ffdad2ebfa8e492167346f85d27692a99c28b4c9c55c9ef5322e71339b",
+          "after": "2d1abe2ef6600c7a5712f7271d6c832423e904e7123bb6e29edb8e9760e5a554"
         }
       }
     },
     "data/generated/ability_coverage/runtime_content_semantic_coverage.json": {
-      "before_sha256": "a3189e523c15bc006e0be15684b76d323f66e1c2ef035c727af357a3d8b1f043",
-      "after_sha256": "e49a5508d44635b684875eaa943a3cf58010c8931e1fb14ac18b20d5de4d7e4a",
+      "before_sha256": "e49a5508d44635b684875eaa943a3cf58010c8931e1fb14ac18b20d5de4d7e4a",
+      "after_sha256": "73a44908461a0810f0d37f9133ce175dd293af0ae6a733519708e8e619d0226f",
       "owners": {
         "@document": {
-          "before": "a3189e523c15bc006e0be15684b76d323f66e1c2ef035c727af357a3d8b1f043",
-          "after": "e49a5508d44635b684875eaa943a3cf58010c8931e1fb14ac18b20d5de4d7e4a"
+          "before": "e49a5508d44635b684875eaa943a3cf58010c8931e1fb14ac18b20d5de4d7e4a",
+          "after": "73a44908461a0810f0d37f9133ce175dd293af0ae6a733519708e8e619d0226f"
         }
       }
     },
-    "data/source_audits/ci64_provenance_v1/sheathed-in-brass-transition-v1.json": {
+    "data/source_audits/ci64_provenance_v1/blood-begets-skulls-transition-v1.json": {
       "before_sha256": null,
-      "after_sha256": "eed47b44cae336c88c37fbde89a41f8f7b0224e63945ffd75526170bd0bb6a66",
+      "after_sha256": "60b75729404329a6d013b8b3cdd9e08527294ea2da50cfad43549473cf08dccf",
       "owners": {
         "@document": {
           "before": null,
-          "after": "eed47b44cae336c88c37fbde89a41f8f7b0224e63945ffd75526170bd0bb6a66"
+          "after": "60b75729404329a6d013b8b3cdd9e08527294ea2da50cfad43549473cf08dccf"
         }
       }
     },
     "docs/ABILITY_SUPPORT_MATRIX_V2.md": {
-      "before_sha256": "fea49b6cfc42f51fbbeacd87f5c569bb6f213eb701b7dfc5dd3f41eba8708287",
-      "after_sha256": "b080969b712afade809bbf2456109a15f85be07591b9ece42b29ebe6232f7ddd",
+      "before_sha256": "b080969b712afade809bbf2456109a15f85be07591b9ece42b29ebe6232f7ddd",
+      "after_sha256": "f06d4663c9bc7485f68b7fabafa7553747c6e3f17e655bd216fbb3f18b9f782a",
       "owners": {
         "@document": {
-          "before": "fea49b6cfc42f51fbbeacd87f5c569bb6f213eb701b7dfc5dd3f41eba8708287",
-          "after": "b080969b712afade809bbf2456109a15f85be07591b9ece42b29ebe6232f7ddd"
+          "before": "b080969b712afade809bbf2456109a15f85be07591b9ece42b29ebe6232f7ddd",
+          "after": "f06d4663c9bc7485f68b7fabafa7553747c6e3f17e655bd216fbb3f18b9f782a"
+        }
+      }
+    },
+    "docs/ADAPTER_DECISION_CONTRACT.md": {
+      "before_sha256": "1f92e6dbae8c131b7c15952d0e42ce3c31e9cad49e5499f157fe7a6b85d7df63",
+      "after_sha256": "154fd76c3ecbfbed3c3a41a0d9871d2df34e6766bf88d5eb9038ef264720e6d9",
+      "owners": {
+        "@document": {
+          "before": "1f92e6dbae8c131b7c15952d0e42ce3c31e9cad49e5499f157fe7a6b85d7df63",
+          "after": "154fd76c3ecbfbed3c3a41a0d9871d2df34e6766bf88d5eb9038ef264720e6d9"
         }
       }
     },
     "docs/CROSS_SOURCE_SEMANTIC_EQUIVALENCE.md": {
-      "before_sha256": "b50d81510425fb1a4f14f06ec1014bdbf6ac33db9871120da784775cd8a54d62",
-      "after_sha256": "c05e96b1d8dfb613e2a3ef92eae052038f50381d241468d451113058b117e49a",
+      "before_sha256": "c05e96b1d8dfb613e2a3ef92eae052038f50381d241468d451113058b117e49a",
+      "after_sha256": "91c014158ba61a5ce5fa67430f7ee78a4a0bb4c6d8093130c1a047f862c3faa1",
       "owners": {
         "@document": {
-          "before": "b50d81510425fb1a4f14f06ec1014bdbf6ac33db9871120da784775cd8a54d62",
-          "after": "c05e96b1d8dfb613e2a3ef92eae052038f50381d241468d451113058b117e49a"
+          "before": "c05e96b1d8dfb613e2a3ef92eae052038f50381d241468d451113058b117e49a",
+          "after": "91c014158ba61a5ce5fa67430f7ee78a4a0bb4c6d8093130c1a047f862c3faa1"
         }
       }
     },
     "docs/factions/audit/chaos-daemons.md": {
-      "before_sha256": "67a977dc6546cf7c03904b1ee8b85bd91f8d77362600d36dbba49cf14fa8da62",
-      "after_sha256": "c96d30a11c3e42d4068fd1cf26125b4e2bcc0657e286ae17a0b68c74c9c0e4e4",
+      "before_sha256": "c96d30a11c3e42d4068fd1cf26125b4e2bcc0657e286ae17a0b68c74c9c0e4e4",
+      "after_sha256": "5215e1513d717e33c7bc5969dcb80964024c2ed81e8f0a424672205b6f41b375",
       "owners": {
         "@document": {
-          "before": "67a977dc6546cf7c03904b1ee8b85bd91f8d77362600d36dbba49cf14fa8da62",
-          "after": "c96d30a11c3e42d4068fd1cf26125b4e2bcc0657e286ae17a0b68c74c9c0e4e4"
+          "before": "c96d30a11c3e42d4068fd1cf26125b4e2bcc0657e286ae17a0b68c74c9c0e4e4",
+          "after": "5215e1513d717e33c7bc5969dcb80964024c2ed81e8f0a424672205b6f41b375"
         }
       }
     },
     "docs/factions/chaos-daemons.md": {
-      "before_sha256": "40f9c6bbb2e2e55864d364af7db761f2de6ce7bfb267c4bc68561bcadb3350af",
-      "after_sha256": "b1c1c1e763159570011d4128953a6f925db1b2913bd26c70fbe01cb2c7f20462",
+      "before_sha256": "b1c1c1e763159570011d4128953a6f925db1b2913bd26c70fbe01cb2c7f20462",
+      "after_sha256": "6644e17ee7e365ce1d460722aeb2699ec97cedff64273f25707f7ff33581be19",
       "owners": {
         "@document": {
-          "before": "40f9c6bbb2e2e55864d364af7db761f2de6ce7bfb267c4bc68561bcadb3350af",
-          "after": "b1c1c1e763159570011d4128953a6f925db1b2913bd26c70fbe01cb2c7f20462"
+          "before": "b1c1c1e763159570011d4128953a6f925db1b2913bd26c70fbe01cb2c7f20462",
+          "after": "6644e17ee7e365ce1d460722aeb2699ec97cedff64273f25707f7ff33581be19"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "d0d1c4ac492e3c69070a49ef5903afb1d2e5394069d267e4b74147357a660e62",
-      "after_sha256": "0a5164a6c50e074686f78b3d9c8d9278c26d7c2edec9910823a55f3e4f59d3e6",
+      "before_sha256": "0a5164a6c50e074686f78b3d9c8d9278c26d7c2edec9910823a55f3e4f59d3e6",
+      "after_sha256": "f98368bc97f89fed5c61a27db5714cb3fb9ddb9386df8e701a9b698e66bae918",
       "owners": {
         "@document": {
-          "before": "d0d1c4ac492e3c69070a49ef5903afb1d2e5394069d267e4b74147357a660e62",
-          "after": "0a5164a6c50e074686f78b3d9c8d9278c26d7c2edec9910823a55f3e4f59d3e6"
+          "before": "0a5164a6c50e074686f78b3d9c8d9278c26d7c2edec9910823a55f3e4f59d3e6",
+          "after": "f98368bc97f89fed5c61a27db5714cb3fb9ddb9386df8e701a9b698e66bae918"
         }
       }
     },
     "scripts/engine_numerical_identity_test_admission.py": {
-      "before_sha256": "774cbddb494f3681afcb869acbb5f2e675eb9020786e19b559424b081cf64087",
-      "after_sha256": "ad6250e7ca008c663700dc845bb40289a738b025b0aabd71441a17823daf9c04",
+      "before_sha256": "ad6250e7ca008c663700dc845bb40289a738b025b0aabd71441a17823daf9c04",
+      "after_sha256": "11c826b92cc3421e71b230dcb2b41499bec360f8256dbafb607d93000f9b90dd",
       "owners": {
-        "_sheathed_in_brass_test_addition": {
-          "before": null,
-          "after": "ccb9e5995eeaa8cbaf3db21f402ed9048060faccec175306c113f365add6c35c"
+        "@module": {
+          "before": "aa6cb27b10bde9301827674d266ce2f384eb71a070987fd3774b3286493ee517",
+          "after": "9da0add5a97b5aa8d352e1ddd38760fe1457ab0525128bc4e3decc1e6a4fa660"
         },
-        "exact_movement_test_transition": {
-          "before": "5707a6cc0332484e50f56f47aba0cbb676333d1176b22734d2ad73668bb3f5bf",
-          "after": "e1857cf0a73a77642453761cfea32b7d80b01c7baccc18cf3d6f35f65e1d86b0"
+        "_blood_begets_skulls_test_successor": {
+          "before": null,
+          "after": "99a3d35e4c31108680a55b823da2fd9581c3289ab1a8492f0575396c6ab6831d"
+        },
+        "_sheathed_in_brass_test_addition": {
+          "before": "ccb9e5995eeaa8cbaf3db21f402ed9048060faccec175306c113f365add6c35c",
+          "after": "649c0a811c34174bd9fb88f238a7b15bf2743dfcca1ad9208c59ce43ec1fbacb"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "939dbdf485c5cd4acea7a0158453ab09e1272c96745efda6e282b74f9fbbd2d2",
-      "after_sha256": "133a527c8e351c3f6d8cf3b9b7e769b548a8d08c816870543e646cbcdb80f7a6",
+      "before_sha256": "133a527c8e351c3f6d8cf3b9b7e769b548a8d08c816870543e646cbcdb80f7a6",
+      "after_sha256": "30456764e902dd2e31ac0f37b429882de8b60a24bfe17fe8f7dbd94f6be3b6d7",
       "owners": {
         "@document": {
-          "before": "939dbdf485c5cd4acea7a0158453ab09e1272c96745efda6e282b74f9fbbd2d2",
-          "after": "133a527c8e351c3f6d8cf3b9b7e769b548a8d08c816870543e646cbcdb80f7a6"
+          "before": "133a527c8e351c3f6d8cf3b9b7e769b548a8d08c816870543e646cbcdb80f7a6",
+          "after": "30456764e902dd2e31ac0f37b429882de8b60a24bfe17fe8f7dbd94f6be3b6d7"
         }
       }
     },
-    "src/warhammer40k_core/engine/generic_attack_save_modifiers.py": {
-      "before_sha256": "88299631d03e87b18783c2fb64f5c5076ebd07bf336a77495d0086edb99012fc",
-      "after_sha256": "2e950fabdf699054b17909a329cf0b7afa0ac59db255d45118c17390afd446cd",
+    "src/warhammer40k_core/engine/charge_phase_flow.py": {
+      "before_sha256": "c81a390c314f6bfe7539c218ea56ab25e4abd86c95b5e4ff89c4cd5e4b276edd",
+      "after_sha256": "8555063eb6ba4ed24a714a474e0d439aca1368be35bde098320b1aec2bc21b3f",
       "owners": {
         "@module": {
-          "before": "44f227a63add3ba0cc488683aa5e7b59b99760c1b35fbe8cd600117f6550d4d4",
-          "after": "5dc023786b5b72b3c487ccdb0677ce0f2b86d6745afb941a986d3b8f2ae1d277"
+          "before": "ba0dd335f6099ad496177be1a22fda0ece27ade5de202a8f74304036b3ec953c",
+          "after": "8116d26025acf2c282586613013f503239749a8a834226725e4842e7b450a92e"
         },
-        "generic_rule_modified_save_options": {
-          "before": "7d15ee7303a0617d6c48d85ce7d51d5faa74bfcad0427c1b2c6e67dcb3cace3e",
-          "after": "f6d8cc047dd3934e69a2a3e8165e225a36e7bb035bd1b4e769f8758de3a96ae8"
-        },
-        "is_unconditional_armour_save_set": {
+        "begin_phase": {
+          "before": "979e1704f51654e04e48107ebba77a7c96e5e50f9b969d01af318103c3c6e00d",
+          "after": "02e3dcab1e89904a043f67ecea2b356c3ddfd23d7a7d49ea74bec9a9a5f15928"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/charge_preselection_stratagems.py": {
+      "before_sha256": null,
+      "after_sha256": "369694145ac6b28019b4fd75fe90a6a482e63f66e06a4a710743e8f7b2b12083",
+      "owners": {
+        "@module": {
           "before": null,
-          "after": "7022deef3d1faf998f453ac41b642165a677c8477ba0dbf2b3b754130143bd0e"
+          "after": "69776a65f20a5b02d2388971b65bff891d062d250ffae8922a0061971b4c13a8"
+        },
+        "charge_preselection_context": {
+          "before": null,
+          "after": "12e4eb933a3573dac51cffc40f4023d7027fee0a7d9f84ca5375c03b2b5f19da"
+        },
+        "request_charge_preselection_stratagem": {
+          "before": null,
+          "after": "ab6e2dd5145e89fead5fd4b54a55dc512bfb54edb66a93eab38f3c742039110a"
         }
       }
     },
-    "src/warhammer40k_core/engine/native_attack_gathering.py": {
-      "before_sha256": "330d2ce3dcf839cada5579c9492f1e1eb3a6ce71dded9db996735126e7c2dc6d",
-      "after_sha256": "e1185b69c849d918d79d5707829e434f0b3fce96abd9b4115a8554ea7e1ac0c8",
+    "src/warhammer40k_core/engine/stratagems.py": {
+      "before_sha256": "f57f29dc8ff47a8adab07e05f560318de9686e2cefea0e57edd197155ee2a871",
+      "after_sha256": "48124618d293605c5e531f7e9bfe985da8a3fd0f14b6a0fd8e7a32fa45f18c04",
       "owners": {
-        "_current_applicable_rules": {
-          "before": "d014ee40532f708a27578cea55ebefa98c40c6e304a8f0139ce4a7b162232220",
-          "after": "adce202abbf94e3aa3a62e4aa380ab641bea0a8979462414b3e8d3236acc0656"
+        "@module": {
+          "before": "35f2c812646362c35a0b2d1870f8ccf25c96754b68de3f939db0f75fe2474829",
+          "after": "b1d81849cfdce4ca255fc24b4deb5e9bcb28469efde134f4d5fabb1f5bb03805"
         }
       }
     },
-    "src/warhammer40k_core/engine/native_gathering_permission_relevance.py": {
-      "before_sha256": "90ea27af2322efeb15ab0970d9f27229e82940801b55f08fe16c0c99892e1150",
-      "after_sha256": "85de2756d2b9282fc73093db7cb51dc8ef39c1ca9e5b921101c1ccd1981e5b04",
+    "src/warhammer40k_core/engine/stratagems_model.py": {
+      "before_sha256": "053aa9c0a577dfc4552439c1109f9e3406e3c5ea250f74ed286f33d93386b495",
+      "after_sha256": "7175d33102066ad7f8bc73302f8f5168b1313036e82d13b9809420e217a079a2",
       "owners": {
-        "target_permission_kinds_for_gathering": {
-          "before": "15e5d54f1b8438ec3093ed8a7e23c4a135c41846e08b0972e8d339a5364571ba",
-          "after": "4cfdc0587714f15e15a946da754ca7a1352b19141bc48ce6bb72c2c47b9fba87"
+        "@module": {
+          "before": "a9b049e5ab76680343546d818972591a7c257efb443f05ce90a55867cefafd30",
+          "after": "925ba2f7c92239bb920bf7f2b20015b1bb0fc5edd3ddd093bd67178b8e4d0080"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/stratagems_requests.py": {
+      "before_sha256": "032a5e2bc7ef4cf6d938119333b9b81a47e4667f677e9677cd6405558bbc42a3",
+      "after_sha256": "b16d9b3a4b4c5cef3300d21a3da6f88d34acad2f2007831692de826e42c1a889",
+      "owners": {
+        "@module": {
+          "before": "7f7c3630980ad9b5364267a335e8bac8e018980cf18288f4781d8488304427c9",
+          "after": "be6da5881653ba0630ac1a4c6493ae17ac861b81fd1f7a70bef6667aa1f7ab03"
+        },
+        "_stratagem_use_options_for_records": {
+          "before": "a8aac655e2cceaec3bfd4b2b1273d5d7056baad82b956ca0222f3869dcba4735",
+          "after": "5916a85bb7adaa3174a19142ac3ba933781629f2747572d37ef2e430a761cc6e"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/stratagems_targeting.py": {
+      "before_sha256": "be6f79caded75e817c5634c158ebf93ac5975fd3f54baac98aa966ac04b81f6d",
+      "after_sha256": "d8d0f553f5e422f6f154c8ea6b50250627340ad0e523e61fa29fc8a880f3d6e9",
+      "owners": {
+        "@module": {
+          "before": "8f558270f024436fefcc09e7a17aa695fdfa75b26017994bffab0ed76bca2637",
+          "after": "956cd6ade28c25d3aa2ef4cd7612168ec58d63335475a2007f3ad7d044a140ce"
+        },
+        "_not_selected_to_charge_target_error": {
+          "before": null,
+          "after": "96624e00150a0cb41e5992b93ee50cd8cc19b94ed660776b7de33b765a7e0023"
+        },
+        "_target_binding_error": {
+          "before": "bf413eb21bf2d81d1c4aceb505ee81387c4bb0a2b86c62c6a2ec5427b2ec4b8d",
+          "after": "f9ef31452affc9144f52faf7cfd4abf4104c41da26a59d33efbdc174888a51d7"
+        }
+      }
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_blood_legion_ir_support_2026_27.py": {
+      "before_sha256": "a592b6eec5e74b22d5142a79615174f4f7d46c6e4c4d17a42287ddf613060c0f",
+      "after_sha256": "abd4f8cc3ca4ad1afa991021ae3ceac9cbd8a788b8822062aa1347c8c75b40a2",
+      "owners": {
+        "@module": {
+          "before": "98b6f778fbfe5d9a888db89ae485ab09e6dfdb477515eae8477f2a359fe88c97",
+          "after": "d9271b2e75427ada2533ab2a8838250e1255c53e949f3556b42a9e5b23e34ae4"
         }
       }
     },
     "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_generic_ir_support_2026_27.py": {
-      "before_sha256": "50a63e1dc01d6cde8e04d90be10c52fb34be62e0cb4b6671ea235dd57407fd71",
-      "after_sha256": "e8f5a65c4a9bc0209bb4eeae56df192c658cf3e00e73fe9d484a074047ad4fa3",
+      "before_sha256": "e8f5a65c4a9bc0209bb4eeae56df192c658cf3e00e73fe9d484a074047ad4fa3",
+      "after_sha256": "7a041b6113f905ab9f3662e345d27d70a06875f3f78f44c4a993d3956e11708a",
       "owners": {
-        "@module": {
-          "before": "60ae9a9675083d90157b4339214b09c8089ea1d9446e89f61e3cfa442a3b55a9",
-          "after": "01f851f2803da32c611f5586adf5fbec6343240e0fd99b4414f4348a3f7eca9c"
-        },
         "_stratagem_activation_rule_ir_payload_by_descriptor_id": {
-          "before": "97ee4bd8a3d32199dfa05a340e33a2f55bc81f327db4a5aea0cfdc3317fd3150",
-          "after": "afdeb12faa86ff8bd33d84799eb952e954a877a0f19e45217a31361069a0f15c"
+          "before": "afdeb12faa86ff8bd33d84799eb952e954a877a0f19e45217a31361069a0f15c",
+          "after": "832072aff5fa2b6fca579690b7293bae187e6b5fa6cf1996eacccc5acc2fb4dc"
         },
         "generic_supported_stratagem_rule_ir_hash": {
-          "before": "02b3fc37c4e133d51e543b1f744fa80507b7b7e46ec2e225a562082378a38602",
-          "after": "7ad5c9071bcb89283a576e239960e75eb53ff79d57fc032faf23bf4019b72302"
+          "before": "7ad5c9071bcb89283a576e239960e75eb53ff79d57fc032faf23bf4019b72302",
+          "after": "3548fbe8258070827d432ee5bd52d0345034e42fa56c5a59115901df994c3d12"
         }
       }
     },
     "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_stratagem_activation_2026_27.json": {
-      "before_sha256": "c50e9b188744bff24359d8a0559556f1c47a59a48f32aae662822322ab58f67f",
-      "after_sha256": "a90f0804c3056547996fe35ffb355944ddf2992115f7da84dae124a055e90851",
+      "before_sha256": "a90f0804c3056547996fe35ffb355944ddf2992115f7da84dae124a055e90851",
+      "after_sha256": "336e02fa9554d73f82d88d3522eedff5bc62c27d1cdcbd2ef9b1dfc3e9fc3c3e",
       "owners": {
         "@document": {
-          "before": "c50e9b188744bff24359d8a0559556f1c47a59a48f32aae662822322ab58f67f",
-          "after": "a90f0804c3056547996fe35ffb355944ddf2992115f7da84dae124a055e90851"
+          "before": "a90f0804c3056547996fe35ffb355944ddf2992115f7da84dae124a055e90851",
+          "after": "336e02fa9554d73f82d88d3522eedff5bc62c27d1cdcbd2ef9b1dfc3e9fc3c3e"
         }
       }
     },
     "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_stratagem_activation_2026_27.py": {
-      "before_sha256": "8dc38d3e6804038c55fcbdd97bb69dfc46bdeea65050e9623f412cc1583cc8c4",
-      "after_sha256": "d64abaa77341080308d577dc260853f1fb9d58bb98988a05ccb2c1dcae35b7a6",
+      "before_sha256": "d64abaa77341080308d577dc260853f1fb9d58bb98988a05ccb2c1dcae35b7a6",
+      "after_sha256": "d08f2418c48818a928ba141fed3651583f17b2f3755937f7264e15e77c24b763",
       "owners": {
         "@module": {
-          "before": "984a7dff0203bc86532302ac685c2f41ca473b1cd2348fce123bad26a9e969f4",
-          "after": "f9f45556618e854afebbdb53e86d44f1aee8cce144da63f2b7aac97516ec8261"
-        },
-        "ActivationArtifact": {
-          "before": "588cd037394d59ffd9f5c6b1ec2562867f5f82b4ee15203ca758d25edf10ed43",
-          "after": "720a86a94611778b5b6225cedfd21e5d6582f6c47c93db7b5fb75923085852d1"
-        },
-        "SourceStratagemActivationProfile.effect_payload": {
-          "before": "61de3c3579d13ad8d30c0f3676b3f4480912760a5f97b8d4ae90608c557d1daa",
-          "after": "79d7b11c2caee41d4d2a612f60cf8d40c3c8d65c250fbe2f58b5820453f8849e"
-        },
-        "SourceStratagemActivationProfile.to_payload": {
-          "before": "e57b0c0f70f73510cc4fa1d07f4aadd67ac26bea1f05b172eca513e281d37b29",
-          "after": "80c06496800f795f3a6c595f5a3b36d3841787437c179b2e7e622b9d0215d293"
-        },
-        "validate_artifact_bytes": {
-          "before": "6c95c185424a230086a47086958e2dbf12637d8993971cb310bc0e45e3e2650e",
-          "after": "940b03d625b4a4e2c1912cd93b5d69753ee00378b031017ef954dfc87bc4d36f"
+          "before": "f9f45556618e854afebbdb53e86d44f1aee8cce144da63f2b7aac97516ec8261",
+          "after": "29ec9545adfdcd48895edcaf3642b67d2a5981e25ec4e94b6eb2b745148f6219"
         }
       }
     },
     "tests/code_quality/test_engine_numerical_identity_admission.py": {
-      "before_sha256": "cf465609a2cb8ec77ef30a66f987317d6cad2e80529b8b681f6d8d441aadde48",
-      "after_sha256": "e45b9a2363839df58a0bfa1035ab1f6e46809135491443f34912cd9e9787055c",
+      "before_sha256": "e45b9a2363839df58a0bfa1035ab1f6e46809135491443f34912cd9e9787055c",
+      "after_sha256": "531fb773fd7c4abb19950f6e61b18f871b327caec5786d971c2f639e70c54324",
       "owners": {
         "test_identity_inventory_uses_current_twelve_shards_and_native_cohort": {
-          "before": "e71c959e3f54486cf8eb765a838e8591ae31421acb196316f4a60cc1e854639f",
-          "after": "ac0a537f9c650d6bb628ecbe2ae4dcb9f41a50b55e94735fd0593b1843ee1b7d"
+          "before": "ac0a537f9c650d6bb628ecbe2ae4dcb9f41a50b55e94735fd0593b1843ee1b7d",
+          "after": "ea50fe651fb03e0daabc33c9e17401695a9d4ac31fb2b5d2018b007f4987e238"
         }
       }
     },
-    "tests/code_quality/test_order117_mortal_allocation.py": {
-      "before_sha256": "9bebada6a7b96471568f29c43144114f9a10143a457542766003c7165b682f60",
-      "after_sha256": "abed0a98e88da7b551be98feac4908e67c40f25952fd4471504e915995874a92",
-      "owners": {
-        "@module": {
-          "before": "2c6f033514e0ddea6de56bdb2ab2e494bda340efc28b01fcc6763e5fd0142049",
-          "after": "83cf4487ef21cd2940a1645a5d3733a90206f6aba2ed8423e750b7de68e1c66f"
-        },
-        "test_allocation_trigger_retains_selected_core_and_real_example_authority": {
-          "before": "80391664f84d373c7f5efa064b3592975e6754a5c1b65ef5e08a82926608d0e7",
-          "after": "cae6eaa2fa0e52c5553c4c96684834328fa9eecced9080abcb555d56bff5d85d"
-        }
-      }
-    },
-    "tests/factions/chaos_daemons/integration/test_sheathed_in_brass.py": {
+    "tests/factions/chaos_daemons/integration/test_blood_begets_skulls.py": {
       "before_sha256": null,
-      "after_sha256": "391ca1cdeb16a39278dcf7b982e8985e1c721ce137519f92a0a8c7fe5938f3be",
+      "after_sha256": "27f5617e3e182cd547caedee49c2383c291a96ed76b40ef71a26730f072a1c84",
       "owners": {
         "@module": {
           "before": null,
-          "after": "8a250cf3a97b17138feacfe7d3995672784069b8a07745a5480252fff7103b7c"
+          "after": "da875b3714312021e4ec5e78e76913d80234af35ec372c6bfc9b26d7aee64c83"
         },
-        "_assert_cover_policy": {
+        "_assert_grant": {
           "before": null,
-          "after": "eb3884e4e43da97232e306ff8c7a19c51905be5463702dbe087c3cca819c2ac6"
+          "after": "6f48b2a66153d06ed480cdc1d302416656b69c3397735555b5ad9dc4c5af4486"
         },
-        "_assert_save_options": {
+        "_reach_charge": {
           "before": null,
-          "after": "3f7c376f219b7f4219eaa2f8052dc10e326f688d88fe3365df3b4c5b0d3c0745"
-        },
-        "_brass_options": {
-          "before": null,
-          "after": "f382daeda0cd71bfc01d5aa62af4f5befd085159dc0b7fb5ef29b6b22c576ceb"
-        },
-        "_finish_shooter": {
-          "before": null,
-          "after": "a6a92bdd8b1db7e52418beb6bb0a03f75caff5ba708c02bea6b74ec13cff7066"
-        },
-        "_first_shot": {
-          "before": null,
-          "after": "c2e3f5451af67063f4a8820b5a467c8a0f0818eafc8844993897934e92dd8676"
-        },
-        "_save_payloads": {
-          "before": null,
-          "after": "771190fa933c651312aa701d1c45671c2bc4a9e9b329d12abffd4c6ff33d220b"
+          "after": "45e6e29d0d2bc882515a31ab7faf10c286d7bdce15a0d8690baef37fec7b287e"
         },
         "_scene": {
           "before": null,
-          "after": "e1dec9f07eb10603fb76705924591b282bfe3e0ca49e3074b26e579c055ee11d"
+          "after": "fc21e93a5a3d7a6dcad1cb06720bb746fd6d9c56f7cea39138259d3769b7a1cc"
         },
-        "brass_definitions": {
+        "_submit": {
           "before": null,
-          "after": "292ed252c305b3abd52c2a1228bdf1d2cd0c85914b0da5c9ac65e7b0f6f2c047"
+          "after": "6e6885c2260afba792d490f7276a32ba8b1952fe54b0aa00f8a8d03167fdc2d3"
         },
-        "test_sheathed_in_brass_native_accept_later_shooting_expiry_and_replay": {
+        "_targets": {
           "before": null,
-          "after": "a27fde6c440e72be7e08de5811a91ce125054bf5927478ae8c2494c7603c3f8a"
+          "after": "ab333fc9401ac81315837edc20ec55c59bd80648b034c981e3767e0e69771eea"
         },
-        "test_sheathed_in_brass_native_decline_or_unaffordable": {
+        "skulls_definitions": {
           "before": null,
-          "after": "4156b226589450806885fc8114b77c55f6dd31d9d0902989723af2b35d6a7f28"
+          "after": "3793a44f75d36f1f63a5a84b41903d522632394505061761170c2ff01091787c"
         },
-        "test_sheathed_in_brass_native_gathering_and_save_ignore": {
+        "test_blood_begets_skulls_decline_then_offer_after_earlier_charge": {
           "before": null,
-          "after": "65baf7df51db2c2417430a6f4ab7d3909ac68def620a115e2bcd048e5b12a0df"
+          "after": "7b94ffa2f3bf32a13306261a9c21ade0bcbda8589b831ceda0ad26d98066e93f"
+        },
+        "test_blood_begets_skulls_offers_when_advance_prevents_all_charges": {
+          "before": null,
+          "after": "1cca3f8edeca3e746f1e7077e5e0f7da2f8aa0133855bba0c86bb4ce3c4b21b3"
+        },
+        "test_blood_begets_skulls_unavailable_without_cp_or_outside_own_charge": {
+          "before": null,
+          "after": "6b82234137851fc1a0447dfb62a69c5563673ef36c82fbe54ee780e6d75e6abf"
         }
       }
     },
     "tests/infrastructure/source_governance/unit/test_blocked_row_classification.py": {
-      "before_sha256": "8dae54c9416de9a7e31c4d7a18616ed2f5a9f37b3923e8219319af3ac69fe59d",
-      "after_sha256": "4d4509863793bd6190b639b7b221d66b84b3a52f4d21610cf6f14efdab479a4b",
+      "before_sha256": "4d4509863793bd6190b639b7b221d66b84b3a52f4d21610cf6f14efdab479a4b",
+      "after_sha256": "0a6d42a0ec9fd0bc7b539f8d6d51798f6e435308d6d16693385d83168b48f366",
       "owners": {
         "test_phase17i_existing_template_report_uses_phase17c_template_families": {
-          "before": "b37c936bfa151ad7859db7a59b1ef4c1bb46e3d0419207eb4ace5c49e22961d2",
-          "after": "60aaced743442e0ba221f25c5709a14b21d0663eb41a67d3885c76ac6f8e3255"
+          "before": "60aaced743442e0ba221f25c5709a14b21d0663eb41a67d3885c76ac6f8e3255",
+          "after": "1ec342e54e5e9b2f73abee4db18d84a420c6ec5e54ce7b4a8065fb3f52a20781"
         },
         "test_phase17i_missing_capability_report_groups_rows_by_family": {
-          "before": "586820da6f8ff4e546ec2c5b4defb02b8ee13834397944d62573c457e1bbd3ce",
-          "after": "add7173af1754b28716c40228a772694f4703bc8ca731e68dbc189a91828cb2e"
+          "before": "add7173af1754b28716c40228a772694f4703bc8ca731e68dbc189a91828cb2e",
+          "after": "9694e5186646755e7b693b19a49c69575560151320b4cc6cb393eda7d4c0b811"
         },
         "test_phase17i_source_text_boundaries_are_explicit": {
-          "before": "db8c18c6f1a88839c73dfc33b2170ce3ee1d7aca425c36549b152c3c51d39e79",
-          "after": "1ac9cbf17852a6c78b046792ed2dcf5147db5513d1d2ba00e26dcec2ba83e097"
+          "before": "1ac9cbf17852a6c78b046792ed2dcf5147db5513d1d2ba00e26dcec2ba83e097",
+          "after": "b24e86a54225460fe80ded893432d5e1d286d02fc023be9e09b62eeae3e79721"
         }
       }
     },
     "tools/generate_faction_stratagem_activation_support.py": {
-      "before_sha256": "251da969c896bdae28bfa0c7f39636e657f1b3498f4097e382b2d936504a0154",
-      "after_sha256": "41e0cb5db98473d769805169d2532b80ce5836208605ec87b8e7a7285ecef32b",
+      "before_sha256": "41e0cb5db98473d769805169d2532b80ce5836208605ec87b8e7a7285ecef32b",
+      "after_sha256": "877319f1b69e8401af3e5060653d7580241df7fc5b4e5c54fbfecf22a03388dd",
       "owners": {
         "@module": {
-          "before": "57444ab184b27448f351e4cda15c8d09b02e7d46a5f66f24b66cbd6310ce974d",
-          "after": "624b7a485136c9ed6012c36493603a47d7b75e20324bfec8aad5e3af7b1a88f8"
+          "before": "624b7a485136c9ed6012c36493603a47d7b75e20324bfec8aad5e3af7b1a88f8",
+          "after": "4c71e1aa1c7c2ffd753cb71b4b37127d01c4a86f90a5cd492d39f0c82a75be48"
         },
-        "ActivationProfile": {
-          "before": "84a563ebe3743e8e5541b83df5b746dcb063bd1e7cc8831a83af2fbdc82d8177",
-          "after": "d70ca6ef6b207c5be7273b8c3a3a824b38d0450cf32e2cb3fd1c259332ac2958"
-        },
-        "SourceOnlyActivationMetadata": {
-          "before": "33f67f248e0effaf91294b35e77aa1288da33be6d4562839d31bc226b71eb9a7",
-          "after": "ce4fb178498a96f945f62f0d7833e5672a2d6c866dfd6f26da4d96afc3e8a340"
-        },
-        "_activation_profile_from_current_source_metadata": {
-          "before": "2320cf5415ae1ee4c755d653d8efe28c36dd2ba5d701e3da509a2c34bbbdea4f",
-          "after": "a3dc3f513dfb3c7d7dd8558c26df2a1cd601b693cd33220b0d97ef8cd8715ce1"
-        },
-        "_artifact_payload": {
-          "before": "24ce1550a934c052bc7e6e1097bb0d47374dd58ffe72716a3ae1bbc5953d5eab",
-          "after": "b11dcbf67e4759490147a72fbda4acb2159482c394a1f24d5b5c073eaed60cf5"
-        },
-        "_compiled_stratagem_rule_ir_payload_or_none": {
-          "before": "d7b935c051fa9367e65dc1c221c991da67891310304eec63cdc3029bc269db56",
-          "after": "630cd758e2529e62163bcd4ec01cb8f0a9011a7465b11d3d98584f3496567249"
+        "_activation_profile_for_source_row": {
+          "before": "22d6a2e836f891a5189ff54f6505d92ac41a93a8b8ff051bc9b93a4ebf44926a",
+          "after": "7570b9246efc9182a44877fd2c35fb591991c65e42b8fa107df0345742df3cf5"
         }
       }
     }
@@ -534,9 +546,9 @@
         "supported-acts-current-source-documentation"
       ],
       "selected_families": [],
-      "rationale": "Refresh the current faction checksums and the Chaos Daemons Stratagem counts from the source packages.",
-      "source_obligation": "Chaos Daemons July Faction Pack page 124. Register the source-backed Sheathed in Brass ability as an executable generic activation.",
-      "unchanged_work": "The existing runtime, source receipts and evidence validators execute with the same operations. The updated checks bind the current generated report and historical predecessor bytes."
+      "rationale": "Publish the single qualified Stratagem support transition and its dependent evidence.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Charge phase, 1 CP, both target keywords, target remains unselected, and phase-end expiry.",
+      "unchanged_work": "Charge Move generation, charge target geometry and the CP and effect ledgers keep their existing paths. Canonical friendly Rules Units are enumerated only for the new preselection target policy."
     },
     "ci/test_shards/durations.json": {
       "category": "rule_semantics",
@@ -544,9 +556,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Preserve inherited case weights and incorporate measured weights for the five added native controls.",
-      "source_obligation": "Chaos Daemons July Faction Pack page 124. Verify the 1 CP opponent Shooting reaction, both target keywords, and the phase-long Save characteristic of 3+.",
-      "unchanged_work": "The same timing window, CP ledger, expiry, allocation and save rebuild execute. A live whole-unit armour SET contributes its source-linked operation and only the applicable Save permission."
+      "rationale": "Preserve inherited case weights and schedule measured Charge and changed Phase 17I cases.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Charge phase, 1 CP, both target keywords, target remains unselected, and phase-end expiry.",
+      "unchanged_work": "Charge Move generation, charge target geometry and the CP and effect ledgers keep their existing paths. Canonical friendly Rules Units are enumerated only for the new preselection target policy."
     },
     "ci/test_shards/shard-1.txt": {
       "category": "rule_semantics",
@@ -554,9 +566,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Preserve inherited case weights and incorporate measured weights for the five added native controls.",
-      "source_obligation": "Chaos Daemons July Faction Pack page 124. Verify the 1 CP opponent Shooting reaction, both target keywords, and the phase-long Save characteristic of 3+.",
-      "unchanged_work": "The same timing window, CP ledger, expiry, allocation and save rebuild execute. A live whole-unit armour SET contributes its source-linked operation and only the applicable Save permission."
+      "rationale": "Preserve inherited case weights and schedule measured Charge and changed Phase 17I cases.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Charge phase, 1 CP, both target keywords, target remains unselected, and phase-end expiry.",
+      "unchanged_work": "Charge Move generation, charge target geometry and the CP and effect ledgers keep their existing paths. Canonical friendly Rules Units are enumerated only for the new preselection target policy."
     },
     "ci/test_shards/shard-10.txt": {
       "category": "rule_semantics",
@@ -564,9 +576,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Preserve inherited case weights and incorporate measured weights for the five added native controls.",
-      "source_obligation": "Chaos Daemons July Faction Pack page 124. Verify the 1 CP opponent Shooting reaction, both target keywords, and the phase-long Save characteristic of 3+.",
-      "unchanged_work": "The same timing window, CP ledger, expiry, allocation and save rebuild execute. A live whole-unit armour SET contributes its source-linked operation and only the applicable Save permission."
+      "rationale": "Preserve inherited case weights and schedule measured Charge and changed Phase 17I cases.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Charge phase, 1 CP, both target keywords, target remains unselected, and phase-end expiry.",
+      "unchanged_work": "Charge Move generation, charge target geometry and the CP and effect ledgers keep their existing paths. Canonical friendly Rules Units are enumerated only for the new preselection target policy."
     },
     "ci/test_shards/shard-11.txt": {
       "category": "rule_semantics",
@@ -574,9 +586,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Preserve inherited case weights and incorporate measured weights for the five added native controls.",
-      "source_obligation": "Chaos Daemons July Faction Pack page 124. Verify the 1 CP opponent Shooting reaction, both target keywords, and the phase-long Save characteristic of 3+.",
-      "unchanged_work": "The same timing window, CP ledger, expiry, allocation and save rebuild execute. A live whole-unit armour SET contributes its source-linked operation and only the applicable Save permission."
+      "rationale": "Preserve inherited case weights and schedule measured Charge and changed Phase 17I cases.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Charge phase, 1 CP, both target keywords, target remains unselected, and phase-end expiry.",
+      "unchanged_work": "Charge Move generation, charge target geometry and the CP and effect ledgers keep their existing paths. Canonical friendly Rules Units are enumerated only for the new preselection target policy."
     },
     "ci/test_shards/shard-12.txt": {
       "category": "rule_semantics",
@@ -584,9 +596,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Preserve inherited case weights and incorporate measured weights for the five added native controls.",
-      "source_obligation": "Chaos Daemons July Faction Pack page 124. Verify the 1 CP opponent Shooting reaction, both target keywords, and the phase-long Save characteristic of 3+.",
-      "unchanged_work": "The same timing window, CP ledger, expiry, allocation and save rebuild execute. A live whole-unit armour SET contributes its source-linked operation and only the applicable Save permission."
+      "rationale": "Preserve inherited case weights and schedule measured Charge and changed Phase 17I cases.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Charge phase, 1 CP, both target keywords, target remains unselected, and phase-end expiry.",
+      "unchanged_work": "Charge Move generation, charge target geometry and the CP and effect ledgers keep their existing paths. Canonical friendly Rules Units are enumerated only for the new preselection target policy."
     },
     "ci/test_shards/shard-4.txt": {
       "category": "rule_semantics",
@@ -594,9 +606,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Preserve inherited case weights and incorporate measured weights for the five added native controls.",
-      "source_obligation": "Chaos Daemons July Faction Pack page 124. Verify the 1 CP opponent Shooting reaction, both target keywords, and the phase-long Save characteristic of 3+.",
-      "unchanged_work": "The same timing window, CP ledger, expiry, allocation and save rebuild execute. A live whole-unit armour SET contributes its source-linked operation and only the applicable Save permission."
+      "rationale": "Preserve inherited case weights and schedule measured Charge and changed Phase 17I cases.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Charge phase, 1 CP, both target keywords, target remains unselected, and phase-end expiry.",
+      "unchanged_work": "Charge Move generation, charge target geometry and the CP and effect ledgers keep their existing paths. Canonical friendly Rules Units are enumerated only for the new preselection target policy."
     },
     "ci/test_shards/shard-5.txt": {
       "category": "rule_semantics",
@@ -604,9 +616,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Preserve inherited case weights and incorporate measured weights for the five added native controls.",
-      "source_obligation": "Chaos Daemons July Faction Pack page 124. Verify the 1 CP opponent Shooting reaction, both target keywords, and the phase-long Save characteristic of 3+.",
-      "unchanged_work": "The same timing window, CP ledger, expiry, allocation and save rebuild execute. A live whole-unit armour SET contributes its source-linked operation and only the applicable Save permission."
+      "rationale": "Preserve inherited case weights and schedule measured Charge and changed Phase 17I cases.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Charge phase, 1 CP, both target keywords, target remains unselected, and phase-end expiry.",
+      "unchanged_work": "Charge Move generation, charge target geometry and the CP and effect ledgers keep their existing paths. Canonical friendly Rules Units are enumerated only for the new preselection target policy."
     },
     "ci/test_shards/shard-6.txt": {
       "category": "rule_semantics",
@@ -614,9 +626,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Preserve inherited case weights and incorporate measured weights for the five added native controls.",
-      "source_obligation": "Chaos Daemons July Faction Pack page 124. Verify the 1 CP opponent Shooting reaction, both target keywords, and the phase-long Save characteristic of 3+.",
-      "unchanged_work": "The same timing window, CP ledger, expiry, allocation and save rebuild execute. A live whole-unit armour SET contributes its source-linked operation and only the applicable Save permission."
+      "rationale": "Preserve inherited case weights and schedule measured Charge and changed Phase 17I cases.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Charge phase, 1 CP, both target keywords, target remains unselected, and phase-end expiry.",
+      "unchanged_work": "Charge Move generation, charge target geometry and the CP and effect ledgers keep their existing paths. Canonical friendly Rules Units are enumerated only for the new preselection target policy."
     },
     "ci/test_shards/shard-7.txt": {
       "category": "rule_semantics",
@@ -624,9 +636,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Preserve inherited case weights and incorporate measured weights for the five added native controls.",
-      "source_obligation": "Chaos Daemons July Faction Pack page 124. Verify the 1 CP opponent Shooting reaction, both target keywords, and the phase-long Save characteristic of 3+.",
-      "unchanged_work": "The same timing window, CP ledger, expiry, allocation and save rebuild execute. A live whole-unit armour SET contributes its source-linked operation and only the applicable Save permission."
+      "rationale": "Preserve inherited case weights and schedule measured Charge and changed Phase 17I cases.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Charge phase, 1 CP, both target keywords, target remains unselected, and phase-end expiry.",
+      "unchanged_work": "Charge Move generation, charge target geometry and the CP and effect ledgers keep their existing paths. Canonical friendly Rules Units are enumerated only for the new preselection target policy."
     },
     "ci/test_shards/shard-8.txt": {
       "category": "rule_semantics",
@@ -634,9 +646,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Preserve inherited case weights and incorporate measured weights for the five added native controls.",
-      "source_obligation": "Chaos Daemons July Faction Pack page 124. Verify the 1 CP opponent Shooting reaction, both target keywords, and the phase-long Save characteristic of 3+.",
-      "unchanged_work": "The same timing window, CP ledger, expiry, allocation and save rebuild execute. A live whole-unit armour SET contributes its source-linked operation and only the applicable Save permission."
+      "rationale": "Preserve inherited case weights and schedule measured Charge and changed Phase 17I cases.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Charge phase, 1 CP, both target keywords, target remains unselected, and phase-end expiry.",
+      "unchanged_work": "Charge Move generation, charge target geometry and the CP and effect ledgers keep their existing paths. Canonical friendly Rules Units are enumerated only for the new preselection target policy."
     },
     "ci/test_shards/shard-9.txt": {
       "category": "rule_semantics",
@@ -644,9 +656,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Preserve inherited case weights and incorporate measured weights for the five added native controls.",
-      "source_obligation": "Chaos Daemons July Faction Pack page 124. Verify the 1 CP opponent Shooting reaction, both target keywords, and the phase-long Save characteristic of 3+.",
-      "unchanged_work": "The same timing window, CP ledger, expiry, allocation and save rebuild execute. A live whole-unit armour SET contributes its source-linked operation and only the applicable Save permission."
+      "rationale": "Preserve inherited case weights and schedule measured Charge and changed Phase 17I cases.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Charge phase, 1 CP, both target keywords, target remains unselected, and phase-end expiry.",
+      "unchanged_work": "Charge Move generation, charge target geometry and the CP and effect ledgers keep their existing paths. Canonical friendly Rules Units are enumerated only for the new preselection target policy."
     },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
@@ -654,9 +666,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate the existing authored examples or manifest that carries the pinned runtime build identity.",
-      "source_obligation": "Chaos Daemons July Faction Pack page 124. Verify the 1 CP opponent Shooting reaction, both target keywords, and the phase-long Save characteristic of 3+.",
-      "unchanged_work": "The same timing window, CP ledger, expiry, allocation and save rebuild execute. A live whole-unit armour SET contributes its source-linked operation and only the applicable Save permission."
+      "rationale": "Refresh maintained external examples and manifests against the exact runtime build ID.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Charge phase, 1 CP, both target keywords, target remains unselected, and phase-end expiry.",
+      "unchanged_work": "Charge Move generation, charge target geometry and the CP and effect ledgers keep their existing paths. Canonical friendly Rules Units are enumerated only for the new preselection target policy."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
@@ -664,9 +676,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate the existing authored examples or manifest that carries the pinned runtime build identity.",
-      "source_obligation": "Chaos Daemons July Faction Pack page 124. Verify the 1 CP opponent Shooting reaction, both target keywords, and the phase-long Save characteristic of 3+.",
-      "unchanged_work": "The same timing window, CP ledger, expiry, allocation and save rebuild execute. A live whole-unit armour SET contributes its source-linked operation and only the applicable Save permission."
+      "rationale": "Refresh maintained external examples and manifests against the exact runtime build ID.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Charge phase, 1 CP, both target keywords, target remains unselected, and phase-end expiry.",
+      "unchanged_work": "Charge Move generation, charge target geometry and the CP and effect ledgers keep their existing paths. Canonical friendly Rules Units are enumerated only for the new preselection target policy."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
@@ -674,9 +686,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate the existing authored examples or manifest that carries the pinned runtime build identity.",
-      "source_obligation": "Chaos Daemons July Faction Pack page 124. Verify the 1 CP opponent Shooting reaction, both target keywords, and the phase-long Save characteristic of 3+.",
-      "unchanged_work": "The same timing window, CP ledger, expiry, allocation and save rebuild execute. A live whole-unit armour SET contributes its source-linked operation and only the applicable Save permission."
+      "rationale": "Refresh maintained external examples and manifests against the exact runtime build ID.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Charge phase, 1 CP, both target keywords, target remains unselected, and phase-end expiry.",
+      "unchanged_work": "Charge Move generation, charge target geometry and the CP and effect ledgers keep their existing paths. Canonical friendly Rules Units are enumerated only for the new preselection target policy."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
@@ -684,9 +696,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate the existing authored examples or manifest that carries the pinned runtime build identity.",
-      "source_obligation": "Chaos Daemons July Faction Pack page 124. Verify the 1 CP opponent Shooting reaction, both target keywords, and the phase-long Save characteristic of 3+.",
-      "unchanged_work": "The same timing window, CP ledger, expiry, allocation and save rebuild execute. A live whole-unit armour SET contributes its source-linked operation and only the applicable Save permission."
+      "rationale": "Refresh maintained external examples and manifests against the exact runtime build ID.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Charge phase, 1 CP, both target keywords, target remains unselected, and phase-end expiry.",
+      "unchanged_work": "Charge Move generation, charge target geometry and the CP and effect ledgers keep their existing paths. Canonical friendly Rules Units are enumerated only for the new preselection target policy."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
@@ -694,9 +706,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate the existing authored examples or manifest that carries the pinned runtime build identity.",
-      "source_obligation": "Chaos Daemons July Faction Pack page 124. Verify the 1 CP opponent Shooting reaction, both target keywords, and the phase-long Save characteristic of 3+.",
-      "unchanged_work": "The same timing window, CP ledger, expiry, allocation and save rebuild execute. A live whole-unit armour SET contributes its source-linked operation and only the applicable Save permission."
+      "rationale": "Refresh maintained external examples and manifests against the exact runtime build ID.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Charge phase, 1 CP, both target keywords, target remains unselected, and phase-end expiry.",
+      "unchanged_work": "Charge Move generation, charge target geometry and the CP and effect ledgers keep their existing paths. Canonical friendly Rules Units are enumerated only for the new preselection target policy."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
@@ -704,9 +716,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate the existing authored examples or manifest that carries the pinned runtime build identity.",
-      "source_obligation": "Chaos Daemons July Faction Pack page 124. Verify the 1 CP opponent Shooting reaction, both target keywords, and the phase-long Save characteristic of 3+.",
-      "unchanged_work": "The same timing window, CP ledger, expiry, allocation and save rebuild execute. A live whole-unit armour SET contributes its source-linked operation and only the applicable Save permission."
+      "rationale": "Refresh maintained external examples and manifests against the exact runtime build ID.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Charge phase, 1 CP, both target keywords, target remains unselected, and phase-end expiry.",
+      "unchanged_work": "Charge Move generation, charge target geometry and the CP and effect ledgers keep their existing paths. Canonical friendly Rules Units are enumerated only for the new preselection target policy."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
@@ -714,9 +726,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate the existing authored examples or manifest that carries the pinned runtime build identity.",
-      "source_obligation": "Chaos Daemons July Faction Pack page 124. Verify the 1 CP opponent Shooting reaction, both target keywords, and the phase-long Save characteristic of 3+.",
-      "unchanged_work": "The same timing window, CP ledger, expiry, allocation and save rebuild execute. A live whole-unit armour SET contributes its source-linked operation and only the applicable Save permission."
+      "rationale": "Refresh maintained external examples and manifests against the exact runtime build ID.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Charge phase, 1 CP, both target keywords, target remains unselected, and phase-end expiry.",
+      "unchanged_work": "Charge Move generation, charge target geometry and the CP and effect ledgers keep their existing paths. Canonical friendly Rules Units are enumerated only for the new preselection target policy."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
@@ -724,9 +736,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate the existing authored examples or manifest that carries the pinned runtime build identity.",
-      "source_obligation": "Chaos Daemons July Faction Pack page 124. Verify the 1 CP opponent Shooting reaction, both target keywords, and the phase-long Save characteristic of 3+.",
-      "unchanged_work": "The same timing window, CP ledger, expiry, allocation and save rebuild execute. A live whole-unit armour SET contributes its source-linked operation and only the applicable Save permission."
+      "rationale": "Refresh maintained external examples and manifests against the exact runtime build ID.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Charge phase, 1 CP, both target keywords, target remains unselected, and phase-end expiry.",
+      "unchanged_work": "Charge Move generation, charge target geometry and the CP and effect ledgers keep their existing paths. Canonical friendly Rules Units are enumerated only for the new preselection target policy."
     },
     "data/generated/ability_coverage/cross_source_semantic_equivalence.json": {
       "category": "rule_semantics",
@@ -734,9 +746,9 @@
         "phase-end-healing-source-and-report"
       ],
       "selected_families": [],
-      "rationale": "Regenerate executable generic RuleIR coverage for the retained Sheathed in Brass source.",
-      "source_obligation": "Chaos Daemons July Faction Pack page 124. Verify the 1 CP opponent Shooting reaction, both target keywords, and the phase-long Save characteristic of 3+.",
-      "unchanged_work": "The same timing window, CP ledger, expiry, allocation and save rebuild execute. A live whole-unit armour SET contributes its source-linked operation and only the applicable Save permission."
+      "rationale": "Publish the single qualified Stratagem support transition and its dependent evidence.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Charge phase, 1 CP, both target keywords, target remains unselected, and phase-end expiry.",
+      "unchanged_work": "Charge Move generation, charge target geometry and the CP and effect ledgers keep their existing paths. Canonical friendly Rules Units are enumerated only for the new preselection target policy."
     },
     "data/generated/ability_coverage/runtime_content_semantic_coverage.json": {
       "category": "rule_semantics",
@@ -744,25 +756,33 @@
         "supported-acts-current-semantic-artifact"
       ],
       "selected_families": [],
-      "rationale": "Regenerate executable generic RuleIR coverage for the retained Sheathed in Brass source.",
-      "source_obligation": "Chaos Daemons July Faction Pack page 124. Verify the 1 CP opponent Shooting reaction, both target keywords, and the phase-long Save characteristic of 3+.",
-      "unchanged_work": "The same timing window, CP ledger, expiry, allocation and save rebuild execute. A live whole-unit armour SET contributes its source-linked operation and only the applicable Save permission."
+      "rationale": "Publish the single qualified Stratagem support transition and its dependent evidence.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Charge phase, 1 CP, both target keywords, target remains unselected, and phase-end expiry.",
+      "unchanged_work": "Charge Move generation, charge target geometry and the CP and effect ledgers keep their existing paths. Canonical friendly Rules Units are enumerated only for the new preselection target policy."
     },
-    "data/source_audits/ci64_provenance_v1/sheathed-in-brass-transition-v1.json": {
+    "data/source_audits/ci64_provenance_v1/blood-begets-skulls-transition-v1.json": {
       "category": "rule_semantics",
       "operations": [
-        "sheathed-in-brass-test-admission"
+        "blood-begets-skulls-test-admission"
       ],
       "selected_families": [],
-      "rationale": "Add exact native controls and authenticate their membership against the rigid ground charge predecessor.",
-      "source_obligation": "Chaos Daemons July Faction Pack page 124. Verify the 1 CP opponent Shooting reaction, both target keywords, and the phase-long Save characteristic of 3+.",
-      "unchanged_work": "The same timing window, CP ledger, expiry, allocation and save rebuild execute. A live whole-unit armour SET contributes its source-linked operation and only the applicable Save permission."
+      "rationale": "Validate scoped native Charge behavior and bind live selectors and source successors to the Sheathed receipt.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Charge phase, 1 CP, both target keywords, target remains unselected, and phase-end expiry.",
+      "unchanged_work": "Charge Move generation, charge target geometry and the CP and effect ledgers keep their existing paths. Canonical friendly Rules Units are enumerated only for the new preselection target policy."
     },
     "docs/ABILITY_SUPPORT_MATRIX_V2.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Record the individually qualified Stratagem coverage and register the exact changed performance owners.",
+      "rationale": "Publish the single qualified Stratagem support transition and its dependent evidence.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/ADAPTER_DECISION_CONTRACT.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Publish the single qualified Stratagem support transition and its dependent evidence.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -770,7 +790,7 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Record the individually qualified Stratagem coverage and register the exact changed performance owners.",
+      "rationale": "Publish the single qualified Stratagem support transition and its dependent evidence.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -778,7 +798,7 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Record the individually qualified Stratagem coverage and register the exact changed performance owners.",
+      "rationale": "Publish the single qualified Stratagem support transition and its dependent evidence.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -786,7 +806,7 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Record the individually qualified Stratagem coverage and register the exact changed performance owners.",
+      "rationale": "Publish the single qualified Stratagem support transition and its dependent evidence.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -794,7 +814,7 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Record the individually qualified Stratagem coverage and register the exact changed performance owners.",
+      "rationale": "Publish the single qualified Stratagem support transition and its dependent evidence.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -808,12 +828,13 @@
         "round4-malice-bearer-liveness",
         "round4-battle-shock-event-wounds",
         "phase-end-healing-test-admission",
-        "sheathed-in-brass-test-admission"
+        "sheathed-in-brass-test-admission",
+        "blood-begets-skulls-test-admission"
       ],
       "selected_families": [],
-      "rationale": "Add exact native controls and authenticate their membership against the rigid ground charge predecessor.",
-      "source_obligation": "Chaos Daemons July Faction Pack page 124. Verify the 1 CP opponent Shooting reaction, both target keywords, and the phase-long Save characteristic of 3+.",
-      "unchanged_work": "The same timing window, CP ledger, expiry, allocation and save rebuild execute. A live whole-unit armour SET contributes its source-linked operation and only the applicable Save permission."
+      "rationale": "Validate scoped native Charge behavior and bind live selectors and source successors to the Sheathed receipt.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Charge phase, 1 CP, both target keywords, target remains unselected, and phase-end expiry.",
+      "unchanged_work": "Charge Move generation, charge target geometry and the CP and effect ledgers keep their existing paths. Canonical friendly Rules Units are enumerated only for the new preselection target policy."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
@@ -822,69 +843,112 @@
         "phase-end-healing-source-and-report"
       ],
       "selected_families": [],
-      "rationale": "Regenerate the existing authored examples or manifest that carries the pinned runtime build identity.",
-      "source_obligation": "Chaos Daemons July Faction Pack page 124. Verify the 1 CP opponent Shooting reaction, both target keywords, and the phase-long Save characteristic of 3+.",
-      "unchanged_work": "The same timing window, CP ledger, expiry, allocation and save rebuild execute. A live whole-unit armour SET contributes its source-linked operation and only the applicable Save permission."
+      "rationale": "Refresh maintained external examples and manifests against the exact runtime build ID.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Charge phase, 1 CP, both target keywords, target remains unselected, and phase-end expiry.",
+      "unchanged_work": "Charge Move generation, charge target geometry and the CP and effect ledgers keep their existing paths. Canonical friendly Rules Units are enumerated only for the new preselection target policy."
     },
-    "src/warhammer40k_core/engine/generic_attack_save_modifiers.py": {
+    "src/warhammer40k_core/engine/charge_phase_flow.py": {
       "category": "rule_semantics",
       "operations": [
-        "sheathed-in-brass-armour-save"
+        "blood-begets-skulls-charge-preselection"
       ],
       "selected_families": [],
-      "rationale": "Bind the retained Stratagem to its existing selected-target window and the source-linked armour characteristic operation.",
-      "source_obligation": "Chaos Daemons July Faction Pack page 124. Verify the 1 CP opponent Shooting reaction, both target keywords, and the phase-long Save characteristic of 3+.",
-      "unchanged_work": "The same timing window, CP ledger, expiry, allocation and save rebuild execute. A live whole-unit armour SET contributes its source-linked operation and only the applicable Save permission."
+      "rationale": "Offer Blood Begets Skulls between ordinary Charge activations and apply its existing source-linked effect.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Charge phase, 1 CP, both target keywords, target remains unselected, and phase-end expiry.",
+      "unchanged_work": "Charge Move generation, charge target geometry and the CP and effect ledgers keep their existing paths. Canonical friendly Rules Units are enumerated only for the new preselection target policy."
     },
-    "src/warhammer40k_core/engine/native_attack_gathering.py": {
+    "src/warhammer40k_core/engine/charge_preselection_stratagems.py": {
       "category": "rule_semantics",
       "operations": [
-        "s25-src-warhammer40k_core-engine-native_attack_gathering"
+        "blood-begets-skulls-charge-preselection"
       ],
       "selected_families": [],
-      "rationale": "Bind the retained Stratagem to its existing selected-target window and the source-linked armour characteristic operation.",
-      "source_obligation": "Chaos Daemons July Faction Pack page 124. Verify the 1 CP opponent Shooting reaction, both target keywords, and the phase-long Save characteristic of 3+.",
-      "unchanged_work": "The same timing window, CP ledger, expiry, allocation and save rebuild execute. A live whole-unit armour SET contributes its source-linked operation and only the applicable Save permission."
+      "rationale": "Offer Blood Begets Skulls between ordinary Charge activations and apply its existing source-linked effect.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Charge phase, 1 CP, both target keywords, target remains unselected, and phase-end expiry.",
+      "unchanged_work": "Charge Move generation, charge target geometry and the CP and effect ledgers keep their existing paths. Canonical friendly Rules Units are enumerated only for the new preselection target policy."
     },
-    "src/warhammer40k_core/engine/native_gathering_permission_relevance.py": {
+    "src/warhammer40k_core/engine/stratagems.py": {
       "category": "rule_semantics",
       "operations": [
-        "s25-src-warhammer40k_core-engine-native_gathering_permission_relevance"
+        "blood-begets-skulls-charge-preselection"
       ],
       "selected_families": [],
-      "rationale": "Bind the retained Stratagem to its existing selected-target window and the source-linked armour characteristic operation.",
-      "source_obligation": "Chaos Daemons July Faction Pack page 124. Verify the 1 CP opponent Shooting reaction, both target keywords, and the phase-long Save characteristic of 3+.",
-      "unchanged_work": "The same timing window, CP ledger, expiry, allocation and save rebuild execute. A live whole-unit armour SET contributes its source-linked operation and only the applicable Save permission."
+      "rationale": "Offer Blood Begets Skulls between ordinary Charge activations and apply its existing source-linked effect.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Charge phase, 1 CP, both target keywords, target remains unselected, and phase-end expiry.",
+      "unchanged_work": "Charge Move generation, charge target geometry and the CP and effect ledgers keep their existing paths. Canonical friendly Rules Units are enumerated only for the new preselection target policy."
+    },
+    "src/warhammer40k_core/engine/stratagems_model.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "blood-begets-skulls-charge-preselection"
+      ],
+      "selected_families": [],
+      "rationale": "Offer Blood Begets Skulls between ordinary Charge activations and apply its existing source-linked effect.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Charge phase, 1 CP, both target keywords, target remains unselected, and phase-end expiry.",
+      "unchanged_work": "Charge Move generation, charge target geometry and the CP and effect ledgers keep their existing paths. Canonical friendly Rules Units are enumerated only for the new preselection target policy."
+    },
+    "src/warhammer40k_core/engine/stratagems_requests.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "blood-begets-skulls-charge-preselection"
+      ],
+      "selected_families": [],
+      "rationale": "Offer Blood Begets Skulls between ordinary Charge activations and apply its existing source-linked effect.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Charge phase, 1 CP, both target keywords, target remains unselected, and phase-end expiry.",
+      "unchanged_work": "Charge Move generation, charge target geometry and the CP and effect ledgers keep their existing paths. Canonical friendly Rules Units are enumerated only for the new preselection target policy."
+    },
+    "src/warhammer40k_core/engine/stratagems_targeting.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "blood-begets-skulls-charge-preselection"
+      ],
+      "selected_families": [],
+      "rationale": "Offer Blood Begets Skulls between ordinary Charge activations and apply its existing source-linked effect.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Charge phase, 1 CP, both target keywords, target remains unselected, and phase-end expiry.",
+      "unchanged_work": "Charge Move generation, charge target geometry and the CP and effect ledgers keep their existing paths. Canonical friendly Rules Units are enumerated only for the new preselection target policy."
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_blood_legion_ir_support_2026_27.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "blood-begets-skulls-source-activation"
+      ],
+      "selected_families": [],
+      "rationale": "Offer Blood Begets Skulls between ordinary Charge activations and apply its existing source-linked effect.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Charge phase, 1 CP, both target keywords, target remains unselected, and phase-end expiry.",
+      "unchanged_work": "Charge Move generation, charge target geometry and the CP and effect ledgers keep their existing paths. Canonical friendly Rules Units are enumerated only for the new preselection target policy."
     },
     "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_generic_ir_support_2026_27.py": {
       "category": "rule_semantics",
       "operations": [
-        "sheathed-in-brass-armour-save"
+        "sheathed-in-brass-armour-save",
+        "blood-begets-skulls-source-activation"
       ],
       "selected_families": [],
-      "rationale": "Bind the retained Stratagem to its existing selected-target window and the source-linked armour characteristic operation.",
-      "source_obligation": "Chaos Daemons July Faction Pack page 124. Verify the 1 CP opponent Shooting reaction, both target keywords, and the phase-long Save characteristic of 3+.",
-      "unchanged_work": "The same timing window, CP ledger, expiry, allocation and save rebuild execute. A live whole-unit armour SET contributes its source-linked operation and only the applicable Save permission."
+      "rationale": "Offer Blood Begets Skulls between ordinary Charge activations and apply its existing source-linked effect.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Charge phase, 1 CP, both target keywords, target remains unselected, and phase-end expiry.",
+      "unchanged_work": "Charge Move generation, charge target geometry and the CP and effect ledgers keep their existing paths. Canonical friendly Rules Units are enumerated only for the new preselection target policy."
     },
     "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_stratagem_activation_2026_27.json": {
       "category": "rule_semantics",
       "operations": [
-        "sheathed-in-brass-armour-save"
+        "sheathed-in-brass-armour-save",
+        "blood-begets-skulls-source-activation"
       ],
       "selected_families": [],
-      "rationale": "Bind the retained Stratagem to its existing selected-target window and the source-linked armour characteristic operation.",
-      "source_obligation": "Chaos Daemons July Faction Pack page 124. Verify the 1 CP opponent Shooting reaction, both target keywords, and the phase-long Save characteristic of 3+.",
-      "unchanged_work": "The same timing window, CP ledger, expiry, allocation and save rebuild execute. A live whole-unit armour SET contributes its source-linked operation and only the applicable Save permission."
+      "rationale": "Offer Blood Begets Skulls between ordinary Charge activations and apply its existing source-linked effect.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Charge phase, 1 CP, both target keywords, target remains unselected, and phase-end expiry.",
+      "unchanged_work": "Charge Move generation, charge target geometry and the CP and effect ledgers keep their existing paths. Canonical friendly Rules Units are enumerated only for the new preselection target policy."
     },
     "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_stratagem_activation_2026_27.py": {
       "category": "rule_semantics",
       "operations": [
-        "sheathed-in-brass-armour-save"
+        "sheathed-in-brass-armour-save",
+        "blood-begets-skulls-source-activation"
       ],
       "selected_families": [],
-      "rationale": "Bind the retained Stratagem to its existing selected-target window and the source-linked armour characteristic operation.",
-      "source_obligation": "Chaos Daemons July Faction Pack page 124. Verify the 1 CP opponent Shooting reaction, both target keywords, and the phase-long Save characteristic of 3+.",
-      "unchanged_work": "The same timing window, CP ledger, expiry, allocation and save rebuild execute. A live whole-unit armour SET contributes its source-linked operation and only the applicable Save permission."
+      "rationale": "Offer Blood Begets Skulls between ordinary Charge activations and apply its existing source-linked effect.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Charge phase, 1 CP, both target keywords, target remains unselected, and phase-end expiry.",
+      "unchanged_work": "Charge Move generation, charge target geometry and the CP and effect ledgers keep their existing paths. Canonical friendly Rules Units are enumerated only for the new preselection target policy."
     },
     "tests/code_quality/test_engine_numerical_identity_admission.py": {
       "category": "rule_semantics",
@@ -894,27 +958,19 @@
         "round4-battle-shock-event-wounds"
       ],
       "selected_families": [],
-      "rationale": "Keep the rigid ground charge fingerprint bound to the exact predecessor and check the appended Sheathed admission against the current runtime.",
-      "source_obligation": "Chaos Daemons July Faction Pack page 124. Register the source-backed Sheathed in Brass ability as an executable generic activation.",
-      "unchanged_work": "The existing runtime, source receipts and evidence validators execute with the same operations. The updated checks bind the current generated report and historical predecessor bytes."
+      "rationale": "Validate scoped native Charge behavior and bind live selectors and source successors to the Sheathed receipt.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Charge phase, 1 CP, both target keywords, target remains unselected, and phase-end expiry.",
+      "unchanged_work": "Charge Move generation, charge target geometry and the CP and effect ledgers keep their existing paths. Canonical friendly Rules Units are enumerated only for the new preselection target policy."
     },
-    "tests/code_quality/test_order117_mortal_allocation.py": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Verify the original exemplar artifact at its historical revision and compare its source-linked activation row and RuleIR to the current artifact.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "tests/factions/chaos_daemons/integration/test_sheathed_in_brass.py": {
+    "tests/factions/chaos_daemons/integration/test_blood_begets_skulls.py": {
       "category": "rule_semantics",
       "operations": [
-        "sheathed-in-brass-test-admission"
+        "blood-begets-skulls-test-admission"
       ],
       "selected_families": [],
-      "rationale": "Add exact native controls and authenticate their membership against the rigid ground charge predecessor.",
-      "source_obligation": "Chaos Daemons July Faction Pack page 124. Verify the 1 CP opponent Shooting reaction, both target keywords, and the phase-long Save characteristic of 3+.",
-      "unchanged_work": "The same timing window, CP ledger, expiry, allocation and save rebuild execute. A live whole-unit armour SET contributes its source-linked operation and only the applicable Save permission."
+      "rationale": "Validate scoped native Charge behavior and bind live selectors and source successors to the Sheathed receipt.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Charge phase, 1 CP, both target keywords, target remains unselected, and phase-end expiry.",
+      "unchanged_work": "Charge Move generation, charge target geometry and the CP and effect ledgers keep their existing paths. Canonical friendly Rules Units are enumerated only for the new preselection target policy."
     },
     "tests/infrastructure/source_governance/unit/test_blocked_row_classification.py": {
       "category": "rule_semantics",
@@ -922,19 +978,20 @@
         "ci-restructure-tests-infrastructure-source_governance-unit-test_blocked_row_classification.py"
       ],
       "selected_families": [],
-      "rationale": "Realign the exact Phase 17I assertions with the single Sheathed in Brass member becoming executable.",
-      "source_obligation": "The retained July Chaos Daemons faction pack, page 124, supplies the Sheathed in Brass rule bound as executable generic RuleIR.",
-      "unchanged_work": "Keep all existing classification, semantic checksum and malformed-payload checks. Prove the revised blocked inventory and the new exact membership separately."
+      "rationale": "Validate scoped native Charge behavior and bind live selectors and source successors to the Sheathed receipt.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Charge phase, 1 CP, both target keywords, target remains unselected, and phase-end expiry.",
+      "unchanged_work": "Charge Move generation, charge target geometry and the CP and effect ledgers keep their existing paths. Canonical friendly Rules Units are enumerated only for the new preselection target policy."
     },
     "tools/generate_faction_stratagem_activation_support.py": {
       "category": "rule_semantics",
       "operations": [
-        "sheathed-in-brass-armour-save"
+        "sheathed-in-brass-armour-save",
+        "blood-begets-skulls-source-activation"
       ],
       "selected_families": [],
-      "rationale": "Bind the retained Stratagem to its existing selected-target window and the source-linked armour characteristic operation.",
-      "source_obligation": "Chaos Daemons July Faction Pack page 124. Verify the 1 CP opponent Shooting reaction, both target keywords, and the phase-long Save characteristic of 3+.",
-      "unchanged_work": "The same timing window, CP ledger, expiry, allocation and save rebuild execute. A live whole-unit armour SET contributes its source-linked operation and only the applicable Save permission."
+      "rationale": "Offer Blood Begets Skulls between ordinary Charge activations and apply its existing source-linked effect.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Charge phase, 1 CP, both target keywords, target remains unselected, and phase-end expiry.",
+      "unchanged_work": "Charge Move generation, charge target geometry and the CP and effect ledgers keep their existing paths. Canonical friendly Rules Units are enumerated only for the new preselection target policy."
     }
   },
   "milestone": "ordinary",
