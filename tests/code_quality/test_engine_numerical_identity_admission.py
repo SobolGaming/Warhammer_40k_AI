@@ -383,6 +383,7 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         for name in (
             "test_rigid_group_charge_certifies_the_exact_mixed_endpoint_witness",
             "test_rigid_group_charge_native_rejects_a_column_that_stops_outside_engagement",
+            "test_group_charge_keeps_grid_at_rounded_reachability_bound",
         )
     )
     screen = _record(ground_charge.SCREEN_TRANSITION)

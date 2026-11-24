@@ -1,206 +1,206 @@
 {
   "policy": "rules-engine-performance-v3",
   "base": "5aca97bfaf4b3f1a753d65ed6b7dfc2482aa77f0",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:3655e221739a9f5a95fd1da200a1069879ec361b04ac1c9082eb316242749df7",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0620b70b0c2bbedd4c55fa2805ff698135009c695c3a6c8b390a2a76629f0666",
   "operation_map_sha256": "7c28e0eadf8c9060658a88fd2de40a6867555b33694e4b719e92157da5d2385e",
   "changes": {
     "ci/test_shards/durations.json": {
       "before_sha256": "98ce1a57bd82e90e0a72a499d207f9e7286cd5c0f0ec58e2e36db4bf20a8a1ad",
-      "after_sha256": "67fbf52fc2f0434c4430c801c39b1a23bcaa397164fefba609c1cd41681bd33f",
+      "after_sha256": "1c3803c11c20c30840fffa22ecaae47826475d8a9baf7a9706703e7aeec0cbcd",
       "owners": {
         "@document": {
           "before": "98ce1a57bd82e90e0a72a499d207f9e7286cd5c0f0ec58e2e36db4bf20a8a1ad",
-          "after": "67fbf52fc2f0434c4430c801c39b1a23bcaa397164fefba609c1cd41681bd33f"
+          "after": "1c3803c11c20c30840fffa22ecaae47826475d8a9baf7a9706703e7aeec0cbcd"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
       "before_sha256": "bce702ee87e3a30a09016faecab69004465442a1490e6e2892c26525b5b055f7",
-      "after_sha256": "14a482e8cbfedf4701a926ad505b22cd88268aa81dd44a9bd9a552ca5c24dc1d",
+      "after_sha256": "762ce4622e90d203d405edf66e7efb7b459276f84b3607401119f8508f744dba",
       "owners": {
         "@document": {
           "before": "bce702ee87e3a30a09016faecab69004465442a1490e6e2892c26525b5b055f7",
-          "after": "14a482e8cbfedf4701a926ad505b22cd88268aa81dd44a9bd9a552ca5c24dc1d"
+          "after": "762ce4622e90d203d405edf66e7efb7b459276f84b3607401119f8508f744dba"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
       "before_sha256": "437b06ef64cadefffcff8e0388bfc5f9372c11027154d2b8582030671ea05a04",
-      "after_sha256": "0aca20679fe73c7c0d5216a6806aba453e84d2d82eff7023694b1db978df58ff",
+      "after_sha256": "90944a81469ae49c211915798f66d97e9aff15fea64a7c1ad303dbdeaa42c071",
       "owners": {
         "@document": {
           "before": "437b06ef64cadefffcff8e0388bfc5f9372c11027154d2b8582030671ea05a04",
-          "after": "0aca20679fe73c7c0d5216a6806aba453e84d2d82eff7023694b1db978df58ff"
+          "after": "90944a81469ae49c211915798f66d97e9aff15fea64a7c1ad303dbdeaa42c071"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
       "before_sha256": "7817a95906d378a9b1d0fab717b3bca0a39559464a57f6fa57f19e05a7190906",
-      "after_sha256": "3f69c523deda33e594547daee3410d36b61d90d96617b7f72aa61c97a83599eb",
+      "after_sha256": "584411d86e4a0934c58fd98cdcd8188d6489a568ae6b6cfcaf8046804df6a618",
       "owners": {
         "@document": {
           "before": "7817a95906d378a9b1d0fab717b3bca0a39559464a57f6fa57f19e05a7190906",
-          "after": "3f69c523deda33e594547daee3410d36b61d90d96617b7f72aa61c97a83599eb"
+          "after": "584411d86e4a0934c58fd98cdcd8188d6489a568ae6b6cfcaf8046804df6a618"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
       "before_sha256": "0ddc4bc7add76538480c76888b2a75b601adfc76c2f137bd6423211c713d39c0",
-      "after_sha256": "c70c7deb3ac7f51ac0f82ec402d450821c0b1174fbefb0af9ac78fc747c780cf",
+      "after_sha256": "daccd424046b5d7cedec7ece9b3950a822d15b637f2446b74637dfdd2e5e195e",
       "owners": {
         "@document": {
           "before": "0ddc4bc7add76538480c76888b2a75b601adfc76c2f137bd6423211c713d39c0",
-          "after": "c70c7deb3ac7f51ac0f82ec402d450821c0b1174fbefb0af9ac78fc747c780cf"
+          "after": "daccd424046b5d7cedec7ece9b3950a822d15b637f2446b74637dfdd2e5e195e"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
       "before_sha256": "b7833d897a51bb5228484ed7a70a1e10bece1495d11323a556380db34a4fa148",
-      "after_sha256": "9c9d8cdfe7b70dd52a3c92593f5f41d29b47d1c997c3ccbe49b454c26a4dd960",
+      "after_sha256": "f64f2ec1e9871560a99f2319d1d4932d7bbc88ed5f2c0a8baae0ae33de3fd616",
       "owners": {
         "@document": {
           "before": "b7833d897a51bb5228484ed7a70a1e10bece1495d11323a556380db34a4fa148",
-          "after": "9c9d8cdfe7b70dd52a3c92593f5f41d29b47d1c997c3ccbe49b454c26a4dd960"
+          "after": "f64f2ec1e9871560a99f2319d1d4932d7bbc88ed5f2c0a8baae0ae33de3fd616"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
       "before_sha256": "0a1c581863f8005be11d69d3ce2f51de58f27f2a481d8d48f590511955835578",
-      "after_sha256": "96d1f68129fa5aa4060bac0ca85c7082b63e7bd4749e03ade486e6b2a11d9daa",
+      "after_sha256": "b399dc187b235771790c03f5422c6d8a4afe8ee42b390b0d2b1536f6fb1ffad0",
       "owners": {
         "@document": {
           "before": "0a1c581863f8005be11d69d3ce2f51de58f27f2a481d8d48f590511955835578",
-          "after": "96d1f68129fa5aa4060bac0ca85c7082b63e7bd4749e03ade486e6b2a11d9daa"
+          "after": "b399dc187b235771790c03f5422c6d8a4afe8ee42b390b0d2b1536f6fb1ffad0"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
       "before_sha256": "acefff6f4b8d3bda688e2526ac8938011ce95d96644891e7b66cce0a0cc4f82d",
-      "after_sha256": "18495f1cb64dcf7dc3b64c5db85b98dbb440f08d80be892871b5401be13920cf",
+      "after_sha256": "b27bc2a259150fa891fcb9757b66e97429232dfd21ef66b285db12f196c0f78a",
       "owners": {
         "@document": {
           "before": "acefff6f4b8d3bda688e2526ac8938011ce95d96644891e7b66cce0a0cc4f82d",
-          "after": "18495f1cb64dcf7dc3b64c5db85b98dbb440f08d80be892871b5401be13920cf"
+          "after": "b27bc2a259150fa891fcb9757b66e97429232dfd21ef66b285db12f196c0f78a"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
       "before_sha256": "01bb2deb6d3b243a2a0ecbcaf5b5969f6dbc160cd1ca907ef0221ca30a02bc66",
-      "after_sha256": "3d8ed1186ece67aa63ef22e4d3bc6d2b6264fdf41506babcfe5775dc0d9286e0",
+      "after_sha256": "8bc3e9b05f12042612c3ef3f0a26ad0a319882919b849c88a8ddca75a4c32f01",
       "owners": {
         "@document": {
           "before": "01bb2deb6d3b243a2a0ecbcaf5b5969f6dbc160cd1ca907ef0221ca30a02bc66",
-          "after": "3d8ed1186ece67aa63ef22e4d3bc6d2b6264fdf41506babcfe5775dc0d9286e0"
+          "after": "8bc3e9b05f12042612c3ef3f0a26ad0a319882919b849c88a8ddca75a4c32f01"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
       "before_sha256": "53d26b48eb0f2c55f46bd08758236b34cce34a3d3cc2c8fdd987ba2b9e1364a4",
-      "after_sha256": "d7fd3428ea8a3b0a9cbf46ba781863c6fcc095becaddc0a5d2df5b6ec34fa6f4",
+      "after_sha256": "cdff62407f243b8cf7fd9e3f1ba575719cb5065d3ff3bca8af4e247d44491c8c",
       "owners": {
         "@document": {
           "before": "53d26b48eb0f2c55f46bd08758236b34cce34a3d3cc2c8fdd987ba2b9e1364a4",
-          "after": "d7fd3428ea8a3b0a9cbf46ba781863c6fcc095becaddc0a5d2df5b6ec34fa6f4"
+          "after": "cdff62407f243b8cf7fd9e3f1ba575719cb5065d3ff3bca8af4e247d44491c8c"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
       "before_sha256": "465f14716c05afa096d71c87afd37ee40fe0c7b20e99b08cef65c5c6882cbab2",
-      "after_sha256": "a9cb36bf8fd50473d09a1797f2a458d87f56d3b92453108bfc6cd462c77abf28",
+      "after_sha256": "82b9b11a6d8567fe213c834f998aa7fe9e8ffe0e809de96680524de23858e0b7",
       "owners": {
         "@document": {
           "before": "465f14716c05afa096d71c87afd37ee40fe0c7b20e99b08cef65c5c6882cbab2",
-          "after": "a9cb36bf8fd50473d09a1797f2a458d87f56d3b92453108bfc6cd462c77abf28"
+          "after": "82b9b11a6d8567fe213c834f998aa7fe9e8ffe0e809de96680524de23858e0b7"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
       "before_sha256": "3b859d95c83a93048a6a5eadb1ae5c93195012332f1433cfbffb2f94a2947035",
-      "after_sha256": "e8237a0e2f235520920c70745370e7dcb67c6fdab46186f69f4306fdd7ea8143",
+      "after_sha256": "1574bb1b479b631c17271ebac7224bb33493cc2194a05242ec907b913867da56",
       "owners": {
         "@document": {
           "before": "3b859d95c83a93048a6a5eadb1ae5c93195012332f1433cfbffb2f94a2947035",
-          "after": "e8237a0e2f235520920c70745370e7dcb67c6fdab46186f69f4306fdd7ea8143"
+          "after": "1574bb1b479b631c17271ebac7224bb33493cc2194a05242ec907b913867da56"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "before_sha256": "b1812dadd30ce05aa3cd7b6c9b4107845bd0effe6431e895cb1d89f5219b06a7",
-      "after_sha256": "cf204551466316d97216b5f9635a0c57d62d815b420df312fefb0d071d2bbee0",
+      "after_sha256": "692af51c87fb5350b01bf93535d06960d635195368a003026dfbd019098d0be2",
       "owners": {
         "@document": {
           "before": "b1812dadd30ce05aa3cd7b6c9b4107845bd0effe6431e895cb1d89f5219b06a7",
-          "after": "cf204551466316d97216b5f9635a0c57d62d815b420df312fefb0d071d2bbee0"
+          "after": "692af51c87fb5350b01bf93535d06960d635195368a003026dfbd019098d0be2"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
       "before_sha256": "3967bb245452e604c3002d63e9272af569f98c59e487e20caf2f2091e3431202",
-      "after_sha256": "6b9584c1443a09e71bb794fb68cba3355b9b47741369b55449549c0ab5a33888",
+      "after_sha256": "f07544a360acc488307e474b128c3759e0be7c337f63def6731c11e11f6d85c8",
       "owners": {
         "@document": {
           "before": "3967bb245452e604c3002d63e9272af569f98c59e487e20caf2f2091e3431202",
-          "after": "6b9584c1443a09e71bb794fb68cba3355b9b47741369b55449549c0ab5a33888"
+          "after": "f07544a360acc488307e474b128c3759e0be7c337f63def6731c11e11f6d85c8"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "before_sha256": "e1bfa8bafa11d990c251ab8cd3e08a4a33b29704af2a459804ebe049b5a11039",
-      "after_sha256": "325a524f30cede5067f4a5a606de1d48aa6938b00d026c7d8caa8ac2b3f11fb6",
+      "after_sha256": "8c4be5ce5b8ee9252bb0054642c8f02e7f1821dc87fae5f30fdd757a1957e006",
       "owners": {
         "@document": {
           "before": "e1bfa8bafa11d990c251ab8cd3e08a4a33b29704af2a459804ebe049b5a11039",
-          "after": "325a524f30cede5067f4a5a606de1d48aa6938b00d026c7d8caa8ac2b3f11fb6"
+          "after": "8c4be5ce5b8ee9252bb0054642c8f02e7f1821dc87fae5f30fdd757a1957e006"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "before_sha256": "ed3b466bde7e46572635fd9d80912f158ed0ada69ff10342ed8db7f3c3aaa18b",
-      "after_sha256": "db6bd5162fcfbb71ad418f29bcee72f7fccdb1c9d13275ae2b6c18109f880e5b",
+      "after_sha256": "773c790f9e45faa8cd43d0ebeffc2a16d8eed04fdbbd45c5e0ec12a9bd16a5b4",
       "owners": {
         "@document": {
           "before": "ed3b466bde7e46572635fd9d80912f158ed0ada69ff10342ed8db7f3c3aaa18b",
-          "after": "db6bd5162fcfbb71ad418f29bcee72f7fccdb1c9d13275ae2b6c18109f880e5b"
+          "after": "773c790f9e45faa8cd43d0ebeffc2a16d8eed04fdbbd45c5e0ec12a9bd16a5b4"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "before_sha256": "a11b77527dcaa708d95ce6863e40e85f06a0138e804bc740023e751d8d026a3e",
-      "after_sha256": "d8bc40f56ec51e03559bf0a0f884735f1793e7a0381808e1f4883e50beb3d977",
+      "after_sha256": "91e72b5b360e604dd80d89890e6eaed915cbf3f3f663518d71e7d41de2411e8f",
       "owners": {
         "@document": {
           "before": "a11b77527dcaa708d95ce6863e40e85f06a0138e804bc740023e751d8d026a3e",
-          "after": "d8bc40f56ec51e03559bf0a0f884735f1793e7a0381808e1f4883e50beb3d977"
+          "after": "91e72b5b360e604dd80d89890e6eaed915cbf3f3f663518d71e7d41de2411e8f"
         }
       }
     },
     "contracts/examples/support-profile.json": {
       "before_sha256": "696213f346b6e682c484530425c09eab214eb1c5ea2d1a66d2ed765f7bc0f47c",
-      "after_sha256": "641a82a7c5a48f6effa3f0de51b7f8a95c9a6af6ca7ed0d1af5b43990710def2",
+      "after_sha256": "e27c52ec4301ca96bdbc32de066ed56681b035871da546a3dcf96503149d6e4a",
       "owners": {
         "@document": {
           "before": "696213f346b6e682c484530425c09eab214eb1c5ea2d1a66d2ed765f7bc0f47c",
-          "after": "641a82a7c5a48f6effa3f0de51b7f8a95c9a6af6ca7ed0d1af5b43990710def2"
+          "after": "e27c52ec4301ca96bdbc32de066ed56681b035871da546a3dcf96503149d6e4a"
         }
       }
     },
     "contracts/manifest.json": {
       "before_sha256": "bbffd76f9041c85a5c753bbed85549ecb49eeeb00caa3760c1cce6b1fe6a1543",
-      "after_sha256": "aa6eb7145e6edd20c09f006e030c0ce09a4675c0d780453a85e883752bd093d1",
+      "after_sha256": "da5604bd2ba326902cde281896c819069593dcd00fe0a31146b1ea7ae19c6b1e",
       "owners": {
         "@document": {
           "before": "bbffd76f9041c85a5c753bbed85549ecb49eeeb00caa3760c1cce6b1fe6a1543",
-          "after": "aa6eb7145e6edd20c09f006e030c0ce09a4675c0d780453a85e883752bd093d1"
+          "after": "da5604bd2ba326902cde281896c819069593dcd00fe0a31146b1ea7ae19c6b1e"
         }
       }
     },
     "data/source_audits/ci64_provenance_v1/stage2-rigid-ground-charge-test-v1.json": {
       "before_sha256": null,
-      "after_sha256": "e5442180d99829bfc43b5627266588a27eb97afcf392e3e46d430254bc8f0719",
+      "after_sha256": "2345dd760e0b9786c2420a024beb30aa7b734e6ab7ef1c0a9cedd33b0e0b72f2",
       "owners": {
         "@document": {
           "before": null,
-          "after": "e5442180d99829bfc43b5627266588a27eb97afcf392e3e46d430254bc8f0719"
+          "after": "2345dd760e0b9786c2420a024beb30aa7b734e6ab7ef1c0a9cedd33b0e0b72f2"
         }
       }
     },
@@ -216,11 +216,11 @@
     },
     "docs/AI_POLICY_INTERFACE.md": {
       "before_sha256": "80226c6322fc9852d4d93b8b586f41b724f4119c0109506c4212087502c05939",
-      "after_sha256": "47250d888f9ecefdf035880599542f78ebee9c56ed869f82d2bc6f251f0885ea",
+      "after_sha256": "2ab5c7452f33e2b904962f5db7e6ecc49d565c17d5e95f8e839ef3a5bda25c69",
       "owners": {
         "@document": {
           "before": "80226c6322fc9852d4d93b8b586f41b724f4119c0109506c4212087502c05939",
-          "after": "47250d888f9ecefdf035880599542f78ebee9c56ed869f82d2bc6f251f0885ea"
+          "after": "2ab5c7452f33e2b904962f5db7e6ecc49d565c17d5e95f8e839ef3a5bda25c69"
         }
       }
     },
@@ -246,11 +246,11 @@
     },
     "scripts/stage2_ground_charge_test_admission.py": {
       "before_sha256": "4b12dd23a49504f21a8cc874882fd24483b51da48eed90da561f464e8dc81b1d",
-      "after_sha256": "2509281481a9a0674b95ecc5bef6cb58eaaaa0b711a1dd7b0d2a03d4791418d4",
+      "after_sha256": "82497e5dd7e86bc4f2399debed29a6adfe258f14fc74bc733c53c7d7213c8137",
       "owners": {
         "@module": {
           "before": "dda5d2f22406ec6358bd5c0164e9c263cdcbd7384ef19092457125a98cf5ce30",
-          "after": "0c195103db0eeeeca9e987c9e27f23e2de3556607638f682e0236dab8996312f"
+          "after": "bfe59a5f4a4197584ca8e148e4aa2d6d2ea7b83d4e744b19b60a9ee81c2cf2bb"
         },
         "ground_charge_test_successor": {
           "before": "442ff5a883c3e122c42462bc20fa1efb6dbba7e7b81fa4c88aed217fe7976a9e",
@@ -264,17 +264,17 @@
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "before_sha256": "94b048d787d3909f961ef1c4ad0b779ff7d99ed86fa6578e9d176a7783b8e748",
-      "after_sha256": "b25717600e42e90246ffa42bcbf3a4de338674acf3698a644e5323b9effd73ce",
+      "after_sha256": "939dbdf485c5cd4acea7a0158453ab09e1272c96745efda6e282b74f9fbbd2d2",
       "owners": {
         "@document": {
           "before": "94b048d787d3909f961ef1c4ad0b779ff7d99ed86fa6578e9d176a7783b8e748",
-          "after": "b25717600e42e90246ffa42bcbf3a4de338674acf3698a644e5323b9effd73ce"
+          "after": "939dbdf485c5cd4acea7a0158453ab09e1272c96745efda6e282b74f9fbbd2d2"
         }
       }
     },
     "src/warhammer40k_core/ai/ground_charge_candidates.py": {
       "before_sha256": "119d2b422daa3154db2a703491fd14f4a946c9ddb9f47a97653c833a4837685f",
-      "after_sha256": "d9679cc88e746f98355bdb813c45e66a12944ca531b81af9843d5831e2b8d4ee",
+      "after_sha256": "439096ba693ea8793c9c5405c08d6f2978271111c1d2e7bef9d01d1162d1544b",
       "owners": {
         "_five_model_candidates": {
           "before": "a2cea861d85ae29202afc9a7f86d1b8d18aea6fd7b6ec0c59a0f4c30f97e44d7",
@@ -282,7 +282,7 @@
         },
         "_five_model_formations": {
           "before": null,
-          "after": "528549343eefff98540f345f043c6558642490912924ad37050c97e897ebb17a"
+          "after": "55addaca1d85521b3ea6da6f8759de81d2dc2d56ec41d204ecaa84c70d6e96e0"
         },
         "_group_paths": {
           "before": "ae3cc37ff9f586cd5b3c393e624690675fbeb28ef78a173d96576e540750605d",
@@ -304,29 +304,37 @@
     },
     "tests/code_quality/test_engine_numerical_identity_admission.py": {
       "before_sha256": "b8c99c0d1cdd24350eaa0ab4b190b85fa6c8c0e3a4faf9082dd0a561afd2f962",
-      "after_sha256": "003b72ae006b9f648eea6f82e4be5195c3a7dc1c4812092c56696d0feb80169f",
+      "after_sha256": "cf465609a2cb8ec77ef30a66f987317d6cad2e80529b8b681f6d8d441aadde48",
       "owners": {
         "test_identity_inventory_uses_current_twelve_shards_and_native_cohort": {
           "before": "333e6fb66653c1c6fcee01bcc78a3cdfeead32f08b04450ff3edc559d230b42b",
-          "after": "c6c43821dc4d4aaeb1218aafa4d41e577bd745776eceed3415934973e1769382"
+          "after": "e71c959e3f54486cf8eb765a838e8591ae31421acb196316f4a60cc1e854639f"
         }
       }
     },
     "tests/infrastructure/adapters/test_rigid_group_ground_charge_policy.py": {
       "before_sha256": null,
-      "after_sha256": "7a55f67658a40dcb27bd1e6f0ee97367c3e19cbaac570b9c847eb3fd3949a296",
+      "after_sha256": "4999195e6d40d9d38dd9ac61b032d79788d53aa6fe4c76bf430bccafc0530113",
       "owners": {
         "@module": {
           "before": null,
-          "after": "3f554d69314db184f4f326cc246f9bb95c8aaabdfedf0c0b3eea7360678a8079"
+          "after": "8cc56e538bacc15f4baef735a9f32e3c503da831ec2206d6777382af76fe3f52"
         },
         "_context": {
           "before": null,
           "after": "b512cc70fe8da33187ddad58812c076f1c71040f5c133b37826156cd5853d61a"
         },
+        "_roundoff_charge_lifecycle": {
+          "before": null,
+          "after": "bd7b169b1a85b358ef488d5f270bc38934ebfb918c6ce4efd08690364a5e05cb"
+        },
         "mixed_charge": {
           "before": null,
           "after": "691c5d72fec31db90b1d2df261f821a6050253a9ad7186ba6bd60c9b7f7479ca"
+        },
+        "test_group_charge_keeps_grid_at_rounded_reachability_bound": {
+          "before": null,
+          "after": "7747639204dd1f05527324cfb766932b658534c2e750f0f0ba1574efbb42b7ab"
         },
         "test_rigid_group_charge_certifies_the_exact_mixed_endpoint_witness": {
           "before": null,
@@ -346,7 +354,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Retain exact measured case weights from the four #734 healing and two Stage 2 charge additions. Regenerate the existing twelve-shard assignment against their combined inventory.",
+      "rationale": "Retain the 6705 existing measured weights and add the measured three-inch Charge roundoff case. Regenerate the existing twelve-shard assignment for their combined inventory.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -356,7 +364,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Retain exact measured case weights from the four #734 healing and two Stage 2 charge additions. Regenerate the existing twelve-shard assignment against their combined inventory.",
+      "rationale": "Retain the 6705 existing measured weights and add the measured three-inch Charge roundoff case. Regenerate the existing twelve-shard assignment for their combined inventory.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -366,7 +374,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Retain exact measured case weights from the four #734 healing and two Stage 2 charge additions. Regenerate the existing twelve-shard assignment against their combined inventory.",
+      "rationale": "Retain the 6705 existing measured weights and add the measured three-inch Charge roundoff case. Regenerate the existing twelve-shard assignment for their combined inventory.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -376,7 +384,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Retain exact measured case weights from the four #734 healing and two Stage 2 charge additions. Regenerate the existing twelve-shard assignment against their combined inventory.",
+      "rationale": "Retain the 6705 existing measured weights and add the measured three-inch Charge roundoff case. Regenerate the existing twelve-shard assignment for their combined inventory.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -386,7 +394,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Retain exact measured case weights from the four #734 healing and two Stage 2 charge additions. Regenerate the existing twelve-shard assignment against their combined inventory.",
+      "rationale": "Retain the 6705 existing measured weights and add the measured three-inch Charge roundoff case. Regenerate the existing twelve-shard assignment for their combined inventory.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -396,7 +404,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Retain exact measured case weights from the four #734 healing and two Stage 2 charge additions. Regenerate the existing twelve-shard assignment against their combined inventory.",
+      "rationale": "Retain the 6705 existing measured weights and add the measured three-inch Charge roundoff case. Regenerate the existing twelve-shard assignment for their combined inventory.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -406,7 +414,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Retain exact measured case weights from the four #734 healing and two Stage 2 charge additions. Regenerate the existing twelve-shard assignment against their combined inventory.",
+      "rationale": "Retain the 6705 existing measured weights and add the measured three-inch Charge roundoff case. Regenerate the existing twelve-shard assignment for their combined inventory.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -416,7 +424,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Retain exact measured case weights from the four #734 healing and two Stage 2 charge additions. Regenerate the existing twelve-shard assignment against their combined inventory.",
+      "rationale": "Retain the 6705 existing measured weights and add the measured three-inch Charge roundoff case. Regenerate the existing twelve-shard assignment for their combined inventory.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -426,7 +434,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Retain exact measured case weights from the four #734 healing and two Stage 2 charge additions. Regenerate the existing twelve-shard assignment against their combined inventory.",
+      "rationale": "Retain the 6705 existing measured weights and add the measured three-inch Charge roundoff case. Regenerate the existing twelve-shard assignment for their combined inventory.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -436,7 +444,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Retain exact measured case weights from the four #734 healing and two Stage 2 charge additions. Regenerate the existing twelve-shard assignment against their combined inventory.",
+      "rationale": "Retain the 6705 existing measured weights and add the measured three-inch Charge roundoff case. Regenerate the existing twelve-shard assignment for their combined inventory.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -446,7 +454,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Retain exact measured case weights from the four #734 healing and two Stage 2 charge additions. Regenerate the existing twelve-shard assignment against their combined inventory.",
+      "rationale": "Retain the 6705 existing measured weights and add the measured three-inch Charge roundoff case. Regenerate the existing twelve-shard assignment for their combined inventory.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -607,7 +615,7 @@
         "stage2-ground-charge-policy"
       ],
       "selected_families": [],
-      "rationale": "Use one rigid translation under the existing geometry and native limits when the old five-model grid is impossible. The sealed #735 B2 comparison between ac827185 and original draft 6f0ffd09 measured zero proposals after 1665 work units and the exact native-accepted witness after 1639 units. The candidate implementation is byte-identical to that draft. The refreshed runtime retains #734 healing and uses the exact-base serial smoke and focused controls.",
+      "rationale": "Retain the five-model grid within the native reachability bound's numerical slack. The reviewed three-inch fixture produced one rejected rigid proposal; the revision produces four grid proposals and the first is natively accepted. The sealed #735 view still generates the original 9.5-inch witness in 1639 geometry work units. Raw, work, validation and wall-time limits stay fixed. Verify focused cases and the exact-base serial smoke.",
       "source_obligation": null,
       "unchanged_work": null
     },

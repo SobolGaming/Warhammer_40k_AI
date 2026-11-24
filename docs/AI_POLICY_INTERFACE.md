@@ -2963,7 +2963,7 @@ visible placed target models by their projected rules-unit identity, including
 attached components. It keeps the issued target ID in the proposal. Grid paths
 put each mover near a target model and sample landing regions on visible
 objective terrain. When circumscribed-base distances show a mover cannot reach
-the grid's one-inch band within the roll, the generator tries one straight
+the grid's one-inch band within the roll and numerical tolerance, the generator tries one straight
 whole-unit translation toward the closest target pair. The translation keeps
 every mover closer and at least one within the close band. Both branches screen
 paths for blockers and connected coherency under the same geometry work budget.

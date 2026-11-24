@@ -1022,6 +1022,7 @@
     "tests/infrastructure/adapters/test_preserve_scenario.py::test_preserve_prefix_has_exact_routes_candidates_and_scoped_tactical_gaps": 24.476,
     "tests/infrastructure/adapters/test_preserve_scenario.py::test_preserve_prefix_persists_replays_and_rejects_changed_closed_evidence": 199.166,
     "tests/infrastructure/adapters/test_preserve_scenario.py::test_preserve_prefix_rejects_other_config_incomplete_and_extra_ordinary_choices": 14.767,
+    "tests/infrastructure/adapters/test_rigid_group_ground_charge_policy.py::test_group_charge_keeps_grid_at_rounded_reachability_bound": 5.291,
     "tests/infrastructure/adapters/test_rigid_group_ground_charge_policy.py::test_rigid_group_charge_certifies_the_exact_mixed_endpoint_witness": 5.575,
     "tests/infrastructure/adapters/test_rigid_group_ground_charge_policy.py::test_rigid_group_charge_native_rejects_a_column_that_stops_outside_engagement": 0.604,
     "tests/infrastructure/adapters/test_runner_accounting.py::test_failed_choice_retains_actual_seed_binding_and_stage[drift-validation-not_submitted]": 4.148,
@@ -6708,18 +6709,18 @@
   },
   "execution_model": {
     "assignment_wall_lower_bound_seconds": {
-      "1": 569.189,
-      "10": 569.189,
-      "11": 569.19,
-      "12": 569.19,
+      "1": 569.322,
+      "10": 569.322,
+      "11": 569.322,
+      "12": 569.322,
       "2": 795.547,
       "3": 609.537,
-      "4": 569.19,
-      "5": 569.19,
-      "6": 569.189,
-      "7": 569.19,
-      "8": 569.19,
-      "9": 569.189
+      "4": 569.323,
+      "5": 569.322,
+      "6": 569.322,
+      "7": 569.322,
+      "8": 569.322,
+      "9": 569.322
     },
     "cold_shard_assignment": "minimum-unrounded-modeled-test-load-existing-bucket-v1",
     "cold_shard_id": 1,
@@ -6728,18 +6729,18 @@
       "tests/factions/chaos_daemons/integration/test_cavalcade_v995_roster.py::test_exact_mirror_deploys_all_78_models_and_replays_to_battle"
     ],
     "shard_worker_seconds": {
-      "1": 2276.756,
-      "10": 2276.757,
-      "11": 2276.761,
-      "12": 2276.759,
+      "1": 2277.286,
+      "10": 2277.29,
+      "11": 2277.286,
+      "12": 2277.286,
       "2": 3182.186,
       "3": 2438.146,
-      "4": 2276.76,
-      "5": 2276.761,
-      "6": 2276.757,
-      "7": 2276.761,
-      "8": 2276.761,
-      "9": 2276.757
+      "4": 2277.291,
+      "5": 2277.289,
+      "6": 2277.289,
+      "7": 2277.29,
+      "8": 2277.288,
+      "9": 2277.286
     }
   },
   "files": {
@@ -6811,7 +6812,7 @@
     "tests/infrastructure/adapters/test_normal_move_scenario.py": 466.004,
     "tests/infrastructure/adapters/test_opposing_shooter_scenario.py": 296.773,
     "tests/infrastructure/adapters/test_preserve_scenario.py": 238.409,
-    "tests/infrastructure/adapters/test_rigid_group_ground_charge_policy.py": 6.179,
+    "tests/infrastructure/adapters/test_rigid_group_ground_charge_policy.py": 11.47,
     "tests/infrastructure/adapters/test_runner_accounting.py": 626.885,
     "tests/infrastructure/adapters/test_training_admission.py": 3182.186,
     "tests/infrastructure/adapters/unit/test_linux_authority.py": 154.775,
@@ -7289,23 +7290,24 @@
       "junit_sha256": [
         "25759acf6c9170e603034a4071122fd33e00661a1f1a158d3439551f528f0624",
         "431f84031f3029637fa3c74e55d1c8dede1e3fe1aa04f223da43a8cacdd7574d",
+        "6065394017e442925f4256644907ffc7924dcc2b4a699b5065e1dda846989353",
         "63db8ac24763535fbddc46142b0c99e6833b128bc40e674ff95ec735b05e1018",
         "708e2a7cdde4ec8155cc758efc538d7dc0dd4b5c25644c8a1c2d88652d6df8df",
         "7cded789191d3e9a531806a0b448b6347da9bd58f9f62af169b77cae998e0753",
         "9a5f617751dd2ef273362bcbec3d532afb594c23b9d7c4576a1ba54a82305422",
         "9dc1b70162325c830e81f4b6e06c9199b793ed7d7805d59287feb2a593be541d"
       ],
-      "source": "Retained #734 representative timing profile including four Grotesque Regeneration cases and the two measured #736 rigid ground Charge cases",
-      "test_cases": 6705,
+      "source": "Retained #736 refresh timing profile and one measured three-inch Charge roundoff regression on WSL",
+      "test_cases": 6706,
       "test_files": 445
     }
   ],
   "shard_count": 12,
   "shards": [
     {
-      "duration_seconds": 2276.756,
+      "duration_seconds": 2277.286,
       "shard_id": 1,
-      "test_file_count": 51
+      "test_file_count": 49
     },
     {
       "duration_seconds": 3182.186,
@@ -7318,49 +7320,49 @@
       "test_file_count": 1
     },
     {
-      "duration_seconds": 2276.76,
+      "duration_seconds": 2277.291,
       "shard_id": 4,
       "test_file_count": 42
     },
     {
-      "duration_seconds": 2276.761,
+      "duration_seconds": 1776.055,
       "shard_id": 5,
       "test_file_count": 48
     },
     {
-      "duration_seconds": 2276.757,
+      "duration_seconds": 2277.289,
       "shard_id": 6,
-      "test_file_count": 50
+      "test_file_count": 47
     },
     {
-      "duration_seconds": 2276.761,
+      "duration_seconds": 2277.29,
       "shard_id": 7,
       "test_file_count": 48
     },
     {
-      "duration_seconds": 2276.761,
+      "duration_seconds": 2277.288,
       "shard_id": 8,
       "test_file_count": 48
     },
     {
-      "duration_seconds": 1775.523,
+      "duration_seconds": 2277.286,
       "shard_id": 9,
-      "test_file_count": 49
-    },
-    {
-      "duration_seconds": 2276.757,
-      "shard_id": 10,
       "test_file_count": 52
     },
     {
-      "duration_seconds": 2276.761,
-      "shard_id": 11,
-      "test_file_count": 98
+      "duration_seconds": 2277.29,
+      "shard_id": 10,
+      "test_file_count": 48
     },
     {
-      "duration_seconds": 2276.759,
+      "duration_seconds": 2277.286,
+      "shard_id": 11,
+      "test_file_count": 101
+    },
+    {
+      "duration_seconds": 2277.286,
       "shard_id": 12,
-      "test_file_count": 48
+      "test_file_count": 51
     }
   ],
   "step5g_partitions": {
@@ -7368,5 +7370,5 @@
     "sha256": "b241b31651a8d5d903a2b851583186c276a5ac32fed26de1a1c69b4aa278b711"
   },
   "strategy": "largest-processing-time-by-derived-selector-weight",
-  "total_test_duration_seconds": 27886.688
+  "total_test_duration_seconds": 27891.979
 }

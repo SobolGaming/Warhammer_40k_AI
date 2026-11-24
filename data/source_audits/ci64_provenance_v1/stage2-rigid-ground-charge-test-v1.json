@@ -3,17 +3,17 @@
   "base": "5aca97bfaf4b3f1a753d65ed6b7dfc2482aa77f0",
   "retained_group_charge_sha256": "f32f75b6d38120e8663fde79612493ff40922c5eff7459d3d7197787791ea601",
   "retained_runtime_fingerprint": "858c9136f8da02d92ff986bc6e54d7d608070f3a89df76de009cc655d0433bd0",
-  "runtime_fingerprint": "3655e221739a9f5a95fd1da200a1069879ec361b04ac1c9082eb316242749df7",
+  "runtime_fingerprint": "0620b70b0c2bbedd4c55fa2805ff698135009c695c3a6c8b390a2a76629f0666",
   "source": {
     "before": "119d2b422daa3154db2a703491fd14f4a946c9ddb9f47a97653c833a4837685f",
-    "after": "d9679cc88e746f98355bdb813c45e66a12944ca531b81af9843d5831e2b8d4ee"
+    "after": "439096ba693ea8793c9c5405c08d6f2978271111c1d2e7bef9d01d1162d1544b"
   },
   "added_files": {
     "tests/infrastructure/adapters/test_rigid_group_ground_charge_policy.py": {
       "mode": "100644",
-      "bytes": 8269,
-      "sha256": "7a55f67658a40dcb27bd1e6f0ee97367c3e19cbaac570b9c847eb3fd3949a296",
-      "blob_sha1": "6e5f7acf50fe88e466b65451509fde59c1e68d81"
+      "bytes": 11885,
+      "sha256": "4999195e6d40d9d38dd9ac61b032d79788d53aa6fe4c76bf430bccafc0530113",
+      "blob_sha1": "bcd22f9a709e5287b2d323321f4649a422d2034f"
     }
   }
 }

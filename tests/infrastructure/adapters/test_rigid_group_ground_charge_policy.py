@@ -2,12 +2,15 @@ from __future__ import annotations
 
 import json
 import multiprocessing
+from dataclasses import replace
+from functools import partial
 from math import isclose
 
 import pytest
 
 from tests import phase15a_charge_declaration_helpers as charge_fixtures
 from tests.charge_distance_helpers import add_modifier, select_source, select_targets
+from tests.phase15a_charge_config_helpers import _army_muster_request
 from warhammer40k_core.adapters.access_control import ViewerContext
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.ai.ground_charge_candidates import (
@@ -17,8 +20,11 @@ from warhammer40k_core.ai.ground_charge_candidates import (
 )
 from warhammer40k_core.ai.ground_charge_policy import prepare_ground_charge_policy
 from warhammer40k_core.ai.player_policy import PlayerDecisionContext
+from warhammer40k_core.core.army_catalog import ArmyCatalog
+from warhammer40k_core.core.datasheet import BaseSizeDefinition
 from warhammer40k_core.core.ruleset_descriptor import MovementMode
 from warhammer40k_core.engine.event_log import validate_json_value
+from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.movement_proposals import ProposalKind
 from warhammer40k_core.engine.phase import LifecycleStatusKind
 from warhammer40k_core.engine.phases.charge import ChargeMoveProposal
@@ -189,3 +195,80 @@ def test_rigid_group_charge_native_rejects_a_column_that_stops_outside_engagemen
     assert current is not None
     assert current.battlefield_state is not None
     assert current.battlefield_state.unit_placement_by_id(SOURCE) == placement
+
+
+def _roundoff_charge_lifecycle(monkeypatch: pytest.MonkeyPatch) -> GameLifecycle:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    template = catalog.datasheet_by_id("core-intercessor-like-infantry")
+    (profile,) = template.model_profiles
+    mover = replace(
+        template,
+        datasheet_id="fixture-charge-roundoff-mover",
+        name="Fixture Charge Roundoff Mover",
+        model_profiles=(replace(profile, base_size=BaseSizeDefinition.circular(60)),),
+    )
+    catalog = replace(catalog, datasheets=(*catalog.datasheets, mover))
+    rows = (13, 15.5, 18, 20.5, 23)
+    source = tuple(Pose.at(x, y) for x, y in zip((6.32, 6.32, 6.32, 6.32, 7.82), rows, strict=True))
+
+    def source_poses(*, origin: Pose, model_count: int) -> tuple[Pose, ...]:
+        assert origin == source[0]
+        assert model_count == len(source)
+        return source
+
+    with monkeypatch.context() as fixture:
+        fixture.setattr(charge_fixtures, "compact_test_unit_poses", source_poses)
+        fixture.setattr(
+            charge_fixtures,
+            "_army_muster_request",
+            partial(
+                _army_muster_request, datasheet_ids_by_selection_id={"source": mover.datasheet_id}
+            ),
+        )
+        lifecycle, _ = charge_fixtures.charge_lifecycle(
+            game_id="charge-envelope-roundoff",
+            battle_round=2,
+            alpha_unit_ids=("source",),
+            alpha_origins={"source": source[0]},
+            enemy_model_poses=tuple(Pose.at(2.0089763779527563, y) for y in rows),
+            catalog=catalog,
+        )
+    return lifecycle
+
+
+def test_group_charge_keeps_grid_at_rounded_reachability_bound(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    lifecycle = _roundoff_charge_lifecycle(monkeypatch)
+    assert lifecycle.state is not None
+    # The fixture rolls 7. Keep the ordinary three-inch budget after modifiers.
+    add_modifier(lifecycle.state, effect_id="fixture", kind="modify_dice_roll", delta=-4)
+    session = LocalGameSession(lifecycle)
+    request = select_targets(session, select_source(session), (TARGET,))
+    assert isinstance(request.payload, dict)
+    proposal = request.payload["proposal_request"]
+    assert isinstance(proposal, dict)
+    details = proposal["context"]
+    assert isinstance(details, dict)
+    assert details["maximum_distance_inches"] == 3
+
+    generated = generate_ground_charge_candidates(_context(session), raw_limit=4)
+    assert generated.stop is ChargeSearchStop.RAW_LIMIT
+    assert len(generated.candidates) == 4
+    first = generated.candidates[0].action
+    assert first.proposal_json is not None
+    payload = json.loads(first.proposal_json)
+    witness = PathWitness.from_payload(payload["witness"])
+    (rear,) = (poses for _, poses in witness.model_paths if poses[0].position.x == 7.82)
+    assert rear[-1].position.x == 4.82
+    verdict = session.submit_viewer_parameterized_payload(
+        viewer=ViewerContext.for_player(ACTOR),
+        request_id=first.request_id,
+        result_id="charge-envelope-roundoff:accepted",
+        payload=payload,
+    )
+    assert verdict.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert any(
+        event.event_type == "charge_move_completed"
+        for event in lifecycle.decision_controller.event_log.records
+    )

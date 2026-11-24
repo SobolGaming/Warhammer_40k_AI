@@ -674,7 +674,10 @@ def _five_model_formations(
     work: _Work,
 ) -> Iterator[tuple[_Path, ...]]:
     nearest = tuple(_nearest_target_envelope(model, targets, work) for model in movers)
-    if any(gap > budget + _PREFERRED_GAP_INCHES for gap, _ in nearest):
+    # Allow the native reachability bound's numerical slack before pruning
+    # the grid, whose footprint distances use different floating-point operations.
+    grid_limit = budget + _PREFERRED_GAP_INCHES + 1e-8
+    if any(gap > grid_limit for gap, _ in nearest):
         # The old grid cannot fill every bank. Try one coherency-preserving
         # translation with the same work counter and no extra search.
         yield from _rigid_group_formation(
