@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Self, TypedDict, cast
+from typing import TYPE_CHECKING, Self, TypedDict, TypeGuard, cast
 
 from warhammer40k_core.core.dice import DiceExpression, RerollPermission
 from warhammer40k_core.core.modifiers import RollModifier, RollModifierPayload
@@ -520,6 +520,10 @@ class BattleShockPendingOutcomeRoute:
     ) -> BattleShockPendingOutcomeAuthority | None:
         return self.validator(context)
 
+    @staticmethod
+    def is_route(validator: object) -> TypeGuard[BattleShockPendingOutcomeRoute]:
+        return type(validator) is BattleShockPendingOutcomeRoute
+
     def needs_validation(self, context: BattleShockPendingOutcomeAuthorityContext) -> bool:
         request_type = context.request.decision_type
         if type(request_type) is not str or request_type in self.request_types:
@@ -850,7 +854,7 @@ class BattleShockHookRegistry:
             for binding in self.bindings
             if (validator := binding.pending_outcome_authority_validator) is not None
             and (
-                type(validator) is not BattleShockPendingOutcomeRoute
+                not BattleShockPendingOutcomeRoute.is_route(validator)
                 or validator.needs_validation(context)
             )
         )

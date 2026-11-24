@@ -3,11 +3,11 @@
   "base": "161378a16c4557228b2af45db0d311a522eb3f8f",
   "retained_screen_movement_sha256": "7e0b32cb0f7a0ef8e7d05f9b0a4aa7bb965cb6644e5d42ffd035897a536deb94",
   "retained_runtime_fingerprint": "f18fe40b7fb1e8841d01bcb2c4c98f56ea85cddb7ae1ae4c0905a69f24146432",
-  "runtime_fingerprint": "6a47a867bba140bc25c450cd587c0501ffd524deb4a4dce79782f478ba68f856",
+  "runtime_fingerprint": "3ab59441d5b59260e25b52791d21b84fb3759484fbec344689d8ad765b676fd4",
   "sources": {
     "src/warhammer40k_core/engine/battle_shock_hooks.py": {
       "before": "4f149f2664ac363aa9034c3924c43c7f1356c82dc27cdd2c32467b163ec4f99b",
-      "after": "b8132e305060c6f9b3bf87f984d926eab7ae39e497f81d2db06fe2d194480cd4"
+      "after": "1a16275a0dec6e820308691239ab2374aefc0112a3f9545c21a161f20ac359a1"
     },
     "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/army_rule.py": {
       "before": "2adb65d7afbe38c7d8b31bdfdc4c01e4233870b04fcdd1065371a3d6246c8684",

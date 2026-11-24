@@ -358,6 +358,7 @@
         "BattleShockPendingOutcomeRoute",
         "BattleShockPendingOutcomeRoute.__call__",
         "BattleShockPendingOutcomeRoute.__post_init__",
+        "BattleShockPendingOutcomeRoute.is_route",
         "BattleShockPendingOutcomeRoute.needs_validation",
         "_placement_producer_identifies_provider",
         "_runtime_contribution",

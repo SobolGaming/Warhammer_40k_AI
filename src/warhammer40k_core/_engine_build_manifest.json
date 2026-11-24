@@ -1,7 +1,7 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:6a47a867bba140bc25c450cd587c0501ffd524deb4a4dce79782f478ba68f856",
-  "fingerprint": "6a47a867bba140bc25c450cd587c0501ffd524deb4a4dce79782f478ba68f856",
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:3ab59441d5b59260e25b52791d21b84fb3759484fbec344689d8ad765b676fd4",
+  "fingerprint": "3ab59441d5b59260e25b52791d21b84fb3759484fbec344689d8ad765b676fd4",
   "resource_count": 3289,
   "resources": [
     {
@@ -1345,9 +1345,9 @@
       "sha256": "d33d5a29f29b470ceefe993e40d1433757fa97098ba0d05676b1eb547c3389f1"
     },
     {
-      "byte_length": 40433,
+      "byte_length": 40611,
       "path": "warhammer40k_core/engine/battle_shock_hooks.py",
-      "sha256": "b8132e305060c6f9b3bf87f984d926eab7ae39e497f81d2db06fe2d194480cd4"
+      "sha256": "1a16275a0dec6e820308691239ab2374aefc0112a3f9545c21a161f20ac359a1"
     },
     {
       "byte_length": 10986,

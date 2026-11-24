@@ -601,7 +601,7 @@ def _pending_battle_shock_source_transition(
     if not path.exists():
         return None
     raw = _checked_bytes(
-        root, name, "509792f8ac6ac85ab0c37bc356d7d73f7add8062f38fe2bc12b3d0936400986b"
+        root, name, "b1e7e72fbd1cb729b2b08ec0253ed5d3b72f463c046238952c9c574c85e17849"
     )
     record = json.loads(raw, object_pairs_hook=_selection_object)
     if (

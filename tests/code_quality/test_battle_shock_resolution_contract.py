@@ -610,7 +610,7 @@ def test_pending_outcome_route_requires_exact_negative_provenance(
     context = hooks.BattleShockPendingOutcomeAuthorityContext(state, ledger, request)
     (known,) = army_rule.staged_july_runtime_contribution().battle_shock_hook_bindings
     route = known.pending_outcome_authority_validator
-    assert type(route) is hooks.BattleShockPendingOutcomeRoute
+    assert hooks.BattleShockPendingOutcomeRoute.is_route(route)
     registry = hooks.BattleShockHookRegistry.from_bindings((known,))
     snapshots = 0
 
