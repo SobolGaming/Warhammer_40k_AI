@@ -1,388 +1,234 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "161378a16c4557228b2af45db0d311a522eb3f8f",
+  "base": "b7f2d27b3afaa98cb68420cdcecc85350562fdbb",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:bef24c387ca386c885fd7508796e065e0e6fb68efa2159f3aa8be6d8f41b1db1",
-  "operation_map_sha256": "9fdf1ba5dd0429c3889d56679981f85f2b871245b66570c5f612be3ec8809456",
+  "operation_map_sha256": "e4da5aa6fea51b6d5dd2b35f52d0a06ee3ff6d42049b1851d680ec402ad06638",
   "changes": {
-    "ci/quality_shards/all.txt": {
-      "before_sha256": "4fcd4aead761e9aba13f33ff9ef3365169bb521640a966ffeb09d73c9e4b62b0",
-      "after_sha256": "1a0ce3ac14e7d040580a8063aa323fc0561e165bd62531725d612296ac65db55",
+    "docs/AI_IMPLEMENTATION_PLAN.md": {
+      "before_sha256": "3c874cdf08e2c21db30ce9c4b3554b64829df8760e602f36ee9cb990577d2d6c",
+      "after_sha256": "541e540f2f70e51c0af4a4fabb9e47da9a6b262b68071bbecb52917a903c4a5c",
       "owners": {
         "@document": {
-          "before": "4fcd4aead761e9aba13f33ff9ef3365169bb521640a966ffeb09d73c9e4b62b0",
-          "after": "1a0ce3ac14e7d040580a8063aa323fc0561e165bd62531725d612296ac65db55"
-        }
-      }
-    },
-    "ci/quality_shards/shard-4.txt": {
-      "before_sha256": "2cdb33a1b69efe104ff471bbb36ce675f038a40351cdfb8648323fd210c43f6a",
-      "after_sha256": "6638459fc909c8e9e56f6f36be633968f5fbab33b6f2001fb5b53413949ee581",
-      "owners": {
-        "@document": {
-          "before": "2cdb33a1b69efe104ff471bbb36ce675f038a40351cdfb8648323fd210c43f6a",
-          "after": "6638459fc909c8e9e56f6f36be633968f5fbab33b6f2001fb5b53413949ee581"
-        }
-      }
-    },
-    "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "53f446c4b290322e7e4e811590edc3869bcedc5aa30cd200c8002ff95b498df8",
-      "after_sha256": "a530d4d49fb6df3defaa5162c9f3e5ef7e3c08d37e090a237e4e1791fb72b941",
-      "owners": {
-        "@document": {
-          "before": "53f446c4b290322e7e4e811590edc3869bcedc5aa30cd200c8002ff95b498df8",
-          "after": "a530d4d49fb6df3defaa5162c9f3e5ef7e3c08d37e090a237e4e1791fb72b941"
-        }
-      }
-    },
-    "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "1e57ce1b12e776f6ba61756a72528946277374a899386feff74b6498f08d15f3",
-      "after_sha256": "d7347b7ca05a03defd0528461c0c9326fc4f1c48b9df32df35a2ada11a223975",
-      "owners": {
-        "@document": {
-          "before": "1e57ce1b12e776f6ba61756a72528946277374a899386feff74b6498f08d15f3",
-          "after": "d7347b7ca05a03defd0528461c0c9326fc4f1c48b9df32df35a2ada11a223975"
-        }
-      }
-    },
-    "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "5c0d66563c183e4760ab9f65b01b545d36a0c6dc411fc18584df56eb18068bc0",
-      "after_sha256": "a7a4bad46c410484f9f1488832ccb422378e252a0d1fa4fc5f3bb4f0c8cb77a2",
-      "owners": {
-        "@document": {
-          "before": "5c0d66563c183e4760ab9f65b01b545d36a0c6dc411fc18584df56eb18068bc0",
-          "after": "a7a4bad46c410484f9f1488832ccb422378e252a0d1fa4fc5f3bb4f0c8cb77a2"
-        }
-      }
-    },
-    "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "0c1eaa3ccc8db708bbc4aa5232b1a511144f1041871a58e3dce631ceb19fdd5f",
-      "after_sha256": "1eb4f8c321a04e17f6b49af1b97e2d2d57788f642624897efaa656a5910b3988",
-      "owners": {
-        "@document": {
-          "before": "0c1eaa3ccc8db708bbc4aa5232b1a511144f1041871a58e3dce631ceb19fdd5f",
-          "after": "1eb4f8c321a04e17f6b49af1b97e2d2d57788f642624897efaa656a5910b3988"
-        }
-      }
-    },
-    "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "409a2313a6613b6dfd4d5bcacd04a0e4a44136abed31762222ef76d4b673a977",
-      "after_sha256": "074d093c6b78a6a14be883de53a1075093954c9b45349329736195d449c050d6",
-      "owners": {
-        "@document": {
-          "before": "409a2313a6613b6dfd4d5bcacd04a0e4a44136abed31762222ef76d4b673a977",
-          "after": "074d093c6b78a6a14be883de53a1075093954c9b45349329736195d449c050d6"
-        }
-      }
-    },
-    "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "e514d6a3a74492a48b3b600e1bc208380fd6ce1c1e1ef9c4c163274c48efcfac",
-      "after_sha256": "f3abb13bf455f2a14e73466005e4ccb5bf4249c0b056128b0a04d5eb251e9847",
-      "owners": {
-        "@document": {
-          "before": "e514d6a3a74492a48b3b600e1bc208380fd6ce1c1e1ef9c4c163274c48efcfac",
-          "after": "f3abb13bf455f2a14e73466005e4ccb5bf4249c0b056128b0a04d5eb251e9847"
-        }
-      }
-    },
-    "contracts/examples/support-profile.json": {
-      "before_sha256": "d0b874c7094fc912474b79fa850d969048c9e1f4fec614e37f73267c6ca28f76",
-      "after_sha256": "f8372e7e66f26c381ba4d6ea4b047e128f5fbd4033ed2d3777336c4db9a56c84",
-      "owners": {
-        "@document": {
-          "before": "d0b874c7094fc912474b79fa850d969048c9e1f4fec614e37f73267c6ca28f76",
-          "after": "f8372e7e66f26c381ba4d6ea4b047e128f5fbd4033ed2d3777336c4db9a56c84"
-        }
-      }
-    },
-    "contracts/manifest.json": {
-      "before_sha256": "f714451dbbb1c83207c0083aa85b8a498e3f55d9ad6b27015d480f9106a291c2",
-      "after_sha256": "7c92771ab76551333a3a7ef5a6d8391e6bf9ea0dbaa366f0e5662e4b1d561d7c",
-      "owners": {
-        "@document": {
-          "before": "f714451dbbb1c83207c0083aa85b8a498e3f55d9ad6b27015d480f9106a291c2",
-          "after": "7c92771ab76551333a3a7ef5a6d8391e6bf9ea0dbaa366f0e5662e4b1d561d7c"
-        }
-      }
-    },
-    "data/source_audits/ci64_provenance_v1/stage2-pending-battle-shock-transition-v1.json": {
-      "before_sha256": null,
-      "after_sha256": "1188532c9acbc0b9c4b19323e98458aeb64d7d51ad3c8bf3b889486230568a03",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "1188532c9acbc0b9c4b19323e98458aeb64d7d51ad3c8bf3b889486230568a03"
-        }
-      }
-    },
-    "docs/performance/current/cavalcade-pending-authority-20261124.json": {
-      "before_sha256": null,
-      "after_sha256": "e1bf66f0783c8674f8727e18631e4b93090a97a3181987cdb4455f29e6f6ecb3",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "e1bf66f0783c8674f8727e18631e4b93090a97a3181987cdb4455f29e6f6ecb3"
+          "before": "3c874cdf08e2c21db30ce9c4b3554b64829df8760e602f36ee9cb990577d2d6c",
+          "after": "541e540f2f70e51c0af4a4fabb9e47da9a6b262b68071bbecb52917a903c4a5c"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "e1116b71998744f09a0754043903e016c9adb2f40f978802d95fa1e400353fd9",
-      "after_sha256": "f7a5a5d76b63e39f0406d1472cdbd3200b528b3ddd6a5f48d64b1d1d53b2d090",
+      "before_sha256": "f7a5a5d76b63e39f0406d1472cdbd3200b528b3ddd6a5f48d64b1d1d53b2d090",
+      "after_sha256": "f9e6133929dc2574a3b8d3eb3aed2911b74770d6be43a9577124c33e08e9e840",
       "owners": {
         "@document": {
-          "before": "e1116b71998744f09a0754043903e016c9adb2f40f978802d95fa1e400353fd9",
-          "after": "f7a5a5d76b63e39f0406d1472cdbd3200b528b3ddd6a5f48d64b1d1d53b2d090"
+          "before": "f7a5a5d76b63e39f0406d1472cdbd3200b528b3ddd6a5f48d64b1d1d53b2d090",
+          "after": "f9e6133929dc2574a3b8d3eb3aed2911b74770d6be43a9577124c33e08e9e840"
         }
       }
     },
-    "scripts/engine_numerical_identity_test_admission.py": {
-      "before_sha256": "dea43fbc1f7f2901d7bd0a66600792a6c82a1b9f53a5214758b92a33f82d7c22",
-      "after_sha256": "4c58252eba4630a363f950c8fbfd0f00c5782f649cd709801f62978dc56563eb",
-      "owners": {
-        "_pending_battle_shock_source_transition": {
-          "before": null,
-          "after": "3cd12b22ccd0523acdf61d0f3cf2b5dd5685aa965535a55c86b9247c4238146a"
-        },
-        "_round4_battle_shock_successor": {
-          "before": "218161aeec895a23b6d216b70d7b3f6067e0e7e1b6ae78c84682c1599f2b0ccd",
-          "after": "7a60b064103b24a6656134476590efd08e9f317669fe5ae45eea0c60e235b111"
-        },
-        "exact_movement_test_transition": {
-          "before": "5a17621c488cba4b77e58a0e92aa2056008afcf0095cb2e0dbf9fabc15a678f1",
-          "after": "bc337417facb730a788c505b7c27b16a6b7d036c4d8ebb2ef25348f533753bf6"
-        }
-      }
-    },
-    "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "73091916a3e1527d7e5d58961478f628a65caa745df92739e29232f304e9d905",
-      "after_sha256": "5f1f327281ba68b1dd4d6d411108a006a23f856fe508466be435e0d94820cf06",
-      "owners": {
-        "@document": {
-          "before": "73091916a3e1527d7e5d58961478f628a65caa745df92739e29232f304e9d905",
-          "after": "5f1f327281ba68b1dd4d6d411108a006a23f856fe508466be435e0d94820cf06"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/battle_shock_hooks.py": {
-      "before_sha256": "4f149f2664ac363aa9034c3924c43c7f1356c82dc27cdd2c32467b163ec4f99b",
-      "after_sha256": "9a237d454074fb42347a514e49ef58fd137c3f672571b71f106600221e485c14",
-      "owners": {
-        "@module": {
-          "before": "772611fbeba979f0c2ee1f96e5daffc1501b6177c40603cf5d679f0d0c2845a3",
-          "after": "35c7007ae63520d270082b25f01fc2bd07311fee7ff0f1f36c850cb289e0a8a1"
-        },
-        "BattleShockHookRegistry.pending_outcome_authority_for": {
-          "before": "f6a27c26003b71670f9b65174383b6b266b63efe651df7e45cebd18b8cb0f1a2",
-          "after": "da9d06c86446d3d9ec578eeec9a6436817cd31dbd1d399e4ed5545cd1e961630"
-        },
-        "BattleShockPendingOutcomeRoute": {
-          "before": null,
-          "after": "7abc8ab553ade5842f413382eb1e2aa1a03bd46946c89c1f6afab7238f9951c9"
-        },
-        "BattleShockPendingOutcomeRoute.__call__": {
-          "before": null,
-          "after": "d934c107f370f57ffa7f64c4e60ed4ed9439b5aef71cf3bafa10cf493a5562ec"
-        },
-        "BattleShockPendingOutcomeRoute.__post_init__": {
-          "before": null,
-          "after": "ef3d3ebe2e374cf3fe0e57017ba8ce9b053c85c2d154d7b598d7dc3a9bb5fdd5"
-        },
-        "BattleShockPendingOutcomeRoute.needs_validation": {
-          "before": null,
-          "after": "3945279d725d52650b6e0d3173a7e76d2fe4790d3f976e2a4ca5c96ac9761aa3"
-        },
-        "pending_outcome_provenance_requires_validation": {
-          "before": null,
-          "after": "82e549e230927d94348a6e2c6fcbf8fddcadf8d6db20230e435d78e3d5cb7ec2"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/faction_content/pending_battle_shock_routes.py": {
+    "scripts/stage2_preservation_timing.py": {
       "before_sha256": null,
-      "after_sha256": "3867badbb15156a7a63d5946ee74ec47a706373ca369392c4509b7292a99413b",
+      "after_sha256": "0398d94c4919f33d1f500cd03c6b2b6cf83dc91a32bab94245ff83bdec86c434",
       "owners": {
         "@module": {
           "before": null,
-          "after": "02d1e44145b294b3b472e03ed8efccbc71dad222469b1bc144cb63edb9b1e6d4"
+          "after": "a3d09c97f216d8a888d384a583dcb8287ba5c798c3539bbd83ab9d87da7bab74"
         },
-        "pending_battle_shock_outcome_needs_validation": {
+        "Blocker": {
           "before": null,
-          "after": "379ce2596b49ece7fc5371fb0b9328a8aa74eddf76c3e8262dccf355a541a2ae"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/army_rule.py": {
-      "before_sha256": "2adb65d7afbe38c7d8b31bdfdc4c01e4233870b04fcdd1065371a3d6246c8684",
-      "after_sha256": "00ffe06bf3fbd050cef1efc88b6de38eacd7a11c4d3fd9d5f2a4fff9e1de3043",
-      "owners": {
-        "@module": {
-          "before": "8ec4a4bbf4f14033e0e86ce795fe2d57d85fffd27eb712c8bbcb25043e16e6cf",
-          "after": "ff3ce2cdc4acc26005f6cce7ccdbf9557160b859cd468be26bb9b8eab1924c71"
+          "after": "73ad02b8dc49ef5d55dd4a2a3b9e96a32554c04105590b39e9739f042b098187"
         },
-        "_runtime_contribution": {
-          "before": "ad895ad5e75abe3380f9e9194008e0817d4f4e3b94aaa8c72be42f5b92e173ce",
-          "after": "93b4c5de53c3b7d96d6a767f3cd59739ec1cb8fec1a20d42f0156b97939693b1"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/battle_shock_outcome_authority.py": {
-      "before_sha256": "15e25a9bc3587826c6a4be6928cb33ddcfa4a32460273aa7a7ae8ce9cccd76ba",
-      "after_sha256": "4c66f099bd6f5c504782e167d9686dbfad9998ecf8af16adc165200290f4cfa5",
-      "owners": {
-        "@module": {
-          "before": "7e6cf570ff6bf9437f485247fbe0978c695936cbf27ae20d70ea707d0448751d",
-          "after": "fb5e1cc37d3e8dc80aa6b36496277b64dd12284bd7e0c47daf41d5eeaaf5a12e"
-        },
-        "_pending_outcome_provenance": {
+        "Experiment": {
           "before": null,
-          "after": "a257a6914b7983392b55aac464dddb84cdcee9674cf088f4639dbb9294ac0179"
+          "after": "b34bb036d1d33998bc1dc3a66099f035047a16aeed791431a81d33af658ea925"
         },
-        "native_pending_outcome_needs_validation": {
+        "Experiment.__enter__": {
           "before": null,
-          "after": "6bfd41a59f504b19579773b952ed294f2f78619e7980ea853985c2e2f59f18e3"
+          "after": "b1d9afdbf340299eb63649b1713baa87e774e5e24fc3a3cbcaaecfe2e6804411"
         },
-        "pending_outcome_route": {
+        "Experiment.__exit__": {
           "before": null,
-          "after": "cbc4f615c897a96b58fee361090a3ef1a9dc032d1f5c5eca3a55511602cad85a"
-        }
-      }
-    },
-    "tests/code_quality/test_battle_shock_resolution_contract.py": {
-      "before_sha256": "32fdbfb3e31f846bf3e69c9af00a5eb08e82a06efed40eb0b55d458460d600a8",
-      "after_sha256": "cba5a0ac3bc291dcfc872f9e53398aa13135935222d080bf54e5ae0a7796a162",
-      "owners": {
-        "@module": {
-          "before": "8463fed64fd0d17c342b2bbfad01a6eeb4f19e06941aa6132dd6d33085553778",
-          "after": "b9929c6642a7dafe64fed900b528e80347328225100479eb2c20e7922292f975"
+          "after": "0b321d180a090cb94fa930e7aa976df461c3170f9936fd7972693f17490b2eb3"
         },
-        "test_pending_outcome_route_requires_exact_negative_provenance": {
+        "Experiment.__init__": {
           "before": null,
-          "after": "72106cff4dfc6ae37d11288da3948efd9491d3b416848d77220d985a93869a42"
-        }
-      }
-    },
-    "tests/code_quality/test_engine_numerical_identity_admission.py": {
-      "before_sha256": "619d60b5f3b60e00a72082e561e66cf0754ee534d5ff8eb24862dee2d0a02e52",
-      "after_sha256": "b6f547e8870b0b1c971306a92dbaa5d338505ce33df8b1810eb2bbcc055cd0b5",
-      "owners": {
-        "test_identity_inventory_uses_current_twelve_shards_and_native_cohort": {
-          "before": "8fb1bc82085538c6954ff331a54c8646833719d7794c997b7d3d4ad5475602a6",
-          "after": "5c1e8a6d368682ad8b50a64d609c065d60987d8cf2b2edb3d3b29fbdcd5f151c"
+          "after": "60a5233e9a24e78bec864ef2c6bd3880a3783c6afe36f5494785bea1952e9251"
+        },
+        "Experiment.call": {
+          "before": null,
+          "after": "0024c6bac005de8179490e54999144b00a78c8762928f3bec507fcbe87a577d0"
+        },
+        "Experiment.charge_witness": {
+          "before": null,
+          "after": "9943869bfe0a2d3ab503c84354298381005374e818daeb6623a572c0ba626b9a"
+        },
+        "Experiment.commit_action": {
+          "before": null,
+          "after": "00d69cacf8b6baa0cb27dcc33adb8755db8dd4bb821365bdd526343bb1741469"
+        },
+        "Experiment.common": {
+          "before": null,
+          "after": "a092d056badba6ee2c358e641f6c438379f8f9ffb803bb4b3644cade5b10fff5"
+        },
+        "Experiment.compare_exact": {
+          "before": null,
+          "after": "b242aa3924b940d4b9bb07ef929c24ade4a7093c076354378beb4fc7fd659f03"
+        },
+        "Experiment.context": {
+          "before": null,
+          "after": "b5f6b356c1df8312a7a4137b43ea826710318d802fa55b043b1e1ac32406e9dc"
+        },
+        "Experiment.e_shoot": {
+          "before": null,
+          "after": "1c1d469fa6d25a584e33e03b204cd4d5101869ce8c13ea180fb44cba05c07f2e"
+        },
+        "Experiment.execute": {
+          "before": null,
+          "after": "da808c293fb572206c97968365b44c2ef989111989e9cb84c175f66e4d81ad84"
+        },
+        "Experiment.gap": {
+          "before": null,
+          "after": "6aa5c18a090a829f752363d22a1d9641ec619178664240ca7b0597a6c83e730f"
+        },
+        "Experiment.log": {
+          "before": null,
+          "after": "cb48ab5d9a414520ea48ec9719c2fe2279653482b7d326f7ac98615113715704"
+        },
+        "Experiment.native_replay": {
+          "before": null,
+          "after": "57f44934869268e044ec5550fc18c7a1f553602465c3a84f3909b02d892ff43a"
+        },
+        "Experiment.next_public": {
+          "before": null,
+          "after": "50a650bc9de5faa962a2e574fc1880b3e4144d77460d9c35db1a187ad4728393"
+        },
+        "Experiment.player_context": {
+          "before": null,
+          "after": "1dd16d8066794f778a23d823e36bce0f1be11909a548044fb817d72d6fcfbd37"
+        },
+        "Experiment.position": {
+          "before": null,
+          "after": "8a5615f2703a89932604c5a85ba7ab89a94d37c78e2d01ffdb93e7dd63512c5d"
+        },
+        "Experiment.prepare_e": {
+          "before": null,
+          "after": "91959cda58112c4ff9237f235c4698d8a3e5f4b57253d19385b0023b18e54641"
+        },
+        "Experiment.record_id": {
+          "before": null,
+          "after": "3fa61d2e04a57259f270f3ad51e3496267ba731c07cd25ea5c2228dea305d161"
+        },
+        "Experiment.report_core_coverage": {
+          "before": null,
+          "after": "3af6620f96630ca25df1a184416e0eb2904829b9bc41ed45e2e59cdafa743a8b"
+        },
+        "Experiment.response": {
+          "before": null,
+          "after": "eb65cd99ce2994766b2a1c7ee8ffab2eea7c63f5b28de0dd82a4a13fd9d946ab"
+        },
+        "Experiment.seal": {
+          "before": null,
+          "after": "d12f93ef1ae19badad5912edff0c1014e68512245796647af2c4ee3d5bb475ba"
+        },
+        "Experiment.source": {
+          "before": null,
+          "after": "aecaa892123de913275cb01b9972e50eb98a01fc0a446008f335012eb4102800"
+        },
+        "Experiment.status": {
+          "before": null,
+          "after": "8d5b0ad8a23b652eedac541368379070c38a59b70b1d9513ccb30576494f58ec"
+        },
+        "Experiment.strict": {
+          "before": null,
+          "after": "0f5a1c02e9185c11d216dd187c3b62ae391ec46c7864869c06b96cc7d508314a"
+        },
+        "Experiment.translate": {
+          "before": null,
+          "after": "ba588af8915bea1f1b8b8e5dd4994bf3cd10b41af054c6648ede971189f811af"
+        },
+        "archived_action": {
+          "before": null,
+          "after": "4db111d60fc7293c2ba4983878d6f0dd4aa2093030802577adf230df66cdc6a1"
+        },
+        "issued": {
+          "before": null,
+          "after": "998665c5ceb1d5b884337a99fa3a398e86cbd3c05e5358055c91e14d58012344"
+        },
+        "main": {
+          "before": null,
+          "after": "c7210b1dbe0bf1fbc782a9893f4bd201f6a960099ae67f98fe88f7a2d61d8b0f"
+        },
+        "metrics": {
+          "before": null,
+          "after": "bae731e9cfe645cba79e8e24b2083d0b4471800ad5ea51ffbfcf21d8ea95cecf"
+        },
+        "need": {
+          "before": null,
+          "after": "b0cf0317a25d1c425cd6a17e5243bacf7897d5218601036abbcb2d75eb72bcfa"
+        },
+        "observed_models": {
+          "before": null,
+          "after": "34d379e6d553c1c1e0f09fe474bc552e2cecfdea662a6bd0816054cae975940b"
+        },
+        "options": {
+          "before": null,
+          "after": "26926fc00276f5f2251414636faf7b887bde6b8cf40ed530d6c4c58be9853589"
+        },
+        "phase": {
+          "before": null,
+          "after": "e4d3093815e9704c28baec505d3c6127807ac61293a02456863f1b17e26c746a"
+        },
+        "placement_map": {
+          "before": null,
+          "after": "8f8a4d0e00f87bb3d8924793b9552038f46881f05ce0a4e20f0bbd63237ed9e4"
+        },
+        "policy": {
+          "before": null,
+          "after": "af76ca3e3e8c07e88967edab7a76b05d0e8041ff2693961fce379675a1fadd49"
+        },
+        "provenance": {
+          "before": null,
+          "after": "cc8e314d56db8cd8bc11850bd5f9ff32a83eb45917284be1007e3bd776f7deff"
+        },
+        "read": {
+          "before": null,
+          "after": "bccab904d2ab7195be1d2b7d3fba19655f454b07a3b6a66ddfb4376c956d0fd4"
+        },
+        "reference_bearers": {
+          "before": null,
+          "after": "decee72a217176e41ecb126aab097bed596dcdc3c9b9d7c5cf1223b79862913a"
+        },
+        "stop_on_timeout": {
+          "before": null,
+          "after": "11b73a929afed97bf3666c3bf0ac7df2e05860b9cdc6a2282a8a936f72918d60"
+        },
+        "translated": {
+          "before": null,
+          "after": "bba369f5da04fcad4bb0f9115bed6f70944340dc4cb55848379895f2c52cfab2"
+        },
+        "unit_map": {
+          "before": null,
+          "after": "d32d40a623d3441e55f96e0e34e5dd65caa4e95ab80439c4b0a8ef3851501f99"
+        },
+        "verified_input": {
+          "before": null,
+          "after": "a9437c849fb05d84d3c375a08d52d229edd715c2f7617e74f7a00537c59d7d75"
+        },
+        "views": {
+          "before": null,
+          "after": "d3758462f68fda99cc6c7ce7ff9b3a194c59d4227a959b5eb7c210653957ec72"
+        },
+        "write": {
+          "before": null,
+          "after": "2864fd05824162de5fc9bc834963a9dd46b061a5017f22db49e0d99622ef3ebb"
         }
       }
     }
   },
   "rows": {
-    "ci/quality_shards/all.txt": {
+    "docs/AI_IMPLEMENTATION_PLAN.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Records the exact owner mapping or the measured current comparison for the bounded pending Battle-shock authority change.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "ci/quality_shards/shard-4.txt": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Records the exact owner mapping or the measured current comparison for the bounded pending Battle-shock authority change.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "contracts/examples/persistence/session-persistence.json": {
-      "category": "measured_workload",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Binds changed runtime identity, contract examples or the exact admission and regression controls for the bounded pending Battle-shock authority change.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "contracts/examples/sessions/session-command-outcome.json": {
-      "category": "measured_workload",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Binds changed runtime identity, contract examples or the exact admission and regression controls for the bounded pending Battle-shock authority change.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "contracts/examples/sessions/session-command-started.json": {
-      "category": "measured_workload",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Binds changed runtime identity, contract examples or the exact admission and regression controls for the bounded pending Battle-shock authority change.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "contracts/examples/sessions/session-metadata-created.json": {
-      "category": "measured_workload",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Binds changed runtime identity, contract examples or the exact admission and regression controls for the bounded pending Battle-shock authority change.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "contracts/examples/support-profile-player-a-redacted.json": {
-      "category": "measured_workload",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Binds changed runtime identity, contract examples or the exact admission and regression controls for the bounded pending Battle-shock authority change.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "contracts/examples/support-profile-player-b-redacted.json": {
-      "category": "measured_workload",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Binds changed runtime identity, contract examples or the exact admission and regression controls for the bounded pending Battle-shock authority change.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "contracts/examples/support-profile.json": {
-      "category": "measured_workload",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Binds changed runtime identity, contract examples or the exact admission and regression controls for the bounded pending Battle-shock authority change.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "contracts/manifest.json": {
-      "category": "measured_workload",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Binds changed runtime identity, contract examples or the exact admission and regression controls for the bounded pending Battle-shock authority change.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "data/source_audits/ci64_provenance_v1/stage2-pending-battle-shock-transition-v1.json": {
-      "category": "measured_workload",
-      "operations": [
-        "cavalcade-authority-admission"
-      ],
-      "selected_families": [],
-      "rationale": "Binds changed runtime identity, contract examples or the exact admission and regression controls for the bounded pending Battle-shock authority change.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "docs/performance/current/cavalcade-pending-authority-20261124.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Records the exact owner mapping or the measured current comparison for the bounded pending Battle-shock authority change.",
+      "rationale": "Records the frozen local experiment and its measured scope.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -390,111 +236,22 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Records the exact owner mapping or the measured current comparison for the bounded pending Battle-shock authority change.",
+      "rationale": "Records the frozen local experiment and its measured scope.",
       "source_obligation": null,
       "unchanged_work": null
     },
-    "scripts/engine_numerical_identity_test_admission.py": {
+    "scripts/stage2_preservation_timing.py": {
       "category": "measured_workload",
       "operations": [
-        "cavalcade-authority-admission",
-        "close-quarters-test-admission",
-        "engine-numerical-identity-admission",
-        "round4-battle-shock-event-wounds",
-        "round4-malice-bearer-liveness",
-        "stage2-strict-replay-test-admission"
+        "stage2-preservation-timing-reproducer"
       ],
       "selected_families": [],
-      "rationale": "Binds changed runtime identity, contract examples or the exact admission and regression controls for the bounded pending Battle-shock authority change.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "src/warhammer40k_core/_engine_build_manifest.json": {
-      "category": "measured_workload",
-      "operations": [
-        "cavalcade-authority-admission"
-      ],
-      "selected_families": [],
-      "rationale": "Binds changed runtime identity, contract examples or the exact admission and regression controls for the bounded pending Battle-shock authority change.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "src/warhammer40k_core/engine/battle_shock_hooks.py": {
-      "category": "hot_query_or_data_structure",
-      "operations": [
-        "cavalcade-hot-authority"
-      ],
-      "selected_families": [
-        "cavalcade-authority-comparison"
-      ],
-      "rationale": "Tests the current request and exact ledger provenance before dispatching possible Daemonic Terror or Manifestation authorities. The matched registered workload measures the affected pre-submission guard.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "src/warhammer40k_core/engine/faction_content/pending_battle_shock_routes.py": {
-      "category": "hot_query_or_data_structure",
-      "operations": [
-        "cavalcade-hot-authority"
-      ],
-      "selected_families": [
-        "cavalcade-authority-comparison"
-      ],
-      "rationale": "Tests the current request and exact ledger provenance before dispatching possible Daemonic Terror or Manifestation authorities. The matched registered workload measures the affected pre-submission guard.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/army_rule.py": {
-      "category": "hot_query_or_data_structure",
-      "operations": [
-        "cavalcade-hot-authority",
-        "cavalcade-round-five-contextual-shadow-rule",
-        "round4-battle-shock-event-wounds"
-      ],
-      "selected_families": [
-        "cavalcade-authority-comparison"
-      ],
-      "rationale": "Tests the current request and exact ledger provenance before dispatching possible Daemonic Terror or Manifestation authorities. The matched registered workload measures the affected pre-submission guard.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/battle_shock_outcome_authority.py": {
-      "category": "hot_query_or_data_structure",
-      "operations": [
-        "cavalcade-hot-authority"
-      ],
-      "selected_families": [
-        "cavalcade-authority-comparison"
-      ],
-      "rationale": "Tests the current request and exact ledger provenance before dispatching possible Daemonic Terror or Manifestation authorities. The matched registered workload measures the affected pre-submission guard.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "tests/code_quality/test_battle_shock_resolution_contract.py": {
-      "category": "measured_workload",
-      "operations": [
-        "cavalcade-pending-authority-regression"
-      ],
-      "selected_families": [],
-      "rationale": "Binds changed runtime identity, contract examples or the exact admission and regression controls for the bounded pending Battle-shock authority change.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "tests/code_quality/test_engine_numerical_identity_admission.py": {
-      "category": "measured_workload",
-      "operations": [
-        "engine-numerical-identity-admission",
-        "round4-battle-shock-event-wounds",
-        "round4-malice-bearer-liveness"
-      ],
-      "selected_families": [],
-      "rationale": "Binds changed runtime identity, contract examples or the exact admission and regression controls for the bounded pending Battle-shock authority change.",
+      "rationale": "Development-only serial operator that exercises existing actor projections, native submission, persistence and replay for one frozen tactical comparison.",
       "source_obligation": null,
       "unchanged_work": null
     }
   },
   "milestone": "ordinary",
-  "comparisons": {
-    "cavalcade-authority-comparison": "docs/performance/current/cavalcade-pending-authority-20261124.json"
-  },
+  "comparisons": {},
   "full_game": null
 }

@@ -35780,6 +35780,17 @@
       "sensitive": false,
       "mandatory": true
     },
+    "stage2-preservation-timing-reproducer": {
+      "paths": [
+        "scripts/stage2_preservation_timing.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
     "stage2-screen-movement-candidates": {
       "paths": [
         "src/warhammer40k_core/ai/screen_movement_candidates.py",
