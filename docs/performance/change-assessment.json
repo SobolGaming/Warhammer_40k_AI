@@ -1,126 +1,126 @@
 {
   "policy": "rules-engine-performance-v3",
   "base": "161378a16c4557228b2af45db0d311a522eb3f8f",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:6a47a867bba140bc25c450cd587c0501ffd524deb4a4dce79782f478ba68f856",
-  "operation_map_sha256": "79a8246364cc499a7c92fe53c82533fd05b80a8376d5ff0bdf23e0f90cde1654",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:3ab59441d5b59260e25b52791d21b84fb3759484fbec344689d8ad765b676fd4",
+  "operation_map_sha256": "d1d720fecbda90ac40a84c4449b35c271871bd7b513fe3cc18467d09c2029d08",
   "changes": {
     "contracts/examples/persistence/session-persistence.json": {
       "before_sha256": "53f446c4b290322e7e4e811590edc3869bcedc5aa30cd200c8002ff95b498df8",
-      "after_sha256": "56e4363c14e4222965de31dea84269c97bd47304596435e5028b0541edb97935",
+      "after_sha256": "1b2054425b4b6e35a4553558dc609dccecb7bb80a53b39b00fe15f406e03bba2",
       "owners": {
         "@document": {
           "before": "53f446c4b290322e7e4e811590edc3869bcedc5aa30cd200c8002ff95b498df8",
-          "after": "56e4363c14e4222965de31dea84269c97bd47304596435e5028b0541edb97935"
+          "after": "1b2054425b4b6e35a4553558dc609dccecb7bb80a53b39b00fe15f406e03bba2"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "before_sha256": "1e57ce1b12e776f6ba61756a72528946277374a899386feff74b6498f08d15f3",
-      "after_sha256": "08d99dc3f04df88750d7ffa4a9bd42bc239227d90bb659d0481b16999a1d148b",
+      "after_sha256": "f4f6219d174fe2c533af47efb783d2c5bbd7d925ca52a6465ba1280c4301eaa9",
       "owners": {
         "@document": {
           "before": "1e57ce1b12e776f6ba61756a72528946277374a899386feff74b6498f08d15f3",
-          "after": "08d99dc3f04df88750d7ffa4a9bd42bc239227d90bb659d0481b16999a1d148b"
+          "after": "f4f6219d174fe2c533af47efb783d2c5bbd7d925ca52a6465ba1280c4301eaa9"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
       "before_sha256": "5c0d66563c183e4760ab9f65b01b545d36a0c6dc411fc18584df56eb18068bc0",
-      "after_sha256": "0123ed235cb6029b38a879782998437bd0c6f280d99ba945e46daef1aaab60b6",
+      "after_sha256": "8e152bf3241090c1d10be2b480051c86a45a6c3f503ad97e57bca9b6ced480e0",
       "owners": {
         "@document": {
           "before": "5c0d66563c183e4760ab9f65b01b545d36a0c6dc411fc18584df56eb18068bc0",
-          "after": "0123ed235cb6029b38a879782998437bd0c6f280d99ba945e46daef1aaab60b6"
+          "after": "8e152bf3241090c1d10be2b480051c86a45a6c3f503ad97e57bca9b6ced480e0"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "before_sha256": "0c1eaa3ccc8db708bbc4aa5232b1a511144f1041871a58e3dce631ceb19fdd5f",
-      "after_sha256": "db5dbfa838046621c9eaa90ed6c0ac2e25317966420505f54a829fc3b667c580",
+      "after_sha256": "1c2f56b96c46f6ce44b4f3d2c4757e8e1b920c3423ea279ab53743006a509592",
       "owners": {
         "@document": {
           "before": "0c1eaa3ccc8db708bbc4aa5232b1a511144f1041871a58e3dce631ceb19fdd5f",
-          "after": "db5dbfa838046621c9eaa90ed6c0ac2e25317966420505f54a829fc3b667c580"
+          "after": "1c2f56b96c46f6ce44b4f3d2c4757e8e1b920c3423ea279ab53743006a509592"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "before_sha256": "409a2313a6613b6dfd4d5bcacd04a0e4a44136abed31762222ef76d4b673a977",
-      "after_sha256": "a3be8931984b1c445cc8824632f3be9c43a53828be164e1c65bb264dfa1856bf",
+      "after_sha256": "b88b847c2bf0ff244f2af08fafd18677221ae2a9b57230ed0eaac6afe84dfb21",
       "owners": {
         "@document": {
           "before": "409a2313a6613b6dfd4d5bcacd04a0e4a44136abed31762222ef76d4b673a977",
-          "after": "a3be8931984b1c445cc8824632f3be9c43a53828be164e1c65bb264dfa1856bf"
+          "after": "b88b847c2bf0ff244f2af08fafd18677221ae2a9b57230ed0eaac6afe84dfb21"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "before_sha256": "e514d6a3a74492a48b3b600e1bc208380fd6ce1c1e1ef9c4c163274c48efcfac",
-      "after_sha256": "72b1eb2085dc7c6d5dc94af38160d0dd319566a6f827b4fc508446fd1fd783b3",
+      "after_sha256": "c5975dbe70cef087c03ebe3485e9efadb78cc2f562ca69fabd78dab58df922dd",
       "owners": {
         "@document": {
           "before": "e514d6a3a74492a48b3b600e1bc208380fd6ce1c1e1ef9c4c163274c48efcfac",
-          "after": "72b1eb2085dc7c6d5dc94af38160d0dd319566a6f827b4fc508446fd1fd783b3"
+          "after": "c5975dbe70cef087c03ebe3485e9efadb78cc2f562ca69fabd78dab58df922dd"
         }
       }
     },
     "contracts/examples/support-profile.json": {
       "before_sha256": "d0b874c7094fc912474b79fa850d969048c9e1f4fec614e37f73267c6ca28f76",
-      "after_sha256": "7d4d6b805a18cbf8dbd249e9d34f37d41391cdce549976a27a658a8be805e156",
+      "after_sha256": "4b2cd17441bececf557c13401deb59120ef3683edc2c54b802dceb198f508d46",
       "owners": {
         "@document": {
           "before": "d0b874c7094fc912474b79fa850d969048c9e1f4fec614e37f73267c6ca28f76",
-          "after": "7d4d6b805a18cbf8dbd249e9d34f37d41391cdce549976a27a658a8be805e156"
+          "after": "4b2cd17441bececf557c13401deb59120ef3683edc2c54b802dceb198f508d46"
         }
       }
     },
     "contracts/manifest.json": {
       "before_sha256": "f714451dbbb1c83207c0083aa85b8a498e3f55d9ad6b27015d480f9106a291c2",
-      "after_sha256": "c9a098223e3f07ab68293d2f6b04a66cec7eae34ba580c369bafc427b013d68b",
+      "after_sha256": "8fcf24f03772073ed214b72b95481352251d0ac20db29a7165ed853d363c7625",
       "owners": {
         "@document": {
           "before": "f714451dbbb1c83207c0083aa85b8a498e3f55d9ad6b27015d480f9106a291c2",
-          "after": "c9a098223e3f07ab68293d2f6b04a66cec7eae34ba580c369bafc427b013d68b"
+          "after": "8fcf24f03772073ed214b72b95481352251d0ac20db29a7165ed853d363c7625"
         }
       }
     },
     "data/source_audits/ci64_provenance_v1/stage2-pending-battle-shock-transition-v1.json": {
       "before_sha256": null,
-      "after_sha256": "509792f8ac6ac85ab0c37bc356d7d73f7add8062f38fe2bc12b3d0936400986b",
+      "after_sha256": "b1e7e72fbd1cb729b2b08ec0253ed5d3b72f463c046238952c9c574c85e17849",
       "owners": {
         "@document": {
           "before": null,
-          "after": "509792f8ac6ac85ab0c37bc356d7d73f7add8062f38fe2bc12b3d0936400986b"
+          "after": "b1e7e72fbd1cb729b2b08ec0253ed5d3b72f463c046238952c9c574c85e17849"
         }
       }
     },
     "docs/performance/current/cavalcade-pending-authority-20261124.json": {
       "before_sha256": null,
-      "after_sha256": "ea6d3dd3c3d13a4a063d9c300861ce653299449b0361e6b4345f66beb11cfbc3",
+      "after_sha256": "4d33ee4d6961ee0bc42ea7f21c60a79dfc11164c2c667729fd1598c3888a6235",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ea6d3dd3c3d13a4a063d9c300861ce653299449b0361e6b4345f66beb11cfbc3"
+          "after": "4d33ee4d6961ee0bc42ea7f21c60a79dfc11164c2c667729fd1598c3888a6235"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "e1116b71998744f09a0754043903e016c9adb2f40f978802d95fa1e400353fd9",
-      "after_sha256": "0aaf056331391dad8b2a40d8f2812c8de25771fe6a353cb7b4f3bdad6fc22a66",
+      "after_sha256": "3674682d6719a3d5e0b99a4c45cabc779c46f52a7b77a33256b1c9f3d4e5a13a",
       "owners": {
         "@document": {
           "before": "e1116b71998744f09a0754043903e016c9adb2f40f978802d95fa1e400353fd9",
-          "after": "0aaf056331391dad8b2a40d8f2812c8de25771fe6a353cb7b4f3bdad6fc22a66"
+          "after": "3674682d6719a3d5e0b99a4c45cabc779c46f52a7b77a33256b1c9f3d4e5a13a"
         }
       }
     },
     "scripts/engine_numerical_identity_test_admission.py": {
       "before_sha256": "dea43fbc1f7f2901d7bd0a66600792a6c82a1b9f53a5214758b92a33f82d7c22",
-      "after_sha256": "0774c43d08d87a9825bc89c696506af74e8f7a7dc4c9981967fea65220269ffe",
+      "after_sha256": "6244e3494473d69924534a324eae493832c4bdbb1e8eb127a76924734a478a72",
       "owners": {
         "_pending_battle_shock_source_transition": {
           "before": null,
-          "after": "55a8ba491ee36185976602c0697e7b3fb68744fb1e58b417d0d5cbae5b0a0400"
+          "after": "2802d36d68a3af4932c97bd1bb0f3362c2857568cbcb2d0a1429c1b21c4f6394"
         },
         "_round4_battle_shock_successor": {
           "before": "218161aeec895a23b6d216b70d7b3f6067e0e7e1b6ae78c84682c1599f2b0ccd",
@@ -134,25 +134,25 @@
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "before_sha256": "73091916a3e1527d7e5d58961478f628a65caa745df92739e29232f304e9d905",
-      "after_sha256": "3afa077711a2fe2b32c83aa2e21077e1d5fdc52e60268e45aaf8b109cb8dc47b",
+      "after_sha256": "420df42ac559f819417d5f0e8eeab6c89d273ae26e55e9a3e44847631bbe870e",
       "owners": {
         "@document": {
           "before": "73091916a3e1527d7e5d58961478f628a65caa745df92739e29232f304e9d905",
-          "after": "3afa077711a2fe2b32c83aa2e21077e1d5fdc52e60268e45aaf8b109cb8dc47b"
+          "after": "420df42ac559f819417d5f0e8eeab6c89d273ae26e55e9a3e44847631bbe870e"
         }
       }
     },
     "src/warhammer40k_core/engine/battle_shock_hooks.py": {
       "before_sha256": "4f149f2664ac363aa9034c3924c43c7f1356c82dc27cdd2c32467b163ec4f99b",
-      "after_sha256": "b8132e305060c6f9b3bf87f984d926eab7ae39e497f81d2db06fe2d194480cd4",
+      "after_sha256": "1a16275a0dec6e820308691239ab2374aefc0112a3f9545c21a161f20ac359a1",
       "owners": {
         "@module": {
           "before": "772611fbeba979f0c2ee1f96e5daffc1501b6177c40603cf5d679f0d0c2845a3",
-          "after": "35c7007ae63520d270082b25f01fc2bd07311fee7ff0f1f36c850cb289e0a8a1"
+          "after": "70dfd84333b9fdd5241b87c5801adc590d9333c86e3d0798bc562354742be598"
         },
         "BattleShockHookRegistry.pending_outcome_authority_for": {
           "before": "f6a27c26003b71670f9b65174383b6b266b63efe651df7e45cebd18b8cb0f1a2",
-          "after": "0464a89aa488c8f10f47415af407ae1018e1f7078e7bcb113e7e8b43a96212e9"
+          "after": "7a081907620844dbd63e25fc03f9ca6b7d1551ad3350cce656736e4499a8062a"
         },
         "BattleShockPendingOutcomeRoute": {
           "before": null,
@@ -165,6 +165,10 @@
         "BattleShockPendingOutcomeRoute.__post_init__": {
           "before": null,
           "after": "ef3d3ebe2e374cf3fe0e57017ba8ce9b053c85c2d154d7b598d7dc3a9bb5fdd5"
+        },
+        "BattleShockPendingOutcomeRoute.is_route": {
+          "before": null,
+          "after": "246264a2a216f53863436fccf153be500102361b6e93533aabc18304ac986b55"
         },
         "BattleShockPendingOutcomeRoute.needs_validation": {
           "before": null,
@@ -198,7 +202,7 @@
     },
     "tests/code_quality/test_battle_shock_resolution_contract.py": {
       "before_sha256": "32fdbfb3e31f846bf3e69c9af00a5eb08e82a06efed40eb0b55d458460d600a8",
-      "after_sha256": "de2bd02c233d89b4b42872efb37d13ebf6819c767eddbf5b208e4d127fdf9784",
+      "after_sha256": "c9c71735f4160372192c04e1c5e3a7abe7c1387deaeee0f864a67911a3689394",
       "owners": {
         "@module": {
           "before": "8463fed64fd0d17c342b2bbfad01a6eeb4f19e06941aa6132dd6d33085553778",
@@ -206,7 +210,17 @@
         },
         "test_pending_outcome_route_requires_exact_negative_provenance": {
           "before": null,
-          "after": "f82e06c2ecbaa4484f3a126b3f83f2346e7256b76ad84c3df193da92fc5f93e6"
+          "after": "5253ceebe836e48d3dabf3e4fa67e843bf9a972985cb224115d45b6295cbc361"
+        }
+      }
+    },
+    "tests/code_quality/test_engine_numerical_identity_admission.py": {
+      "before_sha256": "619d60b5f3b60e00a72082e561e66cf0754ee534d5ff8eb24862dee2d0a02e52",
+      "after_sha256": "6efd7f2f39f250942219e476e0415b2f92f303111a348d0490a0d9740586f21b",
+      "owners": {
+        "test_identity_inventory_uses_current_twelve_shards_and_native_cohort": {
+          "before": "8fb1bc82085538c6954ff331a54c8646833719d7794c997b7d3d4ad5475602a6",
+          "after": "24f6b4d7215339b1145ee5353f7de2d61e0b82fa361676f6159d06e491e57860"
         }
       }
     }
@@ -383,6 +397,18 @@
       "category": "measured_workload",
       "operations": [
         "cavalcade-pending-authority-regression"
+      ],
+      "selected_families": [],
+      "rationale": "Binds changed runtime identity, contract examples or the exact admission and regression controls for the bounded pending Battle-shock authority change.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "tests/code_quality/test_engine_numerical_identity_admission.py": {
+      "category": "measured_workload",
+      "operations": [
+        "engine-numerical-identity-admission",
+        "round4-battle-shock-event-wounds",
+        "round4-malice-bearer-liveness"
       ],
       "selected_families": [],
       "rationale": "Binds changed runtime identity, contract examples or the exact admission and regression controls for the bounded pending Battle-shock authority change.",
