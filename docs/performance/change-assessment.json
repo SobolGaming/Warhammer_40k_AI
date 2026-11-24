@@ -1,228 +1,260 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "b7f2d27b3afaa98cb68420cdcecc85350562fdbb",
+  "base": "d9185cf53a2816ab666f3c1b16410b960a3d1cc7",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:bef24c387ca386c885fd7508796e065e0e6fb68efa2159f3aa8be6d8f41b1db1",
-  "operation_map_sha256": "e4da5aa6fea51b6d5dd2b35f52d0a06ee3ff6d42049b1851d680ec402ad06638",
+  "operation_map_sha256": "d2eb2ce3d120a4b3a2564a0b6eb2dcde393d9a6b9d50fa9fc163e6eb3719d652",
   "changes": {
     "docs/AI_IMPLEMENTATION_PLAN.md": {
-      "before_sha256": "3c874cdf08e2c21db30ce9c4b3554b64829df8760e602f36ee9cb990577d2d6c",
-      "after_sha256": "21e66a9d3d6ab57b55723900e8886406fdf71d52abd6a6f1f002324b693392e4",
+      "before_sha256": "21e66a9d3d6ab57b55723900e8886406fdf71d52abd6a6f1f002324b693392e4",
+      "after_sha256": "f9c5242b8cc1d5335ec90b9bcb2ba229a4a3d1e91f22f71890f0a81a0c6781f0",
       "owners": {
         "@document": {
-          "before": "3c874cdf08e2c21db30ce9c4b3554b64829df8760e602f36ee9cb990577d2d6c",
-          "after": "21e66a9d3d6ab57b55723900e8886406fdf71d52abd6a6f1f002324b693392e4"
+          "before": "21e66a9d3d6ab57b55723900e8886406fdf71d52abd6a6f1f002324b693392e4",
+          "after": "f9c5242b8cc1d5335ec90b9bcb2ba229a4a3d1e91f22f71890f0a81a0c6781f0"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "f7a5a5d76b63e39f0406d1472cdbd3200b528b3ddd6a5f48d64b1d1d53b2d090",
-      "after_sha256": "f9e6133929dc2574a3b8d3eb3aed2911b74770d6be43a9577124c33e08e9e840",
+      "before_sha256": "f9e6133929dc2574a3b8d3eb3aed2911b74770d6be43a9577124c33e08e9e840",
+      "after_sha256": "e44f87dea22fcdc3a7cfb3afac88e3d1b8e51e23aecce93d56f6d97986a5c6f9",
       "owners": {
         "@document": {
-          "before": "f7a5a5d76b63e39f0406d1472cdbd3200b528b3ddd6a5f48d64b1d1d53b2d090",
-          "after": "f9e6133929dc2574a3b8d3eb3aed2911b74770d6be43a9577124c33e08e9e840"
+          "before": "f9e6133929dc2574a3b8d3eb3aed2911b74770d6be43a9577124c33e08e9e840",
+          "after": "e44f87dea22fcdc3a7cfb3afac88e3d1b8e51e23aecce93d56f6d97986a5c6f9"
+        }
+      }
+    },
+    "docs/stage2/b2-b3-charge-timing-protocol.md": {
+      "before_sha256": null,
+      "after_sha256": "c3c87197c000be139fb29f8e2074050b64674460b611e368ca863de1dd855163",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "c3c87197c000be139fb29f8e2074050b64674460b611e368ca863de1dd855163"
+        }
+      }
+    },
+    "scripts/stage2_charge_timing.py": {
+      "before_sha256": null,
+      "after_sha256": "0f89614af7c6862e9f48c1867891d18eb0085155f9a953ef82cf8c5ff5a49590",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "a7fa4809325d3616639e10689d8cef416e7a4d042d6d7e79fdc3d3889890ac4f"
+        },
+        "TimingExperiment": {
+          "before": null,
+          "after": "fde9ca8a8f8a4fa201ebfe8b3b192c98f904ab531fb17248750c4bd35cee6303"
+        },
+        "TimingExperiment.__exit__": {
+          "before": null,
+          "after": "20c91dc3c0412dcc8f73eb3ab1d9cefe860dcfc5c1e459772e21589625ec85e9"
+        },
+        "TimingExperiment.__init__": {
+          "before": null,
+          "after": "8f9849c04a49cc791b10464fe250cb1aa40470033e9ee23fe580be60a8d39754"
+        },
+        "TimingExperiment.boundary": {
+          "before": null,
+          "after": "a689cec4d276b63dfc8f46969335231234e16547b74d7a978ed0edc7b5dd46a7"
+        },
+        "TimingExperiment.common": {
+          "before": null,
+          "after": "5284d0959e891766d03aaddb5b0113cd123d5d95ad88b2b8b0ce3d5e53ec00d7"
+        },
+        "TimingExperiment.continuation": {
+          "before": null,
+          "after": "6e24764a1521d8fca6a4002e19b3c182f40a0086636ba131f9f7d9d527822fee"
+        },
+        "TimingExperiment.early_charge": {
+          "before": null,
+          "after": "56651b8be28a9015326d3672a42b83f717976a97a37eb397c32b5a1819ca60ef"
+        },
+        "TimingExperiment.early_omission": {
+          "before": null,
+          "after": "610bd2c0f21d68e34d71a02ab51449de3b3857c52f8c6b34137819101f0ed9f3"
+        },
+        "TimingExperiment.execute": {
+          "before": null,
+          "after": "aca4ddcc37a9442471a05ae67c3f78ac42fa692aa633fe0f75fc58633cd0d6f9"
+        },
+        "TimingExperiment.finish_early": {
+          "before": null,
+          "after": "c88475c5d82bf54c1f999c5ee37e9f0615c9bddf2af679afe8ed27572d05ab7c"
+        },
+        "TimingExperiment.finite_reference": {
+          "before": null,
+          "after": "7940142fbf66fbb9ba215f50be453816177786a0c26d1ebeb5523dda11eb31f8"
+        },
+        "TimingExperiment.follow_e": {
+          "before": null,
+          "after": "eb407f24ee4def39cc61ce9c6e1781f55f672f028279426a2d379237406dac68"
+        },
+        "TimingExperiment.market_e": {
+          "before": null,
+          "after": "51d4eda259a14009906bb3105ce2cdbadd615c7a87a5a887aea2b1dfc80ac976"
+        },
+        "TimingExperiment.position": {
+          "before": null,
+          "after": "96f481b1e0e9d64692457bb239778b481854207f047ecb20441400836ff7d8e8"
+        },
+        "TimingExperiment.prepare_early_charge": {
+          "before": null,
+          "after": "bfb84ecbfd715ebb784534be415d2ad1b05f4e56c16bfc7101773683c484d091"
+        },
+        "TimingExperiment.same_route": {
+          "before": null,
+          "after": "31383ba4bf4afd292e4626eeb846274c6c2c8ede052872eb2c4efca72bb40162"
+        },
+        "TimingExperiment.save_progress": {
+          "before": null,
+          "after": "1a453f2643df29d4130fd496f6d193a7313f925253c4df89ba1e075ca59c762e"
+        },
+        "TimingExperiment.seal": {
+          "before": null,
+          "after": "e47d48ebe46deac1058cedd9fca5fc06d0eb818b4ebda8eca9e408fafc9955b9"
+        },
+        "TimingExperiment.strict": {
+          "before": null,
+          "after": "6da6555d45e94a2a1827c93b7dc436052e550671cb522b7dbbd6f59aed57c7b6"
+        },
+        "TimingExperiment.unmatched": {
+          "before": null,
+          "after": "e43c7ed02b3968a4f4d6cbc5ee781828c8a11ce9079e54bf4567c38d0db1f729"
+        },
+        "TimingExperiment.update_coverage": {
+          "before": null,
+          "after": "825e1c7fdc0dbf6793b0c640da082a14d6d0701065bd468707b42523cd294c82"
+        },
+        "Unmatchable": {
+          "before": null,
+          "after": "2e4282a0cb734e13ca525bdfc350941294c13f96be1aaf0358b2b862882441b2"
+        },
+        "Unmatchable.__init__": {
+          "before": null,
+          "after": "78be1cbe0445686a22f583b4d12467353018905055ce787205df717ae87e3160"
+        },
+        "audit_actor_views": {
+          "before": null,
+          "after": "0aaa31aea968f996f95f9ccacd2166b452760d37ecaa7b9f8fe1723d90ee5a27"
+        },
+        "bind_early_fight_reference": {
+          "before": null,
+          "after": "8a1035f8ea3bf8eef8056d61502b9ba71ef0482a760e6a612ce9c011f06b1bba"
+        },
+        "charge_history": {
+          "before": null,
+          "after": "381326b03cc488d264551f6d01a862b3ecec6036ab1d34db6e0847c34c5da71b"
+        },
+        "declared_references": {
+          "before": null,
+          "after": "82e2a779872734dc1436ab86b1e7dd8efd4b0a5450792517c6762454b4ece56e"
+        },
+        "frozen_e_rows": {
+          "before": null,
+          "after": "6b17c2d0387445748d7e1321e349ae2e77dcb97b12ca9a92282881f1428da2c7"
+        },
+        "main": {
+          "before": null,
+          "after": "752a05927057150edf447a51007e574c73844caebb677169c026368248ebe4c3"
         }
       }
     },
     "scripts/stage2_preservation_timing.py": {
+      "before_sha256": "80de96b1091916f371b0c3997a527888e1015926137990ca6c7ccfea521a2aef",
+      "after_sha256": "74ed021d783baffa209f15cdf56af633e79a1f88372d18e32b44140bbd9acc94",
+      "owners": {
+        "ArchiveMismatch": {
+          "before": null,
+          "after": "20a01b63241dd7951d00a46b7bf8aa2850342f2f448de582178917206c26fb3d"
+        },
+        "archived_action": {
+          "before": "4db111d60fc7293c2ba4983878d6f0dd4aa2093030802577adf230df66cdc6a1",
+          "after": "5f0a471c575d5907589b1376e067218ab9213da84ce22a237f893766865920fe"
+        }
+      }
+    },
+    "scripts/tests/test_stage2_charge_timing.py": {
       "before_sha256": null,
-      "after_sha256": "80de96b1091916f371b0c3997a527888e1015926137990ca6c7ccfea521a2aef",
+      "after_sha256": "7ee0ddf9d793d4acc6314a4543df01bb01a069c80d22aa51301097097bd99139",
       "owners": {
         "@module": {
           "before": null,
-          "after": "f6ce3cace4935d4c7b7a9c98491d01075998f8e5790ccd99dd28a9ae7dfae9b0"
+          "after": "1a4f13bbc1e3ddd4084bbc07fa0e538c5813caeae7924e04d0cf63fbe692e227"
         },
-        "Blocker": {
+        "matching_row_65": {
           "before": null,
-          "after": "73ad02b8dc49ef5d55dd4a2a3b9e96a32554c04105590b39e9739f042b098187"
+          "after": "70fd4a50bce4749e83b530cb888fbf69add678e816c9797372bfbf300af46cce"
         },
-        "Experiment": {
+        "test_early_charge_deadline_covers_generation_and_validation": {
           "before": null,
-          "after": "b34bb036d1d33998bc1dc3a66099f035047a16aeed791431a81d33af658ea925"
+          "after": "cce11fd27183db974a2c0c1d563e7df7b06ce4c30f5c33fa54da28f93f2f0935"
         },
-        "Experiment.__enter__": {
+        "test_early_fight_round_drift_seals_typed_frontier": {
           "before": null,
-          "after": "b1d9afdbf340299eb63649b1713baa87e774e5e24fc3a3cbcaaecfe2e6804411"
+          "after": "3424d41c1f1a970f2f99a73b9d33cfaa2dbbae9545286b799d1258e54dfddce5"
         },
-        "Experiment.__exit__": {
+        "test_matching_row_65_propagates_an_unrelated_blocker": {
           "before": null,
-          "after": "0b321d180a090cb94fa930e7aa976df461c3170f9936fd7972693f17490b2eb3"
+          "after": "8f1b3a4d7683f5e32865a60ee6e7c391582f9515745ff88a0edf9514022abcc6"
         },
-        "Experiment.__init__": {
+        "test_matching_row_65_watchdog_remains_an_operational_blocker": {
           "before": null,
-          "after": "60a5233e9a24e78bec864ef2c6bd3880a3783c6afe36f5494785bea1952e9251"
+          "after": "3c363ae81e11ca75a51d03fd6da06b0ea94c16e05d68fe94d06eb65897aa5cd0"
+        }
+      }
+    },
+    "scripts/verify_stage2_charge_timing_receipts.py": {
+      "before_sha256": null,
+      "after_sha256": "952ac2341e2dba18932edfcd955e67ee7fb265a91f7f7e1b1ac9cbe99b7e84b4",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "54a0784578889542275e4e20542ad78f92d3357cb169042d83f4a16f817b7011"
         },
-        "Experiment.call": {
+        "authenticate_json": {
           "before": null,
-          "after": "0024c6bac005de8179490e54999144b00a78c8762928f3bec507fcbe87a577d0"
+          "after": "2674c83e21758dcf6f5060c3e43a0bf55cf2d9a1b03303848f6735e8651a41b1"
         },
-        "Experiment.charge_witness": {
+        "authenticate_pr733": {
           "before": null,
-          "after": "9943869bfe0a2d3ab503c84354298381005374e818daeb6623a572c0ba626b9a"
+          "after": "3b4ad29cd3e4369b25b797811ead11aecb1ce490d41cdde167edd35fa1608d4e"
         },
-        "Experiment.commit_action": {
+        "authenticate_raw": {
           "before": null,
-          "after": "00d69cacf8b6baa0cb27dcc33adb8755db8dd4bb821365bdd526343bb1741469"
+          "after": "86015f1c33c2c5a4013cf94e09369d3c395560ef2de62c81c7a8b404e81ac17d"
         },
-        "Experiment.common": {
+        "file_sha256": {
           "before": null,
-          "after": "a092d056badba6ee2c358e641f6c438379f8f9ffb803bb4b3644cade5b10fff5"
-        },
-        "Experiment.compare_exact": {
-          "before": null,
-          "after": "b242aa3924b940d4b9bb07ef929c24ade4a7093c076354378beb4fc7fd659f03"
-        },
-        "Experiment.context": {
-          "before": null,
-          "after": "b5f6b356c1df8312a7a4137b43ea826710318d802fa55b043b1e1ac32406e9dc"
-        },
-        "Experiment.e_shoot": {
-          "before": null,
-          "after": "b4f77eeab1772b120857d019542887cd9e9040af70e90a9a9aa5dd4aaa2a2c33"
-        },
-        "Experiment.execute": {
-          "before": null,
-          "after": "da808c293fb572206c97968365b44c2ef989111989e9cb84c175f66e4d81ad84"
-        },
-        "Experiment.gap": {
-          "before": null,
-          "after": "6aa5c18a090a829f752363d22a1d9641ec619178664240ca7b0597a6c83e730f"
-        },
-        "Experiment.log": {
-          "before": null,
-          "after": "cb48ab5d9a414520ea48ec9719c2fe2279653482b7d326f7ac98615113715704"
-        },
-        "Experiment.native_replay": {
-          "before": null,
-          "after": "57f44934869268e044ec5550fc18c7a1f553602465c3a84f3909b02d892ff43a"
-        },
-        "Experiment.next_public": {
-          "before": null,
-          "after": "50a650bc9de5faa962a2e574fc1880b3e4144d77460d9c35db1a187ad4728393"
-        },
-        "Experiment.player_context": {
-          "before": null,
-          "after": "1dd16d8066794f778a23d823e36bce0f1be11909a548044fb817d72d6fcfbd37"
-        },
-        "Experiment.position": {
-          "before": null,
-          "after": "8a5615f2703a89932604c5a85ba7ab89a94d37c78e2d01ffdb93e7dd63512c5d"
-        },
-        "Experiment.prepare_e": {
-          "before": null,
-          "after": "91959cda58112c4ff9237f235c4698d8a3e5f4b57253d19385b0023b18e54641"
-        },
-        "Experiment.record_id": {
-          "before": null,
-          "after": "3fa61d2e04a57259f270f3ad51e3496267ba731c07cd25ea5c2228dea305d161"
-        },
-        "Experiment.report_core_coverage": {
-          "before": null,
-          "after": "520a78bc8dabd57eabe2934b2539ef58d9ed00acc245168c0979793bddba495b"
-        },
-        "Experiment.response": {
-          "before": null,
-          "after": "eb65cd99ce2994766b2a1c7ee8ffab2eea7c63f5b28de0dd82a4a13fd9d946ab"
-        },
-        "Experiment.seal": {
-          "before": null,
-          "after": "d12f93ef1ae19badad5912edff0c1014e68512245796647af2c4ee3d5bb475ba"
-        },
-        "Experiment.source": {
-          "before": null,
-          "after": "aecaa892123de913275cb01b9972e50eb98a01fc0a446008f335012eb4102800"
-        },
-        "Experiment.status": {
-          "before": null,
-          "after": "8d5b0ad8a23b652eedac541368379070c38a59b70b1d9513ccb30576494f58ec"
-        },
-        "Experiment.strict": {
-          "before": null,
-          "after": "0f5a1c02e9185c11d216dd187c3b62ae391ec46c7864869c06b96cc7d508314a"
-        },
-        "Experiment.translate": {
-          "before": null,
-          "after": "ba588af8915bea1f1b8b8e5dd4994bf3cd10b41af054c6648ede971189f811af"
-        },
-        "archived_action": {
-          "before": null,
-          "after": "4db111d60fc7293c2ba4983878d6f0dd4aa2093030802577adf230df66cdc6a1"
-        },
-        "issued": {
-          "before": null,
-          "after": "998665c5ceb1d5b884337a99fa3a398e86cbd3c05e5358055c91e14d58012344"
+          "after": "fda77a21235097a9ef351e04ef8adc5711bdd3867d2e223e3dbbc08d3612ba8e"
         },
         "main": {
           "before": null,
-          "after": "c7210b1dbe0bf1fbc782a9893f4bd201f6a960099ae67f98fe88f7a2d61d8b0f"
+          "after": "ae039c89a22d96a2fd27df8ac4fdfd5636aaf28c62b5dae05042201194992ae8"
         },
-        "metrics": {
+        "read_json": {
           "before": null,
-          "after": "bae731e9cfe645cba79e8e24b2083d0b4471800ad5ea51ffbfcf21d8ea95cecf"
+          "after": "9beab4a3e3a81eb177d177de70ec93778ac7595ee9f34d7a446f9a0a00b2f2c2"
         },
-        "need": {
+        "read_manifest": {
           "before": null,
-          "after": "b0cf0317a25d1c425cd6a17e5243bacf7897d5218601036abbcb2d75eb72bcfa"
+          "after": "6572a316433462b7f346a84d13bb1449645a484ccbb319930da6822bba91b93a"
         },
-        "observed_models": {
+        "recover_summary": {
           "before": null,
-          "after": "34d379e6d553c1c1e0f09fe474bc552e2cecfdea662a6bd0816054cae975940b"
+          "after": "a14c23ad58e98c8b774f8f9f0724a162787238dcbf64dd99f12176b51b5cfb44"
         },
-        "options": {
+        "require_replay": {
           "before": null,
-          "after": "26926fc00276f5f2251414636faf7b887bde6b8cf40ed530d6c4c58be9853589"
+          "after": "b9c7b7de034e55d977346e17c9de8ba746739fbb91de38dcc52f5dfb79053446"
         },
-        "phase": {
+        "require_strict": {
           "before": null,
-          "after": "e4d3093815e9704c28baec505d3c6127807ac61293a02456863f1b17e26c746a"
+          "after": "b06f1a8c5809a26896c27a4d03dcefdb7fac8469203795bd68722d54c748050b"
         },
-        "placement_map": {
+        "verify": {
           "before": null,
-          "after": "8f8a4d0e00f87bb3d8924793b9552038f46881f05ce0a4e20f0bbd63237ed9e4"
-        },
-        "policy": {
-          "before": null,
-          "after": "af76ca3e3e8c07e88967edab7a76b05d0e8041ff2693961fce379675a1fadd49"
-        },
-        "provenance": {
-          "before": null,
-          "after": "cc8e314d56db8cd8bc11850bd5f9ff32a83eb45917284be1007e3bd776f7deff"
-        },
-        "read": {
-          "before": null,
-          "after": "bccab904d2ab7195be1d2b7d3fba19655f454b07a3b6a66ddfb4376c956d0fd4"
-        },
-        "reference_bearers": {
-          "before": null,
-          "after": "decee72a217176e41ecb126aab097bed596dcdc3c9b9d7c5cf1223b79862913a"
-        },
-        "stop_on_timeout": {
-          "before": null,
-          "after": "11b73a929afed97bf3666c3bf0ac7df2e05860b9cdc6a2282a8a936f72918d60"
-        },
-        "translated": {
-          "before": null,
-          "after": "bba369f5da04fcad4bb0f9115bed6f70944340dc4cb55848379895f2c52cfab2"
-        },
-        "unit_map": {
-          "before": null,
-          "after": "d32d40a623d3441e55f96e0e34e5dd65caa4e95ab80439c4b0a8ef3851501f99"
-        },
-        "verified_input": {
-          "before": null,
-          "after": "a9437c849fb05d84d3c375a08d52d229edd715c2f7617e74f7a00537c59d7d75"
-        },
-        "verify_shooting_reference": {
-          "before": null,
-          "after": "9c2aefb2d53b951d1a1ec8760e71afdc6612608a9cc1677f9d894265979cfff2"
-        },
-        "views": {
-          "before": null,
-          "after": "d3758462f68fda99cc6c7ce7ff9b3a194c59d4227a959b5eb7c210653957ec72"
-        },
-        "write": {
-          "before": null,
-          "after": "2864fd05824162de5fc9bc834963a9dd46b061a5017f22db49e0d99622ef3ebb"
+          "after": "de8cd04c57f2ff791baa6291ce579d8c7c6dbf96c656bd2c9e276df910e8298e"
         }
       }
     }
@@ -232,7 +264,7 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Records the frozen local experiment and its measured scope.",
+      "rationale": "Binds and records the Stage 2 development experiment.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -240,7 +272,25 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Records the frozen local experiment and its measured scope.",
+      "rationale": "Binds and records the Stage 2 development experiment.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/stage2/b2-b3-charge-timing-protocol.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Binds and records the Stage 2 development experiment.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "scripts/stage2_charge_timing.py": {
+      "category": "measured_workload",
+      "operations": [
+        "stage2-b2-b3-charge-timing-reproducer"
+      ],
+      "selected_families": [],
+      "rationale": "Development-only native operator, focused tests, and sealed-receipt audit for the frozen B2/B3 comparison.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -250,7 +300,27 @@
         "stage2-preservation-timing-reproducer"
       ],
       "selected_families": [],
-      "rationale": "Development-only serial operator that exercises existing actor projections, native submission, persistence and replay for one frozen tactical comparison.",
+      "rationale": "Development-only native operator, focused tests, and sealed-receipt audit for the frozen B2/B3 comparison.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "scripts/tests/test_stage2_charge_timing.py": {
+      "category": "measured_workload",
+      "operations": [
+        "stage2-b2-b3-charge-timing-reproducer"
+      ],
+      "selected_families": [],
+      "rationale": "Development-only native operator, focused tests, and sealed-receipt audit for the frozen B2/B3 comparison.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "scripts/verify_stage2_charge_timing_receipts.py": {
+      "category": "measured_workload",
+      "operations": [
+        "stage2-b2-b3-charge-receipt-verifier"
+      ],
+      "selected_families": [],
+      "rationale": "Development-only native operator, focused tests, and sealed-receipt audit for the frozen B2/B3 comparison.",
       "source_obligation": null,
       "unchanged_work": null
     }

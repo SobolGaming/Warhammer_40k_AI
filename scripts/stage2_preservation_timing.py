@@ -148,6 +148,10 @@ class Blocker(Exception):
     pass
 
 
+class ArchiveMismatch(Blocker):
+    """An archived action does not match the live offer."""
+
+
 def read(path):
     return orjson.loads(path.read_bytes())
 
@@ -213,20 +217,20 @@ def archived_action(context, reference):
     """Rebind frozen ordinary choices only to the correct current actor and route."""
     request = context.request
     old_request, old_result = reference["request"], reference["result"]
-    need(
-        all(request[key] == old_request[key] for key in ("actor_id", "decision_type")),
-        f"Expected {old_request['actor_id']} {old_request['decision_type']}.",
-    )
+    if any(request[key] != old_request[key] for key in ("actor_id", "decision_type")):
+        raise ArchiveMismatch(f"Expected {old_request['actor_id']} {old_request['decision_type']}.")
     for key in ("unit_instance_id", "active_player_id", "battle_round", "phase"):
-        if key in old_request["payload"]:
-            need(
-                request["payload"].get(key) == old_request["payload"][key], f"Request drift: {key}."
-            )
+        if (
+            key in old_request["payload"]
+            and request["payload"].get(key) != old_request["payload"][key]
+        ):
+            raise ArchiveMismatch(f"Request drift: {key}.")
 
     selected = old_result["selected_option_id"]
     if selected != PARAMETERIZED:
         live = options(request)
-        need(selected in live, f"Archived choice unavailable: {selected}.")
+        if selected not in live:
+            raise ArchiveMismatch(f"Archived choice unavailable: {selected}.")
         original = options(old_request)[selected]
         for key in (
             "unit_instance_id",
@@ -237,17 +241,19 @@ def archived_action(context, reference):
             "ordering_band",
             "fight_type",
         ):
-            if key in original:
-                need(live[selected].get(key) == original[key], f"Option drift: {key}.")
+            if key in original and live[selected].get(key) != original[key]:
+                raise ArchiveMismatch(f"Option drift: {key}.")
         return context.select_option(selected)
     if request["decision_type"] == OPTIONAL:
-        need(request["payload"]["declinable"], "Compulsory reaction cannot be declined.")
+        if not request["payload"]["declinable"]:
+            raise ArchiveMismatch("Compulsory reaction cannot be declined.")
         return context.propose(stratagem_decline_payload())
     need(request["decision_type"] == PROPOSAL, "Unplanned archived proposal.")
     payload = old_result["payload"]
     offer = request["payload"].get("proposal_request") or context.observation["pending_proposal"]
     for key in ("proposal_kind", "unit_instance_id", "movement_phase_action"):
-        need(offer[key] == payload[key], f"Archived proposal drift: {key}.")
+        if offer[key] != payload[key]:
+            raise ArchiveMismatch(f"Archived proposal drift: {key}.")
     return context.propose({**payload, "proposal_request_id": offer["request_id"]})
 
 

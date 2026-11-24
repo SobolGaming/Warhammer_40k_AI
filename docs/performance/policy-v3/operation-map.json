@@ -35780,6 +35780,29 @@
       "sensitive": false,
       "mandatory": true
     },
+    "stage2-b2-b3-charge-receipt-verifier": {
+      "paths": [
+        "scripts/verify_stage2_charge_timing_receipts.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "stage2-b2-b3-charge-timing-reproducer": {
+      "paths": [
+        "scripts/stage2_charge_timing.py",
+        "scripts/tests/test_stage2_charge_timing.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
     "stage2-preservation-timing-reproducer": {
       "paths": [
         "scripts/stage2_preservation_timing.py"
