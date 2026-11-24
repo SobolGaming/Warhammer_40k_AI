@@ -1,9 +1,9 @@
 {
   "schema": "finite-sheathed-in-brass-transition-v1",
-  "base": "5aca97bfaf4b3f1a753d65ed6b7dfc2482aa77f0",
-  "retained_transition_sha256": "4e48442b32a20933c864a1f5e7c5d398233526c9d1d4a4aa720f0eb50af86581",
-  "retained_runtime_fingerprint": "858c9136f8da02d92ff986bc6e54d7d608070f3a89df76de009cc655d0433bd0",
-  "runtime_fingerprint": "c3e3f9515d3e7dda75bf4add50d20a0b070ab684f6d9ad5f7bc0a0120ac0a26f",
+  "base": "d137b5cc0c7557c8b6653a1aa36ee47260242945",
+  "retained_transition_sha256": "2345dd760e0b9786c2420a024beb30aa7b734e6ab7ef1c0a9cedd33b0e0b72f2",
+  "retained_runtime_fingerprint": "0620b70b0c2bbedd4c55fa2805ff698135009c695c3a6c8b390a2a76629f0666",
+  "runtime_fingerprint": "081b7dba5fd5f7e987a1a870dcece79a128507ddb62bd583f6971a3d9d9d7052",
   "sources": {
     "src/warhammer40k_core/engine/generic_attack_save_modifiers.py": "2e950fabdf699054b17909a329cf0b7afa0ac59db255d45118c17390afd446cd",
     "src/warhammer40k_core/engine/native_attack_gathering.py": "e1185b69c849d918d79d5707829e434f0b3fce96abd9b4115a8554ea7e1ac0c8",

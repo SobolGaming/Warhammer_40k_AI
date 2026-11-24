@@ -690,7 +690,7 @@ def _sheathed_in_brass_test_addition(
     _selection_no_links(root, path)
     if not path.exists():
         return None
-    digest = "c01495718443f44cd080a610de2c58045998eba8d8b11d1394b700ab2deda59c"
+    digest = "69e27ec9472891dae2012b21c4ce977f48a79fb7398ce1ddfd8721d10a8bfb9c"
     raw = _checked_bytes(root, name, digest)
     record = json.loads(raw, object_pairs_hook=_selection_object)
     owner = "tests/factions/chaos_daemons/integration/test_sheathed_in_brass.py"
@@ -706,7 +706,7 @@ def _sheathed_in_brass_test_addition(
             "added_files",
         }
         or record["schema"] != "finite-sheathed-in-brass-transition-v1"
-        or record["base"] != "5aca97bfaf4b3f1a753d65ed6b7dfc2482aa77f0"
+        or record["base"] != "d137b5cc0c7557c8b6653a1aa36ee47260242945"
         or record["retained_transition_sha256"] != hashlib.sha256(previous_transition).hexdigest()
         or record["retained_runtime_fingerprint"] != previous_runtime
         or record["added_files"].keys() != {owner}
@@ -1254,27 +1254,43 @@ def exact_movement_test_transition(
         if malice is None or shooting_visibility is None or shalaxi[0] != runtime:
             raise SystemExit("Round 3 Shalaxi tests require the exact Malice bearer predecessor.")
         runtime = shalaxi[1]
+    from scripts.stage2_ground_charge_test_admission import (
+        SCREEN_TRANSITION,
+        SHOOTING_TRANSITION,
+        ground_charge_test_successor,
+        normal_shooting_test_successor,
+        rigid_ground_charge_test_successor,
+        screen_movement_test_successor,
+    )
+
+    # The rigid successor supplies the current source digest for the older
+    # group charge admission below. Authenticate its runtime predecessor first.
+    regeneration = (
+        None
+        if pending_battle_shock is None
+        else _grotesque_regeneration_test_successor(
+            root,
+            previous_runtime=pending_battle_shock[1],
+            previous_transition=pending_battle_shock[3],
+        )
+    )
+    rigid_charge = rigid_ground_charge_test_successor(
+        root, previous_runtime=None if regeneration is None else regeneration[0]
+    )
     ground_charge = None
     ground_charge_path = root / GROUND_CHARGE_TEST_TRANSITION
     _selection_no_links(root, ground_charge_path)
     if ground_charge_path.exists():
         if shalaxi is None:
             raise SystemExit("Ground charge tests require the Shalaxi predecessor.")
-        from scripts.stage2_ground_charge_test_admission import ground_charge_test_successor
-
         ground_charge = ground_charge_test_successor(
             root,
             transition_path=ground_charge_path,
             previous_runtime=runtime,
             previous_transition_sha256=ROUND3_SHALAXI_SHA256,
+            rigid_source=None if rigid_charge is None else rigid_charge[1],
         )
         runtime = ground_charge[0]
-    from scripts.stage2_ground_charge_test_admission import (
-        SCREEN_TRANSITION,
-        SHOOTING_TRANSITION,
-        normal_shooting_test_successor,
-        screen_movement_test_successor,
-    )
 
     shooting_path = root / SHOOTING_TRANSITION
     _selection_no_links(root, shooting_path)
@@ -1298,16 +1314,15 @@ def exact_movement_test_transition(
         if screen is None or pending_battle_shock[0] != runtime:
             raise SystemExit("Pending Battle-shock requires the exact Screen movement predecessor.")
         runtime = pending_battle_shock[1]
-        regeneration = _grotesque_regeneration_test_successor(
-            root, previous_runtime=runtime, previous_transition=pending_battle_shock[3]
-        )
-    else:
-        regeneration = None
-    brass = None
     if regeneration is not None:
         runtime = regeneration[0]
+    brass = None
+    if rigid_charge is not None:
+        if ground_charge is None:
+            raise SystemExit("Rigid ground charge tests require the group charge predecessor.")
+        runtime = rigid_charge[0]
         brass = _sheathed_in_brass_test_addition(
-            root, previous_runtime=runtime, previous_transition=regeneration[2]
+            root, previous_runtime=runtime, previous_transition=rigid_charge[3]
         )
         if brass is not None:
             runtime = brass[0]
@@ -1434,11 +1449,18 @@ def exact_movement_test_transition(
             raise SystemExit("Grotesque Regeneration test update overlaps a prior transition.")
         updated.update(regeneration[1])
         raw += b"\0" + regeneration[2]
+    if rigid_charge is not None:
+        _, _, tests, rigid_raw = rigid_charge
+        if tests.keys() & (updated.keys() | added.keys() | additions.keys()):
+            raise SystemExit("Rigid ground charge tests overlap the predecessor selection.")
+        additions.update(tests)
+        raw += b"\0" + rigid_raw
     if brass is not None:
-        if brass[1].keys() & (updated.keys() | added.keys() | additions.keys()):
-            raise SystemExit("Sheathed in Brass test addition overlaps the predecessor selection.")
-        additions.update(brass[1])
-        raw += b"\0" + brass[2]
+        _, tests, brass_raw = brass
+        if tests.keys() & (updated.keys() | added.keys() | additions.keys()):
+            raise SystemExit("Sheathed in Brass tests overlap the predecessor selection.")
+        additions.update(tests)
+        raw += b"\0" + brass_raw
     return updated, {**added, **additions}, retained_raw + b"\0" + raw
 
 

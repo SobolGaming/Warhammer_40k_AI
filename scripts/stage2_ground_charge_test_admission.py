@@ -19,14 +19,24 @@ GROUP_BASE = "ffd62f1b1cdcf81c2fbd4b99457482c1018d2eb8"
 GROUP_TRANSITION = "data/source_audits/ci64_provenance_v1/stage2-group-ground-charge-test-v1.json"
 GROUP_TRANSITION_SHA256 = "f32f75b6d38120e8663fde79612493ff40922c5eff7459d3d7197787791ea601"
 GROUP_OWNER = "tests/infrastructure/adapters/test_group_ground_charge_policy.py"
+RIGID_BASE = "5aca97bfaf4b3f1a753d65ed6b7dfc2482aa77f0"
+RIGID_TRANSITION = "data/source_audits/ci64_provenance_v1/stage2-rigid-ground-charge-test-v1.json"
+RIGID_TRANSITION_SHA256 = "2345dd760e0b9786c2420a024beb30aa7b734e6ab7ef1c0a9cedd33b0e0b72f2"
+RIGID_OWNER = "tests/infrastructure/adapters/test_rigid_group_ground_charge_policy.py"
+RIGID_SOURCE = "src/warhammer40k_core/ai/ground_charge_candidates.py"
 SOURCES = (
-    "src/warhammer40k_core/ai/ground_charge_candidates.py",
+    RIGID_SOURCE,
     "src/warhammer40k_core/ai/ground_charge_policy.py",
 )
 
 
 def ground_charge_test_successor(
-    root: Path, *, transition_path: Path, previous_runtime: str, previous_transition_sha256: str
+    root: Path,
+    *,
+    transition_path: Path,
+    previous_runtime: str,
+    previous_transition_sha256: str,
+    rigid_source: dict[str, str] | None = None,
 ) -> tuple[str, dict[str, dict[str, object]], bytes]:
     raw = transition_path.read_bytes()
     if hashlib.sha256(raw).hexdigest() != TRANSITION_SHA256:
@@ -82,6 +92,10 @@ def ground_charge_test_successor(
         ):
             raise SystemExit("Group ground charge test transition membership differs.")
         current_sources = {name: row["after"] for name, row in group["sources"].items()}
+    if rigid_source is not None:
+        if group is None or rigid_source["before"] != current_sources[RIGID_SOURCE]:
+            raise SystemExit("Rigid ground charge source preimage differs.")
+        current_sources = {**current_sources, RIGID_SOURCE: rigid_source["after"]}
     for name, digest in current_sources.items():
         source = root / name
         _selection_no_links(root, source)
@@ -92,6 +106,44 @@ def ground_charge_test_successor(
         tests.update(_selection_members(group["added_files"], root))
         return group["runtime_fingerprint"], tests, raw + b"\0" + group_raw
     return record["runtime_fingerprint"], tests, raw
+
+
+def rigid_ground_charge_test_successor(
+    root: Path, *, previous_runtime: str | None
+) -> tuple[str, dict[str, str], dict[str, dict[str, object]], bytes] | None:
+    from scripts.engine_numerical_identity_test_admission import _checked_bytes
+
+    path = root / RIGID_TRANSITION
+    _selection_no_links(root, path)
+    if not path.exists():
+        return None
+    raw = _checked_bytes(root, RIGID_TRANSITION, RIGID_TRANSITION_SHA256)
+    record = json.loads(raw, object_pairs_hook=_selection_object)
+    if (
+        record.keys()
+        != {
+            "schema",
+            "base",
+            "retained_group_charge_sha256",
+            "retained_runtime_fingerprint",
+            "runtime_fingerprint",
+            "source",
+            "added_files",
+        }
+        or record["schema"] != "finite-stage2-rigid-ground-charge-test-v1"
+        or record["base"] != RIGID_BASE
+        or record["retained_group_charge_sha256"] != GROUP_TRANSITION_SHA256
+        or record["retained_runtime_fingerprint"] != previous_runtime
+        or record["source"].keys() != {"before", "after"}
+        or set(record["added_files"]) != {RIGID_OWNER}
+    ):
+        raise SystemExit("Rigid ground charge test transition differs.")
+    return (
+        record["runtime_fingerprint"],
+        record["source"],
+        _selection_members(record["added_files"], root),
+        raw,
+    )
 
 
 SHOOTING_BASE = "153bb57bfd03a6b8bc8ca137dcd2f33e8648a9f8"
