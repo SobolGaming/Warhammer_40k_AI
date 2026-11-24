@@ -1135,10 +1135,42 @@ was 278 ms for finite and 443 ms for parameterized actions. The logs retain
 wall and CPU time by component. These observations cover this bounded
 operator workload.
 
-The recovered summary SHA-256 is
+The archive verifier is a separate read-only command. It checks every raw
+file against the pinned B2/B3 inventory, authenticates the original #733
+run manifest and the #733 review-correction manifest, and checks the
+retained strict and ordinary replay proofs against the checkpoint and
+view hashes of all eight inherited controls. It emits the recovered
+summary only after its bytes match the pinned SHA-256. It exercises no
+fresh game, RNG, restore or replay.
+
+```sh
+raw="$HOME/Warhammer_40k_AI_worktrees/stage2-b2-b3-timing-20261124-task9/evidence/run-02"
+pr733="$HOME/Warhammer_40k_AI_recovery/pr733-closeout-d9185cf5"
+retreat="$HOME/stage2-ordered-hold-retreat.67k3Jp/retreat-checkpoint.json"
+timeout --signal=TERM --kill-after=3 180 uv run --no-sync python -B \
+  -m scripts.verify_stage2_charge_timing_receipts \
+  --raw "$raw" --pr733 "$pr733" --retreat "$retreat" > verified-summary.json
+sha256sum "$raw/SHA256SUMS" verified-summary.json
+```
+
+The raw inventory SHA-256 is
+`c90f850529aadc9c03cd57edd1cb916c85955de6301752e3061a8707e7381b83`
+and the verified summary SHA-256 is
 `1a8df3da22c3139fa687e04ddc296a040298a44f8cdbfdfca936fa46ae9a771d`.
-The sealed raw campaign checksum inventory SHA-256 is
-`c90f850529aadc9c03cd57edd1cb916c85955de6301752e3061a8707e7381b83`.
+The negative check uses a disposable copy of the inventory and changes
+one byte of `actions.jsonl` while leaving its manifest untouched. The
+command must fail with exit status 2 and emit no summary.
+
+The revised fresh runner applies one 120-second wall-time deadline to
+B2's candidate generation and native validation. The recorded B2
+preparation took 0.320 seconds. If a landed B2 Charge presents a Fight
+offer that cannot bind to the frozen B3 reference, the runner saves a
+typed unmatchable frontier describing the archive and issued rounds.
+The archived Fight rows 67 and 68 carry round 3. A new B2 Fight choice
+would require a separately declared reference.
+
+The focused operator checks run with
+`uv run --no-sync python -B -m pytest -q scripts/tests/test_stage2_charge_timing.py`.
 
 The separately archived +0.75-inch Retreat case accepted zero of eight
 native probes. Its coverage is outside the timing matrix. The local VP

@@ -2,25 +2,25 @@
   "policy": "rules-engine-performance-v3",
   "base": "d9185cf53a2816ab666f3c1b16410b960a3d1cc7",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:bef24c387ca386c885fd7508796e065e0e6fb68efa2159f3aa8be6d8f41b1db1",
-  "operation_map_sha256": "0b373679fdfb00545df7d0f792892b6ff4939bfbe0b5aa707198f7064884b7f9",
+  "operation_map_sha256": "d2eb2ce3d120a4b3a2564a0b6eb2dcde393d9a6b9d50fa9fc163e6eb3719d652",
   "changes": {
     "docs/AI_IMPLEMENTATION_PLAN.md": {
       "before_sha256": "21e66a9d3d6ab57b55723900e8886406fdf71d52abd6a6f1f002324b693392e4",
-      "after_sha256": "2072ce94a9e4ab8d252d960822314259928ceada0ab46e8b21122077ff91fe43",
+      "after_sha256": "b6103d1c4ed36b58d8e9ef5bd40b1f8539d6ddee47dfe2c31e0872b38d6a1a42",
       "owners": {
         "@document": {
           "before": "21e66a9d3d6ab57b55723900e8886406fdf71d52abd6a6f1f002324b693392e4",
-          "after": "2072ce94a9e4ab8d252d960822314259928ceada0ab46e8b21122077ff91fe43"
+          "after": "b6103d1c4ed36b58d8e9ef5bd40b1f8539d6ddee47dfe2c31e0872b38d6a1a42"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "f9e6133929dc2574a3b8d3eb3aed2911b74770d6be43a9577124c33e08e9e840",
-      "after_sha256": "9734d2f82fafce84f975f0d2a7130fb54df31b622520b629e66ebedcc6f6140e",
+      "after_sha256": "e44f87dea22fcdc3a7cfb3afac88e3d1b8e51e23aecce93d56f6d97986a5c6f9",
       "owners": {
         "@document": {
           "before": "f9e6133929dc2574a3b8d3eb3aed2911b74770d6be43a9577124c33e08e9e840",
-          "after": "9734d2f82fafce84f975f0d2a7130fb54df31b622520b629e66ebedcc6f6140e"
+          "after": "e44f87dea22fcdc3a7cfb3afac88e3d1b8e51e23aecce93d56f6d97986a5c6f9"
         }
       }
     },
@@ -36,11 +36,11 @@
     },
     "scripts/stage2_charge_timing.py": {
       "before_sha256": null,
-      "after_sha256": "3eea72c76df6b61ddbae30517d5cac876af10d86457b3e069f50d442fd440510",
+      "after_sha256": "523b99423e4b8cbc4d65e1041dd981460a707ca753adf1150a311567791d651e",
       "owners": {
         "@module": {
           "before": null,
-          "after": "ca0dff5d111b9c73bbf991c3d8a79ab3d5c13012e4e4b617fca50a8dc7ec8ccf"
+          "after": "a7fa4809325d3616639e10689d8cef416e7a4d042d6d7e79fdc3d3889890ac4f"
         },
         "TimingExperiment": {
           "before": null,
@@ -52,7 +52,7 @@
         },
         "TimingExperiment.__init__": {
           "before": null,
-          "after": "485abafffdc2379d698d01796363f8773d7a201367ab3f1864eb0b636be12b5e"
+          "after": "8f9849c04a49cc791b10464fe250cb1aa40470033e9ee23fe580be60a8d39754"
         },
         "TimingExperiment.boundary": {
           "before": null,
@@ -68,7 +68,7 @@
         },
         "TimingExperiment.early_charge": {
           "before": null,
-          "after": "25368afc1006bf5fa6beda9a9f3036601528df8fee4a3d4c5115d152b5c7c20e"
+          "after": "56651b8be28a9015326d3672a42b83f717976a97a37eb397c32b5a1819ca60ef"
         },
         "TimingExperiment.early_omission": {
           "before": null,
@@ -80,7 +80,7 @@
         },
         "TimingExperiment.finish_early": {
           "before": null,
-          "after": "07ae94d15f8b8eacd28e7ecf05533f16e001e10a79d3378a6317fdfd72fb71f3"
+          "after": "c88475c5d82bf54c1f999c5ee37e9f0615c9bddf2af679afe8ed27572d05ab7c"
         },
         "TimingExperiment.finite_reference": {
           "before": null,
@@ -97,6 +97,10 @@
         "TimingExperiment.position": {
           "before": null,
           "after": "96f481b1e0e9d64692457bb239778b481854207f047ecb20441400836ff7d8e8"
+        },
+        "TimingExperiment.prepare_early_charge": {
+          "before": null,
+          "after": "bfb84ecbfd715ebb784534be415d2ad1b05f4e56c16bfc7101773683c484d091"
         },
         "TimingExperiment.same_route": {
           "before": null,
@@ -116,7 +120,7 @@
         },
         "TimingExperiment.unmatched": {
           "before": null,
-          "after": "ec6082e735c2037f313cc896e43c10d4661aa5444145f73cdd665fc01b22ec23"
+          "after": "e43c7ed02b3968a4f4d6cbc5ee781828c8a11ce9079e54bf4567c38d0db1f729"
         },
         "TimingExperiment.update_coverage": {
           "before": null,
@@ -134,6 +138,10 @@
           "before": null,
           "after": "0aaa31aea968f996f95f9ccacd2166b452760d37ecaa7b9f8fe1723d90ee5a27"
         },
+        "bind_early_fight_reference": {
+          "before": null,
+          "after": "8cb68a07deb53f22c658b6bf3db7a0adbc438948fb7e82e5a72eb0fb42492a9e"
+        },
         "charge_history": {
           "before": null,
           "after": "381326b03cc488d264551f6d01a862b3ecec6036ab1d34db6e0847c34c5da71b"
@@ -149,6 +157,78 @@
         "main": {
           "before": null,
           "after": "752a05927057150edf447a51007e574c73844caebb677169c026368248ebe4c3"
+        }
+      }
+    },
+    "scripts/tests/test_stage2_charge_timing.py": {
+      "before_sha256": null,
+      "after_sha256": "bf6eef51a6d8e3f8d5289235f21a5d3cc1a5cc37a2f8e724623da596b8c307e8",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "1a4f13bbc1e3ddd4084bbc07fa0e538c5813caeae7924e04d0cf63fbe692e227"
+        },
+        "test_early_charge_deadline_covers_generation_and_validation": {
+          "before": null,
+          "after": "cce11fd27183db974a2c0c1d563e7df7b06ce4c30f5c33fa54da28f93f2f0935"
+        },
+        "test_early_fight_round_drift_seals_typed_frontier": {
+          "before": null,
+          "after": "3424d41c1f1a970f2f99a73b9d33cfaa2dbbae9545286b799d1258e54dfddce5"
+        }
+      }
+    },
+    "scripts/verify_stage2_charge_timing_receipts.py": {
+      "before_sha256": null,
+      "after_sha256": "952ac2341e2dba18932edfcd955e67ee7fb265a91f7f7e1b1ac9cbe99b7e84b4",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "54a0784578889542275e4e20542ad78f92d3357cb169042d83f4a16f817b7011"
+        },
+        "authenticate_json": {
+          "before": null,
+          "after": "2674c83e21758dcf6f5060c3e43a0bf55cf2d9a1b03303848f6735e8651a41b1"
+        },
+        "authenticate_pr733": {
+          "before": null,
+          "after": "3b4ad29cd3e4369b25b797811ead11aecb1ce490d41cdde167edd35fa1608d4e"
+        },
+        "authenticate_raw": {
+          "before": null,
+          "after": "86015f1c33c2c5a4013cf94e09369d3c395560ef2de62c81c7a8b404e81ac17d"
+        },
+        "file_sha256": {
+          "before": null,
+          "after": "fda77a21235097a9ef351e04ef8adc5711bdd3867d2e223e3dbbc08d3612ba8e"
+        },
+        "main": {
+          "before": null,
+          "after": "ae039c89a22d96a2fd27df8ac4fdfd5636aaf28c62b5dae05042201194992ae8"
+        },
+        "read_json": {
+          "before": null,
+          "after": "9beab4a3e3a81eb177d177de70ec93778ac7595ee9f34d7a446f9a0a00b2f2c2"
+        },
+        "read_manifest": {
+          "before": null,
+          "after": "6572a316433462b7f346a84d13bb1449645a484ccbb319930da6822bba91b93a"
+        },
+        "recover_summary": {
+          "before": null,
+          "after": "a14c23ad58e98c8b774f8f9f0724a162787238dcbf64dd99f12176b51b5cfb44"
+        },
+        "require_replay": {
+          "before": null,
+          "after": "b9c7b7de034e55d977346e17c9de8ba746739fbb91de38dcc52f5dfb79053446"
+        },
+        "require_strict": {
+          "before": null,
+          "after": "b06f1a8c5809a26896c27a4d03dcefdb7fac8469203795bd68722d54c748050b"
+        },
+        "verify": {
+          "before": null,
+          "after": "de8cd04c57f2ff791baa6291ce579d8c7c6dbf96c656bd2c9e276df910e8298e"
         }
       }
     }
@@ -184,7 +264,27 @@
         "stage2-b2-b3-charge-timing-reproducer"
       ],
       "selected_families": [],
-      "rationale": "Development-only serial operator for the frozen native B2/B3 comparison. Uses existing actor projection, witnessed movement, shooting, restore and replay.",
+      "rationale": "Development-only native operator, focused tests, and sealed-receipt audit for the frozen B2/B3 comparison.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "scripts/tests/test_stage2_charge_timing.py": {
+      "category": "measured_workload",
+      "operations": [
+        "stage2-b2-b3-charge-timing-reproducer"
+      ],
+      "selected_families": [],
+      "rationale": "Development-only native operator, focused tests, and sealed-receipt audit for the frozen B2/B3 comparison.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "scripts/verify_stage2_charge_timing_receipts.py": {
+      "category": "measured_workload",
+      "operations": [
+        "stage2-b2-b3-charge-receipt-verifier"
+      ],
+      "selected_families": [],
+      "rationale": "Development-only native operator, focused tests, and sealed-receipt audit for the frozen B2/B3 comparison.",
       "source_obligation": null,
       "unchanged_work": null
     }

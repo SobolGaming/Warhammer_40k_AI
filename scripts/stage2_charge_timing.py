@@ -2,6 +2,7 @@
 
 import argparse
 import signal
+from functools import partial
 from pathlib import Path
 from time import monotonic
 
@@ -29,6 +30,7 @@ PREFIX_LENGTH = 43
 PREFIX_EVENTS = 423
 MAX_EARLY_PROPOSALS = 4
 MAX_EARLY_WORK = 600_000
+MAX_EARLY_WALL_SECONDS = 120
 
 
 class Unmatchable(Exception):
@@ -100,6 +102,19 @@ def frozen_e_rows(checkpoint):
     ]
 
 
+def bind_early_fight_reference(context, number, reference):
+    """Classify a changed archived Fight offer before submitting any action."""
+    try:
+        return late.archived_action(context, reference)
+    except late.Blocker as error:
+        raise Unmatchable(
+            "early_fight_archive_unbindable",
+            f"Archived Fight row {number} cannot bind at B2. "
+            f"Archived round {reference['request']['payload'].get('battle_round')}, "
+            f"issued round {context.request['payload'].get('battle_round')}. {error}",
+        ) from error
+
+
 def charge_history(session, round_number):
     relevant = {
         "charge_roll_resolved",
@@ -139,7 +154,11 @@ class TimingExperiment(late.Experiment):
             e_reference_declarations=self.volley,
             schedules=SCHEDULES,
             maximum_endpoints=12,
-            early_charge_cap={"raw": MAX_EARLY_PROPOSALS, "work": MAX_EARLY_WORK, "seconds": 120},
+            early_charge_cap={
+                "raw": MAX_EARLY_PROPOSALS,
+                "work": MAX_EARLY_WORK,
+                "seconds": MAX_EARLY_WALL_SECONDS,
+            },
         )
 
     def common(self):
@@ -280,19 +299,7 @@ class TimingExperiment(late.Experiment):
         self.boundary("early-b2-charge-move", session, proof=True)
         late.need(public["decision_type"] == late.PROPOSAL, "B2 Charge Move was not issued.")
         try:
-            prepared = self.call(
-                "b2_generate_and_validate_charge",
-                lambda: prepare_ground_charge_policy(
-                    session,
-                    context,
-                    raw_limit=MAX_EARLY_PROPOSALS,
-                    geometry_limit=MAX_EARLY_WORK,
-                    validation_limit=MAX_EARLY_PROPOSALS,
-                    accepted_limit=1,
-                    native_seconds=120,
-                    per_probe_seconds=30,
-                ),
-            )
+            prepared = self.prepare_early_charge(session, context)
         except GroundChargeValidationExhaustedError as error:
             receipt.update(
                 disposition=error.reason.value,
@@ -333,6 +340,33 @@ class TimingExperiment(late.Experiment):
         receipt["disposition"] = "native_charge_completed"
         return True
 
+    def prepare_early_charge(self, session, context):
+        # The native helper's own clock starts after generation. Apply one
+        # operator deadline to the whole call and preserve the campaign bound.
+        previous_deadline = self.preparation_deadline
+        self.preparation_deadline = min(previous_deadline, monotonic() + MAX_EARLY_WALL_SECONDS)
+        try:
+            prepared = self.call(
+                "b2_generate_and_validate_charge",
+                lambda: prepare_ground_charge_policy(
+                    session,
+                    context,
+                    raw_limit=MAX_EARLY_PROPOSALS,
+                    geometry_limit=MAX_EARLY_WORK,
+                    validation_limit=MAX_EARLY_PROPOSALS,
+                    accepted_limit=1,
+                    native_seconds=120,
+                    per_probe_seconds=30,
+                ),
+            )
+            late.need(
+                monotonic() < self.preparation_deadline,
+                "B2 Charge preparation exceeded the operator wall-time bound.",
+            )
+            return prepared
+        finally:
+            self.preparation_deadline = previous_deadline
+
     def finish_early(self, session, charged):
         if charged:
             self.boundary("early-b2-charged", session, proof=True)
@@ -358,7 +392,12 @@ class TimingExperiment(late.Experiment):
                     number = next(fight_refs, None)
                     if number is None or not self.same_route(public, number):
                         raise Unmatchable("early_fight_route_changed", f"Unexpected B2 {kind}.")
-                    self.source(session, number)
+                    reference = self.numbered[number]
+                    action = self.call(
+                        "bind_archived_action",
+                        partial(bind_early_fight_reference, context, number, reference),
+                    )
+                    self.commit_action(session, action, self.record_id(number))
             else:
                 raise Unmatchable("early_fight_limit", "B2 exceeded twelve issued responses.")
         self.source(session, 45)
@@ -432,6 +471,7 @@ class TimingExperiment(late.Experiment):
             "detail": str(error),
         }
         self.boundary(f"{label}-frontier", session, proof=True)
+        self.save_progress("unmatchable_frontier")
         print("UNMATCHABLE", label, error.reason, str(error), flush=True)
 
     def continuation(self, origin, schedule, position):
