@@ -2395,6 +2395,15 @@ formation or exhausted translation set reports a typed candidate gap. The
 generator returns alternatives for an operator comparison and assigns no
 tactical ordering to Hold versus Fall Back.
 
+On the pinned synthetic control, the initial search exhausted eight native
+probes. A development probe on that same checkpoint found that the heading
+`(8, -3)` at `0.875 × Move` passed native validation. The shipped search uses
+that heading and distance in its second candidate on the pinned view. The
+generator receives the actor view and never receives the archived operator
+witness. The pinned acceptance demonstrates fixture-tuned feasibility.
+A withheld comparison requires committing to the search order, work limits
+and checkpoint selection before observing that comparison's outcomes.
+
 ## Proposed native v995 screening workload
 
 `cavalcade-v995-native-screen-follow-through-v1` is a separately versioned proposal,

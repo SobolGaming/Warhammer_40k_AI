@@ -206,11 +206,11 @@
     },
     "docs/AI_POLICY_INTERFACE.md": {
       "before_sha256": "b0a73cdadfb77ffe7b9da81884448cd72d142fad23d8527a46d4f4d6b2931a85",
-      "after_sha256": "cc84be6c02eb9092a5892d806a71102bebb10bce7b5fdca3db05c594a525e98e",
+      "after_sha256": "80226c6322fc9852d4d93b8b586f41b724f4119c0109506c4212087502c05939",
       "owners": {
         "@document": {
           "before": "b0a73cdadfb77ffe7b9da81884448cd72d142fad23d8527a46d4f4d6b2931a85",
-          "after": "cc84be6c02eb9092a5892d806a71102bebb10bce7b5fdca3db05c594a525e98e"
+          "after": "80226c6322fc9852d4d93b8b586f41b724f4119c0109506c4212087502c05939"
         }
       }
     },
