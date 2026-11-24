@@ -180,12 +180,11 @@ def _runtime_contribution(
     historical_handler: Callable[
         [HistoricalBattleShockAuthorityContext], HistoricalBattleShockContribution
     ],
-    pending_outcome_authority_validator: (
-        BattleShockPendingOutcomeAuthorityValidator | None
-    ) = None,
+    pending_outcome_authority_validator: BattleShockPendingOutcomeAuthorityValidator,
 ) -> RuntimeContentContribution:
     from functools import partial
 
+    from .battle_shock_outcome_authority import pending_outcome_route
     from .outcome_sequencing import candidates
 
     return RuntimeContentContribution(
@@ -203,7 +202,9 @@ def _runtime_contribution(
                     source_rule_id=source_rule_id,
                     battleline_revival_enabled=source_rule_id == JULY_SOURCE_RULE_ID,
                 ),
-                pending_outcome_authority_validator=(pending_outcome_authority_validator),
+                pending_outcome_authority_validator=pending_outcome_route(
+                    pending_outcome_authority_validator
+                ),
                 historical_contribution_handler=historical_handler,
             ),
         ),

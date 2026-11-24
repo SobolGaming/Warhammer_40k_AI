@@ -19,6 +19,8 @@ from warhammer40k_core.engine.battle_shock_historical_authority import (
 from warhammer40k_core.engine.battle_shock_hooks import (
     BattleShockPendingOutcomeAuthority,
     BattleShockPendingOutcomeAuthorityContext,
+    BattleShockPendingOutcomeAuthorityValidator,
+    BattleShockPendingOutcomeRoute,
 )
 from warhammer40k_core.engine.battle_shock_outcome_history import outcome_activation_index
 from warhammer40k_core.engine.battle_shock_resolution_authority import (
@@ -103,6 +105,33 @@ _PENDING_EVENT_KEYS = frozenset(
         "decision_request_id",
     }
 )
+
+
+def pending_outcome_route(
+    validator: BattleShockPendingOutcomeAuthorityValidator,
+) -> BattleShockPendingOutcomeRoute:
+    from warhammer40k_core.engine.damage_allocation import SELECT_FEEL_NO_PAIN_DECISION_TYPE
+    from warhammer40k_core.engine.mortal_wound_model_allocation import (
+        SELECT_MORTAL_WOUND_MODEL_DECISION_TYPE,
+    )
+
+    # The Terror validator reads its marker and only parses mortal-wound
+    # requests. Manifestation also audits recorded healing producers, even
+    # when the live request looks unrelated. Retain that audit whenever a
+    # producer exists, including malformed or incomplete placement lineage.
+    return BattleShockPendingOutcomeRoute(
+        validator=validator,
+        request_types=frozenset(
+            (
+                SELECT_FEEL_NO_PAIN_DECISION_TYPE,
+                SELECT_MORTAL_WOUND_MODEL_DECISION_TYPE,
+                SELECT_HEALING_MODEL_DECISION_TYPE,
+                SUBMIT_HEALING_REVIVAL_PLACEMENT_DECISION_TYPE,
+            )
+        ),
+        marker_event_types=frozenset((_PENDING_EVENT_TYPE, _TERROR_PENDING_EVENT_TYPE)),
+        producer_request_types=frozenset((SELECT_HEALING_MODEL_DECISION_TYPE,)),
+    )
 
 
 def validate_daemonic_terror_pending_outcome(

@@ -14,8 +14,10 @@ from warhammer40k_core.engine.battle_shock import (
     battle_shock_test_reason_from_token,
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
+from warhammer40k_core.engine.decision_record import DecisionRecord
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.dice import DiceRollManager
+from warhammer40k_core.engine.event_log import EventLog, EventRecord
 from warhammer40k_core.engine.lifecycle_hooks import LifecycleHookEvent, validate_hook_bindings
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatus
 from warhammer40k_core.engine.runtime_read_only import runtime_read_only_snapshot
@@ -488,6 +490,65 @@ class BattleShockCompletedOutcomeAuthorityContext:
 
 
 @dataclass(frozen=True, slots=True)
+class BattleShockPendingOutcomeRoute:
+    """The request and recorded provenance that can reach one outcome validator."""
+
+    validator: BattleShockPendingOutcomeAuthorityValidator
+    request_types: frozenset[str]
+    marker_event_types: frozenset[str]
+    producer_request_types: frozenset[str]
+
+    def __post_init__(self) -> None:
+        if not callable(self.validator) or not self.request_types or not self.marker_event_types:
+            raise GameLifecycleError(
+                "Battle-shock outcome routes require a validator and route IDs."
+            )
+        for identifiers in (
+            self.request_types,
+            self.marker_event_types,
+            self.producer_request_types,
+        ):
+            if type(identifiers) is not frozenset or any(
+                type(identifier) is not str or not identifier.strip() for identifier in identifiers
+            ):
+                raise GameLifecycleError(
+                    "Battle-shock outcome route IDs must be frozen identifiers."
+                )
+
+    def __call__(
+        self, context: BattleShockPendingOutcomeAuthorityContext
+    ) -> BattleShockPendingOutcomeAuthority | None:
+        return self.validator(context)
+
+    def needs_validation(self, context: BattleShockPendingOutcomeAuthorityContext) -> bool:
+        request_type = context.request.decision_type
+        if type(request_type) is not str or request_type in self.request_types:
+            return True
+        log = context.decisions.event_log
+        if type(log) is not EventLog:
+            return True
+        events = log._records  # pyright: ignore[reportPrivateUsage]
+        records = context.decisions._records  # pyright: ignore[reportPrivateUsage]
+        if type(events) is not list or type(records) is not list:
+            return True
+        # A marker or producer anywhere can carry authority even when the live
+        # request's discriminator has drifted. Inspect the live ledger without
+        # copying its rows or relying on a cached index or revision.
+        return any(
+            type(event) is not EventRecord
+            or type(event.event_type) is not str
+            or event.event_type in self.marker_event_types
+            for event in events
+        ) or any(
+            type(record) is not DecisionRecord
+            or type(record.request) is not DecisionRequest
+            or type(record.request.decision_type) is not str
+            or record.request.decision_type in self.producer_request_types
+            for record in records
+        )
+
+
+@dataclass(frozen=True, slots=True)
 class BattleShockHookBinding:
     hook_id: str
     source_id: str
@@ -785,9 +846,13 @@ class BattleShockHookRegistry:
         if type(context) is not BattleShockPendingOutcomeAuthorityContext:
             raise GameLifecycleError("Pending Battle-shock outcome hooks require context.")
         validators = tuple(
-            binding.pending_outcome_authority_validator
+            validator
             for binding in self.bindings
-            if binding.pending_outcome_authority_validator is not None
+            if (validator := binding.pending_outcome_authority_validator) is not None
+            and (
+                type(validator) is not BattleShockPendingOutcomeRoute
+                or validator.needs_validation(context)
+            )
         )
         if not validators:
             return None

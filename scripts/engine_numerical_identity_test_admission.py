@@ -592,6 +592,49 @@ def engine_numerical_identity_test_transition(
     return _identity_test_transition(root, retained_cutover_sha256, runtime=RUNTIME)
 
 
+def _pending_battle_shock_source_transition(
+    root: Path,
+) -> tuple[str, str, SourceSuccessors, bytes] | None:
+    name = "data/source_audits/ci64_provenance_v1/stage2-pending-battle-shock-transition-v1.json"
+    path = root / name
+    _selection_no_links(root, path)
+    if not path.exists():
+        return None
+    raw = _checked_bytes(
+        root, name, "509792f8ac6ac85ab0c37bc356d7d73f7add8062f38fe2bc12b3d0936400986b"
+    )
+    record = json.loads(raw, object_pairs_hook=_selection_object)
+    if (
+        record.keys()
+        != {
+            "schema",
+            "base",
+            "retained_screen_movement_sha256",
+            "retained_runtime_fingerprint",
+            "runtime_fingerprint",
+            "sources",
+        }
+        or record["schema"] != "finite-stage2-pending-battle-shock-transition-v1"
+        or record["base"] != "161378a16c4557228b2af45db0d311a522eb3f8f"
+        or record["retained_screen_movement_sha256"]
+        != "7e0b32cb0f7a0ef8e7d05f9b0a4aa7bb965cb6644e5d42ffd035897a536deb94"
+    ):
+        raise SystemExit("Pending Battle-shock source transition differs.")
+    expected_sources = {
+        path
+        for path in CAVALCADE_AUTHORITY_SOURCES
+        if path.endswith(("battle_shock_hooks.py", "battle_shock_outcome_authority.py"))
+    } | {ROUND_FIVE_SHADOW_SOURCES[0]}
+    sources: SourceSuccessors = record["sources"]
+    if sources.keys() != expected_sources:
+        raise SystemExit("Pending Battle-shock source transition membership differs.")
+    for source, change in sources.items():
+        if change.keys() != {"before", "after"}:
+            raise SystemExit("Pending Battle-shock transition requires exact source digests.")
+        _checked_bytes(root, source, change["after"])
+    return record["retained_runtime_fingerprint"], record["runtime_fingerprint"], sources, raw
+
+
 def exact_movement_test_transition(
     root: Path, retained_cutover_sha256: str
 ) -> TestTransition | None:
@@ -875,6 +918,8 @@ def exact_movement_test_transition(
         additions.update(_selection_members(codec["added_files"], root))
         runtime = codec["runtime_fingerprint"]
         raw += b"\0" + codec_raw
+    pending_battle_shock = _pending_battle_shock_source_transition(root)
+    pending_sources = {} if pending_battle_shock is None else pending_battle_shock[2]
     attack_reroll_order_path = root / MONSTER_MASH_ATTACK_REROLL_TRANSITION
     _selection_no_links(root, attack_reroll_order_path)
     attack_reroll_order = (
@@ -889,7 +934,10 @@ def exact_movement_test_transition(
         if attack_reroll_order is None:
             raise SystemExit("Round 4 Battle-shock tests require the attack reroll predecessor.")
         round4 = _round4_battle_shock_successor(
-            root, retained_cutover_sha256, attack_reroll_order[1]
+            root,
+            retained_cutover_sha256,
+            attack_reroll_order[1],
+            current_sources=pending_sources,
         )
     fight_reroll = (
         _stage2_fight_reroll_successor(
@@ -932,7 +980,7 @@ def exact_movement_test_transition(
         _selection_no_links(root, authority_guard)
         if authority_guard.exists():
             for name, digest in CAVALCADE_AUTHORITY_SOURCES.items():
-                _checked_bytes(root, name, digest)
+                _retained_source(root, name, digest, pending_sources)
             runtime = CAVALCADE_AUTHORITY_RUNTIME
     shadow_path = root / ROUND_FIVE_SHADOW_TRANSITION
     _selection_no_links(root, shadow_path)
@@ -1164,6 +1212,10 @@ def exact_movement_test_transition(
             raise SystemExit("Screen movement tests require the Normal Shooting predecessor.")
         screen = screen_movement_test_successor(root, previous_runtime=runtime)
         runtime = screen[0]
+    if pending_battle_shock is not None:
+        if screen is None or pending_battle_shock[0] != runtime:
+            raise SystemExit("Pending Battle-shock requires the exact Screen movement predecessor.")
+        runtime = pending_battle_shock[1]
     retained = _identity_test_transition(
         root,
         retained_cutover_sha256,
@@ -1280,6 +1332,8 @@ def exact_movement_test_transition(
             raise SystemExit("Screen movement tests overlap the predecessor selection.")
         additions.update(screen_tests)
         raw += b"\0" + screen_raw
+    if pending_battle_shock is not None:
+        raw += b"\0" + pending_battle_shock[3]
     return updated, {**added, **additions}, retained_raw + b"\0" + raw
 
 
@@ -1327,7 +1381,11 @@ def _round4_malice_bearer_successor(
 
 
 def _round4_battle_shock_successor(
-    root: Path, retained_cutover_sha256: str, retained_runtime: str
+    root: Path,
+    retained_cutover_sha256: str,
+    retained_runtime: str,
+    *,
+    current_sources: SourceSuccessors,
 ) -> tuple[str, SourceSuccessors, TestSuccessors, bytes]:
     from scripts.build_test_shards import CUTOVER_PATH
 
@@ -1365,7 +1423,7 @@ def _round4_battle_shock_successor(
     for name, source in record["source"].items():
         if set(source) != {"before", "after"}:
             raise SystemExit("Round 4 Battle-shock requires exact source digests.")
-        _checked_bytes(root, name, source["after"])
+        _retained_source(root, name, source["after"], current_sources)
     return (
         record["runtime_fingerprint"],
         record["source"],
