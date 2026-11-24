@@ -987,6 +987,67 @@ seconds). Both lifecycle payloads remain exact. Original unresolved receipts
 retain their historical meaning; no cover, shooting, screening benefit, combat
 or learning qualification follows from these Boolean answers.
 
+### Bounded A3 preservation and B3 response
+
+The synthetic edge-column fixture shares 45 accepted decisions and 481 events
+through A's round-three S movement-action request, historical
+`decision-request-000046`. Previous turns, including B2's Charge decline, are
+fixed by the admitted history. At this request Preserve selects Remain
+Stationary and Spend selects Normal Move with the archived six-inch negative-Y
+witness. B then takes the same 1.4-inch positive-Y approach. From each resulting
+position, the response either completes Charge or selects B, keeps the natural
+roll and attempts the independently frozen charge path if S is offered as a
+target. This continuation measures the late B3 window from one shared origin.
+A positive early B2 arm and an early-to-late preference reversal remain open.
+
+All arms stop at A's first round-four Shooting unit selection after E has been
+consumed. E moves six inches negative Y in every arm and either commits all
+three eligible carbines against B or submits the empty declaration from the same
+offer. Engaged S uses the archived Desperate Escape path to open E's shot in
+the charged Spend history. Unengaged S remains stationary. S's A3 choices,
+S's Spend path, the four E movement witnesses and the four pairs of E
+declarations account for 15 core branch occurrences. All 15 matched and were
+accepted. The six distinct reference contents cover S's Hold and Normal Move
+selections, the S Spend witness, the shared E movement witness, and E's focused
+volley and empty declaration. The reproducer independently derives each
+expected shooting candidate ID from the frozen policy ID, E's unit ID and the
+reference declaration rows. It checks the rows and ID against the generated
+candidate and records a separate declaration digest. It also records native
+acceptance, missing choices and unissued windows. The separately published
++0.75-inch board accepted zero of eight native Retreat probes and remains
+outside this denominator.
+
+| S choice | B3 response | A / B VP after E omit or shoot | S models / wounds | B wounds, omit / shoot |
+|---|---|---:|---:|---:|
+| Preserve | Attempt Charge | 0 / 0 | 5 / 10 | 10 / 10 |
+| Spend | Attempt Charge | 0 / 3 | 4 / 8 | 10 / 9 |
+| Preserve | Complete Charge | 0 / 0 | 5 / 10 | 10 / 9 |
+| Spend | Complete Charge | 0 / 0 | 5 / 10 | 10 / 9 |
+
+B naturally rolls 7 in Preserve and the engine records no reachable target
+and no Charge Move. B rolls 11 in Spend, accepts the frozen charge witness and
+earns 3 VP for expansion-02. A's Desperate Escape then costs S one model. The
+separate E omission controls show where E's volley changes B's wounds. The VP
+difference is already present at A4 Movement and persists through the common
+horizon. Both branches use the same original seed. Their different natural
+rolls limit inference to this exact native continuation and response policy.
+The local VP ledger is the payoff. Terminal utility, learning labels and
+win-probability estimates remain outside this experiment.
+
+Run the standalone development command from the repository root with sealed
+`anchor-checkpoint.json` and `retreat-checkpoint.json` from the ordered
+Hold/Retreat archive. The command checks archive SHA-256 and content IDs,
+rebuilds the exact common prefix from ordinary setup, and writes native action
+and timing ledgers, checkpoints, both actor views and event streams, exact
+restore and replay proofs, and the core reference inventory.
+
+```sh
+uv run --no-sync python -B -m scripts.stage2_preservation_timing \
+  --anchor <archive>/anchor-checkpoint.json \
+  --retreat <archive>/retreat-checkpoint.json \
+  --output <fresh-receipt-directory>
+```
+
 ## 6. First delayed-tradeoff experiment
 
 **Status: proposed, not an existing certified benchmark.** Start from the earliest suitable canonical Core fixture/checkpoint. References: `tests/replay/test_phase18b_replay_runner.py`, `tests/shared/category_migration/primary_boundary_scoring_builders.py`, `tests/shared/category_migration/phase11f_game_end_scoring.py`, and `tests/support/selected_target_charge_fixtures.py`. Use real domain objects and normal engine decisions; do not import test modules into runtime or present a synthetic state alteration as an engine-generated checkpoint.
