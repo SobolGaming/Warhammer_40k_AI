@@ -315,7 +315,6 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
     assert group_charge["retained_runtime_fingerprint"] == charge["runtime_fingerprint"]
     shooting = _record(ground_charge.SHOOTING_TRANSITION)
     assert shooting["retained_runtime_fingerprint"] == group_charge["runtime_fingerprint"]
-    assert _record(MANIFEST)["fingerprint"] == shooting["runtime_fingerprint"]
     shooting_base_test = subprocess.check_output(
         ["git", "show", ground_charge.SHOOTING_BASE + ":" + ground_charge.SHOOTING_OWNER],
         cwd=ROOT,
@@ -364,6 +363,23 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
             "test_group_charge_objective_inventory_limits[linked-vertices]",
             "test_group_charge_ranks_objective_reach_ahead_of_shorter_accepted_travel",
         )
+    )
+    screen = _record(ground_charge.SCREEN_TRANSITION)
+    assert _record(MANIFEST)["fingerprint"] == screen["runtime_fingerprint"]
+    screen_base_manifest = json.loads(
+        subprocess.check_output(
+            ["git", "show", ground_charge.SCREEN_BASE + ":" + MANIFEST], cwd=ROOT
+        )
+    )
+    assert screen["retained_runtime_fingerprint"] == screen_base_manifest["fingerprint"]
+    assert screen["retained_runtime_fingerprint"] == shooting["runtime_fingerprint"]
+    assert screen["retained_normal_shooting_sha256"] == ground_charge.SHOOTING_TRANSITION_SHA256
+    assert set(screen["added_files"]) == {ground_charge.SCREEN_OWNER}
+    assert ground_charge.SCREEN_OWNER in active_files
+    assert sum(ground_charge.SCREEN_OWNER in group for group in groups) == 1
+    assert (
+        screen["policy_sha256"]
+        == hashlib.sha256((ROOT / ground_charge.SCREEN_SOURCE).read_bytes()).hexdigest()
     )
     assert shalaxi["test"]["before"] == shooting_visibility["test"]["after"]
     for source in selection.ROUND3_SHALAXI_SOURCES:
@@ -696,6 +712,16 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         | shalaxi_cases
         | charge_cases
         | shooting_cases
+        | {
+            ground_charge.SCREEN_OWNER
+            + "::test_screen_options_and_retreat_paths_use_native_requests"
+            + f"[{mode}]"
+            for mode in ("ordered_retreat", "desperate_escape")
+        }
+        | {
+            ground_charge.SCREEN_OWNER
+            + "::test_screen_options_require_an_issued_fall_back_alternative"
+        }
         | allocation_cases
         | round4_cases
         | {

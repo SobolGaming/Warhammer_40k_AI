@@ -1140,8 +1140,10 @@ def exact_movement_test_transition(
         )
         runtime = ground_charge[0]
     from scripts.stage2_ground_charge_test_admission import (
+        SCREEN_TRANSITION,
         SHOOTING_TRANSITION,
         normal_shooting_test_successor,
+        screen_movement_test_successor,
     )
 
     shooting_path = root / SHOOTING_TRANSITION
@@ -1154,6 +1156,14 @@ def exact_movement_test_transition(
             root, previous_runtime=runtime, retained_cutover_sha256=retained_cutover_sha256
         )
         runtime = shooting[0]
+    screen_path = root / SCREEN_TRANSITION
+    _selection_no_links(root, screen_path)
+    screen = None
+    if screen_path.exists():
+        if shooting is None:
+            raise SystemExit("Screen movement tests require the Normal Shooting predecessor.")
+        screen = screen_movement_test_successor(root, previous_runtime=runtime)
+        runtime = screen[0]
     retained = _identity_test_transition(
         root,
         retained_cutover_sha256,
@@ -1264,6 +1274,12 @@ def exact_movement_test_transition(
             raise SystemExit("Normal Shooting tests overlap the predecessor selection.")
         updated.update(shooting_tests)
         raw += b"\0" + shooting_raw
+    if screen is not None:
+        _, screen_tests, screen_raw = screen
+        if screen_tests.keys() & (updated.keys() | added.keys() | additions.keys()):
+            raise SystemExit("Screen movement tests overlap the predecessor selection.")
+        additions.update(screen_tests)
+        raw += b"\0" + screen_raw
     return updated, {**added, **additions}, retained_raw + b"\0" + raw
 
 

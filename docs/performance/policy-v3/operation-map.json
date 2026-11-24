@@ -35754,6 +35754,18 @@
       "sensitive": false,
       "mandatory": true
     },
+    "stage2-screen-movement-candidates": {
+      "paths": [
+        "src/warhammer40k_core/ai/screen_movement_candidates.py",
+        "tests/rules/section09/test_screen_movement_candidates.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [],
+      "sensitive": true,
+      "mandatory": true
+    },
     "stage2-normal-shooting-policy": {
       "paths": [
         "src/warhammer40k_core/ai/normal_shooting_policy.py",
@@ -36664,7 +36676,8 @@
         "data/source_audits/ci64_provenance_v1/stage2-ground-charge-test-addition-v1.json",
         "scripts/stage2_ground_charge_test_admission.py",
         "data/source_audits/ci64_provenance_v1/stage2-group-ground-charge-test-v1.json",
-        "data/source_audits/ci64_provenance_v1/stage2-normal-shooting-test-v1.json"
+        "data/source_audits/ci64_provenance_v1/stage2-normal-shooting-test-v1.json",
+        "data/source_audits/ci64_provenance_v1/stage2-screen-movement-test-v1.json"
       ],
       "owners": [
         "*"

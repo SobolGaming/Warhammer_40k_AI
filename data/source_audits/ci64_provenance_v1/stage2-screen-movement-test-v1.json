@@ -1,0 +1,16 @@
+{
+  "schema": "finite-stage2-screen-movement-test-v1",
+  "base": "a194e8f10d198f5560119cd1450aa597cae723c1",
+  "retained_normal_shooting_sha256": "e52c9197bb04d1cd64c595f960d39f9cf6964971dc90f650575429d83fcf2862",
+  "retained_runtime_fingerprint": "80502a951d120f3f9fed19c66198b2918858c7da104d24ac812cf03c8ceabb27",
+  "runtime_fingerprint": "f18fe40b7fb1e8841d01bcb2c4c98f56ea85cddb7ae1ae4c0905a69f24146432",
+  "policy_sha256": "457f13060a8aa288c5399901ae8db83e6be0e1778c66009e76a322d4fbaf424e",
+  "added_files": {
+    "tests/rules/section09/test_screen_movement_candidates.py": {
+      "mode": "100644",
+      "bytes": 5334,
+      "sha256": "fff7386af1a27003151fc074210abf04b765434210b176746870f4c83bf42a4f",
+      "blob_sha1": "e6a19a1c6fe290855a1394021d1962f831886429"
+    }
+  }
+}

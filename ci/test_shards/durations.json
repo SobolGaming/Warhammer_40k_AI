@@ -4504,6 +4504,9 @@
     "tests/rules/section09/test_restrictions.py::test_prior_normal_move_in_same_phase_blocks_another_normal_only[surge-shooting]": 0.397,
     "tests/rules/section09/test_restrictions.py::test_prior_normal_move_in_same_phase_blocks_another_normal_only[triggered-movement]": 0.41,
     "tests/rules/section09/test_restrictions.py::test_prior_normal_move_in_same_phase_blocks_another_normal_only[triggered-shooting]": 0.416,
+    "tests/rules/section09/test_screen_movement_candidates.py::test_screen_options_and_retreat_paths_use_native_requests[desperate_escape]": 0.714,
+    "tests/rules/section09/test_screen_movement_candidates.py::test_screen_options_and_retreat_paths_use_native_requests[ordered_retreat]": 5.984,
+    "tests/rules/section09/test_screen_movement_candidates.py::test_screen_options_require_an_issued_fall_back_alternative": 0.314,
     "tests/rules/section09/test_selection.py::test_all_locations_can_be_selected_and_remain_stationary[battlefield]": 0.397,
     "tests/rules/section09/test_selection.py::test_all_locations_can_be_selected_and_remain_stationary[embarked]": 0.713,
     "tests/rules/section09/test_selection.py::test_all_locations_can_be_selected_and_remain_stationary[reserves]": 0.411,
@@ -6699,18 +6702,18 @@
   },
   "execution_model": {
     "assignment_wall_lower_bound_seconds": {
-      "1": 568.116,
-      "10": 568.116,
-      "11": 568.117,
-      "12": 568.117,
+      "1": 568.292,
+      "10": 568.292,
+      "11": 568.292,
+      "12": 568.293,
       "2": 795.547,
       "3": 609.537,
-      "4": 568.117,
-      "5": 568.117,
-      "6": 568.117,
-      "7": 568.116,
-      "8": 568.117,
-      "9": 568.117
+      "4": 568.292,
+      "5": 568.292,
+      "6": 568.292,
+      "7": 568.292,
+      "8": 568.292,
+      "9": 568.292
     },
     "cold_shard_assignment": "minimum-unrounded-modeled-test-load-existing-bucket-v1",
     "cold_shard_id": 1,
@@ -6719,18 +6722,18 @@
       "tests/factions/chaos_daemons/integration/test_cavalcade_v995_roster.py::test_exact_mirror_deploys_all_78_models_and_replays_to_battle"
     ],
     "shard_worker_seconds": {
-      "1": 2272.466,
-      "10": 2272.466,
-      "11": 2272.468,
-      "12": 2272.467,
+      "1": 2273.167,
+      "10": 2273.168,
+      "11": 2273.168,
+      "12": 2273.17,
       "2": 3182.186,
       "3": 2438.146,
-      "4": 2272.468,
-      "5": 2272.467,
-      "6": 2272.467,
-      "7": 2272.466,
-      "8": 2272.467,
-      "9": 2272.467
+      "4": 2273.168,
+      "5": 2273.168,
+      "6": 2273.168,
+      "7": 2273.168,
+      "8": 2273.168,
+      "9": 2273.168
     }
   },
   "files": {
@@ -7113,6 +7116,7 @@
     "tests/rules/section09/test_isolation.py": 0.112,
     "tests/rules/section09/test_phase_flow.py": 4.087,
     "tests/rules/section09/test_restrictions.py": 16.698,
+    "tests/rules/section09/test_screen_movement_candidates.py": 7.012,
     "tests/rules/section09/test_selection.py": 13.824,
     "tests/rules/section10/test_boundaries.py": 4.744,
     "tests/rules/section10/test_coverage_map.py": 0.457,
@@ -7279,19 +7283,20 @@
         "431f84031f3029637fa3c74e55d1c8dede1e3fe1aa04f223da43a8cacdd7574d",
         "63db8ac24763535fbddc46142b0c99e6833b128bc40e674ff95ec735b05e1018",
         "708e2a7cdde4ec8155cc758efc538d7dc0dd4b5c25644c8a1c2d88652d6df8df",
+        "7cded789191d3e9a531806a0b448b6347da9bd58f9f62af169b77cae998e0753",
         "9dc1b70162325c830e81f4b6e06c9199b793ed7d7805d59287feb2a593be541d"
       ],
-      "source": "Retained #729 representative JUnit timing and six measured Stage 2 Normal Shooting cases",
-      "test_cases": 6696,
-      "test_files": 443
+      "source": "Retained #730 representative timing profile and three measured Stage 2 screen movement cases",
+      "test_cases": 6699,
+      "test_files": 444
     }
   ],
   "shard_count": 12,
   "shards": [
     {
-      "duration_seconds": 2272.466,
+      "duration_seconds": 2273.167,
       "shard_id": 1,
-      "test_file_count": 43
+      "test_file_count": 48
     },
     {
       "duration_seconds": 3182.186,
@@ -7304,47 +7309,47 @@
       "test_file_count": 1
     },
     {
-      "duration_seconds": 1771.234,
+      "duration_seconds": 2273.168,
       "shard_id": 4,
-      "test_file_count": 48
+      "test_file_count": 43
     },
     {
-      "duration_seconds": 2272.467,
+      "duration_seconds": 1771.934,
       "shard_id": 5,
-      "test_file_count": 49
+      "test_file_count": 50
     },
     {
-      "duration_seconds": 2272.467,
+      "duration_seconds": 2273.168,
       "shard_id": 6,
       "test_file_count": 47
     },
     {
-      "duration_seconds": 2272.466,
+      "duration_seconds": 2273.168,
       "shard_id": 7,
       "test_file_count": 50
     },
     {
-      "duration_seconds": 2272.467,
+      "duration_seconds": 2273.168,
       "shard_id": 8,
       "test_file_count": 48
     },
     {
-      "duration_seconds": 2272.467,
+      "duration_seconds": 2273.168,
       "shard_id": 9,
       "test_file_count": 50
     },
     {
-      "duration_seconds": 2272.466,
+      "duration_seconds": 2273.168,
       "shard_id": 10,
-      "test_file_count": 50
+      "test_file_count": 49
     },
     {
-      "duration_seconds": 2272.468,
+      "duration_seconds": 2273.168,
       "shard_id": 11,
-      "test_file_count": 99
+      "test_file_count": 100
     },
     {
-      "duration_seconds": 2272.467,
+      "duration_seconds": 2273.17,
       "shard_id": 12,
       "test_file_count": 48
     }
@@ -7354,5 +7359,5 @@
     "sha256": "b241b31651a8d5d903a2b851583186c276a5ac32fed26de1a1c69b4aa278b711"
   },
   "strategy": "largest-processing-time-by-derived-selector-weight",
-  "total_test_duration_seconds": 27843.767
+  "total_test_duration_seconds": 27850.779
 }
