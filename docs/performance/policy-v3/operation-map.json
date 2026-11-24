@@ -37188,6 +37188,61 @@
       "families": [],
       "sensitive": false,
       "mandatory": true
+    },
+    "sheathed-in-brass-armour-save": {
+      "paths": [
+        "src/warhammer40k_core/engine/generic_attack_save_modifiers.py",
+        "src/warhammer40k_core/rules/rule_characteristic_parser.py",
+        "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_generic_ir_support_2026_27.py",
+        "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_stratagem_activation_2026_27.json",
+        "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_stratagem_activation_2026_27.py",
+        "tools/generate_faction_stratagem_activation_support.py"
+      ],
+      "owners": [
+        "@document",
+        "@module",
+        "ActivationArtifact",
+        "ActivationProfile",
+        "SourceOnlyActivationMetadata",
+        "SourceStratagemActivationProfile.effect_payload",
+        "SourceStratagemActivationProfile.to_payload",
+        "_activation_profile_from_current_source_metadata",
+        "_artifact_payload",
+        "_stratagem_activation_rule_ir_payload_by_descriptor_id",
+        "generic_rule_modified_save_options",
+        "generic_supported_stratagem_rule_ir_hash",
+        "parse_characteristic_effects",
+        "validate_artifact_bytes"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "sheathed-in-brass-test-admission": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/sheathed-in-brass-transition-v1.json",
+        "scripts/engine_numerical_identity_test_admission.py",
+        "tests/factions/chaos_daemons/integration/test_sheathed_in_brass.py"
+      ],
+      "owners": [
+        "@document",
+        "@module",
+        "_assert_cover_policy",
+        "_assert_save_options",
+        "_brass_options",
+        "_finish_shooter",
+        "_first_shot",
+        "_save_payloads",
+        "_scene",
+        "_sheathed_in_brass_test_addition",
+        "brass_definitions",
+        "exact_movement_test_transition",
+        "test_sheathed_in_brass_native_accept_later_shooting_expiry_and_replay",
+        "test_sheathed_in_brass_native_decline_or_unaffordable"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

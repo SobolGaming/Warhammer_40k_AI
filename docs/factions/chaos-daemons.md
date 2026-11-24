@@ -10,9 +10,9 @@ This page separates source data from executable rules. An `Implemented` row has 
 | --- | ---: | ---: | ---: | ---: |
 | Detachment rules | 9 | 6 | 0 | 3 |
 | Enhancements | 29 | 17 | 0 | 12 |
-| Stratagems | 46 | 22 | 0 | 24 |
+| Stratagems | 46 | 23 | 0 | 23 |
 
-Across army, detachment, Enhancement, and Stratagem records, 46 exact source rows currently have engine consumers.
+Across army, detachment, Enhancement, and Stratagem records, 47 exact source rows currently have engine consumers.
 
 **This is not a full-game support claim.** Roster legality, selected units, model geometry, mission scoring, network safety, and replay certification are separate Phase 17O capabilities. Query the selected game's `capability_manifest` before presenting a roster or matchup as playable or certified.
 
@@ -84,7 +84,7 @@ The checked-in v995 app roster [`cavalcade-shadow-bloodthirster.json`](../../dat
 
 | Detachment | Runtime executable | Still source-only / blocked |
 | --- | --- | --- |
-| Blood Legion | None | BLOOD BEGETS SKULLS<br>FOOLS' FLIGHT<br>GORE-HUNGRY ONSLAUGHT<br>SHEATHED IN BRASS<br>SKULLS BEGET BLOOD<br>WRATH UNDENIABLE |
+| Blood Legion | SHEATHED IN BRASS | BLOOD BEGETS SKULLS<br>FOOLS' FLIGHT<br>GORE-HUNGRY ONSLAUGHT<br>SKULLS BEGET BLOOD<br>WRATH UNDENIABLE |
 | Cavalcade of Chaos | From Beyond the Veil<br>Inescapable Manifestations<br>Warp-Riders | None |
 | Daemonic Incursion | Corrupt Realspace<br>Daemonic Invulnerability<br>Denizens of the Warp<br>Draught of Terror<br>The Realm of Chaos<br>Warp Surge | None |
 | Legion of Excess | None | ARCHAGONISTS<br>CAVALCADE OF BLADES<br>OVERWHELMING EXCESS<br>PHANTASMAL LONGING<br>SENSORY EXCRUCIATION<br>THIEVES OF PAIN |

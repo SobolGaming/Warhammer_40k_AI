@@ -225,6 +225,9 @@
     "tests/factions/chaos_daemons/integration/test_horror_split_materialization.py::test_matching_sequence_model_destroyed_event_requires_typed_attribution": 11.46,
     "tests/factions/chaos_daemons/integration/test_horror_split_materialization.py::test_split_mixed_rolls_materialize_only_successes_before_handoff": 13.241,
     "tests/factions/chaos_daemons/integration/test_monster_mash_v995_roster.py::test_exact_monster_mash_admission_deployment_and_replay": 34.04,
+    "tests/factions/chaos_daemons/integration/test_sheathed_in_brass.py::test_sheathed_in_brass_native_accept_later_shooting_expiry_and_replay": 41.077,
+    "tests/factions/chaos_daemons/integration/test_sheathed_in_brass.py::test_sheathed_in_brass_native_decline_or_unaffordable[decline]": 3.542,
+    "tests/factions/chaos_daemons/integration/test_sheathed_in_brass.py::test_sheathed_in_brass_native_decline_or_unaffordable[unaffordable]": 3.733,
     "tests/factions/chaos_daemons/unit/test_bloodcrushers_abilities.py::test_brass_stampede_native_charge_completion": 17.349,
     "tests/factions/chaos_daemons/unit/test_bloodcrushers_abilities.py::test_icon_leadership_query_uses_current_physical_bearer[False]": 0.426,
     "tests/factions/chaos_daemons/unit/test_bloodcrushers_abilities.py::test_icon_leadership_query_uses_current_physical_bearer[True]": 0.422,
@@ -6706,18 +6709,18 @@
   },
   "execution_model": {
     "assignment_wall_lower_bound_seconds": {
-      "1": 569.035,
-      "10": 569.036,
-      "11": 569.035,
-      "12": 569.035,
+      "1": 570.244,
+      "10": 570.244,
+      "11": 570.244,
+      "12": 570.245,
       "2": 795.547,
       "3": 609.537,
-      "4": 569.036,
-      "5": 569.035,
-      "6": 569.035,
-      "7": 569.035,
-      "8": 569.035,
-      "9": 569.036
+      "4": 570.244,
+      "5": 570.244,
+      "6": 570.244,
+      "7": 570.245,
+      "8": 570.244,
+      "9": 570.244
     },
     "cold_shard_assignment": "minimum-unrounded-modeled-test-load-existing-bucket-v1",
     "cold_shard_id": 1,
@@ -6726,18 +6729,18 @@
       "tests/factions/chaos_daemons/integration/test_cavalcade_v995_roster.py::test_exact_mirror_deploys_all_78_models_and_replays_to_battle"
     ],
     "shard_worker_seconds": {
-      "1": 2276.139,
-      "10": 2276.144,
-      "11": 2276.142,
-      "12": 2276.141,
+      "1": 2280.975,
+      "10": 2280.976,
+      "11": 2280.975,
+      "12": 2280.978,
       "2": 3182.186,
       "3": 2438.146,
-      "4": 2276.142,
-      "5": 2276.14,
-      "6": 2276.14,
-      "7": 2276.14,
-      "8": 2276.139,
-      "9": 2276.144
+      "4": 2280.977,
+      "5": 2280.976,
+      "6": 2280.976,
+      "7": 2280.978,
+      "8": 2280.976,
+      "9": 2280.976
     }
   },
   "files": {
@@ -6756,6 +6759,7 @@
     "tests/factions/chaos_daemons/integration/test_cavalcade_v995_roster.py::test_exact_mirror_deploys_all_78_models_and_replays_to_battle": 167.078,
     "tests/factions/chaos_daemons/integration/test_horror_split_materialization.py": 196.249,
     "tests/factions/chaos_daemons/integration/test_monster_mash_v995_roster.py": 34.04,
+    "tests/factions/chaos_daemons/integration/test_sheathed_in_brass.py": 48.352,
     "tests/factions/chaos_daemons/unit/test_bloodcrushers_abilities.py": 26.798,
     "tests/factions/chaos_daemons/unit/test_bloodcrushers_reserves.py": 3.314,
     "tests/factions/chaos_daemons/unit/test_chaos_daemons_army_rule.py": 68.038,
@@ -7289,19 +7293,20 @@
         "708e2a7cdde4ec8155cc758efc538d7dc0dd4b5c25644c8a1c2d88652d6df8df",
         "7cded789191d3e9a531806a0b448b6347da9bd58f9f62af169b77cae998e0753",
         "9a5f617751dd2ef273362bcbec3d532afb594c23b9d7c4576a1ba54a82305422",
-        "9dc1b70162325c830e81f4b6e06c9199b793ed7d7805d59287feb2a593be541d"
+        "9dc1b70162325c830e81f4b6e06c9199b793ed7d7805d59287feb2a593be541d",
+        "d221fa9414f09deb36d275dca16085e59d0239e19246d38cf138ddd866c65662"
       ],
-      "source": "Retained #731 representative timing profile and four measured Grotesque Regeneration cases (serial WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only)",
-      "test_cases": 6703,
-      "test_files": 444
+      "source": "Retained #731 representative timing profile and four measured Grotesque Regeneration cases (serial WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); plus three measured Sheathed in Brass cases (serial WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only)",
+      "test_cases": 6706,
+      "test_files": 445
     }
   ],
   "shard_count": 12,
   "shards": [
     {
-      "duration_seconds": 2276.139,
+      "duration_seconds": 2280.975,
       "shard_id": 1,
-      "test_file_count": 49
+      "test_file_count": 46
     },
     {
       "duration_seconds": 3182.186,
@@ -7314,47 +7319,47 @@
       "test_file_count": 1
     },
     {
-      "duration_seconds": 2276.142,
+      "duration_seconds": 1779.743,
       "shard_id": 4,
-      "test_file_count": 42
+      "test_file_count": 48
     },
     {
-      "duration_seconds": 2276.14,
+      "duration_seconds": 2280.976,
       "shard_id": 5,
-      "test_file_count": 51
+      "test_file_count": 49
     },
     {
-      "duration_seconds": 1774.906,
+      "duration_seconds": 2280.976,
       "shard_id": 6,
-      "test_file_count": 51
+      "test_file_count": 47
     },
     {
-      "duration_seconds": 2276.14,
+      "duration_seconds": 2280.978,
       "shard_id": 7,
       "test_file_count": 48
     },
     {
-      "duration_seconds": 2276.139,
+      "duration_seconds": 2280.976,
       "shard_id": 8,
-      "test_file_count": 50
+      "test_file_count": 49
     },
     {
-      "duration_seconds": 2276.144,
+      "duration_seconds": 2280.976,
       "shard_id": 9,
-      "test_file_count": 48
+      "test_file_count": 49
     },
     {
-      "duration_seconds": 2276.144,
+      "duration_seconds": 2280.976,
       "shard_id": 10,
-      "test_file_count": 48
+      "test_file_count": 52
     },
     {
-      "duration_seconds": 2276.142,
+      "duration_seconds": 2280.975,
       "shard_id": 11,
       "test_file_count": 98
     },
     {
-      "duration_seconds": 2276.141,
+      "duration_seconds": 2280.978,
       "shard_id": 12,
       "test_file_count": 48
     }
@@ -7364,5 +7369,5 @@
     "sha256": "b241b31651a8d5d903a2b851583186c276a5ac32fed26de1a1c69b4aa278b711"
   },
   "strategy": "largest-processing-time-by-derived-selector-weight",
-  "total_test_duration_seconds": 27880.509
+  "total_test_duration_seconds": 27928.861
 }

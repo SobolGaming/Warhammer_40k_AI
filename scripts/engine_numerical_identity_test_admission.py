@@ -682,6 +682,41 @@ def _grotesque_regeneration_test_successor(
     return record["runtime_fingerprint"], tests, raw
 
 
+def _sheathed_in_brass_test_addition(
+    root: Path, *, previous_runtime: str, previous_transition: bytes
+) -> tuple[str, TestSuccessors, bytes] | None:
+    name = "data/source_audits/ci64_provenance_v1/sheathed-in-brass-transition-v1.json"
+    path = root / name
+    _selection_no_links(root, path)
+    if not path.exists():
+        return None
+    digest = "ffa3c14483289a4aebfd6d2a66d17e87a7685384c4563d19c781d7b3adbc2426"
+    raw = _checked_bytes(root, name, digest)
+    record = json.loads(raw, object_pairs_hook=_selection_object)
+    owner = "tests/factions/chaos_daemons/integration/test_sheathed_in_brass.py"
+    if (
+        set(record)
+        != {
+            "schema",
+            "base",
+            "retained_transition_sha256",
+            "retained_runtime_fingerprint",
+            "runtime_fingerprint",
+            "sources",
+            "added_files",
+        }
+        or record["schema"] != "finite-sheathed-in-brass-transition-v1"
+        or record["base"] != "5aca97bfaf4b3f1a753d65ed6b7dfc2482aa77f0"
+        or record["retained_transition_sha256"] != hashlib.sha256(previous_transition).hexdigest()
+        or record["retained_runtime_fingerprint"] != previous_runtime
+        or record["added_files"].keys() != {owner}
+    ):
+        raise SystemExit("Sheathed in Brass test transition differs.")
+    for source, digest in record["sources"].items():
+        _checked_bytes(root, source, digest)
+    return record["runtime_fingerprint"], _selection_members(record["added_files"], root), raw
+
+
 def exact_movement_test_transition(
     root: Path, retained_cutover_sha256: str
 ) -> TestTransition | None:
@@ -1268,8 +1303,14 @@ def exact_movement_test_transition(
         )
     else:
         regeneration = None
+    brass = None
     if regeneration is not None:
         runtime = regeneration[0]
+        brass = _sheathed_in_brass_test_addition(
+            root, previous_runtime=runtime, previous_transition=regeneration[2]
+        )
+        if brass is not None:
+            runtime = brass[0]
     retained = _identity_test_transition(
         root,
         retained_cutover_sha256,
@@ -1393,6 +1434,11 @@ def exact_movement_test_transition(
             raise SystemExit("Grotesque Regeneration test update overlaps a prior transition.")
         updated.update(regeneration[1])
         raw += b"\0" + regeneration[2]
+    if brass is not None:
+        if brass[1].keys() & (updated.keys() | added.keys() | additions.keys()):
+            raise SystemExit("Sheathed in Brass test addition overlaps the predecessor selection.")
+        additions.update(brass[1])
+        raw += b"\0" + brass[2]
     return updated, {**added, **additions}, retained_raw + b"\0" + raw
 
 

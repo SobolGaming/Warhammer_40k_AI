@@ -6698,7 +6698,7 @@
     {
       "profile_id": "phase17s:stratagem:chaos-daemons:blood-legion:000009816007",
       "source_row_id": "stratagem:chaos-daemons:blood-legion:000009816007",
-      "source_id": "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:chaos-daemons:blood-legion:000009816007",
+      "source_id": "gw-11e-faction-packs-2026-07:stratagem:chaos-daemons:blood-legion:000009816007",
       "faction_id": "chaos-daemons",
       "detachment_id": "blood-legion",
       "stratagem_id": "000009816007",
@@ -6715,12 +6715,16 @@
       ],
       "target_kind": "friendly_unit",
       "target_policy_id": "selected_target_unit",
-      "required_keywords": [],
+      "required_keywords": [
+        "KHORNE"
+      ],
       "required_keywords_any": [],
-      "required_faction_keywords": [],
+      "required_faction_keywords": [
+        "LEGIONES DAEMONICA"
+      ],
       "excluded_keywords": [],
       "excluded_faction_keywords": [],
-      "rule_ir_hash": "3958d001b56d7c23a7e13e25933ee7e27468c3b1b4e4656d4082fc15ac97e907"
+      "rule_ir_hash": "12c3e20f208c5f25e6cffe2e39b760f66bb2c3a8d83064306df482c28d7117d5"
     },
     {
       "profile_id": "phase17s:stratagem:chaos-daemons:legion-of-excess:000009807002",
@@ -40425,7 +40429,7 @@
     },
     "phase17s:stratagem:chaos-daemons:blood-legion:000009816007": {
       "rule_id": "phase17s:stratagem:chaos-daemons:blood-legion:000009816007",
-      "source_id": "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:chaos-daemons:blood-legion:000009816007",
+      "source_id": "gw-11e-faction-packs-2026-07:stratagem:chaos-daemons:blood-legion:000009816007",
       "normalized_text": "stratagem_activation_target_binding\nUntil the end of the phase, models in your unit have a Save characteristic of 3+.",
       "parser_version": "phase17s-stratagem-activation-template-v2",
       "schema_version": "phase17c-rule-ir-v1",
@@ -40480,7 +40484,7 @@
                 },
                 {
                   "key": "value",
-                  "value": "3+"
+                  "value": 3
                 }
               ]
             }
@@ -40504,7 +40508,7 @@
         }
       ],
       "diagnostics": [],
-      "ir_hash": "3958d001b56d7c23a7e13e25933ee7e27468c3b1b4e4656d4082fc15ac97e907"
+      "ir_hash": "12c3e20f208c5f25e6cffe2e39b760f66bb2c3a8d83064306df482c28d7117d5"
     },
     "phase17s:stratagem:chaos-daemons:legion-of-excess:000009807002": {
       "rule_id": "phase17s:stratagem:chaos-daemons:legion-of-excess:000009807002",
@@ -78667,6 +78671,9 @@
       "ir_hash": "8874a0c9e68e1a8da34ddff36a3dbf42d8c42a2800df9878114e16b34747fa9f"
     }
   },
+  "opponent_turn_profile_ids": [
+    "phase17s:stratagem:chaos-daemons:blood-legion:000009816007"
+  ],
   "effect_selection_kind_by_profile_id": {
     "phase17s:stratagem:astra-militarum:steel-hammer:000010788005": "hit_enemy_unit"
   }
