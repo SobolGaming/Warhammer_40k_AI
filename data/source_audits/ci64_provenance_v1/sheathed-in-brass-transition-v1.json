@@ -19,5 +19,21 @@
       "sha256": "391ca1cdeb16a39278dcf7b982e8985e1c721ce137519f92a0a8c7fe5938f3be",
       "bytes": 19463
     }
+  },
+  "updated_files": {
+    "tests/infrastructure/source_governance/unit/test_blocked_row_classification.py": {
+      "before": {
+        "mode": "100644",
+        "blob_sha1": "df3410c8205c6381c11e823fffa94fce68ff9b91",
+        "sha256": "8dae54c9416de9a7e31c4d7a18616ed2f5a9f37b3923e8219319af3ac69fe59d",
+        "bytes": 8533
+      },
+      "after": {
+        "mode": "100644",
+        "blob_sha1": "ed6d3901892a570326e6009795d1e414a88aeb09",
+        "sha256": "4d4509863793bd6190b639b7b221d66b84b3a52f4d21610cf6f14efdab479a4b",
+        "bytes": 9335
+      }
+    }
   }
 }

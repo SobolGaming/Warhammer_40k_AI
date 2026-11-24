@@ -452,6 +452,28 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         brass["added_files"][brass_owner]["sha256"]
         == hashlib.sha256((ROOT / brass_owner).read_bytes()).hexdigest()
     )
+    classification_owner = (
+        "tests/infrastructure/source_governance/unit/test_blocked_row_classification.py"
+    )
+    assert set(brass["updated_files"]) == {classification_owner}
+    classification_change = brass["updated_files"][classification_owner]
+    assert (
+        classification_change["before"]
+        == _record(sharding.CUTOVER_PATH)["active_files"][classification_owner]
+    )
+    classification_preimage = subprocess.check_output(
+        ["git", "show", brass["base"] + ":" + classification_owner], cwd=ROOT
+    )
+    assert (
+        classification_change["before"]["sha256"]
+        == hashlib.sha256(classification_preimage).hexdigest()
+    )
+    assert (
+        classification_change["after"]["sha256"]
+        == hashlib.sha256((ROOT / classification_owner).read_bytes()).hexdigest()
+    )
+    assert classification_owner in active_files
+    assert sum(classification_owner in group for group in groups) == 1
     pending_before: dict[str, str] = {}
     for name, binding in pending["sources"].items():
         present = subprocess.check_output(["git", "ls-tree", pending_base, "--", name], cwd=ROOT)

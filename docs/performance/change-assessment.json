@@ -226,11 +226,11 @@
     },
     "data/source_audits/ci64_provenance_v1/sheathed-in-brass-transition-v1.json": {
       "before_sha256": null,
-      "after_sha256": "4875f8c50033dab7755745c92d24851abaaf41c70ff3aa19bff61ccbf3ee5a10",
+      "after_sha256": "eed47b44cae336c88c37fbde89a41f8f7b0224e63945ffd75526170bd0bb6a66",
       "owners": {
         "@document": {
           "before": null,
-          "after": "4875f8c50033dab7755745c92d24851abaaf41c70ff3aa19bff61ccbf3ee5a10"
+          "after": "eed47b44cae336c88c37fbde89a41f8f7b0224e63945ffd75526170bd0bb6a66"
         }
       }
     },
@@ -286,15 +286,15 @@
     },
     "scripts/engine_numerical_identity_test_admission.py": {
       "before_sha256": "774cbddb494f3681afcb869acbb5f2e675eb9020786e19b559424b081cf64087",
-      "after_sha256": "fcf21f9ee804542440d4fb97141c4d50c485b7f22eabf6c644d8c8bceb4fd6ca",
+      "after_sha256": "ad6250e7ca008c663700dc845bb40289a738b025b0aabd71441a17823daf9c04",
       "owners": {
         "_sheathed_in_brass_test_addition": {
           "before": null,
-          "after": "488e6bcc0211d8197b8a4551d9c65279714da883bfd86ea4b3d26f978ae0f875"
+          "after": "ccb9e5995eeaa8cbaf3db21f402ed9048060faccec175306c113f365add6c35c"
         },
         "exact_movement_test_transition": {
           "before": "5707a6cc0332484e50f56f47aba0cbb676333d1176b22734d2ad73668bb3f5bf",
-          "after": "1d29e3da7abb0941e1c09307a7a4684971838f39a42749867f7fc58a94c81e72"
+          "after": "e1857cf0a73a77642453761cfea32b7d80b01c7baccc18cf3d6f35f65e1d86b0"
         }
       }
     },
@@ -402,11 +402,11 @@
     },
     "tests/code_quality/test_engine_numerical_identity_admission.py": {
       "before_sha256": "cf465609a2cb8ec77ef30a66f987317d6cad2e80529b8b681f6d8d441aadde48",
-      "after_sha256": "3c6a7f26bbbd4bda5e6a47d5f5ff27d5e59667e28f2940d07e7afe8c63835ba0",
+      "after_sha256": "e45b9a2363839df58a0bfa1035ab1f6e46809135491443f34912cd9e9787055c",
       "owners": {
         "test_identity_inventory_uses_current_twelve_shards_and_native_cohort": {
           "before": "e71c959e3f54486cf8eb765a838e8591ae31421acb196316f4a60cc1e854639f",
-          "after": "4756f8a13c2632e430a603b02c986f30ba4a2df70e909080992837c0d61131ef"
+          "after": "ac0a537f9c650d6bb628ecbe2ae4dcb9f41a50b55e94735fd0593b1843ee1b7d"
         }
       }
     },
@@ -475,6 +475,24 @@
         "test_sheathed_in_brass_native_gathering_and_save_ignore": {
           "before": null,
           "after": "65baf7df51db2c2417430a6f4ab7d3909ac68def620a115e2bcd048e5b12a0df"
+        }
+      }
+    },
+    "tests/infrastructure/source_governance/unit/test_blocked_row_classification.py": {
+      "before_sha256": "8dae54c9416de9a7e31c4d7a18616ed2f5a9f37b3923e8219319af3ac69fe59d",
+      "after_sha256": "4d4509863793bd6190b639b7b221d66b84b3a52f4d21610cf6f14efdab479a4b",
+      "owners": {
+        "test_phase17i_existing_template_report_uses_phase17c_template_families": {
+          "before": "b37c936bfa151ad7859db7a59b1ef4c1bb46e3d0419207eb4ace5c49e22961d2",
+          "after": "60aaced743442e0ba221f25c5709a14b21d0663eb41a67d3885c76ac6f8e3255"
+        },
+        "test_phase17i_missing_capability_report_groups_rows_by_family": {
+          "before": "586820da6f8ff4e546ec2c5b4defb02b8ee13834397944d62573c457e1bbd3ce",
+          "after": "add7173af1754b28716c40228a772694f4703bc8ca731e68dbc189a91828cb2e"
+        },
+        "test_phase17i_source_text_boundaries_are_explicit": {
+          "before": "db8c18c6f1a88839c73dfc33b2170ce3ee1d7aca425c36549b152c3c51d39e79",
+          "after": "1ac9cbf17852a6c78b046792ed2dcf5147db5513d1d2ba00e26dcec2ba83e097"
         }
       }
     },
@@ -897,6 +915,16 @@
       "rationale": "Add exact native controls and authenticate their membership against the rigid ground charge predecessor.",
       "source_obligation": "Chaos Daemons July Faction Pack page 124. Verify the 1 CP opponent Shooting reaction, both target keywords, and the phase-long Save characteristic of 3+.",
       "unchanged_work": "The same timing window, CP ledger, expiry, allocation and save rebuild execute. A live whole-unit armour SET contributes its source-linked operation and only the applicable Save permission."
+    },
+    "tests/infrastructure/source_governance/unit/test_blocked_row_classification.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "ci-restructure-tests-infrastructure-source_governance-unit-test_blocked_row_classification.py"
+      ],
+      "selected_families": [],
+      "rationale": "Realign the exact Phase 17I assertions with the single Sheathed in Brass member becoming executable.",
+      "source_obligation": "The retained July Chaos Daemons faction pack, page 124, supplies the Sheathed in Brass rule bound as executable generic RuleIR.",
+      "unchanged_work": "Keep all existing classification, semantic checksum and malformed-payload checks. Prove the revised blocked inventory and the new exact membership separately."
     },
     "tools/generate_faction_stratagem_activation_support.py": {
       "category": "rule_semantics",
