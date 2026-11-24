@@ -365,9 +365,10 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         )
     )
     screen = _record(ground_charge.SCREEN_TRANSITION)
-    pending = _record(
+    pending_path = (
         "data/source_audits/ci64_provenance_v1/stage2-pending-battle-shock-transition-v1.json"
     )
+    pending = _record(pending_path)
     pending_base = "161378a16c4557228b2af45db0d311a522eb3f8f"
     assert pending["base"] == pending_base
     pending_base_manifest = json.loads(
@@ -379,7 +380,31 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         pending["retained_screen_movement_sha256"]
         == hashlib.sha256((ROOT / ground_charge.SCREEN_TRANSITION).read_bytes()).hexdigest()
     )
-    assert _record(MANIFEST)["fingerprint"] == pending["runtime_fingerprint"]
+    regeneration = _record(
+        "data/source_audits/ci64_provenance_v1/grotesque-regeneration-transition-v1.json"
+    )
+    regeneration_base = "d9185cf53a2816ab666f3c1b16410b960a3d1cc7"
+    assert regeneration["base"] == regeneration_base
+    regeneration_base_manifest = json.loads(
+        subprocess.check_output(["git", "show", regeneration_base + ":" + MANIFEST], cwd=ROOT)
+    )
+    assert pending["runtime_fingerprint"] == regeneration_base_manifest["fingerprint"]
+    assert regeneration["retained_runtime_fingerprint"] == pending["runtime_fingerprint"]
+    assert (
+        regeneration["retained_transition_sha256"]
+        == hashlib.sha256((ROOT / pending_path).read_bytes()).hexdigest()
+    )
+    assert _record(MANIFEST)["fingerprint"] == regeneration["runtime_fingerprint"]
+    healing_owner = "tests/rules/section02/test_02_02_04_healing.py"
+    assert sum(healing_owner in group for group in groups) == 1
+    assert (
+        regeneration["test"]["before"]
+        == _record(sharding.CUTOVER_PATH)["active_files"][healing_owner]
+    )
+    assert (
+        regeneration["test"]["after"]["sha256"]
+        == hashlib.sha256((ROOT / healing_owner).read_bytes()).hexdigest()
+    )
     pending_before: dict[str, str] = {}
     for name, binding in pending["sources"].items():
         present = subprocess.check_output(["git", "ls-tree", pending_base, "--", name], cwd=ROOT)

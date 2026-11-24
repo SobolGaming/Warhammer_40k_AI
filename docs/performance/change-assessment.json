@@ -2,8 +2,28 @@
   "policy": "rules-engine-performance-v3",
   "base": "d9185cf53a2816ab666f3c1b16410b960a3d1cc7",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:858c9136f8da02d92ff986bc6e54d7d608070f3a89df76de009cc655d0433bd0",
-  "operation_map_sha256": "c3c9351caf2199dd5ee24fba29f7546e7db9f7d6e10adefe76f5374201c981a7",
+  "operation_map_sha256": "2f260ef5bc27b9d3665e65db2da108ddefcb86ae422b4aefc4ae1d690ce51cde",
   "changes": {
+    "ci/quality_shards/all.txt": {
+      "before_sha256": "1a0ce3ac14e7d040580a8063aa323fc0561e165bd62531725d612296ac65db55",
+      "after_sha256": "efcca4fe167e3ee4bef7037cc4e71066ccd33654694a0d8ac22b77fcb5ca7970",
+      "owners": {
+        "@document": {
+          "before": "1a0ce3ac14e7d040580a8063aa323fc0561e165bd62531725d612296ac65db55",
+          "after": "efcca4fe167e3ee4bef7037cc4e71066ccd33654694a0d8ac22b77fcb5ca7970"
+        }
+      }
+    },
+    "ci/quality_shards/shard-1.txt": {
+      "before_sha256": "f8d47bd22e9ce2405b8cb6f1811e98e568c2ab7b0041580e7df0c861c98be5f7",
+      "after_sha256": "39db12fea141f6547f16883cb315729dc16bdbb43903603575407ebbc4145480",
+      "owners": {
+        "@document": {
+          "before": "f8d47bd22e9ce2405b8cb6f1811e98e568c2ab7b0041580e7df0c861c98be5f7",
+          "after": "39db12fea141f6547f16883cb315729dc16bdbb43903603575407ebbc4145480"
+        }
+      }
+    },
     "contracts/examples/persistence/session-persistence.json": {
       "before_sha256": "a530d4d49fb6df3defaa5162c9f3e5ef7e3c08d37e090a237e4e1791fb72b941",
       "after_sha256": "3b859d95c83a93048a6a5eadb1ae5c93195012332f1433cfbffb2f94a2947035",
@@ -126,11 +146,11 @@
     },
     "docs/factions/chaos-daemons.md": {
       "before_sha256": "1d13278983edfddb2cabf839444ca922f9e9760e0b28f12b3c55e40897cfab86",
-      "after_sha256": "5c47baaf01842c30716deb4b7946ca4a37b0a75297c26486ecfeaa4f24f9a8c8",
+      "after_sha256": "40f9c6bbb2e2e55864d364af7db761f2de6ce7bfb267c4bc68561bcadb3350af",
       "owners": {
         "@document": {
           "before": "1d13278983edfddb2cabf839444ca922f9e9760e0b28f12b3c55e40897cfab86",
-          "after": "5c47baaf01842c30716deb4b7946ca4a37b0a75297c26486ecfeaa4f24f9a8c8"
+          "after": "40f9c6bbb2e2e55864d364af7db761f2de6ce7bfb267c4bc68561bcadb3350af"
         }
       }
     },
@@ -146,11 +166,11 @@
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "f9e6133929dc2574a3b8d3eb3aed2911b74770d6be43a9577124c33e08e9e840",
-      "after_sha256": "baf1b62350ed57b0c19c5eca75d82311c9836091726ddefd0d7ba19c7b7038c2",
+      "after_sha256": "09d809bac6c9679a304c0e0cb6581f9a2d213265b0c502da62de21d9d5d5a391",
       "owners": {
         "@document": {
           "before": "f9e6133929dc2574a3b8d3eb3aed2911b74770d6be43a9577124c33e08e9e840",
-          "after": "baf1b62350ed57b0c19c5eca75d82311c9836091726ddefd0d7ba19c7b7038c2"
+          "after": "09d809bac6c9679a304c0e0cb6581f9a2d213265b0c502da62de21d9d5d5a391"
         }
       }
     },
@@ -300,6 +320,56 @@
         }
       }
     },
+    "tests/code_quality/test_engine_numerical_identity_admission.py": {
+      "before_sha256": "b6f547e8870b0b1c971306a92dbaa5d338505ce33df8b1810eb2bbcc055cd0b5",
+      "after_sha256": "52a25fe8137a03ee5df006b8ed67e4d341dd4f2000a916bc7a17c6013b3d3bb8",
+      "owners": {
+        "test_identity_inventory_uses_current_twelve_shards_and_native_cohort": {
+          "before": "5c1e8a6d368682ad8b50a64d609c065d60987d8cf2b2edb3d3b29fbdcd5f151c",
+          "after": "b838d1efc7171f1f5acbee428a417ff6ab08d83c0c95c1e740e27e80f4d9701f"
+        }
+      }
+    },
+    "tests/code_quality/test_generated_faction_docs.py": {
+      "before_sha256": "f898a5d03504072a92948ebdbdcc2b874bc96e7d231d70f27e6717f436490935",
+      "after_sha256": "116cea7ce124fffaf04362faca7516fac3cdb6bfcfbb74b40ba628b526d3f8f4",
+      "owners": {
+        "test_chaos_daemons_document_scopes_checked_in_roster_evidence": {
+          "before": "a56beafd134262dc1c7d7f53a7433140f659ed2ad9edb9ddfa5f6a298477b846",
+          "after": "d70229c2c90bfab2eac392f493d05925a94b1f5017d544cc01dac107c37820bb"
+        }
+      }
+    },
+    "tests/code_quality/test_ws12_generated_data_artifacts.py": {
+      "before_sha256": "6566e21fc91623be1309fb7230fe6707aa616a89a0c1db1d319e909722f104d0",
+      "after_sha256": "8bbb2b6e142c998cdb50da0516ba3b6cdb01f0467976c4e9355b45486d3fd0d9",
+      "owners": {
+        "@module": {
+          "before": "10343e9630f333e880e47ab7b0cb3875dc32f826c7b405de4e351fc36a940af7",
+          "after": "e5ce230bb9f0a0965bccc21843dfede8c2cfbf0bd2d1bd98ee614a80d34eac15"
+        },
+        "_redirect_rule_ir_generator_outputs": {
+          "before": "c6225085c42e7a6ff51d55899eaa6afffb44ec0796649312dbab786eb568376f",
+          "after": "5f6b20d14f8821f49dcddafc030a0b508bd84dd09b284137971c3402548aaf17"
+        },
+        "test_datasheet_rule_ir_shards_record_source_backed_faction_identity": {
+          "before": "081b03eb29b6f019845e3d7c36b684f067b9acfc8105150f47f7f0b029f1a540",
+          "after": "1690ce37d7a4d3ef3be38103be0b0eb35f53bbb1d9e1c3ef09235e7378cf7016"
+        },
+        "test_datasheet_rule_ir_uses_one_stable_physical_sharded_package": {
+          "before": "3278774690c2b6e13b6b8bdfdcb2aba0f889805ac0211b35b6b4ef8d1acf8f9c",
+          "after": "e5eacda2fb2b34df5543f719c2e4bd112a09131224112a49e2fe23053339bda8"
+        },
+        "test_source_specific_check_rejects_stale_sibling_shard": {
+          "before": "d444dcc1a7607dc16df95a7285a56b98e55373fa32bdcef53c22cf2d8c5ee5ce",
+          "after": "3d8facada8dd2fc5c360350790b2f9fa527e14ce2015d42d271029748a6de7aa"
+        },
+        "test_source_specific_checks_preserve_real_loader_compatibility": {
+          "before": "d64f90dac5c4d0ca62acb852ef0b95b3369e886a959195b4b033c8b8fb144935",
+          "after": "80bb34be72f336586260435543069b796788117e84abf72a0423d91d8a5f26b1"
+        }
+      }
+    },
     "tests/rules/section02/test_02_02_04_healing.py": {
       "before_sha256": "ab8d3b083fd47a02e0814f694e5b9122ff9cb1878d9a9f0ee4b3c75e44159cca",
       "after_sha256": "2c699708adfe8cc60291893902fe702b316e7666c2cd2e8951468e259251990e",
@@ -320,11 +390,11 @@
     },
     "tools/generate_ability_support_matrix.py": {
       "before_sha256": "ce85c47a0bd2405892a6312cacbea09246c8e1faa3764f2e10fd75aad3884668",
-      "after_sha256": "8378acc365d6ac266fd0aeaf96cede1233b0124085e4a4ba095b7c9b1c0aa79a",
+      "after_sha256": "76d547de784f93801f52412f82d044223afdfa5bd6f678d13ba8fe70003d2334",
       "owners": {
         "_chaos_daemons_nurgle_review_rows": {
           "before": "05d6f8f40c70e3523b458b78396bec4afbb99ecfdbfd3a8c749876982fb4e8fe",
-          "after": "a97cf52ba9bc09ec72bd9e0c44a17112da82fc921bd4bad8a31d993733ab064c"
+          "after": "1b03cd39e65e3b8b234c54c4d78981d31366ed3fe136cb7f41f6711d1fd8edfb"
         }
       }
     },
@@ -370,6 +440,22 @@
     }
   },
   "rows": {
+    "ci/quality_shards/all.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Admit the Death Guard loader case to the active quality inventory.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/quality_shards/shard-1.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Run the new Death Guard parameter with the existing generated artifact tests.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
       "operations": [
@@ -378,7 +464,7 @@
       "selected_families": [],
       "rationale": "Refresh the example payloads for the exact runtime identity.",
       "source_obligation": "Review Chaos Daemons Faction Pack pp. 82-83 and the separately pinned Death Guard Datasheets_abilities row 000004115:5 with its unchanged-predecessor disposition.",
-      "unchanged_work": "Use the existing phase-end scheduler and model-scoped healing mutation. Candidate discovery visits only loaded source sheets and creates no effect for a full-health or destroyed model. Movement, attacks and replay algorithms retain their work."
+      "unchanged_work": "The added work is limited to source registration, phase-end discovery and any model-scoped healing. The conditional guard snapshot cost is recorded on the phase-end runtime and registry assessment rows."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
@@ -388,7 +474,7 @@
       "selected_families": [],
       "rationale": "Refresh the example payloads for the exact runtime identity.",
       "source_obligation": "Review Chaos Daemons Faction Pack pp. 82-83 and the separately pinned Death Guard Datasheets_abilities row 000004115:5 with its unchanged-predecessor disposition.",
-      "unchanged_work": "Use the existing phase-end scheduler and model-scoped healing mutation. Candidate discovery visits only loaded source sheets and creates no effect for a full-health or destroyed model. Movement, attacks and replay algorithms retain their work."
+      "unchanged_work": "The added work is limited to source registration, phase-end discovery and any model-scoped healing. The conditional guard snapshot cost is recorded on the phase-end runtime and registry assessment rows."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
@@ -398,7 +484,7 @@
       "selected_families": [],
       "rationale": "Refresh the example payloads for the exact runtime identity.",
       "source_obligation": "Review Chaos Daemons Faction Pack pp. 82-83 and the separately pinned Death Guard Datasheets_abilities row 000004115:5 with its unchanged-predecessor disposition.",
-      "unchanged_work": "Use the existing phase-end scheduler and model-scoped healing mutation. Candidate discovery visits only loaded source sheets and creates no effect for a full-health or destroyed model. Movement, attacks and replay algorithms retain their work."
+      "unchanged_work": "The added work is limited to source registration, phase-end discovery and any model-scoped healing. The conditional guard snapshot cost is recorded on the phase-end runtime and registry assessment rows."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
@@ -408,7 +494,7 @@
       "selected_families": [],
       "rationale": "Refresh the example payloads for the exact runtime identity.",
       "source_obligation": "Review Chaos Daemons Faction Pack pp. 82-83 and the separately pinned Death Guard Datasheets_abilities row 000004115:5 with its unchanged-predecessor disposition.",
-      "unchanged_work": "Use the existing phase-end scheduler and model-scoped healing mutation. Candidate discovery visits only loaded source sheets and creates no effect for a full-health or destroyed model. Movement, attacks and replay algorithms retain their work."
+      "unchanged_work": "The added work is limited to source registration, phase-end discovery and any model-scoped healing. The conditional guard snapshot cost is recorded on the phase-end runtime and registry assessment rows."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
@@ -418,7 +504,7 @@
       "selected_families": [],
       "rationale": "Refresh the example payloads for the exact runtime identity.",
       "source_obligation": "Review Chaos Daemons Faction Pack pp. 82-83 and the separately pinned Death Guard Datasheets_abilities row 000004115:5 with its unchanged-predecessor disposition.",
-      "unchanged_work": "Use the existing phase-end scheduler and model-scoped healing mutation. Candidate discovery visits only loaded source sheets and creates no effect for a full-health or destroyed model. Movement, attacks and replay algorithms retain their work."
+      "unchanged_work": "The added work is limited to source registration, phase-end discovery and any model-scoped healing. The conditional guard snapshot cost is recorded on the phase-end runtime and registry assessment rows."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
@@ -428,7 +514,7 @@
       "selected_families": [],
       "rationale": "Refresh the example payloads for the exact runtime identity.",
       "source_obligation": "Review Chaos Daemons Faction Pack pp. 82-83 and the separately pinned Death Guard Datasheets_abilities row 000004115:5 with its unchanged-predecessor disposition.",
-      "unchanged_work": "Use the existing phase-end scheduler and model-scoped healing mutation. Candidate discovery visits only loaded source sheets and creates no effect for a full-health or destroyed model. Movement, attacks and replay algorithms retain their work."
+      "unchanged_work": "The added work is limited to source registration, phase-end discovery and any model-scoped healing. The conditional guard snapshot cost is recorded on the phase-end runtime and registry assessment rows."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
@@ -438,7 +524,7 @@
       "selected_families": [],
       "rationale": "Refresh the example payloads for the exact runtime identity.",
       "source_obligation": "Review Chaos Daemons Faction Pack pp. 82-83 and the separately pinned Death Guard Datasheets_abilities row 000004115:5 with its unchanged-predecessor disposition.",
-      "unchanged_work": "Use the existing phase-end scheduler and model-scoped healing mutation. Candidate discovery visits only loaded source sheets and creates no effect for a full-health or destroyed model. Movement, attacks and replay algorithms retain their work."
+      "unchanged_work": "The added work is limited to source registration, phase-end discovery and any model-scoped healing. The conditional guard snapshot cost is recorded on the phase-end runtime and registry assessment rows."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
@@ -448,7 +534,7 @@
       "selected_families": [],
       "rationale": "Refresh the example payloads for the exact runtime identity.",
       "source_obligation": "Review Chaos Daemons Faction Pack pp. 82-83 and the separately pinned Death Guard Datasheets_abilities row 000004115:5 with its unchanged-predecessor disposition.",
-      "unchanged_work": "Use the existing phase-end scheduler and model-scoped healing mutation. Candidate discovery visits only loaded source sheets and creates no effect for a full-health or destroyed model. Movement, attacks and replay algorithms retain their work."
+      "unchanged_work": "The added work is limited to source registration, phase-end discovery and any model-scoped healing. The conditional guard snapshot cost is recorded on the phase-end runtime and registry assessment rows."
     },
     "data/generated/ability_coverage/cross_source_semantic_equivalence.json": {
       "category": "rule_semantics",
@@ -458,7 +544,7 @@
       "selected_families": [],
       "rationale": "Pin the separate source artifacts and regenerate the identified RuleIR or support evidence.",
       "source_obligation": "Review Chaos Daemons Faction Pack pp. 82-83 and the separately pinned Death Guard Datasheets_abilities row 000004115:5 with its unchanged-predecessor disposition.",
-      "unchanged_work": "Use the existing phase-end scheduler and model-scoped healing mutation. Candidate discovery visits only loaded source sheets and creates no effect for a full-health or destroyed model. Movement, attacks and replay algorithms retain their work."
+      "unchanged_work": "The added work is limited to source registration, phase-end discovery and any model-scoped healing. The conditional guard snapshot cost is recorded on the phase-end runtime and registry assessment rows."
     },
     "data/source_audits/ci64_provenance_v1/grotesque-regeneration-transition-v1.json": {
       "category": "rule_semantics",
@@ -468,7 +554,7 @@
       "selected_families": [],
       "rationale": "Retain test selection and prove the two source bindings on the native lifecycle.",
       "source_obligation": "Review Chaos Daemons Faction Pack pp. 82-83 and the separately pinned Death Guard Datasheets_abilities row 000004115:5 with its unchanged-predecessor disposition.",
-      "unchanged_work": "Use the existing phase-end scheduler and model-scoped healing mutation. Candidate discovery visits only loaded source sheets and creates no effect for a full-health or destroyed model. Movement, attacks and replay algorithms retain their work."
+      "unchanged_work": "The added work is limited to source registration, phase-end discovery and any model-scoped healing. The conditional guard snapshot cost is recorded on the phase-end runtime and registry assessment rows."
     },
     "docs/ABILITY_SUPPORT_MATRIX_V2.md": {
       "category": "governance",
@@ -524,7 +610,7 @@
       "selected_families": [],
       "rationale": "Retain test selection and prove the two source bindings on the native lifecycle.",
       "source_obligation": "Review Chaos Daemons Faction Pack pp. 82-83 and the separately pinned Death Guard Datasheets_abilities row 000004115:5 with its unchanged-predecessor disposition.",
-      "unchanged_work": "Use the existing phase-end scheduler and model-scoped healing mutation. Candidate discovery visits only loaded source sheets and creates no effect for a full-health or destroyed model. Movement, attacks and replay algorithms retain their work."
+      "unchanged_work": "The added work is limited to source registration, phase-end discovery and any model-scoped healing. The conditional guard snapshot cost is recorded on the phase-end runtime and registry assessment rows."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
@@ -535,7 +621,7 @@
       "selected_families": [],
       "rationale": "Pin the separate source artifacts and regenerate the identified RuleIR or support evidence.",
       "source_obligation": "Review Chaos Daemons Faction Pack pp. 82-83 and the separately pinned Death Guard Datasheets_abilities row 000004115:5 with its unchanged-predecessor disposition.",
-      "unchanged_work": "Use the existing phase-end scheduler and model-scoped healing mutation. Candidate discovery visits only loaded source sheets and creates no effect for a full-health or destroyed model. Movement, attacks and replay algorithms retain their work."
+      "unchanged_work": "The added work is limited to source registration, phase-end discovery and any model-scoped healing. The conditional guard snapshot cost is recorded on the phase-end runtime and registry assessment rows."
     },
     "src/warhammer40k_core/engine/catalog_datasheet_rule_extensions.py": {
       "category": "rule_semantics",
@@ -545,7 +631,7 @@
       "selected_families": [],
       "rationale": "Resolve the exact damaged-living-model rule through the existing phase boundary.",
       "source_obligation": "Review Chaos Daemons Faction Pack pp. 82-83 and the separately pinned Death Guard Datasheets_abilities row 000004115:5 with its unchanged-predecessor disposition.",
-      "unchanged_work": "Use the existing phase-end scheduler and model-scoped healing mutation. Candidate discovery visits only loaded source sheets and creates no effect for a full-health or destroyed model. Movement, attacks and replay algorithms retain their work."
+      "unchanged_work": "The added work is limited to source registration, phase-end discovery and any model-scoped healing. The conditional guard snapshot cost is recorded on the phase-end runtime and registry assessment rows."
     },
     "src/warhammer40k_core/engine/catalog_datasheet_rule_support.py": {
       "category": "rule_semantics",
@@ -555,7 +641,7 @@
       "selected_families": [],
       "rationale": "Resolve the exact damaged-living-model rule through the existing phase boundary.",
       "source_obligation": "Review Chaos Daemons Faction Pack pp. 82-83 and the separately pinned Death Guard Datasheets_abilities row 000004115:5 with its unchanged-predecessor disposition.",
-      "unchanged_work": "Use the existing phase-end scheduler and model-scoped healing mutation. Candidate discovery visits only loaded source sheets and creates no effect for a full-health or destroyed model. Movement, attacks and replay algorithms retain their work."
+      "unchanged_work": "The added work is limited to source registration, phase-end discovery and any model-scoped healing. The conditional guard snapshot cost is recorded on the phase-end runtime and registry assessment rows."
     },
     "src/warhammer40k_core/engine/catalog_phase_end_healing.py": {
       "category": "rule_semantics",
@@ -565,7 +651,7 @@
       "selected_families": [],
       "rationale": "Resolve the exact damaged-living-model rule through the existing phase boundary.",
       "source_obligation": "Review Chaos Daemons Faction Pack pp. 82-83 and the separately pinned Death Guard Datasheets_abilities row 000004115:5 with its unchanged-predecessor disposition.",
-      "unchanged_work": "Use the existing phase-end scheduler and model-scoped healing mutation. Candidate discovery visits only loaded source sheets and creates no effect for a full-health or destroyed model. Movement, attacks and replay algorithms retain their work."
+      "unchanged_work": "Games with neither source selected register no phase-end healing binding. With a source selected, discovery scans its owning army units for the bound datasheet and checks those models' wounds. Healthy sources yield zero candidates but add one full snapshot of runtime state and history for the shared read-only guard. On a three-model healthy Shooting checkpoint, independent review measured six versus seven snapshots and +0.45 ms median over 13 alternating pairs. A registry-only repeat on a three-model healthy checkpoint measured three versus four snapshots and +0.388 ms median paired delta over 13 pairs, with zero candidates in both routes. These results apply to the measured discovery calls. The existing model-scoped healing path handles damaged sources."
     },
     "src/warhammer40k_core/engine/faction_content/phase_end_hook_registries.py": {
       "category": "rule_semantics",
@@ -575,7 +661,7 @@
       "selected_families": [],
       "rationale": "Resolve the exact damaged-living-model rule through the existing phase boundary.",
       "source_obligation": "Review Chaos Daemons Faction Pack pp. 82-83 and the separately pinned Death Guard Datasheets_abilities row 000004115:5 with its unchanged-predecessor disposition.",
-      "unchanged_work": "Use the existing phase-end scheduler and model-scoped healing mutation. Candidate discovery visits only loaded source sheets and creates no effect for a full-health or destroyed model. Movement, attacks and replay algorithms retain their work."
+      "unchanged_work": "Games with neither source selected register no phase-end healing binding. With a source selected, discovery scans its owning army units for the bound datasheet and checks those models' wounds. Healthy sources yield zero candidates but add one full snapshot of runtime state and history for the shared read-only guard. On a three-model healthy Shooting checkpoint, independent review measured six versus seven snapshots and +0.45 ms median over 13 alternating pairs. A registry-only repeat on a three-model healthy checkpoint measured three versus four snapshots and +0.388 ms median paired delta over 13 pairs, with zero candidates in both routes. These results apply to the measured discovery calls. The existing model-scoped healing path handles damaged sources."
     },
     "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_pack_rule_ir/__init__.py": {
       "category": "rule_semantics",
@@ -585,7 +671,7 @@
       "selected_families": [],
       "rationale": "Pin the separate source artifacts and regenerate the identified RuleIR or support evidence.",
       "source_obligation": "Review Chaos Daemons Faction Pack pp. 82-83 and the separately pinned Death Guard Datasheets_abilities row 000004115:5 with its unchanged-predecessor disposition.",
-      "unchanged_work": "Use the existing phase-end scheduler and model-scoped healing mutation. Candidate discovery visits only loaded source sheets and creates no effect for a full-health or destroyed model. Movement, attacks and replay algorithms retain their work."
+      "unchanged_work": "The added work is limited to source registration, phase-end discovery and any model-scoped healing. The conditional guard snapshot cost is recorded on the phase-end runtime and registry assessment rows."
     },
     "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_pack_rule_ir/_artifacts.py": {
       "category": "rule_semantics",
@@ -595,7 +681,7 @@
       "selected_families": [],
       "rationale": "Pin the separate source artifacts and regenerate the identified RuleIR or support evidence.",
       "source_obligation": "Review Chaos Daemons Faction Pack pp. 82-83 and the separately pinned Death Guard Datasheets_abilities row 000004115:5 with its unchanged-predecessor disposition.",
-      "unchanged_work": "Use the existing phase-end scheduler and model-scoped healing mutation. Candidate discovery visits only loaded source sheets and creates no effect for a full-health or destroyed model. Movement, attacks and replay algorithms retain their work."
+      "unchanged_work": "The added work is limited to source registration, phase-end discovery and any model-scoped healing. The conditional guard snapshot cost is recorded on the phase-end runtime and registry assessment rows."
     },
     "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_pack_rule_ir/artifacts/package.json": {
       "category": "rule_semantics",
@@ -605,7 +691,7 @@
       "selected_families": [],
       "rationale": "Pin the separate source artifacts and regenerate the identified RuleIR or support evidence.",
       "source_obligation": "Review Chaos Daemons Faction Pack pp. 82-83 and the separately pinned Death Guard Datasheets_abilities row 000004115:5 with its unchanged-predecessor disposition.",
-      "unchanged_work": "Use the existing phase-end scheduler and model-scoped healing mutation. Candidate discovery visits only loaded source sheets and creates no effect for a full-health or destroyed model. Movement, attacks and replay algorithms retain their work."
+      "unchanged_work": "The added work is limited to source registration, phase-end discovery and any model-scoped healing. The conditional guard snapshot cost is recorded on the phase-end runtime and registry assessment rows."
     },
     "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_pack_rule_ir/artifacts/shards/chaos-daemons.json": {
       "category": "rule_semantics",
@@ -615,7 +701,7 @@
       "selected_families": [],
       "rationale": "Pin the separate source artifacts and regenerate the identified RuleIR or support evidence.",
       "source_obligation": "Review Chaos Daemons Faction Pack pp. 82-83 and the separately pinned Death Guard Datasheets_abilities row 000004115:5 with its unchanged-predecessor disposition.",
-      "unchanged_work": "Use the existing phase-end scheduler and model-scoped healing mutation. Candidate discovery visits only loaded source sheets and creates no effect for a full-health or destroyed model. Movement, attacks and replay algorithms retain their work."
+      "unchanged_work": "The added work is limited to source registration, phase-end discovery and any model-scoped healing. The conditional guard snapshot cost is recorded on the phase-end runtime and registry assessment rows."
     },
     "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_pack_rule_ir/artifacts/shards/death-guard.json": {
       "category": "rule_semantics",
@@ -625,7 +711,38 @@
       "selected_families": [],
       "rationale": "Pin the separate source artifacts and regenerate the identified RuleIR or support evidence.",
       "source_obligation": "Review Chaos Daemons Faction Pack pp. 82-83 and the separately pinned Death Guard Datasheets_abilities row 000004115:5 with its unchanged-predecessor disposition.",
-      "unchanged_work": "Use the existing phase-end scheduler and model-scoped healing mutation. Candidate discovery visits only loaded source sheets and creates no effect for a full-health or destroyed model. Movement, attacks and replay algorithms retain their work."
+      "unchanged_work": "The added work is limited to source registration, phase-end discovery and any model-scoped healing. The conditional guard snapshot cost is recorded on the phase-end runtime and registry assessment rows."
+    },
+    "tests/code_quality/test_engine_numerical_identity_admission.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "engine-numerical-identity-admission",
+        "round4-battle-shock-event-wounds",
+        "round4-malice-bearer-liveness"
+      ],
+      "selected_families": [],
+      "rationale": "Verify that the exact runtime successor extends the retained phase-test admission chain.",
+      "source_obligation": "Review Chaos Daemons Faction Pack pp. 82-83 and the separately pinned Death Guard Datasheets_abilities row 000004115:5 with its unchanged-predecessor disposition.",
+      "unchanged_work": "These assertions exercise generated source and test admission in the quality suite."
+    },
+    "tests/code_quality/test_generated_faction_docs.py": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Check that the Beasts row appears in the correct summary column and retains the detailed geometry limit.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "tests/code_quality/test_ws12_generated_data_artifacts.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "phase-end-healing-quality-controls",
+        "supported-vyper-source-regression-controls"
+      ],
+      "selected_families": [],
+      "rationale": "Check the independent Death Guard shard inventory, provenance, and rollback and stale-output controls.",
+      "source_obligation": "Review Chaos Daemons Faction Pack pp. 82-83 and the separately pinned Death Guard Datasheets_abilities row 000004115:5 with its unchanged-predecessor disposition.",
+      "unchanged_work": "These assertions exercise generated source and test admission in the quality suite."
     },
     "tests/rules/section02/test_02_02_04_healing.py": {
       "category": "rule_semantics",
@@ -636,17 +753,17 @@
       "selected_families": [],
       "rationale": "Retain test selection and prove the two source bindings on the native lifecycle.",
       "source_obligation": "Review Chaos Daemons Faction Pack pp. 82-83 and the separately pinned Death Guard Datasheets_abilities row 000004115:5 with its unchanged-predecessor disposition.",
-      "unchanged_work": "Use the existing phase-end scheduler and model-scoped healing mutation. Candidate discovery visits only loaded source sheets and creates no effect for a full-health or destroyed model. Movement, attacks and replay algorithms retain their work."
+      "unchanged_work": "The added work is limited to source registration, phase-end discovery and any model-scoped healing. The conditional guard snapshot cost is recorded on the phase-end runtime and registry assessment rows."
     },
     "tools/generate_ability_support_matrix.py": {
       "category": "rule_semantics",
       "operations": [
-        "phase-end-healing-source-and-report"
+        "phase-end-healing-guide-summary"
       ],
       "selected_families": [],
       "rationale": "Pin the separate source artifacts and regenerate the identified RuleIR or support evidence.",
       "source_obligation": "Review Chaos Daemons Faction Pack pp. 82-83 and the separately pinned Death Guard Datasheets_abilities row 000004115:5 with its unchanged-predecessor disposition.",
-      "unchanged_work": "Use the existing phase-end scheduler and model-scoped healing mutation. Candidate discovery visits only loaded source sheets and creates no effect for a full-health or destroyed model. Movement, attacks and replay algorithms retain their work."
+      "unchanged_work": "The added work is limited to source registration, phase-end discovery and any model-scoped healing. The conditional guard snapshot cost is recorded on the phase-end runtime and registry assessment rows."
     },
     "tools/generate_beasts_of_nurgle_rule_ir.py": {
       "category": "rule_semantics",
@@ -656,7 +773,7 @@
       "selected_families": [],
       "rationale": "Pin the separate source artifacts and regenerate the identified RuleIR or support evidence.",
       "source_obligation": "Review Chaos Daemons Faction Pack pp. 82-83 and the separately pinned Death Guard Datasheets_abilities row 000004115:5 with its unchanged-predecessor disposition.",
-      "unchanged_work": "Use the existing phase-end scheduler and model-scoped healing mutation. Candidate discovery visits only loaded source sheets and creates no effect for a full-health or destroyed model. Movement, attacks and replay algorithms retain their work."
+      "unchanged_work": "The added work is limited to source registration, phase-end discovery and any model-scoped healing. The conditional guard snapshot cost is recorded on the phase-end runtime and registry assessment rows."
     },
     "tools/generate_faction_rule_ir_bundles.py": {
       "category": "rule_semantics",
@@ -666,7 +783,7 @@
       "selected_families": [],
       "rationale": "Pin the separate source artifacts and regenerate the identified RuleIR or support evidence.",
       "source_obligation": "Review Chaos Daemons Faction Pack pp. 82-83 and the separately pinned Death Guard Datasheets_abilities row 000004115:5 with its unchanged-predecessor disposition.",
-      "unchanged_work": "Use the existing phase-end scheduler and model-scoped healing mutation. Candidate discovery visits only loaded source sheets and creates no effect for a full-health or destroyed model. Movement, attacks and replay algorithms retain their work."
+      "unchanged_work": "The added work is limited to source registration, phase-end discovery and any model-scoped healing. The conditional guard snapshot cost is recorded on the phase-end runtime and registry assessment rows."
     }
   },
   "milestone": "ordinary",

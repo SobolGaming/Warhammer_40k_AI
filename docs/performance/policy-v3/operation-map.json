@@ -37106,14 +37106,12 @@
         "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_pack_rule_ir/artifacts/package.json",
         "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_pack_rule_ir/artifacts/shards/chaos-daemons.json",
         "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_pack_rule_ir/artifacts/shards/death-guard.json",
-        "tools/generate_ability_support_matrix.py",
         "tools/generate_beasts_of_nurgle_rule_ir.py",
         "tools/generate_faction_rule_ir_bundles.py"
       ],
       "owners": [
         "@document",
         "@module",
-        "_chaos_daemons_nurgle_review_rows",
         "_package",
         "_parameters",
         "_span",
@@ -37123,6 +37121,32 @@
       "families": [],
       "sensitive": false,
       "mandatory": true
+    },
+    "phase-end-healing-guide-summary": {
+      "paths": [
+        "tools/generate_ability_support_matrix.py"
+      ],
+      "owners": [
+        "_chaos_daemons_nurgle_review_rows"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "phase-end-healing-quality-controls": {
+      "paths": [
+        "tests/code_quality/test_ws12_generated_data_artifacts.py"
+      ],
+      "owners": [
+        "_redirect_rule_ir_generator_outputs",
+        "test_datasheet_rule_ir_shards_record_source_backed_faction_identity",
+        "test_datasheet_rule_ir_uses_one_stable_physical_sharded_package",
+        "test_source_specific_check_rejects_stale_sibling_shard",
+        "test_source_specific_checks_preserve_real_loader_compatibility"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
     },
     "phase-end-healing-test-admission": {
       "paths": [

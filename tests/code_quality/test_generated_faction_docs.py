@@ -81,6 +81,18 @@ def test_chaos_daemons_document_scopes_checked_in_roster_evidence() -> None:
     assert "Cavalcade of Chaos and Shadow Legion runtime bundles" in document
     assert "does not claim `FULL_GAME_SUPPORTED` or `REPLAY_VERIFIED`" in document
 
+    summary = document.split("### Unit Datasheets\n", 1)[1].split("\n### ", 1)[0]
+    nurgle = next(line for line in summary.splitlines() if line.startswith("| Nurgle |"))
+    (_, _, all_consumed, *_) = nurgle.split("|")
+    assert "Beasts of Nurgle (`000001134`)" in all_consumed
+    detailed_row = next(
+        line
+        for line in document.splitlines()
+        if line.startswith("| Beasts of Nurgle (`000001134`)")
+    )
+    assert "Grotesque Regeneration restores" in detailed_row
+    assert "Representative height remains unreviewed" in detailed_row
+
 
 @cache
 def _generated_faction_documents() -> dict[str, str]:

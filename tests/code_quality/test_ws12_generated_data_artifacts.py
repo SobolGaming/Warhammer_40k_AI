@@ -58,10 +58,20 @@ _FORBIDDEN_ENGINE_IMPORTS = {
     "importlib.resources",
     "warhammer40k_core.rules.source_packages.artifact_loader",
 }
+_EXPECTED_RULE_IR_SHARDS = (
+    "aeldari",
+    "chaos-daemons",
+    "chaos-space-marines",
+    "death-guard",
+    "emperors-children",
+    "thousand-sons",
+    "world-eaters",
+)
 _CANONICAL_FACTION_ID_BY_SOURCE_ID = {
     "AE": "aeldari",
     "CD": "chaos-daemons",
     "CSM": "chaos-space-marines",
+    "DG": "death-guard",
     "EC": "emperors-children",
     "TS": "thousand-sons",
     "WE": "world-eaters",
@@ -504,14 +514,7 @@ def test_datasheet_rule_ir_uses_one_stable_physical_sharded_package() -> None:
 
     assert python_modules == ("__init__.py", "_artifacts.py")
     assert (FACTION_PACK_RULE_IR_PACKAGE / "artifacts" / "package.json").is_file()
-    assert shard_artifacts == (
-        "aeldari.json",
-        "chaos-daemons.json",
-        "chaos-space-marines.json",
-        "emperors-children.json",
-        "thousand-sons.json",
-        "world-eaters.json",
-    )
+    assert shard_artifacts == tuple(f"{shard_id}.json" for shard_id in _EXPECTED_RULE_IR_SHARDS)
 
 
 def test_datasheet_rule_ir_shards_record_source_backed_faction_identity() -> None:
@@ -528,14 +531,7 @@ def test_datasheet_rule_ir_shards_record_source_backed_faction_identity() -> Non
     )
 
     assert "faction_artifacts" not in manifest
-    assert tuple(sorted(manifest["shard_artifacts"])) == (
-        "aeldari",
-        "chaos-daemons",
-        "chaos-space-marines",
-        "emperors-children",
-        "thousand-sons",
-        "world-eaters",
-    )
+    assert tuple(sorted(manifest["shard_artifacts"])) == _EXPECTED_RULE_IR_SHARDS
     for shard_id, reference in manifest["shard_artifacts"].items():
         assert reference["path"] == f"shards/{shard_id}.json"
         shard = json.loads(
@@ -574,6 +570,31 @@ def test_datasheet_rule_ir_shards_record_source_backed_faction_identity() -> Non
         == hashlib.sha256(source_raw).hexdigest()
     )
     assert chaos_component["datasheet_source_artifact_hash"] == source_payload["artifact_hash"]
+
+    death_guard_reference = manifest["shard_artifacts"]["death-guard"]
+    assert death_guard_reference["datasheet_ids"] == ["000004115"]
+    assert death_guard_reference["source_row_ids"] == ["000004115:5"]
+    death_guard = json.loads(
+        (FACTION_PACK_RULE_IR_PACKAGE / "artifacts" / "shards" / "death-guard.json").read_bytes()
+    )
+    (death_guard_component,) = death_guard["source_packages"].values()
+    assert death_guard_component["source_snapshot_filename"] == "Datasheets_abilities.json"
+    assert (
+        death_guard_component["source_snapshot_sha256"]
+        == hashlib.sha256(ability_source_raw).hexdigest()
+    )
+    assert death_guard_component["source_artifact_hash"] == ability_source_payload["artifact_hash"]
+    assert death_guard_component["review_row_id"] == "source:000004115"
+    assert death_guard_component["review_treatment"] == "unchanged_predecessor"
+    (predecessor_ability,) = (
+        row["fields"]["description"]
+        for row in ability_source_payload["rows"]
+        if row["source_row_id"] == "000004115:5"
+    )
+    assert (
+        death_guard_component["records"]["000004115:5"]["rule_ir"]["normalized_text"]
+        == predecessor_ability
+    )
 
 
 def test_datasheet_faction_identity_resolution_is_typed_and_fail_closed(
@@ -879,11 +900,15 @@ def test_source_specific_check_rejects_stale_sibling_shard(
         requested_shard_ids=("aeldari",),
         check=False,
     )
-    stale_sibling_path = output_paths["emperors-children"]
-    stale_sibling_path.write_bytes(stale_sibling_path.read_bytes() + b"\n")
+    for sibling in ("death-guard", "emperors-children"):
+        stale_sibling_path = output_paths[sibling]
+        original_bytes = stale_sibling_path.read_bytes()
+        stale_sibling_path.write_bytes(original_bytes + b"\n")
 
-    with pytest.raises(SystemExit, match=r"emperors-children\.json"):
-        faction_rule_ir_generator.main(("--check", "--shard", "aeldari"))
+        with pytest.raises(SystemExit, match=rf"{sibling}\.json"):
+            faction_rule_ir_generator.main(("--check", "--shard", "aeldari"))
+
+        stale_sibling_path.write_bytes(original_bytes)
 
 
 def test_source_specific_rule_ir_builders_share_complete_package_delegate() -> None:
@@ -949,17 +974,7 @@ def test_source_specific_rule_ir_builders_share_complete_package_delegate() -> N
     assert violations == []
 
 
-@pytest.mark.parametrize(
-    "shard_id",
-    [
-        "aeldari",
-        "chaos-daemons",
-        "chaos-space-marines",
-        "emperors-children",
-        "thousand-sons",
-        "world-eaters",
-    ],
-)
+@pytest.mark.parametrize("shard_id", _EXPECTED_RULE_IR_SHARDS)
 def test_source_specific_checks_preserve_real_loader_compatibility(shard_id: str) -> None:
     generate_registered_rule_ir_shard(shard_id=shard_id, check=True)
     completed = subprocess.run(
@@ -969,9 +984,7 @@ def test_source_specific_checks_preserve_real_loader_compatibility(shard_id: str
             (
                 "from warhammer40k_core.rules.source_packages.warhammer_40000_11th "
                 "import faction_pack_rule_ir as registry; "
-                "assert registry.supported_shard_ids() == "
-                "('aeldari', 'chaos-daemons', 'chaos-space-marines', "
-                "'emperors-children', 'thousand-sons', 'world-eaters')"
+                f"assert registry.supported_shard_ids() == {_EXPECTED_RULE_IR_SHARDS!r}"
             ),
         ),
         cwd=ROOT,
@@ -1062,15 +1075,7 @@ def _redirect_rule_ir_generator_outputs(
 ) -> dict[str, Path]:
     shard_directory = tmp_path / "artifacts" / "shards"
     output_paths = {
-        shard_id: shard_directory / f"{shard_id}.json"
-        for shard_id in (
-            "aeldari",
-            "chaos-daemons",
-            "chaos-space-marines",
-            "emperors-children",
-            "thousand-sons",
-            "world-eaters",
-        )
+        shard_id: shard_directory / f"{shard_id}.json" for shard_id in _EXPECTED_RULE_IR_SHARDS
     }
     monkeypatch.setattr(
         faction_rule_ir_generator,
