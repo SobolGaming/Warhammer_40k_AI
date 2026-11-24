@@ -1024,6 +1024,9 @@
     "tests/infrastructure/adapters/test_opposing_shooter_scenario.py::test_normal_shooting_rejects_one_over_each_candidate_limit[rows]": 0.288,
     "tests/infrastructure/adapters/test_opposing_shooter_scenario.py::test_normal_shooting_rejects_one_over_each_candidate_limit[targets]": 0.183,
     "tests/infrastructure/adapters/test_opposing_shooter_scenario.py::test_opposing_qualification_rejects_unreached_and_wrong_configuration": 0.455,
+    "tests/infrastructure/adapters/test_ordinary_melee_profile_policy.py::test_great_axe_actor_offer_selects_applied_wounds_and_replays[bloodthirster]": 5.765,
+    "tests/infrastructure/adapters/test_ordinary_melee_profile_policy.py::test_great_axe_actor_offer_selects_applied_wounds_and_replays[seekers]": 31.303,
+    "tests/infrastructure/adapters/test_ordinary_melee_profile_policy.py::test_wounded_seeker_first_changes_applied_wound_expectation": 0.001,
     "tests/infrastructure/adapters/test_preserve_scenario.py::test_preserve_prefix_has_exact_routes_candidates_and_scoped_tactical_gaps": 24.476,
     "tests/infrastructure/adapters/test_preserve_scenario.py::test_preserve_prefix_persists_replays_and_rejects_changed_closed_evidence": 199.166,
     "tests/infrastructure/adapters/test_preserve_scenario.py::test_preserve_prefix_rejects_other_config_incomplete_and_extra_ordinary_choices": 14.767,
@@ -6714,18 +6717,18 @@
   },
   "execution_model": {
     "assignment_wall_lower_bound_seconds": {
-      "1": 572.337,
-      "10": 572.337,
-      "11": 572.337,
-      "12": 572.337,
+      "1": 573.264,
+      "10": 573.264,
+      "11": 573.264,
+      "12": 573.264,
       "2": 795.547,
       "3": 609.537,
-      "4": 572.337,
-      "5": 572.337,
-      "6": 572.337,
-      "7": 572.337,
-      "8": 572.338,
-      "9": 572.337
+      "4": 573.264,
+      "5": 573.264,
+      "6": 573.264,
+      "7": 573.264,
+      "8": 573.265,
+      "9": 573.264
     },
     "cold_shard_assignment": "minimum-unrounded-modeled-test-load-existing-bucket-v1",
     "cold_shard_id": 1,
@@ -6734,18 +6737,18 @@
       "tests/factions/chaos_daemons/integration/test_cavalcade_v995_roster.py::test_exact_mirror_deploys_all_78_models_and_replays_to_battle"
     ],
     "shard_worker_seconds": {
-      "1": 2289.348,
-      "10": 2289.349,
-      "11": 2289.349,
-      "12": 2289.349,
+      "1": 2293.054,
+      "10": 2293.054,
+      "11": 2293.056,
+      "12": 2293.057,
       "2": 3182.186,
       "3": 2438.146,
-      "4": 2289.349,
-      "5": 2289.35,
-      "6": 2289.349,
-      "7": 2289.349,
-      "8": 2289.351,
-      "9": 2289.349
+      "4": 2293.058,
+      "5": 2293.058,
+      "6": 2293.057,
+      "7": 2293.054,
+      "8": 2293.059,
+      "9": 2293.054
     }
   },
   "files": {
@@ -6817,6 +6820,7 @@
     "tests/infrastructure/adapters/test_matched_attack_scenario.py": 1890.765,
     "tests/infrastructure/adapters/test_normal_move_scenario.py": 466.004,
     "tests/infrastructure/adapters/test_opposing_shooter_scenario.py": 296.773,
+    "tests/infrastructure/adapters/test_ordinary_melee_profile_policy.py": 37.069,
     "tests/infrastructure/adapters/test_preserve_scenario.py": 238.409,
     "tests/infrastructure/adapters/test_rigid_group_ground_charge_policy.py": 11.47,
     "tests/infrastructure/adapters/test_runner_accounting.py": 626.885,
@@ -7300,22 +7304,23 @@
         "6065394017e442925f4256644907ffc7924dcc2b4a699b5065e1dda846989353",
         "63db8ac24763535fbddc46142b0c99e6833b128bc40e674ff95ec735b05e1018",
         "708e2a7cdde4ec8155cc758efc538d7dc0dd4b5c25644c8a1c2d88652d6df8df",
+        "78d036b464521c90592f4c3db25a4b7cda2a6052c6646bd340463718c8657ccb",
         "7cded789191d3e9a531806a0b448b6347da9bd58f9f62af169b77cae998e0753",
         "9a5f617751dd2ef273362bcbec3d532afb594c23b9d7c4576a1ba54a82305422",
         "9dc1b70162325c830e81f4b6e06c9199b793ed7d7805d59287feb2a593be541d",
         "d221fa9414f09deb36d275dca16085e59d0239e19246d38cf138ddd866c65662"
       ],
-      "source": "Retained #736 refresh timing profile and one measured three-inch Charge roundoff regression on WSL; plus five measured Sheathed in Brass cases (serial WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only)",
-      "test_cases": 6711,
-      "test_files": 446
+      "source": "Retained #736 refresh timing profile and one measured three-inch Charge roundoff regression on WSL; plus five measured Sheathed in Brass cases (serial WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); plus three Stage 3 melee profile cases (WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only)",
+      "test_cases": 6714,
+      "test_files": 447
     }
   ],
   "shard_count": 12,
   "shards": [
     {
-      "duration_seconds": 2289.348,
+      "duration_seconds": 2293.054,
       "shard_id": 1,
-      "test_file_count": 50
+      "test_file_count": 43
     },
     {
       "duration_seconds": 3182.186,
@@ -7328,49 +7333,49 @@
       "test_file_count": 1
     },
     {
-      "duration_seconds": 2289.349,
+      "duration_seconds": 1791.824,
       "shard_id": 4,
-      "test_file_count": 43
+      "test_file_count": 49
     },
     {
-      "duration_seconds": 2289.35,
+      "duration_seconds": 2293.058,
       "shard_id": 5,
       "test_file_count": 49
     },
     {
-      "duration_seconds": 2289.349,
+      "duration_seconds": 2293.057,
       "shard_id": 6,
-      "test_file_count": 49
+      "test_file_count": 48
     },
     {
-      "duration_seconds": 2289.349,
+      "duration_seconds": 2293.054,
       "shard_id": 7,
-      "test_file_count": 51
+      "test_file_count": 53
     },
     {
-      "duration_seconds": 1788.117,
+      "duration_seconds": 2293.059,
       "shard_id": 8,
       "test_file_count": 49
     },
     {
-      "duration_seconds": 2289.349,
+      "duration_seconds": 2293.054,
       "shard_id": 9,
-      "test_file_count": 51
+      "test_file_count": 52
     },
     {
-      "duration_seconds": 2289.349,
+      "duration_seconds": 2293.054,
       "shard_id": 10,
-      "test_file_count": 51
+      "test_file_count": 53
     },
     {
-      "duration_seconds": 2289.349,
+      "duration_seconds": 2293.056,
       "shard_id": 11,
-      "test_file_count": 92
+      "test_file_count": 91
     },
     {
-      "duration_seconds": 2289.349,
+      "duration_seconds": 2293.057,
       "shard_id": 12,
-      "test_file_count": 50
+      "test_file_count": 49
     }
   ],
   "step5g_partitions": {
@@ -7378,5 +7383,5 @@
     "sha256": "b241b31651a8d5d903a2b851583186c276a5ac32fed26de1a1c69b4aa278b711"
   },
   "strategy": "largest-processing-time-by-derived-selector-weight",
-  "total_test_duration_seconds": 28012.59
+  "total_test_duration_seconds": 28049.659
 }

@@ -3087,3 +3087,54 @@ this fixture establish native roster admission and the staged setup boundary.
 Bloodletters' 7+ armour and 5+ invulnerable save have a separate component
 allocation regression from PR #618. Combat in this mixed matchup has yet to be
 exercised.
+
+## Opt-in ordinary melee profile choice
+
+`ordinary_melee_profile_registration` compares only profiles issued for one
+physical melee weapon on an admitted `submit_melee_declaration`. The activation
+has one attacking model and a single legal target rules unit. The policy reads
+the target's visible Toughness, Save, invulnerable save and remaining model
+wounds from the actor's projection, along with each offered target-specific
+weapon profile. Registration pins the actor observation hash and the weapon
+selection's viewer-issued source reference. That nested reference has its own
+request namespace. The declaration carries the outer offer's source references
+through the ordinary viewer submission contract.
+
+This is a fixed-A declaration route. Activations that commit a profile earlier
+through `select_melee_weapon` are outside scope. Offers with multiple target
+units, Extra Attacks, unresolved weapon choices, target attachments,
+heterogeneous defenses or more than one wounded target model fall outside the
+calculation. Admission must qualify the ordinary hit, wound, save and damage
+path for the exact observation. The current actor projection does not establish
+that qualification for arbitrary fights, including external roll modifiers,
+rerolls and Feel No Pain. A missing or different admission fails explicitly.
+
+The calculator assigns damage to the wounded model first when present, caps
+each attack at that model's remaining wounds, and carries no excess to the next
+model. It evaluates the full supported damage distribution and chooses the
+greatest expected applied wounds. Equal values retain native profile order.
+
+The bounded Fight fixtures use the retained Cavalcade catalog's physical Great
+axe of Khorne. Strike (7 attacks, WS 2+, S16, AP −4, D6+2) and sweep (14 attacks,
+WS 2+, S10, AP −2, D2) are distinct profiles of that same equipped weapon.
+The baseline expectations below are analytical.
+
+| Target | Strike | Sweep | Choice |
+| --- | ---: | ---: | --- |
+| Five full-wound Seekers | 6.389217063 | 9.576614232 | Sweep |
+| One full-wound Bloodthirster | 10.036506171 | 3.888885582 | Strike |
+| Seekers with one wounded model | 5.402100438 | 8.576780213 | Sweep |
+
+The native controls use a constructed Fight start with source-backed models and
+equipment. The full-health controls exercise both proposals through the actor's
+ordinary submission path and replay the chosen declaration from its checkpoint.
+The wounded-first row is an analytical control. It is independent of the dice
+rolled during these native submissions. Stage 2 useful-reference status is
+`scoped_gap`.
+
+The retained [official Chaos Daemons Faction Pack](https://assets.warhammer-community.com/eng_22-07_warhammer_40%2C000_faction_pack_chaos_daemons-lycqqrymwe-qogh4b5yly.pdf)
+confirms the profiles and target defenses on PDF pages 16 and 110. The
+[40k.app Bloodthirster entry](https://www.40k.app/factions/chaos-daemons/units/bloodthirster)
+was available through indexed content after direct access returned HTTP 403.
+The [40k.app Seekers entry](https://www.40k.app/879/factions/chaos-daemons/units/seekers)
+was available on an indexed versioned page.

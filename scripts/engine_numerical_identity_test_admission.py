@@ -739,6 +739,43 @@ def _sheathed_in_brass_test_addition(
     )
 
 
+def _stage3_melee_profile_successor(
+    root: Path, *, previous_runtime: str, previous_transition: bytes
+) -> tuple[str, TestSuccessors, bytes] | None:
+    name = "data/source_audits/ci64_provenance_v1/stage3-melee-profile-test-v1.json"
+    path = root / name
+    _selection_no_links(root, path)
+    if not path.exists():
+        return None
+    raw = _checked_bytes(
+        root, name, "ac0d8abf3973d7b80b65eb4647b93f3855916461e47b120c5f558ceca350c53e"
+    )
+    record = json.loads(raw, object_pairs_hook=_selection_object)
+    owner = "tests/infrastructure/adapters/test_ordinary_melee_profile_policy.py"
+    if (
+        record.keys()
+        != {
+            "schema",
+            "base",
+            "retained_transition_sha256",
+            "retained_runtime_fingerprint",
+            "runtime_fingerprint",
+            "policy_sha256",
+            "added_files",
+        }
+        or record["schema"] != "finite-stage3-melee-profile-test-v1"
+        or record["base"] != "c63a300c28fa772f59c75b66d50038e5e6241cd5"
+        or record["retained_transition_sha256"] != hashlib.sha256(previous_transition).hexdigest()
+        or record["retained_runtime_fingerprint"] != previous_runtime
+        or record["added_files"].keys() != {owner}
+    ):
+        raise SystemExit("Stage 3 melee profile test transition differs.")
+    _checked_bytes(
+        root, "src/warhammer40k_core/ai/ordinary_melee_profile_policy.py", record["policy_sha256"]
+    )
+    return record["runtime_fingerprint"], _selection_members(record["added_files"], root), raw
+
+
 def exact_movement_test_transition(
     root: Path, retained_cutover_sha256: str
 ) -> TestTransition | None:
@@ -1338,6 +1375,7 @@ def exact_movement_test_transition(
         runtime = pending_battle_shock[1]
     if regeneration is not None:
         runtime = regeneration[0]
+    stage3_melee = None
     brass = None
     if rigid_charge is not None:
         if ground_charge is None:
@@ -1348,6 +1386,11 @@ def exact_movement_test_transition(
         )
         if brass is not None:
             runtime = brass[0]
+            stage3_melee = _stage3_melee_profile_successor(
+                root, previous_runtime=runtime, previous_transition=brass[3]
+            )
+            if stage3_melee is not None:
+                runtime = stage3_melee[0]
     retained = _identity_test_transition(
         root,
         retained_cutover_sha256,
@@ -1486,6 +1529,12 @@ def exact_movement_test_transition(
         updated.update(brass_updates)
         additions.update(brass_additions)
         raw += b"\0" + brass_raw
+    if stage3_melee is not None:
+        _, tests, stage3_raw = stage3_melee
+        if tests.keys() & (updated.keys() | added.keys() | additions.keys()):
+            raise SystemExit("Stage 3 melee profile tests overlap the predecessor selection.")
+        additions.update(tests)
+        raw += b"\0" + stage3_raw
     return updated, {**added, **additions}, retained_raw + b"\0" + raw
 
 

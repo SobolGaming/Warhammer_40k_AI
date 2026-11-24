@@ -1,0 +1,16 @@
+{
+  "schema": "finite-stage3-melee-profile-test-v1",
+  "base": "c63a300c28fa772f59c75b66d50038e5e6241cd5",
+  "retained_transition_sha256": "eed47b44cae336c88c37fbde89a41f8f7b0224e63945ffd75526170bd0bb6a66",
+  "retained_runtime_fingerprint": "081b7dba5fd5f7e987a1a870dcece79a128507ddb62bd583f6971a3d9d9d7052",
+  "runtime_fingerprint": "b8ee171f7cfee5bb753620217cdff26022c6fb48e801ad6448d2a7f3a4526e4e",
+  "policy_sha256": "d598e079cee6a9bea511945b6b90f4b1bcc44cb8ad4be9d3f81ee1ca28951169",
+  "added_files": {
+    "tests/infrastructure/adapters/test_ordinary_melee_profile_policy.py": {
+      "mode": "100644",
+      "blob_sha1": "f2068eb319717b39bc29d2b2a0c0124d5e59d89a",
+      "sha256": "10fcf6668d5a57ef3ca48be97312a2b2a48f86eb9a6ff686f77f14e85f160de4",
+      "bytes": 11647
+    }
+  }
+}

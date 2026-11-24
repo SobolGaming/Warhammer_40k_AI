@@ -1,8 +1,8 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:081b7dba5fd5f7e987a1a870dcece79a128507ddb62bd583f6971a3d9d9d7052",
-  "fingerprint": "081b7dba5fd5f7e987a1a870dcece79a128507ddb62bd583f6971a3d9d9d7052",
-  "resource_count": 3292,
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:b8ee171f7cfee5bb753620217cdff26022c6fb48e801ad6448d2a7f3a4526e4e",
+  "fingerprint": "b8ee171f7cfee5bb753620217cdff26022c6fb48e801ad6448d2a7f3a4526e4e",
+  "resource_count": 3293,
   "resources": [
     {
       "byte_length": 113,
@@ -333,6 +333,11 @@
       "byte_length": 24909,
       "path": "warhammer40k_core/ai/opposing_shooter_scenario.py",
       "sha256": "e501eaaa4ea2c241273b1c1b3b41a79e55e82e8a4317cc81abaed05e2071f630"
+    },
+    {
+      "byte_length": 13500,
+      "path": "warhammer40k_core/ai/ordinary_melee_profile_policy.py",
+      "sha256": "d598e079cee6a9bea511945b6b90f4b1bcc44cb8ad4be9d3f81ee1ca28951169"
     },
     {
       "byte_length": 16932,
