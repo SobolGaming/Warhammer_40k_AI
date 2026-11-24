@@ -24,6 +24,116 @@
         }
       }
     },
+    "ci/test_shards/durations.json": {
+      "before_sha256": "14ee87ea47b50c099b4561f1f9db57c6703d4ca7593c346486ef7f18a1cdbec8",
+      "after_sha256": "98ce1a57bd82e90e0a72a499d207f9e7286cd5c0f0ec58e2e36db4bf20a8a1ad",
+      "owners": {
+        "@document": {
+          "before": "14ee87ea47b50c099b4561f1f9db57c6703d4ca7593c346486ef7f18a1cdbec8",
+          "after": "98ce1a57bd82e90e0a72a499d207f9e7286cd5c0f0ec58e2e36db4bf20a8a1ad"
+        }
+      }
+    },
+    "ci/test_shards/shard-1.txt": {
+      "before_sha256": "e38c5a5756ab50b357b211834906480ff27d5d889f08f1f308af6a8b2d8e7d7c",
+      "after_sha256": "bce702ee87e3a30a09016faecab69004465442a1490e6e2892c26525b5b055f7",
+      "owners": {
+        "@document": {
+          "before": "e38c5a5756ab50b357b211834906480ff27d5d889f08f1f308af6a8b2d8e7d7c",
+          "after": "bce702ee87e3a30a09016faecab69004465442a1490e6e2892c26525b5b055f7"
+        }
+      }
+    },
+    "ci/test_shards/shard-10.txt": {
+      "before_sha256": "ba63517795f8700e8eba0f2423cd8ca88c2ebb4df786b8da227385dcd783cc1c",
+      "after_sha256": "437b06ef64cadefffcff8e0388bfc5f9372c11027154d2b8582030671ea05a04",
+      "owners": {
+        "@document": {
+          "before": "ba63517795f8700e8eba0f2423cd8ca88c2ebb4df786b8da227385dcd783cc1c",
+          "after": "437b06ef64cadefffcff8e0388bfc5f9372c11027154d2b8582030671ea05a04"
+        }
+      }
+    },
+    "ci/test_shards/shard-11.txt": {
+      "before_sha256": "667c489a278c3ce536dd3d3b93e1de195621402d7093b3f24241a8a8164a049e",
+      "after_sha256": "7817a95906d378a9b1d0fab717b3bca0a39559464a57f6fa57f19e05a7190906",
+      "owners": {
+        "@document": {
+          "before": "667c489a278c3ce536dd3d3b93e1de195621402d7093b3f24241a8a8164a049e",
+          "after": "7817a95906d378a9b1d0fab717b3bca0a39559464a57f6fa57f19e05a7190906"
+        }
+      }
+    },
+    "ci/test_shards/shard-12.txt": {
+      "before_sha256": "a6fd7e7212e7f2b373fd09429e03fb4de57bfb4c4a0193b45f37d686d434c942",
+      "after_sha256": "0ddc4bc7add76538480c76888b2a75b601adfc76c2f137bd6423211c713d39c0",
+      "owners": {
+        "@document": {
+          "before": "a6fd7e7212e7f2b373fd09429e03fb4de57bfb4c4a0193b45f37d686d434c942",
+          "after": "0ddc4bc7add76538480c76888b2a75b601adfc76c2f137bd6423211c713d39c0"
+        }
+      }
+    },
+    "ci/test_shards/shard-4.txt": {
+      "before_sha256": "26dc734e750331e0a34ffdab86bad91072555772750935ee7aceb71c7f7842fb",
+      "after_sha256": "b7833d897a51bb5228484ed7a70a1e10bece1495d11323a556380db34a4fa148",
+      "owners": {
+        "@document": {
+          "before": "26dc734e750331e0a34ffdab86bad91072555772750935ee7aceb71c7f7842fb",
+          "after": "b7833d897a51bb5228484ed7a70a1e10bece1495d11323a556380db34a4fa148"
+        }
+      }
+    },
+    "ci/test_shards/shard-5.txt": {
+      "before_sha256": "9e2d9e9f83326ffa1755b465c648c8a4e06e1288718c24f8d424bdd3ea873784",
+      "after_sha256": "0a1c581863f8005be11d69d3ce2f51de58f27f2a481d8d48f590511955835578",
+      "owners": {
+        "@document": {
+          "before": "9e2d9e9f83326ffa1755b465c648c8a4e06e1288718c24f8d424bdd3ea873784",
+          "after": "0a1c581863f8005be11d69d3ce2f51de58f27f2a481d8d48f590511955835578"
+        }
+      }
+    },
+    "ci/test_shards/shard-6.txt": {
+      "before_sha256": "b89b9cd84441ea4f5b0a024bd460346915fceb8a3917417e8c166f578eeebac1",
+      "after_sha256": "acefff6f4b8d3bda688e2526ac8938011ce95d96644891e7b66cce0a0cc4f82d",
+      "owners": {
+        "@document": {
+          "before": "b89b9cd84441ea4f5b0a024bd460346915fceb8a3917417e8c166f578eeebac1",
+          "after": "acefff6f4b8d3bda688e2526ac8938011ce95d96644891e7b66cce0a0cc4f82d"
+        }
+      }
+    },
+    "ci/test_shards/shard-7.txt": {
+      "before_sha256": "7522136a795a0e543ef227fd36e7b942e7bba5b1e9118da414c234d958ee88ba",
+      "after_sha256": "01bb2deb6d3b243a2a0ecbcaf5b5969f6dbc160cd1ca907ef0221ca30a02bc66",
+      "owners": {
+        "@document": {
+          "before": "7522136a795a0e543ef227fd36e7b942e7bba5b1e9118da414c234d958ee88ba",
+          "after": "01bb2deb6d3b243a2a0ecbcaf5b5969f6dbc160cd1ca907ef0221ca30a02bc66"
+        }
+      }
+    },
+    "ci/test_shards/shard-8.txt": {
+      "before_sha256": "b504045143d0b87e04106f3da0df701b37773005e02c36d9c10bd3f841713514",
+      "after_sha256": "53d26b48eb0f2c55f46bd08758236b34cce34a3d3cc2c8fdd987ba2b9e1364a4",
+      "owners": {
+        "@document": {
+          "before": "b504045143d0b87e04106f3da0df701b37773005e02c36d9c10bd3f841713514",
+          "after": "53d26b48eb0f2c55f46bd08758236b34cce34a3d3cc2c8fdd987ba2b9e1364a4"
+        }
+      }
+    },
+    "ci/test_shards/shard-9.txt": {
+      "before_sha256": "59ff62b7e462550127e17f9953a48c4cb8fcd11890676d662d360fea13f4ebc4",
+      "after_sha256": "465f14716c05afa096d71c87afd37ee40fe0c7b20e99b08cef65c5c6882cbab2",
+      "owners": {
+        "@document": {
+          "before": "59ff62b7e462550127e17f9953a48c4cb8fcd11890676d662d360fea13f4ebc4",
+          "after": "465f14716c05afa096d71c87afd37ee40fe0c7b20e99b08cef65c5c6882cbab2"
+        }
+      }
+    },
     "contracts/examples/persistence/session-persistence.json": {
       "before_sha256": "a530d4d49fb6df3defaa5162c9f3e5ef7e3c08d37e090a237e4e1791fb72b941",
       "after_sha256": "3b859d95c83a93048a6a5eadb1ae5c93195012332f1433cfbffb2f94a2947035",
@@ -322,11 +432,11 @@
     },
     "tests/code_quality/test_engine_numerical_identity_admission.py": {
       "before_sha256": "b6f547e8870b0b1c971306a92dbaa5d338505ce33df8b1810eb2bbcc055cd0b5",
-      "after_sha256": "52a25fe8137a03ee5df006b8ed67e4d341dd4f2000a916bc7a17c6013b3d3bb8",
+      "after_sha256": "b8c99c0d1cdd24350eaa0ab4b190b85fa6c8c0e3a4faf9082dd0a561afd2f962",
       "owners": {
         "test_identity_inventory_uses_current_twelve_shards_and_native_cohort": {
           "before": "5c1e8a6d368682ad8b50a64d609c065d60987d8cf2b2edb3d3b29fbdcd5f151c",
-          "after": "b838d1efc7171f1f5acbee428a417ff6ab08d83c0c95c1e740e27e80f4d9701f"
+          "after": "333e6fb66653c1c6fcee01bcc78a3cdfeead32f08b04450ff3edc559d230b42b"
         }
       }
     },
@@ -453,6 +563,127 @@
       "operations": [],
       "selected_families": [],
       "rationale": "Run the new Death Guard parameter with the existing generated artifact tests.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/durations.json": {
+      "category": "measured_workload",
+      "operations": [
+        "behavior-shard-inventory",
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Adds measured planning weights for the four native Grotesque Regeneration test cases while retaining all 6,699 prior case weights. The serial Python 3.14.5 WSL coverage timings supply dispatch inputs only.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-1.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "behavior-shard-inventory",
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerates the deterministic twelve-shard assignment from the retained profile and the four measured Grotesque Regeneration test weights. The covered test inventory and CI thresholds are checked separately from scheduling estimates.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-10.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "behavior-shard-inventory",
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerates the deterministic twelve-shard assignment from the retained profile and the four measured Grotesque Regeneration test weights. The covered test inventory and CI thresholds are checked separately from scheduling estimates.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-11.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "behavior-shard-inventory",
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerates the deterministic twelve-shard assignment from the retained profile and the four measured Grotesque Regeneration test weights. The covered test inventory and CI thresholds are checked separately from scheduling estimates.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-12.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "behavior-shard-inventory",
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerates the deterministic twelve-shard assignment from the retained profile and the four measured Grotesque Regeneration test weights. The covered test inventory and CI thresholds are checked separately from scheduling estimates.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-4.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "behavior-shard-inventory",
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerates the deterministic twelve-shard assignment from the retained profile and the four measured Grotesque Regeneration test weights. The covered test inventory and CI thresholds are checked separately from scheduling estimates.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-5.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "behavior-shard-inventory",
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerates the deterministic twelve-shard assignment from the retained profile and the four measured Grotesque Regeneration test weights. The covered test inventory and CI thresholds are checked separately from scheduling estimates.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-6.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "behavior-shard-inventory",
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerates the deterministic twelve-shard assignment from the retained profile and the four measured Grotesque Regeneration test weights. The covered test inventory and CI thresholds are checked separately from scheduling estimates.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-7.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "behavior-shard-inventory",
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerates the deterministic twelve-shard assignment from the retained profile and the four measured Grotesque Regeneration test weights. The covered test inventory and CI thresholds are checked separately from scheduling estimates.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-8.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "behavior-shard-inventory",
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerates the deterministic twelve-shard assignment from the retained profile and the four measured Grotesque Regeneration test weights. The covered test inventory and CI thresholds are checked separately from scheduling estimates.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-9.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "behavior-shard-inventory",
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerates the deterministic twelve-shard assignment from the retained profile and the four measured Grotesque Regeneration test weights. The covered test inventory and CI thresholds are checked separately from scheduling estimates.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -721,7 +952,7 @@
         "round4-malice-bearer-liveness"
       ],
       "selected_families": [],
-      "rationale": "Verify that the exact runtime successor extends the retained phase-test admission chain.",
+      "rationale": "Verify that the exact runtime successor extends the retained phase-test admission chain. The exact scheduling inventory independently enumerates the four current phase and faction case IDs.",
       "source_obligation": "Review Chaos Daemons Faction Pack pp. 82-83 and the separately pinned Death Guard Datasheets_abilities row 000004115:5 with its unchanged-predecessor disposition.",
       "unchanged_work": "These assertions exercise generated source and test admission in the quality suite."
     },

@@ -747,6 +747,12 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
             "test_later_daemon_casualty_still_requires_historical_territorial_terror[True-True]",
         )
     }
+    regeneration_cases = {
+        healing_owner
+        + f"::test_grotesque_regeneration_native_phase_end_and_replay[{phase}-{source}]"
+        for phase in ("shooting", "fight")
+        for source in ("chaos-daemons", "death-guard")
+    }
     assert current.keys() == (
         retained
         | added
@@ -778,6 +784,7 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         }
         | allocation_cases
         | round4_cases
+        | regeneration_cases
         | {
             owner + "::" + test + f"[{reroll}]"
             for owner, test in (
