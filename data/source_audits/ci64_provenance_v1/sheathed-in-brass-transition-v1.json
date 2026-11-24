@@ -15,9 +15,9 @@
   "added_files": {
     "tests/factions/chaos_daemons/integration/test_sheathed_in_brass.py": {
       "mode": "100644",
-      "blob_sha1": "16be1f7fa81f80adc202058541f9eb1a3db21e83",
-      "sha256": "3bfc6ed420865949a98c9676decd1e9edf5bbb959f0738b65730c90394e427e2",
-      "bytes": 19400
+      "blob_sha1": "4017ffe5e851802c5bf6ed81425e41dac9085622",
+      "sha256": "391ca1cdeb16a39278dcf7b982e8985e1c721ce137519f92a0a8c7fe5938f3be",
+      "bytes": 19463
     }
   }
 }

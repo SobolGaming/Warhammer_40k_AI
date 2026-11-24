@@ -4,6 +4,16 @@
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:081b7dba5fd5f7e987a1a870dcece79a128507ddb62bd583f6971a3d9d9d7052",
   "operation_map_sha256": "372f176743395b2567ff186ae6b5c6985207a7cb2079e7f32c817f58d7e28d32",
   "changes": {
+    "FACTION_INTEGRATION.md": {
+      "before_sha256": "e6f4bea3922126dc1443915f2d404e80b307159b17c08a1f15c0dda496bbf510",
+      "after_sha256": "376bc20056232b480ef55675574ee79b530dec2878354ed4e823d75b7afbbc2c",
+      "owners": {
+        "@document": {
+          "before": "e6f4bea3922126dc1443915f2d404e80b307159b17c08a1f15c0dda496bbf510",
+          "after": "376bc20056232b480ef55675574ee79b530dec2878354ed4e823d75b7afbbc2c"
+        }
+      }
+    },
     "ci/test_shards/durations.json": {
       "before_sha256": "1c3803c11c20c30840fffa22ecaae47826475d8a9baf7a9706703e7aeec0cbcd",
       "after_sha256": "7534394b2fe30ea17afa0d4ea423c334fcbcf45f32c7cbb5cac0d3c26ac80820",
@@ -216,11 +226,11 @@
     },
     "data/source_audits/ci64_provenance_v1/sheathed-in-brass-transition-v1.json": {
       "before_sha256": null,
-      "after_sha256": "69e27ec9472891dae2012b21c4ce977f48a79fb7398ce1ddfd8721d10a8bfb9c",
+      "after_sha256": "4875f8c50033dab7755745c92d24851abaaf41c70ff3aa19bff61ccbf3ee5a10",
       "owners": {
         "@document": {
           "before": null,
-          "after": "69e27ec9472891dae2012b21c4ce977f48a79fb7398ce1ddfd8721d10a8bfb9c"
+          "after": "4875f8c50033dab7755745c92d24851abaaf41c70ff3aa19bff61ccbf3ee5a10"
         }
       }
     },
@@ -276,11 +286,11 @@
     },
     "scripts/engine_numerical_identity_test_admission.py": {
       "before_sha256": "774cbddb494f3681afcb869acbb5f2e675eb9020786e19b559424b081cf64087",
-      "after_sha256": "73505eaae41eb62377c3c773a0b1d3bff5d61530fdee2a23a20c3589ebdef4d1",
+      "after_sha256": "fcf21f9ee804542440d4fb97141c4d50c485b7f22eabf6c644d8c8bceb4fd6ca",
       "owners": {
         "_sheathed_in_brass_test_addition": {
           "before": null,
-          "after": "e88d79bcc2079608c729d2c8ea6eeb31e58fd40ea6c85c47eb5a014febfa6ca2"
+          "after": "488e6bcc0211d8197b8a4551d9c65279714da883bfd86ea4b3d26f978ae0f875"
         },
         "exact_movement_test_transition": {
           "before": "5707a6cc0332484e50f56f47aba0cbb676333d1176b22734d2ad73668bb3f5bf",
@@ -390,9 +400,33 @@
         }
       }
     },
+    "tests/code_quality/test_engine_numerical_identity_admission.py": {
+      "before_sha256": "cf465609a2cb8ec77ef30a66f987317d6cad2e80529b8b681f6d8d441aadde48",
+      "after_sha256": "3c6a7f26bbbd4bda5e6a47d5f5ff27d5e59667e28f2940d07e7afe8c63835ba0",
+      "owners": {
+        "test_identity_inventory_uses_current_twelve_shards_and_native_cohort": {
+          "before": "e71c959e3f54486cf8eb765a838e8591ae31421acb196316f4a60cc1e854639f",
+          "after": "4756f8a13c2632e430a603b02c986f30ba4a2df70e909080992837c0d61131ef"
+        }
+      }
+    },
+    "tests/code_quality/test_order117_mortal_allocation.py": {
+      "before_sha256": "9bebada6a7b96471568f29c43144114f9a10143a457542766003c7165b682f60",
+      "after_sha256": "abed0a98e88da7b551be98feac4908e67c40f25952fd4471504e915995874a92",
+      "owners": {
+        "@module": {
+          "before": "2c6f033514e0ddea6de56bdb2ab2e494bda340efc28b01fcc6763e5fd0142049",
+          "after": "83cf4487ef21cd2940a1645a5d3733a90206f6aba2ed8423e750b7de68e1c66f"
+        },
+        "test_allocation_trigger_retains_selected_core_and_real_example_authority": {
+          "before": "80391664f84d373c7f5efa064b3592975e6754a5c1b65ef5e08a82926608d0e7",
+          "after": "cae6eaa2fa0e52c5553c4c96684834328fa9eecced9080abcb555d56bff5d85d"
+        }
+      }
+    },
     "tests/factions/chaos_daemons/integration/test_sheathed_in_brass.py": {
       "before_sha256": null,
-      "after_sha256": "3bfc6ed420865949a98c9676decd1e9edf5bbb959f0738b65730c90394e427e2",
+      "after_sha256": "391ca1cdeb16a39278dcf7b982e8985e1c721ce137519f92a0a8c7fe5938f3be",
       "owners": {
         "@module": {
           "before": null,
@@ -408,7 +442,7 @@
         },
         "_brass_options": {
           "before": null,
-          "after": "6e786a7e08efb10355b72f98637505ff9bdda2997e76e4510f3e0ab69fcc2c72"
+          "after": "f382daeda0cd71bfc01d5aa62af4f5befd085159dc0b7fb5ef29b6b22c576ceb"
         },
         "_finish_shooter": {
           "before": null,
@@ -420,7 +454,7 @@
         },
         "_save_payloads": {
           "before": null,
-          "after": "2a8b7c5692081d94f51e7ee434d1524caaadcf152f5bddfd422a008a270a93e8"
+          "after": "771190fa933c651312aa701d1c45671c2bc4a9e9b329d12abffd4c6ff33d220b"
         },
         "_scene": {
           "before": null,
@@ -440,7 +474,7 @@
         },
         "test_sheathed_in_brass_native_gathering_and_save_ignore": {
           "before": null,
-          "after": "da741b7e2d38edcc698334065a8b099f4690008af05d74604a4e38217297a965"
+          "after": "65baf7df51db2c2417430a6f4ab7d3909ac68def620a115e2bcd048e5b12a0df"
         }
       }
     },
@@ -476,6 +510,16 @@
     }
   },
   "rows": {
+    "FACTION_INTEGRATION.md": {
+      "category": "rule_semantics",
+      "operations": [
+        "supported-acts-current-source-documentation"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh the current faction checksums and the Chaos Daemons Stratagem counts from the source packages.",
+      "source_obligation": "Chaos Daemons July Faction Pack page 124. Register the source-backed Sheathed in Brass ability as an executable generic activation.",
+      "unchanged_work": "The existing runtime, source receipts and evidence validators execute with the same operations. The updated checks bind the current generated report and historical predecessor bytes."
+    },
     "ci/test_shards/durations.json": {
       "category": "rule_semantics",
       "operations": [
@@ -823,6 +867,26 @@
       "rationale": "Bind the retained Stratagem to its existing selected-target window and the source-linked armour characteristic operation.",
       "source_obligation": "Chaos Daemons July Faction Pack page 124. Verify the 1 CP opponent Shooting reaction, both target keywords, and the phase-long Save characteristic of 3+.",
       "unchanged_work": "The same timing window, CP ledger, expiry, allocation and save rebuild execute. A live whole-unit armour SET contributes its source-linked operation and only the applicable Save permission."
+    },
+    "tests/code_quality/test_engine_numerical_identity_admission.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "engine-numerical-identity-admission",
+        "round4-malice-bearer-liveness",
+        "round4-battle-shock-event-wounds"
+      ],
+      "selected_families": [],
+      "rationale": "Keep the rigid ground charge fingerprint bound to the exact predecessor and check the appended Sheathed admission against the current runtime.",
+      "source_obligation": "Chaos Daemons July Faction Pack page 124. Register the source-backed Sheathed in Brass ability as an executable generic activation.",
+      "unchanged_work": "The existing runtime, source receipts and evidence validators execute with the same operations. The updated checks bind the current generated report and historical predecessor bytes."
+    },
+    "tests/code_quality/test_order117_mortal_allocation.py": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Verify the original exemplar artifact at its historical revision and compare its source-linked activation row and RuleIR to the current artifact.",
+      "source_obligation": null,
+      "unchanged_work": null
     },
     "tests/factions/chaos_daemons/integration/test_sheathed_in_brass.py": {
       "category": "rule_semantics",

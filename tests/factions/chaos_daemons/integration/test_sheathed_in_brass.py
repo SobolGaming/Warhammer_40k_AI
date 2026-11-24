@@ -175,7 +175,7 @@ def _scene(
 
 
 def _brass_options(request: DecisionRequest) -> dict[str, DecisionOption]:
-    options = {}
+    options: dict[str, DecisionOption] = {}
     for option in request.options:
         if not option.option_id.startswith(f"use-stratagem:{STRATAGEM_ID}:"):
             continue
@@ -220,7 +220,7 @@ def _finish_shooter(session: LocalGameSession) -> None:
 
 
 def _save_payloads(session: LocalGameSession, unit_id: str) -> list[dict[str, JsonValue]]:
-    payloads = []
+    payloads: list[dict[str, JsonValue]] = []
     for record in events(session, "attack_sequence_step"):
         if record["step"] != "save":
             continue
@@ -479,8 +479,10 @@ def test_sheathed_in_brass_native_gathering_and_save_ignore(
             target_has_character=False,
         )
         templates = cast(list[dict[str, JsonValue]], rules["target_model_ignore_source_templates"])
-        assert {template["kind"] for template in templates} == {"save_characteristic"}
-        assert {template["effect_id"] for template in templates} == {permission.effect_id}
+        assert templates
+        for template in templates:
+            assert template["kind"] == "save_characteristic"
+            assert template["effect_id"] == permission.effect_id
         assert unrelated.source_rule_id not in json.dumps(proof["generic_applicable_sources"])
         (modifier,) = cast(list[dict[str, JsonValue]], body(request)["modifiers"])
         operation = cast(dict[str, JsonValue], modifier["operation"])

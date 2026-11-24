@@ -5,6 +5,7 @@ from __future__ import annotations
 import ast
 import hashlib
 import json
+import subprocess
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -21,10 +22,30 @@ def test_allocation_trigger_retains_selected_core_and_real_example_authority() -
         assert row == rows[row["row_id"]]
     example = audit["official_exemplar"]
     assert hashlib.sha256((ROOT / example["path"]).read_bytes()).hexdigest() == example["sha256"]
-    assert (
-        hashlib.sha256((ROOT / example["retained_profile"]).read_bytes()).hexdigest()
-        == (example["retained_profile_sha256"])
+    profile_path = example["retained_profile"]
+    retained_bytes = subprocess.check_output(
+        ["git", "show", f"{audit['base']}:{profile_path}"], cwd=ROOT
     )
+    assert hashlib.sha256(retained_bytes).hexdigest() == example["retained_profile_sha256"]
+
+    retained = json.loads(retained_bytes)
+    current = json.loads((ROOT / profile_path).read_bytes())
+    source_row_id = example["source_row_id"]
+    (retained_profile,) = [
+        row for row in retained["profiles"] if row["source_row_id"] == source_row_id
+    ]
+    (current_profile,) = [
+        row for row in current["profiles"] if row["source_row_id"] == source_row_id
+    ]
+    assert current_profile == retained_profile
+    profile_id = retained_profile["profile_id"]
+    assert (
+        current["rule_ir_by_profile_id"][profile_id]
+        == retained["rule_ir_by_profile_id"][profile_id]
+    )
+    assert current["effect_selection_kind_by_profile_id"].get(profile_id) == retained[
+        "effect_selection_kind_by_profile_id"
+    ].get(profile_id)
 
 
 def test_every_mortal_select_model_owner_uses_the_shared_executable_boundary() -> None:

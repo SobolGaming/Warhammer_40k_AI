@@ -433,7 +433,25 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         == hashlib.sha256((ROOT / healing_owner).read_bytes()).hexdigest()
     )
     assert rigid_charge["retained_runtime_fingerprint"] == regeneration["runtime_fingerprint"]
-    assert _record(MANIFEST)["fingerprint"] == rigid_charge["runtime_fingerprint"]
+    brass = _record("data/source_audits/ci64_provenance_v1/sheathed-in-brass-transition-v1.json")
+    rigid_manifest = json.loads(
+        subprocess.check_output(["git", "show", brass["base"] + ":" + MANIFEST], cwd=ROOT)
+    )
+    assert rigid_manifest["fingerprint"] == rigid_charge["runtime_fingerprint"]
+    assert (
+        brass["retained_transition_sha256"]
+        == hashlib.sha256((ROOT / ground_charge.RIGID_TRANSITION).read_bytes()).hexdigest()
+    )
+    assert brass["retained_runtime_fingerprint"] == rigid_charge["runtime_fingerprint"]
+    assert brass["runtime_fingerprint"] == _record(MANIFEST)["fingerprint"]
+    brass_owner = "tests/factions/chaos_daemons/integration/test_sheathed_in_brass.py"
+    assert set(brass["added_files"]) == {brass_owner}
+    assert brass_owner in active_files
+    assert sum(brass_owner in group for group in groups) == 1
+    assert (
+        brass["added_files"][brass_owner]["sha256"]
+        == hashlib.sha256((ROOT / brass_owner).read_bytes()).hexdigest()
+    )
     pending_before: dict[str, str] = {}
     for name, binding in pending["sources"].items():
         present = subprocess.check_output(["git", "ls-tree", pending_base, "--", name], cwd=ROOT)
@@ -782,6 +800,16 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         for phase in ("shooting", "fight")
         for source in ("chaos-daemons", "death-guard")
     }
+    brass_cases = {
+        brass_owner + "::" + name
+        for name in (
+            "test_sheathed_in_brass_native_accept_later_shooting_expiry_and_replay",
+            "test_sheathed_in_brass_native_decline_or_unaffordable[unaffordable]",
+            "test_sheathed_in_brass_native_decline_or_unaffordable[decline]",
+            "test_sheathed_in_brass_native_gathering_and_save_ignore[fight-only]",
+            "test_sheathed_in_brass_native_gathering_and_save_ignore[sheathed-ignore]",
+        )
+    }
     assert current.keys() == (
         retained
         | added
@@ -814,6 +842,7 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         | allocation_cases
         | round4_cases
         | regeneration_cases
+        | brass_cases
         | {
             owner + "::" + test + f"[{reroll}]"
             for owner, test in (

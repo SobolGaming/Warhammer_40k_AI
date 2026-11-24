@@ -116,7 +116,7 @@ coverage package is:
 - source edition: `11th`
 - schema version: `core-v2-phase17e-faction-coverage-v3`
 - source-payload SHA-256 checksum:
-  `a2fc77e036246b5834df81179fe0c1718dbef4b8ccafc672917ef6fb67b73cf8`
+  `220771613eda23b801801f2e4f47b22ecf2e2c054a5f3c895f43dacfd343ae06`
 
 The package validates all 28 faction-pack PDF manifest records and emits
 coverage rows for every seeded faction and detachment. Faction army rules and
@@ -141,8 +141,9 @@ three Stratagem rows are also generic-supported through semantic RuleIR.
 The Chaos Daemons Shadow Legion, Blood Legion, and Daemonic Incursion
 detachment rules are generic-supported through semantic RuleIR. Shadow Legion
 also adds six generic-supported Stratagem rows, Blood Legion adds the Brazenmaw,
-Fury's Cage, Gateway Unto Damnation, and Slaughterthirst Enhancements, and Daemonic Incursion
-adds six generic-supported Stratagem rows and four generic-supported Enhancements.
+Fury's Cage, Gateway Unto Damnation, and Slaughterthirst Enhancements and the
+Sheathed in Brass Stratagem. Daemonic Incursion adds six generic-supported
+Stratagem rows and four generic-supported Enhancements.
 Aeldari Corsair Coterie and Path of the Outcast add nine generic-supported
 Stratagem rows. Chaos Daemons Warptide adds a generic-supported detachment rule,
 two Enhancements, and three Stratagem rows. Chaos Daemons Lords of the Warp adds
@@ -150,7 +151,7 @@ a generic-supported detachment rule, one Enhancement, and four Stratagem rows,
 and Emperor's Children Mercurial Host adds a generic-supported Quicksilver Grace
 detachment rule. All 29 exact incoming-AP modifier Stratagem rows, including
 the 15 Space Marines Armour of Contempt rows and their cross-faction semantic
-equivalents, add source-backed incoming AP modification, for a total of 133
+equivalents, add source-backed incoming AP modification. Phase 17E has 134
 generic-supported rows;
 exact rows outside generic IR with existing runtime consumers are marked
 implemented. No aggregate faction-pack Enhancement or Stratagem row is used to
@@ -183,13 +184,13 @@ Phase 17E coverage row. The execution package is:
 - source edition: `11th`
 - schema version: `core-v2-phase17f-faction-execution-v3`
 - source-payload SHA-256 checksum:
-  `6555b090a8828ec11c0de75dc2e2d1dc65dadaaaed1e75077337af6fbf67673c`
+  `2d61b7555e6b9ac8946397a0efb1b127d86122a148bffaa88847aa47228057ab`
 - upstream Phase 17E checksum:
-  `a2fc77e036246b5834df81179fe0c1718dbef4b8ccafc672917ef6fb67b73cf8`
+  `220771613eda23b801801f2e4f47b22ecf2e2c054a5f3c895f43dacfd343ae06`
 
 The package emits 2073 execution records, one for every Phase 17E coverage row:
-1889 rows are blocked as `structured_rule_semantics_required`, 28 rows are
-blocked as `approved_phase17e_source_gap`, 133 rows are executable generic IR
+1888 rows are blocked as `structured_rule_semantics_required`, 28 rows are
+blocked as `approved_phase17e_source_gap`, 134 rows are executable generic IR
 rows, and 23 rows are executable named-handler rows because they already have
 runtime consumers.
 The engine dispatcher can route every record and returns typed `unsupported`
@@ -450,15 +451,15 @@ WS14 step 1 is implemented as a deterministic Phase 17I source package artifact:
 - source edition: `11th`
 - schema version: `core-v2-phase17i-blocked-row-classification-v1`
 - source-payload SHA-256 checksum:
-  `04fd32ece69f6935772be3a9eee2d8d21c3edb8b43cef4cb37445bc77e28c5d1`
+  `5fbec2efad6b66405e7c61d5e32d84c3ae188ca6810de928e8dc8526cd97264d`
 - upstream Phase 17F checksum:
-  `6555b090a8828ec11c0de75dc2e2d1dc65dadaaaed1e75077337af6fbf67673c`
+  `2d61b7555e6b9ac8946397a0efb1b127d86122a148bffaa88847aa47228057ab`
 - bridge source version: `10th-edition-2026-06-14`
 - bridge JSON source:
   `data/source_snapshots/wahapedia/10th-edition/2026-06-14/json`
 
-The report emits 1889 classification rows, one for every Phase 17F row blocked
-as `blocked_structured_semantics_required`. It compiles 1790 rows from Wahapedia
+The report emits 1888 classification rows, one for every Phase 17F row blocked
+as `blocked_structured_semantics_required`. It compiles 1789 rows from Wahapedia
 bridge descriptions through Phase 17C and marks 99 rows as
 `source_text_not_available` metadata-only rows. Each row records the existing
 Phase 17C template IDs and template families that can already express clauses,
@@ -492,9 +493,9 @@ WS14 step 3 is enforced as a deterministic Phase 17I source package artifact:
 - source edition: `11th`
 - schema version: `core-v2-phase17i-named-handler-budget-v1`
 - source-payload SHA-256 checksum:
-  `7de50a1d4a3fbcd0a664779e61a23acedd8e1e8eca9516d7d93b646d101cb26e`
+  `588d496c713138826d4dfd9ecfef3fa2e9a63d056f34e7bd299b95a50fac5bd1`
 - upstream Phase 17F checksum:
-  `6555b090a8828ec11c0de75dc2e2d1dc65dadaaaed1e75077337af6fbf67673c`
+  `2d61b7555e6b9ac8946397a0efb1b127d86122a148bffaa88847aa47228057ab`
 
 The budget report tracks 23 executable named-handler Phase 17F rows and 23
 approved entries. The current approved reason is
@@ -764,8 +765,8 @@ already engine-consumed named handlers.
 | Detachment rules | 6 | `executable_generic_ir` | `applied` | `none` |
 | Enhancements | 12 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Enhancements | 17 | `executable_generic_ir` | `applied` | `none` |
-| Stratagems | 24 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Stratagems | 22 | `executable_generic_ir` | `applied` | `none` |
+| Stratagems | 23 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Stratagems | 23 | `executable_generic_ir` | `applied` | `none` |
 | Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
 
 ### Astra Militarum Execution Status
