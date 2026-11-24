@@ -313,7 +313,20 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
     assert charge["retained_runtime_fingerprint"] == shalaxi["runtime_fingerprint"]
     group_charge = _record(ground_charge.GROUP_TRANSITION)
     assert group_charge["retained_runtime_fingerprint"] == charge["runtime_fingerprint"]
-    assert _record(MANIFEST)["fingerprint"] == group_charge["runtime_fingerprint"]
+    shooting = _record(ground_charge.SHOOTING_TRANSITION)
+    assert shooting["retained_runtime_fingerprint"] == group_charge["runtime_fingerprint"]
+    assert _record(MANIFEST)["fingerprint"] == shooting["runtime_fingerprint"]
+    shooting_base_test = subprocess.check_output(
+        ["git", "show", ground_charge.SHOOTING_BASE + ":" + ground_charge.SHOOTING_OWNER],
+        cwd=ROOT,
+    )
+    assert shooting["test"]["before"]["sha256"] == hashlib.sha256(shooting_base_test).hexdigest()
+    assert sum(ground_charge.SHOOTING_OWNER in group for group in groups) == 1
+    shooting_cases = {
+        ground_charge.SHOOTING_OWNER
+        + f"::test_normal_shooting_policy_uses_the_projected_offer_and_native_submission[{fire}]"
+        for fire in (False, True)
+    }
     assert sum(ground_charge.GROUP_OWNER in group for group in groups) == 1
     for source, row in group_charge["sources"].items():
         assert row["before"] == charge["sources"][source]
@@ -673,6 +686,7 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         | close_quarters_cases
         | shalaxi_cases
         | charge_cases
+        | shooting_cases
         | allocation_cases
         | round4_cases
         | {

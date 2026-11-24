@@ -6,18 +6,29 @@ from typing import cast
 
 import pytest
 
+from tests.phase13b_shooting_declaration_helpers import _shooting_lifecycle
+from warhammer40k_core.adapters.access_control import ViewerContext
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.ai.canonical_deployment import canonical_deployment_config
 from warhammer40k_core.ai.followthrough_scenario import (
     FOLLOWTHROUGH_DEFINITION_HASH,
     reproduce_followthrough_pair,
 )
+from warhammer40k_core.ai.normal_shooting_policy import (
+    NormalShootingGap,
+    NormalShootingGapReason,
+    generate_normal_shooting_candidates,
+    normal_shooting_registration,
+    rank_normal_shooting_candidates,
+)
 from warhammer40k_core.ai.opposing_shooter_scenario import OpposingShooterQualification
-from warhammer40k_core.ai.player_policy import PlayerDecisionContext, payload_digest
+from warhammer40k_core.ai.player_policy import PlayerDecisionContext, PolicyRouter, payload_digest
 from warhammer40k_core.ai.preserve_scenario import EXPLOITER_UNIT_ID, OPPONENT_UNIT_ID
 from warhammer40k_core.ai.training_admission import TrainingAdmissionError
 from warhammer40k_core.engine.event_log import JsonValue, canonical_json
+from warhammer40k_core.engine.phase import LifecycleStatusKind
 from warhammer40k_core.engine.replay import ReplayArtifactPayload, ReplayRunner
+from warhammer40k_core.geometry.pose import Pose
 
 
 def test_exact_pair_shooter_diagnostics_and_ordinary_opposing_attack_replay() -> None:
@@ -156,3 +167,87 @@ def test_opposing_qualification_rejects_unreached_and_wrong_configuration() -> N
         OpposingShooterQualification.from_sessions(other, fresh)
     with pytest.raises(TrainingAdmissionError, match="22/23-record endpoints"):
         OpposingShooterQualification.from_sessions(fresh, fresh)
+
+
+@pytest.mark.parametrize("fire", [False, True])
+def test_normal_shooting_policy_uses_the_projected_offer_and_native_submission(fire: bool) -> None:
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("exploiter",),
+        alpha_unit_specs=(("exploiter", "core-deep-strike-unit", "core-deep-strike-model", 3),),
+        enemy_pose=Pose.at(23.0, 35.0),
+    )
+    session = LocalGameSession(lifecycle=lifecycle)
+    viewer = ViewerContext.for_player("player-a")
+    session.advance_until_decision_or_terminal()
+    unit_context = PlayerDecisionContext.from_view(
+        session.view_for_context(viewer=viewer), choice_seed=1
+    )
+    with pytest.raises(NormalShootingGap) as gap:
+        generate_normal_shooting_candidates(unit_context)
+    assert gap.value.reason is NormalShootingGapReason.NO_ORDINARY_DECLARATION
+    assert (
+        session.submit_viewer_option(
+            viewer=viewer,
+            request_id=unit_context.request["request_id"],
+            result_id="normal-focus-select-unit",
+            option_id=units["exploiter"].unit_instance_id,
+        ).status_kind
+        is LifecycleStatusKind.WAITING_FOR_DECISION
+    )
+
+    type_context = PlayerDecisionContext.from_view(
+        session.view_for_context(viewer=viewer), choice_seed=1
+    )
+    normal = next(
+        option
+        for option in type_context.request["options"]
+        if isinstance(option["payload"], dict) and option["payload"]["shooting_type"] == "normal"
+    )
+    assert (
+        session.submit_viewer_option(
+            viewer=viewer,
+            request_id=type_context.request["request_id"],
+            result_id="normal-focus-select-type",
+            option_id=normal["option_id"],
+        ).status_kind
+        is LifecycleStatusKind.WAITING_FOR_DECISION
+    )
+
+    before = session.view_for_context(viewer=viewer)
+    context = PlayerDecisionContext.from_view(before, choice_seed=1)
+    candidates = generate_normal_shooting_candidates(context)
+    ranked = rank_normal_shooting_candidates(candidates)
+    assert ranked == rank_normal_shooting_candidates(tuple(reversed(candidates)))
+    assert [
+        (candidate.target_unit_instance_id, candidate.declaration_count) for candidate in ranked
+    ] == [
+        (units["enemy"].unit_instance_id, 3),
+        (None, 0),
+    ]
+    assert len({candidate.candidate_id for candidate in ranked}) == 2
+    router = PolicyRouter((normal_shooting_registration("player-a"),))
+    ranked_action = router.resolve(context.route).policy.choose(context)
+    assert ranked_action == ranked[0].action
+    assert session.view_for_context(viewer=viewer) == before
+    action = ranked_action if fire else ranked[-1].action
+    assert action.proposal_json is not None
+    status = session.submit_viewer_parameterized_payload(
+        viewer=viewer,
+        request_id=action.request_id,
+        result_id="normal-focus-declaration",
+        payload=json.loads(action.proposal_json),
+    )
+    assert status.status_kind in (
+        LifecycleStatusKind.ADVANCED,
+        LifecycleStatusKind.WAITING_FOR_DECISION,
+    )
+    accepted = [
+        event
+        for event in lifecycle.decision_controller.event_log.records
+        if event.event_type == "shooting_declaration_accepted"
+    ]
+    (event,) = accepted
+    assert isinstance(event.payload, dict)
+    pools = event.payload["attack_pools"]
+    assert isinstance(pools, list)
+    assert len(pools) == (3 if fire else 0)

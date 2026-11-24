@@ -1,4 +1,4 @@
-"""Exact test-admission successors for the opt-in ground Charge Move policy."""
+"""Exact test-admission successors for opt-in Stage 2 policies."""
 
 from __future__ import annotations
 
@@ -91,4 +91,47 @@ def ground_charge_test_successor(
     if group is not None:
         tests.update(_selection_members(group["added_files"], root))
         return group["runtime_fingerprint"], tests, raw + b"\0" + group_raw
+    return record["runtime_fingerprint"], tests, raw
+
+
+SHOOTING_BASE = "153bb57bfd03a6b8bc8ca137dcd2f33e8648a9f8"
+SHOOTING_TRANSITION = "data/source_audits/ci64_provenance_v1/stage2-normal-shooting-test-v1.json"
+SHOOTING_TRANSITION_SHA256 = "9f1ae4b44e3563b8583932f182095bcf23364bc3fdfab183714aa2c3aa1fb79f"
+SHOOTING_OWNER = "tests/infrastructure/adapters/test_opposing_shooter_scenario.py"
+SHOOTING_SOURCE = "src/warhammer40k_core/ai/normal_shooting_policy.py"
+
+
+def normal_shooting_test_successor(
+    root: Path, *, previous_runtime: str, retained_cutover_sha256: str
+) -> tuple[str, dict[str, dict[str, object]], bytes]:
+    from scripts.build_test_shards import CUTOVER_PATH
+    from scripts.engine_numerical_identity_test_admission import _checked_bytes
+
+    raw = _checked_bytes(root, SHOOTING_TRANSITION, SHOOTING_TRANSITION_SHA256)
+    record = json.loads(raw, object_pairs_hook=_selection_object)
+    retained = json.loads(
+        _checked_bytes(root, CUTOVER_PATH, retained_cutover_sha256),
+        object_pairs_hook=_selection_object,
+    )
+    if (
+        record.keys()
+        != {
+            "schema",
+            "base",
+            "retained_group_charge_sha256",
+            "retained_runtime_fingerprint",
+            "runtime_fingerprint",
+            "policy_sha256",
+            "test",
+        }
+        or record["schema"] != "finite-stage2-normal-shooting-test-v1"
+        or record["base"] != SHOOTING_BASE
+        or record["retained_group_charge_sha256"] != GROUP_TRANSITION_SHA256
+        or record["retained_runtime_fingerprint"] != previous_runtime
+        or record["test"]["before"] != retained["active_files"][SHOOTING_OWNER]
+    ):
+        raise SystemExit("Normal Shooting test transition membership differs.")
+    _checked_bytes(root, GROUP_TRANSITION, GROUP_TRANSITION_SHA256)
+    _checked_bytes(root, SHOOTING_SOURCE, record["policy_sha256"])
+    tests = _selection_members({SHOOTING_OWNER: record["test"]["after"]}, root)
     return record["runtime_fingerprint"], tests, raw

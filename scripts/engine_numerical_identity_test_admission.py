@@ -1139,6 +1139,21 @@ def exact_movement_test_transition(
             previous_transition_sha256=ROUND3_SHALAXI_SHA256,
         )
         runtime = ground_charge[0]
+    from scripts.stage2_ground_charge_test_admission import (
+        SHOOTING_TRANSITION,
+        normal_shooting_test_successor,
+    )
+
+    shooting_path = root / SHOOTING_TRANSITION
+    _selection_no_links(root, shooting_path)
+    shooting = None
+    if shooting_path.exists():
+        if ground_charge is None:
+            raise SystemExit("Normal Shooting tests require the ground charge predecessor.")
+        shooting = normal_shooting_test_successor(
+            root, previous_runtime=runtime, retained_cutover_sha256=retained_cutover_sha256
+        )
+        runtime = shooting[0]
     retained = _identity_test_transition(
         root,
         retained_cutover_sha256,
@@ -1243,6 +1258,12 @@ def exact_movement_test_transition(
             raise SystemExit("Ground charge tests overlap the predecessor selection.")
         additions.update(ground_charge_tests)
         raw += b"\0" + ground_charge_raw
+    if shooting is not None:
+        _, shooting_tests, shooting_raw = shooting
+        if shooting_tests.keys() & (updated.keys() | added.keys() | additions.keys()):
+            raise SystemExit("Normal Shooting tests overlap the predecessor selection.")
+        updated.update(shooting_tests)
+        raw += b"\0" + shooting_raw
     return updated, {**added, **additions}, retained_raw + b"\0" + raw
 
 

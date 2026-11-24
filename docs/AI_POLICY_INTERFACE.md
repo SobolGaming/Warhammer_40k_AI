@@ -2353,6 +2353,28 @@ Stage 2 completion, learning admission and full-game throughput remain unqualifi
 and `eligible_for_learning` remains false.
 
 
+## Opt-in Normal Shooting focus policy
+
+`ai.normal_shooting_policy` uses the acting player's pending Normal Shooting
+declaration. It emits one focused volley per target from the legal per-weapon
+rows in the offer and an empty declaration for an explicit omission control.
+Each volley preserves issued equipment order. The ranker prefers more declared
+weapons and breaks ties by ascending target unit ID. Candidate IDs bind the
+unit and declaration rows. The selected action binds the actor, request and
+observation through the existing policy interfaces.
+
+Register the policy only for the actor and supported declaration being evaluated.
+It accepts ordinary offers with one weapon copy and profile per participating
+model, without Firing Deck, targetless attacks, weapon selection limits or
+required weapon-ability selections. It examines at most 256 target rows and
+emits at most 32 focus alternatives plus omission. An unsupported offer, a
+limit or a missing focused volley raises a typed candidate gap. The engine
+still validates each submission through the existing adapter contract.
+
+This is a bounded candidate and ordering rule for the synthetic Stage 2 E
+shooting slice. Candidate membership, native acceptance, material and scoring
+through a declared local horizon, and exact replay are separate evidence.
+
 ## Proposed native v995 screening workload
 
 `cavalcade-v995-native-screen-follow-through-v1` is a separately versioned proposal,
