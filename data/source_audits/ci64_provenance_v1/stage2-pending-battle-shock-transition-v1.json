@@ -1,0 +1,25 @@
+{
+  "schema": "finite-stage2-pending-battle-shock-transition-v1",
+  "base": "161378a16c4557228b2af45db0d311a522eb3f8f",
+  "retained_screen_movement_sha256": "7e0b32cb0f7a0ef8e7d05f9b0a4aa7bb965cb6644e5d42ffd035897a536deb94",
+  "retained_runtime_fingerprint": "f18fe40b7fb1e8841d01bcb2c4c98f56ea85cddb7ae1ae4c0905a69f24146432",
+  "runtime_fingerprint": "bef24c387ca386c885fd7508796e065e0e6fb68efa2159f3aa8be6d8f41b1db1",
+  "sources": {
+    "src/warhammer40k_core/engine/battle_shock_hooks.py": {
+      "before": "4f149f2664ac363aa9034c3924c43c7f1356c82dc27cdd2c32467b163ec4f99b",
+      "after": "9a237d454074fb42347a514e49ef58fd137c3f672571b71f106600221e485c14"
+    },
+    "src/warhammer40k_core/engine/faction_content/pending_battle_shock_routes.py": {
+      "before": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "after": "3867badbb15156a7a63d5946ee74ec47a706373ca369392c4509b7292a99413b"
+    },
+    "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/army_rule.py": {
+      "before": "2adb65d7afbe38c7d8b31bdfdc4c01e4233870b04fcdd1065371a3d6246c8684",
+      "after": "00ffe06bf3fbd050cef1efc88b6de38eacd7a11c4d3fd9d5f2a4fff9e1de3043"
+    },
+    "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/battle_shock_outcome_authority.py": {
+      "before": "15e25a9bc3587826c6a4be6928cb33ddcfa4a32460273aa7a7ae8ce9cccd76ba",
+      "after": "4c66f099bd6f5c504782e167d9686dbfad9998ecf8af16adc165200290f4cfa5"
+    }
+  }
+}

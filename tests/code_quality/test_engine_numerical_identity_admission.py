@@ -365,7 +365,32 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         )
     )
     screen = _record(ground_charge.SCREEN_TRANSITION)
-    assert _record(MANIFEST)["fingerprint"] == screen["runtime_fingerprint"]
+    pending = _record(
+        "data/source_audits/ci64_provenance_v1/stage2-pending-battle-shock-transition-v1.json"
+    )
+    pending_base = "161378a16c4557228b2af45db0d311a522eb3f8f"
+    assert pending["base"] == pending_base
+    pending_base_manifest = json.loads(
+        subprocess.check_output(["git", "show", pending_base + ":" + MANIFEST], cwd=ROOT)
+    )
+    assert screen["runtime_fingerprint"] == pending_base_manifest["fingerprint"]
+    assert pending["retained_runtime_fingerprint"] == screen["runtime_fingerprint"]
+    assert (
+        pending["retained_screen_movement_sha256"]
+        == hashlib.sha256((ROOT / ground_charge.SCREEN_TRANSITION).read_bytes()).hexdigest()
+    )
+    assert _record(MANIFEST)["fingerprint"] == pending["runtime_fingerprint"]
+    pending_before: dict[str, str] = {}
+    for name, binding in pending["sources"].items():
+        present = subprocess.check_output(["git", "ls-tree", pending_base, "--", name], cwd=ROOT)
+        predecessor = (
+            subprocess.check_output(["git", "show", pending_base + ":" + name], cwd=ROOT)
+            if present
+            else b""
+        )
+        pending_before[name] = hashlib.sha256(predecessor).hexdigest()
+        assert binding["before"] == pending_before[name]
+        assert binding["after"] == hashlib.sha256((ROOT / name).read_bytes()).hexdigest()
     screen_base_manifest = json.loads(
         subprocess.check_output(
             ["git", "show", ground_charge.SCREEN_BASE + ":" + MANIFEST], cwd=ROOT
@@ -434,10 +459,11 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
                 ["git", "show", selection.ROUND4_BATTLE_SHOCK_BASE + ":" + source], cwd=ROOT
             )
         assert round4["source"][source]["before"] == hashlib.sha256(base_source).hexdigest()
-        assert (
-            round4["source"][source]["after"]
-            == hashlib.sha256((ROOT / source).read_bytes()).hexdigest()
-        )
+        if source in pending_before:
+            round4_after = pending_before[source]
+        else:
+            round4_after = hashlib.sha256((ROOT / source).read_bytes()).hexdigest()
+        assert round4["source"][source]["after"] == round4_after
     round4_owner = selection.ROUND4_BATTLE_SHOCK_OWNER
     assert round4_owner in active_files
     assert sum(round4_owner in group for group in groups) == 1
@@ -563,7 +589,10 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
                 == hashlib.sha256((ROOT / name).read_bytes()).hexdigest()
             )
     for name, digest in selection.CAVALCADE_AUTHORITY_SOURCES.items():
-        assert hashlib.sha256((ROOT / name).read_bytes()).hexdigest() == digest
+        if name in pending_before:
+            assert pending_before[name] == digest
+        else:
+            assert hashlib.sha256((ROOT / name).read_bytes()).hexdigest() == digest
     for terminal_owner in selection.TERMINAL_RESTORE_OWNERS:
         assert (
             terminal["test"][terminal_owner]["before"]

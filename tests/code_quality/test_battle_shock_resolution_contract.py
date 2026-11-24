@@ -7,6 +7,8 @@ from enum import StrEnum
 from pathlib import Path
 from typing import cast
 
+import pytest
+
 ROOT = Path(__file__).resolve().parents[2]
 ENGINE_ROOT = ROOT / "src" / "warhammer40k_core" / "engine"
 
@@ -575,3 +577,154 @@ def test_read_only_authorities_detect_nested_and_same_length_mutations() -> None
         ):
             check(surface, target)
     check("turn-end", "reaction queue")
+
+
+def test_pending_outcome_route_requires_exact_negative_provenance(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from tests.phase11c_command_phase_helpers import battle_state
+    from warhammer40k_core.engine import battle_shock_hooks as hooks
+    from warhammer40k_core.engine.decision_controller import DecisionController
+    from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
+    from warhammer40k_core.engine.decision_result import DecisionResult
+    from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons import (
+        army_rule,
+        battle_shock_outcome_authority,
+    )
+    from warhammer40k_core.engine.game_state import GameState
+    from warhammer40k_core.engine.healing import SELECT_HEALING_MODEL_DECISION_TYPE
+    from warhammer40k_core.engine.phase import GameLifecycleError
+    from warhammer40k_core.engine.runtime_read_only import (
+        RuntimeReadOnlySnapshot,
+        runtime_read_only_snapshot,
+    )
+
+    state = battle_state()
+    ledger = DecisionController()
+    request = DecisionRequest(
+        "unrelated-request",
+        "unrelated-type",
+        "player-a",
+        None,
+        (DecisionOption("continue", "Continue"),),
+    )
+    context = hooks.BattleShockPendingOutcomeAuthorityContext(state, ledger, request)
+    (known,) = army_rule.staged_july_runtime_contribution().battle_shock_hook_bindings
+    native = army_rule.validate_july_pending_outcome
+    assert known.pending_outcome_authority_validator is native
+    route = battle_shock_outcome_authority.pending_outcome_route(native)
+    registry = hooks.BattleShockHookRegistry.from_bindings((known,))
+    snapshots = 0
+
+    def snapshot(
+        state: GameState, decisions: DecisionController, *additional_inputs: object
+    ) -> RuntimeReadOnlySnapshot:
+        nonlocal snapshots
+        snapshots += 1
+        return runtime_read_only_snapshot(state, decisions, *additional_inputs)
+
+    monkeypatch.setattr(hooks, "runtime_read_only_snapshot", snapshot)
+    (default,) = army_rule.runtime_contribution().battle_shock_hook_bindings
+    assert (
+        default.pending_outcome_authority_validator
+        is army_rule.validate_daemonic_terror_pending_outcome
+    )
+    for binding in (known, default):
+        assert (
+            hooks.BattleShockHookRegistry.from_bindings((binding,)).pending_outcome_authority_for(
+                context
+            )
+            is None
+        )
+    assert snapshots == 0
+
+    def reject(_: hooks.BattleShockPendingOutcomeAuthorityContext) -> None:
+        raise GameLifecycleError("wrapped validator rejected the request")
+
+    wrapped = battle_shock_outcome_authority.pending_outcome_route(reject)
+    assert not wrapped.needs_validation(context)
+    with pytest.raises(GameLifecycleError, match="wrapped validator rejected the request"):
+        hooks.BattleShockHookRegistry.from_bindings(
+            (replace(known, pending_outcome_authority_validator=wrapped),)
+        ).pending_outcome_authority_for(context)
+    assert snapshots == 1
+
+    # A same-length ledger edit changes the live routing evidence.
+    ledger.event_log.append("unrelated-event", {"decision_request_id": request.request_id})
+    (event,) = ledger.event_log.records
+    assert registry.pending_outcome_authority_for(context) is None
+    assert snapshots == 1
+    for marker in sorted(route.marker_event_types):
+        object.__setattr__(event, "event_type", marker)
+        with pytest.raises(GameLifecycleError, match="outcome provider identity drifted"):
+            registry.pending_outcome_authority_for(context)
+    object.__setattr__(event, "event_type", "unrelated-event")
+
+    # A request discriminator or a producer anywhere in the history keeps
+    # the validator live even without a matching marker.
+    assert route.needs_validation(
+        replace(context, request=replace(request, decision_type=SELECT_HEALING_MODEL_DECISION_TYPE))
+    )
+    producer = ledger.request_decision(replace(request, request_id="producer-request"))
+    record = ledger.submit_result(
+        DecisionResult.for_request(
+            result_id="unrelated-result",
+            request=producer,
+            selected_option_id="continue",
+        )
+    )
+    object.__setattr__(record.request, "decision_type", SELECT_HEALING_MODEL_DECISION_TYPE)
+    assert route.needs_validation(context)
+    before_producer = snapshots
+    assert registry.pending_outcome_authority_for(context) is None
+    assert snapshots == before_producer + 2
+    object.__setattr__(record.request, "decision_type", "unrelated-type")
+    assert not route.needs_validation(context)
+
+    # Custom providers still receive the live context and are checked before
+    # any later provider has a chance to repair a direct mutation.
+    model = state.army_definitions[0].units[0].own_models[0]
+    original_name = model.name
+
+    def mutate(_: hooks.BattleShockPendingOutcomeAuthorityContext) -> None:
+        object.__setattr__(model, "name", "read-only route test")
+
+    def restore(_: hooks.BattleShockPendingOutcomeAuthorityContext) -> None:
+        object.__setattr__(model, "name", original_name)
+
+    forged = replace(route, validator=mutate)
+    assert not forged.needs_validation(context)
+    before_forged = snapshots
+    with pytest.raises(GameLifecycleError, match="mutated runtime state"):
+        hooks.BattleShockHookRegistry.from_bindings(
+            (replace(known, pending_outcome_authority_validator=forged),)
+        ).pending_outcome_authority_for(context)
+    assert snapshots == before_forged + 2
+    assert model.name == "read-only route test"
+    restore(context)
+
+    # A copy with the real callable and narrowed markers must still validate.
+    marker = sorted(route.marker_event_types)[0]
+    narrowed = replace(route, marker_event_types=route.marker_event_types - {marker})
+    object.__setattr__(event, "event_type", marker)
+    assert not narrowed.needs_validation(context)
+    with pytest.raises(GameLifecycleError, match="outcome provider identity drifted"):
+        hooks.BattleShockHookRegistry.from_bindings(
+            (replace(known, pending_outcome_authority_validator=narrowed),)
+        ).pending_outcome_authority_for(context)
+    object.__setattr__(event, "event_type", "unrelated-event")
+
+    custom = tuple(
+        hooks.BattleShockHookBinding(
+            hook_id,
+            "source",
+            outcome_handler=lambda _: None,
+            pending_outcome_authority_validator=validator,
+        )
+        for hook_id, validator in (("a-mutate", mutate), ("z-restore", restore))
+    )
+    with pytest.raises(GameLifecycleError, match="mutated runtime state"):
+        hooks.BattleShockHookRegistry.from_bindings((known, *custom)).pending_outcome_authority_for(
+            context
+        )
+    assert model.name == "read-only route test"

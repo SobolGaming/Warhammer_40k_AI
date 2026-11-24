@@ -4,7 +4,7 @@ from collections.abc import Callable
 from copy import copy
 from dataclasses import replace
 from enum import StrEnum
-from typing import cast
+from typing import Final, cast
 
 from warhammer40k_core.core.datasheet import (
     CatalogAbilitySourceKind,
@@ -180,9 +180,7 @@ def _runtime_contribution(
     historical_handler: Callable[
         [HistoricalBattleShockAuthorityContext], HistoricalBattleShockContribution
     ],
-    pending_outcome_authority_validator: (
-        BattleShockPendingOutcomeAuthorityValidator | None
-    ) = None,
+    pending_outcome_authority_validator: BattleShockPendingOutcomeAuthorityValidator,
 ) -> RuntimeContentContribution:
     from functools import partial
 
@@ -203,7 +201,7 @@ def _runtime_contribution(
                     source_rule_id=source_rule_id,
                     battleline_revival_enabled=source_rule_id == JULY_SOURCE_RULE_ID,
                 ),
-                pending_outcome_authority_validator=(pending_outcome_authority_validator),
+                pending_outcome_authority_validator=pending_outcome_authority_validator,
                 historical_contribution_handler=historical_handler,
             ),
         ),
@@ -270,6 +268,13 @@ def validate_july_pending_outcome(
     if terror is not None and manifestation is not None:
         raise GameLifecycleError("Chaos Daemons pending outcome authority is ambiguous.")
     return terror or manifestation
+
+
+# Capture the native callable identities separately from hook registration.
+NATIVE_PENDING_OUTCOME_VALIDATORS: Final = (
+    validate_daemonic_terror_pending_outcome,
+    validate_july_pending_outcome,
+)
 
 
 def battle_shock_modifiers(
