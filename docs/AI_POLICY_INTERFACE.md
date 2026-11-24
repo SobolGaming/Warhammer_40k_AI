@@ -3102,6 +3102,8 @@ through the ordinary viewer submission contract. The trusted runner binds the
 registration to the reviewed session checkpoint for that pending offer. It
 checks the full checkpoint digest before policy choice and again before
 submission. The digest stays in operator registration and dispatch evidence.
+When reconstructing a registration from its exported manifest, pass the digest
+through the typed registration field. The key is reserved in policy configuration.
 The scorer receives the detached actor observation and its existing choice seed.
 
 This is a fixed-A declaration route. Activations that commit a profile earlier

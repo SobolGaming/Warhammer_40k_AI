@@ -1029,7 +1029,7 @@
     "tests/infrastructure/adapters/test_opposing_shooter_scenario.py::test_opposing_qualification_rejects_unreached_and_wrong_configuration": 0.455,
     "tests/infrastructure/adapters/test_ordinary_melee_profile_policy.py::test_great_axe_actor_offer_selects_applied_wounds_and_replays[bloodthirster]": 5.814,
     "tests/infrastructure/adapters/test_ordinary_melee_profile_policy.py::test_great_axe_actor_offer_selects_applied_wounds_and_replays[seekers]": 29.697,
-    "tests/infrastructure/adapters/test_ordinary_melee_profile_policy.py::test_great_axe_dispatch_rejects_identical_view_at_unadmitted_checkpoint": 13.725,
+    "tests/infrastructure/adapters/test_ordinary_melee_profile_policy.py::test_great_axe_dispatch_rejects_identical_view_at_unadmitted_checkpoint": 15.137,
     "tests/infrastructure/adapters/test_ordinary_melee_profile_policy.py::test_wounded_seeker_first_changes_applied_wound_expectation": 0.001,
     "tests/infrastructure/adapters/test_preserve_scenario.py::test_preserve_prefix_has_exact_routes_candidates_and_scoped_tactical_gaps": 24.476,
     "tests/infrastructure/adapters/test_preserve_scenario.py::test_preserve_prefix_persists_replays_and_rejects_changed_closed_evidence": 199.166,
@@ -6721,18 +6721,18 @@
   },
   "execution_model": {
     "assignment_wall_lower_bound_seconds": {
-      "1": 573.568,
-      "10": 573.568,
-      "11": 573.569,
-      "12": 573.568,
+      "1": 573.603,
+      "10": 573.605,
+      "11": 573.604,
+      "12": 573.604,
       "2": 795.547,
       "3": 609.537,
-      "4": 573.568,
-      "5": 573.569,
-      "6": 573.569,
-      "7": 573.568,
-      "8": 573.569,
-      "9": 573.568
+      "4": 573.603,
+      "5": 573.604,
+      "6": 573.603,
+      "7": 573.605,
+      "8": 573.604,
+      "9": 573.603
     },
     "cold_shard_assignment": "minimum-unrounded-modeled-test-load-existing-bucket-v1",
     "cold_shard_id": 1,
@@ -6741,18 +6741,18 @@
       "tests/factions/chaos_daemons/integration/test_cavalcade_v995_roster.py::test_exact_mirror_deploys_all_78_models_and_replays_to_battle"
     ],
     "shard_worker_seconds": {
-      "1": 2294.271,
-      "10": 2294.272,
-      "11": 2294.277,
-      "12": 2294.274,
+      "1": 2294.412,
+      "10": 2294.418,
+      "11": 2294.415,
+      "12": 2294.416,
       "2": 3182.186,
       "3": 2438.146,
-      "4": 2294.271,
-      "5": 2294.275,
-      "6": 2294.276,
-      "7": 2294.274,
-      "8": 2294.275,
-      "9": 2294.272
+      "4": 2294.413,
+      "5": 2294.416,
+      "6": 2294.413,
+      "7": 2294.418,
+      "8": 2294.416,
+      "9": 2294.412
     }
   },
   "files": {
@@ -6825,7 +6825,7 @@
     "tests/infrastructure/adapters/test_matched_attack_scenario.py": 1890.765,
     "tests/infrastructure/adapters/test_normal_move_scenario.py": 466.004,
     "tests/infrastructure/adapters/test_opposing_shooter_scenario.py": 296.773,
-    "tests/infrastructure/adapters/test_ordinary_melee_profile_policy.py": 49.237,
+    "tests/infrastructure/adapters/test_ordinary_melee_profile_policy.py": 50.649,
     "tests/infrastructure/adapters/test_preserve_scenario.py": 238.409,
     "tests/infrastructure/adapters/test_rigid_group_ground_charge_policy.py": 11.47,
     "tests/infrastructure/adapters/test_runner_accounting.py": 626.885,
@@ -7307,6 +7307,7 @@
         "1dae3124aecf7ab4eaf80b7ace29412f8a2510f844859c649ceee85c08333f17",
         "25759acf6c9170e603034a4071122fd33e00661a1f1a158d3439551f528f0624",
         "297a9f3fa66471f2f4792e5fd6bdc804517c797ff1aad1f397be73ab0c9fc71d",
+        "318c7912fdab7fce1cce68a3998df8fbda4c9536540c88431e6303edb9b7fb5a",
         "431f84031f3029637fa3c74e55d1c8dede1e3fe1aa04f223da43a8cacdd7574d",
         "6065394017e442925f4256644907ffc7924dcc2b4a699b5065e1dda846989353",
         "63db8ac24763535fbddc46142b0c99e6833b128bc40e674ff95ec735b05e1018",
@@ -7324,9 +7325,9 @@
   "shard_count": 12,
   "shards": [
     {
-      "duration_seconds": 2294.271,
+      "duration_seconds": 2294.412,
       "shard_id": 1,
-      "test_file_count": 51
+      "test_file_count": 45
     },
     {
       "duration_seconds": 3182.186,
@@ -7339,47 +7340,47 @@
       "test_file_count": 1
     },
     {
-      "duration_seconds": 2294.271,
+      "duration_seconds": 1793.179,
       "shard_id": 4,
-      "test_file_count": 48
+      "test_file_count": 49
     },
     {
-      "duration_seconds": 2294.275,
+      "duration_seconds": 2294.416,
       "shard_id": 5,
       "test_file_count": 49
     },
     {
-      "duration_seconds": 2294.276,
+      "duration_seconds": 2294.413,
       "shard_id": 6,
-      "test_file_count": 48
+      "test_file_count": 53
     },
     {
-      "duration_seconds": 2294.274,
+      "duration_seconds": 2294.418,
       "shard_id": 7,
       "test_file_count": 49
     },
     {
-      "duration_seconds": 1793.041,
+      "duration_seconds": 2294.416,
       "shard_id": 8,
       "test_file_count": 49
     },
     {
-      "duration_seconds": 2294.272,
+      "duration_seconds": 2294.412,
       "shard_id": 9,
-      "test_file_count": 49
-    },
-    {
-      "duration_seconds": 2294.272,
-      "shard_id": 10,
       "test_file_count": 54
     },
     {
-      "duration_seconds": 2294.277,
+      "duration_seconds": 2294.418,
+      "shard_id": 10,
+      "test_file_count": 49
+    },
+    {
+      "duration_seconds": 2294.415,
       "shard_id": 11,
       "test_file_count": 91
     },
     {
-      "duration_seconds": 2294.274,
+      "duration_seconds": 2294.416,
       "shard_id": 12,
       "test_file_count": 49
     }
@@ -7389,5 +7390,5 @@
     "sha256": "b241b31651a8d5d903a2b851583186c276a5ac32fed26de1a1c69b4aa278b711"
   },
   "strategy": "largest-processing-time-by-derived-selector-weight",
-  "total_test_duration_seconds": 28061.835
+  "total_test_duration_seconds": 28063.247
 }

@@ -189,12 +189,13 @@ class PolicyRegistration:
         if not isinstance(value, dict):
             raise PolicyError("Policy configuration must be an object.")
         validate_json_value(cast(dict[str, object], value))
+        if "required_checkpoint_hash" in value:
+            raise PolicyError("Policy configuration reserves required_checkpoint_hash.")
         checkpoint = self.required_checkpoint_hash
         if checkpoint is not None and (
             type(checkpoint) is not str
             or len(checkpoint) != 64
             or bool(set(checkpoint) - set("0123456789abcdef"))
-            or "required_checkpoint_hash" in value
         ):
             raise PolicyError("Policy checkpoint admission requires a separate SHA-256 binding.")
 

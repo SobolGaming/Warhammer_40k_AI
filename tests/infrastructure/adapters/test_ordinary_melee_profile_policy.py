@@ -32,6 +32,7 @@ from warhammer40k_core.ai.ordinary_melee_profile_policy import (
 from warhammer40k_core.ai.player_policy import (
     PlayerDecisionContext,
     PolicyError,
+    PolicyRegistration,
     PolicyRouter,
     payload_digest,
 )
@@ -45,7 +46,7 @@ from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.engine.army_mustering import muster_army
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.effects import EffectExpiration
-from warhammer40k_core.engine.event_log import JsonValue
+from warhammer40k_core.engine.event_log import JsonValue, canonical_json
 from warhammer40k_core.engine.fight_order import FIGHTS_FIRST_EFFECT_KIND
 from warhammer40k_core.engine.game_state import (
     GameState,
@@ -318,16 +319,34 @@ def test_great_axe_dispatch_rejects_identical_view_at_unadmitted_checkpoint() ->
     assert strike.expected_applied_wounds > sweep.expected_applied_wounds
     assert kill_chance(7, 5) < kill_chance(14, 3)
 
-    router = PolicyRouter(
-        (
-            ordinary_melee_profile_registration(
-                ACTOR, admission=admission, admitted_checkpoint_hash=ordinary_checkpoint
-            ),
-        )
+    entry = ordinary_melee_profile_registration(
+        ACTOR, admission=admission, admitted_checkpoint_hash=ordinary_checkpoint
     )
+    router = PolicyRouter((entry,))
+    (manifest_entry,) = router.to_manifest_payload()
+    assert isinstance(manifest_entry, dict)
+    configuration = manifest_entry["configuration"]
+    assert isinstance(configuration, dict)
+    with pytest.raises(PolicyError, match="reserves required_checkpoint_hash"):
+        PolicyRegistration(
+            entry.route, entry.policy_id, canonical_json(configuration), entry.policy
+        )
+
+    checkpoint = configuration.pop("required_checkpoint_hash")
+    assert isinstance(checkpoint, str)
+    reconstructed = PolicyRegistration(
+        entry.route,
+        entry.policy_id,
+        canonical_json(configuration),
+        entry.policy,
+        required_checkpoint_hash=checkpoint,
+    )
+    reconstructed_router = PolicyRouter((reconstructed,))
+    assert reconstructed_router.identity == router.identity
+
     limits = RunLimits(policy_seed=7, max_decisions=1, max_seconds=60.0)
     with pytest.raises(RunnerError) as gap:
-        BoundedPolicyRunner(session=modified, router=router, limits=limits).run()
+        BoundedPolicyRunner(session=modified, router=reconstructed_router, limits=limits).run()
     assert isinstance(gap.value.__cause__, PolicyCheckpointGap)
     assert gap.value.report.failure_reason == "unadmitted_checkpoint"
     (blocked,) = gap.value.report.decisions

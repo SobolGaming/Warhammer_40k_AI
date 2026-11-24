@@ -836,7 +836,7 @@ def _stage3_melee_profile_successor(
     if not path.exists():
         return None
     raw = _checked_bytes(
-        root, name, "3b8cbd56b1137f2b64f63fa689d764d5bf689417f76f666f6171d66e8845848f"
+        root, name, "d6878ec80208f32f09e52fa324fe7237123dc90f403d2238139d020ba780df40"
     )
     record = json.loads(raw, object_pairs_hook=_selection_object)
     owner = "tests/infrastructure/adapters/test_ordinary_melee_profile_policy.py"
