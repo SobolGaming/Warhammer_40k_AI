@@ -311,7 +311,13 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
     assert shalaxi["retained_runtime_fingerprint"] == malice["runtime_fingerprint"]
     charge = _record(selection.GROUND_CHARGE_TEST_TRANSITION)
     assert charge["retained_runtime_fingerprint"] == shalaxi["runtime_fingerprint"]
-    assert _record(MANIFEST)["fingerprint"] == charge["runtime_fingerprint"]
+    group_charge = _record(ground_charge.GROUP_TRANSITION)
+    assert group_charge["retained_runtime_fingerprint"] == charge["runtime_fingerprint"]
+    assert _record(MANIFEST)["fingerprint"] == group_charge["runtime_fingerprint"]
+    assert sum(ground_charge.GROUP_OWNER in group for group in groups) == 1
+    for source, row in group_charge["sources"].items():
+        assert row["before"] == charge["sources"][source]
+        assert row["after"] == hashlib.sha256((ROOT / source).read_bytes()).hexdigest()
     assert sum(ground_charge.OWNER in group for group in groups) == 1
     charge_cases = {
         ground_charge.OWNER + "::" + name
@@ -322,6 +328,21 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
             "test_ground_charge_receipt_deadline_preserves_live_session[unresolved-after-accept]",
         )
     }
+    charge_cases.update(
+        ground_charge.GROUP_OWNER + "::" + name
+        for name in (
+            "test_group_charge_generates_distinct_complete_witnesses",
+            "test_group_charge_commits_a_native_accept",
+            "test_group_charge_accepts_attached_target_with_four_surviving_bodyguards",
+            "test_group_charge_objective_preprocessing_exhausts_before_geometry[0]",
+            "test_group_charge_objective_preprocessing_exhausts_before_geometry[1]",
+            "test_group_charge_objective_preprocessing_exhausts_before_geometry[1000]",
+            "test_group_charge_objective_inventory_limits[areas]",
+            "test_group_charge_objective_inventory_limits[vertices]",
+            "test_group_charge_objective_inventory_limits[linked-vertices]",
+            "test_group_charge_ranks_objective_reach_ahead_of_shorter_accepted_travel",
+        )
+    )
     assert shalaxi["test"]["before"] == shooting_visibility["test"]["after"]
     for source in selection.ROUND3_SHALAXI_SOURCES:
         present = subprocess.check_output(["git", "ls-tree", shalaxi_base, "--", source], cwd=ROOT)

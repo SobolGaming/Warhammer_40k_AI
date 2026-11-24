@@ -9,6 +9,7 @@ from enum import StrEnum
 from itertools import pairwise, zip_longest
 from typing import Protocol, cast
 
+from warhammer40k_core.adapters.projection import ModelDisplayPayload
 from warhammer40k_core.ai.player_policy import (
     CandidateExhaustedError,
     PlayerDecisionContext,
@@ -29,10 +30,12 @@ from warhammer40k_core.engine.phases.charge import ChargeMoveProposal
 from warhammer40k_core.geometry.base import BaseShape, CircularBase, OvalBase
 from warhammer40k_core.geometry.model_geometry import ModelGeometry, ModelGeometryPayload
 from warhammer40k_core.geometry.pathing import PathWitness
+from warhammer40k_core.geometry.polygons import Point2D
 from warhammer40k_core.geometry.pose import Point3, Pose, PosePayload
 from warhammer40k_core.geometry.shapely_backend import (
     FootprintGeometry,
     footprint_for_base,
+    footprint_for_polygon_union,
     footprint_for_terrain,
 )
 from warhammer40k_core.geometry.terrain import TerrainWallDefinition
@@ -49,6 +52,10 @@ _PREFERRED_GAP_INCHES = 1.0
 _MIN_TARGET_GAP_INCHES = 0.025
 _COHERENCY_GAP_INCHES = 2.0
 _ENDPOINT_TERRAIN_CLEARANCE_INCHES = 0.05
+_GROUP_GRID_STEP_INCHES = 0.5
+_GROUP_MAX_SPAN_INCHES = 9.0
+_MAX_OBJECTIVE_AREA_VERTICES = 256
+_MAX_OBJECTIVE_VERTICES = 4096
 
 type _Bounds = tuple[float, float, float, float]
 
@@ -90,6 +97,7 @@ class GroundChargeCandidate:
     longest_path_inches: float
     total_path_inches: float
     waypoint_count: int
+    objective_reach: int = 0
 
     @property
     def candidate_id(self) -> str:
@@ -119,6 +127,7 @@ class _Path:
     sweeps: tuple[FootprintGeometry, ...]
     distance: float
     gap: float
+    objectives: frozenset[int] = frozenset()
 
 
 class _HullGeometry(Protocol):
@@ -131,12 +140,13 @@ class _Work:
         self.limit = limit
         self.used = 0
 
-    def step(self) -> None:
-        if self.used == self.limit:
+    def step(self, amount: int = 1) -> None:
+        if amount > self.limit - self.used:
+            self.used = self.limit
             raise GroundChargeExhaustedError(
                 ChargeSearchStop.GEOMETRY_LIMIT, ChargeSearchCounts(geometry_work=self.used)
             )
-        self.used += 1
+        self.used += amount
 
 
 def _object(value: JsonValue) -> dict[str, JsonValue]:
@@ -174,18 +184,21 @@ def _bounded_int(value: int, maximum: int) -> None:
         raise PolicyError(f"Ground charge count limit must be in [0, {maximum}].")
 
 
-def _placed_models(
-    battlefield: dict[str, JsonValue], context: PlayerDecisionContext
-) -> tuple[_Placed, ...]:
-    displays = context.observation["model_display_by_id"]
-    placed = [
+def _model_placements(battlefield: dict[str, JsonValue]) -> tuple[dict[str, JsonValue], ...]:
+    placed = tuple(
         _object(model)
         for army in _items(battlefield["placed_armies"])
         for unit in _items(_object(army)["unit_placements"])
         for model in _items(_object(unit)["model_placements"])
-    ]
+    )
     if len(placed) > _MAX_OBSTACLES:
         raise PolicyError("Ground charge visible model inventory exceeds its supported scope.")
+    return placed
+
+
+def _placed_models(
+    placed: tuple[dict[str, JsonValue], ...], displays: dict[str, ModelDisplayPayload]
+) -> tuple[_Placed, ...]:
     models: list[_Placed] = []
     for model in placed:
         model_id = _identifier(model["model_instance_id"])
@@ -266,6 +279,25 @@ def _feature_bounds(feature: dict[str, JsonValue]) -> _Bounds:
     return x - rx, y - ry, x + rx, y + ry
 
 
+def _local_blockers(
+    model: _Placed, blockers: tuple[FootprintGeometry, ...], budget: float, work: _Work
+) -> tuple[FootprintGeometry, ...]:
+    start_x, start_y = model.pose.position.x, model.pose.position.y
+    extent = budget + model.base.max_radius()
+    nearby: list[FootprintGeometry] = []
+    for obstacle in blockers:
+        work.step()
+        xmin, ymin, xmax, ymax = obstacle.bounds
+        if (
+            start_x - extent <= xmax
+            and xmin <= start_x + extent
+            and start_y - extent <= ymax
+            and ymin <= start_y + extent
+        ):
+            nearby.append(obstacle)
+    return tuple(nearby)
+
+
 def _paths(
     model: _Placed,
     target: _Placed,
@@ -283,20 +315,7 @@ def _paths(
     if radius > _MAX_GRID_RADIUS:
         raise PolicyError("Ground charge target footprint exceeds the endpoint grid scope.")
     target_x, target_y = target.pose.position.x, target.pose.position.y
-    start_x, start_y = model.pose.position.x, model.pose.position.y
-    extent = budget + model.base.max_radius()
-    nearby: list[FootprintGeometry] = []
-    for obstacle in blockers:
-        work.step()
-        xmin, ymin, xmax, ymax = obstacle.bounds
-        if (
-            start_x - extent <= xmax
-            and xmin <= start_x + extent
-            and start_y - extent <= ymax
-            and ymin <= start_y + extent
-        ):
-            nearby.append(obstacle)
-    local_blockers = tuple(nearby)
+    local_blockers = _local_blockers(model, blockers, budget, work)
     options: list[_Path] = []
     for ix in range(-radius, radius + 1):
         for iy in range(-radius, radius + 1):
@@ -353,15 +372,21 @@ def _formations(
     domains: dict[int, tuple[_Path, ...]],
     placed: dict[int, _Path],
     work: _Work,
+    *,
+    group: bool = False,
 ) -> Iterator[tuple[_Path, ...]]:
     if not domains:
         formation = tuple(path for _, path in sorted(placed.items()))
-        distances = {
-            (index, other_index): a.end.distance(b.end)
-            for index, a in enumerate(formation)
-            for other_index, b in enumerate(formation)
-            if index < other_index
-        }
+        distances: dict[tuple[int, int], float] = {}
+        for index, first in enumerate(formation):
+            for other_index in range(index + 1, len(formation)):
+                if group:
+                    work.step()
+                distances[index, other_index] = first.end.distance(formation[other_index].end)
+        if group:
+            if _connected_group(len(formation), distances, work):
+                yield formation
+            return
         if all(
             any(gap <= _COHERENCY_GAP_INCHES and index in pair for pair, gap in distances.items())
             for index in range(len(formation))
@@ -384,7 +409,253 @@ def _formations(
                 break
             remaining[other_index] = tuple(compatible)
         else:
-            yield from _formations(remaining, {**placed, index: path}, work)
+            yield from _formations(remaining, {**placed, index: path}, work, group=group)
+
+
+def _connected_group(
+    model_count: int, distances: dict[tuple[int, int], float], work: _Work
+) -> bool:
+    if max(distances.values()) > _GROUP_MAX_SPAN_INCHES:
+        return False
+    connected = {0}
+    while True:
+        work.step()
+        next_connected = connected | {
+            index
+            for (first, second), gap in distances.items()
+            if gap <= _COHERENCY_GAP_INCHES and {first, second} & connected
+            for index in (first, second)
+        }
+        if next_connected == connected:
+            return len(connected) == model_count
+        connected = next_connected
+
+
+def _objective_areas(mission_payload: JsonValue, work: _Work) -> tuple[FootprintGeometry, ...]:
+    mission = _object(mission_payload)
+    definitions = _items(mission["objective_terrain_areas"])
+    areas = _items(mission["terrain_areas"])
+    message = "Ground charge objective inventory exceeds its supported scope."
+    if max(len(definitions), len(areas)) > _MAX_OBSTACLES:
+        raise PolicyError(message)
+    polygons: dict[str, tuple[Point2D, ...]] = {}
+    vertex_count = 0
+    for area in map(_object, areas):
+        points = _items(area["footprint_polygon"])
+        vertex_count += len(points)
+        if len(points) > _MAX_OBJECTIVE_AREA_VERTICES or vertex_count > _MAX_OBJECTIVE_VERTICES:
+            raise PolicyError(message)
+        work.step(1 + len(points))
+        polygons[_identifier(area["terrain_area_id"])] = tuple(
+            (_number(point["x_inches"]), _number(point["y_inches"]))
+            for point in map(_object, points)
+        )
+    linked: list[tuple[tuple[Point2D, ...], ...]] = []
+    linked_vertices = 0
+    geometry_work = 0
+    for definition in map(_object, definitions):
+        keys = _items(definition["terrain_area_ids"])
+        if len(keys) > _MAX_OBSTACLES:
+            raise PolicyError(message)
+        work.step(1 + len(keys))
+        if not keys:
+            continue
+        footprints = tuple(polygons[_identifier(key)] for key in keys)
+        vertices = sum(map(len, footprints))
+        linked_vertices += vertices
+        if linked_vertices > _MAX_OBJECTIVE_VERTICES:
+            raise PolicyError(message)
+        geometry_work += vertices * vertices
+        linked.append(footprints)
+    # The footprint backend eagerly checks polygon edges pairwise before union.
+    work.step(geometry_work)
+    return tuple(footprint_for_polygon_union(footprints) for footprints in linked)
+
+
+def _group_endpoints(
+    model: _Placed, targets: tuple[_Placed, ...], budget: float, work: _Work
+) -> Iterator[Pose]:
+    step = _GROUP_GRID_STEP_INCHES
+    start = model.pose.position
+    offsets: set[tuple[int, int]] = set()
+    for target in targets:
+        center = target.pose.position
+        reach = target.base.max_radius() + model.base.max_radius() + _PREFERRED_GAP_INCHES
+        for x in range(
+            math.ceil(max(-budget, center.x - start.x - reach) / step),
+            math.floor(min(budget, center.x - start.x + reach) / step) + 1,
+        ):
+            for y in range(
+                math.ceil(max(-budget, center.y - start.y - reach) / step),
+                math.floor(min(budget, center.y - start.y + reach) / step) + 1,
+            ):
+                work.step()
+                offsets.add((x, y))
+    for x, y in sorted(offsets):
+        if 0 < math.hypot(x * step, y * step) <= budget:
+            yield _at(model, start.x + x * step, start.y + y * step)
+
+
+def _within_board(footprint: FootprintGeometry, width: float, depth: float) -> bool:
+    xmin, ymin, xmax, ymax = footprint.bounds
+    return xmin >= 0 and ymin >= 0 and xmax <= width and ymax <= depth
+
+
+def _group_paths(
+    model: _Placed,
+    targets: tuple[_Placed, ...],
+    blockers: tuple[FootprintGeometry, ...],
+    objectives: tuple[FootprintGeometry, ...],
+    board: tuple[float, float],
+    budget: float,
+    work: _Work,
+) -> tuple[_Path, ...]:
+    width, depth = board
+    local = _local_blockers(model, blockers, budget, work)
+    start_gap = min(model.footprint.distance(target.footprint) for target in targets)
+    options: list[_Path] = []
+    for end in _group_endpoints(model, targets, budget, work):
+        footprint = footprint_for_base(model.base, end)
+        if not _within_board(footprint, width, depth):
+            continue
+        gap = min(footprint.distance(target.footprint) for target in targets)
+        if not _MIN_TARGET_GAP_INCHES <= gap <= _PREFERRED_GAP_INCHES or gap >= start_gap:
+            continue
+        if _blocked(footprint, local, work):
+            continue
+        reached: set[int] = set()
+        for i, objective in enumerate(objectives):
+            work.step()
+            if footprint.intersects(objective):
+                reached.add(i)
+        for waypoint in (None, *_waypoints(model, end)):
+            work.step()
+            poses = (model.pose, end) if waypoint is None else (model.pose, waypoint, end)
+            distance = sum(a.distance_3d_to(b) for a, b in pairwise(poses))
+            if distance > budget:
+                continue
+            footprints: tuple[FootprintGeometry, ...] = (model.footprint, footprint)
+            if waypoint is not None:
+                middle = footprint_for_base(model.base, waypoint)
+                if not _within_board(middle, width, depth):
+                    continue
+                footprints = (model.footprint, middle, footprint)
+            sweeps = tuple(
+                cast(_HullGeometry, a.union(b)).convex_hull for a, b in pairwise(footprints)
+            )
+            if not any(_blocked(sweep, local, work) for sweep in sweeps):
+                options.append(_Path(poses, footprint, sweeps, distance, gap, frozenset(reached)))
+                break
+    return tuple(
+        sorted(
+            options,
+            key=lambda path: (
+                path.gap > _PREFERRED_GAP_INCHES,
+                path.distance,
+                path.gap,
+            ),
+        )
+    )
+
+
+def _group_formations(
+    banks: dict[int, tuple[_Path, ...]], work: _Work
+) -> Iterator[tuple[_Path, ...]]:
+    # Try a distinct one-inch landing region for a mover on a visible objective.
+    # Then allow the ordinary finite search when those anchors are unavailable.
+    anchors: dict[tuple[int, int, int], _Path] = {}
+    for slot, paths in banks.items():
+        for path in paths:
+            if path.objectives:
+                end = path.poses[-1].position
+                anchors.setdefault((slot, math.floor(end.x), math.floor(end.y)), path)
+    seen: set[tuple[tuple[Pose, ...], ...]] = set()
+    for (slot, _, _), path in sorted(
+        anchors.items(),
+        key=lambda pair: (
+            pair[1].distance,
+            pair[0],
+        ),
+    ):
+        formation = next(_formations({**banks, slot: (path,)}, {}, work, group=True), None)
+        if formation is not None:
+            key = tuple(p.poses for p in formation)
+            if key not in seen:
+                seen.add(key)
+                yield formation
+    for formation in _formations(banks, {}, work, group=True):
+        if tuple(p.poses for p in formation) not in seen:
+            yield formation
+
+
+def _candidate(
+    context: PlayerDecisionContext,
+    issued: MovementProposalRequest,
+    target_id: str,
+    movers: tuple[_Placed, ...],
+    formation: tuple[_Path, ...],
+) -> GroundChargeCandidate:
+    witness = PathWitness.for_paths(
+        tuple((model.model_id, path.poses) for model, path in zip(movers, formation, strict=True))
+    )
+    proposal: JsonValue = validate_json_value(
+        ChargeMoveProposal(
+            issued.request_id,
+            ProposalKind.CHARGE_MOVE,
+            issued.unit_instance_id,
+            "charge_move",
+            MovementMode.CHARGE,
+            (target_id,),
+            witness,
+        ).to_payload()
+    )
+    return GroundChargeCandidate(
+        context.propose(proposal),
+        max(path.distance for path in formation),
+        sum(path.distance for path in formation),
+        sum(len(path.poses) > 2 for path in formation),
+        len({objective for path in formation for objective in path.objectives}),
+    )
+
+
+def _five_model_candidates(
+    context: PlayerDecisionContext,
+    issued: MovementProposalRequest,
+    target_id: str,
+    movers: tuple[_Placed, ...],
+    targets: tuple[_Placed, ...],
+    static: tuple[FootprintGeometry, ...],
+    objectives: tuple[FootprintGeometry, ...],
+    board: tuple[float, float],
+    budget: float,
+    work: _Work,
+    raw_limit: int,
+) -> GroundChargeCandidates:
+    candidates: list[GroundChargeCandidate] = []
+    stop = ChargeSearchStop.COMPLETE
+    try:
+        banks = {
+            index: _group_paths(
+                model,
+                targets,
+                (*static, *(later.footprint for later in movers[index + 1 :])),
+                objectives,
+                board,
+                budget,
+                work,
+            )
+            for index, model in enumerate(movers)
+        }
+        for formation in _group_formations(banks, work):
+            candidates.append(_candidate(context, issued, target_id, movers, formation))
+            if len(candidates) == raw_limit:
+                stop = ChargeSearchStop.RAW_LIMIT
+                break
+    except GroundChargeExhaustedError:
+        stop = ChargeSearchStop.GEOMETRY_LIMIT
+    if not candidates:
+        raise GroundChargeExhaustedError(stop, ChargeSearchCounts(geometry_work=work.used))
+    return GroundChargeCandidates(tuple(candidates), work.used, stop)
 
 
 def _formation_stage(
@@ -449,19 +720,36 @@ def generate_ground_charge_candidates(
         raise PolicyError("Ground charge requires a positive issued distance.")
     if raw_limit == 0:
         raise GroundChargeExhaustedError(ChargeSearchStop.RAW_LIMIT, ChargeSearchCounts())
+    work = _Work(geometry_limit)
+    if not geometry_limit:
+        work.step()
     battlefield = _object(view["battlefield_state"])
-    models = _placed_models(battlefield, context)
+    placements = _model_placements(battlefield)
+    five_models = sum(row["unit_instance_id"] == issued.unit_instance_id for row in placements) == 5
+    objectives = _objective_areas(view["mission_setup"], work) if five_models else ()
+    models = _placed_models(placements, view["model_display_by_id"])
     movers = tuple(model for model in models if model.unit_id == issued.unit_instance_id)
-    targets = tuple(model for model in models if model.unit_id == target_id)
-    if (
-        len(movers) != 6
-        or len(targets) != 1
-        or any(
-            type(model.base) not in (CircularBase, OvalBase) or model.pose.position.z != 0
-            for model in (*movers, *targets)
+    if five_models:
+        battlefield_view = view["battlefield_view"]
+        if battlefield_view is None:
+            raise PolicyError("Ground charge requires projected rules-unit identities.")
+        projected = battlefield_view["authoritative"]["models_by_id"]
+        targets = tuple(
+            model
+            for model in models
+            if (entity := projected.get(model.model_id)) is not None
+            and entity["rules_unit_instance_id"] == target_id
+            and entity["state"] == "placed"
         )
+    else:
+        targets = tuple(model for model in models if model.unit_id == target_id)
+    if (len(movers), len(targets)) not in ((6, 1), (5, 5)) or any(
+        type(model.base) not in (CircularBase, OvalBase) or model.pose.position.z != 0
+        for model in (*movers, *targets)
     ):
-        raise PolicyError("Ground charge requires six ground movers and one ground target model.")
+        raise PolicyError(
+            "Ground charge requires six versus one or five versus five ground models."
+        )
     unit_displays = view["unit_display_by_id"]
     mover_display = unit_displays[issued.unit_instance_id]
     if (
@@ -474,13 +762,12 @@ def generate_ground_charge_candidates(
         for model in (*movers, *targets)
     ):
         raise PolicyError("Ground charge requires visible surviving participants.")
-    target = targets[0]
     # Nearest-first physical execution. Stable coordinate keys precede IDs.
     movers = tuple(
         sorted(
             movers,
             key=lambda model: (
-                model.pose.distance_3d_to(target.pose),
+                min(model.pose.distance_3d_to(target.pose) for target in targets),
                 model.pose.position.x,
                 model.pose.position.y,
                 model.model_id,
@@ -513,7 +800,21 @@ def generate_ground_charge_candidates(
     )
     width = _number(battlefield["battlefield_width_inches"])
     depth = _number(battlefield["battlefield_depth_inches"])
-    work = _Work(geometry_limit)
+    if five_models:
+        return _five_model_candidates(
+            context,
+            issued,
+            target_id,
+            movers,
+            targets,
+            static,
+            objectives,
+            (width, depth),
+            budget,
+            work,
+            raw_limit,
+        )
+    target = targets[0]
     direct: list[GroundChargeCandidate] = []
     waypoint: list[GroundChargeCandidate] = []
     stop = ChargeSearchStop.COMPLETE
@@ -547,32 +848,8 @@ def generate_ground_charge_candidates(
                 waypoint_count = sum(len(path.poses) == 3 for path in formation)
                 if use_waypoints != (waypoint_count > 0):
                     continue
-                witness = PathWitness.for_paths(
-                    tuple(
-                        (model.model_id, path.poses)
-                        for model, path in zip(movers, formation, strict=True)
-                    )
-                )
-                proposal: JsonValue = validate_json_value(
-                    ChargeMoveProposal(
-                        issued.request_id,
-                        ProposalKind.CHARGE_MOVE,
-                        issued.unit_instance_id,
-                        "charge_move",
-                        MovementMode.CHARGE,
-                        (target_id,),
-                        witness,
-                    ).to_payload()
-                )
                 group = waypoint if use_waypoints else direct
-                group.append(
-                    GroundChargeCandidate(
-                        context.propose(proposal),
-                        max(path.distance for path in formation),
-                        sum(path.distance for path in formation),
-                        waypoint_count,
-                    )
-                )
+                group.append(_candidate(context, issued, target_id, movers, formation))
                 if len(direct) + len(waypoint) == raw_limit:
                     return GroundChargeCandidates(
                         _interleave(direct, waypoint),

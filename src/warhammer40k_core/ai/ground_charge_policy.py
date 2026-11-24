@@ -72,6 +72,7 @@ class PreparedGroundCharge:
     stop: ChargeSearchStop
     generation_seconds: float
     validation_seconds: float
+    selection_seconds: float
 
 
 class GroundChargeValidationExhaustedError(GroundChargeExhaustedError):
@@ -262,9 +263,11 @@ def prepare_ground_charge_policy(
             generation_seconds,
             validation_seconds,
         )
+    selection_started = monotonic()
     ranked = sorted(
         accepted,
         key=lambda candidate: (
+            -candidate.objective_reach,
             candidate.longest_path_inches,
             candidate.total_path_inches,
         ),
@@ -292,4 +295,5 @@ def prepare_ground_charge_policy(
         stop,
         generation_seconds,
         validation_seconds,
+        monotonic() - selection_started,
     )

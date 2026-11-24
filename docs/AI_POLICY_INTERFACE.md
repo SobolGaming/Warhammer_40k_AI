@@ -2899,17 +2899,22 @@ Required local/hosted gates and both exact-final-head independent reviews remain
 delivery prerequisites. These observations do not qualify complete-game timing,
 tactical benefit or learning eligibility.
 
-## Opt-in six-model ground Charge Move
+## Opt-in ground Charge Move
 
 `ai.ground_charge_candidates.generate_ground_charge_candidates` takes the pending
 actor's `PlayerDecisionContext` on the exact battle Charge / movement proposal /
 `charge_move` route. It uses the issued target and distance, visible model poses
-and footprints, and visible terrain. The scoped formation has six grounded
-movers and one grounded model in the selected opposing unit. Search keeps each
-mover's facing and elevation, samples endpoints around the target, and tries
-direct paths and paths with one lateral waypoint per model. The placement and
-clearance screens are bounded geometric heuristics. The ordinary engine still
-decides path, terrain, endpoint and coherency legality.
+and footprints, and visible terrain. The two supported formation sizes are
+six grounded movers against one grounded target model and five against five.
+Search keeps each mover's facing and elevation and tries direct paths and paths
+with one lateral waypoint per model. For five against five, the policy groups
+visible placed target models by their projected rules-unit identity, including
+attached components. It keeps the issued target ID in the proposal. Each
+endpoint is near at least one target model. The search screens for connected
+coherency and samples landing regions on visible objective terrain. Objective
+preprocessing caps area and vertex inventory and charges the geometry work
+budget before building footprints. The engine decides path, terrain, endpoint
+and coherency legality.
 
 Call `ai.ground_charge_policy.prepare_ground_charge_policy` with the matching
 actor context and an exclusively owned `LocalGameSession` in a single-threaded,
@@ -2924,12 +2929,15 @@ existing viewer submission. This uses the existing [adapter decision contract](A
 Preparation caps generation at 32 proposals and 600,000 geometry work units,
 then checks at most 32 proposals and retains at most 16 accepts. A probe defaults
 to 15 seconds, is capped at 30 seconds, and shares a 300-second native deadline
-with the other probes. The operator receipt separates generation and validation
-time, accepts, engine rejections and timeouts. Selection orders only completed
-native accepts by shortest longest model path, then shortest total, with stable
+with the other probes. The operator receipt separates generation, validation
+and selection time and records accepts, engine rejections and timeouts.
+Selection considers completed native accepts. For five against five it first
+prefers more distinct linked objective areas reached by the formation. It then
+prefers the shortest longest model path and the shortest total, with stable
 generated order for ties. An unresolved timeout before a selection limit or
 a search with no accepted proposal raises typed exhaustion before registration.
-This is a single decision policy with explicit registration.
+Those results describe the bounded search. This policy covers a single decision
+with explicit registration.
 
 ## Native preserve Fight continuation
 

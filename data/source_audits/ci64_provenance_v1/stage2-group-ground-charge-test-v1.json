@@ -1,0 +1,25 @@
+{
+  "schema": "finite-stage2-group-ground-charge-test-v1",
+  "base": "ffd62f1b1cdcf81c2fbd4b99457482c1018d2eb8",
+  "retained_transition_sha256": "0b1591280543a9952a3da9590a64dde5f6d6d5ebe1412ad333edac4234293001",
+  "retained_runtime_fingerprint": "e7042cdd0b8f68eaf73967b27b3e5b058fca3247f98340259499c0c4cf9e5606",
+  "runtime_fingerprint": "9093c4f4cf68af8485115fa985de7d02e2b36cb3c27e2a233e7388c31ab7e9d4",
+  "sources": {
+    "src/warhammer40k_core/ai/ground_charge_candidates.py": {
+      "before": "f581c6f6f7bc17b611f8bab05d5dbb1a788e2c49f6a2cec0603c3a8adc6f83f7",
+      "after": "119d2b422daa3154db2a703491fd14f4a946c9ddb9f47a97653c833a4837685f"
+    },
+    "src/warhammer40k_core/ai/ground_charge_policy.py": {
+      "before": "b05be820adf733f7b74d27955fe22e625cd73a186ede3fb1372ecbaaa4d4720a",
+      "after": "aacc6a6ba17261eed94491d4705669177bcddfddc50306a0a7006f696fa931b9"
+    }
+  },
+  "added_files": {
+    "tests/infrastructure/adapters/test_group_ground_charge_policy.py": {
+      "mode": "100644",
+      "bytes": 14532,
+      "sha256": "9e38771b24ab5df522f60d7b57353c30eb710595b2921a4b77d8cc76f9bb9825",
+      "blob_sha1": "db6a96b564e75ebb0536b7e468992269698bc1bb"
+    }
+  }
+}
