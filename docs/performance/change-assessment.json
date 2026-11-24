@@ -4,6 +4,26 @@
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:3ab59441d5b59260e25b52791d21b84fb3759484fbec344689d8ad765b676fd4",
   "operation_map_sha256": "d1d720fecbda90ac40a84c4449b35c271871bd7b513fe3cc18467d09c2029d08",
   "changes": {
+    "ci/quality_shards/all.txt": {
+      "before_sha256": "4fcd4aead761e9aba13f33ff9ef3365169bb521640a966ffeb09d73c9e4b62b0",
+      "after_sha256": "1a0ce3ac14e7d040580a8063aa323fc0561e165bd62531725d612296ac65db55",
+      "owners": {
+        "@document": {
+          "before": "4fcd4aead761e9aba13f33ff9ef3365169bb521640a966ffeb09d73c9e4b62b0",
+          "after": "1a0ce3ac14e7d040580a8063aa323fc0561e165bd62531725d612296ac65db55"
+        }
+      }
+    },
+    "ci/quality_shards/shard-4.txt": {
+      "before_sha256": "2cdb33a1b69efe104ff471bbb36ce675f038a40351cdfb8648323fd210c43f6a",
+      "after_sha256": "6638459fc909c8e9e56f6f36be633968f5fbab33b6f2001fb5b53413949ee581",
+      "owners": {
+        "@document": {
+          "before": "2cdb33a1b69efe104ff471bbb36ce675f038a40351cdfb8648323fd210c43f6a",
+          "after": "6638459fc909c8e9e56f6f36be633968f5fbab33b6f2001fb5b53413949ee581"
+        }
+      }
+    },
     "contracts/examples/persistence/session-persistence.json": {
       "before_sha256": "53f446c4b290322e7e4e811590edc3869bcedc5aa30cd200c8002ff95b498df8",
       "after_sha256": "1b2054425b4b6e35a4553558dc609dccecb7bb80a53b39b00fe15f406e03bba2",
@@ -226,6 +246,22 @@
     }
   },
   "rows": {
+    "ci/quality_shards/all.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Records the exact owner mapping or the measured current comparison for the bounded pending Battle-shock authority change.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/quality_shards/shard-4.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Records the exact owner mapping or the measured current comparison for the bounded pending Battle-shock authority change.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "measured_workload",
       "operations": [
