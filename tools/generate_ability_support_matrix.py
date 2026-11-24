@@ -4745,12 +4745,13 @@ def _chaos_daemons_nurgle_review_rows() -> tuple[DatasheetGroupReviewRow, ...]:
             datasheet="Beasts of Nurgle",
             datasheet_id="000001134",
             source_basis="PDF pages 82-83; supersedes Wahapedia.",
-            ir_coverage="Unsupported IR",
+            ir_coverage="Grotesque Regeneration consumed",
             supported_semantics=(
                 'Deadly Demise 1, Deep Strike, Scouts 6", and The Shadow of Chaos are '
-                "known structured paths."
+                "known structured paths. Grotesque Regeneration restores the living model's "
+                "lost wounds at the end of each phase through shared catalog RuleIR."
             ),
-            semantics_needed="Grotesque Regeneration end-of-phase healing.",
+            semantics_needed="None for Grotesque Regeneration.",
             catalog_blockers="Representative height remains unreviewed outside this report.",
         ),
         DatasheetGroupReviewRow(

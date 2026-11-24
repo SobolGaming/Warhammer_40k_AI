@@ -1,238 +1,504 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "b7f2d27b3afaa98cb68420cdcecc85350562fdbb",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:bef24c387ca386c885fd7508796e065e0e6fb68efa2159f3aa8be6d8f41b1db1",
-  "operation_map_sha256": "e4da5aa6fea51b6d5dd2b35f52d0a06ee3ff6d42049b1851d680ec402ad06638",
+  "base": "d9185cf53a2816ab666f3c1b16410b960a3d1cc7",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:858c9136f8da02d92ff986bc6e54d7d608070f3a89df76de009cc655d0433bd0",
+  "operation_map_sha256": "c3c9351caf2199dd5ee24fba29f7546e7db9f7d6e10adefe76f5374201c981a7",
   "changes": {
-    "docs/AI_IMPLEMENTATION_PLAN.md": {
-      "before_sha256": "3c874cdf08e2c21db30ce9c4b3554b64829df8760e602f36ee9cb990577d2d6c",
-      "after_sha256": "21e66a9d3d6ab57b55723900e8886406fdf71d52abd6a6f1f002324b693392e4",
+    "contracts/examples/persistence/session-persistence.json": {
+      "before_sha256": "a530d4d49fb6df3defaa5162c9f3e5ef7e3c08d37e090a237e4e1791fb72b941",
+      "after_sha256": "3b859d95c83a93048a6a5eadb1ae5c93195012332f1433cfbffb2f94a2947035",
       "owners": {
         "@document": {
-          "before": "3c874cdf08e2c21db30ce9c4b3554b64829df8760e602f36ee9cb990577d2d6c",
-          "after": "21e66a9d3d6ab57b55723900e8886406fdf71d52abd6a6f1f002324b693392e4"
+          "before": "a530d4d49fb6df3defaa5162c9f3e5ef7e3c08d37e090a237e4e1791fb72b941",
+          "after": "3b859d95c83a93048a6a5eadb1ae5c93195012332f1433cfbffb2f94a2947035"
+        }
+      }
+    },
+    "contracts/examples/sessions/session-command-outcome.json": {
+      "before_sha256": "d7347b7ca05a03defd0528461c0c9326fc4f1c48b9df32df35a2ada11a223975",
+      "after_sha256": "b1812dadd30ce05aa3cd7b6c9b4107845bd0effe6431e895cb1d89f5219b06a7",
+      "owners": {
+        "@document": {
+          "before": "d7347b7ca05a03defd0528461c0c9326fc4f1c48b9df32df35a2ada11a223975",
+          "after": "b1812dadd30ce05aa3cd7b6c9b4107845bd0effe6431e895cb1d89f5219b06a7"
+        }
+      }
+    },
+    "contracts/examples/sessions/session-command-started.json": {
+      "before_sha256": "a7a4bad46c410484f9f1488832ccb422378e252a0d1fa4fc5f3bb4f0c8cb77a2",
+      "after_sha256": "3967bb245452e604c3002d63e9272af569f98c59e487e20caf2f2091e3431202",
+      "owners": {
+        "@document": {
+          "before": "a7a4bad46c410484f9f1488832ccb422378e252a0d1fa4fc5f3bb4f0c8cb77a2",
+          "after": "3967bb245452e604c3002d63e9272af569f98c59e487e20caf2f2091e3431202"
+        }
+      }
+    },
+    "contracts/examples/sessions/session-metadata-created.json": {
+      "before_sha256": "1eb4f8c321a04e17f6b49af1b97e2d2d57788f642624897efaa656a5910b3988",
+      "after_sha256": "e1bfa8bafa11d990c251ab8cd3e08a4a33b29704af2a459804ebe049b5a11039",
+      "owners": {
+        "@document": {
+          "before": "1eb4f8c321a04e17f6b49af1b97e2d2d57788f642624897efaa656a5910b3988",
+          "after": "e1bfa8bafa11d990c251ab8cd3e08a4a33b29704af2a459804ebe049b5a11039"
+        }
+      }
+    },
+    "contracts/examples/support-profile-player-a-redacted.json": {
+      "before_sha256": "074d093c6b78a6a14be883de53a1075093954c9b45349329736195d449c050d6",
+      "after_sha256": "ed3b466bde7e46572635fd9d80912f158ed0ada69ff10342ed8db7f3c3aaa18b",
+      "owners": {
+        "@document": {
+          "before": "074d093c6b78a6a14be883de53a1075093954c9b45349329736195d449c050d6",
+          "after": "ed3b466bde7e46572635fd9d80912f158ed0ada69ff10342ed8db7f3c3aaa18b"
+        }
+      }
+    },
+    "contracts/examples/support-profile-player-b-redacted.json": {
+      "before_sha256": "f3abb13bf455f2a14e73466005e4ccb5bf4249c0b056128b0a04d5eb251e9847",
+      "after_sha256": "a11b77527dcaa708d95ce6863e40e85f06a0138e804bc740023e751d8d026a3e",
+      "owners": {
+        "@document": {
+          "before": "f3abb13bf455f2a14e73466005e4ccb5bf4249c0b056128b0a04d5eb251e9847",
+          "after": "a11b77527dcaa708d95ce6863e40e85f06a0138e804bc740023e751d8d026a3e"
+        }
+      }
+    },
+    "contracts/examples/support-profile.json": {
+      "before_sha256": "f8372e7e66f26c381ba4d6ea4b047e128f5fbd4033ed2d3777336c4db9a56c84",
+      "after_sha256": "696213f346b6e682c484530425c09eab214eb1c5ea2d1a66d2ed765f7bc0f47c",
+      "owners": {
+        "@document": {
+          "before": "f8372e7e66f26c381ba4d6ea4b047e128f5fbd4033ed2d3777336c4db9a56c84",
+          "after": "696213f346b6e682c484530425c09eab214eb1c5ea2d1a66d2ed765f7bc0f47c"
+        }
+      }
+    },
+    "contracts/manifest.json": {
+      "before_sha256": "7c92771ab76551333a3a7ef5a6d8391e6bf9ea0dbaa366f0e5662e4b1d561d7c",
+      "after_sha256": "bbffd76f9041c85a5c753bbed85549ecb49eeeb00caa3760c1cce6b1fe6a1543",
+      "owners": {
+        "@document": {
+          "before": "7c92771ab76551333a3a7ef5a6d8391e6bf9ea0dbaa366f0e5662e4b1d561d7c",
+          "after": "bbffd76f9041c85a5c753bbed85549ecb49eeeb00caa3760c1cce6b1fe6a1543"
+        }
+      }
+    },
+    "data/generated/ability_coverage/cross_source_semantic_equivalence.json": {
+      "before_sha256": "ce35eabd06ae0f843143847636da15764489cb9b05bd6368a004d3c912afaf0a",
+      "after_sha256": "6a243f769ad2dad1d478babe8e9a47ad9e255b606e41a21e2d163a7e894cf582",
+      "owners": {
+        "@document": {
+          "before": "ce35eabd06ae0f843143847636da15764489cb9b05bd6368a004d3c912afaf0a",
+          "after": "6a243f769ad2dad1d478babe8e9a47ad9e255b606e41a21e2d163a7e894cf582"
+        }
+      }
+    },
+    "data/source_audits/ci64_provenance_v1/grotesque-regeneration-transition-v1.json": {
+      "before_sha256": null,
+      "after_sha256": "4e48442b32a20933c864a1f5e7c5d398233526c9d1d4a4aa720f0eb50af86581",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "4e48442b32a20933c864a1f5e7c5d398233526c9d1d4a4aa720f0eb50af86581"
+        }
+      }
+    },
+    "docs/ABILITY_SUPPORT_MATRIX_V2.md": {
+      "before_sha256": "102273d6ae0d5c053d0743d3e321d38f58779c948440ac22489220155c9f6150",
+      "after_sha256": "fea49b6cfc42f51fbbeacd87f5c569bb6f213eb701b7dfc5dd3f41eba8708287",
+      "owners": {
+        "@document": {
+          "before": "102273d6ae0d5c053d0743d3e321d38f58779c948440ac22489220155c9f6150",
+          "after": "fea49b6cfc42f51fbbeacd87f5c569bb6f213eb701b7dfc5dd3f41eba8708287"
+        }
+      }
+    },
+    "docs/CROSS_SOURCE_SEMANTIC_EQUIVALENCE.md": {
+      "before_sha256": "ab4b7b286362d89b067de4f78cff595547384dc14c1e4dad001478fb4b71b2c3",
+      "after_sha256": "b50d81510425fb1a4f14f06ec1014bdbf6ac33db9871120da784775cd8a54d62",
+      "owners": {
+        "@document": {
+          "before": "ab4b7b286362d89b067de4f78cff595547384dc14c1e4dad001478fb4b71b2c3",
+          "after": "b50d81510425fb1a4f14f06ec1014bdbf6ac33db9871120da784775cd8a54d62"
+        }
+      }
+    },
+    "docs/factions/chaos-daemons.md": {
+      "before_sha256": "1d13278983edfddb2cabf839444ca922f9e9760e0b28f12b3c55e40897cfab86",
+      "after_sha256": "5c47baaf01842c30716deb4b7946ca4a37b0a75297c26486ecfeaa4f24f9a8c8",
+      "owners": {
+        "@document": {
+          "before": "1d13278983edfddb2cabf839444ca922f9e9760e0b28f12b3c55e40897cfab86",
+          "after": "5c47baaf01842c30716deb4b7946ca4a37b0a75297c26486ecfeaa4f24f9a8c8"
+        }
+      }
+    },
+    "docs/factions/death-guard.md": {
+      "before_sha256": "9b25d69bdaf8f58944a8f4eaf99ecd0935c5b7502211229a8a6d48390a4268e5",
+      "after_sha256": "5c51530762e860e4e4a9c5e87665313f2eedf1d87a5d69eddd218218c26e1087",
+      "owners": {
+        "@document": {
+          "before": "9b25d69bdaf8f58944a8f4eaf99ecd0935c5b7502211229a8a6d48390a4268e5",
+          "after": "5c51530762e860e4e4a9c5e87665313f2eedf1d87a5d69eddd218218c26e1087"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "f7a5a5d76b63e39f0406d1472cdbd3200b528b3ddd6a5f48d64b1d1d53b2d090",
-      "after_sha256": "f9e6133929dc2574a3b8d3eb3aed2911b74770d6be43a9577124c33e08e9e840",
+      "before_sha256": "f9e6133929dc2574a3b8d3eb3aed2911b74770d6be43a9577124c33e08e9e840",
+      "after_sha256": "baf1b62350ed57b0c19c5eca75d82311c9836091726ddefd0d7ba19c7b7038c2",
       "owners": {
         "@document": {
-          "before": "f7a5a5d76b63e39f0406d1472cdbd3200b528b3ddd6a5f48d64b1d1d53b2d090",
-          "after": "f9e6133929dc2574a3b8d3eb3aed2911b74770d6be43a9577124c33e08e9e840"
+          "before": "f9e6133929dc2574a3b8d3eb3aed2911b74770d6be43a9577124c33e08e9e840",
+          "after": "baf1b62350ed57b0c19c5eca75d82311c9836091726ddefd0d7ba19c7b7038c2"
         }
       }
     },
-    "scripts/stage2_preservation_timing.py": {
+    "scripts/engine_numerical_identity_test_admission.py": {
+      "before_sha256": "4c58252eba4630a363f950c8fbfd0f00c5782f649cd709801f62978dc56563eb",
+      "after_sha256": "3d8f80931b128ac9ef1e425276125810e617e463bf50863f0bc258b83cbbf743",
+      "owners": {
+        "_grotesque_regeneration_test_successor": {
+          "before": null,
+          "after": "d963f01eb21cc227ecc5a293a9b5e473a5d0d55439124ca91eeebe1423c28a4c"
+        },
+        "exact_movement_test_transition": {
+          "before": "bc337417facb730a788c505b7c27b16a6b7d036c4d8ebb2ef25348f533753bf6",
+          "after": "47043dc2d83ab3e173e662c0874a72704bb4665d99c87e9327e2a05f5d8db428"
+        }
+      }
+    },
+    "src/warhammer40k_core/_engine_build_manifest.json": {
+      "before_sha256": "5f1f327281ba68b1dd4d6d411108a006a23f856fe508466be435e0d94820cf06",
+      "after_sha256": "94b048d787d3909f961ef1c4ad0b779ff7d99ed86fa6578e9d176a7783b8e748",
+      "owners": {
+        "@document": {
+          "before": "5f1f327281ba68b1dd4d6d411108a006a23f856fe508466be435e0d94820cf06",
+          "after": "94b048d787d3909f961ef1c4ad0b779ff7d99ed86fa6578e9d176a7783b8e748"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/catalog_datasheet_rule_extensions.py": {
+      "before_sha256": "c1476de065b3bf0af89da609d00dd90ac09a15350f8409fb61d6efa6f06f9206",
+      "after_sha256": "9821d45f786b2f3f7d007052ba89ae4ebced6059debec60594be093e19b0636d",
+      "owners": {
+        "@module": {
+          "before": "15de5d3e32e083f2548645eb15c734b659b9b9731971ba7f241968bbc7049d66",
+          "after": "718017b05d48f2e20d0dbbd0051fcf873efbc3307d726edf619486b3ae42554e"
+        },
+        "clause_is_phase_end_self_healing": {
+          "before": null,
+          "after": "56ec57b0a77c9f2e91ed7d0c3e980150220d5535e92329484621436674311858"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/catalog_datasheet_rule_support.py": {
+      "before_sha256": "de63eb937fc7d9eca433ad4e0408ab2ca597f34e1d5ae1397dfa6912558be4c4",
+      "after_sha256": "3c0cf1498fb977a122c3a62b3b15d765033e7930b587c769f46b39aaafaeaf20",
+      "owners": {
+        "@module": {
+          "before": "d54ab1909ea1ce93395f434f799644146932dc86d96c694df5363be016827131",
+          "after": "f04bec021c9af3e21268c58bf4870b98e636abb396ca3c23c0ec7255e4752588"
+        },
+        "clause_has_invalid_exact_datasheet_runtime_shape": {
+          "before": "5aaa7a4868e2c7af7891875b7d4fd7b2eedbe228ead52ccd8890b8d5c1a61ff3",
+          "after": "1acc092b16583a8fa4f8ab70b47a2834fe379c2c727b2cf5470c7bb580380a6f"
+        },
+        "consumer_ids_for_clause": {
+          "before": "64012b2711bb0e219e9da013c50ce9c5dcbf74b8ab344806a11022aaa88ffbb9",
+          "after": "582adc8aaf671e9cc8cbbba11294728f889876222750c4c80fdfb425fb702b4e"
+        },
+        "registered_consumer_ids": {
+          "before": "293948707f45843c95232015b24fd83d2be8369a2691cdba0b63069058541bbd",
+          "after": "bc216c2ad74108a19315b3e04a16c302ea5ab08ff048230063ba5e4c8604c5a3"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/catalog_phase_end_healing.py": {
       "before_sha256": null,
-      "after_sha256": "80de96b1091916f371b0c3997a527888e1015926137990ca6c7ccfea521a2aef",
+      "after_sha256": "26b352631298b27d7a67e948a0e8a9cd14d64fde3bc8248ac3977810f923f244",
       "owners": {
         "@module": {
           "before": null,
-          "after": "f6ce3cace4935d4c7b7a9c98491d01075998f8e5790ccd99dd28a9ae7dfae9b0"
+          "after": "3234bf14516e20a05ededd9d84ba5e239302747ffe3c17bdcd0443a9894b5b6b"
         },
-        "Blocker": {
+        "_candidates": {
           "before": null,
-          "after": "73ad02b8dc49ef5d55dd4a2a3b9e96a32554c04105590b39e9739f042b098187"
+          "after": "b6760e17321bb6c97a806a223609d0a71c43a37cc3b466dfc6bade728d8e1789"
         },
-        "Experiment": {
+        "_restore_wounds": {
           "before": null,
-          "after": "b34bb036d1d33998bc1dc3a66099f035047a16aeed791431a81d33af658ea925"
+          "after": "133812d576d768f30da9697cd94671abb2e09d28387cfe42513c6b9606e7c53d"
         },
-        "Experiment.__enter__": {
+        "catalog_phase_end_healing_bindings": {
           "before": null,
-          "after": "b1d9afdbf340299eb63649b1713baa87e774e5e24fc3a3cbcaaecfe2e6804411"
+          "after": "26d4dd9be76a6e3f201fd3292bbe09eb7ee40cb9fb9b52d04b5fd9120d913c95"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/faction_content/phase_end_hook_registries.py": {
+      "before_sha256": "c6ad419e1c01cea3f66c630cc7310fdc97006d4420285a123ebf788ea82264ae",
+      "after_sha256": "96353725dc12bd895572ccc4120d8659f9d09651d2d28589acd4cc8ec54f818d",
+      "owners": {
+        "@module": {
+          "before": "c675ca84e641320107716e1b56fc7be536607c9ea88eb54af0c6534397a23358",
+          "after": "10e6e4d1a2d0095f9411732fd5795e4238fb4e9c3feb70de8c46d5ce2b841cd7"
         },
-        "Experiment.__exit__": {
+        "phase_end_registry": {
+          "before": "53afeac86b378d9e4ebc0287e896c556c2e1729e17fdebcdcf61c6ea1be5707e",
+          "after": "c2c7dd2d423ad56d21cba1f0f01eeaf5af88e3561f8d0dd682f2511faef863d8"
+        }
+      }
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_pack_rule_ir/__init__.py": {
+      "before_sha256": "e0e0385b6f6d7d0ff550741b0e8f58548ba87478f5fd9e0af256e4aca22201ca",
+      "after_sha256": "ba715ea27e2aaa018ca318a5a53f34f7fa2f8683a3293c610fc3d8edef85f9f7",
+      "owners": {
+        "@module": {
+          "before": "3cf8ab94850be0b892ab257043f8168ecb937518b2dc067a73491af3aa79bc2f",
+          "after": "1c485423f205502a32f98d8ba6e148d4c53b4f057099b647775d7585937d4768"
+        }
+      }
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_pack_rule_ir/_artifacts.py": {
+      "before_sha256": "d8713371d7aa67bd1ca55290caf8e9741e94b7c3f5259c30b1ee1ac8cba83195",
+      "after_sha256": "39f8c123613b7259cbf823a9f391502c13c0c6ff58c7b98ba11d0fc9b4e00737",
+      "owners": {
+        "@module": {
+          "before": "c74f44d74d5a661d6eb251ec45131c92574f2ba11736be49bc25877dfe6357bd",
+          "after": "9d041ca248806302f74ef02f96b8e100e1cd3664ee6b386ba57fddffeed1350a"
+        }
+      }
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_pack_rule_ir/artifacts/package.json": {
+      "before_sha256": "11cd609fb635d4b4cece6707f9bf6360cb4d5d8d4162b0e8f8125a02c6b5ee75",
+      "after_sha256": "dec2004a4a82de40ec87a38090b94b173fe540e54eaa4cf4e573619d6cd88cd8",
+      "owners": {
+        "@document": {
+          "before": "11cd609fb635d4b4cece6707f9bf6360cb4d5d8d4162b0e8f8125a02c6b5ee75",
+          "after": "dec2004a4a82de40ec87a38090b94b173fe540e54eaa4cf4e573619d6cd88cd8"
+        }
+      }
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_pack_rule_ir/artifacts/shards/chaos-daemons.json": {
+      "before_sha256": "0f42df67de162c702a1348ab0ece0867bd4d06d1581a940d42e95d789dbac607",
+      "after_sha256": "249e340591648a13a9246ca0170870500cb1c54318a105d6aa99bb78ae1eb8b0",
+      "owners": {
+        "@document": {
+          "before": "0f42df67de162c702a1348ab0ece0867bd4d06d1581a940d42e95d789dbac607",
+          "after": "249e340591648a13a9246ca0170870500cb1c54318a105d6aa99bb78ae1eb8b0"
+        }
+      }
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_pack_rule_ir/artifacts/shards/death-guard.json": {
+      "before_sha256": null,
+      "after_sha256": "2b2e54d59790f4422a1f5460dd7bb3ad695854881f1f6f770c136d6c4ba7d028",
+      "owners": {
+        "@document": {
           "before": null,
-          "after": "0b321d180a090cb94fa930e7aa976df461c3170f9936fd7972693f17490b2eb3"
+          "after": "2b2e54d59790f4422a1f5460dd7bb3ad695854881f1f6f770c136d6c4ba7d028"
+        }
+      }
+    },
+    "tests/rules/section02/test_02_02_04_healing.py": {
+      "before_sha256": "ab8d3b083fd47a02e0814f694e5b9122ff9cb1878d9a9f0ee4b3c75e44159cca",
+      "after_sha256": "2c699708adfe8cc60291893902fe702b316e7666c2cd2e8951468e259251990e",
+      "owners": {
+        "@module": {
+          "before": "9e5eab9c03ec9b10182f5d625c3170db78393f5965744559a345b913968043db",
+          "after": "73da1f22cd9a728b6243a4aa0b7fa717b6fece01660bcead310a30ac1d9d9550"
         },
-        "Experiment.__init__": {
+        "beasts_definitions": {
           "before": null,
-          "after": "60a5233e9a24e78bec864ef2c6bd3880a3783c6afe36f5494785bea1952e9251"
+          "after": "545d76b7eadb9468f3da69ea12186ab6800b6c9eee4087aa176ecd6758ff78bb"
         },
-        "Experiment.call": {
+        "test_grotesque_regeneration_native_phase_end_and_replay": {
           "before": null,
-          "after": "0024c6bac005de8179490e54999144b00a78c8762928f3bec507fcbe87a577d0"
+          "after": "f20c857e39ed5cc2c8eaf20602f12eec4502ed87b00d0c8bde679ddd0cc85c49"
+        }
+      }
+    },
+    "tools/generate_ability_support_matrix.py": {
+      "before_sha256": "ce85c47a0bd2405892a6312cacbea09246c8e1faa3764f2e10fd75aad3884668",
+      "after_sha256": "8378acc365d6ac266fd0aeaf96cede1233b0124085e4a4ba095b7c9b1c0aa79a",
+      "owners": {
+        "_chaos_daemons_nurgle_review_rows": {
+          "before": "05d6f8f40c70e3523b458b78396bec4afbb99ecfdbfd3a8c749876982fb4e8fe",
+          "after": "a97cf52ba9bc09ec72bd9e0c44a17112da82fc921bd4bad8a31d993733ab064c"
+        }
+      }
+    },
+    "tools/generate_beasts_of_nurgle_rule_ir.py": {
+      "before_sha256": null,
+      "after_sha256": "26ec315274c7c0c3abd9d3e389401ec5e2ef473deb1ee8c10db2eda5d218cc7c",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "97f63f63047f98f7a7adba9213e3b6f499c0205cc30605b6e7a8161df0b5202c"
         },
-        "Experiment.charge_witness": {
+        "_package": {
           "before": null,
-          "after": "9943869bfe0a2d3ab503c84354298381005374e818daeb6623a572c0ba626b9a"
+          "after": "efef65ba18ba917b42577ce0bca69046a91edaf6e86bdd9c90c28732b455deca"
         },
-        "Experiment.commit_action": {
+        "_parameters": {
           "before": null,
-          "after": "00d69cacf8b6baa0cb27dcc33adb8755db8dd4bb821365bdd526343bb1741469"
+          "after": "01dceacd35b2af3d04be14ec77df5abbcef5ed4435b9f73e25e412e01c6e512d"
         },
-        "Experiment.common": {
+        "_span": {
           "before": null,
-          "after": "a092d056badba6ee2c358e641f6c438379f8f9ffb803bb4b3644cade5b10fff5"
+          "after": "f4c4ebbd51f82d82335965ef9690d235a51936eed0dee21d83ba6ea0abd3c902"
         },
-        "Experiment.compare_exact": {
+        "generated_chaos_daemons_artifact_payload": {
           "before": null,
-          "after": "b242aa3924b940d4b9bb07ef929c24ade4a7093c076354378beb4fc7fd659f03"
+          "after": "a4e652bcc935f2778dcc0041810e7e335b0e11ea543e4e43aa2b2a36c91db10d"
         },
-        "Experiment.context": {
+        "generated_death_guard_artifact_payload": {
           "before": null,
-          "after": "b5f6b356c1df8312a7a4137b43ea826710318d802fa55b043b1e1ac32406e9dc"
-        },
-        "Experiment.e_shoot": {
-          "before": null,
-          "after": "b4f77eeab1772b120857d019542887cd9e9040af70e90a9a9aa5dd4aaa2a2c33"
-        },
-        "Experiment.execute": {
-          "before": null,
-          "after": "da808c293fb572206c97968365b44c2ef989111989e9cb84c175f66e4d81ad84"
-        },
-        "Experiment.gap": {
-          "before": null,
-          "after": "6aa5c18a090a829f752363d22a1d9641ec619178664240ca7b0597a6c83e730f"
-        },
-        "Experiment.log": {
-          "before": null,
-          "after": "cb48ab5d9a414520ea48ec9719c2fe2279653482b7d326f7ac98615113715704"
-        },
-        "Experiment.native_replay": {
-          "before": null,
-          "after": "57f44934869268e044ec5550fc18c7a1f553602465c3a84f3909b02d892ff43a"
-        },
-        "Experiment.next_public": {
-          "before": null,
-          "after": "50a650bc9de5faa962a2e574fc1880b3e4144d77460d9c35db1a187ad4728393"
-        },
-        "Experiment.player_context": {
-          "before": null,
-          "after": "1dd16d8066794f778a23d823e36bce0f1be11909a548044fb817d72d6fcfbd37"
-        },
-        "Experiment.position": {
-          "before": null,
-          "after": "8a5615f2703a89932604c5a85ba7ab89a94d37c78e2d01ffdb93e7dd63512c5d"
-        },
-        "Experiment.prepare_e": {
-          "before": null,
-          "after": "91959cda58112c4ff9237f235c4698d8a3e5f4b57253d19385b0023b18e54641"
-        },
-        "Experiment.record_id": {
-          "before": null,
-          "after": "3fa61d2e04a57259f270f3ad51e3496267ba731c07cd25ea5c2228dea305d161"
-        },
-        "Experiment.report_core_coverage": {
-          "before": null,
-          "after": "520a78bc8dabd57eabe2934b2539ef58d9ed00acc245168c0979793bddba495b"
-        },
-        "Experiment.response": {
-          "before": null,
-          "after": "eb65cd99ce2994766b2a1c7ee8ffab2eea7c63f5b28de0dd82a4a13fd9d946ab"
-        },
-        "Experiment.seal": {
-          "before": null,
-          "after": "d12f93ef1ae19badad5912edff0c1014e68512245796647af2c4ee3d5bb475ba"
-        },
-        "Experiment.source": {
-          "before": null,
-          "after": "aecaa892123de913275cb01b9972e50eb98a01fc0a446008f335012eb4102800"
-        },
-        "Experiment.status": {
-          "before": null,
-          "after": "8d5b0ad8a23b652eedac541368379070c38a59b70b1d9513ccb30576494f58ec"
-        },
-        "Experiment.strict": {
-          "before": null,
-          "after": "0f5a1c02e9185c11d216dd187c3b62ae391ec46c7864869c06b96cc7d508314a"
-        },
-        "Experiment.translate": {
-          "before": null,
-          "after": "ba588af8915bea1f1b8b8e5dd4994bf3cd10b41af054c6648ede971189f811af"
-        },
-        "archived_action": {
-          "before": null,
-          "after": "4db111d60fc7293c2ba4983878d6f0dd4aa2093030802577adf230df66cdc6a1"
-        },
-        "issued": {
-          "before": null,
-          "after": "998665c5ceb1d5b884337a99fa3a398e86cbd3c05e5358055c91e14d58012344"
-        },
-        "main": {
-          "before": null,
-          "after": "c7210b1dbe0bf1fbc782a9893f4bd201f6a960099ae67f98fe88f7a2d61d8b0f"
-        },
-        "metrics": {
-          "before": null,
-          "after": "bae731e9cfe645cba79e8e24b2083d0b4471800ad5ea51ffbfcf21d8ea95cecf"
-        },
-        "need": {
-          "before": null,
-          "after": "b0cf0317a25d1c425cd6a17e5243bacf7897d5218601036abbcb2d75eb72bcfa"
-        },
-        "observed_models": {
-          "before": null,
-          "after": "34d379e6d553c1c1e0f09fe474bc552e2cecfdea662a6bd0816054cae975940b"
-        },
-        "options": {
-          "before": null,
-          "after": "26926fc00276f5f2251414636faf7b887bde6b8cf40ed530d6c4c58be9853589"
-        },
-        "phase": {
-          "before": null,
-          "after": "e4d3093815e9704c28baec505d3c6127807ac61293a02456863f1b17e26c746a"
-        },
-        "placement_map": {
-          "before": null,
-          "after": "8f8a4d0e00f87bb3d8924793b9552038f46881f05ce0a4e20f0bbd63237ed9e4"
-        },
-        "policy": {
-          "before": null,
-          "after": "af76ca3e3e8c07e88967edab7a76b05d0e8041ff2693961fce379675a1fadd49"
-        },
-        "provenance": {
-          "before": null,
-          "after": "cc8e314d56db8cd8bc11850bd5f9ff32a83eb45917284be1007e3bd776f7deff"
-        },
-        "read": {
-          "before": null,
-          "after": "bccab904d2ab7195be1d2b7d3fba19655f454b07a3b6a66ddfb4376c956d0fd4"
-        },
-        "reference_bearers": {
-          "before": null,
-          "after": "decee72a217176e41ecb126aab097bed596dcdc3c9b9d7c5cf1223b79862913a"
-        },
-        "stop_on_timeout": {
-          "before": null,
-          "after": "11b73a929afed97bf3666c3bf0ac7df2e05860b9cdc6a2282a8a936f72918d60"
-        },
-        "translated": {
-          "before": null,
-          "after": "bba369f5da04fcad4bb0f9115bed6f70944340dc4cb55848379895f2c52cfab2"
-        },
-        "unit_map": {
-          "before": null,
-          "after": "d32d40a623d3441e55f96e0e34e5dd65caa4e95ab80439c4b0a8ef3851501f99"
-        },
-        "verified_input": {
-          "before": null,
-          "after": "a9437c849fb05d84d3c375a08d52d229edd715c2f7617e74f7a00537c59d7d75"
-        },
-        "verify_shooting_reference": {
-          "before": null,
-          "after": "9c2aefb2d53b951d1a1ec8760e71afdc6612608a9cc1677f9d894265979cfff2"
-        },
-        "views": {
-          "before": null,
-          "after": "d3758462f68fda99cc6c7ce7ff9b3a194c59d4227a959b5eb7c210653957ec72"
-        },
-        "write": {
-          "before": null,
-          "after": "2864fd05824162de5fc9bc834963a9dd46b061a5017f22db49e0d99622ef3ebb"
+          "after": "b37e8574c9faac267e074a6afd9f7d3b56a27c2210a18a7111bfb1809c7ea0b0"
+        }
+      }
+    },
+    "tools/generate_faction_rule_ir_bundles.py": {
+      "before_sha256": "2e808930722e2258cd484783ac81cc6f674222db1a0cbf9ef7e971deec4f4ad6",
+      "after_sha256": "385f095c5146db60b90c13dfc1f6a2259c0be9ce7e16ad83902462f2d8f7bf22",
+      "owners": {
+        "@module": {
+          "before": "36a761d0b21c725fd3848f1195418da9dad7df921e62982fc9476066d1e7c138",
+          "after": "273e2a0dd983e34860bb007df87439cdfaf0f2391914adf2cf8391826c561fbc"
         }
       }
     }
   },
   "rows": {
-    "docs/AI_IMPLEMENTATION_PLAN.md": {
+    "contracts/examples/persistence/session-persistence.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh the example payloads for the exact runtime identity.",
+      "source_obligation": "Review Chaos Daemons Faction Pack pp. 82-83 and the separately pinned Death Guard Datasheets_abilities row 000004115:5 with its unchanged-predecessor disposition.",
+      "unchanged_work": "Use the existing phase-end scheduler and model-scoped healing mutation. Candidate discovery visits only loaded source sheets and creates no effect for a full-health or destroyed model. Movement, attacks and replay algorithms retain their work."
+    },
+    "contracts/examples/sessions/session-command-outcome.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh the example payloads for the exact runtime identity.",
+      "source_obligation": "Review Chaos Daemons Faction Pack pp. 82-83 and the separately pinned Death Guard Datasheets_abilities row 000004115:5 with its unchanged-predecessor disposition.",
+      "unchanged_work": "Use the existing phase-end scheduler and model-scoped healing mutation. Candidate discovery visits only loaded source sheets and creates no effect for a full-health or destroyed model. Movement, attacks and replay algorithms retain their work."
+    },
+    "contracts/examples/sessions/session-command-started.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh the example payloads for the exact runtime identity.",
+      "source_obligation": "Review Chaos Daemons Faction Pack pp. 82-83 and the separately pinned Death Guard Datasheets_abilities row 000004115:5 with its unchanged-predecessor disposition.",
+      "unchanged_work": "Use the existing phase-end scheduler and model-scoped healing mutation. Candidate discovery visits only loaded source sheets and creates no effect for a full-health or destroyed model. Movement, attacks and replay algorithms retain their work."
+    },
+    "contracts/examples/sessions/session-metadata-created.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh the example payloads for the exact runtime identity.",
+      "source_obligation": "Review Chaos Daemons Faction Pack pp. 82-83 and the separately pinned Death Guard Datasheets_abilities row 000004115:5 with its unchanged-predecessor disposition.",
+      "unchanged_work": "Use the existing phase-end scheduler and model-scoped healing mutation. Candidate discovery visits only loaded source sheets and creates no effect for a full-health or destroyed model. Movement, attacks and replay algorithms retain their work."
+    },
+    "contracts/examples/support-profile-player-a-redacted.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh the example payloads for the exact runtime identity.",
+      "source_obligation": "Review Chaos Daemons Faction Pack pp. 82-83 and the separately pinned Death Guard Datasheets_abilities row 000004115:5 with its unchanged-predecessor disposition.",
+      "unchanged_work": "Use the existing phase-end scheduler and model-scoped healing mutation. Candidate discovery visits only loaded source sheets and creates no effect for a full-health or destroyed model. Movement, attacks and replay algorithms retain their work."
+    },
+    "contracts/examples/support-profile-player-b-redacted.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh the example payloads for the exact runtime identity.",
+      "source_obligation": "Review Chaos Daemons Faction Pack pp. 82-83 and the separately pinned Death Guard Datasheets_abilities row 000004115:5 with its unchanged-predecessor disposition.",
+      "unchanged_work": "Use the existing phase-end scheduler and model-scoped healing mutation. Candidate discovery visits only loaded source sheets and creates no effect for a full-health or destroyed model. Movement, attacks and replay algorithms retain their work."
+    },
+    "contracts/examples/support-profile.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh the example payloads for the exact runtime identity.",
+      "source_obligation": "Review Chaos Daemons Faction Pack pp. 82-83 and the separately pinned Death Guard Datasheets_abilities row 000004115:5 with its unchanged-predecessor disposition.",
+      "unchanged_work": "Use the existing phase-end scheduler and model-scoped healing mutation. Candidate discovery visits only loaded source sheets and creates no effect for a full-health or destroyed model. Movement, attacks and replay algorithms retain their work."
+    },
+    "contracts/manifest.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh the example payloads for the exact runtime identity.",
+      "source_obligation": "Review Chaos Daemons Faction Pack pp. 82-83 and the separately pinned Death Guard Datasheets_abilities row 000004115:5 with its unchanged-predecessor disposition.",
+      "unchanged_work": "Use the existing phase-end scheduler and model-scoped healing mutation. Candidate discovery visits only loaded source sheets and creates no effect for a full-health or destroyed model. Movement, attacks and replay algorithms retain their work."
+    },
+    "data/generated/ability_coverage/cross_source_semantic_equivalence.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "phase-end-healing-source-and-report"
+      ],
+      "selected_families": [],
+      "rationale": "Pin the separate source artifacts and regenerate the identified RuleIR or support evidence.",
+      "source_obligation": "Review Chaos Daemons Faction Pack pp. 82-83 and the separately pinned Death Guard Datasheets_abilities row 000004115:5 with its unchanged-predecessor disposition.",
+      "unchanged_work": "Use the existing phase-end scheduler and model-scoped healing mutation. Candidate discovery visits only loaded source sheets and creates no effect for a full-health or destroyed model. Movement, attacks and replay algorithms retain their work."
+    },
+    "data/source_audits/ci64_provenance_v1/grotesque-regeneration-transition-v1.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "phase-end-healing-test-admission"
+      ],
+      "selected_families": [],
+      "rationale": "Retain test selection and prove the two source bindings on the native lifecycle.",
+      "source_obligation": "Review Chaos Daemons Faction Pack pp. 82-83 and the separately pinned Death Guard Datasheets_abilities row 000004115:5 with its unchanged-predecessor disposition.",
+      "unchanged_work": "Use the existing phase-end scheduler and model-scoped healing mutation. Candidate discovery visits only loaded source sheets and creates no effect for a full-health or destroyed model. Movement, attacks and replay algorithms retain their work."
+    },
+    "docs/ABILITY_SUPPORT_MATRIX_V2.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Records the frozen local experiment and its measured scope.",
+      "rationale": "Refresh the generated support explanation or map the exact changed owners.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/CROSS_SOURCE_SEMANTIC_EQUIVALENCE.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Refresh the generated support explanation or map the exact changed owners.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/factions/chaos-daemons.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Refresh the generated support explanation or map the exact changed owners.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/factions/death-guard.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Refresh the generated support explanation or map the exact changed owners.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -240,19 +506,167 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Records the frozen local experiment and its measured scope.",
+      "rationale": "Refresh the generated support explanation or map the exact changed owners.",
       "source_obligation": null,
       "unchanged_work": null
     },
-    "scripts/stage2_preservation_timing.py": {
-      "category": "measured_workload",
+    "scripts/engine_numerical_identity_test_admission.py": {
+      "category": "rule_semantics",
       "operations": [
-        "stage2-preservation-timing-reproducer"
+        "cavalcade-authority-admission",
+        "close-quarters-test-admission",
+        "engine-numerical-identity-admission",
+        "phase-end-healing-test-admission",
+        "round4-battle-shock-event-wounds",
+        "round4-malice-bearer-liveness",
+        "stage2-strict-replay-test-admission"
       ],
       "selected_families": [],
-      "rationale": "Development-only serial operator that exercises existing actor projections, native submission, persistence and replay for one frozen tactical comparison.",
-      "source_obligation": null,
-      "unchanged_work": null
+      "rationale": "Retain test selection and prove the two source bindings on the native lifecycle.",
+      "source_obligation": "Review Chaos Daemons Faction Pack pp. 82-83 and the separately pinned Death Guard Datasheets_abilities row 000004115:5 with its unchanged-predecessor disposition.",
+      "unchanged_work": "Use the existing phase-end scheduler and model-scoped healing mutation. Candidate discovery visits only loaded source sheets and creates no effect for a full-health or destroyed model. Movement, attacks and replay algorithms retain their work."
+    },
+    "src/warhammer40k_core/_engine_build_manifest.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "cavalcade-authority-admission",
+        "phase-end-healing-source-and-report"
+      ],
+      "selected_families": [],
+      "rationale": "Pin the separate source artifacts and regenerate the identified RuleIR or support evidence.",
+      "source_obligation": "Review Chaos Daemons Faction Pack pp. 82-83 and the separately pinned Death Guard Datasheets_abilities row 000004115:5 with its unchanged-predecessor disposition.",
+      "unchanged_work": "Use the existing phase-end scheduler and model-scoped healing mutation. Candidate discovery visits only loaded source sheets and creates no effect for a full-health or destroyed model. Movement, attacks and replay algorithms retain their work."
+    },
+    "src/warhammer40k_core/engine/catalog_datasheet_rule_extensions.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "phase-end-healing-runtime"
+      ],
+      "selected_families": [],
+      "rationale": "Resolve the exact damaged-living-model rule through the existing phase boundary.",
+      "source_obligation": "Review Chaos Daemons Faction Pack pp. 82-83 and the separately pinned Death Guard Datasheets_abilities row 000004115:5 with its unchanged-predecessor disposition.",
+      "unchanged_work": "Use the existing phase-end scheduler and model-scoped healing mutation. Candidate discovery visits only loaded source sheets and creates no effect for a full-health or destroyed model. Movement, attacks and replay algorithms retain their work."
+    },
+    "src/warhammer40k_core/engine/catalog_datasheet_rule_support.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "phase-end-healing-runtime"
+      ],
+      "selected_families": [],
+      "rationale": "Resolve the exact damaged-living-model rule through the existing phase boundary.",
+      "source_obligation": "Review Chaos Daemons Faction Pack pp. 82-83 and the separately pinned Death Guard Datasheets_abilities row 000004115:5 with its unchanged-predecessor disposition.",
+      "unchanged_work": "Use the existing phase-end scheduler and model-scoped healing mutation. Candidate discovery visits only loaded source sheets and creates no effect for a full-health or destroyed model. Movement, attacks and replay algorithms retain their work."
+    },
+    "src/warhammer40k_core/engine/catalog_phase_end_healing.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "phase-end-healing-runtime"
+      ],
+      "selected_families": [],
+      "rationale": "Resolve the exact damaged-living-model rule through the existing phase boundary.",
+      "source_obligation": "Review Chaos Daemons Faction Pack pp. 82-83 and the separately pinned Death Guard Datasheets_abilities row 000004115:5 with its unchanged-predecessor disposition.",
+      "unchanged_work": "Use the existing phase-end scheduler and model-scoped healing mutation. Candidate discovery visits only loaded source sheets and creates no effect for a full-health or destroyed model. Movement, attacks and replay algorithms retain their work."
+    },
+    "src/warhammer40k_core/engine/faction_content/phase_end_hook_registries.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "phase-end-healing-runtime"
+      ],
+      "selected_families": [],
+      "rationale": "Resolve the exact damaged-living-model rule through the existing phase boundary.",
+      "source_obligation": "Review Chaos Daemons Faction Pack pp. 82-83 and the separately pinned Death Guard Datasheets_abilities row 000004115:5 with its unchanged-predecessor disposition.",
+      "unchanged_work": "Use the existing phase-end scheduler and model-scoped healing mutation. Candidate discovery visits only loaded source sheets and creates no effect for a full-health or destroyed model. Movement, attacks and replay algorithms retain their work."
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_pack_rule_ir/__init__.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "phase-end-healing-source-and-report"
+      ],
+      "selected_families": [],
+      "rationale": "Pin the separate source artifacts and regenerate the identified RuleIR or support evidence.",
+      "source_obligation": "Review Chaos Daemons Faction Pack pp. 82-83 and the separately pinned Death Guard Datasheets_abilities row 000004115:5 with its unchanged-predecessor disposition.",
+      "unchanged_work": "Use the existing phase-end scheduler and model-scoped healing mutation. Candidate discovery visits only loaded source sheets and creates no effect for a full-health or destroyed model. Movement, attacks and replay algorithms retain their work."
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_pack_rule_ir/_artifacts.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "phase-end-healing-source-and-report"
+      ],
+      "selected_families": [],
+      "rationale": "Pin the separate source artifacts and regenerate the identified RuleIR or support evidence.",
+      "source_obligation": "Review Chaos Daemons Faction Pack pp. 82-83 and the separately pinned Death Guard Datasheets_abilities row 000004115:5 with its unchanged-predecessor disposition.",
+      "unchanged_work": "Use the existing phase-end scheduler and model-scoped healing mutation. Candidate discovery visits only loaded source sheets and creates no effect for a full-health or destroyed model. Movement, attacks and replay algorithms retain their work."
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_pack_rule_ir/artifacts/package.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "phase-end-healing-source-and-report"
+      ],
+      "selected_families": [],
+      "rationale": "Pin the separate source artifacts and regenerate the identified RuleIR or support evidence.",
+      "source_obligation": "Review Chaos Daemons Faction Pack pp. 82-83 and the separately pinned Death Guard Datasheets_abilities row 000004115:5 with its unchanged-predecessor disposition.",
+      "unchanged_work": "Use the existing phase-end scheduler and model-scoped healing mutation. Candidate discovery visits only loaded source sheets and creates no effect for a full-health or destroyed model. Movement, attacks and replay algorithms retain their work."
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_pack_rule_ir/artifacts/shards/chaos-daemons.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "phase-end-healing-source-and-report"
+      ],
+      "selected_families": [],
+      "rationale": "Pin the separate source artifacts and regenerate the identified RuleIR or support evidence.",
+      "source_obligation": "Review Chaos Daemons Faction Pack pp. 82-83 and the separately pinned Death Guard Datasheets_abilities row 000004115:5 with its unchanged-predecessor disposition.",
+      "unchanged_work": "Use the existing phase-end scheduler and model-scoped healing mutation. Candidate discovery visits only loaded source sheets and creates no effect for a full-health or destroyed model. Movement, attacks and replay algorithms retain their work."
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_pack_rule_ir/artifacts/shards/death-guard.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "phase-end-healing-source-and-report"
+      ],
+      "selected_families": [],
+      "rationale": "Pin the separate source artifacts and regenerate the identified RuleIR or support evidence.",
+      "source_obligation": "Review Chaos Daemons Faction Pack pp. 82-83 and the separately pinned Death Guard Datasheets_abilities row 000004115:5 with its unchanged-predecessor disposition.",
+      "unchanged_work": "Use the existing phase-end scheduler and model-scoped healing mutation. Candidate discovery visits only loaded source sheets and creates no effect for a full-health or destroyed model. Movement, attacks and replay algorithms retain their work."
+    },
+    "tests/rules/section02/test_02_02_04_healing.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "phase-end-healing-test-admission",
+        "qualification40-exact-c35d695c5e5caa01"
+      ],
+      "selected_families": [],
+      "rationale": "Retain test selection and prove the two source bindings on the native lifecycle.",
+      "source_obligation": "Review Chaos Daemons Faction Pack pp. 82-83 and the separately pinned Death Guard Datasheets_abilities row 000004115:5 with its unchanged-predecessor disposition.",
+      "unchanged_work": "Use the existing phase-end scheduler and model-scoped healing mutation. Candidate discovery visits only loaded source sheets and creates no effect for a full-health or destroyed model. Movement, attacks and replay algorithms retain their work."
+    },
+    "tools/generate_ability_support_matrix.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "phase-end-healing-source-and-report"
+      ],
+      "selected_families": [],
+      "rationale": "Pin the separate source artifacts and regenerate the identified RuleIR or support evidence.",
+      "source_obligation": "Review Chaos Daemons Faction Pack pp. 82-83 and the separately pinned Death Guard Datasheets_abilities row 000004115:5 with its unchanged-predecessor disposition.",
+      "unchanged_work": "Use the existing phase-end scheduler and model-scoped healing mutation. Candidate discovery visits only loaded source sheets and creates no effect for a full-health or destroyed model. Movement, attacks and replay algorithms retain their work."
+    },
+    "tools/generate_beasts_of_nurgle_rule_ir.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "phase-end-healing-source-and-report"
+      ],
+      "selected_families": [],
+      "rationale": "Pin the separate source artifacts and regenerate the identified RuleIR or support evidence.",
+      "source_obligation": "Review Chaos Daemons Faction Pack pp. 82-83 and the separately pinned Death Guard Datasheets_abilities row 000004115:5 with its unchanged-predecessor disposition.",
+      "unchanged_work": "Use the existing phase-end scheduler and model-scoped healing mutation. Candidate discovery visits only loaded source sheets and creates no effect for a full-health or destroyed model. Movement, attacks and replay algorithms retain their work."
+    },
+    "tools/generate_faction_rule_ir_bundles.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "phase-end-healing-source-and-report"
+      ],
+      "selected_families": [],
+      "rationale": "Pin the separate source artifacts and regenerate the identified RuleIR or support evidence.",
+      "source_obligation": "Review Chaos Daemons Faction Pack pp. 82-83 and the separately pinned Death Guard Datasheets_abilities row 000004115:5 with its unchanged-predecessor disposition.",
+      "unchanged_work": "Use the existing phase-end scheduler and model-scoped healing mutation. Candidate discovery visits only loaded source sheets and creates no effect for a full-health or destroyed model. Movement, attacks and replay algorithms retain their work."
     }
   },
   "milestone": "ordinary",

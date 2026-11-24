@@ -1,6 +1,7 @@
 {
   "artifact_schema": "core-v2-faction-pack-rule-ir-shard-v1",
   "datasheet_faction_ids": {
+    "000001134": "chaos-daemons",
     "000001148": "chaos-daemons",
     "000001149": "chaos-daemons",
     "000001151": "chaos-daemons",
@@ -16,9 +17,127 @@
     "source_snapshot_sha256": "f99c8ac2d4dcfcaf809689d1dac6dc277fa74f0e52efb0e0efd5093aef823b32"
   },
   "edition": 11,
-  "package_hash": "d47110fd332f40cb3a3830d638115b1d8dfa58cf08820d10d424e7a222e7eaa3",
+  "package_hash": "f581a578db8d5116923d8962a655301fb78d19c40b313d085822c4b02aebbddb",
   "shard_id": "chaos-daemons",
   "source_packages": {
+    "gw-11e-chaos-daemons-beasts-of-nurgle-datasheet-2026-07": {
+      "artifact_schema": "core-v2-chaos-daemons-beasts-of-nurgle-rule-ir-v1",
+      "datasheet_id": "000001134",
+      "datasheet_name": "Beasts of Nurgle",
+      "package_hash": "0adce54e11577fc1a48b8757bef638cf1e24aaa36c043cf02b70f1af66d7ccef",
+      "records": {
+        "000001134:5": {
+          "ability_name": "Grotesque Regeneration",
+          "normalized_text_sha256": "e6d6a002f21bb02bb82e8ab348e69fa1dd965789f3fbdffd2c3ef70ac2e54f7c",
+          "rule_ir": {
+            "clauses": [
+              {
+                "clause_id": "phase17n:chaos-daemons:datasheet:000001134:5:clause:001",
+                "conditions": [
+                  {
+                    "kind": "target_constraint",
+                    "parameters": [
+                      {
+                        "key": "model_state",
+                        "value": "living_and_wounded"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 107,
+                      "start": 67,
+                      "text": "has lost any wounds but is not destroyed"
+                    }
+                  }
+                ],
+                "diagnostics": [],
+                "duration": {
+                  "kind": "immediate",
+                  "parameters": [],
+                  "source_span": {
+                    "end": 150,
+                    "start": 120,
+                    "text": "regains all of its lost wounds"
+                  }
+                },
+                "effects": [
+                  {
+                    "kind": "restore_lost_wounds",
+                    "parameters": [
+                      {
+                        "key": "amount",
+                        "value": "all"
+                      },
+                      {
+                        "key": "target_scope",
+                        "value": "that_model"
+                      }
+                    ],
+                    "source_span": {
+                      "end": 150,
+                      "start": 120,
+                      "text": "regains all of its lost wounds"
+                    }
+                  }
+                ],
+                "source_span": {
+                  "end": 151,
+                  "start": 0,
+                  "text": "At the end of each phase, if a Beasts of Nurgle model in this unit has lost any wounds but is not destroyed, that model regains all of its lost wounds."
+                },
+                "target": {
+                  "kind": "this_unit",
+                  "parameters": [
+                    {
+                      "key": "scope",
+                      "value": "own_models"
+                    }
+                  ],
+                  "source_span": {
+                    "end": 66,
+                    "start": 29,
+                    "text": "a Beasts of Nurgle model in this unit"
+                  }
+                },
+                "template_id": "phase17n:phase-end-self-healing",
+                "trigger": {
+                  "kind": "timing_window",
+                  "parameters": [
+                    {
+                      "key": "edge",
+                      "value": "end"
+                    },
+                    {
+                      "key": "phase",
+                      "value": "any"
+                    }
+                  ],
+                  "source_span": {
+                    "end": 24,
+                    "start": 0,
+                    "text": "At the end of each phase"
+                  }
+                },
+                "unsupported_reason": null
+              }
+            ],
+            "diagnostics": [],
+            "ir_hash": "5dac009c1f6c4a705d80c774ef5ef539586f0c938016ff04dfb3cf7beed2374c",
+            "normalized_text": "At the end of each phase, if a Beasts of Nurgle model in this unit has lost any wounds but is not destroyed, that model regains all of its lost wounds.",
+            "parser_version": "manual-source-backed-rule-ir:v1",
+            "rule_id": "phase17n:chaos-daemons:datasheet:000001134:5",
+            "schema_version": "phase17c-rule-ir-v1",
+            "source_id": "gw-11e-chaos-daemons-beasts-of-nurgle-datasheet-2026-07:datasheet:000001134:5"
+          }
+        }
+      },
+      "source_package_id": "gw-11e-chaos-daemons-beasts-of-nurgle-datasheet-2026-07",
+      "source_page_numbers": [
+        82,
+        83
+      ],
+      "source_pdf_filename": "eng_22-07_warhammer_40,000_faction_pack_chaos_daemons-lycqqrymwe-qogh4b5yly.pdf",
+      "source_pdf_sha256": "818f7ef144691b9eef6b3c5b5d0a39793690af5a958037b7055215e6675e6a2c"
+    },
     "gw-11e-chaos-daemons-datasheet-ir-2026-27": {
       "artifact_schema": "core-v2-chaos-daemons-datasheet-rule-ir-v1",
       "datasheet_source_artifact_hash": "1722c3e070c45594aefe86f70250415e7f42774b79b3eaab4a10702129f6252c",

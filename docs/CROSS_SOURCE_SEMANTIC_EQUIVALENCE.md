@@ -13,13 +13,13 @@ A registered static RuleIR is eligible for this audit when its normalized text e
 | Content kind | Source members | Structured RuleIR |
 | --- | ---: | ---: |
 | `faction_rule` | 28 | 0 |
-| `datasheet_ability` | 2049 | 650 |
+| `datasheet_ability` | 2049 | 652 |
 | `detachment_rule` | 266 | 12 |
 | `enhancement` | 701 | 70 |
 | `stratagem` | 1050 | 76 |
-| **Total** | **4094** | **808** |
+| **Total** | **4094** | **810** |
 
-Equivalent groups: **322**; cross-faction groups: **159**; exact-text-only members: **3175**; source-text-unavailable members: **111**.
+Equivalent groups: **322**; cross-faction groups: **159**; exact-text-only members: **3173**; source-text-unavailable members: **111**.
 
 ## Equivalence Groups
 
@@ -103,7 +103,6 @@ Equivalent groups: **322**; cross-faction groups: **159**; exact-text-only membe
 | `3e5b5b26b9d5` | `datasheet_ability` / `datasheet` | `exact_normalized_text` | Chaos Space Marines — Dark Commune — Faithful Flock (`blocked_structured_semantics`)<br>Chaos Space Marines — Dark Commune — Faithful Flock (`blocked_structured_semantics`)<br>Chaos Space Marines — Dark Commune — Faithful Flock (`blocked_structured_semantics`) | `blocked_structured_semantics` | `none` |
 | `402505f6cf31` | `datasheet_ability` / `datasheet` | `exact_normalized_text` | Chaos Space Marines — Fellgor Beastmen — Bestial Raiders (`blocked_structured_semantics`)<br>Chaos Space Marines — Fellgor Beastmen — Bestial Raiders (`blocked_structured_semantics`)<br>Chaos Space Marines — Fellgor Beastmen — Bestial Raiders (`blocked_structured_semantics`) | `blocked_structured_semantics` | `none` |
 | `40a1c3c2eac3` | `datasheet_ability` / `datasheet` | `structured_rule_ir` | Space Marines — Captain Titus — Press the Attack (`engine_consumed`)<br>Tyranids — Tyranid Prime with Lash Whip — Alpha Warrior (`engine_consumed`) | `engine_consumed` | `content_neutral_generic_ir` |
-| `410187836864` | `datasheet_ability` / `datasheet` | `exact_normalized_text` | Chaos Daemons — Beasts Of Nurgle — Grotesque Regeneration (`blocked_structured_semantics`)<br>Death Guard — Beasts of Nurgle — Grotesque Regeneration (`blocked_structured_semantics`) | `blocked_structured_semantics` | `none` |
 | `4286d865bc55` | `datasheet_ability` / `datasheet` | `exact_normalized_text` | Tyranids — The Red Terror — Swallow Whole (`blocked_structured_semantics`)<br>Tyranids — The Red Terror — Swallow Whole (`blocked_structured_semantics`) | `blocked_structured_semantics` | `none` |
 | `4356221f2298` | `datasheet_ability` / `datasheet` | `exact_normalized_text` | Chaos Space Marines — Chaos Terminator Squad — Despoilers (`blocked_structured_semantics`)<br>Chaos Space Marines — Chaos Terminator Squad — Despoilers (`blocked_structured_semantics`) | `blocked_structured_semantics` | `none` |
 | `43a416d159b5` | `datasheet_ability` / `datasheet` | `structured_rule_ir` | Grey Knights — Brother-captain — Eye of Judgement (Psychic) (`engine_consumed`)<br>Imperial Knights — Knight Preceptor — Mentor (Bondsman) (`engine_consumed`) | `engine_consumed` | `content_neutral_generic_ir` |
@@ -146,6 +145,7 @@ Equivalent groups: **322**; cross-faction groups: **159**; exact-text-only membe
 | `5d48fec3b065` | `datasheet_ability` / `datasheet` | `exact_normalized_text` | Astra Militarum — Leman Russ Demolisher — Line-breaker (`blocked_structured_semantics`)<br>Astra Militarum — Leman Russ Demolisher — Line-breaker (`blocked_structured_semantics`) | `blocked_structured_semantics` | `none` |
 | `60e08b746cb3` | `datasheet_ability` / `datasheet` | `structured_rule_ir` | Adeptus Mechanicus — Belisarius Cawl — Self-repair Mechanisms (`generic_ir_executable`)<br>Orks — Wazdakka Gutsmek — Fixit da Grot (`generic_ir_executable`) | `generic_ir_executable` | `none` |
 | `611dd6b2a6f8` | `datasheet_ability` / `datasheet` | `exact_normalized_text` | Imperial Agents — Inquisitor Greyfax — Authority of the Inquisition (`blocked_structured_semantics`)<br>Imperial Agents — Inquisitor Coteaz — Authority of the Inquisition (`blocked_structured_semantics`)<br>Imperial Agents — Inquisitor Draxus — Authority of the Inquisition (`blocked_structured_semantics`) | `blocked_structured_semantics` | `none` |
+| `6368f6b3c494` | `datasheet_ability` / `datasheet` | `structured_rule_ir` | Chaos Daemons — Beasts Of Nurgle — Grotesque Regeneration (`engine_consumed`)<br>Death Guard — Beasts of Nurgle — Grotesque Regeneration (`engine_consumed`) | `engine_consumed` | `content_neutral_generic_ir` |
 | `63881c1042e8` | `datasheet_ability` / `datasheet` | `exact_normalized_text` | Astra Militarum — Baneblade — Rolling Fortress (`blocked_structured_semantics`)<br>Astra Militarum — Baneblade — Rolling Fortress (`blocked_structured_semantics`) | `blocked_structured_semantics` | `none` |
 | `640bcde5f6ce` | `datasheet_ability` / `wargear` | `exact_normalized_text` | Imperial Agents — Vigilant Squad — Nuncio Aquila (Aura) (`blocked_structured_semantics`)<br>Imperial Agents — Subductor Squad — Nuncio Aquila (`blocked_structured_semantics`)<br>Imperial Agents — Exaction Squad — Nuncio Aquila (`blocked_structured_semantics`) | `blocked_structured_semantics` | `none` |
 | `651cb5bd9f92` | `enhancement` / `enhancement` | `exact_normalized_text` | Space Marines — 1st Company Task Force — Fear Made Manifest (Aura) (`blocked_structured_semantics`)<br>Space Marines — Hammer of Avernii — Medusan Roar (Aura) (`blocked_structured_semantics`) | `blocked_structured_semantics` | `none` |

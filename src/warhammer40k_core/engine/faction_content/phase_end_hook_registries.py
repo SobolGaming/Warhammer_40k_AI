@@ -7,6 +7,7 @@ from warhammer40k_core.engine import catalog_turn_end_reserves, generic_rule_lif
 from warhammer40k_core.engine import runtime_event_phase_hooks as _runtime_event_phase_hooks
 from warhammer40k_core.engine.abilities import AbilityCatalogIndex
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
+from warhammer40k_core.engine.catalog_phase_end_healing import catalog_phase_end_healing_bindings
 from warhammer40k_core.engine.faction_content.activation import RuntimeContentActivation
 from warhammer40k_core.engine.faction_content.bundle_validation import (
     contribution_values as _contribution_values,
@@ -39,6 +40,7 @@ def phase_end_registry(
                 armies=validated_armies,
             ),
             *_runtime_event_phase_hooks.end_bindings(event_index),
+            *catalog_phase_end_healing_bindings(ability_indexes_by_player_id),
             *catalog_turn_end_reserves.catalog_turn_end_reserve_hook_bindings(
                 ability_indexes_by_player_id=ability_indexes_by_player_id,
                 armies=validated_armies,
