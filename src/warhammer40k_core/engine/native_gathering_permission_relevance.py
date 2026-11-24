@@ -184,9 +184,13 @@ def target_permission_kinds_for_gathering(
     registry: RuntimeModifierRegistry,
     pool: RangedAttackPool,
     model_instance_id: str,
+    generic_sources: tuple[GenericAttackEffect, ...],
 ) -> tuple[ModifierIgnoreKind, ...]:
     """Use real Wound subjects and model traces; retain later Save possibilities."""
     from warhammer40k_core.engine.damage_allocation import allocation_context_for_unit, model_by_id
+    from warhammer40k_core.engine.generic_attack_save_modifiers import (
+        is_unconditional_armour_save_set,
+    )
     from warhammer40k_core.engine.generic_rule_attack_hooks import (
         generic_rule_characteristic_operations,
         generic_rule_matching_unit_effects,
@@ -234,10 +238,14 @@ def target_permission_kinds_for_gathering(
                     ),
                 )
             )
+    generic_armour_set = any(
+        effect.role == "target" and is_unconditional_armour_save_set(effect)
+        for effect in generic_sources
+    )
     save_operations = _save_provider_may_modify(registry, Characteristic.SAVE) or any(
         value.characteristic is Characteristic.SAVE
         and not value.is_dash
-        and _has_profile_operations(value)
+        and (_has_profile_operations(value) or generic_armour_set)
         for value in model.characteristics
     )
     invulnerable_operations = _save_provider_may_modify(

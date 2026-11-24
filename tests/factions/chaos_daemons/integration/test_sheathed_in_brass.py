@@ -1,5 +1,6 @@
 """Blood Legion's retained July faction-pack rule on the native Shooting path."""
 
+import json
 from dataclasses import replace
 from pathlib import Path
 from typing import cast
@@ -7,11 +8,14 @@ from typing import cast
 import pytest
 
 from tests.daemons_native_source_helpers import BELAKOR, native_definitions
+from tests.generic_modifier_helpers import generic_effect
+from tests.order93_save_damage_helpers import reach_save_damage_request
 from tests.phase13b_shooting_declaration_helpers import _benefit_of_cover_result
 from tests.save7_allocation_helpers import BLOODLETTERS
 from tests.support.faction_batch01 import Scene, anchor, events, locate, scene, selection
 from tests.support.section02_fixtures import Section02Definitions
 from tests.support.section04_fixtures import (
+    body,
     choose,
     declare_shooting,
     pending,
@@ -25,8 +29,11 @@ from warhammer40k_core.core.ruleset_descriptor import CoverEffect
 from warhammer40k_core.engine.command_points import CommandPointSourceKind
 from warhammer40k_core.engine.decision_request import DecisionError, DecisionOption, DecisionRequest
 from warhammer40k_core.engine.dice import DiceRollManager
-from warhammer40k_core.engine.effects import EffectExpiration
+from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue
+from warhammer40k_core.engine.native_attack_gathering import (
+    _current_applicable_rules,  # pyright: ignore[reportPrivateUsage]
+)
 from warhammer40k_core.engine.phase import BattlePhase
 from warhammer40k_core.engine.replay import ReplayRunner
 from warhammer40k_core.engine.runtime_modifiers import (
@@ -104,7 +111,12 @@ def brass_definitions(selected_army_source_index: Path | None) -> Section02Defin
     )
 
 
-def _scene(definitions: Section02Definitions, *, cp: int) -> Scene:
+def _scene(
+    definitions: Section02Definitions,
+    *,
+    cp: int,
+    initial_effects: tuple[PersistingEffect, ...] = (),
+) -> Scene:
     s = scene(
         definitions,
         (
@@ -152,6 +164,9 @@ def _scene(definitions: Section02Definitions, *, cp: int) -> Scene:
             source_kind=CommandPointSourceKind.OTHER,
             cap_exempt=True,
         )
+    # The modifier decision verifier replays from the initial Shooting state.
+    for effect in initial_effects:
+        s.state.record_persisting_effect(effect)
     anchor(s)
     start = begin(s.session)
     if start.decision_type == "start_mission_action":
@@ -387,3 +402,99 @@ def test_sheathed_in_brass_native_decline_or_unaffordable(
     assert s.state.command_point_total("owner") == cp
     assert not any(use.stratagem_id == STRATAGEM_ID for use in s.state.stratagem_use_records)
     assert not any(effect.source_rule_id == SOURCE_ID for effect in s.state.persisting_effects)
+
+
+@pytest.mark.integration
+@pytest.mark.parametrize("use_brass", [False, True], ids=["fight-only", "sheathed-ignore"])
+def test_sheathed_in_brass_native_gathering_and_save_ignore(
+    brass_definitions: Section02Definitions,
+    use_brass: bool,
+) -> None:
+    expiry = EffectExpiration.end_phase(
+        battle_round=1, phase=BattlePhase.SHOOTING, player_id="opponent"
+    )
+    unrelated = generic_effect(
+        effect_id="brass-control:fight-armour",
+        owner_player_id="owner",
+        target_unit_instance_ids=(TARGET,),
+        target_kind="this_unit",
+        effect_kind="set_characteristic",
+        parameters={
+            "characteristic": "save",
+            "value": 2,
+            "source_phase": "fight",
+            "weapon_scope": "melee",
+        },
+    )
+    permission = generic_effect(
+        effect_id="brass-control:defender-ignore",
+        owner_player_id="owner",
+        target_unit_instance_ids=(TARGET,),
+        target_kind="this_unit",
+        effect_kind="grant_ability",
+        parameters={
+            "ability": "modifier_ignore_permission",
+            "selection": "any_or_all",
+            "modifier_kinds": [
+                "save_characteristic",
+                "invulnerable_save_characteristic",
+            ],
+            "attack_role": "target",
+            "source_phase": "shooting",
+        },
+    )
+    s = _scene(
+        brass_definitions,
+        cp=2,
+        initial_effects=(
+            replace(unrelated, expiration=expiry),
+            replace(permission, expiration=expiry),
+        ),
+    )
+    _first_shot(s)
+    req = pending(s.session)
+    choose(
+        s.session,
+        req,
+        _brass_options(req)[TARGET].option_id if use_brass else DECLINE_STRATAGEM_WINDOW_OPTION_ID,
+    )
+    if use_brass:
+        request = reach_save_damage_request(s.session, kind="save_characteristic")
+        assert request.actor_id == "owner"
+        shooting = s.state.shooting_phase_state
+        assert shooting is not None
+        sequence = shooting.attack_sequence
+        assert sequence is not None
+        group = sequence.current_gathered_group
+        assert group is not None
+        assert group.target_unit_instance_id == TARGET
+        assert len(group.native_snapshots) > 1
+        assert len({snapshot.rules_json for snapshot in group.native_snapshots}) == 1
+        bundle = s.session.lifecycle._require_runtime_content_bundle()  # pyright: ignore[reportPrivateUsage]
+        rules, proof = _current_applicable_rules(
+            state=s.state,
+            registry=bundle.runtime_modifier_registry,
+            sequence=sequence,
+            pool=sequence.attack_pools[group.native_snapshots[0].pool_index],
+            target_has_character=False,
+        )
+        templates = cast(list[dict[str, JsonValue]], rules["target_model_ignore_source_templates"])
+        assert {template["kind"] for template in templates} == {"save_characteristic"}
+        assert {template["effect_id"] for template in templates} == {permission.effect_id}
+        assert unrelated.source_rule_id not in json.dumps(proof["generic_applicable_sources"])
+        (modifier,) = cast(list[dict[str, JsonValue]], body(request)["modifiers"])
+        operation = cast(dict[str, JsonValue], modifier["operation"])
+        assert (operation["operation"], operation["operand"]) == ("set", 3)
+        assert SOURCE_ID in json.dumps(modifier)
+        choose(s.session, request, "ignore-remaining")
+        _finish_shooter(s.session)
+        first_save = _save_payloads(s.session, TARGET)[0]
+        normal, special = tuple(
+            SaveOption.from_payload(item)
+            for item in cast(list[SaveOptionPayload], first_save["save_options"])
+        )
+        assert (normal.characteristic_target_number, normal.target_number) == (7, 8)
+        assert (special.save_kind, special.target_number) == (SaveKind.INVULNERABLE, 5)
+    else:
+        _finish_shooter(s.session)
+        _assert_save_options(_save_payloads(s.session, TARGET), armour=7, target=8, invulnerable=5)

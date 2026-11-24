@@ -10,7 +10,7 @@ from typing import cast
 
 from warhammer40k_core.rules.objective_terminology import ObjectiveRuleScope
 from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
-from warhammer40k_core.rules.rule_ir import RuleIR, RuleIRPayload
+from warhammer40k_core.rules.rule_ir import RuleEffectKind, RuleIR, RuleIRPayload
 from warhammer40k_core.rules.source_data import RuleSourceText
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     datasheet_keyword_lexicon_2026_06_14,
@@ -121,7 +121,7 @@ class SourceOnlyActivationMetadata:
     required_faction_keywords: tuple[str, ...] = ()
     excluded_keywords: tuple[str, ...] = ()
     excluded_faction_keywords: tuple[str, ...] = ()
-    compile_effect: bool = False
+    compile_armour_save_set: bool = False
     requires_opponent_turn: bool = False
 
 
@@ -291,7 +291,7 @@ CURRENT_SOURCE_ACTIVATION_METADATA_BY_ROW_ID: dict[str, SourceOnlyActivationMeta
         target_policy_id="selected_target_unit",
         required_keywords=("KHORNE",),
         required_faction_keywords=("LEGIONES DAEMONICA",),
-        compile_effect=True,
+        compile_armour_save_set=True,
         requires_opponent_turn=True,
     ),
     "stratagem:chaos-daemons:shadow-legion:000009979006": SourceOnlyActivationMetadata(
@@ -500,12 +500,13 @@ def _activation_profile_from_current_source_metadata(
         f"stratagem:{source_row.faction_id}:{source_row.detachment_id}:{source_row.stratagem_id}"
     )
     compiled = None
-    if metadata.compile_effect:
+    if metadata.compile_armour_save_set:
         compiled = _compiled_stratagem_rule_ir_payload_or_none(
             profile_id=profile_id,
             source_id=source_id,
             rule_target_kind=rule_target_kind,
             effect_descriptor=metadata.effect_descriptor,
+            normalize_armour_save_set=True,
         )
         if compiled is None:
             raise ValueError(f"Current Stratagem effect did not compile: {profile_id}.")
@@ -855,6 +856,7 @@ def _compiled_stratagem_rule_ir_payload_or_none(
     source_id: str,
     rule_target_kind: str,
     effect_descriptor: str,
+    normalize_armour_save_set: bool = False,
 ) -> RuleIRPayload | None:
     compiled = compile_rule_source_text(
         RuleSourceText.from_raw(
@@ -869,6 +871,20 @@ def _compiled_stratagem_rule_ir_payload_or_none(
     if not compiled.is_supported or not any(clause.effects for clause in compiled.clauses):
         return None
     effect_payload = compiled.to_payload()
+    if normalize_armour_save_set:
+        (clause,) = effect_payload["clauses"]
+        (effect,) = clause["effects"]
+        characteristic, operand = effect["parameters"]
+        raw_value = operand["value"]
+        if (
+            effect["kind"] != RuleEffectKind.SET_CHARACTERISTIC.value
+            or characteristic != {"key": "characteristic", "value": "save"}
+            or operand["key"] != "value"
+            or not isinstance(raw_value, str)
+            or not re.fullmatch(r"[2-7]\+", raw_value)
+        ):
+            raise ValueError(f"Current Stratagem armour SET operand drift: {profile_id}.")
+        operand["value"] = int(raw_value.removesuffix("+"))
     activation_text = RULE_IR_NORMALIZED_TEXT
     effect_text = str(effect_payload["normalized_text"])
     normalized_text = f"{activation_text}\n{effect_text}"

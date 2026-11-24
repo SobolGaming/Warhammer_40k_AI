@@ -690,7 +690,7 @@ def _sheathed_in_brass_test_addition(
     _selection_no_links(root, path)
     if not path.exists():
         return None
-    digest = "ffa3c14483289a4aebfd6d2a66d17e87a7685384c4563d19c781d7b3adbc2426"
+    digest = "c01495718443f44cd080a610de2c58045998eba8d8b11d1394b700ab2deda59c"
     raw = _checked_bytes(root, name, digest)
     record = json.loads(raw, object_pairs_hook=_selection_object)
     owner = "tests/factions/chaos_daemons/integration/test_sheathed_in_brass.py"

@@ -129,12 +129,6 @@ def parse_characteristic_effects(clause_span: TextSpan) -> tuple[RuleEffectSpec,
         )
     for match in _SET_CHARACTERISTIC_RE.finditer(clause_span.text):
         characteristic = _characteristic_from_label(match.group("characteristic"))
-        raw_value = match.group("value")
-        set_value = (
-            int(raw_value.removesuffix("+"))
-            if characteristic is Characteristic.SAVE and re.fullmatch(r"[2-7]\+", raw_value)
-            else raw_value
-        )
         effects.append(
             RuleEffectSpec(
                 kind=RuleEffectKind.SET_CHARACTERISTIC,
@@ -142,7 +136,7 @@ def parse_characteristic_effects(clause_span: TextSpan) -> tuple[RuleEffectSpec,
                 parameters=parameters_from_pairs(
                     (
                         ("characteristic", characteristic.value),
-                        ("value", set_value),
+                        ("value", match.group("value")),
                     )
                 ),
             )

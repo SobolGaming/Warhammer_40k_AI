@@ -20,6 +20,17 @@ from warhammer40k_core.engine.saves import (
 from warhammer40k_core.rules.rule_ir import RuleEffectKind, RuleTargetKind
 
 
+def is_unconditional_armour_save_set(effect: GenericAttackEffect) -> bool:
+    """Recognize a whole-unit Save SET without any attack or model restrictions."""
+    return (
+        effect.effect_kind is RuleEffectKind.SET_CHARACTERISTIC
+        and effect.target_kind is None
+        and not effect.conditions
+        and effect.parameters.keys() == {"characteristic", "value"}
+        and effect.parameters["characteristic"] == Characteristic.SAVE.value
+    )
+
+
 def generic_rule_modified_save_options(
     context: SaveOptionModifierContext,
 ) -> tuple[SaveOption, ...]:
@@ -48,18 +59,7 @@ def generic_rule_modified_save_options(
         unit_instance_id=context.target_unit_instance_id,
         effect_kind=RuleEffectKind.SET_CHARACTERISTIC,
     ):
-        characteristic = _characteristic_parameter(effect.parameters)
-        if characteristic is Characteristic.SAVE:
-            if effect.target_kind is RuleTargetKind.THIS_MODEL and (
-                context.allocated_model_instance_id != effect.source_model_instance_id
-                if context.allocated_model_instance_id is not None
-                else not _generic_this_model_effect_targets_only_alive_model(
-                    state=context.state,
-                    effect=effect,
-                    unit_instance_id=context.target_unit_instance_id,
-                )
-            ):
-                continue
+        if is_unconditional_armour_save_set(effect):
             source_id = generic_rule_modifier_source_id(effect)
             term = ModifierTerm(
                 ModifierOperation.SET, _required_int_parameter(effect.parameters, key="value")
@@ -77,6 +77,7 @@ def generic_rule_modified_save_options(
                 for option in current
             )
             continue
+        characteristic = _characteristic_parameter(effect.parameters)
         if characteristic is not Characteristic.INVULNERABLE_SAVE:
             continue
         if context.allocated_model_instance_id is None:

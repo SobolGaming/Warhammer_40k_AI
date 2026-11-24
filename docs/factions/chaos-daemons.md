@@ -229,7 +229,7 @@ This section is generated from the repository-wide semantic audit. It audits por
 
 | Source members | Structured RuleIR | Equivalent groups |
 | ---: | ---: | ---: |
-| 203 | 128 | 45 |
+| 203 | 129 | 45 |
 
 | Group | Kind / surface | Basis | Equivalent source rules | Execution conclusion |
 | --- | --- | --- | --- | --- |

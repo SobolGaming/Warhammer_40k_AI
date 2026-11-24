@@ -37192,7 +37192,6 @@
     "sheathed-in-brass-armour-save": {
       "paths": [
         "src/warhammer40k_core/engine/generic_attack_save_modifiers.py",
-        "src/warhammer40k_core/rules/rule_characteristic_parser.py",
         "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_generic_ir_support_2026_27.py",
         "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_stratagem_activation_2026_27.json",
         "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_stratagem_activation_2026_27.py",
@@ -37208,10 +37207,11 @@
         "SourceStratagemActivationProfile.to_payload",
         "_activation_profile_from_current_source_metadata",
         "_artifact_payload",
+        "_compiled_stratagem_rule_ir_payload_or_none",
         "_stratagem_activation_rule_ir_payload_by_descriptor_id",
         "generic_rule_modified_save_options",
         "generic_supported_stratagem_rule_ir_hash",
-        "parse_characteristic_effects",
+        "is_unconditional_armour_save_set",
         "validate_artifact_bytes"
       ],
       "families": [],
@@ -37238,7 +37238,8 @@
         "brass_definitions",
         "exact_movement_test_transition",
         "test_sheathed_in_brass_native_accept_later_shooting_expiry_and_replay",
-        "test_sheathed_in_brass_native_decline_or_unaffordable"
+        "test_sheathed_in_brass_native_decline_or_unaffordable",
+        "test_sheathed_in_brass_native_gathering_and_save_ignore"
       ],
       "families": [],
       "sensitive": false,

@@ -3,10 +3,11 @@
   "base": "5aca97bfaf4b3f1a753d65ed6b7dfc2482aa77f0",
   "retained_transition_sha256": "4e48442b32a20933c864a1f5e7c5d398233526c9d1d4a4aa720f0eb50af86581",
   "retained_runtime_fingerprint": "858c9136f8da02d92ff986bc6e54d7d608070f3a89df76de009cc655d0433bd0",
-  "runtime_fingerprint": "01638f91637de21553317fbb07ef62d76f55b86f8f697947ca5133fcf59245a0",
+  "runtime_fingerprint": "c3e3f9515d3e7dda75bf4add50d20a0b070ab684f6d9ad5f7bc0a0120ac0a26f",
   "sources": {
-    "src/warhammer40k_core/engine/generic_attack_save_modifiers.py": "8d158ccd2cf1af12e87d318af6374ac04b5d03392b4d7824fb3b99c9a77b868d",
-    "src/warhammer40k_core/rules/rule_characteristic_parser.py": "4f5ed3de89c669e5f82241de44b8c6dd240f80ab91b5b1d336315977f1b3928c",
+    "src/warhammer40k_core/engine/generic_attack_save_modifiers.py": "2e950fabdf699054b17909a329cf0b7afa0ac59db255d45118c17390afd446cd",
+    "src/warhammer40k_core/engine/native_attack_gathering.py": "e1185b69c849d918d79d5707829e434f0b3fce96abd9b4115a8554ea7e1ac0c8",
+    "src/warhammer40k_core/engine/native_gathering_permission_relevance.py": "85de2756d2b9282fc73093db7cb51dc8ef39c1ca9e5b921101c1ccd1981e5b04",
     "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_generic_ir_support_2026_27.py": "e8f5a65c4a9bc0209bb4eeae56df192c658cf3e00e73fe9d484a074047ad4fa3",
     "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_stratagem_activation_2026_27.json": "a90f0804c3056547996fe35ffb355944ddf2992115f7da84dae124a055e90851",
     "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_stratagem_activation_2026_27.py": "d64abaa77341080308d577dc260853f1fb9d58bb98988a05ccb2c1dcae35b7a6"
@@ -14,9 +15,9 @@
   "added_files": {
     "tests/factions/chaos_daemons/integration/test_sheathed_in_brass.py": {
       "mode": "100644",
-      "blob_sha1": "50ad33eb225307f823d1b291209a29731df74449",
-      "sha256": "cd84132ab42df6c92c17ff135ee059fe38718f815e4b93d87660067cccb756e4",
-      "bytes": 14840
+      "blob_sha1": "16be1f7fa81f80adc202058541f9eb1a3db21e83",
+      "sha256": "3bfc6ed420865949a98c9676decd1e9edf5bbb959f0738b65730c90394e427e2",
+      "bytes": 19400
     }
   }
 }
