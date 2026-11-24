@@ -35780,6 +35780,17 @@
       "sensitive": false,
       "mandatory": true
     },
+    "stage2-b2-b3-charge-timing-reproducer": {
+      "paths": [
+        "scripts/stage2_charge_timing.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
     "stage2-preservation-timing-reproducer": {
       "paths": [
         "scripts/stage2_preservation_timing.py"

@@ -1048,6 +1048,103 @@ uv run --no-sync python -B -m scripts.stage2_preservation_timing \
   --output <fresh-receipt-directory>
 ```
 
+### Bounded B2 versus B3 Charge timing
+
+The [frozen one-seed protocol](stage2/b2-b3-charge-timing-protocol.md)
+starts all policies at the exact B2 Charge selection, after 43 accepted
+decisions and 423 events. B could declare or complete Charge. The latter
+reproduced the 45-decision, 481-event A3 origin from #733. A chooses
+Preserve or Spend at the same A3 Movement window. B either attempts B2
+and declines B3, declines B2 and attempts B3, or declines both. Each arm
+uses the archived B3 approach and the same A4 E move. Shoot and omit fork
+the identical E offer in each arm.
+
+B2's nearest S base-edge gap was 9.540157 inches. B naturally rolled
+(6 + 4 = 10), kept the roll and received the singleton S target and
+ordinary Charge Move request. The bounded actor-visible ground-charge
+search produced no certified witness. The protocol submitted the native
+Charge Move omission and retained the actual post-roll frontier. This
+leaves a landed B2 charge and its possible A3 options unmeasured. B2
+consumed two RNG draws before A3. The B2-decline branches consumed zero.
+
+B's +1.4-inch B3 approach ended on X=1 at Y=16.4 through 23.6 inches.
+S's first model stood at Y=33 in Preserve and Y=27 in Spend. The approach
+resulted in an 8.140157-inch S gap in Preserve
+and a 2.140157-inch gap in Spend. The delayed Preserve roll was 3 + 4 and
+the engine issued no Charge Move. The delayed Spend roll was 6 + 5 and the
+archived witness passed. B held expansion-02 at OC 2 and scored 3 VP
+before A4. S later lost one model on Desperate Escape. E's three carbines
+had the same legal declaration rows in all six offers. E retained three
+models and six wounds in every continuation. B retained five models.
+
+| B policy | A3 S | A / B VP after E omit or shoot | S models / wounds | B wounds, omit / shoot |
+|---|---|---:|---:|---:|
+| B2 attempt, B3 decline | Preserve | 0 / 0 | 5 / 10 | 10 / 9 |
+| B2 attempt, B3 decline | Spend | 0 / 0 | 5 / 10 | 10 / 9 |
+| B2 decline, B3 attempt | Preserve | 0 / 0 | 5 / 10 | 10 / 10 |
+| B2 decline, B3 attempt | Spend | 0 / 3 | 4 / 8 | 10 / 9 |
+| Both decline | Preserve | 0 / 0 | 5 / 10 | 10 / 9 |
+| Both decline | Spend | 0 / 0 | 5 / 10 | 10 / 9 |
+
+Preserve and Spend tied on VP under the observed B2 attempt and omission.
+Preserve led by three local VP under the delayed policy. E caused no VP
+change within any same-offer pair. The geometry, natural charge budgets,
+and realized response differ across windows. The experiment supports a
+bounded candidate gap at B2 and the table's exact policy outcomes. A
+preference reversal from isolated timing remains unresolved.
+
+The standalone operator authenticates the same two archive inputs
+specified for the #733 reproducer and writes the native action and timing
+ledgers, checkpoints, both views and visible event streams, redaction
+checks, reference matches and replay proofs.
+
+```sh
+uv run --no-sync python -B -m scripts.stage2_charge_timing \
+  --anchor <archive>/anchor-checkpoint.json \
+  --retreat <archive>/retreat-checkpoint.json \
+  --output <fresh-receipt-directory>
+```
+
+The native ledger records 29 accepted matches across the 29 declared
+candidate occurrences, representing eight distinct reference contents. The
+sealed logs retain actual E declarations and accepted full movement paths.
+The engine reached all 12 comparable horizons in 715.7 serial seconds.
+All four new early endpoints and the four prefix frontiers passed fresh
+strict JSON restore and independent exact replay. Five of the eight
+delayed and double-decline endpoints also passed both fresh checks. All
+eight matched their #733 exact checkpoint, two-player view and visible
+event receipts byte for byte, including the three controls whose fresh
+verification was interrupted by the 1,800-second cap. The 34 captured
+two-player view and event files omit private seed data. The actor context
+checks rejected binding from the non-acting player's view.
+
+The outer watchdog interrupted the final summary write. Accepted candidate
+matches, outcome measurements and exact proofs were recovered from the
+sealed action, timing, checkpoint and replay files. The B2 bounded search
+stop subtype and per-candidate dispositions were unavailable in those files.
+The operator now writes progress before replay and after each finished proof.
+This changes receipt persistence only. The corrected pre-run boundary check
+uses the native request ID while recording the opaque viewer token separately.
+The diagnostic stopped before any timing policy ran.
+
+Median wall measurements were 16.7 ms for full Normal Move witness
+generation (nine calls), 3.1 ms for E declaration generation (12 calls),
+43.8 s for strict restore (14 completed calls), and 28.9 s for independent
+ordinary replay (13 completed calls). Median authoritative submission time
+was 278 ms for finite and 443 ms for parameterized actions. The logs retain
+wall and CPU time by component. These observations cover this bounded
+operator workload.
+
+The recovered summary SHA-256 is
+`1a8df3da22c3139fa687e04ddc296a040298a44f8cdbfdfca936fa46ae9a771d`.
+The sealed raw campaign checksum inventory SHA-256 is
+`c90f850529aadc9c03cd57edd1cb916c85955de6301752e3061a8707e7381b83`.
+
+The separately archived +0.75-inch Retreat case accepted zero of eight
+native probes. Its coverage is outside the timing matrix. The local VP
+comparison leaves useful-reference status at `scoped_gap`, with a null
+reference target and learning excluded.
+
 ## 6. First delayed-tradeoff experiment
 
 **Status: proposed, not an existing certified benchmark.** Start from the earliest suitable canonical Core fixture/checkpoint. References: `tests/replay/test_phase18b_replay_runner.py`, `tests/shared/category_migration/primary_boundary_scoring_builders.py`, `tests/shared/category_migration/phase11f_game_end_scoring.py`, and `tests/support/selected_target_charge_fixtures.py`. Use real domain objects and normal engine decisions; do not import test modules into runtime or present a synthetic state alteration as an engine-generated checkpoint.
