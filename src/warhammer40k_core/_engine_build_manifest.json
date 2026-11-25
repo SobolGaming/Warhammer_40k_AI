@@ -1,7 +1,7 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:c0d6fbd073b57e898b2dd73def4e91a44c0799d7e4d31c858f4f08bc1dc22bea",
-  "fingerprint": "c0d6fbd073b57e898b2dd73def4e91a44c0799d7e4d31c858f4f08bc1dc22bea",
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0f7d296e1cbe41efd947f0b36f0bcbf2745511c8456d167b6ee26b6552b9d637",
+  "fingerprint": "0f7d296e1cbe41efd947f0b36f0bcbf2745511c8456d167b6ee26b6552b9d637",
   "resource_count": 3296,
   "resources": [
     {
@@ -4920,9 +4920,9 @@
       "sha256": "5f7d6f57f851e6ac5a3f686ee8296d8703b9cb0c53f4ac680de9c350e9077c23"
     },
     {
-      "byte_length": 16430,
+      "byte_length": 16312,
       "path": "warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/detachments/shadow_legion/rule.py",
-      "sha256": "0681a263201adfa6930790cf2439fe2a4547ab60a8b1e7a44307c18fbe1656c3"
+      "sha256": "0488119a17db07058da1cc9cdc3dff146ab25dba078dd9bc9536f8017c342a22"
     },
     {
       "byte_length": 6819,
@@ -5235,9 +5235,9 @@
       "sha256": "7b86867238e107650cfa8606cdbbd17df8037f98856a45f850ff6839b441b9f3"
     },
     {
-      "byte_length": 23743,
+      "byte_length": 23911,
       "path": "warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_space_marines/army_rule.py",
-      "sha256": "7deafd96a97a6447590c03ac27d2840d5f495d6ba27c57f3e43d0f289e02ec1a"
+      "sha256": "40294c896f0687bed39a4e8820d45ec315d04e6b13ec4a3fa950e49cb2a5ecbc"
     },
     {
       "byte_length": 172,
@@ -10670,9 +10670,9 @@
       "sha256": "99ab4dfb4dc020809bd0e507036889e4f6625d2bb5c099f96f4fee647a4d329d"
     },
     {
-      "byte_length": 58365,
+      "byte_length": 58231,
       "path": "warhammer40k_core/engine/generic_rule_ability_registry_defaults.py",
-      "sha256": "7d7afeff56f870a29fb3f37438a629086037094dc92facbf8a469558e9ab8b02"
+      "sha256": "b971fe9052f08a577855c370a651d1b684492adf3e324e7104c3aadaa2ecb285"
     },
     {
       "byte_length": 3145,
@@ -11875,9 +11875,9 @@
       "sha256": "5918b92e34f4b141759ef973c6ab2f8189c3195c85af28b46921bd048d6a754d"
     },
     {
-      "byte_length": 37037,
+      "byte_length": 37778,
       "path": "warhammer40k_core/engine/phases/shooting_unit_selection.py",
-      "sha256": "19ab905c28ae390f0e1df3b84d833b33a913a2f7453519467f78577b339cbbfd"
+      "sha256": "4e43bc3a6144888bbb8bbb8e95b05be3660ea1737b238fddc6bdacce5f60a8b6"
     },
     {
       "byte_length": 28302,
@@ -13155,9 +13155,9 @@
       "sha256": "afc81700ddde7a3ecd9cb1e4a75f1f3ef10145ea94bdb45d4f867b1464f717da"
     },
     {
-      "byte_length": 15414,
+      "byte_length": 15474,
       "path": "warhammer40k_core/engine/shooting_unit_selected_hooks.py",
-      "sha256": "9cd0c085106dc8bf97fd4639c2173ad66030772b3d6dd179b17fdb2082ad8e0d"
+      "sha256": "31a75f26ee3fcd695129f626006a7f06c2796463b880b950b474b0383f077583"
     },
     {
       "byte_length": 16256,

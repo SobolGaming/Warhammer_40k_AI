@@ -2860,7 +2860,7 @@ def test_shadow_legion_out_of_phase_shooting_requests_dark_pacts_grant() -> None
         is dark_pacts.DarkPactKind.LETHAL_HITS
     )
     assert state.out_of_phase_shooting_state is not None
-    assert state.out_of_phase_shooting_state.grant_effect_ids
+    assert not state.out_of_phase_shooting_state.grant_effect_ids
 
 
 def test_shadow_legion_fight_grants_dark_pacts_for_undivided_units() -> None:

@@ -551,7 +551,7 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
     )
     assert pact["runtime_fingerprint"] == _record(MANIFEST)["fingerprint"]
     assert sum(dark_pact.NEW_TEST in group for group in groups) == 1
-    assert len([node for node in current if node.startswith(dark_pact.NEW_TEST + "::")]) == 17
+    assert len([node for node in current if node.startswith(dark_pact.NEW_TEST + "::")]) == 21
     base_weights = json.loads(
         subprocess.check_output(
             ["git", "show", dark_pact.BASE + ":ci/test_shards/durations.json"], cwd=ROOT
@@ -1180,6 +1180,14 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
     pact_cases.add(
         f"{dark_pact.NEW_TEST}::"
         "test_dark_pact_survivor_without_a_legal_gun_ends_shooting_without_an_attack"
+    )
+    pact_cases.update(
+        f"{dark_pact.NEW_TEST}::test_attached_fight_dark_pact_targets_formation_through_attack_and_replay[{case}]"
+        for case in ("pass", "survive")
+    )
+    pact_cases.update(
+        f"{dark_pact.NEW_TEST}::test_native_overwatch_grant_expires_at_its_own_boundary[{phase_scoped}]"
+        for phase_scoped in (True, False)
     )
     assert current.keys() == (
         retained

@@ -372,9 +372,10 @@ def _validate_optional_expiration(field_name: str, value: object) -> str | None:
     if value is None:
         return None
     expiration = _validate_identifier(field_name, value)
-    if expiration not in {"end_phase", "end_turn"}:
+    if expiration not in {"end_phase", "end_turn", "end_enclosing_phase"}:
         raise GameLifecycleError(
-            f"Shooting-unit-selected hook {field_name} must be end_phase or end_turn."
+            f"Shooting-unit-selected hook {field_name} must be "
+            "end_phase, end_turn, or end_enclosing_phase."
         )
     return expiration
 

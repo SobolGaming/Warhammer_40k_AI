@@ -409,7 +409,7 @@ def _shadow_legion_shooting_dark_pact_grant_builder(
                     unit_instance_id=context.unit_instance_id,
                 ),
             ),
-            unit_effect_expiration="end_phase",
+            unit_effect_expiration="end_enclosing_phase",
         )
 
     return builder
@@ -428,10 +428,6 @@ def _shadow_legion_fight_dark_pact_grant_builder(
             army_rule as dark_pacts,
         )
 
-        target_unit_ids = dark_pacts.dark_pact_target_unit_ids(
-            context.state,
-            unit_instance_id=context.unit_instance_id,
-        )
         selected_pact = dark_pacts.DarkPactKind(pact)
         extra_context: dict[str, JsonValue] = {
             "activation_request_id": context.request_id,
@@ -461,7 +457,7 @@ def _shadow_legion_fight_dark_pact_grant_builder(
                 FightUnitSelectedTimedEffect(
                     effect_payload=dark_pacts.dark_pact_effect_payload(
                         unit_instance_id=context.unit_instance_id,
-                        target_unit_instance_ids=target_unit_ids,
+                        target_unit_instance_ids=(context.unit_instance_id,),
                         trigger="selected_to_fight",
                         phase=BattlePhase.FIGHT,
                         selected_dark_pact=selected_pact,

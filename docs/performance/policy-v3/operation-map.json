@@ -37660,7 +37660,7 @@
       "sensitive": false,
       "mandatory": true
     },
-    "dark-pact-timing-scope-020": {
+    "dark-pact-timing-scope-024": {
       "paths": [
         "data/source_audits/ci64_provenance_v1/dark-pact-test-v1.json"
       ],
@@ -37671,7 +37671,7 @@
       "sensitive": false,
       "mandatory": true
     },
-    "dark-pact-timing-scope-028": {
+    "dark-pact-timing-scope-032": {
       "paths": [
         "scripts/dark_pact_test_admission.py"
       ],
@@ -37687,18 +37687,20 @@
       "sensitive": false,
       "mandatory": true
     },
-    "dark-pact-timing-scope-031": {
+    "dark-pact-timing-scope-035": {
       "paths": [
         "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/detachments/shadow_legion/rule.py"
       ],
       "owners": [
-        "@module"
+        "@module",
+        "_fight_dark_pact_grant",
+        "_shooting_dark_pact_grant"
       ],
       "families": [],
       "sensitive": false,
       "mandatory": true
     },
-    "dark-pact-timing-scope-032": {
+    "dark-pact-timing-scope-036": {
       "paths": [
         "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_space_marines/army_rule.py"
       ],
@@ -37712,6 +37714,7 @@
         "_json_object",
         "_model_leadership",
         "_shooting_dark_pact_grant",
+        "active_dark_pact_effect_for_unit",
         "apply_dark_pact_mortal_wound_feel_no_pain_decision",
         "dark_pact_already_resolved",
         "dark_pact_completion_candidates",
@@ -37742,7 +37745,7 @@
       "sensitive": false,
       "mandatory": true
     },
-    "dark-pact-timing-scope-034": {
+    "dark-pact-timing-scope-038": {
       "paths": [
         "src/warhammer40k_core/engine/fight_unit_selected_hooks.py"
       ],
@@ -37758,7 +37761,7 @@
       "sensitive": false,
       "mandatory": true
     },
-    "dark-pact-timing-scope-035": {
+    "dark-pact-timing-scope-039": {
       "paths": [
         "src/warhammer40k_core/engine/generic_rule_ability_registry_defaults.py"
       ],
@@ -37775,7 +37778,7 @@
       "sensitive": false,
       "mandatory": true
     },
-    "dark-pact-timing-scope-037": {
+    "dark-pact-timing-scope-041": {
       "paths": [
         "src/warhammer40k_core/engine/modifier_evaluation_dispatch.py"
       ],
@@ -37788,7 +37791,7 @@
       "sensitive": false,
       "mandatory": true
     },
-    "dark-pact-timing-scope-038": {
+    "dark-pact-timing-scope-042": {
       "paths": [
         "src/warhammer40k_core/engine/phases/fight.py"
       ],
@@ -37804,7 +37807,7 @@
       "sensitive": false,
       "mandatory": true
     },
-    "dark-pact-timing-scope-039": {
+    "dark-pact-timing-scope-043": {
       "paths": [
         "src/warhammer40k_core/engine/phases/shooting_handler.py"
       ],
@@ -37817,7 +37820,7 @@
       "sensitive": false,
       "mandatory": true
     },
-    "dark-pact-timing-scope-040": {
+    "dark-pact-timing-scope-044": {
       "paths": [
         "src/warhammer40k_core/engine/phases/shooting_unit_selection.py"
       ],
@@ -37827,6 +37830,7 @@
         "_continue_out_of_phase_after_shooting_unit_grants",
         "_end_selected_shooting_without_attacks",
         "_request_shooting_unit_selected_grant_decision_if_available",
+        "_shooting_unit_selected_grant_effect_expiration",
         "_shooting_unit_selected_grant_options",
         "resume_shooting_unit_grant_commitment"
       ],
@@ -37834,7 +37838,7 @@
       "sensitive": false,
       "mandatory": true
     },
-    "dark-pact-timing-scope-041": {
+    "dark-pact-timing-scope-045": {
       "paths": [
         "src/warhammer40k_core/engine/shooting_unit_selected_hooks.py"
       ],
@@ -37843,13 +37847,14 @@
         "ShootingUnitSelectedGrant",
         "ShootingUnitSelectedGrant.from_payload",
         "ShootingUnitSelectedGrant.to_payload",
-        "ShootingUnitSelectedGrantPayload"
+        "ShootingUnitSelectedGrantPayload",
+        "_validate_optional_expiration"
       ],
       "families": [],
       "sensitive": false,
       "mandatory": true
     },
-    "dark-pact-timing-scope-042": {
+    "dark-pact-timing-scope-046": {
       "paths": [
         "src/warhammer40k_core/engine/unit_grant_preparation.py"
       ],
@@ -37877,7 +37882,7 @@
       "sensitive": false,
       "mandatory": true
     },
-    "dark-pact-timing-scope-045": {
+    "dark-pact-timing-scope-050": {
       "paths": [
         "tests/factions/chaos_daemons/unit/test_generic_rule_ability_registry.py"
       ],
@@ -37888,7 +37893,7 @@
       "sensitive": false,
       "mandatory": true
     },
-    "dark-pact-timing-scope-046": {
+    "dark-pact-timing-scope-051": {
       "paths": [
         "tests/infrastructure/adapters/test_dark_pact_timing.py"
       ],
@@ -37898,18 +37903,21 @@
         "_choose",
         "_declared_weapons",
         "_events",
+        "_overwatch_fixture",
         "_pact_rolls",
         "_select",
         "_session",
+        "test_attached_fight_dark_pact_targets_formation_through_attack_and_replay",
         "test_dark_pact_selection_resolves_before_attacks",
         "test_dark_pact_survivor_without_a_legal_gun_ends_shooting_without_an_attack",
+        "test_native_overwatch_grant_expires_at_its_own_boundary",
         "test_only_shadow_legion_offers_belakor_the_no_roll_pact"
       ],
       "families": [],
       "sensitive": false,
       "mandatory": true
     },
-    "dark-pact-timing-scope-047": {
+    "dark-pact-timing-scope-052": {
       "paths": [
         "tests/shared/category_migration/reporting__test_runtime_consumer_evidence.py"
       ],
@@ -37920,7 +37928,7 @@
       "sensitive": false,
       "mandatory": true
     },
-    "dark-pact-timing-scope-048": {
+    "dark-pact-timing-scope-054": {
       "paths": [
         "tests/unit/test_phase17g_chaos_daemons_shadow_legion.py"
       ],
@@ -37939,7 +37947,7 @@
       "sensitive": false,
       "mandatory": true
     },
-    "dark-pact-timing-scope-049": {
+    "dark-pact-timing-scope-055": {
       "paths": [
         "tests/unit/test_phase17g_chaos_space_marines_army_rule.py"
       ],

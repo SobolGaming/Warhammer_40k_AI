@@ -340,16 +340,22 @@ def _apply_shooting_unit_selected_grant_decision(
             registry=registry,
             selected_grants=selected_grants,
         )
-    persisting_effects = tuple(
-        effect
-        for grant in selected_grants
-        for effect in _record_shooting_unit_selected_grant_effects(
+    persisting_effects: list[PersistingEffect] = []
+    reaction_effect_ids: list[str] = []
+    for grant in selected_grants:
+        effects = _record_shooting_unit_selected_grant_effects(
             state=state,
             result=result,
             selection=selection,
             grant=grant,
         )
-    )
+        persisting_effects.extend(effects)
+        # The final effect is the unit effect, after any decision spend. Only
+        # an explicitly enclosing-phase unit effect survives reaction cleanup.
+        reaction_effects = (
+            effects[:-1] if grant.unit_effect_expiration == "end_enclosing_phase" else effects
+        )
+        reaction_effect_ids.extend(effect.effect_id for effect in reaction_effects)
     decisions.event_log.append(
         "shooting_unit_selected_grant_decision_resolved",
         validate_json_value(
@@ -407,7 +413,7 @@ def _apply_shooting_unit_selected_grant_decision(
         ruleset_descriptor=ruleset_descriptor,
         army_catalog=army_catalog,
         shooting_target_restriction_hooks=shooting_target_restriction_hooks,
-        persisting_effects=persisting_effects,
+        reaction_effect_ids=tuple(reaction_effect_ids),
     )
 
 
@@ -471,7 +477,7 @@ def resume_shooting_unit_grant_commitment(
         ruleset_descriptor=ruleset_descriptor,
         army_catalog=army_catalog,
         shooting_target_restriction_hooks=shooting_target_restriction_hooks,
-        persisting_effects=(),
+        reaction_effect_ids=(),
     )
 
 
@@ -509,7 +515,7 @@ def _continue_out_of_phase_after_shooting_unit_grants(
     ruleset_descriptor: RulesetDescriptor | None,
     army_catalog: ArmyCatalog | None,
     shooting_target_restriction_hooks: ShootingTargetRestrictionHookRegistry | None,
-    persisting_effects: tuple[PersistingEffect, ...],
+    reaction_effect_ids: tuple[str, ...],
 ) -> LifecycleStatus | None:
     out_of_phase_state = state.out_of_phase_shooting_state
     if (
@@ -519,9 +525,7 @@ def _continue_out_of_phase_after_shooting_unit_grants(
         and out_of_phase_state.attack_sequence is None
     ):
         state.replace_out_of_phase_shooting_state(
-            out_of_phase_state.with_grant_effect_ids(
-                tuple(effect.effect_id for effect in persisting_effects)
-            )
+            out_of_phase_state.with_grant_effect_ids(reaction_effect_ids)
         )
         if ruleset_descriptor is None or army_catalog is None:
             return None
@@ -734,7 +738,14 @@ def _shooting_unit_selected_grant_effect_expiration(
     grant: ShootingUnitSelectedGrant,
 ) -> EffectExpiration:
     expiration = grant.unit_effect_expiration
-    if expiration == "end_phase":
+    out_of_phase_state = state.out_of_phase_shooting_state
+    if expiration == "end_enclosing_phase" and out_of_phase_state is not None:
+        return EffectExpiration.end_phase(
+            battle_round=state.battle_round,
+            phase=out_of_phase_state.parent_phase,
+            player_id=_active_player_id(state),
+        )
+    if expiration in {"end_phase", "end_enclosing_phase"}:
         return EffectExpiration.end_phase(
             battle_round=state.battle_round,
             phase=BattlePhaseKind.SHOOTING,

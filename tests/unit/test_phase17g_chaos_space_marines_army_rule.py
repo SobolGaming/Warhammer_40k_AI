@@ -947,7 +947,7 @@ def test_dark_pacts_out_of_phase_shooting_requests_grant_before_declaration() ->
         is army_rule.DarkPactKind.LETHAL_HITS
     )
     assert state.out_of_phase_shooting_state is not None
-    assert state.out_of_phase_shooting_state.grant_effect_ids
+    assert not state.out_of_phase_shooting_state.grant_effect_ids
 
 
 def test_dark_pacts_fight_grant_and_melee_profile_add_sustained_hits() -> None:

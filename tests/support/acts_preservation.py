@@ -110,19 +110,26 @@ CONSUMER_ARCHIVE = (
 CONSUMER_BEFORE_SHA256 = "2606d89d43fffdecffafbb301fe19e561119a57629dbd29d2d7a8ba2bef261c9"
 CONSUMER_OLD_TOKEN = b"adepta_sororitas_army_rule.BATTLE_ROUND_START_HOOK_ID"
 CONSUMER_NEW_TOKEN = b"adepta_sororitas_army_rule.TURN_START_HOOK_ID"
+CONSUMER_RETIRED_DARK_PACT_LINE = (
+    b"                chaos_space_marines_army_rule.ATTACK_SEQUENCE_COMPLETED_HOOK_ID,\r\n"
+)
 
 
 def acts_consumer_predecessor(root: Path, current: bytes) -> bytes:
-    """Authenticate exactly one live expected-consumer rename before historical checks."""
+    """Recover the pinned consumer before two exact, separately checked rule changes."""
     target = root / CONSUMER_ARCHIVE
-    error = "Acts runtime-consumer predecessor or exact token substitution changed."
+    error = "Acts runtime-consumer predecessor or exact rule-consumer edits changed."
     if target.is_symlink() or not target.is_file():
         raise ValueError(error)
     before = target.read_bytes()
     if (
         hashlib.sha256(before).hexdigest() != CONSUMER_BEFORE_SHA256
         or before.count(CONSUMER_OLD_TOKEN) != 1
-        or before.replace(CONSUMER_OLD_TOKEN, CONSUMER_NEW_TOKEN, 1) != current
+        or before.count(CONSUMER_RETIRED_DARK_PACT_LINE) != 1
+        or before.replace(CONSUMER_OLD_TOKEN, CONSUMER_NEW_TOKEN, 1).replace(
+            CONSUMER_RETIRED_DARK_PACT_LINE, b"", 1
+        )
+        != current
     ):
         raise ValueError(error)
     return before

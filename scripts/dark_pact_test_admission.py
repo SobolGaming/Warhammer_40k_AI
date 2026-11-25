@@ -15,7 +15,7 @@ from scripts.behavioral_selection_members import (
 RECEIPT = "data/source_audits/ci64_provenance_v1/dark-pact-test-v1.json"
 PREDECESSOR = "data/source_audits/ci64_provenance_v1/charge-flight-wall-test-v1.json"
 BASE = "ab3a4ac03854964649f74efe5b8cebd528d3e25a"
-RECEIPT_SHA256 = "268f67647bea981a853b204ea99efe1eb027564c8c0e20445457cff0182e23ee"
+RECEIPT_SHA256 = "a12562dd774086af360aca74bda457ebf0f6e10ae3e533ae4af6e021f3110031"
 NEW_TEST = "tests/infrastructure/adapters/test_dark_pact_timing.py"
 UPDATED_TEST = "tests/factions/chaos_daemons/unit/test_generic_rule_ability_registry.py"
 LIFECYCLE_SOURCE = "src/warhammer40k_core/engine/lifecycle.py"

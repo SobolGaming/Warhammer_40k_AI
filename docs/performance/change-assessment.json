@@ -1,206 +1,246 @@
 {
   "policy": "rules-engine-performance-v3",
   "base": "ab3a4ac03854964649f74efe5b8cebd528d3e25a",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:c0d6fbd073b57e898b2dd73def4e91a44c0799d7e4d31c858f4f08bc1dc22bea",
-  "operation_map_sha256": "d24fab3216d98155f59eba85ba3da4ccf26ac8ba0cf112ffcad076b1f0e73551",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0f7d296e1cbe41efd947f0b36f0bcbf2745511c8456d167b6ee26b6552b9d637",
+  "operation_map_sha256": "e20ba796469af535091c985b4677989c172a7e920b594bc1655b9a51293235b9",
   "changes": {
     "ci/test_shards/durations.json": {
       "before_sha256": "c785120b2ec6a8068d12e63a63f81d2a3f3c19e46b3db431dde43a6e6a443887",
-      "after_sha256": "8e782df1cb953a9db239b079628cff0bebb2173d3225db139365ca3e1d3f6f64",
+      "after_sha256": "31202965f3706a3a387ee4454e5fb8ba52038bfa0f08b4ba63d353bf1bcd2563",
       "owners": {
         "@document": {
           "before": "c785120b2ec6a8068d12e63a63f81d2a3f3c19e46b3db431dde43a6e6a443887",
-          "after": "8e782df1cb953a9db239b079628cff0bebb2173d3225db139365ca3e1d3f6f64"
+          "after": "31202965f3706a3a387ee4454e5fb8ba52038bfa0f08b4ba63d353bf1bcd2563"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
       "before_sha256": "e1af014f1ad79c7d8557b99013aa4b8a488a08ba5552cf4c258c3afcb712d0c2",
-      "after_sha256": "c9147fd7070792cdcb6334e62b46bf865f48d55a93d6fd44d774660f1eb917d3",
+      "after_sha256": "8e2f28f719268fbd0db6dca88a9183586beaa218eefbccd3bc85d4b4eabbb1dd",
       "owners": {
         "@document": {
           "before": "e1af014f1ad79c7d8557b99013aa4b8a488a08ba5552cf4c258c3afcb712d0c2",
-          "after": "c9147fd7070792cdcb6334e62b46bf865f48d55a93d6fd44d774660f1eb917d3"
+          "after": "8e2f28f719268fbd0db6dca88a9183586beaa218eefbccd3bc85d4b4eabbb1dd"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
       "before_sha256": "8bb96b0da785a7e0f4ad0e6987c0d3900290dad49f39a1e9a72bb998fdf09f12",
-      "after_sha256": "1ba0ba27d72500e53af83198677b2d21c9ce73bd1d1a27d0144dd49b8acc6aea",
+      "after_sha256": "83d9999e448f2008dd666f7fa3a8f09a45671fa815945d466f23a45a1d3eff61",
       "owners": {
         "@document": {
           "before": "8bb96b0da785a7e0f4ad0e6987c0d3900290dad49f39a1e9a72bb998fdf09f12",
-          "after": "1ba0ba27d72500e53af83198677b2d21c9ce73bd1d1a27d0144dd49b8acc6aea"
+          "after": "83d9999e448f2008dd666f7fa3a8f09a45671fa815945d466f23a45a1d3eff61"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
       "before_sha256": "a37e962104f16181dbab5a41e3daf09ff611a794405f7e343a1f1b6a1470e6a4",
-      "after_sha256": "bc9642c5114b831d64ae39cd74548e36cacf1e4a515e29a13fc0bc85229030c0",
+      "after_sha256": "653381b9267baaeb6ffb3acad3500bcb0f2e268c9c4f778b9f8729427df8bb92",
       "owners": {
         "@document": {
           "before": "a37e962104f16181dbab5a41e3daf09ff611a794405f7e343a1f1b6a1470e6a4",
-          "after": "bc9642c5114b831d64ae39cd74548e36cacf1e4a515e29a13fc0bc85229030c0"
+          "after": "653381b9267baaeb6ffb3acad3500bcb0f2e268c9c4f778b9f8729427df8bb92"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
       "before_sha256": "66d202be9889b96c1abdb60e5347572bd528826b669b120ae4ce35267fbec4bc",
-      "after_sha256": "1e8f2244731e23ab39d87181b4050966881ce8c7eca9bec7a88a9d3dbb622fdf",
+      "after_sha256": "ce51b5d7a3a5b05c44ef5b43b1b9edfc5f84a685d6b4ee743b51651075906687",
       "owners": {
         "@document": {
           "before": "66d202be9889b96c1abdb60e5347572bd528826b669b120ae4ce35267fbec4bc",
-          "after": "1e8f2244731e23ab39d87181b4050966881ce8c7eca9bec7a88a9d3dbb622fdf"
+          "after": "ce51b5d7a3a5b05c44ef5b43b1b9edfc5f84a685d6b4ee743b51651075906687"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
       "before_sha256": "9404101bc4d11f177df9c3da2a9786ff8b93d7e215b39d87aaa6bb47639c874a",
-      "after_sha256": "37210fd0f3f29c9c0d1fb3ad77d5fcb4bccc6b0975e3ce54e3aabe93127f75d0",
+      "after_sha256": "3309b44963ab4e277c3c94978faf1cd39f706f62e805628aa2df7a166b302336",
       "owners": {
         "@document": {
           "before": "9404101bc4d11f177df9c3da2a9786ff8b93d7e215b39d87aaa6bb47639c874a",
-          "after": "37210fd0f3f29c9c0d1fb3ad77d5fcb4bccc6b0975e3ce54e3aabe93127f75d0"
+          "after": "3309b44963ab4e277c3c94978faf1cd39f706f62e805628aa2df7a166b302336"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
       "before_sha256": "73718a475117df9813a3f03bf62730730620213074d2a3f1824747f24fd756ef",
-      "after_sha256": "f798aca1dd3d58984e2a58e15869870621b6a80f72531f4c79e2f8d6b29264c1",
+      "after_sha256": "927d5d89df1c82b31b4bd09678fb8060b601b82cca99b36878007f351e73691f",
       "owners": {
         "@document": {
           "before": "73718a475117df9813a3f03bf62730730620213074d2a3f1824747f24fd756ef",
-          "after": "f798aca1dd3d58984e2a58e15869870621b6a80f72531f4c79e2f8d6b29264c1"
+          "after": "927d5d89df1c82b31b4bd09678fb8060b601b82cca99b36878007f351e73691f"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
       "before_sha256": "4dd4909365f03b24c09dc9c2e1a84a31e4f5be15f5d2a25900a60424016ba6be",
-      "after_sha256": "a9af3411a77023c74726e0a0780b5f44786d450b8fa56d522834ceac4a7e974f",
+      "after_sha256": "3f248b012869cf2d7a12f86201362681e412017ffabc7c837bb453e653e2bd60",
       "owners": {
         "@document": {
           "before": "4dd4909365f03b24c09dc9c2e1a84a31e4f5be15f5d2a25900a60424016ba6be",
-          "after": "a9af3411a77023c74726e0a0780b5f44786d450b8fa56d522834ceac4a7e974f"
+          "after": "3f248b012869cf2d7a12f86201362681e412017ffabc7c837bb453e653e2bd60"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
       "before_sha256": "49e00896064b0624f490329a2f71445d2e9c4fb44b565ad02c739b591c4a23c3",
-      "after_sha256": "6c0ca9228eb2983e9da05a54d29f5d415aaf7648ba226a791d72a980a66c17ce",
+      "after_sha256": "e32ecd1d45b8e235b926f5881d7db87c29aeb8d4780273912836d8e434219753",
       "owners": {
         "@document": {
           "before": "49e00896064b0624f490329a2f71445d2e9c4fb44b565ad02c739b591c4a23c3",
-          "after": "6c0ca9228eb2983e9da05a54d29f5d415aaf7648ba226a791d72a980a66c17ce"
+          "after": "e32ecd1d45b8e235b926f5881d7db87c29aeb8d4780273912836d8e434219753"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
       "before_sha256": "0fccd6ef4b9b7a14837fb63a13a70b6ec79a5abd9718aa4e6390968e6291fe8b",
-      "after_sha256": "fbf66fbe077eab2ccdf582d6abe2d10f05ceb8da27535a4d3a94c3b18ca474f6",
+      "after_sha256": "0374d935537df1fa426b36515b1df6c4db5d7266f82565e56ba533c35466daea",
       "owners": {
         "@document": {
           "before": "0fccd6ef4b9b7a14837fb63a13a70b6ec79a5abd9718aa4e6390968e6291fe8b",
-          "after": "fbf66fbe077eab2ccdf582d6abe2d10f05ceb8da27535a4d3a94c3b18ca474f6"
+          "after": "0374d935537df1fa426b36515b1df6c4db5d7266f82565e56ba533c35466daea"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
       "before_sha256": "0117be15a6a0024ab1c63c7f558010655d6cae7f81de8a7f82b5a037b2821c2c",
-      "after_sha256": "4360e0d2a01ef7d26530b74b64a0823f5cc948ecdb66dcb56bd8886b7d6c98d4",
+      "after_sha256": "4e4fdf811a78da88903a0a3d92a7021a825fc63afdd1ac1b41f2e8a1f79e3062",
       "owners": {
         "@document": {
           "before": "0117be15a6a0024ab1c63c7f558010655d6cae7f81de8a7f82b5a037b2821c2c",
-          "after": "4360e0d2a01ef7d26530b74b64a0823f5cc948ecdb66dcb56bd8886b7d6c98d4"
+          "after": "4e4fdf811a78da88903a0a3d92a7021a825fc63afdd1ac1b41f2e8a1f79e3062"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
       "before_sha256": "f065b493796999491b66de755822d6e38479ae1ad201cdab8283fb428c354903",
-      "after_sha256": "c4258a003cd974bbff28cc2171b89cb02d94df9bc253cdd26e1c42256a94d2cc",
+      "after_sha256": "a552521fd9c71018ed0cc0d539d68e834582cd53b42ebc5d43aa7c17f3ec8355",
       "owners": {
         "@document": {
           "before": "f065b493796999491b66de755822d6e38479ae1ad201cdab8283fb428c354903",
-          "after": "c4258a003cd974bbff28cc2171b89cb02d94df9bc253cdd26e1c42256a94d2cc"
+          "after": "a552521fd9c71018ed0cc0d539d68e834582cd53b42ebc5d43aa7c17f3ec8355"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "before_sha256": "18dc1d79ec961ee716ad3597fd40ae11a060761f38064a7874653a8e7139cfd3",
-      "after_sha256": "4654136a1c53bf50380ba1834eb374864b5ded7201f7cd9bdefc92e93b7c98ea",
+      "after_sha256": "686ecf572fd457b2e8975b1346a8820c629cbb3156077ff74aa3efa02a419694",
       "owners": {
         "@document": {
           "before": "18dc1d79ec961ee716ad3597fd40ae11a060761f38064a7874653a8e7139cfd3",
-          "after": "4654136a1c53bf50380ba1834eb374864b5ded7201f7cd9bdefc92e93b7c98ea"
+          "after": "686ecf572fd457b2e8975b1346a8820c629cbb3156077ff74aa3efa02a419694"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
       "before_sha256": "3c9fe071a3b8523268ace9bfcb971c0dfc31e3ffce2f68f800973311aaf6569c",
-      "after_sha256": "c080b3562d4661d9c0571184668d482369aaeee3cf7061014553ffeaf0b23dfb",
+      "after_sha256": "ae2bc778d080f11946ee2f5392a2753fdb91e301aafe5fb8da8a52013a9cc811",
       "owners": {
         "@document": {
           "before": "3c9fe071a3b8523268ace9bfcb971c0dfc31e3ffce2f68f800973311aaf6569c",
-          "after": "c080b3562d4661d9c0571184668d482369aaeee3cf7061014553ffeaf0b23dfb"
+          "after": "ae2bc778d080f11946ee2f5392a2753fdb91e301aafe5fb8da8a52013a9cc811"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "before_sha256": "a0a100d1cac88ecb7f121123a863432b9fb41166292552cee0a2f7e93da472dd",
-      "after_sha256": "481b2f6ebbb35ef321dd49e759f40f381ba9c55b6e11c8934e3b1f41cbb489ab",
+      "after_sha256": "8364b271907dc14e6f7da08cca56ec32843b953ac14df100c42a833804a1128e",
       "owners": {
         "@document": {
           "before": "a0a100d1cac88ecb7f121123a863432b9fb41166292552cee0a2f7e93da472dd",
-          "after": "481b2f6ebbb35ef321dd49e759f40f381ba9c55b6e11c8934e3b1f41cbb489ab"
+          "after": "8364b271907dc14e6f7da08cca56ec32843b953ac14df100c42a833804a1128e"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "before_sha256": "3d9ce8bbc5db1785a05b9786be60a50d3e0c6f4bebced84f644c129db9f1587c",
-      "after_sha256": "0336a92c327a4342c97b8235821f99d3f4580e10e946ea164ce55eced5e213c9",
+      "after_sha256": "769c7f7acd5e6b22252d904b0a09ecebabb1492a9ca7757520db22c3a34bd262",
       "owners": {
         "@document": {
           "before": "3d9ce8bbc5db1785a05b9786be60a50d3e0c6f4bebced84f644c129db9f1587c",
-          "after": "0336a92c327a4342c97b8235821f99d3f4580e10e946ea164ce55eced5e213c9"
+          "after": "769c7f7acd5e6b22252d904b0a09ecebabb1492a9ca7757520db22c3a34bd262"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "before_sha256": "00452489597feba5e215d2bd0cb2b800b408636226de7730fa32a9443af25ea7",
-      "after_sha256": "dcfbb7500985cf7fb08941fc9a0303607b0c4b521edd69a41a33c8cf3a1e66d1",
+      "after_sha256": "c7e47f18e832da20122c2edce8f1a568d54a111fc9de22b9be7d0d91d71a8753",
       "owners": {
         "@document": {
           "before": "00452489597feba5e215d2bd0cb2b800b408636226de7730fa32a9443af25ea7",
-          "after": "dcfbb7500985cf7fb08941fc9a0303607b0c4b521edd69a41a33c8cf3a1e66d1"
+          "after": "c7e47f18e832da20122c2edce8f1a568d54a111fc9de22b9be7d0d91d71a8753"
         }
       }
     },
     "contracts/examples/support-profile.json": {
       "before_sha256": "e4198236fcd436348d3eb3991b31dc6fafff9b186fc85084bdd100011a3384a3",
-      "after_sha256": "1575baf6c0693779dbff7551d64d2cec95868bfdb25ec3d35f90f85b780d8ec7",
+      "after_sha256": "6d1ba14bb899ab5ca76ff73a2d8cfce895360d883d28f72a393e4a0ef39e71da",
       "owners": {
         "@document": {
           "before": "e4198236fcd436348d3eb3991b31dc6fafff9b186fc85084bdd100011a3384a3",
-          "after": "1575baf6c0693779dbff7551d64d2cec95868bfdb25ec3d35f90f85b780d8ec7"
+          "after": "6d1ba14bb899ab5ca76ff73a2d8cfce895360d883d28f72a393e4a0ef39e71da"
         }
       }
     },
     "contracts/manifest.json": {
       "before_sha256": "747f40baea92c033cb06a0fb4373a2803bc5d6b8fa4a489f12e4ea91645cb202",
-      "after_sha256": "3088695ce3e8bf447a7538052d6f672cf584cddcc0e76d00af569038736f583e",
+      "after_sha256": "ffa330a15659a0379786edc23914513944a11d21333aeb39d05df0fd01fb86a0",
       "owners": {
         "@document": {
           "before": "747f40baea92c033cb06a0fb4373a2803bc5d6b8fa4a489f12e4ea91645cb202",
-          "after": "3088695ce3e8bf447a7538052d6f672cf584cddcc0e76d00af569038736f583e"
+          "after": "ffa330a15659a0379786edc23914513944a11d21333aeb39d05df0fd01fb86a0"
+        }
+      }
+    },
+    "data/generated/ability_coverage/ability_coverage_rows.json": {
+      "before_sha256": "d04fbb07a7d7070edfc3e17fc1943fa56da9ca85600cc8a3fd7f00fff0124afd",
+      "after_sha256": "9a39774dbe4b138887aee7843ff970cc6eec7ac659e7b6dcd8dbf6af281a858d",
+      "owners": {
+        "@document": {
+          "before": "d04fbb07a7d7070edfc3e17fc1943fa56da9ca85600cc8a3fd7f00fff0124afd",
+          "after": "9a39774dbe4b138887aee7843ff970cc6eec7ac659e7b6dcd8dbf6af281a858d"
+        }
+      }
+    },
+    "data/generated/ability_coverage/ability_support_category_rows.json": {
+      "before_sha256": "387d29cb3ade877b16e597cf6b6ff017daca85120b494653260c0a6f26b0c917",
+      "after_sha256": "e5ec02b494fe92fd8a25e7ba6ecbbadf3fdc392f1d4cb557963b7e68a9947135",
+      "owners": {
+        "@document": {
+          "before": "387d29cb3ade877b16e597cf6b6ff017daca85120b494653260c0a6f26b0c917",
+          "after": "e5ec02b494fe92fd8a25e7ba6ecbbadf3fdc392f1d4cb557963b7e68a9947135"
+        }
+      }
+    },
+    "data/generated/ability_coverage/datasheet_support_rows.json": {
+      "before_sha256": "3e749aae41b080faaa7bf5cda25761677a38f41890a6b5f67b6f93c146a3dd10",
+      "after_sha256": "5a2a9cbcf3f290922ce4d7bfe5720ebfb55f3d142651587fdb0b2395d2b80b66",
+      "owners": {
+        "@document": {
+          "before": "3e749aae41b080faaa7bf5cda25761677a38f41890a6b5f67b6f93c146a3dd10",
+          "after": "5a2a9cbcf3f290922ce4d7bfe5720ebfb55f3d142651587fdb0b2395d2b80b66"
+        }
+      }
+    },
+    "data/generated/ability_coverage/maulerfiend_cross_faction_support.json": {
+      "before_sha256": "5a5f1ab5259af2c79a2084afd38f086afa131e3ef5f76f389d436d5ccd700fc4",
+      "after_sha256": "4a46fc50353ec60c378bbf05bb54f10f1de9a78067b1aa64123043200ab5d2c5",
+      "owners": {
+        "@document": {
+          "before": "5a5f1ab5259af2c79a2084afd38f086afa131e3ef5f76f389d436d5ccd700fc4",
+          "after": "4a46fc50353ec60c378bbf05bb54f10f1de9a78067b1aa64123043200ab5d2c5"
         }
       }
     },
     "data/source_audits/ci64_provenance_v1/dark-pact-test-v1.json": {
       "before_sha256": null,
-      "after_sha256": "268f67647bea981a853b204ea99efe1eb027564c8c0e20445457cff0182e23ee",
+      "after_sha256": "a12562dd774086af360aca74bda457ebf0f6e10ae3e533ae4af6e021f3110031",
       "owners": {
         "@document": {
           "before": null,
-          "after": "268f67647bea981a853b204ea99efe1eb027564c8c0e20445457cff0182e23ee"
+          "after": "a12562dd774086af360aca74bda457ebf0f6e10ae3e533ae4af6e021f3110031"
         }
       }
     },
@@ -256,11 +296,11 @@
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "a7b072f15344746df9dce11e2012b1e600fcc39b8123e26bddeae673d476e9b4",
-      "after_sha256": "faceb61ab3e58ffcd347cccf61b312d730e565fb5910804cad3cab54ebae3eb6",
+      "after_sha256": "250a8a428956b3c8f338a7fd906a443a797bb157e6c818eb95ad795e2d567e93",
       "owners": {
         "@document": {
           "before": "a7b072f15344746df9dce11e2012b1e600fcc39b8123e26bddeae673d476e9b4",
-          "after": "faceb61ab3e58ffcd347cccf61b312d730e565fb5910804cad3cab54ebae3eb6"
+          "after": "250a8a428956b3c8f338a7fd906a443a797bb157e6c818eb95ad795e2d567e93"
         }
       }
     },
@@ -276,11 +316,11 @@
     },
     "scripts/dark_pact_test_admission.py": {
       "before_sha256": null,
-      "after_sha256": "f1f5555571b2abbf3aa7eddc3d9fdae9c2a7fc844ace8cc3cf04636e9778e3e6",
+      "after_sha256": "00c8960756fd8419f02efc04e6c5f41435e66ebfb93c2567fe7d5bb28a8ad5b1",
       "owners": {
         "@module": {
           "before": null,
-          "after": "de23878b9e7ade4dd97dba62aae836912db27269c2bc30317f000d0b10bb698b"
+          "after": "66cdfc695ca7eebaa3001abc9c9f50644ed00c1faa1ef57dccc40bc9b2fd12f6"
         },
         "_read_receipt": {
           "before": null,
@@ -324,31 +364,39 @@
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "before_sha256": "3329d68eae2c6a94e03bd3d925604d7a5e86cbfef9839a7b01a507a83bac5f39",
-      "after_sha256": "581cef0285f5c91daafae58313869cb3320ad9a70b240690158a83138fad66bb",
+      "after_sha256": "2250a7814cd3a73fcfd4dc44514bccfd15d21c1bdba304f5e432b4e93801ba3f",
       "owners": {
         "@document": {
           "before": "3329d68eae2c6a94e03bd3d925604d7a5e86cbfef9839a7b01a507a83bac5f39",
-          "after": "581cef0285f5c91daafae58313869cb3320ad9a70b240690158a83138fad66bb"
+          "after": "2250a7814cd3a73fcfd4dc44514bccfd15d21c1bdba304f5e432b4e93801ba3f"
         }
       }
     },
     "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/detachments/shadow_legion/rule.py": {
       "before_sha256": "51d1781d774ea84588d6182265bd524dce6503ad0d8d85353982b6c4e0f3782b",
-      "after_sha256": "0681a263201adfa6930790cf2439fe2a4547ab60a8b1e7a44307c18fbe1656c3",
+      "after_sha256": "0488119a17db07058da1cc9cdc3dff146ab25dba078dd9bc9536f8017c342a22",
       "owners": {
         "@module": {
           "before": "364396ab3395599f135fa5006158ed937e5fe13d17d6a3306f412fc031d92e10",
           "after": "7cb32b486b5ca0f89c452c2e97ef4ccff9dda6908aba19e3a5256971c68dabbd"
+        },
+        "_fight_dark_pact_grant": {
+          "before": "d7a90f4e5ad3db44a9814cdc9d2f9f65a28287773bb7aa8f2572572f72cd7361",
+          "after": "8adc5e7d546132906f073a004c02dc8123d5dd0dafb857ce68879bc5d3f73391"
+        },
+        "_shooting_dark_pact_grant": {
+          "before": "57f3a427b2b9bf658ca2c19167279705280a940c74a7e03cd0890eb1da7f09d5",
+          "after": "155c75e4f019b97c0b7634a684a6796c87f5e8d7739d5547598f4ada9fa7d274"
         }
       }
     },
     "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_space_marines/army_rule.py": {
       "before_sha256": "9ede066de03eb2948bfb31133ab83efb4630f699d4a58f3f9fbd3d658c7475a4",
-      "after_sha256": "7deafd96a97a6447590c03ac27d2840d5f495d6ba27c57f3e43d0f289e02ec1a",
+      "after_sha256": "40294c896f0687bed39a4e8820d45ec315d04e6b13ec4a3fa950e49cb2a5ecbc",
       "owners": {
         "@module": {
           "before": "af72c9f19fcb5c028f4d5c9a84562a50e9efb7835df9b2923bdf34e4aa168c0d",
-          "after": "ecdbba73cade8ad2a0ae966c664783443d72aa2eed70faeff75228b915223233"
+          "after": "7681b4234991229fcb6a31037e3edfd0ee5e35fa95f62ad6eef2fd63270d5bb0"
         },
         "DarkPactMortalWoundSourceContextPayload": {
           "before": "34f56f35fb4a6ea47102e5062e017544a9f647d52b8313bb1f9849df61ee62cc",
@@ -368,7 +416,7 @@
         },
         "_fight_dark_pact_grant": {
           "before": "be88a34ebbc81a268164b0e1fa7d09372c94057847096239d5a6f5b465112462",
-          "after": "81412e0a51060db325611a593a49894573801e27839aa47a2317abeeac474e91"
+          "after": "92d5c76f6c95fd6b2bc979a8fd0b263a7886732c314e761bbb1bac9adbabaa68"
         },
         "_json_object": {
           "before": "3928d6c66d68c3924b8a56cc349af2b333632b77b7633b24d2214c67d3dd2dc1",
@@ -380,7 +428,11 @@
         },
         "_shooting_dark_pact_grant": {
           "before": "d670da1bd80610de067b2d9d50a26ec750d6658b86104f1a68efdef4735477f0",
-          "after": "a04db964b3cbbb6921c18a6be7c82d60e1d1944f22f99eb52e84d0fbadffdea4"
+          "after": "5452d9521449987f4c271f2d4346cfcfc68713a0c76dd05b4b4386872ed8e3f1"
+        },
+        "active_dark_pact_effect_for_unit": {
+          "before": "f32eca22a9f153ebc5b380e0dcfa5c16660fffe07ca2317e3e9e27ccc06367dd",
+          "after": "e70f2d9771cb96998e5de36a5407a1dacfeeba8be5963e7442c97650fbbb93e3"
         },
         "apply_dark_pact_mortal_wound_feel_no_pain_decision": {
           "before": "978c118738f5c7ddcceb02d1855960e535acc160903e8d3e518cebfd256ef848",
@@ -482,7 +534,7 @@
     },
     "src/warhammer40k_core/engine/generic_rule_ability_registry_defaults.py": {
       "before_sha256": "7516f4ebbfc6daf4d93940b01ab61d240f6f3b2a476fa2e67b88d9b8ad458e79",
-      "after_sha256": "7d7afeff56f870a29fb3f37438a629086037094dc92facbf8a469558e9ab8b02",
+      "after_sha256": "b971fe9052f08a577855c370a651d1b684492adf3e324e7104c3aadaa2ecb285",
       "owners": {
         "@module": {
           "before": "0743dd3d2bc1b44948b80fcbd73d6d1c12cfbb57984eff52e378d91140b4d881",
@@ -506,11 +558,11 @@
         },
         "_shadow_legion_fight_dark_pact_grant_builder": {
           "before": "461b9081e39ffb647112d2d286b27963dd4390842d4c705252e35b78a58cd5f0",
-          "after": "db8a3a4689ac7ad0ca07ecc9a82364d40b93e7552cda7974879dc9126bb0b452"
+          "after": "e5502229da4e354ef291c0bf22d7e02c173d853906be2e2a355840a63e00fcbc"
         },
         "_shadow_legion_shooting_dark_pact_grant_builder": {
           "before": "7d9f57ee0cbd163695a09d3218cdedf00275accfe5f43583e17937e0d53b4fb8",
-          "after": "acc9ea59d3f296bfa5b7ec09d0eff2f859d29c2ab91db8baa903c1defe1626fc"
+          "after": "404339570157c80f146528d8580a1063da9158de931520d2bb02230fe35976c2"
         }
       }
     },
@@ -600,7 +652,7 @@
     },
     "src/warhammer40k_core/engine/phases/shooting_unit_selection.py": {
       "before_sha256": "233720c815c4d61891fc13b8b7b089e67123e43faf9a4c34497b5b88a9863ae1",
-      "after_sha256": "19ab905c28ae390f0e1df3b84d833b33a913a2f7453519467f78577b339cbbfd",
+      "after_sha256": "4e43bc3a6144888bbb8bbb8e95b05be3660ea1737b238fddc6bdacce5f60a8b6",
       "owners": {
         "@module": {
           "before": "55b720db42708d2f99b749572fbcbf8a3acb68e143a7cfedb42e22e726f86fc7",
@@ -608,11 +660,11 @@
         },
         "_apply_shooting_unit_selected_grant_decision": {
           "before": "4c0218cecefbb54839bea13cc4c9a70d7984ce78a4c2003a993182c22415a1a5",
-          "after": "1259f5894210800be1e57cf4c4ff10847f171eb0317c6fbc565c7a576e30519e"
+          "after": "c531548d29922afbc31b0f41b0d2d233080dd6e069b684d43bf439e6b941a152"
         },
         "_continue_out_of_phase_after_shooting_unit_grants": {
           "before": null,
-          "after": "a2cdefa510d8add860c7492b7f67a0923e2c7fe8c480e7ea7ba3816ae4350354"
+          "after": "ea72abfe3858b22da47108e434a3492ec0d2ab8bfc429dbf8e479a5c814057ba"
         },
         "_end_selected_shooting_without_attacks": {
           "before": null,
@@ -622,19 +674,23 @@
           "before": "6df4031accf61013c54b69d2e979da5cc72ef3a08c44e282f853b964fdd71735",
           "after": "dbdb9d310d4ea7434e210972d61684c6910c83fc9bcaf3aed3dcf88aab1eed86"
         },
+        "_shooting_unit_selected_grant_effect_expiration": {
+          "before": "dea919d2470d2848e3a855278b167269131bb5478e331870e3aa8d84b41c0179",
+          "after": "25c9c9fb5d87674b39893b37766c8430fcdd497c1882d7106d169d9ea5624f2c"
+        },
         "_shooting_unit_selected_grant_options": {
           "before": "6e39b0879108960b0f02af5fc7b405adabae7023c84e84f18554bbfbbb5b2ed8",
           "after": "207e2fbf0ae198b8c1f967718b0bd942cd2a6ca5380413b38b059cfbf1139473"
         },
         "resume_shooting_unit_grant_commitment": {
           "before": null,
-          "after": "ac5de570daf04ea1472c30999ea1862361b82780e31a8615e985aea6dc9bc40c"
+          "after": "9a10474e0d29e11c3abcd0b2c2468292b1e4f076653fda4f4531c72965521d52"
         }
       }
     },
     "src/warhammer40k_core/engine/shooting_unit_selected_hooks.py": {
       "before_sha256": "19cff3f7b9133577b496840b2850e64d3058eca0b47209064813ca00cd9f9cf2",
-      "after_sha256": "9cd0c085106dc8bf97fd4639c2173ad66030772b3d6dd179b17fdb2082ad8e0d",
+      "after_sha256": "31a75f26ee3fcd695129f626006a7f06c2796463b880b950b474b0383f077583",
       "owners": {
         "@module": {
           "before": "a93c942b30af0c4ab9e4931c15cb25fbb5ded94a5c8a21ab9d9d167eb0544caa",
@@ -655,6 +711,10 @@
         "ShootingUnitSelectedGrantPayload": {
           "before": "1ca945d1f471fc44134248f71a638eb2a2d01d175a838b3f21ada8f66badcc1c",
           "after": "dde3756da1a48ed6e49b3b7e9293e344c62929ae515d1f86e43822e3ebdf484d"
+        },
+        "_validate_optional_expiration": {
+          "before": "ae7bf99498fa13f9405bd7cff51282b69169c8d149b841d464dae6d500231ae9",
+          "after": "7392bc95963da9d58e97160779e3fcfe39cfa14d45aef067dc4aace5a8eb75ae"
         }
       }
     },
@@ -736,13 +796,27 @@
         }
       }
     },
+    "tests/code_quality/test_ci_performance_gates.py": {
+      "before_sha256": "f3c7eb06b38a09ce25f9d5b4c7bd733ad8ff60365b9a649adee47812dd58f096",
+      "after_sha256": "b5671373c974408e66d954d7318713f9026e5883a641727cbd32581726dd7e03",
+      "owners": {
+        "test_cutover_real_cli_rejects_naming_override": {
+          "before": "1f6acd4d381bf6d4957c7e7d928af11756412b12f9a6ce1795c45cc5bf92b154",
+          "after": "0a68b5caaf878b06a6d08d8a22a478c51f1ba19cdbc8fff82310a03918ef16e3"
+        },
+        "test_cutover_real_pytest_cli_does_not_bypass_explicit_file_guard": {
+          "before": "ab00c26fa40a23b6bd8e76511c959d52e161c6ac1a9fb6cd2e280309a56dd7b4",
+          "after": "a80ed82df7ed314bc4ef6a84cdd9e0ffbac7a26edb64e265593d0617da0c89d4"
+        }
+      }
+    },
     "tests/code_quality/test_engine_numerical_identity_admission.py": {
       "before_sha256": "f6eb8139b65e8787ff0f01da9f4178f9dc27d42f53be7f4abee2a94044a6692e",
-      "after_sha256": "7261791057c9279036f5b4c3b79e03dd85ed036a6223f1c07d44a7da93057587",
+      "after_sha256": "4093e4a072f13386b466988f02048a83c2da0928ea7b5e20de05db5a7e828cf6",
       "owners": {
         "test_identity_inventory_uses_current_twelve_shards_and_native_cohort": {
           "before": "3c566cf7afd5bff9e0a9fed17308e89b7c48394c05f394c02839eb140541a41d",
-          "after": "ac73b6567d763e2b2c73749e710ec86b3bfee322948979a408dc41105d1bb882"
+          "after": "883c644fa1d980e2fd353dea1771391508d6919058681c84ff5c1e978350991d"
         }
       }
     },
@@ -768,15 +842,15 @@
     },
     "tests/infrastructure/adapters/test_dark_pact_timing.py": {
       "before_sha256": null,
-      "after_sha256": "48a8f447a624b108229decfb23180b526d30947db23fd986bf375626b4c6574a",
+      "after_sha256": "af0a2326c0996aff5b8515e5e4cd3400b41ab9b62c126013ee9a5d528e221dec",
       "owners": {
         "@module": {
           "before": null,
-          "after": "5708f45a9c00d5f6eacfcd22374bd30db624036728038ea896715928355dafdc"
+          "after": "7accc6f4c90030924bb1317148deb2fcc0f0e94ad102c99f187b5f850264c013"
         },
         "_catalog": {
           "before": null,
-          "after": "369429bd44e356880bcdb8c5b98e2c79abea6f27af34c0d94a2c282df35838b8"
+          "after": "09f1d29de86942c3cacf23e3c8047c25c220f5b646e3460ccfda6b975c07b5e7"
         },
         "_choose": {
           "before": null,
@@ -790,25 +864,37 @@
           "before": null,
           "after": "88ff23e9b9e40993038ec4fa49016ea318f9b761ac5c9477c53a210c0b8e52d6"
         },
+        "_overwatch_fixture": {
+          "before": null,
+          "after": "457ae76c93546be978f280237c7b6fe24018c59a9fe36d4cbf7c02520a2c5ba8"
+        },
         "_pact_rolls": {
           "before": null,
           "after": "3a50d887f2c18bad6753392fb3588ca3401fc90d0ca9078791eae235d84fd54b"
         },
         "_select": {
           "before": null,
-          "after": "9c671885a5d1da302cef2e4eff24d3ac751f6bd7602b9c87b9e8337c2c872ea6"
+          "after": "22e853a7ac8c72e7b545196174a068755c8e1d295292353f448970a7e43a7e07"
         },
         "_session": {
           "before": null,
-          "after": "69c7eee8a0760e4ef370af1af12348726f2ca8405d2e7ffbc2ae4f9b6c792d36"
+          "after": "561c8c009ac0a361f6a5d65c4c01a3c2317a5c75bd73cd53b6e730ec42b77f68"
+        },
+        "test_attached_fight_dark_pact_targets_formation_through_attack_and_replay": {
+          "before": null,
+          "after": "b5f222513ee7a369f0e8d5dd4be607b1fe44afb5857e535ddf99be40d5af7ea9"
         },
         "test_dark_pact_selection_resolves_before_attacks": {
           "before": null,
-          "after": "f3c9d350916bf260892e22434f896d884cf6fdeb18788c70abb9c1f6d83b8643"
+          "after": "5ff8647c2ce2849d59565edbb593628fcf448f7a15ef76f4b82a6e025e31fa42"
         },
         "test_dark_pact_survivor_without_a_legal_gun_ends_shooting_without_an_attack": {
           "before": null,
           "after": "890b32647c48edc8b35bba5ad780b295348b8751af71f049de832216f1060566"
+        },
+        "test_native_overwatch_grant_expires_at_its_own_boundary": {
+          "before": null,
+          "after": "1fa45e62f49f3f8327824c4c47b1ce5ff35156fdae8a0d363118173dc383efa0"
         },
         "test_only_shadow_legion_offers_belakor_the_no_roll_pact": {
           "before": null,
@@ -826,9 +912,23 @@
         }
       }
     },
+    "tests/support/acts_preservation.py": {
+      "before_sha256": "4a92f3556d7c1160bf8d107db83a49c3ed10eeef5a9230e17f97e1f06fc8311c",
+      "after_sha256": "496b2bc61a8f2e406d18532834b3bd5ffe2008365ad7ff86016cf7b6bb6c6619",
+      "owners": {
+        "@module": {
+          "before": "399a10d9db3e4a8cd6ea0e071d47e6cfd5041352496c770e7d308d533307a45f",
+          "after": "f76c587acaf64797a62aa81382bcd8297d4d299461f2b37da880bc89acd06943"
+        },
+        "acts_consumer_predecessor": {
+          "before": "ffc7c2e82cc5100125765e491eb635e678d4ee1c4b9149815b090e3ab2b3789b",
+          "after": "291456cc1186bf2c2af7789141ae480cad6bdffe80674486dabe3e92507dbb5c"
+        }
+      }
+    },
     "tests/unit/test_phase17g_chaos_daemons_shadow_legion.py": {
       "before_sha256": "9e1c033fa246822e637d0c87f7daadbc4fee1d9eb53f424eb23a3a58a51be1a4",
-      "after_sha256": "30216000ca259775c56b854b460638276245153c9a2be9617fc1a6bb55308c57",
+      "after_sha256": "2b013289d44d782fb64e3d0880e083223cd444cc9b64d1c0a861c32e90edb68e",
       "owners": {
         "@module": {
           "before": "92f790d39dd8115efdfeda0a74f76bf03c63ff7059902614ec4b42043b92dccb",
@@ -864,13 +964,13 @@
         },
         "test_shadow_legion_out_of_phase_shooting_requests_dark_pacts_grant": {
           "before": "991773b40d6bbd096b723849b95532b0cba3cfc76348663b6ca24d96384c2252",
-          "after": "a56efccd258a1005bfe6074c38b35e55ae2a3a44cea626830a2fd3325fb3467c"
+          "after": "69ad961cf345ccb64726b63688556b38f2645366374cfa71a4484db768393c8c"
         }
       }
     },
     "tests/unit/test_phase17g_chaos_space_marines_army_rule.py": {
       "before_sha256": "132ad158de58951446b311204ccc83af37e1d7596ac20ff9142feef3c26a6dac",
-      "after_sha256": "49b9d05091c10728bbd4faa3a35725d53a1c355d1af8313d4f0722371d501d1c",
+      "after_sha256": "b9b7fbc24d9f8841e65b12f5cb3d0857b278bf71bf4f9a844a464b16a8dce2d6",
       "owners": {
         "@module": {
           "before": "59b8a6d7fef0ce1e193169bbdc49e39f235af2d3358bd7205b672dbdbe1a4f61",
@@ -910,7 +1010,7 @@
         },
         "test_dark_pacts_out_of_phase_shooting_requests_grant_before_declaration": {
           "before": "a0975e8e9dbe9f40fa9fb12d1fab48801d3eab6309a0c10bb8982a2929d6dcd7",
-          "after": "c4bab48bf07428432b734d7bab1e9132272a9343457dd45c402722a5b41ce0d5"
+          "after": "7fcbab2575138b34b0088e1d2a71ae800ec533186cf07c689401d18e3b31e424"
         },
         "test_dark_pacts_runtime_contribution_registers_engine_hooks": {
           "before": "495edb88a4c40115649acfd338a5d225c049c39b1a092d456a577b83725128d6",
@@ -973,7 +1073,7 @@
       ],
       "selected_families": [],
       "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
-      "source_obligation": "GW Dark Pacts requires optional commitment, the Leadership test and any failed-test casualties, then a surviving unit's weapon-effect choice before attacks.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
       "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "ci/test_shards/shard-1.txt": {
@@ -983,7 +1083,7 @@
       ],
       "selected_families": [],
       "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
-      "source_obligation": "GW Dark Pacts requires optional commitment, the Leadership test and any failed-test casualties, then a surviving unit's weapon-effect choice before attacks.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
       "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "ci/test_shards/shard-10.txt": {
@@ -993,7 +1093,7 @@
       ],
       "selected_families": [],
       "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
-      "source_obligation": "GW Dark Pacts requires optional commitment, the Leadership test and any failed-test casualties, then a surviving unit's weapon-effect choice before attacks.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
       "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "ci/test_shards/shard-11.txt": {
@@ -1003,7 +1103,7 @@
       ],
       "selected_families": [],
       "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
-      "source_obligation": "GW Dark Pacts requires optional commitment, the Leadership test and any failed-test casualties, then a surviving unit's weapon-effect choice before attacks.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
       "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "ci/test_shards/shard-12.txt": {
@@ -1013,7 +1113,7 @@
       ],
       "selected_families": [],
       "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
-      "source_obligation": "GW Dark Pacts requires optional commitment, the Leadership test and any failed-test casualties, then a surviving unit's weapon-effect choice before attacks.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
       "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "ci/test_shards/shard-4.txt": {
@@ -1023,7 +1123,7 @@
       ],
       "selected_families": [],
       "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
-      "source_obligation": "GW Dark Pacts requires optional commitment, the Leadership test and any failed-test casualties, then a surviving unit's weapon-effect choice before attacks.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
       "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "ci/test_shards/shard-5.txt": {
@@ -1033,7 +1133,7 @@
       ],
       "selected_families": [],
       "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
-      "source_obligation": "GW Dark Pacts requires optional commitment, the Leadership test and any failed-test casualties, then a surviving unit's weapon-effect choice before attacks.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
       "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "ci/test_shards/shard-6.txt": {
@@ -1043,7 +1143,7 @@
       ],
       "selected_families": [],
       "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
-      "source_obligation": "GW Dark Pacts requires optional commitment, the Leadership test and any failed-test casualties, then a surviving unit's weapon-effect choice before attacks.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
       "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "ci/test_shards/shard-7.txt": {
@@ -1053,7 +1153,7 @@
       ],
       "selected_families": [],
       "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
-      "source_obligation": "GW Dark Pacts requires optional commitment, the Leadership test and any failed-test casualties, then a surviving unit's weapon-effect choice before attacks.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
       "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "ci/test_shards/shard-8.txt": {
@@ -1063,7 +1163,7 @@
       ],
       "selected_families": [],
       "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
-      "source_obligation": "GW Dark Pacts requires optional commitment, the Leadership test and any failed-test casualties, then a surviving unit's weapon-effect choice before attacks.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
       "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "ci/test_shards/shard-9.txt": {
@@ -1073,7 +1173,7 @@
       ],
       "selected_families": [],
       "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
-      "source_obligation": "GW Dark Pacts requires optional commitment, the Leadership test and any failed-test casualties, then a surviving unit's weapon-effect choice before attacks.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
       "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "contracts/examples/persistence/session-persistence.json": {
@@ -1083,7 +1183,7 @@
       ],
       "selected_families": [],
       "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
-      "source_obligation": "GW Dark Pacts requires optional commitment, the Leadership test and any failed-test casualties, then a surviving unit's weapon-effect choice before attacks.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
       "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
@@ -1093,7 +1193,7 @@
       ],
       "selected_families": [],
       "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
-      "source_obligation": "GW Dark Pacts requires optional commitment, the Leadership test and any failed-test casualties, then a surviving unit's weapon-effect choice before attacks.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
       "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "contracts/examples/sessions/session-command-started.json": {
@@ -1103,7 +1203,7 @@
       ],
       "selected_families": [],
       "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
-      "source_obligation": "GW Dark Pacts requires optional commitment, the Leadership test and any failed-test casualties, then a surviving unit's weapon-effect choice before attacks.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
       "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
@@ -1113,7 +1213,7 @@
       ],
       "selected_families": [],
       "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
-      "source_obligation": "GW Dark Pacts requires optional commitment, the Leadership test and any failed-test casualties, then a surviving unit's weapon-effect choice before attacks.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
       "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
@@ -1123,7 +1223,7 @@
       ],
       "selected_families": [],
       "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
-      "source_obligation": "GW Dark Pacts requires optional commitment, the Leadership test and any failed-test casualties, then a surviving unit's weapon-effect choice before attacks.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
       "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
@@ -1133,7 +1233,7 @@
       ],
       "selected_families": [],
       "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
-      "source_obligation": "GW Dark Pacts requires optional commitment, the Leadership test and any failed-test casualties, then a surviving unit's weapon-effect choice before attacks.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
       "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "contracts/examples/support-profile.json": {
@@ -1143,7 +1243,7 @@
       ],
       "selected_families": [],
       "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
-      "source_obligation": "GW Dark Pacts requires optional commitment, the Leadership test and any failed-test casualties, then a surviving unit's weapon-effect choice before attacks.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
       "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "contracts/manifest.json": {
@@ -1153,17 +1253,57 @@
       ],
       "selected_families": [],
       "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
-      "source_obligation": "GW Dark Pacts requires optional commitment, the Leadership test and any failed-test casualties, then a surviving unit's weapon-effect choice before attacks.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
+      "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
+    },
+    "data/generated/ability_coverage/ability_coverage_rows.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "supported-vyper-source-title-binding"
+      ],
+      "selected_families": [],
+      "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
+      "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
+    },
+    "data/generated/ability_coverage/ability_support_category_rows.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "supported-vyper-source-title-binding"
+      ],
+      "selected_families": [],
+      "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
+      "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
+    },
+    "data/generated/ability_coverage/datasheet_support_rows.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "supported-vyper-source-title-binding"
+      ],
+      "selected_families": [],
+      "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
+      "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
+    },
+    "data/generated/ability_coverage/maulerfiend_cross_faction_support.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "supported-defiler-generated-owner-locator"
+      ],
+      "selected_families": [],
+      "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
       "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "data/source_audits/ci64_provenance_v1/dark-pact-test-v1.json": {
       "category": "rule_semantics",
       "operations": [
-        "dark-pact-timing-scope-020"
+        "dark-pact-timing-scope-024"
       ],
       "selected_families": [],
       "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
-      "source_obligation": "GW Dark Pacts requires optional commitment, the Leadership test and any failed-test casualties, then a surviving unit's weapon-effect choice before attacks.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
       "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "docs/ABILITY_SUPPORT_MATRIX_V2.md": {
@@ -1171,7 +1311,7 @@
       "operations": [],
       "selected_families": [],
       "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
-      "source_obligation": "GW Dark Pacts requires optional commitment, the Leadership test and any failed-test casualties, then a surviving unit's weapon-effect choice before attacks.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
       "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "docs/ADAPTER_DECISION_CONTRACT.md": {
@@ -1179,7 +1319,7 @@
       "operations": [],
       "selected_families": [],
       "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
-      "source_obligation": "GW Dark Pacts requires optional commitment, the Leadership test and any failed-test casualties, then a surviving unit's weapon-effect choice before attacks.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
       "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "docs/DECISION_SUBMISSION_CATALOG.md": {
@@ -1187,7 +1327,7 @@
       "operations": [],
       "selected_families": [],
       "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
-      "source_obligation": "GW Dark Pacts requires optional commitment, the Leadership test and any failed-test casualties, then a surviving unit's weapon-effect choice before attacks.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
       "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "docs/factions/chaos-space-marines.md": {
@@ -1195,7 +1335,7 @@
       "operations": [],
       "selected_families": [],
       "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
-      "source_obligation": "GW Dark Pacts requires optional commitment, the Leadership test and any failed-test casualties, then a surviving unit's weapon-effect choice before attacks.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
       "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "docs/performance/policy-v3/dark-pact-timing-scope.json": {
@@ -1203,7 +1343,7 @@
       "operations": [],
       "selected_families": [],
       "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
-      "source_obligation": "GW Dark Pacts requires optional commitment, the Leadership test and any failed-test casualties, then a surviving unit's weapon-effect choice before attacks.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
       "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "docs/performance/policy-v3/operation-map.json": {
@@ -1211,7 +1351,7 @@
       "operations": [],
       "selected_families": [],
       "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
-      "source_obligation": "GW Dark Pacts requires optional commitment, the Leadership test and any failed-test casualties, then a surviving unit's weapon-effect choice before attacks.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
       "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "scripts/build_test_shards.py": {
@@ -1221,17 +1361,17 @@
       ],
       "selected_families": [],
       "rationale": "Finite behavioral membership only; no source-token or external contract input processing changes.",
-      "source_obligation": "GW Dark Pacts requires optional commitment, the Leadership test and any failed-test casualties, then a surviving unit's weapon-effect choice before attacks.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
       "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "scripts/dark_pact_test_admission.py": {
       "category": "rule_semantics",
       "operations": [
-        "dark-pact-timing-scope-028"
+        "dark-pact-timing-scope-032"
       ],
       "selected_families": [],
       "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
-      "source_obligation": "GW Dark Pacts requires optional commitment, the Leadership test and any failed-test casualties, then a surviving unit's weapon-effect choice before attacks.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
       "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "scripts/engine_numerical_identity_test_admission.py": {
@@ -1255,7 +1395,7 @@
       ],
       "selected_families": [],
       "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
-      "source_obligation": "GW Dark Pacts requires optional commitment, the Leadership test and any failed-test casualties, then a surviving unit's weapon-effect choice before attacks.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
       "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
@@ -1266,27 +1406,27 @@
       ],
       "selected_families": [],
       "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
-      "source_obligation": "GW Dark Pacts requires optional commitment, the Leadership test and any failed-test casualties, then a surviving unit's weapon-effect choice before attacks.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
       "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/detachments/shadow_legion/rule.py": {
       "category": "rule_semantics",
       "operations": [
-        "dark-pact-timing-scope-031"
+        "dark-pact-timing-scope-035"
       ],
       "selected_families": [],
       "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
-      "source_obligation": "GW Dark Pacts requires optional commitment, the Leadership test and any failed-test casualties, then a surviving unit's weapon-effect choice before attacks.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
       "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_space_marines/army_rule.py": {
       "category": "rule_semantics",
       "operations": [
-        "dark-pact-timing-scope-032"
+        "dark-pact-timing-scope-036"
       ],
       "selected_families": [],
       "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
-      "source_obligation": "GW Dark Pacts requires optional commitment, the Leadership test and any failed-test casualties, then a surviving unit's weapon-effect choice before attacks.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
       "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_space_marines/completion_sequencing.py": {
@@ -1296,27 +1436,27 @@
       ],
       "selected_families": [],
       "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
-      "source_obligation": "GW Dark Pacts requires optional commitment, the Leadership test and any failed-test casualties, then a surviving unit's weapon-effect choice before attacks.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
       "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "src/warhammer40k_core/engine/fight_unit_selected_hooks.py": {
       "category": "rule_semantics",
       "operations": [
-        "dark-pact-timing-scope-034"
+        "dark-pact-timing-scope-038"
       ],
       "selected_families": [],
       "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
-      "source_obligation": "GW Dark Pacts requires optional commitment, the Leadership test and any failed-test casualties, then a surviving unit's weapon-effect choice before attacks.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
       "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "src/warhammer40k_core/engine/generic_rule_ability_registry_defaults.py": {
       "category": "rule_semantics",
       "operations": [
-        "dark-pact-timing-scope-035"
+        "dark-pact-timing-scope-039"
       ],
       "selected_families": [],
       "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
-      "source_obligation": "GW Dark Pacts requires optional commitment, the Leadership test and any failed-test casualties, then a surviving unit's weapon-effect choice before attacks.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
       "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "src/warhammer40k_core/engine/lifecycle.py": {
@@ -1328,17 +1468,17 @@
       ],
       "selected_families": [],
       "rationale": "Mortal wound dispatch gains a rule-specific return to a selected-unit grant. Dice, weapon attack grouping and reconstruction/serialization algorithms are unchanged; the regular attack-damage paths remain identical.",
-      "source_obligation": "GW Dark Pacts requires optional commitment, the Leadership test and any failed-test casualties, then a surviving unit's weapon-effect choice before attacks.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
       "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "src/warhammer40k_core/engine/modifier_evaluation_dispatch.py": {
       "category": "rule_semantics",
       "operations": [
-        "dark-pact-timing-scope-037"
+        "dark-pact-timing-scope-041"
       ],
       "selected_families": [],
       "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
-      "source_obligation": "GW Dark Pacts requires optional commitment, the Leadership test and any failed-test casualties, then a surviving unit's weapon-effect choice before attacks.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
       "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "src/warhammer40k_core/engine/phases/fight.py": {
@@ -1346,52 +1486,63 @@
       "operations": [
         "order103-src-warhammer40k_core-engine-phases-fight",
         "d12-melee-completion-reaction-forwarding",
-        "dark-pact-timing-scope-038"
+        "dark-pact-timing-scope-042"
       ],
       "selected_families": [],
       "rationale": "Insert a grant preparation before declaring weapons; no probabilistic grouping or sequence-selection validator changes.",
-      "source_obligation": "GW Dark Pacts requires optional commitment, the Leadership test and any failed-test casualties, then a surviving unit's weapon-effect choice before attacks.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
       "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "src/warhammer40k_core/engine/phases/shooting_handler.py": {
       "category": "rule_semantics",
       "operations": [
         "order103-src-warhammer40k_core-engine-phases-shooting_handler",
-        "dark-pact-timing-scope-039"
+        "dark-pact-timing-scope-043"
       ],
       "selected_families": [],
       "rationale": "Add a pre-declaration grant validator and continuation, not an attack-pool or grouped-precision inventory change.",
-      "source_obligation": "GW Dark Pacts requires optional commitment, the Leadership test and any failed-test casualties, then a surviving unit's weapon-effect choice before attacks.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
       "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "src/warhammer40k_core/engine/phases/shooting_unit_selection.py": {
       "category": "rule_semantics",
       "operations": [
-        "dark-pact-timing-scope-040"
+        "dark-pact-timing-scope-044"
       ],
       "selected_families": [],
       "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
-      "source_obligation": "GW Dark Pacts requires optional commitment, the Leadership test and any failed-test casualties, then a surviving unit's weapon-effect choice before attacks.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
       "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "src/warhammer40k_core/engine/shooting_unit_selected_hooks.py": {
       "category": "rule_semantics",
       "operations": [
-        "dark-pact-timing-scope-041"
+        "dark-pact-timing-scope-045"
       ],
       "selected_families": [],
       "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
-      "source_obligation": "GW Dark Pacts requires optional commitment, the Leadership test and any failed-test casualties, then a surviving unit's weapon-effect choice before attacks.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
       "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "src/warhammer40k_core/engine/unit_grant_preparation.py": {
       "category": "rule_semantics",
       "operations": [
-        "dark-pact-timing-scope-042"
+        "dark-pact-timing-scope-046"
       ],
       "selected_families": [],
       "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
-      "source_obligation": "GW Dark Pacts requires optional commitment, the Leadership test and any failed-test casualties, then a surviving unit's weapon-effect choice before attacks.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
+      "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
+    },
+    "tests/code_quality/test_ci_performance_gates.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "ci78-cutover-owners-2bec45eb6ecc7574f5395711c9381e101ae612cb57b1a0e433c8a508aa991453",
+        "milli-inch-test-admission"
+      ],
+      "selected_families": [],
+      "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
       "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "tests/code_quality/test_engine_numerical_identity_admission.py": {
@@ -1409,7 +1560,7 @@
       ],
       "selected_families": [],
       "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
-      "source_obligation": "GW Dark Pacts requires optional commitment, the Leadership test and any failed-test casualties, then a surviving unit's weapon-effect choice before attacks.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
       "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "tests/code_quality/test_performance_policy.py": {
@@ -1421,57 +1572,67 @@
       ],
       "selected_families": [],
       "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
-      "source_obligation": "GW Dark Pacts requires optional commitment, the Leadership test and any failed-test casualties, then a surviving unit's weapon-effect choice before attacks.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
       "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "tests/factions/chaos_daemons/unit/test_generic_rule_ability_registry.py": {
       "category": "rule_semantics",
       "operations": [
-        "dark-pact-timing-scope-045"
+        "dark-pact-timing-scope-050"
       ],
       "selected_families": [],
       "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
-      "source_obligation": "GW Dark Pacts requires optional commitment, the Leadership test and any failed-test casualties, then a surviving unit's weapon-effect choice before attacks.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
       "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "tests/infrastructure/adapters/test_dark_pact_timing.py": {
       "category": "rule_semantics",
       "operations": [
-        "dark-pact-timing-scope-046"
+        "dark-pact-timing-scope-051"
       ],
       "selected_families": [],
       "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
-      "source_obligation": "GW Dark Pacts requires optional commitment, the Leadership test and any failed-test casualties, then a surviving unit's weapon-effect choice before attacks.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
       "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "tests/shared/category_migration/reporting__test_runtime_consumer_evidence.py": {
       "category": "rule_semantics",
       "operations": [
-        "dark-pact-timing-scope-047"
+        "dark-pact-timing-scope-052"
       ],
       "selected_families": [],
       "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
-      "source_obligation": "GW Dark Pacts requires optional commitment, the Leadership test and any failed-test casualties, then a surviving unit's weapon-effect choice before attacks.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
+      "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
+    },
+    "tests/support/acts_preservation.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "supported-acts-original-test-preservation"
+      ],
+      "selected_families": [],
+      "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
       "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "tests/unit/test_phase17g_chaos_daemons_shadow_legion.py": {
       "category": "rule_semantics",
       "operations": [
-        "dark-pact-timing-scope-048"
+        "dark-pact-timing-scope-054"
       ],
       "selected_families": [],
       "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
-      "source_obligation": "GW Dark Pacts requires optional commitment, the Leadership test and any failed-test casualties, then a surviving unit's weapon-effect choice before attacks.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
       "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "tests/unit/test_phase17g_chaos_space_marines_army_rule.py": {
       "category": "rule_semantics",
       "operations": [
-        "dark-pact-timing-scope-049"
+        "dark-pact-timing-scope-055"
       ],
       "selected_families": [],
       "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
-      "source_obligation": "GW Dark Pacts requires optional commitment, the Leadership test and any failed-test casualties, then a surviving unit's weapon-effect choice before attacks.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
       "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "tools/performance_cavalcade_policy_successor.py": {
@@ -1481,7 +1642,7 @@
       ],
       "selected_families": [],
       "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
-      "source_obligation": "GW Dark Pacts requires optional commitment, the Leadership test and any failed-test casualties, then a surviving unit's weapon-effect choice before attacks.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
       "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "tools/performance_dark_pacts.py": {
@@ -1489,7 +1650,7 @@
       "operations": [],
       "selected_families": [],
       "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
-      "source_obligation": "GW Dark Pacts requires optional commitment, the Leadership test and any failed-test casualties, then a surviving unit's weapon-effect choice before attacks.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
       "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "tools/performance_policy.py": {
@@ -1500,7 +1661,7 @@
       ],
       "selected_families": [],
       "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
-      "source_obligation": "GW Dark Pacts requires optional commitment, the Leadership test and any failed-test casualties, then a surviving unit's weapon-effect choice before attacks.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
       "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     }
   },

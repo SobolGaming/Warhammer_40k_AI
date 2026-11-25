@@ -36,7 +36,11 @@ from warhammer40k_core.engine.phase import (
     BattlePhase,
     GameLifecycleError,
 )
-from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_view_by_id
+from warhammer40k_core.engine.rules_units import (
+    RulesUnitView,
+    rules_unit_view_by_id,
+    rules_unit_view_from_armies,
+)
 from warhammer40k_core.engine.runtime_modifiers import (
     AttackRerollPermissionBinding,
     AttackRerollPermissionContext,
@@ -233,7 +237,7 @@ def _shooting_dark_pact_grant(
                 "selection_result_id": context.result_id,
             },
         ),
-        unit_effect_expiration="end_phase",
+        unit_effect_expiration="end_enclosing_phase",
     )
 
 
@@ -253,10 +257,6 @@ def _fight_dark_pact_grant(
         phase=BattlePhase.FIGHT,
     ):
         return None
-    target_unit_ids = dark_pact_target_unit_ids(
-        context.state,
-        unit_instance_id=context.unit_instance_id,
-    )
     return FightUnitSelectedGrant(
         hook_id=hook_id,
         source_id=SOURCE_RULE_ID,
@@ -276,7 +276,7 @@ def _fight_dark_pact_grant(
             FightUnitSelectedTimedEffect(
                 effect_payload=dark_pact_effect_payload(
                     unit_instance_id=context.unit_instance_id,
-                    target_unit_instance_ids=target_unit_ids,
+                    target_unit_instance_ids=(context.unit_instance_id,),
                     trigger="selected_to_fight",
                     phase=BattlePhase.FIGHT,
                     selected_dark_pact=pact,
@@ -508,9 +508,12 @@ def active_dark_pact_effect_for_unit(
         raise GameLifecycleError("Dark Pacts effect lookup requires GameState.")
     requested_phase = _battle_phase_from_token(phase)
     effects: list[PersistingEffect] = []
-    for effect in state.persisting_effects_for_unit(
-        _validate_identifier("unit_instance_id", unit_instance_id)
-    ):
+    # A weapon can belong to either component; the pact belongs to the rules unit.
+    target_unit_id = rules_unit_view_from_armies(
+        armies=tuple(state.army_definitions),
+        unit_instance_id=_validate_identifier("unit_instance_id", unit_instance_id),
+    ).unit_instance_id
+    for effect in state.persisting_effects_for_unit(target_unit_id):
         if effect.source_rule_id not in DARK_PACT_SOURCE_RULE_IDS:
             continue
         payload = dark_pact_payload(effect.effect_payload)
