@@ -1,16 +1,16 @@
 {
   "policy": "rules-engine-performance-v3",
   "base": "f69eda2040ab55db4dd18686eee69edafcca9dd2",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:1610294a6227b0fed4e77ec9ec457dfa9c4c044d520c3af56650b0eaf4410081",
-  "operation_map_sha256": "309a7f0cfda7bfc67a1964b9c02d148945d6a3f37cebf1f0723b2281d665efe6",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:848a6630549d8b8b208bf69544a707e42dd466760f779838d020e0e1e392d8de",
+  "operation_map_sha256": "0210527ecf8627d7ab252fa36ad4c47b8995210ca7e29bff8a70d4d25fb2a177",
   "changes": {
     "FACTION_INTEGRATION.md": {
       "before_sha256": "57d141b8c2cb3532051655495b6b7960223ee6e31c0a880145410c7aedead07a",
-      "after_sha256": "45f9c9c4281aec0ec5d1e6ce1c02010dd895865847a840e8ebedcf7345a0308d",
+      "after_sha256": "2bcebb67de687120cfb6de745e0da7edec7bd02f594c6854a12736fd68a80cfc",
       "owners": {
         "@document": {
           "before": "57d141b8c2cb3532051655495b6b7960223ee6e31c0a880145410c7aedead07a",
-          "after": "45f9c9c4281aec0ec5d1e6ce1c02010dd895865847a840e8ebedcf7345a0308d"
+          "after": "2bcebb67de687120cfb6de745e0da7edec7bd02f594c6854a12736fd68a80cfc"
         }
       }
     },
@@ -126,111 +126,111 @@
     },
     "contracts/examples/persistence/session-persistence.json": {
       "before_sha256": "fdfb30143d2c62f5bbec93916db175688255ff79ae75ce127f782df56d6da4b5",
-      "after_sha256": "a14a5f3834783e0ec2b95b94ea8c332f772b5c38b407b17cc098757ee3403171",
+      "after_sha256": "b241f42bf9ff1df3a324155ce91881120f5d83288ae2f5dc6d23c56f4dfbba16",
       "owners": {
         "@document": {
           "before": "fdfb30143d2c62f5bbec93916db175688255ff79ae75ce127f782df56d6da4b5",
-          "after": "a14a5f3834783e0ec2b95b94ea8c332f772b5c38b407b17cc098757ee3403171"
+          "after": "b241f42bf9ff1df3a324155ce91881120f5d83288ae2f5dc6d23c56f4dfbba16"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "before_sha256": "faf6bcaf4dbfc8ce26ecdca702d081e7301a9cfaaae33680aeb6c65f8a1a276d",
-      "after_sha256": "9862f56d13d7c393dd713d12bb203c5738e569cbeb2e88da0350d63b5e8f2764",
+      "after_sha256": "457c01a487a9d58d6fec3218b1e17b4c54ec69e81315cb9c915ba4e5fd47a2bd",
       "owners": {
         "@document": {
           "before": "faf6bcaf4dbfc8ce26ecdca702d081e7301a9cfaaae33680aeb6c65f8a1a276d",
-          "after": "9862f56d13d7c393dd713d12bb203c5738e569cbeb2e88da0350d63b5e8f2764"
+          "after": "457c01a487a9d58d6fec3218b1e17b4c54ec69e81315cb9c915ba4e5fd47a2bd"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
       "before_sha256": "bd8c982e2fdd17d0de01371aaff5668e87fd575b69d27ebce0d6e79e145644fd",
-      "after_sha256": "e23e943cca605e513ea8e5e9445d1b79f4a2a22ba0800f6f680667a519821d20",
+      "after_sha256": "d175f32c90ec7bf4635302e73541f2b02c438d2f9864213a844f092e7bda1e34",
       "owners": {
         "@document": {
           "before": "bd8c982e2fdd17d0de01371aaff5668e87fd575b69d27ebce0d6e79e145644fd",
-          "after": "e23e943cca605e513ea8e5e9445d1b79f4a2a22ba0800f6f680667a519821d20"
+          "after": "d175f32c90ec7bf4635302e73541f2b02c438d2f9864213a844f092e7bda1e34"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "before_sha256": "87cadcf98ddcd578dfaace9e40569796af272b0fc8967638375ed96ed4670295",
-      "after_sha256": "edf0a2fedc4f39337b47d18cc9225862d6243932a5b51c37265d01712926e3d0",
+      "after_sha256": "1ce23235ad145462255b31ef69ada112b6125e410e41fafe05f765cbd9035f88",
       "owners": {
         "@document": {
           "before": "87cadcf98ddcd578dfaace9e40569796af272b0fc8967638375ed96ed4670295",
-          "after": "edf0a2fedc4f39337b47d18cc9225862d6243932a5b51c37265d01712926e3d0"
+          "after": "1ce23235ad145462255b31ef69ada112b6125e410e41fafe05f765cbd9035f88"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "before_sha256": "2e80fe65bdda3c25c2ca5b7bb66270e837043b62a45861e54f34a5a1e2d35b96",
-      "after_sha256": "80ff90275fd52572f0a005a061a5d9e9c18047a351fabe85a7652918a53fbc9e",
+      "after_sha256": "82c2e89b876bd7819b26ee9cc93118a874cb879eaf540e112010ab4cf42a22e0",
       "owners": {
         "@document": {
           "before": "2e80fe65bdda3c25c2ca5b7bb66270e837043b62a45861e54f34a5a1e2d35b96",
-          "after": "80ff90275fd52572f0a005a061a5d9e9c18047a351fabe85a7652918a53fbc9e"
+          "after": "82c2e89b876bd7819b26ee9cc93118a874cb879eaf540e112010ab4cf42a22e0"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "before_sha256": "c087e36ee3c7d7e52e0e23184f35333ecdf24c57922d9dcb833cf00b8c235543",
-      "after_sha256": "917a1753e3f8346bd783a2cfe3960f8bea3f97b60e1053ac39aafd7174f851e9",
+      "after_sha256": "46171afa96b2f7dec6096abb44bbc446a15321fe70ed8d4f1fb847642f6adaaa",
       "owners": {
         "@document": {
           "before": "c087e36ee3c7d7e52e0e23184f35333ecdf24c57922d9dcb833cf00b8c235543",
-          "after": "917a1753e3f8346bd783a2cfe3960f8bea3f97b60e1053ac39aafd7174f851e9"
+          "after": "46171afa96b2f7dec6096abb44bbc446a15321fe70ed8d4f1fb847642f6adaaa"
         }
       }
     },
     "contracts/examples/support-profile.json": {
       "before_sha256": "f7b30d32123d56dd03e2b0a1964b4a817939abb024cf4ae67eecb0c4241eda04",
-      "after_sha256": "993b44336fe70cc6a90e2e46e288dd961f0c251b889d4314d93e564812f4029f",
+      "after_sha256": "17719b0c841448ac92b0d4a20f747e263d7975110bcfeecfefd4bc99040e5f35",
       "owners": {
         "@document": {
           "before": "f7b30d32123d56dd03e2b0a1964b4a817939abb024cf4ae67eecb0c4241eda04",
-          "after": "993b44336fe70cc6a90e2e46e288dd961f0c251b889d4314d93e564812f4029f"
+          "after": "17719b0c841448ac92b0d4a20f747e263d7975110bcfeecfefd4bc99040e5f35"
         }
       }
     },
     "contracts/manifest.json": {
       "before_sha256": "9e343b09006abda678c83402805e7f7774fcebd8f979b67fe79bfef58654b65b",
-      "after_sha256": "82ffb951f844d9b8ea5442fee83c1f224439728d40193032b5bb034f21cce4cc",
+      "after_sha256": "ca2ef866e845540f688177a223e716f546311236f1273e0b718a42f2fc29b38a",
       "owners": {
         "@document": {
           "before": "9e343b09006abda678c83402805e7f7774fcebd8f979b67fe79bfef58654b65b",
-          "after": "82ffb951f844d9b8ea5442fee83c1f224439728d40193032b5bb034f21cce4cc"
+          "after": "ca2ef866e845540f688177a223e716f546311236f1273e0b718a42f2fc29b38a"
         }
       }
     },
     "data/generated/ability_coverage/cross_source_semantic_equivalence.json": {
       "before_sha256": "9e97f354c244777d636a34a573d305c9529ec72f2cff3317b8f7072b67465878",
-      "after_sha256": "d4fe1765b76190fc5a23851f259690c66c1d936ac2088a979750d405ca184301",
+      "after_sha256": "11ebd6b34680a25dc388907bb117f382b0c5a6a2825f771ae805f5fc64581206",
       "owners": {
         "@document": {
           "before": "9e97f354c244777d636a34a573d305c9529ec72f2cff3317b8f7072b67465878",
-          "after": "d4fe1765b76190fc5a23851f259690c66c1d936ac2088a979750d405ca184301"
+          "after": "11ebd6b34680a25dc388907bb117f382b0c5a6a2825f771ae805f5fc64581206"
         }
       }
     },
     "data/generated/ability_coverage/runtime_content_semantic_coverage.json": {
       "before_sha256": "58dc056d646fc3250fbe65771d07b65c37625a5c6a3730a5f4e1c4ef87ff2feb",
-      "after_sha256": "59d806a55a7aac856db297f884272425559023001bb69916bc433996f1603064",
+      "after_sha256": "26b10f8b754ef94f6f1ac32f611f60c0cc7570fc4f2015dd5f12e1d448eb2ff3",
       "owners": {
         "@document": {
           "before": "58dc056d646fc3250fbe65771d07b65c37625a5c6a3730a5f4e1c4ef87ff2feb",
-          "after": "59d806a55a7aac856db297f884272425559023001bb69916bc433996f1603064"
+          "after": "26b10f8b754ef94f6f1ac32f611f60c0cc7570fc4f2015dd5f12e1d448eb2ff3"
         }
       }
     },
     "data/source_audits/ci64_provenance_v1/gore-hungry-onslaught-transition-v1.json": {
       "before_sha256": null,
-      "after_sha256": "38163938a156c0553c9b694e5a47039858ddd72ece483785044e46c48bf726f6",
+      "after_sha256": "687ae65658d837db07333ea5cd4264d215e89b417ebf4ad56a59027a659db92b",
       "owners": {
         "@document": {
           "before": null,
-          "after": "38163938a156c0553c9b694e5a47039858ddd72ece483785044e46c48bf726f6"
+          "after": "687ae65658d837db07333ea5cd4264d215e89b417ebf4ad56a59027a659db92b"
         }
       }
     },
@@ -246,11 +246,11 @@
     },
     "docs/ADAPTER_DECISION_CONTRACT.md": {
       "before_sha256": "93beac77295aec1cb10c0a10f5a40908fd7595530bb2e0f4c69343f62b885e96",
-      "after_sha256": "7e0a97de9a7b2ffe6d35e2dd7413e88c1248ba50b29b735e5f46890940805935",
+      "after_sha256": "430e1a175137824be58ddf1ad2fdca2c5f248b088d5d9f96503e8e3dcfdab5e6",
       "owners": {
         "@document": {
           "before": "93beac77295aec1cb10c0a10f5a40908fd7595530bb2e0f4c69343f62b885e96",
-          "after": "7e0a97de9a7b2ffe6d35e2dd7413e88c1248ba50b29b735e5f46890940805935"
+          "after": "430e1a175137824be58ddf1ad2fdca2c5f248b088d5d9f96503e8e3dcfdab5e6"
         }
       }
     },
@@ -266,11 +266,11 @@
     },
     "docs/factions/audit/chaos-daemons.md": {
       "before_sha256": "33f493c2a156fef77eae933343d343bd3773a4817935a49fd948550d5689532c",
-      "after_sha256": "105f6108e15841fa32c0b1db5b30464ae8b253967346d32104f6234c970cd7d8",
+      "after_sha256": "de8489509a3c4344e0ab5498d3c1c5bb32f548027590360d426c57c665a29181",
       "owners": {
         "@document": {
           "before": "33f493c2a156fef77eae933343d343bd3773a4817935a49fd948550d5689532c",
-          "after": "105f6108e15841fa32c0b1db5b30464ae8b253967346d32104f6234c970cd7d8"
+          "after": "de8489509a3c4344e0ab5498d3c1c5bb32f548027590360d426c57c665a29181"
         }
       }
     },
@@ -294,23 +294,53 @@
         }
       }
     },
+    "docs/performance/current/gore-hungry-onslaught-review-20261125-movement.json": {
+      "before_sha256": null,
+      "after_sha256": "8e9eac13ed93800ca9e1dcb7285fa6d6d0f121b92b3d8a3a912b9b6d242e46c3",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "8e9eac13ed93800ca9e1dcb7285fa6d6d0f121b92b3d8a3a912b9b6d242e46c3"
+        }
+      }
+    },
+    "docs/performance/current/gore-hungry-onslaught-review-20261125-setup.json": {
+      "before_sha256": null,
+      "after_sha256": "3fc0869ae24b62576601a24a59e97f0cc9603e8761eda7195be345cfe08ce9e7",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "3fc0869ae24b62576601a24a59e97f0cc9603e8761eda7195be345cfe08ce9e7"
+        }
+      }
+    },
+    "docs/performance/current/gore-hungry-onslaught-review-20261125-visibility.json": {
+      "before_sha256": null,
+      "after_sha256": "2b39fc4c2d708ee32df841a31cfd375d5700f26a50ec1eae27f73f1f0b4f825d",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "2b39fc4c2d708ee32df841a31cfd375d5700f26a50ec1eae27f73f1f0b4f825d"
+        }
+      }
+    },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "118602169995d24a90be185bb50f30f94c6be834172ea991aa6406ddd4a2187c",
-      "after_sha256": "9e0faf8a21b617df7426c3aece04ba5414f474ea68b241539174ef6e6d8acd6e",
+      "after_sha256": "5474998589ddd713791975785f876d06c6313bc41451953ac9d887d1b67a33c0",
       "owners": {
         "@document": {
           "before": "118602169995d24a90be185bb50f30f94c6be834172ea991aa6406ddd4a2187c",
-          "after": "9e0faf8a21b617df7426c3aece04ba5414f474ea68b241539174ef6e6d8acd6e"
+          "after": "5474998589ddd713791975785f876d06c6313bc41451953ac9d887d1b67a33c0"
         }
       }
     },
     "scripts/engine_numerical_identity_test_admission.py": {
       "before_sha256": "304c6fe4c87ebf7cc7e28b94f8ef306ff2938927b15c2a25c5079e208819e7eb",
-      "after_sha256": "da235fd4b392169b90c69c72d2085bb998724985d16e7e0505fa2c91d6a46b7c",
+      "after_sha256": "d10886e5c8e04d6d2305e568119b0b82de17218a687992f27de2891cf309a4c4",
       "owners": {
         "@module": {
           "before": "2f04554db9367a7ddcf6abecbae0a506f4a937f2eb73a4f28c60ea2e9b3c6e11",
-          "after": "15ce6450fa75929ae491b1dc5c9f4033ca4d184388e1ac2799ddeda98e6638c7"
+          "after": "b46db9f678079d1413277bc5135d9b9c96bb11604783a0f9b486bfd8ffeafa93"
         },
         "_blood_begets_skulls_test_successor": {
           "before": "7473cd8a99deacf3776da89b91bd2e518f7d529068abcb282b18eb68bcff866e",
@@ -318,7 +348,7 @@
         },
         "_gore_hungry_onslaught_transition": {
           "before": null,
-          "after": "f75d65ca24d6c5a46ab319665434a2a55384ffd87c24b01599a1d042a3aa68a1"
+          "after": "68552dff8dcab48fd95f67bb3298db9a55bdda8f1db2adc1455cc9fffb3f8d47"
         },
         "_skulls_beget_blood_test_successor": {
           "before": "d9c9e040b0d167a0870f0588a4062b8677f4eacd91f7777a02c7b7f7ca6c5744",
@@ -330,17 +360,17 @@
         },
         "exact_movement_test_transition": {
           "before": "6c02e3e8df5421b369716651a1d2dc5b78047cca693f8c759911f5d867f2f833",
-          "after": "824f6a37671653856d4a213979c959b4b9b7289a92ee97b7017b0e3fdda916a1"
+          "after": "f50af58867daf9a5516d320c6625bc866a5018bfca4c941608a55af7a77f25f5"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "before_sha256": "553780be64ff619b992e3580d4e32917214713c49637c0f06da3df9128a1aa3c",
-      "after_sha256": "c8cc728be00ce36823d07752b4666a1c16b3890d2f764343d66a10f1faf1f78e",
+      "after_sha256": "72579299bf39bb9a43a8cea1d51a8fec5df516e710723b076a1d0d5836506c45",
       "owners": {
         "@document": {
           "before": "553780be64ff619b992e3580d4e32917214713c49637c0f06da3df9128a1aa3c",
-          "after": "c8cc728be00ce36823d07752b4666a1c16b3890d2f764343d66a10f1faf1f78e"
+          "after": "72579299bf39bb9a43a8cea1d51a8fec5df516e710723b076a1d0d5836506c45"
         }
       }
     },
@@ -358,17 +388,31 @@
         }
       }
     },
+    "src/warhammer40k_core/engine/charge_roll_flow.py": {
+      "before_sha256": "53e8aed16152e2641e15c34227dde6635eaee3497b1411be620ae8a06c03fe60",
+      "after_sha256": "e076961474a43f0a9671cb9cf6b4c17f9740e3a98abc6b096cb0dd9966019cd3",
+      "owners": {
+        "_resolve_charge_roll_state": {
+          "before": "03f81f176510c213e9c7f1c4883cdc20b179563811891fd65e007e80d88c0061",
+          "after": "bb4604fa364c2de2969763281ead00c89a5b4d8cb8095cc2489eb42da0e2651b"
+        },
+        "continue_charge_roll": {
+          "before": "247fe7c19971cffe11e1c272d15fc8e818a154772eac1aa5506f30b916469efc",
+          "after": "d3b8af1c1644475511c2d3a647faad211e095d2a0bc12e521d4d1d901120ccb3"
+        }
+      }
+    },
     "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/detachments/blood_legion/stratagems.py": {
       "before_sha256": "99648d47e8246c424163b67df7fdf2114361f786115e3ce9d21161ab2830299e",
-      "after_sha256": "3241df18adccc6b93f6ea24ca0222969e5cb93741e65f9b26fc2fd980a842bf0",
+      "after_sha256": "8324867d91876c18a8ae045047ccdf8b566231dfe0f34814900368be240bf86e",
       "owners": {
         "@module": {
           "before": "6ca2596b32c572a6a32d5b1fc0a3a339672f5699368a77064b3e7240273e1dd3",
-          "after": "8c1021e4300b000c9ad2f4ed18b9f696d955dd3cff45d66c609a9dbc5993b1c9"
+          "after": "4ef44094ff6cb78dc366ef635d1eb638f27680fe39985a211d2a97cc0a766218"
         },
         "_gore_hungry_onslaught_records": {
           "before": null,
-          "after": "20df6124623640fb0d4ad0478f08764e3e7f7d562e7566fb4810308fc07daf3e"
+          "after": "c0e64bafa5f5a3eaca3d3d417feed6f44080438f255d3c6efd3a7dbd3f43224d"
         },
         "runtime_contribution": {
           "before": "ee82a41553647378feb2ac91b50391487504dbed03bff3b46bbfc0be1dba37ca",
@@ -376,33 +420,223 @@
         }
       }
     },
+    "src/warhammer40k_core/engine/movement_legality.py": {
+      "before_sha256": "081dd924dd3e56ff070d0f164e8dfa646dc1a1d65c7661eb0d2ac79eea2fdc7c",
+      "after_sha256": "72c9c043c19d69a2d4c1eb04c4346f799b969f2d6b23b9f01e3b71f8cb36680f",
+      "owners": {
+        "@module": {
+          "before": "e017b262b93b122bde5633d52f7d982ca7c274e08499cda4a8268a24d746833a",
+          "after": "e3f77eddadd94a2e4153a8f9e3a0a5f20d70d683fcc9877d2850c2751b9a3616"
+        },
+        "MovementCapabilitySet": {
+          "before": "c2075296fccd010d0b615c71475ebde065a31224294077b47fe22f88fef69caf",
+          "after": "36ef83b3147b4a0b0aacbe5ce48a7687a4cd3ad627d70c267d8a4471808d2868"
+        },
+        "MovementCapabilitySet.__post_init__": {
+          "before": "fa45b4bb1e8bbe1d63c14323b03fe313de63d5ec61257608910937398e101501",
+          "after": "784f06a654041d186e75360d8dd470ce45edf80f6d23f28d1e76d83fa0e9fcba"
+        },
+        "MovementCapabilitySet.from_keywords": {
+          "before": "f45ff455090ff11ecd4a357ddab7e3ad60da41b219ac4d21be96b448189f9b35",
+          "after": "fe068aa964a968fbcaa0294861e373575ed33fc0464173ab57100d8b129ecad7"
+        },
+        "MovementCapabilitySet.from_payload": {
+          "before": "6812ee74b23d261246c56eaf08e88ec39f2404c89a2563d814651523a9fe5dda",
+          "after": "b964aeb589a084f463269bdcce4a0cdd633022ce6d259df049f3d6b837b06563"
+        },
+        "MovementCapabilitySet.to_payload": {
+          "before": "e88f3b428b2bdde27b8ce6ca9dc3ebe9dd045856540bd58abbc48de7ec7c425c",
+          "after": "16edba110deee8ea7158c37a192b9fe3dbcce048f0f72022dfed336c42fcb82d"
+        },
+        "MovementCapabilitySetPayload": {
+          "before": "d4ec07b8cd3f06bdbbedd66d2dfa25b88bec96c13e3180eb207e2fa251e2faa7",
+          "after": "31ed212fd4c430aa3d5e8d12c5de8efa036259633dc767d6ab42471eea629d3e"
+        },
+        "MovementLegalityContext.to_terrain_path_legality_context": {
+          "before": "912115bc047a841cc3377168df667a30abcc91a2f4b900a98848aa8c0ba747b6",
+          "after": "6db0ac581dd6e0d59ec8ba7e41a8e0a8dc46a990d04161fcb616fb09c419c42f"
+        },
+        "_unit_effect_terrain_transit_permission": {
+          "before": "09ada05623483cae8e3b91ff5d2d045a2390b1bb4953117137923feb59413fc1",
+          "after": "ed7733035af15b1127610b62caeb9313bb74c36615b46cc42584045b51402915"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/phases/movement_action_decisions.py": {
+      "before_sha256": "c387d1062dc6c11e82f5004c8605490372d10a60940b9ac86b2d07ddc0ce0429",
+      "after_sha256": "a079b5db1c0cfcd4a23d157c798077497c6aa5ae46d4818bee8a147b1067d30e",
+      "owners": {
+        "_resolve_pending_advance_action": {
+          "before": "4c21e6d5a0e9621065e1d1f599c1fcd6815c6307566092267cddcf4312a5ef54",
+          "after": "078fdb7fbfeb3ed56e89e4112d8735b79ac66474b043feac61d99e8fc1a0346b"
+        },
+        "_resolve_pending_movement_action_after_grants": {
+          "before": "5af612e710678149e9ec556d3dbfd0848264942f1c9497e0d228052f19b2f076",
+          "after": "697a04879347cea4b21e70faeff0a671beecf31ed564a2d7ee735edd5545e0a0"
+        }
+      }
+    },
     "src/warhammer40k_core/engine/phases/movement_handler.py": {
       "before_sha256": "ea0935d48b649aa5beadb0ccd567dbe830fbae96da666c8d7a09856a37692e79",
-      "after_sha256": "3fc69ae23d5c44146ba7a998e7fb41c72e9ae13cbd5d5ba5deb07a304045507f",
+      "after_sha256": "c296ad504119bc5f3cfd8b8df97ef57921e87f0aa1aab44cc4a6e8311155c3c5",
       "owners": {
         "@module": {
           "before": "aab8c335e433f3f1480f027c4f9c3e995c6bfd6c58c80fe1e833a6abf3490c3e",
           "after": "50b366eec9543111eb2296b8260694a87d05971719a9530cf765dad110224442"
         },
+        "MovementPhaseHandler.apply_decision": {
+          "before": "118a01941f88f1c29fcc8745cdac57f1ed419085f41ef184e2619c0ef187ad28",
+          "after": "0bb4f812f8acbb9b77006e0bb29465431ce9f44248941cbef2257a008db4c241"
+        },
         "MovementPhaseHandler.begin_phase": {
           "before": "b3acb3fe37573eeefc0e580bfd671b383142a30f9cce7942c8323bf303f91d65",
-          "after": "3207c7292988dd8d5d19650df9fa18b44102e669db37420462f2ee6a5b5a9e88"
+          "after": "d2e86fe3197d5cdf440e10573b946ecbfe891cd1932fb74bd8c9ae43292f4194"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/phases/movement_resolution_flow.py": {
+      "before_sha256": "43bf2656044fc8bc4049fe5ac6076857047eb1a45bde474afe0cc860c1e1775c",
+      "after_sha256": "2e71792a4984f45cda1e09d25edd7e20a4522c25428daf25098549f8697671a9",
+      "owners": {
+        "_apply_advance_roll_reroll_decision": {
+          "before": "abc51840fb9632b036890074f24abd53503a0f260eeb073a123f7f0d4b7a28d5",
+          "after": "7f1472ccbdaa5b31efceb6374c715e55c6a02f3ddf6da724baeea5a0d512e5dc"
+        },
+        "_resolve_and_apply_advance_move": {
+          "before": "2cd2599b4a32d53d735c6547edbca15aafa9a30ef164fe5e5af50b8d1b690360",
+          "after": "e33ef7a82d5fd287fa958026a15a8c90b6322119b223eec5611fe8e9d8081629"
+        },
+        "resume_advance_move_after_stratagem": {
+          "before": null,
+          "after": "8453f3213013405f4dd966f0641c386b3b66e236263fe5dd4b6f6a12db0f9b38"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/phases/movement_start_actions.py": {
+      "before_sha256": "4f7d371efbd41a6197f290f10835d84cc8983b5ad5579ab1c12f2e9848656b22",
+      "after_sha256": "10c57a33998807e1db423f4914da2acdad85bbce29694ca2c499b43b5d56480b",
+      "owners": {
+        "resume_move_start_action": {
+          "before": "eb4933de3eb5bfb631a068588978c710b25a2e13a61e2ad017521004775e2661",
+          "after": "b20331f50d22a1c3b90f4dad82e5623a01fdb6e1cbec31a229a00defe26ce551"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/stratagems_eligibility.py": {
+      "before_sha256": "69bdde9f8674ace9e7925d5294b93b837d9bce6f7114e59f738eaec47d805a6f",
+      "after_sha256": "8ca0274919eebd381513f9e99ca938935ec27cbd2d5b69dfc364deadfbde0ef1",
+      "owners": {
+        "@module": {
+          "before": "fa25091fb82c2e0572c75b61cdef97bd872bc8d7e09766cd7168318fabdcadbe",
+          "after": "188cfa3fa90719e2d464198859184e1dabacd2d8721ae6a77dcad8bf495e7f01"
+        },
+        "_enumerated_target_bindings": {
+          "before": "66d66dea6db6edc77d5095c79e4d1ae57dfe748a6a55357b6abbb3bac1ae891d",
+          "after": "fc87116bdc3b34c24a4cd764e96294f1766d4dcdd80f6d360389a928a711edec"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/stratagems_model.py": {
+      "before_sha256": "7175d33102066ad7f8bc73302f8f5168b1313036e82d13b9809420e217a079a2",
+      "after_sha256": "0dc01ad2f92bb9cd432148b1b6b2f80911c23410190467f32e53984c63a3d720",
+      "owners": {
+        "@module": {
+          "before": "925ba2f7c92239bb920bf7f2b20015b1bb0fc5edd3ddd093bd67178b8e4d0080",
+          "after": "b22b02480c5551b871e1ea31a11f7cceba9749f0bd331e86aa527b086bf72cc2"
         }
       }
     },
     "src/warhammer40k_core/engine/stratagems_requests.py": {
       "before_sha256": "78c9f03e89a86f38b13adaea1957045867a34d04715acaae0f7ea03f15c034a1",
-      "after_sha256": "21e0c8ec7787254bbaf7d313256649a60f33ee9661cf87f3259be4a26dad3e43",
+      "after_sha256": "1668494246f32053da518ae4ace8ef91ecfcde91fe1c9cc45d1596f94e76786f",
       "owners": {
+        "@module": {
+          "before": "fa17af2f9841ff2a5e727ec780e6b8761aab90977ed01c4121e88f39ce984eb6",
+          "after": "26818146ce1996ead689fe9a96ddcce90845f016e3d715266f990402b7b06401"
+        },
+        "_request_phase_stratagem_opportunity": {
+          "before": null,
+          "after": "4ff5ed6895a4e5e1341594ffd6fe6f67ddb41ba9eea4ad4aca9712d95392461f"
+        },
+        "post_roll_movement_stratagem_records": {
+          "before": null,
+          "after": "5c2f5ecfa752c47090607b2a4abd5d16d215bf113dc6527093a0051da2ddca27"
+        },
         "request_phase_preselection_stratagem": {
           "before": null,
-          "after": "218a6ce998373bbfeb181cf546899b62e09acd1df2fd1efe1dc494a23377561c"
+          "after": "745865474eb9e1aee7dc08650d176dffb4e7cf73893119b172970a97f8e1d1f7"
+        },
+        "request_post_roll_movement_stratagem": {
+          "before": null,
+          "after": "6d4ddd6938f994e885d8037f3857ada47c93ca1e7ebf329f8d64603440b23b81"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/stratagems_targeting.py": {
+      "before_sha256": "d8d0f553f5e422f6f154c8ea6b50250627340ad0e523e61fa29fc8a880f3d6e9",
+      "after_sha256": "9ae5111ebc94967bfebc7d91533d7b62b02d5cce1dd2b032e32422b37ff16dac",
+      "owners": {
+        "@module": {
+          "before": "956cd6ade28c25d3aa2ef4cd7612168ec58d63335475a2007f3ad7d044a140ce",
+          "after": "c8f922c0b158ee2c165a2689738b8aeff5ed22df2499a6ae955b43f501d03c27"
+        },
+        "_target_binding_error": {
+          "before": "f9ef31452affc9144f52faf7cfd4abf4104c41da26a59d33efbdc174888a51d7",
+          "after": "81e072a4520c50ec5ff1e997abc2103eadecefb598cdc5c147132c1851e57dea"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/unit_rule_effects.py": {
+      "before_sha256": "62095ef0db51216ab49d22aee10030648c4f6dd42ed2773c456ab379f3bbed5c",
+      "after_sha256": "ea5bb3a894a58e4335277526b557755a6ae26e6192b01682e238e0eeb82cfb2d",
+      "owners": {
+        "movement_transit_through_terrain_features_allowed": {
+          "before": "b319e0283293db72d28436e88f5731e7568a1b566988b21609a3d88d2d9ae86c",
+          "after": "42a8ae615fce91c7dd815ef24ad89c27a2fde6e75be6962ad0a07bf347b02d4f"
+        }
+      }
+    },
+    "src/warhammer40k_core/geometry/pathing.py": {
+      "before_sha256": "f3cc92cb86a600c899000fb8d5d46b920c58ea32045137c155764822886823fd",
+      "after_sha256": "ad1b9fd84a47b80664b3d33a5a1c6876d5c783ff0b88372b428f7619376fcd90",
+      "owners": {
+        "@module": {
+          "before": "87747adbf4adaa0a6341751228d061215c49de740ef551d9b940fd2269f5e59c",
+          "after": "501e4aa6d681225e7ec7f031a3a923828474e4dd36f082d7db009295a5f781ca"
+        },
+        "TerrainPathLegalityContext": {
+          "before": "cbbf309376a40e862087a4395271be08d6fe876504d7464c62b3f7868b7cf4a4",
+          "after": "6f3d6eb5906ec9f96bc54fc8652d431e5248d9c1666dbfbf1a34cedec7fdba6d"
+        },
+        "TerrainPathLegalityContext.__post_init__": {
+          "before": "710c2777531e33fe6258e4573c450de6832bf871656ff9d8536fa3238b566372",
+          "after": "50827d75f983b5fb11e5113cbe8ec1f75a1ff0a25135ac8917ac90c6a774cba2"
+        },
+        "TerrainPathLegalityContext._traversal_mode_for_terrain": {
+          "before": "1be6cad74170549f0507de5e41e33cfb50678077a808b54ab21521ae902ae67f",
+          "after": "5521f036348816de71054fb94d6155426b1942a9e9afc685cacd1cf9a1fdac00"
+        },
+        "TerrainPathLegalityContext.from_payload": {
+          "before": "8e02b2db7d30564a79b1312504d75062407bf865a6f93e9c55f519e9b301bdac",
+          "after": "174c12922b831909269dbb8a9839e9aa6eb179a2330b07df28f83f45c2d3fcd3"
+        },
+        "TerrainPathLegalityContext.to_payload": {
+          "before": "efd2ef72a47914e1a777bc80e45d905307c620c4ccfddb5ba37e6f88e7f72c2d",
+          "after": "d561ca553cad9bf457f393d487a6bc8a1b6a34cb9cc6b11a8ba0c5bfaaef5989"
+        },
+        "TerrainPathLegalityContext.validate": {
+          "before": "8e0d782e853f453ca1117d421d1d295dc18c2e7a414133ee3d6fa11c8955cc28",
+          "after": "4046bade13e402122c7270e94e8689bf5f0aa7d6cafd6208f621783bfb34312f"
+        },
+        "TerrainPathLegalityContextPayload": {
+          "before": "353d2c54e4606c0451bddfcbb9455d66ad0a35547e87cc4f953cc6cf47c28edf",
+          "after": "2691d7d988ca7f911dad02e545a92005a0d92b042370b2241c48665fe31e4f30"
         }
       }
     },
     "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_blood_legion_ir_support_2026_27.py": {
       "before_sha256": "5a5d47a3757bba5a52913de00b5ff6d153b532588747dd1a5f5fd86c79f3fed6",
-      "after_sha256": "43659fff6c185c4f5f26769b380d16a92358bdde61aadabf0784bd21c0f88e74",
+      "after_sha256": "6817fc9a9716554cb33e844229512dedaa446cdf12d0b5764cdc64c6c28a622a",
       "owners": {
         "@module": {
           "before": "80cd19813304deb520112e7c34fb4a4585e501da6ca723de920e0eac6b487a6d",
@@ -414,7 +648,7 @@
         },
         "_gore_hungry_onslaught_payload": {
           "before": null,
-          "after": "0a1fe0af150cf9d840d9b3e5a5ff1bbb9d87d02028491ddba541c2647d94651f"
+          "after": "308208ab101bfdb4a4c1f7ae06c6e30f6c218cf410a63490bb8a46235388b6c6"
         }
       }
     },
@@ -430,7 +664,7 @@
     },
     "tests/factions/chaos_daemons/integration/test_blood_begets_skulls.py": {
       "before_sha256": "27f5617e3e182cd547caedee49c2383c291a96ed76b40ef71a26730f072a1c84",
-      "after_sha256": "5b52f6c73a1652086a1bf63947a57726c29a095a28c14bb0949f095450ecd00d",
+      "after_sha256": "2e40f57baf32b92e3361b6bd0e50bc11ef12dbcf253abc3fc78e2b2e9fa773ce",
       "owners": {
         "@module": {
           "before": "da875b3714312021e4ec5e78e76913d80234af35ec372c6bfc9b26d7aee64c83",
@@ -438,7 +672,7 @@
         },
         "_reach_charge": {
           "before": "45e6e29d0d2bc882515a31ab7faf10c286d7bdce15a0d8690baef37fec7b287e",
-          "after": "6bf212329fb636e544636277cbfcc91390af092c3368d9869fcac03b1ee7ac6a"
+          "after": "a641408197e8f90a3386e0e1378cde7ef3425e11c6dcd119a0f2da95be9e389b"
         },
         "_submit": {
           "before": "6e6885c2260afba792d490f7276a32ba8b1952fe54b0aa00f8a8d03167fdc2d3",
@@ -462,7 +696,7 @@
         },
         "test_blood_begets_skulls_decline_then_offer_after_earlier_charge": {
           "before": "7b94ffa2f3bf32a13306261a9c21ade0bcbda8589b831ceda0ad26d98066e93f",
-          "after": "6d0276e9cfd69aedced5dd65a255b0b54e151c9b43cbdb8f2c51d3e22c6508a4"
+          "after": "4be769667246cb20a8b28f41333d81293151383ed6dad332c760360fc607020f"
         },
         "test_blood_begets_skulls_offers_when_advance_prevents_all_charges": {
           "before": "1cca3f8edeca3e746f1e7077e5e0f7da2f8aa0133855bba0c86bb4ce3c4b21b3",
@@ -476,19 +710,35 @@
     },
     "tests/factions/chaos_daemons/integration/test_gore_hungry_onslaught.py": {
       "before_sha256": null,
-      "after_sha256": "3fc91f2a6b9c0306f906d1bf48fabd8268c7c290ab395433108d6199085e2b9b",
+      "after_sha256": "f862fc166ae361098520c13cbf3e30ced40bbc36df7f61ecc36b78b117e0b0d0",
       "owners": {
         "@module": {
           "before": null,
-          "after": "e2a735aabe85a535d7d7625d576fca50cc2f5ba3a8e8bab60b5678e6c3e54276"
+          "after": "67fdf4715bc94e81e4e0f72a022bbac5c9caa6df77ea4f2da3d16ba1fc498f2b"
         },
         "_advance_through_wall": {
           "before": null,
           "after": "262b144ef344e413cdf73bfa2ff018fd03aa9a2d90707e5a8e99a8ae2710a41b"
         },
+        "_assert_attached_target": {
+          "before": null,
+          "after": "e43a959bf32a2f3dfa3319ded343c438b17670f0435adbfe84517bbe13e8e7db"
+        },
         "_assert_onslaught": {
           "before": null,
-          "after": "b56cf4af863999eb07a99c457c0abc3264f7e99872c2f77d58151271633d9d1b"
+          "after": "00b64b73346923fc8c07d180e4ccbeb29e6ddf739fec1010767a73c493b3d23f"
+        },
+        "_assert_replay": {
+          "before": null,
+          "after": "6e8ee2faa163d9e83aec408d01a0a54b01cf9c55f9d2a239c6a757bfea750c36"
+        },
+        "_move_nonlevel": {
+          "before": null,
+          "after": "fa019dbcc4d7859cda383ee06a30f42eaa765074a0a6beeb558213c68cd3d302"
+        },
+        "_nonlevel_witness": {
+          "before": null,
+          "after": "3cb47806478e5bf583f828f881347775ef7eb515915eb2c7c63631f8bb5ea853"
         },
         "_onslaught_option": {
           "before": null,
@@ -496,11 +746,11 @@
         },
         "_onslaught_scene": {
           "before": null,
-          "after": "b097599c8d3bdb76041b7f35d7feabd668e7e14cbe91eaf761bc1802cd00fb50"
+          "after": "32345aef69e98209b2715ae7abcc853e9bc7dc34851490d1b93eee09a3f4e491"
         },
         "test_gore_hungry_onslaught_charge_path_and_replay": {
           "before": null,
-          "after": "338a07e9a995e069677f23c105687053f0bc91faca3b035e646861b49a1f3915"
+          "after": "5c9ab3dc7d33e362a08e845069827291196d7b97a2c042343d4aef7eb7cb5152"
         },
         "test_gore_hungry_onslaught_ineligible_window": {
           "before": null,
@@ -508,7 +758,7 @@
         },
         "test_gore_hungry_onslaught_later_movement_window": {
           "before": null,
-          "after": "49fc18b92f421bb7d8c33bd9ce883cde4705581c875730972505eec0485040b3"
+          "after": "1ec7eb207b8e4a06d36b4c2d6fe8084a24364e2e3bdf416a80d99edea3930184"
         },
         "test_gore_hungry_onslaught_movement_path_and_replay": {
           "before": null,
@@ -518,17 +768,17 @@
     },
     "tests/factions/chaos_daemons/integration/test_skulls_beget_blood.py": {
       "before_sha256": "8fffccffbedd6b697d85d2b0da189435d8251c88c88f96ae69e865cfe1abd6b9",
-      "after_sha256": "c93228606f0f51e5aeaea0d7dc9c9ba6b4eb07b6961d99611e1f8b8ffc749b24",
+      "after_sha256": "0a887fe28de5be226a37272b9176a445ae2cf467615f6d28636391812aa862ca",
       "owners": {
         "test_skulls_beget_blood_allows_advance_but_excludes_fall_back": {
           "before": "0c81778844f035850e0c1c4b3a3deb34f7b35921f8b1d95f4a04b25b96c132fe",
-          "after": "7924526523cf5631d0ce55cf2baebbedc06ae4adc50c504f3d6b21333ecaa27f"
+          "after": "540500ec37ff14f0fd000e9ad06f2783dd5700eedf89c315d6b32da09560064b"
         }
       }
     },
     "tests/infrastructure/source_governance/unit/test_blocked_row_classification.py": {
       "before_sha256": "32d202415e5947bed75e740362d2d2b40de2ffe3af282e775e305b41bf501f33",
-      "after_sha256": "901336e2a44f83246b108dd0903f06f84bb0ffaf588eb0ed95080c2dcaada145",
+      "after_sha256": "aba698741823c0a06af773ccf06d48a16cd0f7a37c6aed8b56a9f0e8cbd0a22d",
       "owners": {
         "test_phase17i_missing_capability_report_groups_rows_by_family": {
           "before": "246ff1a7e05cd64ad8e621bd203dd9652042a5b518ec26f897f5dea5b05d570f",
@@ -536,7 +786,7 @@
         },
         "test_phase17i_source_text_boundaries_are_explicit": {
           "before": "6405f4bd29f3b814b5dc39325131db22e0446cb2d5a7679a753e5e0c4192857f",
-          "after": "867f27aa8ab6230caff6aaca88979d66544e8d5f560f1eefdf42428976d4b631"
+          "after": "4c828bd6e79d93901ef87c13ebc11c4fd78c87104ba122e212e6fcdebf7f38b6"
         }
       }
     }
@@ -548,9 +798,9 @@
         "supported-acts-current-source-documentation"
       ],
       "selected_families": [],
-      "rationale": "Record the single qualified Blood Legion rule and unchanged adjacent unsupported scope.",
-      "source_obligation": "Official June and July Chaos Daemons faction packs, page 124. Verify own Movement/Charge, 1 CP, both keywords, terrain-only transit and phase-end expiry.",
-      "unchanged_work": "Native path search, terrain geometry, endpoint/collision checks, Charge flight, CP and effect ledgers and replay validation retain existing authorities. Only the scoped phase-choice and source-backed effect admission change."
+      "rationale": "Use native settled Advance and Charge continuations, scoped terrain crossing, and canonical attached-unit options.",
+      "source_obligation": "Retained June and July Chaos Daemons card, page 124, and Core Rules 09.06 and 11.02.",
+      "unchanged_work": "No changes to the algorithms for path search, endpoints, model collision, distance, LOS, or the existing MOBILE/FLY permissions. Run exact matched measurements on the touched geometry and eligibility owners."
     },
     "ci/test_shards/durations.json": {
       "category": "rule_semantics",
@@ -558,9 +808,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Retain every inherited node and selector weight; add only the seven measured Linux gameplay nodes, then rebalance twelve shards.",
-      "source_obligation": "Official June and July Chaos Daemons faction packs, page 124. Verify own Movement/Charge, 1 CP, both keywords, terrain-only transit and phase-end expiry.",
-      "unchanged_work": "Native path search, terrain geometry, endpoint/collision checks, Charge flight, CP and effect ledgers and replay validation retain existing authorities. Only the scoped phase-choice and source-backed effect admission change."
+      "rationale": "Use native settled Advance and Charge continuations, scoped terrain crossing, and canonical attached-unit options.",
+      "source_obligation": "Retained June and July Chaos Daemons card, page 124, and Core Rules 09.06 and 11.02.",
+      "unchanged_work": "No changes to the algorithms for path search, endpoints, model collision, distance, LOS, or the existing MOBILE/FLY permissions. Run exact matched measurements on the touched geometry and eligibility owners."
     },
     "ci/test_shards/shard-1.txt": {
       "category": "rule_semantics",
@@ -568,9 +818,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Retain every inherited node and selector weight; add only the seven measured Linux gameplay nodes, then rebalance twelve shards.",
-      "source_obligation": "Official June and July Chaos Daemons faction packs, page 124. Verify own Movement/Charge, 1 CP, both keywords, terrain-only transit and phase-end expiry.",
-      "unchanged_work": "Native path search, terrain geometry, endpoint/collision checks, Charge flight, CP and effect ledgers and replay validation retain existing authorities. Only the scoped phase-choice and source-backed effect admission change."
+      "rationale": "Use native settled Advance and Charge continuations, scoped terrain crossing, and canonical attached-unit options.",
+      "source_obligation": "Retained June and July Chaos Daemons card, page 124, and Core Rules 09.06 and 11.02.",
+      "unchanged_work": "No changes to the algorithms for path search, endpoints, model collision, distance, LOS, or the existing MOBILE/FLY permissions. Run exact matched measurements on the touched geometry and eligibility owners."
     },
     "ci/test_shards/shard-10.txt": {
       "category": "rule_semantics",
@@ -578,9 +828,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Retain every inherited node and selector weight; add only the seven measured Linux gameplay nodes, then rebalance twelve shards.",
-      "source_obligation": "Official June and July Chaos Daemons faction packs, page 124. Verify own Movement/Charge, 1 CP, both keywords, terrain-only transit and phase-end expiry.",
-      "unchanged_work": "Native path search, terrain geometry, endpoint/collision checks, Charge flight, CP and effect ledgers and replay validation retain existing authorities. Only the scoped phase-choice and source-backed effect admission change."
+      "rationale": "Use native settled Advance and Charge continuations, scoped terrain crossing, and canonical attached-unit options.",
+      "source_obligation": "Retained June and July Chaos Daemons card, page 124, and Core Rules 09.06 and 11.02.",
+      "unchanged_work": "No changes to the algorithms for path search, endpoints, model collision, distance, LOS, or the existing MOBILE/FLY permissions. Run exact matched measurements on the touched geometry and eligibility owners."
     },
     "ci/test_shards/shard-11.txt": {
       "category": "rule_semantics",
@@ -588,9 +838,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Retain every inherited node and selector weight; add only the seven measured Linux gameplay nodes, then rebalance twelve shards.",
-      "source_obligation": "Official June and July Chaos Daemons faction packs, page 124. Verify own Movement/Charge, 1 CP, both keywords, terrain-only transit and phase-end expiry.",
-      "unchanged_work": "Native path search, terrain geometry, endpoint/collision checks, Charge flight, CP and effect ledgers and replay validation retain existing authorities. Only the scoped phase-choice and source-backed effect admission change."
+      "rationale": "Use native settled Advance and Charge continuations, scoped terrain crossing, and canonical attached-unit options.",
+      "source_obligation": "Retained June and July Chaos Daemons card, page 124, and Core Rules 09.06 and 11.02.",
+      "unchanged_work": "No changes to the algorithms for path search, endpoints, model collision, distance, LOS, or the existing MOBILE/FLY permissions. Run exact matched measurements on the touched geometry and eligibility owners."
     },
     "ci/test_shards/shard-12.txt": {
       "category": "rule_semantics",
@@ -598,9 +848,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Retain every inherited node and selector weight; add only the seven measured Linux gameplay nodes, then rebalance twelve shards.",
-      "source_obligation": "Official June and July Chaos Daemons faction packs, page 124. Verify own Movement/Charge, 1 CP, both keywords, terrain-only transit and phase-end expiry.",
-      "unchanged_work": "Native path search, terrain geometry, endpoint/collision checks, Charge flight, CP and effect ledgers and replay validation retain existing authorities. Only the scoped phase-choice and source-backed effect admission change."
+      "rationale": "Use native settled Advance and Charge continuations, scoped terrain crossing, and canonical attached-unit options.",
+      "source_obligation": "Retained June and July Chaos Daemons card, page 124, and Core Rules 09.06 and 11.02.",
+      "unchanged_work": "No changes to the algorithms for path search, endpoints, model collision, distance, LOS, or the existing MOBILE/FLY permissions. Run exact matched measurements on the touched geometry and eligibility owners."
     },
     "ci/test_shards/shard-4.txt": {
       "category": "rule_semantics",
@@ -608,9 +858,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Retain every inherited node and selector weight; add only the seven measured Linux gameplay nodes, then rebalance twelve shards.",
-      "source_obligation": "Official June and July Chaos Daemons faction packs, page 124. Verify own Movement/Charge, 1 CP, both keywords, terrain-only transit and phase-end expiry.",
-      "unchanged_work": "Native path search, terrain geometry, endpoint/collision checks, Charge flight, CP and effect ledgers and replay validation retain existing authorities. Only the scoped phase-choice and source-backed effect admission change."
+      "rationale": "Use native settled Advance and Charge continuations, scoped terrain crossing, and canonical attached-unit options.",
+      "source_obligation": "Retained June and July Chaos Daemons card, page 124, and Core Rules 09.06 and 11.02.",
+      "unchanged_work": "No changes to the algorithms for path search, endpoints, model collision, distance, LOS, or the existing MOBILE/FLY permissions. Run exact matched measurements on the touched geometry and eligibility owners."
     },
     "ci/test_shards/shard-5.txt": {
       "category": "rule_semantics",
@@ -618,9 +868,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Retain every inherited node and selector weight; add only the seven measured Linux gameplay nodes, then rebalance twelve shards.",
-      "source_obligation": "Official June and July Chaos Daemons faction packs, page 124. Verify own Movement/Charge, 1 CP, both keywords, terrain-only transit and phase-end expiry.",
-      "unchanged_work": "Native path search, terrain geometry, endpoint/collision checks, Charge flight, CP and effect ledgers and replay validation retain existing authorities. Only the scoped phase-choice and source-backed effect admission change."
+      "rationale": "Use native settled Advance and Charge continuations, scoped terrain crossing, and canonical attached-unit options.",
+      "source_obligation": "Retained June and July Chaos Daemons card, page 124, and Core Rules 09.06 and 11.02.",
+      "unchanged_work": "No changes to the algorithms for path search, endpoints, model collision, distance, LOS, or the existing MOBILE/FLY permissions. Run exact matched measurements on the touched geometry and eligibility owners."
     },
     "ci/test_shards/shard-6.txt": {
       "category": "rule_semantics",
@@ -628,9 +878,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Retain every inherited node and selector weight; add only the seven measured Linux gameplay nodes, then rebalance twelve shards.",
-      "source_obligation": "Official June and July Chaos Daemons faction packs, page 124. Verify own Movement/Charge, 1 CP, both keywords, terrain-only transit and phase-end expiry.",
-      "unchanged_work": "Native path search, terrain geometry, endpoint/collision checks, Charge flight, CP and effect ledgers and replay validation retain existing authorities. Only the scoped phase-choice and source-backed effect admission change."
+      "rationale": "Use native settled Advance and Charge continuations, scoped terrain crossing, and canonical attached-unit options.",
+      "source_obligation": "Retained June and July Chaos Daemons card, page 124, and Core Rules 09.06 and 11.02.",
+      "unchanged_work": "No changes to the algorithms for path search, endpoints, model collision, distance, LOS, or the existing MOBILE/FLY permissions. Run exact matched measurements on the touched geometry and eligibility owners."
     },
     "ci/test_shards/shard-7.txt": {
       "category": "rule_semantics",
@@ -638,9 +888,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Retain every inherited node and selector weight; add only the seven measured Linux gameplay nodes, then rebalance twelve shards.",
-      "source_obligation": "Official June and July Chaos Daemons faction packs, page 124. Verify own Movement/Charge, 1 CP, both keywords, terrain-only transit and phase-end expiry.",
-      "unchanged_work": "Native path search, terrain geometry, endpoint/collision checks, Charge flight, CP and effect ledgers and replay validation retain existing authorities. Only the scoped phase-choice and source-backed effect admission change."
+      "rationale": "Use native settled Advance and Charge continuations, scoped terrain crossing, and canonical attached-unit options.",
+      "source_obligation": "Retained June and July Chaos Daemons card, page 124, and Core Rules 09.06 and 11.02.",
+      "unchanged_work": "No changes to the algorithms for path search, endpoints, model collision, distance, LOS, or the existing MOBILE/FLY permissions. Run exact matched measurements on the touched geometry and eligibility owners."
     },
     "ci/test_shards/shard-8.txt": {
       "category": "rule_semantics",
@@ -648,9 +898,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Retain every inherited node and selector weight; add only the seven measured Linux gameplay nodes, then rebalance twelve shards.",
-      "source_obligation": "Official June and July Chaos Daemons faction packs, page 124. Verify own Movement/Charge, 1 CP, both keywords, terrain-only transit and phase-end expiry.",
-      "unchanged_work": "Native path search, terrain geometry, endpoint/collision checks, Charge flight, CP and effect ledgers and replay validation retain existing authorities. Only the scoped phase-choice and source-backed effect admission change."
+      "rationale": "Use native settled Advance and Charge continuations, scoped terrain crossing, and canonical attached-unit options.",
+      "source_obligation": "Retained June and July Chaos Daemons card, page 124, and Core Rules 09.06 and 11.02.",
+      "unchanged_work": "No changes to the algorithms for path search, endpoints, model collision, distance, LOS, or the existing MOBILE/FLY permissions. Run exact matched measurements on the touched geometry and eligibility owners."
     },
     "ci/test_shards/shard-9.txt": {
       "category": "rule_semantics",
@@ -658,9 +908,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Retain every inherited node and selector weight; add only the seven measured Linux gameplay nodes, then rebalance twelve shards.",
-      "source_obligation": "Official June and July Chaos Daemons faction packs, page 124. Verify own Movement/Charge, 1 CP, both keywords, terrain-only transit and phase-end expiry.",
-      "unchanged_work": "Native path search, terrain geometry, endpoint/collision checks, Charge flight, CP and effect ledgers and replay validation retain existing authorities. Only the scoped phase-choice and source-backed effect admission change."
+      "rationale": "Use native settled Advance and Charge continuations, scoped terrain crossing, and canonical attached-unit options.",
+      "source_obligation": "Retained June and July Chaos Daemons card, page 124, and Core Rules 09.06 and 11.02.",
+      "unchanged_work": "No changes to the algorithms for path search, endpoints, model collision, distance, LOS, or the existing MOBILE/FLY permissions. Run exact matched measurements on the touched geometry and eligibility owners."
     },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
@@ -668,9 +918,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate examples and dependent hashes for the exact combined Onslaught and landed Charge-flight runtime.",
-      "source_obligation": "Official June and July Chaos Daemons faction packs, page 124. Verify own Movement/Charge, 1 CP, both keywords, terrain-only transit and phase-end expiry.",
-      "unchanged_work": "Native path search, terrain geometry, endpoint/collision checks, Charge flight, CP and effect ledgers and replay validation retain existing authorities. Only the scoped phase-choice and source-backed effect admission change."
+      "rationale": "Use native settled Advance and Charge continuations, scoped terrain crossing, and canonical attached-unit options.",
+      "source_obligation": "Retained June and July Chaos Daemons card, page 124, and Core Rules 09.06 and 11.02.",
+      "unchanged_work": "No changes to the algorithms for path search, endpoints, model collision, distance, LOS, or the existing MOBILE/FLY permissions. Run exact matched measurements on the touched geometry and eligibility owners."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
@@ -678,9 +928,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate examples and dependent hashes for the exact combined Onslaught and landed Charge-flight runtime.",
-      "source_obligation": "Official June and July Chaos Daemons faction packs, page 124. Verify own Movement/Charge, 1 CP, both keywords, terrain-only transit and phase-end expiry.",
-      "unchanged_work": "Native path search, terrain geometry, endpoint/collision checks, Charge flight, CP and effect ledgers and replay validation retain existing authorities. Only the scoped phase-choice and source-backed effect admission change."
+      "rationale": "Use native settled Advance and Charge continuations, scoped terrain crossing, and canonical attached-unit options.",
+      "source_obligation": "Retained June and July Chaos Daemons card, page 124, and Core Rules 09.06 and 11.02.",
+      "unchanged_work": "No changes to the algorithms for path search, endpoints, model collision, distance, LOS, or the existing MOBILE/FLY permissions. Run exact matched measurements on the touched geometry and eligibility owners."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
@@ -688,9 +938,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate examples and dependent hashes for the exact combined Onslaught and landed Charge-flight runtime.",
-      "source_obligation": "Official June and July Chaos Daemons faction packs, page 124. Verify own Movement/Charge, 1 CP, both keywords, terrain-only transit and phase-end expiry.",
-      "unchanged_work": "Native path search, terrain geometry, endpoint/collision checks, Charge flight, CP and effect ledgers and replay validation retain existing authorities. Only the scoped phase-choice and source-backed effect admission change."
+      "rationale": "Use native settled Advance and Charge continuations, scoped terrain crossing, and canonical attached-unit options.",
+      "source_obligation": "Retained June and July Chaos Daemons card, page 124, and Core Rules 09.06 and 11.02.",
+      "unchanged_work": "No changes to the algorithms for path search, endpoints, model collision, distance, LOS, or the existing MOBILE/FLY permissions. Run exact matched measurements on the touched geometry and eligibility owners."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
@@ -698,9 +948,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate examples and dependent hashes for the exact combined Onslaught and landed Charge-flight runtime.",
-      "source_obligation": "Official June and July Chaos Daemons faction packs, page 124. Verify own Movement/Charge, 1 CP, both keywords, terrain-only transit and phase-end expiry.",
-      "unchanged_work": "Native path search, terrain geometry, endpoint/collision checks, Charge flight, CP and effect ledgers and replay validation retain existing authorities. Only the scoped phase-choice and source-backed effect admission change."
+      "rationale": "Use native settled Advance and Charge continuations, scoped terrain crossing, and canonical attached-unit options.",
+      "source_obligation": "Retained June and July Chaos Daemons card, page 124, and Core Rules 09.06 and 11.02.",
+      "unchanged_work": "No changes to the algorithms for path search, endpoints, model collision, distance, LOS, or the existing MOBILE/FLY permissions. Run exact matched measurements on the touched geometry and eligibility owners."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
@@ -708,9 +958,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate examples and dependent hashes for the exact combined Onslaught and landed Charge-flight runtime.",
-      "source_obligation": "Official June and July Chaos Daemons faction packs, page 124. Verify own Movement/Charge, 1 CP, both keywords, terrain-only transit and phase-end expiry.",
-      "unchanged_work": "Native path search, terrain geometry, endpoint/collision checks, Charge flight, CP and effect ledgers and replay validation retain existing authorities. Only the scoped phase-choice and source-backed effect admission change."
+      "rationale": "Use native settled Advance and Charge continuations, scoped terrain crossing, and canonical attached-unit options.",
+      "source_obligation": "Retained June and July Chaos Daemons card, page 124, and Core Rules 09.06 and 11.02.",
+      "unchanged_work": "No changes to the algorithms for path search, endpoints, model collision, distance, LOS, or the existing MOBILE/FLY permissions. Run exact matched measurements on the touched geometry and eligibility owners."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
@@ -718,9 +968,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate examples and dependent hashes for the exact combined Onslaught and landed Charge-flight runtime.",
-      "source_obligation": "Official June and July Chaos Daemons faction packs, page 124. Verify own Movement/Charge, 1 CP, both keywords, terrain-only transit and phase-end expiry.",
-      "unchanged_work": "Native path search, terrain geometry, endpoint/collision checks, Charge flight, CP and effect ledgers and replay validation retain existing authorities. Only the scoped phase-choice and source-backed effect admission change."
+      "rationale": "Use native settled Advance and Charge continuations, scoped terrain crossing, and canonical attached-unit options.",
+      "source_obligation": "Retained June and July Chaos Daemons card, page 124, and Core Rules 09.06 and 11.02.",
+      "unchanged_work": "No changes to the algorithms for path search, endpoints, model collision, distance, LOS, or the existing MOBILE/FLY permissions. Run exact matched measurements on the touched geometry and eligibility owners."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
@@ -728,9 +978,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate examples and dependent hashes for the exact combined Onslaught and landed Charge-flight runtime.",
-      "source_obligation": "Official June and July Chaos Daemons faction packs, page 124. Verify own Movement/Charge, 1 CP, both keywords, terrain-only transit and phase-end expiry.",
-      "unchanged_work": "Native path search, terrain geometry, endpoint/collision checks, Charge flight, CP and effect ledgers and replay validation retain existing authorities. Only the scoped phase-choice and source-backed effect admission change."
+      "rationale": "Use native settled Advance and Charge continuations, scoped terrain crossing, and canonical attached-unit options.",
+      "source_obligation": "Retained June and July Chaos Daemons card, page 124, and Core Rules 09.06 and 11.02.",
+      "unchanged_work": "No changes to the algorithms for path search, endpoints, model collision, distance, LOS, or the existing MOBILE/FLY permissions. Run exact matched measurements on the touched geometry and eligibility owners."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
@@ -738,9 +988,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate examples and dependent hashes for the exact combined Onslaught and landed Charge-flight runtime.",
-      "source_obligation": "Official June and July Chaos Daemons faction packs, page 124. Verify own Movement/Charge, 1 CP, both keywords, terrain-only transit and phase-end expiry.",
-      "unchanged_work": "Native path search, terrain geometry, endpoint/collision checks, Charge flight, CP and effect ledgers and replay validation retain existing authorities. Only the scoped phase-choice and source-backed effect admission change."
+      "rationale": "Use native settled Advance and Charge continuations, scoped terrain crossing, and canonical attached-unit options.",
+      "source_obligation": "Retained June and July Chaos Daemons card, page 124, and Core Rules 09.06 and 11.02.",
+      "unchanged_work": "No changes to the algorithms for path search, endpoints, model collision, distance, LOS, or the existing MOBILE/FLY permissions. Run exact matched measurements on the touched geometry and eligibility owners."
     },
     "data/generated/ability_coverage/cross_source_semantic_equivalence.json": {
       "category": "rule_semantics",
@@ -748,9 +998,9 @@
         "phase-end-healing-source-and-report"
       ],
       "selected_families": [],
-      "rationale": "Record the single qualified Blood Legion rule and unchanged adjacent unsupported scope.",
-      "source_obligation": "Official June and July Chaos Daemons faction packs, page 124. Verify own Movement/Charge, 1 CP, both keywords, terrain-only transit and phase-end expiry.",
-      "unchanged_work": "Native path search, terrain geometry, endpoint/collision checks, Charge flight, CP and effect ledgers and replay validation retain existing authorities. Only the scoped phase-choice and source-backed effect admission change."
+      "rationale": "Use native settled Advance and Charge continuations, scoped terrain crossing, and canonical attached-unit options.",
+      "source_obligation": "Retained June and July Chaos Daemons card, page 124, and Core Rules 09.06 and 11.02.",
+      "unchanged_work": "No changes to the algorithms for path search, endpoints, model collision, distance, LOS, or the existing MOBILE/FLY permissions. Run exact matched measurements on the touched geometry and eligibility owners."
     },
     "data/generated/ability_coverage/runtime_content_semantic_coverage.json": {
       "category": "rule_semantics",
@@ -758,9 +1008,9 @@
         "supported-acts-current-semantic-artifact"
       ],
       "selected_families": [],
-      "rationale": "Record the single qualified Blood Legion rule and unchanged adjacent unsupported scope.",
-      "source_obligation": "Official June and July Chaos Daemons faction packs, page 124. Verify own Movement/Charge, 1 CP, both keywords, terrain-only transit and phase-end expiry.",
-      "unchanged_work": "Native path search, terrain geometry, endpoint/collision checks, Charge flight, CP and effect ledgers and replay validation retain existing authorities. Only the scoped phase-choice and source-backed effect admission change."
+      "rationale": "Use native settled Advance and Charge continuations, scoped terrain crossing, and canonical attached-unit options.",
+      "source_obligation": "Retained June and July Chaos Daemons card, page 124, and Core Rules 09.06 and 11.02.",
+      "unchanged_work": "No changes to the algorithms for path search, endpoints, model collision, distance, LOS, or the existing MOBILE/FLY permissions. Run exact matched measurements on the touched geometry and eligibility owners."
     },
     "data/source_audits/ci64_provenance_v1/gore-hungry-onslaught-transition-v1.json": {
       "category": "rule_semantics",
@@ -768,9 +1018,9 @@
         "gore-hungry-onslaught-predecessor-admission"
       ],
       "selected_families": [],
-      "rationale": "Retain and validate predecessor admission, and add native Movement/Charge, negative controls and exact deterministic replay.",
-      "source_obligation": "Official June and July Chaos Daemons faction packs, page 124. Verify own Movement/Charge, 1 CP, both keywords, terrain-only transit and phase-end expiry.",
-      "unchanged_work": "Native path search, terrain geometry, endpoint/collision checks, Charge flight, CP and effect ledgers and replay validation retain existing authorities. Only the scoped phase-choice and source-backed effect admission change."
+      "rationale": "Use native settled Advance and Charge continuations, scoped terrain crossing, and canonical attached-unit options.",
+      "source_obligation": "Retained June and July Chaos Daemons card, page 124, and Core Rules 09.06 and 11.02.",
+      "unchanged_work": "No changes to the algorithms for path search, endpoints, model collision, distance, LOS, or the existing MOBILE/FLY permissions. Run exact matched measurements on the touched geometry and eligibility owners."
     },
     "docs/ABILITY_SUPPORT_MATRIX_V2.md": {
       "category": "governance",
@@ -817,6 +1067,30 @@
       "operations": [],
       "selected_families": [],
       "rationale": "Record the single qualified Blood Legion rule and unchanged adjacent unsupported scope.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/performance/current/gore-hungry-onslaught-review-20261125-movement.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Fresh serial matched-head evidence for the exact registered workload and base.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/performance/current/gore-hungry-onslaught-review-20261125-setup.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Fresh serial matched-head evidence for the exact registered workload and base.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/performance/current/gore-hungry-onslaught-review-20261125-visibility.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Fresh serial matched-head evidence for the exact registered workload and base.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -848,9 +1122,9 @@
         "gore-hungry-onslaught-predecessor-admission"
       ],
       "selected_families": [],
-      "rationale": "Retain and validate predecessor admission, and add native Movement/Charge, negative controls and exact deterministic replay.",
-      "source_obligation": "Official June and July Chaos Daemons faction packs, page 124. Verify own Movement/Charge, 1 CP, both keywords, terrain-only transit and phase-end expiry.",
-      "unchanged_work": "Native path search, terrain geometry, endpoint/collision checks, Charge flight, CP and effect ledgers and replay validation retain existing authorities. Only the scoped phase-choice and source-backed effect admission change."
+      "rationale": "Use native settled Advance and Charge continuations, scoped terrain crossing, and canonical attached-unit options.",
+      "source_obligation": "Retained June and July Chaos Daemons card, page 124, and Core Rules 09.06 and 11.02.",
+      "unchanged_work": "No changes to the algorithms for path search, endpoints, model collision, distance, LOS, or the existing MOBILE/FLY permissions. Run exact matched measurements on the touched geometry and eligibility owners."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
@@ -859,9 +1133,9 @@
         "phase-end-healing-source-and-report"
       ],
       "selected_families": [],
-      "rationale": "Regenerate examples and dependent hashes for the exact combined Onslaught and landed Charge-flight runtime.",
-      "source_obligation": "Official June and July Chaos Daemons faction packs, page 124. Verify own Movement/Charge, 1 CP, both keywords, terrain-only transit and phase-end expiry.",
-      "unchanged_work": "Native path search, terrain geometry, endpoint/collision checks, Charge flight, CP and effect ledgers and replay validation retain existing authorities. Only the scoped phase-choice and source-backed effect admission change."
+      "rationale": "Use native settled Advance and Charge continuations, scoped terrain crossing, and canonical attached-unit options.",
+      "source_obligation": "Retained June and July Chaos Daemons card, page 124, and Core Rules 09.06 and 11.02.",
+      "unchanged_work": "No changes to the algorithms for path search, endpoints, model collision, distance, LOS, or the existing MOBILE/FLY permissions. Run exact matched measurements on the touched geometry and eligibility owners."
     },
     "src/warhammer40k_core/engine/charge_preselection_stratagems.py": {
       "category": "rule_semantics",
@@ -870,9 +1144,20 @@
         "gore-hungry-onslaught-phase-opportunities"
       ],
       "selected_families": [],
-      "rationale": "Offer the source-backed Stratagem at ordinary own-phase unit-selection boundaries and grant an existing phase-scoped terrain permission.",
-      "source_obligation": "Official June and July Chaos Daemons faction packs, page 124. Verify own Movement/Charge, 1 CP, both keywords, terrain-only transit and phase-end expiry.",
-      "unchanged_work": "Native path search, terrain geometry, endpoint/collision checks, Charge flight, CP and effect ledgers and replay validation retain existing authorities. Only the scoped phase-choice and source-backed effect admission change."
+      "rationale": "Use native settled Advance and Charge continuations, scoped terrain crossing, and canonical attached-unit options.",
+      "source_obligation": "Retained June and July Chaos Daemons card, page 124, and Core Rules 09.06 and 11.02.",
+      "unchanged_work": "No changes to the algorithms for path search, endpoints, model collision, distance, LOS, or the existing MOBILE/FLY permissions. Run exact matched measurements on the touched geometry and eligibility owners."
+    },
+    "src/warhammer40k_core/engine/charge_roll_flow.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "private-rng-owner-f814d5887038cb89",
+        "gore-hungry-onslaught-phase-opportunities"
+      ],
+      "rationale": "Use native settled Advance and Charge continuations, scoped terrain crossing, and canonical attached-unit options.",
+      "source_obligation": "Retained June and July Chaos Daemons card, page 124, and Core Rules 09.06 and 11.02.",
+      "unchanged_work": "No changes to the algorithms for path search, endpoints, model collision, distance, LOS, or the existing MOBILE/FLY permissions. Run exact matched measurements on the touched geometry and eligibility owners.",
+      "selected_families": []
     },
     "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/detachments/blood_legion/stratagems.py": {
       "category": "rule_semantics",
@@ -882,9 +1167,30 @@
         "gore-hungry-onslaught-source-backed-terrain"
       ],
       "selected_families": [],
-      "rationale": "Offer the source-backed Stratagem at ordinary own-phase unit-selection boundaries and grant an existing phase-scoped terrain permission.",
-      "source_obligation": "Official June and July Chaos Daemons faction packs, page 124. Verify own Movement/Charge, 1 CP, both keywords, terrain-only transit and phase-end expiry.",
-      "unchanged_work": "Native path search, terrain geometry, endpoint/collision checks, Charge flight, CP and effect ledgers and replay validation retain existing authorities. Only the scoped phase-choice and source-backed effect admission change."
+      "rationale": "Use native settled Advance and Charge continuations, scoped terrain crossing, and canonical attached-unit options.",
+      "source_obligation": "Retained June and July Chaos Daemons card, page 124, and Core Rules 09.06 and 11.02.",
+      "unchanged_work": "No changes to the algorithms for path search, endpoints, model collision, distance, LOS, or the existing MOBILE/FLY permissions. Run exact matched measurements on the touched geometry and eligibility owners."
+    },
+    "src/warhammer40k_core/engine/movement_legality.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "gore-hungry-onslaught-source-backed-terrain",
+        "movement-rule-branch"
+      ],
+      "rationale": "Use native settled Advance and Charge continuations, scoped terrain crossing, and canonical attached-unit options.",
+      "source_obligation": "Retained June and July Chaos Daemons card, page 124, and Core Rules 09.06 and 11.02.",
+      "unchanged_work": "No changes to the algorithms for path search, endpoints, model collision, distance, LOS, or the existing MOBILE/FLY permissions. Run exact matched measurements on the touched geometry and eligibility owners.",
+      "selected_families": []
+    },
+    "src/warhammer40k_core/engine/phases/movement_action_decisions.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "movement-rule-branch"
+      ],
+      "rationale": "Use native settled Advance and Charge continuations, scoped terrain crossing, and canonical attached-unit options.",
+      "source_obligation": "Retained June and July Chaos Daemons card, page 124, and Core Rules 09.06 and 11.02.",
+      "unchanged_work": "No changes to the algorithms for path search, endpoints, model collision, distance, LOS, or the existing MOBILE/FLY permissions. Run exact matched measurements on the touched geometry and eligibility owners.",
+      "selected_families": []
     },
     "src/warhammer40k_core/engine/phases/movement_handler.py": {
       "category": "rule_semantics",
@@ -893,19 +1199,102 @@
         "gore-hungry-onslaught-phase-opportunities"
       ],
       "selected_families": [],
-      "rationale": "Offer the source-backed Stratagem at ordinary own-phase unit-selection boundaries and grant an existing phase-scoped terrain permission.",
-      "source_obligation": "Official June and July Chaos Daemons faction packs, page 124. Verify own Movement/Charge, 1 CP, both keywords, terrain-only transit and phase-end expiry.",
-      "unchanged_work": "Native path search, terrain geometry, endpoint/collision checks, Charge flight, CP and effect ledgers and replay validation retain existing authorities. Only the scoped phase-choice and source-backed effect admission change."
+      "rationale": "Use native settled Advance and Charge continuations, scoped terrain crossing, and canonical attached-unit options.",
+      "source_obligation": "Retained June and July Chaos Daemons card, page 124, and Core Rules 09.06 and 11.02.",
+      "unchanged_work": "No changes to the algorithms for path search, endpoints, model collision, distance, LOS, or the existing MOBILE/FLY permissions. Run exact matched measurements on the touched geometry and eligibility owners."
     },
-    "src/warhammer40k_core/engine/stratagems_requests.py": {
+    "src/warhammer40k_core/engine/phases/movement_resolution_flow.py": {
       "category": "rule_semantics",
       "operations": [
         "gore-hungry-onslaught-phase-opportunities"
       ],
+      "rationale": "Use native settled Advance and Charge continuations, scoped terrain crossing, and canonical attached-unit options.",
+      "source_obligation": "Retained June and July Chaos Daemons card, page 124, and Core Rules 09.06 and 11.02.",
+      "unchanged_work": "No changes to the algorithms for path search, endpoints, model collision, distance, LOS, or the existing MOBILE/FLY permissions. Run exact matched measurements on the touched geometry and eligibility owners.",
+      "selected_families": []
+    },
+    "src/warhammer40k_core/engine/phases/movement_start_actions.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "movement-rule-branch"
+      ],
+      "rationale": "Use native settled Advance and Charge continuations, scoped terrain crossing, and canonical attached-unit options.",
+      "source_obligation": "Retained June and July Chaos Daemons card, page 124, and Core Rules 09.06 and 11.02.",
+      "unchanged_work": "No changes to the algorithms for path search, endpoints, model collision, distance, LOS, or the existing MOBILE/FLY permissions. Run exact matched measurements on the touched geometry and eligibility owners.",
+      "selected_families": []
+    },
+    "src/warhammer40k_core/engine/stratagems_eligibility.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order135-visibility-hot-consumers",
+        "skulls-beget-blood-shooting-resolution",
+        "gore-hungry-onslaught-source-backed-terrain"
+      ],
+      "rationale": "Use native settled Advance and Charge continuations, scoped terrain crossing, and canonical attached-unit options.",
+      "source_obligation": "Retained June and July Chaos Daemons card, page 124, and Core Rules 09.06 and 11.02.",
+      "unchanged_work": "No changes to the algorithms for path search, endpoints, model collision, distance, LOS, or the existing MOBILE/FLY permissions. Run exact matched measurements on the touched geometry and eligibility owners.",
+      "selected_families": [
+        "visibility"
+      ]
+    },
+    "src/warhammer40k_core/engine/stratagems_model.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "blood-begets-skulls-charge-preselection",
+        "gore-hungry-onslaught-source-backed-terrain"
+      ],
+      "rationale": "Use native settled Advance and Charge continuations, scoped terrain crossing, and canonical attached-unit options.",
+      "source_obligation": "Retained June and July Chaos Daemons card, page 124, and Core Rules 09.06 and 11.02.",
+      "unchanged_work": "No changes to the algorithms for path search, endpoints, model collision, distance, LOS, or the existing MOBILE/FLY permissions. Run exact matched measurements on the touched geometry and eligibility owners.",
+      "selected_families": []
+    },
+    "src/warhammer40k_core/engine/stratagems_requests.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "gore-hungry-onslaught-phase-opportunities",
+        "blood-begets-skulls-charge-preselection",
+        "skulls-beget-blood-shooting-resolution"
+      ],
       "selected_families": [],
-      "rationale": "Offer the source-backed Stratagem at ordinary own-phase unit-selection boundaries and grant an existing phase-scoped terrain permission.",
-      "source_obligation": "Official June and July Chaos Daemons faction packs, page 124. Verify own Movement/Charge, 1 CP, both keywords, terrain-only transit and phase-end expiry.",
-      "unchanged_work": "Native path search, terrain geometry, endpoint/collision checks, Charge flight, CP and effect ledgers and replay validation retain existing authorities. Only the scoped phase-choice and source-backed effect admission change."
+      "rationale": "Use native settled Advance and Charge continuations, scoped terrain crossing, and canonical attached-unit options.",
+      "source_obligation": "Retained June and July Chaos Daemons card, page 124, and Core Rules 09.06 and 11.02.",
+      "unchanged_work": "No changes to the algorithms for path search, endpoints, model collision, distance, LOS, or the existing MOBILE/FLY permissions. Run exact matched measurements on the touched geometry and eligibility owners."
+    },
+    "src/warhammer40k_core/engine/stratagems_targeting.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "blood-begets-skulls-charge-preselection",
+        "gore-hungry-onslaught-source-backed-terrain"
+      ],
+      "rationale": "Use native settled Advance and Charge continuations, scoped terrain crossing, and canonical attached-unit options.",
+      "source_obligation": "Retained June and July Chaos Daemons card, page 124, and Core Rules 09.06 and 11.02.",
+      "unchanged_work": "No changes to the algorithms for path search, endpoints, model collision, distance, LOS, or the existing MOBILE/FLY permissions. Run exact matched measurements on the touched geometry and eligibility owners.",
+      "selected_families": []
+    },
+    "src/warhammer40k_core/engine/unit_rule_effects.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "gore-hungry-onslaught-source-backed-terrain"
+      ],
+      "rationale": "Use native settled Advance and Charge continuations, scoped terrain crossing, and canonical attached-unit options.",
+      "source_obligation": "Retained June and July Chaos Daemons card, page 124, and Core Rules 09.06 and 11.02.",
+      "unchanged_work": "No changes to the algorithms for path search, endpoints, model collision, distance, LOS, or the existing MOBILE/FLY permissions. Run exact matched measurements on the touched geometry and eligibility owners.",
+      "selected_families": []
+    },
+    "src/warhammer40k_core/geometry/pathing.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "geometry-search",
+        "gore-hungry-onslaught-source-backed-terrain"
+      ],
+      "rationale": "Use native settled Advance and Charge continuations, scoped terrain crossing, and canonical attached-unit options.",
+      "source_obligation": "Retained June and July Chaos Daemons card, page 124, and Core Rules 09.06 and 11.02.",
+      "unchanged_work": "No changes to the algorithms for path search, endpoints, model collision, distance, LOS, or the existing MOBILE/FLY permissions. Run exact matched measurements on the touched geometry and eligibility owners.",
+      "selected_families": [
+        "movement",
+        "setup",
+        "visibility"
+      ]
     },
     "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_blood_legion_ir_support_2026_27.py": {
       "category": "rule_semantics",
@@ -916,9 +1305,9 @@
         "gore-hungry-onslaught-source-backed-terrain"
       ],
       "selected_families": [],
-      "rationale": "Offer the source-backed Stratagem at ordinary own-phase unit-selection boundaries and grant an existing phase-scoped terrain permission.",
-      "source_obligation": "Official June and July Chaos Daemons faction packs, page 124. Verify own Movement/Charge, 1 CP, both keywords, terrain-only transit and phase-end expiry.",
-      "unchanged_work": "Native path search, terrain geometry, endpoint/collision checks, Charge flight, CP and effect ledgers and replay validation retain existing authorities. Only the scoped phase-choice and source-backed effect admission change."
+      "rationale": "Use native settled Advance and Charge continuations, scoped terrain crossing, and canonical attached-unit options.",
+      "source_obligation": "Retained June and July Chaos Daemons card, page 124, and Core Rules 09.06 and 11.02.",
+      "unchanged_work": "No changes to the algorithms for path search, endpoints, model collision, distance, LOS, or the existing MOBILE/FLY permissions. Run exact matched measurements on the touched geometry and eligibility owners."
     },
     "tests/code_quality/test_engine_numerical_identity_admission.py": {
       "category": "rule_semantics",
@@ -933,9 +1322,9 @@
         "pre-roll-charge-flight-test-admission"
       ],
       "selected_families": [],
-      "rationale": "Retain and validate predecessor admission, and add native Movement/Charge, negative controls and exact deterministic replay.",
-      "source_obligation": "Official June and July Chaos Daemons faction packs, page 124. Verify own Movement/Charge, 1 CP, both keywords, terrain-only transit and phase-end expiry.",
-      "unchanged_work": "Native path search, terrain geometry, endpoint/collision checks, Charge flight, CP and effect ledgers and replay validation retain existing authorities. Only the scoped phase-choice and source-backed effect admission change."
+      "rationale": "Use native settled Advance and Charge continuations, scoped terrain crossing, and canonical attached-unit options.",
+      "source_obligation": "Retained June and July Chaos Daemons card, page 124, and Core Rules 09.06 and 11.02.",
+      "unchanged_work": "No changes to the algorithms for path search, endpoints, model collision, distance, LOS, or the existing MOBILE/FLY permissions. Run exact matched measurements on the touched geometry and eligibility owners."
     },
     "tests/factions/chaos_daemons/integration/test_blood_begets_skulls.py": {
       "category": "rule_semantics",
@@ -944,9 +1333,9 @@
         "gore-hungry-onslaught-native-validation"
       ],
       "selected_families": [],
-      "rationale": "Retain and validate predecessor admission, and add native Movement/Charge, negative controls and exact deterministic replay.",
-      "source_obligation": "Official June and July Chaos Daemons faction packs, page 124. Verify own Movement/Charge, 1 CP, both keywords, terrain-only transit and phase-end expiry.",
-      "unchanged_work": "Native path search, terrain geometry, endpoint/collision checks, Charge flight, CP and effect ledgers and replay validation retain existing authorities. Only the scoped phase-choice and source-backed effect admission change."
+      "rationale": "Use native settled Advance and Charge continuations, scoped terrain crossing, and canonical attached-unit options.",
+      "source_obligation": "Retained June and July Chaos Daemons card, page 124, and Core Rules 09.06 and 11.02.",
+      "unchanged_work": "No changes to the algorithms for path search, endpoints, model collision, distance, LOS, or the existing MOBILE/FLY permissions. Run exact matched measurements on the touched geometry and eligibility owners."
     },
     "tests/factions/chaos_daemons/integration/test_gore_hungry_onslaught.py": {
       "category": "rule_semantics",
@@ -954,9 +1343,9 @@
         "gore-hungry-onslaught-native-validation"
       ],
       "selected_families": [],
-      "rationale": "Retain and validate predecessor admission, and add native Movement/Charge, negative controls and exact deterministic replay.",
-      "source_obligation": "Official June and July Chaos Daemons faction packs, page 124. Verify own Movement/Charge, 1 CP, both keywords, terrain-only transit and phase-end expiry.",
-      "unchanged_work": "Native path search, terrain geometry, endpoint/collision checks, Charge flight, CP and effect ledgers and replay validation retain existing authorities. Only the scoped phase-choice and source-backed effect admission change."
+      "rationale": "Use native settled Advance and Charge continuations, scoped terrain crossing, and canonical attached-unit options.",
+      "source_obligation": "Retained June and July Chaos Daemons card, page 124, and Core Rules 09.06 and 11.02.",
+      "unchanged_work": "No changes to the algorithms for path search, endpoints, model collision, distance, LOS, or the existing MOBILE/FLY permissions. Run exact matched measurements on the touched geometry and eligibility owners."
     },
     "tests/factions/chaos_daemons/integration/test_skulls_beget_blood.py": {
       "category": "rule_semantics",
@@ -965,9 +1354,9 @@
         "gore-hungry-onslaught-native-validation"
       ],
       "selected_families": [],
-      "rationale": "Retain and validate predecessor admission, and add native Movement/Charge, negative controls and exact deterministic replay.",
-      "source_obligation": "Official June and July Chaos Daemons faction packs, page 124. Verify own Movement/Charge, 1 CP, both keywords, terrain-only transit and phase-end expiry.",
-      "unchanged_work": "Native path search, terrain geometry, endpoint/collision checks, Charge flight, CP and effect ledgers and replay validation retain existing authorities. Only the scoped phase-choice and source-backed effect admission change."
+      "rationale": "Use native settled Advance and Charge continuations, scoped terrain crossing, and canonical attached-unit options.",
+      "source_obligation": "Retained June and July Chaos Daemons card, page 124, and Core Rules 09.06 and 11.02.",
+      "unchanged_work": "No changes to the algorithms for path search, endpoints, model collision, distance, LOS, or the existing MOBILE/FLY permissions. Run exact matched measurements on the touched geometry and eligibility owners."
     },
     "tests/infrastructure/source_governance/unit/test_blocked_row_classification.py": {
       "category": "rule_semantics",
@@ -975,12 +1364,16 @@
         "gore-hungry-onslaught-native-validation"
       ],
       "selected_families": [],
-      "rationale": "Retain and validate predecessor admission, and add native Movement/Charge, negative controls and exact deterministic replay.",
-      "source_obligation": "Official June and July Chaos Daemons faction packs, page 124. Verify own Movement/Charge, 1 CP, both keywords, terrain-only transit and phase-end expiry.",
-      "unchanged_work": "Native path search, terrain geometry, endpoint/collision checks, Charge flight, CP and effect ledgers and replay validation retain existing authorities. Only the scoped phase-choice and source-backed effect admission change."
+      "rationale": "Use native settled Advance and Charge continuations, scoped terrain crossing, and canonical attached-unit options.",
+      "source_obligation": "Retained June and July Chaos Daemons card, page 124, and Core Rules 09.06 and 11.02.",
+      "unchanged_work": "No changes to the algorithms for path search, endpoints, model collision, distance, LOS, or the existing MOBILE/FLY permissions. Run exact matched measurements on the touched geometry and eligibility owners."
     }
   },
   "milestone": "ordinary",
-  "comparisons": {},
+  "comparisons": {
+    "visibility": "docs/performance/current/gore-hungry-onslaught-review-20261125-visibility.json",
+    "movement": "docs/performance/current/gore-hungry-onslaught-review-20261125-movement.json",
+    "setup": "docs/performance/current/gore-hungry-onslaught-review-20261125-setup.json"
+  },
   "full_game": null
 }
