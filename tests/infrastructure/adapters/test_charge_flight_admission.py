@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import replace
 from itertools import product
 from math import isclose
@@ -12,17 +13,23 @@ from tests.charge_distance_helpers import add_modifier
 from tests.phase15c_fight_order_helpers import fight_config, fight_lifecycle
 from warhammer40k_core.adapters.access_control import ViewerContext
 from warhammer40k_core.adapters.local_session import LocalGameSession
+from warhammer40k_core.ai import charge_flight_admission
 from warhammer40k_core.ai.charge_flight_admission import (
     ChargeFlightOffer,
     ChargeFlightUnresolved,
     ChargeFlightUnresolvedReason,
     ProvenChargeFlightChoice,
+    ProvenChargeFlightNoSuccess,
     choose_proven_charge_flight_mode,
     inspect_charge_flight_offer,
 )
 from warhammer40k_core.ai.player_policy import PlayerDecisionContext
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.engine.charge_declaration import ChargeRollRequest
+from warhammer40k_core.engine.charge_move_resolution import (
+    ChargeMoveResolution,
+    resolve_charge_move,
+)
 from warhammer40k_core.engine.phase import BattlePhase
 from warhammer40k_core.engine.replay import ReplayRunner
 from warhammer40k_core.geometry.pathing import PathWitness
@@ -37,7 +44,9 @@ MOVER = "army-alpha:mover"
 TARGET = "army-beta:target"
 
 
-def _fixture(private_seed: int, *, target_x: float = 18) -> LocalGameSession:
+def _fixture(
+    private_seed: int, *, target_x: float = 18, declaration_range: float | None = None
+) -> LocalGameSession:
     game_id = "pre-roll-charge-flight"
     package = chaos_daemons_cavalcade_2026_11.catalog_package()
     config = fight_config(
@@ -53,13 +62,19 @@ def _fixture(private_seed: int, *, target_x: float = 18) -> LocalGameSession:
         enemy_detachment_ids=("cavalcade-of-chaos", "shadow-legion"),
         catalog=package.army_catalog,
     )
-    config = replace(
-        config,
-        private_rng_seed=f"{private_seed:064x}",
-        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2026_27(
-            descriptor_version="pre-roll-charge-flight-fixture",
-        ),
+    descriptor = RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2026_27(
+        descriptor_version="pre-roll-charge-flight-fixture",
     )
+    if declaration_range is not None:
+        # Synthetic range permits an offered target beyond all attainable 2D6 budgets.
+        descriptor = replace(
+            descriptor,
+            descriptor_hash="",
+            charge_policy=replace(
+                descriptor.charge_policy, max_declaration_range_inches=declaration_range
+            ),
+        )
+    config = replace(config, private_rng_seed=f"{private_seed:064x}", ruleset_descriptor=descriptor)
     lifecycle, _ = fight_lifecycle(
         game_id=game_id,
         alpha_unit_ids=("mover",),
@@ -85,7 +100,9 @@ def _admit(context: PlayerDecisionContext) -> ChargeFlightOffer:
     return result.offer
 
 
-def test_charge_flight_admits_native_offer_without_claiming_a_minimum() -> None:
+def test_charge_flight_admits_native_offer_without_claiming_a_minimum(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     session = _fixture(2)
     counterpart = _fixture(3)
     context = _context(session)
@@ -276,6 +293,61 @@ def test_charge_flight_admits_native_offer_without_claiming_a_minimum() -> None:
     ).run()
     assert replay.reproduced_exactly, replay.to_payload()
     assert session.to_persistence_payload() == original
+
+    _assert_zero_roll_proofs(monkeypatch)
+
+
+def _assert_zero_roll_proofs(monkeypatch: pytest.MonkeyPatch) -> None:
+    far = _fixture(2, target_x=25)
+    context = _context(far)
+    offer = _admit(context)
+    start = Pose.at(10, 20)
+    witness = PathWitness.for_paths(
+        ((offer.model_id, (start, Pose.at(10 + offer.target_filter_distance_inches, 20))),)
+    )
+    handler = far.lifecycle._charge_phase_handler  # pyright: ignore[reportPrivateUsage]
+    expected = handler.ability_index_for_player(ACTOR)
+    native_resolver: Callable[..., ChargeMoveResolution] = resolve_charge_move
+    probes: list[tuple[object, object]] = []
+
+    def resolver_spy(*args: object, **kwargs: object) -> ChargeMoveResolution:
+        assert kwargs.get("ability_index") is expected
+        probes.append((kwargs["maximum_distance_inches"], kwargs["take_to_the_skies"]))
+        return native_resolver(*args, **kwargs)
+
+    with monkeypatch.context() as patch:
+        patch.setattr(charge_flight_admission, "resolve_charge_move", resolver_spy)
+        proof = choose_proven_charge_flight_mode(
+            far, context, unit_id=MOVER, target_id=TARGET, witness=witness
+        )
+        assert probes == [(11.0, False), (12.0, False)]
+        assert isinstance(proof, ProvenChargeFlightChoice), proof
+        assert proof.action == context.select_option(offer.ground_option_id)
+        assert (proof.ground.minimum_roll, proof.ground.successful_outcomes) == (11, 3)
+        assert proof.flight.successful_rolls == ()
+        assert (proof.flight.minimum_roll, proof.flight.successful_outcomes) == (None, 0)
+        wrong = PathWitness.for_paths(((offer.model_id, (start, Pose.at(9, 20))),))
+        unresolved = choose_proven_charge_flight_mode(
+            far, context, unit_id=MOVER, target_id=TARGET, witness=wrong
+        )
+        assert isinstance(unresolved, ChargeFlightUnresolved)
+        assert unresolved.reason is ChargeFlightUnresolvedReason.MINIMUM_ROLL_UNPROVEN
+        assert probes == [(11.0, False), (12.0, False), (11.0, False)]
+
+        neither = _fixture(2, target_x=27, declaration_range=13)
+        neither_context = _context(neither)
+        neither_offer = _admit(neither_context)
+        assert 12 < neither_offer.target_filter_distance_inches < 13
+        probes.clear()
+        no_success = choose_proven_charge_flight_mode(
+            neither, neither_context, unit_id=MOVER, target_id=TARGET, witness=witness
+        )
+        assert probes == []
+        assert isinstance(no_success, ProvenChargeFlightNoSuccess), no_success
+        assert no_success.action is None
+        assert no_success.ground == no_success.flight
+        assert no_success.ground.successful_rolls == ()
+        assert (no_success.ground.minimum_roll, no_success.ground.successful_outcomes) == (None, 0)
 
 
 @pytest.mark.parametrize(

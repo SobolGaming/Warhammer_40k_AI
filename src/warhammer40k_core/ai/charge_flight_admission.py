@@ -40,6 +40,7 @@ from warhammer40k_core.geometry.pose import Pose
 if TYPE_CHECKING:
     from warhammer40k_core.adapters.local_session import LocalGameSession
     from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
+    from warhammer40k_core.engine.abilities import AbilityCatalogIndex
     from warhammer40k_core.engine.battlefield_state import BattlefieldScenario
     from warhammer40k_core.engine.game_state import GameState
     from warhammer40k_core.engine.phases.charge import ChargePhaseHandler
@@ -226,8 +227,8 @@ class ChargeFlightModeProof:
     successful_outcomes: int
 
     @property
-    def minimum_roll(self) -> int:
-        return self.successful_rolls[0]
+    def minimum_roll(self) -> int | None:
+        return self.successful_rolls[0] if self.successful_rolls else None
 
 
 @dataclass(frozen=True, slots=True)
@@ -239,6 +240,16 @@ class ProvenChargeFlightChoice:
     action: PolicyAction
 
 
+@dataclass(frozen=True, slots=True)
+class ProvenChargeFlightNoSuccess:
+    """Both modes are ruled out for this target; do not declare a charge."""
+
+    offer: ChargeFlightOffer
+    ground: ChargeFlightModeProof
+    flight: ChargeFlightModeProof
+    action: None = None
+
+
 def choose_proven_charge_flight_mode(
     session: LocalGameSession,
     context: PlayerDecisionContext,
@@ -246,7 +257,7 @@ def choose_proven_charge_flight_mode(
     unit_id: str,
     target_id: str,
     witness: PathWitness,
-) -> ProvenChargeFlightChoice | ChargeFlightUnresolved:
+) -> ProvenChargeFlightChoice | ProvenChargeFlightNoSuccess | ChargeFlightUnresolved:
     """Choose an issued declaration only with a proof from this live request.
 
     Trusted, read-only qualification; there are no speculative submissions, forks,
@@ -291,7 +302,8 @@ def choose_proven_charge_flight_mode(
     # Use the actual active Charge handler, not a reconstructed/default registry.
     handler = lifecycle._charge_phase_handler  # pyright: ignore[reportPrivateUsage]
     scenario = _open_native_scenario(state, poses)
-    if scenario is None or not _plain_charge_supported(state, handler, offer, actor):
+    abilities = handler.ability_index_for_player(actor)
+    if scenario is None or not _plain_charge_supported(state, handler, offer, actor, abilities):
         return ChargeFlightUnresolved(ChargeFlightUnresolvedReason.UNSUPPORTED_PROOF_CONTEXT)
     # The Charge handler supplies route semantics; the live state's ruleset
     # separately owns the movement-budget penalty, just as in native Charge.
@@ -333,8 +345,8 @@ def choose_proven_charge_flight_mode(
         dice.total(faces) for faces in product(range(1, dice.sides + 1), repeat=dice.quantity)
     )
 
-    ground = _prove_mode(scenario, ruleset, offer, witness, counts, flies=False)
-    flight = _prove_mode(scenario, ruleset, offer, witness, counts, flies=True)
+    ground = _prove_mode(scenario, ruleset, offer, witness, counts, abilities, flies=False)
+    flight = _prove_mode(scenario, ruleset, offer, witness, counts, abilities, flies=True)
     if ground is None or flight is None:
         return result
     if (
@@ -342,7 +354,9 @@ def choose_proven_charge_flight_mode(
         or payload_digest(session.view_for_context(viewer=viewer)) != offer.observation_hash
     ):
         return ChargeFlightUnresolved(ChargeFlightUnresolvedReason.OBSERVATION_DRIFT)
-    # Use the exact ordered 2D6 outcome counts and prefer ground on a proven tie.
+    if not ground.successful_rolls and not flight.successful_rolls:
+        return ProvenChargeFlightNoSuccess(offer, ground, flight)
+    # Use the exact ordered 2D6 outcome counts and prefer ground on a proven nonzero tie.
     option_id = (
         offer.flight_option_id
         if flight.successful_outcomes > ground.successful_outcomes
@@ -417,7 +431,11 @@ def _open_native_scenario(state: GameState, poses: dict[str, Pose]) -> Battlefie
 
 
 def _plain_charge_supported(
-    state: GameState, handler: ChargePhaseHandler, offer: ChargeFlightOffer, actor: str
+    state: GameState,
+    handler: ChargePhaseHandler,
+    offer: ChargeFlightOffer,
+    actor: str,
+    abilities: AbilityCatalogIndex,
 ) -> bool:
     phase = state.charge_phase_state
     registry = handler.runtime_modifier_registry
@@ -442,7 +460,6 @@ def _plain_charge_supported(
         for row in index.all_records()
     ):
         return False
-    abilities = handler.ability_index_for_player(actor)
     mover = rules_unit_view_by_id(state=state, unit_instance_id=offer.unit_id)
     return (
         not charge_roll_modifiers_for_unit(
@@ -471,6 +488,7 @@ def _prove_mode(
     offer: ChargeFlightOffer,
     witness: PathWitness,
     counts: Counter[int],
+    abilities: AbilityCatalogIndex,
     *,
     flies: bool,
 ) -> ChargeFlightModeProof | None:
@@ -493,6 +511,7 @@ def _prove_mode(
             maximum_distance_inches=budget,
             take_to_the_skies=flies,
             path_witness=witness,
+            ability_index=abilities,
         )
         if (
             charge_move_violation_code(
@@ -502,6 +521,5 @@ def _prove_mode(
         ):
             return None
         successes.append(raw_roll)
-    if not successes:
-        return None
+    # An empty set is a proof only if every budget was excluded by the target filter.
     return ChargeFlightModeProof(tuple(successes), sum(counts[roll] for roll in successes))

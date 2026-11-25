@@ -1,7 +1,7 @@
 {
   "policy": "rules-engine-performance-v3",
   "base": "bdc1b2111530576a71bf3391564d5a9e9c356be0",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:e9f1e4a143f03d7051c24af923d4b65b0ff2764520bc5dc786fe2b640331c1e9",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:9d0e97747b4a261a53ddbd60172e2bc6789da40518fec0e7e7c087f861b7373c",
   "operation_map_sha256": "6cda06f0e704a218edecc6187497338bde6bdcb6d43ec5b7251647f1ac527380",
   "changes": {
     "ci/test_shards/durations.json": {
@@ -116,101 +116,101 @@
     },
     "contracts/examples/persistence/session-persistence.json": {
       "before_sha256": "3a4a1cc70cd9cb890a8c90953fc66559ff741b0bca9021d9afd894130be21f6d",
-      "after_sha256": "56d212b7943708185ffd4a5a030051be13682cd20a93be61026eefb6529f68e9",
+      "after_sha256": "cb90491ec27574cc99674c0fb3951acf5af7e5e36560a84d5a89981c8f99ae98",
       "owners": {
         "@document": {
           "before": "3a4a1cc70cd9cb890a8c90953fc66559ff741b0bca9021d9afd894130be21f6d",
-          "after": "56d212b7943708185ffd4a5a030051be13682cd20a93be61026eefb6529f68e9"
+          "after": "cb90491ec27574cc99674c0fb3951acf5af7e5e36560a84d5a89981c8f99ae98"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "before_sha256": "4770ccb1c68b0a28cf26770c83d5f510c3bf8b100f8d2e39a59c9dd68d72fe26",
-      "after_sha256": "18ee2c78932b2489a3ff629347c1e2801a1944a30b896fc80a859d0c6ad8d8eb",
+      "after_sha256": "03288229630eb4c9d3c3b4c2244937e369683a5083093e32571c190cf13d0bb4",
       "owners": {
         "@document": {
           "before": "4770ccb1c68b0a28cf26770c83d5f510c3bf8b100f8d2e39a59c9dd68d72fe26",
-          "after": "18ee2c78932b2489a3ff629347c1e2801a1944a30b896fc80a859d0c6ad8d8eb"
+          "after": "03288229630eb4c9d3c3b4c2244937e369683a5083093e32571c190cf13d0bb4"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
       "before_sha256": "63e40ce84e34176566aad06e2cc2f3d27e256de66de61e4b1ae3d9ab256e1fb7",
-      "after_sha256": "c3a7f7e0c1034e39dbe48e8589f9c897b843b9bb8e132b829fc926295adc306c",
+      "after_sha256": "7c06d3dfcd765247362856ff86c9bb0bdd503397dcdcb2a4da6ac9b30f1b19d7",
       "owners": {
         "@document": {
           "before": "63e40ce84e34176566aad06e2cc2f3d27e256de66de61e4b1ae3d9ab256e1fb7",
-          "after": "c3a7f7e0c1034e39dbe48e8589f9c897b843b9bb8e132b829fc926295adc306c"
+          "after": "7c06d3dfcd765247362856ff86c9bb0bdd503397dcdcb2a4da6ac9b30f1b19d7"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "before_sha256": "3d3776d88763d6afca93ce4c4d4a7372bf40fdabcb6ccf1f100d70e7434542f3",
-      "after_sha256": "df2aa03ab273d0f1f44bc313cf394efc7fed9b173d2e2dfd01eeabe84f0ae75b",
+      "after_sha256": "026b0c5e139edb4e3381fbc15ef05eb48af00e6670ee30fc41f59d42e3b18946",
       "owners": {
         "@document": {
           "before": "3d3776d88763d6afca93ce4c4d4a7372bf40fdabcb6ccf1f100d70e7434542f3",
-          "after": "df2aa03ab273d0f1f44bc313cf394efc7fed9b173d2e2dfd01eeabe84f0ae75b"
+          "after": "026b0c5e139edb4e3381fbc15ef05eb48af00e6670ee30fc41f59d42e3b18946"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "before_sha256": "14874dbe1f2cdd7e59547a3fe712067aacc5b69f608082ed8f79323c1b10c4fd",
-      "after_sha256": "7e200e56c0e520c6ea540edf7cf7ff3742f6348b8850d6c88e4be90b0a179790",
+      "after_sha256": "aa0fc46ed42cee18cd9c7f99e86e697dbbf5cc09dbc76104732f6a37b240db0b",
       "owners": {
         "@document": {
           "before": "14874dbe1f2cdd7e59547a3fe712067aacc5b69f608082ed8f79323c1b10c4fd",
-          "after": "7e200e56c0e520c6ea540edf7cf7ff3742f6348b8850d6c88e4be90b0a179790"
+          "after": "aa0fc46ed42cee18cd9c7f99e86e697dbbf5cc09dbc76104732f6a37b240db0b"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "before_sha256": "271571db37ab94d0cfac66c3a7d4b6c0db2b5903bc82339b3c3b6e7ce5032a85",
-      "after_sha256": "dc3388e35af4d3fea574c85aff85bf0c4a8e7ab3d5f9df89ea8610d596ec21a7",
+      "after_sha256": "47bbe400f76f892a4f8f39036d8804ec148de361c9da3a6221ddba65e08e7086",
       "owners": {
         "@document": {
           "before": "271571db37ab94d0cfac66c3a7d4b6c0db2b5903bc82339b3c3b6e7ce5032a85",
-          "after": "dc3388e35af4d3fea574c85aff85bf0c4a8e7ab3d5f9df89ea8610d596ec21a7"
+          "after": "47bbe400f76f892a4f8f39036d8804ec148de361c9da3a6221ddba65e08e7086"
         }
       }
     },
     "contracts/examples/support-profile.json": {
       "before_sha256": "fd85ada1bbc9a1688454a4822d489b3de58a88e651b65f482ab08625b5e7299f",
-      "after_sha256": "1bc9faec2796a6439087fc34221da8c6f8c1dc268f2e2c36d07fe82ff476bab0",
+      "after_sha256": "8f6625fbc5d8037921fd3c75461e6fea4792d345208857c8622b0ec4489246bc",
       "owners": {
         "@document": {
           "before": "fd85ada1bbc9a1688454a4822d489b3de58a88e651b65f482ab08625b5e7299f",
-          "after": "1bc9faec2796a6439087fc34221da8c6f8c1dc268f2e2c36d07fe82ff476bab0"
+          "after": "8f6625fbc5d8037921fd3c75461e6fea4792d345208857c8622b0ec4489246bc"
         }
       }
     },
     "contracts/manifest.json": {
       "before_sha256": "aff798c2d921a77c62371e674710ae4a7ba5443771923fbcec3da44ad9c27430",
-      "after_sha256": "d54b3ace91a7f40cd4670022203383770c6728c38a5b8a397b6ffc39b698e94d",
+      "after_sha256": "f24545dde5761e22bb22338b2d9acca93eacc47c72e464b3ff12e2d6abc73910",
       "owners": {
         "@document": {
           "before": "aff798c2d921a77c62371e674710ae4a7ba5443771923fbcec3da44ad9c27430",
-          "after": "d54b3ace91a7f40cd4670022203383770c6728c38a5b8a397b6ffc39b698e94d"
+          "after": "f24545dde5761e22bb22338b2d9acca93eacc47c72e464b3ff12e2d6abc73910"
         }
       }
     },
     "data/source_audits/ci64_provenance_v1/pre-roll-charge-flight-test-v1.json": {
       "before_sha256": null,
-      "after_sha256": "23111ca84b3c404c108de2a966a376ab484551416445a62d85765120aee0079a",
+      "after_sha256": "1b86bf2c539f05b27b034d168f5793ff4efecf66ffc0d3ef55a8fd86608d7b6d",
       "owners": {
         "@document": {
           "before": null,
-          "after": "23111ca84b3c404c108de2a966a376ab484551416445a62d85765120aee0079a"
+          "after": "1b86bf2c539f05b27b034d168f5793ff4efecf66ffc0d3ef55a8fd86608d7b6d"
         }
       }
     },
     "docs/AI_POLICY_INTERFACE.md": {
       "before_sha256": "5fdb6ebf75a4c0b3957d0077fa47255593ca6ea669b60388d3d3dc78522b2dda",
-      "after_sha256": "872208cdb6f13d2c387ace5f193025170dfe8a30f9c5f997786c7024f8fd0d47",
+      "after_sha256": "38e6b0f614fdb4e6741ad0178254223051213212907e4858a2c3d556044cabb2",
       "owners": {
         "@document": {
           "before": "5fdb6ebf75a4c0b3957d0077fa47255593ca6ea669b60388d3d3dc78522b2dda",
-          "after": "872208cdb6f13d2c387ace5f193025170dfe8a30f9c5f997786c7024f8fd0d47"
+          "after": "38e6b0f614fdb4e6741ad0178254223051213212907e4858a2c3d556044cabb2"
         }
       }
     },
@@ -226,11 +226,11 @@
     },
     "scripts/engine_numerical_identity_test_admission.py": {
       "before_sha256": "8c3fa9db10e7d22d0ca4b78fb1af044da0f5f2bee25e56b818d7383518cb206e",
-      "after_sha256": "747c9f08232281e66c5565151d63ecbc4906a12f6fa036b37438fc6e9ab500aa",
+      "after_sha256": "a0f7ba1d88cd944f2db61bddd4a5cc781ec4deba72425703596d17db6d849b6d",
       "owners": {
         "_pre_roll_charge_flight_test_addition": {
           "before": null,
-          "after": "04a94423184249a1a2fb42322a7004d532eca45a1d09451ce52f4453a0517aee"
+          "after": "710d7eb91d119d68ba789e1924e398cfa1af97e8b281212a183fa73dd4440144"
         },
         "exact_movement_test_transition": {
           "before": "e4cd56ac02061239b9bf12eb46047e9ddfb48f434a4917ed1e6275135b7a856b",
@@ -240,21 +240,21 @@
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "before_sha256": "297cce37b7227cb91dd359e190a8f919a29df1f8bb360cdca9abc02b0f7ad895",
-      "after_sha256": "cf0aabac8ae69801834b1c40e8bffe33c8561613144e619d390f15b2ed8c1c3f",
+      "after_sha256": "3e092bd2cae133d65eccfb578f89501d5c6a75cbf7cce1d43e5adb025404a217",
       "owners": {
         "@document": {
           "before": "297cce37b7227cb91dd359e190a8f919a29df1f8bb360cdca9abc02b0f7ad895",
-          "after": "cf0aabac8ae69801834b1c40e8bffe33c8561613144e619d390f15b2ed8c1c3f"
+          "after": "3e092bd2cae133d65eccfb578f89501d5c6a75cbf7cce1d43e5adb025404a217"
         }
       }
     },
     "src/warhammer40k_core/ai/charge_flight_admission.py": {
       "before_sha256": null,
-      "after_sha256": "9b2d3f09ca323d2c2f7cd5025ce3ae43e9dc1eced3dacb792d1f55266b1931d1",
+      "after_sha256": "37b0a0f6325536b7b3ece1ac66e367f80336a52754aff7e86b07ff78f6d24a85",
       "owners": {
         "@module": {
           "before": null,
-          "after": "1c8fe4222b8c575ed9722a0db11ada83aec5cc47ebf6f29982b37f4e267cd6f7"
+          "after": "03f96b5d149d41b90d53d0cbb1da8620b5c447b099c3d6f6ca145a8ed6d17e8e"
         },
         "ChargeFlightModeProof": {
           "before": null,
@@ -262,7 +262,7 @@
         },
         "ChargeFlightModeProof.minimum_roll": {
           "before": null,
-          "after": "0f1ee3b9e9aedad444c21c75558e4dfbeaf678feaca9aa2981857874fd57bfa6"
+          "after": "d3062559426937a31266c1c0ea4945ef7fa412c57fde5933813468a41b821a34"
         },
         "ChargeFlightOffer": {
           "before": null,
@@ -280,6 +280,10 @@
           "before": null,
           "after": "7597308649f401144f9f9c45bd66f65440fe2d58b61d297507b1f55675911c5f"
         },
+        "ProvenChargeFlightNoSuccess": {
+          "before": null,
+          "after": "b4e8646b5094cf08a1d30aab9ae60d9d9b791cf340c079b5f35648d1bfb24a36"
+        },
         "_nonnegative_inches": {
           "before": null,
           "after": "4ea25633906ae7936fa028509185df504811526c9d003ee46f7e05c1d87df529"
@@ -294,11 +298,11 @@
         },
         "_plain_charge_supported": {
           "before": null,
-          "after": "8d4edc1af6e7b7398939c99b7ae8819e7fe620e5fb6fbd690794cbcb1edca092"
+          "after": "b554b9ca7aab80bbc5a487b3ba413c81cb07518d8b579742962534b8e0303407"
         },
         "_prove_mode": {
           "before": null,
-          "after": "7d84be824d8fcbcb080e663dbc395e20295f24b2dc7d703499e1fd66ebf4c0d1"
+          "after": "65d07fd0754d6e1c5bc6210ad1f7171e55b41e86457e6819acd566a6c3463904"
         },
         "_target_filter_distance": {
           "before": null,
@@ -306,7 +310,7 @@
         },
         "choose_proven_charge_flight_mode": {
           "before": null,
-          "after": "e22e575315ef2ac9ee4f6a0241c5b66e9072229b4fc07ec0668fa29129a9f45d"
+          "after": "da6c917cab832e986833e10136dd771c4dbb77baacfcabe6b613fb818ad7a93e"
         },
         "inspect_charge_flight_offer": {
           "before": null,
@@ -326,15 +330,19 @@
     },
     "tests/infrastructure/adapters/test_charge_flight_admission.py": {
       "before_sha256": null,
-      "after_sha256": "b071eb3a1b9dd93285bc169d6d40ccd1434ed06227718b08c620090abd0040ae",
+      "after_sha256": "5263cd4deed24ee99ea713a83b47f7fad5948df2b5c18ef4485324d3c474c58a",
       "owners": {
         "@module": {
           "before": null,
-          "after": "6099a5dcfd1a3dfd996902bf5f8b5c7a800031c22236b77e17265d14d564995b"
+          "after": "69c720d7fb5f298318e6eecebd1e2910da86006c534238404cf01f4f9af339ce"
         },
         "_admit": {
           "before": null,
           "after": "1705436d5cba7b8b856274ba4ca217ba2c5c0f7ec00d9b59a985aba4ac44c8f6"
+        },
+        "_assert_zero_roll_proofs": {
+          "before": null,
+          "after": "bd4574cc486bd5a5a32543b297cec5a04a027ad6e391ab9feffe2a919ccca6a1"
         },
         "_context": {
           "before": null,
@@ -342,11 +350,11 @@
         },
         "_fixture": {
           "before": null,
-          "after": "d4cc4e87d2d3f4a270415e641b25b3656ac4870ed46dc4d0aea24caaf49fc694"
+          "after": "88f80b8ea5ecf0f2893d0457552dc79dc30453beae6a274a90d8d8c084249f26"
         },
         "test_charge_flight_admits_native_offer_without_claiming_a_minimum": {
           "before": null,
-          "after": "a464ad3e53437c8a7f45bb6412faaba270d9f7724b0122d354b0bdd458eaa621"
+          "after": "34574ff72928c84da58bf47f677ed1d5e175fbc0d0ee5648b58c229f842d7d67"
         },
         "test_unmodified_charge_probability_synthetic_controls": {
           "before": null,

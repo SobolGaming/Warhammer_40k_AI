@@ -3,16 +3,16 @@
   "base": "bdc1b2111530576a71bf3391564d5a9e9c356be0",
   "retained_transition_sha256": "47ee27bbd227b22ae4f64bf6c148eb8944439e2a2245efc123451d0ea1e968bf",
   "retained_runtime_fingerprint": "5d31931e184f18ab678daeccb3dfb6cb8612974f5fabc1c5de33dcfc5519608a",
-  "runtime_fingerprint": "e9f1e4a143f03d7051c24af923d4b65b0ff2764520bc5dc786fe2b640331c1e9",
+  "runtime_fingerprint": "9d0e97747b4a261a53ddbd60172e2bc6789da40518fec0e7e7c087f861b7373c",
   "sources": {
-    "src/warhammer40k_core/ai/charge_flight_admission.py": "9b2d3f09ca323d2c2f7cd5025ce3ae43e9dc1eced3dacb792d1f55266b1931d1"
+    "src/warhammer40k_core/ai/charge_flight_admission.py": "37b0a0f6325536b7b3ece1ac66e367f80336a52754aff7e86b07ff78f6d24a85"
   },
   "added_files": {
     "tests/infrastructure/adapters/test_charge_flight_admission.py": {
       "mode": "100644",
-      "blob_sha1": "7f5d0d8a26b76ee226af03ad5e3f4c23c48a2b02",
-      "sha256": "b071eb3a1b9dd93285bc169d6d40ccd1434ed06227718b08c620090abd0040ae",
-      "bytes": 13532
+      "blob_sha1": "6d8d0d13a98f0bf5d1c2ff07145f4818a9828dcd",
+      "sha256": "5263cd4deed24ee99ea713a83b47f7fad5948df2b5c18ef4485324d3c474c58a",
+      "bytes": 17007
     }
   }
 }

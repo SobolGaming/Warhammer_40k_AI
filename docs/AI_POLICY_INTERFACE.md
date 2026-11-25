@@ -3220,17 +3220,21 @@ For every remaining budget, the ordinary Charge resolver must accept the fixed
 witness to that target. An invalid witness cannot rule out another path; such
 a result leaves the entire comparison unresolved. This finite check does not
 assume that a witness accepted at one budget remains legal at higher budgets.
+The proof uses the ordinary movement proposal's live ability index. If the
+target filter excludes every budget for a mode, that mode has zero successful
+outcomes and no minimum. If both modes are proven zero, no action is returned.
 
 The caller submits the returned option through the ordinary viewer route. The
 policy chooses neither the target nor the path; the supplied witness is proof
 only. Qualification takes no roll, reads no seed or private checkpoint, and
 does not submit actions or open post-roll requests. Requalify on the session
 that will submit the choice. The selection uses the greater count of successful
-ordered outcomes, preferring ground on a proven tie.
+ordered outcomes, preferring ground on a proven nonzero tie.
 
 The native open-board test has a target-filter distance of about 3.276 inches,
 giving ground 4+ (33/36) and flight 6+ (26/36) at the issued 2-inch penalty. A
-different target position gives 5+ (30/36) and 7+ (21/36). The original same-prefix
+different target position gives 5+ (30/36) and 7+ (21/36); placing the target at
+x=25 gives ground 11+ (3/36) and flight zero with no minimum. The original same-prefix
 ground and flight submissions and the actual policy-selected ground submission
 all replay exactly. Their realized rolls do not enter the pre-roll comparison.
 With an assumed 2-inch penalty and stipulated exact costs, separate synthetic
