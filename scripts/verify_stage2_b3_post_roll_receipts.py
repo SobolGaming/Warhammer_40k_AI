@@ -66,10 +66,16 @@ def verify(root: Path, fixture: dict[str, Any]) -> None:
         if not name.endswith("-views.json"):
             packet[name] = json.loads(raw)
 
+    generated = packet[f"{GENERATED}/result.json"]
+    campaign = fixture["generated_campaign"]
+    require(
+        campaign["qualifying_landed_pair"] == generated["qualifying_pair"] is None,
+        "Qualifying generated landed pair differs from the authenticated source.",
+    )
+
     comparison = fixture["comparison"]
     closeout = packet[f"{CLOSEOUT}/result.json"]
     protocol = closeout["protocol"]
-    generated = packet[f"{GENERATED}/result.json"]
     fork = packet[f"{CLOSEOUT}/fork-checkpoint.json"]
     anchor = packet[f"{AUTHORED}/common-checkpoint.json"]
     (pending,) = decisions(fork)["queue"]["pending_requests"]
@@ -109,7 +115,6 @@ def verify(root: Path, fixture: dict[str, Any]) -> None:
         "The finite take does not join the generated Charge anchor.",
     )
 
-    campaign = fixture["generated_campaign"]
     control = closeout["take_targets_generated_charge"]
     candidate = generated["trials"]["active"][0]
     proposal = packet[f"{GENERATED}/proposals.json"][0]
@@ -117,7 +122,6 @@ def verify(root: Path, fixture: dict[str, Any]) -> None:
         generated["generator"] == campaign["generator"]
         and generated["counts"] == campaign["counts"]
         and generated["candidate_inventory_sha256"] == campaign["candidate_inventory_sha256"]
-        and generated["qualifying_pair"] is None
         and candidate["id"] == proposal["id"] == control["id"] == campaign["candidate_id"]
         and candidate["index"] == proposal["index"] == campaign["candidate_index"]
         and candidate["charge"] == "accepted"

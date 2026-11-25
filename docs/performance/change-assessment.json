@@ -46,11 +46,15 @@
     },
     "scripts/tests/test_verify_stage2_b3_post_roll_receipts.py": {
       "before_sha256": null,
-      "after_sha256": "559f0fb18546a8eaa313cc9b68de6b04dec300edd7f254136d7d62d47c305061",
+      "after_sha256": "80e6b7cfb3253969014c2736aa5541161756e1aae04630cffd55fc6b625bf205",
       "owners": {
         "@module": {
           "before": null,
-          "after": "7b54455246c78d45f508e1f86e112e5db6d318ff5530f5ca380d0945dfa5ced0"
+          "after": "04f51be0af2522b618687fe3dd3f677b38a9e4bfae9708af018fc2b1e3d6a24b"
+        },
+        "test_rejects_fabricated_generated_authored_pair_without_summary": {
+          "before": null,
+          "after": "92001f5fc19bdecfb3ffe84d25e42cb81ed72a96ffc70c92855e60313d1df199"
         },
         "test_rejects_unverified_archive_without_summary": {
           "before": null,
@@ -60,7 +64,7 @@
     },
     "scripts/verify_stage2_b3_post_roll_receipts.py": {
       "before_sha256": null,
-      "after_sha256": "b1cd4fbdc6409ed3de808b6050327b008596d12160b142004422cd5d50c54c3c",
+      "after_sha256": "4f1fe4a4f78aa186e8d3736bdbf07f8369150eee629687271a0835dc5ee216fa",
       "owners": {
         "@module": {
           "before": null,
@@ -84,7 +88,7 @@
         },
         "verify": {
           "before": null,
-          "after": "eda6253ca8296b7e1410b93805fe36a46d2fd06c85a12e5ec229da07e11ff3b3"
+          "after": "4d98468ea56ee797d0828d2e211e96487a5160e3c945a18a08b5da7e1e174f79"
         }
       }
     }
