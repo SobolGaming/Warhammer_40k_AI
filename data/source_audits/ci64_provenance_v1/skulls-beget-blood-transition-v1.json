@@ -3,7 +3,7 @@
   "base": "16069416ea8de4c5623402c1cc6d53e55b673cb0",
   "retained_transition_sha256": "5931fce8052b2edddfc030540aad6dd8f737db8c27ee862aaf06a5df0c416b18",
   "retained_runtime_fingerprint": "f7a33a7ce44113b8754268ca735a0dfde601b7a1d81394e2c12c55382edefdf0",
-  "runtime_fingerprint": "c30d77a805d649f7e916fde64f442060e13c0b0d43a84427c641768a3db12bbd",
+  "runtime_fingerprint": "64a4133aaa039346e783fb5ea80920976ff2ae48aab96aec003505d0d33106d2",
   "replaced_sources": {
     "src/warhammer40k_core/engine/stratagems_requests.py": {
       "before": "b16d9b3a4b4c5cef3300d21a3da6f88d34acad2f2007831692de826e42c1a889",
@@ -20,7 +20,7 @@
   },
   "new_sources": {
     "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/detachments/blood_legion/stratagems.py": "d57aa64b1a4a203ca76181812208dfca3b0821bc8a1326130ffb923d1c4b1eaf",
-    "src/warhammer40k_core/engine/stratagems_eligibility.py": "52635405049de7f5e553502d7766c7b61adccfb18079fe1669daee56cf86d537",
+    "src/warhammer40k_core/engine/stratagems_eligibility.py": "69bdde9f8674ace9e7925d5294b93b837d9bce6f7114e59f738eaec47d805a6f",
     "src/warhammer40k_core/engine/stratagems_generic_metadata.py": "91b3d851b28b1457cdafcde4a6688e8188fca724fed0c967579f8bb611958e94",
     "src/warhammer40k_core/engine/stratagems_generic_rule_ir_runtime.py": "fc557945581f3fdd146208811686a890e47b69304c22d9df84f8ccba354fe57f",
     "src/warhammer40k_core/engine/stratagems_geometry.py": "4ad5b5c1a3a7a69b4893aea35a74258f5284e4ef16edb4403bbe780372065969"

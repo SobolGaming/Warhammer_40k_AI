@@ -1241,13 +1241,13 @@ def _enumerated_target_bindings(
     ):
         if state.battlefield_state is None:
             return ()
-        candidates = (
+        unit_candidates = (
             (view.owner_player_id, view.unit_instance_id)
             for view in placed_alive_rules_unit_views(state=state)
             if view.owner_player_id == player_id
         )
     else:
-        candidates = (
+        unit_candidates = (
             (army.player_id, unit.unit_instance_id)
             for army in state.army_definitions
             if target_spec.target_kind is not StratagemTargetKind.FRIENDLY_UNIT
@@ -1255,7 +1255,7 @@ def _enumerated_target_bindings(
             for unit in army.units
         )
     bindings: list[StratagemTargetBinding] = []
-    for owner, unit_id in candidates:
+    for owner, unit_id in unit_candidates:
         binding = StratagemTargetBinding(
             target_kind=target_spec.target_kind,
             target_player_id=owner,
