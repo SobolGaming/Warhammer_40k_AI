@@ -3,7 +3,7 @@
     "completed": true,
     "concurrency": 1,
     "coverage": false,
-    "fixture_sha256": "50e7db74bd660d7d353742834808052209b4c3014a9a7fdb1e89b24cb2b36d6c",
+    "fixture_sha256": "8a758e0aced4c05459c0d0f911234acfaa343cc1a890e256575e10c0bf936161",
     "host": {
       "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
       "logical_cpus": 64,
@@ -16,14 +16,14 @@
     "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:3e65aaeb280065edad60fe80cf210522a93ad41ea8318c6bfc34e0e7f2614533",
     "samples": {
       "finite": [
-        2.3036663600000793,
-        2.2266821560001517,
-        2.3246694890001436
+        2.2329610359997787,
+        2.254310626000006,
+        2.214586462999705
       ],
       "parameterized": [
-        2.1015036999999666,
-        2.0314465129999917,
-        2.099301598000011
+        2.1157256000001325,
+        2.0022141429999465,
+        2.1156788870002856
       ]
     },
     "workload_sha256": "1af0bb7fa3733e4e31b8fa73f35839956e2ef5d2e952e6e378c2639ea9dd0427"
@@ -35,7 +35,7 @@
     "completed": true,
     "concurrency": 1,
     "coverage": false,
-    "fixture_sha256": "50e7db74bd660d7d353742834808052209b4c3014a9a7fdb1e89b24cb2b36d6c",
+    "fixture_sha256": "8a758e0aced4c05459c0d0f911234acfaa343cc1a890e256575e10c0bf936161",
     "host": {
       "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
       "logical_cpus": 64,
@@ -48,19 +48,19 @@
     "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:848a6630549d8b8b208bf69544a707e42dd466760f779838d020e0e1e392d8de",
     "samples": {
       "finite": [
-        2.2871821280000404,
-        2.2261883029998444,
-        2.264298093999969
+        2.2592992230001983,
+        2.25043933500001,
+        2.2456797380000353
       ],
       "parameterized": [
-        2.1090061469999455,
-        2.0997006150000743,
-        2.0628986599999735
+        2.08056489899991,
+        1.9681612439999299,
+        2.0768411009999
       ]
     },
     "workload_sha256": "1af0bb7fa3733e4e31b8fa73f35839956e2ef5d2e952e6e378c2639ea9dd0427"
   },
-  "head_input_digest": "3419c876c599cb2a70de43e1cafa733766592f03ba22c4b594288cc38bafcd8a",
+  "head_input_digest": "c7b2bb00235ee3b8cfa87c9fc16dc0b31a9fd65045f2cdf60e4da4937198c010",
   "head_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:848a6630549d8b8b208bf69544a707e42dd466760f779838d020e0e1e392d8de",
   "historical_failures": [],
   "policy": "rules-engine-performance-v3",

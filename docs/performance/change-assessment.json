@@ -226,11 +226,11 @@
     },
     "data/source_audits/ci64_provenance_v1/gore-hungry-onslaught-transition-v1.json": {
       "before_sha256": null,
-      "after_sha256": "687ae65658d837db07333ea5cd4264d215e89b417ebf4ad56a59027a659db92b",
+      "after_sha256": "06d2b7f60680ae5fa049e33ba1fc13c3d96c12e458d8f7bfe03b3ab8491df55e",
       "owners": {
         "@document": {
           "before": null,
-          "after": "687ae65658d837db07333ea5cd4264d215e89b417ebf4ad56a59027a659db92b"
+          "after": "06d2b7f60680ae5fa049e33ba1fc13c3d96c12e458d8f7bfe03b3ab8491df55e"
         }
       }
     },
@@ -296,31 +296,31 @@
     },
     "docs/performance/current/gore-hungry-onslaught-review-20261125-movement.json": {
       "before_sha256": null,
-      "after_sha256": "8e9eac13ed93800ca9e1dcb7285fa6d6d0f121b92b3d8a3a912b9b6d242e46c3",
+      "after_sha256": "1751b215610b51b778a003622074f605b5399abacbe0c714ff343d0d3a9a6e26",
       "owners": {
         "@document": {
           "before": null,
-          "after": "8e9eac13ed93800ca9e1dcb7285fa6d6d0f121b92b3d8a3a912b9b6d242e46c3"
+          "after": "1751b215610b51b778a003622074f605b5399abacbe0c714ff343d0d3a9a6e26"
         }
       }
     },
     "docs/performance/current/gore-hungry-onslaught-review-20261125-setup.json": {
       "before_sha256": null,
-      "after_sha256": "3fc0869ae24b62576601a24a59e97f0cc9603e8761eda7195be345cfe08ce9e7",
+      "after_sha256": "d6e893d3075b7bffa9295ad1f1e5c5641f32b8d89e7fd885278e5a85da3988bc",
       "owners": {
         "@document": {
           "before": null,
-          "after": "3fc0869ae24b62576601a24a59e97f0cc9603e8761eda7195be345cfe08ce9e7"
+          "after": "d6e893d3075b7bffa9295ad1f1e5c5641f32b8d89e7fd885278e5a85da3988bc"
         }
       }
     },
     "docs/performance/current/gore-hungry-onslaught-review-20261125-visibility.json": {
       "before_sha256": null,
-      "after_sha256": "2b39fc4c2d708ee32df841a31cfd375d5700f26a50ec1eae27f73f1f0b4f825d",
+      "after_sha256": "6e7d8f1583f084d89ee3c23ca48063a24b471edc2a5e637e5185fab9aa7b473a",
       "owners": {
         "@document": {
           "before": null,
-          "after": "2b39fc4c2d708ee32df841a31cfd375d5700f26a50ec1eae27f73f1f0b4f825d"
+          "after": "6e7d8f1583f084d89ee3c23ca48063a24b471edc2a5e637e5185fab9aa7b473a"
         }
       }
     },
@@ -336,11 +336,11 @@
     },
     "scripts/engine_numerical_identity_test_admission.py": {
       "before_sha256": "304c6fe4c87ebf7cc7e28b94f8ef306ff2938927b15c2a25c5079e208819e7eb",
-      "after_sha256": "d10886e5c8e04d6d2305e568119b0b82de17218a687992f27de2891cf309a4c4",
+      "after_sha256": "e2f7618dbcf65bfe28aafac41fea0e3b7d2ea0aed7462f70ce87a2485b5c72df",
       "owners": {
         "@module": {
           "before": "2f04554db9367a7ddcf6abecbae0a506f4a937f2eb73a4f28c60ea2e9b3c6e11",
-          "after": "b46db9f678079d1413277bc5135d9b9c96bb11604783a0f9b486bfd8ffeafa93"
+          "after": "d5cb6e61c4f6a758e921e7aa56ddf1b4c7e3e90938a925204e03f559d1cabaee"
         },
         "_blood_begets_skulls_test_successor": {
           "before": "7473cd8a99deacf3776da89b91bd2e518f7d529068abcb282b18eb68bcff866e",
@@ -710,11 +710,11 @@
     },
     "tests/factions/chaos_daemons/integration/test_gore_hungry_onslaught.py": {
       "before_sha256": null,
-      "after_sha256": "f862fc166ae361098520c13cbf3e30ced40bbc36df7f61ecc36b78b117e0b0d0",
+      "after_sha256": "49016f52ee4ae0f35f26a4630e2ef4acdc9cc87b3c6a5285453c069b4a439509",
       "owners": {
         "@module": {
           "before": null,
-          "after": "67fdf4715bc94e81e4e0f72a022bbac5c9caa6df77ea4f2da3d16ba1fc498f2b"
+          "after": "0e3dea1c067b782976e674fac0c0b5b247cb577fed61d65973be32a298080db1"
         },
         "_advance_through_wall": {
           "before": null,
@@ -758,7 +758,7 @@
         },
         "test_gore_hungry_onslaught_later_movement_window": {
           "before": null,
-          "after": "1ec7eb207b8e4a06d36b4c2d6fe8084a24364e2e3bdf416a80d99edea3930184"
+          "after": "60f5152d826ee37e5221014560e123a3788167e2b560f9069e8f4241b8e078c3"
         },
         "test_gore_hungry_onslaught_movement_path_and_replay": {
           "before": null,
