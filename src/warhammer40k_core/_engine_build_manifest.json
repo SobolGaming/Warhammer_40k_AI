@@ -1,7 +1,7 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:fbc166871c2c3a962265db49b4b1ae7c51425c9924986f6e943b7f448e0b7737",
-  "fingerprint": "fbc166871c2c3a962265db49b4b1ae7c51425c9924986f6e943b7f448e0b7737",
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:b1ecd9a6bd751abd9bb732e2bb1d63edcf14839cde43183ae88133c789e368f1",
+  "fingerprint": "b1ecd9a6bd751abd9bb732e2bb1d63edcf14839cde43183ae88133c789e368f1",
   "resource_count": 3297,
   "resources": [
     {
@@ -1820,9 +1820,9 @@
       "sha256": "0d22ad3c274431c45376927396bc8356b1c515badca41c821a7b29d126cacd78"
     },
     {
-      "byte_length": 250793,
+      "byte_length": 250750,
       "path": "warhammer40k_core/engine/catalog_rule_consumption.py",
-      "sha256": "c78c04b7195da3f81bca63945a3b143ab053deaeb3220079111c1daee2b50f19"
+      "sha256": "42e211ca2d79b68200628538e7322306dad498d458de29c9c76190ccce1de0ad"
     },
     {
       "byte_length": 784,
@@ -2020,9 +2020,9 @@
       "sha256": "06f00c59e7650d8add805ca0f78cc7b7a8ae86808ae668ef65e63ef88dbf83dd"
     },
     {
-      "byte_length": 27969,
+      "byte_length": 28150,
       "path": "warhammer40k_core/engine/catalog_unit_move_completed_mortal_wounds_runtime.py",
-      "sha256": "8994166baee3393b210ea2e8df47b8beacddc65dcf1c4c8be168b3a1678760dd"
+      "sha256": "66f79978fb3c9f8db3bbe696fd6f4bdb4e89a5bfc9ae76445ce819b5f27ef7dd"
     },
     {
       "byte_length": 4074,
@@ -11365,9 +11365,9 @@
       "sha256": "ad34ee988a7e93e6f5cb21a767b1e8ed1fd6a3572c9fe9479936cec0226ab18b"
     },
     {
-      "byte_length": 16658,
+      "byte_length": 16804,
       "path": "warhammer40k_core/engine/move_completion_triggers.py",
-      "sha256": "ad9c31dc814983ce71d4381b51bafbe8fba977e19d247504cce30ba55416c3f8"
+      "sha256": "38b81448f3b161ed06a0f1a1ce46baee780efe392e65a98473aabd68401534c4"
     },
     {
       "byte_length": 7637,
@@ -11610,9 +11610,9 @@
       "sha256": "6a6f229a96b8fc64cdfe5fabf686b1a45f296784e1ae5995c24176e253bbcdd9"
     },
     {
-      "byte_length": 14870,
+      "byte_length": 15264,
       "path": "warhammer40k_core/engine/phase_movement_history.py",
-      "sha256": "3e08a7fa77ce315d0c5c7c89bfd57bc50775ab4108b8ffded13baeaeea63e012"
+      "sha256": "0db5d3349eebcbc053b14fdf8c0e329b539e6e453a7fccbb1931a15e8dab5706"
     },
     {
       "byte_length": 1417,

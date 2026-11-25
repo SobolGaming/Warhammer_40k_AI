@@ -2612,10 +2612,13 @@ def post_shoot_hit_target_status_option_label(
 def _unit_move_completed_mortal_wounds_target_request_payload(
     *,
     state: GameState,
+    phase: BattlePhase,
     group: CatalogUnitMoveCompletedMortalWoundsGroup,
 ) -> dict[str, object]:
     return {
-        **_unit_move_completed_mortal_wounds_target_base_payload(state=state, group=group),
+        **_unit_move_completed_mortal_wounds_target_base_payload(
+            state=state, phase=phase, group=group
+        ),
         "available_target_unit_instance_ids": [
             option.target_unit_instance_id for option in group.options
         ],
@@ -2629,11 +2632,14 @@ def _unit_move_completed_mortal_wounds_target_request_payload(
 def _unit_move_completed_mortal_wounds_target_option_payload(
     *,
     state: GameState,
+    phase: BattlePhase,
     group: CatalogUnitMoveCompletedMortalWoundsGroup,
     option: CatalogUnitMoveCompletedMortalWoundsTargetOption,
 ) -> dict[str, object]:
     return {
-        **_unit_move_completed_mortal_wounds_target_base_payload(state=state, group=group),
+        **_unit_move_completed_mortal_wounds_target_base_payload(
+            state=state, phase=phase, group=group
+        ),
         "selected_unit_move_completed_mortal_wounds_target": (
             _unit_move_completed_mortal_wounds_target_selection_payload(option)
         ),
@@ -2643,10 +2649,13 @@ def _unit_move_completed_mortal_wounds_target_option_payload(
 def _unit_move_completed_mortal_wounds_decline_payload(
     *,
     state: GameState,
+    phase: BattlePhase,
     group: CatalogUnitMoveCompletedMortalWoundsGroup,
 ) -> dict[str, object]:
     return {
-        **_unit_move_completed_mortal_wounds_target_base_payload(state=state, group=group),
+        **_unit_move_completed_mortal_wounds_target_base_payload(
+            state=state, phase=phase, group=group
+        ),
         "declined_unit_move_completed_mortal_wounds": True,
     }
 
@@ -2654,6 +2663,7 @@ def _unit_move_completed_mortal_wounds_decline_payload(
 def _unit_move_completed_mortal_wounds_target_base_payload(
     *,
     state: GameState,
+    phase: BattlePhase,
     group: CatalogUnitMoveCompletedMortalWoundsGroup,
 ) -> dict[str, object]:
     return {
@@ -2663,7 +2673,7 @@ def _unit_move_completed_mortal_wounds_target_base_payload(
         "hook_id": CATALOG_IR_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_CONSUMER_ID,
         "game_id": state.game_id,
         "battle_round": state.battle_round,
-        "phase": _unit_move_completed_group_phase(group).value,
+        "phase": phase.value,
         "active_player_id": state.active_player_id,
         "player_id": group.player_id,
         "catalog_record_id": group.record.record_id,
@@ -2687,12 +2697,6 @@ def _unit_move_completed_mortal_wounds_target_base_payload(
         "trigger_event_id": group.trigger_event_id,
         "movement_action": group.movement_action,
     }
-
-
-def _unit_move_completed_group_phase(
-    group: CatalogUnitMoveCompletedMortalWoundsGroup,
-) -> BattlePhase:
-    return BattlePhase.CHARGE if group.movement_action == "charge_move" else BattlePhase.MOVEMENT
 
 
 def _unit_move_completed_mortal_wounds_decline_option_id(

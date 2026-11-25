@@ -147,8 +147,13 @@ def validate_battlefield_movement_locks(
 
 
 def completion_phase_record(
-    *, state: GameState, event: EventRecord, turn_player_id: str
+    *,
+    state: GameState,
+    event: EventRecord,
+    turn_player_id: str,
+    charge_host_phase: BattlePhase | None = None,
 ) -> PhaseMovementRecord | None:
+    """Record the actual phase occurrence, not the Charge action's wire label."""
     from warhammer40k_core.engine.battlefield_state import (
         BattlefieldTransitionBatch,
         BattlefieldTransitionBatchPayload,
@@ -208,7 +213,11 @@ def completion_phase_record(
         event_id=event.event_id,
         battle_round=cast(int, payload["battle_round"]),
         turn_player_id=turn_player_id,
-        phase=BattlePhase(cast(str, payload["phase"])),
+        phase=(
+            BattlePhase(cast(str, payload["phase"]))
+            if charge_host_phase is None
+            else charge_host_phase
+        ),
         unit_instance_id=cast(str, payload["unit_instance_id"]),
         model_instance_ids=model_ids,
         is_surge=event.event_type == "triggered_movement_resolved"
@@ -219,7 +228,7 @@ def completion_phase_record(
 
 
 def validate_phase_movement_history(*, state: GameState, events: tuple[EventRecord, ...]) -> None:
-    from warhammer40k_core.engine.interrupted_charge import charge_turn_owner_at_event
+    from warhammer40k_core.engine.interrupted_charge import charge_interruption_at_event
     from warhammer40k_core.engine.move_completion_triggers import MOVE_COMPLETION_EVENT_TYPES
 
     expected: list[PhaseMovementRecord] = []
@@ -234,11 +243,14 @@ def validate_phase_movement_history(*, state: GameState, events: tuple[EventReco
         ):
             raise GameLifecycleError("Phase movement completion requires its turn owner.")
         owner = cast(str, event.payload["active_player_id"])
+        host_phase = None
         if event.event_type == "charge_move_completed":
-            owner = charge_turn_owner_at_event(
-                event_records=events, event_index=index, actor_id=owner
-            )
-        row = completion_phase_record(state=state, event=event, turn_player_id=owner)
+            source = charge_interruption_at_event(event_records=events, event_index=index)
+            if source is not None:
+                owner, host_phase = source.turn_player_id, source.host_phase
+        row = completion_phase_record(
+            state=state, event=event, turn_player_id=owner, charge_host_phase=host_phase
+        )
         if row is not None:
             from warhammer40k_core.engine.ingress_lifetimes import validate_ingress_movement_history
 

@@ -232,6 +232,115 @@ def test_fools_flight_native_fall_back_charge_resume_and_replay(
     assert replay.reproduced_exactly, replay
 
 
+@pytest.mark.integration
+def test_fools_flight_stampede_resolves_before_murdercall_and_replays(
+    skulls_definitions: Section02Definitions,
+) -> None:
+    from tests.support.faction_batch01 import CRUSHERS
+    from tests.support.section11_fixtures import propose, targets, witness
+    from warhammer40k_core.engine.phase import LifecycleStatusKind
+    from warhammer40k_core.engine.phase_movement_history import current_unit_moves
+    from warhammer40k_core.engine.surge_movement import surge_ineligibility
+
+    d = skulls_definitions
+    charger, spare, foe = "own:crushers", "own:spare", "foe:target"
+    battle = scene(
+        d,
+        (
+            selection(d, CRUSHERS, "crushers", equipment=("instrument-of-chaos",)),
+            selection(d, CRUSHERS, "spare"),
+        ),
+        (selection(d, CRUSHERS, "target"), selection(d, CRUSHERS, "normal")),
+        phase=BattlePhase.MOVEMENT,
+        active="opponent",
+        detachment_id_by_faction=DETACHMENTS,
+        seed="faction-batch01",
+    )
+    for unit, x, y in ((charger, 10, 10), (foe, 13.5, 10), (spare, 13, 20.1)):
+        locate(battle, unit, tuple(Pose.at(x, y + i * 2.5) for i in range(3)))
+    locate(battle, NORMAL_MOVER, tuple(Pose.at(21.5, 18 + i * 2.5) for i in range(3)))
+    battle.state.gain_command_points(
+        player_id="owner",
+        amount=2,
+        source_id="fools-flight:stampede-fixture-cp",
+        source_kind=CommandPointSourceKind.OTHER,
+        cap_exempt=True,
+    )
+    anchor(battle)
+
+    begin(battle.session)
+    offer = _flight_next(
+        battle, _flight_move(battle, foe, "fall_back:ordered_retreat", 2.5), stop_at_offer=True
+    )
+    charge = require_request(
+        submit_option(battle.session, stratagem_targets(offer, FOOLS_FLIGHT_ID)[charger])
+    )
+    assert charge.decision_type == "select_charging_unit"
+    choice = require_request(submit_option(battle.session, charger))
+    while choice.decision_type == "use_stratagem":
+        choice = require_request(submit_option(battle.session, DECLINE_STRATAGEM_WINDOW_OPTION_ID))
+    assert choice.decision_type == "select_charge_targets"
+    targets(battle.session, (foe,))
+    stampede = require_request(
+        propose(battle.session, charger, (foe,), witness(battle.state, charger, 2.0)),
+        "select_catalog_unit_move_completed_mortal_wounds_target",
+    )
+    assert stampede.actor_id == "owner"
+    assert isinstance(stampede.payload, dict)
+    assert stampede.payload["phase"] == "movement"
+    assert stampede.payload["movement_action"] == "charge_move"
+    assert stampede.payload["available_target_unit_instance_ids"] == [foe]
+    assert str(stampede.payload["source_rule_id"]).endswith("Datasheets_abilities:000001115:5")
+    assert len(stampede.options) == 1  # no decline for mandatory Brass Stampede
+
+    saved = battle.session.to_persistence_payload()
+    restored = LocalGameSession.from_persistence_payload(saved)
+    assert restored.to_persistence_payload() == saved
+    for current in (battle.session, restored):
+        state = current.lifecycle.state
+        assert state is not None
+        (move,) = current_unit_moves(state, charger)
+        assert (move.phase, move.turn_player_id) == (BattlePhase.MOVEMENT, "opponent")
+        assert not move.is_surge
+
+        status = submit_option(current, stampede.options[0].option_id)
+        assert status.status_kind is not LifecycleStatusKind.INVALID, status
+        next_request = require_request(status)
+        for _ in range(8):
+            if next_request.decision_type != "select_mortal_wound_model":
+                break
+            next_request = require_request(
+                submit_option(current, next_request.options[0].option_id)
+            )
+        else:
+            pytest.fail("Brass Stampede allocation did not terminate.")
+
+        assert state.current_battle_phase is BattlePhase.MOVEMENT
+        assert state.effective_active_player_id() == "opponent"
+        assert len(events(current, "charge_move_completed")) == 1
+        assert len(events(current, "unit_move_completed_mortal_wounds_rolled")) == 3
+        assert (
+            len(events(current, "catalog_unit_move_completed_mortal_wounds_target_selected")) == 1
+        )
+        assert surge_ineligibility(state, charger) == "surge_prior_move_this_phase"
+        assert surge_ineligibility(state, spare) is None
+        assert next_request.decision_type == "select_movement_unit"
+
+    assert restored.to_persistence_payload() == battle.session.to_persistence_payload()
+    # The shared Surge eligibility predicate above is the one used to filter
+    # Murdercall grants. Complete an ordinary opponent move before replaying
+    # the full decision history, including the mandatory Stampede continuation.
+    assert _flight_move(battle, NORMAL_MOVER, "normal_move", -2.5).actor_id == "opponent"
+    assert any(
+        row.get("unit_instance_id") == NORMAL_MOVER
+        for row in events(battle.session, "movement_activation_completed")
+    )
+    replay = ReplayRunner.from_payload(
+        battle.session.replay_artifact(artifact_id="fools-flight-stampede")
+    ).run()
+    assert replay.reproduced_exactly, replay
+
+
 def _assert_fights_first_through_turn_end(battle: Scene) -> None:
     from tests.psychic_modifier_helpers import submit_fixture_request
     from warhammer40k_core.engine.effects import EffectExpiration

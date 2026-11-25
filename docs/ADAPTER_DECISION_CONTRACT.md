@@ -3066,7 +3066,11 @@ The Movement phase and turn owner remain unchanged while the reacting player
 owns the Charge action. The interruption receipt has no suspended Charge phase
 and instead identifies the Movement turn owner and originating Fall Back
 event. A declined, failed, or completed Charge releases the reacting scope and
-resumes Movement. No adapter-local choice, roll, or movement is required.
+resumes Movement after mandatory continuations. A movement-completion choice
+(e.g. Brass Stampede) retains `movement_action: "charge_move"` but carries the
+enclosing `phase: "movement"`. A successful reaction counts as a move in that
+opponent's Movement phase for rules such as Surge. No adapter-local choice,
+roll, or movement is required.
 The September 2026 faction pack (v1.2, p. 124) does not suppress the normal
 Core 11.04 Charge bonus: a successful Fool's Flight Charge grants Fights First
 until the end of the opponent's current turn.

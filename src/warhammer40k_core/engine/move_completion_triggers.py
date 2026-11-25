@@ -76,7 +76,12 @@ def record_move_completion_event(
     from warhammer40k_core.engine.phase_movement_history import completion_phase_record
 
     phase_record = completion_phase_record(
-        state=state, event=event, turn_player_id=state.active_player_id
+        state=state,
+        event=event,
+        turn_player_id=state.active_player_id,
+        charge_host_phase=(
+            state.current_battle_phase if event_type == "charge_move_completed" else None
+        ),
     )
     if phase_record is not None:
         state.phase_movement_history.append(phase_record)

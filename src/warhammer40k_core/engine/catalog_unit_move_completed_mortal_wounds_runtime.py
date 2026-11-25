@@ -119,6 +119,7 @@ class CatalogUnitMoveCompletedMortalWoundsRuntime:
             payload=validate_json_value(
                 _catalog._unit_move_completed_mortal_wounds_target_request_payload(
                     state=context.state,
+                    phase=context.completed_phase,
                     group=group,
                 )
             ),
@@ -133,6 +134,7 @@ class CatalogUnitMoveCompletedMortalWoundsRuntime:
                             payload=validate_json_value(
                                 _catalog._unit_move_completed_mortal_wounds_decline_payload(
                                     state=context.state,
+                                    phase=context.completed_phase,
                                     group=group,
                                 )
                             ),
@@ -150,6 +152,7 @@ class CatalogUnitMoveCompletedMortalWoundsRuntime:
                         payload=validate_json_value(
                             _catalog._unit_move_completed_mortal_wounds_target_option_payload(
                                 state=context.state,
+                                phase=context.completed_phase,
                                 group=group,
                                 option=option,
                             )
