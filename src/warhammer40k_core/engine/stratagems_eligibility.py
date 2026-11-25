@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from warhammer40k_core.engine.target_restriction_hooks import ShootingTargetRestrictionHookRegistry
 
-from warhammer40k_core.engine.rules_units import rules_unit_views_from_armies
+from warhammer40k_core.engine.rules_units import rules_unit_view_by_id, rules_unit_views_from_armies
 
 from collections.abc import Callable
 from warhammer40k_core.engine.rapid_ingress_eligibility import rapid_ingress_window_error
@@ -19,6 +19,7 @@ from warhammer40k_core.engine.stratagems_generic_metadata import (
     EFFECT_SELECTION_KIND_KEY,
     REQUIRED_TRIGGER_CONTEXT_KEYS_KEY,
     SELECTED_FRIENDLY_COMPANION_UNIT_EFFECT_SELECTION_KIND,
+    TARGET_FORBIDDEN_IF_FELL_BACK_THIS_TURN_KEY,
     TARGET_REQUIRED_CONTEXTUAL_STATUS_KEY,
     TARGET_REQUIRED_REINFORCEMENT_ARRIVAL_THIS_TURN_KEY,
     TARGET_REQUIRED_TRIGGER_CONTEXT_LIST_KEY,
@@ -28,6 +29,7 @@ from warhammer40k_core.engine.stratagems_generic_metadata import (
     stratagem_turn_unavailable_reason,
     unit_arrived_from_reserves_this_turn,
     unit_has_contextual_status,
+    visible_enemy_requires_unengaged,
 )
 from warhammer40k_core.engine.stratagems_model import *
 from warhammer40k_core.engine.stratagems_requests import *
@@ -608,6 +610,25 @@ def _generic_rule_ir_stratagem_unavailable_reason(
         )
     ):
         return "target_within_engagement_range"
+    if (
+        target_unit_id is not None
+        and _optional_generic_metadata_bool(
+            effect_payload,
+            key=TARGET_FORBIDDEN_IF_FELL_BACK_THIS_TURN_KEY,
+        )
+        and _rules_unit_owner(state=state, unit_instance_id=target_unit_id) == context.player_id
+    ):
+        unit = rules_unit_view_by_id(state=state, unit_instance_id=target_unit_id)
+        if any(
+            state.fell_back_unit_state_for_unit(
+                player_id=context.player_id,
+                battle_round=context.battle_round,
+                unit_instance_id=unit_id,
+            )
+            is not None
+            for unit_id in (unit.unit_instance_id, *unit.component_unit_instance_ids)
+        ):
+            return "target_fell_back_this_turn"
     target_trigger_list_key = _optional_generic_metadata_identifier(
         effect_payload,
         key=TARGET_REQUIRED_TRIGGER_CONTEXT_LIST_KEY,
@@ -727,6 +748,7 @@ def _visible_enemy_selection_error(
         player_id=context.player_id,
         source_unit_instance_id=source_unit_id,
         range_inches=raw_range,
+        require_unengaged=visible_enemy_requires_unengaged(effect_payload),
     )
     selected_unit_id = _visible_enemy_unit_id_or_none(effect_selection)
     if selected_unit_id is None:

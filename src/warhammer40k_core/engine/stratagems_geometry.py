@@ -18,7 +18,10 @@ from warhammer40k_core.engine.reserve_arrival_requirements import (
     placement_kinds_for_reserve_state,
     proposal_kind_for_reserve_state,
 )
-from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+from warhammer40k_core.engine.rules_units import (
+    placed_alive_rules_unit_views,
+    rules_unit_view_by_id,
+)
 from warhammer40k_core.engine.stratagems_imports import *
 from warhammer40k_core.engine.stratagems_model import *
 from warhammer40k_core.engine.stratagems_requests import *
@@ -573,12 +576,20 @@ def visible_enemy_unit_ids_for_source(
     player_id: str,
     source_unit_instance_id: str,
     range_inches: int,
+    require_unengaged: bool = False,
 ) -> tuple[str, ...]:
     requested_player_id = _validate_identifier("player_id", player_id)
     requested_source_id = _validate_identifier("source_unit_instance_id", source_unit_instance_id)
     distance = _visible_enemy_range_inches(range_inches)
     if _unit_owner(state=state, unit_instance_id=requested_source_id) != requested_player_id:
         return ()
+    if require_unengaged:
+        return _visible_unengaged_enemy_unit_ids(
+            state=state,
+            player_id=requested_player_id,
+            source_unit_instance_id=requested_source_id,
+            range_inches=distance,
+        )
     candidate_ids: list[str] = []
     for army in state.army_definitions:
         if army.player_id == requested_player_id:
@@ -592,6 +603,66 @@ def visible_enemy_unit_ids_for_source(
             ):
                 candidate_ids.append(unit.unit_instance_id)
     return tuple(sorted(candidate_ids))
+
+
+def _visible_unengaged_enemy_unit_ids(
+    *,
+    state: GameState,
+    player_id: str,
+    source_unit_instance_id: str,
+    range_inches: int,
+) -> tuple[str, ...]:
+    from warhammer40k_core.engine.shooting_selection_range import (
+        target_within_shooting_selection_range,
+    )
+
+    units = placed_alive_rules_unit_views(state=state)
+    source = rules_unit_view_by_id(state=state, unit_instance_id=source_unit_instance_id)
+    if not rules_unit_has_placed_alive_model(state=state, rules_unit=source):
+        return ()
+    scenario = _battlefield_scenario_for_stratagem(state)
+    ruleset = state.runtime_ruleset_descriptor()
+    terrain_features = _stratagem_terrain_features(state)
+    terrain_areas = shooting_terrain_areas_for_state(state)
+    observers = tuple(
+        component.unit
+        for component in source.components
+        if scenario.battlefield_state.unit_placement_or_none(component.unit.unit_instance_id)
+        is not None
+    )
+    eligible_ids = []
+    for enemy in units:
+        enemy_id = enemy.unit_instance_id
+        if enemy.owner_player_id == player_id:
+            continue
+        if not target_within_shooting_selection_range(
+            scenario=scenario,
+            attacking_unit_instance_id=source.unit_instance_id,
+            target_unit_instance_id=enemy_id,
+            max_range_inches=range_inches,
+            placed_alive_attacker_models_only=True,
+            placed_alive_target_models_only=True,
+        ):
+            continue
+        if _enemy_unit_is_within_friendly_engagement_range(
+            state=state, player_id=player_id, target_unit_instance_id=enemy_id
+        ):
+            continue
+        if any(
+            unit_has_line_of_sight_to_target(
+                state=state,
+                scenario=scenario,
+                ruleset_descriptor=ruleset,
+                observing_unit=observer,
+                target_unit_id=enemy_id,
+                terrain_features=terrain_features,
+                terrain_areas=terrain_areas,
+                placed_alive_models_only=True,
+            )
+            for observer in observers
+        ):
+            eligible_ids.append(enemy_id)
+    return tuple(sorted(eligible_ids))
 
 
 def _visible_enemy_target_is_visible_and_in_range(

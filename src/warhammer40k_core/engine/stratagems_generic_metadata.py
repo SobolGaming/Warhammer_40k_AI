@@ -32,6 +32,8 @@ COMPANION_REQUIRED_KEYWORDS_BY_TARGET_KEYWORD_KEY = "companion_required_keywords
 COMPANION_REQUIRED_REINFORCEMENT_ARRIVAL_THIS_TURN_KEY = (
     "companion_required_reinforcement_arrival_this_turn"
 )
+VISIBLE_ENEMY_REQUIRES_UNENGAGED_KEY = "visible_enemy_requires_unengaged"
+TARGET_FORBIDDEN_IF_FELL_BACK_THIS_TURN_KEY = "target_forbidden_if_fell_back_this_turn"
 EFFECT_SELECTION_KIND_KEY = "effect_selection_kind"
 TARGET_REQUIRED_CONTEXTUAL_STATUS_KEY = "target_required_contextual_status"
 TARGET_CONTEXTUAL_STATUS_SHADOW_OF_CHAOS = (
@@ -68,6 +70,13 @@ def stratagem_turn_unavailable_reason(
         if required and (context.active_player_id == context.player_id) is not own_turn:
             return reason
     return None
+
+
+def visible_enemy_requires_unengaged(effect_payload: dict[str, JsonValue]) -> bool:
+    required = effect_payload.get(VISIBLE_ENEMY_REQUIRES_UNENGAGED_KEY, False)
+    if type(required) is not bool:
+        raise GameLifecycleError("Visible enemy engagement restriction must be a bool.")
+    return required
 
 
 def companion_unit_effect_selection(unit_instance_id: str) -> JsonValue:

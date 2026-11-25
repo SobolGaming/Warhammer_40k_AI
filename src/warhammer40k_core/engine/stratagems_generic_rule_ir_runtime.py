@@ -62,6 +62,7 @@ from warhammer40k_core.engine.stratagems_generic_metadata import (
 )
 from warhammer40k_core.engine.stratagems_generic_rule_ir_context import (
     effect_selection_unit_id,
+    rule_effect_source_unit_id_for_context,
     rule_effect_target_unit_id_for_context,
 )
 from warhammer40k_core.engine.stratagems_model import (
@@ -560,6 +561,14 @@ def _resolve_generic_roll_pool_mortal_wounds(
             application=None,
         )
         return
+    source_unit_id = None
+    if (
+        _optional_rule_effect_string_parameter(effect_payload, "source_unit_context_key")
+        is not None
+    ):
+        source_unit_id = rule_effect_source_unit_id_for_context(
+            context=context, use_record=use_record, effect_payload=effect_payload
+        )
     progress = MortalWoundApplicationProgress.start(
         application_id=f"{use_record.use_id}:mortal-wounds:{target_unit_id}",
         source_rule_id=_rule_effect_source_id(effect_payload),
@@ -574,7 +583,7 @@ def _resolve_generic_roll_pool_mortal_wounds(
         destruction_evidence=MortalWoundDestructionEvidence.for_non_attack_state(
             state=state,
             destroying_player_id=use_record.player_id,
-            source_rules_unit_instance_id=None,
+            source_rules_unit_instance_id=source_unit_id,
             source_model_instance_id=None,
             destruction_source_kind=DestructionSourceKind.ABILITY,
             action_phase=BattlePhase(use_record.phase.value),

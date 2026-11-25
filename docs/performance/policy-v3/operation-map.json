@@ -37312,6 +37312,64 @@
       "families": [],
       "sensitive": false,
       "mandatory": true
+    },
+    "skulls-beget-blood-shooting-resolution": {
+      "paths": [
+        "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/detachments/blood_legion/stratagems.py",
+        "src/warhammer40k_core/engine/stratagems_eligibility.py",
+        "src/warhammer40k_core/engine/stratagems_generic_metadata.py",
+        "src/warhammer40k_core/engine/stratagems_generic_rule_ir_runtime.py",
+        "src/warhammer40k_core/engine/stratagems_geometry.py",
+        "src/warhammer40k_core/engine/stratagems_requests.py",
+        "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_blood_legion_ir_support_2026_27.py",
+        "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_generic_ir_support_2026_27.py"
+      ],
+      "owners": [
+        "@module",
+        "_coverage_payloads",
+        "_effect_clause",
+        "_effect_selections_for_binding",
+        "_generic_rule_ir_stratagem_unavailable_reason",
+        "_resolve_generic_roll_pool_mortal_wounds",
+        "_skulls_beget_blood_payload",
+        "_skulls_beget_blood_record",
+        "_visible_enemy_selection_error",
+        "_visible_unengaged_enemy_unit_ids",
+        "generic_supported_stratagem_rule_ir_hash",
+        "runtime_contribution",
+        "visible_enemy_requires_unengaged",
+        "visible_enemy_unit_ids_for_source"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "skulls-beget-blood-test-admission": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/skulls-beget-blood-transition-v1.json",
+        "scripts/engine_numerical_identity_test_admission.py",
+        "tests/factions/chaos_daemons/integration/test_skulls_beget_blood.py",
+        "tests/code_quality/test_engine_numerical_identity_admission.py"
+      ],
+      "owners": [
+        "@document",
+        "@module",
+        "_blood_begets_skulls_test_successor",
+        "_choices",
+        "_materialize_battle_formation_effects",
+        "_scene",
+        "_skulls_beget_blood_test_successor",
+        "_submit",
+        "shooting_skulls_definitions",
+        "test_identity_inventory_uses_current_twelve_shards_and_native_cohort",
+        "test_skulls_beget_blood_allows_advance_but_excludes_fall_back",
+        "test_skulls_beget_blood_excludes_both_ends_of_engagement",
+        "test_skulls_beget_blood_has_no_option_when_use_is_illegal",
+        "test_skulls_beget_blood_ordinary_choice_damage_attribution_and_replay"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

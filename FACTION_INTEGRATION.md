@@ -116,7 +116,7 @@ coverage package is:
 - source edition: `11th`
 - schema version: `core-v2-phase17e-faction-coverage-v3`
 - source-payload SHA-256 checksum:
-  `56a592add7a5cb0c86e797847b7bedd93e8e6c7be4bc7faa3d63aa49315c9ce2`
+  `2e242598a42f2727fa24afe450780d8c4b23d502e2d9807290fde30c255e0714`
 
 The package validates all 28 faction-pack PDF manifest records and emits
 coverage rows for every seeded faction and detachment. Faction army rules and
@@ -142,8 +142,9 @@ The Chaos Daemons Shadow Legion, Blood Legion, and Daemonic Incursion
 detachment rules are generic-supported through semantic RuleIR. Shadow Legion
 also adds six generic-supported Stratagem rows, Blood Legion adds the Brazenmaw,
 Fury's Cage, Gateway Unto Damnation, and Slaughterthirst Enhancements and the
-Sheathed in Brass and Blood Begets Skulls Stratagems. Daemonic Incursion adds six generic-supported
-Stratagem rows and four generic-supported Enhancements.
+Blood Begets Skulls, Sheathed in Brass, and Skulls Beget Blood Stratagems.
+Daemonic Incursion adds six generic-supported Stratagem rows and four
+generic-supported Enhancements.
 Aeldari Corsair Coterie and Path of the Outcast add nine generic-supported
 Stratagem rows. Chaos Daemons Warptide adds a generic-supported detachment rule,
 two Enhancements, and three Stratagem rows. Chaos Daemons Lords of the Warp adds
@@ -184,13 +185,13 @@ Phase 17E coverage row. The execution package is:
 - source edition: `11th`
 - schema version: `core-v2-phase17f-faction-execution-v3`
 - source-payload SHA-256 checksum:
-  `4888f9c05debef05d83f0508936a9e98dfced778066d6cb1939ade8641affef5`
+  `9c7065ea04b14a0840b27a0580a5b6041e0b11dff3de849718b656bc3f405865`
 - upstream Phase 17E checksum:
-  `56a592add7a5cb0c86e797847b7bedd93e8e6c7be4bc7faa3d63aa49315c9ce2`
+  `2e242598a42f2727fa24afe450780d8c4b23d502e2d9807290fde30c255e0714`
 
 The package emits 2073 execution records, one for every Phase 17E coverage row:
-1887 rows are blocked as `structured_rule_semantics_required`, 28 rows are
-blocked as `approved_phase17e_source_gap`, 135 rows are executable generic IR
+1886 rows are blocked as `structured_rule_semantics_required`, 28 rows are
+blocked as `approved_phase17e_source_gap`, 136 rows are executable generic IR
 rows, and 23 rows are executable named-handler rows because they already have
 runtime consumers.
 The engine dispatcher can route every record and returns typed `unsupported`
@@ -451,15 +452,15 @@ WS14 step 1 is implemented as a deterministic Phase 17I source package artifact:
 - source edition: `11th`
 - schema version: `core-v2-phase17i-blocked-row-classification-v1`
 - source-payload SHA-256 checksum:
-  `10b02f6eeb56afafcd00386794cde31872ad938e0d40f13873c6aa6b42886153`
+  `8d8fc439b5b1d4d7703f8a158c5c57387ff726ae944caac68056d96fe9ebeb6e`
 - upstream Phase 17F checksum:
-  `4888f9c05debef05d83f0508936a9e98dfced778066d6cb1939ade8641affef5`
+  `9c7065ea04b14a0840b27a0580a5b6041e0b11dff3de849718b656bc3f405865`
 - bridge source version: `10th-edition-2026-06-14`
 - bridge JSON source:
   `data/source_snapshots/wahapedia/10th-edition/2026-06-14/json`
 
-The report emits 1887 classification rows, one for every Phase 17F row blocked
-as `blocked_structured_semantics_required`. It compiles 1788 rows from Wahapedia
+The report emits 1886 classification rows, one for every Phase 17F row blocked
+as `blocked_structured_semantics_required`. It compiles 1787 rows from Wahapedia
 bridge descriptions through Phase 17C and marks 99 rows as
 `source_text_not_available` metadata-only rows. Each row records the existing
 Phase 17C template IDs and template families that can already express clauses,
@@ -493,9 +494,9 @@ WS14 step 3 is enforced as a deterministic Phase 17I source package artifact:
 - source edition: `11th`
 - schema version: `core-v2-phase17i-named-handler-budget-v1`
 - source-payload SHA-256 checksum:
-  `cbe984dcf9fecf2281db80a8229bbf27af7e2087d9d02069f480c3efdc612579`
+  `b07925b0765ce248e46588bbfa4dd59bc7d151173d056d86810c6c5c4ecec01d`
 - upstream Phase 17F checksum:
-  `4888f9c05debef05d83f0508936a9e98dfced778066d6cb1939ade8641affef5`
+  `9c7065ea04b14a0840b27a0580a5b6041e0b11dff3de849718b656bc3f405865`
 
 The budget report tracks 23 executable named-handler Phase 17F rows and 23
 approved entries. The current approved reason is

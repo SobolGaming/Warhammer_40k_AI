@@ -41,6 +41,25 @@ BLOOD_BEGETS_SKULLS_SOURCE_ROW_ID = (
     f"stratagem:{CHAOS_DAEMONS_FACTION_ID}:{BLOOD_LEGION_DETACHMENT_ID}:"
     f"{BLOOD_BEGETS_SKULLS_STRATAGEM_ID}"
 )
+SKULLS_BEGET_BLOOD_STRATAGEM_ID = "000009816004"
+SKULLS_BEGET_BLOOD_SOURCE_ROW_ID = (
+    f"stratagem:{CHAOS_DAEMONS_FACTION_ID}:{BLOOD_LEGION_DETACHMENT_ID}:"
+    f"{SKULLS_BEGET_BLOOD_STRATAGEM_ID}"
+)
+SKULLS_BEGET_BLOOD_DESCRIPTOR_ID = f"phase17e:{SKULLS_BEGET_BLOOD_SOURCE_ROW_ID}"
+SKULLS_BEGET_BLOOD_SOURCE_ID = "gw-11e-faction-packs-2026-07:" + SKULLS_BEGET_BLOOD_SOURCE_ROW_ID
+SKULLS_BEGET_BLOOD_WHEN = "Your Shooting phase."
+SKULLS_BEGET_BLOOD_TARGET = (
+    "One Legiones Daemonica Khorne Infantry or Legiones Daemonica Khorne Mounted unit "
+    "from your army (excluding units that Fell Back this turn) that is not within "
+    "Engagement Range of one or more enemy units."
+)
+SKULLS_BEGET_BLOOD_RANGE_INCHES = 8
+SKULLS_BEGET_BLOOD_EFFECT = (
+    "Select one enemy unit that is not within Engagement Range of one or more units "
+    'from your army and is within 8" of and visible to your unit. '
+    "Roll six D6: for each 4+, that enemy unit suffers 1 mortal wound."
+)
 BRAZENMAW_ENHANCEMENT_ID = "000009815004"
 BRAZENMAW_SOURCE_ROW_ID = (
     f"enhancement:{CHAOS_DAEMONS_FACTION_ID}:{BLOOD_LEGION_DETACHMENT_ID}:"
@@ -643,6 +662,53 @@ def _gateway_unto_damnation_payload() -> RuleIRPayload:
     )
 
 
+def _skulls_beget_blood_payload() -> RuleIRPayload:
+    normalized_text = f"{SKULLS_BEGET_BLOOD_TARGET} {SKULLS_BEGET_BLOOD_EFFECT}"
+    return _payload(
+        SKULLS_BEGET_BLOOD_DESCRIPTOR_ID,
+        SKULLS_BEGET_BLOOD_SOURCE_ID,
+        normalized_text,
+        (
+            _effect_clause(
+                clause_id=f"{SKULLS_BEGET_BLOOD_DESCRIPTOR_ID}:target-binding",
+                template_id="phase17s:stratagem-activation-target-binding",
+                normalized_text=normalized_text,
+                source_text=SKULLS_BEGET_BLOOD_TARGET,
+                target=_target("friendly_unit", normalized_text, SKULLS_BEGET_BLOOD_TARGET),
+                effects=(),
+                duration=None,
+            ),
+            _effect_clause(
+                clause_id=f"{SKULLS_BEGET_BLOOD_DESCRIPTOR_ID}:effect:001",
+                template_id=None,
+                normalized_text=normalized_text,
+                source_text=SKULLS_BEGET_BLOOD_EFFECT,
+                target=None,
+                effects=(
+                    _effect(
+                        "inflict_mortal_wounds",
+                        normalized_text,
+                        "that enemy unit suffers 1 mortal wound",
+                        (
+                            _parameter("effect_selection_kind", "visible_enemy_unit"),
+                            _parameter("source_unit_context_key", "target_binding_unit"),
+                            _parameter("roll_quantity", 6),
+                            _parameter("roll_sides", 6),
+                            _parameter("success_threshold", 4),
+                            _parameter("mortal_wounds_per_success", 1),
+                            _parameter("roll_type", "mortal_wounds"),
+                            _parameter("spill_over", True),
+                            _parameter("replay_effect_kind", "skulls_beget_blood"),
+                        ),
+                    ),
+                ),
+                duration=None,
+            ),
+        ),
+        "phase17s-stratagem-activation-template-v2",
+    )
+
+
 def _coverage_payload(
     source_row_id: str,
     normalized_text: str,
@@ -755,7 +821,7 @@ def _ability_clause(
 def _effect_clause(
     *,
     clause_id: str,
-    template_id: str,
+    template_id: str | None,
     normalized_text: str,
     source_text: str,
     target: RuleTargetSpecPayload | None,
@@ -909,6 +975,7 @@ def _coverage_payloads() -> Mapping[str, RuleIRPayload]:
             FURYS_CAGE_DESCRIPTOR_ID: _furys_cage_payload(),
             GATEWAY_UNTO_DAMNATION_DESCRIPTOR_ID: _gateway_unto_damnation_payload(),
             SLAUGHTERTHIRST_DESCRIPTOR_ID: _slaughterthirst_payload(),
+            SKULLS_BEGET_BLOOD_DESCRIPTOR_ID: _skulls_beget_blood_payload(),
         }
     )
 
