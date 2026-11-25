@@ -1,0 +1,18 @@
+{
+  "schema": "finite-pre-roll-charge-flight-test-v1",
+  "base": "bdc1b2111530576a71bf3391564d5a9e9c356be0",
+  "retained_transition_sha256": "47ee27bbd227b22ae4f64bf6c148eb8944439e2a2245efc123451d0ea1e968bf",
+  "retained_runtime_fingerprint": "5d31931e184f18ab678daeccb3dfb6cb8612974f5fabc1c5de33dcfc5519608a",
+  "runtime_fingerprint": "92b0f8688cdbd61c91e085316aaef6eec7a508afb411a370f7dace8ec2877f9b",
+  "sources": {
+    "src/warhammer40k_core/ai/charge_flight_admission.py": "1ec7454f7cb99fc623785432980db2e7b9d262a42f1f73a6f42b7d5fd92179f2"
+  },
+  "added_files": {
+    "tests/infrastructure/adapters/test_charge_flight_admission.py": {
+      "mode": "100644",
+      "blob_sha1": "b706e1b15625c1895eb37deeb38031e9322b112c",
+      "sha256": "322ed12b0f36924a24fdb99a84bb2314159760a6d2c411f495936b37772853d5",
+      "bytes": 8485
+    }
+  }
+}

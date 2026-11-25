@@ -1,0 +1,198 @@
+"""Pre-roll Charge flight admission stays detached from native chance and replay."""
+
+from __future__ import annotations
+
+from dataclasses import replace
+from itertools import product
+
+import pytest
+
+from tests.phase15c_fight_order_helpers import fight_config, fight_lifecycle
+from warhammer40k_core.adapters.access_control import ViewerContext
+from warhammer40k_core.adapters.local_session import LocalGameSession
+from warhammer40k_core.ai.charge_flight_admission import (
+    ChargeFlightOffer,
+    ChargeFlightUnresolvedReason,
+    inspect_charge_flight_offer,
+)
+from warhammer40k_core.ai.player_policy import PlayerDecisionContext
+from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
+from warhammer40k_core.engine.charge_declaration import ChargeRollRequest
+from warhammer40k_core.engine.phase import BattlePhase
+from warhammer40k_core.engine.replay import ReplayRunner
+from warhammer40k_core.geometry.pose import Pose
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    chaos_daemons_cavalcade_2026_11,
+)
+
+ACTOR = "player-a"
+VIEWER = ViewerContext.for_player(ACTOR)
+MOVER = "army-alpha:mover"
+TARGET = "army-beta:target"
+
+
+def _fixture(private_seed: int) -> LocalGameSession:
+    game_id = "pre-roll-charge-flight"
+    package = chaos_daemons_cavalcade_2026_11.catalog_package()
+    config = fight_config(
+        game_id=game_id,
+        alpha_unit_ids=("mover",),
+        enemy_unit_ids=("target",),
+        datasheet_id="000002582",
+        model_profile_id="000002582:bloodthirster",
+        model_count=1,
+        alpha_faction_id="chaos-daemons",
+        enemy_faction_id="chaos-daemons",
+        alpha_detachment_ids=("cavalcade-of-chaos", "shadow-legion"),
+        enemy_detachment_ids=("cavalcade-of-chaos", "shadow-legion"),
+        catalog=package.army_catalog,
+    )
+    config = replace(
+        config,
+        private_rng_seed=f"{private_seed:064x}",
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2026_27(
+            descriptor_version="pre-roll-charge-flight-fixture",
+        ),
+    )
+    lifecycle, _ = fight_lifecycle(
+        game_id=game_id,
+        alpha_unit_ids=("mover",),
+        enemy_unit_ids=("target",),
+        origins={"mover": Pose.at(10, 20), "target": Pose.at(18, 20)},
+        battle_phase=BattlePhase.CHARGE,
+        config=config,
+        record_deployment=True,
+    )
+    session = LocalGameSession(lifecycle)
+    session.advance_until_decision_or_terminal()
+    return session
+
+
+def _context(session: LocalGameSession) -> PlayerDecisionContext:
+    return PlayerDecisionContext.from_view(session.view_for_context(viewer=VIEWER), choice_seed=0)
+
+
+def _admit(context: PlayerDecisionContext) -> ChargeFlightOffer:
+    result = inspect_charge_flight_offer(context, unit_id=MOVER, target_id=TARGET)
+    assert result.reason is ChargeFlightUnresolvedReason.MINIMUM_ROLL_UNPROVEN
+    assert result.offer is not None
+    return result.offer
+
+
+def test_charge_flight_admits_native_offer_without_claiming_a_minimum() -> None:
+    session = _fixture(2)
+    counterpart = _fixture(3)
+    context = _context(session)
+    original = session.to_persistence_payload()
+    assert original != counterpart.to_persistence_payload()
+    assert _context(counterpart) == context
+    assert "private_rng_seed" not in context.observation_json
+    assert "charge_roll_state" not in context.observation_json
+    assert "movement_budget" not in context.observation_json
+    offer = _admit(context)
+    assert _admit(_context(counterpart)) == offer
+    assert offer.request_id == context.request["request_id"]
+    assert offer.observation_hash == context.observation_hash
+    assert (offer.unit_id, offer.target_id) == (MOVER, TARGET)
+    assert offer.flight_penalty_inches == 2
+    assert offer.target_filter_distance_inches > 0
+    assert (
+        inspect_charge_flight_offer(context, unit_id=MOVER, target_id=MOVER).reason
+        is ChargeFlightUnresolvedReason.UNADMITTED_TARGET
+    )
+    assert (
+        inspect_charge_flight_offer(context, unit_id=TARGET, target_id=MOVER).reason
+        is ChargeFlightUnresolvedReason.UNSUPPORTED_MOVER
+    )
+    assert session.to_persistence_payload() == original
+    baseline = session.lifecycle.decision_controller.event_log.records
+    assert not any(event.event_type == "dice_rolled" for event in baseline)
+
+    for flies, option_id in ((False, offer.ground_option_id), (True, offer.flight_option_id)):
+        arm = session.fork()
+        assert arm.to_persistence_payload() == original
+        assert _context(arm) == context
+        # This is an explicit test control, not a decision made by admission.
+        arm.submit_viewer_option(
+            viewer=VIEWER,
+            request_id=offer.request_id,
+            option_id=option_id,
+            result_id="fixture:charge-mode",
+        )
+        decisions = arm.lifecycle.decision_controller
+        tail = decisions.event_log.records[len(baseline) :]
+        kinds = [event.event_type for event in tail]
+        assert kinds.index("charging_unit_selected") < kinds.index("dice_rolled")
+        assert kinds.index("dice_rolled") < kinds.index("charge_roll_started")
+        (rolled,) = [event for event in tail if event.event_type == "charge_roll_started"]
+        payload = rolled.payload
+        assert isinstance(payload, dict)
+        roll_request = payload["charge_roll_request"]
+        assert isinstance(roll_request, dict)
+        assert roll_request["take_to_the_skies"] is flies
+        assert roll_request["roll_modifiers"] == []
+        (record,) = [
+            item
+            for item in decisions.records
+            if item.request.decision_type == "select_charging_unit"
+        ]
+        assert roll_request["source_decision_request_id"] == record.request.request_id
+        assert roll_request["source_decision_result_id"] == record.result.result_id
+        roll_state = payload["charge_roll_state"]
+        assert isinstance(roll_state, dict)
+        assert roll_state["rerolls"] == []
+        assert kinds.count("dice_rolled") == 1
+        (resolved,) = [
+            event.payload for event in tail if event.event_type == "charge_roll_resolved"
+        ]
+        assert isinstance(resolved, dict)
+        roll_result = resolved["roll_result"]
+        assert isinstance(roll_result, dict)
+        value = roll_result["value"]
+        assert isinstance(value, int)
+        penalty = offer.flight_penalty_inches if flies else 0
+        assert resolved["maximum_distance_inches"] == max(0, value - penalty)
+        # This native negative has a failed ground roll and an offered flight target.
+        # Realized rolls on the two arms cannot settle the earlier mode choice.
+        assert resolved["charge_move_available"] is flies
+        post_roll_view = arm.view_for_context(viewer=VIEWER)
+        pending = post_roll_view["pending_decision"]
+        if pending is not None and pending["actor_id"] == ACTOR:
+            assert (
+                inspect_charge_flight_offer(_context(arm), unit_id=MOVER, target_id=TARGET).reason
+                is ChargeFlightUnresolvedReason.NOT_ORDINARY_CHARGE_OFFER
+            )
+        else:
+            assert post_roll_view["active_player_id"] != ACTOR
+        replay = ReplayRunner.from_payload(arm.replay_artifact(artifact_id="charge-flight")).run()
+        assert replay.reproduced_exactly, replay.to_payload()
+    assert session.to_persistence_payload() == original
+
+
+@pytest.mark.parametrize(
+    ("ground_cost", "flight_cost", "expected"),
+    [(7, 7, (21, 10)), (10, 6, (6, 15)), (9, 7, (10, 10))],
+)
+def test_unmodified_charge_probability_synthetic_controls(
+    ground_cost: int, flight_cost: int, expected: tuple[int, int]
+) -> None:
+    # These costs are stipulated exact minima, never evidence about the native fixture.
+    request = ChargeRollRequest(
+        request_id="fixture:roll",
+        game_id="fixture",
+        battle_round=1,
+        player_id=ACTOR,
+        unit_instance_id=MOVER,
+        source_decision_request_id="fixture:request",
+        source_decision_result_id="fixture:result",
+    )
+    expression = request.spec.expression
+    assert expression.quantity == 2
+    assert expression.sides == 6
+    faces = range(1, expression.sides + 1)
+    pairs = tuple(product(faces, repeat=expression.quantity))
+    assert len(pairs) == 36
+    assert (
+        sum(sum(pair) >= ground_cost for pair in pairs),
+        sum(sum(pair) - 2 >= flight_cost for pair in pairs),
+    ) == expected

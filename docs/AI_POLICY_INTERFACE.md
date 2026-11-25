@@ -3197,3 +3197,37 @@ approved secondary lookup on 25 November 2026 was indexed-only because the
 direct 40k.app section returned HTTP 403. [Official Core Rules](source_rules/eng_01-06_warhammer40k_new40k_core_rules-was6fbu1ix-hfewhmxyiy.pdf),
 [Universal Rules Updates v1.1](https://assets.warhammer-community.com/eng_wh40k_core%26key_universal_rules_updates-lu3grocned-rphh78bl6k.pdf),
 [40k.app Flying and Surging](https://www.40k.app/rules/21-flying-and-surging).
+
+
+## Pre-roll Charge flight admission (no policy recommendation)
+
+`inspect_charge_flight_offer` reads the actor's detached ordinary
+`select_charging_unit` request for a caller-supplied unit and target. It admits
+one placed, standalone non-Hover FLY model only when both native modes match
+the same target eligibility and the selected target has an actor-visible
+placement. The admission identifies the issued options, actual flight penalty,
+and target-filter distance. It returns `minimum_roll_unproven` rather than a
+recommendation, and it neither chooses nor submits a mode, target or path.
+
+Core Rules p. 71 §21.03 supplies the movement penalty and transit permissions;
+the retained v931 FAQ fixes declaration before the Charge roll. The native
+charging-unit selection commits the mode before producing any roll. It does
+not expose complete route or roll-distribution authority: the candidate
+distance gates the later target offer; it is not a legal route cost. The
+post-roll target request and movement proposal cannot be used as a pre-roll
+oracle, and a single accepted path would only bound the minimum from above.
+A live policy needs mode-specific certified minima or sufficient separated
+legal-roll bounds, and authority for any effect on the roll or movement budget.
+
+The synthetic unmodified 2D6 controls, with an assumed 2-inch penalty, are:
+7/7 inches gives 21/36 ground versus 10/36 flight; 10/6 gives 6/36 versus
+15/36; and 9/7 gives 10/36 each. None are native route minima. The native
+negative control inspects ordinary declarations on a shared pre-roll prefix,
+then submits each mode separately on test-only forks and replays both exactly.
+The ground arm's realized roll fails to offer the target; the flight arm's
+realized roll does offer it. Those outcomes are not a pre-roll comparison.
+
+Sources: [official Core Rules, p. 71](source_rules/eng_01-06_warhammer40k_new40k_core_rules-was6fbu1ix-hfewhmxyiy.pdf#page=71),
+[approved 40k.app mirror, §21.03](https://www.40k.app/rules/21-flying-and-surging)
+(indexed text corroborated; direct fetch returned HTTP 403), and the
+[retained source package](../src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_flying_2026_09/artifacts/package.json).

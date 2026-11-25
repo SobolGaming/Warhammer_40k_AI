@@ -467,7 +467,36 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         flight["retained_transition_sha256"]
         == hashlib.sha256(b"\0".join(path.read_bytes() for path in flight_predecessors)).hexdigest()
     )
-    assert flight["runtime_fingerprint"] == _record(MANIFEST)["fingerprint"]
+    charge_flight = _record(
+        "data/source_audits/ci64_provenance_v1/pre-roll-charge-flight-test-v1.json"
+    )
+    charge_flight_base_manifest = json.loads(
+        subprocess.check_output(["git", "show", charge_flight["base"] + ":" + MANIFEST], cwd=ROOT)
+    )
+    assert flight["runtime_fingerprint"] == charge_flight_base_manifest["fingerprint"]
+    assert charge_flight["retained_runtime_fingerprint"] == flight["runtime_fingerprint"]
+    assert (
+        charge_flight["retained_transition_sha256"]
+        == hashlib.sha256((ROOT / flight_path).read_bytes()).hexdigest()
+    )
+    assert charge_flight["runtime_fingerprint"] == _record(MANIFEST)["fingerprint"]
+    charge_flight_owner = "tests/infrastructure/adapters/test_charge_flight_admission.py"
+    assert set(charge_flight["added_files"]) == {charge_flight_owner}
+    assert charge_flight_owner in active_files
+    assert sum(charge_flight_owner in group for group in groups) == 1
+    assert (
+        charge_flight["added_files"][charge_flight_owner]["sha256"]
+        == hashlib.sha256((ROOT / charge_flight_owner).read_bytes()).hexdigest()
+    )
+    charge_flight_cases = {
+        charge_flight_owner + "::" + name
+        for name in (
+            "test_charge_flight_admits_native_offer_without_claiming_a_minimum",
+            "test_unmodified_charge_probability_synthetic_controls[7-7-expected0]",
+            "test_unmodified_charge_probability_synthetic_controls[10-6-expected1]",
+            "test_unmodified_charge_probability_synthetic_controls[9-7-expected2]",
+        )
+    }
     flight_owner = "tests/infrastructure/adapters/test_flight_normal_move_policy.py"
     assert set(flight["added_files"]) == {flight_owner}
     assert flight_owner in active_files
@@ -1008,6 +1037,7 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         | brass_cases
         | stage3_cases
         | flight_cases
+        | charge_flight_cases
         | {
             selection.BLOOD_BEGETS_SKULLS_OWNER + "::" + case
             for case in (
