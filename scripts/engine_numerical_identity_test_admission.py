@@ -709,7 +709,7 @@ WRATH_UNDENIABLE_OWNER = "tests/factions/chaos_daemons/integration/test_wrath_un
 GORE_HUNGRY_ONSLAUGHT_TRANSITION = (
     "data/source_audits/ci64_provenance_v1/gore-hungry-onslaught-transition-v1.json"
 )
-GORE_HUNGRY_ONSLAUGHT_SHA256 = "687ae65658d837db07333ea5cd4264d215e89b417ebf4ad56a59027a659db92b"
+GORE_HUNGRY_ONSLAUGHT_SHA256 = "06d2b7f60680ae5fa049e33ba1fc13c3d96c12e458d8f7bfe03b3ab8491df55e"
 GORE_HUNGRY_ONSLAUGHT_OWNER = (
     "tests/factions/chaos_daemons/integration/test_gore_hungry_onslaught.py"
 )

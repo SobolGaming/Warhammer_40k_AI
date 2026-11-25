@@ -21,12 +21,12 @@ from tests.factions.chaos_daemons.integration.test_blood_begets_skulls import (
     skulls_definitions as skulls_definitions,
 )
 from tests.factions.chaos_daemons.integration.test_skulls_beget_blood import (
-    BLOODLETTERS,
     BLOODMASTER,
 )
 from tests.factions.chaos_daemons.integration.test_skulls_beget_blood import (
     attached_skulls_definitions as attached_skulls_definitions,
 )
+from tests.save7_allocation_helpers import BLOODLETTERS
 from tests.sequential_translation_helpers import leading_first_translation_paths
 from tests.support.faction_batch01 import (
     CRUSHERS,
@@ -49,7 +49,7 @@ from warhammer40k_core.engine.command_points import CommandPointSourceKind
 from warhammer40k_core.engine.decision_request import DecisionError, DecisionRequest
 from warhammer40k_core.engine.dice import DICE_REROLL_DECISION_TYPE
 from warhammer40k_core.engine.effects import GENERIC_RULE_EFFECT_KIND, EffectExpiration
-from warhammer40k_core.engine.event_log import validate_json_value
+from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.list_validation import AttachmentDeclaration
 from warhammer40k_core.engine.movement_keyword_effects import movement_keywords_granted_by_effects
 from warhammer40k_core.engine.movement_proposals import (
@@ -355,7 +355,7 @@ def test_gore_hungry_onslaught_later_movement_window(
     require_request(submit_option(battle.session, _onslaught_option(later)), "select_movement_unit")
     _assert_onslaught(battle, BattlePhase.MOVEMENT)
 
-    proposals = []
+    proposals: list[dict[str, JsonValue] | None] = []
     for use in (False, True):
         advance = _onslaught_scene(
             attached_skulls_definitions, BattlePhase.MOVEMENT, round_mover=True, advance_reroll=True

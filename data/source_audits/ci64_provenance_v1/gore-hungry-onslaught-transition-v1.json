@@ -89,9 +89,9 @@
   "added_files": {
     "tests/factions/chaos_daemons/integration/test_gore_hungry_onslaught.py": {
       "mode": "100644",
-      "blob_sha1": "cd005b54bc3f04a205ed470567ce2451b9364cca",
-      "sha256": "f862fc166ae361098520c13cbf3e30ced40bbc36df7f61ecc36b78b117e0b0d0",
-      "bytes": 24207
+      "blob_sha1": "aea57be325087a76323cd6871c2e41cf05ccb2e4",
+      "sha256": "49016f52ee4ae0f35f26a4630e2ef4acdc9cc87b3c6a5285453c069b4a439509",
+      "bytes": 24291
     }
   },
   "historical_sources": {
