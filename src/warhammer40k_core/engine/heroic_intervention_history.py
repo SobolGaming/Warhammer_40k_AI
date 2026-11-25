@@ -27,6 +27,7 @@ if TYPE_CHECKING:
 def validate_interrupted_charge_source(*, state: GameState, decisions: DecisionController) -> None:
     active: ChargeInterruption | None = None
     actor: str | None = None
+    source_round: int | None = None
     seen: set[str] = set()
     rolls: list[ChargeRollResult] = []
     for index, event in enumerate(decisions.event_log.records):
@@ -60,6 +61,7 @@ def validate_interrupted_charge_source(*, state: GameState, decisions: DecisionC
                 mutation_index=index,
             )
             actor = use.player_id
+            source_round = use.battle_round
             if (
                 payload["player_id"] != actor
                 or use.phase is not active.host_phase
@@ -101,7 +103,7 @@ def validate_interrupted_charge_source(*, state: GameState, decisions: DecisionC
                 if (
                     roll.request.player_id != actor
                     or roll.request.unit_instance_id != active.unit_instance_id
-                    or roll.request.battle_round != use.battle_round
+                    or roll.request.battle_round != source_round
                     or roll.movement_budget.roll_limit != active.roll_limit
                     or any(
                         distance > active.target_range_inches
@@ -141,7 +143,7 @@ def validate_interrupted_charge_source(*, state: GameState, decisions: DecisionC
                 or tuple(row.roll_result for row in phase.distance_states) != tuple(rolls)
             ):
                 raise GameLifecycleError("Interrupted Charge completion state drift.")
-            active, actor = None, None
+            active, actor, source_round = None, None, None
     current_phase = state.charge_phase_state
     if (None if current_phase is None else current_phase.interruption) != active:
         raise GameLifecycleError("Interrupted Charge current source differs from its history.")

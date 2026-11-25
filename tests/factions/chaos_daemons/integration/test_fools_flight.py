@@ -185,7 +185,7 @@ def test_fools_flight_native_fall_back_charge_resume_and_replay(
     while choice.decision_type == "use_stratagem":
         choice = require_request(submit_option(battle.session, DECLINE_STRATAGEM_WINDOW_OPTION_ID))
     assert choice.decision_type == "select_charge_targets"
-    allowed = set()
+    allowed: set[tuple[str, ...]] = set()
     for option in choice.options:
         if isinstance(option.payload, dict) and isinstance(
             ids := option.payload.get("target_ids"), list
