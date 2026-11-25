@@ -1,8 +1,8 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:64a4133aaa039346e783fb5ea80920976ff2ae48aab96aec003505d0d33106d2",
-  "fingerprint": "64a4133aaa039346e783fb5ea80920976ff2ae48aab96aec003505d0d33106d2",
-  "resource_count": 3294,
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:5d31931e184f18ab678daeccb3dfb6cb8612974f5fabc1c5de33dcfc5519608a",
+  "fingerprint": "5d31931e184f18ab678daeccb3dfb6cb8612974f5fabc1c5de33dcfc5519608a",
+  "resource_count": 3295,
   "resources": [
     {
       "byte_length": 113,
@@ -288,6 +288,11 @@
       "byte_length": 6948,
       "path": "warhammer40k_core/ai/finite_candidates.py",
       "sha256": "17a4026598e575fa76882cdca27eaad1b3384807d438e504d5d18ee7235cd0e5"
+    },
+    {
+      "byte_length": 14745,
+      "path": "warhammer40k_core/ai/flight_normal_move_policy.py",
+      "sha256": "d82e4acca77f52b60336bdee199bdedf20b3e4c67428c7f37493039228a1bac4"
     },
     {
       "byte_length": 19973,

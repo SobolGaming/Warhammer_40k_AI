@@ -1,0 +1,18 @@
+{
+  "schema": "finite-stage3-flight-normal-move-test-v1",
+  "base": "98f83a364d0a9ea8bef3fa00b02b4420948601fb",
+  "retained_transition_sha256": "041bfd4e3798175b3b16ce51359429950b4514ac9c98cef158cd9237f227580c",
+  "retained_runtime_fingerprint": "64a4133aaa039346e783fb5ea80920976ff2ae48aab96aec003505d0d33106d2",
+  "runtime_fingerprint": "5d31931e184f18ab678daeccb3dfb6cb8612974f5fabc1c5de33dcfc5519608a",
+  "sources": {
+    "src/warhammer40k_core/ai/flight_normal_move_policy.py": "d82e4acca77f52b60336bdee199bdedf20b3e4c67428c7f37493039228a1bac4"
+  },
+  "added_files": {
+    "tests/infrastructure/adapters/test_flight_normal_move_policy.py": {
+      "mode": "100644",
+      "blob_sha1": "62cd5c7fd72966c281d64a13e0b297a3f84a86ca",
+      "sha256": "fd6b2bb257958438735312ec6510ad6257d3a88b549f37e51f2c5073a6ac3459",
+      "bytes": 15992
+    }
+  }
+}
