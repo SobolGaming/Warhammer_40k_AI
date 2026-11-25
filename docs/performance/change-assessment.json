@@ -2,7 +2,7 @@
   "policy": "rules-engine-performance-v3",
   "base": "f69eda2040ab55db4dd18686eee69edafcca9dd2",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:848a6630549d8b8b208bf69544a707e42dd466760f779838d020e0e1e392d8de",
-  "operation_map_sha256": "0210527ecf8627d7ab252fa36ad4c47b8995210ca7e29bff8a70d4d25fb2a177",
+  "operation_map_sha256": "c8c07b22781e72fe0e46153900ca9ff90c163b0c93dc3bebf1406b0400d583f4",
   "changes": {
     "FACTION_INTEGRATION.md": {
       "before_sha256": "57d141b8c2cb3532051655495b6b7960223ee6e31c0a880145410c7aedead07a",
@@ -226,11 +226,11 @@
     },
     "data/source_audits/ci64_provenance_v1/gore-hungry-onslaught-transition-v1.json": {
       "before_sha256": null,
-      "after_sha256": "06d2b7f60680ae5fa049e33ba1fc13c3d96c12e458d8f7bfe03b3ab8491df55e",
+      "after_sha256": "6f854ba2aad31c2ff3d84343151692174d492356cac79afeed1c6105a2f72ead",
       "owners": {
         "@document": {
           "before": null,
-          "after": "06d2b7f60680ae5fa049e33ba1fc13c3d96c12e458d8f7bfe03b3ab8491df55e"
+          "after": "6f854ba2aad31c2ff3d84343151692174d492356cac79afeed1c6105a2f72ead"
         }
       }
     },
@@ -296,51 +296,59 @@
     },
     "docs/performance/current/gore-hungry-onslaught-review-20261125-movement.json": {
       "before_sha256": null,
-      "after_sha256": "1751b215610b51b778a003622074f605b5399abacbe0c714ff343d0d3a9a6e26",
+      "after_sha256": "76e045a52fd71e7da5cbf403df561e881688bd4095c01dd9ed149a80c41d4f28",
       "owners": {
         "@document": {
           "before": null,
-          "after": "1751b215610b51b778a003622074f605b5399abacbe0c714ff343d0d3a9a6e26"
+          "after": "76e045a52fd71e7da5cbf403df561e881688bd4095c01dd9ed149a80c41d4f28"
         }
       }
     },
     "docs/performance/current/gore-hungry-onslaught-review-20261125-setup.json": {
       "before_sha256": null,
-      "after_sha256": "d6e893d3075b7bffa9295ad1f1e5c5641f32b8d89e7fd885278e5a85da3988bc",
+      "after_sha256": "0f9c30368953cc9770855f4d625e8bb26af0a09bb2636d627df0335621bb60ac",
       "owners": {
         "@document": {
           "before": null,
-          "after": "d6e893d3075b7bffa9295ad1f1e5c5641f32b8d89e7fd885278e5a85da3988bc"
+          "after": "0f9c30368953cc9770855f4d625e8bb26af0a09bb2636d627df0335621bb60ac"
         }
       }
     },
     "docs/performance/current/gore-hungry-onslaught-review-20261125-visibility.json": {
       "before_sha256": null,
-      "after_sha256": "6e7d8f1583f084d89ee3c23ca48063a24b471edc2a5e637e5185fab9aa7b473a",
+      "after_sha256": "5808e67c2a3e8887aa93bc983480363f5a7227d45ec684b5d03f2c6221e108bb",
       "owners": {
         "@document": {
           "before": null,
-          "after": "6e7d8f1583f084d89ee3c23ca48063a24b471edc2a5e637e5185fab9aa7b473a"
+          "after": "5808e67c2a3e8887aa93bc983480363f5a7227d45ec684b5d03f2c6221e108bb"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "118602169995d24a90be185bb50f30f94c6be834172ea991aa6406ddd4a2187c",
-      "after_sha256": "5474998589ddd713791975785f876d06c6313bc41451953ac9d887d1b67a33c0",
+      "after_sha256": "452af417e2c0e5f6013fcb098ac5c1835d01c6d9ceece6e46e5f7bcec9dedbb0",
       "owners": {
         "@document": {
           "before": "118602169995d24a90be185bb50f30f94c6be834172ea991aa6406ddd4a2187c",
-          "after": "5474998589ddd713791975785f876d06c6313bc41451953ac9d887d1b67a33c0"
+          "after": "452af417e2c0e5f6013fcb098ac5c1835d01c6d9ceece6e46e5f7bcec9dedbb0"
         }
       }
     },
     "scripts/engine_numerical_identity_test_admission.py": {
       "before_sha256": "304c6fe4c87ebf7cc7e28b94f8ef306ff2938927b15c2a25c5079e208819e7eb",
-      "after_sha256": "e2f7618dbcf65bfe28aafac41fea0e3b7d2ea0aed7462f70ce87a2485b5c72df",
+      "after_sha256": "c5bf9af8d77b1d303050bf4acede5f0a704d230c675d21876cd7a488436f3b9b",
       "owners": {
         "@module": {
           "before": "2f04554db9367a7ddcf6abecbae0a506f4a937f2eb73a4f28c60ea2e9b3c6e11",
-          "after": "d5cb6e61c4f6a758e921e7aa56ddf1b4c7e3e90938a925204e03f559d1cabaee"
+          "after": "6e6eaf09a19e94d46a5afeecf05cd60f82909793abeb7f5cd841714af3a2e0e1"
+        },
+        "_GoreOnslaughtTestBinding": {
+          "before": null,
+          "after": "ac11a3c6fb51709bd959b5a17ebd7b977d862f25914d2b12da0398ac2d58c72f"
+        },
+        "_GoreOnslaughtTransition": {
+          "before": null,
+          "after": "eacdecbb776e910b2a8f74eaeed3ab3776f7272a176d18491932f684131ef44f"
         },
         "_blood_begets_skulls_test_successor": {
           "before": "7473cd8a99deacf3776da89b91bd2e518f7d529068abcb282b18eb68bcff866e",
@@ -348,7 +356,7 @@
         },
         "_gore_hungry_onslaught_transition": {
           "before": null,
-          "after": "68552dff8dcab48fd95f67bb3298db9a55bdda8f1db2adc1455cc9fffb3f8d47"
+          "after": "c87b79e283b46532c8acd6876ef0786c3a39946b3b6d42fb6f01a5616214b628"
         },
         "_skulls_beget_blood_test_successor": {
           "before": "d9c9e040b0d167a0870f0588a4062b8677f4eacd91f7777a02c7b7f7ca6c5744",
@@ -662,13 +670,23 @@
         }
       }
     },
+    "tests/code_quality/test_performance_policy.py": {
+      "before_sha256": "0702b2a540c904e06a55d6f7a543e1cef4d8f73211990dbacb514c7ae58141dc",
+      "after_sha256": "69430b0d432479329e8acf671c8eadce38bb00f2baa09dc1ce883685208c3a3e",
+      "owners": {
+        "test_order108_smoke_scope_authenticates_complete_semantic_rows": {
+          "before": "fa492ce9847e680664d9425c11a0d950965617abf3f336d745cb9879a62563e7",
+          "after": "b565e5f270a97b4da77a5dafd021a2209247a9d57df4d52bb8e940c479a67ff7"
+        }
+      }
+    },
     "tests/factions/chaos_daemons/integration/test_blood_begets_skulls.py": {
       "before_sha256": "27f5617e3e182cd547caedee49c2383c291a96ed76b40ef71a26730f072a1c84",
-      "after_sha256": "2e40f57baf32b92e3361b6bd0e50bc11ef12dbcf253abc3fc78e2b2e9fa773ce",
+      "after_sha256": "7716bb0cffabe2d7b73b95fe35e437e851e97e73c18e758fe143b5c7ad50eb28",
       "owners": {
         "@module": {
           "before": "da875b3714312021e4ec5e78e76913d80234af35ec372c6bfc9b26d7aee64c83",
-          "after": "6a0072dfe62c3e4f36ae3ed69cfa89ae2813c1ef54b22701a997a996cbc7cb57"
+          "after": "a0b36de739931723c55a4527c43e049ba9c1f7da157490c2312e74541a18eada"
         },
         "_reach_charge": {
           "before": "45e6e29d0d2bc882515a31ab7faf10c286d7bdce15a0d8690baef37fec7b287e",
@@ -684,15 +702,7 @@
         },
         "skulls_definitions": {
           "before": "3793a44f75d36f1f63a5a84b41903d522632394505061761170c2ff01091787c",
-          "after": "f3dc6b730f8b59afada3c28561054cf18e657dcb758c1495d49320b541a8178a"
-        },
-        "stratagem_targets": {
-          "before": null,
-          "after": "39471ee0d57fa349371872213e7d643c9ea48734c328dbe1b7465250e8a6f794"
-        },
-        "submit_option": {
-          "before": null,
-          "after": "af0fa403468cd67dd2bf7084cc04d5b07e5d8f0a5a3ac5a35721708ca93a3f48"
+          "after": null
         },
         "test_blood_begets_skulls_decline_then_offer_after_earlier_charge": {
           "before": "7b94ffa2f3bf32a13306261a9c21ade0bcbda8589b831ceda0ad26d98066e93f",
@@ -710,11 +720,11 @@
     },
     "tests/factions/chaos_daemons/integration/test_gore_hungry_onslaught.py": {
       "before_sha256": null,
-      "after_sha256": "49016f52ee4ae0f35f26a4630e2ef4acdc9cc87b3c6a5285453c069b4a439509",
+      "after_sha256": "d7576d5bfb20b14450a50a5171396352d4ef2a4939ea74fea91a5f7593ae64af",
       "owners": {
         "@module": {
           "before": null,
-          "after": "0e3dea1c067b782976e674fac0c0b5b247cb577fed61d65973be32a298080db1"
+          "after": "5c126525cf5f80ff04366a54d0e45287ed427dd8572ef688cdaef40dbd859b2f"
         },
         "_advance_through_wall": {
           "before": null,
@@ -768,8 +778,28 @@
     },
     "tests/factions/chaos_daemons/integration/test_skulls_beget_blood.py": {
       "before_sha256": "8fffccffbedd6b697d85d2b0da189435d8251c88c88f96ae69e865cfe1abd6b9",
-      "after_sha256": "0a887fe28de5be226a37272b9176a445ae2cf467615f6d28636391812aa862ca",
+      "after_sha256": "47b8ed9ae433b78130342433e0ebea27ebafde9488dcce651cf0da3da25e2e65",
       "owners": {
+        "@module": {
+          "before": "b880ace73a1485ee7f90d7f774fd6f06d40fa7eda64385d5725a46b44999e50d",
+          "after": "f5f37a57394b1271cfdcc1f8a16bc57db2f772d4243c905ed5dfdbb94746be0f"
+        },
+        "_blood_legion_definitions": {
+          "before": "293a363c9f45e679aa1f44391cc68896d3227a7304b2bba7a4de3753b30f9644",
+          "after": null
+        },
+        "_overlay_attached_fixture_deep_strike": {
+          "before": "f976779407bee8388c0d933d61e8467d114347cca3186d8bd6e9f8c63c476e57",
+          "after": null
+        },
+        "attached_skulls_definitions": {
+          "before": "bfecd404d3b1877d8d4ab5077505b72e5f6585ff293458d3082937219ab122d1",
+          "after": null
+        },
+        "shooting_skulls_definitions": {
+          "before": "d486ef90494c661b0688743db6671869211067f3109307022feb71d67cddf07f",
+          "after": "100f96fff23eec586729005558900f7875780668157e54b12a95910b17aa954a"
+        },
         "test_skulls_beget_blood_allows_advance_but_excludes_fall_back": {
           "before": "0c81778844f035850e0c1c4b3a3deb34f7b35921f8b1d95f4a04b25b96c132fe",
           "after": "540500ec37ff14f0fd000e9ad06f2783dd5700eedf89c315d6b32da09560064b"
@@ -787,6 +817,40 @@
         "test_phase17i_source_text_boundaries_are_explicit": {
           "before": "6405f4bd29f3b814b5dc39325131db22e0446cb2d5a7679a753e5e0c4192857f",
           "after": "4c828bd6e79d93901ef87c13ebc11c4fd78c87104ba122e212e6fcdebf7f38b6"
+        }
+      }
+    },
+    "tests/support/blood_legion.py": {
+      "before_sha256": null,
+      "after_sha256": "57a526024d49eb61173e62f287b4dfa4937fa05d09e68b30cf3e81c3c70c8a47",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "2534dfe8d3a1e30003a36521d4c01b6938f0c46a1881ef6dc24a91288d64a2f8"
+        },
+        "_overlay_attached_fixture_deep_strike": {
+          "before": null,
+          "after": "f976779407bee8388c0d933d61e8467d114347cca3186d8bd6e9f8c63c476e57"
+        },
+        "attached_skulls_definitions": {
+          "before": null,
+          "after": "0025a5eafd9740c9b5497c9119c2707affbda46edad54f462e9a3aea9c474b7c"
+        },
+        "blood_legion_definitions": {
+          "before": null,
+          "after": "53f87f167af0c5adbb3f6625caa4a4442e8c3b676bc07ef00902d7b931c6a610"
+        },
+        "skulls_definitions": {
+          "before": null,
+          "after": "56d6ceaae55ebe210a1196c8e6d94398435c8b1639fbbc5dab7ae711b3f000f2"
+        },
+        "stratagem_targets": {
+          "before": null,
+          "after": "d129a92e1907a1c436ff865b5e7c53aecb7e3e132be22b2cbc7042c2c26b0445"
+        },
+        "submit_option": {
+          "before": null,
+          "after": "af0fa403468cd67dd2bf7084cc04d5b07e5d8f0a5a3ac5a35721708ca93a3f48"
         }
       }
     }
@@ -1326,6 +1390,18 @@
       "source_obligation": "Retained June and July Chaos Daemons card, page 124, and Core Rules 09.06 and 11.02.",
       "unchanged_work": "No changes to the algorithms for path search, endpoints, model collision, distance, LOS, or the existing MOBILE/FLY permissions. Run exact matched measurements on the touched geometry and eligibility owners."
     },
+    "tests/code_quality/test_performance_policy.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "ci64-provenance-c8a1c41e8f12a86f5176cb3116bad5fc710ca45c9bc40c0f0a8e9230613ff960",
+        "ci67-transaction-c8a1c41e8f12a86f5176cb3116bad5fc710ca45c9bc40c0f0a8e9230613ff960",
+        "speedup-test-admission"
+      ],
+      "rationale": "Use native settled Advance and Charge continuations, scoped terrain crossing, and canonical attached-unit options.",
+      "source_obligation": "Retained June and July Chaos Daemons card, page 124, and Core Rules 09.06 and 11.02.",
+      "unchanged_work": "No changes to the algorithms for path search, endpoints, model collision, distance, LOS, or the existing MOBILE/FLY permissions. Run exact matched measurements on the touched geometry and eligibility owners.",
+      "selected_families": []
+    },
     "tests/factions/chaos_daemons/integration/test_blood_begets_skulls.py": {
       "category": "rule_semantics",
       "operations": [
@@ -1367,6 +1443,16 @@
       "rationale": "Use native settled Advance and Charge continuations, scoped terrain crossing, and canonical attached-unit options.",
       "source_obligation": "Retained June and July Chaos Daemons card, page 124, and Core Rules 09.06 and 11.02.",
       "unchanged_work": "No changes to the algorithms for path search, endpoints, model collision, distance, LOS, or the existing MOBILE/FLY permissions. Run exact matched measurements on the touched geometry and eligibility owners."
+    },
+    "tests/support/blood_legion.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "gore-hungry-onslaught-native-validation"
+      ],
+      "rationale": "Use native settled Advance and Charge continuations, scoped terrain crossing, and canonical attached-unit options.",
+      "source_obligation": "Retained June and July Chaos Daemons card, page 124, and Core Rules 09.06 and 11.02.",
+      "unchanged_work": "No changes to the algorithms for path search, endpoints, model collision, distance, LOS, or the existing MOBILE/FLY permissions. Run exact matched measurements on the touched geometry and eligibility owners.",
+      "selected_families": []
     }
   },
   "milestone": "ordinary",
