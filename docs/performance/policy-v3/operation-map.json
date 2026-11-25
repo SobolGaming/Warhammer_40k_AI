@@ -37585,7 +37585,8 @@
         "tests/factions/chaos_daemons/integration/test_blood_begets_skulls.py",
         "tests/factions/chaos_daemons/integration/test_gore_hungry_onslaught.py",
         "tests/factions/chaos_daemons/integration/test_skulls_beget_blood.py",
-        "tests/infrastructure/source_governance/unit/test_blocked_row_classification.py"
+        "tests/infrastructure/source_governance/unit/test_blocked_row_classification.py",
+        "tests/support/blood_legion.py"
       ],
       "owners": [
         "@module",
@@ -37593,13 +37594,18 @@
         "_assert_attached_target",
         "_assert_onslaught",
         "_assert_replay",
+        "_blood_legion_definitions",
         "_move_nonlevel",
         "_nonlevel_witness",
         "_onslaught_option",
         "_onslaught_scene",
+        "_overlay_attached_fixture_deep_strike",
         "_reach_charge",
         "_submit",
         "_targets",
+        "attached_skulls_definitions",
+        "blood_legion_definitions",
+        "shooting_skulls_definitions",
         "skulls_definitions",
         "stratagem_targets",
         "submit_option",
@@ -37626,6 +37632,8 @@
       "owners": [
         "@document",
         "@module",
+        "_GoreOnslaughtTestBinding",
+        "_GoreOnslaughtTransition",
         "_blood_begets_skulls_test_successor",
         "_gore_hungry_onslaught_transition",
         "_skulls_beget_blood_test_successor",

@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 from pathlib import Path
+from typing import TypedDict, cast
 
 from scripts.behavioral_selection_members import (
     _selection_members,
@@ -709,7 +710,7 @@ WRATH_UNDENIABLE_OWNER = "tests/factions/chaos_daemons/integration/test_wrath_un
 GORE_HUNGRY_ONSLAUGHT_TRANSITION = (
     "data/source_audits/ci64_provenance_v1/gore-hungry-onslaught-transition-v1.json"
 )
-GORE_HUNGRY_ONSLAUGHT_SHA256 = "06d2b7f60680ae5fa049e33ba1fc13c3d96c12e458d8f7bfe03b3ab8491df55e"
+GORE_HUNGRY_ONSLAUGHT_SHA256 = "6f854ba2aad31c2ff3d84343151692174d492356cac79afeed1c6105a2f72ead"
 GORE_HUNGRY_ONSLAUGHT_OWNER = (
     "tests/factions/chaos_daemons/integration/test_gore_hungry_onslaught.py"
 )
@@ -742,13 +743,31 @@ GORE_HUNGRY_ONSLAUGHT_HISTORICAL_SOURCES = {
 }
 
 
-def _gore_hungry_onslaught_transition(root: Path) -> tuple[dict[str, object], bytes] | None:
+class _GoreOnslaughtTestBinding(TypedDict):
+    before: dict[str, object]
+    after: dict[str, object]
+
+
+class _GoreOnslaughtTransition(TypedDict):
+    schema: str
+    base: str
+    retained_transition_sha256: str
+    retained_runtime_fingerprint: str
+    runtime_fingerprint: str
+    replaced_sources: SourceSuccessors
+    new_sources: dict[str, str]
+    historical_sources: SourceSuccessors
+    updated_files: dict[str, _GoreOnslaughtTestBinding]
+    added_files: TestSuccessors
+
+
+def _gore_hungry_onslaught_transition(root: Path) -> tuple[_GoreOnslaughtTransition, bytes] | None:
     path = root / GORE_HUNGRY_ONSLAUGHT_TRANSITION
     _selection_no_links(root, path)
     if not path.exists():
         return None
     raw = _checked_bytes(root, GORE_HUNGRY_ONSLAUGHT_TRANSITION, GORE_HUNGRY_ONSLAUGHT_SHA256)
-    record = json.loads(raw, object_pairs_hook=_selection_object)
+    record = cast(_GoreOnslaughtTransition, json.loads(raw, object_pairs_hook=_selection_object))
     classifier = "tests/infrastructure/source_governance/unit/test_blocked_row_classification.py"
     if (
         record.keys()

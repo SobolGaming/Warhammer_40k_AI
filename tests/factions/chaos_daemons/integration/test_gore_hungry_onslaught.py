@@ -6,7 +6,10 @@ from math import inf, nextafter
 import pytest
 
 from tests.daemons_native_source_helpers import BELAKOR
-from tests.factions.chaos_daemons.integration.test_blood_begets_skulls import (
+from tests.save7_allocation_helpers import BLOODLETTERS
+from tests.sequential_translation_helpers import leading_first_translation_paths
+from tests.support.blood_legion import (
+    BLOODMASTER,
     BLOODTHIRSTER,
     DETACHMENTS,
     ENEMY,
@@ -17,17 +20,12 @@ from tests.factions.chaos_daemons.integration.test_blood_begets_skulls import (
     stratagem_targets,
     submit_option,
 )
-from tests.factions.chaos_daemons.integration.test_blood_begets_skulls import (
-    skulls_definitions as skulls_definitions,
-)
-from tests.factions.chaos_daemons.integration.test_skulls_beget_blood import (
-    BLOODMASTER,
-)
-from tests.factions.chaos_daemons.integration.test_skulls_beget_blood import (
+from tests.support.blood_legion import (
     attached_skulls_definitions as attached_skulls_definitions,
 )
-from tests.save7_allocation_helpers import BLOODLETTERS
-from tests.sequential_translation_helpers import leading_first_translation_paths
+from tests.support.blood_legion import (
+    skulls_definitions as skulls_definitions,
+)
 from tests.support.faction_batch01 import (
     CRUSHERS,
     LORD,

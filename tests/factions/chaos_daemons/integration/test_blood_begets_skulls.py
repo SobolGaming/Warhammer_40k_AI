@@ -1,14 +1,21 @@
 """Blood Begets Skulls through the live Movement and Charge decisions."""
 
-from dataclasses import replace
-from pathlib import Path
-
 import pytest
-from tools.generate_ability_support_matrix import (
-    _ability_support_catalog_package,  # pyright: ignore[reportPrivateUsage]
-)
 
-from tests.daemons_native_source_helpers import BELAKOR, SELECTED
+from tests.daemons_native_source_helpers import BELAKOR
+from tests.support.blood_legion import (
+    DETACHMENTS,
+    ENEMY,
+    FIRST,
+    GORE_ID,
+    SECOND,
+    WRONG_KEYWORD,
+    stratagem_targets,
+    submit_option,
+)
+from tests.support.blood_legion import (
+    skulls_definitions as skulls_definitions,
+)
 from tests.support.faction_batch01 import (
     CRUSHERS,
     LORD,
@@ -25,7 +32,6 @@ from tests.support.section02_fixtures import Section02Definitions
 from tests.support.section04_fixtures import pending
 from tests.support.section11_fixtures import begin
 from warhammer40k_core.adapters.local_session import LocalGameSession
-from warhammer40k_core.core.detachment import DetachmentDefinition
 from warhammer40k_core.engine.charge_effects import (
     CHARGE_AFTER_ADVANCE_EFFECT_KIND,
     charge_after_advance_allowed_by_effects,
@@ -33,7 +39,7 @@ from warhammer40k_core.engine.charge_effects import (
 from warhammer40k_core.engine.command_points import CommandPointSourceKind
 from warhammer40k_core.engine.decision_request import DecisionError, DecisionRequest
 from warhammer40k_core.engine.effects import EffectExpiration
-from warhammer40k_core.engine.phase import BattlePhase, LifecycleStatus
+from warhammer40k_core.engine.phase import BattlePhase
 from warhammer40k_core.engine.replay import ReplayRunner
 from warhammer40k_core.engine.stratagems import (
     DECLINE_STRATAGEM_WINDOW_OPTION_ID,
@@ -43,67 +49,12 @@ from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_blood_legion_ir_support_2026_27 as blood_legion_ir,
 )
-from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
-    faction_detachments_2026_27 as identities,
-)
 
 STRATAGEM_ID = blood_legion_ir.BLOOD_BEGETS_SKULLS_STRATAGEM_ID
 SOURCE_ID = (
     "gw-11e-phase17e-exact-faction-subrules-2026-27:"
     f"{blood_legion_ir.BLOOD_BEGETS_SKULLS_SOURCE_ROW_ID}"
 )
-DETACHMENTS = {
-    "chaos-daemons": "blood-legion",
-    "emperors-children": "court-of-the-phoenician",
-}
-FIRST = "own:first"
-SECOND = "own:second"
-WRONG_KEYWORD = "own:undivided"
-ENEMY = "foe:target"
-BLOODTHIRSTER = "000002582"
-GORE_ID = blood_legion_ir.GORE_HUNGRY_ONSLAUGHT_STRATAGEM_ID
-
-
-@pytest.fixture(scope="module")
-def skulls_definitions(selected_army_source_index: Path | None) -> Section02Definitions:
-    package = _ability_support_catalog_package(
-        datasheet_ids=(*SELECTED, BLOODTHIRSTER, "000004080", LORD, "000004090"),
-        source_index_dir=selected_army_source_index,
-    )
-    catalog = package.army_catalog
-    source_factions = {"CD": "chaos-daemons", "EC": "emperors-children"}
-    factions = tuple(
-        replace(faction, faction_id=source_factions[faction.faction_id])
-        for faction in catalog.factions
-    )
-    detachments = tuple(
-        DetachmentDefinition(
-            canonical_detachment_id=row.detachment_id,
-            detachment_id=row.detachment_id,
-            name=row.name,
-            faction_id=faction.faction_id,
-            detachment_point_cost=row.detachment_point_cost,
-            unit_datasheet_ids=tuple(
-                sheet.datasheet_id
-                for sheet in catalog.datasheets
-                if set(sheet.keywords.faction_keywords).intersection(faction.faction_keywords)
-            ),
-            force_disposition_ids=tuple(
-                sorted({row.force_disposition_id, "take-and-hold", "purge-the-foe"})
-            ),
-            source_ids=row.source_ids,
-        )
-        for faction in factions
-        for row in identities.detachment_rows()
-        if row.detachment_id == DETACHMENTS[faction.faction_id]
-    )
-    return Section02Definitions(
-        replace(
-            package,
-            army_catalog=replace(catalog, factions=factions, detachments=detachments),
-        ),
-        0.0,
-    )
 
 
 def _scene(
@@ -142,15 +93,6 @@ def _scene(
     return battle
 
 
-def submit_option(session: LocalGameSession, option: str) -> LifecycleStatus:
-    req = pending(session)
-    return session.submit_option(
-        request_id=req.request_id,
-        result_id=f"{req.request_id}:skulls",
-        option_id=option,
-    )
-
-
 def _reach_charge(battle: Scene, *, advance: tuple[str, ...]) -> DecisionRequest:
     begin(battle.session)
     for unit in (FIRST, SECOND, WRONG_KEYWORD):
@@ -179,20 +121,6 @@ def _reach_charge(battle: Scene, *, advance: tuple[str, ...]) -> DecisionRequest
     if req.decision_type == "select_shooting_unit":
         req = require_request(submit_option(battle.session, "complete_shooting_phase"))
     return req
-
-
-def stratagem_targets(request: DecisionRequest, stratagem_id: str = STRATAGEM_ID) -> dict[str, str]:
-    targets: dict[str, str] = {}
-    for option in request.options:
-        if not option.option_id.startswith(f"use-stratagem:{stratagem_id}:"):
-            continue
-        assert isinstance(option.payload, dict)
-        binding = option.payload["target_binding"]
-        assert isinstance(binding, dict)
-        unit_id = binding["target_unit_instance_id"]
-        assert isinstance(unit_id, str)
-        targets[unit_id] = option.option_id
-    return targets
 
 
 def _assert_grant(battle: Scene, target: str, *, remaining_cp: int) -> None:

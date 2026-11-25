@@ -66,9 +66,9 @@
       },
       "after": {
         "mode": "100644",
-        "blob_sha1": "c54d326f54612770883fac242b683b820b2d8a0a",
-        "sha256": "2e40f57baf32b92e3361b6bd0e50bc11ef12dbcf253abc3fc78e2b2e9fa773ce",
-        "bytes": 14150
+        "blob_sha1": "cdee52b101b4e96bcd7a699d75b2dbbe0108f8e8",
+        "sha256": "7716bb0cffabe2d7b73b95fe35e437e851e97e73c18e758fe143b5c7ad50eb28",
+        "bytes": 11283
       }
     },
     "tests/factions/chaos_daemons/integration/test_skulls_beget_blood.py": {
@@ -80,18 +80,18 @@
       },
       "after": {
         "mode": "100644",
-        "blob_sha1": "3e055bb1d0c1c53095ceff8277d8311484dd754c",
-        "sha256": "0a887fe28de5be226a37272b9176a445ae2cf467615f6d28636391812aa862ca",
-        "bytes": 21764
+        "blob_sha1": "b416c741a0a5632fee8c0c896d4fbbf75e045f5a",
+        "sha256": "47b8ed9ae433b78130342433e0ebea27ebafde9488dcce651cf0da3da25e2e65",
+        "bytes": 17820
       }
     }
   },
   "added_files": {
     "tests/factions/chaos_daemons/integration/test_gore_hungry_onslaught.py": {
       "mode": "100644",
-      "blob_sha1": "aea57be325087a76323cd6871c2e41cf05ccb2e4",
-      "sha256": "49016f52ee4ae0f35f26a4630e2ef4acdc9cc87b3c6a5285453c069b4a439509",
-      "bytes": 24291
+      "blob_sha1": "bd31fd162978cd74b24458a720caa98d48a1ec3a",
+      "sha256": "d7576d5bfb20b14450a50a5171396352d4ef2a4939ea74fea91a5f7593ae64af",
+      "bytes": 24094
     }
   },
   "historical_sources": {

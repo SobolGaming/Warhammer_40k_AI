@@ -125,7 +125,11 @@ def test_order108_smoke_scope_authenticates_complete_semantic_rows(path: str, dr
     scope = read_object(ROOT / ORDER108_SCOPE)
     base = str(scope["base"])
     operation = "visibility-query" if "/core/" in path else "geometry-search"
-    value, changes, mapping = _assessment(path, category="rule_semantics", operations=(operation,))
+    operations: tuple[str, ...] = (operation,)
+    if path == "src/warhammer40k_core/geometry/pathing.py":
+        # The complete current pathing row also routes the scoped terrain capability.
+        operations += ("gore-hungry-onslaught-source-backed-terrain",)
+    value, changes, mapping = _assessment(path, category="rule_semantics", operations=operations)
     change = copy.deepcopy(object_value(object_value(scope["changes"])[path]))
     changes[path] = change
     value["base"] = base
@@ -141,6 +145,8 @@ def test_order108_smoke_scope_authenticates_complete_semantic_rows(path: str, dr
         renamed = path.replace(".py", "_other.py")
         changes[renamed] = changes.pop(path)
         rows[renamed] = rows.pop(path)
+        # The renamed path retains only the general operation; isolate scope drift.
+        row["operations"] = [operation]
     elif drift in {"before_file", "after_file"}:
         change[drift.removesuffix("_file") + "_sha256"] = "0" * 64
     elif drift in {"before_owner", "after_owner"}:
