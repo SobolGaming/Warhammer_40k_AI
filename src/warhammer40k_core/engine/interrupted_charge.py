@@ -15,6 +15,42 @@ from warhammer40k_core.engine.reaction_queue import ReactionQueue
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
     from warhammer40k_core.engine.phases.charge import ChargePhaseHandler
+    from warhammer40k_core.engine.stratagems_model import StratagemUseRecord
+
+
+def charge_action_in_current_phase(state: GameState) -> bool:
+    phase = state.charge_phase_state
+    source = None if phase is None else phase.interruption
+    host = BattlePhase.CHARGE if source is None else source.host_phase
+    return state.current_battle_phase is host
+
+
+def start_interrupted_charge(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    use: StratagemUseRecord,
+    source: ChargeInterruption,
+) -> None:
+    if (
+        state.current_battle_phase is not source.host_phase
+        or state.active_player_id != source.turn_player_id
+        or state.charge_phase_state != source.suspended_phase
+    ):
+        raise GameLifecycleError("Charge interruption parent phase drift.")
+    from warhammer40k_core.engine.active_player_scopes import charge_scope, push_scope
+    from warhammer40k_core.engine.charge_phase_state import ChargePhaseState
+
+    state.replace_charge_phase_state(
+        ChargePhaseState(state.battle_round, use.player_id, interruption=source)
+    )
+    scope = charge_scope(state)
+    if scope is None:
+        raise GameLifecycleError("Charge interruption failed to create its active-player scope.")
+    push_scope(state, scope)
+    decisions.event_log.append(
+        "interrupted_charge_started", {"player_id": use.player_id, "source": source.to_payload()}
+    )
 
 
 def advance_interrupted_charge(
@@ -27,7 +63,7 @@ def advance_interrupted_charge(
     phase = state.charge_phase_state
     if phase is None or phase.interruption is None:
         return None
-    if state.current_battle_phase is not BattlePhase.CHARGE:
+    if not charge_action_in_current_phase(state):
         raise GameLifecycleError("Interrupted Charge cannot escape its phase.")
     if decisions.queue.pending_requests or state.out_of_phase_shooting_state is not None:
         return None
@@ -99,6 +135,13 @@ def continue_interrupted_charge_reaction(
 def charge_turn_owner_at_event(
     *, event_records: tuple[EventRecord, ...], event_index: int, actor_id: str
 ) -> str:
+    source = charge_interruption_at_event(event_records=event_records, event_index=event_index)
+    return actor_id if source is None else source.turn_player_id
+
+
+def charge_interruption_at_event(
+    *, event_records: tuple[EventRecord, ...], event_index: int
+) -> ChargeInterruption | None:
     source: ChargeInterruption | None = None
     for event in event_records[:event_index]:
         if event.event_type == "interrupted_charge_started":
@@ -107,4 +150,4 @@ def charge_turn_owner_at_event(
             source = ChargeInterruption.from_payload(event.payload["source"])
         elif event.event_type == "interrupted_charge_completed":
             source = None
-    return actor_id if source is None else source.suspended_phase.active_player_id
+    return source

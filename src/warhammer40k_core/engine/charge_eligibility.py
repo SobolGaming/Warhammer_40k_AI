@@ -59,6 +59,7 @@ def charge_unit_ineligibility_reason(
     ruleset_descriptor: RulesetDescriptor,
     charge_state: ChargePhaseState,
     ignore_already_selected: bool,
+    allowed_target_ids: tuple[str, ...] | None = None,
     charge_target_restriction_hooks: ChargeTargetRestrictionHookRegistry | None = None,
 ) -> str | None:
     requested_unit_id = _charge._validate_identifier("unit_instance_id", unit_instance_id)
@@ -147,6 +148,10 @@ def charge_unit_ineligibility_reason(
         ruleset_descriptor=ruleset_descriptor,
         charge_target_restriction_hooks=charge_target_restriction_hooks,
     )
+    if allowed_target_ids is not None:
+        legal_target_ids = tuple(
+            unit_id for unit_id in legal_target_ids if unit_id in allowed_target_ids
+        )
     if not charge_target_constraints_satisfied(
         state=state,
         unit_instance_id=requested_unit_id,

@@ -1,0 +1,17 @@
+{
+  "base": "740b558ab5542e4120fdc49d05bb6819d1b53698",
+  "path": "src/warhammer40k_core/engine/stratagems_eligibility.py",
+  "change": {
+    "before_sha256": "8ca0274919eebd381513f9e99ca938935ec27cbd2d5b69dfc364deadfbde0ef1",
+    "after_sha256": "8710548a1a3a07fdda22e451eb4f8f81d9206ab1c3b77d577c1bb1b452ba668c",
+    "owners": {
+      "_generic_rule_ir_stratagem_unavailable_reason": {
+        "before": "0695308e7309326922bf8036540bc40b91e9357b8fd45c594826c193699c8e10",
+        "after": "f2224abbdc719c94c458d86eef4cc4694527dc0ab3499f642c68149ff3b55ab2"
+      }
+    }
+  },
+  "operation": "order135-visibility-hot-consumers",
+  "source_obligation": "Chaos Daemons Faction Pack v1.2 page 124 requires the chosen friendly Khorne daemon to be within six inches of the enemy that just Fell Back.",
+  "unchanged_work": "The added check runs only for the Fall Back Charge trigger metadata and uses the existing unit-distance authority. Visible-enemy enumeration, LOS geometry, and all other Stratagem target checks keep their existing algorithms."
+}

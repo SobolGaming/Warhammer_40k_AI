@@ -709,6 +709,18 @@ def _generic_rule_ir_stratagem_unavailable_reason(
         )
         if visible_enemy_error is not None:
             return visible_enemy_error
+    from warhammer40k_core.engine.movement_charge_stratagem import (
+        TRIGGER_RANGE,
+        fall_back_charge_target_error,
+    )
+
+    if TRIGGER_RANGE in effect_payload:
+        return fall_back_charge_target_error(
+            state=state,
+            context=context,
+            target_unit_id=target_unit_id,
+            trigger_range=effect_payload[TRIGGER_RANGE],
+        )
     effect_selection_battle_shock_key = _optional_generic_metadata_identifier(
         effect_payload,
         key="effect_selection_unit_forbidden_if_battle_shocked",

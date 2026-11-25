@@ -111,6 +111,21 @@ def _apply_generic_rule_ir_stratagem_handler(
         if rule_result.reason is None:
             raise GameLifecycleError("Generic Stratagem rule execution failed without reason.")
         raise GameLifecycleError(f"Generic Stratagem rule execution failed: {rule_result.reason}.")
+    from warhammer40k_core.engine.movement_charge_stratagem import ABILITY, movement_charge_source
+
+    if _rule_execution_result_grants_ability(
+        effect_payloads=rule_result.effect_payloads, ability=ABILITY
+    ):
+        from warhammer40k_core.engine.interrupted_charge import start_interrupted_charge
+
+        source = movement_charge_source(
+            state=state,
+            use=use_record,
+            context=context,
+            events=decisions.event_log.records,
+            records=decisions.records,
+        )
+        start_interrupted_charge(state=state, decisions=decisions, use=use_record, source=source)
     if _rule_execution_result_grants_out_of_phase_shoot(rule_result.effect_payloads):
         _request_generic_out_of_phase_shooting(
             runtime_modifier_registry=runtime_modifier_registry,

@@ -11,6 +11,7 @@ from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.move_completed_stratagem_candidates import (
     charge_move_stratagem_candidates,
 )
+from warhammer40k_core.engine.movement_charge_stratagem import fall_back_charge_trigger_payload
 from warhammer40k_core.engine.movement_end_surge_hooks import (
     MovementEndSurgeContext,
     MovementEndSurgeDistanceKind,
@@ -29,7 +30,7 @@ from warhammer40k_core.engine.reaction_windows import ReactionWindowKind
 from warhammer40k_core.engine.sequencing import SequencingParticipant, SequencingRequirement
 from warhammer40k_core.engine.stratagem_cost_modifiers import StratagemCostModifierRegistry
 from warhammer40k_core.engine.stratagem_timing_candidates import stratagem_timing_candidates
-from warhammer40k_core.engine.stratagems import StratagemCatalogIndex
+from warhammer40k_core.engine.stratagems import StratagemCatalogIndex, StratagemEligibilityContext
 from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.triggered_movement import (
@@ -78,6 +79,34 @@ def move_reaction_candidates(
     for player_id in state.player_ids:
         if player_id == context.triggering_player_id:
             continue
+        if (
+            context.movement_action == "fall_back"
+            and state.active_player_id == context.triggering_player_id
+            and stratagem_index.records_for(TimingTriggerKind.AFTER_ENEMY_UNIT_ENDS_FALL_BACK)
+        ):
+            payload = fall_back_charge_trigger_payload(
+                battle_round=state.battle_round,
+                turn_player_id=context.triggering_player_id,
+                source_event_id=context.trigger_event_id,
+                events=decisions.event_log.records,
+                records=decisions.records,
+            )
+            candidates.extend(
+                stratagem_timing_candidates(
+                    state=state,
+                    decisions=decisions,
+                    index=stratagem_index,
+                    context=StratagemEligibilityContext.from_state(
+                        state=state,
+                        player_id=player_id,
+                        trigger_kind=TimingTriggerKind.AFTER_ENEMY_UNIT_ENDS_FALL_BACK,
+                        timing_window_id=f"enemy-fell-back:{context.trigger_event_id}",
+                        trigger_payload=payload,
+                    ),
+                    cost_modifiers=cost_modifiers,
+                    requested_event_type="move_completed_stratagem_window_opened",
+                )
+            )
         surge_context = MovementEndSurgeContext(
             state=state,
             ruleset_descriptor=context.ruleset_descriptor,

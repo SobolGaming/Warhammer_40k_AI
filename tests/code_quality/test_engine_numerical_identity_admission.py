@@ -11,6 +11,7 @@ from typing import Any, cast
 import pytest
 from scripts import build_test_shards as sharding
 from scripts import engine_numerical_identity_test_admission as selection
+from scripts import fools_flight_test_admission as fools
 from scripts import stage2_ground_charge_test_admission as ground_charge
 from scripts.canonical_circle_test_admission import ADDITION as CIRCLE_ADDITION
 from scripts.canonical_polygon_pairs_test_admission import ADDITION as PAIRS_ADDITION
@@ -549,7 +550,6 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         pact["retained_transition_sha256"]
         == hashlib.sha256((ROOT / selection.CHARGE_FLIGHT_WALL_TRANSITION).read_bytes()).hexdigest()
     )
-    assert pact["runtime_fingerprint"] == _record(MANIFEST)["fingerprint"]
     assert sum(dark_pact.NEW_TEST in group for group in groups) == 1
     assert len([node for node in current if node.startswith(dark_pact.NEW_TEST + "::")]) == 21
     base_weights = json.loads(
@@ -558,6 +558,59 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         )
     )["case_seconds"]
     assert all(current[node] == seconds for node, seconds in base_weights.items())
+    fools_record = _record(fools.TRANSITION)
+    flight_base_manifest = json.loads(
+        subprocess.check_output(["git", "show", fools.BASE + ":" + MANIFEST], cwd=ROOT)
+    )
+    assert pact["runtime_fingerprint"] == flight_base_manifest["fingerprint"]
+    assert pact["runtime_fingerprint"] == fools_record["retained_runtime_fingerprint"]
+    assert fools_record["runtime_fingerprint"] == _record(MANIFEST)["fingerprint"]
+    assert (
+        fools_record["retained_transition_sha256"]
+        == hashlib.sha256((ROOT / dark_pact.RECEIPT).read_bytes()).hexdigest()
+    )
+    assert (ROOT / dark_pact.RECEIPT).read_bytes() == subprocess.check_output(
+        ["git", "show", fools.BASE + ":" + dark_pact.RECEIPT], cwd=ROOT
+    )
+    flight_base_weights = json.loads(
+        subprocess.check_output(
+            ["git", "show", fools.BASE + ":ci/test_shards/durations.json"], cwd=ROOT
+        )
+    )
+    current_weights = _record("ci/test_shards/durations.json")
+    for weights in ("files", "case_seconds"):
+        assert all(
+            current_weights[weights][node] == seconds
+            for node, seconds in flight_base_weights[weights].items()
+        )
+    assert set(fools_record["replaced_sources"]) == fools.REPLACED_SOURCES
+    for name, binding in fools_record["replaced_sources"].items():
+        assert (
+            binding["before"]
+            == hashlib.sha256(
+                subprocess.check_output(["git", "show", fools.BASE + ":" + name], cwd=ROOT)
+            ).hexdigest()
+        )
+        assert binding["after"] == hashlib.sha256((ROOT / name).read_bytes()).hexdigest()
+    assert fools_record["new_sources"] == {
+        fools.NEW_SOURCE: hashlib.sha256((ROOT / fools.NEW_SOURCE).read_bytes()).hexdigest(),
+    }
+    assert fools.OWNER in active_files
+    assert sum(fools.OWNER in group for group in groups) == 1
+    assert set(fools_record["added_files"]) == {fools.OWNER}
+    assert (
+        fools_record["added_files"][fools.OWNER]["sha256"]
+        == hashlib.sha256((ROOT / fools.OWNER).read_bytes()).hexdigest()
+    )
+    fools_cases = {
+        fools.OWNER + "::" + name
+        for name in (
+            "test_fools_flight_native_fall_back_charge_resume_and_replay",
+            "test_fools_flight_unavailable_at_one_cp",
+            "test_fools_flight_short_roll_resumes_opponent_movement",
+            "test_fools_flight_stampede_resolves_before_murdercall_and_replays",
+        )
+    }
     predecessor_path = selection.GORE_HUNGRY_ONSLAUGHT_TRANSITION
     assert (
         wall["retained_transition_sha256"]
@@ -671,7 +724,12 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         )
         predecessor_sources[source] = binding["after"]
     assert gore["new_sources"].keys().isdisjoint(predecessor_sources)
-    for source, digest in (predecessor_sources | gore["new_sources"]).items():
+    predecessor_sources.update(gore["new_sources"])
+    for source, binding in fools_record["replaced_sources"].items():
+        assert binding["before"] == predecessor_sources[source]
+        predecessor_sources[source] = binding["after"]
+    assert fools_record["new_sources"].keys().isdisjoint(predecessor_sources)
+    for source, digest in (predecessor_sources | fools_record["new_sources"]).items():
         assert digest == hashlib.sha256((ROOT / source).read_bytes()).hexdigest()
     wrath_owner = selection.WRATH_UNDENIABLE_OWNER
     assert set(wrath["added_files"]) == {wrath_owner}
@@ -804,6 +862,16 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
     )
     assert (
         gore_classification["after"]["sha256"]
+        == hashlib.sha256(
+            subprocess.check_output(
+                ["git", "show", fools.BASE + ":" + classification_owner], cwd=ROOT
+            )
+        ).hexdigest()
+    )
+    flight_classification = fools_record["updated_files"][classification_owner]
+    assert flight_classification["before"] == gore_classification["after"]
+    assert (
+        flight_classification["after"]["sha256"]
         == hashlib.sha256((ROOT / classification_owner).read_bytes()).hexdigest()
     )
     assert classification_owner in active_files
@@ -1229,6 +1297,7 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         | gore_cases
         | wall_cases
         | onslaught_cases
+        | fools_cases
         | {
             selection.BLOOD_BEGETS_SKULLS_OWNER + "::" + case
             for case in (

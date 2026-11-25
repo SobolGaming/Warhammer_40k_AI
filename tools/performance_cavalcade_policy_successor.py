@@ -19,8 +19,9 @@ def _digest(raw: bytes) -> str:
 def cavalcade_policy_predecessor(raw: bytes) -> bytes:
     """Recover the exact historical policy before its registered-fixture block."""
     from tools.performance_dark_pacts import dark_pacts_policy_predecessor
+    from tools.performance_fools_flight import fools_flight_policy_predecessor
 
-    raw = dark_pacts_policy_predecessor(raw)
+    raw = dark_pacts_policy_predecessor(fools_flight_policy_predecessor(raw))
     if _digest(raw) != _POLICY_AFTER:
         return raw
     start = raw.index(_POLICY_START)

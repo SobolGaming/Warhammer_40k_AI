@@ -11,8 +11,13 @@ from warhammer40k_core.engine.charge_phase_state import (
     ChargePhaseStatePayload,
 )
 from warhammer40k_core.engine.heroic_intervention_rolls import heroic_charge_source
-from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
-from warhammer40k_core.engine.stratagem_use_history_authority import validate_stratagem_use_history
+from warhammer40k_core.engine.movement_charge_stratagem import TRIGGER_RANGE, movement_charge_source
+from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.stratagem_use_history_authority import (
+    FiniteStratagemUseHistoryAuthority,
+    validate_stratagem_use_history,
+)
+from warhammer40k_core.engine.stratagems_model import GENERIC_RULE_IR_STRATAGEM_HANDLER_ID
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.decision_controller import DecisionController
@@ -22,6 +27,7 @@ if TYPE_CHECKING:
 def validate_interrupted_charge_source(*, state: GameState, decisions: DecisionController) -> None:
     active: ChargeInterruption | None = None
     actor: str | None = None
+    source_round: int | None = None
     seen: set[str] = set()
     rolls: list[ChargeRollResult] = []
     for index, event in enumerate(decisions.event_log.records):
@@ -47,7 +53,7 @@ def validate_interrupted_charge_source(*, state: GameState, decisions: DecisionC
             if len(matches) != 1:
                 raise GameLifecycleError("Interrupted Charge lost its Stratagem source.")
             use = matches[0]
-            validate_stratagem_use_history(
+            authority = validate_stratagem_use_history(
                 state=state,
                 event_records=decisions.event_log.records,
                 decision_records=decisions.records,
@@ -55,17 +61,37 @@ def validate_interrupted_charge_source(*, state: GameState, decisions: DecisionC
                 mutation_index=index,
             )
             actor = use.player_id
+            source_round = use.battle_round
             if (
-                use.handler_id != "core:heroic-intervention"
-                or payload["player_id"] != actor
-                or use.phase is not BattlePhase.CHARGE
-                or use.battle_round != active.suspended_phase.battle_round
-                or use.active_player_id != active.suspended_phase.active_player_id
+                payload["player_id"] != actor
+                or use.phase is not active.host_phase
+                or use.active_player_id != active.turn_player_id
                 or actor == use.active_player_id
-                or heroic_charge_source(state=state, use=use, parent=active.suspended_phase)
-                != active
             ):
                 raise GameLifecycleError("Interrupted Charge source restrictions or owner drift.")
+            if active.suspended_phase is not None:
+                if (
+                    use.handler_id != "core:heroic-intervention"
+                    or use.battle_round != active.suspended_phase.battle_round
+                    or heroic_charge_source(state=state, use=use, parent=active.suspended_phase)
+                    != active
+                ):
+                    raise GameLifecycleError("Interrupted Charge source restrictions drift.")
+            elif (
+                use.handler_id != GENERIC_RULE_IR_STRATAGEM_HANDLER_ID
+                or not isinstance(authority, FiniteStratagemUseHistoryAuthority)
+                or not isinstance(authority.catalog_record.definition.effect_payload, dict)
+                or TRIGGER_RANGE not in authority.catalog_record.definition.effect_payload
+                or movement_charge_source(
+                    state=state,
+                    use=use,
+                    context=authority.context,
+                    events=decisions.event_log.records[: authority.requested_event_index],
+                    records=decisions.records,
+                )
+                != active
+            ):
+                raise GameLifecycleError("Interrupted Movement Charge source restrictions drift.")
             rolls = []
         elif event.event_type == "charge_roll_resolved":
             if not isinstance(payload, dict) or not isinstance(payload.get("roll_result"), dict):
@@ -77,7 +103,7 @@ def validate_interrupted_charge_source(*, state: GameState, decisions: DecisionC
                 if (
                     roll.request.player_id != actor
                     or roll.request.unit_instance_id != active.unit_instance_id
-                    or roll.request.battle_round != active.suspended_phase.battle_round
+                    or roll.request.battle_round != source_round
                     or roll.movement_budget.roll_limit != active.roll_limit
                     or any(
                         distance > active.target_range_inches
@@ -117,7 +143,7 @@ def validate_interrupted_charge_source(*, state: GameState, decisions: DecisionC
                 or tuple(row.roll_result for row in phase.distance_states) != tuple(rolls)
             ):
                 raise GameLifecycleError("Interrupted Charge completion state drift.")
-            active, actor = None, None
+            active, actor, source_round = None, None, None
     current_phase = state.charge_phase_state
     if (None if current_phase is None else current_phase.interruption) != active:
         raise GameLifecycleError("Interrupted Charge current source differs from its history.")

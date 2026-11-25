@@ -1009,7 +1009,8 @@ def _unprocessed_move_completion_events(
         )
     )
     events: list[tuple[str, dict[str, JsonValue]]] = []
-    for record in decisions.event_log.records:
+    records = decisions.event_log.records
+    for index, record in enumerate(records):
         if requested_event_id is not None and record.event_id != requested_event_id:
             continue
         if record.event_type != event_type:
@@ -1023,6 +1024,13 @@ def _unprocessed_move_completion_events(
             continue
         if payload.get("phase") != completed_phase.value:
             continue
+        if record.event_type == "charge_move_completed":
+            from warhammer40k_core.engine.interrupted_charge import charge_interruption_at_event
+
+            source = charge_interruption_at_event(event_records=records, event_index=index)
+            if source is not None and source.host_phase is not completed_phase:
+                # The canonical Charge action event may be hosted by Movement.
+                continue
         if requested_unit_id is not None and payload.get("unit_instance_id") != requested_unit_id:
             continue
         if requested_player_id is not None and (

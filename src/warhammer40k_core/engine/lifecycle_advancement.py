@@ -9,7 +9,7 @@ from warhammer40k_core.engine import (
     catalog_selected_target_battle_shock_continuation as _selected_target_bs,
 )
 from warhammer40k_core.engine.core_ability_selection import request_core_ability_selection_if_needed
-from warhammer40k_core.engine.phase import GameLifecycleStage, LifecycleStatus
+from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleStage, LifecycleStatus
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.lifecycle import GameLifecycle
@@ -29,6 +29,18 @@ def advance_once(host: GameLifecycle) -> LifecycleStatus:
     )
     if selection_status is not None:
         return selection_status
+    from warhammer40k_core.engine.interrupted_charge import advance_interrupted_charge
+
+    if state.current_battle_phase is BattlePhase.MOVEMENT:
+        interrupted = advance_interrupted_charge(
+            state=state,
+            decisions=host.decision_controller,
+            reaction_queue=host.reaction_queue,
+            handler=host._charge_phase_handler,
+        )
+        if interrupted is not None:
+            return interrupted
+
     from warhammer40k_core.engine.rule_trigger_runtime import advance_rule_triggers
 
     trigger_status = advance_rule_triggers(
@@ -39,8 +51,6 @@ def advance_once(host: GameLifecycle) -> LifecycleStatus:
     )
     if trigger_status is not None:
         return trigger_status
-    from warhammer40k_core.engine.interrupted_charge import advance_interrupted_charge
-
     interrupted = advance_interrupted_charge(
         state=state,
         decisions=host.decision_controller,
@@ -49,6 +59,7 @@ def advance_once(host: GameLifecycle) -> LifecycleStatus:
     )
     if interrupted is not None:
         return interrupted
+
     from warhammer40k_core.engine.charge_target_continuation import refresh_pending_charge_move
 
     charge_continuation = refresh_pending_charge_move(

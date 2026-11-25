@@ -20,6 +20,7 @@ from warhammer40k_core.engine.decision_record import DecisionRecord
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.event_log import EventRecord
 from warhammer40k_core.engine.game_state import GameConfig, GameState
+from warhammer40k_core.engine.interrupted_charge import charge_action_in_current_phase
 from warhammer40k_core.engine.lethal_hits import (
     validate_lethal_hit_history,
     validate_pending_lethal_hit_requests,
@@ -310,16 +311,16 @@ def _validate_charge_phase_state_consistency(*, state: GameState) -> None:
         return
     if state.stage is not GameLifecycleStage.BATTLE:
         raise GameLifecycleError("charge_phase_state requires battle stage.")
-    if state.current_battle_phase is not BattlePhase.CHARGE:
+    if not charge_action_in_current_phase(state):
         raise GameLifecycleError("charge_phase_state requires CHARGE phase.")
     if state.active_player_id is None:
         raise GameLifecycleError("charge_phase_state requires active player.")
-    parent = (
-        charge_state
+    turn_player_id = (
+        charge_state.active_player_id
         if charge_state.interruption is None
-        else charge_state.interruption.suspended_phase
+        else charge_state.interruption.turn_player_id
     )
-    if parent.active_player_id != state.active_player_id:
+    if turn_player_id != state.active_player_id:
         raise GameLifecycleError("charge_phase_state active player drift.")
     if charge_state.battle_round != state.battle_round:
         raise GameLifecycleError("charge_phase_state battle round drift.")

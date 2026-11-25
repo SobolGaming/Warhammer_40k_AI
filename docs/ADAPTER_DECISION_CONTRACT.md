@@ -3053,6 +3053,29 @@ Malformed, stale, wrong-kind, wrong-unit, wrong-mode, unreachable-target, requir
 
 Accepted Charge Move proposals consume the shared movement/pathing/terrain/coherency validators. A valid move emits `charge_move_completed`, updates authoritative model placements through engine-owned mutation only, records `BattlefieldTransitionBatch.displacements` with `displacement_kind: "charge_move"` and `source_phase: "charge"`, records endpoint witness details, and registers a `PersistingEffect` with `effect_kind: "charge_grants_fights_first"` until the end of the turn. Source-backed out-of-phase Charge Move proposals may carry explicit `charge_bonus_suppressed` context; those proposals still use the shared Charge Move validation contract but must not register `charge_grants_fights_first`.
 
+Blood Legion’s **Fool’s Flight** uses the finite `use_stratagem` decision after a
+completed enemy Fall Back in the opponent’s Movement phase. The reacting unit
+must be a friendly, unengaged LEGIONES DAEMONICA KHORNE unit within 6 inches of
+the triggering enemy. The `after_enemy_unit_ends_fall_back` context identifies
+that completion and retains the enemy rules-unit IDs that Fell Back earlier in
+the same Movement phase, including the triggering unit. It is not a
+preselected Charge target. The existing Charge decisions apply the core
+12-inch declaration limit and the post-roll maximum distance to that pool.
+
+The Movement phase and turn owner remain unchanged while the reacting player
+owns the Charge action. The interruption receipt has no suspended Charge phase
+and instead identifies the Movement turn owner and originating Fall Back
+event. A declined, failed, or completed Charge releases the reacting scope and
+resumes Movement after mandatory continuations. A movement-completion choice
+(e.g. Brass Stampede) retains `movement_action: "charge_move"` but carries the
+enclosing `phase: "movement"`. A successful reaction counts as a move in that
+opponent's Movement phase for rules such as Surge. No adapter-local choice,
+roll, or movement is required.
+The September 2026 faction pack (v1.2, p. 124) does not suppress the normal
+Core 11.04 Charge bonus: a successful Fool's Flight Charge grants Fights First
+until the end of the opponent's current turn.
+
+
 Charge declarations and charge rolls are public table information in the current rules scope. Viewer-scoped projections and event deltas still must not leak hidden opponent information through option counts, target candidates, invalid diagnostics, roll metadata, or derived fields if future hidden deployment, reserve, or secret objective mechanics affect Charge eligibility.
 
 Required Phase 15A adapter-contract tests:

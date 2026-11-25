@@ -1,0 +1,40 @@
+{
+  "schema": "fools-flight-source-verification-v1",
+  "source_row_id": "stratagem:chaos-daemons:blood-legion:000009816006",
+  "official_faction_pack": {
+    "title": "Chaos Daemons Faction Pack",
+    "version": "1.2",
+    "effective_date": "2026-09-30",
+    "pdf_page": 124,
+    "url": "https://assets.warhammer-community.com/eng_30-09_wh40k_faction_pack_chaos_daemons-e67vyzvv3x-mownb49uc3.pdf",
+    "sha256": "de3f7c0319fa96530dfa687a516668cf7e52dc9d5a87954c44c7e38842569075",
+    "verified": "The 2 CP reaction follows an enemy's completed Fall Back in the opponent's Movement phase. The unengaged friendly Legiones Daemonica Khorne unit must be within 6 inches of that enemy. Its Charge targets are enemy units that Fell Back in that phase and are within the Charge maximum. This printing does not withhold a Charge bonus."
+  },
+  "faction_mirror": {
+    "url": "https://www.40k.app/factions/chaos-daemons/detachments/blood-legion",
+    "verified": "The mirror shows the same eligibility, timing and target pool without a Charge bonus exception."
+  },
+  "official_core": {
+    "url": "https://assets.warhammer-community.com/eng_01-06_warhammer40k_new40k_core_rules-was6fbu1ix-hfewhmxyiy.pdf",
+    "sha256": "f6a2443a44627ac5f0ef08407d29aa5ec7e97339998f05bc35f3ae37bf276833",
+    "sections": [
+      "11.02",
+      "11.04",
+      "12.04",
+      "24.13"
+    ],
+    "verified": "Core Charge targets must also be within 12 inches. A completed Charge Move grants Fights First until the end of the current turn. Fight ordering resolves the Fights First band before remaining combats."
+  },
+  "current_commentary": {
+    "authority": "Warhammer 40,000 App FAQ and Rules Appendix, checked in public transcriptions",
+    "faq_url": "https://wahapedia.ru/wh40k11ed/the-rules/core-rules/",
+    "appendix_url": "https://wahapedia.ru/wh40k11ed/the-rules/",
+    "faq_corroboration_url": "https://www.tabletopbattles.com/40k-ruleshammer-11th-edition-faq-compendium",
+    "sections": [
+      "11.02 FAQ",
+      "07.02.01"
+    ],
+    "verified": "A Charge outside the Charge phase still rolls and attempts the Charge (11.02 steps 2 and 3). Out-of-phase rules exclude other expressly phase-locked rules, not the intrinsic Charge Move result."
+  },
+  "acceptance": "Resolve the ordinary Charge Move and Fights First grant on success; expire that grant at the end of the opponent's current turn. Do not import the older card's explicit exception."
+}

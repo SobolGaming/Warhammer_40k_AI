@@ -1117,6 +1117,7 @@ def validate_assessment(
         from tools.performance_daemons_native import daemons_native_smoke_operations
         from tools.performance_daemons_next import daemons_next_smoke_operations
         from tools.performance_dark_pacts import dark_pacts_smoke_operations
+        from tools.performance_fools_flight import fools_flight_smoke_operations
         from tools.performance_private_randomness import private_randomness_smoke_operations
         from tools.performance_wave_frame import wave_frame_smoke_operations
 
@@ -1186,6 +1187,9 @@ def validate_assessment(
                 base=base, path=path, category=category, change=changes[path]
             )
             | dark_pacts_smoke_operations(
+                base=base, path=path, category=category, change=changes[path]
+            )
+            | fools_flight_smoke_operations(
                 base=base, path=path, category=category, change=changes[path]
             )
             | d02_rule_semantics_smoke_operations(

@@ -1,0 +1,70 @@
+{
+  "base": {
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false,
+    "fixture_sha256": "4ccc07e5733a47c003f44c03e01f19706baa07713020e0797c8fd8b33f9ad3b8",
+    "host": {
+      "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+      "logical_cpus": 64,
+      "memory_bytes": 67359367168,
+      "platform": "Linux-6.18.58.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "659a2d81e02176d23168861529651506ac87a4eab1982109f144cd62a63fce71",
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0f7d296e1cbe41efd947f0b36f0bcbf2745511c8456d167b6ee26b6552b9d637",
+    "samples": {
+      "finite": [
+        2.1509510420000026,
+        2.0885642570000016,
+        2.1009766769999985
+      ],
+      "parameterized": [
+        1.9392401489999997,
+        1.8378511240000037,
+        1.9617768430000027
+      ]
+    },
+    "workload_sha256": "1af0bb7fa3733e4e31b8fa73f35839956e2ef5d2e952e6e378c2639ea9dd0427"
+  },
+  "base_revision": "740b558ab5542e4120fdc49d05bb6819d1b53698",
+  "budget_profile": "current-change-relative-v1",
+  "family": "movement",
+  "head": {
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false,
+    "fixture_sha256": "4ccc07e5733a47c003f44c03e01f19706baa07713020e0797c8fd8b33f9ad3b8",
+    "host": {
+      "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+      "logical_cpus": 64,
+      "memory_bytes": 67359367168,
+      "platform": "Linux-6.18.58.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "659a2d81e02176d23168861529651506ac87a4eab1982109f144cd62a63fce71",
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:b1ecd9a6bd751abd9bb732e2bb1d63edcf14839cde43183ae88133c789e368f1",
+    "samples": {
+      "finite": [
+        2.1132750639999927,
+        2.2607187659999965,
+        2.156527122
+      ],
+      "parameterized": [
+        2.011821877999992,
+        2.021692711,
+        1.9956875130000071
+      ]
+    },
+    "workload_sha256": "1af0bb7fa3733e4e31b8fa73f35839956e2ef5d2e952e6e378c2639ea9dd0427"
+  },
+  "head_input_digest": "3a32e3eb49a9bb25319bf935596f27d2faf5e2e05ac9bf99f0254b6559b09b57",
+  "head_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:b1ecd9a6bd751abd9bb732e2bb1d63edcf14839cde43183ae88133c789e368f1",
+  "historical_failures": [
+    "Existing historical timing receipts, workload definitions, and absolute-budget failures remain unchanged; these exact-base measurements cover only the required component comparisons."
+  ],
+  "policy": "rules-engine-performance-v3",
+  "workload_id": "order80-normal-move-occurrence-v1"
+}

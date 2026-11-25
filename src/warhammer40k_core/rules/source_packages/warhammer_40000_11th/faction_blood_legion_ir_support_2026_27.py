@@ -93,7 +93,22 @@ GORE_HUNGRY_ONSLAUGHT_EFFECT = (
     "Until the end of the phase, each time a model in your unit makes a move, "
     "it can move through terrain features."
 )
+# Official Chaos Daemons faction pack v1.2, page 124, and the 40k.app Blood Legion mirror.
+FOOLS_FLIGHT_STRATAGEM_ID = "000009816006"
+FOOLS_FLIGHT_SOURCE_ROW_ID = (
+    f"stratagem:{CHAOS_DAEMONS_FACTION_ID}:{BLOOD_LEGION_DETACHMENT_ID}:{FOOLS_FLIGHT_STRATAGEM_ID}"
+)
+FOOLS_FLIGHT_DESCRIPTOR_ID = f"phase17e:{FOOLS_FLIGHT_SOURCE_ROW_ID}"
+FOOLS_FLIGHT_SOURCE_ID = "gw-11e-faction-packs-2026-07:" + FOOLS_FLIGHT_SOURCE_ROW_ID
+FOOLS_FLIGHT_TARGET = (
+    'One friendly unengaged LEGIONES DAEMONICA KHORNE unit that is within 6" of that enemy unit.'
+)
+FOOLS_FLIGHT_EFFECT = (
+    "Declare a charge with your unit. When selecting charge targets, you can only select "
+    "enemy units that made a Fall Back move this phase and are within the maximum distance."
+)
 COVERED_STRATAGEM_SOURCE_ROW_IDS = (
+    FOOLS_FLIGHT_SOURCE_ROW_ID,
     GORE_HUNGRY_ONSLAUGHT_SOURCE_ROW_ID,
     BLOOD_BEGETS_SKULLS_SOURCE_ROW_ID,
     SKULLS_BEGET_BLOOD_SOURCE_ROW_ID,
@@ -701,6 +716,35 @@ def _gateway_unto_damnation_payload() -> RuleIRPayload:
     )
 
 
+def _fools_flight_payload() -> RuleIRPayload:
+    normalized_text = f"{FOOLS_FLIGHT_TARGET} {FOOLS_FLIGHT_EFFECT}"
+    descriptor_id = f"{FOOLS_FLIGHT_SOURCE_ID}:charge-after-enemy-fall-back"
+    return _payload(
+        descriptor_id,
+        FOOLS_FLIGHT_SOURCE_ID,
+        normalized_text,
+        (
+            _effect_clause(
+                clause_id=f"{descriptor_id}:grant",
+                template_id=GRANT_ABILITY_TEMPLATE_ID,
+                normalized_text=normalized_text,
+                source_text=FOOLS_FLIGHT_EFFECT,
+                target=_target("selected_unit", normalized_text, FOOLS_FLIGHT_TARGET),
+                effects=(
+                    _effect(
+                        "grant_ability",
+                        normalized_text,
+                        "Declare a charge with your unit.",
+                        (_parameter("ability", "charge_after_enemy_fall_back"),),
+                    ),
+                ),
+                duration=None,
+            ),
+        ),
+        "phase17s-stratagem-activation-template-v2",
+    )
+
+
 def _gore_hungry_onslaught_payload() -> RuleIRPayload:
     normalized_text = f"{GORE_HUNGRY_ONSLAUGHT_TARGET} {GORE_HUNGRY_ONSLAUGHT_EFFECT}"
     return _payload(
@@ -1088,6 +1132,7 @@ def _coverage_payloads() -> Mapping[str, RuleIRPayload]:
             SKULLS_BEGET_BLOOD_DESCRIPTOR_ID: _skulls_beget_blood_payload(),
             WRATH_UNDENIABLE_DESCRIPTOR_ID: _wrath_undeniable_payload(),
             GORE_HUNGRY_ONSLAUGHT_DESCRIPTOR_ID: _gore_hungry_onslaught_payload(),
+            FOOLS_FLIGHT_DESCRIPTOR_ID: _fools_flight_payload(),
         }
     )
 

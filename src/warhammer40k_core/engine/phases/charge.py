@@ -150,6 +150,7 @@ from warhammer40k_core.engine.faction_resources import (
     faction_resource_result_enriched_payload,
     resolve_faction_resource_refund_roll,
 )
+from warhammer40k_core.engine.interrupted_charge import charge_action_in_current_phase
 from warhammer40k_core.engine.move_completion_rule_hooks import MoveCompletionRuleRegistry
 from warhammer40k_core.engine.movement_proposals import (
     MOVEMENT_PROPOSAL_DECISION_TYPE,
@@ -880,6 +881,8 @@ def _request_charge_declaration_grant_if_available(
         raise GameLifecycleError("Charge declaration grant request requires a selection.")
     if type(registry) is not ChargeDeclarationHookRegistry:
         raise GameLifecycleError("Charge declaration grant request requires a registry.")
+    if state.current_battle_phase is not BattlePhase.CHARGE:
+        return None  # Phase-locked Charge declaration grants do not follow an interruption.
     context = ChargeDeclarationContext(
         state=state,
         player_id=selection.player_id,
@@ -1306,7 +1309,7 @@ def _ensure_charge_phase_state(*, state: GameState) -> ChargePhaseState:
 def _validate_charge_phase_state(state: GameState) -> None:
     if state.stage is not GameLifecycleStage.BATTLE:
         raise GameLifecycleError("Charge phase requires battle stage.")
-    if state.current_battle_phase is not BattlePhase.CHARGE:
+    if not charge_action_in_current_phase(state):
         raise GameLifecycleError("Charge phase requires CHARGE phase.")
     _active_player_id(state)
     if state.battlefield_state is None:
@@ -1316,12 +1319,12 @@ def _validate_charge_phase_state(state: GameState) -> None:
     charge_state = state.charge_phase_state
     if charge_state.battle_round != state.battle_round:
         raise GameLifecycleError("charge_phase_state battle round drift.")
-    parent = (
-        charge_state
+    turn_player_id = (
+        charge_state.active_player_id
         if charge_state.interruption is None
-        else charge_state.interruption.suspended_phase
+        else charge_state.interruption.turn_player_id
     )
-    if parent.active_player_id != state.active_player_id:
+    if turn_player_id != state.active_player_id:
         raise GameLifecycleError("charge_phase_state active player drift.")
 
 
