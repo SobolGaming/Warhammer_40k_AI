@@ -29,7 +29,7 @@ Open gates: F03 rule semantics, force-disposition eligibility, DP validation, be
 | Enhancement / Upgrade | Fury’s Cage | 20 pts | E | engine_consumed | Review hit modifiers, wound modifiers; revalidate baseline execution |
 | Enhancement / Upgrade | Gateway Unto Damnation | 10 pts | E | source_only | Review exact source effect; revalidate baseline execution |
 | Enhancement / Upgrade | Slaughterthirst (Aura) | 25 pts | E | source_only | Review exact source effect; revalidate baseline execution |
-| Stratagem | Wrath Undeniable | 1 CP | July faction pack p. 124 | executable_generic_ir | The selected-as-target Fight window grants an eligible Khorne Daemon unit a phase-long 4+ melee-casualty Fight-on-Death effect under core 05.04.05. |
+| Stratagem | Wrath Undeniable | 1 CP | Source | source_only | Current execution: `executable_generic_ir` (July faction pack, p. 124). The selected-as-target Fight window grants an eligible Khorne Daemon unit a phase-long 4+ melee-casualty Fight-on-Death effect under core 05.04.05. |
 | Stratagem | Gore-hungry Onslaught | 1 CP | Source | source_only | Implement exact timing, eligibility, choice and effect through F03 |
 | Stratagem | Skulls Beget Blood | 1 CP | Source | source_only | Current generic RuleIR offers a visible, unengaged enemy within 8 inches of a qualifying friendly unit during its Shooting phase. Six D6 cause one mortal wound per 4+. |
 | Stratagem | Blood Begets Skulls | 1 CP | Source | source_only | Current generic RuleIR grants one eligible unselected unit permission to charge after Advancing until phase end. |
