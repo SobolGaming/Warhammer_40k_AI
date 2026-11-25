@@ -1078,6 +1078,43 @@ def _stage3_flight_normal_move_successor(
     return record["runtime_fingerprint"], _selection_members(record["added_files"], root), raw
 
 
+def _pre_roll_charge_flight_test_addition(
+    root: Path, *, previous_runtime: str, previous_transition: bytes
+) -> tuple[str, TestSuccessors, bytes] | None:
+    name = "data/source_audits/ci64_provenance_v1/pre-roll-charge-flight-test-v1.json"
+    path = root / name
+    _selection_no_links(root, path)
+    if not path.exists():
+        return None
+    raw = _checked_bytes(
+        root, name, "fd5511973dabe4068f618dec2f1f1419cb79f99629e831b9b14a810ab3cb110e"
+    )
+    record = json.loads(raw, object_pairs_hook=_selection_object)
+    owner = "tests/infrastructure/adapters/test_charge_flight_admission.py"
+    source = "src/warhammer40k_core/ai/charge_flight_admission.py"
+    if (
+        record.keys()
+        != {
+            "schema",
+            "base",
+            "retained_transition_sha256",
+            "retained_runtime_fingerprint",
+            "runtime_fingerprint",
+            "sources",
+            "added_files",
+        }
+        or record["schema"] != "finite-pre-roll-charge-flight-test-v1"
+        or record["base"] != "344129210b416dab7fc3dc79d1a4d467e7ebfa98"
+        or record["retained_transition_sha256"] != hashlib.sha256(previous_transition).hexdigest()
+        or record["retained_runtime_fingerprint"] != previous_runtime
+        or record["sources"].keys() != {source}
+        or record["added_files"].keys() != {owner}
+    ):
+        raise SystemExit("Pre-roll Charge flight test transition differs.")
+    _checked_bytes(root, source, record["sources"][source])
+    return record["runtime_fingerprint"], _selection_members(record["added_files"], root), raw
+
+
 def exact_movement_test_transition(
     root: Path, retained_cutover_sha256: str
 ) -> TestTransition | None:
@@ -1679,6 +1716,7 @@ def exact_movement_test_transition(
         runtime = regeneration[0]
     brass = None
     stage3_flight = None
+    charge_flight = None
     if rigid_charge is not None:
         if ground_charge is None:
             raise SystemExit("Rigid ground charge tests require the group charge predecessor.")
@@ -1696,6 +1734,11 @@ def exact_movement_test_transition(
                 )
                 if not brass[3].endswith(b"\0" + wrath_raw):
                     raise SystemExit("Wrath Undeniable is missing from the source lineage.")
+                charge_flight = _pre_roll_charge_flight_test_addition(
+                    root, previous_runtime=runtime, previous_transition=wrath_raw
+                )
+                if charge_flight is not None:
+                    runtime = charge_flight[0]
             else:
                 stage3_flight = _stage3_flight_normal_move_successor(
                     root, previous_runtime=runtime, previous_transition=brass[3]
@@ -1846,6 +1889,12 @@ def exact_movement_test_transition(
             raise SystemExit("Stage 3 flight Normal Move tests overlap the predecessor selection.")
         additions.update(flight_tests)
         raw += b"\0" + flight_raw
+    if charge_flight is not None:
+        _, charge_flight_tests, charge_flight_raw = charge_flight
+        if charge_flight_tests.keys() & (updated.keys() | added.keys() | additions.keys()):
+            raise SystemExit("Pre-roll Charge flight tests overlap the predecessor selection.")
+        additions.update(charge_flight_tests)
+        raw += b"\0" + charge_flight_raw
     return updated, {**added, **additions}, retained_raw + b"\0" + raw
 
 

@@ -1,8 +1,8 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:a9b19bcbc40327b3801c1b531a2415498f81118626ce2b320308e905af17f9ef",
-  "fingerprint": "a9b19bcbc40327b3801c1b531a2415498f81118626ce2b320308e905af17f9ef",
-  "resource_count": 3295,
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:3e65aaeb280065edad60fe80cf210522a93ad41ea8318c6bfc34e0e7f2614533",
+  "fingerprint": "3e65aaeb280065edad60fe80cf210522a93ad41ea8318c6bfc34e0e7f2614533",
+  "resource_count": 3296,
   "resources": [
     {
       "byte_length": 113,
@@ -238,6 +238,11 @@
       "byte_length": 15378,
       "path": "warhammer40k_core/ai/canonical_deployment_coverage.py",
       "sha256": "10747a3382b89d7a6c55d5624a42fccd052980544689a20805185b2cdd2be311"
+    },
+    {
+      "byte_length": 20535,
+      "path": "warhammer40k_core/ai/charge_flight_admission.py",
+      "sha256": "37b0a0f6325536b7b3ece1ac66e367f80336a52754aff7e86b07ff78f6d24a85"
     },
     {
       "byte_length": 11118,

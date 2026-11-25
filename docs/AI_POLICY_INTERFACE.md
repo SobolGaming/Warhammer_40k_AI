@@ -3197,3 +3197,53 @@ approved secondary lookup on 25 November 2026 was indexed-only because the
 direct 40k.app section returned HTTP 403. [Official Core Rules](source_rules/eng_01-06_warhammer40k_new40k_core_rules-was6fbu1ix-hfewhmxyiy.pdf),
 [Universal Rules Updates v1.1](https://assets.warhammer-community.com/eng_wh40k_core%26key_universal_rules_updates-lu3grocned-rphh78bl6k.pdf),
 [40k.app Flying and Surging](https://www.40k.app/rules/21-flying-and-surging).
+
+## Opt-in pre-roll Charge flight policy
+
+`inspect_charge_flight_offer` identifies the two options issued on the actor's
+ordinary `select_charging_unit` request for one placed, standalone non-Hover FLY
+model and one caller-fixed target. Declaration alone returns
+`minimum_roll_unproven`: the shared target-filter distance is not a path cost.
+
+`choose_proven_charge_flight_mode` qualifies that exact request on the current
+native session, and returns a finite `PolicyAction` only if it proves the
+comparison. It is restricted to an open, planar board with the two known
+standalone models fully visible, a caller-supplied straight witness, and an
+ordinary unmodified 2D6 Charge. It checks the native roll and movement modifier
+providers, declaration and target-restriction hooks, reroll permissions, and that
+the actor has no CP and Command Re-roll cannot be free. Unsupported or drifted
+inputs yield a typed result with no action.
+
+For each mode and each attainable raw sum, the native target filter rules out
+all routes if the movement budget, using the offered penalty, is too small.
+For every remaining budget, the ordinary Charge resolver must accept the fixed
+witness to that target. An invalid witness cannot rule out another path; such
+a result leaves the entire comparison unresolved. This finite check does not
+assume that a witness accepted at one budget remains legal at higher budgets.
+The proof uses the ordinary movement proposal's live ability index. If the
+target filter excludes every budget for a mode, that mode has zero successful
+outcomes and no minimum. If both modes are proven zero, no action is returned.
+
+The caller submits the returned option through the ordinary viewer route. The
+policy chooses neither the target nor the path; the supplied witness is proof
+only. Qualification takes no roll, reads no seed or private checkpoint, and
+does not submit actions or open post-roll requests. Requalify on the session
+that will submit the choice. The selection uses the greater count of successful
+ordered outcomes, preferring ground on a proven nonzero tie.
+
+The native open-board test has a target-filter distance of about 3.276 inches,
+giving ground 4+ (33/36) and flight 6+ (26/36) at the issued 2-inch penalty. A
+different target position gives 5+ (30/36) and 7+ (21/36); placing the target at
+x=25 gives ground 11+ (3/36) and flight zero with no minimum. The original same-prefix
+ground and flight submissions and the actual policy-selected ground submission
+all replay exactly. Their realized rolls do not enter the pre-roll comparison.
+With an assumed 2-inch penalty and stipulated exact costs, separate synthetic
+controls give 21/36 vs. 10/36 at 7/7 inches, 6/36 vs. 15/36 at 10/6,
+and a 10/36 tie at 9/7.
+
+Core Rules p. 71, section 21.03, supplies the movement penalty and transit
+permissions; the retained v931 FAQ fixes declaration before the Charge roll.
+[Official Core Rules](source_rules/eng_01-06_warhammer40k_new40k_core_rules-was6fbu1ix-hfewhmxyiy.pdf#page=71),
+[approved 40k.app mirror](https://www.40k.app/rules/21-flying-and-surging)
+(indexed text corroborated; direct fetch returned HTTP 403), and
+[retained source package](../src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_flying_2026_09/artifacts/package.json).

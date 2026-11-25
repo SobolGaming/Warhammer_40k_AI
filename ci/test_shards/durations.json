@@ -603,6 +603,10 @@
     "tests/infrastructure/adapters/test_canonical_deployment_coverage.py::test_reference_case_ordinary_prefixes_geometry_and_feasible_gaps[scout-deep-vehicle]": 280.849,
     "tests/infrastructure/adapters/test_canonical_deployment_coverage.py::test_reference_case_ordinary_prefixes_geometry_and_feasible_gaps[vehicle-scout-deep]": 242.402,
     "tests/infrastructure/adapters/test_canonical_deployment_coverage.py::test_reference_suite_definition_is_pinned_and_closed": 0.015,
+    "tests/infrastructure/adapters/test_charge_flight_admission.py::test_charge_flight_admits_native_offer_without_claiming_a_minimum": 19.713,
+    "tests/infrastructure/adapters/test_charge_flight_admission.py::test_unmodified_charge_probability_synthetic_controls[10-6-expected1]": 0.001,
+    "tests/infrastructure/adapters/test_charge_flight_admission.py::test_unmodified_charge_probability_synthetic_controls[7-7-expected0]": 0.001,
+    "tests/infrastructure/adapters/test_charge_flight_admission.py::test_unmodified_charge_probability_synthetic_controls[9-7-expected2]": 0.001,
     "tests/infrastructure/adapters/test_cover_event_identity.py::test_save_cover_cache_key_projects_embedded_request_reference": 0.001,
     "tests/infrastructure/adapters/test_deployment_candidates.py::test_deployment_binding_and_receipt_tampering_fail_closed": 0.98,
     "tests/infrastructure/adapters/test_deployment_candidates.py::test_deployment_generation_duplicate_and_raw_budget_accounting": 0.42,
@@ -6733,18 +6737,18 @@
   },
   "execution_model": {
     "assignment_wall_lower_bound_seconds": {
-      "1": 578.215,
-      "10": 578.215,
-      "11": 578.215,
-      "12": 578.215,
+      "1": 578.707,
+      "10": 578.708,
+      "11": 578.707,
+      "12": 578.708,
       "2": 795.547,
       "3": 609.537,
-      "4": 578.215,
-      "5": 578.215,
-      "6": 578.215,
-      "7": 578.215,
-      "8": 578.215,
-      "9": 578.215
+      "4": 578.708,
+      "5": 578.708,
+      "6": 578.708,
+      "7": 578.708,
+      "8": 578.707,
+      "9": 578.708
     },
     "cold_shard_assignment": "minimum-unrounded-modeled-test-load-existing-bucket-v1",
     "cold_shard_id": 1,
@@ -6753,18 +6757,18 @@
       "tests/factions/chaos_daemons/integration/test_cavalcade_v995_roster.py::test_exact_mirror_deploys_all_78_models_and_replays_to_battle"
     ],
     "shard_worker_seconds": {
-      "1": 2312.858,
-      "10": 2312.86,
-      "11": 2312.859,
-      "12": 2312.858,
+      "1": 2314.83,
+      "10": 2314.831,
+      "11": 2314.83,
+      "12": 2314.831,
       "2": 3182.186,
       "3": 2438.146,
-      "4": 2312.86,
-      "5": 2312.859,
-      "6": 2312.859,
-      "7": 2312.859,
-      "8": 2312.861,
-      "9": 2312.858
+      "4": 2314.831,
+      "5": 2314.831,
+      "6": 2314.831,
+      "7": 2314.831,
+      "8": 2314.83,
+      "9": 2314.831
     }
   },
   "files": {
@@ -6828,6 +6832,7 @@
     "tests/infrastructure/adapters/test_canonical_coverage_preflight.py::test_coverage_totals_require_typed_rows[rows4]": 0.001,
     "tests/infrastructure/adapters/test_canonical_deployment.py": 472.838,
     "tests/infrastructure/adapters/test_canonical_deployment_coverage.py": 1335.308,
+    "tests/infrastructure/adapters/test_charge_flight_admission.py": 19.716,
     "tests/infrastructure/adapters/test_cover_event_identity.py": 0.001,
     "tests/infrastructure/adapters/test_deployment_candidates.py": 463.191,
     "tests/infrastructure/adapters/test_deployment_experiment.py": 493.559,
@@ -7323,6 +7328,7 @@
         "25759acf6c9170e603034a4071122fd33e00661a1f1a158d3439551f528f0624",
         "297a9f3fa66471f2f4792e5fd6bdc804517c797ff1aad1f397be73ab0c9fc71d",
         "318c7912fdab7fce1cce68a3998df8fbda4c9536540c88431e6303edb9b7fb5a",
+        "3a22a93418b69848df9f3add62ccad61a8bb7cc93f094c2be079414f226c903d",
         "431f84031f3029637fa3c74e55d1c8dede1e3fe1aa04f223da43a8cacdd7574d",
         "6065394017e442925f4256644907ffc7924dcc2b4a699b5065e1dda846989353",
         "63db8ac24763535fbddc46142b0c99e6833b128bc40e674ff95ec735b05e1018",
@@ -7333,19 +7339,20 @@
         "9a5f617751dd2ef273362bcbec3d532afb594c23b9d7c4576a1ba54a82305422",
         "9dc1b70162325c830e81f4b6e06c9199b793ed7d7805d59287feb2a593be541d",
         "a58370bb7e97f2155a65d0b16e4dc74b9e2fdb5251ee95594210b0d558e2ef63",
+        "b6375213c9da2f15abad64e49a6464d2963ef84289178cef5d659c8ec4ce1295",
         "d221fa9414f09deb36d275dca16085e59d0239e19246d38cf138ddd866c65662"
       ],
-      "source": "Retained #736 refresh timing profile and one measured three-inch Charge roundoff regression on WSL; plus five measured Sheathed in Brass cases (serial WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); plus measured Blood Begets Skulls and Phase 17I updates (serial WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); add four measured Stage 3 melee cases (WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); plus measured Skulls Beget Blood and Phase 17I updates (serial WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); retain two reviewed Stage 3 native-qualification flight weights (serial Windows, Python 3.14.5; scheduling only); plus measured Wrath Undeniable and Phase 17I updates (serial WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only)",
-      "test_cases": 6730,
-      "test_files": 451
+      "source": "Retained #736 refresh timing profile and one measured three-inch Charge roundoff regression on WSL; plus five measured Sheathed in Brass cases (serial WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); plus measured Blood Begets Skulls and Phase 17I updates (serial WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); add four measured Stage 3 melee cases (WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); plus measured Skulls Beget Blood and Phase 17I updates (serial WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); retain two reviewed Stage 3 native-qualification flight weights (serial Windows, Python 3.14.5; scheduling only); plus measured Wrath Undeniable and Phase 17I updates (serial WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); plus four measured pre-roll Charge flight admission cases (serial Windows, Python 3.14.5; scheduling only); remeasured the same native Charge case with the operational proof and unchanged case inventory",
+      "test_cases": 6734,
+      "test_files": 452
     }
   ],
   "shard_count": 12,
   "shards": [
     {
-      "duration_seconds": 1811.624,
+      "duration_seconds": 2314.83,
       "shard_id": 1,
-      "test_file_count": 54
+      "test_file_count": 46
     },
     {
       "duration_seconds": 3182.186,
@@ -7358,49 +7365,49 @@
       "test_file_count": 1
     },
     {
-      "duration_seconds": 2312.86,
+      "duration_seconds": 1813.597,
       "shard_id": 4,
-      "test_file_count": 44
+      "test_file_count": 52
     },
     {
-      "duration_seconds": 2312.859,
+      "duration_seconds": 2314.831,
       "shard_id": 5,
-      "test_file_count": 50
+      "test_file_count": 51
     },
     {
-      "duration_seconds": 2312.859,
+      "duration_seconds": 2314.831,
       "shard_id": 6,
-      "test_file_count": 50
+      "test_file_count": 51
     },
     {
-      "duration_seconds": 2312.859,
+      "duration_seconds": 2314.831,
       "shard_id": 7,
-      "test_file_count": 53
+      "test_file_count": 51
     },
     {
-      "duration_seconds": 2312.861,
+      "duration_seconds": 2314.83,
       "shard_id": 8,
       "test_file_count": 50
     },
     {
-      "duration_seconds": 2312.858,
+      "duration_seconds": 2314.831,
       "shard_id": 9,
-      "test_file_count": 50
+      "test_file_count": 51
     },
     {
-      "duration_seconds": 2312.86,
+      "duration_seconds": 2314.831,
       "shard_id": 10,
-      "test_file_count": 50
+      "test_file_count": 52
     },
     {
-      "duration_seconds": 2312.859,
+      "duration_seconds": 2314.83,
       "shard_id": 11,
       "test_file_count": 85
     },
     {
-      "duration_seconds": 2312.858,
+      "duration_seconds": 2314.831,
       "shard_id": 12,
-      "test_file_count": 54
+      "test_file_count": 52
     }
   ],
   "step5g_partitions": {
@@ -7408,5 +7415,5 @@
     "sha256": "b241b31651a8d5d903a2b851583186c276a5ac32fed26de1a1c69b4aa278b711"
   },
   "strategy": "largest-processing-time-by-derived-selector-weight",
-  "total_test_duration_seconds": 28247.689
+  "total_test_duration_seconds": 28267.405
 }
