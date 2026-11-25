@@ -1583,10 +1583,15 @@ def exact_movement_test_transition(
         raw += b"\0" + codec_raw
     pending_battle_shock = _pending_battle_shock_source_transition(root)
     pending_sources = {} if pending_battle_shock is None else pending_battle_shock[2]
+    from scripts.dark_pact_test_admission import dark_pact_source_successors
+
+    pact_sources = dark_pact_source_successors(root)
     attack_reroll_order_path = root / MONSTER_MASH_ATTACK_REROLL_TRANSITION
     _selection_no_links(root, attack_reroll_order_path)
     attack_reroll_order = (
-        _monster_mash_attack_reroll_successor(root, retained_cutover_sha256)
+        _monster_mash_attack_reroll_successor(
+            root, retained_cutover_sha256, current_sources=pact_sources
+        )
         if attack_reroll_order_path.exists()
         else None
     )
@@ -1966,6 +1971,14 @@ def exact_movement_test_transition(
         )
         if charge_flight_wall is not None:
             runtime = charge_flight_wall[0]
+    from scripts.dark_pact_test_admission import dark_pact_test_transition
+
+    pact = dark_pact_test_transition(
+        root, runtime=runtime, active_successors={} if malice is None else malice[1]
+    )
+    if pact is not None:
+        runtime, pact_updated, pact_added, pact_raw = pact
+        test_successors.update(pact_updated)
     retained = _identity_test_transition(
         root,
         retained_cutover_sha256,
@@ -2127,6 +2140,12 @@ def exact_movement_test_transition(
             raise SystemExit("Charge flight wall tests overlap predecessor tests.")
         additions.update(wall_tests)
         raw += b"\0" + wall_raw
+    if pact is not None:
+        if pact_added.keys() & (updated.keys() | added.keys() | additions.keys()):
+            raise SystemExit("Dark Pact tests overlap their predecessor selection.")
+        updated.update(pact_updated)
+        additions.update(pact_added)
+        raw += b"\0" + pact_raw
     return updated, {**added, **additions}, retained_raw + b"\0" + raw
 
 
@@ -2166,9 +2185,14 @@ def _round4_malice_bearer_successor(
     ):
         raise SystemExit("Round 4 Malice bearer test predecessor differs.")
     _checked_bytes(root, ROUND4_MALICE_BEARER_SOURCE, record["source"]["after"])
+    from scripts.dark_pact_test_admission import dark_pact_active_successors
+
+    predecessors = {ROUND4_MALICE_BEARER_OWNER: change["after"]}
+    successors = dark_pact_active_successors(root, predecessors)
+    retained = _selection_members(predecessors, root, current=successors)
     return (
         record["runtime_fingerprint"],
-        _selection_members({ROUND4_MALICE_BEARER_OWNER: change["after"]}, root),
+        successors or retained,
         raw,
     )
 
@@ -2226,7 +2250,7 @@ def _round4_battle_shock_successor(
 
 
 def _monster_mash_attack_reroll_successor(
-    root: Path, retained_cutover_sha256: str
+    root: Path, retained_cutover_sha256: str, *, current_sources: SourceSuccessors | None = None
 ) -> tuple[str, str, SourceSuccessors, TestSuccessors, bytes]:
     from scripts.build_test_shards import CUTOVER_PATH
 
@@ -2263,7 +2287,7 @@ def _monster_mash_attack_reroll_successor(
     for name, change in record["source"].items():
         if set(change) != {"before", "after"}:
             raise SystemExit("Monster Mash attack reroll requires exact source digests.")
-        _checked_bytes(root, name, change["after"])
+        _retained_source(root, name, change["after"], current_sources or {})
     return (
         record["retained_runtime_fingerprint"],
         record["runtime_fingerprint"],

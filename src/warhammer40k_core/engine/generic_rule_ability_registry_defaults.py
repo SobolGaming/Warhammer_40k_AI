@@ -12,9 +12,6 @@ from warhammer40k_core.engine.advance_eligibility_hooks import (
     AdvanceEligibilityGrant,
 )
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
-from warhammer40k_core.engine.attack_sequence_completion_hooks import (
-    AttackSequenceCompletedContext,
-)
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
     UnitPlacement,
@@ -51,7 +48,6 @@ from warhammer40k_core.engine.generic_rule_ability_registry import (
     GenericRuleAbilityRegistry,
     GenericRuleAbilitySource,
     GenericRuleAdvanceEligibilityAbility,
-    GenericRuleAttackSequenceCompletedAbility,
     GenericRuleEnhancementEffectAbility,
     GenericRuleFightPhaseStartAbility,
     GenericRuleFightUnitSelectedGrantAbility,
@@ -138,6 +134,9 @@ from warhammer40k_core.engine.unit_destroyed_hooks import (
     unit_destruction_completion_events_for_phase,
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
+from warhammer40k_core.engine.unit_grant_preparation import (
+    apply_preparation_mortal_wound_decision,
+)
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_blood_legion_ir_support_2026_27 as blood_legion_ir,
 )
@@ -379,6 +378,12 @@ def _shadow_legion_shooting_dark_pact_grant_builder(
             hook_id=_shadow_legion_shooting_dark_pact_hook_id(source, pact),
             source_id=_SHADOW_LEGION_SOURCE_RULE_ID,
             label=label,
+            preparation=dark_pacts.dark_pact_preparation(
+                source_rule_id=_SHADOW_LEGION_SOURCE_RULE_ID,
+                auto_pass=_rules_unit_is_belakor(
+                    state=context.state, unit_instance_id=context.unit_instance_id
+                ),
+            ),
             replay_payload=_shadow_legion_dark_pact_replay_payload(
                 source=source,
                 matching_effects=matching_effects,
@@ -438,6 +443,12 @@ def _shadow_legion_fight_dark_pact_grant_builder(
             hook_id=_shadow_legion_fight_dark_pact_hook_id(source, pact),
             source_id=_SHADOW_LEGION_SOURCE_RULE_ID,
             label=label,
+            preparation=dark_pacts.dark_pact_preparation(
+                source_rule_id=_SHADOW_LEGION_SOURCE_RULE_ID,
+                auto_pass=_rules_unit_is_belakor(
+                    state=context.state, unit_instance_id=context.unit_instance_id
+                ),
+            ),
             replay_payload=_shadow_legion_dark_pact_replay_payload(
                 source=source,
                 matching_effects=matching_effects,
@@ -570,13 +581,6 @@ def _shadow_legion_fight_dark_pact_hook_id_builder(
     return builder
 
 
-def _shadow_legion_dark_pact_completion_hook_id(source: GenericRuleAbilitySource) -> str:
-    return _validate_identifier(
-        "generic Shadow Legion Dark Pact completion hook_id",
-        f"{source.record.execution_id}:shadow-legion:dark-pact-completion",
-    )
-
-
 def _shadow_legion_dark_pact_mortal_wound_fnp_hook_id(
     source: GenericRuleAbilitySource,
 ) -> str:
@@ -656,34 +660,10 @@ def _shadow_legion_fight_dark_pact_abilities() -> tuple[
     )
 
 
-def _shadow_legion_dark_pact_completion_candidates(
-    context: AttackSequenceCompletedContext,
-) -> tuple[TimingRuleCandidate, ...]:
-    from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_space_marines import (
-        completion_sequencing,
-    )
-
-    return completion_sequencing.candidates(context)
-
-
-def _resolve_shadow_legion_dark_pact_attack_sequence_completion(
-    context: AttackSequenceCompletedContext,
-) -> LifecycleStatus | None:
-    from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_space_marines import (
-        army_rule as dark_pacts,
-    )
-
-    return dark_pacts.resolve_dark_pact_attack_sequence_completion(context)
-
-
 def _apply_shadow_legion_dark_pact_mortal_wound_feel_no_pain_decision(
     context: MortalWoundFeelNoPainContinuationContext,
 ) -> LifecycleStatus | None:
-    from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_space_marines import (
-        army_rule as dark_pacts,
-    )
-
-    return dark_pacts.apply_dark_pact_mortal_wound_feel_no_pain_decision(context)
+    return apply_preparation_mortal_wound_decision(context)
 
 
 def _shadow_legion_dark_pact_weapon_profile_modifier(
@@ -1346,18 +1326,7 @@ DEFAULT_GENERIC_RULE_ABILITY_REGISTRY = GenericRuleAbilityRegistry(
         *_shadow_legion_fight_dark_pact_abilities(),
         *blood_legion_fight_unit_selected_grant_abilities(),
     ),
-    attack_sequence_completed_abilities=(
-        GenericRuleAttackSequenceCompletedAbility(
-            ability_ids_value=_SHADOW_LEGION_DARK_PACT_ABILITY_IDS,
-            coverage_descriptor_id=shadow_legion_ir.SHADOW_LEGION_DETACHMENT_RULE_DESCRIPTOR_ID,
-            source_rule_id=_SHADOW_LEGION_SOURCE_RULE_ID,
-            hook_id_builder=_shadow_legion_dark_pact_completion_hook_id,
-            handler=_resolve_shadow_legion_dark_pact_attack_sequence_completion,
-            candidate_handler=_shadow_legion_dark_pact_completion_candidates,
-            requires_attacks=False,
-        ),
-        *daemonic_incursion_attack_sequence_completed_abilities(),
-    ),
+    attack_sequence_completed_abilities=daemonic_incursion_attack_sequence_completed_abilities(),
     mortal_wound_feel_no_pain_abilities=(
         *blood_legion_mortal_wound_feel_no_pain_abilities(),
         GenericRuleMortalWoundFeelNoPainAbility(

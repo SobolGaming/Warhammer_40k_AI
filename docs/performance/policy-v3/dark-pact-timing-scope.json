@@ -1,0 +1,87 @@
+{
+  "base": "ab3a4ac03854964649f74efe5b8cebd528d3e25a",
+  "changes": {
+    "scripts/build_test_shards.py": {
+      "after_sha256": "e9c278924ec18958737f61437b68653c86ea35d2ae7e4ac9915ffa2b6c233c56",
+      "before_sha256": "8843ed051f815f81584bd8cb3b8f50ed2c0ef74308ebb3c4695e8db9eec66aaa",
+      "owners": {
+        "behavioral_selection": {
+          "after": "cdaa7621aba65303a981bb288fa70254999a894b6bfa1e722609e023d9b300d6",
+          "before": "5f8776a0b49339dffc07ffa15da12d1bf847442022a487a23179a1e02a901271"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/lifecycle.py": {
+      "after_sha256": "a8ff6864a1e25ac197fcbed1fb02e12db3c0368825d9004f123be28543c59021",
+      "before_sha256": "819f9a321f68af59893616f72139ab72c09e23d5e26f252f3e64dedfaa91f6e9",
+      "owners": {
+        "@module": {
+          "after": "74a8c04f58c4a2a5ba6284098d87727d3efdebd01a4a9fdca5ae8b87bf94d00f",
+          "before": "23fb7c25b555be7ce5f8644c5f93bf03bd340c392f1875dfe01d32838a46782b"
+        },
+        "GameLifecycle._apply_mortal_wound_resolution_decision": {
+          "after": "3258b2457c60b572ad94d1bd92b38a6034e6904ad862e5d4e0f6d366e45a88c1",
+          "before": "afcbb1ea1653b6cb763e0fa267b910e1cd7a0822ba07a24570be1188e10efde0"
+        },
+        "GameLifecycle._resume_unit_grant_commitment": {
+          "after": "03d5ed75ef38b865f8e56681b74c4ca87b7a3199f74356e388e1f0e37d451523",
+          "before": null
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/phases/fight.py": {
+      "after_sha256": "5b329d78d216336e141692e00cca125d4ffb743ef216a3b0f814ceeaddb7518b",
+      "before_sha256": "85db1b94649a35c8688b86127c2ba18932a4783ecea4233b125021e6b6001478",
+      "owners": {
+        "@module": {
+          "after": "6393d49a348fca1f2c09dca92d906031f1a15d7813a5137a9af38d701fc5b9a5",
+          "before": "a143caa6812183fde41712756bfe55833bfa137a2b00c4af3bf8b800f36cfc26"
+        },
+        "FightPhaseHandler.apply_decision": {
+          "after": "83cd9e7853fe6ff53aa8a20a6f78bed9746571e94980d3783a8de817773f2340",
+          "before": "bb53c7e629853f24f859a5df8eb92b3ac8ac533945b70a099c451aba019f38fb"
+        },
+        "FightPhaseHandler.invalid_fight_unit_selected_grant_status": {
+          "after": "d0cf9907db59ffca4f4688c12eee6e288c13776d6f1e85569f177c5a3f0fb71a",
+          "before": "9f8dc63d0d57e84e25cf677f4165aacd26986e57e4f160c5995f09e32874340c"
+        },
+        "FightPhaseHandler.resume_unit_grant_commitment": {
+          "after": "d172c800529537815b75d40d7c7e5b339d18db4b2e771ebd641c90384833c292",
+          "before": null
+        },
+        "_apply_fight_interrupt_decision": {
+          "after": "0567fc9e969cffe602786eb137b16f8dc0dc50e7d9a4801b93d6f52d1bfa91b2",
+          "before": "03756e41710d7579753a51338ebad2e7176c181204b587f8319e246144a3e19f"
+        },
+        "_request_fight_unit_selected_grant_decision_if_available": {
+          "after": "c9ce59135df03b4c32f2855a96eff553278d09fc5d424d944b95c6999202abbd",
+          "before": "c944b29d6c26381d755b4b88db02c942d83a0fa1c4c50c9af74a4e20992eb9f3"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/phases/shooting_handler.py": {
+      "after_sha256": "bd51bf8f09cf70635d7dab3fa36bffbf5ffbd81aadd8ec3e568a8480ec318ada",
+      "before_sha256": "123a40ecf7b2b9d07affbaff98f0b5a4a63bef8e4dc4dba580ad3103da125d69",
+      "owners": {
+        "@module": {
+          "after": "69151947dfd2d639cb133a2388a0d3d026cf965a4208ed74c40344b468ebd58e",
+          "before": "b820f148e67dbfa0b91c9634f0dd4377ad7f449916e38004e547d52500cfe776"
+        },
+        "ShootingPhaseHandler.invalid_shooting_unit_selected_grant_status": {
+          "after": "3e4d6b844fe9f41c147f0478addbf678666b81d403b6a91998d574882a07182b",
+          "before": "dc096acc1e078cc5c36e3c5e1f2932eacbcf2794e875dae02488b30df262506e"
+        },
+        "ShootingPhaseHandler.resume_unit_grant_commitment": {
+          "after": "de078dbb97fce130c7492cdfd1b1b2ac8a43793aa0ca3eec0c2c34dc501e8b39",
+          "before": null
+        }
+      }
+    }
+  },
+  "rationale": {
+    "scripts/build_test_shards.py": "Finite behavioral membership only; no source-token or external contract input processing changes.",
+    "src/warhammer40k_core/engine/lifecycle.py": "Mortal wound dispatch gains a rule-specific return to a selected-unit grant. Dice, weapon attack grouping and reconstruction/serialization algorithms are unchanged; the regular attack-damage paths remain identical.",
+    "src/warhammer40k_core/engine/phases/fight.py": "Insert a grant preparation before declaring weapons; no probabilistic grouping or sequence-selection validator changes.",
+    "src/warhammer40k_core/engine/phases/shooting_handler.py": "Add a pre-declaration grant validator and continuation, not an attack-pool or grouped-precision inventory change."
+  }
+}

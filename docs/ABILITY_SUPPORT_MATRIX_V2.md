@@ -492,7 +492,6 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `warhammer_40000_11th:chaos_knights:army_rule:harbingers_of_dread:delirium:mortal-wound-fnp` | Harbingers of Dread |
 | `warhammer_40000_11th:chaos_knights:army_rule:harbingers_of_dread:doom:wound-roll` | Harbingers of Dread - Doom |
 | `warhammer_40000_11th:chaos_knights:army_rule:harbingers_of_dread:leadership` | Harbingers of Dread - Deathly Terror and Despair |
-| `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:attack_sequence_completed` | Dark Pacts |
 | `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:defiler-daemonforge:wound-reroll` | Daemonforge |
 | `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:fight:lethal_hits` | Dark Pacts |
 | `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:fight:sustained_hits_1` | Dark Pacts |

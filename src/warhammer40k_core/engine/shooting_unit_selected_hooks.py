@@ -2,13 +2,14 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Self, TypedDict
+from typing import TYPE_CHECKING, NotRequired, Self, TypedDict
 
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.effects import PersistingEffect, PersistingEffectPayload
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.lifecycle_hooks import LifecycleHookEvent, validate_hook_bindings
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
+from warhammer40k_core.engine.unit_grant_preparation import UnitGrantPreparation
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
@@ -24,6 +25,7 @@ class ShootingUnitSelectedEffectGrantPayload(TypedDict):
 
 
 class ShootingUnitSelectedGrantPayload(TypedDict):
+    preparation: NotRequired[dict[str, JsonValue]]
     hook_id: str
     source_id: str
     label: str
@@ -149,6 +151,8 @@ class ShootingUnitSelectedGrant:
     unit_effect_payload: JsonValue = None
     unit_effect_expiration: str | None = None
 
+    preparation: UnitGrantPreparation | None = None
+
     def __post_init__(self) -> None:
         object.__setattr__(self, "hook_id", _validate_identifier("hook_id", self.hook_id))
         object.__setattr__(self, "source_id", _validate_identifier("source_id", self.source_id))
@@ -175,7 +179,7 @@ class ShootingUnitSelectedGrant:
             raise GameLifecycleError("Shooting-unit-selected grant effect requires expiration.")
 
     def to_payload(self) -> ShootingUnitSelectedGrantPayload:
-        return {
+        payload: ShootingUnitSelectedGrantPayload = {
             "hook_id": self.hook_id,
             "source_id": self.source_id,
             "label": self.label,
@@ -185,9 +189,18 @@ class ShootingUnitSelectedGrant:
             "unit_effect_expiration": self.unit_effect_expiration,
         }
 
+        if self.preparation is not None:
+            payload["preparation"] = self.preparation.to_payload()
+        return payload
+
     @classmethod
     def from_payload(cls, payload: ShootingUnitSelectedGrantPayload) -> Self:
         return cls(
+            preparation=(
+                UnitGrantPreparation.from_payload(payload["preparation"])
+                if "preparation" in payload
+                else None
+            ),
             hook_id=payload["hook_id"],
             source_id=payload["source_id"],
             label=payload["label"],

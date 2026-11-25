@@ -41,6 +41,7 @@ from warhammer40k_core.engine import private_randomness as _private_randomness
 from warhammer40k_core.engine import psychic_modifier_history_origin as _pmh
 from warhammer40k_core.engine import rule_model_destruction
 from warhammer40k_core.engine import target_replacement_dispatch as _target_replacement_dispatch
+from warhammer40k_core.engine import unit_grant_preparation as grant_preparation
 from warhammer40k_core.engine import unit_split_dispatch as _unit_split_dispatch
 from warhammer40k_core.engine.advance_hooks import SELECT_ADVANCE_MOVE_GRANT_DECISION_TYPE
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
@@ -2152,6 +2153,14 @@ class GameLifecycle:
                     ability_indexes_by_player_id=runtime_bundle.ability_indexes_by_player_id,
                 )
             )
+            if runtime_status is None and grant_preparation.is_preparation_mortal_wound_source(
+                source_context
+            ):
+                runtime_status = self._resume_unit_grant_commitment(
+                    phase=_runtime_mortal_wound_source_context_phase(source_context),
+                    result_id=grant_preparation.mortal_wound_commitment_result_id(source_context),
+                    resolved=True,
+                )
             if runtime_status is not None:
                 if resolves_reaction_frame:
                     if _runtime_mortal_wound_source_context_phase(source_context) is (
@@ -2187,6 +2196,23 @@ class GameLifecycle:
         if _fight_decision_owns_request(state=state, request=record.request):
             return self._apply_fight_phase_decision(record, result)
         return self._apply_shooting_phase_decision(record, result)
+
+    def _resume_unit_grant_commitment(
+        self, *, phase: BattlePhase, result_id: str, resolved: bool = False
+    ) -> LifecycleStatus | None:
+        handler: FightPhaseHandler | ShootingPhaseHandler
+        if phase is BattlePhase.FIGHT:
+            handler = self._fight_phase_handler
+        elif phase is BattlePhase.SHOOTING:
+            handler = self._shooting_phase_handler
+        else:
+            raise GameLifecycleError("Selected unit grant commitment phase is unsupported.")
+        return handler.resume_unit_grant_commitment(
+            state=self._require_state(),
+            decisions=self.decision_controller,
+            result=grant_preparation.commitment_record_result(self.decision_controller, result_id),
+            resolved=resolved,
+        )
 
     def _pre_validate_charge_phase_decision(
         self,

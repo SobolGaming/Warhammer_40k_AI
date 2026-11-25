@@ -2,7 +2,10 @@
 # pyright: reportUnusedImport=false
 from __future__ import annotations
 
+from dataclasses import replace
 from typing import TYPE_CHECKING
+
+from warhammer40k_core.engine import unit_grant_preparation as preparation_flow
 
 from warhammer40k_core.engine.phases.shooting_imports import *
 from warhammer40k_core.engine.phases.shooting_model import *
@@ -41,6 +44,7 @@ __all__ = (
     "_shooting_unit_selected_grant_unit_effect_target_ids",
     "_validate_selected_shooting_unit_grants",
     "_validate_shooting_unit_selected_grant_payload_context",
+    "resume_shooting_unit_grant_commitment",
 )
 
 
@@ -174,11 +178,28 @@ def _request_shooting_unit_selected_grant_decision_if_available(
     decisions: DecisionController,
     selection: ShootingUnitSelection,
     registry: ShootingUnitSelectedGrantRegistry,
+    committed: bool | None = None,
 ) -> LifecycleStatus | None:
     if type(registry) is not ShootingUnitSelectedGrantRegistry:
         raise GameLifecycleError("Shooting-unit-selected grants require a registry.")
     context = _shooting_unit_selected_context(state=state, selection=selection)
     grants = registry.grants_for(context)
+    preparation = preparation_flow.preparation_for(grants)
+    if preparation is not None and committed is None:
+        return preparation_flow.commitment_request(
+            state=state,
+            decisions=decisions,
+            decision_type=SELECT_SHOOTING_UNIT_GRANT_DECISION_TYPE,
+            actor_id=selection.player_id,
+            phase=BattlePhase.SHOOTING,
+            unit_id=selection.unit_instance_id,
+            selection_request_id=selection.request_id,
+            selection_result_id=selection.result_id,
+            preparation=preparation,
+            decline_option_id=DECLINE_SHOOTING_UNIT_GRANT_OPTION_ID,
+        )
+    if committed is not None:
+        grants = tuple(grant for grant in grants if (grant.preparation is not None) == committed)
     if not grants:
         return None
     request = DecisionRequest(
@@ -197,7 +218,11 @@ def _request_shooting_unit_selected_grant_decision_if_available(
                 "available_shooting_unit_grants": [grant.to_payload() for grant in grants],
             }
         ),
-        options=_shooting_unit_selected_grant_options(selection=selection, grants=grants),
+        options=_shooting_unit_selected_grant_options(
+            selection=selection,
+            grants=grants,
+            decline_allowed=committed is not True,
+        ),
     )
     decisions.request_decision(request)
     decisions.event_log.append(
@@ -235,6 +260,7 @@ def _shooting_unit_selected_grant_options(
     *,
     selection: ShootingUnitSelection,
     grants: tuple[ShootingUnitSelectedGrant, ...],
+    decline_allowed: bool = True,
 ) -> tuple[DecisionOption, ...]:
     options = [
         DecisionOption(
@@ -251,6 +277,8 @@ def _shooting_unit_selected_grant_options(
             ),
         )
     ]
+    if not decline_allowed:
+        options.clear()
     for grant in grants:
         options.append(
             DecisionOption(
@@ -287,6 +315,19 @@ def _apply_shooting_unit_selected_grant_decision(
         _validate_shooting_phase_state(state)
     if result.actor_id != selection.player_id:
         raise GameLifecycleError("Shooting unit grant actor must be the selected unit player.")
+    request = decisions.record_for_result(result).request
+    if preparation_flow.is_commitment_request(request):
+        return resume_shooting_unit_grant_commitment(
+            state=state,
+            decisions=decisions,
+            result=result,
+            runtime_modifier_registry=runtime_modifier_registry,
+            registry=registry,
+            completion_hooks=completion_hooks,
+            ruleset_descriptor=ruleset_descriptor,
+            army_catalog=army_catalog,
+            shooting_target_restriction_hooks=shooting_target_restriction_hooks,
+        )
     payload = _decision_payload_object(result.payload)
     _validate_shooting_unit_selected_grant_payload_context(payload=payload, selection=selection)
     if result.selected_option_id == DECLINE_SHOOTING_UNIT_GRANT_OPTION_ID:
@@ -327,6 +368,149 @@ def _apply_shooting_unit_selected_grant_decision(
             }
         ),
     )
+    if (
+        any(grant.preparation is not None for grant in selected_grants)
+        and state.out_of_phase_shooting_state is None
+        and ruleset_descriptor is not None
+        and army_catalog is not None
+    ):
+        # Preparation can remove the only model with a legal shot. A surviving unit
+        # still chose its grant, but cannot enter a shooting type that no longer exists.
+        from warhammer40k_core.engine.random_weapon_range import (
+            prepare_selected_weapon_ranges,
+        )
+
+        prepare_selected_weapon_ranges(
+            state=state, decisions=decisions, selection=selection, catalog=army_catalog
+        )
+        unit = rules_unit_view_by_id(state=state, unit_instance_id=selection.unit_instance_id)
+        if not _legal_shooting_types_for_rules_unit(
+            state=state,
+            rules_unit=unit,
+            ruleset_descriptor=ruleset_descriptor,
+            army_catalog=army_catalog,
+            shooting_target_restriction_hooks=shooting_target_restriction_hooks,
+        ):
+            _end_selected_shooting_without_attacks(
+                state=state,
+                decisions=decisions,
+                selection=selection,
+                reason="no_legal_shooting_type_after_grant",
+            )
+            return None
+    return _continue_out_of_phase_after_shooting_unit_grants(
+        state=state,
+        decisions=decisions,
+        selection=selection,
+        runtime_modifier_registry=runtime_modifier_registry,
+        completion_hooks=completion_hooks,
+        ruleset_descriptor=ruleset_descriptor,
+        army_catalog=army_catalog,
+        shooting_target_restriction_hooks=shooting_target_restriction_hooks,
+        persisting_effects=persisting_effects,
+    )
+
+
+def resume_shooting_unit_grant_commitment(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    result: DecisionResult,
+    runtime_modifier_registry: RuntimeModifierRegistry,
+    registry: ShootingUnitSelectedGrantRegistry,
+    completion_hooks: AttackSequenceCompletedHookRegistry | None,
+    ruleset_descriptor: RulesetDescriptor | None,
+    army_catalog: ArmyCatalog | None,
+    shooting_target_restriction_hooks: ShootingTargetRestrictionHookRegistry | None,
+    resolved: bool = False,
+) -> LifecycleStatus | None:
+    selection = _active_shooting_unit_selection(state)
+    committed = result.selected_option_id != DECLINE_SHOOTING_UNIT_GRANT_OPTION_ID
+    if committed:
+        if not resolved:
+            status = preparation_flow.resolve_commitment(
+                state=state,
+                decisions=decisions,
+                runtime_modifier_registry=runtime_modifier_registry,
+                result=result,
+                phase=BattlePhase.SHOOTING,
+            )
+            if status is not None:
+                return status
+        unit = rules_unit_view_by_id(state=state, unit_instance_id=selection.unit_instance_id)
+        if not unit.alive_models():
+            out_of_phase_state = state.out_of_phase_shooting_state
+            if out_of_phase_state is not None:
+                return _complete_out_of_phase_shooting(
+                    state=state,
+                    decisions=decisions,
+                    completed_state=out_of_phase_state,
+                )
+            _end_selected_shooting_without_attacks(
+                state=state,
+                decisions=decisions,
+                selection=selection,
+                reason="selected_unit_destroyed_during_grant",
+            )
+            return None
+    grant_status = _request_shooting_unit_selected_grant_decision_if_available(
+        state=state,
+        decisions=decisions,
+        selection=selection,
+        registry=registry,
+        committed=committed,
+    )
+    if grant_status is not None:
+        return grant_status
+    return _continue_out_of_phase_after_shooting_unit_grants(
+        state=state,
+        decisions=decisions,
+        selection=selection,
+        runtime_modifier_registry=runtime_modifier_registry,
+        completion_hooks=completion_hooks,
+        ruleset_descriptor=ruleset_descriptor,
+        army_catalog=army_catalog,
+        shooting_target_restriction_hooks=shooting_target_restriction_hooks,
+        persisting_effects=(),
+    )
+
+
+def _end_selected_shooting_without_attacks(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    selection: ShootingUnitSelection,
+    reason: str,
+) -> None:
+    shooting_state = _ensure_shooting_phase_state(state=state)
+    if (
+        shooting_state.active_selection != selection
+        or shooting_state.selected_shooting_type is not None
+    ):
+        raise GameLifecycleError("Shooting selection ended outside its pre-declaration window.")
+    state.replace_shooting_phase_state(replace(shooting_state, active_selection=None))
+    decisions.event_log.append(
+        "shooting_selection_ended_without_attacks",
+        {
+            "unit_instance_id": selection.unit_instance_id,
+            "selection_result_id": selection.result_id,
+            "reason": reason,
+        },
+    )
+
+
+def _continue_out_of_phase_after_shooting_unit_grants(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    selection: ShootingUnitSelection,
+    runtime_modifier_registry: RuntimeModifierRegistry,
+    completion_hooks: AttackSequenceCompletedHookRegistry | None,
+    ruleset_descriptor: RulesetDescriptor | None,
+    army_catalog: ArmyCatalog | None,
+    shooting_target_restriction_hooks: ShootingTargetRestrictionHookRegistry | None,
+    persisting_effects: tuple[PersistingEffect, ...],
+) -> LifecycleStatus | None:
     out_of_phase_state = state.out_of_phase_shooting_state
     if (
         out_of_phase_state is not None

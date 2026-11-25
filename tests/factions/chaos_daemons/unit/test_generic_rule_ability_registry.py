@@ -189,14 +189,9 @@ def test_default_generic_rule_ability_registry_maps_shadow_legion_grants() -> No
         ("phase17f:phase17e:chaos-daemons:shadow-legion:rule:shadow-legion:fight:sustained_hits_1"),
     }
 
-    attack_completion = registry.attack_sequence_completed_abilities[0]
-    assert attack_completion.hook_family is GenericRuleAbilityHookFamily.ATTACK_SEQUENCE_COMPLETED
-    assert set(attack_completion.ability_ids()) == {
-        shadow_legion_ir.SHADOW_LEGION_DARK_PACT_LETHAL_HITS_CHOICE_ABILITY,
-        shadow_legion_ir.SHADOW_LEGION_DARK_PACT_SUSTAINED_HITS_1_CHOICE_ABILITY,
-    }
-    assert attack_completion.hook_id(source) == (
-        "phase17f:phase17e:chaos-daemons:shadow-legion:rule:shadow-legion:dark-pact-completion"
+    assert all(
+        descriptor.source_rule_id != dark_pacts.SHADOW_LEGION_SOURCE_RULE_ID
+        for descriptor in registry.attack_sequence_completed_abilities
     )
 
     fnp = next(
