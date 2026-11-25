@@ -4,8 +4,11 @@ from dataclasses import replace
 from pathlib import Path
 
 import pytest
+from tools.generate_ability_support_matrix import (
+    _ability_support_catalog_package,  # pyright: ignore[reportPrivateUsage]
+)
 
-from tests.daemons_native_source_helpers import BELAKOR, native_definitions
+from tests.daemons_native_source_helpers import BELAKOR, SELECTED
 from tests.support.faction_batch01 import (
     CRUSHERS,
     LORD,
@@ -57,12 +60,17 @@ FIRST = "own:first"
 SECOND = "own:second"
 WRONG_KEYWORD = "own:undivided"
 ENEMY = "foe:target"
+BLOODTHIRSTER = "000002582"
+GORE_ID = blood_legion_ir.GORE_HUNGRY_ONSLAUGHT_STRATAGEM_ID
 
 
 @pytest.fixture(scope="module")
 def skulls_definitions(selected_army_source_index: Path | None) -> Section02Definitions:
-    native = native_definitions(selected_army_source_index)
-    catalog = native.package.army_catalog
+    package = _ability_support_catalog_package(
+        datasheet_ids=(*SELECTED, BLOODTHIRSTER, "000004080", LORD, "000004090"),
+        source_index_dir=selected_army_source_index,
+    )
+    catalog = package.army_catalog
     source_factions = {"CD": "chaos-daemons", "EC": "emperors-children"}
     factions = tuple(
         replace(faction, faction_id=source_factions[faction.faction_id])
@@ -91,10 +99,10 @@ def skulls_definitions(selected_army_source_index: Path | None) -> Section02Defi
     )
     return Section02Definitions(
         replace(
-            native.package,
+            package,
             army_catalog=replace(catalog, factions=factions, detachments=detachments),
         ),
-        native.preparation_seconds,
+        0.0,
     )
 
 
@@ -134,7 +142,7 @@ def _scene(
     return battle
 
 
-def _submit(session: LocalGameSession, option: str) -> LifecycleStatus:
+def submit_option(session: LocalGameSession, option: str) -> LifecycleStatus:
     req = pending(session)
     return session.submit_option(
         request_id=req.request_id,
@@ -146,11 +154,13 @@ def _submit(session: LocalGameSession, option: str) -> LifecycleStatus:
 def _reach_charge(battle: Scene, *, advance: tuple[str, ...]) -> DecisionRequest:
     begin(battle.session)
     for unit in (FIRST, SECOND, WRONG_KEYWORD):
+        if stratagem_targets(pending(battle.session), GORE_ID):
+            submit_option(battle.session, DECLINE_STRATAGEM_WINDOW_OPTION_ID)
         assert pending(battle.session).decision_type == "select_movement_unit"
-        require_request(_submit(battle.session, unit), "select_movement_action")
+        require_request(submit_option(battle.session, unit), "select_movement_action")
         if unit in advance:
             proposal = require_request(
-                _submit(battle.session, "advance"), "submit_movement_proposal"
+                submit_option(battle.session, "advance"), "submit_movement_proposal"
             )
             require_request(submit_translation(battle, proposal, unit, 0.5))
             advanced = battle.state.advanced_unit_state_for_unit(
@@ -159,19 +169,19 @@ def _reach_charge(battle: Scene, *, advance: tuple[str, ...]) -> DecisionRequest
             assert advanced is not None
             assert not advanced.can_declare_charge
         else:
-            require_request(_submit(battle.session, "remain_stationary"))
+            require_request(submit_option(battle.session, "remain_stationary"))
     req = pending(battle.session)
     if req.decision_type == "start_mission_action":
-        req = require_request(_submit(battle.session, "continue_to_shooting"))
+        req = require_request(submit_option(battle.session, "continue_to_shooting"))
     if req.decision_type == "select_shooting_unit":
-        req = require_request(_submit(battle.session, "complete_shooting_phase"))
+        req = require_request(submit_option(battle.session, "complete_shooting_phase"))
     return req
 
 
-def _targets(request: DecisionRequest) -> dict[str, str]:
+def stratagem_targets(request: DecisionRequest, stratagem_id: str = STRATAGEM_ID) -> dict[str, str]:
     targets: dict[str, str] = {}
     for option in request.options:
-        if not option.option_id.startswith(f"use-stratagem:{STRATAGEM_ID}:"):
+        if not option.option_id.startswith(f"use-stratagem:{stratagem_id}:"):
             continue
         assert isinstance(option.payload, dict)
         binding = option.payload["target_binding"]
@@ -218,7 +228,7 @@ def test_blood_begets_skulls_offers_when_advance_prevents_all_charges(
     offer = _reach_charge(battle, advance=(FIRST, SECOND))
     assert offer.decision_type == "use_stratagem"
     assert offer.actor_id == "owner"
-    assert set(_targets(offer)) == {FIRST, SECOND}
+    assert set(stratagem_targets(offer)) == {FIRST, SECOND}
     assert battle.state.charge_phase_state is not None
     assert battle.state.charge_phase_state.selected_unit_ids == ()
     assert not events(battle.session, "charging_unit_selection_requested")
@@ -226,25 +236,27 @@ def test_blood_begets_skulls_offers_when_advance_prevents_all_charges(
     checkpoint = battle.session.to_persistence_payload()
     restored = LocalGameSession.from_persistence_payload(checkpoint)
     assert restored.to_persistence_payload() == checkpoint
-    alternative = require_request(_submit(restored, DECLINE_STRATAGEM_WINDOW_OPTION_ID))
-    assert not _targets(alternative)
+    alternative = require_request(submit_option(restored, DECLINE_STRATAGEM_WINDOW_OPTION_ID))
+    assert not stratagem_targets(alternative)
     assert not events(restored, "charging_unit_selection_requested")
     assert not events(restored, "stratagem_used")
 
     with pytest.raises(DecisionError, match="option"):
-        _submit(battle.session, _targets(offer)[FIRST].replace(FIRST, WRONG_KEYWORD))
+        submit_option(battle.session, stratagem_targets(offer)[FIRST].replace(FIRST, WRONG_KEYWORD))
     assert pending(battle.session) == offer
     assert battle.state.command_point_total("owner") == 2
 
-    charge = require_request(
-        _submit(battle.session, _targets(offer)[FIRST]), "select_charging_unit"
-    )
+    charge = require_request(submit_option(battle.session, stratagem_targets(offer)[FIRST]))
+    if stratagem_targets(charge, GORE_ID):
+        charge = require_request(submit_option(battle.session, DECLINE_STRATAGEM_WINDOW_OPTION_ID))
+    assert charge.decision_type == "select_charging_unit"
+
     assert {option.option_id for option in charge.options} == {FIRST, "complete_charge_phase"}
     assert battle.state.charge_phase_state.selected_unit_ids == ()
     _assert_grant(battle, FIRST, remaining_cp=1)
     active = battle.session.to_persistence_payload()
     assert LocalGameSession.from_persistence_payload(active).to_persistence_payload() == active
-    require_request(_submit(battle.session, "complete_charge_phase"))
+    require_request(submit_option(battle.session, "complete_charge_phase"))
     assert battle.state.current_battle_phase is not BattlePhase.CHARGE
     assert not charge_after_advance_allowed_by_effects(state=battle.state, unit_instance_id=FIRST)
     replay = ReplayRunner.from_payload(battle.session.replay_artifact(artifact_id="skulls")).run()
@@ -257,27 +269,29 @@ def test_blood_begets_skulls_decline_then_offer_after_earlier_charge(
 ) -> None:
     battle = _scene(skulls_definitions, cp=2)
     first_offer = _reach_charge(battle, advance=(SECOND,))
-    assert set(_targets(first_offer)) == {FIRST, SECOND}
+    assert set(stratagem_targets(first_offer)) == {FIRST, SECOND}
     charge = require_request(
-        _submit(battle.session, DECLINE_STRATAGEM_WINDOW_OPTION_ID), "select_charging_unit"
+        submit_option(battle.session, DECLINE_STRATAGEM_WINDOW_OPTION_ID), "select_charging_unit"
     )
     assert {option.option_id for option in charge.options} == {FIRST, "complete_charge_phase"}
-    later = require_request(_submit(battle.session, FIRST))
-    if later.decision_type == "use_stratagem" and not _targets(later):
-        later = require_request(_submit(battle.session, DECLINE_STRATAGEM_WINDOW_OPTION_ID))
+    later = require_request(submit_option(battle.session, FIRST))
+    if later.decision_type == "use_stratagem" and not stratagem_targets(later):
+        later = require_request(submit_option(battle.session, DECLINE_STRATAGEM_WINDOW_OPTION_ID))
     if later.decision_type == "select_charge_targets":
-        later = require_request(_submit(battle.session, "decline_charge_targets"))
+        later = require_request(submit_option(battle.session, "decline_charge_targets"))
     assert later.decision_type == "use_stratagem"
-    assert set(_targets(later)) == {SECOND}
+    assert set(stratagem_targets(later)) == {SECOND}
     assert (
         stratagem_window_context_from_request(first_offer).timing_window_id
         != stratagem_window_context_from_request(later).timing_window_id
     )
     assert battle.state.charge_phase_state is not None
     assert battle.state.charge_phase_state.selected_unit_ids == (FIRST,)
-    resumed = require_request(
-        _submit(battle.session, _targets(later)[SECOND]), "select_charging_unit"
-    )
+    resumed = require_request(submit_option(battle.session, stratagem_targets(later)[SECOND]))
+    if stratagem_targets(resumed, GORE_ID):
+        resumed = require_request(submit_option(battle.session, DECLINE_STRATAGEM_WINDOW_OPTION_ID))
+    assert resumed.decision_type == "select_charging_unit"
+
     assert {option.option_id for option in resumed.options} == {SECOND, "complete_charge_phase"}
     _assert_grant(battle, SECOND, remaining_cp=1)
     assert battle.state.charge_phase_state.selected_unit_ids == (FIRST,)
@@ -300,11 +314,11 @@ def test_blood_begets_skulls_unavailable_without_cp_or_outside_own_charge(
     wrong_phase = _scene(skulls_definitions, cp=2, phase=BattlePhase.SHOOTING)
     shooting = begin(wrong_phase.session)
     assert wrong_phase.state.current_battle_phase is BattlePhase.SHOOTING
-    assert not _targets(shooting)
+    assert not stratagem_targets(shooting)
 
     wrong_turn = _scene(skulls_definitions, cp=2, phase=BattlePhase.CHARGE, turn="opponent")
     opponent_charge = begin(wrong_turn.session)
     assert opponent_charge.decision_type == "select_charging_unit"
     assert opponent_charge.actor_id == "opponent"
-    assert not _targets(opponent_charge)
+    assert not stratagem_targets(opponent_charge)
     assert not wrong_turn.state.stratagem_use_records

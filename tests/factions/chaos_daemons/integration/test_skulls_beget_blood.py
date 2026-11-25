@@ -374,7 +374,19 @@ def test_skulls_beget_blood_allows_advance_but_excludes_fall_back(
     shooting_skulls_definitions: Section02Definitions,
 ) -> None:
     battle = _scene(shooting_skulls_definitions, phase=BattlePhase.MOVEMENT)
-    begin(battle.session)
+
+    def decline_movement_stratagem(offer: DecisionRequest) -> DecisionRequest:
+        if offer.decision_type != "use_stratagem":
+            return offer
+        assert any(
+            option.option_id.startswith(
+                f"use-stratagem:{blood_legion_ir.GORE_HUNGRY_ONSLAUGHT_STRATAGEM_ID}:"
+            )
+            for option in offer.options
+        )
+        return require_request(_submit(battle.session, DECLINE_STRATAGEM_WINDOW_OPTION_ID))
+
+    assert decline_movement_stratagem(begin(battle.session)).decision_type == "select_movement_unit"
     require_request(_submit(battle.session, INFANTRY), "select_movement_action")
     proposal = require_request(
         _submit(battle.session, "fall_back:ordered_retreat"), "submit_movement_proposal"
@@ -393,10 +405,11 @@ def test_skulls_beget_blood_allows_advance_but_excludes_fall_back(
             result_id=f"{proposal.request_id}:retreat",
         )
     )
-    assert request.decision_type == "select_movement_unit"
+    assert decline_movement_stratagem(request).decision_type == "select_movement_unit"
     require_request(_submit(battle.session, MOUNTED), "select_movement_action")
     advance = require_request(_submit(battle.session, "advance"), "submit_movement_proposal")
-    require_request(submit_translation(battle, advance, MOUNTED, 0.5), "select_movement_unit")
+    after_move = require_request(submit_translation(battle, advance, MOUNTED, 0.5))
+    assert decline_movement_stratagem(after_move).decision_type == "select_movement_unit"
     require_request(_submit(battle.session, WRONG_KEYWORD), "select_movement_action")
     request = require_request(_submit(battle.session, "remain_stationary"))
     if request.decision_type == "start_mission_action":

@@ -37512,6 +37512,90 @@
       "families": [],
       "sensitive": false,
       "mandatory": true
+    },
+    "gore-hungry-onslaught-phase-opportunities": {
+      "paths": [
+        "src/warhammer40k_core/engine/charge_preselection_stratagems.py",
+        "src/warhammer40k_core/engine/phases/movement_handler.py",
+        "src/warhammer40k_core/engine/stratagems_requests.py"
+      ],
+      "owners": [
+        "@module",
+        "MovementPhaseHandler.begin_phase",
+        "request_charge_preselection_stratagem",
+        "request_phase_preselection_stratagem"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "gore-hungry-onslaught-source-backed-terrain": {
+      "paths": [
+        "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/detachments/blood_legion/stratagems.py",
+        "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_blood_legion_ir_support_2026_27.py"
+      ],
+      "owners": [
+        "@module",
+        "_coverage_payloads",
+        "_gore_hungry_onslaught_payload",
+        "_gore_hungry_onslaught_records",
+        "runtime_contribution"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "gore-hungry-onslaught-native-validation": {
+      "paths": [
+        "tests/factions/chaos_daemons/integration/test_blood_begets_skulls.py",
+        "tests/factions/chaos_daemons/integration/test_gore_hungry_onslaught.py",
+        "tests/factions/chaos_daemons/integration/test_skulls_beget_blood.py",
+        "tests/infrastructure/source_governance/unit/test_blocked_row_classification.py"
+      ],
+      "owners": [
+        "@module",
+        "_advance_through_wall",
+        "_assert_onslaught",
+        "_onslaught_option",
+        "_onslaught_scene",
+        "_reach_charge",
+        "_submit",
+        "_targets",
+        "skulls_definitions",
+        "stratagem_targets",
+        "submit_option",
+        "test_blood_begets_skulls_decline_then_offer_after_earlier_charge",
+        "test_blood_begets_skulls_offers_when_advance_prevents_all_charges",
+        "test_blood_begets_skulls_unavailable_without_cp_or_outside_own_charge",
+        "test_gore_hungry_onslaught_charge_path_and_replay",
+        "test_gore_hungry_onslaught_ineligible_window",
+        "test_gore_hungry_onslaught_later_movement_window",
+        "test_gore_hungry_onslaught_movement_path_and_replay",
+        "test_phase17i_missing_capability_report_groups_rows_by_family",
+        "test_phase17i_source_text_boundaries_are_explicit",
+        "test_skulls_beget_blood_allows_advance_but_excludes_fall_back"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "gore-hungry-onslaught-predecessor-admission": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/gore-hungry-onslaught-transition-v1.json",
+        "scripts/engine_numerical_identity_test_admission.py"
+      ],
+      "owners": [
+        "@document",
+        "@module",
+        "_blood_begets_skulls_test_successor",
+        "_gore_hungry_onslaught_transition",
+        "_skulls_beget_blood_test_successor",
+        "_wrath_undeniable_test_successor",
+        "exact_movement_test_transition"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

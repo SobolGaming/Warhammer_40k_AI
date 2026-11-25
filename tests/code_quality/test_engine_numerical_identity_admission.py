@@ -498,7 +498,42 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         charge_flight["retained_transition_sha256"]
         == hashlib.sha256((ROOT / selection.WRATH_UNDENIABLE_TRANSITION).read_bytes()).hexdigest()
     )
-    assert charge_flight["runtime_fingerprint"] == _record(MANIFEST)["fingerprint"]
+    gore = _record(selection.GORE_HUNGRY_ONSLAUGHT_TRANSITION)
+    gore_base_manifest = json.loads(
+        subprocess.check_output(["git", "show", gore["base"] + ":" + MANIFEST], cwd=ROOT)
+    )
+    assert gore["base"] == "f69eda2040ab55db4dd18686eee69edafcca9dd2"
+    assert gore["retained_runtime_fingerprint"] == (charge_flight["runtime_fingerprint"])
+    assert charge_flight["runtime_fingerprint"] == gore_base_manifest["fingerprint"]
+    assert gore["runtime_fingerprint"] == _record(MANIFEST)["fingerprint"]
+    assert (
+        gore["retained_transition_sha256"]
+        == hashlib.sha256(
+            (
+                ROOT / "data/source_audits/ci64_provenance_v1/pre-roll-charge-flight-test-v1.json"
+            ).read_bytes()
+        ).hexdigest()
+    )
+    gore_owner = selection.GORE_HUNGRY_ONSLAUGHT_OWNER
+    assert set(gore["added_files"]) == {gore_owner}
+    assert gore_owner in active_files
+    assert sum(gore_owner in group for group in groups) == 1
+    assert (
+        gore["added_files"][gore_owner]["sha256"]
+        == hashlib.sha256((ROOT / gore_owner).read_bytes()).hexdigest()
+    )
+    gore_cases = {
+        gore_owner + "::test_gore_hungry_onslaught_" + case
+        for case in (
+            "movement_path_and_replay",
+            "later_movement_window",
+            "charge_path_and_replay",
+            "ineligible_window[movement-0-owner]",
+            "ineligible_window[movement-1-opponent]",
+            "ineligible_window[charge-1-opponent]",
+            "ineligible_window[shooting-1-owner]",
+        )
+    }
     charge_flight_owner = "tests/infrastructure/adapters/test_charge_flight_admission.py"
     assert set(charge_flight["added_files"]) == {charge_flight_owner}
     assert charge_flight_owner in active_files
@@ -557,7 +592,18 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         assert binding["before"] == predecessor_sources[source]
         predecessor_sources[source] = binding["after"]
     assert wrath["new_sources"].keys().isdisjoint(predecessor_sources)
-    for source, digest in (predecessor_sources | wrath["new_sources"]).items():
+    predecessor_sources.update(wrath["new_sources"])
+    for source, binding in gore["replaced_sources"].items():
+        assert binding["before"] == predecessor_sources[source]
+        assert (
+            binding["before"]
+            == hashlib.sha256(
+                subprocess.check_output(["git", "show", gore["base"] + ":" + source], cwd=ROOT)
+            ).hexdigest()
+        )
+        predecessor_sources[source] = binding["after"]
+    assert gore["new_sources"].keys().isdisjoint(predecessor_sources)
+    for source, digest in (predecessor_sources | gore["new_sources"]).items():
         assert digest == hashlib.sha256((ROOT / source).read_bytes()).hexdigest()
     wrath_owner = selection.WRATH_UNDENIABLE_OWNER
     assert set(wrath["added_files"]) == {wrath_owner}
@@ -572,15 +618,20 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
     assert shooting_skulls_owner in active_files
     assert sum(shooting_skulls_owner in group for group in groups) == 1
     assert (
-        shooting_skulls["added_files"][shooting_skulls_owner]["sha256"]
+        gore["updated_files"][shooting_skulls_owner]["before"]
+        == shooting_skulls["added_files"][shooting_skulls_owner]
+    )
+    assert (
+        gore["updated_files"][shooting_skulls_owner]["after"]["sha256"]
         == hashlib.sha256((ROOT / shooting_skulls_owner).read_bytes()).hexdigest()
     )
     skulls_owner = selection.BLOOD_BEGETS_SKULLS_OWNER
     assert set(skulls["added_files"]) == {skulls_owner}
     assert skulls_owner in active_files
     assert sum(skulls_owner in group for group in groups) == 1
+    assert gore["updated_files"][skulls_owner]["before"] == skulls["added_files"][skulls_owner]
     assert (
-        skulls["added_files"][skulls_owner]["sha256"]
+        gore["updated_files"][skulls_owner]["after"]["sha256"]
         == hashlib.sha256((ROOT / skulls_owner).read_bytes()).hexdigest()
     )
     stage3 = _record("data/source_audits/ci64_provenance_v1/stage3-melee-profile-test-v1.json")
@@ -673,8 +724,18 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
     assert set(wrath["updated_files"]) == {classification_owner}
     wrath_classification = wrath["updated_files"][classification_owner]
     assert wrath_classification["before"] == current_classification["after"]
+    gore_classification = gore["updated_files"][classification_owner]
+    assert gore_classification["before"] == wrath_classification["after"]
     assert (
         wrath_classification["after"]["sha256"]
+        == hashlib.sha256(
+            subprocess.check_output(
+                ["git", "show", gore["base"] + ":" + classification_owner], cwd=ROOT
+            )
+        ).hexdigest()
+    )
+    assert (
+        gore_classification["after"]["sha256"]
         == hashlib.sha256((ROOT / classification_owner).read_bytes()).hexdigest()
     )
     assert classification_owner in active_files
@@ -1073,6 +1134,7 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         | stage3_cases
         | flight_cases
         | charge_flight_cases
+        | gore_cases
         | {
             selection.BLOOD_BEGETS_SKULLS_OWNER + "::" + case
             for case in (

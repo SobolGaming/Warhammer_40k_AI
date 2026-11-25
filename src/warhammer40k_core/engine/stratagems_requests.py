@@ -255,6 +255,42 @@ def stratagem_window_decline_event_payload(
     )
 
 
+def request_phase_preselection_stratagem(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    stratagem_index: StratagemCatalogIndex,
+    cost_modifiers: StratagemCostModifierRegistry,
+    context: StratagemEligibilityContext,
+) -> LifecycleStatus | None:
+    records = tuple(
+        record
+        for record in stratagem_index.records_for(TimingTriggerKind.DURING_PHASE)
+        if record.definition.timing.phase is context.phase
+    )
+    if not records:
+        return None
+    options = stratagem_use_options_from_index(
+        state=state,
+        index=StratagemCatalogIndex.from_records(records),
+        context=context,
+        stratagem_cost_modifier_registry=cost_modifiers,
+    )
+    if not options or stratagem_window_declined_for_context(decisions=decisions, context=context):
+        return None
+    request = create_stratagem_use_decision_request(
+        state=state,
+        context=context,
+        options=(*options, stratagem_decline_option()),
+    )
+    decisions.request_decision(request)
+    return LifecycleStatus.waiting_for_decision(
+        stage=state.stage,
+        decision_request=request,
+        payload={"phase_body_status": f"{context.phase.value}_preselection_stratagem_pending"},
+    )
+
+
 def stratagem_window_declined_for_context(
     *,
     decisions: DecisionController,

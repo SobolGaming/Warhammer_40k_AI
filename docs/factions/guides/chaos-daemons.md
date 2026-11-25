@@ -34,7 +34,7 @@ DP is a detachment budget, separate from unit/Enhancement points and Stratagem C
 
 | Detachment | DP / force disposition | Rule headings | Baseline rule | Enh. / Strat. |
 | --- | --- | --- | --- | --- |
-| [Blood Legion](../audit/chaos-daemons.md#detachment-blood-legion) | 2 DP · Purge the Foe | Murdercall; Blood Tainted | E | 4 / 6 |
+| [Blood Legion](../audit/chaos-daemons.md#detachment-blood-legion) | 2 DP · Purge the Foe | Murdercall; Blood Tainted | E | 5 / 6 |
 | [Cavalcade of Chaos](../audit/chaos-daemons.md#detachment-cavalcade-of-chaos) | 1 DP · Disruption | Unholy Avalanche | E | 2 / 3 |
 | [Daemonic Incursion](../audit/chaos-daemons.md#detachment-daemonic-incursion) | 3 DP · Take and Hold | Warp Rifts | E | 4 / 6 |
 | [Legion of Excess](../audit/chaos-daemons.md#detachment-legion-of-excess) | 2 DP · Priority Assets | Beguiling Aura; Seductive Gambit | Source | 4 / 6 |

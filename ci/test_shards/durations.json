@@ -192,6 +192,13 @@
     "tests/factions/chaos_daemons/integration/test_cavalcade_v995_roster.py::test_tactical_card_order_uses_private_seed_and_preserves_exclusions": 2.596,
     "tests/factions/chaos_daemons/integration/test_cavalcade_v995_roster.py::test_v995_army_strictly_musters_independently_for_both_players": 0.033,
     "tests/factions/chaos_daemons/integration/test_cavalcade_v995_roster.py::test_viewer_identity_map_preserves_entities_and_rejects_unissued_references": 0.01,
+    "tests/factions/chaos_daemons/integration/test_gore_hungry_onslaught.py::test_gore_hungry_onslaught_charge_path_and_replay": 6.768,
+    "tests/factions/chaos_daemons/integration/test_gore_hungry_onslaught.py::test_gore_hungry_onslaught_ineligible_window[charge-1-opponent]": 0.621,
+    "tests/factions/chaos_daemons/integration/test_gore_hungry_onslaught.py::test_gore_hungry_onslaught_ineligible_window[movement-0-owner]": 0.619,
+    "tests/factions/chaos_daemons/integration/test_gore_hungry_onslaught.py::test_gore_hungry_onslaught_ineligible_window[movement-1-opponent]": 0.617,
+    "tests/factions/chaos_daemons/integration/test_gore_hungry_onslaught.py::test_gore_hungry_onslaught_ineligible_window[shooting-1-owner]": 0.877,
+    "tests/factions/chaos_daemons/integration/test_gore_hungry_onslaught.py::test_gore_hungry_onslaught_later_movement_window": 0.671,
+    "tests/factions/chaos_daemons/integration/test_gore_hungry_onslaught.py::test_gore_hungry_onslaught_movement_path_and_replay": 33.49,
     "tests/factions/chaos_daemons/integration/test_horror_split_materialization.py::test_authenticated_materialization_rejects_corrupted_evidence_graph[accepted_model_set-Catalog materialization accepted model set drift]": 0.749,
     "tests/factions/chaos_daemons/integration/test_horror_split_materialization.py::test_authenticated_materialization_rejects_corrupted_evidence_graph[accepted_placement-Catalog materialization accepted placement drift]": 13.223,
     "tests/factions/chaos_daemons/integration/test_horror_split_materialization.py::test_authenticated_materialization_rejects_corrupted_evidence_graph[completion_payload-Catalog materialization completion payload drift]": 11.987,
@@ -6737,18 +6744,18 @@
   },
   "execution_model": {
     "assignment_wall_lower_bound_seconds": {
-      "1": 578.707,
-      "10": 578.708,
-      "11": 578.707,
-      "12": 578.708,
+      "1": 579.799,
+      "10": 579.799,
+      "11": 579.799,
+      "12": 579.799,
       "2": 795.547,
       "3": 609.537,
-      "4": 578.708,
-      "5": 578.708,
-      "6": 578.708,
-      "7": 578.708,
-      "8": 578.707,
-      "9": 578.708
+      "4": 579.8,
+      "5": 579.799,
+      "6": 579.799,
+      "7": 579.8,
+      "8": 579.799,
+      "9": 579.799
     },
     "cold_shard_assignment": "minimum-unrounded-modeled-test-load-existing-bucket-v1",
     "cold_shard_id": 1,
@@ -6757,18 +6764,18 @@
       "tests/factions/chaos_daemons/integration/test_cavalcade_v995_roster.py::test_exact_mirror_deploys_all_78_models_and_replays_to_battle"
     ],
     "shard_worker_seconds": {
-      "1": 2314.83,
-      "10": 2314.831,
-      "11": 2314.83,
-      "12": 2314.831,
+      "1": 2319.196,
+      "10": 2319.197,
+      "11": 2319.196,
+      "12": 2319.196,
       "2": 3182.186,
       "3": 2438.146,
-      "4": 2314.831,
-      "5": 2314.831,
-      "6": 2314.831,
-      "7": 2314.831,
-      "8": 2314.83,
-      "9": 2314.831
+      "4": 2319.198,
+      "5": 2319.196,
+      "6": 2319.196,
+      "7": 2319.201,
+      "8": 2319.196,
+      "9": 2319.198
     }
   },
   "files": {
@@ -6786,6 +6793,7 @@
     "tests/factions/chaos_daemons/integration/test_cavalcade_opening_movement_unit.py": 106.668,
     "tests/factions/chaos_daemons/integration/test_cavalcade_v995_roster.py": 550.273,
     "tests/factions/chaos_daemons/integration/test_cavalcade_v995_roster.py::test_exact_mirror_deploys_all_78_models_and_replays_to_battle": 167.078,
+    "tests/factions/chaos_daemons/integration/test_gore_hungry_onslaught.py": 43.663,
     "tests/factions/chaos_daemons/integration/test_horror_split_materialization.py": 196.249,
     "tests/factions/chaos_daemons/integration/test_monster_mash_v995_roster.py": 34.04,
     "tests/factions/chaos_daemons/integration/test_sheathed_in_brass.py": 120.611,
@@ -7338,21 +7346,22 @@
         "8e6ef17843af538ddc0a9551452cf432963faad6de879cd1033d4ca1caa906b4",
         "9a5f617751dd2ef273362bcbec3d532afb594c23b9d7c4576a1ba54a82305422",
         "9dc1b70162325c830e81f4b6e06c9199b793ed7d7805d59287feb2a593be541d",
+        "a0c739be5dead41e85b3bd2dd20621e2c1740137928b6661ac0bf3e095e36bef",
         "a58370bb7e97f2155a65d0b16e4dc74b9e2fdb5251ee95594210b0d558e2ef63",
         "b6375213c9da2f15abad64e49a6464d2963ef84289178cef5d659c8ec4ce1295",
         "d221fa9414f09deb36d275dca16085e59d0239e19246d38cf138ddd866c65662"
       ],
-      "source": "Retained #736 refresh timing profile and one measured three-inch Charge roundoff regression on WSL; plus five measured Sheathed in Brass cases (serial WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); plus measured Blood Begets Skulls and Phase 17I updates (serial WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); add four measured Stage 3 melee cases (WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); plus measured Skulls Beget Blood and Phase 17I updates (serial WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); retain two reviewed Stage 3 native-qualification flight weights (serial Windows, Python 3.14.5; scheduling only); plus measured Wrath Undeniable and Phase 17I updates (serial WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); plus four measured pre-roll Charge flight admission cases (serial Windows, Python 3.14.5; scheduling only); remeasured the same native Charge case with the operational proof and unchanged case inventory",
-      "test_cases": 6734,
-      "test_files": 452
+      "source": "Retained #736 refresh timing profile and one measured three-inch Charge roundoff regression on WSL; plus five measured Sheathed in Brass cases (serial WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); plus measured Blood Begets Skulls and Phase 17I updates (serial WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); add four measured Stage 3 melee cases (WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); plus measured Skulls Beget Blood and Phase 17I updates (serial WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); retain two reviewed Stage 3 native-qualification flight weights (serial Windows, Python 3.14.5; scheduling only); plus measured Wrath Undeniable and Phase 17I updates (serial WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); plus four measured pre-roll Charge flight admission cases (serial Windows, Python 3.14.5; scheduling only); remeasured the same native Charge case with the operational proof and unchanged case inventory; plus seven measured Gore-Hungry Onslaught nodes (serial Linux, Python 3.14.5, branch coverage; scheduling only)",
+      "test_cases": 6741,
+      "test_files": 453
     }
   ],
   "shard_count": 12,
   "shards": [
     {
-      "duration_seconds": 2314.83,
+      "duration_seconds": 1817.962,
       "shard_id": 1,
-      "test_file_count": 46
+      "test_file_count": 53
     },
     {
       "duration_seconds": 3182.186,
@@ -7365,47 +7374,47 @@
       "test_file_count": 1
     },
     {
-      "duration_seconds": 1813.597,
+      "duration_seconds": 2319.198,
       "shard_id": 4,
+      "test_file_count": 45
+    },
+    {
+      "duration_seconds": 2319.196,
+      "shard_id": 5,
       "test_file_count": 52
     },
     {
-      "duration_seconds": 2314.831,
-      "shard_id": 5,
-      "test_file_count": 51
-    },
-    {
-      "duration_seconds": 2314.831,
+      "duration_seconds": 2319.196,
       "shard_id": 6,
       "test_file_count": 51
     },
     {
-      "duration_seconds": 2314.831,
+      "duration_seconds": 2319.201,
       "shard_id": 7,
       "test_file_count": 51
     },
     {
-      "duration_seconds": 2314.83,
+      "duration_seconds": 2319.196,
       "shard_id": 8,
+      "test_file_count": 53
+    },
+    {
+      "duration_seconds": 2319.198,
+      "shard_id": 9,
       "test_file_count": 50
     },
     {
-      "duration_seconds": 2314.831,
-      "shard_id": 9,
-      "test_file_count": 51
-    },
-    {
-      "duration_seconds": 2314.831,
+      "duration_seconds": 2319.197,
       "shard_id": 10,
-      "test_file_count": 52
+      "test_file_count": 50
     },
     {
-      "duration_seconds": 2314.83,
+      "duration_seconds": 2319.196,
       "shard_id": 11,
       "test_file_count": 85
     },
     {
-      "duration_seconds": 2314.831,
+      "duration_seconds": 2319.196,
       "shard_id": 12,
       "test_file_count": 52
     }
@@ -7415,5 +7424,5 @@
     "sha256": "b241b31651a8d5d903a2b851583186c276a5ac32fed26de1a1c69b4aa278b711"
   },
   "strategy": "largest-processing-time-by-derived-selector-weight",
-  "total_test_duration_seconds": 28267.405
+  "total_test_duration_seconds": 28311.068
 }

@@ -12,6 +12,7 @@ from warhammer40k_core.engine import physical_proposal_context as _physical_cont
 from warhammer40k_core.engine.phases.movement_imports import *
 from warhammer40k_core.engine.phases.movement_model import *
 from warhammer40k_core.engine.phases.movement_state import *
+from warhammer40k_core.engine.stratagems_requests import request_phase_preselection_stratagem
 from warhammer40k_core.engine.tactical_disembark_setup_boundary import (
     resolve_pending_tactical_disembark_setup_boundary,
 )
@@ -376,6 +377,24 @@ class MovementPhaseHandler:
                 decisions=decisions,
             )
 
+        stratagem_status = request_phase_preselection_stratagem(
+            state=state,
+            decisions=decisions,
+            stratagem_index=self.stratagem_index,
+            cost_modifiers=self.stratagem_cost_modifier_registry,
+            context=StratagemEligibilityContext.from_state(
+                state=state,
+                player_id=movement_state.active_player_id,
+                trigger_kind=TimingTriggerKind.DURING_PHASE,
+                timing_window_id=(
+                    f"movement-preselection:round-{movement_state.battle_round}:"
+                    f"player-{movement_state.active_player_id}:"
+                    f"selected-{len(movement_state.selected_unit_ids)}"
+                ),
+            ),
+        )
+        if stratagem_status is not None:
+            return stratagem_status
         request = request_movement_unit_selection(state=state, decisions=decisions)
         return LifecycleStatus.waiting_for_decision(
             stage=GameLifecycleStage.BATTLE,

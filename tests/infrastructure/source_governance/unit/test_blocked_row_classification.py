@@ -29,8 +29,8 @@ def test_phase17i_source_text_boundaries_are_explicit() -> None:
         is classification_source.Phase17IClassificationSourceKind.PHASE17F_METADATA_ONLY
     )
 
-    assert report.structured_blocked_count == 1885
-    assert report.source_text_matched_count == 1786
+    assert report.structured_blocked_count == 1884
+    assert report.source_text_matched_count == 1785
     assert report.source_text_missing_count == 99
     assert len(source_text_rows) == report.source_text_matched_count
     assert len(metadata_only_rows) == report.source_text_missing_count
@@ -94,6 +94,16 @@ def test_phase17i_source_text_boundaries_are_explicit() -> None:
     assert wrath_undeniable.rule_ir_hash == (
         "432609839320500af5714ef183fe2b3f562fd25afd4a2e27df20d6dedb5afd55"
     )
+    (onslaught,) = [
+        record
+        for record in execution_records
+        if record.execution_id
+        == "phase17f:phase17e:stratagem:chaos-daemons:blood-legion:000009816003"
+    ]
+    assert onslaught.execution_status is Phase17FExecutionStatus.EXECUTABLE_GENERIC_IR
+    assert onslaught.rule_ir_hash == (
+        "0f0131d5481225b84c993d88a0d28c53334b35877b2fef8ea59053335877a5ff"
+    )
 
 
 def test_phase17i_missing_capability_report_groups_rows_by_family() -> None:
@@ -102,21 +112,21 @@ def test_phase17i_missing_capability_report_groups_rows_by_family() -> None:
         summary.family: summary for summary in report.missing_capability_summaries()
     }
 
-    assert summary_by_family["generic_ir_execution_binding"].row_count == 1885
+    assert summary_by_family["generic_ir_execution_binding"].row_count == 1884
     assert summary_by_family["generic_ir_execution_binding"].coverage_kind_counts == {
         "detachment_enhancement": 654,
         "detachment_rule": 256,
-        "detachment_stratagem": 970,
+        "detachment_stratagem": 969,
         "faction_army_rule": 5,
     }
-    assert summary_by_family["unrepresented_rule_language"].row_count == 1750
-    assert summary_by_family["duration_and_expiry_state"].row_count == 936
-    assert summary_by_family["faction_resource_ledger"].row_count == 995
+    assert summary_by_family["unrepresented_rule_language"].row_count == 1749
+    assert summary_by_family["duration_and_expiry_state"].row_count == 935
+    assert summary_by_family["faction_resource_ledger"].row_count == 994
     assert summary_by_family["stratagem_activation_and_targeting"].coverage_kind_counts == {
-        "detachment_stratagem": 970
+        "detachment_stratagem": 969
     }
     assert summary_by_family["stratagem_effect_execution"].coverage_kind_counts == {
-        "detachment_stratagem": 970
+        "detachment_stratagem": 969
     }
     assert summary_by_family["enhancement_assignment_effect"].coverage_kind_counts == {
         "detachment_enhancement": 654

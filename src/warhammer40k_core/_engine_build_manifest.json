@@ -1,7 +1,7 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:3e65aaeb280065edad60fe80cf210522a93ad41ea8318c6bfc34e0e7f2614533",
-  "fingerprint": "3e65aaeb280065edad60fe80cf210522a93ad41ea8318c6bfc34e0e7f2614533",
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:1610294a6227b0fed4e77ec9ec457dfa9c4c044d520c3af56650b0eaf4410081",
+  "fingerprint": "1610294a6227b0fed4e77ec9ec457dfa9c4c044d520c3af56650b0eaf4410081",
   "resource_count": 3296,
   "resources": [
     {
@@ -2115,9 +2115,9 @@
       "sha256": "a567e2b3eae9e46fed784f61cbfd5d01594cb95c7301f98c54264b45dd3c14cc"
     },
     {
-      "byte_length": 3092,
+      "byte_length": 2139,
       "path": "warhammer40k_core/engine/charge_preselection_stratagems.py",
-      "sha256": "369694145ac6b28019b4fd75fe90a6a482e63f66e06a4a710743e8f7b2b12083"
+      "sha256": "827b4477b72dd7127958f81574d835c2aaf99e46b70ebc12ce24235fdc03e2be"
     },
     {
       "byte_length": 4107,
@@ -4740,9 +4740,9 @@
       "sha256": "d41e27a9052f0250d78ba38b29d4bef7545fedc5a3e2e187df5b37700a6b4e9f"
     },
     {
-      "byte_length": 4929,
+      "byte_length": 6899,
       "path": "warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/detachments/blood_legion/stratagems.py",
-      "sha256": "99648d47e8246c424163b67df7fdf2114361f786115e3ce9d21161ab2830299e"
+      "sha256": "3241df18adccc6b93f6ea24ca0222969e5cb93741e65f9b26fc2fd980a842bf0"
     },
     {
       "byte_length": 172,
@@ -11730,9 +11730,9 @@
       "sha256": "ac552517c6f7ccd6e478cd54539a84a7dd29e4b17b9691b460cbe99d67300c9b"
     },
     {
-      "byte_length": 47793,
+      "byte_length": 48710,
       "path": "warhammer40k_core/engine/phases/movement_handler.py",
-      "sha256": "ea0935d48b649aa5beadb0ccd567dbe830fbae96da666c8d7a09856a37692e79"
+      "sha256": "3fc69ae23d5c44146ba7a998e7fb41c72e9ae13cbd5d5ba5deb07a304045507f"
     },
     {
       "byte_length": 18647,
@@ -13335,9 +13335,9 @@
       "sha256": "7175d33102066ad7f8bc73302f8f5168b1313036e82d13b9809420e217a079a2"
     },
     {
-      "byte_length": 43417,
+      "byte_length": 44662,
       "path": "warhammer40k_core/engine/stratagems_requests.py",
-      "sha256": "78c9f03e89a86f38b13adaea1957045867a34d04715acaae0f7ea03f15c034a1"
+      "sha256": "21e0c8ec7787254bbaf7d313256649a60f33ee9661cf87f3259be4a26dad3e43"
     },
     {
       "byte_length": 36413,
@@ -15525,9 +15525,9 @@
       "sha256": "d79e9bcdf13c9b76415c19cdc40280548521d0cb05e35ceaf081a7d4629feb1c"
     },
     {
-      "byte_length": 41060,
+      "byte_length": 43354,
       "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_blood_legion_ir_support_2026_27.py",
-      "sha256": "5a5d47a3757bba5a52913de00b5ff6d153b532588747dd1a5f5fd86c79f3fed6"
+      "sha256": "43659fff6c185c4f5f26769b380d16a92358bdde61aadabf0784bd21c0f88e74"
     },
     {
       "byte_length": 13574,

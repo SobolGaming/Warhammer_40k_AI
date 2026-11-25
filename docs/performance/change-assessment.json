@@ -1,945 +1,822 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "344129210b416dab7fc3dc79d1a4d467e7ebfa98",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:3e65aaeb280065edad60fe80cf210522a93ad41ea8318c6bfc34e0e7f2614533",
-  "operation_map_sha256": "036705d9e9d7390bb193ecd23d99485e0b38025cad79da8075c9c2618952e388",
+  "base": "f69eda2040ab55db4dd18686eee69edafcca9dd2",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:1610294a6227b0fed4e77ec9ec457dfa9c4c044d520c3af56650b0eaf4410081",
+  "operation_map_sha256": "309a7f0cfda7bfc67a1964b9c02d148945d6a3f37cebf1f0723b2281d665efe6",
   "changes": {
-    "ci/test_shards/durations.json": {
-      "before_sha256": "9a2c2d3f1d5bcd278723a430f86d0811ebdae8efaac460828ba3e1846198d8aa",
-      "after_sha256": "7956999620c1124dd29d4538b545fd3affa87d06b1b56edb60a81d870c704564",
+    "FACTION_INTEGRATION.md": {
+      "before_sha256": "57d141b8c2cb3532051655495b6b7960223ee6e31c0a880145410c7aedead07a",
+      "after_sha256": "45f9c9c4281aec0ec5d1e6ce1c02010dd895865847a840e8ebedcf7345a0308d",
       "owners": {
         "@document": {
-          "before": "9a2c2d3f1d5bcd278723a430f86d0811ebdae8efaac460828ba3e1846198d8aa",
-          "after": "7956999620c1124dd29d4538b545fd3affa87d06b1b56edb60a81d870c704564"
+          "before": "57d141b8c2cb3532051655495b6b7960223ee6e31c0a880145410c7aedead07a",
+          "after": "45f9c9c4281aec0ec5d1e6ce1c02010dd895865847a840e8ebedcf7345a0308d"
+        }
+      }
+    },
+    "ci/test_shards/durations.json": {
+      "before_sha256": "7956999620c1124dd29d4538b545fd3affa87d06b1b56edb60a81d870c704564",
+      "after_sha256": "89d704f13e641565ecd0ea636c3a266e7318fa366aad2353b74b8f8d5f8b7321",
+      "owners": {
+        "@document": {
+          "before": "7956999620c1124dd29d4538b545fd3affa87d06b1b56edb60a81d870c704564",
+          "after": "89d704f13e641565ecd0ea636c3a266e7318fa366aad2353b74b8f8d5f8b7321"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
-      "before_sha256": "2434405e86e25436f214782a8d4e373c5f3f12ad07f885c1150b952458a70e9c",
-      "after_sha256": "c8307509c100e2362fa2352cb7e34853fd5ae9a3daafa71d1d958bd0da1e90ed",
+      "before_sha256": "c8307509c100e2362fa2352cb7e34853fd5ae9a3daafa71d1d958bd0da1e90ed",
+      "after_sha256": "e5a8a3af5406671cf5e1187dd209da647aea16ae3b6e12c7234b9f956ffa831c",
       "owners": {
         "@document": {
-          "before": "2434405e86e25436f214782a8d4e373c5f3f12ad07f885c1150b952458a70e9c",
-          "after": "c8307509c100e2362fa2352cb7e34853fd5ae9a3daafa71d1d958bd0da1e90ed"
+          "before": "c8307509c100e2362fa2352cb7e34853fd5ae9a3daafa71d1d958bd0da1e90ed",
+          "after": "e5a8a3af5406671cf5e1187dd209da647aea16ae3b6e12c7234b9f956ffa831c"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
-      "before_sha256": "5a44d8c13c5744909b38c88a8cf83baf6c519e04a7255d76ed4c6942aa91bbee",
-      "after_sha256": "b535a5afacb8c2969b9ba5fcbcb8266b8750bdf6471d54760dc2662a84485b66",
+      "before_sha256": "b535a5afacb8c2969b9ba5fcbcb8266b8750bdf6471d54760dc2662a84485b66",
+      "after_sha256": "8f8f6ef3f5a8fbd386d54427b8e1178cc363bf8e4c627d5d6ea344f94013168b",
       "owners": {
         "@document": {
-          "before": "5a44d8c13c5744909b38c88a8cf83baf6c519e04a7255d76ed4c6942aa91bbee",
-          "after": "b535a5afacb8c2969b9ba5fcbcb8266b8750bdf6471d54760dc2662a84485b66"
+          "before": "b535a5afacb8c2969b9ba5fcbcb8266b8750bdf6471d54760dc2662a84485b66",
+          "after": "8f8f6ef3f5a8fbd386d54427b8e1178cc363bf8e4c627d5d6ea344f94013168b"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
-      "before_sha256": "d53a5ddb81e1536ee64360888e347bd1bdba3e6620b4a12031b5c6f0c521b308",
-      "after_sha256": "a4d8ca23faeed43aa99cfd57a5286b9501d7f2567b641065017283c097d83f3b",
+      "before_sha256": "a4d8ca23faeed43aa99cfd57a5286b9501d7f2567b641065017283c097d83f3b",
+      "after_sha256": "03b397da06f33715ebc86b4759dfd407cb77486d817a59623f372b29249170b2",
       "owners": {
         "@document": {
-          "before": "d53a5ddb81e1536ee64360888e347bd1bdba3e6620b4a12031b5c6f0c521b308",
-          "after": "a4d8ca23faeed43aa99cfd57a5286b9501d7f2567b641065017283c097d83f3b"
+          "before": "a4d8ca23faeed43aa99cfd57a5286b9501d7f2567b641065017283c097d83f3b",
+          "after": "03b397da06f33715ebc86b4759dfd407cb77486d817a59623f372b29249170b2"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
-      "before_sha256": "9a4d4f9b22798202088e9c5180a8cf63bf8acfbe2dcc8d619f177bf1b1d7f73f",
-      "after_sha256": "82f51bb37def0b043d5455791f58e9c2619d91e76a099a9c7f9f4729605150c3",
+      "before_sha256": "82f51bb37def0b043d5455791f58e9c2619d91e76a099a9c7f9f4729605150c3",
+      "after_sha256": "3c522e1b18599ceab78ec13a019bb080c0db380b0d6da6e7c3796ae635214db2",
       "owners": {
         "@document": {
-          "before": "9a4d4f9b22798202088e9c5180a8cf63bf8acfbe2dcc8d619f177bf1b1d7f73f",
-          "after": "82f51bb37def0b043d5455791f58e9c2619d91e76a099a9c7f9f4729605150c3"
+          "before": "82f51bb37def0b043d5455791f58e9c2619d91e76a099a9c7f9f4729605150c3",
+          "after": "3c522e1b18599ceab78ec13a019bb080c0db380b0d6da6e7c3796ae635214db2"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
-      "before_sha256": "f8a82852b366c4015ca9f0bb24bdb3a15c39c636b13801673bf34ec1f7977bf6",
-      "after_sha256": "bcb364bc3b5497231a6f445f05c8a52c2cb79a9cfe7093e367c7f157544eba3e",
+      "before_sha256": "bcb364bc3b5497231a6f445f05c8a52c2cb79a9cfe7093e367c7f157544eba3e",
+      "after_sha256": "218668b3befb8bf1e146b8a03ec7caf3c2da7931904bbb6916452a0fa9e5631f",
       "owners": {
         "@document": {
-          "before": "f8a82852b366c4015ca9f0bb24bdb3a15c39c636b13801673bf34ec1f7977bf6",
-          "after": "bcb364bc3b5497231a6f445f05c8a52c2cb79a9cfe7093e367c7f157544eba3e"
+          "before": "bcb364bc3b5497231a6f445f05c8a52c2cb79a9cfe7093e367c7f157544eba3e",
+          "after": "218668b3befb8bf1e146b8a03ec7caf3c2da7931904bbb6916452a0fa9e5631f"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
-      "before_sha256": "105163d63025b0042694600003bd4f39d8e7fab6a32fb0d207f46a2c35630e21",
-      "after_sha256": "bfdd5f505cd3ce9597953c45f6a5e2241293e31e585a48634e05650023290091",
+      "before_sha256": "bfdd5f505cd3ce9597953c45f6a5e2241293e31e585a48634e05650023290091",
+      "after_sha256": "a6d82acd3ce375fb792d00f494959cad0a45ee21ef1ab2aa9a8016114230c03a",
       "owners": {
         "@document": {
-          "before": "105163d63025b0042694600003bd4f39d8e7fab6a32fb0d207f46a2c35630e21",
-          "after": "bfdd5f505cd3ce9597953c45f6a5e2241293e31e585a48634e05650023290091"
+          "before": "bfdd5f505cd3ce9597953c45f6a5e2241293e31e585a48634e05650023290091",
+          "after": "a6d82acd3ce375fb792d00f494959cad0a45ee21ef1ab2aa9a8016114230c03a"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
-      "before_sha256": "37c9ada65663ed63e06bec5197e07c508c4f29270bf970888a681188b07fa745",
-      "after_sha256": "049fd517710b4b8b94424a9a7b2179961c242194ceb0c982c44ada48baca7868",
+      "before_sha256": "049fd517710b4b8b94424a9a7b2179961c242194ceb0c982c44ada48baca7868",
+      "after_sha256": "96e99c403ad3fbfbe8dc7046af75042bb7c94d7f3369300f21ba867f2689b20a",
       "owners": {
         "@document": {
-          "before": "37c9ada65663ed63e06bec5197e07c508c4f29270bf970888a681188b07fa745",
-          "after": "049fd517710b4b8b94424a9a7b2179961c242194ceb0c982c44ada48baca7868"
+          "before": "049fd517710b4b8b94424a9a7b2179961c242194ceb0c982c44ada48baca7868",
+          "after": "96e99c403ad3fbfbe8dc7046af75042bb7c94d7f3369300f21ba867f2689b20a"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
-      "before_sha256": "793c29b92059c0633f3443ca20957a8940be0abfb0f2a28809a3d445baf10f88",
-      "after_sha256": "877e5545e9a0ddee6e304bc80a4db0a21dc3cf5105251e654db8b1af9980edfe",
+      "before_sha256": "877e5545e9a0ddee6e304bc80a4db0a21dc3cf5105251e654db8b1af9980edfe",
+      "after_sha256": "8344317fb7837f97b0c52651447873d60dedfd0cca159a32aa2b46a411af0028",
       "owners": {
         "@document": {
-          "before": "793c29b92059c0633f3443ca20957a8940be0abfb0f2a28809a3d445baf10f88",
-          "after": "877e5545e9a0ddee6e304bc80a4db0a21dc3cf5105251e654db8b1af9980edfe"
+          "before": "877e5545e9a0ddee6e304bc80a4db0a21dc3cf5105251e654db8b1af9980edfe",
+          "after": "8344317fb7837f97b0c52651447873d60dedfd0cca159a32aa2b46a411af0028"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
-      "before_sha256": "4305965660f173f950ccaea4ddbacd2a208b8efc412fd1397a267a06f5be2950",
-      "after_sha256": "537be748b35f5265fc8d17133c27dc09697ca83a612114a2d02c37f591c6ba78",
+      "before_sha256": "537be748b35f5265fc8d17133c27dc09697ca83a612114a2d02c37f591c6ba78",
+      "after_sha256": "c2f3a4699ea9ac114f69532d6cbaff7ad8fa03a5f5fa6ffbcfd81808d8367336",
       "owners": {
         "@document": {
-          "before": "4305965660f173f950ccaea4ddbacd2a208b8efc412fd1397a267a06f5be2950",
-          "after": "537be748b35f5265fc8d17133c27dc09697ca83a612114a2d02c37f591c6ba78"
+          "before": "537be748b35f5265fc8d17133c27dc09697ca83a612114a2d02c37f591c6ba78",
+          "after": "c2f3a4699ea9ac114f69532d6cbaff7ad8fa03a5f5fa6ffbcfd81808d8367336"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
-      "before_sha256": "04cb55b3b4dc2701340df1f8c5d2e9e650709baf3aa15c1ebe0d9a6f3833a0df",
-      "after_sha256": "a727e92dd47f6bc6757b1c5862da1d87c94800c2a4678269cc2561760b4db7f3",
+      "before_sha256": "a727e92dd47f6bc6757b1c5862da1d87c94800c2a4678269cc2561760b4db7f3",
+      "after_sha256": "842997e74d7bf4c3eb0686e1b685b75130fa75022922ab1552e398e98e369938",
       "owners": {
         "@document": {
-          "before": "04cb55b3b4dc2701340df1f8c5d2e9e650709baf3aa15c1ebe0d9a6f3833a0df",
-          "after": "a727e92dd47f6bc6757b1c5862da1d87c94800c2a4678269cc2561760b4db7f3"
+          "before": "a727e92dd47f6bc6757b1c5862da1d87c94800c2a4678269cc2561760b4db7f3",
+          "after": "842997e74d7bf4c3eb0686e1b685b75130fa75022922ab1552e398e98e369938"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "607de93e78ea8608ad0426135a482a6ddb7ebf329b3ff9bbddd577ddac6fa034",
-      "after_sha256": "fdfb30143d2c62f5bbec93916db175688255ff79ae75ce127f782df56d6da4b5",
+      "before_sha256": "fdfb30143d2c62f5bbec93916db175688255ff79ae75ce127f782df56d6da4b5",
+      "after_sha256": "a14a5f3834783e0ec2b95b94ea8c332f772b5c38b407b17cc098757ee3403171",
       "owners": {
         "@document": {
-          "before": "607de93e78ea8608ad0426135a482a6ddb7ebf329b3ff9bbddd577ddac6fa034",
-          "after": "fdfb30143d2c62f5bbec93916db175688255ff79ae75ce127f782df56d6da4b5"
+          "before": "fdfb30143d2c62f5bbec93916db175688255ff79ae75ce127f782df56d6da4b5",
+          "after": "a14a5f3834783e0ec2b95b94ea8c332f772b5c38b407b17cc098757ee3403171"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "fd519f416d01be082d36cfdcb5a5215e32fd179aef6299750bbc584bbb59256c",
-      "after_sha256": "faf6bcaf4dbfc8ce26ecdca702d081e7301a9cfaaae33680aeb6c65f8a1a276d",
+      "before_sha256": "faf6bcaf4dbfc8ce26ecdca702d081e7301a9cfaaae33680aeb6c65f8a1a276d",
+      "after_sha256": "9862f56d13d7c393dd713d12bb203c5738e569cbeb2e88da0350d63b5e8f2764",
       "owners": {
         "@document": {
-          "before": "fd519f416d01be082d36cfdcb5a5215e32fd179aef6299750bbc584bbb59256c",
-          "after": "faf6bcaf4dbfc8ce26ecdca702d081e7301a9cfaaae33680aeb6c65f8a1a276d"
+          "before": "faf6bcaf4dbfc8ce26ecdca702d081e7301a9cfaaae33680aeb6c65f8a1a276d",
+          "after": "9862f56d13d7c393dd713d12bb203c5738e569cbeb2e88da0350d63b5e8f2764"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "5e686526f0df5d1cbac10a4f04c6f0fb8cc75d2e0e693aabf59e481198f7c65a",
-      "after_sha256": "bd8c982e2fdd17d0de01371aaff5668e87fd575b69d27ebce0d6e79e145644fd",
+      "before_sha256": "bd8c982e2fdd17d0de01371aaff5668e87fd575b69d27ebce0d6e79e145644fd",
+      "after_sha256": "e23e943cca605e513ea8e5e9445d1b79f4a2a22ba0800f6f680667a519821d20",
       "owners": {
         "@document": {
-          "before": "5e686526f0df5d1cbac10a4f04c6f0fb8cc75d2e0e693aabf59e481198f7c65a",
-          "after": "bd8c982e2fdd17d0de01371aaff5668e87fd575b69d27ebce0d6e79e145644fd"
+          "before": "bd8c982e2fdd17d0de01371aaff5668e87fd575b69d27ebce0d6e79e145644fd",
+          "after": "e23e943cca605e513ea8e5e9445d1b79f4a2a22ba0800f6f680667a519821d20"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "a985fc224c2c472c320ce9bc0ea2f8d279e8b6577d6f6e3b5f39d5f9f506a598",
-      "after_sha256": "87cadcf98ddcd578dfaace9e40569796af272b0fc8967638375ed96ed4670295",
+      "before_sha256": "87cadcf98ddcd578dfaace9e40569796af272b0fc8967638375ed96ed4670295",
+      "after_sha256": "edf0a2fedc4f39337b47d18cc9225862d6243932a5b51c37265d01712926e3d0",
       "owners": {
         "@document": {
-          "before": "a985fc224c2c472c320ce9bc0ea2f8d279e8b6577d6f6e3b5f39d5f9f506a598",
-          "after": "87cadcf98ddcd578dfaace9e40569796af272b0fc8967638375ed96ed4670295"
+          "before": "87cadcf98ddcd578dfaace9e40569796af272b0fc8967638375ed96ed4670295",
+          "after": "edf0a2fedc4f39337b47d18cc9225862d6243932a5b51c37265d01712926e3d0"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "e9fbd7342ba62de62f45b706c5081b8998d2c4e184d0de346ca9326073a605b5",
-      "after_sha256": "2e80fe65bdda3c25c2ca5b7bb66270e837043b62a45861e54f34a5a1e2d35b96",
+      "before_sha256": "2e80fe65bdda3c25c2ca5b7bb66270e837043b62a45861e54f34a5a1e2d35b96",
+      "after_sha256": "80ff90275fd52572f0a005a061a5d9e9c18047a351fabe85a7652918a53fbc9e",
       "owners": {
         "@document": {
-          "before": "e9fbd7342ba62de62f45b706c5081b8998d2c4e184d0de346ca9326073a605b5",
-          "after": "2e80fe65bdda3c25c2ca5b7bb66270e837043b62a45861e54f34a5a1e2d35b96"
+          "before": "2e80fe65bdda3c25c2ca5b7bb66270e837043b62a45861e54f34a5a1e2d35b96",
+          "after": "80ff90275fd52572f0a005a061a5d9e9c18047a351fabe85a7652918a53fbc9e"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "0c61e50d9526789972edcacd8d4484b32838704cc1727ee99eb75bda22681e67",
-      "after_sha256": "c087e36ee3c7d7e52e0e23184f35333ecdf24c57922d9dcb833cf00b8c235543",
+      "before_sha256": "c087e36ee3c7d7e52e0e23184f35333ecdf24c57922d9dcb833cf00b8c235543",
+      "after_sha256": "917a1753e3f8346bd783a2cfe3960f8bea3f97b60e1053ac39aafd7174f851e9",
       "owners": {
         "@document": {
-          "before": "0c61e50d9526789972edcacd8d4484b32838704cc1727ee99eb75bda22681e67",
-          "after": "c087e36ee3c7d7e52e0e23184f35333ecdf24c57922d9dcb833cf00b8c235543"
+          "before": "c087e36ee3c7d7e52e0e23184f35333ecdf24c57922d9dcb833cf00b8c235543",
+          "after": "917a1753e3f8346bd783a2cfe3960f8bea3f97b60e1053ac39aafd7174f851e9"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "f7efeca267fb2d57090b9ef90537aef31cfea37dc2f5435f096e6c6c1f07fc96",
-      "after_sha256": "f7b30d32123d56dd03e2b0a1964b4a817939abb024cf4ae67eecb0c4241eda04",
+      "before_sha256": "f7b30d32123d56dd03e2b0a1964b4a817939abb024cf4ae67eecb0c4241eda04",
+      "after_sha256": "993b44336fe70cc6a90e2e46e288dd961f0c251b889d4314d93e564812f4029f",
       "owners": {
         "@document": {
-          "before": "f7efeca267fb2d57090b9ef90537aef31cfea37dc2f5435f096e6c6c1f07fc96",
-          "after": "f7b30d32123d56dd03e2b0a1964b4a817939abb024cf4ae67eecb0c4241eda04"
+          "before": "f7b30d32123d56dd03e2b0a1964b4a817939abb024cf4ae67eecb0c4241eda04",
+          "after": "993b44336fe70cc6a90e2e46e288dd961f0c251b889d4314d93e564812f4029f"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "8672f72d6c0811f5ec7b378c00723cac21db7aa568528798211b5b7050e52279",
-      "after_sha256": "9e343b09006abda678c83402805e7f7774fcebd8f979b67fe79bfef58654b65b",
+      "before_sha256": "9e343b09006abda678c83402805e7f7774fcebd8f979b67fe79bfef58654b65b",
+      "after_sha256": "82ffb951f844d9b8ea5442fee83c1f224439728d40193032b5bb034f21cce4cc",
       "owners": {
         "@document": {
-          "before": "8672f72d6c0811f5ec7b378c00723cac21db7aa568528798211b5b7050e52279",
-          "after": "9e343b09006abda678c83402805e7f7774fcebd8f979b67fe79bfef58654b65b"
+          "before": "9e343b09006abda678c83402805e7f7774fcebd8f979b67fe79bfef58654b65b",
+          "after": "82ffb951f844d9b8ea5442fee83c1f224439728d40193032b5bb034f21cce4cc"
         }
       }
     },
-    "data/source_audits/ci64_provenance_v1/pre-roll-charge-flight-test-v1.json": {
+    "data/generated/ability_coverage/cross_source_semantic_equivalence.json": {
+      "before_sha256": "9e97f354c244777d636a34a573d305c9529ec72f2cff3317b8f7072b67465878",
+      "after_sha256": "d4fe1765b76190fc5a23851f259690c66c1d936ac2088a979750d405ca184301",
+      "owners": {
+        "@document": {
+          "before": "9e97f354c244777d636a34a573d305c9529ec72f2cff3317b8f7072b67465878",
+          "after": "d4fe1765b76190fc5a23851f259690c66c1d936ac2088a979750d405ca184301"
+        }
+      }
+    },
+    "data/generated/ability_coverage/runtime_content_semantic_coverage.json": {
+      "before_sha256": "58dc056d646fc3250fbe65771d07b65c37625a5c6a3730a5f4e1c4ef87ff2feb",
+      "after_sha256": "59d806a55a7aac856db297f884272425559023001bb69916bc433996f1603064",
+      "owners": {
+        "@document": {
+          "before": "58dc056d646fc3250fbe65771d07b65c37625a5c6a3730a5f4e1c4ef87ff2feb",
+          "after": "59d806a55a7aac856db297f884272425559023001bb69916bc433996f1603064"
+        }
+      }
+    },
+    "data/source_audits/ci64_provenance_v1/gore-hungry-onslaught-transition-v1.json": {
       "before_sha256": null,
-      "after_sha256": "fd5511973dabe4068f618dec2f1f1419cb79f99629e831b9b14a810ab3cb110e",
+      "after_sha256": "38163938a156c0553c9b694e5a47039858ddd72ece483785044e46c48bf726f6",
       "owners": {
         "@document": {
           "before": null,
-          "after": "fd5511973dabe4068f618dec2f1f1419cb79f99629e831b9b14a810ab3cb110e"
+          "after": "38163938a156c0553c9b694e5a47039858ddd72ece483785044e46c48bf726f6"
         }
       }
     },
-    "docs/AI_POLICY_INTERFACE.md": {
-      "before_sha256": "5fdb6ebf75a4c0b3957d0077fa47255593ca6ea669b60388d3d3dc78522b2dda",
-      "after_sha256": "38e6b0f614fdb4e6741ad0178254223051213212907e4858a2c3d556044cabb2",
+    "docs/ABILITY_SUPPORT_MATRIX_V2.md": {
+      "before_sha256": "f7c3b8985f9e1d74292eb053dc191e8183c0a5440778c85dee35b1799279e316",
+      "after_sha256": "06995bf9a530bd9aa36d42cb2ded73568b87af83ba54e7d51bed69a0e91b908d",
       "owners": {
         "@document": {
-          "before": "5fdb6ebf75a4c0b3957d0077fa47255593ca6ea669b60388d3d3dc78522b2dda",
-          "after": "38e6b0f614fdb4e6741ad0178254223051213212907e4858a2c3d556044cabb2"
+          "before": "f7c3b8985f9e1d74292eb053dc191e8183c0a5440778c85dee35b1799279e316",
+          "after": "06995bf9a530bd9aa36d42cb2ded73568b87af83ba54e7d51bed69a0e91b908d"
+        }
+      }
+    },
+    "docs/ADAPTER_DECISION_CONTRACT.md": {
+      "before_sha256": "93beac77295aec1cb10c0a10f5a40908fd7595530bb2e0f4c69343f62b885e96",
+      "after_sha256": "7e0a97de9a7b2ffe6d35e2dd7413e88c1248ba50b29b735e5f46890940805935",
+      "owners": {
+        "@document": {
+          "before": "93beac77295aec1cb10c0a10f5a40908fd7595530bb2e0f4c69343f62b885e96",
+          "after": "7e0a97de9a7b2ffe6d35e2dd7413e88c1248ba50b29b735e5f46890940805935"
+        }
+      }
+    },
+    "docs/CROSS_SOURCE_SEMANTIC_EQUIVALENCE.md": {
+      "before_sha256": "fb079856088f5f759028fcf44733c1e16e0ecaf6e85bff64e5c9cfb005e28cc7",
+      "after_sha256": "5f459e434657686ca84570da3b06577e20a3566cf83408d0ce5cba167e6454ff",
+      "owners": {
+        "@document": {
+          "before": "fb079856088f5f759028fcf44733c1e16e0ecaf6e85bff64e5c9cfb005e28cc7",
+          "after": "5f459e434657686ca84570da3b06577e20a3566cf83408d0ce5cba167e6454ff"
+        }
+      }
+    },
+    "docs/factions/audit/chaos-daemons.md": {
+      "before_sha256": "33f493c2a156fef77eae933343d343bd3773a4817935a49fd948550d5689532c",
+      "after_sha256": "105f6108e15841fa32c0b1db5b30464ae8b253967346d32104f6234c970cd7d8",
+      "owners": {
+        "@document": {
+          "before": "33f493c2a156fef77eae933343d343bd3773a4817935a49fd948550d5689532c",
+          "after": "105f6108e15841fa32c0b1db5b30464ae8b253967346d32104f6234c970cd7d8"
+        }
+      }
+    },
+    "docs/factions/chaos-daemons.md": {
+      "before_sha256": "d0926a68eb7fce970ff199cbc5e9c5002101078fc3523a4c758f4a6383111fba",
+      "after_sha256": "98d9c875f099579b4ebb6621b0a56c6778d6aa3524e18fe489cb6f05e4cf7afd",
+      "owners": {
+        "@document": {
+          "before": "d0926a68eb7fce970ff199cbc5e9c5002101078fc3523a4c758f4a6383111fba",
+          "after": "98d9c875f099579b4ebb6621b0a56c6778d6aa3524e18fe489cb6f05e4cf7afd"
+        }
+      }
+    },
+    "docs/factions/guides/chaos-daemons.md": {
+      "before_sha256": "f4bb2493736a0eab31c87327271cd2f4c0e0ef1020e0afab3e85aa989692c33e",
+      "after_sha256": "023043aefa026e4bc2c6932eca1defe6ffa05ad32bb919662ca70825b0370b88",
+      "owners": {
+        "@document": {
+          "before": "f4bb2493736a0eab31c87327271cd2f4c0e0ef1020e0afab3e85aa989692c33e",
+          "after": "023043aefa026e4bc2c6932eca1defe6ffa05ad32bb919662ca70825b0370b88"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "8fc56e7633a16c9b2050e458f7b890cb13e8300bd81d574b48e0c7ae8d9bc2bb",
-      "after_sha256": "118602169995d24a90be185bb50f30f94c6be834172ea991aa6406ddd4a2187c",
+      "before_sha256": "118602169995d24a90be185bb50f30f94c6be834172ea991aa6406ddd4a2187c",
+      "after_sha256": "9e0faf8a21b617df7426c3aece04ba5414f474ea68b241539174ef6e6d8acd6e",
       "owners": {
         "@document": {
-          "before": "8fc56e7633a16c9b2050e458f7b890cb13e8300bd81d574b48e0c7ae8d9bc2bb",
-          "after": "118602169995d24a90be185bb50f30f94c6be834172ea991aa6406ddd4a2187c"
+          "before": "118602169995d24a90be185bb50f30f94c6be834172ea991aa6406ddd4a2187c",
+          "after": "9e0faf8a21b617df7426c3aece04ba5414f474ea68b241539174ef6e6d8acd6e"
         }
       }
     },
     "scripts/engine_numerical_identity_test_admission.py": {
-      "before_sha256": "30b658bcbf62c26d5a73509ead659d948d665fdd5287e5a067f9781350bef407",
-      "after_sha256": "304c6fe4c87ebf7cc7e28b94f8ef306ff2938927b15c2a25c5079e208819e7eb",
+      "before_sha256": "304c6fe4c87ebf7cc7e28b94f8ef306ff2938927b15c2a25c5079e208819e7eb",
+      "after_sha256": "da235fd4b392169b90c69c72d2085bb998724985d16e7e0505fa2c91d6a46b7c",
       "owners": {
-        "_pre_roll_charge_flight_test_addition": {
+        "@module": {
+          "before": "2f04554db9367a7ddcf6abecbae0a506f4a937f2eb73a4f28c60ea2e9b3c6e11",
+          "after": "15ce6450fa75929ae491b1dc5c9f4033ca4d184388e1ac2799ddeda98e6638c7"
+        },
+        "_blood_begets_skulls_test_successor": {
+          "before": "7473cd8a99deacf3776da89b91bd2e518f7d529068abcb282b18eb68bcff866e",
+          "after": "2fe349243d24c97fb593e533f29618288c2a4dc03788a97dc07b3ffc1e603270"
+        },
+        "_gore_hungry_onslaught_transition": {
           "before": null,
-          "after": "2bf120ae2fca07465d1b238db23233e54d8043b613cd9672cbb9278c817679d2"
+          "after": "f75d65ca24d6c5a46ab319665434a2a55384ffd87c24b01599a1d042a3aa68a1"
+        },
+        "_skulls_beget_blood_test_successor": {
+          "before": "d9c9e040b0d167a0870f0588a4062b8677f4eacd91f7777a02c7b7f7ca6c5744",
+          "after": "d90d06934e2c90f26f668d685b45e70eb2ff0e1a5c188fdbe0b5fd4fd578ae0a"
+        },
+        "_wrath_undeniable_test_successor": {
+          "before": "8b9dfd63a7ed17b31da0e24a0881e397b496911d20d585c99fe7ea9b81f00a14",
+          "after": "4d450d4765a5ed0542d14b7649202e0b6058fa012e14dfc8f765b606b8b55a47"
         },
         "exact_movement_test_transition": {
-          "before": "245e2475634f6b20aea5c0d0aac0972623bdd1c613cfe2445b86f34d8746bfe5",
-          "after": "6c02e3e8df5421b369716651a1d2dc5b78047cca693f8c759911f5d867f2f833"
+          "before": "6c02e3e8df5421b369716651a1d2dc5b78047cca693f8c759911f5d867f2f833",
+          "after": "824f6a37671653856d4a213979c959b4b9b7289a92ee97b7017b0e3fdda916a1"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "af7a486673d1687d28b81d8437bdcc4095359cbcefc6217bea524898e867b2fa",
-      "after_sha256": "553780be64ff619b992e3580d4e32917214713c49637c0f06da3df9128a1aa3c",
+      "before_sha256": "553780be64ff619b992e3580d4e32917214713c49637c0f06da3df9128a1aa3c",
+      "after_sha256": "c8cc728be00ce36823d07752b4666a1c16b3890d2f764343d66a10f1faf1f78e",
       "owners": {
         "@document": {
-          "before": "af7a486673d1687d28b81d8437bdcc4095359cbcefc6217bea524898e867b2fa",
-          "after": "553780be64ff619b992e3580d4e32917214713c49637c0f06da3df9128a1aa3c"
+          "before": "553780be64ff619b992e3580d4e32917214713c49637c0f06da3df9128a1aa3c",
+          "after": "c8cc728be00ce36823d07752b4666a1c16b3890d2f764343d66a10f1faf1f78e"
         }
       }
     },
-    "src/warhammer40k_core/ai/charge_flight_admission.py": {
-      "before_sha256": null,
-      "after_sha256": "37b0a0f6325536b7b3ece1ac66e367f80336a52754aff7e86b07ff78f6d24a85",
+    "src/warhammer40k_core/engine/charge_preselection_stratagems.py": {
+      "before_sha256": "369694145ac6b28019b4fd75fe90a6a482e63f66e06a4a710743e8f7b2b12083",
+      "after_sha256": "827b4477b72dd7127958f81574d835c2aaf99e46b70ebc12ce24235fdc03e2be",
       "owners": {
         "@module": {
-          "before": null,
-          "after": "03f96b5d149d41b90d53d0cbb1da8620b5c447b099c3d6f6ca145a8ed6d17e8e"
+          "before": "69776a65f20a5b02d2388971b65bff891d062d250ffae8922a0061971b4c13a8",
+          "after": "cb9824b936136aabd6081b20d75830deb9f28cfef343a76b6a491f4580e85ed6"
         },
-        "ChargeFlightModeProof": {
-          "before": null,
-          "after": "75be20c3dfa0847647a338365333c4186a9c79cece1c56e4d0ac10bfbeaf88be"
+        "request_charge_preselection_stratagem": {
+          "before": "ab6e2dd5145e89fead5fd4b54a55dc512bfb54edb66a93eab38f3c742039110a",
+          "after": "0e117419177f1c5a3bef09b511aa616de0c24ca312ceb1c39256f2caa8148303"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/detachments/blood_legion/stratagems.py": {
+      "before_sha256": "99648d47e8246c424163b67df7fdf2114361f786115e3ce9d21161ab2830299e",
+      "after_sha256": "3241df18adccc6b93f6ea24ca0222969e5cb93741e65f9b26fc2fd980a842bf0",
+      "owners": {
+        "@module": {
+          "before": "6ca2596b32c572a6a32d5b1fc0a3a339672f5699368a77064b3e7240273e1dd3",
+          "after": "8c1021e4300b000c9ad2f4ed18b9f696d955dd3cff45d66c609a9dbc5993b1c9"
         },
-        "ChargeFlightModeProof.minimum_roll": {
+        "_gore_hungry_onslaught_records": {
           "before": null,
-          "after": "d3062559426937a31266c1c0ea4945ef7fa412c57fde5933813468a41b821a34"
+          "after": "20df6124623640fb0d4ad0478f08764e3e7f7d562e7566fb4810308fc07daf3e"
         },
-        "ChargeFlightOffer": {
-          "before": null,
-          "after": "4f7cfaa10d372a9bca9324c084b4a14aba956487f9132aaab70b0a6cc4317b0f"
+        "runtime_contribution": {
+          "before": "ee82a41553647378feb2ac91b50391487504dbed03bff3b46bbfc0be1dba37ca",
+          "after": "a214acbec7e76fa15f70e485c17b5b09eef2a829844a157b8f5f5c28df704e73"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/phases/movement_handler.py": {
+      "before_sha256": "ea0935d48b649aa5beadb0ccd567dbe830fbae96da666c8d7a09856a37692e79",
+      "after_sha256": "3fc69ae23d5c44146ba7a998e7fb41c72e9ae13cbd5d5ba5deb07a304045507f",
+      "owners": {
+        "@module": {
+          "before": "aab8c335e433f3f1480f027c4f9c3e995c6bfd6c58c80fe1e833a6abf3490c3e",
+          "after": "50b366eec9543111eb2296b8260694a87d05971719a9530cf765dad110224442"
         },
-        "ChargeFlightUnresolved": {
+        "MovementPhaseHandler.begin_phase": {
+          "before": "b3acb3fe37573eeefc0e580bfd671b383142a30f9cce7942c8323bf303f91d65",
+          "after": "3207c7292988dd8d5d19650df9fa18b44102e669db37420462f2ee6a5b5a9e88"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/stratagems_requests.py": {
+      "before_sha256": "78c9f03e89a86f38b13adaea1957045867a34d04715acaae0f7ea03f15c034a1",
+      "after_sha256": "21e0c8ec7787254bbaf7d313256649a60f33ee9661cf87f3259be4a26dad3e43",
+      "owners": {
+        "request_phase_preselection_stratagem": {
           "before": null,
-          "after": "c72c8525dfb3a4ee0db32962298e61b6eff4abda0c6da66efde5546d8e091c67"
+          "after": "218a6ce998373bbfeb181cf546899b62e09acd1df2fd1efe1dc494a23377561c"
+        }
+      }
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_blood_legion_ir_support_2026_27.py": {
+      "before_sha256": "5a5d47a3757bba5a52913de00b5ff6d153b532588747dd1a5f5fd86c79f3fed6",
+      "after_sha256": "43659fff6c185c4f5f26769b380d16a92358bdde61aadabf0784bd21c0f88e74",
+      "owners": {
+        "@module": {
+          "before": "80cd19813304deb520112e7c34fb4a4585e501da6ca723de920e0eac6b487a6d",
+          "after": "efe2cc5586da5cd872ef2bb976eeeb279ab057f0bef5523bc697a270761323aa"
         },
-        "ChargeFlightUnresolvedReason": {
-          "before": null,
-          "after": "6b57e95e121ef22deaab3e71876c898be6d500bccb884245ca130552b250e99f"
+        "_coverage_payloads": {
+          "before": "ab0ee835ffcc35e1ba3bb5ebdc789cafa017ddb9ae47a59ad68971dc1ff281c1",
+          "after": "5dcab82a484bca27500c0566edb8584fd68484fbd8c5e168a4ab1b8f2e8f4412"
         },
-        "ProvenChargeFlightChoice": {
+        "_gore_hungry_onslaught_payload": {
           "before": null,
-          "after": "7597308649f401144f9f9c45bd66f65440fe2d58b61d297507b1f55675911c5f"
-        },
-        "ProvenChargeFlightNoSuccess": {
-          "before": null,
-          "after": "b4e8646b5094cf08a1d30aab9ae60d9d9b791cf340c079b5f35648d1bfb24a36"
-        },
-        "_nonnegative_inches": {
-          "before": null,
-          "after": "4ea25633906ae7936fa028509185df504811526c9d003ee46f7e05c1d87df529"
-        },
-        "_open_native_scenario": {
-          "before": null,
-          "after": "77c1b37e30c94ad4bb88bb22159d4c38313b8251bd1a7ef21d0ed2f0e713b959"
-        },
-        "_open_visible_poses": {
-          "before": null,
-          "after": "11daa2ce7a248d0b64c57aa119bb43e1c7809f9318f119a33471c65c4d7cd4fd"
-        },
-        "_plain_charge_supported": {
-          "before": null,
-          "after": "b554b9ca7aab80bbc5a487b3ba413c81cb07518d8b579742962534b8e0303407"
-        },
-        "_prove_mode": {
-          "before": null,
-          "after": "65d07fd0754d6e1c5bc6210ad1f7171e55b41e86457e6819acd566a6c3463904"
-        },
-        "_target_filter_distance": {
-          "before": null,
-          "after": "a3f59ceeba95dab964feb91a858f44d8873852bb38f82c34349337e52a6f9592"
-        },
-        "choose_proven_charge_flight_mode": {
-          "before": null,
-          "after": "da6c917cab832e986833e10136dd771c4dbb77baacfcabe6b613fb818ad7a93e"
-        },
-        "inspect_charge_flight_offer": {
-          "before": null,
-          "after": "a6d0ffed5b06672a54c6a419ca33fe89f95e51cf3f53e0e3d045e11955fdb669"
+          "after": "0a1fe0af150cf9d840d9b3e5a5ff1bbb9d87d02028491ddba541c2647d94651f"
         }
       }
     },
     "tests/code_quality/test_engine_numerical_identity_admission.py": {
-      "before_sha256": "6b7cbe10a356022a130e4798d911ce3f493df3b142f0643be3eafe10c4403bc2",
-      "after_sha256": "28b509bebca07550ee55f6aca1d719020b5ed3967fe37de5c9976b7ceb83ed61",
+      "before_sha256": "28b509bebca07550ee55f6aca1d719020b5ed3967fe37de5c9976b7ceb83ed61",
+      "after_sha256": "87f393a5a076b9f4b98e052836da1be6e84c8dcfa2b69d5dffce3e22542dd66a",
       "owners": {
         "test_identity_inventory_uses_current_twelve_shards_and_native_cohort": {
-          "before": "9a9ccff4426c59661d1d96803cf3ef0483f73084900c5aeae46421358494eff1",
-          "after": "3056de84b4f2542578cb40d76555710844869537413a20a0259128b3bb7c9887"
+          "before": "3056de84b4f2542578cb40d76555710844869537413a20a0259128b3bb7c9887",
+          "after": "cd3d2011f821cdf105eee3d153a794c658c6704d4ad8411ccd5a452eacd562d5"
         }
       }
     },
-    "tests/infrastructure/adapters/test_charge_flight_admission.py": {
+    "tests/factions/chaos_daemons/integration/test_blood_begets_skulls.py": {
+      "before_sha256": "27f5617e3e182cd547caedee49c2383c291a96ed76b40ef71a26730f072a1c84",
+      "after_sha256": "5b52f6c73a1652086a1bf63947a57726c29a095a28c14bb0949f095450ecd00d",
+      "owners": {
+        "@module": {
+          "before": "da875b3714312021e4ec5e78e76913d80234af35ec372c6bfc9b26d7aee64c83",
+          "after": "6a0072dfe62c3e4f36ae3ed69cfa89ae2813c1ef54b22701a997a996cbc7cb57"
+        },
+        "_reach_charge": {
+          "before": "45e6e29d0d2bc882515a31ab7faf10c286d7bdce15a0d8690baef37fec7b287e",
+          "after": "6bf212329fb636e544636277cbfcc91390af092c3368d9869fcac03b1ee7ac6a"
+        },
+        "_submit": {
+          "before": "6e6885c2260afba792d490f7276a32ba8b1952fe54b0aa00f8a8d03167fdc2d3",
+          "after": null
+        },
+        "_targets": {
+          "before": "ab333fc9401ac81315837edc20ec55c59bd80648b034c981e3767e0e69771eea",
+          "after": null
+        },
+        "skulls_definitions": {
+          "before": "3793a44f75d36f1f63a5a84b41903d522632394505061761170c2ff01091787c",
+          "after": "f3dc6b730f8b59afada3c28561054cf18e657dcb758c1495d49320b541a8178a"
+        },
+        "stratagem_targets": {
+          "before": null,
+          "after": "39471ee0d57fa349371872213e7d643c9ea48734c328dbe1b7465250e8a6f794"
+        },
+        "submit_option": {
+          "before": null,
+          "after": "af0fa403468cd67dd2bf7084cc04d5b07e5d8f0a5a3ac5a35721708ca93a3f48"
+        },
+        "test_blood_begets_skulls_decline_then_offer_after_earlier_charge": {
+          "before": "7b94ffa2f3bf32a13306261a9c21ade0bcbda8589b831ceda0ad26d98066e93f",
+          "after": "6d0276e9cfd69aedced5dd65a255b0b54e151c9b43cbdb8f2c51d3e22c6508a4"
+        },
+        "test_blood_begets_skulls_offers_when_advance_prevents_all_charges": {
+          "before": "1cca3f8edeca3e746f1e7077e5e0f7da2f8aa0133855bba0c86bb4ce3c4b21b3",
+          "after": "3b319e7f62a253a3864624ada0543b816299078fb69d3ce8941dff2f6b3a5215"
+        },
+        "test_blood_begets_skulls_unavailable_without_cp_or_outside_own_charge": {
+          "before": "6b82234137851fc1a0447dfb62a69c5563673ef36c82fbe54ee780e6d75e6abf",
+          "after": "d84cb10e091f670f8f24d677e14099d1d9cd2e14c64598396d8d6cbe5f57e727"
+        }
+      }
+    },
+    "tests/factions/chaos_daemons/integration/test_gore_hungry_onslaught.py": {
       "before_sha256": null,
-      "after_sha256": "5263cd4deed24ee99ea713a83b47f7fad5948df2b5c18ef4485324d3c474c58a",
+      "after_sha256": "3fc91f2a6b9c0306f906d1bf48fabd8268c7c290ab395433108d6199085e2b9b",
       "owners": {
         "@module": {
           "before": null,
-          "after": "69c720d7fb5f298318e6eecebd1e2910da86006c534238404cf01f4f9af339ce"
+          "after": "e2a735aabe85a535d7d7625d576fca50cc2f5ba3a8e8bab60b5678e6c3e54276"
         },
-        "_admit": {
+        "_advance_through_wall": {
           "before": null,
-          "after": "1705436d5cba7b8b856274ba4ca217ba2c5c0f7ec00d9b59a985aba4ac44c8f6"
+          "after": "262b144ef344e413cdf73bfa2ff018fd03aa9a2d90707e5a8e99a8ae2710a41b"
         },
-        "_assert_zero_roll_proofs": {
+        "_assert_onslaught": {
           "before": null,
-          "after": "bd4574cc486bd5a5a32543b297cec5a04a027ad6e391ab9feffe2a919ccca6a1"
+          "after": "b56cf4af863999eb07a99c457c0abc3264f7e99872c2f77d58151271633d9d1b"
         },
-        "_context": {
+        "_onslaught_option": {
           "before": null,
-          "after": "986520845bd206681ac3ce8c90d368d83bdb4be62a55833594cc373996ddeda3"
+          "after": "3ca72df6ad5379d119b08e7a45d49dd7d1a22b55d0dd3ab911012667b23c61fd"
         },
-        "_fixture": {
+        "_onslaught_scene": {
           "before": null,
-          "after": "88f80b8ea5ecf0f2893d0457552dc79dc30453beae6a274a90d8d8c084249f26"
+          "after": "b097599c8d3bdb76041b7f35d7feabd668e7e14cbe91eaf761bc1802cd00fb50"
         },
-        "test_charge_flight_admits_native_offer_without_claiming_a_minimum": {
+        "test_gore_hungry_onslaught_charge_path_and_replay": {
           "before": null,
-          "after": "34574ff72928c84da58bf47f677ed1d5e175fbc0d0ee5648b58c229f842d7d67"
+          "after": "338a07e9a995e069677f23c105687053f0bc91faca3b035e646861b49a1f3915"
         },
-        "test_unmodified_charge_probability_synthetic_controls": {
+        "test_gore_hungry_onslaught_ineligible_window": {
           "before": null,
-          "after": "1bdc00195824d67e54fd9446a496feb895a77ed31f88f49d8ce582faec029281"
+          "after": "3bd60c4563c23f6e8427333960729866a44da0c1d47b616add387f0063615d6e"
+        },
+        "test_gore_hungry_onslaught_later_movement_window": {
+          "before": null,
+          "after": "49fc18b92f421bb7d8c33bd9ce883cde4705581c875730972505eec0485040b3"
+        },
+        "test_gore_hungry_onslaught_movement_path_and_replay": {
+          "before": null,
+          "after": "55c13b06def2a8ebd8146a5199fb3a64a800bebb80fedbe77f76431187228cc0"
+        }
+      }
+    },
+    "tests/factions/chaos_daemons/integration/test_skulls_beget_blood.py": {
+      "before_sha256": "8fffccffbedd6b697d85d2b0da189435d8251c88c88f96ae69e865cfe1abd6b9",
+      "after_sha256": "c93228606f0f51e5aeaea0d7dc9c9ba6b4eb07b6961d99611e1f8b8ffc749b24",
+      "owners": {
+        "test_skulls_beget_blood_allows_advance_but_excludes_fall_back": {
+          "before": "0c81778844f035850e0c1c4b3a3deb34f7b35921f8b1d95f4a04b25b96c132fe",
+          "after": "7924526523cf5631d0ce55cf2baebbedc06ae4adc50c504f3d6b21333ecaa27f"
+        }
+      }
+    },
+    "tests/infrastructure/source_governance/unit/test_blocked_row_classification.py": {
+      "before_sha256": "32d202415e5947bed75e740362d2d2b40de2ffe3af282e775e305b41bf501f33",
+      "after_sha256": "901336e2a44f83246b108dd0903f06f84bb0ffaf588eb0ed95080c2dcaada145",
+      "owners": {
+        "test_phase17i_missing_capability_report_groups_rows_by_family": {
+          "before": "246ff1a7e05cd64ad8e621bd203dd9652042a5b518ec26f897f5dea5b05d570f",
+          "after": "5f1dd8537d0754986f3e54087938d733206dc7576210600f4a06a182c6b90ff0"
+        },
+        "test_phase17i_source_text_boundaries_are_explicit": {
+          "before": "6405f4bd29f3b814b5dc39325131db22e0446cb2d5a7679a753e5e0c4192857f",
+          "after": "867f27aa8ab6230caff6aaca88979d66544e8d5f560f1eefdf42428976d4b631"
         }
       }
     }
   },
   "rows": {
+    "FACTION_INTEGRATION.md": {
+      "category": "rule_semantics",
+      "operations": [
+        "supported-acts-current-source-documentation"
+      ],
+      "selected_families": [],
+      "rationale": "Record the single qualified Blood Legion rule and unchanged adjacent unsupported scope.",
+      "source_obligation": "Official June and July Chaos Daemons faction packs, page 124. Verify own Movement/Charge, 1 CP, both keywords, terrain-only transit and phase-end expiry.",
+      "unchanged_work": "Native path search, terrain geometry, endpoint/collision checks, Charge flight, CP and effect ledgers and replay validation retain existing authorities. Only the scoped phase-choice and source-backed effect admission change."
+    },
     "ci/test_shards/durations.json": {
       "category": "rule_semantics",
       "operations": [
-        "behavior-shard-inventory",
-        "issue533-client-regressions",
-        "order104-client-regressions",
-        "order105-client-regressions",
-        "order106-client-regressions",
-        "order107-client-regressions",
-        "order108-client-regressions",
-        "order109-control-regressions",
-        "mfm-current-behavior-profile",
-        "cavalcade-v995-roster-admission"
+        "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Combine the two approved scheduling deltas and recompute the same twelve-shard allocation without losing either lane's cases or measured weights.",
-      "source_obligation": "Core Rules 21.03 and retained v931 timing; use the unchanged Charge target filter, native resolve_charge_move contract, and unmodified dice spec.",
-      "unchanged_work": "No existing workload calls this opt-in read-only policy. It checks one caller-supplied witness at no more than eleven attainable sums per mode. No path search, chance sample, decision submission, resolver change or normal gameplay work is added."
+      "rationale": "Retain every inherited node and selector weight; add only the seven measured Linux gameplay nodes, then rebalance twelve shards.",
+      "source_obligation": "Official June and July Chaos Daemons faction packs, page 124. Verify own Movement/Charge, 1 CP, both keywords, terrain-only transit and phase-end expiry.",
+      "unchanged_work": "Native path search, terrain geometry, endpoint/collision checks, Charge flight, CP and effect ledgers and replay validation retain existing authorities. Only the scoped phase-choice and source-backed effect admission change."
     },
     "ci/test_shards/shard-1.txt": {
       "category": "rule_semantics",
       "operations": [
-        "behavior-shard-inventory",
-        "issue533-client-regressions",
-        "order104-client-regressions",
-        "order105-client-regressions",
-        "order106-client-regressions",
-        "order107-client-regressions",
-        "order108-client-regressions",
-        "order109-control-regressions",
-        "mfm-current-behavior-profile",
-        "cavalcade-v995-roster-admission"
+        "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Combine the two approved scheduling deltas and recompute the same twelve-shard allocation without losing either lane's cases or measured weights.",
-      "source_obligation": "Core Rules 21.03 and retained v931 timing; use the unchanged Charge target filter, native resolve_charge_move contract, and unmodified dice spec.",
-      "unchanged_work": "No existing workload calls this opt-in read-only policy. It checks one caller-supplied witness at no more than eleven attainable sums per mode. No path search, chance sample, decision submission, resolver change or normal gameplay work is added."
+      "rationale": "Retain every inherited node and selector weight; add only the seven measured Linux gameplay nodes, then rebalance twelve shards.",
+      "source_obligation": "Official June and July Chaos Daemons faction packs, page 124. Verify own Movement/Charge, 1 CP, both keywords, terrain-only transit and phase-end expiry.",
+      "unchanged_work": "Native path search, terrain geometry, endpoint/collision checks, Charge flight, CP and effect ledgers and replay validation retain existing authorities. Only the scoped phase-choice and source-backed effect admission change."
     },
     "ci/test_shards/shard-10.txt": {
       "category": "rule_semantics",
       "operations": [
-        "behavior-shard-inventory",
-        "issue533-client-regressions",
-        "order104-client-regressions",
-        "order105-client-regressions",
-        "order106-client-regressions",
-        "order107-client-regressions",
-        "order108-client-regressions",
-        "order109-control-regressions",
-        "mfm-current-behavior-profile",
-        "cavalcade-v995-roster-admission"
+        "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Combine the two approved scheduling deltas and recompute the same twelve-shard allocation without losing either lane's cases or measured weights.",
-      "source_obligation": "Core Rules 21.03 and retained v931 timing; use the unchanged Charge target filter, native resolve_charge_move contract, and unmodified dice spec.",
-      "unchanged_work": "No existing workload calls this opt-in read-only policy. It checks one caller-supplied witness at no more than eleven attainable sums per mode. No path search, chance sample, decision submission, resolver change or normal gameplay work is added."
+      "rationale": "Retain every inherited node and selector weight; add only the seven measured Linux gameplay nodes, then rebalance twelve shards.",
+      "source_obligation": "Official June and July Chaos Daemons faction packs, page 124. Verify own Movement/Charge, 1 CP, both keywords, terrain-only transit and phase-end expiry.",
+      "unchanged_work": "Native path search, terrain geometry, endpoint/collision checks, Charge flight, CP and effect ledgers and replay validation retain existing authorities. Only the scoped phase-choice and source-backed effect admission change."
     },
     "ci/test_shards/shard-11.txt": {
       "category": "rule_semantics",
       "operations": [
-        "behavior-shard-inventory",
-        "issue533-client-regressions",
-        "order104-client-regressions",
-        "order105-client-regressions",
-        "order106-client-regressions",
-        "order107-client-regressions",
-        "order108-client-regressions",
-        "order109-control-regressions",
-        "mfm-current-behavior-profile",
-        "cavalcade-v995-roster-admission"
+        "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Combine the two approved scheduling deltas and recompute the same twelve-shard allocation without losing either lane's cases or measured weights.",
-      "source_obligation": "Core Rules 21.03 and retained v931 timing; use the unchanged Charge target filter, native resolve_charge_move contract, and unmodified dice spec.",
-      "unchanged_work": "No existing workload calls this opt-in read-only policy. It checks one caller-supplied witness at no more than eleven attainable sums per mode. No path search, chance sample, decision submission, resolver change or normal gameplay work is added."
+      "rationale": "Retain every inherited node and selector weight; add only the seven measured Linux gameplay nodes, then rebalance twelve shards.",
+      "source_obligation": "Official June and July Chaos Daemons faction packs, page 124. Verify own Movement/Charge, 1 CP, both keywords, terrain-only transit and phase-end expiry.",
+      "unchanged_work": "Native path search, terrain geometry, endpoint/collision checks, Charge flight, CP and effect ledgers and replay validation retain existing authorities. Only the scoped phase-choice and source-backed effect admission change."
     },
     "ci/test_shards/shard-12.txt": {
       "category": "rule_semantics",
       "operations": [
-        "behavior-shard-inventory",
-        "issue533-client-regressions",
-        "order104-client-regressions",
-        "order105-client-regressions",
-        "order106-client-regressions",
-        "order107-client-regressions",
-        "order108-client-regressions",
-        "order109-control-regressions",
-        "mfm-current-behavior-profile",
-        "cavalcade-v995-roster-admission"
+        "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Combine the two approved scheduling deltas and recompute the same twelve-shard allocation without losing either lane's cases or measured weights.",
-      "source_obligation": "Core Rules 21.03 and retained v931 timing; use the unchanged Charge target filter, native resolve_charge_move contract, and unmodified dice spec.",
-      "unchanged_work": "No existing workload calls this opt-in read-only policy. It checks one caller-supplied witness at no more than eleven attainable sums per mode. No path search, chance sample, decision submission, resolver change or normal gameplay work is added."
+      "rationale": "Retain every inherited node and selector weight; add only the seven measured Linux gameplay nodes, then rebalance twelve shards.",
+      "source_obligation": "Official June and July Chaos Daemons faction packs, page 124. Verify own Movement/Charge, 1 CP, both keywords, terrain-only transit and phase-end expiry.",
+      "unchanged_work": "Native path search, terrain geometry, endpoint/collision checks, Charge flight, CP and effect ledgers and replay validation retain existing authorities. Only the scoped phase-choice and source-backed effect admission change."
     },
     "ci/test_shards/shard-4.txt": {
       "category": "rule_semantics",
       "operations": [
-        "behavior-shard-inventory",
-        "issue533-client-regressions",
-        "order104-client-regressions",
-        "order105-client-regressions",
-        "order106-client-regressions",
-        "order107-client-regressions",
-        "order108-client-regressions",
-        "order109-control-regressions",
-        "mfm-current-behavior-profile",
-        "cavalcade-v995-roster-admission"
+        "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Combine the two approved scheduling deltas and recompute the same twelve-shard allocation without losing either lane's cases or measured weights.",
-      "source_obligation": "Core Rules 21.03 and retained v931 timing; use the unchanged Charge target filter, native resolve_charge_move contract, and unmodified dice spec.",
-      "unchanged_work": "No existing workload calls this opt-in read-only policy. It checks one caller-supplied witness at no more than eleven attainable sums per mode. No path search, chance sample, decision submission, resolver change or normal gameplay work is added."
+      "rationale": "Retain every inherited node and selector weight; add only the seven measured Linux gameplay nodes, then rebalance twelve shards.",
+      "source_obligation": "Official June and July Chaos Daemons faction packs, page 124. Verify own Movement/Charge, 1 CP, both keywords, terrain-only transit and phase-end expiry.",
+      "unchanged_work": "Native path search, terrain geometry, endpoint/collision checks, Charge flight, CP and effect ledgers and replay validation retain existing authorities. Only the scoped phase-choice and source-backed effect admission change."
     },
     "ci/test_shards/shard-5.txt": {
       "category": "rule_semantics",
       "operations": [
-        "behavior-shard-inventory",
-        "issue533-client-regressions",
-        "order104-client-regressions",
-        "order105-client-regressions",
-        "order106-client-regressions",
-        "order107-client-regressions",
-        "order108-client-regressions",
-        "order109-control-regressions",
-        "mfm-current-behavior-profile",
-        "cavalcade-v995-roster-admission"
+        "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Combine the two approved scheduling deltas and recompute the same twelve-shard allocation without losing either lane's cases or measured weights.",
-      "source_obligation": "Core Rules 21.03 and retained v931 timing; use the unchanged Charge target filter, native resolve_charge_move contract, and unmodified dice spec.",
-      "unchanged_work": "No existing workload calls this opt-in read-only policy. It checks one caller-supplied witness at no more than eleven attainable sums per mode. No path search, chance sample, decision submission, resolver change or normal gameplay work is added."
+      "rationale": "Retain every inherited node and selector weight; add only the seven measured Linux gameplay nodes, then rebalance twelve shards.",
+      "source_obligation": "Official June and July Chaos Daemons faction packs, page 124. Verify own Movement/Charge, 1 CP, both keywords, terrain-only transit and phase-end expiry.",
+      "unchanged_work": "Native path search, terrain geometry, endpoint/collision checks, Charge flight, CP and effect ledgers and replay validation retain existing authorities. Only the scoped phase-choice and source-backed effect admission change."
     },
     "ci/test_shards/shard-6.txt": {
       "category": "rule_semantics",
       "operations": [
-        "behavior-shard-inventory",
-        "issue533-client-regressions",
-        "order104-client-regressions",
-        "order105-client-regressions",
-        "order106-client-regressions",
-        "order107-client-regressions",
-        "order108-client-regressions",
-        "order109-control-regressions",
-        "mfm-current-behavior-profile",
-        "cavalcade-v995-roster-admission"
+        "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Combine the two approved scheduling deltas and recompute the same twelve-shard allocation without losing either lane's cases or measured weights.",
-      "source_obligation": "Core Rules 21.03 and retained v931 timing; use the unchanged Charge target filter, native resolve_charge_move contract, and unmodified dice spec.",
-      "unchanged_work": "No existing workload calls this opt-in read-only policy. It checks one caller-supplied witness at no more than eleven attainable sums per mode. No path search, chance sample, decision submission, resolver change or normal gameplay work is added."
+      "rationale": "Retain every inherited node and selector weight; add only the seven measured Linux gameplay nodes, then rebalance twelve shards.",
+      "source_obligation": "Official June and July Chaos Daemons faction packs, page 124. Verify own Movement/Charge, 1 CP, both keywords, terrain-only transit and phase-end expiry.",
+      "unchanged_work": "Native path search, terrain geometry, endpoint/collision checks, Charge flight, CP and effect ledgers and replay validation retain existing authorities. Only the scoped phase-choice and source-backed effect admission change."
     },
     "ci/test_shards/shard-7.txt": {
       "category": "rule_semantics",
       "operations": [
-        "behavior-shard-inventory",
-        "issue533-client-regressions",
-        "order104-client-regressions",
-        "order105-client-regressions",
-        "order106-client-regressions",
-        "order107-client-regressions",
-        "order108-client-regressions",
-        "order109-control-regressions",
-        "mfm-current-behavior-profile",
-        "cavalcade-v995-roster-admission"
+        "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Combine the two approved scheduling deltas and recompute the same twelve-shard allocation without losing either lane's cases or measured weights.",
-      "source_obligation": "Core Rules 21.03 and retained v931 timing; use the unchanged Charge target filter, native resolve_charge_move contract, and unmodified dice spec.",
-      "unchanged_work": "No existing workload calls this opt-in read-only policy. It checks one caller-supplied witness at no more than eleven attainable sums per mode. No path search, chance sample, decision submission, resolver change or normal gameplay work is added."
+      "rationale": "Retain every inherited node and selector weight; add only the seven measured Linux gameplay nodes, then rebalance twelve shards.",
+      "source_obligation": "Official June and July Chaos Daemons faction packs, page 124. Verify own Movement/Charge, 1 CP, both keywords, terrain-only transit and phase-end expiry.",
+      "unchanged_work": "Native path search, terrain geometry, endpoint/collision checks, Charge flight, CP and effect ledgers and replay validation retain existing authorities. Only the scoped phase-choice and source-backed effect admission change."
     },
     "ci/test_shards/shard-8.txt": {
       "category": "rule_semantics",
       "operations": [
-        "behavior-shard-inventory",
-        "issue533-client-regressions",
-        "order104-client-regressions",
-        "order105-client-regressions",
-        "order106-client-regressions",
-        "order107-client-regressions",
-        "order108-client-regressions",
-        "order109-control-regressions",
-        "mfm-current-behavior-profile",
-        "cavalcade-v995-roster-admission"
+        "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Combine the two approved scheduling deltas and recompute the same twelve-shard allocation without losing either lane's cases or measured weights.",
-      "source_obligation": "Core Rules 21.03 and retained v931 timing; use the unchanged Charge target filter, native resolve_charge_move contract, and unmodified dice spec.",
-      "unchanged_work": "No existing workload calls this opt-in read-only policy. It checks one caller-supplied witness at no more than eleven attainable sums per mode. No path search, chance sample, decision submission, resolver change or normal gameplay work is added."
+      "rationale": "Retain every inherited node and selector weight; add only the seven measured Linux gameplay nodes, then rebalance twelve shards.",
+      "source_obligation": "Official June and July Chaos Daemons faction packs, page 124. Verify own Movement/Charge, 1 CP, both keywords, terrain-only transit and phase-end expiry.",
+      "unchanged_work": "Native path search, terrain geometry, endpoint/collision checks, Charge flight, CP and effect ledgers and replay validation retain existing authorities. Only the scoped phase-choice and source-backed effect admission change."
     },
     "ci/test_shards/shard-9.txt": {
       "category": "rule_semantics",
       "operations": [
-        "behavior-shard-inventory",
-        "issue533-client-regressions",
-        "order104-client-regressions",
-        "order105-client-regressions",
-        "order106-client-regressions",
-        "order107-client-regressions",
-        "order108-client-regressions",
-        "order109-control-regressions",
-        "mfm-current-behavior-profile",
-        "cavalcade-v995-roster-admission"
+        "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Combine the two approved scheduling deltas and recompute the same twelve-shard allocation without losing either lane's cases or measured weights.",
-      "source_obligation": "Core Rules 21.03 and retained v931 timing; use the unchanged Charge target filter, native resolve_charge_move contract, and unmodified dice spec.",
-      "unchanged_work": "No existing workload calls this opt-in read-only policy. It checks one caller-supplied witness at no more than eleven attainable sums per mode. No path search, chance sample, decision submission, resolver change or normal gameplay work is added."
+      "rationale": "Retain every inherited node and selector weight; add only the seven measured Linux gameplay nodes, then rebalance twelve shards.",
+      "source_obligation": "Official June and July Chaos Daemons faction packs, page 124. Verify own Movement/Charge, 1 CP, both keywords, terrain-only transit and phase-end expiry.",
+      "unchanged_work": "Native path search, terrain geometry, endpoint/collision checks, Charge flight, CP and effect ledgers and replay validation retain existing authorities. Only the scoped phase-choice and source-backed effect admission change."
     },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
       "operations": [
-        "contract-42-1-publication",
-        "order103-contract-publication",
-        "issue532-contract44-publication",
-        "issue533-contract-publication",
-        "order104-contract-publication",
-        "order105-contract-publication",
-        "order106-contract-publication",
-        "order107-contract-publication",
-        "order108-contract-publication",
-        "order109-contract-publication",
-        "order110-contract-publication",
-        "v963-snap-contract-publication",
-        "order115-contract-publication",
-        "order116-contract-publication",
-        "order117-contract-publication",
-        "order118-contract-publication",
-        "order119-contract-publication",
-        "order120-contract-publication",
-        "order121-contract-publication",
-        "order122-contract-publication",
-        "order123-contract-publication",
-        "order124-contract-publication",
-        "order125-contract-publication",
-        "order126-contract-publication",
-        "order127-contract-publication",
-        "order128-contract-publication",
-        "order129-contract-publication",
-        "order130-contract-publication",
-        "order131-contract-publication",
-        "order132-contract-publication",
-        "order133-contract-publication",
-        "order134-contract-publication",
-        "order135-contract-publication",
-        "d07-generated-current-contract-inventory",
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Refresh existing packaged and contract identities; no schema, adapter route or wire format changes.",
-      "source_obligation": "Core Rules 21.03 and retained v931 timing; use the unchanged Charge target filter, native resolve_charge_move contract, and unmodified dice spec.",
-      "unchanged_work": "No existing workload calls this opt-in read-only policy. It checks one caller-supplied witness at no more than eleven attainable sums per mode. No path search, chance sample, decision submission, resolver change or normal gameplay work is added."
+      "rationale": "Regenerate examples and dependent hashes for the exact combined Onslaught and landed Charge-flight runtime.",
+      "source_obligation": "Official June and July Chaos Daemons faction packs, page 124. Verify own Movement/Charge, 1 CP, both keywords, terrain-only transit and phase-end expiry.",
+      "unchanged_work": "Native path search, terrain geometry, endpoint/collision checks, Charge flight, CP and effect ledgers and replay validation retain existing authorities. Only the scoped phase-choice and source-backed effect admission change."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
       "operations": [
-        "contract-42-1-publication",
-        "order103-contract-publication",
-        "issue532-contract44-publication",
-        "issue533-contract-publication",
-        "order104-contract-publication",
-        "order105-contract-publication",
-        "order106-contract-publication",
-        "order107-contract-publication",
-        "order108-contract-publication",
-        "order109-contract-publication",
-        "order110-contract-publication",
-        "v963-snap-contract-publication",
-        "order115-contract-publication",
-        "order116-contract-publication",
-        "order117-contract-publication",
-        "order118-contract-publication",
-        "order119-contract-publication",
-        "order120-contract-publication",
-        "order121-contract-publication",
-        "order122-contract-publication",
-        "order123-contract-publication",
-        "order124-contract-publication",
-        "order125-contract-publication",
-        "order126-contract-publication",
-        "order127-contract-publication",
-        "order128-contract-publication",
-        "order129-contract-publication",
-        "order130-contract-publication",
-        "order131-contract-publication",
-        "order132-contract-publication",
-        "order133-contract-publication",
-        "order134-contract-publication",
-        "order135-contract-publication",
-        "d07-generated-current-contract-inventory",
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Refresh existing packaged and contract identities; no schema, adapter route or wire format changes.",
-      "source_obligation": "Core Rules 21.03 and retained v931 timing; use the unchanged Charge target filter, native resolve_charge_move contract, and unmodified dice spec.",
-      "unchanged_work": "No existing workload calls this opt-in read-only policy. It checks one caller-supplied witness at no more than eleven attainable sums per mode. No path search, chance sample, decision submission, resolver change or normal gameplay work is added."
+      "rationale": "Regenerate examples and dependent hashes for the exact combined Onslaught and landed Charge-flight runtime.",
+      "source_obligation": "Official June and July Chaos Daemons faction packs, page 124. Verify own Movement/Charge, 1 CP, both keywords, terrain-only transit and phase-end expiry.",
+      "unchanged_work": "Native path search, terrain geometry, endpoint/collision checks, Charge flight, CP and effect ledgers and replay validation retain existing authorities. Only the scoped phase-choice and source-backed effect admission change."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
       "operations": [
-        "contract-42-1-publication",
-        "order103-contract-publication",
-        "issue532-contract44-publication",
-        "issue533-contract-publication",
-        "order104-contract-publication",
-        "order105-contract-publication",
-        "order106-contract-publication",
-        "order107-contract-publication",
-        "order108-contract-publication",
-        "order109-contract-publication",
-        "order110-contract-publication",
-        "v963-snap-contract-publication",
-        "order115-contract-publication",
-        "order116-contract-publication",
-        "order117-contract-publication",
-        "order118-contract-publication",
-        "order119-contract-publication",
-        "order120-contract-publication",
-        "order121-contract-publication",
-        "order122-contract-publication",
-        "order123-contract-publication",
-        "order124-contract-publication",
-        "order125-contract-publication",
-        "order126-contract-publication",
-        "order127-contract-publication",
-        "order128-contract-publication",
-        "order129-contract-publication",
-        "order130-contract-publication",
-        "order131-contract-publication",
-        "order132-contract-publication",
-        "order133-contract-publication",
-        "order134-contract-publication",
-        "order135-contract-publication",
-        "d07-generated-current-contract-inventory",
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Refresh existing packaged and contract identities; no schema, adapter route or wire format changes.",
-      "source_obligation": "Core Rules 21.03 and retained v931 timing; use the unchanged Charge target filter, native resolve_charge_move contract, and unmodified dice spec.",
-      "unchanged_work": "No existing workload calls this opt-in read-only policy. It checks one caller-supplied witness at no more than eleven attainable sums per mode. No path search, chance sample, decision submission, resolver change or normal gameplay work is added."
+      "rationale": "Regenerate examples and dependent hashes for the exact combined Onslaught and landed Charge-flight runtime.",
+      "source_obligation": "Official June and July Chaos Daemons faction packs, page 124. Verify own Movement/Charge, 1 CP, both keywords, terrain-only transit and phase-end expiry.",
+      "unchanged_work": "Native path search, terrain geometry, endpoint/collision checks, Charge flight, CP and effect ledgers and replay validation retain existing authorities. Only the scoped phase-choice and source-backed effect admission change."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
       "operations": [
-        "contract-42-1-publication",
-        "order103-contract-publication",
-        "issue532-contract44-publication",
-        "issue533-contract-publication",
-        "order104-contract-publication",
-        "order105-contract-publication",
-        "order106-contract-publication",
-        "order107-contract-publication",
-        "order108-contract-publication",
-        "order109-contract-publication",
-        "order110-contract-publication",
-        "v963-snap-contract-publication",
-        "order115-contract-publication",
-        "order116-contract-publication",
-        "order117-contract-publication",
-        "order118-contract-publication",
-        "order119-contract-publication",
-        "order120-contract-publication",
-        "order121-contract-publication",
-        "order122-contract-publication",
-        "order123-contract-publication",
-        "order124-contract-publication",
-        "order125-contract-publication",
-        "order126-contract-publication",
-        "order127-contract-publication",
-        "order128-contract-publication",
-        "order129-contract-publication",
-        "order130-contract-publication",
-        "order131-contract-publication",
-        "order132-contract-publication",
-        "order133-contract-publication",
-        "order134-contract-publication",
-        "order135-contract-publication",
-        "d07-generated-current-contract-inventory",
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Refresh existing packaged and contract identities; no schema, adapter route or wire format changes.",
-      "source_obligation": "Core Rules 21.03 and retained v931 timing; use the unchanged Charge target filter, native resolve_charge_move contract, and unmodified dice spec.",
-      "unchanged_work": "No existing workload calls this opt-in read-only policy. It checks one caller-supplied witness at no more than eleven attainable sums per mode. No path search, chance sample, decision submission, resolver change or normal gameplay work is added."
+      "rationale": "Regenerate examples and dependent hashes for the exact combined Onslaught and landed Charge-flight runtime.",
+      "source_obligation": "Official June and July Chaos Daemons faction packs, page 124. Verify own Movement/Charge, 1 CP, both keywords, terrain-only transit and phase-end expiry.",
+      "unchanged_work": "Native path search, terrain geometry, endpoint/collision checks, Charge flight, CP and effect ledgers and replay validation retain existing authorities. Only the scoped phase-choice and source-backed effect admission change."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
       "operations": [
-        "contract-42-1-publication",
-        "order103-contract-publication",
-        "issue532-contract44-publication",
-        "issue533-contract-publication",
-        "order104-contract-publication",
-        "order105-contract-publication",
-        "order106-contract-publication",
-        "order107-contract-publication",
-        "order108-contract-publication",
-        "order109-contract-publication",
-        "order110-contract-publication",
-        "v963-snap-contract-publication",
-        "order115-contract-publication",
-        "order116-contract-publication",
-        "order117-contract-publication",
-        "order118-contract-publication",
-        "order119-contract-publication",
-        "order120-contract-publication",
-        "order121-contract-publication",
-        "order122-contract-publication",
-        "order123-contract-publication",
-        "order124-contract-publication",
-        "order125-contract-publication",
-        "order126-contract-publication",
-        "order127-contract-publication",
-        "order128-contract-publication",
-        "order129-contract-publication",
-        "order130-contract-publication",
-        "order131-contract-publication",
-        "order132-contract-publication",
-        "order133-contract-publication",
-        "order134-contract-publication",
-        "order135-contract-publication",
-        "d07-generated-current-contract-inventory",
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Refresh existing packaged and contract identities; no schema, adapter route or wire format changes.",
-      "source_obligation": "Core Rules 21.03 and retained v931 timing; use the unchanged Charge target filter, native resolve_charge_move contract, and unmodified dice spec.",
-      "unchanged_work": "No existing workload calls this opt-in read-only policy. It checks one caller-supplied witness at no more than eleven attainable sums per mode. No path search, chance sample, decision submission, resolver change or normal gameplay work is added."
+      "rationale": "Regenerate examples and dependent hashes for the exact combined Onslaught and landed Charge-flight runtime.",
+      "source_obligation": "Official June and July Chaos Daemons faction packs, page 124. Verify own Movement/Charge, 1 CP, both keywords, terrain-only transit and phase-end expiry.",
+      "unchanged_work": "Native path search, terrain geometry, endpoint/collision checks, Charge flight, CP and effect ledgers and replay validation retain existing authorities. Only the scoped phase-choice and source-backed effect admission change."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
       "operations": [
-        "contract-42-1-publication",
-        "order103-contract-publication",
-        "issue532-contract44-publication",
-        "issue533-contract-publication",
-        "order104-contract-publication",
-        "order105-contract-publication",
-        "order106-contract-publication",
-        "order107-contract-publication",
-        "order108-contract-publication",
-        "order109-contract-publication",
-        "order110-contract-publication",
-        "v963-snap-contract-publication",
-        "order115-contract-publication",
-        "order116-contract-publication",
-        "order117-contract-publication",
-        "order118-contract-publication",
-        "order119-contract-publication",
-        "order120-contract-publication",
-        "order121-contract-publication",
-        "order122-contract-publication",
-        "order123-contract-publication",
-        "order124-contract-publication",
-        "order125-contract-publication",
-        "order126-contract-publication",
-        "order127-contract-publication",
-        "order128-contract-publication",
-        "order129-contract-publication",
-        "order130-contract-publication",
-        "order131-contract-publication",
-        "order132-contract-publication",
-        "order133-contract-publication",
-        "order134-contract-publication",
-        "order135-contract-publication",
-        "d07-generated-current-contract-inventory",
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Refresh existing packaged and contract identities; no schema, adapter route or wire format changes.",
-      "source_obligation": "Core Rules 21.03 and retained v931 timing; use the unchanged Charge target filter, native resolve_charge_move contract, and unmodified dice spec.",
-      "unchanged_work": "No existing workload calls this opt-in read-only policy. It checks one caller-supplied witness at no more than eleven attainable sums per mode. No path search, chance sample, decision submission, resolver change or normal gameplay work is added."
+      "rationale": "Regenerate examples and dependent hashes for the exact combined Onslaught and landed Charge-flight runtime.",
+      "source_obligation": "Official June and July Chaos Daemons faction packs, page 124. Verify own Movement/Charge, 1 CP, both keywords, terrain-only transit and phase-end expiry.",
+      "unchanged_work": "Native path search, terrain geometry, endpoint/collision checks, Charge flight, CP and effect ledgers and replay validation retain existing authorities. Only the scoped phase-choice and source-backed effect admission change."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
       "operations": [
-        "contract-42-1-publication",
-        "order103-contract-publication",
-        "issue532-contract44-publication",
-        "issue533-contract-publication",
-        "order104-contract-publication",
-        "order105-contract-publication",
-        "order106-contract-publication",
-        "order107-contract-publication",
-        "order108-contract-publication",
-        "order109-contract-publication",
-        "order110-contract-publication",
-        "v963-snap-contract-publication",
-        "order115-contract-publication",
-        "order116-contract-publication",
-        "order117-contract-publication",
-        "order118-contract-publication",
-        "order119-contract-publication",
-        "order120-contract-publication",
-        "order121-contract-publication",
-        "order122-contract-publication",
-        "order123-contract-publication",
-        "order124-contract-publication",
-        "order125-contract-publication",
-        "order126-contract-publication",
-        "order127-contract-publication",
-        "order128-contract-publication",
-        "order129-contract-publication",
-        "order130-contract-publication",
-        "order131-contract-publication",
-        "order132-contract-publication",
-        "order133-contract-publication",
-        "order134-contract-publication",
-        "order135-contract-publication",
-        "d07-generated-current-contract-inventory",
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Refresh existing packaged and contract identities; no schema, adapter route or wire format changes.",
-      "source_obligation": "Core Rules 21.03 and retained v931 timing; use the unchanged Charge target filter, native resolve_charge_move contract, and unmodified dice spec.",
-      "unchanged_work": "No existing workload calls this opt-in read-only policy. It checks one caller-supplied witness at no more than eleven attainable sums per mode. No path search, chance sample, decision submission, resolver change or normal gameplay work is added."
+      "rationale": "Regenerate examples and dependent hashes for the exact combined Onslaught and landed Charge-flight runtime.",
+      "source_obligation": "Official June and July Chaos Daemons faction packs, page 124. Verify own Movement/Charge, 1 CP, both keywords, terrain-only transit and phase-end expiry.",
+      "unchanged_work": "Native path search, terrain geometry, endpoint/collision checks, Charge flight, CP and effect ledgers and replay validation retain existing authorities. Only the scoped phase-choice and source-backed effect admission change."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
       "operations": [
-        "contract-42-1-publication",
-        "order103-contract-publication",
-        "issue532-contract44-publication",
-        "issue533-contract-publication",
-        "order104-contract-publication",
-        "order105-contract-publication",
-        "order106-contract-publication",
-        "order107-contract-publication",
-        "order108-contract-publication",
-        "order109-contract-publication",
-        "order110-contract-publication",
-        "v963-snap-contract-publication",
-        "order115-contract-publication",
-        "order116-contract-publication",
-        "order117-contract-publication",
-        "order118-contract-publication",
-        "order119-contract-publication",
-        "order120-contract-publication",
-        "order121-contract-publication",
-        "order122-contract-publication",
-        "order123-contract-publication",
-        "order124-contract-publication",
-        "order125-contract-publication",
-        "order126-contract-publication",
-        "order127-contract-publication",
-        "order128-contract-publication",
-        "order129-contract-publication",
-        "order130-contract-publication",
-        "order131-contract-publication",
-        "order132-contract-publication",
-        "order133-contract-publication",
-        "order134-contract-publication",
-        "order135-contract-publication",
-        "d07-generated-current-contract-inventory",
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Refresh existing packaged and contract identities; no schema, adapter route or wire format changes.",
-      "source_obligation": "Core Rules 21.03 and retained v931 timing; use the unchanged Charge target filter, native resolve_charge_move contract, and unmodified dice spec.",
-      "unchanged_work": "No existing workload calls this opt-in read-only policy. It checks one caller-supplied witness at no more than eleven attainable sums per mode. No path search, chance sample, decision submission, resolver change or normal gameplay work is added."
+      "rationale": "Regenerate examples and dependent hashes for the exact combined Onslaught and landed Charge-flight runtime.",
+      "source_obligation": "Official June and July Chaos Daemons faction packs, page 124. Verify own Movement/Charge, 1 CP, both keywords, terrain-only transit and phase-end expiry.",
+      "unchanged_work": "Native path search, terrain geometry, endpoint/collision checks, Charge flight, CP and effect ledgers and replay validation retain existing authorities. Only the scoped phase-choice and source-backed effect admission change."
     },
-    "data/source_audits/ci64_provenance_v1/pre-roll-charge-flight-test-v1.json": {
+    "data/generated/ability_coverage/cross_source_semantic_equivalence.json": {
       "category": "rule_semantics",
       "operations": [
-        "pre-roll-charge-flight-test-admission"
+        "phase-end-healing-source-and-report"
       ],
       "selected_families": [],
-      "rationale": "Authenticate the revised native test and opt-in proof without relaxing predecessor source or test guards.",
-      "source_obligation": "Core Rules 21.03 and retained v931 timing; use the unchanged Charge target filter, native resolve_charge_move contract, and unmodified dice spec.",
-      "unchanged_work": "No existing workload calls this opt-in read-only policy. It checks one caller-supplied witness at no more than eleven attainable sums per mode. No path search, chance sample, decision submission, resolver change or normal gameplay work is added."
+      "rationale": "Record the single qualified Blood Legion rule and unchanged adjacent unsupported scope.",
+      "source_obligation": "Official June and July Chaos Daemons faction packs, page 124. Verify own Movement/Charge, 1 CP, both keywords, terrain-only transit and phase-end expiry.",
+      "unchanged_work": "Native path search, terrain geometry, endpoint/collision checks, Charge flight, CP and effect ledgers and replay validation retain existing authorities. Only the scoped phase-choice and source-backed effect admission change."
     },
-    "docs/AI_POLICY_INTERFACE.md": {
+    "data/generated/ability_coverage/runtime_content_semantic_coverage.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "supported-acts-current-semantic-artifact"
+      ],
+      "selected_families": [],
+      "rationale": "Record the single qualified Blood Legion rule and unchanged adjacent unsupported scope.",
+      "source_obligation": "Official June and July Chaos Daemons faction packs, page 124. Verify own Movement/Charge, 1 CP, both keywords, terrain-only transit and phase-end expiry.",
+      "unchanged_work": "Native path search, terrain geometry, endpoint/collision checks, Charge flight, CP and effect ledgers and replay validation retain existing authorities. Only the scoped phase-choice and source-backed effect admission change."
+    },
+    "data/source_audits/ci64_provenance_v1/gore-hungry-onslaught-transition-v1.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "gore-hungry-onslaught-predecessor-admission"
+      ],
+      "selected_families": [],
+      "rationale": "Retain and validate predecessor admission, and add native Movement/Charge, negative controls and exact deterministic replay.",
+      "source_obligation": "Official June and July Chaos Daemons faction packs, page 124. Verify own Movement/Charge, 1 CP, both keywords, terrain-only transit and phase-end expiry.",
+      "unchanged_work": "Native path search, terrain geometry, endpoint/collision checks, Charge flight, CP and effect ledgers and replay validation retain existing authorities. Only the scoped phase-choice and source-backed effect admission change."
+    },
+    "docs/ABILITY_SUPPORT_MATRIX_V2.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Document the request-bound Charge declaration proof and its closed, opt-in scope.",
+      "rationale": "Record the single qualified Blood Legion rule and unchanged adjacent unsupported scope.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/ADAPTER_DECISION_CONTRACT.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Record the single qualified Blood Legion rule and unchanged adjacent unsupported scope.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/CROSS_SOURCE_SEMANTIC_EQUIVALENCE.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Record the single qualified Blood Legion rule and unchanged adjacent unsupported scope.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/factions/audit/chaos-daemons.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Record the single qualified Blood Legion rule and unchanged adjacent unsupported scope.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/factions/chaos-daemons.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Record the single qualified Blood Legion rule and unchanged adjacent unsupported scope.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/factions/guides/chaos-daemons.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Record the single qualified Blood Legion rule and unchanged adjacent unsupported scope.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -947,7 +824,7 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Document the request-bound Charge declaration proof and its closed, opt-in scope.",
+      "rationale": "Record the single qualified Blood Legion rule and unchanged adjacent unsupported scope.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -957,47 +834,91 @@
         "cavalcade-authority-admission",
         "stage2-strict-replay-test-admission",
         "close-quarters-test-admission",
-        "monster-mash-v995-roster-admission",
         "engine-numerical-identity-admission",
         "round4-malice-bearer-liveness",
         "round4-battle-shock-event-wounds",
         "phase-end-healing-test-admission",
         "sheathed-in-brass-test-admission",
+        "blood-begets-skulls-test-admission",
         "stage3-ordinary-melee-test-admission",
         "skulls-beget-blood-test-admission",
         "stage3-flight-normal-move-test-admission",
         "wrath-undeniable-test-admission",
-        "pre-roll-charge-flight-test-admission"
+        "pre-roll-charge-flight-test-admission",
+        "gore-hungry-onslaught-predecessor-admission"
       ],
       "selected_families": [],
-      "rationale": "Authenticate the revised native test and opt-in proof without relaxing predecessor source or test guards.",
-      "source_obligation": "Core Rules 21.03 and retained v931 timing; use the unchanged Charge target filter, native resolve_charge_move contract, and unmodified dice spec.",
-      "unchanged_work": "No existing workload calls this opt-in read-only policy. It checks one caller-supplied witness at no more than eleven attainable sums per mode. No path search, chance sample, decision submission, resolver change or normal gameplay work is added."
+      "rationale": "Retain and validate predecessor admission, and add native Movement/Charge, negative controls and exact deterministic replay.",
+      "source_obligation": "Official June and July Chaos Daemons faction packs, page 124. Verify own Movement/Charge, 1 CP, both keywords, terrain-only transit and phase-end expiry.",
+      "unchanged_work": "Native path search, terrain geometry, endpoint/collision checks, Charge flight, CP and effect ledgers and replay validation retain existing authorities. Only the scoped phase-choice and source-backed effect admission change."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
       "operations": [
         "cavalcade-authority-admission",
-        "source-record",
-        "order108-terrain-semantics",
-        "order109-unit-control-semantics",
-        "order110-action-battle-shock-semantics",
         "phase-end-healing-source-and-report"
       ],
       "selected_families": [],
-      "rationale": "Refresh existing packaged and contract identities; no schema, adapter route or wire format changes.",
-      "source_obligation": "Core Rules 21.03 and retained v931 timing; use the unchanged Charge target filter, native resolve_charge_move contract, and unmodified dice spec.",
-      "unchanged_work": "No existing workload calls this opt-in read-only policy. It checks one caller-supplied witness at no more than eleven attainable sums per mode. No path search, chance sample, decision submission, resolver change or normal gameplay work is added."
+      "rationale": "Regenerate examples and dependent hashes for the exact combined Onslaught and landed Charge-flight runtime.",
+      "source_obligation": "Official June and July Chaos Daemons faction packs, page 124. Verify own Movement/Charge, 1 CP, both keywords, terrain-only transit and phase-end expiry.",
+      "unchanged_work": "Native path search, terrain geometry, endpoint/collision checks, Charge flight, CP and effect ledgers and replay validation retain existing authorities. Only the scoped phase-choice and source-backed effect admission change."
     },
-    "src/warhammer40k_core/ai/charge_flight_admission.py": {
+    "src/warhammer40k_core/engine/charge_preselection_stratagems.py": {
       "category": "rule_semantics",
       "operations": [
-        "pre-roll-charge-flight-admission"
+        "blood-begets-skulls-charge-preselection",
+        "gore-hungry-onslaught-phase-opportunities"
       ],
       "selected_families": [],
-      "rationale": "Prove both modes independently on the same request and choose the issued option using exact 2D6 counts.",
-      "source_obligation": "Core Rules 21.03 and retained v931 timing; use the unchanged Charge target filter, native resolve_charge_move contract, and unmodified dice spec.",
-      "unchanged_work": "No existing workload calls this opt-in read-only policy. It checks one caller-supplied witness at no more than eleven attainable sums per mode. No path search, chance sample, decision submission, resolver change or normal gameplay work is added."
+      "rationale": "Offer the source-backed Stratagem at ordinary own-phase unit-selection boundaries and grant an existing phase-scoped terrain permission.",
+      "source_obligation": "Official June and July Chaos Daemons faction packs, page 124. Verify own Movement/Charge, 1 CP, both keywords, terrain-only transit and phase-end expiry.",
+      "unchanged_work": "Native path search, terrain geometry, endpoint/collision checks, Charge flight, CP and effect ledgers and replay validation retain existing authorities. Only the scoped phase-choice and source-backed effect admission change."
+    },
+    "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/detachments/blood_legion/stratagems.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "skulls-beget-blood-shooting-resolution",
+        "wrath-undeniable-fight-retention",
+        "gore-hungry-onslaught-source-backed-terrain"
+      ],
+      "selected_families": [],
+      "rationale": "Offer the source-backed Stratagem at ordinary own-phase unit-selection boundaries and grant an existing phase-scoped terrain permission.",
+      "source_obligation": "Official June and July Chaos Daemons faction packs, page 124. Verify own Movement/Charge, 1 CP, both keywords, terrain-only transit and phase-end expiry.",
+      "unchanged_work": "Native path search, terrain geometry, endpoint/collision checks, Charge flight, CP and effect ledgers and replay validation retain existing authorities. Only the scoped phase-choice and source-backed effect admission change."
+    },
+    "src/warhammer40k_core/engine/phases/movement_handler.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "movement-witness-membership-validation",
+        "gore-hungry-onslaught-phase-opportunities"
+      ],
+      "selected_families": [],
+      "rationale": "Offer the source-backed Stratagem at ordinary own-phase unit-selection boundaries and grant an existing phase-scoped terrain permission.",
+      "source_obligation": "Official June and July Chaos Daemons faction packs, page 124. Verify own Movement/Charge, 1 CP, both keywords, terrain-only transit and phase-end expiry.",
+      "unchanged_work": "Native path search, terrain geometry, endpoint/collision checks, Charge flight, CP and effect ledgers and replay validation retain existing authorities. Only the scoped phase-choice and source-backed effect admission change."
+    },
+    "src/warhammer40k_core/engine/stratagems_requests.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "gore-hungry-onslaught-phase-opportunities"
+      ],
+      "selected_families": [],
+      "rationale": "Offer the source-backed Stratagem at ordinary own-phase unit-selection boundaries and grant an existing phase-scoped terrain permission.",
+      "source_obligation": "Official June and July Chaos Daemons faction packs, page 124. Verify own Movement/Charge, 1 CP, both keywords, terrain-only transit and phase-end expiry.",
+      "unchanged_work": "Native path search, terrain geometry, endpoint/collision checks, Charge flight, CP and effect ledgers and replay validation retain existing authorities. Only the scoped phase-choice and source-backed effect admission change."
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_blood_legion_ir_support_2026_27.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "blood-begets-skulls-source-activation",
+        "skulls-beget-blood-shooting-resolution",
+        "wrath-undeniable-fight-retention",
+        "gore-hungry-onslaught-source-backed-terrain"
+      ],
+      "selected_families": [],
+      "rationale": "Offer the source-backed Stratagem at ordinary own-phase unit-selection boundaries and grant an existing phase-scoped terrain permission.",
+      "source_obligation": "Official June and July Chaos Daemons faction packs, page 124. Verify own Movement/Charge, 1 CP, both keywords, terrain-only transit and phase-end expiry.",
+      "unchanged_work": "Native path search, terrain geometry, endpoint/collision checks, Charge flight, CP and effect ledgers and replay validation retain existing authorities. Only the scoped phase-choice and source-backed effect admission change."
     },
     "tests/code_quality/test_engine_numerical_identity_admission.py": {
       "category": "rule_semantics",
@@ -1012,19 +933,51 @@
         "pre-roll-charge-flight-test-admission"
       ],
       "selected_families": [],
-      "rationale": "Authenticate the revised native test and opt-in proof without relaxing predecessor source or test guards.",
-      "source_obligation": "Core Rules 21.03 and retained v931 timing; use the unchanged Charge target filter, native resolve_charge_move contract, and unmodified dice spec.",
-      "unchanged_work": "No existing workload calls this opt-in read-only policy. It checks one caller-supplied witness at no more than eleven attainable sums per mode. No path search, chance sample, decision submission, resolver change or normal gameplay work is added."
+      "rationale": "Retain and validate predecessor admission, and add native Movement/Charge, negative controls and exact deterministic replay.",
+      "source_obligation": "Official June and July Chaos Daemons faction packs, page 124. Verify own Movement/Charge, 1 CP, both keywords, terrain-only transit and phase-end expiry.",
+      "unchanged_work": "Native path search, terrain geometry, endpoint/collision checks, Charge flight, CP and effect ledgers and replay validation retain existing authorities. Only the scoped phase-choice and source-backed effect admission change."
     },
-    "tests/infrastructure/adapters/test_charge_flight_admission.py": {
+    "tests/factions/chaos_daemons/integration/test_blood_begets_skulls.py": {
       "category": "rule_semantics",
       "operations": [
-        "pre-roll-charge-flight-admission"
+        "blood-begets-skulls-test-admission",
+        "gore-hungry-onslaught-native-validation"
       ],
       "selected_families": [],
-      "rationale": "Prove both modes independently on the same request and choose the issued option using exact 2D6 counts.",
-      "source_obligation": "Core Rules 21.03 and retained v931 timing; use the unchanged Charge target filter, native resolve_charge_move contract, and unmodified dice spec.",
-      "unchanged_work": "No existing workload calls this opt-in read-only policy. It checks one caller-supplied witness at no more than eleven attainable sums per mode. No path search, chance sample, decision submission, resolver change or normal gameplay work is added."
+      "rationale": "Retain and validate predecessor admission, and add native Movement/Charge, negative controls and exact deterministic replay.",
+      "source_obligation": "Official June and July Chaos Daemons faction packs, page 124. Verify own Movement/Charge, 1 CP, both keywords, terrain-only transit and phase-end expiry.",
+      "unchanged_work": "Native path search, terrain geometry, endpoint/collision checks, Charge flight, CP and effect ledgers and replay validation retain existing authorities. Only the scoped phase-choice and source-backed effect admission change."
+    },
+    "tests/factions/chaos_daemons/integration/test_gore_hungry_onslaught.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "gore-hungry-onslaught-native-validation"
+      ],
+      "selected_families": [],
+      "rationale": "Retain and validate predecessor admission, and add native Movement/Charge, negative controls and exact deterministic replay.",
+      "source_obligation": "Official June and July Chaos Daemons faction packs, page 124. Verify own Movement/Charge, 1 CP, both keywords, terrain-only transit and phase-end expiry.",
+      "unchanged_work": "Native path search, terrain geometry, endpoint/collision checks, Charge flight, CP and effect ledgers and replay validation retain existing authorities. Only the scoped phase-choice and source-backed effect admission change."
+    },
+    "tests/factions/chaos_daemons/integration/test_skulls_beget_blood.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "skulls-beget-blood-test-admission",
+        "gore-hungry-onslaught-native-validation"
+      ],
+      "selected_families": [],
+      "rationale": "Retain and validate predecessor admission, and add native Movement/Charge, negative controls and exact deterministic replay.",
+      "source_obligation": "Official June and July Chaos Daemons faction packs, page 124. Verify own Movement/Charge, 1 CP, both keywords, terrain-only transit and phase-end expiry.",
+      "unchanged_work": "Native path search, terrain geometry, endpoint/collision checks, Charge flight, CP and effect ledgers and replay validation retain existing authorities. Only the scoped phase-choice and source-backed effect admission change."
+    },
+    "tests/infrastructure/source_governance/unit/test_blocked_row_classification.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "gore-hungry-onslaught-native-validation"
+      ],
+      "selected_families": [],
+      "rationale": "Retain and validate predecessor admission, and add native Movement/Charge, negative controls and exact deterministic replay.",
+      "source_obligation": "Official June and July Chaos Daemons faction packs, page 124. Verify own Movement/Charge, 1 CP, both keywords, terrain-only transit and phase-end expiry.",
+      "unchanged_work": "Native path search, terrain geometry, endpoint/collision checks, Charge flight, CP and effect ledgers and replay validation retain existing authorities. Only the scoped phase-choice and source-backed effect admission change."
     }
   },
   "milestone": "ordinary",

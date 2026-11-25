@@ -1,0 +1,80 @@
+{
+  "schema": "finite-gore-hungry-onslaught-transition-v1",
+  "base": "f69eda2040ab55db4dd18686eee69edafcca9dd2",
+  "retained_transition_sha256": "fd5511973dabe4068f618dec2f1f1419cb79f99629e831b9b14a810ab3cb110e",
+  "retained_runtime_fingerprint": "3e65aaeb280065edad60fe80cf210522a93ad41ea8318c6bfc34e0e7f2614533",
+  "runtime_fingerprint": "1610294a6227b0fed4e77ec9ec457dfa9c4c044d520c3af56650b0eaf4410081",
+  "replaced_sources": {
+    "src/warhammer40k_core/engine/charge_preselection_stratagems.py": {
+      "before": "369694145ac6b28019b4fd75fe90a6a482e63f66e06a4a710743e8f7b2b12083",
+      "after": "827b4477b72dd7127958f81574d835c2aaf99e46b70ebc12ce24235fdc03e2be"
+    },
+    "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/detachments/blood_legion/stratagems.py": {
+      "before": "99648d47e8246c424163b67df7fdf2114361f786115e3ce9d21161ab2830299e",
+      "after": "3241df18adccc6b93f6ea24ca0222969e5cb93741e65f9b26fc2fd980a842bf0"
+    },
+    "src/warhammer40k_core/engine/stratagems_requests.py": {
+      "before": "78c9f03e89a86f38b13adaea1957045867a34d04715acaae0f7ea03f15c034a1",
+      "after": "21e0c8ec7787254bbaf7d313256649a60f33ee9661cf87f3259be4a26dad3e43"
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_blood_legion_ir_support_2026_27.py": {
+      "before": "5a5d47a3757bba5a52913de00b5ff6d153b532588747dd1a5f5fd86c79f3fed6",
+      "after": "43659fff6c185c4f5f26769b380d16a92358bdde61aadabf0784bd21c0f88e74"
+    }
+  },
+  "new_sources": {
+    "src/warhammer40k_core/engine/phases/movement_handler.py": "3fc69ae23d5c44146ba7a998e7fb41c72e9ae13cbd5d5ba5deb07a304045507f"
+  },
+  "updated_files": {
+    "tests/infrastructure/source_governance/unit/test_blocked_row_classification.py": {
+      "before": {
+        "mode": "100644",
+        "blob_sha1": "4f7388c915253f285c0ed8c3ff9bcb730634ada4",
+        "sha256": "32d202415e5947bed75e740362d2d2b40de2ffe3af282e775e305b41bf501f33",
+        "bytes": 10798
+      },
+      "after": {
+        "mode": "100644",
+        "blob_sha1": "58a57b98cea6776433b9cef99b1747929a521c85",
+        "sha256": "901336e2a44f83246b108dd0903f06f84bb0ffaf588eb0ed95080c2dcaada145",
+        "bytes": 11209
+      }
+    },
+    "tests/factions/chaos_daemons/integration/test_blood_begets_skulls.py": {
+      "before": {
+        "mode": "100644",
+        "blob_sha1": "abd93ba35dffaddca54d214320fe7b780d62c692",
+        "sha256": "27f5617e3e182cd547caedee49c2383c291a96ed76b40ef71a26730f072a1c84",
+        "bytes": 12934
+      },
+      "after": {
+        "mode": "100644",
+        "blob_sha1": "1b978113cb9e2f683eb7f2f6e51bf2ae3ca94e89",
+        "sha256": "5b52f6c73a1652086a1bf63947a57726c29a095a28c14bb0949f095450ecd00d",
+        "bytes": 13932
+      }
+    },
+    "tests/factions/chaos_daemons/integration/test_skulls_beget_blood.py": {
+      "before": {
+        "mode": "100644",
+        "blob_sha1": "0dc3397715d85a7297bd5dafb9a0379c2cd9dcac",
+        "sha256": "8fffccffbedd6b697d85d2b0da189435d8251c88c88f96ae69e865cfe1abd6b9",
+        "bytes": 21058
+      },
+      "after": {
+        "mode": "100644",
+        "blob_sha1": "2ac8d06bbbda606eaecc3f68b7dd38f79f6f2647",
+        "sha256": "c93228606f0f51e5aeaea0d7dc9c9ba6b4eb07b6961d99611e1f8b8ffc749b24",
+        "bytes": 21701
+      }
+    }
+  },
+  "added_files": {
+    "tests/factions/chaos_daemons/integration/test_gore_hungry_onslaught.py": {
+      "mode": "100644",
+      "blob_sha1": "02ec20e0f09474ef1de0970c7fb2eac4874faaa1",
+      "sha256": "3fc91f2a6b9c0306f906d1bf48fabd8268c7c290ab395433108d6199085e2b9b",
+      "bytes": 12395
+    }
+  }
+}
