@@ -239,6 +239,15 @@ def move_trigger_source_context(
         raise GameLifecycleError("Move completion source game or round drift.")
     phase = _hooks._battle_phase_from_token(payload.get("phase"))
     turn_player_id = _hooks._payload_string(payload, "active_player_id")
+    if event.event_type == "charge_move_completed":
+        from warhammer40k_core.engine.interrupted_charge import charge_interruption_at_event
+
+        charge_source = charge_interruption_at_event(
+            event_records=decisions.event_log.records,
+            event_index=decisions.event_log.records.index(event),
+        )
+        if charge_source is not None and charge_source.host_phase is BattlePhase.MOVEMENT:
+            phase, turn_player_id = charge_source.host_phase, charge_source.turn_player_id
     if owner not in state.player_ids or turn_player_id not in state.player_ids:
         raise GameLifecycleError("Move completion source player is invalid.")
     return {

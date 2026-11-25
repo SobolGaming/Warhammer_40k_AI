@@ -30,6 +30,7 @@ from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.event_log import validate_json_value
+from warhammer40k_core.engine.interrupted_charge import charge_action_in_current_phase
 from warhammer40k_core.engine.mutation_decision_authority import validate_mutation_decision_closure
 from warhammer40k_core.engine.phase import (
     BattlePhase,
@@ -53,7 +54,7 @@ def pending_charge_roll(
     if (
         phase is None
         or phase.active_selection is None
-        or state.current_battle_phase is not BattlePhase.CHARGE
+        or not charge_action_in_current_phase(state)
         or phase.active_selection.player_id != phase.active_player_id
     ):
         raise GameLifecycleError("Pending Charge roll requires an active selection.")

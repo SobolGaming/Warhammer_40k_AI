@@ -8,6 +8,7 @@ from warhammer40k_core.core.modifiers import Modifier, RollModifier
 from warhammer40k_core.engine.catalog_modifier_ignore import ModifierIgnoreKind
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.interrupted_charge import charge_action_in_current_phase
 from warhammer40k_core.engine.modifier_evaluation import (
     ModifierEvaluationSubject,
     modifier_inventory_payload,
@@ -31,7 +32,7 @@ def _active_scope(state: GameState, unit_id: str, kind: ModifierIgnoreKind) -> s
         charge = state.charge_phase_state
         selection = None if charge is None else charge.active_selection
         if (
-            state.current_battle_phase is not BattlePhase.CHARGE
+            not charge_action_in_current_phase(state)
             or selection is None
             or selection.unit_instance_id != unit_id
         ):

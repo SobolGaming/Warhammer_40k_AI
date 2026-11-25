@@ -14,7 +14,7 @@ from warhammer40k_core.engine.charge_declaration import (
     ChargeRollResult,
 )
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
-from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)
 
@@ -173,9 +173,12 @@ class ChargePhaseState:
         if self.interruption is not None:
             if type(self.interruption) is not ChargeInterruption:
                 raise GameLifecycleError("Charge interruption must be typed.")
-            if self.interruption.suspended_phase.battle_round != self.battle_round:
+            if (
+                self.interruption.suspended_phase is not None
+                and self.interruption.suspended_phase.battle_round != self.battle_round
+            ):
                 raise GameLifecycleError("Charge interruption round drift.")
-            if self.interruption.suspended_phase.active_player_id == self.active_player_id:
+            if self.interruption.turn_player_id == self.active_player_id:
                 raise GameLifecycleError("Charge interruption must belong to the other player.")
             if any(unit != self.interruption.unit_instance_id for unit in self.selected_unit_ids):
                 raise GameLifecycleError("Charge interruption selected an unauthorized unit.")
@@ -401,18 +404,34 @@ class ChargeInterruption:
     allowed_target_ids: tuple[str, ...] | None
     target_range_inches: float
     roll_limit: ChargeRollLimit | None
-    suspended_phase: ChargePhaseState
+    suspended_phase: ChargePhaseState | None
+    movement_source_player_id: str | None = None
+    movement_source_event_id: str | None = None
+
+    @property
+    def turn_player_id(self) -> str:
+        if self.suspended_phase is not None:
+            return self.suspended_phase.active_player_id
+        return _validate_identifier("movement_source_player_id", self.movement_source_player_id)
+
+    @property
+    def host_phase(self) -> BattlePhase:
+        return BattlePhase.CHARGE if self.suspended_phase is not None else BattlePhase.MOVEMENT
 
     def __post_init__(self) -> None:
         for name in ("source_id", "source_request_id", "source_result_id", "unit_instance_id"):
             _validate_identifier(name, getattr(self, name))
-        if (
+        if self.suspended_phase is None:
+            _validate_identifier("movement_source_player_id", self.movement_source_player_id)
+            _validate_identifier("movement_source_event_id", self.movement_source_event_id)
+        elif (
             type(self.suspended_phase) is not ChargePhaseState
             or self.suspended_phase.interruption is not None
+            or not self.suspended_phase.phase_complete
+            or self.movement_source_player_id is not None
+            or self.movement_source_event_id is not None
         ):
-            raise GameLifecycleError("Charge interruption requires an ordinary parent phase.")
-        if not self.suspended_phase.phase_complete:
-            raise GameLifecycleError("Charge interruption requires completed ordinary Charges.")
+            raise GameLifecycleError("Charge interruption requires a completed ordinary Charge.")
         if (
             self.allowed_target_ids is not None
             and self.allowed_target_ids
@@ -444,7 +463,17 @@ class ChargeInterruption:
                     else list(self.allowed_target_ids),
                     "target_range_inches": self.target_range_inches,
                     "roll_limit": msgspec.to_builtins(self.roll_limit),
-                    "suspended_phase": self.suspended_phase.to_payload(),
+                    "suspended_phase": (
+                        None if self.suspended_phase is None else self.suspended_phase.to_payload()
+                    ),
+                    **(
+                        {
+                            "movement_source_player_id": self.movement_source_player_id,
+                            "movement_source_event_id": self.movement_source_event_id,
+                        }
+                        if self.suspended_phase is None
+                        else {}
+                    ),
                 }
             ),
         )
@@ -463,7 +492,13 @@ class ChargeInterruption:
             parsed.allowed_target_ids,
             parsed.target_range_inches,
             parsed.roll_limit,
-            ChargePhaseState.from_payload(cast(ChargePhaseStatePayload, parsed.suspended_phase)),
+            None
+            if parsed.suspended_phase is None
+            else ChargePhaseState.from_payload(
+                cast(ChargePhaseStatePayload, parsed.suspended_phase)
+            ),
+            parsed.movement_source_player_id,
+            parsed.movement_source_event_id,
         )
         if result.to_payload() != payload:
             raise GameLifecycleError("Charge interruption payload shape drift.")
@@ -478,7 +513,9 @@ class _ChargeInterruptionPayload(msgspec.Struct, frozen=True, forbid_unknown_fie
     allowed_target_ids: tuple[str, ...] | None
     target_range_inches: float
     roll_limit: ChargeRollLimit | None
-    suspended_phase: dict[str, object]
+    suspended_phase: dict[str, object] | None
+    movement_source_player_id: str | None = None
+    movement_source_event_id: str | None = None
 
 
 def _validate_charge_distance_states(values: object) -> tuple[ChargeDistanceState, ...]:

@@ -43,11 +43,15 @@ def begin_phase(
         if status is not None:
             return status
         charge_state = _charge._ensure_charge_phase_state(state=state)
-    move_completed_status = resolve_charge_move_completed_hooks(
-        state=state, decisions=decisions, handler=self, movement_action=_charge.CHARGE_MOVE_ACTION
-    )
-    if move_completed_status is not None:
-        return move_completed_status
+    if state.current_battle_phase is BattlePhase.CHARGE:
+        move_completed_status = resolve_charge_move_completed_hooks(
+            state=state,
+            decisions=decisions,
+            handler=self,
+            movement_action=_charge.CHARGE_MOVE_ACTION,
+        )
+        if move_completed_status is not None:
+            return move_completed_status
     from warhammer40k_core.engine.interrupted_charge import finish_interrupted_charge_if_complete
 
     interrupted = finish_interrupted_charge_if_complete(

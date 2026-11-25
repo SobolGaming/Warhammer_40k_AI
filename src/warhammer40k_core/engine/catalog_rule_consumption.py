@@ -1736,6 +1736,7 @@ def _available_catalog_unit_move_completed_mortal_wounds_groups(
         "normal_move",
         "advance",
         "fall_back",
+        "charge_move",
     }:
         return ()
     source_rules_unit = rules_unit_view_by_id(
@@ -1812,6 +1813,12 @@ def _catalog_unit_move_completed_mortal_wounds_group_from_clause(
     if type(clause) is not RuleClause:
         raise GameLifecycleError("Catalog move-completed mortal wounds requires a clause.")
     if not _clause_is_supported_unit_move_completed_mortal_wounds(clause):
+        return None
+    if clause.trigger is None:
+        raise GameLifecycleError("Move-completed effect is missing its classified trigger.")
+    timing_window = parameter_payload(clause.trigger.parameters)["timing_window"]
+    # A charge-move-end trigger follows the action, not the enclosing player's phase.
+    if (timing_window == "charge_move_end") != (context.movement_action == "charge_move"):
         return None
     supported_effects = tuple(
         (effect_index, effect)

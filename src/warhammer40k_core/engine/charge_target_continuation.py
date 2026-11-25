@@ -15,6 +15,7 @@ from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.event_log import canonical_json, validate_json_value
+from warhammer40k_core.engine.interrupted_charge import charge_action_in_current_phase
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatus
 from warhammer40k_core.engine.target_replacement import (
     SELECT_TARGET_REPLACEMENT_DECISION_TYPE,
@@ -38,7 +39,7 @@ def is_charge_target_replacement_request(*, state: GameState, request: DecisionR
     """Bind shared choices to their action, including during a Shooting interruption."""
     phase = state.charge_phase_state
     if (
-        state.current_battle_phase is not BattlePhase.CHARGE
+        not charge_action_in_current_phase(state)
         or state.out_of_phase_shooting_state is not None
         or phase is None
     ):
@@ -58,7 +59,7 @@ def pending_charge(state: GameState) -> ChargePhaseState:
         phase is None
         or phase.active_selection is None
         or phase.move_pending_distance_state() is None
-        or state.current_battle_phase is not BattlePhase.CHARGE
+        or not charge_action_in_current_phase(state)
         or phase.battle_round != state.battle_round
     ):
         raise GameLifecycleError("Charge continuation requires its current rolled action.")
@@ -368,7 +369,7 @@ def refresh_pending_charge_move(
 
     phase = state.charge_phase_state
     if (
-        state.current_battle_phase is not BattlePhase.CHARGE
+        not charge_action_in_current_phase(state)
         or phase is None
         or phase.active_selection is None
         or not decisions.queue.pending_requests

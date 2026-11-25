@@ -81,26 +81,9 @@ def _apply_heroic_intervention_handler(
             "Heroic Intervention requires completed ordinary Charge authority."
         )
     source = heroic_charge_source(state=state, use=use_record, parent=parent)
-    state.replace_charge_phase_state(
-        ChargePhaseState(
-            battle_round=state.battle_round,
-            active_player_id=use_record.player_id,
-            interruption=source,
-        )
-    )
-    from warhammer40k_core.engine.active_player_scopes import charge_scope, push_scope
+    from warhammer40k_core.engine.interrupted_charge import start_interrupted_charge
 
-    scope = charge_scope(state)
-    if scope is None:
-        raise GameLifecycleError("Charge interruption failed to create its active-player scope.")
-    push_scope(state, scope)
-    decisions.event_log.append(
-        "interrupted_charge_started",
-        {
-            "player_id": use_record.player_id,
-            "source": source.to_payload(),
-        },
-    )
+    start_interrupted_charge(state=state, decisions=decisions, use=use_record, source=source)
 
 
 __all__ = ("_apply_heroic_intervention_handler",)

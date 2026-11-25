@@ -37,6 +37,41 @@ def runtime_contribution() -> RuntimeContentContribution:
             *_gore_hungry_onslaught_records(),
             _skulls_beget_blood_record(),
             _wrath_undeniable_record(),
+            _fools_flight_record(),
+        ),
+    )
+
+
+def _fools_flight_record() -> StratagemCatalogRecord:
+    (record,) = tuple(
+        record
+        for record in source_backed_detachment_stratagem_activation_records()
+        if record.detachment_id == blood_legion_ir.BLOOD_LEGION_DETACHMENT_ID
+        and record.definition.stratagem_id == blood_legion_ir.FOOLS_FLIGHT_STRATAGEM_ID
+    )
+    definition = record.definition
+    return replace(
+        record,
+        definition=replace(
+            definition,
+            timing=replace(
+                definition.timing, trigger_kind=TimingTriggerKind.AFTER_ENEMY_UNIT_ENDS_FALL_BACK
+            ),
+            target_spec=replace(
+                definition.target_spec,
+                target_policy_id=CANONICAL_FRIENDLY_RULES_UNIT_TARGET_POLICY_ID,
+            ),
+            effect_payload=validate_json_value(
+                {
+                    "rule_ir": blood_legion_ir.fools_flight_rule_ir_payload(
+                        source_id=definition.source_id,
+                        target_text=definition.target_descriptor,
+                        effect_text=definition.effect_descriptor,
+                    ),
+                    "requires_opponent_turn": True,
+                    "charge_after_enemy_fall_back_trigger_range_inches": 6,
+                }
+            ),
         ),
     )
 

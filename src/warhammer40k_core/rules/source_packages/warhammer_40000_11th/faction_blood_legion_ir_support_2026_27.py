@@ -701,6 +701,40 @@ def _gateway_unto_damnation_payload() -> RuleIRPayload:
     )
 
 
+FOOLS_FLIGHT_STRATAGEM_ID = "000009816006"
+
+
+def fools_flight_rule_ir_payload(
+    *, source_id: str, target_text: str, effect_text: str
+) -> RuleIRPayload:
+    normalized_text = f"{target_text} {effect_text}"
+    descriptor_id = f"{source_id}:charge-after-enemy-fall-back"
+    return _payload(
+        descriptor_id,
+        source_id,
+        normalized_text,
+        (
+            _effect_clause(
+                clause_id=f"{descriptor_id}:grant",
+                template_id=GRANT_ABILITY_TEMPLATE_ID,
+                normalized_text=normalized_text,
+                source_text=effect_text,
+                target=_target("selected_unit", normalized_text, target_text),
+                effects=(
+                    _effect(
+                        "grant_ability",
+                        normalized_text,
+                        "Declare a charge with your unit.",
+                        (_parameter("ability", "charge_after_enemy_fall_back"),),
+                    ),
+                ),
+                duration=None,
+            ),
+        ),
+        "phase17s-stratagem-activation-template-v2",
+    )
+
+
 def _gore_hungry_onslaught_payload() -> RuleIRPayload:
     normalized_text = f"{GORE_HUNGRY_ONSLAUGHT_TARGET} {GORE_HUNGRY_ONSLAUGHT_EFFECT}"
     return _payload(
