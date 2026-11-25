@@ -724,7 +724,12 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         )
         predecessor_sources[source] = binding["after"]
     assert gore["new_sources"].keys().isdisjoint(predecessor_sources)
-    for source, digest in (predecessor_sources | gore["new_sources"]).items():
+    predecessor_sources.update(gore["new_sources"])
+    for source, binding in fools_record["replaced_sources"].items():
+        assert binding["before"] == predecessor_sources[source]
+        predecessor_sources[source] = binding["after"]
+    assert fools_record["new_sources"].keys().isdisjoint(predecessor_sources)
+    for source, digest in (predecessor_sources | fools_record["new_sources"]).items():
         assert digest == hashlib.sha256((ROOT / source).read_bytes()).hexdigest()
     wrath_owner = selection.WRATH_UNDENIABLE_OWNER
     assert set(wrath["added_files"]) == {wrath_owner}
