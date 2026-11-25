@@ -14,6 +14,26 @@
         }
       }
     },
+    "ci/quality_shards/all.txt": {
+      "before_sha256": "efcca4fe167e3ee4bef7037cc4e71066ccd33654694a0d8ac22b77fcb5ca7970",
+      "after_sha256": "f7b6cb51753d8836fd5991e325c94b258e279bfa75a0c23da78e45d4cccb085d",
+      "owners": {
+        "@document": {
+          "before": "efcca4fe167e3ee4bef7037cc4e71066ccd33654694a0d8ac22b77fcb5ca7970",
+          "after": "f7b6cb51753d8836fd5991e325c94b258e279bfa75a0c23da78e45d4cccb085d"
+        }
+      }
+    },
+    "ci/quality_shards/shard-2.txt": {
+      "before_sha256": "2e5d6b5bf17db3b6ba9d6b204a128a9dd21e301aea344f34acb866c6d74a5ade",
+      "after_sha256": "b32739f0cca65db2999a729b07cb354e8b664b2e21188d99f505c4c2a95c8aaf",
+      "owners": {
+        "@document": {
+          "before": "2e5d6b5bf17db3b6ba9d6b204a128a9dd21e301aea344f34acb866c6d74a5ade",
+          "after": "b32739f0cca65db2999a729b07cb354e8b664b2e21188d99f505c4c2a95c8aaf"
+        }
+      }
+    },
     "ci/test_shards/durations.json": {
       "before_sha256": "31202965f3706a3a387ee4454e5fb8ba52038bfa0f08b4ba63d353bf1bcd2563",
       "after_sha256": "3bd92f1597516c5618f508bba535cc27894fc2895f83ed0fa488c0bb1f1110f7",
@@ -929,6 +949,22 @@
       "rationale": "Refresh the verified faction package checksums and document the one source row newly executable.",
       "source_obligation": "Expose declared semantic status accurately after native Fool's Flight behavior has been proven.",
       "unchanged_work": "Documentation only; all runtime algorithms, typed source validators and benchmark workloads are unchanged."
+    },
+    "ci/quality_shards/all.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Admit the existing Fool's Flight preservation regression to its owning quality shard without changing execution policy.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/quality_shards/shard-2.txt": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Admit the existing Fool's Flight preservation regression to its owning quality shard without changing execution policy.",
+      "source_obligation": null,
+      "unchanged_work": null
     },
     "ci/test_shards/durations.json": {
       "category": "rule_semantics",
