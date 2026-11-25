@@ -1,5 +1,5 @@
 {
-  "base": "6701b3108eeea0124932cac5d70758e18dea89f2",
+  "base": "740b558ab5542e4120fdc49d05bb6819d1b53698",
   "path": "src/warhammer40k_core/engine/stratagems_eligibility.py",
   "change": {
     "before_sha256": "8ca0274919eebd381513f9e99ca938935ec27cbd2d5b69dfc364deadfbde0ef1",

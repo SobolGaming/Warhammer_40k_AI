@@ -1,6 +1,6 @@
 {
   "schema": "finite-fools-flight-test-v1",
-  "base": "6701b3108eeea0124932cac5d70758e18dea89f2",
+  "base": "740b558ab5542e4120fdc49d05bb6819d1b53698",
   "retained_transition_sha256": "a12562dd774086af360aca74bda457ebf0f6e10ae3e533ae4af6e021f3110031",
   "retained_runtime_fingerprint": "0f7d296e1cbe41efd947f0b36f0bcbf2745511c8456d167b6ee26b6552b9d637",
   "runtime_fingerprint": "b1ecd9a6bd751abd9bb732e2bb1d63edcf14839cde43183ae88133c789e368f1",

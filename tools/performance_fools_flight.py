@@ -5,10 +5,10 @@ from __future__ import annotations
 import hashlib
 from pathlib import Path
 
-BASE = "6701b3108eeea0124932cac5d70758e18dea89f2"
+BASE = "740b558ab5542e4120fdc49d05bb6819d1b53698"
 PATH = "src/warhammer40k_core/engine/stratagems_eligibility.py"
 SCOPE = "docs/performance/policy-v3/fools-flight-smoke-scope.json"
-SCOPE_SHA256 = "a0ff344400560e03908fe74546457d0dfc91f3465ff295aaaff4b00c56c7c9f5"
+SCOPE_SHA256 = "3f44ce8e95c64c0a4c3a9f9d96b816b814fa96cbd575ff283f2f688972fa00e5"
 _POLICY_BEFORE = "7f522cd8485dc761ba56dd271728222fbace7dcc1c93134a51bff7b7b67728b5"
 _POLICY_AFTER = "b50d348363bd0926f6b8bbc09f15a4269ec2e723ef05f28841bf7d6ed1b66358"
 _INSERTIONS = (
