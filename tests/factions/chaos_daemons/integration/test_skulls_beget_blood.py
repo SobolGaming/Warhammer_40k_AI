@@ -4,8 +4,13 @@ from dataclasses import replace
 from pathlib import Path
 
 import pytest
+from tools.core_deep_strike_catalog_overlay import with_current_deep_strike
+from tools.generate_ability_support_matrix import (
+    BLOODLETTERS_HEIGHT_OVERRIDES,
+    _ability_support_catalog_package,  # pyright: ignore[reportPrivateUsage]
+)
 
-from tests.daemons_native_source_helpers import BELAKOR, native_definitions
+from tests.daemons_native_source_helpers import BELAKOR, SELECTED, native_definitions
 from tests.phase11c_command_phase_helpers import center_marker_definition
 from tests.save7_allocation_helpers import BLOODLETTERS
 from tests.support.faction_batch01 import (
@@ -32,6 +37,7 @@ from warhammer40k_core.engine.command_points import CommandPointSourceKind
 from warhammer40k_core.engine.damage_allocation import DamageKind, apply_damage_to_model
 from warhammer40k_core.engine.decision_request import DecisionError, DecisionRequest
 from warhammer40k_core.engine.destruction_provenance import ModelDestructionAttribution
+from warhammer40k_core.engine.list_validation import AttachmentDeclaration
 from warhammer40k_core.engine.phase import (
     BattlePhase,
     GameLifecycleStage,
@@ -39,8 +45,15 @@ from warhammer40k_core.engine.phase import (
     SetupStep,
 )
 from warhammer40k_core.engine.replay import ReplayRunner
+from warhammer40k_core.engine.rules_unit_geometry import (
+    placed_alive_geometry_models_for_component_unit,
+    placed_alive_geometry_models_for_rules_unit,
+)
+from warhammer40k_core.engine.shooting_selection_range import target_in_range_model_ids
 from warhammer40k_core.engine.stratagems import DECLINE_STRATAGEM_WINDOW_OPTION_ID
 from warhammer40k_core.geometry.pose import Pose
+from warhammer40k_core.rules.catalog_package import CanonicalCatalogPackage
+from warhammer40k_core.rules.core_deep_strike_successor import ABILITY_ID as DEEP_STRIKE_ABILITY_ID
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_blood_legion_ir_support_2026_27 as blood_legion_ir,
 )
@@ -49,6 +62,8 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
 )
 
 STRATAGEM_ID = blood_legion_ir.SKULLS_BEGET_BLOOD_STRATAGEM_ID
+BLOODMASTER = "000001455"
+INFRACTORS = "000004080"
 INFANTRY = "own:infantry"
 MOUNTED = "own:mounted"
 WRONG_KEYWORD = "own:undivided"
@@ -63,7 +78,57 @@ DETACHMENTS = {
 
 @pytest.fixture(scope="module")
 def shooting_skulls_definitions(selected_army_source_index: Path | None) -> Section02Definitions:
-    native = native_definitions(selected_army_source_index)
+    return _blood_legion_definitions(native_definitions(selected_army_source_index))
+
+
+@pytest.fixture(scope="module")
+def attached_skulls_definitions(selected_army_source_index: Path | None) -> Section02Definitions:
+    # The production bridge has no reviewed Bloodmaster height. Use a test
+    # height while retaining the source datasheet, base and attachment relation.
+    test_height = replace(
+        BLOODLETTERS_HEIGHT_OVERRIDES[0],
+        datasheet_id=BLOODMASTER,
+        model_name="Bloodmaster",
+        height_source_id="test:skulls-beget-blood:bloodmaster:height",
+        height_document_reference="Attached formation test fixture",
+    )
+    with pytest.MonkeyPatch.context() as monkeypatch:
+        monkeypatch.setattr(
+            "tools.generate_ability_support_matrix.BLOODLETTERS_HEIGHT_OVERRIDES",
+            (*BLOODLETTERS_HEIGHT_OVERRIDES, test_height),
+        )
+        monkeypatch.setattr(
+            "tools.generate_ability_support_matrix.with_current_deep_strike",
+            _overlay_attached_fixture_deep_strike,
+        )
+        package = _ability_support_catalog_package(
+            datasheet_ids=(*SELECTED, BLOODMASTER, INFRACTORS, LORD, "000004090"),
+            source_index_dir=selected_army_source_index,
+        )
+    return _blood_legion_definitions(Section02Definitions(package, 0.0))
+
+
+def _overlay_attached_fixture_deep_strike(
+    package: CanonicalCatalogPackage,
+) -> CanonicalCatalogPackage:
+    # This Shooting checkpoint does not exercise the unaudited Bloodmaster
+    # reserve descriptor. Keep the production overlay exact for the other rows.
+    catalog = package.army_catalog
+    sheets = tuple(
+        replace(
+            sheet,
+            abilities=tuple(a for a in sheet.abilities if a.ability_id != DEEP_STRIKE_ABILITY_ID),
+        )
+        if sheet.datasheet_id == BLOODMASTER
+        else sheet
+        for sheet in catalog.datasheets
+    )
+    return with_current_deep_strike(
+        replace(package, army_catalog=replace(catalog, datasheets=sheets))
+    )
+
+
+def _blood_legion_definitions(native: Section02Definitions) -> Section02Definitions:
     catalog = native.package.army_catalog
     source_factions = {"CD": "chaos-daemons", "EC": "emperors-children"}
     factions = tuple(
@@ -127,6 +192,7 @@ def _choices(request: DecisionRequest) -> dict[tuple[str, str], str]:
         enemy_id = effect["visible_enemy_unit_instance_id"]
         assert isinstance(unit_id, str)
         assert isinstance(enemy_id, str)
+        assert (unit_id, enemy_id) not in choices
         choices[unit_id, enemy_id] = option.option_id
     return choices
 
@@ -354,3 +420,91 @@ def test_skulls_beget_blood_allows_advance_but_excludes_fall_back(
     (use,) = tuple(r for r in battle.state.stratagem_use_records if r.stratagem_id == STRATAGEM_ID)
     assert use.targeted_unit_instance_ids == (MOUNTED,)
     assert battle.state.command_point_total("owner") == 1
+
+
+@pytest.mark.integration
+def test_skulls_beget_blood_attached_leader_range_defender_allocation_and_replay(
+    attached_skulls_definitions: Section02Definitions,
+) -> None:
+    definitions = attached_skulls_definitions
+    battle = scene(
+        definitions,
+        (
+            selection(definitions, BLOODLETTERS, "body"),
+            selection(definitions, BLOODMASTER, "leader"),
+        ),
+        (selection(definitions, INFRACTORS, "body"), selection(definitions, LORD, "leader")),
+        phase=BattlePhase.SHOOTING,
+        attachments=(AttachmentDeclaration("leader", "body"),),
+        enemy_attachments=(AttachmentDeclaration("leader", "body"),),
+        detachment_id_by_faction=DETACHMENTS,
+        seed="skulls-beget-blood-attached",
+    )
+    source_formation = "attached-unit:own:body"
+    enemy_formation = "attached-unit:foe:body"
+    locate(
+        battle,
+        "own:body",
+        tuple(Pose.at(10.8 + 1.5 * (i // 5), 11 + 1.5 * (i % 5)) for i in range(10)),
+    )
+    locate(battle, "own:leader", (Pose.at(14, 14),))
+    locate(
+        battle,
+        "foe:body",
+        tuple(
+            Pose.at(23 + 1.5 * (i // 5), 11 + 1.5 * (i % 5))
+            for i in range(len(battle.units["foe:body"].own_models))
+        ),
+    )
+    locate(battle, "foe:leader", (Pose.at(26, 14),))
+    targets = placed_alive_geometry_models_for_rules_unit(
+        state=battle.state, unit_instance_id=enemy_formation
+    )
+    for component, within_range in (("own:body", False), ("own:leader", True)):
+        assert (
+            bool(
+                target_in_range_model_ids(
+                    attacker_models=placed_alive_geometry_models_for_component_unit(
+                        state=battle.state, component_unit_instance_id=component
+                    ),
+                    target_models=targets,
+                    range_inches=8,
+                )
+            )
+            is within_range
+        )
+    battle.state.gain_command_points(
+        player_id="owner",
+        amount=2,
+        source_id="skulls:cp",
+        source_kind=CommandPointSourceKind.OTHER,
+        cap_exempt=True,
+    )
+    anchor(battle)
+
+    request = begin(battle.session)
+    choices = _choices(request)
+    assert set(choices) == {(source_formation, enemy_formation)}
+    allocation = require_request(
+        _submit(battle.session, choices[source_formation, enemy_formation]),
+        "select_mortal_wound_model",
+    )
+    assert battle.state.command_point_total("owner") == 1
+    bodyguard_ids = set(battle.units["foe:body"].own_model_ids())
+    while allocation.decision_type == "select_mortal_wound_model":
+        assert allocation.actor_id == "opponent"
+        assert {option.option_id for option in allocation.options} <= bodyguard_ids
+        allocation = require_request(_submit(battle.session, allocation.options[0].option_id))
+    assert events(battle.session, "generic_stratagem_roll_pool_mortal_wounds_resolved")
+    destroyed = events(battle.session, "model_destroyed")
+    assert destroyed
+    for payload in destroyed:
+        attribution = ModelDestructionAttribution.from_model_destroyed_payload(payload)
+        assert attribution.destroying_player_id == "owner"
+        assert attribution.source_rules_unit_instance_id == source_formation
+        assert attribution.source_model_instance_id is None
+
+    replay = ReplayRunner.from_payload(
+        battle.session.replay_artifact(artifact_id="skulls-beget-blood-attached")
+    ).run()
+    assert replay.reproduced_exactly, replay

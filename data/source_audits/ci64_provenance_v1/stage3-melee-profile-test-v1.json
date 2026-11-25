@@ -1,0 +1,20 @@
+{
+  "schema": "finite-stage3-melee-profile-test-v1",
+  "base": "5ebd32bf98f5313e7ef0790f601a88ee1a6eb8fe",
+  "retained_transition_sha256": "1555a7c7046c5ca5d266f7993e8862a5e85c08b2754cec1e340d04ca3cfe430b",
+  "retained_runtime_fingerprint": "0f9bc14dd7b611704595a5c72599170c33b31c6b83c535b9135b5a745321f77c",
+  "runtime_fingerprint": "f7a33a7ce44113b8754268ca735a0dfde601b7a1d81394e2c12c55382edefdf0",
+  "added_files": {
+    "tests/infrastructure/adapters/test_ordinary_melee_profile_policy.py": {
+      "mode": "100644",
+      "blob_sha1": "f0b5ea3f9f2f8ce20c06f32dd722e5188067e16c",
+      "sha256": "b0e6e802f70fd12f83a2e2fd472dce5dc83ca7cb29cd90b1bba0aa0d295d17c5",
+      "bytes": 18909
+    }
+  },
+  "sources": {
+    "src/warhammer40k_core/ai/ordinary_melee_profile_policy.py": "5b1ae2009d9c89d5471b95367c6767cf8ab9ce3d1a2d41aee52be76f0d5bfca3",
+    "src/warhammer40k_core/ai/player_policy.py": "27d900f0387f1889def4d0ccb56a1268458ea1d7ee6085f0f3a0113a0b355e64",
+    "src/warhammer40k_core/ai/runner.py": "b303035d61188e91a019438bb446e94d12698577e1c3500f59f566c4a47a84c0"
+  }
+}

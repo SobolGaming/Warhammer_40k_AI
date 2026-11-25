@@ -1343,7 +1343,6 @@ def test_range_and_los_consumers_declare_living_model_policy_explicitly() -> Non
     living_range_consumers = {
         ENGINE / "primary_mission_action_lifecycle_policy.py",
         ENGINE / "primary_mission_action_options.py",
-        STRATAGEMS_GEOMETRY,
     }
     present_range_consumers = {
         ENGINE / "catalog_attack_context_rule_runtime.py",

@@ -695,7 +695,7 @@ SKULLS_BEGET_BLOOD_TRANSITION = (
     "data/source_audits/ci64_provenance_v1/skulls-beget-blood-transition-v1.json"
 )
 SKULLS_BEGET_BLOOD_TRANSITION_SHA256 = (
-    "be7eafbb6843867ccc9eaf20db21d1f6405cf49d9a1e4ad4b4c871723c19b9be"
+    "d2357f156b4b12e24cab454932a9b814345925555ef70582e59ca27c975befce"
 )
 SKULLS_BEGET_BLOOD_OWNER = "tests/factions/chaos_daemons/integration/test_skulls_beget_blood.py"
 
@@ -704,7 +704,8 @@ def _skulls_beget_blood_test_successor(
     root: Path,
     *,
     previous: dict[str, object],
-    previous_raw: bytes,
+    previous_runtime: str,
+    previous_transition: bytes,
     previous_sources: dict[str, str],
     retained_additions: TestSuccessors,
 ) -> tuple[str, TestSuccessors, TestSuccessors, bytes]:
@@ -726,9 +727,9 @@ def _skulls_beget_blood_test_successor(
             "updated_files",
         }
         or record["schema"] != "finite-skulls-beget-blood-transition-v1"
-        or record["base"] != "5ebd32bf98f5313e7ef0790f601a88ee1a6eb8fe"
-        or record["retained_transition_sha256"] != hashlib.sha256(previous_raw).hexdigest()
-        or record["retained_runtime_fingerprint"] != previous["runtime_fingerprint"]
+        or record["base"] != "16069416ea8de4c5623402c1cc6d53e55b673cb0"
+        or record["retained_transition_sha256"] != hashlib.sha256(previous_transition).hexdigest()
+        or record["retained_runtime_fingerprint"] != previous_runtime
         or record["added_files"].keys() != {SKULLS_BEGET_BLOOD_OWNER}
         or record["updated_files"].keys() != {classifier}
         or record["updated_files"][classifier].keys() != {"before", "after"}
@@ -810,33 +811,38 @@ def _blood_begets_skulls_test_successor(
     added = _selection_members(record["added_files"], root)
     if added.keys() & brass_additions.keys():
         raise SystemExit("Blood Begets Skulls duplicates a Sheathed in Brass test owner.")
+    retained_runtime = record["runtime_fingerprint"]
+    retained_transition = previous_transition + b"\0" + raw
+    retained_additions = {**brass_additions, **added}
+    stage3 = _stage3_melee_profile_successor(
+        root, previous_runtime=retained_runtime, previous_transition=retained_transition
+    )
+    if stage3 is not None:
+        retained_runtime, stage3_tests, stage3_raw = stage3
+        if stage3_tests.keys() & (retained_additions.keys() | {classification_owner}):
+            raise SystemExit("Stage 3 melee profile tests overlap the predecessor selection.")
+        retained_additions.update(stage3_tests)
+        retained_transition += b"\0" + stage3_raw
     successor_path = root / SKULLS_BEGET_BLOOD_TRANSITION
     _selection_no_links(root, successor_path)
     if successor_path.exists():
+        if stage3 is None:
+            raise SystemExit("Skulls Beget Blood requires the exact Stage 3 melee predecessor.")
         fingerprint, updated, additions, successor_raw = _skulls_beget_blood_test_successor(
             root,
             previous=record,
-            previous_raw=raw,
+            previous_runtime=retained_runtime,
+            previous_transition=retained_transition,
             previous_sources=current_sources,
-            retained_additions={**brass_additions, **added},
+            retained_additions=retained_additions,
         )
-        return (
-            fingerprint,
-            updated,
-            additions,
-            previous_transition + b"\0" + raw + b"\0" + successor_raw,
-        )
+        return fingerprint, updated, additions, retained_transition + b"\0" + successor_raw
     for source, digest in current_sources.items():
         _checked_bytes(root, source, digest)
     updated = _selection_members(
         {classification_owner: record["updated_files"][classification_owner]["after"]}, root
     )
-    return (
-        record["runtime_fingerprint"],
-        updated,
-        {**brass_additions, **added},
-        previous_transition + b"\0" + raw,
-    )
+    return retained_runtime, updated, retained_additions, retained_transition
 
 
 def _sheathed_in_brass_test_addition(
@@ -905,6 +911,48 @@ def _sheathed_in_brass_test_addition(
         _selection_members(record["added_files"], root),
         raw,
     )
+
+
+def _stage3_melee_profile_successor(
+    root: Path, *, previous_runtime: str, previous_transition: bytes
+) -> tuple[str, TestSuccessors, bytes] | None:
+    name = "data/source_audits/ci64_provenance_v1/stage3-melee-profile-test-v1.json"
+    path = root / name
+    _selection_no_links(root, path)
+    if not path.exists():
+        return None
+    raw = _checked_bytes(
+        root, name, "d6878ec80208f32f09e52fa324fe7237123dc90f403d2238139d020ba780df40"
+    )
+    record = json.loads(raw, object_pairs_hook=_selection_object)
+    owner = "tests/infrastructure/adapters/test_ordinary_melee_profile_policy.py"
+    sources = {
+        "src/warhammer40k_core/ai/ordinary_melee_profile_policy.py",
+        "src/warhammer40k_core/ai/player_policy.py",
+        "src/warhammer40k_core/ai/runner.py",
+    }
+    if (
+        record.keys()
+        != {
+            "schema",
+            "base",
+            "retained_transition_sha256",
+            "retained_runtime_fingerprint",
+            "runtime_fingerprint",
+            "sources",
+            "added_files",
+        }
+        or record["schema"] != "finite-stage3-melee-profile-test-v1"
+        or record["base"] != "5ebd32bf98f5313e7ef0790f601a88ee1a6eb8fe"
+        or record["retained_transition_sha256"] != hashlib.sha256(previous_transition).hexdigest()
+        or record["retained_runtime_fingerprint"] != previous_runtime
+        or record["sources"].keys() != sources
+        or record["added_files"].keys() != {owner}
+    ):
+        raise SystemExit("Stage 3 melee profile test transition differs.")
+    for source in sorted(sources):
+        _checked_bytes(root, source, record["sources"][source])
+    return record["runtime_fingerprint"], _selection_members(record["added_files"], root), raw
 
 
 def exact_movement_test_transition(

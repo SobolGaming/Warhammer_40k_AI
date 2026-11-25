@@ -581,8 +581,6 @@ def visible_enemy_unit_ids_for_source(
     requested_player_id = _validate_identifier("player_id", player_id)
     requested_source_id = _validate_identifier("source_unit_instance_id", source_unit_instance_id)
     distance = _visible_enemy_range_inches(range_inches)
-    if _unit_owner(state=state, unit_instance_id=requested_source_id) != requested_player_id:
-        return ()
     if require_unengaged:
         return _visible_unengaged_enemy_unit_ids(
             state=state,
@@ -590,6 +588,8 @@ def visible_enemy_unit_ids_for_source(
             source_unit_instance_id=requested_source_id,
             range_inches=distance,
         )
+    if _unit_owner(state=state, unit_instance_id=requested_source_id) != requested_player_id:
+        return ()
     candidate_ids: list[str] = []
     for army in state.army_definitions:
         if army.player_id == requested_player_id:
@@ -612,14 +612,26 @@ def _visible_unengaged_enemy_unit_ids(
     source_unit_instance_id: str,
     range_inches: int,
 ) -> tuple[str, ...]:
-    from warhammer40k_core.engine.shooting_selection_range import (
-        target_within_shooting_selection_range,
+    from warhammer40k_core.engine.rules_unit_geometry import (
+        placed_alive_geometry_models_for_rules_unit,
     )
+    from warhammer40k_core.engine.shooting_selection_range import target_in_range_model_ids
 
     units = placed_alive_rules_unit_views(state=state)
-    source = rules_unit_view_by_id(state=state, unit_instance_id=source_unit_instance_id)
-    if not rules_unit_has_placed_alive_model(state=state, rules_unit=source):
+    source = next(
+        (
+            unit
+            for unit in units
+            if unit.owner_player_id == player_id
+            and source_unit_instance_id == unit.unit_instance_id
+        ),
+        None,
+    )
+    if source is None:
         return ()
+    source_models = placed_alive_geometry_models_for_rules_unit(
+        state=state, unit_instance_id=source.unit_instance_id
+    )
     scenario = _battlefield_scenario_for_stratagem(state)
     ruleset = state.runtime_ruleset_descriptor()
     terrain_features = _stratagem_terrain_features(state)
@@ -635,13 +647,13 @@ def _visible_unengaged_enemy_unit_ids(
         enemy_id = enemy.unit_instance_id
         if enemy.owner_player_id == player_id:
             continue
-        if not target_within_shooting_selection_range(
-            scenario=scenario,
-            attacking_unit_instance_id=source.unit_instance_id,
-            target_unit_instance_id=enemy_id,
-            max_range_inches=range_inches,
-            placed_alive_attacker_models_only=True,
-            placed_alive_target_models_only=True,
+        target_models = placed_alive_geometry_models_for_rules_unit(
+            state=state, unit_instance_id=enemy_id
+        )
+        if not target_in_range_model_ids(
+            attacker_models=source_models,
+            target_models=target_models,
+            range_inches=range_inches,
         ):
             continue
         if _enemy_unit_is_within_friendly_engagement_range(

@@ -449,15 +449,7 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
     previous_manifest = json.loads(
         subprocess.check_output(["git", "show", shooting_skulls["base"] + ":" + MANIFEST], cwd=ROOT)
     )
-    assert skulls["runtime_fingerprint"] == previous_manifest["fingerprint"]
-    assert shooting_skulls["retained_runtime_fingerprint"] == skulls["runtime_fingerprint"]
     assert shooting_skulls["runtime_fingerprint"] == _record(MANIFEST)["fingerprint"]
-    assert (
-        shooting_skulls["retained_transition_sha256"]
-        == hashlib.sha256(
-            (ROOT / selection.BLOOD_BEGETS_SKULLS_TRANSITION).read_bytes()
-        ).hexdigest()
-    )
     assert (
         skulls["retained_transition_sha256"]
         == hashlib.sha256(
@@ -500,6 +492,55 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         skulls["added_files"][skulls_owner]["sha256"]
         == hashlib.sha256((ROOT / skulls_owner).read_bytes()).hexdigest()
     )
+    stage3 = _record("data/source_audits/ci64_provenance_v1/stage3-melee-profile-test-v1.json")
+    stage3_base_manifest = json.loads(
+        subprocess.check_output(["git", "show", stage3["base"] + ":" + MANIFEST], cwd=ROOT)
+    )
+    assert skulls["runtime_fingerprint"] == stage3_base_manifest["fingerprint"]
+    assert stage3["retained_runtime_fingerprint"] == skulls["runtime_fingerprint"]
+    assert (
+        stage3["retained_transition_sha256"]
+        == hashlib.sha256(
+            (
+                ROOT / "data/source_audits/ci64_provenance_v1/sheathed-in-brass-transition-v1.json"
+            ).read_bytes()
+            + b"\0"
+            + (ROOT / selection.BLOOD_BEGETS_SKULLS_TRANSITION).read_bytes()
+        ).hexdigest()
+    )
+    assert shooting_skulls["retained_runtime_fingerprint"] == stage3["runtime_fingerprint"]
+    assert stage3["runtime_fingerprint"] == previous_manifest["fingerprint"]
+    assert (
+        shooting_skulls["retained_transition_sha256"]
+        == hashlib.sha256(
+            (
+                ROOT / "data/source_audits/ci64_provenance_v1/sheathed-in-brass-transition-v1.json"
+            ).read_bytes()
+            + b"\0"
+            + (ROOT / selection.BLOOD_BEGETS_SKULLS_TRANSITION).read_bytes()
+            + b"\0"
+            + (
+                ROOT / "data/source_audits/ci64_provenance_v1/stage3-melee-profile-test-v1.json"
+            ).read_bytes()
+        ).hexdigest()
+    )
+    stage3_owner = "tests/infrastructure/adapters/test_ordinary_melee_profile_policy.py"
+    assert set(stage3["added_files"]) == {stage3_owner}
+    assert stage3_owner in active_files
+    assert sum(stage3_owner in group for group in groups) == 1
+    assert (
+        stage3["added_files"][stage3_owner]["sha256"]
+        == hashlib.sha256((ROOT / stage3_owner).read_bytes()).hexdigest()
+    )
+    stage3_cases = {
+        stage3_owner + "::" + name
+        for name in (
+            "test_great_axe_actor_offer_selects_applied_wounds_and_replays[seekers]",
+            "test_great_axe_actor_offer_selects_applied_wounds_and_replays[bloodthirster]",
+            "test_great_axe_dispatch_rejects_identical_view_at_unadmitted_checkpoint",
+            "test_wounded_seeker_first_changes_applied_wound_expectation",
+        )
+    }
     brass_owner = "tests/factions/chaos_daemons/integration/test_sheathed_in_brass.py"
     assert set(brass["added_files"]) == {brass_owner}
     assert brass_owner in active_files
@@ -935,6 +976,7 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         | round4_cases
         | regeneration_cases
         | brass_cases
+        | stage3_cases
         | {
             selection.BLOOD_BEGETS_SKULLS_OWNER + "::" + case
             for case in (
@@ -961,6 +1003,7 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
             selection.SKULLS_BEGET_BLOOD_OWNER + "::test_skulls_beget_blood_" + case
             for case in (
                 "ordinary_choice_damage_attribution_and_replay",
+                "attached_leader_range_defender_allocation_and_replay",
                 "excludes_both_ends_of_engagement",
                 "has_no_option_when_use_is_illegal[no_cp]",
                 "has_no_option_when_use_is_illegal[opponent_turn]",

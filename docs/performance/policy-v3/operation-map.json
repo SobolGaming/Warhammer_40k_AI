@@ -37313,6 +37313,34 @@
       "sensitive": false,
       "mandatory": true
     },
+    "stage3-ordinary-melee-profile-policy": {
+      "paths": [
+        "src/warhammer40k_core/ai/ordinary_melee_profile_policy.py",
+        "tests/infrastructure/adapters/test_ordinary_melee_profile_policy.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "stage3-ordinary-melee-test-admission": {
+      "paths": [
+        "scripts/engine_numerical_identity_test_admission.py",
+        "data/source_audits/ci64_provenance_v1/stage3-melee-profile-test-v1.json",
+        "tests/code_quality/test_engine_numerical_identity_admission.py"
+      ],
+      "owners": [
+        "@document",
+        "exact_movement_test_transition",
+        "_stage3_melee_profile_successor",
+        "test_identity_inventory_uses_current_twelve_shards_and_native_cohort"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
     "skulls-beget-blood-shooting-resolution": {
       "paths": [
         "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/detachments/blood_legion/stratagems.py",
@@ -37329,6 +37357,7 @@
         "_coverage_payloads",
         "_effect_clause",
         "_effect_selections_for_binding",
+        "_enumerated_target_bindings",
         "_generic_rule_ir_stratagem_unavailable_reason",
         "_resolve_generic_roll_pool_mortal_wounds",
         "_skulls_beget_blood_payload",
@@ -37355,14 +37384,19 @@
         "@document",
         "@module",
         "_blood_begets_skulls_test_successor",
+        "_blood_legion_definitions",
         "_choices",
         "_materialize_battle_formation_effects",
+        "_overlay_attached_fixture_deep_strike",
         "_scene",
         "_skulls_beget_blood_test_successor",
         "_submit",
+        "attached_skulls_definitions",
+        "exact_movement_test_transition",
         "shooting_skulls_definitions",
         "test_identity_inventory_uses_current_twelve_shards_and_native_cohort",
         "test_skulls_beget_blood_allows_advance_but_excludes_fall_back",
+        "test_skulls_beget_blood_attached_leader_range_defender_allocation_and_replay",
         "test_skulls_beget_blood_excludes_both_ends_of_engagement",
         "test_skulls_beget_blood_has_no_option_when_use_is_illegal",
         "test_skulls_beget_blood_ordinary_choice_damage_attribution_and_replay"
