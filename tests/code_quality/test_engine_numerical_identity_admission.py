@@ -343,6 +343,15 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
     assert set(rigid_charge["added_files"]) == {ground_charge.RIGID_OWNER}
     assert ground_charge.RIGID_OWNER in active_files
     assert sum(ground_charge.RIGID_OWNER in group for group in groups) == 1
+    retry = _record(ground_charge.RETRY_TRANSITION)
+    assert retry["base"] == ground_charge.RETRY_BASE
+    assert retry["reviewed_runtime_commit"] == ground_charge.RETRY_REVIEWED_RUNTIME
+    assert set(retry["sources"]) == set(ground_charge.SOURCES)
+    assert set(retry["added_files"]) == {ground_charge.RETRY_OWNER}
+    assert retry["added_cases"] == [
+        f"{ground_charge.RETRY_OWNER}::{name}" for name in ground_charge.RETRY_CASES
+    ]
+    assert sum(ground_charge.RETRY_OWNER in group for group in groups) == 1
     for source, row in group_charge["sources"].items():
         assert row["before"] == charge["sources"][source]
         current_digest = row["after"]
@@ -353,7 +362,11 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
             assert row["after"] == hashlib.sha256(predecessor).hexdigest()
             assert rigid_charge["source"]["before"] == row["after"]
             current_digest = rigid_charge["source"]["after"]
-        assert current_digest == hashlib.sha256((ROOT / source).read_bytes()).hexdigest()
+        assert retry["sources"][source]["before"] == current_digest
+        assert (
+            retry["sources"][source]["after"]
+            == hashlib.sha256((ROOT / source).read_bytes()).hexdigest()
+        )
     assert sum(ground_charge.OWNER in group for group in groups) == 1
     charge_cases = {
         ground_charge.OWNER + "::" + name
@@ -550,6 +563,18 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         pact["retained_transition_sha256"]
         == hashlib.sha256((ROOT / selection.CHARGE_FLIGHT_WALL_TRANSITION).read_bytes()).hexdigest()
     )
+    assert retry["retained_runtime_fingerprint"] == pact["runtime_fingerprint"]
+    assert (
+        retry["retained_transition_sha256"]
+        == hashlib.sha256((ROOT / dark_pact.RECEIPT).read_bytes()).hexdigest()
+    )
+    combined = _record(selection.COMBINED_CHARGE_TRANSITION)
+    assert combined["base"] == selection.COMBINED_CHARGE_BASE
+    assert retry["runtime_fingerprint"] == combined["ground_charge_runtime_fingerprint"]
+    assert (
+        combined["dark_pact_receipt_sha256"]
+        == hashlib.sha256((ROOT / dark_pact.RECEIPT).read_bytes()).hexdigest()
+    )
     assert sum(dark_pact.NEW_TEST in group for group in groups) == 1
     assert len([node for node in current if node.startswith(dark_pact.NEW_TEST + "::")]) == 21
     base_weights = json.loads(
@@ -564,7 +589,19 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
     )
     assert pact["runtime_fingerprint"] == flight_base_manifest["fingerprint"]
     assert pact["runtime_fingerprint"] == fools_record["retained_runtime_fingerprint"]
-    assert fools_record["runtime_fingerprint"] == _record(MANIFEST)["fingerprint"]
+    landed_manifest = subprocess.check_output(
+        ["git", "show", selection.COMBINED_CHARGE_BASE + ":" + MANIFEST], cwd=ROOT
+    )
+    assert combined["landed_manifest_sha256"] == hashlib.sha256(landed_manifest).hexdigest()
+    assert combined["landed_runtime_fingerprint"] == json.loads(landed_manifest)["fingerprint"]
+    assert fools_record["runtime_fingerprint"] == combined["landed_runtime_fingerprint"]
+    flight_raw = (ROOT / fools.TRANSITION).read_bytes()
+    retry_raw = (ROOT / ground_charge.RETRY_TRANSITION).read_bytes()
+    assert _record(MANIFEST)["fingerprint"] == selection.combined_charge_runtime(
+        ROOT, flight_raw, retry_raw
+    )
+    with pytest.raises(SystemExit, match="Combined Charge admission predecessor differs"):
+        selection.combined_charge_runtime(ROOT, flight_raw, retry_raw + b" ")
     assert (
         fools_record["retained_transition_sha256"]
         == hashlib.sha256((ROOT / dark_pact.RECEIPT).read_bytes()).hexdigest()
@@ -1276,6 +1313,7 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         | close_quarters_cases
         | shalaxi_cases
         | charge_cases
+        | set(retry["added_cases"])
         | shooting_cases
         | {
             ground_charge.SCREEN_OWNER

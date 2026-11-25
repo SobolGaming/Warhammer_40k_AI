@@ -1,0 +1,14 @@
+{
+  "schema": "combined-charge-admission-v1",
+  "base": "4d753ec652ee38b394260d3f539df7b04403149b",
+  "reviewed_base_tree": "d69fdc3d05ad62434fe349139e7c721a0147cfad",
+  "reviewed_ground_charge_head": "9df6773c7b234a88e23fce416e8ef306b6e750a7",
+  "landed_runtime_fingerprint": "b1ecd9a6bd751abd9bb732e2bb1d63edcf14839cde43183ae88133c789e368f1",
+  "landed_manifest_sha256": "d48155d9b49a46bfdfc91c7a717160cb2fd935e07037e0470b09cac86a13d1b2",
+  "ground_charge_runtime_fingerprint": "bffd03b4bc11f3f6575aacd7651b5763f687dce83eed277a5f0f362dc0c3086c",
+  "dark_pact_receipt_sha256": "a12562dd774086af360aca74bda457ebf0f6e10ae3e533ae4af6e021f3110031",
+  "fools_flight_receipt_sha256": "4b9f1d94a9383b684108eedf371ee1a080b670dc493891ba1b5349315ee3403f",
+  "ground_charge_receipt_sha256": "0c26e91d36dacb03918a07ecdd5cffc9d5befdc729f443722f038a6687d6df53",
+  "combined_runtime_fingerprint": "dc9eb5d3f570d34d71e26a1c6b8ef794b5723aa812f8de505066309805678d18",
+  "combined_manifest_sha256": "c26c71c97e1d460f53f064a50516bcdc88b0a901ef5324267852ae32031cd3d1"
+}

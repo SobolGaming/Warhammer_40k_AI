@@ -4,7 +4,9 @@ from __future__ import annotations
 
 import hashlib
 import json
+from dataclasses import dataclass
 from pathlib import Path
+from typing import TypedDict, cast
 
 from scripts.behavioral_selection_members import (
     _selection_members,
@@ -30,6 +32,84 @@ SOURCES = (
 )
 
 
+RETRY_TRANSITION = "data/source_audits/ci64_provenance_v1/stage2-ground-charge-retry-test-v1.json"
+RETRY_TRANSITION_SHA256 = "0c26e91d36dacb03918a07ecdd5cffc9d5befdc729f443722f038a6687d6df53"
+RETRY_BASE = "740b558ab5542e4120fdc49d05bb6819d1b53698"
+RETRY_REVIEWED_RUNTIME = "eb50bc30fea67e25e8cb70b2f7b7f0a8b8de5ca6"
+RETRY_OWNER = "tests/infrastructure/adapters/test_ground_charge_engagement_retry.py"
+RETRY_CASES = (
+    "test_rejected_rigid_charge_respects_remaining_budget[geometry]",
+    "test_rejected_rigid_charge_respects_remaining_budget[probe]",
+    "test_rejected_rigid_charge_retries_and_commits_deterministically",
+    "test_successful_eligible_rigid_charge_does_not_run_engagement_grid",
+)
+
+
+class _RetryReceipt(TypedDict):
+    schema: str
+    base: str
+    reviewed_runtime_commit: str
+    retained_transition_sha256: str
+    retained_runtime_fingerprint: str
+    runtime_fingerprint: str
+    sources: dict[str, dict[str, str]]
+    added_files: dict[str, dict[str, object]]
+    added_cases: list[str]
+
+
+@dataclass(frozen=True, slots=True)
+class GroundChargeRetryAdmission:
+    receipt: _RetryReceipt
+    raw: bytes
+
+    def source_pins(self, sources: dict[str, str]) -> dict[str, str]:
+        replacements = self.receipt["sources"]
+        for name, binding in replacements.items():
+            if sources.get(name) != binding["before"]:
+                raise SystemExit("Ground charge retry source predecessor differs: " + name)
+        return {**sources, **{name: binding["after"] for name, binding in replacements.items()}}
+
+    def admit(
+        self, root: Path, *, runtime: str, predecessor: bytes
+    ) -> tuple[str, dict[str, dict[str, object]], bytes]:
+        if (
+            runtime != self.receipt["retained_runtime_fingerprint"]
+            or hashlib.sha256(predecessor).hexdigest() != self.receipt["retained_transition_sha256"]
+        ):
+            raise SystemExit("Ground charge retry requires its exact Dark Pact predecessor.")
+        return (
+            self.receipt["runtime_fingerprint"],
+            _selection_members(self.receipt["added_files"], root),
+            self.raw,
+        )
+
+
+def ground_charge_retry_admission(root: Path) -> GroundChargeRetryAdmission | None:
+    path = root / RETRY_TRANSITION
+    _selection_no_links(root, path)
+    if not path.exists():
+        return None
+    raw = path.read_bytes()
+    if hashlib.sha256(raw).hexdigest() != RETRY_TRANSITION_SHA256:
+        raise SystemExit("Ground charge retry admission receipt bytes differ.")
+    record = cast(_RetryReceipt, json.loads(raw, object_pairs_hook=_selection_object))
+    if (
+        record.keys() != _RetryReceipt.__required_keys__
+        or record["schema"] != "finite-stage2-ground-charge-retry-test-v1"
+        or record["base"] != RETRY_BASE
+        or record["reviewed_runtime_commit"] != RETRY_REVIEWED_RUNTIME
+        or record["sources"].keys() != set(SOURCES)
+        or record["added_files"].keys() != {RETRY_OWNER}
+        or record["added_cases"] != [f"{RETRY_OWNER}::{case}" for case in RETRY_CASES]
+        or any(
+            binding.keys() != {"before", "after"} or binding["before"] == binding["after"]
+            for binding in record["sources"].values()
+        )
+    ):
+        raise SystemExit("Ground charge retry admission inventory differs.")
+    return GroundChargeRetryAdmission(record, raw)
+
+
 def ground_charge_test_successor(
     root: Path,
     *,
@@ -37,6 +117,7 @@ def ground_charge_test_successor(
     previous_runtime: str,
     previous_transition_sha256: str,
     rigid_source: dict[str, str] | None = None,
+    retry: GroundChargeRetryAdmission | None = None,
 ) -> tuple[str, dict[str, dict[str, object]], bytes]:
     raw = transition_path.read_bytes()
     if hashlib.sha256(raw).hexdigest() != TRANSITION_SHA256:
@@ -96,6 +177,10 @@ def ground_charge_test_successor(
         if group is None or rigid_source["before"] != current_sources[RIGID_SOURCE]:
             raise SystemExit("Rigid ground charge source preimage differs.")
         current_sources = {**current_sources, RIGID_SOURCE: rigid_source["after"]}
+    if retry is not None:
+        if rigid_source is None:
+            raise SystemExit("Ground charge retry requires the rigid source predecessor.")
+        current_sources = retry.source_pins(current_sources)
     for name, digest in current_sources.items():
         source = root / name
         _selection_no_links(root, source)

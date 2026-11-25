@@ -1,0 +1,32 @@
+{
+  "schema": "finite-stage2-ground-charge-retry-test-v1",
+  "base": "740b558ab5542e4120fdc49d05bb6819d1b53698",
+  "reviewed_runtime_commit": "eb50bc30fea67e25e8cb70b2f7b7f0a8b8de5ca6",
+  "retained_transition_sha256": "a12562dd774086af360aca74bda457ebf0f6e10ae3e533ae4af6e021f3110031",
+  "retained_runtime_fingerprint": "0f7d296e1cbe41efd947f0b36f0bcbf2745511c8456d167b6ee26b6552b9d637",
+  "runtime_fingerprint": "bffd03b4bc11f3f6575aacd7651b5763f687dce83eed277a5f0f362dc0c3086c",
+  "sources": {
+    "src/warhammer40k_core/ai/ground_charge_candidates.py": {
+      "before": "439096ba693ea8793c9c5405c08d6f2978271111c1d2e7bef9d01d1162d1544b",
+      "after": "3f037af8677bbb7dc70671c558caa0ee99a0a9bcbb3227ec4e2f33e2ff0a71d8"
+    },
+    "src/warhammer40k_core/ai/ground_charge_policy.py": {
+      "before": "aacc6a6ba17261eed94491d4705669177bcddfddc50306a0a7006f696fa931b9",
+      "after": "cd2658365f138f330da0214d15e1d4a842969167ccccdcf1aa23fa1c8f62b700"
+    }
+  },
+  "added_files": {
+    "tests/infrastructure/adapters/test_ground_charge_engagement_retry.py": {
+      "mode": "100644",
+      "bytes": 6737,
+      "sha256": "01662eab39413fd6201809356f66e9beb4d33674f4509f76d5eed69cd484bae2",
+      "blob_sha1": "a500c15ac795266000f41ef020c87b620a57d5d8"
+    }
+  },
+  "added_cases": [
+    "tests/infrastructure/adapters/test_ground_charge_engagement_retry.py::test_rejected_rigid_charge_respects_remaining_budget[geometry]",
+    "tests/infrastructure/adapters/test_ground_charge_engagement_retry.py::test_rejected_rigid_charge_respects_remaining_budget[probe]",
+    "tests/infrastructure/adapters/test_ground_charge_engagement_retry.py::test_rejected_rigid_charge_retries_and_commits_deterministically",
+    "tests/infrastructure/adapters/test_ground_charge_engagement_retry.py::test_successful_eligible_rigid_charge_does_not_run_engagement_grid"
+  ]
+}

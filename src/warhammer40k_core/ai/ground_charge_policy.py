@@ -216,40 +216,60 @@ def prepare_ground_charge_policy(
     deadline = started + native_seconds
     validations: list[ChargeCandidateValidation] = []
     accepted: list[GroundChargeCandidate] = []
-    stop = generated.stop
-    for candidate in generated.candidates:
-        if len(accepted) == accepted_limit:
-            stop = ChargeSearchStop.ACCEPTED_LIMIT
+    raw = 0
+    retry_seconds = 0.0
+    while True:
+        raw += len(generated.candidates)
+        stop = generated.stop
+        for candidate in generated.candidates:
+            if len(accepted) == accepted_limit:
+                stop = ChargeSearchStop.ACCEPTED_LIMIT
+                break
+            if len(validations) == validation_limit:
+                stop = ChargeSearchStop.VALIDATION_LIMIT
+                break
+            probe_started = monotonic()
+            if probe_started >= deadline:
+                stop = ChargeSearchStop.NATIVE_TIMEOUT
+                break
+            receipt = _validate_candidate(
+                session, candidate, min(probe_started + per_probe_seconds, deadline)
+            )
+            if receipt is None:
+                validations.append(
+                    ChargeCandidateValidation(
+                        candidate.candidate_id,
+                        None,
+                        "Native probe wall limit reached.",
+                        monotonic() - probe_started,
+                    )
+                )
+                stop = ChargeSearchStop.NATIVE_TIMEOUT
+                break
+            validations.append(receipt)
+            if receipt.status is not LifecycleStatusKind.INVALID:
+                accepted.append(candidate)
+        if (
+            accepted
+            or generated.retry_engagement is None
+            or stop is ChargeSearchStop.NATIVE_TIMEOUT
+        ):
             break
         if len(validations) == validation_limit:
             stop = ChargeSearchStop.VALIDATION_LIMIT
             break
-        probe_started = monotonic()
-        if probe_started >= deadline:
+        retry_started = monotonic()
+        if retry_started >= deadline:
             stop = ChargeSearchStop.NATIVE_TIMEOUT
             break
-        receipt = _validate_candidate(
-            session, candidate, min(probe_started + per_probe_seconds, deadline)
-        )
-        if receipt is None:
-            validations.append(
-                ChargeCandidateValidation(
-                    candidate.candidate_id,
-                    None,
-                    "Native probe wall limit reached.",
-                    monotonic() - probe_started,
-                )
-            )
-            stop = ChargeSearchStop.NATIVE_TIMEOUT
-            break
-        validations.append(receipt)
-        if receipt.status is not LifecycleStatusKind.INVALID:
-            accepted.append(candidate)
-    validation_seconds = monotonic() - started
+        generated = generated.retry_engagement()
+        retry_seconds = monotonic() - retry_started
+    generation_seconds += retry_seconds
+    validation_seconds = monotonic() - started - retry_seconds
     if _checkpoint_hash(session) != checkpoint:
         raise PolicyError("Live ground charge checkpoint changed during validation.")
     counts = ChargeSearchCounts(
-        raw=len(generated.candidates),
+        raw=raw,
         geometry_work=generated.geometry_work,
         accepted=len(accepted),
         rejected=sum(probe.status is LifecycleStatusKind.INVALID for probe in validations),

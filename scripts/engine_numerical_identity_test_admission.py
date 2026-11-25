@@ -1305,6 +1305,33 @@ def _charge_flight_wall_test_addition(
     return record["runtime_fingerprint"], _selection_members(record["added_files"], root), raw
 
 
+COMBINED_CHARGE_TRANSITION = (
+    "data/source_audits/ci64_provenance_v1/combined-charge-admission-v1.json"
+)
+COMBINED_CHARGE_TRANSITION_SHA256 = (
+    "85a8eb553ae08b36446c89ebccbc2081ea7e363984f77a462690f1eb348801ec"
+)
+COMBINED_CHARGE_BASE = "4d753ec652ee38b394260d3f539df7b04403149b"
+
+
+def combined_charge_runtime(root: Path, flight_raw: bytes, retry_raw: bytes) -> str:
+    """Bind both independently validated lineages to their one composed runtime."""
+    receipt = _checked_bytes(root, COMBINED_CHARGE_TRANSITION, COMBINED_CHARGE_TRANSITION_SHA256)
+    binding = json.loads(receipt, object_pairs_hook=_selection_object)
+    if (
+        binding["schema"] != "combined-charge-admission-v1"
+        or binding["base"] != COMBINED_CHARGE_BASE
+        or hashlib.sha256(flight_raw).hexdigest() != binding["fools_flight_receipt_sha256"]
+        or hashlib.sha256(retry_raw).hexdigest() != binding["ground_charge_receipt_sha256"]
+    ):
+        raise SystemExit("Combined Charge admission predecessor differs.")
+    _checked_bytes(root, MANIFEST, binding["combined_manifest_sha256"])
+    fingerprint = binding["combined_runtime_fingerprint"]
+    if not isinstance(fingerprint, str):
+        raise SystemExit("Combined Charge runtime fingerprint is malformed.")
+    return fingerprint
+
+
 def exact_movement_test_transition(
     root: Path, retained_cutover_sha256: str
 ) -> TestTransition | None:
@@ -1857,6 +1884,7 @@ def exact_movement_test_transition(
     from scripts.stage2_ground_charge_test_admission import (
         SCREEN_TRANSITION,
         SHOOTING_TRANSITION,
+        ground_charge_retry_admission,
         ground_charge_test_successor,
         normal_shooting_test_successor,
         rigid_ground_charge_test_successor,
@@ -1877,6 +1905,7 @@ def exact_movement_test_transition(
     rigid_charge = rigid_ground_charge_test_successor(
         root, previous_runtime=None if regeneration is None else regeneration[0]
     )
+    retry_charge = ground_charge_retry_admission(root)
     ground_charge = None
     ground_charge_path = root / GROUND_CHARGE_TEST_TRANSITION
     _selection_no_links(root, ground_charge_path)
@@ -1889,6 +1918,7 @@ def exact_movement_test_transition(
             previous_runtime=runtime,
             previous_transition_sha256=ROUND3_SHALAXI_SHA256,
             rigid_source=None if rigid_charge is None else rigid_charge[1],
+            retry=retry_charge,
         )
         runtime = ground_charge[0]
 
@@ -1990,13 +2020,34 @@ def exact_movement_test_transition(
 
     fools_flight = load_fools_flight_admission(root)
     flight_addition = None
+    flight_runtime = None
     if fools_flight is not None:
         if pact is None:
             raise SystemExit("Fool's Flight requires the exact Dark Pact predecessor.")
-        runtime, flight_tests, flight_raw = fools_flight.admits_after(
-            root=root, runtime=runtime, predecessor=pact[3]
+        flight_runtime, flight_tests, flight_raw = fools_flight.admits_after(
+            root=root, runtime=pact[0], predecessor=pact[3]
         )
         flight_addition = (flight_tests, flight_raw)
+    retry_addition = None
+    retry_runtime = None
+    if retry_charge is not None:
+        if pact is None or ground_charge is None:
+            raise SystemExit(
+                "Ground charge retry requires the Dark Pact and ground charge lineage."
+            )
+        # Bind to the historical Dark Pact receipt, not a parallel successor.
+        retry_runtime, retry_tests, retry_raw = retry_charge.admit(
+            root, runtime=pact[0], predecessor=pact[3]
+        )
+        retry_addition = (retry_tests, retry_raw)
+    if flight_runtime is not None and retry_runtime is not None:
+        if flight_addition is None or retry_addition is None:
+            raise SystemExit("Combined Charge source admission is incomplete.")
+        runtime = combined_charge_runtime(root, flight_addition[1], retry_addition[1])
+    elif flight_runtime is not None:
+        runtime = flight_runtime
+    elif retry_runtime is not None:
+        runtime = retry_runtime
 
     retained = _identity_test_transition(
         root,
@@ -2171,6 +2222,12 @@ def exact_movement_test_transition(
             raise SystemExit("Fool's Flight tests overlap predecessor tests.")
         additions.update(flight_tests)
         raw += b"\0" + flight_raw
+    if retry_addition is not None:
+        retry_tests, retry_raw = retry_addition
+        if retry_tests.keys() & (updated.keys() | added.keys() | additions.keys()):
+            raise SystemExit("Ground charge retry tests overlap their predecessor selection.")
+        additions.update(retry_tests)
+        raw += b"\0" + retry_raw
     return updated, {**added, **additions}, retained_raw + b"\0" + raw
 
 
