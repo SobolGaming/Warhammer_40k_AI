@@ -1,0 +1,56 @@
+{
+  "schema": "finite-fools-flight-test-v1",
+  "base": "ab3a4ac03854964649f74efe5b8cebd528d3e25a",
+  "retained_transition_sha256": "93199961c9111e9cc0dd527f2b1224fd4a6e2c9e627ef735fac37cf7b30b5c27",
+  "retained_runtime_fingerprint": "6580f37c0a152b8e39723a8aa5c7371c389826af531913de973c9ac4f100b66d",
+  "runtime_fingerprint": "cef0a4a5006fbbd770fc2a4d158ae01f89779b6b515a4b2b5db67e6a41d190e1",
+  "replaced_sources": {
+    "src/warhammer40k_core/engine/charge_phase_flow.py": {
+      "before": "8555063eb6ba4ed24a714a474e0d439aca1368be35bde098320b1aec2bc21b3f",
+      "after": "7ab1d66eb096417ea2757c600d392f87f435a72ac7e793da500cc6b31c0c754e"
+    },
+    "src/warhammer40k_core/engine/charge_roll_flow.py": {
+      "before": "e076961474a43f0a9671cb9cf6b4c17f9740e3a98abc6b096cb0dd9966019cd3",
+      "after": "4125bbc95678e3d7030096758c20c3d480c40882c7cfd76a7f90852cd66f0279"
+    },
+    "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/detachments/blood_legion/stratagems.py": {
+      "before": "8324867d91876c18a8ae045047ccdf8b566231dfe0f34814900368be240bf86e",
+      "after": "b4a0b3ace23ea9292b2355a2d020ddf2ec8936356d373dcb324cf74ef06d25a6"
+    },
+    "src/warhammer40k_core/engine/stratagems_eligibility.py": {
+      "before": "8ca0274919eebd381513f9e99ca938935ec27cbd2d5b69dfc364deadfbde0ef1",
+      "after": "8710548a1a3a07fdda22e451eb4f8f81d9206ab1c3b77d577c1bb1b452ba668c"
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_blood_legion_ir_support_2026_27.py": {
+      "before": "6817fc9a9716554cb33e844229512dedaa446cdf12d0b5764cdc64c6c28a622a",
+      "after": "d4b8238a75079f3c6d49a1625d5e71183c362293a0258c758e91266f5ea28db1"
+    }
+  },
+  "new_sources": {
+    "src/warhammer40k_core/engine/movement_charge_stratagem.py": "1fa3d6f94bd50b3958087a5ea91422513b308dabd099c2027d68d5e159821bb6"
+  },
+  "added_files": {
+    "tests/factions/chaos_daemons/integration/test_fools_flight.py": {
+      "mode": "100644",
+      "blob_sha1": "cab0ef0f719f86d8b3b612f66c963b65ad254f6c",
+      "sha256": "ef3090703c270fccfc9c01c3bc096f572b5beceaf57bf16b2519057a86b860d0",
+      "bytes": 14593
+    }
+  },
+  "updated_files": {
+    "tests/infrastructure/source_governance/unit/test_blocked_row_classification.py": {
+      "before": {
+        "mode": "100644",
+        "blob_sha1": "95040c7d69d11bca887cd450521a040d62110f39",
+        "sha256": "aba698741823c0a06af773ccf06d48a16cd0f7a37c6aed8b56a9f0e8cbd0a22d",
+        "bytes": 11209
+      },
+      "after": {
+        "mode": "100644",
+        "blob_sha1": "d7887c985e1abb277df172caec553e9317838d05",
+        "sha256": "b10de433dbd34b4fb9d4d6deb1e3aada7099370338ddccf194daf346136af289",
+        "bytes": 11631
+      }
+    }
+  }
+}

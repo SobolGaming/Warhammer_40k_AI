@@ -957,6 +957,13 @@ def _wrath_undeniable_test_successor(
             current_sources[source] = binding["after"]
         current_sources.update(successor["new_sources"])
         classification = successor["updated_files"][classifier]["after"]
+    from scripts.fools_flight_test_admission import load_fools_flight_admission
+
+    fools_flight = load_fools_flight_admission(root)
+    if fools_flight is not None:
+        current_sources, classification = fools_flight.replace_pins(
+            sources=current_sources, classification=classification
+        )
     for source, digest in current_sources.items():
         _checked_bytes(root, source, digest)
     updated = _selection_members({classifier: classification}, root)
@@ -1979,6 +1986,18 @@ def exact_movement_test_transition(
     if pact is not None:
         runtime, pact_updated, pact_added, pact_raw = pact
         test_successors.update(pact_updated)
+    from scripts.fools_flight_test_admission import load_fools_flight_admission
+
+    fools_flight = load_fools_flight_admission(root)
+    flight_addition = None
+    if fools_flight is not None:
+        if pact is None:
+            raise SystemExit("Fool's Flight requires the exact Dark Pact predecessor.")
+        runtime, flight_tests, flight_raw = fools_flight.admits_after(
+            root=root, runtime=runtime, predecessor=pact_raw
+        )
+        flight_addition = (flight_tests, flight_raw)
+
     retained = _identity_test_transition(
         root,
         retained_cutover_sha256,
@@ -2146,6 +2165,12 @@ def exact_movement_test_transition(
         updated.update(pact_updated)
         additions.update(pact_added)
         raw += b"\0" + pact_raw
+    if flight_addition is not None:
+        flight_tests, flight_raw = flight_addition
+        if flight_tests.keys() & (updated.keys() | added.keys() | additions.keys()):
+            raise SystemExit("Fool's Flight tests overlap predecessor tests.")
+        additions.update(flight_tests)
+        raw += b"\0" + flight_raw
     return updated, {**added, **additions}, retained_raw + b"\0" + raw
 
 

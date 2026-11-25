@@ -29,8 +29,8 @@ def test_phase17i_source_text_boundaries_are_explicit() -> None:
         is classification_source.Phase17IClassificationSourceKind.PHASE17F_METADATA_ONLY
     )
 
-    assert report.structured_blocked_count == 1884
-    assert report.source_text_matched_count == 1785
+    assert report.structured_blocked_count == 1883
+    assert report.source_text_matched_count == 1784
     assert report.source_text_missing_count == 99
     assert len(source_text_rows) == report.source_text_matched_count
     assert len(metadata_only_rows) == report.source_text_missing_count
@@ -105,6 +105,17 @@ def test_phase17i_source_text_boundaries_are_explicit() -> None:
         "b7905db674b31fb7ab48f218106aadaa4ce3ca5af1e49027b06c4c4bfc891a22"
     )
 
+    (fools_flight,) = [
+        record
+        for record in execution_records
+        if record.execution_id
+        == "phase17f:phase17e:stratagem:chaos-daemons:blood-legion:000009816006"
+    ]
+    assert fools_flight.execution_status is Phase17FExecutionStatus.EXECUTABLE_GENERIC_IR
+    assert fools_flight.rule_ir_hash == (
+        "4826d02380a2d63ef822b820e6f918d7387145145e62d3c0e0d8083f0a0bfd3c"
+    )
+
 
 def test_phase17i_missing_capability_report_groups_rows_by_family() -> None:
     report = classification_source.phase17i_blocked_row_classification_report()
@@ -112,21 +123,21 @@ def test_phase17i_missing_capability_report_groups_rows_by_family() -> None:
         summary.family: summary for summary in report.missing_capability_summaries()
     }
 
-    assert summary_by_family["generic_ir_execution_binding"].row_count == 1884
+    assert summary_by_family["generic_ir_execution_binding"].row_count == 1883
     assert summary_by_family["generic_ir_execution_binding"].coverage_kind_counts == {
         "detachment_enhancement": 654,
         "detachment_rule": 256,
-        "detachment_stratagem": 969,
+        "detachment_stratagem": 968,
         "faction_army_rule": 5,
     }
-    assert summary_by_family["unrepresented_rule_language"].row_count == 1749
+    assert summary_by_family["unrepresented_rule_language"].row_count == 1748
     assert summary_by_family["duration_and_expiry_state"].row_count == 935
-    assert summary_by_family["faction_resource_ledger"].row_count == 994
+    assert summary_by_family["faction_resource_ledger"].row_count == 993
     assert summary_by_family["stratagem_activation_and_targeting"].coverage_kind_counts == {
-        "detachment_stratagem": 969
+        "detachment_stratagem": 968
     }
     assert summary_by_family["stratagem_effect_execution"].coverage_kind_counts == {
-        "detachment_stratagem": 969
+        "detachment_stratagem": 968
     }
     assert summary_by_family["enhancement_assignment_effect"].coverage_kind_counts == {
         "detachment_enhancement": 654
@@ -155,7 +166,7 @@ def test_phase17i_existing_template_report_uses_phase17c_template_families() -> 
     phase17c_family_values = {family.value for family in RuleTemplateFamily}
 
     assert set(template_summary_by_family) <= phase17c_family_values
-    assert template_summary_by_family["selected_target_constraint"].row_count == 1068
+    assert template_summary_by_family["selected_target_constraint"].row_count == 1067
     assert template_summary_by_family["characteristic_set"].row_count == 18
     assert template_summary_by_family["keyword_gate"].row_count == 715
     assert template_summary_by_family["dice_roll_modification"].row_count == 170

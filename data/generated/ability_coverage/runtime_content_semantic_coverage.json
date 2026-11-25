@@ -1,7 +1,7 @@
 {
   "detachment_status_counts": {
-    "implemented": 8,
-    "partial": 46,
+    "implemented": 9,
+    "partial": 45,
     "placeholder": 212
   },
   "faction_status_counts": {
@@ -5302,8 +5302,8 @@
     },
     {
       "detachment_status_counts": {
-        "implemented": 5,
-        "partial": 1,
+        "implemented": 6,
+        "partial": 0,
         "placeholder": 3
       },
       "detachments": [
@@ -5375,7 +5375,7 @@
           "detachment_name": "Blood Legion",
           "execution_record_count": 11,
           "module_path": "warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons.detachments.blood_legion.manifest",
-          "semantic_status": "partial",
+          "semantic_status": "implemented",
           "source_ids": [
             "gw-11e-faction-detachments-2026-27:detachment:chaos-daemons:blood-legion",
             "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Enhancements:000009815002",
@@ -7007,6 +7007,6 @@
     }
   ],
   "schema_version": "runtime-content-semantic-coverage-v1",
-  "source_package_hash": "a16d6682577ffed179a4552922b5939246fdc87e17e8d0fce0ad0579a10a75ab",
+  "source_package_hash": "662b0f11b9903d46f9bf5568e829bd4fb3a821a1cdd0bd8892ab6381e0b57b77",
   "source_package_id": "gw-11e-phase17f-faction-execution-2026-07"
 }

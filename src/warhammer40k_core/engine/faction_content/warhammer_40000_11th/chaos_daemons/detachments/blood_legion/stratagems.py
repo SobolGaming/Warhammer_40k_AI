@@ -50,6 +50,15 @@ def _fools_flight_record() -> StratagemCatalogRecord:
         and record.definition.stratagem_id == blood_legion_ir.FOOLS_FLIGHT_STRATAGEM_ID
     )
     definition = record.definition
+    rule_ir = blood_legion_ir.coverage_rule_ir_payload_by_descriptor_id(
+        blood_legion_ir.FOOLS_FLIGHT_DESCRIPTOR_ID
+    )
+    if rule_ir is None or (
+        definition.source_id != blood_legion_ir.FOOLS_FLIGHT_SOURCE_ID
+        or definition.target_descriptor != blood_legion_ir.FOOLS_FLIGHT_TARGET
+        or definition.effect_descriptor != blood_legion_ir.FOOLS_FLIGHT_EFFECT
+    ):
+        raise GameLifecycleError("Fool's Flight requires matching faction pack RuleIR.")
     return replace(
         record,
         definition=replace(
@@ -63,11 +72,7 @@ def _fools_flight_record() -> StratagemCatalogRecord:
             ),
             effect_payload=validate_json_value(
                 {
-                    "rule_ir": blood_legion_ir.fools_flight_rule_ir_payload(
-                        source_id=definition.source_id,
-                        target_text=definition.target_descriptor,
-                        effect_text=definition.effect_descriptor,
-                    ),
+                    "rule_ir": rule_ir,
                     "requires_opponent_turn": True,
                     "charge_after_enemy_fall_back_trigger_range_inches": 6,
                 }
