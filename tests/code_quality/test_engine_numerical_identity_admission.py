@@ -608,6 +608,7 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
             "test_fools_flight_native_fall_back_charge_resume_and_replay",
             "test_fools_flight_unavailable_at_one_cp",
             "test_fools_flight_short_roll_resumes_opponent_movement",
+            "test_fools_flight_stampede_resolves_before_murdercall_and_replays",
         )
     }
     predecessor_path = selection.GORE_HUNGRY_ONSLAUGHT_TRANSITION

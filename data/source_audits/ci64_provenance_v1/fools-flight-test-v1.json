@@ -3,7 +3,7 @@
   "base": "6701b3108eeea0124932cac5d70758e18dea89f2",
   "retained_transition_sha256": "a12562dd774086af360aca74bda457ebf0f6e10ae3e533ae4af6e021f3110031",
   "retained_runtime_fingerprint": "0f7d296e1cbe41efd947f0b36f0bcbf2745511c8456d167b6ee26b6552b9d637",
-  "runtime_fingerprint": "fbc166871c2c3a962265db49b4b1ae7c51425c9924986f6e943b7f448e0b7737",
+  "runtime_fingerprint": "b1ecd9a6bd751abd9bb732e2bb1d63edcf14839cde43183ae88133c789e368f1",
   "replaced_sources": {
     "src/warhammer40k_core/engine/charge_phase_flow.py": {
       "before": "8555063eb6ba4ed24a714a474e0d439aca1368be35bde098320b1aec2bc21b3f",
@@ -32,9 +32,9 @@
   "added_files": {
     "tests/factions/chaos_daemons/integration/test_fools_flight.py": {
       "mode": "100644",
-      "blob_sha1": "57c5f967e5e3e28e958537f17d6f5222c28c7280",
-      "sha256": "038d53523d2c44fbd27750d33197e0c76a845dd520f78dd561e13a8733942c51",
-      "bytes": 14615
+      "blob_sha1": "89571f492ec07646bc6d3ff69bfbd6ec1493916c",
+      "sha256": "277d5043f761ca5d23542834c3491fdb8c868038dab3c6a5a684ca0ba13d0ed7",
+      "bytes": 19762
     }
   },
   "updated_files": {
