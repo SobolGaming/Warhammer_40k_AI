@@ -955,6 +955,43 @@ def _stage3_melee_profile_successor(
     return record["runtime_fingerprint"], _selection_members(record["added_files"], root), raw
 
 
+def _stage3_flight_normal_move_successor(
+    root: Path, *, previous_runtime: str, previous_transition: bytes
+) -> tuple[str, TestSuccessors, bytes] | None:
+    name = "data/source_audits/ci64_provenance_v1/stage3-flight-normal-move-test-v1.json"
+    path = root / name
+    _selection_no_links(root, path)
+    if not path.exists():
+        return None
+    raw = _checked_bytes(
+        root, name, "47ee27bbd227b22ae4f64bf6c148eb8944439e2a2245efc123451d0ea1e968bf"
+    )
+    record = json.loads(raw, object_pairs_hook=_selection_object)
+    owner = "tests/infrastructure/adapters/test_flight_normal_move_policy.py"
+    source = "src/warhammer40k_core/ai/flight_normal_move_policy.py"
+    if (
+        record.keys()
+        != {
+            "schema",
+            "base",
+            "retained_transition_sha256",
+            "retained_runtime_fingerprint",
+            "runtime_fingerprint",
+            "sources",
+            "added_files",
+        }
+        or record["schema"] != "finite-stage3-flight-normal-move-test-v1"
+        or record["base"] != "98f83a364d0a9ea8bef3fa00b02b4420948601fb"
+        or record["retained_transition_sha256"] != hashlib.sha256(previous_transition).hexdigest()
+        or record["retained_runtime_fingerprint"] != previous_runtime
+        or record["sources"].keys() != {source}
+        or record["added_files"].keys() != {owner}
+    ):
+        raise SystemExit("Stage 3 flight Normal Move test transition differs.")
+    _checked_bytes(root, source, record["sources"][source])
+    return record["runtime_fingerprint"], _selection_members(record["added_files"], root), raw
+
+
 def exact_movement_test_transition(
     root: Path, retained_cutover_sha256: str
 ) -> TestTransition | None:
@@ -1555,6 +1592,7 @@ def exact_movement_test_transition(
     if regeneration is not None:
         runtime = regeneration[0]
     brass = None
+    stage3_flight = None
     if rigid_charge is not None:
         if ground_charge is None:
             raise SystemExit("Rigid ground charge tests require the group charge predecessor.")
@@ -1564,6 +1602,11 @@ def exact_movement_test_transition(
         )
         if brass is not None:
             runtime = brass[0]
+            stage3_flight = _stage3_flight_normal_move_successor(
+                root, previous_runtime=runtime, previous_transition=brass[3]
+            )
+            if stage3_flight is not None:
+                runtime = stage3_flight[0]
     retained = _identity_test_transition(
         root,
         retained_cutover_sha256,
@@ -1702,6 +1745,12 @@ def exact_movement_test_transition(
         updated.update(brass_updates)
         additions.update(brass_additions)
         raw += b"\0" + brass_raw
+    if stage3_flight is not None:
+        _, flight_tests, flight_raw = stage3_flight
+        if flight_tests.keys() & (updated.keys() | added.keys() | additions.keys()):
+            raise SystemExit("Stage 3 flight Normal Move tests overlap the predecessor selection.")
+        additions.update(flight_tests)
+        raw += b"\0" + flight_raw
     return updated, {**added, **additions}, retained_raw + b"\0" + raw
 
 

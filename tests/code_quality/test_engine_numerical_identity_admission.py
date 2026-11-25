@@ -449,7 +449,37 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
     previous_manifest = json.loads(
         subprocess.check_output(["git", "show", shooting_skulls["base"] + ":" + MANIFEST], cwd=ROOT)
     )
-    assert shooting_skulls["runtime_fingerprint"] == _record(MANIFEST)["fingerprint"]
+    flight_path = "data/source_audits/ci64_provenance_v1/stage3-flight-normal-move-test-v1.json"
+    flight = _record(flight_path)
+    flight_base_manifest = json.loads(
+        subprocess.check_output(["git", "show", flight["base"] + ":" + MANIFEST], cwd=ROOT)
+    )
+    assert shooting_skulls["runtime_fingerprint"] == flight_base_manifest["fingerprint"]
+    assert flight["retained_runtime_fingerprint"] == shooting_skulls["runtime_fingerprint"]
+    audit_root = ROOT / "data/source_audits/ci64_provenance_v1"
+    flight_predecessors = (
+        audit_root / "sheathed-in-brass-transition-v1.json",
+        ROOT / selection.BLOOD_BEGETS_SKULLS_TRANSITION,
+        audit_root / "stage3-melee-profile-test-v1.json",
+        ROOT / selection.SKULLS_BEGET_BLOOD_TRANSITION,
+    )
+    assert (
+        flight["retained_transition_sha256"]
+        == hashlib.sha256(b"\0".join(path.read_bytes() for path in flight_predecessors)).hexdigest()
+    )
+    assert flight["runtime_fingerprint"] == _record(MANIFEST)["fingerprint"]
+    flight_owner = "tests/infrastructure/adapters/test_flight_normal_move_policy.py"
+    assert set(flight["added_files"]) == {flight_owner}
+    assert flight_owner in active_files
+    assert sum(flight_owner in group for group in groups) == 1
+    assert (
+        flight["added_files"][flight_owner]["sha256"]
+        == hashlib.sha256((ROOT / flight_owner).read_bytes()).hexdigest()
+    )
+    flight_cases = {
+        flight_owner + "::test_fixed_destination_flight_policy_and_native_comparison" + f"[{scene}]"
+        for scene in ("open", "roof")
+    }
     assert (
         skulls["retained_transition_sha256"]
         == hashlib.sha256(
@@ -977,6 +1007,7 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         | regeneration_cases
         | brass_cases
         | stage3_cases
+        | flight_cases
         | {
             selection.BLOOD_BEGETS_SKULLS_OWNER + "::" + case
             for case in (

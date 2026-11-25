@@ -3149,3 +3149,51 @@ confirms the profiles and target defenses on PDF pages 16 and 110. The
 was available through indexed content after direct access returned HTTP 403.
 The [40k.app Seekers entry](https://www.40k.app/879/factions/chaos-daemons/units/seekers)
 was available on an indexed versioned page.
+
+## Opt-in flight mode for a fixed Normal Move destination
+
+`prepare_flight_normal_move` qualifies two supplied paths for an already
+selected destination. It requires one placed, standalone non-Hover FLY model
+with both native Normal Move modes offered. The existing
+`select_movement_action` and `submit_movement_proposal` contracts carry the
+mode and `PathWitness`. The caller submits the chosen retained witness when
+the runner commits the mode and the native movement proposal opens.
+
+Preparation takes the trusted session checkpoint and checks each path on a
+disposable fork of that exact checkpoint. It binds the native result to the
+issued proposal, mode, model and endpoint. An accepted route requires its full
+path in the movement completion event. The move receipts supply the effective
+budgets. Preparation accepts candidate paths and the destination.
+
+A completed ground route takes precedence when both routes complete. For
+flight to be selected after a rejected ground route, the native distance
+receipt must record `movement_distance_exceeded` on the direct ground path
+and preserve both endpoint elevations in its measured segment. Native path
+validation fixes the measurement mode before measuring the segments. The
+unflattened direct segment therefore certifies 3D ground counting at this
+checkpoint. The straight-line anchor distance bounds the sum of all possible
+3D segment lengths from below. It must exceed the native ground budget by
+more than a milli-inch to allow for budget rounding. Missing or inconclusive
+native evidence returns a typed gap.
+
+Preparation creates the checkpoint binding itself. The trusted runner checks
+that binding before choice and submission. The actor callback receives the
+issued action and checks it against the detached observation. The regression
+uses identical actor observations with different private RNG seeds and
+verifies that dispatch and checkpoint rebinding fail.
+
+The native tests use an equipped Bloodthirster. Both modes complete the open
+10-inch move, with budgets of 12 inches on ground and 10 inches in flight.
+The roof is 10 inches away horizontally and 12 inches up. The discarded
+ground fork measures the actual 3D chord at about 15.62 inches against the
+12-inch ground budget. The flight fork accepts the supported endpoint with a
+10-inch horizontal path. Both arms start at the same actor-visible prefix.
+The ordinary decisions and the policy's submitted choice reproduce exactly.
+
+Core Rules 21.03 specifies declaration before movement, a 2-inch reduction
+and flight transit benefits. The retained official PDF confirms the rule on
+page 71, and Universal Rules Updates v1.1 carries no change to 21.03. The
+approved secondary lookup on 25 November 2026 was indexed-only because the
+direct 40k.app section returned HTTP 403. [Official Core Rules](source_rules/eng_01-06_warhammer40k_new40k_core_rules-was6fbu1ix-hfewhmxyiy.pdf),
+[Universal Rules Updates v1.1](https://assets.warhammer-community.com/eng_wh40k_core%26key_universal_rules_updates-lu3grocned-rphh78bl6k.pdf),
+[40k.app Flying and Surging](https://www.40k.app/rules/21-flying-and-surging).

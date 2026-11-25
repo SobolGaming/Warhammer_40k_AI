@@ -1001,6 +1001,8 @@
     "tests/infrastructure/adapters/test_finite_candidates.py::test_training_candidate_link_requires_real_typed_inputs": 0.719,
     "tests/infrastructure/adapters/test_finite_candidates.py::test_training_candidate_link_round_trips_without_changing_row_or_engine[-1]": 4.394,
     "tests/infrastructure/adapters/test_finite_candidates.py::test_training_candidate_link_round_trips_without_changing_row_or_engine[0]": 4.381,
+    "tests/infrastructure/adapters/test_flight_normal_move_policy.py::test_fixed_destination_flight_policy_and_native_comparison[open]": 24.602,
+    "tests/infrastructure/adapters/test_flight_normal_move_policy.py::test_fixed_destination_flight_policy_and_native_comparison[roof]": 20.642,
     "tests/infrastructure/adapters/test_followthrough_scenario.py::test_followthrough_rejects_wrong_configuration_and_unreached_endpoints": 0.415,
     "tests/infrastructure/adapters/test_followthrough_scenario.py::test_matched_exploiter_movement_and_engine_rejected_opponent_shooter": 155.877,
     "tests/infrastructure/adapters/test_followthrough_scenario.py::test_pair_json_replay_closed_receipt_and_declined_reaction_continuation": 141.462,
@@ -6728,18 +6730,18 @@
   },
   "execution_model": {
     "assignment_wall_lower_bound_seconds": {
-      "1": 574.7,
-      "10": 574.701,
-      "11": 574.701,
-      "12": 574.701,
+      "1": 575.832,
+      "10": 575.832,
+      "11": 575.832,
+      "12": 575.832,
       "2": 795.547,
       "3": 609.537,
-      "4": 574.701,
-      "5": 574.701,
-      "6": 574.701,
-      "7": 574.701,
-      "8": 574.701,
-      "9": 574.701
+      "4": 575.832,
+      "5": 575.832,
+      "6": 575.832,
+      "7": 575.832,
+      "8": 575.832,
+      "9": 575.832
     },
     "cold_shard_assignment": "minimum-unrounded-modeled-test-load-existing-bucket-v1",
     "cold_shard_id": 1,
@@ -6748,18 +6750,18 @@
       "tests/factions/chaos_daemons/integration/test_cavalcade_v995_roster.py::test_exact_mirror_deploys_all_78_models_and_replays_to_battle"
     ],
     "shard_worker_seconds": {
-      "1": 2298.801,
-      "10": 2298.802,
-      "11": 2298.802,
-      "12": 2298.802,
+      "1": 2303.326,
+      "10": 2303.326,
+      "11": 2303.326,
+      "12": 2303.326,
       "2": 3182.186,
       "3": 2438.146,
-      "4": 2298.802,
-      "5": 2298.803,
-      "6": 2298.804,
-      "7": 2298.802,
-      "8": 2298.802,
-      "9": 2298.802
+      "4": 2303.326,
+      "5": 2303.326,
+      "6": 2303.328,
+      "7": 2303.33,
+      "8": 2303.326,
+      "9": 2303.326
     }
   },
   "files": {
@@ -6827,6 +6829,7 @@
     "tests/infrastructure/adapters/test_deployment_experiment.py": 493.559,
     "tests/infrastructure/adapters/test_deployment_geometry_features.py": 358.567,
     "tests/infrastructure/adapters/test_finite_candidates.py": 529.218,
+    "tests/infrastructure/adapters/test_flight_normal_move_policy.py": 45.244,
     "tests/infrastructure/adapters/test_followthrough_scenario.py": 297.754,
     "tests/infrastructure/adapters/test_ground_charge_policy.py": 58.294,
     "tests/infrastructure/adapters/test_group_ground_charge_policy.py": 19.053,
@@ -7321,22 +7324,23 @@
         "63db8ac24763535fbddc46142b0c99e6833b128bc40e674ff95ec735b05e1018",
         "708e2a7cdde4ec8155cc758efc538d7dc0dd4b5c25644c8a1c2d88652d6df8df",
         "7cded789191d3e9a531806a0b448b6347da9bd58f9f62af169b77cae998e0753",
+        "8e6ef17843af538ddc0a9551452cf432963faad6de879cd1033d4ca1caa906b4",
         "9a5f617751dd2ef273362bcbec3d532afb594c23b9d7c4576a1ba54a82305422",
         "9dc1b70162325c830e81f4b6e06c9199b793ed7d7805d59287feb2a593be541d",
         "a58370bb7e97f2155a65d0b16e4dc74b9e2fdb5251ee95594210b0d558e2ef63",
         "d221fa9414f09deb36d275dca16085e59d0239e19246d38cf138ddd866c65662"
       ],
-      "source": "Retained #736 refresh timing profile and one measured three-inch Charge roundoff regression on WSL; plus five measured Sheathed in Brass cases (serial WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); plus measured Blood Begets Skulls and Phase 17I updates (serial WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); add four measured Stage 3 melee cases (WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); plus measured Skulls Beget Blood and Phase 17I updates (serial WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only)",
-      "test_cases": 6725,
-      "test_files": 449
+      "source": "Retained #736 refresh timing profile and one measured three-inch Charge roundoff regression on WSL; plus five measured Sheathed in Brass cases (serial WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); plus measured Blood Begets Skulls and Phase 17I updates (serial WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); add four measured Stage 3 melee cases (WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); plus measured Skulls Beget Blood and Phase 17I updates (serial WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); retain two reviewed Stage 3 native-qualification flight weights (serial Windows, Python 3.14.5; scheduling only)",
+      "test_cases": 6727,
+      "test_files": 450
     }
   ],
   "shard_count": 12,
   "shards": [
     {
-      "duration_seconds": 2298.801,
+      "duration_seconds": 1802.092,
       "shard_id": 1,
-      "test_file_count": 50
+      "test_file_count": 52
     },
     {
       "duration_seconds": 3182.186,
@@ -7349,49 +7353,49 @@
       "test_file_count": 1
     },
     {
-      "duration_seconds": 2298.802,
+      "duration_seconds": 2303.326,
       "shard_id": 4,
-      "test_file_count": 45
+      "test_file_count": 46
     },
     {
-      "duration_seconds": 2298.803,
+      "duration_seconds": 2303.326,
       "shard_id": 5,
-      "test_file_count": 49
+      "test_file_count": 51
     },
     {
-      "duration_seconds": 2298.804,
+      "duration_seconds": 2303.328,
       "shard_id": 6,
       "test_file_count": 49
     },
     {
-      "duration_seconds": 2298.802,
+      "duration_seconds": 2303.33,
       "shard_id": 7,
       "test_file_count": 50
     },
     {
-      "duration_seconds": 2298.802,
+      "duration_seconds": 2303.326,
       "shard_id": 8,
-      "test_file_count": 51
+      "test_file_count": 49
     },
     {
-      "duration_seconds": 2298.802,
+      "duration_seconds": 2303.326,
       "shard_id": 9,
-      "test_file_count": 51
-    },
-    {
-      "duration_seconds": 2298.802,
-      "shard_id": 10,
-      "test_file_count": 50
-    },
-    {
-      "duration_seconds": 2298.802,
-      "shard_id": 11,
-      "test_file_count": 91
-    },
-    {
-      "duration_seconds": 1797.568,
-      "shard_id": 12,
       "test_file_count": 52
+    },
+    {
+      "duration_seconds": 2303.326,
+      "shard_id": 10,
+      "test_file_count": 49
+    },
+    {
+      "duration_seconds": 2303.326,
+      "shard_id": 11,
+      "test_file_count": 90
+    },
+    {
+      "duration_seconds": 2303.326,
+      "shard_id": 12,
+      "test_file_count": 51
     }
   ],
   "step5g_partitions": {
@@ -7399,5 +7403,5 @@
     "sha256": "b241b31651a8d5d903a2b851583186c276a5ac32fed26de1a1c69b4aa278b711"
   },
   "strategy": "largest-processing-time-by-derived-selector-weight",
-  "total_test_duration_seconds": 28107.12
+  "total_test_duration_seconds": 28152.364
 }
