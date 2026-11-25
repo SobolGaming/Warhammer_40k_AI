@@ -19,8 +19,9 @@ from warhammer40k_core.engine.modifier_evaluation import (
     selection_history,
 )
 from warhammer40k_core.engine.modifier_evaluation_history import validate_modifier_origin
-from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus
+from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatus
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+from warhammer40k_core.engine.unit_grant_preparation import COMMITMENT_RESULT_KEY, PREPARATION_KEY
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.lifecycle import GameLifecycle
@@ -47,7 +48,7 @@ def modifier_evaluation_dispatch_handler(lifecycle: GameLifecycle) -> DecisionDi
     return DecisionDispatchHandler(
         decision_type=SELECT_MODIFIER_IGNORES_DECISION_TYPE,
         pre_validator=validate,
-        applier=lambda record, _result: _resume(lifecycle, record.request),
+        applier=lambda record, result: _resume(lifecycle, record.request, result),
     )
 
 
@@ -92,11 +93,31 @@ def _validate(lifecycle: GameLifecycle, request: DecisionRequest, result: Decisi
     validate_modifier_origin(lifecycle, lifecycle._modifier_evaluation_history_origin)
 
 
-def _resume(lifecycle: GameLifecycle, request: DecisionRequest) -> LifecycleStatus:
+def _resume(
+    lifecycle: GameLifecycle, request: DecisionRequest, result: DecisionResult
+) -> LifecycleStatus:
     payload = request.payload
     if not isinstance(payload, dict) or not isinstance(payload["source_context"], dict):
         raise GameLifecycleError("Modifier continuation requires source context.")
     context = payload["source_context"]
+    if context.get("continuation") == PREPARATION_KEY:
+        phase_token, result_id = context.get("phase"), context.get(COMMITMENT_RESULT_KEY)
+        if not isinstance(phase_token, str) or not isinstance(result_id, str):
+            raise GameLifecycleError("Selected unit grant modifier continuation context drifted.")
+        phase = BattlePhase(phase_token)
+        status = lifecycle._resume_unit_grant_commitment(phase=phase, result_id=result_id)
+        if lifecycle._result_resolves_active_reaction_frame(result):
+            if phase is BattlePhase.FIGHT:
+                if status is None:
+                    status = lifecycle.advance_until_decision_or_terminal()
+                lifecycle._continue_or_resolve_fight_reaction(result=result, status=status)
+            else:
+                status = lifecycle._continue_or_resolve_out_of_phase_reaction(
+                    result=result,
+                    status=status,
+                )
+        if status is not None:
+            return status
     if context.get("continuation") == "mission_action":
         from warhammer40k_core.engine.mission_decisions import request_mission_action_start
 

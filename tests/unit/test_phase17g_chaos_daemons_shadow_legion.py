@@ -6,7 +6,6 @@ from dataclasses import replace
 from typing import cast
 
 import pytest
-from tests.completed_attack_fixture_helpers import record_attack_completion_for_executor_fixture
 from tests.fight_on_death_helpers import retain_destroyed_model_for_fixture
 from tests.phase11c_command_phase_helpers import (
     battle_state,
@@ -18,7 +17,7 @@ from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.datasheet import DatasheetDefinition, DatasheetKeywordSet
 from warhammer40k_core.core.detachment import DetachmentDefinition
-from warhammer40k_core.core.dice import DiceExpression, DiceRollResult, DiceRollSpec
+from warhammer40k_core.core.dice import DiceRollResult
 from warhammer40k_core.core.faction import FactionDefinition
 from warhammer40k_core.core.faction_aliases import (
     CHAOS_DAEMONS_FACTION_ID,
@@ -58,10 +57,6 @@ from warhammer40k_core.engine.army_mustering import (
     validate_roster_legality,
 )
 from warhammer40k_core.engine.attached_unit_formation import AttachedUnitFormation
-from warhammer40k_core.engine.attack_sequence import AttackSequence
-from warhammer40k_core.engine.attack_sequence_completion_hooks import (
-    AttackSequenceCompletedContext,
-)
 from warhammer40k_core.engine.battle_formation_hooks import BattleFormationRequestContext
 from warhammer40k_core.engine.battle_shock_test_service import BattleShockTestRuntime
 from warhammer40k_core.engine.battlefield_state import (
@@ -152,10 +147,6 @@ from warhammer40k_core.engine.phases.fight import (
 from warhammer40k_core.engine.phases.shooting import (
     SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE,
     ShootingPhaseHandler,
-    ShootingPhaseState,
-    ShootingUnitSelection,
-    _apply_shooting_unit_selected_grant_decision,
-    _request_shooting_unit_selected_grant_decision_if_available,
     request_out_of_phase_shooting_declaration,
 )
 from warhammer40k_core.engine.physical_engagement import (
@@ -229,7 +220,6 @@ from warhammer40k_core.engine.wargear_selections import (
     ModelProfileSelection,
 )
 from warhammer40k_core.engine.weapon_abilities import FIRE_OVERWATCH_RULE_ID
-from warhammer40k_core.engine.weapon_declaration import RangedAttackPool
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_shadow_legion_ir_support_2026_27 as shadow_legion_ir,
@@ -2785,277 +2775,6 @@ def test_shadow_legion_generic_runtime_bundle_materializes_detachment_hooks() ->
     )
 
 
-def test_shadow_legion_dark_pacts_grant_and_belakor_auto_pass_completion() -> None:
-    state = _shadow_legion_state(
-        name="Be'lakor",
-        unit_keywords=("Shadow Legion", "Undivided"),
-    )
-    unit = _unit_for_player(state, player_id="player-a")
-    target = _unit_for_player(state, player_id="player-b")
-    _set_current_battle_phase(state, BattlePhase.SHOOTING)
-    selection = _shooting_selection(state, unit)
-    state.shooting_phase_state = ShootingPhaseState(
-        battle_round=state.battle_round,
-        active_player_id="player-a",
-    ).with_unit_selection(selection)
-    decisions = DecisionController()
-    bundle = _shadow_legion_runtime_bundle(state)
-    grant_registry = bundle.shooting_unit_selected_grant_hook_registry
-
-    status = _request_shooting_unit_selected_grant_decision_if_available(
-        state=state,
-        decisions=decisions,
-        selection=selection,
-        registry=grant_registry,
-    )
-    request = _decision_request(None if status is None else status.decision_request)
-
-    assert request.decision_type == SELECT_SHOOTING_UNIT_GRANT_DECISION_TYPE
-    assert {option.option_id for option in request.options} == (
-        _EXPECTED_SHADOW_LEGION_SHOOTING_DARK_PACT_OPTION_IDS
-        | {DECLINE_SHOOTING_UNIT_GRANT_OPTION_ID}
-    )
-
-    result = DecisionResult.for_request(
-        result_id="shadow-legion-belakor-dark-pact-result",
-        request=request,
-        selected_option_id=_option_id_for_label(request, "Dark Pacts: Lethal Hits"),
-    )
-    decisions.submit_result(result)
-    _apply_shooting_unit_selected_grant_decision(
-        runtime_modifier_registry=bundle.runtime_modifier_registry,
-        state=state,
-        result=result,
-        decisions=decisions,
-        registry=grant_registry,
-    )
-
-    modified = bundle.runtime_modifier_registry.modified_weapon_profile(
-        WeaponProfileModifierContext(
-            state=state,
-            source_phase=BattlePhase.SHOOTING,
-            attacking_unit_instance_id=unit.unit_instance_id,
-            attacker_model_instance_id=unit.own_models[0].model_instance_id,
-            target_unit_instance_id=target.unit_instance_id,
-            weapon_profile=_weapon_profile(melee=False),
-        )
-    )
-    assert WeaponKeyword.LETHAL_HITS in modified.keywords
-    assert rule.SOURCE_RULE_ID in modified.source_ids
-    assert dark_pacts.SOURCE_RULE_ID not in modified.source_ids
-
-    attack_pool = _attack_pool(attacker=unit, target=target, weapon_profile=modified)
-    state.shooting_phase_state = ShootingPhaseState(
-        battle_round=state.battle_round,
-        active_player_id="player-a",
-        selected_unit_ids=(unit.unit_instance_id,),
-        shot_unit_ids=(unit.unit_instance_id,),
-        attack_pools=(attack_pool,),
-        attack_sequence=AttackSequence(
-            sequence_id="shadow-legion-belakor-sequence",
-            attacker_player_id="player-a",
-            attacking_unit_instance_id=unit.unit_instance_id,
-            attack_pools=(attack_pool,),
-            source_phase=BattlePhase.SHOOTING,
-            used_pool_indices=(0,),
-            pool_index=1,
-        ),
-    )
-
-    completion_status = ShootingPhaseHandler(
-        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(
-            descriptor_version="phase17g-shadow-legion-belakor"
-        ),
-        army_catalog=ArmyCatalog.phase9a_canonical_content_pack(),
-        attack_sequence_completed_hooks=bundle.attack_sequence_completed_hook_registry,
-    ).begin_phase(state=state, decisions=decisions)
-
-    assert completion_status.status_kind is LifecycleStatusKind.ADVANCED
-    assert _event_count(decisions, "chaos_space_marines_dark_pact_resolved") == 1
-    payload = _last_event_payload(decisions, "chaos_space_marines_dark_pact_resolved")
-    assert payload["source_rule_id"] == rule.SOURCE_RULE_ID
-    assert payload["hook_id"] == rule.ATTACK_SEQUENCE_COMPLETED_HOOK_ID
-    assert payload["hook_id"] != dark_pacts.ATTACK_SEQUENCE_COMPLETED_HOOK_ID
-    assert payload["leadership_auto_pass"] is True
-    assert payload["leadership_roll"] is None
-    assert payload["d3_result"] is None
-    ShootingPhaseHandler(
-        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(
-            descriptor_version="phase17g-shadow-legion-belakor"
-        ),
-        army_catalog=ArmyCatalog.phase9a_canonical_content_pack(),
-        attack_sequence_completed_hooks=bundle.attack_sequence_completed_hook_registry,
-    ).begin_phase(state=state, decisions=decisions)
-    assert _event_count(decisions, "chaos_space_marines_dark_pact_resolved") == 1
-
-
-def test_shadow_legion_dark_pacts_failed_leadership_routes_fnp_decision() -> None:
-    state = _shadow_legion_state(unit_keywords=("Shadow Legion", "Undivided"))
-    unit = _unit_for_player(state, player_id="player-a")
-    target = _unit_for_player(state, player_id="player-b")
-    _set_current_battle_phase(state, BattlePhase.SHOOTING)
-    _record_shadow_dark_pact_effect(
-        state,
-        unit=unit,
-        phase=BattlePhase.SHOOTING,
-        pact=dark_pacts.DarkPactKind.LETHAL_HITS,
-    )
-    source_a = FeelNoPainSource(source_id="shadow-legion-fnp-a", threshold=5)
-    source_b = FeelNoPainSource(source_id="shadow-legion-fnp-b", threshold=6)
-    state.record_model_feel_no_pain_sources(
-        model_instance_id=unit.own_models[0].model_instance_id,
-        sources=(source_a, source_b),
-    )
-    decisions = DecisionController()
-    attack_sequence = AttackSequence(
-        sequence_id="shadow-legion-fnp-sequence",
-        attacker_player_id="player-a",
-        attacking_unit_instance_id=unit.unit_instance_id,
-        attack_pools=(
-            _attack_pool(
-                attacker=unit,
-                target=target,
-                weapon_profile=_weapon_profile(melee=False),
-            ),
-        ),
-        source_phase=BattlePhase.SHOOTING,
-        used_pool_indices=(0,),
-        pool_index=1,
-    )
-    completed_event = record_attack_completion_for_executor_fixture(
-        state=state, decisions=decisions, sequence=attack_sequence
-    )
-    manager = DiceRollManager(
-        state.game_id,
-        event_log=decisions.event_log,
-        injected_results=(
-            DiceRollResult.from_values(
-                roll_id="shadow-legion-fnp-leadership-roll",
-                spec=DiceRollSpec(
-                    expression=DiceExpression(quantity=2, sides=6),
-                    reason=f"Dark Pact Leadership test for {unit.unit_instance_id}",
-                    roll_type=dark_pacts.DARK_PACT_LEADERSHIP_ROLL_TYPE,
-                    actor_id=unit.unit_instance_id,
-                ),
-                values=(1, 1),
-                source="fixed",
-            ),
-            DiceRollResult.from_values(
-                roll_id="shadow-legion-fnp-mortal-wounds-roll",
-                spec=DiceRollManager.d3_source_spec(
-                    reason=f"Dark Pact mortal wounds for {unit.unit_instance_id}",
-                    roll_type=dark_pacts.DARK_PACT_MORTAL_WOUNDS_ROLL_TYPE,
-                    actor_id=unit.unit_instance_id,
-                ),
-                values=(1,),
-                source="fixed",
-            ),
-        ),
-    )
-    starting_wounds = sum(model.current_wounds for model in unit.own_models)
-    bundle = _shadow_legion_runtime_bundle(state)
-
-    status = bundle.attack_sequence_completed_hook_registry.resolve_completed_sequence(
-        AttackSequenceCompletedContext(
-            state=state,
-            decisions=decisions,
-            dice_manager=manager,
-            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
-            source_phase=BattlePhase.SHOOTING,
-            attack_sequence=attack_sequence,
-            attack_sequence_completed_event_id=completed_event.event_id,
-        )
-    )
-    request = _decision_request(None if status is None else status.decision_request)
-
-    assert status is not None
-    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
-    model_result = DecisionResult.for_request(
-        result_id="shadow-legion-fnp-model",
-        request=request,
-        selected_option_id=unit.own_models[0].model_instance_id,
-    )
-    decisions.submit_result(model_result)
-    status = bundle.mortal_wound_feel_no_pain_hook_registry.apply_decision(
-        MortalWoundFeelNoPainContinuationContext(
-            state=state,
-            decisions=decisions,
-            request=request,
-            result=model_result,
-            source_context=mortal_wound_resolution_source_context(request),
-            dice_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
-            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
-        )
-    )
-    request = _decision_request(None if status is None else status.decision_request)
-    assert is_mortal_wound_feel_no_pain_request(request)
-    source_context = mortal_wound_feel_no_pain_source_context(request)
-    assert isinstance(source_context, dict)
-    assert source_context["source_kind"] == (
-        dark_pacts.SHADOW_LEGION_DARK_PACT_MORTAL_WOUNDS_SOURCE_KIND
-    )
-    pending_payload = cast(dict[str, JsonValue], source_context["resolution_payload"])
-    assert pending_payload["hook_id"] == rule.ATTACK_SEQUENCE_COMPLETED_HOOK_ID
-    assert pending_payload["hook_id"] != dark_pacts.ATTACK_SEQUENCE_COMPLETED_HOOK_ID
-    assert {option.option_id for option in request.options} == {
-        source_a.source_id,
-        source_b.source_id,
-    }
-    assert not _has_event(decisions, "chaos_space_marines_dark_pact_resolved")
-    assert sum(model.current_wounds for model in _refreshed_unit(state, unit).own_models) == (
-        starting_wounds
-    )
-
-    result = DecisionResult.for_request(
-        result_id="shadow-legion-fnp-source-a",
-        request=request,
-        selected_option_id=source_a.source_id,
-    )
-    decisions.submit_result(result)
-    continuation_status = bundle.mortal_wound_feel_no_pain_hook_registry.apply_decision(
-        MortalWoundFeelNoPainContinuationContext(
-            state=state,
-            decisions=decisions,
-            request=request,
-            result=result,
-            source_context=source_context,
-            dice_manager=DiceRollManager(
-                state.game_id,
-                event_log=decisions.event_log,
-                injected_results=(
-                    DiceRollResult.from_values(
-                        roll_id="shadow-legion-fnp-roll",
-                        spec=feel_no_pain_roll_spec(
-                            source=source_a,
-                            player_id="player-a",
-                            model_instance_id=unit.own_models[0].model_instance_id,
-                            wound_index=1,
-                        ),
-                        values=(1,),
-                        source="fixed",
-                    ),
-                ),
-            ),
-            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
-        )
-    )
-
-    assert continuation_status is None
-    payload = _last_event_payload(decisions, "chaos_space_marines_dark_pact_resolved")
-    assert payload["source_rule_id"] == rule.SOURCE_RULE_ID
-    assert payload["hook_id"] == rule.ATTACK_SEQUENCE_COMPLETED_HOOK_ID
-    assert payload["hook_id"] != dark_pacts.ATTACK_SEQUENCE_COMPLETED_HOOK_ID
-    assert payload["leadership_auto_pass"] is False
-    assert payload["feel_no_pain_result_id"] == result.result_id
-    application = cast(dict[str, JsonValue], payload["mortal_wound_application"])
-    assert application["mortal_wounds"] == 1
-    assert (
-        starting_wounds
-        - sum(model.current_wounds for model in _refreshed_unit(state, unit).own_models)
-        == 1
-    )
-
-
 def test_shadow_legion_out_of_phase_shooting_requests_dark_pacts_grant() -> None:
     state = _shadow_legion_state(unit_keywords=("Shadow Legion", "Undivided"))
     unit = _unit_for_player(state, player_id="player-a")
@@ -3096,28 +2815,37 @@ def test_shadow_legion_out_of_phase_shooting_requests_dark_pacts_grant() -> None
     assert request.decision_type == SELECT_SHOOTING_UNIT_GRANT_DECISION_TYPE
     assert state.out_of_phase_shooting_state is not None
     assert state.out_of_phase_shooting_state.target_unit_ids == (target.unit_instance_id,)
+    assert {option.option_id for option in request.options} == {
+        DECLINE_SHOOTING_UNIT_GRANT_OPTION_ID,
+        f"{rule.SOURCE_RULE_ID}:commit",
+    }
+    handler = ShootingPhaseHandler(
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(
+            descriptor_version="phase17g-shadow-legion-out-of-phase"
+        ),
+        army_catalog=ArmyCatalog.phase9a_canonical_content_pack(),
+        shooting_unit_selected_grant_hooks=grant_registry,
+        runtime_modifier_registry=bundle.runtime_modifier_registry,
+    )
+    commitment = DecisionResult.for_request(
+        result_id="shadow-legion-overwatch-commit",
+        request=request,
+        selected_option_id=f"{rule.SOURCE_RULE_ID}:commit",
+    )
+    decisions.submit_result(commitment)
+    choice = handler.apply_decision(state=state, result=commitment, decisions=decisions)
+    assert choice is not None
+    request = _decision_request(choice.decision_request)
     assert {option.option_id for option in request.options} == (
         _EXPECTED_SHADOW_LEGION_SHOOTING_DARK_PACT_OPTION_IDS
-        | {DECLINE_SHOOTING_UNIT_GRANT_OPTION_ID}
     )
-
     result = DecisionResult.for_request(
         result_id="shadow-legion-out-of-phase-dark-pact-result",
         request=request,
         selected_option_id=_option_id_for_label(request, "Dark Pacts: Lethal Hits"),
     )
     decisions.submit_result(result)
-    declaration_status = ShootingPhaseHandler(
-        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(
-            descriptor_version="phase17g-shadow-legion-out-of-phase"
-        ),
-        army_catalog=ArmyCatalog.phase9a_canonical_content_pack(),
-        shooting_unit_selected_grant_hooks=grant_registry,
-    ).apply_decision(
-        state=state,
-        result=result,
-        decisions=decisions,
-    )
+    declaration_status = handler.apply_decision(state=state, result=result, decisions=decisions)
     declaration_request = _decision_request(
         None if declaration_status is None else declaration_status.decision_request
     )
@@ -3132,7 +2860,7 @@ def test_shadow_legion_out_of_phase_shooting_requests_dark_pacts_grant() -> None
         is dark_pacts.DarkPactKind.LETHAL_HITS
     )
     assert state.out_of_phase_shooting_state is not None
-    assert state.out_of_phase_shooting_state.grant_effect_ids
+    assert not state.out_of_phase_shooting_state.grant_effect_ids
 
 
 def test_shadow_legion_fight_grants_dark_pacts_for_undivided_units() -> None:
@@ -3179,9 +2907,10 @@ def test_shadow_legion_fight_grants_dark_pacts_for_undivided_units() -> None:
     request = _decision_request(None if status is None else status.decision_request)
 
     assert request.decision_type == SELECT_FIGHT_UNIT_GRANT_DECISION_TYPE
-    assert {option.option_id for option in request.options} == (
-        _EXPECTED_SHADOW_LEGION_FIGHT_DARK_PACT_OPTION_IDS | {DECLINE_FIGHT_UNIT_GRANT_OPTION_ID}
-    )
+    assert {option.option_id for option in request.options} == {
+        f"{rule.SOURCE_RULE_ID}:commit",
+        DECLINE_FIGHT_UNIT_GRANT_OPTION_ID,
+    }
 
 
 def test_shadow_legion_generic_effect_consumption_excludes_faction_keyword_only_units() -> None:
@@ -3836,47 +3565,6 @@ def _core_unit_selection(unit_selection_id: str) -> UnitMusterSelection:
     )
 
 
-def _record_shadow_dark_pact_effect(
-    state: GameState,
-    *,
-    unit: UnitInstance,
-    phase: BattlePhase,
-    pact: dark_pacts.DarkPactKind,
-) -> None:
-    phase_kind = (
-        BattlePhaseKind.SHOOTING if phase is BattlePhase.SHOOTING else BattlePhaseKind.FIGHT
-    )
-    state.record_persisting_effect(
-        PersistingEffect(
-            effect_id=f"shadow-legion-dark-pact:{phase.value}:{pact.value}:{unit.unit_instance_id}",
-            source_rule_id=rule.SOURCE_RULE_ID,
-            owner_player_id="player-a",
-            target_unit_instance_ids=dark_pacts.dark_pact_target_unit_ids(
-                state,
-                unit_instance_id=unit.unit_instance_id,
-            ),
-            started_battle_round=state.battle_round,
-            started_phase=phase_kind,
-            expiration=EffectExpiration.end_phase(
-                battle_round=state.battle_round,
-                phase=phase_kind,
-                player_id="player-a",
-            ),
-            effect_payload=dark_pacts.dark_pact_effect_payload(
-                unit_instance_id=unit.unit_instance_id,
-                target_unit_instance_ids=dark_pacts.dark_pact_target_unit_ids(
-                    state,
-                    unit_instance_id=unit.unit_instance_id,
-                ),
-                trigger="test",
-                phase=phase,
-                selected_dark_pact=pact,
-                source_context={"source_rule_id": rule.SOURCE_RULE_ID},
-            ),
-        )
-    )
-
-
 def _assign_fade_to_darkness(state: GameState, *, unit: UnitInstance) -> None:
     updated_armies: list[ArmyDefinition] = []
     for army in state.army_definitions:
@@ -4462,16 +4150,6 @@ def _set_current_battle_phase(state: GameState, phase: BattlePhase) -> None:
     state.battle_phase_index = state.battle_phase_sequence.index(phase)
 
 
-def _shooting_selection(state: GameState, unit: UnitInstance) -> ShootingUnitSelection:
-    return ShootingUnitSelection(
-        player_id="player-a",
-        battle_round=state.battle_round,
-        unit_instance_id=unit.unit_instance_id,
-        request_id="shadow-legion-shooting-selection-request",
-        result_id="shadow-legion-shooting-selection-result",
-    )
-
-
 def _weapon_profile(*, melee: bool) -> WeaponProfile:
     return WeaponProfile(
         profile_id="shadow-legion-melee-profile" if melee else "shadow-legion-ranged-profile",
@@ -4486,26 +4164,6 @@ def _weapon_profile(*, melee: bool) -> WeaponProfile:
         armor_penetration=CharacteristicValue.from_raw(Characteristic.ARMOR_PENETRATION, 0),
         damage_profile=DamageProfile.fixed(1),
         source_ids=("shadow-legion-test-profile",),
-    )
-
-
-def _attack_pool(
-    *,
-    attacker: UnitInstance,
-    target: UnitInstance,
-    weapon_profile: WeaponProfile,
-) -> RangedAttackPool:
-    return RangedAttackPool(
-        attacker_model_instance_id=attacker.own_models[0].model_instance_id,
-        weapon_instance_id=f"weapon-instance:test:{weapon_profile.profile_id}",
-        wargear_id="shadow-legion-test-wargear",
-        weapon_profile_id=weapon_profile.profile_id,
-        weapon_profile=weapon_profile,
-        target_unit_instance_id=target.unit_instance_id,
-        shooting_type=ShootingType.NORMAL,
-        attacks=1,
-        target_visible_model_ids=(target.own_models[0].model_instance_id,),
-        target_in_range_model_ids=(target.own_models[0].model_instance_id,),
     )
 
 
@@ -4533,10 +4191,6 @@ def _last_event_payload(
         if event.event_type == event_type:
             return cast(dict[str, JsonValue], event.payload)
     raise AssertionError(f"Missing event {event_type}.")
-
-
-def _has_event(decisions: DecisionController, event_type: str) -> bool:
-    return any(event.event_type == event_type for event in decisions.event_log.records)
 
 
 def _event_count(decisions: DecisionController, event_type: str) -> int:

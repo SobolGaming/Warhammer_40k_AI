@@ -540,7 +540,24 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
     )
     assert wall["retained_runtime_fingerprint"] == gore["runtime_fingerprint"]
     assert wall["retained_runtime_fingerprint"] == wall_base_manifest["fingerprint"]
-    assert wall["runtime_fingerprint"] == _record(MANIFEST)["fingerprint"]
+    from scripts import dark_pact_test_admission as dark_pact
+
+    pact = _record(dark_pact.RECEIPT)
+    assert pact["base"] == dark_pact.BASE
+    assert pact["retained_runtime_fingerprint"] == wall["runtime_fingerprint"]
+    assert (
+        pact["retained_transition_sha256"]
+        == hashlib.sha256((ROOT / selection.CHARGE_FLIGHT_WALL_TRANSITION).read_bytes()).hexdigest()
+    )
+    assert pact["runtime_fingerprint"] == _record(MANIFEST)["fingerprint"]
+    assert sum(dark_pact.NEW_TEST in group for group in groups) == 1
+    assert len([node for node in current if node.startswith(dark_pact.NEW_TEST + "::")]) == 21
+    base_weights = json.loads(
+        subprocess.check_output(
+            ["git", "show", dark_pact.BASE + ":ci/test_shards/durations.json"], cwd=ROOT
+        )
+    )["case_seconds"]
+    assert all(current[node] == seconds for node, seconds in base_weights.items())
     predecessor_path = selection.GORE_HUNGRY_ONSLAUGHT_TRANSITION
     assert (
         wall["retained_transition_sha256"]
@@ -887,10 +904,11 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
             ["git", "show", selection.MONSTER_MASH_ATTACK_REROLL_BASE + ":" + source], cwd=ROOT
         )
         assert fight_reroll["source"][source]["before"] == hashlib.sha256(source_before).hexdigest()
-        assert (
-            fight_reroll["source"][source]["after"]
-            == hashlib.sha256((ROOT / source).read_bytes()).hexdigest()
-        )
+        expected = fight_reroll["source"][source]["after"]
+        if source == dark_pact.LIFECYCLE_SOURCE:
+            assert pact["retained_lifecycle"]["before"] == expected
+            expected = pact["retained_lifecycle"]["after"]
+        assert expected == hashlib.sha256((ROOT / source).read_bytes()).hexdigest()
     shooting_reroll_owner, fight_reroll_owner = selection.MONSTER_MASH_ATTACK_REROLL_OWNERS
     for attack_reroll_owner in selection.MONSTER_MASH_ATTACK_REROLL_OWNERS:
         assert attack_reroll_owner in active_files
@@ -1149,8 +1167,31 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
             "test_sheathed_in_brass_native_gathering_and_save_ignore[sheathed-ignore]",
         )
     }
+    pact_cases = {
+        f"{dark_pact.NEW_TEST}::test_dark_pact_selection_resolves_before_attacks[{case}-{phase}]"
+        for case in ("decline", "pass", "survive", "casualty", "wipe", "fnp")
+        for phase in ("shooting", "fight")
+    } | {
+        f"{dark_pact.NEW_TEST}::test_only_shadow_legion_offers_belakor_the_no_roll_pact"
+        f"[{detachment}-{phase}]"
+        for detachment in ("shadow-legion", "blood-legion")
+        for phase in ("shooting", "fight")
+    }
+    pact_cases.add(
+        f"{dark_pact.NEW_TEST}::"
+        "test_dark_pact_survivor_without_a_legal_gun_ends_shooting_without_an_attack"
+    )
+    pact_cases.update(
+        f"{dark_pact.NEW_TEST}::test_attached_fight_dark_pact_targets_formation_through_attack_and_replay[{case}]"
+        for case in ("pass", "survive")
+    )
+    pact_cases.update(
+        f"{dark_pact.NEW_TEST}::test_native_overwatch_grant_expires_at_its_own_boundary[{phase_scoped}]"
+        for phase_scoped in (True, False)
+    )
     assert current.keys() == (
         retained
+        | pact_cases
         | added
         | staged
         | mixed

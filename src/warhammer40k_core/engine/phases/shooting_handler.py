@@ -13,6 +13,8 @@ from warhammer40k_core.engine.selected_target_stratagem_reactions import (
 
 from typing import TYPE_CHECKING
 
+from warhammer40k_core.engine import unit_grant_preparation as preparation_flow
+
 from warhammer40k_core.engine.phases.shooting_imports import *
 from warhammer40k_core.engine.phases.shooting_model import *
 
@@ -649,6 +651,31 @@ class ShootingPhaseHandler:
             )
         return None
 
+    def resume_unit_grant_commitment(
+        self,
+        *,
+        state: GameState,
+        decisions: DecisionController,
+        result: DecisionResult,
+        resolved: bool = False,
+    ) -> LifecycleStatus | None:
+        from warhammer40k_core.engine.phases.shooting_unit_selection import (
+            resume_shooting_unit_grant_commitment,
+        )
+
+        return resume_shooting_unit_grant_commitment(
+            state=state,
+            decisions=decisions,
+            result=result,
+            resolved=resolved,
+            runtime_modifier_registry=self.runtime_modifier_registry,
+            registry=self.shooting_unit_selected_grant_hooks,
+            completion_hooks=self.attack_sequence_completed_hooks,
+            ruleset_descriptor=_ruleset_descriptor_for_handler(self),
+            army_catalog=_army_catalog_for_handler(self),
+            shooting_target_restriction_hooks=self.shooting_target_restriction_hooks,
+        )
+
     def invalid_shooting_unit_selected_grant_status(
         self,
         *,
@@ -663,6 +690,23 @@ class ShootingPhaseHandler:
         try:
             result.validate_for_request(request)
             selection = _active_shooting_unit_selection(state)
+            if preparation_flow.is_commitment_request(request):
+                from warhammer40k_core.engine.phases.shooting_unit_selection import (
+                    _shooting_unit_selected_context,
+                )
+
+                grants = self.shooting_unit_selected_grant_hooks.grants_for(
+                    _shooting_unit_selected_context(state=state, selection=selection)
+                )
+                preparation_flow.validate_commitment(
+                    request=request,
+                    result=result,
+                    preparation=preparation_flow.preparation_for(grants),
+                    unit_id=selection.unit_instance_id,
+                    selection_request_id=selection.request_id,
+                    selection_result_id=selection.result_id,
+                )
+                return None
             payload = _decision_payload_object(result.payload)
             _validate_shooting_unit_selected_grant_payload_context(
                 payload=payload,

@@ -632,6 +632,27 @@
     "tests/infrastructure/adapters/test_charge_flight_onslaught_timing.py::test_real_late_spend_changes_ground_only_if_authorized[decline]": 3.51,
     "tests/infrastructure/adapters/test_charge_flight_onslaught_timing.py::test_real_late_spend_changes_ground_only_if_authorized[spend]": 6.009,
     "tests/infrastructure/adapters/test_cover_event_identity.py::test_save_cover_cache_key_projects_embedded_request_reference": 0.001,
+    "tests/infrastructure/adapters/test_dark_pact_timing.py::test_attached_fight_dark_pact_targets_formation_through_attack_and_replay[pass]": 6.856,
+    "tests/infrastructure/adapters/test_dark_pact_timing.py::test_attached_fight_dark_pact_targets_formation_through_attack_and_replay[survive]": 2.264,
+    "tests/infrastructure/adapters/test_dark_pact_timing.py::test_dark_pact_selection_resolves_before_attacks[casualty-fight]": 1.531,
+    "tests/infrastructure/adapters/test_dark_pact_timing.py::test_dark_pact_selection_resolves_before_attacks[casualty-shooting]": 1.462,
+    "tests/infrastructure/adapters/test_dark_pact_timing.py::test_dark_pact_selection_resolves_before_attacks[decline-fight]": 1.467,
+    "tests/infrastructure/adapters/test_dark_pact_timing.py::test_dark_pact_selection_resolves_before_attacks[decline-shooting]": 5.961,
+    "tests/infrastructure/adapters/test_dark_pact_timing.py::test_dark_pact_selection_resolves_before_attacks[fnp-fight]": 1.572,
+    "tests/infrastructure/adapters/test_dark_pact_timing.py::test_dark_pact_selection_resolves_before_attacks[fnp-shooting]": 1.939,
+    "tests/infrastructure/adapters/test_dark_pact_timing.py::test_dark_pact_selection_resolves_before_attacks[pass-fight]": 1.529,
+    "tests/infrastructure/adapters/test_dark_pact_timing.py::test_dark_pact_selection_resolves_before_attacks[pass-shooting]": 1.6,
+    "tests/infrastructure/adapters/test_dark_pact_timing.py::test_dark_pact_selection_resolves_before_attacks[survive-fight]": 1.536,
+    "tests/infrastructure/adapters/test_dark_pact_timing.py::test_dark_pact_selection_resolves_before_attacks[survive-shooting]": 1.681,
+    "tests/infrastructure/adapters/test_dark_pact_timing.py::test_dark_pact_selection_resolves_before_attacks[wipe-fight]": 1.339,
+    "tests/infrastructure/adapters/test_dark_pact_timing.py::test_dark_pact_selection_resolves_before_attacks[wipe-shooting]": 1.595,
+    "tests/infrastructure/adapters/test_dark_pact_timing.py::test_dark_pact_survivor_without_a_legal_gun_ends_shooting_without_an_attack": 1.417,
+    "tests/infrastructure/adapters/test_dark_pact_timing.py::test_native_overwatch_grant_expires_at_its_own_boundary[False]": 1.58,
+    "tests/infrastructure/adapters/test_dark_pact_timing.py::test_native_overwatch_grant_expires_at_its_own_boundary[True]": 1.714,
+    "tests/infrastructure/adapters/test_dark_pact_timing.py::test_only_shadow_legion_offers_belakor_the_no_roll_pact[blood-legion-fight]": 1.109,
+    "tests/infrastructure/adapters/test_dark_pact_timing.py::test_only_shadow_legion_offers_belakor_the_no_roll_pact[blood-legion-shooting]": 1.134,
+    "tests/infrastructure/adapters/test_dark_pact_timing.py::test_only_shadow_legion_offers_belakor_the_no_roll_pact[shadow-legion-fight]": 1.166,
+    "tests/infrastructure/adapters/test_dark_pact_timing.py::test_only_shadow_legion_offers_belakor_the_no_roll_pact[shadow-legion-shooting]": 1.228,
     "tests/infrastructure/adapters/test_deployment_candidates.py::test_deployment_binding_and_receipt_tampering_fail_closed": 0.98,
     "tests/infrastructure/adapters/test_deployment_candidates.py::test_deployment_generation_duplicate_and_raw_budget_accounting": 0.42,
     "tests/infrastructure/adapters/test_deployment_candidates.py::test_deployment_generation_has_distinct_geometry_and_stable_detached_roundtrip": 0.727,
@@ -6761,18 +6782,18 @@
   },
   "execution_model": {
     "assignment_wall_lower_bound_seconds": {
-      "1": 581.048,
-      "10": 581.048,
-      "11": 581.049,
-      "12": 581.049,
+      "1": 582.09,
+      "10": 582.091,
+      "11": 582.091,
+      "12": 582.09,
       "2": 795.547,
       "3": 609.537,
-      "4": 581.049,
-      "5": 581.049,
-      "6": 581.049,
-      "7": 581.049,
-      "8": 581.048,
-      "9": 581.048
+      "4": 582.091,
+      "5": 582.091,
+      "6": 582.091,
+      "7": 582.091,
+      "8": 582.091,
+      "9": 582.09
     },
     "cold_shard_assignment": "minimum-unrounded-modeled-test-load-existing-bucket-v1",
     "cold_shard_id": 1,
@@ -6781,18 +6802,18 @@
       "tests/factions/chaos_daemons/integration/test_cavalcade_v995_roster.py::test_exact_mirror_deploys_all_78_models_and_replays_to_battle"
     ],
     "shard_worker_seconds": {
-      "1": 2324.194,
-      "10": 2324.194,
-      "11": 2324.195,
-      "12": 2324.196,
+      "1": 2328.361,
+      "10": 2328.362,
+      "11": 2328.366,
+      "12": 2328.361,
       "2": 3182.186,
       "3": 2438.146,
-      "4": 2324.195,
-      "5": 2324.195,
-      "6": 2324.195,
-      "7": 2324.196,
-      "8": 2324.194,
-      "9": 2324.194
+      "4": 2328.365,
+      "5": 2328.362,
+      "6": 2328.364,
+      "7": 2328.363,
+      "8": 2328.363,
+      "9": 2328.361
     }
   },
   "files": {
@@ -6861,6 +6882,7 @@
     "tests/infrastructure/adapters/test_charge_flight_barrier.py": 22.032,
     "tests/infrastructure/adapters/test_charge_flight_onslaught_timing.py": 27.946,
     "tests/infrastructure/adapters/test_cover_event_identity.py": 0.001,
+    "tests/infrastructure/adapters/test_dark_pact_timing.py": 41.68,
     "tests/infrastructure/adapters/test_deployment_candidates.py": 463.191,
     "tests/infrastructure/adapters/test_deployment_experiment.py": 493.559,
     "tests/infrastructure/adapters/test_deployment_geometry_features.py": 358.567,
@@ -7360,6 +7382,7 @@
         "5e4e0c1d0dec8330b10e7b4b4b3ec3191c4750ff009cfa932d3468ab003b7c65",
         "6065394017e442925f4256644907ffc7924dcc2b4a699b5065e1dda846989353",
         "63db8ac24763535fbddc46142b0c99e6833b128bc40e674ff95ec735b05e1018",
+        "6bd26136bbdd8633d62e2096d5ee6ec30ce1467afa4d9b33da379504811a9622",
         "708e2a7cdde4ec8155cc758efc538d7dc0dd4b5c25644c8a1c2d88652d6df8df",
         "70fd07b8320b0845f0fda4a1605082f32d3491ccc020572c417dbde73bb3179c",
         "7cded789191d3e9a531806a0b448b6347da9bd58f9f62af169b77cae998e0753",
@@ -7369,19 +7392,20 @@
         "a0c739be5dead41e85b3bd2dd20621e2c1740137928b6661ac0bf3e095e36bef",
         "a58370bb7e97f2155a65d0b16e4dc74b9e2fdb5251ee95594210b0d558e2ef63",
         "b6375213c9da2f15abad64e49a6464d2963ef84289178cef5d659c8ec4ce1295",
+        "cd7f89e05a4dbf7b6653c684a090d9dadccc238e9de7faeecb0f352235ef9e38",
         "d221fa9414f09deb36d275dca16085e59d0239e19246d38cf138ddd866c65662"
       ],
-      "source": "Retained #736 refresh timing profile and one measured three-inch Charge roundoff regression on WSL; plus five measured Sheathed in Brass cases (serial WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); plus measured Blood Begets Skulls and Phase 17I updates (serial WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); add four measured Stage 3 melee cases (WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); plus measured Skulls Beget Blood and Phase 17I updates (serial WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); retain two reviewed Stage 3 native-qualification flight weights (serial Windows, Python 3.14.5; scheduling only); plus measured Wrath Undeniable and Phase 17I updates (serial WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); plus four measured pre-roll Charge flight admission cases (serial Windows, Python 3.14.5; scheduling only); remeasured the same native Charge case with the operational proof and unchanged case inventory; plus seven measured Gore-Hungry Onslaught nodes (serial Linux, Python 3.14.5, branch coverage; scheduling only); plus 17 measured Stage 3 Dense-wall and native late-spend controls (serial Windows, Python 3.14.5; scheduling only), retaining all exact landed-base weights",
-      "test_cases": 6758,
-      "test_files": 455
+      "source": "Retained #736 refresh timing profile and one measured three-inch Charge roundoff regression on WSL; plus five measured Sheathed in Brass cases (serial WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); plus measured Blood Begets Skulls and Phase 17I updates (serial WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); add four measured Stage 3 melee cases (WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); plus measured Skulls Beget Blood and Phase 17I updates (serial WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); retain two reviewed Stage 3 native-qualification flight weights (serial Windows, Python 3.14.5; scheduling only); plus measured Wrath Undeniable and Phase 17I updates (serial WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); plus four measured pre-roll Charge flight admission cases (serial Windows, Python 3.14.5; scheduling only); remeasured the same native Charge case with the operational proof and unchanged case inventory; plus seven measured Gore-Hungry Onslaught nodes (serial Linux, Python 3.14.5, branch coverage; scheduling only); plus 17 measured Stage 3 Dense-wall and native late-spend controls (serial Windows, Python 3.14.5; scheduling only), retaining all exact landed-base weights; plus 17 measured native Dark Pact timing regressions (serial WSL Ubuntu, Python 3.14.5; scheduling only), retaining all exact #745 base weights; plus four measured native Attached Fight and Fire Overwatch regressions (serial pytest, WSL Ubuntu, Python 3.14.5; scheduling only), retaining all exact prior weights",
+      "test_cases": 6779,
+      "test_files": 456
     }
   ],
   "shard_count": 12,
   "shards": [
     {
-      "duration_seconds": 2324.194,
+      "duration_seconds": 2328.361,
       "shard_id": 1,
-      "test_file_count": 51
+      "test_file_count": 53
     },
     {
       "duration_seconds": 3182.186,
@@ -7394,49 +7418,49 @@
       "test_file_count": 1
     },
     {
-      "duration_seconds": 2324.195,
+      "duration_seconds": 2328.365,
       "shard_id": 4,
-      "test_file_count": 46
+      "test_file_count": 45
     },
     {
-      "duration_seconds": 2324.195,
+      "duration_seconds": 2328.362,
       "shard_id": 5,
-      "test_file_count": 51
+      "test_file_count": 54
     },
     {
-      "duration_seconds": 2324.195,
+      "duration_seconds": 2328.364,
       "shard_id": 6,
-      "test_file_count": 53
+      "test_file_count": 50
     },
     {
-      "duration_seconds": 1822.962,
+      "duration_seconds": 1827.129,
       "shard_id": 7,
       "test_file_count": 51
     },
     {
-      "duration_seconds": 2324.194,
+      "duration_seconds": 2328.363,
       "shard_id": 8,
-      "test_file_count": 53
-    },
-    {
-      "duration_seconds": 2324.194,
-      "shard_id": 9,
-      "test_file_count": 53
-    },
-    {
-      "duration_seconds": 2324.194,
-      "shard_id": 10,
-      "test_file_count": 50
-    },
-    {
-      "duration_seconds": 2324.195,
-      "shard_id": 11,
-      "test_file_count": 85
-    },
-    {
-      "duration_seconds": 2324.196,
-      "shard_id": 12,
       "test_file_count": 51
+    },
+    {
+      "duration_seconds": 2328.361,
+      "shard_id": 9,
+      "test_file_count": 54
+    },
+    {
+      "duration_seconds": 2328.362,
+      "shard_id": 10,
+      "test_file_count": 51
+    },
+    {
+      "duration_seconds": 2328.366,
+      "shard_id": 11,
+      "test_file_count": 83
+    },
+    {
+      "duration_seconds": 2328.361,
+      "shard_id": 12,
+      "test_file_count": 53
     }
   ],
   "step5g_partitions": {
@@ -7444,5 +7468,5 @@
     "sha256": "b241b31651a8d5d903a2b851583186c276a5ac32fed26de1a1c69b4aa278b711"
   },
   "strategy": "largest-processing-time-by-derived-selector-weight",
-  "total_test_duration_seconds": 28361.046
+  "total_test_duration_seconds": 28402.726
 }

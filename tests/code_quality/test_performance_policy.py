@@ -822,7 +822,26 @@ def test_operation_map_uses_real_driver_and_owner_paths() -> None:
         assert path not in paths, path
         assert not (ROOT / path).exists(), path
         assert historical_input_bytes(path), path
+    import hashlib
+
+    from tools import performance_dark_pacts as dark_pact
+
+    retired_pact = dark_pact.RETIRED_COMPLETION_SOURCE
+    archived_pact = subprocess.check_output(
+        ["git", "show", f"{dark_pact.BASE}:{retired_pact}"],
+        cwd=ROOT,
+    )
+    assert hashlib.sha256(archived_pact).hexdigest() == dark_pact.RETIRED_COMPLETION_SHA256
+    assert retired_pact not in paths
+    assert not (ROOT / retired_pact).exists()
     for name, raw in operations.items():
+        if name == dark_pact.RETIRED_COMPLETION_OPERATION:
+            operation = object_value(raw)
+            assert operation["paths"] == [retired_pact]
+            assert operation["families"] == []
+            assert operation["mandatory"] is True
+            assert operation["sensitive"] is False
+            continue
         # Only the exact approved retirement uses hash-authenticated Git source.
         # Do not admit these missing paths for any other operation or live driver.
         if name == retirement:

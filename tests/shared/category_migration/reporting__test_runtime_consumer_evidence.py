@@ -61,7 +61,6 @@ _ARMY_RULE_EVIDENCE = (
         datasheet_name="Chaos Space Marines",
         runtime_consumer_ids=frozenset(
             {
-                chaos_space_marines_army_rule.ATTACK_SEQUENCE_COMPLETED_HOOK_ID,
                 chaos_space_marines_army_rule.FIGHT_LETHAL_HITS_HOOK_ID,
                 chaos_space_marines_army_rule.FIGHT_SUSTAINED_HITS_HOOK_ID,
                 chaos_space_marines_army_rule.MORTAL_WOUND_FEEL_NO_PAIN_HOOK_ID,

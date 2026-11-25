@@ -1,462 +1,1066 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "ccf3b3bed821d5fe92aa084f919100aaea3502e2",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:6580f37c0a152b8e39723a8aa5c7371c389826af531913de973c9ac4f100b66d",
-  "operation_map_sha256": "0e49a4ff8c7d82d83d68170be7518cbff4d9f5f09ccd0be2d10a11e51348c832",
+  "base": "ab3a4ac03854964649f74efe5b8cebd528d3e25a",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0f7d296e1cbe41efd947f0b36f0bcbf2745511c8456d167b6ee26b6552b9d637",
+  "operation_map_sha256": "e20ba796469af535091c985b4677989c172a7e920b594bc1655b9a51293235b9",
   "changes": {
     "ci/test_shards/durations.json": {
-      "before_sha256": "89d704f13e641565ecd0ea636c3a266e7318fa366aad2353b74b8f8d5f8b7321",
-      "after_sha256": "c785120b2ec6a8068d12e63a63f81d2a3f3c19e46b3db431dde43a6e6a443887",
+      "before_sha256": "c785120b2ec6a8068d12e63a63f81d2a3f3c19e46b3db431dde43a6e6a443887",
+      "after_sha256": "31202965f3706a3a387ee4454e5fb8ba52038bfa0f08b4ba63d353bf1bcd2563",
       "owners": {
         "@document": {
-          "before": "89d704f13e641565ecd0ea636c3a266e7318fa366aad2353b74b8f8d5f8b7321",
-          "after": "c785120b2ec6a8068d12e63a63f81d2a3f3c19e46b3db431dde43a6e6a443887"
+          "before": "c785120b2ec6a8068d12e63a63f81d2a3f3c19e46b3db431dde43a6e6a443887",
+          "after": "31202965f3706a3a387ee4454e5fb8ba52038bfa0f08b4ba63d353bf1bcd2563"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
-      "before_sha256": "e5a8a3af5406671cf5e1187dd209da647aea16ae3b6e12c7234b9f956ffa831c",
-      "after_sha256": "e1af014f1ad79c7d8557b99013aa4b8a488a08ba5552cf4c258c3afcb712d0c2",
+      "before_sha256": "e1af014f1ad79c7d8557b99013aa4b8a488a08ba5552cf4c258c3afcb712d0c2",
+      "after_sha256": "8e2f28f719268fbd0db6dca88a9183586beaa218eefbccd3bc85d4b4eabbb1dd",
       "owners": {
         "@document": {
-          "before": "e5a8a3af5406671cf5e1187dd209da647aea16ae3b6e12c7234b9f956ffa831c",
-          "after": "e1af014f1ad79c7d8557b99013aa4b8a488a08ba5552cf4c258c3afcb712d0c2"
+          "before": "e1af014f1ad79c7d8557b99013aa4b8a488a08ba5552cf4c258c3afcb712d0c2",
+          "after": "8e2f28f719268fbd0db6dca88a9183586beaa218eefbccd3bc85d4b4eabbb1dd"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
-      "before_sha256": "8f8f6ef3f5a8fbd386d54427b8e1178cc363bf8e4c627d5d6ea344f94013168b",
-      "after_sha256": "8bb96b0da785a7e0f4ad0e6987c0d3900290dad49f39a1e9a72bb998fdf09f12",
+      "before_sha256": "8bb96b0da785a7e0f4ad0e6987c0d3900290dad49f39a1e9a72bb998fdf09f12",
+      "after_sha256": "83d9999e448f2008dd666f7fa3a8f09a45671fa815945d466f23a45a1d3eff61",
       "owners": {
         "@document": {
-          "before": "8f8f6ef3f5a8fbd386d54427b8e1178cc363bf8e4c627d5d6ea344f94013168b",
-          "after": "8bb96b0da785a7e0f4ad0e6987c0d3900290dad49f39a1e9a72bb998fdf09f12"
+          "before": "8bb96b0da785a7e0f4ad0e6987c0d3900290dad49f39a1e9a72bb998fdf09f12",
+          "after": "83d9999e448f2008dd666f7fa3a8f09a45671fa815945d466f23a45a1d3eff61"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
-      "before_sha256": "03b397da06f33715ebc86b4759dfd407cb77486d817a59623f372b29249170b2",
-      "after_sha256": "a37e962104f16181dbab5a41e3daf09ff611a794405f7e343a1f1b6a1470e6a4",
+      "before_sha256": "a37e962104f16181dbab5a41e3daf09ff611a794405f7e343a1f1b6a1470e6a4",
+      "after_sha256": "653381b9267baaeb6ffb3acad3500bcb0f2e268c9c4f778b9f8729427df8bb92",
       "owners": {
         "@document": {
-          "before": "03b397da06f33715ebc86b4759dfd407cb77486d817a59623f372b29249170b2",
-          "after": "a37e962104f16181dbab5a41e3daf09ff611a794405f7e343a1f1b6a1470e6a4"
+          "before": "a37e962104f16181dbab5a41e3daf09ff611a794405f7e343a1f1b6a1470e6a4",
+          "after": "653381b9267baaeb6ffb3acad3500bcb0f2e268c9c4f778b9f8729427df8bb92"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
-      "before_sha256": "3c522e1b18599ceab78ec13a019bb080c0db380b0d6da6e7c3796ae635214db2",
-      "after_sha256": "66d202be9889b96c1abdb60e5347572bd528826b669b120ae4ce35267fbec4bc",
+      "before_sha256": "66d202be9889b96c1abdb60e5347572bd528826b669b120ae4ce35267fbec4bc",
+      "after_sha256": "ce51b5d7a3a5b05c44ef5b43b1b9edfc5f84a685d6b4ee743b51651075906687",
       "owners": {
         "@document": {
-          "before": "3c522e1b18599ceab78ec13a019bb080c0db380b0d6da6e7c3796ae635214db2",
-          "after": "66d202be9889b96c1abdb60e5347572bd528826b669b120ae4ce35267fbec4bc"
+          "before": "66d202be9889b96c1abdb60e5347572bd528826b669b120ae4ce35267fbec4bc",
+          "after": "ce51b5d7a3a5b05c44ef5b43b1b9edfc5f84a685d6b4ee743b51651075906687"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
-      "before_sha256": "218668b3befb8bf1e146b8a03ec7caf3c2da7931904bbb6916452a0fa9e5631f",
-      "after_sha256": "9404101bc4d11f177df9c3da2a9786ff8b93d7e215b39d87aaa6bb47639c874a",
+      "before_sha256": "9404101bc4d11f177df9c3da2a9786ff8b93d7e215b39d87aaa6bb47639c874a",
+      "after_sha256": "3309b44963ab4e277c3c94978faf1cd39f706f62e805628aa2df7a166b302336",
       "owners": {
         "@document": {
-          "before": "218668b3befb8bf1e146b8a03ec7caf3c2da7931904bbb6916452a0fa9e5631f",
-          "after": "9404101bc4d11f177df9c3da2a9786ff8b93d7e215b39d87aaa6bb47639c874a"
+          "before": "9404101bc4d11f177df9c3da2a9786ff8b93d7e215b39d87aaa6bb47639c874a",
+          "after": "3309b44963ab4e277c3c94978faf1cd39f706f62e805628aa2df7a166b302336"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
-      "before_sha256": "a6d82acd3ce375fb792d00f494959cad0a45ee21ef1ab2aa9a8016114230c03a",
-      "after_sha256": "73718a475117df9813a3f03bf62730730620213074d2a3f1824747f24fd756ef",
+      "before_sha256": "73718a475117df9813a3f03bf62730730620213074d2a3f1824747f24fd756ef",
+      "after_sha256": "927d5d89df1c82b31b4bd09678fb8060b601b82cca99b36878007f351e73691f",
       "owners": {
         "@document": {
-          "before": "a6d82acd3ce375fb792d00f494959cad0a45ee21ef1ab2aa9a8016114230c03a",
-          "after": "73718a475117df9813a3f03bf62730730620213074d2a3f1824747f24fd756ef"
+          "before": "73718a475117df9813a3f03bf62730730620213074d2a3f1824747f24fd756ef",
+          "after": "927d5d89df1c82b31b4bd09678fb8060b601b82cca99b36878007f351e73691f"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
-      "before_sha256": "96e99c403ad3fbfbe8dc7046af75042bb7c94d7f3369300f21ba867f2689b20a",
-      "after_sha256": "4dd4909365f03b24c09dc9c2e1a84a31e4f5be15f5d2a25900a60424016ba6be",
+      "before_sha256": "4dd4909365f03b24c09dc9c2e1a84a31e4f5be15f5d2a25900a60424016ba6be",
+      "after_sha256": "3f248b012869cf2d7a12f86201362681e412017ffabc7c837bb453e653e2bd60",
       "owners": {
         "@document": {
-          "before": "96e99c403ad3fbfbe8dc7046af75042bb7c94d7f3369300f21ba867f2689b20a",
-          "after": "4dd4909365f03b24c09dc9c2e1a84a31e4f5be15f5d2a25900a60424016ba6be"
+          "before": "4dd4909365f03b24c09dc9c2e1a84a31e4f5be15f5d2a25900a60424016ba6be",
+          "after": "3f248b012869cf2d7a12f86201362681e412017ffabc7c837bb453e653e2bd60"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
-      "before_sha256": "8344317fb7837f97b0c52651447873d60dedfd0cca159a32aa2b46a411af0028",
-      "after_sha256": "49e00896064b0624f490329a2f71445d2e9c4fb44b565ad02c739b591c4a23c3",
+      "before_sha256": "49e00896064b0624f490329a2f71445d2e9c4fb44b565ad02c739b591c4a23c3",
+      "after_sha256": "e32ecd1d45b8e235b926f5881d7db87c29aeb8d4780273912836d8e434219753",
       "owners": {
         "@document": {
-          "before": "8344317fb7837f97b0c52651447873d60dedfd0cca159a32aa2b46a411af0028",
-          "after": "49e00896064b0624f490329a2f71445d2e9c4fb44b565ad02c739b591c4a23c3"
+          "before": "49e00896064b0624f490329a2f71445d2e9c4fb44b565ad02c739b591c4a23c3",
+          "after": "e32ecd1d45b8e235b926f5881d7db87c29aeb8d4780273912836d8e434219753"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
-      "before_sha256": "c2f3a4699ea9ac114f69532d6cbaff7ad8fa03a5f5fa6ffbcfd81808d8367336",
-      "after_sha256": "0fccd6ef4b9b7a14837fb63a13a70b6ec79a5abd9718aa4e6390968e6291fe8b",
+      "before_sha256": "0fccd6ef4b9b7a14837fb63a13a70b6ec79a5abd9718aa4e6390968e6291fe8b",
+      "after_sha256": "0374d935537df1fa426b36515b1df6c4db5d7266f82565e56ba533c35466daea",
       "owners": {
         "@document": {
-          "before": "c2f3a4699ea9ac114f69532d6cbaff7ad8fa03a5f5fa6ffbcfd81808d8367336",
-          "after": "0fccd6ef4b9b7a14837fb63a13a70b6ec79a5abd9718aa4e6390968e6291fe8b"
+          "before": "0fccd6ef4b9b7a14837fb63a13a70b6ec79a5abd9718aa4e6390968e6291fe8b",
+          "after": "0374d935537df1fa426b36515b1df6c4db5d7266f82565e56ba533c35466daea"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
-      "before_sha256": "842997e74d7bf4c3eb0686e1b685b75130fa75022922ab1552e398e98e369938",
-      "after_sha256": "0117be15a6a0024ab1c63c7f558010655d6cae7f81de8a7f82b5a037b2821c2c",
+      "before_sha256": "0117be15a6a0024ab1c63c7f558010655d6cae7f81de8a7f82b5a037b2821c2c",
+      "after_sha256": "4e4fdf811a78da88903a0a3d92a7021a825fc63afdd1ac1b41f2e8a1f79e3062",
       "owners": {
         "@document": {
-          "before": "842997e74d7bf4c3eb0686e1b685b75130fa75022922ab1552e398e98e369938",
-          "after": "0117be15a6a0024ab1c63c7f558010655d6cae7f81de8a7f82b5a037b2821c2c"
+          "before": "0117be15a6a0024ab1c63c7f558010655d6cae7f81de8a7f82b5a037b2821c2c",
+          "after": "4e4fdf811a78da88903a0a3d92a7021a825fc63afdd1ac1b41f2e8a1f79e3062"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "b241f42bf9ff1df3a324155ce91881120f5d83288ae2f5dc6d23c56f4dfbba16",
-      "after_sha256": "f065b493796999491b66de755822d6e38479ae1ad201cdab8283fb428c354903",
+      "before_sha256": "f065b493796999491b66de755822d6e38479ae1ad201cdab8283fb428c354903",
+      "after_sha256": "a552521fd9c71018ed0cc0d539d68e834582cd53b42ebc5d43aa7c17f3ec8355",
       "owners": {
         "@document": {
-          "before": "b241f42bf9ff1df3a324155ce91881120f5d83288ae2f5dc6d23c56f4dfbba16",
-          "after": "f065b493796999491b66de755822d6e38479ae1ad201cdab8283fb428c354903"
+          "before": "f065b493796999491b66de755822d6e38479ae1ad201cdab8283fb428c354903",
+          "after": "a552521fd9c71018ed0cc0d539d68e834582cd53b42ebc5d43aa7c17f3ec8355"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "457c01a487a9d58d6fec3218b1e17b4c54ec69e81315cb9c915ba4e5fd47a2bd",
-      "after_sha256": "18dc1d79ec961ee716ad3597fd40ae11a060761f38064a7874653a8e7139cfd3",
+      "before_sha256": "18dc1d79ec961ee716ad3597fd40ae11a060761f38064a7874653a8e7139cfd3",
+      "after_sha256": "686ecf572fd457b2e8975b1346a8820c629cbb3156077ff74aa3efa02a419694",
       "owners": {
         "@document": {
-          "before": "457c01a487a9d58d6fec3218b1e17b4c54ec69e81315cb9c915ba4e5fd47a2bd",
-          "after": "18dc1d79ec961ee716ad3597fd40ae11a060761f38064a7874653a8e7139cfd3"
+          "before": "18dc1d79ec961ee716ad3597fd40ae11a060761f38064a7874653a8e7139cfd3",
+          "after": "686ecf572fd457b2e8975b1346a8820c629cbb3156077ff74aa3efa02a419694"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "d175f32c90ec7bf4635302e73541f2b02c438d2f9864213a844f092e7bda1e34",
-      "after_sha256": "3c9fe071a3b8523268ace9bfcb971c0dfc31e3ffce2f68f800973311aaf6569c",
+      "before_sha256": "3c9fe071a3b8523268ace9bfcb971c0dfc31e3ffce2f68f800973311aaf6569c",
+      "after_sha256": "ae2bc778d080f11946ee2f5392a2753fdb91e301aafe5fb8da8a52013a9cc811",
       "owners": {
         "@document": {
-          "before": "d175f32c90ec7bf4635302e73541f2b02c438d2f9864213a844f092e7bda1e34",
-          "after": "3c9fe071a3b8523268ace9bfcb971c0dfc31e3ffce2f68f800973311aaf6569c"
+          "before": "3c9fe071a3b8523268ace9bfcb971c0dfc31e3ffce2f68f800973311aaf6569c",
+          "after": "ae2bc778d080f11946ee2f5392a2753fdb91e301aafe5fb8da8a52013a9cc811"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "1ce23235ad145462255b31ef69ada112b6125e410e41fafe05f765cbd9035f88",
-      "after_sha256": "a0a100d1cac88ecb7f121123a863432b9fb41166292552cee0a2f7e93da472dd",
+      "before_sha256": "a0a100d1cac88ecb7f121123a863432b9fb41166292552cee0a2f7e93da472dd",
+      "after_sha256": "8364b271907dc14e6f7da08cca56ec32843b953ac14df100c42a833804a1128e",
       "owners": {
         "@document": {
-          "before": "1ce23235ad145462255b31ef69ada112b6125e410e41fafe05f765cbd9035f88",
-          "after": "a0a100d1cac88ecb7f121123a863432b9fb41166292552cee0a2f7e93da472dd"
+          "before": "a0a100d1cac88ecb7f121123a863432b9fb41166292552cee0a2f7e93da472dd",
+          "after": "8364b271907dc14e6f7da08cca56ec32843b953ac14df100c42a833804a1128e"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "82c2e89b876bd7819b26ee9cc93118a874cb879eaf540e112010ab4cf42a22e0",
-      "after_sha256": "3d9ce8bbc5db1785a05b9786be60a50d3e0c6f4bebced84f644c129db9f1587c",
+      "before_sha256": "3d9ce8bbc5db1785a05b9786be60a50d3e0c6f4bebced84f644c129db9f1587c",
+      "after_sha256": "769c7f7acd5e6b22252d904b0a09ecebabb1492a9ca7757520db22c3a34bd262",
       "owners": {
         "@document": {
-          "before": "82c2e89b876bd7819b26ee9cc93118a874cb879eaf540e112010ab4cf42a22e0",
-          "after": "3d9ce8bbc5db1785a05b9786be60a50d3e0c6f4bebced84f644c129db9f1587c"
+          "before": "3d9ce8bbc5db1785a05b9786be60a50d3e0c6f4bebced84f644c129db9f1587c",
+          "after": "769c7f7acd5e6b22252d904b0a09ecebabb1492a9ca7757520db22c3a34bd262"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "46171afa96b2f7dec6096abb44bbc446a15321fe70ed8d4f1fb847642f6adaaa",
-      "after_sha256": "00452489597feba5e215d2bd0cb2b800b408636226de7730fa32a9443af25ea7",
+      "before_sha256": "00452489597feba5e215d2bd0cb2b800b408636226de7730fa32a9443af25ea7",
+      "after_sha256": "c7e47f18e832da20122c2edce8f1a568d54a111fc9de22b9be7d0d91d71a8753",
       "owners": {
         "@document": {
-          "before": "46171afa96b2f7dec6096abb44bbc446a15321fe70ed8d4f1fb847642f6adaaa",
-          "after": "00452489597feba5e215d2bd0cb2b800b408636226de7730fa32a9443af25ea7"
+          "before": "00452489597feba5e215d2bd0cb2b800b408636226de7730fa32a9443af25ea7",
+          "after": "c7e47f18e832da20122c2edce8f1a568d54a111fc9de22b9be7d0d91d71a8753"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "17719b0c841448ac92b0d4a20f747e263d7975110bcfeecfefd4bc99040e5f35",
-      "after_sha256": "e4198236fcd436348d3eb3991b31dc6fafff9b186fc85084bdd100011a3384a3",
+      "before_sha256": "e4198236fcd436348d3eb3991b31dc6fafff9b186fc85084bdd100011a3384a3",
+      "after_sha256": "6d1ba14bb899ab5ca76ff73a2d8cfce895360d883d28f72a393e4a0ef39e71da",
       "owners": {
         "@document": {
-          "before": "17719b0c841448ac92b0d4a20f747e263d7975110bcfeecfefd4bc99040e5f35",
-          "after": "e4198236fcd436348d3eb3991b31dc6fafff9b186fc85084bdd100011a3384a3"
+          "before": "e4198236fcd436348d3eb3991b31dc6fafff9b186fc85084bdd100011a3384a3",
+          "after": "6d1ba14bb899ab5ca76ff73a2d8cfce895360d883d28f72a393e4a0ef39e71da"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "ca2ef866e845540f688177a223e716f546311236f1273e0b718a42f2fc29b38a",
-      "after_sha256": "747f40baea92c033cb06a0fb4373a2803bc5d6b8fa4a489f12e4ea91645cb202",
+      "before_sha256": "747f40baea92c033cb06a0fb4373a2803bc5d6b8fa4a489f12e4ea91645cb202",
+      "after_sha256": "ffa330a15659a0379786edc23914513944a11d21333aeb39d05df0fd01fb86a0",
       "owners": {
         "@document": {
-          "before": "ca2ef866e845540f688177a223e716f546311236f1273e0b718a42f2fc29b38a",
-          "after": "747f40baea92c033cb06a0fb4373a2803bc5d6b8fa4a489f12e4ea91645cb202"
+          "before": "747f40baea92c033cb06a0fb4373a2803bc5d6b8fa4a489f12e4ea91645cb202",
+          "after": "ffa330a15659a0379786edc23914513944a11d21333aeb39d05df0fd01fb86a0"
         }
       }
     },
-    "data/source_audits/ci64_provenance_v1/charge-flight-wall-test-v1.json": {
+    "data/generated/ability_coverage/ability_coverage_rows.json": {
+      "before_sha256": "d04fbb07a7d7070edfc3e17fc1943fa56da9ca85600cc8a3fd7f00fff0124afd",
+      "after_sha256": "9a39774dbe4b138887aee7843ff970cc6eec7ac659e7b6dcd8dbf6af281a858d",
+      "owners": {
+        "@document": {
+          "before": "d04fbb07a7d7070edfc3e17fc1943fa56da9ca85600cc8a3fd7f00fff0124afd",
+          "after": "9a39774dbe4b138887aee7843ff970cc6eec7ac659e7b6dcd8dbf6af281a858d"
+        }
+      }
+    },
+    "data/generated/ability_coverage/ability_support_category_rows.json": {
+      "before_sha256": "387d29cb3ade877b16e597cf6b6ff017daca85120b494653260c0a6f26b0c917",
+      "after_sha256": "e5ec02b494fe92fd8a25e7ba6ecbbadf3fdc392f1d4cb557963b7e68a9947135",
+      "owners": {
+        "@document": {
+          "before": "387d29cb3ade877b16e597cf6b6ff017daca85120b494653260c0a6f26b0c917",
+          "after": "e5ec02b494fe92fd8a25e7ba6ecbbadf3fdc392f1d4cb557963b7e68a9947135"
+        }
+      }
+    },
+    "data/generated/ability_coverage/datasheet_support_rows.json": {
+      "before_sha256": "3e749aae41b080faaa7bf5cda25761677a38f41890a6b5f67b6f93c146a3dd10",
+      "after_sha256": "5a2a9cbcf3f290922ce4d7bfe5720ebfb55f3d142651587fdb0b2395d2b80b66",
+      "owners": {
+        "@document": {
+          "before": "3e749aae41b080faaa7bf5cda25761677a38f41890a6b5f67b6f93c146a3dd10",
+          "after": "5a2a9cbcf3f290922ce4d7bfe5720ebfb55f3d142651587fdb0b2395d2b80b66"
+        }
+      }
+    },
+    "data/generated/ability_coverage/maulerfiend_cross_faction_support.json": {
+      "before_sha256": "5a5f1ab5259af2c79a2084afd38f086afa131e3ef5f76f389d436d5ccd700fc4",
+      "after_sha256": "4a46fc50353ec60c378bbf05bb54f10f1de9a78067b1aa64123043200ab5d2c5",
+      "owners": {
+        "@document": {
+          "before": "5a5f1ab5259af2c79a2084afd38f086afa131e3ef5f76f389d436d5ccd700fc4",
+          "after": "4a46fc50353ec60c378bbf05bb54f10f1de9a78067b1aa64123043200ab5d2c5"
+        }
+      }
+    },
+    "data/source_audits/ci64_provenance_v1/dark-pact-test-v1.json": {
       "before_sha256": null,
-      "after_sha256": "93199961c9111e9cc0dd527f2b1224fd4a6e2c9e627ef735fac37cf7b30b5c27",
+      "after_sha256": "a12562dd774086af360aca74bda457ebf0f6e10ae3e533ae4af6e021f3110031",
       "owners": {
         "@document": {
           "before": null,
-          "after": "93199961c9111e9cc0dd527f2b1224fd4a6e2c9e627ef735fac37cf7b30b5c27"
+          "after": "a12562dd774086af360aca74bda457ebf0f6e10ae3e533ae4af6e021f3110031"
         }
       }
     },
-    "docs/AI_POLICY_INTERFACE.md": {
-      "before_sha256": "38e6b0f614fdb4e6741ad0178254223051213212907e4858a2c3d556044cabb2",
-      "after_sha256": "f81bbb6052c2a1ef1e8785b1471ba147c5f00c72511be8a77d70ed60756cabcd",
+    "docs/ABILITY_SUPPORT_MATRIX_V2.md": {
+      "before_sha256": "06995bf9a530bd9aa36d42cb2ded73568b87af83ba54e7d51bed69a0e91b908d",
+      "after_sha256": "e36fa5b79678b16e9ab351b3f926e297f094b5d20cc62ccf72b622db2cd18b53",
       "owners": {
         "@document": {
-          "before": "38e6b0f614fdb4e6741ad0178254223051213212907e4858a2c3d556044cabb2",
-          "after": "f81bbb6052c2a1ef1e8785b1471ba147c5f00c72511be8a77d70ed60756cabcd"
+          "before": "06995bf9a530bd9aa36d42cb2ded73568b87af83ba54e7d51bed69a0e91b908d",
+          "after": "e36fa5b79678b16e9ab351b3f926e297f094b5d20cc62ccf72b622db2cd18b53"
+        }
+      }
+    },
+    "docs/ADAPTER_DECISION_CONTRACT.md": {
+      "before_sha256": "430e1a175137824be58ddf1ad2fdca2c5f248b088d5d9f96503e8e3dcfdab5e6",
+      "after_sha256": "4014fa72fc7925f4facab2e78a87c76dfec11d40766ee01d07bade463c8c388c",
+      "owners": {
+        "@document": {
+          "before": "430e1a175137824be58ddf1ad2fdca2c5f248b088d5d9f96503e8e3dcfdab5e6",
+          "after": "4014fa72fc7925f4facab2e78a87c76dfec11d40766ee01d07bade463c8c388c"
+        }
+      }
+    },
+    "docs/DECISION_SUBMISSION_CATALOG.md": {
+      "before_sha256": "d1dfd0ac2b2024478d52aa418d4effeff2225a360808de9e96b83595caca9a79",
+      "after_sha256": "66216324c3e5f500f05f085dced24801e39f5378eccb55eb7137474b84d86a2f",
+      "owners": {
+        "@document": {
+          "before": "d1dfd0ac2b2024478d52aa418d4effeff2225a360808de9e96b83595caca9a79",
+          "after": "66216324c3e5f500f05f085dced24801e39f5378eccb55eb7137474b84d86a2f"
+        }
+      }
+    },
+    "docs/factions/chaos-space-marines.md": {
+      "before_sha256": "54ba4dd46c331c3a939f92208d0c7bdbb648c2bcaaf121b67e19517cc3a3e057",
+      "after_sha256": "bba928afb167a035f69ca1dc9d0c966027e3db379ea46760cc416872cdefaad5",
+      "owners": {
+        "@document": {
+          "before": "54ba4dd46c331c3a939f92208d0c7bdbb648c2bcaaf121b67e19517cc3a3e057",
+          "after": "bba928afb167a035f69ca1dc9d0c966027e3db379ea46760cc416872cdefaad5"
+        }
+      }
+    },
+    "docs/performance/policy-v3/dark-pact-timing-scope.json": {
+      "before_sha256": null,
+      "after_sha256": "acda45d3c67d2e321808b8e107d952c7e32b7de88fdf39ec038de64d09193ed0",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "acda45d3c67d2e321808b8e107d952c7e32b7de88fdf39ec038de64d09193ed0"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "452af417e2c0e5f6013fcb098ac5c1835d01c6d9ceece6e46e5f7bcec9dedbb0",
-      "after_sha256": "a7b072f15344746df9dce11e2012b1e600fcc39b8123e26bddeae673d476e9b4",
+      "before_sha256": "a7b072f15344746df9dce11e2012b1e600fcc39b8123e26bddeae673d476e9b4",
+      "after_sha256": "250a8a428956b3c8f338a7fd906a443a797bb157e6c818eb95ad795e2d567e93",
       "owners": {
         "@document": {
-          "before": "452af417e2c0e5f6013fcb098ac5c1835d01c6d9ceece6e46e5f7bcec9dedbb0",
-          "after": "a7b072f15344746df9dce11e2012b1e600fcc39b8123e26bddeae673d476e9b4"
+          "before": "a7b072f15344746df9dce11e2012b1e600fcc39b8123e26bddeae673d476e9b4",
+          "after": "250a8a428956b3c8f338a7fd906a443a797bb157e6c818eb95ad795e2d567e93"
+        }
+      }
+    },
+    "scripts/build_test_shards.py": {
+      "before_sha256": "8843ed051f815f81584bd8cb3b8f50ed2c0ef74308ebb3c4695e8db9eec66aaa",
+      "after_sha256": "e9c278924ec18958737f61437b68653c86ea35d2ae7e4ac9915ffa2b6c233c56",
+      "owners": {
+        "behavioral_selection": {
+          "before": "5f8776a0b49339dffc07ffa15da12d1bf847442022a487a23179a1e02a901271",
+          "after": "cdaa7621aba65303a981bb288fa70254999a894b6bfa1e722609e023d9b300d6"
+        }
+      }
+    },
+    "scripts/dark_pact_test_admission.py": {
+      "before_sha256": null,
+      "after_sha256": "00c8960756fd8419f02efc04e6c5f41435e66ebfb93c2567fe7d5bb28a8ad5b1",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "66cdfc695ca7eebaa3001abc9c9f50644ed00c1faa1ef57dccc40bc9b2fd12f6"
+        },
+        "_read_receipt": {
+          "before": null,
+          "after": "2ec1ca2c89496d565c255322fb9264169c5e945a66dc704b78be15b3017ae66e"
+        },
+        "dark_pact_active_successors": {
+          "before": null,
+          "after": "9b5e3974d6478b0ddc0eef613cc2347eb9ce348aa42b6962fad4948341e2cb99"
+        },
+        "dark_pact_inactive_successors": {
+          "before": null,
+          "after": "e62831cd083b5bf458e247f287559531d1ae5669eba1792f2dd1fb3de2e67de7"
+        },
+        "dark_pact_source_successors": {
+          "before": null,
+          "after": "be318b91488ec2a00cd8d0341a34f10e0fd181d492b47909a34ff79cb13d0643"
+        },
+        "dark_pact_test_transition": {
+          "before": null,
+          "after": "1ae3f48b33711243a331b39bcc77db048cd3bcac362dd0f7b138d6e1f5eb804e"
         }
       }
     },
     "scripts/engine_numerical_identity_test_admission.py": {
-      "before_sha256": "c5bf9af8d77b1d303050bf4acede5f0a704d230c675d21876cd7a488436f3b9b",
-      "after_sha256": "167744fcf163f2247246b31c48fe2f2bebb1cffd4488bf7c9e7a3df64e698ac1",
+      "before_sha256": "167744fcf163f2247246b31c48fe2f2bebb1cffd4488bf7c9e7a3df64e698ac1",
+      "after_sha256": "ef7257f10327894892b8e2df68ddc3b378b6c7bf9274eb0712fca57622bde6e2",
       "owners": {
-        "@module": {
-          "before": "6e6eaf09a19e94d46a5afeecf05cd60f82909793abeb7f5cd841714af3a2e0e1",
-          "after": "3a9cc111aa8a55209ce7830d1b4550875ddbd0e738505b5691fbbc3fda9f1488"
+        "_monster_mash_attack_reroll_successor": {
+          "before": "279bf040aecbf832f369ccbe89fa9d7b1b9e32f8396214c014d3f3ecda531a6b",
+          "after": "ea194bca8f9601a3f9866551cb54277567c9ad70d2067e888638917dd82a952e"
         },
-        "_charge_flight_wall_test_addition": {
-          "before": null,
-          "after": "78193841ed028e154cac53b73087c4d72a67ed6d638412b8fa2126f9f11f87ac"
-        },
-        "_pre_roll_charge_flight_test_addition": {
-          "before": "2bf120ae2fca07465d1b238db23233e54d8043b613cd9672cbb9278c817679d2",
-          "after": "58ecca5407967a5a30f0d058b209b794444536b29f7b7af8b78fe000cfc40dd7"
+        "_round4_malice_bearer_successor": {
+          "before": "04bf62d1e975e979a1039b0ec4668d2fa71eae4944e7f2ddbaa49246f23f360c",
+          "after": "d7e2b82e34ac4d0622bd96f0c425937c572448c1e47d96f1a6f10672e973bb63"
         },
         "exact_movement_test_transition": {
-          "before": "f50af58867daf9a5516d320c6625bc866a5018bfca4c941608a55af7a77f25f5",
-          "after": "fee1b13d274ebaea5e582bfea3e6da6935492c678fe7809eeee79abbf20478f5"
+          "before": "fee1b13d274ebaea5e582bfea3e6da6935492c678fe7809eeee79abbf20478f5",
+          "after": "0f3a10f33a1a56e077f108fc754ffb284adad9ca717975c075cd5b8716770d11"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "72579299bf39bb9a43a8cea1d51a8fec5df516e710723b076a1d0d5836506c45",
-      "after_sha256": "3329d68eae2c6a94e03bd3d925604d7a5e86cbfef9839a7b01a507a83bac5f39",
+      "before_sha256": "3329d68eae2c6a94e03bd3d925604d7a5e86cbfef9839a7b01a507a83bac5f39",
+      "after_sha256": "2250a7814cd3a73fcfd4dc44514bccfd15d21c1bdba304f5e432b4e93801ba3f",
       "owners": {
         "@document": {
-          "before": "72579299bf39bb9a43a8cea1d51a8fec5df516e710723b076a1d0d5836506c45",
-          "after": "3329d68eae2c6a94e03bd3d925604d7a5e86cbfef9839a7b01a507a83bac5f39"
+          "before": "3329d68eae2c6a94e03bd3d925604d7a5e86cbfef9839a7b01a507a83bac5f39",
+          "after": "2250a7814cd3a73fcfd4dc44514bccfd15d21c1bdba304f5e432b4e93801ba3f"
         }
       }
     },
-    "src/warhammer40k_core/ai/charge_flight_admission.py": {
-      "before_sha256": "37b0a0f6325536b7b3ece1ac66e367f80336a52754aff7e86b07ff78f6d24a85",
-      "after_sha256": "008c5379dfa3e49b65080ae35d35522165b660729c3c8dff57239cbdeeab59e5",
+    "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/detachments/shadow_legion/rule.py": {
+      "before_sha256": "51d1781d774ea84588d6182265bd524dce6503ad0d8d85353982b6c4e0f3782b",
+      "after_sha256": "0488119a17db07058da1cc9cdc3dff146ab25dba078dd9bc9536f8017c342a22",
       "owners": {
         "@module": {
-          "before": "03f96b5d149d41b90d53d0cbb1da8620b5c447b099c3d6f6ca145a8ed6d17e8e",
-          "after": "4588ec5592d8d28d3dbd7cf9eea8baa865263572afa1634a79c0e6cb857f2660"
+          "before": "364396ab3395599f135fa5006158ed937e5fe13d17d6a3306f412fc031d92e10",
+          "after": "7cb32b486b5ca0f89c452c2e97ef4ccff9dda6908aba19e3a5256971c68dabbd"
         },
-        "ChargeFlightRollBound": {
-          "before": null,
-          "after": "5624a70aff32969ce1b675910a83b173f2fbeb44fc7e2593465e003a63a82524"
+        "_fight_dark_pact_grant": {
+          "before": "d7a90f4e5ad3db44a9814cdc9d2f9f65a28287773bb7aa8f2572572f72cd7361",
+          "after": "8adc5e7d546132906f073a004c02dc8123d5dd0dafb857ce68879bc5d3f73391"
         },
-        "ChargeFlightUnresolvedReason": {
-          "before": "6b57e95e121ef22deaab3e71876c898be6d500bccb884245ca130552b250e99f",
-          "after": "e521fd327cc40228c1f35ac78a0e7e16aee3eb02e05ee7124a560d85c00d6f5f"
+        "_shooting_dark_pact_grant": {
+          "before": "57f3a427b2b9bf658ca2c19167279705280a940c74a7e03cd0890eb1da7f09d5",
+          "after": "155c75e4f019b97c0b7634a684a6796c87f5e8d7739d5547598f4ada9fa7d274"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_space_marines/army_rule.py": {
+      "before_sha256": "9ede066de03eb2948bfb31133ab83efb4630f699d4a58f3f9fbd3d658c7475a4",
+      "after_sha256": "40294c896f0687bed39a4e8820d45ec315d04e6b13ec4a3fa950e49cb2a5ecbc",
+      "owners": {
+        "@module": {
+          "before": "af72c9f19fcb5c028f4d5c9a84562a50e9efb7835df9b2923bdf34e4aa168c0d",
+          "after": "7681b4234991229fcb6a31037e3edfd0ee5e35fa95f62ad6eef2fd63270d5bb0"
         },
-        "ProvenChargeFlightAdvantage": {
-          "before": null,
-          "after": "06f688b6a61c4b76221ca1c991fc0623d9a5aff9b42f906d87dbfb1feb336645"
-        },
-        "_native_scenario": {
-          "before": null,
-          "after": "5c15b1048d4deed3045d5a121b1c29aa1934d25bb8e308140a935ae7755e9e30"
-        },
-        "_open_native_scenario": {
-          "before": "77c1b37e30c94ad4bb88bb22159d4c38313b8251bd1a7ef21d0ed2f0e713b959",
+        "DarkPactMortalWoundSourceContextPayload": {
+          "before": "34f56f35fb4a6ea47102e5062e017544a9f647d52b8313bb1f9849df61ee62cc",
           "after": null
         },
-        "_open_visible_poses": {
-          "before": "11daa2ce7a248d0b64c57aa119bb43e1c7809f9318f119a33471c65c4d7cd4fd",
+        "_dark_pact_completion_hook_id_for_rule": {
+          "before": "53dca18591ce8f37811bad588b62d33d1660bbae4c03bb4a8397c2376bec5468",
           "after": null
         },
-        "_plain_charge_supported": {
-          "before": "b554b9ca7aab80bbc5a487b3ba413c81cb07518d8b579742962534b8e0303407",
-          "after": "dc312d8e6c34ba8290b7db167c1ddb321678325bb559b8e2a4d237166114fc21"
+        "_dark_pact_mortal_wound_source_context_from_payload": {
+          "before": "eef7def0a9abcaec595f3347e7093eac20d1977a13cac3906249f870e6aab390",
+          "after": null
         },
-        "_prove_mode": {
-          "before": "65d07fd0754d6e1c5bc6210ad1f7171e55b41e86457e6819acd566a6c3463904",
-          "after": "8bab04cc1eaf8d1b4448c9e903a4a56085176c3ed4637108569f6748bb9b3ead"
+        "_dark_pact_mortal_wound_source_kind_for_rule": {
+          "before": "20403b5494005d6370c680d827bee23cf593dc1e9bb2d5550944220c453b0d17",
+          "after": null
         },
-        "_prove_open_choice": {
+        "_fight_dark_pact_grant": {
+          "before": "be88a34ebbc81a268164b0e1fa7d09372c94057847096239d5a6f5b465112462",
+          "after": "92d5c76f6c95fd6b2bc979a8fd0b263a7886732c314e761bbb1bac9adbabaa68"
+        },
+        "_json_object": {
+          "before": "3928d6c66d68c3924b8a56cc349af2b333632b77b7633b24d2214c67d3dd2dc1",
+          "after": null
+        },
+        "_model_leadership": {
+          "before": "d726568f4b9acc93bae5b970f45fcad4a4a3c35bdca6dbd8e861c80af4ee5a1f",
+          "after": null
+        },
+        "_shooting_dark_pact_grant": {
+          "before": "d670da1bd80610de067b2d9d50a26ec750d6658b86104f1a68efdef4735477f0",
+          "after": "5452d9521449987f4c271f2d4346cfcfc68713a0c76dd05b4b4386872ed8e3f1"
+        },
+        "active_dark_pact_effect_for_unit": {
+          "before": "f32eca22a9f153ebc5b380e0dcfa5c16660fffe07ca2317e3e9e27ccc06367dd",
+          "after": "e70f2d9771cb96998e5de36a5407a1dacfeeba8be5963e7442c97650fbbb93e3"
+        },
+        "apply_dark_pact_mortal_wound_feel_no_pain_decision": {
+          "before": "978c118738f5c7ddcceb02d1855960e535acc160903e8d3e518cebfd256ef848",
+          "after": null
+        },
+        "dark_pact_already_resolved": {
+          "before": "4af57c647ad02fb40a13393b27d8214e445749aa442c3d4638b80351b321151c",
+          "after": null
+        },
+        "dark_pact_completion_candidates": {
+          "before": "f29d653ac7f6d34d6c5ea024dfbfd8548463055b4198abbd239a869ab54e41ad",
+          "after": null
+        },
+        "dark_pact_leadership_auto_passes": {
+          "before": "d3ae9a02f443a0ce5c2e7426c9fc4f1720c46cd0acb9e0e9472170e9853595d9",
+          "after": null
+        },
+        "dark_pact_mortal_wound_source_context": {
+          "before": "2b5e2eee8554a5f39218806e44facd987cd664f2497e90e7658c79b082e66413",
+          "after": null
+        },
+        "dark_pact_preparation": {
           "before": null,
-          "after": "5d427ed3619d316c17ba3da73e5a65fe45c1a7c136bb193c15d74d3e973e2fb9"
+          "after": "991bef16a0352859f80b135c34ccf0c4944dda0ffe113ee6ce1e0c4b5067ddde"
         },
-        "_prove_wall_advantage": {
+        "dark_pact_resolution_payload": {
+          "before": "73196d3d10e2d11280a0a4f5a98d900895ec472a9a2cbca01131a370113867ef",
+          "after": null
+        },
+        "leadership_target_for_rules_unit": {
+          "before": "e0d455ab1de244c22b76e8ccdc6d3ac1e2ffdbbba1d70ae49f7e9e9aa9345de9",
+          "after": null
+        },
+        "resolve_dark_pact_attack_sequence_completion": {
+          "before": "cd98c8f7d351c5f821a8bc50fbe6a654d1e7984ee9a336eec5e4685905ae9c81",
+          "after": null
+        },
+        "resolve_routed_dark_pact_mortal_wounds": {
+          "before": "20bcdafa6478017315c8267fca630e6628bbd940bbb1037a9403e4481371a2cb",
+          "after": null
+        },
+        "runtime_contribution": {
+          "before": "0e4b03d68b8bf38618d4aaffca625de3bb86c7db5a9e559ae2339e61bbac386b",
+          "after": "f8d2f81b692fd463230c4adde5a8639bd4ad11809688a55675e587cc6086df78"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_space_marines/completion_sequencing.py": {
+      "before_sha256": "0ecada76e882ec1f4f15861f2cbd304d7a5474249ffe2b21c39d86b2aa572cc1",
+      "after_sha256": null,
+      "owners": {
+        "@module": {
+          "before": "f685b9830c71cd7cd2c188dbf8626aea75036755201b319cbf9e2a5838306354",
+          "after": null
+        },
+        "_activate": {
+          "before": "41720da5d8c0ee08efa2f7cfea7be99fee3b83e0aeabfb8365b1f3fae6c4f45e",
+          "after": null
+        },
+        "candidates": {
+          "before": "257616f1d83de02bdcfd165c55bfae793c382503eb060990916c18079eb7720a",
+          "after": null
+        },
+        "resolve": {
+          "before": "bcafe5d8addc979a48c2f8abec560806656f15eb3b4f6c5517e133eb4669f5cb",
+          "after": null
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/fight_unit_selected_hooks.py": {
+      "before_sha256": "2e32a27fb176fa5f0bdd177c0c18fd653b2f26bda4f3ed75400bd3eddd5542e1",
+      "after_sha256": "06df8921a9313aba97509c7b23461fe9e4b78dd921c3b81927dcf9147347edad",
+      "owners": {
+        "@module": {
+          "before": "e3b1ba62e4f1a903a196b3af850aaa33875cc55eec8394fef14d1308b639005d",
+          "after": "eb0cccf0acb2285e71c9eef83ca6ba3acfe8f3429dcc9c4069a1fd5aa4bc4355"
+        },
+        "FightUnitSelectedGrant": {
+          "before": "b1faac666035444f2e9c7d796ec3ffec762dbef0dc0ac56df7d86d3528752fcb",
+          "after": "319c595bfeeb0f832274c4bce1072c9476bc013eacc812576e271a78dfad92b0"
+        },
+        "FightUnitSelectedGrant.from_payload": {
+          "before": "f88acc8917fcc1872dc30da237e43fd68e93ab77231120503543e57dfdcd98c6",
+          "after": "d057b4dde7ed020bf1a43ed30d44f793217cdef943d6acd9507e88725ef64115"
+        },
+        "FightUnitSelectedGrant.to_payload": {
+          "before": "3cd8a66995700cf0e2fa292159402bb54d1b34161a39f418c8e37cc2f89c33e9",
+          "after": "8960e01f36cd1959b56ef91a02c75de6df166f01decf569e0f84737080d2218e"
+        },
+        "FightUnitSelectedGrantPayload": {
+          "before": "56fc06f7fa2b3057471f7dfc8aae594dc72d9b1c9b40612576391c13b80d73ad",
+          "after": "97bff96cd1fbd7523b2a26914e3539ed3fc2407cf998a75e2438e1993f2d1e2a"
+        },
+        "fight_unit_selected_grant_options": {
+          "before": "fe628143a32db8d87b5abc87e38bec7a88e25f00a8d5a0d243d9aba30d16fa8e",
+          "after": "517f0e85159069c5bb82df1591c86c1da1d908e239c4b95d510ddc35b35437d4"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/generic_rule_ability_registry_defaults.py": {
+      "before_sha256": "7516f4ebbfc6daf4d93940b01ab61d240f6f3b2a476fa2e67b88d9b8ad458e79",
+      "after_sha256": "b971fe9052f08a577855c370a651d1b684492adf3e324e7104c3aadaa2ecb285",
+      "owners": {
+        "@module": {
+          "before": "0743dd3d2bc1b44948b80fcbd73d6d1c12cfbb57984eff52e378d91140b4d881",
+          "after": "c1f6c57d981008161752e7978577801ddb3d9c85cad595e9f873fcb15826e7a3"
+        },
+        "_apply_shadow_legion_dark_pact_mortal_wound_feel_no_pain_decision": {
+          "before": "c0f0240361e6aa51d90b6a2afe4b58051626d8e44db0c9b8b866cc0b5c05d8e2",
+          "after": "350c0c8b28914ccf1d308e9be71bf292d7efa852c650928df9681f7e1e4704fe"
+        },
+        "_resolve_shadow_legion_dark_pact_attack_sequence_completion": {
+          "before": "298324f83f22f80fbc4202a3499e769ce8e6409eebdd1c7103ca0c9f53f0e3eb",
+          "after": null
+        },
+        "_shadow_legion_dark_pact_completion_candidates": {
+          "before": "450e75b755c8b3eb0f3ee7b642b0c51c10737ecd68a2cb927c0140441a1b6761",
+          "after": null
+        },
+        "_shadow_legion_dark_pact_completion_hook_id": {
+          "before": "0b88db953f1a5b74e5970fe1cdf0711b34c992ba69738121cb8b03dd69d7c79a",
+          "after": null
+        },
+        "_shadow_legion_fight_dark_pact_grant_builder": {
+          "before": "461b9081e39ffb647112d2d286b27963dd4390842d4c705252e35b78a58cd5f0",
+          "after": "e5502229da4e354ef291c0bf22d7e02c173d853906be2e2a355840a63e00fcbc"
+        },
+        "_shadow_legion_shooting_dark_pact_grant_builder": {
+          "before": "7d9f57ee0cbd163695a09d3218cdedf00275accfe5f43583e17937e0d53b4fb8",
+          "after": "404339570157c80f146528d8580a1063da9158de931520d2bb02230fe35976c2"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/lifecycle.py": {
+      "before_sha256": "819f9a321f68af59893616f72139ab72c09e23d5e26f252f3e64dedfaa91f6e9",
+      "after_sha256": "a8ff6864a1e25ac197fcbed1fb02e12db3c0368825d9004f123be28543c59021",
+      "owners": {
+        "@module": {
+          "before": "23fb7c25b555be7ce5f8644c5f93bf03bd340c392f1875dfe01d32838a46782b",
+          "after": "74a8c04f58c4a2a5ba6284098d87727d3efdebd01a4a9fdca5ae8b87bf94d00f"
+        },
+        "GameLifecycle._apply_mortal_wound_resolution_decision": {
+          "before": "afcbb1ea1653b6cb763e0fa267b910e1cd7a0822ba07a24570be1188e10efde0",
+          "after": "3258b2457c60b572ad94d1bd92b38a6034e6904ad862e5d4e0f6d366e45a88c1"
+        },
+        "GameLifecycle._resume_unit_grant_commitment": {
           "before": null,
-          "after": "38492021bec30f08b667a47ad88269e0ed6c0b110826225a6c09fdcb900bd9dd"
+          "after": "03d5ed75ef38b865f8e56681b74c4ca87b7a3199f74356e388e1f0e37d451523"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/modifier_evaluation_dispatch.py": {
+      "before_sha256": "1b318d5df936f93bf474e90d974eba07807f886ea46504358f1ac2c922f60fee",
+      "after_sha256": "167288cbc31c882fea26695d905f0a10cea81cd4944213062517b9ca711e3266",
+      "owners": {
+        "@module": {
+          "before": "8503b0b07fd3d6780f87a508a34316275e8a8a5bcbc861a6a85bd41825fc6b76",
+          "after": "5f0b307bbfd2c04d111367d8ca06acd0c7ada0181ebc3e05b0ca5acde2d2b282"
         },
-        "_visible_poses": {
+        "_resume": {
+          "before": "535bc711bf3ca286696c69e928623040a226687ded632152e7fd5c7d0ef0f2f5",
+          "after": "caf5c759c33e13f973b843d73c0054ce2ffd329253ee2bd22d15091814fcc45e"
+        },
+        "modifier_evaluation_dispatch_handler": {
+          "before": "e6be3bb8ad38d9234f4b3867421b7ed146412dcac594f7ef65672b5b557a9b30",
+          "after": "3172ed8305cf5dbd9cd6958493078624f86f4007dca7eb9008ad7d5fc8a6f4a2"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/phases/fight.py": {
+      "before_sha256": "85db1b94649a35c8688b86127c2ba18932a4783ecea4233b125021e6b6001478",
+      "after_sha256": "5b329d78d216336e141692e00cca125d4ffb743ef216a3b0f814ceeaddb7518b",
+      "owners": {
+        "@module": {
+          "before": "a143caa6812183fde41712756bfe55833bfa137a2b00c4af3bf8b800f36cfc26",
+          "after": "6393d49a348fca1f2c09dca92d906031f1a15d7813a5137a9af38d701fc5b9a5"
+        },
+        "FightPhaseHandler.apply_decision": {
+          "before": "bb53c7e629853f24f859a5df8eb92b3ac8ac533945b70a099c451aba019f38fb",
+          "after": "83cd9e7853fe6ff53aa8a20a6f78bed9746571e94980d3783a8de817773f2340"
+        },
+        "FightPhaseHandler.invalid_fight_unit_selected_grant_status": {
+          "before": "9f8dc63d0d57e84e25cf677f4165aacd26986e57e4f160c5995f09e32874340c",
+          "after": "d0cf9907db59ffca4f4688c12eee6e288c13776d6f1e85569f177c5a3f0fb71a"
+        },
+        "FightPhaseHandler.resume_unit_grant_commitment": {
           "before": null,
-          "after": "01ecf04133ae904ac4a592a18b9406df5984c221552455ef821da980f68d5b84"
+          "after": "d172c800529537815b75d40d7c7e5b339d18db4b2e771ebd641c90384833c292"
         },
-        "_wall_ground_distance_lower_bound": {
+        "_apply_fight_interrupt_decision": {
+          "before": "03756e41710d7579753a51338ebad2e7176c181204b587f8319e246144a3e19f",
+          "after": "0567fc9e969cffe602786eb137b16f8dc0dc50e7d9a4801b93d6f52d1bfa91b2"
+        },
+        "_request_fight_unit_selected_grant_decision_if_available": {
+          "before": "c944b29d6c26381d755b4b88db02c942d83a0fa1c4c50c9af74a4e20992eb9f3",
+          "after": "c9ce59135df03b4c32f2855a96eff553278d09fc5d424d944b95c6999202abbd"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/phases/shooting_handler.py": {
+      "before_sha256": "123a40ecf7b2b9d07affbaff98f0b5a4a63bef8e4dc4dba580ad3103da125d69",
+      "after_sha256": "bd51bf8f09cf70635d7dab3fa36bffbf5ffbd81aadd8ec3e568a8480ec318ada",
+      "owners": {
+        "@module": {
+          "before": "b820f148e67dbfa0b91c9634f0dd4377ad7f449916e38004e547d52500cfe776",
+          "after": "69151947dfd2d639cb133a2388a0d3d026cf965a4208ed74c40344b468ebd58e"
+        },
+        "ShootingPhaseHandler.invalid_shooting_unit_selected_grant_status": {
+          "before": "dc096acc1e078cc5c36e3c5e1f2932eacbcf2794e875dae02488b30df262506e",
+          "after": "3e4d6b844fe9f41c147f0478addbf678666b81d403b6a91998d574882a07182b"
+        },
+        "ShootingPhaseHandler.resume_unit_grant_commitment": {
           "before": null,
-          "after": "e00c0c90cfb83fc576e9e9a92f03de96cdd40adbff196a3ee59194d8043f7df0"
+          "after": "de078dbb97fce130c7492cdfd1b1b2ac8a43793aa0ca3eec0c2c34dc501e8b39"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/phases/shooting_unit_selection.py": {
+      "before_sha256": "233720c815c4d61891fc13b8b7b089e67123e43faf9a4c34497b5b88a9863ae1",
+      "after_sha256": "4e43bc3a6144888bbb8bbb8e95b05be3660ea1737b238fddc6bdacce5f60a8b6",
+      "owners": {
+        "@module": {
+          "before": "55b720db42708d2f99b749572fbcbf8a3acb68e143a7cfedb42e22e726f86fc7",
+          "after": "52fe48d09efad42fa4062f87e8e3fd0093e7cc25f768f3861c2b4deb4fd410ce"
         },
-        "_witness_accepted": {
+        "_apply_shooting_unit_selected_grant_decision": {
+          "before": "4c0218cecefbb54839bea13cc4c9a70d7984ce78a4c2003a993182c22415a1a5",
+          "after": "c531548d29922afbc31b0f41b0d2d233080dd6e069b684d43bf439e6b941a152"
+        },
+        "_continue_out_of_phase_after_shooting_unit_grants": {
           "before": null,
-          "after": "d49a7ef4d1f98bbb2d9eac46f63b5a0c0ece084b172316e0799d78c67bbf4f4a"
+          "after": "ea72abfe3858b22da47108e434a3492ec0d2ab8bfc429dbf8e479a5c814057ba"
         },
-        "choose_proven_charge_flight_mode": {
-          "before": "da6c917cab832e986833e10136dd771c4dbb77baacfcabe6b613fb818ad7a93e",
-          "after": "ba69a6dcbe3d33c48f453befdcdbcbfd3c99cceced5116eb80f02f41b36ab4d7"
+        "_end_selected_shooting_without_attacks": {
+          "before": null,
+          "after": "2a09855e09a4bf3d5d8e310aad6d927ab3cb8e8fb55a389cf5aa0a6cf6cf12b2"
+        },
+        "_request_shooting_unit_selected_grant_decision_if_available": {
+          "before": "6df4031accf61013c54b69d2e979da5cc72ef3a08c44e282f853b964fdd71735",
+          "after": "dbdb9d310d4ea7434e210972d61684c6910c83fc9bcaf3aed3dcf88aab1eed86"
+        },
+        "_shooting_unit_selected_grant_effect_expiration": {
+          "before": "dea919d2470d2848e3a855278b167269131bb5478e331870e3aa8d84b41c0179",
+          "after": "25c9c9fb5d87674b39893b37766c8430fcdd497c1882d7106d169d9ea5624f2c"
+        },
+        "_shooting_unit_selected_grant_options": {
+          "before": "6e39b0879108960b0f02af5fc7b405adabae7023c84e84f18554bbfbbb5b2ed8",
+          "after": "207e2fbf0ae198b8c1f967718b0bd942cd2a6ca5380413b38b059cfbf1139473"
+        },
+        "resume_shooting_unit_grant_commitment": {
+          "before": null,
+          "after": "9a10474e0d29e11c3abcd0b2c2468292b1e4f076653fda4f4531c72965521d52"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/shooting_unit_selected_hooks.py": {
+      "before_sha256": "19cff3f7b9133577b496840b2850e64d3058eca0b47209064813ca00cd9f9cf2",
+      "after_sha256": "31a75f26ee3fcd695129f626006a7f06c2796463b880b950b474b0383f077583",
+      "owners": {
+        "@module": {
+          "before": "a93c942b30af0c4ab9e4931c15cb25fbb5ded94a5c8a21ab9d9d167eb0544caa",
+          "after": "9ffb5e3c6e178170189522e3704339297c94fca900c79b73ecd226956a58912f"
+        },
+        "ShootingUnitSelectedGrant": {
+          "before": "1a3b35c73e5a50abd6fc15edc2de58b313fac8b8c08bff5bc718526720aa0f82",
+          "after": "6f66e9d823004abeb6b9cd59f4ee754ccfd9a4cb6c82bfd2b828f56362aaa37f"
+        },
+        "ShootingUnitSelectedGrant.from_payload": {
+          "before": "dbeee32dfd1d76692e2f5a5c1353de0056660818c00925514f71f5d3ba88fe5d",
+          "after": "bcc6a4a6747dc777617d94ac971fcc858fd342bfe32425ff50123457172d28b8"
+        },
+        "ShootingUnitSelectedGrant.to_payload": {
+          "before": "db5de4bb82fac1b178c889c07ab539911e5aa925f77f3a720796aa3361887fff",
+          "after": "32b010e21182178aa7e5028d7c008d6688c7a22cc2b418f9f602affd2c3b087a"
+        },
+        "ShootingUnitSelectedGrantPayload": {
+          "before": "1ca945d1f471fc44134248f71a638eb2a2d01d175a838b3f21ada8f66badcc1c",
+          "after": "dde3756da1a48ed6e49b3b7e9293e344c62929ae515d1f86e43822e3ebdf484d"
+        },
+        "_validate_optional_expiration": {
+          "before": "ae7bf99498fa13f9405bd7cff51282b69169c8d149b841d464dae6d500231ae9",
+          "after": "7392bc95963da9d58e97160779e3fcfe39cfa14d45aef067dc4aace5a8eb75ae"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/unit_grant_preparation.py": {
+      "before_sha256": null,
+      "after_sha256": "fd5672c97b7a0356e8eacc4a4533ef288dd4f560bf55512ec6069abe26fb6ed3",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "9e36ab2cbd0503e3cf0d28af6bb3f0c35cfc34fc1eaa5b74fc3244e84eb74f77"
+        },
+        "UnitGrantPreparation": {
+          "before": null,
+          "after": "98a1e145a0a2faa5efa4ca8a33bd9655c24e3f172df7569301c7c6725d0f1d6a"
+        },
+        "UnitGrantPreparation.from_payload": {
+          "before": null,
+          "after": "f08371cc342273dd4b823608a238f59401e353f3efa57aa5547441e57b742b42"
+        },
+        "UnitGrantPreparation.option_id": {
+          "before": null,
+          "after": "958a93a5096ffb50ffd5a2bc6080bc40dc1c3c03888b4bc35d1f54bb48b056ee"
+        },
+        "UnitGrantPreparation.to_payload": {
+          "before": null,
+          "after": "7332bea06ac6668d105396837218b4e6d2a80cbf0bb4742e230809a77c7356e3"
+        },
+        "_PreparedGrant": {
+          "before": null,
+          "after": "4463e382fc4483f46a612bd4b6acc33814002c6fc865dc7358bb5954594927a1"
+        },
+        "_PreparedGrant.preparation": {
+          "before": null,
+          "after": "fdca0458a776341efc5ab68ac3ec6ec9a6d1d2876716304ff0f595d05b70c0b1"
+        },
+        "_finish_mortal_wounds": {
+          "before": null,
+          "after": "96e655085c7d7a15f022996c78505b79888fa7df6b49528b886c889442f7ec0d"
+        },
+        "_string": {
+          "before": null,
+          "after": "3099116d6b081d221a4e58c929f09800ea664b96a41600a719b0f87cdb04d857"
+        },
+        "apply_preparation_mortal_wound_decision": {
+          "before": null,
+          "after": "80a73d86c69a2d4b923d51b21e8b74100145cc375835b0f6f8c4ab30958be0d1"
+        },
+        "commitment_record_result": {
+          "before": null,
+          "after": "544ee4e690dda53829ffb4d457b66ed2ae3cbc3da27b430d5cf4a648e0470ebb"
+        },
+        "commitment_request": {
+          "before": null,
+          "after": "a372af43ea5ac11b4c50e82bce4dd30c79259eb1b79a20d4f734acfba29705d6"
+        },
+        "is_commitment_request": {
+          "before": null,
+          "after": "3a6d154d46bd800268563666b468c8d70031fc775e940ef65628950e8f232a20"
+        },
+        "is_preparation_mortal_wound_source": {
+          "before": null,
+          "after": "4b4b7e94c33ff1d6a7084a7e4969e2ca0cb8ea95b015a4b98799c5284c53e7de"
+        },
+        "mortal_wound_commitment_result_id": {
+          "before": null,
+          "after": "3b96ce92e96663707ebcdc9628f6361f141d7e07199cc746f94c5910171fe57c"
+        },
+        "preparation_for": {
+          "before": null,
+          "after": "bd31ac45acf3c514b12c6ba265e14d69572d50560a0654416ae6b10d290bfd90"
+        },
+        "resolve_commitment": {
+          "before": null,
+          "after": "21a62d29857a611583e0e5af54f86e204a303097e13e451c61241f820b56dd12"
+        },
+        "validate_commitment": {
+          "before": null,
+          "after": "da3d7c412ebd4af8d99bd4506d5e94575a4a76ef340c6e04de1c102e197b95b8"
+        }
+      }
+    },
+    "tests/code_quality/test_ci_performance_gates.py": {
+      "before_sha256": "f3c7eb06b38a09ce25f9d5b4c7bd733ad8ff60365b9a649adee47812dd58f096",
+      "after_sha256": "b5671373c974408e66d954d7318713f9026e5883a641727cbd32581726dd7e03",
+      "owners": {
+        "test_cutover_real_cli_rejects_naming_override": {
+          "before": "1f6acd4d381bf6d4957c7e7d928af11756412b12f9a6ce1795c45cc5bf92b154",
+          "after": "0a68b5caaf878b06a6d08d8a22a478c51f1ba19cdbc8fff82310a03918ef16e3"
+        },
+        "test_cutover_real_pytest_cli_does_not_bypass_explicit_file_guard": {
+          "before": "ab00c26fa40a23b6bd8e76511c959d52e161c6ac1a9fb6cd2e280309a56dd7b4",
+          "after": "a80ed82df7ed314bc4ef6a84cdd9e0ffbac7a26edb64e265593d0617da0c89d4"
         }
       }
     },
     "tests/code_quality/test_engine_numerical_identity_admission.py": {
-      "before_sha256": "87f393a5a076b9f4b98e052836da1be6e84c8dcfa2b69d5dffce3e22542dd66a",
-      "after_sha256": "f6eb8139b65e8787ff0f01da9f4178f9dc27d42f53be7f4abee2a94044a6692e",
+      "before_sha256": "f6eb8139b65e8787ff0f01da9f4178f9dc27d42f53be7f4abee2a94044a6692e",
+      "after_sha256": "4093e4a072f13386b466988f02048a83c2da0928ea7b5e20de05db5a7e828cf6",
       "owners": {
         "test_identity_inventory_uses_current_twelve_shards_and_native_cohort": {
-          "before": "cd3d2011f821cdf105eee3d153a794c658c6704d4ad8411ccd5a452eacd562d5",
-          "after": "3c566cf7afd5bff9e0a9fed17308e89b7c48394c05f394c02839eb140541a41d"
+          "before": "3c566cf7afd5bff9e0a9fed17308e89b7c48394c05f394c02839eb140541a41d",
+          "after": "883c644fa1d980e2fd353dea1771391508d6919058681c84ff5c1e978350991d"
         }
       }
     },
-    "tests/infrastructure/adapters/test_charge_flight_barrier.py": {
-      "before_sha256": null,
-      "after_sha256": "9b5c0267b4c1ea4f9aef1e1185c505ad2e7db24ed8349ffe5e95a881da1feb5a",
+    "tests/code_quality/test_performance_policy.py": {
+      "before_sha256": "69430b0d432479329e8acf671c8eadce38bb00f2baa09dc1ce883685208c3a3e",
+      "after_sha256": "b6e9ecacc8a52f0c9cbeb2858c9f71d656a24918976d9f1bacdc5e9818f98257",
       "owners": {
-        "@module": {
-          "before": null,
-          "after": "e58b5f6b8bc5d60c073e700385423c63e0de46c3ddf02000d764538bab418752"
-        },
-        "_context": {
-          "before": null,
-          "after": "986520845bd206681ac3ce8c90d368d83bdb4be62a55833594cc373996ddeda3"
-        },
-        "_scenario": {
-          "before": null,
-          "after": "e03816b5c192fec72c634c2d1ec712d484b724c493f8389d19303405ecb5e5ac"
-        },
-        "_submit_fixed_target_and_path": {
-          "before": null,
-          "after": "834dd6a214742b3412b9a68570d79bfa1f98c9d05a479d1b8fea62a406687fb7"
-        },
-        "_wall": {
-          "before": null,
-          "after": "34917165ba014a08a6e5ace02d8d272735700186c8b3b9f7365a12ec7ded1b27"
-        },
-        "test_barrier_flight_preserves_open_board_ground_choice": {
-          "before": null,
-          "after": "e952103b459e3197472ce512a1c2f98d7a1f34847808fdaeffe8bb7adb1ff2c3"
-        },
-        "test_dense_wall_native_flight_advantage_replays": {
-          "before": null,
-          "after": "f4d330b074694cfb71a43c69385a65f195083e0428f07d388acdefae0bd6d537"
-        },
-        "test_wall_charge_abstains_without_a_separated_bound": {
-          "before": null,
-          "after": "37741e4900c57fd0aa506864b4e40a4821f8b65075a3379e55648361bf18168d"
+        "test_operation_map_uses_real_driver_and_owner_paths": {
+          "before": "fb54e74149c59eaaeb8ee740d035e106d80d90aa11f6ac1c3f5f897f039d232f",
+          "after": "ed8712478430869f71a41125a1090c86e07e64c4f8bad1d3b8dbcf8350aa994c"
         }
       }
     },
-    "tests/infrastructure/adapters/test_charge_flight_onslaught_timing.py": {
+    "tests/factions/chaos_daemons/unit/test_generic_rule_ability_registry.py": {
+      "before_sha256": "8901ff75b652675d0ce253424d5da1d251b09d2f7a67b0be02061c5da9aeea18",
+      "after_sha256": "bd3e0639e2b1e08fcaca598ecc8341a75fd0d93dd59fc23d2c4b927feae553d4",
+      "owners": {
+        "test_default_generic_rule_ability_registry_maps_shadow_legion_grants": {
+          "before": "4c4064f7a5e0b2599bae47b124354f37d60b0c21a3004b6757a868042469483f",
+          "after": "638a8e1f122e48a24b9b147602b07e7798c149c08fc4f8f84ff7183b2b93c358"
+        }
+      }
+    },
+    "tests/infrastructure/adapters/test_dark_pact_timing.py": {
       "before_sha256": null,
-      "after_sha256": "e791a9d8208124f6676e13dae2e43367b39e05db84b28a096b30985acfa59cf2",
+      "after_sha256": "af0a2326c0996aff5b8515e5e4cd3400b41ab9b62c126013ee9a5d528e221dec",
       "owners": {
         "@module": {
           "before": null,
-          "after": "a02e803afe762114e3f48c4ce11e42a2ad9fb49e60b88dfbc2d24e8aa11da6d8"
+          "after": "7accc6f4c90030924bb1317148deb2fcc0f0e94ad102c99f187b5f850264c013"
         },
-        "_assert_actual_spend": {
+        "_catalog": {
           "before": null,
-          "after": "7f2f2e2414f0e27e475a47be94d0387cd42d4201b750ec42c58e38c23c12208f"
-        },
-        "_assert_proof": {
-          "before": null,
-          "after": "53cfdad939b17fdb11bcede1f8a69d563a383719cd4c7c4fbd32b52f55be22f7"
-        },
-        "_battle": {
-          "before": null,
-          "after": "852187b6bc587aa3f32bd427bdbd160a171814dc014e452157f694d63e48e014"
+          "after": "09f1d29de86942c3cacf23e3c8047c25c220f5b646e3460ccfda6b975c07b5e7"
         },
         "_choose": {
           "before": null,
-          "after": "a48c51a1d7e25138a6b40e6201ae55f5196649351a4142f50bec7da3e8823411"
+          "after": "ed94384ba110c298a244dc7f37c03f04522d651e73d5c2c4cf9c628f62cd7a2c"
         },
-        "_context": {
+        "_declared_weapons": {
           "before": null,
-          "after": "f8f8133ca68d76e6f65d2681b422e3372c6452ef67f1e8c19fba1131efc52d11"
+          "after": "ebd9ad458116376511f8e1db1b0a51e7ab34b04dc0f7f358aa499d7d64fa697a"
         },
         "_events": {
           "before": null,
-          "after": "6c50fbe575db3dfcde9d9050e380ff820e64057788fb2e35dffa3bc3405671a2"
+          "after": "88ff23e9b9e40993038ec4fa49016ea318f9b761ac5c9477c53a210c0b8e52d6"
         },
-        "_grant_active": {
+        "_overwatch_fixture": {
           "before": null,
-          "after": "35ba7ab477ef1aa3a02c0783f46dc3d4f0f82a76e9a56ea7f73a44d3666a9bb5"
+          "after": "457ae76c93546be978f280237c7b6fe24018c59a9fe36d4cbf7c02520a2c5ba8"
         },
-        "_issue_onslaught_option": {
+        "_pact_rolls": {
           "before": null,
-          "after": "6e53e1db874bbe13a131711b60962c318dccac9eb976613c54e52d19f1b9e51d"
+          "after": "3a50d887f2c18bad6753392fb3588ca3401fc90d0ca9078791eae235d84fd54b"
         },
-        "_native_violation_without_rolling": {
+        "_select": {
           "before": null,
-          "after": "412d16d3601fc10fe23ad1cbcdf67e8f56b7eab1150d9ab6de57dbc17b872bf9"
+          "after": "22e853a7ac8c72e7b545196174a068755c8e1d295292353f448970a7e43a7e07"
         },
-        "_offer_and_path": {
+        "_session": {
           "before": null,
-          "after": "aec649beef26c02198be1812a9b50f2828eb312a2fe8562c1175871ab3f07f1e"
+          "after": "561c8c009ac0a361f6a5d65c4c01a3c2317a5c75bd73cd53b6e730ec42b77f68"
         },
-        "_reach_charge_proposal": {
+        "test_attached_fight_dark_pact_targets_formation_through_attack_and_replay": {
           "before": null,
-          "after": "dbf04cfa946bf1c9ba0121bc90f421602c71e8ab00e77c203a5f4202a0596494"
+          "after": "b5f222513ee7a369f0e8d5dd4be607b1fe44afb5857e535ddf99be40d5af7ea9"
         },
-        "_reach_unspent_declaration": {
+        "test_dark_pact_selection_resolves_before_attacks": {
           "before": null,
-          "after": "1f88269412ff00d979069b33a5c2f14204f0ac68232c93f92eff205999e8601b"
+          "after": "5ff8647c2ce2849d59565edbb593628fcf448f7a15ef76f4b82a6e025e31fa42"
         },
-        "_wall": {
+        "test_dark_pact_survivor_without_a_legal_gun_ends_shooting_without_an_attack": {
           "before": null,
-          "after": "c1360feeb3b6f1b1417bfa7750d931876a682a8a15cad45b535781f7616823a4"
+          "after": "890b32647c48edc8b35bba5ad780b295348b8751af71f049de832216f1060566"
         },
-        "definitions": {
+        "test_native_overwatch_grant_expires_at_its_own_boundary": {
           "before": null,
-          "after": "b6f93565fbb9e8cc44abc145ce7d76fc872948c6de9571e6dc08590c872f752d"
+          "after": "1fa45e62f49f3f8327824c4c47b1ce5ff35156fdae8a0d363118173dc383efa0"
         },
-        "test_early_offer_distinguishes_held_cp_from_a_live_grant": {
+        "test_only_shadow_legion_offers_belakor_the_no_roll_pact": {
           "before": null,
-          "after": "eddb24adeacf4f2717ce7924ae479944e24809922d6808cb223170e5ee69c141"
+          "after": "d4814d3f01a8d83487109d370db1075f63a065a1947bf195580250c7ad45e3c3"
+        }
+      }
+    },
+    "tests/shared/category_migration/reporting__test_runtime_consumer_evidence.py": {
+      "before_sha256": "b26f3439b84848d0d9a00aa03f37bd416a8f941d0c0ff3768afc52bca9c47484",
+      "after_sha256": "0f3adac04a0114497877835e7db38a02d20a2439559fcd53b48dadfb16190606",
+      "owners": {
+        "@module": {
+          "before": "a35732b4984af8d6805db355164e9393df2063edb3e42d244b75ffb33b8dc8bb",
+          "after": "394bc21589caba6685fbcf79a55cbc3061f0caf65c0385c116546b4fb4591ff8"
+        }
+      }
+    },
+    "tests/support/acts_preservation.py": {
+      "before_sha256": "4a92f3556d7c1160bf8d107db83a49c3ed10eeef5a9230e17f97e1f06fc8311c",
+      "after_sha256": "496b2bc61a8f2e406d18532834b3bd5ffe2008365ad7ff86016cf7b6bb6c6619",
+      "owners": {
+        "@module": {
+          "before": "399a10d9db3e4a8cd6ea0e071d47e6cfd5041352496c770e7d308d533307a45f",
+          "after": "f76c587acaf64797a62aa81382bcd8297d4d299461f2b37da880bc89acd06943"
         },
-        "test_flight_does_not_gain_distance_or_refund_penalty": {
-          "before": null,
-          "after": "b8be1dc6f67762ec46c2fcc7f76016215601edb8153293e656b094187ecf73b4"
+        "acts_consumer_predecessor": {
+          "before": "ffc7c2e82cc5100125765e491eb635e678d4ee1c4b9149815b090e3ab2b3789b",
+          "after": "291456cc1186bf2c2af7789141ae480cad6bdffe80674486dabe3e92507dbb5c"
+        }
+      }
+    },
+    "tests/unit/test_phase17g_chaos_daemons_shadow_legion.py": {
+      "before_sha256": "9e1c033fa246822e637d0c87f7daadbc4fee1d9eb53f424eb23a3a58a51be1a4",
+      "after_sha256": "2b013289d44d782fb64e3d0880e083223cd444cc9b64d1c0a861c32e90edb68e",
+      "owners": {
+        "@module": {
+          "before": "92f790d39dd8115efdfeda0a74f76bf03c63ff7059902614ec4b42043b92dccb",
+          "after": "15faee3a773035ae9fc1a942a757600665e138e30bc417ce3983966770db8da9"
         },
-        "test_native_late_grant_leaves_declared_flight_unchanged": {
-          "before": null,
-          "after": "9628e36602f91a32d8c5de67e058beeda27cc8924e2c2c3dd5844fd6769ccb07"
+        "_attack_pool": {
+          "before": "3a05f559b3a63b8137842581663ac5e3e9b9870321e8a4da78e7dca316f7e6df",
+          "after": null
         },
-        "test_no_cp_keeps_the_wall_proof": {
-          "before": null,
-          "after": "dfdf5ea0840519a9d7ce7c9c57e82a694f595ff8f96e1535ef9da9819fa20912"
+        "_has_event": {
+          "before": "4ade926d3e9957a3473bae80be28cb82ac6803d48b4e7e9c9c8844dc452b2f7a",
+          "after": null
         },
-        "test_other_unit_spend_is_not_a_mover_grant": {
-          "before": null,
-          "after": "b656053d47a9e3cf8fbb551aaf909b39bdb4c3622698d977ec539377363509ab"
+        "_record_shadow_dark_pact_effect": {
+          "before": "d9270d0847ebdde526caba4f1f01a89aaac34cbf5488f46e63fcd2b742f2d58f",
+          "after": null
         },
-        "test_real_late_spend_changes_ground_only_if_authorized": {
+        "_shooting_selection": {
+          "before": "d5a031c3cbf9876ce715ab0df08c5d21b62560deb82e790c5a789ee6af94383c",
+          "after": null
+        },
+        "test_shadow_legion_dark_pacts_failed_leadership_routes_fnp_decision": {
+          "before": "8b4440169355835d5a9377cfc9546d0f277e94cf83e90c0b16a5c1f2d14dcf34",
+          "after": null
+        },
+        "test_shadow_legion_dark_pacts_grant_and_belakor_auto_pass_completion": {
+          "before": "1df990c0e05f955c3216327358dfc0a86467d12fdae5e60531d5527693f77690",
+          "after": null
+        },
+        "test_shadow_legion_fight_grants_dark_pacts_for_undivided_units": {
+          "before": "98da157feb037f436f19c5f29797aee68ef8d1f675a6c445ce937b92828cdc5b",
+          "after": "ea77d32202ee4e36ca7015a7ca2dd8cfc4347c70c9d38747e67cd467cfc986e6"
+        },
+        "test_shadow_legion_out_of_phase_shooting_requests_dark_pacts_grant": {
+          "before": "991773b40d6bbd096b723849b95532b0cba3cfc76348663b6ca24d96384c2252",
+          "after": "69ad961cf345ccb64726b63688556b38f2645366374cfa71a4484db768393c8c"
+        }
+      }
+    },
+    "tests/unit/test_phase17g_chaos_space_marines_army_rule.py": {
+      "before_sha256": "132ad158de58951446b311204ccc83af37e1d7596ac20ff9142feef3c26a6dac",
+      "after_sha256": "b9b7fbc24d9f8841e65b12f5cb3d0857b278bf71bf4f9a844a464b16a8dce2d6",
+      "owners": {
+        "@module": {
+          "before": "59b8a6d7fef0ce1e193169bbdc49e39f235af2d3358bd7205b672dbdbe1a4f61",
+          "after": "a65562f9140115a23573fb10656e4216beb5fd31c4c2552f30791791be161045"
+        },
+        "_daemonforge_fight_status": {
+          "before": "22f133745c04585d565f3286cce19c65b8102f9bcc04e3fe8414103b29ff743f",
+          "after": "b139ba287560f2338289566670493bd30e770ad6b069eed0334e2897c7f67c93"
+        },
+        "_daemonforge_shooting_status": {
+          "before": "71c805feb158eb9bb50b374f7d81ed61e715fc313b19e04da1d377215fbed4f5",
+          "after": "05019032473a3ab478e73c4d8f8b7e5506f7ded88a271a9c86bed9910caabdcd"
+        },
+        "_dark_pact_completion_handler": {
+          "before": "743385aa0fe39790b3b69401821d568f0d1d7c202ac4658c2551b1ad4fc7bb05",
+          "after": null
+        },
+        "_has_event": {
+          "before": "4ade926d3e9957a3473bae80be28cb82ac6803d48b4e7e9c9c8844dc452b2f7a",
+          "after": null
+        },
+        "_last_event_payload": {
+          "before": "7d41fe499ca3998b107c06864a6ecc62f831256b32f9d71e92b9c3d0a2140c0b",
+          "after": null
+        },
+        "test_dark_pacts_completion_hook_runs_once_through_shooting_phase_handler": {
+          "before": "0420ba3895b3a1f9f1b4b33cfdfff5e42af7f2d466f9fca14bba4461f25737e1",
+          "after": null
+        },
+        "test_dark_pacts_failed_leadership_mortal_wounds_route_feel_no_pain_choice": {
+          "before": "f55fde5b70341604eaac346bbc2e11a1252a1846fd7618a75f4972589fb006af",
+          "after": null
+        },
+        "test_dark_pacts_failed_leadership_test_applies_d3_mortal_wounds": {
+          "before": "ca3e6d53b2586145112e0be0d0979090f775a6e38a6e1b32955c6d7693209fc5",
+          "after": null
+        },
+        "test_dark_pacts_out_of_phase_shooting_requests_grant_before_declaration": {
+          "before": "a0975e8e9dbe9f40fa9fb12d1fab48801d3eab6309a0c10bb8982a2929d6dcd7",
+          "after": "7fcbab2575138b34b0088e1d2a71ae800ec533186cf07c689401d18e3b31e424"
+        },
+        "test_dark_pacts_runtime_contribution_registers_engine_hooks": {
+          "before": "495edb88a4c40115649acfd338a5d225c049c39b1a092d456a577b83725128d6",
+          "after": "49f02e49f1b445443cd925ba6fb01e8b77140be5219c1fef8a1622d7073850d9"
+        },
+        "test_dark_pacts_shooting_decision_records_effect_and_grants_lethal_hits": {
+          "before": "6ea3eecfaf23f00dc431e487efcd338a69ebd7f527ccb16826de1a5d7defc4db",
+          "after": "51226972bb46351e8fcf98b59c761118c7203e4f55d9a2fdb57c71e2a8cf46cb"
+        },
+        "test_hazardous_and_dark_pacts_offer_the_owner_a_shared_mandatory_order": {
+          "before": "d66571af9d4325406d26b2669781de6d54b23a61cb0600aa49fd0d02e9aad64d",
+          "after": null
+        }
+      }
+    },
+    "tools/performance_cavalcade_policy_successor.py": {
+      "before_sha256": "e9ac899110ec2e8e6e2815d9388f36d574f747e2796986606e71b932cb17fe39",
+      "after_sha256": "bce0867436b3dc1708beaee7bc885f8f281fe200385d86b79e1ecd0727ae4d63",
+      "owners": {
+        "cavalcade_policy_predecessor": {
+          "before": "4c9aae7e0b21869d46c83abc1858bccfda31c47e1e8ba5543fffa5ecb3449c6c",
+          "after": "e5821e82852198c61c67221dd71d3187ad26318a81d19fa28d75e82943ef7df6"
+        }
+      }
+    },
+    "tools/performance_dark_pacts.py": {
+      "before_sha256": null,
+      "after_sha256": "50c638acf2cb690f24ed342a9937a48442302fb8754be7ff9a1c41f9b7c2fd91",
+      "owners": {
+        "@module": {
           "before": null,
-          "after": "3d8be8908fb233f636e99fd8e514044675b8626c7a75f317f36e74a5a1624c52"
+          "after": "c76aca5d2944e786fd2f1b2fb55d10d99d91af78c0034f140167dd43ea8249f3"
+        },
+        "dark_pacts_policy_predecessor": {
+          "before": null,
+          "after": "3bd41863d2a01f238feb3e83e25b705632e8f4a155fba7083f5b3ea73489c180"
+        },
+        "dark_pacts_smoke_operations": {
+          "before": null,
+          "after": "0d48ffcaa6c63f8ca515f8cce07a4659c9d3ab178b970ba23375391b514dfe55"
+        }
+      }
+    },
+    "tools/performance_policy.py": {
+      "before_sha256": "6da5eb9e49bb2e521afe322cae620dde2e40162fbdc7605326cde2d28f0dbf6c",
+      "after_sha256": "7f522cd8485dc761ba56dd271728222fbace7dcc1c93134a51bff7b7b67728b5",
+      "owners": {
+        "validate_assessment": {
+          "before": "94b215525a4740047075afabc64d89f0b9ce751f4717706f9122e88e27a45901",
+          "after": "d88e2c63e277699fea52a66ad1806a6d09e81af1e0c6a4269b9e64a146bb73fc"
         }
       }
     }
@@ -468,9 +1072,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Bind reviewed native witnesses, late-spend controls and exact retained behavioral membership.",
-      "source_obligation": "Preserve Core Rules 21.03 pre-roll declaration and native Charge distance; honor the landed Blood Legion late-spend permission and phase usage.",
-      "unchanged_work": "No gameplay workload calls the opt-in read-only policy. It checks a supplied witness at finite 2D6 budgets without changing native route search, RNG, replay, or action authority."
+      "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
+      "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "ci/test_shards/shard-1.txt": {
       "category": "rule_semantics",
@@ -478,9 +1082,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Bind reviewed native witnesses, late-spend controls and exact retained behavioral membership.",
-      "source_obligation": "Preserve Core Rules 21.03 pre-roll declaration and native Charge distance; honor the landed Blood Legion late-spend permission and phase usage.",
-      "unchanged_work": "No gameplay workload calls the opt-in read-only policy. It checks a supplied witness at finite 2D6 budgets without changing native route search, RNG, replay, or action authority."
+      "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
+      "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "ci/test_shards/shard-10.txt": {
       "category": "rule_semantics",
@@ -488,9 +1092,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Bind reviewed native witnesses, late-spend controls and exact retained behavioral membership.",
-      "source_obligation": "Preserve Core Rules 21.03 pre-roll declaration and native Charge distance; honor the landed Blood Legion late-spend permission and phase usage.",
-      "unchanged_work": "No gameplay workload calls the opt-in read-only policy. It checks a supplied witness at finite 2D6 budgets without changing native route search, RNG, replay, or action authority."
+      "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
+      "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "ci/test_shards/shard-11.txt": {
       "category": "rule_semantics",
@@ -498,9 +1102,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Bind reviewed native witnesses, late-spend controls and exact retained behavioral membership.",
-      "source_obligation": "Preserve Core Rules 21.03 pre-roll declaration and native Charge distance; honor the landed Blood Legion late-spend permission and phase usage.",
-      "unchanged_work": "No gameplay workload calls the opt-in read-only policy. It checks a supplied witness at finite 2D6 budgets without changing native route search, RNG, replay, or action authority."
+      "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
+      "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "ci/test_shards/shard-12.txt": {
       "category": "rule_semantics",
@@ -508,9 +1112,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Bind reviewed native witnesses, late-spend controls and exact retained behavioral membership.",
-      "source_obligation": "Preserve Core Rules 21.03 pre-roll declaration and native Charge distance; honor the landed Blood Legion late-spend permission and phase usage.",
-      "unchanged_work": "No gameplay workload calls the opt-in read-only policy. It checks a supplied witness at finite 2D6 budgets without changing native route search, RNG, replay, or action authority."
+      "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
+      "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "ci/test_shards/shard-4.txt": {
       "category": "rule_semantics",
@@ -518,9 +1122,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Bind reviewed native witnesses, late-spend controls and exact retained behavioral membership.",
-      "source_obligation": "Preserve Core Rules 21.03 pre-roll declaration and native Charge distance; honor the landed Blood Legion late-spend permission and phase usage.",
-      "unchanged_work": "No gameplay workload calls the opt-in read-only policy. It checks a supplied witness at finite 2D6 budgets without changing native route search, RNG, replay, or action authority."
+      "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
+      "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "ci/test_shards/shard-5.txt": {
       "category": "rule_semantics",
@@ -528,9 +1132,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Bind reviewed native witnesses, late-spend controls and exact retained behavioral membership.",
-      "source_obligation": "Preserve Core Rules 21.03 pre-roll declaration and native Charge distance; honor the landed Blood Legion late-spend permission and phase usage.",
-      "unchanged_work": "No gameplay workload calls the opt-in read-only policy. It checks a supplied witness at finite 2D6 budgets without changing native route search, RNG, replay, or action authority."
+      "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
+      "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "ci/test_shards/shard-6.txt": {
       "category": "rule_semantics",
@@ -538,9 +1142,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Bind reviewed native witnesses, late-spend controls and exact retained behavioral membership.",
-      "source_obligation": "Preserve Core Rules 21.03 pre-roll declaration and native Charge distance; honor the landed Blood Legion late-spend permission and phase usage.",
-      "unchanged_work": "No gameplay workload calls the opt-in read-only policy. It checks a supplied witness at finite 2D6 budgets without changing native route search, RNG, replay, or action authority."
+      "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
+      "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "ci/test_shards/shard-7.txt": {
       "category": "rule_semantics",
@@ -548,9 +1152,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Bind reviewed native witnesses, late-spend controls and exact retained behavioral membership.",
-      "source_obligation": "Preserve Core Rules 21.03 pre-roll declaration and native Charge distance; honor the landed Blood Legion late-spend permission and phase usage.",
-      "unchanged_work": "No gameplay workload calls the opt-in read-only policy. It checks a supplied witness at finite 2D6 budgets without changing native route search, RNG, replay, or action authority."
+      "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
+      "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "ci/test_shards/shard-8.txt": {
       "category": "rule_semantics",
@@ -558,9 +1162,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Bind reviewed native witnesses, late-spend controls and exact retained behavioral membership.",
-      "source_obligation": "Preserve Core Rules 21.03 pre-roll declaration and native Charge distance; honor the landed Blood Legion late-spend permission and phase usage.",
-      "unchanged_work": "No gameplay workload calls the opt-in read-only policy. It checks a supplied witness at finite 2D6 budgets without changing native route search, RNG, replay, or action authority."
+      "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
+      "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "ci/test_shards/shard-9.txt": {
       "category": "rule_semantics",
@@ -568,9 +1172,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Bind reviewed native witnesses, late-spend controls and exact retained behavioral membership.",
-      "source_obligation": "Preserve Core Rules 21.03 pre-roll declaration and native Charge distance; honor the landed Blood Legion late-spend permission and phase usage.",
-      "unchanged_work": "No gameplay workload calls the opt-in read-only policy. It checks a supplied witness at finite 2D6 budgets without changing native route search, RNG, replay, or action authority."
+      "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
+      "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
@@ -578,9 +1182,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Refresh the generated gameplay-neutral build and external contract identity examples.",
-      "source_obligation": "Preserve Core Rules 21.03 pre-roll declaration and native Charge distance; honor the landed Blood Legion late-spend permission and phase usage.",
-      "unchanged_work": "No gameplay workload calls the opt-in read-only policy. It checks a supplied witness at finite 2D6 budgets without changing native route search, RNG, replay, or action authority."
+      "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
+      "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
@@ -588,9 +1192,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Refresh the generated gameplay-neutral build and external contract identity examples.",
-      "source_obligation": "Preserve Core Rules 21.03 pre-roll declaration and native Charge distance; honor the landed Blood Legion late-spend permission and phase usage.",
-      "unchanged_work": "No gameplay workload calls the opt-in read-only policy. It checks a supplied witness at finite 2D6 budgets without changing native route search, RNG, replay, or action authority."
+      "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
+      "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
@@ -598,9 +1202,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Refresh the generated gameplay-neutral build and external contract identity examples.",
-      "source_obligation": "Preserve Core Rules 21.03 pre-roll declaration and native Charge distance; honor the landed Blood Legion late-spend permission and phase usage.",
-      "unchanged_work": "No gameplay workload calls the opt-in read-only policy. It checks a supplied witness at finite 2D6 budgets without changing native route search, RNG, replay, or action authority."
+      "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
+      "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
@@ -608,9 +1212,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Refresh the generated gameplay-neutral build and external contract identity examples.",
-      "source_obligation": "Preserve Core Rules 21.03 pre-roll declaration and native Charge distance; honor the landed Blood Legion late-spend permission and phase usage.",
-      "unchanged_work": "No gameplay workload calls the opt-in read-only policy. It checks a supplied witness at finite 2D6 budgets without changing native route search, RNG, replay, or action authority."
+      "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
+      "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
@@ -618,9 +1222,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Refresh the generated gameplay-neutral build and external contract identity examples.",
-      "source_obligation": "Preserve Core Rules 21.03 pre-roll declaration and native Charge distance; honor the landed Blood Legion late-spend permission and phase usage.",
-      "unchanged_work": "No gameplay workload calls the opt-in read-only policy. It checks a supplied witness at finite 2D6 budgets without changing native route search, RNG, replay, or action authority."
+      "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
+      "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
@@ -628,9 +1232,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Refresh the generated gameplay-neutral build and external contract identity examples.",
-      "source_obligation": "Preserve Core Rules 21.03 pre-roll declaration and native Charge distance; honor the landed Blood Legion late-spend permission and phase usage.",
-      "unchanged_work": "No gameplay workload calls the opt-in read-only policy. It checks a supplied witness at finite 2D6 budgets without changing native route search, RNG, replay, or action authority."
+      "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
+      "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
@@ -638,9 +1242,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Refresh the generated gameplay-neutral build and external contract identity examples.",
-      "source_obligation": "Preserve Core Rules 21.03 pre-roll declaration and native Charge distance; honor the landed Blood Legion late-spend permission and phase usage.",
-      "unchanged_work": "No gameplay workload calls the opt-in read-only policy. It checks a supplied witness at finite 2D6 budgets without changing native route search, RNG, replay, or action authority."
+      "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
+      "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
@@ -648,35 +1252,127 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Refresh the generated gameplay-neutral build and external contract identity examples.",
-      "source_obligation": "Preserve Core Rules 21.03 pre-roll declaration and native Charge distance; honor the landed Blood Legion late-spend permission and phase usage.",
-      "unchanged_work": "No gameplay workload calls the opt-in read-only policy. It checks a supplied witness at finite 2D6 budgets without changing native route search, RNG, replay, or action authority."
+      "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
+      "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
-    "data/source_audits/ci64_provenance_v1/charge-flight-wall-test-v1.json": {
+    "data/generated/ability_coverage/ability_coverage_rows.json": {
       "category": "rule_semantics",
       "operations": [
-        "bounded-charge-flight-wall-proof"
+        "supported-vyper-source-title-binding"
       ],
       "selected_families": [],
-      "rationale": "Bind reviewed native witnesses, late-spend controls and exact retained behavioral membership.",
-      "source_obligation": "Preserve Core Rules 21.03 pre-roll declaration and native Charge distance; honor the landed Blood Legion late-spend permission and phase usage.",
-      "unchanged_work": "No gameplay workload calls the opt-in read-only policy. It checks a supplied witness at finite 2D6 budgets without changing native route search, RNG, replay, or action authority."
+      "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
+      "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
-    "docs/AI_POLICY_INTERFACE.md": {
+    "data/generated/ability_coverage/ability_support_category_rows.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "supported-vyper-source-title-binding"
+      ],
+      "selected_families": [],
+      "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
+      "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
+    },
+    "data/generated/ability_coverage/datasheet_support_rows.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "supported-vyper-source-title-binding"
+      ],
+      "selected_families": [],
+      "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
+      "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
+    },
+    "data/generated/ability_coverage/maulerfiend_cross_faction_support.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "supported-defiler-generated-owner-locator"
+      ],
+      "selected_families": [],
+      "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
+      "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
+    },
+    "data/source_audits/ci64_provenance_v1/dark-pact-test-v1.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "dark-pact-timing-scope-024"
+      ],
+      "selected_families": [],
+      "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
+      "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
+    },
+    "docs/ABILITY_SUPPORT_MATRIX_V2.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Document and verify the bounded Charge comparison and exact case inventory without changing live gameplay.",
-      "source_obligation": "",
-      "unchanged_work": ""
+      "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
+      "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
+    },
+    "docs/ADAPTER_DECISION_CONTRACT.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
+      "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
+    },
+    "docs/DECISION_SUBMISSION_CATALOG.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
+      "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
+    },
+    "docs/factions/chaos-space-marines.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
+      "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
+    },
+    "docs/performance/policy-v3/dark-pact-timing-scope.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
+      "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Document and verify the bounded Charge comparison and exact case inventory without changing live gameplay.",
-      "source_obligation": "",
-      "unchanged_work": ""
+      "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
+      "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
+    },
+    "scripts/build_test_shards.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "ci78-cutover-owners-83cd0803bcde80cbfc805d2a110f3274d501da3bc2230de8cc7f95cc0cbd608f"
+      ],
+      "selected_families": [],
+      "rationale": "Finite behavioral membership only; no source-token or external contract input processing changes.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
+      "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
+    },
+    "scripts/dark_pact_test_admission.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "dark-pact-timing-scope-032"
+      ],
+      "selected_families": [],
+      "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
+      "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "scripts/engine_numerical_identity_test_admission.py": {
       "category": "rule_semantics",
@@ -689,7 +1385,6 @@
         "round4-battle-shock-event-wounds",
         "phase-end-healing-test-admission",
         "sheathed-in-brass-test-admission",
-        "blood-begets-skulls-test-admission",
         "stage3-ordinary-melee-test-admission",
         "skulls-beget-blood-test-admission",
         "stage3-flight-normal-move-test-admission",
@@ -699,9 +1394,9 @@
         "bounded-charge-flight-wall-proof"
       ],
       "selected_families": [],
-      "rationale": "Bind reviewed native witnesses, late-spend controls and exact retained behavioral membership.",
-      "source_obligation": "Preserve Core Rules 21.03 pre-roll declaration and native Charge distance; honor the landed Blood Legion late-spend permission and phase usage.",
-      "unchanged_work": "No gameplay workload calls the opt-in read-only policy. It checks a supplied witness at finite 2D6 budgets without changing native route search, RNG, replay, or action authority."
+      "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
+      "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
@@ -710,20 +1405,145 @@
         "phase-end-healing-source-and-report"
       ],
       "selected_families": [],
-      "rationale": "Refresh the generated gameplay-neutral build and external contract identity examples.",
-      "source_obligation": "Preserve Core Rules 21.03 pre-roll declaration and native Charge distance; honor the landed Blood Legion late-spend permission and phase usage.",
-      "unchanged_work": "No gameplay workload calls the opt-in read-only policy. It checks a supplied witness at finite 2D6 budgets without changing native route search, RNG, replay, or action authority."
+      "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
+      "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
-    "src/warhammer40k_core/ai/charge_flight_admission.py": {
+    "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/detachments/shadow_legion/rule.py": {
       "category": "rule_semantics",
       "operations": [
-        "pre-roll-charge-flight-admission",
-        "bounded-charge-flight-wall-proof"
+        "dark-pact-timing-scope-035"
       ],
       "selected_families": [],
-      "rationale": "Prove the fixed-target, no-additional-CP native Charge flight advantage across one Dense wall without adding a planner.",
-      "source_obligation": "Preserve Core Rules 21.03 pre-roll declaration and native Charge distance; honor the landed Blood Legion late-spend permission and phase usage.",
-      "unchanged_work": "No gameplay workload calls the opt-in read-only policy. It checks a supplied witness at finite 2D6 budgets without changing native route search, RNG, replay, or action authority."
+      "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
+      "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
+    },
+    "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_space_marines/army_rule.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "dark-pact-timing-scope-036"
+      ],
+      "selected_families": [],
+      "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
+      "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
+    },
+    "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_space_marines/completion_sequencing.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "dark-pact-timing-retired-completion"
+      ],
+      "selected_families": [],
+      "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
+      "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
+    },
+    "src/warhammer40k_core/engine/fight_unit_selected_hooks.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "dark-pact-timing-scope-038"
+      ],
+      "selected_families": [],
+      "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
+      "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
+    },
+    "src/warhammer40k_core/engine/generic_rule_ability_registry_defaults.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "dark-pact-timing-scope-039"
+      ],
+      "selected_families": [],
+      "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
+      "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
+    },
+    "src/warhammer40k_core/engine/lifecycle.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order135-gathered-attack-steps",
+        "d04-combat-lifecycle-continuation",
+        "attack-reroll-casualty-order"
+      ],
+      "selected_families": [],
+      "rationale": "Mortal wound dispatch gains a rule-specific return to a selected-unit grant. Dice, weapon attack grouping and reconstruction/serialization algorithms are unchanged; the regular attack-damage paths remain identical.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
+      "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
+    },
+    "src/warhammer40k_core/engine/modifier_evaluation_dispatch.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "dark-pact-timing-scope-041"
+      ],
+      "selected_families": [],
+      "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
+      "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
+    },
+    "src/warhammer40k_core/engine/phases/fight.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order103-src-warhammer40k_core-engine-phases-fight",
+        "d12-melee-completion-reaction-forwarding",
+        "dark-pact-timing-scope-042"
+      ],
+      "selected_families": [],
+      "rationale": "Insert a grant preparation before declaring weapons; no probabilistic grouping or sequence-selection validator changes.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
+      "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
+    },
+    "src/warhammer40k_core/engine/phases/shooting_handler.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order103-src-warhammer40k_core-engine-phases-shooting_handler",
+        "dark-pact-timing-scope-043"
+      ],
+      "selected_families": [],
+      "rationale": "Add a pre-declaration grant validator and continuation, not an attack-pool or grouped-precision inventory change.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
+      "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
+    },
+    "src/warhammer40k_core/engine/phases/shooting_unit_selection.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "dark-pact-timing-scope-044"
+      ],
+      "selected_families": [],
+      "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
+      "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
+    },
+    "src/warhammer40k_core/engine/shooting_unit_selected_hooks.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "dark-pact-timing-scope-045"
+      ],
+      "selected_families": [],
+      "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
+      "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
+    },
+    "src/warhammer40k_core/engine/unit_grant_preparation.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "dark-pact-timing-scope-046"
+      ],
+      "selected_families": [],
+      "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
+      "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
+    },
+    "tests/code_quality/test_ci_performance_gates.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "ci78-cutover-owners-2bec45eb6ecc7574f5395711c9381e101ae612cb57b1a0e433c8a508aa991453",
+        "milli-inch-test-admission"
+      ],
+      "selected_families": [],
+      "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
+      "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
     "tests/code_quality/test_engine_numerical_identity_admission.py": {
       "category": "rule_semantics",
@@ -739,29 +1559,110 @@
         "bounded-charge-flight-wall-proof"
       ],
       "selected_families": [],
-      "rationale": "Bind reviewed native witnesses, late-spend controls and exact retained behavioral membership.",
-      "source_obligation": "Preserve Core Rules 21.03 pre-roll declaration and native Charge distance; honor the landed Blood Legion late-spend permission and phase usage.",
-      "unchanged_work": "No gameplay workload calls the opt-in read-only policy. It checks a supplied witness at finite 2D6 budgets without changing native route search, RNG, replay, or action authority."
+      "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
+      "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
-    "tests/infrastructure/adapters/test_charge_flight_barrier.py": {
+    "tests/code_quality/test_performance_policy.py": {
       "category": "rule_semantics",
       "operations": [
-        "bounded-charge-flight-wall-proof"
+        "ci64-provenance-c8a1c41e8f12a86f5176cb3116bad5fc710ca45c9bc40c0f0a8e9230613ff960",
+        "ci67-transaction-c8a1c41e8f12a86f5176cb3116bad5fc710ca45c9bc40c0f0a8e9230613ff960",
+        "speedup-test-admission"
       ],
       "selected_families": [],
-      "rationale": "Bind reviewed native witnesses, late-spend controls and exact retained behavioral membership.",
-      "source_obligation": "Preserve Core Rules 21.03 pre-roll declaration and native Charge distance; honor the landed Blood Legion late-spend permission and phase usage.",
-      "unchanged_work": "No gameplay workload calls the opt-in read-only policy. It checks a supplied witness at finite 2D6 budgets without changing native route search, RNG, replay, or action authority."
+      "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
+      "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     },
-    "tests/infrastructure/adapters/test_charge_flight_onslaught_timing.py": {
+    "tests/factions/chaos_daemons/unit/test_generic_rule_ability_registry.py": {
       "category": "rule_semantics",
       "operations": [
-        "bounded-charge-flight-wall-proof"
+        "dark-pact-timing-scope-050"
       ],
       "selected_families": [],
-      "rationale": "Bind reviewed native witnesses, late-spend controls and exact retained behavioral membership.",
-      "source_obligation": "Preserve Core Rules 21.03 pre-roll declaration and native Charge distance; honor the landed Blood Legion late-spend permission and phase usage.",
-      "unchanged_work": "No gameplay workload calls the opt-in read-only policy. It checks a supplied witness at finite 2D6 budgets without changing native route search, RNG, replay, or action authority."
+      "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
+      "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
+    },
+    "tests/infrastructure/adapters/test_dark_pact_timing.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "dark-pact-timing-scope-051"
+      ],
+      "selected_families": [],
+      "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
+      "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
+    },
+    "tests/shared/category_migration/reporting__test_runtime_consumer_evidence.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "dark-pact-timing-scope-052"
+      ],
+      "selected_families": [],
+      "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
+      "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
+    },
+    "tests/support/acts_preservation.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "supported-acts-original-test-preservation"
+      ],
+      "selected_families": [],
+      "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
+      "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
+    },
+    "tests/unit/test_phase17g_chaos_daemons_shadow_legion.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "dark-pact-timing-scope-054"
+      ],
+      "selected_families": [],
+      "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
+      "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
+    },
+    "tests/unit/test_phase17g_chaos_space_marines_army_rule.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "dark-pact-timing-scope-055"
+      ],
+      "selected_families": [],
+      "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
+      "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
+    },
+    "tools/performance_cavalcade_policy_successor.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "cavalcade-comparison-fixture-binding"
+      ],
+      "selected_families": [],
+      "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
+      "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
+    },
+    "tools/performance_dark_pacts.py": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
+      "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
+    },
+    "tools/performance_policy.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "ci64-provenance-1504c891c8d333f3c62a63c7948e98ffbf88e3f7ed520168c4d3861cdcbac334",
+        "ci67-transaction-1504c891c8d333f3c62a63c7948e98ffbf88e3f7ed520168c4d3861cdcbac334"
+      ],
+      "selected_families": [],
+      "rationale": "Bind current pre-attack Dark Pact sequencing, rule evidence, and the precise set of supporting test and generated artifacts.",
+      "source_obligation": "GW Dark Pacts requires optional commitment, a Leadership test and any failed-test casualties, then a surviving rules unit's weapon-effect choice before attacks, lasting to the enclosing phase boundary.",
+      "unchanged_work": "Reuse existing deterministic test, mortal-wound allocation, and native phase decisions. The scoped rule does not change attack resolution, search, cache policy, or the format of replay/session serialization."
     }
   },
   "milestone": "ordinary",

@@ -1,9 +1,8 @@
 from __future__ import annotations
 
 from enum import StrEnum
-from typing import TYPE_CHECKING, TypedDict, cast
+from typing import TYPE_CHECKING
 
-from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.dice import (
     RerollComponentSelectionPolicy,
     RerollPermission,
@@ -21,16 +20,6 @@ from warhammer40k_core.core.weapon_profiles import (
     WeaponKeyword,
     WeaponProfile,
 )
-from warhammer40k_core.engine.attack_sequence_completion_hooks import (
-    AttackSequenceCompletedContext,
-    AttackSequenceCompletedHookBinding,
-)
-from warhammer40k_core.engine.damage_allocation import (
-    MortalWoundApplication,
-    MortalWoundApplicationProgress,
-)
-from warhammer40k_core.engine.decision_controller import DecisionController
-from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.effects import PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentContribution
@@ -41,23 +30,20 @@ from warhammer40k_core.engine.fight_unit_selected_hooks import (
     FightUnitSelectedTimedEffect,
 )
 from warhammer40k_core.engine.mortal_wound_feel_no_pain_hooks import (
-    MortalWoundFeelNoPainContinuationContext,
     MortalWoundFeelNoPainContinuationHookBinding,
-)
-from warhammer40k_core.engine.mortal_wound_model_allocation import (
-    resolve_mortal_wound_decision,
 )
 from warhammer40k_core.engine.phase import (
     BattlePhase,
     GameLifecycleError,
-    GameLifecycleStage,
-    LifecycleStatus,
 )
-from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_view_by_id
+from warhammer40k_core.engine.rules_units import (
+    RulesUnitView,
+    rules_unit_view_by_id,
+    rules_unit_view_from_armies,
+)
 from warhammer40k_core.engine.runtime_modifiers import (
     AttackRerollPermissionBinding,
     AttackRerollPermissionContext,
-    UnitCharacteristicModifierContext,
     WeaponProfileModifierBinding,
     WeaponProfileModifierContext,
 )
@@ -69,16 +55,14 @@ from warhammer40k_core.engine.shooting_unit_selected_hooks import (
 from warhammer40k_core.engine.source_backed_rerolls import (
     SourceBackedRerollPermissionContext,
 )
-from warhammer40k_core.engine.timing_rule_candidates import TimingRuleCandidate
-from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
+from warhammer40k_core.engine.unit_factory import UnitInstance
+from warhammer40k_core.engine.unit_grant_preparation import (
+    UnitGrantPreparation,
+    apply_preparation_mortal_wound_decision,
+)
 
 if TYPE_CHECKING:
-    from warhammer40k_core.engine.game_state import GameState
-
-
-class DarkPactMortalWoundSourceContextPayload(TypedDict):
-    source_kind: str
-    resolution_payload: dict[str, JsonValue]
+    pass
 
 
 CONTRIBUTION_ID = "warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts"
@@ -103,14 +87,9 @@ SHOOTING_LETHAL_HITS_HOOK_ID = f"{HOOK_ID}:shooting:lethal_hits"
 SHOOTING_SUSTAINED_HITS_HOOK_ID = f"{HOOK_ID}:shooting:sustained_hits_1"
 FIGHT_LETHAL_HITS_HOOK_ID = f"{HOOK_ID}:fight:lethal_hits"
 FIGHT_SUSTAINED_HITS_HOOK_ID = f"{HOOK_ID}:fight:sustained_hits_1"
-ATTACK_SEQUENCE_COMPLETED_HOOK_ID = f"{HOOK_ID}:attack_sequence_completed"
 MORTAL_WOUND_FEEL_NO_PAIN_HOOK_ID = f"{HOOK_ID}:mortal_wound_feel_no_pain"
 WEAPON_PROFILE_MODIFIER_ID = f"{HOOK_ID}:weapon_profile_modifier"
 DEFILER_DAEMONFORGE_WOUND_REROLL_MODIFIER_ID = f"{HOOK_ID}:defiler-daemonforge:wound-reroll"
-SHADOW_LEGION_ATTACK_SEQUENCE_COMPLETED_HOOK_ID = (
-    "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule:"
-    "disciples-of-belakor:attack-sequence-completed"
-)
 
 
 class DarkPactKind(StrEnum):
@@ -145,21 +124,12 @@ def runtime_contribution() -> RuntimeContentContribution:
                 handler=fight_sustained_hits_dark_pact_grant,
             ),
         ),
-        attack_sequence_completed_hook_bindings=(
-            AttackSequenceCompletedHookBinding(
-                hook_id=ATTACK_SEQUENCE_COMPLETED_HOOK_ID,
-                source_id=SOURCE_RULE_ID,
-                handler=resolve_dark_pact_attack_sequence_completion,
-                candidate_handler=dark_pact_completion_candidates,
-                requires_attacks=False,
-            ),
-        ),
         mortal_wound_feel_no_pain_hook_bindings=(
             MortalWoundFeelNoPainContinuationHookBinding(
                 hook_id=MORTAL_WOUND_FEEL_NO_PAIN_HOOK_ID,
                 source_id=SOURCE_RULE_ID,
                 source_kind=DARK_PACT_MORTAL_WOUNDS_SOURCE_KIND,
-                handler=apply_dark_pact_mortal_wound_feel_no_pain_decision,
+                handler=apply_preparation_mortal_wound_decision,
             ),
         ),
         weapon_profile_modifier_bindings=(
@@ -247,6 +217,7 @@ def _shooting_dark_pact_grant(
         hook_id=hook_id,
         source_id=SOURCE_RULE_ID,
         label=label,
+        preparation=dark_pact_preparation(source_rule_id=SOURCE_RULE_ID),
         replay_payload={
             "effect_kind": DARK_PACT_EFFECT_KIND,
             "selected_dark_pact": pact.value,
@@ -266,7 +237,7 @@ def _shooting_dark_pact_grant(
                 "selection_result_id": context.result_id,
             },
         ),
-        unit_effect_expiration="end_phase",
+        unit_effect_expiration="end_enclosing_phase",
     )
 
 
@@ -286,14 +257,11 @@ def _fight_dark_pact_grant(
         phase=BattlePhase.FIGHT,
     ):
         return None
-    target_unit_ids = dark_pact_target_unit_ids(
-        context.state,
-        unit_instance_id=context.unit_instance_id,
-    )
     return FightUnitSelectedGrant(
         hook_id=hook_id,
         source_id=SOURCE_RULE_ID,
         label=label,
+        preparation=dark_pact_preparation(source_rule_id=SOURCE_RULE_ID),
         replay_payload={
             "effect_kind": DARK_PACT_EFFECT_KIND,
             "selected_dark_pact": pact.value,
@@ -308,7 +276,7 @@ def _fight_dark_pact_grant(
             FightUnitSelectedTimedEffect(
                 effect_payload=dark_pact_effect_payload(
                     unit_instance_id=context.unit_instance_id,
-                    target_unit_instance_ids=target_unit_ids,
+                    target_unit_instance_ids=(context.unit_instance_id,),
                     trigger="selected_to_fight",
                     phase=BattlePhase.FIGHT,
                     selected_dark_pact=pact,
@@ -322,6 +290,25 @@ def _fight_dark_pact_grant(
                 expiration="end_phase",
             ),
         ),
+    )
+
+
+def dark_pact_preparation(*, source_rule_id: str, auto_pass: bool = False) -> UnitGrantPreparation:
+    source_kinds = {
+        SOURCE_RULE_ID: DARK_PACT_MORTAL_WOUNDS_SOURCE_KIND,
+        SHADOW_LEGION_SOURCE_RULE_ID: SHADOW_LEGION_DARK_PACT_MORTAL_WOUNDS_SOURCE_KIND,
+    }
+    if source_rule_id not in source_kinds:
+        raise GameLifecycleError("Unknown Dark Pacts source rule.")
+    return UnitGrantPreparation(
+        source_rule_id=source_rule_id,
+        label="Dark Pact",
+        leadership_roll_type=DARK_PACT_LEADERSHIP_ROLL_TYPE,
+        mortal_wounds_roll_type=DARK_PACT_MORTAL_WOUNDS_ROLL_TYPE,
+        mortal_wound_source_kind=source_kinds[source_rule_id],
+        resolved_event_type="chaos_space_marines_dark_pact_resolved",
+        pending_event_type="chaos_space_marines_dark_pact_mortal_wounds_pending",
+        auto_pass=auto_pass,
     )
 
 
@@ -445,103 +432,6 @@ def defiler_daemonforge_wound_reroll_permission(
     )
 
 
-def resolve_dark_pact_attack_sequence_completion(
-    context: AttackSequenceCompletedContext,
-) -> LifecycleStatus | None:
-    from .completion_sequencing import resolve
-
-    return resolve(context)
-
-
-def dark_pact_completion_candidates(
-    context: AttackSequenceCompletedContext,
-) -> tuple[TimingRuleCandidate, ...]:
-    from .completion_sequencing import candidates
-
-    return candidates(context)
-
-
-def apply_dark_pact_mortal_wound_feel_no_pain_decision(
-    context: MortalWoundFeelNoPainContinuationContext,
-) -> LifecycleStatus | None:
-    if type(context) is not MortalWoundFeelNoPainContinuationContext:
-        raise GameLifecycleError("Dark Pacts FNP continuation requires context.")
-    routed = resolve_mortal_wound_decision(
-        state=context.state,
-        decisions=context.decisions,
-        request=context.request,
-        result=context.result,
-        next_request_id=context.state.next_decision_request_id(),
-        dice_manager=context.dice_manager,
-    )
-    source_context = _dark_pact_mortal_wound_source_context_from_payload(
-        routed.progress.source_context
-    )
-    phase = _battle_phase_from_token(source_context["resolution_payload"]["phase"])
-    return resolve_routed_dark_pact_mortal_wounds(
-        state=context.state,
-        decisions=context.decisions,
-        feel_no_pain_result_id=context.result.result_id,
-        routed_request=routed.request,
-        routed_application=routed.application,
-        routed_progress=routed.progress,
-        source_phase=phase,
-    )
-
-
-def resolve_routed_dark_pact_mortal_wounds(
-    *,
-    state: GameState,
-    decisions: DecisionController,
-    feel_no_pain_result_id: str | None,
-    routed_request: DecisionRequest | None,
-    routed_application: MortalWoundApplication | None,
-    routed_progress: MortalWoundApplicationProgress,
-    source_phase: BattlePhase,
-) -> LifecycleStatus | None:
-    source_context = _dark_pact_mortal_wound_source_context_from_payload(
-        routed_progress.source_context
-    )
-    resolution_payload = source_context["resolution_payload"]
-    if routed_request is not None:
-        decisions.request_decision(routed_request)
-        decisions.event_log.append(
-            "chaos_space_marines_dark_pact_mortal_wounds_pending",
-            validate_json_value(
-                {
-                    **resolution_payload,
-                    "request_id": routed_request.request_id,
-                    "remaining_mortal_wounds": routed_progress.remaining_mortal_wounds,
-                }
-            ),
-        )
-        return LifecycleStatus.waiting_for_decision(
-            stage=GameLifecycleStage.BATTLE,
-            decision_request=routed_request,
-            payload={
-                "phase": source_phase.value,
-                "decision_type": routed_request.decision_type,
-                "source_rule_id": resolution_payload["source_rule_id"],
-                "source_kind": source_context["source_kind"],
-                "unit_instance_id": resolution_payload["unit_instance_id"],
-                "attack_sequence_id": resolution_payload["attack_sequence_id"],
-            },
-        )
-    if routed_application is None:
-        raise GameLifecycleError("Dark Pacts mortal wound routing did not produce application.")
-    resolved_payload = {
-        **resolution_payload,
-        "mortal_wound_application": validate_json_value(routed_application.to_payload()),
-    }
-    if feel_no_pain_result_id is not None:
-        resolved_payload["feel_no_pain_result_id"] = feel_no_pain_result_id
-    decisions.event_log.append(
-        "chaos_space_marines_dark_pact_resolved",
-        validate_json_value(resolved_payload),
-    )
-    return None
-
-
 def active_dark_pact_for_unit(
     state: object,
     *,
@@ -618,9 +508,12 @@ def active_dark_pact_effect_for_unit(
         raise GameLifecycleError("Dark Pacts effect lookup requires GameState.")
     requested_phase = _battle_phase_from_token(phase)
     effects: list[PersistingEffect] = []
-    for effect in state.persisting_effects_for_unit(
-        _validate_identifier("unit_instance_id", unit_instance_id)
-    ):
+    # A weapon can belong to either component; the pact belongs to the rules unit.
+    target_unit_id = rules_unit_view_from_armies(
+        armies=tuple(state.army_definitions),
+        unit_instance_id=_validate_identifier("unit_instance_id", unit_instance_id),
+    ).unit_instance_id
+    for effect in state.persisting_effects_for_unit(target_unit_id):
         if effect.source_rule_id not in DARK_PACT_SOURCE_RULE_IDS:
             continue
         payload = dark_pact_payload(effect.effect_payload)
@@ -654,35 +547,6 @@ def _unit_has_dark_pacts(unit: UnitInstance) -> bool:
     )
 
 
-def leadership_target_for_rules_unit(
-    *,
-    context: AttackSequenceCompletedContext,
-    rules_unit: RulesUnitView,
-) -> int:
-    alive_models = rules_unit.alive_models()
-    if not alive_models:
-        raise GameLifecycleError("Dark Pacts Leadership test requires alive models.")
-    base_leadership = min(_model_leadership(model) for model in alive_models)
-    return context.runtime_modifier_registry.modified_unit_characteristic(
-        UnitCharacteristicModifierContext(
-            state=context.state,
-            unit_instance_id=rules_unit.unit_instance_id,
-            characteristic=Characteristic.LEADERSHIP,
-            base_value=base_leadership,
-            current_value=base_leadership,
-        )
-    )
-
-
-def _model_leadership(model: ModelInstance) -> int:
-    if type(model) is not ModelInstance:
-        raise GameLifecycleError("Dark Pacts Leadership lookup requires ModelInstance.")
-    for value in model.characteristics:
-        if value.characteristic is Characteristic.LEADERSHIP:
-            return value.final
-    raise GameLifecycleError("Dark Pacts model is missing Leadership.")
-
-
 def _profile_with_keyword_and_ability(
     profile: WeaponProfile,
     *,
@@ -702,69 +566,6 @@ def _profile_with_keyword_and_ability(
     )
 
 
-def dark_pact_already_resolved(
-    *,
-    context: AttackSequenceCompletedContext,
-    effect_id: str,
-) -> bool:
-    requested_effect_id = _validate_identifier("effect_id", effect_id)
-    for event in context.decisions.event_log.records:
-        if event.event_type != "chaos_space_marines_dark_pact_resolved":
-            continue
-        payload = event.payload
-        if not isinstance(payload, dict):
-            raise GameLifecycleError("Dark Pacts resolution payload is malformed.")
-        if payload.get("effect_id") != requested_effect_id:
-            continue
-        if payload.get("attack_sequence_id") == context.attack_sequence.sequence_id:
-            return True
-    return False
-
-
-def dark_pact_resolution_payload(
-    *,
-    context: AttackSequenceCompletedContext,
-    rules_unit: RulesUnitView,
-    effect: PersistingEffect,
-    selected_pact: DarkPactKind,
-    leadership_target: int | None,
-    leadership_roll: JsonValue,
-    leadership_modified_roll: JsonValue,
-    passed: bool,
-    d3_result: JsonValue,
-    mortal_wound_application: JsonValue,
-    leadership_auto_pass: bool,
-) -> dict[str, JsonValue]:
-    if type(leadership_auto_pass) is not bool:
-        raise GameLifecycleError("Dark Pacts leadership_auto_pass must be a bool.")
-    return cast(
-        dict[str, JsonValue],
-        validate_json_value(
-            {
-                "game_id": context.state.game_id,
-                "battle_round": context.state.battle_round,
-                "phase": context.source_phase.value,
-                "source_rule_id": effect.source_rule_id,
-                "hook_id": _dark_pact_completion_hook_id_for_rule(effect.source_rule_id),
-                "player_id": rules_unit.owner_player_id,
-                "unit_instance_id": rules_unit.unit_instance_id,
-                "target_unit_instance_ids": list(effect.target_unit_instance_ids),
-                "effect_id": effect.effect_id,
-                "selected_dark_pact": selected_pact.value,
-                "attack_sequence_id": context.attack_sequence.sequence_id,
-                "attack_sequence_completed_event_id": (context.attack_sequence_completed_event_id),
-                "leadership_target": leadership_target,
-                "leadership_roll": leadership_roll,
-                "leadership_modified_roll": leadership_modified_roll,
-                "leadership_auto_pass": leadership_auto_pass,
-                "passed": passed,
-                "d3_result": d3_result,
-                "mortal_wound_application": mortal_wound_application,
-            }
-        ),
-    )
-
-
 def dark_pact_payload(payload: JsonValue) -> dict[str, JsonValue]:
     if not isinstance(payload, dict):
         raise GameLifecycleError("Dark Pacts effect payload must be an object.")
@@ -780,63 +581,6 @@ def dark_pact_payload(payload: JsonValue) -> dict[str, JsonValue]:
     if type(payload.get("leadership_test_auto_pass")) is not bool:
         raise GameLifecycleError("Dark Pacts effect payload is missing leadership auto-pass.")
     return payload
-
-
-def dark_pact_leadership_auto_passes(payload: dict[str, JsonValue]) -> bool:
-    auto_pass = payload.get("leadership_test_auto_pass")
-    if type(auto_pass) is not bool:
-        raise GameLifecycleError("Dark Pacts leadership auto-pass payload is invalid.")
-    return auto_pass
-
-
-def dark_pact_mortal_wound_source_context(
-    *,
-    resolution_payload: dict[str, JsonValue],
-    source_rule_id: str,
-) -> JsonValue:
-    return validate_json_value(
-        {
-            "source_kind": _dark_pact_mortal_wound_source_kind_for_rule(source_rule_id),
-            "resolution_payload": resolution_payload,
-        }
-    )
-
-
-def _dark_pact_mortal_wound_source_context_from_payload(
-    payload: JsonValue,
-) -> DarkPactMortalWoundSourceContextPayload:
-    raw = _json_object("Dark Pacts mortal wound source context", payload)
-    source_kind = raw.get("source_kind")
-    if source_kind not in DARK_PACT_MORTAL_WOUNDS_SOURCE_KINDS:
-        raise GameLifecycleError("Dark Pacts mortal wound source context kind is invalid.")
-    resolution_payload = raw.get("resolution_payload")
-    if not isinstance(resolution_payload, dict):
-        raise GameLifecycleError(
-            "Dark Pacts mortal wound source context is missing resolution_payload."
-        )
-    validated_resolution_payload = validate_json_value(cast(dict[str, object], resolution_payload))
-    return {
-        "source_kind": source_kind,
-        "resolution_payload": cast(dict[str, JsonValue], validated_resolution_payload),
-    }
-
-
-def _dark_pact_mortal_wound_source_kind_for_rule(source_rule_id: str) -> str:
-    requested_source_rule_id = _validate_identifier("source_rule_id", source_rule_id)
-    if requested_source_rule_id == SOURCE_RULE_ID:
-        return DARK_PACT_MORTAL_WOUNDS_SOURCE_KIND
-    if requested_source_rule_id == SHADOW_LEGION_SOURCE_RULE_ID:
-        return SHADOW_LEGION_DARK_PACT_MORTAL_WOUNDS_SOURCE_KIND
-    raise GameLifecycleError("Dark Pacts mortal wound source rule is unsupported.")
-
-
-def _dark_pact_completion_hook_id_for_rule(source_rule_id: str) -> str:
-    requested_source_rule_id = _validate_identifier("source_rule_id", source_rule_id)
-    if requested_source_rule_id == SOURCE_RULE_ID:
-        return ATTACK_SEQUENCE_COMPLETED_HOOK_ID
-    if requested_source_rule_id == SHADOW_LEGION_SOURCE_RULE_ID:
-        return SHADOW_LEGION_ATTACK_SEQUENCE_COMPLETED_HOOK_ID
-    raise GameLifecycleError("Dark Pacts completion source rule is unsupported.")
 
 
 def dark_pact_kind_from_token(token: object) -> DarkPactKind:
@@ -861,12 +605,6 @@ def _battle_phase_from_token(token: object) -> BattlePhase:
         return BattlePhase(token)
     except ValueError as exc:
         raise GameLifecycleError(f"Unsupported Dark Pacts phase: {token}.") from exc
-
-
-def _json_object(field_name: str, value: JsonValue) -> dict[str, object]:
-    if not isinstance(value, dict):
-        raise GameLifecycleError(f"{field_name} must be an object.")
-    return cast(dict[str, object], value)
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)

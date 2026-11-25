@@ -460,6 +460,12 @@ def behavioral_selection(root: Path) -> BehavioralSelection:
     present_inactive = {
         name: row for name, row in value["inactive_legacy_files"].items() if name not in retired
     }
+    from scripts.dark_pact_test_admission import dark_pact_inactive_successors
+
+    for name, after in dark_pact_inactive_successors(root, present_inactive).items():
+        if name in current:
+            raise SystemExit("Dark Pact fixture updates overlap a predecessor selection.")
+        current[name] = after
     inactive = _selection_members(present_inactive, root, current=current)
     inactive.update({name: value["inactive_legacy_files"][name] for name in retired})
     benchmarks = _selection_members(value["benchmark_files"], root)

@@ -14,6 +14,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
 )
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine import rule_model_destruction
+from warhammer40k_core.engine import unit_grant_preparation as preparation_flow
 from warhammer40k_core.engine.attack_sequence import (
     ATTACK_ALLOCATION_DECISION_TYPES,
     ATTACK_RESOLUTION_SELECTION_DECISION_TYPES,
@@ -357,6 +358,44 @@ class FightPhaseHandler:
     def phase(self) -> BattlePhase:
         return BattlePhase.FIGHT
 
+    def resume_unit_grant_commitment(
+        self,
+        *,
+        state: GameState,
+        decisions: DecisionController,
+        result: DecisionResult,
+        resolved: bool = False,
+    ) -> LifecycleStatus | None:
+        activation = require_fight_state(state).active_activation
+        if activation is None:
+            raise GameLifecycleError("Fight unit grant commitment requires active activation.")
+        committed = result.selected_option_id != DECLINE_FIGHT_UNIT_GRANT_OPTION_ID
+        if committed:
+            if not resolved:
+                status = preparation_flow.resolve_commitment(
+                    state=state,
+                    decisions=decisions,
+                    result=result,
+                    phase=BattlePhase.FIGHT,
+                    runtime_modifier_registry=self.runtime_modifier_registry,
+                )
+                if status is not None:
+                    return status
+            from warhammer40k_core.engine.fight_activation_units import (
+                active_fight_activation_rules_unit,
+            )
+
+            unit = active_fight_activation_rules_unit(state=state, activation=activation)
+            if unit is None or not unit.alive_models():
+                return None
+        return _request_fight_unit_selected_grant_decision_if_available(
+            state=state,
+            decisions=decisions,
+            activation=activation,
+            registry=self.fight_unit_selected_grant_hooks,
+            committed=committed,
+        )
+
     def invalid_fight_unit_selected_grant_status(
         self,
         *,
@@ -388,6 +427,20 @@ class FightPhaseHandler:
             )
         payload = _decision_payload_object(result.payload)
         try:
+            if preparation_flow.is_commitment_request(request):
+                activation = fight_state.active_activation
+                grants = self.fight_unit_selected_grant_hooks.grants_for(
+                    _fight_unit_selected_context(state=state, activation=activation)
+                )
+                preparation_flow.validate_commitment(
+                    request=request,
+                    result=result,
+                    preparation=preparation_flow.preparation_for(grants),
+                    unit_id=activation.unit_instance_id,
+                    selection_request_id=activation.request_id,
+                    selection_result_id=activation.result_id,
+                )
+                return None
             _validate_fight_unit_selected_grant_payload_context(
                 payload=payload,
                 activation=fight_state.active_activation,
@@ -539,6 +592,12 @@ class FightPhaseHandler:
                 policy=fight_policy_for_handler(self),
             )
         if result.decision_type == SELECT_FIGHT_UNIT_GRANT_DECISION_TYPE:
+            if preparation_flow.is_commitment_request(decisions.record_for_result(result).request):
+                return self.resume_unit_grant_commitment(
+                    state=state,
+                    decisions=decisions,
+                    result=result,
+                )
             return _apply_fight_unit_selected_grant_decision(
                 state=state,
                 result=result,
@@ -581,6 +640,7 @@ class FightPhaseHandler:
         if result.decision_type == FIGHT_INTERRUPT_DECISION_TYPE:
             return _apply_fight_interrupt_decision(
                 state=state,
+                registry=self.fight_unit_selected_grant_hooks,
                 result=result,
                 decisions=decisions,
                 policy=fight_policy_for_handler(self),
@@ -2429,9 +2489,29 @@ def _request_fight_unit_selected_grant_decision_if_available(
     decisions: DecisionController,
     activation: FightActivationSelection,
     registry: FightUnitSelectedGrantRegistry,
+    committed: bool | None = None,
+    preparation_only: bool = False,
 ) -> LifecycleStatus | None:
     context = _fight_unit_selected_context(state=state, activation=activation)
     grants = registry.grants_for(context)
+    preparation = preparation_flow.preparation_for(grants)
+    if preparation is not None and committed is None:
+        return preparation_flow.commitment_request(
+            state=state,
+            decisions=decisions,
+            decision_type=SELECT_FIGHT_UNIT_GRANT_DECISION_TYPE,
+            actor_id=activation.player_id,
+            phase=BattlePhase.FIGHT,
+            unit_id=activation.unit_instance_id,
+            selection_request_id=activation.request_id,
+            selection_result_id=activation.result_id,
+            preparation=preparation,
+            decline_option_id=DECLINE_FIGHT_UNIT_GRANT_OPTION_ID,
+        )
+    if preparation_only:
+        return None
+    if committed is False:
+        grants = tuple(grant for grant in grants if grant.preparation is None)
     if not grants:
         return None
     request = DecisionRequest(
@@ -2455,6 +2535,7 @@ def _request_fight_unit_selected_grant_decision_if_available(
             activation_request_id=activation.request_id,
             activation_result_id=activation.result_id,
             grants=grants,
+            committed=committed is True,
         ),
     )
     decisions.request_decision(request)
@@ -2765,6 +2846,7 @@ def _apply_fight_activation_ability_decision(
 def _apply_fight_interrupt_decision(
     *,
     state: GameState,
+    registry: FightUnitSelectedGrantRegistry,
     result: DecisionResult,
     decisions: DecisionController,
     policy: FightPolicyDescriptor,
@@ -2820,7 +2902,13 @@ def _apply_fight_interrupt_decision(
             }
         ),
     )
-    return None
+    return _request_fight_unit_selected_grant_decision_if_available(
+        state=state,
+        decisions=decisions,
+        activation=selection,
+        registry=registry,
+        preparation_only=True,
+    )
 
 
 def request_counteroffensive_if_available(

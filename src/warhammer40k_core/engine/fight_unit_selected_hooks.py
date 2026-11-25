@@ -10,6 +10,7 @@ from warhammer40k_core.engine.effects import PersistingEffect, PersistingEffectP
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.lifecycle_hooks import LifecycleHookEvent, validate_hook_bindings
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
+from warhammer40k_core.engine.unit_grant_preparation import UnitGrantPreparation
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
@@ -21,6 +22,7 @@ class FightUnitSelectedTimedEffectPayload(TypedDict):
 
 
 class FightUnitSelectedGrantPayload(TypedDict):
+    preparation: NotRequired[dict[str, JsonValue]]
     hook_id: str
     source_id: str
     label: str
@@ -164,6 +166,8 @@ class FightUnitSelectedGrant:
     immediate_effect_payload: JsonValue = None
     decline_allowed: bool = True
 
+    preparation: UnitGrantPreparation | None = None
+
     def __post_init__(self) -> None:
         object.__setattr__(self, "hook_id", _validate_identifier("hook_id", self.hook_id))
         object.__setattr__(self, "source_id", _validate_identifier("source_id", self.source_id))
@@ -201,11 +205,18 @@ class FightUnitSelectedGrant:
         }
         if not self.decline_allowed:
             payload["decline_allowed"] = False
+        if self.preparation is not None:
+            payload["preparation"] = self.preparation.to_payload()
         return payload
 
     @classmethod
     def from_payload(cls, payload: FightUnitSelectedGrantPayload) -> Self:
         return cls(
+            preparation=(
+                UnitGrantPreparation.from_payload(payload["preparation"])
+                if "preparation" in payload
+                else None
+            ),
             hook_id=payload["hook_id"],
             source_id=payload["source_id"],
             label=payload["label"],
@@ -226,12 +237,30 @@ def fight_unit_selected_grant_options(
     activation_request_id: str,
     activation_result_id: str,
     grants: tuple[FightUnitSelectedGrant, ...],
+    committed: bool = False,
 ) -> tuple[DecisionOption, ...]:
     unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
     request_id = _validate_identifier("activation_request_id", activation_request_id)
     result_id = _validate_identifier("activation_result_id", activation_result_id)
+    prepared = tuple(grant for grant in grants if committed and grant.preparation is not None)
     mandatory_grants = tuple(grant for grant in grants if not grant.decline_allowed)
-    optional_grants = tuple(grant for grant in grants if grant.decline_allowed)
+    optional_grants = tuple(
+        grant for grant in grants if grant.decline_allowed and grant not in prepared
+    )
+    if prepared and mandatory_grants:
+        return tuple(
+            _grant_decision_option(
+                option_id=f"{grant.hook_id}:with:{mandatory.hook_id}",
+                label=f"{grant.label} and {mandatory.label}",
+                unit_instance_id=unit_id,
+                activation_request_id=request_id,
+                activation_result_id=result_id,
+                grants=(grant, mandatory),
+            )
+            for grant in prepared
+            for mandatory in mandatory_grants
+        )
+    mandatory_grants = prepared or mandatory_grants
     options: list[DecisionOption] = []
     if not mandatory_grants:
         options.append(

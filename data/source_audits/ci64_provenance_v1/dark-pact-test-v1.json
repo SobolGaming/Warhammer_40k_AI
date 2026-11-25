@@ -1,0 +1,65 @@
+{
+  "schema": "finite-dark-pact-test-v1",
+  "base": "ab3a4ac03854964649f74efe5b8cebd528d3e25a",
+  "retained_transition_sha256": "93199961c9111e9cc0dd527f2b1224fd4a6e2c9e627ef735fac37cf7b30b5c27",
+  "retained_runtime_fingerprint": "6580f37c0a152b8e39723a8aa5c7371c389826af531913de973c9ac4f100b66d",
+  "runtime_fingerprint": "0f7d296e1cbe41efd947f0b36f0bcbf2745511c8456d167b6ee26b6552b9d637",
+  "added_files": {
+    "tests/infrastructure/adapters/test_dark_pact_timing.py": {
+      "mode": "100644",
+      "blob_sha1": "09eeb70ebb666340fd1ff81985203aaeea8f049c",
+      "sha256": "af0a2326c0996aff5b8515e5e4cd3400b41ab9b62c126013ee9a5d528e221dec",
+      "bytes": 36171
+    }
+  },
+  "updated_files": {
+    "tests/factions/chaos_daemons/unit/test_generic_rule_ability_registry.py": {
+      "before": {
+        "mode": "100644",
+        "blob_sha1": "8246d6ca14183efe1bbf736b65509eccf75452c6",
+        "sha256": "8901ff75b652675d0ce253424d5da1d251b09d2f7a67b0be02061c5da9aeea18",
+        "bytes": 23460
+      },
+      "after": {
+        "mode": "100644",
+        "blob_sha1": "dff28e3ce61a40be6b1affafe986617e1781dc15",
+        "sha256": "bd3e0639e2b1e08fcaca598ecc8341a75fd0d93dd59fc23d2c4b927feae553d4",
+        "bytes": 23084
+      }
+    }
+  },
+  "inactive_fixtures": {
+    "tests/unit/test_phase17g_chaos_daemons_shadow_legion.py": {
+      "before": {
+        "blob_sha1": "a09ac13ce5c4deb5d152513dcab6adb4e8450de3",
+        "bytes": 180586,
+        "mode": "100644",
+        "sha256": "9e1c033fa246822e637d0c87f7daadbc4fee1d9eb53f424eb23a3a58a51be1a4"
+      },
+      "after": {
+        "mode": "100644",
+        "blob_sha1": "7cfa909c440d0f3895e6880cc7d8f938f0de1928",
+        "sha256": "2b013289d44d782fb64e3d0880e083223cd444cc9b64d1c0a861c32e90edb68e",
+        "bytes": 166174
+      }
+    },
+    "tests/unit/test_phase17g_chaos_space_marines_army_rule.py": {
+      "before": {
+        "blob_sha1": "bca8f6963a4b0a10af18d5ac3e0213be0981c1a2",
+        "bytes": 84908,
+        "mode": "100644",
+        "sha256": "132ad158de58951446b311204ccc83af37e1d7596ac20ff9142feef3c26a6dac"
+      },
+      "after": {
+        "mode": "100644",
+        "blob_sha1": "4818753c19318e34704845aec0ebe1fb65049788",
+        "sha256": "b9b7fbc24d9f8841e65b12f5cb3d0857b278bf71bf4f9a844a464b16a8dce2d6",
+        "bytes": 61714
+      }
+    }
+  },
+  "retained_lifecycle": {
+    "before": "819f9a321f68af59893616f72139ab72c09e23d5e26f252f3e64dedfaa91f6e9",
+    "after": "a8ff6864a1e25ac197fcbed1fb02e12db3c0368825d9004f123be28543c59021"
+  }
+}

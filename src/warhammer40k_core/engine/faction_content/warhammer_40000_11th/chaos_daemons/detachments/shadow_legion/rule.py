@@ -57,7 +57,6 @@ SHOOTING_LETHAL_HITS_HOOK_ID = f"{HOOK_ID}:disciples-of-belakor:shooting:lethal_
 SHOOTING_SUSTAINED_HITS_HOOK_ID = f"{HOOK_ID}:disciples-of-belakor:shooting:sustained_hits_1"
 FIGHT_LETHAL_HITS_HOOK_ID = f"{HOOK_ID}:disciples-of-belakor:fight:lethal_hits"
 FIGHT_SUSTAINED_HITS_HOOK_ID = f"{HOOK_ID}:disciples-of-belakor:fight:sustained_hits_1"
-ATTACK_SEQUENCE_COMPLETED_HOOK_ID = dark_pacts.SHADOW_LEGION_ATTACK_SEQUENCE_COMPLETED_HOOK_ID
 MORTAL_WOUND_FEEL_NO_PAIN_HOOK_ID = f"{HOOK_ID}:disciples-of-belakor:mortal-wound-fnp"
 WEAPON_PROFILE_MODIFIER_ID = f"{HOOK_ID}:disciples-of-belakor:weapon-profile"
 
@@ -242,7 +241,7 @@ def _shooting_dark_pact_grant(
                 unit_instance_id=context.unit_instance_id,
             ),
         ),
-        unit_effect_expiration="end_phase",
+        unit_effect_expiration="end_enclosing_phase",
     )
 
 
@@ -262,10 +261,6 @@ def _fight_dark_pact_grant(
         phase=BattlePhase.FIGHT,
     ):
         return None
-    target_unit_ids = dark_pacts.dark_pact_target_unit_ids(
-        context.state,
-        unit_instance_id=context.unit_instance_id,
-    )
     return FightUnitSelectedGrant(
         hook_id=hook_id,
         source_id=SOURCE_RULE_ID,
@@ -285,7 +280,7 @@ def _fight_dark_pact_grant(
             FightUnitSelectedTimedEffect(
                 effect_payload=dark_pacts.dark_pact_effect_payload(
                     unit_instance_id=context.unit_instance_id,
-                    target_unit_instance_ids=target_unit_ids,
+                    target_unit_instance_ids=(context.unit_instance_id,),
                     trigger="selected_to_fight",
                     phase=BattlePhase.FIGHT,
                     selected_dark_pact=pact,
