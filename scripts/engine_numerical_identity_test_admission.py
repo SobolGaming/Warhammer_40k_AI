@@ -1994,7 +1994,7 @@ def exact_movement_test_transition(
         if pact is None:
             raise SystemExit("Fool's Flight requires the exact Dark Pact predecessor.")
         runtime, flight_tests, flight_raw = fools_flight.admits_after(
-            root=root, runtime=runtime, predecessor=pact_raw
+            root=root, runtime=runtime, predecessor=pact[3]
         )
         flight_addition = (flight_tests, flight_raw)
 

@@ -15,8 +15,8 @@ from scripts.behavioral_selection_members import (
 )
 
 TRANSITION = "data/source_audits/ci64_provenance_v1/fools-flight-test-v1.json"
-TRANSITION_SHA256 = "6463a6988eaecd0622205f1f19491c08cf2eb05ac855f464ca105d2ca5075044"
-BASE = "ab3a4ac03854964649f74efe5b8cebd528d3e25a"
+TRANSITION_SHA256 = "58295167f3d1474f244baafbd96b4688913ad501567fc7d1e657ab1da326ce41"
+BASE = "6701b3108eeea0124932cac5d70758e18dea89f2"
 OWNER = "tests/factions/chaos_daemons/integration/test_fools_flight.py"
 CLASSIFIER = "tests/infrastructure/source_governance/unit/test_blocked_row_classification.py"
 REPLACED_SOURCES = frozenset(

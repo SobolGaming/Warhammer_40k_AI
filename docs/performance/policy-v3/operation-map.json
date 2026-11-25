@@ -37981,6 +37981,228 @@
       "families": [],
       "sensitive": false,
       "mandatory": true
+    },
+    "fools-flight-fools-flight-test-v1": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/fools-flight-test-v1.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "fools-flight-source-verification": {
+      "paths": [
+        "data/source_audits/fools_flight_2026_11/source-verification.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "fools-flight-fools-flight-test-admission": {
+      "paths": [
+        "scripts/fools_flight_test_admission.py"
+      ],
+      "owners": [
+        "@module",
+        "FoolsFlightAdmission",
+        "FoolsFlightAdmission.admits_after",
+        "FoolsFlightAdmission.replace_pins",
+        "_Receipt",
+        "_TestReplacement",
+        "_sha",
+        "load_fools_flight_admission"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "fools-flight-catalog-rule-consumption": {
+      "paths": [
+        "src/warhammer40k_core/engine/catalog_rule_consumption.py"
+      ],
+      "owners": [
+        "_available_catalog_unit_move_completed_mortal_wounds_groups",
+        "_catalog_unit_move_completed_mortal_wounds_group_from_clause"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "fools-flight-charge-phase-state": {
+      "paths": [
+        "src/warhammer40k_core/engine/charge_phase_state.py"
+      ],
+      "owners": [
+        "@module",
+        "ChargeInterruption",
+        "ChargeInterruption.__post_init__",
+        "ChargeInterruption.from_payload",
+        "ChargeInterruption.host_phase",
+        "ChargeInterruption.to_payload",
+        "ChargeInterruption.turn_player_id",
+        "ChargePhaseState.__post_init__",
+        "_ChargeInterruptionPayload"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "fools-flight-charge-roll-flow": {
+      "paths": [
+        "src/warhammer40k_core/engine/charge_roll_flow.py"
+      ],
+      "owners": [
+        "pending_charge_roll"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "fools-flight-charge-target-continuation": {
+      "paths": [
+        "src/warhammer40k_core/engine/charge_target_continuation.py"
+      ],
+      "owners": [
+        "@module",
+        "is_charge_target_replacement_request",
+        "pending_charge",
+        "refresh_pending_charge_move"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "fools-flight-stratagems": {
+      "paths": [
+        "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/detachments/blood_legion/stratagems.py"
+      ],
+      "owners": [
+        "_fools_flight_record"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "fools-flight-heroic-intervention-history": {
+      "paths": [
+        "src/warhammer40k_core/engine/heroic_intervention_history.py"
+      ],
+      "owners": [
+        "@module",
+        "validate_interrupted_charge_source"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "fools-flight-heroic-intervention-rolls": {
+      "paths": [
+        "src/warhammer40k_core/engine/heroic_intervention_rolls.py"
+      ],
+      "owners": [
+        "_apply_heroic_intervention_handler"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "fools-flight-interrupted-charge": {
+      "paths": [
+        "src/warhammer40k_core/engine/interrupted_charge.py"
+      ],
+      "owners": [
+        "@module",
+        "advance_interrupted_charge",
+        "charge_action_in_current_phase",
+        "charge_interruption_at_event",
+        "charge_turn_owner_at_event",
+        "start_interrupted_charge"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "fools-flight-lifecycle-advancement": {
+      "paths": [
+        "src/warhammer40k_core/engine/lifecycle_advancement.py"
+      ],
+      "owners": [
+        "@module",
+        "advance_once"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "fools-flight-lifecycle-restore-consistency": {
+      "paths": [
+        "src/warhammer40k_core/engine/lifecycle_restore_consistency.py"
+      ],
+      "owners": [
+        "_validate_charge_phase_state_consistency"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "fools-flight-move-completion-triggers": {
+      "paths": [
+        "src/warhammer40k_core/engine/move_completion_triggers.py"
+      ],
+      "owners": [
+        "move_trigger_source_context"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "fools-flight-charge": {
+      "paths": [
+        "src/warhammer40k_core/engine/phases/charge.py"
+      ],
+      "owners": [
+        "@module",
+        "_request_charge_declaration_grant_if_available",
+        "_validate_charge_phase_state"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "fools-flight-unit-move-completed-hooks": {
+      "paths": [
+        "src/warhammer40k_core/engine/unit_move_completed_hooks.py"
+      ],
+      "owners": [
+        "_unprocessed_move_completion_events"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
+    "fools-flight-test-fools-flight": {
+      "paths": [
+        "tests/factions/chaos_daemons/integration/test_fools_flight.py"
+      ],
+      "owners": [
+        "@module",
+        "_assert_fights_first_through_turn_end",
+        "_flight_move",
+        "_flight_next",
+        "_flight_scene",
+        "test_fools_flight_native_fall_back_charge_resume_and_replay",
+        "test_fools_flight_short_roll_resumes_opponent_movement",
+        "test_fools_flight_unavailable_at_one_cp"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

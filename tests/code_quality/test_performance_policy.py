@@ -1543,3 +1543,22 @@ def test_milli_inch_arithmetic_keeps_sensitive_geometry_comparison_obligations()
         for name in ("visibility", "movement", "setup")
     }
     assert _validate(value, changes, mapping) == {"visibility", "movement", "setup"}
+
+
+def test_fools_flight_scope_preserves_dark_pact_policy_and_rejects_drift() -> None:
+    from tools import performance_fools_flight as flight
+
+    scope = read_object(ROOT / flight.SCOPE)
+    change = object_value(scope["change"])
+    assert flight.fools_flight_smoke_operations(
+        base=flight.BASE, path=flight.PATH, category="rule_semantics", change=change
+    ) == {"order135-visibility-hot-consumers"}
+    assert not flight.fools_flight_smoke_operations(
+        base=flight.BASE,
+        path=flight.PATH,
+        category="rule_semantics",
+        change={**change, "owners": {}},
+    )
+    policy = "tools/performance_policy.py"
+    retained = subprocess.check_output(["git", "show", f"{flight.BASE}:{policy}"], cwd=ROOT)
+    assert flight.fools_flight_policy_predecessor((ROOT / policy).read_bytes()) == retained
