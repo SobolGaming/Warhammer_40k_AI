@@ -1,100 +1,26 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "c0235fe0bfda75743a4ba987b9ef7ae7b4fd5da3",
+  "base": "e5cfe3cacfc869774e8e98863c1f43722215879f",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:dc9eb5d3f570d34d71e26a1c6b8ef794b5723aa812f8de505066309805678d18",
   "operation_map_sha256": "b58b3839a8b6c419fda1143d0883d97224cc7d2e4062eb28ccae3d677fc6cdd7",
   "changes": {
-    "docs/AI_IMPLEMENTATION_PLAN.md": {
-      "before_sha256": "0fb8c70a40ac82f1baf20536c5d65ec56421c420c19c6b17554bfc7ebdcac643",
-      "after_sha256": "1c89415df9b99180f1902042a71a27792e5713d538291314397531cf0ef29f6b",
+    "docs/AI_POLICY_INTERFACE.md": {
+      "before_sha256": "2232524951a5927131249c904671333a7288784a14264b24e939c537067d719b",
+      "after_sha256": "bd4bbeb64cb2ecf030d68e9bdacd720fcbcb2e389f9d7a21e19dbb0583dbe2dc",
       "owners": {
         "@document": {
-          "before": "0fb8c70a40ac82f1baf20536c5d65ec56421c420c19c6b17554bfc7ebdcac643",
-          "after": "1c89415df9b99180f1902042a71a27792e5713d538291314397531cf0ef29f6b"
-        }
-      }
-    },
-    "docs/stage2/b3-objective-preservation-receipt.json": {
-      "before_sha256": null,
-      "after_sha256": "5f24bc13539c8ddc17b983ec0554580fd918912bdc07035e5d9afc6fd2c984c3",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "5f24bc13539c8ddc17b983ec0554580fd918912bdc07035e5d9afc6fd2c984c3"
-        }
-      }
-    },
-    "scripts/tests/test_verify_stage2_b3_post_roll_receipts.py": {
-      "before_sha256": "80e6b7cfb3253969014c2736aa5541161756e1aae04630cffd55fc6b625bf205",
-      "after_sha256": "0f88f9e98bdfb112cc8a42f62917e00b49301658b390a275ee0a81222d26ada6",
-      "owners": {
-        "test_rejects_unverified_archive_without_summary": {
-          "before": "b823830399b1403f1b265a011da738b8bd914957e9d48e41634c173eb89423da",
-          "after": "9037f1921a9c59ff58e9ff2e5445da0ba112b1974804ac420591c55f92d98644"
-        }
-      }
-    },
-    "scripts/verify_stage2_b3_post_roll_receipts.py": {
-      "before_sha256": "4f1fe4a4f78aa186e8d3736bdbf07f8369150eee629687271a0835dc5ee216fa",
-      "after_sha256": "ac4dc75943dadb023b12bdadb7e4ba3b9763edee570486fa0f06bb0741facb4b",
-      "owners": {
-        "@module": {
-          "before": "036b4f2ec58e22c5a5ec9630bcee21e9b266aeedc5a35008c404d82fd544477e",
-          "after": "20ee16d85d64804b5e76ee9c000bf20e28d007b06c230f5969d902428e674fc5"
-        },
-        "authenticate": {
-          "before": null,
-          "after": "3268bd487008001145c25f11b0cc8cb11b65f1bdebcdb6381580f15092ca9b59"
-        },
-        "main": {
-          "before": "b84907a0f76eece7e04a7f172f79785c771b585dd070d20875aeff38c364ceea",
-          "after": "60e942a508e699ab1680e2fc816899bed6b8c87341d5b577463bb474fa64723d"
-        },
-        "verify": {
-          "before": "4d98468ea56ee797d0828d2e211e96487a5160e3c945a18a08b5da7e1e174f79",
-          "after": "b5bbbcd004d31f10340fd9bef1a0914c82221be6b425b29a4f1ec93ff3c9cee4"
-        },
-        "verify_preservation": {
-          "before": null,
-          "after": "38145c934a7f8379b62e2d6d5ec7f51ec95a12dd20ffc786258606b5a22ad905"
+          "before": "2232524951a5927131249c904671333a7288784a14264b24e939c537067d719b",
+          "after": "bd4bbeb64cb2ecf030d68e9bdacd720fcbcb2e389f9d7a21e19dbb0583dbe2dc"
         }
       }
     }
   },
   "rows": {
-    "docs/AI_IMPLEMENTATION_PLAN.md": {
+    "docs/AI_POLICY_INTERFACE.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Documents the exact-build B3 preservation comparison and its scope.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "docs/stage2/b3-objective-preservation-receipt.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Pins one historical fork, fresh proposal, native results and external proof digests.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "scripts/verify_stage2_b3_post_roll_receipts.py": {
-      "category": "measured_workload",
-      "operations": [
-        "stage2-b3-post-roll-receipt-verifier"
-      ],
-      "selected_families": [],
-      "rationale": "Extends the existing read-only operator verifier without loading gameplay.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "scripts/tests/test_verify_stage2_b3_post_roll_receipts.py": {
-      "category": "measured_workload",
-      "operations": [
-        "stage2-b3-post-roll-receipt-verifier"
-      ],
-      "selected_families": [],
-      "rationale": "Checks fail-closed CLI behavior in both receipt modes.",
+      "rationale": "Records the bounded Dense-wall CP comparison on an unchanged native fixture; no change to runtime, tests, or measured workload.",
       "source_obligation": null,
       "unchanged_work": null
     }
