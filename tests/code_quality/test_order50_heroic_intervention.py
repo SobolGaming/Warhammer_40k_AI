@@ -22,12 +22,28 @@ def test_heroic_provider_only_authorizes_the_shared_charge_owner() -> None:
     assert {
         "ChargeInterruption",
         "ChargeRollLimit",
-        "ChargePhaseState",
         "charge_target_candidates",
+        "start_interrupted_charge",
     } <= calls
     assert (
         not {"DiceRollManager", "roll_fixed", "request_roll", "resolve_charge_move", "PathWitness"}
         & calls
+    )
+    assert "ChargePhaseState" not in calls
+    shared_owner = (ENGINE / "interrupted_charge.py").read_text()
+    start = next(
+        node
+        for node in ast.parse(shared_owner).body
+        if isinstance(node, ast.FunctionDef) and node.name == "start_interrupted_charge"
+    )
+    assert (
+        sum(
+            isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Name)
+            and node.func.id == "ChargePhaseState"
+            for node in ast.walk(start)
+        )
+        == 1
     )
     assert "declared_target_unit_instance_ids_by_unit" in provider
     assert "charge_grants_fights_first" not in provider
