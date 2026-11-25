@@ -873,6 +873,7 @@ def _resolve_pending_movement_action_after_grants(
     selected_advance_move_grants: tuple[AdvanceMoveGrant, ...],
     reaction_queue: ReactionQueue | None,
     stratagem_index: StratagemCatalogIndex | None,
+    cost_modifiers: StratagemCostModifierRegistry,
     ability_index: AbilityCatalogIndex,
     runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> LifecycleStatus | None:
@@ -904,6 +905,7 @@ def _resolve_pending_movement_action_after_grants(
             selected_advance_move_grants=selected_advance_move_grants,
             reaction_queue=reaction_queue,
             stratagem_index=stratagem_index,
+            cost_modifiers=cost_modifiers,
             ability_index=ability_index,
             runtime_modifier_registry=runtime_modifier_registry,
         )
@@ -941,6 +943,7 @@ def _resolve_pending_advance_action(
     selected_advance_move_grants: tuple[AdvanceMoveGrant, ...],
     reaction_queue: ReactionQueue | None,
     stratagem_index: StratagemCatalogIndex | None,
+    cost_modifiers: StratagemCostModifierRegistry,
     ability_index: AbilityCatalogIndex,
     runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> LifecycleStatus | None:
@@ -996,6 +999,7 @@ def _resolve_pending_advance_action(
             selected_advance_move_grants=selected_advance_move_grants,
             reaction_queue=reaction_queue,
             stratagem_index=stratagem_index,
+            cost_modifiers=cost_modifiers,
         )
     advance_roll_state = _roll_advance_dice(
         state=state,
@@ -1039,6 +1043,7 @@ def _resolve_pending_advance_action(
         selected_advance_move_grants=selected_advance_move_grants,
         reaction_queue=reaction_queue,
         stratagem_index=stratagem_index,
+        cost_modifiers=cost_modifiers,
     )
 
 

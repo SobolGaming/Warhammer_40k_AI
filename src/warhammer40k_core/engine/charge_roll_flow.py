@@ -147,6 +147,7 @@ def continue_charge_roll(
         ability_index=handler.ability_index_for_player(roll_request.player_id),
         runtime_modifier_registry=handler.runtime_modifier_registry,
         charge_target_restriction_hooks=handler.charge_target_restriction_hooks,
+        handler=handler,
     )
 
 
@@ -250,6 +251,7 @@ def _resolve_charge_roll_state(
     charge_target_restriction_hooks: ChargeTargetRestrictionHookRegistry,
     ability_index: AbilityCatalogIndex,
     runtime_modifier_registry: RuntimeModifierRegistry,
+    handler: _charge.ChargePhaseHandler,
 ) -> LifecycleStatus | None:
     from warhammer40k_core.engine.movement_modifier_evaluation import prepare_charge_modifiers
 
@@ -318,6 +320,22 @@ def _resolve_charge_roll_state(
         "charge_move_required",
         phase15a_charge_roll_payload(roll_result=roll_result),
     )
+    if charge_state.interruption is None:
+        from warhammer40k_core.engine.stratagems_requests import (
+            request_post_roll_movement_stratagem,
+        )
+
+        opportunity = request_post_roll_movement_stratagem(
+            state=state,
+            decisions=decisions,
+            stratagem_index=handler.stratagem_index,
+            cost_modifiers=handler.stratagem_cost_modifier_registry,
+            phase=BattlePhase.CHARGE,
+            player_id=selection.player_id,
+            action_id=roll_request.request_id,
+        )
+        if opportunity is not None:
+            return opportunity
     return request_charge_targets(
         state=state, decisions=decisions, budget=budget, reachable=reachable_distances
     )

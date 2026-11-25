@@ -78,7 +78,23 @@ SKULLS_BEGET_BLOOD_EFFECT = (
     'from your army and is within 8" of and visible to your unit. '
     "Roll six D6: for each 4+, that enemy unit suffers 1 mortal wound."
 )
+GORE_HUNGRY_ONSLAUGHT_STRATAGEM_ID = "000009816003"
+GORE_HUNGRY_ONSLAUGHT_SOURCE_ROW_ID = (
+    f"stratagem:{CHAOS_DAEMONS_FACTION_ID}:{BLOOD_LEGION_DETACHMENT_ID}:"
+    f"{GORE_HUNGRY_ONSLAUGHT_STRATAGEM_ID}"
+)
+GORE_HUNGRY_ONSLAUGHT_DESCRIPTOR_ID = f"phase17e:{GORE_HUNGRY_ONSLAUGHT_SOURCE_ROW_ID}"
+GORE_HUNGRY_ONSLAUGHT_SOURCE_ID = (
+    "gw-11e-faction-packs-2026-07:" + GORE_HUNGRY_ONSLAUGHT_SOURCE_ROW_ID
+)
+GORE_HUNGRY_ONSLAUGHT_WHEN = "Your Movement phase or your Charge phase."
+GORE_HUNGRY_ONSLAUGHT_TARGET = "One Legiones Daemonica Khorne unit from your army."
+GORE_HUNGRY_ONSLAUGHT_EFFECT = (
+    "Until the end of the phase, each time a model in your unit makes a move, "
+    "it can move through terrain features."
+)
 COVERED_STRATAGEM_SOURCE_ROW_IDS = (
+    GORE_HUNGRY_ONSLAUGHT_SOURCE_ROW_ID,
     BLOOD_BEGETS_SKULLS_SOURCE_ROW_ID,
     SKULLS_BEGET_BLOOD_SOURCE_ROW_ID,
     WRATH_UNDENIABLE_SOURCE_ROW_ID,
@@ -685,6 +701,40 @@ def _gateway_unto_damnation_payload() -> RuleIRPayload:
     )
 
 
+def _gore_hungry_onslaught_payload() -> RuleIRPayload:
+    normalized_text = f"{GORE_HUNGRY_ONSLAUGHT_TARGET} {GORE_HUNGRY_ONSLAUGHT_EFFECT}"
+    return _payload(
+        GORE_HUNGRY_ONSLAUGHT_DESCRIPTOR_ID,
+        GORE_HUNGRY_ONSLAUGHT_SOURCE_ID,
+        normalized_text,
+        (
+            _effect_clause(
+                clause_id=f"{GORE_HUNGRY_ONSLAUGHT_DESCRIPTOR_ID}:terrain-transit",
+                template_id=None,
+                normalized_text=normalized_text,
+                source_text=GORE_HUNGRY_ONSLAUGHT_EFFECT,
+                target=_target("selected_unit", normalized_text, GORE_HUNGRY_ONSLAUGHT_TARGET),
+                effects=(
+                    _effect(
+                        "movement_transit_permission",
+                        normalized_text,
+                        "it can move through terrain features",
+                        (
+                            _parameter("permission", "move_through_terrain_features_on_any_path"),
+                            _parameter("terrain_features", True),
+                            _parameter(
+                                "movement_modes", ("normal", "advance", "fall_back", "charge")
+                            ),
+                        ),
+                    ),
+                ),
+                duration=_end_phase_duration(normalized_text, "Until the end of the phase"),
+            ),
+        ),
+        "phase17s-stratagem-activation-template-v2",
+    )
+
+
 def _wrath_undeniable_payload() -> RuleIRPayload:
     normalized_text = f"{WRATH_UNDENIABLE_TARGET} {WRATH_UNDENIABLE_EFFECT}"
     return _payload(
@@ -1037,6 +1087,7 @@ def _coverage_payloads() -> Mapping[str, RuleIRPayload]:
             SLAUGHTERTHIRST_DESCRIPTOR_ID: _slaughterthirst_payload(),
             SKULLS_BEGET_BLOOD_DESCRIPTOR_ID: _skulls_beget_blood_payload(),
             WRATH_UNDENIABLE_DESCRIPTOR_ID: _wrath_undeniable_payload(),
+            GORE_HUNGRY_ONSLAUGHT_DESCRIPTOR_ID: _gore_hungry_onslaught_payload(),
         }
     )
 

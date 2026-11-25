@@ -7,7 +7,7 @@ from warhammer40k_core.engine.faction_content.bundle import RuntimeContentContri
 from warhammer40k_core.engine.faction_content.stratagem_activation import (
     source_backed_detachment_stratagem_activation_records,
 )
-from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.stratagems import (
     TARGET_BINDING_UNIT_CONTEXT_KEY,
     VISIBLE_ENEMY_RANGE_INCHES_KEY,
@@ -20,6 +20,8 @@ from warhammer40k_core.engine.stratagems_generic_metadata import (
     TARGET_FORBIDDEN_IF_FELL_BACK_THIS_TURN_KEY,
     VISIBLE_ENEMY_REQUIRES_UNENGAGED_KEY,
 )
+from warhammer40k_core.engine.stratagems_model import CANONICAL_FRIENDLY_RULES_UNIT_TARGET_POLICY_ID
+from warhammer40k_core.engine.stratagems_requests import POST_ROLL_MOVEMENT_OPPORTUNITY_KEY
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_blood_legion_ir_support_2026_27 as blood_legion_ir,
@@ -31,7 +33,59 @@ CONTRIBUTION_ID = "warhammer_40000_11th:chaos_daemons:detachment:blood_legion:st
 def runtime_contribution() -> RuntimeContentContribution:
     return RuntimeContentContribution(
         contribution_id=CONTRIBUTION_ID,
-        stratagem_records=(_skulls_beget_blood_record(), _wrath_undeniable_record()),
+        stratagem_records=(
+            *_gore_hungry_onslaught_records(),
+            _skulls_beget_blood_record(),
+            _wrath_undeniable_record(),
+        ),
+    )
+
+
+def _gore_hungry_onslaught_records() -> tuple[StratagemCatalogRecord, ...]:
+    records = tuple(
+        record
+        for record in source_backed_detachment_stratagem_activation_records()
+        if record.detachment_id == blood_legion_ir.BLOOD_LEGION_DETACHMENT_ID
+        and record.definition.stratagem_id == blood_legion_ir.GORE_HUNGRY_ONSLAUGHT_STRATAGEM_ID
+    )
+    if tuple(record.definition.timing.phase for record in records) != (
+        BattlePhase.MOVEMENT,
+        BattlePhase.CHARGE,
+    ):
+        raise GameLifecycleError("Gore-Hungry Onslaught requires Movement and Charge records.")
+    rule_ir = blood_legion_ir.coverage_rule_ir_payload_by_descriptor_id(
+        blood_legion_ir.GORE_HUNGRY_ONSLAUGHT_DESCRIPTOR_ID
+    )
+    if rule_ir is None:
+        raise GameLifecycleError("Gore-Hungry Onslaught requires retained faction pack RuleIR.")
+    return tuple(
+        replace(
+            record,
+            definition=replace(
+                record.definition,
+                source_id=blood_legion_ir.GORE_HUNGRY_ONSLAUGHT_SOURCE_ID,
+                when_descriptor=blood_legion_ir.GORE_HUNGRY_ONSLAUGHT_WHEN,
+                target_descriptor=blood_legion_ir.GORE_HUNGRY_ONSLAUGHT_TARGET,
+                effect_descriptor=blood_legion_ir.GORE_HUNGRY_ONSLAUGHT_EFFECT,
+                timing=replace(
+                    record.definition.timing, trigger_kind=TimingTriggerKind.DURING_PHASE
+                ),
+                target_spec=replace(
+                    record.definition.target_spec,
+                    target_policy_id=CANONICAL_FRIENDLY_RULES_UNIT_TARGET_POLICY_ID,
+                    required_keywords=(blood_legion_ir.KHORNE_KEYWORD,),
+                    required_faction_keywords=(blood_legion_ir.LEGIONES_DAEMONICA_KEYWORD,),
+                ),
+                effect_payload=validate_json_value(
+                    {
+                        "rule_ir": rule_ir,
+                        "requires_own_turn": True,
+                        POST_ROLL_MOVEMENT_OPPORTUNITY_KEY: True,
+                    }
+                ),
+            ),
+        )
+        for record in records
     )
 
 

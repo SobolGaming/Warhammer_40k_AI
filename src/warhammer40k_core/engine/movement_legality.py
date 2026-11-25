@@ -3,7 +3,7 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import Self, TypedDict, cast
+from typing import NotRequired, Self, TypedDict, cast
 
 from warhammer40k_core.core.ruleset import RulesetEdition, RulesetError, ruleset_edition_from_token
 from warhammer40k_core.core.ruleset_descriptor import (
@@ -76,6 +76,7 @@ class MovementCapabilitySetPayload(TypedDict):
     can_move_through_enemy_models: bool
     can_move_through_terrain: bool
     horizontal_terrain_feature_transit: bool
+    nonlevel_terrain_feature_transit: NotRequired[bool]
     can_transit_all_terrain: bool
     can_transit_enemy_engagement_range: bool
     ignores_vertical_distance: bool
@@ -171,6 +172,7 @@ class MovementCapabilitySet:
     enemy_model_transit_blocker_keywords: tuple[str, ...] = ()
     desperate_escape_tests_auto_passed: bool = False
     horizontal_terrain_feature_transit: bool = False
+    nonlevel_terrain_feature_transit: bool = False
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -202,6 +204,7 @@ class MovementCapabilitySet:
             ("can_move_through_enemy_models", self.can_move_through_enemy_models),
             ("can_move_through_terrain", self.can_move_through_terrain),
             ("horizontal_terrain_feature_transit", self.horizontal_terrain_feature_transit),
+            ("nonlevel_terrain_feature_transit", self.nonlevel_terrain_feature_transit),
             ("can_transit_all_terrain", self.can_transit_all_terrain),
             (
                 "can_transit_enemy_engagement_range",
@@ -328,6 +331,13 @@ class MovementCapabilitySet:
             movement_mode=movement_mode,
             unit_keywords=normalized_keywords,
         )
+        nonlevel_terrain_transit_permission = _unit_effect_terrain_transit_permission(
+            effects=unit_persisting_effects,
+            owner_player_id=owner_player_id,
+            movement_mode=movement_mode,
+            unit_keywords=normalized_keywords,
+            nonlevel=True,
+        )
         friendly_model_effect_permissions = _unit_effect_model_transit_permissions(
             effects=unit_persisting_effects,
             owner_player_id=owner_player_id,
@@ -402,6 +412,7 @@ class MovementCapabilitySet:
             can_traverse_ruins_walls
             or (flying and descriptor.fly_policy.may_move_through_terrain)
             or terrain_transit_permission
+            or nonlevel_terrain_transit_permission
             or _catalog_terrain_transit_allowed(catalog_permissions)
         )
         can_transit_enemy_engagement_range = _catalog_transits_enemy_engagement(
@@ -439,6 +450,7 @@ class MovementCapabilitySet:
             horizontal_terrain_feature_transit=(
                 terrain_transit_permission or _catalog_terrain_transit_allowed(catalog_permissions)
             ),
+            nonlevel_terrain_feature_transit=nonlevel_terrain_transit_permission,
             can_transit_all_terrain=flying and descriptor.fly_policy.may_move_through_terrain,
             can_transit_enemy_engagement_range=can_transit_enemy_engagement_range,
             ignores_vertical_distance=ignores_vertical_distance,
@@ -483,7 +495,7 @@ class MovementCapabilitySet:
         )
 
     def to_payload(self) -> MovementCapabilitySetPayload:
-        return {
+        payload: MovementCapabilitySetPayload = {
             "ruleset_descriptor_hash": self.ruleset_descriptor_hash,
             "keywords": list(self.keywords),
             "has_fly": self.has_fly,
@@ -520,6 +532,9 @@ class MovementCapabilitySet:
             "enemy_model_transit_blocker_keywords": list(self.enemy_model_transit_blocker_keywords),
             "desperate_escape_tests_auto_passed": self.desperate_escape_tests_auto_passed,
         }
+        if self.nonlevel_terrain_feature_transit:
+            payload["nonlevel_terrain_feature_transit"] = True
+        return payload
 
     @classmethod
     def from_payload(cls, payload: object) -> Self:
@@ -544,6 +559,9 @@ class MovementCapabilitySet:
             can_move_through_enemy_models=raw_payload["can_move_through_enemy_models"],
             can_move_through_terrain=raw_payload["can_move_through_terrain"],
             horizontal_terrain_feature_transit=raw_payload["horizontal_terrain_feature_transit"],
+            nonlevel_terrain_feature_transit=raw_payload.get(
+                "nonlevel_terrain_feature_transit", False
+            ),
             can_transit_all_terrain=raw_payload["can_transit_all_terrain"],
             can_transit_enemy_engagement_range=raw_payload["can_transit_enemy_engagement_range"],
             ignores_vertical_distance=raw_payload["ignores_vertical_distance"],
@@ -931,6 +949,7 @@ class MovementLegalityContext:
             can_traverse_ruins_walls=self.capabilities.can_traverse_ruins_walls,
             can_move_through_terrain=self.capabilities.can_move_through_terrain,
             horizontal_terrain_feature_transit=self.capabilities.horizontal_terrain_feature_transit,
+            nonlevel_terrain_feature_transit=self.capabilities.nonlevel_terrain_feature_transit,
             can_transit_all_terrain=self.capabilities.can_transit_all_terrain,
             terrain_as_if_absent_height_inches=(
                 self.capabilities.terrain_as_if_absent_height_inches
@@ -1134,6 +1153,7 @@ def _unit_effect_terrain_transit_permission(
     owner_player_id: str | None,
     movement_mode: object | None,
     unit_keywords: tuple[str, ...],
+    nonlevel: bool = False,
 ) -> bool:
     if not effects:
         return False
@@ -1145,6 +1165,7 @@ def _unit_effect_terrain_transit_permission(
         owner_player_id=owner_player_id,
         movement_mode=mode.value,
         unit_keywords=unit_keywords,
+        nonlevel=nonlevel,
     )
 
 

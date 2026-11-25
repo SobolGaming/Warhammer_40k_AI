@@ -6,16 +6,10 @@ from typing import TYPE_CHECKING
 
 from warhammer40k_core.engine.phase import BattlePhase, LifecycleStatus
 from warhammer40k_core.engine.stratagems_model import (
-    NOT_SELECTED_TO_CHARGE_TARGET_POLICY_ID,
     StratagemCatalogIndex,
     StratagemEligibilityContext,
 )
-from warhammer40k_core.engine.stratagems_requests import (
-    create_stratagem_use_decision_request,
-    stratagem_decline_option,
-    stratagem_use_options_from_index,
-    stratagem_window_declined_for_context,
-)
+from warhammer40k_core.engine.stratagems_requests import request_phase_preselection_stratagem
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 
 if TYPE_CHECKING:
@@ -54,32 +48,13 @@ def request_charge_preselection_stratagem(
     stratagem_index: StratagemCatalogIndex,
     cost_modifiers: StratagemCostModifierRegistry,
 ) -> LifecycleStatus | None:
-    records = tuple(
-        record
-        for record in stratagem_index.records_for(TimingTriggerKind.DURING_PHASE)
-        if record.definition.target_spec.target_policy_id == NOT_SELECTED_TO_CHARGE_TARGET_POLICY_ID
-    )
-    if not records:
-        return None
     context = charge_preselection_context(state)
     if context is None:
         return None
-    options = stratagem_use_options_from_index(
+    return request_phase_preselection_stratagem(
         state=state,
-        index=StratagemCatalogIndex.from_records(records),
+        decisions=decisions,
+        stratagem_index=stratagem_index,
+        cost_modifiers=cost_modifiers,
         context=context,
-        stratagem_cost_modifier_registry=cost_modifiers,
-    )
-    if not options or stratagem_window_declined_for_context(decisions=decisions, context=context):
-        return None
-    request = create_stratagem_use_decision_request(
-        state=state,
-        context=context,
-        options=(*options, stratagem_decline_option()),
-    )
-    decisions.request_decision(request)
-    return LifecycleStatus.waiting_for_decision(
-        stage=state.stage,
-        decision_request=request,
-        payload={"phase_body_status": "charge_preselection_stratagem_pending"},
     )

@@ -38,7 +38,10 @@ from warhammer40k_core.engine.rules_units import (
 from warhammer40k_core.engine.selected_target_context import selected_target_unit_ids_or_none
 from warhammer40k_core.engine.stratagems_imports import *
 from warhammer40k_core.engine.stratagems_model import *
-from warhammer40k_core.engine.stratagems_model import NOT_SELECTED_TO_CHARGE_TARGET_POLICY_ID
+from warhammer40k_core.engine.stratagems_model import (
+    CANONICAL_FRIENDLY_RULES_UNIT_TARGET_POLICY_ID,
+    NOT_SELECTED_TO_CHARGE_TARGET_POLICY_ID,
+)
 from warhammer40k_core.engine.stratagems_requests import *
 from warhammer40k_core.engine.stratagems_apply import *
 from warhammer40k_core.engine.stratagems_selection import *
@@ -448,6 +451,11 @@ def _target_binding_error(
         if target_unit_instance_id != expected_id:
             return "command_reroll_target_drift"
         return None
+    if target_spec.target_policy_id == CANONICAL_FRIENDLY_RULES_UNIT_TARGET_POLICY_ID:
+        unit = rules_unit_view_by_id(state=state, unit_instance_id=target_unit_instance_id)
+        if unit.unit_instance_id != target_unit_instance_id:
+            return "target_not_canonical_rules_unit"
+        return None if unit.alive_models() else "target_unit_destroyed"
     if target_spec.target_policy_id not in {"friendly_unit", "any_unit"}:
         return "unsupported_target_policy"
     return None

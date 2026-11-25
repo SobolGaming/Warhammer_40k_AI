@@ -3,7 +3,7 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass, field, replace
 from enum import StrEnum
-from typing import Self, TypedDict, cast
+from typing import NotRequired, Self, TypedDict, cast
 
 from warhammer40k_core.core.ruleset_descriptor import (
     TerrainEndpointSupportPolicy,
@@ -219,6 +219,7 @@ class TerrainPathLegalityContextPayload(TypedDict):
     can_traverse_ruins_walls: bool
     can_move_through_terrain: bool
     horizontal_terrain_feature_transit: bool
+    nonlevel_terrain_feature_transit: NotRequired[bool]
     can_transit_all_terrain: bool
     terrain_as_if_absent_height_inches: float | None
     horizontal_terrain_transit_height_inches: float | None
@@ -919,6 +920,7 @@ class TerrainPathLegalityContext:
     can_traverse_ruins_walls: bool = False
     can_move_through_terrain: bool = False
     horizontal_terrain_feature_transit: bool = False
+    nonlevel_terrain_feature_transit: bool = False
     can_transit_all_terrain: bool = False
     terrain_as_if_absent_height_inches: float | None = None
     horizontal_terrain_transit_height_inches: float | None = None
@@ -979,6 +981,10 @@ class TerrainPathLegalityContext:
         _validate_bool(
             "TerrainPathLegalityContext can_transit_all_terrain", self.can_transit_all_terrain
         )
+        _validate_bool(
+            "TerrainPathLegalityContext nonlevel_terrain_feature_transit",
+            self.nonlevel_terrain_feature_transit,
+        )
         object.__setattr__(
             self,
             "terrain_as_if_absent_height_inches",
@@ -1029,7 +1035,7 @@ class TerrainPathLegalityContext:
 
         floor_crossing = (
             None
-            if self.can_transit_all_terrain
+            if self.can_transit_all_terrain or self.nonlevel_terrain_feature_transit
             else forbidden_dense_floor_crossing(
                 self.moving_model, path, self.terrain_features, self.movement_keywords
             )
@@ -1252,6 +1258,8 @@ class TerrainPathLegalityContext:
         # intersection, support and placement validation still run afterward.
         if self.can_transit_all_terrain:
             return TerrainTraversalMode.FREELY_TRAVERSABLE
+        if self.nonlevel_terrain_feature_transit and feature is not None:
+            return TerrainTraversalMode.FREELY_TRAVERSABLE
         # Source-backed horizontal permission supersedes feature categories;
         # endpoint collision/support and vertical floor checks remain authoritative.
         if (
@@ -1433,7 +1441,7 @@ class TerrainPathLegalityContext:
         return None
 
     def to_payload(self) -> TerrainPathLegalityContextPayload:
-        return {
+        payload: TerrainPathLegalityContextPayload = {
             "moving_model": self.moving_model.to_payload(),
             "witness": self.witness.to_payload(),
             "terrain": [terrain.to_payload() for terrain in self.terrain],
@@ -1452,6 +1460,9 @@ class TerrainPathLegalityContext:
             "has_fly": self.has_fly,
             "sample_interval_inches": self.sample_interval_inches,
         }
+        if self.nonlevel_terrain_feature_transit:
+            payload["nonlevel_terrain_feature_transit"] = True
+        return payload
 
     @classmethod
     def from_payload(cls, payload: TerrainPathLegalityContextPayload) -> Self:
@@ -1471,6 +1482,7 @@ class TerrainPathLegalityContext:
             can_traverse_ruins_walls=payload["can_traverse_ruins_walls"],
             can_move_through_terrain=payload["can_move_through_terrain"],
             horizontal_terrain_feature_transit=payload["horizontal_terrain_feature_transit"],
+            nonlevel_terrain_feature_transit=payload.get("nonlevel_terrain_feature_transit", False),
             can_transit_all_terrain=payload["can_transit_all_terrain"],
             terrain_as_if_absent_height_inches=payload["terrain_as_if_absent_height_inches"],
             horizontal_terrain_transit_height_inches=payload[

@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 from pathlib import Path
+from typing import TypedDict, cast
 
 from scripts.behavioral_selection_members import (
     _selection_members,
@@ -706,6 +707,101 @@ WRATH_UNDENIABLE_TRANSITION_SHA256 = (
 )
 WRATH_UNDENIABLE_OWNER = "tests/factions/chaos_daemons/integration/test_wrath_undeniable.py"
 
+GORE_HUNGRY_ONSLAUGHT_TRANSITION = (
+    "data/source_audits/ci64_provenance_v1/gore-hungry-onslaught-transition-v1.json"
+)
+GORE_HUNGRY_ONSLAUGHT_SHA256 = "6f854ba2aad31c2ff3d84343151692174d492356cac79afeed1c6105a2f72ead"
+GORE_HUNGRY_ONSLAUGHT_OWNER = (
+    "tests/factions/chaos_daemons/integration/test_gore_hungry_onslaught.py"
+)
+GORE_HUNGRY_ONSLAUGHT_REPLACED_SOURCES = {
+    "src/warhammer40k_core/engine/charge_preselection_stratagems.py",
+    "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/"
+    "chaos_daemons/detachments/blood_legion/stratagems.py",
+    "src/warhammer40k_core/engine/stratagems_eligibility.py",
+    "src/warhammer40k_core/engine/stratagems_model.py",
+    "src/warhammer40k_core/engine/stratagems_requests.py",
+    "src/warhammer40k_core/engine/stratagems_targeting.py",
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/"
+    "faction_blood_legion_ir_support_2026_27.py",
+}
+GORE_HUNGRY_ONSLAUGHT_NEW_SOURCES = {
+    "src/warhammer40k_core/engine/charge_roll_flow.py",
+    "src/warhammer40k_core/engine/movement_legality.py",
+    "src/warhammer40k_core/engine/phases/movement_action_decisions.py",
+    "src/warhammer40k_core/engine/phases/movement_handler.py",
+    "src/warhammer40k_core/engine/phases/movement_start_actions.py",
+    "src/warhammer40k_core/engine/unit_rule_effects.py",
+}
+_GORE_HUNGRY_ONSLAUGHT_BUDGET_SOURCE = (
+    "src/warhammer40k_core/engine/phases/movement_resolution_flow.py"
+)
+_GORE_HUNGRY_ONSLAUGHT_IDENTITY_SOURCE = "src/warhammer40k_core/geometry/pathing.py"
+GORE_HUNGRY_ONSLAUGHT_HISTORICAL_SOURCES = {
+    _GORE_HUNGRY_ONSLAUGHT_BUDGET_SOURCE,
+    _GORE_HUNGRY_ONSLAUGHT_IDENTITY_SOURCE,
+}
+
+
+class _GoreOnslaughtTestBinding(TypedDict):
+    before: dict[str, object]
+    after: dict[str, object]
+
+
+class _GoreOnslaughtTransition(TypedDict):
+    schema: str
+    base: str
+    retained_transition_sha256: str
+    retained_runtime_fingerprint: str
+    runtime_fingerprint: str
+    replaced_sources: SourceSuccessors
+    new_sources: dict[str, str]
+    historical_sources: SourceSuccessors
+    updated_files: dict[str, _GoreOnslaughtTestBinding]
+    added_files: TestSuccessors
+
+
+def _gore_hungry_onslaught_transition(root: Path) -> tuple[_GoreOnslaughtTransition, bytes] | None:
+    path = root / GORE_HUNGRY_ONSLAUGHT_TRANSITION
+    _selection_no_links(root, path)
+    if not path.exists():
+        return None
+    raw = _checked_bytes(root, GORE_HUNGRY_ONSLAUGHT_TRANSITION, GORE_HUNGRY_ONSLAUGHT_SHA256)
+    record = cast(_GoreOnslaughtTransition, json.loads(raw, object_pairs_hook=_selection_object))
+    classifier = "tests/infrastructure/source_governance/unit/test_blocked_row_classification.py"
+    if (
+        record.keys()
+        != {
+            "schema",
+            "base",
+            "retained_transition_sha256",
+            "retained_runtime_fingerprint",
+            "runtime_fingerprint",
+            "replaced_sources",
+            "new_sources",
+            "historical_sources",
+            "updated_files",
+            "added_files",
+        }
+        or record["schema"] != "finite-gore-hungry-onslaught-transition-v1"
+        or record["base"] != "f69eda2040ab55db4dd18686eee69edafcca9dd2"
+        or record["replaced_sources"].keys() != GORE_HUNGRY_ONSLAUGHT_REPLACED_SOURCES
+        or record["new_sources"].keys() != GORE_HUNGRY_ONSLAUGHT_NEW_SOURCES
+        or record["historical_sources"].keys() != GORE_HUNGRY_ONSLAUGHT_HISTORICAL_SOURCES
+        or record["added_files"].keys() != {GORE_HUNGRY_ONSLAUGHT_OWNER}
+        or record["updated_files"].keys()
+        != {BLOOD_BEGETS_SKULLS_OWNER, SKULLS_BEGET_BLOOD_OWNER, classifier}
+        or any(
+            binding.keys() != {"before", "after"} for binding in record["updated_files"].values()
+        )
+    ):
+        raise SystemExit("Gore-Hungry Onslaught test transition differs.")
+    for source, binding in record["historical_sources"].items():
+        if binding.keys() != {"before", "after"} or binding["before"] == binding["after"]:
+            raise SystemExit("Gore-Hungry Onslaught historical source binding differs: " + source)
+        _checked_bytes(root, source, binding["after"])
+    return record, raw
+
 
 def _skulls_beget_blood_test_successor(
     root: Path,
@@ -754,7 +850,14 @@ def _skulls_beget_blood_test_successor(
             raise SystemExit("Skulls Beget Blood source predecessor differs: " + source)
         current_sources[source] = binding["after"]
     current_sources.update(new)
-    added = _selection_members(record["added_files"], root)
+    members = record["added_files"]
+    gore = _gore_hungry_onslaught_transition(root)
+    if gore is not None:
+        updated_test = gore[0]["updated_files"][SKULLS_BEGET_BLOOD_OWNER]
+        if updated_test["before"] != members[SKULLS_BEGET_BLOOD_OWNER]:
+            raise SystemExit("Gore-Hungry Onslaught Shooting test owner preimage differs.")
+        members = {SKULLS_BEGET_BLOOD_OWNER: updated_test["after"]}
+    added = _selection_members(members, root)
     if added.keys() & retained_additions.keys():
         raise SystemExit("Skulls Beget Blood duplicates a retained test owner.")
     additions = {**retained_additions, **added}
@@ -827,19 +930,36 @@ def _wrath_undeniable_test_successor(
     new = record["new_sources"]
     if not replaced.keys() <= previous_sources.keys() or new.keys() & previous_sources.keys():
         raise SystemExit("Wrath Undeniable source successor inventory differs.")
-    for source, digest in previous_sources.items():
-        if source in replaced:
-            binding = replaced[source]
-            if binding.keys() != {"before", "after"} or binding["before"] != digest:
-                raise SystemExit("Wrath Undeniable source predecessor differs: " + source)
-            digest = binding["after"]
-        _checked_bytes(root, source, digest)
-    for source, digest in new.items():
-        _checked_bytes(root, source, digest)
+    current_sources = {**previous_sources, **new}
+    for source, binding in replaced.items():
+        if binding.keys() != {"before", "after"} or binding["before"] != previous_sources[source]:
+            raise SystemExit("Wrath Undeniable source predecessor differs: " + source)
+        current_sources[source] = binding["after"]
     added = _selection_members(record["added_files"], root)
     if added.keys() & previous_additions.keys():
         raise SystemExit("Wrath Undeniable duplicates a retained test owner.")
-    updated = _selection_members({classifier: record["updated_files"][classifier]["after"]}, root)
+    classification = record["updated_files"][classifier]["after"]
+    gore = _gore_hungry_onslaught_transition(root)
+    if gore is not None:
+        successor, _ = gore
+        if (
+            successor["updated_files"][classifier]["before"] != classification
+            or not successor["replaced_sources"].keys() <= current_sources.keys()
+            or successor["new_sources"].keys() & current_sources.keys()
+        ):
+            raise SystemExit("Gore-Hungry Onslaught test predecessor differs.")
+        for source, binding in successor["replaced_sources"].items():
+            if (
+                binding.keys() != {"before", "after"}
+                or binding["before"] != current_sources[source]
+            ):
+                raise SystemExit("Gore-Hungry Onslaught source predecessor differs: " + source)
+            current_sources[source] = binding["after"]
+        current_sources.update(successor["new_sources"])
+        classification = successor["updated_files"][classifier]["after"]
+    for source, digest in current_sources.items():
+        _checked_bytes(root, source, digest)
+    updated = _selection_members({classifier: classification}, root)
     return record["runtime_fingerprint"], updated, {**previous_additions, **added}, raw
 
 
@@ -894,7 +1014,14 @@ def _blood_begets_skulls_test_successor(
             raise SystemExit("Blood Begets Skulls source predecessor differs: " + source)
         current_sources[source] = binding["after"]
     current_sources.update(record["new_sources"])
-    added = _selection_members(record["added_files"], root)
+    members = record["added_files"]
+    gore = _gore_hungry_onslaught_transition(root)
+    if gore is not None:
+        updated_test = gore[0]["updated_files"][BLOOD_BEGETS_SKULLS_OWNER]
+        if updated_test["before"] != members[BLOOD_BEGETS_SKULLS_OWNER]:
+            raise SystemExit("Gore-Hungry Onslaught test owner preimage differs.")
+        members = {BLOOD_BEGETS_SKULLS_OWNER: updated_test["after"]}
+    added = _selection_members(members, root)
     if added.keys() & brass_additions.keys():
         raise SystemExit("Blood Begets Skulls duplicates a Sheathed in Brass test owner.")
     retained_runtime = record["runtime_fingerprint"]
@@ -1430,13 +1557,20 @@ def exact_movement_test_transition(
     test_successors: TestSuccessors = {}
     fight_successor = _stage2_fight_successor(root) if has_stage2_fight else None
     stage2_fight_tests = {} if fight_successor is None else fight_successor[1]
+    gore = _gore_hungry_onslaught_transition(root)
     if has_gameplay_budget:
         if not has_codec:
             raise SystemExit("Gameplay movement budget tests require the oval codec predecessor.")
+        budget_sources = {} if fight_reroll is None else dict(fight_reroll[3])
+        if gore is not None:
+            budget_source = _GORE_HUNGRY_ONSLAUGHT_BUDGET_SOURCE
+            if budget_source in budget_sources:
+                raise SystemExit("Gore-Hungry Onslaught duplicates a budget source successor.")
+            budget_sources[budget_source] = gore[0]["historical_sources"][budget_source]
         runtime, source_successors, test_successors, successor_raw = _gameplay_budget_successor(
             root,
             current_tests=stage2_fight_tests,
-            current_sources={} if fight_reroll is None else fight_reroll[3],
+            current_sources=budget_sources,
         )
         raw += b"\0" + successor_raw
     if fight_successor is not None:
@@ -1717,6 +1851,7 @@ def exact_movement_test_transition(
     brass = None
     stage3_flight = None
     charge_flight = None
+    gore_additions: TestSuccessors = {}
     if rigid_charge is not None:
         if ground_charge is None:
             raise SystemExit("Rigid ground charge tests require the group charge predecessor.")
@@ -1745,6 +1880,22 @@ def exact_movement_test_transition(
                 )
                 if stage3_flight is not None:
                     runtime = stage3_flight[0]
+    if gore is not None:
+        record, _ = gore
+        if (
+            charge_flight is None
+            or record["retained_runtime_fingerprint"] != runtime
+            or record["retained_transition_sha256"] != hashlib.sha256(charge_flight[2]).hexdigest()
+        ):
+            raise SystemExit(
+                "Gore-Hungry Onslaught requires the exact pre-roll Charge flight predecessor."
+            )
+        identity_source = _GORE_HUNGRY_ONSLAUGHT_IDENTITY_SOURCE
+        if identity_source in source_successors:
+            raise SystemExit("Gore-Hungry Onslaught duplicates an identity source successor.")
+        source_successors[identity_source] = record["historical_sources"][identity_source]
+        gore_additions = _selection_members(record["added_files"], root)
+        runtime = record["runtime_fingerprint"]
     retained = _identity_test_transition(
         root,
         retained_cutover_sha256,
@@ -1895,6 +2046,11 @@ def exact_movement_test_transition(
             raise SystemExit("Pre-roll Charge flight tests overlap the predecessor selection.")
         additions.update(charge_flight_tests)
         raw += b"\0" + charge_flight_raw
+    if gore is not None:
+        if gore_additions.keys() & (updated.keys() | added.keys() | additions.keys()):
+            raise SystemExit("Gore-Hungry Onslaught tests overlap predecessor tests.")
+        additions.update(gore_additions)
+        raw += b"\0" + gore[1]
     return updated, {**added, **additions}, retained_raw + b"\0" + raw
 
 
