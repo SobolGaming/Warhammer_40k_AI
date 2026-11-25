@@ -505,7 +505,6 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
     assert gore["base"] == "f69eda2040ab55db4dd18686eee69edafcca9dd2"
     assert gore["retained_runtime_fingerprint"] == (charge_flight["runtime_fingerprint"])
     assert charge_flight["runtime_fingerprint"] == gore_base_manifest["fingerprint"]
-    assert gore["runtime_fingerprint"] == _record(MANIFEST)["fingerprint"]
     assert (
         gore["retained_transition_sha256"]
         == hashlib.sha256(
@@ -532,6 +531,58 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
             "ineligible_window[movement-1-opponent]",
             "ineligible_window[charge-1-opponent]",
             "ineligible_window[shooting-1-owner]",
+        )
+    }
+    wall = _record(selection.CHARGE_FLIGHT_WALL_TRANSITION)
+    assert wall["base"] == selection.CHARGE_FLIGHT_WALL_BASE
+    wall_base_manifest = json.loads(
+        subprocess.check_output(["git", "show", wall["base"] + ":" + MANIFEST], cwd=ROOT)
+    )
+    assert wall["retained_runtime_fingerprint"] == gore["runtime_fingerprint"]
+    assert wall["retained_runtime_fingerprint"] == wall_base_manifest["fingerprint"]
+    assert wall["runtime_fingerprint"] == _record(MANIFEST)["fingerprint"]
+    predecessor_path = selection.GORE_HUNGRY_ONSLAUGHT_TRANSITION
+    assert (
+        wall["retained_transition_sha256"]
+        == hashlib.sha256((ROOT / predecessor_path).read_bytes()).hexdigest()
+    )
+    for name, binding in wall["sources"].items():
+        base_bytes = subprocess.check_output(
+            ["git", "show", selection.CHARGE_FLIGHT_WALL_BASE + ":" + name], cwd=ROOT
+        )
+        assert binding["before"] == hashlib.sha256(base_bytes).hexdigest()
+        assert binding["after"] == hashlib.sha256((ROOT / name).read_bytes()).hexdigest()
+    wall_owner = selection.CHARGE_FLIGHT_WALL_OWNER
+    onslaught_owner = selection.CHARGE_FLIGHT_ONSLAUGHT_OWNER
+    assert set(wall["added_files"]) == {wall_owner, onslaught_owner}
+    for admitted_owner in (wall_owner, onslaught_owner):
+        assert admitted_owner in active_files
+        assert sum(admitted_owner in group for group in groups) == 1
+        assert (
+            wall["added_files"][admitted_owner]["sha256"]
+            == hashlib.sha256((ROOT / admitted_owner).read_bytes()).hexdigest()
+        )
+    wall_cases = {
+        wall_owner + "::test_dense_wall_native_flight_advantage_replays",
+        wall_owner + "::test_barrier_flight_preserves_open_board_ground_choice",
+        *(
+            wall_owner + "::test_wall_charge_abstains_without_a_separated_bound[" + case + "]"
+            for case in ("low", "short", "rotated", "uncertified-endpoints", "bad-witness")
+        ),
+    }
+    onslaught_cases = {
+        onslaught_owner + "::" + name
+        for name in (
+            "test_no_cp_keeps_the_wall_proof",
+            "test_early_offer_distinguishes_held_cp_from_a_live_grant[active-grant]",
+            "test_early_offer_distinguishes_held_cp_from_a_live_grant[held-cp]",
+            "test_other_unit_spend_is_not_a_mover_grant",
+            "test_flight_does_not_gain_distance_or_refund_penalty",
+            "test_real_late_spend_changes_ground_only_if_authorized[absent]",
+            "test_real_late_spend_changes_ground_only_if_authorized[decline]",
+            "test_real_late_spend_changes_ground_only_if_authorized[spend]",
+            "test_native_late_grant_leaves_declared_flight_unchanged[decline]",
+            "test_native_late_grant_leaves_declared_flight_unchanged[spend]",
         )
     }
     charge_flight_owner = "tests/infrastructure/adapters/test_charge_flight_admission.py"
@@ -1135,6 +1186,8 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         | flight_cases
         | charge_flight_cases
         | gore_cases
+        | wall_cases
+        | onslaught_cases
         | {
             selection.BLOOD_BEGETS_SKULLS_OWNER + "::" + case
             for case in (

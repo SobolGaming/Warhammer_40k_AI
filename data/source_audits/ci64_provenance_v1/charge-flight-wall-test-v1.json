@@ -1,0 +1,27 @@
+{
+  "schema": "finite-charge-flight-wall-test-v1",
+  "base": "ccf3b3bed821d5fe92aa084f919100aaea3502e2",
+  "retained_transition_sha256": "6f854ba2aad31c2ff3d84343151692174d492356cac79afeed1c6105a2f72ead",
+  "retained_runtime_fingerprint": "848a6630549d8b8b208bf69544a707e42dd466760f779838d020e0e1e392d8de",
+  "runtime_fingerprint": "6580f37c0a152b8e39723a8aa5c7371c389826af531913de973c9ac4f100b66d",
+  "sources": {
+    "src/warhammer40k_core/ai/charge_flight_admission.py": {
+      "before": "37b0a0f6325536b7b3ece1ac66e367f80336a52754aff7e86b07ff78f6d24a85",
+      "after": "008c5379dfa3e49b65080ae35d35522165b660729c3c8dff57239cbdeeab59e5"
+    }
+  },
+  "added_files": {
+    "tests/infrastructure/adapters/test_charge_flight_barrier.py": {
+      "mode": "100644",
+      "blob_sha1": "60789d64e039b643a071be6c14509b092c04176f",
+      "sha256": "9b5c0267b4c1ea4f9aef1e1185c505ad2e7db24ed8349ffe5e95a881da1feb5a",
+      "bytes": 12721
+    },
+    "tests/infrastructure/adapters/test_charge_flight_onslaught_timing.py": {
+      "mode": "100644",
+      "blob_sha1": "51070c31487263c9336d35927f0a718a5c6b2f39",
+      "sha256": "e791a9d8208124f6676e13dae2e43367b39e05db84b28a096b30985acfa59cf2",
+      "bytes": 21619
+    }
+  }
+}

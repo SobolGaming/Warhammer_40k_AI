@@ -3247,3 +3247,48 @@ permissions; the retained v931 FAQ fixes declaration before the Charge roll.
 [approved 40k.app mirror](https://www.40k.app/rules/21-flying-and-surging)
 (indexed text corroborated; direct fetch returned HTTP 403), and
 [retained source package](../src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/core_flying_2026_09/artifacts/package.json).
+
+#### Stage 3 extension: strictly better flight across one Dense barrier
+
+The same read-only entry point also accepts one actor-visible, axis-aligned,
+grounded Dense wall with no other terrain, two standalone circular or oval bases at
+ground level, one fixed target, and the original plain 2D6 restrictions. The
+live native ground Charge capabilities must rule out passing through the wall
+or ignoring its rise. The certificate is independent of the supplied witness's
+endpoint: the disk enclosing *every* horizontal engagement endpoint (both maximum base radii
+plus Engagement Range) must lie beyond the wall's center plane. Every ground
+path must cross that plane; a path too short to reach the wall's top or get
+outside its sides must be blocked. The side bound keeps a margin inside the
+wall to account for the native sample spacing; movement comparisons retain
+a milli-inch for native rounding.
+
+Each flight roll is counted only when the issued penalty still leaves the
+target selectable and the supplied witness passes the native Charge validator
+at that exact budget. A rejected witness is not evidence against any other
+route. If assumptions fail or these conservative bounds overlap, no wall
+choice is returned. Neither target nor path is chosen by policy.
+
+The native fixture's ground distance lower bound is about 10.499 inches.
+Ground can succeed on at most 3/36 ordered rolls (11 or 12); flight has a
+validated witness on at least 10/36 (9 through 12, after the 2-inch penalty).
+These are bounds for the **no-additional-CP** comparison, not exact optimal
+success rates or a recommendation to spend. Holding CP, seeing an optional
+paid terrain grant, or a prior spend on another unit does not grant this mover
+an exception to the wall. A grant live on the mover invalidates the wall
+certificate; a caller planning to pay for a later option needs a separate
+resource-aware decision. The policy does not spend or reserve CP. Declared
+flight already crosses this wall under Core Rules 21.03; a transit grant does
+not refund the flight penalty or rescue a roll below the native target budget.
+Without the wall, the same target gives ground 21/36 vs. flight 10/36. The
+fixture declares flight before the dice, rolls 10 (8 inches after the penalty),
+then submits the fixed target and path through the ordinary viewer route and
+reproduces the completed charge exactly on replay.
+
+The Blood Legion control resolves a ground roll of 9 before Onslaught is
+offered again. Declining it leaves the route blocked; spending 1 CP permits
+the same route and replays exactly. Another unit's spend isn't a grant to
+this mover. In the paired flight controls, the original roll of 10 still
+leaves an 8-inch movement budget whether the player spends or declines;
+the same witness remains invalid at a 6-inch budget. The [official Core Rules](source_rules/eng_01-06_warhammer40k_new40k_core_rules-was6fbu1ix-hfewhmxyiy.pdf#page=71)
+and [40k.app supplemental reference](https://www.40k.app/rules/21-flying-and-surging)
+are unchanged from the initial Charge flight admission above.
