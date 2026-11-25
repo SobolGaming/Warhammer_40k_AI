@@ -4,15 +4,20 @@ from __future__ import annotations
 
 from dataclasses import replace
 from itertools import product
+from math import isclose
 
 import pytest
 
+from tests.charge_distance_helpers import add_modifier
 from tests.phase15c_fight_order_helpers import fight_config, fight_lifecycle
 from warhammer40k_core.adapters.access_control import ViewerContext
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.ai.charge_flight_admission import (
     ChargeFlightOffer,
+    ChargeFlightUnresolved,
     ChargeFlightUnresolvedReason,
+    ProvenChargeFlightChoice,
+    choose_proven_charge_flight_mode,
     inspect_charge_flight_offer,
 )
 from warhammer40k_core.ai.player_policy import PlayerDecisionContext
@@ -20,6 +25,7 @@ from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.engine.charge_declaration import ChargeRollRequest
 from warhammer40k_core.engine.phase import BattlePhase
 from warhammer40k_core.engine.replay import ReplayRunner
+from warhammer40k_core.geometry.pathing import PathWitness
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     chaos_daemons_cavalcade_2026_11,
@@ -31,7 +37,7 @@ MOVER = "army-alpha:mover"
 TARGET = "army-beta:target"
 
 
-def _fixture(private_seed: int) -> LocalGameSession:
+def _fixture(private_seed: int, *, target_x: float = 18) -> LocalGameSession:
     game_id = "pre-roll-charge-flight"
     package = chaos_daemons_cavalcade_2026_11.catalog_package()
     config = fight_config(
@@ -58,7 +64,7 @@ def _fixture(private_seed: int) -> LocalGameSession:
         game_id=game_id,
         alpha_unit_ids=("mover",),
         enemy_unit_ids=("target",),
-        origins={"mover": Pose.at(10, 20), "target": Pose.at(18, 20)},
+        origins={"mover": Pose.at(10, 20), "target": Pose.at(target_x, 20)},
         battle_phase=BattlePhase.CHARGE,
         config=config,
         record_deployment=True,
@@ -166,6 +172,109 @@ def test_charge_flight_admits_native_offer_without_claiming_a_minimum() -> None:
             assert post_roll_view["active_player_id"] != ACTOR
         replay = ReplayRunner.from_payload(arm.replay_artifact(artifact_id="charge-flight")).run()
         assert replay.reproduced_exactly, replay.to_payload()
+    assert session.to_persistence_payload() == original
+
+    # The proof shares the ordinary prefix with the original native fork controls.
+    # The supplied destination is evidence only; the policy returns a finite choice.
+    start = Pose.at(10, 20)
+    terminal = Pose.at(10 + offer.target_filter_distance_inches, 20)
+    witness = PathWitness.for_paths(((offer.model_id, (start, terminal)),))
+    assert isclose(offer.target_filter_distance_inches, 3.2755905511811036, abs_tol=1e-9)
+    proof = choose_proven_charge_flight_mode(
+        session, context, unit_id=MOVER, target_id=TARGET, witness=witness
+    )
+    assert isinstance(proof, ProvenChargeFlightChoice), proof
+    assert proof.offer == offer
+    assert proof.action == context.select_option(offer.ground_option_id)
+    assert proof.ground.minimum_roll == 4
+    assert proof.ground.successful_rolls == tuple(range(4, 13))
+    assert proof.ground.successful_outcomes == 33
+    assert proof.flight.minimum_roll == 6
+    assert proof.flight.successful_rolls == tuple(range(6, 13))
+    assert proof.flight.successful_outcomes == 26
+    assert session.to_persistence_payload() == original
+    assert not any(event.event_type == "dice_rolled" for event in baseline)
+
+    different = _fixture(2, target_x=19)
+    different_context = _context(different)
+    different_offer = _admit(different_context)
+    different_witness = PathWitness.for_paths(
+        (
+            (
+                different_offer.model_id,
+                (start, Pose.at(10 + different_offer.target_filter_distance_inches, 20)),
+            ),
+        )
+    )
+    stale = choose_proven_charge_flight_mode(
+        different, context, unit_id=MOVER, target_id=TARGET, witness=witness
+    )
+    assert isinstance(stale, ChargeFlightUnresolved)
+    assert stale.reason is ChargeFlightUnresolvedReason.OBSERVATION_DRIFT
+    changed = choose_proven_charge_flight_mode(
+        different, different_context, unit_id=MOVER, target_id=TARGET, witness=different_witness
+    )
+    assert isinstance(changed, ProvenChargeFlightChoice), changed
+    assert (changed.ground.minimum_roll, changed.ground.successful_outcomes) == (5, 30)
+    assert (changed.flight.minimum_roll, changed.flight.successful_outcomes) == (7, 21)
+
+    wrong_witness = PathWitness.for_paths(((offer.model_id, (start, Pose.at(9, 20))),))
+    unsupported = choose_proven_charge_flight_mode(
+        session, context, unit_id=MOVER, target_id=TARGET, witness=wrong_witness
+    )
+    assert isinstance(unsupported, ChargeFlightUnresolved)
+    assert unsupported.reason is ChargeFlightUnresolvedReason.MINIMUM_ROLL_UNPROVEN
+    modified = session.fork()
+    assert modified.lifecycle.state is not None
+    add_modifier(
+        modified.lifecycle.state,
+        effect_id="proof:modifier",
+        kind="modify_dice_roll",
+        delta=1,
+        unit_instance_id=MOVER,
+    )
+    excluded = choose_proven_charge_flight_mode(
+        modified, _context(modified), unit_id=MOVER, target_id=TARGET, witness=witness
+    )
+    assert isinstance(excluded, ChargeFlightUnresolved)
+    assert excluded.reason is ChargeFlightUnresolvedReason.UNSUPPORTED_PROOF_CONTEXT
+
+    policy_arm = session.fork()
+    # Qualify on the actual submission session, not a certificate from another session.
+    chosen = choose_proven_charge_flight_mode(
+        policy_arm, _context(policy_arm), unit_id=MOVER, target_id=TARGET, witness=witness
+    )
+    assert isinstance(chosen, ProvenChargeFlightChoice), chosen
+    assert chosen == proof
+    assert policy_arm.to_persistence_payload() == original
+    assert chosen.action.option_id is not None
+    policy_arm.submit_viewer_option(
+        viewer=VIEWER,
+        request_id=chosen.action.request_id,
+        option_id=chosen.action.option_id,
+        result_id="fixture:policy-charge-mode",
+    )
+    journal = policy_arm.lifecycle.decision_controller
+    first = journal.event_log.records[len(baseline) :]
+    kinds = [event.event_type for event in first]
+    assert kinds.index("charging_unit_selected") < kinds.index("dice_rolled")
+    (declared,) = [
+        record
+        for record in journal.records
+        if record.request.decision_type == "select_charging_unit"
+    ]
+    after_roll = choose_proven_charge_flight_mode(
+        policy_arm, context, unit_id=MOVER, target_id=TARGET, witness=witness
+    )
+    assert isinstance(after_roll, ChargeFlightUnresolved)
+    assert after_roll.reason is ChargeFlightUnresolvedReason.OBSERVATION_DRIFT
+    committed = declared.result.payload
+    assert isinstance(committed, dict)
+    assert committed["take_to_the_skies"] is False
+    replay = ReplayRunner.from_payload(
+        policy_arm.replay_artifact(artifact_id="charge-flight-policy")
+    ).run()
+    assert replay.reproduced_exactly, replay.to_payload()
     assert session.to_persistence_payload() == original
 
 

@@ -1001,7 +1001,7 @@ def _pre_roll_charge_flight_test_addition(
     if not path.exists():
         return None
     raw = _checked_bytes(
-        root, name, "33e0a10ccce6d1e37e033ee9dbe0b2891491ebc2749f7eee6f84668167117bfa"
+        root, name, "23111ca84b3c404c108de2a966a376ab484551416445a62d85765120aee0079a"
     )
     record = json.loads(raw, object_pairs_hook=_selection_object)
     owner = "tests/infrastructure/adapters/test_charge_flight_admission.py"

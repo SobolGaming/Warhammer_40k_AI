@@ -1,216 +1,216 @@
 {
   "policy": "rules-engine-performance-v3",
   "base": "bdc1b2111530576a71bf3391564d5a9e9c356be0",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:92b0f8688cdbd61c91e085316aaef6eec7a508afb411a370f7dace8ec2877f9b",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:e9f1e4a143f03d7051c24af923d4b65b0ff2764520bc5dc786fe2b640331c1e9",
   "operation_map_sha256": "6cda06f0e704a218edecc6187497338bde6bdcb6d43ec5b7251647f1ac527380",
   "changes": {
     "ci/test_shards/durations.json": {
       "before_sha256": "7fcf878d08203bf0dfe1337ad3e1e8fc87d45d3ebdf4f2bd17c6196f27e0b619",
-      "after_sha256": "73540e62b444d12bdaa2c8846aa7af0783cebfdb312b1c7d031c899dff9e2a13",
+      "after_sha256": "3b0604006eebdaf8b89ad8fd9f4e798bb192cac745d69e86a9dee6f566e4e4be",
       "owners": {
         "@document": {
           "before": "7fcf878d08203bf0dfe1337ad3e1e8fc87d45d3ebdf4f2bd17c6196f27e0b619",
-          "after": "73540e62b444d12bdaa2c8846aa7af0783cebfdb312b1c7d031c899dff9e2a13"
+          "after": "3b0604006eebdaf8b89ad8fd9f4e798bb192cac745d69e86a9dee6f566e4e4be"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
       "before_sha256": "a2581513eab078fa2083d710792c2517111c704d80913ba21888180ff156de5a",
-      "after_sha256": "2c60fe1b48fb7834ea9ff6ce64413679614abc8aba1a1b71616e0a9c96d6ede8",
+      "after_sha256": "9f7754b90e077ccce54b67e9f19e5513aba4c8b2f3d5eede23cfd3d45d282c95",
       "owners": {
         "@document": {
           "before": "a2581513eab078fa2083d710792c2517111c704d80913ba21888180ff156de5a",
-          "after": "2c60fe1b48fb7834ea9ff6ce64413679614abc8aba1a1b71616e0a9c96d6ede8"
+          "after": "9f7754b90e077ccce54b67e9f19e5513aba4c8b2f3d5eede23cfd3d45d282c95"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
       "before_sha256": "9fd72938698ec93a2b1d6819e690ef1efd58d2fd7f35a615e3ad822bea7dd874",
-      "after_sha256": "04cebf01d181eb3944bc38fe63a3c5d8304d3ef845e87b44b12dcbf9d4c6c6a9",
+      "after_sha256": "2474b85b566a73feebbeee542df56989b4b816f600210a63d32eb6d73558af31",
       "owners": {
         "@document": {
           "before": "9fd72938698ec93a2b1d6819e690ef1efd58d2fd7f35a615e3ad822bea7dd874",
-          "after": "04cebf01d181eb3944bc38fe63a3c5d8304d3ef845e87b44b12dcbf9d4c6c6a9"
+          "after": "2474b85b566a73feebbeee542df56989b4b816f600210a63d32eb6d73558af31"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
       "before_sha256": "8e1a069ea40ac9eb35f7f6aeac92b4c544d62a1d9aecd20bca85dce1b777a357",
-      "after_sha256": "f01b0fe449447f8f20ce6c74f7d05ac0b3cefd57145368343700a9a64d534e02",
+      "after_sha256": "a8df9f06aaa3b00eafd33328d5860f429e39815d118da7e96b9fefc9b2d844fa",
       "owners": {
         "@document": {
           "before": "8e1a069ea40ac9eb35f7f6aeac92b4c544d62a1d9aecd20bca85dce1b777a357",
-          "after": "f01b0fe449447f8f20ce6c74f7d05ac0b3cefd57145368343700a9a64d534e02"
+          "after": "a8df9f06aaa3b00eafd33328d5860f429e39815d118da7e96b9fefc9b2d844fa"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
       "before_sha256": "55bf3b0ab79ecdb18e26c6803863b271ef5e4cb8df5bb03638485e2713859897",
-      "after_sha256": "669685e052923d45231a95665d559d7a3f3395553ba1048190460afa9c5f60a4",
+      "after_sha256": "76302a48cbe2cf3c7f7bd713b13a3b3f33bbde0fd5c9824925b3f052f2cc640d",
       "owners": {
         "@document": {
           "before": "55bf3b0ab79ecdb18e26c6803863b271ef5e4cb8df5bb03638485e2713859897",
-          "after": "669685e052923d45231a95665d559d7a3f3395553ba1048190460afa9c5f60a4"
+          "after": "76302a48cbe2cf3c7f7bd713b13a3b3f33bbde0fd5c9824925b3f052f2cc640d"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
       "before_sha256": "fe11c0b5ab88b74ba4c24d8a5fc1835b9837e1f4e637b5ecf90d83837647199b",
-      "after_sha256": "7911a83b8675f2704b75039c61f1afef07f6c528f835c718fef29e89b146539b",
+      "after_sha256": "8091de6b698f21bb2c1d6fd8c740b810fc69bccad70c4aa0541cb607f9e57706",
       "owners": {
         "@document": {
           "before": "fe11c0b5ab88b74ba4c24d8a5fc1835b9837e1f4e637b5ecf90d83837647199b",
-          "after": "7911a83b8675f2704b75039c61f1afef07f6c528f835c718fef29e89b146539b"
+          "after": "8091de6b698f21bb2c1d6fd8c740b810fc69bccad70c4aa0541cb607f9e57706"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
       "before_sha256": "cff267c3c74b66a8f7fe3dd1cf17b0a2feecd7c72b5b3628ca17855a287d0f39",
-      "after_sha256": "047493c09774cf034e9dece79621f00c19acf0353e75753b196d0c87de629545",
+      "after_sha256": "ebb44e556e3c043d447deff13d595607cf8fe4cbd67b617d59e06ce402a6df1d",
       "owners": {
         "@document": {
           "before": "cff267c3c74b66a8f7fe3dd1cf17b0a2feecd7c72b5b3628ca17855a287d0f39",
-          "after": "047493c09774cf034e9dece79621f00c19acf0353e75753b196d0c87de629545"
+          "after": "ebb44e556e3c043d447deff13d595607cf8fe4cbd67b617d59e06ce402a6df1d"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
       "before_sha256": "cdc8e5e8bdd5521e1d22de916843c910b9906ff1cc7aca4a19d2c300e6d42dd2",
-      "after_sha256": "026b85f11c859bdab3ba151f4602d24fa8970412e7973152bc1b5ca999d72c47",
+      "after_sha256": "f28bb93337be79eb3cd3ffb9cd22573df6ff4e75b3cab0e429f86c8c7bdb2835",
       "owners": {
         "@document": {
           "before": "cdc8e5e8bdd5521e1d22de916843c910b9906ff1cc7aca4a19d2c300e6d42dd2",
-          "after": "026b85f11c859bdab3ba151f4602d24fa8970412e7973152bc1b5ca999d72c47"
+          "after": "f28bb93337be79eb3cd3ffb9cd22573df6ff4e75b3cab0e429f86c8c7bdb2835"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
       "before_sha256": "6e74a36d7014864256468c423d3109452f9e8ca3e93edc922b3f2a4c0bcd58ce",
-      "after_sha256": "7c9406ffae4f84d82dd510a89375e5cc39a3851ed0f60433fdaebdb5aef5b228",
+      "after_sha256": "1aa117c9c26fa4f7e67d9a6514372e0a94cb307feef846e32e6bf5813a6f618b",
       "owners": {
         "@document": {
           "before": "6e74a36d7014864256468c423d3109452f9e8ca3e93edc922b3f2a4c0bcd58ce",
-          "after": "7c9406ffae4f84d82dd510a89375e5cc39a3851ed0f60433fdaebdb5aef5b228"
+          "after": "1aa117c9c26fa4f7e67d9a6514372e0a94cb307feef846e32e6bf5813a6f618b"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
       "before_sha256": "b139a1e273de5317b06e9797eda9689eb77352118d1f6c73635dee60c2975300",
-      "after_sha256": "62eaab06f8506c65cf637312b8bcf7db6e69367de899d2cc337ba43dba523d59",
+      "after_sha256": "698bd8471916f5e88da101311812f9e3789d5fb847b90d7ee7842a924c70987e",
       "owners": {
         "@document": {
           "before": "b139a1e273de5317b06e9797eda9689eb77352118d1f6c73635dee60c2975300",
-          "after": "62eaab06f8506c65cf637312b8bcf7db6e69367de899d2cc337ba43dba523d59"
+          "after": "698bd8471916f5e88da101311812f9e3789d5fb847b90d7ee7842a924c70987e"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
       "before_sha256": "e7a6f3378333a3200891c9eb6be5c0d4ee763b813db598f3653142437a40274f",
-      "after_sha256": "3fba5363b58216336d5d66711a68d7ece3d8d4d49fa352f71de2819bf07cb8ec",
+      "after_sha256": "7528022c63737352fc08e083fff32fa449b4aa0b454bf459effed19a8a29ea13",
       "owners": {
         "@document": {
           "before": "e7a6f3378333a3200891c9eb6be5c0d4ee763b813db598f3653142437a40274f",
-          "after": "3fba5363b58216336d5d66711a68d7ece3d8d4d49fa352f71de2819bf07cb8ec"
+          "after": "7528022c63737352fc08e083fff32fa449b4aa0b454bf459effed19a8a29ea13"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
       "before_sha256": "3a4a1cc70cd9cb890a8c90953fc66559ff741b0bca9021d9afd894130be21f6d",
-      "after_sha256": "b004ce786d5f9463e8d0e0aa0d0c70e4a62c8a479b25c495250aed03d16a0db8",
+      "after_sha256": "56d212b7943708185ffd4a5a030051be13682cd20a93be61026eefb6529f68e9",
       "owners": {
         "@document": {
           "before": "3a4a1cc70cd9cb890a8c90953fc66559ff741b0bca9021d9afd894130be21f6d",
-          "after": "b004ce786d5f9463e8d0e0aa0d0c70e4a62c8a479b25c495250aed03d16a0db8"
+          "after": "56d212b7943708185ffd4a5a030051be13682cd20a93be61026eefb6529f68e9"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "before_sha256": "4770ccb1c68b0a28cf26770c83d5f510c3bf8b100f8d2e39a59c9dd68d72fe26",
-      "after_sha256": "1969e777274d937d5dce6b402376fb3da9526b7b08872b2712941eb7e4ba0c82",
+      "after_sha256": "18ee2c78932b2489a3ff629347c1e2801a1944a30b896fc80a859d0c6ad8d8eb",
       "owners": {
         "@document": {
           "before": "4770ccb1c68b0a28cf26770c83d5f510c3bf8b100f8d2e39a59c9dd68d72fe26",
-          "after": "1969e777274d937d5dce6b402376fb3da9526b7b08872b2712941eb7e4ba0c82"
+          "after": "18ee2c78932b2489a3ff629347c1e2801a1944a30b896fc80a859d0c6ad8d8eb"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
       "before_sha256": "63e40ce84e34176566aad06e2cc2f3d27e256de66de61e4b1ae3d9ab256e1fb7",
-      "after_sha256": "c7903701e678d02e7e1d23c319e9fcb44f0c50b9fb9ca9be1346355bc6d7297d",
+      "after_sha256": "c3a7f7e0c1034e39dbe48e8589f9c897b843b9bb8e132b829fc926295adc306c",
       "owners": {
         "@document": {
           "before": "63e40ce84e34176566aad06e2cc2f3d27e256de66de61e4b1ae3d9ab256e1fb7",
-          "after": "c7903701e678d02e7e1d23c319e9fcb44f0c50b9fb9ca9be1346355bc6d7297d"
+          "after": "c3a7f7e0c1034e39dbe48e8589f9c897b843b9bb8e132b829fc926295adc306c"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "before_sha256": "3d3776d88763d6afca93ce4c4d4a7372bf40fdabcb6ccf1f100d70e7434542f3",
-      "after_sha256": "048152a92cc78f8ebc99d26b635b2aeb4ec5d0121c31eb6f23fe3db5a5dfa40a",
+      "after_sha256": "df2aa03ab273d0f1f44bc313cf394efc7fed9b173d2e2dfd01eeabe84f0ae75b",
       "owners": {
         "@document": {
           "before": "3d3776d88763d6afca93ce4c4d4a7372bf40fdabcb6ccf1f100d70e7434542f3",
-          "after": "048152a92cc78f8ebc99d26b635b2aeb4ec5d0121c31eb6f23fe3db5a5dfa40a"
+          "after": "df2aa03ab273d0f1f44bc313cf394efc7fed9b173d2e2dfd01eeabe84f0ae75b"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "before_sha256": "14874dbe1f2cdd7e59547a3fe712067aacc5b69f608082ed8f79323c1b10c4fd",
-      "after_sha256": "cd169223d065adbb037c36e0c647c7f756d536d944aba814882acdf9f67f99bc",
+      "after_sha256": "7e200e56c0e520c6ea540edf7cf7ff3742f6348b8850d6c88e4be90b0a179790",
       "owners": {
         "@document": {
           "before": "14874dbe1f2cdd7e59547a3fe712067aacc5b69f608082ed8f79323c1b10c4fd",
-          "after": "cd169223d065adbb037c36e0c647c7f756d536d944aba814882acdf9f67f99bc"
+          "after": "7e200e56c0e520c6ea540edf7cf7ff3742f6348b8850d6c88e4be90b0a179790"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "before_sha256": "271571db37ab94d0cfac66c3a7d4b6c0db2b5903bc82339b3c3b6e7ce5032a85",
-      "after_sha256": "575e4b570d158dd2a373d6fddc0ec553089cee7ff62571461d52a70aa7cfe268",
+      "after_sha256": "dc3388e35af4d3fea574c85aff85bf0c4a8e7ab3d5f9df89ea8610d596ec21a7",
       "owners": {
         "@document": {
           "before": "271571db37ab94d0cfac66c3a7d4b6c0db2b5903bc82339b3c3b6e7ce5032a85",
-          "after": "575e4b570d158dd2a373d6fddc0ec553089cee7ff62571461d52a70aa7cfe268"
+          "after": "dc3388e35af4d3fea574c85aff85bf0c4a8e7ab3d5f9df89ea8610d596ec21a7"
         }
       }
     },
     "contracts/examples/support-profile.json": {
       "before_sha256": "fd85ada1bbc9a1688454a4822d489b3de58a88e651b65f482ab08625b5e7299f",
-      "after_sha256": "cdd89367756190563b93066d5536a9c31ccca92fa65996ac61570e3d3407e04c",
+      "after_sha256": "1bc9faec2796a6439087fc34221da8c6f8c1dc268f2e2c36d07fe82ff476bab0",
       "owners": {
         "@document": {
           "before": "fd85ada1bbc9a1688454a4822d489b3de58a88e651b65f482ab08625b5e7299f",
-          "after": "cdd89367756190563b93066d5536a9c31ccca92fa65996ac61570e3d3407e04c"
+          "after": "1bc9faec2796a6439087fc34221da8c6f8c1dc268f2e2c36d07fe82ff476bab0"
         }
       }
     },
     "contracts/manifest.json": {
       "before_sha256": "aff798c2d921a77c62371e674710ae4a7ba5443771923fbcec3da44ad9c27430",
-      "after_sha256": "a1ab841c9bce42bdd56440ce8e87ef0b61cc6565dc5db1ba4f00c5e55e5e2302",
+      "after_sha256": "d54b3ace91a7f40cd4670022203383770c6728c38a5b8a397b6ffc39b698e94d",
       "owners": {
         "@document": {
           "before": "aff798c2d921a77c62371e674710ae4a7ba5443771923fbcec3da44ad9c27430",
-          "after": "a1ab841c9bce42bdd56440ce8e87ef0b61cc6565dc5db1ba4f00c5e55e5e2302"
+          "after": "d54b3ace91a7f40cd4670022203383770c6728c38a5b8a397b6ffc39b698e94d"
         }
       }
     },
     "data/source_audits/ci64_provenance_v1/pre-roll-charge-flight-test-v1.json": {
       "before_sha256": null,
-      "after_sha256": "33e0a10ccce6d1e37e033ee9dbe0b2891491ebc2749f7eee6f84668167117bfa",
+      "after_sha256": "23111ca84b3c404c108de2a966a376ab484551416445a62d85765120aee0079a",
       "owners": {
         "@document": {
           "before": null,
-          "after": "33e0a10ccce6d1e37e033ee9dbe0b2891491ebc2749f7eee6f84668167117bfa"
+          "after": "23111ca84b3c404c108de2a966a376ab484551416445a62d85765120aee0079a"
         }
       }
     },
     "docs/AI_POLICY_INTERFACE.md": {
       "before_sha256": "5fdb6ebf75a4c0b3957d0077fa47255593ca6ea669b60388d3d3dc78522b2dda",
-      "after_sha256": "3958984a4f65f0c5d7e20f100724fa524168a85ed20d4f5528c18023d5adcd92",
+      "after_sha256": "872208cdb6f13d2c387ace5f193025170dfe8a30f9c5f997786c7024f8fd0d47",
       "owners": {
         "@document": {
           "before": "5fdb6ebf75a4c0b3957d0077fa47255593ca6ea669b60388d3d3dc78522b2dda",
-          "after": "3958984a4f65f0c5d7e20f100724fa524168a85ed20d4f5528c18023d5adcd92"
+          "after": "872208cdb6f13d2c387ace5f193025170dfe8a30f9c5f997786c7024f8fd0d47"
         }
       }
     },
@@ -226,11 +226,11 @@
     },
     "scripts/engine_numerical_identity_test_admission.py": {
       "before_sha256": "8c3fa9db10e7d22d0ca4b78fb1af044da0f5f2bee25e56b818d7383518cb206e",
-      "after_sha256": "919dce5c641e05423bf20c736276ca2249f72ded29661d2c6208ff9fc17216bd",
+      "after_sha256": "747c9f08232281e66c5565151d63ecbc4906a12f6fa036b37438fc6e9ab500aa",
       "owners": {
         "_pre_roll_charge_flight_test_addition": {
           "before": null,
-          "after": "c75753d3beb60ddd66723603f7b65d55bf0a580f8e1f659821f27330d7c31571"
+          "after": "04a94423184249a1a2fb42322a7004d532eca45a1d09451ce52f4453a0517aee"
         },
         "exact_movement_test_transition": {
           "before": "e4cd56ac02061239b9bf12eb46047e9ddfb48f434a4917ed1e6275135b7a856b",
@@ -240,21 +240,29 @@
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "before_sha256": "297cce37b7227cb91dd359e190a8f919a29df1f8bb360cdca9abc02b0f7ad895",
-      "after_sha256": "f4848e00d48fdebb94a09ce05aee97a7e37d49c39736c49f1be1b71aa27e27d9",
+      "after_sha256": "cf0aabac8ae69801834b1c40e8bffe33c8561613144e619d390f15b2ed8c1c3f",
       "owners": {
         "@document": {
           "before": "297cce37b7227cb91dd359e190a8f919a29df1f8bb360cdca9abc02b0f7ad895",
-          "after": "f4848e00d48fdebb94a09ce05aee97a7e37d49c39736c49f1be1b71aa27e27d9"
+          "after": "cf0aabac8ae69801834b1c40e8bffe33c8561613144e619d390f15b2ed8c1c3f"
         }
       }
     },
     "src/warhammer40k_core/ai/charge_flight_admission.py": {
       "before_sha256": null,
-      "after_sha256": "1ec7454f7cb99fc623785432980db2e7b9d262a42f1f73a6f42b7d5fd92179f2",
+      "after_sha256": "9b2d3f09ca323d2c2f7cd5025ce3ae43e9dc1eced3dacb792d1f55266b1931d1",
       "owners": {
         "@module": {
           "before": null,
-          "after": "e2aed4bc4b0988e8815f84d7885f858262053c16a5844d9e5af1b94b4670d84e"
+          "after": "1c8fe4222b8c575ed9722a0db11ada83aec5cc47ebf6f29982b37f4e267cd6f7"
+        },
+        "ChargeFlightModeProof": {
+          "before": null,
+          "after": "75be20c3dfa0847647a338365333c4186a9c79cece1c56e4d0ac10bfbeaf88be"
+        },
+        "ChargeFlightModeProof.minimum_roll": {
+          "before": null,
+          "after": "0f1ee3b9e9aedad444c21c75558e4dfbeaf678feaca9aa2981857874fd57bfa6"
         },
         "ChargeFlightOffer": {
           "before": null,
@@ -266,15 +274,39 @@
         },
         "ChargeFlightUnresolvedReason": {
           "before": null,
-          "after": "8351e6fff7cf6f3e34299e7c23365b18a47db0ce9cd854553a322791a2657be6"
+          "after": "6b57e95e121ef22deaab3e71876c898be6d500bccb884245ca130552b250e99f"
+        },
+        "ProvenChargeFlightChoice": {
+          "before": null,
+          "after": "7597308649f401144f9f9c45bd66f65440fe2d58b61d297507b1f55675911c5f"
         },
         "_nonnegative_inches": {
           "before": null,
           "after": "4ea25633906ae7936fa028509185df504811526c9d003ee46f7e05c1d87df529"
         },
+        "_open_native_scenario": {
+          "before": null,
+          "after": "77c1b37e30c94ad4bb88bb22159d4c38313b8251bd1a7ef21d0ed2f0e713b959"
+        },
+        "_open_visible_poses": {
+          "before": null,
+          "after": "11daa2ce7a248d0b64c57aa119bb43e1c7809f9318f119a33471c65c4d7cd4fd"
+        },
+        "_plain_charge_supported": {
+          "before": null,
+          "after": "8d4edc1af6e7b7398939c99b7ae8819e7fe620e5fb6fbd690794cbcb1edca092"
+        },
+        "_prove_mode": {
+          "before": null,
+          "after": "7d84be824d8fcbcb080e663dbc395e20295f24b2dc7d703499e1fd66ebf4c0d1"
+        },
         "_target_filter_distance": {
           "before": null,
           "after": "a3f59ceeba95dab964feb91a858f44d8873852bb38f82c34349337e52a6f9592"
+        },
+        "choose_proven_charge_flight_mode": {
+          "before": null,
+          "after": "e22e575315ef2ac9ee4f6a0241c5b66e9072229b4fc07ec0668fa29129a9f45d"
         },
         "inspect_charge_flight_offer": {
           "before": null,
@@ -294,11 +326,11 @@
     },
     "tests/infrastructure/adapters/test_charge_flight_admission.py": {
       "before_sha256": null,
-      "after_sha256": "322ed12b0f36924a24fdb99a84bb2314159760a6d2c411f495936b37772853d5",
+      "after_sha256": "b071eb3a1b9dd93285bc169d6d40ccd1434ed06227718b08c620090abd0040ae",
       "owners": {
         "@module": {
           "before": null,
-          "after": "6566086cfac99b0508a62be1896ec9d85be33572c6cf2cdc73f60b05c7f0ad4c"
+          "after": "6099a5dcfd1a3dfd996902bf5f8b5c7a800031c22236b77e17265d14d564995b"
         },
         "_admit": {
           "before": null,
@@ -310,11 +342,11 @@
         },
         "_fixture": {
           "before": null,
-          "after": "518eddb7c8a4eb398a4f703e1bf4f939cc6cd27f63ee6715187ed199074e3ad9"
+          "after": "d4cc4e87d2d3f4a270415e641b25b3656ac4870ed46dc4d0aea24caaf49fc694"
         },
         "test_charge_flight_admits_native_offer_without_claiming_a_minimum": {
           "before": null,
-          "after": "c355f0191e8a5aa605a91fc817adf97cdd713099693a71e162684ed4273d7cce"
+          "after": "a464ad3e53437c8a7f45bb6412faaba270d9f7724b0122d354b0bdd458eaa621"
         },
         "test_unmodified_charge_probability_synthetic_controls": {
           "before": null,
@@ -339,9 +371,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Retain predecessor weights while admitting four measured development cases in the weighted shard inventory.",
-      "source_obligation": "Core Rules 21.03 and retained v931 declaration timing; preserve the existing native Charge, 2D6, viewer and replay contracts.",
-      "unchanged_work": "Opt-in detached offer inspection only; no registration, roll, fork, route search, engine mutation, or change to normal game execution. Tests and generated receipts preserve every existing case and weight."
+      "rationale": "Reweight the revised native case without changing any behavioral case or predecessor source selection.",
+      "source_obligation": "Core Rules 21.03 and retained v931 timing; use the unchanged Charge target filter, native resolve_charge_move contract, and unmodified dice spec.",
+      "unchanged_work": "No existing workload calls this opt-in read-only policy. It checks one caller-supplied witness at no more than eleven attainable sums per mode. No path search, chance sample, decision submission, resolver change or normal gameplay work is added."
     },
     "ci/test_shards/shard-1.txt": {
       "category": "rule_semantics",
@@ -358,9 +390,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Retain predecessor weights while admitting four measured development cases in the weighted shard inventory.",
-      "source_obligation": "Core Rules 21.03 and retained v931 declaration timing; preserve the existing native Charge, 2D6, viewer and replay contracts.",
-      "unchanged_work": "Opt-in detached offer inspection only; no registration, roll, fork, route search, engine mutation, or change to normal game execution. Tests and generated receipts preserve every existing case and weight."
+      "rationale": "Reweight the revised native case without changing any behavioral case or predecessor source selection.",
+      "source_obligation": "Core Rules 21.03 and retained v931 timing; use the unchanged Charge target filter, native resolve_charge_move contract, and unmodified dice spec.",
+      "unchanged_work": "No existing workload calls this opt-in read-only policy. It checks one caller-supplied witness at no more than eleven attainable sums per mode. No path search, chance sample, decision submission, resolver change or normal gameplay work is added."
     },
     "ci/test_shards/shard-10.txt": {
       "category": "rule_semantics",
@@ -377,9 +409,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Retain predecessor weights while admitting four measured development cases in the weighted shard inventory.",
-      "source_obligation": "Core Rules 21.03 and retained v931 declaration timing; preserve the existing native Charge, 2D6, viewer and replay contracts.",
-      "unchanged_work": "Opt-in detached offer inspection only; no registration, roll, fork, route search, engine mutation, or change to normal game execution. Tests and generated receipts preserve every existing case and weight."
+      "rationale": "Reweight the revised native case without changing any behavioral case or predecessor source selection.",
+      "source_obligation": "Core Rules 21.03 and retained v931 timing; use the unchanged Charge target filter, native resolve_charge_move contract, and unmodified dice spec.",
+      "unchanged_work": "No existing workload calls this opt-in read-only policy. It checks one caller-supplied witness at no more than eleven attainable sums per mode. No path search, chance sample, decision submission, resolver change or normal gameplay work is added."
     },
     "ci/test_shards/shard-11.txt": {
       "category": "rule_semantics",
@@ -396,9 +428,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Retain predecessor weights while admitting four measured development cases in the weighted shard inventory.",
-      "source_obligation": "Core Rules 21.03 and retained v931 declaration timing; preserve the existing native Charge, 2D6, viewer and replay contracts.",
-      "unchanged_work": "Opt-in detached offer inspection only; no registration, roll, fork, route search, engine mutation, or change to normal game execution. Tests and generated receipts preserve every existing case and weight."
+      "rationale": "Reweight the revised native case without changing any behavioral case or predecessor source selection.",
+      "source_obligation": "Core Rules 21.03 and retained v931 timing; use the unchanged Charge target filter, native resolve_charge_move contract, and unmodified dice spec.",
+      "unchanged_work": "No existing workload calls this opt-in read-only policy. It checks one caller-supplied witness at no more than eleven attainable sums per mode. No path search, chance sample, decision submission, resolver change or normal gameplay work is added."
     },
     "ci/test_shards/shard-12.txt": {
       "category": "rule_semantics",
@@ -415,9 +447,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Retain predecessor weights while admitting four measured development cases in the weighted shard inventory.",
-      "source_obligation": "Core Rules 21.03 and retained v931 declaration timing; preserve the existing native Charge, 2D6, viewer and replay contracts.",
-      "unchanged_work": "Opt-in detached offer inspection only; no registration, roll, fork, route search, engine mutation, or change to normal game execution. Tests and generated receipts preserve every existing case and weight."
+      "rationale": "Reweight the revised native case without changing any behavioral case or predecessor source selection.",
+      "source_obligation": "Core Rules 21.03 and retained v931 timing; use the unchanged Charge target filter, native resolve_charge_move contract, and unmodified dice spec.",
+      "unchanged_work": "No existing workload calls this opt-in read-only policy. It checks one caller-supplied witness at no more than eleven attainable sums per mode. No path search, chance sample, decision submission, resolver change or normal gameplay work is added."
     },
     "ci/test_shards/shard-4.txt": {
       "category": "rule_semantics",
@@ -434,9 +466,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Retain predecessor weights while admitting four measured development cases in the weighted shard inventory.",
-      "source_obligation": "Core Rules 21.03 and retained v931 declaration timing; preserve the existing native Charge, 2D6, viewer and replay contracts.",
-      "unchanged_work": "Opt-in detached offer inspection only; no registration, roll, fork, route search, engine mutation, or change to normal game execution. Tests and generated receipts preserve every existing case and weight."
+      "rationale": "Reweight the revised native case without changing any behavioral case or predecessor source selection.",
+      "source_obligation": "Core Rules 21.03 and retained v931 timing; use the unchanged Charge target filter, native resolve_charge_move contract, and unmodified dice spec.",
+      "unchanged_work": "No existing workload calls this opt-in read-only policy. It checks one caller-supplied witness at no more than eleven attainable sums per mode. No path search, chance sample, decision submission, resolver change or normal gameplay work is added."
     },
     "ci/test_shards/shard-5.txt": {
       "category": "rule_semantics",
@@ -453,9 +485,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Retain predecessor weights while admitting four measured development cases in the weighted shard inventory.",
-      "source_obligation": "Core Rules 21.03 and retained v931 declaration timing; preserve the existing native Charge, 2D6, viewer and replay contracts.",
-      "unchanged_work": "Opt-in detached offer inspection only; no registration, roll, fork, route search, engine mutation, or change to normal game execution. Tests and generated receipts preserve every existing case and weight."
+      "rationale": "Reweight the revised native case without changing any behavioral case or predecessor source selection.",
+      "source_obligation": "Core Rules 21.03 and retained v931 timing; use the unchanged Charge target filter, native resolve_charge_move contract, and unmodified dice spec.",
+      "unchanged_work": "No existing workload calls this opt-in read-only policy. It checks one caller-supplied witness at no more than eleven attainable sums per mode. No path search, chance sample, decision submission, resolver change or normal gameplay work is added."
     },
     "ci/test_shards/shard-6.txt": {
       "category": "rule_semantics",
@@ -472,9 +504,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Retain predecessor weights while admitting four measured development cases in the weighted shard inventory.",
-      "source_obligation": "Core Rules 21.03 and retained v931 declaration timing; preserve the existing native Charge, 2D6, viewer and replay contracts.",
-      "unchanged_work": "Opt-in detached offer inspection only; no registration, roll, fork, route search, engine mutation, or change to normal game execution. Tests and generated receipts preserve every existing case and weight."
+      "rationale": "Reweight the revised native case without changing any behavioral case or predecessor source selection.",
+      "source_obligation": "Core Rules 21.03 and retained v931 timing; use the unchanged Charge target filter, native resolve_charge_move contract, and unmodified dice spec.",
+      "unchanged_work": "No existing workload calls this opt-in read-only policy. It checks one caller-supplied witness at no more than eleven attainable sums per mode. No path search, chance sample, decision submission, resolver change or normal gameplay work is added."
     },
     "ci/test_shards/shard-7.txt": {
       "category": "rule_semantics",
@@ -491,9 +523,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Retain predecessor weights while admitting four measured development cases in the weighted shard inventory.",
-      "source_obligation": "Core Rules 21.03 and retained v931 declaration timing; preserve the existing native Charge, 2D6, viewer and replay contracts.",
-      "unchanged_work": "Opt-in detached offer inspection only; no registration, roll, fork, route search, engine mutation, or change to normal game execution. Tests and generated receipts preserve every existing case and weight."
+      "rationale": "Reweight the revised native case without changing any behavioral case or predecessor source selection.",
+      "source_obligation": "Core Rules 21.03 and retained v931 timing; use the unchanged Charge target filter, native resolve_charge_move contract, and unmodified dice spec.",
+      "unchanged_work": "No existing workload calls this opt-in read-only policy. It checks one caller-supplied witness at no more than eleven attainable sums per mode. No path search, chance sample, decision submission, resolver change or normal gameplay work is added."
     },
     "ci/test_shards/shard-8.txt": {
       "category": "rule_semantics",
@@ -510,9 +542,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Retain predecessor weights while admitting four measured development cases in the weighted shard inventory.",
-      "source_obligation": "Core Rules 21.03 and retained v931 declaration timing; preserve the existing native Charge, 2D6, viewer and replay contracts.",
-      "unchanged_work": "Opt-in detached offer inspection only; no registration, roll, fork, route search, engine mutation, or change to normal game execution. Tests and generated receipts preserve every existing case and weight."
+      "rationale": "Reweight the revised native case without changing any behavioral case or predecessor source selection.",
+      "source_obligation": "Core Rules 21.03 and retained v931 timing; use the unchanged Charge target filter, native resolve_charge_move contract, and unmodified dice spec.",
+      "unchanged_work": "No existing workload calls this opt-in read-only policy. It checks one caller-supplied witness at no more than eleven attainable sums per mode. No path search, chance sample, decision submission, resolver change or normal gameplay work is added."
     },
     "ci/test_shards/shard-9.txt": {
       "category": "rule_semantics",
@@ -529,9 +561,9 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Retain predecessor weights while admitting four measured development cases in the weighted shard inventory.",
-      "source_obligation": "Core Rules 21.03 and retained v931 declaration timing; preserve the existing native Charge, 2D6, viewer and replay contracts.",
-      "unchanged_work": "Opt-in detached offer inspection only; no registration, roll, fork, route search, engine mutation, or change to normal game execution. Tests and generated receipts preserve every existing case and weight."
+      "rationale": "Reweight the revised native case without changing any behavioral case or predecessor source selection.",
+      "source_obligation": "Core Rules 21.03 and retained v931 timing; use the unchanged Charge target filter, native resolve_charge_move contract, and unmodified dice spec.",
+      "unchanged_work": "No existing workload calls this opt-in read-only policy. It checks one caller-supplied witness at no more than eleven attainable sums per mode. No path search, chance sample, decision submission, resolver change or normal gameplay work is added."
     },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
@@ -573,9 +605,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Refresh existing packaged and contract identities; no adapter schema, route or wire format changes.",
-      "source_obligation": "Core Rules 21.03 and retained v931 declaration timing; preserve the existing native Charge, 2D6, viewer and replay contracts.",
-      "unchanged_work": "Opt-in detached offer inspection only; no registration, roll, fork, route search, engine mutation, or change to normal game execution. Tests and generated receipts preserve every existing case and weight."
+      "rationale": "Refresh existing packaged and contract identities; no schema, adapter route or wire format changes.",
+      "source_obligation": "Core Rules 21.03 and retained v931 timing; use the unchanged Charge target filter, native resolve_charge_move contract, and unmodified dice spec.",
+      "unchanged_work": "No existing workload calls this opt-in read-only policy. It checks one caller-supplied witness at no more than eleven attainable sums per mode. No path search, chance sample, decision submission, resolver change or normal gameplay work is added."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
@@ -617,9 +649,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Refresh existing packaged and contract identities; no adapter schema, route or wire format changes.",
-      "source_obligation": "Core Rules 21.03 and retained v931 declaration timing; preserve the existing native Charge, 2D6, viewer and replay contracts.",
-      "unchanged_work": "Opt-in detached offer inspection only; no registration, roll, fork, route search, engine mutation, or change to normal game execution. Tests and generated receipts preserve every existing case and weight."
+      "rationale": "Refresh existing packaged and contract identities; no schema, adapter route or wire format changes.",
+      "source_obligation": "Core Rules 21.03 and retained v931 timing; use the unchanged Charge target filter, native resolve_charge_move contract, and unmodified dice spec.",
+      "unchanged_work": "No existing workload calls this opt-in read-only policy. It checks one caller-supplied witness at no more than eleven attainable sums per mode. No path search, chance sample, decision submission, resolver change or normal gameplay work is added."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
@@ -661,9 +693,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Refresh existing packaged and contract identities; no adapter schema, route or wire format changes.",
-      "source_obligation": "Core Rules 21.03 and retained v931 declaration timing; preserve the existing native Charge, 2D6, viewer and replay contracts.",
-      "unchanged_work": "Opt-in detached offer inspection only; no registration, roll, fork, route search, engine mutation, or change to normal game execution. Tests and generated receipts preserve every existing case and weight."
+      "rationale": "Refresh existing packaged and contract identities; no schema, adapter route or wire format changes.",
+      "source_obligation": "Core Rules 21.03 and retained v931 timing; use the unchanged Charge target filter, native resolve_charge_move contract, and unmodified dice spec.",
+      "unchanged_work": "No existing workload calls this opt-in read-only policy. It checks one caller-supplied witness at no more than eleven attainable sums per mode. No path search, chance sample, decision submission, resolver change or normal gameplay work is added."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
@@ -705,9 +737,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Refresh existing packaged and contract identities; no adapter schema, route or wire format changes.",
-      "source_obligation": "Core Rules 21.03 and retained v931 declaration timing; preserve the existing native Charge, 2D6, viewer and replay contracts.",
-      "unchanged_work": "Opt-in detached offer inspection only; no registration, roll, fork, route search, engine mutation, or change to normal game execution. Tests and generated receipts preserve every existing case and weight."
+      "rationale": "Refresh existing packaged and contract identities; no schema, adapter route or wire format changes.",
+      "source_obligation": "Core Rules 21.03 and retained v931 timing; use the unchanged Charge target filter, native resolve_charge_move contract, and unmodified dice spec.",
+      "unchanged_work": "No existing workload calls this opt-in read-only policy. It checks one caller-supplied witness at no more than eleven attainable sums per mode. No path search, chance sample, decision submission, resolver change or normal gameplay work is added."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
@@ -749,9 +781,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Refresh existing packaged and contract identities; no adapter schema, route or wire format changes.",
-      "source_obligation": "Core Rules 21.03 and retained v931 declaration timing; preserve the existing native Charge, 2D6, viewer and replay contracts.",
-      "unchanged_work": "Opt-in detached offer inspection only; no registration, roll, fork, route search, engine mutation, or change to normal game execution. Tests and generated receipts preserve every existing case and weight."
+      "rationale": "Refresh existing packaged and contract identities; no schema, adapter route or wire format changes.",
+      "source_obligation": "Core Rules 21.03 and retained v931 timing; use the unchanged Charge target filter, native resolve_charge_move contract, and unmodified dice spec.",
+      "unchanged_work": "No existing workload calls this opt-in read-only policy. It checks one caller-supplied witness at no more than eleven attainable sums per mode. No path search, chance sample, decision submission, resolver change or normal gameplay work is added."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
@@ -793,9 +825,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Refresh existing packaged and contract identities; no adapter schema, route or wire format changes.",
-      "source_obligation": "Core Rules 21.03 and retained v931 declaration timing; preserve the existing native Charge, 2D6, viewer and replay contracts.",
-      "unchanged_work": "Opt-in detached offer inspection only; no registration, roll, fork, route search, engine mutation, or change to normal game execution. Tests and generated receipts preserve every existing case and weight."
+      "rationale": "Refresh existing packaged and contract identities; no schema, adapter route or wire format changes.",
+      "source_obligation": "Core Rules 21.03 and retained v931 timing; use the unchanged Charge target filter, native resolve_charge_move contract, and unmodified dice spec.",
+      "unchanged_work": "No existing workload calls this opt-in read-only policy. It checks one caller-supplied witness at no more than eleven attainable sums per mode. No path search, chance sample, decision submission, resolver change or normal gameplay work is added."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
@@ -837,9 +869,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Refresh existing packaged and contract identities; no adapter schema, route or wire format changes.",
-      "source_obligation": "Core Rules 21.03 and retained v931 declaration timing; preserve the existing native Charge, 2D6, viewer and replay contracts.",
-      "unchanged_work": "Opt-in detached offer inspection only; no registration, roll, fork, route search, engine mutation, or change to normal game execution. Tests and generated receipts preserve every existing case and weight."
+      "rationale": "Refresh existing packaged and contract identities; no schema, adapter route or wire format changes.",
+      "source_obligation": "Core Rules 21.03 and retained v931 timing; use the unchanged Charge target filter, native resolve_charge_move contract, and unmodified dice spec.",
+      "unchanged_work": "No existing workload calls this opt-in read-only policy. It checks one caller-supplied witness at no more than eleven attainable sums per mode. No path search, chance sample, decision submission, resolver change or normal gameplay work is added."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
@@ -881,9 +913,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Refresh existing packaged and contract identities; no adapter schema, route or wire format changes.",
-      "source_obligation": "Core Rules 21.03 and retained v931 declaration timing; preserve the existing native Charge, 2D6, viewer and replay contracts.",
-      "unchanged_work": "Opt-in detached offer inspection only; no registration, roll, fork, route search, engine mutation, or change to normal game execution. Tests and generated receipts preserve every existing case and weight."
+      "rationale": "Refresh existing packaged and contract identities; no schema, adapter route or wire format changes.",
+      "source_obligation": "Core Rules 21.03 and retained v931 timing; use the unchanged Charge target filter, native resolve_charge_move contract, and unmodified dice spec.",
+      "unchanged_work": "No existing workload calls this opt-in read-only policy. It checks one caller-supplied witness at no more than eleven attainable sums per mode. No path search, chance sample, decision submission, resolver change or normal gameplay work is added."
     },
     "data/source_audits/ci64_provenance_v1/pre-roll-charge-flight-test-v1.json": {
       "category": "rule_semantics",
@@ -891,15 +923,15 @@
         "pre-roll-charge-flight-test-admission"
       ],
       "selected_families": [],
-      "rationale": "Append an exact-byte native test admission without relaxing predecessor behavior or source checks.",
-      "source_obligation": "Core Rules 21.03 and retained v931 declaration timing; preserve the existing native Charge, 2D6, viewer and replay contracts.",
-      "unchanged_work": "Opt-in detached offer inspection only; no registration, roll, fork, route search, engine mutation, or change to normal game execution. Tests and generated receipts preserve every existing case and weight."
+      "rationale": "Authenticate the revised native test and opt-in proof without relaxing predecessor source or test guards.",
+      "source_obligation": "Core Rules 21.03 and retained v931 timing; use the unchanged Charge target filter, native resolve_charge_move contract, and unmodified dice spec.",
+      "unchanged_work": "No existing workload calls this opt-in read-only policy. It checks one caller-supplied witness at no more than eleven attainable sums per mode. No path search, chance sample, decision submission, resolver change or normal gameplay work is added."
     },
     "docs/AI_POLICY_INTERFACE.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Document the Charge declaration admission scope and map its exact work owners.",
+      "rationale": "Document the request-bound Charge declaration proof and its closed, opt-in scope.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -907,7 +939,7 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Document the Charge declaration admission scope and map its exact work owners.",
+      "rationale": "Document the request-bound Charge declaration proof and its closed, opt-in scope.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -929,9 +961,9 @@
         "pre-roll-charge-flight-test-admission"
       ],
       "selected_families": [],
-      "rationale": "Append an exact-byte native test admission without relaxing predecessor behavior or source checks.",
-      "source_obligation": "Core Rules 21.03 and retained v931 declaration timing; preserve the existing native Charge, 2D6, viewer and replay contracts.",
-      "unchanged_work": "Opt-in detached offer inspection only; no registration, roll, fork, route search, engine mutation, or change to normal game execution. Tests and generated receipts preserve every existing case and weight."
+      "rationale": "Authenticate the revised native test and opt-in proof without relaxing predecessor source or test guards.",
+      "source_obligation": "Core Rules 21.03 and retained v931 timing; use the unchanged Charge target filter, native resolve_charge_move contract, and unmodified dice spec.",
+      "unchanged_work": "No existing workload calls this opt-in read-only policy. It checks one caller-supplied witness at no more than eleven attainable sums per mode. No path search, chance sample, decision submission, resolver change or normal gameplay work is added."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
@@ -944,9 +976,9 @@
         "phase-end-healing-source-and-report"
       ],
       "selected_families": [],
-      "rationale": "Refresh existing packaged and contract identities; no adapter schema, route or wire format changes.",
-      "source_obligation": "Core Rules 21.03 and retained v931 declaration timing; preserve the existing native Charge, 2D6, viewer and replay contracts.",
-      "unchanged_work": "Opt-in detached offer inspection only; no registration, roll, fork, route search, engine mutation, or change to normal game execution. Tests and generated receipts preserve every existing case and weight."
+      "rationale": "Refresh existing packaged and contract identities; no schema, adapter route or wire format changes.",
+      "source_obligation": "Core Rules 21.03 and retained v931 timing; use the unchanged Charge target filter, native resolve_charge_move contract, and unmodified dice spec.",
+      "unchanged_work": "No existing workload calls this opt-in read-only policy. It checks one caller-supplied witness at no more than eleven attainable sums per mode. No path search, chance sample, decision submission, resolver change or normal gameplay work is added."
     },
     "src/warhammer40k_core/ai/charge_flight_admission.py": {
       "category": "rule_semantics",
@@ -954,9 +986,9 @@
         "pre-roll-charge-flight-admission"
       ],
       "selected_families": [],
-      "rationale": "Inspect only the ordinary actor-owned pre-roll offer for a fixed unit, model and target; unresolved is not a mode choice.",
-      "source_obligation": "Core Rules 21.03 and retained v931 declaration timing; preserve the existing native Charge, 2D6, viewer and replay contracts.",
-      "unchanged_work": "Opt-in detached offer inspection only; no registration, roll, fork, route search, engine mutation, or change to normal game execution. Tests and generated receipts preserve every existing case and weight."
+      "rationale": "Prove both modes independently on the same request and choose the issued option using exact 2D6 counts.",
+      "source_obligation": "Core Rules 21.03 and retained v931 timing; use the unchanged Charge target filter, native resolve_charge_move contract, and unmodified dice spec.",
+      "unchanged_work": "No existing workload calls this opt-in read-only policy. It checks one caller-supplied witness at no more than eleven attainable sums per mode. No path search, chance sample, decision submission, resolver change or normal gameplay work is added."
     },
     "tests/code_quality/test_engine_numerical_identity_admission.py": {
       "category": "rule_semantics",
@@ -970,9 +1002,9 @@
         "pre-roll-charge-flight-test-admission"
       ],
       "selected_families": [],
-      "rationale": "Append an exact-byte native test admission without relaxing predecessor behavior or source checks.",
-      "source_obligation": "Core Rules 21.03 and retained v931 declaration timing; preserve the existing native Charge, 2D6, viewer and replay contracts.",
-      "unchanged_work": "Opt-in detached offer inspection only; no registration, roll, fork, route search, engine mutation, or change to normal game execution. Tests and generated receipts preserve every existing case and weight."
+      "rationale": "Authenticate the revised native test and opt-in proof without relaxing predecessor source or test guards.",
+      "source_obligation": "Core Rules 21.03 and retained v931 timing; use the unchanged Charge target filter, native resolve_charge_move contract, and unmodified dice spec.",
+      "unchanged_work": "No existing workload calls this opt-in read-only policy. It checks one caller-supplied witness at no more than eleven attainable sums per mode. No path search, chance sample, decision submission, resolver change or normal gameplay work is added."
     },
     "tests/infrastructure/adapters/test_charge_flight_admission.py": {
       "category": "rule_semantics",
@@ -980,9 +1012,9 @@
         "pre-roll-charge-flight-admission"
       ],
       "selected_families": [],
-      "rationale": "Inspect only the ordinary actor-owned pre-roll offer for a fixed unit, model and target; unresolved is not a mode choice.",
-      "source_obligation": "Core Rules 21.03 and retained v931 declaration timing; preserve the existing native Charge, 2D6, viewer and replay contracts.",
-      "unchanged_work": "Opt-in detached offer inspection only; no registration, roll, fork, route search, engine mutation, or change to normal game execution. Tests and generated receipts preserve every existing case and weight."
+      "rationale": "Prove both modes independently on the same request and choose the issued option using exact 2D6 counts.",
+      "source_obligation": "Core Rules 21.03 and retained v931 timing; use the unchanged Charge target filter, native resolve_charge_move contract, and unmodified dice spec.",
+      "unchanged_work": "No existing workload calls this opt-in read-only policy. It checks one caller-supplied witness at no more than eleven attainable sums per mode. No path search, chance sample, decision submission, resolver change or normal gameplay work is added."
     }
   },
   "milestone": "ordinary",
