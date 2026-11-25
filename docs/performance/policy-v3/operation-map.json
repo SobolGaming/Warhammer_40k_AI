@@ -35780,6 +35780,18 @@
       "sensitive": false,
       "mandatory": true
     },
+    "stage2-b3-post-roll-receipt-verifier": {
+      "paths": [
+        "scripts/verify_stage2_b3_post_roll_receipts.py",
+        "scripts/tests/test_verify_stage2_b3_post_roll_receipts.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
     "stage2-b2-b3-charge-receipt-verifier": {
       "paths": [
         "scripts/verify_stage2_charge_timing_receipts.py"

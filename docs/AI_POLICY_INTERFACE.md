@@ -2994,6 +2994,22 @@ a search with no accepted proposal raises typed exhaustion before registration.
 Those results describe the bounded search. This policy covers a single decision
 with explicit registration.
 
+## Retained B3 post-roll finite comparison
+
+The [Stage 2 B3 post-roll receipt](AI_IMPLEMENTATION_PLAN.md#b3-post-roll-finite-choice-take-targets-or-decline)
+is an offline operator fixture. At one actor-bound `select_charge_targets`
+occurrence, `FiniteCandidateSet` binds the two issued options; ordinary
+`LocalGameSession` viewer submission is the decision authority. A finite
+take leads to a separate parameterized Charge Move offer. The generated
+witness is not a third finite option. The ordinary scorer and replay determine
+the observed 3 VP versus 0 VP through B3 turn end.
+
+The 0-VP authored landed Charge is an offline reference only. It is neither a
+generated candidate nor the finite decline. The receipt registers no router,
+policy, runtime admission or training target, and its score must not be used
+as a live worse-path heuristic. The existing decision and proposal contracts
+are unchanged.
+
 ## Native preserve Fight continuation
 
 `tests.support.cavalcade_native_fight` extends the real round-four Cavalcade

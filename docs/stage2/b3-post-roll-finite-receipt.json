@@ -1,0 +1,171 @@
+{
+  "schema": "stage2-b3-post-roll-finite-receipt-v1",
+  "evidence_revision": "ab3a4ac03854964649f74efe5b8cebd528d3e25a",
+  "archived_origin": {
+    "checkpoint": "5b3250f55a69d29ba66c0b1d44f13c0644d427ace791a5fde444cf6f8f84f331",
+    "raw_sha256": "6731a89e97da64ed1a167a7b5b20f8ea8a524f2a9ffd24232dc11a4ca89e3f0e",
+    "file": "delayed-spend-b3-response-checkpoint.json"
+  },
+  "comparison": {
+    "request": "decision-request-000063",
+    "actor": "player-b",
+    "natural_roll": [
+      6,
+      5
+    ],
+    "fork_checkpoint": "f9d8cbbc78cb9da8398ce16336b5fcdb38ea429c437c1f0fec47820b6382f6f8",
+    "fork_actor_view": "36ea550cb2e6dfb4c4016ed7b2184f8f21d8a54ba8c7f4c3cadc0f8cd683ab4c",
+    "fork_event_log_hash": "80c31676b9e821fc3f7514c6457e7dff3635fce01a69d2b80474afe973940064",
+    "fork_counts_decisions_events_rng": [
+      62,
+      637,
+      2
+    ],
+    "finite_candidates": [
+      {
+        "content_hash": "6e6c540d4b685b76562adacd6cc249d743f1037fe104fa79d40b159a30083e99",
+        "id": "charge-targets:0000"
+      },
+      {
+        "content_hash": "55af46b1fac25528112bc6045317d9e7caa61bdc3761e76eac6a3f54676660ad",
+        "id": "decline_charge_targets"
+      }
+    ],
+    "finite_references": {
+      "generated": 2,
+      "invalid": 0,
+      "native_accepted": 2
+    },
+    "take_anchor": "cca516e0b1e73f16b76a3fdce59afedd5ed07682c783ea13f1b5bfc587e5afe0",
+    "charge_move_request": "decision-request-000064",
+    "charge_actor_view": "f00db17a0963232b975ad38909feefcf948cf062d82ee178fb0d0463e8c6ffa6",
+    "horizon": "B3 turn-end scoring captured at first A4 Movement selection",
+    "scoring_checkpoint": "objective-control:round-03:player-b:fight:turn_end",
+    "objective": "take-and-hold-vs-purge-the-foe-layout-3-expansion-02",
+    "decline_optional_descriptors": [
+      "core-heroic-intervention-end-opponent-charge"
+    ],
+    "take": {
+      "checkpoint": "eabdef3e5b6c58e9632a00fee1658964fb99347f2bf0056f2c426278e2fddb95",
+      "event_log_hash": "1921f8e6c730985ac88fdd6da7e08f593fadd4a819e809dac9d9aa35c4a016f5",
+      "rng_state_hash": "7ae3e395ac8e8c8dc3f8543f7907d4931170d049394cac0be4838391a6c6c893",
+      "counts_decisions_events_rng": [
+        70,
+        754,
+        2
+      ],
+      "pending_request": "decision-request-000071",
+      "vp": {
+        "player-a": 0,
+        "player-b": 3
+      },
+      "objective_status": "controlled",
+      "controlled_by": "player-b"
+    },
+    "decline": {
+      "checkpoint": "64e5968371a29fa026112a403d6ade6d5e549efc0dddc44c4b0d080bd6f29052",
+      "event_log_hash": "2bdb39bb1f399c94794d89b4650bbd35899dd43d5fadc9696556d172942d9ac5",
+      "rng_state_hash": "6e47b342bf692952c0f15c7d2d8da6a15151aa00490be4515385760b930d0129",
+      "counts_decisions_events_rng": [
+        64,
+        698,
+        2
+      ],
+      "pending_request": "decision-request-000065",
+      "vp": {
+        "player-a": 0,
+        "player-b": 0
+      },
+      "objective_status": "uncontrolled",
+      "controlled_by": null
+    }
+  },
+  "generated_campaign": {
+    "candidate_index": 1,
+    "candidate_id": "f2b4a64a1b544ace6c3db1d084a4521b5e4cdb23169d3ca97e1aa5b61ad58c2d",
+    "candidate_inventory_sha256": "190d0b89455d0837e5cd828f3fcd0195fc36ffaed910397b33a66fd80729399c",
+    "generator": {
+      "geometry_work": 16101,
+      "raw": 32,
+      "stop": "raw_limit"
+    },
+    "counts": {
+      "active": {
+        "charge": {
+          "accepted": 32
+        },
+        "rejection_codes": {},
+        "response": {
+          "scored": 23,
+          "unmatchable": 9
+        },
+        "scores": {
+          "0-3": 23
+        }
+      },
+      "stationary": {
+        "charge": {
+          "accepted": 6
+        },
+        "rejection_codes": {},
+        "response": {
+          "scored": 1,
+          "unmatchable": 5
+        },
+        "scores": {
+          "0-3": 1
+        }
+      }
+    },
+    "qualifying_landed_pair": null
+  },
+  "authored_landed_reference": {
+    "checkpoint": "83dc34d0a794db7f6e02b3f1680bce0d81d992a560745dd16a1472cee9010af8",
+    "event_log_hash": "bcd12e94c676bd652739a77a146518aef38d7fc85d4c4f14f0094b06d2576090",
+    "rng_state_hash": "6fe8f15eb07a7f3f9e7d9d82573e1f41610e830fb723157d697b1f6cb9a22fe8",
+    "counts_decisions_events_rng": [
+      70,
+      754,
+      2
+    ],
+    "pending_request": "decision-request-000071",
+    "vp": {
+      "player-a": 0,
+      "player-b": 0
+    },
+    "objective_status": "uncontrolled",
+    "controlled_by": null
+  },
+  "sample_seconds": {
+    "archived_restore": 46.111555358000004,
+    "decline_submit": 0.12379739800000777,
+    "finite_generation": 0.0034978690000002644
+  },
+  "required_proof": {
+    "both_player_views_and_event_streams": true,
+    "decisions_and_events": true,
+    "independent_ordinary_replay": true,
+    "lifecycle": true,
+    "rng": true,
+    "save_payload": true
+  },
+  "raw_sha256": {
+    "stage2-b3-closeout-evidence/decline-targets-checkpoint.json": "99094c59dc56436831ea70402773f1fac41c93c9c5971d2b22aecf97e7949792",
+    "stage2-b3-closeout-evidence/decline-targets-ordinary-replay.json": "63b8cbf9ffa38ceb8dbb9fb8093fa9281aba617f87b29215344c94c3f462a2c3",
+    "stage2-b3-closeout-evidence/decline-targets-strict-proof.json": "a4c12493561b21544b268f6eafbb3766322e48f1c8a0a3190cdfa03fc6a45452",
+    "stage2-b3-closeout-evidence/decline-targets-views.json": "d94074ef54a00a2c45e74a3d6eafd39fa214d2b1b3a2a389337fba3fbcd76ff9",
+    "stage2-b3-closeout-evidence/fork-checkpoint.json": "6590ff65699f18a33c234f46d67a13166be4efe791693b711a08655cb0bd88b0",
+    "stage2-b3-closeout-evidence/result.json": "3d0f3bcba5f0ec8e86dfd2efdee8eeffa692e439ec6556be326fc8771ae60230",
+    "stage2-generated-b3-evidence/generated-01-checkpoint.json": "8449a7c7438a8548af82110a567ee089f247d3aa78ffa4855b04f4e0bf730ad4",
+    "stage2-generated-b3-evidence/generated-01-ordinary-replay.json": "4af0f7dab30debc053226f7f5de966f7eda6c5b68fa74d0ad499eef5673f0ea6",
+    "stage2-generated-b3-evidence/generated-01-strict-proof.json": "a4c12493561b21544b268f6eafbb3766322e48f1c8a0a3190cdfa03fc6a45452",
+    "stage2-generated-b3-evidence/generated-01-views.json": "ac70003830838e52ead4d800789a0c5617bcc87e08c499f57241e4a214f1ac3e",
+    "stage2-generated-b3-evidence/proposals.json": "3b64cb502e10543d087dd886280b0ccaad9ddb91023d4a04097a149b67c31e82",
+    "stage2-generated-b3-evidence/result.json": "55464a0f4d1b53f8e93df04eb6c431df55ced4905c4c935aa2a9454af32e862e",
+    "stage2-score-evidence-final/clear-checkpoint.json": "129b830b46989e9e86c673651e0c03dd31cf8085d5472d5c399f668c1ed7d8d1",
+    "stage2-score-evidence-final/clear-ordinary-replay.json": "1e8a22ee3719643b3e54e1ecacb582b04bd84ffe988c90a882033a72396cf2ef",
+    "stage2-score-evidence-final/clear-strict-proof.json": "a4c12493561b21544b268f6eafbb3766322e48f1c8a0a3190cdfa03fc6a45452",
+    "stage2-score-evidence-final/clear-views.json": "de06e6f32639a7baf9bd7a22c50165847143851331f40c83ff057fbc13144d2c",
+    "stage2-score-evidence-final/common-checkpoint.json": "26e5f3b460888568e58eaef667126dee6f03b499be22ccf66873cedb8708ecc8"
+  }
+}

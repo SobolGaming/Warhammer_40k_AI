@@ -1178,6 +1178,68 @@ native probes. Its coverage is outside the timing matrix. The local VP
 comparison leaves useful-reference status at `scoped_gap`, with a null
 reference target and learning excluded.
 
+### B3 post-roll finite choice: take targets or decline
+
+This is one finite comparison at Player B's `select_charge_targets`
+request `decision-request-000063`, after the natural 6 + 5 roll. It starts
+from the archived #735 delayed/Spend B3 prefix, restored on
+`ab3a4ac03854964649f74efe5b8cebd528d3e25a`. The shared fork has
+62 decisions, 637 events and two draws. The finite generator returned both
+engine-issued options; both were natively accepted and neither was invalid.
+Taking `charge-targets:0000` reproduced the exact Charge Move anchor. The
+next request, `decision-request-000064`, accepted generated witness 1 through
+the ordinary viewer submission, then completed the fixed active Fight
+response. Declining `decline_charge_targets` submitted no Charge Move; A
+declined the one offered Heroic Intervention and no Fight activation ran.
+
+Both continuations stop at the first A4 Movement unit selection after B3
+turn-end scoring. The native `unstoppable-force-new-objective-turn-end`
+transaction awards B 3 VP for controlling expansion objective 02 on the
+take arm. The decline arm leaves that objective uncontrolled and records no
+VP transaction. Player A scores 0 in both.
+
+| Continuation | A / B VP | Decisions / events / RNG draws | Objective 02 |
+| --- | ---: | ---: | --- |
+| Take targets, generated Charge 1, active Fight response | 0 / 3 | 70 / 754 / 2 | B, with 2 OC |
+| Decline targets (legal finite control) | 0 / 0 | 64 / 698 / 2 | Uncontrolled |
+| Authored clear landed Charge (offline reference only) | 0 / 0 | 70 / 754 / 2 | Uncontrolled |
+
+The [frozen receipt](stage2/b3-post-roll-finite-receipt.json) pins the shared
+fork and actor-view hash, option and candidate identities, the take anchor,
+and each endpoint's persistence, event and RNG hashes. Strict JSON restore
+and independent ordinary replay reproduced both finite arms and the separate
+authored reference, including both player views and visible event streams.
+The authored clear path is a legal landed Charge, not the finite decline and
+not a second generated landed alternative.
+
+The retained finite-control run measured 3.5 ms for finite generation,
+124 ms for the decline submission, and 46.1 s for strict restoration of the
+archived origin (one wall sample each; decline submit excludes the follow-up).
+Parameterized Charge generation stopped at 32 raw witnesses after 16,101
+geometry work units. In the active-response campaign, 32 Charge Moves
+were accepted; 23 reached 3 VP and nine had an unmatched response offer.
+The separate stationary-response control had six accepted Charge Moves,
+one scoring 3 VP and five unmatched. No generated landed 0-VP arm qualified.
+Unmatched offers are not scored losses. These counts and component costs are
+for this bounded fixture, not full-game budgets or evidence of an optimization.
+
+Verify the retained bytes and compare the native ledgers to the pinned summary
+with the read-only operator command:
+
+```sh
+uv run --no-sync python -B -m scripts.verify_stage2_b3_post_roll_receipts \
+  --receipts <source-workstream-receipt-root>
+```
+
+The root contains the three evidence directories identified in the receipt's
+raw file inventory. It is an external archive; the large checkpoints and
+player views are not checked in. The verifier emits the frozen summary only
+on a complete match. It authenticates retained restore and replay outputs;
+it does not execute a new restore or replay. The evidence qualifies only this
+post-roll choice and declared continuation. It does not choose a live action,
+make the authored path available as a policy, admit training labels, or
+complete the Stage 2 exit.
+
 ### Landed B2 charge and A3 action availability
 
 The sealed #735 B2 offer at `decision-request-000047` restored from the same
