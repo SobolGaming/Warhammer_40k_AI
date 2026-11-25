@@ -1,0 +1,90 @@
+{
+  "base": {
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false,
+    "fixture_sha256": "0aaff64cdc088fe0170fa4f8a3e46916fb185631445324a5f8cc9cbb7bd25fac",
+    "host": {
+      "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+      "logical_cpus": 64,
+      "memory_bytes": 67359383552,
+      "platform": "Linux-6.18.58.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "659a2d81e02176d23168861529651506ac87a4eab1982109f144cd62a63fce71",
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0f7d296e1cbe41efd947f0b36f0bcbf2745511c8456d167b6ee26b6552b9d637",
+    "samples": {
+      "active_shock/replay": [
+        0.2759125219999987,
+        0.2742888910000829,
+        0.28382373700003427
+      ],
+      "active_shock/restore": [
+        1.0048218540000562,
+        0.992755984999917,
+        0.9070939130000397
+      ],
+      "expired_shock/replay": [
+        0.6743738140000914,
+        0.676068111999939,
+        0.6726348380000218
+      ],
+      "expired_shock/restore": [
+        1.4707610369999884,
+        1.5647591019999254,
+        1.5802709870000626
+      ]
+    },
+    "workload_sha256": "f9a750bddeacecac6dca0a3d3e4c5c03a3ac6347596fa4d8ae827d0b5f5638d5"
+  },
+  "base_revision": "6701b3108eeea0124932cac5d70758e18dea89f2",
+  "budget_profile": "current-change-relative-v1",
+  "family": "shock_reconstruction",
+  "head": {
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false,
+    "fixture_sha256": "0aaff64cdc088fe0170fa4f8a3e46916fb185631445324a5f8cc9cbb7bd25fac",
+    "host": {
+      "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+      "logical_cpus": 64,
+      "memory_bytes": 67359383552,
+      "platform": "Linux-6.18.58.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "659a2d81e02176d23168861529651506ac87a4eab1982109f144cd62a63fce71",
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:b1ecd9a6bd751abd9bb732e2bb1d63edcf14839cde43183ae88133c789e368f1",
+    "samples": {
+      "active_shock/replay": [
+        0.2784384990000035,
+        0.27587897499995506,
+        0.2848713260000295
+      ],
+      "active_shock/restore": [
+        0.9880135560000554,
+        0.988283812000077,
+        0.8928544180000699
+      ],
+      "expired_shock/replay": [
+        0.69987654199997,
+        0.6964097019999826,
+        0.6985342230000242
+      ],
+      "expired_shock/restore": [
+        1.4970728490000056,
+        1.5668139959999507,
+        1.6501852089999147
+      ]
+    },
+    "workload_sha256": "f9a750bddeacecac6dca0a3d3e4c5c03a3ac6347596fa4d8ae827d0b5f5638d5"
+  },
+  "head_input_digest": "d56269e5daf08954b6e424986c62e2fc5cafbd34e67acc32c099b41eb9e50ec2",
+  "head_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:b1ecd9a6bd751abd9bb732e2bb1d63edcf14839cde43183ae88133c789e368f1",
+  "historical_failures": [
+    "Existing historical timing receipts, workload definitions, and absolute-budget failures remain unchanged; these exact-base measurements cover only the required component comparisons."
+  ],
+  "policy": "rules-engine-performance-v3",
+  "workload_id": "v963-shock-reconstruction-v1"
+}
