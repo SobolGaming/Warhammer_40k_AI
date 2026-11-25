@@ -1,708 +1,100 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "4d753ec652ee38b394260d3f539df7b04403149b",
+  "base": "c0235fe0bfda75743a4ba987b9ef7ae7b4fd5da3",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:dc9eb5d3f570d34d71e26a1c6b8ef794b5723aa812f8de505066309805678d18",
   "operation_map_sha256": "b58b3839a8b6c419fda1143d0883d97224cc7d2e4062eb28ccae3d677fc6cdd7",
   "changes": {
-    "ci/test_shards/durations.json": {
-      "before_sha256": "3bd92f1597516c5618f508bba535cc27894fc2895f83ed0fa488c0bb1f1110f7",
-      "after_sha256": "283bfd9f8c00bf088230151f8760a9cdee5510faaa93a48d932f3c3b720d74ac",
+    "docs/AI_IMPLEMENTATION_PLAN.md": {
+      "before_sha256": "0fb8c70a40ac82f1baf20536c5d65ec56421c420c19c6b17554bfc7ebdcac643",
+      "after_sha256": "1c89415df9b99180f1902042a71a27792e5713d538291314397531cf0ef29f6b",
       "owners": {
         "@document": {
-          "before": "3bd92f1597516c5618f508bba535cc27894fc2895f83ed0fa488c0bb1f1110f7",
-          "after": "283bfd9f8c00bf088230151f8760a9cdee5510faaa93a48d932f3c3b720d74ac"
+          "before": "0fb8c70a40ac82f1baf20536c5d65ec56421c420c19c6b17554bfc7ebdcac643",
+          "after": "1c89415df9b99180f1902042a71a27792e5713d538291314397531cf0ef29f6b"
         }
       }
     },
-    "ci/test_shards/shard-1.txt": {
-      "before_sha256": "399c9a1cd741135ec1dc2e8c22e0feb866ee615c8b39947565241489c116c69d",
-      "after_sha256": "b01e9d2cd701f57df8919afa1915ee9da09372d77544efefe41f4239f77e4010",
-      "owners": {
-        "@document": {
-          "before": "399c9a1cd741135ec1dc2e8c22e0feb866ee615c8b39947565241489c116c69d",
-          "after": "b01e9d2cd701f57df8919afa1915ee9da09372d77544efefe41f4239f77e4010"
-        }
-      }
-    },
-    "ci/test_shards/shard-10.txt": {
-      "before_sha256": "4e5e0b7da12f4ae69cc18e15314594e6647dab0bde1768c3df68954f8a579710",
-      "after_sha256": "694b108e6a1e9903500f8413a2b24a8c4181ef43d1aec31ff413938b35595c72",
-      "owners": {
-        "@document": {
-          "before": "4e5e0b7da12f4ae69cc18e15314594e6647dab0bde1768c3df68954f8a579710",
-          "after": "694b108e6a1e9903500f8413a2b24a8c4181ef43d1aec31ff413938b35595c72"
-        }
-      }
-    },
-    "ci/test_shards/shard-11.txt": {
-      "before_sha256": "6bc0ace16faf503042487e770f40da1a887680b39fe0da1601f0c4d5c0a26c04",
-      "after_sha256": "62950bee912a3dca87544bfd3178295661362e227c8a3f30f8a9b0039259b0cf",
-      "owners": {
-        "@document": {
-          "before": "6bc0ace16faf503042487e770f40da1a887680b39fe0da1601f0c4d5c0a26c04",
-          "after": "62950bee912a3dca87544bfd3178295661362e227c8a3f30f8a9b0039259b0cf"
-        }
-      }
-    },
-    "ci/test_shards/shard-12.txt": {
-      "before_sha256": "8419d6b8313734c6a7e2511d18826260737fa31c4f1b210c899aef31f8ff2d88",
-      "after_sha256": "734d8a0dc2d581aed9f2b28c520692ae75b3f2afe4a248291721639d3f7105a8",
-      "owners": {
-        "@document": {
-          "before": "8419d6b8313734c6a7e2511d18826260737fa31c4f1b210c899aef31f8ff2d88",
-          "after": "734d8a0dc2d581aed9f2b28c520692ae75b3f2afe4a248291721639d3f7105a8"
-        }
-      }
-    },
-    "ci/test_shards/shard-4.txt": {
-      "before_sha256": "cb66e86e991c505cc58147bc128236ac73d7b74408932bdfb93e2101f658afc7",
-      "after_sha256": "35b0ef26de5a5f7b1755cae071bf07a7bbbdca194f735ce8deec7061f6421d14",
-      "owners": {
-        "@document": {
-          "before": "cb66e86e991c505cc58147bc128236ac73d7b74408932bdfb93e2101f658afc7",
-          "after": "35b0ef26de5a5f7b1755cae071bf07a7bbbdca194f735ce8deec7061f6421d14"
-        }
-      }
-    },
-    "ci/test_shards/shard-5.txt": {
-      "before_sha256": "c6e0732b2973c1b34b7b8de1ec748316f4d34421a80c75526a9815232565de01",
-      "after_sha256": "9e785bd8fa436000c7ece727e2cbd379567da7484eb76083004b313b004dd0ba",
-      "owners": {
-        "@document": {
-          "before": "c6e0732b2973c1b34b7b8de1ec748316f4d34421a80c75526a9815232565de01",
-          "after": "9e785bd8fa436000c7ece727e2cbd379567da7484eb76083004b313b004dd0ba"
-        }
-      }
-    },
-    "ci/test_shards/shard-6.txt": {
-      "before_sha256": "54952ef5f97dcedebee80080f39f7f38234b4a3723d7fcc20657760aeac91e74",
-      "after_sha256": "31f103b6055187de7a402f5043a174d1d269144a23de56f2b06a60cacc7fe427",
-      "owners": {
-        "@document": {
-          "before": "54952ef5f97dcedebee80080f39f7f38234b4a3723d7fcc20657760aeac91e74",
-          "after": "31f103b6055187de7a402f5043a174d1d269144a23de56f2b06a60cacc7fe427"
-        }
-      }
-    },
-    "ci/test_shards/shard-7.txt": {
-      "before_sha256": "1ae9260764225883a6c20304936ab7f406433a25e8de5422ab1f0d119326a805",
-      "after_sha256": "91f260a08db40aa49061abb60fc1f8fdd68d19c6dae3e55cb7d7415cce3814c1",
-      "owners": {
-        "@document": {
-          "before": "1ae9260764225883a6c20304936ab7f406433a25e8de5422ab1f0d119326a805",
-          "after": "91f260a08db40aa49061abb60fc1f8fdd68d19c6dae3e55cb7d7415cce3814c1"
-        }
-      }
-    },
-    "ci/test_shards/shard-8.txt": {
-      "before_sha256": "3583b95c6b72d35841bf6a7bb0ab13ddf4123fe4704f1e6671bbd8af70eb4d31",
-      "after_sha256": "1beb1fb3b0a533b245a110a15b93162bd73a701131be2abf6e0a65bc8da13138",
-      "owners": {
-        "@document": {
-          "before": "3583b95c6b72d35841bf6a7bb0ab13ddf4123fe4704f1e6671bbd8af70eb4d31",
-          "after": "1beb1fb3b0a533b245a110a15b93162bd73a701131be2abf6e0a65bc8da13138"
-        }
-      }
-    },
-    "ci/test_shards/shard-9.txt": {
-      "before_sha256": "669cebd4fc07aef621e8c7d351775fb07240c69d7ad6c22afa801dffce168d0c",
-      "after_sha256": "9e19461b030d8fe622c0fd9ce381f4b2aeb91cd282cb9f5b0d2f4a541bafe5cd",
-      "owners": {
-        "@document": {
-          "before": "669cebd4fc07aef621e8c7d351775fb07240c69d7ad6c22afa801dffce168d0c",
-          "after": "9e19461b030d8fe622c0fd9ce381f4b2aeb91cd282cb9f5b0d2f4a541bafe5cd"
-        }
-      }
-    },
-    "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "69db5d7fc4e9fe55415d55b78b5df8bbb230f97fc0e97d307b4762308e571a6c",
-      "after_sha256": "426b81a5c77f108f6ac4371c72327a603e4a8395e289cef93e2157d603b84382",
-      "owners": {
-        "@document": {
-          "before": "69db5d7fc4e9fe55415d55b78b5df8bbb230f97fc0e97d307b4762308e571a6c",
-          "after": "426b81a5c77f108f6ac4371c72327a603e4a8395e289cef93e2157d603b84382"
-        }
-      }
-    },
-    "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "d4e81181eafff3a1eac46b55d72e48700420317d106cdb1863eb620437e0ea55",
-      "after_sha256": "4f43761343e67b65620608dd0bc170c1b16a312e272ebad3d4ec8cd1587da204",
-      "owners": {
-        "@document": {
-          "before": "d4e81181eafff3a1eac46b55d72e48700420317d106cdb1863eb620437e0ea55",
-          "after": "4f43761343e67b65620608dd0bc170c1b16a312e272ebad3d4ec8cd1587da204"
-        }
-      }
-    },
-    "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "e71b225824e79b8692deac3da5c792fc31c4bc6114ca033287f154ae674404f1",
-      "after_sha256": "add07de631f8f5f06c9426eac72b13b4e0ecb98c55a2361912808ff46b3c8187",
-      "owners": {
-        "@document": {
-          "before": "e71b225824e79b8692deac3da5c792fc31c4bc6114ca033287f154ae674404f1",
-          "after": "add07de631f8f5f06c9426eac72b13b4e0ecb98c55a2361912808ff46b3c8187"
-        }
-      }
-    },
-    "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "e287754fd80d4c4b7b77a2821e4adddb44a9465ce545c5aa1264e395fd10d1f0",
-      "after_sha256": "df55abb1b61db0964e69248bce522c1efdac7cc7e107f341218ccd8c50a1d0ad",
-      "owners": {
-        "@document": {
-          "before": "e287754fd80d4c4b7b77a2821e4adddb44a9465ce545c5aa1264e395fd10d1f0",
-          "after": "df55abb1b61db0964e69248bce522c1efdac7cc7e107f341218ccd8c50a1d0ad"
-        }
-      }
-    },
-    "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "44ea53b044b72276eb45bf936011a515ba9e0dc87b6025d898e2f21337fac4c6",
-      "after_sha256": "56a0c4036c0ddb990faf25b9ca6424ef720037a6b4f1da4ba4c27ef98c725acd",
-      "owners": {
-        "@document": {
-          "before": "44ea53b044b72276eb45bf936011a515ba9e0dc87b6025d898e2f21337fac4c6",
-          "after": "56a0c4036c0ddb990faf25b9ca6424ef720037a6b4f1da4ba4c27ef98c725acd"
-        }
-      }
-    },
-    "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "2e7926a08a77d671cf71822f004db8227fdc98f40e16bbba6ec74abd9fd6f8a8",
-      "after_sha256": "e824844439c30256e9374a4627bf198995bcf745bc169aa54f7541bf25e7d708",
-      "owners": {
-        "@document": {
-          "before": "2e7926a08a77d671cf71822f004db8227fdc98f40e16bbba6ec74abd9fd6f8a8",
-          "after": "e824844439c30256e9374a4627bf198995bcf745bc169aa54f7541bf25e7d708"
-        }
-      }
-    },
-    "contracts/examples/support-profile.json": {
-      "before_sha256": "9709f34a6d2535780982c5574cf4c9b5089423022d0984eee292e3a8f21c0ff2",
-      "after_sha256": "7633441ff59429d3ec20634f99382a05a1d58d138072e74f1923efffe3c1bd6c",
-      "owners": {
-        "@document": {
-          "before": "9709f34a6d2535780982c5574cf4c9b5089423022d0984eee292e3a8f21c0ff2",
-          "after": "7633441ff59429d3ec20634f99382a05a1d58d138072e74f1923efffe3c1bd6c"
-        }
-      }
-    },
-    "contracts/manifest.json": {
-      "before_sha256": "a3888c64e4dc9199922ac4e4839164e245234803dfc15fe116caa9e5497fabe6",
-      "after_sha256": "551f928e5a4863a5de5909a68a9f1cd669ee79149d78117b22ef4ca9aae3b6ed",
-      "owners": {
-        "@document": {
-          "before": "a3888c64e4dc9199922ac4e4839164e245234803dfc15fe116caa9e5497fabe6",
-          "after": "551f928e5a4863a5de5909a68a9f1cd669ee79149d78117b22ef4ca9aae3b6ed"
-        }
-      }
-    },
-    "data/source_audits/ci64_provenance_v1/combined-charge-admission-v1.json": {
+    "docs/stage2/b3-objective-preservation-receipt.json": {
       "before_sha256": null,
-      "after_sha256": "85a8eb553ae08b36446c89ebccbc2081ea7e363984f77a462690f1eb348801ec",
+      "after_sha256": "5f24bc13539c8ddc17b983ec0554580fd918912bdc07035e5d9afc6fd2c984c3",
       "owners": {
         "@document": {
           "before": null,
-          "after": "85a8eb553ae08b36446c89ebccbc2081ea7e363984f77a462690f1eb348801ec"
+          "after": "5f24bc13539c8ddc17b983ec0554580fd918912bdc07035e5d9afc6fd2c984c3"
         }
       }
     },
-    "data/source_audits/ci64_provenance_v1/stage2-ground-charge-retry-test-v1.json": {
-      "before_sha256": null,
-      "after_sha256": "0c26e91d36dacb03918a07ecdd5cffc9d5befdc729f443722f038a6687d6df53",
+    "scripts/tests/test_verify_stage2_b3_post_roll_receipts.py": {
+      "before_sha256": "80e6b7cfb3253969014c2736aa5541161756e1aae04630cffd55fc6b625bf205",
+      "after_sha256": "0f88f9e98bdfb112cc8a42f62917e00b49301658b390a275ee0a81222d26ada6",
       "owners": {
-        "@document": {
-          "before": null,
-          "after": "0c26e91d36dacb03918a07ecdd5cffc9d5befdc729f443722f038a6687d6df53"
+        "test_rejects_unverified_archive_without_summary": {
+          "before": "b823830399b1403f1b265a011da738b8bd914957e9d48e41634c173eb89423da",
+          "after": "9037f1921a9c59ff58e9ff2e5445da0ba112b1974804ac420591c55f92d98644"
         }
       }
     },
-    "docs/AI_POLICY_INTERFACE.md": {
-      "before_sha256": "2f969b5d2c6cc34fffb4f6467338d3cb483685d2ff3940f875b9f5bf09ec174a",
-      "after_sha256": "2232524951a5927131249c904671333a7288784a14264b24e939c537067d719b",
-      "owners": {
-        "@document": {
-          "before": "2f969b5d2c6cc34fffb4f6467338d3cb483685d2ff3940f875b9f5bf09ec174a",
-          "after": "2232524951a5927131249c904671333a7288784a14264b24e939c537067d719b"
-        }
-      }
-    },
-    "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "b55a24a328cbba979a6ae63839985eb51a97245a8361ebb88043898e2e4afe2b",
-      "after_sha256": "7137208a47852f09f31c23ff3f65246c631e3105b359456c370095cd4cf35eb0",
-      "owners": {
-        "@document": {
-          "before": "b55a24a328cbba979a6ae63839985eb51a97245a8361ebb88043898e2e4afe2b",
-          "after": "7137208a47852f09f31c23ff3f65246c631e3105b359456c370095cd4cf35eb0"
-        }
-      }
-    },
-    "scripts/engine_numerical_identity_test_admission.py": {
-      "before_sha256": "2d0c71dd5f9c69f0a4314ffac21325d965502884e9906cde769a2bc0e2f62461",
-      "after_sha256": "2c2ea888cea224cb4bea84371c955f803c75a4a58f9c58c45eee367d36b6d8c7",
+    "scripts/verify_stage2_b3_post_roll_receipts.py": {
+      "before_sha256": "4f1fe4a4f78aa186e8d3736bdbf07f8369150eee629687271a0835dc5ee216fa",
+      "after_sha256": "ac4dc75943dadb023b12bdadb7e4ba3b9763edee570486fa0f06bb0741facb4b",
       "owners": {
         "@module": {
-          "before": "3a9cc111aa8a55209ce7830d1b4550875ddbd0e738505b5691fbbc3fda9f1488",
-          "after": "1f18eca685483ad971338229c441311da0503eaeb25464cddae4f3c62b3e36c8"
+          "before": "036b4f2ec58e22c5a5ec9630bcee21e9b266aeedc5a35008c404d82fd544477e",
+          "after": "20ee16d85d64804b5e76ee9c000bf20e28d007b06c230f5969d902428e674fc5"
         },
-        "combined_charge_runtime": {
+        "authenticate": {
           "before": null,
-          "after": "49421aee2ba39f3e81dc1007493f467ffb8d8cc4df34da8589c462ecaf15abee"
+          "after": "3268bd487008001145c25f11b0cc8cb11b65f1bdebcdb6381580f15092ca9b59"
         },
-        "exact_movement_test_transition": {
-          "before": "42df3cccb6a3bc1dbbbc9602c469a4570a33301ec5120b7275e99bf57fb2364d",
-          "after": "c1c8814768c859cad09ff643c1d4df0da27afa1177b4f2122d24f03685552628"
-        }
-      }
-    },
-    "scripts/stage2_ground_charge_test_admission.py": {
-      "before_sha256": "82497e5dd7e86bc4f2399debed29a6adfe258f14fc74bc733c53c7d7213c8137",
-      "after_sha256": "d5c6b70f0037c33f1e55b0c4bae9024ff68685826f24cefb6d8362ce2cc00aa5",
-      "owners": {
-        "@module": {
-          "before": "bfe59a5f4a4197584ca8e148e4aa2d6d2ea7b83d4e744b19b60a9ee81c2cf2bb",
-          "after": "abb04dae421ffd70285f610b1ed882c972be4bbe0589ecf7ad92eed408f72caa"
+        "main": {
+          "before": "b84907a0f76eece7e04a7f172f79785c771b585dd070d20875aeff38c364ceea",
+          "after": "60e942a508e699ab1680e2fc816899bed6b8c87341d5b577463bb474fa64723d"
         },
-        "GroundChargeRetryAdmission": {
+        "verify": {
+          "before": "4d98468ea56ee797d0828d2e211e96487a5160e3c945a18a08b5da7e1e174f79",
+          "after": "b5bbbcd004d31f10340fd9bef1a0914c82221be6b425b29a4f1ec93ff3c9cee4"
+        },
+        "verify_preservation": {
           "before": null,
-          "after": "f10362a10401f89c6e1588e855e36dae34d9d0abd083caa09554d7b968223f46"
-        },
-        "GroundChargeRetryAdmission.admit": {
-          "before": null,
-          "after": "2a7d8faf2a110cc3713c9c3dca7a550a4dc2a279d5449dd1129d3740e612da6f"
-        },
-        "GroundChargeRetryAdmission.source_pins": {
-          "before": null,
-          "after": "b355db6f14b6dbf7f9f7a1ed28b6f19f1b14eba28fef9322b03d33392d0d8f3b"
-        },
-        "_RetryReceipt": {
-          "before": null,
-          "after": "4a14b97690604119cd229befdafd75e83342f13c949e63339012767d912ca595"
-        },
-        "ground_charge_retry_admission": {
-          "before": null,
-          "after": "bec60663a12b6a92a32c2672ac28b23f337d3d4cb6fed5829f50a17e739ef452"
-        },
-        "ground_charge_test_successor": {
-          "before": "50625b5d6363d6761d1fa710d26fad6700b6f209beebbf7a1df646349cebf22b",
-          "after": "e77741630998394c63e5a2ccd969a5ba69d314bfd2a37486bf9644e7f4da66b5"
-        }
-      }
-    },
-    "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "d48155d9b49a46bfdfc91c7a717160cb2fd935e07037e0470b09cac86a13d1b2",
-      "after_sha256": "c26c71c97e1d460f53f064a50516bcdc88b0a901ef5324267852ae32031cd3d1",
-      "owners": {
-        "@document": {
-          "before": "d48155d9b49a46bfdfc91c7a717160cb2fd935e07037e0470b09cac86a13d1b2",
-          "after": "c26c71c97e1d460f53f064a50516bcdc88b0a901ef5324267852ae32031cd3d1"
-        }
-      }
-    },
-    "src/warhammer40k_core/ai/ground_charge_candidates.py": {
-      "before_sha256": "439096ba693ea8793c9c5405c08d6f2978271111c1d2e7bef9d01d1162d1544b",
-      "after_sha256": "3f037af8677bbb7dc70671c558caa0ee99a0a9bcbb3227ec4e2f33e2ff0a71d8",
-      "owners": {
-        "@module": {
-          "before": "5e7838747c2799922f4283ae9b7da63ac4dba2c2dc09010b8484bfb937de9c23",
-          "after": "50c506b2286aeeeb0c3ccb11b6a1109c6bb9fc0562b02e6be01a6bdb2d4d7a1d"
-        },
-        "GroundChargeCandidates": {
-          "before": "d34955a5c77ff1e1125b4ecd594e4d3552605b6ddbfeea04f10eb401f9bffbf0",
-          "after": "c07767047ecfb31ffede272cdb22cf3e90fb50b483f864cc432887d5f8c07cdd"
-        },
-        "_five_model_candidates": {
-          "before": "4dc1c388a96d45f16496c9b06af9a1963b27c5ec12c03e5abae8ac6867e7f8e4",
-          "after": "1bec38e01d88669a6468f67914d21a43dd7eb863bc6e1901e8cc34cb0068d1e6"
-        },
-        "_five_model_formations": {
-          "before": "55addaca1d85521b3ea6da6f8759de81d2dc2d56ec41d204ecaa84c70d6e96e0",
-          "after": null
-        },
-        "_group_endpoints": {
-          "before": "240d9d88f3c213d0d37e14ca82b6ece8040e57d19c89193cc032a3b07b2d599d",
-          "after": "6fe77f748a5f1ed2f3fa01281ff8107c43d4193120c7e2fd9cf5c5f43f893fdd"
-        },
-        "_group_grid_formations": {
-          "before": null,
-          "after": "0154296298f32dc70a3bacdcb5d00b824ec955a4e09b830602a2cc158b5d2b2b"
-        },
-        "_group_paths": {
-          "before": "1f4a8b09be3cc7e908b11262db83876e90bf1f6903af065ef56ec233912d412e",
-          "after": "30e6acd6ba85177ae7259d9f697a0e01d5f6fb0ba0206d4318bcb89155d66f72"
-        },
-        "generate_ground_charge_candidates": {
-          "before": "ff35d4046fa52ca0e1ad15ecffb9aa6ec692807dfb961af8a60ef8b019833795",
-          "after": "fdb08b77aa2e634f7c99c5211b15abc358e1299c86e947c1bf3d21640828f187"
-        }
-      }
-    },
-    "src/warhammer40k_core/ai/ground_charge_policy.py": {
-      "before_sha256": "aacc6a6ba17261eed94491d4705669177bcddfddc50306a0a7006f696fa931b9",
-      "after_sha256": "cd2658365f138f330da0214d15e1d4a842969167ccccdcf1aa23fa1c8f62b700",
-      "owners": {
-        "prepare_ground_charge_policy": {
-          "before": "ba9aaa81f7d64aaa2fb4ba09f495ecda56bfbfa7d4d6d69c5745fde7a551558d",
-          "after": "582d418706b959637ff9820fe746c55f48fd1145eb5fe90f5b9afc8bbeaf97a7"
-        }
-      }
-    },
-    "tests/code_quality/test_engine_numerical_identity_admission.py": {
-      "before_sha256": "c33b4baf55169d5d76331026b6795b033af2dee47b6cd553198eb719f8402c27",
-      "after_sha256": "b45832202a6a55c90c5f2891b303fe5d53c8b1ce74f42ce2c0490db6d4935a8d",
-      "owners": {
-        "test_identity_inventory_uses_current_twelve_shards_and_native_cohort": {
-          "before": "9e8cda2abe79a0404d41c77c42f0abda4298ac15a0b2fb7c0f1dee2130247033",
-          "after": "ebbcdf0e958d48586e20f1eae20fd0df0e8fa2265ed4e68b68c5299a7f3a925a"
-        }
-      }
-    },
-    "tests/infrastructure/adapters/test_ground_charge_engagement_retry.py": {
-      "before_sha256": null,
-      "after_sha256": "01662eab39413fd6201809356f66e9beb4d33674f4509f76d5eed69cd484bae2",
-      "owners": {
-        "@module": {
-          "before": null,
-          "after": "159454acdf352c07c6ebb60c17eb4493c424ee54c3cdaff7bf234611930bb154"
-        },
-        "_context": {
-          "before": null,
-          "after": "b512cc70fe8da33187ddad58812c076f1c71040f5c133b37826156cd5853d61a"
-        },
-        "_session": {
-          "before": null,
-          "after": "0b84bdec66527df173461c4fb529123a8fc5e050364c3bb6b4d9a563d7c15af7"
-        },
-        "test_rejected_rigid_charge_respects_remaining_budget": {
-          "before": null,
-          "after": "a8016f4bd092c1fa1d22ad238afcb202da58c5553dd7269ce84da0417956abc9"
-        },
-        "test_rejected_rigid_charge_retries_and_commits_deterministically": {
-          "before": null,
-          "after": "38de23c887d2431e4729d4b18f04d2ba9ba67861fb4679160ebd6ebc73bcf504"
-        },
-        "test_successful_eligible_rigid_charge_does_not_run_engagement_grid": {
-          "before": null,
-          "after": "851ccce23c8e8ce9941d991f904baea2fcc14662b19c7271ca4a02d1c65e9468"
+          "after": "38145c934a7f8379b62e2d6d5ec7f51ec95a12dd20ffc786258606b5a22ad905"
         }
       }
     }
   },
   "rows": {
-    "ci/test_shards/durations.json": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerates twelve assignments with only four new observed weights and all retained weights unchanged.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "ci/test_shards/shard-1.txt": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerates twelve assignments with only four new observed weights and all retained weights unchanged.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "ci/test_shards/shard-10.txt": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerates twelve assignments with only four new observed weights and all retained weights unchanged.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "ci/test_shards/shard-11.txt": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerates twelve assignments with only four new observed weights and all retained weights unchanged.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "ci/test_shards/shard-12.txt": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerates twelve assignments with only four new observed weights and all retained weights unchanged.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "ci/test_shards/shard-4.txt": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerates twelve assignments with only four new observed weights and all retained weights unchanged.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "ci/test_shards/shard-5.txt": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerates twelve assignments with only four new observed weights and all retained weights unchanged.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "ci/test_shards/shard-6.txt": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerates twelve assignments with only four new observed weights and all retained weights unchanged.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "ci/test_shards/shard-7.txt": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerates twelve assignments with only four new observed weights and all retained weights unchanged.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "ci/test_shards/shard-8.txt": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerates twelve assignments with only four new observed weights and all retained weights unchanged.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "ci/test_shards/shard-9.txt": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerates twelve assignments with only four new observed weights and all retained weights unchanged.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "contracts/examples/persistence/session-persistence.json": {
-      "category": "measured_workload",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerates identity-bound artifacts mechanically; the ordinary native decision schema is unchanged.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "contracts/examples/sessions/session-command-outcome.json": {
-      "category": "measured_workload",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerates identity-bound artifacts mechanically; the ordinary native decision schema is unchanged.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "contracts/examples/sessions/session-command-started.json": {
-      "category": "measured_workload",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerates identity-bound artifacts mechanically; the ordinary native decision schema is unchanged.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "contracts/examples/sessions/session-metadata-created.json": {
-      "category": "measured_workload",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerates identity-bound artifacts mechanically; the ordinary native decision schema is unchanged.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "contracts/examples/support-profile-player-a-redacted.json": {
-      "category": "measured_workload",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerates identity-bound artifacts mechanically; the ordinary native decision schema is unchanged.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "contracts/examples/support-profile-player-b-redacted.json": {
-      "category": "measured_workload",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerates identity-bound artifacts mechanically; the ordinary native decision schema is unchanged.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "contracts/examples/support-profile.json": {
-      "category": "measured_workload",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerates identity-bound artifacts mechanically; the ordinary native decision schema is unchanged.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "contracts/manifest.json": {
-      "category": "measured_workload",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerates identity-bound artifacts mechanically; the ordinary native decision schema is unchanged.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "data/source_audits/ci64_provenance_v1/combined-charge-admission-v1.json": {
-      "category": "measured_workload",
-      "operations": [
-        "engine-numerical-identity-admission"
-      ],
-      "selected_families": [],
-      "rationale": "Binds both original source receipts and their combined runtime to the exact landed Fool's Flight squash.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "data/source_audits/ci64_provenance_v1/stage2-ground-charge-retry-test-v1.json": {
-      "category": "measured_workload",
-      "operations": [
-        "engine-numerical-identity-admission"
-      ],
-      "selected_families": [],
-      "rationale": "Admits only four explicit native cases through the older independently hash-checked lineage.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "docs/AI_POLICY_INTERFACE.md": {
+    "docs/AI_IMPLEMENTATION_PLAN.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Binds the exact Stage 2 candidate or its finite local validation inputs.",
+      "rationale": "Documents the exact-build B3 preservation comparison and its scope.",
       "source_obligation": null,
       "unchanged_work": null
     },
-    "docs/performance/policy-v3/operation-map.json": {
+    "docs/stage2/b3-objective-preservation-receipt.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Maps only the newly added retry regression module and its separately pinned source successor.",
+      "rationale": "Pins one historical fork, fresh proposal, native results and external proof digests.",
       "source_obligation": null,
       "unchanged_work": null
     },
-    "scripts/engine_numerical_identity_test_admission.py": {
+    "scripts/verify_stage2_b3_post_roll_receipts.py": {
       "category": "measured_workload",
       "operations": [
-        "blood-begets-skulls-test-admission",
-        "bounded-charge-flight-wall-proof",
-        "cavalcade-authority-admission",
-        "close-quarters-test-admission",
-        "engine-numerical-identity-admission",
-        "gore-hungry-onslaught-predecessor-admission",
-        "phase-end-healing-test-admission",
-        "pre-roll-charge-flight-test-admission",
-        "round4-battle-shock-event-wounds",
-        "round4-malice-bearer-liveness",
-        "sheathed-in-brass-test-admission",
-        "skulls-beget-blood-test-admission",
-        "stage2-strict-replay-test-admission",
-        "stage3-flight-normal-move-test-admission",
-        "stage3-ordinary-melee-test-admission",
-        "wrath-undeniable-test-admission"
+        "stage2-b3-post-roll-receipt-verifier"
       ],
       "selected_families": [],
-      "rationale": "Admits only four explicit native cases through the older independently hash-checked lineage.",
+      "rationale": "Extends the existing read-only operator verifier without loading gameplay.",
       "source_obligation": null,
       "unchanged_work": null
     },
-    "scripts/stage2_ground_charge_test_admission.py": {
+    "scripts/tests/test_verify_stage2_b3_post_roll_receipts.py": {
       "category": "measured_workload",
       "operations": [
-        "engine-numerical-identity-admission"
+        "stage2-b3-post-roll-receipt-verifier"
       ],
       "selected_families": [],
-      "rationale": "Admits only four explicit native cases through the older independently hash-checked lineage.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "src/warhammer40k_core/_engine_build_manifest.json": {
-      "category": "measured_workload",
-      "operations": [
-        "cavalcade-authority-admission",
-        "phase-end-healing-source-and-report"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerates identity-bound artifacts mechanically; the ordinary native decision schema is unchanged.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "src/warhammer40k_core/ai/ground_charge_candidates.py": {
-      "category": "algorithm_or_search",
-      "operations": [
-        "stage2-ground-charge-policy"
-      ],
-      "selected_families": [],
-      "rationale": "Defers a bounded actor-only formation search until needed and preserves the ordinary grid, legal rigid proposal, native validator and ranking; exact-base paired native operator controls cover accept, rejected recovery and finite work/probe exhaustion.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "src/warhammer40k_core/ai/ground_charge_policy.py": {
-      "category": "algorithm_or_search",
-      "operations": [
-        "stage2-ground-charge-policy"
-      ],
-      "selected_families": [],
-      "rationale": "Defers a bounded actor-only formation search until needed and preserves the ordinary grid, legal rigid proposal, native validator and ranking; exact-base paired native operator controls cover accept, rejected recovery and finite work/probe exhaustion.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "tests/code_quality/test_engine_numerical_identity_admission.py": {
-      "category": "measured_workload",
-      "operations": [
-        "bounded-charge-flight-wall-proof",
-        "engine-numerical-identity-admission",
-        "pre-roll-charge-flight-test-admission",
-        "round4-battle-shock-event-wounds",
-        "round4-malice-bearer-liveness",
-        "skulls-beget-blood-test-admission",
-        "stage3-flight-normal-move-test-admission",
-        "stage3-ordinary-melee-test-admission",
-        "wrath-undeniable-test-admission"
-      ],
-      "selected_families": [],
-      "rationale": "Binds the exact Stage 2 candidate or its finite local validation inputs.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "tests/infrastructure/adapters/test_ground_charge_engagement_retry.py": {
-      "category": "measured_workload",
-      "operations": [
-        "stage2-ground-charge-policy"
-      ],
-      "selected_families": [],
-      "rationale": "Runs real native operator cases for deterministic recovery, accepted rigid work and both retry limits.",
+      "rationale": "Checks fail-closed CLI behavior in both receipt modes.",
       "source_obligation": null,
       "unchanged_work": null
     }

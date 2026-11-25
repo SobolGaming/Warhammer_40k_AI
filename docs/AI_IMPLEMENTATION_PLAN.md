@@ -1240,6 +1240,52 @@ post-roll choice and declared continuation. It does not choose a live action,
 make the authored path available as a policy, admit training labels, or
 complete the Stage 2 exit.
 
+### B3 objective preservation: the separate natural 5 + 5 fork
+
+The [preservation receipt](stage2/b3-objective-preservation-receipt.json)
+records an exact-build rerun on the landed #749 commit. This is not a repeat
+of the positive 6 + 5 case above. At B's `decision-request-000061` the fork
+matches the frozen checkpoint and both player projections byte for byte:
+60 decisions, 624 events, and two natural draws for a 10-inch budget. B004
+contributes 2 OC to Expansion Objective 2 before the choice.
+
+The landed generator produced four raw paths with 8,039 geometry work units.
+The first rigid path received a native endpoint rejection; the mixed retry
+passed and landed through the ordinary viewer route. Two other raw paths
+were not probed; no probe timed out. The accepted generated path was not the
+historical authored `east-245` reference. The decline arm selects the other
+issued finite option and submits no Charge Move.
+
+A declines the issued Heroic Intervention in both arms. Where Fight is
+issued, each side takes its sole activation and keeps Fight movement
+stationary. Both arms stop at the first A4 Movement unit-selection request,
+after native B3 turn-end scoring and before any A4 action.
+
+| Finite continuation | A / B VP | Decisions / events / draws | Expansion Objective 2 |
+| --- | ---: | ---: | --- |
+| Take targets, newly generated landed Charge | 0 / 0 | 69 / 747 / 2 | Uncontrolled |
+| Decline targets | 0 / 3 | 62 / 685 / 2 | B004, 2 OC |
+
+Declining preserves the same `unstoppable-force-new-objective-turn-end`
+award observed on the reviewed build. Both arms pass strict JSON round-trip
+and independent ordinary replay, with exact RNG, native decisions/events, and
+both player views and visible event streams at the seal. Candidate and
+endpoint identities match the earlier reviewed observations; the timing
+samples are from this rerun, not a throughput or speedup claim.
+
+Verify the pinned external archive without executing gameplay:
+
+```sh
+uv run --no-sync python -B -m scripts.verify_stage2_b3_post_roll_receipts \
+  --preservation --receipts <exact-merged-native-archive>
+```
+
+The receipt separately identifies the reviewed historical authored witness,
+the generated proposal, and the native replay outputs. It qualifies only
+this frozen fork and response, not the general value of declining a Charge,
+a held-out opponent, timing or E cooperation, useful candidate coverage, a
+production ranking choice, or training eligibility. Stage 2 remains open.
+
 ### Landed B2 charge and A3 action availability
 
 The sealed #735 B2 offer at `decision-request-000047` restored from the same
