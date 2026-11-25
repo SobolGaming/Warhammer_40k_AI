@@ -3,7 +3,7 @@
   "base": "f69eda2040ab55db4dd18686eee69edafcca9dd2",
   "retained_transition_sha256": "fd5511973dabe4068f618dec2f1f1419cb79f99629e831b9b14a810ab3cb110e",
   "retained_runtime_fingerprint": "3e65aaeb280065edad60fe80cf210522a93ad41ea8318c6bfc34e0e7f2614533",
-  "runtime_fingerprint": "1610294a6227b0fed4e77ec9ec457dfa9c4c044d520c3af56650b0eaf4410081",
+  "runtime_fingerprint": "848a6630549d8b8b208bf69544a707e42dd466760f779838d020e0e1e392d8de",
   "replaced_sources": {
     "src/warhammer40k_core/engine/charge_preselection_stratagems.py": {
       "before": "369694145ac6b28019b4fd75fe90a6a482e63f66e06a4a710743e8f7b2b12083",
@@ -11,19 +11,36 @@
     },
     "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/detachments/blood_legion/stratagems.py": {
       "before": "99648d47e8246c424163b67df7fdf2114361f786115e3ce9d21161ab2830299e",
-      "after": "3241df18adccc6b93f6ea24ca0222969e5cb93741e65f9b26fc2fd980a842bf0"
+      "after": "8324867d91876c18a8ae045047ccdf8b566231dfe0f34814900368be240bf86e"
+    },
+    "src/warhammer40k_core/engine/stratagems_eligibility.py": {
+      "before": "69bdde9f8674ace9e7925d5294b93b837d9bce6f7114e59f738eaec47d805a6f",
+      "after": "8ca0274919eebd381513f9e99ca938935ec27cbd2d5b69dfc364deadfbde0ef1"
+    },
+    "src/warhammer40k_core/engine/stratagems_model.py": {
+      "before": "7175d33102066ad7f8bc73302f8f5168b1313036e82d13b9809420e217a079a2",
+      "after": "0dc01ad2f92bb9cd432148b1b6b2f80911c23410190467f32e53984c63a3d720"
     },
     "src/warhammer40k_core/engine/stratagems_requests.py": {
       "before": "78c9f03e89a86f38b13adaea1957045867a34d04715acaae0f7ea03f15c034a1",
-      "after": "21e0c8ec7787254bbaf7d313256649a60f33ee9661cf87f3259be4a26dad3e43"
+      "after": "1668494246f32053da518ae4ace8ef91ecfcde91fe1c9cc45d1596f94e76786f"
+    },
+    "src/warhammer40k_core/engine/stratagems_targeting.py": {
+      "before": "d8d0f553f5e422f6f154c8ea6b50250627340ad0e523e61fa29fc8a880f3d6e9",
+      "after": "9ae5111ebc94967bfebc7d91533d7b62b02d5cce1dd2b032e32422b37ff16dac"
     },
     "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_blood_legion_ir_support_2026_27.py": {
       "before": "5a5d47a3757bba5a52913de00b5ff6d153b532588747dd1a5f5fd86c79f3fed6",
-      "after": "43659fff6c185c4f5f26769b380d16a92358bdde61aadabf0784bd21c0f88e74"
+      "after": "6817fc9a9716554cb33e844229512dedaa446cdf12d0b5764cdc64c6c28a622a"
     }
   },
   "new_sources": {
-    "src/warhammer40k_core/engine/phases/movement_handler.py": "3fc69ae23d5c44146ba7a998e7fb41c72e9ae13cbd5d5ba5deb07a304045507f"
+    "src/warhammer40k_core/engine/charge_roll_flow.py": "e076961474a43f0a9671cb9cf6b4c17f9740e3a98abc6b096cb0dd9966019cd3",
+    "src/warhammer40k_core/engine/movement_legality.py": "72c9c043c19d69a2d4c1eb04c4346f799b969f2d6b23b9f01e3b71f8cb36680f",
+    "src/warhammer40k_core/engine/phases/movement_action_decisions.py": "a079b5db1c0cfcd4a23d157c798077497c6aa5ae46d4818bee8a147b1067d30e",
+    "src/warhammer40k_core/engine/phases/movement_handler.py": "c296ad504119bc5f3cfd8b8df97ef57921e87f0aa1aab44cc4a6e8311155c3c5",
+    "src/warhammer40k_core/engine/phases/movement_start_actions.py": "10c57a33998807e1db423f4914da2acdad85bbce29694ca2c499b43b5d56480b",
+    "src/warhammer40k_core/engine/unit_rule_effects.py": "ea5bb3a894a58e4335277526b557755a6ae26e6192b01682e238e0eeb82cfb2d"
   },
   "updated_files": {
     "tests/infrastructure/source_governance/unit/test_blocked_row_classification.py": {
@@ -35,8 +52,8 @@
       },
       "after": {
         "mode": "100644",
-        "blob_sha1": "58a57b98cea6776433b9cef99b1747929a521c85",
-        "sha256": "901336e2a44f83246b108dd0903f06f84bb0ffaf588eb0ed95080c2dcaada145",
+        "blob_sha1": "95040c7d69d11bca887cd450521a040d62110f39",
+        "sha256": "aba698741823c0a06af773ccf06d48a16cd0f7a37c6aed8b56a9f0e8cbd0a22d",
         "bytes": 11209
       }
     },
@@ -49,9 +66,9 @@
       },
       "after": {
         "mode": "100644",
-        "blob_sha1": "1b978113cb9e2f683eb7f2f6e51bf2ae3ca94e89",
-        "sha256": "5b52f6c73a1652086a1bf63947a57726c29a095a28c14bb0949f095450ecd00d",
-        "bytes": 13932
+        "blob_sha1": "c54d326f54612770883fac242b683b820b2d8a0a",
+        "sha256": "2e40f57baf32b92e3361b6bd0e50bc11ef12dbcf253abc3fc78e2b2e9fa773ce",
+        "bytes": 14150
       }
     },
     "tests/factions/chaos_daemons/integration/test_skulls_beget_blood.py": {
@@ -63,18 +80,28 @@
       },
       "after": {
         "mode": "100644",
-        "blob_sha1": "2ac8d06bbbda606eaecc3f68b7dd38f79f6f2647",
-        "sha256": "c93228606f0f51e5aeaea0d7dc9c9ba6b4eb07b6961d99611e1f8b8ffc749b24",
-        "bytes": 21701
+        "blob_sha1": "3e055bb1d0c1c53095ceff8277d8311484dd754c",
+        "sha256": "0a887fe28de5be226a37272b9176a445ae2cf467615f6d28636391812aa862ca",
+        "bytes": 21764
       }
     }
   },
   "added_files": {
     "tests/factions/chaos_daemons/integration/test_gore_hungry_onslaught.py": {
       "mode": "100644",
-      "blob_sha1": "02ec20e0f09474ef1de0970c7fb2eac4874faaa1",
-      "sha256": "3fc91f2a6b9c0306f906d1bf48fabd8268c7c290ab395433108d6199085e2b9b",
-      "bytes": 12395
+      "blob_sha1": "cd005b54bc3f04a205ed470567ce2451b9364cca",
+      "sha256": "f862fc166ae361098520c13cbf3e30ced40bbc36df7f61ecc36b78b117e0b0d0",
+      "bytes": 24207
+    }
+  },
+  "historical_sources": {
+    "src/warhammer40k_core/engine/phases/movement_resolution_flow.py": {
+      "before": "43bf2656044fc8bc4049fe5ac6076857047eb1a45bde474afe0cc860c1e1775c",
+      "after": "2e71792a4984f45cda1e09d25edd7e20a4522c25428daf25098549f8697671a9"
+    },
+    "src/warhammer40k_core/geometry/pathing.py": {
+      "before": "f3cc92cb86a600c899000fb8d5d46b920c58ea32045137c155764822886823fd",
+      "after": "ad1b9fd84a47b80664b3d33a5a1c6876d5c783ff0b88372b428f7619376fcd90"
     }
   }
 }

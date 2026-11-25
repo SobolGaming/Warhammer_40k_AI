@@ -407,7 +407,8 @@ def test_skulls_beget_blood_allows_advance_but_excludes_fall_back(
     )
     assert decline_movement_stratagem(request).decision_type == "select_movement_unit"
     require_request(_submit(battle.session, MOUNTED), "select_movement_action")
-    advance = require_request(_submit(battle.session, "advance"), "submit_movement_proposal")
+    advance = decline_movement_stratagem(require_request(_submit(battle.session, "advance")))
+    assert advance.decision_type == "submit_movement_proposal"
     after_move = require_request(submit_translation(battle, advance, MOUNTED, 0.5))
     assert decline_movement_stratagem(after_move).decision_type == "select_movement_unit"
     require_request(_submit(battle.session, WRONG_KEYWORD), "select_movement_action")

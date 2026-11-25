@@ -178,6 +178,18 @@ class MovementPhaseHandler:
         _ensure_transport_cargo_phase_states(state)
         active_selection = movement_state.active_selection
         if active_selection is not None:
+            from warhammer40k_core.engine.phases.movement_resolution_flow import (
+                resume_advance_move_after_stratagem,
+            )
+
+            advance_status = resume_advance_move_after_stratagem(
+                state=state,
+                decisions=decisions,
+                selection=active_selection,
+                stratagem_index=self.stratagem_index,
+            )
+            if advance_status is not None:
+                return advance_status
             from warhammer40k_core.engine.desperate_escape_mortal_wounds import (
                 pending_escape_movement,
             )
@@ -641,6 +653,7 @@ class MovementPhaseHandler:
                 ruleset_descriptor=_ruleset_descriptor_for_handler(self),
                 reaction_queue=reaction_queue,
                 stratagem_index=self.stratagem_index,
+                cost_modifiers=self.stratagem_cost_modifier_registry,
             )
         if result.decision_type == SELECT_DESPERATE_ESCAPE_MODEL_DECISION_TYPE:
             return _apply_desperate_escape_model_selection_decision(

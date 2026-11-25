@@ -7,6 +7,7 @@ from warhammer40k_core.engine.target_restriction_hooks import ShootingTargetRest
 from warhammer40k_core.engine.rules_units import (
     placed_alive_rules_unit_views,
     rules_unit_view_by_id,
+    rules_unit_views_for_state,
     rules_unit_views_from_armies,
 )
 
@@ -36,6 +37,7 @@ from warhammer40k_core.engine.stratagems_generic_metadata import (
     visible_enemy_requires_unengaged,
 )
 from warhammer40k_core.engine.stratagems_model import *
+from warhammer40k_core.engine.stratagems_model import CANONICAL_FRIENDLY_RULES_UNIT_TARGET_POLICY_ID
 from warhammer40k_core.engine.stratagems_requests import *
 from warhammer40k_core.engine.stratagems_apply import *
 from warhammer40k_core.engine.stratagems_selection import *
@@ -1245,6 +1247,12 @@ def _enumerated_target_bindings(
             (view.owner_player_id, view.unit_instance_id)
             for view in placed_alive_rules_unit_views(state=state)
             if view.owner_player_id == player_id
+        )
+    elif target_spec.target_policy_id == CANONICAL_FRIENDLY_RULES_UNIT_TARGET_POLICY_ID:
+        unit_candidates = (
+            (view.owner_player_id, view.unit_instance_id)
+            for view in rules_unit_views_for_state(state=state)
+            if view.owner_player_id == player_id and view.alive_models()
         )
     else:
         unit_candidates = (

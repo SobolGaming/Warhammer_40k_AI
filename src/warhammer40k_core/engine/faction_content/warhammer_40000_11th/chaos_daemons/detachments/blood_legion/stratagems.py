@@ -20,6 +20,8 @@ from warhammer40k_core.engine.stratagems_generic_metadata import (
     TARGET_FORBIDDEN_IF_FELL_BACK_THIS_TURN_KEY,
     VISIBLE_ENEMY_REQUIRES_UNENGAGED_KEY,
 )
+from warhammer40k_core.engine.stratagems_model import CANONICAL_FRIENDLY_RULES_UNIT_TARGET_POLICY_ID
+from warhammer40k_core.engine.stratagems_requests import POST_ROLL_MOVEMENT_OPPORTUNITY_KEY
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_blood_legion_ir_support_2026_27 as blood_legion_ir,
@@ -70,10 +72,17 @@ def _gore_hungry_onslaught_records() -> tuple[StratagemCatalogRecord, ...]:
                 ),
                 target_spec=replace(
                     record.definition.target_spec,
+                    target_policy_id=CANONICAL_FRIENDLY_RULES_UNIT_TARGET_POLICY_ID,
                     required_keywords=(blood_legion_ir.KHORNE_KEYWORD,),
                     required_faction_keywords=(blood_legion_ir.LEGIONES_DAEMONICA_KEYWORD,),
                 ),
-                effect_payload=validate_json_value({"rule_ir": rule_ir, "requires_own_turn": True}),
+                effect_payload=validate_json_value(
+                    {
+                        "rule_ir": rule_ir,
+                        "requires_own_turn": True,
+                        POST_ROLL_MOVEMENT_OPPORTUNITY_KEY: True,
+                    }
+                ),
             ),
         )
         for record in records

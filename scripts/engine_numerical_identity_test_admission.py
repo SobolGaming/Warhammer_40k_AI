@@ -709,7 +709,7 @@ WRATH_UNDENIABLE_OWNER = "tests/factions/chaos_daemons/integration/test_wrath_un
 GORE_HUNGRY_ONSLAUGHT_TRANSITION = (
     "data/source_audits/ci64_provenance_v1/gore-hungry-onslaught-transition-v1.json"
 )
-GORE_HUNGRY_ONSLAUGHT_SHA256 = "38163938a156c0553c9b694e5a47039858ddd72ece483785044e46c48bf726f6"
+GORE_HUNGRY_ONSLAUGHT_SHA256 = "687ae65658d837db07333ea5cd4264d215e89b417ebf4ad56a59027a659db92b"
 GORE_HUNGRY_ONSLAUGHT_OWNER = (
     "tests/factions/chaos_daemons/integration/test_gore_hungry_onslaught.py"
 )
@@ -717,12 +717,28 @@ GORE_HUNGRY_ONSLAUGHT_REPLACED_SOURCES = {
     "src/warhammer40k_core/engine/charge_preselection_stratagems.py",
     "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/"
     "chaos_daemons/detachments/blood_legion/stratagems.py",
+    "src/warhammer40k_core/engine/stratagems_eligibility.py",
+    "src/warhammer40k_core/engine/stratagems_model.py",
     "src/warhammer40k_core/engine/stratagems_requests.py",
+    "src/warhammer40k_core/engine/stratagems_targeting.py",
     "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/"
     "faction_blood_legion_ir_support_2026_27.py",
 }
 GORE_HUNGRY_ONSLAUGHT_NEW_SOURCES = {
+    "src/warhammer40k_core/engine/charge_roll_flow.py",
+    "src/warhammer40k_core/engine/movement_legality.py",
+    "src/warhammer40k_core/engine/phases/movement_action_decisions.py",
     "src/warhammer40k_core/engine/phases/movement_handler.py",
+    "src/warhammer40k_core/engine/phases/movement_start_actions.py",
+    "src/warhammer40k_core/engine/unit_rule_effects.py",
+}
+_GORE_HUNGRY_ONSLAUGHT_BUDGET_SOURCE = (
+    "src/warhammer40k_core/engine/phases/movement_resolution_flow.py"
+)
+_GORE_HUNGRY_ONSLAUGHT_IDENTITY_SOURCE = "src/warhammer40k_core/geometry/pathing.py"
+GORE_HUNGRY_ONSLAUGHT_HISTORICAL_SOURCES = {
+    _GORE_HUNGRY_ONSLAUGHT_BUDGET_SOURCE,
+    _GORE_HUNGRY_ONSLAUGHT_IDENTITY_SOURCE,
 }
 
 
@@ -744,6 +760,7 @@ def _gore_hungry_onslaught_transition(root: Path) -> tuple[dict[str, object], by
             "runtime_fingerprint",
             "replaced_sources",
             "new_sources",
+            "historical_sources",
             "updated_files",
             "added_files",
         }
@@ -751,6 +768,7 @@ def _gore_hungry_onslaught_transition(root: Path) -> tuple[dict[str, object], by
         or record["base"] != "f69eda2040ab55db4dd18686eee69edafcca9dd2"
         or record["replaced_sources"].keys() != GORE_HUNGRY_ONSLAUGHT_REPLACED_SOURCES
         or record["new_sources"].keys() != GORE_HUNGRY_ONSLAUGHT_NEW_SOURCES
+        or record["historical_sources"].keys() != GORE_HUNGRY_ONSLAUGHT_HISTORICAL_SOURCES
         or record["added_files"].keys() != {GORE_HUNGRY_ONSLAUGHT_OWNER}
         or record["updated_files"].keys()
         != {BLOOD_BEGETS_SKULLS_OWNER, SKULLS_BEGET_BLOOD_OWNER, classifier}
@@ -759,6 +777,10 @@ def _gore_hungry_onslaught_transition(root: Path) -> tuple[dict[str, object], by
         )
     ):
         raise SystemExit("Gore-Hungry Onslaught test transition differs.")
+    for source, binding in record["historical_sources"].items():
+        if binding.keys() != {"before", "after"} or binding["before"] == binding["after"]:
+            raise SystemExit("Gore-Hungry Onslaught historical source binding differs: " + source)
+        _checked_bytes(root, source, binding["after"])
     return record, raw
 
 
@@ -1516,13 +1538,20 @@ def exact_movement_test_transition(
     test_successors: TestSuccessors = {}
     fight_successor = _stage2_fight_successor(root) if has_stage2_fight else None
     stage2_fight_tests = {} if fight_successor is None else fight_successor[1]
+    gore = _gore_hungry_onslaught_transition(root)
     if has_gameplay_budget:
         if not has_codec:
             raise SystemExit("Gameplay movement budget tests require the oval codec predecessor.")
+        budget_sources = {} if fight_reroll is None else dict(fight_reroll[3])
+        if gore is not None:
+            budget_source = _GORE_HUNGRY_ONSLAUGHT_BUDGET_SOURCE
+            if budget_source in budget_sources:
+                raise SystemExit("Gore-Hungry Onslaught duplicates a budget source successor.")
+            budget_sources[budget_source] = gore[0]["historical_sources"][budget_source]
         runtime, source_successors, test_successors, successor_raw = _gameplay_budget_successor(
             root,
             current_tests=stage2_fight_tests,
-            current_sources={} if fight_reroll is None else fight_reroll[3],
+            current_sources=budget_sources,
         )
         raw += b"\0" + successor_raw
     if fight_successor is not None:
@@ -1803,7 +1832,6 @@ def exact_movement_test_transition(
     brass = None
     stage3_flight = None
     charge_flight = None
-    gore = _gore_hungry_onslaught_transition(root)
     gore_additions: TestSuccessors = {}
     if rigid_charge is not None:
         if ground_charge is None:
@@ -1843,6 +1871,10 @@ def exact_movement_test_transition(
             raise SystemExit(
                 "Gore-Hungry Onslaught requires the exact pre-roll Charge flight predecessor."
             )
+        identity_source = _GORE_HUNGRY_ONSLAUGHT_IDENTITY_SOURCE
+        if identity_source in source_successors:
+            raise SystemExit("Gore-Hungry Onslaught duplicates an identity source successor.")
+        source_successors[identity_source] = record["historical_sources"][identity_source]
         gore_additions = _selection_members(record["added_files"], root)
         runtime = record["runtime_fingerprint"]
     retained = _identity_test_transition(

@@ -188,10 +188,16 @@ def movement_transit_through_terrain_features_allowed(
     owner_player_id: str,
     movement_mode: str,
     unit_keywords: tuple[str, ...],
+    nonlevel: bool = False,
 ) -> bool:
     requested_owner = _validate_identifier("owner_player_id", owner_player_id)
     requested_mode = _validate_identifier("movement_mode", movement_mode)
     keywords = _validate_keyword_tuple(unit_keywords)
+    permissions = (
+        {"move_through_terrain_features_on_any_path"}
+        if nonlevel
+        else {"move_horizontally_through_terrain_features", "move_through_terrain_features"}
+    )
     for effect in _validated_effects(effects):
         if effect.owner_player_id != requested_owner:
             continue
@@ -206,10 +212,8 @@ def movement_transit_through_terrain_features_allowed(
         if rule_effect.get("kind") != "movement_transit_permission":
             continue
         parameters = _parameter_mapping(rule_effect)
-        if parameters.get("permission") not in {
-            "move_horizontally_through_terrain_features",
-            "move_through_terrain_features",
-        }:
+        permission = parameters.get("permission")
+        if not isinstance(permission, str) or permission not in permissions:
             continue
         if requested_mode not in _string_sequence_parameter(parameters, "movement_modes"):
             continue

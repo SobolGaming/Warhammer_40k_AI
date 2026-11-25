@@ -137,6 +137,7 @@ def resume_move_start_action(
         selected_advance_move_grants=grants,
         reaction_queue=reaction_queue,
         stratagem_index=stratagem_index,
+        cost_modifiers=cost_modifiers,
         ability_index=_ability_index_for_player(
             ability_indexes_by_player_id, player_id=pending_action.player_id
         ),

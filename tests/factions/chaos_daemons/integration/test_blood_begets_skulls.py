@@ -159,9 +159,12 @@ def _reach_charge(battle: Scene, *, advance: tuple[str, ...]) -> DecisionRequest
         assert pending(battle.session).decision_type == "select_movement_unit"
         require_request(submit_option(battle.session, unit), "select_movement_action")
         if unit in advance:
-            proposal = require_request(
-                submit_option(battle.session, "advance"), "submit_movement_proposal"
-            )
+            proposal = require_request(submit_option(battle.session, "advance"))
+            if stratagem_targets(proposal, GORE_ID):
+                proposal = require_request(
+                    submit_option(battle.session, DECLINE_STRATAGEM_WINDOW_OPTION_ID)
+                )
+            assert proposal.decision_type == "submit_movement_proposal"
             require_request(submit_translation(battle, proposal, unit, 0.5))
             advanced = battle.state.advanced_unit_state_for_unit(
                 player_id="owner", battle_round=1, unit_instance_id=unit
@@ -275,7 +278,7 @@ def test_blood_begets_skulls_decline_then_offer_after_earlier_charge(
     )
     assert {option.option_id for option in charge.options} == {FIRST, "complete_charge_phase"}
     later = require_request(submit_option(battle.session, FIRST))
-    if later.decision_type == "use_stratagem" and not stratagem_targets(later):
+    while later.decision_type == "use_stratagem" and not stratagem_targets(later):
         later = require_request(submit_option(battle.session, DECLINE_STRATAGEM_WINDOW_OPTION_ID))
     if later.decision_type == "select_charge_targets":
         later = require_request(submit_option(battle.session, "decline_charge_targets"))

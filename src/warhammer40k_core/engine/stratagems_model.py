@@ -186,6 +186,7 @@ DESTROYED_TARGET_BY_JUST_SHOT_UNIT_TARGET_POLICY_ID = "destroyed_target_by_just_
 ENGAGED_WITH_FALL_BACK_UNIT_TARGET_POLICY_ID = "engaged_with_fall_back_unit"
 ENEMY_UNIT_TARGET_POLICY_ID = "enemy_unit"
 SELECTED_TARGET_UNIT_TARGET_POLICY_ID = "selected_target_unit"
+CANONICAL_FRIENDLY_RULES_UNIT_TARGET_POLICY_ID = "canonical_friendly_rules_unit"
 NOT_SELECTED_TO_CHARGE_TARGET_POLICY_ID = "not_selected_to_charge_unit"
 NOT_SELECTED_TO_SHOOT_TARGET_POLICY_ID = "not_selected_to_shoot_unit"
 NOT_SELECTED_TO_FIGHT_TARGET_POLICY_ID = "not_selected_to_fight_unit"

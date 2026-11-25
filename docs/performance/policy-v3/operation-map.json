@@ -37516,14 +37516,30 @@
     "gore-hungry-onslaught-phase-opportunities": {
       "paths": [
         "src/warhammer40k_core/engine/charge_preselection_stratagems.py",
+        "src/warhammer40k_core/engine/charge_roll_flow.py",
+        "src/warhammer40k_core/engine/phases/movement_action_decisions.py",
         "src/warhammer40k_core/engine/phases/movement_handler.py",
+        "src/warhammer40k_core/engine/phases/movement_resolution_flow.py",
+        "src/warhammer40k_core/engine/phases/movement_start_actions.py",
         "src/warhammer40k_core/engine/stratagems_requests.py"
       ],
       "owners": [
         "@module",
+        "MovementPhaseHandler.apply_decision",
         "MovementPhaseHandler.begin_phase",
+        "_apply_advance_action",
+        "_apply_advance_roll_reroll_decision",
+        "_apply_movement_action_decision",
+        "_apply_movement_start_action",
+        "_request_phase_stratagem_opportunity",
+        "_resolve_and_apply_advance_move",
+        "_resolve_charge_roll_state",
+        "continue_charge_roll",
+        "post_roll_movement_stratagem_records",
         "request_charge_preselection_stratagem",
-        "request_phase_preselection_stratagem"
+        "request_phase_preselection_stratagem",
+        "request_post_roll_movement_stratagem",
+        "resume_advance_move_after_stratagem"
       ],
       "families": [],
       "sensitive": false,
@@ -37532,13 +37548,32 @@
     "gore-hungry-onslaught-source-backed-terrain": {
       "paths": [
         "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/detachments/blood_legion/stratagems.py",
+        "src/warhammer40k_core/engine/movement_legality.py",
+        "src/warhammer40k_core/engine/stratagems_eligibility.py",
+        "src/warhammer40k_core/engine/stratagems_model.py",
+        "src/warhammer40k_core/engine/stratagems_targeting.py",
+        "src/warhammer40k_core/engine/unit_rule_effects.py",
+        "src/warhammer40k_core/geometry/pathing.py",
         "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_blood_legion_ir_support_2026_27.py"
       ],
       "owners": [
         "@module",
+        "MovementCapabilitySet.from_ruleset_descriptor",
+        "MovementLegalityContext.terrain_path_context",
+        "TerrainPathLegalityContext",
+        "TerrainPathLegalityContext.__post_init__",
+        "TerrainPathLegalityContext._traversal_mode_for_terrain",
+        "TerrainPathLegalityContext.from_payload",
+        "TerrainPathLegalityContext.to_payload",
+        "TerrainPathLegalityContext.validate",
+        "TerrainPathLegalityContextPayload",
         "_coverage_payloads",
+        "_enumerated_target_bindings",
         "_gore_hungry_onslaught_payload",
         "_gore_hungry_onslaught_records",
+        "_target_binding_error",
+        "_unit_effect_terrain_transit_permission",
+        "movement_transit_through_terrain_features_allowed",
         "runtime_contribution"
       ],
       "families": [],
@@ -37555,7 +37590,11 @@
       "owners": [
         "@module",
         "_advance_through_wall",
+        "_assert_attached_target",
         "_assert_onslaught",
+        "_assert_replay",
+        "_move_nonlevel",
+        "_nonlevel_witness",
         "_onslaught_option",
         "_onslaught_scene",
         "_reach_charge",

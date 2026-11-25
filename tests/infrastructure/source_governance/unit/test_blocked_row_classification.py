@@ -102,7 +102,7 @@ def test_phase17i_source_text_boundaries_are_explicit() -> None:
     ]
     assert onslaught.execution_status is Phase17FExecutionStatus.EXECUTABLE_GENERIC_IR
     assert onslaught.rule_ir_hash == (
-        "0f0131d5481225b84c993d88a0d28c53334b35877b2fef8ea59053335877a5ff"
+        "b7905db674b31fb7ab48f218106aadaa4ce3ca5af1e49027b06c4c4bfc891a22"
     )
 
 

@@ -720,7 +720,7 @@ def _gore_hungry_onslaught_payload() -> RuleIRPayload:
                         normalized_text,
                         "it can move through terrain features",
                         (
-                            _parameter("permission", "move_through_terrain_features"),
+                            _parameter("permission", "move_through_terrain_features_on_any_path"),
                             _parameter("terrain_features", True),
                             _parameter(
                                 "movement_modes", ("normal", "advance", "fall_back", "charge")

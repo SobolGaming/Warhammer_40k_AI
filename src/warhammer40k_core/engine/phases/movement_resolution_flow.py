@@ -1004,6 +1004,7 @@ def _apply_advance_roll_reroll_decision(
     ruleset_descriptor: RulesetDescriptor,
     reaction_queue: ReactionQueue | None,
     stratagem_index: StratagemCatalogIndex | None,
+    cost_modifiers: StratagemCostModifierRegistry,
 ) -> LifecycleStatus | None:
     _validate_movement_phase_state(state)
     active_player_id = _active_player_id(state)
@@ -1071,6 +1072,7 @@ def _apply_advance_roll_reroll_decision(
         selected_advance_move_grants=_advance_move_grants_from_context(context_payload),
         reaction_queue=reaction_queue,
         stratagem_index=stratagem_index,
+        cost_modifiers=cost_modifiers,
     )
 
 
@@ -1086,12 +1088,50 @@ def _resolve_and_apply_advance_move(
     selected_advance_move_grants: tuple[AdvanceMoveGrant, ...],
     reaction_queue: ReactionQueue | None = None,
     stratagem_index: StratagemCatalogIndex | None = None,
+    cost_modifiers: StratagemCostModifierRegistry | None = None,
 ) -> LifecycleStatus | None:
     _record_advance_roll_resolved_event(
         state=state,
         decisions=decisions,
         advance_roll=advance_roll,
     )
+    context: dict[str, JsonValue] = {
+        "advance_roll": validate_json_value(advance_roll.to_payload()),
+        "movement_mode": movement_mode.value,
+        "selected_movement_action_grant_hook_ids": [
+            grant.hook_id for grant in selected_advance_move_grants
+        ],
+        "selected_movement_action_grants": validate_json_value(
+            [grant.to_payload() for grant in selected_advance_move_grants]
+        ),
+    }
+    if stratagem_index is not None:
+        from warhammer40k_core.engine.stratagems_requests import (
+            request_post_roll_movement_stratagem,
+        )
+
+        status = request_post_roll_movement_stratagem(
+            state=state,
+            decisions=decisions,
+            stratagem_index=stratagem_index,
+            cost_modifiers=cost_modifiers,
+            phase=BattlePhase.MOVEMENT,
+            player_id=_active_player_id(state),
+            action_id=result.result_id,
+        )
+        if status is not None:
+            selection = _active_movement_selection(state)
+            decisions.event_log.append(
+                "advance_post_roll_proposal_deferred",
+                {
+                    "selection_id": selection.request_id,
+                    "unit_instance_id": unit_instance_id,
+                    "source_decision_request_id": result.request_id,
+                    "source_decision_result_id": result.result_id,
+                    "proposal_context": context,
+                },
+            )
+            return status
     return _request_movement_proposal(
         state=state,
         decisions=decisions,
@@ -1099,17 +1139,59 @@ def _resolve_and_apply_advance_move(
         unit_instance_id=unit_instance_id,
         action=MovementPhaseActionKind.ADVANCE,
         proposal_kind=ProposalKind.ADVANCE,
-        context={
-            "advance_roll": validate_json_value(advance_roll.to_payload()),
-            "movement_mode": movement_mode.value,
-            "selected_movement_action_grant_hook_ids": [
-                grant.hook_id for grant in selected_advance_move_grants
-            ],
-            "selected_movement_action_grants": validate_json_value(
-                [grant.to_payload() for grant in selected_advance_move_grants]
-            ),
-        },
+        context=context,
     )
+
+
+def resume_advance_move_after_stratagem(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    selection: MovementUnitSelection,
+    stratagem_index: StratagemCatalogIndex,
+) -> LifecycleStatus | None:
+    """Resume the native proposal from its original settled Advance, never a new roll."""
+    from warhammer40k_core.engine.stratagems_requests import post_roll_movement_stratagem_records
+
+    if not post_roll_movement_stratagem_records(stratagem_index, BattlePhase.MOVEMENT):
+        return None
+    for event in reversed(decisions.event_log.records):
+        if event.event_type in {"movement_unit_selected", "movement_proposal_requested"}:
+            return None
+        if event.event_type != "advance_post_roll_proposal_deferred":
+            continue
+        payload = _decision_payload_object(event.payload)
+        if payload.get("selection_id") != selection.request_id:
+            return None
+        unit_id = _payload_string(payload, key="unit_instance_id")
+        request_id = _payload_string(payload, key="source_decision_request_id")
+        result_id = _payload_string(payload, key="source_decision_result_id")
+        matches = tuple(
+            record.result
+            for record in decisions.records
+            if record.request.request_id == request_id and record.result.result_id == result_id
+        )
+        if len(matches) != 1 or unit_id != selection.unit_instance_id:
+            raise GameLifecycleError("Deferred Advance proposal lost its original action.")
+        (result,) = matches
+        action_payload = _decision_payload_object(result.payload)
+        if (
+            result.actor_id != selection.player_id
+            or result.decision_type != SELECT_MOVEMENT_ACTION_DECISION_TYPE
+            or action_payload.get("unit_instance_id") != unit_id
+            or action_payload.get("movement_phase_action") != MovementPhaseActionKind.ADVANCE.value
+        ):
+            raise GameLifecycleError("Deferred Advance proposal source action drifted.")
+        return _request_movement_proposal(
+            state=state,
+            decisions=decisions,
+            result=result,
+            unit_instance_id=unit_id,
+            action=MovementPhaseActionKind.ADVANCE,
+            proposal_kind=ProposalKind.ADVANCE,
+            context=_payload_json_object(payload, key="proposal_context"),
+        )
+    return None
 
 
 def _advance_move_grants_from_context(

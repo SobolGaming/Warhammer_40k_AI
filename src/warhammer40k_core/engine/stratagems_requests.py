@@ -255,6 +255,57 @@ def stratagem_window_decline_event_payload(
     )
 
 
+POST_ROLL_MOVEMENT_OPPORTUNITY_KEY = "post_roll_movement_opportunity"
+POST_ROLL_MOVEMENT_ACTION_KEY = "post_roll_movement_action_id"
+
+
+def post_roll_movement_stratagem_records(
+    index: StratagemCatalogIndex,
+    phase: BattlePhase,
+) -> tuple[StratagemCatalogRecord, ...]:
+    return tuple(
+        record
+        for record in index.records_for(TimingTriggerKind.DURING_PHASE)
+        if record.definition.timing.phase is phase
+        and isinstance(record.definition.effect_payload, dict)
+        and record.definition.effect_payload.get(POST_ROLL_MOVEMENT_OPPORTUNITY_KEY) is True
+    )
+
+
+def request_post_roll_movement_stratagem(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    stratagem_index: StratagemCatalogIndex,
+    cost_modifiers: StratagemCostModifierRegistry | None,
+    phase: BattlePhase,
+    player_id: str,
+    action_id: str,
+) -> LifecycleStatus | None:
+    records = post_roll_movement_stratagem_records(stratagem_index, phase)
+    if (
+        not records
+        or state.current_battle_phase is not phase
+        or state.active_player_id != player_id
+    ):
+        return None
+    context = StratagemEligibilityContext.from_state(
+        state=state,
+        player_id=player_id,
+        trigger_kind=TimingTriggerKind.DURING_PHASE,
+        timing_window_id=f"{phase.value}-post-roll:{action_id}",
+        trigger_payload={POST_ROLL_MOVEMENT_ACTION_KEY: action_id},
+    )
+    return _request_phase_stratagem_opportunity(
+        state=state,
+        decisions=decisions,
+        cost_modifiers=cost_modifiers,
+        context=context,
+        records=records,
+        status="post_roll",
+    )
+
+
 def request_phase_preselection_stratagem(
     *,
     state: GameState,
@@ -268,7 +319,26 @@ def request_phase_preselection_stratagem(
         for record in stratagem_index.records_for(TimingTriggerKind.DURING_PHASE)
         if record.definition.timing.phase is context.phase
     )
-    if not records:
+    return _request_phase_stratagem_opportunity(
+        state=state,
+        decisions=decisions,
+        cost_modifiers=cost_modifiers,
+        context=context,
+        records=records,
+        status="preselection",
+    )
+
+
+def _request_phase_stratagem_opportunity(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    cost_modifiers: StratagemCostModifierRegistry | None,
+    context: StratagemEligibilityContext,
+    records: tuple[StratagemCatalogRecord, ...],
+    status: str,
+) -> LifecycleStatus | None:
+    if not records or stratagem_window_declined_for_context(decisions=decisions, context=context):
         return None
     options = stratagem_use_options_from_index(
         state=state,
@@ -276,7 +346,7 @@ def request_phase_preselection_stratagem(
         context=context,
         stratagem_cost_modifier_registry=cost_modifiers,
     )
-    if not options or stratagem_window_declined_for_context(decisions=decisions, context=context):
+    if not options:
         return None
     request = create_stratagem_use_decision_request(
         state=state,
@@ -287,7 +357,7 @@ def request_phase_preselection_stratagem(
     return LifecycleStatus.waiting_for_decision(
         stage=state.stage,
         decision_request=request,
-        payload={"phase_body_status": f"{context.phase.value}_preselection_stratagem_pending"},
+        payload={"phase_body_status": f"{context.phase.value}_{status}_stratagem_pending"},
     )
 
 
