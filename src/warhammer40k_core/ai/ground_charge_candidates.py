@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 import math
-from collections.abc import Iterator
-from dataclasses import asdict, dataclass
+from collections.abc import Callable, Iterator
+from dataclasses import asdict, dataclass, field, replace
 from enum import StrEnum
+from functools import cache
 from itertools import pairwise, zip_longest
 from typing import Protocol, cast
 
@@ -49,6 +50,7 @@ _GRID_STEP_INCHES = 0.25
 _MAX_GRID_RADIUS = 24
 _MAX_OBSTACLES = 256
 _PREFERRED_GAP_INCHES = 1.0
+_ENGAGEMENT_GAP_INCHES = 2.0
 _MIN_TARGET_GAP_INCHES = 0.025
 _COHERENCY_GAP_INCHES = 2.0
 _ENDPOINT_TERRAIN_CLEARANCE_INCHES = 0.05
@@ -109,6 +111,9 @@ class GroundChargeCandidates:
     candidates: tuple[GroundChargeCandidate, ...]
     geometry_work: int
     stop: ChargeSearchStop
+    retry_engagement: Callable[[], GroundChargeCandidates] | None = field(
+        default=None, compare=False, repr=False
+    )
 
 
 @dataclass(frozen=True, slots=True)
@@ -473,14 +478,14 @@ def _objective_areas(mission_payload: JsonValue, work: _Work) -> tuple[Footprint
 
 
 def _group_endpoints(
-    model: _Placed, targets: tuple[_Placed, ...], budget: float, work: _Work
+    model: _Placed, targets: tuple[_Placed, ...], budget: float, work: _Work, max_gap: float
 ) -> Iterator[Pose]:
     step = _GROUP_GRID_STEP_INCHES
     start = model.pose.position
     offsets: set[tuple[int, int]] = set()
     for target in targets:
         center = target.pose.position
-        reach = target.base.max_radius() + model.base.max_radius() + _PREFERRED_GAP_INCHES
+        reach = target.base.max_radius() + model.base.max_radius() + max_gap
         for x in range(
             math.ceil(max(-budget, center.x - start.x - reach) / step),
             math.floor(min(budget, center.x - start.x + reach) / step) + 1,
@@ -518,17 +523,19 @@ def _group_paths(
     board: tuple[float, float],
     budget: float,
     work: _Work,
+    *,
+    max_gap: float = _PREFERRED_GAP_INCHES,
 ) -> tuple[_Path, ...]:
     width, depth = board
     local = _local_blockers(model, blockers, budget, work)
     start_gap = min(model.footprint.distance(target.footprint) for target in targets)
     options: list[_Path] = []
-    for end in _group_endpoints(model, targets, budget, work):
+    for end in _group_endpoints(model, targets, budget, work, max_gap):
         footprint = footprint_for_base(model.base, end)
         if not _within_board(footprint, width, depth):
             continue
         gap = min(footprint.distance(target.footprint) for target in targets)
-        if not _MIN_TARGET_GAP_INCHES <= gap <= _PREFERRED_GAP_INCHES or gap >= start_gap:
+        if not _MIN_TARGET_GAP_INCHES <= gap <= max_gap or gap >= start_gap:
             continue
         if _blocked(footprint, local, work):
             continue
@@ -664,7 +671,7 @@ def _rigid_group_formation(
         yield from _formations(banks, {}, work, group=True)
 
 
-def _five_model_formations(
+def _group_grid_formations(
     movers: tuple[_Placed, ...],
     targets: tuple[_Placed, ...],
     static: tuple[FootprintGeometry, ...],
@@ -672,18 +679,8 @@ def _five_model_formations(
     board: tuple[float, float],
     budget: float,
     work: _Work,
+    max_end_gap: float,
 ) -> Iterator[tuple[_Path, ...]]:
-    nearest = tuple(_nearest_target_envelope(model, targets, work) for model in movers)
-    # Allow the native reachability bound's numerical slack before pruning
-    # the grid, whose footprint distances use different floating-point operations.
-    grid_limit = budget + _PREFERRED_GAP_INCHES + 1e-8
-    if any(gap > grid_limit for gap, _ in nearest):
-        # The old grid cannot fill every bank. Try one coherency-preserving
-        # translation with the same work counter and no extra search.
-        yield from _rigid_group_formation(
-            movers, targets, nearest, static, objectives, board, budget, work
-        )
-        return
     banks = {
         index: _group_paths(
             model,
@@ -693,6 +690,7 @@ def _five_model_formations(
             board,
             budget,
             work,
+            max_gap=max_end_gap,
         )
         for index, model in enumerate(movers)
     }
@@ -742,21 +740,59 @@ def _five_model_candidates(
     work: _Work,
     raw_limit: int,
 ) -> GroundChargeCandidates:
-    candidates: list[GroundChargeCandidate] = []
-    stop = ChargeSearchStop.COMPLETE
-    try:
-        for formation in _five_model_formations(
-            movers, targets, static, objectives, board, budget, work
+    def collect(formations: Iterator[tuple[_Path, ...]], limit: int) -> GroundChargeCandidates:
+        candidates: list[GroundChargeCandidate] = []
+        stop = ChargeSearchStop.COMPLETE
+        try:
+            for formation in formations:
+                candidates.append(_candidate(context, issued, target_id, movers, formation))
+                if len(candidates) == limit:
+                    stop = ChargeSearchStop.RAW_LIMIT
+                    break
+        except GroundChargeExhaustedError:
+            stop = ChargeSearchStop.GEOMETRY_LIMIT
+        return GroundChargeCandidates(tuple(candidates), work.used, stop)
+
+    def grid(max_gap: float, limit: int) -> GroundChargeCandidates:
+        return collect(
+            _group_grid_formations(
+                movers, targets, static, objectives, board, budget, work, max_gap
+            ),
+            limit,
+        )
+
+    nearest = tuple(_nearest_target_envelope(model, targets, work) for model in movers)
+    # Keep numerical slack for the circumscribed-disk reachability bound.
+    max_start_gap = max(gap for gap, _ in nearest)
+    if max_start_gap <= budget + _PREFERRED_GAP_INCHES + 1e-8:
+        result = grid(_PREFERRED_GAP_INCHES, raw_limit)
+    else:
+        result = collect(
+            _rigid_group_formation(
+                movers, targets, nearest, static, objectives, board, budget, work
+            ),
+            raw_limit,
+        )
+        if (
+            result.stop is ChargeSearchStop.COMPLETE
+            and max_start_gap <= budget + _ENGAGEMENT_GAP_INCHES + 1e-8
         ):
-            candidates.append(_candidate(context, issued, target_id, movers, formation))
-            if len(candidates) == raw_limit:
-                stop = ChargeSearchStop.RAW_LIMIT
-                break
-    except GroundChargeExhaustedError:
-        stop = ChargeSearchStop.GEOMETRY_LIMIT
-    if not candidates:
-        raise GroundChargeExhaustedError(stop, ChargeSearchCounts(geometry_work=work.used))
-    return GroundChargeCandidates(tuple(candidates), work.used, stop)
+            remaining = raw_limit - len(result.candidates)
+
+            # Leave the retry deferred even at the geometry limit so the
+            # operator can resolve its earlier probe and deadline stops first.
+            @cache
+            def retry_engagement() -> GroundChargeCandidates:
+                if work.used == work.limit:
+                    return GroundChargeCandidates((), work.used, ChargeSearchStop.GEOMETRY_LIMIT)
+                return grid(_ENGAGEMENT_GAP_INCHES, remaining)
+
+            if result.candidates:
+                return replace(result, retry_engagement=retry_engagement)
+            result = retry_engagement()
+    if not result.candidates:
+        raise GroundChargeExhaustedError(result.stop, ChargeSearchCounts(geometry_work=work.used))
+    return result
 
 
 def _formation_stage(
@@ -786,7 +822,7 @@ def generate_ground_charge_candidates(
     raw_limit: int = MAX_RAW_CANDIDATES,
     geometry_limit: int = MAX_GEOMETRY_WORK,
 ) -> GroundChargeCandidates:
-    """Emit ordinary proposals. Geometric screens are only search heuristics."""
+    """Emit ordinary proposals and, when applicable, a deferred engagement retry."""
     _bounded_int(raw_limit, MAX_RAW_CANDIDATES)
     _bounded_int(geometry_limit, MAX_GEOMETRY_WORK)
     view = context.observation

@@ -1,1254 +1,606 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "740b558ab5542e4120fdc49d05bb6819d1b53698",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:b1ecd9a6bd751abd9bb732e2bb1d63edcf14839cde43183ae88133c789e368f1",
-  "operation_map_sha256": "6dbdae6c485a0889b7468bdfc4c73376131c77737a8115e05b4fcfc23355e626",
+  "base": "4d753ec652ee38b394260d3f539df7b04403149b",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:dc9eb5d3f570d34d71e26a1c6b8ef794b5723aa812f8de505066309805678d18",
+  "operation_map_sha256": "b58b3839a8b6c419fda1143d0883d97224cc7d2e4062eb28ccae3d677fc6cdd7",
   "changes": {
-    "FACTION_INTEGRATION.md": {
-      "before_sha256": "2bcebb67de687120cfb6de745e0da7edec7bd02f594c6854a12736fd68a80cfc",
-      "after_sha256": "f22e942016d06b617f8ef952e8bed96609d72ca013e722e7674f1bc5598570e2",
-      "owners": {
-        "@document": {
-          "before": "2bcebb67de687120cfb6de745e0da7edec7bd02f594c6854a12736fd68a80cfc",
-          "after": "f22e942016d06b617f8ef952e8bed96609d72ca013e722e7674f1bc5598570e2"
-        }
-      }
-    },
-    "ci/quality_shards/all.txt": {
-      "before_sha256": "efcca4fe167e3ee4bef7037cc4e71066ccd33654694a0d8ac22b77fcb5ca7970",
-      "after_sha256": "f7b6cb51753d8836fd5991e325c94b258e279bfa75a0c23da78e45d4cccb085d",
-      "owners": {
-        "@document": {
-          "before": "efcca4fe167e3ee4bef7037cc4e71066ccd33654694a0d8ac22b77fcb5ca7970",
-          "after": "f7b6cb51753d8836fd5991e325c94b258e279bfa75a0c23da78e45d4cccb085d"
-        }
-      }
-    },
-    "ci/quality_shards/shard-2.txt": {
-      "before_sha256": "2e5d6b5bf17db3b6ba9d6b204a128a9dd21e301aea344f34acb866c6d74a5ade",
-      "after_sha256": "b32739f0cca65db2999a729b07cb354e8b664b2e21188d99f505c4c2a95c8aaf",
-      "owners": {
-        "@document": {
-          "before": "2e5d6b5bf17db3b6ba9d6b204a128a9dd21e301aea344f34acb866c6d74a5ade",
-          "after": "b32739f0cca65db2999a729b07cb354e8b664b2e21188d99f505c4c2a95c8aaf"
-        }
-      }
-    },
     "ci/test_shards/durations.json": {
-      "before_sha256": "31202965f3706a3a387ee4454e5fb8ba52038bfa0f08b4ba63d353bf1bcd2563",
-      "after_sha256": "3bd92f1597516c5618f508bba535cc27894fc2895f83ed0fa488c0bb1f1110f7",
+      "before_sha256": "3bd92f1597516c5618f508bba535cc27894fc2895f83ed0fa488c0bb1f1110f7",
+      "after_sha256": "283bfd9f8c00bf088230151f8760a9cdee5510faaa93a48d932f3c3b720d74ac",
       "owners": {
         "@document": {
-          "before": "31202965f3706a3a387ee4454e5fb8ba52038bfa0f08b4ba63d353bf1bcd2563",
-          "after": "3bd92f1597516c5618f508bba535cc27894fc2895f83ed0fa488c0bb1f1110f7"
+          "before": "3bd92f1597516c5618f508bba535cc27894fc2895f83ed0fa488c0bb1f1110f7",
+          "after": "283bfd9f8c00bf088230151f8760a9cdee5510faaa93a48d932f3c3b720d74ac"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
-      "before_sha256": "8e2f28f719268fbd0db6dca88a9183586beaa218eefbccd3bc85d4b4eabbb1dd",
-      "after_sha256": "399c9a1cd741135ec1dc2e8c22e0feb866ee615c8b39947565241489c116c69d",
+      "before_sha256": "399c9a1cd741135ec1dc2e8c22e0feb866ee615c8b39947565241489c116c69d",
+      "after_sha256": "b01e9d2cd701f57df8919afa1915ee9da09372d77544efefe41f4239f77e4010",
       "owners": {
         "@document": {
-          "before": "8e2f28f719268fbd0db6dca88a9183586beaa218eefbccd3bc85d4b4eabbb1dd",
-          "after": "399c9a1cd741135ec1dc2e8c22e0feb866ee615c8b39947565241489c116c69d"
+          "before": "399c9a1cd741135ec1dc2e8c22e0feb866ee615c8b39947565241489c116c69d",
+          "after": "b01e9d2cd701f57df8919afa1915ee9da09372d77544efefe41f4239f77e4010"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
-      "before_sha256": "83d9999e448f2008dd666f7fa3a8f09a45671fa815945d466f23a45a1d3eff61",
-      "after_sha256": "4e5e0b7da12f4ae69cc18e15314594e6647dab0bde1768c3df68954f8a579710",
+      "before_sha256": "4e5e0b7da12f4ae69cc18e15314594e6647dab0bde1768c3df68954f8a579710",
+      "after_sha256": "694b108e6a1e9903500f8413a2b24a8c4181ef43d1aec31ff413938b35595c72",
       "owners": {
         "@document": {
-          "before": "83d9999e448f2008dd666f7fa3a8f09a45671fa815945d466f23a45a1d3eff61",
-          "after": "4e5e0b7da12f4ae69cc18e15314594e6647dab0bde1768c3df68954f8a579710"
+          "before": "4e5e0b7da12f4ae69cc18e15314594e6647dab0bde1768c3df68954f8a579710",
+          "after": "694b108e6a1e9903500f8413a2b24a8c4181ef43d1aec31ff413938b35595c72"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
-      "before_sha256": "653381b9267baaeb6ffb3acad3500bcb0f2e268c9c4f778b9f8729427df8bb92",
-      "after_sha256": "6bc0ace16faf503042487e770f40da1a887680b39fe0da1601f0c4d5c0a26c04",
+      "before_sha256": "6bc0ace16faf503042487e770f40da1a887680b39fe0da1601f0c4d5c0a26c04",
+      "after_sha256": "62950bee912a3dca87544bfd3178295661362e227c8a3f30f8a9b0039259b0cf",
       "owners": {
         "@document": {
-          "before": "653381b9267baaeb6ffb3acad3500bcb0f2e268c9c4f778b9f8729427df8bb92",
-          "after": "6bc0ace16faf503042487e770f40da1a887680b39fe0da1601f0c4d5c0a26c04"
+          "before": "6bc0ace16faf503042487e770f40da1a887680b39fe0da1601f0c4d5c0a26c04",
+          "after": "62950bee912a3dca87544bfd3178295661362e227c8a3f30f8a9b0039259b0cf"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
-      "before_sha256": "ce51b5d7a3a5b05c44ef5b43b1b9edfc5f84a685d6b4ee743b51651075906687",
-      "after_sha256": "8419d6b8313734c6a7e2511d18826260737fa31c4f1b210c899aef31f8ff2d88",
+      "before_sha256": "8419d6b8313734c6a7e2511d18826260737fa31c4f1b210c899aef31f8ff2d88",
+      "after_sha256": "734d8a0dc2d581aed9f2b28c520692ae75b3f2afe4a248291721639d3f7105a8",
       "owners": {
         "@document": {
-          "before": "ce51b5d7a3a5b05c44ef5b43b1b9edfc5f84a685d6b4ee743b51651075906687",
-          "after": "8419d6b8313734c6a7e2511d18826260737fa31c4f1b210c899aef31f8ff2d88"
+          "before": "8419d6b8313734c6a7e2511d18826260737fa31c4f1b210c899aef31f8ff2d88",
+          "after": "734d8a0dc2d581aed9f2b28c520692ae75b3f2afe4a248291721639d3f7105a8"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
-      "before_sha256": "3309b44963ab4e277c3c94978faf1cd39f706f62e805628aa2df7a166b302336",
-      "after_sha256": "cb66e86e991c505cc58147bc128236ac73d7b74408932bdfb93e2101f658afc7",
+      "before_sha256": "cb66e86e991c505cc58147bc128236ac73d7b74408932bdfb93e2101f658afc7",
+      "after_sha256": "35b0ef26de5a5f7b1755cae071bf07a7bbbdca194f735ce8deec7061f6421d14",
       "owners": {
         "@document": {
-          "before": "3309b44963ab4e277c3c94978faf1cd39f706f62e805628aa2df7a166b302336",
-          "after": "cb66e86e991c505cc58147bc128236ac73d7b74408932bdfb93e2101f658afc7"
+          "before": "cb66e86e991c505cc58147bc128236ac73d7b74408932bdfb93e2101f658afc7",
+          "after": "35b0ef26de5a5f7b1755cae071bf07a7bbbdca194f735ce8deec7061f6421d14"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
-      "before_sha256": "927d5d89df1c82b31b4bd09678fb8060b601b82cca99b36878007f351e73691f",
-      "after_sha256": "c6e0732b2973c1b34b7b8de1ec748316f4d34421a80c75526a9815232565de01",
+      "before_sha256": "c6e0732b2973c1b34b7b8de1ec748316f4d34421a80c75526a9815232565de01",
+      "after_sha256": "9e785bd8fa436000c7ece727e2cbd379567da7484eb76083004b313b004dd0ba",
       "owners": {
         "@document": {
-          "before": "927d5d89df1c82b31b4bd09678fb8060b601b82cca99b36878007f351e73691f",
-          "after": "c6e0732b2973c1b34b7b8de1ec748316f4d34421a80c75526a9815232565de01"
+          "before": "c6e0732b2973c1b34b7b8de1ec748316f4d34421a80c75526a9815232565de01",
+          "after": "9e785bd8fa436000c7ece727e2cbd379567da7484eb76083004b313b004dd0ba"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
-      "before_sha256": "3f248b012869cf2d7a12f86201362681e412017ffabc7c837bb453e653e2bd60",
-      "after_sha256": "54952ef5f97dcedebee80080f39f7f38234b4a3723d7fcc20657760aeac91e74",
+      "before_sha256": "54952ef5f97dcedebee80080f39f7f38234b4a3723d7fcc20657760aeac91e74",
+      "after_sha256": "31f103b6055187de7a402f5043a174d1d269144a23de56f2b06a60cacc7fe427",
       "owners": {
         "@document": {
-          "before": "3f248b012869cf2d7a12f86201362681e412017ffabc7c837bb453e653e2bd60",
-          "after": "54952ef5f97dcedebee80080f39f7f38234b4a3723d7fcc20657760aeac91e74"
+          "before": "54952ef5f97dcedebee80080f39f7f38234b4a3723d7fcc20657760aeac91e74",
+          "after": "31f103b6055187de7a402f5043a174d1d269144a23de56f2b06a60cacc7fe427"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
-      "before_sha256": "e32ecd1d45b8e235b926f5881d7db87c29aeb8d4780273912836d8e434219753",
-      "after_sha256": "1ae9260764225883a6c20304936ab7f406433a25e8de5422ab1f0d119326a805",
+      "before_sha256": "1ae9260764225883a6c20304936ab7f406433a25e8de5422ab1f0d119326a805",
+      "after_sha256": "91f260a08db40aa49061abb60fc1f8fdd68d19c6dae3e55cb7d7415cce3814c1",
       "owners": {
         "@document": {
-          "before": "e32ecd1d45b8e235b926f5881d7db87c29aeb8d4780273912836d8e434219753",
-          "after": "1ae9260764225883a6c20304936ab7f406433a25e8de5422ab1f0d119326a805"
+          "before": "1ae9260764225883a6c20304936ab7f406433a25e8de5422ab1f0d119326a805",
+          "after": "91f260a08db40aa49061abb60fc1f8fdd68d19c6dae3e55cb7d7415cce3814c1"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
-      "before_sha256": "0374d935537df1fa426b36515b1df6c4db5d7266f82565e56ba533c35466daea",
-      "after_sha256": "3583b95c6b72d35841bf6a7bb0ab13ddf4123fe4704f1e6671bbd8af70eb4d31",
+      "before_sha256": "3583b95c6b72d35841bf6a7bb0ab13ddf4123fe4704f1e6671bbd8af70eb4d31",
+      "after_sha256": "1beb1fb3b0a533b245a110a15b93162bd73a701131be2abf6e0a65bc8da13138",
       "owners": {
         "@document": {
-          "before": "0374d935537df1fa426b36515b1df6c4db5d7266f82565e56ba533c35466daea",
-          "after": "3583b95c6b72d35841bf6a7bb0ab13ddf4123fe4704f1e6671bbd8af70eb4d31"
+          "before": "3583b95c6b72d35841bf6a7bb0ab13ddf4123fe4704f1e6671bbd8af70eb4d31",
+          "after": "1beb1fb3b0a533b245a110a15b93162bd73a701131be2abf6e0a65bc8da13138"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
-      "before_sha256": "4e4fdf811a78da88903a0a3d92a7021a825fc63afdd1ac1b41f2e8a1f79e3062",
-      "after_sha256": "669cebd4fc07aef621e8c7d351775fb07240c69d7ad6c22afa801dffce168d0c",
+      "before_sha256": "669cebd4fc07aef621e8c7d351775fb07240c69d7ad6c22afa801dffce168d0c",
+      "after_sha256": "9e19461b030d8fe622c0fd9ce381f4b2aeb91cd282cb9f5b0d2f4a541bafe5cd",
       "owners": {
         "@document": {
-          "before": "4e4fdf811a78da88903a0a3d92a7021a825fc63afdd1ac1b41f2e8a1f79e3062",
-          "after": "669cebd4fc07aef621e8c7d351775fb07240c69d7ad6c22afa801dffce168d0c"
+          "before": "669cebd4fc07aef621e8c7d351775fb07240c69d7ad6c22afa801dffce168d0c",
+          "after": "9e19461b030d8fe622c0fd9ce381f4b2aeb91cd282cb9f5b0d2f4a541bafe5cd"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "a552521fd9c71018ed0cc0d539d68e834582cd53b42ebc5d43aa7c17f3ec8355",
-      "after_sha256": "69db5d7fc4e9fe55415d55b78b5df8bbb230f97fc0e97d307b4762308e571a6c",
+      "before_sha256": "69db5d7fc4e9fe55415d55b78b5df8bbb230f97fc0e97d307b4762308e571a6c",
+      "after_sha256": "426b81a5c77f108f6ac4371c72327a603e4a8395e289cef93e2157d603b84382",
       "owners": {
         "@document": {
-          "before": "a552521fd9c71018ed0cc0d539d68e834582cd53b42ebc5d43aa7c17f3ec8355",
-          "after": "69db5d7fc4e9fe55415d55b78b5df8bbb230f97fc0e97d307b4762308e571a6c"
+          "before": "69db5d7fc4e9fe55415d55b78b5df8bbb230f97fc0e97d307b4762308e571a6c",
+          "after": "426b81a5c77f108f6ac4371c72327a603e4a8395e289cef93e2157d603b84382"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "686ecf572fd457b2e8975b1346a8820c629cbb3156077ff74aa3efa02a419694",
-      "after_sha256": "d4e81181eafff3a1eac46b55d72e48700420317d106cdb1863eb620437e0ea55",
+      "before_sha256": "d4e81181eafff3a1eac46b55d72e48700420317d106cdb1863eb620437e0ea55",
+      "after_sha256": "4f43761343e67b65620608dd0bc170c1b16a312e272ebad3d4ec8cd1587da204",
       "owners": {
         "@document": {
-          "before": "686ecf572fd457b2e8975b1346a8820c629cbb3156077ff74aa3efa02a419694",
-          "after": "d4e81181eafff3a1eac46b55d72e48700420317d106cdb1863eb620437e0ea55"
+          "before": "d4e81181eafff3a1eac46b55d72e48700420317d106cdb1863eb620437e0ea55",
+          "after": "4f43761343e67b65620608dd0bc170c1b16a312e272ebad3d4ec8cd1587da204"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "ae2bc778d080f11946ee2f5392a2753fdb91e301aafe5fb8da8a52013a9cc811",
-      "after_sha256": "e71b225824e79b8692deac3da5c792fc31c4bc6114ca033287f154ae674404f1",
+      "before_sha256": "e71b225824e79b8692deac3da5c792fc31c4bc6114ca033287f154ae674404f1",
+      "after_sha256": "add07de631f8f5f06c9426eac72b13b4e0ecb98c55a2361912808ff46b3c8187",
       "owners": {
         "@document": {
-          "before": "ae2bc778d080f11946ee2f5392a2753fdb91e301aafe5fb8da8a52013a9cc811",
-          "after": "e71b225824e79b8692deac3da5c792fc31c4bc6114ca033287f154ae674404f1"
+          "before": "e71b225824e79b8692deac3da5c792fc31c4bc6114ca033287f154ae674404f1",
+          "after": "add07de631f8f5f06c9426eac72b13b4e0ecb98c55a2361912808ff46b3c8187"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "8364b271907dc14e6f7da08cca56ec32843b953ac14df100c42a833804a1128e",
-      "after_sha256": "e287754fd80d4c4b7b77a2821e4adddb44a9465ce545c5aa1264e395fd10d1f0",
+      "before_sha256": "e287754fd80d4c4b7b77a2821e4adddb44a9465ce545c5aa1264e395fd10d1f0",
+      "after_sha256": "df55abb1b61db0964e69248bce522c1efdac7cc7e107f341218ccd8c50a1d0ad",
       "owners": {
         "@document": {
-          "before": "8364b271907dc14e6f7da08cca56ec32843b953ac14df100c42a833804a1128e",
-          "after": "e287754fd80d4c4b7b77a2821e4adddb44a9465ce545c5aa1264e395fd10d1f0"
+          "before": "e287754fd80d4c4b7b77a2821e4adddb44a9465ce545c5aa1264e395fd10d1f0",
+          "after": "df55abb1b61db0964e69248bce522c1efdac7cc7e107f341218ccd8c50a1d0ad"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "769c7f7acd5e6b22252d904b0a09ecebabb1492a9ca7757520db22c3a34bd262",
-      "after_sha256": "44ea53b044b72276eb45bf936011a515ba9e0dc87b6025d898e2f21337fac4c6",
+      "before_sha256": "44ea53b044b72276eb45bf936011a515ba9e0dc87b6025d898e2f21337fac4c6",
+      "after_sha256": "56a0c4036c0ddb990faf25b9ca6424ef720037a6b4f1da4ba4c27ef98c725acd",
       "owners": {
         "@document": {
-          "before": "769c7f7acd5e6b22252d904b0a09ecebabb1492a9ca7757520db22c3a34bd262",
-          "after": "44ea53b044b72276eb45bf936011a515ba9e0dc87b6025d898e2f21337fac4c6"
+          "before": "44ea53b044b72276eb45bf936011a515ba9e0dc87b6025d898e2f21337fac4c6",
+          "after": "56a0c4036c0ddb990faf25b9ca6424ef720037a6b4f1da4ba4c27ef98c725acd"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "c7e47f18e832da20122c2edce8f1a568d54a111fc9de22b9be7d0d91d71a8753",
-      "after_sha256": "2e7926a08a77d671cf71822f004db8227fdc98f40e16bbba6ec74abd9fd6f8a8",
+      "before_sha256": "2e7926a08a77d671cf71822f004db8227fdc98f40e16bbba6ec74abd9fd6f8a8",
+      "after_sha256": "e824844439c30256e9374a4627bf198995bcf745bc169aa54f7541bf25e7d708",
       "owners": {
         "@document": {
-          "before": "c7e47f18e832da20122c2edce8f1a568d54a111fc9de22b9be7d0d91d71a8753",
-          "after": "2e7926a08a77d671cf71822f004db8227fdc98f40e16bbba6ec74abd9fd6f8a8"
+          "before": "2e7926a08a77d671cf71822f004db8227fdc98f40e16bbba6ec74abd9fd6f8a8",
+          "after": "e824844439c30256e9374a4627bf198995bcf745bc169aa54f7541bf25e7d708"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "6d1ba14bb899ab5ca76ff73a2d8cfce895360d883d28f72a393e4a0ef39e71da",
-      "after_sha256": "9709f34a6d2535780982c5574cf4c9b5089423022d0984eee292e3a8f21c0ff2",
+      "before_sha256": "9709f34a6d2535780982c5574cf4c9b5089423022d0984eee292e3a8f21c0ff2",
+      "after_sha256": "7633441ff59429d3ec20634f99382a05a1d58d138072e74f1923efffe3c1bd6c",
       "owners": {
         "@document": {
-          "before": "6d1ba14bb899ab5ca76ff73a2d8cfce895360d883d28f72a393e4a0ef39e71da",
-          "after": "9709f34a6d2535780982c5574cf4c9b5089423022d0984eee292e3a8f21c0ff2"
+          "before": "9709f34a6d2535780982c5574cf4c9b5089423022d0984eee292e3a8f21c0ff2",
+          "after": "7633441ff59429d3ec20634f99382a05a1d58d138072e74f1923efffe3c1bd6c"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "ffa330a15659a0379786edc23914513944a11d21333aeb39d05df0fd01fb86a0",
-      "after_sha256": "a3888c64e4dc9199922ac4e4839164e245234803dfc15fe116caa9e5497fabe6",
+      "before_sha256": "a3888c64e4dc9199922ac4e4839164e245234803dfc15fe116caa9e5497fabe6",
+      "after_sha256": "551f928e5a4863a5de5909a68a9f1cd669ee79149d78117b22ef4ca9aae3b6ed",
       "owners": {
         "@document": {
-          "before": "ffa330a15659a0379786edc23914513944a11d21333aeb39d05df0fd01fb86a0",
-          "after": "a3888c64e4dc9199922ac4e4839164e245234803dfc15fe116caa9e5497fabe6"
+          "before": "a3888c64e4dc9199922ac4e4839164e245234803dfc15fe116caa9e5497fabe6",
+          "after": "551f928e5a4863a5de5909a68a9f1cd669ee79149d78117b22ef4ca9aae3b6ed"
         }
       }
     },
-    "data/generated/ability_coverage/cross_source_semantic_equivalence.json": {
-      "before_sha256": "11ebd6b34680a25dc388907bb117f382b0c5a6a2825f771ae805f5fc64581206",
-      "after_sha256": "9d3d3d39a66c619ec5085a0296351f80ae101466c25938ad1534900019a08d82",
-      "owners": {
-        "@document": {
-          "before": "11ebd6b34680a25dc388907bb117f382b0c5a6a2825f771ae805f5fc64581206",
-          "after": "9d3d3d39a66c619ec5085a0296351f80ae101466c25938ad1534900019a08d82"
-        }
-      }
-    },
-    "data/generated/ability_coverage/runtime_content_semantic_coverage.json": {
-      "before_sha256": "26b10f8b754ef94f6f1ac32f611f60c0cc7570fc4f2015dd5f12e1d448eb2ff3",
-      "after_sha256": "19fc9e9678a41f8f45e6a79d2f18504130bb2930c6c8f385ecadd6ac767423ba",
-      "owners": {
-        "@document": {
-          "before": "26b10f8b754ef94f6f1ac32f611f60c0cc7570fc4f2015dd5f12e1d448eb2ff3",
-          "after": "19fc9e9678a41f8f45e6a79d2f18504130bb2930c6c8f385ecadd6ac767423ba"
-        }
-      }
-    },
-    "data/source_audits/ci64_provenance_v1/fools-flight-test-v1.json": {
+    "data/source_audits/ci64_provenance_v1/combined-charge-admission-v1.json": {
       "before_sha256": null,
-      "after_sha256": "4b9f1d94a9383b684108eedf371ee1a080b670dc493891ba1b5349315ee3403f",
+      "after_sha256": "85a8eb553ae08b36446c89ebccbc2081ea7e363984f77a462690f1eb348801ec",
       "owners": {
         "@document": {
           "before": null,
-          "after": "4b9f1d94a9383b684108eedf371ee1a080b670dc493891ba1b5349315ee3403f"
+          "after": "85a8eb553ae08b36446c89ebccbc2081ea7e363984f77a462690f1eb348801ec"
         }
       }
     },
-    "data/source_audits/fools_flight_2026_11/source-verification.json": {
+    "data/source_audits/ci64_provenance_v1/stage2-ground-charge-retry-test-v1.json": {
       "before_sha256": null,
-      "after_sha256": "a9e2264c12324c4e87a0d642d5b6290c82719d664cd1f15b54f71cd6be47185d",
+      "after_sha256": "0c26e91d36dacb03918a07ecdd5cffc9d5befdc729f443722f038a6687d6df53",
       "owners": {
         "@document": {
           "before": null,
-          "after": "a9e2264c12324c4e87a0d642d5b6290c82719d664cd1f15b54f71cd6be47185d"
+          "after": "0c26e91d36dacb03918a07ecdd5cffc9d5befdc729f443722f038a6687d6df53"
         }
       }
     },
-    "docs/ABILITY_SUPPORT_MATRIX_V2.md": {
-      "before_sha256": "e36fa5b79678b16e9ab351b3f926e297f094b5d20cc62ccf72b622db2cd18b53",
-      "after_sha256": "d766d1b8153649bb238aa6e67aa2418d012d059919aeaeb3a1895514ce97322e",
+    "docs/AI_POLICY_INTERFACE.md": {
+      "before_sha256": "2f969b5d2c6cc34fffb4f6467338d3cb483685d2ff3940f875b9f5bf09ec174a",
+      "after_sha256": "2232524951a5927131249c904671333a7288784a14264b24e939c537067d719b",
       "owners": {
         "@document": {
-          "before": "e36fa5b79678b16e9ab351b3f926e297f094b5d20cc62ccf72b622db2cd18b53",
-          "after": "d766d1b8153649bb238aa6e67aa2418d012d059919aeaeb3a1895514ce97322e"
-        }
-      }
-    },
-    "docs/ADAPTER_DECISION_CONTRACT.md": {
-      "before_sha256": "4014fa72fc7925f4facab2e78a87c76dfec11d40766ee01d07bade463c8c388c",
-      "after_sha256": "64d9de023dccfeccf0dd86550c47c581175291ded92be6d835f6743e53379d67",
-      "owners": {
-        "@document": {
-          "before": "4014fa72fc7925f4facab2e78a87c76dfec11d40766ee01d07bade463c8c388c",
-          "after": "64d9de023dccfeccf0dd86550c47c581175291ded92be6d835f6743e53379d67"
-        }
-      }
-    },
-    "docs/CROSS_SOURCE_SEMANTIC_EQUIVALENCE.md": {
-      "before_sha256": "5f459e434657686ca84570da3b06577e20a3566cf83408d0ce5cba167e6454ff",
-      "after_sha256": "8f80a554fbe7fbb847bdd76bba2ee528bf651874c82ad2d0d67e87c368c804c4",
-      "owners": {
-        "@document": {
-          "before": "5f459e434657686ca84570da3b06577e20a3566cf83408d0ce5cba167e6454ff",
-          "after": "8f80a554fbe7fbb847bdd76bba2ee528bf651874c82ad2d0d67e87c368c804c4"
-        }
-      }
-    },
-    "docs/factions/chaos-daemons.md": {
-      "before_sha256": "98d9c875f099579b4ebb6621b0a56c6778d6aa3524e18fe489cb6f05e4cf7afd",
-      "after_sha256": "7bc5ff0ad171b709a9de5d55b3e91888c9537d8396ed2ceeca2a369c5b437a2f",
-      "owners": {
-        "@document": {
-          "before": "98d9c875f099579b4ebb6621b0a56c6778d6aa3524e18fe489cb6f05e4cf7afd",
-          "after": "7bc5ff0ad171b709a9de5d55b3e91888c9537d8396ed2ceeca2a369c5b437a2f"
-        }
-      }
-    },
-    "docs/performance/current/fools-flight-movement.json": {
-      "before_sha256": null,
-      "after_sha256": "dae20f67cfce8e1202da4248a1a7cd0f1f17535fdd51b250d2e05185faae6185",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "dae20f67cfce8e1202da4248a1a7cd0f1f17535fdd51b250d2e05185faae6185"
-        }
-      }
-    },
-    "docs/performance/current/fools-flight-shock_reconstruction.json": {
-      "before_sha256": null,
-      "after_sha256": "5ccd9bf6bbc3ac5309ef833a71f3e68851247a530938771b1667633ea5ea802a",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "5ccd9bf6bbc3ac5309ef833a71f3e68851247a530938771b1667633ea5ea802a"
-        }
-      }
-    },
-    "docs/performance/policy-v3/fools-flight-smoke-scope.json": {
-      "before_sha256": null,
-      "after_sha256": "3f44ce8e95c64c0a4c3a9f9d96b816b814fa96cbd575ff283f2f688972fa00e5",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "3f44ce8e95c64c0a4c3a9f9d96b816b814fa96cbd575ff283f2f688972fa00e5"
+          "before": "2f969b5d2c6cc34fffb4f6467338d3cb483685d2ff3940f875b9f5bf09ec174a",
+          "after": "2232524951a5927131249c904671333a7288784a14264b24e939c537067d719b"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "735b6f6290cc3101fa7a3622e90459d05cbe9395b30e48c1e4f6261b31244f48",
-      "after_sha256": "b55a24a328cbba979a6ae63839985eb51a97245a8361ebb88043898e2e4afe2b",
+      "before_sha256": "b55a24a328cbba979a6ae63839985eb51a97245a8361ebb88043898e2e4afe2b",
+      "after_sha256": "7137208a47852f09f31c23ff3f65246c631e3105b359456c370095cd4cf35eb0",
       "owners": {
         "@document": {
-          "before": "735b6f6290cc3101fa7a3622e90459d05cbe9395b30e48c1e4f6261b31244f48",
-          "after": "b55a24a328cbba979a6ae63839985eb51a97245a8361ebb88043898e2e4afe2b"
+          "before": "b55a24a328cbba979a6ae63839985eb51a97245a8361ebb88043898e2e4afe2b",
+          "after": "7137208a47852f09f31c23ff3f65246c631e3105b359456c370095cd4cf35eb0"
         }
       }
     },
     "scripts/engine_numerical_identity_test_admission.py": {
-      "before_sha256": "ef7257f10327894892b8e2df68ddc3b378b6c7bf9274eb0712fca57622bde6e2",
-      "after_sha256": "2d0c71dd5f9c69f0a4314ffac21325d965502884e9906cde769a2bc0e2f62461",
+      "before_sha256": "2d0c71dd5f9c69f0a4314ffac21325d965502884e9906cde769a2bc0e2f62461",
+      "after_sha256": "2c2ea888cea224cb4bea84371c955f803c75a4a58f9c58c45eee367d36b6d8c7",
       "owners": {
-        "_wrath_undeniable_test_successor": {
-          "before": "4d450d4765a5ed0542d14b7649202e0b6058fa012e14dfc8f765b606b8b55a47",
-          "after": "18b8d2ca300946b25f1213bca6a6fd72ce65af0be0e2b73c1558d4caca5b6a7d"
+        "@module": {
+          "before": "3a9cc111aa8a55209ce7830d1b4550875ddbd0e738505b5691fbbc3fda9f1488",
+          "after": "1f18eca685483ad971338229c441311da0503eaeb25464cddae4f3c62b3e36c8"
+        },
+        "combined_charge_runtime": {
+          "before": null,
+          "after": "49421aee2ba39f3e81dc1007493f467ffb8d8cc4df34da8589c462ecaf15abee"
         },
         "exact_movement_test_transition": {
-          "before": "0f3a10f33a1a56e077f108fc754ffb284adad9ca717975c075cd5b8716770d11",
-          "after": "42df3cccb6a3bc1dbbbc9602c469a4570a33301ec5120b7275e99bf57fb2364d"
+          "before": "42df3cccb6a3bc1dbbbc9602c469a4570a33301ec5120b7275e99bf57fb2364d",
+          "after": "c1c8814768c859cad09ff643c1d4df0da27afa1177b4f2122d24f03685552628"
         }
       }
     },
-    "scripts/fools_flight_test_admission.py": {
-      "before_sha256": null,
-      "after_sha256": "f0f563fd7962a1bbd18233ae3327ef207901d96e09cd46614ab06cb239064902",
+    "scripts/stage2_ground_charge_test_admission.py": {
+      "before_sha256": "82497e5dd7e86bc4f2399debed29a6adfe258f14fc74bc733c53c7d7213c8137",
+      "after_sha256": "d5c6b70f0037c33f1e55b0c4bae9024ff68685826f24cefb6d8362ce2cc00aa5",
       "owners": {
         "@module": {
-          "before": null,
-          "after": "5b660cef1a969c2bbc77539af25e64b23ebee39a89806eb001a455efa847e30e"
+          "before": "bfe59a5f4a4197584ca8e148e4aa2d6d2ea7b83d4e744b19b60a9ee81c2cf2bb",
+          "after": "abb04dae421ffd70285f610b1ed882c972be4bbe0589ecf7ad92eed408f72caa"
         },
-        "FoolsFlightAdmission": {
+        "GroundChargeRetryAdmission": {
           "before": null,
-          "after": "d861523c756821440223fc66f03c05622f9f4cb74234f94ba90a534d184b69f5"
+          "after": "f10362a10401f89c6e1588e855e36dae34d9d0abd083caa09554d7b968223f46"
         },
-        "FoolsFlightAdmission.admits_after": {
+        "GroundChargeRetryAdmission.admit": {
           "before": null,
-          "after": "bb5922c2243e4113799866a421cfcc6287958d6adc636dbaf312b74db03b1746"
+          "after": "2a7d8faf2a110cc3713c9c3dca7a550a4dc2a279d5449dd1129d3740e612da6f"
         },
-        "FoolsFlightAdmission.replace_pins": {
+        "GroundChargeRetryAdmission.source_pins": {
           "before": null,
-          "after": "56e7753b02266546002c40730d536b194b8213a395a11dc00ec206be85c2f93d"
+          "after": "b355db6f14b6dbf7f9f7a1ed28b6f19f1b14eba28fef9322b03d33392d0d8f3b"
         },
-        "_Receipt": {
+        "_RetryReceipt": {
           "before": null,
-          "after": "698bb9868c914c7e909a6525003fdfee1faaaae6cc37dcc29c5aaf186e691cf4"
+          "after": "4a14b97690604119cd229befdafd75e83342f13c949e63339012767d912ca595"
         },
-        "_TestReplacement": {
+        "ground_charge_retry_admission": {
           "before": null,
-          "after": "04f19190c95ef960f51d7595628aeac10ce68776e13c5e14a586587237e49915"
+          "after": "bec60663a12b6a92a32c2672ac28b23f337d3d4cb6fed5829f50a17e739ef452"
         },
-        "_sha": {
-          "before": null,
-          "after": "8f72dbfdc310957eeb857f007dc7be9414470c6878c7300c4da70e2c18567e8f"
-        },
-        "load_fools_flight_admission": {
-          "before": null,
-          "after": "34f1bcf0f076558f7ab614638f037bfa993ea8c17bef0febda3eba5ecf6a43db"
+        "ground_charge_test_successor": {
+          "before": "50625b5d6363d6761d1fa710d26fad6700b6f209beebbf7a1df646349cebf22b",
+          "after": "e77741630998394c63e5a2ccd969a5ba69d314bfd2a37486bf9644e7f4da66b5"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "2250a7814cd3a73fcfd4dc44514bccfd15d21c1bdba304f5e432b4e93801ba3f",
-      "after_sha256": "d48155d9b49a46bfdfc91c7a717160cb2fd935e07037e0470b09cac86a13d1b2",
+      "before_sha256": "d48155d9b49a46bfdfc91c7a717160cb2fd935e07037e0470b09cac86a13d1b2",
+      "after_sha256": "c26c71c97e1d460f53f064a50516bcdc88b0a901ef5324267852ae32031cd3d1",
       "owners": {
         "@document": {
-          "before": "2250a7814cd3a73fcfd4dc44514bccfd15d21c1bdba304f5e432b4e93801ba3f",
-          "after": "d48155d9b49a46bfdfc91c7a717160cb2fd935e07037e0470b09cac86a13d1b2"
+          "before": "d48155d9b49a46bfdfc91c7a717160cb2fd935e07037e0470b09cac86a13d1b2",
+          "after": "c26c71c97e1d460f53f064a50516bcdc88b0a901ef5324267852ae32031cd3d1"
         }
       }
     },
-    "src/warhammer40k_core/engine/catalog_rule_consumption.py": {
-      "before_sha256": "a82ce36c3563ecf97460e41629ae1a6b60695292dd75cd478bd39e480f2dbec6",
-      "after_sha256": "42e211ca2d79b68200628538e7322306dad498d458de29c9c76190ccce1de0ad",
+    "src/warhammer40k_core/ai/ground_charge_candidates.py": {
+      "before_sha256": "439096ba693ea8793c9c5405c08d6f2978271111c1d2e7bef9d01d1162d1544b",
+      "after_sha256": "3f037af8677bbb7dc70671c558caa0ee99a0a9bcbb3227ec4e2f33e2ff0a71d8",
       "owners": {
-        "_available_catalog_unit_move_completed_mortal_wounds_groups": {
-          "before": "692aa2438a5da6ac23dc65af77526844da7c28abb2ce25bd7a9b52eee97a4be9",
-          "after": "04402d17da1be5362bc569195d431777b41363b0aa3bc7f94f81e7f499116041"
+        "@module": {
+          "before": "5e7838747c2799922f4283ae9b7da63ac4dba2c2dc09010b8484bfb937de9c23",
+          "after": "50c506b2286aeeeb0c3ccb11b6a1109c6bb9fc0562b02e6be01a6bdb2d4d7a1d"
         },
-        "_catalog_unit_move_completed_mortal_wounds_group_from_clause": {
-          "before": "76e26394ef63e2a63eabc8cda496bfb52229cfecc4c24e482c38c8385e1b5da6",
-          "after": "17b7b140d026cdc30807673c6a55e43d7b5a3056822667b3f52afcc50439c436"
+        "GroundChargeCandidates": {
+          "before": "d34955a5c77ff1e1125b4ecd594e4d3552605b6ddbfeea04f10eb401f9bffbf0",
+          "after": "c07767047ecfb31ffede272cdb22cf3e90fb50b483f864cc432887d5f8c07cdd"
         },
-        "_unit_move_completed_group_phase": {
-          "before": "1da09b631a009f001ba6543df5b1a04a780fca6811cc1ac194f97e1514ea06cd",
+        "_five_model_candidates": {
+          "before": "4dc1c388a96d45f16496c9b06af9a1963b27c5ec12c03e5abae8ac6867e7f8e4",
+          "after": "1bec38e01d88669a6468f67914d21a43dd7eb863bc6e1901e8cc34cb0068d1e6"
+        },
+        "_five_model_formations": {
+          "before": "55addaca1d85521b3ea6da6f8759de81d2dc2d56ec41d204ecaa84c70d6e96e0",
           "after": null
         },
-        "_unit_move_completed_mortal_wounds_decline_payload": {
-          "before": "afb3c6730b9efaba1ca7038492dbf1b104ee05dbe5b7cfeffa581fc4927c2938",
-          "after": "085b52d3dda119c8f53f75f14492730e96739c19e11bb3a876c0be376c166c61"
+        "_group_endpoints": {
+          "before": "240d9d88f3c213d0d37e14ca82b6ece8040e57d19c89193cc032a3b07b2d599d",
+          "after": "6fe77f748a5f1ed2f3fa01281ff8107c43d4193120c7e2fd9cf5c5f43f893fdd"
         },
-        "_unit_move_completed_mortal_wounds_target_base_payload": {
-          "before": "121b5d9cff35b0e2ea4e206448343be9492b3803ef0180c479f6bff5b6ae609c",
-          "after": "b1b1df46d2a3f7008e86010b3d97af0fe17ffc8afa5cf141a7fd34f6358de98d"
-        },
-        "_unit_move_completed_mortal_wounds_target_option_payload": {
-          "before": "9eb52560e4693e71fa56c9dd2545c10b752d9b9b5c4c3a1b780024f4b1f8e656",
-          "after": "1e391e1325c5e02fa2d8dcff00228428f2a70311b50adf1eb291f403f9161112"
-        },
-        "_unit_move_completed_mortal_wounds_target_request_payload": {
-          "before": "461ff041a6f0f8bd158f2b26bbae6aad0b9771c8d2e8aa36b271c0af2eb4a06c",
-          "after": "ae696a2a93b3cb5dfdda4da4529958c5e83d13c46508fcfe8dc02269c261eeeb"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/catalog_unit_move_completed_mortal_wounds_runtime.py": {
-      "before_sha256": "8994166baee3393b210ea2e8df47b8beacddc65dcf1c4c8be168b3a1678760dd",
-      "after_sha256": "66f79978fb3c9f8db3bbe696fd6f4bdb4e89a5bfc9ae76445ce819b5f27ef7dd",
-      "owners": {
-        "CatalogUnitMoveCompletedMortalWoundsRuntime.activate_group": {
-          "before": "f8439f34a594e568992c52a5df4c3b8c0333711cfb981e62cfcd4507121f736e",
-          "after": "115c609e2b71428cdb219d78f96a9c7dfaf770bc3aabed64232708f9ab59a852"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/charge_eligibility.py": {
-      "before_sha256": "76eccfe31fa8f6b250cc1cc02e16e1af090003b24355436ed9667e4981249c4c",
-      "after_sha256": "749a7a8ca005dd728c062f5726c048e4f8560ea05f0b7aa75d5a567555d7c814",
-      "owners": {
-        "charge_unit_ineligibility_reason": {
-          "before": "5a5dd729d84337bfa8766858abae29a26fd40793e236fb5ed60ceaff66dac772",
-          "after": "1902d91d8b4bff2a85fc7e08e20745d79c91547f378e7d46116278a60a4a9232"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/charge_phase_flow.py": {
-      "before_sha256": "8555063eb6ba4ed24a714a474e0d439aca1368be35bde098320b1aec2bc21b3f",
-      "after_sha256": "7ab1d66eb096417ea2757c600d392f87f435a72ac7e793da500cc6b31c0c754e",
-      "owners": {
-        "begin_phase": {
-          "before": "02e3dcab1e89904a043f67ecea2b356c3ddfd23d7a7d49ea74bec9a9a5f15928",
-          "after": "45d0898d4527406f9f19df3ae417182ff935d146537dd3f78f73f89df43d1b31"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/charge_phase_state.py": {
-      "before_sha256": "a567e2b3eae9e46fed784f61cbfd5d01594cb95c7301f98c54264b45dd3c14cc",
-      "after_sha256": "41454dcbb13d23847618575ce33f87fce6e1422a03cbe90121fc7ff05f0649ea",
-      "owners": {
-        "@module": {
-          "before": "7fa6bf5d0f1d1ed9fb0b789a61471824850d6aeb45c16fae9e90e125bbae5b15",
-          "after": "e82d116c5abec5222556315076083d3b78101f50741439ab53e4088e1baa06a1"
-        },
-        "ChargeInterruption": {
-          "before": "e88536189402cca622c54ac83d16ee3a7c164f75d712030d11fea0d18b4b61ce",
-          "after": "7133f5133fa2d059769f11f5468653eab8a308345a6d91823f3369366b9fc58f"
-        },
-        "ChargeInterruption.__post_init__": {
-          "before": "0335ce9e0b148b03e2ee5c6e6f2d818d7e247d0b31a090db21ea2ecbbeccb655",
-          "after": "bc3bbb226594ea7b1359018637997fe4e610f5c6490a0c8b9a5492e50ed9415e"
-        },
-        "ChargeInterruption.from_payload": {
-          "before": "69370dcc6dc9d1ab8e7ca5cdb78baf7553748b5ae7aa04be69923ac2a573174f",
-          "after": "625a450d71b4525612bec520649813c72292a935b2e20ce225cc2a1fd31ff0ff"
-        },
-        "ChargeInterruption.host_phase": {
+        "_group_grid_formations": {
           "before": null,
-          "after": "9ec59ee1316c3841dcfa1774d53a25c390eed257e1e3fe18649ad11822f487cc"
+          "after": "0154296298f32dc70a3bacdcb5d00b824ec955a4e09b830602a2cc158b5d2b2b"
         },
-        "ChargeInterruption.to_payload": {
-          "before": "ba66a16fb392fa268e7a3249a47c60c12e8157b21f6d6319ed5302f6a2517d22",
-          "after": "0b194d2a27b69148a2d59906cdf4f51d97ff3b64ff0aaa4eec608e3f04bc7e0c"
+        "_group_paths": {
+          "before": "1f4a8b09be3cc7e908b11262db83876e90bf1f6903af065ef56ec233912d412e",
+          "after": "30e6acd6ba85177ae7259d9f697a0e01d5f6fb0ba0206d4318bcb89155d66f72"
         },
-        "ChargeInterruption.turn_player_id": {
-          "before": null,
-          "after": "545833cdd0a8de7e7c875294ecb633bd68872763fc2fb5a0b0c82752da242612"
-        },
-        "ChargePhaseState.__post_init__": {
-          "before": "40bfc807355acfe95d70bc5b5499aa9d9842e9fb32a767be6d9d4a203e8fd75f",
-          "after": "00ccca9603304ad0c5e6253b9e51ff6c63cb9d21ded3e37483d1598c577bae82"
-        },
-        "_ChargeInterruptionPayload": {
-          "before": "62b465c3e0cac07c94faff411d3e97b177992372d7236e75c49631b4070d16b2",
-          "after": "beede5423d482b234150375a4f542672dc9b6ff80001943491061b30fa2ee4d0"
+        "generate_ground_charge_candidates": {
+          "before": "ff35d4046fa52ca0e1ad15ecffb9aa6ec692807dfb961af8a60ef8b019833795",
+          "after": "fdb08b77aa2e634f7c99c5211b15abc358e1299c86e947c1bf3d21640828f187"
         }
       }
     },
-    "src/warhammer40k_core/engine/charge_roll_flow.py": {
-      "before_sha256": "e076961474a43f0a9671cb9cf6b4c17f9740e3a98abc6b096cb0dd9966019cd3",
-      "after_sha256": "4125bbc95678e3d7030096758c20c3d480c40882c7cfd76a7f90852cd66f0279",
+    "src/warhammer40k_core/ai/ground_charge_policy.py": {
+      "before_sha256": "aacc6a6ba17261eed94491d4705669177bcddfddc50306a0a7006f696fa931b9",
+      "after_sha256": "cd2658365f138f330da0214d15e1d4a842969167ccccdcf1aa23fa1c8f62b700",
       "owners": {
-        "@module": {
-          "before": "75ac1646933f4efe8169e8dc901c1e563aad3efa4b6ef464bb93d8f26f366ac1",
-          "after": "38f2abb9f8d2d251eaaf4beab5f073d4f8599ec197da1d7343012fa93035d93f"
-        },
-        "pending_charge_roll": {
-          "before": "3ac70ee72bbe29fd1e87d47c535f023e62fef71aacca83557fdb3f222cade9ff",
-          "after": "7b23c712c1b25ffc92ed64cdca10e3f1cdedda5e3b34915316d94f46e7ccddae"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/charge_target_continuation.py": {
-      "before_sha256": "6f47c3b42e4660aa7187270286322f8cbd69e720997cb2ed3cfb30011c8ad3ce",
-      "after_sha256": "769a7433280e9bcaf0a9367149e6c21c31003e0ecbeccbde68bc3dfd3b6699b1",
-      "owners": {
-        "@module": {
-          "before": "adbdb763c2b2e364d5549ab8ea645718265f69a5643ce29f4ee3eab44f88b6c2",
-          "after": "4744e14189335890c7ffbd0c47f84a2f6a2b415985e08127231cce3dae08c85c"
-        },
-        "is_charge_target_replacement_request": {
-          "before": "41681f77ebeaaedc6174ff24de9b6f1132255957ac2b592d1f27cc230e684fcd",
-          "after": "a020e45ecebdc10950e0e399a831bbc2d86e8ff7684b5ef7e3d459fbb7f1b86b"
-        },
-        "pending_charge": {
-          "before": "4417b089b3bd0aa5f5748f9d4248aefd368e1e8abf162c91b092d061a24730de",
-          "after": "76bc206d4ef1cdf942710b6953a4637b3fcf190d91e42c4b45c6b761b0054e21"
-        },
-        "refresh_pending_charge_move": {
-          "before": "cda6c53c102a63f44f5133e7f6461307d606d9d85750e1b4c078541282cba504",
-          "after": "507ca8c446731687c7b58a30e30c26e7f83451ac93c93ffba2ca45957ad94c69"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/detachments/blood_legion/stratagems.py": {
-      "before_sha256": "8324867d91876c18a8ae045047ccdf8b566231dfe0f34814900368be240bf86e",
-      "after_sha256": "b4a0b3ace23ea9292b2355a2d020ddf2ec8936356d373dcb324cf74ef06d25a6",
-      "owners": {
-        "_fools_flight_record": {
-          "before": null,
-          "after": "ac5ad578f3853c242b1a54bd7b071570d662d82b9ee4ffe08ed9f9b767b7393f"
-        },
-        "runtime_contribution": {
-          "before": "a214acbec7e76fa15f70e485c17b5b09eef2a829844a157b8f5f5c28df704e73",
-          "after": "4adab691d2ab5241f267e5f556bd38620f631dcec368475ba8866cb04a13bd5d"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/heroic_intervention_history.py": {
-      "before_sha256": "9c4f971da4c7d42b4bdcfe9966e1e45310a1045f3a3a30c50332faa6d496b99c",
-      "after_sha256": "c9618f599a228f476ed95eacfe52db725301c511a79f0be00390768a569df692",
-      "owners": {
-        "@module": {
-          "before": "f11fd4a809f6a807e79058dd8139e9e517d81ca4dc4c0f966a83423abfbbe7cf",
-          "after": "6ecfcaff3bf2930beacd511182f2ede026161b6213ac78a396892ae54ea07046"
-        },
-        "validate_interrupted_charge_source": {
-          "before": "323e8d02061059b1be0dcf4814eb0bb9724df98088d5264c4944909a62377771",
-          "after": "bd931ddc46109b5f311e5ed22a2adb28974914049cd18c88bd595825a12deaf2"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/heroic_intervention_rolls.py": {
-      "before_sha256": "6286118cb88c37f85753ce0c2dc04f120bfa5726a6a0a56e96a384ae12f4a9d9",
-      "after_sha256": "68b114ac82b00c70240edf261e9d7a780e334ccdcefe3e8567ec765e06bda3eb",
-      "owners": {
-        "_apply_heroic_intervention_handler": {
-          "before": "7b14710b732b70794d2a1b444b55e598a9ae36365055d30a88951c708efd3f9f",
-          "after": "de5383571b0002c34e51994d20c4b2c1d90cd8d316b4894987f3fd66c07cfa54"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/interrupted_charge.py": {
-      "before_sha256": "eb1afb3539c6e366dc9d3d24e6196641b78cdb06ab38d02d45e7dec7f7fd1a92",
-      "after_sha256": "742c1fc3d9f8f69ca31b3ab708109d126ca55c6a916d1c9b0e1baa123ed78e23",
-      "owners": {
-        "@module": {
-          "before": "14daedb5b865287e958b21658d13b04cf5040a9a66015b4736789fa36574b787",
-          "after": "e88c52f9f182fa08fc097556aaf2b160464df914c57704f4df469f4a9054cdf1"
-        },
-        "advance_interrupted_charge": {
-          "before": "daa70a3cd24da0cf9d65ad82764b5f20b8ec6b07c1466d66b86e37d81290101b",
-          "after": "4043ed1ce35b90b26647f580433dc457a15764fdbafa8346c555f6f70f8963e0"
-        },
-        "charge_action_in_current_phase": {
-          "before": null,
-          "after": "4a4355bd34ec180aa8997cde30e8d697567ad2f2d0230b2a81f90babc87b249a"
-        },
-        "charge_interruption_at_event": {
-          "before": null,
-          "after": "f11df0355d4b71a2ee7740d62852c6b59e57dc4b780c9a3f750073ce26c522e6"
-        },
-        "charge_turn_owner_at_event": {
-          "before": "53e9d3b44abdf08edfb0f3838e55c76af1b6f935e82a72b831fd4710aea98dc5",
-          "after": "19f6b61fbff63b5fbc78cac51a4dcf7a30aae960c26a6a2b6caacad3bc8d212f"
-        },
-        "start_interrupted_charge": {
-          "before": null,
-          "after": "8123772e9f31fb65ebca76f9902f1a4d0939f0d04e02acdffc7d848ee190ed35"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/lifecycle_advancement.py": {
-      "before_sha256": "f683b1e3672c229797d52e131ae503f837df37017989a763c1fe75967fdaf470",
-      "after_sha256": "d3e4cb6ee8b8d8aaf39d493568c952f99bea1e0130cf91892f9638f81ea07934",
-      "owners": {
-        "@module": {
-          "before": "5c6c155f695578ab576a6d55625095e7492898f2b094aac8727f69adaf81e44f",
-          "after": "bf94681402a0f8c354e685cbb195759e6b776c1c8f8564a32a73fd2633834cbb"
-        },
-        "advance_once": {
-          "before": "45ef3af6416992c61aa048a033cf8ee2a4b95d9764df2dd8c71828c5e7a2a9f2",
-          "after": "ecae38d03fb03ee436ae1ca8293b1dbc3c8b345f94cdba0c07763f11a96ee265"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/lifecycle_restore_consistency.py": {
-      "before_sha256": "9ad0ba6f6064ba4b54e8cb165f4991602ba9f6e4096c5f8930c4768b2bfe5fd7",
-      "after_sha256": "2c1d61135b28d85bc00fb06e01174cfa566c5dc9457e0827316cbb2a1cec9740",
-      "owners": {
-        "@module": {
-          "before": "17aa3b6c5c2328877b15b95d91fd11f258e32e11a00e463d064806e3eba4d958",
-          "after": "b76f81e32c97f6b10242e1b850aff4fdbb355bf0a40676701df963c8660bf2e7"
-        },
-        "_validate_charge_phase_state_consistency": {
-          "before": "a8e68c0a5065181b457197eb997cf3cd6cb549ce6fc5b6a8c75bbb26a6e1505b",
-          "after": "b85f61df287a8d4867bed7b3b795c54c2cbef921f44c6258322423aa13f9d65b"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/move_completion_triggers.py": {
-      "before_sha256": "4d6dc6696ae1c09c2073487883f7798884cef93776a2c506df0d66a2670d8361",
-      "after_sha256": "38b81448f3b161ed06a0f1a1ce46baee780efe392e65a98473aabd68401534c4",
-      "owners": {
-        "move_trigger_source_context": {
-          "before": "1444d173df1d93bd5af9ecfb3d8b93ea595eb82eee4767ab4300252594854769",
-          "after": "1ee6882d2bb6bd857714dc92f404b71b9d21029619dd09f35731226318391e9d"
-        },
-        "record_move_completion_event": {
-          "before": "718c63e569d23af385a18d8d446221fcae8567dee8f8599d57716f548e599413",
-          "after": "ab82a6c59bbb64cb4364bdd1534eaddc2525fcdc777025973d29ff3b509e7ac4"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/movement_charge_stratagem.py": {
-      "before_sha256": null,
-      "after_sha256": "1fa3d6f94bd50b3958087a5ea91422513b308dabd099c2027d68d5e159821bb6",
-      "owners": {
-        "@module": {
-          "before": null,
-          "after": "16d21702d0b92a3f674f1b65758542ab7dd2d190409704083c0dedf0091830f5"
-        },
-        "_allowed_targets": {
-          "before": null,
-          "after": "32260eab9f62de763b38698625b3d5f105acddf54480abf665c8422e60acd289"
-        },
-        "fall_back_charge_target_error": {
-          "before": null,
-          "after": "8615c4f5c05345711cada0cfe4681a504ea9632f64d2068cd10bb81ae06ff841"
-        },
-        "fall_back_charge_trigger_payload": {
-          "before": null,
-          "after": "ee25adeafa902403609007ea5afacb0f0aca457490c9e9083e09ceb72bc5d2d3"
-        },
-        "movement_charge_source": {
-          "before": null,
-          "after": "f2afbe46e1a9a24e772177fff67656e36e499455a76b8399c29f4adccaef25b0"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/movement_modifier_evaluation.py": {
-      "before_sha256": "f5fcb382e0d60085a06031d1334202168ef03173d1580f7b809873d958c326b8",
-      "after_sha256": "45c147c6593726e0f012fb81ab7db9346c2b221c763051ba07f82aca36d05852",
-      "owners": {
-        "@module": {
-          "before": "ee7cfb13ffee12f02cc883ac5ceefee0af169fcd4dcae9ac0cd51eef3571286f",
-          "after": "805571789607b27d0e522c418cb59ecddec7c3ef664668dbda13a3ccdd1231db"
-        },
-        "_active_scope": {
-          "before": "17e7c1373bd2cf35ac9c6da2db618c0a8523412fda57bc056a51c292c52d17c4",
-          "after": "a2558c6763fb85e1a8610738ebf5c459b05d4a02fe04661e462306786fe13743"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/phase_movement_history.py": {
-      "before_sha256": "3e08a7fa77ce315d0c5c7c89bfd57bc50775ab4108b8ffded13baeaeea63e012",
-      "after_sha256": "0db5d3349eebcbc053b14fdf8c0e329b539e6e453a7fccbb1931a15e8dab5706",
-      "owners": {
-        "completion_phase_record": {
-          "before": "a4618691b9d3536aef2ba04fc49f552b24c6855a02931601bc4406e8e731cbf1",
-          "after": "96b0fc45a74e75faa81988cded32625672d7a4d62c8b3ffefbf545c746ec2ea8"
-        },
-        "validate_phase_movement_history": {
-          "before": "daa44406c0916c116f6b90fa5161573abcc8c7b8bb77279089f2ac49b6201870",
-          "after": "84ee367d76e2ff237e026273c1fdbd2d8b790eb22e85e451ce02652b2f53d7a1"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/phases/charge.py": {
-      "before_sha256": "3508914efefb9b1c873922fb27afad23697b343f86f2a52de78a7b4a8564aa00",
-      "after_sha256": "d57da1a97cd58b858ac30a1062ff7549dc0cfea98a93a729bbf2f9ef029082a5",
-      "owners": {
-        "@module": {
-          "before": "2e1a3a3db456bdef36fad7b779b7530522453347c0e8cae31edda58fc050601d",
-          "after": "ced6b76df4c84efb7449e8f611f4cab0a636adabdf6207ab26d120ba55e1ea02"
-        },
-        "_request_charge_declaration_grant_if_available": {
-          "before": "67e1400256ccbd84c4d35ab69cfc7bf3cbbd40727ab2726b3ba56bcc3be3dbf9",
-          "after": "9b6998bda1acecec1b792c8d59b84d25ae0114f907fbc3d3b166806cf86bdcb6"
-        },
-        "_validate_charge_phase_state": {
-          "before": "c166c035378a499918e5b3010ae842636c2952be9a8846305fa8fa0d6bea6da4",
-          "after": "3684a174a7b28273cd32020444c5207152b4b837300511e158fc2ccda190aaf9"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/phases/movement_completion_candidates.py": {
-      "before_sha256": "fa124efe4c584caf6d4ccdb3d57b4ed70beca8d39470b37b40aa411f52fa7190",
-      "after_sha256": "83295877d191dceeac1d31df09855ec40f2d9151bc596eba11a8838f70ab5be6",
-      "owners": {
-        "@module": {
-          "before": "f16b71ec5a10f11d9b6e2f58d8a9847197eb45a53201dc35398a6e421beb17ea",
-          "after": "0a5d06b544600cd104a99e174b2987ea4ac937447c183c5683088f5d18f0595f"
-        },
-        "move_reaction_candidates": {
-          "before": "7a8b2cd6e5f1c4e486cff73d13325f64bc47049bde6c8a273ecc74e3b6806c21",
-          "after": "fbc17f9f192a6638af14d7333dbf9a8a998046fad3c772fd64257cc083c94643"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/stratagems_eligibility.py": {
-      "before_sha256": "8ca0274919eebd381513f9e99ca938935ec27cbd2d5b69dfc364deadfbde0ef1",
-      "after_sha256": "8710548a1a3a07fdda22e451eb4f8f81d9206ab1c3b77d577c1bb1b452ba668c",
-      "owners": {
-        "_generic_rule_ir_stratagem_unavailable_reason": {
-          "before": "0695308e7309326922bf8036540bc40b91e9357b8fd45c594826c193699c8e10",
-          "after": "f2224abbdc719c94c458d86eef4cc4694527dc0ab3499f642c68149ff3b55ab2"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/stratagems_generic_rule_ir.py": {
-      "before_sha256": "e68c9996dba055461568dabfb98b05e21b0a56851a3821da1d0721a8e729d998",
-      "after_sha256": "52c0fce8bcb863cb4f706a708af49ceaa090a610f67c1a39a88e89b8e04fa280",
-      "owners": {
-        "_apply_generic_rule_ir_stratagem_handler": {
-          "before": "7e4d0c9c399a47d1e21d521255484b56677bc19e32618c6bfc69fc2069d1f736",
-          "after": "489882859934383b282ed6ad1fcca277c5d3e67cdca1bb996799b73b2af7dd9d"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/timing_windows.py": {
-      "before_sha256": "61390718e0026ebe1274fefcc7bfa20c1b6dd507d209d2f69849be605beca90f",
-      "after_sha256": "09f202580a70e3c181314010ed311f51c0993b42e9970c15edb8ee4296b6edf4",
-      "owners": {
-        "TimingTriggerKind": {
-          "before": "97073289d0a8724df4da2230bae77bba2291591520f45b15beab40d878ccf4a5",
-          "after": "98dbf8870ec952b483b8d408af9281553143a32ea0088f11e5f81947d5fdbabd"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/unit_move_completed_hooks.py": {
-      "before_sha256": "c9fee474241f2bfe745199bf340fd16d463a665205632f6cf232aab77b182f4d",
-      "after_sha256": "f4f211e7740d654cd5a136594f3424461b694af4557ad139d05eeb08a0024005",
-      "owners": {
-        "_unprocessed_move_completion_events": {
-          "before": "ab98399866d8cf163f6160fcaf6316d4f04a549133011949162764ba6d84b7b7",
-          "after": "acc6d6feaf2924fa9bfb7df2159a8d04b454a480ddfae51db2e189058f54f8a4"
-        }
-      }
-    },
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_blood_legion_ir_support_2026_27.py": {
-      "before_sha256": "6817fc9a9716554cb33e844229512dedaa446cdf12d0b5764cdc64c6c28a622a",
-      "after_sha256": "d4b8238a75079f3c6d49a1625d5e71183c362293a0258c758e91266f5ea28db1",
-      "owners": {
-        "@module": {
-          "before": "efe2cc5586da5cd872ef2bb976eeeb279ab057f0bef5523bc697a270761323aa",
-          "after": "ecbc8ec262b0c0e5da2ab33743c92c0767e39c905c5e15f0a1101a3ecd535c07"
-        },
-        "_coverage_payloads": {
-          "before": "5dcab82a484bca27500c0566edb8584fd68484fbd8c5e168a4ab1b8f2e8f4412",
-          "after": "540fbaad6226aacfabb35546239943fefa1fe955dce79e6b349e7a6af711d392"
-        },
-        "_fools_flight_payload": {
-          "before": null,
-          "after": "f4cbf2f72156a6dbbe36de10a0336b4d0f1386d982a248e8261bc16b7a02bbc2"
+        "prepare_ground_charge_policy": {
+          "before": "ba9aaa81f7d64aaa2fb4ba09f495ecda56bfbfa7d4d6d69c5745fde7a551558d",
+          "after": "582d418706b959637ff9820fe746c55f48fd1145eb5fe90f5b9afc8bbeaf97a7"
         }
       }
     },
     "tests/code_quality/test_engine_numerical_identity_admission.py": {
-      "before_sha256": "4093e4a072f13386b466988f02048a83c2da0928ea7b5e20de05db5a7e828cf6",
-      "after_sha256": "c33b4baf55169d5d76331026b6795b033af2dee47b6cd553198eb719f8402c27",
+      "before_sha256": "c33b4baf55169d5d76331026b6795b033af2dee47b6cd553198eb719f8402c27",
+      "after_sha256": "b45832202a6a55c90c5f2891b303fe5d53c8b1ce74f42ce2c0490db6d4935a8d",
       "owners": {
-        "@module": {
-          "before": "875cc71086df25ce6dcdecd230985b6ea905641d7a240566bc48b3a08b849da3",
-          "after": "de58df9fd3fe706af039a0d0d600215777012e73d430d74a7bce3cb9a8969414"
-        },
         "test_identity_inventory_uses_current_twelve_shards_and_native_cohort": {
-          "before": "883c644fa1d980e2fd353dea1771391508d6919058681c84ff5c1e978350991d",
-          "after": "9e8cda2abe79a0404d41c77c42f0abda4298ac15a0b2fb7c0f1dee2130247033"
+          "before": "9e8cda2abe79a0404d41c77c42f0abda4298ac15a0b2fb7c0f1dee2130247033",
+          "after": "ebbcdf0e958d48586e20f1eae20fd0df0e8fa2265ed4e68b68c5299a7f3a925a"
         }
       }
     },
-    "tests/code_quality/test_order50_heroic_intervention.py": {
-      "before_sha256": "db08252ec8700fdc717357245dea312fe4b716de5873df334a32bcb8534d4621",
-      "after_sha256": "102e96887db9a70990f0a52b8bb3072c9ec24108f5c15661b78165379dcc2226",
-      "owners": {
-        "test_heroic_provider_only_authorizes_the_shared_charge_owner": {
-          "before": "cf77818e32261242eebf24c0d19d5c53e849cf5f5ad93b075a04c5f43a85c6f6",
-          "after": "b01c193532d7df8b394648ef43d44059ac4de84487ab23a7f7a79b207b92fb8c"
-        }
-      }
-    },
-    "tests/code_quality/test_performance_policy.py": {
-      "before_sha256": "b6e9ecacc8a52f0c9cbeb2858c9f71d656a24918976d9f1bacdc5e9818f98257",
-      "after_sha256": "255b1a932c16e883aca4a0c0e98584bd21aa1c2c3bcf6bd54e8d635e67fe1a13",
-      "owners": {
-        "test_fools_flight_scope_preserves_dark_pact_policy_and_rejects_drift": {
-          "before": null,
-          "after": "2040c4e53d5ae7b326f06fdc062d1f184995c0a88ff2b8e4a7e8bb5fd86c329b"
-        }
-      }
-    },
-    "tests/factions/chaos_daemons/integration/test_fools_flight.py": {
+    "tests/infrastructure/adapters/test_ground_charge_engagement_retry.py": {
       "before_sha256": null,
-      "after_sha256": "277d5043f761ca5d23542834c3491fdb8c868038dab3c6a5a684ca0ba13d0ed7",
+      "after_sha256": "01662eab39413fd6201809356f66e9beb4d33674f4509f76d5eed69cd484bae2",
       "owners": {
         "@module": {
           "before": null,
-          "after": "dcad23f483efa5a89ea1b829e728da02c7296c2864108ba587d7bd13b99bf80c"
+          "after": "159454acdf352c07c6ebb60c17eb4493c424ee54c3cdaff7bf234611930bb154"
         },
-        "_assert_fights_first_through_turn_end": {
+        "_context": {
           "before": null,
-          "after": "698ceb82f2c4406e257a4f4d1e26749ad88e4ae38e65031616322769d67a805f"
+          "after": "b512cc70fe8da33187ddad58812c076f1c71040f5c133b37826156cd5853d61a"
         },
-        "_flight_move": {
+        "_session": {
           "before": null,
-          "after": "1ad3305bcd620d4c68261b14bfe18642f16a80937ee5ccb231fee210190f1632"
+          "after": "0b84bdec66527df173461c4fb529123a8fc5e050364c3bb6b4d9a563d7c15af7"
         },
-        "_flight_next": {
+        "test_rejected_rigid_charge_respects_remaining_budget": {
           "before": null,
-          "after": "89cce95ae0ce4cee3639c057984dd368705dec8381d74d0abda43e9ae8603c02"
+          "after": "a8016f4bd092c1fa1d22ad238afcb202da58c5553dd7269ce84da0417956abc9"
         },
-        "_flight_scene": {
+        "test_rejected_rigid_charge_retries_and_commits_deterministically": {
           "before": null,
-          "after": "4c4ad60ea7b3448632212628985c347339cb8760197cb32f38e43c2f09af5b00"
+          "after": "38de23c887d2431e4729d4b18f04d2ba9ba67861fb4679160ebd6ebc73bcf504"
         },
-        "test_fools_flight_native_fall_back_charge_resume_and_replay": {
+        "test_successful_eligible_rigid_charge_does_not_run_engagement_grid": {
           "before": null,
-          "after": "c8e04d3dde8c877bb7761429b1744b4fcb57e26a969d053aa7531bbd255b91e9"
-        },
-        "test_fools_flight_short_roll_resumes_opponent_movement": {
-          "before": null,
-          "after": "87b2ab381db4f467c5b027f1414251c63238c206950328e0149cec68212813d1"
-        },
-        "test_fools_flight_stampede_resolves_before_murdercall_and_replays": {
-          "before": null,
-          "after": "ad812a0c3c84c338be1e20897fbdace8a6fe48385838fb87279f1d5b926b4fa2"
-        },
-        "test_fools_flight_unavailable_at_one_cp": {
-          "before": null,
-          "after": "66c35c9c6c609fc87ce57d9fdac42d1ef17504aa7ce423b3e41faea44179c5e9"
-        }
-      }
-    },
-    "tests/infrastructure/source_governance/unit/test_blocked_row_classification.py": {
-      "before_sha256": "aba698741823c0a06af773ccf06d48a16cd0f7a37c6aed8b56a9f0e8cbd0a22d",
-      "after_sha256": "b10de433dbd34b4fb9d4d6deb1e3aada7099370338ddccf194daf346136af289",
-      "owners": {
-        "test_phase17i_existing_template_report_uses_phase17c_template_families": {
-          "before": "1e438ff7dcacca4a782183aacd35599676c992ce4f4b455c44fb356093db3e29",
-          "after": "9105ba7b172e098aeb279ad9e880312a55f5dcc93a3e30a03033b13af1632b7a"
-        },
-        "test_phase17i_missing_capability_report_groups_rows_by_family": {
-          "before": "5f1dd8537d0754986f3e54087938d733206dc7576210600f4a06a182c6b90ff0",
-          "after": "cc87e5445e4f586c61e0fe0918def620770b99c5b8bd8ada1ffb231b2815af9a"
-        },
-        "test_phase17i_source_text_boundaries_are_explicit": {
-          "before": "4c828bd6e79d93901ef87c13ebc11c4fd78c87104ba122e212e6fcdebf7f38b6",
-          "after": "3166d61720251c96c9e99ef31b6f153a393fd5bb6d3c915987db5deea5dfbbda"
-        }
-      }
-    },
-    "tools/performance_cavalcade_policy_successor.py": {
-      "before_sha256": "bce0867436b3dc1708beaee7bc885f8f281fe200385d86b79e1ecd0727ae4d63",
-      "after_sha256": "3fe971842b8e229ad4a3dc03d360a38429278d713e93a4757360e992f2219138",
-      "owners": {
-        "cavalcade_policy_predecessor": {
-          "before": "e5821e82852198c61c67221dd71d3187ad26318a81d19fa28d75e82943ef7df6",
-          "after": "a6184f358bc5d5e585dcaebc0921f1d7b19c4d493e841b9f3eb0e3597732f7fd"
-        }
-      }
-    },
-    "tools/performance_fools_flight.py": {
-      "before_sha256": null,
-      "after_sha256": "a19b7d021e53eaac4f876b524d671d750d8adaed7e8338ea07a4388dfbd02a0a",
-      "owners": {
-        "@module": {
-          "before": null,
-          "after": "589a6e9c8dc61a5050fcabfa04d8faeb0286009667a84ce4036f23259d523f4f"
-        },
-        "_sha": {
-          "before": null,
-          "after": "8f72dbfdc310957eeb857f007dc7be9414470c6878c7300c4da70e2c18567e8f"
-        },
-        "fools_flight_policy_predecessor": {
-          "before": null,
-          "after": "20add8aa1742ff409c6be36939e4cc88251c49bcb4d88ccd88cc7db81d5f35cb"
-        },
-        "fools_flight_smoke_operations": {
-          "before": null,
-          "after": "53a2196f803df55d5a1a16c96b7ed0d74b9b313f537a111ef16db4009f8f12c2"
-        }
-      }
-    },
-    "tools/performance_policy.py": {
-      "before_sha256": "7f522cd8485dc761ba56dd271728222fbace7dcc1c93134a51bff7b7b67728b5",
-      "after_sha256": "b50d348363bd0926f6b8bbc09f15a4269ec2e723ef05f28841bf7d6ed1b66358",
-      "owners": {
-        "validate_assessment": {
-          "before": "d88e2c63e277699fea52a66ad1806a6d09e81af1e0c6a4269b9e64a146bb73fc",
-          "after": "48896d4bb862e75bf0b2c3995dc72c010a1772816841ceb5bf3e705bf0b55448"
+          "after": "851ccce23c8e8ce9941d991f904baea2fcc14662b19c7271ca4a02d1c65e9468"
         }
       }
     }
   },
   "rows": {
-    "FACTION_INTEGRATION.md": {
-      "category": "rule_semantics",
-      "operations": [
-        "supported-acts-current-source-documentation"
-      ],
-      "selected_families": [],
-      "rationale": "Refresh the verified faction package checksums and document the one source row newly executable.",
-      "source_obligation": "Expose declared semantic status accurately after native Fool's Flight behavior has been proven.",
-      "unchanged_work": "Documentation only; all runtime algorithms, typed source validators and benchmark workloads are unchanged."
-    },
-    "ci/quality_shards/all.txt": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Admit the existing Fool's Flight preservation regression to its owning quality shard without changing execution policy.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "ci/quality_shards/shard-2.txt": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Admit the existing Fool's Flight preservation regression to its owning quality shard without changing execution policy.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
     "ci/test_shards/durations.json": {
-      "category": "rule_semantics",
+      "category": "measured_workload",
       "operations": [
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Derive twelve shard assignments from four added timing samples and every unchanged landed weight.",
-      "source_obligation": "The four native Fool's Flight regressions must enter the canonical selected inventory without changing any predecessor measurement or coverage obligation.",
-      "unchanged_work": "Only measured scheduling input and resulting selectors change; no allocation algorithm, worker model, quality control or coverage threshold changes."
+      "rationale": "Regenerates twelve assignments with only four new observed weights and all retained weights unchanged.",
+      "source_obligation": null,
+      "unchanged_work": null
     },
     "ci/test_shards/shard-1.txt": {
-      "category": "rule_semantics",
+      "category": "measured_workload",
       "operations": [
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Derive twelve shard assignments from four added timing samples and every unchanged landed weight.",
-      "source_obligation": "The four native Fool's Flight regressions must enter the canonical selected inventory without changing any predecessor measurement or coverage obligation.",
-      "unchanged_work": "Only measured scheduling input and resulting selectors change; no allocation algorithm, worker model, quality control or coverage threshold changes."
+      "rationale": "Regenerates twelve assignments with only four new observed weights and all retained weights unchanged.",
+      "source_obligation": null,
+      "unchanged_work": null
     },
     "ci/test_shards/shard-10.txt": {
-      "category": "rule_semantics",
+      "category": "measured_workload",
       "operations": [
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Derive twelve shard assignments from four added timing samples and every unchanged landed weight.",
-      "source_obligation": "The four native Fool's Flight regressions must enter the canonical selected inventory without changing any predecessor measurement or coverage obligation.",
-      "unchanged_work": "Only measured scheduling input and resulting selectors change; no allocation algorithm, worker model, quality control or coverage threshold changes."
+      "rationale": "Regenerates twelve assignments with only four new observed weights and all retained weights unchanged.",
+      "source_obligation": null,
+      "unchanged_work": null
     },
     "ci/test_shards/shard-11.txt": {
-      "category": "rule_semantics",
+      "category": "measured_workload",
       "operations": [
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Derive twelve shard assignments from four added timing samples and every unchanged landed weight.",
-      "source_obligation": "The four native Fool's Flight regressions must enter the canonical selected inventory without changing any predecessor measurement or coverage obligation.",
-      "unchanged_work": "Only measured scheduling input and resulting selectors change; no allocation algorithm, worker model, quality control or coverage threshold changes."
+      "rationale": "Regenerates twelve assignments with only four new observed weights and all retained weights unchanged.",
+      "source_obligation": null,
+      "unchanged_work": null
     },
     "ci/test_shards/shard-12.txt": {
-      "category": "rule_semantics",
+      "category": "measured_workload",
       "operations": [
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Derive twelve shard assignments from four added timing samples and every unchanged landed weight.",
-      "source_obligation": "The four native Fool's Flight regressions must enter the canonical selected inventory without changing any predecessor measurement or coverage obligation.",
-      "unchanged_work": "Only measured scheduling input and resulting selectors change; no allocation algorithm, worker model, quality control or coverage threshold changes."
+      "rationale": "Regenerates twelve assignments with only four new observed weights and all retained weights unchanged.",
+      "source_obligation": null,
+      "unchanged_work": null
     },
     "ci/test_shards/shard-4.txt": {
-      "category": "rule_semantics",
+      "category": "measured_workload",
       "operations": [
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Derive twelve shard assignments from four added timing samples and every unchanged landed weight.",
-      "source_obligation": "The four native Fool's Flight regressions must enter the canonical selected inventory without changing any predecessor measurement or coverage obligation.",
-      "unchanged_work": "Only measured scheduling input and resulting selectors change; no allocation algorithm, worker model, quality control or coverage threshold changes."
+      "rationale": "Regenerates twelve assignments with only four new observed weights and all retained weights unchanged.",
+      "source_obligation": null,
+      "unchanged_work": null
     },
     "ci/test_shards/shard-5.txt": {
-      "category": "rule_semantics",
+      "category": "measured_workload",
       "operations": [
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Derive twelve shard assignments from four added timing samples and every unchanged landed weight.",
-      "source_obligation": "The four native Fool's Flight regressions must enter the canonical selected inventory without changing any predecessor measurement or coverage obligation.",
-      "unchanged_work": "Only measured scheduling input and resulting selectors change; no allocation algorithm, worker model, quality control or coverage threshold changes."
+      "rationale": "Regenerates twelve assignments with only four new observed weights and all retained weights unchanged.",
+      "source_obligation": null,
+      "unchanged_work": null
     },
     "ci/test_shards/shard-6.txt": {
-      "category": "rule_semantics",
+      "category": "measured_workload",
       "operations": [
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Derive twelve shard assignments from four added timing samples and every unchanged landed weight.",
-      "source_obligation": "The four native Fool's Flight regressions must enter the canonical selected inventory without changing any predecessor measurement or coverage obligation.",
-      "unchanged_work": "Only measured scheduling input and resulting selectors change; no allocation algorithm, worker model, quality control or coverage threshold changes."
+      "rationale": "Regenerates twelve assignments with only four new observed weights and all retained weights unchanged.",
+      "source_obligation": null,
+      "unchanged_work": null
     },
     "ci/test_shards/shard-7.txt": {
-      "category": "rule_semantics",
+      "category": "measured_workload",
       "operations": [
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Derive twelve shard assignments from four added timing samples and every unchanged landed weight.",
-      "source_obligation": "The four native Fool's Flight regressions must enter the canonical selected inventory without changing any predecessor measurement or coverage obligation.",
-      "unchanged_work": "Only measured scheduling input and resulting selectors change; no allocation algorithm, worker model, quality control or coverage threshold changes."
+      "rationale": "Regenerates twelve assignments with only four new observed weights and all retained weights unchanged.",
+      "source_obligation": null,
+      "unchanged_work": null
     },
     "ci/test_shards/shard-8.txt": {
-      "category": "rule_semantics",
+      "category": "measured_workload",
       "operations": [
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Derive twelve shard assignments from four added timing samples and every unchanged landed weight.",
-      "source_obligation": "The four native Fool's Flight regressions must enter the canonical selected inventory without changing any predecessor measurement or coverage obligation.",
-      "unchanged_work": "Only measured scheduling input and resulting selectors change; no allocation algorithm, worker model, quality control or coverage threshold changes."
+      "rationale": "Regenerates twelve assignments with only four new observed weights and all retained weights unchanged.",
+      "source_obligation": null,
+      "unchanged_work": null
     },
     "ci/test_shards/shard-9.txt": {
-      "category": "rule_semantics",
+      "category": "measured_workload",
       "operations": [
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Derive twelve shard assignments from four added timing samples and every unchanged landed weight.",
-      "source_obligation": "The four native Fool's Flight regressions must enter the canonical selected inventory without changing any predecessor measurement or coverage obligation.",
-      "unchanged_work": "Only measured scheduling input and resulting selectors change; no allocation algorithm, worker model, quality control or coverage threshold changes."
+      "rationale": "Regenerates twelve assignments with only four new observed weights and all retained weights unchanged.",
+      "source_obligation": null,
+      "unchanged_work": null
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "category": "rule_semantics",
+      "category": "measured_workload",
       "operations": [
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate the published runtime identities and existing example sessions for the combined exact source tree.",
-      "source_obligation": "The external contract must identify the source tree executing the verified Fall Back reaction while retaining the previously published request surfaces.",
-      "unchanged_work": "No schema, serialization algorithm, contract dependency or review benchmark workload is modified by these generated identity replacements."
+      "rationale": "Regenerates identity-bound artifacts mechanically; the ordinary native decision schema is unchanged.",
+      "source_obligation": null,
+      "unchanged_work": null
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "category": "rule_semantics",
+      "category": "measured_workload",
       "operations": [
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate the published runtime identities and existing example sessions for the combined exact source tree.",
-      "source_obligation": "The external contract must identify the source tree executing the verified Fall Back reaction while retaining the previously published request surfaces.",
-      "unchanged_work": "No schema, serialization algorithm, contract dependency or review benchmark workload is modified by these generated identity replacements."
+      "rationale": "Regenerates identity-bound artifacts mechanically; the ordinary native decision schema is unchanged.",
+      "source_obligation": null,
+      "unchanged_work": null
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "category": "rule_semantics",
+      "category": "measured_workload",
       "operations": [
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate the published runtime identities and existing example sessions for the combined exact source tree.",
-      "source_obligation": "The external contract must identify the source tree executing the verified Fall Back reaction while retaining the previously published request surfaces.",
-      "unchanged_work": "No schema, serialization algorithm, contract dependency or review benchmark workload is modified by these generated identity replacements."
+      "rationale": "Regenerates identity-bound artifacts mechanically; the ordinary native decision schema is unchanged.",
+      "source_obligation": null,
+      "unchanged_work": null
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "category": "rule_semantics",
+      "category": "measured_workload",
       "operations": [
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate the published runtime identities and existing example sessions for the combined exact source tree.",
-      "source_obligation": "The external contract must identify the source tree executing the verified Fall Back reaction while retaining the previously published request surfaces.",
-      "unchanged_work": "No schema, serialization algorithm, contract dependency or review benchmark workload is modified by these generated identity replacements."
+      "rationale": "Regenerates identity-bound artifacts mechanically; the ordinary native decision schema is unchanged.",
+      "source_obligation": null,
+      "unchanged_work": null
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "category": "rule_semantics",
+      "category": "measured_workload",
       "operations": [
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate the published runtime identities and existing example sessions for the combined exact source tree.",
-      "source_obligation": "The external contract must identify the source tree executing the verified Fall Back reaction while retaining the previously published request surfaces.",
-      "unchanged_work": "No schema, serialization algorithm, contract dependency or review benchmark workload is modified by these generated identity replacements."
+      "rationale": "Regenerates identity-bound artifacts mechanically; the ordinary native decision schema is unchanged.",
+      "source_obligation": null,
+      "unchanged_work": null
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "category": "rule_semantics",
+      "category": "measured_workload",
       "operations": [
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate the published runtime identities and existing example sessions for the combined exact source tree.",
-      "source_obligation": "The external contract must identify the source tree executing the verified Fall Back reaction while retaining the previously published request surfaces.",
-      "unchanged_work": "No schema, serialization algorithm, contract dependency or review benchmark workload is modified by these generated identity replacements."
+      "rationale": "Regenerates identity-bound artifacts mechanically; the ordinary native decision schema is unchanged.",
+      "source_obligation": null,
+      "unchanged_work": null
     },
     "contracts/examples/support-profile.json": {
-      "category": "rule_semantics",
+      "category": "measured_workload",
       "operations": [
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate the published runtime identities and existing example sessions for the combined exact source tree.",
-      "source_obligation": "The external contract must identify the source tree executing the verified Fall Back reaction while retaining the previously published request surfaces.",
-      "unchanged_work": "No schema, serialization algorithm, contract dependency or review benchmark workload is modified by these generated identity replacements."
+      "rationale": "Regenerates identity-bound artifacts mechanically; the ordinary native decision schema is unchanged.",
+      "source_obligation": null,
+      "unchanged_work": null
     },
     "contracts/manifest.json": {
-      "category": "rule_semantics",
+      "category": "measured_workload",
       "operations": [
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate the published runtime identities and existing example sessions for the combined exact source tree.",
-      "source_obligation": "The external contract must identify the source tree executing the verified Fall Back reaction while retaining the previously published request surfaces.",
-      "unchanged_work": "No schema, serialization algorithm, contract dependency or review benchmark workload is modified by these generated identity replacements."
+      "rationale": "Regenerates identity-bound artifacts mechanically; the ordinary native decision schema is unchanged.",
+      "source_obligation": null,
+      "unchanged_work": null
     },
-    "data/generated/ability_coverage/cross_source_semantic_equivalence.json": {
-      "category": "rule_semantics",
+    "data/source_audits/ci64_provenance_v1/combined-charge-admission-v1.json": {
+      "category": "measured_workload",
       "operations": [
-        "phase-end-healing-source-and-report"
+        "engine-numerical-identity-admission"
       ],
       "selected_families": [],
-      "rationale": "Publish exact semantic support for the newly executable Fool's Flight source row.",
-      "source_obligation": "Claim execution support only after the actual native charge, resumption and opponent Fight selection can be verified.",
-      "unchanged_work": "Report data updates only; runtime algorithms, cache behavior and all benchmark inputs remain unchanged."
+      "rationale": "Binds both original source receipts and their combined runtime to the exact landed Fool's Flight squash.",
+      "source_obligation": null,
+      "unchanged_work": null
     },
-    "data/generated/ability_coverage/runtime_content_semantic_coverage.json": {
-      "category": "rule_semantics",
+    "data/source_audits/ci64_provenance_v1/stage2-ground-charge-retry-test-v1.json": {
+      "category": "measured_workload",
       "operations": [
-        "supported-acts-current-semantic-artifact"
+        "engine-numerical-identity-admission"
       ],
       "selected_families": [],
-      "rationale": "Publish exact semantic support for the newly executable Fool's Flight source row.",
-      "source_obligation": "Claim execution support only after the actual native charge, resumption and opponent Fight selection can be verified.",
-      "unchanged_work": "Report data updates only; runtime algorithms, cache behavior and all benchmark inputs remain unchanged."
-    },
-    "data/source_audits/ci64_provenance_v1/fools-flight-test-v1.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "fools-flight-fools-flight-test-v1"
-      ],
-      "selected_families": [],
-      "rationale": "Bind the exact Fool's Flight source and proof inventory to its byte-identical landed Dark Pact predecessor.",
-      "source_obligation": "Admit only the verified Blood Legion reaction and matching native regressions, leaving the earlier Dark Pact and Charge admission records intact.",
-      "unchanged_work": "Source/test proof bookkeeping does not alter runtime query algorithms, measurement fixtures, sample counts or performance budgets."
-    },
-    "data/source_audits/fools_flight_2026_11/source-verification.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "fools-flight-source-verification"
-      ],
-      "selected_families": [],
-      "rationale": "Bind the exact Fool's Flight source and proof inventory to its byte-identical landed Dark Pact predecessor.",
-      "source_obligation": "Admit only the verified Blood Legion reaction and matching native regressions, leaving the earlier Dark Pact and Charge admission records intact.",
-      "unchanged_work": "Source/test proof bookkeeping does not alter runtime query algorithms, measurement fixtures, sample counts or performance budgets."
-    },
-    "docs/ABILITY_SUPPORT_MATRIX_V2.md": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Documentation, validation, or performance-policy provenance for the isolated Fool's Flight change.",
+      "rationale": "Admits only four explicit native cases through the older independently hash-checked lineage.",
       "source_obligation": null,
       "unchanged_work": null
     },
-    "docs/ADAPTER_DECISION_CONTRACT.md": {
+    "docs/AI_POLICY_INTERFACE.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Documentation, validation, or performance-policy provenance for the isolated Fool's Flight change.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "docs/CROSS_SOURCE_SEMANTIC_EQUIVALENCE.md": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Documentation, validation, or performance-policy provenance for the isolated Fool's Flight change.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "docs/factions/chaos-daemons.md": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Documentation, validation, or performance-policy provenance for the isolated Fool's Flight change.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "docs/performance/current/fools-flight-movement.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Record exact-base measured applicability without changing any workload or gate.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "docs/performance/current/fools-flight-shock_reconstruction.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Record exact-base measured applicability without changing any workload or gate.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "docs/performance/policy-v3/fools-flight-smoke-scope.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Documentation, validation, or performance-policy provenance for the isolated Fool's Flight change.",
+      "rationale": "Binds the exact Stage 2 candidate or its finite local validation inputs.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -1256,13 +608,14 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Documentation, validation, or performance-policy provenance for the isolated Fool's Flight change.",
+      "rationale": "Maps only the newly added retry regression module and its separately pinned source successor.",
       "source_obligation": null,
       "unchanged_work": null
     },
     "scripts/engine_numerical_identity_test_admission.py": {
-      "category": "rule_semantics",
+      "category": "measured_workload",
       "operations": [
+        "blood-begets-skulls-test-admission",
         "bounded-charge-flight-wall-proof",
         "cavalcade-authority-admission",
         "close-quarters-test-admission",
@@ -1280,288 +633,53 @@
         "wrath-undeniable-test-admission"
       ],
       "selected_families": [],
-      "rationale": "Bind the exact Fool's Flight source and proof inventory to its byte-identical landed Dark Pact predecessor.",
-      "source_obligation": "Admit only the verified Blood Legion reaction and matching native regressions, leaving the earlier Dark Pact and Charge admission records intact.",
-      "unchanged_work": "Source/test proof bookkeeping does not alter runtime query algorithms, measurement fixtures, sample counts or performance budgets."
+      "rationale": "Admits only four explicit native cases through the older independently hash-checked lineage.",
+      "source_obligation": null,
+      "unchanged_work": null
     },
-    "scripts/fools_flight_test_admission.py": {
-      "category": "rule_semantics",
+    "scripts/stage2_ground_charge_test_admission.py": {
+      "category": "measured_workload",
       "operations": [
-        "fools-flight-fools-flight-test-admission"
+        "engine-numerical-identity-admission"
       ],
       "selected_families": [],
-      "rationale": "Bind the exact Fool's Flight source and proof inventory to its byte-identical landed Dark Pact predecessor.",
-      "source_obligation": "Admit only the verified Blood Legion reaction and matching native regressions, leaving the earlier Dark Pact and Charge admission records intact.",
-      "unchanged_work": "Source/test proof bookkeeping does not alter runtime query algorithms, measurement fixtures, sample counts or performance budgets."
+      "rationale": "Admits only four explicit native cases through the older independently hash-checked lineage.",
+      "source_obligation": null,
+      "unchanged_work": null
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "category": "rule_semantics",
+      "category": "measured_workload",
       "operations": [
         "cavalcade-authority-admission",
         "phase-end-healing-source-and-report"
       ],
       "selected_families": [],
-      "rationale": "Regenerate the published runtime identities and existing example sessions for the combined exact source tree.",
-      "source_obligation": "The external contract must identify the source tree executing the verified Fall Back reaction while retaining the previously published request surfaces.",
-      "unchanged_work": "No schema, serialization algorithm, contract dependency or review benchmark workload is modified by these generated identity replacements."
+      "rationale": "Regenerates identity-bound artifacts mechanically; the ordinary native decision schema is unchanged.",
+      "source_obligation": null,
+      "unchanged_work": null
     },
-    "src/warhammer40k_core/engine/catalog_rule_consumption.py": {
-      "category": "rule_semantics",
+    "src/warhammer40k_core/ai/ground_charge_candidates.py": {
+      "category": "algorithm_or_search",
       "operations": [
-        "fools-flight-catalog-completion-phase",
-        "fools-flight-catalog-rule-consumption"
+        "stage2-ground-charge-policy"
       ],
       "selected_families": [],
-      "rationale": "Bind move-effect target choices to the same host phase as their authenticated completion trigger.",
-      "source_obligation": "Mandatory Brass Stampede resolves in the opponent's Movement during Fool's Flight while retaining the original Charge action and normal behavior in Charge.",
-      "unchanged_work": "No geometric search, dice, cache or placement algorithm changes; only phase binding for existing native choices and their resolution."
+      "rationale": "Defers a bounded actor-only formation search until needed and preserves the ordinary grid, legal rigid proposal, native validator and ranking; exact-base paired native operator controls cover accept, rejected recovery and finite work/probe exhaustion.",
+      "source_obligation": null,
+      "unchanged_work": null
     },
-    "src/warhammer40k_core/engine/catalog_unit_move_completed_mortal_wounds_runtime.py": {
-      "category": "rule_semantics",
+    "src/warhammer40k_core/ai/ground_charge_policy.py": {
+      "category": "algorithm_or_search",
       "operations": [
-        "fools-flight-catalog-continuation-phase"
+        "stage2-ground-charge-policy"
       ],
       "selected_families": [],
-      "rationale": "Bind move-effect target choices to the same host phase as their authenticated completion trigger.",
-      "source_obligation": "Mandatory Brass Stampede resolves in the opponent's Movement during Fool's Flight while retaining the original Charge action and normal behavior in Charge.",
-      "unchanged_work": "No geometric search, dice, cache or placement algorithm changes; only phase binding for existing native choices and their resolution."
-    },
-    "src/warhammer40k_core/engine/charge_eligibility.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "movement-rule-branch"
-      ],
-      "selected_families": [],
-      "rationale": "Route only the source-backed completed Fall Back reaction through the existing native Charge lifecycle.",
-      "source_obligation": "Apply Chaos Daemons Faction Pack v1.2 page 124 and Core Rules 11.04: constrain reaction targets, resolve the Charge Move and expire the granted Fights First at turn end.",
-      "unchanged_work": "Charge path solving, roll generation, geometry and cache algorithms are unchanged; native phase ownership and history validation enforce the new reaction's boundary."
-    },
-    "src/warhammer40k_core/engine/charge_phase_flow.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "blood-begets-skulls-charge-preselection"
-      ],
-      "selected_families": [],
-      "rationale": "Route only the source-backed completed Fall Back reaction through the existing native Charge lifecycle.",
-      "source_obligation": "Apply Chaos Daemons Faction Pack v1.2 page 124 and Core Rules 11.04: constrain reaction targets, resolve the Charge Move and expire the granted Fights First at turn end.",
-      "unchanged_work": "Charge path solving, roll generation, geometry and cache algorithms are unchanged; native phase ownership and history validation enforce the new reaction's boundary."
-    },
-    "src/warhammer40k_core/engine/charge_phase_state.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "fools-flight-charge-phase-state"
-      ],
-      "selected_families": [],
-      "rationale": "Route only the source-backed completed Fall Back reaction through the existing native Charge lifecycle.",
-      "source_obligation": "Apply Chaos Daemons Faction Pack v1.2 page 124 and Core Rules 11.04: constrain reaction targets, resolve the Charge Move and expire the granted Fights First at turn end.",
-      "unchanged_work": "Charge path solving, roll generation, geometry and cache algorithms are unchanged; native phase ownership and history validation enforce the new reaction's boundary."
-    },
-    "src/warhammer40k_core/engine/charge_roll_flow.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "fools-flight-charge-roll-flow",
-        "gore-hungry-onslaught-phase-opportunities"
-      ],
-      "selected_families": [],
-      "rationale": "Route only the source-backed completed Fall Back reaction through the existing native Charge lifecycle.",
-      "source_obligation": "Apply Chaos Daemons Faction Pack v1.2 page 124 and Core Rules 11.04: constrain reaction targets, resolve the Charge Move and expire the granted Fights First at turn end.",
-      "unchanged_work": "Charge path solving, roll generation, geometry and cache algorithms are unchanged; native phase ownership and history validation enforce the new reaction's boundary."
-    },
-    "src/warhammer40k_core/engine/charge_target_continuation.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "fools-flight-charge-target-continuation"
-      ],
-      "selected_families": [],
-      "rationale": "Route only the source-backed completed Fall Back reaction through the existing native Charge lifecycle.",
-      "source_obligation": "Apply Chaos Daemons Faction Pack v1.2 page 124 and Core Rules 11.04: constrain reaction targets, resolve the Charge Move and expire the granted Fights First at turn end.",
-      "unchanged_work": "Charge path solving, roll generation, geometry and cache algorithms are unchanged; native phase ownership and history validation enforce the new reaction's boundary."
-    },
-    "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/detachments/blood_legion/stratagems.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "fools-flight-stratagems",
-        "gore-hungry-onslaught-source-backed-terrain",
-        "skulls-beget-blood-shooting-resolution",
-        "wrath-undeniable-fight-retention"
-      ],
-      "selected_families": [],
-      "rationale": "Route only the source-backed completed Fall Back reaction through the existing native Charge lifecycle.",
-      "source_obligation": "Apply Chaos Daemons Faction Pack v1.2 page 124 and Core Rules 11.04: constrain reaction targets, resolve the Charge Move and expire the granted Fights First at turn end.",
-      "unchanged_work": "Charge path solving, roll generation, geometry and cache algorithms are unchanged; native phase ownership and history validation enforce the new reaction's boundary."
-    },
-    "src/warhammer40k_core/engine/heroic_intervention_history.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "fools-flight-heroic-intervention-history"
-      ],
-      "selected_families": [],
-      "rationale": "Route only the source-backed completed Fall Back reaction through the existing native Charge lifecycle.",
-      "source_obligation": "Apply Chaos Daemons Faction Pack v1.2 page 124 and Core Rules 11.04: constrain reaction targets, resolve the Charge Move and expire the granted Fights First at turn end.",
-      "unchanged_work": "Charge path solving, roll generation, geometry and cache algorithms are unchanged; native phase ownership and history validation enforce the new reaction's boundary."
-    },
-    "src/warhammer40k_core/engine/heroic_intervention_rolls.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "fools-flight-heroic-intervention-rolls"
-      ],
-      "selected_families": [],
-      "rationale": "Route only the source-backed completed Fall Back reaction through the existing native Charge lifecycle.",
-      "source_obligation": "Apply Chaos Daemons Faction Pack v1.2 page 124 and Core Rules 11.04: constrain reaction targets, resolve the Charge Move and expire the granted Fights First at turn end.",
-      "unchanged_work": "Charge path solving, roll generation, geometry and cache algorithms are unchanged; native phase ownership and history validation enforce the new reaction's boundary."
-    },
-    "src/warhammer40k_core/engine/interrupted_charge.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "fools-flight-interrupted-charge"
-      ],
-      "selected_families": [],
-      "rationale": "Route only the source-backed completed Fall Back reaction through the existing native Charge lifecycle.",
-      "source_obligation": "Apply Chaos Daemons Faction Pack v1.2 page 124 and Core Rules 11.04: constrain reaction targets, resolve the Charge Move and expire the granted Fights First at turn end.",
-      "unchanged_work": "Charge path solving, roll generation, geometry and cache algorithms are unchanged; native phase ownership and history validation enforce the new reaction's boundary."
-    },
-    "src/warhammer40k_core/engine/lifecycle_advancement.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "fools-flight-lifecycle-advancement"
-      ],
-      "selected_families": [],
-      "rationale": "Route only the source-backed completed Fall Back reaction through the existing native Charge lifecycle.",
-      "source_obligation": "Apply Chaos Daemons Faction Pack v1.2 page 124 and Core Rules 11.04: constrain reaction targets, resolve the Charge Move and expire the granted Fights First at turn end.",
-      "unchanged_work": "Charge path solving, roll generation, geometry and cache algorithms are unchanged; native phase ownership and history validation enforce the new reaction's boundary."
-    },
-    "src/warhammer40k_core/engine/lifecycle_restore_consistency.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "fools-flight-lifecycle-restore-consistency",
-        "order130-model-mission-history"
-      ],
-      "selected_families": [],
-      "rationale": "Route only the source-backed completed Fall Back reaction through the existing native Charge lifecycle.",
-      "source_obligation": "Apply Chaos Daemons Faction Pack v1.2 page 124 and Core Rules 11.04: constrain reaction targets, resolve the Charge Move and expire the granted Fights First at turn end.",
-      "unchanged_work": "Charge path solving, roll generation, geometry and cache algorithms are unchanged; native phase ownership and history validation enforce the new reaction's boundary."
-    },
-    "src/warhammer40k_core/engine/move_completion_triggers.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "cumulative-exact-029",
-        "fools-flight-move-completion-triggers"
-      ],
-      "selected_families": [
-        "movement",
-        "shock_reconstruction"
-      ],
-      "rationale": "Tie accepted and restored Charge move history to the actual host phase occurrence.",
-      "source_obligation": "A reactive Charge is a move in its enclosing Movement phase; use authenticated history so Surge eligibility is not evaluated on a false empty history.",
-      "unchanged_work": "Geometry, Charge path resolution and restoration algorithms are unchanged; the ledger receives the correct phase. Run both sensitive movement and shock reconstruction comparisons where required."
-    },
-    "src/warhammer40k_core/engine/movement_charge_stratagem.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "movement-rule-branch"
-      ],
-      "selected_families": [],
-      "rationale": "Route only the source-backed completed Fall Back reaction through the existing native Charge lifecycle.",
-      "source_obligation": "Apply Chaos Daemons Faction Pack v1.2 page 124 and Core Rules 11.04: constrain reaction targets, resolve the Charge Move and expire the granted Fights First at turn end.",
-      "unchanged_work": "Charge path solving, roll generation, geometry and cache algorithms are unchanged; native phase ownership and history validation enforce the new reaction's boundary."
-    },
-    "src/warhammer40k_core/engine/movement_modifier_evaluation.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "movement-rule-branch"
-      ],
-      "selected_families": [],
-      "rationale": "Route only the source-backed completed Fall Back reaction through the existing native Charge lifecycle.",
-      "source_obligation": "Apply Chaos Daemons Faction Pack v1.2 page 124 and Core Rules 11.04: constrain reaction targets, resolve the Charge Move and expire the granted Fights First at turn end.",
-      "unchanged_work": "Charge path solving, roll generation, geometry and cache algorithms are unchanged; native phase ownership and history validation enforce the new reaction's boundary."
-    },
-    "src/warhammer40k_core/engine/phase_movement_history.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "movement-rule-branch"
-      ],
-      "selected_families": [],
-      "rationale": "Tie accepted and restored Charge move history to the actual host phase occurrence.",
-      "source_obligation": "A reactive Charge is a move in its enclosing Movement phase; use authenticated history so Surge eligibility is not evaluated on a false empty history.",
-      "unchanged_work": "Geometry, Charge path resolution and restoration algorithms are unchanged; the ledger receives the correct phase. Run both sensitive movement and shock reconstruction comparisons where required."
-    },
-    "src/warhammer40k_core/engine/phases/charge.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "fools-flight-charge"
-      ],
-      "selected_families": [],
-      "rationale": "Route only the source-backed completed Fall Back reaction through the existing native Charge lifecycle.",
-      "source_obligation": "Apply Chaos Daemons Faction Pack v1.2 page 124 and Core Rules 11.04: constrain reaction targets, resolve the Charge Move and expire the granted Fights First at turn end.",
-      "unchanged_work": "Charge path solving, roll generation, geometry and cache algorithms are unchanged; native phase ownership and history validation enforce the new reaction's boundary."
-    },
-    "src/warhammer40k_core/engine/phases/movement_completion_candidates.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "movement-rule-branch"
-      ],
-      "selected_families": [],
-      "rationale": "Route only the source-backed completed Fall Back reaction through the existing native Charge lifecycle.",
-      "source_obligation": "Apply Chaos Daemons Faction Pack v1.2 page 124 and Core Rules 11.04: constrain reaction targets, resolve the Charge Move and expire the granted Fights First at turn end.",
-      "unchanged_work": "Charge path solving, roll generation, geometry and cache algorithms are unchanged; native phase ownership and history validation enforce the new reaction's boundary."
-    },
-    "src/warhammer40k_core/engine/stratagems_eligibility.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "order135-visibility-hot-consumers",
-        "skulls-beget-blood-shooting-resolution"
-      ],
-      "selected_families": [],
-      "rationale": "Add the authenticated trigger-range requirement to native eligibility without calling the LOS evaluator.",
-      "source_obligation": "Chaos Daemons Faction Pack v1.2 page 124 requires the chosen friendly Khorne daemon to be within six inches of the enemy that just Fell Back.",
-      "unchanged_work": "The added check runs only for the Fall Back Charge trigger metadata and uses the existing unit-distance authority. Visible-enemy enumeration, LOS geometry, and all other Stratagem target checks keep their existing algorithms."
-    },
-    "src/warhammer40k_core/engine/stratagems_generic_rule_ir.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "order131-objective-approach"
-      ],
-      "selected_families": [],
-      "rationale": "Route only the source-backed completed Fall Back reaction through the existing native Charge lifecycle.",
-      "source_obligation": "Apply Chaos Daemons Faction Pack v1.2 page 124 and Core Rules 11.04: constrain reaction targets, resolve the Charge Move and expire the granted Fights First at turn end.",
-      "unchanged_work": "Charge path solving, roll generation, geometry and cache algorithms are unchanged; native phase ownership and history validation enforce the new reaction's boundary."
-    },
-    "src/warhammer40k_core/engine/timing_windows.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "order117-allocation-permission"
-      ],
-      "selected_families": [],
-      "rationale": "Route only the source-backed completed Fall Back reaction through the existing native Charge lifecycle.",
-      "source_obligation": "Apply Chaos Daemons Faction Pack v1.2 page 124 and Core Rules 11.04: constrain reaction targets, resolve the Charge Move and expire the granted Fights First at turn end.",
-      "unchanged_work": "Charge path solving, roll generation, geometry and cache algorithms are unchanged; native phase ownership and history validation enforce the new reaction's boundary."
-    },
-    "src/warhammer40k_core/engine/unit_move_completed_hooks.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "fools-flight-unit-move-completed-hooks"
-      ],
-      "selected_families": [],
-      "rationale": "Route only the source-backed completed Fall Back reaction through the existing native Charge lifecycle.",
-      "source_obligation": "Apply Chaos Daemons Faction Pack v1.2 page 124 and Core Rules 11.04: constrain reaction targets, resolve the Charge Move and expire the granted Fights First at turn end.",
-      "unchanged_work": "Charge path solving, roll generation, geometry and cache algorithms are unchanged; native phase ownership and history validation enforce the new reaction's boundary."
-    },
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_blood_legion_ir_support_2026_27.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "blood-begets-skulls-source-activation",
-        "gore-hungry-onslaught-source-backed-terrain",
-        "skulls-beget-blood-shooting-resolution",
-        "source-record",
-        "wrath-undeniable-fight-retention"
-      ],
-      "selected_families": [],
-      "rationale": "Route only the source-backed completed Fall Back reaction through the existing native Charge lifecycle.",
-      "source_obligation": "Apply Chaos Daemons Faction Pack v1.2 page 124 and Core Rules 11.04: constrain reaction targets, resolve the Charge Move and expire the granted Fights First at turn end.",
-      "unchanged_work": "Charge path solving, roll generation, geometry and cache algorithms are unchanged; native phase ownership and history validation enforce the new reaction's boundary."
+      "rationale": "Defers a bounded actor-only formation search until needed and preserves the ordinary grid, legal rigid proposal, native validator and ranking; exact-base paired native operator controls cover accept, rejected recovery and finite work/probe exhaustion.",
+      "source_obligation": null,
+      "unchanged_work": null
     },
     "tests/code_quality/test_engine_numerical_identity_admission.py": {
-      "category": "rule_semantics",
+      "category": "measured_workload",
       "operations": [
         "bounded-charge-flight-wall-proof",
         "engine-numerical-identity-admission",
@@ -1574,84 +692,22 @@
         "wrath-undeniable-test-admission"
       ],
       "selected_families": [],
-      "rationale": "Bind the exact Fool's Flight source and proof inventory to its byte-identical landed Dark Pact predecessor.",
-      "source_obligation": "Admit only the verified Blood Legion reaction and matching native regressions, leaving the earlier Dark Pact and Charge admission records intact.",
-      "unchanged_work": "Source/test proof bookkeeping does not alter runtime query algorithms, measurement fixtures, sample counts or performance budgets."
-    },
-    "tests/code_quality/test_order50_heroic_intervention.py": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Verify that Heroic Intervention delegates interrupted Charge state creation to the shared lifecycle owner.",
+      "rationale": "Binds the exact Stage 2 candidate or its finite local validation inputs.",
       "source_obligation": null,
       "unchanged_work": null
     },
-    "tests/code_quality/test_performance_policy.py": {
-      "category": "rule_semantics",
+    "tests/infrastructure/adapters/test_ground_charge_engagement_retry.py": {
+      "category": "measured_workload",
       "operations": [
-        "speedup-test-admission"
+        "stage2-ground-charge-policy"
       ],
       "selected_families": [],
-      "rationale": "Bind the exact Fool's Flight source and proof inventory to its byte-identical landed Dark Pact predecessor.",
-      "source_obligation": "Admit only the verified Blood Legion reaction and matching native regressions, leaving the earlier Dark Pact and Charge admission records intact.",
-      "unchanged_work": "Source/test proof bookkeeping does not alter runtime query algorithms, measurement fixtures, sample counts or performance budgets."
-    },
-    "tests/factions/chaos_daemons/integration/test_fools_flight.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "fools-flight-stampede-native-proof",
-        "fools-flight-test-fools-flight"
-      ],
-      "selected_families": [],
-      "rationale": "Bind the exact Fool's Flight source and proof inventory to its byte-identical landed Dark Pact predecessor.",
-      "source_obligation": "Admit only the verified Blood Legion reaction and matching native regressions, leaving the earlier Dark Pact and Charge admission records intact.",
-      "unchanged_work": "Source/test proof bookkeeping does not alter runtime query algorithms, measurement fixtures, sample counts or performance budgets."
-    },
-    "tests/infrastructure/source_governance/unit/test_blocked_row_classification.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "ci-restructure-tests-infrastructure-source_governance-unit-test_blocked_row_classification.py",
-        "gore-hungry-onslaught-native-validation"
-      ],
-      "selected_families": [],
-      "rationale": "Bind the exact Fool's Flight source and proof inventory to its byte-identical landed Dark Pact predecessor.",
-      "source_obligation": "Admit only the verified Blood Legion reaction and matching native regressions, leaving the earlier Dark Pact and Charge admission records intact.",
-      "unchanged_work": "Source/test proof bookkeeping does not alter runtime query algorithms, measurement fixtures, sample counts or performance budgets."
-    },
-    "tools/performance_cavalcade_policy_successor.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "cavalcade-comparison-fixture-binding"
-      ],
-      "selected_families": [],
-      "rationale": "Bind the exact Fool's Flight source and proof inventory to its byte-identical landed Dark Pact predecessor.",
-      "source_obligation": "Admit only the verified Blood Legion reaction and matching native regressions, leaving the earlier Dark Pact and Charge admission records intact.",
-      "unchanged_work": "Source/test proof bookkeeping does not alter runtime query algorithms, measurement fixtures, sample counts or performance budgets."
-    },
-    "tools/performance_fools_flight.py": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Documentation, validation, or performance-policy provenance for the isolated Fool's Flight change.",
+      "rationale": "Runs real native operator cases for deterministic recovery, accepted rigid work and both retry limits.",
       "source_obligation": null,
       "unchanged_work": null
-    },
-    "tools/performance_policy.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "ci64-provenance-1504c891c8d333f3c62a63c7948e98ffbf88e3f7ed520168c4d3861cdcbac334",
-        "ci67-transaction-1504c891c8d333f3c62a63c7948e98ffbf88e3f7ed520168c4d3861cdcbac334"
-      ],
-      "selected_families": [],
-      "rationale": "Bind the exact Fool's Flight source and proof inventory to its byte-identical landed Dark Pact predecessor.",
-      "source_obligation": "Admit only the verified Blood Legion reaction and matching native regressions, leaving the earlier Dark Pact and Charge admission records intact.",
-      "unchanged_work": "Source/test proof bookkeeping does not alter runtime query algorithms, measurement fixtures, sample counts or performance budgets."
     }
   },
   "milestone": "ordinary",
-  "comparisons": {
-    "movement": "docs/performance/current/fools-flight-movement.json",
-    "shock_reconstruction": "docs/performance/current/fools-flight-shock_reconstruction.json"
-  },
+  "comparisons": {},
   "full_game": null
 }

@@ -2962,11 +2962,17 @@ with one lateral waypoint per model. For five against five, the policy groups
 visible placed target models by their projected rules-unit identity, including
 attached components. It keeps the issued target ID in the proposal. Grid paths
 put each mover near a target model and sample landing regions on visible
-objective terrain. When circumscribed-base distances show a mover cannot reach
-the grid's one-inch band within the roll and numerical tolerance, the generator tries one straight
-whole-unit translation toward the closest target pair. The translation keeps
-every mover closer and at least one within the close band. Both branches screen
-paths for blockers and connected coherency under the same geometry work budget.
+objective terrain. When circumscribed-base distances put a mover outside the
+one-inch preferred band plus the roll and numerical tolerance, the generator
+first tries a straight whole-unit translation toward the closest target pair.
+The translation keeps every mover closer and at least one within the preferred
+band. If those distances still allow every mover to reach the two-inch
+engagement band, the generator can search that wider band, preferring
+preferred-band endpoints in each model's path options. It only searches the
+wider band when no rigid proposal can be built or when native validation
+rejects the rigid proposal and probe capacity remains. A native accept or
+timeout does not start the wider search. The searches share geometry work and
+output limits and screen paths for blockers and connected coherency.
 Objective preprocessing caps area and vertex inventory and charges the budget
 before building footprints. The ordinary native submission certifies path,
 terrain, conditional per-model endpoints, target engagement and coherency.
@@ -2986,6 +2992,7 @@ then checks at most 32 proposals and retains at most 16 accepts. A probe default
 to 15 seconds, is capped at 30 seconds, and shares a 300-second native deadline
 with the other probes. The operator receipt separates generation, validation
 and selection time and records accepts, engine rejections and timeouts.
+A deferred engagement search does not restart the native deadline.
 Selection considers completed native accepts. For five against five it first
 prefers more distinct linked objective areas reached by the formation. It then
 prefers the shortest longest model path and the shortest total, with stable
