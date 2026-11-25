@@ -614,6 +614,23 @@
     "tests/infrastructure/adapters/test_charge_flight_admission.py::test_unmodified_charge_probability_synthetic_controls[10-6-expected1]": 0.001,
     "tests/infrastructure/adapters/test_charge_flight_admission.py::test_unmodified_charge_probability_synthetic_controls[7-7-expected0]": 0.001,
     "tests/infrastructure/adapters/test_charge_flight_admission.py::test_unmodified_charge_probability_synthetic_controls[9-7-expected2]": 0.001,
+    "tests/infrastructure/adapters/test_charge_flight_barrier.py::test_barrier_flight_preserves_open_board_ground_choice": 0.602,
+    "tests/infrastructure/adapters/test_charge_flight_barrier.py::test_dense_wall_native_flight_advantage_replays": 11.924,
+    "tests/infrastructure/adapters/test_charge_flight_barrier.py::test_wall_charge_abstains_without_a_separated_bound[bad-witness]": 1.896,
+    "tests/infrastructure/adapters/test_charge_flight_barrier.py::test_wall_charge_abstains_without_a_separated_bound[low]": 1.891,
+    "tests/infrastructure/adapters/test_charge_flight_barrier.py::test_wall_charge_abstains_without_a_separated_bound[rotated]": 1.881,
+    "tests/infrastructure/adapters/test_charge_flight_barrier.py::test_wall_charge_abstains_without_a_separated_bound[short]": 1.906,
+    "tests/infrastructure/adapters/test_charge_flight_barrier.py::test_wall_charge_abstains_without_a_separated_bound[uncertified-endpoints]": 1.932,
+    "tests/infrastructure/adapters/test_charge_flight_onslaught_timing.py::test_early_offer_distinguishes_held_cp_from_a_live_grant[active-grant]": 1.956,
+    "tests/infrastructure/adapters/test_charge_flight_onslaught_timing.py::test_early_offer_distinguishes_held_cp_from_a_live_grant[held-cp]": 1.928,
+    "tests/infrastructure/adapters/test_charge_flight_onslaught_timing.py::test_flight_does_not_gain_distance_or_refund_penalty": 1.459,
+    "tests/infrastructure/adapters/test_charge_flight_onslaught_timing.py::test_native_late_grant_leaves_declared_flight_unchanged[decline]": 3.763,
+    "tests/infrastructure/adapters/test_charge_flight_onslaught_timing.py::test_native_late_grant_leaves_declared_flight_unchanged[spend]": 4.576,
+    "tests/infrastructure/adapters/test_charge_flight_onslaught_timing.py::test_no_cp_keeps_the_wall_proof": 1.866,
+    "tests/infrastructure/adapters/test_charge_flight_onslaught_timing.py::test_other_unit_spend_is_not_a_mover_grant": 0.935,
+    "tests/infrastructure/adapters/test_charge_flight_onslaught_timing.py::test_real_late_spend_changes_ground_only_if_authorized[absent]": 1.944,
+    "tests/infrastructure/adapters/test_charge_flight_onslaught_timing.py::test_real_late_spend_changes_ground_only_if_authorized[decline]": 3.51,
+    "tests/infrastructure/adapters/test_charge_flight_onslaught_timing.py::test_real_late_spend_changes_ground_only_if_authorized[spend]": 6.009,
     "tests/infrastructure/adapters/test_cover_event_identity.py::test_save_cover_cache_key_projects_embedded_request_reference": 0.001,
     "tests/infrastructure/adapters/test_deployment_candidates.py::test_deployment_binding_and_receipt_tampering_fail_closed": 0.98,
     "tests/infrastructure/adapters/test_deployment_candidates.py::test_deployment_generation_duplicate_and_raw_budget_accounting": 0.42,
@@ -6744,18 +6761,18 @@
   },
   "execution_model": {
     "assignment_wall_lower_bound_seconds": {
-      "1": 579.799,
-      "10": 579.799,
-      "11": 579.799,
-      "12": 579.799,
+      "1": 581.048,
+      "10": 581.048,
+      "11": 581.049,
+      "12": 581.049,
       "2": 795.547,
       "3": 609.537,
-      "4": 579.8,
-      "5": 579.799,
-      "6": 579.799,
-      "7": 579.8,
-      "8": 579.799,
-      "9": 579.799
+      "4": 581.049,
+      "5": 581.049,
+      "6": 581.049,
+      "7": 581.049,
+      "8": 581.048,
+      "9": 581.048
     },
     "cold_shard_assignment": "minimum-unrounded-modeled-test-load-existing-bucket-v1",
     "cold_shard_id": 1,
@@ -6764,18 +6781,18 @@
       "tests/factions/chaos_daemons/integration/test_cavalcade_v995_roster.py::test_exact_mirror_deploys_all_78_models_and_replays_to_battle"
     ],
     "shard_worker_seconds": {
-      "1": 2319.196,
-      "10": 2319.197,
-      "11": 2319.196,
-      "12": 2319.196,
+      "1": 2324.194,
+      "10": 2324.194,
+      "11": 2324.195,
+      "12": 2324.196,
       "2": 3182.186,
       "3": 2438.146,
-      "4": 2319.198,
-      "5": 2319.196,
-      "6": 2319.196,
-      "7": 2319.201,
-      "8": 2319.196,
-      "9": 2319.198
+      "4": 2324.195,
+      "5": 2324.195,
+      "6": 2324.195,
+      "7": 2324.196,
+      "8": 2324.194,
+      "9": 2324.194
     }
   },
   "files": {
@@ -6841,6 +6858,8 @@
     "tests/infrastructure/adapters/test_canonical_deployment.py": 472.838,
     "tests/infrastructure/adapters/test_canonical_deployment_coverage.py": 1335.308,
     "tests/infrastructure/adapters/test_charge_flight_admission.py": 19.716,
+    "tests/infrastructure/adapters/test_charge_flight_barrier.py": 22.032,
+    "tests/infrastructure/adapters/test_charge_flight_onslaught_timing.py": 27.946,
     "tests/infrastructure/adapters/test_cover_event_identity.py": 0.001,
     "tests/infrastructure/adapters/test_deployment_candidates.py": 463.191,
     "tests/infrastructure/adapters/test_deployment_experiment.py": 493.559,
@@ -7338,6 +7357,7 @@
         "318c7912fdab7fce1cce68a3998df8fbda4c9536540c88431e6303edb9b7fb5a",
         "3a22a93418b69848df9f3add62ccad61a8bb7cc93f094c2be079414f226c903d",
         "431f84031f3029637fa3c74e55d1c8dede1e3fe1aa04f223da43a8cacdd7574d",
+        "5e4e0c1d0dec8330b10e7b4b4b3ec3191c4750ff009cfa932d3468ab003b7c65",
         "6065394017e442925f4256644907ffc7924dcc2b4a699b5065e1dda846989353",
         "63db8ac24763535fbddc46142b0c99e6833b128bc40e674ff95ec735b05e1018",
         "708e2a7cdde4ec8155cc758efc538d7dc0dd4b5c25644c8a1c2d88652d6df8df",
@@ -7351,17 +7371,17 @@
         "b6375213c9da2f15abad64e49a6464d2963ef84289178cef5d659c8ec4ce1295",
         "d221fa9414f09deb36d275dca16085e59d0239e19246d38cf138ddd866c65662"
       ],
-      "source": "Retained #736 refresh timing profile and one measured three-inch Charge roundoff regression on WSL; plus five measured Sheathed in Brass cases (serial WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); plus measured Blood Begets Skulls and Phase 17I updates (serial WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); add four measured Stage 3 melee cases (WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); plus measured Skulls Beget Blood and Phase 17I updates (serial WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); retain two reviewed Stage 3 native-qualification flight weights (serial Windows, Python 3.14.5; scheduling only); plus measured Wrath Undeniable and Phase 17I updates (serial WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); plus four measured pre-roll Charge flight admission cases (serial Windows, Python 3.14.5; scheduling only); remeasured the same native Charge case with the operational proof and unchanged case inventory; plus seven measured Gore-Hungry Onslaught nodes (serial Linux, Python 3.14.5, branch coverage; scheduling only)",
-      "test_cases": 6741,
-      "test_files": 453
+      "source": "Retained #736 refresh timing profile and one measured three-inch Charge roundoff regression on WSL; plus five measured Sheathed in Brass cases (serial WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); plus measured Blood Begets Skulls and Phase 17I updates (serial WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); add four measured Stage 3 melee cases (WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); plus measured Skulls Beget Blood and Phase 17I updates (serial WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); retain two reviewed Stage 3 native-qualification flight weights (serial Windows, Python 3.14.5; scheduling only); plus measured Wrath Undeniable and Phase 17I updates (serial WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); plus four measured pre-roll Charge flight admission cases (serial Windows, Python 3.14.5; scheduling only); remeasured the same native Charge case with the operational proof and unchanged case inventory; plus seven measured Gore-Hungry Onslaught nodes (serial Linux, Python 3.14.5, branch coverage; scheduling only); plus 17 measured Stage 3 Dense-wall and native late-spend controls (serial Windows, Python 3.14.5; scheduling only), retaining all exact landed-base weights",
+      "test_cases": 6758,
+      "test_files": 455
     }
   ],
   "shard_count": 12,
   "shards": [
     {
-      "duration_seconds": 1817.962,
+      "duration_seconds": 2324.194,
       "shard_id": 1,
-      "test_file_count": 53
+      "test_file_count": 51
     },
     {
       "duration_seconds": 3182.186,
@@ -7374,49 +7394,49 @@
       "test_file_count": 1
     },
     {
-      "duration_seconds": 2319.198,
+      "duration_seconds": 2324.195,
       "shard_id": 4,
-      "test_file_count": 45
+      "test_file_count": 46
     },
     {
-      "duration_seconds": 2319.196,
+      "duration_seconds": 2324.195,
       "shard_id": 5,
-      "test_file_count": 52
-    },
-    {
-      "duration_seconds": 2319.196,
-      "shard_id": 6,
       "test_file_count": 51
     },
     {
-      "duration_seconds": 2319.201,
+      "duration_seconds": 2324.195,
+      "shard_id": 6,
+      "test_file_count": 53
+    },
+    {
+      "duration_seconds": 1822.962,
       "shard_id": 7,
       "test_file_count": 51
     },
     {
-      "duration_seconds": 2319.196,
+      "duration_seconds": 2324.194,
       "shard_id": 8,
       "test_file_count": 53
     },
     {
-      "duration_seconds": 2319.198,
+      "duration_seconds": 2324.194,
       "shard_id": 9,
-      "test_file_count": 50
+      "test_file_count": 53
     },
     {
-      "duration_seconds": 2319.197,
+      "duration_seconds": 2324.194,
       "shard_id": 10,
       "test_file_count": 50
     },
     {
-      "duration_seconds": 2319.196,
+      "duration_seconds": 2324.195,
       "shard_id": 11,
       "test_file_count": 85
     },
     {
-      "duration_seconds": 2319.196,
+      "duration_seconds": 2324.196,
       "shard_id": 12,
-      "test_file_count": 52
+      "test_file_count": 51
     }
   ],
   "step5g_partitions": {
@@ -7424,5 +7444,5 @@
     "sha256": "b241b31651a8d5d903a2b851583186c276a5ac32fed26de1a1c69b4aa278b711"
   },
   "strategy": "largest-processing-time-by-derived-selector-weight",
-  "total_test_duration_seconds": 28311.068
+  "total_test_duration_seconds": 28361.046
 }

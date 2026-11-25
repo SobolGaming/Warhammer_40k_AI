@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from enum import StrEnum
 from itertools import product
 from sys import float_info
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal
 
 from warhammer40k_core.adapters.access_control import ViewerContext
 from warhammer40k_core.ai.player_policy import (
@@ -21,6 +21,7 @@ from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_f
 from warhammer40k_core.engine.charge_declaration import ChargeRollRequest
 from warhammer40k_core.engine.charge_move_resolution import resolve_charge_move
 from warhammer40k_core.engine.charge_movement_source import charge_movement_placement
+from warhammer40k_core.engine.charge_path_contexts import charge_model_path_contexts
 from warhammer40k_core.engine.charge_required_targets import charge_target_constraints_satisfied
 from warhammer40k_core.engine.charge_roll_permissions import charge_reroll_permission_for_unit
 from warhammer40k_core.engine.charge_targets import charge_target_candidates
@@ -32,16 +33,22 @@ from warhammer40k_core.engine.phases.charge_modifier_ignore import (
     SELECT_CHARGING_UNIT_DECISION_TYPE,
     charge_roll_modifiers_for_unit,
 )
+from warhammer40k_core.engine.physical_engagement import physical_geometry_models_for_rules_unit
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.stratagems import CORE_COMMAND_REROLL_HANDLER_ID
 from warhammer40k_core.engine.take_to_the_skies import flight_penalty
+from warhammer40k_core.geometry.base import CircularBase, OvalBase
+from warhammer40k_core.geometry.milli_inch import TICKS_PER_INCH
 from warhammer40k_core.geometry.pose import Pose
+from warhammer40k_core.geometry.terrain import classified_feature_transit_permission
+from warhammer40k_core.geometry.terrain_classification import TerrainAreaClassification
 
 if TYPE_CHECKING:
     from warhammer40k_core.adapters.local_session import LocalGameSession
     from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
     from warhammer40k_core.engine.abilities import AbilityCatalogIndex
     from warhammer40k_core.engine.battlefield_state import BattlefieldScenario
+    from warhammer40k_core.engine.charge_movement_source import ChargePlacement
     from warhammer40k_core.engine.game_state import GameState
     from warhammer40k_core.engine.phases.charge import ChargePhaseHandler
     from warhammer40k_core.geometry.pathing import PathWitness
@@ -55,6 +62,7 @@ class ChargeFlightUnresolvedReason(StrEnum):
     OBSERVATION_DRIFT = "observation_drift"
     UNSUPPORTED_PROOF_CONTEXT = "unsupported_proof_context"
     MINIMUM_ROLL_UNPROVEN = "minimum_roll_unproven"
+    BOUNDS_OVERLAP = "bounds_overlap"
 
 
 @dataclass(frozen=True, slots=True)
@@ -250,6 +258,25 @@ class ProvenChargeFlightNoSuccess:
     action: None = None
 
 
+@dataclass(frozen=True, slots=True)
+class ChargeFlightRollBound:
+    rolls: tuple[int, ...]
+    ordered_outcomes: int
+
+
+@dataclass(frozen=True, slots=True)
+class ProvenChargeFlightAdvantage:
+    """Flight is better if no additional Command Points are spent on the Charge."""
+
+    offer: ChargeFlightOffer
+    witness_sha256: str
+    ground_distance_lower_bound_inches: float
+    ground_upper_bound: ChargeFlightRollBound
+    flight_lower_bound: ChargeFlightRollBound
+    action: PolicyAction
+    comparison_scope: Literal["no_additional_cp"] = "no_additional_cp"
+
+
 def choose_proven_charge_flight_mode(
     session: LocalGameSession,
     context: PlayerDecisionContext,
@@ -257,7 +284,12 @@ def choose_proven_charge_flight_mode(
     unit_id: str,
     target_id: str,
     witness: PathWitness,
-) -> ProvenChargeFlightChoice | ProvenChargeFlightNoSuccess | ChargeFlightUnresolved:
+) -> (
+    ProvenChargeFlightChoice
+    | ProvenChargeFlightNoSuccess
+    | ProvenChargeFlightAdvantage
+    | ChargeFlightUnresolved
+):
     """Choose an issued declaration only with a proof from this live request.
 
     Trusted, read-only qualification; there are no speculative submissions, forks,
@@ -285,7 +317,7 @@ def choose_proven_charge_flight_mode(
     viewer = ViewerContext.for_player(actor)
     if payload_digest(session.view_for_context(viewer=viewer)) != offer.observation_hash:
         return ChargeFlightUnresolved(ChargeFlightUnresolvedReason.OBSERVATION_DRIFT)
-    poses = _open_visible_poses(context, offer)
+    poses = _visible_poses(context, offer)
     if poses is None:
         return ChargeFlightUnresolved(ChargeFlightUnresolvedReason.UNSUPPORTED_PROOF_CONTEXT)
     if witness.model_ids() != (offer.model_id,):
@@ -301,9 +333,16 @@ def choose_proven_charge_flight_mode(
 
     # Use the actual active Charge handler, not a reconstructed/default registry.
     handler = lifecycle._charge_phase_handler  # pyright: ignore[reportPrivateUsage]
-    scenario = _open_native_scenario(state, poses)
+    scenario = _native_scenario(state, poses)
     abilities = handler.ability_index_for_player(actor)
-    if scenario is None or not _plain_charge_supported(state, handler, offer, actor, abilities):
+    if scenario is None or not _plain_charge_supported(
+        state,
+        handler,
+        offer,
+        actor,
+        abilities,
+        no_additional_cp=bool(scenario.battlefield_state.terrain_features),
+    ):
         return ChargeFlightUnresolved(ChargeFlightUnresolvedReason.UNSUPPORTED_PROOF_CONTEXT)
     # The Charge handler supplies route semantics; the live state's ruleset
     # separately owns the movement-budget penalty, just as in native Charge.
@@ -345,15 +384,47 @@ def choose_proven_charge_flight_mode(
         dice.total(faces) for faces in product(range(1, dice.sides + 1), repeat=dice.quantity)
     )
 
-    ground = _prove_mode(scenario, ruleset, offer, witness, counts, abilities, flies=False)
-    flight = _prove_mode(scenario, ruleset, offer, witness, counts, abilities, flies=True)
-    if ground is None or flight is None:
-        return result
+    placement = charge_movement_placement(scenario=scenario, unit_instance_id=offer.unit_id)
+    proof: (
+        ProvenChargeFlightChoice
+        | ProvenChargeFlightNoSuccess
+        | ProvenChargeFlightAdvantage
+        | ChargeFlightUnresolved
+    )
+    if scenario.battlefield_state.terrain_features:
+        proof = _prove_wall_advantage(
+            context, scenario, ruleset, offer, witness, counts, abilities, placement
+        )
+    else:
+        proof = _prove_open_choice(
+            context, scenario, ruleset, offer, witness, counts, abilities, placement
+        )
     if (
         lifecycle.pending_decision_request() != request
         or payload_digest(session.view_for_context(viewer=viewer)) != offer.observation_hash
     ):
         return ChargeFlightUnresolved(ChargeFlightUnresolvedReason.OBSERVATION_DRIFT)
+    return proof
+
+
+def _prove_open_choice(
+    context: PlayerDecisionContext,
+    scenario: BattlefieldScenario,
+    ruleset: RulesetDescriptor,
+    offer: ChargeFlightOffer,
+    witness: PathWitness,
+    counts: Counter[int],
+    abilities: AbilityCatalogIndex,
+    placement: ChargePlacement,
+) -> ProvenChargeFlightChoice | ProvenChargeFlightNoSuccess | ChargeFlightUnresolved:
+    ground = _prove_mode(
+        scenario, ruleset, offer, witness, counts, abilities, placement, flies=False
+    )
+    flight = _prove_mode(
+        scenario, ruleset, offer, witness, counts, abilities, placement, flies=True
+    )
+    if ground is None or flight is None:
+        return ChargeFlightUnresolved(ChargeFlightUnresolvedReason.MINIMUM_ROLL_UNPROVEN, offer)
     if not ground.successful_rolls and not flight.successful_rolls:
         return ProvenChargeFlightNoSuccess(offer, ground, flight)
     # Use the exact ordered 2D6 outcome counts and prefer ground on a proven nonzero tie.
@@ -371,7 +442,7 @@ def choose_proven_charge_flight_mode(
     )
 
 
-def _open_visible_poses(
+def _visible_poses(
     context: PlayerDecisionContext, offer: ChargeFlightOffer
 ) -> dict[str, Pose] | None:
     view = context.observation
@@ -382,7 +453,6 @@ def _open_visible_poses(
     placements = board["models_by_id"]
     if (
         board["terrain_areas_by_id"]
-        or board["terrain_features_by_id"]
         or set(view["model_display_by_id"]) != placements.keys()
         or len(placements) != 2
         or {p["rules_unit_instance_id"] for p in placements.values()}
@@ -407,14 +477,14 @@ def _open_visible_poses(
     return poses
 
 
-def _open_native_scenario(state: GameState, poses: dict[str, Pose]) -> BattlefieldScenario | None:
+def _native_scenario(state: GameState, poses: dict[str, Pose]) -> BattlefieldScenario | None:
     board = state.battlefield_state
     mission = state.mission_setup
     if (
         board is None
         or mission is None
         or mission.terrain_areas
-        or board.terrain_features
+        or board.terrain_features != mission.terrain_features
         or len(state.army_definitions) != 2
         or any(
             len(army.units) != 1 or len(army.units[0].own_models) != 1
@@ -436,6 +506,8 @@ def _plain_charge_supported(
     offer: ChargeFlightOffer,
     actor: str,
     abilities: AbilityCatalogIndex,
+    *,
+    no_additional_cp: bool = False,
 ) -> bool:
     phase = state.charge_phase_state
     registry = handler.runtime_modifier_registry
@@ -449,7 +521,13 @@ def _plain_charge_supported(
         or handler.charge_target_restriction_hooks.bindings
         or registry.charge_roll_modifier_bindings
         or handler.stratagem_cost_modifier_registry.bindings
-        or state.command_point_ledger_for_player(actor).command_points != 0
+        # Only the explicitly conditional wall proof may ignore optional paid
+        # choices (including a paid reroll or later terrain transit). Neither
+        # holding CP nor another unit's use grants this mover terrain transit.
+        or (
+            not no_additional_cp
+            and state.command_point_ledger_for_player(actor).command_points != 0
+        )
         or state.persisting_effects_for_unit(offer.unit_id)
     ):
         return False
@@ -489,10 +567,10 @@ def _prove_mode(
     witness: PathWitness,
     counts: Counter[int],
     abilities: AbilityCatalogIndex,
+    placement: ChargePlacement,
     *,
     flies: bool,
 ) -> ChargeFlightModeProof | None:
-    placement = charge_movement_placement(scenario=scenario, unit_instance_id=offer.unit_id)
     penalty = (("take-to-the-skies", -offer.flight_penalty_inches),) if flies else ()
     successes: list[int] = []
     for raw_roll in sorted(counts):
@@ -503,23 +581,243 @@ def _prove_mode(
         # Above that floor this fixed path must pass for every attainable budget:
         # a rejection is not proof of impossibility, and endpoint rules may vary
         # by budget, so neither an alternative search nor monotonicity is assumed.
-        resolution = resolve_charge_move(
-            scenario=scenario,
-            ruleset_descriptor=ruleset,
-            unit_placement=placement,
-            selected_target_unit_instance_ids=(offer.target_id,),
-            maximum_distance_inches=budget,
-            take_to_the_skies=flies,
-            path_witness=witness,
-            ability_index=abilities,
-        )
-        if (
-            charge_move_violation_code(
-                resolution=resolution, ruleset_descriptor=ruleset, maximum_distance_inches=budget
-            )
-            is not None
+        if not _witness_accepted(
+            scenario, ruleset, offer, witness, abilities, placement, budget=budget, flies=flies
         ):
             return None
         successes.append(raw_roll)
     # An empty set is a proof only if every budget was excluded by the target filter.
     return ChargeFlightModeProof(tuple(successes), sum(counts[roll] for roll in successes))
+
+
+def _prove_wall_advantage(
+    context: PlayerDecisionContext,
+    scenario: BattlefieldScenario,
+    ruleset: RulesetDescriptor,
+    offer: ChargeFlightOffer,
+    witness: PathWitness,
+    counts: Counter[int],
+    abilities: AbilityCatalogIndex,
+    placement: ChargePlacement,
+) -> ProvenChargeFlightAdvantage | ChargeFlightUnresolved:
+    distance = _wall_ground_distance_lower_bound(
+        context, scenario, ruleset, offer, witness, abilities
+    )
+    if distance is None:
+        return ChargeFlightUnresolved(ChargeFlightUnresolvedReason.UNSUPPORTED_PROOF_CONTEXT, offer)
+    # Removing rolls below a necessary ground distance is safe regardless of
+    # which endpoints a real player would consider. Native movement rounds the
+    # whole path to milli-inches; retain a full tick at the comparison boundary.
+    ground = tuple(
+        roll
+        for roll in sorted(counts)
+        if roll >= offer.target_filter_distance_inches and roll + 1 / TICKS_PER_INCH >= distance
+    )
+    flight: list[int] = []
+    penalty = (("take-to-the-skies", -offer.flight_penalty_inches),)
+    for roll in sorted(counts):
+        budget, _ = resolve_distance_deltas(float(roll), penalty)
+        if budget >= offer.target_filter_distance_inches and _witness_accepted(
+            scenario, ruleset, offer, witness, abilities, placement, budget=budget, flies=True
+        ):
+            flight.append(roll)
+    ground_count = sum(counts[roll] for roll in ground)
+    flight_count = sum(counts[roll] for roll in flight)
+    if flight_count <= ground_count:
+        return ChargeFlightUnresolved(ChargeFlightUnresolvedReason.BOUNDS_OVERLAP, offer)
+    return ProvenChargeFlightAdvantage(
+        offer,
+        payload_digest(witness.to_payload()),
+        distance,
+        ChargeFlightRollBound(ground, ground_count),
+        ChargeFlightRollBound(tuple(flight), flight_count),
+        context.select_option(offer.flight_option_id),
+    )
+
+
+def _wall_ground_distance_lower_bound(
+    context: PlayerDecisionContext,
+    scenario: BattlefieldScenario,
+    ruleset: RulesetDescriptor,
+    offer: ChargeFlightOffer,
+    witness: PathWitness,
+    abilities: AbilityCatalogIndex,
+) -> float | None:
+    """Certify a single public axis-aligned Dense wall across the enclosing engagement disk."""
+    board = scenario.battlefield_state
+    field = context.observation["battlefield_view"]
+    if (
+        field is None
+        or len(board.terrain_features) != 1
+        or not ruleset.charge_policy.must_end_engaged_with_every_selected_target
+    ):
+        return None
+    (feature,) = board.terrain_features
+    public_features = field["authoritative"]["terrain_features_by_id"]
+    public = public_features.get(feature.feature_id)
+    if (
+        len(public_features) != 1
+        or public is None
+        or public["classification"] != TerrainAreaClassification.DENSE.value
+        or feature.classification is not TerrainAreaClassification.DENSE
+        or feature.floors
+        or len(feature.walls) != 1
+        or len(public["volumes"]) != 1
+    ):
+        return None
+    (wall,) = feature.walls
+    (volume,) = public["volumes"]
+    if (
+        wall.bottom_z_inches != 0
+        or wall.rotation_degrees != 0
+        or volume["volume_kind"] != "wall"
+        or volume["volume_id"] != wall.wall_id
+        or volume["bottom_center"]
+        != {
+            "x_inches": wall.center_x_inches,
+            "y_inches": wall.center_y_inches,
+            "z_inches": 0.0,
+        }
+        or volume["width_inches"] != wall.width_inches
+        or volume["depth_inches"] != wall.depth_inches
+        or volume["height_inches"] != wall.height_inches
+        or volume["rotation_degrees"] != 0
+    ):
+        return None
+
+    (mover,) = physical_geometry_models_for_rules_unit(
+        scenario=scenario, unit_instance_id=offer.unit_id
+    )
+    (target,) = physical_geometry_models_for_rules_unit(
+        scenario=scenario, unit_instance_id=offer.target_id
+    )
+    entities = field["authoritative"]["models_by_id"]
+    if not (
+        isinstance(mover.base, CircularBase | OvalBase)
+        and isinstance(target.base, CircularBase | OvalBase)
+        and not mover.measures_every_part
+        and not target.measures_every_part
+    ):
+        return None
+    for model in (mover, target):
+        geometry = entities[model.model_id]["geometry"]
+        shape = geometry["support_shape"]
+        if geometry["measurement_basis"] != "base":
+            return None
+        if shape["kind"] == "circle":
+            radius = shape["radius_inches"]
+        elif (
+            shape["kind"] == "ellipse"
+            and shape["length_inches"] is not None
+            and shape["width_inches"] is not None
+        ):
+            radius = max(shape["length_inches"], shape["width_inches"]) / 2
+        else:
+            return None
+        if radius != model.base.max_radius():
+            return None
+
+    # Endpoints must be engaged. Project that whole engagement disk onto X:
+    # even allowing every facing and any elevation, its nearest possible X
+    # must be strictly beyond the wall's center plane.
+    start = mover.pose.position
+    engagement_radius = (
+        mover.base.max_radius()
+        + target.base.max_radius()
+        + ruleset.engagement_policy.horizontal_inches
+    )
+    padding = 1 / TICKS_PER_INCH
+    if not (
+        start.x + padding
+        < wall.center_x_inches
+        < target.pose.position.x - engagement_radius - padding
+    ):
+        return None
+
+    mover_placement = board.model_placement_by_id(mover.model_id)
+    unit = scenario.army_by_id(mover_placement.army_id).unit_by_id(offer.unit_id)
+    path, terrain = charge_model_path_contexts(
+        unit=unit,
+        moving_model=mover,
+        witness=witness,
+        ruleset=ruleset,
+        owner_player_id=mover_placement.player_id,
+        current_model_instance_ids=(mover.model_id,),
+        take_to_the_skies=False,
+        ability_index=abilities,
+        effects=(),
+        battlefield_width_inches=board.battlefield_width_inches,
+        battlefield_depth_inches=board.battlefield_depth_inches,
+        friendly_models=(),
+        enemy_models=(target,),
+        units_by_model_id={
+            target.model_id: scenario.army_by_id(
+                board.model_placement_by_id(target.model_id).army_id
+            ).unit_by_id(offer.target_id)
+        },
+        retained_model_ids=frozenset(),
+        maximum_distance_inches=12,
+        terrain=feature.terrain_volumes(),
+        terrain_features=(feature,),
+    )
+    policy = terrain.terrain_movement_policy
+    feature_policy = policy.policy_for_feature_kind(feature.feature_kind)
+    if (
+        path.ignores_vertical_distance
+        or terrain.can_transit_all_terrain
+        or terrain.horizontal_terrain_feature_transit
+        or terrain.nonlevel_terrain_feature_transit
+        or wall.height_inches
+        <= max(
+            policy.freely_traversable_height_threshold_inches,
+            feature_policy.freely_moved_over_height_inches or 0,
+            terrain.terrain_as_if_absent_height_inches or 0,
+            terrain.horizontal_terrain_transit_height_inches or 0,
+        )
+        or classified_feature_transit_permission(feature, terrain.movement_keywords, (mover.pose,))
+        is not False
+    ):
+        return None
+
+    # When the continuous center path crosses the plane, a native sampled
+    # center is no more than half a sampling interval away. Keep that margin
+    # INSIDE the wall footprint: every path below the side bound is detected
+    # by native terrain sampling, even if its waypoints skip the wall.
+    sample_margin = terrain.sample_interval_inches / 2 + padding
+    if wall.width_inches / 2 <= sample_margin:
+        return None
+    side = wall.depth_inches / 2 - abs(start.y - wall.center_y_inches) - sample_margin
+    # Alternatively the path must reach the top. Leave slack for the
+    # validator's math.isclose terrain-top contact comparison.
+    climb = wall.height_inches * (1 - 1e-9) - padding
+    distance = min(side, climb)
+    return distance if distance > 0 else None
+
+
+def _witness_accepted(
+    scenario: BattlefieldScenario,
+    ruleset: RulesetDescriptor,
+    offer: ChargeFlightOffer,
+    witness: PathWitness,
+    abilities: AbilityCatalogIndex,
+    placement: ChargePlacement,
+    *,
+    budget: float,
+    flies: bool,
+) -> bool:
+    resolution = resolve_charge_move(
+        scenario=scenario,
+        ruleset_descriptor=ruleset,
+        unit_placement=placement,
+        selected_target_unit_instance_ids=(offer.target_id,),
+        maximum_distance_inches=budget,
+        take_to_the_skies=flies,
+        path_witness=witness,
+        ability_index=abilities,
+    )
+    return (
+        charge_move_violation_code(
+            resolution=resolution, ruleset_descriptor=ruleset, maximum_distance_inches=budget
+        )
+        is None
+    )

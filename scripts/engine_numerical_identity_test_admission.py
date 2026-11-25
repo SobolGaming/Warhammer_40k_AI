@@ -1205,6 +1205,17 @@ def _stage3_flight_normal_move_successor(
     return record["runtime_fingerprint"], _selection_members(record["added_files"], root), raw
 
 
+CHARGE_FLIGHT_WALL_TRANSITION = (
+    "data/source_audits/ci64_provenance_v1/charge-flight-wall-test-v1.json"
+)
+CHARGE_FLIGHT_WALL_SHA256 = "93199961c9111e9cc0dd527f2b1224fd4a6e2c9e627ef735fac37cf7b30b5c27"
+CHARGE_FLIGHT_WALL_BASE = "ccf3b3bed821d5fe92aa084f919100aaea3502e2"
+CHARGE_FLIGHT_WALL_OWNER = "tests/infrastructure/adapters/test_charge_flight_barrier.py"
+CHARGE_FLIGHT_ONSLAUGHT_OWNER = (
+    "tests/infrastructure/adapters/test_charge_flight_onslaught_timing.py"
+)
+
+
 def _pre_roll_charge_flight_test_addition(
     root: Path, *, previous_runtime: str, previous_transition: bytes
 ) -> tuple[str, TestSuccessors, bytes] | None:
@@ -1238,7 +1249,52 @@ def _pre_roll_charge_flight_test_addition(
         or record["added_files"].keys() != {owner}
     ):
         raise SystemExit("Pre-roll Charge flight test transition differs.")
-    _checked_bytes(root, source, record["sources"][source])
+    successor_path = root / CHARGE_FLIGHT_WALL_TRANSITION
+    _selection_no_links(root, successor_path)
+    if not successor_path.exists():
+        _checked_bytes(root, source, record["sources"][source])
+    return record["runtime_fingerprint"], _selection_members(record["added_files"], root), raw
+
+
+def _charge_flight_wall_test_addition(
+    root: Path,
+    *,
+    previous_runtime: str,
+    previous_transition: bytes,
+    original_charge_transition: bytes,
+) -> tuple[str, TestSuccessors, bytes] | None:
+    path = root / CHARGE_FLIGHT_WALL_TRANSITION
+    _selection_no_links(root, path)
+    if not path.exists():
+        return None
+    raw = _checked_bytes(root, CHARGE_FLIGHT_WALL_TRANSITION, CHARGE_FLIGHT_WALL_SHA256)
+    record = json.loads(raw, object_pairs_hook=_selection_object)
+    source = "src/warhammer40k_core/ai/charge_flight_admission.py"
+    predecessor = json.loads(original_charge_transition, object_pairs_hook=_selection_object)
+    if (
+        set(record)
+        != {
+            "schema",
+            "base",
+            "retained_transition_sha256",
+            "retained_runtime_fingerprint",
+            "runtime_fingerprint",
+            "sources",
+            "added_files",
+        }
+        or record["schema"] != "finite-charge-flight-wall-test-v1"
+        or record["base"] != CHARGE_FLIGHT_WALL_BASE
+        or record["retained_transition_sha256"] != hashlib.sha256(previous_transition).hexdigest()
+        or record["retained_runtime_fingerprint"] != previous_runtime
+        or set(record["sources"]) != {source}
+        or set(record["added_files"]) != {CHARGE_FLIGHT_WALL_OWNER, CHARGE_FLIGHT_ONSLAUGHT_OWNER}
+        or record["sources"][source]["before"] != predecessor["sources"][source]
+    ):
+        raise SystemExit("Charge flight wall test transition differs.")
+    for name, binding in record["sources"].items():
+        if set(binding) != {"before", "after"}:
+            raise SystemExit("Charge flight wall test source binding differs.")
+        _checked_bytes(root, name, binding["after"])
     return record["runtime_fingerprint"], _selection_members(record["added_files"], root), raw
 
 
@@ -1851,6 +1907,7 @@ def exact_movement_test_transition(
     brass = None
     stage3_flight = None
     charge_flight = None
+    charge_flight_wall = None
     gore_additions: TestSuccessors = {}
     if rigid_charge is not None:
         if ground_charge is None:
@@ -1896,6 +1953,19 @@ def exact_movement_test_transition(
         source_successors[identity_source] = record["historical_sources"][identity_source]
         gore_additions = _selection_members(record["added_files"], root)
         runtime = record["runtime_fingerprint"]
+    wall_path = root / CHARGE_FLIGHT_WALL_TRANSITION
+    _selection_no_links(root, wall_path)
+    if wall_path.exists():
+        if gore is None or charge_flight is None:
+            raise SystemExit("Charge flight wall tests require the Onslaught predecessor.")
+        charge_flight_wall = _charge_flight_wall_test_addition(
+            root,
+            previous_runtime=runtime,
+            previous_transition=gore[1],
+            original_charge_transition=charge_flight[2],
+        )
+        if charge_flight_wall is not None:
+            runtime = charge_flight_wall[0]
     retained = _identity_test_transition(
         root,
         retained_cutover_sha256,
@@ -2051,6 +2121,12 @@ def exact_movement_test_transition(
             raise SystemExit("Gore-Hungry Onslaught tests overlap predecessor tests.")
         additions.update(gore_additions)
         raw += b"\0" + gore[1]
+    if charge_flight_wall is not None:
+        _, wall_tests, wall_raw = charge_flight_wall
+        if wall_tests.keys() & (updated.keys() | added.keys() | additions.keys()):
+            raise SystemExit("Charge flight wall tests overlap predecessor tests.")
+        additions.update(wall_tests)
+        raw += b"\0" + wall_raw
     return updated, {**added, **additions}, retained_raw + b"\0" + raw
 
 
