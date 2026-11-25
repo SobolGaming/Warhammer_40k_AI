@@ -108,7 +108,7 @@ def _submit(session: LocalGameSession, option: str) -> LifecycleStatus:
 
 
 def _choices(request: DecisionRequest) -> dict[tuple[str, str], str]:
-    choices = {}
+    choices: dict[tuple[str, str], str] = {}
     for option in request.options:
         payload = option.payload
         if not isinstance(payload, dict):
@@ -248,7 +248,7 @@ def test_skulls_beget_blood_ordinary_choice_damage_attribution_and_replay(
     rolls = resolved["rolls"]
     assert isinstance(rolls, list)
     assert len(rolls) == 6
-    values = []
+    values: list[int] = []
     for roll in rolls:
         assert isinstance(roll, dict)
         result = roll["original_result"]

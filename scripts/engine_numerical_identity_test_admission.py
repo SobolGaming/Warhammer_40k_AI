@@ -695,7 +695,7 @@ SKULLS_BEGET_BLOOD_TRANSITION = (
     "data/source_audits/ci64_provenance_v1/skulls-beget-blood-transition-v1.json"
 )
 SKULLS_BEGET_BLOOD_TRANSITION_SHA256 = (
-    "30b1ba53b70db6e3a8a0622b0de4bee7b641a1480baf1fa79968d2bf90a83d48"
+    "be7eafbb6843867ccc9eaf20db21d1f6405cf49d9a1e4ad4b4c871723c19b9be"
 )
 SKULLS_BEGET_BLOOD_OWNER = "tests/factions/chaos_daemons/integration/test_skulls_beget_blood.py"
 

@@ -60,6 +60,10 @@ SKULLS_BEGET_BLOOD_EFFECT = (
     'from your army and is within 8" of and visible to your unit. '
     "Roll six D6: for each 4+, that enemy unit suffers 1 mortal wound."
 )
+COVERED_STRATAGEM_SOURCE_ROW_IDS = (
+    BLOOD_BEGETS_SKULLS_SOURCE_ROW_ID,
+    SKULLS_BEGET_BLOOD_SOURCE_ROW_ID,
+)
 BRAZENMAW_ENHANCEMENT_ID = "000009815004"
 BRAZENMAW_SOURCE_ROW_ID = (
     f"enhancement:{CHAOS_DAEMONS_FACTION_ID}:{BLOOD_LEGION_DETACHMENT_ID}:"

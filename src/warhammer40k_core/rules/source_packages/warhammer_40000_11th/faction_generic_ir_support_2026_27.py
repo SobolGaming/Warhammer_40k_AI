@@ -363,11 +363,7 @@ def generic_supported_stratagem_rule_ir_hash(
     descriptor_id = f"phase17e:{source_row.source_row_id}"
     if (
         source_row.source_row_id in _SUPPORTED_ARMOUR_SAVE_SET_STRATAGEM_SOURCE_ROW_IDS
-        or source_row.source_row_id
-        in {
-            blood_legion_ir.BLOOD_BEGETS_SKULLS_SOURCE_ROW_ID,
-            blood_legion_ir.SKULLS_BEGET_BLOOD_SOURCE_ROW_ID,
-        }
+        or source_row.source_row_id in blood_legion_ir.COVERED_STRATAGEM_SOURCE_ROW_IDS
     ):
         return generic_rule_ir_hash_by_coverage_descriptor_id(descriptor_id)
     rule_ir_hash = daemonic_incursion_ir.coverage_rule_ir_hash_by_descriptor_id(descriptor_id)

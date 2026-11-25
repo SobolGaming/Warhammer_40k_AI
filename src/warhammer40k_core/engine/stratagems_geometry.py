@@ -630,7 +630,7 @@ def _visible_unengaged_enemy_unit_ids(
         if scenario.battlefield_state.unit_placement_or_none(component.unit.unit_instance_id)
         is not None
     )
-    eligible_ids = []
+    eligible_ids: list[str] = []
     for enemy in units:
         enemy_id = enemy.unit_instance_id
         if enemy.owner_player_id == player_id:

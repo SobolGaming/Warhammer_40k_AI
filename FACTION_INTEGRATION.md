@@ -766,8 +766,8 @@ already engine-consumed named handlers.
 | Detachment rules | 6 | `executable_generic_ir` | `applied` | `none` |
 | Enhancements | 12 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Enhancements | 17 | `executable_generic_ir` | `applied` | `none` |
-| Stratagems | 22 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Stratagems | 24 | `executable_generic_ir` | `applied` | `none` |
+| Stratagems | 21 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Stratagems | 25 | `executable_generic_ir` | `applied` | `none` |
 | Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
 
 ### Astra Militarum Execution Status
