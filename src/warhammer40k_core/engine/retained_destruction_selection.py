@@ -28,6 +28,7 @@ from warhammer40k_core.engine.retained_attack_permissions import (
     RETAINED_ATTACK_REACTION_KINDS,
     RetainedAttackAction,
     retained_attack_options,
+    retained_attack_prior_action_condition_is_met,
     retained_attack_selection,
 )
 from warhammer40k_core.engine.retained_destruction_state import (
@@ -311,11 +312,10 @@ def _eligible_sources(
             descriptor=descriptor,
         )
         if descriptor.get("requires_not_shot_or_fought_this_phase") is True:
-            from warhammer40k_core.engine.model_attack_history import model_has_attacked_this_phase
-
             if state.current_battle_phase is None or state.active_player_id is None:
                 raise GameLifecycleError("Retained attack prior-action condition requires a phase.")
-            applicable = applicable and not model_has_attacked_this_phase(
+            applicable = applicable and retained_attack_prior_action_condition_is_met(
+                source=source,
                 event_records=decisions.event_log.records,
                 model_instance_id=model_instance_id,
                 battle_round=state.battle_round,

@@ -39,15 +39,19 @@ class RetainedAttackGrant:
     trigger_roll_threshold: int
     requires_not_shot_or_fought_this_phase: bool
     shooting_hazardous_tests_automatically_pass: bool
+    requires_destroyed_by_melee_attack: bool
 
     def source_payload(self) -> dict[str, JsonValue]:
-        return {
+        payload: dict[str, JsonValue] = {
             "trigger_roll_threshold": self.trigger_roll_threshold,
             "requires_not_shot_or_fought_this_phase": self.requires_not_shot_or_fought_this_phase,
             "shooting_hazardous_tests_automatically_pass": (
                 self.shooting_hazardous_tests_automatically_pass
             ),
         }
+        if self.requires_destroyed_by_melee_attack:
+            payload["requires_destroyed_by_melee_attack"] = True
+        return payload
 
 
 def retained_attack_grant_for_effect(effect: RuleEffectSpec) -> RetainedAttackGrant | None:
@@ -57,7 +61,7 @@ def retained_attack_grant_for_effect(effect: RuleEffectSpec) -> RetainedAttackGr
         or parameters.get("ability") != RETAINED_ATTACK_ABILITY
     ):
         return None
-    if set(parameters) != {
+    if parameters.keys() - {"requires_destroyed_by_melee_attack"} != {
         "ability",
         "actions",
         "optional",
@@ -77,16 +81,18 @@ def retained_attack_grant_for_effect(effect: RuleEffectSpec) -> RetainedAttackGr
     threshold = parameters["trigger_roll_threshold"]
     previous = parameters["requires_not_shot_or_fought_this_phase"]
     hazardous = parameters["shooting_hazardous_tests_automatically_pass"]
+    melee_only = parameters.get("requires_destroyed_by_melee_attack", False)
     if (
         parameters["optional"] is not True
         or type(threshold) is not int
         or not 2 <= threshold <= 6
         or type(previous) is not bool
         or type(hazardous) is not bool
+        or type(melee_only) is not bool
         or (hazardous and "shoot" not in actions)
     ):
         raise GameLifecycleError("Retained attack grant permissions are invalid.")
-    return RetainedAttackGrant(kinds[actions], threshold, previous, hazardous)
+    return RetainedAttackGrant(kinds[actions], threshold, previous, hazardous, melee_only)
 
 
 def retained_attack_descriptor_for_clause(clause: RuleClause) -> RetainedAttackGrant | None:

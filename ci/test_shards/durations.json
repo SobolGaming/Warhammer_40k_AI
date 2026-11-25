@@ -240,6 +240,9 @@
     "tests/factions/chaos_daemons/integration/test_skulls_beget_blood.py::test_skulls_beget_blood_has_no_option_when_use_is_illegal[no_cp]": 0.625,
     "tests/factions/chaos_daemons/integration/test_skulls_beget_blood.py::test_skulls_beget_blood_has_no_option_when_use_is_illegal[opponent_turn]": 0.699,
     "tests/factions/chaos_daemons/integration/test_skulls_beget_blood.py::test_skulls_beget_blood_ordinary_choice_damage_attribution_and_replay": 32.188,
+    "tests/factions/chaos_daemons/integration/test_wrath_undeniable.py::test_wrath_undeniable_native_retention_and_replay[already-fought]": 11.488,
+    "tests/factions/chaos_daemons/integration/test_wrath_undeniable.py::test_wrath_undeniable_native_retention_and_replay[four]": 67.388,
+    "tests/factions/chaos_daemons/integration/test_wrath_undeniable.py::test_wrath_undeniable_native_retention_and_replay[three]": 14.934,
     "tests/factions/chaos_daemons/unit/test_bloodcrushers_abilities.py::test_brass_stampede_native_charge_completion": 17.349,
     "tests/factions/chaos_daemons/unit/test_bloodcrushers_abilities.py::test_icon_leadership_query_uses_current_physical_bearer[False]": 0.426,
     "tests/factions/chaos_daemons/unit/test_bloodcrushers_abilities.py::test_icon_leadership_query_uses_current_physical_bearer[True]": 0.422,
@@ -2358,7 +2361,7 @@
     "tests/infrastructure/source_governance/unit/test_blocked_row_classification.py::test_phase17i_existing_template_report_uses_phase17c_template_families": 0.004,
     "tests/infrastructure/source_governance/unit/test_blocked_row_classification.py::test_phase17i_missing_capability_report_groups_rows_by_family": 0.01,
     "tests/infrastructure/source_governance/unit/test_blocked_row_classification.py::test_phase17i_payload_is_deterministic_json_safe_and_round_trips": 31.12,
-    "tests/infrastructure/source_governance/unit/test_blocked_row_classification.py::test_phase17i_source_text_boundaries_are_explicit": 19.93,
+    "tests/infrastructure/source_governance/unit/test_blocked_row_classification.py::test_phase17i_source_text_boundaries_are_explicit": 21.445,
     "tests/infrastructure/source_governance/unit/test_blocked_row_classification.py::test_phase17i_validation_rejects_inconsistent_classification_shapes": 24.597,
     "tests/infrastructure/source_governance/unit/test_named_handler_budget.py::test_phase17i_named_handler_budget_payload_is_deterministic_json_safe": 6.807,
     "tests/infrastructure/source_governance/unit/test_named_handler_budget.py::test_phase17i_named_handler_budget_rejects_invalid_shapes": 0.207,
@@ -6730,18 +6733,18 @@
   },
   "execution_model": {
     "assignment_wall_lower_bound_seconds": {
-      "1": 575.832,
-      "10": 575.832,
-      "11": 575.832,
-      "12": 575.832,
+      "1": 578.215,
+      "10": 578.215,
+      "11": 578.215,
+      "12": 578.215,
       "2": 795.547,
       "3": 609.537,
-      "4": 575.832,
-      "5": 575.832,
-      "6": 575.832,
-      "7": 575.832,
-      "8": 575.832,
-      "9": 575.832
+      "4": 578.215,
+      "5": 578.215,
+      "6": 578.215,
+      "7": 578.215,
+      "8": 578.215,
+      "9": 578.215
     },
     "cold_shard_assignment": "minimum-unrounded-modeled-test-load-existing-bucket-v1",
     "cold_shard_id": 1,
@@ -6750,18 +6753,18 @@
       "tests/factions/chaos_daemons/integration/test_cavalcade_v995_roster.py::test_exact_mirror_deploys_all_78_models_and_replays_to_battle"
     ],
     "shard_worker_seconds": {
-      "1": 2303.326,
-      "10": 2303.326,
-      "11": 2303.326,
-      "12": 2303.326,
+      "1": 2312.858,
+      "10": 2312.86,
+      "11": 2312.859,
+      "12": 2312.858,
       "2": 3182.186,
       "3": 2438.146,
-      "4": 2303.326,
-      "5": 2303.326,
-      "6": 2303.328,
-      "7": 2303.33,
-      "8": 2303.326,
-      "9": 2303.326
+      "4": 2312.86,
+      "5": 2312.859,
+      "6": 2312.859,
+      "7": 2312.859,
+      "8": 2312.861,
+      "9": 2312.858
     }
   },
   "files": {
@@ -6783,6 +6786,7 @@
     "tests/factions/chaos_daemons/integration/test_monster_mash_v995_roster.py": 34.04,
     "tests/factions/chaos_daemons/integration/test_sheathed_in_brass.py": 120.611,
     "tests/factions/chaos_daemons/integration/test_skulls_beget_blood.py": 46.113,
+    "tests/factions/chaos_daemons/integration/test_wrath_undeniable.py": 93.81,
     "tests/factions/chaos_daemons/unit/test_bloodcrushers_abilities.py": 26.798,
     "tests/factions/chaos_daemons/unit/test_bloodcrushers_reserves.py": 3.314,
     "tests/factions/chaos_daemons/unit/test_chaos_daemons_army_rule.py": 68.038,
@@ -6955,7 +6959,7 @@
     "tests/infrastructure/source/unit/test_source_overlays.py": 3.475,
     "tests/infrastructure/source/unit/test_source_reconciliation.py": 0.191,
     "tests/infrastructure/source/unit/test_starfang_deep_strike.py": 2438.146,
-    "tests/infrastructure/source_governance/unit/test_blocked_row_classification.py": 75.661,
+    "tests/infrastructure/source_governance/unit/test_blocked_row_classification.py": 77.176,
     "tests/infrastructure/source_governance/unit/test_named_handler_budget.py": 7.265,
     "tests/infrastructure/source_governance/unit/test_support_evidence_inventories.py": 101.366,
     "tests/performance/test_fight_phase_reconstruction.py": 5.298,
@@ -7323,6 +7327,7 @@
         "6065394017e442925f4256644907ffc7924dcc2b4a699b5065e1dda846989353",
         "63db8ac24763535fbddc46142b0c99e6833b128bc40e674ff95ec735b05e1018",
         "708e2a7cdde4ec8155cc758efc538d7dc0dd4b5c25644c8a1c2d88652d6df8df",
+        "70fd07b8320b0845f0fda4a1605082f32d3491ccc020572c417dbde73bb3179c",
         "7cded789191d3e9a531806a0b448b6347da9bd58f9f62af169b77cae998e0753",
         "8e6ef17843af538ddc0a9551452cf432963faad6de879cd1033d4ca1caa906b4",
         "9a5f617751dd2ef273362bcbec3d532afb594c23b9d7c4576a1ba54a82305422",
@@ -7330,17 +7335,17 @@
         "a58370bb7e97f2155a65d0b16e4dc74b9e2fdb5251ee95594210b0d558e2ef63",
         "d221fa9414f09deb36d275dca16085e59d0239e19246d38cf138ddd866c65662"
       ],
-      "source": "Retained #736 refresh timing profile and one measured three-inch Charge roundoff regression on WSL; plus five measured Sheathed in Brass cases (serial WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); plus measured Blood Begets Skulls and Phase 17I updates (serial WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); add four measured Stage 3 melee cases (WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); plus measured Skulls Beget Blood and Phase 17I updates (serial WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); retain two reviewed Stage 3 native-qualification flight weights (serial Windows, Python 3.14.5; scheduling only)",
-      "test_cases": 6727,
-      "test_files": 450
+      "source": "Retained #736 refresh timing profile and one measured three-inch Charge roundoff regression on WSL; plus five measured Sheathed in Brass cases (serial WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); plus measured Blood Begets Skulls and Phase 17I updates (serial WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); add four measured Stage 3 melee cases (WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); plus measured Skulls Beget Blood and Phase 17I updates (serial WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); retain two reviewed Stage 3 native-qualification flight weights (serial Windows, Python 3.14.5; scheduling only); plus measured Wrath Undeniable and Phase 17I updates (serial WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only)",
+      "test_cases": 6730,
+      "test_files": 451
     }
   ],
   "shard_count": 12,
   "shards": [
     {
-      "duration_seconds": 1802.092,
+      "duration_seconds": 1811.624,
       "shard_id": 1,
-      "test_file_count": 52
+      "test_file_count": 54
     },
     {
       "duration_seconds": 3182.186,
@@ -7353,49 +7358,49 @@
       "test_file_count": 1
     },
     {
-      "duration_seconds": 2303.326,
+      "duration_seconds": 2312.86,
       "shard_id": 4,
-      "test_file_count": 46
+      "test_file_count": 44
     },
     {
-      "duration_seconds": 2303.326,
+      "duration_seconds": 2312.859,
       "shard_id": 5,
-      "test_file_count": 51
-    },
-    {
-      "duration_seconds": 2303.328,
-      "shard_id": 6,
-      "test_file_count": 49
-    },
-    {
-      "duration_seconds": 2303.33,
-      "shard_id": 7,
       "test_file_count": 50
     },
     {
-      "duration_seconds": 2303.326,
+      "duration_seconds": 2312.859,
+      "shard_id": 6,
+      "test_file_count": 50
+    },
+    {
+      "duration_seconds": 2312.859,
+      "shard_id": 7,
+      "test_file_count": 53
+    },
+    {
+      "duration_seconds": 2312.861,
       "shard_id": 8,
-      "test_file_count": 49
+      "test_file_count": 50
     },
     {
-      "duration_seconds": 2303.326,
+      "duration_seconds": 2312.858,
       "shard_id": 9,
-      "test_file_count": 52
+      "test_file_count": 50
     },
     {
-      "duration_seconds": 2303.326,
+      "duration_seconds": 2312.86,
       "shard_id": 10,
-      "test_file_count": 49
+      "test_file_count": 50
     },
     {
-      "duration_seconds": 2303.326,
+      "duration_seconds": 2312.859,
       "shard_id": 11,
-      "test_file_count": 90
+      "test_file_count": 85
     },
     {
-      "duration_seconds": 2303.326,
+      "duration_seconds": 2312.858,
       "shard_id": 12,
-      "test_file_count": 51
+      "test_file_count": 54
     }
   ],
   "step5g_partitions": {
@@ -7403,5 +7408,5 @@
     "sha256": "b241b31651a8d5d903a2b851583186c276a5ac32fed26de1a1c69b4aa278b711"
   },
   "strategy": "largest-processing-time-by-derived-selector-weight",
-  "total_test_duration_seconds": 28152.364
+  "total_test_duration_seconds": 28247.689
 }

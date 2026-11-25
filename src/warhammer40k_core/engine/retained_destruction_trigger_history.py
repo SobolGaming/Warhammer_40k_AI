@@ -19,7 +19,10 @@ from warhammer40k_core.engine.destruction_reaction_conditions import (
 )
 from warhammer40k_core.engine.event_log import EventRecord, JsonValue
 from warhammer40k_core.engine.phase import GameLifecycleError
-from warhammer40k_core.engine.retained_attack_permissions import RETAINED_ATTACK_REACTION_KINDS
+from warhammer40k_core.engine.retained_attack_permissions import (
+    RETAINED_ATTACK_REACTION_KINDS,
+    retained_attack_prior_action_condition_is_met,
+)
 from warhammer40k_core.engine.retained_destruction_state import (
     DestructionOwnerKind,
     RetainedModelDestruction,
@@ -126,14 +129,16 @@ def validate_retention_trigger_history(
             descriptor=descriptor,
         )
         if descriptor.get("requires_not_shot_or_fought_this_phase") is True:
-            from warhammer40k_core.engine.model_attack_history import model_has_attacked_this_phase
-
-            fixed_conditions_met = fixed_conditions_met and not model_has_attacked_this_phase(
-                event_records=event_records[:logical_index],
-                model_instance_id=record.model_instance_id,
-                battle_round=battle_round,
-                active_player_id=active_player_id,
-                phase=phase,
+            fixed_conditions_met = (
+                fixed_conditions_met
+                and retained_attack_prior_action_condition_is_met(
+                    source=source,
+                    event_records=event_records[:logical_index],
+                    model_instance_id=record.model_instance_id,
+                    battle_round=battle_round,
+                    active_player_id=active_player_id,
+                    phase=phase,
+                )
             )
         if (not fixed_conditions_met and applicable) or (
             "requires_active_persisting_effect" not in descriptor

@@ -698,6 +698,13 @@ SKULLS_BEGET_BLOOD_TRANSITION_SHA256 = (
     "d52df25433449b126bdd6549b9b687a7105a0bc1737645357c7b73fce40c8d95"
 )
 SKULLS_BEGET_BLOOD_OWNER = "tests/factions/chaos_daemons/integration/test_skulls_beget_blood.py"
+WRATH_UNDENIABLE_TRANSITION = (
+    "data/source_audits/ci64_provenance_v1/wrath-undeniable-transition-v1.json"
+)
+WRATH_UNDENIABLE_TRANSITION_SHA256 = (
+    "16917990831b5c2a30720e21fd6decde891b7b8aca883439ec21038538142d29"
+)
+WRATH_UNDENIABLE_OWNER = "tests/factions/chaos_daemons/integration/test_wrath_undeniable.py"
 
 
 def _skulls_beget_blood_test_successor(
@@ -741,20 +748,99 @@ def _skulls_beget_blood_test_successor(
     new = record["new_sources"]
     if not replaced.keys() <= previous_sources.keys() or new.keys() & previous_sources.keys():
         raise SystemExit("Skulls Beget Blood source successor inventory differs.")
+    current_sources = dict(previous_sources)
+    for source, binding in replaced.items():
+        if binding.keys() != {"before", "after"} or binding["before"] != previous_sources[source]:
+            raise SystemExit("Skulls Beget Blood source predecessor differs: " + source)
+        current_sources[source] = binding["after"]
+    current_sources.update(new)
+    added = _selection_members(record["added_files"], root)
+    if added.keys() & retained_additions.keys():
+        raise SystemExit("Skulls Beget Blood duplicates a retained test owner.")
+    additions = {**retained_additions, **added}
+    successor_path = root / WRATH_UNDENIABLE_TRANSITION
+    _selection_no_links(root, successor_path)
+    if successor_path.exists():
+        predecessor = previous_transition + b"\0" + raw
+        flight = _stage3_flight_normal_move_successor(
+            root, previous_runtime=record["runtime_fingerprint"], previous_transition=predecessor
+        )
+        if flight is None:
+            raise SystemExit("Wrath Undeniable requires the exact Stage 3 Flight predecessor.")
+        flight_runtime, flight_tests, flight_raw = flight
+        if flight_tests.keys() & (additions.keys() | {classifier}):
+            raise SystemExit("Stage 3 flight Normal Move tests overlap the predecessor selection.")
+        fingerprint, updated, additions, successor_raw = _wrath_undeniable_test_successor(
+            root,
+            previous=record,
+            predecessor=predecessor + b"\0" + flight_raw,
+            previous_runtime=flight_runtime,
+            previous_sources=current_sources,
+            previous_additions={**additions, **flight_tests},
+            classifier=classifier,
+        )
+        return fingerprint, updated, additions, b"\0".join((raw, flight_raw, successor_raw))
+    for source, digest in current_sources.items():
+        _checked_bytes(root, source, digest)
+    updated = _selection_members({classifier: record["updated_files"][classifier]["after"]}, root)
+    return record["runtime_fingerprint"], updated, additions, raw
+
+
+def _wrath_undeniable_test_successor(
+    root: Path,
+    *,
+    previous: dict[str, object],
+    predecessor: bytes,
+    previous_runtime: str,
+    previous_sources: dict[str, str],
+    previous_additions: TestSuccessors,
+    classifier: str,
+) -> tuple[str, TestSuccessors, TestSuccessors, bytes]:
+    raw = _checked_bytes(root, WRATH_UNDENIABLE_TRANSITION, WRATH_UNDENIABLE_TRANSITION_SHA256)
+    record = json.loads(raw, object_pairs_hook=_selection_object)
+    previous_updated = previous["updated_files"]
+    if (
+        record.keys()
+        != {
+            "schema",
+            "base",
+            "retained_transition_sha256",
+            "retained_runtime_fingerprint",
+            "runtime_fingerprint",
+            "replaced_sources",
+            "new_sources",
+            "added_files",
+            "updated_files",
+        }
+        or record["schema"] != "finite-wrath-undeniable-transition-v1"
+        or record["base"] != "bdc1b2111530576a71bf3391564d5a9e9c356be0"
+        or record["retained_transition_sha256"] != hashlib.sha256(predecessor).hexdigest()
+        or record["retained_runtime_fingerprint"] != previous_runtime
+        or record["added_files"].keys() != {WRATH_UNDENIABLE_OWNER}
+        or record["updated_files"].keys() != {classifier}
+        or record["updated_files"][classifier].keys() != {"before", "after"}
+        or not isinstance(previous_updated, dict)
+        or record["updated_files"][classifier]["before"] != previous_updated[classifier]["after"]
+    ):
+        raise SystemExit("Wrath Undeniable test transition differs.")
+    replaced = record["replaced_sources"]
+    new = record["new_sources"]
+    if not replaced.keys() <= previous_sources.keys() or new.keys() & previous_sources.keys():
+        raise SystemExit("Wrath Undeniable source successor inventory differs.")
     for source, digest in previous_sources.items():
         if source in replaced:
             binding = replaced[source]
             if binding.keys() != {"before", "after"} or binding["before"] != digest:
-                raise SystemExit("Skulls Beget Blood source predecessor differs: " + source)
+                raise SystemExit("Wrath Undeniable source predecessor differs: " + source)
             digest = binding["after"]
         _checked_bytes(root, source, digest)
     for source, digest in new.items():
         _checked_bytes(root, source, digest)
     added = _selection_members(record["added_files"], root)
-    if added.keys() & retained_additions.keys():
-        raise SystemExit("Skulls Beget Blood duplicates a retained test owner.")
+    if added.keys() & previous_additions.keys():
+        raise SystemExit("Wrath Undeniable duplicates a retained test owner.")
     updated = _selection_members({classifier: record["updated_files"][classifier]["after"]}, root)
-    return record["runtime_fingerprint"], updated, {**retained_additions, **added}, raw
+    return record["runtime_fingerprint"], updated, {**previous_additions, **added}, raw
 
 
 def _blood_begets_skulls_test_successor(
@@ -1602,11 +1688,20 @@ def exact_movement_test_transition(
         )
         if brass is not None:
             runtime = brass[0]
-            stage3_flight = _stage3_flight_normal_move_successor(
-                root, previous_runtime=runtime, previous_transition=brass[3]
-            )
-            if stage3_flight is not None:
-                runtime = stage3_flight[0]
+            wrath_path = root / WRATH_UNDENIABLE_TRANSITION
+            _selection_no_links(root, wrath_path)
+            if wrath_path.exists():
+                wrath_raw = _checked_bytes(
+                    root, WRATH_UNDENIABLE_TRANSITION, WRATH_UNDENIABLE_TRANSITION_SHA256
+                )
+                if not brass[3].endswith(b"\0" + wrath_raw):
+                    raise SystemExit("Wrath Undeniable is missing from the source lineage.")
+            else:
+                stage3_flight = _stage3_flight_normal_move_successor(
+                    root, previous_runtime=runtime, previous_transition=brass[3]
+                )
+                if stage3_flight is not None:
+                    runtime = stage3_flight[0]
     retained = _identity_test_transition(
         root,
         retained_cutover_sha256,

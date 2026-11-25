@@ -212,7 +212,7 @@ Faction-specific Detachment Rule, Enhancement, and Stratagem rows are split into
 | Death Guard | 9 | 0 | 0 | 9 | 1 | [death-guard](factions/death-guard.md) |
 | Thousand Sons | 9 | 0 | 0 | 9 | 2 | [thousand-sons](factions/thousand-sons.md) |
 | Chaos Knights | 8 | 0 | 0 | 8 | 3 | [chaos-knights](factions/chaos-knights.md) |
-| Chaos Daemons | 9 | 6 | 0 | 3 | 49 | [chaos-daemons](factions/chaos-daemons.md) |
+| Chaos Daemons | 9 | 6 | 0 | 3 | 50 | [chaos-daemons](factions/chaos-daemons.md) |
 | Astra Militarum | 11 | 0 | 0 | 11 | 3 | [astra-militarum](factions/astra-militarum.md) |
 | Adepta Sororitas | 8 | 0 | 0 | 8 | 2 | [adepta-sororitas](factions/adepta-sororitas.md) |
 | Adeptus Mechanicus | 10 | 0 | 0 | 10 | 1 | [adeptus-mechanicus](factions/adeptus-mechanicus.md) |
@@ -434,7 +434,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `descriptor:prebattle:scouts` | Scouts |
 | `descriptor:reserve-declaration:deep-strike` | Deep Strike |
 | `descriptor:shooting-target:lone-operative` | Lone Operative |
-| `generic:rule-ir` | BINDING SHADOW<br>Bilious Blessing<br>CALL DAT DAKKA?<br>CATALYTIC STIMULUS<br>CHANNELLED WRATH<br>CLOSE-QUARTERS EXCRUCIATION<br>CONTEMPTUOUS DISREGARD<br>Call to Murder<br>Casting Back the Veil<br>Cloak and Shadow<br>Corrupt Realspace<br>DEATH DENIED<br>Daemonic Infestation<br>Daemonic Invulnerability<br>Denizens of the Warp<br>Draught of Terror<br>ENCROACHING DARKNESS<br>EUPHORIC INSPIRATION<br>Eldritch Suppression<br>Fluxmaster<br>From Beyond the Veil<br>GET STUCK IN, LADZ!<br>HONOUR IS FOR FOOLS<br>HUGE SHOW-OFFS<br>INTOXICATED BY TRIUMPH<br>Incorporeal Entities<br>Inescapable Manifestations<br>Into the Breach<br>LONG, UNCONTROLLED BURSTS<br>Lethal Ruse<br>Nomads of the Hidden Way<br>ORKS IS STILL ORKS<br>One Head Looks Back<br>Outcast Ambush<br>PRIDEFUL SUPERIORITY<br>Pirates' Due<br>SHADE PATH<br>SINGLE-MINDED STRIKE<br>SINUOUS BREACH<br>SKULLS BEGET BLOOD<br>SPESHUL SHELLS<br>SPITEFUL DEMISE<br>Skirling Magicks<br>Smokescreen<br>Soulseeing<br>The Realm of Chaos<br>Vengeful Sorrow<br>Warp Surge<br>Warp-Riders |
+| `generic:rule-ir` | BINDING SHADOW<br>Bilious Blessing<br>CALL DAT DAKKA?<br>CATALYTIC STIMULUS<br>CHANNELLED WRATH<br>CLOSE-QUARTERS EXCRUCIATION<br>CONTEMPTUOUS DISREGARD<br>Call to Murder<br>Casting Back the Veil<br>Cloak and Shadow<br>Corrupt Realspace<br>DEATH DENIED<br>Daemonic Infestation<br>Daemonic Invulnerability<br>Denizens of the Warp<br>Draught of Terror<br>ENCROACHING DARKNESS<br>EUPHORIC INSPIRATION<br>Eldritch Suppression<br>Fluxmaster<br>From Beyond the Veil<br>GET STUCK IN, LADZ!<br>HONOUR IS FOR FOOLS<br>HUGE SHOW-OFFS<br>INTOXICATED BY TRIUMPH<br>Incorporeal Entities<br>Inescapable Manifestations<br>Into the Breach<br>LONG, UNCONTROLLED BURSTS<br>Lethal Ruse<br>Nomads of the Hidden Way<br>ORKS IS STILL ORKS<br>One Head Looks Back<br>Outcast Ambush<br>PRIDEFUL SUPERIORITY<br>Pirates' Due<br>SHADE PATH<br>SINGLE-MINDED STRIKE<br>SINUOUS BREACH<br>SKULLS BEGET BLOOD<br>SPESHUL SHELLS<br>SPITEFUL DEMISE<br>Skirling Magicks<br>Smokescreen<br>Soulseeing<br>The Realm of Chaos<br>Vengeful Sorrow<br>WRATH UNDENIABLE<br>Warp Surge<br>Warp-Riders |
 | `phase17g:space-marines:space-marine-chapters` | Space Marine Chapters |
 | `warhammer_40000_11th:adepta_sororitas:army_rule:acts_of_faith:turn-start` | Acts of Faith |
 | `warhammer_40000_11th:adepta_sororitas:army_rule:acts_of_faith:unit-destroyed` | Acts of Faith |

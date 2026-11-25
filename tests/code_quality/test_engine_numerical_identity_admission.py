@@ -467,7 +467,23 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         flight["retained_transition_sha256"]
         == hashlib.sha256(b"\0".join(path.read_bytes() for path in flight_predecessors)).hexdigest()
     )
-    assert flight["runtime_fingerprint"] == _record(MANIFEST)["fingerprint"]
+    wrath = _record(selection.WRATH_UNDENIABLE_TRANSITION)
+    assert wrath["base"] == "bdc1b2111530576a71bf3391564d5a9e9c356be0"
+    wrath_base_manifest = json.loads(
+        subprocess.check_output(["git", "show", wrath["base"] + ":" + MANIFEST], cwd=ROOT)
+    )
+    assert (
+        wrath["retained_runtime_fingerprint"]
+        == flight["runtime_fingerprint"]
+        == wrath_base_manifest["fingerprint"]
+    )
+    assert wrath["runtime_fingerprint"] == _record(MANIFEST)["fingerprint"]
+    assert (
+        wrath["retained_transition_sha256"]
+        == hashlib.sha256(
+            b"\0".join(path.read_bytes() for path in (*flight_predecessors, ROOT / flight_path))
+        ).hexdigest()
+    )
     flight_owner = "tests/infrastructure/adapters/test_flight_normal_move_policy.py"
     assert set(flight["added_files"]) == {flight_owner}
     assert flight_owner in active_files
@@ -504,8 +520,21 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         assert binding["before"] == predecessor_sources[source]
         predecessor_sources[source] = binding["after"]
     assert shooting_skulls["new_sources"].keys().isdisjoint(predecessor_sources)
-    for source, digest in (predecessor_sources | shooting_skulls["new_sources"]).items():
+    predecessor_sources.update(shooting_skulls["new_sources"])
+    for source, binding in wrath["replaced_sources"].items():
+        assert binding["before"] == predecessor_sources[source]
+        predecessor_sources[source] = binding["after"]
+    assert wrath["new_sources"].keys().isdisjoint(predecessor_sources)
+    for source, digest in (predecessor_sources | wrath["new_sources"]).items():
         assert digest == hashlib.sha256((ROOT / source).read_bytes()).hexdigest()
+    wrath_owner = selection.WRATH_UNDENIABLE_OWNER
+    assert set(wrath["added_files"]) == {wrath_owner}
+    assert wrath_owner in active_files
+    assert sum(wrath_owner in group for group in groups) == 1
+    assert (
+        wrath["added_files"][wrath_owner]["sha256"]
+        == hashlib.sha256((ROOT / wrath_owner).read_bytes()).hexdigest()
+    )
     shooting_skulls_owner = selection.SKULLS_BEGET_BLOOD_OWNER
     assert set(shooting_skulls["added_files"]) == {shooting_skulls_owner}
     assert shooting_skulls_owner in active_files
@@ -609,8 +638,11 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
     assert set(shooting_skulls["updated_files"]) == {classification_owner}
     current_classification = shooting_skulls["updated_files"][classification_owner]
     assert current_classification["before"] == classification_successor["after"]
+    assert set(wrath["updated_files"]) == {classification_owner}
+    wrath_classification = wrath["updated_files"][classification_owner]
+    assert wrath_classification["before"] == current_classification["after"]
     assert (
-        current_classification["after"]["sha256"]
+        wrath_classification["after"]["sha256"]
         == hashlib.sha256((ROOT / classification_owner).read_bytes()).hexdigest()
     )
     assert classification_owner in active_files
@@ -1041,6 +1073,10 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
                 "has_no_option_when_use_is_illegal[blocked]",
                 "allows_advance_but_excludes_fall_back",
             )
+        }
+        | {
+            wrath_owner + "::test_wrath_undeniable_native_retention_and_replay[" + case + "]"
+            for case in ("four", "three", "already-fought")
         }
         | {cover_owner + "::test_save_cover_cache_key_projects_embedded_request_reference"}
         | {opening_owner + "::test_opening_shadow_form_policy_reaches_native_movement"}
