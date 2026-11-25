@@ -16,10 +16,10 @@ A registered static RuleIR is eligible for this audit when its normalized text e
 | `datasheet_ability` | 2049 | 652 |
 | `detachment_rule` | 266 | 12 |
 | `enhancement` | 701 | 70 |
-| `stratagem` | 1050 | 78 |
-| **Total** | **4094** | **812** |
+| `stratagem` | 1050 | 79 |
+| **Total** | **4094** | **813** |
 
-Equivalent groups: **322**; cross-faction groups: **159**; exact-text-only members: **3171**; source-text-unavailable members: **111**.
+Equivalent groups: **322**; cross-faction groups: **159**; exact-text-only members: **3170**; source-text-unavailable members: **111**.
 
 ## Equivalence Groups
 

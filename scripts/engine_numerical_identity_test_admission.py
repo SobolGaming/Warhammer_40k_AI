@@ -691,6 +691,72 @@ BLOOD_BEGETS_SKULLS_TRANSITION_SHA256 = (
 BLOOD_BEGETS_SKULLS_OWNER = "tests/factions/chaos_daemons/integration/test_blood_begets_skulls.py"
 
 
+SKULLS_BEGET_BLOOD_TRANSITION = (
+    "data/source_audits/ci64_provenance_v1/skulls-beget-blood-transition-v1.json"
+)
+SKULLS_BEGET_BLOOD_TRANSITION_SHA256 = (
+    "d52df25433449b126bdd6549b9b687a7105a0bc1737645357c7b73fce40c8d95"
+)
+SKULLS_BEGET_BLOOD_OWNER = "tests/factions/chaos_daemons/integration/test_skulls_beget_blood.py"
+
+
+def _skulls_beget_blood_test_successor(
+    root: Path,
+    *,
+    previous: dict[str, object],
+    previous_runtime: str,
+    previous_transition: bytes,
+    previous_sources: dict[str, str],
+    retained_additions: TestSuccessors,
+) -> tuple[str, TestSuccessors, TestSuccessors, bytes]:
+    raw = _checked_bytes(root, SKULLS_BEGET_BLOOD_TRANSITION, SKULLS_BEGET_BLOOD_TRANSITION_SHA256)
+    record = json.loads(raw, object_pairs_hook=_selection_object)
+    classifier = "tests/infrastructure/source_governance/unit/test_blocked_row_classification.py"
+    previous_updated = previous["updated_files"]
+    if (
+        record.keys()
+        != {
+            "schema",
+            "base",
+            "retained_transition_sha256",
+            "retained_runtime_fingerprint",
+            "runtime_fingerprint",
+            "replaced_sources",
+            "new_sources",
+            "added_files",
+            "updated_files",
+        }
+        or record["schema"] != "finite-skulls-beget-blood-transition-v1"
+        or record["base"] != "16069416ea8de4c5623402c1cc6d53e55b673cb0"
+        or record["retained_transition_sha256"] != hashlib.sha256(previous_transition).hexdigest()
+        or record["retained_runtime_fingerprint"] != previous_runtime
+        or record["added_files"].keys() != {SKULLS_BEGET_BLOOD_OWNER}
+        or record["updated_files"].keys() != {classifier}
+        or record["updated_files"][classifier].keys() != {"before", "after"}
+        or not isinstance(previous_updated, dict)
+        or record["updated_files"][classifier]["before"] != previous_updated[classifier]["after"]
+    ):
+        raise SystemExit("Skulls Beget Blood test transition differs.")
+    replaced = record["replaced_sources"]
+    new = record["new_sources"]
+    if not replaced.keys() <= previous_sources.keys() or new.keys() & previous_sources.keys():
+        raise SystemExit("Skulls Beget Blood source successor inventory differs.")
+    for source, digest in previous_sources.items():
+        if source in replaced:
+            binding = replaced[source]
+            if binding.keys() != {"before", "after"} or binding["before"] != digest:
+                raise SystemExit("Skulls Beget Blood source predecessor differs: " + source)
+            digest = binding["after"]
+        _checked_bytes(root, source, digest)
+    for source, digest in new.items():
+        _checked_bytes(root, source, digest)
+    added = _selection_members(record["added_files"], root)
+    if added.keys() & retained_additions.keys():
+        raise SystemExit("Skulls Beget Blood duplicates a retained test owner.")
+    updated = _selection_members({classifier: record["updated_files"][classifier]["after"]}, root)
+    return record["runtime_fingerprint"], updated, {**retained_additions, **added}, raw
+
+
 def _blood_begets_skulls_test_successor(
     root: Path,
     *,
@@ -736,27 +802,47 @@ def _blood_begets_skulls_test_successor(
         or record["new_sources"].keys() & previous_sources.keys()
     ):
         raise SystemExit("Blood Begets Skulls source successor inventory differs.")
-    for source, digest in previous_sources.items():
-        if source in replaced:
-            binding = replaced[source]
-            if binding.keys() != {"before", "after"} or binding["before"] != digest:
-                raise SystemExit("Blood Begets Skulls source predecessor differs: " + source)
-            digest = binding["after"]
-        _checked_bytes(root, source, digest)
-    for source, digest in record["new_sources"].items():
-        _checked_bytes(root, source, digest)
+    current_sources = dict(previous_sources)
+    for source, binding in replaced.items():
+        if binding.keys() != {"before", "after"} or binding["before"] != previous_sources[source]:
+            raise SystemExit("Blood Begets Skulls source predecessor differs: " + source)
+        current_sources[source] = binding["after"]
+    current_sources.update(record["new_sources"])
     added = _selection_members(record["added_files"], root)
     if added.keys() & brass_additions.keys():
         raise SystemExit("Blood Begets Skulls duplicates a Sheathed in Brass test owner.")
+    retained_runtime = record["runtime_fingerprint"]
+    retained_transition = previous_transition + b"\0" + raw
+    retained_additions = {**brass_additions, **added}
+    stage3 = _stage3_melee_profile_successor(
+        root, previous_runtime=retained_runtime, previous_transition=retained_transition
+    )
+    if stage3 is not None:
+        retained_runtime, stage3_tests, stage3_raw = stage3
+        if stage3_tests.keys() & (retained_additions.keys() | {classification_owner}):
+            raise SystemExit("Stage 3 melee profile tests overlap the predecessor selection.")
+        retained_additions.update(stage3_tests)
+        retained_transition += b"\0" + stage3_raw
+    successor_path = root / SKULLS_BEGET_BLOOD_TRANSITION
+    _selection_no_links(root, successor_path)
+    if successor_path.exists():
+        if stage3 is None:
+            raise SystemExit("Skulls Beget Blood requires the exact Stage 3 melee predecessor.")
+        fingerprint, updated, additions, successor_raw = _skulls_beget_blood_test_successor(
+            root,
+            previous=record,
+            previous_runtime=retained_runtime,
+            previous_transition=retained_transition,
+            previous_sources=current_sources,
+            retained_additions=retained_additions,
+        )
+        return fingerprint, updated, additions, retained_transition + b"\0" + successor_raw
+    for source, digest in current_sources.items():
+        _checked_bytes(root, source, digest)
     updated = _selection_members(
         {classification_owner: record["updated_files"][classification_owner]["after"]}, root
     )
-    return (
-        record["runtime_fingerprint"],
-        updated,
-        {**brass_additions, **added},
-        previous_transition + b"\0" + raw,
-    )
+    return retained_runtime, updated, retained_additions, retained_transition
 
 
 def _sheathed_in_brass_test_addition(
@@ -1468,7 +1554,6 @@ def exact_movement_test_transition(
         runtime = pending_battle_shock[1]
     if regeneration is not None:
         runtime = regeneration[0]
-    stage3_melee = None
     brass = None
     if rigid_charge is not None:
         if ground_charge is None:
@@ -1479,11 +1564,6 @@ def exact_movement_test_transition(
         )
         if brass is not None:
             runtime = brass[0]
-            stage3_melee = _stage3_melee_profile_successor(
-                root, previous_runtime=runtime, previous_transition=brass[3]
-            )
-            if stage3_melee is not None:
-                runtime = stage3_melee[0]
     retained = _identity_test_transition(
         root,
         retained_cutover_sha256,
@@ -1622,12 +1702,6 @@ def exact_movement_test_transition(
         updated.update(brass_updates)
         additions.update(brass_additions)
         raw += b"\0" + brass_raw
-    if stage3_melee is not None:
-        _, tests, stage3_raw = stage3_melee
-        if tests.keys() & (updated.keys() | added.keys() | additions.keys()):
-            raise SystemExit("Stage 3 melee profile tests overlap the predecessor selection.")
-        additions.update(tests)
-        raw += b"\0" + stage3_raw
     return updated, {**added, **additions}, retained_raw + b"\0" + raw
 
 

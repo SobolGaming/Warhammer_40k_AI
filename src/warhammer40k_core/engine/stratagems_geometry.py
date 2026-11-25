@@ -18,7 +18,10 @@ from warhammer40k_core.engine.reserve_arrival_requirements import (
     placement_kinds_for_reserve_state,
     proposal_kind_for_reserve_state,
 )
-from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+from warhammer40k_core.engine.rules_units import (
+    placed_alive_rules_unit_views,
+    rules_unit_view_by_id,
+)
 from warhammer40k_core.engine.stratagems_imports import *
 from warhammer40k_core.engine.stratagems_model import *
 from warhammer40k_core.engine.stratagems_requests import *
@@ -573,10 +576,18 @@ def visible_enemy_unit_ids_for_source(
     player_id: str,
     source_unit_instance_id: str,
     range_inches: int,
+    require_unengaged: bool = False,
 ) -> tuple[str, ...]:
     requested_player_id = _validate_identifier("player_id", player_id)
     requested_source_id = _validate_identifier("source_unit_instance_id", source_unit_instance_id)
     distance = _visible_enemy_range_inches(range_inches)
+    if require_unengaged:
+        return _visible_unengaged_enemy_unit_ids(
+            state=state,
+            player_id=requested_player_id,
+            source_unit_instance_id=requested_source_id,
+            range_inches=distance,
+        )
     if _unit_owner(state=state, unit_instance_id=requested_source_id) != requested_player_id:
         return ()
     candidate_ids: list[str] = []
@@ -592,6 +603,78 @@ def visible_enemy_unit_ids_for_source(
             ):
                 candidate_ids.append(unit.unit_instance_id)
     return tuple(sorted(candidate_ids))
+
+
+def _visible_unengaged_enemy_unit_ids(
+    *,
+    state: GameState,
+    player_id: str,
+    source_unit_instance_id: str,
+    range_inches: int,
+) -> tuple[str, ...]:
+    from warhammer40k_core.engine.rules_unit_geometry import (
+        placed_alive_geometry_models_for_rules_unit,
+    )
+    from warhammer40k_core.engine.shooting_selection_range import target_in_range_model_ids
+
+    units = placed_alive_rules_unit_views(state=state)
+    source = next(
+        (
+            unit
+            for unit in units
+            if unit.owner_player_id == player_id
+            and source_unit_instance_id == unit.unit_instance_id
+        ),
+        None,
+    )
+    if source is None:
+        return ()
+    source_models = placed_alive_geometry_models_for_rules_unit(
+        state=state, unit_instance_id=source.unit_instance_id
+    )
+    scenario = _battlefield_scenario_for_stratagem(state)
+    ruleset = state.runtime_ruleset_descriptor()
+    terrain_features = _stratagem_terrain_features(state)
+    terrain_areas = shooting_terrain_areas_for_state(state)
+    observers = tuple(
+        component.unit
+        for component in source.components
+        if scenario.battlefield_state.unit_placement_or_none(component.unit.unit_instance_id)
+        is not None
+    )
+    eligible_ids: list[str] = []
+    for enemy in units:
+        enemy_id = enemy.unit_instance_id
+        if enemy.owner_player_id == player_id:
+            continue
+        target_models = placed_alive_geometry_models_for_rules_unit(
+            state=state, unit_instance_id=enemy_id
+        )
+        if not target_in_range_model_ids(
+            attacker_models=source_models,
+            target_models=target_models,
+            range_inches=range_inches,
+        ):
+            continue
+        if _enemy_unit_is_within_friendly_engagement_range(
+            state=state, player_id=player_id, target_unit_instance_id=enemy_id
+        ):
+            continue
+        if any(
+            unit_has_line_of_sight_to_target(
+                state=state,
+                scenario=scenario,
+                ruleset_descriptor=ruleset,
+                observing_unit=observer,
+                target_unit_id=enemy_id,
+                terrain_features=terrain_features,
+                terrain_areas=terrain_areas,
+                placed_alive_models_only=True,
+            )
+            for observer in observers
+        ):
+            eligible_ids.append(enemy_id)
+    return tuple(sorted(eligible_ids))
 
 
 def _visible_enemy_target_is_visible_and_in_range(

@@ -445,6 +445,11 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
     assert brass["retained_runtime_fingerprint"] == rigid_charge["runtime_fingerprint"]
     skulls = _record(selection.BLOOD_BEGETS_SKULLS_TRANSITION)
     assert skulls["retained_runtime_fingerprint"] == brass["runtime_fingerprint"]
+    shooting_skulls = _record(selection.SKULLS_BEGET_BLOOD_TRANSITION)
+    previous_manifest = json.loads(
+        subprocess.check_output(["git", "show", shooting_skulls["base"] + ":" + MANIFEST], cwd=ROOT)
+    )
+    assert shooting_skulls["runtime_fingerprint"] == _record(MANIFEST)["fingerprint"]
     assert (
         skulls["retained_transition_sha256"]
         == hashlib.sha256(
@@ -453,9 +458,32 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
             ).read_bytes()
         ).hexdigest()
     )
+    predecessor_sources = {**brass["sources"], **skulls["new_sources"]}
     for source, binding in skulls["replaced_sources"].items():
         assert binding["before"] == brass["sources"][source]
-        assert binding["after"] == hashlib.sha256((ROOT / source).read_bytes()).hexdigest()
+        assert (
+            binding["after"]
+            == hashlib.sha256(
+                subprocess.check_output(
+                    ["git", "show", shooting_skulls["base"] + ":" + source], cwd=ROOT
+                )
+            ).hexdigest()
+        )
+        predecessor_sources[source] = binding["after"]
+    for source, binding in shooting_skulls["replaced_sources"].items():
+        assert binding["before"] == predecessor_sources[source]
+        predecessor_sources[source] = binding["after"]
+    assert shooting_skulls["new_sources"].keys().isdisjoint(predecessor_sources)
+    for source, digest in (predecessor_sources | shooting_skulls["new_sources"]).items():
+        assert digest == hashlib.sha256((ROOT / source).read_bytes()).hexdigest()
+    shooting_skulls_owner = selection.SKULLS_BEGET_BLOOD_OWNER
+    assert set(shooting_skulls["added_files"]) == {shooting_skulls_owner}
+    assert shooting_skulls_owner in active_files
+    assert sum(shooting_skulls_owner in group for group in groups) == 1
+    assert (
+        shooting_skulls["added_files"][shooting_skulls_owner]["sha256"]
+        == hashlib.sha256((ROOT / shooting_skulls_owner).read_bytes()).hexdigest()
+    )
     skulls_owner = selection.BLOOD_BEGETS_SKULLS_OWNER
     assert set(skulls["added_files"]) == {skulls_owner}
     assert skulls_owner in active_files
@@ -480,7 +508,22 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
             + (ROOT / selection.BLOOD_BEGETS_SKULLS_TRANSITION).read_bytes()
         ).hexdigest()
     )
-    assert stage3["runtime_fingerprint"] == _record(MANIFEST)["fingerprint"]
+    assert shooting_skulls["retained_runtime_fingerprint"] == stage3["runtime_fingerprint"]
+    assert stage3["runtime_fingerprint"] == previous_manifest["fingerprint"]
+    assert (
+        shooting_skulls["retained_transition_sha256"]
+        == hashlib.sha256(
+            (
+                ROOT / "data/source_audits/ci64_provenance_v1/sheathed-in-brass-transition-v1.json"
+            ).read_bytes()
+            + b"\0"
+            + (ROOT / selection.BLOOD_BEGETS_SKULLS_TRANSITION).read_bytes()
+            + b"\0"
+            + (
+                ROOT / "data/source_audits/ci64_provenance_v1/stage3-melee-profile-test-v1.json"
+            ).read_bytes()
+        ).hexdigest()
+    )
     stage3_owner = "tests/infrastructure/adapters/test_ordinary_melee_profile_policy.py"
     assert set(stage3["added_files"]) == {stage3_owner}
     assert stage3_owner in active_files
@@ -527,6 +570,17 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
     assert classification_successor["before"] == classification_change["after"]
     assert (
         classification_successor["after"]["sha256"]
+        == hashlib.sha256(
+            subprocess.check_output(
+                ["git", "show", shooting_skulls["base"] + ":" + classification_owner], cwd=ROOT
+            )
+        ).hexdigest()
+    )
+    assert set(shooting_skulls["updated_files"]) == {classification_owner}
+    current_classification = shooting_skulls["updated_files"][classification_owner]
+    assert current_classification["before"] == classification_successor["after"]
+    assert (
+        current_classification["after"]["sha256"]
         == hashlib.sha256((ROOT / classification_owner).read_bytes()).hexdigest()
     )
     assert classification_owner in active_files
@@ -944,6 +998,18 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
                 ),
             )
             for reroll in (False, True)
+        }
+        | {
+            selection.SKULLS_BEGET_BLOOD_OWNER + "::test_skulls_beget_blood_" + case
+            for case in (
+                "ordinary_choice_damage_attribution_and_replay",
+                "attached_leader_range_defender_allocation_and_replay",
+                "excludes_both_ends_of_engagement",
+                "has_no_option_when_use_is_illegal[no_cp]",
+                "has_no_option_when_use_is_illegal[opponent_turn]",
+                "has_no_option_when_use_is_illegal[blocked]",
+                "allows_advance_but_excludes_fall_back",
+            )
         }
         | {cover_owner + "::test_save_cover_cache_key_projects_embedded_request_reference"}
         | {opening_owner + "::test_opening_shadow_form_policy_reaches_native_movement"}

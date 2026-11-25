@@ -1,7 +1,7 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:f7a33a7ce44113b8754268ca735a0dfde601b7a1d81394e2c12c55382edefdf0",
-  "fingerprint": "f7a33a7ce44113b8754268ca735a0dfde601b7a1d81394e2c12c55382edefdf0",
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:64a4133aaa039346e783fb5ea80920976ff2ae48aab96aec003505d0d33106d2",
+  "fingerprint": "64a4133aaa039346e783fb5ea80920976ff2ae48aab96aec003505d0d33106d2",
   "resource_count": 3294,
   "resources": [
     {
@@ -4730,9 +4730,9 @@
       "sha256": "d41e27a9052f0250d78ba38b29d4bef7545fedc5a3e2e187df5b37700a6b4e9f"
     },
     {
-      "byte_length": 798,
+      "byte_length": 3569,
       "path": "warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/detachments/blood_legion/stratagems.py",
-      "sha256": "2de9e90dc1d42bbc58d182be558147f05f07fe0dc273f8a76a7da1e958cb290f"
+      "sha256": "d57aa64b1a4a203ca76181812208dfca3b0821bc8a1326130ffb923d1c4b1eaf"
     },
     {
       "byte_length": 172,
@@ -13270,9 +13270,9 @@
       "sha256": "eeec51078f3a0a00e066660cffb0ceac98e6544e8995fc330b3cd7f61bb6a3bd"
     },
     {
-      "byte_length": 58229,
+      "byte_length": 60008,
       "path": "warhammer40k_core/engine/stratagems_eligibility.py",
-      "sha256": "e4dede93c3481b5cdcf14ea87389a1c12a5e22409796adaa584184bf58a02d7e"
+      "sha256": "69bdde9f8674ace9e7925d5294b93b837d9bce6f7114e59f738eaec47d805a6f"
     },
     {
       "byte_length": 3659,
@@ -13280,9 +13280,9 @@
       "sha256": "2fc56cfa207e8000bf44d6d28d673794aee67058591edc8b242f04f730bf6ffc"
     },
     {
-      "byte_length": 19199,
+      "byte_length": 19670,
       "path": "warhammer40k_core/engine/stratagems_generic_metadata.py",
-      "sha256": "3d5b1dab14ee3faca43943169cd21ff26fc41150337ef29c290319ac937cbb76"
+      "sha256": "91b3d851b28b1457cdafcde4a6688e8188fca724fed0c967579f8bb611958e94"
     },
     {
       "byte_length": 10937,
@@ -13300,14 +13300,14 @@
       "sha256": "711134a9cf4e585ee8f88d431a770b85bb360eff8bf879a3a8648d6efd0bc2d3"
     },
     {
-      "byte_length": 50455,
+      "byte_length": 50818,
       "path": "warhammer40k_core/engine/stratagems_generic_rule_ir_runtime.py",
-      "sha256": "1bbf5f574b9d67a4bce616573d1ab5cde7c83e7402af4c338f1d74538f04ab42"
+      "sha256": "fc557945581f3fdd146208811686a890e47b69304c22d9df84f8ccba354fe57f"
     },
     {
-      "byte_length": 43403,
+      "byte_length": 46202,
       "path": "warhammer40k_core/engine/stratagems_geometry.py",
-      "sha256": "17134ce5015c2f00809670aceb891a5d66a2e00a463b397bb45c34ae0713f065"
+      "sha256": "4ad5b5c1a3a7a69b4893aea35a74258f5284e4ef16edb4403bbe780372065969"
     },
     {
       "byte_length": 9687,
@@ -13325,9 +13325,9 @@
       "sha256": "7175d33102066ad7f8bc73302f8f5168b1313036e82d13b9809420e217a079a2"
     },
     {
-      "byte_length": 43302,
+      "byte_length": 43417,
       "path": "warhammer40k_core/engine/stratagems_requests.py",
-      "sha256": "b16d9b3a4b4c5cef3300d21a3da6f88d34acad2f2007831692de826e42c1a889"
+      "sha256": "78c9f03e89a86f38b13adaea1957045867a34d04715acaae0f7ea03f15c034a1"
     },
     {
       "byte_length": 36413,
@@ -15515,9 +15515,9 @@
       "sha256": "d79e9bcdf13c9b76415c19cdc40280548521d0cb05e35ceaf081a7d4629feb1c"
     },
     {
-      "byte_length": 35097,
+      "byte_length": 38341,
       "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_blood_legion_ir_support_2026_27.py",
-      "sha256": "abd4f8cc3ca4ad1afa991021ae3ceac9cbd8a788b8822062aa1347c8c75b40a2"
+      "sha256": "08f0a3919cf7e84466f2d1d5ac29bc346d7281ee3b2c548c6a1bf619823d772f"
     },
     {
       "byte_length": 13574,
@@ -15555,9 +15555,9 @@
       "sha256": "f1dfd3d3fc5d23d47769cf6ea39d11d33475c98c91cb632e2aff5bbd75cac673"
     },
     {
-      "byte_length": 68497,
+      "byte_length": 68496,
       "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_generic_ir_support_2026_27.py",
-      "sha256": "7a041b6113f905ab9f3662e345d27d70a06875f3f78f44c4a993d3956e11708a"
+      "sha256": "45e2bca6fb99a3d68c694045ce96d04f8b4a8e7dc7ec7bdf680a38e37e3ecfc2"
     },
     {
       "byte_length": 20660,

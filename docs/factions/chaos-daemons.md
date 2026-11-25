@@ -10,9 +10,9 @@ This page separates source data from executable rules. An `Implemented` row has 
 | --- | ---: | ---: | ---: | ---: |
 | Detachment rules | 9 | 6 | 0 | 3 |
 | Enhancements | 29 | 17 | 0 | 12 |
-| Stratagems | 46 | 24 | 0 | 22 |
+| Stratagems | 46 | 25 | 0 | 21 |
 
-Across army, detachment, Enhancement, and Stratagem records, 48 exact source rows currently have engine consumers.
+Across army, detachment, Enhancement, and Stratagem records, 49 exact source rows currently have engine consumers.
 
 **This is not a full-game support claim.** Roster legality, selected units, model geometry, mission scoring, network safety, and replay certification are separate Phase 17O capabilities. Query the selected game's `capability_manifest` before presenting a roster or matchup as playable or certified.
 
@@ -84,7 +84,7 @@ The checked-in v995 app roster [`cavalcade-shadow-bloodthirster.json`](../../dat
 
 | Detachment | Runtime executable | Still source-only / blocked |
 | --- | --- | --- |
-| Blood Legion | BLOOD BEGETS SKULLS<br>SHEATHED IN BRASS | FOOLS' FLIGHT<br>GORE-HUNGRY ONSLAUGHT<br>SKULLS BEGET BLOOD<br>WRATH UNDENIABLE |
+| Blood Legion | BLOOD BEGETS SKULLS<br>SHEATHED IN BRASS<br>SKULLS BEGET BLOOD | FOOLS' FLIGHT<br>GORE-HUNGRY ONSLAUGHT<br>WRATH UNDENIABLE |
 | Cavalcade of Chaos | From Beyond the Veil<br>Inescapable Manifestations<br>Warp-Riders | None |
 | Daemonic Incursion | Corrupt Realspace<br>Daemonic Invulnerability<br>Denizens of the Warp<br>Draught of Terror<br>The Realm of Chaos<br>Warp Surge | None |
 | Legion of Excess | None | ARCHAGONISTS<br>CAVALCADE OF BLADES<br>OVERWHELMING EXCESS<br>PHANTASMAL LONGING<br>SENSORY EXCRUCIATION<br>THIEVES OF PAIN |
@@ -229,7 +229,7 @@ This section is generated from the repository-wide semantic audit. It audits por
 
 | Source members | Structured RuleIR | Equivalent groups |
 | ---: | ---: | ---: |
-| 203 | 130 | 45 |
+| 203 | 131 | 45 |
 
 | Group | Kind / surface | Basis | Equivalent source rules | Execution conclusion |
 | --- | --- | --- | --- | --- |

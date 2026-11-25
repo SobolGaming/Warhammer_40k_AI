@@ -1,414 +1,584 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "5ebd32bf98f5313e7ef0790f601a88ee1a6eb8fe",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:f7a33a7ce44113b8754268ca735a0dfde601b7a1d81394e2c12c55382edefdf0",
-  "operation_map_sha256": "405fad33753ff1052e1a8b920452d0e1223422530e748c3b4c376b37e5cca19e",
+  "base": "16069416ea8de4c5623402c1cc6d53e55b673cb0",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:64a4133aaa039346e783fb5ea80920976ff2ae48aab96aec003505d0d33106d2",
+  "operation_map_sha256": "303455cad64bc2b993e88886d54202dc6a633907f5b21e204bdd5ee94046d00f",
   "changes": {
-    "ci/test_shards/durations.json": {
-      "before_sha256": "a91648e5cbda4e21748e6a4b6cd6ebc61fa16913baa40d505990f09216192b4d",
-      "after_sha256": "4d0e7bb1b4814c1a7205d69ac297d485950f1f9083937d54843fb481d0a7fb33",
+    "FACTION_INTEGRATION.md": {
+      "before_sha256": "c1e5dc2af9496419f91057f3c983bc49a2512ea4059a19246d7633f3ff33f1e1",
+      "after_sha256": "a19ab653ffd0ae58978d467d79736c06b767ea58a7352671bdcd52a874f4901f",
       "owners": {
         "@document": {
-          "before": "a91648e5cbda4e21748e6a4b6cd6ebc61fa16913baa40d505990f09216192b4d",
-          "after": "4d0e7bb1b4814c1a7205d69ac297d485950f1f9083937d54843fb481d0a7fb33"
+          "before": "c1e5dc2af9496419f91057f3c983bc49a2512ea4059a19246d7633f3ff33f1e1",
+          "after": "a19ab653ffd0ae58978d467d79736c06b767ea58a7352671bdcd52a874f4901f"
+        }
+      }
+    },
+    "ci/test_shards/durations.json": {
+      "before_sha256": "4d0e7bb1b4814c1a7205d69ac297d485950f1f9083937d54843fb481d0a7fb33",
+      "after_sha256": "8fd09f0d51c925db963a474fcc09731eac8107325722f44fd865e028e5b9f75b",
+      "owners": {
+        "@document": {
+          "before": "4d0e7bb1b4814c1a7205d69ac297d485950f1f9083937d54843fb481d0a7fb33",
+          "after": "8fd09f0d51c925db963a474fcc09731eac8107325722f44fd865e028e5b9f75b"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
-      "before_sha256": "c5d14f312226b7dda6e8c6169b2571b3444a9b1268b36e9cfc259e8db462b567",
-      "after_sha256": "df02c9ef5140b48172d37bafc08582d2d3d64327007060340616e0f187fd37f0",
+      "before_sha256": "df02c9ef5140b48172d37bafc08582d2d3d64327007060340616e0f187fd37f0",
+      "after_sha256": "6aa7b0de6324135276a60a3fbfcca13e838cce1d042696b89633098c2a2ed122",
       "owners": {
         "@document": {
-          "before": "c5d14f312226b7dda6e8c6169b2571b3444a9b1268b36e9cfc259e8db462b567",
-          "after": "df02c9ef5140b48172d37bafc08582d2d3d64327007060340616e0f187fd37f0"
+          "before": "df02c9ef5140b48172d37bafc08582d2d3d64327007060340616e0f187fd37f0",
+          "after": "6aa7b0de6324135276a60a3fbfcca13e838cce1d042696b89633098c2a2ed122"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
-      "before_sha256": "28f952913d1be65c7bcc2a5457cf795e2a86ad49160f67ccb9cb259dde5b9a80",
-      "after_sha256": "f43f78028dad4e773fe2a18855b3c319ab38d56c6db471371416a22e3e866e7f",
+      "before_sha256": "f43f78028dad4e773fe2a18855b3c319ab38d56c6db471371416a22e3e866e7f",
+      "after_sha256": "06909c7e9c3a1eee790dabd3aacad1f363ac97fa25296f62b7b3e0bb4da1572e",
       "owners": {
         "@document": {
-          "before": "28f952913d1be65c7bcc2a5457cf795e2a86ad49160f67ccb9cb259dde5b9a80",
-          "after": "f43f78028dad4e773fe2a18855b3c319ab38d56c6db471371416a22e3e866e7f"
+          "before": "f43f78028dad4e773fe2a18855b3c319ab38d56c6db471371416a22e3e866e7f",
+          "after": "06909c7e9c3a1eee790dabd3aacad1f363ac97fa25296f62b7b3e0bb4da1572e"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
-      "before_sha256": "c68763c54a6746ecaf5c502278241f49f48a62444a888784a82e51ffb95c0df8",
-      "after_sha256": "843401083b54afa80750e75922d06b229a7727d882bac749b31babe82e8e3cb4",
+      "before_sha256": "843401083b54afa80750e75922d06b229a7727d882bac749b31babe82e8e3cb4",
+      "after_sha256": "2587c15663d9d763fcec098546ff684cd4f8edf1048a41872adb56cb87810621",
       "owners": {
         "@document": {
-          "before": "c68763c54a6746ecaf5c502278241f49f48a62444a888784a82e51ffb95c0df8",
-          "after": "843401083b54afa80750e75922d06b229a7727d882bac749b31babe82e8e3cb4"
+          "before": "843401083b54afa80750e75922d06b229a7727d882bac749b31babe82e8e3cb4",
+          "after": "2587c15663d9d763fcec098546ff684cd4f8edf1048a41872adb56cb87810621"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
-      "before_sha256": "c8a09b39cd52eaa9f40115ff3591fe12c2c120d9824143c1a5c47b58b382f51a",
-      "after_sha256": "1189475a0e8b5799d824eb30b5edcba6a8aa674517a3382ad284def850b7c9e9",
+      "before_sha256": "1189475a0e8b5799d824eb30b5edcba6a8aa674517a3382ad284def850b7c9e9",
+      "after_sha256": "bafd9f83762779915479f213862d5fd6613623c06e3b86aa75f90dd9ed525a9f",
       "owners": {
         "@document": {
-          "before": "c8a09b39cd52eaa9f40115ff3591fe12c2c120d9824143c1a5c47b58b382f51a",
-          "after": "1189475a0e8b5799d824eb30b5edcba6a8aa674517a3382ad284def850b7c9e9"
+          "before": "1189475a0e8b5799d824eb30b5edcba6a8aa674517a3382ad284def850b7c9e9",
+          "after": "bafd9f83762779915479f213862d5fd6613623c06e3b86aa75f90dd9ed525a9f"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
-      "before_sha256": "7531fc331fdc0eb1c324856adbb85743640a530812d1069345f0517684eaf42b",
-      "after_sha256": "5735f8c1bc0fbb6928764cda57a8cdddcb1873cff76028add11a4c9c45d9aab0",
+      "before_sha256": "5735f8c1bc0fbb6928764cda57a8cdddcb1873cff76028add11a4c9c45d9aab0",
+      "after_sha256": "2842a97c9713cdab4b6101b6195f102f7fed314f28820c8eebe7f38340102eea",
       "owners": {
         "@document": {
-          "before": "7531fc331fdc0eb1c324856adbb85743640a530812d1069345f0517684eaf42b",
-          "after": "5735f8c1bc0fbb6928764cda57a8cdddcb1873cff76028add11a4c9c45d9aab0"
+          "before": "5735f8c1bc0fbb6928764cda57a8cdddcb1873cff76028add11a4c9c45d9aab0",
+          "after": "2842a97c9713cdab4b6101b6195f102f7fed314f28820c8eebe7f38340102eea"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
-      "before_sha256": "46399ffacddd4a55d67fb92340d28d0a1a382bb1d1690f88e08af657b88eb2b7",
-      "after_sha256": "38287539feae107f1b139315eb34369b50717b598993c91dc716b30146128541",
+      "before_sha256": "38287539feae107f1b139315eb34369b50717b598993c91dc716b30146128541",
+      "after_sha256": "c3bea3ca8c88d2f413a9f2e868587bfeebb408a7a9e440c3a029acdc187de741",
       "owners": {
         "@document": {
-          "before": "46399ffacddd4a55d67fb92340d28d0a1a382bb1d1690f88e08af657b88eb2b7",
-          "after": "38287539feae107f1b139315eb34369b50717b598993c91dc716b30146128541"
+          "before": "38287539feae107f1b139315eb34369b50717b598993c91dc716b30146128541",
+          "after": "c3bea3ca8c88d2f413a9f2e868587bfeebb408a7a9e440c3a029acdc187de741"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
-      "before_sha256": "ea806070089351aee7dac49a80c093d51912e1c8144e3ec86d82bbcdad487980",
-      "after_sha256": "0e664bea51c31246f56f6d71ae9266134f3c0d861de2c9d8b3e7cf91e7dd05cc",
+      "before_sha256": "0e664bea51c31246f56f6d71ae9266134f3c0d861de2c9d8b3e7cf91e7dd05cc",
+      "after_sha256": "84d2f967f288bf7e644f2671184be6e99dc953731c23d06286f66198bfefdb8c",
       "owners": {
         "@document": {
-          "before": "ea806070089351aee7dac49a80c093d51912e1c8144e3ec86d82bbcdad487980",
-          "after": "0e664bea51c31246f56f6d71ae9266134f3c0d861de2c9d8b3e7cf91e7dd05cc"
+          "before": "0e664bea51c31246f56f6d71ae9266134f3c0d861de2c9d8b3e7cf91e7dd05cc",
+          "after": "84d2f967f288bf7e644f2671184be6e99dc953731c23d06286f66198bfefdb8c"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
-      "before_sha256": "c65f18f94752568680acdb8e3a1509112a9d5dc2e059f6d75a287fb5f84a15a1",
-      "after_sha256": "b7461e34603cea25df1113abb99fe709dfa33179139a447e37845773205c358b",
+      "before_sha256": "b7461e34603cea25df1113abb99fe709dfa33179139a447e37845773205c358b",
+      "after_sha256": "5f23890b902f53849ee551101e0cd8314b8b63543d57ab356c039db35a9e6e6f",
       "owners": {
         "@document": {
-          "before": "c65f18f94752568680acdb8e3a1509112a9d5dc2e059f6d75a287fb5f84a15a1",
-          "after": "b7461e34603cea25df1113abb99fe709dfa33179139a447e37845773205c358b"
+          "before": "b7461e34603cea25df1113abb99fe709dfa33179139a447e37845773205c358b",
+          "after": "5f23890b902f53849ee551101e0cd8314b8b63543d57ab356c039db35a9e6e6f"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
-      "before_sha256": "0453ced44765687768decd470d1cee3db8a9e5045af3ddede0c3665a395b8460",
-      "after_sha256": "66c0402968dc6b103946675b9409605e84ff2130a047d1fe0ad7eaf17e929aff",
+      "before_sha256": "66c0402968dc6b103946675b9409605e84ff2130a047d1fe0ad7eaf17e929aff",
+      "after_sha256": "487fddd26898889bb80f0fa147bc1ab1c75041f18a31d90c45528a1b1da40577",
       "owners": {
         "@document": {
-          "before": "0453ced44765687768decd470d1cee3db8a9e5045af3ddede0c3665a395b8460",
-          "after": "66c0402968dc6b103946675b9409605e84ff2130a047d1fe0ad7eaf17e929aff"
+          "before": "66c0402968dc6b103946675b9409605e84ff2130a047d1fe0ad7eaf17e929aff",
+          "after": "487fddd26898889bb80f0fa147bc1ab1c75041f18a31d90c45528a1b1da40577"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
-      "before_sha256": "e0c534eefbbe4dd969df6f43bbae5cf9af8b247a53f4da9da84ec5991bacba3e",
-      "after_sha256": "5f4cee07a9f9471f61b78df7a2b007c23b3840f7206cff1f43aaab4a65f139b6",
+      "before_sha256": "5f4cee07a9f9471f61b78df7a2b007c23b3840f7206cff1f43aaab4a65f139b6",
+      "after_sha256": "52f55c18fef1ea0bb39fd738e5445dd6097a7a3108476accc860b78e5747a418",
       "owners": {
         "@document": {
-          "before": "e0c534eefbbe4dd969df6f43bbae5cf9af8b247a53f4da9da84ec5991bacba3e",
-          "after": "5f4cee07a9f9471f61b78df7a2b007c23b3840f7206cff1f43aaab4a65f139b6"
+          "before": "5f4cee07a9f9471f61b78df7a2b007c23b3840f7206cff1f43aaab4a65f139b6",
+          "after": "52f55c18fef1ea0bb39fd738e5445dd6097a7a3108476accc860b78e5747a418"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "e5f0d3e36fb6b01f476a98a81b89a71ea9e5e653e0f8e9f841d3bedc7250df0e",
-      "after_sha256": "12125ece384280a8e6f3619e89c9bc072f8132f1a10abd39ced0653e9aea453e",
+      "before_sha256": "12125ece384280a8e6f3619e89c9bc072f8132f1a10abd39ced0653e9aea453e",
+      "after_sha256": "aa53d41e3ee781dd744b2059f32bcc3b912bc367bda3b6a9de3aa3e8b9017ac0",
       "owners": {
         "@document": {
-          "before": "e5f0d3e36fb6b01f476a98a81b89a71ea9e5e653e0f8e9f841d3bedc7250df0e",
-          "after": "12125ece384280a8e6f3619e89c9bc072f8132f1a10abd39ced0653e9aea453e"
+          "before": "12125ece384280a8e6f3619e89c9bc072f8132f1a10abd39ced0653e9aea453e",
+          "after": "aa53d41e3ee781dd744b2059f32bcc3b912bc367bda3b6a9de3aa3e8b9017ac0"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "38e1fc670dcfd0aa9561a922094bd4686eb3786be365498b882a0f30ebb3389d",
-      "after_sha256": "3de72a0eb4a2b43e2c36b98ba05a6894cee07e75a9357bc0bbba160219d4ad9e",
+      "before_sha256": "3de72a0eb4a2b43e2c36b98ba05a6894cee07e75a9357bc0bbba160219d4ad9e",
+      "after_sha256": "d64829db51157e5c24c799b66f2c372e12756cd74736a5b138dbfc3cad3c0a1c",
       "owners": {
         "@document": {
-          "before": "38e1fc670dcfd0aa9561a922094bd4686eb3786be365498b882a0f30ebb3389d",
-          "after": "3de72a0eb4a2b43e2c36b98ba05a6894cee07e75a9357bc0bbba160219d4ad9e"
+          "before": "3de72a0eb4a2b43e2c36b98ba05a6894cee07e75a9357bc0bbba160219d4ad9e",
+          "after": "d64829db51157e5c24c799b66f2c372e12756cd74736a5b138dbfc3cad3c0a1c"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "21b82e68e1d6204b39c174ed8c723ecd01d97df2f4d6274d36a73cb51efa34fc",
-      "after_sha256": "17f6c4c6170a6282715baf1972d3355ba7f2dc12cca3e59fcc98240555e4bba5",
+      "before_sha256": "17f6c4c6170a6282715baf1972d3355ba7f2dc12cca3e59fcc98240555e4bba5",
+      "after_sha256": "5bf96f8c2a4143fb0aa912894771eb7427f17896283052b965a92e793b31dd70",
       "owners": {
         "@document": {
-          "before": "21b82e68e1d6204b39c174ed8c723ecd01d97df2f4d6274d36a73cb51efa34fc",
-          "after": "17f6c4c6170a6282715baf1972d3355ba7f2dc12cca3e59fcc98240555e4bba5"
+          "before": "17f6c4c6170a6282715baf1972d3355ba7f2dc12cca3e59fcc98240555e4bba5",
+          "after": "5bf96f8c2a4143fb0aa912894771eb7427f17896283052b965a92e793b31dd70"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "acf9b1d0358aaa91b43bd4da82b66d9495391916f0c1f63f77914ad999f49c60",
-      "after_sha256": "62b6a8c0a04e59b1488f34c68c991bcbde0f6b6be75de38e631bec5ef3755c39",
+      "before_sha256": "62b6a8c0a04e59b1488f34c68c991bcbde0f6b6be75de38e631bec5ef3755c39",
+      "after_sha256": "bc6c273032732b583566e93a83cf49c6d7eb8c411a9a930ecbf7b4fad79d6cb1",
       "owners": {
         "@document": {
-          "before": "acf9b1d0358aaa91b43bd4da82b66d9495391916f0c1f63f77914ad999f49c60",
-          "after": "62b6a8c0a04e59b1488f34c68c991bcbde0f6b6be75de38e631bec5ef3755c39"
+          "before": "62b6a8c0a04e59b1488f34c68c991bcbde0f6b6be75de38e631bec5ef3755c39",
+          "after": "bc6c273032732b583566e93a83cf49c6d7eb8c411a9a930ecbf7b4fad79d6cb1"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "db94dc7ae9b4bcb714a385885d4edbd23f77f762fee3c02f4b5bbcdda5e022e7",
-      "after_sha256": "9748ca0de15dd565e490c02ad1f80cf0bdd5f30183123f4a24d36b83b397b041",
+      "before_sha256": "9748ca0de15dd565e490c02ad1f80cf0bdd5f30183123f4a24d36b83b397b041",
+      "after_sha256": "a6d334755b5adea9f4be4a5f9a30e554f36341a39e244bf1b67ffcdf5a04c230",
       "owners": {
         "@document": {
-          "before": "db94dc7ae9b4bcb714a385885d4edbd23f77f762fee3c02f4b5bbcdda5e022e7",
-          "after": "9748ca0de15dd565e490c02ad1f80cf0bdd5f30183123f4a24d36b83b397b041"
+          "before": "9748ca0de15dd565e490c02ad1f80cf0bdd5f30183123f4a24d36b83b397b041",
+          "after": "a6d334755b5adea9f4be4a5f9a30e554f36341a39e244bf1b67ffcdf5a04c230"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "63d3537eb0bd848e9fa4a579deae7848468523ae0a664d51e43c382d042d8b66",
-      "after_sha256": "e39f0214aa87bc819942d010fd4f08492ecfe4bd6e589b34f2d86175552c0e5d",
+      "before_sha256": "e39f0214aa87bc819942d010fd4f08492ecfe4bd6e589b34f2d86175552c0e5d",
+      "after_sha256": "b00614629e5828f088f0fea3a2ef89c53804fd5b67eb46a8ddbdf9363931b5f5",
       "owners": {
         "@document": {
-          "before": "63d3537eb0bd848e9fa4a579deae7848468523ae0a664d51e43c382d042d8b66",
-          "after": "e39f0214aa87bc819942d010fd4f08492ecfe4bd6e589b34f2d86175552c0e5d"
+          "before": "e39f0214aa87bc819942d010fd4f08492ecfe4bd6e589b34f2d86175552c0e5d",
+          "after": "b00614629e5828f088f0fea3a2ef89c53804fd5b67eb46a8ddbdf9363931b5f5"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "0a2519a01d5c593fe4b862596e12d2cd6823a93c019a36eaec23dc7b6c53dbbc",
-      "after_sha256": "783e6d05dfce0fd04f5aea357f431c9e61598d5849de4e3cc5e7926bd2421f54",
+      "before_sha256": "783e6d05dfce0fd04f5aea357f431c9e61598d5849de4e3cc5e7926bd2421f54",
+      "after_sha256": "919c853f9a40116dbfe79c465e69518025b0876e8a496ab4dc06ecea781465a2",
       "owners": {
         "@document": {
-          "before": "0a2519a01d5c593fe4b862596e12d2cd6823a93c019a36eaec23dc7b6c53dbbc",
-          "after": "783e6d05dfce0fd04f5aea357f431c9e61598d5849de4e3cc5e7926bd2421f54"
+          "before": "783e6d05dfce0fd04f5aea357f431c9e61598d5849de4e3cc5e7926bd2421f54",
+          "after": "919c853f9a40116dbfe79c465e69518025b0876e8a496ab4dc06ecea781465a2"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "8faa781f5324b267bf4d9cc9ecd719284d19210ae74a15de9e14c954aa984c30",
-      "after_sha256": "4736854130113cc04379ef3ccd0edc49282533d81a2c28039ae940aace468288",
+      "before_sha256": "4736854130113cc04379ef3ccd0edc49282533d81a2c28039ae940aace468288",
+      "after_sha256": "b65b467d503742e3c542a89d7086c275f0f15e72920a68b600c55f31dcca1e95",
       "owners": {
         "@document": {
-          "before": "8faa781f5324b267bf4d9cc9ecd719284d19210ae74a15de9e14c954aa984c30",
-          "after": "4736854130113cc04379ef3ccd0edc49282533d81a2c28039ae940aace468288"
+          "before": "4736854130113cc04379ef3ccd0edc49282533d81a2c28039ae940aace468288",
+          "after": "b65b467d503742e3c542a89d7086c275f0f15e72920a68b600c55f31dcca1e95"
         }
       }
     },
-    "data/source_audits/ci64_provenance_v1/stage3-melee-profile-test-v1.json": {
+    "data/generated/ability_coverage/cross_source_semantic_equivalence.json": {
+      "before_sha256": "2d1abe2ef6600c7a5712f7271d6c832423e904e7123bb6e29edb8e9760e5a554",
+      "after_sha256": "f4863e3fa20a4f32a307c97a492c2f025efd46b68d5b95a6d7f506b14a88f542",
+      "owners": {
+        "@document": {
+          "before": "2d1abe2ef6600c7a5712f7271d6c832423e904e7123bb6e29edb8e9760e5a554",
+          "after": "f4863e3fa20a4f32a307c97a492c2f025efd46b68d5b95a6d7f506b14a88f542"
+        }
+      }
+    },
+    "data/generated/ability_coverage/runtime_content_semantic_coverage.json": {
+      "before_sha256": "73a44908461a0810f0d37f9133ce175dd293af0ae6a733519708e8e619d0226f",
+      "after_sha256": "83bc89b4ed13f0d3635a42805c0f788afc3d95e3301345b56802330c3da1a540",
+      "owners": {
+        "@document": {
+          "before": "73a44908461a0810f0d37f9133ce175dd293af0ae6a733519708e8e619d0226f",
+          "after": "83bc89b4ed13f0d3635a42805c0f788afc3d95e3301345b56802330c3da1a540"
+        }
+      }
+    },
+    "data/source_audits/ci64_provenance_v1/skulls-beget-blood-transition-v1.json": {
       "before_sha256": null,
-      "after_sha256": "d6878ec80208f32f09e52fa324fe7237123dc90f403d2238139d020ba780df40",
+      "after_sha256": "d52df25433449b126bdd6549b9b687a7105a0bc1737645357c7b73fce40c8d95",
       "owners": {
         "@document": {
           "before": null,
-          "after": "d6878ec80208f32f09e52fa324fe7237123dc90f403d2238139d020ba780df40"
+          "after": "d52df25433449b126bdd6549b9b687a7105a0bc1737645357c7b73fce40c8d95"
         }
       }
     },
-    "docs/AI_POLICY_INTERFACE.md": {
-      "before_sha256": "2ab5c7452f33e2b904962f5db7e6ecc49d565c17d5e95f8e839ef3a5bda25c69",
-      "after_sha256": "e8cd7a62179340740d10750f87351e472a2b0167d9ddbc05e68ec801e3855361",
+    "docs/ABILITY_SUPPORT_MATRIX_V2.md": {
+      "before_sha256": "f06d4663c9bc7485f68b7fabafa7553747c6e3f17e655bd216fbb3f18b9f782a",
+      "after_sha256": "f17501ce0af59844cf658467ce5f182637d70b5c82dd7c107377265f4e1919ef",
       "owners": {
         "@document": {
-          "before": "2ab5c7452f33e2b904962f5db7e6ecc49d565c17d5e95f8e839ef3a5bda25c69",
-          "after": "e8cd7a62179340740d10750f87351e472a2b0167d9ddbc05e68ec801e3855361"
+          "before": "f06d4663c9bc7485f68b7fabafa7553747c6e3f17e655bd216fbb3f18b9f782a",
+          "after": "f17501ce0af59844cf658467ce5f182637d70b5c82dd7c107377265f4e1919ef"
+        }
+      }
+    },
+    "docs/ADAPTER_DECISION_CONTRACT.md": {
+      "before_sha256": "154fd76c3ecbfbed3c3a41a0d9871d2df34e6766bf88d5eb9038ef264720e6d9",
+      "after_sha256": "af4a28d13eb19e4aac4e9ebb577ba98e086c3ec37b4b24136493daef925272d7",
+      "owners": {
+        "@document": {
+          "before": "154fd76c3ecbfbed3c3a41a0d9871d2df34e6766bf88d5eb9038ef264720e6d9",
+          "after": "af4a28d13eb19e4aac4e9ebb577ba98e086c3ec37b4b24136493daef925272d7"
+        }
+      }
+    },
+    "docs/CROSS_SOURCE_SEMANTIC_EQUIVALENCE.md": {
+      "before_sha256": "91c014158ba61a5ce5fa67430f7ee78a4a0bb4c6d8093130c1a047f862c3faa1",
+      "after_sha256": "0d7fb705b49408a584e7174a0262d7919af3a571e140fa7f93a3930d024165c3",
+      "owners": {
+        "@document": {
+          "before": "91c014158ba61a5ce5fa67430f7ee78a4a0bb4c6d8093130c1a047f862c3faa1",
+          "after": "0d7fb705b49408a584e7174a0262d7919af3a571e140fa7f93a3930d024165c3"
+        }
+      }
+    },
+    "docs/factions/audit/chaos-daemons.md": {
+      "before_sha256": "5215e1513d717e33c7bc5969dcb80964024c2ed81e8f0a424672205b6f41b375",
+      "after_sha256": "d3594d7f607604b97fe0745011340e713ebee952ffcdbce6dbd79563d08ea60c",
+      "owners": {
+        "@document": {
+          "before": "5215e1513d717e33c7bc5969dcb80964024c2ed81e8f0a424672205b6f41b375",
+          "after": "d3594d7f607604b97fe0745011340e713ebee952ffcdbce6dbd79563d08ea60c"
+        }
+      }
+    },
+    "docs/factions/chaos-daemons.md": {
+      "before_sha256": "6644e17ee7e365ce1d460722aeb2699ec97cedff64273f25707f7ff33581be19",
+      "after_sha256": "b4efd7658617236fcdbefe61e8bc2803e60a21ed1ec91696a0135edd82e57da4",
+      "owners": {
+        "@document": {
+          "before": "6644e17ee7e365ce1d460722aeb2699ec97cedff64273f25707f7ff33581be19",
+          "after": "b4efd7658617236fcdbefe61e8bc2803e60a21ed1ec91696a0135edd82e57da4"
+        }
+      }
+    },
+    "docs/performance/current/skulls-beget-blood-visibility.json": {
+      "before_sha256": null,
+      "after_sha256": "4629bf53d5d29cd616886be018ad6829106b1be578fc01cb0c4e788e40f1941b",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "4629bf53d5d29cd616886be018ad6829106b1be578fc01cb0c4e788e40f1941b"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "f98368bc97f89fed5c61a27db5714cb3fb9ddb9386df8e701a9b698e66bae918",
-      "after_sha256": "e4cf88b33f28750e5a17f38107e17c01dd5984acf235e279f552f982320a157e",
+      "before_sha256": "e4cf88b33f28750e5a17f38107e17c01dd5984acf235e279f552f982320a157e",
+      "after_sha256": "a68e574afcec17abbb4629b77df6a988468c9482d782537a299a1672e21a3c22",
       "owners": {
         "@document": {
-          "before": "f98368bc97f89fed5c61a27db5714cb3fb9ddb9386df8e701a9b698e66bae918",
-          "after": "e4cf88b33f28750e5a17f38107e17c01dd5984acf235e279f552f982320a157e"
+          "before": "e4cf88b33f28750e5a17f38107e17c01dd5984acf235e279f552f982320a157e",
+          "after": "a68e574afcec17abbb4629b77df6a988468c9482d782537a299a1672e21a3c22"
         }
       }
     },
     "scripts/engine_numerical_identity_test_admission.py": {
-      "before_sha256": "11c826b92cc3421e71b230dcb2b41499bec360f8256dbafb607d93000f9b90dd",
-      "after_sha256": "0d20a4c30cc79535ad4e9702ca81221813cad2def790d280ddcbb7a48a7b7295",
+      "before_sha256": "0d20a4c30cc79535ad4e9702ca81221813cad2def790d280ddcbb7a48a7b7295",
+      "after_sha256": "33a72dad0dadbb46b22f58144c89a38395e83ca3c79a496b5ac6ca3272ae1c1a",
       "owners": {
-        "_stage3_melee_profile_successor": {
+        "@module": {
+          "before": "9da0add5a97b5aa8d352e1ddd38760fe1457ab0525128bc4e3decc1e6a4fa660",
+          "after": "ca04371cfbb41f1569c8edc74619e615e0d6f7692191c6217f1e0c90bd9abefa"
+        },
+        "_blood_begets_skulls_test_successor": {
+          "before": "99a3d35e4c31108680a55b823da2fd9581c3289ab1a8492f0575396c6ab6831d",
+          "after": "7473cd8a99deacf3776da89b91bd2e518f7d529068abcb282b18eb68bcff866e"
+        },
+        "_skulls_beget_blood_test_successor": {
           "before": null,
-          "after": "5538e7acfb93231d11de9e4d55e74f4d66d1d2ee19beb232f858548ea251a693"
+          "after": "d217e34acab723a24d7279470469ffa67b043fcf58e2c5e196a7111347e79a6c"
         },
         "exact_movement_test_transition": {
-          "before": "e1857cf0a73a77642453761cfea32b7d80b01c7baccc18cf3d6f35f65e1d86b0",
-          "after": "a4b21064708a4a526225ea6fb32f364f064c9bdd201abdada7c04e4a0161e1c7"
+          "before": "a4b21064708a4a526225ea6fb32f364f064c9bdd201abdada7c04e4a0161e1c7",
+          "after": "e1857cf0a73a77642453761cfea32b7d80b01c7baccc18cf3d6f35f65e1d86b0"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "30456764e902dd2e31ac0f37b429882de8b60a24bfe17fe8f7dbd94f6be3b6d7",
-      "after_sha256": "e05855797a3d04dd40660c04be8b4ca51ee02cedea37a054745d93e2a5180186",
+      "before_sha256": "e05855797a3d04dd40660c04be8b4ca51ee02cedea37a054745d93e2a5180186",
+      "after_sha256": "850fb699b37211370e6cbf36a18659e23aac91280f745a1bf3eaa7cd48d12e42",
       "owners": {
         "@document": {
-          "before": "30456764e902dd2e31ac0f37b429882de8b60a24bfe17fe8f7dbd94f6be3b6d7",
-          "after": "e05855797a3d04dd40660c04be8b4ca51ee02cedea37a054745d93e2a5180186"
+          "before": "e05855797a3d04dd40660c04be8b4ca51ee02cedea37a054745d93e2a5180186",
+          "after": "850fb699b37211370e6cbf36a18659e23aac91280f745a1bf3eaa7cd48d12e42"
         }
       }
     },
-    "src/warhammer40k_core/ai/ordinary_melee_profile_policy.py": {
-      "before_sha256": null,
-      "after_sha256": "5b1ae2009d9c89d5471b95367c6767cf8ab9ce3d1a2d41aee52be76f0d5bfca3",
+    "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/detachments/blood_legion/stratagems.py": {
+      "before_sha256": "2de9e90dc1d42bbc58d182be558147f05f07fe0dc273f8a76a7da1e958cb290f",
+      "after_sha256": "d57aa64b1a4a203ca76181812208dfca3b0821bc8a1326130ffb923d1c4b1eaf",
       "owners": {
         "@module": {
-          "before": null,
-          "after": "1b96f428e15f460ff86927f0a73d90f41916134517b455d0290eddb996d0dede"
+          "before": "5794221e4f6631f08c024327ca68fcbb44260d0b1ff55d6e8fd5e9e32cae9abe",
+          "after": "6ca2596b32c572a6a32d5b1fc0a3a339672f5699368a77064b3e7240273e1dd3"
         },
-        "MeleeProfileAdmission": {
+        "_skulls_beget_blood_record": {
           "before": null,
-          "after": "bb705b05836fe1aa49be88d2f97eebdfa64244c1ad700567798de1cff6e900b5"
+          "after": "8fe248b68126f8fda336173c6fdfb3f9d9abb77a5c65c5aa585f980b163d4753"
         },
-        "MeleeProfileCandidate": {
-          "before": null,
-          "after": "17edd150a86160e5dc95790ddfa6956030fb9d0507885ffa2e5815887ba32cc7"
-        },
-        "MeleeProfileGap": {
-          "before": null,
-          "after": "829e9f661e17f197989154868863364d7b6b5874abbbbbd85459371b41ab4520"
-        },
-        "MeleeProfileGap.__init__": {
-          "before": null,
-          "after": "5e9a2fe37f21eee7f0b5bd9cbead7756783eccb7354e3c14a93b041abe348da7"
-        },
-        "MeleeProfileGapReason": {
-          "before": null,
-          "after": "bdb131377c80010f9ecd6a731c2b1c09d6112d4dd1fda30140bd15d3e372804f"
-        },
-        "_Defense": {
-          "before": null,
-          "after": "853af3e5fd20c71930b82014f8070ab687431c165dff3f3bfce62f204e9a0f89"
-        },
-        "_OfferedWeapon": {
-          "before": null,
-          "after": "d8f946f2f43082dc7d9a00b7710a3e47c703d8659648817b3eed8682df4d4a9d"
-        },
-        "_OrdinaryMeleeProfilePolicy": {
-          "before": null,
-          "after": "a8ec6ec804f550e35ee6e973b82702f5bf30dd8101d60287ee70f92474cd0151"
-        },
-        "_OrdinaryMeleeProfilePolicy.choose": {
-          "before": null,
-          "after": "b5866eb0738c1a90c341c6c5f51fb5a82fa6de50cd608794da781227ac17ff6d"
-        },
-        "_expected_applied_wounds": {
-          "before": null,
-          "after": "696d207ef8e8e8cdb3a555114ab55fb141c38a7a1b78d262a842d035508df55c"
-        },
-        "_target_defense": {
-          "before": null,
-          "after": "c79e6788e5e1126ebf6ac0b301771039aaba6e90a9c02f63bf41b77fe7fda567"
-        },
-        "_target_wounds": {
-          "before": null,
-          "after": "2eafe1598ded454b1b113f77432536e4d3a55822b3f63891e395b735fdb906d0"
-        },
-        "generate_ordinary_melee_profile_candidates": {
-          "before": null,
-          "after": "4fb3e97ebfd12e06a1b7fa7453c6aa6414b61b9157f532f918a6560b2b9b7c81"
-        },
-        "ordinary_melee_profile_registration": {
-          "before": null,
-          "after": "4f42172207c1e2044e44d102e638c389da4e6cc2c83c23a0b49b1545eba9d64e"
-        },
-        "ordinary_melee_profile_route": {
-          "before": null,
-          "after": "1583552523a2c53a98ae49368a61bc08507dfb6d58403827c36bf5c160d498fc"
+        "runtime_contribution": {
+          "before": "4f386542452bc738740f32d604aac153e169482baf4354c869aa05fd0dbac6d9",
+          "after": "3ba7f6630fc0b896a8c8875de9da87f6a6815fc5720d4addf33eb141f5aca250"
         }
       }
     },
-    "src/warhammer40k_core/ai/player_policy.py": {
-      "before_sha256": "378579408960b8c72486d89c66d61d130876641790cce9a18be4edfb3de011f5",
-      "after_sha256": "27d900f0387f1889def4d0ccb56a1268458ea1d7ee6085f0f3a0113a0b355e64",
-      "owners": {
-        "PolicyRegistration": {
-          "before": "27223555de3e74106f001960a409baecb1d734fb7239617ab369ea4ef8a3d727",
-          "after": "109060c752f384a27e1ee9c68c5c28079f50adb5e7140991cea637c59d4f989a"
-        },
-        "PolicyRegistration.__post_init__": {
-          "before": "c77a84cafd0a1248531fab42b6e073231a61eb32e79e850fd6c0990745b50ef1",
-          "after": "8811c9698cafb5e852009e61fc9a1249c544cae20fc961dd273add2e91e42649"
-        },
-        "PolicyRouter.__init__": {
-          "before": "54dd4642402e7f8ac641e38e351d021bdd8ef4935898457e82227d6339ed6cc3",
-          "after": "ed9a6406e2bf187aef06eee5fa7fdb60bc108c1d4c61ba519bbca0baa8763503"
-        }
-      }
-    },
-    "src/warhammer40k_core/ai/runner.py": {
-      "before_sha256": "ea7aa3a524351bedabea722827b901e5ea64cafcff6f476a19e88d4724e287d8",
-      "after_sha256": "b303035d61188e91a019438bb446e94d12698577e1c3500f59f566c4a47a84c0",
+    "src/warhammer40k_core/engine/stratagems_eligibility.py": {
+      "before_sha256": "e4dede93c3481b5cdcf14ea87389a1c12a5e22409796adaa584184bf58a02d7e",
+      "after_sha256": "69bdde9f8674ace9e7925d5294b93b837d9bce6f7114e59f738eaec47d805a6f",
       "owners": {
         "@module": {
-          "before": "888bf716b35ba1c1d734b4ac0d979e2cccaa97a9ec737e6b780671e320f35c99",
-          "after": "3a08a3b5f2a308f59c642877baa89bf3082a229aad868052c3d456e0f95ad982"
+          "before": "810bec4485a6a1aa8e676124cd55e82d8cefd43020407ec4168ae316998f07ad",
+          "after": "fa25091fb82c2e0572c75b61cdef97bd872bc8d7e09766cd7168318fabdcadbe"
         },
-        "BoundedPolicyRunner._attempt": {
-          "before": "75860fc15252b637063ccbe66679250759414dbea19743efbfe906c62699b865",
-          "after": "6d9e6c2d8bd9604f1ab83225d31d76a0971964e15449deccee102b1b97c1582e"
+        "_enumerated_target_bindings": {
+          "before": "7a3f51783bd1a6e3aae8c83432c593267e30a7307394f8ce215910433db07616",
+          "after": "66d66dea6db6edc77d5095c79e4d1ae57dfe748a6a55357b6abbb3bac1ae891d"
         },
-        "BoundedPolicyRunner._require_checkpoint": {
+        "_generic_rule_ir_stratagem_unavailable_reason": {
+          "before": "76048216e7bcb013d85e8b8774ae2b128e95bb7251e8f70e7598ecb6b626f3d3",
+          "after": "0695308e7309326922bf8036540bc40b91e9357b8fd45c594826c193699c8e10"
+        },
+        "_visible_enemy_selection_error": {
+          "before": "993c827a411ca36be4f5b30ce8bc4305147775a90f1db1e189c709e0fa99b1f6",
+          "after": "c95280e434b3f3d868f5a72eadfeffe9c65cbb418638e2a780e26dc1e3ae1c36"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/stratagems_generic_metadata.py": {
+      "before_sha256": "3d5b1dab14ee3faca43943169cd21ff26fc41150337ef29c290319ac937cbb76",
+      "after_sha256": "91b3d851b28b1457cdafcde4a6688e8188fca724fed0c967579f8bb611958e94",
+      "owners": {
+        "@module": {
+          "before": "f3efb0f226e304ba3e37c4ec363ef1747bc9efaeba0859cf200a9d7023a7685a",
+          "after": "e7a0115264a9165c89537872ad2a9a8885e0f12c2237aa8b4d840136b6fbc568"
+        },
+        "visible_enemy_requires_unengaged": {
           "before": null,
-          "after": "5e3d52a256611923ac57992ab1e14421b0f8904de21a525f0d208281c832e467"
+          "after": "969b3b48b7d028c121c23a052fea6d6c50bb38e045f37c947fbb34352f0323c4"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/stratagems_generic_rule_ir_runtime.py": {
+      "before_sha256": "1bbf5f574b9d67a4bce616573d1ab5cde7c83e7402af4c338f1d74538f04ab42",
+      "after_sha256": "fc557945581f3fdd146208811686a890e47b69304c22d9df84f8ccba354fe57f",
+      "owners": {
+        "@module": {
+          "before": "2f196a8830efe1a854a3fb5b574d8377df30f3dd78194ff184cd209140250e6f",
+          "after": "ab19bcbe155fd7ae14a0d944eba0f4d5a2ed8a84f0096b892a5aec354571abdc"
         },
-        "PolicyCheckpointGap": {
+        "_resolve_generic_roll_pool_mortal_wounds": {
+          "before": "2bb5bd08db01b8651389141e2c037610bec0407fb8d7de3096bfef5fefb05f2a",
+          "after": "8b44343b61eca1f6459801e14c71ecd373df39720740a43e49aa058409b06e21"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/stratagems_geometry.py": {
+      "before_sha256": "17134ce5015c2f00809670aceb891a5d66a2e00a463b397bb45c34ae0713f065",
+      "after_sha256": "4ad5b5c1a3a7a69b4893aea35a74258f5284e4ef16edb4403bbe780372065969",
+      "owners": {
+        "@module": {
+          "before": "bf846d416cd628d6564d23e57a540abf51e94389294f554d36fbb88fc3a4d1d0",
+          "after": "6ee66e0bcb68d17a0d9446a652dd50d422a7d3992c4143d366addef6d0c591be"
+        },
+        "_visible_unengaged_enemy_unit_ids": {
           "before": null,
-          "after": "47094942f74d6c4d868fb8b30cba4487a6bbfd1563bf7516e42ebf314a460f7a"
+          "after": "bfedf2b92ac6ad26e3dea389ac858bb62c169074dc17b5013bc8156037461872"
+        },
+        "visible_enemy_unit_ids_for_source": {
+          "before": "e849719ffad4fad4dbad3c92711a5addb49430c473c742a2168324ae557e3bb7",
+          "after": "a72ddf91efc596ad6053fc16df02e8630a120779b369d3c58048792e817c37a3"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/stratagems_requests.py": {
+      "before_sha256": "b16d9b3a4b4c5cef3300d21a3da6f88d34acad2f2007831692de826e42c1a889",
+      "after_sha256": "78c9f03e89a86f38b13adaea1957045867a34d04715acaae0f7ea03f15c034a1",
+      "owners": {
+        "@module": {
+          "before": "be6da5881653ba0630ac1a4c6493ae17ac861b81fd1f7a70bef6667aa1f7ab03",
+          "after": "fa17af2f9841ff2a5e727ec780e6b8761aab90977ed01c4121e88f39ce984eb6"
+        },
+        "_effect_selections_for_binding": {
+          "before": "89afedfa6c74566daa965950cde9c360d4cd76f2303d2dd7ff21d1e3b68495f9",
+          "after": "fa6c2f263d744740bf95406c0d0faae031abe61eb553c11e55922d62adc49cd7"
+        }
+      }
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_blood_legion_ir_support_2026_27.py": {
+      "before_sha256": "abd4f8cc3ca4ad1afa991021ae3ceac9cbd8a788b8822062aa1347c8c75b40a2",
+      "after_sha256": "08f0a3919cf7e84466f2d1d5ac29bc346d7281ee3b2c548c6a1bf619823d772f",
+      "owners": {
+        "@module": {
+          "before": "d9271b2e75427ada2533ab2a8838250e1255c53e949f3556b42a9e5b23e34ae4",
+          "after": "ea2b5b1cc6797b0980ee107b1a8f82900afe009716d490cfb6519bd827aca2f1"
+        },
+        "_coverage_payloads": {
+          "before": "e16795105e0597215da2faab0313c0b702e8de5ee6785a072ba921bfb81799ef",
+          "after": "884edcf65c10a31f7a623b2c013f34a58d836bd811c49537714607a39ee53be1"
+        },
+        "_effect_clause": {
+          "before": "c9a53d0768b194d6e547be85888a7274914f4abfc63c852d5f849d0bc2ac0f1a",
+          "after": "670d773475cf60240e16357d52f55df2c14e7b2295bb8c9c7353615f98afdca4"
+        },
+        "_skulls_beget_blood_payload": {
+          "before": null,
+          "after": "cc1e32734540c14e918859c23d32eff4b0b62ff0ee3ce8f7778552f4e7ee7771"
+        }
+      }
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_generic_ir_support_2026_27.py": {
+      "before_sha256": "7a041b6113f905ab9f3662e345d27d70a06875f3f78f44c4a993d3956e11708a",
+      "after_sha256": "45e2bca6fb99a3d68c694045ce96d04f8b4a8e7dc7ec7bdf680a38e37e3ecfc2",
+      "owners": {
+        "generic_supported_stratagem_rule_ir_hash": {
+          "before": "3548fbe8258070827d432ee5bd52d0345034e42fa56c5a59115901df994c3d12",
+          "after": "ab95e8de96489a044bac94b7f3537e91074814bc136aadd5eccf977cbedf5123"
         }
       }
     },
     "tests/code_quality/test_engine_numerical_identity_admission.py": {
-      "before_sha256": "531fb773fd7c4abb19950f6e61b18f871b327caec5786d971c2f639e70c54324",
-      "after_sha256": "551846020fe7a4427909091e08515f2bbb9303ed0668154cdb1db37022eeebeb",
+      "before_sha256": "551846020fe7a4427909091e08515f2bbb9303ed0668154cdb1db37022eeebeb",
+      "after_sha256": "dc60e7514d82a6020794ce28faddebb70ec3ad08ae4a53cd87cc8629ee7595b0",
       "owners": {
         "test_identity_inventory_uses_current_twelve_shards_and_native_cohort": {
-          "before": "ea50fe651fb03e0daabc33c9e17401695a9d4ac31fb2b5d2018b007f4987e238",
-          "after": "ad1c76b59bdd3e428876bbf62aebf76d95d16e80316aa7c5f489353b937ac431"
+          "before": "ad1c76b59bdd3e428876bbf62aebf76d95d16e80316aa7c5f489353b937ac431",
+          "after": "336bbd0b8029fabf6fe7f99a5f47ed8dda458e0e765f38b6dd5a70ceb8f0d4e4"
         }
       }
     },
-    "tests/infrastructure/adapters/test_ordinary_melee_profile_policy.py": {
+    "tests/factions/chaos_daemons/integration/test_skulls_beget_blood.py": {
       "before_sha256": null,
-      "after_sha256": "b0e6e802f70fd12f83a2e2fd472dce5dc83ca7cb29cd90b1bba0aa0d295d17c5",
+      "after_sha256": "8fffccffbedd6b697d85d2b0da189435d8251c88c88f96ae69e865cfe1abd6b9",
       "owners": {
         "@module": {
           "before": null,
-          "after": "cbe05e452a182c2c7c43fe3580b0dbe2248eefaa616756cee27b13d0a9207bb4"
+          "after": "b880ace73a1485ee7f90d7f774fd6f06d40fa7eda64385d5725a46b44999e50d"
         },
-        "_actor_offer": {
+        "_blood_legion_definitions": {
           "before": null,
-          "after": "88103c06f45021b4a80b890b28490d1f0764a5fb467f27751b4fb4448d1e10a4"
+          "after": "293a363c9f45e679aa1f44391cc68896d3227a7304b2bba7a4de3753b30f9644"
         },
-        "_fight_session": {
+        "_choices": {
           "before": null,
-          "after": "8c36694ac2b40c10ecc4e9a63fc789225e31515ecd27782e212e7727f74d6d1c"
+          "after": "9fa45539662aee21922e472760494d5f8eb7b4a3ec6b3f063ffddf3a6b46b61e"
         },
-        "test_great_axe_actor_offer_selects_applied_wounds_and_replays": {
+        "_materialize_battle_formation_effects": {
           "before": null,
-          "after": "272275aea659d46c1d2fbc86eade65ea0be7480805bb91232a3dbc41e8d8dcb5"
+          "after": "eb92c9d111aca541e5563c1559541b28e7ebb00befbe0790ddd6e09c855b7c4e"
         },
-        "test_great_axe_dispatch_rejects_identical_view_at_unadmitted_checkpoint": {
+        "_overlay_attached_fixture_deep_strike": {
           "before": null,
-          "after": "094d617db2414175f9eb425f8610bcf64613dc84bce7cac70cb3e24d334f08c6"
+          "after": "f976779407bee8388c0d933d61e8467d114347cca3186d8bd6e9f8c63c476e57"
         },
-        "test_wounded_seeker_first_changes_applied_wound_expectation": {
+        "_scene": {
           "before": null,
-          "after": "b28fe88363d4869e331f6b2975bdea65245af9540e5800cc86cb2f8369870e93"
+          "after": "3e0a2db5450c874a7196fa50acea6e20d070a2b85d661e1efc6d4d87055972e2"
+        },
+        "_submit": {
+          "before": null,
+          "after": "fd77018c8b143991cb9a9e7d970260edb2144d3b14a9685db2b755ca8818b19f"
+        },
+        "attached_skulls_definitions": {
+          "before": null,
+          "after": "bfecd404d3b1877d8d4ab5077505b72e5f6585ff293458d3082937219ab122d1"
+        },
+        "shooting_skulls_definitions": {
+          "before": null,
+          "after": "d486ef90494c661b0688743db6671869211067f3109307022feb71d67cddf07f"
+        },
+        "test_skulls_beget_blood_allows_advance_but_excludes_fall_back": {
+          "before": null,
+          "after": "0c81778844f035850e0c1c4b3a3deb34f7b35921f8b1d95f4a04b25b96c132fe"
+        },
+        "test_skulls_beget_blood_attached_leader_range_defender_allocation_and_replay": {
+          "before": null,
+          "after": "d24ad9d8aacb31512b55d3f55946750cc4a84407f4034be2afdc90b45c06c2e6"
+        },
+        "test_skulls_beget_blood_excludes_both_ends_of_engagement": {
+          "before": null,
+          "after": "b0ab97e3269b9f5d44b44265a502dda8a4ea5cdd3f886f14ae3bc60243830a78"
+        },
+        "test_skulls_beget_blood_has_no_option_when_use_is_illegal": {
+          "before": null,
+          "after": "72686b1055fb48ee41aeb6d0e6e4896f0c678a15db100e202805392748a79c4b"
+        },
+        "test_skulls_beget_blood_ordinary_choice_damage_attribution_and_replay": {
+          "before": null,
+          "after": "52d8d38d86321c33cd477dbffe1aedef12a2dec50785cda995018acde3e4c60d"
+        }
+      }
+    },
+    "tests/infrastructure/source_governance/unit/test_blocked_row_classification.py": {
+      "before_sha256": "0a6d42a0ec9fd0bc7b539f8d6d51798f6e435308d6d16693385d83168b48f366",
+      "after_sha256": "a4738abd8a932344b91fe012f10ca3c7a60e2c8b0dea3b2278856919e60b1c97",
+      "owners": {
+        "test_phase17i_existing_template_report_uses_phase17c_template_families": {
+          "before": "1ec342e54e5e9b2f73abee4db18d84a420c6ec5e54ce7b4a8065fb3f52a20781",
+          "after": "450794f4b881b9a396de52744f91d5116c0599a4b52e0029fb02f437faba0f99"
+        },
+        "test_phase17i_missing_capability_report_groups_rows_by_family": {
+          "before": "9694e5186646755e7b693b19a49c69575560151320b4cc6cb393eda7d4c0b811",
+          "after": "3b6161a003af9433b78221b9fffb6d8cf2f8b232ab8915cb9834c6195b83075c"
+        },
+        "test_phase17i_source_text_boundaries_are_explicit": {
+          "before": "b24e86a54225460fe80ded893432d5e1d286d02fc023be9e09b62eeae3e79721",
+          "after": "5530a63177132d6f860dfac5efc5a2bb4ef47dd82d5db32a8eb46e6c19fb2a45"
         }
       }
     }
   },
   "rows": {
+    "FACTION_INTEGRATION.md": {
+      "category": "rule_semantics",
+      "operations": [
+        "supported-acts-current-source-documentation"
+      ],
+      "selected_families": [],
+      "rationale": "Publish the single qualified Stratagem support transition and its dependent evidence.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Shooting phase, 1 CP, printed friendly and enemy eligibility, six D6 at 4+, and rules-unit destruction attribution.",
+      "unchanged_work": "The new exact source record reuses the ordinary Shooting window, CP, and generic mortal-wound resolution. The unengaged visibility query runs only for the source-backed option carrying that restriction. Existing source-free mortal effects retain their attribution."
+    },
     "ci/test_shards/durations.json": {
       "category": "rule_semantics",
       "operations": [
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Preserve all inherited case weights and balance four Stage 3 cases across the existing twelve shards.",
-      "source_obligation": "Record covered Linux JUnit durations for the four added Stage 3 cases while preserving every selector and weight from current main.",
-      "unchanged_work": "All retained cases, their weights, the coverage floor and the timing limits are preserved."
+      "rationale": "Preserve inherited case weights and schedule measured Shooting and changed Phase 17I cases.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Shooting phase, 1 CP, printed friendly and enemy eligibility, six D6 at 4+, and rules-unit destruction attribution.",
+      "unchanged_work": "The new exact source record reuses the ordinary Shooting window, CP, and generic mortal-wound resolution. The unengaged visibility query runs only for the source-backed option carrying that restriction. Existing source-free mortal effects retain their attribution."
     },
     "ci/test_shards/shard-1.txt": {
       "category": "rule_semantics",
@@ -416,9 +586,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Preserve all inherited case weights and balance four Stage 3 cases across the existing twelve shards.",
-      "source_obligation": "Record covered Linux JUnit durations for the four added Stage 3 cases while preserving every selector and weight from current main.",
-      "unchanged_work": "All retained cases, their weights, the coverage floor and the timing limits are preserved."
+      "rationale": "Preserve inherited case weights and schedule measured Shooting and changed Phase 17I cases.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Shooting phase, 1 CP, printed friendly and enemy eligibility, six D6 at 4+, and rules-unit destruction attribution.",
+      "unchanged_work": "The new exact source record reuses the ordinary Shooting window, CP, and generic mortal-wound resolution. The unengaged visibility query runs only for the source-backed option carrying that restriction. Existing source-free mortal effects retain their attribution."
     },
     "ci/test_shards/shard-10.txt": {
       "category": "rule_semantics",
@@ -426,9 +596,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Preserve all inherited case weights and balance four Stage 3 cases across the existing twelve shards.",
-      "source_obligation": "Record covered Linux JUnit durations for the four added Stage 3 cases while preserving every selector and weight from current main.",
-      "unchanged_work": "All retained cases, their weights, the coverage floor and the timing limits are preserved."
+      "rationale": "Preserve inherited case weights and schedule measured Shooting and changed Phase 17I cases.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Shooting phase, 1 CP, printed friendly and enemy eligibility, six D6 at 4+, and rules-unit destruction attribution.",
+      "unchanged_work": "The new exact source record reuses the ordinary Shooting window, CP, and generic mortal-wound resolution. The unengaged visibility query runs only for the source-backed option carrying that restriction. Existing source-free mortal effects retain their attribution."
     },
     "ci/test_shards/shard-11.txt": {
       "category": "rule_semantics",
@@ -436,9 +606,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Preserve all inherited case weights and balance four Stage 3 cases across the existing twelve shards.",
-      "source_obligation": "Record covered Linux JUnit durations for the four added Stage 3 cases while preserving every selector and weight from current main.",
-      "unchanged_work": "All retained cases, their weights, the coverage floor and the timing limits are preserved."
+      "rationale": "Preserve inherited case weights and schedule measured Shooting and changed Phase 17I cases.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Shooting phase, 1 CP, printed friendly and enemy eligibility, six D6 at 4+, and rules-unit destruction attribution.",
+      "unchanged_work": "The new exact source record reuses the ordinary Shooting window, CP, and generic mortal-wound resolution. The unengaged visibility query runs only for the source-backed option carrying that restriction. Existing source-free mortal effects retain their attribution."
     },
     "ci/test_shards/shard-12.txt": {
       "category": "rule_semantics",
@@ -446,9 +616,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Preserve all inherited case weights and balance four Stage 3 cases across the existing twelve shards.",
-      "source_obligation": "Record covered Linux JUnit durations for the four added Stage 3 cases while preserving every selector and weight from current main.",
-      "unchanged_work": "All retained cases, their weights, the coverage floor and the timing limits are preserved."
+      "rationale": "Preserve inherited case weights and schedule measured Shooting and changed Phase 17I cases.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Shooting phase, 1 CP, printed friendly and enemy eligibility, six D6 at 4+, and rules-unit destruction attribution.",
+      "unchanged_work": "The new exact source record reuses the ordinary Shooting window, CP, and generic mortal-wound resolution. The unengaged visibility query runs only for the source-backed option carrying that restriction. Existing source-free mortal effects retain their attribution."
     },
     "ci/test_shards/shard-4.txt": {
       "category": "rule_semantics",
@@ -456,9 +626,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Preserve all inherited case weights and balance four Stage 3 cases across the existing twelve shards.",
-      "source_obligation": "Record covered Linux JUnit durations for the four added Stage 3 cases while preserving every selector and weight from current main.",
-      "unchanged_work": "All retained cases, their weights, the coverage floor and the timing limits are preserved."
+      "rationale": "Preserve inherited case weights and schedule measured Shooting and changed Phase 17I cases.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Shooting phase, 1 CP, printed friendly and enemy eligibility, six D6 at 4+, and rules-unit destruction attribution.",
+      "unchanged_work": "The new exact source record reuses the ordinary Shooting window, CP, and generic mortal-wound resolution. The unengaged visibility query runs only for the source-backed option carrying that restriction. Existing source-free mortal effects retain their attribution."
     },
     "ci/test_shards/shard-5.txt": {
       "category": "rule_semantics",
@@ -466,9 +636,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Preserve all inherited case weights and balance four Stage 3 cases across the existing twelve shards.",
-      "source_obligation": "Record covered Linux JUnit durations for the four added Stage 3 cases while preserving every selector and weight from current main.",
-      "unchanged_work": "All retained cases, their weights, the coverage floor and the timing limits are preserved."
+      "rationale": "Preserve inherited case weights and schedule measured Shooting and changed Phase 17I cases.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Shooting phase, 1 CP, printed friendly and enemy eligibility, six D6 at 4+, and rules-unit destruction attribution.",
+      "unchanged_work": "The new exact source record reuses the ordinary Shooting window, CP, and generic mortal-wound resolution. The unengaged visibility query runs only for the source-backed option carrying that restriction. Existing source-free mortal effects retain their attribution."
     },
     "ci/test_shards/shard-6.txt": {
       "category": "rule_semantics",
@@ -476,9 +646,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Preserve all inherited case weights and balance four Stage 3 cases across the existing twelve shards.",
-      "source_obligation": "Record covered Linux JUnit durations for the four added Stage 3 cases while preserving every selector and weight from current main.",
-      "unchanged_work": "All retained cases, their weights, the coverage floor and the timing limits are preserved."
+      "rationale": "Preserve inherited case weights and schedule measured Shooting and changed Phase 17I cases.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Shooting phase, 1 CP, printed friendly and enemy eligibility, six D6 at 4+, and rules-unit destruction attribution.",
+      "unchanged_work": "The new exact source record reuses the ordinary Shooting window, CP, and generic mortal-wound resolution. The unengaged visibility query runs only for the source-backed option carrying that restriction. Existing source-free mortal effects retain their attribution."
     },
     "ci/test_shards/shard-7.txt": {
       "category": "rule_semantics",
@@ -486,9 +656,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Preserve all inherited case weights and balance four Stage 3 cases across the existing twelve shards.",
-      "source_obligation": "Record covered Linux JUnit durations for the four added Stage 3 cases while preserving every selector and weight from current main.",
-      "unchanged_work": "All retained cases, their weights, the coverage floor and the timing limits are preserved."
+      "rationale": "Preserve inherited case weights and schedule measured Shooting and changed Phase 17I cases.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Shooting phase, 1 CP, printed friendly and enemy eligibility, six D6 at 4+, and rules-unit destruction attribution.",
+      "unchanged_work": "The new exact source record reuses the ordinary Shooting window, CP, and generic mortal-wound resolution. The unengaged visibility query runs only for the source-backed option carrying that restriction. Existing source-free mortal effects retain their attribution."
     },
     "ci/test_shards/shard-8.txt": {
       "category": "rule_semantics",
@@ -496,9 +666,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Preserve all inherited case weights and balance four Stage 3 cases across the existing twelve shards.",
-      "source_obligation": "Record covered Linux JUnit durations for the four added Stage 3 cases while preserving every selector and weight from current main.",
-      "unchanged_work": "All retained cases, their weights, the coverage floor and the timing limits are preserved."
+      "rationale": "Preserve inherited case weights and schedule measured Shooting and changed Phase 17I cases.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Shooting phase, 1 CP, printed friendly and enemy eligibility, six D6 at 4+, and rules-unit destruction attribution.",
+      "unchanged_work": "The new exact source record reuses the ordinary Shooting window, CP, and generic mortal-wound resolution. The unengaged visibility query runs only for the source-backed option carrying that restriction. Existing source-free mortal effects retain their attribution."
     },
     "ci/test_shards/shard-9.txt": {
       "category": "rule_semantics",
@@ -506,9 +676,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Preserve all inherited case weights and balance four Stage 3 cases across the existing twelve shards.",
-      "source_obligation": "Record covered Linux JUnit durations for the four added Stage 3 cases while preserving every selector and weight from current main.",
-      "unchanged_work": "All retained cases, their weights, the coverage floor and the timing limits are preserved."
+      "rationale": "Preserve inherited case weights and schedule measured Shooting and changed Phase 17I cases.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Shooting phase, 1 CP, printed friendly and enemy eligibility, six D6 at 4+, and rules-unit destruction attribution.",
+      "unchanged_work": "The new exact source record reuses the ordinary Shooting window, CP, and generic mortal-wound resolution. The unengaged visibility query runs only for the source-backed option carrying that restriction. Existing source-free mortal effects retain their attribution."
     },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
@@ -516,9 +686,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate the existing authored examples and manifest fields that carry the packaged runtime fingerprint.",
-      "source_obligation": "Match generated external contract and build identity bytes with their maintained generators.",
-      "unchanged_work": "The proposal schema, engine validation, viewer projection and replay mechanics use the existing contract."
+      "rationale": "Refresh maintained external examples and manifests against the exact runtime build ID.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Shooting phase, 1 CP, printed friendly and enemy eligibility, six D6 at 4+, and rules-unit destruction attribution.",
+      "unchanged_work": "The new exact source record reuses the ordinary Shooting window, CP, and generic mortal-wound resolution. The unengaged visibility query runs only for the source-backed option carrying that restriction. Existing source-free mortal effects retain their attribution."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
@@ -526,9 +696,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate the existing authored examples and manifest fields that carry the packaged runtime fingerprint.",
-      "source_obligation": "Match generated external contract and build identity bytes with their maintained generators.",
-      "unchanged_work": "The proposal schema, engine validation, viewer projection and replay mechanics use the existing contract."
+      "rationale": "Refresh maintained external examples and manifests against the exact runtime build ID.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Shooting phase, 1 CP, printed friendly and enemy eligibility, six D6 at 4+, and rules-unit destruction attribution.",
+      "unchanged_work": "The new exact source record reuses the ordinary Shooting window, CP, and generic mortal-wound resolution. The unengaged visibility query runs only for the source-backed option carrying that restriction. Existing source-free mortal effects retain their attribution."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
@@ -536,9 +706,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate the existing authored examples and manifest fields that carry the packaged runtime fingerprint.",
-      "source_obligation": "Match generated external contract and build identity bytes with their maintained generators.",
-      "unchanged_work": "The proposal schema, engine validation, viewer projection and replay mechanics use the existing contract."
+      "rationale": "Refresh maintained external examples and manifests against the exact runtime build ID.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Shooting phase, 1 CP, printed friendly and enemy eligibility, six D6 at 4+, and rules-unit destruction attribution.",
+      "unchanged_work": "The new exact source record reuses the ordinary Shooting window, CP, and generic mortal-wound resolution. The unengaged visibility query runs only for the source-backed option carrying that restriction. Existing source-free mortal effects retain their attribution."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
@@ -546,9 +716,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate the existing authored examples and manifest fields that carry the packaged runtime fingerprint.",
-      "source_obligation": "Match generated external contract and build identity bytes with their maintained generators.",
-      "unchanged_work": "The proposal schema, engine validation, viewer projection and replay mechanics use the existing contract."
+      "rationale": "Refresh maintained external examples and manifests against the exact runtime build ID.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Shooting phase, 1 CP, printed friendly and enemy eligibility, six D6 at 4+, and rules-unit destruction attribution.",
+      "unchanged_work": "The new exact source record reuses the ordinary Shooting window, CP, and generic mortal-wound resolution. The unengaged visibility query runs only for the source-backed option carrying that restriction. Existing source-free mortal effects retain their attribution."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
@@ -556,9 +726,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate the existing authored examples and manifest fields that carry the packaged runtime fingerprint.",
-      "source_obligation": "Match generated external contract and build identity bytes with their maintained generators.",
-      "unchanged_work": "The proposal schema, engine validation, viewer projection and replay mechanics use the existing contract."
+      "rationale": "Refresh maintained external examples and manifests against the exact runtime build ID.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Shooting phase, 1 CP, printed friendly and enemy eligibility, six D6 at 4+, and rules-unit destruction attribution.",
+      "unchanged_work": "The new exact source record reuses the ordinary Shooting window, CP, and generic mortal-wound resolution. The unengaged visibility query runs only for the source-backed option carrying that restriction. Existing source-free mortal effects retain their attribution."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
@@ -566,9 +736,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate the existing authored examples and manifest fields that carry the packaged runtime fingerprint.",
-      "source_obligation": "Match generated external contract and build identity bytes with their maintained generators.",
-      "unchanged_work": "The proposal schema, engine validation, viewer projection and replay mechanics use the existing contract."
+      "rationale": "Refresh maintained external examples and manifests against the exact runtime build ID.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Shooting phase, 1 CP, printed friendly and enemy eligibility, six D6 at 4+, and rules-unit destruction attribution.",
+      "unchanged_work": "The new exact source record reuses the ordinary Shooting window, CP, and generic mortal-wound resolution. The unengaged visibility query runs only for the source-backed option carrying that restriction. Existing source-free mortal effects retain their attribution."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
@@ -576,9 +746,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate the existing authored examples and manifest fields that carry the packaged runtime fingerprint.",
-      "source_obligation": "Match generated external contract and build identity bytes with their maintained generators.",
-      "unchanged_work": "The proposal schema, engine validation, viewer projection and replay mechanics use the existing contract."
+      "rationale": "Refresh maintained external examples and manifests against the exact runtime build ID.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Shooting phase, 1 CP, printed friendly and enemy eligibility, six D6 at 4+, and rules-unit destruction attribution.",
+      "unchanged_work": "The new exact source record reuses the ordinary Shooting window, CP, and generic mortal-wound resolution. The unengaged visibility query runs only for the source-backed option carrying that restriction. Existing source-free mortal effects retain their attribution."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
@@ -586,25 +756,85 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate the existing authored examples and manifest fields that carry the packaged runtime fingerprint.",
-      "source_obligation": "Match generated external contract and build identity bytes with their maintained generators.",
-      "unchanged_work": "The proposal schema, engine validation, viewer projection and replay mechanics use the existing contract."
+      "rationale": "Refresh maintained external examples and manifests against the exact runtime build ID.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Shooting phase, 1 CP, printed friendly and enemy eligibility, six D6 at 4+, and rules-unit destruction attribution.",
+      "unchanged_work": "The new exact source record reuses the ordinary Shooting window, CP, and generic mortal-wound resolution. The unengaged visibility query runs only for the source-backed option carrying that restriction. Existing source-free mortal effects retain their attribution."
     },
-    "data/source_audits/ci64_provenance_v1/stage3-melee-profile-test-v1.json": {
+    "data/generated/ability_coverage/cross_source_semantic_equivalence.json": {
       "category": "rule_semantics",
       "operations": [
-        "stage3-ordinary-melee-test-admission"
+        "phase-end-healing-source-and-report"
       ],
       "selected_families": [],
-      "rationale": "Pin the finite Stage 3 test addition and verify the existing melee declaration path through the source-backed controls and checkpoint regression.",
-      "source_obligation": "Use the retained Chaos Daemons Faction Pack pages 16 and 110 and the versioned Cavalcade catalog.",
-      "unchanged_work": "The existing melee, save, allocation and replay authorities execute through the same submission path."
+      "rationale": "Publish the single qualified Stratagem support transition and its dependent evidence.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Shooting phase, 1 CP, printed friendly and enemy eligibility, six D6 at 4+, and rules-unit destruction attribution.",
+      "unchanged_work": "The new exact source record reuses the ordinary Shooting window, CP, and generic mortal-wound resolution. The unengaged visibility query runs only for the source-backed option carrying that restriction. Existing source-free mortal effects retain their attribution."
     },
-    "docs/AI_POLICY_INTERFACE.md": {
+    "data/generated/ability_coverage/runtime_content_semantic_coverage.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "supported-acts-current-semantic-artifact"
+      ],
+      "selected_families": [],
+      "rationale": "Publish the single qualified Stratagem support transition and its dependent evidence.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Shooting phase, 1 CP, printed friendly and enemy eligibility, six D6 at 4+, and rules-unit destruction attribution.",
+      "unchanged_work": "The new exact source record reuses the ordinary Shooting window, CP, and generic mortal-wound resolution. The unengaged visibility query runs only for the source-backed option carrying that restriction. Existing source-free mortal effects retain their attribution."
+    },
+    "data/source_audits/ci64_provenance_v1/skulls-beget-blood-transition-v1.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "skulls-beget-blood-test-admission"
+      ],
+      "selected_families": [],
+      "rationale": "Validate scoped native Shooting behavior and bind live selectors and source successors to the retained Blood Legion receipts.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Shooting phase, 1 CP, printed friendly and enemy eligibility, six D6 at 4+, and rules-unit destruction attribution.",
+      "unchanged_work": "The new exact source record reuses the ordinary Shooting window, CP, and generic mortal-wound resolution. The unengaged visibility query runs only for the source-backed option carrying that restriction. Existing source-free mortal effects retain their attribution."
+    },
+    "docs/ABILITY_SUPPORT_MATRIX_V2.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Document the admitted melee decision and declare exact ownership of the new optional policy.",
+      "rationale": "Publish the single qualified Stratagem support transition and its dependent evidence.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/ADAPTER_DECISION_CONTRACT.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Publish the single qualified Stratagem support transition and its dependent evidence.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/CROSS_SOURCE_SEMANTIC_EQUIVALENCE.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Publish the single qualified Stratagem support transition and its dependent evidence.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/factions/audit/chaos-daemons.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Publish the single qualified Stratagem support transition and its dependent evidence.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/factions/chaos-daemons.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Publish the single qualified Stratagem support transition and its dependent evidence.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/performance/current/skulls-beget-blood-visibility.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Publish the single qualified Stratagem support transition and its dependent evidence.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -612,7 +842,7 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Document the admitted melee decision and declare exact ownership of the new optional policy.",
+      "rationale": "Publish the single qualified Stratagem support transition and its dependent evidence.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -627,12 +857,14 @@
         "round4-battle-shock-event-wounds",
         "phase-end-healing-test-admission",
         "sheathed-in-brass-test-admission",
-        "stage3-ordinary-melee-test-admission"
+        "blood-begets-skulls-test-admission",
+        "stage3-ordinary-melee-test-admission",
+        "skulls-beget-blood-test-admission"
       ],
       "selected_families": [],
-      "rationale": "Pin the finite Stage 3 test addition and verify the existing melee declaration path through the source-backed controls and checkpoint regression.",
-      "source_obligation": "Use the retained Chaos Daemons Faction Pack pages 16 and 110 and the versioned Cavalcade catalog.",
-      "unchanged_work": "The existing melee, save, allocation and replay authorities execute through the same submission path."
+      "rationale": "Validate scoped native Shooting behavior and bind live selectors and source successors to the retained Blood Legion receipts.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Shooting phase, 1 CP, printed friendly and enemy eligibility, six D6 at 4+, and rules-unit destruction attribution.",
+      "unchanged_work": "The new exact source record reuses the ordinary Shooting window, CP, and generic mortal-wound resolution. The unengaged visibility query runs only for the source-backed option carrying that restriction. Existing source-free mortal effects retain their attribution."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
@@ -641,39 +873,103 @@
         "phase-end-healing-source-and-report"
       ],
       "selected_families": [],
-      "rationale": "Regenerate the existing authored examples and manifest fields that carry the packaged runtime fingerprint.",
-      "source_obligation": "Match generated external contract and build identity bytes with their maintained generators.",
-      "unchanged_work": "The proposal schema, engine validation, viewer projection and replay mechanics use the existing contract."
+      "rationale": "Refresh maintained external examples and manifests against the exact runtime build ID.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Shooting phase, 1 CP, printed friendly and enemy eligibility, six D6 at 4+, and rules-unit destruction attribution.",
+      "unchanged_work": "The new exact source record reuses the ordinary Shooting window, CP, and generic mortal-wound resolution. The unengaged visibility query runs only for the source-backed option carrying that restriction. Existing source-free mortal effects retain their attribution."
     },
-    "src/warhammer40k_core/ai/ordinary_melee_profile_policy.py": {
-      "category": "algorithm_or_search",
-      "operations": [
-        "stage3-ordinary-melee-profile-policy"
-      ],
-      "selected_families": [],
-      "rationale": "Add an exact rational non-spill damage expectation for an explicitly admitted actor offer. Upper bounds are eight profiles, 24 attacks, ten models and 32 wounds per model. Existing gameplay and registered comparison workloads never register this opt-in policy. Verify four analytical and native cases under branch coverage, including exact-checkpoint dispatch, and the required runtime smoke.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "src/warhammer40k_core/ai/player_policy.py": {
+    "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/detachments/blood_legion/stratagems.py": {
       "category": "rule_semantics",
       "operations": [
-        "player-policy-boundary"
+        "skulls-beget-blood-shooting-resolution"
       ],
       "selected_families": [],
-      "rationale": "Reserve the typed checkpoint binding in configuration and verify the committed session digest before choosing or submitting.",
-      "source_obligation": "Test equal actor observations with different native wound effects and require a typed gap for the unqualified checkpoint.",
-      "unchanged_work": "Existing unguarded policy dispatch takes no additional checkpoint digests. Native melee and replay continue through the adapter."
+      "rationale": "Bind one exact Shooting Stratagem to the native finite choice, existing mortal-wound route, and source-unit attribution.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Shooting phase, 1 CP, printed friendly and enemy eligibility, six D6 at 4+, and rules-unit destruction attribution.",
+      "unchanged_work": "The new exact source record reuses the ordinary Shooting window, CP, and generic mortal-wound resolution. The unengaged visibility query runs only for the source-backed option carrying that restriction. Existing source-free mortal effects retain their attribution."
     },
-    "src/warhammer40k_core/ai/runner.py": {
+    "src/warhammer40k_core/engine/stratagems_eligibility.py": {
       "category": "rule_semantics",
       "operations": [
-        "player-policy-boundary"
+        "order135-visibility-hot-consumers",
+        "skulls-beget-blood-shooting-resolution"
+      ],
+      "selected_families": [
+        "visibility"
+      ],
+      "rationale": "Bind one exact Shooting Stratagem to the native finite choice, existing mortal-wound route, and source-unit attribution.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Shooting phase, 1 CP, printed friendly and enemy eligibility, six D6 at 4+, and rules-unit destruction attribution.",
+      "unchanged_work": "The new exact source record reuses the ordinary Shooting window, CP, and generic mortal-wound resolution. The unengaged visibility query runs only for the source-backed option carrying that restriction. Existing source-free mortal effects retain their attribution."
+    },
+    "src/warhammer40k_core/engine/stratagems_generic_metadata.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order135-visibility-hot-consumers",
+        "skulls-beget-blood-shooting-resolution"
+      ],
+      "selected_families": [
+        "visibility"
+      ],
+      "rationale": "Bind one exact Shooting Stratagem to the native finite choice, existing mortal-wound route, and source-unit attribution.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Shooting phase, 1 CP, printed friendly and enemy eligibility, six D6 at 4+, and rules-unit destruction attribution.",
+      "unchanged_work": "The new exact source record reuses the ordinary Shooting window, CP, and generic mortal-wound resolution. The unengaged visibility query runs only for the source-backed option carrying that restriction. Existing source-free mortal effects retain their attribution."
+    },
+    "src/warhammer40k_core/engine/stratagems_generic_rule_ir_runtime.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "private-rng-owner-b317406a425aafb1",
+        "skulls-beget-blood-shooting-resolution"
       ],
       "selected_families": [],
-      "rationale": "Reserve the typed checkpoint binding in configuration and verify the committed session digest before choosing or submitting.",
-      "source_obligation": "Test equal actor observations with different native wound effects and require a typed gap for the unqualified checkpoint.",
-      "unchanged_work": "Existing unguarded policy dispatch takes no additional checkpoint digests. Native melee and replay continue through the adapter."
+      "rationale": "Bind one exact Shooting Stratagem to the native finite choice, existing mortal-wound route, and source-unit attribution.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Shooting phase, 1 CP, printed friendly and enemy eligibility, six D6 at 4+, and rules-unit destruction attribution.",
+      "unchanged_work": "The new exact source record reuses the ordinary Shooting window, CP, and generic mortal-wound resolution. The unengaged visibility query runs only for the source-backed option carrying that restriction. Existing source-free mortal effects retain their attribution."
+    },
+    "src/warhammer40k_core/engine/stratagems_geometry.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order135-visibility-hot-consumers",
+        "skulls-beget-blood-shooting-resolution"
+      ],
+      "selected_families": [
+        "visibility"
+      ],
+      "rationale": "Bind one exact Shooting Stratagem to the native finite choice, existing mortal-wound route, and source-unit attribution.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Shooting phase, 1 CP, printed friendly and enemy eligibility, six D6 at 4+, and rules-unit destruction attribution.",
+      "unchanged_work": "The new exact source record reuses the ordinary Shooting window, CP, and generic mortal-wound resolution. The unengaged visibility query runs only for the source-backed option carrying that restriction. Existing source-free mortal effects retain their attribution."
+    },
+    "src/warhammer40k_core/engine/stratagems_requests.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "blood-begets-skulls-charge-preselection",
+        "skulls-beget-blood-shooting-resolution"
+      ],
+      "selected_families": [],
+      "rationale": "Bind one exact Shooting Stratagem to the native finite choice, existing mortal-wound route, and source-unit attribution.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Shooting phase, 1 CP, printed friendly and enemy eligibility, six D6 at 4+, and rules-unit destruction attribution.",
+      "unchanged_work": "The new exact source record reuses the ordinary Shooting window, CP, and generic mortal-wound resolution. The unengaged visibility query runs only for the source-backed option carrying that restriction. Existing source-free mortal effects retain their attribution."
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_blood_legion_ir_support_2026_27.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "blood-begets-skulls-source-activation",
+        "skulls-beget-blood-shooting-resolution"
+      ],
+      "selected_families": [],
+      "rationale": "Bind one exact Shooting Stratagem to the native finite choice, existing mortal-wound route, and source-unit attribution.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Shooting phase, 1 CP, printed friendly and enemy eligibility, six D6 at 4+, and rules-unit destruction attribution.",
+      "unchanged_work": "The new exact source record reuses the ordinary Shooting window, CP, and generic mortal-wound resolution. The unengaged visibility query runs only for the source-backed option carrying that restriction. Existing source-free mortal effects retain their attribution."
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_generic_ir_support_2026_27.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "sheathed-in-brass-armour-save",
+        "blood-begets-skulls-source-activation",
+        "skulls-beget-blood-shooting-resolution"
+      ],
+      "selected_families": [],
+      "rationale": "Bind one exact Shooting Stratagem to the native finite choice, existing mortal-wound route, and source-unit attribution.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Shooting phase, 1 CP, printed friendly and enemy eligibility, six D6 at 4+, and rules-unit destruction attribution.",
+      "unchanged_work": "The new exact source record reuses the ordinary Shooting window, CP, and generic mortal-wound resolution. The unengaged visibility query runs only for the source-backed option carrying that restriction. Existing source-free mortal effects retain their attribution."
     },
     "tests/code_quality/test_engine_numerical_identity_admission.py": {
       "category": "rule_semantics",
@@ -681,25 +977,38 @@
         "engine-numerical-identity-admission",
         "round4-malice-bearer-liveness",
         "round4-battle-shock-event-wounds",
-        "stage3-ordinary-melee-test-admission"
+        "stage3-ordinary-melee-test-admission",
+        "skulls-beget-blood-test-admission"
       ],
       "selected_families": [],
-      "rationale": "Pin the finite Stage 3 test addition and verify the existing melee declaration path through the source-backed controls and checkpoint regression.",
-      "source_obligation": "Use the retained Chaos Daemons Faction Pack pages 16 and 110 and the versioned Cavalcade catalog.",
-      "unchanged_work": "The existing melee, save, allocation and replay authorities execute through the same submission path."
+      "rationale": "Validate scoped native Shooting behavior and bind live selectors and source successors to the retained Blood Legion receipts.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Shooting phase, 1 CP, printed friendly and enemy eligibility, six D6 at 4+, and rules-unit destruction attribution.",
+      "unchanged_work": "The new exact source record reuses the ordinary Shooting window, CP, and generic mortal-wound resolution. The unengaged visibility query runs only for the source-backed option carrying that restriction. Existing source-free mortal effects retain their attribution."
     },
-    "tests/infrastructure/adapters/test_ordinary_melee_profile_policy.py": {
+    "tests/factions/chaos_daemons/integration/test_skulls_beget_blood.py": {
       "category": "rule_semantics",
       "operations": [
-        "stage3-ordinary-melee-profile-policy"
+        "skulls-beget-blood-test-admission"
       ],
       "selected_families": [],
-      "rationale": "Pin the finite Stage 3 test addition and verify the existing melee declaration path through the source-backed controls and checkpoint regression.",
-      "source_obligation": "Use the retained Chaos Daemons Faction Pack pages 16 and 110 and the versioned Cavalcade catalog.",
-      "unchanged_work": "The existing melee, save, allocation and replay authorities execute through the same submission path."
+      "rationale": "Validate scoped native Shooting behavior and bind live selectors and source successors to the retained Blood Legion receipts.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Shooting phase, 1 CP, printed friendly and enemy eligibility, six D6 at 4+, and rules-unit destruction attribution.",
+      "unchanged_work": "The new exact source record reuses the ordinary Shooting window, CP, and generic mortal-wound resolution. The unengaged visibility query runs only for the source-backed option carrying that restriction. Existing source-free mortal effects retain their attribution."
+    },
+    "tests/infrastructure/source_governance/unit/test_blocked_row_classification.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "ci-restructure-tests-infrastructure-source_governance-unit-test_blocked_row_classification.py"
+      ],
+      "selected_families": [],
+      "rationale": "Validate scoped native Shooting behavior and bind live selectors and source successors to the retained Blood Legion receipts.",
+      "source_obligation": "Chaos Daemons July faction pack page 124. Verify own Shooting phase, 1 CP, printed friendly and enemy eligibility, six D6 at 4+, and rules-unit destruction attribution.",
+      "unchanged_work": "The new exact source record reuses the ordinary Shooting window, CP, and generic mortal-wound resolution. The unengaged visibility query runs only for the source-backed option carrying that restriction. Existing source-free mortal effects retain their attribution."
     }
   },
   "milestone": "ordinary",
-  "comparisons": {},
+  "comparisons": {
+    "visibility": "docs/performance/current/skulls-beget-blood-visibility.json"
+  },
   "full_game": null
 }

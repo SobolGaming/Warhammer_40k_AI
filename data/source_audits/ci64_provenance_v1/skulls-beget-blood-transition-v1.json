@@ -1,0 +1,52 @@
+{
+  "schema": "finite-skulls-beget-blood-transition-v1",
+  "base": "16069416ea8de4c5623402c1cc6d53e55b673cb0",
+  "retained_transition_sha256": "5931fce8052b2edddfc030540aad6dd8f737db8c27ee862aaf06a5df0c416b18",
+  "retained_runtime_fingerprint": "f7a33a7ce44113b8754268ca735a0dfde601b7a1d81394e2c12c55382edefdf0",
+  "runtime_fingerprint": "64a4133aaa039346e783fb5ea80920976ff2ae48aab96aec003505d0d33106d2",
+  "replaced_sources": {
+    "src/warhammer40k_core/engine/stratagems_requests.py": {
+      "before": "b16d9b3a4b4c5cef3300d21a3da6f88d34acad2f2007831692de826e42c1a889",
+      "after": "78c9f03e89a86f38b13adaea1957045867a34d04715acaae0f7ea03f15c034a1"
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_blood_legion_ir_support_2026_27.py": {
+      "before": "abd4f8cc3ca4ad1afa991021ae3ceac9cbd8a788b8822062aa1347c8c75b40a2",
+      "after": "08f0a3919cf7e84466f2d1d5ac29bc346d7281ee3b2c548c6a1bf619823d772f"
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_generic_ir_support_2026_27.py": {
+      "before": "7a041b6113f905ab9f3662e345d27d70a06875f3f78f44c4a993d3956e11708a",
+      "after": "45e2bca6fb99a3d68c694045ce96d04f8b4a8e7dc7ec7bdf680a38e37e3ecfc2"
+    }
+  },
+  "new_sources": {
+    "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/detachments/blood_legion/stratagems.py": "d57aa64b1a4a203ca76181812208dfca3b0821bc8a1326130ffb923d1c4b1eaf",
+    "src/warhammer40k_core/engine/stratagems_eligibility.py": "69bdde9f8674ace9e7925d5294b93b837d9bce6f7114e59f738eaec47d805a6f",
+    "src/warhammer40k_core/engine/stratagems_generic_metadata.py": "91b3d851b28b1457cdafcde4a6688e8188fca724fed0c967579f8bb611958e94",
+    "src/warhammer40k_core/engine/stratagems_generic_rule_ir_runtime.py": "fc557945581f3fdd146208811686a890e47b69304c22d9df84f8ccba354fe57f",
+    "src/warhammer40k_core/engine/stratagems_geometry.py": "4ad5b5c1a3a7a69b4893aea35a74258f5284e4ef16edb4403bbe780372065969"
+  },
+  "added_files": {
+    "tests/factions/chaos_daemons/integration/test_skulls_beget_blood.py": {
+      "mode": "100644",
+      "blob_sha1": "0dc3397715d85a7297bd5dafb9a0379c2cd9dcac",
+      "sha256": "8fffccffbedd6b697d85d2b0da189435d8251c88c88f96ae69e865cfe1abd6b9",
+      "bytes": 21058
+    }
+  },
+  "updated_files": {
+    "tests/infrastructure/source_governance/unit/test_blocked_row_classification.py": {
+      "before": {
+        "mode": "100644",
+        "blob_sha1": "70ea55352fcbe08509cf732e8b5bcc000828f800",
+        "sha256": "0a6d42a0ec9fd0bc7b539f8d6d51798f6e435308d6d16693385d83168b48f366",
+        "bytes": 9926
+      },
+      "after": {
+        "mode": "100644",
+        "blob_sha1": "a5e81988682962e5703fe3cf73833b9b068b9b64",
+        "sha256": "a4738abd8a932344b91fe012f10ca3c7a60e2c8b0dea3b2278856919e60b1c97",
+        "bytes": 10366
+      }
+    }
+  }
+}

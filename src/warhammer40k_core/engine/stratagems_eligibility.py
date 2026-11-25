@@ -4,7 +4,11 @@ from __future__ import annotations
 
 from warhammer40k_core.engine.target_restriction_hooks import ShootingTargetRestrictionHookRegistry
 
-from warhammer40k_core.engine.rules_units import rules_unit_views_from_armies
+from warhammer40k_core.engine.rules_units import (
+    placed_alive_rules_unit_views,
+    rules_unit_view_by_id,
+    rules_unit_views_from_armies,
+)
 
 from collections.abc import Callable
 from warhammer40k_core.engine.rapid_ingress_eligibility import rapid_ingress_window_error
@@ -19,6 +23,7 @@ from warhammer40k_core.engine.stratagems_generic_metadata import (
     EFFECT_SELECTION_KIND_KEY,
     REQUIRED_TRIGGER_CONTEXT_KEYS_KEY,
     SELECTED_FRIENDLY_COMPANION_UNIT_EFFECT_SELECTION_KIND,
+    TARGET_FORBIDDEN_IF_FELL_BACK_THIS_TURN_KEY,
     TARGET_REQUIRED_CONTEXTUAL_STATUS_KEY,
     TARGET_REQUIRED_REINFORCEMENT_ARRIVAL_THIS_TURN_KEY,
     TARGET_REQUIRED_TRIGGER_CONTEXT_LIST_KEY,
@@ -28,6 +33,7 @@ from warhammer40k_core.engine.stratagems_generic_metadata import (
     stratagem_turn_unavailable_reason,
     unit_arrived_from_reserves_this_turn,
     unit_has_contextual_status,
+    visible_enemy_requires_unengaged,
 )
 from warhammer40k_core.engine.stratagems_model import *
 from warhammer40k_core.engine.stratagems_requests import *
@@ -608,6 +614,25 @@ def _generic_rule_ir_stratagem_unavailable_reason(
         )
     ):
         return "target_within_engagement_range"
+    if (
+        target_unit_id is not None
+        and _optional_generic_metadata_bool(
+            effect_payload,
+            key=TARGET_FORBIDDEN_IF_FELL_BACK_THIS_TURN_KEY,
+        )
+        and _rules_unit_owner(state=state, unit_instance_id=target_unit_id) == context.player_id
+    ):
+        unit = rules_unit_view_by_id(state=state, unit_instance_id=target_unit_id)
+        if any(
+            state.fell_back_unit_state_for_unit(
+                player_id=context.player_id,
+                battle_round=context.battle_round,
+                unit_instance_id=unit_id,
+            )
+            is not None
+            for unit_id in (unit.unit_instance_id, *unit.component_unit_instance_ids)
+        ):
+            return "target_fell_back_this_turn"
     target_trigger_list_key = _optional_generic_metadata_identifier(
         effect_payload,
         key=TARGET_REQUIRED_TRIGGER_CONTEXT_LIST_KEY,
@@ -722,11 +747,18 @@ def _visible_enemy_selection_error(
     from warhammer40k_core.engine.stratagems_geometry import visible_enemy_unit_ids_for_source
     from warhammer40k_core.engine.stratagems_targeting import _visible_enemy_unit_id_or_none
 
+    require_unengaged = visible_enemy_requires_unengaged(effect_payload)
+    if require_unengaged and (
+        source_unit_id
+        != rules_unit_view_by_id(state=state, unit_instance_id=source_unit_id).unit_instance_id
+    ):
+        return "visible_enemy_source_must_be_rules_unit"
     eligible_unit_ids = visible_enemy_unit_ids_for_source(
         state=state,
         player_id=context.player_id,
         source_unit_instance_id=source_unit_id,
         range_inches=raw_range,
+        require_unengaged=require_unengaged,
     )
     selected_unit_id = _visible_enemy_unit_id_or_none(effect_selection)
     if selected_unit_id is None:
@@ -1201,34 +1233,49 @@ def _enumerated_target_bindings(
             )
             is None
         )
+    payload = definition.effect_payload
+    if (
+        isinstance(payload, dict)
+        and payload.get(EFFECT_SELECTION_KIND_KEY) == VISIBLE_ENEMY_UNIT_EFFECT_SELECTION_KIND
+        and visible_enemy_requires_unengaged(payload)
+    ):
+        if state.battlefield_state is None:
+            return ()
+        unit_candidates = (
+            (view.owner_player_id, view.unit_instance_id)
+            for view in placed_alive_rules_unit_views(state=state)
+            if view.owner_player_id == player_id
+        )
+    else:
+        unit_candidates = (
+            (army.player_id, unit.unit_instance_id)
+            for army in state.army_definitions
+            if target_spec.target_kind is not StratagemTargetKind.FRIENDLY_UNIT
+            or army.player_id == player_id
+            for unit in army.units
+        )
     bindings: list[StratagemTargetBinding] = []
-    for army in state.army_definitions:
+    for owner, unit_id in unit_candidates:
+        binding = StratagemTargetBinding(
+            target_kind=target_spec.target_kind,
+            target_player_id=owner,
+            target_unit_instance_id=unit_id,
+        )
         if (
-            target_spec.target_kind is StratagemTargetKind.FRIENDLY_UNIT
-            and army.player_id != player_id
-        ):
-            continue
-        for unit in army.units:
-            binding = StratagemTargetBinding(
-                target_kind=target_spec.target_kind,
-                target_player_id=army.player_id,
-                target_unit_instance_id=unit.unit_instance_id,
+            _target_binding_error(
+                state=state,
+                player_id=player_id,
+                target_spec=target_spec,
+                policy=definition.restriction_policy,
+                target_binding=binding,
+                context=context,
+                ruleset_descriptor=ruleset_descriptor,
+                army_catalog=army_catalog,
+                shooting_target_restriction_hooks=shooting_target_restriction_hooks,
             )
-            if (
-                _target_binding_error(
-                    state=state,
-                    player_id=player_id,
-                    target_spec=target_spec,
-                    policy=definition.restriction_policy,
-                    target_binding=binding,
-                    context=context,
-                    ruleset_descriptor=ruleset_descriptor,
-                    army_catalog=army_catalog,
-                    shooting_target_restriction_hooks=shooting_target_restriction_hooks,
-                )
-                is None
-            ):
-                bindings.append(binding)
+            is None
+        ):
+            bindings.append(binding)
     return tuple(
         sorted(
             bindings,

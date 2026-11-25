@@ -12,6 +12,7 @@ from warhammer40k_core.engine.stratagems_generic_metadata import (
     SELECTED_FRIENDLY_COMPANION_UNIT_EFFECT_SELECTION_KIND,
     companion_effect_selections_for_binding,
     controlled_objective_effect_selections_for_binding,
+    visible_enemy_requires_unengaged,
 )
 from warhammer40k_core.engine.rules_units import rules_unit_views_for_state
 from warhammer40k_core.engine.stratagems_model import *
@@ -524,6 +525,7 @@ def _effect_selections_for_binding(
                 player_id=context.player_id,
                 source_unit_instance_id=source_unit_id,
                 range_inches=range_inches,
+                require_unengaged=visible_enemy_requires_unengaged(payload),
             )
         )
     if selection_kind == SELECTED_FRIENDLY_COMPANION_UNIT_EFFECT_SELECTION_KIND:
