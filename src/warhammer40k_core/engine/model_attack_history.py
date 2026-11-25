@@ -104,6 +104,7 @@ def model_has_attacked_this_phase(
     battle_round: int,
     active_player_id: str,
     phase: str,
+    attack_phase: str | None = None,
 ) -> bool:
     for event in event_records:
         payload = event.payload
@@ -129,6 +130,7 @@ def model_has_attacked_this_phase(
             payload["battle_round"] == battle_round
             and payload["active_player_id"] == active_player_id
             and payload["phase"] == phase
+            and (attack_phase is None or payload["attack_phase"] == attack_phase)
             and model_instance_id in model_ids
         ):
             return True

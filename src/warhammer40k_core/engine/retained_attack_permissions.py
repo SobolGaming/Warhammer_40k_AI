@@ -12,6 +12,7 @@ from warhammer40k_core.engine.phase import GameLifecycleError
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.damage_allocation import DestructionReactionSource
+    from warhammer40k_core.engine.event_log import EventRecord
 
 
 class RetainedAttackAction(StrEnum):
@@ -36,6 +37,29 @@ def retained_attack_actions(source: DestructionReactionSource) -> tuple[Retained
     if source.reaction_kind is DestructionReactionKind.SHOOT_OR_FIGHT_ON_DEATH:
         return (RetainedAttackAction.SHOOT, RetainedAttackAction.FIGHT)
     raise GameLifecycleError("Destruction source does not grant a retained attack.")
+
+
+def retained_attack_prior_action_condition_is_met(
+    *,
+    source: DestructionReactionSource,
+    event_records: tuple[EventRecord, ...],
+    model_instance_id: str,
+    battle_round: int,
+    active_player_id: str,
+    phase: str,
+) -> bool:
+    from warhammer40k_core.engine.model_attack_history import model_has_attacked_this_phase
+
+    return not model_has_attacked_this_phase(
+        event_records=event_records,
+        model_instance_id=model_instance_id,
+        battle_round=battle_round,
+        active_player_id=active_player_id,
+        phase=phase,
+        attack_phase="fight"
+        if source.reaction_kind is DestructionReactionKind.FIGHT_ON_DEATH
+        else None,
+    )
 
 
 def retained_attack_options(

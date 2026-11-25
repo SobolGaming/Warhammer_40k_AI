@@ -36,6 +36,24 @@ BLOOD_LEGION_DETACHMENT_RULE_DESCRIPTOR_ID = "phase17e:chaos-daemons:blood-legio
 BLOOD_LEGION_SOURCE_RULE_ID = "phase17f:phase17e:chaos-daemons:blood-legion:rule"
 BLOOD_LEGION_DETACHMENT_ID = "blood-legion"
 CHAOS_DAEMONS_FACTION_ID = "chaos-daemons"
+WRATH_UNDENIABLE_STRATAGEM_ID = "000009816002"
+WRATH_UNDENIABLE_SOURCE_ROW_ID = (
+    f"stratagem:{CHAOS_DAEMONS_FACTION_ID}:{BLOOD_LEGION_DETACHMENT_ID}:"
+    f"{WRATH_UNDENIABLE_STRATAGEM_ID}"
+)
+WRATH_UNDENIABLE_DESCRIPTOR_ID = f"phase17e:{WRATH_UNDENIABLE_SOURCE_ROW_ID}"
+WRATH_UNDENIABLE_SOURCE_ID = "gw-11e-faction-packs-2026-07:" + WRATH_UNDENIABLE_SOURCE_ROW_ID
+WRATH_UNDENIABLE_WHEN = "Fight phase, just after an enemy unit has selected its targets."
+WRATH_UNDENIABLE_TARGET = (
+    "One Legiones Daemonica Khorne unit from your army that was selected as the target of "
+    "one or more of the attacking unit's attacks."
+)
+WRATH_UNDENIABLE_EFFECT = (
+    "Until the end of the phase, each time a model in your unit is destroyed by a melee attack, "
+    "if that model has not fought this phase, roll one D6: on a 4+, do not remove the destroyed "
+    "model from play; it can fight after the attacking unit has finished making its attacks, "
+    "and is then removed from play."
+)
 BLOOD_BEGETS_SKULLS_STRATAGEM_ID = "000009816005"
 BLOOD_BEGETS_SKULLS_SOURCE_ROW_ID = (
     f"stratagem:{CHAOS_DAEMONS_FACTION_ID}:{BLOOD_LEGION_DETACHMENT_ID}:"
@@ -63,6 +81,7 @@ SKULLS_BEGET_BLOOD_EFFECT = (
 COVERED_STRATAGEM_SOURCE_ROW_IDS = (
     BLOOD_BEGETS_SKULLS_SOURCE_ROW_ID,
     SKULLS_BEGET_BLOOD_SOURCE_ROW_ID,
+    WRATH_UNDENIABLE_SOURCE_ROW_ID,
 )
 BRAZENMAW_ENHANCEMENT_ID = "000009815004"
 BRAZENMAW_SOURCE_ROW_ID = (
@@ -666,6 +685,42 @@ def _gateway_unto_damnation_payload() -> RuleIRPayload:
     )
 
 
+def _wrath_undeniable_payload() -> RuleIRPayload:
+    normalized_text = f"{WRATH_UNDENIABLE_TARGET} {WRATH_UNDENIABLE_EFFECT}"
+    return _payload(
+        WRATH_UNDENIABLE_DESCRIPTOR_ID,
+        WRATH_UNDENIABLE_SOURCE_ID,
+        normalized_text,
+        (
+            _effect_clause(
+                clause_id=f"{WRATH_UNDENIABLE_DESCRIPTOR_ID}:grant",
+                template_id="retained-attack:timed-unit-grant",
+                normalized_text=normalized_text,
+                source_text=WRATH_UNDENIABLE_EFFECT,
+                target=_target("selected_unit", normalized_text, WRATH_UNDENIABLE_TARGET),
+                effects=(
+                    _effect(
+                        "grant_ability",
+                        normalized_text,
+                        WRATH_UNDENIABLE_EFFECT,
+                        (
+                            _parameter("ability", "retained_destruction_attack"),
+                            _parameter("actions", ("fight",)),
+                            _parameter("optional", True),
+                            _parameter("trigger_roll_threshold", 4),
+                            _parameter("requires_not_shot_or_fought_this_phase", True),
+                            _parameter("shooting_hazardous_tests_automatically_pass", False),
+                            _parameter("requires_destroyed_by_melee_attack", True),
+                        ),
+                    ),
+                ),
+                duration=_end_phase_duration(normalized_text, "Until the end of the phase"),
+            ),
+        ),
+        "phase17s-stratagem-activation-template-v2",
+    )
+
+
 def _skulls_beget_blood_payload() -> RuleIRPayload:
     normalized_text = f"{SKULLS_BEGET_BLOOD_TARGET} {SKULLS_BEGET_BLOOD_EFFECT}"
     return _payload(
@@ -944,8 +999,9 @@ def _immediate_duration(
     )
 
 
-def _end_phase_duration(normalized_text: str) -> RuleDurationPayload:
-    source_text = "until the end of the phase"
+def _end_phase_duration(
+    normalized_text: str, source_text: str = "until the end of the phase"
+) -> RuleDurationPayload:
     return cast(
         RuleDurationPayload,
         {
@@ -980,6 +1036,7 @@ def _coverage_payloads() -> Mapping[str, RuleIRPayload]:
             GATEWAY_UNTO_DAMNATION_DESCRIPTOR_ID: _gateway_unto_damnation_payload(),
             SLAUGHTERTHIRST_DESCRIPTOR_ID: _slaughterthirst_payload(),
             SKULLS_BEGET_BLOOD_DESCRIPTOR_ID: _skulls_beget_blood_payload(),
+            WRATH_UNDENIABLE_DESCRIPTOR_ID: _wrath_undeniable_payload(),
         }
     )
 

@@ -1,386 +1,512 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "98f83a364d0a9ea8bef3fa00b02b4420948601fb",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:5d31931e184f18ab678daeccb3dfb6cb8612974f5fabc1c5de33dcfc5519608a",
-  "operation_map_sha256": "c2075a063be13cce165f005952c38b105bc41ba8d99843f69d9efcf95c1dfd86",
+  "base": "bdc1b2111530576a71bf3391564d5a9e9c356be0",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:a9b19bcbc40327b3801c1b531a2415498f81118626ce2b320308e905af17f9ef",
+  "operation_map_sha256": "1dff98cc8d57c83d2365b06f8c2a7b9b46df93b57f1d3f1e9dbe56b9e2e9fb16",
   "changes": {
-    "ci/test_shards/durations.json": {
-      "before_sha256": "8fd09f0d51c925db963a474fcc09731eac8107325722f44fd865e028e5b9f75b",
-      "after_sha256": "7fcf878d08203bf0dfe1337ad3e1e8fc87d45d3ebdf4f2bd17c6196f27e0b619",
+    "FACTION_INTEGRATION.md": {
+      "before_sha256": "a19ab653ffd0ae58978d467d79736c06b767ea58a7352671bdcd52a874f4901f",
+      "after_sha256": "57d141b8c2cb3532051655495b6b7960223ee6e31c0a880145410c7aedead07a",
       "owners": {
         "@document": {
-          "before": "8fd09f0d51c925db963a474fcc09731eac8107325722f44fd865e028e5b9f75b",
-          "after": "7fcf878d08203bf0dfe1337ad3e1e8fc87d45d3ebdf4f2bd17c6196f27e0b619"
+          "before": "a19ab653ffd0ae58978d467d79736c06b767ea58a7352671bdcd52a874f4901f",
+          "after": "57d141b8c2cb3532051655495b6b7960223ee6e31c0a880145410c7aedead07a"
+        }
+      }
+    },
+    "ci/test_shards/durations.json": {
+      "before_sha256": "7fcf878d08203bf0dfe1337ad3e1e8fc87d45d3ebdf4f2bd17c6196f27e0b619",
+      "after_sha256": "9a2c2d3f1d5bcd278723a430f86d0811ebdae8efaac460828ba3e1846198d8aa",
+      "owners": {
+        "@document": {
+          "before": "7fcf878d08203bf0dfe1337ad3e1e8fc87d45d3ebdf4f2bd17c6196f27e0b619",
+          "after": "9a2c2d3f1d5bcd278723a430f86d0811ebdae8efaac460828ba3e1846198d8aa"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
-      "before_sha256": "6aa7b0de6324135276a60a3fbfcca13e838cce1d042696b89633098c2a2ed122",
-      "after_sha256": "a2581513eab078fa2083d710792c2517111c704d80913ba21888180ff156de5a",
+      "before_sha256": "a2581513eab078fa2083d710792c2517111c704d80913ba21888180ff156de5a",
+      "after_sha256": "2434405e86e25436f214782a8d4e373c5f3f12ad07f885c1150b952458a70e9c",
       "owners": {
         "@document": {
-          "before": "6aa7b0de6324135276a60a3fbfcca13e838cce1d042696b89633098c2a2ed122",
-          "after": "a2581513eab078fa2083d710792c2517111c704d80913ba21888180ff156de5a"
+          "before": "a2581513eab078fa2083d710792c2517111c704d80913ba21888180ff156de5a",
+          "after": "2434405e86e25436f214782a8d4e373c5f3f12ad07f885c1150b952458a70e9c"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
-      "before_sha256": "06909c7e9c3a1eee790dabd3aacad1f363ac97fa25296f62b7b3e0bb4da1572e",
-      "after_sha256": "9fd72938698ec93a2b1d6819e690ef1efd58d2fd7f35a615e3ad822bea7dd874",
+      "before_sha256": "9fd72938698ec93a2b1d6819e690ef1efd58d2fd7f35a615e3ad822bea7dd874",
+      "after_sha256": "5a44d8c13c5744909b38c88a8cf83baf6c519e04a7255d76ed4c6942aa91bbee",
       "owners": {
         "@document": {
-          "before": "06909c7e9c3a1eee790dabd3aacad1f363ac97fa25296f62b7b3e0bb4da1572e",
-          "after": "9fd72938698ec93a2b1d6819e690ef1efd58d2fd7f35a615e3ad822bea7dd874"
+          "before": "9fd72938698ec93a2b1d6819e690ef1efd58d2fd7f35a615e3ad822bea7dd874",
+          "after": "5a44d8c13c5744909b38c88a8cf83baf6c519e04a7255d76ed4c6942aa91bbee"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
-      "before_sha256": "2587c15663d9d763fcec098546ff684cd4f8edf1048a41872adb56cb87810621",
-      "after_sha256": "8e1a069ea40ac9eb35f7f6aeac92b4c544d62a1d9aecd20bca85dce1b777a357",
+      "before_sha256": "8e1a069ea40ac9eb35f7f6aeac92b4c544d62a1d9aecd20bca85dce1b777a357",
+      "after_sha256": "d53a5ddb81e1536ee64360888e347bd1bdba3e6620b4a12031b5c6f0c521b308",
       "owners": {
         "@document": {
-          "before": "2587c15663d9d763fcec098546ff684cd4f8edf1048a41872adb56cb87810621",
-          "after": "8e1a069ea40ac9eb35f7f6aeac92b4c544d62a1d9aecd20bca85dce1b777a357"
+          "before": "8e1a069ea40ac9eb35f7f6aeac92b4c544d62a1d9aecd20bca85dce1b777a357",
+          "after": "d53a5ddb81e1536ee64360888e347bd1bdba3e6620b4a12031b5c6f0c521b308"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
-      "before_sha256": "bafd9f83762779915479f213862d5fd6613623c06e3b86aa75f90dd9ed525a9f",
-      "after_sha256": "55bf3b0ab79ecdb18e26c6803863b271ef5e4cb8df5bb03638485e2713859897",
+      "before_sha256": "55bf3b0ab79ecdb18e26c6803863b271ef5e4cb8df5bb03638485e2713859897",
+      "after_sha256": "9a4d4f9b22798202088e9c5180a8cf63bf8acfbe2dcc8d619f177bf1b1d7f73f",
       "owners": {
         "@document": {
-          "before": "bafd9f83762779915479f213862d5fd6613623c06e3b86aa75f90dd9ed525a9f",
-          "after": "55bf3b0ab79ecdb18e26c6803863b271ef5e4cb8df5bb03638485e2713859897"
+          "before": "55bf3b0ab79ecdb18e26c6803863b271ef5e4cb8df5bb03638485e2713859897",
+          "after": "9a4d4f9b22798202088e9c5180a8cf63bf8acfbe2dcc8d619f177bf1b1d7f73f"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
-      "before_sha256": "2842a97c9713cdab4b6101b6195f102f7fed314f28820c8eebe7f38340102eea",
-      "after_sha256": "fe11c0b5ab88b74ba4c24d8a5fc1835b9837e1f4e637b5ecf90d83837647199b",
+      "before_sha256": "fe11c0b5ab88b74ba4c24d8a5fc1835b9837e1f4e637b5ecf90d83837647199b",
+      "after_sha256": "f8a82852b366c4015ca9f0bb24bdb3a15c39c636b13801673bf34ec1f7977bf6",
       "owners": {
         "@document": {
-          "before": "2842a97c9713cdab4b6101b6195f102f7fed314f28820c8eebe7f38340102eea",
-          "after": "fe11c0b5ab88b74ba4c24d8a5fc1835b9837e1f4e637b5ecf90d83837647199b"
+          "before": "fe11c0b5ab88b74ba4c24d8a5fc1835b9837e1f4e637b5ecf90d83837647199b",
+          "after": "f8a82852b366c4015ca9f0bb24bdb3a15c39c636b13801673bf34ec1f7977bf6"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
-      "before_sha256": "c3bea3ca8c88d2f413a9f2e868587bfeebb408a7a9e440c3a029acdc187de741",
-      "after_sha256": "cff267c3c74b66a8f7fe3dd1cf17b0a2feecd7c72b5b3628ca17855a287d0f39",
+      "before_sha256": "cff267c3c74b66a8f7fe3dd1cf17b0a2feecd7c72b5b3628ca17855a287d0f39",
+      "after_sha256": "105163d63025b0042694600003bd4f39d8e7fab6a32fb0d207f46a2c35630e21",
       "owners": {
         "@document": {
-          "before": "c3bea3ca8c88d2f413a9f2e868587bfeebb408a7a9e440c3a029acdc187de741",
-          "after": "cff267c3c74b66a8f7fe3dd1cf17b0a2feecd7c72b5b3628ca17855a287d0f39"
+          "before": "cff267c3c74b66a8f7fe3dd1cf17b0a2feecd7c72b5b3628ca17855a287d0f39",
+          "after": "105163d63025b0042694600003bd4f39d8e7fab6a32fb0d207f46a2c35630e21"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
-      "before_sha256": "84d2f967f288bf7e644f2671184be6e99dc953731c23d06286f66198bfefdb8c",
-      "after_sha256": "cdc8e5e8bdd5521e1d22de916843c910b9906ff1cc7aca4a19d2c300e6d42dd2",
+      "before_sha256": "cdc8e5e8bdd5521e1d22de916843c910b9906ff1cc7aca4a19d2c300e6d42dd2",
+      "after_sha256": "37c9ada65663ed63e06bec5197e07c508c4f29270bf970888a681188b07fa745",
       "owners": {
         "@document": {
-          "before": "84d2f967f288bf7e644f2671184be6e99dc953731c23d06286f66198bfefdb8c",
-          "after": "cdc8e5e8bdd5521e1d22de916843c910b9906ff1cc7aca4a19d2c300e6d42dd2"
+          "before": "cdc8e5e8bdd5521e1d22de916843c910b9906ff1cc7aca4a19d2c300e6d42dd2",
+          "after": "37c9ada65663ed63e06bec5197e07c508c4f29270bf970888a681188b07fa745"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
-      "before_sha256": "5f23890b902f53849ee551101e0cd8314b8b63543d57ab356c039db35a9e6e6f",
-      "after_sha256": "6e74a36d7014864256468c423d3109452f9e8ca3e93edc922b3f2a4c0bcd58ce",
+      "before_sha256": "6e74a36d7014864256468c423d3109452f9e8ca3e93edc922b3f2a4c0bcd58ce",
+      "after_sha256": "793c29b92059c0633f3443ca20957a8940be0abfb0f2a28809a3d445baf10f88",
       "owners": {
         "@document": {
-          "before": "5f23890b902f53849ee551101e0cd8314b8b63543d57ab356c039db35a9e6e6f",
-          "after": "6e74a36d7014864256468c423d3109452f9e8ca3e93edc922b3f2a4c0bcd58ce"
+          "before": "6e74a36d7014864256468c423d3109452f9e8ca3e93edc922b3f2a4c0bcd58ce",
+          "after": "793c29b92059c0633f3443ca20957a8940be0abfb0f2a28809a3d445baf10f88"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
-      "before_sha256": "487fddd26898889bb80f0fa147bc1ab1c75041f18a31d90c45528a1b1da40577",
-      "after_sha256": "b139a1e273de5317b06e9797eda9689eb77352118d1f6c73635dee60c2975300",
+      "before_sha256": "b139a1e273de5317b06e9797eda9689eb77352118d1f6c73635dee60c2975300",
+      "after_sha256": "4305965660f173f950ccaea4ddbacd2a208b8efc412fd1397a267a06f5be2950",
       "owners": {
         "@document": {
-          "before": "487fddd26898889bb80f0fa147bc1ab1c75041f18a31d90c45528a1b1da40577",
-          "after": "b139a1e273de5317b06e9797eda9689eb77352118d1f6c73635dee60c2975300"
+          "before": "b139a1e273de5317b06e9797eda9689eb77352118d1f6c73635dee60c2975300",
+          "after": "4305965660f173f950ccaea4ddbacd2a208b8efc412fd1397a267a06f5be2950"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
-      "before_sha256": "52f55c18fef1ea0bb39fd738e5445dd6097a7a3108476accc860b78e5747a418",
-      "after_sha256": "e7a6f3378333a3200891c9eb6be5c0d4ee763b813db598f3653142437a40274f",
+      "before_sha256": "e7a6f3378333a3200891c9eb6be5c0d4ee763b813db598f3653142437a40274f",
+      "after_sha256": "04cb55b3b4dc2701340df1f8c5d2e9e650709baf3aa15c1ebe0d9a6f3833a0df",
       "owners": {
         "@document": {
-          "before": "52f55c18fef1ea0bb39fd738e5445dd6097a7a3108476accc860b78e5747a418",
-          "after": "e7a6f3378333a3200891c9eb6be5c0d4ee763b813db598f3653142437a40274f"
+          "before": "e7a6f3378333a3200891c9eb6be5c0d4ee763b813db598f3653142437a40274f",
+          "after": "04cb55b3b4dc2701340df1f8c5d2e9e650709baf3aa15c1ebe0d9a6f3833a0df"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "aa53d41e3ee781dd744b2059f32bcc3b912bc367bda3b6a9de3aa3e8b9017ac0",
-      "after_sha256": "3a4a1cc70cd9cb890a8c90953fc66559ff741b0bca9021d9afd894130be21f6d",
+      "before_sha256": "3a4a1cc70cd9cb890a8c90953fc66559ff741b0bca9021d9afd894130be21f6d",
+      "after_sha256": "607de93e78ea8608ad0426135a482a6ddb7ebf329b3ff9bbddd577ddac6fa034",
       "owners": {
         "@document": {
-          "before": "aa53d41e3ee781dd744b2059f32bcc3b912bc367bda3b6a9de3aa3e8b9017ac0",
-          "after": "3a4a1cc70cd9cb890a8c90953fc66559ff741b0bca9021d9afd894130be21f6d"
+          "before": "3a4a1cc70cd9cb890a8c90953fc66559ff741b0bca9021d9afd894130be21f6d",
+          "after": "607de93e78ea8608ad0426135a482a6ddb7ebf329b3ff9bbddd577ddac6fa034"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "d64829db51157e5c24c799b66f2c372e12756cd74736a5b138dbfc3cad3c0a1c",
-      "after_sha256": "4770ccb1c68b0a28cf26770c83d5f510c3bf8b100f8d2e39a59c9dd68d72fe26",
+      "before_sha256": "4770ccb1c68b0a28cf26770c83d5f510c3bf8b100f8d2e39a59c9dd68d72fe26",
+      "after_sha256": "fd519f416d01be082d36cfdcb5a5215e32fd179aef6299750bbc584bbb59256c",
       "owners": {
         "@document": {
-          "before": "d64829db51157e5c24c799b66f2c372e12756cd74736a5b138dbfc3cad3c0a1c",
-          "after": "4770ccb1c68b0a28cf26770c83d5f510c3bf8b100f8d2e39a59c9dd68d72fe26"
+          "before": "4770ccb1c68b0a28cf26770c83d5f510c3bf8b100f8d2e39a59c9dd68d72fe26",
+          "after": "fd519f416d01be082d36cfdcb5a5215e32fd179aef6299750bbc584bbb59256c"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "5bf96f8c2a4143fb0aa912894771eb7427f17896283052b965a92e793b31dd70",
-      "after_sha256": "63e40ce84e34176566aad06e2cc2f3d27e256de66de61e4b1ae3d9ab256e1fb7",
+      "before_sha256": "63e40ce84e34176566aad06e2cc2f3d27e256de66de61e4b1ae3d9ab256e1fb7",
+      "after_sha256": "5e686526f0df5d1cbac10a4f04c6f0fb8cc75d2e0e693aabf59e481198f7c65a",
       "owners": {
         "@document": {
-          "before": "5bf96f8c2a4143fb0aa912894771eb7427f17896283052b965a92e793b31dd70",
-          "after": "63e40ce84e34176566aad06e2cc2f3d27e256de66de61e4b1ae3d9ab256e1fb7"
+          "before": "63e40ce84e34176566aad06e2cc2f3d27e256de66de61e4b1ae3d9ab256e1fb7",
+          "after": "5e686526f0df5d1cbac10a4f04c6f0fb8cc75d2e0e693aabf59e481198f7c65a"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "bc6c273032732b583566e93a83cf49c6d7eb8c411a9a930ecbf7b4fad79d6cb1",
-      "after_sha256": "3d3776d88763d6afca93ce4c4d4a7372bf40fdabcb6ccf1f100d70e7434542f3",
+      "before_sha256": "3d3776d88763d6afca93ce4c4d4a7372bf40fdabcb6ccf1f100d70e7434542f3",
+      "after_sha256": "a985fc224c2c472c320ce9bc0ea2f8d279e8b6577d6f6e3b5f39d5f9f506a598",
       "owners": {
         "@document": {
-          "before": "bc6c273032732b583566e93a83cf49c6d7eb8c411a9a930ecbf7b4fad79d6cb1",
-          "after": "3d3776d88763d6afca93ce4c4d4a7372bf40fdabcb6ccf1f100d70e7434542f3"
+          "before": "3d3776d88763d6afca93ce4c4d4a7372bf40fdabcb6ccf1f100d70e7434542f3",
+          "after": "a985fc224c2c472c320ce9bc0ea2f8d279e8b6577d6f6e3b5f39d5f9f506a598"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "a6d334755b5adea9f4be4a5f9a30e554f36341a39e244bf1b67ffcdf5a04c230",
-      "after_sha256": "14874dbe1f2cdd7e59547a3fe712067aacc5b69f608082ed8f79323c1b10c4fd",
+      "before_sha256": "14874dbe1f2cdd7e59547a3fe712067aacc5b69f608082ed8f79323c1b10c4fd",
+      "after_sha256": "e9fbd7342ba62de62f45b706c5081b8998d2c4e184d0de346ca9326073a605b5",
       "owners": {
         "@document": {
-          "before": "a6d334755b5adea9f4be4a5f9a30e554f36341a39e244bf1b67ffcdf5a04c230",
-          "after": "14874dbe1f2cdd7e59547a3fe712067aacc5b69f608082ed8f79323c1b10c4fd"
+          "before": "14874dbe1f2cdd7e59547a3fe712067aacc5b69f608082ed8f79323c1b10c4fd",
+          "after": "e9fbd7342ba62de62f45b706c5081b8998d2c4e184d0de346ca9326073a605b5"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "b00614629e5828f088f0fea3a2ef89c53804fd5b67eb46a8ddbdf9363931b5f5",
-      "after_sha256": "271571db37ab94d0cfac66c3a7d4b6c0db2b5903bc82339b3c3b6e7ce5032a85",
+      "before_sha256": "271571db37ab94d0cfac66c3a7d4b6c0db2b5903bc82339b3c3b6e7ce5032a85",
+      "after_sha256": "0c61e50d9526789972edcacd8d4484b32838704cc1727ee99eb75bda22681e67",
       "owners": {
         "@document": {
-          "before": "b00614629e5828f088f0fea3a2ef89c53804fd5b67eb46a8ddbdf9363931b5f5",
-          "after": "271571db37ab94d0cfac66c3a7d4b6c0db2b5903bc82339b3c3b6e7ce5032a85"
+          "before": "271571db37ab94d0cfac66c3a7d4b6c0db2b5903bc82339b3c3b6e7ce5032a85",
+          "after": "0c61e50d9526789972edcacd8d4484b32838704cc1727ee99eb75bda22681e67"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "919c853f9a40116dbfe79c465e69518025b0876e8a496ab4dc06ecea781465a2",
-      "after_sha256": "fd85ada1bbc9a1688454a4822d489b3de58a88e651b65f482ab08625b5e7299f",
+      "before_sha256": "fd85ada1bbc9a1688454a4822d489b3de58a88e651b65f482ab08625b5e7299f",
+      "after_sha256": "f7efeca267fb2d57090b9ef90537aef31cfea37dc2f5435f096e6c6c1f07fc96",
       "owners": {
         "@document": {
-          "before": "919c853f9a40116dbfe79c465e69518025b0876e8a496ab4dc06ecea781465a2",
-          "after": "fd85ada1bbc9a1688454a4822d489b3de58a88e651b65f482ab08625b5e7299f"
+          "before": "fd85ada1bbc9a1688454a4822d489b3de58a88e651b65f482ab08625b5e7299f",
+          "after": "f7efeca267fb2d57090b9ef90537aef31cfea37dc2f5435f096e6c6c1f07fc96"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "b65b467d503742e3c542a89d7086c275f0f15e72920a68b600c55f31dcca1e95",
-      "after_sha256": "aff798c2d921a77c62371e674710ae4a7ba5443771923fbcec3da44ad9c27430",
+      "before_sha256": "aff798c2d921a77c62371e674710ae4a7ba5443771923fbcec3da44ad9c27430",
+      "after_sha256": "8672f72d6c0811f5ec7b378c00723cac21db7aa568528798211b5b7050e52279",
       "owners": {
         "@document": {
-          "before": "b65b467d503742e3c542a89d7086c275f0f15e72920a68b600c55f31dcca1e95",
-          "after": "aff798c2d921a77c62371e674710ae4a7ba5443771923fbcec3da44ad9c27430"
+          "before": "aff798c2d921a77c62371e674710ae4a7ba5443771923fbcec3da44ad9c27430",
+          "after": "8672f72d6c0811f5ec7b378c00723cac21db7aa568528798211b5b7050e52279"
         }
       }
     },
-    "data/source_audits/ci64_provenance_v1/stage3-flight-normal-move-test-v1.json": {
+    "data/generated/ability_coverage/cross_source_semantic_equivalence.json": {
+      "before_sha256": "f4863e3fa20a4f32a307c97a492c2f025efd46b68d5b95a6d7f506b14a88f542",
+      "after_sha256": "9e97f354c244777d636a34a573d305c9529ec72f2cff3317b8f7072b67465878",
+      "owners": {
+        "@document": {
+          "before": "f4863e3fa20a4f32a307c97a492c2f025efd46b68d5b95a6d7f506b14a88f542",
+          "after": "9e97f354c244777d636a34a573d305c9529ec72f2cff3317b8f7072b67465878"
+        }
+      }
+    },
+    "data/generated/ability_coverage/runtime_content_semantic_coverage.json": {
+      "before_sha256": "83bc89b4ed13f0d3635a42805c0f788afc3d95e3301345b56802330c3da1a540",
+      "after_sha256": "58dc056d646fc3250fbe65771d07b65c37625a5c6a3730a5f4e1c4ef87ff2feb",
+      "owners": {
+        "@document": {
+          "before": "83bc89b4ed13f0d3635a42805c0f788afc3d95e3301345b56802330c3da1a540",
+          "after": "58dc056d646fc3250fbe65771d07b65c37625a5c6a3730a5f4e1c4ef87ff2feb"
+        }
+      }
+    },
+    "data/source_audits/ci64_provenance_v1/wrath-undeniable-transition-v1.json": {
       "before_sha256": null,
-      "after_sha256": "47ee27bbd227b22ae4f64bf6c148eb8944439e2a2245efc123451d0ea1e968bf",
+      "after_sha256": "16917990831b5c2a30720e21fd6decde891b7b8aca883439ec21038538142d29",
       "owners": {
         "@document": {
           "before": null,
-          "after": "47ee27bbd227b22ae4f64bf6c148eb8944439e2a2245efc123451d0ea1e968bf"
+          "after": "16917990831b5c2a30720e21fd6decde891b7b8aca883439ec21038538142d29"
         }
       }
     },
-    "docs/AI_POLICY_INTERFACE.md": {
-      "before_sha256": "e8cd7a62179340740d10750f87351e472a2b0167d9ddbc05e68ec801e3855361",
-      "after_sha256": "5fdb6ebf75a4c0b3957d0077fa47255593ca6ea669b60388d3d3dc78522b2dda",
+    "docs/ABILITY_SUPPORT_MATRIX_V2.md": {
+      "before_sha256": "f17501ce0af59844cf658467ce5f182637d70b5c82dd7c107377265f4e1919ef",
+      "after_sha256": "f7c3b8985f9e1d74292eb053dc191e8183c0a5440778c85dee35b1799279e316",
       "owners": {
         "@document": {
-          "before": "e8cd7a62179340740d10750f87351e472a2b0167d9ddbc05e68ec801e3855361",
-          "after": "5fdb6ebf75a4c0b3957d0077fa47255593ca6ea669b60388d3d3dc78522b2dda"
+          "before": "f17501ce0af59844cf658467ce5f182637d70b5c82dd7c107377265f4e1919ef",
+          "after": "f7c3b8985f9e1d74292eb053dc191e8183c0a5440778c85dee35b1799279e316"
+        }
+      }
+    },
+    "docs/ADAPTER_DECISION_CONTRACT.md": {
+      "before_sha256": "af4a28d13eb19e4aac4e9ebb577ba98e086c3ec37b4b24136493daef925272d7",
+      "after_sha256": "93beac77295aec1cb10c0a10f5a40908fd7595530bb2e0f4c69343f62b885e96",
+      "owners": {
+        "@document": {
+          "before": "af4a28d13eb19e4aac4e9ebb577ba98e086c3ec37b4b24136493daef925272d7",
+          "after": "93beac77295aec1cb10c0a10f5a40908fd7595530bb2e0f4c69343f62b885e96"
+        }
+      }
+    },
+    "docs/CROSS_SOURCE_SEMANTIC_EQUIVALENCE.md": {
+      "before_sha256": "0d7fb705b49408a584e7174a0262d7919af3a571e140fa7f93a3930d024165c3",
+      "after_sha256": "fb079856088f5f759028fcf44733c1e16e0ecaf6e85bff64e5c9cfb005e28cc7",
+      "owners": {
+        "@document": {
+          "before": "0d7fb705b49408a584e7174a0262d7919af3a571e140fa7f93a3930d024165c3",
+          "after": "fb079856088f5f759028fcf44733c1e16e0ecaf6e85bff64e5c9cfb005e28cc7"
+        }
+      }
+    },
+    "docs/factions/audit/chaos-daemons.md": {
+      "before_sha256": "d3594d7f607604b97fe0745011340e713ebee952ffcdbce6dbd79563d08ea60c",
+      "after_sha256": "33f493c2a156fef77eae933343d343bd3773a4817935a49fd948550d5689532c",
+      "owners": {
+        "@document": {
+          "before": "d3594d7f607604b97fe0745011340e713ebee952ffcdbce6dbd79563d08ea60c",
+          "after": "33f493c2a156fef77eae933343d343bd3773a4817935a49fd948550d5689532c"
+        }
+      }
+    },
+    "docs/factions/chaos-daemons.md": {
+      "before_sha256": "b4efd7658617236fcdbefe61e8bc2803e60a21ed1ec91696a0135edd82e57da4",
+      "after_sha256": "d0926a68eb7fce970ff199cbc5e9c5002101078fc3523a4c758f4a6383111fba",
+      "owners": {
+        "@document": {
+          "before": "b4efd7658617236fcdbefe61e8bc2803e60a21ed1ec91696a0135edd82e57da4",
+          "after": "d0926a68eb7fce970ff199cbc5e9c5002101078fc3523a4c758f4a6383111fba"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "a68e574afcec17abbb4629b77df6a988468c9482d782537a299a1672e21a3c22",
-      "after_sha256": "92b0dde171d4efdd5e6f26f1d6f8fa3cd6943412ad3916d1402a626c60598075",
+      "before_sha256": "92b0dde171d4efdd5e6f26f1d6f8fa3cd6943412ad3916d1402a626c60598075",
+      "after_sha256": "8fc56e7633a16c9b2050e458f7b890cb13e8300bd81d574b48e0c7ae8d9bc2bb",
       "owners": {
         "@document": {
-          "before": "a68e574afcec17abbb4629b77df6a988468c9482d782537a299a1672e21a3c22",
-          "after": "92b0dde171d4efdd5e6f26f1d6f8fa3cd6943412ad3916d1402a626c60598075"
+          "before": "92b0dde171d4efdd5e6f26f1d6f8fa3cd6943412ad3916d1402a626c60598075",
+          "after": "8fc56e7633a16c9b2050e458f7b890cb13e8300bd81d574b48e0c7ae8d9bc2bb"
         }
       }
     },
     "scripts/engine_numerical_identity_test_admission.py": {
-      "before_sha256": "33a72dad0dadbb46b22f58144c89a38395e83ca3c79a496b5ac6ca3272ae1c1a",
-      "after_sha256": "8c3fa9db10e7d22d0ca4b78fb1af044da0f5f2bee25e56b818d7383518cb206e",
+      "before_sha256": "8c3fa9db10e7d22d0ca4b78fb1af044da0f5f2bee25e56b818d7383518cb206e",
+      "after_sha256": "30b658bcbf62c26d5a73509ead659d948d665fdd5287e5a067f9781350bef407",
       "owners": {
-        "_stage3_flight_normal_move_successor": {
+        "@module": {
+          "before": "ca04371cfbb41f1569c8edc74619e615e0d6f7692191c6217f1e0c90bd9abefa",
+          "after": "2f04554db9367a7ddcf6abecbae0a506f4a937f2eb73a4f28c60ea2e9b3c6e11"
+        },
+        "_skulls_beget_blood_test_successor": {
+          "before": "d217e34acab723a24d7279470469ffa67b043fcf58e2c5e196a7111347e79a6c",
+          "after": "d9c9e040b0d167a0870f0588a4062b8677f4eacd91f7777a02c7b7f7ca6c5744"
+        },
+        "_wrath_undeniable_test_successor": {
           "before": null,
-          "after": "f6bc8cbcb5aed6447213860435130edf3e5535a0a991a1d09e401e345ce95a58"
+          "after": "8b9dfd63a7ed17b31da0e24a0881e397b496911d20d585c99fe7ea9b81f00a14"
         },
         "exact_movement_test_transition": {
-          "before": "e1857cf0a73a77642453761cfea32b7d80b01c7baccc18cf3d6f35f65e1d86b0",
-          "after": "e4cd56ac02061239b9bf12eb46047e9ddfb48f434a4917ed1e6275135b7a856b"
+          "before": "e4cd56ac02061239b9bf12eb46047e9ddfb48f434a4917ed1e6275135b7a856b",
+          "after": "245e2475634f6b20aea5c0d0aac0972623bdd1c613cfe2445b86f34d8746bfe5"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "850fb699b37211370e6cbf36a18659e23aac91280f745a1bf3eaa7cd48d12e42",
-      "after_sha256": "297cce37b7227cb91dd359e190a8f919a29df1f8bb360cdca9abc02b0f7ad895",
+      "before_sha256": "297cce37b7227cb91dd359e190a8f919a29df1f8bb360cdca9abc02b0f7ad895",
+      "after_sha256": "af7a486673d1687d28b81d8437bdcc4095359cbcefc6217bea524898e867b2fa",
       "owners": {
         "@document": {
-          "before": "850fb699b37211370e6cbf36a18659e23aac91280f745a1bf3eaa7cd48d12e42",
-          "after": "297cce37b7227cb91dd359e190a8f919a29df1f8bb360cdca9abc02b0f7ad895"
+          "before": "297cce37b7227cb91dd359e190a8f919a29df1f8bb360cdca9abc02b0f7ad895",
+          "after": "af7a486673d1687d28b81d8437bdcc4095359cbcefc6217bea524898e867b2fa"
         }
       }
     },
-    "src/warhammer40k_core/ai/flight_normal_move_policy.py": {
-      "before_sha256": null,
-      "after_sha256": "d82e4acca77f52b60336bdee199bdedf20b3e4c67428c7f37493039228a1bac4",
+    "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/detachments/blood_legion/stratagems.py": {
+      "before_sha256": "d57aa64b1a4a203ca76181812208dfca3b0821bc8a1326130ffb923d1c4b1eaf",
+      "after_sha256": "99648d47e8246c424163b67df7fdf2114361f786115e3ce9d21161ab2830299e",
+      "owners": {
+        "_wrath_undeniable_record": {
+          "before": null,
+          "after": "044f128f86b97e3d39438c4414495f2ebed461fafcccf7ff9ac8f061a831f4f2"
+        },
+        "runtime_contribution": {
+          "before": "3ba7f6630fc0b896a8c8875de9da87f6a6815fc5720d4addf33eb141f5aca250",
+          "after": "ee82a41553647378feb2ac91b50391487504dbed03bff3b46bbfc0be1dba37ca"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/model_attack_history.py": {
+      "before_sha256": "a5ce2b7df8280e4090213a218f55b4288e97b2f5cea8703970b319c119d56f02",
+      "after_sha256": "d8bc7641d6ff2cdd26420c01ffe2241bb03402a6e73485f2911362a78b4e4e18",
+      "owners": {
+        "model_has_attacked_this_phase": {
+          "before": "da92d6dc24aae034dbc5e314e544f4b4cf9b1b89e167c8f8fbcaf5d0aad65852",
+          "after": "3f2456d05cbda62f9c99756ebd593c398d4af3849fc628b8dc1316650801fae5"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/retained_attack_grants.py": {
+      "before_sha256": "1b18194c993fe6faa76e3e1c02b07ed93cc3b4e8f51c2ff093a83b1118f981cd",
+      "after_sha256": "5dbcacf8f4206fe4ed257cfede1021f630c897fc95738d99264dd330bb869082",
+      "owners": {
+        "RetainedAttackGrant": {
+          "before": "a8e6d0d619823fb2902e31f24dbcdc810a0c068c126d831d59af546cad370e9b",
+          "after": "04803be43c51c9215d89ba401ec70f592ca96be4fd13ff8da370808cf9438d4c"
+        },
+        "RetainedAttackGrant.source_payload": {
+          "before": "81b42e011f2aaf13bd06249a7c6315c654fcc83edeffcbea746ce0b007229404",
+          "after": "037620a5c8604aa9469f4b1acc7799ff8f86dfdac077ca336da2a976293a0235"
+        },
+        "retained_attack_grant_for_effect": {
+          "before": "ce1025ca3231d34aae518a2e600703ad9064c0bb4bfb1d65608e0e2b098d3465",
+          "after": "a3d42b285f8b07f327b6b99c88464d9ab34d6a95c6ea6a1a91afb29724e2d999"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/retained_attack_permissions.py": {
+      "before_sha256": "a535f1b7d68a8274e3de45151819c67926b9d9528070cd461625965d393a673f",
+      "after_sha256": "ef253802c43a2f2cea53f341bc84fde039c6a9ee168503c19e3cdaa6658f0de2",
       "owners": {
         "@module": {
-          "before": null,
-          "after": "24bce24b7ded1e9cf2c87b4abb1dbf2e41f11d98dea4bf357b776ceeed62ca0b"
+          "before": "ef262b0de6c1ae5da743426d2c0ebc675b75dca18f4bcfdfab7e48c9ddaf78d4",
+          "after": "486c4cbe2920ae4c04702da096436e1844955e56d761bd985627ffd5dbdd9691"
         },
-        "FlightNormalMoveChoice": {
+        "retained_attack_prior_action_condition_is_met": {
           "before": null,
-          "after": "75ccde120c9ec860bd910f5084d82d0ade253e9a0ccff7afccd19bc965f15cf7"
+          "after": "a072741e2b2b77014f46de73b99ab6cbb397f97a7de160a45d97c7e500540a88"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/retained_destruction_selection.py": {
+      "before_sha256": "a4feb4af6c37301ae153062167f5f005c8379a614b94684b36ffb38f26266578",
+      "after_sha256": "2bc7511b55485c4d195c37bf4efdad73806c81cd4753d5d14d65bdaef2dab77d",
+      "owners": {
+        "@module": {
+          "before": "2b9c6c1b653ef40b93b0c007bba380e89c0a34670b7243c403907aff2fac1035",
+          "after": "10b2512836cb13d6fb0476f77cd1d5b3264a20ffe75eb29088e71e3fcd4cbcbd"
         },
-        "FlightNormalMoveGap": {
-          "before": null,
-          "after": "60baa9feaa56dfcd99e2214c57d7a946fc58aa5fa7890341ac5ffc4a85726d0f"
+        "_eligible_sources": {
+          "before": "bb0508f3bacf3fa7624fba24f3b4f2f7fd51c54c29ffebfc26da1883240f3ef0",
+          "after": "cee2c6b6193e59dc211098a83fdaa067ec26ec81696659b93149a9855d8c18ad"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/retained_destruction_trigger_history.py": {
+      "before_sha256": "48809093d731d9d0ba5b047979ea98303840dcfb96a746ce4087517d3f0ca05e",
+      "after_sha256": "6216b566cc34466f6b5f953201c91370d27f06c590f386261ba57fab55974f8a",
+      "owners": {
+        "@module": {
+          "before": "d48345ac9443285098d10f2fb9935263221d791f3ac3956de19788f87041af86",
+          "after": "822a7f5c4d780dd84a456077e46204626d8cbcf122478f644d3c745c245180ad"
         },
-        "FlightNormalMoveGap.__init__": {
-          "before": null,
-          "after": "3d6cc1423fa86e4f8a0477b526b661f1c07413ec8c19d9e3720e4d188bef4ac3"
+        "validate_retention_trigger_history": {
+          "before": "88c3312296c6c3344e228610ad6a7ed3b16b162ed0423c83fdfd23632782d628",
+          "after": "e638d7852437ea4772a04637c2695cc7c5b7e77adf055dcf13ff940a059e18c0"
+        }
+      }
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_blood_legion_ir_support_2026_27.py": {
+      "before_sha256": "08f0a3919cf7e84466f2d1d5ac29bc346d7281ee3b2c548c6a1bf619823d772f",
+      "after_sha256": "5a5d47a3757bba5a52913de00b5ff6d153b532588747dd1a5f5fd86c79f3fed6",
+      "owners": {
+        "@module": {
+          "before": "ea2b5b1cc6797b0980ee107b1a8f82900afe009716d490cfb6519bd827aca2f1",
+          "after": "80cd19813304deb520112e7c34fb4a4585e501da6ca723de920e0eac6b487a6d"
         },
-        "FlightNormalMoveGapReason": {
-          "before": null,
-          "after": "089afeac42ab413c63f40040a4ef697ce9ed75ad79ef686e995394dbe3baac77"
+        "_coverage_payloads": {
+          "before": "884edcf65c10a31f7a623b2c013f34a58d836bd811c49537714607a39ee53be1",
+          "after": "ab0ee835ffcc35e1ba3bb5ebdc789cafa017ddb9ae47a59ad68971dc1ff281c1"
         },
-        "PreparedFlightNormalMove": {
-          "before": null,
-          "after": "6e3cca01b826701d7e36a0074956d19625419d7349e5d23bb06e73e04aa8b9c2"
+        "_end_phase_duration": {
+          "before": "1a9f4d966341725ee96c12efd49a1c3534475cbeff62d9ef33df4e4abafa7114",
+          "after": "982bf386a0cf5d905e5f84150a7f5144779f5bfb4e76ed260cd907051724d85b"
         },
-        "_BoundFlightRegistration": {
+        "_wrath_undeniable_payload": {
           "before": null,
-          "after": "b2bc7843a39811cf63d990d28f3415f48df06cc504600472efcc80ac40a2562e"
-        },
-        "_BoundFlightRegistration.__post_init__": {
-          "before": null,
-          "after": "cbe005ecb6714f89d3cf5cf16d38abe8cb93151e092b72de6ec1aa4ddb7cfb50"
-        },
-        "_FlightNormalMovePolicy": {
-          "before": null,
-          "after": "f650b3a238e6da14b797d011fbffb6104841b2004783c033a6639aeb7cade14a"
-        },
-        "_FlightNormalMovePolicy.choose": {
-          "before": null,
-          "after": "6e2c1cbd73631b01e7610f834ee8d84e2477fa47b58e04d333ea64d4b7270df4"
-        },
-        "_FlightOffer": {
-          "before": null,
-          "after": "c11d7f021ddd8a479b1c3622b3281dadfee45857d2549091d568f8bbf66f378a"
-        },
-        "_NativeRoute": {
-          "before": null,
-          "after": "6fd78bb37b3b3c6dca9923984db8f494d946e6f5668ac9551d9ec6b5b5aa2f93"
-        },
-        "_ground_proven_over_budget": {
-          "before": null,
-          "after": "a498fdecbbe9d45f0bf76fd5b441db98cf1477b81d58cee81eef7a664f973ec9"
-        },
-        "_normal_move_offer": {
-          "before": null,
-          "after": "f49c52d56c5a003df2ed7eddb3c0cb4ee3089bad49a36ba132497f1c9a6ed75b"
-        },
-        "_probe_normal_move": {
-          "before": null,
-          "after": "2b873fb87b91556e657a3e18e675ffcd63d89422f3d97b1121ff078c8ecacfb1"
-        },
-        "prepare_flight_normal_move": {
-          "before": null,
-          "after": "8710221a0d9bde8de3ccd88959ad3112c9753f4623d23b348c936a8eccea3e41"
+          "after": "87d3b77bb4fea5b7f846a5665511ca799109dda2b796b90c90bb604275c29351"
         }
       }
     },
     "tests/code_quality/test_engine_numerical_identity_admission.py": {
-      "before_sha256": "dc60e7514d82a6020794ce28faddebb70ec3ad08ae4a53cd87cc8629ee7595b0",
-      "after_sha256": "583fbb8e8e4c02f72391f7cc2acd67d0bd7463e2ca4700dd2593747709a06995",
+      "before_sha256": "583fbb8e8e4c02f72391f7cc2acd67d0bd7463e2ca4700dd2593747709a06995",
+      "after_sha256": "6b7cbe10a356022a130e4798d911ce3f493df3b142f0643be3eafe10c4403bc2",
       "owners": {
         "test_identity_inventory_uses_current_twelve_shards_and_native_cohort": {
-          "before": "336bbd0b8029fabf6fe7f99a5f47ed8dda458e0e765f38b6dd5a70ceb8f0d4e4",
-          "after": "0ba10d7a56551a447b2dca22ac6df9bddd1b185adfbeb9c7b3b8fc07ce23119e"
+          "before": "0ba10d7a56551a447b2dca22ac6df9bddd1b185adfbeb9c7b3b8fc07ce23119e",
+          "after": "9a9ccff4426c59661d1d96803cf3ef0483f73084900c5aeae46421358494eff1"
         }
       }
     },
-    "tests/infrastructure/adapters/test_flight_normal_move_policy.py": {
+    "tests/factions/chaos_daemons/integration/test_wrath_undeniable.py": {
       "before_sha256": null,
-      "after_sha256": "fd6b2bb257958438735312ec6510ad6257d3a88b549f37e51f2c5073a6ac3459",
+      "after_sha256": "b53cb4a098b808649c26aaa8b6b006ff666819577658d2186252da5ab112d47c",
       "owners": {
         "@module": {
           "before": null,
-          "after": "d1413edf423247c57141eb2de652ef4bba1c991bca4d7f550199cf5d288eadfc"
+          "after": "516ea2741fc6ec98fb86f53b94793fce93979e0c707600eacc98e930e3573d13"
         },
-        "_completed": {
+        "_play": {
           "before": null,
-          "after": "f8ef63ffc07154f0876e75fcb4de5463b36950c3c1f4fa7072b949c10f5cfdf3"
+          "after": "08a2455cc65758f6a0da49e5b579e2d26d40deb0c023ae7c86b2db79c79e592e"
         },
-        "_context": {
+        "_scene": {
           "before": null,
-          "after": "b512cc70fe8da33187ddad58812c076f1c71040f5c133b37826156cd5853d61a"
+          "after": "9853f6a6849f6efe98d2d783c9d528e17ea25162d6a030c8de04aa5354914324"
         },
-        "_move": {
+        "test_wrath_undeniable_native_retention_and_replay": {
           "before": null,
-          "after": "367563baa6503dd181799a4ac52d5a15eaed918e45dac8987a94f0bfa0724378"
+          "after": "17e3f47972a0c549fb59245772ebce34200b6ce587e31919370f77671b1fb073"
         },
-        "_prefix": {
+        "wrath_definitions": {
           "before": null,
-          "after": "6e1dbbb55601a28f2aa878d30bb456c28f2e9de957f987aa05778b07a9ab7f80"
+          "after": "cf0e2776b99a76ef5fee1859b30f0bc0969ef8297aa37e252427b7d2968c5b1e"
+        }
+      }
+    },
+    "tests/infrastructure/source_governance/unit/test_blocked_row_classification.py": {
+      "before_sha256": "a4738abd8a932344b91fe012f10ca3c7a60e2c8b0dea3b2278856919e60b1c97",
+      "after_sha256": "32d202415e5947bed75e740362d2d2b40de2ffe3af282e775e305b41bf501f33",
+      "owners": {
+        "test_phase17i_existing_template_report_uses_phase17c_template_families": {
+          "before": "450794f4b881b9a396de52744f91d5116c0599a4b52e0029fb02f437faba0f99",
+          "after": "1e438ff7dcacca4a782183aacd35599676c992ce4f4b455c44fb356093db3e29"
         },
-        "_reproduces": {
-          "before": null,
-          "after": "25ba9ebf22940d190ff00102105af90abee003bb164a9a931d063c80a647e410"
+        "test_phase17i_missing_capability_report_groups_rows_by_family": {
+          "before": "3b6161a003af9433b78221b9fffb6d8cf2f8b232ab8915cb9834c6195b83075c",
+          "after": "246ff1a7e05cd64ad8e621bd203dd9652042a5b518ec26f897f5dea5b05d570f"
         },
-        "_submit_path": {
-          "before": null,
-          "after": "ec87cadaf1f5300930c71a6f0252467b8ec612353556fb6650a11dc9aa1bbbb1"
-        },
-        "_terrain": {
-          "before": null,
-          "after": "b8ac11b2db4af5edc3f1398b398c49c3e71f856f560974011810953241ebb94c"
-        },
-        "test_fixed_destination_flight_policy_and_native_comparison": {
-          "before": null,
-          "after": "c42e30d40c58ccea3e0ebb6186505b84a3dde762d9bc0ae98247272051557e87"
+        "test_phase17i_source_text_boundaries_are_explicit": {
+          "before": "5530a63177132d6f860dfac5efc5a2bb4ef47dd82d5db32a8eb46e6c19fb2a45",
+          "after": "6405f4bd29f3b814b5dc39325131db22e0446cb2d5a7679a753e5e0c4192857f"
         }
       }
     }
   },
   "rows": {
+    "FACTION_INTEGRATION.md": {
+      "category": "rule_semantics",
+      "operations": [
+        "supported-acts-current-source-documentation"
+      ],
+      "selected_families": [],
+      "rationale": "Record the Wrath Undeniable source and execution status.",
+      "source_obligation": "July Chaos Daemons faction pack page 124 and core 05.04.05. Use the attacking unit's Fight target declaration, verify the paid friendly Khorne Daemon target, and resolve the mandatory 4+ melee casualty check and phase-bounded retained Fight.",
+      "unchanged_work": "Target discovery, Command Point mutation, the D6 executor, damage and physical cleanup, and replay serialization use existing owners. The source condition reuses the existing melee provenance gate and model attack history scan."
+    },
     "ci/test_shards/durations.json": {
       "category": "rule_semantics",
       "operations": [
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Preserve the exact 6,725 case weights from the merged faction base and both reviewed flight weights in the twelve-shard assignment.",
-      "source_obligation": "Core Rules section 21.03, the actual 2-inch native modifier, and the paired ordinary viewer submissions with exact replay.",
-      "unchanged_work": "Trusted preparation submits at most two explicitly supplied paths through existing native validation on disposable forks. The actor callback receives one issued action. Existing workloads do not register this opt-in policy."
+      "rationale": "Preserve inherited memberships and weights and schedule the measured Fight and Phase 17I cases.",
+      "source_obligation": "July Chaos Daemons faction pack page 124 and core 05.04.05. Use the attacking unit's Fight target declaration, verify the paid friendly Khorne Daemon target, and resolve the mandatory 4+ melee casualty check and phase-bounded retained Fight.",
+      "unchanged_work": "Target discovery, Command Point mutation, the D6 executor, damage and physical cleanup, and replay serialization use existing owners. The source condition reuses the existing melee provenance gate and model attack history scan."
     },
     "ci/test_shards/shard-1.txt": {
       "category": "rule_semantics",
@@ -388,9 +514,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Preserve the exact 6,725 case weights from the merged faction base and both reviewed flight weights in the twelve-shard assignment.",
-      "source_obligation": "Core Rules section 21.03, the actual 2-inch native modifier, and the paired ordinary viewer submissions with exact replay.",
-      "unchanged_work": "Trusted preparation submits at most two explicitly supplied paths through existing native validation on disposable forks. The actor callback receives one issued action. Existing workloads do not register this opt-in policy."
+      "rationale": "Preserve inherited memberships and weights and schedule the measured Fight and Phase 17I cases.",
+      "source_obligation": "July Chaos Daemons faction pack page 124 and core 05.04.05. Use the attacking unit's Fight target declaration, verify the paid friendly Khorne Daemon target, and resolve the mandatory 4+ melee casualty check and phase-bounded retained Fight.",
+      "unchanged_work": "Target discovery, Command Point mutation, the D6 executor, damage and physical cleanup, and replay serialization use existing owners. The source condition reuses the existing melee provenance gate and model attack history scan."
     },
     "ci/test_shards/shard-10.txt": {
       "category": "rule_semantics",
@@ -398,9 +524,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Preserve the exact 6,725 case weights from the merged faction base and both reviewed flight weights in the twelve-shard assignment.",
-      "source_obligation": "Core Rules section 21.03, the actual 2-inch native modifier, and the paired ordinary viewer submissions with exact replay.",
-      "unchanged_work": "Trusted preparation submits at most two explicitly supplied paths through existing native validation on disposable forks. The actor callback receives one issued action. Existing workloads do not register this opt-in policy."
+      "rationale": "Preserve inherited memberships and weights and schedule the measured Fight and Phase 17I cases.",
+      "source_obligation": "July Chaos Daemons faction pack page 124 and core 05.04.05. Use the attacking unit's Fight target declaration, verify the paid friendly Khorne Daemon target, and resolve the mandatory 4+ melee casualty check and phase-bounded retained Fight.",
+      "unchanged_work": "Target discovery, Command Point mutation, the D6 executor, damage and physical cleanup, and replay serialization use existing owners. The source condition reuses the existing melee provenance gate and model attack history scan."
     },
     "ci/test_shards/shard-11.txt": {
       "category": "rule_semantics",
@@ -408,9 +534,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Preserve the exact 6,725 case weights from the merged faction base and both reviewed flight weights in the twelve-shard assignment.",
-      "source_obligation": "Core Rules section 21.03, the actual 2-inch native modifier, and the paired ordinary viewer submissions with exact replay.",
-      "unchanged_work": "Trusted preparation submits at most two explicitly supplied paths through existing native validation on disposable forks. The actor callback receives one issued action. Existing workloads do not register this opt-in policy."
+      "rationale": "Preserve inherited memberships and weights and schedule the measured Fight and Phase 17I cases.",
+      "source_obligation": "July Chaos Daemons faction pack page 124 and core 05.04.05. Use the attacking unit's Fight target declaration, verify the paid friendly Khorne Daemon target, and resolve the mandatory 4+ melee casualty check and phase-bounded retained Fight.",
+      "unchanged_work": "Target discovery, Command Point mutation, the D6 executor, damage and physical cleanup, and replay serialization use existing owners. The source condition reuses the existing melee provenance gate and model attack history scan."
     },
     "ci/test_shards/shard-12.txt": {
       "category": "rule_semantics",
@@ -418,9 +544,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Preserve the exact 6,725 case weights from the merged faction base and both reviewed flight weights in the twelve-shard assignment.",
-      "source_obligation": "Core Rules section 21.03, the actual 2-inch native modifier, and the paired ordinary viewer submissions with exact replay.",
-      "unchanged_work": "Trusted preparation submits at most two explicitly supplied paths through existing native validation on disposable forks. The actor callback receives one issued action. Existing workloads do not register this opt-in policy."
+      "rationale": "Preserve inherited memberships and weights and schedule the measured Fight and Phase 17I cases.",
+      "source_obligation": "July Chaos Daemons faction pack page 124 and core 05.04.05. Use the attacking unit's Fight target declaration, verify the paid friendly Khorne Daemon target, and resolve the mandatory 4+ melee casualty check and phase-bounded retained Fight.",
+      "unchanged_work": "Target discovery, Command Point mutation, the D6 executor, damage and physical cleanup, and replay serialization use existing owners. The source condition reuses the existing melee provenance gate and model attack history scan."
     },
     "ci/test_shards/shard-4.txt": {
       "category": "rule_semantics",
@@ -428,9 +554,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Preserve the exact 6,725 case weights from the merged faction base and both reviewed flight weights in the twelve-shard assignment.",
-      "source_obligation": "Core Rules section 21.03, the actual 2-inch native modifier, and the paired ordinary viewer submissions with exact replay.",
-      "unchanged_work": "Trusted preparation submits at most two explicitly supplied paths through existing native validation on disposable forks. The actor callback receives one issued action. Existing workloads do not register this opt-in policy."
+      "rationale": "Preserve inherited memberships and weights and schedule the measured Fight and Phase 17I cases.",
+      "source_obligation": "July Chaos Daemons faction pack page 124 and core 05.04.05. Use the attacking unit's Fight target declaration, verify the paid friendly Khorne Daemon target, and resolve the mandatory 4+ melee casualty check and phase-bounded retained Fight.",
+      "unchanged_work": "Target discovery, Command Point mutation, the D6 executor, damage and physical cleanup, and replay serialization use existing owners. The source condition reuses the existing melee provenance gate and model attack history scan."
     },
     "ci/test_shards/shard-5.txt": {
       "category": "rule_semantics",
@@ -438,9 +564,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Preserve the exact 6,725 case weights from the merged faction base and both reviewed flight weights in the twelve-shard assignment.",
-      "source_obligation": "Core Rules section 21.03, the actual 2-inch native modifier, and the paired ordinary viewer submissions with exact replay.",
-      "unchanged_work": "Trusted preparation submits at most two explicitly supplied paths through existing native validation on disposable forks. The actor callback receives one issued action. Existing workloads do not register this opt-in policy."
+      "rationale": "Preserve inherited memberships and weights and schedule the measured Fight and Phase 17I cases.",
+      "source_obligation": "July Chaos Daemons faction pack page 124 and core 05.04.05. Use the attacking unit's Fight target declaration, verify the paid friendly Khorne Daemon target, and resolve the mandatory 4+ melee casualty check and phase-bounded retained Fight.",
+      "unchanged_work": "Target discovery, Command Point mutation, the D6 executor, damage and physical cleanup, and replay serialization use existing owners. The source condition reuses the existing melee provenance gate and model attack history scan."
     },
     "ci/test_shards/shard-6.txt": {
       "category": "rule_semantics",
@@ -448,9 +574,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Preserve the exact 6,725 case weights from the merged faction base and both reviewed flight weights in the twelve-shard assignment.",
-      "source_obligation": "Core Rules section 21.03, the actual 2-inch native modifier, and the paired ordinary viewer submissions with exact replay.",
-      "unchanged_work": "Trusted preparation submits at most two explicitly supplied paths through existing native validation on disposable forks. The actor callback receives one issued action. Existing workloads do not register this opt-in policy."
+      "rationale": "Preserve inherited memberships and weights and schedule the measured Fight and Phase 17I cases.",
+      "source_obligation": "July Chaos Daemons faction pack page 124 and core 05.04.05. Use the attacking unit's Fight target declaration, verify the paid friendly Khorne Daemon target, and resolve the mandatory 4+ melee casualty check and phase-bounded retained Fight.",
+      "unchanged_work": "Target discovery, Command Point mutation, the D6 executor, damage and physical cleanup, and replay serialization use existing owners. The source condition reuses the existing melee provenance gate and model attack history scan."
     },
     "ci/test_shards/shard-7.txt": {
       "category": "rule_semantics",
@@ -458,9 +584,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Preserve the exact 6,725 case weights from the merged faction base and both reviewed flight weights in the twelve-shard assignment.",
-      "source_obligation": "Core Rules section 21.03, the actual 2-inch native modifier, and the paired ordinary viewer submissions with exact replay.",
-      "unchanged_work": "Trusted preparation submits at most two explicitly supplied paths through existing native validation on disposable forks. The actor callback receives one issued action. Existing workloads do not register this opt-in policy."
+      "rationale": "Preserve inherited memberships and weights and schedule the measured Fight and Phase 17I cases.",
+      "source_obligation": "July Chaos Daemons faction pack page 124 and core 05.04.05. Use the attacking unit's Fight target declaration, verify the paid friendly Khorne Daemon target, and resolve the mandatory 4+ melee casualty check and phase-bounded retained Fight.",
+      "unchanged_work": "Target discovery, Command Point mutation, the D6 executor, damage and physical cleanup, and replay serialization use existing owners. The source condition reuses the existing melee provenance gate and model attack history scan."
     },
     "ci/test_shards/shard-8.txt": {
       "category": "rule_semantics",
@@ -468,9 +594,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Preserve the exact 6,725 case weights from the merged faction base and both reviewed flight weights in the twelve-shard assignment.",
-      "source_obligation": "Core Rules section 21.03, the actual 2-inch native modifier, and the paired ordinary viewer submissions with exact replay.",
-      "unchanged_work": "Trusted preparation submits at most two explicitly supplied paths through existing native validation on disposable forks. The actor callback receives one issued action. Existing workloads do not register this opt-in policy."
+      "rationale": "Preserve inherited memberships and weights and schedule the measured Fight and Phase 17I cases.",
+      "source_obligation": "July Chaos Daemons faction pack page 124 and core 05.04.05. Use the attacking unit's Fight target declaration, verify the paid friendly Khorne Daemon target, and resolve the mandatory 4+ melee casualty check and phase-bounded retained Fight.",
+      "unchanged_work": "Target discovery, Command Point mutation, the D6 executor, damage and physical cleanup, and replay serialization use existing owners. The source condition reuses the existing melee provenance gate and model attack history scan."
     },
     "ci/test_shards/shard-9.txt": {
       "category": "rule_semantics",
@@ -478,9 +604,9 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Preserve the exact 6,725 case weights from the merged faction base and both reviewed flight weights in the twelve-shard assignment.",
-      "source_obligation": "Core Rules section 21.03, the actual 2-inch native modifier, and the paired ordinary viewer submissions with exact replay.",
-      "unchanged_work": "Trusted preparation submits at most two explicitly supplied paths through existing native validation on disposable forks. The actor callback receives one issued action. Existing workloads do not register this opt-in policy."
+      "rationale": "Preserve inherited memberships and weights and schedule the measured Fight and Phase 17I cases.",
+      "source_obligation": "July Chaos Daemons faction pack page 124 and core 05.04.05. Use the attacking unit's Fight target declaration, verify the paid friendly Khorne Daemon target, and resolve the mandatory 4+ melee casualty check and phase-bounded retained Fight.",
+      "unchanged_work": "Target discovery, Command Point mutation, the D6 executor, damage and physical cleanup, and replay serialization use existing owners. The source condition reuses the existing melee provenance gate and model attack history scan."
     },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
@@ -488,9 +614,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Refresh published contract examples and manifests that carry the verified runtime build identity.",
-      "source_obligation": "Core Rules section 21.03, the actual 2-inch native modifier, and the paired ordinary viewer submissions with exact replay.",
-      "unchanged_work": "Trusted preparation submits at most two explicitly supplied paths through existing native validation on disposable forks. The actor callback receives one issued action. Existing workloads do not register this opt-in policy."
+      "rationale": "Refresh the exact runtime build identity and maintained contract examples.",
+      "source_obligation": "July Chaos Daemons faction pack page 124 and core 05.04.05. Use the attacking unit's Fight target declaration, verify the paid friendly Khorne Daemon target, and resolve the mandatory 4+ melee casualty check and phase-bounded retained Fight.",
+      "unchanged_work": "Target discovery, Command Point mutation, the D6 executor, damage and physical cleanup, and replay serialization use existing owners. The source condition reuses the existing melee provenance gate and model attack history scan."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
@@ -498,9 +624,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Refresh published contract examples and manifests that carry the verified runtime build identity.",
-      "source_obligation": "Core Rules section 21.03, the actual 2-inch native modifier, and the paired ordinary viewer submissions with exact replay.",
-      "unchanged_work": "Trusted preparation submits at most two explicitly supplied paths through existing native validation on disposable forks. The actor callback receives one issued action. Existing workloads do not register this opt-in policy."
+      "rationale": "Refresh the exact runtime build identity and maintained contract examples.",
+      "source_obligation": "July Chaos Daemons faction pack page 124 and core 05.04.05. Use the attacking unit's Fight target declaration, verify the paid friendly Khorne Daemon target, and resolve the mandatory 4+ melee casualty check and phase-bounded retained Fight.",
+      "unchanged_work": "Target discovery, Command Point mutation, the D6 executor, damage and physical cleanup, and replay serialization use existing owners. The source condition reuses the existing melee provenance gate and model attack history scan."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
@@ -508,9 +634,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Refresh published contract examples and manifests that carry the verified runtime build identity.",
-      "source_obligation": "Core Rules section 21.03, the actual 2-inch native modifier, and the paired ordinary viewer submissions with exact replay.",
-      "unchanged_work": "Trusted preparation submits at most two explicitly supplied paths through existing native validation on disposable forks. The actor callback receives one issued action. Existing workloads do not register this opt-in policy."
+      "rationale": "Refresh the exact runtime build identity and maintained contract examples.",
+      "source_obligation": "July Chaos Daemons faction pack page 124 and core 05.04.05. Use the attacking unit's Fight target declaration, verify the paid friendly Khorne Daemon target, and resolve the mandatory 4+ melee casualty check and phase-bounded retained Fight.",
+      "unchanged_work": "Target discovery, Command Point mutation, the D6 executor, damage and physical cleanup, and replay serialization use existing owners. The source condition reuses the existing melee provenance gate and model attack history scan."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
@@ -518,9 +644,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Refresh published contract examples and manifests that carry the verified runtime build identity.",
-      "source_obligation": "Core Rules section 21.03, the actual 2-inch native modifier, and the paired ordinary viewer submissions with exact replay.",
-      "unchanged_work": "Trusted preparation submits at most two explicitly supplied paths through existing native validation on disposable forks. The actor callback receives one issued action. Existing workloads do not register this opt-in policy."
+      "rationale": "Refresh the exact runtime build identity and maintained contract examples.",
+      "source_obligation": "July Chaos Daemons faction pack page 124 and core 05.04.05. Use the attacking unit's Fight target declaration, verify the paid friendly Khorne Daemon target, and resolve the mandatory 4+ melee casualty check and phase-bounded retained Fight.",
+      "unchanged_work": "Target discovery, Command Point mutation, the D6 executor, damage and physical cleanup, and replay serialization use existing owners. The source condition reuses the existing melee provenance gate and model attack history scan."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
@@ -528,9 +654,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Refresh published contract examples and manifests that carry the verified runtime build identity.",
-      "source_obligation": "Core Rules section 21.03, the actual 2-inch native modifier, and the paired ordinary viewer submissions with exact replay.",
-      "unchanged_work": "Trusted preparation submits at most two explicitly supplied paths through existing native validation on disposable forks. The actor callback receives one issued action. Existing workloads do not register this opt-in policy."
+      "rationale": "Refresh the exact runtime build identity and maintained contract examples.",
+      "source_obligation": "July Chaos Daemons faction pack page 124 and core 05.04.05. Use the attacking unit's Fight target declaration, verify the paid friendly Khorne Daemon target, and resolve the mandatory 4+ melee casualty check and phase-bounded retained Fight.",
+      "unchanged_work": "Target discovery, Command Point mutation, the D6 executor, damage and physical cleanup, and replay serialization use existing owners. The source condition reuses the existing melee provenance gate and model attack history scan."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
@@ -538,9 +664,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Refresh published contract examples and manifests that carry the verified runtime build identity.",
-      "source_obligation": "Core Rules section 21.03, the actual 2-inch native modifier, and the paired ordinary viewer submissions with exact replay.",
-      "unchanged_work": "Trusted preparation submits at most two explicitly supplied paths through existing native validation on disposable forks. The actor callback receives one issued action. Existing workloads do not register this opt-in policy."
+      "rationale": "Refresh the exact runtime build identity and maintained contract examples.",
+      "source_obligation": "July Chaos Daemons faction pack page 124 and core 05.04.05. Use the attacking unit's Fight target declaration, verify the paid friendly Khorne Daemon target, and resolve the mandatory 4+ melee casualty check and phase-bounded retained Fight.",
+      "unchanged_work": "Target discovery, Command Point mutation, the D6 executor, damage and physical cleanup, and replay serialization use existing owners. The source condition reuses the existing melee provenance gate and model attack history scan."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
@@ -548,9 +674,9 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Refresh published contract examples and manifests that carry the verified runtime build identity.",
-      "source_obligation": "Core Rules section 21.03, the actual 2-inch native modifier, and the paired ordinary viewer submissions with exact replay.",
-      "unchanged_work": "Trusted preparation submits at most two explicitly supplied paths through existing native validation on disposable forks. The actor callback receives one issued action. Existing workloads do not register this opt-in policy."
+      "rationale": "Refresh the exact runtime build identity and maintained contract examples.",
+      "source_obligation": "July Chaos Daemons faction pack page 124 and core 05.04.05. Use the attacking unit's Fight target declaration, verify the paid friendly Khorne Daemon target, and resolve the mandatory 4+ melee casualty check and phase-bounded retained Fight.",
+      "unchanged_work": "Target discovery, Command Point mutation, the D6 executor, damage and physical cleanup, and replay serialization use existing owners. The source condition reuses the existing melee provenance gate and model attack history scan."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
@@ -558,25 +684,77 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Refresh published contract examples and manifests that carry the verified runtime build identity.",
-      "source_obligation": "Core Rules section 21.03, the actual 2-inch native modifier, and the paired ordinary viewer submissions with exact replay.",
-      "unchanged_work": "Trusted preparation submits at most two explicitly supplied paths through existing native validation on disposable forks. The actor callback receives one issued action. Existing workloads do not register this opt-in policy."
+      "rationale": "Refresh the exact runtime build identity and maintained contract examples.",
+      "source_obligation": "July Chaos Daemons faction pack page 124 and core 05.04.05. Use the attacking unit's Fight target declaration, verify the paid friendly Khorne Daemon target, and resolve the mandatory 4+ melee casualty check and phase-bounded retained Fight.",
+      "unchanged_work": "Target discovery, Command Point mutation, the D6 executor, damage and physical cleanup, and replay serialization use existing owners. The source condition reuses the existing melee provenance gate and model attack history scan."
     },
-    "data/source_audits/ci64_provenance_v1/stage3-flight-normal-move-test-v1.json": {
+    "data/generated/ability_coverage/cross_source_semantic_equivalence.json": {
       "category": "rule_semantics",
       "operations": [
-        "stage3-flight-normal-move-test-admission"
+        "phase-end-healing-source-and-report"
       ],
       "selected_families": [],
-      "rationale": "Append both reviewed flight cases after the merged Skulls Beget Blood audit chain and retain its source, case and predecessor checks.",
-      "source_obligation": "Core Rules section 21.03, the actual 2-inch native modifier, and the paired ordinary viewer submissions with exact replay.",
-      "unchanged_work": "Trusted preparation submits at most two explicitly supplied paths through existing native validation on disposable forks. The actor callback receives one issued action. Existing workloads do not register this opt-in policy."
+      "rationale": "Record the Wrath Undeniable source and execution status.",
+      "source_obligation": "July Chaos Daemons faction pack page 124 and core 05.04.05. Use the attacking unit's Fight target declaration, verify the paid friendly Khorne Daemon target, and resolve the mandatory 4+ melee casualty check and phase-bounded retained Fight.",
+      "unchanged_work": "Target discovery, Command Point mutation, the D6 executor, damage and physical cleanup, and replay serialization use existing owners. The source condition reuses the existing melee provenance gate and model attack history scan."
     },
-    "docs/AI_POLICY_INTERFACE.md": {
+    "data/generated/ability_coverage/runtime_content_semantic_coverage.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "supported-acts-current-semantic-artifact"
+      ],
+      "selected_families": [],
+      "rationale": "Record the Wrath Undeniable source and execution status.",
+      "source_obligation": "July Chaos Daemons faction pack page 124 and core 05.04.05. Use the attacking unit's Fight target declaration, verify the paid friendly Khorne Daemon target, and resolve the mandatory 4+ melee casualty check and phase-bounded retained Fight.",
+      "unchanged_work": "Target discovery, Command Point mutation, the D6 executor, damage and physical cleanup, and replay serialization use existing owners. The source condition reuses the existing melee provenance gate and model attack history scan."
+    },
+    "data/source_audits/ci64_provenance_v1/wrath-undeniable-transition-v1.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "wrath-undeniable-test-admission"
+      ],
+      "selected_families": [],
+      "rationale": "Bind the one-row source successor and validate melee casualty eligibility, retention and replay.",
+      "source_obligation": "July Chaos Daemons faction pack page 124 and core 05.04.05. Use the attacking unit's Fight target declaration, verify the paid friendly Khorne Daemon target, and resolve the mandatory 4+ melee casualty check and phase-bounded retained Fight.",
+      "unchanged_work": "Target discovery, Command Point mutation, the D6 executor, damage and physical cleanup, and replay serialization use existing owners. The source condition reuses the existing melee provenance gate and model attack history scan."
+    },
+    "docs/ABILITY_SUPPORT_MATRIX_V2.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Document the opt-in fixed-destination flight mode and its narrow performance ownership.",
+      "rationale": "Record the Wrath Undeniable source and execution status.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/ADAPTER_DECISION_CONTRACT.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Record the Wrath Undeniable source and execution status.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/CROSS_SOURCE_SEMANTIC_EQUIVALENCE.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Record the Wrath Undeniable source and execution status.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/factions/audit/chaos-daemons.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Record the Wrath Undeniable source and execution status.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/factions/chaos-daemons.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Record the Wrath Undeniable source and execution status.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -584,7 +762,7 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Document the opt-in fixed-destination flight mode and its narrow performance ownership.",
+      "rationale": "Record the Wrath Undeniable source and execution status.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -599,14 +777,16 @@
         "round4-battle-shock-event-wounds",
         "phase-end-healing-test-admission",
         "sheathed-in-brass-test-admission",
+        "blood-begets-skulls-test-admission",
         "stage3-ordinary-melee-test-admission",
         "skulls-beget-blood-test-admission",
-        "stage3-flight-normal-move-test-admission"
+        "stage3-flight-normal-move-test-admission",
+        "wrath-undeniable-test-admission"
       ],
       "selected_families": [],
-      "rationale": "Append both reviewed flight cases after the merged Skulls Beget Blood audit chain and retain its source, case and predecessor checks.",
-      "source_obligation": "Core Rules section 21.03, the actual 2-inch native modifier, and the paired ordinary viewer submissions with exact replay.",
-      "unchanged_work": "Trusted preparation submits at most two explicitly supplied paths through existing native validation on disposable forks. The actor callback receives one issued action. Existing workloads do not register this opt-in policy."
+      "rationale": "Bind the one-row source successor and validate melee casualty eligibility, retention and replay.",
+      "source_obligation": "July Chaos Daemons faction pack page 124 and core 05.04.05. Use the attacking unit's Fight target declaration, verify the paid friendly Khorne Daemon target, and resolve the mandatory 4+ melee casualty check and phase-bounded retained Fight.",
+      "unchanged_work": "Target discovery, Command Point mutation, the D6 executor, damage and physical cleanup, and replay serialization use existing owners. The source condition reuses the existing melee provenance gate and model attack history scan."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
@@ -615,19 +795,82 @@
         "phase-end-healing-source-and-report"
       ],
       "selected_families": [],
-      "rationale": "Refresh published contract examples and manifests that carry the verified runtime build identity.",
-      "source_obligation": "Core Rules section 21.03, the actual 2-inch native modifier, and the paired ordinary viewer submissions with exact replay.",
-      "unchanged_work": "Trusted preparation submits at most two explicitly supplied paths through existing native validation on disposable forks. The actor callback receives one issued action. Existing workloads do not register this opt-in policy."
+      "rationale": "Refresh the exact runtime build identity and maintained contract examples.",
+      "source_obligation": "July Chaos Daemons faction pack page 124 and core 05.04.05. Use the attacking unit's Fight target declaration, verify the paid friendly Khorne Daemon target, and resolve the mandatory 4+ melee casualty check and phase-bounded retained Fight.",
+      "unchanged_work": "Target discovery, Command Point mutation, the D6 executor, damage and physical cleanup, and replay serialization use existing owners. The source condition reuses the existing melee provenance gate and model attack history scan."
     },
-    "src/warhammer40k_core/ai/flight_normal_move_policy.py": {
+    "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/detachments/blood_legion/stratagems.py": {
       "category": "rule_semantics",
       "operations": [
-        "stage3-flight-normal-move-policy"
+        "skulls-beget-blood-shooting-resolution",
+        "wrath-undeniable-fight-retention"
       ],
       "selected_families": [],
-      "rationale": "Choose between issued modes for one already selected destination using native completion receipts or a native direct 3D ground rejection receipt.",
-      "source_obligation": "Core Rules section 21.03, the actual 2-inch native modifier, and the paired ordinary viewer submissions with exact replay.",
-      "unchanged_work": "Trusted preparation submits at most two explicitly supplied paths through existing native validation on disposable forks. The actor callback receives one issued action. Existing workloads do not register this opt-in policy."
+      "rationale": "Reuse the existing selected-target Stratagem and phase-limited retained Fight continuation.",
+      "source_obligation": "July Chaos Daemons faction pack page 124 and core 05.04.05. Use the attacking unit's Fight target declaration, verify the paid friendly Khorne Daemon target, and resolve the mandatory 4+ melee casualty check and phase-bounded retained Fight.",
+      "unchanged_work": "Target discovery, Command Point mutation, the D6 executor, damage and physical cleanup, and replay serialization use existing owners. The source condition reuses the existing melee provenance gate and model attack history scan."
+    },
+    "src/warhammer40k_core/engine/model_attack_history.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "wrath-undeniable-fight-retention"
+      ],
+      "selected_families": [],
+      "rationale": "Reuse the existing selected-target Stratagem and phase-limited retained Fight continuation.",
+      "source_obligation": "July Chaos Daemons faction pack page 124 and core 05.04.05. Use the attacking unit's Fight target declaration, verify the paid friendly Khorne Daemon target, and resolve the mandatory 4+ melee casualty check and phase-bounded retained Fight.",
+      "unchanged_work": "Target discovery, Command Point mutation, the D6 executor, damage and physical cleanup, and replay serialization use existing owners. The source condition reuses the existing melee provenance gate and model attack history scan."
+    },
+    "src/warhammer40k_core/engine/retained_attack_grants.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "wrath-undeniable-fight-retention"
+      ],
+      "selected_families": [],
+      "rationale": "Reuse the existing selected-target Stratagem and phase-limited retained Fight continuation.",
+      "source_obligation": "July Chaos Daemons faction pack page 124 and core 05.04.05. Use the attacking unit's Fight target declaration, verify the paid friendly Khorne Daemon target, and resolve the mandatory 4+ melee casualty check and phase-bounded retained Fight.",
+      "unchanged_work": "Target discovery, Command Point mutation, the D6 executor, damage and physical cleanup, and replay serialization use existing owners. The source condition reuses the existing melee provenance gate and model attack history scan."
+    },
+    "src/warhammer40k_core/engine/retained_attack_permissions.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "wrath-undeniable-fight-retention"
+      ],
+      "selected_families": [],
+      "rationale": "Reuse the existing selected-target Stratagem and phase-limited retained Fight continuation.",
+      "source_obligation": "July Chaos Daemons faction pack page 124 and core 05.04.05. Use the attacking unit's Fight target declaration, verify the paid friendly Khorne Daemon target, and resolve the mandatory 4+ melee casualty check and phase-bounded retained Fight.",
+      "unchanged_work": "Target discovery, Command Point mutation, the D6 executor, damage and physical cleanup, and replay serialization use existing owners. The source condition reuses the existing melee provenance gate and model attack history scan."
+    },
+    "src/warhammer40k_core/engine/retained_destruction_selection.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "wrath-undeniable-fight-retention"
+      ],
+      "selected_families": [],
+      "rationale": "Reuse the existing selected-target Stratagem and phase-limited retained Fight continuation.",
+      "source_obligation": "July Chaos Daemons faction pack page 124 and core 05.04.05. Use the attacking unit's Fight target declaration, verify the paid friendly Khorne Daemon target, and resolve the mandatory 4+ melee casualty check and phase-bounded retained Fight.",
+      "unchanged_work": "Target discovery, Command Point mutation, the D6 executor, damage and physical cleanup, and replay serialization use existing owners. The source condition reuses the existing melee provenance gate and model attack history scan."
+    },
+    "src/warhammer40k_core/engine/retained_destruction_trigger_history.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "wrath-undeniable-fight-retention"
+      ],
+      "selected_families": [],
+      "rationale": "Reuse the existing selected-target Stratagem and phase-limited retained Fight continuation.",
+      "source_obligation": "July Chaos Daemons faction pack page 124 and core 05.04.05. Use the attacking unit's Fight target declaration, verify the paid friendly Khorne Daemon target, and resolve the mandatory 4+ melee casualty check and phase-bounded retained Fight.",
+      "unchanged_work": "Target discovery, Command Point mutation, the D6 executor, damage and physical cleanup, and replay serialization use existing owners. The source condition reuses the existing melee provenance gate and model attack history scan."
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_blood_legion_ir_support_2026_27.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "blood-begets-skulls-source-activation",
+        "skulls-beget-blood-shooting-resolution",
+        "wrath-undeniable-fight-retention"
+      ],
+      "selected_families": [],
+      "rationale": "Reuse the existing selected-target Stratagem and phase-limited retained Fight continuation.",
+      "source_obligation": "July Chaos Daemons faction pack page 124 and core 05.04.05. Use the attacking unit's Fight target declaration, verify the paid friendly Khorne Daemon target, and resolve the mandatory 4+ melee casualty check and phase-bounded retained Fight.",
+      "unchanged_work": "Target discovery, Command Point mutation, the D6 executor, damage and physical cleanup, and replay serialization use existing owners. The source condition reuses the existing melee provenance gate and model attack history scan."
     },
     "tests/code_quality/test_engine_numerical_identity_admission.py": {
       "category": "rule_semantics",
@@ -637,22 +880,33 @@
         "round4-battle-shock-event-wounds",
         "stage3-ordinary-melee-test-admission",
         "skulls-beget-blood-test-admission",
-        "stage3-flight-normal-move-test-admission"
+        "stage3-flight-normal-move-test-admission",
+        "wrath-undeniable-test-admission"
       ],
       "selected_families": [],
-      "rationale": "Append both reviewed flight cases after the merged Skulls Beget Blood audit chain and retain its source, case and predecessor checks.",
-      "source_obligation": "Core Rules section 21.03, the actual 2-inch native modifier, and the paired ordinary viewer submissions with exact replay.",
-      "unchanged_work": "Trusted preparation submits at most two explicitly supplied paths through existing native validation on disposable forks. The actor callback receives one issued action. Existing workloads do not register this opt-in policy."
+      "rationale": "Bind the one-row source successor and validate melee casualty eligibility, retention and replay.",
+      "source_obligation": "July Chaos Daemons faction pack page 124 and core 05.04.05. Use the attacking unit's Fight target declaration, verify the paid friendly Khorne Daemon target, and resolve the mandatory 4+ melee casualty check and phase-bounded retained Fight.",
+      "unchanged_work": "Target discovery, Command Point mutation, the D6 executor, damage and physical cleanup, and replay serialization use existing owners. The source condition reuses the existing melee provenance gate and model attack history scan."
     },
-    "tests/infrastructure/adapters/test_flight_normal_move_policy.py": {
+    "tests/factions/chaos_daemons/integration/test_wrath_undeniable.py": {
       "category": "rule_semantics",
       "operations": [
-        "stage3-flight-normal-move-policy"
+        "wrath-undeniable-test-admission"
       ],
       "selected_families": [],
-      "rationale": "Choose between issued modes for one already selected destination using native completion receipts or a native direct 3D ground rejection receipt.",
-      "source_obligation": "Core Rules section 21.03, the actual 2-inch native modifier, and the paired ordinary viewer submissions with exact replay.",
-      "unchanged_work": "Trusted preparation submits at most two explicitly supplied paths through existing native validation on disposable forks. The actor callback receives one issued action. Existing workloads do not register this opt-in policy."
+      "rationale": "Bind the one-row source successor and validate melee casualty eligibility, retention and replay.",
+      "source_obligation": "July Chaos Daemons faction pack page 124 and core 05.04.05. Use the attacking unit's Fight target declaration, verify the paid friendly Khorne Daemon target, and resolve the mandatory 4+ melee casualty check and phase-bounded retained Fight.",
+      "unchanged_work": "Target discovery, Command Point mutation, the D6 executor, damage and physical cleanup, and replay serialization use existing owners. The source condition reuses the existing melee provenance gate and model attack history scan."
+    },
+    "tests/infrastructure/source_governance/unit/test_blocked_row_classification.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "ci-restructure-tests-infrastructure-source_governance-unit-test_blocked_row_classification.py"
+      ],
+      "selected_families": [],
+      "rationale": "Bind the one-row source successor and validate melee casualty eligibility, retention and replay.",
+      "source_obligation": "July Chaos Daemons faction pack page 124 and core 05.04.05. Use the attacking unit's Fight target declaration, verify the paid friendly Khorne Daemon target, and resolve the mandatory 4+ melee casualty check and phase-bounded retained Fight.",
+      "unchanged_work": "Target discovery, Command Point mutation, the D6 executor, damage and physical cleanup, and replay serialization use existing owners. The source condition reuses the existing melee provenance gate and model attack history scan."
     }
   },
   "milestone": "ordinary",
