@@ -1,206 +1,206 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "bdc1b2111530576a71bf3391564d5a9e9c356be0",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:9d0e97747b4a261a53ddbd60172e2bc6789da40518fec0e7e7c087f861b7373c",
-  "operation_map_sha256": "6cda06f0e704a218edecc6187497338bde6bdcb6d43ec5b7251647f1ac527380",
+  "base": "344129210b416dab7fc3dc79d1a4d467e7ebfa98",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:3e65aaeb280065edad60fe80cf210522a93ad41ea8318c6bfc34e0e7f2614533",
+  "operation_map_sha256": "036705d9e9d7390bb193ecd23d99485e0b38025cad79da8075c9c2618952e388",
   "changes": {
     "ci/test_shards/durations.json": {
-      "before_sha256": "7fcf878d08203bf0dfe1337ad3e1e8fc87d45d3ebdf4f2bd17c6196f27e0b619",
-      "after_sha256": "3b0604006eebdaf8b89ad8fd9f4e798bb192cac745d69e86a9dee6f566e4e4be",
+      "before_sha256": "9a2c2d3f1d5bcd278723a430f86d0811ebdae8efaac460828ba3e1846198d8aa",
+      "after_sha256": "7956999620c1124dd29d4538b545fd3affa87d06b1b56edb60a81d870c704564",
       "owners": {
         "@document": {
-          "before": "7fcf878d08203bf0dfe1337ad3e1e8fc87d45d3ebdf4f2bd17c6196f27e0b619",
-          "after": "3b0604006eebdaf8b89ad8fd9f4e798bb192cac745d69e86a9dee6f566e4e4be"
+          "before": "9a2c2d3f1d5bcd278723a430f86d0811ebdae8efaac460828ba3e1846198d8aa",
+          "after": "7956999620c1124dd29d4538b545fd3affa87d06b1b56edb60a81d870c704564"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
-      "before_sha256": "a2581513eab078fa2083d710792c2517111c704d80913ba21888180ff156de5a",
-      "after_sha256": "9f7754b90e077ccce54b67e9f19e5513aba4c8b2f3d5eede23cfd3d45d282c95",
+      "before_sha256": "2434405e86e25436f214782a8d4e373c5f3f12ad07f885c1150b952458a70e9c",
+      "after_sha256": "c8307509c100e2362fa2352cb7e34853fd5ae9a3daafa71d1d958bd0da1e90ed",
       "owners": {
         "@document": {
-          "before": "a2581513eab078fa2083d710792c2517111c704d80913ba21888180ff156de5a",
-          "after": "9f7754b90e077ccce54b67e9f19e5513aba4c8b2f3d5eede23cfd3d45d282c95"
+          "before": "2434405e86e25436f214782a8d4e373c5f3f12ad07f885c1150b952458a70e9c",
+          "after": "c8307509c100e2362fa2352cb7e34853fd5ae9a3daafa71d1d958bd0da1e90ed"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
-      "before_sha256": "9fd72938698ec93a2b1d6819e690ef1efd58d2fd7f35a615e3ad822bea7dd874",
-      "after_sha256": "2474b85b566a73feebbeee542df56989b4b816f600210a63d32eb6d73558af31",
+      "before_sha256": "5a44d8c13c5744909b38c88a8cf83baf6c519e04a7255d76ed4c6942aa91bbee",
+      "after_sha256": "b535a5afacb8c2969b9ba5fcbcb8266b8750bdf6471d54760dc2662a84485b66",
       "owners": {
         "@document": {
-          "before": "9fd72938698ec93a2b1d6819e690ef1efd58d2fd7f35a615e3ad822bea7dd874",
-          "after": "2474b85b566a73feebbeee542df56989b4b816f600210a63d32eb6d73558af31"
+          "before": "5a44d8c13c5744909b38c88a8cf83baf6c519e04a7255d76ed4c6942aa91bbee",
+          "after": "b535a5afacb8c2969b9ba5fcbcb8266b8750bdf6471d54760dc2662a84485b66"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
-      "before_sha256": "8e1a069ea40ac9eb35f7f6aeac92b4c544d62a1d9aecd20bca85dce1b777a357",
-      "after_sha256": "a8df9f06aaa3b00eafd33328d5860f429e39815d118da7e96b9fefc9b2d844fa",
+      "before_sha256": "d53a5ddb81e1536ee64360888e347bd1bdba3e6620b4a12031b5c6f0c521b308",
+      "after_sha256": "a4d8ca23faeed43aa99cfd57a5286b9501d7f2567b641065017283c097d83f3b",
       "owners": {
         "@document": {
-          "before": "8e1a069ea40ac9eb35f7f6aeac92b4c544d62a1d9aecd20bca85dce1b777a357",
-          "after": "a8df9f06aaa3b00eafd33328d5860f429e39815d118da7e96b9fefc9b2d844fa"
+          "before": "d53a5ddb81e1536ee64360888e347bd1bdba3e6620b4a12031b5c6f0c521b308",
+          "after": "a4d8ca23faeed43aa99cfd57a5286b9501d7f2567b641065017283c097d83f3b"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
-      "before_sha256": "55bf3b0ab79ecdb18e26c6803863b271ef5e4cb8df5bb03638485e2713859897",
-      "after_sha256": "76302a48cbe2cf3c7f7bd713b13a3b3f33bbde0fd5c9824925b3f052f2cc640d",
+      "before_sha256": "9a4d4f9b22798202088e9c5180a8cf63bf8acfbe2dcc8d619f177bf1b1d7f73f",
+      "after_sha256": "82f51bb37def0b043d5455791f58e9c2619d91e76a099a9c7f9f4729605150c3",
       "owners": {
         "@document": {
-          "before": "55bf3b0ab79ecdb18e26c6803863b271ef5e4cb8df5bb03638485e2713859897",
-          "after": "76302a48cbe2cf3c7f7bd713b13a3b3f33bbde0fd5c9824925b3f052f2cc640d"
+          "before": "9a4d4f9b22798202088e9c5180a8cf63bf8acfbe2dcc8d619f177bf1b1d7f73f",
+          "after": "82f51bb37def0b043d5455791f58e9c2619d91e76a099a9c7f9f4729605150c3"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
-      "before_sha256": "fe11c0b5ab88b74ba4c24d8a5fc1835b9837e1f4e637b5ecf90d83837647199b",
-      "after_sha256": "8091de6b698f21bb2c1d6fd8c740b810fc69bccad70c4aa0541cb607f9e57706",
+      "before_sha256": "f8a82852b366c4015ca9f0bb24bdb3a15c39c636b13801673bf34ec1f7977bf6",
+      "after_sha256": "bcb364bc3b5497231a6f445f05c8a52c2cb79a9cfe7093e367c7f157544eba3e",
       "owners": {
         "@document": {
-          "before": "fe11c0b5ab88b74ba4c24d8a5fc1835b9837e1f4e637b5ecf90d83837647199b",
-          "after": "8091de6b698f21bb2c1d6fd8c740b810fc69bccad70c4aa0541cb607f9e57706"
+          "before": "f8a82852b366c4015ca9f0bb24bdb3a15c39c636b13801673bf34ec1f7977bf6",
+          "after": "bcb364bc3b5497231a6f445f05c8a52c2cb79a9cfe7093e367c7f157544eba3e"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
-      "before_sha256": "cff267c3c74b66a8f7fe3dd1cf17b0a2feecd7c72b5b3628ca17855a287d0f39",
-      "after_sha256": "ebb44e556e3c043d447deff13d595607cf8fe4cbd67b617d59e06ce402a6df1d",
+      "before_sha256": "105163d63025b0042694600003bd4f39d8e7fab6a32fb0d207f46a2c35630e21",
+      "after_sha256": "bfdd5f505cd3ce9597953c45f6a5e2241293e31e585a48634e05650023290091",
       "owners": {
         "@document": {
-          "before": "cff267c3c74b66a8f7fe3dd1cf17b0a2feecd7c72b5b3628ca17855a287d0f39",
-          "after": "ebb44e556e3c043d447deff13d595607cf8fe4cbd67b617d59e06ce402a6df1d"
+          "before": "105163d63025b0042694600003bd4f39d8e7fab6a32fb0d207f46a2c35630e21",
+          "after": "bfdd5f505cd3ce9597953c45f6a5e2241293e31e585a48634e05650023290091"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
-      "before_sha256": "cdc8e5e8bdd5521e1d22de916843c910b9906ff1cc7aca4a19d2c300e6d42dd2",
-      "after_sha256": "f28bb93337be79eb3cd3ffb9cd22573df6ff4e75b3cab0e429f86c8c7bdb2835",
+      "before_sha256": "37c9ada65663ed63e06bec5197e07c508c4f29270bf970888a681188b07fa745",
+      "after_sha256": "049fd517710b4b8b94424a9a7b2179961c242194ceb0c982c44ada48baca7868",
       "owners": {
         "@document": {
-          "before": "cdc8e5e8bdd5521e1d22de916843c910b9906ff1cc7aca4a19d2c300e6d42dd2",
-          "after": "f28bb93337be79eb3cd3ffb9cd22573df6ff4e75b3cab0e429f86c8c7bdb2835"
+          "before": "37c9ada65663ed63e06bec5197e07c508c4f29270bf970888a681188b07fa745",
+          "after": "049fd517710b4b8b94424a9a7b2179961c242194ceb0c982c44ada48baca7868"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
-      "before_sha256": "6e74a36d7014864256468c423d3109452f9e8ca3e93edc922b3f2a4c0bcd58ce",
-      "after_sha256": "1aa117c9c26fa4f7e67d9a6514372e0a94cb307feef846e32e6bf5813a6f618b",
+      "before_sha256": "793c29b92059c0633f3443ca20957a8940be0abfb0f2a28809a3d445baf10f88",
+      "after_sha256": "877e5545e9a0ddee6e304bc80a4db0a21dc3cf5105251e654db8b1af9980edfe",
       "owners": {
         "@document": {
-          "before": "6e74a36d7014864256468c423d3109452f9e8ca3e93edc922b3f2a4c0bcd58ce",
-          "after": "1aa117c9c26fa4f7e67d9a6514372e0a94cb307feef846e32e6bf5813a6f618b"
+          "before": "793c29b92059c0633f3443ca20957a8940be0abfb0f2a28809a3d445baf10f88",
+          "after": "877e5545e9a0ddee6e304bc80a4db0a21dc3cf5105251e654db8b1af9980edfe"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
-      "before_sha256": "b139a1e273de5317b06e9797eda9689eb77352118d1f6c73635dee60c2975300",
-      "after_sha256": "698bd8471916f5e88da101311812f9e3789d5fb847b90d7ee7842a924c70987e",
+      "before_sha256": "4305965660f173f950ccaea4ddbacd2a208b8efc412fd1397a267a06f5be2950",
+      "after_sha256": "537be748b35f5265fc8d17133c27dc09697ca83a612114a2d02c37f591c6ba78",
       "owners": {
         "@document": {
-          "before": "b139a1e273de5317b06e9797eda9689eb77352118d1f6c73635dee60c2975300",
-          "after": "698bd8471916f5e88da101311812f9e3789d5fb847b90d7ee7842a924c70987e"
+          "before": "4305965660f173f950ccaea4ddbacd2a208b8efc412fd1397a267a06f5be2950",
+          "after": "537be748b35f5265fc8d17133c27dc09697ca83a612114a2d02c37f591c6ba78"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
-      "before_sha256": "e7a6f3378333a3200891c9eb6be5c0d4ee763b813db598f3653142437a40274f",
-      "after_sha256": "7528022c63737352fc08e083fff32fa449b4aa0b454bf459effed19a8a29ea13",
+      "before_sha256": "04cb55b3b4dc2701340df1f8c5d2e9e650709baf3aa15c1ebe0d9a6f3833a0df",
+      "after_sha256": "a727e92dd47f6bc6757b1c5862da1d87c94800c2a4678269cc2561760b4db7f3",
       "owners": {
         "@document": {
-          "before": "e7a6f3378333a3200891c9eb6be5c0d4ee763b813db598f3653142437a40274f",
-          "after": "7528022c63737352fc08e083fff32fa449b4aa0b454bf459effed19a8a29ea13"
+          "before": "04cb55b3b4dc2701340df1f8c5d2e9e650709baf3aa15c1ebe0d9a6f3833a0df",
+          "after": "a727e92dd47f6bc6757b1c5862da1d87c94800c2a4678269cc2561760b4db7f3"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "3a4a1cc70cd9cb890a8c90953fc66559ff741b0bca9021d9afd894130be21f6d",
-      "after_sha256": "cb90491ec27574cc99674c0fb3951acf5af7e5e36560a84d5a89981c8f99ae98",
+      "before_sha256": "607de93e78ea8608ad0426135a482a6ddb7ebf329b3ff9bbddd577ddac6fa034",
+      "after_sha256": "fdfb30143d2c62f5bbec93916db175688255ff79ae75ce127f782df56d6da4b5",
       "owners": {
         "@document": {
-          "before": "3a4a1cc70cd9cb890a8c90953fc66559ff741b0bca9021d9afd894130be21f6d",
-          "after": "cb90491ec27574cc99674c0fb3951acf5af7e5e36560a84d5a89981c8f99ae98"
+          "before": "607de93e78ea8608ad0426135a482a6ddb7ebf329b3ff9bbddd577ddac6fa034",
+          "after": "fdfb30143d2c62f5bbec93916db175688255ff79ae75ce127f782df56d6da4b5"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "4770ccb1c68b0a28cf26770c83d5f510c3bf8b100f8d2e39a59c9dd68d72fe26",
-      "after_sha256": "03288229630eb4c9d3c3b4c2244937e369683a5083093e32571c190cf13d0bb4",
+      "before_sha256": "fd519f416d01be082d36cfdcb5a5215e32fd179aef6299750bbc584bbb59256c",
+      "after_sha256": "faf6bcaf4dbfc8ce26ecdca702d081e7301a9cfaaae33680aeb6c65f8a1a276d",
       "owners": {
         "@document": {
-          "before": "4770ccb1c68b0a28cf26770c83d5f510c3bf8b100f8d2e39a59c9dd68d72fe26",
-          "after": "03288229630eb4c9d3c3b4c2244937e369683a5083093e32571c190cf13d0bb4"
+          "before": "fd519f416d01be082d36cfdcb5a5215e32fd179aef6299750bbc584bbb59256c",
+          "after": "faf6bcaf4dbfc8ce26ecdca702d081e7301a9cfaaae33680aeb6c65f8a1a276d"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "63e40ce84e34176566aad06e2cc2f3d27e256de66de61e4b1ae3d9ab256e1fb7",
-      "after_sha256": "7c06d3dfcd765247362856ff86c9bb0bdd503397dcdcb2a4da6ac9b30f1b19d7",
+      "before_sha256": "5e686526f0df5d1cbac10a4f04c6f0fb8cc75d2e0e693aabf59e481198f7c65a",
+      "after_sha256": "bd8c982e2fdd17d0de01371aaff5668e87fd575b69d27ebce0d6e79e145644fd",
       "owners": {
         "@document": {
-          "before": "63e40ce84e34176566aad06e2cc2f3d27e256de66de61e4b1ae3d9ab256e1fb7",
-          "after": "7c06d3dfcd765247362856ff86c9bb0bdd503397dcdcb2a4da6ac9b30f1b19d7"
+          "before": "5e686526f0df5d1cbac10a4f04c6f0fb8cc75d2e0e693aabf59e481198f7c65a",
+          "after": "bd8c982e2fdd17d0de01371aaff5668e87fd575b69d27ebce0d6e79e145644fd"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "3d3776d88763d6afca93ce4c4d4a7372bf40fdabcb6ccf1f100d70e7434542f3",
-      "after_sha256": "026b0c5e139edb4e3381fbc15ef05eb48af00e6670ee30fc41f59d42e3b18946",
+      "before_sha256": "a985fc224c2c472c320ce9bc0ea2f8d279e8b6577d6f6e3b5f39d5f9f506a598",
+      "after_sha256": "87cadcf98ddcd578dfaace9e40569796af272b0fc8967638375ed96ed4670295",
       "owners": {
         "@document": {
-          "before": "3d3776d88763d6afca93ce4c4d4a7372bf40fdabcb6ccf1f100d70e7434542f3",
-          "after": "026b0c5e139edb4e3381fbc15ef05eb48af00e6670ee30fc41f59d42e3b18946"
+          "before": "a985fc224c2c472c320ce9bc0ea2f8d279e8b6577d6f6e3b5f39d5f9f506a598",
+          "after": "87cadcf98ddcd578dfaace9e40569796af272b0fc8967638375ed96ed4670295"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "14874dbe1f2cdd7e59547a3fe712067aacc5b69f608082ed8f79323c1b10c4fd",
-      "after_sha256": "aa0fc46ed42cee18cd9c7f99e86e697dbbf5cc09dbc76104732f6a37b240db0b",
+      "before_sha256": "e9fbd7342ba62de62f45b706c5081b8998d2c4e184d0de346ca9326073a605b5",
+      "after_sha256": "2e80fe65bdda3c25c2ca5b7bb66270e837043b62a45861e54f34a5a1e2d35b96",
       "owners": {
         "@document": {
-          "before": "14874dbe1f2cdd7e59547a3fe712067aacc5b69f608082ed8f79323c1b10c4fd",
-          "after": "aa0fc46ed42cee18cd9c7f99e86e697dbbf5cc09dbc76104732f6a37b240db0b"
+          "before": "e9fbd7342ba62de62f45b706c5081b8998d2c4e184d0de346ca9326073a605b5",
+          "after": "2e80fe65bdda3c25c2ca5b7bb66270e837043b62a45861e54f34a5a1e2d35b96"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "271571db37ab94d0cfac66c3a7d4b6c0db2b5903bc82339b3c3b6e7ce5032a85",
-      "after_sha256": "47bbe400f76f892a4f8f39036d8804ec148de361c9da3a6221ddba65e08e7086",
+      "before_sha256": "0c61e50d9526789972edcacd8d4484b32838704cc1727ee99eb75bda22681e67",
+      "after_sha256": "c087e36ee3c7d7e52e0e23184f35333ecdf24c57922d9dcb833cf00b8c235543",
       "owners": {
         "@document": {
-          "before": "271571db37ab94d0cfac66c3a7d4b6c0db2b5903bc82339b3c3b6e7ce5032a85",
-          "after": "47bbe400f76f892a4f8f39036d8804ec148de361c9da3a6221ddba65e08e7086"
+          "before": "0c61e50d9526789972edcacd8d4484b32838704cc1727ee99eb75bda22681e67",
+          "after": "c087e36ee3c7d7e52e0e23184f35333ecdf24c57922d9dcb833cf00b8c235543"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "fd85ada1bbc9a1688454a4822d489b3de58a88e651b65f482ab08625b5e7299f",
-      "after_sha256": "8f6625fbc5d8037921fd3c75461e6fea4792d345208857c8622b0ec4489246bc",
+      "before_sha256": "f7efeca267fb2d57090b9ef90537aef31cfea37dc2f5435f096e6c6c1f07fc96",
+      "after_sha256": "f7b30d32123d56dd03e2b0a1964b4a817939abb024cf4ae67eecb0c4241eda04",
       "owners": {
         "@document": {
-          "before": "fd85ada1bbc9a1688454a4822d489b3de58a88e651b65f482ab08625b5e7299f",
-          "after": "8f6625fbc5d8037921fd3c75461e6fea4792d345208857c8622b0ec4489246bc"
+          "before": "f7efeca267fb2d57090b9ef90537aef31cfea37dc2f5435f096e6c6c1f07fc96",
+          "after": "f7b30d32123d56dd03e2b0a1964b4a817939abb024cf4ae67eecb0c4241eda04"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "aff798c2d921a77c62371e674710ae4a7ba5443771923fbcec3da44ad9c27430",
-      "after_sha256": "f24545dde5761e22bb22338b2d9acca93eacc47c72e464b3ff12e2d6abc73910",
+      "before_sha256": "8672f72d6c0811f5ec7b378c00723cac21db7aa568528798211b5b7050e52279",
+      "after_sha256": "9e343b09006abda678c83402805e7f7774fcebd8f979b67fe79bfef58654b65b",
       "owners": {
         "@document": {
-          "before": "aff798c2d921a77c62371e674710ae4a7ba5443771923fbcec3da44ad9c27430",
-          "after": "f24545dde5761e22bb22338b2d9acca93eacc47c72e464b3ff12e2d6abc73910"
+          "before": "8672f72d6c0811f5ec7b378c00723cac21db7aa568528798211b5b7050e52279",
+          "after": "9e343b09006abda678c83402805e7f7774fcebd8f979b67fe79bfef58654b65b"
         }
       }
     },
     "data/source_audits/ci64_provenance_v1/pre-roll-charge-flight-test-v1.json": {
       "before_sha256": null,
-      "after_sha256": "1b86bf2c539f05b27b034d168f5793ff4efecf66ffc0d3ef55a8fd86608d7b6d",
+      "after_sha256": "fd5511973dabe4068f618dec2f1f1419cb79f99629e831b9b14a810ab3cb110e",
       "owners": {
         "@document": {
           "before": null,
-          "after": "1b86bf2c539f05b27b034d168f5793ff4efecf66ffc0d3ef55a8fd86608d7b6d"
+          "after": "fd5511973dabe4068f618dec2f1f1419cb79f99629e831b9b14a810ab3cb110e"
         }
       }
     },
@@ -215,36 +215,36 @@
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "92b0dde171d4efdd5e6f26f1d6f8fa3cd6943412ad3916d1402a626c60598075",
-      "after_sha256": "93460f84d23772f2c100bc77f6e7b45dbbd1935a506c21b68e4af96cf5777413",
+      "before_sha256": "8fc56e7633a16c9b2050e458f7b890cb13e8300bd81d574b48e0c7ae8d9bc2bb",
+      "after_sha256": "118602169995d24a90be185bb50f30f94c6be834172ea991aa6406ddd4a2187c",
       "owners": {
         "@document": {
-          "before": "92b0dde171d4efdd5e6f26f1d6f8fa3cd6943412ad3916d1402a626c60598075",
-          "after": "93460f84d23772f2c100bc77f6e7b45dbbd1935a506c21b68e4af96cf5777413"
+          "before": "8fc56e7633a16c9b2050e458f7b890cb13e8300bd81d574b48e0c7ae8d9bc2bb",
+          "after": "118602169995d24a90be185bb50f30f94c6be834172ea991aa6406ddd4a2187c"
         }
       }
     },
     "scripts/engine_numerical_identity_test_admission.py": {
-      "before_sha256": "8c3fa9db10e7d22d0ca4b78fb1af044da0f5f2bee25e56b818d7383518cb206e",
-      "after_sha256": "a0f7ba1d88cd944f2db61bddd4a5cc781ec4deba72425703596d17db6d849b6d",
+      "before_sha256": "30b658bcbf62c26d5a73509ead659d948d665fdd5287e5a067f9781350bef407",
+      "after_sha256": "304c6fe4c87ebf7cc7e28b94f8ef306ff2938927b15c2a25c5079e208819e7eb",
       "owners": {
         "_pre_roll_charge_flight_test_addition": {
           "before": null,
-          "after": "710d7eb91d119d68ba789e1924e398cfa1af97e8b281212a183fa73dd4440144"
+          "after": "2bf120ae2fca07465d1b238db23233e54d8043b613cd9672cbb9278c817679d2"
         },
         "exact_movement_test_transition": {
-          "before": "e4cd56ac02061239b9bf12eb46047e9ddfb48f434a4917ed1e6275135b7a856b",
-          "after": "ad669c41469874801952b6fbe9ad441cd56dae8f0fab725a14b043b17c79135b"
+          "before": "245e2475634f6b20aea5c0d0aac0972623bdd1c613cfe2445b86f34d8746bfe5",
+          "after": "6c02e3e8df5421b369716651a1d2dc5b78047cca693f8c759911f5d867f2f833"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "297cce37b7227cb91dd359e190a8f919a29df1f8bb360cdca9abc02b0f7ad895",
-      "after_sha256": "3e092bd2cae133d65eccfb578f89501d5c6a75cbf7cce1d43e5adb025404a217",
+      "before_sha256": "af7a486673d1687d28b81d8437bdcc4095359cbcefc6217bea524898e867b2fa",
+      "after_sha256": "553780be64ff619b992e3580d4e32917214713c49637c0f06da3df9128a1aa3c",
       "owners": {
         "@document": {
-          "before": "297cce37b7227cb91dd359e190a8f919a29df1f8bb360cdca9abc02b0f7ad895",
-          "after": "3e092bd2cae133d65eccfb578f89501d5c6a75cbf7cce1d43e5adb025404a217"
+          "before": "af7a486673d1687d28b81d8437bdcc4095359cbcefc6217bea524898e867b2fa",
+          "after": "553780be64ff619b992e3580d4e32917214713c49637c0f06da3df9128a1aa3c"
         }
       }
     },
@@ -319,12 +319,12 @@
       }
     },
     "tests/code_quality/test_engine_numerical_identity_admission.py": {
-      "before_sha256": "583fbb8e8e4c02f72391f7cc2acd67d0bd7463e2ca4700dd2593747709a06995",
-      "after_sha256": "9742d9f3bd2fe0fde0484b39b2a699e260765fabb0c5244c099ef031999a90cd",
+      "before_sha256": "6b7cbe10a356022a130e4798d911ce3f493df3b142f0643be3eafe10c4403bc2",
+      "after_sha256": "28b509bebca07550ee55f6aca1d719020b5ed3967fe37de5c9976b7ceb83ed61",
       "owners": {
         "test_identity_inventory_uses_current_twelve_shards_and_native_cohort": {
-          "before": "0ba10d7a56551a447b2dca22ac6df9bddd1b185adfbeb9c7b3b8fc07ce23119e",
-          "after": "be6f72544dfdc734c4a8de57dd02fd8dd25f077a5bd295cc99facdeae23cc7fd"
+          "before": "9a9ccff4426c59661d1d96803cf3ef0483f73084900c5aeae46421358494eff1",
+          "after": "3056de84b4f2542578cb40d76555710844869537413a20a0259128b3bb7c9887"
         }
       }
     },
@@ -379,7 +379,7 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Reweight the revised native case without changing any behavioral case or predecessor source selection.",
+      "rationale": "Combine the two approved scheduling deltas and recompute the same twelve-shard allocation without losing either lane's cases or measured weights.",
       "source_obligation": "Core Rules 21.03 and retained v931 timing; use the unchanged Charge target filter, native resolve_charge_move contract, and unmodified dice spec.",
       "unchanged_work": "No existing workload calls this opt-in read-only policy. It checks one caller-supplied witness at no more than eleven attainable sums per mode. No path search, chance sample, decision submission, resolver change or normal gameplay work is added."
     },
@@ -398,7 +398,7 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Reweight the revised native case without changing any behavioral case or predecessor source selection.",
+      "rationale": "Combine the two approved scheduling deltas and recompute the same twelve-shard allocation without losing either lane's cases or measured weights.",
       "source_obligation": "Core Rules 21.03 and retained v931 timing; use the unchanged Charge target filter, native resolve_charge_move contract, and unmodified dice spec.",
       "unchanged_work": "No existing workload calls this opt-in read-only policy. It checks one caller-supplied witness at no more than eleven attainable sums per mode. No path search, chance sample, decision submission, resolver change or normal gameplay work is added."
     },
@@ -417,7 +417,7 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Reweight the revised native case without changing any behavioral case or predecessor source selection.",
+      "rationale": "Combine the two approved scheduling deltas and recompute the same twelve-shard allocation without losing either lane's cases or measured weights.",
       "source_obligation": "Core Rules 21.03 and retained v931 timing; use the unchanged Charge target filter, native resolve_charge_move contract, and unmodified dice spec.",
       "unchanged_work": "No existing workload calls this opt-in read-only policy. It checks one caller-supplied witness at no more than eleven attainable sums per mode. No path search, chance sample, decision submission, resolver change or normal gameplay work is added."
     },
@@ -436,7 +436,7 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Reweight the revised native case without changing any behavioral case or predecessor source selection.",
+      "rationale": "Combine the two approved scheduling deltas and recompute the same twelve-shard allocation without losing either lane's cases or measured weights.",
       "source_obligation": "Core Rules 21.03 and retained v931 timing; use the unchanged Charge target filter, native resolve_charge_move contract, and unmodified dice spec.",
       "unchanged_work": "No existing workload calls this opt-in read-only policy. It checks one caller-supplied witness at no more than eleven attainable sums per mode. No path search, chance sample, decision submission, resolver change or normal gameplay work is added."
     },
@@ -455,7 +455,7 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Reweight the revised native case without changing any behavioral case or predecessor source selection.",
+      "rationale": "Combine the two approved scheduling deltas and recompute the same twelve-shard allocation without losing either lane's cases or measured weights.",
       "source_obligation": "Core Rules 21.03 and retained v931 timing; use the unchanged Charge target filter, native resolve_charge_move contract, and unmodified dice spec.",
       "unchanged_work": "No existing workload calls this opt-in read-only policy. It checks one caller-supplied witness at no more than eleven attainable sums per mode. No path search, chance sample, decision submission, resolver change or normal gameplay work is added."
     },
@@ -474,7 +474,7 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Reweight the revised native case without changing any behavioral case or predecessor source selection.",
+      "rationale": "Combine the two approved scheduling deltas and recompute the same twelve-shard allocation without losing either lane's cases or measured weights.",
       "source_obligation": "Core Rules 21.03 and retained v931 timing; use the unchanged Charge target filter, native resolve_charge_move contract, and unmodified dice spec.",
       "unchanged_work": "No existing workload calls this opt-in read-only policy. It checks one caller-supplied witness at no more than eleven attainable sums per mode. No path search, chance sample, decision submission, resolver change or normal gameplay work is added."
     },
@@ -493,7 +493,7 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Reweight the revised native case without changing any behavioral case or predecessor source selection.",
+      "rationale": "Combine the two approved scheduling deltas and recompute the same twelve-shard allocation without losing either lane's cases or measured weights.",
       "source_obligation": "Core Rules 21.03 and retained v931 timing; use the unchanged Charge target filter, native resolve_charge_move contract, and unmodified dice spec.",
       "unchanged_work": "No existing workload calls this opt-in read-only policy. It checks one caller-supplied witness at no more than eleven attainable sums per mode. No path search, chance sample, decision submission, resolver change or normal gameplay work is added."
     },
@@ -512,7 +512,7 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Reweight the revised native case without changing any behavioral case or predecessor source selection.",
+      "rationale": "Combine the two approved scheduling deltas and recompute the same twelve-shard allocation without losing either lane's cases or measured weights.",
       "source_obligation": "Core Rules 21.03 and retained v931 timing; use the unchanged Charge target filter, native resolve_charge_move contract, and unmodified dice spec.",
       "unchanged_work": "No existing workload calls this opt-in read-only policy. It checks one caller-supplied witness at no more than eleven attainable sums per mode. No path search, chance sample, decision submission, resolver change or normal gameplay work is added."
     },
@@ -531,7 +531,7 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Reweight the revised native case without changing any behavioral case or predecessor source selection.",
+      "rationale": "Combine the two approved scheduling deltas and recompute the same twelve-shard allocation without losing either lane's cases or measured weights.",
       "source_obligation": "Core Rules 21.03 and retained v931 timing; use the unchanged Charge target filter, native resolve_charge_move contract, and unmodified dice spec.",
       "unchanged_work": "No existing workload calls this opt-in read-only policy. It checks one caller-supplied witness at no more than eleven attainable sums per mode. No path search, chance sample, decision submission, resolver change or normal gameplay work is added."
     },
@@ -550,7 +550,7 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Reweight the revised native case without changing any behavioral case or predecessor source selection.",
+      "rationale": "Combine the two approved scheduling deltas and recompute the same twelve-shard allocation without losing either lane's cases or measured weights.",
       "source_obligation": "Core Rules 21.03 and retained v931 timing; use the unchanged Charge target filter, native resolve_charge_move contract, and unmodified dice spec.",
       "unchanged_work": "No existing workload calls this opt-in read-only policy. It checks one caller-supplied witness at no more than eleven attainable sums per mode. No path search, chance sample, decision submission, resolver change or normal gameplay work is added."
     },
@@ -569,7 +569,7 @@
         "cavalcade-v995-roster-admission"
       ],
       "selected_families": [],
-      "rationale": "Reweight the revised native case without changing any behavioral case or predecessor source selection.",
+      "rationale": "Combine the two approved scheduling deltas and recompute the same twelve-shard allocation without losing either lane's cases or measured weights.",
       "source_obligation": "Core Rules 21.03 and retained v931 timing; use the unchanged Charge target filter, native resolve_charge_move contract, and unmodified dice spec.",
       "unchanged_work": "No existing workload calls this opt-in read-only policy. It checks one caller-supplied witness at no more than eleven attainable sums per mode. No path search, chance sample, decision submission, resolver change or normal gameplay work is added."
     },
@@ -966,6 +966,7 @@
         "stage3-ordinary-melee-test-admission",
         "skulls-beget-blood-test-admission",
         "stage3-flight-normal-move-test-admission",
+        "wrath-undeniable-test-admission",
         "pre-roll-charge-flight-test-admission"
       ],
       "selected_families": [],
@@ -1007,6 +1008,7 @@
         "stage3-ordinary-melee-test-admission",
         "skulls-beget-blood-test-admission",
         "stage3-flight-normal-move-test-admission",
+        "wrath-undeniable-test-admission",
         "pre-roll-charge-flight-test-admission"
       ],
       "selected_families": [],

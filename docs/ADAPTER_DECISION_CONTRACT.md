@@ -2515,6 +2515,10 @@ boundary the engine first offers applicable Fight On Death grants through the
 retention context below. Acceptance retains the original placement and defers
 other destruction reactions. Decline or a failed grant continues mandatory
 reactions, physical removal and the remaining optional reactions in ordinary order.
+Blood Legion's Wrath Undeniable uses the existing selected-as-target Fight
+Stratagem decision and the same retained Fight choice. Its phase-end grant
+requires a melee attack casualty that has yet to fight this phase. The engine
+rolls the casualty's D6 before offering the defender a Fight option on 4+.
 `AttackSequence` retains ordered destruction records, original damage and
 attacks-resolved event IDs, original placements and captured reaction sources.
 Shooting and Fight share this owner; adapters cannot advance, reorder or remove

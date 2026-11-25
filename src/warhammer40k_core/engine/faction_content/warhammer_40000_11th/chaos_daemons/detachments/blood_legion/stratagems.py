@@ -31,7 +31,38 @@ CONTRIBUTION_ID = "warhammer_40000_11th:chaos_daemons:detachment:blood_legion:st
 def runtime_contribution() -> RuntimeContentContribution:
     return RuntimeContentContribution(
         contribution_id=CONTRIBUTION_ID,
-        stratagem_records=(_skulls_beget_blood_record(),),
+        stratagem_records=(_skulls_beget_blood_record(), _wrath_undeniable_record()),
+    )
+
+
+def _wrath_undeniable_record() -> StratagemCatalogRecord:
+    (record,) = tuple(
+        record
+        for record in source_backed_detachment_stratagem_activation_records()
+        if record.detachment_id == blood_legion_ir.BLOOD_LEGION_DETACHMENT_ID
+        and record.definition.stratagem_id == blood_legion_ir.WRATH_UNDENIABLE_STRATAGEM_ID
+    )
+    definition = record.definition
+    rule_ir = blood_legion_ir.coverage_rule_ir_payload_by_descriptor_id(
+        blood_legion_ir.WRATH_UNDENIABLE_DESCRIPTOR_ID
+    )
+    if rule_ir is None:
+        raise GameLifecycleError("Wrath Undeniable requires retained faction pack RuleIR.")
+    return replace(
+        record,
+        definition=replace(
+            definition,
+            source_id=blood_legion_ir.WRATH_UNDENIABLE_SOURCE_ID,
+            when_descriptor=blood_legion_ir.WRATH_UNDENIABLE_WHEN,
+            target_descriptor=blood_legion_ir.WRATH_UNDENIABLE_TARGET,
+            effect_descriptor=blood_legion_ir.WRATH_UNDENIABLE_EFFECT,
+            target_spec=replace(
+                definition.target_spec,
+                required_keywords=(blood_legion_ir.KHORNE_KEYWORD,),
+                required_faction_keywords=(blood_legion_ir.LEGIONES_DAEMONICA_KEYWORD,),
+            ),
+            effect_payload=validate_json_value({"rule_ir": rule_ir}),
+        ),
     )
 
 

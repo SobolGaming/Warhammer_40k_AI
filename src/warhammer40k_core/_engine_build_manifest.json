@@ -1,7 +1,7 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:9d0e97747b4a261a53ddbd60172e2bc6789da40518fec0e7e7c087f861b7373c",
-  "fingerprint": "9d0e97747b4a261a53ddbd60172e2bc6789da40518fec0e7e7c087f861b7373c",
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:3e65aaeb280065edad60fe80cf210522a93ad41ea8318c6bfc34e0e7f2614533",
+  "fingerprint": "3e65aaeb280065edad60fe80cf210522a93ad41ea8318c6bfc34e0e7f2614533",
   "resource_count": 3296,
   "resources": [
     {
@@ -4740,9 +4740,9 @@
       "sha256": "d41e27a9052f0250d78ba38b29d4bef7545fedc5a3e2e187df5b37700a6b4e9f"
     },
     {
-      "byte_length": 3569,
+      "byte_length": 4929,
       "path": "warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/detachments/blood_legion/stratagems.py",
-      "sha256": "d57aa64b1a4a203ca76181812208dfca3b0821bc8a1326130ffb923d1c4b1eaf"
+      "sha256": "99648d47e8246c424163b67df7fdf2114361f786115e3ce9d21161ab2830299e"
     },
     {
       "byte_length": 172,
@@ -11165,9 +11165,9 @@
       "sha256": "4a1746d6fcd2b3cf4da4d316ac47ebbfbcf084d9ffc8a5f2743b8c0447e6f4f5"
     },
     {
-      "byte_length": 18970,
+      "byte_length": 19089,
       "path": "warhammer40k_core/engine/model_attack_history.py",
-      "sha256": "a5ce2b7df8280e4090213a218f55b4288e97b2f5cea8703970b319c119d56f02"
+      "sha256": "d8bc7641d6ff2cdd26420c01ffe2241bb03402a6e73485f2911362a78b4e4e18"
     },
     {
       "byte_length": 1504,
@@ -12585,14 +12585,14 @@
       "sha256": "b3d3e70fc263a48c696b48bb6b360edfa8fed1d00948398255e1e8b53e68da98"
     },
     {
-      "byte_length": 8583,
+      "byte_length": 8965,
       "path": "warhammer40k_core/engine/retained_attack_grants.py",
-      "sha256": "1b18194c993fe6faa76e3e1c02b07ed93cc3b4e8f51c2ff093a83b1118f981cd"
+      "sha256": "5dbcacf8f4206fe4ed257cfede1021f630c897fc95738d99264dd330bb869082"
     },
     {
-      "byte_length": 3640,
+      "byte_length": 4399,
       "path": "warhammer40k_core/engine/retained_attack_permissions.py",
-      "sha256": "a535f1b7d68a8274e3de45151819c67926b9d9528070cd461625965d393a673f"
+      "sha256": "ef253802c43a2f2cea53f341bc84fde039c6a9ee168503c19e3cdaa6658f0de2"
     },
     {
       "byte_length": 18431,
@@ -12625,9 +12625,9 @@
       "sha256": "a0b1d44d5ae9050d5cad3d8c0ce829097f51ecf12569669cd42a89da9eb92ede"
     },
     {
-      "byte_length": 16215,
+      "byte_length": 16208,
       "path": "warhammer40k_core/engine/retained_destruction_selection.py",
-      "sha256": "a4feb4af6c37301ae153062167f5f005c8379a614b94684b36ffb38f26266578"
+      "sha256": "2bc7511b55485c4d195c37bf4efdad73806c81cd4753d5d14d65bdaef2dab77d"
     },
     {
       "byte_length": 22938,
@@ -12635,9 +12635,9 @@
       "sha256": "21ffc242eaf1549a7128413f25bc66654c86a78e0228703cfbbcf21ae0e89f03"
     },
     {
-      "byte_length": 8056,
+      "byte_length": 8134,
       "path": "warhammer40k_core/engine/retained_destruction_trigger_history.py",
-      "sha256": "48809093d731d9d0ba5b047979ea98303840dcfb96a746ce4087517d3f0ca05e"
+      "sha256": "6216b566cc34466f6b5f953201c91370d27f06c590f386261ba57fab55974f8a"
     },
     {
       "byte_length": 3994,
@@ -15525,9 +15525,9 @@
       "sha256": "d79e9bcdf13c9b76415c19cdc40280548521d0cb05e35ceaf081a7d4629feb1c"
     },
     {
-      "byte_length": 38341,
+      "byte_length": 41060,
       "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/faction_blood_legion_ir_support_2026_27.py",
-      "sha256": "08f0a3919cf7e84466f2d1d5ac29bc346d7281ee3b2c548c6a1bf619823d772f"
+      "sha256": "5a5d47a3757bba5a52913de00b5ff6d153b532588747dd1a5f5fd86c79f3fed6"
     },
     {
       "byte_length": 13574,
