@@ -266,11 +266,11 @@
     },
     "docs/factions/audit/chaos-daemons.md": {
       "before_sha256": "d3594d7f607604b97fe0745011340e713ebee952ffcdbce6dbd79563d08ea60c",
-      "after_sha256": "df71ef2a09b9a90e0b303035631e88f8fb98882bd68d5b71bd47937a37ca392b",
+      "after_sha256": "33f493c2a156fef77eae933343d343bd3773a4817935a49fd948550d5689532c",
       "owners": {
         "@document": {
           "before": "d3594d7f607604b97fe0745011340e713ebee952ffcdbce6dbd79563d08ea60c",
-          "after": "df71ef2a09b9a90e0b303035631e88f8fb98882bd68d5b71bd47937a37ca392b"
+          "after": "33f493c2a156fef77eae933343d343bd3773a4817935a49fd948550d5689532c"
         }
       }
     },
