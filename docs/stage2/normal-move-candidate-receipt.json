@@ -1,0 +1,340 @@
+{
+  "arms": {
+    "hold_e_hold": {
+      "control_holder": "player-b",
+      "objective_control": {
+        "player-b": 10
+      },
+      "ordinary_replay": {
+        "artifact_id": "session-persistence:stage2-e-cooperation-screen-before-denial-v1",
+        "diagnostics": [],
+        "final_event_log_hash": "6a77edeae2a174ce41f8eb8939d63a9a73c6b72afc0bfa667acfed3948cfbf74",
+        "reproduced_decision_count": 20,
+        "reproduced_event_count": 432,
+        "status": "reproduced"
+      },
+      "player_a_vp": 0,
+      "player_a_vp_before_e": 0,
+      "player_b_vp": 12,
+      "player_b_vp_before_e": 12,
+      "proof": {
+        "both_view_digest": "22a6d89bf5e7929afa0b6efb3bb2812b467bf29cb313bd3a0e12609fa56f22ca",
+        "both_views_and_events_exact": true,
+        "checkpoint": "fef44863f9cf224ee1a7bd42f53a24f3e61d2e6350d2910a028ef956ae54b878",
+        "decisions": 20,
+        "event_hash": "6a77edeae2a174ce41f8eb8939d63a9a73c6b72afc0bfa667acfed3948cfbf74",
+        "events": 432,
+        "ordinary_replay_exact": true,
+        "rng_draws": 0,
+        "strict_json_restore": true
+      }
+    },
+    "hold_e_score": {
+      "control_holder": null,
+      "objective_control": {
+        "player-a": 10,
+        "player-b": 10
+      },
+      "ordinary_replay": {
+        "artifact_id": "session-persistence:stage2-e-cooperation-screen-before-denial-v1",
+        "diagnostics": [],
+        "final_event_log_hash": "cb9e137bb1965bbc4d0b9e4edc73ba39de4891a4cbd7e5bc5bcaae447cd9bfc2",
+        "reproduced_decision_count": 22,
+        "reproduced_event_count": 445,
+        "status": "reproduced"
+      },
+      "player_a_vp": 0,
+      "player_a_vp_before_e": 0,
+      "player_b_vp": 12,
+      "player_b_vp_before_e": 12,
+      "proof": {
+        "both_view_digest": "ad8d1e73d986f6a13dfecdd29b3e32feabaf70750a2f573ae2e3741e54b41a3b",
+        "both_views_and_events_exact": true,
+        "checkpoint": "29d9cf46bd4d16e0e501fc8e254555353f7eebe8250ae376c1210d0d6ba4ee8e",
+        "decisions": 22,
+        "event_hash": "cb9e137bb1965bbc4d0b9e4edc73ba39de4891a4cbd7e5bc5bcaae447cd9bfc2",
+        "events": 445,
+        "ordinary_replay_exact": true,
+        "rng_draws": 0,
+        "strict_json_restore": true
+      }
+    },
+    "late_screen_e_score": {
+      "control_holder": null,
+      "objective_control": {
+        "player-a": 10,
+        "player-b": 10
+      },
+      "ordinary_replay": {
+        "artifact_id": "session-persistence:stage2-e-cooperation-screen-before-denial-v1",
+        "diagnostics": [],
+        "final_event_log_hash": "0f48293e5a04bf6e257939b687d6230d77e2d6831d895a2e221f31ed4eca4911",
+        "reproduced_decision_count": 23,
+        "reproduced_event_count": 452,
+        "status": "reproduced"
+      },
+      "player_a_vp": 0,
+      "player_a_vp_before_e": 0,
+      "player_b_vp": 12,
+      "player_b_vp_before_e": 12,
+      "proof": {
+        "both_view_digest": "3d2cbeb4135a62ddc05ffbd10748317813eb97fdd7ba8c795f0658816aa66727",
+        "both_views_and_events_exact": true,
+        "checkpoint": "e5467d54eb4b6c4ce19a904bc65bb56bfa09d04e06e6ebede79ed00367cb02a5",
+        "decisions": 23,
+        "event_hash": "0f48293e5a04bf6e257939b687d6230d77e2d6831d895a2e221f31ed4eca4911",
+        "events": 452,
+        "ordinary_replay_exact": true,
+        "rng_draws": 0,
+        "strict_json_restore": true
+      }
+    },
+    "screen_e_hold": {
+      "control_holder": "player-b",
+      "objective_control": {
+        "player-b": 2
+      },
+      "ordinary_replay": {
+        "artifact_id": "session-persistence:stage2-e-cooperation-screen-before-denial-v1",
+        "diagnostics": [],
+        "final_event_log_hash": "5873197fa6726024513e0d6dc46ae177d64cd396ce3166a33f55316ca70f3083",
+        "reproduced_decision_count": 23,
+        "reproduced_event_count": 450,
+        "status": "reproduced"
+      },
+      "player_a_vp": 0,
+      "player_a_vp_before_e": 0,
+      "player_b_vp": 12,
+      "player_b_vp_before_e": 12,
+      "proof": {
+        "both_view_digest": "8b104594eb8f4f3f74e87d471033967dabbc2c2e9f9f049ec5429680483fe274",
+        "both_views_and_events_exact": true,
+        "checkpoint": "ee4e57c6316b32df74c238125b492df69fb1a6b9913bd35f5f24cf0cfdf356c7",
+        "decisions": 23,
+        "event_hash": "5873197fa6726024513e0d6dc46ae177d64cd396ce3166a33f55316ca70f3083",
+        "events": 450,
+        "ordinary_replay_exact": true,
+        "rng_draws": 0,
+        "strict_json_restore": true
+      }
+    },
+    "screen_e_score": {
+      "control_holder": "player-a",
+      "objective_control": {
+        "player-a": 10,
+        "player-b": 2
+      },
+      "ordinary_replay": {
+        "artifact_id": "session-persistence:stage2-e-cooperation-screen-before-denial-v1",
+        "diagnostics": [],
+        "final_event_log_hash": "2ee74f4b183fd66cfcbda6e60ddf1fcfc18921ad24ae8e842968c01208c75d55",
+        "reproduced_decision_count": 24,
+        "reproduced_event_count": 457,
+        "status": "reproduced"
+      },
+      "player_a_vp": 4,
+      "player_a_vp_before_e": 0,
+      "player_b_vp": 12,
+      "player_b_vp_before_e": 12,
+      "proof": {
+        "both_view_digest": "a7b8434991b233f75eabd74916a981cbd20840270bf3a9c02a7bc718788eb5b1",
+        "both_views_and_events_exact": true,
+        "checkpoint": "2b40364caf95a18863448b9b2252895f5df3382d49727a31368f59a59fdfafa6",
+        "decisions": 24,
+        "event_hash": "2ee74f4b183fd66cfcbda6e60ddf1fcfc18921ad24ae8e842968c01208c75d55",
+        "events": 457,
+        "ordinary_replay_exact": true,
+        "rng_draws": 0,
+        "strict_json_restore": true
+      }
+    }
+  },
+  "candidate_audit": {
+    "E-after-S-hold": {
+      "finite_candidates": [
+        "advance",
+        "normal_move",
+        "remain_stationary"
+      ],
+      "generated_normal_move_count": 32,
+      "native_path_request": [
+        "decision-request-000018",
+        "submit_movement_proposal",
+        "normal_move"
+      ],
+      "retreat_path_typed_gap": "no_ordinary_fall_back_request",
+      "specialized_screen_typed_gap": "no_hold_retreat_offer"
+    },
+    "E-after-S-screen": {
+      "finite_candidates": [
+        "advance",
+        "normal_move",
+        "remain_stationary"
+      ],
+      "generated_normal_move_count": 32,
+      "native_path_request": [
+        "decision-request-000020",
+        "submit_movement_proposal",
+        "normal_move"
+      ],
+      "retreat_path_typed_gap": "no_ordinary_fall_back_request",
+      "specialized_screen_typed_gap": "no_hold_retreat_offer"
+    },
+    "S": {
+      "finite_candidates": [
+        "advance",
+        "normal_move",
+        "remain_stationary"
+      ],
+      "generated_normal_move_count": 32,
+      "native_path_request": [
+        "decision-request-000003",
+        "submit_movement_proposal",
+        "normal_move"
+      ],
+      "retreat_path_typed_gap": "no_ordinary_fall_back_request",
+      "specialized_screen_typed_gap": "no_hold_retreat_offer"
+    },
+    "fixed_normal_route_lane": "prepare_flight_normal_move requires a caller-specified fixed route; it is not independent generation of tactical endpoints"
+  },
+  "candidate_runtime": "warhammer40k-core-v2:runtime-tree-sha256-v1:40b91df8a39aa85afd3503b466b7bcab93c87d70db8189243bc9c5d70f924e1a",
+  "common": {
+    "both_view_digest": "6ad816c71a5b1a3496db6e62c69a468e66168969eff4012ed5df31b627179db0",
+    "both_views_and_events_exact": true,
+    "checkpoint": "2919cce290824fd387e2eba766d4c9375730e6d81571f55a40255419bc8c222f",
+    "decisions": 1,
+    "event_hash": "111083e38972569788bb2a9bb906e25969e2acbb9f681f674f992964dd58b174",
+    "events": 162,
+    "ordinary_replay_exact": true,
+    "rng_draws": 0,
+    "strict_json_restore": true
+  },
+  "common_replay": {
+    "artifact_id": "session-persistence:stage2-e-cooperation-screen-before-denial-v1",
+    "diagnostics": [],
+    "final_event_log_hash": "111083e38972569788bb2a9bb906e25969e2acbb9f681f674f992964dd58b174",
+    "reproduced_decision_count": 1,
+    "reproduced_event_count": 162,
+    "status": "reproduced"
+  },
+  "controls": {
+    "identical_e_full_path_in_three_moving_arms": true,
+    "identical_early_late_s_and_e_final_poses": true,
+    "same_wounds_survivors_and_rng_as_common_start": true,
+    "screen_never_contributed_control": true
+  },
+  "generated_full_path_sha256": {
+    "e_in_all_moving_arms": "d0121e1b981826f904efa5935b533af61814dc5df3d496fd4638d90ab12270f9",
+    "screen_early_and_late": "0d49b8a9fae91c1ef870a70b50fbdf33ba44622d4bd1fe754e85412d811a5286"
+  },
+  "generated_protocol": {
+    "B4_policy": {
+      "bounds": "one path and one isolated probe per S arm; no resampling, unrelated rejection stops",
+      "fallback": "only when isolated native submission rejects the path specifically for enemy engagement transit, select issued Remain Stationary on original unchanged B4 offer",
+      "priority": "same authored reinforcement path using engine-issued Normal Move"
+    },
+    "actions": {
+      "E5": "select E, Hold or the same single inward Normal Move; no alternate target",
+      "S4": "select S, Hold or the single Screen path; then E Hold",
+      "S5": "select S first and Hold, except the separate Late Screen arm applies the same Screen path now",
+      "S_E_rule": "test-only fixed witness predicates: pure -Y S and pure +Y E, each at three quarters of the shortest visible Move; exactly one generated match per offer; no retry or score input",
+      "paths_xy_from_each_own_model_start": {
+        "army-alpha:exploiter": null,
+        "army-alpha:screen": null,
+        "army-beta:denial": [
+          [
+            0,
+            0
+          ],
+          [
+            -2.8,
+            1.0
+          ],
+          [
+            -5.6,
+            0
+          ]
+        ]
+      },
+      "physical_order": "B leading west to east; S/E use complete generated path order"
+    },
+    "base": "c0235fe0bfda75743a4ba987b9ef7ae7b4fd5da3",
+    "board": {
+      "fixture_open_map": true,
+      "height_inches": 0,
+      "model_count_per_row": 5,
+      "objective": {
+        "center": [
+          30,
+          30
+        ],
+        "id": "phase15a-remote-objective",
+        "role": "central"
+      },
+      "primary_both": "primary-meatgrinder",
+      "start": "A4 Movement with earlier Command history from the existing fixture helper",
+      "unit_rows": {
+        "army-alpha:exploiter": [
+          27.2,
+          22.8
+        ],
+        "army-alpha:screen": [
+          23.7,
+          40.8
+        ],
+        "army-beta:denial": [
+          32.8,
+          33.0
+        ]
+      },
+      "x_pitch_inches": 1.4
+    },
+    "expected_build": "warhammer40k-core-v2:runtime-tree-sha256-v1:40b91df8a39aa85afd3503b466b7bcab93c87d70db8189243bc9c5d70f924e1a",
+    "fixture": "tests.phase15a_charge_declaration_helpers.charge_lifecycle before play",
+    "fixture_game_id": "stage2-e-cooperation-screen-before-denial-v1",
+    "other_policy": "Complete Shooting and Charge without attacks/charges; decline any optional Stratagem if issued; stop on an unexpected mandatory request",
+    "outcomes": {
+      "four_arms": {
+        "hold_e_hold": [
+          false,
+          false
+        ],
+        "hold_e_score": [
+          false,
+          true
+        ],
+        "screen_e_hold": [
+          true,
+          false
+        ],
+        "screen_e_score": [
+          true,
+          true
+        ]
+      },
+      "guard": "No VP is used for proposal selection; both B4 pre-E VP and A5 selected geometry remain unchanged within same policy. After outcomes, only actor-visible generator audit.",
+      "horizon": "first eligible post-E Meatgrinder objective-control score at A5 turn end; seal at B5 first Movement decision without submitting it",
+      "primary": "A/B actual pre/post VP, A5 award by native transaction, A5 central control including contributor OC",
+      "success": "A gains more by screening than holding with E moving, not with E holding; S never contributes or changes material, endpoint of both E moves native-accepted",
+      "timing": "fifth: S Hold on A4, same untouched B-denial continuation, Screen on A5 before E's identical scoring move"
+    },
+    "scope": "constructed generated-witness feasibility; no historical reachability or training claim",
+    "seed": "44ed16844e854af476fb544c63b723cfe9610881bd8487194680edddf2ab9fff"
+  },
+  "generated_protocol_digest": "3bcc7cc5c0d0444ce87ac24b3b03086294b8867598bbfd673fd10018125367f4",
+  "generated_result_sha256": "b053fe2106483cca0d455b6fa1581f19e347d1cbe464d33d4b6c68feb1cb1f98",
+  "locked_authored_reference": {
+    "generator-audit_sha256": "03f236430365d2d1973485993d57cf9bb1f75ef0cb62a261289a06955e86ccdb",
+    "protocol_sha256": "e2299bf4aa14b320e640502625a1dc9ff83a87c79f2912d687cd06130d9ff556",
+    "result_sha256": "4b1c9baeb6b49d93c00ee7387b24fc0cebeabd581963f20b73a4ee449dd1b59c"
+  },
+  "native_b4_response": {
+    "early_screen": "same reinforcement path rejected in an isolated probe; issued Hold selected on the unchanged origin",
+    "hold": "same locked reinforcement path accepted",
+    "rejection": "enemy_engagement_range_transit_forbidden"
+  },
+  "producer_base": "c0235fe0bfda75743a4ba987b9ef7ae7b4fd5da3",
+  "producer_driver_sha256": "29c778b8b5452f3fd4f05c87087897b1cdb1c48f0d1d58e2e89c5cebe15a328f",
+  "schema": "stage2-generated-normal-move-evidence-v1",
+  "scope": "Constructed candidate availability, timing and native replay only; no tactical ranking, historical reachability or dataset admission."
+}

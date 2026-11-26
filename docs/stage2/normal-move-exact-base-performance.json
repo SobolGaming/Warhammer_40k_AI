@@ -1,0 +1,125 @@
+{
+  "base": {
+    "batch": 20,
+    "checkout_base": "c0235fe0bfda75743a4ba987b9ef7ae7b4fd5da3",
+    "driver_sha256": "ad2d95ed535c12c734108d90c8ebd13482774aeb7b03d856b546377945f51cc8",
+    "finite_options_sha256": "03bf1b1e7a20c8edb6087e63ad57bfddbcd27d4a79ac863872974fe0fb76f942",
+    "lock_sha256": "659a2d81e02176d23168861529651506ac87a4eab1982109f144cd62a63fce71",
+    "normal_observation_sha256": "0209099e9fb45fc164a08d6a87e4641e984723598ab22f2efe65bbba1aa019fd",
+    "ordinary_native_control": {
+      "final_event_log_hash": "8ddca235bf5b97665fad2baedb5f26aba5fd8fd545bd3ddc0e04ee41d8f58c74",
+      "status": "waiting_for_decision",
+      "viewer_sha256": "59383c7c68026b686e44aa1d234f25d8fb2504c76604ac6f41c28bd61807dcd7"
+    },
+    "platform": "Windows-11-10.0.26300-SP0",
+    "python": "3.14.5 (main, May 10 2026, 20:29:46) [MSC v.1944 64 bit (AMD64)]",
+    "retreat": {
+      "desperate_escape": {
+        "actor_observation_sha256": "59a746e34e81661cb60922ba562a33181a7f2d8d5d98dca2f098006152c373be",
+        "count": 32,
+        "median_seconds_per_call": 0.008544354999321513,
+        "ordered_actions_sha256": "9630da34d46935c2ca0e88a7d7be61d362ee7195aff7de61129cbb7d44bcd692",
+        "seconds_per_call": [
+          0.008051480000722222,
+          0.008401309998589568,
+          0.008836515000439249,
+          0.008544354999321513,
+          0.009274789999471978
+        ]
+      },
+      "ordered_retreat": {
+        "actor_observation_sha256": "e7c52c807d39ed7ce86f659fe137237c88e30236b7e9ee4d85e6905d9ce2fda3",
+        "count": 32,
+        "median_seconds_per_call": 0.008676325000124052,
+        "ordered_actions_sha256": "0feb6d175c7b16d4be6a7852337df2cacadeb8a05972781e6256ad8bc97a3c25",
+        "seconds_per_call": [
+          0.00864585000090301,
+          0.008676325000124052,
+          0.008677734999218955,
+          0.008543499998631887,
+          0.009786775000975467
+        ]
+      }
+    },
+    "runtime": "warhammer40k-core-v2:runtime-tree-sha256-v1:dc9eb5d3f570d34d71e26a1c6b8ef794b5723aa812f8de505066309805678d18",
+    "sample_count": 5,
+    "schema": "stage2-normal-move-exact-base-probe-v1",
+    "side": "base"
+  },
+  "bounds": {
+    "candidate_count": 32,
+    "direction_count": 16,
+    "distance_count": 2,
+    "maximum_moving_models": 5,
+    "maximum_visible_models": 256,
+    "native_validations_per_generator_call": 0,
+    "search_runs_only_on_opt_in": true
+  },
+  "head": {
+    "batch": 20,
+    "checkout_base": "c0235fe0bfda75743a4ba987b9ef7ae7b4fd5da3",
+    "driver_sha256": "ad2d95ed535c12c734108d90c8ebd13482774aeb7b03d856b546377945f51cc8",
+    "finite_options_sha256": "03bf1b1e7a20c8edb6087e63ad57bfddbcd27d4a79ac863872974fe0fb76f942",
+    "generated_normal_move": {
+      "actor_observation_sha256": "0209099e9fb45fc164a08d6a87e4641e984723598ab22f2efe65bbba1aa019fd",
+      "count": 32,
+      "median_seconds_per_call": 0.008415370000875555,
+      "ordered_actions_sha256": "9c8e0240c40520524350d3818c15b97e69bbbcbe2d65c25f1958f598d7e7bb3c",
+      "seconds_per_call": [
+        0.008784489997196943,
+        0.008415370000875555,
+        0.008439154998632148,
+        0.008254175001638941,
+        0.008215354999992996
+      ]
+    },
+    "lock_sha256": "659a2d81e02176d23168861529651506ac87a4eab1982109f144cd62a63fce71",
+    "normal_observation_sha256": "0209099e9fb45fc164a08d6a87e4641e984723598ab22f2efe65bbba1aa019fd",
+    "ordinary_native_control": {
+      "final_event_log_hash": "8ddca235bf5b97665fad2baedb5f26aba5fd8fd545bd3ddc0e04ee41d8f58c74",
+      "status": "waiting_for_decision",
+      "viewer_sha256": "59383c7c68026b686e44aa1d234f25d8fb2504c76604ac6f41c28bd61807dcd7"
+    },
+    "platform": "Windows-11-10.0.26300-SP0",
+    "python": "3.14.5 (main, May 10 2026, 20:29:46) [MSC v.1944 64 bit (AMD64)]",
+    "retreat": {
+      "desperate_escape": {
+        "actor_observation_sha256": "59a746e34e81661cb60922ba562a33181a7f2d8d5d98dca2f098006152c373be",
+        "count": 32,
+        "median_seconds_per_call": 0.008094030001666397,
+        "ordered_actions_sha256": "9630da34d46935c2ca0e88a7d7be61d362ee7195aff7de61129cbb7d44bcd692",
+        "seconds_per_call": [
+          0.008547069999622181,
+          0.008094030001666397,
+          0.008228254999266937,
+          0.008028875000309198,
+          0.00800495500152465
+        ]
+      },
+      "ordered_retreat": {
+        "actor_observation_sha256": "e7c52c807d39ed7ce86f659fe137237c88e30236b7e9ee4d85e6905d9ce2fda3",
+        "count": 32,
+        "median_seconds_per_call": 0.008164899999974296,
+        "ordered_actions_sha256": "0feb6d175c7b16d4be6a7852337df2cacadeb8a05972781e6256ad8bc97a3c25",
+        "seconds_per_call": [
+          0.008164899999974296,
+          0.008066559999133461,
+          0.00828400999889709,
+          0.008696970000164584,
+          0.008024609999847599
+        ]
+      }
+    },
+    "runtime": "warhammer40k-core-v2:runtime-tree-sha256-v1:40b91df8a39aa85afd3503b466b7bcab93c87d70db8189243bc9c5d70f924e1a",
+    "sample_count": 5,
+    "schema": "stage2-normal-move-exact-base-probe-v1",
+    "side": "head"
+  },
+  "schema": "stage2-normal-move-serial-component-diagnostic-v1",
+  "scope": "Exact-base semantic and bounded search work controls; serial component timing only, not full-game or hosted throughput certification.",
+  "unchanged": [
+    "same ordered Fall Back actions under both issued modes",
+    "same finite Normal Move and Hold offer and same actor-view request",
+    "same event log and actor projection after ordinary native submission with no candidate generation"
+  ]
+}

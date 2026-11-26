@@ -1,0 +1,29 @@
+{
+  "current_draft_base": "e5cfe3cacfc869774e8e98863c1f43722215879f",
+  "git_objects_identical_on_both_bases": {
+    "ci/test_shards": "c29ec37f4fd0c407b89dcb46040bdc409552a89e",
+    "contracts/schemas": "4adc0dece8c4600cafe1c106a705ae6a8e7978ee",
+    "data/source_snapshots": "2013d2e1beca68c0e19be4b2c6e63667c4e005f2",
+    "pyproject.toml": "c6c28efc5840d756904b4374740db608c908e22b",
+    "scripts/build_test_shards.py": "4ab65b47f4f3bde521b348b7ab1c23a10de7c48e",
+    "scripts/engine_numerical_identity_test_admission.py": "6d889911a5d55a70b9c8340c411edaad30afce66",
+    "scripts/stage2_ground_charge_test_admission.py": "f170bbef22778bf57223d24db7e2e854f96d5137",
+    "src": "351621f2ebc7b3ad8d92dea09450009457963289",
+    "tests": "f024a634ac31dcd01e8db742ae47ad6d221c2a26",
+    "uv.lock": "b353e51cf0fc402e4e8ede54582522a6348378df"
+  },
+  "measured_base": "c0235fe0bfda75743a4ba987b9ef7ae7b4fd5da3",
+  "new_base_changes": [
+    "M\tdocs/AI_IMPLEMENTATION_PLAN.md",
+    "M\tdocs/performance/change-assessment.json",
+    "A\tdocs/stage2/b3-objective-preservation-receipt.json",
+    "M\tscripts/tests/test_verify_stage2_b3_post_roll_receipts.py",
+    "M\tscripts/verify_stage2_b3_post_roll_receipts.py"
+  ],
+  "retained_measurement": {
+    "path": "docs/stage2/normal-move-exact-base-performance.json",
+    "sha256": "43f69602ccc1605a06258bd5b5224cbc075121672e5f968941f377a43bcac7b4"
+  },
+  "schema": "stage2-normal-move-evidence-only-base-successor-v1",
+  "scope": "Retain the original component samples without relabeling their producer. Both bases have the same measured runtime, workload, lock and behavioral-selection inputs. The exact-diff serial gate is validated separately against the current draft base."
+}

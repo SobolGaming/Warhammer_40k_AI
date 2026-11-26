@@ -1,0 +1,29 @@
+{
+  "current_draft_base": "738cef0a75422aa5b77d6f969b285dc78bca6ad4",
+  "git_objects_identical_across_bases": {
+    "ci/test_shards": "c29ec37f4fd0c407b89dcb46040bdc409552a89e",
+    "contracts/schemas": "4adc0dece8c4600cafe1c106a705ae6a8e7978ee",
+    "data/source_snapshots": "2013d2e1beca68c0e19be4b2c6e63667c4e005f2",
+    "pyproject.toml": "c6c28efc5840d756904b4374740db608c908e22b",
+    "scripts/build_test_shards.py": "4ab65b47f4f3bde521b348b7ab1c23a10de7c48e",
+    "scripts/engine_numerical_identity_test_admission.py": "6d889911a5d55a70b9c8340c411edaad30afce66",
+    "scripts/stage2_ground_charge_test_admission.py": "f170bbef22778bf57223d24db7e2e854f96d5137",
+    "src": "351621f2ebc7b3ad8d92dea09450009457963289",
+    "tests": "f024a634ac31dcd01e8db742ae47ad6d221c2a26",
+    "uv.lock": "b353e51cf0fc402e4e8ede54582522a6348378df"
+  },
+  "landed_changes": [
+    "M\tdocs/AI_POLICY_INTERFACE.md",
+    "M\tdocs/performance/change-assessment.json"
+  ],
+  "measured_base": "c0235fe0bfda75743a4ba987b9ef7ae7b4fd5da3",
+  "previous_draft_base": "e5cfe3cacfc869774e8e98863c1f43722215879f",
+  "retained_receipt_sha256": {
+    "docs/stage2/normal-move-base-successor.json": "861a8a7a13063bdeeda52421912ea5828f76b30bb84e767eaedd7adda354dedf",
+    "docs/stage2/normal-move-candidate-receipt.json": "28a1a880af228075d9569fa7f49ba582bc07d73e9c1c20d13a5d2aed73ead85c",
+    "docs/stage2/normal-move-exact-base-performance.json": "43f69602ccc1605a06258bd5b5224cbc075121672e5f968941f377a43bcac7b4",
+    "docs/stage2/normal-move-frontier-evidence.json": "aa620bebe821dbe996796ac22d0bd09ca46b442ecbfd16e9987b0c6f09899197"
+  },
+  "schema": "stage2-normal-move-evidence-only-base-rebind-v1",
+  "scope": "Carry the earlier component diagnostics forward by exact workload, runtime and lock identity, without relabeling their measurements. Bind the serial performance gate separately to the actual draft diff. No replay, scoring, timing, or admission claim is extended."
+}

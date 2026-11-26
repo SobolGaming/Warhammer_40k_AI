@@ -1,0 +1,16 @@
+{
+  "schema": "finite-stage2-constructed-normal-move-origin-test-v1",
+  "retained_normal_move_sha256": "bf15b3ce40bd26cc9c1af4da30a21fc17cd475c8f849bceabf8407f3fa9348a0",
+  "runtime_fingerprint": "40b91df8a39aa85afd3503b466b7bcab93c87d70db8189243bc9c5d70f924e1a",
+  "added_files": {
+    "tests/rules/section09/test_constructed_normal_move_origin.py": {
+      "mode": "100644",
+      "blob_sha1": "66a502beeefdb9f2566252aa6967fee2cb7353e9",
+      "sha256": "7d98b29916544db1d2d973173e041af7f8f3c91c241054b3a13ed0cbaf52d84f",
+      "bytes": 12073
+    }
+  },
+  "added_cases": [
+    "tests/rules/section09/test_constructed_normal_move_origin.py::test_constructed_normal_move_origin_v1_admits_only_test_fixture"
+  ]
+}

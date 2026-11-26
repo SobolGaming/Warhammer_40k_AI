@@ -1,4 +1,4 @@
-"""Small, actor-view Hold and ground Fall Back search for Stage 2 comparisons."""
+"""Small, actor-view ground movement search for Stage 2 comparisons."""
 
 from __future__ import annotations
 
@@ -56,12 +56,15 @@ _DIRECTIONS = (
     (_DIAGONAL, -_DIAGONAL),
 )
 _DISTANCE_FRACTIONS = (0.875, 0.75)
-MAX_RETREAT_PROPOSALS = len(_DIRECTIONS) * len(_DISTANCE_FRACTIONS)
+_MAX_TRANSLATION_PROPOSALS = len(_DIRECTIONS) * len(_DISTANCE_FRACTIONS)
+MAX_RETREAT_PROPOSALS = _MAX_TRANSLATION_PROPOSALS
+MAX_NORMAL_MOVE_PROPOSALS = _MAX_TRANSLATION_PROPOSALS
 
 
 class ScreenMovementGapReason(StrEnum):
     NO_HOLD_RETREAT_OFFER = "no_hold_retreat_offer"
     NO_ORDINARY_FALL_BACK_REQUEST = "no_ordinary_fall_back_request"
+    NO_ORDINARY_NORMAL_MOVE_REQUEST = "no_ordinary_normal_move_request"
     UNSUPPORTED_FORMATION = "unsupported_formation"
     CANDIDATE_LIMIT = "candidate_limit"
     NO_TRANSLATION = "no_translation"
@@ -124,22 +127,46 @@ def generate_screen_movement_options(context: PlayerDecisionContext) -> ScreenMo
 
 
 def generate_retreat_proposals(context: PlayerDecisionContext) -> tuple[PolicyAction, ...]:
-    """Build rigid, planar full-path proposals for native validation.
+    """Build rigid, planar Fall Back proposals in the issued retreat mode."""
+    return _generate_translation_proposals(
+        context,
+        kind=ProposalKind.FALL_BACK,
+        action=MovementPhaseActionKind.FALL_BACK,
+        movement_mode=MovementMode.FALL_BACK,
+        route_gap=ScreenMovementGapReason.NO_ORDINARY_FALL_BACK_REQUEST,
+    )
 
-    The visible Move characteristic scales the search. Native submission checks
-    the effective budget, traversal, engagement, coherency and the issued mode.
+
+def generate_normal_move_proposals(context: PlayerDecisionContext) -> tuple[PolicyAction, ...]:
+    """Build ordinary Normal Move alternatives from the pending actor request.
+
+    Select between the issued Normal Move and Hold on the preceding finite
+    request. These unranked paths are not legality claims: native submission
+    owns the effective budget, traversal, engagement and coherency checks.
     """
+    return _generate_translation_proposals(
+        context,
+        kind=ProposalKind.NORMAL_MOVE,
+        action=MovementPhaseActionKind.NORMAL_MOVE,
+        movement_mode=MovementMode.NORMAL,
+        route_gap=ScreenMovementGapReason.NO_ORDINARY_NORMAL_MOVE_REQUEST,
+    )
+
+
+def _generate_translation_proposals(
+    context: PlayerDecisionContext,
+    *,
+    kind: ProposalKind,
+    action: MovementPhaseActionKind,
+    movement_mode: MovementMode,
+    route_gap: ScreenMovementGapReason,
+) -> tuple[PolicyAction, ...]:
     actor = context.route.actor_id
     route = PolicyRoute(
-        actor,
-        MOVEMENT_PROPOSAL_DECISION_TYPE,
-        "battle",
-        None,
-        "movement",
-        ProposalKind.FALL_BACK.value,
+        actor, MOVEMENT_PROPOSAL_DECISION_TYPE, "battle", None, "movement", kind.value
     )
     if context.route != route:
-        raise ScreenMovementGap(ScreenMovementGapReason.NO_ORDINARY_FALL_BACK_REQUEST)
+        raise ScreenMovementGap(route_gap)
     view = context.observation
     request = view["pending_decision"]
     assert request is not None
@@ -148,15 +175,19 @@ def generate_retreat_proposals(context: PlayerDecisionContext) -> tuple[PolicyAc
     if (
         issued.actor_id != actor
         or issued.request_id != request["request_id"]
-        or issued.proposal_kind is not ProposalKind.FALL_BACK
-        or issued.movement_phase_action != MovementPhaseActionKind.FALL_BACK
+        or issued.proposal_kind is not kind
+        or issued.movement_phase_action != action
         or details is None
-        or details.get("movement_mode") != MovementMode.FALL_BACK
+        or details.get("movement_mode") != movement_mode
     ):
-        raise ScreenMovementGap(ScreenMovementGapReason.NO_ORDINARY_FALL_BACK_REQUEST)
-    mode = details.get("fall_back_mode")
-    if not isinstance(mode, str) or mode not in tuple(FallBackModeKind):
-        raise ScreenMovementGap(ScreenMovementGapReason.NO_ORDINARY_FALL_BACK_REQUEST)
+        raise ScreenMovementGap(route_gap)
+
+    fall_back_mode = None
+    if kind is ProposalKind.FALL_BACK:
+        mode = details.get("fall_back_mode")
+        if not isinstance(mode, str) or mode not in tuple(FallBackModeKind):
+            raise ScreenMovementGap(route_gap)
+        fall_back_mode = mode
 
     battlefield = view["battlefield_view"]
     if battlefield is None or not isinstance(view["battlefield_state"], dict):
@@ -195,8 +226,9 @@ def generate_retreat_proposals(context: PlayerDecisionContext) -> tuple[PolicyAc
     width, depth = board["battlefield_width_inches"], board["battlefield_depth_inches"]
     actor_hash = context.observation_hash
     proposals: list[PolicyAction] = []
+    shortest_move = min(distances)
     for fraction in _DISTANCE_FRACTIONS:
-        distance = min(distances) * fraction
+        distance = shortest_move * fraction
         for x, y in _DIRECTIONS:
             endpoints = tuple(
                 (
@@ -217,12 +249,12 @@ def generate_retreat_proposals(context: PlayerDecisionContext) -> tuple[PolicyAc
                 continue
             proposal = MovementProposalPayload(
                 issued.request_id,
-                ProposalKind.FALL_BACK,
+                kind,
                 issued.unit_instance_id,
-                MovementPhaseActionKind.FALL_BACK.value,
+                action.value,
                 PathWitness.for_straight_line_endpoints(endpoints),
-                movement_mode=MovementMode.FALL_BACK.value,
-                fall_back_mode=mode,
+                movement_mode=movement_mode.value,
+                fall_back_mode=fall_back_mode,
             )
             proposals.append(
                 PolicyAction(

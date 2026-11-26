@@ -1,0 +1,367 @@
+{
+  "authored_protocol_sha256": "e2299bf4aa14b320e640502625a1dc9ff83a87c79f2912d687cd06130d9ff556",
+  "driver_sha256": "2ffe8046854cd9c0017f5861875ce3cf36bbabc0ec20fb7befe38be4f4e10a5e",
+  "frontiers": [
+    {
+      "accepted_native_probe_event_log_hash": "4b84e448f04afe5ce664b165b368754c3ad4122f66cea7f4dac5dfb482a1b566",
+      "accepted_samples": 3,
+      "archive_start_checkpoint": "common-A4-S-choice",
+      "archive_start_checkpoint_sha256": "555033c0a87a60cfe8a920458ccac3993c3252627828dcf640132d6530cfb725",
+      "archived_native_request": "decision-request-000003",
+      "authored_relative_xy_waypoints_inches": [
+        [
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          -2.0
+        ],
+        [
+          0.0,
+          -4.0
+        ]
+      ],
+      "exact_authored_waypoint_matches": 0,
+      "frontier": "S early A4",
+      "generated_candidates": 32,
+      "generation_wall_seconds": {
+        "median": 0.0081673,
+        "range": [
+          0.0079529,
+          0.0081994
+        ],
+        "samples": [
+          0.0081994,
+          0.0081673,
+          0.0079529
+        ]
+      },
+      "native_resolution_wall_seconds": {
+        "median": 0.0133806,
+        "range": [
+          0.0128158,
+          0.0180819
+        ],
+        "samples": [
+          0.0180819,
+          0.0133806,
+          0.0128158
+        ]
+      },
+      "native_submission_including_resolution_wall_seconds": {
+        "median": 0.0590817,
+        "range": [
+          0.0578917,
+          0.0655864
+        ],
+        "samples": [
+          0.0655864,
+          0.0590817,
+          0.0578917
+        ]
+      },
+      "predeclared_equivalent_matches": 1,
+      "proposal_checkpoint_sha256": "b06f7ed1449ba0e8451901297608f85540b48883df9234775fe2354de27350d4",
+      "role": "S",
+      "selected_equivalent_relative_xy_endpoint_inches": [
+        0.0,
+        -4.5
+      ],
+      "selected_witness_sha256": "0d49b8a9fae91c1ef870a70b50fbdf33ba44622d4bd1fe754e85412d811a5286",
+      "viewer_request": "view-request-9ca1092a34221538cf55639ea512d268b092638f5178ca1a6e297459c606ab52"
+    },
+    {
+      "accepted_native_probe_event_log_hash": "56a11c824adcbb9d32fbe1dbe306b6cd56f6e0aeee179d7c7e98d2d4f09915a0",
+      "accepted_samples": 3,
+      "archive_start_checkpoint": "hold-A5-entry",
+      "archive_start_checkpoint_sha256": "319f7c13ba1fe96c568906c81f8f5f5034c436fd04dfba4841a4ab2a5cb12a0c",
+      "archived_native_request": "decision-request-000016",
+      "authored_relative_xy_waypoints_inches": [
+        [
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          -2.0
+        ],
+        [
+          0.0,
+          -4.0
+        ]
+      ],
+      "exact_authored_waypoint_matches": 0,
+      "frontier": "S late A5",
+      "generated_candidates": 32,
+      "generation_wall_seconds": {
+        "median": 0.0085264,
+        "range": [
+          0.0082909,
+          0.0113644
+        ],
+        "samples": [
+          0.0113644,
+          0.0085264,
+          0.0082909
+        ]
+      },
+      "native_resolution_wall_seconds": {
+        "median": 0.0152984,
+        "range": [
+          0.0146112,
+          0.0158314
+        ],
+        "samples": [
+          0.0152984,
+          0.0158314,
+          0.0146112
+        ]
+      },
+      "native_submission_including_resolution_wall_seconds": {
+        "median": 0.1479979,
+        "range": [
+          0.1318024,
+          0.2114487
+        ],
+        "samples": [
+          0.1479979,
+          0.1318024,
+          0.2114487
+        ]
+      },
+      "predeclared_equivalent_matches": 1,
+      "proposal_checkpoint_sha256": "f3e8fc3c8b14452dbd614fb03e75a630141572581038a16e7b43d017c8f5877d",
+      "role": "S",
+      "selected_equivalent_relative_xy_endpoint_inches": [
+        0.0,
+        -4.5
+      ],
+      "selected_witness_sha256": "0d49b8a9fae91c1ef870a70b50fbdf33ba44622d4bd1fe754e85412d811a5286",
+      "viewer_request": "view-request-c7e96840ee99070d5c51dc7d5b20c4e0313d794cd080dfaa0456eba5248e7c23"
+    },
+    {
+      "accepted_native_probe_event_log_hash": "d44bc85700e6589470066f953dd034ed71a0c00204b1a93ae5501d710e87f329",
+      "accepted_samples": 3,
+      "archive_start_checkpoint": "hold-E-choice",
+      "archive_start_checkpoint_sha256": "120d8135c066864ce158f129a70b1d75ba10538914196b1c6aa57e3ef48f8612",
+      "archived_native_request": "decision-request-000018",
+      "authored_relative_xy_waypoints_inches": [
+        [
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          2.1
+        ],
+        [
+          0.0,
+          4.2
+        ]
+      ],
+      "exact_authored_waypoint_matches": 0,
+      "frontier": "E A5 after S held",
+      "generated_candidates": 32,
+      "generation_wall_seconds": {
+        "median": 0.0080874,
+        "range": [
+          0.0080771,
+          0.0084564
+        ],
+        "samples": [
+          0.0080771,
+          0.0084564,
+          0.0080874
+        ]
+      },
+      "native_resolution_wall_seconds": {
+        "median": 0.013239,
+        "range": [
+          0.0128051,
+          0.016833
+        ],
+        "samples": [
+          0.016833,
+          0.0128051,
+          0.013239
+        ]
+      },
+      "native_submission_including_resolution_wall_seconds": {
+        "median": 0.1725932,
+        "range": [
+          0.1661806,
+          0.1778202
+        ],
+        "samples": [
+          0.1725932,
+          0.1661806,
+          0.1778202
+        ]
+      },
+      "predeclared_equivalent_matches": 1,
+      "proposal_checkpoint_sha256": "ca308f21fa025fb3fd9a14daf44415fdcb1e097d31e45e6276a9ec14f04dee98",
+      "role": "E",
+      "selected_equivalent_relative_xy_endpoint_inches": [
+        0.0,
+        4.5
+      ],
+      "selected_witness_sha256": "d0121e1b981826f904efa5935b533af61814dc5df3d496fd4638d90ab12270f9",
+      "viewer_request": "view-request-11706d46fde4ea23f7358645faef800bb1f3484c4cf1ce1d89223fcfce39c000"
+    },
+    {
+      "accepted_native_probe_event_log_hash": "39706277e0b0a9fc652ad631f1c5875d9b4bae130c20b275d1f03e3e66471a74",
+      "accepted_samples": 3,
+      "archive_start_checkpoint": "screen-E-choice",
+      "archive_start_checkpoint_sha256": "16fd98856069f1fd20d01a48060fd151b844c1950f580cfe6e325ffeb16d5d5a",
+      "archived_native_request": "decision-request-000020",
+      "authored_relative_xy_waypoints_inches": [
+        [
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          2.1
+        ],
+        [
+          0.0,
+          4.2
+        ]
+      ],
+      "exact_authored_waypoint_matches": 0,
+      "frontier": "E A5 after early S",
+      "generated_candidates": 32,
+      "generation_wall_seconds": {
+        "median": 0.0079381,
+        "range": [
+          0.0078349,
+          0.0084908
+        ],
+        "samples": [
+          0.0084908,
+          0.0079381,
+          0.0078349
+        ]
+      },
+      "native_resolution_wall_seconds": {
+        "median": 0.0136129,
+        "range": [
+          0.013376,
+          0.0136302
+        ],
+        "samples": [
+          0.0136129,
+          0.013376,
+          0.0136302
+        ]
+      },
+      "native_submission_including_resolution_wall_seconds": {
+        "median": 0.1713439,
+        "range": [
+          0.1641524,
+          0.1816959
+        ],
+        "samples": [
+          0.1816959,
+          0.1641524,
+          0.1713439
+        ]
+      },
+      "predeclared_equivalent_matches": 1,
+      "proposal_checkpoint_sha256": "f12dc993bc3e07bed4fa741b5359375f4f22325a7ab089dc81895af48201cb7d",
+      "role": "E",
+      "selected_equivalent_relative_xy_endpoint_inches": [
+        0.0,
+        4.5
+      ],
+      "selected_witness_sha256": "d0121e1b981826f904efa5935b533af61814dc5df3d496fd4638d90ab12270f9",
+      "viewer_request": "view-request-52f936b1eba6a979ceac147e3ce9491b0408c3ba8ec5b36c536ae81728d1df92"
+    },
+    {
+      "accepted_native_probe_event_log_hash": "c9ae2249a8be410ae30bbabf04d309bc240f62c5aa49b421c71622e2945c17ec",
+      "accepted_samples": 3,
+      "archive_start_checkpoint": "late-E-choice",
+      "archive_start_checkpoint_sha256": "7284f76531c6e0f0b4081f18a34d2ac147011867896f59ece2613cd6bcef2f6a",
+      "archived_native_request": "decision-request-000019",
+      "authored_relative_xy_waypoints_inches": [
+        [
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          2.1
+        ],
+        [
+          0.0,
+          4.2
+        ]
+      ],
+      "exact_authored_waypoint_matches": 0,
+      "frontier": "E A5 after late S",
+      "generated_candidates": 32,
+      "generation_wall_seconds": {
+        "median": 0.0082099,
+        "range": [
+          0.0080317,
+          0.0085691
+        ],
+        "samples": [
+          0.0085691,
+          0.0082099,
+          0.0080317
+        ]
+      },
+      "native_resolution_wall_seconds": {
+        "median": 0.0132639,
+        "range": [
+          0.013025,
+          0.0137518
+        ],
+        "samples": [
+          0.013025,
+          0.0132639,
+          0.0137518
+        ]
+      },
+      "native_submission_including_resolution_wall_seconds": {
+        "median": 0.2587999,
+        "range": [
+          0.2558871,
+          0.2593002
+        ],
+        "samples": [
+          0.2558871,
+          0.2593002,
+          0.2587999
+        ]
+      },
+      "predeclared_equivalent_matches": 1,
+      "proposal_checkpoint_sha256": "1a9a472a7dcca594b3e7960cddc8d9c73a2614e8fb58831f0a4f5c8f48659724",
+      "role": "E",
+      "selected_equivalent_relative_xy_endpoint_inches": [
+        0.0,
+        4.5
+      ],
+      "selected_witness_sha256": "d0121e1b981826f904efa5935b533af61814dc5df3d496fd4638d90ab12270f9",
+      "viewer_request": "view-request-cb275aab4f2dfdb5f1629553726f5b464ae86636e977073d8faa142a497454f3"
+    }
+  ],
+  "generated_protocol_digest": "3bcc7cc5c0d0444ce87ac24b3b03086294b8867598bbfd673fd10018125367f4",
+  "native_proposals_validated_per_sample": 1,
+  "platform": "Windows-11-10.0.26300-SP0",
+  "predeclared_equivalent_predicate": "test-only fixed witness predicates: pure -Y S and pure +Y E, each at three quarters of the shortest visible Move; exactly one generated match per offer; no retry or score input",
+  "python": "3.14.5 (main, May 10 2026, 20:29:46) [MSC v.1944 64 bit (AMD64)]",
+  "runtime": "warhammer40k-core-v2:runtime-tree-sha256-v1:40b91df8a39aa85afd3503b466b7bcab93c87d70db8189243bc9c5d70f924e1a",
+  "samples_per_frontier": 3,
+  "schema": "stage2-normal-move-frontier-probes-v1",
+  "scope": "One preserved matched witness per sample, fresh restore each time. No timing of other witnesses, no opponent actions, no resampling or scoring continuation.",
+  "scoring_receipt_sha256": "28a1a880af228075d9569fa7f49ba582bc07d73e9c1c20d13a5d2aed73ead85c",
+  "serial": true,
+  "timing_boundaries": {
+    "generation_wall_seconds": "generate_normal_move_proposals on a ready actor context; excludes restore, view construction, predicate matching and all native submission",
+    "native_resolution_wall_seconds": "resolve_rules_unit_normal_move inside ordinary submission: grouped geometry, path and rule resolution only; excludes the facade and commit/events",
+    "native_submission_including_resolution_wall_seconds": "submit_viewer_parameterized_payload: actor binding, native resolution, apply, events and next request; excludes preparation and post-timing checks"
+  }
+}

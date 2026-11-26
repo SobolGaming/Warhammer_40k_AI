@@ -282,7 +282,7 @@ SCREEN_SOURCE = "src/warhammer40k_core/ai/screen_movement_candidates.py"
 
 
 def screen_movement_test_successor(
-    root: Path, *, previous_runtime: str
+    root: Path, *, previous_runtime: str, normal_move: NormalMoveAdmission | None = None
 ) -> tuple[str, dict[str, dict[str, object]], bytes]:
     from scripts.engine_numerical_identity_test_admission import _checked_bytes
 
@@ -306,5 +306,132 @@ def screen_movement_test_successor(
         or set(record["added_files"]) != {SCREEN_OWNER}
     ):
         raise SystemExit("Screen movement test transition membership differs.")
-    _checked_bytes(root, SCREEN_SOURCE, record["policy_sha256"])
+    if normal_move is None:
+        _checked_bytes(root, SCREEN_SOURCE, record["policy_sha256"])
+    else:
+        normal_move.validate_screen_source(root, record["policy_sha256"])
     return record["runtime_fingerprint"], _selection_members(record["added_files"], root), raw
+
+
+NORMAL_MOVE_TRANSITION = "data/source_audits/ci64_provenance_v1/stage2-normal-move-test-v1.json"
+NORMAL_MOVE_TRANSITION_SHA256 = "bf15b3ce40bd26cc9c1af4da30a21fc17cd475c8f849bceabf8407f3fa9348a0"
+NORMAL_MOVE_BASE = "c0235fe0bfda75743a4ba987b9ef7ae7b4fd5da3"
+NORMAL_MOVE_OWNER = "tests/rules/section09/test_normal_move_candidates.py"
+NORMAL_MOVE_CASES = (
+    "test_generated_normal_move_replays_with_exact_viewer_history",
+    "test_normal_paths_use_native_offer_alongside_unchanged_hold",
+)
+
+
+class _NormalMoveReceipt(TypedDict):
+    schema: str
+    base: str
+    retained_screen_sha256: str
+    retained_combined_charge_sha256: str
+    retained_runtime_fingerprint: str
+    runtime_fingerprint: str
+    runtime_manifest: dict[str, str]
+    screen_source: dict[str, str]
+    added_files: dict[str, dict[str, object]]
+    added_cases: list[str]
+
+
+@dataclass(frozen=True, slots=True)
+class NormalMoveAdmission:
+    receipt: _NormalMoveReceipt
+    raw: bytes
+
+    def validate_screen_source(self, root: Path, predecessor: str) -> None:
+        from scripts.engine_numerical_identity_test_admission import _checked_bytes
+
+        binding = self.receipt["screen_source"]
+        if binding["before"] != predecessor:
+            raise SystemExit("Normal Move admission requires the exact Screen source predecessor.")
+        _checked_bytes(root, SCREEN_SOURCE, binding["after"])
+
+    def admit_runtime(
+        self, root: Path, *, predecessor: bytes, fingerprint: str, manifest_sha256: str
+    ) -> str:
+        from scripts.engine_numerical_identity_test_admission import _checked_bytes
+        from scripts.milli_inch_test_admission import MANIFEST
+
+        binding = self.receipt["runtime_manifest"]
+        if (
+            self.receipt["retained_combined_charge_sha256"]
+            != hashlib.sha256(predecessor).hexdigest()
+            or self.receipt["retained_runtime_fingerprint"] != fingerprint
+            or binding["before"] != manifest_sha256
+        ):
+            raise SystemExit(
+                "Normal Move admission requires the exact combined Charge predecessor."
+            )
+        _checked_bytes(root, MANIFEST, binding["after"])
+        return self.receipt["runtime_fingerprint"]
+
+
+def load_normal_move_admission(root: Path) -> NormalMoveAdmission | None:
+    from scripts.engine_numerical_identity_test_admission import _checked_bytes
+
+    path = root / NORMAL_MOVE_TRANSITION
+    _selection_no_links(root, path)
+    if not path.exists():
+        return None
+    raw = _checked_bytes(root, NORMAL_MOVE_TRANSITION, NORMAL_MOVE_TRANSITION_SHA256)
+    record = cast(_NormalMoveReceipt, json.loads(raw, object_pairs_hook=_selection_object))
+    if (
+        record.keys() != _NormalMoveReceipt.__required_keys__
+        or record["schema"] != "finite-stage2-normal-move-test-v1"
+        or record["base"] != NORMAL_MOVE_BASE
+        or record["retained_screen_sha256"] != SCREEN_TRANSITION_SHA256
+        or record["added_files"].keys() != {NORMAL_MOVE_OWNER}
+        or record["added_cases"] != [f"{NORMAL_MOVE_OWNER}::{case}" for case in NORMAL_MOVE_CASES]
+        or record["runtime_fingerprint"] == record["retained_runtime_fingerprint"]
+        or any(
+            change.keys() != {"before", "after"} or change["before"] == change["after"]
+            for change in (record["screen_source"], record["runtime_manifest"])
+        )
+    ):
+        raise SystemExit("Normal Move test admission inventory differs.")
+    return NormalMoveAdmission(record, raw)
+
+
+NORMAL_MOVE_ORIGIN_TRANSITION = (
+    "data/source_audits/ci64_provenance_v1/stage2-constructed-normal-move-origin-test-v1.json"
+)
+NORMAL_MOVE_ORIGIN_TRANSITION_SHA256 = (
+    "a49351e14abf1b1542f240ee4f05823476f33b80ba5c13e5681df10cb8d64fc5"
+)
+NORMAL_MOVE_ORIGIN_OWNER = "tests/rules/section09/test_constructed_normal_move_origin.py"
+NORMAL_MOVE_ORIGIN_CASE = "test_constructed_normal_move_origin_v1_admits_only_test_fixture"
+
+
+def normal_move_origin_test_addition(
+    root: Path, *, predecessor: NormalMoveAdmission | None, runtime: str
+) -> tuple[dict[str, dict[str, object]], bytes] | None:
+    from scripts.engine_numerical_identity_test_admission import _checked_bytes
+
+    path = root / NORMAL_MOVE_ORIGIN_TRANSITION
+    _selection_no_links(root, path)
+    if not path.exists():
+        return None
+    raw = _checked_bytes(root, NORMAL_MOVE_ORIGIN_TRANSITION, NORMAL_MOVE_ORIGIN_TRANSITION_SHA256)
+    record = json.loads(raw, object_pairs_hook=_selection_object)
+    if (
+        predecessor is None
+        or record.keys()
+        != {
+            "schema",
+            "retained_normal_move_sha256",
+            "runtime_fingerprint",
+            "added_files",
+            "added_cases",
+        }
+        or record["schema"] != "finite-stage2-constructed-normal-move-origin-test-v1"
+        or record["retained_normal_move_sha256"] != hashlib.sha256(predecessor.raw).hexdigest()
+        or record["runtime_fingerprint"] != runtime
+        or record["runtime_fingerprint"] != predecessor.receipt["runtime_fingerprint"]
+        or set(record["added_files"]) != {NORMAL_MOVE_ORIGIN_OWNER}
+        or record["added_cases"] != [f"{NORMAL_MOVE_ORIGIN_OWNER}::{NORMAL_MOVE_ORIGIN_CASE}"]
+    ):
+        raise SystemExit("Constructed Normal Move origin requires the exact Normal Move lineage.")
+    return _selection_members(record["added_files"], root), raw
