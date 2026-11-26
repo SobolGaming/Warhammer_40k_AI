@@ -4588,6 +4588,14 @@
     "tests/rules/section09/test_forced_escape.py::test_native_forced_test_rolls_for_every_model_and_tests_battle_shock[False]": 7.145,
     "tests/rules/section09/test_forced_escape.py::test_native_forced_test_rolls_for_every_model_and_tests_battle_shock[True]": 3.451,
     "tests/rules/section09/test_isolation.py::test_units_ability_payloads_health_and_phase_ledgers_are_fresh": 0.112,
+    "tests/rules/section09/test_native_ordered_retreat.py::test_forced_escape_restore_rejects_invented_pretest_shock": 1.947,
+    "tests/rules/section09/test_native_ordered_retreat.py::test_native_ordered_retreat_resolves_and_replays[excluded-monster]": 13.074,
+    "tests/rules/section09/test_native_ordered_retreat.py::test_native_ordered_retreat_resolves_and_replays[outside-shadow]": 13.39,
+    "tests/rules/section09/test_native_ordered_retreat.py::test_native_ordered_retreat_resolves_and_replays[territorial-terror]": 26.555,
+    "tests/rules/section09/test_native_ordered_retreat.py::test_native_ordered_retreat_with_active_walker_objective_control[fail-and-wounds]": 92.992,
+    "tests/rules/section09/test_native_ordered_retreat.py::test_native_ordered_retreat_with_active_walker_objective_control[pass-and-restore]": 50.003,
+    "tests/rules/section09/test_native_ordered_retreat.py::test_native_ordered_retreat_with_active_walker_objective_control[terror-casualty-before-hazards]": 58.657,
+    "tests/rules/section09/test_native_ordered_retreat.py::test_second_forced_retreat_uses_only_territory_contributors": 37.232,
     "tests/rules/section09/test_normal_move_candidates.py::test_generated_normal_move_replays_with_exact_viewer_history": 9.823,
     "tests/rules/section09/test_normal_move_candidates.py::test_normal_paths_use_native_offer_alongside_unchanged_hold": 9.481,
     "tests/rules/section09/test_phase_flow.py::test_nonempty_start_and_end_rules_surround_all_active_units_exactly_once[At the end of your Movement phase-end-opponent]": 2.337,
@@ -6803,18 +6811,18 @@
   },
   "execution_model": {
     "assignment_wall_lower_bound_seconds": {
-      "1": 585.72,
-      "10": 585.72,
-      "11": 585.72,
-      "12": 585.72,
+      "1": 593.067,
+      "10": 593.067,
+      "11": 593.067,
+      "12": 593.067,
       "2": 795.547,
       "3": 609.537,
-      "4": 585.72,
-      "5": 585.721,
-      "6": 585.72,
-      "7": 585.72,
-      "8": 585.721,
-      "9": 585.72
+      "4": 593.067,
+      "5": 593.067,
+      "6": 593.067,
+      "7": 593.067,
+      "8": 593.067,
+      "9": 593.067
     },
     "cold_shard_assignment": "minimum-unrounded-modeled-test-load-existing-bucket-v1",
     "cold_shard_id": 1,
@@ -6823,18 +6831,18 @@
       "tests/factions/chaos_daemons/integration/test_cavalcade_v995_roster.py::test_exact_mirror_deploys_all_78_models_and_replays_to_battle"
     ],
     "shard_worker_seconds": {
-      "1": 2342.88,
-      "10": 2342.881,
-      "11": 2342.881,
-      "12": 2342.88,
+      "1": 2372.266,
+      "10": 2372.266,
+      "11": 2372.266,
+      "12": 2372.266,
       "2": 3182.186,
       "3": 2438.146,
-      "4": 2342.881,
-      "5": 2342.883,
-      "6": 2342.881,
-      "7": 2342.881,
-      "8": 2342.883,
-      "9": 2342.881
+      "4": 2372.266,
+      "5": 2372.266,
+      "6": 2372.266,
+      "7": 2372.266,
+      "8": 2372.268,
+      "9": 2372.266
     }
   },
   "files": {
@@ -7231,6 +7239,7 @@
     "tests/rules/section09/test_focused_checkpoint.py": 21.383,
     "tests/rules/section09/test_forced_escape.py": 10.596,
     "tests/rules/section09/test_isolation.py": 0.112,
+    "tests/rules/section09/test_native_ordered_retreat.py": 293.85,
     "tests/rules/section09/test_normal_move_candidates.py": 19.304,
     "tests/rules/section09/test_phase_flow.py": 4.087,
     "tests/rules/section09/test_restrictions.py": 16.698,
@@ -7404,41 +7413,45 @@
         "25759acf6c9170e603034a4071122fd33e00661a1f1a158d3439551f528f0624",
         "297a9f3fa66471f2f4792e5fd6bdc804517c797ff1aad1f397be73ab0c9fc71d",
         "318c7912fdab7fce1cce68a3998df8fbda4c9536540c88431e6303edb9b7fb5a",
+        "3531a7c68e3c7fd6caf54a356b1f2f1fdf38f1886baf78200ed0e7737bed0317",
         "3a22a93418b69848df9f3add62ccad61a8bb7cc93f094c2be079414f226c903d",
         "431f84031f3029637fa3c74e55d1c8dede1e3fe1aa04f223da43a8cacdd7574d",
         "5e4e0c1d0dec8330b10e7b4b4b3ec3191c4750ff009cfa932d3468ab003b7c65",
         "6065394017e442925f4256644907ffc7924dcc2b4a699b5065e1dda846989353",
+        "62e9b04db3c95d18d1d2228894bf276ab57839212f2c28dcf79105c8ffdd2f1d",
         "63db8ac24763535fbddc46142b0c99e6833b128bc40e674ff95ec735b05e1018",
         "6bd26136bbdd8633d62e2096d5ee6ec30ce1467afa4d9b33da379504811a9622",
         "708e2a7cdde4ec8155cc758efc538d7dc0dd4b5c25644c8a1c2d88652d6df8df",
         "70fd07b8320b0845f0fda4a1605082f32d3491ccc020572c417dbde73bb3179c",
+        "745b43747a5e0b20b81b6b4f349016f8d84d36754899bc0d1fef9a0dae6e08e5",
         "7cded789191d3e9a531806a0b448b6347da9bd58f9f62af169b77cae998e0753",
+        "890a314e728a19ebba487131081de5458b9065187e32437293bb56210a00f614",
         "891d5a38d19d3ecad0928ba55ce8ece1b340878065c973bbec5bbeeee9617cdd",
         "8e6ef17843af538ddc0a9551452cf432963faad6de879cd1033d4ca1caa906b4",
         "9a5f617751dd2ef273362bcbec3d532afb594c23b9d7c4576a1ba54a82305422",
         "9dc1b70162325c830e81f4b6e06c9199b793ed7d7805d59287feb2a593be541d",
         "a0c739be5dead41e85b3bd2dd20621e2c1740137928b6661ac0bf3e095e36bef",
         "a58370bb7e97f2155a65d0b16e4dc74b9e2fdb5251ee95594210b0d558e2ef63",
+        "ab98f12b63c9409af29e55f320be3ba4b26f032cfe4e46916cca30959d87d709",
         "b6375213c9da2f15abad64e49a6464d2963ef84289178cef5d659c8ec4ce1295",
         "ba4852f843008fdbaeeca9a9dce4b1952d47d25e3d6183409f2ad66b92ebaf65",
         "bfc1b038ad1ad3421e09e96ec44abee3fda3659ef23ab3717e1e066dbb158052",
         "cd7f89e05a4dbf7b6653c684a090d9dadccc238e9de7faeecb0f352235ef9e38",
         "d221fa9414f09deb36d275dca16085e59d0239e19246d38cf138ddd866c65662",
         "dc90b4c3e99d80d1501f965655e2d26f68388eb11d1993290e41f9802f4c00be",
-        "ab98f12b63c9409af29e55f320be3ba4b26f032cfe4e46916cca30959d87d709",
         "dfc98fbc7fececc1f1301c84bb15f410d0edc56b215a6ff2a1ba22dec183cee2"
       ],
-      "source": "Retained #736 refresh timing profile and one measured three-inch Charge roundoff regression on WSL; plus five measured Sheathed in Brass cases (serial WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); plus measured Blood Begets Skulls and Phase 17I updates (serial WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); add four measured Stage 3 melee cases (WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); plus measured Skulls Beget Blood and Phase 17I updates (serial WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); retain two reviewed Stage 3 native-qualification flight weights (serial Windows, Python 3.14.5; scheduling only); plus measured Wrath Undeniable and Phase 17I updates (serial WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); plus four measured pre-roll Charge flight admission cases (serial Windows, Python 3.14.5; scheduling only); remeasured the same native Charge case with the operational proof and unchanged case inventory; plus seven measured Gore-Hungry Onslaught nodes (serial Linux, Python 3.14.5, branch coverage; scheduling only); plus 17 measured Stage 3 Dense-wall and native late-spend controls (serial Windows, Python 3.14.5; scheduling only), retaining all exact landed-base weights; plus 17 measured native Dark Pact timing regressions (serial WSL Ubuntu, Python 3.14.5; scheduling only), retaining all exact #745 base weights; plus four measured native Attached Fight and Fire Overwatch regressions (serial pytest, WSL Ubuntu, Python 3.14.5; scheduling only), retaining all exact prior weights; plus four Fool's Flight cases (serial Windows, Python 3.14.5, native pytest; scheduling only), retaining all exact landed-base weights; plus the four separately measured #749 ground Charge retry cases, retaining all exact landed #748 case and selector weights and both original JUnit receipts; add only two measured Stage 2 Normal Move cases (serial Windows, Python 3.14.5, normal pytest; scheduling only) while retaining all exact #749 case and selector weights and receipt hashes; add only the measured Stage 2 constructed A4 origin case (serial Windows, standard pytest, Python 3.14.5; scheduling only), preserving all predecessor case and selector weights and original JUnit hashes; add five measured Dense-wall Charge CP policy cases (serial WSL Ubuntu, CPython 3.14.5, focused standard pytest; scheduling only), retaining every exact-base selector weight, case weight, and JUnit receipt; add four measured declaration-binding and Boolean opt-in regressions (WSL Ubuntu, CPython 3.14.5, focused serial pytest; scheduling only), retaining all 6795 prior case weights and 27 prior report hashes; add the measured pre-declaration CP drift case (WSL Ubuntu, CPython 3.14.5, focused serial pytest; scheduling only), retaining all 6799 prior case weights and 28 prior report hashes",
-      "test_cases": 6800,
-      "test_files": 461
+      "source": "Retained #736 refresh timing profile and one measured three-inch Charge roundoff regression on WSL; plus five measured Sheathed in Brass cases (serial WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); plus measured Blood Begets Skulls and Phase 17I updates (serial WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); add four measured Stage 3 melee cases (WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); plus measured Skulls Beget Blood and Phase 17I updates (serial WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); retain two reviewed Stage 3 native-qualification flight weights (serial Windows, Python 3.14.5; scheduling only); plus measured Wrath Undeniable and Phase 17I updates (serial WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); plus four measured pre-roll Charge flight admission cases (serial Windows, Python 3.14.5; scheduling only); remeasured the same native Charge case with the operational proof and unchanged case inventory; plus seven measured Gore-Hungry Onslaught nodes (serial Linux, Python 3.14.5, branch coverage; scheduling only); plus 17 measured Stage 3 Dense-wall and native late-spend controls (serial Windows, Python 3.14.5; scheduling only), retaining all exact landed-base weights; plus 17 measured native Dark Pact timing regressions (serial WSL Ubuntu, Python 3.14.5; scheduling only), retaining all exact #745 base weights; plus four measured native Attached Fight and Fire Overwatch regressions (serial pytest, WSL Ubuntu, Python 3.14.5; scheduling only), retaining all exact prior weights; plus four Fool's Flight cases (serial Windows, Python 3.14.5, native pytest; scheduling only), retaining all exact landed-base weights; plus the four separately measured #749 ground Charge retry cases, retaining all exact landed #748 case and selector weights and both original JUnit receipts; add only two measured Stage 2 Normal Move cases (serial Windows, Python 3.14.5, normal pytest; scheduling only) while retaining all exact #749 case and selector weights and receipt hashes; add only the measured Stage 2 constructed A4 origin case (serial Windows, standard pytest, Python 3.14.5; scheduling only), preserving all predecessor case and selector weights and original JUnit hashes; add five measured Dense-wall Charge CP policy cases (serial WSL Ubuntu, CPython 3.14.5, focused standard pytest; scheduling only), retaining every exact-base selector weight, case weight, and JUnit receipt; add four measured declaration-binding and Boolean opt-in regressions (WSL Ubuntu, CPython 3.14.5, focused serial pytest; scheduling only), retaining all 6795 prior case weights and 27 prior report hashes; add the measured pre-declaration CP drift case (WSL Ubuntu, CPython 3.14.5, focused serial pytest; scheduling only), retaining all 6799 prior case weights and 28 prior report hashes; retain the eight reviewed PR #753 native retreat weights and their original Windows Python 3.14.5 JUnit receipts",
+      "test_cases": 6808,
+      "test_files": 462
     }
   ],
   "shard_count": 12,
   "shards": [
     {
-      "duration_seconds": 2342.88,
+      "duration_seconds": 1871.032,
       "shard_id": 1,
-      "test_file_count": 83
+      "test_file_count": 53
     },
     {
       "duration_seconds": 3182.186,
@@ -7451,49 +7464,49 @@
       "test_file_count": 1
     },
     {
-      "duration_seconds": 2342.881,
+      "duration_seconds": 2372.266,
       "shard_id": 4,
-      "test_file_count": 48
+      "test_file_count": 47
     },
     {
-      "duration_seconds": 2342.883,
+      "duration_seconds": 2372.266,
       "shard_id": 5,
-      "test_file_count": 52
-    },
-    {
-      "duration_seconds": 2342.881,
-      "shard_id": 6,
-      "test_file_count": 51
-    },
-    {
-      "duration_seconds": 2342.881,
-      "shard_id": 7,
-      "test_file_count": 52
-    },
-    {
-      "duration_seconds": 2342.883,
-      "shard_id": 8,
-      "test_file_count": 52
-    },
-    {
-      "duration_seconds": 2342.881,
-      "shard_id": 9,
-      "test_file_count": 53
-    },
-    {
-      "duration_seconds": 2342.881,
-      "shard_id": 10,
-      "test_file_count": 52
-    },
-    {
-      "duration_seconds": 1841.647,
-      "shard_id": 11,
-      "test_file_count": 53
-    },
-    {
-      "duration_seconds": 2342.88,
-      "shard_id": 12,
       "test_file_count": 54
+    },
+    {
+      "duration_seconds": 2372.266,
+      "shard_id": 6,
+      "test_file_count": 54
+    },
+    {
+      "duration_seconds": 2372.266,
+      "shard_id": 7,
+      "test_file_count": 53
+    },
+    {
+      "duration_seconds": 2372.268,
+      "shard_id": 8,
+      "test_file_count": 53
+    },
+    {
+      "duration_seconds": 2372.266,
+      "shard_id": 9,
+      "test_file_count": 54
+    },
+    {
+      "duration_seconds": 2372.266,
+      "shard_id": 10,
+      "test_file_count": 54
+    },
+    {
+      "duration_seconds": 2372.266,
+      "shard_id": 11,
+      "test_file_count": 76
+    },
+    {
+      "duration_seconds": 2372.266,
+      "shard_id": 12,
+      "test_file_count": 53
     }
   ],
   "step5g_partitions": {
@@ -7501,5 +7514,5 @@
     "sha256": "b241b31651a8d5d903a2b851583186c276a5ac32fed26de1a1c69b4aa278b711"
   },
   "strategy": "largest-processing-time-by-derived-selector-weight",
-  "total_test_duration_seconds": 28547.91
+  "total_test_duration_seconds": 28841.76
 }

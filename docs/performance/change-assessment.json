@@ -1,71 +1,1091 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "55eef9b20652b030d3ab3e9b85755e0acd7c2d49",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:6a62fab60ddf5b30cb9651f7a2ec7140e06765f9c35eec1abd625e1f5814caec",
-  "operation_map_sha256": "175c598e3332a1123f54e7b792c6ee5e5711a63a7eaf4ad463704b919388cd5e",
+  "base": "769f1ed3643ef52be59343a53750502de9be02c7",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:2d9f15526ffb5d9e4beece2176972f35e8396c6e4519f950f8838a16f4c713fa",
+  "operation_map_sha256": "caf2780309f3927922d1be7ac1964314887d0dc9ab08a8feb14e31e9a91eeda3",
   "changes": {
-    "data/source_audits/caudit_01_successors/README.md": {
-      "before_sha256": null,
-      "after_sha256": "971b97bd2614da1e6747568f784ca2e58fd0675562484b6defc86697db5f611f",
+    "ci/test_shards/durations.json": {
+      "before_sha256": "0955ecaedc1b28e4d467ec3e44b4c07ff4469588274a16ba25e93111af449609",
+      "after_sha256": "5d35ab02b2fb41cb5e1c7896706a2f6f3529bdfa3f20cfc90c2f2b9a210cb99d",
       "owners": {
         "@document": {
-          "before": null,
-          "after": "971b97bd2614da1e6747568f784ca2e58fd0675562484b6defc86697db5f611f"
+          "before": "0955ecaedc1b28e4d467ec3e44b4c07ff4469588274a16ba25e93111af449609",
+          "after": "5d35ab02b2fb41cb5e1c7896706a2f6f3529bdfa3f20cfc90c2f2b9a210cb99d"
         }
       }
     },
-    "data/source_audits/caudit_01_successors/successor-inventory.json": {
+    "ci/test_shards/shard-1.txt": {
+      "before_sha256": "7190aa762e15a22a60fb0f6445579d222b57fda6a903e0944bf4efb749d9db56",
+      "after_sha256": "0e3d44bcfc990375e8704b6213c72f44c4eb280d72f546cd6d364a3dcaede17c",
+      "owners": {
+        "@document": {
+          "before": "7190aa762e15a22a60fb0f6445579d222b57fda6a903e0944bf4efb749d9db56",
+          "after": "0e3d44bcfc990375e8704b6213c72f44c4eb280d72f546cd6d364a3dcaede17c"
+        }
+      }
+    },
+    "ci/test_shards/shard-10.txt": {
+      "before_sha256": "e7ff3725c3a71b3776d5ccb4ac246a105d5abda10d39d5b744347d04f91f4b30",
+      "after_sha256": "f6b673271806fc73e07e5dbf404f8657a3a85e104d97091deb85d0e9ebb1c794",
+      "owners": {
+        "@document": {
+          "before": "e7ff3725c3a71b3776d5ccb4ac246a105d5abda10d39d5b744347d04f91f4b30",
+          "after": "f6b673271806fc73e07e5dbf404f8657a3a85e104d97091deb85d0e9ebb1c794"
+        }
+      }
+    },
+    "ci/test_shards/shard-11.txt": {
+      "before_sha256": "40d7f5b32133e972df288dd22e979e62ec1a7acb741b51875701040ddb232df1",
+      "after_sha256": "043101734865e016d7ae85f76b84088a4090f962321cab9f183aa2133cb080e7",
+      "owners": {
+        "@document": {
+          "before": "40d7f5b32133e972df288dd22e979e62ec1a7acb741b51875701040ddb232df1",
+          "after": "043101734865e016d7ae85f76b84088a4090f962321cab9f183aa2133cb080e7"
+        }
+      }
+    },
+    "ci/test_shards/shard-12.txt": {
+      "before_sha256": "7640ffadaace375f3dc7dc48d734d92fbdf9f840ef0596ef270a019092eec29f",
+      "after_sha256": "9ca251eb0943c115509d4a9aafa1597f79fc43fdc73d6e0a3ad13a7a952d1077",
+      "owners": {
+        "@document": {
+          "before": "7640ffadaace375f3dc7dc48d734d92fbdf9f840ef0596ef270a019092eec29f",
+          "after": "9ca251eb0943c115509d4a9aafa1597f79fc43fdc73d6e0a3ad13a7a952d1077"
+        }
+      }
+    },
+    "ci/test_shards/shard-4.txt": {
+      "before_sha256": "7bdb930f2ff26ef940d9f8d7a8bb2735311a99a5feb77de535ab316ca8b6fb65",
+      "after_sha256": "2996411ee4a143ae790f5aec35058756bd3951e7010c212c428e0900efae5865",
+      "owners": {
+        "@document": {
+          "before": "7bdb930f2ff26ef940d9f8d7a8bb2735311a99a5feb77de535ab316ca8b6fb65",
+          "after": "2996411ee4a143ae790f5aec35058756bd3951e7010c212c428e0900efae5865"
+        }
+      }
+    },
+    "ci/test_shards/shard-5.txt": {
+      "before_sha256": "f114129234b190e6caaefeffb691f6a7f7a85c13d78b986f33cf0ad6ec4511e4",
+      "after_sha256": "180521b2883f5b0cf405749c2647fac3c0aac7a7f30580b2c3b7c9200bb72173",
+      "owners": {
+        "@document": {
+          "before": "f114129234b190e6caaefeffb691f6a7f7a85c13d78b986f33cf0ad6ec4511e4",
+          "after": "180521b2883f5b0cf405749c2647fac3c0aac7a7f30580b2c3b7c9200bb72173"
+        }
+      }
+    },
+    "ci/test_shards/shard-6.txt": {
+      "before_sha256": "2d22d6d54ce4413f244281d2f0629242bd5730507e0d725f8c6584a190e57b12",
+      "after_sha256": "e4bfebea56a4270f3212590c91ab3e1e3cdc0180244c0179485d6bc252f96db2",
+      "owners": {
+        "@document": {
+          "before": "2d22d6d54ce4413f244281d2f0629242bd5730507e0d725f8c6584a190e57b12",
+          "after": "e4bfebea56a4270f3212590c91ab3e1e3cdc0180244c0179485d6bc252f96db2"
+        }
+      }
+    },
+    "ci/test_shards/shard-7.txt": {
+      "before_sha256": "c59b4abd3c8293313e759aaa08b01d7c7a412ffc9277c291adbba89d83b61404",
+      "after_sha256": "161e7d0b2b3930d8d3f91be8dd7e739d7848d469bb7e1a12aa084613aeafcaa9",
+      "owners": {
+        "@document": {
+          "before": "c59b4abd3c8293313e759aaa08b01d7c7a412ffc9277c291adbba89d83b61404",
+          "after": "161e7d0b2b3930d8d3f91be8dd7e739d7848d469bb7e1a12aa084613aeafcaa9"
+        }
+      }
+    },
+    "ci/test_shards/shard-8.txt": {
+      "before_sha256": "bbcf2f883fb9c31b88e60aa7abbda833f06edaa58fddf3107c4c57f32d3b86d9",
+      "after_sha256": "d7b358a07a383837ad9ed912f676fde03b3c7d97d061b039f10fb49c093c5725",
+      "owners": {
+        "@document": {
+          "before": "bbcf2f883fb9c31b88e60aa7abbda833f06edaa58fddf3107c4c57f32d3b86d9",
+          "after": "d7b358a07a383837ad9ed912f676fde03b3c7d97d061b039f10fb49c093c5725"
+        }
+      }
+    },
+    "ci/test_shards/shard-9.txt": {
+      "before_sha256": "12b1c69d58236b6ba9ba55e54d0e577791903156936a621726085d0db40a3dcf",
+      "after_sha256": "c686e9acfa9b3750f5681120cefe19c411852db7fad28c5978d0c8e60620b243",
+      "owners": {
+        "@document": {
+          "before": "12b1c69d58236b6ba9ba55e54d0e577791903156936a621726085d0db40a3dcf",
+          "after": "c686e9acfa9b3750f5681120cefe19c411852db7fad28c5978d0c8e60620b243"
+        }
+      }
+    },
+    "contracts/examples/persistence/session-persistence.json": {
+      "before_sha256": "6681f0e71e0af27064770b35159b276caa95070918587a7215d869d6b941944e",
+      "after_sha256": "b034202d647899ca362ae238fd5779b3d909cfd8bb58d21480b43afb30c52d50",
+      "owners": {
+        "@document": {
+          "before": "6681f0e71e0af27064770b35159b276caa95070918587a7215d869d6b941944e",
+          "after": "b034202d647899ca362ae238fd5779b3d909cfd8bb58d21480b43afb30c52d50"
+        }
+      }
+    },
+    "contracts/examples/sessions/session-command-outcome.json": {
+      "before_sha256": "39682a6edb5debc56ebd470eca434174f110df2f690f396545bcbdbf8379361a",
+      "after_sha256": "2694c575eb2959967058c4ed3acc8972d08c13efccda22cc672c52dbfd9d57b7",
+      "owners": {
+        "@document": {
+          "before": "39682a6edb5debc56ebd470eca434174f110df2f690f396545bcbdbf8379361a",
+          "after": "2694c575eb2959967058c4ed3acc8972d08c13efccda22cc672c52dbfd9d57b7"
+        }
+      }
+    },
+    "contracts/examples/sessions/session-command-started.json": {
+      "before_sha256": "a4a25e74d7d2f0b891fc466aa02b175828815b5f1f62e0b93a17e11d386b5c7f",
+      "after_sha256": "bc35fe3501216ce94e8face0ec405f7b14221e660855561844309a36bfbaee3c",
+      "owners": {
+        "@document": {
+          "before": "a4a25e74d7d2f0b891fc466aa02b175828815b5f1f62e0b93a17e11d386b5c7f",
+          "after": "bc35fe3501216ce94e8face0ec405f7b14221e660855561844309a36bfbaee3c"
+        }
+      }
+    },
+    "contracts/examples/sessions/session-metadata-created.json": {
+      "before_sha256": "63ad0e9a41db337b61fe8bf5f7114666fa43854377f8e3991e929472eceb3e5b",
+      "after_sha256": "bdd0a091f8da1d9e82b8443b0088c5872b0b0977dda33721ae59943a2d71fe86",
+      "owners": {
+        "@document": {
+          "before": "63ad0e9a41db337b61fe8bf5f7114666fa43854377f8e3991e929472eceb3e5b",
+          "after": "bdd0a091f8da1d9e82b8443b0088c5872b0b0977dda33721ae59943a2d71fe86"
+        }
+      }
+    },
+    "contracts/examples/support-profile-player-a-redacted.json": {
+      "before_sha256": "468b7a881b128cf5e55b57fd7868cde11636a994850a107797c2b7fad8a3ee33",
+      "after_sha256": "6cb4f338685dd698afa581de5ffebdebc0bb8bb10cccb0a0900f3bd8b0f838fd",
+      "owners": {
+        "@document": {
+          "before": "468b7a881b128cf5e55b57fd7868cde11636a994850a107797c2b7fad8a3ee33",
+          "after": "6cb4f338685dd698afa581de5ffebdebc0bb8bb10cccb0a0900f3bd8b0f838fd"
+        }
+      }
+    },
+    "contracts/examples/support-profile-player-b-redacted.json": {
+      "before_sha256": "d76e11141424c5cb7d171e1215da9947a1d45e4e8022ce98da0ecc206da5fb41",
+      "after_sha256": "0ec15dcdb25aa3eb19ee59f29bec588934403cfd84318c2bb5de19a84bbe534a",
+      "owners": {
+        "@document": {
+          "before": "d76e11141424c5cb7d171e1215da9947a1d45e4e8022ce98da0ecc206da5fb41",
+          "after": "0ec15dcdb25aa3eb19ee59f29bec588934403cfd84318c2bb5de19a84bbe534a"
+        }
+      }
+    },
+    "contracts/examples/support-profile.json": {
+      "before_sha256": "b49dbe607de8c8ec1d3b6e0583495fa82bcd9ed49822e34b77ea9ca8d7e4db5b",
+      "after_sha256": "d5ecc857de54e5ac5adba7fa1d984a8d3881baa1c0179e8e8db720fb6f5a48d0",
+      "owners": {
+        "@document": {
+          "before": "b49dbe607de8c8ec1d3b6e0583495fa82bcd9ed49822e34b77ea9ca8d7e4db5b",
+          "after": "d5ecc857de54e5ac5adba7fa1d984a8d3881baa1c0179e8e8db720fb6f5a48d0"
+        }
+      }
+    },
+    "contracts/manifest.json": {
+      "before_sha256": "2b66e20f189ac841b7b427c9ebfb1bea2d48b4c3867a5321b066113fb87cd85c",
+      "after_sha256": "1d42b35c1c6a3b551b5a01d170cac2d323e4a09823894ed60917c29492ad7be7",
+      "owners": {
+        "@document": {
+          "before": "2b66e20f189ac841b7b427c9ebfb1bea2d48b4c3867a5321b066113fb87cd85c",
+          "after": "1d42b35c1c6a3b551b5a01d170cac2d323e4a09823894ed60917c29492ad7be7"
+        }
+      }
+    },
+    "data/source_audits/ci64_provenance_v1/daemonic-terror-ordered-retreat-v1.json": {
       "before_sha256": null,
-      "after_sha256": "f4bf2ec918853cd2c9e1d8505ce24d6c8b013bed9a454754ace4ce9c3393e91d",
+      "after_sha256": "68e641b2079eaeff94bc4c0724d5662293682512e276bd72dfbf936b60b64c2e",
       "owners": {
         "@document": {
           "before": null,
-          "after": "f4bf2ec918853cd2c9e1d8505ce24d6c8b013bed9a454754ace4ce9c3393e91d"
+          "after": "68e641b2079eaeff94bc4c0724d5662293682512e276bd72dfbf936b60b64c2e"
+        }
+      }
+    },
+    "docs/performance/current/forced-retreat-outcome-reconstruction-20261126.json": {
+      "before_sha256": null,
+      "after_sha256": "f93b48c2edf59fedd5557edc323ecf9749da28bbd0e45165185828de35d68e3a",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "f93b48c2edf59fedd5557edc323ecf9749da28bbd0e45165185828de35d68e3a"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "8658b29d837cb3947fd134a4b5ac80efb223c1bda69a44fa630514b2c9dc07be",
-      "after_sha256": "460019df7a6c3d510522606447a18ff4e92726b03eeade906f88670163be99d5",
+      "before_sha256": "460019df7a6c3d510522606447a18ff4e92726b03eeade906f88670163be99d5",
+      "after_sha256": "17a09fd81425164a83ee091769f1261670a46719b7f2f97db5867340bd5f542e",
       "owners": {
         "@document": {
-          "before": "8658b29d837cb3947fd134a4b5ac80efb223c1bda69a44fa630514b2c9dc07be",
-          "after": "460019df7a6c3d510522606447a18ff4e92726b03eeade906f88670163be99d5"
+          "before": "460019df7a6c3d510522606447a18ff4e92726b03eeade906f88670163be99d5",
+          "after": "17a09fd81425164a83ee091769f1261670a46719b7f2f97db5867340bd5f542e"
+        }
+      }
+    },
+    "scripts/engine_numerical_identity_test_admission.py": {
+      "before_sha256": "40227f08b7a2c290083a9526f99d8a89f634901a06c304af90b9ee346cadc285",
+      "after_sha256": "8d7f6790ce10e0026c26213f1908e686d3e33be43b9a4b9ac8c9240d3f02dd4f",
+      "owners": {
+        "@module": {
+          "before": "4dd2165c209d75a67cd1aab59eb63841d1406c4b3757d542d2ce70787f4a0211",
+          "after": "b3b28155231bc4eb40dfe11a970b260780fa6c24d18fcf0338f38972dd547a2b"
+        },
+        "_DaemonicTerrorTransition": {
+          "before": null,
+          "after": "c43294c17c803d441166f963065957b4327276f19f1a4f7c63144c9d77196255"
+        },
+        "_daemonic_terror_transition": {
+          "before": null,
+          "after": "f1432dd10330d87f27b5b26b3430737578e44428ed46641e64377b327a934785"
+        },
+        "_pending_battle_shock_source_transition": {
+          "before": "3cd12b22ccd0523acdf61d0f3cf2b5dd5685aa965535a55c86b9247c4238146a",
+          "after": "87ac53d87be91d68683d9f42fc89f2946e918663a33d26c60b155004611ef352"
+        },
+        "combined_charge_runtime": {
+          "before": "4e578785d442eb9442e48ac5bacc99d8c1475f7efb9c5cb3214c5ed869a1561d",
+          "after": "94e6927db6153a79aecde2bc31539e9b566463b94aa1d70dcd6386387b430ef6"
+        },
+        "exact_movement_test_transition": {
+          "before": "d6f353a39310b84c4674c57922c2c94c05e82af99544d01ec06babc851fa9f2b",
+          "after": "52b66c7d8130061125299123d98ca322c388e50ff533fa7312c38a6a39d4d20f"
+        }
+      }
+    },
+    "src/warhammer40k_core/_engine_build_manifest.json": {
+      "before_sha256": "011c4baa764d5c8062632b8f19c4f4fcfe5925b5744afce28fba77ed84800720",
+      "after_sha256": "6f3b38d81c97fd2950a2ebc77b03439f843c9db402a2c6fdc77a2a4d5144b048",
+      "owners": {
+        "@document": {
+          "before": "011c4baa764d5c8062632b8f19c4f4fcfe5925b5744afce28fba77ed84800720",
+          "after": "6f3b38d81c97fd2950a2ebc77b03439f843c9db402a2c6fdc77a2a4d5144b048"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/battle_shock_event_authority.py": {
+      "before_sha256": "2d80ebb089666a49a452d8267cb3c65640ea61c24a7d3817e3a3d22a61d1e028",
+      "after_sha256": "fcafc67f3d7a0253b811850b52636f9e4908213e26e523374505270a38c1579c",
+      "owners": {
+        "validate_battle_shock_runtime_content_authority": {
+          "before": "e0839695b8fab23b0a3cebdf3d7e5eafe89f0cc4bcae97d7feedaa9363831e6c",
+          "after": "038c82d9367aba4bb785d03b36c3091f5af6e1e8338d75c49f44863d9a836e61"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/battle_shock_historical_authority.py": {
+      "before_sha256": "d33d5a29f29b470ceefe993e40d1433757fa97098ba0d05676b1eb547c3389f1",
+      "after_sha256": "5612a79c036f0f802659a225a29b036044c76f2c742b5859f35d313a139de08f",
+      "owners": {
+        "@module": {
+          "before": "08b4ca60b2afadda6406d486c4e445409f96d13f082f2be9133750f25e232a91",
+          "after": "77342dd09b67156290dcd63c258b6e2719ecb54751172f44ae46c8235702f3a2"
+        },
+        "HistoricalBattleShockAuthorityContext": {
+          "before": "1a3bebcee3ced9545af9312e12ee5f34f6aaa23333170fa08bf23df36bac0622",
+          "after": "3fc220db261b32dc8ad6cbc464b71deaea0fa93acd15d210862edefc4c5da368"
+        },
+        "historical_battle_shock_authority_context": {
+          "before": "bd5b5520040c4a564a81bf3ca5e3bce92005d1ac4130990a9b95efaf723fe3f4",
+          "after": "f60c89881e690395fd16a46bf610a74d60bc5db4db2ec85b8699070cfd6a3d7e"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/battle_shock_hooks.py": {
+      "before_sha256": "9a237d454074fb42347a514e49ef58fd137c3f672571b71f106600221e485c14",
+      "after_sha256": "fad64bae0f3f02b334ac55b3b1d6a9a5d5c5f63d660b460b014bf59f03afd863",
+      "owners": {
+        "BattleShockHookRegistry": {
+          "before": "01a7951fffaec305a5fe787efecc5ebe1b78ea45e269f221cf0ad94413d683ac",
+          "after": "1ec9d11e9816ac46b9e72f32c592f78fd92c0c2f939b2edbab29b02f1d8b5a17"
+        },
+        "BattleShockHookRegistry.from_bindings": {
+          "before": "295274e50058a6cbf3cc2812ea87aed46018ab5a42ab45277869bd8901d218d9",
+          "after": "5e1bd0c1c368aab889c113b39be1c13e9e9bb54ed1db94b699eec2d68b70b34f"
+        },
+        "BattleShockPendingOutcomeAuthorityContext": {
+          "before": "56e0a5fcc6c49ffec3f09e5b2de6a9aa04c3b6244a6fb4069e2d582b7c16eec5",
+          "after": "0b9c07b0eb122a52ff57817ce3c79203a9b6d1329606d94b2aadce6f8a587ead"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/battle_shock_lifecycle_authority.py": {
+      "before_sha256": "b0e772df21ff7af8a140fb76203f9f40ae6f464ba104f748555b697622f98a20",
+      "after_sha256": "7cf972e7f35c03659987b4eeed46353e2482e2f0519b168853a9b0a0eaf844b5",
+      "owners": {
+        "validate_pending_outcome_request": {
+          "before": "6dfb836219ececb8d59ac370d5058c5590debac0cd54c8d65e870692a326fb4c",
+          "after": "4a9e582d81de4432c69e809d00cf5a8d91ab92089446641da95155513f5994a8"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/battle_shock_source_family_authority.py": {
+      "before_sha256": "4c39c5a0229d595ec84a8ef4083ecc217f40df5f9c090fe7636ae944c186e152",
+      "after_sha256": "74f852b834a1ba310251bc7b2dec95ae7454ec99348160edd1dabe2ced9c22d8",
+      "owners": {
+        "validate_battle_shock_runtime_source_family_authority": {
+          "before": "afc2f0662dd46c9fba7d27ee0752e17ccf8df9045862a07db69b18235de3b2b2",
+          "after": "918074028576cc8d81d9318b35423bac36b69e1ea5e58cbc69a2498dc535dc94"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/catalog_selected_target_battle_shock_continuation.py": {
+      "before_sha256": "f4040770ee28309fbd9f948c39b727000a38b8ab81112f317076fc58feccbb40",
+      "after_sha256": "5d1d9fec1aea088643c2e7b930f5d7f9c6d107ba85bb02f2387d3eeffce1e29a",
+      "owners": {
+        "_pending_claim": {
+          "before": "3ee161c08fa4df1c64bffa6734b0898f93822ddacb63a5e735c7cf65019dfd3c",
+          "after": "eed9d98fd843bb8eafb3e4d02f04bb830a5ce32e7b21c0c17a4617651f3e34b7"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/faction_content/bundle.py": {
+      "before_sha256": "2f30bcf286a7d12532a5b7c7b4a216f2eb3044512d3d7838ac85dc04fbc444e0",
+      "after_sha256": "5356f317a50cf64913c911dea9a98f265cbd5d1245b44eb0045492867e7ba9cc",
+      "owners": {
+        "RuntimeContentBundle.from_contributions": {
+          "before": "7c2fd19a53f2f532b241c311812d8730cde7bdcc34b50a9e80a6063545d9c8ea",
+          "after": "1d45f0bf74122721613caeaab0b774574a59aa4992343ed177e4201a7c6b271f"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/army_rule.py": {
+      "before_sha256": "00ffe06bf3fbd050cef1efc88b6de38eacd7a11c4d3fd9d5f2a4fff9e1de3043",
+      "after_sha256": "8ecba93a2d491edc94550b81aae63a55a9ee78d36f7e5ffd5b42f6ebf5d28d3e",
+      "owners": {
+        "_historical_battle_shock_contribution": {
+          "before": "9ab1625b0703f1d25624d6ef3bbcc162f5f3a446d9f70506381da0c5a9c1e658",
+          "after": "ea475d24fc41606147f6eee6134334495697fd8d40a3f8a44082686d30eda691"
+        },
+        "_historical_daemonic_terror_applies": {
+          "before": "86872841a22fe02c0662a22e3d27f19eb8e9ef49dc4cb38e185f806f86154b9a",
+          "after": null
+        },
+        "historical_daemonic_terror_applies": {
+          "before": "f8ef825db6111861a5e3238d0af9b36f4f74b1e0e6a8e2802a3cbb4b8055b4e6",
+          "after": "f893a79bda6f64c0b137d0368cce3fafeec7c7a2ce7dec97ab56d7548711e79d"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/battle_shock_outcome_authority.py": {
+      "before_sha256": "4c66f099bd6f5c504782e167d9686dbfad9998ecf8af16adc165200290f4cfa5",
+      "after_sha256": "f36568758285aabc26165f8b7e40610878bebc6cec447bb7dd6cc1754dc0a0a8",
+      "owners": {
+        "validate_daemonic_terror_pending_outcome": {
+          "before": "401ba455f45d8902eface4c9d3b4b371e2d113f56a4578931ddfa8d4c3124b7e",
+          "after": "6f6946f8f4e6c2377606ff66c7b03ff3e0157b796e86d4801f179b5c148ef2c5"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/battle_shock_territory_authority.py": {
+      "before_sha256": "4f110d54ff14ce4e2976ef551764f67a45ace8f2e74c51101d4cf41eca7a9886",
+      "after_sha256": "eb22292bbebc11c3377e21165618c7f09b0bf0169f2302696208a0130ee0ef51",
+      "owners": {
+        "@module": {
+          "before": "6fd5ebca5099fb82df2b57c5606b73c79e273ae1fb7d1d1947fb5c1fb3b9ce4c",
+          "after": "72d481fa420aefefd4670918ac112f406bb27912e2b12b1831a1bd6e9c6ae231"
+        },
+        "_active_objective_control_effects": {
+          "before": null,
+          "after": "6906bc507106d089a73ae58034605cb454ce3ada1df21190e84181c19005361d"
+        },
+        "_contributor_rules_unit": {
+          "before": null,
+          "after": "f2c1f70fd9689128661f2849e869f15f93b3eb25819d9dc5f9ea646ee06b727a"
+        },
+        "_historical_control_at_objective": {
+          "before": "a98366980e2d7c28c18f84211b337295f34f9e50831e296e7323548ec96517cd",
+          "after": "ea941a1e49839bd0ed32698bd97f0a541613733ef185755ea8e13ad039f73cd1"
+        },
+        "_may_modify_objective_control": {
+          "before": "e1e1037ed0c9af4e4a5f29b176d258d78626f8bbd24e90bee9c9f98a0e698525",
+          "after": "a7581878cfff5fd81b1df248e6605aa2cb30311a327c0a99c3ebd1a3db6d772f"
+        },
+        "_rules_unit_identities": {
+          "before": null,
+          "after": "eb2e10d45652f622e962df06bcb1ff4c2bc21e7934fcdf430b4a400287c73535"
+        },
+        "historical_territorial_control": {
+          "before": "96fc0f3af2c6f272348d6b3354e96d7f8bd362b0dd86924c03d8b01fc0393b43",
+          "after": "f26d02fac94cd318f8eb33d961067d6ccf265c1d80c182ca9bd26223ee96b368"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/tyranids/army_rule_modifier_continuation.py": {
+      "before_sha256": "8f76800f4db82f88b84f8d122a7c613738df365b0df77bf14dab5ce29df77715",
+      "after_sha256": "b7fb0a0f862c77bffae6a6ae83aec8f58607bf3324c4fd05fea6dcd40e0bf570",
+      "owners": {
+        "_existing_nested_source": {
+          "before": "d7af58b64ff2c3c05b1d00be29d6f6a81c18865a212c7b9503adbe50e3cb65c0",
+          "after": "52d8c93a63b95e4a2a39bef3aa9d628945bc61c0d9c2aafcccb72788b270166e"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/generic_effect_history.py": {
+      "before_sha256": "5d8b7ba65b2e48f0003e0976624a32a5971f51429b92b20ac2e78581d1e00093",
+      "after_sha256": "7820884ede8265f530da88eb8f3e7dc704cb621becaf55ed44c5f6c843143524",
+      "owners": {
+        "@module": {
+          "before": "132e1fe2241576d3fe7195d6cf466c5527474a8836ffa857f9177bcffed92457",
+          "after": "3976eefb884dfc2cae5d48c119538fe9e010acc67ecfc237b6258aa36989569e"
+        },
+        "HistoricalEffectSources": {
+          "before": null,
+          "after": "74bcdb0527144ea38ae6ca72609a62d482adeabd02d324c8f0ea27c2ae0cbbb1"
+        },
+        "historical_generic_effect_inventory": {
+          "before": "5c765c233cf2eb32b480f0e40e26addc923731355692e873de326fc841e0554d",
+          "after": "047d5c14dd568038d0b357276ba9f7d07942aeee605e79bfdd6b7a617f6ad51e"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/movement_decision_authority.py": {
+      "before_sha256": "9572a8865ebee464c2078116b2e095c1819fb9389267cd0ec6e4620724d82a0d",
+      "after_sha256": "8397bb5f30fd3560708cff3067758bb698e6d99d12dc7bd1a97f3e6f3e478b28",
+      "owners": {
+        "_completion_witness": {
+          "before": "9147a43017af58a61219b0d54e839325260805768c0ae0cd7bba420ddc82efaf",
+          "after": "d44b5346603945eadb10374091729eece707fe461323ea741855429d15e69323"
+        },
+        "_forced_escape_casualties_for_proposal": {
+          "before": null,
+          "after": "bf91895f4393294300a9606f3142f259ab2d3931142e1aeb860a63ee04e8244b"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/phases/movement_battle_shock_continuation.py": {
+      "before_sha256": "13f6bafd631c7e1996c090ebda96e396d119597426ea99ad91f3dc25910722c5",
+      "after_sha256": "c73580f62fa56a249377b86d00998c1939bd5c8911624981ae4d3c23a5cff37c",
+      "owners": {
+        "@module": {
+          "before": "683bcf64a258cdac84a4af36ffe426b54257046999b3b7600218cb71842e337e",
+          "after": "2d2726a5a223a1f68100705dde06e4472c07e3ca21fd3ab29cf70642f5445b2d"
+        },
+        "_validate_pending_forced_shock_inventory": {
+          "before": null,
+          "after": "bce9e603a2e8564718c0d5d8718899c584444a42b085c68d9d9e53d390401495"
+        },
+        "_validate_pending_outcome_authority": {
+          "before": "19bc4860276b835e4a1622a43ae865e0b2de4faca6ad96b77395dcfbcbb07fb0",
+          "after": "a4641773112a44add3e176102859faa24f4aedc20c4dca13fc8d8fd14869ccff"
+        },
+        "record_desperate_escape_battle_shock_resolution": {
+          "before": "f853e3216a5608d0272376c55e5444307cbf8cb24387b0b08249df0b1977f13e",
+          "after": "7d3dc3a39585e02ed4533f33110a6aa7a1b44f8034e797c728f49cd80157c04d"
+        },
+        "validate_pending_desperate_escape_battle_shock_continuation": {
+          "before": "bfaa73706fdb12aed1289f642dc054c68055fea7c924b113bd1afd9ca4b8fcc5",
+          "after": "9a93ff8ca492b02c673930fad88cea377be4331ec5d48f76dd7f7fd81dfbc4b8"
+        },
+        "validate_pending_escape_reroll_matches_continuation": {
+          "before": "29069472c2e2e487f0109a607d7ef54753c60046cd3dc95c9356ddf185f74da0",
+          "after": "a63a6d5c3d37496144c8e87c632e79d6add99f91f13285c0ff86f690e9cc1da1"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/phases/movement_escape_mortals.py": {
+      "before_sha256": "42f9178333cc6012a5db5dd3c949349bbf0680875e7ebf4528b06eaed97ea8dd",
+      "after_sha256": "a6628a5a662f70acd4e84dd70e545af9891b0c5ed72e2d5337254d8a87445668",
+      "owners": {
+        "@module": {
+          "before": "5ca18aeee44bb76ff1cc66a10d6123d2f66dec85f85f6c239c36c62dc6d3f1eb",
+          "after": "2c12b372c85e78e4200572e20254cb05d28f078db2fb1735c82489063457ba7b"
+        },
+        "forced_escape_outcome_casualties": {
+          "before": null,
+          "after": "2f667c6df238c74b090dec2d14c9efc5e77618f4d41aa693df019b91872b9921"
+        },
+        "resume_escape_movement": {
+          "before": "a09b731ef517e7943b6bf1032bb7e6ac23ce48cc31031c338e85779ea82848b6",
+          "after": "bafc6380ff67e2a8d724a492cc9bf268a8bcff47caa3a06c48494d035d9ae6de"
+        },
+        "witnessed_escape_start": {
+          "before": null,
+          "after": "be799c067d1a2ab988a41c2c8e24ef4cb8c1a36b549a36af6fea7c1511d7f526"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/phases/movement_fall_back_embark.py": {
+      "before_sha256": "529ca8c3dbb69def4c35559270b493f260f1117152da6462668e989c5e8d40fc",
+      "after_sha256": "54092610a2f236c9400b03c42d09de5cfa6338ba10338cc967a22352bbefc296",
+      "owners": {
+        "_apply_fall_back_result": {
+          "before": "92e7c92b44c5174c188cd20e18322e569132036146b406b9c0f7c57878e17411",
+          "after": "6bf7bca6cbe7098a2b06626a66ea4faa2b1ddeeab61193361b411289a137d30d"
+        },
+        "_request_embark_after_move_or_complete_activation": {
+          "before": "a2a745a2480824086b3c059fd9a87eedd6dc8028ea8200c740e940ae93339447",
+          "after": "f66dc7d35a621be89be7cd82b545ba01550499720ee1917ee0dcb7230e268da6"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/phases/movement_state.py": {
+      "before_sha256": "bec47df2752122dc5d34780a0d3fde4193c2e8bb350c7d34fd8dec0673d661ec",
+      "after_sha256": "6c7fb5cb7d2057db51490225e53795b172d7bbfb31be31e6dc3b674149f63752",
+      "owners": {
+        "FallBackActionResult.transition_batch": {
+          "before": "4fb3e97c5292fb311c37c2adf340d266381bb67d33e969071f1f9ee1275fa114",
+          "after": "05a24a6cc226a57bfc6527d64164b2574adffdddc6bec6480541ab1762eb0a2d"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/runtime_characteristic_modifiers.py": {
+      "before_sha256": "6b3d0c33805a64f14f39783e9fe2059b71e8efa67314731d1a0d282a556b62c2",
+      "after_sha256": "61ab8edaa347acedaf23b481f38fd67ea98522ecee75e0c72da331aa454978a2",
+      "owners": {
+        "apply_objective_control_operations": {
+          "before": null,
+          "after": "ae65a175a9e4e2be03d5aefd75448d71e2bab5d9b93bb9be72bd35cd15e1f914"
+        },
+        "resolve_runtime_objective_control": {
+          "before": "db746cd76d521e91e6b255f847b1d0e0af7f12c9d680b3079559b442045efcb5",
+          "after": "3edb0e5b9ff903880d2ac8dafcf3bec3aceb7cfac889e9ba4cbcc1be43ad8ba9"
+        }
+      }
+    },
+    "tests/code_quality/test_engine_numerical_identity_admission.py": {
+      "before_sha256": "f177ca17769f35d36927ea6a98af58e5cc953fa885919b6947d8c81a5b5178cd",
+      "after_sha256": "2fa352320aa20e2c8ee5cdfbfae45d8ea0e06399ce20c96cdae7c390efed875b",
+      "owners": {
+        "test_identity_inventory_uses_current_twelve_shards_and_native_cohort": {
+          "before": "8417f6bb082dd0bc2a9fe2019820dea093f6d0dd6811c6a48ecd07955a94d199",
+          "after": "4778152faa903e182918fb3e1338d20f19a931b6fb848a0db1248a42e7a7b795"
+        }
+      }
+    },
+    "tests/rules/section09/test_native_ordered_retreat.py": {
+      "before_sha256": null,
+      "after_sha256": "ea2519924090e02c7284844a18db5655c6dc899009e4e8a78b4f5347ab521fed",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "bbca5b06bcb9a48320c2e3d7ca205b79ee066c02a8500d524a44c14f22b12070"
+        },
+        "_choose": {
+          "before": null,
+          "after": "6f5ed7115093931f2588a841a85e5d27fc4cf40b394c71e61393d203c4c20482"
+        },
+        "_health": {
+          "before": null,
+          "after": "f1cb8b0f11868a6128a02b7b7fd155e03786c3410d5b2032a9f645dfa21f2d98"
+        },
+        "_positions": {
+          "before": null,
+          "after": "7a2d042368ea3a1ca7f0adbd3d017c051f440afabf41cac5d348baffa065a371"
+        },
+        "_restore": {
+          "before": null,
+          "after": "0936790e6cd7a804c5a82a5ee822ab3007a03b17cbd6b80246a035fe1d4fcd83"
+        },
+        "_review_scene": {
+          "before": null,
+          "after": "d63f7c5fc93a531dfc452b02540a24bf3b67e65d0fe5865947cd537045a0aa91"
+        },
+        "_select_review_retreat": {
+          "before": null,
+          "after": "fa58e2044e6519443c646188f8db5ac12cc3e8fba60210aa341a0da8f3a270d1"
+        },
+        "retreat_definitions": {
+          "before": null,
+          "after": "d9bf5052f63c2307870f687a7adca7d98c515322e600faf03b5cfc8632d68da0"
+        },
+        "test_forced_escape_restore_rejects_invented_pretest_shock": {
+          "before": null,
+          "after": "2c7e60bb4d65e3d888a2f6f1b05f56b91c3cd2a4213d465c299cb8c81ec0c1e0"
+        },
+        "test_native_ordered_retreat_resolves_and_replays": {
+          "before": null,
+          "after": "efe7767bacdb20499d3450ebd2e6047df6dfcf00c1928162eed33b8f91f60589"
+        },
+        "test_native_ordered_retreat_with_active_walker_objective_control": {
+          "before": null,
+          "after": "b26bab5620572c790a2eead851627d8de4f8c7dc32f58a343294993fc8cd4ff6"
+        },
+        "test_second_forced_retreat_uses_only_territory_contributors": {
+          "before": null,
+          "after": "984db31cd45f8a68a3399e985328300b48564fe9875ab8af6dd8fbb8d5d6b88a"
+        },
+        "walker_retreat_definitions": {
+          "before": null,
+          "after": "e23e097bd5e41b2d027959aad1a5a81a1dabab02e41eb699c78d76eb92d1ad31"
         }
       }
     }
   },
   "rows": {
-    "data/source_audits/caudit_01_successors/README.md": {
-      "category": "rule_semantics",
+    "ci/test_shards/durations.json": {
+      "category": "measured_workload",
       "operations": [
-        "caudit-01-successor-evidence"
+        "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Retains scoped source, assertion, diagnostic and execution evidence from existing engine and test paths.",
-      "source_obligation": "CAUDIT-01 records bounded and partial source-linked successors and one reproduced gap across sixteen Core sections.",
-      "unchanged_work": "The evidence inventory leaves runtime algorithms, fixtures, workload selection and budgets intact."
+      "rationale": "Retain the validated Charge CP and native retreat weights in the twelve-shard inventory.",
+      "source_obligation": null,
+      "unchanged_work": null
     },
-    "data/source_audits/caudit_01_successors/successor-inventory.json": {
-      "category": "rule_semantics",
+    "ci/test_shards/shard-1.txt": {
+      "category": "measured_workload",
       "operations": [
-        "caudit-01-successor-evidence"
+        "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Retains scoped source, assertion, diagnostic and execution evidence from existing engine and test paths.",
-      "source_obligation": "CAUDIT-01 records bounded and partial source-linked successors and one reproduced gap across sixteen Core sections.",
-      "unchanged_work": "The evidence inventory leaves runtime algorithms, fixtures, workload selection and budgets intact."
+      "rationale": "Retain the validated Charge CP and native retreat weights in the twelve-shard inventory.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-10.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Retain the validated Charge CP and native retreat weights in the twelve-shard inventory.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-11.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Retain the validated Charge CP and native retreat weights in the twelve-shard inventory.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-12.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Retain the validated Charge CP and native retreat weights in the twelve-shard inventory.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-4.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Retain the validated Charge CP and native retreat weights in the twelve-shard inventory.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-5.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Retain the validated Charge CP and native retreat weights in the twelve-shard inventory.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-6.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Retain the validated Charge CP and native retreat weights in the twelve-shard inventory.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-7.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Retain the validated Charge CP and native retreat weights in the twelve-shard inventory.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-8.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Retain the validated Charge CP and native retreat weights in the twelve-shard inventory.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-9.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Retain the validated Charge CP and native retreat weights in the twelve-shard inventory.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "contracts/examples/persistence/session-persistence.json": {
+      "category": "measured_workload",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate build identity and dependent contract commitments for the native rule repair.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "contracts/examples/sessions/session-command-outcome.json": {
+      "category": "measured_workload",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate build identity and dependent contract commitments for the native rule repair.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "contracts/examples/sessions/session-command-started.json": {
+      "category": "measured_workload",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate build identity and dependent contract commitments for the native rule repair.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "contracts/examples/sessions/session-metadata-created.json": {
+      "category": "measured_workload",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate build identity and dependent contract commitments for the native rule repair.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "contracts/examples/support-profile-player-a-redacted.json": {
+      "category": "measured_workload",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate build identity and dependent contract commitments for the native rule repair.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "contracts/examples/support-profile-player-b-redacted.json": {
+      "category": "measured_workload",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate build identity and dependent contract commitments for the native rule repair.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "contracts/examples/support-profile.json": {
+      "category": "measured_workload",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate build identity and dependent contract commitments for the native rule repair.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "contracts/manifest.json": {
+      "category": "measured_workload",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate build identity and dependent contract commitments for the native rule repair.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "data/source_audits/ci64_provenance_v1/daemonic-terror-ordered-retreat-v1.json": {
+      "category": "measured_workload",
+      "operations": [
+        "daemonic-terror-ordered-retreat"
+      ],
+      "selected_families": [],
+      "rationale": "Authenticate the current runtime and the replay and control cases while retaining exact predecessor inputs.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/performance/current/forced-retreat-outcome-reconstruction-20261126.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Record the matched comparison for the changed movement completion history.",
+      "source_obligation": null,
+      "unchanged_work": null
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Classifies two exact audit evidence paths. The operation selects no runtime workload.",
+      "rationale": "Map the exact test admission and shared historical Terror predicate owners for local smoke.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "scripts/engine_numerical_identity_test_admission.py": {
+      "category": "measured_workload",
+      "operations": [
+        "blood-begets-skulls-test-admission",
+        "bounded-charge-flight-wall-proof",
+        "cavalcade-authority-admission",
+        "close-quarters-test-admission",
+        "daemonic-terror-ordered-retreat",
+        "engine-numerical-identity-admission",
+        "gore-hungry-onslaught-predecessor-admission",
+        "phase-end-healing-test-admission",
+        "pre-roll-charge-flight-test-admission",
+        "round4-battle-shock-event-wounds",
+        "round4-malice-bearer-liveness",
+        "sheathed-in-brass-test-admission",
+        "skulls-beget-blood-test-admission",
+        "stage2-strict-replay-test-admission",
+        "stage3-flight-normal-move-test-admission",
+        "stage3-ordinary-melee-test-admission",
+        "wrath-undeniable-test-admission"
+      ],
+      "selected_families": [],
+      "rationale": "Authenticate the current runtime and the replay and control cases while retaining exact predecessor inputs.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "src/warhammer40k_core/_engine_build_manifest.json": {
+      "category": "measured_workload",
+      "operations": [
+        "cavalcade-authority-admission",
+        "phase-end-healing-source-and-report"
+      ],
+      "selected_families": [],
+      "rationale": "Bind the generated runtime manifest to the changed historical Terror eligibility owner.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "src/warhammer40k_core/engine/battle_shock_event_authority.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemonic-terror-ordered-retreat"
+      ],
+      "selected_families": [],
+      "rationale": "Authenticate the test-boundary rules and the earlier forced outcome casualties separately from the escape hazard packet.",
+      "source_obligation": "Native Bane of Cowards forces the Desperate Escape Battle-shock test, which triggers Terror in qualifying Shadow.",
+      "unchanged_work": "Reuse event-bound geometry and rule duration semantics to bind territorial checks and the captured Movement inventory."
+    },
+    "src/warhammer40k_core/engine/battle_shock_historical_authority.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemonic-terror-ordered-retreat",
+        "round4-battle-shock-event-wounds"
+      ],
+      "selected_families": [],
+      "rationale": "Authenticate the test-boundary rules and the earlier forced outcome casualties separately from the escape hazard packet.",
+      "source_obligation": "Native Bane of Cowards forces the Desperate Escape Battle-shock test, which triggers Terror in qualifying Shadow.",
+      "unchanged_work": "Reuse event-bound geometry and rule duration semantics to bind territorial checks and the captured Movement inventory."
+    },
+    "src/warhammer40k_core/engine/battle_shock_hooks.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemonic-terror-ordered-retreat"
+      ],
+      "selected_families": [],
+      "rationale": "Authenticate the test-boundary rules and the earlier forced outcome casualties separately from the escape hazard packet.",
+      "source_obligation": "Native Bane of Cowards forces the Desperate Escape Battle-shock test, which triggers Terror in qualifying Shadow.",
+      "unchanged_work": "Reuse event-bound geometry and rule duration semantics to bind territorial checks and the captured Movement inventory."
+    },
+    "src/warhammer40k_core/engine/battle_shock_lifecycle_authority.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemonic-terror-ordered-retreat"
+      ],
+      "selected_families": [],
+      "rationale": "Authenticate the test-boundary rules and the earlier forced outcome casualties separately from the escape hazard packet.",
+      "source_obligation": "Native Bane of Cowards forces the Desperate Escape Battle-shock test, which triggers Terror in qualifying Shadow.",
+      "unchanged_work": "Reuse event-bound geometry and rule duration semantics to bind territorial checks and the captured Movement inventory."
+    },
+    "src/warhammer40k_core/engine/battle_shock_source_family_authority.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemonic-terror-ordered-retreat"
+      ],
+      "selected_families": [],
+      "rationale": "Authenticate the test-boundary rules and the earlier forced outcome casualties separately from the escape hazard packet.",
+      "source_obligation": "Native Bane of Cowards forces the Desperate Escape Battle-shock test, which triggers Terror in qualifying Shadow.",
+      "unchanged_work": "Reuse event-bound geometry and rule duration semantics to bind territorial checks and the captured Movement inventory."
+    },
+    "src/warhammer40k_core/engine/catalog_selected_target_battle_shock_continuation.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemonic-terror-ordered-retreat"
+      ],
+      "selected_families": [],
+      "rationale": "Authenticate the test-boundary rules and the earlier forced outcome casualties separately from the escape hazard packet.",
+      "source_obligation": "Native Bane of Cowards forces the Desperate Escape Battle-shock test, which triggers Terror in qualifying Shadow.",
+      "unchanged_work": "Reuse event-bound geometry and rule duration semantics to bind territorial checks and the captured Movement inventory."
+    },
+    "src/warhammer40k_core/engine/faction_content/bundle.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemonic-terror-ordered-retreat"
+      ],
+      "selected_families": [],
+      "rationale": "Authenticate the test-boundary rules and the earlier forced outcome casualties separately from the escape hazard packet.",
+      "source_obligation": "Native Bane of Cowards forces the Desperate Escape Battle-shock test, which triggers Terror in qualifying Shadow.",
+      "unchanged_work": "Reuse event-bound geometry and rule duration semantics to bind territorial checks and the captured Movement inventory."
+    },
+    "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/army_rule.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemonic-terror-ordered-retreat",
+        "round4-battle-shock-event-wounds"
+      ],
+      "selected_families": [],
+      "rationale": "Authenticate the test-boundary rules and the earlier forced outcome casualties separately from the escape hazard packet.",
+      "source_obligation": "Native Bane of Cowards forces the Desperate Escape Battle-shock test, which triggers Terror in qualifying Shadow.",
+      "unchanged_work": "Reuse event-bound geometry and rule duration semantics to bind territorial checks and the captured Movement inventory."
+    },
+    "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/battle_shock_outcome_authority.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemonic-terror-ordered-retreat"
+      ],
+      "selected_families": [],
+      "rationale": "Authenticate the test-boundary rules and the earlier forced outcome casualties separately from the escape hazard packet.",
+      "source_obligation": "Native Bane of Cowards forces the Desperate Escape Battle-shock test, which triggers Terror in qualifying Shadow.",
+      "unchanged_work": "Reuse event-bound geometry and rule duration semantics to bind territorial checks and the captured Movement inventory."
+    },
+    "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/battle_shock_territory_authority.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemonic-terror-ordered-retreat",
+        "round4-battle-shock-event-wounds"
+      ],
+      "selected_families": [],
+      "rationale": "Authenticate the test-boundary rules and the earlier forced outcome casualties separately from the escape hazard packet.",
+      "source_obligation": "Native Bane of Cowards forces the Desperate Escape Battle-shock test, which triggers Terror in qualifying Shadow.",
+      "unchanged_work": "Reuse event-bound geometry and rule duration semantics to bind territorial checks and the captured Movement inventory."
+    },
+    "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/tyranids/army_rule_modifier_continuation.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemonic-terror-ordered-retreat"
+      ],
+      "selected_families": [],
+      "rationale": "Authenticate the test-boundary rules and the earlier forced outcome casualties separately from the escape hazard packet.",
+      "source_obligation": "Native Bane of Cowards forces the Desperate Escape Battle-shock test, which triggers Terror in qualifying Shadow.",
+      "unchanged_work": "Reuse event-bound geometry and rule duration semantics to bind territorial checks and the captured Movement inventory."
+    },
+    "src/warhammer40k_core/engine/generic_effect_history.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemonic-terror-ordered-retreat",
+        "round4-battle-shock-event-wounds"
+      ],
+      "selected_families": [],
+      "rationale": "Authenticate the test-boundary rules and the earlier forced outcome casualties separately from the escape hazard packet.",
+      "source_obligation": "Native Bane of Cowards forces the Desperate Escape Battle-shock test, which triggers Terror in qualifying Shadow.",
+      "unchanged_work": "Reuse event-bound geometry and rule duration semantics to bind territorial checks and the captured Movement inventory."
+    },
+    "src/warhammer40k_core/engine/movement_decision_authority.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemonic-terror-ordered-retreat",
+        "desperate-escape-survivor-history"
+      ],
+      "selected_families": [
+        "reconstruction"
+      ],
+      "rationale": "Authenticate the test-boundary rules and the earlier forced outcome casualties separately from the escape hazard packet.",
+      "source_obligation": "Native Bane of Cowards forces the Desperate Escape Battle-shock test, which triggers Terror in qualifying Shadow.",
+      "unchanged_work": "Reuse event-bound geometry and rule duration semantics to bind territorial checks and the captured Movement inventory."
+    },
+    "src/warhammer40k_core/engine/phases/movement_battle_shock_continuation.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemonic-terror-ordered-retreat"
+      ],
+      "selected_families": [],
+      "rationale": "Authenticate the test-boundary rules and the earlier forced outcome casualties separately from the escape hazard packet.",
+      "source_obligation": "Native Bane of Cowards forces the Desperate Escape Battle-shock test, which triggers Terror in qualifying Shadow.",
+      "unchanged_work": "Reuse event-bound geometry and rule duration semantics to bind territorial checks and the captured Movement inventory."
+    },
+    "src/warhammer40k_core/engine/phases/movement_escape_mortals.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemonic-terror-ordered-retreat"
+      ],
+      "selected_families": [],
+      "rationale": "Authenticate the test-boundary rules and the earlier forced outcome casualties separately from the escape hazard packet.",
+      "source_obligation": "Native Bane of Cowards forces the Desperate Escape Battle-shock test, which triggers Terror in qualifying Shadow.",
+      "unchanged_work": "Reuse event-bound geometry and rule duration semantics to bind territorial checks and the captured Movement inventory."
+    },
+    "src/warhammer40k_core/engine/phases/movement_fall_back_embark.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemonic-terror-ordered-retreat"
+      ],
+      "selected_families": [],
+      "rationale": "Authenticate the test-boundary rules and the earlier forced outcome casualties separately from the escape hazard packet.",
+      "source_obligation": "Native Bane of Cowards forces the Desperate Escape Battle-shock test, which triggers Terror in qualifying Shadow.",
+      "unchanged_work": "Reuse event-bound geometry and rule duration semantics to bind territorial checks and the captured Movement inventory."
+    },
+    "src/warhammer40k_core/engine/phases/movement_state.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemonic-terror-ordered-retreat"
+      ],
+      "selected_families": [],
+      "rationale": "Authenticate the test-boundary rules and the earlier forced outcome casualties separately from the escape hazard packet.",
+      "source_obligation": "Native Bane of Cowards forces the Desperate Escape Battle-shock test, which triggers Terror in qualifying Shadow.",
+      "unchanged_work": "Reuse event-bound geometry and rule duration semantics to bind territorial checks and the captured Movement inventory."
+    },
+    "src/warhammer40k_core/engine/runtime_characteristic_modifiers.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemonic-terror-ordered-retreat"
+      ],
+      "selected_families": [],
+      "rationale": "Authenticate the test-boundary rules and the earlier forced outcome casualties separately from the escape hazard packet.",
+      "source_obligation": "Native Bane of Cowards forces the Desperate Escape Battle-shock test, which triggers Terror in qualifying Shadow.",
+      "unchanged_work": "Reuse event-bound geometry and rule duration semantics to bind territorial checks and the captured Movement inventory."
+    },
+    "tests/code_quality/test_engine_numerical_identity_admission.py": {
+      "category": "measured_workload",
+      "operations": [
+        "bounded-charge-flight-wall-proof",
+        "engine-numerical-identity-admission",
+        "pre-roll-charge-flight-test-admission",
+        "round4-battle-shock-event-wounds",
+        "round4-malice-bearer-liveness",
+        "skulls-beget-blood-test-admission",
+        "stage3-flight-normal-move-test-admission",
+        "stage3-ordinary-melee-test-admission",
+        "wrath-undeniable-test-admission"
+      ],
+      "selected_families": [],
+      "rationale": "Authenticate the current runtime and the replay and control cases while retaining exact predecessor inputs.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "tests/rules/section09/test_native_ordered_retreat.py": {
+      "category": "measured_workload",
+      "operations": [
+        "daemonic-terror-ordered-retreat"
+      ],
+      "selected_families": [],
+      "rationale": "Authenticate the current runtime and the replay and control cases while retaining exact predecessor inputs.",
       "source_obligation": null,
       "unchanged_work": null
     }
   },
   "milestone": "ordinary",
-  "comparisons": {},
+  "comparisons": {
+    "reconstruction": "docs/performance/current/forced-retreat-outcome-reconstruction-20261126.json"
+  },
   "full_game": null
 }

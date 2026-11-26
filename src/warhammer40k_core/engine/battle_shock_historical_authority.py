@@ -41,7 +41,9 @@ from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
 from warhammer40k_core.geometry.volume import Model as GeometryModel
 
 if TYPE_CHECKING:
+    from warhammer40k_core.engine.faction_content.bundle import RuntimeContentBundle
     from warhammer40k_core.engine.game_state import GameState
+    from warhammer40k_core.engine.generic_effect_history import HistoricalEffectSources
 
 
 @dataclass(frozen=True, slots=True)
@@ -78,6 +80,7 @@ class HistoricalBattleShockAuthorityContext:
     active_player_id: str
     phase: BattlePhase
     phase_start_battle_shocked_unit_ids: tuple[str, ...]
+    historical_effect_sources: RuntimeContentBundle | HistoricalEffectSources | None = None
 
     def rules_unit(self, unit_instance_id: str) -> RulesUnitView:
         if type(unit_instance_id) is not str or not unit_instance_id:
@@ -407,6 +410,7 @@ def historical_battle_shock_authority_context(
     active_player_id: str,
     phase: BattlePhase,
     phase_start_battle_shocked_unit_ids: tuple[str, ...],
+    historical_effect_sources: RuntimeContentBundle | HistoricalEffectSources | None = None,
 ) -> HistoricalBattleShockAuthorityContext:
     from warhammer40k_core.engine.game_state import GameState
 
@@ -480,6 +484,7 @@ def historical_battle_shock_authority_context(
         active_player_id=active_player_id,
         phase=phase,
         phase_start_battle_shocked_unit_ids=phase_start_battle_shocked_unit_ids,
+        historical_effect_sources=historical_effect_sources,
     )
 
 

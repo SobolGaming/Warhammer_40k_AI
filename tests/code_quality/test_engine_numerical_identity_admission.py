@@ -405,6 +405,7 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         "data/source_audits/ci64_provenance_v1/stage2-pending-battle-shock-transition-v1.json"
     )
     pending = _record(pending_path)
+    terror = _record(selection.DAEMONIC_TERROR_TRANSITION)
     pending_base = "161378a16c4557228b2af45db0d311a522eb3f8f"
     assert pending["base"] == pending_base
     pending_base_manifest = json.loads(
@@ -923,7 +924,11 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         )
         pending_before[name] = hashlib.sha256(predecessor).hexdigest()
         assert binding["before"] == pending_before[name]
-        assert binding["after"] == hashlib.sha256((ROOT / name).read_bytes()).hexdigest()
+        expected = binding["after"]
+        if name in terror["source"]:
+            assert terror["source"][name]["before"] == expected
+            expected = terror["source"][name]["after"]
+        assert expected == hashlib.sha256((ROOT / name).read_bytes()).hexdigest()
     screen_base_manifest = json.loads(
         subprocess.check_output(
             ["git", "show", ground_charge.SCREEN_BASE + ":" + MANIFEST], cwd=ROOT
@@ -956,10 +961,22 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
     assert normal_move["retained_runtime_fingerprint"] == combined["combined_runtime_fingerprint"]
     assert normal_move["runtime_fingerprint"] == json.loads(normal_move_manifest)["fingerprint"]
     assert charge_cp["retained_manifest_sha256"] == normal_move["runtime_manifest"]["after"]
-    assert (
-        charge_cp["manifest_sha256"] == hashlib.sha256((ROOT / MANIFEST).read_bytes()).hexdigest()
+    cp_manifest = subprocess.check_output(
+        ["git", "show", terror["base"] + ":" + MANIFEST], cwd=ROOT
     )
-    assert charge_cp["runtime_fingerprint"] == _record(MANIFEST)["fingerprint"]
+    assert charge_cp["manifest_sha256"] == hashlib.sha256(cp_manifest).hexdigest()
+    assert charge_cp["runtime_fingerprint"] == json.loads(cp_manifest)["fingerprint"]
+    assert (
+        terror["retained_charge_cp_sha256"]
+        == hashlib.sha256((ROOT / selection.CHARGE_CP_TEST_ADDITION).read_bytes()).hexdigest()
+    )
+    assert terror["retained_runtime_fingerprint"] == charge_cp["runtime_fingerprint"]
+    assert terror["runtime_manifest"]["before"] == charge_cp["manifest_sha256"]
+    assert (
+        terror["runtime_manifest"]["after"]
+        == hashlib.sha256((ROOT / MANIFEST).read_bytes()).hexdigest()
+    )
+    assert terror["runtime_fingerprint"] == _record(MANIFEST)["fingerprint"]
     assert (
         charge_cp["policy_sha256"]
         == hashlib.sha256((ROOT / selection.CHARGE_CP_POLICY_SOURCE).read_bytes()).hexdigest()
@@ -967,6 +984,12 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
     for cp_owner in charge_cp["added_files"]:
         assert cp_owner in active_files
         assert sum(cp_owner in group for group in groups) == 1
+    for name, change in terror["source"].items():
+        original = subprocess.check_output(["git", "show", terror["base"] + ":" + name], cwd=ROOT)
+        assert change["before"] == hashlib.sha256(original).hexdigest()
+        assert change["after"] == hashlib.sha256((ROOT / name).read_bytes()).hexdigest()
+    assert selection.DAEMONIC_TERROR_OWNER in active_files
+    assert sum(selection.DAEMONIC_TERROR_OWNER in group for group in groups) == 1
     assert ground_charge.NORMAL_MOVE_OWNER in active_files
     assert sum(ground_charge.NORMAL_MOVE_OWNER in group for group in groups) == 1
     assert normal_move["added_cases"] == [
@@ -1056,6 +1079,8 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         assert round4["source"][source]["before"] == hashlib.sha256(base_source).hexdigest()
         if source in pending_before:
             round4_after = pending_before[source]
+        elif source in terror["source"]:
+            round4_after = terror["source"][source]["before"]
         else:
             round4_after = hashlib.sha256((ROOT / source).read_bytes()).hexdigest()
         assert round4["source"][source]["after"] == round4_after
@@ -1379,6 +1404,7 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         | set(normal_move["added_cases"])
         | set(origin["added_cases"])
         | set(charge_cp["added_cases"])
+        | set(terror["added_cases"])
         | shooting_cases
         | {
             ground_charge.SCREEN_OWNER

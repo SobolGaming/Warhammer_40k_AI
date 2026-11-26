@@ -436,9 +436,13 @@ class BattleShockOutcomeContext:
 class BattleShockPendingOutcomeAuthorityContext:
     """Internal loaded-provider context for one outcome-enqueued decision."""
 
+    if TYPE_CHECKING:
+        from warhammer40k_core.engine.generic_effect_history import HistoricalEffectSources
+
     state: GameState
     decisions: DecisionController
     request: DecisionRequest
+    historical_effect_sources: HistoricalEffectSources | None = None
 
     def __post_init__(self) -> None:
         from warhammer40k_core.engine.game_state import GameState
@@ -658,7 +662,11 @@ class BattleShockHookBinding:
 
 @dataclass(frozen=True, slots=True)
 class BattleShockHookRegistry:
+    if TYPE_CHECKING:
+        from warhammer40k_core.engine.generic_effect_history import HistoricalEffectSources
+
     bindings: tuple[BattleShockHookBinding, ...]
+    historical_effect_sources: HistoricalEffectSources | None = None
 
     def __post_init__(self) -> None:
         bindings = _validate_hook_bindings(self.bindings)
@@ -669,8 +677,13 @@ class BattleShockHookRegistry:
         return cls(bindings=())
 
     @classmethod
-    def from_bindings(cls, bindings: tuple[BattleShockHookBinding, ...]) -> Self:
-        return cls(bindings=bindings)
+    def from_bindings(
+        cls,
+        bindings: tuple[BattleShockHookBinding, ...],
+        *,
+        historical_effect_sources: HistoricalEffectSources | None = None,
+    ) -> Self:
+        return cls(bindings=bindings, historical_effect_sources=historical_effect_sources)
 
     def all_bindings(self) -> tuple[BattleShockHookBinding, ...]:
         return self.bindings
