@@ -936,6 +936,7 @@ class FallBackActionResult:
         *,
         before: UnitPlacement | RulesUnitPlacement,
         destroyed_model_ids: tuple[str, ...],
+        prior_outcome_casualty_ids: tuple[str, ...] = (),
         mortal_wound_application: MortalWoundApplication | None = None,
     ) -> BattlefieldTransitionBatch:
         if not self.is_valid:
@@ -971,7 +972,7 @@ class FallBackActionResult:
             after=self.attempted_placement,
             witness=self.witness,
             displacement_kind=ModelDisplacementKind.FALL_BACK,
-            destroyed_model_ids=destroyed_ids,
+            destroyed_model_ids=(*destroyed_ids, *prior_outcome_casualty_ids),
         )
         # Shared mortal-wound authority already records casualty removal before
         # movement. This batch describes only surviving model displacement.

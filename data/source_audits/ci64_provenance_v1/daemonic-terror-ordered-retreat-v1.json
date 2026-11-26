@@ -3,10 +3,10 @@
   "base": "dec50bca2394c755a0d5fb76e6659882b388c032",
   "retained_normal_move_sha256": "bf15b3ce40bd26cc9c1af4da30a21fc17cd475c8f849bceabf8407f3fa9348a0",
   "retained_runtime_fingerprint": "40b91df8a39aa85afd3503b466b7bcab93c87d70db8189243bc9c5d70f924e1a",
-  "runtime_fingerprint": "3d8993c2ee844482e163bf9c4a17037bf347388a8b42ba35b63899304d05b12b",
+  "runtime_fingerprint": "6f6eada9685c02c7baff43ef99e6d45598cd987b68f746b4db02e8e1134f1592",
   "runtime_manifest": {
     "before": "1701a163d58756209054de421d459e057faedfb3cf670c72d9e3c5f9efc5edaa",
-    "after": "a72fa3f1b6188561ade3cddff681b7cfbda0f33cfbdab755aaf8cd1ef731f049"
+    "after": "dfa462f45655a976cd8baf016919e5f78f96b5e62f186452e4d03c729a8a08bc"
   },
   "source": {
     "src/warhammer40k_core/engine/battle_shock_event_authority.py": {
@@ -57,9 +57,25 @@
       "before": "5d8b7ba65b2e48f0003e0976624a32a5971f51429b92b20ac2e78581d1e00093",
       "after": "7820884ede8265f530da88eb8f3e7dc704cb621becaf55ed44c5f6c843143524"
     },
+    "src/warhammer40k_core/engine/movement_decision_authority.py": {
+      "before": "9572a8865ebee464c2078116b2e095c1819fb9389267cd0ec6e4620724d82a0d",
+      "after": "8397bb5f30fd3560708cff3067758bb698e6d99d12dc7bd1a97f3e6f3e478b28"
+    },
     "src/warhammer40k_core/engine/phases/movement_battle_shock_continuation.py": {
       "before": "13f6bafd631c7e1996c090ebda96e396d119597426ea99ad91f3dc25910722c5",
       "after": "c73580f62fa56a249377b86d00998c1939bd5c8911624981ae4d3c23a5cff37c"
+    },
+    "src/warhammer40k_core/engine/phases/movement_escape_mortals.py": {
+      "before": "42f9178333cc6012a5db5dd3c949349bbf0680875e7ebf4528b06eaed97ea8dd",
+      "after": "a6628a5a662f70acd4e84dd70e545af9891b0c5ed72e2d5337254d8a87445668"
+    },
+    "src/warhammer40k_core/engine/phases/movement_fall_back_embark.py": {
+      "before": "529ca8c3dbb69def4c35559270b493f260f1117152da6462668e989c5e8d40fc",
+      "after": "54092610a2f236c9400b03c42d09de5cfa6338ba10338cc967a22352bbefc296"
+    },
+    "src/warhammer40k_core/engine/phases/movement_state.py": {
+      "before": "bec47df2752122dc5d34780a0d3fde4193c2e8bb350c7d34fd8dec0673d661ec",
+      "after": "6c7fb5cb7d2057db51490225e53795b172d7bbfb31be31e6dc3b674149f63752"
     },
     "src/warhammer40k_core/engine/runtime_characteristic_modifiers.py": {
       "before": "6b3d0c33805a64f14f39783e9fe2059b71e8efa67314731d1a0d282a556b62c2",
@@ -69,9 +85,9 @@
   "added_files": {
     "tests/rules/section09/test_native_ordered_retreat.py": {
       "mode": "100644",
-      "bytes": 29183,
-      "sha256": "a8b0eb1ac0a85904fd7657dfa50e697f42be55515f64183bb9411cff01976e14",
-      "blob_sha1": "ba59784a1455ad09a44a6dc8c89fa4776f5f89a6"
+      "bytes": 32304,
+      "sha256": "f34fb8f1142bc99199343bf740b6bd14614a274780424a377c5432a427f9a0b7",
+      "blob_sha1": "296a6417ed18a5b7ca60d0213acfe79a6da5de10"
     }
   },
   "added_cases": [
@@ -81,7 +97,8 @@
     "tests/rules/section09/test_native_ordered_retreat.py::test_second_forced_retreat_uses_only_territory_contributors",
     "tests/rules/section09/test_native_ordered_retreat.py::test_forced_escape_restore_rejects_invented_pretest_shock",
     "tests/rules/section09/test_native_ordered_retreat.py::test_native_ordered_retreat_with_active_walker_objective_control[fail-and-wounds]",
-    "tests/rules/section09/test_native_ordered_retreat.py::test_native_ordered_retreat_with_active_walker_objective_control[pass-and-restore]"
+    "tests/rules/section09/test_native_ordered_retreat.py::test_native_ordered_retreat_with_active_walker_objective_control[pass-and-restore]",
+    "tests/rules/section09/test_native_ordered_retreat.py::test_native_ordered_retreat_with_active_walker_objective_control[terror-casualty-before-hazards]"
   ],
   "origin_test": {
     "before": {
@@ -93,8 +110,8 @@
     "after": {
       "mode": "100644",
       "bytes": 12073,
-      "sha256": "645305248ec00487c0928d2dbf3fccfe333c81ccc0a7e376137c62d9a8536aaa",
-      "blob_sha1": "afc0e8bf1de878649d78119fb1c972d654111ee2"
+      "sha256": "2f984fc3ede4cacaa948b9d2d3a185f90ab41b6dc2b1e9d7e22e31ced233559f",
+      "blob_sha1": "77b79e54d2bbfea881b3180e906a94ed1f1d8d9e"
     }
   }
 }

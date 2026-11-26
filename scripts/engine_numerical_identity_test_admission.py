@@ -1320,7 +1320,7 @@ DAEMONIC_TERROR_TRANSITION = (
     "data/source_audits/ci64_provenance_v1/daemonic-terror-ordered-retreat-v1.json"
 )
 DAEMONIC_TERROR_TRANSITION_SHA256 = (
-    "e7adadc6a3e8cae62cd3d9f4495afd28778106a68adf796d2f852b1a078182a7"
+    "de4fc75a730a114e14541f342f8100be305486cfcb679ac619bd38f5b0e85ec8"
 )
 DAEMONIC_TERROR_OWNER = "tests/rules/section09/test_native_ordered_retreat.py"
 
@@ -1334,6 +1334,7 @@ DAEMONIC_TERROR_CASES = (
     "test_forced_escape_restore_rejects_invented_pretest_shock",
     "test_native_ordered_retreat_with_active_walker_objective_control[fail-and-wounds]",
     "test_native_ordered_retreat_with_active_walker_objective_control[pass-and-restore]",
+    "test_native_ordered_retreat_with_active_walker_objective_control[terror-casualty-before-hazards]",
 )
 DAEMONIC_TERROR_SOURCES = {
     ROUND_FIVE_SHADOW_SOURCES[0],
@@ -1349,6 +1350,10 @@ DAEMONIC_TERROR_SOURCES = {
     "src/warhammer40k_core/engine/faction_content/bundle.py",
     "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/battle_shock_outcome_authority.py",
     "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/tyranids/army_rule_modifier_continuation.py",
+    "src/warhammer40k_core/engine/movement_decision_authority.py",
+    "src/warhammer40k_core/engine/phases/movement_escape_mortals.py",
+    "src/warhammer40k_core/engine/phases/movement_fall_back_embark.py",
+    "src/warhammer40k_core/engine/phases/movement_state.py",
     "src/warhammer40k_core/engine/runtime_characteristic_modifiers.py",
 }
 

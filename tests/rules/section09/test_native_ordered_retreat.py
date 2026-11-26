@@ -520,14 +520,19 @@ def walker_retreat_definitions(selected_army_source_index: Path | None) -> Secti
 
 
 @pytest.mark.parametrize(
-    ("seed", "total", "passed"),
+    ("seed", "total", "passed", "terror_wounds"),
     [
-        pytest.param(2, 1, False, id="fail-and-wounds"),
-        pytest.param(9, 10, True, id="pass-and-restore"),
+        pytest.param(2, 1, False, 1, id="fail-and-wounds"),
+        pytest.param(9, 10, True, 0, id="pass-and-restore"),
+        pytest.param(0, 4, False, 2, id="terror-casualty-before-hazards"),
     ],
 )
 def test_native_ordered_retreat_with_active_walker_objective_control(
-    walker_retreat_definitions: Section02Definitions, seed: int, total: int, passed: bool
+    walker_retreat_definitions: Section02Definitions,
+    seed: int,
+    total: int,
+    passed: bool,
+    terror_wounds: int,
 ) -> None:
     definitions = walker_retreat_definitions
     battle = scene(
@@ -613,8 +618,11 @@ def test_native_ordered_retreat_with_active_walker_objective_control(
     assert walker.effective_objective_control == 4
 
     retreat = _select_review_retreat(session, SUBJECT)
+    subject = battle.units[SUBJECT]
     ends = tuple(Pose.at(pose.position.x, pose.position.y - 3.0) for pose in boyz)
-    status = propose(session, retreat, battle.units[SUBJECT], ends, result_id="walker-witness")
+    expected_ends = dict(zip(subject.own_model_ids(), ends, strict=True))
+    boss_nob = next(model_id for model_id in expected_ends if ":boss-nob:" in model_id)
+    status = propose(session, retreat, subject, ends, result_id="walker-witness")
     assert len(events(session, "desperate_escape_roll_resolved")) == 10
     (test,) = events(session, "forced_desperate_escape_battle_shock_resolved")
     outcome = BattleShockResult.from_payload(
@@ -633,7 +641,8 @@ def test_native_ordered_retreat_with_active_walker_objective_control(
         allocation = request(status, "select_mortal_wound_model")
         progress = mortal_wound_resolution_progress(allocation)
         assert progress.application_id == f"{outcome.result_id}:daemonic-terror:{SUBJECT}"
-        assert progress.mortal_wounds == 1
+        assert progress.mortal_wounds == terror_wounds
+        assert allocation.options[0].option_id == boss_nob
         assert events(session, "movement_activation_completed") == []
         status = session.submit_option(
             request_id=allocation.request_id,
@@ -646,12 +655,25 @@ def test_native_ordered_retreat_with_active_walker_objective_control(
         damage = MortalWoundApplication.from_payload(
             cast(MortalWoundApplicationPayload, applied["mortal_wound_application"])
         )
-        assert damage.mortal_wounds == 1
+        assert damage.mortal_wounds == terror_wounds
         assert damage.remaining_mortal_wounds_lost == 0
         assert damage.ignored_mortal_wounds == 0
-        (wound,) = damage.applications
-        assert wound.wounds_lost == 1
-        assert not wound.destroyed
+        assert {wound.model_instance_id for wound in damage.applications} == {boss_nob}
+        assert sum(wound.wounds_lost for wound in damage.applications) == terror_wounds
+        lethal = damage.applications[-1].destroyed
+        assert lethal is (terror_wounds == 2)
+        if lethal:
+            hazard = request(status, "select_mortal_wound_model")
+            hazard_progress = mortal_wound_resolution_progress(hazard)
+            assert hazard_progress.application_id.endswith(":hazards")
+            assert hazard_progress.mortal_wounds == 2
+            session = _restore(session)
+            assert session.lifecycle.pending_decision_request() == hazard
+            checkpoint = session.lifecycle.state
+            assert checkpoint is not None
+            assert checkpoint.battlefield_state is not None
+            assert boss_nob in checkpoint.battlefield_state.removed_model_ids
+            assert checkpoint.battlefield_state.model_placement_or_none(boss_nob) is None
     else:
         assert events(session, TERROR_APPLIED) == []
 
@@ -669,8 +691,42 @@ def test_native_ordered_retreat_with_active_walker_objective_control(
     (completed,) = events(session, "movement_activation_completed")
     assert completed["unit_instance_id"] == SUBJECT
     assert completed["fall_back_mode"] == "desperate_escape"
+    if terror_wounds == 2:
+        assert completed["prior_battle_shock_casualty_ids"] == [boss_nob]
+        hazard_ids = completed["destroyed_model_ids"]
+        assert isinstance(hazard_ids, list)
+        assert all(isinstance(model_id, str) for model_id in hazard_ids)
+        hazard_ids = cast(list[str], hazard_ids)
+        assert len(hazard_ids) == 2
+        assert boss_nob not in hazard_ids
+        event_log = session.lifecycle.decision_controller.event_log.records
+        event_types = [event.event_type for event in event_log]
+        ordering = (
+            "forced_desperate_escape_battle_shock_resolved",
+            TERROR_APPLIED,
+            "desperate_escape_hazard_mortals_started",
+            "desperate_escape_hazard_mortals_resolved",
+            "desperate_escape_hazard_movement_continued",
+            "movement_activation_completed",
+        )
+        assert [event_types.index(kind) for kind in ordering] == sorted(
+            event_types.index(kind) for kind in ordering
+        )
+        deaths = events(session, "model_logical_death_recorded")
+        assert [row["model_instance_id"] for row in deaths] == [boss_nob, *hazard_ids]
+        final = session.lifecycle.state
+        assert final is not None
+        assert final.battlefield_state is not None
+        battlefield = final.battlefield_state
+        assert set(battlefield.removed_model_ids) == {boss_nob, *hazard_ids}
+        placed = battlefield.unit_placement_by_id(SUBJECT)
+        assert {model.model_instance_id: model.pose for model in placed.model_placements} == {
+            model_id: pose
+            for model_id, pose in expected_ends.items()
+            if model_id not in battlefield.removed_model_ids
+        }
+        assert final.current_battle_phase is BattlePhase.MOVEMENT
+        assert WALKER in {option.option_id for option in pending.options}
     assert _restore(session).lifecycle.pending_decision_request() == pending
-    replay = ReplayRunner.from_payload(
-        session.replay_artifact(artifact_id=f"walker:{passed}")
-    ).run()
+    replay = ReplayRunner.from_payload(session.replay_artifact(artifact_id=f"walker:{seed}")).run()
     assert replay.reproduced_exactly, replay.to_payload()
