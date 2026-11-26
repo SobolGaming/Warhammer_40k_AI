@@ -1325,10 +1325,20 @@ def combined_charge_runtime(root: Path, flight_raw: bytes, retry_raw: bytes) -> 
         or hashlib.sha256(retry_raw).hexdigest() != binding["ground_charge_receipt_sha256"]
     ):
         raise SystemExit("Combined Charge admission predecessor differs.")
-    _checked_bytes(root, MANIFEST, binding["combined_manifest_sha256"])
     fingerprint = binding["combined_runtime_fingerprint"]
     if not isinstance(fingerprint, str):
         raise SystemExit("Combined Charge runtime fingerprint is malformed.")
+    from scripts.stage2_ground_charge_test_admission import load_normal_move_admission
+
+    normal_move = load_normal_move_admission(root)
+    if normal_move is not None:
+        return normal_move.admit_runtime(
+            root,
+            predecessor=receipt,
+            fingerprint=fingerprint,
+            manifest_sha256=binding["combined_manifest_sha256"],
+        )
+    _checked_bytes(root, MANIFEST, binding["combined_manifest_sha256"])
     return fingerprint
 
 
@@ -1886,6 +1896,7 @@ def exact_movement_test_transition(
         SHOOTING_TRANSITION,
         ground_charge_retry_admission,
         ground_charge_test_successor,
+        load_normal_move_admission,
         normal_shooting_test_successor,
         rigid_ground_charge_test_successor,
         screen_movement_test_successor,
@@ -1906,6 +1917,7 @@ def exact_movement_test_transition(
         root, previous_runtime=None if regeneration is None else regeneration[0]
     )
     retry_charge = ground_charge_retry_admission(root)
+    normal_move = load_normal_move_admission(root)
     ground_charge = None
     ground_charge_path = root / GROUND_CHARGE_TEST_TRANSITION
     _selection_no_links(root, ground_charge_path)
@@ -1938,7 +1950,9 @@ def exact_movement_test_transition(
     if screen_path.exists():
         if shooting is None:
             raise SystemExit("Screen movement tests require the Normal Shooting predecessor.")
-        screen = screen_movement_test_successor(root, previous_runtime=runtime)
+        screen = screen_movement_test_successor(
+            root, previous_runtime=runtime, normal_move=normal_move
+        )
         runtime = screen[0]
     if pending_battle_shock is not None:
         if screen is None or pending_battle_shock[0] != runtime:
@@ -2048,6 +2062,10 @@ def exact_movement_test_transition(
         runtime = flight_runtime
     elif retry_runtime is not None:
         runtime = retry_runtime
+    if normal_move is not None and (
+        screen is None or runtime != normal_move.receipt["runtime_fingerprint"]
+    ):
+        raise SystemExit("Normal Move tests require the exact Screen and combined Charge lineage.")
 
     retained = _identity_test_transition(
         root,
@@ -2228,6 +2246,12 @@ def exact_movement_test_transition(
             raise SystemExit("Ground charge retry tests overlap their predecessor selection.")
         additions.update(retry_tests)
         raw += b"\0" + retry_raw
+    if normal_move is not None:
+        normal_tests = _selection_members(normal_move.receipt["added_files"], root)
+        if normal_tests.keys() & (updated.keys() | added.keys() | additions.keys()):
+            raise SystemExit("Normal Move tests overlap predecessor tests.")
+        additions.update(normal_tests)
+        raw += b"\0" + normal_move.raw
     return updated, {**added, **additions}, retained_raw + b"\0" + raw
 
 

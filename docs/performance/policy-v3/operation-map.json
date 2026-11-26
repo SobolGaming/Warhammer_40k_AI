@@ -35829,7 +35829,8 @@
     "stage2-screen-movement-candidates": {
       "paths": [
         "src/warhammer40k_core/ai/screen_movement_candidates.py",
-        "tests/rules/section09/test_screen_movement_candidates.py"
+        "tests/rules/section09/test_screen_movement_candidates.py",
+        "tests/rules/section09/test_normal_move_candidates.py"
       ],
       "owners": [
         "*"
@@ -36754,7 +36755,8 @@
         "data/source_audits/ci64_provenance_v1/stage2-screen-movement-test-v1.json",
         "data/source_audits/ci64_provenance_v1/stage2-rigid-ground-charge-test-v1.json",
         "data/source_audits/ci64_provenance_v1/stage2-ground-charge-retry-test-v1.json",
-        "data/source_audits/ci64_provenance_v1/combined-charge-admission-v1.json"
+        "data/source_audits/ci64_provenance_v1/combined-charge-admission-v1.json",
+        "data/source_audits/ci64_provenance_v1/stage2-normal-move-test-v1.json"
       ],
       "owners": [
         "*"

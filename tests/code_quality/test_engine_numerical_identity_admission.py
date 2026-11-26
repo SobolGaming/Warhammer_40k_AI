@@ -935,10 +935,37 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
     assert set(screen["added_files"]) == {ground_charge.SCREEN_OWNER}
     assert ground_charge.SCREEN_OWNER in active_files
     assert sum(ground_charge.SCREEN_OWNER in group for group in groups) == 1
-    assert (
-        screen["policy_sha256"]
-        == hashlib.sha256((ROOT / ground_charge.SCREEN_SOURCE).read_bytes()).hexdigest()
-    )
+    normal_move = _record(ground_charge.NORMAL_MOVE_TRANSITION)
+    assert normal_move["base"] == ground_charge.NORMAL_MOVE_BASE
+    assert normal_move["screen_source"]["before"] == screen["policy_sha256"]
+    for path, key in (
+        (ground_charge.SCREEN_SOURCE, "screen_source"),
+        (MANIFEST, "runtime_manifest"),
+    ):
+        before = subprocess.check_output(
+            ["git", "show", normal_move["base"] + ":" + path], cwd=ROOT
+        )
+        assert normal_move[key]["before"] == hashlib.sha256(before).hexdigest()
+        assert normal_move[key]["after"] == hashlib.sha256((ROOT / path).read_bytes()).hexdigest()
+    assert normal_move["runtime_manifest"]["before"] == combined["combined_manifest_sha256"]
+    assert normal_move["retained_runtime_fingerprint"] == combined["combined_runtime_fingerprint"]
+    assert normal_move["runtime_fingerprint"] == _record(MANIFEST)["fingerprint"]
+    assert ground_charge.NORMAL_MOVE_OWNER in active_files
+    assert sum(ground_charge.NORMAL_MOVE_OWNER in group for group in groups) == 1
+    assert normal_move["added_cases"] == [
+        f"{ground_charge.NORMAL_MOVE_OWNER}::{name}" for name in ground_charge.NORMAL_MOVE_CASES
+    ]
+    admission = ground_charge.load_normal_move_admission(ROOT)
+    assert admission is not None
+    with pytest.raises(SystemExit, match="exact Screen source predecessor"):
+        admission.validate_screen_source(ROOT, "0" * 64)
+    with pytest.raises(SystemExit, match="exact combined Charge predecessor"):
+        admission.admit_runtime(
+            ROOT,
+            predecessor=b"unbound",
+            fingerprint=combined["combined_runtime_fingerprint"],
+            manifest_sha256=combined["combined_manifest_sha256"],
+        )
     assert shalaxi["test"]["before"] == shooting_visibility["test"]["after"]
     for source in selection.ROUND3_SHALAXI_SOURCES:
         present = subprocess.check_output(["git", "ls-tree", shalaxi_base, "--", source], cwd=ROOT)
@@ -1314,6 +1341,7 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         | shalaxi_cases
         | charge_cases
         | set(retry["added_cases"])
+        | set(normal_move["added_cases"])
         | shooting_cases
         | {
             ground_charge.SCREEN_OWNER

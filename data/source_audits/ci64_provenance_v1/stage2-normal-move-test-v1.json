@@ -1,0 +1,28 @@
+{
+  "schema": "finite-stage2-normal-move-test-v1",
+  "base": "c0235fe0bfda75743a4ba987b9ef7ae7b4fd5da3",
+  "retained_screen_sha256": "7e0b32cb0f7a0ef8e7d05f9b0a4aa7bb965cb6644e5d42ffd035897a536deb94",
+  "retained_combined_charge_sha256": "85a8eb553ae08b36446c89ebccbc2081ea7e363984f77a462690f1eb348801ec",
+  "retained_runtime_fingerprint": "dc9eb5d3f570d34d71e26a1c6b8ef794b5723aa812f8de505066309805678d18",
+  "runtime_fingerprint": "40b91df8a39aa85afd3503b466b7bcab93c87d70db8189243bc9c5d70f924e1a",
+  "runtime_manifest": {
+    "before": "c26c71c97e1d460f53f064a50516bcdc88b0a901ef5324267852ae32031cd3d1",
+    "after": "1701a163d58756209054de421d459e057faedfb3cf670c72d9e3c5f9efc5edaa"
+  },
+  "screen_source": {
+    "before": "457f13060a8aa288c5399901ae8db83e6be0e1778c66009e76a322d4fbaf424e",
+    "after": "a3c6c07ad8134788908e04cc2bac661b680a224d2e0b8dadc3b50b8ee36a38f4"
+  },
+  "added_files": {
+    "tests/rules/section09/test_normal_move_candidates.py": {
+      "mode": "100644",
+      "blob_sha1": "9c4ac44749738af7ebad63c04ff9ccec42ddbb91",
+      "sha256": "cd3e815eac11f46f4df9503735f2c00389e1d6261fcde304fe948aff98b18c88",
+      "bytes": 11067
+    }
+  },
+  "added_cases": [
+    "tests/rules/section09/test_normal_move_candidates.py::test_generated_normal_move_replays_with_exact_viewer_history",
+    "tests/rules/section09/test_normal_move_candidates.py::test_normal_paths_use_native_offer_alongside_unchanged_hold"
+  ]
+}
