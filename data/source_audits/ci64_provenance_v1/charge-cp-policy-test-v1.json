@@ -1,0 +1,36 @@
+{
+  "base": "dec50bca2394c755a0d5fb76e6659882b388c032",
+  "policy_sha256": "2d28946dc9d654f12f01be0a54c286f59fee3fa0bfd0b40edec697e42009ffed",
+  "retained_manifest_sha256": "1701a163d58756209054de421d459e057faedfb3cf670c72d9e3c5f9efc5edaa",
+  "manifest_sha256": "dd7f40a4f58d481a25bc865123a8035f35a816800444ebf3dea36b5779feba74",
+  "runtime_fingerprint": "dc4e5095bcdba03a4936fb8f4f3525abeed92bbdf801f17216a969e5fd49afec",
+  "added_files": {
+    "tests/infrastructure/adapters/test_charge_cp_policy.py": {
+      "mode": "100644",
+      "blob_sha1": "1817813e1a98823f8aade5c0912479ec478d6afe",
+      "sha256": "56d04c8a19057d69398af0665b33acdd99dfdbb0b1bbcf6401e7c2b2ac5310dc",
+      "bytes": 13574
+    }
+  },
+  "added_cases": [
+    "tests/infrastructure/adapters/test_charge_cp_policy.py::test_dense_wall_policy_submits_native_modes_and_costs[conditional-ground]",
+    "tests/infrastructure/adapters/test_charge_cp_policy.py::test_dense_wall_policy_submits_native_modes_and_costs[keep-cp]",
+    "tests/infrastructure/adapters/test_charge_cp_policy.py::test_dense_wall_policy_submits_native_modes_and_costs[short-roll]",
+    "tests/infrastructure/adapters/test_charge_cp_policy.py::test_dense_wall_policy_submits_native_modes_and_costs[unaffordable]",
+    "tests/infrastructure/adapters/test_charge_cp_policy.py::test_used_phase_allowance_cannot_be_spent_again"
+  ],
+  "origin_test": {
+    "before": {
+      "mode": "100644",
+      "blob_sha1": "66a502beeefdb9f2566252aa6967fee2cb7353e9",
+      "sha256": "7d98b29916544db1d2d973173e041af7f8f3c91c241054b3a13ed0cbaf52d84f",
+      "bytes": 12073
+    },
+    "after": {
+      "mode": "100644",
+      "blob_sha1": "d8e47d43a7b3177e973ca4e4749f7f8c976d95e0",
+      "sha256": "9c65c252a42ca011e78d94203baabd550c97c9782de45ed9b5b6d0b9a6c92b0b",
+      "bytes": 11818
+    }
+  }
+}

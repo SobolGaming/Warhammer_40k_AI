@@ -37666,6 +37666,10 @@
     "bounded-charge-flight-wall-proof": {
       "paths": [
         "src/warhammer40k_core/ai/charge_flight_admission.py",
+        "src/warhammer40k_core/ai/charge_cp_policy.py",
+        "tests/infrastructure/adapters/test_charge_cp_policy.py",
+        "data/source_audits/ci64_provenance_v1/charge-cp-policy-test-v1.json",
+        "scripts/stage2_ground_charge_test_admission.py",
         "tests/infrastructure/adapters/test_charge_flight_barrier.py",
         "tests/infrastructure/adapters/test_charge_flight_onslaught_timing.py",
         "tests/code_quality/test_engine_numerical_identity_admission.py",

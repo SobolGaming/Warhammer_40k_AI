@@ -1,532 +1,388 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "738cef0a75422aa5b77d6f969b285dc78bca6ad4",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:40b91df8a39aa85afd3503b466b7bcab93c87d70db8189243bc9c5d70f924e1a",
-  "operation_map_sha256": "1d2b6674023f25c564fd4fb627ee61718e567767c116a7da266f59b75755f0c0",
+  "base": "dec50bca2394c755a0d5fb76e6659882b388c032",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:dc4e5095bcdba03a4936fb8f4f3525abeed92bbdf801f17216a969e5fd49afec",
+  "operation_map_sha256": "6df1b7479384bb706938b796fd920f81350c1f8af79b9c2721ffdfec6b18c3aa",
   "changes": {
     "ci/test_shards/durations.json": {
-      "before_sha256": "283bfd9f8c00bf088230151f8760a9cdee5510faaa93a48d932f3c3b720d74ac",
-      "after_sha256": "fdf80448294fc7edb4fdb774a5a0fc541e3dcb089692b1edc5556689b344d86c",
+      "before_sha256": "fdf80448294fc7edb4fdb774a5a0fc541e3dcb089692b1edc5556689b344d86c",
+      "after_sha256": "c5bd3050f1098cbd78a4df14ab12890ab7a239ae0807e7c993921caf9f82ea6a",
       "owners": {
         "@document": {
-          "before": "283bfd9f8c00bf088230151f8760a9cdee5510faaa93a48d932f3c3b720d74ac",
-          "after": "fdf80448294fc7edb4fdb774a5a0fc541e3dcb089692b1edc5556689b344d86c"
+          "before": "fdf80448294fc7edb4fdb774a5a0fc541e3dcb089692b1edc5556689b344d86c",
+          "after": "c5bd3050f1098cbd78a4df14ab12890ab7a239ae0807e7c993921caf9f82ea6a"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
-      "before_sha256": "b01e9d2cd701f57df8919afa1915ee9da09372d77544efefe41f4239f77e4010",
-      "after_sha256": "ab9be80b394c3f6842b9530e71f1f75e648eebbffb597c4a8e7d8976d435b8e7",
+      "before_sha256": "ab9be80b394c3f6842b9530e71f1f75e648eebbffb597c4a8e7d8976d435b8e7",
+      "after_sha256": "68ecc535c6dd2c32b1fe5032137d7ef4a077ff7eb29197e6a8818c7571e19384",
       "owners": {
         "@document": {
-          "before": "b01e9d2cd701f57df8919afa1915ee9da09372d77544efefe41f4239f77e4010",
-          "after": "ab9be80b394c3f6842b9530e71f1f75e648eebbffb597c4a8e7d8976d435b8e7"
+          "before": "ab9be80b394c3f6842b9530e71f1f75e648eebbffb597c4a8e7d8976d435b8e7",
+          "after": "68ecc535c6dd2c32b1fe5032137d7ef4a077ff7eb29197e6a8818c7571e19384"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
-      "before_sha256": "694b108e6a1e9903500f8413a2b24a8c4181ef43d1aec31ff413938b35595c72",
-      "after_sha256": "5227d0f54703b18163f0ca54b0d0428b7c9514cd20d2e4935734e57dc08d0216",
+      "before_sha256": "5227d0f54703b18163f0ca54b0d0428b7c9514cd20d2e4935734e57dc08d0216",
+      "after_sha256": "82eea10e6f4218d0b65f3ce48664ed887869ace60921b0491ce2f1c46ce77007",
       "owners": {
         "@document": {
-          "before": "694b108e6a1e9903500f8413a2b24a8c4181ef43d1aec31ff413938b35595c72",
-          "after": "5227d0f54703b18163f0ca54b0d0428b7c9514cd20d2e4935734e57dc08d0216"
+          "before": "5227d0f54703b18163f0ca54b0d0428b7c9514cd20d2e4935734e57dc08d0216",
+          "after": "82eea10e6f4218d0b65f3ce48664ed887869ace60921b0491ce2f1c46ce77007"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
-      "before_sha256": "62950bee912a3dca87544bfd3178295661362e227c8a3f30f8a9b0039259b0cf",
-      "after_sha256": "a2270719c5574bd3cf1faf381b4c55a8a24cf3c34a6a86b16ad5c63565dbd24d",
+      "before_sha256": "a2270719c5574bd3cf1faf381b4c55a8a24cf3c34a6a86b16ad5c63565dbd24d",
+      "after_sha256": "d9cc354f8eab170deb9fff8d26f813aacf59d2fda5a18d65681f56c0dc5a8aa1",
       "owners": {
         "@document": {
-          "before": "62950bee912a3dca87544bfd3178295661362e227c8a3f30f8a9b0039259b0cf",
-          "after": "a2270719c5574bd3cf1faf381b4c55a8a24cf3c34a6a86b16ad5c63565dbd24d"
+          "before": "a2270719c5574bd3cf1faf381b4c55a8a24cf3c34a6a86b16ad5c63565dbd24d",
+          "after": "d9cc354f8eab170deb9fff8d26f813aacf59d2fda5a18d65681f56c0dc5a8aa1"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
-      "before_sha256": "734d8a0dc2d581aed9f2b28c520692ae75b3f2afe4a248291721639d3f7105a8",
-      "after_sha256": "b481ec81d8b408816823f883efdeab14b1e1764afea52915ce3a0b14b3f5c001",
+      "before_sha256": "b481ec81d8b408816823f883efdeab14b1e1764afea52915ce3a0b14b3f5c001",
+      "after_sha256": "c8ec470e94a1e22bfc8dc2bf38203c7a4101690b2f7980163d4313f314e1ec00",
       "owners": {
         "@document": {
-          "before": "734d8a0dc2d581aed9f2b28c520692ae75b3f2afe4a248291721639d3f7105a8",
-          "after": "b481ec81d8b408816823f883efdeab14b1e1764afea52915ce3a0b14b3f5c001"
+          "before": "b481ec81d8b408816823f883efdeab14b1e1764afea52915ce3a0b14b3f5c001",
+          "after": "c8ec470e94a1e22bfc8dc2bf38203c7a4101690b2f7980163d4313f314e1ec00"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
-      "before_sha256": "35b0ef26de5a5f7b1755cae071bf07a7bbbdca194f735ce8deec7061f6421d14",
-      "after_sha256": "1a7c88bab53d43c7e21194fd4e4a1c71b24d2d428737b09734b15337820ff9d4",
+      "before_sha256": "1a7c88bab53d43c7e21194fd4e4a1c71b24d2d428737b09734b15337820ff9d4",
+      "after_sha256": "6b07aa63eb1a2d256e9638139db440726690a206f05c040972757ccea90de483",
       "owners": {
         "@document": {
-          "before": "35b0ef26de5a5f7b1755cae071bf07a7bbbdca194f735ce8deec7061f6421d14",
-          "after": "1a7c88bab53d43c7e21194fd4e4a1c71b24d2d428737b09734b15337820ff9d4"
+          "before": "1a7c88bab53d43c7e21194fd4e4a1c71b24d2d428737b09734b15337820ff9d4",
+          "after": "6b07aa63eb1a2d256e9638139db440726690a206f05c040972757ccea90de483"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
-      "before_sha256": "9e785bd8fa436000c7ece727e2cbd379567da7484eb76083004b313b004dd0ba",
-      "after_sha256": "90cb68738ca6db9d6edf7d8a151fd195b78b604c871a237d318d57059f7e5231",
+      "before_sha256": "90cb68738ca6db9d6edf7d8a151fd195b78b604c871a237d318d57059f7e5231",
+      "after_sha256": "4c65677ece6e027ac314600a72bb3a0bfbdee4d86d40a2b1f5b433c14df760fb",
       "owners": {
         "@document": {
-          "before": "9e785bd8fa436000c7ece727e2cbd379567da7484eb76083004b313b004dd0ba",
-          "after": "90cb68738ca6db9d6edf7d8a151fd195b78b604c871a237d318d57059f7e5231"
+          "before": "90cb68738ca6db9d6edf7d8a151fd195b78b604c871a237d318d57059f7e5231",
+          "after": "4c65677ece6e027ac314600a72bb3a0bfbdee4d86d40a2b1f5b433c14df760fb"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
-      "before_sha256": "31f103b6055187de7a402f5043a174d1d269144a23de56f2b06a60cacc7fe427",
-      "after_sha256": "4f7c7b5b4aa078c6694e539f0acf700c9de1a7e53f066b372b53995be77aa252",
+      "before_sha256": "4f7c7b5b4aa078c6694e539f0acf700c9de1a7e53f066b372b53995be77aa252",
+      "after_sha256": "14defe078e7e99a10450a36553a4f98087b7178145e87825e343fc20ae494faa",
       "owners": {
         "@document": {
-          "before": "31f103b6055187de7a402f5043a174d1d269144a23de56f2b06a60cacc7fe427",
-          "after": "4f7c7b5b4aa078c6694e539f0acf700c9de1a7e53f066b372b53995be77aa252"
+          "before": "4f7c7b5b4aa078c6694e539f0acf700c9de1a7e53f066b372b53995be77aa252",
+          "after": "14defe078e7e99a10450a36553a4f98087b7178145e87825e343fc20ae494faa"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
-      "before_sha256": "91f260a08db40aa49061abb60fc1f8fdd68d19c6dae3e55cb7d7415cce3814c1",
-      "after_sha256": "025dcaad09ad869998e9206a398304d68cd83c6189c307890b56fd65b29f7c28",
+      "before_sha256": "025dcaad09ad869998e9206a398304d68cd83c6189c307890b56fd65b29f7c28",
+      "after_sha256": "da1bdfc9b567d58fbf7ed656f53443768f32d98b19fcfefc9c0524b0f61a34eb",
       "owners": {
         "@document": {
-          "before": "91f260a08db40aa49061abb60fc1f8fdd68d19c6dae3e55cb7d7415cce3814c1",
-          "after": "025dcaad09ad869998e9206a398304d68cd83c6189c307890b56fd65b29f7c28"
+          "before": "025dcaad09ad869998e9206a398304d68cd83c6189c307890b56fd65b29f7c28",
+          "after": "da1bdfc9b567d58fbf7ed656f53443768f32d98b19fcfefc9c0524b0f61a34eb"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
-      "before_sha256": "1beb1fb3b0a533b245a110a15b93162bd73a701131be2abf6e0a65bc8da13138",
-      "after_sha256": "de96a082f224be8a880410bb3a61a3b6bd95f16e5b5292f21802cd8ec8cab3da",
+      "before_sha256": "de96a082f224be8a880410bb3a61a3b6bd95f16e5b5292f21802cd8ec8cab3da",
+      "after_sha256": "868c2eeb1e3dbacf6fe7db366e36a09757c9a8a087c0e0539bd39abe59cd1cdd",
       "owners": {
         "@document": {
-          "before": "1beb1fb3b0a533b245a110a15b93162bd73a701131be2abf6e0a65bc8da13138",
-          "after": "de96a082f224be8a880410bb3a61a3b6bd95f16e5b5292f21802cd8ec8cab3da"
+          "before": "de96a082f224be8a880410bb3a61a3b6bd95f16e5b5292f21802cd8ec8cab3da",
+          "after": "868c2eeb1e3dbacf6fe7db366e36a09757c9a8a087c0e0539bd39abe59cd1cdd"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
-      "before_sha256": "9e19461b030d8fe622c0fd9ce381f4b2aeb91cd282cb9f5b0d2f4a541bafe5cd",
-      "after_sha256": "0474ac03e6e029e80cd75222a22297a369f1f3a05281d9b8ea1c87ad475c5b9b",
+      "before_sha256": "0474ac03e6e029e80cd75222a22297a369f1f3a05281d9b8ea1c87ad475c5b9b",
+      "after_sha256": "7147082050f1c2d851b8188e364beb06fc1d23c535440660cd6ae3e98c3dbbe5",
       "owners": {
         "@document": {
-          "before": "9e19461b030d8fe622c0fd9ce381f4b2aeb91cd282cb9f5b0d2f4a541bafe5cd",
-          "after": "0474ac03e6e029e80cd75222a22297a369f1f3a05281d9b8ea1c87ad475c5b9b"
+          "before": "0474ac03e6e029e80cd75222a22297a369f1f3a05281d9b8ea1c87ad475c5b9b",
+          "after": "7147082050f1c2d851b8188e364beb06fc1d23c535440660cd6ae3e98c3dbbe5"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "426b81a5c77f108f6ac4371c72327a603e4a8395e289cef93e2157d603b84382",
-      "after_sha256": "b3e5f8a7b1b163c89ed8809f25519ea82c6de4c20f167398209dd0882ae69dd3",
+      "before_sha256": "b3e5f8a7b1b163c89ed8809f25519ea82c6de4c20f167398209dd0882ae69dd3",
+      "after_sha256": "33378060324634fa4710730dea0ef57ff4cecda634d3fb7c7fd40f07e4e60a44",
       "owners": {
         "@document": {
-          "before": "426b81a5c77f108f6ac4371c72327a603e4a8395e289cef93e2157d603b84382",
-          "after": "b3e5f8a7b1b163c89ed8809f25519ea82c6de4c20f167398209dd0882ae69dd3"
+          "before": "b3e5f8a7b1b163c89ed8809f25519ea82c6de4c20f167398209dd0882ae69dd3",
+          "after": "33378060324634fa4710730dea0ef57ff4cecda634d3fb7c7fd40f07e4e60a44"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "4f43761343e67b65620608dd0bc170c1b16a312e272ebad3d4ec8cd1587da204",
-      "after_sha256": "435c9f6e8382188270e4a9acc6c86097a6b19a153f75a0925106fa7ad4797c00",
+      "before_sha256": "435c9f6e8382188270e4a9acc6c86097a6b19a153f75a0925106fa7ad4797c00",
+      "after_sha256": "ecd7ce99a6bec6fd13c62384308a51caa50ed8edb94fac578d97310012600980",
       "owners": {
         "@document": {
-          "before": "4f43761343e67b65620608dd0bc170c1b16a312e272ebad3d4ec8cd1587da204",
-          "after": "435c9f6e8382188270e4a9acc6c86097a6b19a153f75a0925106fa7ad4797c00"
+          "before": "435c9f6e8382188270e4a9acc6c86097a6b19a153f75a0925106fa7ad4797c00",
+          "after": "ecd7ce99a6bec6fd13c62384308a51caa50ed8edb94fac578d97310012600980"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "add07de631f8f5f06c9426eac72b13b4e0ecb98c55a2361912808ff46b3c8187",
-      "after_sha256": "fdea99d223c79b57763dbff3d66ba6b7658309669bb4f1ddff683f7c735ca68f",
+      "before_sha256": "fdea99d223c79b57763dbff3d66ba6b7658309669bb4f1ddff683f7c735ca68f",
+      "after_sha256": "e6f87cec9b19fe6d0adaee3b6b31aec916ab30f78b2dbcba92dac404c6fc20fe",
       "owners": {
         "@document": {
-          "before": "add07de631f8f5f06c9426eac72b13b4e0ecb98c55a2361912808ff46b3c8187",
-          "after": "fdea99d223c79b57763dbff3d66ba6b7658309669bb4f1ddff683f7c735ca68f"
+          "before": "fdea99d223c79b57763dbff3d66ba6b7658309669bb4f1ddff683f7c735ca68f",
+          "after": "e6f87cec9b19fe6d0adaee3b6b31aec916ab30f78b2dbcba92dac404c6fc20fe"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "df55abb1b61db0964e69248bce522c1efdac7cc7e107f341218ccd8c50a1d0ad",
-      "after_sha256": "c08f529036c0ecfa9f0cb7d9a01e46961c6ee86ed66a345dfd3f8e6b0d0b0da8",
+      "before_sha256": "c08f529036c0ecfa9f0cb7d9a01e46961c6ee86ed66a345dfd3f8e6b0d0b0da8",
+      "after_sha256": "852aa0093608953a87d99ab556830dba1472770c4072d9412817beffdced1ee1",
       "owners": {
         "@document": {
-          "before": "df55abb1b61db0964e69248bce522c1efdac7cc7e107f341218ccd8c50a1d0ad",
-          "after": "c08f529036c0ecfa9f0cb7d9a01e46961c6ee86ed66a345dfd3f8e6b0d0b0da8"
+          "before": "c08f529036c0ecfa9f0cb7d9a01e46961c6ee86ed66a345dfd3f8e6b0d0b0da8",
+          "after": "852aa0093608953a87d99ab556830dba1472770c4072d9412817beffdced1ee1"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "56a0c4036c0ddb990faf25b9ca6424ef720037a6b4f1da4ba4c27ef98c725acd",
-      "after_sha256": "e1b2569956f1bfe24285ec6eb9c275ce9a0d7f4c60e56719e3e16bc17b06fe7e",
+      "before_sha256": "e1b2569956f1bfe24285ec6eb9c275ce9a0d7f4c60e56719e3e16bc17b06fe7e",
+      "after_sha256": "ce7a8832b2b46e7a50d9ce98e0511a82844472762547a65f7572d813de81cc8e",
       "owners": {
         "@document": {
-          "before": "56a0c4036c0ddb990faf25b9ca6424ef720037a6b4f1da4ba4c27ef98c725acd",
-          "after": "e1b2569956f1bfe24285ec6eb9c275ce9a0d7f4c60e56719e3e16bc17b06fe7e"
+          "before": "e1b2569956f1bfe24285ec6eb9c275ce9a0d7f4c60e56719e3e16bc17b06fe7e",
+          "after": "ce7a8832b2b46e7a50d9ce98e0511a82844472762547a65f7572d813de81cc8e"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "e824844439c30256e9374a4627bf198995bcf745bc169aa54f7541bf25e7d708",
-      "after_sha256": "36431d963e5b5d25714db9f448495c0577ccdd710d42bec630573b0fa14bb629",
+      "before_sha256": "36431d963e5b5d25714db9f448495c0577ccdd710d42bec630573b0fa14bb629",
+      "after_sha256": "ac7083b18d1b1ee86300e50d01f391594640c7b72780be5af11429ca030daa85",
       "owners": {
         "@document": {
-          "before": "e824844439c30256e9374a4627bf198995bcf745bc169aa54f7541bf25e7d708",
-          "after": "36431d963e5b5d25714db9f448495c0577ccdd710d42bec630573b0fa14bb629"
+          "before": "36431d963e5b5d25714db9f448495c0577ccdd710d42bec630573b0fa14bb629",
+          "after": "ac7083b18d1b1ee86300e50d01f391594640c7b72780be5af11429ca030daa85"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "7633441ff59429d3ec20634f99382a05a1d58d138072e74f1923efffe3c1bd6c",
-      "after_sha256": "614f4e5d14bf67d91d7277c8e11fe9641fdfc80a0169b0f2b6eb593ec7efbcfc",
+      "before_sha256": "614f4e5d14bf67d91d7277c8e11fe9641fdfc80a0169b0f2b6eb593ec7efbcfc",
+      "after_sha256": "423816b1d010145976aa4fc27d6414ac213d885c1e040bb88964d361e3ce9983",
       "owners": {
         "@document": {
-          "before": "7633441ff59429d3ec20634f99382a05a1d58d138072e74f1923efffe3c1bd6c",
-          "after": "614f4e5d14bf67d91d7277c8e11fe9641fdfc80a0169b0f2b6eb593ec7efbcfc"
+          "before": "614f4e5d14bf67d91d7277c8e11fe9641fdfc80a0169b0f2b6eb593ec7efbcfc",
+          "after": "423816b1d010145976aa4fc27d6414ac213d885c1e040bb88964d361e3ce9983"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "551f928e5a4863a5de5909a68a9f1cd669ee79149d78117b22ef4ca9aae3b6ed",
-      "after_sha256": "b746e95eec923229af5b87fbebc96b4dc8b51365dfe6155e7f75db7ef0b669da",
+      "before_sha256": "b746e95eec923229af5b87fbebc96b4dc8b51365dfe6155e7f75db7ef0b669da",
+      "after_sha256": "e32619710876392eaf42f4ce4ed1a41c65d6f230ad1017274e60ae6983757b32",
       "owners": {
         "@document": {
-          "before": "551f928e5a4863a5de5909a68a9f1cd669ee79149d78117b22ef4ca9aae3b6ed",
-          "after": "b746e95eec923229af5b87fbebc96b4dc8b51365dfe6155e7f75db7ef0b669da"
+          "before": "b746e95eec923229af5b87fbebc96b4dc8b51365dfe6155e7f75db7ef0b669da",
+          "after": "e32619710876392eaf42f4ce4ed1a41c65d6f230ad1017274e60ae6983757b32"
         }
       }
     },
-    "data/source_audits/ci64_provenance_v1/stage2-constructed-normal-move-origin-test-v1.json": {
+    "data/source_audits/ci64_provenance_v1/charge-cp-policy-test-v1.json": {
       "before_sha256": null,
-      "after_sha256": "a49351e14abf1b1542f240ee4f05823476f33b80ba5c13e5681df10cb8d64fc5",
+      "after_sha256": "657541c69cc31107c7ae82fe5b42b9c0c20994bf1c5c83af16c4526c900d4b08",
       "owners": {
         "@document": {
           "before": null,
-          "after": "a49351e14abf1b1542f240ee4f05823476f33b80ba5c13e5681df10cb8d64fc5"
+          "after": "657541c69cc31107c7ae82fe5b42b9c0c20994bf1c5c83af16c4526c900d4b08"
         }
       }
     },
-    "data/source_audits/ci64_provenance_v1/stage2-normal-move-test-v1.json": {
-      "before_sha256": null,
-      "after_sha256": "bf15b3ce40bd26cc9c1af4da30a21fc17cd475c8f849bceabf8407f3fa9348a0",
+    "docs/AI_POLICY_INTERFACE.md": {
+      "before_sha256": "bd4bbeb64cb2ecf030d68e9bdacd720fcbcb2e389f9d7a21e19dbb0583dbe2dc",
+      "after_sha256": "9a6bc0db045dc3ba26c8a4395832017f8676b1c0a8507c74f051f8ce8ab45ae1",
       "owners": {
         "@document": {
-          "before": null,
-          "after": "bf15b3ce40bd26cc9c1af4da30a21fc17cd475c8f849bceabf8407f3fa9348a0"
+          "before": "bd4bbeb64cb2ecf030d68e9bdacd720fcbcb2e389f9d7a21e19dbb0583dbe2dc",
+          "after": "9a6bc0db045dc3ba26c8a4395832017f8676b1c0a8507c74f051f8ce8ab45ae1"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "7137208a47852f09f31c23ff3f65246c631e3105b359456c370095cd4cf35eb0",
-      "after_sha256": "59fe67a75401dd9ae26a177c41749735e735e50ac1ba3706cfcdd11e7f7d4ecc",
+      "before_sha256": "59fe67a75401dd9ae26a177c41749735e735e50ac1ba3706cfcdd11e7f7d4ecc",
+      "after_sha256": "a815eb36a999cb3838ee042aec428a7cc4548a12240b8c16b33a13ddea41383c",
       "owners": {
         "@document": {
-          "before": "7137208a47852f09f31c23ff3f65246c631e3105b359456c370095cd4cf35eb0",
-          "after": "59fe67a75401dd9ae26a177c41749735e735e50ac1ba3706cfcdd11e7f7d4ecc"
-        }
-      }
-    },
-    "docs/stage2/normal-move-base-rebind-738cef0a.json": {
-      "before_sha256": null,
-      "after_sha256": "2af439c0c14c2e1003740a67fb9a6a6a73d954d4e5e87fe591b009f11221acf7",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "2af439c0c14c2e1003740a67fb9a6a6a73d954d4e5e87fe591b009f11221acf7"
-        }
-      }
-    },
-    "docs/stage2/normal-move-base-successor.json": {
-      "before_sha256": null,
-      "after_sha256": "861a8a7a13063bdeeda52421912ea5828f76b30bb84e767eaedd7adda354dedf",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "861a8a7a13063bdeeda52421912ea5828f76b30bb84e767eaedd7adda354dedf"
-        }
-      }
-    },
-    "docs/stage2/normal-move-candidate-receipt.json": {
-      "before_sha256": null,
-      "after_sha256": "28a1a880af228075d9569fa7f49ba582bc07d73e9c1c20d13a5d2aed73ead85c",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "28a1a880af228075d9569fa7f49ba582bc07d73e9c1c20d13a5d2aed73ead85c"
-        }
-      }
-    },
-    "docs/stage2/normal-move-candidates.md": {
-      "before_sha256": null,
-      "after_sha256": "63bde88b39538a682ef5a5a40fbb6d9ab9b20518bca025a8edb88ff2c6f1655e",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "63bde88b39538a682ef5a5a40fbb6d9ab9b20518bca025a8edb88ff2c6f1655e"
-        }
-      }
-    },
-    "docs/stage2/normal-move-exact-base-performance.json": {
-      "before_sha256": null,
-      "after_sha256": "43f69602ccc1605a06258bd5b5224cbc075121672e5f968941f377a43bcac7b4",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "43f69602ccc1605a06258bd5b5224cbc075121672e5f968941f377a43bcac7b4"
-        }
-      }
-    },
-    "docs/stage2/normal-move-frontier-evidence.json": {
-      "before_sha256": null,
-      "after_sha256": "aa620bebe821dbe996796ac22d0bd09ca46b442ecbfd16e9987b0c6f09899197",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "aa620bebe821dbe996796ac22d0bd09ca46b442ecbfd16e9987b0c6f09899197"
+          "before": "59fe67a75401dd9ae26a177c41749735e735e50ac1ba3706cfcdd11e7f7d4ecc",
+          "after": "a815eb36a999cb3838ee042aec428a7cc4548a12240b8c16b33a13ddea41383c"
         }
       }
     },
     "scripts/engine_numerical_identity_test_admission.py": {
-      "before_sha256": "2c2ea888cea224cb4bea84371c955f803c75a4a58f9c58c45eee367d36b6d8c7",
-      "after_sha256": "b3bdb825d1e31f7fd29a67e119d9bf10efab97597c6b906b2f11db33b0870c46",
+      "before_sha256": "b3bdb825d1e31f7fd29a67e119d9bf10efab97597c6b906b2f11db33b0870c46",
+      "after_sha256": "5df545de9c4a302f548d03544e20322f58b3036a921f2b1792616e1398564898",
       "owners": {
+        "@module": {
+          "before": "1f18eca685483ad971338229c441311da0503eaeb25464cddae4f3c62b3e36c8",
+          "after": "d108075827607fd7ebd21229ed2019c02e71959f3ed38ef8ac7a7ed031760710"
+        },
+        "_ChargeCpTestAddition": {
+          "before": null,
+          "after": "55641be75ad5d57b6afa54691a544e1f2fdb053bde88704f58714c35738519d9"
+        },
+        "_charge_cp_test_addition": {
+          "before": null,
+          "after": "405e0be1ec716e52c097481f46a4dc78d8b19f0b55839809de4c327952f85c06"
+        },
         "combined_charge_runtime": {
-          "before": "49421aee2ba39f3e81dc1007493f467ffb8d8cc4df34da8589c462ecaf15abee",
-          "after": "182f215bc337712b824de56b162a483ac57237e5192c9c0b29d0eca6459cdecd"
+          "before": "182f215bc337712b824de56b162a483ac57237e5192c9c0b29d0eca6459cdecd",
+          "after": "4e578785d442eb9442e48ac5bacc99d8c1475f7efb9c5cb3214c5ed869a1561d"
         },
         "exact_movement_test_transition": {
-          "before": "c1c8814768c859cad09ff643c1d4df0da27afa1177b4f2122d24f03685552628",
-          "after": "c40953866ec3cbcc3434cd7edeac0eb831201a7fca57b7173051c9f86963e523"
+          "before": "c40953866ec3cbcc3434cd7edeac0eb831201a7fca57b7173051c9f86963e523",
+          "after": "0c9e9d6f4faea6ae7dca52b5601e3f052068fdaf35b8dc4d5f52222d79d210e9"
         }
       }
     },
     "scripts/stage2_ground_charge_test_admission.py": {
-      "before_sha256": "d5c6b70f0037c33f1e55b0c4bae9024ff68685826f24cefb6d8362ce2cc00aa5",
-      "after_sha256": "df87580db572dd91ab2708232371685e03a9f552de8e8300e84e5a03a8fed347",
+      "before_sha256": "df87580db572dd91ab2708232371685e03a9f552de8e8300e84e5a03a8fed347",
+      "after_sha256": "23aca1777a60f72a9d5fc2f7a9ed0b36ddb8b1ba12695774fbef80a29c013257",
       "owners": {
-        "@module": {
-          "before": "abb04dae421ffd70285f610b1ed882c972be4bbe0589ecf7ad92eed408f72caa",
-          "after": "cb5cc12d35f955387f2f4b019fe21c8123cd13da0ca8da0d16dae62257d1856f"
-        },
-        "NormalMoveAdmission": {
-          "before": null,
-          "after": "26c4eb6b901f303881666de75418565ad987aa162ae0b230e8c2b61fec00babf"
-        },
         "NormalMoveAdmission.admit_runtime": {
-          "before": null,
-          "after": "fa00f1c6832d92c8481d0b40380394b462f1e8c8c9a5afe85762c7a2f201153d"
-        },
-        "NormalMoveAdmission.validate_screen_source": {
-          "before": null,
-          "after": "f9a35b465fd0cb94c2ba6aa94e2b2956d2063a3b6b2f6dc70c0dca77b11fa7d0"
-        },
-        "_NormalMoveReceipt": {
-          "before": null,
-          "after": "adaecf52de35dc7459e5b7d134312d10928801bf526bfc6552af5a4dcf1b261a"
-        },
-        "load_normal_move_admission": {
-          "before": null,
-          "after": "c6ea7a97eaff8720a008608aa6fbff4d8253b71b5129bd318acab750d75d4da7"
+          "before": "fa00f1c6832d92c8481d0b40380394b462f1e8c8c9a5afe85762c7a2f201153d",
+          "after": "6685bc31e9dfa10a10574599318d82fc77572fe4c0c33cf7422c30c1de55c128"
         },
         "normal_move_origin_test_addition": {
-          "before": null,
-          "after": "831f66a781ac471afc7e6f5bedcba7774f00f7a24186d29e964d070bcc87a03f"
-        },
-        "screen_movement_test_successor": {
-          "before": "3ab29031977918ea40a043b1ca69e6f122ffcc241a8ddb33c25bf73bd3cb9e68",
-          "after": "79d9b466f59a34660feddf2c6db3fbf3e213efb96e3cff56eebc0d8fd8c7312f"
+          "before": "831f66a781ac471afc7e6f5bedcba7774f00f7a24186d29e964d070bcc87a03f",
+          "after": "ed987b9019eb5bf726dd39a6863cedbfc25f5ba24711291e154efe46071b22f3"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "c26c71c97e1d460f53f064a50516bcdc88b0a901ef5324267852ae32031cd3d1",
-      "after_sha256": "1701a163d58756209054de421d459e057faedfb3cf670c72d9e3c5f9efc5edaa",
+      "before_sha256": "1701a163d58756209054de421d459e057faedfb3cf670c72d9e3c5f9efc5edaa",
+      "after_sha256": "dd7f40a4f58d481a25bc865123a8035f35a816800444ebf3dea36b5779feba74",
       "owners": {
         "@document": {
-          "before": "c26c71c97e1d460f53f064a50516bcdc88b0a901ef5324267852ae32031cd3d1",
-          "after": "1701a163d58756209054de421d459e057faedfb3cf670c72d9e3c5f9efc5edaa"
+          "before": "1701a163d58756209054de421d459e057faedfb3cf670c72d9e3c5f9efc5edaa",
+          "after": "dd7f40a4f58d481a25bc865123a8035f35a816800444ebf3dea36b5779feba74"
         }
       }
     },
-    "src/warhammer40k_core/ai/screen_movement_candidates.py": {
-      "before_sha256": "457f13060a8aa288c5399901ae8db83e6be0e1778c66009e76a322d4fbaf424e",
-      "after_sha256": "a3c6c07ad8134788908e04cc2bac661b680a224d2e0b8dadc3b50b8ee36a38f4",
+    "src/warhammer40k_core/ai/charge_cp_policy.py": {
+      "before_sha256": null,
+      "after_sha256": "2d28946dc9d654f12f01be0a54c286f59fee3fa0bfd0b40edec697e42009ffed",
       "owners": {
         "@module": {
-          "before": "d5abdd38e22e0e2bed4c5fd9dad42f9627fd8e8819d855abab52dfb1543d8a09",
-          "after": "f952bc375cf1356ac9bff2b8faee0584eb0c1519d692e68c76f0aa9d33454972"
-        },
-        "ScreenMovementGapReason": {
-          "before": "f1256355a6162cf2e2ccbe8fdba0596bcd82c41b32407c94712f3ebf2638df90",
-          "after": "f83c58a7e892a9840947799b14044cd05e7173e2e99cf965c2a32068eb6ca091"
-        },
-        "_generate_translation_proposals": {
           "before": null,
-          "after": "490ecc86143ff3d65e3f8b78548f1821623b9a680ebad3f0d421d0d468c56e7e"
+          "after": "62043c25722a77d81b392a359c6147866c57c88e5a37ec64e6d4b14007547ece"
         },
-        "generate_normal_move_proposals": {
+        "DenseWallChargeChoice": {
           "before": null,
-          "after": "99076bebcae1c5599e26ef5e5ccde6b478044066faa87e1bd689419d28a9cc4c"
+          "after": "dcf15ad67593aad0dc232f7be16e22e4e50cd0586778ddf471a9fc71de0eacd4"
         },
-        "generate_retreat_proposals": {
-          "before": "fae9c61407d5975c65eac335ce77f69b315c57fe587cb982e02321e3b2b35970",
-          "after": "cffa61470173e6ef884a06c302f1e6cb67791aa1be5ad5ddd4474619c3fc2077"
+        "_conditional_grant": {
+          "before": null,
+          "after": "3b34c513aed0c083e3089adcc8e6c8828fdb06cb06acdc555f4150c093b8052f"
+        },
+        "_eligible_onslaught": {
+          "before": null,
+          "after": "d093c0087c0afe75ace5f074d3777946e4e59f37efb16848aadd126c21ce155e"
+        },
+        "choose_dense_wall_charge": {
+          "before": null,
+          "after": "05ebad28e65154a46731651eb3225e6d660406cb2bc44264892ff5d233703f43"
+        },
+        "select_late_onslaught": {
+          "before": null,
+          "after": "7876edfe91d87891ec5fb8842f53faf7b83d45129f6f5f0f87c359c5918278e7"
         }
       }
     },
     "tests/code_quality/test_engine_numerical_identity_admission.py": {
-      "before_sha256": "b45832202a6a55c90c5f2891b303fe5d53c8b1ce74f42ce2c0490db6d4935a8d",
-      "after_sha256": "428c325a0db25902ae357b6d8e6cdbb8007063748c82fb8ce29391f27fc0a296",
+      "before_sha256": "428c325a0db25902ae357b6d8e6cdbb8007063748c82fb8ce29391f27fc0a296",
+      "after_sha256": "f177ca17769f35d36927ea6a98af58e5cc953fa885919b6947d8c81a5b5178cd",
       "owners": {
         "test_identity_inventory_uses_current_twelve_shards_and_native_cohort": {
-          "before": "ebbcdf0e958d48586e20f1eae20fd0df0e8fa2265ed4e68b68c5299a7f3a925a",
-          "after": "cf1691846754f1db551b22cf936dcaed51ac826b7d339e61c4cb24c82b3bda72"
+          "before": "cf1691846754f1db551b22cf936dcaed51ac826b7d339e61c4cb24c82b3bda72",
+          "after": "8417f6bb082dd0bc2a9fe2019820dea093f6d0dd6811c6a48ecd07955a94d199"
+        }
+      }
+    },
+    "tests/infrastructure/adapters/test_charge_cp_policy.py": {
+      "before_sha256": null,
+      "after_sha256": "56d04c8a19057d69398af0665b33acdd99dfdbb0b1bbcf6401e7c2b2ac5310dc",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "6caaa78641c708e7d1544c9d73f23b227e7a86d52f91c2bce6f543a7a7b2581f"
+        },
+        "_assert_replay": {
+          "before": null,
+          "after": "144e80655d2431014fd15bdf4ce33fc80bb0065d719ad1d18ffc93e45f91a79d"
+        },
+        "_battle": {
+          "before": null,
+          "after": "b22abdf37cddc3c4a7131e2348cddf016a9b9315ae68d44f868dd75f16a4ad60"
+        },
+        "_context": {
+          "before": null,
+          "after": "f8f8133ca68d76e6f65d2681b422e3372c6452ef67f1e8c19fba1131efc52d11"
+        },
+        "_decline_before_roll": {
+          "before": null,
+          "after": "b8bc051ce52fc2e487de88302213192261f85b8c04a3d9d8c40f7f8048049eb9"
+        },
+        "_finish": {
+          "before": null,
+          "after": "0364ef18b4bb6d705043f6a012af20af1ace4bf93f6e82d431a3f06749141828"
+        },
+        "_natural_roll": {
+          "before": null,
+          "after": "af1ee36fb9b647e742dc1b20b24017a3cfd4d35f232c83d98aabb7fd4804900b"
+        },
+        "_select": {
+          "before": null,
+          "after": "7a83e53e3430a5ab9f4f2cb504057ff35ff7abea05a54c52f23809695a153d0a"
+        },
+        "_wall": {
+          "before": null,
+          "after": "c1360feeb3b6f1b1417bfa7750d931876a682a8a15cad45b535781f7616823a4"
+        },
+        "_witness": {
+          "before": null,
+          "after": "c89dd7284a3ea15f51e5068ce20c45220ffd1d799c98c8ccba8fce9d8770ab23"
+        },
+        "definitions": {
+          "before": null,
+          "after": "b6f93565fbb9e8cc44abc145ce7d76fc872948c6de9571e6dc08590c872f752d"
+        },
+        "test_dense_wall_policy_submits_native_modes_and_costs": {
+          "before": null,
+          "after": "ed4eb69dfa555151b07e36cdedeb71d3603295d7eaf65a2cb40ba4419c807506"
+        },
+        "test_used_phase_allowance_cannot_be_spent_again": {
+          "before": null,
+          "after": "f4b72262b73a08cf1c7f70955d78ae5faf6da78c3a298b270cb035595faab29f"
         }
       }
     },
     "tests/rules/section09/test_constructed_normal_move_origin.py": {
-      "before_sha256": null,
-      "after_sha256": "7d98b29916544db1d2d973173e041af7f8f3c91c241054b3a13ed0cbaf52d84f",
+      "before_sha256": "7d98b29916544db1d2d973173e041af7f8f3c91c241054b3a13ed0cbaf52d84f",
+      "after_sha256": "9c65c252a42ca011e78d94203baabd550c97c9782de45ed9b5b6d0b9a6c92b0b",
       "owners": {
         "@module": {
-          "before": null,
-          "after": "012920391c2c8c2469f5712a7d22f7b232f6813870362ac3519086305fd07591"
-        },
-        "_check_cp_vp_provenance": {
-          "before": null,
-          "after": "4252073b7566d06384e51e57c2bf564c0ee953c1a7cc51dc95c6eda78a59b412"
-        },
-        "_check_rosters_and_placement": {
-          "before": null,
-          "after": "9bdef77ea34bc796687cee3b822c1d12ef606275a733f7265416691988c4d6a9"
-        },
-        "_construct_v1": {
-          "before": null,
-          "after": "916070ead6b897de6cbe7411213dbd2b2c1b1b16d06e6804ae1e664910c3aaf9"
-        },
-        "_viewer_digest": {
-          "before": null,
-          "after": "88ef576b5cc272e540ff7da6fddb45fd1be564f2dd8da86bdfc3459c147216ac"
+          "before": "012920391c2c8c2469f5712a7d22f7b232f6813870362ac3519086305fd07591",
+          "after": "229413868ca12f93d033247771513c3a9ca57a9a36c082d343d3f11a6a3c3e68"
         },
         "test_constructed_normal_move_origin_v1_admits_only_test_fixture": {
-          "before": null,
-          "after": "a12f0520e73b363bc89f1589ef262843a13acff11f70505f3c3165f2dbdb910f"
-        }
-      }
-    },
-    "tests/rules/section09/test_normal_move_candidates.py": {
-      "before_sha256": null,
-      "after_sha256": "cd3e815eac11f46f4df9503735f2c00389e1d6261fcde304fe948aff98b18c88",
-      "owners": {
-        "@module": {
-          "before": null,
-          "after": "ec10a39e3210f1ddd9448722b09833b5113a98c8a2df00fc392cf1e38d8b1e39"
-        },
-        "test_generated_normal_move_replays_with_exact_viewer_history": {
-          "before": null,
-          "after": "9809e97eb93400b1b3c23aa43ab741ed60ec679402c51ad57433ed7a6685c7ff"
-        },
-        "test_normal_paths_use_native_offer_alongside_unchanged_hold": {
-          "before": null,
-          "after": "ee05d9443787e2ad7bba32f0ed02718c4e29842bf74170c5fa8edfdad77b6688"
-        }
-      }
-    },
-    "tools/performance_stage2_normal_move.py": {
-      "before_sha256": null,
-      "after_sha256": "ad2d95ed535c12c734108d90c8ebd13482774aeb7b03d856b546377945f51cc8",
-      "owners": {
-        "@module": {
-          "before": null,
-          "after": "6587cfc22d5b4e27cdd735b8b80a6321d4fd9a569ac124acb87bb56da835a8ac"
-        },
-        "_before_action": {
-          "before": null,
-          "after": "a3631b8d26f25e745a53ccb5fb6966b6d9acfa8540438bced50bef683a4aad18"
-        },
-        "_choose": {
-          "before": null,
-          "after": "00445d7f5af8d5957087095d90f322a7e8531d420a0715f8cbaac022e23acdec"
-        },
-        "_context": {
-          "before": null,
-          "after": "b7e2fc16ce83bd05ea55b62db3be4d1a63a7c2477faae64c041145fdd5e5b527"
-        },
-        "_digest": {
-          "before": null,
-          "after": "e78ecb108e734e37b58ac9213378d4ba56e5305dab31ec92be2a33e31d757993"
-        },
-        "_ordinary_control": {
-          "before": null,
-          "after": "2c4d8091d92bb90d66d63d6be42260b95e9d34dff9871c1faa3d9e4036678a41"
-        },
-        "_time": {
-          "before": null,
-          "after": "9cdee543ab2acc4c5c0a67bf61f563168913e190bb99045140ff7dd11eec71f7"
-        },
-        "main": {
-          "before": null,
-          "after": "f8a74df2ad34efef1310e16f3a63620fcc0125d418db56f973ae059a91dfa6da"
-        }
-      }
-    },
-    "tools/performance_stage2_normal_move_frontiers.py": {
-      "before_sha256": null,
-      "after_sha256": "2ffe8046854cd9c0017f5861875ce3cf36bbabc0ec20fb7befe38be4f4e10a5e",
-      "owners": {
-        "@module": {
-          "before": null,
-          "after": "e6095bd378ca8185bc16ddda7c9416d10d8d594ae24b5f4ab5e47035c08b9124"
-        },
-        "_Frontier": {
-          "before": null,
-          "after": "33c943db87a43b99603557386ce05268215f709920d5ee1a8d78223abcdaa52f"
-        },
-        "_canonical": {
-          "before": null,
-          "after": "fe05f49b22b3c1b381b608b9441d3ae8b77423f23d214898fe89f1a08e83b032"
-        },
-        "_context": {
-          "before": null,
-          "after": "b7e2fc16ce83bd05ea55b62db3be4d1a63a7c2477faae64c041145fdd5e5b527"
-        },
-        "_digest": {
-          "before": null,
-          "after": "39fb2914d847b49ac87299c7984753035a25daf4b782f07f4bef9cac7c25fe33"
-        },
-        "_find_matches": {
-          "before": null,
-          "after": "6383dea4c8f71aaa46cffee8cb6037b6736aebea4e1de9d257a19bc6018b32e9"
-        },
-        "_measure": {
-          "before": null,
-          "after": "2e8463d06bd23f6958183cb477d3e4f52bb815ca7691ea48b07807136294dffc"
-        },
-        "_native": {
-          "before": null,
-          "after": "14e1141872f4eaaa7a4e78ab52743176bc833e4e22a0bd0e74984a9944c69351"
-        },
-        "_path_offsets": {
-          "before": null,
-          "after": "ddac3db47f6476728042c8d890beaff74e759447bc306a45720bee95aadf09fd"
-        },
-        "_prepare": {
-          "before": null,
-          "after": "14d851a1f6d5bf8fbb6cd473ef7c3b13373a301d5d8e1bbb4977351a0d11c511"
-        },
-        "_raw": {
-          "before": null,
-          "after": "5ed83ad86d9b1c7454e5843e354a4e8a2e4563efb58b1d8d03216c19154208d3"
-        },
-        "_summary": {
-          "before": null,
-          "after": "957b8deb24e6ba0e246863277bfb54cf6a4380b5a36ea04ee0e1ab67fe4c819e"
-        },
-        "_xy_matches": {
-          "before": null,
-          "after": "056f71de3d7f18511273cc8aba5fc1faebc8f5463672394930461ff6d46b58d8"
-        },
-        "main": {
-          "before": null,
-          "after": "98f0594623cb8ef1c8ce0e222121397340f3ec7ad4f4815448570bac0f492450"
+          "before": "a12f0520e73b363bc89f1589ef262843a13acff11f70505f3c3165f2dbdb910f",
+          "after": "5f47490bbccb81b10a162151e7e0f9585dc7b27881adee2246f872915470f801"
         }
       }
     }
@@ -538,7 +394,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Derive the canonical twelve assignments from the two original candidate case weights and the single new measured origin case; retain all other case weights, selector weights, JUnit hashes and limits.",
+      "rationale": "Admit only the five new native policy replay cases and regenerated identity while retaining all previous test bytes, weights, timing receipts, coverage and job limits.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -548,7 +404,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Derive the canonical twelve assignments from the two original candidate case weights and the single new measured origin case; retain all other case weights, selector weights, JUnit hashes and limits.",
+      "rationale": "Admit only the five new native policy replay cases and regenerated identity while retaining all previous test bytes, weights, timing receipts, coverage and job limits.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -558,7 +414,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Derive the canonical twelve assignments from the two original candidate case weights and the single new measured origin case; retain all other case weights, selector weights, JUnit hashes and limits.",
+      "rationale": "Admit only the five new native policy replay cases and regenerated identity while retaining all previous test bytes, weights, timing receipts, coverage and job limits.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -568,7 +424,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Derive the canonical twelve assignments from the two original candidate case weights and the single new measured origin case; retain all other case weights, selector weights, JUnit hashes and limits.",
+      "rationale": "Admit only the five new native policy replay cases and regenerated identity while retaining all previous test bytes, weights, timing receipts, coverage and job limits.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -578,7 +434,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Derive the canonical twelve assignments from the two original candidate case weights and the single new measured origin case; retain all other case weights, selector weights, JUnit hashes and limits.",
+      "rationale": "Admit only the five new native policy replay cases and regenerated identity while retaining all previous test bytes, weights, timing receipts, coverage and job limits.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -588,7 +444,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Derive the canonical twelve assignments from the two original candidate case weights and the single new measured origin case; retain all other case weights, selector weights, JUnit hashes and limits.",
+      "rationale": "Admit only the five new native policy replay cases and regenerated identity while retaining all previous test bytes, weights, timing receipts, coverage and job limits.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -598,7 +454,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Derive the canonical twelve assignments from the two original candidate case weights and the single new measured origin case; retain all other case weights, selector weights, JUnit hashes and limits.",
+      "rationale": "Admit only the five new native policy replay cases and regenerated identity while retaining all previous test bytes, weights, timing receipts, coverage and job limits.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -608,7 +464,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Derive the canonical twelve assignments from the two original candidate case weights and the single new measured origin case; retain all other case weights, selector weights, JUnit hashes and limits.",
+      "rationale": "Admit only the five new native policy replay cases and regenerated identity while retaining all previous test bytes, weights, timing receipts, coverage and job limits.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -618,7 +474,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Derive the canonical twelve assignments from the two original candidate case weights and the single new measured origin case; retain all other case weights, selector weights, JUnit hashes and limits.",
+      "rationale": "Admit only the five new native policy replay cases and regenerated identity while retaining all previous test bytes, weights, timing receipts, coverage and job limits.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -628,7 +484,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Derive the canonical twelve assignments from the two original candidate case weights and the single new measured origin case; retain all other case weights, selector weights, JUnit hashes and limits.",
+      "rationale": "Admit only the five new native policy replay cases and regenerated identity while retaining all previous test bytes, weights, timing receipts, coverage and job limits.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -638,7 +494,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Derive the canonical twelve assignments from the two original candidate case weights and the single new measured origin case; retain all other case weights, selector weights, JUnit hashes and limits.",
+      "rationale": "Admit only the five new native policy replay cases and regenerated identity while retaining all previous test bytes, weights, timing receipts, coverage and job limits.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -648,7 +504,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate the exact runtime identity and dependent example commitments; native decision kinds, schemas and validation are unchanged.",
+      "rationale": "Regenerate the exact package identity and dependent external examples for the added policy module without altering native options, schemas, replay or validation.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -658,7 +514,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate the exact runtime identity and dependent example commitments; native decision kinds, schemas and validation are unchanged.",
+      "rationale": "Regenerate the exact package identity and dependent external examples for the added policy module without altering native options, schemas, replay or validation.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -668,7 +524,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate the exact runtime identity and dependent example commitments; native decision kinds, schemas and validation are unchanged.",
+      "rationale": "Regenerate the exact package identity and dependent external examples for the added policy module without altering native options, schemas, replay or validation.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -678,7 +534,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate the exact runtime identity and dependent example commitments; native decision kinds, schemas and validation are unchanged.",
+      "rationale": "Regenerate the exact package identity and dependent external examples for the added policy module without altering native options, schemas, replay or validation.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -688,7 +544,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate the exact runtime identity and dependent example commitments; native decision kinds, schemas and validation are unchanged.",
+      "rationale": "Regenerate the exact package identity and dependent external examples for the added policy module without altering native options, schemas, replay or validation.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -698,7 +554,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate the exact runtime identity and dependent example commitments; native decision kinds, schemas and validation are unchanged.",
+      "rationale": "Regenerate the exact package identity and dependent external examples for the added policy module without altering native options, schemas, replay or validation.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -708,7 +564,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate the exact runtime identity and dependent example commitments; native decision kinds, schemas and validation are unchanged.",
+      "rationale": "Regenerate the exact package identity and dependent external examples for the added policy module without altering native options, schemas, replay or validation.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -718,27 +574,25 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate the exact runtime identity and dependent example commitments; native decision kinds, schemas and validation are unchanged.",
+      "rationale": "Regenerate the exact package identity and dependent external examples for the added policy module without altering native options, schemas, replay or validation.",
       "source_obligation": null,
       "unchanged_work": null
     },
-    "data/source_audits/ci64_provenance_v1/stage2-constructed-normal-move-origin-test-v1.json": {
+    "data/source_audits/ci64_provenance_v1/charge-cp-policy-test-v1.json": {
       "category": "measured_workload",
       "operations": [
-        "engine-numerical-identity-admission"
+        "bounded-charge-flight-wall-proof"
       ],
       "selected_families": [],
-      "rationale": "Authenticate the exact bounded movement source/runtime successor, retain the earlier cases and receipts, and append one test-only constructed origin case.",
+      "rationale": "Admit only the five new native policy replay cases and regenerated identity while retaining all previous test bytes, weights, timing receipts, coverage and job limits.",
       "source_obligation": null,
       "unchanged_work": null
     },
-    "data/source_audits/ci64_provenance_v1/stage2-normal-move-test-v1.json": {
-      "category": "measured_workload",
-      "operations": [
-        "engine-numerical-identity-admission"
-      ],
+    "docs/AI_POLICY_INTERFACE.md": {
+      "category": "governance",
+      "operations": [],
       "selected_families": [],
-      "rationale": "Authenticate the exact bounded movement source/runtime successor, retain the earlier cases and receipts, and append one test-only constructed origin case.",
+      "rationale": "Document the opt-in Dense-wall decision and bind its existing runtime and native regression operations.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -746,61 +600,14 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Register only the newly added test file and additive admission receipt; leave every established operation and family intact.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "docs/stage2/normal-move-base-rebind-738cef0a.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Record the bounded opt-in API and exact-base evidence; no gameplay path, validation ceiling, policy rank or complete-game qualification changes.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "docs/stage2/normal-move-base-successor.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Record the bounded opt-in API and exact-base evidence; no gameplay path, validation ceiling, policy rank or complete-game qualification changes.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "docs/stage2/normal-move-candidate-receipt.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Record the bounded opt-in API and exact-base evidence; no gameplay path, validation ceiling, policy rank or complete-game qualification changes.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "docs/stage2/normal-move-candidates.md": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Record the bounded opt-in API and exact-base evidence; no gameplay path, validation ceiling, policy rank or complete-game qualification changes.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "docs/stage2/normal-move-exact-base-performance.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Record the bounded opt-in API and exact-base evidence; no gameplay path, validation ceiling, policy rank or complete-game qualification changes.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "docs/stage2/normal-move-frontier-evidence.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Record the bounded opt-in API and exact-base evidence; no gameplay path, validation ceiling, policy rank or complete-game qualification changes.",
+      "rationale": "Document the opt-in Dense-wall decision and bind its existing runtime and native regression operations.",
       "source_obligation": null,
       "unchanged_work": null
     },
     "scripts/engine_numerical_identity_test_admission.py": {
       "category": "measured_workload",
       "operations": [
+        "blood-begets-skulls-test-admission",
         "bounded-charge-flight-wall-proof",
         "cavalcade-authority-admission",
         "close-quarters-test-admission",
@@ -818,17 +625,18 @@
         "wrath-undeniable-test-admission"
       ],
       "selected_families": [],
-      "rationale": "Authenticate the exact bounded movement source/runtime successor, retain the earlier cases and receipts, and append one test-only constructed origin case.",
+      "rationale": "Admit only the five new native policy replay cases and regenerated identity while retaining all previous test bytes, weights, timing receipts, coverage and job limits.",
       "source_obligation": null,
       "unchanged_work": null
     },
     "scripts/stage2_ground_charge_test_admission.py": {
       "category": "measured_workload",
       "operations": [
+        "bounded-charge-flight-wall-proof",
         "engine-numerical-identity-admission"
       ],
       "selected_families": [],
-      "rationale": "Authenticate the exact bounded movement source/runtime successor, retain the earlier cases and receipts, and append one test-only constructed origin case.",
+      "rationale": "Admit only the five new native policy replay cases and regenerated identity while retaining all previous test bytes, weights, timing receipts, coverage and job limits.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -839,17 +647,17 @@
         "phase-end-healing-source-and-report"
       ],
       "selected_families": [],
-      "rationale": "Regenerate the exact runtime identity and dependent example commitments; native decision kinds, schemas and validation are unchanged.",
+      "rationale": "Regenerate the exact package identity and dependent external examples for the added policy module without altering native options, schemas, replay or validation.",
       "source_obligation": null,
       "unchanged_work": null
     },
-    "src/warhammer40k_core/ai/screen_movement_candidates.py": {
+    "src/warhammer40k_core/ai/charge_cp_policy.py": {
       "category": "algorithm_or_search",
       "operations": [
-        "stage2-screen-movement-candidates"
+        "bounded-charge-flight-wall-proof"
       ],
       "selected_families": [],
-      "rationale": "Expose opt-in ordinary Normal Move candidates from the existing 16-by-2 bounded actor-view translation primitive; exact-base measurements confirm both retained Fall Back outputs and ordinary native behavior.",
+      "rationale": "Opt-in Dense-wall route qualification enumerates only the standard natural sums, reuses the existing wall proof and native path validators, and leaves existing consumers and native Charge execution untouched.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -867,7 +675,17 @@
         "wrath-undeniable-test-admission"
       ],
       "selected_families": [],
-      "rationale": "Authenticate the exact bounded movement source/runtime successor, retain the earlier cases and receipts, and append one test-only constructed origin case.",
+      "rationale": "Admit only the five new native policy replay cases and regenerated identity while retaining all previous test bytes, weights, timing receipts, coverage and job limits.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "tests/infrastructure/adapters/test_charge_cp_policy.py": {
+      "category": "measured_workload",
+      "operations": [
+        "bounded-charge-flight-wall-proof"
+      ],
+      "selected_families": [],
+      "rationale": "Admit only the five new native policy replay cases and regenerated identity while retaining all previous test bytes, weights, timing receipts, coverage and job limits.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -877,33 +695,7 @@
         "stage2-screen-movement-candidates"
       ],
       "selected_families": [],
-      "rationale": "Add one registered replay and admission case for the exact constructed A4 origin, sharing the native geometry and ledger owners, with no runtime changes.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "tests/rules/section09/test_normal_move_candidates.py": {
-      "category": "measured_workload",
-      "operations": [
-        "stage2-screen-movement-candidates"
-      ],
-      "selected_families": [],
-      "rationale": "Measure only the two added native candidate and replay tests; retain every historical movement test, case identity and existing scheduling measurement.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "tools/performance_stage2_normal_move.py": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Record the bounded opt-in API and exact-base evidence; no gameplay path, validation ceiling, policy rank or complete-game qualification changes.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "tools/performance_stage2_normal_move_frontiers.py": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Record the bounded opt-in API and exact-base evidence; no gameplay path, validation ceiling, policy rank or complete-game qualification changes.",
+      "rationale": "Retain the exact native Stage 2 fixture, state hashes, checkpoint, and replay assertions on the current build while keeping the original runtime identity in its archived receipt.",
       "source_obligation": null,
       "unchanged_work": null
     }
