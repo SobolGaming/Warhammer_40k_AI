@@ -1448,10 +1448,20 @@ uv run --no-sync pytest -q tests/rules/section09/test_normal_move_candidates.py 
 ```
 
 On PowerShell, set `$env:PYTHONPATH = 'src;.'` before the same `uv run`
-commands. Each reproduction is local and offline. The west run has an
-800-second wall cap. The guard run and optional retrospective west audit have
-a 1,050-second cap per invocation. The runner reports a missing offer,
-rejected committed action, timeout or unreached boundary as unobserved.
+commands. Each reproduction is local and offline. The cap applies to one
+child process for the entire invocation, including the optional west audit.
+The observed elapsed times include launcher startup and come from one
+successful serial run per mode on Ubuntu WSL2 with Python 3.14.5 and the
+locked dependencies.
+
+| Invocation flags | Runner child cap | Observed elapsed |
+| --- | ---: | ---: |
+| `--family west` | 800 s | 361.7 s |
+| `--family west --audit-west` | 1,050 s | 433.4 s |
+| `--family guard` | 1,050 s | 419.2 s |
+
+The runner reports a missing offer, rejected committed action, timeout or
+unreached boundary as unobserved.
 
 All arms share each fixture's exact round-three S action offer, use the fixed
 synthetic seed, omit Shooting and Charge, and decline issued optional reactions.
@@ -1464,14 +1474,19 @@ A-minus-B VP at that boundary.
 `immediate-material-hold-v1` reads the issued finite Hold and Normal Move
 options. Both have zero immediate wound swing, so it selects Hold. The
 runner uses that action at the fork, then applies the same E and B rules as in
-the Screen arm.
+the Screen arm. The baseline chose the higher-scoring action in one of
+these two development cases. That count describes this pair.
 
 | Development group | Hold baseline VP gain (A–B) | Screen + E | Screen, E omitted | Screen minus baseline margin |
 | --- | ---: | ---: | ---: | ---: |
 | Layout 3 west lane | 0–3 | 5–0 | 0–0 | +8 |
 | Layout 2 central guard | 13–0 | 8–3 | 0–3 | −8 |
 
-In the west lane, the generated S move stays off every objective and
+The west lane was selected as a mechanism demonstration. Before B3 turn-end
+scoring, the original operator required E to contribute positive OC at
+Expansion 2 in both follow-through arms and zero when omitted. It also
+required B to gain OC there only after Hold. The generated S move stays off
+every objective and
 blocks the B3 diagonal by native Engagement Range transit validation.
 B's actor-visible clearance rule takes the diagonal when clear and Holds
 otherwise. E alone supplies the OC for A's five VP at Expansion 2. The live
@@ -1482,7 +1497,8 @@ different raw ID on disposable forks. Across six post-fork requests it
 reconstructed 112 raw proposals, probed 12, accepted seven, and left 100
 untested at the cap. These seven are retrospective accepts.
 
-In the central guard, the same B policy evaluates a southwest Central 2
+Central guard admission used native action coverage and the declared boundary,
+regardless of OC or VP outcomes. Its B policy evaluates a southwest Central 2
 approach and a northwest lane advance using directional and objective-contact
 predicates. It takes a validated Central 2 approach, then a validated
 northwest advance, then the issued Hold if neither is viable. There is one
