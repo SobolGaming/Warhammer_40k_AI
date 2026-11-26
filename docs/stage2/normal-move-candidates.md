@@ -93,6 +93,12 @@ The [base successor record](normal-move-base-successor.json) records those
 immutable Git objects. The serial performance gate binds the exact new draft
 base and diff separately; the original samples are not relabeled or replaced.
 
+The next evidence-only landing (#751) advanced the draft base to 738cef0a.
+The [base rebind record](normal-move-base-rebind-738cef0a.json) retains the
+earlier receipts and confirms identical measured inputs across all three
+bases. It does not redate the measurements or extend the replay or timing
+claims; the serial gate uses the actual new base and exact draft diff.
+
 ## Frozen S and E decision-point timings
 
 The [frontier receipt](normal-move-frontier-evidence.json) records three serial
