@@ -263,6 +263,18 @@
     }
   },
   "operations": {
+    "caudit-01-successor-evidence": {
+      "mandatory": true,
+      "sensitive": false,
+      "paths": [
+        "data/source_audits/caudit_01_successors/README.md",
+        "data/source_audits/caudit_01_successors/successor-inventory.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": []
+    },
     "cavalcade-round-five-contextual-shadow-rule": {
       "mandatory": true,
       "sensitive": false,
