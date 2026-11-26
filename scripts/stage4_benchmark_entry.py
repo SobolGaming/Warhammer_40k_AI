@@ -1147,21 +1147,31 @@ def reproduce_west_cooperation(fixture: Row) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument(
+    modes = parser.add_mutually_exclusive_group()
+    modes.add_argument(
         "--family", choices=("west", "guard"), help="Reproduce one development family."
     )
     parser.add_argument(
         "--audit-west", action="store_true", help="Also regenerate the retrospective west audit."
     )
-    parser.add_argument(
+    modes.add_argument(
         "--west-cooperation", action="store_true", help="Reproduce the four-arm West control."
     )
+    modes.add_argument(
+        "--split-objective",
+        choices=("prepare", "replay"),
+        help="Latch or replay the four-arm Layout C development pilot.",
+    )
+    parser.add_argument("--checkpoint", type=Path, help="Layout C setup checkpoint path.")
     parser.add_argument("--worker", action="store_true", help=argparse.SUPPRESS)
     args = parser.parse_args()
-    if args.west_cooperation and (args.family is not None or args.audit_west):
-        parser.error("--west-cooperation is a separate reproduction mode")
+    if (args.split_objective is None) != (args.checkpoint is None):
+        parser.error("--split-objective and --checkpoint must be supplied together")
     if args.audit_west and args.family != "west":
         parser.error("--audit-west requires --family west")
+    if args.split_objective is not None:
+        split_objective(args.split_objective, args.checkpoint, worker=args.worker)
+        return
     data = json.loads(RECEIPT.read_text(encoding="utf-8"))
     check_receipt(data)
     if args.west_cooperation:
@@ -1182,6 +1192,24 @@ def main() -> None:
     if args.audit_west:
         flags.append("--audit-west")
     run_worker(flags, args.family, cap)
+
+
+def split_objective(mode: str, checkpoint: Path, *, worker: bool) -> None:
+    if mode == "prepare":
+        from scripts.stage4_split_objective import PREPARE_SECONDS as cap
+        from scripts.stage4_split_objective import prepare as work
+    else:
+        from scripts.stage4_split_objective_replay import WALL_SECONDS as cap
+        from scripts.stage4_split_objective_replay import run as work
+
+    if worker:
+        work(checkpoint)
+    else:
+        run_worker(
+            ["--split-objective", mode, "--checkpoint", str(checkpoint)],
+            f"Layout C {mode}",
+            cap,
+        )
 
 
 def run_worker(flags: list[str], label: str, cap: int) -> None:

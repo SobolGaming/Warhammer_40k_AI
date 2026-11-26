@@ -1,0 +1,1930 @@
+{
+  "group": "disruption-mirror-c-split-central-dev",
+  "schema": "stage4-disruption-c-split-central-2x2-v1",
+  "base": "54fd9dcceaa593314a519ceaa695adbafc5ac14a",
+  "partition": "development",
+  "status": "observed",
+  "interaction": 5,
+  "training_rows": 0,
+  "arms": {
+    "hold-omit": {
+      "menus": [
+        {
+          "arm": "hold-omit",
+          "role": "screen",
+          "unit": "army-alpha:screen",
+          "actor": "player-a",
+          "action_request_id": "view-request-aff262b2df13a4bf51621513bcff8c76106a99d1c7855c04c74518e91f7ee0d9",
+          "selected": "remain_stationary"
+        },
+        {
+          "arm": "hold-omit",
+          "role": "follow",
+          "unit": "army-alpha:ally",
+          "actor": "player-a",
+          "action_request_id": "view-request-c136e7a956e966998ba5ecbc096b7c93c7c86a9c118d5a8392fc71e3dc6c4829",
+          "selected": "remain_stationary"
+        },
+        {
+          "arm": "hold-omit",
+          "role": "respond",
+          "unit": "army-beta:opponent",
+          "actor": "player-b",
+          "action_request_id": "view-request-16a6eb6b08a9a28a8a4824a1b9168e1f79196890ce6d8abecc80630f99a8a6ac",
+          "proposal_request_id": "view-request-372d8f7669816ca1aaa103161e6b1edcb70186010d0f7f45ecb8dcaebf8c0b7d",
+          "actor_view_hash": "2824735b8e874a369730c0c033121d0f8513024aaffa04b1e2c0a680b771f606",
+          "raw_count": 32,
+          "raw_ids_hash": "c85afbd904f20757cc31845942ed59821bd35af879346d3bc0f778895084fbc8",
+          "geometry_excluded": 28,
+          "ordered_eligible_ids": [
+            "normal-move:18b0cddad71a6aa5dd98958dd9ea06a14b608012b8c2e65eeca5f91bcdc6c15d",
+            "normal-move:f1f55d8266e0e9e20bb2bfe535b365f427decc9e014915cf11039a0f4c5c01c0",
+            "normal-move:e684106462ddbcb7df499c26219c6f6a6c1b52b6a311d0c0d1fa64274d6075cb",
+            "normal-move:f0ca762a30ce018d02ca0c90399b36df06fc5115dad48202cf43ad41b82eead0"
+          ],
+          "cap_lost_ids": [
+            "normal-move:e684106462ddbcb7df499c26219c6f6a6c1b52b6a311d0c0d1fa64274d6075cb",
+            "normal-move:f0ca762a30ce018d02ca0c90399b36df06fc5115dad48202cf43ad41b82eead0"
+          ],
+          "native_probes": [
+            {
+              "id": "normal-move:18b0cddad71a6aa5dd98958dd9ea06a14b608012b8c2e65eeca5f91bcdc6c15d",
+              "violation": null,
+              "route": 0,
+              "translation_inches": [
+                -5.25,
+                0.0
+              ],
+              "endpoint_inches": [
+                22.799999999999997,
+                29.0
+              ],
+              "footprint_radius_inches": 0.7874015748031497,
+              "west_contact": true,
+              "east_contact": true
+            },
+            {
+              "id": "normal-move:f1f55d8266e0e9e20bb2bfe535b365f427decc9e014915cf11039a0f4c5c01c0",
+              "violation": null,
+              "route": 1,
+              "translation_inches": [
+                -3.712310601229376,
+                3.712310601229376
+              ],
+              "endpoint_inches": [
+                24.33768939877062,
+                32.712310601229376
+              ],
+              "footprint_radius_inches": 0.7874015748031497,
+              "west_contact": false,
+              "east_contact": true
+            }
+          ],
+          "selected": "normal-move:18b0cddad71a6aa5dd98958dd9ea06a14b608012b8c2e65eeca5f91bcdc6c15d"
+        }
+      ],
+      "checkpoint": "424d9dfb9923d8567261cdbe76cdcf8daf526fccf51d24ff14eaf6a0a5feb5f2",
+      "event_log": "7964a1724b9b23b5e3d37e59cef99147bbce8ce00df6dc5b76a59218ad543275",
+      "active_rng_draws": 0,
+      "active_rng_history_tokens": 358,
+      "strict_replay": true,
+      "gain_vp": {
+        "player-a": 0,
+        "player-b": 0
+      },
+      "awards": [],
+      "objective_boundaries": {
+        "objective-control:round-02:player-a:fight:turn_end": {
+          "boundary": [
+            2,
+            "player-a",
+            "fight",
+            "turn_end"
+          ],
+          "objectives": {
+            "disruption-vs-disruption-layout-3-attacker-home-01": {
+              "oc": {},
+              "controller": null,
+              "unit_oc": {},
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            },
+            "disruption-vs-disruption-layout-3-central-01": {
+              "oc": {},
+              "controller": null,
+              "unit_oc": {},
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            },
+            "disruption-vs-disruption-layout-3-defender-home-01": {
+              "oc": {},
+              "controller": null,
+              "unit_oc": {},
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            },
+            "disruption-vs-disruption-layout-3-expansion-01": {
+              "oc": {},
+              "controller": null,
+              "unit_oc": {},
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            },
+            "disruption-vs-disruption-layout-3-expansion-02": {
+              "oc": {},
+              "controller": null,
+              "unit_oc": {},
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            }
+          }
+        },
+        "objective-control:round-02:player-b:command:phase_end": {
+          "boundary": [
+            2,
+            "player-b",
+            "command",
+            "phase_end"
+          ],
+          "objectives": {
+            "disruption-vs-disruption-layout-3-attacker-home-01": {
+              "oc": {},
+              "controller": null,
+              "unit_oc": {},
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            },
+            "disruption-vs-disruption-layout-3-central-01": {
+              "oc": {},
+              "controller": null,
+              "unit_oc": {},
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            },
+            "disruption-vs-disruption-layout-3-defender-home-01": {
+              "oc": {},
+              "controller": null,
+              "unit_oc": {},
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            },
+            "disruption-vs-disruption-layout-3-expansion-01": {
+              "oc": {},
+              "controller": null,
+              "unit_oc": {},
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            },
+            "disruption-vs-disruption-layout-3-expansion-02": {
+              "oc": {},
+              "controller": null,
+              "unit_oc": {},
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            }
+          }
+        },
+        "objective-control:round-02:player-b:fight:turn_end": {
+          "boundary": [
+            2,
+            "player-b",
+            "fight",
+            "turn_end"
+          ],
+          "objectives": {
+            "disruption-vs-disruption-layout-3-attacker-home-01": {
+              "oc": {},
+              "controller": null,
+              "unit_oc": {},
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            },
+            "disruption-vs-disruption-layout-3-central-01": {
+              "oc": {
+                "player-b": 1
+              },
+              "controller": "player-b",
+              "unit_oc": {
+                "army-beta:opponent": 1
+              },
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            },
+            "disruption-vs-disruption-layout-3-defender-home-01": {
+              "oc": {},
+              "controller": null,
+              "unit_oc": {},
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            },
+            "disruption-vs-disruption-layout-3-expansion-01": {
+              "oc": {},
+              "controller": null,
+              "unit_oc": {},
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            },
+            "disruption-vs-disruption-layout-3-expansion-02": {
+              "oc": {},
+              "controller": null,
+              "unit_oc": {},
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            }
+          }
+        },
+        "objective-control:round-03:player-a:command:phase_end": {
+          "boundary": [
+            3,
+            "player-a",
+            "command",
+            "phase_end"
+          ],
+          "objectives": {
+            "disruption-vs-disruption-layout-3-attacker-home-01": {
+              "oc": {},
+              "controller": null,
+              "unit_oc": {},
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            },
+            "disruption-vs-disruption-layout-3-central-01": {
+              "oc": {
+                "player-b": 1
+              },
+              "controller": "player-b",
+              "unit_oc": {
+                "army-beta:opponent": 1
+              },
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            },
+            "disruption-vs-disruption-layout-3-defender-home-01": {
+              "oc": {},
+              "controller": null,
+              "unit_oc": {},
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            },
+            "disruption-vs-disruption-layout-3-expansion-01": {
+              "oc": {},
+              "controller": null,
+              "unit_oc": {},
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            },
+            "disruption-vs-disruption-layout-3-expansion-02": {
+              "oc": {},
+              "controller": null,
+              "unit_oc": {},
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            }
+          }
+        }
+      },
+      "material": {
+        "origin": {
+          "living_models": 3,
+          "total_wounds": 15,
+          "wounds_by_model": {
+            "army-alpha:screen:core-character-leader:001": 5,
+            "army-alpha:ally:core-character-leader:001": 5,
+            "army-beta:opponent:core-character-leader:001": 5
+          }
+        },
+        "endpoint": {
+          "living_models": 3,
+          "total_wounds": 15,
+          "wounds_by_model": {
+            "army-alpha:screen:core-character-leader:001": 5,
+            "army-alpha:ally:core-character-leader:001": 5,
+            "army-beta:opponent:core-character-leader:001": 5
+          }
+        }
+      },
+      "rng_draw_delta": 0,
+      "records": 36
+    },
+    "hold-follow": {
+      "menus": [
+        {
+          "arm": "hold-follow",
+          "role": "screen",
+          "unit": "army-alpha:screen",
+          "actor": "player-a",
+          "action_request_id": "view-request-aff262b2df13a4bf51621513bcff8c76106a99d1c7855c04c74518e91f7ee0d9",
+          "selected": "remain_stationary"
+        },
+        {
+          "arm": "hold-follow",
+          "role": "follow",
+          "unit": "army-alpha:ally",
+          "actor": "player-a",
+          "action_request_id": "view-request-c136e7a956e966998ba5ecbc096b7c93c7c86a9c118d5a8392fc71e3dc6c4829",
+          "proposal_request_id": "view-request-dde9c3f159bc3737e51934dc81429f87db56ae3b28e3cbe79f3ec42a67bab225",
+          "actor_view_hash": "941bab900f5a3048607836d0f59429611990f3d2a06dd42c0830fc49babde5e0",
+          "raw_count": 32,
+          "raw_ids_hash": "3d5aa2e4ae743bd1a8cd6f59ffd3ea703c19e62641de1b073c8c70f039a265d2",
+          "geometry_excluded": 30,
+          "ordered_eligible_ids": [
+            "normal-move:b21f8707093704f8b612a3455a6627315859f4427e997802f6753b6f6679010b",
+            "normal-move:68f4ce764da05f612104235876eb69a4903c0d0df068201647c4102d12d73233"
+          ],
+          "cap_lost_ids": [],
+          "native_probes": [
+            {
+              "id": "normal-move:b21f8707093704f8b612a3455a6627315859f4427e997802f6753b6f6679010b",
+              "violation": null,
+              "route": 0,
+              "translation_inches": [
+                5.25,
+                0.0
+              ],
+              "endpoint_inches": [
+                22.55,
+                36.65
+              ],
+              "footprint_radius_inches": 0.7874015748031497,
+              "west_contact": false,
+              "east_contact": true
+            },
+            {
+              "id": "normal-move:68f4ce764da05f612104235876eb69a4903c0d0df068201647c4102d12d73233",
+              "violation": null,
+              "route": 0,
+              "translation_inches": [
+                4.5,
+                0.0
+              ],
+              "endpoint_inches": [
+                21.8,
+                36.65
+              ],
+              "footprint_radius_inches": 0.7874015748031497,
+              "west_contact": false,
+              "east_contact": true
+            }
+          ],
+          "selected": "normal-move:b21f8707093704f8b612a3455a6627315859f4427e997802f6753b6f6679010b"
+        },
+        {
+          "arm": "hold-follow",
+          "role": "respond",
+          "unit": "army-beta:opponent",
+          "actor": "player-b",
+          "action_request_id": "view-request-372d8f7669816ca1aaa103161e6b1edcb70186010d0f7f45ecb8dcaebf8c0b7d",
+          "proposal_request_id": "view-request-62625e3e7091e0479ad11a006fe45ce92db90f27e7f46a4d16fddfa756883fe1",
+          "actor_view_hash": "24fe7ace0880f0d8047339e79eda364c5f0b1d8ff606c2d45db38048a019f294",
+          "raw_count": 32,
+          "raw_ids_hash": "c85afbd904f20757cc31845942ed59821bd35af879346d3bc0f778895084fbc8",
+          "geometry_excluded": 28,
+          "ordered_eligible_ids": [
+            "normal-move:18b0cddad71a6aa5dd98958dd9ea06a14b608012b8c2e65eeca5f91bcdc6c15d",
+            "normal-move:f1f55d8266e0e9e20bb2bfe535b365f427decc9e014915cf11039a0f4c5c01c0",
+            "normal-move:e684106462ddbcb7df499c26219c6f6a6c1b52b6a311d0c0d1fa64274d6075cb",
+            "normal-move:f0ca762a30ce018d02ca0c90399b36df06fc5115dad48202cf43ad41b82eead0"
+          ],
+          "cap_lost_ids": [
+            "normal-move:e684106462ddbcb7df499c26219c6f6a6c1b52b6a311d0c0d1fa64274d6075cb",
+            "normal-move:f0ca762a30ce018d02ca0c90399b36df06fc5115dad48202cf43ad41b82eead0"
+          ],
+          "native_probes": [
+            {
+              "id": "normal-move:18b0cddad71a6aa5dd98958dd9ea06a14b608012b8c2e65eeca5f91bcdc6c15d",
+              "violation": null,
+              "route": 0,
+              "translation_inches": [
+                -5.25,
+                0.0
+              ],
+              "endpoint_inches": [
+                22.799999999999997,
+                29.0
+              ],
+              "footprint_radius_inches": 0.7874015748031497,
+              "west_contact": true,
+              "east_contact": true
+            },
+            {
+              "id": "normal-move:f1f55d8266e0e9e20bb2bfe535b365f427decc9e014915cf11039a0f4c5c01c0",
+              "violation": null,
+              "route": 1,
+              "translation_inches": [
+                -3.712310601229376,
+                3.712310601229376
+              ],
+              "endpoint_inches": [
+                24.33768939877062,
+                32.712310601229376
+              ],
+              "footprint_radius_inches": 0.7874015748031497,
+              "west_contact": false,
+              "east_contact": true
+            }
+          ],
+          "selected": "normal-move:18b0cddad71a6aa5dd98958dd9ea06a14b608012b8c2e65eeca5f91bcdc6c15d"
+        }
+      ],
+      "checkpoint": "7787729c3289c562223d53f8a5c07d4faa175d34cbe91f62df5830277c14159e",
+      "event_log": "4ca65bb0a96cdcf8bc0e484af6e3bad55b2bc6bc46606cefc91f6cd224cafdab",
+      "active_rng_draws": 0,
+      "active_rng_history_tokens": 363,
+      "strict_replay": true,
+      "gain_vp": {
+        "player-a": 0,
+        "player-b": 0
+      },
+      "awards": [],
+      "objective_boundaries": {
+        "objective-control:round-02:player-a:fight:turn_end": {
+          "boundary": [
+            2,
+            "player-a",
+            "fight",
+            "turn_end"
+          ],
+          "objectives": {
+            "disruption-vs-disruption-layout-3-attacker-home-01": {
+              "oc": {},
+              "controller": null,
+              "unit_oc": {},
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            },
+            "disruption-vs-disruption-layout-3-central-01": {
+              "oc": {
+                "player-a": 1
+              },
+              "controller": "player-a",
+              "unit_oc": {
+                "army-alpha:ally": 1
+              },
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            },
+            "disruption-vs-disruption-layout-3-defender-home-01": {
+              "oc": {},
+              "controller": null,
+              "unit_oc": {},
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            },
+            "disruption-vs-disruption-layout-3-expansion-01": {
+              "oc": {},
+              "controller": null,
+              "unit_oc": {},
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            },
+            "disruption-vs-disruption-layout-3-expansion-02": {
+              "oc": {},
+              "controller": null,
+              "unit_oc": {},
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            }
+          }
+        },
+        "objective-control:round-02:player-b:command:phase_end": {
+          "boundary": [
+            2,
+            "player-b",
+            "command",
+            "phase_end"
+          ],
+          "objectives": {
+            "disruption-vs-disruption-layout-3-attacker-home-01": {
+              "oc": {},
+              "controller": null,
+              "unit_oc": {},
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            },
+            "disruption-vs-disruption-layout-3-central-01": {
+              "oc": {
+                "player-a": 1
+              },
+              "controller": "player-a",
+              "unit_oc": {
+                "army-alpha:ally": 1
+              },
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            },
+            "disruption-vs-disruption-layout-3-defender-home-01": {
+              "oc": {},
+              "controller": null,
+              "unit_oc": {},
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            },
+            "disruption-vs-disruption-layout-3-expansion-01": {
+              "oc": {},
+              "controller": null,
+              "unit_oc": {},
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            },
+            "disruption-vs-disruption-layout-3-expansion-02": {
+              "oc": {},
+              "controller": null,
+              "unit_oc": {},
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            }
+          }
+        },
+        "objective-control:round-02:player-b:fight:turn_end": {
+          "boundary": [
+            2,
+            "player-b",
+            "fight",
+            "turn_end"
+          ],
+          "objectives": {
+            "disruption-vs-disruption-layout-3-attacker-home-01": {
+              "oc": {},
+              "controller": null,
+              "unit_oc": {},
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            },
+            "disruption-vs-disruption-layout-3-central-01": {
+              "oc": {
+                "player-a": 1,
+                "player-b": 1
+              },
+              "controller": null,
+              "unit_oc": {
+                "army-alpha:ally": 1,
+                "army-beta:opponent": 1
+              },
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            },
+            "disruption-vs-disruption-layout-3-defender-home-01": {
+              "oc": {},
+              "controller": null,
+              "unit_oc": {},
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            },
+            "disruption-vs-disruption-layout-3-expansion-01": {
+              "oc": {},
+              "controller": null,
+              "unit_oc": {},
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            },
+            "disruption-vs-disruption-layout-3-expansion-02": {
+              "oc": {},
+              "controller": null,
+              "unit_oc": {},
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            }
+          }
+        },
+        "objective-control:round-03:player-a:command:phase_end": {
+          "boundary": [
+            3,
+            "player-a",
+            "command",
+            "phase_end"
+          ],
+          "objectives": {
+            "disruption-vs-disruption-layout-3-attacker-home-01": {
+              "oc": {},
+              "controller": null,
+              "unit_oc": {},
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            },
+            "disruption-vs-disruption-layout-3-central-01": {
+              "oc": {
+                "player-a": 1,
+                "player-b": 1
+              },
+              "controller": null,
+              "unit_oc": {
+                "army-alpha:ally": 1,
+                "army-beta:opponent": 1
+              },
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            },
+            "disruption-vs-disruption-layout-3-defender-home-01": {
+              "oc": {},
+              "controller": null,
+              "unit_oc": {},
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            },
+            "disruption-vs-disruption-layout-3-expansion-01": {
+              "oc": {},
+              "controller": null,
+              "unit_oc": {},
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            },
+            "disruption-vs-disruption-layout-3-expansion-02": {
+              "oc": {},
+              "controller": null,
+              "unit_oc": {},
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            }
+          }
+        }
+      },
+      "material": {
+        "origin": {
+          "living_models": 3,
+          "total_wounds": 15,
+          "wounds_by_model": {
+            "army-alpha:screen:core-character-leader:001": 5,
+            "army-alpha:ally:core-character-leader:001": 5,
+            "army-beta:opponent:core-character-leader:001": 5
+          }
+        },
+        "endpoint": {
+          "living_models": 3,
+          "total_wounds": 15,
+          "wounds_by_model": {
+            "army-alpha:screen:core-character-leader:001": 5,
+            "army-alpha:ally:core-character-leader:001": 5,
+            "army-beta:opponent:core-character-leader:001": 5
+          }
+        }
+      },
+      "rng_draw_delta": 0,
+      "records": 37
+    },
+    "screen-omit": {
+      "menus": [
+        {
+          "arm": "screen-omit",
+          "role": "screen",
+          "unit": "army-alpha:screen",
+          "actor": "player-a",
+          "action_request_id": "view-request-aff262b2df13a4bf51621513bcff8c76106a99d1c7855c04c74518e91f7ee0d9",
+          "proposal_request_id": "view-request-47899afee937c95a899a51cbe4aa585a11f4d6ab32513e02f466143f696c29fd",
+          "actor_view_hash": "c54d256a3d10c8ff753a151268cf13145ecf491565e64e3f6f9617a49efa6021",
+          "raw_count": 32,
+          "raw_ids_hash": "005b17c52ee8c828d51806e86f611944cb71ddd51fb549e257ae65cce4a2cef9",
+          "geometry_excluded": 30,
+          "ordered_eligible_ids": [
+            "normal-move:df79306a1c7dc3806acea8b5d4086010b71a454f5fada06d314c3f5492d3f1ef",
+            "normal-move:746585e6e5a0ba3891d06a3c0af4fd29c1afd3a1a0f7025e367e70961fe2cc21"
+          ],
+          "cap_lost_ids": [],
+          "native_probes": [
+            {
+              "id": "normal-move:df79306a1c7dc3806acea8b5d4086010b71a454f5fada06d314c3f5492d3f1ef",
+              "violation": null,
+              "route": 0,
+              "translation_inches": [
+                4.915728182237485,
+                -1.8433980683390558
+              ],
+              "endpoint_inches": [
+                20.815728182237486,
+                29.256601931660946
+              ],
+              "footprint_radius_inches": 0.7874015748031497,
+              "west_contact": true,
+              "east_contact": false
+            },
+            {
+              "id": "normal-move:746585e6e5a0ba3891d06a3c0af4fd29c1afd3a1a0f7025e367e70961fe2cc21",
+              "violation": null,
+              "route": 0,
+              "translation_inches": [
+                4.213481299060701,
+                -1.5800554871477637
+              ],
+              "endpoint_inches": [
+                20.1134812990607,
+                29.519944512852238
+              ],
+              "footprint_radius_inches": 0.7874015748031497,
+              "west_contact": true,
+              "east_contact": false
+            }
+          ],
+          "selected": "normal-move:df79306a1c7dc3806acea8b5d4086010b71a454f5fada06d314c3f5492d3f1ef"
+        },
+        {
+          "arm": "screen-omit",
+          "role": "follow",
+          "unit": "army-alpha:ally",
+          "actor": "player-a",
+          "action_request_id": "view-request-dde9c3f159bc3737e51934dc81429f87db56ae3b28e3cbe79f3ec42a67bab225",
+          "selected": "remain_stationary"
+        },
+        {
+          "arm": "screen-omit",
+          "role": "respond",
+          "unit": "army-beta:opponent",
+          "actor": "player-b",
+          "action_request_id": "view-request-62625e3e7091e0479ad11a006fe45ce92db90f27e7f46a4d16fddfa756883fe1",
+          "proposal_request_id": "view-request-b09fa9d10290fb23b417d165666cae63206a2a2cbe25cb11be1b49aa947308fb",
+          "actor_view_hash": "0a62fa881bec0aba4d700effbb62f2f7c06abf6ed3dd6b43ec4d3a00c32a21c0",
+          "raw_count": 32,
+          "raw_ids_hash": "c85afbd904f20757cc31845942ed59821bd35af879346d3bc0f778895084fbc8",
+          "geometry_excluded": 28,
+          "ordered_eligible_ids": [
+            "normal-move:18b0cddad71a6aa5dd98958dd9ea06a14b608012b8c2e65eeca5f91bcdc6c15d",
+            "normal-move:f1f55d8266e0e9e20bb2bfe535b365f427decc9e014915cf11039a0f4c5c01c0",
+            "normal-move:e684106462ddbcb7df499c26219c6f6a6c1b52b6a311d0c0d1fa64274d6075cb",
+            "normal-move:f0ca762a30ce018d02ca0c90399b36df06fc5115dad48202cf43ad41b82eead0"
+          ],
+          "cap_lost_ids": [
+            "normal-move:e684106462ddbcb7df499c26219c6f6a6c1b52b6a311d0c0d1fa64274d6075cb",
+            "normal-move:f0ca762a30ce018d02ca0c90399b36df06fc5115dad48202cf43ad41b82eead0"
+          ],
+          "native_probes": [
+            {
+              "id": "normal-move:18b0cddad71a6aa5dd98958dd9ea06a14b608012b8c2e65eeca5f91bcdc6c15d",
+              "violation": "enemy_engagement_range_transit_forbidden",
+              "route": 0,
+              "translation_inches": [
+                -5.25,
+                0.0
+              ],
+              "endpoint_inches": [
+                22.799999999999997,
+                29.0
+              ],
+              "footprint_radius_inches": 0.7874015748031497,
+              "west_contact": true,
+              "east_contact": true
+            },
+            {
+              "id": "normal-move:f1f55d8266e0e9e20bb2bfe535b365f427decc9e014915cf11039a0f4c5c01c0",
+              "violation": null,
+              "route": 1,
+              "translation_inches": [
+                -3.712310601229376,
+                3.712310601229376
+              ],
+              "endpoint_inches": [
+                24.33768939877062,
+                32.712310601229376
+              ],
+              "footprint_radius_inches": 0.7874015748031497,
+              "west_contact": false,
+              "east_contact": true
+            }
+          ],
+          "selected": "normal-move:f1f55d8266e0e9e20bb2bfe535b365f427decc9e014915cf11039a0f4c5c01c0"
+        }
+      ],
+      "checkpoint": "b4ee5f72bd117e7a04bf1d2e2fcb4b31a9200ebc7cb7aa2159e5e234bb20bc85",
+      "event_log": "4fc1437176f6f0b12469885c248140c5684673d0292eb6938e7a79593ec8e70f",
+      "active_rng_draws": 0,
+      "active_rng_history_tokens": 371,
+      "strict_replay": true,
+      "gain_vp": {
+        "player-a": 0,
+        "player-b": 0
+      },
+      "awards": [],
+      "objective_boundaries": {
+        "objective-control:round-02:player-a:fight:turn_end": {
+          "boundary": [
+            2,
+            "player-a",
+            "fight",
+            "turn_end"
+          ],
+          "objectives": {
+            "disruption-vs-disruption-layout-3-attacker-home-01": {
+              "oc": {},
+              "controller": null,
+              "unit_oc": {},
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            },
+            "disruption-vs-disruption-layout-3-central-01": {
+              "oc": {
+                "player-a": 1
+              },
+              "controller": "player-a",
+              "unit_oc": {
+                "army-alpha:screen": 1
+              },
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            },
+            "disruption-vs-disruption-layout-3-defender-home-01": {
+              "oc": {},
+              "controller": null,
+              "unit_oc": {},
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            },
+            "disruption-vs-disruption-layout-3-expansion-01": {
+              "oc": {},
+              "controller": null,
+              "unit_oc": {},
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            },
+            "disruption-vs-disruption-layout-3-expansion-02": {
+              "oc": {},
+              "controller": null,
+              "unit_oc": {},
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            }
+          }
+        },
+        "objective-control:round-02:player-b:command:phase_end": {
+          "boundary": [
+            2,
+            "player-b",
+            "command",
+            "phase_end"
+          ],
+          "objectives": {
+            "disruption-vs-disruption-layout-3-attacker-home-01": {
+              "oc": {},
+              "controller": null,
+              "unit_oc": {},
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            },
+            "disruption-vs-disruption-layout-3-central-01": {
+              "oc": {
+                "player-a": 1
+              },
+              "controller": "player-a",
+              "unit_oc": {
+                "army-alpha:screen": 1
+              },
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            },
+            "disruption-vs-disruption-layout-3-defender-home-01": {
+              "oc": {},
+              "controller": null,
+              "unit_oc": {},
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            },
+            "disruption-vs-disruption-layout-3-expansion-01": {
+              "oc": {},
+              "controller": null,
+              "unit_oc": {},
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            },
+            "disruption-vs-disruption-layout-3-expansion-02": {
+              "oc": {},
+              "controller": null,
+              "unit_oc": {},
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            }
+          }
+        },
+        "objective-control:round-02:player-b:fight:turn_end": {
+          "boundary": [
+            2,
+            "player-b",
+            "fight",
+            "turn_end"
+          ],
+          "objectives": {
+            "disruption-vs-disruption-layout-3-attacker-home-01": {
+              "oc": {},
+              "controller": null,
+              "unit_oc": {},
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            },
+            "disruption-vs-disruption-layout-3-central-01": {
+              "oc": {
+                "player-a": 1,
+                "player-b": 1
+              },
+              "controller": null,
+              "unit_oc": {
+                "army-alpha:screen": 1,
+                "army-beta:opponent": 1
+              },
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            },
+            "disruption-vs-disruption-layout-3-defender-home-01": {
+              "oc": {},
+              "controller": null,
+              "unit_oc": {},
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            },
+            "disruption-vs-disruption-layout-3-expansion-01": {
+              "oc": {},
+              "controller": null,
+              "unit_oc": {},
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            },
+            "disruption-vs-disruption-layout-3-expansion-02": {
+              "oc": {},
+              "controller": null,
+              "unit_oc": {},
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            }
+          }
+        },
+        "objective-control:round-03:player-a:command:phase_end": {
+          "boundary": [
+            3,
+            "player-a",
+            "command",
+            "phase_end"
+          ],
+          "objectives": {
+            "disruption-vs-disruption-layout-3-attacker-home-01": {
+              "oc": {},
+              "controller": null,
+              "unit_oc": {},
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            },
+            "disruption-vs-disruption-layout-3-central-01": {
+              "oc": {
+                "player-a": 1,
+                "player-b": 1
+              },
+              "controller": null,
+              "unit_oc": {
+                "army-alpha:screen": 1,
+                "army-beta:opponent": 1
+              },
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            },
+            "disruption-vs-disruption-layout-3-defender-home-01": {
+              "oc": {},
+              "controller": null,
+              "unit_oc": {},
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            },
+            "disruption-vs-disruption-layout-3-expansion-01": {
+              "oc": {},
+              "controller": null,
+              "unit_oc": {},
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            },
+            "disruption-vs-disruption-layout-3-expansion-02": {
+              "oc": {},
+              "controller": null,
+              "unit_oc": {},
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            }
+          }
+        }
+      },
+      "material": {
+        "origin": {
+          "living_models": 3,
+          "total_wounds": 15,
+          "wounds_by_model": {
+            "army-alpha:screen:core-character-leader:001": 5,
+            "army-alpha:ally:core-character-leader:001": 5,
+            "army-beta:opponent:core-character-leader:001": 5
+          }
+        },
+        "endpoint": {
+          "living_models": 3,
+          "total_wounds": 15,
+          "wounds_by_model": {
+            "army-alpha:screen:core-character-leader:001": 5,
+            "army-alpha:ally:core-character-leader:001": 5,
+            "army-beta:opponent:core-character-leader:001": 5
+          }
+        }
+      },
+      "rng_draw_delta": 0,
+      "records": 38
+    },
+    "screen-follow": {
+      "menus": [
+        {
+          "arm": "screen-follow",
+          "role": "screen",
+          "unit": "army-alpha:screen",
+          "actor": "player-a",
+          "action_request_id": "view-request-aff262b2df13a4bf51621513bcff8c76106a99d1c7855c04c74518e91f7ee0d9",
+          "proposal_request_id": "view-request-47899afee937c95a899a51cbe4aa585a11f4d6ab32513e02f466143f696c29fd",
+          "actor_view_hash": "c54d256a3d10c8ff753a151268cf13145ecf491565e64e3f6f9617a49efa6021",
+          "raw_count": 32,
+          "raw_ids_hash": "005b17c52ee8c828d51806e86f611944cb71ddd51fb549e257ae65cce4a2cef9",
+          "geometry_excluded": 30,
+          "ordered_eligible_ids": [
+            "normal-move:df79306a1c7dc3806acea8b5d4086010b71a454f5fada06d314c3f5492d3f1ef",
+            "normal-move:746585e6e5a0ba3891d06a3c0af4fd29c1afd3a1a0f7025e367e70961fe2cc21"
+          ],
+          "cap_lost_ids": [],
+          "native_probes": [
+            {
+              "id": "normal-move:df79306a1c7dc3806acea8b5d4086010b71a454f5fada06d314c3f5492d3f1ef",
+              "violation": null,
+              "route": 0,
+              "translation_inches": [
+                4.915728182237485,
+                -1.8433980683390558
+              ],
+              "endpoint_inches": [
+                20.815728182237486,
+                29.256601931660946
+              ],
+              "footprint_radius_inches": 0.7874015748031497,
+              "west_contact": true,
+              "east_contact": false
+            },
+            {
+              "id": "normal-move:746585e6e5a0ba3891d06a3c0af4fd29c1afd3a1a0f7025e367e70961fe2cc21",
+              "violation": null,
+              "route": 0,
+              "translation_inches": [
+                4.213481299060701,
+                -1.5800554871477637
+              ],
+              "endpoint_inches": [
+                20.1134812990607,
+                29.519944512852238
+              ],
+              "footprint_radius_inches": 0.7874015748031497,
+              "west_contact": true,
+              "east_contact": false
+            }
+          ],
+          "selected": "normal-move:df79306a1c7dc3806acea8b5d4086010b71a454f5fada06d314c3f5492d3f1ef"
+        },
+        {
+          "arm": "screen-follow",
+          "role": "follow",
+          "unit": "army-alpha:ally",
+          "actor": "player-a",
+          "action_request_id": "view-request-dde9c3f159bc3737e51934dc81429f87db56ae3b28e3cbe79f3ec42a67bab225",
+          "proposal_request_id": "view-request-295571e4c6c4a1be9a6bbe5bcdf0715004eeac98ab3267fb6baabf2a22f90bde",
+          "actor_view_hash": "4ed58505faa075bd39ec3b42e788e3ecf2f69e497aab7ea3a7e081c38019003c",
+          "raw_count": 32,
+          "raw_ids_hash": "3d5aa2e4ae743bd1a8cd6f59ffd3ea703c19e62641de1b073c8c70f039a265d2",
+          "geometry_excluded": 30,
+          "ordered_eligible_ids": [
+            "normal-move:b21f8707093704f8b612a3455a6627315859f4427e997802f6753b6f6679010b",
+            "normal-move:68f4ce764da05f612104235876eb69a4903c0d0df068201647c4102d12d73233"
+          ],
+          "cap_lost_ids": [],
+          "native_probes": [
+            {
+              "id": "normal-move:b21f8707093704f8b612a3455a6627315859f4427e997802f6753b6f6679010b",
+              "violation": null,
+              "route": 0,
+              "translation_inches": [
+                5.25,
+                0.0
+              ],
+              "endpoint_inches": [
+                22.55,
+                36.65
+              ],
+              "footprint_radius_inches": 0.7874015748031497,
+              "west_contact": false,
+              "east_contact": true
+            },
+            {
+              "id": "normal-move:68f4ce764da05f612104235876eb69a4903c0d0df068201647c4102d12d73233",
+              "violation": null,
+              "route": 0,
+              "translation_inches": [
+                4.5,
+                0.0
+              ],
+              "endpoint_inches": [
+                21.8,
+                36.65
+              ],
+              "footprint_radius_inches": 0.7874015748031497,
+              "west_contact": false,
+              "east_contact": true
+            }
+          ],
+          "selected": "normal-move:b21f8707093704f8b612a3455a6627315859f4427e997802f6753b6f6679010b"
+        },
+        {
+          "arm": "screen-follow",
+          "role": "respond",
+          "unit": "army-beta:opponent",
+          "actor": "player-b",
+          "action_request_id": "view-request-b09fa9d10290fb23b417d165666cae63206a2a2cbe25cb11be1b49aa947308fb",
+          "proposal_request_id": "view-request-20ca804b0116c3fbf61ff8dbad68f735b5deefad5c29a41dbac77f01419297ca",
+          "actor_view_hash": "8ac8c2a6c56c009567b41a9396af955a1bdd52714893dd014b42ff6940052291",
+          "raw_count": 32,
+          "raw_ids_hash": "c85afbd904f20757cc31845942ed59821bd35af879346d3bc0f778895084fbc8",
+          "geometry_excluded": 28,
+          "ordered_eligible_ids": [
+            "normal-move:18b0cddad71a6aa5dd98958dd9ea06a14b608012b8c2e65eeca5f91bcdc6c15d",
+            "normal-move:f1f55d8266e0e9e20bb2bfe535b365f427decc9e014915cf11039a0f4c5c01c0",
+            "normal-move:e684106462ddbcb7df499c26219c6f6a6c1b52b6a311d0c0d1fa64274d6075cb",
+            "normal-move:f0ca762a30ce018d02ca0c90399b36df06fc5115dad48202cf43ad41b82eead0"
+          ],
+          "cap_lost_ids": [
+            "normal-move:e684106462ddbcb7df499c26219c6f6a6c1b52b6a311d0c0d1fa64274d6075cb",
+            "normal-move:f0ca762a30ce018d02ca0c90399b36df06fc5115dad48202cf43ad41b82eead0"
+          ],
+          "native_probes": [
+            {
+              "id": "normal-move:18b0cddad71a6aa5dd98958dd9ea06a14b608012b8c2e65eeca5f91bcdc6c15d",
+              "violation": "enemy_engagement_range_transit_forbidden",
+              "route": 0,
+              "translation_inches": [
+                -5.25,
+                0.0
+              ],
+              "endpoint_inches": [
+                22.799999999999997,
+                29.0
+              ],
+              "footprint_radius_inches": 0.7874015748031497,
+              "west_contact": true,
+              "east_contact": true
+            },
+            {
+              "id": "normal-move:f1f55d8266e0e9e20bb2bfe535b365f427decc9e014915cf11039a0f4c5c01c0",
+              "violation": null,
+              "route": 1,
+              "translation_inches": [
+                -3.712310601229376,
+                3.712310601229376
+              ],
+              "endpoint_inches": [
+                24.33768939877062,
+                32.712310601229376
+              ],
+              "footprint_radius_inches": 0.7874015748031497,
+              "west_contact": false,
+              "east_contact": true
+            }
+          ],
+          "selected": "normal-move:f1f55d8266e0e9e20bb2bfe535b365f427decc9e014915cf11039a0f4c5c01c0"
+        }
+      ],
+      "checkpoint": "83e58fb119cd27822c4093f0f3754a461d955a28907f3cb1f49fcc6952c403b3",
+      "event_log": "ad1ace492db48ee85c37cfb9f5fa14a794cbaa007f2db57790f669819bdb7a48",
+      "active_rng_draws": 0,
+      "active_rng_history_tokens": 376,
+      "strict_replay": true,
+      "gain_vp": {
+        "player-a": 5,
+        "player-b": 0
+      },
+      "awards": [
+        {
+          "player": "player-a",
+          "boundary_id": "objective-control:round-03:player-a:command:phase_end",
+          "rule": "outmaneuver-rounds-two-three-objectives",
+          "vp": 5,
+          "vp_by_objective": {
+            "disruption-vs-disruption-layout-3-central-01": 5
+          }
+        }
+      ],
+      "objective_boundaries": {
+        "objective-control:round-02:player-a:fight:turn_end": {
+          "boundary": [
+            2,
+            "player-a",
+            "fight",
+            "turn_end"
+          ],
+          "objectives": {
+            "disruption-vs-disruption-layout-3-attacker-home-01": {
+              "oc": {},
+              "controller": null,
+              "unit_oc": {},
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            },
+            "disruption-vs-disruption-layout-3-central-01": {
+              "oc": {
+                "player-a": 2
+              },
+              "controller": "player-a",
+              "unit_oc": {
+                "army-alpha:ally": 1,
+                "army-alpha:screen": 1
+              },
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            },
+            "disruption-vs-disruption-layout-3-defender-home-01": {
+              "oc": {},
+              "controller": null,
+              "unit_oc": {},
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            },
+            "disruption-vs-disruption-layout-3-expansion-01": {
+              "oc": {},
+              "controller": null,
+              "unit_oc": {},
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            },
+            "disruption-vs-disruption-layout-3-expansion-02": {
+              "oc": {},
+              "controller": null,
+              "unit_oc": {},
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            }
+          }
+        },
+        "objective-control:round-02:player-b:command:phase_end": {
+          "boundary": [
+            2,
+            "player-b",
+            "command",
+            "phase_end"
+          ],
+          "objectives": {
+            "disruption-vs-disruption-layout-3-attacker-home-01": {
+              "oc": {},
+              "controller": null,
+              "unit_oc": {},
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            },
+            "disruption-vs-disruption-layout-3-central-01": {
+              "oc": {
+                "player-a": 2
+              },
+              "controller": "player-a",
+              "unit_oc": {
+                "army-alpha:ally": 1,
+                "army-alpha:screen": 1
+              },
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            },
+            "disruption-vs-disruption-layout-3-defender-home-01": {
+              "oc": {},
+              "controller": null,
+              "unit_oc": {},
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            },
+            "disruption-vs-disruption-layout-3-expansion-01": {
+              "oc": {},
+              "controller": null,
+              "unit_oc": {},
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            },
+            "disruption-vs-disruption-layout-3-expansion-02": {
+              "oc": {},
+              "controller": null,
+              "unit_oc": {},
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            }
+          }
+        },
+        "objective-control:round-02:player-b:fight:turn_end": {
+          "boundary": [
+            2,
+            "player-b",
+            "fight",
+            "turn_end"
+          ],
+          "objectives": {
+            "disruption-vs-disruption-layout-3-attacker-home-01": {
+              "oc": {},
+              "controller": null,
+              "unit_oc": {},
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            },
+            "disruption-vs-disruption-layout-3-central-01": {
+              "oc": {
+                "player-a": 2,
+                "player-b": 1
+              },
+              "controller": "player-a",
+              "unit_oc": {
+                "army-alpha:ally": 1,
+                "army-alpha:screen": 1,
+                "army-beta:opponent": 1
+              },
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            },
+            "disruption-vs-disruption-layout-3-defender-home-01": {
+              "oc": {},
+              "controller": null,
+              "unit_oc": {},
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            },
+            "disruption-vs-disruption-layout-3-expansion-01": {
+              "oc": {},
+              "controller": null,
+              "unit_oc": {},
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            },
+            "disruption-vs-disruption-layout-3-expansion-02": {
+              "oc": {},
+              "controller": null,
+              "unit_oc": {},
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            }
+          }
+        },
+        "objective-control:round-03:player-a:command:phase_end": {
+          "boundary": [
+            3,
+            "player-a",
+            "command",
+            "phase_end"
+          ],
+          "objectives": {
+            "disruption-vs-disruption-layout-3-attacker-home-01": {
+              "oc": {},
+              "controller": null,
+              "unit_oc": {},
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            },
+            "disruption-vs-disruption-layout-3-central-01": {
+              "oc": {
+                "player-a": 2,
+                "player-b": 1
+              },
+              "controller": "player-a",
+              "unit_oc": {
+                "army-alpha:ally": 1,
+                "army-alpha:screen": 1,
+                "army-beta:opponent": 1
+              },
+              "vp": {
+                "player-a": 5,
+                "player-b": 0
+              }
+            },
+            "disruption-vs-disruption-layout-3-defender-home-01": {
+              "oc": {},
+              "controller": null,
+              "unit_oc": {},
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            },
+            "disruption-vs-disruption-layout-3-expansion-01": {
+              "oc": {},
+              "controller": null,
+              "unit_oc": {},
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            },
+            "disruption-vs-disruption-layout-3-expansion-02": {
+              "oc": {},
+              "controller": null,
+              "unit_oc": {},
+              "vp": {
+                "player-a": 0,
+                "player-b": 0
+              }
+            }
+          }
+        }
+      },
+      "material": {
+        "origin": {
+          "living_models": 3,
+          "total_wounds": 15,
+          "wounds_by_model": {
+            "army-alpha:screen:core-character-leader:001": 5,
+            "army-alpha:ally:core-character-leader:001": 5,
+            "army-beta:opponent:core-character-leader:001": 5
+          }
+        },
+        "endpoint": {
+          "living_models": 3,
+          "total_wounds": 15,
+          "wounds_by_model": {
+            "army-alpha:screen:core-character-leader:001": 5,
+            "army-alpha:ally:core-character-leader:001": 5,
+            "army-beta:opponent:core-character-leader:001": 5
+          }
+        }
+      },
+      "rng_draw_delta": 0,
+      "records": 39
+    }
+  },
+  "protocol": {
+    "seed": "0fda2ab092cec5bf66a11a4d130e40b9b0de3c246a93df5e3ebded4d284ca0e3",
+    "setup": "60ce229b27f8fede057883a471142c9a32104d71b65fe02b75f1a5fe9febf167",
+    "policy": {
+      "stage": "R1 A moves east and B west, exactly 4.5 inches",
+      "screen": "shallow south-east at 8:3, touch west footprint, longest eligible first",
+      "follow": "east, touch east footprint, longest eligible first",
+      "respond": "West aimed at west footprint (longest first); northwest diagonal aimed at east footprint (longest first); reserve one slot for each present route before testing additional eligible moves; take first native-accepted candidate, else issued Hold",
+      "controls": "A uses its issued Hold for each omitted action",
+      "admission": "identical restored prefix, ordered A2 Screen/Hold and Follow/Omit and B2 response, at least one native-accepted active response, exact common horizon and independent replay of each arm, no dependence on scoring values"
+    },
+    "native_cap": 2,
+    "horizon": [
+      3,
+      "player-a",
+      "movement",
+      "select_movement_unit"
+    ],
+    "wall_seconds": 1100,
+    "setup_deployment_inches": {
+      "army-alpha:screen": [
+        [
+          11.4,
+          31.1
+        ]
+      ],
+      "army-alpha:ally": [
+        [
+          12.8,
+          36.65
+        ]
+      ],
+      "army-beta:opponent": [
+        [
+          32.55,
+          29.0
+        ]
+      ]
+    },
+    "target": "disruption-vs-disruption-layout-3-central-01",
+    "layout_source": {
+      "package": "gw-11e-warhammer-event-companion-layouts-v1-3-2026-10",
+      "artifact_hash": "be19e97db9124271cae2dba2cdc8ef76992526b67c11505cf7c10c00435d36a7",
+      "pdf_sha256": "187253a9b6ea377f5e44d1148454bd042b165b03bb5c45c51a5880762bf56dc2",
+      "page": 38,
+      "association_review_sha256": "a01e515f43fc4b6c2097a7b2fb5f42024d4979f7a688a3297b34cd911e86f92a"
+    },
+    "mission_source": {
+      "package": "gw-11e-warhammer-event-companion-v1-1-2026-07",
+      "version": "1.1",
+      "scoring_artifact_hash": "8358cc11078b27e8773f58182e40bbf6194c54c3bda16b3aa1e286ee9b646dd1",
+      "rule": {
+        "rule_id": "outmaneuver-rounds-two-three-objectives",
+        "battle_round_window_text": null,
+        "trigger_text": null,
+        "canonical_text": null,
+        "timing": "battle_rounds_two_and_three_command_phase",
+        "turn_scope": "own_player_turn",
+        "source_kind": "primary",
+        "victory_points": 5,
+        "cap": null,
+        "condition": "each_non_home_objective_controlled_battle_rounds_two_and_three",
+        "resolution_mode": "independent",
+        "resolution_group_id": null
+      }
+    },
+    "linked_footprints_inches": {
+      "disruption-vs-disruption-layout-3-terrain-area-08": [
+        [
+          27.15,
+          35.9
+        ],
+        [
+          27.15,
+          24.4
+        ],
+        [
+          25.15,
+          24.4
+        ],
+        [
+          25.15,
+          24.9
+        ],
+        [
+          19.15,
+          35.4
+        ],
+        [
+          19.15,
+          35.9
+        ],
+        [
+          21.35,
+          35.9
+        ],
+        [
+          22.55,
+          36.4
+        ],
+        [
+          23.15,
+          35.9
+        ]
+      ],
+      "disruption-vs-disruption-layout-3-terrain-area-09": [
+        [
+          17.15,
+          24.15
+        ],
+        [
+          17.15,
+          35.65
+        ],
+        [
+          19.15,
+          35.65
+        ],
+        [
+          19.15,
+          35.15
+        ],
+        [
+          25.15,
+          24.65
+        ],
+        [
+          25.15,
+          24.15
+        ],
+        [
+          22.95,
+          24.15
+        ],
+        [
+          21.75,
+          23.65
+        ],
+        [
+          21.15,
+          24.15
+        ]
+      ]
+    },
+    "base_diameters_mm": {
+      "army-alpha:screen": 40.0,
+      "army-alpha:ally": 40.0,
+      "army-beta:opponent": 40.0
+    },
+    "october_scoring_clause_verified": false
+  },
+  "stem": [
+    {
+      "arm": "shared",
+      "role": "stage-a",
+      "unit": "army-alpha:screen",
+      "actor": "player-a",
+      "action_request_id": "view-request-125f175433247a41b18878f4826150b03f74590ec152a6efefec63146c1d87c1",
+      "proposal_request_id": "view-request-9a4e5f5cde987540ec1c974b8670d3ee79711e11f57186560049d085af9845f2",
+      "actor_view_hash": "99399874c461b3ea587989c6da8868a0ddb09a3bc274aa5acc986d4eeca80d52",
+      "raw_count": 32,
+      "raw_ids_hash": "1cec51d65cb96823227065b312de25ae06e80d63a56dcdc39ef99691f6fad063",
+      "geometry_excluded": 31,
+      "ordered_eligible_ids": [
+        "normal-move:6b6c257e134835ee461a1676ecb2a66bc6fa92802d1957a8b16a448abbf57b0f"
+      ],
+      "cap_lost_ids": [],
+      "native_probes": [
+        {
+          "id": "normal-move:6b6c257e134835ee461a1676ecb2a66bc6fa92802d1957a8b16a448abbf57b0f",
+          "violation": null,
+          "route": 0,
+          "translation_inches": [
+            4.5,
+            0.0
+          ],
+          "endpoint_inches": [
+            15.9,
+            31.1
+          ],
+          "footprint_radius_inches": 0.7874015748031497,
+          "west_contact": false,
+          "east_contact": false
+        }
+      ],
+      "selected": "normal-move:6b6c257e134835ee461a1676ecb2a66bc6fa92802d1957a8b16a448abbf57b0f"
+    },
+    {
+      "arm": "shared",
+      "role": "stage-a",
+      "unit": "army-alpha:ally",
+      "actor": "player-a",
+      "action_request_id": "view-request-c305f2d002a36bf2a82cfb65f3d875d7fe3bb3b7e64037a81aef17dfee9fc334",
+      "proposal_request_id": "view-request-269d5dc779b14ad88fbff5a151fa406dbb3a0a8ac4a3c47e1ed28edad7db155d",
+      "actor_view_hash": "81e587e3d30181192754e185e13f00ff4f0813208a9c67935b57120152131bf9",
+      "raw_count": 32,
+      "raw_ids_hash": "090f0f51b6cd633fe6f781b83934a466112dcb9b8c5d941534a5cf7fdd0deda3",
+      "geometry_excluded": 31,
+      "ordered_eligible_ids": [
+        "normal-move:1311122ee203b7f0354f769756f877027b08074b55248c802588eab2020790e4"
+      ],
+      "cap_lost_ids": [],
+      "native_probes": [
+        {
+          "id": "normal-move:1311122ee203b7f0354f769756f877027b08074b55248c802588eab2020790e4",
+          "violation": null,
+          "route": 0,
+          "translation_inches": [
+            4.5,
+            0.0
+          ],
+          "endpoint_inches": [
+            17.3,
+            36.65
+          ],
+          "footprint_radius_inches": 0.7874015748031497,
+          "west_contact": false,
+          "east_contact": false
+        }
+      ],
+      "selected": "normal-move:1311122ee203b7f0354f769756f877027b08074b55248c802588eab2020790e4"
+    },
+    {
+      "arm": "shared",
+      "role": "stage-b",
+      "unit": "army-beta:opponent",
+      "actor": "player-b",
+      "action_request_id": "view-request-6000b92adf7a0f5264b8c80a4cc3187d1cfcb76fbe95ce8a7468c0333625c631",
+      "proposal_request_id": "view-request-3638cf9f11da857791d63e8707a1139715addcebbd74d3fec3fcdad083b305f0",
+      "actor_view_hash": "fab4e6df1c5e76318d18188f281f16a9f16382c97a812eec248b71130b975a7f",
+      "raw_count": 32,
+      "raw_ids_hash": "89bb6d3848c4db0f297395dceef3111e7f0c1f26d63543b266bc1b7a61fb48b3",
+      "geometry_excluded": 31,
+      "ordered_eligible_ids": [
+        "normal-move:cf68b2de3458afda0247f3106895efbb08fb1688e787de2e898e2284224135ba"
+      ],
+      "cap_lost_ids": [],
+      "native_probes": [
+        {
+          "id": "normal-move:cf68b2de3458afda0247f3106895efbb08fb1688e787de2e898e2284224135ba",
+          "violation": null,
+          "route": 0,
+          "translation_inches": [
+            -4.5,
+            0.0
+          ],
+          "endpoint_inches": [
+            28.049999999999997,
+            29.0
+          ],
+          "footprint_radius_inches": 0.7874015748031497,
+          "west_contact": false,
+          "east_contact": false
+        }
+      ],
+      "selected": "normal-move:cf68b2de3458afda0247f3106895efbb08fb1688e787de2e898e2284224135ba"
+    }
+  ],
+  "origin": {
+    "checkpoint": "e00f5a8245e52af1f324944d1b31adbd691a9b27e4407ef7b7fb23f115d8af3b",
+    "event_log": "e54c9b1b2565470ee438200bbf2a688b8bfc4499e627950f1f79695b259357c5",
+    "active_rng_draws": 0,
+    "record_count": 23,
+    "request_id": "view-request-aff262b2df13a4bf51621513bcff8c76106a99d1c7855c04c74518e91f7ee0d9"
+  },
+  "margins": {
+    "hold-omit": 0,
+    "hold-follow": 0,
+    "screen-omit": 0,
+    "screen-follow": 5
+  },
+  "follow_after_hold": 0,
+  "follow_after_screen": 5,
+  "setup_evidence": {
+    "roster": {
+      "deployment": {
+        "army-alpha:screen": [
+          [
+            11.4,
+            31.1
+          ]
+        ],
+        "army-alpha:ally": [
+          [
+            12.8,
+            36.65
+          ]
+        ],
+        "army-beta:opponent": [
+          [
+            32.55,
+            29.0
+          ]
+        ]
+      },
+      "datasheets": {
+        "army-alpha:screen": "core-character-leader",
+        "army-alpha:ally": "core-character-leader",
+        "army-beta:opponent": "core-character-leader"
+      }
+    },
+    "placement_receipts": [
+      {
+        "unit": "army-beta:opponent",
+        "request_id": "view-request-f62555704e03cd912498422ecba528def7eee7a480362a77d4752299e5973e20",
+        "status": "waiting_for_decision",
+        "detail": null,
+        "native": null
+      },
+      {
+        "unit": "army-alpha:screen",
+        "request_id": "view-request-1ed9f50bbcf27701919b41c3dcbcccedecdbb320eb978023d121f465c54f7e7b",
+        "status": "waiting_for_decision",
+        "detail": null,
+        "native": null
+      },
+      {
+        "unit": "army-alpha:ally",
+        "request_id": "view-request-e56a5662143a4e72432a58886666b070689c5bbbc65f32c49055307a541be20c",
+        "status": "waiting_for_decision",
+        "detail": null,
+        "native": null
+      }
+    ],
+    "latch": {
+      "checkpoint": "60ce229b27f8fede057883a471142c9a32104d71b65fe02b75f1a5fe9febf167",
+      "event_log": "c3e3e6c2ed18825530bf0e57923b278a18c1405e57ef9123759131f230ff347a",
+      "request_id": "view-request-3e0df15cee4f33938d96a1180aa168199459f2cc0677df672c0c8871c2894113",
+      "placed": [
+        "army-beta:opponent",
+        "army-alpha:screen",
+        "army-alpha:ally"
+      ],
+      "rng_draws": 0,
+      "records": 8
+    }
+  }
+}
