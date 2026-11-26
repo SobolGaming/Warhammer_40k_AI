@@ -3382,11 +3382,14 @@ the witness with that grant at every target-reachable budget. Ground must
 also exceed flight's target-filter ceiling under that condition. Unsupported
 wall cases retain the existing unresolved behavior.
 
-The caller submits the bound declaration before the roll and declines Command
-Re-roll for the natural 2D6 comparison. A conditional
-ground plan holds no CP or phase use. After the roll, `select_late_onslaught`
-returns a separate bound action only for the live, issued post-roll option
-for that ground declaration and mover. Native eligibility is checked again
+The caller uses `submit_dense_wall_charge` before the roll. It checks the
+exact qualifying player observation and binds that observation and the issued
+option to the native declaration result. Decline Command Re-roll for the
+natural 2D6 comparison. A conditional ground plan holds no CP or phase use.
+After the roll, `select_late_onslaught` verifies the actor-visible ground
+decision record and that the visible battlefield still matches. It then
+returns a separate bound action for the live, issued post-roll option for
+that declaration and mover. The opt-in accepts only Boolean values. Native eligibility is checked again
 in that exact window, including CP and phase usage. A short roll gives no
 spend action. Flight keeps the native penalty and never uses this spending
 policy. The caller submits the original witness through the native proposal

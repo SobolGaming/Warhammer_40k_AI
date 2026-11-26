@@ -1335,7 +1335,7 @@ def _charge_cp_test_addition(root: Path) -> tuple[_ChargeCpTestAddition, bytes] 
     if not (root / path).exists():
         return None
     raw = _checked_bytes(
-        root, path, "657541c69cc31107c7ae82fe5b42b9c0c20994bf1c5c83af16c4526c900d4b08"
+        root, path, "c3f6f91e082ffbfa2d0fc784a04fca802b4ac41a854f83ad338bdcb3a994f653"
     )
     record = cast(_ChargeCpTestAddition, json.loads(raw, object_pairs_hook=_selection_object))
     if record.keys() != _ChargeCpTestAddition.__required_keys__:

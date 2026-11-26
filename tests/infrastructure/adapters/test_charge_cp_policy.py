@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import replace
+from typing import cast
 
 import pytest
 
@@ -14,6 +15,7 @@ from warhammer40k_core.ai.charge_cp_policy import (
     DenseWallChargeChoice,
     choose_dense_wall_charge,
     select_late_onslaught,
+    submit_dense_wall_charge,
 )
 from warhammer40k_core.ai.charge_flight_admission import (
     ChargeFlightRollBound,
@@ -21,7 +23,7 @@ from warhammer40k_core.ai.charge_flight_admission import (
     ChargeFlightUnresolvedReason,
     inspect_charge_flight_offer,
 )
-from warhammer40k_core.ai.player_policy import PlayerDecisionContext
+from warhammer40k_core.ai.player_policy import PlayerDecisionContext, PolicyError
 from warhammer40k_core.core.detachment import DetachmentDefinition
 from warhammer40k_core.core.ruleset_descriptor import TerrainFeatureKind
 from warhammer40k_core.core.terrain_display import TerrainDisplayGeometry
@@ -100,7 +102,9 @@ def _wall() -> TerrainFeatureDefinition:
     )
 
 
-def _battle(definitions: Section02Definitions, cp: int, *, rng: str) -> Scene:
+def _battle(
+    definitions: Section02Definitions, cp: int, *, rng: str, y: float = START.position.y
+) -> Scene:
     b = scene(
         definitions,
         (selection(definitions, BLOODTHIRSTER, "first"),),
@@ -111,8 +115,8 @@ def _battle(definitions: Section02Definitions, cp: int, *, rng: str) -> Scene:
         rng_seed_label=rng,
         terrain_features=(_wall(),),
     )
-    locate(b, MOVER, (START,))
-    locate(b, TARGET, (Pose.at(21, 20),))
+    locate(b, MOVER, (Pose.at(START.position.x, y),))
+    locate(b, TARGET, (Pose.at(21, y),))
     if cp:
         b.state.gain_command_points(
             player_id=OWNER,
@@ -149,11 +153,11 @@ def _decline_before_roll(b: Scene) -> None:
     pytest.fail("No ordinary Charge declaration")
 
 
-def _witness(b: Scene) -> PathWitness:
+def _witness(b: Scene, *, start: Pose = START) -> PathWitness:
     offer = inspect_charge_flight_offer(_context(b), unit_id=MOVER, target_id=TARGET).offer
     assert offer is not None
-    end = Pose.at(10 + offer.target_filter_distance_inches, 20)
-    return PathWitness.for_paths(((offer.model_id, (START, end)),))
+    end = Pose.at(start.position.x + offer.target_filter_distance_inches, start.position.y)
+    return PathWitness.for_paths(((offer.model_id, (start, end)),))
 
 
 def _assert_replay(b: Scene, *, completed: bool = True) -> None:
@@ -227,9 +231,9 @@ def _finish(
 @pytest.mark.parametrize(
     ("cp", "allow_spend", "rng", "flies", "expected_roll"),
     [
-        (1, False, "dense-cp-policy-1", True, 10),
-        (1, True, "dense-cp-policy-1", False, 8),
-        (0, True, "dense-cp-policy-9", True, 10),
+        (1, False, "dense-cp-policy-0", True, 10),
+        (1, True, "dense-cp-policy-11", False, 8),
+        (0, True, "dense-cp-policy-0", True, 11),
         (1, True, "dense-cp-policy-0", False, 6),
     ],
     ids=["keep-cp", "conditional-ground", "unaffordable", "short-roll"],
@@ -280,9 +284,8 @@ def test_dense_wall_policy_submits_native_modes_and_costs(
     )
     assert choice.declaration.request_id == context.request["request_id"]
     assert choice.declaration.observation_hash == context.observation_hash
-    option = choice.declaration.option_id
-    assert option is not None
-    _select(b, option, result_id="rehearse:flight" if flies else "rehearse:ground")
+    status = submit_dense_wall_charge(b.session, choice=choice)
+    assert status.status_kind is not LifecycleStatusKind.INVALID, status
 
     actual = _natural_roll(b, choice)
     assert actual.value == expected_roll
@@ -337,3 +340,78 @@ def test_used_phase_allowance_cannot_be_spent_again(definitions: Section02Defini
     assert len(b.state.stratagem_use_records) == 1
     assert b.state.command_point_total(OWNER) == 1
     _assert_replay(b)
+
+
+@pytest.mark.parametrize("value", ["false", 1, None], ids=["string-false", "integer", "null"])
+def test_late_onslaught_opt_in_requires_boolean(
+    definitions: Section02Definitions, value: object
+) -> None:
+    b = _battle(definitions, 1, rng="dense-cp-policy-1")
+    _decline_before_roll(b)
+    before = b.session.to_persistence_payload()
+    with pytest.raises(PolicyError, match="allow_late_onslaught requires a Boolean"):
+        choose_dense_wall_charge(
+            b.session,
+            _context(b),
+            unit_id=MOVER,
+            target_id=TARGET,
+            witness=_witness(b),
+            allow_late_onslaught=cast(bool, value),
+        )
+    assert b.session.to_persistence_payload() == before
+
+
+def test_late_onslaught_rejects_charge_plan_from_different_position(
+    definitions: Section02Definitions,
+) -> None:
+    origin = _battle(definitions, 1, rng="dense-cp-policy-11")
+    _decline_before_roll(origin)
+    initial = _context(origin)
+    choice = choose_dense_wall_charge(
+        origin.session,
+        initial,
+        unit_id=MOVER,
+        target_id=TARGET,
+        witness=_witness(origin),
+        allow_late_onslaught=True,
+    )
+    assert isinstance(choice, DenseWallChargeChoice)
+    assert choice.conditional_ground is not None
+    assert submit_dense_wall_charge(origin.session, choice=choice).status_kind is not (
+        LifecycleStatusKind.INVALID
+    )
+    committed = _natural_roll(origin, choice)
+
+    clear = _battle(definitions, 1, rng="dense-cp-policy-11", y=36)
+    _decline_before_roll(clear)
+    visible = _context(clear)
+    clear_witness = _witness(clear, start=Pose.at(START.position.x, 36))
+    assert visible.observation["game_id"] == initial.observation["game_id"]
+    assert visible.route == initial.route
+    assert visible.request["request_id"] == initial.request["request_id"]
+    assert visible.request["options"] == initial.request["options"]
+    assert visible.observation_hash != initial.observation_hash
+    before = clear.session.to_persistence_payload()
+    with pytest.raises(PolicyError, match="declaration no longer matches its observation"):
+        submit_dense_wall_charge(clear.session, choice=choice)
+    assert clear.session.to_persistence_payload() == before
+
+    # Even copying the accepted client result ID onto the same issued ground
+    # option cannot extend a qualification to a different public battlefield.
+    _select(
+        clear,
+        choice.no_spend.offer.ground_option_id,
+        result_id=committed.request.source_decision_result_id,
+    )
+    actual = _natural_roll(clear, choice)
+    assert committed.value == 8
+    assert actual.value == 7
+    assert actual.move_available
+    assert any(
+        row["option_id"].startswith(f"use-stratagem:{ir.GORE_HUNGRY_ONSLAUGHT_STRATAGEM_ID}:")
+        for row in _context(clear).request["options"]
+    )
+    assert _finish(clear, clear_witness, choice) == 0
+    assert clear.state.command_point_total(OWNER) == 1
+    assert not clear.state.stratagem_use_records
+    _assert_replay(clear)
