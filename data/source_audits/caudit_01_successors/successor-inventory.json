@@ -6658,6 +6658,77 @@
     "section07/punishment_scores": {
       "assertions": [],
       "file_sha256": "462c487f44d4031768f5f51d78bae007032589698f87451e8ebbdaf180d2c084",
+      "helper_assertions": {
+        "assertions": [
+          {
+            "assertion": "assert owner_player_id in scoring_ids",
+            "line": 579
+          },
+          {
+            "assertion": "assert PrimaryScoringBoundaryKind.ORDINARY in required_kinds",
+            "line": 585
+          },
+          {
+            "assertion": "assert [ledger.to_payload() for ledger in state.victory_point_ledgers] == ledgers_payload",
+            "line": 622
+          },
+          {
+            "assertion": "assert [evidence.to_payload() for evidence in state.primary_scoring_state_evidence_records] == evidence_payload",
+            "line": 623
+          },
+          {
+            "assertion": "assert restored.to_payload() == state.to_payload()",
+            "line": 627
+          },
+          {
+            "assertion": "assert replayed_log.to_payload() == decisions.event_log.to_payload()",
+            "line": 629
+          },
+          {
+            "assertion": "assert any((event.event_type == PRIMARY_SCORING_COMMIT_CHECKPOINT_EVENT for event in replayed_log.records))",
+            "line": 630
+          },
+          {
+            "assertion": "assert awards[CONDEMNED_ENEMY_UNITS_LEFT_BATTLEFIELD_THIS_TURN] == expected_vp",
+            "line": 594
+          },
+          {
+            "assertion": "assert condemned_rows",
+            "line": 605
+          },
+          {
+            "assertion": "assert all((row.player_id == owner_player_id for row in condemned_rows))",
+            "line": 606
+          },
+          {
+            "assertion": "assert CONDEMNED_ENEMY_UNITS_LEFT_BATTLEFIELD_THIS_TURN not in awards",
+            "line": 608
+          },
+          {
+            "assertion": "assert 'control_one_or_more_non_home_objectives_from_battle_round_two' not in awards",
+            "line": 610
+          },
+          {
+            "assertion": "assert 'control_more_objectives_than_opponent_from_battle_round_two' not in awards",
+            "line": 611
+          },
+          {
+            "assertion": "assert len(reevaluated_condemned) == 1",
+            "line": 654
+          },
+          {
+            "assertion": "assert reevaluated_condemned[0].amount == expected_vp",
+            "line": 655
+          },
+          {
+            "assertion": "assert not reevaluated_condemned",
+            "line": 657
+          }
+        ],
+        "function": "_assert_condemned_boundary_path",
+        "path": "tests/shared/category_migration/phase17n_step5d_condemned_departure_conditions.py",
+        "source_sha256": "71b53cc40639f0989e6d8562797a2b95a7f2acd3fbce07711470c46ed9a66402"
+      },
       "node": "tests/infrastructure/missions/unit/test_step5d_condemned_departure_conditions.py::test_phase17n_step5d_scores_condemned_departure_across_turn_windows",
       "passing_cases_by_junit": {
         "section07/section07-mission-consumers.junit.xml": [
@@ -7165,6 +7236,112 @@
         }
       ],
       "file_sha256": "70de686b11d136f5b4596a028c70afc966d0ba728ff4f31000dc4ca365c3595a",
+      "helper_assertions": {
+        "assertions": [
+          {
+            "assertion": "assert state is not None",
+            "line": 58
+          },
+          {
+            "assertion": "assert state.current_battle_phase is BattlePhase.MOVEMENT",
+            "line": 59
+          },
+          {
+            "assertion": "assert len(sticky) == 2",
+            "line": 61
+          },
+          {
+            "assertion": "assert {item.source_rule_id for item in sticky} == {STICKY_SOURCE_ID}",
+            "line": 62
+          },
+          {
+            "assertion": "assert {item.player_id for item in sticky} == {active}",
+            "line": 63
+          },
+          {
+            "assertion": "assert {item.originating_unit_instance_id for item in sticky} == ({'own:a', 'own:b'} if active == 'owner' else {'foe:c', 'foe:d'})",
+            "line": 64
+          },
+          {
+            "assertion": "assert len({item.objective_id for item in sticky}) == 1",
+            "line": 67
+          },
+          {
+            "assertion": "assert ledger.victory_points == expected",
+            "line": 71
+          },
+          {
+            "assertion": "assert state.victory_point_ledger_for_player(other).victory_points == 0",
+            "line": 72
+          },
+          {
+            "assertion": "assert len(ledger.transactions) == 1",
+            "line": 73
+          },
+          {
+            "assertion": "assert transaction.amount == expected",
+            "line": 75
+          },
+          {
+            "assertion": "assert transaction.phase == BattlePhase.COMMAND.value",
+            "line": 76
+          },
+          {
+            "assertion": "assert isinstance(transaction.metadata, dict)",
+            "line": 77
+          },
+          {
+            "assertion": "assert transaction.metadata['controlled_objective_ids'] == [sticky[0].objective_id]",
+            "line": 78
+          },
+          {
+            "assertion": "assert transaction.metadata['scoring_rule_source_id'] == ('gw-11e-chapter-approved-2026-27:primary:primary-immovable-object:scoring-rule:immovable-object-rounds-two-to-four-command' if active == 'owner' else 'gw-11e-chapter-approved-2026-27:primary:primary-unstoppable-force:scoring-rule:unstoppable-force-objectives')",
+            "line": 79
+          },
+          {
+            "assertion": "assert len(sticky_indices) == 2",
+            "line": 97
+          },
+          {
+            "assertion": "assert len(commits) == 1",
+            "line": 98
+          },
+          {
+            "assertion": "assert max(sticky_indices) < commits[0]",
+            "line": 99
+          },
+          {
+            "assertion": "assert transitions",
+            "line": 103
+          },
+          {
+            "assertion": "assert isinstance(event.payload, dict)",
+            "line": 105
+          },
+          {
+            "assertion": "assert isinstance(batch, dict)",
+            "line": 107
+          },
+          {
+            "assertion": "assert isinstance(participants, list)",
+            "line": 109
+          },
+          {
+            "assertion": "assert isinstance(participant, dict)",
+            "line": 111
+          },
+          {
+            "assertion": "assert participant['origin'] == 'player'",
+            "line": 112
+          },
+          {
+            "assertion": "assert participant['source_rule_id'] == STICKY_SOURCE_ID",
+            "line": 113
+          }
+        ],
+        "path": "tests/support/section08_native_mission.py",
+        "source_sha256": "c5cd5422243cc6a2b849b30c03743afc52a8535245b739ae00bde656c9e9feec"
+      },
       "node": "tests/rules/section08/test_end_priority.py::test_native_command_end_finishes_loaded_rules_before_actual_mission_scoring",
       "passing_cases_by_junit": {
         "section08/section08.junit.xml": [

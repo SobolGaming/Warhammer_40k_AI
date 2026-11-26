@@ -16,11 +16,11 @@
     },
     "data/source_audits/caudit_01_successors/successor-inventory.json": {
       "before_sha256": null,
-      "after_sha256": "d979a2d842ee0b754d4727d337e623869673fd820a160becde6b4435f982d420",
+      "after_sha256": "f4bf2ec918853cd2c9e1d8505ce24d6c8b013bed9a454754ace4ce9c3393e91d",
       "owners": {
         "@document": {
           "before": null,
-          "after": "d979a2d842ee0b754d4727d337e623869673fd820a160becde6b4435f982d420"
+          "after": "f4bf2ec918853cd2c9e1d8505ce24d6c8b013bed9a454754ace4ce9c3393e91d"
         }
       }
     },
