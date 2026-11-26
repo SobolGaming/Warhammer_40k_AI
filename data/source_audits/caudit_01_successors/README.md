@@ -1,6 +1,6 @@
 # CAUDIT-01 Core successor evidence
 
-This audit covers Sections 01, 02, 04 and 07 on GitHub main
+This audit consolidates 212 reviewed obligations across 16 Core sections on GitHub main
 `dec50bca2394c755a0d5fb76e6659882b388c032` (tree
 `f58dbb84417cf2f8d5418bd0cbd0df133635aa01`). The
 [successor inventory](successor-inventory.json) records bounded assertions and
@@ -8,19 +8,21 @@ their limits. Read it beside the archived [Order 135 inventory](../order135/curr
 and [retained source capture](../order135/retained-current-sources.json).
 CAUDIT-01, PFINAL and faction Gate 0 remain open.
 
-| Historical population | Bounded | Partial | Unreachable and open | Unreviewed candidates | Missing evidence | Source drift |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| 398 rows with a missing test path | 115 | 12 | 1 | 261 | 9 | 0 |
-| All 1,083 rows | 115 | 12 | 1 | 933 | 20 | 2 |
+| Historical population | Bounded | Partial | Unreachable and open | Unreviewed candidates | Missing evidence | Reproduced gap | Source drift |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 398 rows with a missing test path | 185 | 25 | 1 | 177 | 9 | 1 | 0 |
+| All 1,083 rows | 185 | 25 | 1 | 849 | 20 | 1 | 2 |
 
 The 398 rows contain 868 missing references, of which CI69 explicitly retired
-866. The 128 reviewed bindings are disjoint across the baseline (57), the
-battle-round and modifier review (32), and the healing, datasheet and attack
-review (39). The three ownership draft bindings are already in the baseline.
-The inventory has one row per historical category and obligation ID. Each
-reviewed row identifies source block ordinals and hashes, engine owners,
-current assertions, full passing case IDs and scope limits. The JUnit entries
-identify the original Windows runs by their hashes and passing counts.
+866. The first 128 reviews came from the baseline (57), the battle-round and
+modifier review (32), and the healing, datasheet and attack review (39).
+The six follow-on receipts add 84 distinct reviews. The three ownership
+draft bindings were already counted in the baseline. Each reviewed row
+identifies source block ordinals and hashes, engine owners, assertion or
+diagnostic records, and scope limits. The JUnit entries preserve the exact
+passing case IDs and identify the original Windows runs by hash.
+
+## Initial review
 
 | Section | Bounded | Partial | Unreachable and open | Unreviewed candidates |
 | --- | ---: | ---: | ---: | ---: |
@@ -52,6 +54,52 @@ identify the original Windows runs by their hashes and passing counts.
   achieved round-end score for `07.03-mission-after` remains open. The inventory
   preserves the assignment and compiler findings alongside the passing boundary
   order assertions.
+
+## Follow-on receipts
+
+| Cohort | Bounded | Partial | Reproduced gap |
+| --- | ---: | ---: | ---: |
+| Sections 05 and 13, Attack Sequence, visibility, Hidden and terrain membership | 29 | 4 | 0 |
+| Section 08, Command | 8 | 1 | 0 |
+| Sections 06, 10 and 20, Hazardous, Shooting and Strategic Reserves | 15 | 3 | 0 |
+| Sections 12, 14 and 19, Fight ordering, Objectives and Attached Units | 8 | 5 | 0 |
+| Sections 15 and 24, Stratagem decisions and Twin-linked | 5 | 0 | 1 |
+| Sections 16 and 24, Actions, Devastating Wounds and Melta | 5 | 0 | 0 |
+
+- The Attack Sequence receipt preserves the four partials. They concern a
+  downstream suffers-damage consumer, a retained non-Demise destruction
+  trigger, a baseless non-vehicle comparison, and continuation through both
+  wounded-group orders. Natural Epic Challenge and the Solid threshold are
+  local diagnostics with their original fixture limits. Terrain movement
+  remains outside the Section 13 review.
+- Section 08 proves ordinary Command ordering and an achieved active-player
+  mission award after the non-mission rules. The simultaneous two-player
+  score remains partial. The two current assignment packs allow Command-end
+  primary awards only for the active player.
+- The Hazardous, Shooting and Strategic Reserves receipt distinguishes
+  requested dice and mixed-unit evaluation from combined native multi-weapon
+  damage. The terminal reserve fixture leaves independent same-body
+  destruction eligibility and ordinary final-turn progression open.
+- The Fight and attached-unit receipt retains the unequal Remaining Combats
+  and attack-caused bearer lifetime gaps. The legacy cross-band attempt was
+  rejected at collection. The operative Objective Control wording predicates
+  range on the unit and positive OC on a member. Order 109 and the current
+  checkpoint support that distinction. The archived same-model wording is
+  preserved and its row remains partial.
+- The Counteroffensive diagnostic used paired native branches from a prepared
+  Fight checkpoint. Declining the stratagem offered Normal and Overrun for
+  the newly engaged target. Spending 2 CP selected Normal and advanced to
+  melee, although the engine classified both types as legal. The inventory
+  counts one reproduced gap under `15.12-next-selection` and cross-references
+  `12.04-fight-type`. The runtime fix is separate.
+- The subsequent Actions and weapon damage receipt verifies atomic exclusion
+  and same-turn uniqueness, a normal attack resolving before deferred
+  Devastating Wounds, and a declaration-time Melta bonus retained after the
+  near target model dies. The native damage diagnostics start from prepared
+  Shooting checkpoints. The unadmitted geometry attempt carries no
+  gameplay credit.
+
+## Source observations
 
 The reviewed source matches use the timestamped, unversioned Game Datamissions
 Core observation. The inventory pins the source observations by capture and

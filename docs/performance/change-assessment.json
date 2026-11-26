@@ -6,21 +6,21 @@
   "changes": {
     "data/source_audits/caudit_01_successors/README.md": {
       "before_sha256": null,
-      "after_sha256": "3e71a42324428a949839a9ec934f26775aa93cc505bdda2acec52e8c8ab5d127",
+      "after_sha256": "971b97bd2614da1e6747568f784ca2e58fd0675562484b6defc86697db5f611f",
       "owners": {
         "@document": {
           "before": null,
-          "after": "3e71a42324428a949839a9ec934f26775aa93cc505bdda2acec52e8c8ab5d127"
+          "after": "971b97bd2614da1e6747568f784ca2e58fd0675562484b6defc86697db5f611f"
         }
       }
     },
     "data/source_audits/caudit_01_successors/successor-inventory.json": {
       "before_sha256": null,
-      "after_sha256": "8278e8d79d0b3824352c75ee2f0d5d43693baaa60ad0d02610532174dec98000",
+      "after_sha256": "d979a2d842ee0b754d4727d337e623869673fd820a160becde6b4435f982d420",
       "owners": {
         "@document": {
           "before": null,
-          "after": "8278e8d79d0b3824352c75ee2f0d5d43693baaa60ad0d02610532174dec98000"
+          "after": "d979a2d842ee0b754d4727d337e623869673fd820a160becde6b4435f982d420"
         }
       }
     },
@@ -42,9 +42,9 @@
         "caudit-01-successor-evidence"
       ],
       "selected_families": [],
-      "rationale": "Retains scoped source, assertion and execution evidence from existing engine and test paths. This changes no runtime or measured workload.",
-      "source_obligation": "CAUDIT-01 records source-linked bounded successors for Core Sections 01, 02, 04 and 07.",
-      "unchanged_work": "The bookkeeping leaves runtime algorithms, fixtures, workload selection and budgets intact."
+      "rationale": "Retains scoped source, assertion, diagnostic and execution evidence from existing engine and test paths.",
+      "source_obligation": "CAUDIT-01 records bounded and partial source-linked successors and one reproduced gap across sixteen Core sections.",
+      "unchanged_work": "The evidence inventory leaves runtime algorithms, fixtures, workload selection and budgets intact."
     },
     "data/source_audits/caudit_01_successors/successor-inventory.json": {
       "category": "rule_semantics",
@@ -52,9 +52,9 @@
         "caudit-01-successor-evidence"
       ],
       "selected_families": [],
-      "rationale": "Retains scoped source, assertion and execution evidence from existing engine and test paths. This changes no runtime or measured workload.",
-      "source_obligation": "CAUDIT-01 records source-linked bounded successors for Core Sections 01, 02, 04 and 07.",
-      "unchanged_work": "The bookkeeping leaves runtime algorithms, fixtures, workload selection and budgets intact."
+      "rationale": "Retains scoped source, assertion, diagnostic and execution evidence from existing engine and test paths.",
+      "source_obligation": "CAUDIT-01 records bounded and partial source-linked successors and one reproduced gap across sixteen Core sections.",
+      "unchanged_work": "The evidence inventory leaves runtime algorithms, fixtures, workload selection and budgets intact."
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
