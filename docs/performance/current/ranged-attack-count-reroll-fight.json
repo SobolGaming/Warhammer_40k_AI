@@ -1,0 +1,58 @@
+{
+  "policy": "rules-engine-performance-v3",
+  "family": "fight",
+  "workload_id": "order72-engaging-full-fight-restore-replay-v1",
+  "base_revision": "17efed22060afb675b2232ad6f48054f0190ebd7",
+  "head_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:14379b839d569221cb35843f64b1027d4ec7e704f75309dd00eb106a1a9bc8c5",
+  "head_input_digest": "661d7be05c70eb8b1a74d036f7a9f632cda59bba872e43984019b64a7d0c00d6",
+  "budget_profile": "current-change-relative-v1",
+  "base": {
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:cdd4dc3a140f7a09efbe307cf6333b3fada76748838fa5543b2160727da765b0",
+    "host": {
+      "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+      "memory_bytes": 67359350784,
+      "logical_cpus": 64,
+      "platform": "Linux-6.18.58.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "659a2d81e02176d23168861529651506ac87a4eab1982109f144cd62a63fce71",
+    "workload_sha256": "897e5c098c475f54ba17136f58a4c23df9d00450d7131eb85d1f82e4c3cd7af6",
+    "fixture_sha256": "0569b424c57810343614629f1def77c41de7096d98a053dc36dc20cefe911071",
+    "samples": {
+      "complete-fight-phase": [
+        13.257658171999992,
+        12.905272023000009,
+        12.913099942999963
+      ]
+    },
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false
+  },
+  "head": {
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:14379b839d569221cb35843f64b1027d4ec7e704f75309dd00eb106a1a9bc8c5",
+    "host": {
+      "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+      "memory_bytes": 67359350784,
+      "logical_cpus": 64,
+      "platform": "Linux-6.18.58.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "659a2d81e02176d23168861529651506ac87a4eab1982109f144cd62a63fce71",
+    "workload_sha256": "897e5c098c475f54ba17136f58a4c23df9d00450d7131eb85d1f82e4c3cd7af6",
+    "fixture_sha256": "0569b424c57810343614629f1def77c41de7096d98a053dc36dc20cefe911071",
+    "samples": {
+      "complete-fight-phase": [
+        13.251211104000049,
+        12.932438256999944,
+        12.923516688000063
+      ]
+    },
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false
+  },
+  "historical_failures": []
+}

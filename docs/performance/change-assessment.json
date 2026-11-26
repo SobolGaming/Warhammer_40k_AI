@@ -1,151 +1,1378 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "dafbcccdd31d5532c0d58aceac43901e60326d36",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:cdd4dc3a140f7a09efbe307cf6333b3fada76748838fa5543b2160727da765b0",
-  "operation_map_sha256": "f6cb70a7dbd7d442c33523e9194456c864c3733daeb5405706eb44271d090e51",
+  "base": "17efed22060afb675b2232ad6f48054f0190ebd7",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:14379b839d569221cb35843f64b1027d4ec7e704f75309dd00eb106a1a9bc8c5",
+  "operation_map_sha256": "a14a193dc1392dd0d63716966c3474c84d02c17f9ad6c372cdf300cf7100f991",
   "changes": {
-    "data/source_audits/caudit_01_successors/batch-2/README.md": {
-      "before_sha256": null,
-      "after_sha256": "684ef588e22c30723a3d4c4beddc291d8b374d3505f7c2144079cfe2afaa846f",
+    "ci/test_shards/durations.json": {
+      "before_sha256": "0efd2fc79cca4ffee955b40349e20128d53a406b240ba7df997d2f08e18328d3",
+      "after_sha256": "6d9c18d1220a4af823fffe551133ae90a1628e34344d5840e3c69aedb85ddda5",
       "owners": {
         "@document": {
-          "before": null,
-          "after": "684ef588e22c30723a3d4c4beddc291d8b374d3505f7c2144079cfe2afaa846f"
+          "before": "0efd2fc79cca4ffee955b40349e20128d53a406b240ba7df997d2f08e18328d3",
+          "after": "6d9c18d1220a4af823fffe551133ae90a1628e34344d5840e3c69aedb85ddda5"
         }
       }
     },
-    "data/source_audits/caudit_01_successors/batch-2/historical-reconciliation.json": {
-      "before_sha256": null,
-      "after_sha256": "4ead6121300b63b6dc8763f907a93b6c86170cccbfe55f8a50a52ed310847669",
+    "ci/test_shards/shard-1.txt": {
+      "before_sha256": "032e55bbb7ee725fb07ff6b9c51d8f116e351e000c36680bdc5d18c3521c8a32",
+      "after_sha256": "f66ef899a593ac1775f50b6570915ab97774196990fbb01897d1474afcca47c5",
       "owners": {
         "@document": {
-          "before": null,
-          "after": "4ead6121300b63b6dc8763f907a93b6c86170cccbfe55f8a50a52ed310847669"
+          "before": "032e55bbb7ee725fb07ff6b9c51d8f116e351e000c36680bdc5d18c3521c8a32",
+          "after": "f66ef899a593ac1775f50b6570915ab97774196990fbb01897d1474afcca47c5"
         }
       }
     },
-    "data/source_audits/caudit_01_successors/batch-2/main-follow-up.json": {
-      "before_sha256": null,
-      "after_sha256": "39f94bdb472d4d32e6a57bc9bb189b9749148c28867621bd1ca06297edd176cd",
+    "ci/test_shards/shard-10.txt": {
+      "before_sha256": "6b4430379b6ea68580d6bbd18312bdadcf1aadc17ab0f2189c627d2270a23618",
+      "after_sha256": "ec97eade4321fa1b21f33529d51124c2964ec29b98e2e96bcb4953b37d99055f",
       "owners": {
         "@document": {
-          "before": null,
-          "after": "39f94bdb472d4d32e6a57bc9bb189b9749148c28867621bd1ca06297edd176cd"
+          "before": "6b4430379b6ea68580d6bbd18312bdadcf1aadc17ab0f2189c627d2270a23618",
+          "after": "ec97eade4321fa1b21f33529d51124c2964ec29b98e2e96bcb4953b37d99055f"
         }
       }
     },
-    "data/source_audits/caudit_01_successors/batch-2/open-evidence.json": {
-      "before_sha256": null,
-      "after_sha256": "0462a801c4c0adfaf93eeba2a4866f35f2960985b9014b268315b14603da0eb7",
+    "ci/test_shards/shard-11.txt": {
+      "before_sha256": "c3db0a42154ff4af7b545bb624d371e4d744e6c694dcf56cfea7e92d14b6f4d3",
+      "after_sha256": "67ca36da771816524971af6b5aedd50d1691db96b619092644873ed8dd35c64d",
       "owners": {
         "@document": {
-          "before": null,
-          "after": "0462a801c4c0adfaf93eeba2a4866f35f2960985b9014b268315b14603da0eb7"
+          "before": "c3db0a42154ff4af7b545bb624d371e4d744e6c694dcf56cfea7e92d14b6f4d3",
+          "after": "67ca36da771816524971af6b5aedd50d1691db96b619092644873ed8dd35c64d"
         }
       }
     },
-    "data/source_audits/caudit_01_successors/batch-2/source-adoption-map.json": {
-      "before_sha256": null,
-      "after_sha256": "6cdf44e9075da865b859f7d00edc5e447ab8e9f9fcfd81b2eedb6b6ee4bec5a0",
+    "ci/test_shards/shard-12.txt": {
+      "before_sha256": "d30045f015e660d385f71d40e2c37f5b708609725146c0e1801a2dfe81dbbc8f",
+      "after_sha256": "9e1607d2ff242f91d4c321d276417d6f1041751c4faf6a051cb9af7a795debde",
       "owners": {
         "@document": {
-          "before": null,
-          "after": "6cdf44e9075da865b859f7d00edc5e447ab8e9f9fcfd81b2eedb6b6ee4bec5a0"
+          "before": "d30045f015e660d385f71d40e2c37f5b708609725146c0e1801a2dfe81dbbc8f",
+          "after": "9e1607d2ff242f91d4c321d276417d6f1041751c4faf6a051cb9af7a795debde"
         }
       }
     },
-    "data/source_audits/caudit_01_successors/batch-2/successor-evidence.json": {
+    "ci/test_shards/shard-4.txt": {
+      "before_sha256": "44db6078f0e745044911fb717d81b2f548d4392fd99aeead0413798db6813718",
+      "after_sha256": "d21c09171b1273f123405c8b0869b03ecfca1c4b8b977b9375960d43bc1e7f52",
+      "owners": {
+        "@document": {
+          "before": "44db6078f0e745044911fb717d81b2f548d4392fd99aeead0413798db6813718",
+          "after": "d21c09171b1273f123405c8b0869b03ecfca1c4b8b977b9375960d43bc1e7f52"
+        }
+      }
+    },
+    "ci/test_shards/shard-5.txt": {
+      "before_sha256": "38af8587ecc0d92d63509c7ff0f1b48e8f9566e6129078a59928c4edd4886b90",
+      "after_sha256": "22e814538649cce40cf010634f11d11a0a1381b23cb166ab8bc6d2947526c51f",
+      "owners": {
+        "@document": {
+          "before": "38af8587ecc0d92d63509c7ff0f1b48e8f9566e6129078a59928c4edd4886b90",
+          "after": "22e814538649cce40cf010634f11d11a0a1381b23cb166ab8bc6d2947526c51f"
+        }
+      }
+    },
+    "ci/test_shards/shard-6.txt": {
+      "before_sha256": "914f5c3a9a5e998e357e8a72e48a64aa9d3d921022ccaaf44f99c0880f8186f9",
+      "after_sha256": "91a2bc31c0074d2446e2187792352a6b58729f1a9d783823ed7ef512730fab65",
+      "owners": {
+        "@document": {
+          "before": "914f5c3a9a5e998e357e8a72e48a64aa9d3d921022ccaaf44f99c0880f8186f9",
+          "after": "91a2bc31c0074d2446e2187792352a6b58729f1a9d783823ed7ef512730fab65"
+        }
+      }
+    },
+    "ci/test_shards/shard-7.txt": {
+      "before_sha256": "75cbeb060b99a81055394a9a3678cea97d089ae281a067e913b733f709ebe0aa",
+      "after_sha256": "c5e33cd3c4edb6489fb4ba684265b6dafff19a2b33b26ad011a288fe38a56283",
+      "owners": {
+        "@document": {
+          "before": "75cbeb060b99a81055394a9a3678cea97d089ae281a067e913b733f709ebe0aa",
+          "after": "c5e33cd3c4edb6489fb4ba684265b6dafff19a2b33b26ad011a288fe38a56283"
+        }
+      }
+    },
+    "ci/test_shards/shard-8.txt": {
+      "before_sha256": "2f7a2c7e110c44325309c3e1a82dd9cf0140c7a20c9cf43cdeaa598231688258",
+      "after_sha256": "df1da2f4978953b0c3704890d9a60de5fd81d5df120f287b0fa6f2f36f4dfea8",
+      "owners": {
+        "@document": {
+          "before": "2f7a2c7e110c44325309c3e1a82dd9cf0140c7a20c9cf43cdeaa598231688258",
+          "after": "df1da2f4978953b0c3704890d9a60de5fd81d5df120f287b0fa6f2f36f4dfea8"
+        }
+      }
+    },
+    "ci/test_shards/shard-9.txt": {
+      "before_sha256": "b21027bfceaf207a0e0ac16b933157997f03aa4529420745015da1dca5580196",
+      "after_sha256": "7332391265e97d32e22b35f0385ceefb2c6b5855c2328c4d3945d3fcee36535a",
+      "owners": {
+        "@document": {
+          "before": "b21027bfceaf207a0e0ac16b933157997f03aa4529420745015da1dca5580196",
+          "after": "7332391265e97d32e22b35f0385ceefb2c6b5855c2328c4d3945d3fcee36535a"
+        }
+      }
+    },
+    "contracts/examples/persistence/session-persistence.json": {
+      "before_sha256": "6484063f3bc0dfbf4a919b8a43a8ec83d8dce3aaf791bf705bb9d043dd3c0a31",
+      "after_sha256": "febfcf5fb77a8f55fc1c335fb2ea7af63407edc51fdc7a5f15b23b24193a0167",
+      "owners": {
+        "@document": {
+          "before": "6484063f3bc0dfbf4a919b8a43a8ec83d8dce3aaf791bf705bb9d043dd3c0a31",
+          "after": "febfcf5fb77a8f55fc1c335fb2ea7af63407edc51fdc7a5f15b23b24193a0167"
+        }
+      }
+    },
+    "contracts/examples/sessions/session-command-outcome.json": {
+      "before_sha256": "3d2a54414a120be7dbfe9d87fec98bb786cd166e9b01579655ca1153c67b64df",
+      "after_sha256": "2dbcf577e0bcb01f7c21189fb9e31112013ff15c13a1126b4b3a79c391c00d61",
+      "owners": {
+        "@document": {
+          "before": "3d2a54414a120be7dbfe9d87fec98bb786cd166e9b01579655ca1153c67b64df",
+          "after": "2dbcf577e0bcb01f7c21189fb9e31112013ff15c13a1126b4b3a79c391c00d61"
+        }
+      }
+    },
+    "contracts/examples/sessions/session-command-started.json": {
+      "before_sha256": "02cef4713f42f79af2291137012c590abc91b808ee872ecc0d186b2d38ca5b61",
+      "after_sha256": "5a697819f8a9207eb63d6a826191c9f5ee824974ef3f1afc6c99306e772ae709",
+      "owners": {
+        "@document": {
+          "before": "02cef4713f42f79af2291137012c590abc91b808ee872ecc0d186b2d38ca5b61",
+          "after": "5a697819f8a9207eb63d6a826191c9f5ee824974ef3f1afc6c99306e772ae709"
+        }
+      }
+    },
+    "contracts/examples/sessions/session-metadata-created.json": {
+      "before_sha256": "a2b90bf05a1246455e5ea92b0d2b92f5dbf87c3defb09a5907237063720b6e5f",
+      "after_sha256": "f4d7a4be649b6479698c32a84dd2de9e5f133340b57a6334a2796d31be648c9f",
+      "owners": {
+        "@document": {
+          "before": "a2b90bf05a1246455e5ea92b0d2b92f5dbf87c3defb09a5907237063720b6e5f",
+          "after": "f4d7a4be649b6479698c32a84dd2de9e5f133340b57a6334a2796d31be648c9f"
+        }
+      }
+    },
+    "contracts/examples/support-profile-player-a-redacted.json": {
+      "before_sha256": "0e16539c3127f65e9651035e8b1e62174c60053d460b38722ffc7d6bb4df81e6",
+      "after_sha256": "3e39e7a6cdaf0c6624ae967d11de8f94b69e9b9ef3650e42f4d09f3dcfca2341",
+      "owners": {
+        "@document": {
+          "before": "0e16539c3127f65e9651035e8b1e62174c60053d460b38722ffc7d6bb4df81e6",
+          "after": "3e39e7a6cdaf0c6624ae967d11de8f94b69e9b9ef3650e42f4d09f3dcfca2341"
+        }
+      }
+    },
+    "contracts/examples/support-profile-player-b-redacted.json": {
+      "before_sha256": "b40fd4beb7344966782bd556594333c493396a81475a6da97b1a0905a734b622",
+      "after_sha256": "564f8084381171998100c8c78d1b0cb6701bb107798088f00428be2ff1c5e93c",
+      "owners": {
+        "@document": {
+          "before": "b40fd4beb7344966782bd556594333c493396a81475a6da97b1a0905a734b622",
+          "after": "564f8084381171998100c8c78d1b0cb6701bb107798088f00428be2ff1c5e93c"
+        }
+      }
+    },
+    "contracts/examples/support-profile.json": {
+      "before_sha256": "303f706781571ef3e6329dcfaa9a7b66216eab89792910840f62c4389eea1e6c",
+      "after_sha256": "e0fdf813f5371f22966a916640d5355b0dbefcba8ab57acecf5643167ffdd6d4",
+      "owners": {
+        "@document": {
+          "before": "303f706781571ef3e6329dcfaa9a7b66216eab89792910840f62c4389eea1e6c",
+          "after": "e0fdf813f5371f22966a916640d5355b0dbefcba8ab57acecf5643167ffdd6d4"
+        }
+      }
+    },
+    "contracts/manifest.json": {
+      "before_sha256": "36f6ff588eefbf69108ecc69052f658cc60664e798ca7b7c3255e8f05b935f5a",
+      "after_sha256": "5fb36cfdcadd8c938c45af432988c23ae1bdc4918b31ce717e1897e07820a79c",
+      "owners": {
+        "@document": {
+          "before": "36f6ff588eefbf69108ecc69052f658cc60664e798ca7b7c3255e8f05b935f5a",
+          "after": "5fb36cfdcadd8c938c45af432988c23ae1bdc4918b31ce717e1897e07820a79c"
+        }
+      }
+    },
+    "data/source_audits/ci64_provenance_v1/ranged-attack-count-faction-repair-test-v1.json": {
       "before_sha256": null,
-      "after_sha256": "b8470c8120aec1d37ba72359d9e7376d57e55d3083c07f588aac20d1ba75ff35",
+      "after_sha256": "e6f609e4efb81fea31efaa37728b593febdd90f6d868f53d319f3e9213a237c5",
       "owners": {
         "@document": {
           "before": null,
-          "after": "b8470c8120aec1d37ba72359d9e7376d57e55d3083c07f588aac20d1ba75ff35"
+          "after": "e6f609e4efb81fea31efaa37728b593febdd90f6d868f53d319f3e9213a237c5"
+        }
+      }
+    },
+    "data/source_audits/ci64_provenance_v1/ranged-attack-count-reroll-test-v1.json": {
+      "before_sha256": null,
+      "after_sha256": "4e8aae570f710e916c1272cb8573c51aeb26d4b07bb54ebc64f548796852c287",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "4e8aae570f710e916c1272cb8573c51aeb26d4b07bb54ebc64f548796852c287"
+        }
+      }
+    },
+    "docs/ADAPTER_DECISION_CONTRACT.md": {
+      "before_sha256": "3ad5a6f19b15c7fe3a83527eef9c42c0ac27a2499274aab37997b2f670e6d108",
+      "after_sha256": "a02ce5add787ea9c60d935b48ef3e542552f2c0290dbcd0a204519c09ef39efd",
+      "owners": {
+        "@document": {
+          "before": "3ad5a6f19b15c7fe3a83527eef9c42c0ac27a2499274aab37997b2f670e6d108",
+          "after": "a02ce5add787ea9c60d935b48ef3e542552f2c0290dbcd0a204519c09ef39efd"
+        }
+      }
+    },
+    "docs/performance/current/ranged-attack-count-reroll-dice.json": {
+      "before_sha256": null,
+      "after_sha256": "f939fe58259be5f01bcfd068c8ed898cec1ad602c7fa7cb69e63103a0b337ca8",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "f939fe58259be5f01bcfd068c8ed898cec1ad602c7fa7cb69e63103a0b337ca8"
+        }
+      }
+    },
+    "docs/performance/current/ranged-attack-count-reroll-fight.json": {
+      "before_sha256": null,
+      "after_sha256": "01b72b2222f6f15230977ea898ba7b460950faff4e919f26c365513dc78878a5",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "01b72b2222f6f15230977ea898ba7b460950faff4e919f26c365513dc78878a5"
+        }
+      }
+    },
+    "docs/performance/current/ranged-attack-count-reroll-player_boundary.json": {
+      "before_sha256": null,
+      "after_sha256": "744eb76e1cd8522d2bacdb6200638fd8a8207dea5ae5bf2487c9f081b6644a32",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "744eb76e1cd8522d2bacdb6200638fd8a8207dea5ae5bf2487c9f081b6644a32"
+        }
+      }
+    },
+    "docs/performance/current/ranged-attack-count-reroll-precision_grouping.json": {
+      "before_sha256": null,
+      "after_sha256": "aed8ae2e7297413baafc0ff34e004452398e4abf3d44f0500fbd63b13b55d4d6",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "aed8ae2e7297413baafc0ff34e004452398e4abf3d44f0500fbd63b13b55d4d6"
+        }
+      }
+    },
+    "docs/performance/current/ranged-attack-count-reroll-reconstruction.json": {
+      "before_sha256": null,
+      "after_sha256": "fa908ce20fdb5ad3c8216fb8cfbc57058d5220946fb4f747a8c049f65a2f5db4",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "fa908ce20fdb5ad3c8216fb8cfbc57058d5220946fb4f747a8c049f65a2f5db4"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "d5a0255320e72bc6e0d2dd6600a92368ccc0719f4333d2adf43276c20a70809d",
-      "after_sha256": "632076d9130b39176f1c71770216125c137650f4cfc338d108946cd38556c90c",
+      "before_sha256": "632076d9130b39176f1c71770216125c137650f4cfc338d108946cd38556c90c",
+      "after_sha256": "7b4ff22273cb16c190fe4270bd9f94fee88e3f7250ddd0798165a1dc7d987bc4",
       "owners": {
         "@document": {
-          "before": "d5a0255320e72bc6e0d2dd6600a92368ccc0719f4333d2adf43276c20a70809d",
-          "after": "632076d9130b39176f1c71770216125c137650f4cfc338d108946cd38556c90c"
+          "before": "632076d9130b39176f1c71770216125c137650f4cfc338d108946cd38556c90c",
+          "after": "7b4ff22273cb16c190fe4270bd9f94fee88e3f7250ddd0798165a1dc7d987bc4"
+        }
+      }
+    },
+    "scripts/engine_numerical_identity_test_admission.py": {
+      "before_sha256": "f32a402603afeedb499453d313a584587c56db89b889996705e2accfbaba412c",
+      "after_sha256": "93d8a28611f8050fde12d24eb1329b9a5ea7b8451561bc2b881f86ca7261f17f",
+      "owners": {
+        "_counteroffensive_fight_type_transition": {
+          "before": "77ac9f6a04679a572642d1ccfdeb06b401a0740becae8f78d1e94c6350a4bd09",
+          "after": "5145da4e509d44ffe81a4b8bc12e7eea878972ca302e1f8847e8a722970e448b"
+        },
+        "_stage2_fight_successor": {
+          "before": "1a690eb71fbe76fc430de78d0c8afb94290f4a4d89447dcfc6e4f435e7cec0ae",
+          "after": "a29117f0efc189f4ce3cbb6c7f033843baf1a22d039a85ea47cffb6a9daefb6d"
+        },
+        "combined_charge_runtime": {
+          "before": "80aa63de33616daad761120370fc65110e67aaa34db390c8f01e073f37f420ea",
+          "after": "a7aa231cd44ed6b691c12126dc4f5c786bad29273099bd4a9abd9879661b11a3"
+        },
+        "exact_movement_test_transition": {
+          "before": "79f7bac02c3072f4e785b44add87c83c7d318440e45f52ae6cb02da0da1de6fc",
+          "after": "7130a6749e2fa79fb46e99623aed06d49cd88f5db0f310c1b0821667982e6c8d"
+        }
+      }
+    },
+    "scripts/measure_precision_grouping.py": {
+      "before_sha256": "0b0e63cba0ef8457f20ba2aa5bb4028018ef11b4a0e2cc932868534bbc76a5db",
+      "after_sha256": "0b1616d8b00696d85a728d22087940526e6e684bef46b1a3ef8432c10ecbe297",
+      "owners": {
+        "@module": {
+          "before": "468cc113a8203d5ac8dd4057785ba689fec185afc09be7fe00c26b19873e963d",
+          "after": "2999497abc3159a77f7acd0191dc24b92056f491260dd1932a28885ed6899b6f"
+        },
+        "decline_command_reroll": {
+          "before": null,
+          "after": "a6e4ba4797d619b02ee013dce7091b4d07cd13b53ebe0d61c9f7df9396529b24"
+        },
+        "main": {
+          "before": "5659007e6ee05a55eba6c856db228025586bcb68901dff65eb0c3b780b76792f",
+          "after": "931ba7483b3accc68c55aa333ead0d0f7423bc72e5d11f0bc2db2b944d14720e"
+        }
+      }
+    },
+    "scripts/ranged_attack_count_test_admission.py": {
+      "before_sha256": null,
+      "after_sha256": "44b4ae9b4026f52b0a9a9b7edff2781bd499a5051552a940c4b45ad426b299d2",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "8575030679bee9dee68c81024512006cafa458eff07cbcac9b1272f75f3e7e3a"
+        },
+        "RangedAttackCountTestAdmission": {
+          "before": null,
+          "after": "be10b781d78961661eed4a701758c1474848ae97f5e21d69ea9c4b0805c0d8c2"
+        },
+        "ranged_attack_count_faction_successor": {
+          "before": null,
+          "after": "aab55e02a82c93134cc098e93d36b147e1b22034f38ca7cf9fc17962957ea19b"
+        },
+        "ranged_attack_count_runtime": {
+          "before": null,
+          "after": "d5114985e06b4b6ceb88abf82bb52c790a86e9a3b9bbbbdec7ae66aedf6a3b09"
+        },
+        "ranged_attack_count_test_addition": {
+          "before": null,
+          "after": "bb7e0b5759918274389e308007dc546ccbbb4191c69860f924aeb4a24f3bfffa"
+        }
+      }
+    },
+    "src/warhammer40k_core/_engine_build_manifest.json": {
+      "before_sha256": "1abd6dc0c5b0b4b994c29d1064cdb0a4dacb571ba588c33f26937a68f2766df7",
+      "after_sha256": "404eedf82536aa16a2c601963cba079a3a707c17c82727cb3a16d044aefa72bd",
+      "owners": {
+        "@document": {
+          "before": "1abd6dc0c5b0b4b994c29d1064cdb0a4dacb571ba588c33f26937a68f2766df7",
+          "after": "404eedf82536aa16a2c601963cba079a3a707c17c82727cb3a16d044aefa72bd"
+        }
+      }
+    },
+    "src/warhammer40k_core/adapters/redaction.py": {
+      "before_sha256": "5e07178315b41f8ee8a1e83d21c05c480974a3dbf90c6bb9d7b4d4972049a57e",
+      "after_sha256": "1e546ba726c5093771fd298ee62842094ae8b25d5ce09f372d414dd0e58f57d0",
+      "owners": {
+        "@module": {
+          "before": "57db02e4eb736c5b7f12ed4aa49aa30bb4a12e0f45ef28b9ca53da6b791072b1",
+          "after": "23fee86b534137742b59acc78d45fe6ba6bfa9d02bf76342b8a14fad94ad8d20"
+        },
+        "_decision_hidden_from_context": {
+          "before": null,
+          "after": "3b0bb2d447364540f372e2739fe42080c3400c9129b0a8a1c62fb4012a5f26c5"
+        },
+        "_event_record_hidden_from_context": {
+          "before": "d75d227090f76975870618dd55e0b354215a3d4080d3f4433db4eb7d8e322d7d",
+          "after": "61f8bd16679f3813f07d5f1e627f176f49f86fc9595541350f387756c7b7ff6a"
+        },
+        "_public_event_payload": {
+          "before": "a45ec39040ac68f55ab010d5e09bcdcc5e9931d4197ef25cb05c26c69efead18",
+          "after": "d96720658bd0997a9377572a8a33b760a9bed5d63589f6fd3f6972fadc5ab3e5"
+        },
+        "decision_request_hidden_from_context": {
+          "before": "c42196803ea95ec129bc470bced81848c65aa5f9f644e47e2c8ddaa027c0e6a2",
+          "after": "921301cc81408039a79cb4c17aa406c8b3bcfeca8f68a10ffa231b09c9c37152"
+        },
+        "decision_request_payload_hidden_from_context": {
+          "before": "aad7b6a2b1f39d741c37f6ec900f6d08da0193e1038f4b34cd405ca9e2bbb50e",
+          "after": "b487cedcd52fa93071dd7470f30b1f2ca8d58d587ac1d36a997e50f6cdccd0c7"
+        }
+      }
+    },
+    "src/warhammer40k_core/adapters/viewer_identity.py": {
+      "before_sha256": "50cb7565c984e288ba2b2fa9ffb1dbfe6c6a83c648e5de4522d239899032418f",
+      "after_sha256": "efb84a68c9da0d794f94f528b7d7eb1c1c4a50d899b8293e20c51fcc795b434d",
+      "owners": {
+        "_identity_family": {
+          "before": "7b9508e836582d4aa8ef0818139709e5df3f811b85e7a39a2bccf38475054de5",
+          "after": "9d568b5367089650907607365ceda4bdcfb1aa7cfe4182fe22c60d32c2536913"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/attack_sequence_dispatch.py": {
+      "before_sha256": "6c79b3635bbb0c268538c4a820180ca261255d5bb8701bd710527510d5b9540c",
+      "after_sha256": "45731a47b04fb9318110dd123dce761446e5eb2c0248c95c7c6718cba2935401",
+      "owners": {
+        "resolve_attack_sequence_until_blocked": {
+          "before": "4a7658118117ddc7f88b4ed828cfaea5b04862c2923a4c31f280c4f73b9e711f",
+          "after": "81833e1b7f03757eeeadd22445ceae6f53f28e45dd86ffc2f0c769900250d2dc"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/attack_sequence_model.py": {
+      "before_sha256": "f8e6f1376edf76fd5232376d8208a9abb0f9a2bf1f0cb2afa1161a918bd2ce98",
+      "after_sha256": "11db8ae0460ab80bc1b809e15228d00f3c9f52d6c837ba57cc7c25b62fc5a89f",
+      "owners": {
+        "GatheredAttackContribution.__post_init__": {
+          "before": "7349000287bb6b2ce3d3859feedc1b09b1b1ae5f760add302588ba09b9cb02ca",
+          "after": "58fa0880570e7dfb2e59759c9a0ae1d0774af737f9f517d01ccce470b36bc007"
+        },
+        "GatheredAttackGroup.__post_init__": {
+          "before": "95bc06d45d15ec9484f998f76067ca7b7399536ff1402567f7caede902ef49a3",
+          "after": "aa0ea2280a55410f048e4ff010c4ee8b261e1d0ef5fa6dc1e11ae883afcc8b6e"
+        },
+        "GatheredAttackGroup.counts_pending": {
+          "before": null,
+          "after": "17bd803e54d4a26c67ce51322242335685364f3b70cddf919e3c59208a4d73d1"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/attack_sequence_state.py": {
+      "before_sha256": "1d9099f3042b97dd9ffd68ad52cf3a67d94fbc2d52fd9add723746cf623e604e",
+      "after_sha256": "6c70fd872c06dd52beae0a2ceba35378be1da6760a031417f29a3093977d5df4",
+      "owners": {
+        "AttackSequence.__post_init__": {
+          "before": "6b8ff3a549de38e48602fd5cd1c939527c125294f7493e6379878d9040a97f9c",
+          "after": "b0e6ba2519a5c9f3dde9bb846ad2edcc5a9d60817c4039090917ee5c0151d4da"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/model_attack_completion.py": {
+      "before_sha256": "4a1746d6fcd2b3cf4da4d316ac47ebbfbcf084d9ffc8a5f2743b8c0447e6f4f5",
+      "after_sha256": "b10a28f500438114910bebb1017d37f1cc52c15dfa929dde74533ae9100f7dd0",
+      "owners": {
+        "resolved_model_ids": {
+          "before": "f5f80013eaaf5b6d8172e0e99421607d40754c7469e49aeb8a473a90a5315968",
+          "after": "30ccc654b7708dd990fe1e6fcb58916540b1d183cbcceb27cc1b71e22061e9f4"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/phases/shooting_declaration_validation.py": {
+      "before_sha256": "35ccf93b335288913b598663310e6f37cc8322bb06651506c5b28c910197b80b",
+      "after_sha256": "2d08dd00f8bd0817a733a713a842ed4935f2684951d5ee022d4ff7d9f3945052",
+      "owners": {
+        "@module": {
+          "before": "40df0be78bb50d69e235c8f0cb924e1559bb3acb46638caf57c98d31ac22c990",
+          "after": "2301c414a56280c325c68839ac05d1d9af45e669ababd2811dc23457901e60f1"
+        },
+        "_attack_pools_or_validation": {
+          "before": "db54767dea297ed0562ff72614fd04be34cad9b34f55f964fdb3ce651df331e6",
+          "after": "63b0766544dcf4b51b7506dcbacd3018ec031690e8f1c9bbe07e3e80dd2f5f5e"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/phases/shooting_handler.py": {
+      "before_sha256": "bd51bf8f09cf70635d7dab3fa36bffbf5ffbd81aadd8ec3e568a8480ec318ada",
+      "after_sha256": "91d8655257d0faf2519a5b122d917720f0baecd4e8712c0384e18ccac86a0a92",
+      "owners": {
+        "ShootingPhaseHandler.begin_phase": {
+          "before": "47c935666896723fb07c99cd69cad38b5ba82265f16d7bec877ce775e51dbf6b",
+          "after": "cf565ab83c726e3ab96e43877942a89e23406b1195fb25849250a526aa1d8e80"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/random_profile_attack_groups.py": {
+      "before_sha256": "7801bbfc569fec0936af85eff7f4182062d27ea5662ff1230c89495d0805e9c0",
+      "after_sha256": "2a9db73d617b7fe167a5734c558dfcc01397c086287749c293fd0a5108d95edb",
+      "owners": {
+        "@module": {
+          "before": "4f7baab7a342e5795da5aed83ad5517b0fe6a04f2b6041a08efe18818db4d93b",
+          "after": "a3053a8da0c072c5e9b14a3385ae1f5e24c5712df354144fe646562196a21637"
+        },
+        "validate_profile_attack_group": {
+          "before": "bcfbc4c5d7d3a91ac41b0dcacaff72e37e687253bf15a03287d7a6e76474f9b8",
+          "after": "1ccaabcde614715d122a62466386518f6e851fc3c3fb3cfa2d3c9a428f3da92b"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/random_weapon_restore.py": {
+      "before_sha256": "b6e5588ba8c6bac4487581d0fd796fe6c22880661c396a7bb8313ca5b9c3e253",
+      "after_sha256": "f288dbdbc6953a672273fc11be284d3d3b7c4d50f18e9b163cc570049d48c6fe",
+      "owners": {
+        "@module": {
+          "before": "55c6fa23a4b39ceef9385c8226db3131364dbaa88c992d6db3b04a3d5dd564ef",
+          "after": "153ef5d1992cf75373770a8d2be75f0827b5f7764b3b08d94b600bf2b4feae65"
+        },
+        "validate_random_weapon_history": {
+          "before": "354779d0e4b7203d403df3cb67b6492bc221a72d2d33e922c8ee26638823d485",
+          "after": "93e7df1d2e7670d2497ed975c9b77a77dc269ee226d460ac671297d1fbde414e"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/ranged_attack_count_gathering.py": {
+      "before_sha256": null,
+      "after_sha256": "70c8386fe482f42aad773208c819c580df214a1b79efc58dd7ff436ab64490a1",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "2a15c82f208c7f8b5c1d42e439cb1a2a6372d6797d71b3bc99c9937b0293e4dd"
+        },
+        "_count_roll_spec": {
+          "before": null,
+          "after": "16a19b9ac8f6978fb789b4cb7effc9989b10ca75be8b12b9016f676e84d0241d"
+        },
+        "_current_count_roll": {
+          "before": null,
+          "after": "e5209c003baaebbf183299834ee1cff66568e7f083dc706cef7a5f97d6903584"
+        },
+        "_original_count_roll": {
+          "before": null,
+          "after": "c6aa5e87c366b826b70dd950bb6e77b9f071f4d3309e38bf3c731a8cecbdeadf"
+        },
+        "_resolved_count": {
+          "before": null,
+          "after": "91e1daebd2ea09099f17a22ed4a9faad40358d175d99cd869c1d6dc5fd101fc5"
+        },
+        "_selected_group_event_index": {
+          "before": null,
+          "after": "573b5b4d292bf8b656a8d8601e5feae9284aa32e7bcd33e678df8b981c34fb40"
+        },
+        "apply_ranged_attack_count_evidence": {
+          "before": null,
+          "after": "6e5ce29d81e3cb8d88e21ce37024ea8d969b9c4f09d85aac9e0c16a183009204"
+        },
+        "gather_ranged_attack_counts": {
+          "before": null,
+          "after": "118cafc630e5861c39f6113991b267e08a7200efc6273545efc1c69931bc5142"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/shooting_target_replacement.py": {
+      "before_sha256": "ece36e1b82ba325d82adf47fe42b4bf4a571ff08a490ee5647e82fe095f62272",
+      "after_sha256": "f64fa353bd84472d512d710d543236e2c1fa45e0c3264b52605447147298d41f",
+      "owners": {
+        "_base_attacks": {
+          "before": "a704a67914df4a8d7d2c51db97d34620a213bae605274fca1491cb450e416aeb",
+          "after": "84ac1d6add9919929da73accbcbf6794289f69cf15a2d64599449d2e85b1f3ca"
+        },
+        "_candidate_pool": {
+          "before": "30381c953df1c31d61bd42a6e53772b12dc2167d2dd2b5e1234499723e145f7b",
+          "after": "2d27abb9677077bd8b214a9052ccdb5d148694852371b6f568233f10a2f20c4a"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/shooting_target_replacement_authority.py": {
+      "before_sha256": "ac70ae498485e9e65090e3033d0f59b4bfcbd04679782556d462dae1117ad466",
+      "after_sha256": "f2a3c9110ca9c60a6fe8a5e506b603ff6ad4d8a2076a713d6702777efe7021a3",
+      "owners": {
+        "@module": {
+          "before": "226c567768b456084a4defc8f82664e3655f14534f15eb68492dc241b04cf1a8",
+          "after": "5ca6b303b4d836b80692787eddfc596ca98afa141ada2c44624872b4e20dc818"
+        },
+        "_validate_sequence_history": {
+          "before": "8b05ecb40db20cadcd2a866b07797164b661f1a73e800fe203109b727c9952a2",
+          "after": "fd7c97e868f2b60c459f4efd563da40be6fcdc8b446a6454c2c821661fd2a1bc"
+        },
+        "validate_restored_replacements": {
+          "before": "0d10d9ad818c2c4d93af8addd9519aea00f71ace13f17c14d1dee0455f38d83e",
+          "after": "27ecafe8dc9846e1d2082282583e3255f1568d76afd8dd5f35b74a9b2aeb6787"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/stratagems_core_handlers.py": {
+      "before_sha256": "45910f0afb0dafff39b674e8c39f3f45c076063a08da427e5c04b65ebae195af",
+      "after_sha256": "7a571ae0f619a69d2b28f704a14aed73b08b662c95d468ab27cccfffa0e70e7f",
+      "owners": {
+        "_apply_command_reroll_handler": {
+          "before": "41915fc8671fc49d8bcfb5fb3c5104130a2be240a44611131bd0640af0ae64b5",
+          "after": "ab845a35030b801c1827c55d5aae453dfc858dec4933592cdaec600dfc9909e4"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/weapon_declaration.py": {
+      "before_sha256": "18a25c378402582462d0d656147971cc1285905342febf4efa12e4d4b8cdc2a3",
+      "after_sha256": "2400ec15aec76ec456945ec4b27e52a411ced5f42056d7adcb82711600dcf301",
+      "owners": {
+        "RangedAttackPool": {
+          "before": "32308bb0a747665736b7bf120a8766720c96d7a20132b01d70266a6f5533e6c4",
+          "after": "ac190eb030c73d81206ff00c638f284a9e099b7b051809e7a74b5a1211b49f55"
+        },
+        "RangedAttackPool.__post_init__": {
+          "before": "d5581198ea8282686aec5f3d76706badf2a19710d39b6b8fb16039fd73e072d4",
+          "after": "7b2f1b23b18b5d99f0cf2a2efbc00d11a95809187f9fd8f1b000ec5c1f3994b0"
+        },
+        "RangedAttackPool.from_declaration": {
+          "before": "86667d7282e52a58a9f159eb6d37df173e41c0582101c9dcef0356c8375dc303",
+          "after": "8ed3871f97c7bf7ee2c45132d44bb865dfa8951ef96501077c93f4a0d770fb59"
+        },
+        "RangedAttackPool.from_payload": {
+          "before": "497afccb500029cb0c0b727ced5ea3f5e624d5a1312a3814d941ccf07dea2c06",
+          "after": "f05df696a0cd96c0caf0b883423d53a539777b506f11de4ce3c7946616c98b85"
+        },
+        "RangedAttackPool.to_payload": {
+          "before": "4108bb1aeaf36e1f16f7eae70b70353b14888b924f56b848765c7453e2b811f7",
+          "after": "26f837b0f18af1725f432480d36d95ded1d0f57e29b360dc0b1c3536b7aa2c17"
+        },
+        "RangedAttackPoolPayload": {
+          "before": "dc677174b09a9402d2d710df3e9b61bc7af93186ca4718df77b3d77863d26b8e",
+          "after": "c3439c74a35dcac32c45571a5f7d2d89dbd299fb81f34cce994155deb279645b"
+        }
+      }
+    },
+    "tests/code_quality/test_engine_numerical_identity_admission.py": {
+      "before_sha256": "5dad52ced7d39565be3589ee852a5fcf8a533328af0bf66f87f6eefa65c5194b",
+      "after_sha256": "cec7aa109dd4e0e75a7ac28b19e99a4981099e964307a92f903f819c6edf6b4c",
+      "owners": {
+        "test_identity_inventory_uses_current_twelve_shards_and_native_cohort": {
+          "before": "160f27e72f3da8803bc40133f4a5b0e5810943100b1497d7fc22f56d61c985df",
+          "after": "843b0a5b7316671bc05af30f2658c63f88d129209473fecb6381b36d336004a8"
+        }
+      }
+    },
+    "tests/factions/aeldari/lhykhis_helpers.py": {
+      "before_sha256": "d4d51e6c63e2ec40b95378c40abd37b733ac2cf0573892f0795c37d2931ea48c",
+      "after_sha256": "4f5b44874eba09f5fee7e83a034c5739272a4eb32a3a573ef55e80bde6b735d8",
+      "owners": {
+        "assert_native_source_loss": {
+          "before": "b424fc63a82929d968381fbd9f011d75c3460a65de5cc94dd75c4ca072fc74c6",
+          "after": "0fce28fd43e2954418e83341a4750bc4d89dae0453de04427ec59bca70221082"
+        }
+      }
+    },
+    "tests/factions/aeldari/lhykhis_scripted_attacks.py": {
+      "before_sha256": null,
+      "after_sha256": "3a01478cb8738fca0a6ae8f0d71c56d50810ab2c7e071bd3c2146b400a9f6cc0",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "74189d852d1ca50dbe4705727e289f34c14bed6bed9c62840670068949291e2f"
+        },
+        "_attack_id": {
+          "before": null,
+          "after": "c56d5afd63fe00f7f68e0cb6f89a7890c08027c1c726d6be345ad61e7cc91723"
+        },
+        "scripted_charged_fangs": {
+          "before": null,
+          "after": "3a9108b36b05bfca50f0eba0ac2ab595ed84b34a04f375986342a292f7ac375d"
+        },
+        "scripted_six_brood_twain_wounds": {
+          "before": null,
+          "after": "080669a171e396760ccf26ebb01d23eb199117d5aea9b76ac93c13b063389711"
+        },
+        "scripted_walker_lethal_attack": {
+          "before": null,
+          "after": "80ed70d30ada567e9b7242d79ef62490d81cb5f7c1c6e977df13cd212059b762"
+        }
+      }
+    },
+    "tests/factions/aeldari/unit/test_lhykhis.py": {
+      "before_sha256": "66c8ff780fdc4b279d3a3de54ed04b0109d4adc7d919f55ce5daf1a819c9648d",
+      "after_sha256": "1b79a222104cb022be11159cde064a1ef1ec23b1f76744f4391f075975dc0b36",
+      "owners": {
+        "@module": {
+          "before": "dbff6ff475c82800d09ab7f34f958b65e9fe5f013cbf1a8340e1c44e8b22dcc9",
+          "after": "578c4a4264d8d12500788cb0293a4dd5a560ecd8a25beef3e69096eb783acf4d"
+        },
+        "_assert_charged_fangs_use_natural_four_and_five": {
+          "before": null,
+          "after": "fa932c9759e044ae53b6ea131a8a674c4f8f84394ab82da9d6940ef7a8793f06"
+        },
+        "_assert_web_choice_replay": {
+          "before": null,
+          "after": "26a74e4b5523ca1644c411c00e55d9720d34b3b4f4663b632cd7e48e651eebdc"
+        },
+        "_assert_web_shooting_end_replay": {
+          "before": null,
+          "after": "d385e0c21e1e5e56a29f7b955248de5ef9d8b46065cd79da1ef6ee35bd26e0b2"
+        },
+        "test_native_attached_target_survives_bodyguard_loss_with_same_mark_identity": {
+          "before": "ec364cf7fe893e1fa43e4f96b2ed4f78edd31d481c710aaaf13126aab46ac98d",
+          "after": "55604f9dcff41eb05d53cfbff8f3f51d34b4395dba220f524685bed9cd6a54a7"
+        },
+        "test_native_charge_fight_critical_five_is_lethal_and_turn_expiry_replays": {
+          "before": "6bce691cddb8ed4a18ebc2269ee2bbf8cf81fb406e8a01ee22fd37a8fef9af93",
+          "after": "8cfe080d0f2ba0961d81f5675c824b5066747e0523af1f61a183062126de2b75"
+        },
+        "test_native_source_last_killed_target_has_no_selection": {
+          "before": "34f92c271dbf66990f8cddc428523a02b5b1a5933679b3ba1f0ccf45343688ba",
+          "after": "2918d54936c78ecf31129e5676da0fcafd0cd2115a81d69e0cc91f613005f242"
+        },
+        "test_native_torrent_hits_without_damage_require_target_choice": {
+          "before": "71bc8b2d4c52eb79f3ec4af8eb8cd019c9fb9052563f619532c0d19e55811b82",
+          "after": "4809b0d4e251522a1fe43e91c811c2f8c4677a3094ff4d6ef68858e29cb3eb54"
+        }
+      }
+    },
+    "tests/factions/emperors_children/test_selected_consumers.py": {
+      "before_sha256": "2061271c9ff1ef95c9b1c12b2ad9771e57890ead2be9eafa27286a1ec4618876",
+      "after_sha256": "12c34f1e7a1b0e5ac5bb58e874caad5361092e4fff196a53091c5880f1b58176",
+      "owners": {
+        "test_two_native_sorcerers_wrack_the_same_target_without_stacking_movement": {
+          "before": "9a8abdbb7586f4dd95837dceb9986277ba392ba5c023706c194c1edaa7e43ee6",
+          "after": "785a8fcd4881bfe035c994e379f7ea37386b14f792122a52ab6fb42151d85685"
+        }
+      }
+    },
+    "tests/rules/section10/test_random_attack_count_reroll.py": {
+      "before_sha256": null,
+      "after_sha256": "2e86c64f637a94faa7d221ac3237b2063077843bfc8ba475b53c6430cb25d212",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "890964da0ef3d2137aaf10f23196024e4fc5da47a2ada8f64050a025cda1b7a4"
+        },
+        "_answer_ranged_count": {
+          "before": null,
+          "after": "f9ab9a95e217f91a7bed173b934de17ec6f3e1acb8c322d70b4522e9edfb6cd5"
+        },
+        "test_native_fixed_group_resolves_before_unselected_random_attacks": {
+          "before": null,
+          "after": "b3ff0834f2d8fc8735142f0410b668761b40b07ce79ea5a3da42e6fe1ed5b307"
+        },
+        "test_native_group_rolls_separately_for_two_physical_weapons": {
+          "before": null,
+          "after": "d3c84864bce41ea5046adc20b0d162d18a04d6374957edf6a4c6334a34e6c334"
+        },
+        "test_native_random_attacks_choose_then_gather_and_reroll": {
+          "before": null,
+          "after": "aefd02f7d8c0989a470c571dfb158062a887e79d42e0ebc21fe10f7ff0ee8066"
+        },
+        "test_random_attack_count_window_restores_and_replays": {
+          "before": null,
+          "after": "76d99abe9ab03ecb17f83304441c074bd4e440d8b7f9ce148468f4c10cfcdd4f"
+        }
+      }
+    },
+    "tests/support/scripted_attack_rolls.py": {
+      "before_sha256": null,
+      "after_sha256": "66bf93b7eb13f240faaa44092bc9630d563515731fb1b74d10a948743418827c",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "637f606e523dc00fa8496ac5a8727469e77b5725cd1e0785cacd480b07e41431"
+        },
+        "ScriptedAttackRolls": {
+          "before": null,
+          "after": "765c4bb48137387555405e856e6d8ca59c7838e168b02c74a7650e66a2cd85c9"
+        },
+        "ScriptedAttackRolls.__init__": {
+          "before": null,
+          "after": "3f86a73c8089c58bdcf05e68091b2caef6a056d58de9c51125c436e334ded3c8"
+        },
+        "ScriptedAttackRolls.assert_consumed": {
+          "before": null,
+          "after": "e6ee88fa4b7ab8dbebaebff60611f7a9324ec9f6f2313c1e83057072a27d7b30"
+        },
+        "ScriptedAttackRolls.run": {
+          "before": null,
+          "after": "95ebaa763d0e5912db7155e28aba3ffa0fd8b67a912c47b9a4816860642f3b19"
+        }
+      }
+    },
+    "tests/support/sorcerer_native.py": {
+      "before_sha256": "042fc1d07be4fadf127af57377de229ee999f78afc383dd6ab3ecea911d78362",
+      "after_sha256": "785b4e9001d10b51d80cca67e67692c0b76f243450e4efb9f3d0b685ec957733",
+      "owners": {
+        "@module": {
+          "before": "c26e86117c2ff9a822e0543b5573bb741b23bac3567eaeaadc6bd75a5c3e0fc4",
+          "after": "c3b8836e6813149fe83421ca16769a095a7783a956a4641a758d8b90628c9abc"
+        },
+        "scripted_wrack_rolls": {
+          "before": null,
+          "after": "c0ae21c703e9fb0051260dc4769a14e4380b37b8b4a4d184b2501e4e3a1b31ab"
         }
       }
     }
   },
   "rows": {
-    "data/source_audits/caudit_01_successors/batch-2/README.md": {
-      "category": "rule_semantics",
+    "ci/test_shards/durations.json": {
+      "category": "measured_workload",
       "operations": [
-        "caudit-01-successor-evidence"
+        "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Records source bindings, historical review dispositions and scoped local diagnostic evidence for the Core rules audit.",
-      "source_obligation": "CAUDIT-01 links the completed Order 135 reconciliation with selected and bounded native witnesses.",
-      "unchanged_work": "Runtime inputs, dependency identities, test selection and measured workload are byte-identical to the exact base."
+      "rationale": "Add measured scheduling costs for six native cases, retaining all 6,819 base case weights and the twelve-shard planner.",
+      "source_obligation": null,
+      "unchanged_work": null
     },
-    "data/source_audits/caudit_01_successors/batch-2/historical-reconciliation.json": {
-      "category": "rule_semantics",
+    "ci/test_shards/shard-1.txt": {
+      "category": "measured_workload",
       "operations": [
-        "caudit-01-successor-evidence"
+        "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Records source bindings, historical review dispositions and scoped local diagnostic evidence for the Core rules audit.",
-      "source_obligation": "CAUDIT-01 links the completed Order 135 reconciliation with selected and bounded native witnesses.",
-      "unchanged_work": "Runtime inputs, dependency identities, test selection and measured workload are byte-identical to the exact base."
+      "rationale": "Add measured scheduling costs for six native cases, retaining all 6,819 base case weights and the twelve-shard planner.",
+      "source_obligation": null,
+      "unchanged_work": null
     },
-    "data/source_audits/caudit_01_successors/batch-2/open-evidence.json": {
-      "category": "rule_semantics",
+    "ci/test_shards/shard-10.txt": {
+      "category": "measured_workload",
       "operations": [
-        "caudit-01-successor-evidence"
+        "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Records source bindings, historical review dispositions and scoped local diagnostic evidence for the Core rules audit.",
-      "source_obligation": "CAUDIT-01 links the completed Order 135 reconciliation with selected and bounded native witnesses.",
-      "unchanged_work": "Runtime inputs, dependency identities, test selection and measured workload are byte-identical to the exact base."
+      "rationale": "Add measured scheduling costs for six native cases, retaining all 6,819 base case weights and the twelve-shard planner.",
+      "source_obligation": null,
+      "unchanged_work": null
     },
-    "data/source_audits/caudit_01_successors/batch-2/source-adoption-map.json": {
-      "category": "rule_semantics",
+    "ci/test_shards/shard-11.txt": {
+      "category": "measured_workload",
       "operations": [
-        "caudit-01-successor-evidence"
+        "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Records source bindings, historical review dispositions and scoped local diagnostic evidence for the Core rules audit.",
-      "source_obligation": "CAUDIT-01 links the completed Order 135 reconciliation with selected and bounded native witnesses.",
-      "unchanged_work": "Runtime inputs, dependency identities, test selection and measured workload are byte-identical to the exact base."
+      "rationale": "Add measured scheduling costs for six native cases, retaining all 6,819 base case weights and the twelve-shard planner.",
+      "source_obligation": null,
+      "unchanged_work": null
     },
-    "data/source_audits/caudit_01_successors/batch-2/successor-evidence.json": {
-      "category": "rule_semantics",
+    "ci/test_shards/shard-12.txt": {
+      "category": "measured_workload",
       "operations": [
-        "caudit-01-successor-evidence"
+        "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Records source bindings, historical review dispositions and scoped local diagnostic evidence for the Core rules audit.",
-      "source_obligation": "CAUDIT-01 links the completed Order 135 reconciliation with selected and bounded native witnesses.",
-      "unchanged_work": "Runtime inputs, dependency identities, test selection and measured workload are byte-identical to the exact base."
+      "rationale": "Add measured scheduling costs for six native cases, retaining all 6,819 base case weights and the twelve-shard planner.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-4.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Add measured scheduling costs for six native cases, retaining all 6,819 base case weights and the twelve-shard planner.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-5.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Add measured scheduling costs for six native cases, retaining all 6,819 base case weights and the twelve-shard planner.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-6.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Add measured scheduling costs for six native cases, retaining all 6,819 base case weights and the twelve-shard planner.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-7.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Add measured scheduling costs for six native cases, retaining all 6,819 base case weights and the twelve-shard planner.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-8.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Add measured scheduling costs for six native cases, retaining all 6,819 base case weights and the twelve-shard planner.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-9.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Add measured scheduling costs for six native cases, retaining all 6,819 base case weights and the twelve-shard planner.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "contracts/examples/persistence/session-persistence.json": {
+      "category": "measured_workload",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh authoritative build identity and dependent examples for the bounded gameplay change.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "contracts/examples/sessions/session-command-outcome.json": {
+      "category": "measured_workload",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh authoritative build identity and dependent examples for the bounded gameplay change.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "contracts/examples/sessions/session-command-started.json": {
+      "category": "measured_workload",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh authoritative build identity and dependent examples for the bounded gameplay change.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "contracts/examples/sessions/session-metadata-created.json": {
+      "category": "measured_workload",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh authoritative build identity and dependent examples for the bounded gameplay change.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "contracts/examples/support-profile-player-a-redacted.json": {
+      "category": "measured_workload",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh authoritative build identity and dependent examples for the bounded gameplay change.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "contracts/examples/support-profile-player-b-redacted.json": {
+      "category": "measured_workload",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh authoritative build identity and dependent examples for the bounded gameplay change.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "contracts/examples/support-profile.json": {
+      "category": "measured_workload",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh authoritative build identity and dependent examples for the bounded gameplay change.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "contracts/manifest.json": {
+      "category": "measured_workload",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh authoritative build identity and dependent examples for the bounded gameplay change.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "data/source_audits/ci64_provenance_v1/ranged-attack-count-faction-repair-test-v1.json": {
+      "category": "measured_workload",
+      "operations": [
+        "native-ranged-attack-count-reroll"
+      ],
+      "selected_families": [],
+      "rationale": "Admit the reviewed fixture bytes for exactly two existing test owners without changing case membership or scheduling weights.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "data/source_audits/ci64_provenance_v1/ranged-attack-count-reroll-test-v1.json": {
+      "category": "measured_workload",
+      "operations": [
+        "native-ranged-attack-count-reroll"
+      ],
+      "selected_families": [],
+      "rationale": "Bind the finite native attack-count regression and record its existing adapter decision contract.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/ADAPTER_DECISION_CONTRACT.md": {
+      "category": "measured_workload",
+      "operations": [
+        "native-ranged-attack-count-reroll"
+      ],
+      "selected_families": [],
+      "rationale": "Bind the finite native attack-count regression and record its existing adapter decision contract.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/performance/current/ranged-attack-count-reroll-dice.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Keep the new matched exact-base workload samples separately from the original historical comparisons.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/performance/current/ranged-attack-count-reroll-fight.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Keep the new matched exact-base workload samples separately from the original historical comparisons.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/performance/current/ranged-attack-count-reroll-player_boundary.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Keep the new matched exact-base workload samples separately from the original historical comparisons.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/performance/current/ranged-attack-count-reroll-precision_grouping.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Keep the new matched exact-base workload samples separately from the original historical comparisons.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/performance/current/ranged-attack-count-reroll-reconstruction.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Keep the new matched exact-base workload samples separately from the original historical comparisons.",
+      "source_obligation": null,
+      "unchanged_work": null
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Adds six exact batch 2 evidence paths to the existing non-sensitive audit operation.",
+      "rationale": "Add gameplay and admission owners and map the Precision benchmark decline helper to its existing detailed comparison.",
       "source_obligation": null,
       "unchanged_work": null
     },
-    "data/source_audits/caudit_01_successors/batch-2/main-follow-up.json": {
-      "category": "rule_semantics",
+    "scripts/engine_numerical_identity_test_admission.py": {
+      "category": "measured_workload",
       "operations": [
-        "caudit-01-successor-evidence"
+        "bounded-charge-flight-wall-proof",
+        "cavalcade-authority-admission",
+        "close-quarters-test-admission",
+        "daemonic-terror-ordered-retreat",
+        "engine-numerical-identity-admission",
+        "gore-hungry-onslaught-predecessor-admission",
+        "native-ranged-attack-count-reroll",
+        "phase-end-healing-test-admission",
+        "pre-roll-charge-flight-test-admission",
+        "round4-battle-shock-event-wounds",
+        "round4-malice-bearer-liveness",
+        "sheathed-in-brass-test-admission",
+        "skulls-beget-blood-test-admission",
+        "stage2-strict-replay-test-admission",
+        "stage3-bolt-of-change-test-admission",
+        "stage3-flight-normal-move-test-admission",
+        "stage3-ordinary-melee-test-admission",
+        "wrath-undeniable-test-admission"
       ],
       "selected_families": [],
-      "rationale": "Records source-delta qualifications, merged exact-main witnesses and bounded local diagnostics for the existing Core audit.",
-      "source_obligation": "CAUDIT-01 retains historical evidence, distinguishes current source and execution scope, and maps the affected Core obligations.",
-      "unchanged_work": "The diff preserves runtime identity, all 6,819 selected scheduling weights, fixtures and executable test selection."
+      "rationale": "Bind the finite native attack-count regression and record its existing adapter decision contract.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "scripts/measure_precision_grouping.py": {
+      "category": "measured_workload",
+      "operations": [
+        "order103-scripts-measure_precision_grouping",
+        "precision-benchmark-live-checkpoint"
+      ],
+      "selected_families": [
+        "precision_grouping"
+      ],
+      "rationale": "Pause ordinary Shooting at the same live random Toughness checkpoint on both runtimes, declining native Command Re-roll windows before exact restore and replay.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "scripts/ranged_attack_count_test_admission.py": {
+      "category": "measured_workload",
+      "operations": [
+        "native-ranged-attack-count-reroll"
+      ],
+      "selected_families": [],
+      "rationale": "Bind the finite native attack-count regression and record its existing adapter decision contract.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "src/warhammer40k_core/_engine_build_manifest.json": {
+      "category": "measured_workload",
+      "operations": [
+        "cavalcade-authority-admission",
+        "phase-end-healing-source-and-report"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh authoritative build identity and dependent examples for the bounded gameplay change.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "src/warhammer40k_core/adapters/redaction.py": {
+      "category": "measured_workload",
+      "operations": [
+        "http-command-rejection-diagnostics",
+        "player-visible-boundary"
+      ],
+      "selected_families": [
+        "player_boundary"
+      ],
+      "rationale": "Keep native player progression through Command Re-roll, using existing viewer aliases for the permission window and actor-only pending attack-count component choices.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "src/warhammer40k_core/adapters/viewer_identity.py": {
+      "category": "measured_workload",
+      "operations": [
+        "player-visible-boundary"
+      ],
+      "selected_families": [
+        "player_boundary"
+      ],
+      "rationale": "Keep native player progression through Command Re-roll, using existing viewer aliases for the permission window and actor-only pending attack-count component choices.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "src/warhammer40k_core/engine/attack_sequence_dispatch.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "native-ranged-attack-count-reroll"
+      ],
+      "selected_families": [],
+      "rationale": "Carry pending ranged counts from ordinary Shooting declaration through selected-group gathering, optional Command Re-roll and authenticated continuation.",
+      "source_obligation": "Core 02.02.03 and 04.03 roll separately for each weapon at Gather Attack Dice. Core 15.02 offers one component reroll before the count is committed.",
+      "unchanged_work": "Static counts retain the existing progression, geometry, selection, dice and replay machinery. Additional count evidence is scoped to ordinary random ranged weapons."
+    },
+    "src/warhammer40k_core/engine/attack_sequence_model.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "native-ranged-attack-count-reroll",
+        "order103-src-warhammer40k_core-engine-attack_sequence_model"
+      ],
+      "selected_families": [
+        "precision_grouping"
+      ],
+      "rationale": "Carry pending ranged counts from ordinary Shooting declaration through selected-group gathering, optional Command Re-roll and authenticated continuation.",
+      "source_obligation": "Core 02.02.03 and 04.03 roll separately for each weapon at Gather Attack Dice. Core 15.02 offers one component reroll before the count is committed.",
+      "unchanged_work": "Static counts retain the existing progression, geometry, selection, dice and replay machinery. Additional count evidence is scoped to ordinary random ranged weapons."
+    },
+    "src/warhammer40k_core/engine/attack_sequence_state.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "native-ranged-attack-count-reroll"
+      ],
+      "selected_families": [],
+      "rationale": "Carry pending ranged counts from ordinary Shooting declaration through selected-group gathering, optional Command Re-roll and authenticated continuation.",
+      "source_obligation": "Core 02.02.03 and 04.03 roll separately for each weapon at Gather Attack Dice. Core 15.02 offers one component reroll before the count is committed.",
+      "unchanged_work": "Static counts retain the existing progression, geometry, selection, dice and replay machinery. Additional count evidence is scoped to ordinary random ranged weapons."
+    },
+    "src/warhammer40k_core/engine/model_attack_completion.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "cumulative-exact-027",
+        "native-ranged-attack-count-reroll"
+      ],
+      "selected_families": [
+        "dice",
+        "fight",
+        "reconstruction"
+      ],
+      "rationale": "Carry pending ranged counts from ordinary Shooting declaration through selected-group gathering, optional Command Re-roll and authenticated continuation.",
+      "source_obligation": "Core 02.02.03 and 04.03 roll separately for each weapon at Gather Attack Dice. Core 15.02 offers one component reroll before the count is committed.",
+      "unchanged_work": "Static counts retain the existing progression, geometry, selection, dice and replay machinery. Additional count evidence is scoped to ordinary random ranged weapons."
+    },
+    "src/warhammer40k_core/engine/phases/shooting_declaration_validation.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "d10-physical-profile-validation",
+        "native-ranged-attack-count-reroll"
+      ],
+      "selected_families": [],
+      "rationale": "Carry pending ranged counts from ordinary Shooting declaration through selected-group gathering, optional Command Re-roll and authenticated continuation.",
+      "source_obligation": "Core 02.02.03 and 04.03 roll separately for each weapon at Gather Attack Dice. Core 15.02 offers one component reroll before the count is committed.",
+      "unchanged_work": "Static counts retain the existing progression, geometry, selection, dice and replay machinery. Additional count evidence is scoped to ordinary random ranged weapons."
+    },
+    "src/warhammer40k_core/engine/phases/shooting_handler.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "ci78-cutover-owners-4ae20fd642e2091e24a42bd057119705c09b616291f7ed0270bebc184db282fc",
+        "native-ranged-attack-count-reroll"
+      ],
+      "selected_families": [],
+      "rationale": "Carry pending ranged counts from ordinary Shooting declaration through selected-group gathering, optional Command Re-roll and authenticated continuation.",
+      "source_obligation": "Core 02.02.03 and 04.03 roll separately for each weapon at Gather Attack Dice. Core 15.02 offers one component reroll before the count is committed.",
+      "unchanged_work": "Static counts retain the existing progression, geometry, selection, dice and replay machinery. Additional count evidence is scoped to ordinary random ranged weapons."
+    },
+    "src/warhammer40k_core/engine/random_profile_attack_groups.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "native-ranged-attack-count-reroll",
+        "order103-src-warhammer40k_core-engine-random_profile_attack_groups"
+      ],
+      "selected_families": [
+        "precision_grouping"
+      ],
+      "rationale": "Carry pending ranged counts from ordinary Shooting declaration through selected-group gathering, optional Command Re-roll and authenticated continuation.",
+      "source_obligation": "Core 02.02.03 and 04.03 roll separately for each weapon at Gather Attack Dice. Core 15.02 offers one component reroll before the count is committed.",
+      "unchanged_work": "Static counts retain the existing progression, geometry, selection, dice and replay machinery. Additional count evidence is scoped to ordinary random ranged weapons."
+    },
+    "src/warhammer40k_core/engine/random_weapon_restore.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "native-ranged-attack-count-reroll"
+      ],
+      "selected_families": [],
+      "rationale": "Carry pending ranged counts from ordinary Shooting declaration through selected-group gathering, optional Command Re-roll and authenticated continuation.",
+      "source_obligation": "Core 02.02.03 and 04.03 roll separately for each weapon at Gather Attack Dice. Core 15.02 offers one component reroll before the count is committed.",
+      "unchanged_work": "Static counts retain the existing progression, geometry, selection, dice and replay machinery. Additional count evidence is scoped to ordinary random ranged weapons."
+    },
+    "src/warhammer40k_core/engine/ranged_attack_count_gathering.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "native-ranged-attack-count-reroll"
+      ],
+      "selected_families": [],
+      "rationale": "Carry pending ranged counts from ordinary Shooting declaration through selected-group gathering, optional Command Re-roll and authenticated continuation.",
+      "source_obligation": "Core 02.02.03 and 04.03 roll separately for each weapon at Gather Attack Dice. Core 15.02 offers one component reroll before the count is committed.",
+      "unchanged_work": "Static counts retain the existing progression, geometry, selection, dice and replay machinery. Additional count evidence is scoped to ordinary random ranged weapons."
+    },
+    "src/warhammer40k_core/engine/shooting_target_replacement.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "native-ranged-attack-count-reroll"
+      ],
+      "selected_families": [],
+      "rationale": "Carry pending ranged counts from ordinary Shooting declaration through selected-group gathering, optional Command Re-roll and authenticated continuation.",
+      "source_obligation": "Core 02.02.03 and 04.03 roll separately for each weapon at Gather Attack Dice. Core 15.02 offers one component reroll before the count is committed.",
+      "unchanged_work": "Static counts retain the existing progression, geometry, selection, dice and replay machinery. Additional count evidence is scoped to ordinary random ranged weapons."
+    },
+    "src/warhammer40k_core/engine/shooting_target_replacement_authority.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "native-ranged-attack-count-reroll"
+      ],
+      "selected_families": [],
+      "rationale": "Carry pending ranged counts from ordinary Shooting declaration through selected-group gathering, optional Command Re-roll and authenticated continuation.",
+      "source_obligation": "Core 02.02.03 and 04.03 roll separately for each weapon at Gather Attack Dice. Core 15.02 offers one component reroll before the count is committed.",
+      "unchanged_work": "Static counts retain the existing progression, geometry, selection, dice and replay machinery. Additional count evidence is scoped to ordinary random ranged weapons."
+    },
+    "src/warhammer40k_core/engine/stratagems_core_handlers.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "native-ranged-attack-count-reroll",
+        "private-rng-owner-aedfa96d1c16f8a1"
+      ],
+      "selected_families": [],
+      "rationale": "Carry pending ranged counts from ordinary Shooting declaration through selected-group gathering, optional Command Re-roll and authenticated continuation.",
+      "source_obligation": "Core 02.02.03 and 04.03 roll separately for each weapon at Gather Attack Dice. Core 15.02 offers one component reroll before the count is committed.",
+      "unchanged_work": "Static counts retain the existing progression, geometry, selection, dice and replay machinery. Additional count evidence is scoped to ordinary random ranged weapons."
+    },
+    "src/warhammer40k_core/engine/weapon_declaration.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "native-ranged-attack-count-reroll"
+      ],
+      "selected_families": [],
+      "rationale": "Carry pending ranged counts from ordinary Shooting declaration through selected-group gathering, optional Command Re-roll and authenticated continuation.",
+      "source_obligation": "Core 02.02.03 and 04.03 roll separately for each weapon at Gather Attack Dice. Core 15.02 offers one component reroll before the count is committed.",
+      "unchanged_work": "Static counts retain the existing progression, geometry, selection, dice and replay machinery. Additional count evidence is scoped to ordinary random ranged weapons."
+    },
+    "tests/code_quality/test_engine_numerical_identity_admission.py": {
+      "category": "measured_workload",
+      "operations": [
+        "bounded-charge-flight-wall-proof",
+        "counteroffensive-fight-type",
+        "engine-numerical-identity-admission",
+        "native-ranged-attack-count-reroll",
+        "pre-roll-charge-flight-test-admission",
+        "round4-battle-shock-event-wounds",
+        "round4-malice-bearer-liveness",
+        "skulls-beget-blood-test-admission",
+        "stage3-bolt-of-change-test-admission",
+        "stage3-flight-normal-move-test-admission",
+        "stage3-ordinary-melee-test-admission",
+        "wrath-undeniable-test-admission"
+      ],
+      "selected_families": [],
+      "rationale": "Bind the finite native attack-count regression and record its existing adapter decision contract.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "tests/factions/aeldari/lhykhis_helpers.py": {
+      "category": "measured_workload",
+      "operations": [
+        "native-ranged-attack-count-reroll"
+      ],
+      "selected_families": [],
+      "rationale": "Prove the existing faction consequences with prescribed native dice, plus independent ordinary-RNG persistence and replay.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "tests/factions/aeldari/lhykhis_scripted_attacks.py": {
+      "category": "measured_workload",
+      "operations": [
+        "native-ranged-attack-count-reroll"
+      ],
+      "selected_families": [],
+      "rationale": "Prove the existing faction consequences with prescribed native dice, plus independent ordinary-RNG persistence and replay.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "tests/factions/aeldari/unit/test_lhykhis.py": {
+      "category": "measured_workload",
+      "operations": [
+        "native-ranged-attack-count-reroll"
+      ],
+      "selected_families": [],
+      "rationale": "Prove the existing faction consequences with prescribed native dice, plus independent ordinary-RNG persistence and replay.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "tests/factions/emperors_children/test_selected_consumers.py": {
+      "category": "measured_workload",
+      "operations": [
+        "native-ranged-attack-count-reroll"
+      ],
+      "selected_families": [],
+      "rationale": "Prove the existing faction consequences with prescribed native dice, plus independent ordinary-RNG persistence and replay.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "tests/rules/section10/test_random_attack_count_reroll.py": {
+      "category": "measured_workload",
+      "operations": [
+        "native-ranged-attack-count-reroll"
+      ],
+      "selected_families": [],
+      "rationale": "Bind the finite native attack-count regression and record its existing adapter decision contract.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "tests/support/scripted_attack_rolls.py": {
+      "category": "measured_workload",
+      "operations": [
+        "native-ranged-attack-count-reroll"
+      ],
+      "selected_families": [],
+      "rationale": "Prove the existing faction consequences with prescribed native dice, plus independent ordinary-RNG persistence and replay.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "tests/support/sorcerer_native.py": {
+      "category": "measured_workload",
+      "operations": [
+        "native-ranged-attack-count-reroll"
+      ],
+      "selected_families": [],
+      "rationale": "Prove the existing faction consequences with prescribed native dice, plus independent ordinary-RNG persistence and replay.",
+      "source_obligation": null,
+      "unchanged_work": null
     }
   },
   "milestone": "ordinary",
-  "comparisons": {},
+  "comparisons": {
+    "fight": "docs/performance/current/ranged-attack-count-reroll-fight.json",
+    "precision_grouping": "docs/performance/current/ranged-attack-count-reroll-precision_grouping.json",
+    "dice": "docs/performance/current/ranged-attack-count-reroll-dice.json",
+    "reconstruction": "docs/performance/current/ranged-attack-count-reroll-reconstruction.json",
+    "player_boundary": "docs/performance/current/ranged-attack-count-reroll-player_boundary.json"
+  },
   "full_game": null
 }
