@@ -1,0 +1,17 @@
+{
+  "base": "098847346d8f554323a6417ede02a06eaa2613d6",
+  "retained_counteroffensive_sha256": "e9b0e313baa71a2965d152b6649e9ea045273a8bc14c4ce084ee7db64dbdcdd7",
+  "retained_manifest_sha256": "50a4f1255d34d13d06257f05352c43b9d591ea23fcd35efe0b56c91009a49f57",
+  "retained_runtime_fingerprint": "c5732ba60d52525e3b628792bb9cd03bdac3ed82834e6c5a7f09e57f1ffd3443",
+  "manifest_sha256": "1abd6dc0c5b0b4b994c29d1064cdb0a4dacb571ba588c33f26937a68f2766df7",
+  "runtime_fingerprint": "cdd4dc3a140f7a09efbe307cf6333b3fada76748838fa5543b2160727da765b0",
+  "source_sha256": "7c02ba784cf5e14c54fb43f58d72e9ea9ecab70a894dd639da8c9b595e40b346",
+  "added_files": {
+    "tests/infrastructure/adapters/test_ordinary_ranged_profile_policy.py": {
+      "mode": "100644",
+      "blob_sha1": "370684bfc997eb2e0aa4e2a2ed2520d2507403df",
+      "sha256": "c729cd574bcc8269de8e5602392d5ed52ccffddd4fc5a1ac4599d1ca42f71b6d",
+      "bytes": 19025
+    }
+  }
+}

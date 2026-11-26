@@ -1110,6 +1110,12 @@
     "tests/infrastructure/adapters/test_ordinary_melee_profile_policy.py::test_great_axe_actor_offer_selects_applied_wounds_and_replays[seekers]": 29.697,
     "tests/infrastructure/adapters/test_ordinary_melee_profile_policy.py::test_great_axe_dispatch_rejects_identical_view_at_unadmitted_checkpoint": 15.137,
     "tests/infrastructure/adapters/test_ordinary_melee_profile_policy.py::test_wounded_seeker_first_changes_applied_wound_expectation": 0.001,
+    "tests/infrastructure/adapters/test_ordinary_ranged_profile_policy.py::test_bolt_profile_admission_blocks_unreviewed_contextual_modifier": 7.31,
+    "tests/infrastructure/adapters/test_ordinary_ranged_profile_policy.py::test_bolt_profile_comparison_commits_and_replays[full]": 24.774,
+    "tests/infrastructure/adapters/test_ordinary_ranged_profile_policy.py::test_bolt_profile_comparison_commits_and_replays[one-left]": 16.617,
+    "tests/infrastructure/adapters/test_ordinary_ranged_profile_policy.py::test_unsupported_native_bolt_context_declines[damaged]": 0.881,
+    "tests/infrastructure/adapters/test_ordinary_ranged_profile_policy.py::test_unsupported_native_bolt_context_declines[lethal]": 0.902,
+    "tests/infrastructure/adapters/test_ordinary_ranged_profile_policy.py::test_unsupported_native_bolt_context_declines[sustained]": 0.835,
     "tests/infrastructure/adapters/test_preserve_scenario.py::test_preserve_prefix_has_exact_routes_candidates_and_scoped_tactical_gaps": 24.476,
     "tests/infrastructure/adapters/test_preserve_scenario.py::test_preserve_prefix_persists_replays_and_rejects_changed_closed_evidence": 199.166,
     "tests/infrastructure/adapters/test_preserve_scenario.py::test_preserve_prefix_rejects_other_config_incomplete_and_extra_ordinary_choices": 14.767,
@@ -6816,18 +6822,18 @@
   },
   "execution_model": {
     "assignment_wall_lower_bound_seconds": {
-      "1": 596.565,
-      "10": 596.565,
-      "11": 596.565,
-      "12": 596.565,
+      "1": 597.848,
+      "10": 597.848,
+      "11": 597.848,
+      "12": 597.849,
       "2": 795.547,
       "3": 609.537,
-      "4": 596.566,
-      "5": 596.565,
-      "6": 596.565,
-      "7": 596.565,
-      "8": 596.566,
-      "9": 596.565
+      "4": 597.848,
+      "5": 597.848,
+      "6": 597.849,
+      "7": 597.848,
+      "8": 597.848,
+      "9": 597.848
     },
     "cold_shard_assignment": "minimum-unrounded-modeled-test-load-existing-bucket-v1",
     "cold_shard_id": 1,
@@ -6836,18 +6842,18 @@
       "tests/factions/chaos_daemons/integration/test_cavalcade_v995_roster.py::test_exact_mirror_deploys_all_78_models_and_replays_to_battle"
     ],
     "shard_worker_seconds": {
-      "1": 2386.259,
-      "10": 2386.261,
-      "11": 2386.259,
-      "12": 2386.26,
+      "1": 2391.391,
+      "10": 2391.391,
+      "11": 2391.391,
+      "12": 2391.396,
       "2": 3182.186,
       "3": 2438.146,
-      "4": 2386.262,
-      "5": 2386.26,
-      "6": 2386.26,
-      "7": 2386.26,
-      "8": 2386.262,
-      "9": 2386.259
+      "4": 2391.391,
+      "5": 2391.391,
+      "6": 2391.395,
+      "7": 2391.392,
+      "8": 2391.391,
+      "9": 2391.392
     }
   },
   "files": {
@@ -6932,6 +6938,7 @@
     "tests/infrastructure/adapters/test_normal_move_scenario.py": 466.004,
     "tests/infrastructure/adapters/test_opposing_shooter_scenario.py": 296.773,
     "tests/infrastructure/adapters/test_ordinary_melee_profile_policy.py": 50.649,
+    "tests/infrastructure/adapters/test_ordinary_ranged_profile_policy.py": 51.319,
     "tests/infrastructure/adapters/test_preserve_scenario.py": 238.409,
     "tests/infrastructure/adapters/test_rigid_group_ground_charge_policy.py": 11.47,
     "tests/infrastructure/adapters/test_runner_accounting.py": 626.885,
@@ -7446,19 +7453,20 @@
         "cd7f89e05a4dbf7b6653c684a090d9dadccc238e9de7faeecb0f352235ef9e38",
         "d221fa9414f09deb36d275dca16085e59d0239e19246d38cf138ddd866c65662",
         "dc90b4c3e99d80d1501f965655e2d26f68388eb11d1993290e41f9802f4c00be",
-        "dfc98fbc7fececc1f1301c84bb15f410d0edc56b215a6ff2a1ba22dec183cee2"
+        "dfc98fbc7fececc1f1301c84bb15f410d0edc56b215a6ff2a1ba22dec183cee2",
+        "d84825e1f06f7418bad0bb7082d4a59aacb81d0ba6f161d80f005a50912ea11c"
       ],
-      "source": "Retained #736 refresh timing profile and one measured three-inch Charge roundoff regression on WSL; plus five measured Sheathed in Brass cases (serial WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); plus measured Blood Begets Skulls and Phase 17I updates (serial WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); add four measured Stage 3 melee cases (WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); plus measured Skulls Beget Blood and Phase 17I updates (serial WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); retain two reviewed Stage 3 native-qualification flight weights (serial Windows, Python 3.14.5; scheduling only); plus measured Wrath Undeniable and Phase 17I updates (serial WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); plus four measured pre-roll Charge flight admission cases (serial Windows, Python 3.14.5; scheduling only); remeasured the same native Charge case with the operational proof and unchanged case inventory; plus seven measured Gore-Hungry Onslaught nodes (serial Linux, Python 3.14.5, branch coverage; scheduling only); plus 17 measured Stage 3 Dense-wall and native late-spend controls (serial Windows, Python 3.14.5; scheduling only), retaining all exact landed-base weights; plus 17 measured native Dark Pact timing regressions (serial WSL Ubuntu, Python 3.14.5; scheduling only), retaining all exact #745 base weights; plus four measured native Attached Fight and Fire Overwatch regressions (serial pytest, WSL Ubuntu, Python 3.14.5; scheduling only), retaining all exact prior weights; plus four Fool's Flight cases (serial Windows, Python 3.14.5, native pytest; scheduling only), retaining all exact landed-base weights; plus the four separately measured #749 ground Charge retry cases, retaining all exact landed #748 case and selector weights and both original JUnit receipts; add only two measured Stage 2 Normal Move cases (serial Windows, Python 3.14.5, normal pytest; scheduling only) while retaining all exact #749 case and selector weights and receipt hashes; add only the measured Stage 2 constructed A4 origin case (serial Windows, standard pytest, Python 3.14.5; scheduling only), preserving all predecessor case and selector weights and original JUnit hashes; add five measured Dense-wall Charge CP policy cases (serial WSL Ubuntu, CPython 3.14.5, focused standard pytest; scheduling only), retaining every exact-base selector weight, case weight, and JUnit receipt; add four measured declaration-binding and Boolean opt-in regressions (WSL Ubuntu, CPython 3.14.5, focused serial pytest; scheduling only), retaining all 6795 prior case weights and 27 prior report hashes; add the measured pre-declaration CP drift case (WSL Ubuntu, CPython 3.14.5, focused serial pytest; scheduling only), retaining all 6799 prior case weights and 28 prior report hashes; retain the eight reviewed PR #753 native retreat weights and their original Windows Python 3.14.5 JUnit receipts; plus five local native Counteroffensive Fight-type regressions (Windows, Python 3.14.5)",
-      "test_cases": 6813,
-      "test_files": 463
+      "source": "Retained #736 refresh timing profile and one measured three-inch Charge roundoff regression on WSL; plus five measured Sheathed in Brass cases (serial WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); plus measured Blood Begets Skulls and Phase 17I updates (serial WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); add four measured Stage 3 melee cases (WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); plus measured Skulls Beget Blood and Phase 17I updates (serial WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); retain two reviewed Stage 3 native-qualification flight weights (serial Windows, Python 3.14.5; scheduling only); plus measured Wrath Undeniable and Phase 17I updates (serial WSL Ubuntu, Python 3.14.5, branch coverage; scheduling only); plus four measured pre-roll Charge flight admission cases (serial Windows, Python 3.14.5; scheduling only); remeasured the same native Charge case with the operational proof and unchanged case inventory; plus seven measured Gore-Hungry Onslaught nodes (serial Linux, Python 3.14.5, branch coverage; scheduling only); plus 17 measured Stage 3 Dense-wall and native late-spend controls (serial Windows, Python 3.14.5; scheduling only), retaining all exact landed-base weights; plus 17 measured native Dark Pact timing regressions (serial WSL Ubuntu, Python 3.14.5; scheduling only), retaining all exact #745 base weights; plus four measured native Attached Fight and Fire Overwatch regressions (serial pytest, WSL Ubuntu, Python 3.14.5; scheduling only), retaining all exact prior weights; plus four Fool's Flight cases (serial Windows, Python 3.14.5, native pytest; scheduling only), retaining all exact landed-base weights; plus the four separately measured #749 ground Charge retry cases, retaining all exact landed #748 case and selector weights and both original JUnit receipts; add only two measured Stage 2 Normal Move cases (serial Windows, Python 3.14.5, normal pytest; scheduling only) while retaining all exact #749 case and selector weights and receipt hashes; add only the measured Stage 2 constructed A4 origin case (serial Windows, standard pytest, Python 3.14.5; scheduling only), preserving all predecessor case and selector weights and original JUnit hashes; add five measured Dense-wall Charge CP policy cases (serial WSL Ubuntu, CPython 3.14.5, focused standard pytest; scheduling only), retaining every exact-base selector weight, case weight, and JUnit receipt; add four measured declaration-binding and Boolean opt-in regressions (WSL Ubuntu, CPython 3.14.5, focused serial pytest; scheduling only), retaining all 6795 prior case weights and 27 prior report hashes; add the measured pre-declaration CP drift case (WSL Ubuntu, CPython 3.14.5, focused serial pytest; scheduling only), retaining all 6799 prior case weights and 28 prior report hashes; retain the eight reviewed PR #753 native retreat weights and their original Windows Python 3.14.5 JUnit receipts; plus five local native Counteroffensive Fight-type regressions (Windows, Python 3.14.5); add the six reviewed Bolt of Change scheduling measurements from draft head e013e082 (focused Windows pytest, Python 3.14.5), preserving every #756 case and selector weight",
+      "test_cases": 6819,
+      "test_files": 464
     }
   ],
   "shard_count": 12,
   "shards": [
     {
-      "duration_seconds": 1885.025,
+      "duration_seconds": 1890.157,
       "shard_id": 1,
-      "test_file_count": 54
+      "test_file_count": 56
     },
     {
       "duration_seconds": 3182.186,
@@ -7471,47 +7479,47 @@
       "test_file_count": 1
     },
     {
-      "duration_seconds": 2386.262,
+      "duration_seconds": 2391.391,
       "shard_id": 4,
-      "test_file_count": 47
+      "test_file_count": 50
     },
     {
-      "duration_seconds": 2386.26,
+      "duration_seconds": 2391.391,
       "shard_id": 5,
-      "test_file_count": 53
+      "test_file_count": 55
     },
     {
-      "duration_seconds": 2386.26,
+      "duration_seconds": 2391.395,
       "shard_id": 6,
       "test_file_count": 52
     },
     {
-      "duration_seconds": 2386.26,
+      "duration_seconds": 2391.392,
       "shard_id": 7,
       "test_file_count": 54
     },
     {
-      "duration_seconds": 2386.262,
+      "duration_seconds": 2391.391,
       "shard_id": 8,
       "test_file_count": 53
     },
     {
-      "duration_seconds": 2386.259,
+      "duration_seconds": 2391.392,
       "shard_id": 9,
-      "test_file_count": 56
+      "test_file_count": 53
     },
     {
-      "duration_seconds": 2386.261,
+      "duration_seconds": 2391.391,
       "shard_id": 10,
-      "test_file_count": 52
+      "test_file_count": 53
     },
     {
-      "duration_seconds": 2386.259,
+      "duration_seconds": 2391.391,
       "shard_id": 11,
-      "test_file_count": 78
+      "test_file_count": 74
     },
     {
-      "duration_seconds": 2386.26,
+      "duration_seconds": 2391.396,
       "shard_id": 12,
       "test_file_count": 53
     }
@@ -7521,5 +7529,5 @@
     "sha256": "b241b31651a8d5d903a2b851583186c276a5ac32fed26de1a1c69b4aa278b711"
   },
   "strategy": "largest-processing-time-by-derived-selector-weight",
-  "total_test_duration_seconds": 28981.7
+  "total_test_duration_seconds": 29033.019
 }
