@@ -129,7 +129,11 @@ def dark_pact_active_successors(root: Path, retained: Members) -> Members:
 
 
 def dark_pact_test_transition(
-    root: Path, *, runtime: str, active_successors: Members
+    root: Path,
+    *,
+    runtime: str,
+    active_successors: Members,
+    test_successor: Members | None = None,
 ) -> tuple[str, Members, Members, bytes] | None:
     read = _read_receipt(root)
     if read is None:
@@ -138,9 +142,11 @@ def dark_pact_test_transition(
     fingerprint = record["runtime_fingerprint"]
     if record["retained_runtime_fingerprint"] != runtime or not isinstance(fingerprint, str):
         raise SystemExit("Dark Pact tests require the exact retained runtime predecessor.")
-    return (
-        fingerprint,
-        active_successors,
-        _selection_members(record["added_files"], root),
-        raw,
-    )
+    added_files = record["added_files"]
+    if test_successor is not None:
+        if test_successor.keys() != {"before", "after"} or added_files != {
+            NEW_TEST: test_successor["before"]
+        }:
+            raise SystemExit("Dark Pact timing test successor differs from its predecessor.")
+        added_files = {NEW_TEST: test_successor["after"]}
+    return fingerprint, active_successors, _selection_members(added_files, root), raw

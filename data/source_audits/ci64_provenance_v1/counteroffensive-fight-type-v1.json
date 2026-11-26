@@ -51,9 +51,9 @@
   "added_files": {
     "tests/rules/section12/test_counteroffensive_fight_type.py": {
       "mode": "100644",
-      "bytes": 21171,
-      "sha256": "4b072f79c546b1dbaf0f8194228c789a1f283c06caf81fbf87a12f077dc73fd2",
-      "blob_sha1": "bce13b0a5ee1f9e91165b0383f64209c128acdd3"
+      "bytes": 21054,
+      "sha256": "55e7baac304ecd4796e9a624275b67b39f100a92658ca72b20a92489cd39748e",
+      "blob_sha1": "762872e27fc8df2e106b73c9cb91a24433dcc038"
     }
   },
   "added_cases": [
@@ -63,5 +63,20 @@
     "tests/rules/section12/test_counteroffensive_fight_type.py::test_counteroffensive_preserves_native_fight_type[single-overrun]",
     "tests/rules/section12/test_counteroffensive_fight_type.py::test_counteroffensive_resolves_dark_pact_before_melee"
   ],
-  "retained_charge_cp_policy_sha256": "aa842ec7a250b3d696b37faf552238f6144c0f30fcaaf8152996609c4317540e"
+  "retained_charge_cp_policy_sha256": "aa842ec7a250b3d696b37faf552238f6144c0f30fcaaf8152996609c4317540e",
+  "dark_pact_test": {
+    "before": {
+      "mode": "100644",
+      "blob_sha1": "09eeb70ebb666340fd1ff81985203aaeea8f049c",
+      "sha256": "af0a2326c0996aff5b8515e5e4cd3400b41ab9b62c126013ee9a5d528e221dec",
+      "bytes": 36171
+    },
+    "after": {
+      "mode": "100644",
+      "bytes": 29210,
+      "sha256": "40af45242d98bcfcfe892740982849367a2d1c56f12c5be68a5b4d340ec2f21e",
+      "blob_sha1": "1d1c020afa3b1ad87a02568fc51ab93b7b9aafb9"
+    }
+  },
+  "dark_pact_fixture_sha256": "89eebdab728dcffbcc0d81408f3ac6af8736372c5336e8c69945cad61eb9389e"
 }

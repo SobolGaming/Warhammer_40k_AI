@@ -2,7 +2,7 @@
   "policy": "rules-engine-performance-v3",
   "base": "55eef9b20652b030d3ab3e9b85755e0acd7c2d49",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:366591e46acc04772907dd25b78727cfb8b6688e8e07c4a1795c2fb47499c0c0",
-  "operation_map_sha256": "468cf7164e5ce338fc22ab849259e132a14510fb20703d29bb4939638151296f",
+  "operation_map_sha256": "92801d57af160051a29896351c34094180d54e7e0f9b6650d987809dc5691c01",
   "changes": {
     "ci/test_shards/durations.json": {
       "before_sha256": "0955ecaedc1b28e4d467ec3e44b4c07ff4469588274a16ba25e93111af449609",
@@ -196,11 +196,11 @@
     },
     "data/source_audits/ci64_provenance_v1/counteroffensive-fight-type-v1.json": {
       "before_sha256": null,
-      "after_sha256": "1ea4ddd8a83e3a329803269811425b1f9497509e9133a5e83829552ca6445f76",
+      "after_sha256": "efde38b5af268cddc471e9a27fc86354b3a5b522f1cf5113c2382745c091dac0",
       "owners": {
         "@document": {
           "before": null,
-          "after": "1ea4ddd8a83e3a329803269811425b1f9497509e9133a5e83829552ca6445f76"
+          "after": "efde38b5af268cddc471e9a27fc86354b3a5b522f1cf5113c2382745c091dac0"
         }
       }
     },
@@ -216,69 +216,73 @@
     },
     "docs/performance/current/counteroffensive-review-dice.json": {
       "before_sha256": null,
-      "after_sha256": "07f6e8af16bc7fd1cba0a12949d4a422c627fd981cbec62e016d6f38ee746fff",
+      "after_sha256": "edff46434499fe76a2716e5a83c3e01db79243f1c90f0fb2fac02f67ef4e3ed6",
       "owners": {
         "@document": {
           "before": null,
-          "after": "07f6e8af16bc7fd1cba0a12949d4a422c627fd981cbec62e016d6f38ee746fff"
+          "after": "edff46434499fe76a2716e5a83c3e01db79243f1c90f0fb2fac02f67ef4e3ed6"
         }
       }
     },
     "docs/performance/current/counteroffensive-review-dice_sustained.json": {
       "before_sha256": null,
-      "after_sha256": "e57e789c04754f415b0dad2544d101c876a9b5112156789a80a50c9356cb2c22",
+      "after_sha256": "a7af55240c0ffe1cfeffb724d6a7e7bdded424d619d36efbc3c78a6d52f24376",
       "owners": {
         "@document": {
           "before": null,
-          "after": "e57e789c04754f415b0dad2544d101c876a9b5112156789a80a50c9356cb2c22"
+          "after": "a7af55240c0ffe1cfeffb724d6a7e7bdded424d619d36efbc3c78a6d52f24376"
         }
       }
     },
     "docs/performance/current/counteroffensive-review-reconstruction.json": {
       "before_sha256": null,
-      "after_sha256": "4133963871db8ee30e6821d25ce3195332aaec5ff2b7df1bee67a4bd52de9fcd",
+      "after_sha256": "c937947322544acf2c799ae0a50f214af3601cd55b30eb685c1254c57cfec7fb",
       "owners": {
         "@document": {
           "before": null,
-          "after": "4133963871db8ee30e6821d25ce3195332aaec5ff2b7df1bee67a4bd52de9fcd"
+          "after": "c937947322544acf2c799ae0a50f214af3601cd55b30eb685c1254c57cfec7fb"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "8658b29d837cb3947fd134a4b5ac80efb223c1bda69a44fa630514b2c9dc07be",
-      "after_sha256": "7cca01b9aabbe1ce3462ef57ebe19f094958c881bd583c7fdfea074222bc3de9",
+      "after_sha256": "3100221520a07f1972790130a78334a09f19614bda4e59510cb58c7d0743d431",
       "owners": {
         "@document": {
           "before": "8658b29d837cb3947fd134a4b5ac80efb223c1bda69a44fa630514b2c9dc07be",
-          "after": "7cca01b9aabbe1ce3462ef57ebe19f094958c881bd583c7fdfea074222bc3de9"
+          "after": "3100221520a07f1972790130a78334a09f19614bda4e59510cb58c7d0743d431"
         }
       }
     },
     "scripts/dark_pact_test_admission.py": {
       "before_sha256": "00c8960756fd8419f02efc04e6c5f41435e66ebfb93c2567fe7d5bb28a8ad5b1",
-      "after_sha256": "26b581db5c9d6a7cd9774d760237b522738b552e3cb4f99893daea42f1acb319",
+      "after_sha256": "118fb2deac4981c9c60a1264e049dd92629a26dff88ccc9a5a7a9768986f1045",
       "owners": {
         "dark_pact_source_successors": {
           "before": "be318b91488ec2a00cd8d0341a34f10e0fd181d492b47909a34ff79cb13d0643",
           "after": "63c23888a4d0d1ab37034c7a89b2855607de31e020264dc59db1544c6f03ad00"
+        },
+        "dark_pact_test_transition": {
+          "before": "1ae3f48b33711243a331b39bcc77db048cd3bcac362dd0f7b138d6e1f5eb804e",
+          "after": "f6f6829f6720d5ec75ce4fae3eb614287b3143e54ce1cd47be330e7b85acce5d"
         }
       }
     },
     "scripts/engine_numerical_identity_test_admission.py": {
       "before_sha256": "40227f08b7a2c290083a9526f99d8a89f634901a06c304af90b9ee346cadc285",
-      "after_sha256": "f2c3bbde214425b0fedf9c6136b59d211b6b4afb5b82001e2daa128f3f87e4c0",
+      "after_sha256": "07654fe2cd9c93243c7002549583426c4af08e66de748a42ad6fe713f04f37eb",
       "owners": {
         "@module": {
           "before": "4dd2165c209d75a67cd1aab59eb63841d1406c4b3757d542d2ce70787f4a0211",
-          "after": "984d5d898dffaf7b0cf08a75519b8ad0459cfa715538e7ff74fd7135822a0d38"
+          "after": "b4a6e129e409684c87e62cfde82ee04ae189c219386a60ccc812b59e53086b63"
         },
         "_CounteroffensiveFightTypeReceipt": {
           "before": null,
-          "after": "9a94e44ae987f6e0ef73691ab51297219244a6eeca7966aac023308efded6835"
+          "after": "84e6a5bf5a00478a19729615b753ea3905a8d1a758c6755358a5ba6530db9700"
         },
         "_counteroffensive_fight_type_transition": {
           "before": null,
-          "after": "2a7179962a5311b1f01edb3777456d7aa00cc61b47b642dfbbaefb8496571e67"
+          "after": "7ee0cae5a1bcb711c22fae9bd4de179c7667480857ab3bd8dc9b2395c0adda44"
         },
         "_stage2_melee_restore_successor": {
           "before": "30cfb3a88427a6e19a2c8ecdebd98480fcf4a6427eb22a67da65b33d19c331ab",
@@ -290,7 +294,7 @@
         },
         "exact_movement_test_transition": {
           "before": "d6f353a39310b84c4674c57922c2c94c05e82af99544d01ec06babc851fa9f2b",
-          "after": "356dac78bf0b7182b4dee1887c218b17c32242c0e688a4b0d02a0b06f12e53d4"
+          "after": "2a6e188aa446827c5c3f58ea88342233757c754aa8295dd06ca921c2670ca4f0"
         }
       }
     },
@@ -484,13 +488,31 @@
         }
       }
     },
+    "tests/infrastructure/adapters/test_dark_pact_timing.py": {
+      "before_sha256": "af0a2326c0996aff5b8515e5e4cd3400b41ab9b62c126013ee9a5d528e221dec",
+      "after_sha256": "40af45242d98bcfcfe892740982849367a2d1c56f12c5be68a5b4d340ec2f21e",
+      "owners": {
+        "@module": {
+          "before": "7accc6f4c90030924bb1317148deb2fcc0f0e94ad102c99f187b5f850264c013",
+          "after": "ecc6ba8b3ef38cc70e442b60f08febd20631797a4326cc2cb28be21c3cf03f7d"
+        },
+        "_catalog": {
+          "before": "09f1d29de86942c3cacf23e3c8047c25c220f5b646e3460ccfda6b975c07b5e7",
+          "after": null
+        },
+        "_session": {
+          "before": "561c8c009ac0a361f6a5d65c4c01a3c2317a5c75bd73cd53b6e730ec42b77f68",
+          "after": "98db21be1b0957038b3e4ae80068b7aca064456918dc700fe7a0c076874c7561"
+        }
+      }
+    },
     "tests/rules/section12/test_counteroffensive_fight_type.py": {
       "before_sha256": null,
-      "after_sha256": "4b072f79c546b1dbaf0f8194228c789a1f283c06caf81fbf87a12f077dc73fd2",
+      "after_sha256": "55e7baac304ecd4796e9a624275b67b39f100a92658ca72b20a92489cd39748e",
       "owners": {
         "@module": {
           "before": null,
-          "after": "8cb835a275470975bba8ce27a09bd32d84884131168dcfcc34aff53e9b79bddc"
+          "after": "07ee08ceacff9483627dc36fb92e221ae2b1d45437216a4b8c51a662af059f48"
         },
         "_after_enemy_overrun": {
           "before": null,
@@ -519,6 +541,20 @@
         "test_counteroffensive_resolves_dark_pact_before_melee": {
           "before": null,
           "after": "aefaecc21465dd961c462ecad115db79c59e88dcf3c5e1ee294a7225c8771e2f"
+        }
+      }
+    },
+    "tests/support/dark_pact_fixtures.py": {
+      "before_sha256": null,
+      "after_sha256": "89eebdab728dcffbcc0d81408f3ac6af8736372c5336e8c69945cad61eb9389e",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "5836fd016bf27b0af0966c7c241016920a61b49373f72f2895287ae9c8aef0d5"
+        },
+        "dark_pact_catalog": {
+          "before": null,
+          "after": "2cb787d36b17cead46eb6bb615625f6e1f2e0446dfbe21934bd4f3eca191a49c"
         }
       }
     }
@@ -910,6 +946,17 @@
       "source_obligation": null,
       "unchanged_work": null
     },
+    "tests/infrastructure/adapters/test_dark_pact_timing.py": {
+      "category": "measured_workload",
+      "operations": [
+        "counteroffensive-fight-type",
+        "dark-pact-timing-scope-051"
+      ],
+      "selected_families": [],
+      "rationale": "Share the unchanged Dark Pact catalog fixture from a named test support module.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
     "tests/rules/section12/test_counteroffensive_fight_type.py": {
       "category": "measured_workload",
       "operations": [
@@ -917,6 +964,16 @@
       ],
       "selected_families": [],
       "rationale": "Admit the five exact Counteroffensive cases while keeping predecessor membership, sources and checks pinned.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "tests/support/dark_pact_fixtures.py": {
+      "category": "measured_workload",
+      "operations": [
+        "counteroffensive-fight-type"
+      ],
+      "selected_families": [],
+      "rationale": "Share the unchanged Dark Pact catalog fixture from a named test support module.",
       "source_obligation": null,
       "unchanged_work": null
     }

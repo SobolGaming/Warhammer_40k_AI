@@ -6,17 +6,15 @@ from typing import cast
 
 import pytest
 
-from tests.infrastructure.adapters.test_dark_pact_timing import (
-    DATASHEET as DARK_PACT_DATASHEET,
-)
-from tests.infrastructure.adapters.test_dark_pact_timing import (
-    RESOLVED as DARK_PACT_RESOLVED,
-)
-from tests.infrastructure.adapters.test_dark_pact_timing import (
-    _catalog as dark_pact_catalog,  # pyright: ignore[reportPrivateUsage]
-)
 from tests.order135_counteroffensive_helpers import proposal_from_native_request
 from tests.phase15c_fight_order_helpers import drain_fight_movement_requests, fight_lifecycle
+from tests.support.dark_pact_fixtures import (
+    DATASHEET as DARK_PACT_DATASHEET,
+)
+from tests.support.dark_pact_fixtures import (
+    RESOLVED as DARK_PACT_RESOLVED,
+)
+from tests.support.dark_pact_fixtures import dark_pact_catalog
 from tests.support.faction_batch01 import (
     LORD,
     anchor,

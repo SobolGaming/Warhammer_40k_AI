@@ -1352,7 +1352,7 @@ COUNTEROFFENSIVE_FIGHT_TYPE_TRANSITION = (
     "data/source_audits/ci64_provenance_v1/counteroffensive-fight-type-v1.json"
 )
 COUNTEROFFENSIVE_FIGHT_TYPE_SHA256 = (
-    "1ea4ddd8a83e3a329803269811425b1f9497509e9133a5e83829552ca6445f76"
+    "efde38b5af268cddc471e9a27fc86354b3a5b522f1cf5113c2382745c091dac0"
 )
 COUNTEROFFENSIVE_FIGHT_TYPE_OWNER = "tests/rules/section12/test_counteroffensive_fight_type.py"
 _COUNTEROFFENSIVE_FIGHT_TYPE_SOURCES = {
@@ -1375,6 +1375,8 @@ class _CounteroffensiveFightTypeReceipt(TypedDict):
     runtime_manifest: dict[str, str]
     sources: SourceSuccessors
     origin_test: dict[str, dict[str, object]]
+    dark_pact_test: TestSuccessors
+    dark_pact_fixture_sha256: str
     added_files: TestSuccessors
     added_cases: list[str]
 
@@ -1417,6 +1419,7 @@ def _counteroffensive_fight_type_transition(
     for name, change in receipt["sources"].items():
         _checked_bytes(root, name, change["after"])
     _checked_bytes(root, MANIFEST, receipt["runtime_manifest"]["after"])
+    _checked_bytes(root, "tests/support/dark_pact_fixtures.py", receipt["dark_pact_fixture_sha256"])
     return receipt, raw
 
 
@@ -2170,7 +2173,10 @@ def exact_movement_test_transition(
     from scripts.dark_pact_test_admission import dark_pact_test_transition
 
     pact = dark_pact_test_transition(
-        root, runtime=runtime, active_successors={} if malice is None else malice[1]
+        root,
+        runtime=runtime,
+        active_successors={} if malice is None else malice[1],
+        test_successor=None if counter_receipt is None else counter_receipt["dark_pact_test"],
     )
     if pact is not None:
         runtime, pact_updated, pact_added, pact_raw = pact

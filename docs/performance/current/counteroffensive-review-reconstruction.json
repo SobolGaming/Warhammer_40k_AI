@@ -4,7 +4,7 @@
   "workload_id": "loaded-ingress-numerical-identity-reconstruction-v3",
   "base_revision": "55eef9b20652b030d3ab3e9b85755e0acd7c2d49",
   "head_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:366591e46acc04772907dd25b78727cfb8b6688e8e07c4a1795c2fb47499c0c0",
-  "head_input_digest": "b8e414d9a46be5c3512f30c215b336d1e05568f00e48de89a637d7e9a5f88c08",
+  "head_input_digest": "c76189cea3e132a5d977ee5c9da29b63feefbe2049072ca270c6eb74cf4dacc9",
   "budget_profile": "current-change-relative-v1",
   "base": {
     "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:6a62fab60ddf5b30cb9651f7a2ec7140e06765f9c35eec1abd625e1f5814caec",
@@ -18,7 +18,7 @@
     },
     "lock_sha256": "659a2d81e02176d23168861529651506ac87a4eab1982109f144cd62a63fce71",
     "workload_sha256": "60a594de61cdde2d170daf35a50cc5826dc01d19127d1d37f24f30e6eeb7b5c5",
-    "fixture_sha256": "28233f9c329c7dc1fa07ab9872e98ea686b682b11b476624965606195268709a",
+    "fixture_sha256": "704fcfd470a12ad019475b86f23b2792b851cad8ba3fd0dda8d27b8686f9601e",
     "samples": {
       "ingress/restore": [
         1.2082627500000171,
@@ -100,7 +100,7 @@
     },
     "lock_sha256": "659a2d81e02176d23168861529651506ac87a4eab1982109f144cd62a63fce71",
     "workload_sha256": "60a594de61cdde2d170daf35a50cc5826dc01d19127d1d37f24f30e6eeb7b5c5",
-    "fixture_sha256": "28233f9c329c7dc1fa07ab9872e98ea686b682b11b476624965606195268709a",
+    "fixture_sha256": "704fcfd470a12ad019475b86f23b2792b851cad8ba3fd0dda8d27b8686f9601e",
     "samples": {
       "ingress/restore": [
         1.20550733999994,

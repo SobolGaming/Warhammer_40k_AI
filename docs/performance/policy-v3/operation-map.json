@@ -36813,7 +36813,9 @@
         "src/warhammer40k_core/engine/stratagems_effect_handlers.py",
         "tests/code_quality/test_engine_numerical_identity_admission.py",
         "tests/code_quality/test_order135_counteroffensive_band_authority.py",
-        "tests/rules/section12/test_counteroffensive_fight_type.py"
+        "tests/infrastructure/adapters/test_dark_pact_timing.py",
+        "tests/rules/section12/test_counteroffensive_fight_type.py",
+        "tests/support/dark_pact_fixtures.py"
       ],
       "owners": [
         "@document",
@@ -36828,6 +36830,7 @@
         "_after_enemy_overrun",
         "_apply_counteroffensive_handler",
         "_apply_fight_activation_decision",
+        "_catalog",
         "_complete_paid_fight",
         "_fight_activation_options",
         "_invalid_fight_activation_selection_status",
@@ -36838,6 +36841,7 @@
         "_issued_counteroffensive_choice",
         "_reject_changed_paid_choice",
         "_restore",
+        "_session",
         "_validate_counteroffensive_choice",
         "_validate_fight_reaction_continuation",
         "_viewer_request",
@@ -36845,7 +36849,9 @@
         "counteroffensive_fight_context",
         "counteroffensive_fights_first_effect",
         "current_fight_activation_selection_from_payload",
+        "dark_pact_catalog",
         "dark_pact_source_successors",
+        "dark_pact_test_transition",
         "fight_activation_option_payload",
         "invalid_fight_activation_status",
         "request_fight_activation",
