@@ -268,7 +268,12 @@
       "sensitive": false,
       "paths": [
         "data/source_audits/caudit_01_successors/README.md",
-        "data/source_audits/caudit_01_successors/successor-inventory.json"
+        "data/source_audits/caudit_01_successors/successor-inventory.json",
+        "data/source_audits/caudit_01_successors/batch-2/README.md",
+        "data/source_audits/caudit_01_successors/batch-2/historical-reconciliation.json",
+        "data/source_audits/caudit_01_successors/batch-2/open-evidence.json",
+        "data/source_audits/caudit_01_successors/batch-2/source-adoption-map.json",
+        "data/source_audits/caudit_01_successors/batch-2/successor-evidence.json"
       ],
       "owners": [
         "@document"

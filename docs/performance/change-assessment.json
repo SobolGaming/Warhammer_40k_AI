@@ -1,66 +1,126 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "55eef9b20652b030d3ab3e9b85755e0acd7c2d49",
+  "base": "769f1ed3643ef52be59343a53750502de9be02c7",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:6a62fab60ddf5b30cb9651f7a2ec7140e06765f9c35eec1abd625e1f5814caec",
-  "operation_map_sha256": "175c598e3332a1123f54e7b792c6ee5e5711a63a7eaf4ad463704b919388cd5e",
+  "operation_map_sha256": "cca1612c223aa87c0bd920749a5e63f0b3d0353383b030b76c328f896e280018",
   "changes": {
-    "data/source_audits/caudit_01_successors/README.md": {
+    "data/source_audits/caudit_01_successors/batch-2/README.md": {
       "before_sha256": null,
-      "after_sha256": "971b97bd2614da1e6747568f784ca2e58fd0675562484b6defc86697db5f611f",
+      "after_sha256": "c5bc3f9e669d081a7ae1a1fc9d8500c5e6d283da3b7fa7287f73cbcf3730acbc",
       "owners": {
         "@document": {
           "before": null,
-          "after": "971b97bd2614da1e6747568f784ca2e58fd0675562484b6defc86697db5f611f"
+          "after": "c5bc3f9e669d081a7ae1a1fc9d8500c5e6d283da3b7fa7287f73cbcf3730acbc"
         }
       }
     },
-    "data/source_audits/caudit_01_successors/successor-inventory.json": {
+    "data/source_audits/caudit_01_successors/batch-2/historical-reconciliation.json": {
       "before_sha256": null,
-      "after_sha256": "f4bf2ec918853cd2c9e1d8505ce24d6c8b013bed9a454754ace4ce9c3393e91d",
+      "after_sha256": "4ead6121300b63b6dc8763f907a93b6c86170cccbfe55f8a50a52ed310847669",
       "owners": {
         "@document": {
           "before": null,
-          "after": "f4bf2ec918853cd2c9e1d8505ce24d6c8b013bed9a454754ace4ce9c3393e91d"
+          "after": "4ead6121300b63b6dc8763f907a93b6c86170cccbfe55f8a50a52ed310847669"
+        }
+      }
+    },
+    "data/source_audits/caudit_01_successors/batch-2/open-evidence.json": {
+      "before_sha256": null,
+      "after_sha256": "0462a801c4c0adfaf93eeba2a4866f35f2960985b9014b268315b14603da0eb7",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "0462a801c4c0adfaf93eeba2a4866f35f2960985b9014b268315b14603da0eb7"
+        }
+      }
+    },
+    "data/source_audits/caudit_01_successors/batch-2/source-adoption-map.json": {
+      "before_sha256": null,
+      "after_sha256": "6cdf44e9075da865b859f7d00edc5e447ab8e9f9fcfd81b2eedb6b6ee4bec5a0",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "6cdf44e9075da865b859f7d00edc5e447ab8e9f9fcfd81b2eedb6b6ee4bec5a0"
+        }
+      }
+    },
+    "data/source_audits/caudit_01_successors/batch-2/successor-evidence.json": {
+      "before_sha256": null,
+      "after_sha256": "7bc26b9e17c326de5a4604ec2d5234f8c880c6af591fb38b5c71477490974104",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "7bc26b9e17c326de5a4604ec2d5234f8c880c6af591fb38b5c71477490974104"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "8658b29d837cb3947fd134a4b5ac80efb223c1bda69a44fa630514b2c9dc07be",
-      "after_sha256": "460019df7a6c3d510522606447a18ff4e92726b03eeade906f88670163be99d5",
+      "before_sha256": "460019df7a6c3d510522606447a18ff4e92726b03eeade906f88670163be99d5",
+      "after_sha256": "e550100d76266492d8ca440da32dd140ba182fab1f2a14c340b11c1ef99851bb",
       "owners": {
         "@document": {
-          "before": "8658b29d837cb3947fd134a4b5ac80efb223c1bda69a44fa630514b2c9dc07be",
-          "after": "460019df7a6c3d510522606447a18ff4e92726b03eeade906f88670163be99d5"
+          "before": "460019df7a6c3d510522606447a18ff4e92726b03eeade906f88670163be99d5",
+          "after": "e550100d76266492d8ca440da32dd140ba182fab1f2a14c340b11c1ef99851bb"
         }
       }
     }
   },
   "rows": {
-    "data/source_audits/caudit_01_successors/README.md": {
+    "data/source_audits/caudit_01_successors/batch-2/README.md": {
       "category": "rule_semantics",
       "operations": [
         "caudit-01-successor-evidence"
       ],
       "selected_families": [],
-      "rationale": "Retains scoped source, assertion, diagnostic and execution evidence from existing engine and test paths.",
-      "source_obligation": "CAUDIT-01 records bounded and partial source-linked successors and one reproduced gap across sixteen Core sections.",
-      "unchanged_work": "The evidence inventory leaves runtime algorithms, fixtures, workload selection and budgets intact."
+      "rationale": "Records source bindings, historical review dispositions and scoped local diagnostic evidence for the Core rules audit.",
+      "source_obligation": "CAUDIT-01 links the completed Order 135 reconciliation with selected and bounded native witnesses.",
+      "unchanged_work": "Runtime inputs, dependency identities, test selection and measured workload are byte-identical to the exact base."
     },
-    "data/source_audits/caudit_01_successors/successor-inventory.json": {
+    "data/source_audits/caudit_01_successors/batch-2/historical-reconciliation.json": {
       "category": "rule_semantics",
       "operations": [
         "caudit-01-successor-evidence"
       ],
       "selected_families": [],
-      "rationale": "Retains scoped source, assertion, diagnostic and execution evidence from existing engine and test paths.",
-      "source_obligation": "CAUDIT-01 records bounded and partial source-linked successors and one reproduced gap across sixteen Core sections.",
-      "unchanged_work": "The evidence inventory leaves runtime algorithms, fixtures, workload selection and budgets intact."
+      "rationale": "Records source bindings, historical review dispositions and scoped local diagnostic evidence for the Core rules audit.",
+      "source_obligation": "CAUDIT-01 links the completed Order 135 reconciliation with selected and bounded native witnesses.",
+      "unchanged_work": "Runtime inputs, dependency identities, test selection and measured workload are byte-identical to the exact base."
+    },
+    "data/source_audits/caudit_01_successors/batch-2/open-evidence.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "caudit-01-successor-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Records source bindings, historical review dispositions and scoped local diagnostic evidence for the Core rules audit.",
+      "source_obligation": "CAUDIT-01 links the completed Order 135 reconciliation with selected and bounded native witnesses.",
+      "unchanged_work": "Runtime inputs, dependency identities, test selection and measured workload are byte-identical to the exact base."
+    },
+    "data/source_audits/caudit_01_successors/batch-2/source-adoption-map.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "caudit-01-successor-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Records source bindings, historical review dispositions and scoped local diagnostic evidence for the Core rules audit.",
+      "source_obligation": "CAUDIT-01 links the completed Order 135 reconciliation with selected and bounded native witnesses.",
+      "unchanged_work": "Runtime inputs, dependency identities, test selection and measured workload are byte-identical to the exact base."
+    },
+    "data/source_audits/caudit_01_successors/batch-2/successor-evidence.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "caudit-01-successor-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Records source bindings, historical review dispositions and scoped local diagnostic evidence for the Core rules audit.",
+      "source_obligation": "CAUDIT-01 links the completed Order 135 reconciliation with selected and bounded native witnesses.",
+      "unchanged_work": "Runtime inputs, dependency identities, test selection and measured workload are byte-identical to the exact base."
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Classifies two exact audit evidence paths. The operation selects no runtime workload.",
+      "rationale": "Adds five exact evidence paths to the existing non-sensitive audit operation.",
       "source_obligation": null,
       "unchanged_work": null
     }

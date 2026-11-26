@@ -1,0 +1,2760 @@
+{
+  "native_evidence": [
+    {
+      "category": "19",
+      "disposition": "missing",
+      "family": "allocation_and_destruction_lifetimes",
+      "obligation_id": "19.04-attack-sequence-source-retention",
+      "order135_obligation": "If an attack destroys the last conferring model, its ability persists until that attacking unit finishes all attacks.",
+      "priority": 1,
+      "receipt": {
+        "path": "caudit-01-baseline/baseline.json",
+        "sha256": "8029035ae56c6bf997a524035bbde3684b6d4e0f0686b807cf90f0d22598681a"
+      },
+      "scope": "No selected assertion-bearing binding in the original retained ledger. Supplementary local witness limits are recorded in the priority handoff.",
+      "source_row_id": "rule:19:19.04:1"
+    },
+    {
+      "category": "24",
+      "disposition": "missing",
+      "family": "allocation_and_destruction_lifetimes",
+      "obligation_id": "24.28.01-precision-devastating-priority",
+      "order135_obligation": "Devastating mortal wounds from Precision first apply to the selected surviving Character group.",
+      "priority": 1,
+      "receipt": {
+        "path": "caudit-01-baseline/baseline.json",
+        "sha256": "8029035ae56c6bf997a524035bbde3684b6d4e0f0686b807cf90f0d22598681a"
+      },
+      "scope": "No selected assertion-bearing binding in the original retained ledger. Supplementary local witness limits are recorded in the priority handoff.",
+      "source_row_id": "rule:24:24.28.01:1"
+    },
+    {
+      "category": "05",
+      "disposition": "partial",
+      "family": "allocation_and_destruction_lifetimes",
+      "obligation_id": "05.04.05-obligation-03",
+      "order135_obligation": "After its retention ends, resolve its destroyed-model triggers and remove it.",
+      "priority": 1,
+      "receipt": {
+        "path": "caudit-01-section05/bindings-receipt.json",
+        "sha256": "67b0e73f5be7a80643bcf56b4f907723bf6056a7798393cc60acb9c0af2446f8"
+      },
+      "scope": "Retained attack completion or expiry removes the casualty. Ordinary non-retained destruction reacts before removal. The adopted FAQ20 exception separately proves after-removal Deadly Demise. A retained non-Demise destruction rule followed by removal remains outside these cases.",
+      "source_row_id": "rule:05:05.04.05:1"
+    },
+    {
+      "category": "05",
+      "disposition": "partial",
+      "family": "allocation_and_destruction_lifetimes",
+      "obligation_id": "05.04.05-obligation-04",
+      "order135_obligation": "An immediately-after-attacker fight-on-death rule waits until that model's unit fights or the phase ends.",
+      "priority": 1,
+      "receipt": {
+        "path": "caudit-01-active-final/bindings-receipt.json",
+        "sha256": "e3666f79033ad54baba14a678ba7074b8422105c64e31836724b453e7823fe4e"
+      },
+      "scope": "Physical retained melee precedes removal and ordinary attack reactions defer. One exact witness must connect the triggering attack to the retained unit later fighting or phase expiry.",
+      "source_row_id": "rule:05:05.04.05:1"
+    },
+    {
+      "category": "24",
+      "disposition": "partial",
+      "family": "allocation_and_destruction_lifetimes",
+      "obligation_id": "24.08-after-emergency-disembark",
+      "order135_obligation": "Deadly Demise resolves only after any embarked units complete Emergency disembark.",
+      "priority": 1,
+      "receipt": {
+        "path": "caudit-01-active-stratagems-weapons/bindings-receipt.json",
+        "sha256": "1d04ff1ca82f4864a153b9d4938cd8311e852ba2abcd2b6b324bff0d0dc6b146"
+      },
+      "scope": "Separate cleanup reaction and passenger setup before carrier removal. A single destroyed transport with multiple passengers and subsequent Demise remains to be asserted.",
+      "source_row_id": "rule:24:24.08:1"
+    },
+    {
+      "category": "24",
+      "disposition": "partial",
+      "family": "allocation_and_destruction_lifetimes",
+      "obligation_id": "24.28-character-priority-lifetime",
+      "order135_obligation": "The selected Precision group remains current until these attacks finish or that Character group is destroyed.",
+      "priority": 1,
+      "receipt": {
+        "path": "caudit-01-active-stratagems-weapons/bindings-receipt.json",
+        "sha256": "1d04ff1ca82f4864a153b9d4938cd8311e852ba2abcd2b6b324bff0d0dc6b146"
+      },
+      "scope": "Current mapped grouping does not prove expiry on sequence completion or transition after the selected Character is destroyed.",
+      "source_row_id": "rule:24:24.28:1"
+    },
+    {
+      "category": "24",
+      "disposition": "partial",
+      "family": "allocation_and_destruction_lifetimes",
+      "obligation_id": "24.28-visible-character-choice",
+      "order135_obligation": "At Allocation Order, Precision permits the active player to select an allocation group containing a Character visible to an attacking model.",
+      "priority": 1,
+      "receipt": {
+        "path": "caudit-01-active-stratagems-weapons/bindings-receipt.json",
+        "sha256": "1d04ff1ca82f4864a153b9d4938cd8311e852ba2abcd2b6b324bff0d0dc6b146"
+      },
+      "scope": "Current live test covers grouping against a Character. Local retained diagnostic supports positive priority, but chooser visibility and active-player negative control remain open.",
+      "source_row_id": "rule:24:24.28:1"
+    },
+    {
+      "category": "15",
+      "disposition": "partial",
+      "family": "turn_locks_and_aftermath",
+      "obligation_id": "15.09-action-lock",
+      "order135_obligation": "Snap shooting blocks action start through phase end.",
+      "priority": 2,
+      "receipt": {
+        "path": "caudit-01-active-stratagems-weapons/bindings-receipt.json",
+        "sha256": "1d04ff1ca82f4864a153b9d4938cd8311e852ba2abcd2b6b324bff0d0dc6b146"
+      },
+      "scope": "Records completed-shooting activity in opposing Movement. No actual start-Action attempt across the exact expiry boundary.",
+      "source_row_id": "rule:15:15.09:1"
+    },
+    {
+      "category": "15",
+      "disposition": "partial",
+      "family": "turn_locks_and_aftermath",
+      "obligation_id": "15.12-expiry",
+      "order135_obligation": "The grant expires at the end of the current Fight phase.",
+      "priority": 2,
+      "receipt": {
+        "path": "caudit-01-active-final/bindings-receipt.json",
+        "sha256": "e3666f79033ad54baba14a678ba7074b8422105c64e31836724b453e7823fe4e"
+      },
+      "scope": "Temporary grant is observed during Fight. Actual phase-end release of this named source needs an assertion.",
+      "source_row_id": "rule:15:15.12:1"
+    },
+    {
+      "category": "18",
+      "disposition": "partial",
+      "family": "turn_locks_and_aftermath",
+      "obligation_id": "18.07-placed-carrier",
+      "order135_obligation": "The unit must be embarked in a transport on the battlefield.",
+      "priority": 2,
+      "receipt": {
+        "path": "caudit-01-active-deployment-transport/bindings-receipt.json",
+        "sha256": "0c666871f5a2b8e0a0be8809a6fae84060afd20962b29e8016bcb3ac699259e6"
+      },
+      "scope": "The Shock positive is a present loaded carrier. Absence and no-cargo negatives reach the shared ordinary owner without a source-granted Shock proposal.",
+      "source_row_id": "rule:18:18.07:1"
+    },
+    {
+      "category": "20",
+      "disposition": "partial",
+      "family": "turn_locks_and_aftermath",
+      "obligation_id": "20.04-until-next-charge-lock",
+      "order135_obligation": "Unless overridden, ingress forbids further move types until the next Charge phase starts.",
+      "priority": 2,
+      "receipt": {
+        "path": "caudit-01-remaining-bindings/bindings-receipt.json",
+        "sha256": "02c992e490372921ca9698baf2098d13c17ba8f4cf05b4f28d27eeea76e47bca"
+      },
+      "scope": "The public reactive movement command is barred in copied Shooting state. The same explicit test permission permits a real path in copied Charge state and continues to an ordinary charging-unit choice. Full phase traversal and named provider admission remain outside this witness.",
+      "source_row_id": "rule:20:20.04:1"
+    },
+    {
+      "category": "24",
+      "disposition": "partial",
+      "family": "turn_locks_and_aftermath",
+      "obligation_id": "24.14-all-cargo-shooting-lock",
+      "order135_obligation": "After Firing Deck selection, every embarked unit is ineligible to shoot until turn end.",
+      "priority": 2,
+      "receipt": {
+        "path": "caudit-01-active-stratagems-weapons/bindings-receipt.json",
+        "sha256": "1d04ff1ca82f4864a153b9d4938cd8311e852ba2abcd2b6b324bff0d0dc6b146"
+      },
+      "scope": "One registered cargo lock under normal native declaration. Second unselected cargo and actual turn-end expiry are still open.",
+      "source_row_id": "rule:24:24.14:1"
+    },
+    {
+      "category": "24",
+      "disposition": "partial",
+      "family": "turn_locks_and_aftermath",
+      "obligation_id": "24.14-borrow-until-completed",
+      "order135_obligation": "The transport temporarily has the selected weapons until its attacks finish.",
+      "priority": 2,
+      "receipt": {
+        "path": "caudit-01-remaining-bindings/bindings-receipt.json",
+        "sha256": "02c992e490372921ca9698baf2098d13c17ba8f4cf05b4f28d27eeea76e47bca"
+      },
+      "scope": "The ordinary carrier accepts two physical cargo weapon pools and completes the native attack sequence. The existing assertion does not query the loan or try the same borrowed weapon again after that attack completion.",
+      "source_row_id": "rule:24:24.14:1"
+    },
+    {
+      "category": "24",
+      "disposition": "partial",
+      "family": "turn_locks_and_aftermath",
+      "obligation_id": "24.14-model-limit-and-prior-selection",
+      "order135_obligation": "Firing Deck selects at most X embarked models, excluding units already selected to shoot this phase.",
+      "priority": 2,
+      "receipt": {
+        "path": "caudit-01-active-stratagems-weapons/bindings-receipt.json",
+        "sha256": "1d04ff1ca82f4864a153b9d4938cd8311e852ba2abcd2b6b324bff0d0dc6b146"
+      },
+      "scope": "Capacity and physical identity across accepted versus over-capacity declaration checked. A cargo unit previously selected in phase is not contrasted.",
+      "source_row_id": "rule:24:24.14:1"
+    },
+    {
+      "category": "24",
+      "disposition": "missing",
+      "family": "attack_choices_and_normal_use",
+      "obligation_id": "24.11-mandatory-extra-weapons",
+      "order135_obligation": "A fighting model must select all of its Extra Attacks weapons.",
+      "priority": 3,
+      "receipt": {
+        "path": "caudit-01-baseline/baseline.json",
+        "sha256": "8029035ae56c6bf997a524035bbde3684b6d4e0f0686b807cf90f0d22598681a"
+      },
+      "scope": "No selected assertion-bearing binding in the original retained ledger. Supplementary local witness limits are recorded in the priority handoff.",
+      "source_row_id": "rule:24:24.11:1"
+    },
+    {
+      "category": "24",
+      "disposition": "missing",
+      "family": "attack_choices_and_normal_use",
+      "obligation_id": "24.11-one-other-melee-if-possible",
+      "order135_obligation": "Alongside Extra Attacks weapons a model selects one other melee weapon when available.",
+      "priority": 3,
+      "receipt": {
+        "path": "caudit-01-baseline/baseline.json",
+        "sha256": "8029035ae56c6bf997a524035bbde3684b6d4e0f0686b807cf90f0d22598681a"
+      },
+      "scope": "No selected assertion-bearing binding in the original retained ledger. Supplementary local witness limits are recorded in the priority handoff.",
+      "source_row_id": "rule:24:24.11:1"
+    },
+    {
+      "category": "24",
+      "disposition": "missing",
+      "family": "attack_choices_and_normal_use",
+      "obligation_id": "24.11.01-extra-without-primary",
+      "order135_obligation": "Extra Attacks weapons can attack even when no ordinary melee weapon is selected.",
+      "priority": 3,
+      "receipt": {
+        "path": "caudit-01-baseline/baseline.json",
+        "sha256": "8029035ae56c6bf997a524035bbde3684b6d4e0f0686b807cf90f0d22598681a"
+      },
+      "scope": "The archived test reference has no active evidence in the initial inventory.",
+      "source_row_id": "rule:24:24.11.01:1"
+    },
+    {
+      "category": "24",
+      "disposition": "missing",
+      "family": "attack_choices_and_normal_use",
+      "obligation_id": "24.18-deny-all-cover",
+      "order135_obligation": "Ignores Cover prevents all sources of benefit of cover, including Stealth.",
+      "priority": 3,
+      "receipt": {
+        "path": "caudit-01-baseline/baseline.json",
+        "sha256": "8029035ae56c6bf997a524035bbde3684b6d4e0f0686b807cf90f0d22598681a"
+      },
+      "scope": "No selected assertion-bearing binding in the original retained ledger. Supplementary local witness limits are recorded in the priority handoff.",
+      "source_row_id": "rule:24:24.18:1"
+    },
+    {
+      "category": "24",
+      "disposition": "missing",
+      "family": "attack_choices_and_normal_use",
+      "obligation_id": "24.21-charge-turn-wound-bonus",
+      "order135_obligation": "Lance adds one to wound if the attacking model’s unit charged this turn.",
+      "priority": 3,
+      "receipt": {
+        "path": "caudit-01-baseline/baseline.json",
+        "sha256": "8029035ae56c6bf997a524035bbde3684b6d4e0f0686b807cf90f0d22598681a"
+      },
+      "scope": "The archived test reference has no active evidence in the initial inventory.",
+      "source_row_id": "rule:24:24.21:1"
+    },
+    {
+      "category": "24",
+      "disposition": "missing",
+      "family": "attack_choices_and_normal_use",
+      "obligation_id": "24.26-new-unit-fresh-weapons",
+      "order135_obligation": "One Shot weapons in a newly added unit each receive their own one-use allowance.",
+      "priority": 3,
+      "receipt": {
+        "path": "caudit-01-baseline/baseline.json",
+        "sha256": "8029035ae56c6bf997a524035bbde3684b6d4e0f0686b807cf90f0d22598681a"
+      },
+      "scope": "The archived test reference has no active evidence in the initial inventory.",
+      "source_row_id": "rule:24:24.26:1"
+    },
+    {
+      "category": "24",
+      "disposition": "missing",
+      "family": "attack_choices_and_normal_use",
+      "obligation_id": "24.26-revival-keeps-spent",
+      "order135_obligation": "Reviving a model does not reset One Shot weapons that it previously selected.",
+      "priority": 3,
+      "receipt": {
+        "path": "caudit-01-baseline/baseline.json",
+        "sha256": "8029035ae56c6bf997a524035bbde3684b6d4e0f0686b807cf90f0d22598681a"
+      },
+      "scope": "The archived test reference has no active evidence in the initial inventory.",
+      "source_row_id": "rule:24:24.26:1"
+    },
+    {
+      "category": "24",
+      "disposition": "missing",
+      "family": "attack_choices_and_normal_use",
+      "obligation_id": "24.29-optional-hit-modifier-subsets",
+      "order135_obligation": "For a Psychic attack the player may ignore any chosen subset of hit-roll modifiers.",
+      "priority": 3,
+      "receipt": {
+        "path": "caudit-01-baseline/baseline.json",
+        "sha256": "8029035ae56c6bf997a524035bbde3684b6d4e0f0686b807cf90f0d22598681a"
+      },
+      "scope": "No selected assertion-bearing binding in the original retained ledger. Supplementary local witness limits are recorded in the priority handoff.",
+      "source_row_id": "rule:24:24.29:1"
+    },
+    {
+      "category": "24",
+      "disposition": "missing",
+      "family": "attack_choices_and_normal_use",
+      "obligation_id": "24.29-optional-skill-modifier-subsets",
+      "order135_obligation": "For a Psychic attack the player may ignore any chosen subset of BS or WS modifiers.",
+      "priority": 3,
+      "receipt": {
+        "path": "caudit-01-baseline/baseline.json",
+        "sha256": "8029035ae56c6bf997a524035bbde3684b6d4e0f0686b807cf90f0d22598681a"
+      },
+      "scope": "No selected assertion-bearing binding in the original retained ledger. Supplementary local witness limits are recorded in the priority handoff.",
+      "source_row_id": "rule:24:24.29:1"
+    },
+    {
+      "category": "24",
+      "disposition": "missing",
+      "family": "attack_choices_and_normal_use",
+      "obligation_id": "24.29-psychic-attack-tag",
+      "order135_obligation": "An attack using a Psychic weapon is recorded as a Psychic attack for downstream rules.",
+      "priority": 3,
+      "receipt": {
+        "path": "caudit-01-baseline/baseline.json",
+        "sha256": "8029035ae56c6bf997a524035bbde3684b6d4e0f0686b807cf90f0d22598681a"
+      },
+      "scope": "No selected assertion-bearing binding in the original retained ledger. Supplementary local witness limits are recorded in the priority handoff.",
+      "source_row_id": "rule:24:24.29:1"
+    },
+    {
+      "category": "02",
+      "disposition": "partial",
+      "family": "attack_choices_and_normal_use",
+      "obligation_id": "02.02.03-obligation-03",
+      "order135_obligation": "Random A is rolled when attacks are generated in Resolve Attacks.",
+      "priority": 3,
+      "receipt": {
+        "path": "caudit-01-active-final/bindings-receipt.json",
+        "sha256": "e3666f79033ad54baba14a678ba7074b8422105c64e31836724b453e7823fe4e"
+      },
+      "scope": "Native per-weapon generation is confirmed. The public shooting witness records the roll before Resolve Attacks and reveals the separate missing Command Re-roll window. Timing remains open in that fix lane.",
+      "source_row_id": "rule:02:02.02.03:1"
+    },
+    {
+      "category": "24",
+      "disposition": "partial",
+      "family": "attack_choices_and_normal_use",
+      "obligation_id": "24.15-after-attacks",
+      "order135_obligation": "After selected Shooting or Fight attacks finish, Hazardous rolls occur.",
+      "priority": 3,
+      "receipt": {
+        "path": "caudit-01-active-stratagems-weapons/bindings-receipt.json",
+        "sha256": "1d04ff1ca82f4864a153b9d4938cd8311e852ba2abcd2b6b324bff0d0dc6b146"
+      },
+      "scope": "Hazard roll follows actual completion event under a constructed attack grant, plus actual native plasma allocation. Native Fight ordering unasserted here.",
+      "source_row_id": "rule:24:24.15:1"
+    },
+    {
+      "category": "24",
+      "disposition": "partial",
+      "family": "attack_choices_and_normal_use",
+      "obligation_id": "24.15-selected-physical-weapon-count",
+      "order135_obligation": "Hazardous roll count equals the selected physical Hazardous weapons, irrespective of targets.",
+      "priority": 3,
+      "receipt": {
+        "path": "caudit-01-remaining-bindings/bindings-receipt.json",
+        "sha256": "02c992e490372921ca9698baf2098d13c17ba8f4cf05b4f28d27eeea76e47bca"
+      },
+      "scope": "One selected physical Hazardous weapon produces one matching test after attack completion. The active assertion does not put the same physical weapon across multiple legal target allocations or compare two selected physical copies.",
+      "source_row_id": "rule:24:24.15:1"
+    },
+    {
+      "category": "24",
+      "disposition": "partial",
+      "family": "attack_choices_and_normal_use",
+      "obligation_id": "24.16-not-set-up-this-turn",
+      "order135_obligation": "Heavy requires the attacking unit not to have been set up this turn.",
+      "priority": 3,
+      "receipt": {
+        "path": "caudit-01-active-stratagems-weapons/bindings-receipt.json",
+        "sha256": "1d04ff1ca82f4864a153b9d4938cd8311e852ba2abcd2b6b324bff0d0dc6b146"
+      },
+      "scope": "Actual permission contrast is distance. It does not independently assert a same-turn setup versus no-setup contrast.",
+      "source_row_id": "rule:24:24.16:1"
+    },
+    {
+      "category": "24",
+      "disposition": "partial",
+      "family": "attack_choices_and_normal_use",
+      "obligation_id": "24.16-unengaged-required",
+      "order135_obligation": "Heavy requires the attacking unit to be unengaged.",
+      "priority": 3,
+      "receipt": {
+        "path": "caudit-01-active-stratagems-weapons/bindings-receipt.json",
+        "sha256": "1d04ff1ca82f4864a153b9d4938cd8311e852ba2abcd2b6b324bff0d0dc6b146"
+      },
+      "scope": "Positive Heavy modifier in open geometry. No paired accepted attack in engagement keeping other premises identical.",
+      "source_row_id": "rule:24:24.16:1"
+    },
+    {
+      "category": "24",
+      "disposition": "partial",
+      "family": "attack_choices_and_normal_use",
+      "obligation_id": "24.23-auto-wound-no-critical",
+      "order135_obligation": "Choosing automatic wounding makes no wound roll and cannot generate a critical-wound effect.",
+      "priority": 3,
+      "receipt": {
+        "path": "caudit-01-active-stratagems-weapons/bindings-receipt.json",
+        "sha256": "1d04ff1ca82f4864a153b9d4938cd8311e852ba2abcd2b6b324bff0d0dc6b146"
+      },
+      "scope": "Prompt and decline recorded. This live test never chooses automatic wound or independently asserts no critical effect following acceptance.",
+      "source_row_id": "rule:24:24.23:1"
+    },
+    {
+      "category": "24",
+      "disposition": "partial",
+      "family": "attack_choices_and_normal_use",
+      "obligation_id": "24.36-critical-extra-hits",
+      "order135_obligation": "Sustained Hits X adds X further hits on each critical hit.",
+      "priority": 3,
+      "receipt": {
+        "path": "caudit-01-active-stratagems-weapons/bindings-receipt.json",
+        "sha256": "1d04ff1ca82f4864a153b9d4938cd8311e852ba2abcd2b6b324bff0d0dc6b146"
+      },
+      "scope": "Pure helper produces original plus selected X hits. No actual critical attack asserting all X downstream wound opportunities in these bindings.",
+      "source_row_id": "rule:24:24.36:1"
+    },
+    {
+      "category": "15",
+      "disposition": "missing",
+      "family": "charge_and_prebattle_geometry",
+      "obligation_id": "15.11-fray-roll",
+      "order135_obligation": "Into the Fray: cap Charge result at 6 after modifiers",
+      "priority": 4,
+      "receipt": {
+        "path": "caudit-01-baseline/baseline.json",
+        "sha256": "8029035ae56c6bf997a524035bbde3684b6d4e0f0686b807cf90f0d22598681a"
+      },
+      "scope": "No selected assertion-bearing binding in the original retained ledger. Supplementary local witness limits are recorded in the priority handoff.",
+      "source_row_id": "rule:15:15.11:1"
+    },
+    {
+      "category": "15",
+      "disposition": "missing",
+      "family": "charge_and_prebattle_geometry",
+      "obligation_id": "15.11-fray-target",
+      "order135_obligation": "Into the Fray: enemies within 6 inches and maximum distance",
+      "priority": 4,
+      "receipt": {
+        "path": "caudit-01-baseline/baseline.json",
+        "sha256": "8029035ae56c6bf997a524035bbde3684b6d4e0f0686b807cf90f0d22598681a"
+      },
+      "scope": "No selected assertion-bearing binding in the original retained ledger. Supplementary local witness limits are recorded in the priority handoff.",
+      "source_row_id": "rule:15:15.11:1"
+    },
+    {
+      "category": "24",
+      "disposition": "missing",
+      "family": "charge_and_prebattle_geometry",
+      "obligation_id": "24.31-dedicated-transport-cargo",
+      "order135_obligation": "A Dedicated Transport wholly in its deployment zone may Scout when every embarked model has Scouts.",
+      "priority": 4,
+      "receipt": {
+        "path": "caudit-01-active-stratagems-weapons/bindings-receipt.json",
+        "sha256": "1d04ff1ca82f4864a153b9d4938cd8311e852ba2abcd2b6b324bff0d0dc6b146"
+      },
+      "scope": "No live assertion-bearing carrier with all versus mixed Scout cargo in actual prebattle selection. Active Scout control covers foot unit only.",
+      "source_row_id": "rule:24:24.31:1"
+    },
+    {
+      "category": "24",
+      "disposition": "missing",
+      "family": "charge_and_prebattle_geometry",
+      "obligation_id": "24.31-reserve-own-zone-setup",
+      "order135_obligation": "A Scout unit in Strategic Reserves may set up wholly within its deployment zone.",
+      "priority": 4,
+      "receipt": {
+        "path": "caudit-01-active-stratagems-weapons/bindings-receipt.json",
+        "sha256": "1d04ff1ca82f4864a153b9d4938cd8311e852ba2abcd2b6b324bff0d0dc6b146"
+      },
+      "scope": "No live assertion of ordinary Strategic Reserve Scout set-up fully inside own zone in this binding.",
+      "source_row_id": "rule:24:24.31:1"
+    },
+    {
+      "category": "24",
+      "disposition": "missing",
+      "family": "charge_and_prebattle_geometry",
+      "obligation_id": "24.32-enemy-eight-inch-boundary",
+      "order135_obligation": "The Scout move must end more than eight horizontal inches from all enemies.",
+      "priority": 4,
+      "receipt": {
+        "path": "caudit-01-active-stratagems-weapons/bindings-receipt.json",
+        "sha256": "1d04ff1ca82f4864a153b9d4938cd8311e852ba2abcd2b6b324bff0d0dc6b146"
+      },
+      "scope": "Live Scout fixture enemy is distant. It never compares exact eight horizontal inches to a point just beyond on a witnessed endpoint.",
+      "source_row_id": "rule:24:24.32:1"
+    },
+    {
+      "category": "24",
+      "disposition": "missing",
+      "family": "charge_and_prebattle_geometry",
+      "obligation_id": "80182be3-1a44-464b-9ef6-cd9212429603-alternate-prebattle",
+      "order135_obligation": "When both players have prebattle rules, resolve units alternately starting with the first-turn player.",
+      "priority": 4,
+      "receipt": {
+        "path": "caudit-01-baseline/baseline.json",
+        "sha256": "8029035ae56c6bf997a524035bbde3684b6d4e0f0686b807cf90f0d22598681a"
+      },
+      "scope": "No selected assertion-bearing binding in the original retained ledger. Supplementary local witness limits are recorded in the priority handoff.",
+      "source_row_id": "faq:80182be3-1a44-464b-9ef6-cd9212429603"
+    },
+    {
+      "category": "03",
+      "disposition": "partial",
+      "family": "charge_and_prebattle_geometry",
+      "obligation_id": "03.02.03-obligation-01",
+      "order135_obligation": "Redeployment removes the unit before setting it up again.",
+      "priority": 4,
+      "receipt": {
+        "path": "caudit-01-active-datasheets-movement-attachments/bindings-receipt.json",
+        "sha256": "fb5dc75cd66bf9a5edc58e56aa7738f33368cbe7d53c1316dffab4cbc6289089"
+      },
+      "scope": "Validated redeploy produces exact physical removal and placement batches. No public command asserts the actual event order.",
+      "source_row_id": "rule:03:03.02.03:1"
+    },
+    {
+      "category": "11",
+      "disposition": "partial",
+      "family": "charge_and_prebattle_geometry",
+      "obligation_id": "11.04-declared",
+      "order135_obligation": "Only a unit that declared charge this phase can make this charge move.",
+      "priority": 4,
+      "receipt": {
+        "path": "caudit-01-active-final/bindings-receipt.json",
+        "sha256": "e3666f79033ad54baba14a678ba7074b8422105c64e31836724b453e7823fe4e"
+      },
+      "scope": "Native charge move follows actual declaration and accepted request identity. Exact forged move with no declaration remains open.",
+      "source_row_id": "rule:11:11.04:1"
+    },
+    {
+      "category": "12",
+      "disposition": "partial",
+      "family": "charge_and_prebattle_geometry",
+      "obligation_id": "12.08-eligibility",
+      "order135_obligation": "Consolidation is available in Fight to units eligible to fight that phase.",
+      "priority": 4,
+      "receipt": {
+        "path": "caudit-01-remaining-bindings/bindings-receipt.json",
+        "sha256": "02c992e490372921ca9698baf2098d13c17ba8f4cf05b4f28d27eeea76e47bca"
+      },
+      "scope": "Native eligible units follow legal Ongoing, Engaging, or Objective modes and maintain one choice per unit. A placement-geometrically-valid but ineligible unit is not independently contrasted in these controls.",
+      "source_row_id": "rule:12:12.08:1"
+    },
+    {
+      "category": "12",
+      "disposition": "partial",
+      "family": "charge_and_prebattle_geometry",
+      "obligation_id": "12.08-engaging-closer",
+      "order135_obligation": "Engaging movement approaches the closest selected enemy and reaches engagement if possible.",
+      "priority": 4,
+      "receipt": {
+        "path": "caudit-01-active-final/bindings-receipt.json",
+        "sha256": "e3666f79033ad54baba14a678ba7074b8422105c64e31836724b453e7823fe4e"
+      },
+      "scope": "Actual movement and Engagement commit checked. Explicit tie/closest target contrast for Engaging is still open.",
+      "source_row_id": "rule:12:12.08:1"
+    },
+    {
+      "category": "15",
+      "disposition": "partial",
+      "family": "charge_and_prebattle_geometry",
+      "obligation_id": "15.11-leap",
+      "order135_obligation": "Leap to Defend: only completed chargers within maximum distance",
+      "priority": 4,
+      "receipt": {
+        "path": "caudit-01-active-stratagems-weapons/bindings-receipt.json",
+        "sha256": "1d04ff1ca82f4864a153b9d4938cd8311e852ba2abcd2b6b324bff0d0dc6b146"
+      },
+      "scope": "Leap constrains target to completed charger ID in configured context. No multiple-candidate or exact maximum-distance contrast.",
+      "source_row_id": "rule:15:15.11:1"
+    },
+    {
+      "category": "15",
+      "disposition": "partial",
+      "family": "charge_and_prebattle_geometry",
+      "obligation_id": "15.11-target",
+      "order135_obligation": "Friendly unengaged unit within 12 inches",
+      "priority": 4,
+      "receipt": {
+        "path": "caudit-01-active-stratagems-weapons/bindings-receipt.json",
+        "sha256": "1d04ff1ca82f4864a153b9d4938cd8311e852ba2abcd2b6b324bff0d0dc6b146"
+      },
+      "scope": "Native reactor acceptance and scoped targets. No dedicated source-unit 12-inch or engaged boundary controls in this receipt.",
+      "source_row_id": "rule:15:15.11:1"
+    },
+    {
+      "category": "24",
+      "disposition": "partial",
+      "family": "charge_and_prebattle_geometry",
+      "obligation_id": "24.31-all-model-prebattle-permission",
+      "order135_obligation": "Scouts is a prebattle option only if every model has the ability; one permitted action is selected.",
+      "priority": 4,
+      "receipt": {
+        "path": "caudit-01-proximity-keywords-admission/bindings-receipt.json",
+        "sha256": "92bea0f682622885245bf479858d8dffbb6c403058a798fe61535c1b193e3f23"
+      },
+      "scope": "Native Infractors produce an instance on every model, and the ordinary owner requests a single six-inch Scout Move. Explicit per-model source data checks finite distance choices. Current controls do not remove one model's entitlement or exercise competing action choices and one-action consumption.",
+      "source_row_id": "rule:24:24.31:1"
+    },
+    {
+      "category": "24",
+      "disposition": "partial",
+      "family": "charge_and_prebattle_geometry",
+      "obligation_id": "24.32-prebattle-zone-eligibility",
+      "order135_obligation": "A Scout move occurs in Resolve Pre-battle Abilities and begins wholly in the player deployment zone.",
+      "priority": 4,
+      "receipt": {
+        "path": "caudit-01-proximity-keywords-admission/bindings-receipt.json",
+        "sha256": "92bea0f682622885245bf479858d8dffbb6c403058a798fe61535c1b193e3f23"
+      },
+      "scope": "In Pre-battle Abilities a native unit starting wholly inside its zone is offered Scout Move and its legal zero- and six-inch attempts resolve. The 6.001-inch negative isolates path allowance. No active control in this batch varies the starting-zone or wrong-step boundary.",
+      "source_row_id": "rule:24:24.32:1"
+    },
+    {
+      "category": "01",
+      "disposition": "missing",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "01.04.01-obligation-05",
+      "order135_obligation": "A unit is wholly within when every member model is wholly within.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-shared-owner-batch/bindings-receipt.json",
+        "sha256": "13d1b9a8b10247ae9b3e80f68e9fbd38c56861bf57d1f7fc14cc2435173df0e4"
+      },
+      "scope": "The proposed successor asserts whole-unit table-quarter assignment, a different question from every base being within a specified distance. The individual FRAME range control cannot establish aggregation across members. No direct active unit-distance assertion was bound.",
+      "source_row_id": "rule:01:01.04.01:1"
+    },
+    {
+      "category": "24",
+      "disposition": "missing",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "24.20-enemy-unit-distance",
+      "order135_obligation": "Infiltrator placement must also be more than eight horizontal inches from every enemy unit.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-proximity-keywords-admission/bindings-receipt.json",
+        "sha256": "92bea0f682622885245bf479858d8dffbb6c403058a798fe61535c1b193e3f23"
+      },
+      "scope": "The live deployment owner has a separate enemy-model distance guard. The reviewed active redeployment control varies distance to the enemy zone only. The exact eight-inch enemy-model equality assertion appears only in the section map's historical nonselected evidence. No active assertion or verified gameplay gap is recorded for this row.",
+      "source_row_id": "rule:24:24.20:1"
+    },
+    {
+      "category": "24",
+      "disposition": "missing",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "24.35-end-move-shock-on-one",
+      "order135_obligation": "If MOBILE was selected, one D6 is rolled after movement and a one Battle-shocks the unit.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-baseline/baseline.json",
+        "sha256": "8029035ae56c6bf997a524035bbde3684b6d4e0f0686b807cf90f0d22598681a"
+      },
+      "scope": "The archived test reference has no active evidence in the initial inventory.",
+      "source_row_id": "rule:24:24.35:1"
+    },
+    {
+      "category": "24",
+      "disposition": "missing",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "24.35-horizontal-four-inch-terrain",
+      "order135_obligation": "Walker models may move horizontally through terrain sections no higher than four inches.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-baseline/baseline.json",
+        "sha256": "8029035ae56c6bf997a524035bbde3684b6d4e0f0686b807cf90f0d22598681a"
+      },
+      "scope": "The archived test reference has no active evidence in the initial inventory.",
+      "source_row_id": "rule:24:24.35:1"
+    },
+    {
+      "category": "24",
+      "disposition": "missing",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "24.35-normal-advance-fall-back-scope",
+      "order135_obligation": "Super-Heavy Walker transit permissions apply only during Normal, Advance and Fall Back movement.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-baseline/baseline.json",
+        "sha256": "8029035ae56c6bf997a524035bbde3684b6d4e0f0686b807cf90f0d22598681a"
+      },
+      "scope": "The archived test reference has no active evidence in the initial inventory.",
+      "source_row_id": "rule:24:24.35:1"
+    },
+    {
+      "category": "24",
+      "disposition": "missing",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "24.35-optional-all-model-mobile",
+      "order135_obligation": "Before movement the player may give every model MOBILE until that move ends.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-baseline/baseline.json",
+        "sha256": "8029035ae56c6bf997a524035bbde3684b6d4e0f0686b807cf90f0d22598681a"
+      },
+      "scope": "The archived test reference has no active evidence in the initial inventory.",
+      "source_row_id": "rule:24:24.35:1"
+    },
+    {
+      "category": "24",
+      "disposition": "missing",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "24.35-transit-models-except-titanic",
+      "order135_obligation": "Walker models may traverse other models including Monster/Vehicle, excluding Titanic.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-baseline/baseline.json",
+        "sha256": "8029035ae56c6bf997a524035bbde3684b6d4e0f0686b807cf90f0d22598681a"
+      },
+      "scope": "The archived test reference has no active evidence in the initial inventory.",
+      "source_row_id": "rule:24:24.35:1"
+    },
+    {
+      "category": "01",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "01.02-obligation-02",
+      "order135_obligation": "Models in a unit move and fight as one rules group.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-active-foundations-missions/bindings-receipt.json",
+        "sha256": "a7df21181710f0199b3b593b769bf06c4d1290a56a1327ad54870906756a3edb"
+      },
+      "scope": "The actual Fight movement witness validator requires all and only the physical members. The mapped control does not commit a Move or Fight activation.",
+      "source_row_id": "rule:01:01.02:1"
+    },
+    {
+      "category": "01",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "01.02.01-obligation-01",
+      "order135_obligation": "Starting Strength is frozen at the first battle round's start.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-shared-owner-batch/bindings-receipt.json",
+        "sha256": "13d1b9a8b10247ae9b3e80f68e9fbd38c56861bf57d1f7fc14cc2435173df0e4"
+      },
+      "scope": "An attached native six-model group keeps its seeded start snapshot through battle entry and casualties. The fixture precomputes the record; it does not witness ordinary setup constructing it at the first-round boundary.",
+      "source_row_id": "rule:01:01.02.01:1"
+    },
+    {
+      "category": "01",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "01.02.02-obligation-02",
+      "order135_obligation": "Embarking does not cancel a persisting effect.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-active-foundations-missions/bindings-receipt.json",
+        "sha256": "a7df21181710f0199b3b593b769bf06c4d1290a56a1327ad54870906756a3edb"
+      },
+      "scope": "The modifier remains active with typed cargo populated and when it is cleared. This case does not commit the real Embark transition while the effect is live.",
+      "source_row_id": "rule:01:01.02.02:1"
+    },
+    {
+      "category": "01",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "01.02.08-obligation-01",
+      "order135_obligation": "Indefinite a model, unit, or object means one or more when no exact count is specified.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-active-foundations-missions/bindings-receipt.json",
+        "sha256": "a7df21181710f0199b3b593b769bf06c4d1290a56a1327ad54870906756a3edb"
+      },
+      "scope": "The unqualified unit reference actually resolves multiple native units. Independent indefinite model and object selectors are not exercised here.",
+      "source_row_id": "rule:01:01.02.08:1"
+    },
+    {
+      "category": "01",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "01.02.09-obligation-02",
+      "order135_obligation": "A reminder token does not obstruct another model's movement; it is repositioned if needed.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-shared-owner-batch/bindings-receipt.json",
+        "sha256": "13d1b9a8b10247ae9b3e80f68e9fbd38c56861bf57d1f7fc14cc2435173df0e4"
+      },
+      "scope": "Native Aspect Shrine resource changes neither battlefield geometry nor model inventory, and a witnessed path stays valid. The fixture has no physical reminder token to reposition.",
+      "source_row_id": "rule:01:01.02.09:1"
+    },
+    {
+      "category": "01",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "01.02.11-obligation-01",
+      "order135_obligation": "All types of model includes both armies.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-active-foundations-missions/bindings-receipt.json",
+        "sha256": "a7df21181710f0199b3b593b769bf06c4d1290a56a1327ad54870906756a3edb"
+      },
+      "scope": "The generic target language reaches both armies, and a separate native unit grant reaches all its physical models. The literal all-types model selector is not isolated across both armies.",
+      "source_row_id": "rule:01:01.02.11:1"
+    },
+    {
+      "category": "01",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "01.02.11-obligation-02",
+      "order135_obligation": "All types of model includes every keyword class.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-shared-owner-batch/bindings-receipt.json",
+        "sha256": "13d1b9a8b10247ae9b3e80f68e9fbd38c56861bf57d1f7fc14cc2435173df0e4"
+      },
+      "scope": "The compiled friendly grant reaches each physical model of four native datasheets spanning Infantry, Character, Beast and a Monster/Vehicle class. The case does not exercise an unrestricted all-types selector against both owners.",
+      "source_row_id": "rule:01:01.02.11:1"
+    },
+    {
+      "category": "01",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "01.03-obligation-06",
+      "order135_obligation": "A fighting unit's controller is active until its attacks resolve.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-shared-owner-batch/bindings-receipt.json",
+        "sha256": "13d1b9a8b10247ae9b3e80f68e9fbd38c56861bf57d1f7fc14cc2435173df0e4"
+      },
+      "scope": "Constructed nested Fight scope exposes the acting unit's controller until the scope is popped, then restores the turn player. The test does not span actual attacks or verify which attack completion pops the scope.",
+      "source_row_id": "rule:01:01.03:1"
+    },
+    {
+      "category": "01",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "01.04.03-obligation-01",
+      "order135_obligation": "An as-close-as-possible move reaches base contact if a legal path and all other constraints allow it.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-proximity-keywords-admission/bindings-receipt.json",
+        "sha256": "92bea0f682622885245bf479858d8dffbb6c403058a798fe61535c1b193e3f23"
+      },
+      "scope": "The witnessed contact goal finds a base-contact endpoint at four inches and no witness at three. The adjacent public Fight cases reject breaking a required engagement and accept preserving both. Neither directly rejects a shorter submission when contact is legally attainable in an action that specifically orders maximum approach.",
+      "source_row_id": "rule:01:01.04.03:1"
+    },
+    {
+      "category": "01",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "01.04.03-obligation-03",
+      "order135_obligation": "A model already maximally close cannot change position.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-proximity-keywords-admission/bindings-receipt.json",
+        "sha256": "92bea0f682622885245bf479858d8dffbb6c403058a798fe61535c1b193e3f23"
+      },
+      "scope": "A native model already in contact may remain still and cannot translate by 0.001 or 1 inch. The test does not vary facing or place a model at the closest legal non-contact point imposed by a separate constraint.",
+      "source_row_id": "rule:01:01.04.03:1"
+    },
+    {
+      "category": "01",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "01.04.04-obligation-04",
+      "order135_obligation": "Overhang-deemed contact requires model-part separation of at most one inch.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-shared-owner-batch/bindings-receipt.json",
+        "sha256": "13d1b9a8b10247ae9b3e80f68e9fbd38c56861bf57d1f7fc14cc2435173df0e4"
+      },
+      "scope": "Constructed x=8 establishes deemed contact at the certified endpoint. x=6.9 has a gap exceeding one inch and rejects. The negative geometry also fails maximal approach, so the control does not isolate the separation branch independently.",
+      "source_row_id": "rule:01:01.04.04:1"
+    },
+    {
+      "category": "01",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "01.06.01-obligation-01",
+      "order135_obligation": "Leadership test and leadership roll denote the same engine operation.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-shared-owner-batch/bindings-receipt.json",
+        "sha256": "13d1b9a8b10247ae9b3e80f68e9fbd38c56861bf57d1f7fc14cc2435173df0e4"
+      },
+      "scope": "Native Ld enters an inclusive two-D6 threshold and the typed Battle-shock roll produces the expected outcomes. Neither test interprets Leadership test and Leadership roll prose as equivalent source phrases.",
+      "source_row_id": "rule:01:01.06.01:1"
+    },
+    {
+      "category": "01",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "01.07.02-obligation-01",
+      "order135_obligation": "Battle-shock test and battle-shock roll denote the same engine operation.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-shared-owner-batch/bindings-receipt.json",
+        "sha256": "13d1b9a8b10247ae9b3e80f68e9fbd38c56861bf57d1f7fc14cc2435173df0e4"
+      },
+      "scope": "A typed BattleShockTestRequest uses a 2D6 roll and writes the expected failure status and restrictions. There is no side-by-side live prose admission check for both names.",
+      "source_row_id": "rule:01:01.07.02:1"
+    },
+    {
+      "category": "01",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "faq-7ac6c358-0263-49ff-aee7-28b8fd4b5b8b-obligation-03",
+      "order135_obligation": "Firing Deck uses Transport weapon ownership and does not inherit cargo-only weapon benefits.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-active-foundations-missions/bindings-receipt.json",
+        "sha256": "a7df21181710f0199b3b593b769bf06c4d1290a56a1327ad54870906756a3edb"
+      },
+      "scope": "The active facade proves accepted borrowed physical weapon IDs. A separate exact-main local diagnostic confirms carrier-owned grants versus cargo-only non-inheritance. The selected test does not assert that comparison.",
+      "source_row_id": "faq:7ac6c358-0263-49ff-aee7-28b8fd4b5b8b"
+    },
+    {
+      "category": "01",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "faq:f1507145-5606-474c-ba71-f5c92f2d6faf",
+      "order135_obligation": "Frozen boundary authority preserves current admitted late OC consumers. Generic expiry inventory precedes late mission choices; no demonstrated admitted live late-effect failure. Specialized Shock expiry is not generalized to all effects; see complete current-source-qualifications.md.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-remaining-bindings/bindings-receipt.json",
+        "sha256": "02c992e490372921ca9698baf2098d13c17ba8f4cf05b4f28d27eeea76e47bca"
+      },
+      "scope": "An Action lock remains active across the wrong owner boundary and expires at its own boundary. Frozen control survives a later differing recomputation. No ordinary late consumer in these cases uses generic bonus OC after the expiry inventory is removed, so the Order 135 qualification remains.",
+      "source_row_id": "faq:f1507145-5606-474c-ba71-f5c92f2d6faf"
+    },
+    {
+      "category": "02",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "02.02-obligation-02",
+      "order135_obligation": "An absent M characteristic still permits setup.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-section02-04/bindings-receipt.json",
+        "sha256": "774f25222d4fc9e14884f0fcc7ddc0d75340de4e72fa7d35b820864e9d6dbb40"
+      },
+      "scope": "An actual reserve arrival validator accepts dash M and produces a transition batch. The test asserts state is unchanged and does not apply that batch through the facade.",
+      "source_row_id": "rule:02:02.02:1"
+    },
+    {
+      "category": "02",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "02.02.02-obligation-01",
+      "order135_obligation": "An unqualified ignore-modifiers rule covers rolls, unit profile characteristics, and weapon characteristics.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-active-datasheets-movement-attachments/bindings-receipt.json",
+        "sha256": "fb5dc75cd66bf9a5edc58e56aa7738f33368cbe7d53c1316dffab4cbc6289089"
+      },
+      "scope": "Constructed unqualified source produces a single permission listing roll, model-characteristic and weapon-characteristic families. Actual selection under every category is outside this narrow assertion.",
+      "source_row_id": "rule:02:02.02.02:1"
+    },
+    {
+      "category": "02",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "02.06.02-obligation-01",
+      "order135_obligation": "A unit's equipment is the collection of wargear equipped by all member models.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-shared-owner-batch/bindings-receipt.json",
+        "sha256": "13d1b9a8b10247ae9b3e80f68e9fbd38c56861bf57d1f7fc14cc2435173df0e4"
+      },
+      "scope": "The native model inventory's equipment union contains every expected piece and the melee consumer creates separate pools for physical weapons. The union is asserted from own_models in the test, with no independently asserted aggregate unit-equipment consumer.",
+      "source_row_id": "rule:02:02.06.02:1"
+    },
+    {
+      "category": "03",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "03.01-obligation-01",
+      "order135_obligation": "Each movement type imposes its own eligibility, budget, and conditions.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-active-datasheets-movement-attachments/bindings-receipt.json",
+        "sha256": "fb5dc75cd66bf9a5edc58e56aa7738f33368cbe7d53c1316dffab4cbc6289089"
+      },
+      "scope": "Normal geometry and distinct engagement availability evidenced. This batch avoids Fall Back and does not assert all move classes.",
+      "source_row_id": "rule:03:03.01:1"
+    },
+    {
+      "category": "03",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "03.01-obligation-13",
+      "order135_obligation": "Rotation uses the upright model's base centre as pivot.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-active-datasheets-movement-attachments/bindings-receipt.json",
+        "sha256": "fb5dc75cd66bf9a5edc58e56aa7738f33368cbe7d53c1316dffab4cbc6289089"
+      },
+      "scope": "Stationary centres during facing changes across three geometries. Explicit pivot extent or tilted path negative is absent from this test.",
+      "source_row_id": "rule:03:03.01:1"
+    },
+    {
+      "category": "03",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "03.01-obligation-18",
+      "order135_obligation": "Every after-moving condition must hold at completion.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-active-datasheets-movement-attachments/bindings-receipt.json",
+        "sha256": "fb5dc75cd66bf9a5edc58e56aa7738f33368cbe7d53c1316dffab4cbc6289089"
+      },
+      "scope": "Actual target engagement and coherency checks at endpoint. Other move-specific after-moving clauses remain outside scope.",
+      "source_row_id": "rule:03:03.01:1"
+    },
+    {
+      "category": "03",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "03.01-obligation-20",
+      "order135_obligation": "A valid move resolves its additional after-moving rules before ending.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-active-final/bindings-receipt.json",
+        "sha256": "e3666f79033ad54baba14a678ba7074b8422105c64e31836724b453e7823fe4e"
+      },
+      "scope": "Movement completion and external phase boundary evidenced. No witness specifically orders an additional move-type effect before closure.",
+      "source_row_id": "rule:03:03.01:1"
+    },
+    {
+      "category": "03",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "03.02-obligation-03",
+      "order135_obligation": "All source-specific setup restrictions apply.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-active-datasheets-movement-attachments/bindings-receipt.json",
+        "sha256": "fb5dc75cd66bf9a5edc58e56aa7738f33368cbe7d53c1316dffab4cbc6289089"
+      },
+      "scope": "Independent setup/arrival/disembark validators enforce their tested conditions. No blanket coverage for every scenario source.",
+      "source_row_id": "rule:03:03.02:1"
+    },
+    {
+      "category": "03",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "03.02.01-obligation-02",
+      "order135_obligation": "A unit whose setup failed may later retry or remain stationary.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-setup-and-next-family/bindings-receipt.json",
+        "sha256": "cd54baff929a9b7ca299c00ca3aa9006cd366f792d5ca2b00fd4843c40ede4b3"
+      },
+      "scope": "The genuine offboard failed Disembark remains in cargo and reaches a legal retry. The direct restore seam offers both a new movement choice and Remain Stationary to a placed unit after a supplied invalid event. The same run does not obtain and submit Stationary after an actual invalid setup from a prior on-board position.",
+      "source_row_id": "rule:03:03.02.01:1"
+    },
+    {
+      "category": "03",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "03.02.02-obligation-02",
+      "order135_obligation": "An oversized deployment locks Normal, Advance, Fall Back, and Charge movement for that setup turn.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-setup-and-next-family/bindings-receipt.json",
+        "sha256": "cd54baff929a9b7ca299c00ca3aa9006cd366f792d5ca2b00fd4843c40ede4b3"
+      },
+      "scope": "Given an explicit qualifying setup occasion, Normal, Advance, Fall Back and Charge restrictions hold for both active players and expire at their actual turn end. Other movement types are separate controls. No genuine qualifying oversized deployment completes and drives public movement and charge choices.",
+      "source_row_id": "rule:03:03.02.02:1"
+    },
+    {
+      "category": "03",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "03.02.02-obligation-03",
+      "order135_obligation": "An oversized deployment locks ranged attacks for that setup turn.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-setup-and-next-family/bindings-receipt.json",
+        "sha256": "cd54baff929a9b7ca299c00ca3aa9006cd366f792d5ca2b00fd4843c40ede4b3"
+      },
+      "scope": "A supplied qualifying occasion prevents ranged attacks, preserves melee and clears after the active player's turn. The live test does not drive placement that produces this effect and then the public Shooting declaration.",
+      "source_row_id": "rule:03:03.02.02:1"
+    },
+    {
+      "category": "03",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "03.02.02-obligation-05",
+      "order135_obligation": "A deployment overhang exception still requires the base wholly in the zone.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-setup-and-next-family/bindings-receipt.json",
+        "sha256": "cd54baff929a9b7ca299c00ca3aa9006cd366f792d5ca2b00fd4843c40ede4b3"
+      },
+      "scope": "The allowed overhang fixture keeps the support base exactly within zone and ordinary deployment rejects outside-zone placements. It does not move the support base outside in the same otherwise-qualifying wing-overhang case.",
+      "source_row_id": "rule:03:03.02.02:1"
+    },
+    {
+      "category": "03",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "03.03-obligation-03",
+      "order135_obligation": "Each member must be within nine inches horizontally and five vertically of every other member.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-active-datasheets-movement-attachments/bindings-receipt.json",
+        "sha256": "fb5dc75cd66bf9a5edc58e56aa7738f33368cbe7d53c1316dffab4cbc6289089"
+      },
+      "scope": "Horizontal all-member span rejection and positive fixture verified. The five-inch vertical check across a wider group remains open.",
+      "source_row_id": "rule:03:03.03:1"
+    },
+    {
+      "category": "03",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "03.04-obligation-02",
+      "order135_obligation": "Opposing models within Engagement Range are mutually engaged.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-shared-owner-batch/bindings-receipt.json",
+        "sha256": "13d1b9a8b10247ae9b3e80f68e9fbd38c56861bf57d1f7fc14cc2435173df0e4"
+      },
+      "scope": "A single placed model pair at the inclusive horizontal and vertical boundaries gives reciprocal unit engagement. The test does not assert both individual model identities through the model-level query.",
+      "source_row_id": "rule:03:03.04:1"
+    },
+    {
+      "category": "03",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "faq-904b8b36-09f0-4449-a9c3-45892664ef60-obligation-01",
+      "order135_obligation": "Models destroyed for coherency count toward mission destruction objectives.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-shared-owner-batch/bindings-receipt.json",
+        "sha256": "13d1b9a8b10247ae9b3e80f68e9fbd38c56861bf57d1f7fc14cc2435173df0e4"
+      },
+      "scope": "An actual chosen coherency casualty reaches mission model-destruction inventory with identity, owner and starting wounds, without a destroyed-unit row. No mission scores or victory points are asserted.",
+      "source_row_id": "faq:904b8b36-09f0-4449-a9c3-45892664ef60"
+    },
+    {
+      "category": "03",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "faq-e5941469-5653-49b2-919e-9c9246e811d4-obligation-01",
+      "order135_obligation": "Transiting an enemy Engagement Range does not itself establish engagement during a move.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-shared-owner-batch/bindings-receipt.json",
+        "sha256": "13d1b9a8b10247ae9b3e80f68e9fbd38c56861bf57d1f7fc14cc2435173df0e4"
+      },
+      "scope": "A witnessed native model transit can pass the enemy with permission and neither endpoint is engaged. This test does not check engagement-dependent triggers during the traversed segment.",
+      "source_row_id": "faq:e5941469-5653-49b2-919e-9c9246e811d4"
+    },
+    {
+      "category": "04",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "04.00-obligation-01",
+      "order135_obligation": "Weapon selection precedes target selection.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-section02-04/bindings-receipt.json",
+        "sha256": "774f25222d4fc9e14884f0fcc7ddc0d75340de4e72fa7d35b820864e9d6dbb40"
+      },
+      "scope": "Weapon/profile rows precede submission and source identity is consumed by the declaration. Weapons and targets commit together in the facade. A separate accepted weapon-to-target transition is outside these assertions.",
+      "source_row_id": "rule:04:04.00:1"
+    },
+    {
+      "category": "04",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "04.01.04-obligation-02",
+      "order135_obligation": "Attack-specific changes also apply to that weapon until its whole attack sequence and ability effects finish.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-active-attacks-shooting/bindings-receipt.json",
+        "sha256": "b80d3d83111f18d0534a3ab428b00565651e4b46bcaa7ff35e79921b5cfdb87a"
+      },
+      "scope": "A constructed attack-only Hazardous grant persists into the post-attack test. Isolation from a later activation or attack sequence is unasserted.",
+      "source_row_id": "rule:04:04.01.04:1"
+    },
+    {
+      "category": "04",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "04.01.04-obligation-03",
+      "order135_obligation": "Weapon roll modifiers apply to attacks made with that weapon.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-shared-owner-batch/bindings-receipt.json",
+        "sha256": "13d1b9a8b10247ae9b3e80f68e9fbd38c56861bf57d1f7fc14cc2435173df0e4"
+      },
+      "scope": "The actual hit owner consumes a constructed modifier on one weapon pool. Two different modifier pools split in the grouping owner. No ordinary two-weapon roll case isolates the unmodified sibling under a source's weapon-specific grant.",
+      "source_row_id": "rule:04:04.01.04:1"
+    },
+    {
+      "category": "04",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "04.02.03-obligation-01",
+      "order135_obligation": "A model or unit targets a single target exactly when every attack from its selected weapons targets that same unit.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-section02-04/bindings-receipt.json",
+        "sha256": "774f25222d4fc9e14884f0fcc7ddc0d75340de4e72fa7d35b820864e9d6dbb40"
+      },
+      "scope": "The native one-target and split variants preserve target cardinality in initial pools and completed declaration evidence. Neither asserts a downstream rule consuming the model- or unit-level single-target predicate.",
+      "source_row_id": "rule:04:04.02.03:1"
+    },
+    {
+      "category": "04",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "04.03-obligation-06",
+      "order135_obligation": "Resolve other unresolved weapons against the same target before switching targets.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-active-attacks-shooting/bindings-receipt.json",
+        "sha256": "b80d3d83111f18d0534a3ab428b00565651e4b46bcaa7ff35e79921b5cfdb87a"
+      },
+      "scope": "Current-target hit ordering and final consumption are explicit. The control does not assert that every intervening damage or reaction finishes before the next-target decision.",
+      "source_row_id": "rule:04:04.03:1"
+    },
+    {
+      "category": "04",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "04.03-obligation-07",
+      "order135_obligation": "Only after the current target's weapons resolve may another declared target be selected.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-active-attacks-shooting/bindings-receipt.json",
+        "sha256": "b80d3d83111f18d0534a3ab428b00565651e4b46bcaa7ff35e79921b5cfdb87a"
+      },
+      "scope": "The initial target prompt and final hit order are asserted with two targets. No later chooser with at least two remaining targets is captured at the full-resolution boundary.",
+      "source_row_id": "rule:04:04.03:1"
+    },
+    {
+      "category": "04",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "04.03.02-obligation-03",
+      "order135_obligation": "A split weapon contributes only its declared attack count to each target's pool.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-active-attacks-shooting/bindings-receipt.json",
+        "sha256": "b80d3d83111f18d0534a3ab428b00565651e4b46bcaa7ff35e79921b5cfdb87a"
+      },
+      "scope": "Native sequence construction stores each declared per-target attack count. The control does not execute Gather Attack Dice for both targets of that split weapon.",
+      "source_row_id": "rule:04:04.03.02:1"
+    },
+    {
+      "category": "04",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "04.03.05-obligation-01",
+      "order135_obligation": "A melee weapon has fought after all its attacks resolve.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-section02-04/bindings-receipt.json",
+        "sha256": "774f25222d4fc9e14884f0fcc7ddc0d75340de4e72fa7d35b820864e9d6dbb40"
+      },
+      "scope": "Completion is asserted for a native melee physical pool and the split declaration conserves its attacks. The controls do not join a single weapon split across targets with the later weapon completion transition.",
+      "source_row_id": "rule:04:04.03.05:1"
+    },
+    {
+      "category": "04",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "04.03.05-obligation-03",
+      "order135_obligation": "A unit has fought after all its declared melee attacks resolve.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-section02-04/bindings-receipt.json",
+        "sha256": "774f25222d4fc9e14884f0fcc7ddc0d75340de4e72fa7d35b820864e9d6dbb40"
+      },
+      "scope": "The positive native unit-has-fought event follows attack resolution, and the no-attack activation emits none. An in-flight, nonempty multi-model Fight unit-has-fought negative assertion is still absent from this family.",
+      "source_row_id": "rule:04:04.03.05:1"
+    },
+    {
+      "category": "05",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "05.03-obligation-04",
+      "order135_obligation": "The opposing player declares legal allocation-group order.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-active-sequence-wounds/bindings-receipt.json",
+        "sha256": "7266afad6eb51ae4f4d725ed3eb4e8ea9e21933b86373ea138a9038707bfdf87"
+      },
+      "scope": "The real request exposes both legal orderings to the defender. The control passes one order directly to the helper without a resumed defender decision.",
+      "source_row_id": "rule:05:05.03:1"
+    },
+    {
+      "category": "05",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "05.03.02-obligation-02",
+      "order135_obligation": "The active player chooses the new attack pool order.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-active-sequence-wounds/bindings-receipt.json",
+        "sha256": "7266afad6eb51ae4f4d725ed3eb4e8ea9e21933b86373ea138a9038707bfdf87"
+      },
+      "scope": "The active player commits either first choice and it determines the observed D1/D2 ordering. A later decision with several remaining pools is not exercised.",
+      "source_row_id": "rule:05:05.03.02:1"
+    },
+    {
+      "category": "05",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "05.04.03-obligation-01",
+      "order135_obligation": "Reaching Resolve Damage establishes suffered-damage status even if wounds are subsequently ignored or not lost.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-section05/bindings-receipt.json",
+        "sha256": "67b0e73f5be7a80643bcf56b4f907723bf6056a7798393cc60acb9c0af2446f8"
+      },
+      "scope": "Resolve Damage still occurs when D is replaced by zero or FNP ignores a wound. These tests assert the authoritative step and wound totals. A separately admitted downstream suffers-damage rule is unasserted.",
+      "source_row_id": "rule:05:05.04.03:1"
+    },
+    {
+      "category": "05",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "05.04.06-obligation-02",
+      "order135_obligation": "A baseless model or non-WALKER VEHICLE uses its pre-destruction physical model extent.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-section05/bindings-receipt.json",
+        "sha256": "67b0e73f5be7a80643bcf56b4f907723bf6056a7798393cc60acb9c0af2446f8"
+      },
+      "scope": "Native physical cases include the Wave Serpent and Maulerfiend. Former physical geometry and distance are verified. The test does not independently assert a baseless non-vehicle admission and compare it with a vehicle having a base.",
+      "source_row_id": "rule:05:05.04.06:1"
+    },
+    {
+      "category": "05",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "faq-06c896b8-bf06-40bd-a892-b56cb3cde9d3-obligation-01",
+      "order135_obligation": "The opponent chooses ordering among multiple wounded non-CHARACTER groups.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-section05/bindings-receipt.json",
+        "sha256": "67b0e73f5be7a80643bcf56b4f907723bf6056a7798393cc60acb9c0af2446f8"
+      },
+      "scope": "Two distinct wounded group orders appear on the opponent request. The test then drives one supplied order through the real advancement helper. Neither option is actually submitted in this selected check.",
+      "source_row_id": "faq:06c896b8-bf06-40bd-a892-b56cb3cde9d3"
+    },
+    {
+      "category": "06",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "06.03-obligation-04",
+      "order135_obligation": "A failed hazard roll inflicts three mortal wounds only if every model is MONSTER or VEHICLE.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-active-sequence-wounds/bindings-receipt.json",
+        "sha256": "7266afad6eb51ae4f4d725ed3eb4e8ea9e21933b86373ea138a9038707bfdf87"
+      },
+      "scope": "The amount owner gives 3 to all-Monster/Vehicle cases and 1 to mixed attached controls including Infantry/Mounted. The selected cases do not apply all three wounds through a normal-admitted native Hazardous failure.",
+      "source_row_id": "rule:06:06.03:1"
+    },
+    {
+      "category": "06",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "faq-5928ab6e-7113-42c8-9085-4291faddae09-obligation-01",
+      "order135_obligation": "Mixed INFANTRY and MONSTER/VEHICLE units suffer one mortal wound per failed hazard roll.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-overnight-three/bindings-receipt.json",
+        "sha256": "fbd74570378a15dd8fdbccf60bdd9e6a6fa351564f9c022ac4301f0243b8b166"
+      },
+      "scope": "The real rules-unit evaluator assigns one mortal per failure to constructed native-body mixed Vehicle/Infantry and Vehicle/Mounted attachments, with all-Monster/Vehicle controls at three. The separate single-weapon application case verifies real health and allocation. A mixed attachment taking multiple actual failed hazard dice was not exercised.",
+      "source_row_id": "faq:5928ab6e-7113-42c8-9085-4291faddae09"
+    },
+    {
+      "category": "06",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "faq-5928ab6e-7113-42c8-9085-4291faddae09-obligation-02",
+      "order135_obligation": "All requested hazard dice roll simultaneously.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-overnight-three/bindings-receipt.json",
+        "sha256": "fbd74570378a15dd8fdbccf60bdd9e6a6fa351564f9c022ac4301f0243b8b166"
+      },
+      "scope": "An explicit multi-die request produces one batch and the constructed mixed attachment uses the correct cost per failed die. There is no combined mixed-attachment run driven by multiple physical Hazardous weapon selections.",
+      "source_row_id": "faq:5928ab6e-7113-42c8-9085-4291faddae09"
+    },
+    {
+      "category": "06",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "faq:9638115f-b94b-4d05-ba62-df9fba2805ac",
+      "order135_obligation": "Approved V963-VISIBILITY repair with actual retained maintained-mirror observation and native catalog ingress; analytical body dimensions remain synthetic/source-linked geometry, not official miniature measurements.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-shared-owner-batch/bindings-receipt.json",
+        "sha256": "13d1b9a8b10247ae9b3e80f68e9fbd38c56861bf57d1f7fc14cc2435173df0e4"
+      },
+      "scope": "Exact synthetic prisms certify offboard target body visibility, bounded outgoing origin clipping, and an in-board blocker control. A native roster's actual measured overhang through public shooting remains outside these controls.",
+      "source_row_id": "faq:9638115f-b94b-4d05-ba62-df9fba2805ac"
+    },
+    {
+      "category": "07",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "07.02-fixed-first",
+      "order135_obligation": "The same mission-selected player takes the first turn in each round.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-section07/bindings-receipt.json",
+        "sha256": "b0808ccee009ffff150bdf31a4bd093668f8dac5a2c283ed67bc854037191413"
+      },
+      "scope": "",
+      "source_row_id": "rule:07:07.02:1"
+    },
+    {
+      "category": "07",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "07.02-mission-after",
+      "order135_obligation": "Resolve achieved end-of-turn mission conditions for both players after non-mission rules.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-section07/bindings-receipt.json",
+        "sha256": "b0808ccee009ffff150bdf31a4bd093668f8dac5a2c283ed67bc854037191413"
+      },
+      "scope": "",
+      "source_row_id": "rule:07:07.02:1"
+    },
+    {
+      "category": "07",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "07.02-nonmission-first",
+      "order135_obligation": "Resolve non-mission end-of-turn rules before mission rules.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-section07/bindings-receipt.json",
+        "sha256": "b0808ccee009ffff150bdf31a4bd093668f8dac5a2c283ed67bc854037191413"
+      },
+      "scope": "",
+      "source_row_id": "rule:07:07.02:1"
+    },
+    {
+      "category": "07",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "07.02-part-3",
+      "order135_obligation": "Resolve start-of-turn rules in the prescribed part of every turn.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-section07/bindings-receipt.json",
+        "sha256": "b0808ccee009ffff150bdf31a4bd093668f8dac5a2c283ed67bc854037191413"
+      },
+      "scope": "",
+      "source_row_id": "rule:07:07.02:1"
+    },
+    {
+      "category": "07",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "07.02.01-phase-lock",
+      "order135_obligation": "An out-of-phase action does not activate other phase-locked rules.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-active-foundations-missions/bindings-receipt.json",
+        "sha256": "a7df21181710f0199b3b593b769bf06c4d1290a56a1327ad54870906756a3edb"
+      },
+      "scope": "The live weapon modifier consumes Heavy only in its eligible phase. The selected control is one phase-bound consumer and does not exercise a second unrelated triggered rule.",
+      "source_row_id": "rule:07:07.02.01:1"
+    },
+    {
+      "category": "07",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "07.02.02-both-players",
+      "order135_obligation": "An unqualified turn or phase rule applies in both players' corresponding turns or phases.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-section07/bindings-receipt.json",
+        "sha256": "b0808ccee009ffff150bdf31a4bd093668f8dac5a2c283ed67bc854037191413"
+      },
+      "scope": "",
+      "source_row_id": "rule:07:07.02.02:1"
+    },
+    {
+      "category": "07",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "07.02.02-every-boundary",
+      "order135_obligation": "Unqualified start-of-round, turn, and phase triggers recur at every corresponding boundary.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-section07/bindings-receipt.json",
+        "sha256": "b0808ccee009ffff150bdf31a4bd093668f8dac5a2c283ed67bc854037191413"
+      },
+      "scope": "",
+      "source_row_id": "rule:07:07.02.02:1"
+    },
+    {
+      "category": "07",
+      "disposition": "unsupported_selected_packs",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "07.03-mission-after",
+      "order135_obligation": "Resolve achieved end-of-round mission conditions after non-mission rules.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-section07/bindings-receipt.json",
+        "sha256": "b0808ccee009ffff150bdf31a4bd093668f8dac5a2c283ed67bc854037191413"
+      },
+      "scope": "",
+      "source_row_id": "rule:07:07.03:1"
+    },
+    {
+      "category": "07",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "07.03-nonmission-first",
+      "order135_obligation": "Resolve non-mission end-of-battle-round rules before mission rules.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-section07/bindings-receipt.json",
+        "sha256": "b0808ccee009ffff150bdf31a4bd093668f8dac5a2c283ed67bc854037191413"
+      },
+      "scope": "",
+      "source_row_id": "rule:07:07.03:1"
+    },
+    {
+      "category": "08",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "08.05-mission",
+      "order135_obligation": "Resolve both players' achieved end-of-Command-phase mission rules after non-mission rules.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-section08/bindings-receipt.json",
+        "sha256": "df3671ff7ec55f78bea58e9123744cb37e55cb725cf77352494caf7a03031555"
+      },
+      "scope": "Both mission owners continue in the typed policy contract. In the loaded native scene, after both sticky mutations one achieved active primary commits 5 VP or 4 VP in opposite role configurations, with the inactive ledger at zero. Native discovery shows no mission participant in its sticky ordering batch. No admitted defined primary rule in the inspected packs permits a simultaneous inactive Command-end award. Retain the conditional two-award verification as unsupported by the inspected primary assignments.",
+      "source_row_id": "rule:08:08.05:1"
+    },
+    {
+      "category": "09",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "09.02.01-all-units",
+      "order135_obligation": "Complete a selection for every army unit; unchosen move types resolve stationary.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-active-final/bindings-receipt.json",
+        "sha256": "e3666f79033ad54baba14a678ba7074b8422105c64e31836724b453e7823fe4e"
+      },
+      "scope": "Live progression completes movement once, including explicit stationary of each location. No exact witness forces implicit stationary for all unchosen units.",
+      "source_row_id": "rule:09:09.02.01:1"
+    },
+    {
+      "category": "09",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "09.02.03-reinforcement-alias",
+      "order135_obligation": "Reinforcements-step timing resolves inside Move Units.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-active-final/bindings-receipt.json",
+        "sha256": "e3666f79033ad54baba14a678ba7074b8422105c64e31836724b453e7823fe4e"
+      },
+      "scope": "Normal live Ingress choice occurs during Move Units. An authored Reinforcements-step trigger resolving in that window remains open.",
+      "source_row_id": "rule:09:09.02.03:1"
+    },
+    {
+      "category": "09",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "09.07-budget",
+      "order135_obligation": "Fall Back maximum distance is the Movement characteristic.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-remaining-bindings/bindings-receipt.json",
+        "sha256": "02c992e490372921ca9698baf2098d13c17ba8f4cf05b4f28d27eeea76e47bca"
+      },
+      "scope": "The ordinary Ordered Retreat rejects a far path atomically and accepts a shorter retry. The reviewed active case does not isolate exact model M and M plus one tick, and the result does not cover the separate Desperate Escape lane.",
+      "source_row_id": "rule:09:09.07:1"
+    },
+    {
+      "category": "09",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "09.07.01-forced-shock-2",
+      "order135_obligation": "Forced Desperate Escape also makes a battle-shock roll.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-active-final/bindings-receipt.json",
+        "sha256": "e3666f79033ad54baba14a678ba7074b8422105c64e31836724b453e7823fe4e"
+      },
+      "scope": "Prepared forced test issues named shock roll. Actual territorial Daemonic Terror failure can block continuation after this roll on baseline.",
+      "source_row_id": "rule:09:09.07.01:2"
+    },
+    {
+      "category": "09",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "faq-4978f15f-2b4a-4805-aacd-db9b5cad71bd-auto-pass",
+      "order135_obligation": "Automatic Desperate Escape success also auto-passes its hazard rolls.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-active-final/bindings-receipt.json",
+        "sha256": "e3666f79033ad54baba14a678ba7074b8422105c64e31836724b453e7823fe4e"
+      },
+      "scope": "Native-supplied auto-pass removes hazard requirements at selector. Full public continued completion after auto-pass remains unasserted.",
+      "source_row_id": "faq:4978f15f-2b4a-4805-aacd-db9b5cad71bd"
+    },
+    {
+      "category": "10",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "10.05-weapons",
+      "order135_obligation": "Only Assault weapons can be selected for Assault shooting.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-active-attacks-shooting/bindings-receipt.json",
+        "sha256": "b80d3d83111f18d0534a3ab428b00565651e4b46bcaa7ff35e79921b5cfdb87a"
+      },
+      "scope": "Only the physical Assault weapon is offered and accepted on retry. The rejected Doomweaver payload retains the Assault weapon's physical instance ID, so it does not isolate rejection of a valid equipped non-Assault instance.",
+      "source_row_id": "rule:10:10.05:1"
+    },
+    {
+      "category": "10",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "10.06-model-penalty",
+      "order135_obligation": "A Monster/Vehicle attacking model suffers minus one to hit except Close-quarters against its engaged target.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-active-attacks-shooting/bindings-receipt.json",
+        "sha256": "b80d3d83111f18d0534a3ab428b00565651e4b46bcaa7ff35e79921b5cfdb87a"
+      },
+      "scope": "Native declared pools carry the penalty and the explicit Vehicle/CQ contract exercises all four model-weapon-target branches. A fixed-die Hit result consuming the exact native CQ exception is unasserted.",
+      "source_row_id": "rule:10:10.06:1"
+    },
+    {
+      "category": "10",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "10.06-ordinary-model",
+      "order135_obligation": "Other models are restricted to Close-quarters weapons against engaged targets.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-active-attacks-shooting/bindings-receipt.json",
+        "sha256": "b80d3d83111f18d0534a3ab428b00565651e4b46bcaa7ff35e79921b5cfdb87a"
+      },
+      "scope": "Public ordinary CQ profiles accept an engaged target and reject an outside target even in a mixed attachment. There is no isolated ordinary non-CQ profile against the engaged target in these mapped cases.",
+      "source_row_id": "rule:10:10.06:1"
+    },
+    {
+      "category": "11",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "11.02-single-declaration",
+      "order135_obligation": "Select each eligible friendly charging unit at most once; resolve it before the next.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-remaining-bindings/bindings-receipt.json",
+        "sha256": "02c992e490372921ca9698baf2098d13c17ba8f4cf05b4f28d27eeea76e47bca"
+      },
+      "scope": "The ordinary declaration records one unit before its actual 2D6 and target selection. A failed double-one consumes that unit and immediately reopens the remaining selection. The selected cases do not follow two successive accepted physical charges.",
+      "source_row_id": "rule:11:11.02:1"
+    },
+    {
+      "category": "12",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "12.03-eligibility",
+      "order135_obligation": "During Fight, engagement, a completed charge this turn or an Overrun selection permits Pile In.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-remaining-bindings/bindings-receipt.json",
+        "sha256": "02c992e490372921ca9698baf2098d13c17ba8f4cf05b4f28d27eeea76e47bca"
+      },
+      "scope": "Native engagement and real Overrun offer and consume the movement. The independent formerly unengaged charger is eligible only with a staged charge-grant record. No ordinary completed Charge feeds the exact Fight eligibility assertion here.",
+      "source_row_id": "rule:12:12.03:1"
+    },
+    {
+      "category": "12",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "12.04-remaining",
+      "order135_obligation": "Continue alternation from the transitioning player, skip unavailable owners and end when no eligible unit remains.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-fight-order-and-followups/bindings-receipt.json",
+        "sha256": "95592a35dcdd0c8db15c62437d8a00bb02b298ad7645cd6bdee4c4cb8aaa07e5"
+      },
+      "scope": "Initial Remaining actor and alternation are verified, and four normal activations finish before consolidation. A late eligible priority unit correctly receives the next request. The one-pass endpoint proves an exhausted opponent case with a pass. An unequal Remaining inventory with an exhausted actor skipped without a prior pass was not explicitly exercised.",
+      "source_row_id": "rule:12:12.04:1"
+    },
+    {
+      "category": "13",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "13.06.01-solid-endpoint",
+      "order135_obligation": "No model part may finish penetrating an enclosed Solid feature at or below three inches, including openings.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-remaining-bindings/bindings-receipt.json",
+        "sha256": "02c992e490372921ca9698baf2098d13c17ba8f4cf05b4f28d27eeea76e47bca"
+      },
+      "scope": "The endpoint owner rejects a prohibited protruding body part and enclosed Solid opening in the low fixture; a clear shifted body, higher endpoint, and Light comparison distinguish the collision rule. The exact three-inch equality case is absent from these fixtures.",
+      "source_row_id": "rule:13:13.06.01:1"
+    },
+    {
+      "category": "14",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "14.02-controlling-unit",
+      "order135_obligation": "A unit controls a player-controlled objective only when one of its in-range models has positive OC.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-fight-order-and-followups/bindings-receipt.json",
+        "sha256": "95592a35dcdd0c8db15c62437d8a00bb02b298ad7645cd6bdee4c4cb8aaa07e5"
+      },
+      "scope": "The archived requirement says the same positive-OC model must be in range. The unchanged adopted text predicates range on the unit and positive OC on a member, consistent with Order 109. The native-body checkpoint proves an in-range OC0 body and an out-of-range OC-positive attached member can control a friendly-controlled objective. The companion overlap control confirms the same in-range model supplies its complete OC to both results. The absence of such a member or missing range rejects unit control. Historical wording remains preserved and requires evidence-inventory reconciliation.",
+      "source_row_id": "rule:14:14.02:1"
+    },
+    {
+      "category": "14",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "14.02-initial",
+      "order135_obligation": "At battle start objectives are uncontrolled until positive OC models establish control; terrain range means within the area.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-active-foundations-missions/bindings-receipt.json",
+        "sha256": "a7df21181710f0199b3b593b769bf06c4d1290a56a1327ad54870906756a3edb"
+      },
+      "scope": "The constructed precontrol state has no initial record, and actual control begins with positive native in-range contributors, including upper terrain membership. Full battle-start traversal is unasserted.",
+      "source_row_id": "rule:14:14.02:1"
+    },
+    {
+      "category": "15",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "15.03-window",
+      "order135_obligation": "Use Epic Challenge just after a friendly unit is selected to fight.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-active-stratagems-weapons/bindings-receipt.json",
+        "sha256": "1d04ff1ca82f4864a153b9d4938cd8311e852ba2abcd2b6b324bff0d0dc6b146"
+      },
+      "scope": "Prepared selected-Fight context and wrong-phase denial. No ordinary Fight activation producer asserted by these cases.",
+      "source_row_id": "rule:15:15.03:1"
+    },
+    {
+      "category": "15",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "15.05-cost",
+      "order135_obligation": "Crushing Impact costs one CP.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-active-stratagems-weapons/bindings-receipt.json",
+        "sha256": "1d04ff1ca82f4864a153b9d4938cd8311e852ba2abcd2b6b324bff0d0dc6b146"
+      },
+      "scope": "Accepted native use confirms the target ledger but the case does not assert CP debit.",
+      "source_row_id": "rule:15:15.05:1"
+    },
+    {
+      "category": "15",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "15.05-window",
+      "order135_obligation": "Use Crushing Impact immediately after a friendly Charge move in the own Charge phase.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-active-stratagems-weapons/bindings-receipt.json",
+        "sha256": "1d04ff1ca82f4864a153b9d4938cd8311e852ba2abcd2b6b324bff0d0dc6b146"
+      },
+      "scope": "Current owner verifies prepared own Charge/charged unit window. Physical movement producing the window is outside these controls.",
+      "source_row_id": "rule:15:15.05:1"
+    },
+    {
+      "category": "15",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "15.06-shooting-eligible",
+      "order135_obligation": "The target unit must be eligible to shoot.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-active-stratagems-weapons/bindings-receipt.json",
+        "sha256": "1d04ff1ca82f4864a153b9d4938cd8311e852ba2abcd2b6b324bff0d0dc6b146"
+      },
+      "scope": "Advance and phase gates checked. No independent shooting-ineligible reason where all other Explosives premises remain legal.",
+      "source_row_id": "rule:15:15.06:1"
+    },
+    {
+      "category": "15",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "15.06-target",
+      "order135_obligation": "Choose an unengaged enemy visible to and within eight inches of that model.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-active-stratagems-weapons/bindings-receipt.json",
+        "sha256": "1d04ff1ca82f4864a153b9d4938cd8311e852ba2abcd2b6b324bff0d0dc6b146"
+      },
+      "scope": "Engaged/too-far negative and selected victim receive real damage. Visibility-only denial and exact eight-inch boundary remain open.",
+      "source_row_id": "rule:15:15.06:1"
+    },
+    {
+      "category": "16",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "16.01-charge-lock",
+      "order135_obligation": "Starting an action prevents charge declaration through turn end.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-active-foundations-missions/bindings-receipt.json",
+        "sha256": "a7df21181710f0199b3b593b769bf06c4d1290a56a1327ad54870906756a3edb"
+      },
+      "scope": "The live Charge eligibility reason persists through all mapped terminal Action statuses including the Titanic shooting exception. The same actor's actual next-turn Charge offer is unasserted.",
+      "source_row_id": "rule:16:16.01:1"
+    },
+    {
+      "category": "18",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "18.01-empty-dedicated-no-triggers",
+      "order135_obligation": "Destroying an empty Dedicated Transport at formation completion does not trigger model-destruction rules.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-transport-family/bindings-receipt.json",
+        "sha256": "f7dc4b7c51c28fb69b17cdc8c541eb41a8e498f6c470b83469675f900bb557b0"
+      },
+      "scope": "The flag and complete log confirm no individual destruction reaction is emitted for the empty carrier, and repeated cleanup stays inert. The fixture does not first show that an admitted configured model-death reaction would trigger for this same carrier in an ordinary destruction.",
+      "source_row_id": "rule:18:18.01:1"
+    },
+    {
+      "category": "18",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "18.02-post-move-choice",
+      "order135_obligation": "After the first battle round starts, a completed Normal, Advance or Fall Back move can offer an embark decision.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-active-deployment-transport/bindings-receipt.json",
+        "sha256": "0c666871f5a2b8e0a0be8809a6fae84060afd20962b29e8016bcb3ac699259e6"
+      },
+      "scope": "Normal Movement offers and commits an actual Embark. Advance/Fall Back reach the same typed owner with supplied completed histories. Their ordinary facade offer continuations are unasserted.",
+      "source_row_id": "rule:18:18.02:1"
+    },
+    {
+      "category": "18",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "18.03-destroyed-carrier-before-removal",
+      "order135_obligation": "Each embarked unit must emergency disembark before its destroyed transport is removed.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-active-deployment-transport/bindings-receipt.json",
+        "sha256": "0c666871f5a2b8e0a0be8809a6fae84060afd20962b29e8016bcb3ac699259e6"
+      },
+      "scope": "The typed closest legal Emergency placement is applied with the destroyed carrier still physically present. The single-passenger fixture does not require sequential completion of every embarked unit on a shared carrier.",
+      "source_row_id": "rule:18:18.03:1"
+    },
+    {
+      "category": "18",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "18.04-combat-battle-shock",
+      "order135_obligation": "Combat disembark leaves the passenger Battle-shocked.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-transport-family/bindings-receipt.json",
+        "sha256": "f7dc4b7c51c28fb69b17cdc8c541eb41a8e498f6c470b83469675f900bb557b0"
+      },
+      "scope": "Accepted Combat resolution returns until-cleared Battle-shock and a charge prohibition in the typed outcome. The selected Combat controls do not submit placement through completion and assert the actual shared Battle-shock state or downstream permission after injury resolution.",
+      "source_row_id": "rule:18:18.04:1"
+    },
+    {
+      "category": "18",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "18.04-combat-charge-lock",
+      "order135_obligation": "Combat disembark prevents declaring a charge until turn end.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-active-deployment-transport/bindings-receipt.json",
+        "sha256": "0c666871f5a2b8e0a0be8809a6fae84060afd20962b29e8016bcb3ac699259e6"
+      },
+      "scope": "Accepted typed Combat places the passenger, rolls hazards and records no Charge plus a Battle-shock directive. The public live mutation and prohibition/expiry are unasserted.",
+      "source_row_id": "rule:18:18.04:1"
+    },
+    {
+      "category": "18",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "18.04-combat-distance",
+      "order135_obligation": "Combat disembark places each model wholly within six inches of the transport.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-transport-family/bindings-receipt.json",
+        "sha256": "f7dc4b7c51c28fb69b17cdc8c541eb41a8e498f6c470b83469675f900bb557b0"
+      },
+      "scope": "A ground endpoint from a carrier on an explicit elevated platform uses the Combat placement path when Tactical feasibility fails; the endpoint checks independently gate engagement. The focused suite does not isolate an exact six-inch acceptance/rejection boundary for Combat.",
+      "source_row_id": "rule:18:18.04:1"
+    },
+    {
+      "category": "18",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "18.04-rapid-charge-lock",
+      "order135_obligation": "Rapid disembark prevents declaring a charge until turn end.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-active-deployment-transport/bindings-receipt.json",
+        "sha256": "0c666871f5a2b8e0a0be8809a6fae84060afd20962b29e8016bcb3ac699259e6"
+      },
+      "scope": "A committed Rapid row records the charge prohibition. The selected live case does not carry that same accepted passenger through expiry or the separate out-of-turn FAQ 71 route.",
+      "source_row_id": "rule:18:18.04:1"
+    },
+    {
+      "category": "18",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "18.04-tactical-followup",
+      "order135_obligation": "Tactical disembark immediately selects a Normal or Advance follow-up move.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-active-deployment-transport/bindings-receipt.json",
+        "sha256": "0c666871f5a2b8e0a0be8809a6fae84060afd20962b29e8016bcb3ac699259e6"
+      },
+      "scope": "Accepted Tactical Disembark keeps movement available and excludes choosing Stationary at the state boundary. The immediate native Normal/Advance menu and command are unasserted.",
+      "source_row_id": "rule:18:18.04:1"
+    },
+    {
+      "category": "18",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "18.05-charge-lock",
+      "order135_obligation": "Emergency disembark prevents declaring a charge until turn end.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-transport-family/bindings-receipt.json",
+        "sha256": "f7dc4b7c51c28fb69b17cdc8c541eb41a8e498f6c470b83469675f900bb557b0"
+      },
+      "scope": "Emergency outcome records the turn owner and charge prohibition. Explicit active-turn cleanup removes the disembark restriction while Battle-shock stays. The Emergency controls do not query a legal downstream Charge offer during the live restriction and at expiry.",
+      "source_row_id": "rule:18:18.05:1"
+    },
+    {
+      "category": "18",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "18.05-engaged-fallback-closest",
+      "order135_obligation": "Only when unengaged setup is impossible may a passenger be set up engaged, still as close as possible within the setup band.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-transport-family/bindings-receipt.json",
+        "sha256": "f7dc4b7c51c28fb69b17cdc8c541eb41a8e498f6c470b83469675f900bb557b0"
+      },
+      "scope": "An available unengaged side prevents the engaged placement. A ring of actual enemy bodies makes the close engaged fixture legal. The numeric not-closest check is on the unengaged path; a strictly farther otherwise legal engaged fallback after the same impossibility proof is unasserted.",
+      "source_row_id": "rule:18:18.05:1"
+    },
+    {
+      "category": "18",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "18.05-shared-setup",
+      "order135_obligation": "Emergency placement uses the shared setup authority.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-transport-family/bindings-receipt.json",
+        "sha256": "f7dc4b7c51c28fb69b17cdc8c541eb41a8e498f6c470b83469675f900bb557b0"
+      },
+      "scope": "Actual Emergency public setup applies physical placements, with distance rejection and exact retry, restore, fork and replay. Independent rejection of a general §03.02 constraint, such as an incoherent otherwise-legal survivor endpoint, is not asserted on the same Emergency path.",
+      "source_row_id": "rule:18:18.05:1"
+    },
+    {
+      "category": "18",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "18.06-placed-carrier",
+      "order135_obligation": "The unit must be embarked in a transport on the battlefield.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-active-deployment-transport/bindings-receipt.json",
+        "sha256": "0c666871f5a2b8e0a0be8809a6fae84060afd20962b29e8016bcb3ac699259e6"
+      },
+      "scope": "The Assault positive is a present loaded carrier. Shared owner negatives use the ordinary mode rather than a source-granted Assault request.",
+      "source_row_id": "rule:18:18.06:1"
+    },
+    {
+      "category": "18",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "b49d0004-1dd8-4746-a971-0b6656719dd3-every-disembark-type",
+      "order135_obligation": "Every disembark move type counts as having disembarked that turn.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-transport-family/bindings-receipt.json",
+        "sha256": "f7dc4b7c51c28fb69b17cdc8c541eb41a8e498f6c470b83469675f900bb557b0"
+      },
+      "scope": "Tactical, Rapid, Assault and Shock public placements all commit one typed disembark movement history. Converted Assault/Shock movement executions restore and replay those histories exactly. Native Emergency emits unit_disembarked. Combat was exercised at the typed resolver without a public shared-history assertion; the every-mode claim stays partial.",
+      "source_row_id": "faq:b49d0004-1dd8-4746-a971-0b6656719dd3"
+    },
+    {
+      "category": "18",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "c2df3e97-f21e-4fc9-943e-37072c08c10e-aerialists-post-disembark",
+      "order135_obligation": "Aerialists can embark after disembarking this turn because its embarkation does not include a Normal, Advance or Fall Back move.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-transport-family/bindings-receipt.json",
+        "sha256": "f7dc4b7c51c28fb69b17cdc8c541eb41a8e498f6c470b83469675f900bb557b0"
+      },
+      "scope": "A supplied source-owned no-move occasion allows re-Embark after Disembark while preserving another type gate. Ordinary same-turn setup controls remain forbidden. No admitted actual Aerialists datasheet provider was exercised.",
+      "source_row_id": "faq:c2df3e97-f21e-4fc9-943e-37072c08c10e"
+    },
+    {
+      "category": "19",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "19.04-bodyguard-source-lifetime",
+      "order135_obligation": "A Bodyguard-sourced unit ability ends when its last Bodyguard model is destroyed, subject to attack-sequence retention.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-fight-order-and-followups/bindings-receipt.json",
+        "sha256": "95592a35dcdd0c8db15c62437d8a00bb02b298ad7645cd6bdee4c4cb8aaa07e5"
+      },
+      "scope": "The compiled Bodyguard grant reaches every living component when one source model remains, then drops at the final source casualty. This is the reserve/checkpoint source-lifetime route. Taking the last bodyguard casualty from an attack and expiry only after the attacker finishes all attacks were not exercised.",
+      "source_row_id": "rule:19:19.04:1"
+    },
+    {
+      "category": "19",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "19.04-leader-support-source-lifetime",
+      "order135_obligation": "A Leader or Support unit ability ends when that component’s last model is destroyed, subject to attack-sequence retention.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-fight-order-and-followups/bindings-receipt.json",
+        "sha256": "95592a35dcdd0c8db15c62437d8a00bb02b298ad7645cd6bdee4c4cb8aaa07e5"
+      },
+      "scope": "A native leading weapon grant survives bodyguard loss but drops when its leader dies. Independent compiled leader and support grants end at the respective final source casualty. The target-restriction control proves retained support presence under a different source and route. The same leader/support weapon grant through last-source attack death and through the end of all attacks is unasserted.",
+      "source_row_id": "rule:19:19.04:1"
+    },
+    {
+      "category": "19",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "19.04-specific-bearer-source-lifetime",
+      "order135_obligation": "A specific bearer’s attached-unit ability ends when that bearer is destroyed, subject to attack-sequence retention.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-fight-order-and-followups/bindings-receipt.json",
+        "sha256": "95592a35dcdd0c8db15c62437d8a00bb02b298ad7645cd6bdee4c4cb8aaa07e5"
+      },
+      "scope": "A constructed unit-wide weapon grant bound to actual equipped native wargear survives an unrelated casualty and disappears when its bearer is killed by the normal rule-caused model-destruction owner. The reserve checkpoint also binds grant recovery to the same revived model. The test does not exercise an attacking-unit attack sequence.",
+      "source_row_id": "rule:19:19.04:1"
+    },
+    {
+      "category": "20",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "20.01-optional-declaration",
+      "order135_obligation": "Declare Battle Formations offers friendly units an optional Strategic Reserves declaration instead of battlefield deployment.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-active-deployment-transport/bindings-receipt.json",
+        "sha256": "0c666871f5a2b8e0a0be8809a6fae84060afd20962b29e8016bcb3ac699259e6"
+      },
+      "scope": "At the declared prebattle setup step the real options owner offers only eligible units and the typed declaration stores the selected rows. The public optional completion followed by nonselected deployment is unasserted.",
+      "source_row_id": "rule:20:20.01:1"
+    },
+    {
+      "category": "20",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "20.01.02-final-no-model-triggers",
+      "order135_obligation": "Final reserve cleanup does not trigger model-destruction rules.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-overnight-three/bindings-receipt.json",
+        "sha256": "fbd74570378a15dd8fdbccf60bdd9e6a6fa351564f9c022ac4301f0243b8b166"
+      },
+      "scope": "Final reserve death leaves the pending return queue empty. The carrier-and-cargo variant additionally asserts the complete decision event log is identical across application. No case first demonstrates that a seeded, admitted model-destruction rule would otherwise trigger for the same body, and no final-turn facade handoff is supplied.",
+      "source_row_id": "rule:20:20.01.02:1"
+    },
+    {
+      "category": "20",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "adf7c2cd-b765-4e84-abb7-f0ed45d52841-pregame-only-cap",
+      "order135_obligation": "The fifty-percent Strategic Reserves cap applies only before the battle; battle-time reserve entry can exceed it.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-shared-owner-batch/bindings-receipt.json",
+        "sha256": "13d1b9a8b10247ae9b3e80f68e9fbd38c56861bf57d1f7fc14cc2435173df0e4"
+      },
+      "scope": "The pregame and round-two controls establish opposite sides of the limit. There is no separately exercised battle-time reposition immediately after first-round start.",
+      "source_row_id": "faq:adf7c2cd-b765-4e84-abb7-f0ed45d52841"
+    },
+    {
+      "category": "21",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "21.03-declare-before-move",
+      "order135_obligation": "A Flying unit may declare take to the skies before Normal, Advance, Fall Back or Charge movement.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-remaining-bindings/bindings-receipt.json",
+        "sha256": "02c992e490372921ca9698baf2098d13c17ba8f4cf05b4f28d27eeea76e47bca"
+      },
+      "scope": "Public Charge and Advance offer/record the declared flight choice before their dice, and the supported Normal-flight command restores and replays. The selected active cases do not directly exercise pre-path flight selection specifically for Fall Back.",
+      "source_row_id": "rule:21:21.03:1"
+    },
+    {
+      "category": "22",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "22.04-unit-item-ownership",
+      "order135_obligation": "A unit-owned wargear item grants its ability to that unit.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-active-final/bindings-receipt.json",
+        "sha256": "e3666f79033ad54baba14a678ba7074b8422105c64e31836724b453e7823fe4e"
+      },
+      "scope": "Native item grant and independent typed whole-unit recipient rules verified. The native equipped item is not itself exercised as a whole-unit granted effect here.",
+      "source_row_id": "rule:22:22.04:1"
+    },
+    {
+      "category": "22",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "22.05-ground-target-and-visible",
+      "order135_obligation": "Plunging Fire requires a visible target unit containing a ground-level model.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-remaining-bindings/bindings-receipt.json",
+        "sha256": "02c992e490372921ca9698baf2098d13c17ba8f4cf05b4f28d27eeea76e47bca"
+      },
+      "scope": "Legal visible targets at proper range gain the constructed Towering branch when a target stands on ground; elevated targets or out-of-range cases do not. The sibling-height owner verifies physical source scope. A hidden but otherwise qualifying ground target is not independently contrasted.",
+      "source_row_id": "rule:22:22.05:1"
+    },
+    {
+      "category": "24",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "24.01-typed-ability-families",
+      "order135_obligation": "Core abilities belong to datasheets and weapon abilities to weapon profiles; bracketed weapon-ability notation is normalized at the source boundary.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-remaining-bindings/bindings-receipt.json",
+        "sha256": "02c992e490372921ca9698baf2098d13c17ba8f4cf05b4f28d27eeea76e47bca"
+      },
+      "scope": "Actual Core datasheet abilities reach the unit-level gates and actual weapon profiles retain typed keyword targeting and roundtrip independently. This pair does not assert raw bracketed source admission and rejection across the distinct families.",
+      "source_row_id": "rule:24:24.01:1"
+    },
+    {
+      "category": "24",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "24.02-single-selected-weapon-instance",
+      "order135_obligation": "Each Select Weapons step selects one instance of duplicated weapon ability families, including different numbers or keywords.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-active-stratagems-weapons/bindings-receipt.json",
+        "sha256": "1d04ff1ca82f4864a153b9d4938cd8311e852ba2abcd2b6b324bff0d0dc6b146"
+      },
+      "scope": "One selected Sustained Hits source reaches output and does not stack. Keyword-duplicate selection and the ordinary Select Weapons request are unasserted here.",
+      "source_row_id": "rule:24:24.02:1"
+    },
+    {
+      "category": "24",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "24.06-cleave-single-target",
+      "order135_obligation": "Cleave X adds X dice per complete five target models only if the weapon allocated every attack to one target.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-active-stratagems-weapons/bindings-receipt.json",
+        "sha256": "1d04ff1ca82f4864a153b9d4938cd8311e852ba2abcd2b6b324bff0d0dc6b146"
+      },
+      "scope": "Actual helper applies count bonus when given whole-weapon single-target condition. Multi-attack declaration must still prove it sets the whole-weapon single-target condition.",
+      "source_row_id": "rule:24:24.06:1"
+    },
+    {
+      "category": "24",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "24.08-mortal-wounds-per-unit",
+      "order135_obligation": "On a trigger, each unit within six inches suffers X mortal wounds, rolling random X separately per unit.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-remaining-bindings/bindings-receipt.json",
+        "sha256": "02c992e490372921ca9698baf2098d13c17ba8f4cf05b4f28d27eeea76e47bca"
+      },
+      "scope": "Native source has the correct trigger, six-inch range, and random damage expression, and retained casualty cleanup runs the reaction after physical removal. Neither binds independent random rolls and actual allocations for multiple qualifying units.",
+      "source_row_id": "rule:24:24.08:1"
+    },
+    {
+      "category": "24",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "24.08-six-to-trigger",
+      "order135_obligation": "A destroyed model with Deadly Demise rolls a D6 and triggers on six.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-active-stratagems-weapons/bindings-receipt.json",
+        "sha256": "1d04ff1ca82f4864a153b9d4938cd8311e852ba2abcd2b6b324bff0d0dc6b146"
+      },
+      "scope": "The native source records six as trigger and cleanup invokes reaction. No corresponding actual five-versus-six outcome on a destroyed native carrier in these bindings.",
+      "source_row_id": "rule:24:24.08:1"
+    },
+    {
+      "category": "24",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "24.09-all-models-deep-strike",
+      "order135_obligation": "Deep Strike ingress requires the ability on every model in the unit.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-proximity-keywords-admission/bindings-receipt.json",
+        "sha256": "92bea0f682622885245bf479858d8dffbb6c403058a798fe61535c1b193e3f23"
+      },
+      "scope": "Native Hawks and Bloodcrushers expose Deep Strike and the ordinary declaration records it. Non-Deep-Strike Infractors fail the ability query and the opponent Lord lacks the declaration option. There is no live mixed-model or mixed-component ingress assertion in this pass.",
+      "source_row_id": "rule:24:24.09:1"
+    },
+    {
+      "category": "24",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "24.09-deep-strike-distance",
+      "order135_obligation": "Deep Strike may set up anywhere, including the enemy zone, while remaining more than eight horizontal inches from enemies.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-proximity-keywords-admission/bindings-receipt.json",
+        "sha256": "92bea0f682622885245bf479858d8dffbb6c403058a798fe61535c1b193e3f23"
+      },
+      "scope": "The live public Bloodcrushers path rejects a too-close arrival, reopens selection, and commits all models on a legal retry. The policy asserts eight inches with no edge or enemy-zone restriction. The public fixture does not isolate exact equality or put the accepted physical placement in the enemy deployment zone.",
+      "source_row_id": "rule:24:24.09:1"
+    },
+    {
+      "category": "24",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "24.20-all-models-infiltrators",
+      "order135_obligation": "Infiltrator deployment requires the ability on every model.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-proximity-keywords-admission/bindings-receipt.json",
+        "sha256": "92bea0f682622885245bf479858d8dffbb6c403058a798fe61535c1b193e3f23"
+      },
+      "scope": "Native Rangers have Infiltrators and can redeploy forward where native Avengers cannot. Prior evidence also accepts in-zone Avengers and rejects Rangers close to the opponent zone. No active mixed-component negative verifies the all-model requirement.",
+      "source_row_id": "rule:24:24.20:1"
+    },
+    {
+      "category": "24",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "24.20-enemy-zone-distance",
+      "order135_obligation": "Infiltrators may deploy outside their own zone but must be more than eight horizontal inches from the opponent’s zone.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-active-stratagems-weapons/bindings-receipt.json",
+        "sha256": "1d04ff1ca82f4864a153b9d4938cd8311e852ba2abcd2b6b324bff0d0dc6b146"
+      },
+      "scope": "Native Infiltrator and redeploy placement positives and invalidity. Exact enemy-zone number depends on tested coordinates and is not credited here.",
+      "source_row_id": "rule:24:24.20:1"
+    },
+    {
+      "category": "24",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "24.24-default-twelve-direct-visibility",
+      "order135_obligation": "A nonattached Lone Operative is invisible to enemies farther than twelve inches.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-active-stratagems-weapons/bindings-receipt.json",
+        "sha256": "1d04ff1ca82f4864a153b9d4938cd8311e852ba2abcd2b6b324bff0d0dc6b146"
+      },
+      "scope": "Direct threshold at explicitly supplied 12 checked. Bare keyword default and other visibility consumers not independently exercised in this control.",
+      "source_row_id": "rule:24:24.24:1"
+    },
+    {
+      "category": "24",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "24.24-default-twelve-indirect",
+      "order135_obligation": "Indirect Fire cannot target a nonattached Lone Operative beyond twelve inches.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-active-stratagems-weapons/bindings-receipt.json",
+        "sha256": "1d04ff1ca82f4864a153b9d4938cd8311e852ba2abcd2b6b324bff0d0dc6b146"
+      },
+      "scope": "Indirect threshold at explicitly supplied 12 checked. Bare source default remains unasserted.",
+      "source_row_id": "rule:24:24.24:1"
+    },
+    {
+      "category": "24",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "24.27-pistol-close-quarters-alias",
+      "order135_obligation": "Pistol and Close-quarters are the same ability for all rules purposes.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-active-stratagems-weapons/bindings-receipt.json",
+        "sha256": "1d04ff1ca82f4864a153b9d4938cd8311e852ba2abcd2b6b324bff0d0dc6b146"
+      },
+      "scope": "Sidearm and Close-quarters consumers are verified under their controls. Whole-runtime alias equivalence needs an identical two-label comparison.",
+      "source_row_id": "rule:24:24.27:1"
+    },
+    {
+      "category": "24",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "24.34-muster-attachment",
+      "order135_obligation": "During Muster Armies a Leader or Support may select one eligible friendly Bodyguard to form an attached unit for the battle.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-active-stratagems-weapons/bindings-receipt.json",
+        "sha256": "1d04ff1ca82f4864a153b9d4938cd8311e852ba2abcd2b6b324bff0d0dc6b146"
+      },
+      "scope": "Formation owner attaches explicitly supplemented Support. No ordinary native Support-provider roster is evidenced.",
+      "source_row_id": "rule:24:24.34:1"
+    },
+    {
+      "category": "25",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "25.01-show-opponent-before-battle",
+      "order135_obligation": "Players show their completed roster to the opponent before battle.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-active-deployment-transport/bindings-receipt.json",
+        "sha256": "0c666871f5a2b8e0a0be8809a6fae84060afd20962b29e8016bcb3ac699259e6"
+      },
+      "scope": "Both player roles see the opponent roster and physical bearer publicly during setup. The formation and transport manifest fields are deliberately hidden until resolution, which the mapped cases do not traverse to observe prebattle reveal.",
+      "source_row_id": "rule:25:25.01:1"
+    },
+    {
+      "category": "25",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "25.03-select-battle-size",
+      "order135_obligation": "The selected battle size determines points, Detachment Points, Enhancement and datasheet-copy limits.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-active-deployment-transport/bindings-receipt.json",
+        "sha256": "0c666871f5a2b8e0a0be8809a6fae84060afd20962b29e8016bcb3ac699259e6"
+      },
+      "scope": "Incursion and Strike Force use different point, Enhancement and copy limits, plus an explicit Incursion DP control. Paired selection authority and the exact Strike Force DP boundary are outside this union.",
+      "source_row_id": "rule:25:25.03:1"
+    },
+    {
+      "category": "25",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "25.03-strike-force-limits",
+      "order135_obligation": "Strike Force permits 2000 points, three Detachment Points, four Enhancements and three ordinary copies per datasheet.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-active-deployment-transport/bindings-receipt.json",
+        "sha256": "0c666871f5a2b8e0a0be8809a6fae84060afd20962b29e8016bcb3ac699259e6"
+      },
+      "scope": "Strike Force has exact 2000-point, four-Enhancement and three-ordinary-copy positive and over-limit controls. There is no active assertion here for accepting 3 DP and rejecting 4 DP.",
+      "source_row_id": "rule:25:25.03:1"
+    },
+    {
+      "category": "25",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "25.04-character-faction-warlord",
+      "order135_obligation": "Select a Character unit of the army faction and one Character model in it as Warlord.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-shared-owner-batch/bindings-receipt.json",
+        "sha256": "13d1b9a8b10247ae9b3e80f68e9fbd38c56861bf57d1f7fc14cc2435173df0e4"
+      },
+      "scope": "The chosen eligible Character model alone gets WARLORD and the record survives serialization. A nonexistent model index rejects. The live controls reviewed here do not isolate valid-index non-Character and off-faction negatives.",
+      "source_row_id": "rule:25:25.04:1"
+    },
+    {
+      "category": "25",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "25.04-detachment-unlocks",
+      "order135_obligation": "Selecting a detachment grants its recorded rules, dispositions, Enhancements and Stratagem inventory.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-active-deployment-transport/bindings-receipt.json",
+        "sha256": "0c666871f5a2b8e0a0be8809a6fae84060afd20962b29e8016bcb3ac699259e6"
+      },
+      "scope": "The selected detachment exposes its dispositions, Enhancements and Stratagem IDs and rejects an unavailable Enhancement. Detachment-rule inventory or downstream rule execution is unasserted.",
+      "source_row_id": "rule:25:25.04:1"
+    },
+    {
+      "category": "25",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "25.04-eligible-faction-units",
+      "order135_obligation": "Roster units must carry the army faction keyword or be explicitly available to that army faction.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-active-deployment-transport/bindings-receipt.json",
+        "sha256": "0c666871f5a2b8e0a0be8809a6fae84060afd20962b29e8016bcb3ac699259e6"
+      },
+      "scope": "Real units reach physical composition/equipment with matching faction and a foreign unit without permission is rejected. An explicit out-of-faction availability grant is unasserted.",
+      "source_row_id": "rule:25:25.04:1"
+    },
+    {
+      "category": "25",
+      "disposition": "partial",
+      "family": "provider_gated_and_other_evidence",
+      "obligation_id": "25.04-obey-size-budgets",
+      "order135_obligation": "Roster totals must obey all limits for the selected battle size.",
+      "priority": 5,
+      "receipt": {
+        "path": "caudit-01-active-deployment-transport/bindings-receipt.json",
+        "sha256": "0c666871f5a2b8e0a0be8809a6fae84060afd20962b29e8016bcb3ac699259e6"
+      },
+      "scope": "Each budget group has meaningful independent executable controls. The mapped selected sizes still lack an exact Strike Force detachment-point rejection boundary.",
+      "source_row_id": "rule:25:25.04:1"
+    }
+  ],
+  "priority_counts": {
+    "1": 7,
+    "2": 7,
+    "3": 17,
+    "4": 14,
+    "5": 129
+  },
+  "row_count": 174,
+  "source_adoption_groups": [
+    {
+      "disposition": "unadopted_core_interaction_faq",
+      "retained_predecessor_sha256": null,
+      "scope": "core_firing_deck_cargo_modifiers",
+      "selected_row": {
+        "blocks": [
+          {
+            "kind": "question",
+            "ordinal": 1,
+            "sha256": "1270015d84e7412a223ccb6ae2c0abbdd7c2ab56f5318888d6d383334570c604"
+          },
+          {
+            "kind": "answer",
+            "ordinal": 2,
+            "sha256": "f9d6cf6d6e96079374ea31eea6ca4d2b82fa2263bf043aeb8a7941344369cfbe"
+          }
+        ],
+        "category": "FAQ",
+        "locator": "2a65a983-98ca-4f81-9668-ab87faad1443",
+        "occurrence": 1,
+        "row_id": "faq:2a65a983-98ca-4f81-9668-ab87faad1443",
+        "source_sha256": "f91abe0e716e55b95fa6b1e363036199c711bbf146888e652bf4bece345ce976",
+        "title": "FAQ 66"
+      },
+      "source_row_id": "faq:2a65a983-98ca-4f81-9668-ab87faad1443"
+    },
+    {
+      "disposition": "unadopted_core_interaction_faq",
+      "retained_predecessor_sha256": null,
+      "scope": "core_firing_deck_cargo_modifiers",
+      "selected_row": {
+        "blocks": [
+          {
+            "kind": "question",
+            "ordinal": 1,
+            "sha256": "1270015d84e7412a223ccb6ae2c0abbdd7c2ab56f5318888d6d383334570c604"
+          },
+          {
+            "kind": "answer",
+            "ordinal": 2,
+            "sha256": "07e2171e8e56659aa0bf256fb4fc2aed7837696eb5d95735e2f0621aee9a35fc"
+          }
+        ],
+        "category": "FAQ",
+        "locator": "46de5d13-e6bb-4085-9948-38ce97880570",
+        "occurrence": 1,
+        "row_id": "faq:46de5d13-e6bb-4085-9948-38ce97880570",
+        "source_sha256": "4749d4b86d84f6febc090db44758d952b15068ce0dbe1e6010655e68a2dabb49",
+        "title": "FAQ 68"
+      },
+      "source_row_id": "faq:46de5d13-e6bb-4085-9948-38ce97880570"
+    },
+    {
+      "disposition": "unadopted_core_interaction_faq",
+      "retained_predecessor_sha256": null,
+      "scope": "core_firing_deck_cargo_modifiers",
+      "selected_row": {
+        "blocks": [
+          {
+            "kind": "question",
+            "ordinal": 1,
+            "sha256": "1270015d84e7412a223ccb6ae2c0abbdd7c2ab56f5318888d6d383334570c604"
+          },
+          {
+            "kind": "answer",
+            "ordinal": 2,
+            "sha256": "ec78e959034cd976678be8d0357fbb8cb4922c4bbf284c82e498c4f5bae4c18b"
+          }
+        ],
+        "category": "FAQ",
+        "locator": "b9fb8097-e9f4-4bab-b2bf-ec525c8e6db7",
+        "occurrence": 1,
+        "row_id": "faq:b9fb8097-e9f4-4bab-b2bf-ec525c8e6db7",
+        "source_sha256": "ede077205e90741754f7f536c4c222e40f8fe8b26c2f15a167fa0fe34132ce96",
+        "title": "FAQ 69"
+      },
+      "source_row_id": "faq:b9fb8097-e9f4-4bab-b2bf-ec525c8e6db7"
+    },
+    {
+      "disposition": "unadopted_core_interaction_faq",
+      "retained_predecessor_sha256": null,
+      "scope": "rapid_disembark_heroic_intervention",
+      "selected_row": {
+        "blocks": [
+          {
+            "kind": "question",
+            "ordinal": 1,
+            "sha256": "30752c28232aa35a8a0ba8ff12be5cdf6b598479371fb543ccd0e9aed27c5933"
+          },
+          {
+            "kind": "answer",
+            "ordinal": 2,
+            "sha256": "a06fcf42f6466d9178edfccb0cb3bc4bb0d40c78258d071f83567fb8f6952083"
+          }
+        ],
+        "category": "FAQ",
+        "locator": "c1acc7d4-f495-4c21-954e-3a119b93a96e",
+        "occurrence": 1,
+        "row_id": "faq:c1acc7d4-f495-4c21-954e-3a119b93a96e",
+        "source_sha256": "99b7439c7db76cabb236c2e6b3dacf68cee83b84fc410c540d753f74a3e65282",
+        "title": "FAQ 71"
+      },
+      "source_row_id": "faq:c1acc7d4-f495-4c21-954e-3a119b93a96e"
+    },
+    {
+      "disposition": "new_core_clause",
+      "retained_predecessor_sha256": null,
+      "scope": "core_replacement_geometry",
+      "selected_row": {
+        "blocks": [
+          {
+            "kind": "text",
+            "ordinal": 1,
+            "sha256": "037150673334efb52ff943f5a737c0ae310dab19c10863f7c14d068b743dffea"
+          },
+          {
+            "kind": "text",
+            "ordinal": 2,
+            "sha256": "7f3ee5c4e13a803d531ab325e1d88efbf7a6751d075c0aa473081adaae04bf24"
+          },
+          {
+            "kind": "text",
+            "ordinal": 3,
+            "sha256": "57324aab0356e23d7cacea33a1198419cad0211b31ece7e13b3b368a81befec5"
+          },
+          {
+            "kind": "text",
+            "ordinal": 4,
+            "sha256": "2aaf68327f871aaeb580ab1df4f2ac371bc6ea25891dc6ece58ef8ee632fd4f0"
+          }
+        ],
+        "category": "01",
+        "locator": "01.02.12",
+        "occurrence": 1,
+        "row_id": "rule:01:01.02.12:1",
+        "source_sha256": "f60b1c9821e07d391b5aee860e06b90ef74b689eff633b793f1704307bee1ea4",
+        "title": "Replacing One Model with Another"
+      },
+      "source_row_id": "rule:01:01.02.12:1"
+    },
+    {
+      "disposition": "new_core_clause",
+      "retained_predecessor_sha256": null,
+      "scope": "core_straight_zero_width_line",
+      "selected_row": {
+        "blocks": [
+          {
+            "kind": "text",
+            "ordinal": 1,
+            "sha256": "407474182eedd3f4a00833aaffb0f862ae763a0e8ab8a3d8fd58cea376bdbe7d"
+          },
+          {
+            "kind": "text",
+            "ordinal": 2,
+            "sha256": "25ab226c4852fbc177faf57badfa200bf84f305c6319174c42882c73a2d3e305"
+          },
+          {
+            "kind": "text",
+            "ordinal": 3,
+            "sha256": "6dedaaabe1a5fa69eaf347f302b934a763061b43a2de84def985e8646a017486"
+          }
+        ],
+        "category": "01",
+        "locator": "01.04.06",
+        "occurrence": 1,
+        "row_id": "rule:01:01.04.06:1",
+        "source_sha256": "e483db78ebcdb2d360989733018414e3c3b81537eac6459ae36160364321f2c7",
+        "title": "Drawing a Line"
+      },
+      "source_row_id": "rule:01:01.04.06:1"
+    },
+    {
+      "disposition": "changed_returned_fall_back_authority",
+      "retained_predecessor_sha256": "6bf4fd4f0ae498fff4f48cc0ded4d5c8e1d7651c66c00c3a81fbb0fe176a476d",
+      "scope": "core_forced_desperate_escape",
+      "selected_row": {
+        "blocks": [
+          {
+            "kind": "text",
+            "ordinal": 1,
+            "sha256": "8d4485ce2413aa0f1a453c412126c3a20ffc8a2a8f4e8469eb09c7fc77bb798e"
+          },
+          {
+            "kind": "text",
+            "ordinal": 2,
+            "sha256": "771f24067fac132c15f07e9afd2a089bb7f7ba7eebeada9129cbf01f4d6bf8ff"
+          },
+          {
+            "kind": "text",
+            "ordinal": 3,
+            "sha256": "882d859a9d6b480732aac9bcc1c21b1609c93d35ffeb83b35f8a065e06c08415"
+          },
+          {
+            "kind": "text",
+            "ordinal": 4,
+            "sha256": "6b490a2b36783729764991cf7a67808d4c3aa53659c0269a3430e1c4b90106e5"
+          },
+          {
+            "kind": "text",
+            "ordinal": 5,
+            "sha256": "c32a1ce6f96ad685f69273eab8c4c3c608057dd1276e99474d06e93fa48f8ef3"
+          },
+          {
+            "kind": "text",
+            "ordinal": 6,
+            "sha256": "b33e021d61f68df3edd3896e79c6b45e01962f6734f1c8e360b75c858ab03824"
+          },
+          {
+            "kind": "text",
+            "ordinal": 7,
+            "sha256": "ecd323e90692b01ce42aeb46a48f6cafa7f73a26f839bdcd5b1829b0f1d22377"
+          },
+          {
+            "kind": "text",
+            "ordinal": 8,
+            "sha256": "ffe45e9eab591a07d10e4eb430cc9d34e7e8e9f7cee392d99938e43f473104da"
+          }
+        ],
+        "category": "09",
+        "locator": "09.07.01",
+        "occurrence": 1,
+        "row_id": "rule:09:09.07.01:1",
+        "source_sha256": "9b6d66fe396a8c5aaf4bf3b3222da8979d55865e5c97e756b3c3131c7b7a2b52",
+        "title": "Desperate Escape Test"
+      },
+      "source_row_id": "rule:09:09.07.01:1"
+    }
+  ],
+  "unique_known_runtime_defects": [
+    {
+      "defect_id": "forced_escape_daemonic_terror",
+      "description": "Native territorial Daemonic Terror can fail after the legal forced retreat reaches Battle-shock. Own fix lane #753.",
+      "disposition": "known_material_baseline_defect",
+      "owner_code_checked": {
+        "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/army_rule.py": {
+          "file_sha256": "00ffe06bf3fbd050cef1efc88b6de38eacd7a11c4d3fd9d5f2a4fff9e1de3043",
+          "git_blob_in_both_trees": "7a0bffeb0068c88f300259b75f5753b8fc8c8a21"
+        },
+        "src/warhammer40k_core/engine/movement_decision_authority.py": {
+          "file_sha256": "9572a8865ebee464c2078116b2e095c1819fb9389267cd0ec6e4620724d82a0d",
+          "git_blob_in_both_trees": "3a7ffa927ab5eacb5ec9ceb72e560aaf2b5fd6a0"
+        },
+        "src/warhammer40k_core/engine/phases/movement_battle_shock_continuation.py": {
+          "file_sha256": "13f6bafd631c7e1996c090ebda96e396d119597426ea99ad91f3dc25910722c5",
+          "git_blob_in_both_trees": "3d8b394abebc08f40b6e3f50e2ade92e8a0d4e3b"
+        }
+      },
+      "receipt": {
+        "path": "caudit-01-desperate-escape/triage.json",
+        "sha256": "8bc7bf2a8a66bcc87d74490babae970dc6bd1ba0c51c2514e5d643d556387edf"
+      },
+      "related_obligation_ids": [
+        "09.07.01-forced-shock-2",
+        "09.07.01-hazard-alias",
+        "09.07.01-modifier-alias"
+      ],
+      "witness_commit": "dec50bca2394c755a0d5fb76e6659882b388c032"
+    },
+    {
+      "defect_id": "counteroffensive_fight_type",
+      "description": "Paid native grant commits Normal despite eligible Overrun. Own fix lane #756.",
+      "disposition": "known_material_baseline_defect",
+      "owner_code_checked": {
+        "src/warhammer40k_core/engine/fight_activation_requests.py": {
+          "file_sha256": "ed5eff1db7580118ba8202e091a413ea199680d40384f21e89c254486cdf0aed",
+          "git_blob_in_both_trees": "c9a25a57522877f9a56bf1dae452a813bf755719"
+        },
+        "src/warhammer40k_core/engine/fight_order.py": {
+          "file_sha256": "f0942554275868586fa1a59b8ac135eb1557ff23b705614f6958bcb101995899",
+          "git_blob_in_both_trees": "5ae7acdc8184da8072a786e1a3535ad5e47fe5e9"
+        },
+        "src/warhammer40k_core/engine/phases/fight.py": {
+          "file_sha256": "5b329d78d216336e141692e00cca125d4ffb743ef216a3b0f814ceeaddb7518b",
+          "git_blob_in_both_trees": "39286ffc87f705bdecd0438cf10237a847bd6e21"
+        },
+        "src/warhammer40k_core/engine/stratagems_effect_handlers.py": {
+          "file_sha256": "eeec51078f3a0a00e066660cffb0ceac98e6544e8995fc330b3cd7f61bb6a3bd",
+          "git_blob_in_both_trees": "e6270beb93e9450e38f1d9985057bb9576164cc5"
+        }
+      },
+      "receipt": {
+        "path": "caudit-01-native-decision-groups/bindings-receipt.json",
+        "sha256": "9eb80c820146fdf9ee86ead080ecd986a1d1a0b82241b71e5ce331f7f0808eb7"
+      },
+      "related_obligation_ids": [
+        "12.04-fight-type",
+        "15.12-next-selection"
+      ],
+      "witness_commit": "dec50bca2394c755a0d5fb76e6659882b388c032"
+    },
+    {
+      "defect_id": "native_attack_count_reroll",
+      "description": "Native weapon attack count supplies no Command Re-roll offer before the first Hit roll. Separate fix lane.",
+      "disposition": "known_material_baseline_defect",
+      "owner_code_checked": {
+        "src/warhammer40k_core/engine/phases/shooting_declaration_validation.py": "35ccf93b335288913b598663310e6f37cc8322bb06651506c5b28c910197b80b",
+        "src/warhammer40k_core/engine/stratagems_targeting.py": "9ae5111ebc94967bfebc7d91533d7b62b02d5cce1dd2b032e32422b37ff16dac",
+        "src/warhammer40k_core/engine/weapon_declaration.py": "18a25c378402582462d0d656147971cc1285905342febf4efa12e4d4b8cdc2a3"
+      },
+      "receipt": {
+        "path": "caudit-01-active-datasheets-movement-attachments/blocker-receipt.json",
+        "sha256": "b3992bbc68ef295fa2fc0820b1fd03f981619c449299faebd6161ce297f815a7"
+      },
+      "related_obligation_ids": [
+        "15.02-eligible-rolls",
+        "02.02.03-obligation-03"
+      ],
+      "witness_commit": "55eef9b20652b030d3ab3e9b85755e0acd7c2d49"
+    }
+  ],
+  "verified_main": "55eef9b20652b030d3ab3e9b85755e0acd7c2d49"
+}

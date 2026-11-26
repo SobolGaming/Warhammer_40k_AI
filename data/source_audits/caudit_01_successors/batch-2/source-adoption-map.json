@@ -1,0 +1,554 @@
+{
+  "adoption_rows": [
+    {
+      "delta": "added",
+      "observation": {
+        "blocks": [
+          {
+            "kind": "text",
+            "ordinal": 1,
+            "sha256": "037150673334efb52ff943f5a737c0ae310dab19c10863f7c14d068b743dffea"
+          },
+          {
+            "kind": "text",
+            "ordinal": 2,
+            "sha256": "7f3ee5c4e13a803d531ab325e1d88efbf7a6751d075c0aa473081adaae04bf24"
+          },
+          {
+            "kind": "text",
+            "ordinal": 3,
+            "sha256": "57324aab0356e23d7cacea33a1198419cad0211b31ece7e13b3b368a81befec5"
+          },
+          {
+            "kind": "text",
+            "ordinal": 4,
+            "sha256": "2aaf68327f871aaeb580ab1df4f2ac371bc6ea25891dc6ece58ef8ee632fd4f0"
+          }
+        ],
+        "category": "01",
+        "locator": "01.02.12",
+        "occurrence": 1,
+        "row_id": "rule:01:01.02.12:1",
+        "source_sha256": "f60b1c9821e07d391b5aee860e06b90ef74b689eff633b793f1704307bee1ea4",
+        "title": "Replacing One Model with Another"
+      },
+      "owner_bytes": {
+        "src/warhammer40k_core/engine/return_on_death.py": "2a43eaf2260f2db711f5ee963023d6873bd474007d98a3ad1d82bc757b4a2267",
+        "tests/rules/section01/README.md": "c42f8be1c6b9c11d4b4dcec4d22eccf0674cb71be3b74917290ef948304c5508"
+      },
+      "qualification": "Current Return on Death restores the same model. No admitted on-board different-model replacement producer was found. Adopt separate source-backed center/Frame alignment and closest-legal fallback in the replacement transition.",
+      "readiness": "requires_core_code_and_producer",
+      "retained_row_sha256": null,
+      "selected_provider_probes": {},
+      "source_row_id": "rule:01:01.02.12:1"
+    },
+    {
+      "delta": "added",
+      "observation": {
+        "blocks": [
+          {
+            "kind": "text",
+            "ordinal": 1,
+            "sha256": "407474182eedd3f4a00833aaffb0f862ae763a0e8ab8a3d8fd58cea376bdbe7d"
+          },
+          {
+            "kind": "text",
+            "ordinal": 2,
+            "sha256": "25ab226c4852fbc177faf57badfa200bf84f305c6319174c42882c73a2d3e305"
+          },
+          {
+            "kind": "text",
+            "ordinal": 3,
+            "sha256": "6dedaaabe1a5fa69eaf347f302b934a763061b43a2de84def985e8646a017486"
+          }
+        ],
+        "category": "01",
+        "locator": "01.04.06",
+        "occurrence": 1,
+        "row_id": "rule:01:01.04.06:1",
+        "source_sha256": "e483db78ebcdb2d360989733018414e3c3b81537eac6459ae36160364321f2c7",
+        "title": "Drawing a Line"
+      },
+      "owner_bytes": {
+        "tests/rules/section01/README.md": "c42f8be1c6b9c11d4b4dcec4d22eccf0674cb71be3b74917290ef948304c5508"
+      },
+      "qualification": "Straight segment and LOS geometry exist. Current scope explicitly leaves the rule-driven, zero-width line unadopted, with no admitted targeting producer established. Bind the default in a source-backed line consumer before proving sizing and exceptions.",
+      "readiness": "requires_rule_consumer",
+      "retained_row_sha256": null,
+      "selected_provider_probes": {},
+      "source_row_id": "rule:01:01.04.06:1"
+    },
+    {
+      "delta": "changed",
+      "observation": {
+        "blocks": [
+          {
+            "kind": "text",
+            "ordinal": 1,
+            "sha256": "8d4485ce2413aa0f1a453c412126c3a20ffc8a2a8f4e8469eb09c7fc77bb798e"
+          },
+          {
+            "kind": "text",
+            "ordinal": 2,
+            "sha256": "771f24067fac132c15f07e9afd2a089bb7f7ba7eebeada9129cbf01f4d6bf8ff"
+          },
+          {
+            "kind": "text",
+            "ordinal": 3,
+            "sha256": "882d859a9d6b480732aac9bcc1c21b1609c93d35ffeb83b35f8a065e06c08415"
+          },
+          {
+            "kind": "text",
+            "ordinal": 4,
+            "sha256": "6b490a2b36783729764991cf7a67808d4c3aa53659c0269a3430e1c4b90106e5"
+          },
+          {
+            "kind": "text",
+            "ordinal": 5,
+            "sha256": "c32a1ce6f96ad685f69273eab8c4c3c608057dd1276e99474d06e93fa48f8ef3"
+          },
+          {
+            "kind": "text",
+            "ordinal": 6,
+            "sha256": "b33e021d61f68df3edd3896e79c6b45e01962f6734f1c8e360b75c858ab03824"
+          },
+          {
+            "kind": "text",
+            "ordinal": 7,
+            "sha256": "ecd323e90692b01ce42aeb46a48f6cafa7f73a26f839bdcd5b1829b0f1d22377"
+          },
+          {
+            "kind": "text",
+            "ordinal": 8,
+            "sha256": "ffe45e9eab591a07d10e4eb430cc9d34e7e8e9f7cee392d99938e43f473104da"
+          }
+        ],
+        "category": "09",
+        "locator": "09.07.01",
+        "occurrence": 1,
+        "row_id": "rule:09:09.07.01:1",
+        "source_sha256": "9b6d66fe396a8c5aaf4bf3b3222da8979d55865e5c97e756b3c3131c7b7a2b52",
+        "title": "Desperate Escape Test"
+      },
+      "owner_bytes": {
+        "src/warhammer40k_core/engine/movement_decision_authority.py": "9572a8865ebee464c2078116b2e095c1819fb9389267cd0ec6e4620724d82a0d",
+        "src/warhammer40k_core/engine/phases/movement_battle_shock_continuation.py": "13f6bafd631c7e1996c090ebda96e396d119597426ea99ad91f3dc25910722c5"
+      },
+      "qualification": "The forced mode, physical hazards and Battle-shock are reachable. The retained wording differs and the territory continuation can fail after the roll. Intake the hazard/test alias and modifier scope with the exact #753 continuation proof.",
+      "readiness": "implemented_in_part_active_fix",
+      "retained_row_sha256": "6bf4fd4f0ae498fff4f48cc0ded4d5c8e1d7651c66c00c3a81fbb0fe176a476d",
+      "selected_provider_probes": {},
+      "source_row_id": "rule:09:09.07.01:1"
+    },
+    {
+      "delta": "added",
+      "observation": {
+        "blocks": [
+          {
+            "kind": "question",
+            "ordinal": 1,
+            "sha256": "ac29a9b31ac2f096aeea435b3d937fdaed82c45af10e0b2b4d96a6fe7269e597"
+          },
+          {
+            "kind": "answer",
+            "ordinal": 2,
+            "sha256": "cf87b23d0f70cff8f9ce62b411ad616fd9be0b93edeba67c70f647e5a4b848e1"
+          }
+        ],
+        "category": "FAQ",
+        "locator": "2733d800-ad70-422b-9c62-d3b3c1cb6d6c",
+        "occurrence": 1,
+        "row_id": "faq:2733d800-ad70-422b-9c62-d3b3c1cb6d6c",
+        "source_sha256": "5086029ae2951111a116fefb5b76f6f9c2a07abdaf22c41474dc4855b3754f39",
+        "title": "FAQ 65"
+      },
+      "owner_bytes": {
+        "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/aeldari/detachments/windrider_host/rule.py": "447c396ba7a8f73f4558cbac7f3a841b7e71f617229982de543c84c47a9816d9"
+      },
+      "qualification": "Vyper alone builds. Windriders fail selected model-height admission, and the Windrider Host runtime contribution is a scaffold. Bind the named first-round Ingress permission for eligible models to the faction provider.",
+      "readiness": "provider_code_required",
+      "retained_row_sha256": null,
+      "selected_provider_probes": {
+        "vyper": {
+          "abilities": [
+            [
+              "Harassment Fire",
+              "generic_rule_ir",
+              0
+            ],
+            [
+              "Deadly Demise",
+              "descriptor_only",
+              0
+            ],
+            [
+              "Battle Focus",
+              "descriptor_only",
+              0
+            ]
+          ],
+          "id": "000000605",
+          "result": "selected_catalog_build_passed"
+        },
+        "windriders": {
+          "error": "Representative model height override is required.",
+          "error_type": "WahapediaBridgeError",
+          "id": "000000591",
+          "result": "selected_catalog_build_rejected"
+        }
+      },
+      "source_row_id": "faq:2733d800-ad70-422b-9c62-d3b3c1cb6d6c"
+    },
+    {
+      "delta": "added",
+      "observation": {
+        "blocks": [
+          {
+            "kind": "question",
+            "ordinal": 1,
+            "sha256": "1270015d84e7412a223ccb6ae2c0abbdd7c2ab56f5318888d6d383334570c604"
+          },
+          {
+            "kind": "answer",
+            "ordinal": 2,
+            "sha256": "f9d6cf6d6e96079374ea31eea6ca4d2b82fa2263bf043aeb8a7941344369cfbe"
+          }
+        ],
+        "category": "FAQ",
+        "locator": "2a65a983-98ca-4f81-9668-ab87faad1443",
+        "occurrence": 1,
+        "row_id": "faq:2a65a983-98ca-4f81-9668-ab87faad1443",
+        "source_sha256": "f91abe0e716e55b95fa6b1e363036199c711bbf146888e652bf4bece345ce976",
+        "title": "FAQ 66"
+      },
+      "owner_bytes": {
+        "src/warhammer40k_core/engine/phases/shooting_firing_deck.py": "c396e65fb091618b31279eaa828624bf8a8d85611b81d773ae143fc866ae075d",
+        "src/warhammer40k_core/engine/transport_firing_deck.py": "130d640ad3042428dfa4bdebe411f5cbf679f7d3712951bc295fdc239cb75354"
+      },
+      "qualification": "The carrier owns the borrowed attack and cargo-only modifiers do not travel with the weapon. Adopt this exact example and verify the named Ork provider after geometry admission.",
+      "readiness": "shared_behavior_implemented_named_route_blocked",
+      "retained_row_sha256": null,
+      "selected_provider_probes": {
+        "big_mek": {
+          "error": "Representative model height override is required.",
+          "error_type": "WahapediaBridgeError",
+          "id": "000003707",
+          "result": "selected_catalog_build_rejected"
+        },
+        "flash_gitz": {
+          "error": "Representative model height override is required.",
+          "error_type": "WahapediaBridgeError",
+          "id": "000000045",
+          "result": "selected_catalog_build_rejected"
+        },
+        "trukk": {
+          "error": "Representative model height override is required.",
+          "error_type": "WahapediaBridgeError",
+          "id": "000000026",
+          "result": "selected_catalog_build_rejected"
+        }
+      },
+      "source_row_id": "faq:2a65a983-98ca-4f81-9668-ab87faad1443"
+    },
+    {
+      "delta": "added",
+      "observation": {
+        "blocks": [
+          {
+            "kind": "question",
+            "ordinal": 1,
+            "sha256": "7ea8cf2fd042aea0850252f0194105a3f90604c4fba28fc2d3af4e96eb6475e0"
+          },
+          {
+            "kind": "answer",
+            "ordinal": 2,
+            "sha256": "a06fcf42f6466d9178edfccb0cb3bc4bb0d40c78258d071f83567fb8f6952083"
+          }
+        ],
+        "category": "FAQ",
+        "locator": "43df168c-3289-4fda-a684-a6e13e62d719",
+        "occurrence": 1,
+        "row_id": "faq:43df168c-3289-4fda-a684-a6e13e62d719",
+        "source_sha256": "2825b95368d2bbdf12cba3fd7ba143cf491c44ace6a0579e5a42dce7a695b086",
+        "title": "FAQ 67"
+      },
+      "owner_bytes": {
+        "src/warhammer40k_core/engine/terrain_hidden.py": "1f66ddfd0841ba5797514d5746af44730cb925821963425ed341b31042fda959"
+      },
+      "qualification": "The selected Biovores build fails representative height. No selected named Seed Spore Mines to Hidden witness. Preserve the distinction between the ordinary Hidden consumer and the named spawning action.",
+      "readiness": "provider_admission_blocked",
+      "retained_row_sha256": null,
+      "selected_provider_probes": {
+        "biovores": {
+          "error": "Representative model height override is required.",
+          "error_type": "WahapediaBridgeError",
+          "id": "000000491",
+          "result": "selected_catalog_build_rejected"
+        }
+      },
+      "source_row_id": "faq:43df168c-3289-4fda-a684-a6e13e62d719"
+    },
+    {
+      "delta": "added",
+      "observation": {
+        "blocks": [
+          {
+            "kind": "question",
+            "ordinal": 1,
+            "sha256": "1270015d84e7412a223ccb6ae2c0abbdd7c2ab56f5318888d6d383334570c604"
+          },
+          {
+            "kind": "answer",
+            "ordinal": 2,
+            "sha256": "07e2171e8e56659aa0bf256fb4fc2aed7837696eb5d95735e2f0621aee9a35fc"
+          }
+        ],
+        "category": "FAQ",
+        "locator": "46de5d13-e6bb-4085-9948-38ce97880570",
+        "occurrence": 1,
+        "row_id": "faq:46de5d13-e6bb-4085-9948-38ce97880570",
+        "source_sha256": "4749d4b86d84f6febc090db44758d952b15068ce0dbe1e6010655e68a2dabb49",
+        "title": "FAQ 68"
+      },
+      "owner_bytes": {
+        "src/warhammer40k_core/engine/phases/shooting_firing_deck.py": "c396e65fb091618b31279eaa828624bf8a8d85611b81d773ae143fc866ae075d"
+      },
+      "qualification": "Same cargo-only restriction in the expanded Ork example with Targetin' Squigs. Evidence for the shared branch does not admit the named upgrade or enhancements.",
+      "readiness": "shared_behavior_implemented_named_route_blocked",
+      "retained_row_sha256": null,
+      "selected_provider_probes": {
+        "big_mek": {
+          "error": "Representative model height override is required.",
+          "error_type": "WahapediaBridgeError",
+          "id": "000003707",
+          "result": "selected_catalog_build_rejected"
+        },
+        "flash_gitz": {
+          "error": "Representative model height override is required.",
+          "error_type": "WahapediaBridgeError",
+          "id": "000000045",
+          "result": "selected_catalog_build_rejected"
+        },
+        "trukk": {
+          "error": "Representative model height override is required.",
+          "error_type": "WahapediaBridgeError",
+          "id": "000000026",
+          "result": "selected_catalog_build_rejected"
+        }
+      },
+      "source_row_id": "faq:46de5d13-e6bb-4085-9948-38ce97880570"
+    },
+    {
+      "delta": "added",
+      "observation": {
+        "blocks": [
+          {
+            "kind": "question",
+            "ordinal": 1,
+            "sha256": "1270015d84e7412a223ccb6ae2c0abbdd7c2ab56f5318888d6d383334570c604"
+          },
+          {
+            "kind": "answer",
+            "ordinal": 2,
+            "sha256": "ec78e959034cd976678be8d0357fbb8cb4922c4bbf284c82e498c4f5bae4c18b"
+          }
+        ],
+        "category": "FAQ",
+        "locator": "b9fb8097-e9f4-4bab-b2bf-ec525c8e6db7",
+        "occurrence": 1,
+        "row_id": "faq:b9fb8097-e9f4-4bab-b2bf-ec525c8e6db7",
+        "source_sha256": "ede077205e90741754f7f536c4c222e40f8fe8b26c2f15a167fa0fe34132ce96",
+        "title": "FAQ 69"
+      },
+      "owner_bytes": {
+        "src/warhammer40k_core/engine/phases/shooting_firing_deck.py": "c396e65fb091618b31279eaa828624bf8a8d85611b81d773ae143fc866ae075d"
+      },
+      "qualification": "Same cargo-only restriction in the alternate Ork example. Keep a distinct source binding and reuse the shared implementation.",
+      "readiness": "shared_behavior_implemented_named_route_blocked",
+      "retained_row_sha256": null,
+      "selected_provider_probes": {
+        "big_mek": {
+          "error": "Representative model height override is required.",
+          "error_type": "WahapediaBridgeError",
+          "id": "000003707",
+          "result": "selected_catalog_build_rejected"
+        },
+        "flash_gitz": {
+          "error": "Representative model height override is required.",
+          "error_type": "WahapediaBridgeError",
+          "id": "000000045",
+          "result": "selected_catalog_build_rejected"
+        },
+        "trukk": {
+          "error": "Representative model height override is required.",
+          "error_type": "WahapediaBridgeError",
+          "id": "000000026",
+          "result": "selected_catalog_build_rejected"
+        }
+      },
+      "source_row_id": "faq:b9fb8097-e9f4-4bab-b2bf-ec525c8e6db7"
+    },
+    {
+      "delta": "added",
+      "observation": {
+        "blocks": [
+          {
+            "kind": "question",
+            "ordinal": 1,
+            "sha256": "6fdb83c51dbc45f0713736f23fce8166ab39fc2c41a6149e32bc169a2c3afb09"
+          },
+          {
+            "kind": "answer",
+            "ordinal": 2,
+            "sha256": "a06fcf42f6466d9178edfccb0cb3bc4bb0d40c78258d071f83567fb8f6952083"
+          }
+        ],
+        "category": "FAQ",
+        "locator": "ba994b78-79ae-4d3c-a3a3-ab792c0cedc2",
+        "occurrence": 1,
+        "row_id": "faq:ba994b78-79ae-4d3c-a3a3-ab792c0cedc2",
+        "source_sha256": "3203d79a3bea78f02065263a077d5f4873c949cfc9344c09c7d0b7a6de409557",
+        "title": "FAQ 70"
+      },
+      "owner_bytes": {
+        "src/warhammer40k_core/engine/attack_sequence_hit_wound.py": "d677e50e2bf25c4bb852e9f131a2f1b4b797e5a51a6ec85808b9e32a3070db69",
+        "tests/rules/section24/test_hit_wound_consumers.py": "d46ea0005063643502c30d44147fbfe0560efaa67bbfeaa2dc9b848afac716dc"
+      },
+      "qualification": "Torrent auto-hits emit no hit roll. No named Grot Shields runtime handler or ordinary public entry point was found in scope. Bind the named Stratagem to physical hit-roll evidence when admitted.",
+      "readiness": "generic_hit_rule_implemented_named_provider_unbound",
+      "retained_row_sha256": null,
+      "selected_provider_probes": {},
+      "source_row_id": "faq:ba994b78-79ae-4d3c-a3a3-ab792c0cedc2"
+    },
+    {
+      "delta": "added",
+      "observation": {
+        "blocks": [
+          {
+            "kind": "question",
+            "ordinal": 1,
+            "sha256": "30752c28232aa35a8a0ba8ff12be5cdf6b598479371fb543ccd0e9aed27c5933"
+          },
+          {
+            "kind": "answer",
+            "ordinal": 2,
+            "sha256": "a06fcf42f6466d9178edfccb0cb3bc4bb0d40c78258d071f83567fb8f6952083"
+          }
+        ],
+        "category": "FAQ",
+        "locator": "c1acc7d4-f495-4c21-954e-3a119b93a96e",
+        "occurrence": 1,
+        "row_id": "faq:c1acc7d4-f495-4c21-954e-3a119b93a96e",
+        "source_sha256": "99b7439c7db76cabb236c2e6b3dacf68cee83b84fc410c540d753f74a3e65282",
+        "title": "FAQ 71"
+      },
+      "owner_bytes": {
+        "src/warhammer40k_core/engine/charge_eligibility.py": "749a7a8ca005dd728c062f5726c048e4f8560ea05f0b7aa75d5a567555d7c814",
+        "src/warhammer40k_core/engine/stratagems_geometry.py": "4ad5b5c1a3a7a69b4893aea35a74258f5284e4ef16edb4403bbe780372065969"
+      },
+      "qualification": "Shared Heroic charge eligibility rejects a unit with the same-turn Rapid lock. The uninterrupted opponent-turn source route and strict replay remain open. The Trukk and Boyz catalogue probes fail before public play.",
+      "readiness": "shared_behavior_implemented_named_route_blocked",
+      "retained_row_sha256": null,
+      "selected_provider_probes": {
+        "boyz": {
+          "error": "Unit composition model name has no matching Wahapedia model stat row.",
+          "error_type": "WahapediaBridgeError",
+          "id": "000000016",
+          "result": "selected_catalog_build_rejected"
+        },
+        "trukk": {
+          "error": "Representative model height override is required.",
+          "error_type": "WahapediaBridgeError",
+          "id": "000000026",
+          "result": "selected_catalog_build_rejected"
+        }
+      },
+      "source_row_id": "faq:c1acc7d4-f495-4c21-954e-3a119b93a96e"
+    },
+    {
+      "delta": "added",
+      "observation": {
+        "blocks": [
+          {
+            "kind": "question",
+            "ordinal": 1,
+            "sha256": "5d1c3445ce99b663ea201fcad0040efb701c9c335de9a2a29218f6b7111d53b1"
+          },
+          {
+            "kind": "answer",
+            "ordinal": 2,
+            "sha256": "ddee3feb7463db1e14cfe42761479c6ccbc1f4a37b78ac25823a817ef75cf577"
+          }
+        ],
+        "category": "FAQ",
+        "locator": "e2df8fc1-824c-407e-847b-0c259898c816",
+        "occurrence": 1,
+        "row_id": "faq:e2df8fc1-824c-407e-847b-0c259898c816",
+        "source_sha256": "603ee8c26e1c9118e7fc444cdd56b6e31a65b66d99d6ecfe801271995ffda233",
+        "title": "FAQ 72"
+      },
+      "owner_bytes": {},
+      "qualification": "The selected Thulia Ghuld build fails representative height. Admit the provider and bind target selection to the chosen Icon mode. Current evidence makes no claim about whether that named consumer needs runtime changes.",
+      "readiness": "provider_admission_blocked",
+      "retained_row_sha256": null,
+      "selected_provider_probes": {
+        "thulia_ghuld": {
+          "error": "Representative model height override is required.",
+          "error_type": "WahapediaBridgeError",
+          "id": "000004210",
+          "result": "selected_catalog_build_rejected"
+        }
+      },
+      "source_row_id": "faq:e2df8fc1-824c-407e-847b-0c259898c816"
+    },
+    {
+      "delta": "added",
+      "observation": {
+        "blocks": [
+          {
+            "kind": "question",
+            "ordinal": 1,
+            "sha256": "cf13b3dca08687347560e28d4840b7f9e62b693390c89be627452b17187d4ec5"
+          },
+          {
+            "kind": "answer",
+            "ordinal": 2,
+            "sha256": "a06fcf42f6466d9178edfccb0cb3bc4bb0d40c78258d071f83567fb8f6952083"
+          }
+        ],
+        "category": "FAQ",
+        "locator": "e33ff7e2-e619-41bf-8af2-8313b486a76b",
+        "occurrence": 1,
+        "row_id": "faq:e33ff7e2-e619-41bf-8af2-8313b486a76b",
+        "source_sha256": "da8a1cb5f3a0cdc183ea378acd94a3ab37f3c31b56280626aeb4b1b633051b69",
+        "title": "FAQ 73"
+      },
+      "owner_bytes": {
+        "src/warhammer40k_core/engine/catalog_lone_operative_grants.py": "72825e72dd249b4204c03a7040461cadbde2444123d6dd90a06dbb4b7deaeea1"
+      },
+      "qualification": "The selected Arkanyst Evaluator build fails representative height. Generic Lone Operative exists. The named qualifying-neighbour predicate still needs an admitted two-Evaluator negative and qualifying-unit positive.",
+      "readiness": "provider_admission_blocked",
+      "retained_row_sha256": null,
+      "selected_provider_probes": {
+        "arkanyst_evaluator": {
+          "error": "Representative model height override is required.",
+          "error_type": "WahapediaBridgeError",
+          "id": "000004142",
+          "result": "selected_catalog_build_rejected"
+        }
+      },
+      "source_row_id": "faq:e33ff7e2-e619-41bf-8af2-8313b486a76b"
+    }
+  ],
+  "base_reconciliation_sha256": "4ead6121300b63b6dc8763f907a93b6c86170cccbfe55f8a50a52ed310847669",
+  "changed_rows": 1,
+  "current_source": {
+    "asset": "https://game-datamissions.com/_next/static/chunks/app/11th/rules/core-rules/page-30534bb58bd962dc.js",
+    "observed_utc": "2026-11-26T06:21:19.7174649Z",
+    "page": "https://game-datamissions.com/11th/rules/core-rules",
+    "sha256": "8971d98f2dd64c9e8f166d774b3a6f57a995f140dc73834be949a172f61c5363"
+  },
+  "new_rows": 11,
+  "retained_packet_sha256": "a473e270f76d9556c25e68477abf040bc8a7f1a6c21c1fd9d9a0fa960edd627f",
+  "verified_main": "55eef9b20652b030d3ab3e9b85755e0acd7c2d49"
+}
