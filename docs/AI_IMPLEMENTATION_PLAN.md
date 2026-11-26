@@ -1429,6 +1429,107 @@ Proposed pre-registered acceptance:
 
 Use a proposed initial test design of at least 20 held-out scenario variants per family and 10 paired chance seeds, then a predeclared cap for any extension within the compute ceiling. Split by scenario family/geometry and trajectory, not adjacent rows. Freeze generator, baseline and evaluation set before training. These sample counts are experimental starting points, not a power guarantee or claim of game-wide strength.
 
+### Stage 4 development benchmark
+
+The [compact Stage 4 receipt](stage4-benchmark-receipt.json) freezes two
+ordinary-start Core fixtures at #762 (`dd2e259d`). It records setup,
+ordered raw-menu fingerprints, selected IDs, validation evidence and exact
+checkpoint/event hashes. The local runner reconstructs the histories through
+the actor facade and verifies strict restore, both actor views and independent
+event replay. The command without a family checks the receipt and prints the
+baseline ledger without starting a game.
+
+```sh
+PYTHONPATH=src:. uv run --no-sync python -B -m scripts.stage4_benchmark_entry
+PYTHONPATH=src:. uv run --no-sync python -B -m scripts.stage4_benchmark_entry --family west
+PYTHONPATH=src:. uv run --no-sync python -B -m scripts.stage4_benchmark_entry --family guard
+PYTHONPATH=src:. uv run --no-sync python -B -m scripts.stage4_benchmark_entry --family west --audit-west
+uv run --no-sync pytest -q tests/rules/section09/test_normal_move_candidates.py --no-cov
+```
+
+On PowerShell, set `$env:PYTHONPATH = 'src;.'` before the same `uv run`
+commands. Each reproduction is local and offline. The west run has an
+800-second wall cap. The guard run and optional retrospective west audit have
+a 1,050-second cap per invocation. The runner reports a missing offer,
+rejected committed action, timeout or unreached boundary as unobserved.
+
+All arms share each fixture's exact round-three S action offer, use the fixed
+synthetic seed, omit Shooting and Charge, and decline issued optional reactions.
+The three arms are Hold with E follow-through, Screen with the same E
+follow-through, and Screen with E omitted. The horizon is A's first A4
+Movement offer after Command scoring. Both fixtures preserve material and
+consume zero RNG draws. The target is the change from the common origin in
+A-minus-B VP at that boundary.
+
+`immediate-material-hold-v1` reads the issued finite Hold and Normal Move
+options. Both have zero immediate wound swing, so it selects Hold. The
+runner uses that action at the fork, then applies the same E and B rules as in
+the Screen arm.
+
+| Development group | Hold baseline VP gain (A–B) | Screen + E | Screen, E omitted | Screen minus baseline margin |
+| --- | ---: | ---: | ---: | ---: |
+| Layout 3 west lane | 0–3 | 5–0 | 0–0 | +8 |
+| Layout 2 central guard | 13–0 | 8–3 | 0–3 | −8 |
+
+In the west lane, the generated S move stays off every objective and
+blocks the B3 diagonal by native Engagement Range transit validation.
+B's actor-visible clearance rule takes the diagonal when clear and Holds
+otherwise. E alone supplies the OC for A's five VP at Expansion 2. The live
+protocol selects one generated path at each Normal Move request and submits
+it to the engine. The rejected B diagonal is an isolated diagnostic. The
+retrospective audit separately probes the selected ID first, then the first
+different raw ID on disposable forks. Across six post-fork requests it
+reconstructed 112 raw proposals, probed 12, accepted seven, and left 100
+untested at the cap. These seven are retrospective accepts.
+
+In the central guard, the same B policy evaluates a southwest Central 2
+approach and a northwest lane advance using directional and objective-contact
+predicates. It takes a validated Central 2 approach, then a validated
+northwest advance, then the issued Hold if neither is viable. There is one
+native probe slot per leading route before additional alternatives. Both
+tested responses are active. Hold blocks the approach and retains Central 2
+at 6–2 OC. Screen blocks the northwest lane and opens the approach, yielding
+10–2 OC for B at Central 2. E independently controls Central 1 in both
+follow-through arms. The post-fork generator returned 224 raw proposals, with
+206 outside the tactical predicates and six untested at the cap. Twelve native
+probes yielded seven live policy-visible accepts and five typed rejects.
+Staging uses a one-probe cap per move. Divergent requests use a two-probe cap.
+Only native-accepted IDs enter the prepared guard policy set. The receipt also
+retains the chosen ID that actually committed.
+
+Each menu row records, in order, the raw count, ordered-ID SHA-256, submitted
+ID, prepared live policy IDs, rejected ID/reason pairs, cap losses and geometry
+exclusions. A null live set means the west protocol submitted directly.
+A null submitted ID in a prepared menu means the finite Hold was used.
+The optional west audit reconstructs its recorded attempts and cap losses
+separately.
+
+Earlier controls retain their scopes. The original Layout 3 edge-column probe
+qualified route denial. Its later matched active B4 continuation scored 5–0
+in both arms, with an authored A5 ally witness outside the generator.
+The Layout 1 Central 2 comparison qualified objective control. S supplied its
+own OC and omitting E left total VP unchanged. #752 remains constructed
+mechanism precedent. These controls stay outside the two-group baseline.
+
+Before fitting, freeze a family manifest and assign whole groups to
+development and held-out partitions. Keep every shared origin, declared
+geometry family, branch, omission, timing variant, policy/response, side swap,
+repeat and seed variant together, transitively. Keep these two families in
+development. Admit held-out families from independent source-backed layouts
+and geometry unused in development. Freeze their ordinary startup, matched
+controls, live candidate budget, opponent rule, horizon and chance handling
+before scoring. Gate admission on actor binding, native action coverage
+within the live cap, observed matched horizons and strict replay regardless
+of score. Record capped and unsupported occurrences. The existing
+[deployment partition contract](AI_POLICY_INTERFACE.md#bounded-deployment-dataset-partitions)
+provides the grouping precedent.
+
+The current evidence covers one seed and one response rule per family.
+Held-out fixtures, response and seed variation, a matched timing control,
+and the linkage from verified tactical rows to targets remain outstanding.
+Local VP differences measure the declared horizon. The development benchmark
+emits zero training rows.
+
 ## 7. Performance and evaluation before scaling
 
 Measure the actual headless workload, with and without the reference transport under matched conditions:
