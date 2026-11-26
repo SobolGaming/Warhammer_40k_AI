@@ -416,7 +416,9 @@ def _gameplay_budget_successor(
     return record["runtime_fingerprint"], record["sources"], successors, raw
 
 
-def _stage2_fight_successor(root: Path) -> tuple[str, TestSuccessors, bytes]:
+def _stage2_fight_successor(
+    root: Path, *, current_tests: TestSuccessors
+) -> tuple[str, TestSuccessors, bytes]:
     raw = _checked_bytes(root, STAGE2_FIGHT_TRANSITION, STAGE2_FIGHT_SHA256)
     record = json.loads(raw, object_pairs_hook=_selection_object)
     if (
@@ -437,7 +439,11 @@ def _stage2_fight_successor(root: Path) -> tuple[str, TestSuccessors, bytes]:
     ):
         raise SystemExit("Stage 2 Fight Cover test transition membership differs.")
     _checked_bytes(root, STAGE2_FIGHT_SOURCE, record["source"][STAGE2_FIGHT_SOURCE]["after"])
-    tests = _selection_members({name: row["after"] for name, row in record["test"].items()}, root)
+    tests = _selection_members(
+        {name: row["after"] for name, row in record["test"].items()},
+        root,
+        current=current_tests,
+    )
     return record["runtime_fingerprint"], tests, raw
 
 
@@ -1502,6 +1508,7 @@ def _counteroffensive_fight_type_transition(
         raise SystemExit("Counteroffensive Fight-type test admission differs.")
     for name, change in receipt["sources"].items():
         _checked_bytes(root, name, change["after"])
+    from scripts.ranged_attack_count_test_admission import ranged_attack_count_runtime
     from scripts.stage3_ranged_profile_test_admission import ranged_profile_test_addition
 
     manifest_sha256 = receipt["runtime_manifest"]["after"]
@@ -1514,7 +1521,9 @@ def _counteroffensive_fight_type_transition(
             or ranged_receipt["retained_runtime_fingerprint"] != receipt["runtime_fingerprint"]
         ):
             raise SystemExit("Ranged profile tests differ from the exact predecessor.")
-        manifest_sha256 = ranged_receipt["manifest_sha256"]
+        manifest_sha256, _ = ranged_attack_count_runtime(
+            root, predecessor=ranged_receipt, predecessor_bytes=ranged[2]
+        )
     _checked_bytes(root, MANIFEST, manifest_sha256)
     _checked_bytes(root, "tests/support/dark_pact_fixtures.py", receipt["dark_pact_fixture_sha256"])
     return receipt, raw
@@ -1534,6 +1543,7 @@ def combined_charge_runtime(root: Path, flight_raw: bytes, retry_raw: bytes) -> 
     fingerprint = binding["combined_runtime_fingerprint"]
     if not isinstance(fingerprint, str):
         raise SystemExit("Combined Charge runtime fingerprint is malformed.")
+    from scripts.ranged_attack_count_test_admission import ranged_attack_count_runtime
     from scripts.stage2_ground_charge_test_admission import load_normal_move_admission
     from scripts.stage3_ranged_profile_test_admission import ranged_profile_test_addition
 
@@ -1592,9 +1602,10 @@ def combined_charge_runtime(root: Path, flight_raw: bytes, retry_raw: bytes) -> 
                 raise SystemExit(
                     "Ranged profile tests require the composed Counteroffensive runtime."
                 )
-            ranged_receipt = ranged[0]
-            successor = (successor[0], ranged_receipt["manifest_sha256"])
-            current_runtime = ranged_receipt["runtime_fingerprint"]
+            manifest_sha256, current_runtime = ranged_attack_count_runtime(
+                root, predecessor=ranged[0], predecessor_bytes=ranged[2]
+            )
+            successor = (successor[0], manifest_sha256)
         normal_runtime = normal_move.admit_runtime(
             root,
             predecessor=receipt,
@@ -1935,7 +1946,13 @@ def exact_movement_test_transition(
     )
     source_successors: SourceSuccessors = {}
     test_successors: TestSuccessors = {}
-    fight_successor = _stage2_fight_successor(root) if has_stage2_fight else None
+    from scripts.ranged_attack_count_test_admission import ranged_attack_count_faction_successor
+
+    faction_repair = ranged_attack_count_faction_successor(root, retained_cutover_sha256)
+    faction_tests = {} if faction_repair is None else faction_repair[0]
+    fight_successor = (
+        _stage2_fight_successor(root, current_tests=faction_tests) if has_stage2_fight else None
+    )
     stage2_fight_tests = {} if fight_successor is None else fight_successor[1]
     gore = _gore_hungry_onslaught_transition(root)
     if has_gameplay_budget:
@@ -1949,7 +1966,7 @@ def exact_movement_test_transition(
             budget_sources[budget_source] = gore[0]["historical_sources"][budget_source]
         runtime, source_successors, test_successors, successor_raw = _gameplay_budget_successor(
             root,
-            current_tests=stage2_fight_tests,
+            current_tests={**stage2_fight_tests, **faction_tests},
             current_sources=budget_sources,
         )
         raw += b"\0" + successor_raw
@@ -2067,6 +2084,9 @@ def exact_movement_test_transition(
         _checked_bytes(root, ALLOCATION_COHERENCY_POLICY, allocation["policy_sha256"])
         additions.update(_selection_members(allocation["added_files"], root))
         runtime = allocation["runtime_fingerprint"]
+    from scripts.ranged_attack_count_test_admission import ranged_attack_count_test_addition
+
+    attack_count = ranged_attack_count_test_addition(root)
     cover_event_path = root / COVER_EVENT_IDENTITY_ADDITION
     _selection_no_links(root, cover_event_path)
     cover_event_raw = None
@@ -2096,7 +2116,12 @@ def exact_movement_test_transition(
             or set(cover_event["added_files"]) != {COVER_EVENT_IDENTITY_OWNER}
         ):
             raise SystemExit("Cover event identity test addition differs.")
-        _checked_bytes(root, COVER_EVENT_IDENTITY_SOURCE, cover_event["source"]["after"])
+        _retained_source(
+            root,
+            COVER_EVENT_IDENTITY_SOURCE,
+            cover_event["source"]["after"],
+            {} if attack_count is None else attack_count[0]["viewer_sources"],
+        )
         additions.update(_selection_members(cover_event["added_files"], root))
         runtime = cover_event["runtime_fingerprint"]
     opening_path = root / OPENING_SHADOW_FORM_TRANSITION
@@ -2602,6 +2627,21 @@ def exact_movement_test_transition(
             raise SystemExit("Ranged profile tests overlap the predecessor selection.")
         additions.update(ranged_tests)
         raw += b"\0" + ranged_raw
+    if attack_count is not None:
+        attack_receipt, attack_tests, attack_raw = attack_count
+        if ranged is None or identity_runtime != attack_receipt["runtime_fingerprint"]:
+            raise SystemExit(
+                "Ranged attack-count tests require the composed ranged profile runtime."
+            )
+        if attack_tests.keys() & (updated.keys() | added.keys() | additions.keys()):
+            raise SystemExit("Ranged attack-count tests overlap the predecessor selection.")
+        additions.update(attack_tests)
+        raw += b"\0" + attack_raw
+    if faction_repair is not None:
+        if attack_count is None or fight_successor is None:
+            raise SystemExit("Ranged attack-count faction repairs require both predecessors.")
+        updated.update(faction_tests)
+        raw += b"\0" + faction_repair[1]
     return updated, {**added, **additions}, retained_raw + b"\0" + raw
 
 

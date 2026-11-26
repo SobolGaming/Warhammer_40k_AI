@@ -405,6 +405,23 @@ def _apply_command_reroll_handler(
         option.option_id for option in request.options if option.option_id != "decline"
     )
     if len(reroll_option_ids) > 1:
+        from dataclasses import replace
+
+        from warhammer40k_core.engine.ranged_attack_count_gathering import (
+            RANGED_ATTACK_COUNT_SCOPE_CONTEXT_KEY,
+        )
+
+        if (
+            roll_type == "number_of_attacks_roll"
+            and isinstance(context.trigger_payload, dict)
+            and RANGED_ATTACK_COUNT_SCOPE_CONTEXT_KEY in context.trigger_payload
+        ):
+            request = replace(
+                request,
+                options=tuple(
+                    option for option in request.options if option.option_id != "decline"
+                ),
+            )
         decisions.request_decision(request)
         decisions.event_log.append(
             "command_reroll_selection_requested",

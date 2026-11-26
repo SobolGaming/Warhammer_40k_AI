@@ -7,6 +7,7 @@ from warhammer40k_core.engine.weapon_abilities import blast_attack_bonus_for_pro
 from warhammer40k_core.engine.targetless_weapons import TargetlessWeapon
 from typing import TYPE_CHECKING
 
+from warhammer40k_core.core.ruleset import RulesetEdition
 from warhammer40k_core.core.weapon_profiles import AttackProfile
 from warhammer40k_core.engine.shooting_engagement import is_monster_or_vehicle
 from warhammer40k_core.engine.weapon_selection_context import WeaponSelectionContext
@@ -302,15 +303,24 @@ def _attack_pools_or_validation(
         player_id=player_id,
         selected_shooting_type=selected_shooting_type,
     )
+    defer_random_attacks = (
+        out_of_phase_state is None
+        and ruleset_descriptor.ruleset_id.edition is RulesetEdition.ELEVENTH
+        and (
+            attack_count_manager is not None
+            or (committed_weapon is not None and committed_base_attacks is None)
+        )
+    )
     if committed_weapon is not None:
         if (
             len(proposal.declarations) != 1
-            or committed_base_attacks is None
             or committed_attack_profile is None
-        ):
-            raise GameLifecycleError(
-                "Committed retargeting requires one weapon and its dice result."
+            or (
+                committed_base_attacks is None
+                and (not defer_random_attacks or committed_attack_profile.dice_expression is None)
             )
+        ):
+            raise GameLifecycleError("Retargeting requires one weapon and its attack-count plan.")
         if _available_weapon_key(committed_weapon) != _declaration_available_weapon_key(
             proposal.declarations[0]
         ):
@@ -595,7 +605,18 @@ def _attack_pools_or_validation(
             snap_target_unit_ids.add(declaration.target_unit_instance_id)
         if validate_only:
             continue
-        if committed_base_attacks is not None:
+        deferred = (
+            defer_random_attacks and weapon_profile.attack_profile.dice_expression is not None
+        )
+        if deferred:
+            if committed_weapon is not None and (
+                committed_attack_profile is None
+                or weapon_profile.attack_profile.dice_expression
+                != committed_attack_profile.dice_expression
+            ):
+                raise GameLifecycleError("Replacement cannot change a pending Attacks expression.")
+            attacks = 0
+        elif committed_base_attacks is not None:
             if committed_weapon is None:
                 raise GameLifecycleError("Committed attack count requires its selected weapon.")
             fixed_attacks = weapon_profile.attack_profile.fixed_attacks
@@ -661,7 +682,8 @@ def _attack_pools_or_validation(
                 weapon_selection_context=selection_context,
                 declaration=declaration,
                 weapon_profile=weapon_profile,
-                attacks=attacks,
+                attacks=0 if deferred else attacks,
+                pending_attack_count_bonus=attacks if deferred else None,
                 target_visible_model_ids=candidate.target_visible_model_ids,
                 target_in_range_model_ids=candidate.target_in_range_model_ids,
                 hit_roll_modifier=hit_roll_modifier,

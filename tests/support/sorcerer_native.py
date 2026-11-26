@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from collections.abc import Generator
+from contextlib import contextmanager
 from dataclasses import replace
 
 from tests.support.private_randomness import fixture_private_rng_seed
@@ -469,3 +471,69 @@ def assert_native_movement_budget(
         budget = witness["budget"]
         assert isinstance(budget, dict)
         assert budget["max_distance_inches"] == expected_inches
+
+
+@contextmanager
+def scripted_wrack_rolls(result_ids: tuple[str, ...], target_id: str) -> Generator[None]:
+    """Two successful Witchfire shots with no damage through the native Shooting owner."""
+    from typing import Any
+    from unittest.mock import patch
+
+    from tests.support.scripted_attack_rolls import ScriptedAttackRolls
+
+    from warhammer40k_core.engine.attack_sequence import (
+        attack_sequence_hit_roll_spec,
+        attack_sequence_wound_roll_spec,
+    )
+    from warhammer40k_core.engine.phase import BattlePhase
+    from warhammer40k_core.engine.phases import shooting_handler
+    from warhammer40k_core.engine.ranged_attack_count_gathering import (
+        _count_roll_spec,  # pyright: ignore[reportPrivateUsage]
+    )
+
+    profile = "000004085:agonising-energies:witchfire"
+    sequence_ids = {f"attack-sequence:{result_id}" for result_id in result_ids}
+    resolver = shooting_handler.resolve_attack_sequence_until_blocked
+    plans: dict[str, ScriptedAttackRolls] = {}
+
+    def resolve(**kwargs: Any) -> Any:
+        sequence = kwargs["attack_sequence"]
+        key = sequence.sequence_id
+        if key not in sequence_ids:
+            return resolver(**kwargs)
+        assert kwargs.get("dice_manager") is None
+        assert sequence.source_phase is BattlePhase.SHOOTING
+        (pool,) = sequence.attack_pools
+        assert pool.weapon_profile_id == profile
+        assert pool.target_unit_instance_id == target_id
+        if key not in plans:
+            _, count = _count_roll_spec(key, sequence.attacker_player_id, 0, pool)
+            context_id = f"{key}:pool-001:attack-001"
+            plans[key] = ScriptedAttackRolls(
+                (
+                    (count, 1),
+                    (
+                        attack_sequence_hit_roll_spec(
+                            weapon_profile_id=profile,
+                            attack_context_id=context_id,
+                            attacker_player_id=sequence.attacker_player_id,
+                        ),
+                        5,
+                    ),
+                    (
+                        attack_sequence_wound_roll_spec(
+                            weapon_profile_id=profile,
+                            attack_context_id=context_id,
+                            attacker_player_id=sequence.attacker_player_id,
+                        ),
+                        1,
+                    ),
+                )
+            )
+        return plans[key].run(resolver, kwargs, manager_parameter="dice_manager")
+
+    with patch.object(shooting_handler, "resolve_attack_sequence_until_blocked", resolve):
+        yield
+    assert plans.keys() == sequence_ids
+    for plan in plans.values():
+        plan.assert_consumed()

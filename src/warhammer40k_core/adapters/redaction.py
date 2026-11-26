@@ -11,6 +11,7 @@ from warhammer40k_core.adapters.support_profile import SupportProfilePayload
 from warhammer40k_core.adapters.viewer_identity import ViewerIdentityMap
 from warhammer40k_core.core.descriptor_hash import canonical_payload_sha256
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest
+from warhammer40k_core.engine.decision import DICE_REROLL_DECISION_TYPE
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.event_log import (
     EventLog,
@@ -58,6 +59,9 @@ from warhammer40k_core.engine.primary_scoring_commit_checkpoint import (
 from warhammer40k_core.engine.primary_turn_start_evidence import (
     PrimaryRulesUnitTurnStartSnapshot,
     PrimaryRulesUnitTurnStartSnapshotPayload,
+)
+from warhammer40k_core.engine.ranged_attack_count_gathering import (
+    RANGED_ATTACK_COUNT_SCOPE_CONTEXT_KEY,
 )
 from warhammer40k_core.engine.scoring import (
     SecondaryMissionCardState,
@@ -500,9 +504,8 @@ def decision_request_hidden_from_context(
         raise GameLifecycleError("DecisionRequest redaction requires a DecisionRequest.")
     if type(viewer) is not ViewerContext:
         raise GameLifecycleError("DecisionRequest redaction requires a ViewerContext.")
-    if request.decision_type in {TACTICAL_SECONDARY_SCORE_DECISION_TYPE, "select_modifier_ignores"}:
-        return not (viewer.policy.omniscient or viewer.owns_player(request.actor_id))
-    return secret_payload_hidden_from_context(
+    return _decision_hidden_from_context(
+        decision_type=request.decision_type,
         actor_id=request.actor_id,
         payload=request.payload,
         viewer=viewer,
@@ -516,15 +519,28 @@ def decision_request_payload_hidden_from_context(
 ) -> bool:
     if type(viewer) is not ViewerContext:
         raise GameLifecycleError("DecisionRequest redaction requires a ViewerContext.")
-    actor_id = _optional_string(request_payload, key="actor_id")
-    decision_type = _required_string(request_payload, key="decision_type")
-    if decision_type in {TACTICAL_SECONDARY_SCORE_DECISION_TYPE, "select_modifier_ignores"}:
-        return not (viewer.policy.omniscient or viewer.owns_player(actor_id))
-    return secret_payload_hidden_from_context(
-        actor_id=actor_id,
+    return _decision_hidden_from_context(
+        decision_type=_required_string(request_payload, key="decision_type"),
+        actor_id=_optional_string(request_payload, key="actor_id"),
         payload=request_payload["payload"],
         viewer=viewer,
     )
+
+
+def _decision_hidden_from_context(
+    *, decision_type: str, actor_id: str | None, payload: JsonValue, viewer: ViewerContext
+) -> bool:
+    if decision_type in {TACTICAL_SECONDARY_SCORE_DECISION_TYPE, "select_modifier_ignores"}:
+        return not (viewer.policy.omniscient or viewer.owns_player(actor_id))
+    if decision_type == DICE_REROLL_DECISION_TYPE and isinstance(payload, dict):
+        command_reroll = payload.get("command_reroll_context")
+        context = (
+            command_reroll.get("stratagem_context") if isinstance(command_reroll, dict) else None
+        )
+        trigger = context.get("trigger_payload") if isinstance(context, dict) else None
+        if isinstance(trigger, dict) and RANGED_ATTACK_COUNT_SCOPE_CONTEXT_KEY in trigger:
+            return not (viewer.policy.omniscient or viewer.owns_player(actor_id))
+    return secret_payload_hidden_from_context(actor_id=actor_id, payload=payload, viewer=viewer)
 
 
 def secret_payload_hidden_from_context(
@@ -728,6 +744,10 @@ def _event_record_hidden_from_context(
             request_payload=request_payload,
             viewer=viewer,
         )
+    if event_type == "command_reroll_selection_requested":
+        event_payload = _json_object("Command Re-roll selection event payload", payload)
+        request = _json_object("Command Re-roll selection request", event_payload["reroll_request"])
+        return decision_request_payload_hidden_from_context(request_payload=request, viewer=viewer)
     if event_type == "secondary_mission_choice_recorded":
         event_payload = _json_object("secondary_mission_choice_recorded payload", payload)
         return not (
@@ -832,6 +852,17 @@ def _public_event_payload(
         return _public_decision_request_payload(payload, viewer=viewer)
     if event_type == "decision_recorded":
         return _public_decision_record_payload(payload, viewer=viewer)
+    if event_type == "command_reroll_resolved":
+        event_payload = _json_object("Command Re-roll resolved event payload", payload)
+        request = _json_object("Command Re-roll resolved request", event_payload["reroll_request"])
+        if decision_request_payload_hidden_from_context(request_payload=request, viewer=viewer):
+            return validate_json_value(
+                {
+                    key: value
+                    for key, value in event_payload.items()
+                    if key not in {"reroll_request", "reroll_result"}
+                }
+            )
     if event_type == "secondary_mission_choice_recorded":
         return _public_secondary_mission_choice_recorded_payload(payload, viewer=viewer)
     if event_type == "tactical_secondary_missions_drawn":

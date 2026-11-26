@@ -6,10 +6,21 @@ from typing import TYPE_CHECKING, cast
 
 import msgspec
 
+from warhammer40k_core.engine.attack_sequence_model import (
+    SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE,
+    GatheredAttackGroup,
+)
+from warhammer40k_core.engine.attack_sequence_selection import (
+    selected_attack_weapon_group_from_result,
+)
 from warhammer40k_core.engine.charge_target_continuation import is_charge_target_replacement_request
 from warhammer40k_core.engine.decision_record import DecisionRecord, DecisionRecordPayload
 from warhammer40k_core.engine.event_log import EventRecord, JsonValue
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatus
+from warhammer40k_core.engine.ranged_attack_count_gathering import (
+    RANGED_ATTACK_COUNTS_GATHERED,
+    apply_ranged_attack_count_evidence,
+)
 from warhammer40k_core.engine.target_replacement import (
     SELECT_TARGET_REPLACEMENT_DECISION_TYPE,
     TargetReplacementContext,
@@ -131,7 +142,43 @@ def _validate_sequence_history(
     expected = _accepted_pools(event_records, record)
     forgone: set[int] = set()
     records_by_result_id = {r.result.result_id: r for r in records}
-    for event in event_records:
+    has_deferred_counts = any(pool.pending_attack_count_bonus is not None for pool in expected)
+    selected_group: GatheredAttackGroup | None = None
+    for event_index, event in enumerate(event_records):
+        body = event.payload
+        if (
+            has_deferred_counts
+            and event.event_type == "decision_recorded"
+            and isinstance(body, dict)
+        ):
+            result = body.get("result")
+            if (
+                isinstance(result, dict)
+                and result.get("decision_type") == SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE
+                and isinstance(selection := result.get("payload"), dict)
+                and selection.get("sequence_id") == sequence.sequence_id
+            ):
+                result_id = result.get("result_id")
+                if type(result_id) is not str or result_id not in records_by_result_id:
+                    raise GameLifecycleError("Ranged group choice lacks its decision record.")
+                selected_group = selected_attack_weapon_group_from_result(
+                    records_by_result_id[result_id].result
+                )
+        if (
+            event.event_type == RANGED_ATTACK_COUNTS_GATHERED
+            and isinstance(body, dict)
+            and body.get("sequence_id") == sequence.sequence_id
+        ):
+            if selected_group is None:
+                raise GameLifecycleError("Ranged attack counts lack their selected group.")
+            expected, selected_group = apply_ranged_attack_count_evidence(
+                evidence=body,
+                sequence_id=sequence.sequence_id,
+                actor_id=sequence.attacker_player_id,
+                pools=expected,
+                group=selected_group,
+                preceding_events=event_records[:event_index],
+            )
         if event.event_type != "target_replacement_resolved":
             continue
         payload = event.payload
@@ -232,6 +279,11 @@ def _validate_sequence_history(
             raise GameLifecycleError(
                 "Replacement changed a committed physical weapon or shooting type."
             )
+        if any(
+            (old.pending_attack_count_bonus is None) != (new.pending_attack_count_bonus is None)
+            for old, new in zip(expected, updated, strict=True)
+        ):
+            raise GameLifecycleError("Replacement changed the ranged count gathering state.")
         if sequence.source_phase is BattlePhase.FIGHT and any(
             old.attacks != new.attacks for old, new in zip(expected, updated, strict=True)
         ):
@@ -240,6 +292,12 @@ def _validate_sequence_history(
             raise GameLifecycleError("Replacement event changed unselected attack pools.")
         forgone.update(skipped)
         expected = updated
+    if (
+        has_deferred_counts
+        and sequence.current_gathered_group is not None
+        and sequence.current_gathered_group != selected_group
+    ):
+        raise GameLifecycleError("Ranged attack group differs from its gathering history.")
     if sequence.attack_pools != expected or not forgone.issubset(sequence.used_pool_indices):
         raise GameLifecycleError("Replacement attack sequence differs from its decision history.")
 
@@ -325,6 +383,15 @@ def validate_restored_replacements(
         if state.out_of_phase_shooting_state is None
         else state.out_of_phase_shooting_state.attack_sequence,
     ):
-        if sequence is not None and replacement_records:
+        if sequence is not None and (
+            replacement_records
+            or any(pool.pending_attack_count_bonus is not None for pool in sequence.attack_pools)
+            or any(
+                event.event_type == RANGED_ATTACK_COUNTS_GATHERED
+                and isinstance(event.payload, dict)
+                and event.payload.get("sequence_id") == sequence.sequence_id
+                for event in decisions.event_log.records
+            )
+        ):
             record, _ = declaration_record_for_sequence(decisions, sequence)
             validate_sequence_authority(decisions, record, sequence)

@@ -1343,11 +1343,8 @@ class GatheredAttackContribution:
                 self.target_unit_instance_id,
             ),
         )
-        object.__setattr__(
-            self,
-            "attacks",
-            _validate_positive_int("GatheredAttackContribution attacks", self.attacks),
-        )
+        attacks = _validate_non_negative_int("GatheredAttackContribution attacks", self.attacks)
+        object.__setattr__(self, "attacks", attacks)
         object.__setattr__(
             self,
             "firing_deck_source_unit_instance_id",
@@ -1439,7 +1436,7 @@ class GatheredAttackGroup:
         object.__setattr__(
             self,
             "total_attacks",
-            _validate_positive_int("GatheredAttackGroup total_attacks", self.total_attacks),
+            _validate_non_negative_int("GatheredAttackGroup total_attacks", self.total_attacks),
         )
         object.__setattr__(
             self,
@@ -1458,6 +1455,10 @@ class GatheredAttackGroup:
         ):
             raise GameLifecycleError("GatheredAttackGroup contribution target drift.")
         validate_native_group_snapshots(self)
+
+    @property
+    def counts_pending(self) -> bool:
+        return any(contribution.attacks == 0 for contribution in self.contributions)
 
     @property
     def primary_pool_index(self) -> int:

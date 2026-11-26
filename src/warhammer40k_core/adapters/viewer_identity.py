@@ -117,6 +117,13 @@ def _identity_family(key: str, value: str) -> str | None:
     explicit = _IDENTITY_FIELDS.get(key)
     if explicit is not None:
         return explicit
+    # A reroll permission can carry the same window reference as window_id.
+    # Symbolic timings (for instance attack_sequence.hit) are plain labels.
+    if key == "timing_window" and (
+        value.startswith("view-window-")
+        or (value.startswith("command-reroll-") and _AUTHORITATIVE_ORDINAL_ID.search(value))
+    ):
+        return "window"
     if key.endswith(("_id", "_ids")):
         reference = _REFERENCE_FIELD.search(key)
         if reference is not None:

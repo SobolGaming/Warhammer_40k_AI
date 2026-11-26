@@ -1013,11 +1013,55 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         ranged_record["retained_counteroffensive_sha256"]
         == hashlib.sha256(receipt_path.read_bytes()).hexdigest()
     )
+    from scripts import ranged_attack_count_test_admission as attack_count
+
+    attack_record = _record(attack_count.RECEIPT)
+    assert attack_record["base"] == attack_count.BASE
+    attack_base_manifest = subprocess.check_output(
+        ["git", "show", attack_count.BASE + ":" + MANIFEST], cwd=ROOT
+    )
+    assert ranged_record["manifest_sha256"] == hashlib.sha256(attack_base_manifest).hexdigest()
+    assert ranged_record["runtime_fingerprint"] == json.loads(attack_base_manifest)["fingerprint"]
     assert (
-        ranged_record["manifest_sha256"]
+        attack_record["retained_ranged_profile_sha256"]
+        == hashlib.sha256((ROOT / ranged.RECEIPT).read_bytes()).hexdigest()
+    )
+    assert attack_record["retained_manifest_sha256"] == ranged_record["manifest_sha256"]
+    assert attack_record["retained_runtime_fingerprint"] == ranged_record["runtime_fingerprint"]
+    assert (
+        attack_record["manifest_sha256"]
         == hashlib.sha256((ROOT / MANIFEST).read_bytes()).hexdigest()
     )
-    assert ranged_record["runtime_fingerprint"] == _record(MANIFEST)["fingerprint"]
+    assert attack_record["runtime_fingerprint"] == _record(MANIFEST)["fingerprint"]
+    assert (
+        attack_record["gathering_source_sha256"]
+        == hashlib.sha256((ROOT / attack_count.SOURCE).read_bytes()).hexdigest()
+    )
+    assert set(attack_record["viewer_sources"]) == set(attack_count.VIEWER_SOURCES)
+    for name in attack_count.VIEWER_SOURCES:
+        before = subprocess.check_output(["git", "show", attack_count.BASE + ":" + name], cwd=ROOT)
+        assert attack_record["viewer_sources"][name] == {
+            "before": hashlib.sha256(before).hexdigest(),
+            "after": hashlib.sha256((ROOT / name).read_bytes()).hexdigest(),
+        }
+    assert attack_count.OWNER in active_files
+    assert sum(attack_count.OWNER in group for group in groups) == 1
+    assert attack_record["added_cases"] == [
+        f"{attack_count.OWNER}::{case}" for case in attack_count.CASES
+    ]
+    attack_base_durations = json.loads(
+        subprocess.check_output(
+            ["git", "show", attack_count.BASE + ":ci/test_shards/durations.json"], cwd=ROOT
+        )
+    )
+    assert len(attack_base_durations["case_seconds"]) == 6819
+    assert all(
+        current[node] == seconds for node, seconds in attack_base_durations["case_seconds"].items()
+    )
+    assert all(
+        summary["files"][node] == seconds
+        for node, seconds in attack_base_durations["files"].items()
+    )
     assert ranged.OWNER in active_files
     assert sum(ranged.OWNER in group for group in groups) == 1
     ranged_cases = {
@@ -1187,10 +1231,7 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         ["git", "show", selection.COVER_EVENT_IDENTITY_BASE + ":" + cover_source], cwd=ROOT
     )
     assert cover_event["source"]["before"] == hashlib.sha256(base_cover_source).hexdigest()
-    assert (
-        cover_event["source"]["after"]
-        == hashlib.sha256((ROOT / cover_source).read_bytes()).hexdigest()
-    )
+    assert cover_event["source"]["after"] == attack_record["viewer_sources"][cover_source]["before"]
     cover_owner = selection.COVER_EVENT_IDENTITY_OWNER
     assert cover_owner in active_files
     assert sum(cover_owner in group for group in groups) == 1
@@ -1475,6 +1516,7 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         | set(terror["added_cases"])
         | (set() if counter is None else set(counter["added_cases"]))
         | ranged_cases
+        | set(attack_record["added_cases"])
         | shooting_cases
         | {
             ground_charge.SCREEN_OWNER

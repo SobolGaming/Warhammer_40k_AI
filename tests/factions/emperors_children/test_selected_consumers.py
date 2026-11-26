@@ -1323,36 +1323,72 @@ def test_two_native_sorcerers_wrack_the_same_target_without_stacking_movement() 
         native_declaration,
         native_fire,
         native_session,
+        scripted_wrack_rolls,
         translate_native,
     )
+    from warhammer40k_core.engine.replay import ReplayRunner
 
-    session = native_session(second_sorcerer=True, seed="ec-double-1")
-    deploy_native(session)
-    translate_native(session, "attached-unit:owner:bodyguard", 7.0)
-    translate_native(session, "owner:second-sorcerer", 6.2)
-    for identity, result in (
+    target = "attached-unit:opponent:bodyguard"
+    shots = (
         ("attached-unit:owner:bodyguard", "native:energies"),
         ("owner:second-sorcerer", "native:energies-2"),
-    ):
-        native_declaration(session, identity)
-        seen = native_fire(
-            session, profile_id="000004085:agonising-energies:witchfire", result_id=result
-        )
-        assert "select_catalog_post_shoot_hit_target_effect" in seen
-    state = session.lifecycle.state
-    assert state is not None
-    assert state.active_player_id == "opponent"
-    effects = [
-        e
-        for e in state.persisting_effects
-        if isinstance(e.effect_payload, dict)
-        and e.effect_payload.get("rule_id") == "sorcerer:datasheet:000004085:4"
-    ]
-    assert len(effects) == 4
-    # Two distinct real receipts retain their durations; the generic source slot
-    # applies the named condition once. A cumulative -4 would reject this move.
-    translate_native(session, "attached-unit:opponent:bodyguard", -5.0)
-    assert_native_movement_budget(session, "attached-unit:opponent:bodyguard", 5.0)
+    )
+
+    def fire_both(session: LocalGameSession) -> int:
+        grants = 0
+        for identity, result in shots:
+            native_declaration(session, identity)
+            seen = native_fire(
+                session, profile_id="000004085:agonising-energies:witchfire", result_id=result
+            )
+            hits = [
+                row["payload"]
+                for row in events(session, "attack_sequence_step")
+                if row["sequence_id"] == f"attack-sequence:{result}" and row["step"] == "hit"
+            ]
+            assert hits
+            successful = any(isinstance(hit, dict) and hit["successful"] is True for hit in hits)
+            assert ("select_catalog_post_shoot_hit_target_effect" in seen) is successful
+            grants += successful
+        state = session.lifecycle.state
+        assert state is not None
+        assert state.active_player_id == "opponent"
+        effects = [
+            e
+            for e in state.persisting_effects
+            if isinstance(e.effect_payload, dict)
+            and e.effect_payload.get("rule_id") == "sorcerer:datasheet:000004085:4"
+        ]
+        assert len(effects) == 2 * grants
+        assert all(e.target_unit_instance_ids == (target,) for e in effects)
+        return grants
+
+    scripted = native_session(second_sorcerer=True, seed="ec-double-1")
+    deploy_native(scripted)
+    translate_native(scripted, "attached-unit:owner:bodyguard", 7.0)
+    translate_native(scripted, "owner:second-sorcerer", 6.2)
+    ordinary = LocalGameSession.from_persistence_payload(scripted.to_persistence_payload())
+
+    # Scripted native evidence. Both real deferred choices apply, yet the two
+    # equal source penalties still allow the original five-inch move.
+    with scripted_wrack_rolls(tuple(result for _, result in shots), target):
+        assert fire_both(scripted) == 2
+    translate_native(scripted, target, -5.0)
+    assert_native_movement_budget(scripted, target, 5.0)
+
+    # Ordinary RNG gives strict full replay, including the actual hit and miss branches.
+    grants = fire_both(ordinary)
+    restored = LocalGameSession.from_persistence_payload(ordinary.to_persistence_payload())
+    assert restored.to_persistence_payload() == ordinary.to_persistence_payload()
+    for current in (ordinary, restored):
+        translate_native(current, target, -5.0)
+        assert_native_movement_budget(current, target, 5.0 if grants else 7.0)
+    assert restored.to_persistence_payload() == ordinary.to_persistence_payload()
+    assert (
+        ReplayRunner.from_payload(ordinary.replay_artifact(artifact_id="two-native-wrack"))
+        .run()
+        .reproduced_exactly
+    )
 
 
 @pytest.mark.parametrize("omit_all", [True, False])

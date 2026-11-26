@@ -1,0 +1,51 @@
+{
+  "schema": "finite-ranged-attack-count-faction-repair-test-v1",
+  "base": "17efed22060afb675b2232ad6f48054f0190ebd7",
+  "retained_attack_count_sha256": "4e8aae570f710e916c1272cb8573c51aeb26d4b07bb54ebc64f548796852c287",
+  "retained_cutover_sha256": "4cd1f0b062fad661e1c71fe27d2e9f8279c3c21d2a9f7bea9e3b053db79afce3",
+  "retained_stage2_fight_cover_sha256": "0a5a29ce7741dc63e2c70633fbc672c34d95e6668f6ec81cf6a0b65238619b79",
+  "updated_files": {
+    "tests/factions/aeldari/unit/test_lhykhis.py": {
+      "before": {
+        "blob_sha1": "f4d7842d774aba9aad901dd12eb62861c3ea3416",
+        "bytes": 28927,
+        "mode": "100644",
+        "sha256": "66c8ff780fdc4b279d3a3de54ed04b0109d4adc7d919f55ce5daf1a819c9648d"
+      },
+      "after": {
+        "mode": "100644",
+        "blob_sha1": "3df0f852e634c3afc6b8c800139f4f0e57081b46",
+        "sha256": "1b79a222104cb022be11159cde064a1ef1ec23b1f76744f4391f075975dc0b36",
+        "bytes": 42645
+      }
+    },
+    "tests/factions/emperors_children/test_selected_consumers.py": {
+      "before": {
+        "mode": "100644",
+        "blob_sha1": "5256991d298bd644962f09315c19df816ee5fca0",
+        "sha256": "2061271c9ff1ef95c9b1c12b2ad9771e57890ead2be9eafa27286a1ec4618876",
+        "bytes": 77740
+      },
+      "after": {
+        "mode": "100644",
+        "blob_sha1": "f34e25d79b3cc485c30f04e23f7a7a81f4c14f5e",
+        "sha256": "12c34f1e7a1b0e5ac5bb58e874caad5361092e4fff196a53091c5880f1b58176",
+        "bytes": 79389
+      }
+    }
+  },
+  "support_sha256": {
+    "tests/factions/aeldari/lhykhis_helpers.py": "4f5b44874eba09f5fee7e83a034c5739272a4eb32a3a573ef55e80bde6b735d8",
+    "tests/factions/aeldari/lhykhis_scripted_attacks.py": "3a01478cb8738fca0a6ae8f0d71c56d50810ab2c7e071bd3c2146b400a9f6cc0",
+    "tests/support/scripted_attack_rolls.py": "66bf93b7eb13f240faaa44092bc9630d563515731fb1b74d10a948743418827c",
+    "tests/support/sorcerer_native.py": "785b4e9001d10b51d80cca67e67692c0b76f243450e4efb9f3d0b685ec957733"
+  },
+  "repaired_cases": [
+    "tests/factions/aeldari/unit/test_lhykhis.py::test_native_attached_target_survives_bodyguard_loss_with_same_mark_identity",
+    "tests/factions/aeldari/unit/test_lhykhis.py::test_native_charge_fight_critical_five_is_lethal_and_turn_expiry_replays",
+    "tests/factions/aeldari/unit/test_lhykhis.py::test_native_source_death_does_not_revoke_existing_turn_grant",
+    "tests/factions/aeldari/unit/test_lhykhis.py::test_native_source_last_killed_target_has_no_selection",
+    "tests/factions/aeldari/unit/test_lhykhis.py::test_native_torrent_hits_without_damage_require_target_choice",
+    "tests/factions/emperors_children/test_selected_consumers.py::test_two_native_sorcerers_wrack_the_same_target_without_stacking_movement"
+  ]
+}
