@@ -1,0 +1,381 @@
+{
+  "experiment": "b3-objective-preservation-after-ground-charge-retry-v1",
+  "producer": {
+    "commit": "c0235fe0bfda75743a4ba987b9ef7ae7b4fd5da3",
+    "tree": "1f5559492c2f21ba0a3fef3b64c20cb68af66d34",
+    "parent": "4d753ec652ee38b394260d3f539df7b04403149b",
+    "build": "warhammer40k-core-v2:runtime-tree-sha256-v1:dc9eb5d3f570d34d71e26a1c6b8ef794b5723aa812f8de505066309805678d18",
+    "python": "Python 3.14.5 (main, Jun  2 2026, 22:25:17) [Clang 22.1.3 ]",
+    "harness_sha256": [
+      "031d829d2316a581abcf03c252996f955938fc4a48665f2b8abf11c7c64bce63",
+      "f474fbe2140f004882114c14d21d186b046259ccdd1057a71c3a28dc50d23f99"
+    ]
+  },
+  "fork": {
+    "checkpoint": "63d3e3a2cf2e0044f0379369c26d79ca6d54c7550e86925935a62ae46d61fb4e",
+    "actor_view": "47b021fccd038d242883e24b87572259b5c58f07988dbc59f0d5db1a3cea1de3",
+    "counts": [
+      60,
+      624,
+      2
+    ],
+    "request": "decision-request-000061",
+    "dice": [
+      5,
+      5
+    ],
+    "budget": 10.0,
+    "finite_ids": [
+      "charge-targets:0000",
+      "decline_charge_targets"
+    ],
+    "objective_before_fork": {
+      "command_end": {
+        "contributors": [],
+        "controlled_by_player_id": null,
+        "objective_id": "take-and-hold-vs-purge-the-foe-layout-3-expansion-02",
+        "retained_control_source_id": null,
+        "scores": [],
+        "status": "uncontrolled",
+        "unsupported_reason": null
+      },
+      "shooting_end": {
+        "contributors": [
+          {
+            "battle_shocked": false,
+            "effective_objective_control": 2,
+            "horizontal_distance_inches": 0.0,
+            "model_instance_id": "army-beta:scout-redeploy-unit:core-intercessor-like:004",
+            "modifier_trace": null,
+            "objective_control": 2,
+            "player_id": "player-b",
+            "unit_instance_id": "army-beta:scout-redeploy-unit",
+            "vertical_gap_inches": 0.0
+          }
+        ],
+        "controlled_by_player_id": "player-b",
+        "objective_id": "take-and-hold-vs-purge-the-foe-layout-3-expansion-02",
+        "retained_control_source_id": null,
+        "scores": [
+          {
+            "player_id": "player-b",
+            "score": 2
+          }
+        ],
+        "status": "controlled",
+        "unsupported_reason": null
+      }
+    }
+  },
+  "protocol": {
+    "charge": "Select sole S target; use actor-visible ground Charge preparation as shipped, first native-certified path, raw/probe cap 4, work cap 600000, accepted cap 1, 12 seconds per probe and 35 seconds total native validation; commit once.",
+    "controlled_setup": "Exact native A3 Hold archive through the issued B3 Normal Move proposal; replace only that one approach with the frozen five full straight paths (facing and height unchanged). No custom mission or state mutation.",
+    "decline": "Use finite actor-visible decline_charge_targets from the exact same post-roll fork.",
+    "horizon": "Native B3 turn-end VP and Expansion Objective 2, sealed at first A4 Movement selection. No E or A4 action.",
+    "hypothesis": "B newly reaches Expansion Objective 2 with B004. A northward Charge toward the stationary A scouts can leave it. Declining may retain the native B3 new-objective award. No requirement a generated path actually leaves.",
+    "limits": "One setup, one natural roll, one generated/decline pair, no score-driven retuning, 330-second outer cap.",
+    "normal_move_endpoints_in_order": {
+      "001": [
+        1.0,
+        19.75
+      ],
+      "002": [
+        1.0,
+        21.55
+      ],
+      "003": [
+        1.0,
+        23.35
+      ],
+      "004": [
+        2.35,
+        26.23
+      ],
+      "005": [
+        1.0,
+        26.35
+      ]
+    },
+    "one_archived_origin": "9bc722b13dd50fcc47f17ccdaa131e0fc6635d0f38f63d9d12877ca168f366af",
+    "one_archived_prefix_reference": "752dec6de69154c3c3d307bfdc684ede87ac2dc99fe70caaae9c5226ef9a2261",
+    "opponent": "A holds its screen without spending CP on optional Heroic Intervention (its scouts have no melee weapons). If engaged and issued Pile In, Fight or Consolidation, A selects its sole scout Fight activation and leaves its formation stationary on both movement requests. If not engaged, take no unissued Fight choices. B similarly uses stationary Fight movement and its sole activation. Stop on any unexpected or mandatory off-policy choice.",
+    "pre_fork": "Rebind only archived shared optional declines and no shooting. Select B in Charge and keep its first natural roll. Use its post-roll target offer; no rerolls or reseeding, and stop if B did not reach the objective or both options are not offered.",
+    "revision": "ab3a4ac03854964649f74efe5b8cebd528d3e25a"
+  },
+  "authored_reference": {
+    "name": "east-245",
+    "revision": "ab3a4ac03854964649f74efe5b8cebd528d3e25a",
+    "disposition": "Historical authored reference; not regenerated or submitted on this build.",
+    "viewer_payload_sha256": "3db6eab1d48bee962f1d074ef3e44ee58d7a3a4450d3ecd58e75813b9372ea39",
+    "checkpoint": "c4f00dd8d24bf5f3d3204a2300acf7b21d7884cbcd842bcdd3198551f73b6d2f",
+    "event_log_hash": "a1bf6c4fc35f6fd4db480ee7fe5c272eb25000aa58976061cfdb9a8d01ae60ff"
+  },
+  "generated": {
+    "preparation": {
+      "counts": {
+        "accepted": 1,
+        "geometry_work": 8039,
+        "raw": 4,
+        "rejected": 1,
+        "timed_out": 0
+      },
+      "selected": "f9838d44f8c2cdbde17f32dc652a153a990375496b564b10e02942341f56b22c",
+      "stop": "accepted_limit",
+      "validations": [
+        {
+          "candidate_id": "80efbb69cf4d623b1bb4ffc01f9e2f61d3dc40f38507a6210555b3a425068fe2",
+          "elapsed_seconds": 0.8117228530000205,
+          "message": "Charge Move endpoint violates charge rules.",
+          "status": "invalid"
+        },
+        {
+          "candidate_id": "f9838d44f8c2cdbde17f32dc652a153a990375496b564b10e02942341f56b22c",
+          "elapsed_seconds": 0.7168875929999956,
+          "message": null,
+          "status": "waiting_for_decision"
+        }
+      ]
+    },
+    "viewer_payload_sha256": "1514eb6033f7caeb36e855f16290cd7d121b884600b5caa54c8828e3f3962a5b"
+  },
+  "scoring_checkpoint": "objective-control:round-03:player-b:fight:turn_end",
+  "objective": "take-and-hold-vs-purge-the-foe-layout-3-expansion-02",
+  "native": {
+    "charge": {
+      "endpoint": {
+        "checkpoint": "a2c294f4ecae7f4ffb5f5396a8dd6d7c3a3bf29dfade17ce835520e0375da378",
+        "event_log_hash": "0b26d8953bce73d418d4f91cbbeee1a22e30b5a610e699f35989dbb6c4e6f8c6",
+        "rng_state_hash": "c0ae2aeeaff5331768639b2b362148a4df376f5d59326fdbb328c6f991773cfb",
+        "counts_decisions_events_rng": [
+          69,
+          747,
+          2
+        ],
+        "pending_request": "decision-request-000070",
+        "vp": {
+          "player-a": 0,
+          "player-b": 0
+        },
+        "objective_status": "uncontrolled",
+        "controlled_by": null
+      },
+      "objective": {
+        "contributors": [],
+        "controlled_by_player_id": null,
+        "objective_id": "take-and-hold-vs-purge-the-foe-layout-3-expansion-02",
+        "retained_control_source_id": null,
+        "scores": [],
+        "status": "uncontrolled",
+        "unsupported_reason": null
+      },
+      "transactions": {
+        "player-a": [],
+        "player-b": []
+      },
+      "fight_response": [
+        [
+          "player-b",
+          "submit_movement_proposal",
+          "pile_in"
+        ],
+        [
+          "player-a",
+          "submit_movement_proposal",
+          "pile_in"
+        ],
+        [
+          "player-b",
+          "select_fight_activation",
+          null
+        ],
+        [
+          "player-a",
+          "select_fight_activation",
+          null
+        ],
+        [
+          "player-b",
+          "submit_movement_proposal",
+          "consolidate"
+        ],
+        [
+          "player-a",
+          "submit_movement_proposal",
+          "consolidate"
+        ]
+      ],
+      "projected_replay": {
+        "both_views_and_event_streams_equal": true,
+        "replay": {
+          "artifact_id": "session-persistence:canonical-deployment-v1",
+          "diagnostics": [],
+          "final_event_log_hash": "0b26d8953bce73d418d4f91cbbeee1a22e30b5a610e699f35989dbb6c4e6f8c6",
+          "reproduced_decision_count": 69,
+          "reproduced_event_count": 747,
+          "status": "reproduced"
+        },
+        "rng_equal": true,
+        "seconds": 39.009,
+        "viewer_sha256": {
+          "player-a": "c2849198c9076c4cf2662ed990fa2b0daaa0e6b57581d99ab2061e019fb2be24",
+          "player-b": "c78ae4e6ac6c4bab160e60c226486c87355284a9f1a7f6c30f5c6aeba2f05d57"
+        }
+      }
+    },
+    "decline": {
+      "endpoint": {
+        "checkpoint": "9c647308c80df8ea6ffc694e3db6aabae5c9a32f6a5041c74370d7770f5125ea",
+        "event_log_hash": "68bf2c582c241393a283a581d545adfbdc515d8db9d64c46699c17dea256a919",
+        "rng_state_hash": "e354fe00e338defe8b78b895ddfbc3d2a96641e435d290e0a93b72a082d2b99b",
+        "counts_decisions_events_rng": [
+          62,
+          685,
+          2
+        ],
+        "pending_request": "decision-request-000063",
+        "vp": {
+          "player-a": 0,
+          "player-b": 3
+        },
+        "objective_status": "controlled",
+        "controlled_by": "player-b"
+      },
+      "objective": {
+        "contributors": [
+          {
+            "battle_shocked": false,
+            "effective_objective_control": 2,
+            "horizontal_distance_inches": 0.0,
+            "model_instance_id": "army-beta:scout-redeploy-unit:core-intercessor-like:004",
+            "modifier_trace": null,
+            "objective_control": 2,
+            "player_id": "player-b",
+            "unit_instance_id": "army-beta:scout-redeploy-unit",
+            "vertical_gap_inches": 0.0
+          }
+        ],
+        "controlled_by_player_id": "player-b",
+        "objective_id": "take-and-hold-vs-purge-the-foe-layout-3-expansion-02",
+        "retained_control_source_id": null,
+        "scores": [
+          {
+            "player_id": "player-b",
+            "score": 2
+          }
+        ],
+        "status": "controlled",
+        "unsupported_reason": null
+      },
+      "transactions": {
+        "player-a": [],
+        "player-b": [
+          {
+            "amount": 3,
+            "battle_round": 3,
+            "hidden": false,
+            "metadata": {
+              "controlled_objective_ids": [
+                "take-and-hold-vs-purge-the-foe-layout-3-expansion-02"
+              ],
+              "destroyed_unit_instance_ids": [],
+              "home_objective_ids": [
+                "take-and-hold-vs-purge-the-foe-layout-3-defender-home-01"
+              ],
+              "objective_control_record_id": "objective-control:round-03:player-b:fight:turn_end",
+              "primary_scoring_achieved_rule_ids": [
+                "unstoppable-force-new-objective-turn-end"
+              ],
+              "primary_scoring_resolution_group_id": null,
+              "primary_scoring_resolution_mode": "independent",
+              "primary_scoring_selected_rule_ids": [
+                "unstoppable-force-new-objective-turn-end"
+              ],
+              "primary_scoring_state_evidence_hash": "a9d34b76e3f8d762ff5aae7454f96678ad634afdba231ff1abce9854a59ee4c2",
+              "primary_scoring_state_evidence_id": "primary-scoring-state-evidence:a9d34b76e3f8d762ff5aae7454f96678ad634afdba231ff1abce9854a59ee4c2",
+              "primary_scoring_suppressed_rule_ids": [],
+              "score_count": 1,
+              "scoring_rule_condition": "control_one_or_more_new_non_home_objectives",
+              "scoring_rule_id": "unstoppable-force-new-objective-turn-end",
+              "scoring_rule_source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:primary:primary-unstoppable-force:scoring-rule:unstoppable-force-new-objective-turn-end",
+              "trapped_terrain_feature_ids": [],
+              "turn_start_controlled_objective_ids": [],
+              "victory_points_per_count": 3
+            },
+            "phase": "fight",
+            "player_id": "player-b",
+            "scoring_timing": "turn_end",
+            "source_id": "primary-unstoppable-force",
+            "source_kind": "primary",
+            "transaction_id": "victory-point:player-b:round-03:000001"
+          }
+        ]
+      },
+      "fight_response": [],
+      "projected_replay": {
+        "both_views_and_event_streams_equal": true,
+        "replay": {
+          "artifact_id": "session-persistence:canonical-deployment-v1",
+          "diagnostics": [],
+          "final_event_log_hash": "68bf2c582c241393a283a581d545adfbdc515d8db9d64c46699c17dea256a919",
+          "reproduced_decision_count": 62,
+          "reproduced_event_count": 685,
+          "status": "reproduced"
+        },
+        "rng_equal": true,
+        "seconds": 37.961,
+        "viewer_sha256": {
+          "player-a": "2025074b05cc0f36f452044553f8be73143d23fbc98e7566c851df9b785b20ff",
+          "player-b": "ba88fdfda7bd8a0a7a1d81fb788c68817604965ead90a07951a9535b551509c2"
+        }
+      }
+    }
+  },
+  "required_proof": {
+    "both_player_views_and_event_streams": true,
+    "decisions_and_events": true,
+    "independent_ordinary_replay": true,
+    "lifecycle": true,
+    "rng": true,
+    "save_payload": true
+  },
+  "preservation_delta_b_vp": 3,
+  "single_operator_samples_seconds": {
+    "endpoints": {
+      "charge": {
+        "strict_restore": 43.489,
+        "ordinary_replay": 28.671
+      },
+      "decline": {
+        "strict_restore": 42.713,
+        "ordinary_replay": 27.738
+      }
+    },
+    "run_elapsed": 236.017
+  },
+  "handoff_sha256": {
+    "stage2-749-handoff.json": "4e0c1005ba6c8a79ffc378a87cd30402be978cba99c6fd77b1c5c1ac47886636",
+    "stage2-preservation-handoff.txt": "f94c01bd86600d19f71e4fca390bb60c88b412628a2741d3f6d78ad66fd1546b"
+  },
+  "raw_sha256": {
+    "producer.txt": "ad3a174431a0e708d42d76dc5bf07d105be82f1940bb8dd1e145199f3a97a32c",
+    "protocol.json": "665a742485a76314706c2df2232a54dbd01b0af8b24e7c7148608d0ba4d0a593",
+    "result.json": "2b7bf1b9b562751d35a11a278e6d756e6085ce35b52730818524fb7d019c7337",
+    "exact-merged-native.log": "bb4666411780fcec926aa84a40b90a35e15732e96c55ecb1529b580adf868353",
+    "replay_endpoint_views.py": "54068775997f927a0f9975e6de3847b9251c7a41e569ec3f7560ab1330b384b8",
+    "fork-checkpoint.json": "ab2283c07d459ae9a12fef178b07a2293d4954589008593364842505417b45e8",
+    "fork-ledger.json": "3a181d43435b7e4385735cd4cefca01ea088d9839be98b98a74e73b8f09421ec",
+    "fork-views.json": "10940d0e3be16bae5fed9226c360845b5630b9bc647a9a03b30d5aab855f142a",
+    "charge-checkpoint.json": "ae4b4c4c71cf82557e450a6701feacc35f534e569c0ebc6b8a554e3da1690e14",
+    "charge-ledger.json": "83f6123c3e7e10ddd5eb018844de22a9e95ddfb66a6747e3dfce2907ebe8e2b8",
+    "charge-views.json": "84b7a56c4ea7f6390a9834557855d9b0f914ca42fb666f44fd77b0454c009483",
+    "charge-strict-proof.json": "a4c12493561b21544b268f6eafbb3766322e48f1c8a0a3190cdfa03fc6a45452",
+    "charge-ordinary-replay.json": "0cf0ecf7a6df28d74baab10f5b2b9131bc78d7e59d32088021811840eabdf37c",
+    "charge-ordinary-replay-views.json": "7e95075f7677770996cf180e21b5e695742ea75cfc52c8b90cc74aab4af50e42",
+    "decline-checkpoint.json": "5674469e2ba5e7ee20a1151d1d551e840bb9ae28634bc73b7cf8f116fd347604",
+    "decline-ledger.json": "93ba2a1cc2e9e4cd2aa975d52fa22f22a0c92da7010c297ab3127434c497aa8d",
+    "decline-views.json": "5d1d6212fb9cc7908b6eee0d66a4c0bd999b85eb3d1bca80439f7f02912da075",
+    "decline-strict-proof.json": "a4c12493561b21544b268f6eafbb3766322e48f1c8a0a3190cdfa03fc6a45452",
+    "decline-ordinary-replay.json": "b484ccd4349403e03e62f9c15c6af7f50af8d028b403ecc582399ae5e208b200",
+    "decline-ordinary-replay-views.json": "3a6c6b6f6ada06de89a8fc29d3d15a2dbfe91e5dd66d7b034e3d15c9daf2ce1b"
+  }
+}

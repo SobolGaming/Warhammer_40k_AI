@@ -1,6 +1,6 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "c0235fe0bfda75743a4ba987b9ef7ae7b4fd5da3",
+  "base": "e5cfe3cacfc869774e8e98863c1f43722215879f",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:40b91df8a39aa85afd3503b466b7bcab93c87d70db8189243bc9c5d70f924e1a",
   "operation_map_sha256": "a28429991481d18e9ef789521866d83767fb9e8a02d76b1f7bb1efb5c745fd30",
   "changes": {
@@ -214,6 +214,16 @@
         }
       }
     },
+    "docs/stage2/normal-move-base-successor.json": {
+      "before_sha256": null,
+      "after_sha256": "861a8a7a13063bdeeda52421912ea5828f76b30bb84e767eaedd7adda354dedf",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "861a8a7a13063bdeeda52421912ea5828f76b30bb84e767eaedd7adda354dedf"
+        }
+      }
+    },
     "docs/stage2/normal-move-candidate-receipt.json": {
       "before_sha256": null,
       "after_sha256": "28a1a880af228075d9569fa7f49ba582bc07d73e9c1c20d13a5d2aed73ead85c",
@@ -226,11 +236,11 @@
     },
     "docs/stage2/normal-move-candidates.md": {
       "before_sha256": null,
-      "after_sha256": "e7539518b57584404203a4f1e953f75340c3b1ffcdd5f6ae2b87bf23bf143395",
+      "after_sha256": "d83ecf8955ca75143c5b04225b2127185f0e13595291b135667ac525b39db54e",
       "owners": {
         "@document": {
           "before": null,
-          "after": "e7539518b57584404203a4f1e953f75340c3b1ffcdd5f6ae2b87bf23bf143395"
+          "after": "d83ecf8955ca75143c5b04225b2127185f0e13595291b135667ac525b39db54e"
         }
       }
     },
@@ -601,6 +611,14 @@
       "operations": [],
       "selected_families": [],
       "rationale": "Register only the newly added test file and additive admission receipt; leave every established operation and family intact.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/stage2/normal-move-base-successor.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Record the bounded opt-in API and exact-base evidence; no gameplay path, validation ceiling, policy rank or complete-game qualification changes.",
       "source_obligation": null,
       "unchanged_work": null
     },

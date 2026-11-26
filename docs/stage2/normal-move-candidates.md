@@ -59,3 +59,10 @@ PYTHONPATH=src:. python -B /path/to/performance_stage2_normal_move.py base /tmp/
 # Candidate checkout, same host and dependency lock:
 PYTHONPATH=src:. python -B /path/to/performance_stage2_normal_move.py head /tmp/normal-head.json
 ```
+
+The original component samples remain bound to c0235fe0. The later B3
+evidence-only landing (#750) changed the draft base to e5cfe3ca, but left the
+measured runtime, fixture, dependency lock and behavioral selection identical.
+The [base successor record](normal-move-base-successor.json) records those
+immutable Git objects. The serial performance gate binds the exact new draft
+base and diff separately; the original samples are not relabeled or replaced.

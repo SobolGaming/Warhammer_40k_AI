@@ -1,4 +1,4 @@
-"""Verify the retained B3 finite comparison without executing gameplay."""
+"""Verify retained B3 comparisons without executing gameplay."""
 
 from __future__ import annotations
 
@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Any
 
 FIXTURE = Path(__file__).resolve().parents[1] / "docs/stage2/b3-post-roll-finite-receipt.json"
+PRESERVATION = FIXTURE.with_name("b3-objective-preservation-receipt.json")
 CLOSEOUT = "stage2-b3-closeout-evidence"
 GENERATED = "stage2-generated-b3-evidence"
 AUTHORED = "stage2-score-evidence-final"
@@ -57,14 +58,21 @@ def endpoint(
     }
 
 
-def verify(root: Path, fixture: dict[str, Any]) -> None:
+def authenticate(root: Path, files: dict[str, str]) -> dict[str, Any]:
     packet: dict[str, Any] = {}
-    for name, digest in fixture["raw_sha256"].items():
-        path = root / name
-        raw = path.read_bytes()
+    for name, digest in files.items():
+        raw = (root / name).read_bytes()
         require(sha256(raw).hexdigest() == digest, f"Raw receipt SHA-256 mismatch: {name}")
-        if not name.endswith("-views.json"):
+        is_view_dump = name.endswith("-views.json") and not name.endswith("-replay-views.json")
+        if name.endswith(".json") and not is_view_dump:
             packet[name] = json.loads(raw)
+        elif name == "producer.txt":
+            packet[name] = raw.decode().splitlines()
+    return packet
+
+
+def verify(root: Path, fixture: dict[str, Any]) -> None:
+    packet = authenticate(root, fixture["raw_sha256"])
 
     generated = packet[f"{GENERATED}/result.json"]
     campaign = fixture["generated_campaign"]
@@ -196,15 +204,177 @@ def verify(root: Path, fixture: dict[str, Any]) -> None:
     )
 
 
+def verify_preservation(root: Path, fixture: dict[str, Any]) -> None:
+    packet = authenticate(root, fixture["raw_sha256"])
+    result = packet["result.json"]
+    producer = fixture["producer"]
+    stamp = packet["producer.txt"]
+    require(
+        stamp[0].split() == [producer["commit"], producer["tree"], producer["parent"]]
+        and stamp[1] == producer["python"]
+        and stamp[2] == producer["build"]
+        and [line.split()[0] for line in stamp[3:]] == producer["harness_sha256"],
+        "Exact producer stamp differs.",
+    )
+
+    fork = packet["fork-checkpoint.json"]
+    fork_ledger = decisions(fork)
+    (pending,) = fork_ledger["queue"]["pending_requests"]
+    common = fixture["fork"]
+    roll = next(
+        event["payload"]
+        for event in reversed(fork_ledger["event_log"])
+        if event["event_type"] == "charge_roll_resolved"
+    )
+    option_ids = [option["option_id"] for option in pending["options"]]
+    require(
+        fork["content_hash"] == result["fork"] == common["checkpoint"]
+        and result["fork_actor_view"] == common["actor_view"]
+        and result["fork_counts"]
+        == common["counts"]
+        == [
+            len(fork_ledger["records"]),
+            len(fork_ledger["event_log"]),
+            fork["rng_state"]["draw_count"],
+        ]
+        and [pending["request_id"], pending["actor_id"], pending["decision_type"]]
+        == [common["request"], "player-b", "select_charge_targets"]
+        and option_ids == result["finite_ids"] == common["finite_ids"]
+        and roll["roll_result"]["modified_roll"]["unmodified"]["component_values"]
+        == result["post_roll"]["dice"]
+        == common["dice"]
+        and roll["maximum_distance_inches"] == result["post_roll"]["budget"] == common["budget"]
+        and result["protocol"] == packet["protocol.json"] == fixture["protocol"]
+        and result["objective_before_fork"] == common["objective_before_fork"],
+        "Frozen native input, rolls, options or protocol differs.",
+    )
+
+    generated = fixture["generated"]
+    preparation = result["charge_preparation"]
+    require(
+        preparation == generated["preparation"]
+        and preparation["validations"][0]["status"] == "invalid"
+        and preparation["validations"][1]["status"] == "waiting_for_decision"
+        and preparation["validations"][1]["candidate_id"] == preparation["selected"]
+        and generated["viewer_payload_sha256"]
+        != fixture["authored_reference"]["viewer_payload_sha256"],
+        "Generated native probe verdicts or distinct proposal identity differ.",
+    )
+    for arm, option_id in zip(("charge", "decline"), option_ids, strict=True):
+        saved = packet[f"{arm}-checkpoint.json"]
+        ledger = decisions(saved)
+        actions = packet[f"{arm}-ledger.json"]
+        tail = ledger["records"][len(fork_ledger["records"]) :]
+        (seal,) = ledger["queue"]["pending_requests"]
+        fork_rng = fork["rng_state"]
+        arm_rng = saved["rng_state"]
+        evidence = result["arms"][arm]
+        expected = fixture["native"][arm]
+        ordinary = packet[f"{arm}-ordinary-replay.json"]
+        projected = packet[f"{arm}-ordinary-replay-views.json"]
+        require(
+            ledger["records"][: len(fork_ledger["records"])] == fork_ledger["records"]
+            and ledger["event_log"][: len(fork_ledger["event_log"])] == fork_ledger["event_log"]
+            and arm_rng["seed"] == fork_rng["seed"]
+            and arm_rng["draw_count"] == fork_rng["draw_count"]
+            and arm_rng["history"][: len(fork_rng["history"])] == fork_rng["history"]
+            and tail == [action["committed_record"] for action in actions]
+            and tail[0]["request"] == pending
+            and tail[0]["result"]["selected_option_id"] == option_id
+            and saved["lifecycle"]["state"]["battle_round"] == 4
+            and [seal["actor_id"], seal["decision_type"]] == ["player-a", "select_movement_unit"]
+            and evidence["status"] == "scored",
+            f"Native prefix, continuation or sealed scoring horizon differs: {arm}.",
+        )
+        require(
+            endpoint(saved, ordinary, fixture["scoring_checkpoint"], fixture["objective"])
+            == expected["endpoint"]
+            and packet[f"{arm}-strict-proof.json"]
+            == result["proofs"][arm]
+            == fixture["required_proof"]
+            and projected == expected["projected_replay"]
+            and projected["replay"] == ordinary
+            and projected["rng_equal"] is True
+            and projected["both_views_and_event_streams_equal"] is True,
+            f"Endpoint, strict restore or independent replay differs: {arm}.",
+        )
+        state = saved["lifecycle"]["state"]
+        control = next(
+            row
+            for row in state["objective_control_records"]
+            if row["record_id"] == fixture["scoring_checkpoint"]
+        )
+        objective = next(
+            row for row in control["results"] if row["objective_id"] == fixture["objective"]
+        )
+        require(
+            objective == expected["objective"] == evidence["objective"]
+            and {row["player_id"]: row["transactions"] for row in state["victory_point_ledgers"]}
+            == expected["transactions"]
+            == evidence["transactions"],
+            f"Native objective contributors or scoring transaction differs: {arm}.",
+        )
+        reaction_index = 2 if arm == "charge" else 1
+        reaction = tail[reaction_index]
+        window = reaction["request"]["payload"]["reaction_window"]["timing_window"]
+        require(
+            reaction["request"]["actor_id"] == "player-a"
+            and window["descriptor"]["descriptor_id"]
+            == "core-heroic-intervention-end-opponent-charge"
+            and reaction["result"]["payload"] == {"submission_kind": "decline_stratagem_window"},
+            f"Fixed Heroic Intervention decline differs: {arm}.",
+        )
+        fight = [row["result"] for row in tail[reaction_index + 1 :]]
+        require(
+            [
+                [row["actor_id"], row["decision_type"], row["payload"].get("proposal_kind")]
+                for row in fight
+            ]
+            == expected["fight_response"]
+            and all("witness" not in row["payload"] for row in fight),
+            f"Fixed stationary Fight response differs: {arm}.",
+        )
+        if arm == "charge":
+            action = actions[1]
+            viewer_payload = action["viewer_action"]["proposal_json"].encode()
+            native_result = action["committed_record"]["result"]
+            require(
+                sha256(viewer_payload).hexdigest() == generated["viewer_payload_sha256"]
+                and native_result["result_id"] == "preservation:generated-charge"
+                and native_result["payload"]
+                == {
+                    **json.loads(viewer_payload),
+                    "proposal_request_id": action["native_request"]["request_id"],
+                }
+                and any(
+                    event["event_type"] == "charge_move_completed"
+                    and event["payload"]["result_id"] == native_result["result_id"]
+                    for event in ledger["event_log"]
+                ),
+                "Generated proposal is not the completed native Charge Move.",
+            )
+    require(
+        fixture["native"]["decline"]["endpoint"]["vp"]["player-b"]
+        - fixture["native"]["charge"]["endpoint"]["vp"]["player-b"]
+        == result["preservation_delta_b_vp"]
+        == fixture["preservation_delta_b_vp"],
+        "Preservation VP delta differs.",
+    )
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--receipts", required=True, type=Path, help="Root of the archived B3 receipts"
     )
+    parser.add_argument(
+        "--preservation", action="store_true", help="Verify the separate 5+5 preservation receipt"
+    )
     args = parser.parse_args()
     try:
-        payload = FIXTURE.read_bytes()
-        verify(args.receipts, json.loads(payload))
+        payload = (PRESERVATION if args.preservation else FIXTURE).read_bytes()
+        check = verify_preservation if args.preservation else verify
+        check(args.receipts, json.loads(payload))
     except (OSError, ValueError, KeyError, IndexError, StopIteration, TypeError) as error:
         print(f"B3 receipt verification failed: {error}", file=sys.stderr)
         return 2
