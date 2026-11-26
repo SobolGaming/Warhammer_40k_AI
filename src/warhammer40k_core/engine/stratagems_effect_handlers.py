@@ -317,20 +317,21 @@ def _apply_counteroffensive_handler(
     use_record: StratagemUseRecord,
     ruleset_descriptor: RulesetDescriptor,
 ) -> None:
+    from warhammer40k_core.engine.fight_activation_requests import (
+        counteroffensive_fight_context,
+        counteroffensive_fights_first_effect,
+        request_fight_activation,
+    )
+
     target_unit_id = _require_target_unit_id(target_binding)
     fight_state = state.fight_phase_state
     if fight_state is None:
         raise GameLifecycleError("Counteroffensive requires fight_phase_state.")
-    contexts = eligible_fight_contexts_for_player(
+    fight_context = counteroffensive_fight_context(
         state=state,
         fight_state=fight_state,
-        player_id=use_record.player_id,
+        use=use_record,
         policy=ruleset_descriptor.fight_policy,
-        respect_ordering_band=False,
-    )
-    fight_context = next(
-        (candidate for candidate in contexts if candidate.unit_instance_id == target_unit_id),
-        None,
     )
     if fight_context is None:
         raise GameLifecycleError("Counteroffensive target was not prevalidated.")
@@ -341,28 +342,13 @@ def _apply_counteroffensive_handler(
     if not fight_types:
         raise GameLifecycleError("Counteroffensive target has no legal fight type.")
     interrupt_id = f"counteroffensive:{use_record.use_id}"
-    effect = PersistingEffect(
-        effect_id=f"{use_record.use_id}:counteroffensive:fights-first",
-        source_rule_id=use_record.source_id,
-        owner_player_id=use_record.player_id,
-        target_unit_instance_ids=(target_unit_id,),
-        started_battle_round=use_record.battle_round,
-        started_phase=use_record.phase,
-        expiration=EffectExpiration.end_phase(
-            battle_round=use_record.battle_round,
-            phase=use_record.phase,
-            player_id=context.active_player_id or use_record.player_id,
-        ),
-        effect_payload={
-            "effect_kind": FIGHTS_FIRST_EFFECT_KIND,
-            "source_rule_id": use_record.source_id,
-            "stratagem_use_id": use_record.use_id,
-        },
+    effect = counteroffensive_fights_first_effect(
+        use_record,
+        unit_id=target_unit_id,
+        active_player_id=context.active_player_id or use_record.player_id,
     )
     state.record_persisting_effect(effect)
     if len(fight_types) != 1:
-        from warhammer40k_core.engine.fight_activation_requests import request_fight_activation
-
         request_fight_activation(
             state=state,
             decisions=decisions,
@@ -386,7 +372,11 @@ def _apply_counteroffensive_handler(
         interrupt_id=interrupt_id,
     )
     state.replace_fight_phase_state(
-        fight_state.with_activation(selection).with_active_activation(selection)
+        fight_state.with_activation(selection)
+        .with_active_activation(selection)
+        .with_next_player(
+            next(player for player in state.player_ids if player != selection.player_id)
+        )
     )
     decisions.event_log.append(
         "counteroffensive_activation_selected",

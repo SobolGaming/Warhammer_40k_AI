@@ -63,7 +63,9 @@ def _read_receipt(root: Path) -> tuple[dict[str, object], bytes] | None:
     return record, raw
 
 
-def dark_pact_source_successors(root: Path) -> dict[str, dict[str, str]]:
+def dark_pact_source_successors(
+    root: Path, *, current_sources: dict[str, dict[str, str]] | None = None
+) -> dict[str, dict[str, str]]:
     read = _read_receipt(root)
     if read is None:
         return {}
@@ -71,11 +73,17 @@ def dark_pact_source_successors(root: Path) -> dict[str, dict[str, str]]:
     row = record["retained_lifecycle"]
     path = root / LIFECYCLE_SOURCE
     _selection_no_links(root, path)
+    successor = None if current_sources is None else current_sources.get(LIFECYCLE_SOURCE)
+    current_digest = hashlib.sha256(path.read_bytes()).hexdigest()
     if (
         not isinstance(row, dict)
         or row.keys() != {"before", "after"}
         or not isinstance(row["before"], str)
-        or row["after"] != hashlib.sha256(path.read_bytes()).hexdigest()
+        or (
+            row["after"] != current_digest
+            if successor is None
+            else row["after"] != successor["before"] or current_digest != successor["after"]
+        )
     ):
         raise SystemExit("Dark Pact lifecycle successor differs.")
     return {LIFECYCLE_SOURCE: row}

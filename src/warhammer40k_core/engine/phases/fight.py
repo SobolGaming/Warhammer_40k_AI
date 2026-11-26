@@ -358,6 +358,26 @@ class FightPhaseHandler:
     def phase(self) -> BattlePhase:
         return BattlePhase.FIGHT
 
+    def apply_fight_unit_selected_hooks(
+        self,
+        *,
+        state: GameState,
+        decisions: DecisionController,
+        activation: FightActivationSelection,
+    ) -> LifecycleStatus | None:
+        _apply_fight_unit_selected_effect_grants(
+            state=state,
+            decisions=decisions,
+            activation=activation,
+            registry=self.fight_unit_selected_hooks,
+        )
+        return _request_fight_unit_selected_grant_decision_if_available(
+            state=state,
+            decisions=decisions,
+            activation=activation,
+            registry=self.fight_unit_selected_grant_hooks,
+        )
+
     def resume_unit_grant_commitment(
         self,
         *,
@@ -2411,10 +2431,11 @@ def _apply_fight_activation_decision(
             current_player_id=selection.player_id,
         )
     )
-    activated_state = fight_state.with_activation(selection).with_active_activation(selection)
-    if selection.interrupt_id is None:
-        activated_state = activated_state.with_next_player(next_player_id)
-    state.replace_fight_phase_state(activated_state)
+    state.replace_fight_phase_state(
+        fight_state.with_activation(selection)
+        .with_active_activation(selection)
+        .with_next_player(next_player_id)
+    )
     decisions.event_log.append(
         "fight_activation_selected",
         validate_json_value(
@@ -2437,20 +2458,11 @@ def _apply_fight_activation_decision(
             }
         ),
     )
-    if selection.interrupt_id is not None:
-        return None
-    _apply_fight_unit_selected_effect_grants(
-        state=state,
-        decisions=decisions,
-        activation=selection,
-        registry=handler.fight_unit_selected_hooks,
-    )
     del reaction_queue, policy
-    return _request_fight_unit_selected_grant_decision_if_available(
+    return handler.apply_fight_unit_selected_hooks(
         state=state,
         decisions=decisions,
         activation=selection,
-        registry=handler.fight_unit_selected_grant_hooks,
     )
 
 

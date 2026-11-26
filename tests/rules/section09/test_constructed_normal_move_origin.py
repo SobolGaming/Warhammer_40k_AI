@@ -41,7 +41,7 @@ _PLAYERS = ("player-a", "player-b")
 _SCREEN = "army-alpha:screen"
 _RUNTIME = (
     "warhammer40k-core-v2:runtime-tree-sha256-v1:"
-    "4145ac829e45612b3fc716574e0cd527b00008c7ec69927fdadb880505d2c392"
+    "1bfd3b67d2fbe5eb2df35cd0c17ab30974c90d1efdf3b0fe2e7167a16655198a"
 )
 _CONFIG = "f94eb419965e3b3facb41f2691176fafac0f4bbbc57c59a148e5d8485399bc1d"
 _ORIGIN = "0ed84a89e5b03dcad8ccdebd2fa29400928111a66fb1144c76ea70a9a55cb6a8"

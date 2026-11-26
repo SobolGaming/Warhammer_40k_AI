@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Collection
 
+from warhammer40k_core.core.ruleset_descriptor import FightPolicyDescriptor
 from warhammer40k_core.engine.attack_sequence import (
     is_destroyed_transport_disembark_proposal_request,
 )
@@ -11,15 +12,28 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
 from warhammer40k_core.engine.catalog_setup_reactive_charge_move import (
     is_catalog_setup_reactive_charge_move_request,
 )
+from warhammer40k_core.engine.core_ability_selection import (
+    SELECT_CORE_ABILITY_INSTANCE_DECISION_TYPE,
+)
+from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_record import DecisionRecord
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.event_log import EventRecord, JsonValue, canonical_json
+from warhammer40k_core.engine.fight_activation_abilities import (
+    FIGHT_ACTIVATION_ABILITY_DECISION_TYPE,
+)
+from warhammer40k_core.engine.fight_activation_requests import (
+    build_fight_activation_request,
+    counteroffensive_fight_context,
+    counteroffensive_fights_first_effect,
+)
 from warhammer40k_core.engine.fight_activation_units import active_fight_activation_rules_unit
 from warhammer40k_core.engine.fight_order import FIGHT_ACTIVATION_DECISION_TYPE
 from warhammer40k_core.engine.fight_resolution import (
     SUBMIT_MELEE_DECLARATION_DECISION_TYPE,
     MeleeDeclarationProposalRequest,
 )
+from warhammer40k_core.engine.fight_unit_selected_hooks import SELECT_FIGHT_UNIT_GRANT_DECISION_TYPE
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.move_completion_effects import (
     SELECT_MOVE_COMPLETION_EFFECT_DECISION_TYPE,
@@ -38,7 +52,11 @@ from warhammer40k_core.engine.reaction_queue import (
     ReactionQueueFramePayload,
 )
 from warhammer40k_core.engine.sequencing import SEQUENCING_DECISION_TYPE
+from warhammer40k_core.engine.stratagem_use_history_authority import (
+    validate_parameterized_stratagem_use_history,
+)
 from warhammer40k_core.engine.stratagems import (
+    CORE_COUNTEROFFENSIVE_HANDLER_ID,
     is_stratagem_placement_proposal_request,
 )
 
@@ -77,7 +95,8 @@ def validate_reaction_queue_consistency(
         pending_request.decision_type not in reaction_frame_decision_types
         and not (charge_active and pending_request.decision_type in charge_types)
         and not _is_interrupted_fight_melee_request(state, pending_request)
-        and not _is_interrupted_fight_selection(state, pending_request, frames[-1])
+        and not _is_counteroffensive_choice(pending_request, frames)
+        and not _is_counteroffensive_fight_continuation(state, pending_request)
     ):
         raise GameLifecycleError("Lifecycle reaction queue pending decision_type drift.")
     if (
@@ -108,19 +127,178 @@ def validate_reaction_queue_consistency(
         raise GameLifecycleError("Lifecycle reaction queue active frame request_id drift.")
 
 
-def _is_interrupted_fight_selection(
-    state: GameState, request: DecisionRequest, frame: ReactionQueueFrame
-) -> bool:
-    fight = state.fight_phase_state
+def validate_restored_counteroffensive_fight(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    reaction_queue: ReactionQueue,
+    pending_request: DecisionRequest | None,
+    fight_policy: FightPolicyDescriptor | None,
+) -> None:
+    frames = reaction_queue.frames
+    issued = _issued_counteroffensive_choice(decisions)
+    if issued is not None and (
+        pending_request is None or issued.get("request_id") != pending_request.request_id
+    ):
+        raise GameLifecycleError("Counteroffensive Fight choice is missing from the pending queue.")
+    if pending_request is None:
+        return
+    if issued is not None or _is_counteroffensive_choice(pending_request, frames):
+        _validate_counteroffensive_choice(
+            state=state,
+            decisions=decisions,
+            request=pending_request,
+            issued=issued,
+            frames=frames,
+            fight_policy=fight_policy,
+        )
+    if _is_counteroffensive_fight_continuation(state, pending_request):
+        if not frames or not _is_counteroffensive_frame(frames[-1]):
+            raise GameLifecycleError("Counteroffensive Fight continuation requires its reaction.")
+        _validate_fight_reaction_continuation(
+            request_id=pending_request.request_id,
+            frames=frames,
+            event_records=decisions.event_log.records,
+            decision_records=decisions.records,
+            label="Counteroffensive Fight",
+        )
+
+
+def _issued_counteroffensive_choice(decisions: DecisionController) -> dict[str, JsonValue] | None:
+    for event in reversed(decisions.event_log.records):
+        if event.event_type == "decision_recorded":
+            break
+        if (
+            event.event_type == "decision_requested"
+            and isinstance(event.payload, dict)
+            and event.payload.get("decision_type") == FIGHT_ACTIVATION_DECISION_TYPE
+        ):
+            payload = event.payload.get("payload")
+            if isinstance(payload, dict) and "interrupt_id" in payload:
+                return event.payload
+    return None
+
+
+def _is_counteroffensive_frame(frame: ReactionQueueFrame) -> bool:
     return (
-        request.decision_type == FIGHT_ACTIVATION_DECISION_TYPE
-        and state.current_battle_phase is BattlePhase.FIGHT
-        and fight is not None
-        and fight.active_activation is None
-        and request.actor_id in frame.reaction_window.eligible_player_ids
-        and isinstance(request.payload, dict)
-        and isinstance(request.payload.get("interrupt_id"), str)
+        frame.reaction_window.timing_window.descriptor.source_rule_id
+        == CORE_COUNTEROFFENSIVE_HANDLER_ID
     )
+
+
+def _is_counteroffensive_choice(
+    request: DecisionRequest, frames: tuple[ReactionQueueFrame, ...]
+) -> bool:
+    return request.decision_type == FIGHT_ACTIVATION_DECISION_TYPE and (
+        (isinstance(request.payload, dict) and "interrupt_id" in request.payload)
+        or (bool(frames) and _is_counteroffensive_frame(frames[-1]))
+    )
+
+
+def _validate_counteroffensive_choice(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    request: DecisionRequest,
+    issued: JsonValue,
+    frames: tuple[ReactionQueueFrame, ...],
+    fight_policy: FightPolicyDescriptor | None,
+) -> None:
+    message = "Counteroffensive Fight choice does not match its paid reaction."
+    fight = state.fight_phase_state
+    if (
+        state.current_battle_phase is not BattlePhase.FIGHT
+        or fight is None
+        or fight.active_activation is not None
+        or not frames
+        or not _is_counteroffensive_frame(frames[-1])
+        or fight_policy is None
+    ):
+        raise GameLifecycleError(message)
+    window = frames[-1].reaction_window
+    timing = window.timing_window
+    uses = tuple(
+        use
+        for use in state.stratagem_use_records
+        if use.handler_id == CORE_COUNTEROFFENSIVE_HANDLER_ID
+        and use.timing_window_id == timing.window_id
+    )
+    if len(uses) != 1:
+        raise GameLifecycleError(message)
+    (use,) = uses
+    unit_id = use.target_binding.target_unit_instance_id
+    if (
+        unit_id is None
+        or use.targeted_unit_instance_ids != (unit_id,)
+        or window.eligible_player_ids != (use.player_id,)
+        or use.battle_round != state.battle_round
+        or use.phase is not BattlePhase.FIGHT
+        or use.active_player_id != fight.active_player_id
+    ):
+        raise GameLifecycleError(message)
+    events = decisions.event_log.records
+    source = validate_parameterized_stratagem_use_history(
+        state=state,
+        event_records=events,
+        decision_records=decisions.records,
+        use_record=use,
+        mutation_index=len(events),
+    )
+    if (
+        not isinstance(source.decision_record.request.payload, dict)
+        or source.decision_record.request.payload.get("reaction_window") != window.to_payload()
+    ):
+        raise GameLifecycleError(message)
+    _validate_fight_reaction_continuation(
+        request_id=request.request_id,
+        frames=frames,
+        event_records=events,
+        decision_records=decisions.records,
+        label="Counteroffensive Fight choice",
+    )
+    effect = counteroffensive_fights_first_effect(
+        use, unit_id=unit_id, active_player_id=fight.active_player_id
+    )
+    if effect not in state.persisting_effects:
+        raise GameLifecycleError(message)
+    context = counteroffensive_fight_context(
+        state=state, fight_state=fight, use=use, policy=fight_policy
+    )
+    if context is None:
+        raise GameLifecycleError(message)
+    expected = build_fight_activation_request(
+        state=state,
+        fight_state=fight.with_next_player(use.player_id),
+        contexts=(context,),
+        pass_available=False,
+        policy=fight_policy,
+        request_id=request.request_id,
+        interrupt_id=f"counteroffensive:{use.use_id}",
+    )
+    if (
+        len(expected.options) < 2
+        or request != expected
+        or canonical_json(issued) != canonical_json(expected.to_payload())
+    ):
+        raise GameLifecycleError(message)
+
+
+def _is_counteroffensive_fight_continuation(state: GameState, request: DecisionRequest) -> bool:
+    fight = state.fight_phase_state
+    activation = None if fight is None else fight.active_activation
+    if (
+        activation is None
+        or activation.interrupt_id is None
+        or not activation.interrupt_id.startswith("counteroffensive:")
+    ):
+        return False
+    if request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE:
+        return _is_interrupted_fight_pile_in(state, request)
+    return request.decision_type in {
+        SELECT_CORE_ABILITY_INSTANCE_DECISION_TYPE,
+        SELECT_FIGHT_UNIT_GRANT_DECISION_TYPE,
+        FIGHT_ACTIVATION_ABILITY_DECISION_TYPE,
+    }
 
 
 def _is_interrupted_fight_pile_in(state: GameState, request: DecisionRequest) -> bool:
@@ -189,6 +367,23 @@ def validate_melee_reaction_continuation(
     decision_records: tuple[DecisionRecord, ...],
 ) -> None:
     """Restore the single frame transfer into a pending Fight declaration."""
+    _validate_fight_reaction_continuation(
+        request_id=request_id,
+        frames=frames,
+        event_records=event_records,
+        decision_records=decision_records,
+        label="Lifecycle melee",
+    )
+
+
+def _validate_fight_reaction_continuation(
+    *,
+    request_id: str,
+    frames: tuple[ReactionQueueFrame, ...],
+    event_records: tuple[EventRecord, ...],
+    decision_records: tuple[DecisionRecord, ...],
+    label: str,
+) -> None:
     events = reversed(event_records)
     handoff: dict[str, JsonValue] | None = None
     source_event: JsonValue = None
@@ -199,24 +394,24 @@ def validate_melee_reaction_continuation(
             break
         if event.event_type == "reaction_window_continued":
             if handoff is not None or not isinstance(event.payload, dict):
-                raise GameLifecycleError("Lifecycle melee reaction continuation drift.")
+                raise GameLifecycleError(f"{label} reaction continuation drift.")
             handoff = event.payload
     if handoff is None:
         if frames:
-            raise GameLifecycleError("Lifecycle melee reaction continuation drift.")
+            raise GameLifecycleError(f"{label} reaction continuation drift.")
         return
     if handoff.get("next_request_id") != request_id:
-        raise GameLifecycleError("Lifecycle melee reaction continuation drift.")
+        raise GameLifecycleError(f"{label} reaction continuation drift.")
     if not frames:
-        raise GameLifecycleError("Lifecycle melee reaction continuation requires a frame.")
+        raise GameLifecycleError(f"{label} reaction continuation requires a frame.")
     frame = frames[-1]
     if frame.request_id != request_id or not _matches_frame_event(
         frame.to_payload(), handoff, request_field="next_request_id"
     ):
-        raise GameLifecycleError("Lifecycle melee reaction continuation drift.")
+        raise GameLifecycleError(f"{label} reaction continuation drift.")
 
     if not decision_records or not isinstance(source_event, dict):
-        raise GameLifecycleError("Lifecycle melee reaction continuation source decision drift.")
+        raise GameLifecycleError(f"{label} reaction continuation source decision drift.")
     source = decision_records[-1]
     source_payload = source.to_payload()
     canonical_source = canonical_json(source_payload)
@@ -225,7 +420,7 @@ def validate_melee_reaction_continuation(
         or canonical_json({key: source_event[key] for key in source_payload.keys() & source_event})
         != canonical_source
     ):
-        raise GameLifecycleError("Lifecycle melee reaction continuation source decision drift.")
+        raise GameLifecycleError(f"{label} reaction continuation source decision drift.")
 
     # Continue replaces the source request's existing frame. Earlier frames in the
     # stack may belong to other windows, but this window may occur only once.
@@ -236,7 +431,7 @@ def validate_melee_reaction_continuation(
         or lower.reaction_window.timing_window.window_id == window_id
         for lower in frames[:-1]
     ):
-        raise GameLifecycleError("Lifecycle melee reaction continuation frame was not replaced.")
+        raise GameLifecycleError(f"{label} reaction continuation frame was not replaced.")
 
     # Opening or continuing the source set the previous request ID. The handoff
     # must preserve every other field from that assignment.
@@ -253,7 +448,7 @@ def validate_melee_reaction_continuation(
             if _matches_frame_event(source_frame, payload, request_field=request_field):
                 return
             break
-    raise GameLifecycleError("Lifecycle melee reaction continuation source frame drift.")
+    raise GameLifecycleError(f"{label} reaction continuation source frame drift.")
 
 
 def _matches_frame_event(

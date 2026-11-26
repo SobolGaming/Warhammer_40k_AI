@@ -3,31 +3,35 @@
   "base": "dec50bca2394c755a0d5fb76e6659882b388c032",
   "retained_normal_move_sha256": "bf15b3ce40bd26cc9c1af4da30a21fc17cd475c8f849bceabf8407f3fa9348a0",
   "retained_runtime_fingerprint": "40b91df8a39aa85afd3503b466b7bcab93c87d70db8189243bc9c5d70f924e1a",
-  "runtime_fingerprint": "4145ac829e45612b3fc716574e0cd527b00008c7ec69927fdadb880505d2c392",
+  "runtime_fingerprint": "1bfd3b67d2fbe5eb2df35cd0c17ab30974c90d1efdf3b0fe2e7167a16655198a",
   "runtime_manifest": {
     "before": "1701a163d58756209054de421d459e057faedfb3cf670c72d9e3c5f9efc5edaa",
-    "after": "a8817518cabf6795fe24deb3ca580d7665940e1eccaab7171255979e4d36b7f2"
+    "after": "aec731a65984f58492e1401edb05cfc0f1876ff009c7cc13395416c858a99a17"
   },
   "sources": {
     "src/warhammer40k_core/engine/fight_activation_requests.py": {
       "before": "ed5eff1db7580118ba8202e091a413ea199680d40384f21e89c254486cdf0aed",
-      "after": "8aeee2054ea66914af364d141b2f1a0dc46806aec62eb3f1e7081a36f6603b54"
+      "after": "8c61e7de0e2f8c51a480782c1ca9e68b8f40b009bc3a0bb0dacdd66acaa75777"
     },
     "src/warhammer40k_core/engine/fight_order.py": {
       "before": "f0942554275868586fa1a59b8ac135eb1557ff23b705614f6958bcb101995899",
       "after": "8937a8178db5ab185c1c3574accbf21b469ed0b4620b3a273985d3da4bebd7d4"
     },
+    "src/warhammer40k_core/engine/lifecycle.py": {
+      "before": "a8ff6864a1e25ac197fcbed1fb02e12db3c0368825d9004f123be28543c59021",
+      "after": "c93e1464838747360fa1ef1a1efc3b6ce20ea695567dce1b8a0f88432243e050"
+    },
     "src/warhammer40k_core/engine/lifecycle_reaction_queue.py": {
       "before": "91b8ae84f3b83578014182e34eea39d37c6d96e2e2457fee12d105b092307960",
-      "after": "04a888f2b2d9f41b004b83fee80716360427ca2bc0f074402374fb0279614769"
+      "after": "eee9e014714e49b20f6fcdf3f823ccb460e5539a21224c81674ec3e49061f9e8"
     },
     "src/warhammer40k_core/engine/phases/fight.py": {
       "before": "5b329d78d216336e141692e00cca125d4ffb743ef216a3b0f814ceeaddb7518b",
-      "after": "690c318e7beefb77b59e774fa06b5aea70876c6d052df3e309be2e0670138006"
+      "after": "45a3a1143366cbebb27e629e069c65890dd7eb8d2413f6cab7a9ed292bf08fcd"
     },
     "src/warhammer40k_core/engine/stratagems_effect_handlers.py": {
       "before": "eeec51078f3a0a00e066660cffb0ceac98e6544e8995fc330b3cd7f61bb6a3bd",
-      "after": "e2c6ad926969ab2759c087548e087e8ef0de2ef6fb392517bae8022c349c511c"
+      "after": "1a7115ec1131b04a9d52dcb89585d3af35992798020079ad64105cb813469306"
     }
   },
   "origin_test": {
@@ -40,22 +44,23 @@
     "after": {
       "mode": "100644",
       "bytes": 12073,
-      "sha256": "fd3e051853e55aff854315b034cb7029b26ddbeb11cf49d6844ecfc2d8af4b1f",
-      "blob_sha1": "80cfc0a9dc2ee2f9afebdb3c4fb97ce35077b587"
+      "sha256": "884e1b7df5879af196d4001a5dc14ffa321894da156d7a1580a17cae08fc3c19",
+      "blob_sha1": "9643e67aa379c57b4e344109c5ef47afdc70010a"
     }
   },
   "added_files": {
     "tests/rules/section12/test_counteroffensive_fight_type.py": {
       "mode": "100644",
-      "bytes": 11995,
-      "sha256": "229c325387300d18ab79e6fc66b4d303505e302fe1583bc25e613cb73908d2c2",
-      "blob_sha1": "2aa13573e15c0065974eeed39e8f2e5c5177c609"
+      "bytes": 21171,
+      "sha256": "4b072f79c546b1dbaf0f8194228c789a1f283c06caf81fbf87a12f077dc73fd2",
+      "blob_sha1": "bce13b0a5ee1f9e91165b0383f64209c128acdd3"
     }
   },
   "added_cases": [
     "tests/rules/section12/test_counteroffensive_fight_type.py::test_counteroffensive_preserves_native_fight_type[decline]",
     "tests/rules/section12/test_counteroffensive_fight_type.py::test_counteroffensive_preserves_native_fight_type[normal]",
     "tests/rules/section12/test_counteroffensive_fight_type.py::test_counteroffensive_preserves_native_fight_type[overrun]",
-    "tests/rules/section12/test_counteroffensive_fight_type.py::test_counteroffensive_preserves_native_fight_type[single-overrun]"
+    "tests/rules/section12/test_counteroffensive_fight_type.py::test_counteroffensive_preserves_native_fight_type[single-overrun]",
+    "tests/rules/section12/test_counteroffensive_fight_type.py::test_counteroffensive_resolves_dark_pact_before_melee"
   ]
 }

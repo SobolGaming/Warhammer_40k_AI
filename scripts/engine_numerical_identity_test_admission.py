@@ -1321,12 +1321,13 @@ COUNTEROFFENSIVE_FIGHT_TYPE_TRANSITION = (
     "data/source_audits/ci64_provenance_v1/counteroffensive-fight-type-v1.json"
 )
 COUNTEROFFENSIVE_FIGHT_TYPE_SHA256 = (
-    "374958f528106e4b8d8b16f7a9c91d2dd26d03622cfd6a02596b0cf11f0f3a24"
+    "ebb1f144169b8c6ebf06cf14df0a44f17c562632a1660e150e97db4a764642e7"
 )
 COUNTEROFFENSIVE_FIGHT_TYPE_OWNER = "tests/rules/section12/test_counteroffensive_fight_type.py"
 _COUNTEROFFENSIVE_FIGHT_TYPE_SOURCES = {
     "src/warhammer40k_core/engine/fight_activation_requests.py",
     "src/warhammer40k_core/engine/fight_order.py",
+    "src/warhammer40k_core/engine/lifecycle.py",
     "src/warhammer40k_core/engine/lifecycle_reaction_queue.py",
     "src/warhammer40k_core/engine/phases/fight.py",
     "src/warhammer40k_core/engine/stratagems_effect_handlers.py",
@@ -1369,8 +1370,11 @@ def _counteroffensive_fight_type_transition(
         or receipt["added_files"].keys() != {COUNTEROFFENSIVE_FIGHT_TYPE_OWNER}
         or receipt["added_cases"]
         != [
-            f"{COUNTEROFFENSIVE_FIGHT_TYPE_OWNER}::test_counteroffensive_preserves_native_fight_type[{case}]"
-            for case in ("decline", "normal", "overrun", "single-overrun")
+            *(
+                f"{COUNTEROFFENSIVE_FIGHT_TYPE_OWNER}::test_counteroffensive_preserves_native_fight_type[{case}]"
+                for case in ("decline", "normal", "overrun", "single-overrun")
+            ),
+            f"{COUNTEROFFENSIVE_FIGHT_TYPE_OWNER}::test_counteroffensive_resolves_dark_pact_before_melee",
         ]
         or any(
             change.keys() != {"before", "after"} or change["before"] == change["after"]
@@ -1715,7 +1719,11 @@ def exact_movement_test_transition(
     pending_sources = {} if pending_battle_shock is None else pending_battle_shock[2]
     from scripts.dark_pact_test_admission import dark_pact_source_successors
 
-    pact_sources = dark_pact_source_successors(root)
+    counter_fight_type = _counteroffensive_fight_type_transition(root)
+    counter_receipt = None if counter_fight_type is None else counter_fight_type[0]
+    pact_sources = dark_pact_source_successors(
+        root, current_sources=None if counter_receipt is None else counter_receipt["sources"]
+    )
     attack_reroll_order_path = root / MONSTER_MASH_ATTACK_REROLL_TRANSITION
     _selection_no_links(root, attack_reroll_order_path)
     attack_reroll_order = (
@@ -1768,8 +1776,6 @@ def exact_movement_test_transition(
         runtime, _, successor_raw = fight_successor
         raw += b"\0" + successor_raw
     counteroffensive_runtime = runtime
-    counter_fight_type = _counteroffensive_fight_type_transition(root)
-    counter_receipt = None if counter_fight_type is None else counter_fight_type[0]
     melee_restore_tests = None
     melee_restore_raw = None
     if has_melee_restore:
