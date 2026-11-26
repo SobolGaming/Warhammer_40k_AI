@@ -1,0 +1,444 @@
+{
+  "schema": "stage4-west-cooperation-2x2-v1",
+  "group": "layout3-west-lane-dev",
+  "partition": "development",
+  "status": "observed",
+  "interaction": 5,
+  "seed": "0fda2ab092cec5bf66a11a4d130e40b9b0de3c246a93df5e3ebded4d284ca0e3",
+  "candidate_cap": 2,
+  "opponent_rule": "generated-west-diagonal-or-issued-hold-v1",
+  "horizon": [4, "player-a", "movement", "select_movement_unit"],
+  "training_rows": 0,
+  "arms": {
+    "hold-omit": {
+      "status": "observed",
+      "menus": [
+        {
+          "unit_id": "army-alpha:scout-redeploy-unit",
+          "actor_id": "player-a",
+          "action_request_id": "view-request-f623ea4f4e284d903fdd5f0809c43302749a2c1167275f83b9b69d5d5f5d2ae2",
+          "selected_id": "remain_stationary"
+        },
+        {
+          "unit_id": "army-alpha:deep-strike-unit",
+          "actor_id": "player-a",
+          "action_request_id": "view-request-8aa03a148f5a00b3222b9a1c490ed77bff49190665ad3b5f7815a1aba23cf35e",
+          "selected_id": "remain_stationary"
+        },
+        {
+          "unit_id": "army-beta:scout-redeploy-unit",
+          "actor_id": "player-b",
+          "action_request_id": "view-request-c39d9abaf77e955f7197ccc2e801d9895d8b99e97409140e78a7c09d0ee73a3d",
+          "proposal_request_id": "view-request-802dcbe9069bf10820d1010e61175a651b4b3bea372dcd7dc15d218dacc180ef",
+          "actor_view_hash": "d503f9a1c0e368a504ec20a1826ab36fe91b268cf350e54e7d6c0f5be3c72e57",
+          "raw_count": 18,
+          "raw_ids_hash": "69f7a3d3d8e21139150a420d691f187dcbb8410313ceaf8972d86213ddb8b730",
+          "eligible_ids": ["normal-move:7aef07b0772352ea7b225209bb9794b4bdf672a9a3dac1e65618d557c18bb5ce"],
+          "geometry_excluded": 17,
+          "cap_lost_ids": [],
+          "probes": [
+            {
+              "id": "normal-move:7aef07b0772352ea7b225209bb9794b4bdf672a9a3dac1e65618d557c18bb5ce",
+              "native_violation": null
+            }
+          ],
+          "live_accepted_ids": ["normal-move:7aef07b0772352ea7b225209bb9794b4bdf672a9a3dac1e65618d557c18bb5ce"],
+          "selected_id": "normal-move:7aef07b0772352ea7b225209bb9794b4bdf672a9a3dac1e65618d557c18bb5ce"
+        }
+      ],
+      "native_preflight": "passed",
+      "checkpoint": "f84da13604405d0f4cc232b4a48d276eab15739d5cd363f3754e1c6ec298d62a",
+      "event_log": "3c3a82ecbecd2e63e5f40674e051751038648c45409b385c85f257fab5a845c0",
+      "active_rng_draws": 0,
+      "active_rng_history_tokens": 556,
+      "strict_replay": true,
+      "gain_vp": {"player-a": 0, "player-b": 3},
+      "objectives_at_boundaries": [
+        {
+          "boundary": [3, "player-a", "fight", "turn_end"],
+          "record_id": "objective-control:round-03:player-a:fight:turn_end",
+          "objectives": {
+            "take-and-hold-vs-purge-the-foe-layout-3-attacker-home-01": {"oc": {"player-a": 0, "player-b": 0}, "controller": null, "unit_oc": {}},
+            "take-and-hold-vs-purge-the-foe-layout-3-central-01": {"oc": {"player-a": 0, "player-b": 0}, "controller": null, "unit_oc": {}},
+            "take-and-hold-vs-purge-the-foe-layout-3-central-02": {"oc": {"player-a": 0, "player-b": 0}, "controller": null, "unit_oc": {}},
+            "take-and-hold-vs-purge-the-foe-layout-3-defender-home-01": {"oc": {"player-a": 0, "player-b": 0}, "controller": null, "unit_oc": {}},
+            "take-and-hold-vs-purge-the-foe-layout-3-expansion-01": {"oc": {"player-a": 0, "player-b": 0}, "controller": null, "unit_oc": {}},
+            "take-and-hold-vs-purge-the-foe-layout-3-expansion-02": {"oc": {"player-a": 0, "player-b": 0}, "controller": null, "unit_oc": {}}
+          }
+        },
+        {
+          "boundary": [3, "player-b", "fight", "turn_end"],
+          "record_id": "objective-control:round-03:player-b:fight:turn_end",
+          "objectives": {
+            "take-and-hold-vs-purge-the-foe-layout-3-attacker-home-01": {"oc": {"player-a": 0, "player-b": 0}, "controller": null, "unit_oc": {}},
+            "take-and-hold-vs-purge-the-foe-layout-3-central-01": {"oc": {"player-a": 0, "player-b": 0}, "controller": null, "unit_oc": {}},
+            "take-and-hold-vs-purge-the-foe-layout-3-central-02": {"oc": {"player-a": 0, "player-b": 0}, "controller": null, "unit_oc": {}},
+            "take-and-hold-vs-purge-the-foe-layout-3-defender-home-01": {"oc": {"player-a": 0, "player-b": 0}, "controller": null, "unit_oc": {}},
+            "take-and-hold-vs-purge-the-foe-layout-3-expansion-01": {"oc": {"player-a": 0, "player-b": 0}, "controller": null, "unit_oc": {}},
+            "take-and-hold-vs-purge-the-foe-layout-3-expansion-02": {"oc": {"player-a": 0, "player-b": 10}, "controller": "player-b", "unit_oc": {"army-beta:scout-redeploy-unit": 10}}
+          }
+        },
+        {
+          "boundary": [4, "player-a", "command", "phase_end"],
+          "record_id": "objective-control:round-04:player-a:command:phase_end",
+          "objectives": {
+            "take-and-hold-vs-purge-the-foe-layout-3-attacker-home-01": {"oc": {"player-a": 0, "player-b": 0}, "controller": null, "unit_oc": {}},
+            "take-and-hold-vs-purge-the-foe-layout-3-central-01": {"oc": {"player-a": 0, "player-b": 0}, "controller": null, "unit_oc": {}},
+            "take-and-hold-vs-purge-the-foe-layout-3-central-02": {"oc": {"player-a": 0, "player-b": 0}, "controller": null, "unit_oc": {}},
+            "take-and-hold-vs-purge-the-foe-layout-3-defender-home-01": {"oc": {"player-a": 0, "player-b": 0}, "controller": null, "unit_oc": {}},
+            "take-and-hold-vs-purge-the-foe-layout-3-expansion-01": {"oc": {"player-a": 0, "player-b": 0}, "controller": null, "unit_oc": {}},
+            "take-and-hold-vs-purge-the-foe-layout-3-expansion-02": {"oc": {"player-a": 0, "player-b": 10}, "controller": "player-b", "unit_oc": {"army-beta:scout-redeploy-unit": 10}}
+          }
+        }
+      ],
+      "awards": [
+        {
+          "player": "player-b",
+          "boundary_id": "objective-control:round-03:player-b:fight:turn_end",
+          "rule": "unstoppable-force-new-objective-turn-end",
+          "vp": 3,
+          "objective_ids": ["take-and-hold-vs-purge-the-foe-layout-3-expansion-02"],
+          "vp_by_objective": {"take-and-hold-vs-purge-the-foe-layout-3-expansion-02": 3}
+        }
+      ],
+      "material": {"model_count": 12, "wounds": 34, "wound_delta": 0}
+    },
+    "hold-follow": {
+      "status": "observed",
+      "menus": [
+        {
+          "unit_id": "army-alpha:scout-redeploy-unit",
+          "actor_id": "player-a",
+          "action_request_id": "view-request-f623ea4f4e284d903fdd5f0809c43302749a2c1167275f83b9b69d5d5f5d2ae2",
+          "selected_id": "remain_stationary"
+        },
+        {
+          "unit_id": "army-alpha:deep-strike-unit",
+          "actor_id": "player-a",
+          "action_request_id": "view-request-8aa03a148f5a00b3222b9a1c490ed77bff49190665ad3b5f7815a1aba23cf35e",
+          "proposal_request_id": "view-request-aff456e30547a80fbce3999535926e4a58796b1ea5e6a7f246056259b56755cd",
+          "actor_view_hash": "c85ee3469810ce40c91ca1e8cbffa72a905e5c10ded6bdae87da8e6ee18cc5c8",
+          "raw_count": 20,
+          "raw_ids_hash": "8c3243f0cdb3eb25a5a4004010d9b3cdbe815f72a17d60feb67a6ea7c650968b",
+          "eligible_ids": ["normal-move:fdc8517b57ceffa00ac215551478abc5d65636c81953efc76c87e55d4294231c"],
+          "geometry_excluded": 19,
+          "cap_lost_ids": [],
+          "probes": [
+            {
+              "id": "normal-move:fdc8517b57ceffa00ac215551478abc5d65636c81953efc76c87e55d4294231c",
+              "native_violation": null
+            }
+          ],
+          "live_accepted_ids": ["normal-move:fdc8517b57ceffa00ac215551478abc5d65636c81953efc76c87e55d4294231c"],
+          "selected_id": "normal-move:fdc8517b57ceffa00ac215551478abc5d65636c81953efc76c87e55d4294231c"
+        },
+        {
+          "unit_id": "army-beta:scout-redeploy-unit",
+          "actor_id": "player-b",
+          "action_request_id": "view-request-802dcbe9069bf10820d1010e61175a651b4b3bea372dcd7dc15d218dacc180ef",
+          "proposal_request_id": "view-request-a5d0cfe49b3b387c0897d049ec22178e62850b12bc51d6ae7f4515bcc5fc0d55",
+          "actor_view_hash": "2aad307b7384dec45e80aae4af149cde7ade69d2b869c26e554a733190e508b5",
+          "raw_count": 18,
+          "raw_ids_hash": "69f7a3d3d8e21139150a420d691f187dcbb8410313ceaf8972d86213ddb8b730",
+          "eligible_ids": ["normal-move:7aef07b0772352ea7b225209bb9794b4bdf672a9a3dac1e65618d557c18bb5ce"],
+          "geometry_excluded": 17,
+          "cap_lost_ids": [],
+          "probes": [
+            {
+              "id": "normal-move:7aef07b0772352ea7b225209bb9794b4bdf672a9a3dac1e65618d557c18bb5ce",
+              "native_violation": null
+            }
+          ],
+          "live_accepted_ids": ["normal-move:7aef07b0772352ea7b225209bb9794b4bdf672a9a3dac1e65618d557c18bb5ce"],
+          "selected_id": "normal-move:7aef07b0772352ea7b225209bb9794b4bdf672a9a3dac1e65618d557c18bb5ce"
+        }
+      ],
+      "native_preflight": "passed",
+      "checkpoint": "a244e52391471cf19c2e4019f82517e2adaaee524df306da53caa3f7569ba592",
+      "event_log": "77278ad066951b0e74446dff8390bdf482b93659e78d1348913c27153d980d40",
+      "active_rng_draws": 0,
+      "active_rng_history_tokens": 561,
+      "strict_replay": true,
+      "gain_vp": {"player-a": 0, "player-b": 3},
+      "objectives_at_boundaries": [
+        {
+          "boundary": [3, "player-a", "fight", "turn_end"],
+          "record_id": "objective-control:round-03:player-a:fight:turn_end",
+          "objectives": {
+            "take-and-hold-vs-purge-the-foe-layout-3-attacker-home-01": {"oc": {"player-a": 0, "player-b": 0}, "controller": null, "unit_oc": {}},
+            "take-and-hold-vs-purge-the-foe-layout-3-central-01": {"oc": {"player-a": 0, "player-b": 0}, "controller": null, "unit_oc": {}},
+            "take-and-hold-vs-purge-the-foe-layout-3-central-02": {"oc": {"player-a": 0, "player-b": 0}, "controller": null, "unit_oc": {}},
+            "take-and-hold-vs-purge-the-foe-layout-3-defender-home-01": {"oc": {"player-a": 0, "player-b": 0}, "controller": null, "unit_oc": {}},
+            "take-and-hold-vs-purge-the-foe-layout-3-expansion-01": {"oc": {"player-a": 0, "player-b": 0}, "controller": null, "unit_oc": {}},
+            "take-and-hold-vs-purge-the-foe-layout-3-expansion-02": {"oc": {"player-a": 2, "player-b": 0}, "controller": "player-a", "unit_oc": {"army-alpha:deep-strike-unit": 2}}
+          }
+        },
+        {
+          "boundary": [3, "player-b", "fight", "turn_end"],
+          "record_id": "objective-control:round-03:player-b:fight:turn_end",
+          "objectives": {
+            "take-and-hold-vs-purge-the-foe-layout-3-attacker-home-01": {"oc": {"player-a": 0, "player-b": 0}, "controller": null, "unit_oc": {}},
+            "take-and-hold-vs-purge-the-foe-layout-3-central-01": {"oc": {"player-a": 0, "player-b": 0}, "controller": null, "unit_oc": {}},
+            "take-and-hold-vs-purge-the-foe-layout-3-central-02": {"oc": {"player-a": 0, "player-b": 0}, "controller": null, "unit_oc": {}},
+            "take-and-hold-vs-purge-the-foe-layout-3-defender-home-01": {"oc": {"player-a": 0, "player-b": 0}, "controller": null, "unit_oc": {}},
+            "take-and-hold-vs-purge-the-foe-layout-3-expansion-01": {"oc": {"player-a": 0, "player-b": 0}, "controller": null, "unit_oc": {}},
+            "take-and-hold-vs-purge-the-foe-layout-3-expansion-02": {"oc": {"player-a": 2, "player-b": 10}, "controller": "player-b", "unit_oc": {"army-alpha:deep-strike-unit": 2, "army-beta:scout-redeploy-unit": 10}}
+          }
+        },
+        {
+          "boundary": [4, "player-a", "command", "phase_end"],
+          "record_id": "objective-control:round-04:player-a:command:phase_end",
+          "objectives": {
+            "take-and-hold-vs-purge-the-foe-layout-3-attacker-home-01": {"oc": {"player-a": 0, "player-b": 0}, "controller": null, "unit_oc": {}},
+            "take-and-hold-vs-purge-the-foe-layout-3-central-01": {"oc": {"player-a": 0, "player-b": 0}, "controller": null, "unit_oc": {}},
+            "take-and-hold-vs-purge-the-foe-layout-3-central-02": {"oc": {"player-a": 0, "player-b": 0}, "controller": null, "unit_oc": {}},
+            "take-and-hold-vs-purge-the-foe-layout-3-defender-home-01": {"oc": {"player-a": 0, "player-b": 0}, "controller": null, "unit_oc": {}},
+            "take-and-hold-vs-purge-the-foe-layout-3-expansion-01": {"oc": {"player-a": 0, "player-b": 0}, "controller": null, "unit_oc": {}},
+            "take-and-hold-vs-purge-the-foe-layout-3-expansion-02": {"oc": {"player-a": 2, "player-b": 10}, "controller": "player-b", "unit_oc": {"army-alpha:deep-strike-unit": 2, "army-beta:scout-redeploy-unit": 10}}
+          }
+        }
+      ],
+      "awards": [
+        {
+          "player": "player-b",
+          "boundary_id": "objective-control:round-03:player-b:fight:turn_end",
+          "rule": "unstoppable-force-new-objective-turn-end",
+          "vp": 3,
+          "objective_ids": ["take-and-hold-vs-purge-the-foe-layout-3-expansion-02"],
+          "vp_by_objective": {"take-and-hold-vs-purge-the-foe-layout-3-expansion-02": 3}
+        }
+      ],
+      "material": {"model_count": 12, "wounds": 34, "wound_delta": 0}
+    },
+    "screen-omit": {
+      "status": "observed",
+      "menus": [
+        {
+          "unit_id": "army-alpha:scout-redeploy-unit",
+          "actor_id": "player-a",
+          "action_request_id": "view-request-f623ea4f4e284d903fdd5f0809c43302749a2c1167275f83b9b69d5d5f5d2ae2",
+          "proposal_request_id": "view-request-a18bb5dca2f5f5ba69bc6bf2740dce57e32781c7ca42f0400218c4b48fe2033e",
+          "actor_view_hash": "2d484a382f28311bb092a81e2962c5a601be7372d28a53b22b810ab08d5bc003",
+          "raw_count": 18,
+          "raw_ids_hash": "99bb0ad0d6c41b024d6fd25cd2e5b73334afba6ad0fcdc98d6311fd409e35202",
+          "eligible_ids": ["normal-move:50153ec1f544246ee7787b3ce07228364399d069fad9c29ac56e1bd64fc15607"],
+          "geometry_excluded": 17,
+          "cap_lost_ids": [],
+          "probes": [
+            {
+              "id": "normal-move:50153ec1f544246ee7787b3ce07228364399d069fad9c29ac56e1bd64fc15607",
+              "native_violation": null
+            }
+          ],
+          "live_accepted_ids": ["normal-move:50153ec1f544246ee7787b3ce07228364399d069fad9c29ac56e1bd64fc15607"],
+          "selected_id": "normal-move:50153ec1f544246ee7787b3ce07228364399d069fad9c29ac56e1bd64fc15607"
+        },
+        {
+          "unit_id": "army-alpha:deep-strike-unit",
+          "actor_id": "player-a",
+          "action_request_id": "view-request-aff456e30547a80fbce3999535926e4a58796b1ea5e6a7f246056259b56755cd",
+          "selected_id": "remain_stationary"
+        },
+        {
+          "unit_id": "army-beta:scout-redeploy-unit",
+          "actor_id": "player-b",
+          "action_request_id": "view-request-a5d0cfe49b3b387c0897d049ec22178e62850b12bc51d6ae7f4515bcc5fc0d55",
+          "proposal_request_id": "view-request-52cb37b26e96dcb346a01dbf7770f91701962e552e032a5c962289f88f2c8d88",
+          "actor_view_hash": "26833b793e1c4660624e76313368bfe14a010e5f1ef42e537160186f487156b2",
+          "raw_count": 18,
+          "raw_ids_hash": "69f7a3d3d8e21139150a420d691f187dcbb8410313ceaf8972d86213ddb8b730",
+          "eligible_ids": ["normal-move:7aef07b0772352ea7b225209bb9794b4bdf672a9a3dac1e65618d557c18bb5ce"],
+          "geometry_excluded": 17,
+          "cap_lost_ids": [],
+          "probes": [
+            {
+              "id": "normal-move:7aef07b0772352ea7b225209bb9794b4bdf672a9a3dac1e65618d557c18bb5ce",
+              "native_violation": "enemy_engagement_range_transit_forbidden"
+            }
+          ],
+          "live_accepted_ids": [],
+          "selected_id": "remain_stationary"
+        }
+      ],
+      "native_preflight": "passed",
+      "checkpoint": "1ee4cae83c9287462cafb6f1103700881609822ec23194a2a18e61fcecabdb24",
+      "event_log": "b93d4220c1a16a483434afa262d4debdda4b0c210fcc4ea67a8f12a5418b0c1c",
+      "active_rng_draws": 0,
+      "active_rng_history_tokens": 564,
+      "strict_replay": true,
+      "gain_vp": {"player-a": 0, "player-b": 0},
+      "objectives_at_boundaries": [
+        {
+          "boundary": [3, "player-a", "fight", "turn_end"],
+          "record_id": "objective-control:round-03:player-a:fight:turn_end",
+          "objectives": {
+            "take-and-hold-vs-purge-the-foe-layout-3-attacker-home-01": {"oc": {"player-a": 0, "player-b": 0}, "controller": null, "unit_oc": {}},
+            "take-and-hold-vs-purge-the-foe-layout-3-central-01": {"oc": {"player-a": 0, "player-b": 0}, "controller": null, "unit_oc": {}},
+            "take-and-hold-vs-purge-the-foe-layout-3-central-02": {"oc": {"player-a": 0, "player-b": 0}, "controller": null, "unit_oc": {}},
+            "take-and-hold-vs-purge-the-foe-layout-3-defender-home-01": {"oc": {"player-a": 0, "player-b": 0}, "controller": null, "unit_oc": {}},
+            "take-and-hold-vs-purge-the-foe-layout-3-expansion-01": {"oc": {"player-a": 0, "player-b": 0}, "controller": null, "unit_oc": {}},
+            "take-and-hold-vs-purge-the-foe-layout-3-expansion-02": {"oc": {"player-a": 0, "player-b": 0}, "controller": null, "unit_oc": {}}
+          }
+        },
+        {
+          "boundary": [3, "player-b", "fight", "turn_end"],
+          "record_id": "objective-control:round-03:player-b:fight:turn_end",
+          "objectives": {
+            "take-and-hold-vs-purge-the-foe-layout-3-attacker-home-01": {"oc": {"player-a": 0, "player-b": 0}, "controller": null, "unit_oc": {}},
+            "take-and-hold-vs-purge-the-foe-layout-3-central-01": {"oc": {"player-a": 0, "player-b": 0}, "controller": null, "unit_oc": {}},
+            "take-and-hold-vs-purge-the-foe-layout-3-central-02": {"oc": {"player-a": 0, "player-b": 0}, "controller": null, "unit_oc": {}},
+            "take-and-hold-vs-purge-the-foe-layout-3-defender-home-01": {"oc": {"player-a": 0, "player-b": 0}, "controller": null, "unit_oc": {}},
+            "take-and-hold-vs-purge-the-foe-layout-3-expansion-01": {"oc": {"player-a": 0, "player-b": 0}, "controller": null, "unit_oc": {}},
+            "take-and-hold-vs-purge-the-foe-layout-3-expansion-02": {"oc": {"player-a": 0, "player-b": 0}, "controller": null, "unit_oc": {}}
+          }
+        },
+        {
+          "boundary": [4, "player-a", "command", "phase_end"],
+          "record_id": "objective-control:round-04:player-a:command:phase_end",
+          "objectives": {
+            "take-and-hold-vs-purge-the-foe-layout-3-attacker-home-01": {"oc": {"player-a": 0, "player-b": 0}, "controller": null, "unit_oc": {}},
+            "take-and-hold-vs-purge-the-foe-layout-3-central-01": {"oc": {"player-a": 0, "player-b": 0}, "controller": null, "unit_oc": {}},
+            "take-and-hold-vs-purge-the-foe-layout-3-central-02": {"oc": {"player-a": 0, "player-b": 0}, "controller": null, "unit_oc": {}},
+            "take-and-hold-vs-purge-the-foe-layout-3-defender-home-01": {"oc": {"player-a": 0, "player-b": 0}, "controller": null, "unit_oc": {}},
+            "take-and-hold-vs-purge-the-foe-layout-3-expansion-01": {"oc": {"player-a": 0, "player-b": 0}, "controller": null, "unit_oc": {}},
+            "take-and-hold-vs-purge-the-foe-layout-3-expansion-02": {"oc": {"player-a": 0, "player-b": 0}, "controller": null, "unit_oc": {}}
+          }
+        }
+      ],
+      "awards": [],
+      "material": {"model_count": 12, "wounds": 34, "wound_delta": 0}
+    },
+    "screen-follow": {
+      "status": "observed",
+      "menus": [
+        {
+          "unit_id": "army-alpha:scout-redeploy-unit",
+          "actor_id": "player-a",
+          "action_request_id": "view-request-f623ea4f4e284d903fdd5f0809c43302749a2c1167275f83b9b69d5d5f5d2ae2",
+          "proposal_request_id": "view-request-a18bb5dca2f5f5ba69bc6bf2740dce57e32781c7ca42f0400218c4b48fe2033e",
+          "actor_view_hash": "2d484a382f28311bb092a81e2962c5a601be7372d28a53b22b810ab08d5bc003",
+          "raw_count": 18,
+          "raw_ids_hash": "99bb0ad0d6c41b024d6fd25cd2e5b73334afba6ad0fcdc98d6311fd409e35202",
+          "eligible_ids": ["normal-move:50153ec1f544246ee7787b3ce07228364399d069fad9c29ac56e1bd64fc15607"],
+          "geometry_excluded": 17,
+          "cap_lost_ids": [],
+          "probes": [
+            {
+              "id": "normal-move:50153ec1f544246ee7787b3ce07228364399d069fad9c29ac56e1bd64fc15607",
+              "native_violation": null
+            }
+          ],
+          "live_accepted_ids": ["normal-move:50153ec1f544246ee7787b3ce07228364399d069fad9c29ac56e1bd64fc15607"],
+          "selected_id": "normal-move:50153ec1f544246ee7787b3ce07228364399d069fad9c29ac56e1bd64fc15607"
+        },
+        {
+          "unit_id": "army-alpha:deep-strike-unit",
+          "actor_id": "player-a",
+          "action_request_id": "view-request-aff456e30547a80fbce3999535926e4a58796b1ea5e6a7f246056259b56755cd",
+          "proposal_request_id": "view-request-e6691e137f3aa0976ce8996095ae06fcc536b65b4184fa2e44611f15787d67e4",
+          "actor_view_hash": "8e9cb47d69f9c6587918a6ccaae59cdaf3517f55c2254fd51c9def53e82cf8bd",
+          "raw_count": 20,
+          "raw_ids_hash": "8c3243f0cdb3eb25a5a4004010d9b3cdbe815f72a17d60feb67a6ea7c650968b",
+          "eligible_ids": ["normal-move:fdc8517b57ceffa00ac215551478abc5d65636c81953efc76c87e55d4294231c"],
+          "geometry_excluded": 19,
+          "cap_lost_ids": [],
+          "probes": [
+            {
+              "id": "normal-move:fdc8517b57ceffa00ac215551478abc5d65636c81953efc76c87e55d4294231c",
+              "native_violation": null
+            }
+          ],
+          "live_accepted_ids": ["normal-move:fdc8517b57ceffa00ac215551478abc5d65636c81953efc76c87e55d4294231c"],
+          "selected_id": "normal-move:fdc8517b57ceffa00ac215551478abc5d65636c81953efc76c87e55d4294231c"
+        },
+        {
+          "unit_id": "army-beta:scout-redeploy-unit",
+          "actor_id": "player-b",
+          "action_request_id": "view-request-52cb37b26e96dcb346a01dbf7770f91701962e552e032a5c962289f88f2c8d88",
+          "proposal_request_id": "view-request-9e6624ec1ed89771220b6bcad8ef348053053b90cf6d26d5bac9f04a5253892f",
+          "actor_view_hash": "e04be4e226c70387c8a411eade592e743e6db1122f70685ccbe8702749311be6",
+          "raw_count": 18,
+          "raw_ids_hash": "69f7a3d3d8e21139150a420d691f187dcbb8410313ceaf8972d86213ddb8b730",
+          "eligible_ids": ["normal-move:7aef07b0772352ea7b225209bb9794b4bdf672a9a3dac1e65618d557c18bb5ce"],
+          "geometry_excluded": 17,
+          "cap_lost_ids": [],
+          "probes": [
+            {
+              "id": "normal-move:7aef07b0772352ea7b225209bb9794b4bdf672a9a3dac1e65618d557c18bb5ce",
+              "native_violation": "enemy_engagement_range_transit_forbidden"
+            }
+          ],
+          "live_accepted_ids": [],
+          "selected_id": "remain_stationary"
+        }
+      ],
+      "native_preflight": "passed",
+      "checkpoint": "55110f9eefc533a066fee77deb305603a774e171e2ae06afdcd503b7f1488237",
+      "event_log": "fea1d9924957de37a15b966b7928fe66a828c76b3deb793eedf0d5757a6d66d8",
+      "active_rng_draws": 0,
+      "active_rng_history_tokens": 569,
+      "strict_replay": true,
+      "gain_vp": {"player-a": 5, "player-b": 0},
+      "objectives_at_boundaries": [
+        {
+          "boundary": [3, "player-a", "fight", "turn_end"],
+          "record_id": "objective-control:round-03:player-a:fight:turn_end",
+          "objectives": {
+            "take-and-hold-vs-purge-the-foe-layout-3-attacker-home-01": {"oc": {"player-a": 0, "player-b": 0}, "controller": null, "unit_oc": {}},
+            "take-and-hold-vs-purge-the-foe-layout-3-central-01": {"oc": {"player-a": 0, "player-b": 0}, "controller": null, "unit_oc": {}},
+            "take-and-hold-vs-purge-the-foe-layout-3-central-02": {"oc": {"player-a": 0, "player-b": 0}, "controller": null, "unit_oc": {}},
+            "take-and-hold-vs-purge-the-foe-layout-3-defender-home-01": {"oc": {"player-a": 0, "player-b": 0}, "controller": null, "unit_oc": {}},
+            "take-and-hold-vs-purge-the-foe-layout-3-expansion-01": {"oc": {"player-a": 0, "player-b": 0}, "controller": null, "unit_oc": {}},
+            "take-and-hold-vs-purge-the-foe-layout-3-expansion-02": {"oc": {"player-a": 2, "player-b": 0}, "controller": "player-a", "unit_oc": {"army-alpha:deep-strike-unit": 2}}
+          }
+        },
+        {
+          "boundary": [3, "player-b", "fight", "turn_end"],
+          "record_id": "objective-control:round-03:player-b:fight:turn_end",
+          "objectives": {
+            "take-and-hold-vs-purge-the-foe-layout-3-attacker-home-01": {"oc": {"player-a": 0, "player-b": 0}, "controller": null, "unit_oc": {}},
+            "take-and-hold-vs-purge-the-foe-layout-3-central-01": {"oc": {"player-a": 0, "player-b": 0}, "controller": null, "unit_oc": {}},
+            "take-and-hold-vs-purge-the-foe-layout-3-central-02": {"oc": {"player-a": 0, "player-b": 0}, "controller": null, "unit_oc": {}},
+            "take-and-hold-vs-purge-the-foe-layout-3-defender-home-01": {"oc": {"player-a": 0, "player-b": 0}, "controller": null, "unit_oc": {}},
+            "take-and-hold-vs-purge-the-foe-layout-3-expansion-01": {"oc": {"player-a": 0, "player-b": 0}, "controller": null, "unit_oc": {}},
+            "take-and-hold-vs-purge-the-foe-layout-3-expansion-02": {"oc": {"player-a": 2, "player-b": 0}, "controller": "player-a", "unit_oc": {"army-alpha:deep-strike-unit": 2}}
+          }
+        },
+        {
+          "boundary": [4, "player-a", "command", "phase_end"],
+          "record_id": "objective-control:round-04:player-a:command:phase_end",
+          "objectives": {
+            "take-and-hold-vs-purge-the-foe-layout-3-attacker-home-01": {"oc": {"player-a": 0, "player-b": 0}, "controller": null, "unit_oc": {}},
+            "take-and-hold-vs-purge-the-foe-layout-3-central-01": {"oc": {"player-a": 0, "player-b": 0}, "controller": null, "unit_oc": {}},
+            "take-and-hold-vs-purge-the-foe-layout-3-central-02": {"oc": {"player-a": 0, "player-b": 0}, "controller": null, "unit_oc": {}},
+            "take-and-hold-vs-purge-the-foe-layout-3-defender-home-01": {"oc": {"player-a": 0, "player-b": 0}, "controller": null, "unit_oc": {}},
+            "take-and-hold-vs-purge-the-foe-layout-3-expansion-01": {"oc": {"player-a": 0, "player-b": 0}, "controller": null, "unit_oc": {}},
+            "take-and-hold-vs-purge-the-foe-layout-3-expansion-02": {"oc": {"player-a": 2, "player-b": 0}, "controller": "player-a", "unit_oc": {"army-alpha:deep-strike-unit": 2}}
+          }
+        }
+      ],
+      "awards": [
+        {
+          "player": "player-a",
+          "boundary_id": "objective-control:round-04:player-a:command:phase_end",
+          "rule": "immovable-object-rounds-two-to-four-command",
+          "vp": 5,
+          "objective_ids": ["take-and-hold-vs-purge-the-foe-layout-3-expansion-02"],
+          "vp_by_objective": {"take-and-hold-vs-purge-the-foe-layout-3-expansion-02": 5}
+        }
+      ],
+      "material": {"model_count": 12, "wounds": 34, "wound_delta": 0}
+    }
+  },
+  "origin": {
+    "checkpoint": "f7d263deefb3facb0dfaabe58df7371929dcda0d13488f88b8c7e2ee7c04a393",
+    "event_log": "fb22f83cbb3890e655fc764abc1cbccd22991f2cb7ad398ec7b6f487ab846398",
+    "active_rng_draws": 0,
+    "active_rng_history_tokens": 406,
+    "strict_replay": true,
+    "record_count": 46,
+    "pending_request_id": "view-request-f623ea4f4e284d903fdd5f0809c43302749a2c1167275f83b9b69d5d5f5d2ae2"
+  },
+  "ally_gain_after_hold": 0,
+  "ally_gain_after_screen": 5
+}
