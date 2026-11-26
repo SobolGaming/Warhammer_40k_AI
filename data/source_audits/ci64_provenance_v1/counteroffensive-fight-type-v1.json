@@ -1,12 +1,12 @@
 {
   "schema": "finite-counteroffensive-fight-type-v1",
-  "base": "dec50bca2394c755a0d5fb76e6659882b388c032",
+  "base": "55eef9b20652b030d3ab3e9b85755e0acd7c2d49",
   "retained_normal_move_sha256": "bf15b3ce40bd26cc9c1af4da30a21fc17cd475c8f849bceabf8407f3fa9348a0",
-  "retained_runtime_fingerprint": "40b91df8a39aa85afd3503b466b7bcab93c87d70db8189243bc9c5d70f924e1a",
-  "runtime_fingerprint": "1bfd3b67d2fbe5eb2df35cd0c17ab30974c90d1efdf3b0fe2e7167a16655198a",
+  "retained_runtime_fingerprint": "6a62fab60ddf5b30cb9651f7a2ec7140e06765f9c35eec1abd625e1f5814caec",
+  "runtime_fingerprint": "366591e46acc04772907dd25b78727cfb8b6688e8e07c4a1795c2fb47499c0c0",
   "runtime_manifest": {
-    "before": "1701a163d58756209054de421d459e057faedfb3cf670c72d9e3c5f9efc5edaa",
-    "after": "aec731a65984f58492e1401edb05cfc0f1876ff009c7cc13395416c858a99a17"
+    "before": "011c4baa764d5c8062632b8f19c4f4fcfe5925b5744afce28fba77ed84800720",
+    "after": "a443af2c1cc3bb5c4f56e81d566fbfea0f994bc846c0237896abace3e517322e"
   },
   "sources": {
     "src/warhammer40k_core/engine/fight_activation_requests.py": {
@@ -37,15 +37,15 @@
   "origin_test": {
     "before": {
       "mode": "100644",
-      "bytes": 12073,
-      "sha256": "7d98b29916544db1d2d973173e041af7f8f3c91c241054b3a13ed0cbaf52d84f",
-      "blob_sha1": "66a502beeefdb9f2566252aa6967fee2cb7353e9"
+      "blob_sha1": "d8e47d43a7b3177e973ca4e4749f7f8c976d95e0",
+      "sha256": "9c65c252a42ca011e78d94203baabd550c97c9782de45ed9b5b6d0b9a6c92b0b",
+      "bytes": 11818
     },
     "after": {
       "mode": "100644",
-      "bytes": 12073,
-      "sha256": "884e1b7df5879af196d4001a5dc14ffa321894da156d7a1580a17cae08fc3c19",
-      "blob_sha1": "9643e67aa379c57b4e344109c5ef47afdc70010a"
+      "bytes": 11818,
+      "sha256": "9c65c252a42ca011e78d94203baabd550c97c9782de45ed9b5b6d0b9a6c92b0b",
+      "blob_sha1": "d8e47d43a7b3177e973ca4e4749f7f8c976d95e0"
     }
   },
   "added_files": {
@@ -62,5 +62,6 @@
     "tests/rules/section12/test_counteroffensive_fight_type.py::test_counteroffensive_preserves_native_fight_type[overrun]",
     "tests/rules/section12/test_counteroffensive_fight_type.py::test_counteroffensive_preserves_native_fight_type[single-overrun]",
     "tests/rules/section12/test_counteroffensive_fight_type.py::test_counteroffensive_resolves_dark_pact_before_melee"
-  ]
+  ],
+  "retained_charge_cp_policy_sha256": "aa842ec7a250b3d696b37faf552238f6144c0f30fcaaf8152996609c4317540e"
 }

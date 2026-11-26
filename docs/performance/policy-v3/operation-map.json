@@ -6,9 +6,7 @@
       "driver": "scripts/measure_cavalcade_full_game.py",
       "historical_workload_reference": "scripts/fixtures/cavalcade_full_game_v1.json",
       "registered_full_game_fixture": "scripts/fixtures/cavalcade_full_game_v1.json",
-      "cases": [
-        "setup-to-game-completed"
-      ],
+      "cases": ["setup-to-game-completed"],
       "samples_per_case": 1,
       "budget_profile": "current-change-relative-v1",
       "workload_id": "cavalcade-v995-setup-to-complete-v1"
@@ -379,20 +377,13 @@
         "TurnEndHookRegistry.candidates_for",
         "validate_record_event_closure"
       ],
-      "families": [
-        "cavalcade-authority-comparison"
-      ],
+      "families": ["cavalcade-authority-comparison"],
       "mandatory": true,
       "sensitive": true
     },
     "cavalcade-pending-authority-regression": {
-      "paths": [
-        "tests/code_quality/test_battle_shock_resolution_contract.py"
-      ],
-      "owners": [
-        "@module",
-        "test_pending_outcome_route_requires_exact_negative_provenance"
-      ],
+      "paths": ["tests/code_quality/test_battle_shock_resolution_contract.py"],
+      "owners": ["@module", "test_pending_outcome_route_requires_exact_negative_provenance"],
       "families": [],
       "mandatory": true,
       "sensitive": false
@@ -402,9 +393,7 @@
         "scripts/measure_cavalcade_full_game.py",
         "scripts/fixtures/cavalcade_full_game_v1.json"
       ],
-      "owners": [
-        "*"
-      ],
+      "owners": ["*"],
       "families": [],
       "mandatory": true,
       "sensitive": false
@@ -425,12 +414,8 @@
       "mandatory": true
     },
     "stage2-strict-replay-regression": {
-      "paths": [
-        "tests/rules/section21/test_persistence.py"
-      ],
-      "owners": [
-        "test_strict_persistence_rejects_valid_artifact_with_mismatched_metadata_or_tails"
-      ],
+      "paths": ["tests/rules/section21/test_persistence.py"],
+      "owners": ["test_strict_persistence_rejects_valid_artifact_with_mismatched_metadata_or_tails"],
       "families": [],
       "sensitive": false,
       "mandatory": true
@@ -36826,6 +36811,7 @@
         "src/warhammer40k_core/engine/lifecycle_reaction_queue.py",
         "src/warhammer40k_core/engine/phases/fight.py",
         "src/warhammer40k_core/engine/stratagems_effect_handlers.py",
+        "tests/code_quality/test_engine_numerical_identity_admission.py",
         "tests/code_quality/test_order135_counteroffensive_band_authority.py",
         "tests/rules/section12/test_counteroffensive_fight_type.py"
       ],
@@ -36865,6 +36851,7 @@
         "request_fight_activation",
         "test_counteroffensive_preserves_native_fight_type",
         "test_counteroffensive_resolves_dark_pact_before_melee",
+        "test_identity_inventory_uses_current_twelve_shards_and_native_cohort",
         "test_pre_grant_query_scope_is_explicit_and_confined_to_core_counter",
         "validate_melee_reaction_continuation",
         "validate_reaction_queue_consistency",
@@ -36889,12 +36876,8 @@
       "mandatory": true
     },
     "critical-wounds-export-type-checking": {
-      "paths": [
-        "src/warhammer40k_core/engine/critical_wounds.py"
-      ],
-      "owners": [
-        "@text"
-      ],
+      "paths": ["src/warhammer40k_core/engine/critical_wounds.py"],
+      "owners": ["@text"],
       "families": [],
       "sensitive": false,
       "mandatory": true
@@ -37060,17 +37043,13 @@
       "paths": [
         "data/source_audits/ci64_provenance_v1/gameplay-movement-budget-test-transition-v1.json"
       ],
-      "owners": [
-        "*"
-      ],
+      "owners": ["*"],
       "families": [],
       "sensitive": false,
       "mandatory": true
     },
     "gameplay-movement-decision-staging": {
-      "paths": [
-        "src/warhammer40k_core/engine/decision_controller.py"
-      ],
+      "paths": ["src/warhammer40k_core/engine/decision_controller.py"],
       "owners": [
         "@module",
         "DecisionController",
@@ -37079,10 +37058,7 @@
         "DecisionController.movement_request_for_result",
         "_PreparedMovementResult"
       ],
-      "families": [
-        "player_boundary",
-        "reconstruction"
-      ],
+      "families": ["player_boundary", "reconstruction"],
       "sensitive": true,
       "mandatory": true
     },
@@ -37095,49 +37071,28 @@
         "_apply_charge_move_proposal_decision",
         "apply_catalog_setup_reactive_charge_move"
       ],
-      "families": [
-        "movement"
-      ],
+      "families": ["movement"],
       "sensitive": true,
       "mandatory": true
     },
     "gameplay-scout-certificate-commit": {
-      "paths": [
-        "src/warhammer40k_core/engine/setup_flow.py"
-      ],
-      "owners": [
-        "SetupFlow.apply_decision"
-      ],
-      "families": [
-        "movement",
-        "setup"
-      ],
+      "paths": ["src/warhammer40k_core/engine/setup_flow.py"],
+      "owners": ["SetupFlow.apply_decision"],
+      "families": ["movement", "setup"],
       "sensitive": true,
       "mandatory": true
     },
     "gameplay-native-charge-retry-test": {
-      "paths": [
-        "tests/rules/section11/test_moves.py"
-      ],
-      "owners": [
-        "test_native_charge_certification_timeout_leaves_the_same_proposal_retryable"
-      ],
+      "paths": ["tests/rules/section11/test_moves.py"],
+      "owners": ["test_native_charge_certification_timeout_leaves_the_same_proposal_retryable"],
       "families": [],
       "sensitive": false,
       "mandatory": true
     },
     "gameplay-live-movement-history-occurrence": {
-      "paths": [
-        "src/warhammer40k_core/engine/event_log.py"
-      ],
-      "owners": [
-        "EventLog.owns_record_at"
-      ],
-      "families": [
-        "movement",
-        "player_boundary",
-        "reconstruction"
-      ],
+      "paths": ["src/warhammer40k_core/engine/event_log.py"],
+      "owners": ["EventLog.owns_record_at"],
+      "families": ["movement", "player_boundary", "reconstruction"],
       "sensitive": true,
       "mandatory": true
     },
@@ -37164,9 +37119,7 @@
       "mandatory": true
     },
     "gameplay-native-escape-reroll-test": {
-      "paths": [
-        "tests/rules/section09/test_fall_back.py"
-      ],
+      "paths": ["tests/rules/section09/test_fall_back.py"],
       "owners": [
         "escape_reroll_definitions",
         "test_native_escape_battle_shock_reroll_reuses_certified_path"
@@ -37191,9 +37144,7 @@
       "paths": [
         "contracts/compatibility/48.0.0-shape.json"
       ],
-      "owners": [
-        "*"
-      ],
+      "owners": ["*"],
       "families": [],
       "sensitive": false,
       "mandatory": true
@@ -37775,6 +37726,11 @@
     "bounded-charge-flight-wall-proof": {
       "paths": [
         "src/warhammer40k_core/ai/charge_flight_admission.py",
+        "src/warhammer40k_core/ai/charge_cp_policy.py",
+        "src/warhammer40k_core/adapters/charge_declaration_session.py",
+        "tests/infrastructure/adapters/test_charge_cp_policy.py",
+        "data/source_audits/ci64_provenance_v1/charge-cp-policy-test-v1.json",
+        "scripts/stage2_ground_charge_test_admission.py",
         "tests/infrastructure/adapters/test_charge_flight_barrier.py",
         "tests/infrastructure/adapters/test_charge_flight_onslaught_timing.py",
         "tests/code_quality/test_engine_numerical_identity_admission.py",

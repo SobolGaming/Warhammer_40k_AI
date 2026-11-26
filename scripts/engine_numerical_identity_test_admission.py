@@ -1317,11 +1317,42 @@ COMBINED_CHARGE_TRANSITION_SHA256 = (
 COMBINED_CHARGE_BASE = "4d753ec652ee38b394260d3f539df7b04403149b"
 
 
+CHARGE_CP_TEST_ADDITION = "data/source_audits/ci64_provenance_v1/charge-cp-policy-test-v1.json"
+CHARGE_CP_POLICY_SOURCE = "src/warhammer40k_core/ai/charge_cp_policy.py"
+CHARGE_DECLARATION_SOURCE = "src/warhammer40k_core/adapters/charge_declaration_session.py"
+
+
+class _ChargeCpTestAddition(TypedDict):
+    base: str
+    policy_sha256: str
+    declaration_sha256: str
+    retained_manifest_sha256: str
+    manifest_sha256: str
+    runtime_fingerprint: str
+    added_files: dict[str, dict[str, object]]
+    added_cases: list[str]
+    origin_test: dict[str, dict[str, object]]
+
+
+def _charge_cp_test_addition(root: Path) -> tuple[_ChargeCpTestAddition, bytes] | None:
+    path = CHARGE_CP_TEST_ADDITION
+    _selection_no_links(root, root / path)
+    if not (root / path).exists():
+        return None
+    raw = _checked_bytes(
+        root, path, "aa842ec7a250b3d696b37faf552238f6144c0f30fcaaf8152996609c4317540e"
+    )
+    record = cast(_ChargeCpTestAddition, json.loads(raw, object_pairs_hook=_selection_object))
+    if record.keys() != _ChargeCpTestAddition.__required_keys__:
+        raise SystemExit("Charge CP policy receipt fields differ.")
+    return record, raw
+
+
 COUNTEROFFENSIVE_FIGHT_TYPE_TRANSITION = (
     "data/source_audits/ci64_provenance_v1/counteroffensive-fight-type-v1.json"
 )
 COUNTEROFFENSIVE_FIGHT_TYPE_SHA256 = (
-    "ebb1f144169b8c6ebf06cf14df0a44f17c562632a1660e150e97db4a764642e7"
+    "1ea4ddd8a83e3a329803269811425b1f9497509e9133a5e83829552ca6445f76"
 )
 COUNTEROFFENSIVE_FIGHT_TYPE_OWNER = "tests/rules/section12/test_counteroffensive_fight_type.py"
 _COUNTEROFFENSIVE_FIGHT_TYPE_SOURCES = {
@@ -1338,6 +1369,7 @@ class _CounteroffensiveFightTypeReceipt(TypedDict):
     schema: str
     base: str
     retained_normal_move_sha256: str
+    retained_charge_cp_policy_sha256: str
     retained_runtime_fingerprint: str
     runtime_fingerprint: str
     runtime_manifest: dict[str, str]
@@ -1363,7 +1395,7 @@ def _counteroffensive_fight_type_transition(
     if (
         receipt.keys() != _CounteroffensiveFightTypeReceipt.__required_keys__
         or receipt["schema"] != "finite-counteroffensive-fight-type-v1"
-        or receipt["base"] != "dec50bca2394c755a0d5fb76e6659882b388c032"
+        or receipt["base"] != "55eef9b20652b030d3ab3e9b85755e0acd7c2d49"
         or receipt["runtime_fingerprint"] == receipt["retained_runtime_fingerprint"]
         or receipt["sources"].keys() != _COUNTEROFFENSIVE_FIGHT_TYPE_SOURCES
         or receipt["origin_test"].keys() != {"before", "after"}
@@ -1405,29 +1437,45 @@ def combined_charge_runtime(root: Path, flight_raw: bytes, retry_raw: bytes) -> 
     from scripts.stage2_ground_charge_test_admission import load_normal_move_admission
 
     normal_move = load_normal_move_admission(root)
+    charge_cp = _charge_cp_test_addition(root)
+    counter = _counteroffensive_fight_type_transition(root)
+    counter_receipt = None if counter is None else counter[0]
+    if counter_receipt is not None and (charge_cp is None or normal_move is None):
+        raise SystemExit("Counteroffensive Fight types require the Charge CP policy predecessor.")
     if normal_move is not None:
-        counter = _counteroffensive_fight_type_transition(root)
-        counter_receipt = None if counter is None else counter[0]
-        normal_runtime = normal_move.admit_runtime(
+        successor = None
+        if charge_cp is not None:
+            cp_receipt, cp_raw = charge_cp
+            manifest_after = cp_receipt["manifest_sha256"]
+            if counter_receipt is not None:
+                if (
+                    counter_receipt["retained_normal_move_sha256"]
+                    != hashlib.sha256(normal_move.raw).hexdigest()
+                    or counter_receipt["retained_charge_cp_policy_sha256"]
+                    != hashlib.sha256(cp_raw).hexdigest()
+                    or counter_receipt["retained_runtime_fingerprint"]
+                    != cp_receipt["runtime_fingerprint"]
+                    or counter_receipt["runtime_manifest"]["before"] != manifest_after
+                    or counter_receipt["origin_test"]["before"]
+                    != cp_receipt["origin_test"]["after"]
+                ):
+                    raise SystemExit(
+                        "Counteroffensive Fight types differ from the exact predecessor."
+                    )
+                manifest_after = counter_receipt["runtime_manifest"]["after"]
+            successor = (cp_receipt["retained_manifest_sha256"], manifest_after)
+        runtime = normal_move.admit_runtime(
             root,
             predecessor=receipt,
             fingerprint=fingerprint,
             manifest_sha256=binding["combined_manifest_sha256"],
-            manifest_successor=None
-            if counter_receipt is None
-            else counter_receipt["runtime_manifest"],
+            successor=successor,
         )
-        if counter_receipt is None:
-            return normal_runtime
-        if (
-            counter_receipt["retained_normal_move_sha256"]
-            != hashlib.sha256(normal_move.raw).hexdigest()
-            or counter_receipt["retained_runtime_fingerprint"] != normal_runtime
-        ):
-            raise SystemExit(
-                "Counteroffensive Fight types require the exact Normal Move predecessor."
-            )
-        return counter_receipt["runtime_fingerprint"]
+        if counter_receipt is not None:
+            return counter_receipt["runtime_fingerprint"]
+        return runtime if charge_cp is None else charge_cp[0]["runtime_fingerprint"]
+    if charge_cp is not None:
+        raise SystemExit("Charge CP policy requires the Normal Move predecessor.")
     _checked_bytes(root, MANIFEST, binding["combined_manifest_sha256"])
     return fingerprint
 
@@ -2151,31 +2199,33 @@ def exact_movement_test_transition(
             root, runtime=pact[0], predecessor=pact[3]
         )
         retry_addition = (retry_tests, retry_raw)
+    charge_cp = _charge_cp_test_addition(root)
+    identity_runtime = None
+    if charge_cp is not None and (
+        normal_move is None or flight_runtime is None or retry_runtime is None
+    ):
+        raise SystemExit("Charge CP policy requires the complete Normal Move lineage.")
     if flight_runtime is not None and retry_runtime is not None:
         if flight_addition is None or retry_addition is None:
             raise SystemExit("Combined Charge source admission is incomplete.")
-        runtime = combined_charge_runtime(root, flight_addition[1], retry_addition[1])
+        identity_runtime = combined_charge_runtime(root, flight_addition[1], retry_addition[1])
+        runtime = identity_runtime
+        if charge_cp is not None and normal_move is not None:
+            # The constructed origin stays bound to the historical Normal Move runtime.
+            runtime = normal_move.receipt["runtime_fingerprint"]
     elif flight_runtime is not None:
         runtime = flight_runtime
     elif retry_runtime is not None:
         runtime = retry_runtime
-    if counter_receipt is not None and normal_move is None:
-        raise SystemExit("Counteroffensive Fight types require the Normal Move predecessor.")
     if normal_move is not None and (
-        screen is None
-        or runtime
-        != (
-            normal_move.receipt["runtime_fingerprint"]
-            if counter_receipt is None
-            else counter_receipt["runtime_fingerprint"]
-        )
+        screen is None or runtime != normal_move.receipt["runtime_fingerprint"]
     ):
         raise SystemExit("Normal Move tests require the exact Screen and combined Charge lineage.")
 
     retained = _identity_test_transition(
         root,
         retained_cutover_sha256,
-        runtime=runtime,
+        runtime=runtime if identity_runtime is None else identity_runtime,
         source_successors=source_successors,
         test_successors={**test_successors, **opening_tests},
     )
@@ -2357,13 +2407,16 @@ def exact_movement_test_transition(
             raise SystemExit("Normal Move tests overlap predecessor tests.")
         additions.update(normal_tests)
         raw += b"\0" + normal_move.raw
+    origin_successor = None if charge_cp is None else charge_cp[0]["origin_test"]
+    if counter_receipt is not None:
+        if origin_successor is None:
+            raise SystemExit("Counteroffensive Fight types require the Charge CP origin test.")
+        origin_successor = {
+            "before": origin_successor["before"],
+            "after": counter_receipt["origin_test"]["after"],
+        }
     origin = normal_move_origin_test_addition(
-        root,
-        predecessor=normal_move,
-        runtime=runtime
-        if counter_receipt is None
-        else counter_receipt["retained_runtime_fingerprint"],
-        successor=None if counter_receipt is None else counter_receipt["origin_test"],
+        root, predecessor=normal_move, runtime=runtime, successor=origin_successor
     )
     if origin is not None:
         origin_tests, origin_raw = origin
@@ -2371,6 +2424,15 @@ def exact_movement_test_transition(
             raise SystemExit("Constructed Normal Move origin tests overlap predecessor tests.")
         additions.update(origin_tests)
         raw += b"\0" + origin_raw
+    if charge_cp is not None:
+        cp_receipt, cp_raw = charge_cp
+        _checked_bytes(root, CHARGE_CP_POLICY_SOURCE, cp_receipt["policy_sha256"])
+        _checked_bytes(root, CHARGE_DECLARATION_SOURCE, cp_receipt["declaration_sha256"])
+        cp_tests = _selection_members(cp_receipt["added_files"], root)
+        if cp_tests.keys() & (updated.keys() | added.keys() | additions.keys()):
+            raise SystemExit("Charge CP policy tests overlap the predecessor selection.")
+        additions.update(cp_tests)
+        raw += b"\0" + cp_raw
     if counter_fight_type is not None:
         counter_receipt, counter_raw = counter_fight_type
         counter_tests = _selection_members(counter_receipt["added_files"], root)

@@ -3370,3 +3370,36 @@ The approved 40k.app references corroborate
 [Stratagems](https://www.40k.app/rules/15-stratagems),
 [Flying and Surging](https://www.40k.app/rules/21-flying-and-surging), and
 [Blood Legion](https://www.40k.app/factions/chaos-daemons/detachments/blood-legion).
+
+#### Stage 3 policy: opt-in late Onslaught across the Dense wall
+
+`choose_dense_wall_charge` takes the caller's fixed unit, target and straight
+witness. It reuses the no-spend wall proof. By default it returns the native
+flight declaration. With `allow_late_onslaught=True`, it considers ground
+only if the current native eligibility check admits a 1 CP Onslaught for
+this mover, the witness needs the grant, and native validation certifies
+the witness with that grant at every target-reachable budget. Ground must
+also exceed flight's target-filter ceiling under that condition. Unsupported
+wall cases retain the existing unresolved behavior.
+
+The caller wraps its live `LocalGameSession` in a `ChargeDeclarationSession`
+and passes that adapter to `submit_dense_wall_charge` before the roll. The
+adapter hashes the live player observation before routing the issued option
+through the native declaration. It records that hash and the accepted option
+against the active ground selection. Decline Command Re-roll for the natural
+2D6 comparison. A conditional ground plan holds no CP or phase use.
+After the roll, the caller passes the same adapter to `select_late_onslaught`.
+The adapter requires its accepted observation and ground option to match the
+plan, with the visible battlefield still matching the declaration. This
+binding is local to the live adapter. Replay uses the native recorded
+decisions. The opt-in accepts only Boolean values. Eligibility is checked
+again against the live, issued post-roll option, including CP and phase usage.
+A short roll gives no spend action. Flight keeps the native penalty and never
+uses this spending policy. The caller submits the original witness through the native proposal
+route after selecting the fixed target.
+
+The fixture retains flight's 10/36 witnessed outcomes at 0 CP and ground's
+3/36 no-spend upper bound. Conditional ground completes on 21/36 rolls and
+spends exactly 1 CP on each completion if the offer is still available
+(21/36 CP per attempt under that condition). This measures the fixed witness
+and resource cost for one attempt.
