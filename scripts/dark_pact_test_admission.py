@@ -63,7 +63,9 @@ def _read_receipt(root: Path) -> tuple[dict[str, object], bytes] | None:
     return record, raw
 
 
-def dark_pact_source_successors(root: Path) -> dict[str, dict[str, str]]:
+def dark_pact_source_successors(
+    root: Path, *, current_sources: dict[str, dict[str, str]] | None = None
+) -> dict[str, dict[str, str]]:
     read = _read_receipt(root)
     if read is None:
         return {}
@@ -71,11 +73,17 @@ def dark_pact_source_successors(root: Path) -> dict[str, dict[str, str]]:
     row = record["retained_lifecycle"]
     path = root / LIFECYCLE_SOURCE
     _selection_no_links(root, path)
+    successor = None if current_sources is None else current_sources.get(LIFECYCLE_SOURCE)
+    current_digest = hashlib.sha256(path.read_bytes()).hexdigest()
     if (
         not isinstance(row, dict)
         or row.keys() != {"before", "after"}
         or not isinstance(row["before"], str)
-        or row["after"] != hashlib.sha256(path.read_bytes()).hexdigest()
+        or (
+            row["after"] != current_digest
+            if successor is None
+            else row["after"] != successor["before"] or current_digest != successor["after"]
+        )
     ):
         raise SystemExit("Dark Pact lifecycle successor differs.")
     return {LIFECYCLE_SOURCE: row}
@@ -121,7 +129,11 @@ def dark_pact_active_successors(root: Path, retained: Members) -> Members:
 
 
 def dark_pact_test_transition(
-    root: Path, *, runtime: str, active_successors: Members
+    root: Path,
+    *,
+    runtime: str,
+    active_successors: Members,
+    test_successor: Members | None = None,
 ) -> tuple[str, Members, Members, bytes] | None:
     read = _read_receipt(root)
     if read is None:
@@ -130,9 +142,11 @@ def dark_pact_test_transition(
     fingerprint = record["runtime_fingerprint"]
     if record["retained_runtime_fingerprint"] != runtime or not isinstance(fingerprint, str):
         raise SystemExit("Dark Pact tests require the exact retained runtime predecessor.")
-    return (
-        fingerprint,
-        active_successors,
-        _selection_members(record["added_files"], root),
-        raw,
-    )
+    added_files = record["added_files"]
+    if test_successor is not None:
+        if test_successor.keys() != {"before", "after"} or added_files != {
+            NEW_TEST: test_successor["before"]
+        }:
+            raise SystemExit("Dark Pact timing test successor differs from its predecessor.")
+        added_files = {NEW_TEST: test_successor["after"]}
+    return fingerprint, active_successors, _selection_members(added_files, root), raw

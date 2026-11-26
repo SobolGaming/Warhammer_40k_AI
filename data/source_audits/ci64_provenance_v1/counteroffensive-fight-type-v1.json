@@ -1,0 +1,83 @@
+{
+  "schema": "finite-counteroffensive-fight-type-v1",
+  "base": "f7fcd013ae67b51945beb4dc71c57edbb2b0015e",
+  "retained_normal_move_sha256": "bf15b3ce40bd26cc9c1af4da30a21fc17cd475c8f849bceabf8407f3fa9348a0",
+  "retained_runtime_fingerprint": "2d9f15526ffb5d9e4beece2176972f35e8396c6e4519f950f8838a16f4c713fa",
+  "runtime_fingerprint": "c5732ba60d52525e3b628792bb9cd03bdac3ed82834e6c5a7f09e57f1ffd3443",
+  "runtime_manifest": {
+    "before": "6f3b38d81c97fd2950a2ebc77b03439f843c9db402a2c6fdc77a2a4d5144b048",
+    "after": "50a4f1255d34d13d06257f05352c43b9d591ea23fcd35efe0b56c91009a49f57"
+  },
+  "sources": {
+    "src/warhammer40k_core/engine/fight_activation_requests.py": {
+      "before": "ed5eff1db7580118ba8202e091a413ea199680d40384f21e89c254486cdf0aed",
+      "after": "8c61e7de0e2f8c51a480782c1ca9e68b8f40b009bc3a0bb0dacdd66acaa75777"
+    },
+    "src/warhammer40k_core/engine/fight_order.py": {
+      "before": "f0942554275868586fa1a59b8ac135eb1557ff23b705614f6958bcb101995899",
+      "after": "8937a8178db5ab185c1c3574accbf21b469ed0b4620b3a273985d3da4bebd7d4"
+    },
+    "src/warhammer40k_core/engine/lifecycle.py": {
+      "before": "a8ff6864a1e25ac197fcbed1fb02e12db3c0368825d9004f123be28543c59021",
+      "after": "c93e1464838747360fa1ef1a1efc3b6ce20ea695567dce1b8a0f88432243e050"
+    },
+    "src/warhammer40k_core/engine/lifecycle_reaction_queue.py": {
+      "before": "91b8ae84f3b83578014182e34eea39d37c6d96e2e2457fee12d105b092307960",
+      "after": "eee9e014714e49b20f6fcdf3f823ccb460e5539a21224c81674ec3e49061f9e8"
+    },
+    "src/warhammer40k_core/engine/phases/fight.py": {
+      "before": "5b329d78d216336e141692e00cca125d4ffb743ef216a3b0f814ceeaddb7518b",
+      "after": "45a3a1143366cbebb27e629e069c65890dd7eb8d2413f6cab7a9ed292bf08fcd"
+    },
+    "src/warhammer40k_core/engine/stratagems_effect_handlers.py": {
+      "before": "eeec51078f3a0a00e066660cffb0ceac98e6544e8995fc330b3cd7f61bb6a3bd",
+      "after": "1a7115ec1131b04a9d52dcb89585d3af35992798020079ad64105cb813469306"
+    }
+  },
+  "origin_test": {
+    "before": {
+      "mode": "100644",
+      "blob_sha1": "d8e47d43a7b3177e973ca4e4749f7f8c976d95e0",
+      "sha256": "9c65c252a42ca011e78d94203baabd550c97c9782de45ed9b5b6d0b9a6c92b0b",
+      "bytes": 11818
+    },
+    "after": {
+      "mode": "100644",
+      "bytes": 11818,
+      "sha256": "9c65c252a42ca011e78d94203baabd550c97c9782de45ed9b5b6d0b9a6c92b0b",
+      "blob_sha1": "d8e47d43a7b3177e973ca4e4749f7f8c976d95e0"
+    }
+  },
+  "added_files": {
+    "tests/rules/section12/test_counteroffensive_fight_type.py": {
+      "mode": "100644",
+      "bytes": 21054,
+      "sha256": "55e7baac304ecd4796e9a624275b67b39f100a92658ca72b20a92489cd39748e",
+      "blob_sha1": "762872e27fc8df2e106b73c9cb91a24433dcc038"
+    }
+  },
+  "added_cases": [
+    "tests/rules/section12/test_counteroffensive_fight_type.py::test_counteroffensive_preserves_native_fight_type[decline]",
+    "tests/rules/section12/test_counteroffensive_fight_type.py::test_counteroffensive_preserves_native_fight_type[normal]",
+    "tests/rules/section12/test_counteroffensive_fight_type.py::test_counteroffensive_preserves_native_fight_type[overrun]",
+    "tests/rules/section12/test_counteroffensive_fight_type.py::test_counteroffensive_preserves_native_fight_type[single-overrun]",
+    "tests/rules/section12/test_counteroffensive_fight_type.py::test_counteroffensive_resolves_dark_pact_before_melee"
+  ],
+  "retained_charge_cp_policy_sha256": "aa842ec7a250b3d696b37faf552238f6144c0f30fcaaf8152996609c4317540e",
+  "dark_pact_test": {
+    "before": {
+      "mode": "100644",
+      "blob_sha1": "09eeb70ebb666340fd1ff81985203aaeea8f049c",
+      "sha256": "af0a2326c0996aff5b8515e5e4cd3400b41ab9b62c126013ee9a5d528e221dec",
+      "bytes": 36171
+    },
+    "after": {
+      "mode": "100644",
+      "bytes": 29210,
+      "sha256": "40af45242d98bcfcfe892740982849367a2d1c56f12c5be68a5b4d340ec2f21e",
+      "blob_sha1": "1d1c020afa3b1ad87a02568fc51ab93b7b9aafb9"
+    }
+  },
+  "dark_pact_fixture_sha256": "89eebdab728dcffbcc0d81408f3ac6af8736372c5336e8c69945cad61eb9389e",
+  "retained_daemonic_terror_sha256": "68e641b2079eaeff94bc4c0724d5662293682512e276bd72dfbf936b60b64c2e"
+}

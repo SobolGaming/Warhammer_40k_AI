@@ -35,9 +35,10 @@ def test_pre_grant_query_scope_is_explicit_and_confined_to_core_counter() -> Non
         ("stratagems_geometry.py", "_counteroffensive_target_context_error"),
     }
     assert actual == {
+        ("fight_activation_requests.py", "counteroffensive_fight_context", "False"),
         ("phases/fight.py", "request_counteroffensive_if_available", "False"),
+        ("phases/fight.py", "invalid_fight_activation_status", "not interrupted"),
         ("stratagems_eligibility.py", "_handler_unavailable_reason", "False"),
-        ("stratagems_effect_handlers.py", "_apply_counteroffensive_handler", "False"),
         (
             "stratagems_geometry.py",
             "_counteroffensive_target_context_error",
