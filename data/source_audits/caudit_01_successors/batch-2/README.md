@@ -36,6 +36,14 @@ and original replay identities. #754 introduced a different runtime build
 identity and an opt-in Charge path. Case evidence from the earlier commit
 retains the scope of its original fixture and asserted path.
 
+Counteroffensive's `15.12-cost` points to the existing #755 assertion record
+for the passing `[opponent]` case. Its accepted native branch checks the
+two-CP debit and recorded cost. FAQ 49's recipient-selection record links
+all eight parameterized cases to their relevant casualty assertions. The
+four retained cases also link the retention-selection event and the nested
+saved-placement check. The four ordinary-death controls do not use those
+helpers.
+
 The retained Order 135 capture has 350 source rows. The November 26,
 06:21 UTC Game Datamissions body observation yielded 349 matches, one
 changed row and 11 additions. The [source adoption map](source-adoption-map.json)

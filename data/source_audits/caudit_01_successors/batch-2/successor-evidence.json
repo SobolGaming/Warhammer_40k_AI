@@ -17637,7 +17637,7 @@
       "source": "assert {v.violation_code for v in validate_roster_legality(catalog=c, request=wrong).violations} == {'attachment_declaration_invalid'}"
     }
   },
-  "called_helper_assertion_scope": "The pinned assert and replay helpers are direct syntactic call sites. Case outcomes and each obligation's asserted scope govern branch credit.",
+  "called_helper_assertion_scope": "Records pin material test helper assertions to their source files. Per-case links identify the applicable branches when present.",
   "called_helper_assertions": {
     "tests/rules/section10/test_indirect.py::test_hidden_target_can_be_spotted_by_a_different_friendly_unit": {
       "tests/support/section10_fixtures.py::assert_valid": {
@@ -17991,6 +17991,84 @@
             }
           ],
           "file_sha256": "dcf6ad6c252e5a18628b0ca549ea24f2e1abbcbcc0c5ede01526ff52b46b5ac3"
+        }
+      }
+    },
+    "tests/rules/section19/test_retained_scope.py::test_conditional_recipient_selection_uses_physical_presence_not_ordinary_death": {
+      "tests/fight_on_death_helpers.py::_place_retained_fixture_model": {
+        "dec50bca2394c755a0d5fb76e6659882b388c032": {
+          "assertions": [
+            {
+              "line": 151,
+              "source": "assert battlefield is not None"
+            },
+            {
+              "line": 154,
+              "source": "assert current == placement"
+            }
+          ],
+          "file_sha256": "aed9a5a1fd26feddc518f5207d6a36b7c28b5344218f9a218b23bc92aae01b63"
+        }
+      },
+      "tests/fight_on_death_helpers.py::retain_destroyed_model_for_fixture": {
+        "dec50bca2394c755a0d5fb76e6659882b388c032": {
+          "assertions": [
+            {
+              "line": 47,
+              "source": "assert not model_by_id(state=state, model_instance_id=placement.model_instance_id).is_alive"
+            },
+            {
+              "line": 48,
+              "source": "assert state.current_battle_phase is source_phase"
+            },
+            {
+              "line": 49,
+              "source": "assert state.active_player_id is not None"
+            },
+            {
+              "line": 135,
+              "source": "assert status is not None"
+            }
+          ],
+          "file_sha256": "aed9a5a1fd26feddc518f5207d6a36b7c28b5344218f9a218b23bc92aae01b63"
+        }
+      },
+      "tests/rules/section19/test_retained_scope.py::_casualty": {
+        "dec50bca2394c755a0d5fb76e6659882b388c032": {
+          "assertions": [
+            {
+              "line": 97,
+              "source": "assert s.support is not None"
+            },
+            {
+              "line": 98,
+              "source": "assert s.state.battlefield_state is not None"
+            },
+            {
+              "line": 119,
+              "source": "assert any((e.event_type == 'fight_on_death_retention_selected' for e in decisions.event_log.records))"
+            },
+            {
+              "line": 124,
+              "source": "assert not s.component('support').own_models[0].is_alive"
+            }
+          ],
+          "file_sha256": "297c924c85b2ea6625c81d767438dcd924f47744e553c4cfe863522b8519a4dc"
+        }
+      },
+      "tests/support/section19_fixtures.py::destroy": {
+        "dec50bca2394c755a0d5fb76e6659882b388c032": {
+          "assertions": [
+            {
+              "line": 252,
+              "source": "assert isinstance(decisions, DecisionController)"
+            },
+            {
+              "line": 278,
+              "source": "assert result.status is None"
+            }
+          ],
+          "file_sha256": "c3870b5b091a31cc56015d17b813ca31f8ac9d7b4cb84c43c8c4a66eda0ba8d5"
         }
       }
     }
@@ -44786,6 +44864,36 @@
           "case_reports": {
             "tests/rules/section15/test_reactions.py::test_counteroffensive_own_turn_denial_and_opponent_turn_fights_first_activation[opponent]": "caudit-01-native-decision-groups/stratagems.junit.xml"
           },
+          "prior_assertion_links": {
+            "tests/rules/section15/test_reactions.py::test_counteroffensive_own_turn_denial_and_opponent_turn_fights_first_activation[opponent]": {
+              "assertion_lines_by_symbol": {
+                "tests/rules/section15/test_reactions.py::_assert_counteroffensive_continuation": [
+                  414,
+                  417,
+                  419
+                ],
+                "tests/rules/section15/test_reactions.py::_assert_counteroffensive_viewer_branches": [
+                  330
+                ]
+              },
+              "assertion_record_id": "native-decision-groups/counteroffensive",
+              "call_edges": [
+                {
+                  "from": "tests/rules/section15/test_reactions.py::test_counteroffensive_own_turn_denial_and_opponent_turn_fights_first_activation",
+                  "line": 295,
+                  "to": "tests/rules/section15/test_reactions.py::_assert_counteroffensive_viewer_branches"
+                },
+                {
+                  "from": "tests/rules/section15/test_reactions.py::_assert_counteroffensive_viewer_branches",
+                  "line": 381,
+                  "to": "tests/rules/section15/test_reactions.py::_assert_counteroffensive_continuation"
+                }
+              ],
+              "credit": "Reference to the existing passing case and #755 assertions.",
+              "inventory_path": "../successor-inventory.json",
+              "junit_member": "native-decision-groups/stratagems.junit.xml"
+            }
+          },
           "test": "tests/rules/section15/test_reactions.py::test_counteroffensive_own_turn_denial_and_opponent_turn_fights_first_activation"
         }
       ]
@@ -53704,6 +53812,147 @@
             "tests/rules/section19/test_retained_scope.py::test_conditional_recipient_selection_uses_physical_presence_not_ordinary_death[40-True-False]": "caudit-01-fight-order-and-followups/attachment.junit.xml",
             "tests/rules/section19/test_retained_scope.py::test_conditional_recipient_selection_uses_physical_presence_not_ordinary_death[40-True-True]": "caudit-01-fight-order-and-followups/attachment.junit.xml"
           },
+          "helper_assertion_lines_by_case": {
+            "tests/rules/section19/test_retained_scope.py::test_conditional_recipient_selection_uses_physical_presence_not_ordinary_death[20-False-False]": {
+              "tests/rules/section19/test_retained_scope.py::_casualty": [
+                97,
+                98,
+                124
+              ],
+              "tests/support/section19_fixtures.py::destroy": [
+                252,
+                278
+              ]
+            },
+            "tests/rules/section19/test_retained_scope.py::test_conditional_recipient_selection_uses_physical_presence_not_ordinary_death[20-False-True]": {
+              "tests/fight_on_death_helpers.py::_place_retained_fixture_model": [
+                151,
+                154
+              ],
+              "tests/fight_on_death_helpers.py::retain_destroyed_model_for_fixture": [
+                47,
+                48,
+                49,
+                135
+              ],
+              "tests/rules/section19/test_retained_scope.py::_casualty": [
+                97,
+                98,
+                119,
+                124
+              ]
+            },
+            "tests/rules/section19/test_retained_scope.py::test_conditional_recipient_selection_uses_physical_presence_not_ordinary_death[20-True-False]": {
+              "tests/rules/section19/test_retained_scope.py::_casualty": [
+                97,
+                98,
+                124
+              ],
+              "tests/support/section19_fixtures.py::destroy": [
+                252,
+                278
+              ]
+            },
+            "tests/rules/section19/test_retained_scope.py::test_conditional_recipient_selection_uses_physical_presence_not_ordinary_death[20-True-True]": {
+              "tests/fight_on_death_helpers.py::_place_retained_fixture_model": [
+                151,
+                154
+              ],
+              "tests/fight_on_death_helpers.py::retain_destroyed_model_for_fixture": [
+                47,
+                48,
+                49,
+                135
+              ],
+              "tests/rules/section19/test_retained_scope.py::_casualty": [
+                97,
+                98,
+                119,
+                124
+              ]
+            },
+            "tests/rules/section19/test_retained_scope.py::test_conditional_recipient_selection_uses_physical_presence_not_ordinary_death[40-False-False]": {
+              "tests/rules/section19/test_retained_scope.py::_casualty": [
+                97,
+                98,
+                124
+              ],
+              "tests/support/section19_fixtures.py::destroy": [
+                252,
+                278
+              ]
+            },
+            "tests/rules/section19/test_retained_scope.py::test_conditional_recipient_selection_uses_physical_presence_not_ordinary_death[40-False-True]": {
+              "tests/fight_on_death_helpers.py::_place_retained_fixture_model": [
+                151,
+                154
+              ],
+              "tests/fight_on_death_helpers.py::retain_destroyed_model_for_fixture": [
+                47,
+                48,
+                49,
+                135
+              ],
+              "tests/rules/section19/test_retained_scope.py::_casualty": [
+                97,
+                98,
+                119,
+                124
+              ]
+            },
+            "tests/rules/section19/test_retained_scope.py::test_conditional_recipient_selection_uses_physical_presence_not_ordinary_death[40-True-False]": {
+              "tests/rules/section19/test_retained_scope.py::_casualty": [
+                97,
+                98,
+                124
+              ],
+              "tests/support/section19_fixtures.py::destroy": [
+                252,
+                278
+              ]
+            },
+            "tests/rules/section19/test_retained_scope.py::test_conditional_recipient_selection_uses_physical_presence_not_ordinary_death[40-True-True]": {
+              "tests/fight_on_death_helpers.py::_place_retained_fixture_model": [
+                151,
+                154
+              ],
+              "tests/fight_on_death_helpers.py::retain_destroyed_model_for_fixture": [
+                47,
+                48,
+                49,
+                135
+              ],
+              "tests/rules/section19/test_retained_scope.py::_casualty": [
+                97,
+                98,
+                119,
+                124
+              ]
+            }
+          },
+          "helper_call_edges": [
+            {
+              "from": "tests/rules/section19/test_retained_scope.py::test_conditional_recipient_selection_uses_physical_presence_not_ordinary_death",
+              "line": 142,
+              "to": "tests/rules/section19/test_retained_scope.py::_casualty"
+            },
+            {
+              "from": "tests/rules/section19/test_retained_scope.py::_casualty",
+              "line": 111,
+              "to": "tests/fight_on_death_helpers.py::retain_destroyed_model_for_fixture"
+            },
+            {
+              "from": "tests/fight_on_death_helpers.py::retain_destroyed_model_for_fixture",
+              "line": 50,
+              "to": "tests/fight_on_death_helpers.py::_place_retained_fixture_model"
+            },
+            {
+              "from": "tests/rules/section19/test_retained_scope.py::_casualty",
+              "line": 123,
+              "to": "tests/support/section19_fixtures.py::destroy"
+            }
+          ],
+          "helper_scope": "The retained branches disable physical removal during lethal damage and check the saved placement, the retention selection event and logical death. The four ordinary-death controls use destroy and never call the retention or placement helpers. Support and Fight on Death are fixture premises.",
           "test": "tests/rules/section19/test_retained_scope.py::test_conditional_recipient_selection_uses_physical_presence_not_ordinary_death"
         }
       ]
