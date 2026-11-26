@@ -1546,6 +1546,47 @@ and the linkage from verified tactical rows to targets remain outstanding.
 Local VP differences measure the declared horizon. The development benchmark
 emits zero training rows.
 
+### West cooperation control
+
+The [West four-arm receipt](stage4-west-cooperation-receipt.json) extends the
+known West development family from #763. It shares that family's exact
+checkpoint, seed and A4 Movement horizon. Keep all four arms with the
+existing West development group. This control provides zero training rows
+and adds no independent held-out case.
+
+```sh
+PYTHONPATH=src:. uv run --no-sync python -B -m scripts.stage4_benchmark_entry --west-cooperation
+```
+
+The opt-in worker has a 1,200-second wall limit. Its West-only mode keeps
+the archived stem and prepares live actor-bound Normal Move candidates at
+the continuation requests. The exact-displacement filter admits the
+generated S screen, E follow-through and B diagonal. The S move ends
+outside every objective area. Each request allows two native probes on
+disposable forks. B takes its diagonal if native validation accepts it
+and otherwise uses the issued finite Hold. Both omission controls use
+the issued Hold for E. All four arms must pass native preflight before
+any endpoint is evaluated. Failure leaves the interaction unobserved.
+
+The live menus record 148 raw proposals across eight requests. Geometry
+excluded 140 and left one eligible candidate per request. Six probes
+passed and two failed, with zero cap losses. The same B diagonal passed in
+both Hold arms and was rejected for Engagement Range transit in both
+Screen arms. The receipt records the selected and rejected IDs, exact
+actor/request bindings, strict replay and objective-specific VP awards.
+
+| Arm | Expansion 2 OC at A3 turn end (A–B) | B3 turn end | A4 Command end | Expansion 2 VP gain (A–B) |
+| --- | ---: | ---: | ---: | ---: |
+| Hold, E holds | 0–0 | 0–10 | 0–10 | 0–3 |
+| Hold, E follows | 2–0 | 2–10 | 2–10 | 0–3 |
+| Screen, E holds | 0–0 | 0–0 | 0–0 | 0–0 |
+| Screen, E follows | 2–0 | 2–0 | 2–0 | 5–0 |
+
+E's gain in A-minus-B VP was +5 after Screen and 0 after Hold, yielding
+a +5 VP interaction. Expansion 2 accounted for every VP award. The
+origin and all four endpoints passed exact persistence and strict replay.
+All arms retained 12 models and 34 wounds, with zero active RNG draws.
+
 ## 7. Performance and evaluation before scaling
 
 Measure the actual headless workload, with and without the reference transport under matched conditions:

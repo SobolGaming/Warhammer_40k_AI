@@ -1,4 +1,4 @@
-"""Reproduce the two Stage 4 development fixtures with the ordinary player facade."""
+"""Reproduce the Stage 4 development fixtures with the ordinary player facade."""
 
 from __future__ import annotations
 
@@ -18,12 +18,17 @@ from warhammer40k_core.adapters.access_control import ViewerContext
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.adapters.setup_smoke import canonical_setup_prebattle_smoke_config
 from warhammer40k_core.ai.finite_candidates import FiniteCandidateSet
-from warhammer40k_core.ai.player_policy import PlayerDecisionContext, PolicyAction, payload_digest
+from warhammer40k_core.ai.player_policy import (
+    PlayerDecisionContext,
+    PolicyAction,
+    PolicyError,
+    payload_digest,
+)
 from warhammer40k_core.ai.screen_movement_candidates import generate_normal_move_proposals
 from warhammer40k_core.ai.training_admission import VerifiedEpisodeOrigin
 from warhammer40k_core.engine.mission_setup import MissionSetup
-from warhammer40k_core.engine.phase import LifecycleStatus, LifecycleStatusKind
-from warhammer40k_core.engine.replay import ReplayRunner
+from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus, LifecycleStatusKind
+from warhammer40k_core.engine.replay import ReplayArtifactError, ReplayRunner
 from warhammer40k_core.engine.stratagems_requests import stratagem_decline_payload
 from warhammer40k_core.rules.mission_pack_import import (
     warhammer_event_companion_2026_07_mission_pack,
@@ -38,6 +43,11 @@ RESERVE = "army-alpha:strategic-reserve-unit"
 OPPONENT = "army-beta:scout-redeploy-unit"
 HOLD, NORMAL = "remain_stationary", "normal_move"
 CASES = ("hold-follow", "screen-follow", "screen-omit")
+WEST_COOPERATION_CASES = ("hold-omit", "hold-follow", "screen-omit", "screen-follow")
+WEST_GROUP = "layout3-west-lane-dev"
+WEST_LIVE_CAP = 2
+WEST_COOPERATION_SECONDS = 1200
+WEST_RECEIPT = RECEIPT.with_name("stage4-west-cooperation-receipt.json")
 HORIZON = (4, A, "movement", "select_movement_unit")
 BOUNDARIES = (
     (3, A, "fight", "turn_end"),
@@ -531,6 +541,80 @@ def guard_b3(
     )
 
 
+def west_live_choice(
+    session: LocalGameSession,
+    context: PlayerDecisionContext,
+    areas: Areas,
+    case: str,
+    menus: list[Row],
+    target: tuple[float, float],
+) -> None:
+    """Admit a generated West move before selection, retaining B's issued Hold."""
+    unit = context.request["payload"]["unit_instance_id"]
+    opponent = unit == OPPONENT
+    scratch = session.fork() if opponent else session
+    commit(scratch, context, finite(context, NORMAL))
+    offer = actor(scratch)
+    raw = raw_moves(offer)
+    eligible = [
+        key
+        for key, (_, proposal) in raw.items()
+        if all(isclose(a, b, abs_tol=1e-8) for a, b in zip(delta(proposal), target, strict=True))
+        and (
+            unit != SCREEN
+            or not any(
+                touches(path_points(proposal, True), polygons) for polygons in areas.values()
+            )
+        )
+    ]
+    entry: Row = {
+        "unit_id": unit,
+        "actor_id": offer.route.actor_id,
+        "action_request_id": context.request["request_id"],
+        "proposal_request_id": offer.request["request_id"],
+        "actor_view_hash": offer.observation_hash,
+        "raw_count": len(raw),
+        "raw_ids_hash": payload_digest(list(raw)),
+        "eligible_ids": eligible,
+        "geometry_excluded": len(raw) - len(eligible),
+        "cap_lost_ids": eligible[WEST_LIVE_CAP:],
+        "probes": [],
+        "live_accepted_ids": [],
+        "selected_id": None,
+    }
+    menus.append(entry)
+    before = payload_digest(scratch.lifecycle.to_payload())
+    for key in eligible[:WEST_LIVE_CAP]:
+        violation = trial(scratch, offer, raw, key)
+        entry["probes"].append({"id": key, "native_violation": violation})
+        if violation is None:
+            entry["live_accepted_ids"].append(key)
+        emit(
+            {
+                "event": "live_native_probe",
+                "case": case,
+                "unit_id": unit,
+                "candidate_id": key,
+                "native_violation": violation,
+            }
+        )
+    require(
+        payload_digest(scratch.lifecycle.to_payload()) == before, "Native probe mutated parent."
+    )
+    accepted = entry["live_accepted_ids"]
+    if accepted:
+        key = accepted[0]
+        if opponent:
+            commit(session, context, finite(context, NORMAL))
+        commit(session, actor(session), raw[key][0])
+        entry["selected_id"] = key
+    elif opponent:
+        commit(session, context, finite(context, HOLD))
+        entry["selected_id"] = HOLD
+    else:
+        raise BenchmarkGap(f"{case}: required {unit} proposal unavailable in the live cap.")
+
+
 def schedule(fixture: Row, case: str) -> dict[tuple[int, str], tuple[str, list[Any]]]:
     if case == "stem":
         return {(r, unit): ("stage", spec) for r, unit, *spec in fixture["stem"]}
@@ -538,9 +622,9 @@ def schedule(fixture: Row, case: str) -> dict[tuple[int, str], tuple[str, list[A
         return {}
     west = fixture["layout"] == 3
     moves = {}
-    if case != "hold-follow":
+    if case in ("screen-follow", "screen-omit"):
         moves[3, SCREEN] = ("screen", ["vector", 0, -8.75] if west else ["long", 1, 1])
-    if case != "screen-omit":
+    if case in ("hold-follow", "screen-follow"):
         diagonal_e = 7.5 / sqrt(2)
         moves[3, ALLY] = (
             "follow",
@@ -556,6 +640,7 @@ def advance(
     case: str,
     *,
     audit: bool = False,
+    live_menus: list[Row] | None = None,
 ) -> Row:
     moves = schedule(fixture, case)
     seen = set()
@@ -570,9 +655,15 @@ def advance(
             break
         if case == "finish" and (rnd, turn, c.route.battle_phase, kind) == HORIZON:
             break
-        if case in CASES and (rnd, turn, kind) == (3, B, MOVE_ACTION):
+        if case in WEST_COOPERATION_CASES and (rnd, turn, kind) == (3, B, MOVE_ACTION):
             require(unit == OPPONENT, "Unexpected active B3 unit.")
-            if west:
+            if live_menus is not None:
+                west_live_choice(session, c, areas, case, live_menus, (DIAGONAL, DIAGONAL))
+                require(
+                    [entry["unit_id"] for entry in live_menus] == [SCREEN, ALLY, OPPONENT],
+                    "A frozen movement occurrence was missing.",
+                )
+            elif west:
                 west_b3(session, c, case, history, audit=audit)
             else:
                 guard_b3(session, c, areas, history)
@@ -604,6 +695,23 @@ def advance(
         elif kind == "submit_deployment_placement":
             action = placement(c, fixture)
         elif kind == MOVE_ACTION:
+            key = (rnd, unit)
+            if live_menus is not None and unit in (SCREEN, ALLY):
+                if key in moves:
+                    _, (_, dx, dy) = moves[key]
+                    west_live_choice(session, c, areas, case, live_menus, (dx, dy))
+                    seen.add(key)
+                else:
+                    commit(session, c, finite(c, HOLD))
+                    live_menus.append(
+                        {
+                            "unit_id": unit,
+                            "actor_id": c.route.actor_id,
+                            "action_request_id": c.request["request_id"],
+                            "selected_id": HOLD,
+                        }
+                    )
+                continue
             if case == "hold-follow" and (rnd, unit) == (3, SCREEN):
                 action = immediate_material(c)
                 history["baseline_option"] = action.option_id
@@ -663,7 +771,7 @@ def scoring_oc(state: Row, targets: list[str]) -> list[list[list[int]]]:
     return values
 
 
-def endpoint(session: LocalGameSession, common: Row, fixture: Row) -> Row:
+def strict_checkpoint(session: LocalGameSession) -> Row:
     cp = session.to_persistence_payload()
     actor_views = views(session)
     restored = LocalGameSession.from_persistence_payload(cp)
@@ -676,6 +784,11 @@ def endpoint(session: LocalGameSession, common: Row, fixture: Row) -> Row:
         replay.reproduced_exactly and replay.final_event_log_hash == cp["event_log_hash"],
         "Independent endpoint replay drifted.",
     )
+    return cp
+
+
+def endpoint(session: LocalGameSession, common: Row, fixture: Row) -> Row:
+    cp = strict_checkpoint(session)
     require(
         cp["rng_state"]["seed"] == common["rng_state"]["seed"]
         and cp["rng_state"]["draw_count"] == 0
@@ -780,7 +893,7 @@ def check_receipt(data: Row) -> None:
             )
 
 
-def reproduce(fixture: Row, *, audit: bool) -> None:
+def start_fixture(fixture: Row) -> tuple[LocalGameSession, Areas, Row]:
     config = make_config(fixture)
     common = LocalGameSession()
     status = common.start(config)
@@ -790,8 +903,12 @@ def reproduce(fixture: Row, *, audit: bool) -> None:
         status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION, "Ordinary startup failed."
     )
     areas = objective_areas(config.mission_setup)
-    stem = advance(common, fixture, areas, "stem")
-    origin = VerifiedEpisodeOrigin.from_session(common, config=config).to_payload()
+    return common, areas, advance(common, fixture, areas, "stem")
+
+
+def reproduce(fixture: Row, *, audit: bool) -> None:
+    common, areas, stem = start_fixture(fixture)
+    origin = VerifiedEpisodeOrigin.from_session(common, config=common.lifecycle.config).to_payload()
     saved = common.to_persistence_payload()
     require(
         origin["engine_build_id"] == fixture["engine_build_id"], "Pinned runtime build drifted."
@@ -833,6 +950,201 @@ def reproduce(fixture: Row, *, audit: bool) -> None:
     print(json.dumps({**baseline_scores(fixture), "training_rows": 0}), flush=True)
 
 
+def west_cooperation_scores(cp: Row, common: Row) -> Row:
+    """Bind the local outcome to authoritative objective and VP records."""
+    start, end = (saved["lifecycle"]["state"] for saved in (common, cp))
+    wounds = material(end)
+    require(wounds == material(start), "Material changed in the movement-only pilot.")
+    before = {row["player_id"]: row for row in start["victory_point_ledgers"]}
+    after = {row["player_id"]: row for row in end["victory_point_ledgers"]}
+    gain, transactions = {}, []
+    for player in (A, B):
+        prior, current = (ledger[player]["transactions"] for ledger in (before, after))
+        require(current[: len(prior)] == prior, "The baseline VP ledger prefix drifted.")
+        new = current[len(prior) :]
+        gain[player] = after[player]["victory_points"] - before[player]["victory_points"]
+        require(gain[player] == sum(t["amount"] for t in new), "VP ledger did not reconcile.")
+        transactions.extend(new)
+
+    boundaries = []
+    for time in BOUNDARIES:
+        records = [
+            r
+            for r in end["objective_control_records"]
+            if (r["battle_round"], r["active_player_id"], r["phase"], r["timing"]) == time
+        ]
+        require(len(records) == 1, f"Missing unique objective-control boundary {time}.")
+        (record,) = records
+        objectives = {}
+        for row in record["results"]:
+            require(
+                row["unsupported_reason"] is None, "An objective-control result is unsupported."
+            )
+            contribution: dict[str, int] = {}
+            for contributor in row["contributors"]:
+                unit = contributor["unit_instance_id"]
+                contribution[unit] = (
+                    contribution.get(unit, 0) + contributor["effective_objective_control"]
+                )
+            objectives[row["objective_id"]] = {
+                "oc": {
+                    p: sum(s["score"] for s in row["scores"] if s["player_id"] == p) for p in (A, B)
+                },
+                "controller": row["controlled_by_player_id"],
+                "unit_oc": contribution,
+            }
+        boundaries.append(
+            {"boundary": list(time), "record_id": record["record_id"], "objectives": objectives}
+        )
+
+    boundary_ids = {row["record_id"] for row in boundaries}
+    awards = []
+    for tx in transactions:
+        meta = tx["metadata"]
+        include = meta.get("controlled_objective_ids", [])
+        boundary = meta.get("objective_control_record_id")
+        require(
+            len(include) == 1 and boundary in boundary_ids,
+            "A West VP award lacked a unique objective at a declared boundary.",
+        )
+        awards.append(
+            {
+                "player": tx["player_id"],
+                "boundary_id": boundary,
+                "rule": meta.get("scoring_rule_id", tx["source_id"]),
+                "vp": tx["amount"],
+                "objective_ids": include,
+                "vp_by_objective": {include[0]: tx["amount"]},
+            }
+        )
+    return {
+        **checkpoint_summary(cp),
+        "status": "observed",
+        "gain_vp": gain,
+        "objectives_at_boundaries": boundaries,
+        "awards": awards,
+        "material": {"model_count": len(wounds), "wounds": sum(wounds.values()), "wound_delta": 0},
+    }
+
+
+def checkpoint_summary(cp: Row) -> Row:
+    return {
+        "checkpoint": cp["content_hash"],
+        "event_log": cp["event_log_hash"],
+        "active_rng_draws": cp["rng_state"]["draw_count"],
+        "active_rng_history_tokens": len(cp["rng_state"]["history"]),
+        "strict_replay": True,
+    }
+
+
+def emit(entry: Row) -> None:
+    print(json.dumps({"group": WEST_GROUP, **entry}), flush=True)
+
+
+def reproduce_west_cooperation(fixture: Row) -> None:
+    """Rebuild one archived development origin and execute four matched arms."""
+    result: Row = {
+        "schema": "stage4-west-cooperation-2x2-v1",
+        "group": WEST_GROUP,
+        "partition": "development",
+        "status": "unobserved",
+        "interaction": None,
+        "seed": SEED,
+        "candidate_cap": WEST_LIVE_CAP,
+        "opponent_rule": "generated-west-diagonal-or-issued-hold-v1",
+        "horizon": list(HORIZON),
+        "training_rows": 0,
+        "arms": {case: {"status": "unobserved", "menus": []} for case in WEST_COOPERATION_CASES},
+    }
+    errors = (BenchmarkGap, GameLifecycleError, PolicyError, ReplayArtifactError)
+    try:
+        require(fixture["group"] == WEST_GROUP, "Archived West group drifted.")
+        common, areas, stem = start_fixture(fixture)
+        saved = strict_checkpoint(common)
+        require(
+            [common.decision_record_count(), saved["content_hash"]]
+            == [fixture["origin"][0], fixture["origin"][2]]
+            and stem["menus"] == fixture["menus"]["stem"],
+            "The reconstructed West checkpoint or stem menus differ from the archive.",
+        )
+        require(
+            saved["rng_state"]["seed"] == SEED and saved["rng_state"]["draw_count"] == 0,
+            "The shared origin missed the fixed zero-draw boundary.",
+        )
+        result["origin"] = {
+            **checkpoint_summary(saved),
+            "record_count": common.decision_record_count(),
+            "pending_request_id": actor(common).request["request_id"],
+        }
+    except errors as error:
+        result["gap"] = {"stage": "origin", "detail": str(error)}
+        emit(result)
+        raise
+    emit({"event": "origin", **result["origin"]})
+
+    admitted = {}
+    for case, arm in result["arms"].items():
+        try:
+            branch = common.fork()
+            advance(branch, fixture, areas, case, live_menus=arm["menus"])
+            admitted[case] = branch
+            arm["native_preflight"] = "passed"
+        except errors as error:
+            arm["gap"] = {"stage": "preflight", "detail": str(error)}
+        emit({"event": "preflight", "case": case, **arm})
+    if len(admitted) != len(WEST_COOPERATION_CASES):
+        result["gap"] = {
+            "stage": "preflight",
+            "detail": "At least one arm missed native admission.",
+        }
+        emit(result)
+        raise BenchmarkGap(result["gap"]["detail"])
+
+    for case, branch in admitted.items():
+        arm = result["arms"][case]
+        try:
+            advance(branch, fixture, areas, "finish")
+            cp = strict_checkpoint(branch)
+            require(
+                cp["rng_state"]["seed"] == SEED and cp["rng_state"]["draw_count"] == 0,
+                "The endpoint missed the fixed zero-draw boundary.",
+            )
+            arm.update(west_cooperation_scores(cp, saved))
+        except errors as error:
+            arm["gap"] = {"stage": "horizon", "detail": str(error)}
+        emit(
+            {
+                "event": "endpoint",
+                "case": case,
+                "status": arm["status"],
+                "gain_vp": arm.get("gain_vp"),
+                "gap": arm.get("gap"),
+            }
+        )
+
+    if common.to_persistence_payload() != saved:
+        result["gap"] = {"stage": "isolation", "detail": "An arm mutated the common origin."}
+    elif all(arm["status"] == "observed" for arm in result["arms"].values()):
+        margins = {
+            case: arm["gain_vp"][A] - arm["gain_vp"][B] for case, arm in result["arms"].items()
+        }
+        after_hold = margins["hold-follow"] - margins["hold-omit"]
+        after_screen = margins["screen-follow"] - margins["screen-omit"]
+        result.update(
+            status="observed",
+            ally_gain_after_hold=after_hold,
+            ally_gain_after_screen=after_screen,
+            interaction=after_screen - after_hold,
+        )
+    if result["status"] == "unobserved":
+        emit(result)
+    require(
+        result == json.loads(WEST_RECEIPT.read_text(encoding="utf-8")),
+        "West cooperation result did not reproduce the sealed four-arm receipt.",
+    )
+    emit(result)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -841,12 +1153,23 @@ def main() -> None:
     parser.add_argument(
         "--audit-west", action="store_true", help="Also regenerate the retrospective west audit."
     )
+    parser.add_argument(
+        "--west-cooperation", action="store_true", help="Reproduce the four-arm West control."
+    )
     parser.add_argument("--worker", action="store_true", help=argparse.SUPPRESS)
     args = parser.parse_args()
+    if args.west_cooperation and (args.family is not None or args.audit_west):
+        parser.error("--west-cooperation is a separate reproduction mode")
     if args.audit_west and args.family != "west":
         parser.error("--audit-west requires --family west")
     data = json.loads(RECEIPT.read_text(encoding="utf-8"))
     check_receipt(data)
+    if args.west_cooperation:
+        if args.worker:
+            reproduce_west_cooperation(data["fixtures"]["west"])
+        else:
+            run_worker(["--west-cooperation"], "west-cooperation", WEST_COOPERATION_SECONDS)
+        return
     if args.family is None:
         for fixture in data["fixtures"].values():
             print(json.dumps(baseline_scores(fixture)))
@@ -855,23 +1178,20 @@ def main() -> None:
         reproduce(data["fixtures"][args.family], audit=args.audit_west)
         return
     cap = 1050 if args.family == "guard" or args.audit_west else 800
-    command = [
-        sys.executable,
-        "-B",
-        "-m",
-        "scripts.stage4_benchmark_entry",
-        "--worker",
-        "--family",
-        args.family,
-    ]
+    flags = ["--family", args.family]
     if args.audit_west:
-        command.append("--audit-west")
+        flags.append("--audit-west")
+    run_worker(flags, args.family, cap)
+
+
+def run_worker(flags: list[str], label: str, cap: int) -> None:
+    command = [sys.executable, "-B", "-m", "scripts.stage4_benchmark_entry", "--worker", *flags]
     try:
         subprocess.run(command, check=True, timeout=cap)
     except subprocess.TimeoutExpired as exc:
-        raise SystemExit(f"Unobserved: {args.family} exceeded the {cap}s local wall cap.") from exc
+        raise SystemExit(f"Unobserved: {label} exceeded the {cap}s local wall cap.") from exc
     except subprocess.CalledProcessError as exc:
-        raise SystemExit(f"Unobserved: {args.family} exited with {exc.returncode}.") from exc
+        raise SystemExit(f"Unobserved: {label} exited with {exc.returncode}.") from exc
 
 
 if __name__ == "__main__":
