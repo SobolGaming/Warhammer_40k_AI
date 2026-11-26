@@ -393,3 +393,45 @@ def load_normal_move_admission(root: Path) -> NormalMoveAdmission | None:
     ):
         raise SystemExit("Normal Move test admission inventory differs.")
     return NormalMoveAdmission(record, raw)
+
+
+NORMAL_MOVE_ORIGIN_TRANSITION = (
+    "data/source_audits/ci64_provenance_v1/stage2-constructed-normal-move-origin-test-v1.json"
+)
+NORMAL_MOVE_ORIGIN_TRANSITION_SHA256 = (
+    "a49351e14abf1b1542f240ee4f05823476f33b80ba5c13e5681df10cb8d64fc5"
+)
+NORMAL_MOVE_ORIGIN_OWNER = "tests/rules/section09/test_constructed_normal_move_origin.py"
+NORMAL_MOVE_ORIGIN_CASE = "test_constructed_normal_move_origin_v1_admits_only_test_fixture"
+
+
+def normal_move_origin_test_addition(
+    root: Path, *, predecessor: NormalMoveAdmission | None, runtime: str
+) -> tuple[dict[str, dict[str, object]], bytes] | None:
+    from scripts.engine_numerical_identity_test_admission import _checked_bytes
+
+    path = root / NORMAL_MOVE_ORIGIN_TRANSITION
+    _selection_no_links(root, path)
+    if not path.exists():
+        return None
+    raw = _checked_bytes(root, NORMAL_MOVE_ORIGIN_TRANSITION, NORMAL_MOVE_ORIGIN_TRANSITION_SHA256)
+    record = json.loads(raw, object_pairs_hook=_selection_object)
+    if (
+        predecessor is None
+        or record.keys()
+        != {
+            "schema",
+            "retained_normal_move_sha256",
+            "runtime_fingerprint",
+            "added_files",
+            "added_cases",
+        }
+        or record["schema"] != "finite-stage2-constructed-normal-move-origin-test-v1"
+        or record["retained_normal_move_sha256"] != hashlib.sha256(predecessor.raw).hexdigest()
+        or record["runtime_fingerprint"] != runtime
+        or record["runtime_fingerprint"] != predecessor.receipt["runtime_fingerprint"]
+        or set(record["added_files"]) != {NORMAL_MOVE_ORIGIN_OWNER}
+        or record["added_cases"] != [f"{NORMAL_MOVE_ORIGIN_OWNER}::{NORMAL_MOVE_ORIGIN_CASE}"]
+    ):
+        raise SystemExit("Constructed Normal Move origin requires the exact Normal Move lineage.")
+    return _selection_members(record["added_files"], root), raw

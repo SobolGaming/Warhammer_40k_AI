@@ -1897,6 +1897,7 @@ def exact_movement_test_transition(
         ground_charge_retry_admission,
         ground_charge_test_successor,
         load_normal_move_admission,
+        normal_move_origin_test_addition,
         normal_shooting_test_successor,
         rigid_ground_charge_test_successor,
         screen_movement_test_successor,
@@ -2252,6 +2253,13 @@ def exact_movement_test_transition(
             raise SystemExit("Normal Move tests overlap predecessor tests.")
         additions.update(normal_tests)
         raw += b"\0" + normal_move.raw
+    origin = normal_move_origin_test_addition(root, predecessor=normal_move, runtime=runtime)
+    if origin is not None:
+        origin_tests, origin_raw = origin
+        if origin_tests.keys() & (updated.keys() | added.keys() | additions.keys()):
+            raise SystemExit("Constructed Normal Move origin tests overlap predecessor tests.")
+        additions.update(origin_tests)
+        raw += b"\0" + origin_raw
     return updated, {**added, **additions}, retained_raw + b"\0" + raw
 
 

@@ -957,6 +957,18 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
     ]
     admission = ground_charge.load_normal_move_admission(ROOT)
     assert admission is not None
+    origin = _record(ground_charge.NORMAL_MOVE_ORIGIN_TRANSITION)
+    assert origin["retained_normal_move_sha256"] == hashlib.sha256(admission.raw).hexdigest()
+    assert origin["runtime_fingerprint"] == normal_move["runtime_fingerprint"]
+    assert origin["added_cases"] == [
+        f"{ground_charge.NORMAL_MOVE_ORIGIN_OWNER}::{ground_charge.NORMAL_MOVE_ORIGIN_CASE}"
+    ]
+    assert ground_charge.NORMAL_MOVE_ORIGIN_OWNER in active_files
+    assert sum(ground_charge.NORMAL_MOVE_ORIGIN_OWNER in group for group in groups) == 1
+    with pytest.raises(SystemExit, match="exact Normal Move lineage"):
+        ground_charge.normal_move_origin_test_addition(
+            ROOT, predecessor=None, runtime=origin["runtime_fingerprint"]
+        )
     with pytest.raises(SystemExit, match="exact Screen source predecessor"):
         admission.validate_screen_source(ROOT, "0" * 64)
     with pytest.raises(SystemExit, match="exact combined Charge predecessor"):
@@ -1342,6 +1354,7 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         | charge_cases
         | set(retry["added_cases"])
         | set(normal_move["added_cases"])
+        | set(origin["added_cases"])
         | shooting_cases
         | {
             ground_charge.SCREEN_OWNER

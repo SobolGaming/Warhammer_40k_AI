@@ -39,6 +39,32 @@ both viewer projections, and their event streams through JSON save/load.
 Wounds, survival and RNG consumption remain unchanged. This is a constructed
 local control, not historic reachability, a policy ranking, or a training label.
 
+## Constructed A4 origin admission
+
+The versioned [test-only A4 constructor](../../tests/rules/section09/test_constructed_normal_move_origin.py)
+uses the locked Phase 15A fixture recipe, with an exact config and runtime pin.
+It reconstructs player A's first round-four Movement request, then submits the
+ordinary S unit choice through the viewer facade. Both players' views and
+event streams match the retained origin and S offer, and the resulting prefix
+round-trips through JSON and exact native replay. S's action has not yet been
+submitted.
+
+The test checks all three five-model formations against the native endpoint
+placement and coherency validators. Placing two S models at the same pose
+fails the overlap check. The two constructed rosters lack a Warlord and
+source-backed unit points; the custom open board has no deployment zones.
+The legacy non-strict roster exception is confined to this fixture.
+
+At the constructed boundary each player has 7 CP from the seven native
+Command occurrences (both turns of rounds one through three and player A's
+round-four turn). Player A has 0 VP; player B has two source-bound 4 VP
+Meatgrinder awards at the ends of B's constructed round-two and round-three
+Command phases. The test validates the CP event anchors and the native
+Primary VP bindings, rather than injecting balances. The ordinary-origin
+verifier rejects this same config and session. This admits only the named
+constructed scenario for scoped evidence, not ordinary-start, tournament,
+or training readiness.
+
 ## Exact-base component control
 
 The [serial component record](normal-move-exact-base-performance.json) takes
