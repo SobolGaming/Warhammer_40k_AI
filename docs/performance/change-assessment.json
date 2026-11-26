@@ -236,11 +236,11 @@
     },
     "docs/stage2/normal-move-candidates.md": {
       "before_sha256": null,
-      "after_sha256": "d83ecf8955ca75143c5b04225b2127185f0e13595291b135667ac525b39db54e",
+      "after_sha256": "3abbf313dbcca6f686084c228a9fe0c04c455eeba31c076a3df1fdb88b517f6c",
       "owners": {
         "@document": {
           "before": null,
-          "after": "d83ecf8955ca75143c5b04225b2127185f0e13595291b135667ac525b39db54e"
+          "after": "3abbf313dbcca6f686084c228a9fe0c04c455eeba31c076a3df1fdb88b517f6c"
         }
       }
     },
@@ -251,6 +251,16 @@
         "@document": {
           "before": null,
           "after": "43f69602ccc1605a06258bd5b5224cbc075121672e5f968941f377a43bcac7b4"
+        }
+      }
+    },
+    "docs/stage2/normal-move-frontier-evidence.json": {
+      "before_sha256": null,
+      "after_sha256": "aa620bebe821dbe996796ac22d0bd09ca46b442ecbfd16e9987b0c6f09899197",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "aa620bebe821dbe996796ac22d0bd09ca46b442ecbfd16e9987b0c6f09899197"
         }
       }
     },
@@ -401,6 +411,68 @@
         "main": {
           "before": null,
           "after": "f8a74df2ad34efef1310e16f3a63620fcc0125d418db56f973ae059a91dfa6da"
+        }
+      }
+    },
+    "tools/performance_stage2_normal_move_frontiers.py": {
+      "before_sha256": null,
+      "after_sha256": "2ffe8046854cd9c0017f5861875ce3cf36bbabc0ec20fb7befe38be4f4e10a5e",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "e6095bd378ca8185bc16ddda7c9416d10d8d594ae24b5f4ab5e47035c08b9124"
+        },
+        "_Frontier": {
+          "before": null,
+          "after": "33c943db87a43b99603557386ce05268215f709920d5ee1a8d78223abcdaa52f"
+        },
+        "_canonical": {
+          "before": null,
+          "after": "fe05f49b22b3c1b381b608b9441d3ae8b77423f23d214898fe89f1a08e83b032"
+        },
+        "_context": {
+          "before": null,
+          "after": "b7e2fc16ce83bd05ea55b62db3be4d1a63a7c2477faae64c041145fdd5e5b527"
+        },
+        "_digest": {
+          "before": null,
+          "after": "39fb2914d847b49ac87299c7984753035a25daf4b782f07f4bef9cac7c25fe33"
+        },
+        "_find_matches": {
+          "before": null,
+          "after": "6383dea4c8f71aaa46cffee8cb6037b6736aebea4e1de9d257a19bc6018b32e9"
+        },
+        "_measure": {
+          "before": null,
+          "after": "2e8463d06bd23f6958183cb477d3e4f52bb815ca7691ea48b07807136294dffc"
+        },
+        "_native": {
+          "before": null,
+          "after": "14e1141872f4eaaa7a4e78ab52743176bc833e4e22a0bd0e74984a9944c69351"
+        },
+        "_path_offsets": {
+          "before": null,
+          "after": "ddac3db47f6476728042c8d890beaff74e759447bc306a45720bee95aadf09fd"
+        },
+        "_prepare": {
+          "before": null,
+          "after": "14d851a1f6d5bf8fbb6cd473ef7c3b13373a301d5d8e1bbb4977351a0d11c511"
+        },
+        "_raw": {
+          "before": null,
+          "after": "5ed83ad86d9b1c7454e5843e354a4e8a2e4563efb58b1d8d03216c19154208d3"
+        },
+        "_summary": {
+          "before": null,
+          "after": "957b8deb24e6ba0e246863277bfb54cf6a4380b5a36ea04ee0e1ab67fe4c819e"
+        },
+        "_xy_matches": {
+          "before": null,
+          "after": "056f71de3d7f18511273cc8aba5fc1faebc8f5463672394930461ff6d46b58d8"
+        },
+        "main": {
+          "before": null,
+          "after": "98f0594623cb8ef1c8ce0e222121397340f3ec7ad4f4815448570bac0f492450"
         }
       }
     }
@@ -646,6 +718,14 @@
       "source_obligation": null,
       "unchanged_work": null
     },
+    "docs/stage2/normal-move-frontier-evidence.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Record the bounded opt-in API and exact-base evidence; no gameplay path, validation ceiling, policy rank or complete-game qualification changes.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
     "scripts/engine_numerical_identity_test_admission.py": {
       "category": "measured_workload",
       "operations": [
@@ -730,6 +810,14 @@
       "unchanged_work": null
     },
     "tools/performance_stage2_normal_move.py": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Record the bounded opt-in API and exact-base evidence; no gameplay path, validation ceiling, policy rank or complete-game qualification changes.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "tools/performance_stage2_normal_move_frontiers.py": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
