@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from dataclasses import replace
 from pathlib import Path
 from typing import Any, cast
 
@@ -12,14 +13,22 @@ from tools.generate_ability_support_matrix import (
 )
 
 from tests.daemons_native_source_helpers import SELECTED
-from tests.support.blood_legion import DETACHMENTS, blood_legion_definitions
+from tests.support.blood_legion import (
+    BLOODLETTERS_HEIGHT_OVERRIDES,
+    DETACHMENTS,
+    blood_legion_definitions,
+    identities,
+)
 from tests.support.faction_batch01 import Scene, anchor, events, locate, request, scene, selection
 from tests.support.section02_fixtures import Section02Definitions
 from tests.support.section03_fixtures import grid
 from tests.support.section09_fixtures import propose
 from warhammer40k_core.adapters.local_session import LocalGameSession
+from warhammer40k_core.core.detachment import DetachmentDefinition, StratagemDefinition
+from warhammer40k_core.core.model_geometry_catalog import GeometrySourceUnits
 from warhammer40k_core.engine.battle_shock import BattleShockResult, BattleShockResultPayload
 from warhammer40k_core.engine.battle_shock_resolution import BattleShockResolutionResult
+from warhammer40k_core.engine.command_points import CommandPointGainStatus, CommandPointSourceKind
 from warhammer40k_core.engine.damage_allocation import (
     MortalWoundApplication,
     MortalWoundApplicationPayload,
@@ -30,10 +39,24 @@ from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.list_validation import AttachmentDeclaration
 from warhammer40k_core.engine.mortal_wound_model_allocation import mortal_wound_resolution_progress
 from warhammer40k_core.engine.movement_proposals import MovementProposalRequest
-from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.objective_control import (
+    ObjectiveControlContext,
+    ObjectiveControlTiming,
+    resolve_objective_control,
+)
+from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.replay import ReplayRunner
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+from warhammer40k_core.engine.stratagems import (
+    StratagemEligibilityContext,
+    request_stratagem_use_from_index,
+)
+from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.geometry.pose import Pose
+from warhammer40k_core.rules import wahapedia_bridge
+from warhammer40k_core.rules.catalog_package import CanonicalCatalogPackage
+from warhammer40k_core.rules.wahapedia_bridge import ModelHeightOverride
+from warhammer40k_core.rules.wahapedia_schema import NormalizedSourceRow
 
 BLOODLETTERS = "000001114"
 SPAWN = "000004090"
@@ -44,6 +67,12 @@ FORCER = "foe:letters"
 SPARE = "own:spare"
 ORDINARY = "fall_back:ordered_retreat"
 TERROR_APPLIED = "chaos_daemons_daemonic_terror_mortal_wounds_applied"
+
+WALKER_DETACHMENTS = {"orks": "more-dakka", "chaos-daemons": "blood-legion"}
+BOYZ = "000000016"
+DEFF_DREAD = "000000040"
+WALKER = "own:dread"
+HUGE_SHOW_OFFS = "000009992004"
 
 
 @pytest.fixture(scope="module")
@@ -370,3 +399,278 @@ def test_forced_escape_restore_rejects_invented_pretest_shock(
         GameLifecycleError, match="Forced Desperate Escape pre-test Battle-shock state drifted"
     ):
         GameLifecycle.from_payload(json.loads(json.dumps(session.lifecycle.to_payload())))
+
+
+@pytest.fixture(scope="module")
+def walker_retreat_definitions(selected_army_source_index: Path | None) -> Section02Definitions:
+    heights = tuple(
+        ModelHeightOverride(
+            datasheet_id,
+            name,
+            height,
+            GeometrySourceUnits.INCHES,
+            f"test:walker-terror:{name}",
+            "Level-board Battle-shock fixture.",
+        )
+        for datasheet_id, name, height in (
+            (BOYZ, "BOY", 1.5),
+            (BOYZ, "BOSS NOB", 1.6),
+            (DEFF_DREAD, "Deff Dread", 2.5),
+        )
+    )
+    source_composition = wahapedia_bridge._composition_entries  # pyright: ignore[reportPrivateUsage]
+    source_rows = wahapedia_bridge._rows_matching  # pyright: ignore[reportPrivateUsage]
+
+    def boyz_composition(
+        *,
+        context: wahapedia_bridge._BridgeContext,  # pyright: ignore[reportPrivateUsage]
+        datasheet_id: str,
+    ) -> tuple[wahapedia_bridge._CompositionEntry, ...]:  # pyright: ignore[reportPrivateUsage]
+        entries = source_composition(context=context, datasheet_id=datasheet_id)
+        if datasheet_id != BOYZ:
+            return entries
+        return tuple(
+            replace(entry, model_name="Boy") if entry.model_name == "Boyz" else entry
+            for entry in entries
+        )
+
+    def standard_loadout_rows(
+        rows: dict[str, tuple[NormalizedSourceRow, ...]],
+        table: str,
+        column: str,
+        value: str,
+    ) -> tuple[NormalizedSourceRow, ...]:
+        if table == "Datasheets_options" and value in (BOYZ, DEFF_DREAD):
+            return ()
+        return source_rows(rows, table, column, value)
+
+    def selected_catalog(package: CanonicalCatalogPackage) -> CanonicalCatalogPackage:
+        return package
+
+    # Normalize the Boyz spelling for default gear and bypass the unrelated
+    # complete-catalog Deadly Demise overlay for this three-datasheet selection.
+    with pytest.MonkeyPatch.context() as patch:
+        patch.setattr(
+            "tools.generate_ability_support_matrix.BLOODLETTERS_HEIGHT_OVERRIDES",
+            (*BLOODLETTERS_HEIGHT_OVERRIDES, *heights),
+        )
+        patch.setattr(wahapedia_bridge, "_composition_entries", boyz_composition)
+        patch.setattr(wahapedia_bridge, "_rows_matching", standard_loadout_rows)
+        patch.setattr(
+            "tools.generate_ability_support_matrix.with_current_deadly_demise",
+            selected_catalog,
+        )
+        package = _ability_support_catalog_package(
+            datasheet_ids=(BOYZ, DEFF_DREAD, BLOODLETTERS),
+            source_index_dir=selected_army_source_index,
+        )
+    catalog = package.army_catalog
+    faction_ids = {"ORK": "orks", "CD": "chaos-daemons"}
+    factions = tuple(
+        replace(faction, faction_id=faction_ids[faction.faction_id]) for faction in catalog.factions
+    )
+    source_detachments = {row.detachment_id: row for row in identities.detachment_rows()}
+    detachments: list[DetachmentDefinition] = []
+    for faction in factions:
+        row = source_detachments[WALKER_DETACHMENTS[faction.faction_id]]
+        detachments.append(
+            DetachmentDefinition(
+                canonical_detachment_id=row.detachment_id,
+                detachment_id=row.detachment_id,
+                name=row.name,
+                faction_id=faction.faction_id,
+                detachment_point_cost=row.detachment_point_cost,
+                unit_datasheet_ids=tuple(
+                    sheet.datasheet_id
+                    for sheet in catalog.datasheets
+                    if set(sheet.keywords.faction_keywords).intersection(faction.faction_keywords)
+                ),
+                force_disposition_ids=tuple(
+                    sorted(
+                        {
+                            row.force_disposition_id,
+                            "take-and-hold",
+                            "purge-the-foe",
+                        }
+                    )
+                ),
+                source_ids=row.source_ids,
+                stratagem_ids=(HUGE_SHOW_OFFS,) if faction.faction_id == "orks" else (),
+            )
+        )
+    huge_show_offs = StratagemDefinition(
+        stratagem_id=HUGE_SHOW_OFFS,
+        name="Huge Show-Offs",
+        source_id=f"phase17e:stratagem:orks:more-dakka:{HUGE_SHOW_OFFS}",
+        command_point_cost=1,
+        timing_tags=("command",),
+    )
+    return Section02Definitions(
+        replace(
+            package,
+            army_catalog=replace(
+                catalog,
+                factions=factions,
+                detachments=tuple(detachments),
+                stratagems=(*catalog.stratagems, huge_show_offs),
+            ),
+        ),
+        0.0,
+    )
+
+
+@pytest.mark.parametrize(
+    ("seed", "total", "passed"),
+    [
+        pytest.param(2, 1, False, id="fail-and-wounds"),
+        pytest.param(9, 10, True, id="pass-and-restore"),
+    ],
+)
+def test_native_ordered_retreat_with_active_walker_objective_control(
+    walker_retreat_definitions: Section02Definitions, seed: int, total: int, passed: bool
+) -> None:
+    definitions = walker_retreat_definitions
+    battle = scene(
+        definitions,
+        (selection(definitions, BOYZ, "retreat"), selection(definitions, DEFF_DREAD, "dread")),
+        (selection(definitions, BLOODLETTERS, "letters"),),
+        phase=BattlePhase.COMMAND,
+        seed="walker-terror",
+        rng_seed_label=f"walker-terror:{seed}",
+        detachment_id_by_faction=WALKER_DETACHMENTS,
+    )
+    mission = battle.state.mission_setup
+    assert mission is not None
+    (home,) = (zone for zone in mission.deployment_zones if zone.player_id == "owner")
+    (marker,) = (
+        item
+        for item in mission.objective_markers
+        if home.contains_point(item.x_inches, item.y_inches)
+    )
+    x, y = marker.x_inches, marker.y_inches
+    letters = tuple(
+        Pose.at(x - 2.64 + 1.32 * (index % 5), y - 0.70 + 1.4 * (index // 5)) for index in range(10)
+    )
+    # Move the rear rank first so it clears the front rank's path.
+    boyz = tuple(
+        Pose.at(x - 2.96 + 1.48 * (index % 5), y - 4.72 + 2.4 * (index // 5)) for index in range(10)
+    )
+    locate(battle, SUBJECT, boyz)
+    locate(battle, FORCER, letters)
+    locate(battle, WALKER, (Pose.at(x, y + 3.6),))
+    anchor(battle)
+
+    session = battle.session
+    state = battle.state
+    bundle = session.lifecycle._require_runtime_content_bundle()  # pyright: ignore[reportPrivateUsage]
+    grant = state.gain_command_points(
+        player_id="owner",
+        amount=1,
+        source_id="walker-fixture-reserve",
+        source_kind=CommandPointSourceKind.COMMAND_PHASE_START,
+    )
+    assert grant.status is CommandPointGainStatus.APPLIED
+    stratagem = request(
+        request_stratagem_use_from_index(
+            state=state,
+            decisions=session.lifecycle.decision_controller,
+            index=bundle.stratagem_indexes_by_player_id["owner"],
+            context=StratagemEligibilityContext.from_state(
+                state=state,
+                player_id="owner",
+                trigger_kind=TimingTriggerKind.START_PHASE,
+            ),
+        ),
+        "use_stratagem",
+    )
+    assert session.advance_until_decision_or_terminal().decision_request == stratagem
+    waaagh = _choose(
+        session,
+        stratagem,
+        f"use-stratagem:{HUGE_SHOW_OFFS}:target:{WALKER}",
+        "walker-command-0",
+        "select_faction_rule_command_phase_start_option",
+    )
+    _choose(session, waaagh, "orks:waaagh:decline", "walker-command-1", "select_movement_unit")
+    (used,) = state.stratagem_use_records
+    assert used.stratagem_id == HUGE_SHOW_OFFS
+    assert used.targeted_unit_instance_ids == (WALKER,)
+
+    objective = resolve_objective_control(
+        ObjectiveControlContext.from_game_state(
+            state,
+            timing=ObjectiveControlTiming.PHASE_END,
+            phase=BattlePhase.MOVEMENT,
+            ruleset_descriptor=state.runtime_ruleset_descriptor(),
+        )
+    ).result_by_objective_id(marker.objective_marker_id)
+    assert objective.controlled_by_player_id == "opponent"
+    assert {score.player_id: score.score for score in objective.scores} == {
+        "owner": 14,
+        "opponent": 20,
+    }
+    (walker,) = (model for model in objective.contributors if model.unit_instance_id == WALKER)
+    assert walker.effective_objective_control == 4
+
+    retreat = _select_review_retreat(session, SUBJECT)
+    ends = tuple(Pose.at(pose.position.x, pose.position.y - 3.0) for pose in boyz)
+    status = propose(session, retreat, battle.units[SUBJECT], ends, result_id="walker-witness")
+    assert len(events(session, "desperate_escape_roll_resolved")) == 10
+    (test,) = events(session, "forced_desperate_escape_battle_shock_resolved")
+    outcome = BattleShockResult.from_payload(
+        cast(BattleShockResultPayload, test["battle_shock_result"])
+    )
+    assert outcome.passed is passed
+    assert outcome.leadership_target == 7
+    assert outcome.roll_state.current_total == total + 1
+    assert outcome.total == total
+    assert [modifier.operand for modifier in outcome.modified_roll.modifiers] == [-1]
+
+    pending = request(status)
+    session = _restore(session)
+    assert session.lifecycle.pending_decision_request() == pending
+    if not passed:
+        allocation = request(status, "select_mortal_wound_model")
+        progress = mortal_wound_resolution_progress(allocation)
+        assert progress.application_id == f"{outcome.result_id}:daemonic-terror:{SUBJECT}"
+        assert progress.mortal_wounds == 1
+        assert events(session, "movement_activation_completed") == []
+        status = session.submit_option(
+            request_id=allocation.request_id,
+            option_id=allocation.options[0].option_id,
+            result_id="walker-wounds-0",
+        )
+        (applied,) = events(session, TERROR_APPLIED)
+        assert applied["target_unit_instance_id"] == SUBJECT
+        assert applied["player_id"] == "opponent"
+        damage = MortalWoundApplication.from_payload(
+            cast(MortalWoundApplicationPayload, applied["mortal_wound_application"])
+        )
+        assert damage.mortal_wounds == 1
+        assert damage.remaining_mortal_wounds_lost == 0
+        assert damage.ignored_mortal_wounds == 0
+        (wound,) = damage.applications
+        assert wound.wounds_lost == 1
+        assert not wound.destroyed
+    else:
+        assert events(session, TERROR_APPLIED) == []
+
+    # Finish any separately recorded escape hazard allocations.
+    allocation_index = int(not passed)
+    while (pending := request(status)).decision_type == "select_mortal_wound_model":
+        assert mortal_wound_resolution_progress(pending).application_id.endswith(":hazards")
+        status = session.submit_option(
+            request_id=pending.request_id,
+            option_id=pending.options[0].option_id,
+            result_id=f"walker-wounds-{allocation_index}",
+        )
+        allocation_index += 1
+    request(status, "select_movement_unit")
+    (completed,) = events(session, "movement_activation_completed")
+    assert completed["unit_instance_id"] == SUBJECT
+    assert completed["fall_back_mode"] == "desperate_escape"
+    assert _restore(session).lifecycle.pending_decision_request() == pending
+    replay = ReplayRunner.from_payload(
+        session.replay_artifact(artifact_id=f"walker:{passed}")
+    ).run()
+    assert replay.reproduced_exactly, replay.to_payload()

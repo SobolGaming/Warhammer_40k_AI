@@ -8,10 +8,16 @@ from warhammer40k_core.engine.battle_shock_historical_authority import (
     HistoricalBattleShockAuthorityContext,
 )
 from warhammer40k_core.engine.battlefield_state import ModelPlacement, geometry_model_for_placement
+from warhammer40k_core.engine.effects import PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.generic_effect_history import (
     HistoricalEffectAuthority,
-    historical_generic_effect_may_be_active,
+    historical_generic_effect_inventory,
+    historical_generic_effect_may_match,
+)
+from warhammer40k_core.engine.generic_rule_attack_hooks import (
+    generic_characteristic_operations_from_effects,
+    generic_matching_unit_effect_applications,
 )
 from warhammer40k_core.engine.objective_control import model_objective_control_characteristic
 from warhammer40k_core.engine.objective_control_sources import resolve_objective_control_sources
@@ -24,7 +30,13 @@ from warhammer40k_core.engine.objective_geometry_sources import (
     terrain_objective_geometry,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
-from warhammer40k_core.engine.rules_units import rules_unit_view_from_armies
+from warhammer40k_core.engine.rules_unit_effects import (
+    rules_unit_effect_applications_from_inventory,
+)
+from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_view_from_armies
+from warhammer40k_core.engine.runtime_characteristic_modifiers import (
+    apply_objective_control_operations,
+)
 from warhammer40k_core.engine.sticky_objective_control import (
     StickyObjectiveControlState,
     StickyObjectiveControlStatePayload,
@@ -152,15 +164,15 @@ def _historical_control_at_objective(
     if not may_be_sticky and all(owner != player_id for owner, _, _ in participants):
         return False
 
-    identities = {
-        unit_id: _contributor_identities(context, unit_id)
+    views = {
+        unit_id: _contributor_rules_unit(context, unit_id)
         for unit_id in {unit_id for _, unit_id, _ in participants}
     }
     shocked = set(context.phase_start_battle_shocked_unit_ids)
     contributing = [
         (owner, unit_id, model)
         for owner, unit_id, model in participants
-        if shocked.isdisjoint(identities[unit_id])
+        if shocked.isdisjoint(_rules_unit_identities(views[unit_id]))
     ]
     if not may_be_sticky and all(owner != player_id for owner, _, _ in contributing):
         return False
@@ -168,24 +180,43 @@ def _historical_control_at_objective(
     effect_targets = {
         predecessor
         for unit_id in {unit_id for _, unit_id, _ in contributing}
-        for identity in identities[unit_id]
+        for identity in _rules_unit_identities(views[unit_id])
         for predecessor in split_effect_predecessor_ids(
             armies=context.armies, unit_instance_id=identity
         )
     }
-    if contributing and (
-        _has_active_objective_control_effect(context, effect_targets)
-        or any(
-            isinstance(model.characteristic(Characteristic.OBJECTIVE_CONTROL), RandomProfileValue)
-            for _, _, model in contributing
-        )
+    if any(
+        isinstance(model.characteristic(Characteristic.OBJECTIVE_CONTROL), RandomProfileValue)
+        for _, _, model in contributing
     ):
-        # This bounded proof does not compute active dynamic OC operations.
         return None
 
+    effects = _active_objective_control_effects(context, effect_targets)
+    effects_by_unit = (
+        {
+            unit_id: generic_matching_unit_effect_applications(
+                applications=rules_unit_effect_applications_from_inventory(
+                    armies=context.armies, effects=effects, rules_unit=views[unit_id]
+                ),
+                effect_kind=RuleEffectKind.MODIFY_CHARACTERISTIC,
+            )
+            for unit_id in {unit_id for _, unit_id, _ in contributing}
+        }
+        if effects
+        else {}
+    )
     scores = dict.fromkeys(context.player_ids, 0)
-    for owner, _, model in contributing:
-        scores[owner] += model_objective_control_characteristic(model, battle_shocked=False).final
+    for owner, unit_id, model in contributing:
+        operations = generic_characteristic_operations_from_effects(
+            effects=effects_by_unit.get(unit_id, ()),
+            characteristic=Characteristic.OBJECTIVE_CONTROL,
+            model_instance_id=model.model_instance_id,
+        )
+        scores[owner] += apply_objective_control_operations(
+            value=model_objective_control_characteristic(model, battle_shocked=False),
+            modifiers=operations,
+            model_instance_id=model.model_instance_id,
+        ).final
     score = scores[player_id]
     opposition = max((value for owner, value in scores.items() if owner != player_id), default=0)
     if score > opposition:
@@ -195,21 +226,38 @@ def _historical_control_at_objective(
     return None
 
 
-def _contributor_identities(
+def _contributor_rules_unit(
     context: HistoricalBattleShockAuthorityContext, unit_id: str
-) -> tuple[str, ...]:
+) -> RulesUnitView:
     view = rules_unit_view_from_armies(armies=context.armies, unit_instance_id=unit_id)
     if (
         view.is_attached_rules_unit
         and view.unit_instance_id not in context.active_attached_unit_ids
     ):
         raise GameLifecycleError("Historical Objective Control contributor attachment drifted.")
+    return view
+
+
+def _rules_unit_identities(view: RulesUnitView) -> tuple[str, ...]:
     return (view.unit_instance_id, *view.component_unit_instance_ids)
 
 
-def _has_active_objective_control_effect(
+def _active_objective_control_effects(
     context: HistoricalBattleShockAuthorityContext, target_ids: set[str]
-) -> bool:
+) -> tuple[PersistingEffect, ...]:
+    if not target_ids:
+        return ()
+
+    def matches(payload: dict[str, JsonValue]) -> bool:
+        return _may_modify_objective_control(payload, target_ids)
+
+    sources = context.historical_effect_sources
+    if sources is None:
+        if historical_generic_effect_may_match(
+            context.event_records[: context.boundary_event_index], matches
+        ):
+            raise GameLifecycleError("Historical Objective Control effect lacks loaded sources.")
+        return ()
     historical = HistoricalEffectAuthority(
         game_id=context.game_id,
         player_ids=context.player_ids,
@@ -225,9 +273,10 @@ def _has_active_objective_control_effect(
         phase=context.phase,
         rules_unit_at_event=lambda unit_id, _index: context.rules_unit_containing_unit(unit_id),
     )
-    return historical_generic_effect_may_be_active(
+    return historical_generic_effect_inventory(
         historical=historical,
-        matches_payload=lambda payload: _may_modify_objective_control(payload, target_ids),
+        runtime_content_bundle=sources,
+        matches_payload=matches,
     )
 
 
