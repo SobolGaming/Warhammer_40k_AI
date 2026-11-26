@@ -84,9 +84,9 @@
   "added_files": {
     "tests/rules/section09/test_native_ordered_retreat.py": {
       "mode": "100644",
-      "bytes": 32304,
-      "sha256": "f34fb8f1142bc99199343bf740b6bd14614a274780424a377c5432a427f9a0b7",
-      "blob_sha1": "296a6417ed18a5b7ca60d0213acfe79a6da5de10"
+      "bytes": 32415,
+      "sha256": "ea2519924090e02c7284844a18db5655c6dc899009e4e8a78b4f5347ab521fed",
+      "blob_sha1": "d079142121bff5e1f492064d36b6902c94359b5a"
     }
   },
   "added_cases": [

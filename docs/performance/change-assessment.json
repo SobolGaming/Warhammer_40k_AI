@@ -196,21 +196,21 @@
     },
     "data/source_audits/ci64_provenance_v1/daemonic-terror-ordered-retreat-v1.json": {
       "before_sha256": null,
-      "after_sha256": "ae80d11cd71778c8738b2ab3d2c4bd759b04c3034765a53f4e3e76bdb489d163",
+      "after_sha256": "68e641b2079eaeff94bc4c0724d5662293682512e276bd72dfbf936b60b64c2e",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ae80d11cd71778c8738b2ab3d2c4bd759b04c3034765a53f4e3e76bdb489d163"
+          "after": "68e641b2079eaeff94bc4c0724d5662293682512e276bd72dfbf936b60b64c2e"
         }
       }
     },
     "docs/performance/current/forced-retreat-outcome-reconstruction-20261126.json": {
       "before_sha256": null,
-      "after_sha256": "58a8b471d89f5feb8488f4bf1e56c2c462857125511546a2ba2ce2bf5b5b74d8",
+      "after_sha256": "f93b48c2edf59fedd5557edc323ecf9749da28bbd0e45165185828de35d68e3a",
       "owners": {
         "@document": {
           "before": null,
-          "after": "58a8b471d89f5feb8488f4bf1e56c2c462857125511546a2ba2ce2bf5b5b74d8"
+          "after": "f93b48c2edf59fedd5557edc323ecf9749da28bbd0e45165185828de35d68e3a"
         }
       }
     },
@@ -226,11 +226,11 @@
     },
     "scripts/engine_numerical_identity_test_admission.py": {
       "before_sha256": "40227f08b7a2c290083a9526f99d8a89f634901a06c304af90b9ee346cadc285",
-      "after_sha256": "c147e62697e95d99dcaaffc22e98d2da3a96b061634c3b6479bab1e881e0f9c8",
+      "after_sha256": "8d7f6790ce10e0026c26213f1908e686d3e33be43b9a4b9ac8c9240d3f02dd4f",
       "owners": {
         "@module": {
           "before": "4dd2165c209d75a67cd1aab59eb63841d1406c4b3757d542d2ce70787f4a0211",
-          "after": "05dec170b7636ca78f37ca88c5d26aca86072ca1104f9db8d706fda27af4afe6"
+          "after": "b3b28155231bc4eb40dfe11a970b260780fa6c24d18fcf0338f38972dd547a2b"
         },
         "_DaemonicTerrorTransition": {
           "before": null,
@@ -556,11 +556,11 @@
     },
     "tests/rules/section09/test_native_ordered_retreat.py": {
       "before_sha256": null,
-      "after_sha256": "f34fb8f1142bc99199343bf740b6bd14614a274780424a377c5432a427f9a0b7",
+      "after_sha256": "ea2519924090e02c7284844a18db5655c6dc899009e4e8a78b4f5347ab521fed",
       "owners": {
         "@module": {
           "before": null,
-          "after": "b19b38b4712f86ce9633b7d030dffddc913e713534f95f2d49a7aed00651896c"
+          "after": "bbca5b06bcb9a48320c2e3d7ca205b79ee066c02a8500d524a44c14f22b12070"
         },
         "_choose": {
           "before": null,
@@ -600,7 +600,7 @@
         },
         "test_native_ordered_retreat_with_active_walker_objective_control": {
           "before": null,
-          "after": "815020653385354e8590b1b8f0a51d8d8c435e57ee67315d160ded28dd2ff8e8"
+          "after": "b26bab5620572c790a2eead851627d8de4f8c7dc32f58a343294993fc8cd4ff6"
         },
         "test_second_forced_retreat_uses_only_territory_contributors": {
           "before": null,

@@ -1351,7 +1351,7 @@ DAEMONIC_TERROR_TRANSITION = (
     "data/source_audits/ci64_provenance_v1/daemonic-terror-ordered-retreat-v1.json"
 )
 DAEMONIC_TERROR_TRANSITION_SHA256 = (
-    "ae80d11cd71778c8738b2ab3d2c4bd759b04c3034765a53f4e3e76bdb489d163"
+    "68e641b2079eaeff94bc4c0724d5662293682512e276bd72dfbf936b60b64c2e"
 )
 DAEMONIC_TERROR_OWNER = "tests/rules/section09/test_native_ordered_retreat.py"
 

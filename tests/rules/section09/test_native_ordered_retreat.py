@@ -9,16 +9,12 @@ from typing import Any, cast
 
 import pytest
 from tools.generate_ability_support_matrix import (
+    BLOODLETTERS_HEIGHT_OVERRIDES,
     _ability_support_catalog_package,  # pyright: ignore[reportPrivateUsage]
 )
 
 from tests.daemons_native_source_helpers import SELECTED
-from tests.support.blood_legion import (
-    BLOODLETTERS_HEIGHT_OVERRIDES,
-    DETACHMENTS,
-    blood_legion_definitions,
-    identities,
-)
+from tests.support.blood_legion import DETACHMENTS, blood_legion_definitions
 from tests.support.faction_batch01 import Scene, anchor, events, locate, request, scene, selection
 from tests.support.section02_fixtures import Section02Definitions
 from tests.support.section03_fixtures import grid
@@ -55,6 +51,9 @@ from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules import wahapedia_bridge
 from warhammer40k_core.rules.catalog_package import CanonicalCatalogPackage
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_detachments_2026_27 as identities,
+)
 from warhammer40k_core.rules.wahapedia_bridge import ModelHeightOverride
 from warhammer40k_core.rules.wahapedia_schema import NormalizedSourceRow
 
@@ -693,10 +692,10 @@ def test_native_ordered_retreat_with_active_walker_objective_control(
     assert completed["fall_back_mode"] == "desperate_escape"
     if terror_wounds == 2:
         assert completed["prior_battle_shock_casualty_ids"] == [boss_nob]
-        hazard_ids = completed["destroyed_model_ids"]
-        assert isinstance(hazard_ids, list)
-        assert all(isinstance(model_id, str) for model_id in hazard_ids)
-        hazard_ids = cast(list[str], hazard_ids)
+        raw_hazard_ids = completed["destroyed_model_ids"]
+        assert isinstance(raw_hazard_ids, list)
+        assert all(isinstance(model_id, str) for model_id in raw_hazard_ids)
+        hazard_ids = cast(list[str], raw_hazard_ids)
         assert len(hazard_ids) == 2
         assert boss_nob not in hazard_ids
         event_log = session.lifecycle.decision_controller.event_log.records
