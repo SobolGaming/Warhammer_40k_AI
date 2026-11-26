@@ -1,15 +1,15 @@
 {
   "base": "dec50bca2394c755a0d5fb76e6659882b388c032",
-  "policy_sha256": "45912a23fd5f45a9bb7316a5535b6f106da1f420203ca4e414d8ed58db5f4a02",
+  "policy_sha256": "9bdee9638108a6240ba4dbae1fd715a32c2f0a6bb190ce08c7caae6be0f5743f",
   "retained_manifest_sha256": "1701a163d58756209054de421d459e057faedfb3cf670c72d9e3c5f9efc5edaa",
-  "manifest_sha256": "8db821a4ac41e4d94f083923b48dc78bb3f0e5e8238056219d5ef3b84895459d",
-  "runtime_fingerprint": "3c3f134df086190dc8afaf689b3ea3ad0c204de0c3a2848bf0a1d1a340a25159",
+  "manifest_sha256": "011c4baa764d5c8062632b8f19c4f4fcfe5925b5744afce28fba77ed84800720",
+  "runtime_fingerprint": "6a62fab60ddf5b30cb9651f7a2ec7140e06765f9c35eec1abd625e1f5814caec",
   "added_files": {
     "tests/infrastructure/adapters/test_charge_cp_policy.py": {
       "mode": "100644",
-      "blob_sha1": "c81f6d274750c3af3bb7c2b36c9d8605d4d2ba58",
-      "sha256": "9119ed750eaa82b5a58db46762f7d286f84891fab187a53fbe7cefd081f1bc8f",
-      "bytes": 16768
+      "blob_sha1": "f8241e18bf89bb344d25d4b5127513acc4140e66",
+      "sha256": "56a3fde80febd0872595480d3bec8113cbcb83920d3d6233cbd87f725fe2800d",
+      "bytes": 20164
     }
   },
   "added_cases": [
@@ -21,6 +21,7 @@
     "tests/infrastructure/adapters/test_charge_cp_policy.py::test_late_onslaught_opt_in_requires_boolean[null]",
     "tests/infrastructure/adapters/test_charge_cp_policy.py::test_late_onslaught_opt_in_requires_boolean[string-false]",
     "tests/infrastructure/adapters/test_charge_cp_policy.py::test_late_onslaught_rejects_charge_plan_from_different_position",
+    "tests/infrastructure/adapters/test_charge_cp_policy.py::test_late_onslaught_rejects_charge_plan_when_cp_changed_before_declaration",
     "tests/infrastructure/adapters/test_charge_cp_policy.py::test_used_phase_allowance_cannot_be_spent_again"
   ],
   "origin_test": {
@@ -36,5 +37,6 @@
       "sha256": "9c65c252a42ca011e78d94203baabd550c97c9782de45ed9b5b6d0b9a6c92b0b",
       "bytes": 11818
     }
-  }
+  },
+  "declaration_sha256": "7da5a8eb9af42e87b59530ea07278a55c7a7d338692ca060475f02fd888e0dff"
 }

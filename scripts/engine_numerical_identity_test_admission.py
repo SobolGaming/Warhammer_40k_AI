@@ -1316,11 +1316,13 @@ COMBINED_CHARGE_BASE = "4d753ec652ee38b394260d3f539df7b04403149b"
 
 CHARGE_CP_TEST_ADDITION = "data/source_audits/ci64_provenance_v1/charge-cp-policy-test-v1.json"
 CHARGE_CP_POLICY_SOURCE = "src/warhammer40k_core/ai/charge_cp_policy.py"
+CHARGE_DECLARATION_SOURCE = "src/warhammer40k_core/adapters/charge_declaration_session.py"
 
 
 class _ChargeCpTestAddition(TypedDict):
     base: str
     policy_sha256: str
+    declaration_sha256: str
     retained_manifest_sha256: str
     manifest_sha256: str
     runtime_fingerprint: str
@@ -1335,7 +1337,7 @@ def _charge_cp_test_addition(root: Path) -> tuple[_ChargeCpTestAddition, bytes] 
     if not (root / path).exists():
         return None
     raw = _checked_bytes(
-        root, path, "c3f6f91e082ffbfa2d0fc784a04fca802b4ac41a854f83ad338bdcb3a994f653"
+        root, path, "aa842ec7a250b3d696b37faf552238f6144c0f30fcaaf8152996609c4317540e"
     )
     record = cast(_ChargeCpTestAddition, json.loads(raw, object_pairs_hook=_selection_object))
     if record.keys() != _ChargeCpTestAddition.__required_keys__:
@@ -2316,6 +2318,7 @@ def exact_movement_test_transition(
     if charge_cp is not None:
         cp_receipt, cp_raw = charge_cp
         _checked_bytes(root, CHARGE_CP_POLICY_SOURCE, cp_receipt["policy_sha256"])
+        _checked_bytes(root, CHARGE_DECLARATION_SOURCE, cp_receipt["declaration_sha256"])
         cp_tests = _selection_members(cp_receipt["added_files"], root)
         if cp_tests.keys() & (updated.keys() | added.keys() | additions.keys()):
             raise SystemExit("Charge CP policy tests overlap the predecessor selection.")

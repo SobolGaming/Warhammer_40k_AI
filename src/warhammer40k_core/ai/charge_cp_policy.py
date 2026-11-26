@@ -6,7 +6,6 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.adapters.access_control import ViewerContext
-from warhammer40k_core.adapters.event_stream import EventStreamCursor
 from warhammer40k_core.ai.charge_flight_admission import (
     ChargeFlightRollBound,
     ChargeFlightUnresolved,
@@ -21,9 +20,6 @@ from warhammer40k_core.engine.charge_movement_source import charge_movement_plac
 from warhammer40k_core.engine.effects import generic_rule_persisting_effect
 from warhammer40k_core.engine.phase import BattlePhase
 from warhammer40k_core.engine.phases.charge import charge_move_violation_code
-from warhammer40k_core.engine.phases.charge_modifier_ignore import (
-    SELECT_CHARGING_UNIT_DECISION_TYPE,
-)
 from warhammer40k_core.engine.rule_duration_execution import expiration_for_clause_effect
 from warhammer40k_core.engine.rule_execution import (
     RuleExecutionContext,
@@ -49,14 +45,11 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th.faction_blood_
 )
 
 if TYPE_CHECKING:
-    from warhammer40k_core.adapters.battlefield_projection import (
-        BattlefieldAuthoritativeEntitiesPayload,
-    )
+    from warhammer40k_core.adapters.charge_declaration_session import ChargeDeclarationSession
     from warhammer40k_core.adapters.local_session import LocalGameSession
     from warhammer40k_core.ai.player_policy import PlayerDecisionContext, PolicyAction
     from warhammer40k_core.engine.decision_request import DecisionOption
     from warhammer40k_core.engine.effects import PersistingEffect
-    from warhammer40k_core.engine.event_log import JsonValue
     from warhammer40k_core.engine.game_state import GameState
     from warhammer40k_core.engine.phase import LifecycleStatus
     from warhammer40k_core.engine.phases.charge import ChargePhaseHandler
@@ -166,71 +159,29 @@ def choose_dense_wall_charge(
 
 
 def submit_dense_wall_charge(
-    session: LocalGameSession, *, choice: DenseWallChargeChoice
+    declaration_session: ChargeDeclarationSession, *, choice: DenseWallChargeChoice
 ) -> LifecycleStatus:
     """Submit the issued mode while the exact qualifying player observation is current."""
     action = choice.declaration
-    viewer = ViewerContext.for_player(action.actor_id)
-    view = session.view_for_context(viewer=viewer)
-    battlefield = view["battlefield_view"]
-    if (
-        battlefield is None
-        or action.option_id is None
-        or payload_digest(view) != action.observation_hash
-    ):
-        raise PolicyError("Dense-wall Charge declaration no longer matches its observation.")
-    return session.submit_viewer_option(
-        viewer=viewer,
+    if action.option_id is None:
+        raise PolicyError("Dense-wall Charge requires an issued declaration option.")
+    status = declaration_session.submit_observed_charge_declaration(
+        viewer=ViewerContext.for_player(action.actor_id),
         request_id=action.request_id,
         option_id=action.option_id,
-        result_id=_declaration_result_id(choice, battlefield["authoritative"]),
+        result_id=f"dense-wall-charge:{action.request_id}",
+        expected_observation_hash=action.observation_hash,
     )
-
-
-def _declaration_result_id(
-    choice: DenseWallChargeChoice, battlefield: BattlefieldAuthoritativeEntitiesPayload
-) -> str:
-    action = choice.declaration
-    return "dense-wall-charge:" + payload_digest(
-        [
-            choice.game_id,
-            action.actor_id,
-            action.request_id,
-            action.observation_hash,
-            action.option_id,
-            choice.no_spend.offer.target_id,
-            choice.no_spend.witness_sha256,
-            battlefield,
-        ]
-    )
-
-
-def _recorded_ground_declaration(
-    session: LocalGameSession,
-    viewer: ViewerContext,
-    action: PolicyAction,
-    result_id: JsonValue,
-) -> bool:
-    events = session.events_since_for_context(EventStreamCursor(), viewer=viewer)["events"]
-    for event in reversed(events):
-        if event["event_type"] != "decision_recorded":
-            continue
-        payload = event["payload"]
-        if not isinstance(payload, dict):
-            continue
-        result = payload.get("result")
-        if isinstance(result, dict) and result.get("request_id") == action.request_id:
-            return (
-                result.get("result_id") == result_id
-                and result.get("actor_id") == action.actor_id
-                and result.get("decision_type") == SELECT_CHARGING_UNIT_DECISION_TYPE
-                and result.get("selected_option_id") == action.option_id
-            )
-    return False
+    if status is None:
+        raise PolicyError("Dense-wall Charge declaration no longer matches its observation.")
+    return status
 
 
 def select_late_onslaught(
-    session: LocalGameSession, context: PlayerDecisionContext, *, choice: DenseWallChargeChoice
+    declaration_session: ChargeDeclarationSession,
+    context: PlayerDecisionContext,
+    *,
+    choice: DenseWallChargeChoice,
 ) -> PolicyAction | None:
     """Select the live 1 CP option for this ground declaration when the engine issues it."""
     declaration = choice.declaration
@@ -245,6 +196,7 @@ def select_late_onslaught(
         != PolicyRoute(actor, STRATAGEM_DECISION_TYPE, "battle", None, "charge", None)
     ):
         return None
+    session = declaration_session.session
     lifecycle = session.lifecycle
     viewer = ViewerContext.for_player(actor)
     state = lifecycle.state
@@ -281,12 +233,13 @@ def select_late_onslaught(
         or offer.target_id not in distance.roll_result.reachable_target_distances_inches
     ):
         return None
-    # Result aliases are local to the viewer. Match the native accepted result
-    # against the commitment from the exact pre-roll view and unchanged board.
-    result_id = identities.project(
-        _declaration_result_id(choice, battlefield["authoritative"]), key="result_id"
-    )
-    if not _recorded_ground_declaration(session, viewer, declaration, result_id):
+    if not declaration_session.matches_observed_ground_charge(
+        viewer=viewer,
+        request_id=offer.request_id,
+        option_id=offer.ground_option_id,
+        observation_hash=offer.observation_hash,
+        battlefield=battlefield["authoritative"],
+    ):
         return None
 
     eligibility = stratagem_window_context_from_request(request)

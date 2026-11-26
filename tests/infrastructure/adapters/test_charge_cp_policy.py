@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import replace
+from dataclasses import dataclass, replace
 from typing import cast
 
 import pytest
@@ -11,6 +11,7 @@ from tests.support.faction_batch01 import Scene, anchor, locate, scene, selectio
 from tests.support.section02_fixtures import Section02Definitions
 from tests.support.section11_fixtures import begin, propose, roll, targets
 from warhammer40k_core.adapters.access_control import ViewerContext
+from warhammer40k_core.adapters.charge_declaration_session import ChargeDeclarationSession
 from warhammer40k_core.ai.charge_cp_policy import (
     DenseWallChargeChoice,
     choose_dense_wall_charge,
@@ -23,7 +24,7 @@ from warhammer40k_core.ai.charge_flight_admission import (
     ChargeFlightUnresolvedReason,
     inspect_charge_flight_offer,
 )
-from warhammer40k_core.ai.player_policy import PlayerDecisionContext, PolicyError
+from warhammer40k_core.ai.player_policy import PlayerDecisionContext, PolicyError, payload_digest
 from warhammer40k_core.core.detachment import DetachmentDefinition
 from warhammer40k_core.core.ruleset_descriptor import TerrainFeatureKind
 from warhammer40k_core.core.terrain_display import TerrainDisplayGeometry
@@ -102,9 +103,14 @@ def _wall() -> TerrainFeatureDefinition:
     )
 
 
+@dataclass
+class _ChargeScene(Scene):
+    declaration: ChargeDeclarationSession
+
+
 def _battle(
     definitions: Section02Definitions, cp: int, *, rng: str, y: float = START.position.y
-) -> Scene:
+) -> _ChargeScene:
     b = scene(
         definitions,
         (selection(definitions, BLOODTHIRSTER, "first"),),
@@ -126,7 +132,7 @@ def _battle(
             cap_exempt=True,
         )
     anchor(b)
-    return b
+    return _ChargeScene(b.session, b.state, b.units, ChargeDeclarationSession(b.session))
 
 
 def _context(b: Scene) -> PlayerDecisionContext:
@@ -171,20 +177,20 @@ def _assert_replay(b: Scene, *, completed: bool = True) -> None:
     assert result.reproduced_exactly, result
 
 
-def _natural_roll(b: Scene, choice: DenseWallChargeChoice | None = None) -> ChargeRollResult:
+def _natural_roll(b: _ChargeScene, choice: DenseWallChargeChoice | None = None) -> ChargeRollResult:
     request = b.session.lifecycle.pending_decision_request()
     assert request is not None
     if request.decision_type == "use_stratagem":
         timing = stratagem_window_context_from_request(request)
         if timing.trigger_kind is TimingTriggerKind.AFTER_DICE_ROLL:
             if choice is not None:
-                assert select_late_onslaught(b.session, _context(b), choice=choice) is None
+                assert select_late_onslaught(b.declaration, _context(b), choice=choice) is None
             _select(b, DECLINE_STRATAGEM_WINDOW_OPTION_ID, result_id="finish:decline-reroll")
     return roll(b.session)
 
 
 def _finish(
-    b: Scene,
+    b: _ChargeScene,
     witness: PathWitness,
     choice: DenseWallChargeChoice | None,
     *,
@@ -198,7 +204,7 @@ def _finish(
         elif context.route.decision_type == "use_stratagem":
             before = b.session.to_persistence_payload()
             if wrong_mode is not None:
-                assert select_late_onslaught(b.session, context, choice=wrong_mode) is None
+                assert select_late_onslaught(b.declaration, context, choice=wrong_mode) is None
             if choice is None:
                 assert not any(
                     row["option_id"].startswith(
@@ -207,7 +213,9 @@ def _finish(
                     for row in context.request["options"]
                 )
             action = (
-                None if choice is None else select_late_onslaught(b.session, context, choice=choice)
+                None
+                if choice is None
+                else select_late_onslaught(b.declaration, context, choice=choice)
             )
             assert b.session.to_persistence_payload() == before
             if action is None:
@@ -218,7 +226,7 @@ def _finish(
                 assert action.option_id is not None
                 _select(b, action.option_id, result_id="finish:accept")
                 assert choice is not None
-                assert select_late_onslaught(b.session, context, choice=choice) is None
+                assert select_late_onslaught(b.declaration, context, choice=choice) is None
                 spent += 1
         else:
             assert context.route.decision_type == "submit_movement_proposal"
@@ -231,10 +239,10 @@ def _finish(
 @pytest.mark.parametrize(
     ("cp", "allow_spend", "rng", "flies", "expected_roll"),
     [
-        (1, False, "dense-cp-policy-0", True, 10),
-        (1, True, "dense-cp-policy-11", False, 8),
-        (0, True, "dense-cp-policy-0", True, 11),
-        (1, True, "dense-cp-policy-0", False, 6),
+        (1, False, "dense-cp-policy-7", True, 10),
+        (1, True, "dense-cp-policy-0", False, 8),
+        (0, True, "dense-cp-policy-5", True, 9),
+        (1, True, "dense-cp-policy-11", False, 6),
     ],
     ids=["keep-cp", "conditional-ground", "unaffordable", "short-roll"],
 )
@@ -284,7 +292,7 @@ def test_dense_wall_policy_submits_native_modes_and_costs(
     )
     assert choice.declaration.request_id == context.request["request_id"]
     assert choice.declaration.observation_hash == context.observation_hash
-    status = submit_dense_wall_charge(b.session, choice=choice)
+    status = submit_dense_wall_charge(b.declaration, choice=choice)
     assert status.status_kind is not LifecycleStatusKind.INVALID, status
 
     actual = _natural_roll(b, choice)
@@ -294,7 +302,7 @@ def test_dense_wall_policy_submits_native_modes_and_costs(
     short = expected_roll < 7
     if short:
         assert not actual.move_available
-        assert select_late_onslaught(b.session, _context(b), choice=choice) is None
+        assert select_late_onslaught(b.declaration, _context(b), choice=choice) is None
         spent = 0
     else:
         assert actual.move_available, actual.value
@@ -361,26 +369,34 @@ def test_late_onslaught_opt_in_requires_boolean(
     assert b.session.to_persistence_payload() == before
 
 
+def _conditional_plan(b: Scene) -> DenseWallChargeChoice:
+    choice = choose_dense_wall_charge(
+        b.session,
+        _context(b),
+        unit_id=MOVER,
+        target_id=TARGET,
+        witness=_witness(b),
+        allow_late_onslaught=True,
+    )
+    assert isinstance(choice, DenseWallChargeChoice)
+    assert choice.conditional_ground is not None
+    return choice
+
+
+def _assert_live_onslaught_offer(context: PlayerDecisionContext) -> None:
+    assert any(
+        row["option_id"].startswith(f"use-stratagem:{ir.GORE_HUNGRY_ONSLAUGHT_STRATAGEM_ID}:")
+        for row in context.request["options"]
+    )
+
+
 def test_late_onslaught_rejects_charge_plan_from_different_position(
     definitions: Section02Definitions,
 ) -> None:
     origin = _battle(definitions, 1, rng="dense-cp-policy-11")
     _decline_before_roll(origin)
     initial = _context(origin)
-    choice = choose_dense_wall_charge(
-        origin.session,
-        initial,
-        unit_id=MOVER,
-        target_id=TARGET,
-        witness=_witness(origin),
-        allow_late_onslaught=True,
-    )
-    assert isinstance(choice, DenseWallChargeChoice)
-    assert choice.conditional_ground is not None
-    assert submit_dense_wall_charge(origin.session, choice=choice).status_kind is not (
-        LifecycleStatusKind.INVALID
-    )
-    committed = _natural_roll(origin, choice)
+    choice = _conditional_plan(origin)
 
     clear = _battle(definitions, 1, rng="dense-cp-policy-11", y=36)
     _decline_before_roll(clear)
@@ -388,30 +404,94 @@ def test_late_onslaught_rejects_charge_plan_from_different_position(
     clear_witness = _witness(clear, start=Pose.at(START.position.x, 36))
     assert visible.observation["game_id"] == initial.observation["game_id"]
     assert visible.route == initial.route
-    assert visible.request["request_id"] == initial.request["request_id"]
-    assert visible.request["options"] == initial.request["options"]
+    assert visible.request == initial.request
     assert visible.observation_hash != initial.observation_hash
     before = clear.session.to_persistence_payload()
     with pytest.raises(PolicyError, match="declaration no longer matches its observation"):
-        submit_dense_wall_charge(clear.session, choice=choice)
+        submit_dense_wall_charge(clear.declaration, choice=choice)
     assert clear.session.to_persistence_payload() == before
 
-    # Even copying the accepted client result ID onto the same issued ground
-    # option cannot extend a qualification to a different public battlefield.
-    _select(
-        clear,
-        choice.no_spend.offer.ground_option_id,
-        result_id=committed.request.source_decision_result_id,
+    # Recompute the former result-ID binding using the stale plan and live board.
+    # The session accepts the native declaration on the live observation only.
+    battlefield = visible.observation["battlefield_view"]
+    assert battlefield is not None
+    action = choice.declaration
+    supplied_id = "dense-wall-charge:" + payload_digest(
+        [
+            choice.game_id,
+            action.actor_id,
+            action.request_id,
+            action.observation_hash,
+            action.option_id,
+            TARGET,
+            choice.no_spend.witness_sha256,
+            battlefield["authoritative"],
+        ]
     )
+    status = clear.declaration.submit_observed_charge_declaration(
+        viewer=VIEWER,
+        request_id=action.request_id,
+        option_id=choice.no_spend.offer.ground_option_id,
+        result_id=supplied_id,
+        expected_observation_hash=visible.observation_hash,
+    )
+    assert status is not None
+    assert status.status_kind is not LifecycleStatusKind.INVALID
     actual = _natural_roll(clear, choice)
-    assert committed.value == 8
-    assert actual.value == 7
+    assert actual.request.source_decision_result_id == supplied_id
     assert actual.move_available
-    assert any(
-        row["option_id"].startswith(f"use-stratagem:{ir.GORE_HUNGRY_ONSLAUGHT_STRATAGEM_ID}:")
-        for row in _context(clear).request["options"]
-    )
+    _assert_live_onslaught_offer(_context(clear))
     assert _finish(clear, clear_witness, choice) == 0
     assert clear.state.command_point_total(OWNER) == 1
     assert not clear.state.stratagem_use_records
     _assert_replay(clear)
+
+
+def test_late_onslaught_rejects_charge_plan_when_cp_changed_before_declaration(
+    definitions: Section02Definitions,
+) -> None:
+    rng = "dense-cp-policy-0"
+    origin = _battle(definitions, 1, rng=rng)
+    _decline_before_roll(origin)
+    initial = _context(origin)
+    choice = _conditional_plan(origin)
+    assert submit_dense_wall_charge(origin.declaration, choice=choice).status_kind is not (
+        LifecycleStatusKind.INVALID
+    )
+    original = _natural_roll(origin, choice)
+    assert original.move_available
+
+    prepared = _battle(definitions, 2, rng=rng)
+    _decline_before_roll(prepared)
+    visible = _context(prepared)
+    assert visible.observation["battlefield_view"] == initial.observation["battlefield_view"]
+    assert visible.observation["game_id"] == initial.observation["game_id"]
+    assert visible.route == initial.route
+    assert visible.request == initial.request
+    assert visible.observation_hash != initial.observation_hash
+    before = prepared.session.to_persistence_payload()
+    with pytest.raises(PolicyError, match="declaration no longer matches its observation"):
+        submit_dense_wall_charge(prepared.declaration, choice=choice)
+    assert prepared.session.to_persistence_payload() == before
+
+    status = prepared.declaration.submit_observed_charge_declaration(
+        viewer=VIEWER,
+        request_id=choice.declaration.request_id,
+        option_id=choice.no_spend.offer.ground_option_id,
+        result_id=original.request.source_decision_result_id,
+        expected_observation_hash=visible.observation_hash,
+    )
+    assert status is not None
+    assert status.status_kind is not LifecycleStatusKind.INVALID
+    actual = _natural_roll(prepared, choice)
+    assert actual.request.source_decision_result_id == original.request.source_decision_result_id
+    assert actual.move_available
+    late = _context(prepared)
+    _assert_live_onslaught_offer(late)
+    before = prepared.session.to_persistence_payload()
+    assert select_late_onslaught(prepared.declaration, late, choice=choice) is None
+    assert prepared.session.to_persistence_payload() == before
+    _select(prepared, DECLINE_STRATAGEM_WINDOW_OPTION_ID, result_id="finish:decline-onslaught")
+    assert prepared.state.command_point_total(OWNER) == 2
+    assert not prepared.state.stratagem_use_records
+    _assert_replay(prepared, completed=False)
