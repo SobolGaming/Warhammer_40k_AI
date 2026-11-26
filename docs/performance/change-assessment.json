@@ -1,560 +1,378 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "f7fcd013ae67b51945beb4dc71c57edbb2b0015e",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:c5732ba60d52525e3b628792bb9cd03bdac3ed82834e6c5a7f09e57f1ffd3443",
-  "operation_map_sha256": "8ea9c660a2007701334580622231e46763137df1d960db851ec5effed4f7cb95",
+  "base": "098847346d8f554323a6417ede02a06eaa2613d6",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:cdd4dc3a140f7a09efbe307cf6333b3fada76748838fa5543b2160727da765b0",
+  "operation_map_sha256": "3a6a9afc6e931407efd6d1189e6da5401d7d31d47ed5ef0796f5c8e1d4c73736",
   "changes": {
     "ci/test_shards/durations.json": {
-      "before_sha256": "5d35ab02b2fb41cb5e1c7896706a2f6f3529bdfa3f20cfc90c2f2b9a210cb99d",
-      "after_sha256": "6f6f8e9adbc68e336dbaeafba17e6dfb13a22b633b44a0bbd7cdbf2cb50c0a18",
+      "before_sha256": "6f6f8e9adbc68e336dbaeafba17e6dfb13a22b633b44a0bbd7cdbf2cb50c0a18",
+      "after_sha256": "0efd2fc79cca4ffee955b40349e20128d53a406b240ba7df997d2f08e18328d3",
       "owners": {
         "@document": {
-          "before": "5d35ab02b2fb41cb5e1c7896706a2f6f3529bdfa3f20cfc90c2f2b9a210cb99d",
-          "after": "6f6f8e9adbc68e336dbaeafba17e6dfb13a22b633b44a0bbd7cdbf2cb50c0a18"
+          "before": "6f6f8e9adbc68e336dbaeafba17e6dfb13a22b633b44a0bbd7cdbf2cb50c0a18",
+          "after": "0efd2fc79cca4ffee955b40349e20128d53a406b240ba7df997d2f08e18328d3"
         }
       }
     },
     "ci/test_shards/shard-1.txt": {
-      "before_sha256": "0e3d44bcfc990375e8704b6213c72f44c4eb280d72f546cd6d364a3dcaede17c",
-      "after_sha256": "1beb344d02e3f4fb7c6ef6692af69f8ac74a60425dbb92349181153861722ce5",
+      "before_sha256": "1beb344d02e3f4fb7c6ef6692af69f8ac74a60425dbb92349181153861722ce5",
+      "after_sha256": "032e55bbb7ee725fb07ff6b9c51d8f116e351e000c36680bdc5d18c3521c8a32",
       "owners": {
         "@document": {
-          "before": "0e3d44bcfc990375e8704b6213c72f44c4eb280d72f546cd6d364a3dcaede17c",
-          "after": "1beb344d02e3f4fb7c6ef6692af69f8ac74a60425dbb92349181153861722ce5"
+          "before": "1beb344d02e3f4fb7c6ef6692af69f8ac74a60425dbb92349181153861722ce5",
+          "after": "032e55bbb7ee725fb07ff6b9c51d8f116e351e000c36680bdc5d18c3521c8a32"
         }
       }
     },
     "ci/test_shards/shard-10.txt": {
-      "before_sha256": "f6b673271806fc73e07e5dbf404f8657a3a85e104d97091deb85d0e9ebb1c794",
-      "after_sha256": "33454c10ac3d133dcf1734697b14a8cad00f6dfada0cd0401367809b52e4ae8a",
+      "before_sha256": "33454c10ac3d133dcf1734697b14a8cad00f6dfada0cd0401367809b52e4ae8a",
+      "after_sha256": "6b4430379b6ea68580d6bbd18312bdadcf1aadc17ab0f2189c627d2270a23618",
       "owners": {
         "@document": {
-          "before": "f6b673271806fc73e07e5dbf404f8657a3a85e104d97091deb85d0e9ebb1c794",
-          "after": "33454c10ac3d133dcf1734697b14a8cad00f6dfada0cd0401367809b52e4ae8a"
+          "before": "33454c10ac3d133dcf1734697b14a8cad00f6dfada0cd0401367809b52e4ae8a",
+          "after": "6b4430379b6ea68580d6bbd18312bdadcf1aadc17ab0f2189c627d2270a23618"
         }
       }
     },
     "ci/test_shards/shard-11.txt": {
-      "before_sha256": "043101734865e016d7ae85f76b84088a4090f962321cab9f183aa2133cb080e7",
-      "after_sha256": "7352f555856342b3066dea76a83941d26851667b22bbee24a13d10dbbd2cc4ec",
+      "before_sha256": "7352f555856342b3066dea76a83941d26851667b22bbee24a13d10dbbd2cc4ec",
+      "after_sha256": "c3db0a42154ff4af7b545bb624d371e4d744e6c694dcf56cfea7e92d14b6f4d3",
       "owners": {
         "@document": {
-          "before": "043101734865e016d7ae85f76b84088a4090f962321cab9f183aa2133cb080e7",
-          "after": "7352f555856342b3066dea76a83941d26851667b22bbee24a13d10dbbd2cc4ec"
+          "before": "7352f555856342b3066dea76a83941d26851667b22bbee24a13d10dbbd2cc4ec",
+          "after": "c3db0a42154ff4af7b545bb624d371e4d744e6c694dcf56cfea7e92d14b6f4d3"
         }
       }
     },
     "ci/test_shards/shard-12.txt": {
-      "before_sha256": "9ca251eb0943c115509d4a9aafa1597f79fc43fdc73d6e0a3ad13a7a952d1077",
-      "after_sha256": "324e4bb8ed49462608c53601d2ca606ec2f4b394c32f3843bab4d1026f564077",
+      "before_sha256": "324e4bb8ed49462608c53601d2ca606ec2f4b394c32f3843bab4d1026f564077",
+      "after_sha256": "d30045f015e660d385f71d40e2c37f5b708609725146c0e1801a2dfe81dbbc8f",
       "owners": {
         "@document": {
-          "before": "9ca251eb0943c115509d4a9aafa1597f79fc43fdc73d6e0a3ad13a7a952d1077",
-          "after": "324e4bb8ed49462608c53601d2ca606ec2f4b394c32f3843bab4d1026f564077"
+          "before": "324e4bb8ed49462608c53601d2ca606ec2f4b394c32f3843bab4d1026f564077",
+          "after": "d30045f015e660d385f71d40e2c37f5b708609725146c0e1801a2dfe81dbbc8f"
         }
       }
     },
     "ci/test_shards/shard-4.txt": {
-      "before_sha256": "2996411ee4a143ae790f5aec35058756bd3951e7010c212c428e0900efae5865",
-      "after_sha256": "70a71859a44aa5ac50ee10208c6ed75bde3294b48b8b998a1dd53bd917f049e5",
+      "before_sha256": "70a71859a44aa5ac50ee10208c6ed75bde3294b48b8b998a1dd53bd917f049e5",
+      "after_sha256": "44db6078f0e745044911fb717d81b2f548d4392fd99aeead0413798db6813718",
       "owners": {
         "@document": {
-          "before": "2996411ee4a143ae790f5aec35058756bd3951e7010c212c428e0900efae5865",
-          "after": "70a71859a44aa5ac50ee10208c6ed75bde3294b48b8b998a1dd53bd917f049e5"
+          "before": "70a71859a44aa5ac50ee10208c6ed75bde3294b48b8b998a1dd53bd917f049e5",
+          "after": "44db6078f0e745044911fb717d81b2f548d4392fd99aeead0413798db6813718"
         }
       }
     },
     "ci/test_shards/shard-5.txt": {
-      "before_sha256": "180521b2883f5b0cf405749c2647fac3c0aac7a7f30580b2c3b7c9200bb72173",
-      "after_sha256": "7bf8bf1855eb829c4f491aca25f1c7161aa21fa7f0cf5bdb4f759baaab7e6227",
+      "before_sha256": "7bf8bf1855eb829c4f491aca25f1c7161aa21fa7f0cf5bdb4f759baaab7e6227",
+      "after_sha256": "38af8587ecc0d92d63509c7ff0f1b48e8f9566e6129078a59928c4edd4886b90",
       "owners": {
         "@document": {
-          "before": "180521b2883f5b0cf405749c2647fac3c0aac7a7f30580b2c3b7c9200bb72173",
-          "after": "7bf8bf1855eb829c4f491aca25f1c7161aa21fa7f0cf5bdb4f759baaab7e6227"
+          "before": "7bf8bf1855eb829c4f491aca25f1c7161aa21fa7f0cf5bdb4f759baaab7e6227",
+          "after": "38af8587ecc0d92d63509c7ff0f1b48e8f9566e6129078a59928c4edd4886b90"
         }
       }
     },
     "ci/test_shards/shard-6.txt": {
-      "before_sha256": "e4bfebea56a4270f3212590c91ab3e1e3cdc0180244c0179485d6bc252f96db2",
-      "after_sha256": "36ad85fd74e0ba43955960d8d63d2a7e0154950563c8f1d229dcf5297cfd4381",
+      "before_sha256": "36ad85fd74e0ba43955960d8d63d2a7e0154950563c8f1d229dcf5297cfd4381",
+      "after_sha256": "914f5c3a9a5e998e357e8a72e48a64aa9d3d921022ccaaf44f99c0880f8186f9",
       "owners": {
         "@document": {
-          "before": "e4bfebea56a4270f3212590c91ab3e1e3cdc0180244c0179485d6bc252f96db2",
-          "after": "36ad85fd74e0ba43955960d8d63d2a7e0154950563c8f1d229dcf5297cfd4381"
+          "before": "36ad85fd74e0ba43955960d8d63d2a7e0154950563c8f1d229dcf5297cfd4381",
+          "after": "914f5c3a9a5e998e357e8a72e48a64aa9d3d921022ccaaf44f99c0880f8186f9"
         }
       }
     },
     "ci/test_shards/shard-7.txt": {
-      "before_sha256": "161e7d0b2b3930d8d3f91be8dd7e739d7848d469bb7e1a12aa084613aeafcaa9",
-      "after_sha256": "00ae12bbe0cdd993b2a75e6d32c31fc2f901e8dc63ded86215dc33375460cd5b",
+      "before_sha256": "00ae12bbe0cdd993b2a75e6d32c31fc2f901e8dc63ded86215dc33375460cd5b",
+      "after_sha256": "75cbeb060b99a81055394a9a3678cea97d089ae281a067e913b733f709ebe0aa",
       "owners": {
         "@document": {
-          "before": "161e7d0b2b3930d8d3f91be8dd7e739d7848d469bb7e1a12aa084613aeafcaa9",
-          "after": "00ae12bbe0cdd993b2a75e6d32c31fc2f901e8dc63ded86215dc33375460cd5b"
+          "before": "00ae12bbe0cdd993b2a75e6d32c31fc2f901e8dc63ded86215dc33375460cd5b",
+          "after": "75cbeb060b99a81055394a9a3678cea97d089ae281a067e913b733f709ebe0aa"
         }
       }
     },
     "ci/test_shards/shard-8.txt": {
-      "before_sha256": "d7b358a07a383837ad9ed912f676fde03b3c7d97d061b039f10fb49c093c5725",
-      "after_sha256": "4fd8670ca1480d8a34c7b577f3eca62b8590d24935c096a5de5cd00a76acefce",
+      "before_sha256": "4fd8670ca1480d8a34c7b577f3eca62b8590d24935c096a5de5cd00a76acefce",
+      "after_sha256": "2f7a2c7e110c44325309c3e1a82dd9cf0140c7a20c9cf43cdeaa598231688258",
       "owners": {
         "@document": {
-          "before": "d7b358a07a383837ad9ed912f676fde03b3c7d97d061b039f10fb49c093c5725",
-          "after": "4fd8670ca1480d8a34c7b577f3eca62b8590d24935c096a5de5cd00a76acefce"
+          "before": "4fd8670ca1480d8a34c7b577f3eca62b8590d24935c096a5de5cd00a76acefce",
+          "after": "2f7a2c7e110c44325309c3e1a82dd9cf0140c7a20c9cf43cdeaa598231688258"
         }
       }
     },
     "ci/test_shards/shard-9.txt": {
-      "before_sha256": "c686e9acfa9b3750f5681120cefe19c411852db7fad28c5978d0c8e60620b243",
-      "after_sha256": "4e32f60c038f8b519a6c40d2dd3457aac61626ff1a67ee8651f2a7ee42fe9fa3",
+      "before_sha256": "4e32f60c038f8b519a6c40d2dd3457aac61626ff1a67ee8651f2a7ee42fe9fa3",
+      "after_sha256": "b21027bfceaf207a0e0ac16b933157997f03aa4529420745015da1dca5580196",
       "owners": {
         "@document": {
-          "before": "c686e9acfa9b3750f5681120cefe19c411852db7fad28c5978d0c8e60620b243",
-          "after": "4e32f60c038f8b519a6c40d2dd3457aac61626ff1a67ee8651f2a7ee42fe9fa3"
+          "before": "4e32f60c038f8b519a6c40d2dd3457aac61626ff1a67ee8651f2a7ee42fe9fa3",
+          "after": "b21027bfceaf207a0e0ac16b933157997f03aa4529420745015da1dca5580196"
         }
       }
     },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "b034202d647899ca362ae238fd5779b3d909cfd8bb58d21480b43afb30c52d50",
-      "after_sha256": "eb6c8ffdff3fa6fce0b312fbe0beb46037370cdc69e62e1e586ee56b5f78b178",
+      "before_sha256": "eb6c8ffdff3fa6fce0b312fbe0beb46037370cdc69e62e1e586ee56b5f78b178",
+      "after_sha256": "6484063f3bc0dfbf4a919b8a43a8ec83d8dce3aaf791bf705bb9d043dd3c0a31",
       "owners": {
         "@document": {
-          "before": "b034202d647899ca362ae238fd5779b3d909cfd8bb58d21480b43afb30c52d50",
-          "after": "eb6c8ffdff3fa6fce0b312fbe0beb46037370cdc69e62e1e586ee56b5f78b178"
+          "before": "eb6c8ffdff3fa6fce0b312fbe0beb46037370cdc69e62e1e586ee56b5f78b178",
+          "after": "6484063f3bc0dfbf4a919b8a43a8ec83d8dce3aaf791bf705bb9d043dd3c0a31"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "2694c575eb2959967058c4ed3acc8972d08c13efccda22cc672c52dbfd9d57b7",
-      "after_sha256": "7b0f9a37d48f3ac242138c351370a68e444f554c13764bee3c46ab9176014b37",
+      "before_sha256": "7b0f9a37d48f3ac242138c351370a68e444f554c13764bee3c46ab9176014b37",
+      "after_sha256": "3d2a54414a120be7dbfe9d87fec98bb786cd166e9b01579655ca1153c67b64df",
       "owners": {
         "@document": {
-          "before": "2694c575eb2959967058c4ed3acc8972d08c13efccda22cc672c52dbfd9d57b7",
-          "after": "7b0f9a37d48f3ac242138c351370a68e444f554c13764bee3c46ab9176014b37"
+          "before": "7b0f9a37d48f3ac242138c351370a68e444f554c13764bee3c46ab9176014b37",
+          "after": "3d2a54414a120be7dbfe9d87fec98bb786cd166e9b01579655ca1153c67b64df"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "bc35fe3501216ce94e8face0ec405f7b14221e660855561844309a36bfbaee3c",
-      "after_sha256": "6f51115b707e62e808b60bb0cf4398ccc3c01bc2b1e90e471819018c682f9d11",
+      "before_sha256": "6f51115b707e62e808b60bb0cf4398ccc3c01bc2b1e90e471819018c682f9d11",
+      "after_sha256": "02cef4713f42f79af2291137012c590abc91b808ee872ecc0d186b2d38ca5b61",
       "owners": {
         "@document": {
-          "before": "bc35fe3501216ce94e8face0ec405f7b14221e660855561844309a36bfbaee3c",
-          "after": "6f51115b707e62e808b60bb0cf4398ccc3c01bc2b1e90e471819018c682f9d11"
+          "before": "6f51115b707e62e808b60bb0cf4398ccc3c01bc2b1e90e471819018c682f9d11",
+          "after": "02cef4713f42f79af2291137012c590abc91b808ee872ecc0d186b2d38ca5b61"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "bdd0a091f8da1d9e82b8443b0088c5872b0b0977dda33721ae59943a2d71fe86",
-      "after_sha256": "40df81c7be51bb7c867372e35dbe6b783ca4740dd8f1d78b03cd3dae79cb5522",
+      "before_sha256": "40df81c7be51bb7c867372e35dbe6b783ca4740dd8f1d78b03cd3dae79cb5522",
+      "after_sha256": "a2b90bf05a1246455e5ea92b0d2b92f5dbf87c3defb09a5907237063720b6e5f",
       "owners": {
         "@document": {
-          "before": "bdd0a091f8da1d9e82b8443b0088c5872b0b0977dda33721ae59943a2d71fe86",
-          "after": "40df81c7be51bb7c867372e35dbe6b783ca4740dd8f1d78b03cd3dae79cb5522"
+          "before": "40df81c7be51bb7c867372e35dbe6b783ca4740dd8f1d78b03cd3dae79cb5522",
+          "after": "a2b90bf05a1246455e5ea92b0d2b92f5dbf87c3defb09a5907237063720b6e5f"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "6cb4f338685dd698afa581de5ffebdebc0bb8bb10cccb0a0900f3bd8b0f838fd",
-      "after_sha256": "5b19b46857ac684a3d9639eaf85889f027ddc13fadd0ebfa9b915b19e69fb957",
+      "before_sha256": "5b19b46857ac684a3d9639eaf85889f027ddc13fadd0ebfa9b915b19e69fb957",
+      "after_sha256": "0e16539c3127f65e9651035e8b1e62174c60053d460b38722ffc7d6bb4df81e6",
       "owners": {
         "@document": {
-          "before": "6cb4f338685dd698afa581de5ffebdebc0bb8bb10cccb0a0900f3bd8b0f838fd",
-          "after": "5b19b46857ac684a3d9639eaf85889f027ddc13fadd0ebfa9b915b19e69fb957"
+          "before": "5b19b46857ac684a3d9639eaf85889f027ddc13fadd0ebfa9b915b19e69fb957",
+          "after": "0e16539c3127f65e9651035e8b1e62174c60053d460b38722ffc7d6bb4df81e6"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "0ec15dcdb25aa3eb19ee59f29bec588934403cfd84318c2bb5de19a84bbe534a",
-      "after_sha256": "2619cf768ffad9c8eaf6fc46ccd14c467ec3568710ecf0054290b58bc0ee3540",
+      "before_sha256": "2619cf768ffad9c8eaf6fc46ccd14c467ec3568710ecf0054290b58bc0ee3540",
+      "after_sha256": "b40fd4beb7344966782bd556594333c493396a81475a6da97b1a0905a734b622",
       "owners": {
         "@document": {
-          "before": "0ec15dcdb25aa3eb19ee59f29bec588934403cfd84318c2bb5de19a84bbe534a",
-          "after": "2619cf768ffad9c8eaf6fc46ccd14c467ec3568710ecf0054290b58bc0ee3540"
+          "before": "2619cf768ffad9c8eaf6fc46ccd14c467ec3568710ecf0054290b58bc0ee3540",
+          "after": "b40fd4beb7344966782bd556594333c493396a81475a6da97b1a0905a734b622"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "d5ecc857de54e5ac5adba7fa1d984a8d3881baa1c0179e8e8db720fb6f5a48d0",
-      "after_sha256": "5ae2479040929349f9f893c77679d935213e1aef7fbe47e1234ab27600bf08c6",
+      "before_sha256": "5ae2479040929349f9f893c77679d935213e1aef7fbe47e1234ab27600bf08c6",
+      "after_sha256": "303f706781571ef3e6329dcfaa9a7b66216eab89792910840f62c4389eea1e6c",
       "owners": {
         "@document": {
-          "before": "d5ecc857de54e5ac5adba7fa1d984a8d3881baa1c0179e8e8db720fb6f5a48d0",
-          "after": "5ae2479040929349f9f893c77679d935213e1aef7fbe47e1234ab27600bf08c6"
+          "before": "5ae2479040929349f9f893c77679d935213e1aef7fbe47e1234ab27600bf08c6",
+          "after": "303f706781571ef3e6329dcfaa9a7b66216eab89792910840f62c4389eea1e6c"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "1d42b35c1c6a3b551b5a01d170cac2d323e4a09823894ed60917c29492ad7be7",
-      "after_sha256": "b69419ded9e015c4eb860d20f46f724cc94c39f7088e485dc229fccc694ce606",
+      "before_sha256": "b69419ded9e015c4eb860d20f46f724cc94c39f7088e485dc229fccc694ce606",
+      "after_sha256": "36f6ff588eefbf69108ecc69052f658cc60664e798ca7b7c3255e8f05b935f5a",
       "owners": {
         "@document": {
-          "before": "1d42b35c1c6a3b551b5a01d170cac2d323e4a09823894ed60917c29492ad7be7",
-          "after": "b69419ded9e015c4eb860d20f46f724cc94c39f7088e485dc229fccc694ce606"
+          "before": "b69419ded9e015c4eb860d20f46f724cc94c39f7088e485dc229fccc694ce606",
+          "after": "36f6ff588eefbf69108ecc69052f658cc60664e798ca7b7c3255e8f05b935f5a"
         }
       }
     },
-    "data/source_audits/ci64_provenance_v1/counteroffensive-fight-type-v1.json": {
+    "data/source_audits/ci64_provenance_v1/stage3-ranged-profile-test-v1.json": {
       "before_sha256": null,
-      "after_sha256": "e9b0e313baa71a2965d152b6649e9ea045273a8bc14c4ce084ee7db64dbdcdd7",
+      "after_sha256": "9060d2c1d4f148890cb33154dedb60908bb7f4eaf9350c3b8932b974f63bce92",
       "owners": {
         "@document": {
           "before": null,
-          "after": "e9b0e313baa71a2965d152b6649e9ea045273a8bc14c4ce084ee7db64dbdcdd7"
+          "after": "9060d2c1d4f148890cb33154dedb60908bb7f4eaf9350c3b8932b974f63bce92"
         }
       }
     },
-    "docs/ADAPTER_DECISION_CONTRACT.md": {
-      "before_sha256": "64d9de023dccfeccf0dd86550c47c581175291ded92be6d835f6743e53379d67",
-      "after_sha256": "3ad5a6f19b15c7fe3a83527eef9c42c0ac27a2499274aab37997b2f670e6d108",
+    "docs/AI_POLICY_INTERFACE.md": {
+      "before_sha256": "e5d70e63b1f35942cb4afa85cc585607d57acb98030c9ee7438b7297eca2d4ea",
+      "after_sha256": "04bda8e314e419eb034705fefc9f5edbbeab3f67006c8bedc546fa6cbe6d6844",
       "owners": {
         "@document": {
-          "before": "64d9de023dccfeccf0dd86550c47c581175291ded92be6d835f6743e53379d67",
-          "after": "3ad5a6f19b15c7fe3a83527eef9c42c0ac27a2499274aab37997b2f670e6d108"
-        }
-      }
-    },
-    "docs/performance/current/counteroffensive-review-dice.json": {
-      "before_sha256": null,
-      "after_sha256": "10044cb5ca785cfdf44c79a93d7e26d9e0d0053ff0ed5dcf360a9d1228330b78",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "10044cb5ca785cfdf44c79a93d7e26d9e0d0053ff0ed5dcf360a9d1228330b78"
-        }
-      }
-    },
-    "docs/performance/current/counteroffensive-review-dice_sustained.json": {
-      "before_sha256": null,
-      "after_sha256": "f4d71b21209be1a83a0e0784c93d68fc994bae4ecf6d91f37249c1ef606acdd6",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "f4d71b21209be1a83a0e0784c93d68fc994bae4ecf6d91f37249c1ef606acdd6"
-        }
-      }
-    },
-    "docs/performance/current/counteroffensive-review-reconstruction.json": {
-      "before_sha256": null,
-      "after_sha256": "0e0b095b58f0b9dbdd5df98e80d1d09075b36a2c8d0cb205b45bfca2464ca783",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "0e0b095b58f0b9dbdd5df98e80d1d09075b36a2c8d0cb205b45bfca2464ca783"
+          "before": "e5d70e63b1f35942cb4afa85cc585607d57acb98030c9ee7438b7297eca2d4ea",
+          "after": "04bda8e314e419eb034705fefc9f5edbbeab3f67006c8bedc546fa6cbe6d6844"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "17a09fd81425164a83ee091769f1261670a46719b7f2f97db5867340bd5f542e",
-      "after_sha256": "1d59c7a80417df482040fb449041169345f070f112cdfa759761daba2b466a19",
+      "before_sha256": "1d59c7a80417df482040fb449041169345f070f112cdfa759761daba2b466a19",
+      "after_sha256": "d5a0255320e72bc6e0d2dd6600a92368ccc0719f4333d2adf43276c20a70809d",
       "owners": {
         "@document": {
-          "before": "17a09fd81425164a83ee091769f1261670a46719b7f2f97db5867340bd5f542e",
-          "after": "1d59c7a80417df482040fb449041169345f070f112cdfa759761daba2b466a19"
-        }
-      }
-    },
-    "scripts/dark_pact_test_admission.py": {
-      "before_sha256": "00c8960756fd8419f02efc04e6c5f41435e66ebfb93c2567fe7d5bb28a8ad5b1",
-      "after_sha256": "118fb2deac4981c9c60a1264e049dd92629a26dff88ccc9a5a7a9768986f1045",
-      "owners": {
-        "dark_pact_source_successors": {
-          "before": "be318b91488ec2a00cd8d0341a34f10e0fd181d492b47909a34ff79cb13d0643",
-          "after": "63c23888a4d0d1ab37034c7a89b2855607de31e020264dc59db1544c6f03ad00"
-        },
-        "dark_pact_test_transition": {
-          "before": "1ae3f48b33711243a331b39bcc77db048cd3bcac362dd0f7b138d6e1f5eb804e",
-          "after": "f6f6829f6720d5ec75ce4fae3eb614287b3143e54ce1cd47be330e7b85acce5d"
+          "before": "1d59c7a80417df482040fb449041169345f070f112cdfa759761daba2b466a19",
+          "after": "d5a0255320e72bc6e0d2dd6600a92368ccc0719f4333d2adf43276c20a70809d"
         }
       }
     },
     "scripts/engine_numerical_identity_test_admission.py": {
-      "before_sha256": "8d7f6790ce10e0026c26213f1908e686d3e33be43b9a4b9ac8c9240d3f02dd4f",
-      "after_sha256": "16af2f5074e7ec286936660d6617ec225602b75271663d8f233b4f4ae14dd591",
+      "before_sha256": "16af2f5074e7ec286936660d6617ec225602b75271663d8f233b4f4ae14dd591",
+      "after_sha256": "f32a402603afeedb499453d313a584587c56db89b889996705e2accfbaba412c",
       "owners": {
-        "@module": {
-          "before": "b3b28155231bc4eb40dfe11a970b260780fa6c24d18fcf0338f38972dd547a2b",
-          "after": "17da2e5c2fc9ba7b9a3cec54525fbda0e27859632ea040b726781fe266ec1d29"
-        },
-        "_CounteroffensiveFightTypeReceipt": {
-          "before": null,
-          "after": "7c3790c222fc65031faa8ee08d2bd3894dcc2e5b8ccec0c9b1b1dfbb3db9b819"
-        },
         "_counteroffensive_fight_type_transition": {
-          "before": null,
-          "after": "d9d65a3c9249ccb15f8dd5c2fd8d0ceab4fab6b923c88ff14615b1ef247e1901"
-        },
-        "_stage2_melee_restore_successor": {
-          "before": "30cfb3a88427a6e19a2c8ecdebd98480fcf4a6427eb22a67da65b33d19c331ab",
-          "after": "80434abb46addf0305b97f0d2e2adcc3142a4785704db4251b5785bdacb6571f"
+          "before": "d9d65a3c9249ccb15f8dd5c2fd8d0ceab4fab6b923c88ff14615b1ef247e1901",
+          "after": "77ac9f6a04679a572642d1ccfdeb06b401a0740becae8f78d1e94c6350a4bd09"
         },
         "combined_charge_runtime": {
-          "before": "94e6927db6153a79aecde2bc31539e9b566463b94aa1d70dcd6386387b430ef6",
-          "after": "cbd6fb35344c292b1926b5c26c10025ca3750bb970e2d6483bcc8aa98ac76942"
+          "before": "cbd6fb35344c292b1926b5c26c10025ca3750bb970e2d6483bcc8aa98ac76942",
+          "after": "80aa63de33616daad761120370fc65110e67aaa34db390c8f01e073f37f420ea"
         },
         "exact_movement_test_transition": {
-          "before": "52b66c7d8130061125299123d98ca322c388e50ff533fa7312c38a6a39d4d20f",
-          "after": "903ac10486a6b261aa6ee233eaf1ad128724529eedb0851a81b03bd3e71953bd"
+          "before": "903ac10486a6b261aa6ee233eaf1ad128724529eedb0851a81b03bd3e71953bd",
+          "after": "79f7bac02c3072f4e785b44add87c83c7d318440e45f52ae6cb02da0da1de6fc"
+        }
+      }
+    },
+    "scripts/stage3_ranged_profile_test_admission.py": {
+      "before_sha256": null,
+      "after_sha256": "16b167835b6339a91f6e82fa961dc89fd6e7237e587eb2c59d7e08cbaf35781e",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "29007ecc1d75daf6789d82a8bb7c52d0a56aa78aa33ba75adc12c198ff2a9bd8"
+        },
+        "RangedProfileTestAdmission": {
+          "before": null,
+          "after": "9fe55d67f74016133986144af2fb87e3bbbf9406a9be076063fe73264f667a1e"
+        },
+        "ranged_profile_test_addition": {
+          "before": null,
+          "after": "f59ffcc124fae4414f2cab960b6d592bdfb4967e8685979b488364ce9952b837"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "6f3b38d81c97fd2950a2ebc77b03439f843c9db402a2c6fdc77a2a4d5144b048",
-      "after_sha256": "50a4f1255d34d13d06257f05352c43b9d591ea23fcd35efe0b56c91009a49f57",
+      "before_sha256": "50a4f1255d34d13d06257f05352c43b9d591ea23fcd35efe0b56c91009a49f57",
+      "after_sha256": "1abd6dc0c5b0b4b994c29d1064cdb0a4dacb571ba588c33f26937a68f2766df7",
       "owners": {
         "@document": {
-          "before": "6f3b38d81c97fd2950a2ebc77b03439f843c9db402a2c6fdc77a2a4d5144b048",
-          "after": "50a4f1255d34d13d06257f05352c43b9d591ea23fcd35efe0b56c91009a49f57"
+          "before": "50a4f1255d34d13d06257f05352c43b9d591ea23fcd35efe0b56c91009a49f57",
+          "after": "1abd6dc0c5b0b4b994c29d1064cdb0a4dacb571ba588c33f26937a68f2766df7"
         }
       }
     },
-    "src/warhammer40k_core/engine/fight_activation_requests.py": {
-      "before_sha256": "ed5eff1db7580118ba8202e091a413ea199680d40384f21e89c254486cdf0aed",
-      "after_sha256": "8c61e7de0e2f8c51a480782c1ca9e68b8f40b009bc3a0bb0dacdd66acaa75777",
+    "src/warhammer40k_core/ai/ordinary_ranged_profile_policy.py": {
+      "before_sha256": null,
+      "after_sha256": "7c02ba784cf5e14c54fb43f58d72e9ea9ecab70a894dd639da8c9b595e40b346",
       "owners": {
         "@module": {
-          "before": "1c268c411190afb788521f1426af91be83294a58e5acda16b6d5b1674a20cdcc",
-          "after": "9067d28f7b2bff164f43ecd2d5ed64e6b77798258efb72ec939dfa5cb8ec92fb"
-        },
-        "_fight_activation_options": {
-          "before": "0aacae25052d25908c2a6d4dddfff6e007ca6c4d1b0111740c1ad6abde16ea35",
-          "after": "47ee1bbfdd41eed85812680f03c1f52aa828044a4ba654c904450a3272eb2029"
-        },
-        "build_fight_activation_request": {
-          "before": "116f499bcb061a19795ea5925db8f2dad8bcff9d54deb7d954c63e8f80b5e1d5",
-          "after": "12f4503c957a641d5af395d28cd322de9ab994eb599bc9fb3591f9ae77bffe9e"
-        },
-        "counteroffensive_fight_context": {
           "before": null,
-          "after": "53d9715228e31c2243237911ba1a5b5d8dbe940de0f973fb91ec019757a626d8"
+          "after": "9d487670a991c9e15ec948078f32fcd8c6fcab41304734e516e325dd825d3255"
         },
-        "counteroffensive_fights_first_effect": {
+        "RangedProfileAdmission": {
           "before": null,
-          "after": "08f26395915ae74cd34b8e6abbd53232676f0f73722d3365ae21d437e75e488f"
+          "after": "f3866d1d1639ce03aebd0c645db623976013878112ebb99d097ba57f49e4a31e"
         },
-        "request_fight_activation": {
-          "before": "c01186c66ee4c2a4b02def2d02924b8bd0cac592e6ce8c6126fcce8083badb71",
-          "after": "52f7fd2890644bf6ac144b4e7911add6454bb6d1b1197171523732f43cb7b4d0"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/fight_order.py": {
-      "before_sha256": "f0942554275868586fa1a59b8ac135eb1557ff23b705614f6958bcb101995899",
-      "after_sha256": "8937a8178db5ab185c1c3574accbf21b469ed0b4620b3a273985d3da4bebd7d4",
-      "owners": {
-        "current_fight_activation_selection_from_payload": {
-          "before": "32a657b50562039e7ae237979bff316b021742709b02e05d5682a5b3c7e7903d",
-          "after": "c9e7fee205bd072dc92cfa6a5f3ab4e7d1668ca16ec9a9466d1078109323253c"
-        },
-        "fight_activation_option_payload": {
-          "before": "bf14b7931df02ccd8215c3dc424ee699e8db4210a4035385bcba24afda087766",
-          "after": "2a704aeb215b4c25ad4639066e991a09fa1c731836d99a276de2087d6ae74952"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/lifecycle.py": {
-      "before_sha256": "a8ff6864a1e25ac197fcbed1fb02e12db3c0368825d9004f123be28543c59021",
-      "after_sha256": "c93e1464838747360fa1ef1a1efc3b6ce20ea695567dce1b8a0f88432243e050",
-      "owners": {
-        "@module": {
-          "before": "74a8c04f58c4a2a5ba6284098d87727d3efdebd01a4a9fdca5ae8b87bf94d00f",
-          "after": "43147e69b377fcb29be36ef8badd89a3d4368ef98c4bc3f3acd65dee567e9dbc"
-        },
-        "GameLifecycle._advance_after_core_ability_selection": {
+        "RangedProfileCandidate": {
           "before": null,
-          "after": "e324d36dc3f2984d23493ad3139f401dbda6c520a24b1536efbf35aa2600da4c"
+          "after": "4dfbcfe2d2b15da25079b42b1241555d164768df4dd086abdde0c01efbc8d209"
         },
-        "GameLifecycle._advance_after_fight_stratagem_spend": {
+        "RangedProfileCandidate.expected_net_wounds": {
           "before": null,
-          "after": "a39fc6151ccf03b8e81f15e624f866c57126021bbdacc8a2e0945ecbdae78664"
+          "after": "13da89a065252ada79dd6908f8cb5f7595d71fd0e77f7c77cef678d8401305b9"
         },
-        "GameLifecycle._apply_stratagem_cost_choice_and_resume": {
-          "before": "38cc893b03df2575bd2739be57827e64e4d65c6f37dbb1a5cafae8482eae4348",
-          "after": "c231f8f60529f711ffaecc949673fb4cf2de260c716725eb3be158993ee84273"
-        },
-        "GameLifecycle._apply_stratagem_target_proposal_decision": {
-          "before": "5e39f912575e8f92878734962752080680e5d81aea4d981d951dcd22e6958a38",
-          "after": "f67689a37e195f3954c9b9c667be7a9fea7f856dbce04a0dc767d7693c1690e9"
-        },
-        "GameLifecycle._build_decision_dispatch_registry": {
-          "before": "12b2f6d822e309f865a544bacf6af7a8a101e238c3904de75bda9ca56d8daa04",
-          "after": "c91f2fd98a825d0147bb641a20908a3172c70b32bbd9006f9ac9e2d12d8d5eb4"
-        },
-        "GameLifecycle.from_payload": {
-          "before": "6d63097e2f304f72e12f2d1cc3a198ee0d2cf9c90ffb70c711321080acd95cd5",
-          "after": "698fe39f14d0912b78cb85f752a6f8e2a577af087a3dcd31c007cad0ce525e2c"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/lifecycle_reaction_queue.py": {
-      "before_sha256": "91b8ae84f3b83578014182e34eea39d37c6d96e2e2457fee12d105b092307960",
-      "after_sha256": "eee9e014714e49b20f6fcdf3f823ccb460e5539a21224c81674ec3e49061f9e8",
-      "owners": {
-        "@module": {
-          "before": "d7d99887f0a735d2a653ade6fa5b440508e4311499abdf0a39ce4788f11dda6a",
-          "after": "bf0935aec7923c8effb466535bd09f29153eb68548aeb9acc30e405153b4ba6d"
-        },
-        "_is_counteroffensive_choice": {
+        "RangedProfileGap": {
           "before": null,
-          "after": "c712d247ce71793d7d397a2d53fdb64c9724269b754557578a5399ff092ce7a9"
+          "after": "215914447038767f894f9439a7a7a3f1e83584b7091267f91f460df0f9e05acb"
         },
-        "_is_counteroffensive_fight_continuation": {
+        "RangedProfileGap.__init__": {
           "before": null,
-          "after": "08c273b00de68473d63e2a9ae2339be4642fbca05f64c3f7bb005acfb8bf8f35"
+          "after": "ad7777c1886fc59b9fc0d79539b0253cfe2f067d6f429572ce01864eefe22d0d"
         },
-        "_is_counteroffensive_frame": {
+        "RangedProfileGapReason": {
           "before": null,
-          "after": "0ee101f05c2169cfc7a7c65d06f1acd27e6d0d8cf49dbe545cd5a02b21af776f"
+          "after": "9280512e2818d1c776b3323d199f1b2db297bea2772f16c56222df0d30b633c4"
         },
-        "_is_interrupted_fight_pile_in": {
+        "_DeclarationRequest": {
           "before": null,
-          "after": "1534e6e38c950c70037d1bffab10c781454f4632fdd0b9b1517dbf171cd0f045"
+          "after": "cbf3e75413da537b358ad01b851e276539b2c9edb6a78caa5a69f748fe3f92c0"
         },
-        "_issued_counteroffensive_choice": {
+        "_OrdinaryRangedProfilePolicy": {
           "before": null,
-          "after": "83433bdcf2b16218948551858490afe08bc93a1f752ab42a9120e9add744840b"
+          "after": "d62bd1d756a99e7b0ad426f798a5d5a49473fd5e37048fdd2725c3784a381fee"
         },
-        "_validate_counteroffensive_choice": {
+        "_OrdinaryRangedProfilePolicy.choose": {
           "before": null,
-          "after": "976258755e85cf43585f51f7767125b50095571f15bda53c75cac37a92977aed"
+          "after": "fac451c3ddf349b8ff7f1db87f08ff39166ca0b6ef67d19311cfe3f3bf18357b"
         },
-        "_validate_fight_reaction_continuation": {
+        "_TargetRow": {
           "before": null,
-          "after": "8b361185f16eff193702f68b9f9dd2590f914599d947a3d9f493f6d9e4d93ee1"
+          "after": "fd4b738b30f1f819085cba4db9fd4a04ff6ca00c9cd39ab38f2025cbda2c00b9"
         },
-        "validate_melee_reaction_continuation": {
-          "before": "75f0a3b4fb44e9e5796a6b1fbcfe1aea81e47bb7e31e788544a511520b569681",
-          "after": "5c15913587e9ccb05ee8761183e0d8ee006377a41aed956d9e366e84abc60e1a"
-        },
-        "validate_reaction_queue_consistency": {
-          "before": "46d976562efc3da69b5f078f66d3e5f7b01fa02a42f1ac1439dc60a7df82d9a1",
-          "after": "c0c4dd9fc14f02775beff244010dc97ad547c33e109a7bbd1e7f2b1771054875"
-        },
-        "validate_restored_counteroffensive_fight": {
+        "_expected_target_wounds": {
           "before": null,
-          "after": "63a1ad77ec2e92bdbacd83a2d36ff524fcf2a1c8736e55506ab1e2d25e2f2bc7"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/phases/fight.py": {
-      "before_sha256": "5b329d78d216336e141692e00cca125d4ffb743ef216a3b0f814ceeaddb7518b",
-      "after_sha256": "45a3a1143366cbebb27e629e069c65890dd7eb8d2413f6cab7a9ed292bf08fcd",
-      "owners": {
-        "FightPhaseHandler.apply_fight_unit_selected_hooks": {
+          "after": "cc5353ac2bb9391278f7cd5612875972a50ce1cebe3aac26d965b5db546145f5"
+        },
+        "generate_ordinary_ranged_profile_candidates": {
           "before": null,
-          "after": "8d145bafb16e6ee295d0bfb52c5548160cfe54f87cea4dcf7881bb6ca85c5ec9"
+          "after": "5c38ea672bcc82e6673672009cf794b19eb195332c051f833b24204802c6d994"
         },
-        "_apply_fight_activation_decision": {
-          "before": "9d49f7aadcea288544bf7ead70ed3fa9ff7e3089f67dd398407d17f56ef2c23d",
-          "after": "bdbfafc2b660424c6c24b64c0767e68be85d9cf59ad79a629063c61d2fb19c55"
-        },
-        "_invalid_fight_activation_selection_status": {
-          "before": "ad5f20523a75a38965a874bffd08f114f1a6422b1543503d36ff20d975b59e98",
-          "after": "8f2a1afb8bcb32d125f589242aa77460a84947fa43991bd6675598d6aa36c711"
-        },
-        "invalid_fight_activation_status": {
-          "before": "4ced4ac5f5d6e51ab4ad404a47a344fa8de9b5dd3e8cedbf57452f3a9bff947f",
-          "after": "4d3462888830bd6fda19ee2660d12a23ae1611bdd782aa928d9e7105e4c4d2e7"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/stratagems_effect_handlers.py": {
-      "before_sha256": "eeec51078f3a0a00e066660cffb0ceac98e6544e8995fc330b3cd7f61bb6a3bd",
-      "after_sha256": "1a7115ec1131b04a9d52dcb89585d3af35992798020079ad64105cb813469306",
-      "owners": {
-        "_apply_counteroffensive_handler": {
-          "before": "f899ac172e465fca43f40bb1670589d866994ef1b0f040a5b5b7de94c248c9bd",
-          "after": "ddacaabe819ae0dc6b0b2469b02a646621ef8c440893e6d11d628f8af5d3f8dc"
+        "ordinary_ranged_profile_registration": {
+          "before": null,
+          "after": "7e6ace5d5cbf7878ea30f581ac302498b79e8d4cc467973970efc343b9ef1eb2"
         }
       }
     },
     "tests/code_quality/test_engine_numerical_identity_admission.py": {
-      "before_sha256": "2fa352320aa20e2c8ee5cdfbfae45d8ea0e06399ce20c96cdae7c390efed875b",
-      "after_sha256": "c2763b47b4f37ef8fb333be6186c620373b66b4c768a24ca105ad63b2f2248fc",
+      "before_sha256": "c2763b47b4f37ef8fb333be6186c620373b66b4c768a24ca105ad63b2f2248fc",
+      "after_sha256": "5dad52ced7d39565be3589ee852a5fcf8a533328af0bf66f87f6eefa65c5194b",
       "owners": {
         "test_identity_inventory_uses_current_twelve_shards_and_native_cohort": {
-          "before": "4778152faa903e182918fb3e1338d20f19a931b6fb848a0db1248a42e7a7b795",
-          "after": "9e504b5859f3274e3371152a10621b0b2cc5a7b88504c52add015da72181f79a"
+          "before": "9e504b5859f3274e3371152a10621b0b2cc5a7b88504c52add015da72181f79a",
+          "after": "160f27e72f3da8803bc40133f4a5b0e5810943100b1497d7fc22f56d61c985df"
         }
       }
     },
-    "tests/code_quality/test_order135_counteroffensive_band_authority.py": {
-      "before_sha256": "2650bb38cb1143ead69110dcc3b4839a0bd97f234b65b21feea00a472fa7c865",
-      "after_sha256": "1da7bd7b3a1dad31bdd90db6396d10a6d1ab7204cff2ff5df22776879366f790",
-      "owners": {
-        "test_pre_grant_query_scope_is_explicit_and_confined_to_core_counter": {
-          "before": "b03c5e4f31fc937c53bcbb954ef8bc0e2f481f7dc4abb560efbc5ba6b8c184e5",
-          "after": "06add1f56620b0ee162384ca8544ed523172bf272360afd8bb975341bdb6db52"
-        }
-      }
-    },
-    "tests/infrastructure/adapters/test_dark_pact_timing.py": {
-      "before_sha256": "af0a2326c0996aff5b8515e5e4cd3400b41ab9b62c126013ee9a5d528e221dec",
-      "after_sha256": "40af45242d98bcfcfe892740982849367a2d1c56f12c5be68a5b4d340ec2f21e",
-      "owners": {
-        "@module": {
-          "before": "7accc6f4c90030924bb1317148deb2fcc0f0e94ad102c99f187b5f850264c013",
-          "after": "ecc6ba8b3ef38cc70e442b60f08febd20631797a4326cc2cb28be21c3cf03f7d"
-        },
-        "_catalog": {
-          "before": "09f1d29de86942c3cacf23e3c8047c25c220f5b646e3460ccfda6b975c07b5e7",
-          "after": null
-        },
-        "_session": {
-          "before": "561c8c009ac0a361f6a5d65c4c01a3c2317a5c75bd73cd53b6e730ec42b77f68",
-          "after": "98db21be1b0957038b3e4ae80068b7aca064456918dc700fe7a0c076874c7561"
-        }
-      }
-    },
-    "tests/rules/section12/test_counteroffensive_fight_type.py": {
+    "tests/infrastructure/adapters/test_ordinary_ranged_profile_policy.py": {
       "before_sha256": null,
-      "after_sha256": "55e7baac304ecd4796e9a624275b67b39f100a92658ca72b20a92489cd39748e",
+      "after_sha256": "c729cd574bcc8269de8e5602392d5ed52ccffddd4fc5a1ac4599d1ca42f71b6d",
       "owners": {
         "@module": {
           "before": null,
-          "after": "07ee08ceacff9483627dc36fb92e221ae2b1d45437216a4b8c51a662af059f48"
+          "after": "97888fef57814679cfb63df69e7f0ed0a8c46c7627558a2cec1af70f1c6dc74f"
         },
-        "_after_enemy_overrun": {
+        "_finish_volley": {
           "before": null,
-          "after": "1cfe7279263a8592619ef1fdb44855cc926376844c85f1447119238de7c8bbde"
+          "after": "ee27d33e42b311f5bb0779460426efb1d07f8f81d9bbd974982614cf04eee1e6"
         },
-        "_complete_paid_fight": {
+        "_proposal": {
           "before": null,
-          "after": "393b9b0577e37e2ef6f2c3f480730314440cb26b48ee91084482cf7b3026fda2"
+          "after": "eb767cf8a791d7aa106534bc59ae191b8ba5f8d601426e844e024bd8b4a511b3"
         },
-        "_reject_changed_paid_choice": {
+        "_shooting_session": {
           "before": null,
-          "after": "ecbad0a568b801f250276e8fad32359a8cd6d9cab73a3993ace3ab98a97ccc93"
+          "after": "4ab2d76d60cc15a49ec250aa359402366285cb3c379b116eca1a4f6db4e1866e"
         },
-        "_restore": {
+        "test_bolt_profile_admission_blocks_unreviewed_contextual_modifier": {
           "before": null,
-          "after": "0936790e6cd7a804c5a82a5ee822ab3007a03b17cbd6b80246a035fe1d4fcd83"
+          "after": "a8f1661ec5636673c1170e208cc8ada1aa048c96761c0f9a61cbe4c3ab25e820"
         },
-        "_viewer_request": {
+        "test_bolt_profile_comparison_commits_and_replays": {
           "before": null,
-          "after": "0677c04ec7f616762424c8333459ced9be23ff29ff6153ec461af86da075e52f"
+          "after": "ad6a0b53bafcbb252c5f2c0cbb9a53e79a7613972f1eb1daf0f0ea385997a9d8"
         },
-        "test_counteroffensive_preserves_native_fight_type": {
+        "test_unsupported_native_bolt_context_declines": {
           "before": null,
-          "after": "e571cfc022356f9c5ad90fdc7907cb09733d821aa17cb4b5e3f6776170280ddb"
-        },
-        "test_counteroffensive_resolves_dark_pact_before_melee": {
-          "before": null,
-          "after": "aefaecc21465dd961c462ecad115db79c59e88dcf3c5e1ee294a7225c8771e2f"
-        }
-      }
-    },
-    "tests/support/dark_pact_fixtures.py": {
-      "before_sha256": null,
-      "after_sha256": "89eebdab728dcffbcc0d81408f3ac6af8736372c5336e8c69945cad61eb9389e",
-      "owners": {
-        "@module": {
-          "before": null,
-          "after": "5836fd016bf27b0af0966c7c241016920a61b49373f72f2895287ae9c8aef0d5"
-        },
-        "dark_pact_catalog": {
-          "before": null,
-          "after": "2cb787d36b17cead46eb6bb615625f6e1f2e0446dfbe21934bd4f3eca191a49c"
+          "after": "8b379f0818e0d3455a653ba1b94ebe9d17b7f286ba8070f5c8805e3603d24d92"
         }
       }
     }
@@ -566,7 +384,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit the additional Dark Pact regression and refresh measured case weights in the existing twelve shards.",
+      "rationale": "Admit six source-backed ranged cases through the exact Counteroffensive successor chain and preserve all 6,813 predecessor case weights, selector weights, and reviewed measurements.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -576,7 +394,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit the additional Dark Pact regression and refresh measured case weights in the existing twelve shards.",
+      "rationale": "Admit six source-backed ranged cases through the exact Counteroffensive successor chain and preserve all 6,813 predecessor case weights, selector weights, and reviewed measurements.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -586,7 +404,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit the additional Dark Pact regression and refresh measured case weights in the existing twelve shards.",
+      "rationale": "Admit six source-backed ranged cases through the exact Counteroffensive successor chain and preserve all 6,813 predecessor case weights, selector weights, and reviewed measurements.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -596,7 +414,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit the additional Dark Pact regression and refresh measured case weights in the existing twelve shards.",
+      "rationale": "Admit six source-backed ranged cases through the exact Counteroffensive successor chain and preserve all 6,813 predecessor case weights, selector weights, and reviewed measurements.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -606,7 +424,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit the additional Dark Pact regression and refresh measured case weights in the existing twelve shards.",
+      "rationale": "Admit six source-backed ranged cases through the exact Counteroffensive successor chain and preserve all 6,813 predecessor case weights, selector weights, and reviewed measurements.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -616,7 +434,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit the additional Dark Pact regression and refresh measured case weights in the existing twelve shards.",
+      "rationale": "Admit six source-backed ranged cases through the exact Counteroffensive successor chain and preserve all 6,813 predecessor case weights, selector weights, and reviewed measurements.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -626,7 +444,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit the additional Dark Pact regression and refresh measured case weights in the existing twelve shards.",
+      "rationale": "Admit six source-backed ranged cases through the exact Counteroffensive successor chain and preserve all 6,813 predecessor case weights, selector weights, and reviewed measurements.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -636,7 +454,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit the additional Dark Pact regression and refresh measured case weights in the existing twelve shards.",
+      "rationale": "Admit six source-backed ranged cases through the exact Counteroffensive successor chain and preserve all 6,813 predecessor case weights, selector weights, and reviewed measurements.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -646,7 +464,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit the additional Dark Pact regression and refresh measured case weights in the existing twelve shards.",
+      "rationale": "Admit six source-backed ranged cases through the exact Counteroffensive successor chain and preserve all 6,813 predecessor case weights, selector weights, and reviewed measurements.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -656,7 +474,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit the additional Dark Pact regression and refresh measured case weights in the existing twelve shards.",
+      "rationale": "Admit six source-backed ranged cases through the exact Counteroffensive successor chain and preserve all 6,813 predecessor case weights, selector weights, and reviewed measurements.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -666,7 +484,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Admit the additional Dark Pact regression and refresh measured case weights in the existing twelve shards.",
+      "rationale": "Admit six source-backed ranged cases through the exact Counteroffensive successor chain and preserve all 6,813 predecessor case weights, selector weights, and reviewed measurements.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -676,7 +494,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate build identity and dependent contract commitments for the native rule repair.",
+      "rationale": "Regenerate the existing packaged build identity and dependent contract examples for the new opt-in module.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -686,7 +504,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate build identity and dependent contract commitments for the native rule repair.",
+      "rationale": "Regenerate the existing packaged build identity and dependent contract examples for the new opt-in module.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -696,7 +514,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate build identity and dependent contract commitments for the native rule repair.",
+      "rationale": "Regenerate the existing packaged build identity and dependent contract examples for the new opt-in module.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -706,7 +524,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate build identity and dependent contract commitments for the native rule repair.",
+      "rationale": "Regenerate the existing packaged build identity and dependent contract examples for the new opt-in module.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -716,7 +534,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate build identity and dependent contract commitments for the native rule repair.",
+      "rationale": "Regenerate the existing packaged build identity and dependent contract examples for the new opt-in module.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -726,7 +544,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate build identity and dependent contract commitments for the native rule repair.",
+      "rationale": "Regenerate the existing packaged build identity and dependent contract examples for the new opt-in module.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -736,7 +554,7 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate build identity and dependent contract commitments for the native rule repair.",
+      "rationale": "Regenerate the existing packaged build identity and dependent contract examples for the new opt-in module.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -746,49 +564,25 @@
         "issue588-contract-publication"
       ],
       "selected_families": [],
-      "rationale": "Regenerate build identity and dependent contract commitments for the native rule repair.",
+      "rationale": "Regenerate the existing packaged build identity and dependent contract examples for the new opt-in module.",
       "source_obligation": null,
       "unchanged_work": null
     },
-    "data/source_audits/ci64_provenance_v1/counteroffensive-fight-type-v1.json": {
+    "data/source_audits/ci64_provenance_v1/stage3-ranged-profile-test-v1.json": {
       "category": "measured_workload",
       "operations": [
-        "counteroffensive-fight-type"
+        "stage3-bolt-of-change-test-admission"
       ],
       "selected_families": [],
-      "rationale": "Admit the five exact Counteroffensive cases while keeping predecessor membership, sources and checks pinned.",
+      "rationale": "Admit six source-backed ranged cases through the exact Counteroffensive successor chain and preserve all 6,813 predecessor case weights, selector weights, and reviewed measurements.",
       "source_obligation": null,
       "unchanged_work": null
     },
-    "docs/ADAPTER_DECISION_CONTRACT.md": {
+    "docs/AI_POLICY_INTERFACE.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Document the existing finite option contract when the paid reaction requires a Fight type.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "docs/performance/current/counteroffensive-review-dice.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Keep the serial matched current benchmark for the touched lifecycle owners alongside the retained historical comparisons.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "docs/performance/current/counteroffensive-review-dice_sustained.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Keep the serial matched current benchmark for the touched lifecycle owners alongside the retained historical comparisons.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "docs/performance/current/counteroffensive-review-reconstruction.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Keep the serial matched current benchmark for the touched lifecycle owners alongside the retained historical comparisons.",
+      "rationale": "Document the actor-visible offer, bounded scoring objective and exact native replay proof.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -796,25 +590,13 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Map the changed owners and preserved admission lineage to the bounded Counteroffensive operation.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "scripts/dark_pact_test_admission.py": {
-      "category": "measured_workload",
-      "operations": [
-        "counteroffensive-fight-type",
-        "dark-pact-timing-scope-032"
-      ],
-      "selected_families": [],
-      "rationale": "Admit the five exact Counteroffensive cases while keeping predecessor membership, sources and checks pinned.",
+      "rationale": "Document the actor-visible offer, bounded scoring objective and exact native replay proof.",
       "source_obligation": null,
       "unchanged_work": null
     },
     "scripts/engine_numerical_identity_test_admission.py": {
       "category": "measured_workload",
       "operations": [
-        "blood-begets-skulls-test-admission",
         "bounded-charge-flight-wall-proof",
         "cavalcade-authority-admission",
         "close-quarters-test-admission",
@@ -828,12 +610,23 @@
         "sheathed-in-brass-test-admission",
         "skulls-beget-blood-test-admission",
         "stage2-strict-replay-test-admission",
+        "stage3-bolt-of-change-test-admission",
         "stage3-flight-normal-move-test-admission",
         "stage3-ordinary-melee-test-admission",
         "wrath-undeniable-test-admission"
       ],
       "selected_families": [],
-      "rationale": "Admit the five exact Counteroffensive cases while keeping predecessor membership, sources and checks pinned.",
+      "rationale": "Admit six source-backed ranged cases through the exact Counteroffensive successor chain and preserve all 6,813 predecessor case weights, selector weights, and reviewed measurements.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "scripts/stage3_ranged_profile_test_admission.py": {
+      "category": "measured_workload",
+      "operations": [
+        "stage3-bolt-of-change-test-admission"
+      ],
+      "selected_families": [],
+      "rationale": "Admit six source-backed ranged cases through the exact Counteroffensive successor chain and preserve all 6,813 predecessor case weights, selector weights, and reviewed measurements.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -844,79 +637,19 @@
         "phase-end-healing-source-and-report"
       ],
       "selected_families": [],
-      "rationale": "Regenerate the deterministic engine build manifest for the scoped Fight runtime changes on current main.",
+      "rationale": "Regenerate the existing packaged build identity and dependent contract examples for the new opt-in module.",
       "source_obligation": null,
       "unchanged_work": null
     },
-    "src/warhammer40k_core/engine/fight_activation_requests.py": {
-      "category": "rule_semantics",
+    "src/warhammer40k_core/ai/ordinary_ranged_profile_policy.py": {
+      "category": "algorithm_or_search",
       "operations": [
-        "counteroffensive-fight-type"
+        "stage3-bolt-of-change-profile-policy"
       ],
       "selected_families": [],
-      "rationale": "Reuse the finite Fight menu and its paid target and Fights First context for live play and restore.",
-      "source_obligation": "Core 12.04 requires the selected player's legal Fight type and alternation. Core 15.12 grants priority and Fights First.",
-      "unchanged_work": "Reuse the existing spend, Fight menu, selected-to-fight hooks and movement proposal. Extra authentication runs on restored Counteroffensive continuations."
-    },
-    "src/warhammer40k_core/engine/fight_order.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "counteroffensive-fight-type"
-      ],
-      "selected_families": [],
-      "rationale": "Serialize the interruption identity through the Fight option and the activation record.",
-      "source_obligation": "Core 12.04 requires the selected player's legal Fight type and alternation. Core 15.12 grants priority and Fights First.",
-      "unchanged_work": "Reuse the existing spend, Fight menu, selected-to-fight hooks and movement proposal. Extra authentication runs on restored Counteroffensive continuations."
-    },
-    "src/warhammer40k_core/engine/lifecycle.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "attack-reroll-casualty-order",
-        "counteroffensive-fight-type",
-        "d04-combat-lifecycle-continuation",
-        "order135-gathered-attack-steps",
-        "serialization-replay",
-        "stage2-fight-stratagem-decline"
-      ],
-      "selected_families": [
-        "dice",
-        "dice_sustained",
-        "reconstruction"
-      ],
-      "rationale": "Run the ordinary selected-to-fight hooks for a sole paid activation and carry its existing frame through core ability selection.",
-      "source_obligation": "Core 12.04 requires the selected player's legal Fight type and alternation. Core 15.12 grants priority and Fights First.",
-      "unchanged_work": "Reuse the existing spend, Fight menu, selected-to-fight hooks and movement proposal. Extra authentication runs on restored Counteroffensive continuations."
-    },
-    "src/warhammer40k_core/engine/lifecycle_reaction_queue.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "counteroffensive-fight-type",
-        "stage2-melee-reaction-restore"
-      ],
-      "selected_families": [],
-      "rationale": "Bind the restored Fight menu to the original request, paid target, Fights First effect, and recorded reaction and spend evidence.",
-      "source_obligation": "Core 12.04 requires the selected player's legal Fight type and alternation. Core 15.12 grants priority and Fights First.",
-      "unchanged_work": "Reuse the existing spend, Fight menu, selected-to-fight hooks and movement proposal. Extra authentication runs on restored Counteroffensive continuations."
-    },
-    "src/warhammer40k_core/engine/phases/fight.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "counteroffensive-fight-type"
-      ],
-      "selected_families": [],
-      "rationale": "Use the paid selection as the reacting player's selection for ordinary alternation and run the ordinary selected-to-fight hooks.",
-      "source_obligation": "Core 12.04 requires the selected player's legal Fight type and alternation. Core 15.12 grants priority and Fights First.",
-      "unchanged_work": "Reuse the existing spend, Fight menu, selected-to-fight hooks and movement proposal. Extra authentication runs on restored Counteroffensive continuations."
-    },
-    "src/warhammer40k_core/engine/stratagems_effect_handlers.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "counteroffensive-fight-type"
-      ],
-      "selected_families": [],
-      "rationale": "Offer a Fight type for the paid target when several types are legal and activate immediately for one.",
-      "source_obligation": "Core 12.04 requires the selected player's legal Fight type and alternation. Core 15.12 grants priority and Fights First.",
-      "unchanged_work": "Reuse the existing spend, Fight menu, selected-to-fight hooks and movement proposal. Extra authentication runs on restored Counteroffensive continuations."
+      "rationale": "Bound the new opt-in calculation to two offered profiles, one target model and at most 24 attacks per profile. Registered gameplay benchmarks do not call the new route.",
+      "source_obligation": null,
+      "unchanged_work": null
     },
     "tests/code_quality/test_engine_numerical_identity_admission.py": {
       "category": "measured_workload",
@@ -928,62 +661,28 @@
         "round4-battle-shock-event-wounds",
         "round4-malice-bearer-liveness",
         "skulls-beget-blood-test-admission",
+        "stage3-bolt-of-change-test-admission",
         "stage3-flight-normal-move-test-admission",
         "stage3-ordinary-melee-test-admission",
         "wrath-undeniable-test-admission"
       ],
       "selected_families": [],
-      "rationale": "Admit the five exact Counteroffensive cases while keeping predecessor membership, sources and checks pinned.",
+      "rationale": "Admit six source-backed ranged cases through the exact Counteroffensive successor chain and preserve all 6,813 predecessor case weights, selector weights, and reviewed measurements.",
       "source_obligation": null,
       "unchanged_work": null
     },
-    "tests/code_quality/test_order135_counteroffensive_band_authority.py": {
+    "tests/infrastructure/adapters/test_ordinary_ranged_profile_policy.py": {
       "category": "measured_workload",
       "operations": [
-        "counteroffensive-fight-type"
+        "stage3-bolt-of-change-profile-policy"
       ],
       "selected_families": [],
-      "rationale": "Admit the five exact Counteroffensive cases while keeping predecessor membership, sources and checks pinned.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "tests/infrastructure/adapters/test_dark_pact_timing.py": {
-      "category": "measured_workload",
-      "operations": [
-        "counteroffensive-fight-type",
-        "dark-pact-timing-scope-051"
-      ],
-      "selected_families": [],
-      "rationale": "Share the unchanged Dark Pact catalog fixture from a named test support module.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "tests/rules/section12/test_counteroffensive_fight_type.py": {
-      "category": "measured_workload",
-      "operations": [
-        "counteroffensive-fight-type"
-      ],
-      "selected_families": [],
-      "rationale": "Admit the five exact Counteroffensive cases while keeping predecessor membership, sources and checks pinned.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "tests/support/dark_pact_fixtures.py": {
-      "category": "measured_workload",
-      "operations": [
-        "counteroffensive-fight-type"
-      ],
-      "selected_families": [],
-      "rationale": "Share the unchanged Dark Pact catalog fixture from a named test support module.",
+      "rationale": "Admit six source-backed ranged cases through the exact Counteroffensive successor chain and preserve all 6,813 predecessor case weights, selector weights, and reviewed measurements.",
       "source_obligation": null,
       "unchanged_work": null
     }
   },
   "milestone": "ordinary",
-  "comparisons": {
-    "dice": "docs/performance/current/counteroffensive-review-dice.json",
-    "dice_sustained": "docs/performance/current/counteroffensive-review-dice_sustained.json",
-    "reconstruction": "docs/performance/current/counteroffensive-review-reconstruction.json"
-  },
+  "comparisons": {},
   "full_game": null
 }

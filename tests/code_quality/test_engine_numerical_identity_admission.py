@@ -997,8 +997,53 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
             )
             assert source["before"] == hashlib.sha256(before).hexdigest()
             assert source["after"] == hashlib.sha256((ROOT / name).read_bytes()).hexdigest()
-    assert manifest_after == hashlib.sha256((ROOT / MANIFEST).read_bytes()).hexdigest()
-    assert runtime_after == _record(MANIFEST)["fingerprint"]
+    from scripts import stage3_ranged_profile_test_admission as ranged
+
+    ranged_record = _record(ranged.RECEIPT)
+    assert ranged_record["base"] == ranged.BASE
+    assert receipt_path.is_file()
+    ranged_base_manifest = subprocess.check_output(
+        ["git", "show", ranged.BASE + ":" + MANIFEST], cwd=ROOT
+    )
+    assert hashlib.sha256(ranged_base_manifest).hexdigest() == manifest_after
+    assert json.loads(ranged_base_manifest)["fingerprint"] == runtime_after
+    assert ranged_record["retained_manifest_sha256"] == manifest_after
+    assert ranged_record["retained_runtime_fingerprint"] == runtime_after
+    assert (
+        ranged_record["retained_counteroffensive_sha256"]
+        == hashlib.sha256(receipt_path.read_bytes()).hexdigest()
+    )
+    assert (
+        ranged_record["manifest_sha256"]
+        == hashlib.sha256((ROOT / MANIFEST).read_bytes()).hexdigest()
+    )
+    assert ranged_record["runtime_fingerprint"] == _record(MANIFEST)["fingerprint"]
+    assert ranged.OWNER in active_files
+    assert sum(ranged.OWNER in group for group in groups) == 1
+    ranged_cases = {
+        f"{ranged.OWNER}::{case}"
+        for case in (
+            "test_bolt_profile_comparison_commits_and_replays[full]",
+            "test_bolt_profile_comparison_commits_and_replays[one-left]",
+            "test_bolt_profile_admission_blocks_unreviewed_contextual_modifier",
+            "test_unsupported_native_bolt_context_declines[damaged]",
+            "test_unsupported_native_bolt_context_declines[lethal]",
+            "test_unsupported_native_bolt_context_declines[sustained]",
+        )
+    }
+    ranged_base_durations = json.loads(
+        subprocess.check_output(
+            ["git", "show", ranged.BASE + ":ci/test_shards/durations.json"], cwd=ROOT
+        )
+    )
+    assert len(ranged_base_durations["case_seconds"]) == 6813
+    assert all(
+        current[node] == seconds for node, seconds in ranged_base_durations["case_seconds"].items()
+    )
+    assert all(
+        summary["files"][node] == seconds
+        for node, seconds in ranged_base_durations["files"].items()
+    )
     assert (
         charge_cp["policy_sha256"]
         == hashlib.sha256((ROOT / selection.CHARGE_CP_POLICY_SOURCE).read_bytes()).hexdigest()
@@ -1429,6 +1474,7 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         | set(charge_cp["added_cases"])
         | set(terror["added_cases"])
         | (set() if counter is None else set(counter["added_cases"]))
+        | ranged_cases
         | shooting_cases
         | {
             ground_charge.SCREEN_OWNER

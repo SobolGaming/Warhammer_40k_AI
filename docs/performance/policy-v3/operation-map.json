@@ -37409,6 +37409,30 @@
       "sensitive": false,
       "mandatory": true
     },
+    "stage3-bolt-of-change-profile-policy": {
+      "paths": [
+        "src/warhammer40k_core/ai/ordinary_ranged_profile_policy.py",
+        "tests/infrastructure/adapters/test_ordinary_ranged_profile_policy.py"
+      ],
+      "owners": ["*"],
+      "families": [],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "stage3-bolt-of-change-test-admission": {
+      "paths": [
+        "scripts/engine_numerical_identity_test_admission.py",
+        "scripts/stage3_ranged_profile_test_admission.py",
+        "data/source_audits/ci64_provenance_v1/stage3-ranged-profile-test-v1.json",
+        "tests/code_quality/test_engine_numerical_identity_admission.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
     "stage3-ordinary-melee-profile-policy": {
       "paths": [
         "src/warhammer40k_core/ai/ordinary_melee_profile_policy.py",

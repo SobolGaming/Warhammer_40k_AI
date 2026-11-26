@@ -1502,7 +1502,20 @@ def _counteroffensive_fight_type_transition(
         raise SystemExit("Counteroffensive Fight-type test admission differs.")
     for name, change in receipt["sources"].items():
         _checked_bytes(root, name, change["after"])
-    _checked_bytes(root, MANIFEST, receipt["runtime_manifest"]["after"])
+    from scripts.stage3_ranged_profile_test_admission import ranged_profile_test_addition
+
+    manifest_sha256 = receipt["runtime_manifest"]["after"]
+    ranged = ranged_profile_test_addition(root)
+    if ranged is not None:
+        ranged_receipt = ranged[0]
+        if (
+            ranged_receipt["retained_counteroffensive_sha256"] != hashlib.sha256(raw).hexdigest()
+            or ranged_receipt["retained_manifest_sha256"] != manifest_sha256
+            or ranged_receipt["retained_runtime_fingerprint"] != receipt["runtime_fingerprint"]
+        ):
+            raise SystemExit("Ranged profile tests differ from the exact predecessor.")
+        manifest_sha256 = ranged_receipt["manifest_sha256"]
+    _checked_bytes(root, MANIFEST, manifest_sha256)
     _checked_bytes(root, "tests/support/dark_pact_fixtures.py", receipt["dark_pact_fixture_sha256"])
     return receipt, raw
 
@@ -1522,12 +1535,18 @@ def combined_charge_runtime(root: Path, flight_raw: bytes, retry_raw: bytes) -> 
     if not isinstance(fingerprint, str):
         raise SystemExit("Combined Charge runtime fingerprint is malformed.")
     from scripts.stage2_ground_charge_test_admission import load_normal_move_admission
+    from scripts.stage3_ranged_profile_test_admission import ranged_profile_test_addition
 
     normal_move = load_normal_move_admission(root)
     charge_cp = _charge_cp_test_addition(root)
     terror = _daemonic_terror_transition(root)
     counter = _counteroffensive_fight_type_transition(root)
     counter_receipt = None if counter is None else counter[0]
+    ranged = ranged_profile_test_addition(root)
+    if ranged is not None and counter is None:
+        raise SystemExit(
+            "Ranged profile tests require the Counteroffensive Fight-type predecessor."
+        )
     if counter_receipt is not None and (terror is None or normal_move is None):
         raise SystemExit("Counteroffensive Fight types require the Daemonic Terror predecessor.")
     if normal_move is not None:
@@ -1568,6 +1587,14 @@ def combined_charge_runtime(root: Path, flight_raw: bytes, retry_raw: bytes) -> 
                     current_runtime = counter_receipt["runtime_fingerprint"]
         elif terror is not None:
             raise SystemExit("Daemonic Terror requires the Charge CP predecessor.")
+        if ranged is not None:
+            if successor is None:
+                raise SystemExit(
+                    "Ranged profile tests require the composed Counteroffensive runtime."
+                )
+            ranged_receipt = ranged[0]
+            successor = (successor[0], ranged_receipt["manifest_sha256"])
+            current_runtime = ranged_receipt["runtime_fingerprint"]
         normal_runtime = normal_move.admit_runtime(
             root,
             predecessor=receipt,
@@ -2564,6 +2591,17 @@ def exact_movement_test_transition(
             raise SystemExit("Counteroffensive Fight-type tests overlap predecessor tests.")
         additions.update(counter_tests)
         raw += b"\0" + counter_raw
+    from scripts.stage3_ranged_profile_test_admission import ranged_profile_test_addition
+
+    ranged = ranged_profile_test_addition(root)
+    if ranged is not None:
+        if counter_fight_type is None or identity_runtime is None:
+            raise SystemExit("Ranged profile tests require the composed Counteroffensive runtime.")
+        _, ranged_tests, ranged_raw = ranged
+        if ranged_tests.keys() & (updated.keys() | added.keys() | additions.keys()):
+            raise SystemExit("Ranged profile tests overlap the predecessor selection.")
+        additions.update(ranged_tests)
+        raw += b"\0" + ranged_raw
     return updated, {**added, **additions}, retained_raw + b"\0" + raw
 
 

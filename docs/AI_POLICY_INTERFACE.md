@@ -3111,6 +3111,46 @@ Bloodletters' 7+ armour and 5+ invulnerable save have a separate component
 allocation regression from PR #618. Combat in this mixed matchup has yet to be
 exercised.
 
+## Opt-in Bolt of Change profile choice
+
+Use the ranged profile registration for a reviewed Lord of Change Normal Shooting
+declaration with the shooter and Master of Magicks grant already selected.
+The caller supplies the held target, one opposing Lord of Change in this slice.
+Both candidates use the same equipped Bolt of Change copy. Each candidate
+submits one profile through the existing
+[Shooting declaration contract](ADAPTER_DECISION_CONTRACT.md#phase-13-shooting-decisions).
+
+The policy reads the target-specific profile from the actor's issued weapon
+selection context. The live Strength aura contributes +1 Strength. Both profiles
+use the selected Ignores Cover grant and the target's better save after AP.
+The calculation uses exact rational probabilities over nine attacks and caps
+total applied damage at the target model's remaining wounds. Focused witchfire
+requires one Hazardous test. A 1 or 2 costs the sole, full-health Monster three
+mortal wounds, for one expected self-wound. The registration maximizes expected
+target wounds minus expected self-wounds, with ties retaining offer order.
+
+| Held target | Witchfire target / self | Focused target / self | Choice |
+|---|---:|---:|---|
+| 18 wounds remaining | 1.875 / 0 | 5.623689 / 1 | Focused witchfire |
+| 1 wound remaining | 0.877853 / 0 | 0.877853 / 1 | Witchfire |
+
+The regression uses two constructed Shooting starts with the same source-backed
+units, battlefield and target. It submits both single-profile alternatives
+individually, rejects a combined declaration, and resolves and exactly replays
+the selected volley in each case. The table records expectations. The replay
+records one actual dice sequence for each case.
+
+The runner requires the reviewed session checkpoint in addition to the
+actor-visible observation hash and target ID. The same visible offer can hide
+a contextual modifier. Registration requires operator review of contextual
+effects, reactions, rerolls, damage prevention and destruction effects before
+dispatch. The focused fixture has no command rerolls or wound prevention and
+puts the models beyond Deadly Demise range. Candidate generation rejects
+other Master of Magicks grants, shooters below full wounds, other ranged weapon
+copies, uncertain visibility, alternate shooting types and unresolved weapon
+ability choices. This registration is opt-in. The caller supplies the shooter
+through the earlier engine selection and supplies the held target in admission.
+
 ## Opt-in ordinary melee profile choice
 
 `ordinary_melee_profile_registration` compares only profiles issued for one
