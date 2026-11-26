@@ -1,8 +1,8 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "55eef9b20652b030d3ab3e9b85755e0acd7c2d49",
+  "base": "769f1ed3643ef52be59343a53750502de9be02c7",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:2d9f15526ffb5d9e4beece2176972f35e8396c6e4519f950f8838a16f4c713fa",
-  "operation_map_sha256": "2de73c739e3a624de8f9c7c07a9e819e5b33bf8eed5afaf8d3ee21ecf3dfe1b5",
+  "operation_map_sha256": "caf2780309f3927922d1be7ac1964314887d0dc9ab08a8feb14e31e9a91eeda3",
   "changes": {
     "ci/test_shards/durations.json": {
       "before_sha256": "0955ecaedc1b28e4d467ec3e44b4c07ff4469588274a16ba25e93111af449609",
@@ -206,21 +206,21 @@
     },
     "docs/performance/current/forced-retreat-outcome-reconstruction-20261126.json": {
       "before_sha256": null,
-      "after_sha256": "670421ffd4f4d4717dad88fae56b40c7f0c646ebde11efac93717c66c66a36e9",
+      "after_sha256": "58a8b471d89f5feb8488f4bf1e56c2c462857125511546a2ba2ce2bf5b5b74d8",
       "owners": {
         "@document": {
           "before": null,
-          "after": "670421ffd4f4d4717dad88fae56b40c7f0c646ebde11efac93717c66c66a36e9"
+          "after": "58a8b471d89f5feb8488f4bf1e56c2c462857125511546a2ba2ce2bf5b5b74d8"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "8658b29d837cb3947fd134a4b5ac80efb223c1bda69a44fa630514b2c9dc07be",
-      "after_sha256": "fb8d353894d05551e3d298f101a12e2364c0924a769abdc31135b7a8694c0e65",
+      "before_sha256": "460019df7a6c3d510522606447a18ff4e92726b03eeade906f88670163be99d5",
+      "after_sha256": "17a09fd81425164a83ee091769f1261670a46719b7f2f97db5867340bd5f542e",
       "owners": {
         "@document": {
-          "before": "8658b29d837cb3947fd134a4b5ac80efb223c1bda69a44fa630514b2c9dc07be",
-          "after": "fb8d353894d05551e3d298f101a12e2364c0924a769abdc31135b7a8694c0e65"
+          "before": "460019df7a6c3d510522606447a18ff4e92726b03eeade906f88670163be99d5",
+          "after": "17a09fd81425164a83ee091769f1261670a46719b7f2f97db5867340bd5f542e"
         }
       }
     },
@@ -620,7 +620,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Combine the retained Charge CP and native retreat weights into the twelve-shard inventory.",
+      "rationale": "Retain the validated Charge CP and native retreat weights in the twelve-shard inventory.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -630,7 +630,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Combine the retained Charge CP and native retreat weights into the twelve-shard inventory.",
+      "rationale": "Retain the validated Charge CP and native retreat weights in the twelve-shard inventory.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -640,7 +640,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Combine the retained Charge CP and native retreat weights into the twelve-shard inventory.",
+      "rationale": "Retain the validated Charge CP and native retreat weights in the twelve-shard inventory.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -650,7 +650,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Combine the retained Charge CP and native retreat weights into the twelve-shard inventory.",
+      "rationale": "Retain the validated Charge CP and native retreat weights in the twelve-shard inventory.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -660,7 +660,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Combine the retained Charge CP and native retreat weights into the twelve-shard inventory.",
+      "rationale": "Retain the validated Charge CP and native retreat weights in the twelve-shard inventory.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -670,7 +670,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Combine the retained Charge CP and native retreat weights into the twelve-shard inventory.",
+      "rationale": "Retain the validated Charge CP and native retreat weights in the twelve-shard inventory.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -680,7 +680,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Combine the retained Charge CP and native retreat weights into the twelve-shard inventory.",
+      "rationale": "Retain the validated Charge CP and native retreat weights in the twelve-shard inventory.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -690,7 +690,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Combine the retained Charge CP and native retreat weights into the twelve-shard inventory.",
+      "rationale": "Retain the validated Charge CP and native retreat weights in the twelve-shard inventory.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -700,7 +700,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Combine the retained Charge CP and native retreat weights into the twelve-shard inventory.",
+      "rationale": "Retain the validated Charge CP and native retreat weights in the twelve-shard inventory.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -710,7 +710,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Combine the retained Charge CP and native retreat weights into the twelve-shard inventory.",
+      "rationale": "Retain the validated Charge CP and native retreat weights in the twelve-shard inventory.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -720,7 +720,7 @@
         "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Combine the retained Charge CP and native retreat weights into the twelve-shard inventory.",
+      "rationale": "Retain the validated Charge CP and native retreat weights in the twelve-shard inventory.",
       "source_obligation": null,
       "unchanged_work": null
     },
