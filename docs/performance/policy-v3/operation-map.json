@@ -35982,6 +35982,17 @@
       "sensitive": false,
       "mandatory": true
     },
+    "stage4-benchmark-entry-reproducer": {
+      "paths": [
+        "scripts/stage4_benchmark_entry.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
     "stage2-screen-movement-candidates": {
       "paths": [
         "src/warhammer40k_core/ai/screen_movement_candidates.py",

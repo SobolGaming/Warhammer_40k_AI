@@ -1,16 +1,178 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "3f69eee636f758344a68cedf02cd9a36f62a85b5",
+  "base": "dd2e259d5e9824a9fdd5245461b2e308f9fb549a",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:af65d2237320cda39c2d38d0dbeb4d415c424956696fc1cc0f40686921848830",
-  "operation_map_sha256": "7c89aa6d00f853918798993d5963e2f9f100d93c02e552216f64828c3992e8f3",
+  "operation_map_sha256": "a79281b1a73485f31b2738cd9ff73a835d3331f547e4974d796dd36edacd3026",
   "changes": {
     "docs/AI_IMPLEMENTATION_PLAN.md": {
-      "before_sha256": "1c89415df9b99180f1902042a71a27792e5713d538291314397531cf0ef29f6b",
-      "after_sha256": "2326f7e3a0c239a47810741516997fbdb6b07be48c0b79fe72879193525e4222",
+      "before_sha256": "2326f7e3a0c239a47810741516997fbdb6b07be48c0b79fe72879193525e4222",
+      "after_sha256": "19a0e6a53463e28cfe0f4282cc690b5a7254daa772d5cf5e63f179271fc681cf",
       "owners": {
         "@document": {
-          "before": "1c89415df9b99180f1902042a71a27792e5713d538291314397531cf0ef29f6b",
-          "after": "2326f7e3a0c239a47810741516997fbdb6b07be48c0b79fe72879193525e4222"
+          "before": "2326f7e3a0c239a47810741516997fbdb6b07be48c0b79fe72879193525e4222",
+          "after": "19a0e6a53463e28cfe0f4282cc690b5a7254daa772d5cf5e63f179271fc681cf"
+        }
+      }
+    },
+    "docs/performance/policy-v3/operation-map.json": {
+      "before_sha256": "2056e514d5b33a09de8940633b976e0d538befb4cb69ad96003c6410a860c5ee",
+      "after_sha256": "34581cfa9403cb45e4da4d1d9afe1a5f00f118e1c208abe57f0c61c3c6b328e7",
+      "owners": {
+        "@document": {
+          "before": "2056e514d5b33a09de8940633b976e0d538befb4cb69ad96003c6410a860c5ee",
+          "after": "34581cfa9403cb45e4da4d1d9afe1a5f00f118e1c208abe57f0c61c3c6b328e7"
+        }
+      }
+    },
+    "docs/stage4-benchmark-receipt.json": {
+      "before_sha256": null,
+      "after_sha256": "e53c7008fe8183810667e774cfeb03ba97bc149a68ec7b15a4ccc106c4540a32",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "e53c7008fe8183810667e774cfeb03ba97bc149a68ec7b15a4ccc106c4540a32"
+        }
+      }
+    },
+    "scripts/stage4_benchmark_entry.py": {
+      "before_sha256": null,
+      "after_sha256": "4b9e2dd2680ab251649e28c290605d6a28e49f0e658aa248c07707b7b0309798",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "98d34957110a57aeb93c86f5024c15c165304cb0263ad07b5053193d09a753ee"
+        },
+        "BenchmarkGap": {
+          "before": null,
+          "after": "9ee8aaf83f79c7ed48977ed43302db983eac4d4f094a6d6c4ad75a4ade97c354"
+        },
+        "actor": {
+          "before": null,
+          "after": "3e58a21097382ac34c244f2da27ee71f964b48849ea26766d89512e235e56fef"
+        },
+        "advance": {
+          "before": null,
+          "after": "2cc719b4520833e8bf80c77275b00d6f8c18e778454eecaa951a85f24b1c9eff"
+        },
+        "baseline_scores": {
+          "before": null,
+          "after": "64cc8baf557ffe7f58fe0855e33fc017ee8f9a75b383eee679e70e3dcd55e5d1"
+        },
+        "battlefield": {
+          "before": null,
+          "after": "f4ef5e92f9c5e5a290f1c87f835a80d569f4517ad7d686de56ad2d2b196ca067"
+        },
+        "capped": {
+          "before": null,
+          "after": "066ab8c1cc3b0ea5975ee6e887f890309addf36661db30bbff4c93876f344d14"
+        },
+        "check_receipt": {
+          "before": null,
+          "after": "4e08827342a829a268ac50ffb86a0a679b938d74ec8a0193d0a27243e11320c4"
+        },
+        "commit": {
+          "before": null,
+          "after": "77b2b23441ac70a8dbe365b6644665c245b3b25cda64606229a87786e1d6f3a2"
+        },
+        "delta": {
+          "before": null,
+          "after": "13f3fc729233d3855022102398f5949fb0b16d33c91bff7f53d48ae15e3d8ecd"
+        },
+        "endpoint": {
+          "before": null,
+          "after": "81414696a5d7463b6f3f2eabec23e2ecbaf629679cacc5724a66fbda08450584"
+        },
+        "finite": {
+          "before": null,
+          "after": "224e2edbe82993f9674abd3477cd1926338243fc14fb01133806ef6370729bf9"
+        },
+        "guard_b3": {
+          "before": null,
+          "after": "bdc861f6b978849365d04f2da16d5bf70818714853772822b415e0ab0d8f6cfb"
+        },
+        "immediate_material": {
+          "before": null,
+          "after": "c89008c7b79bcf03662f6a5719f6553a43812b8744dafdf450cd11be7aec31f7"
+        },
+        "main": {
+          "before": null,
+          "after": "b1928a74e57528f394b6f36ffa8d179ca824a31adad67678d656e12c766feb8a"
+        },
+        "make_config": {
+          "before": null,
+          "after": "aa73c1b96cb9c9a7e86043fc1dc20eac0d4c8873b6b758c2fabae8de85cc9260"
+        },
+        "material": {
+          "before": null,
+          "after": "9ddcf1c14292beadd4c5acf01ac73810ed97d027ab3717188afc12a13957b104"
+        },
+        "menu_row": {
+          "before": null,
+          "after": "60edb62ed857c50113fa71e848eb40f7c472e13253aa1ffdbd19bc7bdea013b6"
+        },
+        "move": {
+          "before": null,
+          "after": "8eb4f4ce19c0652dde27833f332620d792ba80b50992235c9e41411dceedb87a"
+        },
+        "objective_areas": {
+          "before": null,
+          "after": "79aa741d96a52ee44c640b3e5b9d82616e0e5244a8eeb84913d4a5c8b29720e5"
+        },
+        "path_points": {
+          "before": null,
+          "after": "a37c5ee64ac42e3951a50d19640a41129767658011dcd1595672ae8502d9ce78"
+        },
+        "placement": {
+          "before": null,
+          "after": "8f6e8f1ec29d3e6bbe391759362cf8b5ff2d9a584adb52202c060e1cb5d39167"
+        },
+        "ranked": {
+          "before": null,
+          "after": "cc217dac55fe99c4ac18c9b87ee283f24abc1b5b7591f4ed236d991113ac6cd3"
+        },
+        "raw_moves": {
+          "before": null,
+          "after": "da5e9ba7bc9f8a2d808ccb31729ed0dfad2d7e5624c4371ee4bfe44e4e4eedf6"
+        },
+        "reproduce": {
+          "before": null,
+          "after": "508baef9983420db5528eaf6a67f0e72614c24b30c0bf10f510535d1445d28fd"
+        },
+        "require": {
+          "before": null,
+          "after": "4afe1512f557af72e7abc568bd242b0f173899b39cae822600f7456261da6cca"
+        },
+        "schedule": {
+          "before": null,
+          "after": "ebfebefc31f2553d725074737b49731243327f57b6ddee183eb13a2538d9470c"
+        },
+        "scoring_oc": {
+          "before": null,
+          "after": "51e36372680a839929891612467d069c8042a8d9ba6d7350dddc400670e90453"
+        },
+        "submit": {
+          "before": null,
+          "after": "5f5caa20365804b120e4079c469be2e535fa3d15ccc38df289a521f33859c21b"
+        },
+        "touches": {
+          "before": null,
+          "after": "53181e5937312e5d7431534eb47a6554ae6bb6f6be0422bac5f17919db180485"
+        },
+        "trial": {
+          "before": null,
+          "after": "db4de2ef9211b5ebbfd41deb66c92f393d5988a98a4271121437b59dc4d2d03a"
+        },
+        "vector": {
+          "before": null,
+          "after": "05510dee33ac5155abeb5cab8ff9b2ae8d92d3cca9cc676b2957bd4b638954f9"
+        },
+        "west_audit": {
+          "before": null,
+          "after": "80766591486b13b7d5fa1c4bc2bc63895b79fb90f8331c734c670b4326a30374"
+        },
+        "west_b3": {
+          "before": null,
+          "after": "1dbbc6fbd8fc8949b35d6958687ca45988352ce677340293418706425fab28eb"
         }
       }
     }
@@ -20,7 +182,33 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Record the bounded B3 and A4 native replay evidence and bind the standalone synthetic recipe for the ten reviewed endpoints.",
+      "rationale": "Documents the opt-in benchmark, including the west mechanism selection, outcome-independent guard admission, observed runner costs and grouped held-out split.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/stage4-benchmark-receipt.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Stores compact frozen fixture parameters, native menu evidence and replay hashes for the opt-in runner.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/performance/policy-v3/operation-map.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Registers only the new Stage 4 operator script using the existing Stage 2 reproducer mapping pattern.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "scripts/stage4_benchmark_entry.py": {
+      "category": "measured_workload",
+      "operations": [
+        "stage4-benchmark-entry-reproducer"
+      ],
+      "selected_families": [],
+      "rationale": "Adds an opt-in development reproducer that exercises existing actor, candidate, submission, persistence and replay APIs. Default CI test membership, engine code and locked dependencies are unchanged.",
       "source_obligation": null,
       "unchanged_work": null
     }

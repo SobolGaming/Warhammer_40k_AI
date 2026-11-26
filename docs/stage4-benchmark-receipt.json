@@ -1,0 +1,306 @@
+{
+  "schema": "stage4-development-v1",
+  "base": "dd2e259d5e9824a9fdd5245461b2e308f9fb549a",
+  "baseline": "immediate-material-hold-v1",
+  "horizon": [4, "player-a", "movement", "select_movement_unit"],
+  "cases": ["hold-follow", "screen-follow", "screen-omit"],
+  "fixtures": {
+    "west": {
+      "group": "layout3-west-lane-dev",
+      "game_id": "stage4-layout3-west-intercept-v1",
+      "targets": ["expansion-02"],
+      "origin": [46, "fb0441ed6e037bbd70762cb7fb27e3b39c3a18a8ab88e7a3b70680f99767d2b8", "f7d263deefb3facb0dfaabe58df7371929dcda0d13488f88b8c7e2ee7c04a393"],
+      "start_vp": [0, 0],
+      "source_receipt_sha256": "ddf28873fc7bde081d495e5e694143a1f717ae90e45bca63e65925b19137b390",
+      "arms": {
+        "hold-follow": {
+          "vp": [0, 3],
+          "record_count": 62,
+          "checkpoint": "a244e52391471cf19c2e4019f82517e2adaaee524df306da53caa3f7569ba592",
+          "event_log": "77278ad066951b0e74446dff8390bdf482b93659e78d1348913c27153d980d40",
+          "oc": [[[2, 0]], [[2, 10]], [[2, 10]]]
+        },
+        "screen-follow": {
+          "vp": [5, 0],
+          "record_count": 63,
+          "checkpoint": "55110f9eefc533a066fee77deb305603a774e171e2ae06afdcd503b7f1488237",
+          "event_log": "fea1d9924957de37a15b966b7928fe66a828c76b3deb793eedf0d5757a6d66d8",
+          "oc": [[[2, 0]], [[2, 0]], [[2, 0]]]
+        },
+        "screen-omit": {
+          "vp": [0, 0],
+          "record_count": 62,
+          "checkpoint": "1ee4cae83c9287462cafb6f1103700881609822ec23194a2a18e61fcecabdb24",
+          "event_log": "b93d4220c1a16a483434afa262d4debdda4b0c210fcc4ea67a8f12a5418b0c1c",
+          "oc": [[[0, 0]], [[0, 0]], [[0, 0]]]
+        }
+      },
+      "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:af65d2237320cda39c2d38d0dbeb4d415c424956696fc1cc0f40686921848830",
+      "layout": 3,
+      "deployment": {
+        "army-alpha:scout-redeploy-unit": [[1.15, 52.75], [1.15, 54.15], [1.15, 55.55]],
+        "army-alpha:deep-strike-unit": [[3.0, 44.75330085889911], [3.0, 46.55330085889911], [3.0, 48.35330085889911]],
+        "army-beta:scout-redeploy-unit": [[1.0, 11.487689398770625], [1.0, 9.987689398770625], [1.0, 8.487689398770625], [1.0, 6.987689398770625], [1.0, 4.387689398770627]],
+        "army-alpha:strategic-reserve-unit": [[7.0, 57.0]]
+      },
+      "stem": [[1, "army-alpha:scout-redeploy-unit", "vector", 0, -8.75], [1, "army-alpha:deep-strike-unit", "vector", 0, -7.5], [1, "army-beta:scout-redeploy-unit", "vector", 0, 5.25], [2, "army-alpha:scout-redeploy-unit", "vector", 0, -8.75], [2, "army-alpha:deep-strike-unit", "vector", 0, -7.5], [2, "army-beta:scout-redeploy-unit", "vector", 0, 5.25]],
+      "menus": {
+        "stem": [
+          [12, "3cbf4a50afbe7d360da6adb54833bb2647dcfb533517cc147a1fbda7dfb7fc9d", "normal-move:4fa30167a9e2221cfbd9dda9875f9bf448386ed41553b6f7a77b069bbbe82e0e", null, [], null, null],
+          [20, "141e66ffcd50a39c4b1e73079c3d69633d6b66fde8c3210571cc708ac2277de5", "normal-move:262216f133b562a8e5a4a9a7a8f215bc87968780be8d8318bf0db3cdf0afbe1c", null, [], null, null],
+          [15, "7485fda0af049ac1fbda95ffbca94f7164189733ed607934eb6b2d84b77e52bb", "normal-move:285be13281371c0772af28a176074dfc0992d50a220a4e3ee6ffae84dfe3583d", null, [], null, null],
+          [18, "f73476ce845db3729dd64ed85bc57d13cd64fd98cdff7e8a0e1a4eb9232dca7b", "normal-move:9fdb2b03c91073fda3afd7de7dae36350037699281fdb1ddae5e25b6b2342c29", null, [], null, null],
+          [20, "4716be4cd5a9cf611cbdbd7840f49a1a71f84202452ff49a00a44043b68914a5", "normal-move:c7913c83ba6f4577211bebe02af2687b3dca6ff2a70e6f8b9beba45e415c7142", null, [], null, null],
+          [18, "394c9c9121b7be808d2cd27a396b05db34cfe8503c786f5caa548b7c281da960", "normal-move:a47e4a4f36175de42fdf00122b790d9a429707775756f47ac867fe68fbf7681e", null, [], null, null]
+        ],
+        "hold-follow": [
+          [20, "8c3243f0cdb3eb25a5a4004010d9b3cdbe815f72a17d60feb67a6ea7c650968b", "normal-move:fdc8517b57ceffa00ac215551478abc5d65636c81953efc76c87e55d4294231c", null, [], null, null],
+          [18, "69f7a3d3d8e21139150a420d691f187dcbb8410313ceaf8972d86213ddb8b730", "normal-move:7aef07b0772352ea7b225209bb9794b4bdf672a9a3dac1e65618d557c18bb5ce", null, [], null, null]
+        ],
+        "screen-follow": [
+          [18, "99bb0ad0d6c41b024d6fd25cd2e5b73334afba6ad0fcdc98d6311fd409e35202", "normal-move:50153ec1f544246ee7787b3ce07228364399d069fad9c29ac56e1bd64fc15607", null, [], null, null],
+          [20, "8c3243f0cdb3eb25a5a4004010d9b3cdbe815f72a17d60feb67a6ea7c650968b", "normal-move:fdc8517b57ceffa00ac215551478abc5d65636c81953efc76c87e55d4294231c", null, [], null, null],
+          [
+            18,
+            "69f7a3d3d8e21139150a420d691f187dcbb8410313ceaf8972d86213ddb8b730",
+            "normal-move:7aef07b0772352ea7b225209bb9794b4bdf672a9a3dac1e65618d557c18bb5ce",
+            null,
+            [
+              ["normal-move:7aef07b0772352ea7b225209bb9794b4bdf672a9a3dac1e65618d557c18bb5ce", "enemy_engagement_range_transit_forbidden"]
+            ],
+            null,
+            null
+          ]
+        ],
+        "screen-omit": [
+          [18, "99bb0ad0d6c41b024d6fd25cd2e5b73334afba6ad0fcdc98d6311fd409e35202", "normal-move:50153ec1f544246ee7787b3ce07228364399d069fad9c29ac56e1bd64fc15607", null, [], null, null]
+        ]
+      },
+      "retrospective_menus": {
+        "hold-follow": [
+          {
+            "accepted": ["normal-move:fdc8517b57ceffa00ac215551478abc5d65636c81953efc76c87e55d4294231c", "normal-move:3a5763d374e4dd59652bc0c090abd23a05e63a61f9e80564a5f0408657b3916a"],
+            "attempts": [
+              ["normal-move:fdc8517b57ceffa00ac215551478abc5d65636c81953efc76c87e55d4294231c", null],
+              ["normal-move:3a5763d374e4dd59652bc0c090abd23a05e63a61f9e80564a5f0408657b3916a", null]
+            ],
+            "cap_lost": 18
+          },
+          {
+            "accepted": ["normal-move:7aef07b0772352ea7b225209bb9794b4bdf672a9a3dac1e65618d557c18bb5ce"],
+            "attempts": [
+              ["normal-move:7aef07b0772352ea7b225209bb9794b4bdf672a9a3dac1e65618d557c18bb5ce", null],
+              ["normal-move:134da924b7325d0708f088c2dc56773a8655eb7695aee6515397e348d12f9344", "enemy_engagement_range_end_forbidden"]
+            ],
+            "cap_lost": 16
+          }
+        ],
+        "screen-follow": [
+          {
+            "accepted": ["normal-move:50153ec1f544246ee7787b3ce07228364399d069fad9c29ac56e1bd64fc15607"],
+            "attempts": [
+              ["normal-move:50153ec1f544246ee7787b3ce07228364399d069fad9c29ac56e1bd64fc15607", null],
+              ["normal-move:0042efca6f23f1c43ab2b9927629f882b8e97cfbbf872def35fe5296795c884e", "model_cannot_be_placed_at_endpoint"]
+            ],
+            "cap_lost": 16
+          },
+          {
+            "accepted": ["normal-move:fdc8517b57ceffa00ac215551478abc5d65636c81953efc76c87e55d4294231c", "normal-move:3a5763d374e4dd59652bc0c090abd23a05e63a61f9e80564a5f0408657b3916a"],
+            "attempts": [
+              ["normal-move:fdc8517b57ceffa00ac215551478abc5d65636c81953efc76c87e55d4294231c", null],
+              ["normal-move:3a5763d374e4dd59652bc0c090abd23a05e63a61f9e80564a5f0408657b3916a", null]
+            ],
+            "cap_lost": 18
+          },
+          {
+            "accepted": [],
+            "attempts": [
+              ["normal-move:7aef07b0772352ea7b225209bb9794b4bdf672a9a3dac1e65618d557c18bb5ce", "enemy_engagement_range_transit_forbidden"],
+              ["normal-move:134da924b7325d0708f088c2dc56773a8655eb7695aee6515397e348d12f9344", "enemy_engagement_range_end_forbidden"]
+            ],
+            "cap_lost": 16
+          }
+        ],
+        "screen-omit": [
+          {
+            "accepted": ["normal-move:50153ec1f544246ee7787b3ce07228364399d069fad9c29ac56e1bd64fc15607"],
+            "attempts": [
+              ["normal-move:50153ec1f544246ee7787b3ce07228364399d069fad9c29ac56e1bd64fc15607", null],
+              ["normal-move:0042efca6f23f1c43ab2b9927629f882b8e97cfbbf872def35fe5296795c884e", "model_cannot_be_placed_at_endpoint"]
+            ],
+            "cap_lost": 16
+          }
+        ]
+      },
+      "rejected_fork": ["5223e70390cd6292b964c087180cdee93b1cfc4cb980f273551cf20aaba4a262", "577b62fb0ef07b9902ff48ae8980993a8d233a83ca2297440d0b7b925a4ac464"]
+    },
+    "guard": {
+      "group": "layout2-central-guard-dev",
+      "game_id": "stage4-layout2-guard-v1",
+      "targets": ["central-02", "central-01"],
+      "origin": [48, "4171ab82b3c1ea656c6fb5f7a4f85804f247eb189dda0c1c7e30deb8516096d5", "8ec1c330548796ce442e9912d5ee9d480639df2f5a72a9501cd4daecea3e7310"],
+      "start_vp": [8, 0],
+      "source_receipt_sha256": "da0e27c5deb8bf7875c8082fe931193463ea284f4f5f3299f451c99cb33bf858",
+      "arms": {
+        "hold-follow": {
+          "vp": [21, 0],
+          "record_count": 65,
+          "checkpoint": "49a8285f0c834c029555d92e8a3a2528c31f4dc51f4544209230f0c06934a066",
+          "event_log": "a888108ef43115cfa0741aa37e6f0d1a51f2bf0909392011c9cca5e8ccd04389",
+          "oc": [[[6, 2], [2, 0]], [[6, 2], [2, 0]], [[6, 2], [2, 0]]]
+        },
+        "screen-follow": {
+          "vp": [16, 3],
+          "record_count": 66,
+          "checkpoint": "4a850790638b590c5664374409eed546f32313261f6e36596e953d883c732fb3",
+          "event_log": "e04f3def6384081dee9ed1c953ce5ee534778dddd91cdcb4f8f80c5742625749",
+          "oc": [[[2, 2], [2, 0]], [[2, 10], [2, 0]], [[2, 10], [2, 0]]]
+        },
+        "screen-omit": {
+          "vp": [8, 3],
+          "record_count": 65,
+          "checkpoint": "e3ac3c230d8e0d9e57ccdd8902293c800ea64675ae887b6ed6e10247423fd4d0",
+          "event_log": "de483c62b28f9e9044ebb2e3283f19841bb7c825830f03a0e8cd65e93f577c10",
+          "oc": [[[2, 2], [0, 0]], [[2, 10], [0, 0]], [[2, 10], [0, 0]]]
+        }
+      },
+      "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:af65d2237320cda39c2d38d0dbeb4d415c424956696fc1cc0f40686921848830",
+      "layout": 2,
+      "deployment": {
+        "army-alpha:scout-redeploy-unit": [[7.375378797541252, 33.72462120245876], [9.02537879754125, 33.72462120245876], [7.375378797541252, 35.37462120245876], [9.02537879754125, 35.37462120245876], [9.02537879754125, 37.02462120245876]],
+        "army-alpha:deep-strike-unit": [[15.65, 44.5], [15.65, 46.5], [15.65, 48.5]],
+        "army-beta:scout-redeploy-unit": [[28.33236608837714, 17.214208099709932], [30.33236608837714, 17.214208099709932], [32.332366088377135, 17.214208099709932], [28.33236608837714, 19.214208099709932], [30.33236608837714, 19.214208099709932]],
+        "army-alpha:strategic-reserve-unit": [[3, 53]]
+      },
+      "stem": [[1, "army-alpha:deep-strike-unit", "long", 1, 0], [1, "army-alpha:scout-redeploy-unit", "long", 1, -1], [1, "army-beta:scout-redeploy-unit", "short", -3, 8], [2, "army-alpha:scout-redeploy-unit", "long", 1, -1], [2, "army-beta:scout-redeploy-unit", "long", -1, 1]],
+      "menus": {
+        "stem": [
+          [
+            32,
+            "5edb69bfcf4a0c7ba40b914969be49851e047f19e21f3277f03789740737bdc5",
+            "normal-move:90391ff666ecf6bcd2ce3a51464c99d319a29beafb0f79a84dd3afa6faff728e",
+            ["normal-move:90391ff666ecf6bcd2ce3a51464c99d319a29beafb0f79a84dd3afa6faff728e"],
+            [],
+            1,
+            30
+          ],
+          [
+            32,
+            "634a41a0822dbd7c329b35e2c731d2668241d207330af38297b7b31d728c8be9",
+            "normal-move:46cddb2a6ce6cd9ccac6f11081b9abef214f92f577d28fcca2f1063c71b89480",
+            ["normal-move:46cddb2a6ce6cd9ccac6f11081b9abef214f92f577d28fcca2f1063c71b89480"],
+            [],
+            1,
+            30
+          ],
+          [
+            32,
+            "0213de15bec3c8a002afa8ca35110357fa1c7c6fccbf4fa909e03455440c6dd2",
+            "normal-move:885e89b59a836a0ab6289ffe03749ba840afef86aa448e178e37abdea277ca5d",
+            ["normal-move:885e89b59a836a0ab6289ffe03749ba840afef86aa448e178e37abdea277ca5d"],
+            [],
+            1,
+            30
+          ],
+          [
+            32,
+            "c004ce4827bfbd7f7b37ebb678dae8f4de64ed730bc3123f68b56398d7b15579",
+            "normal-move:8ce2414adddf81cbf34d1a55bc5d3cd07f889714f5981bd98c408b4bc4620d96",
+            ["normal-move:8ce2414adddf81cbf34d1a55bc5d3cd07f889714f5981bd98c408b4bc4620d96"],
+            [],
+            1,
+            30
+          ],
+          [
+            32,
+            "3bf52b012dd627718655eae2f9626150c35f82394386f48e22da35c632b34c99",
+            "normal-move:518a450a211f80157f1dea451f82688db7fd96f6bad44aec992ff9534d47c557",
+            ["normal-move:518a450a211f80157f1dea451f82688db7fd96f6bad44aec992ff9534d47c557"],
+            [],
+            1,
+            30
+          ]
+        ],
+        "hold-follow": [
+          [
+            32,
+            "52451ebe65a6a6616cd3b90897f023c138d397323c647c702fa3f7e6c9c331d0",
+            "normal-move:4f15dddec640f72e5e2eeab52b7b8a760369302cb35d34e7d9778ee8669c1ad4",
+            ["normal-move:4f15dddec640f72e5e2eeab52b7b8a760369302cb35d34e7d9778ee8669c1ad4"],
+            [
+              ["normal-move:52c0d9bdbf8e4e57d2a7b5ca9a42d58b03644ca5479624c98e3060aa02368fcd", "model_cannot_be_placed_at_endpoint"]
+            ],
+            0,
+            30
+          ],
+          [
+            32,
+            "91bf164bf2ccd8c824f3b226815ee76f3ba728372bed958806e218986314e510",
+            "normal-move:988fa37f362dbe0247bb21c07b783141fb495890a1a34939f1823b4da1b1a59b",
+            ["normal-move:988fa37f362dbe0247bb21c07b783141fb495890a1a34939f1823b4da1b1a59b"],
+            [
+              ["normal-move:84b9eefe5b3351b053e0d789f3b6c87647a96298b93f07642254897efb1ed21d", "enemy_engagement_range_transit_forbidden"]
+            ],
+            2,
+            28
+          ]
+        ],
+        "screen-follow": [
+          [
+            32,
+            "ae62bb15f5f6906306071b62703e8bfac2b83aa1a732942f0150bf373dbe490b",
+            "normal-move:06371de2efd568183bc88556d32ae6fa308e428d66908276037dcbf9669f3c32",
+            ["normal-move:06371de2efd568183bc88556d32ae6fa308e428d66908276037dcbf9669f3c32"],
+            [],
+            0,
+            31
+          ],
+          [
+            32,
+            "52451ebe65a6a6616cd3b90897f023c138d397323c647c702fa3f7e6c9c331d0",
+            "normal-move:4f15dddec640f72e5e2eeab52b7b8a760369302cb35d34e7d9778ee8669c1ad4",
+            ["normal-move:4f15dddec640f72e5e2eeab52b7b8a760369302cb35d34e7d9778ee8669c1ad4"],
+            [
+              ["normal-move:52c0d9bdbf8e4e57d2a7b5ca9a42d58b03644ca5479624c98e3060aa02368fcd", "model_cannot_be_placed_at_endpoint"]
+            ],
+            0,
+            30
+          ],
+          [
+            32,
+            "91bf164bf2ccd8c824f3b226815ee76f3ba728372bed958806e218986314e510",
+            "normal-move:84b9eefe5b3351b053e0d789f3b6c87647a96298b93f07642254897efb1ed21d",
+            ["normal-move:84b9eefe5b3351b053e0d789f3b6c87647a96298b93f07642254897efb1ed21d"],
+            [
+              ["normal-move:988fa37f362dbe0247bb21c07b783141fb495890a1a34939f1823b4da1b1a59b", "enemy_engagement_range_transit_forbidden"]
+            ],
+            2,
+            28
+          ]
+        ],
+        "screen-omit": [
+          [
+            32,
+            "ae62bb15f5f6906306071b62703e8bfac2b83aa1a732942f0150bf373dbe490b",
+            "normal-move:06371de2efd568183bc88556d32ae6fa308e428d66908276037dcbf9669f3c32",
+            ["normal-move:06371de2efd568183bc88556d32ae6fa308e428d66908276037dcbf9669f3c32"],
+            [],
+            0,
+            31
+          ],
+          [
+            32,
+            "91bf164bf2ccd8c824f3b226815ee76f3ba728372bed958806e218986314e510",
+            "normal-move:84b9eefe5b3351b053e0d789f3b6c87647a96298b93f07642254897efb1ed21d",
+            ["normal-move:84b9eefe5b3351b053e0d789f3b6c87647a96298b93f07642254897efb1ed21d"],
+            [
+              ["normal-move:988fa37f362dbe0247bb21c07b783141fb495890a1a34939f1823b4da1b1a59b", "enemy_engagement_range_transit_forbidden"]
+            ],
+            2,
+            28
+          ]
+        ]
+      }
+    }
+  }
+}
