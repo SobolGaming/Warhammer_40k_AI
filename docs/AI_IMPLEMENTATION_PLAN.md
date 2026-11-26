@@ -1310,6 +1310,99 @@ Hold/Spend scoring counterfactual for a landed early charge. Existing delayed
 controls retain their recorded scope. Stage 2 useful-reference qualification
 stays at `scoped_gap`, with a null reference target and learning excluded.
 
+### Bounded B3/A4 action capability on the #761 build
+
+The bounded evidence now includes a fresh rerun at
+`3f69eee636f758344a68cedf02cd9a36f62a85b5` (tree
+`f98cf1c47fcded6e33be79e4a63e0ba3f6c687d3`). The operator receipt has
+SHA-256 `16edaba30b489a95c2606b701d46389ee6d56a871ef6abcadd926ca0440f2d16` and its local raw inventory has SHA-256
+`d1c31dab757199240b435a369b6355cca871456e9405c31306d0b398fedea626`. Ten endpoints passed strict JSON restore, both restored
+player views and visible event streams, and an independent full replay
+with the same event log. The operator kept raw checkpoints and proof
+payloads locally.
+
+The pull request description carries the standalone Linux reproducer
+with its public synthetic action recipe and exact expected hashes for
+all ten endpoints. Save the fenced Python block as
+`reproduce_stage3.py` and verify its SHA-256
+`d8231fef1d99286f29ff3410ef46147735a14ad77569434dea1b1b887a8777df`. It reconstructs the ordinary prefixes and runs the
+actor-owned continuations without any operator-local inputs.
+
+The smallest admitted ordinary setup remains
+[`canonical-deployment-v1`](AI_POLICY_INTERFACE.md#frozen-canonical-deployment-admission):
+11 accepted submissions before redeploy. The battle run starts ordinarily
+with the separately pinned synthetic edge-column configuration
+`872634336fca36e03d30d3d4593ee7f857d3398a109c118037d46982e78f53c5`,
+using the retained delayed/Spend and delayed/Preserve decisions from #735.
+Its synthetic roster and partial points, legacy model volumes, July
+mission/scoring and October Layout 3 geometry remain part of the
+fixture. The constructed [Normal Move comparison](stage2/normal-move-candidates.md)
+and the [provisional Cavalcade full game](performance/PERFORMANCE_POLICY.md#cavalcade-setup-to-terminal-workload)
+retain their separate evidence scopes.
+
+At B3 `decision-request-000063`, the reconstructed fork matched the
+62-decision, 637-event, two-draw anchor of the
+[#747 comparison](stage2/b3-post-roll-finite-receipt.json). The acting
+player's finite set again contains taking S and declining. The native
+take arm accepts the retained generated Charge witness and its fixed
+Fight response. B controls Expansion Objective 2 with 2 OC and scores
+3 VP. Declining reaches A4 Movement with the objective uncontrolled and
+B at 0 VP. Both endpoint checkpoint payloads and both player projections match
+the retained #747 evidence exactly. The Heroic Intervention decline supplies a
+decline control. The natural 5 + 5 comparison remains a separate result.
+
+The A4 casualty fork instead follows the retained #735 delayed/Spend
+Charge path. After submitting the Desperate Escape path, Player A receives
+`select_mortal_wound_model` at `decision-request-000074`. The one saved
+decision contains 73 accepted records, 779 events and seven draws, with
+checkpoint ID `da468f97539e215838b2d7ff204250a5462ddbd21d2398051ded39c6b216666b`.
+Its five finite candidates are the five living models in S. Each was
+submitted through the player facade on a separate fork of the same
+strictly restored state. Each native destruction event identifies the
+selected model. A wrong-viewer submission was rejected with the
+checkpoint unchanged. The player views and event streams exclude the
+private seed and persistence RNG state. The observer could not bind
+the acting player's action.
+
+All five chosen casualties leave four coherent S survivors with eight
+wounds. Each continuation uses the same subsequent Movement choices and
+the same three-carbine declaration into B. The visible targeting detail
+and realized attack sequence vary, while the legal target unit and
+declared weapons are identical. All reach A4's first post-E Shooting
+unit selection with E at six wounds, B at five surviving models,
+7 CP each and A/B VP of 0/3.
+
+| S model removed | Native Desperate Escape Battle-shock | Expansion Objective 2 at A4 Movement end | B wounds after E volley | Decisions / events / draws |
+| --- | --- | --- | ---: | --- |
+| 001 | 2 + 3, fail | B controls, 2 OC | 9 | 106 / 975 / 27 |
+| 002 | 2 + 4, pass | Contested, 2 OC each | 9 | 105 / 974 / 27 |
+| 003 | 2 + 1, fail | B controls, 2 OC | 10 | 105 / 969 / 25 |
+| 004 | 4 + 2, pass | Contested, 2 OC each | 9 | 102 / 957 / 24 |
+| 005 | 1 + 1, fail | B controls, 2 OC | 10 | 111 / 996 / 29 |
+
+S model 001 is the only S contributor on that objective when it
+survives. It supplies 2 OC if S passes and 0 when S is Battle-shocked.
+The branches retain their natural draws from the shared seed. The
+realized Battle-shock, control and damage differences do not establish
+an expected payoff or a preferred casualty policy.
+
+The matched #735 E controls also reproduce their original checkpoints
+and both viewer/event projections. After removing 001, E shoot versus
+omit leaves B at 9 versus 10 wounds. In the Preserve pair both leave B
+at 10. A/B VP stays 0/3 in Spend and 0/0 in Preserve. Preserve never
+issues the A4 casualty choice. The selected traces stop before later
+scoring. Optional reactions are covered only where the recorded action
+is exercised, and E and the B3 take offer each have one target unit.
+The historical Cavalcade screen arm measured two targets within
+declaration range and continued only one.
+
+This accounts for the five issued A4 casualty alternatives in the
+selected workload. The finite candidate and ordinary submission owners
+already cover this occurrence. These branches do not qualify an
+Ordered Retreat comparison, an alternate target policy, a generic CP
+policy, learning eligibility or the broader Stage 3 exit. The Stage 2
+useful-reference status is still `scoped_gap`.
+
 ## 6. First delayed-tradeoff experiment
 
 **Status: proposed, not an existing certified benchmark.** Start from the earliest suitable canonical Core fixture/checkpoint. References: `tests/replay/test_phase18b_replay_runner.py`, `tests/shared/category_migration/primary_boundary_scoring_builders.py`, `tests/shared/category_migration/phase11f_game_end_scoring.py`, and `tests/support/selected_target_charge_fixtures.py`. Use real domain objects and normal engine decisions; do not import test modules into runtime or present a synthetic state alteration as an engine-generated checkpoint.
