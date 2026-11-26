@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import TYPE_CHECKING, cast
 
 import pytest
 
@@ -12,9 +13,20 @@ from tests.psychic_modifier_helpers import submit_fixture_request
 from tests.support.faction_batch01 import anchor, locate, request, scene, selection
 from tests.support.section02_fixtures import Section02Definitions
 from tests.support.section04_fixtures import shooting_payload, shooting_request, weapon_rows
+from warhammer40k_core.core.dice import (
+    DiceExpression,
+    DiceRollResult,
+    DiceRollResultPayload,
+    RandomCharacteristicRoll,
+    RandomCharacteristicRollPayload,
+)
 from warhammer40k_core.engine.phase import BattlePhase, LifecycleStatusKind
 from warhammer40k_core.engine.replay import ReplayRunner
 from warhammer40k_core.geometry.pose import Pose
+
+if TYPE_CHECKING:
+    from tests.support.faction_batch01 import Scene
+    from warhammer40k_core.engine.decision_request import DecisionRequest
 
 LHYKHIS = "000003909"
 CHOICE = "select_catalog_post_shoot_hit_target_effect"
@@ -60,9 +72,37 @@ def test_native_torrent_hits_without_damage_require_target_choice(
             break
         submit_fixture_request(s.session, r)
     assert r.decision_type == CHOICE
+    from tests.support.faction_batch01 import events
+
+    (count_payload,) = (
+        row
+        for row in events(s.session, "random_characteristic_rolled")
+        if row["characteristic"] == "attacks"
+    )
+    count = RandomCharacteristicRoll.from_payload(
+        cast(RandomCharacteristicRollPayload, count_payload)
+    )
+    attack_die = count.roll_state.original_result
+    rolls = [
+        DiceRollResult.from_payload(cast(DiceRollResultPayload, row))
+        for row in events(s.session, "dice_rolled")
+    ]
+    assert attack_die in rolls
+    assert attack_die.spec.expression == DiceExpression(quantity=1, sides=6, modifier=3)
+    (face,) = attack_die.values
+    assert count.roll_state.current_values == attack_die.values
     hits = hit_payloads(s)
-    assert len(hits) == 6
-    assert all(h["successful"] and h["skipped"] and not h["critical"] for h in hits)
+    assert len(hits) == count.value == face + attack_die.spec.expression.modifier
+    assert all(
+        h["successful"]
+        and h["skipped"]
+        and not h["critical"]
+        and h["roll_state"] is None
+        and h["unmodified_roll"] is None
+        and h["generated_hits"] == 1
+        for h in hits
+    )
+    assert all(roll.spec.roll_type != "attack_sequence.hit" for roll in rolls)
     assert s.units["foe:walkers"].own_models[0].current_wounds == 6
     assert len(r.options) == 1
     s.session.submit_option(
@@ -360,30 +400,227 @@ def test_native_source_last_killed_target_has_no_selection(
     native_definitions: Section02Definitions,
 ) -> None:
     from tests.factions.aeldari.lhykhis_helpers import declare_web, drive_to, web_scene
+    from tests.factions.aeldari.lhykhis_scripted_attacks import scripted_six_brood_twain_wounds
+    from tests.factions.aeldari.mandiblasters_helpers import restored_scene
+    from tests.order130_helpers import session_from_casualty_checkpoint
     from tests.support.faction_batch01 import events
+    from tests.support.section02_consumers import payload_object
+    from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 
-    s = web_scene(
+    target = "foe:walkers"
+    scripted = web_scene(
         native_definitions,
         attached=True,
         seed="native-web-attached",
         rng_seed_label="native-web-attached-private-screen-1526",
     )
-    declare_web(s, attached=True)
-    r = drive_to(s, {CHOICE, "select_shooting_unit"}, source_first=False)
-    assert r.decision_type == "select_shooting_unit"
-    assert not any(
-        m.is_alive
-        for a in s.state.army_definitions
-        for u in a.units
-        if u.unit_instance_id == "foe:walkers"
-        for m in u.own_models
+    ordinary = restored_scene(scripted)
+
+    def resolve(current: Scene) -> DecisionRequest:
+        declare_web(current, attached=True)
+        pending = drive_to(current, {CHOICE, "select_shooting_unit"}, source_first=False)
+        groups = [
+            payload_object(payload_object(record.result.payload)["gathered_group"])["pool_indices"]
+            for record in current.session.lifecycle.decision_controller.records
+            if record.request.decision_type == "select_attack_weapon_group"
+            and payload_object(record.result.payload)["sequence_id"]
+            == "attack-sequence:web-declaration"
+        ]
+        assert groups == [[1], [2, 3, 4, 5], [0]]
+        return pending
+
+    def assert_no_surviving_target(current: Scene, pending: DecisionRequest) -> None:
+        assert pending.decision_type == "select_shooting_unit"
+        assert not rules_unit_view_by_id(
+            state=current.state, unit_instance_id=target
+        ).alive_models()
+        [casualty] = [
+            row
+            for row in events(current.session, "model_destroyed")
+            if row["target_unit_instance_id"] == target
+        ]
+        assert casualty["source_model_instance_id"] in current.units["own:lhykhis"].own_model_ids()
+        assert not events(current.session, "catalog_post_shoot_hit_target_effect_requested")
+
+    # Scripted native proof. Earlier bodyguard groups still consume ordinary RNG.
+    with scripted_six_brood_twain_wounds(scripted, attached_target=False):
+        pending = resolve(scripted)
+    assert_no_surviving_target(scripted, pending)
+    scripted.session = session_from_casualty_checkpoint(scripted.session.lifecycle)
+    _assert_web_shooting_end_replay(scripted, pending, artifact_id="web-scripted-source-last")
+
+    # Ordinary full replay preserves its reached outcome and the actual offer/absence.
+    pending = resolve(ordinary)
+    alive = rules_unit_view_by_id(state=ordinary.state, unit_instance_id=target).alive_models()
+    if alive:
+        assert pending.decision_type == CHOICE
+        assert not any(
+            row["target_unit_instance_id"] == target
+            for row in events(ordinary.session, "model_destroyed")
+        )
+        _assert_web_choice_replay(ordinary, pending, target, artifact_id="web-ordinary-source-last")
+    else:
+        assert_no_surviving_target(ordinary, pending)
+        _assert_web_shooting_end_replay(ordinary, pending, artifact_id="web-ordinary-source-last")
+
+
+def _assert_web_shooting_end_replay(
+    current: Scene, pending: DecisionRequest, *, artifact_id: str
+) -> None:
+    from tests.factions.aeldari.lhykhis_helpers import choose
+    from tests.factions.aeldari.mandiblasters_helpers import restored_scene
+
+    restored = restored_scene(current)
+    assert restored.session.to_persistence_payload() == current.session.to_persistence_payload()
+    for branch in (current, restored):
+        request_before = branch.session.lifecycle.pending_decision_request()
+        assert request_before is not None
+        assert request_before == pending
+        choose(branch, request_before, "complete_shooting_phase")
+    assert restored.session.to_persistence_payload() == current.session.to_persistence_payload()
+    assert (
+        ReplayRunner.from_payload(current.session.replay_artifact(artifact_id=artifact_id))
+        .run()
+        .reproduced_exactly
     )
-    assert any(
-        e["source_model_instance_id"] in s.units["own:lhykhis"].own_model_ids()
-        and e["target_unit_instance_id"] == "foe:walkers"
-        for e in events(s.session, "model_destroyed")
+
+
+def _assert_web_choice_replay(
+    current: Scene,
+    pending: DecisionRequest,
+    target: str,
+    *,
+    artifact_id: str,
+    restore_accepted_mark: bool = False,
+) -> None:
+    from tests.factions.aeldari.lhykhis_helpers import choose, hit_with_face
+    from tests.factions.aeldari.mandiblasters_helpers import restored_scene
+    from tests.support.faction_batch01 import events
+    from tests.support.section02_consumers import payload_object
+
+    assert pending.decision_type == CHOICE
+    assert payload_object(pending.payload)["available_target_unit_instance_ids"] == [target]
+    assert len(pending.options) == 1
+    restored = restored_scene(current)
+    assert restored.session.to_persistence_payload() == current.session.to_persistence_payload()
+    for branch in (current, restored):
+        request_before = branch.session.lifecycle.pending_decision_request()
+        assert request_before is not None
+        assert request_before == pending
+        choose(branch, request_before, request_before.options[0].option_id)
+        assert len(events(branch.session, "catalog_post_shoot_hit_target_effect_selected")) == 1
+        assert hit_with_face(branch, target_id=target, face=5).critical
+    accepted = current.session.to_persistence_payload()
+    assert restored.session.to_persistence_payload() == accepted
+    if restore_accepted_mark:
+        restored_accepted = restored_scene(current)
+        assert restored_accepted.session.to_persistence_payload() == accepted
+        hit = hit_with_face(restored_accepted, target_id=target, face=5)
+        assert hit.unmodified_roll == hit.critical_threshold == 5
+        assert hit.critical
+    assert (
+        ReplayRunner.from_payload(current.session.replay_artifact(artifact_id=artifact_id))
+        .run()
+        .reproduced_exactly
     )
-    assert not events(s.session, "catalog_post_shoot_hit_target_effect_requested")
+
+
+def _assert_charged_fangs_use_natural_four_and_five(s: Scene, completed_before: int) -> None:
+    from tests.factions.aeldari.lhykhis_helpers import choose
+    from tests.factions.aeldari.lhykhis_scripted_attacks import scripted_charged_fangs
+    from tests.support.faction_batch01 import events
+    from tests.support.section02_consumers import payload_object, payload_text
+    from warhammer40k_core.engine.lethal_hits import (
+        AUTO_WOUND_OPTION_ID,
+        SELECT_LETHAL_HIT_WOUND_DECISION_TYPE,
+    )
+
+    choice: DecisionRequest | None = None
+    with scripted_charged_fangs(s):
+        for _ in range(180):
+            if len(events(s.session, "attack_sequence_completed")) > completed_before:
+                break
+            pending = request(s.session.advance_until_decision_or_terminal())
+            if pending.decision_type == "select_attack_weapon_group" and choice is None:
+                options = [
+                    option
+                    for option in pending.options
+                    if payload_object(payload_object(option.payload)["gathered_group"])[
+                        "pool_indices"
+                    ]
+                    == [0]
+                ]
+                assert len(options) == 1
+                choose(s, pending, options[0].option_id)
+            elif pending.decision_type == SELECT_LETHAL_HIT_WOUND_DECISION_TYPE:
+                context = payload_text(payload_object(pending.payload)["attack_context_id"])
+                if context.endswith(":pool-001:attack-002"):
+                    assert choice is None
+                    assert pending.actor_id == "owner"
+                    assert AUTO_WOUND_OPTION_ID in {option.option_id for option in pending.options}
+                    choice = pending
+                    choose(s, pending, AUTO_WOUND_OPTION_ID)
+                else:
+                    submit_fixture_request(s.session, pending)
+            else:
+                submit_fixture_request(s.session, pending)
+        else:
+            raise AssertionError("Scripted native charged Fight did not complete")
+
+    assert choice is not None
+    [completion] = events(s.session, "attack_sequence_completed")[completed_before:]
+    sequence_id = payload_text(completion["sequence_id"])
+    choice_payload = payload_object(choice.payload)
+    assert choice_payload["sequence_id"] == sequence_id
+    critical_id = f"{sequence_id}:pool-001:attack-002"
+    normal_id = f"{sequence_id}:pool-001:attack-001"
+    assert choice_payload["attack_context_id"] == critical_id
+    steps = [
+        row
+        for row in events(s.session, "attack_sequence_step")
+        if row["sequence_id"] == sequence_id
+        and payload_text(row["attack_context_id"]).startswith(f"{sequence_id}:pool-001:")
+    ]
+    hits = [payload_object(row["payload"]) for row in steps if row["step"] == "hit"]
+    assert [hit["unmodified_roll"] for hit in hits] == [4, 5, 1, 1, 1]
+    assert [hit["successful"] for hit in hits] == [True, True, False, False, False]
+    assert [hit["critical"] for hit in hits] == [False, True, False, False, False]
+    assert all(hit["critical_threshold"] == 5 for hit in hits)
+
+    wounds = {
+        payload_text(row["attack_context_id"]): payload_object(row["payload"])
+        for row in steps
+        if row["step"] == "wound"
+    }
+    assert wounds.keys() == {normal_id, critical_id}
+    assert not wounds[normal_id]["skipped"]
+    assert not wounds[normal_id]["successful"]
+    assert wounds[normal_id]["unmodified_roll"] == 1
+    assert wounds[critical_id]["skipped"]
+    assert wounds[critical_id]["successful"]
+    assert wounds[critical_id]["unmodified_roll"] is None
+    assert not wounds[critical_id]["critical"]
+
+    # The selected group uses precisely the fixture's physical dice on the live journal.
+    physical_wounds = [
+        row
+        for row in events(s.session, "dice_rolled")
+        if (spec := payload_object(row["spec"]))["roll_type"] == "attack_sequence.wound"
+        and payload_text(spec["reason"]).endswith((normal_id, critical_id))
+    ]
+    [normal_wound] = physical_wounds
+    assert payload_text(payload_object(normal_wound["spec"])["reason"]).endswith(normal_id)
+    assert normal_wound["values"] == [1]
+    assert normal_wound["source"] == "fixed"
+    records = s.session.lifecycle.decision_controller.records
+    [applied] = [
+        record
+        for record in records
+        if record.request.decision_type == SELECT_LETHAL_HIT_WOUND_DECISION_TYPE
+        and payload_object(record.request.payload)["attack_context_id"] in {normal_id, critical_id}
+    ]
+    assert applied.request == choice
+    assert applied.result.selected_option_id == AUTO_WOUND_OPTION_ID
 
 
 def test_native_charge_fight_critical_five_is_lethal_and_turn_expiry_replays(
@@ -399,6 +636,12 @@ def test_native_charge_fight_critical_five_is_lethal_and_turn_expiry_replays(
     )
     from tests.factions.aeldari.mandiblasters_helpers import restored_scene
     from tests.support.faction_batch01 import events
+    from tests.support.section02_consumers import payload_object, payload_text
+    from warhammer40k_core.engine.attack_completion_authority import completed_attack_sequence
+    from warhammer40k_core.engine.lethal_hits import (
+        AUTO_WOUND_OPTION_ID,
+        SELECT_LETHAL_HIT_WOUND_DECISION_TYPE,
+    )
 
     s = web_scene(native_definitions, full_target=True, charge_ready=True, seed="native-web-charge")
     activate_web(s)
@@ -411,6 +654,8 @@ def test_native_charge_fight_critical_five_is_lethal_and_turn_expiry_replays(
         choose(s, r, "complete_charge_phase")
     assert events(s.session, "charge_move_completed")
     completed_before = len(events(s.session, "attack_sequence_completed"))
+    scripted = restored_scene(s)
+    _assert_charged_fangs_use_natural_four_and_five(scripted, completed_before)
     restored = restored_scene(s)
     assert restored.session.to_persistence_payload() == s.session.to_persistence_payload()
     for current in (s, restored):
@@ -422,23 +667,46 @@ def test_native_charge_fight_critical_five_is_lethal_and_turn_expiry_replays(
         else:
             raise AssertionError("Native charged fight did not complete")
     assert restored.session.to_persistence_payload() == s.session.to_persistence_payload()
-    steps = events(s.session, "attack_sequence_step")
-    hits = [
-        e
-        for e in steps
-        if e["step"] == "hit"
-        and isinstance(e["payload"], dict)
-        and e["payload"]["unmodified_roll"] == 5
+    [completion] = events(s.session, "attack_sequence_completed")[completed_before:]
+    sequence_id = cast(str, completion["sequence_id"])
+    decisions = s.session.lifecycle.decision_controller
+    sequence = completed_attack_sequence(
+        event_records=decisions.event_log.records, sequence_id=sequence_id
+    )
+    assert sequence.attacking_unit_instance_id == "own:lhykhis"
+
+    steps = [
+        row
+        for row in events(s.session, "attack_sequence_step")
+        if row["sequence_id"] == sequence_id
     ]
+    hits = {
+        payload_text(row["attack_context_id"]): payload_object(row["payload"])
+        for row in steps
+        if row["step"] == "hit"
+    }
     assert hits
-    for hit in hits:
-        assert isinstance(hit["payload"], dict)
-        assert hit["payload"]["critical"]
-        assert hit["payload"]["critical_threshold"] == 5
-    wounds = [
-        e["payload"] for e in steps if e["step"] == "wound" and isinstance(e["payload"], dict)
-    ]
-    assert any(w["skipped"] and w["successful"] and not w["critical"] for w in wounds)
+    for hit in hits.values():
+        face = hit["unmodified_roll"]
+        assert type(face) is int
+        assert hit["critical_threshold"] == 5
+        assert hit["critical"] is (face >= 5)
+    critical_ids = {attack_id for attack_id, hit in hits.items() if hit["critical"]}
+    auto_wounds = {
+        payload_text(row["attack_context_id"]): payload_object(row["payload"])
+        for row in steps
+        if row["step"] == "wound" and payload_object(row["payload"])["skipped"]
+    }
+    applied_choices = {
+        payload_text(payload_object(record.request.payload)["attack_context_id"])
+        for record in decisions.records
+        if record.request.decision_type == SELECT_LETHAL_HIT_WOUND_DECISION_TYPE
+        and record.result.selected_option_id == AUTO_WOUND_OPTION_ID
+        and payload_object(record.request.payload)["sequence_id"] == sequence_id
+    }
+    assert critical_ids == applied_choices == auto_wounds.keys()
+    assert auto_wounds
+    assert all(wound["successful"] and not wound["critical"] for wound in auto_wounds.values())
     assert (
         ReplayRunner.from_payload(s.session.replay_artifact(artifact_id="web-charge-fight"))
         .run()
@@ -665,36 +933,51 @@ def test_final_model_and_unit_candidates_share_core_sequencing(
 def test_native_attached_target_survives_bodyguard_loss_with_same_mark_identity(
     native_definitions: Section02Definitions,
 ) -> None:
-    from tests.factions.aeldari.lhykhis_helpers import (
-        choose,
-        declare_web,
-        drive_to,
-        hit_with_face,
-        web_scene,
-    )
+    from tests.factions.aeldari.lhykhis_helpers import declare_web, drive_to, web_scene
+    from tests.factions.aeldari.lhykhis_scripted_attacks import scripted_six_brood_twain_wounds
     from tests.factions.aeldari.mandiblasters_helpers import restored_scene
+    from tests.order130_helpers import session_from_casualty_checkpoint
+    from tests.support.faction_batch01 import events
     from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 
-    target_id = "attached-unit:foe:target-body"
-    s = web_scene(native_definitions, attached_target=True, seed="native-web-attached")
-    declare_web(s, target_id=target_id)
-    r = drive_to(s, {CHOICE, "select_shooting_unit"})
-    assert r.decision_type == CHOICE
-    assert isinstance(r.payload, dict)
-    assert r.payload["available_target_unit_instance_ids"] == [target_id]
-    view = rules_unit_view_by_id(state=s.state, unit_instance_id=target_id)
-    assert all(
-        m.model_instance_id in s.units["foe:target-leader"].own_model_ids()
-        for m in view.alive_models()
+    target = "attached-unit:foe:target-body"
+    scripted = web_scene(native_definitions, attached_target=True, seed="native-web-attached")
+    ordinary = restored_scene(scripted)
+    bodyguard_ids = set(scripted.units["foe:target-body"].own_model_ids())
+    leader_ids = set(scripted.units["foe:target-leader"].own_model_ids())
+    source_ids = set(scripted.units["own:lhykhis"].own_model_ids())
+
+    def resolve(current: Scene) -> tuple[DecisionRequest, set[str]]:
+        declare_web(current, target_id=target)
+        pending = drive_to(current, {CHOICE, "select_shooting_unit"})
+        view = rules_unit_view_by_id(state=current.state, unit_instance_id=target)
+        casualties = [
+            row
+            for row in events(current.session, "model_destroyed")
+            if row["model_instance_id"] in bodyguard_ids
+        ]
+        assert all(row["source_model_instance_id"] in source_ids for row in casualties)
+        from tests.support.section02_consumers import payload_text
+
+        dead = {payload_text(row["model_instance_id"]) for row in casualties}
+        assert view.is_attached_rules_unit
+        assert {model.model_instance_id for model in view.alive_models()} == (
+            (bodyguard_ids - dead) | leader_ids
+        )
+        return pending, dead
+
+    # Scripted native removal of the final bodyguard and a genuine mark continuation.
+    with scripted_six_brood_twain_wounds(scripted, attached_target=True):
+        pending, dead = resolve(scripted)
+    assert dead == bodyguard_ids
+    scripted.session = session_from_casualty_checkpoint(scripted.session.lifecycle)
+    _assert_web_choice_replay(
+        scripted, pending, target, artifact_id="web-scripted-attached", restore_accepted_mark=True
     )
-    assert view.is_attached_rules_unit
-    choose(s, r, r.options[0].option_id)
-    assert hit_with_face(s, target_id=target_id).critical
-    restored = restored_scene(s)
-    assert restored.session.to_persistence_payload() == s.session.to_persistence_payload()
-    assert hit_with_face(restored, target_id=target_id).critical
-    assert (
-        ReplayRunner.from_payload(s.session.replay_artifact(artifact_id="web-target-survivor"))
-        .run()
-        .reproduced_exactly
+
+    # Unmodified ordinary RNG checks the exact derived survivor set and the same
+    # original target identity, whether or not every bodyguard dies on this run.
+    pending, _ = resolve(ordinary)
+    _assert_web_choice_replay(
+        ordinary, pending, target, artifact_id="web-ordinary-attached", restore_accepted_mark=True
     )

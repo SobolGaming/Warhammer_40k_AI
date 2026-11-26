@@ -35,6 +35,20 @@ CASES = (
 )
 
 
+FACTION_REPAIR_RECEIPT = (
+    "data/source_audits/ci64_provenance_v1/ranged-attack-count-faction-repair-test-v1.json"
+)
+FACTION_REPAIR_SHA256 = "e6f609e4efb81fea31efaa37728b593febdd90f6d868f53d319f3e9213a237c5"
+FACTION_REPAIR_BASE = "17efed22060afb675b2232ad6f48054f0190ebd7"
+FACTION_REPAIR_LHYKHIS = "tests/factions/aeldari/unit/test_lhykhis.py"
+FACTION_REPAIR_SUPPORT = (
+    "tests/factions/aeldari/lhykhis_helpers.py",
+    "tests/factions/aeldari/lhykhis_scripted_attacks.py",
+    "tests/support/scripted_attack_rolls.py",
+    "tests/support/sorcerer_native.py",
+)
+
+
 class RangedAttackCountTestAdmission(TypedDict):
     schema: str
     base: str
@@ -80,6 +94,85 @@ def ranged_attack_count_test_addition(
             raise SystemExit("Ranged attack-count viewer transition requires exact source digests.")
         _checked_bytes(root, name, change["after"])
     return record, _selection_members(record["added_files"], root), raw
+
+
+def ranged_attack_count_faction_successor(
+    root: Path, retained_cutover_sha256: str
+) -> tuple[dict[str, dict[str, object]], bytes] | None:
+    """Admit only the repaired bytes of two existing faction test owners."""
+    from scripts.build_test_shards import CUTOVER_PATH
+    from scripts.engine_numerical_identity_test_admission import (
+        GAMEPLAY_SORCERER_OWNER,
+        STAGE2_FIGHT_SHA256,
+        STAGE2_FIGHT_TRANSITION,
+        _checked_bytes,  # pyright: ignore[reportPrivateUsage]
+    )
+
+    path = root / FACTION_REPAIR_RECEIPT
+    _selection_no_links(root, path)
+    if not path.exists():
+        return None
+    raw = _checked_bytes(root, FACTION_REPAIR_RECEIPT, FACTION_REPAIR_SHA256)
+    record = json.loads(raw, object_pairs_hook=_selection_object)
+    cases = (
+        (
+            FACTION_REPAIR_LHYKHIS,
+            "test_native_attached_target_survives_bodyguard_loss_with_same_mark_identity",
+        ),
+        (
+            FACTION_REPAIR_LHYKHIS,
+            "test_native_charge_fight_critical_five_is_lethal_and_turn_expiry_replays",
+        ),
+        (FACTION_REPAIR_LHYKHIS, "test_native_source_death_does_not_revoke_existing_turn_grant"),
+        (FACTION_REPAIR_LHYKHIS, "test_native_source_last_killed_target_has_no_selection"),
+        (FACTION_REPAIR_LHYKHIS, "test_native_torrent_hits_without_damage_require_target_choice"),
+        (
+            GAMEPLAY_SORCERER_OWNER,
+            "test_two_native_sorcerers_wrack_the_same_target_without_stacking_movement",
+        ),
+    )
+    if (
+        record.keys()
+        != {
+            "schema",
+            "base",
+            "retained_attack_count_sha256",
+            "retained_cutover_sha256",
+            "retained_stage2_fight_cover_sha256",
+            "updated_files",
+            "support_sha256",
+            "repaired_cases",
+        }
+        or record["schema"] != "finite-ranged-attack-count-faction-repair-test-v1"
+        or record["base"] != FACTION_REPAIR_BASE
+        or record["retained_attack_count_sha256"] != RECEIPT_SHA256
+        or record["retained_cutover_sha256"] != retained_cutover_sha256
+        or record["retained_stage2_fight_cover_sha256"] != STAGE2_FIGHT_SHA256
+        or record["updated_files"].keys() != {FACTION_REPAIR_LHYKHIS, GAMEPLAY_SORCERER_OWNER}
+        or record["support_sha256"].keys() != set(FACTION_REPAIR_SUPPORT)
+        or record["repaired_cases"] != [f"{owner}::{case}" for owner, case in cases]
+    ):
+        raise SystemExit("Ranged attack-count faction repair admission inventory differs.")
+    _checked_bytes(root, RECEIPT, RECEIPT_SHA256)
+    cutover = json.loads(
+        _checked_bytes(root, CUTOVER_PATH, retained_cutover_sha256),
+        object_pairs_hook=_selection_object,
+    )
+    fight = json.loads(
+        _checked_bytes(root, STAGE2_FIGHT_TRANSITION, STAGE2_FIGHT_SHA256),
+        object_pairs_hook=_selection_object,
+    )
+    predecessor = {
+        FACTION_REPAIR_LHYKHIS: cutover["active_files"][FACTION_REPAIR_LHYKHIS],
+        GAMEPLAY_SORCERER_OWNER: fight["test"][GAMEPLAY_SORCERER_OWNER]["after"],
+    }
+    changes = record["updated_files"]
+    for name, before in predecessor.items():
+        if set(changes[name]) != {"before", "after"} or changes[name]["before"] != before:
+            raise SystemExit("Ranged attack-count faction repair predecessor differs: " + name)
+    for name, digest in record["support_sha256"].items():
+        _checked_bytes(root, name, digest)
+    return _selection_members({name: row["after"] for name, row in changes.items()}, root), raw
 
 
 def ranged_attack_count_runtime(

@@ -468,12 +468,15 @@ def _verify_scene_geometry(s: Scene, *, other_engaged: bool) -> None:
 
 def assert_native_source_loss(native_definitions: Section02Definitions, *, seed: str) -> None:
     from tests.factions.aeldari.current_source_helpers import charge
+    from tests.factions.aeldari.lhykhis_scripted_attacks import scripted_walker_lethal_attack
     from tests.factions.aeldari.mandiblasters_helpers import restored_scene
+    from tests.order130_helpers import session_from_casualty_checkpoint
     from tests.support.faction_batch01 import events
+    from tests.support.section02_consumers import payload_int, payload_text
     from warhammer40k_core.engine.fight_resolution import MeleeDeclarationProposalRequest
     from warhammer40k_core.engine.replay import ReplayRunner
 
-    s = web_scene(
+    scripted = web_scene(
         native_definitions,
         full_target=True,
         charge_ready=True,
@@ -481,66 +484,121 @@ def assert_native_source_loss(native_definitions: Section02Definitions, *, seed:
         other_engaged=True,
         seed=seed,
     )
-    activate_web(s)
-    r = request(s.session.advance_until_decision_or_terminal(), "select_shooting_unit")
-    choose(s, r, "complete_shooting_phase")
-    drive_to(s, {"select_charging_unit"})
-    charge(s, "own:lhykhis", "foe:walkers", 19 - (60 + 40) / 50.8 - 14)
-    r = drive_to(s, {"select_charging_unit", "select_fight_activation"})
+    activate_web(scripted)
+    r = request(scripted.session.advance_until_decision_or_terminal(), "select_shooting_unit")
+    choose(scripted, r, "complete_shooting_phase")
+    drive_to(scripted, {"select_charging_unit"})
+    charge(scripted, "own:lhykhis", "foe:walkers", 19 - (60 + 40) / 50.8 - 14)
+    r = drive_to(scripted, {"select_charging_unit", "select_fight_activation"})
     if r.decision_type == "select_charging_unit":
-        choose(s, r, "complete_charge_phase")
-    source_id = s.units["own:lhykhis"].own_model_ids()[0]
-    for _ in range(180):
-        dead = [
-            e for e in events(s.session, "model_destroyed") if e["model_instance_id"] == source_id
-        ]
-        if dead:
-            break
-        assert s.state.active_player_id == "owner", (
-            events(s.session, "attack_sequence_completed"),
-            events(s.session, "attack_damage_applied"),
-            [
-                (
-                    u.unit_instance_id,
-                    [(m.model_instance_id, m.current_wounds) for m in u.own_models],
-                )
-                for a in s.state.army_definitions
-                for u in a.units
-            ],
-        )
-        r = request(s.session.advance_until_decision_or_terminal())
-        if r.decision_type == "select_fight_activation" and r.actor_id == "opponent":
-            option = next((o for o in r.options if "foe:walkers" in o.option_id), r.options[0])
-            choose(s, r, option.option_id)
-        elif (
-            r.decision_type == "submit_melee_declaration"
-            and r.actor_id == "opponent"
-            and MeleeDeclarationProposalRequest.from_decision_request(r).unit_instance_id
-            == "foe:walkers"
-        ):
-            submit_melee_toward(s, r, "own:lhykhis")
-        else:
-            submit_fixture_request(s.session, r)
-    else:
-        raise AssertionError("Native source destruction not reached")
-    assert dead[0]["attacking_unit_instance_id"] == "foe:walkers"
-    assert (
-        next(
-            m
-            for a in s.state.army_definitions
-            for u in a.units
-            for m in u.own_models
+        choose(scripted, r, "complete_charge_phase")
+    source_id = scripted.units["own:lhykhis"].own_model_ids()[0]
+    ordinary = restored_scene(scripted)
+
+    def source_wounds(current: Scene) -> int:
+        return next(
+            m.current_wounds
+            for army in current.state.army_definitions
+            for unit in army.units
+            for m in unit.own_models
             if m.model_instance_id == source_id
-        ).current_wounds
-        == 0
+        )
+
+    def resolve_walkers(current: Scene) -> tuple[str, list[dict[str, JsonValue]]]:
+        for _ in range(180):
+            dead = [
+                row
+                for row in events(current.session, "model_destroyed")
+                if row["model_instance_id"] == source_id
+            ]
+            completed = [
+                row
+                for row in events(current.session, "attack_sequence_completed")
+                if row["attacking_unit_instance_id"] == "foe:walkers"
+            ]
+            evidence = dead or completed
+            if evidence:
+                assert len(evidence) == 1
+                return payload_text(evidence[0]["sequence_id"]), dead
+            assert current.state.active_player_id == "owner"
+            pending = request(current.session.advance_until_decision_or_terminal())
+            if (
+                pending.decision_type == "select_fight_activation"
+                and pending.actor_id == "opponent"
+            ):
+                option = next(
+                    (o for o in pending.options if "foe:walkers" in o.option_id),
+                    pending.options[0],
+                )
+                choose(current, pending, option.option_id)
+            elif (
+                pending.decision_type == "submit_melee_declaration"
+                and pending.actor_id == "opponent"
+                and MeleeDeclarationProposalRequest.from_decision_request(pending).unit_instance_id
+                == "foe:walkers"
+            ):
+                submit_melee_toward(current, pending, "own:lhykhis")
+            else:
+                submit_fixture_request(current.session, pending)
+        raise AssertionError("Native Walker Fight did not reach a casualty or completion")
+
+    assert source_wounds(scripted) == source_wounds(ordinary) == 1
+    # Scripted native proof of Walker credit and grant retention after the actual death.
+    with scripted_walker_lethal_attack(source_id):
+        _, dead = resolve_walkers(scripted)
+    [death] = dead
+    assert death["attacking_unit_instance_id"] == "foe:walkers"
+    assert source_wounds(scripted) == 0
+    assert scripted.state.current_battle_phase is BattlePhase.FIGHT
+    assert hit_with_face(scripted, face=5).critical
+    scripted.session = session_from_casualty_checkpoint(scripted.session.lifecycle)
+    restored = restored_scene(scripted)
+    assert restored.session.to_persistence_payload() == scripted.session.to_persistence_payload()
+    assert hit_with_face(restored, face=5).critical
+    for current in (scripted, restored):
+        pending = request(current.session.advance_until_decision_or_terminal())
+        submit_fixture_request(current.session, pending)
+    assert restored.session.to_persistence_payload() == scripted.session.to_persistence_payload()
+    assert (
+        ReplayRunner.from_payload(
+            scripted.session.replay_artifact(artifact_id="web-scripted-after-source-death")
+        )
+        .run()
+        .reproduced_exactly
     )
-    assert s.state.current_battle_phase is BattlePhase.FIGHT
-    assert hit_with_face(s, face=5).critical
-    restored = restored_scene(s)
-    assert restored.session.to_persistence_payload() == s.session.to_persistence_payload()
+
+    # Ordinary RNG retains a strict replay from the prior-wound origin. Its actual
+    # wound-loss events decide whether the source survives this Fight activation.
+    sequence_id, dead = resolve_walkers(ordinary)
+    steps = [
+        row
+        for row in events(ordinary.session, "attack_sequence_step")
+        if row["sequence_id"] == sequence_id
+    ]
+    assert any(row["step"] == "hit" for row in steps)
+    lost = 0
+    for step in steps:
+        body = step["payload"]
+        if step["step"] != "damage" or not isinstance(body, dict):
+            continue
+        application = body["damage_application"]
+        if isinstance(application, dict) and application["model_instance_id"] == source_id:
+            lost += payload_int(application["wounds_lost"])
+    assert 0 <= lost <= 1
+    assert source_wounds(ordinary) == 1 - lost
+    assert bool(dead) is bool(lost)
+    if dead:
+        [death] = dead
+        assert death["attacking_unit_instance_id"] == "foe:walkers"
+    assert ordinary.state.current_battle_phase is BattlePhase.FIGHT
+    assert hit_with_face(ordinary, face=5).critical
+    restored = restored_scene(ordinary)
+    assert restored.session.to_persistence_payload() == ordinary.session.to_persistence_payload()
     assert hit_with_face(restored, face=5).critical
     assert (
-        ReplayRunner.from_payload(s.session.replay_artifact(artifact_id="web-source-destroyed"))
+        ReplayRunner.from_payload(
+            ordinary.session.replay_artifact(artifact_id="web-ordinary-walker-fight")
+        )
         .run()
         .reproduced_exactly
     )
