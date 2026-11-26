@@ -168,6 +168,19 @@ and a tie. Native forced allocation resolves in the engine before a model
 choice is requested. The existing adapter decision contract covers the bound
 finite choice.
 
+## Stage 3 defender coherency tie-break
+
+Opt in to `AllocationCoherencyTieBreakPolicy` with
+`post-casualty-coherency-one-removal-v1` on the exact defender allocation route.
+It keeps the coherent-first choice. When all issued removals leave a broken
+formation, it prefers the first whose survivors could regain coherency after
+one more removal. This tie-break requires a complete visible standalone unit of
+at most five living models on coplanar, equal oval bases and agreement at the
+rules thresholds between native distances and canonical 0.001-inch distances.
+Other broken-formation ties retain issued order. The result is conditional on
+the selected model becoming a casualty. Later cleanup choices stay with the
+controlling player.
+
 ## Finite training candidate linkage
 
 `ai.training_candidates.FiniteTrainingCandidateLink.from_row(row, context=before)`

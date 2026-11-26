@@ -1,31 +1,771 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "97770ce65bf150a29ce2680d80bec765538e4f81",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:14379b839d569221cb35843f64b1027d4ec7e704f75309dd00eb106a1a9bc8c5",
-  "operation_map_sha256": "a14a193dc1392dd0d63716966c3474c84d02c17f9ad6c372cdf300cf7100f991",
+  "base": "be568f9188e7ddf0d08c0cee0f1540fa0fd09bbb",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:af65d2237320cda39c2d38d0dbeb4d415c424956696fc1cc0f40686921848830",
+  "operation_map_sha256": "7c89aa6d00f853918798993d5963e2f9f100d93c02e552216f64828c3992e8f3",
   "changes": {
-    ".github/workflows/ci.yml": {
-      "before_sha256": "3fff6d9b8ede9e1aa8d778e5f99c19044df2632cf1191670b2a4ac8fc57ab1c2",
-      "after_sha256": "3b93fcba76ab9d35fa459b9d56209209388a9a7651bd019e88854985b23a5bdf",
+    "ci/test_shards/durations.json": {
+      "before_sha256": "6d9c18d1220a4af823fffe551133ae90a1628e34344d5840e3c69aedb85ddda5",
+      "after_sha256": "7fa3e0bddbcb9a444f27b2407d07977404727207af09969193b7a61cdc020ee0",
       "owners": {
         "@document": {
-          "before": "3fff6d9b8ede9e1aa8d778e5f99c19044df2632cf1191670b2a4ac8fc57ab1c2",
-          "after": "3b93fcba76ab9d35fa459b9d56209209388a9a7651bd019e88854985b23a5bdf"
+          "before": "6d9c18d1220a4af823fffe551133ae90a1628e34344d5840e3c69aedb85ddda5",
+          "after": "7fa3e0bddbcb9a444f27b2407d07977404727207af09969193b7a61cdc020ee0"
+        }
+      }
+    },
+    "ci/test_shards/shard-1.txt": {
+      "before_sha256": "f66ef899a593ac1775f50b6570915ab97774196990fbb01897d1474afcca47c5",
+      "after_sha256": "43f27e04ffd1698ac6c74b6e1389563902ebadffd755f324922ce6a0d43dba37",
+      "owners": {
+        "@document": {
+          "before": "f66ef899a593ac1775f50b6570915ab97774196990fbb01897d1474afcca47c5",
+          "after": "43f27e04ffd1698ac6c74b6e1389563902ebadffd755f324922ce6a0d43dba37"
+        }
+      }
+    },
+    "ci/test_shards/shard-10.txt": {
+      "before_sha256": "ec97eade4321fa1b21f33529d51124c2964ec29b98e2e96bcb4953b37d99055f",
+      "after_sha256": "11eaee4edeee40bc6e3b167538fa1f90a3363548c7fd924523fbb04c89921af3",
+      "owners": {
+        "@document": {
+          "before": "ec97eade4321fa1b21f33529d51124c2964ec29b98e2e96bcb4953b37d99055f",
+          "after": "11eaee4edeee40bc6e3b167538fa1f90a3363548c7fd924523fbb04c89921af3"
+        }
+      }
+    },
+    "ci/test_shards/shard-11.txt": {
+      "before_sha256": "67ca36da771816524971af6b5aedd50d1691db96b619092644873ed8dd35c64d",
+      "after_sha256": "db73a13c99659754df526a5eaec5b6d761af1f6e8b9f3a465e831d55d9b8c8fd",
+      "owners": {
+        "@document": {
+          "before": "67ca36da771816524971af6b5aedd50d1691db96b619092644873ed8dd35c64d",
+          "after": "db73a13c99659754df526a5eaec5b6d761af1f6e8b9f3a465e831d55d9b8c8fd"
+        }
+      }
+    },
+    "ci/test_shards/shard-12.txt": {
+      "before_sha256": "9e1607d2ff242f91d4c321d276417d6f1041751c4faf6a051cb9af7a795debde",
+      "after_sha256": "d39fc0a7f0403139aafa517001ba3297becb11cf71ac14f9cbd9a9fac0863a51",
+      "owners": {
+        "@document": {
+          "before": "9e1607d2ff242f91d4c321d276417d6f1041751c4faf6a051cb9af7a795debde",
+          "after": "d39fc0a7f0403139aafa517001ba3297becb11cf71ac14f9cbd9a9fac0863a51"
+        }
+      }
+    },
+    "ci/test_shards/shard-4.txt": {
+      "before_sha256": "d21c09171b1273f123405c8b0869b03ecfca1c4b8b977b9375960d43bc1e7f52",
+      "after_sha256": "612496c224c83b8dee2a80b11651371edbfcab66250ad3ff59c666d15714862e",
+      "owners": {
+        "@document": {
+          "before": "d21c09171b1273f123405c8b0869b03ecfca1c4b8b977b9375960d43bc1e7f52",
+          "after": "612496c224c83b8dee2a80b11651371edbfcab66250ad3ff59c666d15714862e"
+        }
+      }
+    },
+    "ci/test_shards/shard-5.txt": {
+      "before_sha256": "22e814538649cce40cf010634f11d11a0a1381b23cb166ab8bc6d2947526c51f",
+      "after_sha256": "76bb21cf1a8a6cc8b35f11264cf0cb5c57df306261253773201033b7508538cc",
+      "owners": {
+        "@document": {
+          "before": "22e814538649cce40cf010634f11d11a0a1381b23cb166ab8bc6d2947526c51f",
+          "after": "76bb21cf1a8a6cc8b35f11264cf0cb5c57df306261253773201033b7508538cc"
+        }
+      }
+    },
+    "ci/test_shards/shard-6.txt": {
+      "before_sha256": "91a2bc31c0074d2446e2187792352a6b58729f1a9d783823ed7ef512730fab65",
+      "after_sha256": "3c9a3681197b0f14645262e6a32857e0988b06357bb51a915fa0f442437c6574",
+      "owners": {
+        "@document": {
+          "before": "91a2bc31c0074d2446e2187792352a6b58729f1a9d783823ed7ef512730fab65",
+          "after": "3c9a3681197b0f14645262e6a32857e0988b06357bb51a915fa0f442437c6574"
+        }
+      }
+    },
+    "ci/test_shards/shard-7.txt": {
+      "before_sha256": "c5e33cd3c4edb6489fb4ba684265b6dafff19a2b33b26ad011a288fe38a56283",
+      "after_sha256": "4c0b8d6d8fde107865d8f4650ff2961fd44d3efc88a8f840ef96b9980ffc4554",
+      "owners": {
+        "@document": {
+          "before": "c5e33cd3c4edb6489fb4ba684265b6dafff19a2b33b26ad011a288fe38a56283",
+          "after": "4c0b8d6d8fde107865d8f4650ff2961fd44d3efc88a8f840ef96b9980ffc4554"
+        }
+      }
+    },
+    "ci/test_shards/shard-8.txt": {
+      "before_sha256": "df1da2f4978953b0c3704890d9a60de5fd81d5df120f287b0fa6f2f36f4dfea8",
+      "after_sha256": "b29dc16398e05e09c7b6420f1bfa7ed4da5bd7e47ca1b449c08a7ee15f73b2b9",
+      "owners": {
+        "@document": {
+          "before": "df1da2f4978953b0c3704890d9a60de5fd81d5df120f287b0fa6f2f36f4dfea8",
+          "after": "b29dc16398e05e09c7b6420f1bfa7ed4da5bd7e47ca1b449c08a7ee15f73b2b9"
+        }
+      }
+    },
+    "ci/test_shards/shard-9.txt": {
+      "before_sha256": "7332391265e97d32e22b35f0385ceefb2c6b5855c2328c4d3945d3fcee36535a",
+      "after_sha256": "a9a34bf0bf3502dc7192455277546e6b44654eda28ab726795b6b1bbaa900749",
+      "owners": {
+        "@document": {
+          "before": "7332391265e97d32e22b35f0385ceefb2c6b5855c2328c4d3945d3fcee36535a",
+          "after": "a9a34bf0bf3502dc7192455277546e6b44654eda28ab726795b6b1bbaa900749"
+        }
+      }
+    },
+    "contracts/examples/persistence/session-persistence.json": {
+      "before_sha256": "febfcf5fb77a8f55fc1c335fb2ea7af63407edc51fdc7a5f15b23b24193a0167",
+      "after_sha256": "7abab9a7b4661ea4c9cb6958201cea9e71a4eee6ba32eb2a1056c283236deda8",
+      "owners": {
+        "@document": {
+          "before": "febfcf5fb77a8f55fc1c335fb2ea7af63407edc51fdc7a5f15b23b24193a0167",
+          "after": "7abab9a7b4661ea4c9cb6958201cea9e71a4eee6ba32eb2a1056c283236deda8"
+        }
+      }
+    },
+    "contracts/examples/sessions/session-command-outcome.json": {
+      "before_sha256": "2dbcf577e0bcb01f7c21189fb9e31112013ff15c13a1126b4b3a79c391c00d61",
+      "after_sha256": "5ee21507ddf0acafcaf873f8350e164fc86c79dcc7f01f1e7d836ab4756f2155",
+      "owners": {
+        "@document": {
+          "before": "2dbcf577e0bcb01f7c21189fb9e31112013ff15c13a1126b4b3a79c391c00d61",
+          "after": "5ee21507ddf0acafcaf873f8350e164fc86c79dcc7f01f1e7d836ab4756f2155"
+        }
+      }
+    },
+    "contracts/examples/sessions/session-command-started.json": {
+      "before_sha256": "5a697819f8a9207eb63d6a826191c9f5ee824974ef3f1afc6c99306e772ae709",
+      "after_sha256": "7c7d5f461ca08cf7c866d4e5281fc670a4b871c85edb50e4cdb93592205e12a2",
+      "owners": {
+        "@document": {
+          "before": "5a697819f8a9207eb63d6a826191c9f5ee824974ef3f1afc6c99306e772ae709",
+          "after": "7c7d5f461ca08cf7c866d4e5281fc670a4b871c85edb50e4cdb93592205e12a2"
+        }
+      }
+    },
+    "contracts/examples/sessions/session-metadata-created.json": {
+      "before_sha256": "f4d7a4be649b6479698c32a84dd2de9e5f133340b57a6334a2796d31be648c9f",
+      "after_sha256": "c47c26f8702456c29bc5f9ed4190679a1fbdab6c7b14f6dbc551b6d623a8a8ea",
+      "owners": {
+        "@document": {
+          "before": "f4d7a4be649b6479698c32a84dd2de9e5f133340b57a6334a2796d31be648c9f",
+          "after": "c47c26f8702456c29bc5f9ed4190679a1fbdab6c7b14f6dbc551b6d623a8a8ea"
+        }
+      }
+    },
+    "contracts/examples/support-profile-player-a-redacted.json": {
+      "before_sha256": "3e39e7a6cdaf0c6624ae967d11de8f94b69e9b9ef3650e42f4d09f3dcfca2341",
+      "after_sha256": "cf86e12a2cac5b2b90d167edd714af04b5d16e2711d0d9da58fdf229fbead659",
+      "owners": {
+        "@document": {
+          "before": "3e39e7a6cdaf0c6624ae967d11de8f94b69e9b9ef3650e42f4d09f3dcfca2341",
+          "after": "cf86e12a2cac5b2b90d167edd714af04b5d16e2711d0d9da58fdf229fbead659"
+        }
+      }
+    },
+    "contracts/examples/support-profile-player-b-redacted.json": {
+      "before_sha256": "564f8084381171998100c8c78d1b0cb6701bb107798088f00428be2ff1c5e93c",
+      "after_sha256": "c69c493a3e76d8feb0b7df83da7ecc74171c39fd8f0cfcdcf0010292b5875736",
+      "owners": {
+        "@document": {
+          "before": "564f8084381171998100c8c78d1b0cb6701bb107798088f00428be2ff1c5e93c",
+          "after": "c69c493a3e76d8feb0b7df83da7ecc74171c39fd8f0cfcdcf0010292b5875736"
+        }
+      }
+    },
+    "contracts/examples/support-profile.json": {
+      "before_sha256": "e0fdf813f5371f22966a916640d5355b0dbefcba8ab57acecf5643167ffdd6d4",
+      "after_sha256": "6ed8f8d6a4295722f1677ee9085a1a8b3699ed69375ef568a3953ff3a5f27145",
+      "owners": {
+        "@document": {
+          "before": "e0fdf813f5371f22966a916640d5355b0dbefcba8ab57acecf5643167ffdd6d4",
+          "after": "6ed8f8d6a4295722f1677ee9085a1a8b3699ed69375ef568a3953ff3a5f27145"
+        }
+      }
+    },
+    "contracts/manifest.json": {
+      "before_sha256": "5fb36cfdcadd8c938c45af432988c23ae1bdc4918b31ce717e1897e07820a79c",
+      "after_sha256": "e243540cd2781243ec299cdea42555ea3e8140e2e95002c4932ce977cf9c4d18",
+      "owners": {
+        "@document": {
+          "before": "5fb36cfdcadd8c938c45af432988c23ae1bdc4918b31ce717e1897e07820a79c",
+          "after": "e243540cd2781243ec299cdea42555ea3e8140e2e95002c4932ce977cf9c4d18"
+        }
+      }
+    },
+    "data/source_audits/ci64_provenance_v1/stage3-defender-coherency-test-v1.json": {
+      "before_sha256": null,
+      "after_sha256": "f1165ef04248316b694d625044c05656cfb640d1e38577579a0c9b011681cffe",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "f1165ef04248316b694d625044c05656cfb640d1e38577579a0c9b011681cffe"
+        }
+      }
+    },
+    "docs/AI_POLICY_INTERFACE.md": {
+      "before_sha256": "04bda8e314e419eb034705fefc9f5edbbeab3f67006c8bedc546fa6cbe6d6844",
+      "after_sha256": "6376b822c47d35108c8815ab7dd86a5878351c4be3a254aae777ce024d21df47",
+      "owners": {
+        "@document": {
+          "before": "04bda8e314e419eb034705fefc9f5edbbeab3f67006c8bedc546fa6cbe6d6844",
+          "after": "6376b822c47d35108c8815ab7dd86a5878351c4be3a254aae777ce024d21df47"
+        }
+      }
+    },
+    "docs/performance/policy-v3/operation-map.json": {
+      "before_sha256": "7b4ff22273cb16c190fe4270bd9f94fee88e3f7250ddd0798165a1dc7d987bc4",
+      "after_sha256": "2056e514d5b33a09de8940633b976e0d538befb4cb69ad96003c6410a860c5ee",
+      "owners": {
+        "@document": {
+          "before": "7b4ff22273cb16c190fe4270bd9f94fee88e3f7250ddd0798165a1dc7d987bc4",
+          "after": "2056e514d5b33a09de8940633b976e0d538befb4cb69ad96003c6410a860c5ee"
+        }
+      }
+    },
+    "scripts/engine_numerical_identity_test_admission.py": {
+      "before_sha256": "93d8a28611f8050fde12d24eb1329b9a5ea7b8451561bc2b881f86ca7261f17f",
+      "after_sha256": "dfefcd9d556109c0f131d49fce2a693acd9328a9cbac61f9402a41a42ec72a51",
+      "owners": {
+        "_counteroffensive_fight_type_transition": {
+          "before": "5145da4e509d44ffe81a4b8bc12e7eea878972ca302e1f8847e8a722970e448b",
+          "after": "8ca8ec85ee694edcf085bffd3dc25bc1d0c4dc1122df9069b345699167ca0da8"
+        },
+        "combined_charge_runtime": {
+          "before": "a7aa231cd44ed6b691c12126dc4f5c786bad29273099bd4a9abd9879661b11a3",
+          "after": "a912a5cded7e214596ff75a081d935dd2e92ee93a59f98b7ae0d32d336b8ebc0"
+        },
+        "exact_movement_test_transition": {
+          "before": "7130a6749e2fa79fb46e99623aed06d49cd88f5db0f310c1b0821667982e6c8d",
+          "after": "a656b81cd44789f967800a50caa042aa0c52b7c30acc8d444234a4ae95cd0185"
+        }
+      }
+    },
+    "scripts/stage3_defender_coherency_test_admission.py": {
+      "before_sha256": null,
+      "after_sha256": "84145aedb740adb5729b172e369a8dad78e029b86d4aabd793804f0a9f064a94",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "210d1377cb21c70118a5fe154199178bb3ad2fd50974cd9a4eb684fcadd8d51e"
+        },
+        "DefenderCoherencyReceipt": {
+          "before": null,
+          "after": "c81bf2cd8c1c6bc0da421e605d1a79342e538fdc69c5ca56a23d5f154f7fdce0"
+        },
+        "defender_coherency_runtime": {
+          "before": null,
+          "after": "307f35d240f508c4a16c4dce0d8b7349349971f1e5a3762fa5089b9eb9fcee0e"
+        },
+        "defender_coherency_test_successor": {
+          "before": null,
+          "after": "0c935f7e644e134f65aa28373c845d69c3dbe563ff13ce13c22c87739efd7dd3"
+        }
+      }
+    },
+    "src/warhammer40k_core/_engine_build_manifest.json": {
+      "before_sha256": "404eedf82536aa16a2c601963cba079a3a707c17c82727cb3a16d044aefa72bd",
+      "after_sha256": "9f984acc6ad83e17315c3e542c978c7bcce009051fc2dfb6f39334e1ffef8d2a",
+      "owners": {
+        "@document": {
+          "before": "404eedf82536aa16a2c601963cba079a3a707c17c82727cb3a16d044aefa72bd",
+          "after": "9f984acc6ad83e17315c3e542c978c7bcce009051fc2dfb6f39334e1ffef8d2a"
+        }
+      }
+    },
+    "src/warhammer40k_core/ai/allocation_coherency.py": {
+      "before_sha256": "5820cb446c37ff64eaf6d6da6034b041ff66aff4589436fe62fa4ba1d57c83ae",
+      "after_sha256": "c6eb79f7ec3c0e728e027f7d75da05fb029f2613b4fbe193b43631562bc7b532",
+      "owners": {
+        "@module": {
+          "before": "f7a9555fb237fbb069ece0f1f1745dab57e1b0f5cce16bdab3496d7494e7f974",
+          "after": "f3eee73e86da4ae599888948d56080155acbe95a78688b161dcd2b6665fc4d61"
+        },
+        "AllocationCoherencyPolicy.score_options": {
+          "before": "1dbd2565a03d4c84469dfc5ed03ddca1721feb96738163e8fc47ff1a9f4caf7a",
+          "after": "307e0d13702b742bd663b68af6c5187b88a10377053d0ea28672c6116593135b"
+        },
+        "AllocationCoherencyTieBreakPolicy": {
+          "before": null,
+          "after": "4cafa2b70054ef27a3bef2303ead169a8196be8f425945cdf5d19c4b817931d2"
+        },
+        "AllocationCoherencyTieBreakPolicy.choose": {
+          "before": null,
+          "after": "51b6762baf707c49aef25ba37d99bddbd45fbcf896a35e05613c4d61ff08d66c"
+        },
+        "_allocation": {
+          "before": null,
+          "after": "2a2d83a0a109eade0b367a80e3781ce2ac3fd9990b7b6abaa7d6e048dac85bd7"
+        },
+        "_canonical_distances_agree": {
+          "before": null,
+          "after": "dc25788ff4a981d47b63b23b5681e9cbe350f539aa1bbef05a9a475a132be82d"
+        },
+        "_has_complete_own_formation": {
+          "before": null,
+          "after": "41d9e3287eb2ffa5062becad5f712027e34fe614a98ffe9af24d3ba8b407b2e0"
+        },
+        "_without_model": {
+          "before": null,
+          "after": "4e31ba98f68959795723acf863cec73506467f9bf199e957e42e07198e4bd3dc"
+        }
+      }
+    },
+    "tests/code_quality/test_engine_numerical_identity_admission.py": {
+      "before_sha256": "cec7aa109dd4e0e75a7ac28b19e99a4981099e964307a92f903f819c6edf6b4c",
+      "after_sha256": "78a93a274246c07f78707888d7aec3251eeda4ca2cd9d9a2cff15f5384fccbe1",
+      "owners": {
+        "test_identity_inventory_uses_current_twelve_shards_and_native_cohort": {
+          "before": "843b0a5b7316671bc05af30f2658c63f88d129209473fecb6381b36d336004a8",
+          "after": "55aa847438b80cac6429b98d97e2f382b81305b5f05b6729d7949b53462012e2"
+        }
+      }
+    },
+    "tests/infrastructure/adapters/test_allocation_coherency.py": {
+      "before_sha256": "b37bd57bedddfb2987d34de0ef1d8a0cc64f5e74384c6911934d401de7c1449f",
+      "after_sha256": "aa38bdd8444ca5ed8a747d6d25a7cd0703c5c59ebf7e9a06681bbf095ead6e27",
+      "owners": {
+        "@module": {
+          "before": "d825b1708758ff3a77d817cd9ba53f9b1b608c1d7c82a5c2a197525b64d14995",
+          "after": "296091590d41038345f3eada7029d16ec092828240cbd545daf27490791c7b3f"
+        },
+        "_screen_rod_view": {
+          "before": "4c186f4eda4af50aab646b2a94228fe44cb0571d4180d85d986c24515fd30240",
+          "after": null
+        },
+        "test_allocation_honors_only_option_and_retains_issued_order_on_tie": {
+          "before": "f84f5f3f88078fce07421ce8038922d47ba2a24c331266122fbb3b369cc8b39e",
+          "after": "b7291c58c97848e86547bc706beb82b06516889031954d94849c09c48f6dbb6b"
+        },
+        "test_allocation_requires_defender_visible_formation": {
+          "before": "5e8eb71ab613163291ef3123e6d51d945216f3912d6cbae103372c384afe4efe",
+          "after": "f8c394423c6ff9ce02420c9fe9e958332bf15a0d4c092c5817a15236ce0c1410"
+        },
+        "test_screen_rod_allocation_ranks_issued_choices_by_survivor_coherency": {
+          "before": "25e36bd08b792d1d896854c2712447ca95418b97fd698eaf100679daa6442220",
+          "after": "37c3bba54eed581c7e0eacb1c181cd9e32b2ece918203bec0b7b4c64da28e4f4"
+        }
+      }
+    },
+    "tests/infrastructure/adapters/test_allocation_coherency_tie_break.py": {
+      "before_sha256": null,
+      "after_sha256": "39e8e3687f2d108714d57b7fc7bf5ace40355b175818d0ae3cd9526706b17ab6",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "8888cd171e129151adc9b7b9dd7cac4b785157d77fcf4d9756bb0e48390a8242"
+        },
+        "_context": {
+          "before": null,
+          "after": "caf14154a2f673f9a5d6efd0efd0fd0188f043ba6db4290065671f34ef9ac90a"
+        },
+        "_continued_branch": {
+          "before": null,
+          "after": "84f071f4dfc01e6d5fc07398d2e31c2bb09fef46014da6a2154fc8b4f8820d49"
+        },
+        "_declare_rod": {
+          "before": null,
+          "after": "826ab332420cc4f070043bc0e22f8ac8c8b3a6fd21807f90f42a927b2d77e189"
+        },
+        "_issued": {
+          "before": null,
+          "after": "e358e60037ee8b3459ab308f5dba9efd10e6aecae7ef69448d9c5521c1fbda1d"
+        },
+        "_native_shooting_start": {
+          "before": null,
+          "after": "3b1c64e2fb86e67353451b324ba99cd28c6b0705f76169f490ac55781517290d"
+        },
+        "_pending_view": {
+          "before": null,
+          "after": "55c64f05845722ca13e0fc5198da13ef0042641615f6f8f29d0fe7afb3a9171d"
+        },
+        "_reach_native_frontier": {
+          "before": null,
+          "after": "30c77b90964aa0f571ea1ce97dc53fdcc1d5cafd362d46b364f00a2736f5822f"
+        },
+        "_request": {
+          "before": null,
+          "after": "d240d516f4b4dc732c3e535833f8b468a299106a1f438d3e5f5d8de06d983085"
+        },
+        "_select": {
+          "before": null,
+          "after": "2ce85642b34b4edd77760fa5ecb7c8725077071892b2436acdfc9bb41667fc5e"
+        },
+        "native_frontier": {
+          "before": null,
+          "after": "8ca1231d93d9d0cc1cc61b87de1834ecf47830a93e58dadd26187b2ee93628a5"
+        },
+        "test_bounded_validator_calls_and_first_coherent_short_circuit": {
+          "before": null,
+          "after": "f08b4d4269b473c38f65cb3864a8e1518191f6bc2b4daa658f6e6ff0760ebaaa"
+        },
+        "test_native_defender_tie_break_saves_one_model_with_exact_fork_and_replay": {
+          "before": null,
+          "after": "797ed85f998c04e65f43cb21bceda7dfdefe1e84a7e358adad72ae707c98f118"
+        },
+        "test_native_mixed_ovals_keep_v1_issued_order_without_repair_search": {
+          "before": null,
+          "after": "1d35ec8ab458e283b563212395904f9becd3d8566b4710cc53aa5d3bafffb8b8"
+        },
+        "test_tied_ranks_and_constrained_candidates_keep_issued_order": {
+          "before": null,
+          "after": "e1b987fcd13f2e9ad2aa765628f99b4173f94e287ab15d4699df2c54ae36e7e3"
+        },
+        "test_unsupported_scope_keeps_the_original_choice_and_skips_hypothetical_cleanup": {
+          "before": null,
+          "after": "da2448b3e223cf70530f49edbd7289d9aeb83b99ff4bdb9d888b903c6c971818"
+        },
+        "validation_calls": {
+          "before": null,
+          "after": "40b65c1bf5a9e49775bada51315d409a89dd4f798239a57dd89a344e3ae916a5"
+        }
+      }
+    },
+    "tests/support/screen_rod_allocation.py": {
+      "before_sha256": null,
+      "after_sha256": "d15daae2bf87e354a0a5d99237014b2b071ec6794c49a1b2247c91683f4b04fa",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "2b1ac7b11b9861a93a694c1e528a88093cb1f00a5d8e459eb04d524d98a40605"
+        },
+        "screen_rod_allocation_view": {
+          "before": null,
+          "after": "a59eefcf4e3f6af1a7270bcc910c0bb70c6d17af44cf634073845402aa0af286"
         }
       }
     }
   },
   "rows": {
-    ".github/workflows/ci.yml": {
-      "category": "dependency_environment",
+    "ci/test_shards/durations.json": {
+      "category": "measured_workload",
       "operations": [
-        "behavioral-worker-progress",
-        "covered-shard-workload"
+        "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Sets Node old-space headroom and logs memory measurements for the strict Pyright CI step. The workflow document retains both existing required path mappings.",
+      "rationale": "Add eleven measured scheduling weights and retain all 6,825 predecessor case weights, selector weights, and the existing twelve-shard planner.",
       "source_obligation": null,
-      "unchanged_work": "Pyright analyzes the same strict src and tests scope. Engine runtime, dependencies, behavioral shards, progress instrumentation, and measured workloads match the exact base."
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-1.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Add eleven measured scheduling weights and retain all 6,825 predecessor case weights, selector weights, and the existing twelve-shard planner.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-10.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Add eleven measured scheduling weights and retain all 6,825 predecessor case weights, selector weights, and the existing twelve-shard planner.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-11.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Add eleven measured scheduling weights and retain all 6,825 predecessor case weights, selector weights, and the existing twelve-shard planner.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-12.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Add eleven measured scheduling weights and retain all 6,825 predecessor case weights, selector weights, and the existing twelve-shard planner.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-4.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Add eleven measured scheduling weights and retain all 6,825 predecessor case weights, selector weights, and the existing twelve-shard planner.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-5.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Add eleven measured scheduling weights and retain all 6,825 predecessor case weights, selector weights, and the existing twelve-shard planner.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-6.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Add eleven measured scheduling weights and retain all 6,825 predecessor case weights, selector weights, and the existing twelve-shard planner.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-7.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Add eleven measured scheduling weights and retain all 6,825 predecessor case weights, selector weights, and the existing twelve-shard planner.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-8.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Add eleven measured scheduling weights and retain all 6,825 predecessor case weights, selector weights, and the existing twelve-shard planner.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-9.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Add eleven measured scheduling weights and retain all 6,825 predecessor case weights, selector weights, and the existing twelve-shard planner.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "contracts/examples/persistence/session-persistence.json": {
+      "category": "measured_workload",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh the packaged runtime build identity and its dependent contract examples.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "contracts/examples/sessions/session-command-outcome.json": {
+      "category": "measured_workload",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh the packaged runtime build identity and its dependent contract examples.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "contracts/examples/sessions/session-command-started.json": {
+      "category": "measured_workload",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh the packaged runtime build identity and its dependent contract examples.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "contracts/examples/sessions/session-metadata-created.json": {
+      "category": "measured_workload",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh the packaged runtime build identity and its dependent contract examples.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "contracts/examples/support-profile-player-a-redacted.json": {
+      "category": "measured_workload",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh the packaged runtime build identity and its dependent contract examples.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "contracts/examples/support-profile-player-b-redacted.json": {
+      "category": "measured_workload",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh the packaged runtime build identity and its dependent contract examples.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "contracts/examples/support-profile.json": {
+      "category": "measured_workload",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh the packaged runtime build identity and its dependent contract examples.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "contracts/manifest.json": {
+      "category": "measured_workload",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh the packaged runtime build identity and its dependent contract examples.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "data/source_audits/ci64_provenance_v1/stage3-defender-coherency-test-v1.json": {
+      "category": "measured_workload",
+      "operations": [
+        "stage3-defender-coherency-test-admission"
+      ],
+      "selected_families": [],
+      "rationale": "Retain the four existing Screen Rod cases and bind the eleven native defender-coherency cases to the reviewed source and build.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/AI_POLICY_INTERFACE.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Describe how to register the exact optional route and its small-unit scope.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/performance/policy-v3/operation-map.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Map the bounded opt-in policy and byte-bound admission without replacing existing owners.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "scripts/engine_numerical_identity_test_admission.py": {
+      "category": "measured_workload",
+      "operations": [
+        "bounded-charge-flight-wall-proof",
+        "cavalcade-authority-admission",
+        "close-quarters-test-admission",
+        "daemonic-terror-ordered-retreat",
+        "engine-numerical-identity-admission",
+        "gore-hungry-onslaught-predecessor-admission",
+        "native-ranged-attack-count-reroll",
+        "phase-end-healing-test-admission",
+        "pre-roll-charge-flight-test-admission",
+        "round4-battle-shock-event-wounds",
+        "round4-malice-bearer-liveness",
+        "sheathed-in-brass-test-admission",
+        "skulls-beget-blood-test-admission",
+        "stage2-strict-replay-test-admission",
+        "stage3-bolt-of-change-test-admission",
+        "stage3-defender-coherency-test-admission",
+        "stage3-flight-normal-move-test-admission",
+        "stage3-ordinary-melee-test-admission",
+        "wrath-undeniable-test-admission"
+      ],
+      "selected_families": [],
+      "rationale": "Retain the four existing Screen Rod cases and bind the eleven native defender-coherency cases to the reviewed source and build.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "scripts/stage3_defender_coherency_test_admission.py": {
+      "category": "measured_workload",
+      "operations": [
+        "stage3-defender-coherency-test-admission"
+      ],
+      "selected_families": [],
+      "rationale": "Retain the four existing Screen Rod cases and bind the eleven native defender-coherency cases to the reviewed source and build.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "src/warhammer40k_core/_engine_build_manifest.json": {
+      "category": "measured_workload",
+      "operations": [
+        "cavalcade-authority-admission",
+        "phase-end-healing-source-and-report"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh the packaged runtime build identity and its dependent contract examples.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "src/warhammer40k_core/ai/allocation_coherency.py": {
+      "category": "algorithm_or_search",
+      "operations": [
+        "allocation-coherency-policy",
+        "stage3-defender-coherency-policy"
+      ],
+      "selected_families": [],
+      "rationale": "Opt-in player policy uses at most five initial and ten distinct follow-up coherency validations plus ten canonical base comparisons. No registered engine performance workload calls the new policy.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "tests/code_quality/test_engine_numerical_identity_admission.py": {
+      "category": "measured_workload",
+      "operations": [
+        "bounded-charge-flight-wall-proof",
+        "counteroffensive-fight-type",
+        "engine-numerical-identity-admission",
+        "native-ranged-attack-count-reroll",
+        "pre-roll-charge-flight-test-admission",
+        "round4-battle-shock-event-wounds",
+        "round4-malice-bearer-liveness",
+        "skulls-beget-blood-test-admission",
+        "stage3-bolt-of-change-test-admission",
+        "stage3-defender-coherency-test-admission",
+        "stage3-flight-normal-move-test-admission",
+        "stage3-ordinary-melee-test-admission",
+        "wrath-undeniable-test-admission"
+      ],
+      "selected_families": [],
+      "rationale": "Retain the four existing Screen Rod cases and bind the eleven native defender-coherency cases to the reviewed source and build.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "tests/infrastructure/adapters/test_allocation_coherency.py": {
+      "category": "measured_workload",
+      "operations": [
+        "allocation-coherency-policy",
+        "stage3-defender-coherency-test-admission"
+      ],
+      "selected_families": [],
+      "rationale": "Retain the four existing Screen Rod cases and bind the eleven native defender-coherency cases to the reviewed source and build.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "tests/infrastructure/adapters/test_allocation_coherency_tie_break.py": {
+      "category": "measured_workload",
+      "operations": [
+        "stage3-defender-coherency-policy"
+      ],
+      "selected_families": [],
+      "rationale": "Retain the four existing Screen Rod cases and bind the eleven native defender-coherency cases to the reviewed source and build.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "tests/support/screen_rod_allocation.py": {
+      "category": "measured_workload",
+      "operations": [
+        "stage3-defender-coherency-test-admission"
+      ],
+      "selected_families": [],
+      "rationale": "Retain the four existing Screen Rod cases and bind the eleven native defender-coherency cases to the reviewed source and build.",
+      "source_obligation": null,
+      "unchanged_work": null
     }
   },
   "milestone": "ordinary",

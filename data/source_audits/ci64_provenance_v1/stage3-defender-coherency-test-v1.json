@@ -1,0 +1,56 @@
+{
+  "added_cases": [
+    "tests/infrastructure/adapters/test_allocation_coherency_tie_break.py::test_bounded_validator_calls_and_first_coherent_short_circuit",
+    "tests/infrastructure/adapters/test_allocation_coherency_tie_break.py::test_native_defender_tie_break_saves_one_model_with_exact_fork_and_replay",
+    "tests/infrastructure/adapters/test_allocation_coherency_tie_break.py::test_native_mixed_ovals_keep_v1_issued_order_without_repair_search",
+    "tests/infrastructure/adapters/test_allocation_coherency_tie_break.py::test_tied_ranks_and_constrained_candidates_keep_issued_order[indices0-7]",
+    "tests/infrastructure/adapters/test_allocation_coherency_tie_break.py::test_tied_ranks_and_constrained_candidates_keep_issued_order[indices1-12]",
+    "tests/infrastructure/adapters/test_allocation_coherency_tie_break.py::test_tied_ranks_and_constrained_candidates_keep_issued_order[indices2-1]",
+    "tests/infrastructure/adapters/test_allocation_coherency_tie_break.py::test_unsupported_scope_keeps_the_original_choice_and_skips_hypothetical_cleanup[milli-inch-disagreement]",
+    "tests/infrastructure/adapters/test_allocation_coherency_tie_break.py::test_unsupported_scope_keeps_the_original_choice_and_skips_hypothetical_cleanup[missing-unit]",
+    "tests/infrastructure/adapters/test_allocation_coherency_tie_break.py::test_unsupported_scope_keeps_the_original_choice_and_skips_hypothetical_cleanup[missing-wounds]",
+    "tests/infrastructure/adapters/test_allocation_coherency_tie_break.py::test_unsupported_scope_keeps_the_original_choice_and_skips_hypothetical_cleanup[off-elevation]",
+    "tests/infrastructure/adapters/test_allocation_coherency_tie_break.py::test_unsupported_scope_keeps_the_original_choice_and_skips_hypothetical_cleanup[six-models]"
+  ],
+  "added_files": {
+    "tests/infrastructure/adapters/test_allocation_coherency_tie_break.py": {
+      "blob_sha1": "d0e2ffb8693e7964d507e042c53371b438ca47f3",
+      "bytes": 22190,
+      "mode": "100644",
+      "sha256": "39e8e3687f2d108714d57b7fc7bf5ace40355b175818d0ae3cd9526706b17ab6"
+    }
+  },
+  "base": "be568f9188e7ddf0d08c0cee0f1540fa0fd09bbb",
+  "manifest_sha256": "9f984acc6ad83e17315c3e542c978c7bcce009051fc2dfb6f39334e1ffef8d2a",
+  "policy": {
+    "after": "c6eb79f7ec3c0e728e027f7d75da05fb029f2613b4fbe193b43631562bc7b532",
+    "before": "5820cb446c37ff64eaf6d6da6034b041ff66aff4589436fe62fa4ba1d57c83ae"
+  },
+  "retained_allocation_sha256": "4dee9b64424aedb21324016b9f1e430847fdda5e2a409229b50e8a23f0fb8981",
+  "retained_attack_count_sha256": "4e8aae570f710e916c1272cb8573c51aeb26d4b07bb54ebc64f548796852c287",
+  "retained_cases": [
+    "tests/infrastructure/adapters/test_allocation_coherency.py::test_allocation_honors_only_option_and_retains_issued_order_on_tie[indices0-False]",
+    "tests/infrastructure/adapters/test_allocation_coherency.py::test_allocation_honors_only_option_and_retains_issued_order_on_tie[indices1-True]",
+    "tests/infrastructure/adapters/test_allocation_coherency.py::test_allocation_requires_defender_visible_formation",
+    "tests/infrastructure/adapters/test_allocation_coherency.py::test_screen_rod_allocation_ranks_issued_choices_by_survivor_coherency"
+  ],
+  "retained_manifest_sha256": "404eedf82536aa16a2c601963cba079a3a707c17c82727cb3a16d044aefa72bd",
+  "retained_runtime_fingerprint": "14379b839d569221cb35843f64b1027d4ec7e704f75309dd00eb106a1a9bc8c5",
+  "retained_test": {
+    "after": {
+      "blob_sha1": "6cba9147e27dd75a16908324407cc9da0ee22adc",
+      "bytes": 2208,
+      "mode": "100644",
+      "sha256": "aa38bdd8444ca5ed8a747d6d25a7cd0703c5c59ebf7e9a06681bbf095ead6e27"
+    },
+    "before": {
+      "blob_sha1": "63e67a33463f47d0b38eca1758d7574b532bf56c",
+      "bytes": 5926,
+      "mode": "100644",
+      "sha256": "b37bd57bedddfb2987d34de0ef1d8a0cc64f5e74384c6911934d401de7c1449f"
+    }
+  },
+  "runtime_fingerprint": "af65d2237320cda39c2d38d0dbeb4d415c424956696fc1cc0f40686921848830",
+  "schema": "finite-stage3-defender-coherency-test-v1",
+  "support_sha256": "d15daae2bf87e354a0a5d99237014b2b071ec6794c49a1b2247c91683f4b04fa"
+}
