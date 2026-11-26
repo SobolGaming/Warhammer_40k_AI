@@ -595,6 +595,8 @@ def engine_numerical_identity_test_transition(
 
 def _pending_battle_shock_source_transition(
     root: Path,
+    *,
+    current_sources: SourceSuccessors,
 ) -> tuple[str, str, SourceSuccessors, bytes] | None:
     name = "data/source_audits/ci64_provenance_v1/stage2-pending-battle-shock-transition-v1.json"
     path = root / name
@@ -635,7 +637,7 @@ def _pending_battle_shock_source_transition(
     for source, change in sources.items():
         if change.keys() != {"before", "after"}:
             raise SystemExit("Pending Battle-shock transition requires exact source digests.")
-        _checked_bytes(root, source, change["after"])
+        _retained_source(root, source, change["after"], current_sources)
     return record["retained_runtime_fingerprint"], record["runtime_fingerprint"], sources, raw
 
 
@@ -1314,6 +1316,62 @@ COMBINED_CHARGE_TRANSITION_SHA256 = (
 COMBINED_CHARGE_BASE = "4d753ec652ee38b394260d3f539df7b04403149b"
 
 
+DAEMONIC_TERROR_TRANSITION = (
+    "data/source_audits/ci64_provenance_v1/daemonic-terror-ordered-retreat-v1.json"
+)
+DAEMONIC_TERROR_TRANSITION_SHA256 = (
+    "11eee65e713a8c93c272abb000c7ce86f16179f4dc0fd6eacf7f7e6f95b3a05c"
+)
+DAEMONIC_TERROR_OWNER = "tests/rules/section09/test_native_ordered_retreat.py"
+
+
+DAEMONIC_TERROR_CASES = ("territorial-terror", "outside-shadow", "excluded-monster")
+
+
+class _DaemonicTerrorTransition(TypedDict):
+    schema: str
+    base: str
+    retained_normal_move_sha256: str
+    retained_runtime_fingerprint: str
+    runtime_fingerprint: str
+    runtime_manifest: dict[str, str]
+    source: SourceSuccessors
+    added_files: TestSuccessors
+    added_cases: list[str]
+    origin_test: dict[str, dict[str, object]]
+
+
+def _daemonic_terror_transition(root: Path) -> tuple[_DaemonicTerrorTransition, bytes] | None:
+    path = root / DAEMONIC_TERROR_TRANSITION
+    _selection_no_links(root, path)
+    if not path.exists():
+        return None
+    raw = _checked_bytes(root, DAEMONIC_TERROR_TRANSITION, DAEMONIC_TERROR_TRANSITION_SHA256)
+    record = cast(_DaemonicTerrorTransition, json.loads(raw, object_pairs_hook=_selection_object))
+    if (
+        record.keys() != _DaemonicTerrorTransition.__required_keys__
+        or record["schema"] != "finite-daemonic-terror-ordered-retreat-v1"
+        or record["base"] != "dec50bca2394c755a0d5fb76e6659882b388c032"
+        or record["source"].keys() != {ROUND_FIVE_SHADOW_SOURCES[0]}
+        or record["added_files"].keys() != {DAEMONIC_TERROR_OWNER}
+        or record["added_cases"]
+        != [
+            f"{DAEMONIC_TERROR_OWNER}::test_native_ordered_retreat_resolves_and_replays[{case}]"
+            for case in DAEMONIC_TERROR_CASES
+        ]
+        or record["origin_test"].keys() != {"before", "after"}
+        or record["runtime_fingerprint"] == record["retained_runtime_fingerprint"]
+        or any(
+            change.keys() != {"before", "after"} or change["before"] == change["after"]
+            for change in (record["runtime_manifest"], *record["source"].values())
+        )
+    ):
+        raise SystemExit("Daemonic Terror ordered retreat test admission differs.")
+    for name, change in record["source"].items():
+        _checked_bytes(root, name, change["after"])
+    return record, raw
+
+
 def combined_charge_runtime(root: Path, flight_raw: bytes, retry_raw: bytes) -> str:
     """Bind both independently validated lineages to their one composed runtime."""
     receipt = _checked_bytes(root, COMBINED_CHARGE_TRANSITION, COMBINED_CHARGE_TRANSITION_SHA256)
@@ -1332,12 +1390,26 @@ def combined_charge_runtime(root: Path, flight_raw: bytes, retry_raw: bytes) -> 
 
     normal_move = load_normal_move_admission(root)
     if normal_move is not None:
-        return normal_move.admit_runtime(
+        terror = _daemonic_terror_transition(root)
+        manifest_successor = None if terror is None else terror[0]["runtime_manifest"]
+        normal_runtime = normal_move.admit_runtime(
             root,
             predecessor=receipt,
             fingerprint=fingerprint,
             manifest_sha256=binding["combined_manifest_sha256"],
+            manifest_successor=manifest_successor,
         )
+        if terror is None:
+            return normal_runtime
+        successor = terror[0]
+        if (
+            successor["retained_normal_move_sha256"] != hashlib.sha256(normal_move.raw).hexdigest()
+            or successor["retained_runtime_fingerprint"] != normal_runtime
+        ):
+            raise SystemExit(
+                "Daemonic Terror test admission requires the exact Normal Move predecessor."
+            )
+        return successor["runtime_fingerprint"]
     _checked_bytes(root, MANIFEST, binding["combined_manifest_sha256"])
     return fingerprint
 
@@ -1625,7 +1697,10 @@ def exact_movement_test_transition(
         additions.update(_selection_members(codec["added_files"], root))
         runtime = codec["runtime_fingerprint"]
         raw += b"\0" + codec_raw
-    pending_battle_shock = _pending_battle_shock_source_transition(root)
+    terror = _daemonic_terror_transition(root)
+    pending_battle_shock = _pending_battle_shock_source_transition(
+        root, current_sources={} if terror is None else terror[0]["source"]
+    )
     pending_sources = {} if pending_battle_shock is None else pending_battle_shock[2]
     from scripts.dark_pact_test_admission import dark_pact_source_successors
 
@@ -2064,9 +2139,19 @@ def exact_movement_test_transition(
     elif retry_runtime is not None:
         runtime = retry_runtime
     if normal_move is not None and (
-        screen is None or runtime != normal_move.receipt["runtime_fingerprint"]
+        screen is None
+        or runtime
+        != (
+            normal_move.receipt["runtime_fingerprint"]
+            if terror is None
+            else terror[0]["runtime_fingerprint"]
+        )
     ):
         raise SystemExit("Normal Move tests require the exact Screen and combined Charge lineage.")
+    if terror is not None and (normal_move is None or pending_battle_shock is None):
+        raise SystemExit(
+            "Daemonic Terror ordered retreat requires its source and runtime predecessors."
+        )
 
     retained = _identity_test_transition(
         root,
@@ -2253,13 +2338,28 @@ def exact_movement_test_transition(
             raise SystemExit("Normal Move tests overlap predecessor tests.")
         additions.update(normal_tests)
         raw += b"\0" + normal_move.raw
-    origin = normal_move_origin_test_addition(root, predecessor=normal_move, runtime=runtime)
+    origin_runtime = runtime if terror is None else terror[0]["retained_runtime_fingerprint"]
+    origin = normal_move_origin_test_addition(
+        root,
+        predecessor=normal_move,
+        runtime=origin_runtime,
+        owner_successor=None if terror is None else terror[0]["origin_test"],
+    )
     if origin is not None:
         origin_tests, origin_raw = origin
         if origin_tests.keys() & (updated.keys() | added.keys() | additions.keys()):
             raise SystemExit("Constructed Normal Move origin tests overlap predecessor tests.")
         additions.update(origin_tests)
         raw += b"\0" + origin_raw
+    if terror is not None:
+        if origin is None:
+            raise SystemExit("Daemonic Terror test admission requires the Normal Move origin test.")
+        terror_receipt, terror_raw = terror
+        terror_tests = _selection_members(terror_receipt["added_files"], root)
+        if terror_tests.keys() & (updated.keys() | added.keys() | additions.keys()):
+            raise SystemExit("Daemonic Terror ordered retreat tests overlap predecessor tests.")
+        additions.update(terror_tests)
+        raw += b"\0" + terror_raw
     return updated, {**added, **additions}, retained_raw + b"\0" + raw
 
 

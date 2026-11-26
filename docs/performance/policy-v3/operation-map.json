@@ -38237,6 +38237,33 @@
       "sensitive": false,
       "mandatory": true
     },
+    "daemonic-terror-ordered-retreat": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/daemonic-terror-ordered-retreat-v1.json",
+        "scripts/engine_numerical_identity_test_admission.py",
+        "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/army_rule.py",
+        "tests/rules/section09/test_native_ordered_retreat.py"
+      ],
+      "owners": [
+        "@document",
+        "@module",
+        "_DaemonicTerrorTransition",
+        "_choose",
+        "_daemonic_terror_transition",
+        "_health",
+        "_historical_battle_shock_contribution",
+        "_pending_battle_shock_source_transition",
+        "_positions",
+        "_restore",
+        "combined_charge_runtime",
+        "historical_daemonic_terror_applies",
+        "retreat_definitions",
+        "test_native_ordered_retreat_resolves_and_replays"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
     "fools-flight-stampede-native-proof": {
       "paths": [
         "tests/factions/chaos_daemons/integration/test_fools_flight.py"

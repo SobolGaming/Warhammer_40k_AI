@@ -350,7 +350,13 @@ class NormalMoveAdmission:
         _checked_bytes(root, SCREEN_SOURCE, binding["after"])
 
     def admit_runtime(
-        self, root: Path, *, predecessor: bytes, fingerprint: str, manifest_sha256: str
+        self,
+        root: Path,
+        *,
+        predecessor: bytes,
+        fingerprint: str,
+        manifest_sha256: str,
+        manifest_successor: dict[str, str] | None = None,
     ) -> str:
         from scripts.engine_numerical_identity_test_admission import _checked_bytes
         from scripts.milli_inch_test_admission import MANIFEST
@@ -365,7 +371,12 @@ class NormalMoveAdmission:
             raise SystemExit(
                 "Normal Move admission requires the exact combined Charge predecessor."
             )
-        _checked_bytes(root, MANIFEST, binding["after"])
+        current_manifest_sha256 = binding["after"]
+        if manifest_successor is not None:
+            if manifest_successor["before"] != current_manifest_sha256:
+                raise SystemExit("Normal Move runtime manifest successor preimage differs.")
+            current_manifest_sha256 = manifest_successor["after"]
+        _checked_bytes(root, MANIFEST, current_manifest_sha256)
         return self.receipt["runtime_fingerprint"]
 
 
@@ -406,7 +417,11 @@ NORMAL_MOVE_ORIGIN_CASE = "test_constructed_normal_move_origin_v1_admits_only_te
 
 
 def normal_move_origin_test_addition(
-    root: Path, *, predecessor: NormalMoveAdmission | None, runtime: str
+    root: Path,
+    *,
+    predecessor: NormalMoveAdmission | None,
+    runtime: str,
+    owner_successor: dict[str, dict[str, object]] | None = None,
 ) -> tuple[dict[str, dict[str, object]], bytes] | None:
     from scripts.engine_numerical_identity_test_admission import _checked_bytes
 
@@ -434,4 +449,9 @@ def normal_move_origin_test_addition(
         or record["added_cases"] != [f"{NORMAL_MOVE_ORIGIN_OWNER}::{NORMAL_MOVE_ORIGIN_CASE}"]
     ):
         raise SystemExit("Constructed Normal Move origin requires the exact Normal Move lineage.")
-    return _selection_members(record["added_files"], root), raw
+    added_files = record["added_files"]
+    if owner_successor is not None:
+        if owner_successor["before"] != added_files[NORMAL_MOVE_ORIGIN_OWNER]:
+            raise SystemExit("Constructed Normal Move origin test predecessor differs.")
+        added_files = {NORMAL_MOVE_ORIGIN_OWNER: owner_successor["after"]}
+    return _selection_members(added_files, root), raw

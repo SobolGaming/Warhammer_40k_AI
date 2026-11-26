@@ -405,6 +405,7 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         "data/source_audits/ci64_provenance_v1/stage2-pending-battle-shock-transition-v1.json"
     )
     pending = _record(pending_path)
+    terror = _record(selection.DAEMONIC_TERROR_TRANSITION)
     pending_base = "161378a16c4557228b2af45db0d311a522eb3f8f"
     assert pending["base"] == pending_base
     pending_base_manifest = json.loads(
@@ -923,7 +924,11 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         )
         pending_before[name] = hashlib.sha256(predecessor).hexdigest()
         assert binding["before"] == pending_before[name]
-        assert binding["after"] == hashlib.sha256((ROOT / name).read_bytes()).hexdigest()
+        expected = binding["after"]
+        if name in terror["source"]:
+            assert terror["source"][name]["before"] == expected
+            expected = terror["source"][name]["after"]
+        assert expected == hashlib.sha256((ROOT / name).read_bytes()).hexdigest()
     screen_base_manifest = json.loads(
         subprocess.check_output(
             ["git", "show", ground_charge.SCREEN_BASE + ":" + MANIFEST], cwd=ROOT
@@ -946,10 +951,21 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
             ["git", "show", normal_move["base"] + ":" + path], cwd=ROOT
         )
         assert normal_move[key]["before"] == hashlib.sha256(before).hexdigest()
-        assert normal_move[key]["after"] == hashlib.sha256((ROOT / path).read_bytes()).hexdigest()
+        expected = normal_move[key]["after"]
+        if path == MANIFEST:
+            assert terror["runtime_manifest"]["before"] == expected
+            retained_manifest = subprocess.check_output(
+                ["git", "show", terror["base"] + ":" + MANIFEST], cwd=ROOT
+            )
+            assert expected == hashlib.sha256(retained_manifest).hexdigest()
+            expected = terror["runtime_manifest"]["after"]
+        assert expected == hashlib.sha256((ROOT / path).read_bytes()).hexdigest()
     assert normal_move["runtime_manifest"]["before"] == combined["combined_manifest_sha256"]
     assert normal_move["retained_runtime_fingerprint"] == combined["combined_runtime_fingerprint"]
-    assert normal_move["runtime_fingerprint"] == _record(MANIFEST)["fingerprint"]
+    assert normal_move["runtime_fingerprint"] == terror["retained_runtime_fingerprint"]
+    assert terror["runtime_fingerprint"] == _record(MANIFEST)["fingerprint"]
+    assert selection.DAEMONIC_TERROR_OWNER in active_files
+    assert sum(selection.DAEMONIC_TERROR_OWNER in group for group in groups) == 1
     assert ground_charge.NORMAL_MOVE_OWNER in active_files
     assert sum(ground_charge.NORMAL_MOVE_OWNER in group for group in groups) == 1
     assert normal_move["added_cases"] == [
@@ -960,6 +976,16 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
     origin = _record(ground_charge.NORMAL_MOVE_ORIGIN_TRANSITION)
     assert origin["retained_normal_move_sha256"] == hashlib.sha256(admission.raw).hexdigest()
     assert origin["runtime_fingerprint"] == normal_move["runtime_fingerprint"]
+    origin_owner = ground_charge.NORMAL_MOVE_ORIGIN_OWNER
+    origin_base = subprocess.check_output(
+        ["git", "show", terror["base"] + ":" + origin_owner], cwd=ROOT
+    )
+    assert terror["origin_test"]["before"] == origin["added_files"][origin_owner]
+    assert hashlib.sha256(origin_base).hexdigest() == terror["origin_test"]["before"]["sha256"]
+    assert (
+        hashlib.sha256((ROOT / origin_owner).read_bytes()).hexdigest()
+        == (terror["origin_test"]["after"]["sha256"])
+    )
     assert origin["added_cases"] == [
         f"{ground_charge.NORMAL_MOVE_ORIGIN_OWNER}::{ground_charge.NORMAL_MOVE_ORIGIN_CASE}"
     ]
@@ -1355,6 +1381,7 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         | set(retry["added_cases"])
         | set(normal_move["added_cases"])
         | set(origin["added_cases"])
+        | set(terror["added_cases"])
         | shooting_cases
         | {
             ground_charge.SCREEN_OWNER
