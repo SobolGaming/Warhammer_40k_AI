@@ -978,6 +978,7 @@ def _pending_claim(
             state=state,
             decisions=decisions,
             request=request,
+            historical_effect_sources=battle_shock_hooks.historical_effect_sources,
         )
     )
     if (

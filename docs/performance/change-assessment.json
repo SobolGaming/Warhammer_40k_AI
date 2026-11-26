@@ -1,16 +1,16 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "769f1ed3643ef52be59343a53750502de9be02c7",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:6a62fab60ddf5b30cb9651f7a2ec7140e06765f9c35eec1abd625e1f5814caec",
-  "operation_map_sha256": "cca1612c223aa87c0bd920749a5e63f0b3d0353383b030b76c328f896e280018",
+  "base": "dafbcccdd31d5532c0d58aceac43901e60326d36",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:cdd4dc3a140f7a09efbe307cf6333b3fada76748838fa5543b2160727da765b0",
+  "operation_map_sha256": "f6cb70a7dbd7d442c33523e9194456c864c3733daeb5405706eb44271d090e51",
   "changes": {
     "data/source_audits/caudit_01_successors/batch-2/README.md": {
       "before_sha256": null,
-      "after_sha256": "92218a0c846bd4397a7b787d554df41d24851558423a913d6db39732db0519a0",
+      "after_sha256": "684ef588e22c30723a3d4c4beddc291d8b374d3505f7c2144079cfe2afaa846f",
       "owners": {
         "@document": {
           "before": null,
-          "after": "92218a0c846bd4397a7b787d554df41d24851558423a913d6db39732db0519a0"
+          "after": "684ef588e22c30723a3d4c4beddc291d8b374d3505f7c2144079cfe2afaa846f"
         }
       }
     },
@@ -21,6 +21,16 @@
         "@document": {
           "before": null,
           "after": "4ead6121300b63b6dc8763f907a93b6c86170cccbfe55f8a50a52ed310847669"
+        }
+      }
+    },
+    "data/source_audits/caudit_01_successors/batch-2/main-follow-up.json": {
+      "before_sha256": null,
+      "after_sha256": "39f94bdb472d4d32e6a57bc9bb189b9749148c28867621bd1ca06297edd176cd",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "39f94bdb472d4d32e6a57bc9bb189b9749148c28867621bd1ca06297edd176cd"
         }
       }
     },
@@ -55,12 +65,12 @@
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "460019df7a6c3d510522606447a18ff4e92726b03eeade906f88670163be99d5",
-      "after_sha256": "e550100d76266492d8ca440da32dd140ba182fab1f2a14c340b11c1ef99851bb",
+      "before_sha256": "d5a0255320e72bc6e0d2dd6600a92368ccc0719f4333d2adf43276c20a70809d",
+      "after_sha256": "632076d9130b39176f1c71770216125c137650f4cfc338d108946cd38556c90c",
       "owners": {
         "@document": {
-          "before": "460019df7a6c3d510522606447a18ff4e92726b03eeade906f88670163be99d5",
-          "after": "e550100d76266492d8ca440da32dd140ba182fab1f2a14c340b11c1ef99851bb"
+          "before": "d5a0255320e72bc6e0d2dd6600a92368ccc0719f4333d2adf43276c20a70809d",
+          "after": "632076d9130b39176f1c71770216125c137650f4cfc338d108946cd38556c90c"
         }
       }
     }
@@ -120,9 +130,19 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Adds five exact evidence paths to the existing non-sensitive audit operation.",
+      "rationale": "Adds six exact batch 2 evidence paths to the existing non-sensitive audit operation.",
       "source_obligation": null,
       "unchanged_work": null
+    },
+    "data/source_audits/caudit_01_successors/batch-2/main-follow-up.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "caudit-01-successor-evidence"
+      ],
+      "selected_families": [],
+      "rationale": "Records source-delta qualifications, merged exact-main witnesses and bounded local diagnostics for the existing Core audit.",
+      "source_obligation": "CAUDIT-01 retains historical evidence, distinguishes current source and execution scope, and maps the affected Core obligations.",
+      "unchanged_work": "The diff preserves runtime identity, all 6,819 selected scheduling weights, fixtures and executable test selection."
     }
   },
   "milestone": "ordinary",

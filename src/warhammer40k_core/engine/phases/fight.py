@@ -358,6 +358,26 @@ class FightPhaseHandler:
     def phase(self) -> BattlePhase:
         return BattlePhase.FIGHT
 
+    def apply_fight_unit_selected_hooks(
+        self,
+        *,
+        state: GameState,
+        decisions: DecisionController,
+        activation: FightActivationSelection,
+    ) -> LifecycleStatus | None:
+        _apply_fight_unit_selected_effect_grants(
+            state=state,
+            decisions=decisions,
+            activation=activation,
+            registry=self.fight_unit_selected_hooks,
+        )
+        return _request_fight_unit_selected_grant_decision_if_available(
+            state=state,
+            decisions=decisions,
+            activation=activation,
+            registry=self.fight_unit_selected_grant_hooks,
+        )
+
     def resume_unit_grant_commitment(
         self,
         *,
@@ -1869,11 +1889,13 @@ def invalid_fight_activation_status(
             },
         )
     policy = ruleset_descriptor.fight_policy
+    interrupted = isinstance(request.payload, dict) and "interrupt_id" in request.payload
     current_contexts = eligible_fight_contexts_for_player(
         state=state,
         fight_state=fight_state,
         player_id=_require_actor(result),
         policy=policy,
+        respect_ordering_band=not interrupted,
     )
     if result.selected_option_id == ELIGIBLE_TO_FIGHT_PASS_OPTION_ID:
         if fight_state.forced_activation_context is not None:
@@ -2409,12 +2431,11 @@ def _apply_fight_activation_decision(
             current_player_id=selection.player_id,
         )
     )
-    activated_state = (
+    state.replace_fight_phase_state(
         fight_state.with_activation(selection)
-        .with_next_player(next_player_id)
         .with_active_activation(selection)
+        .with_next_player(next_player_id)
     )
-    state.replace_fight_phase_state(activated_state)
     decisions.event_log.append(
         "fight_activation_selected",
         validate_json_value(
@@ -2437,18 +2458,11 @@ def _apply_fight_activation_decision(
             }
         ),
     )
-    _apply_fight_unit_selected_effect_grants(
-        state=state,
-        decisions=decisions,
-        activation=selection,
-        registry=handler.fight_unit_selected_hooks,
-    )
     del reaction_queue, policy
-    return _request_fight_unit_selected_grant_decision_if_available(
+    return handler.apply_fight_unit_selected_hooks(
         state=state,
         decisions=decisions,
         activation=selection,
-        registry=handler.fight_unit_selected_grant_hooks,
     )
 
 
@@ -3375,7 +3389,12 @@ def _invalid_fight_activation_selection_status(
                 "field": "selected_option_id",
             },
         )
-    if selected.player_id != fight_state.fight_order_state.next_player_id:
+    expected_player = (
+        fight_state.fight_order_state.next_player_id
+        if selected.interrupt_id is None
+        else result.actor_id
+    )
+    if selected.player_id != expected_player:
         return LifecycleStatus.invalid(
             stage=state.stage,
             message="Fight activation player drifted.",

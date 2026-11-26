@@ -855,6 +855,7 @@ def fight_activation_option_payload(
     fight_state: FightPhaseState,
     context: FightEligibilityContext,
     fight_type: FightTypeKind,
+    interrupt_id: str | None = None,
 ) -> JsonValue:
     fight_type_value = fight_type_kind_from_token(fight_type)
     payload: dict[str, JsonValue] = {
@@ -873,6 +874,8 @@ def fight_activation_option_payload(
         payload["forced_activation_context"] = validate_json_value(
             fight_state.forced_activation_context.to_payload()
         )
+    if interrupt_id is not None:
+        payload["interrupt_id"] = interrupt_id
     return validate_json_value(payload)
 
 
@@ -975,7 +978,11 @@ def current_fight_activation_selection_from_payload(
         ),
         request_id=request_id,
         result_id=result_id,
-        interrupt_id=interrupt_id,
+        interrupt_id=(
+            _payload_string(payload, key="interrupt_id")
+            if interrupt_id is None and "interrupt_id" in payload
+            else interrupt_id
+        ),
     )
 
 

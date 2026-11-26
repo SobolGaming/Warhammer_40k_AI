@@ -9,6 +9,10 @@ records for active paths and newly reviewed stale paths. The
 [#755 inventory](../successor-inventory.json) supplies its 212 earlier
 reviews and nine earlier missing-evidence dispositions.
 
+The [main follow-up](main-follow-up.json) records current evidence on green
+main `dafbcccdd31d5532c0d58aceac43901e60326d36`. It adds bounded findings from #753 and
+#756 while retaining this batch's original row counts and execution history.
+
 | Historical cohort | Total | Bounded | Partial | Missing | Unreachable in selected packs | Superseded | Gameplay defect | Source drift | Context |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | Archived missing paths | 398 | 313 | 72 | 11 | 1 | 0 | 1 | 0 | 0 |
@@ -64,8 +68,8 @@ separate [Order 94 transcription](../../../../docs/ORDER_94_SOURCE_REVIEW.md).
   A surviving Lord prompted a fresh choice in the next attack sequence.
   Declining sent the first save to the wounded Bodyguard. These cases use
   public commands and fixture RNG. Strict full-battle replay, full roster
-  setup and the combined Precision/Devastating Wounds destroyed-group
-  fallback remain open.
+  setup and a selected regression for the combined Precision and Devastating
+  Wounds interaction remain open.
 - **Ingress, §20.04.** A public Prince Yriel arrival excluded a second
   selection and atomically rejected the stale proposal. In separate copied
   Shooting and Charge states, the same supplied reactive Normal Move was
@@ -97,25 +101,39 @@ separate [Order 94 transcription](../../../../docs/ORDER_94_SOURCE_REVIEW.md).
   and Support retention through attack-caused destruction, restore, replay
   and expiry. The corresponding selected native-roster evidence remains
   missing. A separate synthetic-keyword attack sequence verified one
-  living-Character Precision and Devastating Wounds branch. Combined
-  native weapon admission and the destroyed-group fallback remain open.
+  living-Character Precision and Devastating Wounds branch. The separate
+  exact-main scratch witness below covers the destroyed-group fallback.
 
-## Gameplay and source limits
+## Current gameplay and source evidence
 
-- Forced Desperate Escape under territorial Daemonic Terror reached the
-  Battle-shock roll and then rejected the ordinary continuation. Outside
-  territory and MONSTER controls completed and replayed. The changed wording
-  and continuation are tracked with the separate #753 fix.
-- Paying Counteroffensive committed Normal Fight when Overrun was also
-  eligible. The active `12.04-fight-type` and archived
-  `15.12-next-selection` share the one defect already evidenced in #755.
-  The fix is tracked separately in #756.
-- The native Night Spinner committed seven Doomweaver attacks without a
-  count-reroll offer, despite one available CP. The same attack offered
-  Command Re-roll on the first Hit. The separate fix needs accepted and
-  declined count responses, the resulting pool size and restore/replay.
-  The attack-count roll also preceded Resolve Attacks, keeping
-  `02.02.03-obligation-03` partial.
+- **Forced Desperate Escape.** #753 resolves the reproduced territorial
+  Daemonic Terror continuation. The eight admitted cases cover hazard
+  counts, forced shock, placement after casualties, restored continuation and
+  exact replay. The current overlay bounds `09.07.01-forced-shock-2`.
+- **October source delta.** In the approved v981 revision of occurrence 1,
+  the alias and modifier blocks match the retained bytes. Occurrence 2 and
+  §09.07 also match. Existing scoped hazard modifiers and the forced
+  movement and Battle-shock proof carry forward. The added example's
+  conditional hazard reroll still needs compiler intake and a live hazard
+  decision. The October Guided Retreat change remains a separate,
+  provider-gated faction dependency.
+- **Counteroffensive.** #756 resolves the reproduced premature Normal Fight
+  selection. The paid target keeps Normal and Overrun when both are legal.
+  The sole Overrun case activates directly. Bind `12.04-fight-type` and
+  `15.12-next-selection` to this one historical defect. The named grant's
+  Fight-end expiry remains partial.
+- **Combined Precision and Devastating Wounds.** Exact-main scratch cases
+  exercised facade selection and decline, normal damage before the one-model
+  packet, fallback after the selected Character died, the restored allocation
+  and strict replay. The fixture substitutes a fixed-A3/D3 Exitus pistol on
+  the canonical test carrier. S24-071 remains missing selected evidence.
+  Finite admission and a complete scheduling profile are pending for the two
+  candidate tests. The #759 Precision benchmark has a separate scope.
+- **Native random Attacks Command Re-roll.** The retained Night Spinner
+  witness committed seven Doomweaver attacks before the first Hit without a
+  count-reroll offer. #759 remains a draft with its separate qualification
+  unresolved. `02.02.03-obligation-03` stays partial and `15.02-eligible-rolls`
+  retains the open native ranged defect.
 - Model replacement and the zero-width line need admitted rule consumers.
   The Windrider Host, Biovores, Grot Shields, Thulia Ghuld and Arkanyst
   Evaluator examples retain their individual provider limits. The achieved

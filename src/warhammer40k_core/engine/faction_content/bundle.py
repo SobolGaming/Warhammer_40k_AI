@@ -1366,18 +1366,6 @@ class RuntimeContentBundle:
                 ),
             )
         )
-        battle_shock_hook_registry = BattleShockHookRegistry.from_bindings(
-            (
-                *catalog_runtime_hooks.battle_shock_hook_bindings(
-                    ability_indexes_by_player_id=ability_indexes_by_player_id,
-                    armies=validated_armies,
-                ),
-                *_contribution_values(
-                    validated_contributions,
-                    lambda contribution: contribution.battle_shock_hook_bindings,
-                ),
-            )
-        )
         advance_eligibility_hook_registry = AdvanceEligibilityHookRegistry.from_bindings(
             (
                 *catalog_advance_eligibility_hook_bindings(
@@ -1761,6 +1749,26 @@ class RuntimeContentBundle:
             armies=validated_armies,
             catalog=catalog,
             records=stratagem_records,
+        )
+        from warhammer40k_core.engine.generic_effect_history import HistoricalEffectSources
+
+        battle_shock_hook_registry = BattleShockHookRegistry.from_bindings(
+            (
+                *catalog_runtime_hooks.battle_shock_hook_bindings(
+                    ability_indexes_by_player_id=ability_indexes_by_player_id,
+                    armies=validated_armies,
+                ),
+                *_contribution_values(
+                    validated_contributions,
+                    lambda contribution: contribution.battle_shock_hook_bindings,
+                ),
+            ),
+            historical_effect_sources=HistoricalEffectSources(
+                ability_indexes_by_player_id=ability_indexes_by_player_id,
+                stratagem_indexes_by_player_id=stratagem_indexes,
+                faction_rule_execution_registry=faction_registry,
+                activation=activation,
+            ),
         )
         turn_end_hook_registry, shooting_phase_start_hook_registry = with_stratagem_boundary_rules(
             turn_end_hook_registry,

@@ -167,6 +167,7 @@ from warhammer40k_core.engine.lifecycle_payload_consistency import (
 )
 from warhammer40k_core.engine.lifecycle_reaction_queue import (
     validate_reaction_queue_consistency,
+    validate_restored_counteroffensive_fight,
 )
 from warhammer40k_core.engine.lifecycle_restore_consistency import validate_payload_consistency
 from warhammer40k_core.engine.lifecycle_runtime_payloads import (
@@ -716,6 +717,14 @@ class GameLifecycle:
             },
         )
 
+    def _advance_after_core_ability_selection(self) -> LifecycleStatus:
+        result = self.decision_controller.records[-1].result
+        interrupted_fight = self._fight_interrupt_activation_is_active()
+        status = self.advance_until_decision_or_terminal()
+        if interrupted_fight and self._result_resolves_active_reaction_frame(result):
+            self._continue_or_resolve_fight_reaction(result=result, status=status)
+        return status
+
     def _advance_once(self) -> LifecycleStatus:
         from warhammer40k_core.engine.lifecycle_advancement import advance_once
         from warhammer40k_core.engine.movement_decision_authority import reuse_live_movement_history
@@ -1017,6 +1026,13 @@ class GameLifecycle:
             pending_request=lifecycle._pending_decision_request(),
             reaction_frame_decision_types=_REACTION_FRAME_DECISION_TYPES,
         )
+        validate_restored_counteroffensive_fight(
+            state=lifecycle._require_state(),
+            decisions=lifecycle.decision_controller,
+            reaction_queue=lifecycle.reaction_queue,
+            pending_request=lifecycle._pending_decision_request(),
+            fight_policy=None if config is None else config.ruleset_descriptor.fight_policy,
+        )
         lifecycle._refresh_runtime_content_bundle_if_armies_mustered(
             preserve_existing_bundle=runtime_content_bundle is not None,
         )
@@ -1269,7 +1285,7 @@ class GameLifecycle:
                 core_ability_selection_dispatch_handler(
                     state_provider=self._require_state,
                     decisions=self.decision_controller,
-                    advance=self.advance_until_decision_or_terminal,
+                    advance=self._advance_after_core_ability_selection,
                     registry_provider=lambda: (
                         self._shooting_phase_handler.runtime_modifier_registry
                     ),
@@ -2759,7 +2775,7 @@ class GameLifecycle:
                 runtime_content_bundle.shooting_unit_selected_grant_hook_registry
             ),
         )
-        advanced_status = self.advance_until_decision_or_terminal()
+        advanced_status = self._advance_after_fight_stratagem_spend(source_result=result)
         if resolves_reaction_frame and self._result_resolves_active_reaction_frame(result):
             if self._fight_interrupt_activation_is_active():
                 self._continue_or_resolve_fight_reaction(
@@ -3216,7 +3232,7 @@ class GameLifecycle:
             ),
             resolve_unaffordable_cost_increase_as_used=cost_increase_unaffordable,
         )
-        advanced_status = self.advance_until_decision_or_terminal()
+        advanced_status = self._advance_after_fight_stratagem_spend(source_result=source_result)
         if self._result_resolves_active_reaction_frame(result):
             if self._fight_interrupt_activation_is_active():
                 self._continue_or_resolve_fight_reaction(
@@ -3235,6 +3251,27 @@ class GameLifecycle:
                     decisions=self.decision_controller,
                 )
         return advanced_status
+
+    def _advance_after_fight_stratagem_spend(
+        self, *, source_result: DecisionResult
+    ) -> LifecycleStatus:
+        state = self._require_state()
+        fight = state.fight_phase_state
+        activation = None if fight is None else fight.active_activation
+        if (
+            activation is not None
+            and activation.interrupt_id is not None
+            and activation.interrupt_id.startswith("counteroffensive:")
+            and activation.result_id == source_result.result_id
+        ):
+            status = self._fight_phase_handler.apply_fight_unit_selected_hooks(
+                state=state,
+                decisions=self.decision_controller,
+                activation=activation,
+            )
+            if status is not None:
+                return status
+        return self.advance_until_decision_or_terminal()
 
     def _result_resolves_active_reaction_frame(self, result: DecisionResult) -> bool:
         if type(result) is not DecisionResult:

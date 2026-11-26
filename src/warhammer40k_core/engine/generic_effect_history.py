@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass, replace
 from typing import TYPE_CHECKING, cast
 
@@ -40,11 +40,25 @@ from warhammer40k_core.engine.stratagems_model import (
 )
 
 if TYPE_CHECKING:
+    from warhammer40k_core.engine.abilities import AbilityCatalogIndex
     from warhammer40k_core.engine.army_mustering import ArmyDefinition
     from warhammer40k_core.engine.decision_record import DecisionRecord
     from warhammer40k_core.engine.event_log import EventRecord
+    from warhammer40k_core.engine.faction_content.activation import RuntimeContentActivation
     from warhammer40k_core.engine.faction_content.bundle import RuntimeContentBundle
+    from warhammer40k_core.engine.faction_rule_execution import FactionRuleExecutionRegistry
     from warhammer40k_core.engine.rules_units import RulesUnitView
+    from warhammer40k_core.engine.stratagems_model import StratagemCatalogIndex
+
+
+@dataclass(frozen=True, slots=True)
+class HistoricalEffectSources:
+    """Loaded provider inputs for consumers that own a hook registry, not a bundle."""
+
+    ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex]
+    stratagem_indexes_by_player_id: Mapping[str, StratagemCatalogIndex]
+    faction_rule_execution_registry: FactionRuleExecutionRegistry
+    activation: RuntimeContentActivation
 
 
 @dataclass(frozen=True, slots=True)
@@ -99,7 +113,7 @@ def historical_generic_effect_may_match(
 def historical_generic_effect_inventory(
     *,
     historical: HistoricalEffectAuthority,
-    runtime_content_bundle: RuntimeContentBundle,
+    runtime_content_bundle: RuntimeContentBundle | HistoricalEffectSources,
     matches_payload: Callable[[dict[str, JsonValue]], bool],
 ) -> tuple[PersistingEffect, ...]:
     """Never consult the restored state's current effect inventory."""

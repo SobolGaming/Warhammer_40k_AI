@@ -341,7 +341,7 @@ def _historical_battle_shock_contribution(
             operand = 1
             kind = "daemonic-manifestation"
         else:
-            applies = _historical_daemonic_terror_applies(
+            applies = historical_daemonic_terror_applies(
                 context=context,
                 daemon_army=army,
                 target=target,
@@ -385,19 +385,6 @@ def historical_daemonic_terror_applies(
     daemon_army: ArmyDefinition,
     target: RulesUnitView,
 ) -> bool:
-    return _historical_daemonic_terror_applies(
-        context=context,
-        daemon_army=daemon_army,
-        target=target,
-    )
-
-
-def _historical_daemonic_terror_applies(
-    *,
-    context: HistoricalBattleShockAuthorityContext,
-    daemon_army: ArmyDefinition,
-    target: RulesUnitView,
-) -> bool:
     if _historical_unit_intersects_owner_deployment(
         context=context,
         player_id=daemon_army.player_id,
@@ -408,21 +395,26 @@ def _historical_daemonic_terror_applies(
         target=target,
     ):
         return True
-    if not _historical_manifestation_restored_by_wounds(context=context, target=target):
-        return False
-
     player_id = daemon_army.player_id
+    restores_manifestation = _historical_manifestation_restored_by_wounds(
+        context=context, target=target
+    )
     mission = context.mission_setup
     models = context.geometry_models(target.unit_instance_id, include_retained=True)
-    if target.retained_model_ids and (
-        _historical_unit_intersects_owner_deployment(
-            context=context, player_id=player_id, target=target, include_retained=True
-        )
-        or _historical_greater_daemon_terror(
-            context=context, daemon_army=daemon_army, target=target, include_retained=True
+    if (
+        restores_manifestation
+        and target.retained_model_ids
+        and (
+            _historical_unit_intersects_owner_deployment(
+                context=context, player_id=player_id, target=target, include_retained=True
+            )
+            or _historical_greater_daemon_terror(
+                context=context, daemon_army=daemon_army, target=target, include_retained=True
+            )
         )
     ):
         return True
+    # Control and footprint intersections use the Battle-shock event boundary.
     groups: list[tuple[str, ...]] = []
     if _historical_unit_intersects_owner_deployment(
         context=context, player_id=target.owner_player_id, target=target, include_retained=True
@@ -453,7 +445,7 @@ def _historical_daemonic_terror_applies(
     )
     if territory is True:
         return True
-    if (
+    if restores_manifestation and (
         territory is None
         or _historical_corrupted_realspace_may_reach(mission, models, sticky)
         or _historical_semantic_aura_may_target_enemy(context, daemon_army)

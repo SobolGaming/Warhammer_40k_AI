@@ -1,0 +1,1255 @@
+{
+  "certification": {
+    "caudit_01_signed_off": false,
+    "faction_gate_zero_closed": false,
+    "pfinal_closed": false
+  },
+  "current_dispositions": {
+    "02.02.03-obligation-03": {
+      "current_disposition": "partial",
+      "evidence_record": "pending_759",
+      "historical_disposition": "partial",
+      "historical_receipt": {
+        "path": "caudit-01-active-final/bindings-receipt.json",
+        "sha256": "e3666f79033ad54baba14a678ba7074b8422105c64e31836724b453e7823fe4e"
+      },
+      "retained_source_blocks": [
+        {
+          "kind": "text",
+          "ordinal": 2,
+          "sha256": "f060ed8aa7bbc4bd3f7d94c63fdd1c7325ae9e2ab3cf7fa91a8c379b645a49ad"
+        }
+      ],
+      "retained_source_row_id": "rule:02:02.02.03:1",
+      "retained_source_sha256": "5e03456e767c79c7a9e156ca6f841fd27cd9fc9f66d692f9efdf54e5799cf607",
+      "scope": "The historical early native ranged roll remains unresolved for this base; no credit is assigned from the pending #759 draft."
+    },
+    "09.07.01-forced-hazards-2": {
+      "current_disposition": "bounded",
+      "evidence_record": "merged_753",
+      "historical_disposition": "bounded",
+      "historical_receipt": {
+        "path": "caudit-01-active-final/bindings-receipt.json",
+        "sha256": "e3666f79033ad54baba14a678ba7074b8422105c64e31836724b453e7823fe4e"
+      },
+      "retained_source_blocks": [
+        {
+          "kind": "text",
+          "ordinal": 1,
+          "sha256": "8aa244e707952185838eea0a79acf6f2af67878f860b7e9b69dda4396b0a6f4f"
+        },
+        {
+          "kind": "text",
+          "ordinal": 2,
+          "sha256": "b7cb1dc29cc1efed238e973a6a2b0089323a4028c41ee3763511144dc5049059"
+        }
+      ],
+      "retained_source_row_id": "rule:09:09.07.01:2",
+      "retained_source_sha256": "a86cc93fd5d3a51bc7899c9111bc5b5384e318289083ae4af5a36b19a9a16678",
+      "scope": "Retain the existing scope and add the landed per-model and casualty-order controls."
+    },
+    "09.07.01-forced-shock-2": {
+      "current_disposition": "bounded",
+      "evidence_record": "merged_753",
+      "historical_disposition": "partial",
+      "historical_receipt": {
+        "path": "caudit-01-active-final/bindings-receipt.json",
+        "sha256": "e3666f79033ad54baba14a678ba7074b8422105c64e31836724b453e7823fe4e"
+      },
+      "retained_source_blocks": [
+        {
+          "kind": "text",
+          "ordinal": 3,
+          "sha256": "fbdb8f2fefacc41b344363aaa6d971682805dc3509d1bd9dd0c5ca92584612eb"
+        }
+      ],
+      "retained_source_row_id": "rule:09:09.07.01:2",
+      "retained_source_sha256": "a86cc93fd5d3a51bc7899c9111bc5b5384e318289083ae4af5a36b19a9a16678",
+      "scope": "Native forced Battle-shock completes the territorial continuation, with source-backed controls and exact replay."
+    },
+    "09.07.01-hazard-alias": {
+      "current_disposition": "source_drift",
+      "evidence_record": "escape_source_delta",
+      "historical_disposition": "source_drift",
+      "historical_receipt": {
+        "path": "caudit-01-baseline/baseline.json",
+        "sha256": "8029035ae56c6bf997a524035bbde3684b6d4e0f0686b807cf90f0d22598681a"
+      },
+      "retained_source_blocks": [
+        {
+          "kind": "text",
+          "ordinal": 1,
+          "sha256": "8d4485ce2413aa0f1a453c412126c3a20ffc8a2a8f4e8469eb09c7fc77bb798e"
+        }
+      ],
+      "retained_source_row_id": "rule:09:09.07.01:1",
+      "retained_source_sha256": "6bf4fd4f0ae498fff4f48cc0ded4d5c8e1d7651c66c00c3a81fbb0fe176a476d",
+      "scope": "Occurrence 1 changes as a whole. Its alias block matches retained bytes and existing scoped behavior carries forward. Current source intake remains open."
+    },
+    "09.07.01-modifier-alias": {
+      "current_disposition": "source_drift",
+      "evidence_record": "escape_source_delta",
+      "historical_disposition": "source_drift",
+      "historical_receipt": {
+        "path": "caudit-01-baseline/baseline.json",
+        "sha256": "8029035ae56c6bf997a524035bbde3684b6d4e0f0686b807cf90f0d22598681a"
+      },
+      "retained_source_blocks": [
+        {
+          "kind": "text",
+          "ordinal": 2,
+          "sha256": "771f24067fac132c15f07e9afd2a089bb7f7ba7eebeada9129cbf01f4d6bf8ff"
+        }
+      ],
+      "retained_source_row_id": "rule:09:09.07.01:1",
+      "retained_source_sha256": "6bf4fd4f0ae498fff4f48cc0ded4d5c8e1d7651c66c00c3a81fbb0fe176a476d",
+      "scope": "The modifier block matches retained bytes. Scoped modifiers apply to hazard dice; the added reroll example is separate."
+    },
+    "12.04-fight-type": {
+      "current_disposition": "bounded",
+      "evidence_record": "merged_756",
+      "historical_disposition": "confirmed_gameplay_defect",
+      "historical_receipt": {
+        "path": "caudit-01-active-final/bindings-receipt.json",
+        "sha256": "e3666f79033ad54baba14a678ba7074b8422105c64e31836724b453e7823fe4e"
+      },
+      "retained_source_blocks": [
+        {
+          "kind": "text",
+          "ordinal": 13,
+          "sha256": "08c01c562d10d59c08bc17e43d2bff23e68717b58305a86899f7a16787eed893"
+        }
+      ],
+      "retained_source_row_id": "rule:12:12.04:1",
+      "retained_source_sha256": "13e1a6964a4ddfd1010e3ae138bc1a4d91026f2bd4aeb795806fc9725b3b5ad5",
+      "scope": "The paid target chooses between lawful Fight types; the sole legal Overrun activates directly."
+    },
+    "12.04-remaining": {
+      "current_disposition": "partial",
+      "evidence_record": "merged_756",
+      "historical_disposition": "partial",
+      "historical_receipt": {
+        "path": "caudit-01-fight-order-and-followups/bindings-receipt.json",
+        "sha256": "95592a35dcdd0c8db15c62437d8a00bb02b298ad7645cd6bdee4c4cb8aaa07e5"
+      },
+      "retained_source_blocks": [
+        {
+          "kind": "text",
+          "ordinal": 8,
+          "sha256": "90425435103965fe84c94d1ee48fd5b15ddbb991907921a47350a676f67b626b"
+        },
+        {
+          "kind": "text",
+          "ordinal": 9,
+          "sha256": "ff7560db65354356dcf91a6d08c94b9e1944988a348efbcfb6a2994b128094fc"
+        },
+        {
+          "kind": "text",
+          "ordinal": 10,
+          "sha256": "7eb498c0b5a88b9ca006aa346ac25b36340d5eca3215e2955485f3756ff5f64b"
+        }
+      ],
+      "retained_source_row_id": "rule:12:12.04:1",
+      "retained_source_sha256": "13e1a6964a4ddfd1010e3ae138bc1a4d91026f2bd4aeb795806fc9725b3b5ad5",
+      "scope": "The control returns to the other player's selection within the same band. Unequal Remaining inventory and exhausted-owner skip without a prior pass remain open."
+    },
+    "15.02-eligible-rolls": {
+      "current_disposition": "confirmed_gameplay_defect",
+      "evidence_record": "pending_759",
+      "historical_disposition": "confirmed_gameplay_defect",
+      "historical_receipt": {
+        "path": "caudit-01-active-stratagems-weapons/bindings-receipt.json",
+        "sha256": "1d04ff1ca82f4864a153b9d4938cd8311e852ba2abcd2b6b324bff0d0dc6b146"
+      },
+      "retained_source_blocks": [
+        {
+          "kind": "stratagem",
+          "ordinal": 2,
+          "sha256": "fb5149908b948107c25edfcc6b70bba088b6dce2d2e3424c2b0f9bc5126e0ad2"
+        },
+        {
+          "kind": "stratagem",
+          "ordinal": 3,
+          "sha256": "6c46f8d46f9381c4d92afcd4bdcb88382b9980561955a977ced0b2cf4a01b993"
+        },
+        {
+          "kind": "stratagem",
+          "ordinal": 4,
+          "sha256": "03656eb5e8398dd257c1714f2d16c84cf8b0605034b7ea1ac867dd8ddeb3ca14"
+        },
+        {
+          "kind": "stratagem",
+          "ordinal": 5,
+          "sha256": "74bd3550561c795201ca58a74241f8cec9fbdceed9ca3582f55c82d683dc85a5"
+        },
+        {
+          "kind": "stratagem",
+          "ordinal": 6,
+          "sha256": "0c49eadebf05cde01c453798d4ad83787eab0c0194bdb010b727c55fa8cfec44"
+        },
+        {
+          "kind": "stratagem",
+          "ordinal": 7,
+          "sha256": "0ab310a94d683ce465502a866a20625389a151ef549d05294c60d28a3b4455e4"
+        },
+        {
+          "kind": "stratagem",
+          "ordinal": 8,
+          "sha256": "ce5269431d841f0b8a5c383b073fdaf7ee7d5e76b80733e2d8bccda764ec5cfb"
+        },
+        {
+          "kind": "stratagem",
+          "ordinal": 9,
+          "sha256": "e5b452b90dddab7c79b745cd0d7ebbce3f64427b4223ec056db28002e2392826"
+        },
+        {
+          "kind": "stratagem",
+          "ordinal": 10,
+          "sha256": "b454200d15c37929107adaceafc1797a169aa08ec7ffa7354425056741829d50"
+        }
+      ],
+      "retained_source_row_id": "rule:15:15.02:1",
+      "retained_source_sha256": "3c81501a7a8affd7e5cf2efcbd7d033d423055c8583729e7d80be6b61ff73faf",
+      "scope": "The historically reproduced native ranged missing-window defect remains open. #759 and its qualification remain pending."
+    },
+    "15.12-expiry": {
+      "current_disposition": "partial",
+      "evidence_record": "merged_756",
+      "historical_disposition": "partial",
+      "historical_receipt": {
+        "path": "caudit-01-active-final/bindings-receipt.json",
+        "sha256": "e3666f79033ad54baba14a678ba7074b8422105c64e31836724b453e7823fe4e"
+      },
+      "retained_source_blocks": [
+        {
+          "kind": "stratagem",
+          "ordinal": 4,
+          "sha256": "12e66b55d0a5c119d7b89be53e5ec149e0aa2da58aee10b59a0218ae282351a1"
+        }
+      ],
+      "retained_source_row_id": "rule:15:15.12:1",
+      "retained_source_sha256": "06249d61dd743d90fcb1c30760d30e6572c178dc6285de3e6c732e565db5a49b",
+      "scope": "The end-of-Fight descriptor is asserted; actual phase-end removal of the named grant remains untested here."
+    },
+    "15.12-next-selection": {
+      "current_disposition": "bounded",
+      "evidence_record": "merged_756",
+      "historical_disposition": "confirmed_gameplay_defect",
+      "historical_receipt": {
+        "path": "caudit-01-native-decision-groups/bindings-receipt.json",
+        "sha256": "9eb80c820146fdf9ee86ead080ecd986a1d1a0b82241b71e5ce331f7f0808eb7"
+      },
+      "retained_source_blocks": [
+        {
+          "kind": "stratagem",
+          "ordinal": 4,
+          "sha256": "12e66b55d0a5c119d7b89be53e5ec149e0aa2da58aee10b59a0218ae282351a1"
+        }
+      ],
+      "retained_source_row_id": "rule:15:15.12:1",
+      "retained_source_sha256": "06249d61dd743d90fcb1c30760d30e6572c178dc6285de3e6c732e565db5a49b",
+      "scope": "The paid unit is the next selection, and its lawful Fight types remain available."
+    },
+    "24.28.01-precision-devastating-priority": {
+      "current_disposition": "missing",
+      "evidence_record": "scratch_precision_devastating",
+      "historical_disposition": "missing",
+      "historical_receipt": {
+        "path": "caudit-01-baseline/baseline.json",
+        "sha256": "8029035ae56c6bf997a524035bbde3684b6d4e0f0686b807cf90f0d22598681a"
+      },
+      "retained_source_blocks": [
+        {
+          "kind": "text",
+          "ordinal": 1,
+          "sha256": "5a0606f338b5d47b6a2356ee9c9d359dff627f1881909fe337d1598eca9f7f15"
+        }
+      ],
+      "retained_source_row_id": "rule:24:24.28.01:1",
+      "retained_source_sha256": "0833673676aaebf5a7f6088354cde2f96e29aadb01bbf1fbaa6ecde3cc100185",
+      "scope": "Combined native scratch execution exists. Standard selected admission and execution remain open."
+    }
+  },
+  "defect_dispositions": {
+    "counteroffensive_fight_type": {
+      "current": "resolved_in_reproduced_scope",
+      "evidence_record": "merged_756",
+      "linked_obligation_ids": [
+        "12.04-fight-type",
+        "15.12-next-selection"
+      ]
+    },
+    "forced_escape_daemonic_terror": {
+      "current": "resolved_in_reproduced_scope",
+      "evidence_record": "merged_753"
+    },
+    "native_attack_count_reroll": {
+      "current": "open",
+      "evidence_record": "pending_759"
+    }
+  },
+  "escape_source_delta": {
+    "changelog": {
+      "date": "2026-10-14",
+      "entry_titles": [
+        "Desperate Escape Test",
+        "Desperate Escape Test Updates"
+      ],
+      "latest_listed_version": "995",
+      "version": "981"
+    },
+    "compiler_controls": {
+      "desperate_escape_rolls_term": {
+        "effects": [
+          "reroll_permission"
+        ],
+        "unsupported": []
+      },
+      "legacy_term": {
+        "effects": [],
+        "unsupported": [
+          "unsupported_language"
+        ]
+      },
+      "native_roll_control": {
+        "effects": [
+          "reroll_permission"
+        ],
+        "unsupported": []
+      },
+      "official_october_clause": {
+        "effects": [],
+        "unsupported": [
+          "unsupported_language"
+        ]
+      },
+      "ungated_hazard_term": {
+        "effects": [],
+        "unsupported": [
+          "unsupported_language"
+        ]
+      }
+    },
+    "compiler_receipt": {
+      "archive_path": "caudit-01-escape-delta-dafbcccd/hazard-reroll-intake-probe.json",
+      "sha256": "32cec451ac13d8d516583192cbf8f02ec51bcc06ccff19ab8feabc6e3d6fe743"
+    },
+    "current_dispositions": {
+      "alias_and_scoped_modifier": "Unchanged blocks. Loaded shocked-only penalty is applied to per-model hazard dice through the existing modifier owner.",
+      "conditional_hazard_reroll": "Open. The official October phrase, older test phrase, and ungated hazard wording have no compiler reroll effect. Alternate Desperate Escape wording compiles, but the live hazard loop exposes no reroll decision. Core Command Re-roll excludes these hazards.",
+      "forced_mode_and_shock": "Existing native evidence. The compiler/source review does not merge the forced pre-move continuation with ordinary after-move Battle-shock.",
+      "guided_retreat": "Source-only faction dependency. October HALO OVERRIDE changed the trigger to Fall Back selection. Retained activation row 000009746006 has the previous post-move trigger, and the detachment contribution remains a scaffold."
+    },
+    "first_two_legacy_blocks_byte_equivalent": true,
+    "next_evidence": "Admitted or explicitly fixture-only HALO OVERRIDE Fall Back with one per-model pre-move hazard rerolled or declined, final-die consequences, restore/replay, and a non-HALO or no-permission control.",
+    "scoped_live_owner_files_sha256": {
+      "src/warhammer40k_core/engine/catalog_desperate_escape.py": "09d0dbb93797192a4fb0471e1a7c4d4c1abf2e16a05b5648a358719894ac52ee",
+      "src/warhammer40k_core/engine/desperate_escape_modifier_evaluation.py": "2f019be36f193d8d3617ebdc5eb6d3dbda99b1a4604010fd96f01b9d91f90ae4",
+      "src/warhammer40k_core/engine/phases/movement_action_decisions.py": "a079b5db1c0cfcd4a23d157c798077497c6aa5ae46d4818bee8a147b1067d30e",
+      "src/warhammer40k_core/engine/phases/movement_fall_back_embark.py": "54092610a2f236c9400b03c42d09de5cfa6338ba10338cc967a22352bbefc296",
+      "src/warhammer40k_core/engine/phases/movement_options_dice.py": "fd638eb64531de161c5f534c726e2fadde961476cc33ee1b23faa8c3a1b0e9b9",
+      "src/warhammer40k_core/engine/phases/movement_resolution_flow.py": "2e71792a4984f45cda1e09d25edd7e20a4522c25428daf25098549f8697671a9"
+    },
+    "source_hashes": {
+      "approved_changelog": "aead0feb7290e89304c0b51a6ec6167ccad1a835a1e6f685c3271ceeda93a8e8",
+      "approved_core_asset": "8971d98f2dd64c9e8f166d774b3a6f57a995f140dc73834be949a172f61c5363",
+      "official_july_chaos_daemons": "818f7ef144691b9eef6b3c5b5d0a39793690af5a958037b7055215e6675e6a2c",
+      "official_launch_core": "f6a2443a44627ac5f0ef08407d29aa5ec7e97339998f05bc35f3ae37bf276833",
+      "official_october_adeptus_mechanicus": "35908c5bfa7bd6428936b00f48ca0c4b666ac14575cdf38341180c23650d0149",
+      "official_universal_august": "e9368c75bf4c9040fa978e7f792080e71d140997def77182dd41e71959185a72",
+      "retained_order135": "a473e270f76d9556c25e68477abf040bc8a7f1a6c21c1fd9d9a0fa960edd627f"
+    },
+    "source_receipt": {
+      "archive_path": "caudit-01-escape-delta-dafbcccd/source-delta-receipt.json",
+      "sha256": "db913aa46f9ee8cef40798c624f5317982577efe84ef37535ef10cbc39d54d30"
+    },
+    "source_rows": {
+      "rule:09:09.07.01:1": {
+        "current": {
+          "blocks": [
+            {
+              "kind": "text",
+              "ordinal": 1,
+              "sha256": "8d4485ce2413aa0f1a453c412126c3a20ffc8a2a8f4e8469eb09c7fc77bb798e"
+            },
+            {
+              "kind": "text",
+              "ordinal": 2,
+              "sha256": "771f24067fac132c15f07e9afd2a089bb7f7ba7eebeada9129cbf01f4d6bf8ff"
+            },
+            {
+              "kind": "text",
+              "ordinal": 3,
+              "sha256": "882d859a9d6b480732aac9bcc1c21b1609c93d35ffeb83b35f8a065e06c08415"
+            },
+            {
+              "kind": "text",
+              "ordinal": 4,
+              "sha256": "6b490a2b36783729764991cf7a67808d4c3aa53659c0269a3430e1c4b90106e5"
+            },
+            {
+              "kind": "text",
+              "ordinal": 5,
+              "sha256": "c32a1ce6f96ad685f69273eab8c4c3c608057dd1276e99474d06e93fa48f8ef3"
+            },
+            {
+              "kind": "text",
+              "ordinal": 6,
+              "sha256": "b33e021d61f68df3edd3896e79c6b45e01962f6734f1c8e360b75c858ab03824"
+            },
+            {
+              "kind": "text",
+              "ordinal": 7,
+              "sha256": "ecd323e90692b01ce42aeb46a48f6cafa7f73a26f839bdcd5b1829b0f1d22377"
+            },
+            {
+              "kind": "text",
+              "ordinal": 8,
+              "sha256": "ffe45e9eab591a07d10e4eb430cc9d34e7e8e9f7cee392d99938e43f473104da"
+            }
+          ],
+          "category": "09",
+          "locator": "09.07.01",
+          "occurrence": 1,
+          "row_id": "rule:09:09.07.01:1",
+          "source_sha256": "9b6d66fe396a8c5aaf4bf3b3222da8979d55865e5c97e756b3c3131c7b7a2b52",
+          "title": "Desperate Escape Test"
+        },
+        "exact_match": false,
+        "retained": {
+          "blocks": [
+            {
+              "kind": "text",
+              "ordinal": 1,
+              "sha256": "8d4485ce2413aa0f1a453c412126c3a20ffc8a2a8f4e8469eb09c7fc77bb798e"
+            },
+            {
+              "kind": "text",
+              "ordinal": 2,
+              "sha256": "771f24067fac132c15f07e9afd2a089bb7f7ba7eebeada9129cbf01f4d6bf8ff"
+            },
+            {
+              "kind": "text",
+              "ordinal": 3,
+              "sha256": "9fadfb98af9f0547923f55a7414050450435579941585b223d5df98cd7525b16"
+            }
+          ],
+          "category": "09",
+          "locator": "09.07.01",
+          "occurrence": 1,
+          "row_id": "rule:09:09.07.01:1",
+          "source_sha256": "6bf4fd4f0ae498fff4f48cc0ded4d5c8e1d7651c66c00c3a81fbb0fe176a476d",
+          "title": "Desperate Escape Test"
+        }
+      },
+      "rule:09:09.07.01:2": {
+        "current": {
+          "blocks": [
+            {
+              "kind": "text",
+              "ordinal": 1,
+              "sha256": "8aa244e707952185838eea0a79acf6f2af67878f860b7e9b69dda4396b0a6f4f"
+            },
+            {
+              "kind": "text",
+              "ordinal": 2,
+              "sha256": "b7cb1dc29cc1efed238e973a6a2b0089323a4028c41ee3763511144dc5049059"
+            },
+            {
+              "kind": "text",
+              "ordinal": 3,
+              "sha256": "fbdb8f2fefacc41b344363aaa6d971682805dc3509d1bd9dd0c5ca92584612eb"
+            }
+          ],
+          "category": "09",
+          "locator": "09.07.01",
+          "occurrence": 2,
+          "row_id": "rule:09:09.07.01:2",
+          "source_sha256": "a86cc93fd5d3a51bc7899c9111bc5b5384e318289083ae4af5a36b19a9a16678",
+          "title": "Desperate Escape"
+        },
+        "exact_match": true,
+        "retained": {
+          "blocks": [
+            {
+              "kind": "text",
+              "ordinal": 1,
+              "sha256": "8aa244e707952185838eea0a79acf6f2af67878f860b7e9b69dda4396b0a6f4f"
+            },
+            {
+              "kind": "text",
+              "ordinal": 2,
+              "sha256": "b7cb1dc29cc1efed238e973a6a2b0089323a4028c41ee3763511144dc5049059"
+            },
+            {
+              "kind": "text",
+              "ordinal": 3,
+              "sha256": "fbdb8f2fefacc41b344363aaa6d971682805dc3509d1bd9dd0c5ca92584612eb"
+            }
+          ],
+          "category": "09",
+          "locator": "09.07.01",
+          "occurrence": 2,
+          "row_id": "rule:09:09.07.01:2",
+          "source_sha256": "a86cc93fd5d3a51bc7899c9111bc5b5384e318289083ae4af5a36b19a9a16678",
+          "title": "Desperate Escape"
+        }
+      },
+      "rule:09:09.07:1": {
+        "current": {
+          "blocks": [
+            {
+              "kind": "text",
+              "ordinal": 1,
+              "sha256": "cc6d8eaa9c0e885a784d1fe68dd469bb42a704969a4f162e702a777f52f71538"
+            },
+            {
+              "kind": "text",
+              "ordinal": 2,
+              "sha256": "efaed1ce5917becb5a59a864b6f6f305dd37eb47d2d57217515cd8c168194fa2"
+            },
+            {
+              "kind": "text",
+              "ordinal": 3,
+              "sha256": "71b6143d5f310205f6d72379853a67a7f27f18983ba7f07ef42b7255d7fca1ee"
+            },
+            {
+              "kind": "text",
+              "ordinal": 4,
+              "sha256": "722c861a2cd0778868be8bdb9cd90031b5806a6b8b946d1c59a658ecd24b506b"
+            },
+            {
+              "kind": "text",
+              "ordinal": 5,
+              "sha256": "68e48f9b4b50181952471f0e79f47da75d03158f8c4a8896eb8f68cedc26240c"
+            },
+            {
+              "kind": "text",
+              "ordinal": 6,
+              "sha256": "1637ad8e901a9990e52ecce687e39af56e3201c2039997ffb58140fafd5ddceb"
+            },
+            {
+              "kind": "text",
+              "ordinal": 7,
+              "sha256": "e71c12176330a1cb6bd961af93620cfe60c68b59704dac7bff9b61bc09d3c041"
+            },
+            {
+              "kind": "text",
+              "ordinal": 8,
+              "sha256": "e3b5a449861b5f4f87f60a8f39adefa149b4b3b5031e94b81656dba922688233"
+            },
+            {
+              "kind": "text",
+              "ordinal": 9,
+              "sha256": "ca90fa8987329bf4863a7c325b6d45c8f39a6e1c604776ff417fc8e16889655d"
+            },
+            {
+              "kind": "text",
+              "ordinal": 10,
+              "sha256": "eeebc152a13fd04424a97836281189fec301c368951c216599430a84fc1bd1ab"
+            },
+            {
+              "kind": "text",
+              "ordinal": 11,
+              "sha256": "93f7fc4c73f4450e9f798302b2574b0462ae4f1e7e6ad9d40f4c7e9d6026a315"
+            },
+            {
+              "kind": "text",
+              "ordinal": 12,
+              "sha256": "7ea44889c11182e5c1b5faa26f13f400d8ae6f5ea372a9efca05e54701bb363a"
+            },
+            {
+              "kind": "text",
+              "ordinal": 13,
+              "sha256": "a820d406efe9a5fa6b1c2a824a32c801971c78ea004febf6d2460318c472ac71"
+            },
+            {
+              "kind": "text",
+              "ordinal": 14,
+              "sha256": "fc57af5c41537c66c0fba008c2f3e38ff40e1bea3cd477f21503f57c5a2850d0"
+            },
+            {
+              "kind": "text",
+              "ordinal": 15,
+              "sha256": "5b373b35b06069cf8f69cd7cdd16704f27a930c2ec5ddc52acffa212c01f32a4"
+            },
+            {
+              "kind": "text",
+              "ordinal": 16,
+              "sha256": "275c4cb105da303b08d54b28d2f1ac19f037f195e5e5426f9bf646c66fb34699"
+            }
+          ],
+          "category": "09",
+          "locator": "09.07",
+          "occurrence": 1,
+          "row_id": "rule:09:09.07:1",
+          "source_sha256": "9a2e9017949710717bf19fcd85f7e4ed9c33a4a3972ee35ee3896b8f084dafd0",
+          "title": "Fall-Back Move"
+        },
+        "exact_match": true,
+        "retained": {
+          "blocks": [
+            {
+              "kind": "text",
+              "ordinal": 1,
+              "sha256": "cc6d8eaa9c0e885a784d1fe68dd469bb42a704969a4f162e702a777f52f71538"
+            },
+            {
+              "kind": "text",
+              "ordinal": 2,
+              "sha256": "efaed1ce5917becb5a59a864b6f6f305dd37eb47d2d57217515cd8c168194fa2"
+            },
+            {
+              "kind": "text",
+              "ordinal": 3,
+              "sha256": "71b6143d5f310205f6d72379853a67a7f27f18983ba7f07ef42b7255d7fca1ee"
+            },
+            {
+              "kind": "text",
+              "ordinal": 4,
+              "sha256": "722c861a2cd0778868be8bdb9cd90031b5806a6b8b946d1c59a658ecd24b506b"
+            },
+            {
+              "kind": "text",
+              "ordinal": 5,
+              "sha256": "68e48f9b4b50181952471f0e79f47da75d03158f8c4a8896eb8f68cedc26240c"
+            },
+            {
+              "kind": "text",
+              "ordinal": 6,
+              "sha256": "1637ad8e901a9990e52ecce687e39af56e3201c2039997ffb58140fafd5ddceb"
+            },
+            {
+              "kind": "text",
+              "ordinal": 7,
+              "sha256": "e71c12176330a1cb6bd961af93620cfe60c68b59704dac7bff9b61bc09d3c041"
+            },
+            {
+              "kind": "text",
+              "ordinal": 8,
+              "sha256": "e3b5a449861b5f4f87f60a8f39adefa149b4b3b5031e94b81656dba922688233"
+            },
+            {
+              "kind": "text",
+              "ordinal": 9,
+              "sha256": "ca90fa8987329bf4863a7c325b6d45c8f39a6e1c604776ff417fc8e16889655d"
+            },
+            {
+              "kind": "text",
+              "ordinal": 10,
+              "sha256": "eeebc152a13fd04424a97836281189fec301c368951c216599430a84fc1bd1ab"
+            },
+            {
+              "kind": "text",
+              "ordinal": 11,
+              "sha256": "93f7fc4c73f4450e9f798302b2574b0462ae4f1e7e6ad9d40f4c7e9d6026a315"
+            },
+            {
+              "kind": "text",
+              "ordinal": 12,
+              "sha256": "7ea44889c11182e5c1b5faa26f13f400d8ae6f5ea372a9efca05e54701bb363a"
+            },
+            {
+              "kind": "text",
+              "ordinal": 13,
+              "sha256": "a820d406efe9a5fa6b1c2a824a32c801971c78ea004febf6d2460318c472ac71"
+            },
+            {
+              "kind": "text",
+              "ordinal": 14,
+              "sha256": "fc57af5c41537c66c0fba008c2f3e38ff40e1bea3cd477f21503f57c5a2850d0"
+            },
+            {
+              "kind": "text",
+              "ordinal": 15,
+              "sha256": "5b373b35b06069cf8f69cd7cdd16704f27a930c2ec5ddc52acffa212c01f32a4"
+            },
+            {
+              "kind": "text",
+              "ordinal": 16,
+              "sha256": "275c4cb105da303b08d54b28d2f1ac19f037f195e5e5426f9bf646c66fb34699"
+            }
+          ],
+          "category": "09",
+          "locator": "09.07",
+          "occurrence": 1,
+          "row_id": "rule:09:09.07:1",
+          "source_sha256": "9a2e9017949710717bf19fcd85f7e4ed9c33a4a3972ee35ee3896b8f084dafd0",
+          "title": "Fall-Back Move"
+        }
+      }
+    }
+  },
+  "historical": {
+    "prior_755_inventory": {
+      "path": "../successor-inventory.json",
+      "sha256": "f4bf2ec918853cd2c9e1d8505ce24d6c8b013bed9a454754ace4ce9c3393e91d"
+    },
+    "prior_batch_files_sha256": {
+      "data/source_audits/caudit_01_successors/batch-2/historical-reconciliation.json": "4ead6121300b63b6dc8763f907a93b6c86170cccbfe55f8a50a52ed310847669",
+      "data/source_audits/caudit_01_successors/batch-2/open-evidence.json": "0462a801c4c0adfaf93eeba2a4866f35f2960985b9014b268315b14603da0eb7",
+      "data/source_audits/caudit_01_successors/batch-2/source-adoption-map.json": "6cdf44e9075da865b859f7d00edc5e447ab8e9f9fcfd81b2eedb6b6ee4bec5a0",
+      "data/source_audits/caudit_01_successors/batch-2/successor-evidence.json": "b8470c8120aec1d37ba72359d9e7376d57e55d3083c07f588aac20d1ba75ff35"
+    },
+    "prior_execution_commits": [
+      "55eef9b20652b030d3ab3e9b85755e0acd7c2d49",
+      "dec50bca2394c755a0d5fb76e6659882b388c032"
+    ],
+    "reconciliation_rows": 1083,
+    "source_index_inputs_byte_matched": 353
+  },
+  "main_covered_ci": {
+    "attempt": 1,
+    "durations_sha256": "0efd2fc79cca4ffee955b40349e20128d53a406b240ba7df997d2f08e18328d3",
+    "execution_commit": "dafbcccdd31d5532c0d58aceac43901e60326d36",
+    "run": 45794399001,
+    "selected_case_weights": 6819,
+    "status": "success"
+  },
+  "merged_753": {
+    "admitted_cases": [
+      "tests/rules/section09/test_native_ordered_retreat.py::test_forced_escape_restore_rejects_invented_pretest_shock",
+      "tests/rules/section09/test_native_ordered_retreat.py::test_native_ordered_retreat_resolves_and_replays[excluded-monster]",
+      "tests/rules/section09/test_native_ordered_retreat.py::test_native_ordered_retreat_resolves_and_replays[outside-shadow]",
+      "tests/rules/section09/test_native_ordered_retreat.py::test_native_ordered_retreat_resolves_and_replays[territorial-terror]",
+      "tests/rules/section09/test_native_ordered_retreat.py::test_native_ordered_retreat_with_active_walker_objective_control[fail-and-wounds]",
+      "tests/rules/section09/test_native_ordered_retreat.py::test_native_ordered_retreat_with_active_walker_objective_control[pass-and-restore]",
+      "tests/rules/section09/test_native_ordered_retreat.py::test_native_ordered_retreat_with_active_walker_objective_control[terror-casualty-before-hazards]",
+      "tests/rules/section09/test_native_ordered_retreat.py::test_second_forced_retreat_uses_only_territory_contributors"
+    ],
+    "assertions_by_function": {
+      "test_forced_escape_restore_rejects_invented_pretest_shock": [
+        {
+          "assertion": "with pytest.raises(GameLifecycleError, match='Forced Desperate Escape pre-test Battle-shock state drifted'):",
+          "line": 397
+        }
+      ],
+      "test_native_ordered_retreat_resolves_and_replays": [
+        {
+          "assertion": "assert source['ability_id'] == f'{BLOODLETTERS}:bane-of-cowards'",
+          "line": 168
+        },
+        {
+          "assertion": "assert [row['model_instance_id'] for row in hazards] == (list(subject.own_model_ids()) if forced else [])",
+          "line": 180
+        },
+        {
+          "assertion": "assert len(tests) == int(forced)",
+          "line": 184
+        },
+        {
+          "assertion": "assert [modifier.operand for modifier in outcome.modified_roll.modifiers] == ([-1] if terror else [])",
+          "line": 193
+        },
+        {
+          "assertion": "assert events(current, 'movement_activation_completed') == []",
+          "line": 199
+        },
+        {
+          "assertion": "assert completed['fall_back_mode'] == mode",
+          "line": 241
+        },
+        {
+          "assertion": "assert _positions(current) == ends",
+          "line": 242
+        },
+        {
+          "assertion": "assert session.to_persistence_payload() == restored.to_persistence_payload()",
+          "line": 244
+        },
+        {
+          "assertion": "assert replay.reproduced_exactly, replay.to_payload()",
+          "line": 247
+        }
+      ],
+      "test_native_ordered_retreat_with_active_walker_objective_control": [
+        {
+          "assertion": "assert {score.player_id: score.score for score in objective.scores} == {'owner': 14, 'opponent': 20}",
+          "line": 612
+        },
+        {
+          "assertion": "assert len(events(session, 'desperate_escape_roll_resolved')) == 10",
+          "line": 625
+        },
+        {
+          "assertion": "assert outcome.passed is passed",
+          "line": 630
+        },
+        {
+          "assertion": "assert [modifier.operand for modifier in outcome.modified_roll.modifiers] == [-1]",
+          "line": 634
+        },
+        {
+          "assertion": "assert boss_nob in checkpoint.battlefield_state.removed_model_ids",
+          "line": 674
+        },
+        {
+          "assertion": "assert completed['unit_instance_id'] == SUBJECT",
+          "line": 691
+        },
+        {
+          "assertion": "assert completed['prior_battle_shock_casualty_ids'] == [boss_nob]",
+          "line": 694
+        },
+        {
+          "assertion": "assert [event_types.index(kind) for kind in ordering] == sorted((event_types.index(kind) for kind in ordering))",
+          "line": 711
+        },
+        {
+          "assertion": "assert {model.model_instance_id: model.pose for model in placed.model_placements} == {model_id: pose for model_id, pose in expected_ends.items() if model_id not in battlefield.removed_model_ids}",
+          "line": 722
+        },
+        {
+          "assertion": "assert replay.reproduced_exactly, replay.to_payload()",
+          "line": 731
+        }
+      ],
+      "test_second_forced_retreat_uses_only_territory_contributors": [
+        {
+          "assertion": "assert [modifier.operand for modifier in result.modified_roll.modifiers] == [-1]",
+          "line": 321
+        },
+        {
+          "assertion": "assert hazard_progress.application_id == f'desperate-escape:{second.request_id}:hazards'",
+          "line": 336
+        },
+        {
+          "assertion": "assert [row['unit_instance_id'] for row in completed] == ['own:outside', SUBJECT]",
+          "line": 352
+        },
+        {
+          "assertion": "assert session.to_persistence_payload() == restored.to_persistence_payload()",
+          "line": 355
+        },
+        {
+          "assertion": "assert replay.reproduced_exactly, replay.to_payload()",
+          "line": 360
+        }
+      ]
+    },
+    "ci": [
+      {
+        "execution_commit": "8701bad9b384ab2ed6987c472c29dec0cbac7e54",
+        "execution_tree": "24e6b8c84c76e6839d98c23846b331768b90c98e",
+        "observed_outcomes": {
+          "passed": 6808
+        },
+        "relevant_reports": [
+          {
+            "file": "behavior-report-8/behavior-shard-8.xml",
+            "passing_case_ids": [
+              "tests/rules/section09/test_native_ordered_retreat.py::test_forced_escape_restore_rejects_invented_pretest_shock",
+              "tests/rules/section09/test_native_ordered_retreat.py::test_native_ordered_retreat_resolves_and_replays[excluded-monster]",
+              "tests/rules/section09/test_native_ordered_retreat.py::test_native_ordered_retreat_resolves_and_replays[outside-shadow]",
+              "tests/rules/section09/test_native_ordered_retreat.py::test_native_ordered_retreat_resolves_and_replays[territorial-terror]",
+              "tests/rules/section09/test_native_ordered_retreat.py::test_native_ordered_retreat_with_active_walker_objective_control[fail-and-wounds]",
+              "tests/rules/section09/test_native_ordered_retreat.py::test_native_ordered_retreat_with_active_walker_objective_control[pass-and-restore]",
+              "tests/rules/section09/test_native_ordered_retreat.py::test_native_ordered_retreat_with_active_walker_objective_control[terror-casualty-before-hazards]",
+              "tests/rules/section09/test_native_ordered_retreat.py::test_second_forced_retreat_uses_only_territory_contributors"
+            ],
+            "sha256": "4d2bea6ecee7c2b4403daf90378ebda6734cdd3a653bbb35399fafeaff935d11"
+          }
+        ],
+        "run": 45772487243,
+        "successful_attempt": 1
+      },
+      {
+        "execution_commit": "f7fcd013ae67b51945beb4dc71c57edbb2b0015e",
+        "execution_tree": "24e6b8c84c76e6839d98c23846b331768b90c98e",
+        "observed_outcomes": {
+          "passed": 6808
+        },
+        "relevant_reports": [
+          {
+            "file": "behavior-report-8/behavior-shard-8.xml",
+            "passing_case_ids": [
+              "tests/rules/section09/test_native_ordered_retreat.py::test_forced_escape_restore_rejects_invented_pretest_shock",
+              "tests/rules/section09/test_native_ordered_retreat.py::test_native_ordered_retreat_resolves_and_replays[excluded-monster]",
+              "tests/rules/section09/test_native_ordered_retreat.py::test_native_ordered_retreat_resolves_and_replays[outside-shadow]",
+              "tests/rules/section09/test_native_ordered_retreat.py::test_native_ordered_retreat_resolves_and_replays[territorial-terror]",
+              "tests/rules/section09/test_native_ordered_retreat.py::test_native_ordered_retreat_with_active_walker_objective_control[fail-and-wounds]",
+              "tests/rules/section09/test_native_ordered_retreat.py::test_native_ordered_retreat_with_active_walker_objective_control[pass-and-restore]",
+              "tests/rules/section09/test_native_ordered_retreat.py::test_native_ordered_retreat_with_active_walker_objective_control[terror-casualty-before-hazards]",
+              "tests/rules/section09/test_native_ordered_retreat.py::test_second_forced_retreat_uses_only_territory_contributors"
+            ],
+            "sha256": "ed380d9ba3b989a14beb0ece4e6d9542f516e3c5a955fb7ad9ef776888969076"
+          }
+        ],
+        "run": 45776260953,
+        "successful_attempt": 1
+      }
+    ],
+    "file_sha256": "ea2519924090e02c7284844a18db5655c6dc899009e4e8a78b4f5347ab521fed",
+    "finite_admission_path": "data/source_audits/ci64_provenance_v1/daemonic-terror-ordered-retreat-v1.json",
+    "finite_admission_sha256": "68e641b2079eaeff94bc4c0724d5662293682512e276bd72dfbf936b60b64c2e",
+    "main_compatible_file_sha256": {
+      "src/warhammer40k_core/engine/battle_shock_event_authority.py": "fcafc67f3d7a0253b811850b52636f9e4908213e26e523374505270a38c1579c",
+      "src/warhammer40k_core/engine/battle_shock_historical_authority.py": "5612a79c036f0f802659a225a29b036044c76f2c742b5859f35d313a139de08f",
+      "src/warhammer40k_core/engine/battle_shock_hooks.py": "fad64bae0f3f02b334ac55b3b1d6a9a5d5c5f63d660b460b014bf59f03afd863",
+      "src/warhammer40k_core/engine/battle_shock_lifecycle_authority.py": "7cf972e7f35c03659987b4eeed46353e2482e2f0519b168853a9b0a0eaf844b5",
+      "src/warhammer40k_core/engine/battle_shock_source_family_authority.py": "74f852b834a1ba310251bc7b2dec95ae7454ec99348160edd1dabe2ced9c22d8",
+      "src/warhammer40k_core/engine/catalog_selected_target_battle_shock_continuation.py": "5d1d9fec1aea088643c2e7b930f5d7f9c6d107ba85bb02f2387d3eeffce1e29a",
+      "src/warhammer40k_core/engine/faction_content/bundle.py": "5356f317a50cf64913c911dea9a98f265cbd5d1245b44eb0045492867e7ba9cc",
+      "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/army_rule.py": "8ecba93a2d491edc94550b81aae63a55a9ee78d36f7e5ffd5b42f6ebf5d28d3e",
+      "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/battle_shock_outcome_authority.py": "f36568758285aabc26165f8b7e40610878bebc6cec447bb7dd6cc1754dc0a0a8",
+      "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/battle_shock_territory_authority.py": "eb22292bbebc11c3377e21165618c7f09b0bf0169f2302696208a0130ee0ef51",
+      "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/tyranids/army_rule_modifier_continuation.py": "b7fb0a0f862c77bffae6a6ae83aec8f58607bf3324c4fd05fea6dcd40e0bf570",
+      "src/warhammer40k_core/engine/generic_effect_history.py": "7820884ede8265f530da88eb8f3e7dc704cb621becaf55ed44c5f6c843143524",
+      "src/warhammer40k_core/engine/movement_decision_authority.py": "8397bb5f30fd3560708cff3067758bb698e6d99d12dc7bd1a97f3e6f3e478b28",
+      "src/warhammer40k_core/engine/phases/movement_battle_shock_continuation.py": "c73580f62fa56a249377b86d00998c1939bd5c8911624981ae4d3c23a5cff37c",
+      "src/warhammer40k_core/engine/phases/movement_escape_mortals.py": "a6628a5a662f70acd4e84dd70e545af9891b0c5ed72e2d5337254d8a87445668",
+      "src/warhammer40k_core/engine/phases/movement_fall_back_embark.py": "54092610a2f236c9400b03c42d09de5cfa6338ba10338cc967a22352bbefc296",
+      "src/warhammer40k_core/engine/phases/movement_state.py": "6c7fb5cb7d2057db51490225e53795b172d7bbfb31be31e6dc3b674149f63752",
+      "src/warhammer40k_core/engine/runtime_characteristic_modifiers.py": "61ab8edaa347acedaf23b481f38fd67ea98522ecee75e0c72da331aa454978a2",
+      "tests/rules/section09/test_native_ordered_retreat.py": "ea2519924090e02c7284844a18db5655c6dc899009e4e8a78b4f5347ab521fed"
+    },
+    "merge_commit": "f7fcd013ae67b51945beb4dc71c57edbb2b0015e",
+    "merge_tree": "24e6b8c84c76e6839d98c23846b331768b90c98e",
+    "pr_head": "8701bad9b384ab2ed6987c472c29dec0cbac7e54",
+    "scope": "Territorial, outside-Shadow and MONSTER branches, exact restore and replay, second retreat, forged history, and active Walker OC pass, fail and casualty controls.",
+    "test_file": "tests/rules/section09/test_native_ordered_retreat.py"
+  },
+  "merged_756": {
+    "admitted_cases": [
+      "tests/rules/section12/test_counteroffensive_fight_type.py::test_counteroffensive_preserves_native_fight_type[decline]",
+      "tests/rules/section12/test_counteroffensive_fight_type.py::test_counteroffensive_preserves_native_fight_type[normal]",
+      "tests/rules/section12/test_counteroffensive_fight_type.py::test_counteroffensive_preserves_native_fight_type[overrun]",
+      "tests/rules/section12/test_counteroffensive_fight_type.py::test_counteroffensive_preserves_native_fight_type[single-overrun]",
+      "tests/rules/section12/test_counteroffensive_fight_type.py::test_counteroffensive_resolves_dark_pact_before_melee"
+    ],
+    "assertions_by_function": {
+      "_complete_paid_fight": [
+        {
+          "assertion": "assert request.actor_id == 'owner'",
+          "line": 361
+        },
+        {
+          "assertion": "assert request.payload['ordering_band'] == ordering_band",
+          "line": 363
+        },
+        {
+          "assertion": "assert request.options[0].option_id == f'fight:normal:{NEXT_OWNER}'",
+          "line": 365
+        },
+        {
+          "assertion": "assert not session.lifecycle.reaction_queue.frames",
+          "line": 373
+        },
+        {
+          "assertion": "assert result.status_kind is not LifecycleStatusKind.INVALID, result",
+          "line": 382
+        }
+      ],
+      "_reject_changed_paid_choice": [
+        {
+          "assertion": "with pytest.raises(GameLifecycleError, match='Counteroffensive Fight choice'):",
+          "line": 353
+        }
+      ],
+      "_restore": [
+        {
+          "assertion": "assert restored.to_persistence_payload() == payload",
+          "line": 162
+        }
+      ],
+      "test_counteroffensive_preserves_native_fight_type": [
+        {
+          "assertion": "assert state.command_point_total(REACTOR) == (4 if branch == 'decline' else 2)",
+          "line": 200
+        },
+        {
+          "assertion": "assert late_options == [f'fight:normal:{LATE}', f'fight:overrun:{LATE}']",
+          "line": 207
+        },
+        {
+          "assertion": "assert use.command_point_cost == 2",
+          "line": 213
+        },
+        {
+          "assertion": "assert effect.expiration == EffectExpiration.end_phase(battle_round=1, phase=BattlePhase.FIGHT, player_id='owner')",
+          "line": 223
+        },
+        {
+          "assertion": "assert state.fight_phase_state.active_activation is None",
+          "line": 228
+        },
+        {
+          "assertion": "assert [option.option_id for option in request.options] == [f'fight:normal:{LATE}', f'fight:overrun:{LATE}']",
+          "line": 231
+        },
+        {
+          "assertion": "assert _viewer_request(session, viewer) == choice",
+          "line": 247
+        },
+        {
+          "assertion": "assert activation.unit_instance_id == LATE",
+          "line": 268
+        },
+        {
+          "assertion": "assert activation.fight_type.value == expected_type",
+          "line": 270
+        },
+        {
+          "assertion": "assert activation.interrupt_id == f'counteroffensive:{use.use_id}'",
+          "line": 273
+        },
+        {
+          "assertion": "assert state.stratagem_use_records == [use]",
+          "line": 276
+        },
+        {
+          "assertion": "assert fork.lifecycle.to_payload() == restored.lifecycle.to_payload()",
+          "line": 288
+        },
+        {
+          "assertion": "assert pile_in.context['fight_movement_timing'] == 'overrun'",
+          "line": 297
+        },
+        {
+          "assertion": "assert state.fight_phase_state.overrun_pile_in_is_completed(activation_result_id=activation.result_id)",
+          "line": 312
+        }
+      ],
+      "test_counteroffensive_resolves_dark_pact_before_melee": [
+        {
+          "assertion": "assert state.command_point_total('player-b') == 0",
+          "line": 443
+        },
+        {
+          "assertion": "assert [option.label for option in commitment.options] == ['Decline Dark Pact', 'Make a Dark Pact']",
+          "line": 447
+        },
+        {
+          "assertion": "assert resolved['passed'] is True",
+          "line": 464
+        },
+        {
+          "assertion": "assert pending(session).decision_type == 'submit_melee_declaration'",
+          "line": 475
+        }
+      ]
+    },
+    "ci": [
+      {
+        "execution_commit": "ad9f097523acfa6a070fbcd8cf2055ddc6b485b4",
+        "execution_tree": "58bc881c580a8f1c566dd961562bf27efcd5f798",
+        "observed_outcomes": {
+          "passed": 6813
+        },
+        "relevant_reports": [
+          {
+            "file": "behavior-report-10/behavior-shard-10.xml",
+            "passing_case_ids": [
+              "tests/rules/section12/test_counteroffensive_fight_type.py::test_counteroffensive_preserves_native_fight_type[decline]",
+              "tests/rules/section12/test_counteroffensive_fight_type.py::test_counteroffensive_preserves_native_fight_type[normal]",
+              "tests/rules/section12/test_counteroffensive_fight_type.py::test_counteroffensive_preserves_native_fight_type[overrun]",
+              "tests/rules/section12/test_counteroffensive_fight_type.py::test_counteroffensive_preserves_native_fight_type[single-overrun]",
+              "tests/rules/section12/test_counteroffensive_fight_type.py::test_counteroffensive_resolves_dark_pact_before_melee"
+            ],
+            "sha256": "511fe34120ce467d43689755b08d5411ff413e7a2196a1864e8afc81b1685e57"
+          }
+        ],
+        "run": 45782190919,
+        "successful_attempt": 1
+      },
+      {
+        "execution_commit": "098847346d8f554323a6417ede02a06eaa2613d6",
+        "execution_tree": "58bc881c580a8f1c566dd961562bf27efcd5f798",
+        "observed_outcomes": {
+          "passed": 6813
+        },
+        "relevant_reports": [
+          {
+            "file": "behavior-report-10/behavior-shard-10.xml",
+            "passing_case_ids": [
+              "tests/rules/section12/test_counteroffensive_fight_type.py::test_counteroffensive_preserves_native_fight_type[decline]",
+              "tests/rules/section12/test_counteroffensive_fight_type.py::test_counteroffensive_preserves_native_fight_type[normal]",
+              "tests/rules/section12/test_counteroffensive_fight_type.py::test_counteroffensive_preserves_native_fight_type[overrun]",
+              "tests/rules/section12/test_counteroffensive_fight_type.py::test_counteroffensive_preserves_native_fight_type[single-overrun]",
+              "tests/rules/section12/test_counteroffensive_fight_type.py::test_counteroffensive_resolves_dark_pact_before_melee"
+            ],
+            "sha256": "8fcfba44bc923bef1e17b203583bbd75c5c59498cce70c3c43db7a4c957012fb"
+          }
+        ],
+        "run": 45785544897,
+        "successful_attempt": 2
+      }
+    ],
+    "file_sha256": "55e7baac304ecd4796e9a624275b67b39f100a92658ca72b20a92489cd39748e",
+    "finite_admission_path": "data/source_audits/ci64_provenance_v1/counteroffensive-fight-type-v1.json",
+    "finite_admission_sha256": "e9b0e313baa71a2965d152b6649e9ea045273a8bc14c4ce084ee7db64dbdcdd7",
+    "first_attempt_preserved": {
+      "attempt": 1,
+      "junit_verification_sha256": "83e553756be758ffeb0916f31f28e9d79054dbbe40af725c57038bc89654d003",
+      "outcomes": {
+        "error": 1,
+        "passed": 6812
+      },
+      "run": 45785544897
+    },
+    "main_compatible_file_sha256": {
+      "src/warhammer40k_core/engine/fight_activation_requests.py": "8c61e7de0e2f8c51a480782c1ca9e68b8f40b009bc3a0bb0dacdd66acaa75777",
+      "src/warhammer40k_core/engine/fight_order.py": "8937a8178db5ab185c1c3574accbf21b469ed0b4620b3a273985d3da4bebd7d4",
+      "src/warhammer40k_core/engine/lifecycle.py": "c93e1464838747360fa1ef1a1efc3b6ce20ea695567dce1b8a0f88432243e050",
+      "src/warhammer40k_core/engine/lifecycle_reaction_queue.py": "eee9e014714e49b20f6fcdf3f823ccb460e5539a21224c81674ec3e49061f9e8",
+      "src/warhammer40k_core/engine/phases/fight.py": "45a3a1143366cbebb27e629e069c65890dd7eb8d2413f6cab7a9ed292bf08fcd",
+      "src/warhammer40k_core/engine/stratagems_effect_handlers.py": "1a7115ec1131b04a9d52dcb89585d3af35992798020079ad64105cb813469306",
+      "tests/rules/section12/test_counteroffensive_fight_type.py": "55e7baac304ecd4796e9a624275b67b39f100a92658ca72b20a92489cd39748e"
+    },
+    "merge_commit": "098847346d8f554323a6417ede02a06eaa2613d6",
+    "merge_tree": "58bc881c580a8f1c566dd961562bf27efcd5f798",
+    "pr_head": "ad9f097523acfa6a070fbcd8cf2055ddc6b485b4",
+    "scope": "Compare decline, paid Normal and Overrun, and sole Overrun. The latter supplies the Charge as a fixture premise. The named expiry descriptor and return to ordinary same-band selection do not exercise phase-end expiry.",
+    "successful_attempt_retained_report_provenance_sha256": "e807577bb6b8781d0a74ea15ae2c851bc98350cced622d46996a680c4feefee3",
+    "test_file": "tests/rules/section12/test_counteroffensive_fight_type.py"
+  },
+  "pending_759": {
+    "observed_head": "654cfd7bf073db0f34b830340003b39c40338a3d",
+    "qualification": "Separate six-failure qualification remains unresolved. No runtime or test evidence from #759 is attributed to this main or the overlay.",
+    "state": "open_draft_unmerged"
+  },
+  "reviewed_main": "dafbcccdd31d5532c0d58aceac43901e60326d36",
+  "reviewed_main_tree": "b660a4fcb0bfdb92e5d14d40a4727fed7f8ec305",
+  "schema": "caudit-01-batch-2-main-follow-up-v1",
+  "scratch_precision_devastating": {
+    "admission_limit": "The companion two-case regression remains unadmitted. The historical inactive case and all base weights are preserved. This fixed-count witness is separate from the pending #759 benchmark.",
+    "admitted_integrated_regression": false,
+    "branches": {
+      "declined": {
+        "discarded_wounds": 1,
+        "event_offsets": {
+          "applied": 54,
+          "completed": 62,
+          "deferred": 37,
+          "successful_ordinary_save": 42
+        },
+        "mortal_application_model": "army-beta:bodyguard-unit:core-intercessor-like:001",
+        "mortal_wound_steps": [
+          [
+            2,
+            1
+          ],
+          [
+            1,
+            0
+          ]
+        ],
+        "normal_damage_model": null,
+        "normal_wound_change": null,
+        "packet_wounds": 3,
+        "seed": 18
+      },
+      "selected": {
+        "discarded_wounds": 1,
+        "event_offsets": {
+          "applied": 50,
+          "completed": 54,
+          "deferred": 37,
+          "normal_damage": 41
+        },
+        "mortal_application_model": "army-beta:leader-unit:core-character-leader:001",
+        "mortal_wound_steps": [
+          [
+            2,
+            1
+          ],
+          [
+            1,
+            0
+          ]
+        ],
+        "normal_damage_model": "army-beta:leader-unit:core-character-leader:001",
+        "normal_wound_change": [
+          5,
+          2
+        ],
+        "packet_wounds": 3,
+        "seed": 18
+      },
+      "selected_group_destroyed": {
+        "discarded_wounds": 1,
+        "event_offsets": {
+          "applied": 58,
+          "completed": 66,
+          "deferred": 35,
+          "normal_damage": 41
+        },
+        "mortal_application_model": "army-beta:bodyguard-unit:core-intercessor-like:001",
+        "mortal_wound_steps": [
+          [
+            2,
+            1
+          ],
+          [
+            1,
+            0
+          ]
+        ],
+        "normal_damage_model": "army-beta:leader-unit:core-character-leader:001",
+        "normal_wound_change": [
+          3,
+          0
+        ],
+        "packet_wounds": 3,
+        "seed": 25
+      }
+    },
+    "exact_restored_selected_continuation": true,
+    "execution_commit": "dafbcccdd31d5532c0d58aceac43901e60326d36",
+    "execution_tree": "b660a4fcb0bfdb92e5d14d40a4727fed7f8ec305",
+    "historical_selected_disposition": "missing",
+    "matched_source_row": {
+      "blocks": [
+        {
+          "kind": "text",
+          "ordinal": 1,
+          "sha256": "5a0606f338b5d47b6a2356ee9c9d359dff627f1881909fe337d1598eca9f7f15"
+        }
+      ],
+      "category": "24",
+      "locator": "24.28.01",
+      "occurrence": 1,
+      "row_id": "rule:24:24.28.01:1",
+      "source_sha256": "0833673676aaebf5a7f6088354cde2f96e29aadb01bbf1fbaa6ecde3cc100185",
+      "title": "Precision and Devastating Wounds"
+    },
+    "receipts": {
+      "selected_group_destroyed": {
+        "archive_path": "precision-devastating-dafbcccd/precision-destroyed-group.json",
+        "sha256": "a39eee003411941086a8d5ba8f56a9be8443b42abbf87c89eb4bd9cf0485989e"
+      },
+      "selection_decline_and_restore": {
+        "archive_path": "precision-devastating-dafbcccd/combined-precision-devastating.json",
+        "sha256": "b4dc3f27b8e05588e8dce5f523be78ae3c161535ef5c31262596873824b2dc7b"
+      }
+    },
+    "reproducers": [
+      {
+        "archive_path": "precision-devastating-dafbcccd/precision_devastating_probe.py",
+        "sha256": "697035fcb4f1ba6149999dee2c144a474bf0f01fee63eb9f89703f1bdbe0e7a1"
+      },
+      {
+        "archive_path": "precision-devastating-dafbcccd/precision_destroyed_group_probe.py",
+        "sha256": "4d6f2a183b473da190cd31c45ea30be29a967950c915b3c516da0617cd38f42c"
+      }
+    ],
+    "scope": "Scratch execution of native engine decisions with a substituted Exitus pistol profile and prepared canonical attached Shooting state. No roster-backed Vindicare admission. No execution of the #759 random-count window in this trace.",
+    "section_24_acceptance_id": "S24-071",
+    "strict_replay": {
+      "allocation_frontier": "reproduced",
+      "declined": "reproduced",
+      "positive": "reproduced",
+      "selected_group_destroyed": "reproduced"
+    },
+    "verified_fixture_and_owner_files_sha256": {
+      "src/warhammer40k_core/adapters/local_session.py": "56b4ad32be565a761e1172418211446c88cf8149c04581d2626abd77730461b9",
+      "src/warhammer40k_core/engine/attack_sequence_deferred_mortals.py": "8e48f057ec07b80068c6b6239fb9b4885cbcdb8625f74e12c3d824480abeaee8",
+      "src/warhammer40k_core/engine/attack_sequence_group_selection.py": "f9a8846b62b5879589c98b38dbe572c585194d2a976888c4a7421e3a66176db9",
+      "src/warhammer40k_core/engine/replay.py": "a47d3588f5f073347ca2096fc038c06027bbd6d1c3050e0f418aaa01825efbcc",
+      "tests/phase13b_shooting_declaration_helpers.py": "b72f14b6736b0dead2f3bd673b9b1e6e8ecd5b7ed93439890a142e3bfd107313",
+      "tests/phase15c_fight_order_helpers.py": "cded3fe1bc843f035624743a3969d1034ef4b9ec15b41e664676b61b4d8dce0d",
+      "tests/psychic_modifier_helpers.py": "59887e626e00bd0c66dce710d235444db3a81736a07dc94eed2a29ba30b6b099",
+      "tests/support/private_randomness.py": "385375b1759730d4ae2d1a31483f28b0e8bd04d4edf911dc762ca40f623015f7"
+    }
+  }
+}

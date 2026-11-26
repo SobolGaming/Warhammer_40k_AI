@@ -465,7 +465,10 @@ def _counteroffensive_test_successor(
 
 
 def _stage2_melee_restore_successor(
-    root: Path, *, current_tests: TestSuccessors | None
+    root: Path,
+    *,
+    current_tests: TestSuccessors | None,
+    current_sources: SourceSuccessors,
 ) -> tuple[str, TestSuccessors, bytes]:
     raw = _checked_bytes(root, STAGE2_MELEE_RESTORE_TRANSITION, STAGE2_MELEE_RESTORE_SHA256)
     record = json.loads(raw, object_pairs_hook=_selection_object)
@@ -492,7 +495,7 @@ def _stage2_melee_restore_successor(
             raise SystemExit(
                 "Stage 2 melee restore requires exact before and after source digests."
             )
-        _checked_bytes(root, name, change["after"])
+        _retained_source(root, name, change["after"], current_sources)
     tests = _selection_members(
         {name: row["after"] for name, row in record["test"].items()},
         root,
@@ -595,6 +598,8 @@ def engine_numerical_identity_test_transition(
 
 def _pending_battle_shock_source_transition(
     root: Path,
+    *,
+    current_sources: SourceSuccessors,
 ) -> tuple[str, str, SourceSuccessors, bytes] | None:
     name = "data/source_audits/ci64_provenance_v1/stage2-pending-battle-shock-transition-v1.json"
     path = root / name
@@ -635,7 +640,7 @@ def _pending_battle_shock_source_transition(
     for source, change in sources.items():
         if change.keys() != {"before", "after"}:
             raise SystemExit("Pending Battle-shock transition requires exact source digests.")
-        _checked_bytes(root, source, change["after"])
+        _retained_source(root, source, change["after"], current_sources)
     return record["retained_runtime_fingerprint"], record["runtime_fingerprint"], sources, raw
 
 
@@ -1345,6 +1350,176 @@ def _charge_cp_test_addition(root: Path) -> tuple[_ChargeCpTestAddition, bytes] 
     return record, raw
 
 
+DAEMONIC_TERROR_TRANSITION = (
+    "data/source_audits/ci64_provenance_v1/daemonic-terror-ordered-retreat-v1.json"
+)
+DAEMONIC_TERROR_TRANSITION_SHA256 = (
+    "68e641b2079eaeff94bc4c0724d5662293682512e276bd72dfbf936b60b64c2e"
+)
+DAEMONIC_TERROR_OWNER = "tests/rules/section09/test_native_ordered_retreat.py"
+
+
+DAEMONIC_TERROR_CASES = (
+    *(
+        f"test_native_ordered_retreat_resolves_and_replays[{case}]"
+        for case in ("territorial-terror", "outside-shadow", "excluded-monster")
+    ),
+    "test_second_forced_retreat_uses_only_territory_contributors",
+    "test_forced_escape_restore_rejects_invented_pretest_shock",
+    "test_native_ordered_retreat_with_active_walker_objective_control[fail-and-wounds]",
+    "test_native_ordered_retreat_with_active_walker_objective_control[pass-and-restore]",
+    "test_native_ordered_retreat_with_active_walker_objective_control[terror-casualty-before-hazards]",
+)
+DAEMONIC_TERROR_SOURCES = {
+    ROUND_FIVE_SHADOW_SOURCES[0],
+    ROUND4_BATTLE_SHOCK_TERRITORY_SOURCE,
+    "src/warhammer40k_core/engine/battle_shock_source_family_authority.py",
+    "src/warhammer40k_core/engine/generic_effect_history.py",
+    "src/warhammer40k_core/engine/phases/movement_battle_shock_continuation.py",
+    "src/warhammer40k_core/engine/battle_shock_event_authority.py",
+    "src/warhammer40k_core/engine/battle_shock_historical_authority.py",
+    "src/warhammer40k_core/engine/battle_shock_hooks.py",
+    "src/warhammer40k_core/engine/battle_shock_lifecycle_authority.py",
+    "src/warhammer40k_core/engine/catalog_selected_target_battle_shock_continuation.py",
+    "src/warhammer40k_core/engine/faction_content/bundle.py",
+    "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/battle_shock_outcome_authority.py",
+    "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/tyranids/army_rule_modifier_continuation.py",
+    "src/warhammer40k_core/engine/movement_decision_authority.py",
+    "src/warhammer40k_core/engine/phases/movement_escape_mortals.py",
+    "src/warhammer40k_core/engine/phases/movement_fall_back_embark.py",
+    "src/warhammer40k_core/engine/phases/movement_state.py",
+    "src/warhammer40k_core/engine/runtime_characteristic_modifiers.py",
+}
+
+
+class _DaemonicTerrorTransition(TypedDict):
+    schema: str
+    base: str
+    retained_charge_cp_sha256: str
+    retained_runtime_fingerprint: str
+    runtime_fingerprint: str
+    runtime_manifest: dict[str, str]
+    source: SourceSuccessors
+    added_files: TestSuccessors
+    added_cases: list[str]
+
+
+def _daemonic_terror_transition(root: Path) -> tuple[_DaemonicTerrorTransition, bytes] | None:
+    path = root / DAEMONIC_TERROR_TRANSITION
+    _selection_no_links(root, path)
+    if not path.exists():
+        return None
+    raw = _checked_bytes(root, DAEMONIC_TERROR_TRANSITION, DAEMONIC_TERROR_TRANSITION_SHA256)
+    record = cast(_DaemonicTerrorTransition, json.loads(raw, object_pairs_hook=_selection_object))
+    if (
+        record.keys() != _DaemonicTerrorTransition.__required_keys__
+        or record["schema"] != "finite-daemonic-terror-ordered-retreat-v1"
+        or record["base"] != "55eef9b20652b030d3ab3e9b85755e0acd7c2d49"
+        or record["source"].keys() != DAEMONIC_TERROR_SOURCES
+        or record["added_files"].keys() != {DAEMONIC_TERROR_OWNER}
+        or record["added_cases"]
+        != [f"{DAEMONIC_TERROR_OWNER}::{case}" for case in DAEMONIC_TERROR_CASES]
+        or record["runtime_fingerprint"] == record["retained_runtime_fingerprint"]
+        or any(
+            change.keys() != {"before", "after"} or change["before"] == change["after"]
+            for change in (record["runtime_manifest"], *record["source"].values())
+        )
+    ):
+        raise SystemExit("Daemonic Terror ordered retreat test admission differs.")
+    for name, change in record["source"].items():
+        _checked_bytes(root, name, change["after"])
+    return record, raw
+
+
+COUNTEROFFENSIVE_FIGHT_TYPE_TRANSITION = (
+    "data/source_audits/ci64_provenance_v1/counteroffensive-fight-type-v1.json"
+)
+COUNTEROFFENSIVE_FIGHT_TYPE_SHA256 = (
+    "e9b0e313baa71a2965d152b6649e9ea045273a8bc14c4ce084ee7db64dbdcdd7"
+)
+COUNTEROFFENSIVE_FIGHT_TYPE_OWNER = "tests/rules/section12/test_counteroffensive_fight_type.py"
+_COUNTEROFFENSIVE_FIGHT_TYPE_SOURCES = {
+    "src/warhammer40k_core/engine/fight_activation_requests.py",
+    "src/warhammer40k_core/engine/fight_order.py",
+    "src/warhammer40k_core/engine/lifecycle.py",
+    "src/warhammer40k_core/engine/lifecycle_reaction_queue.py",
+    "src/warhammer40k_core/engine/phases/fight.py",
+    "src/warhammer40k_core/engine/stratagems_effect_handlers.py",
+}
+
+
+class _CounteroffensiveFightTypeReceipt(TypedDict):
+    schema: str
+    base: str
+    retained_normal_move_sha256: str
+    retained_charge_cp_policy_sha256: str
+    retained_daemonic_terror_sha256: str
+    retained_runtime_fingerprint: str
+    runtime_fingerprint: str
+    runtime_manifest: dict[str, str]
+    sources: SourceSuccessors
+    origin_test: dict[str, dict[str, object]]
+    dark_pact_test: TestSuccessors
+    dark_pact_fixture_sha256: str
+    added_files: TestSuccessors
+    added_cases: list[str]
+
+
+def _counteroffensive_fight_type_transition(
+    root: Path,
+) -> tuple[_CounteroffensiveFightTypeReceipt, bytes] | None:
+    path = root / COUNTEROFFENSIVE_FIGHT_TYPE_TRANSITION
+    _selection_no_links(root, path)
+    if not path.exists():
+        return None
+    raw = _checked_bytes(
+        root, COUNTEROFFENSIVE_FIGHT_TYPE_TRANSITION, COUNTEROFFENSIVE_FIGHT_TYPE_SHA256
+    )
+    receipt = cast(
+        _CounteroffensiveFightTypeReceipt, json.loads(raw, object_pairs_hook=_selection_object)
+    )
+    if (
+        receipt.keys() != _CounteroffensiveFightTypeReceipt.__required_keys__
+        or receipt["schema"] != "finite-counteroffensive-fight-type-v1"
+        or receipt["base"] != "f7fcd013ae67b51945beb4dc71c57edbb2b0015e"
+        or receipt["runtime_fingerprint"] == receipt["retained_runtime_fingerprint"]
+        or receipt["sources"].keys() != _COUNTEROFFENSIVE_FIGHT_TYPE_SOURCES
+        or receipt["origin_test"].keys() != {"before", "after"}
+        or receipt["added_files"].keys() != {COUNTEROFFENSIVE_FIGHT_TYPE_OWNER}
+        or receipt["added_cases"]
+        != [
+            *(
+                f"{COUNTEROFFENSIVE_FIGHT_TYPE_OWNER}::test_counteroffensive_preserves_native_fight_type[{case}]"
+                for case in ("decline", "normal", "overrun", "single-overrun")
+            ),
+            f"{COUNTEROFFENSIVE_FIGHT_TYPE_OWNER}::test_counteroffensive_resolves_dark_pact_before_melee",
+        ]
+        or any(
+            change.keys() != {"before", "after"} or change["before"] == change["after"]
+            for change in (receipt["runtime_manifest"], *receipt["sources"].values())
+        )
+    ):
+        raise SystemExit("Counteroffensive Fight-type test admission differs.")
+    for name, change in receipt["sources"].items():
+        _checked_bytes(root, name, change["after"])
+    from scripts.stage3_ranged_profile_test_admission import ranged_profile_test_addition
+
+    manifest_sha256 = receipt["runtime_manifest"]["after"]
+    ranged = ranged_profile_test_addition(root)
+    if ranged is not None:
+        ranged_receipt = ranged[0]
+        if (
+            ranged_receipt["retained_counteroffensive_sha256"] != hashlib.sha256(raw).hexdigest()
+            or ranged_receipt["retained_manifest_sha256"] != manifest_sha256
+            or ranged_receipt["retained_runtime_fingerprint"] != receipt["runtime_fingerprint"]
+        ):
+            raise SystemExit("Ranged profile tests differ from the exact predecessor.")
+        manifest_sha256 = ranged_receipt["manifest_sha256"]
+    _checked_bytes(root, MANIFEST, manifest_sha256)
+    _checked_bytes(root, "tests/support/dark_pact_fixtures.py", receipt["dark_pact_fixture_sha256"])
+    return receipt, raw
+
+
 def combined_charge_runtime(root: Path, flight_raw: bytes, retry_raw: bytes) -> str:
     """Bind both independently validated lineages to their one composed runtime."""
     receipt = _checked_bytes(root, COMBINED_CHARGE_TRANSITION, COMBINED_CHARGE_TRANSITION_SHA256)
@@ -1360,24 +1535,76 @@ def combined_charge_runtime(root: Path, flight_raw: bytes, retry_raw: bytes) -> 
     if not isinstance(fingerprint, str):
         raise SystemExit("Combined Charge runtime fingerprint is malformed.")
     from scripts.stage2_ground_charge_test_admission import load_normal_move_admission
+    from scripts.stage3_ranged_profile_test_admission import ranged_profile_test_addition
 
     normal_move = load_normal_move_admission(root)
     charge_cp = _charge_cp_test_addition(root)
+    terror = _daemonic_terror_transition(root)
+    counter = _counteroffensive_fight_type_transition(root)
+    counter_receipt = None if counter is None else counter[0]
+    ranged = ranged_profile_test_addition(root)
+    if ranged is not None and counter is None:
+        raise SystemExit(
+            "Ranged profile tests require the Counteroffensive Fight-type predecessor."
+        )
+    if counter_receipt is not None and (terror is None or normal_move is None):
+        raise SystemExit("Counteroffensive Fight types require the Daemonic Terror predecessor.")
     if normal_move is not None:
         successor = None
+        current_runtime = None
         if charge_cp is not None:
-            cp_receipt, _ = charge_cp
+            cp_receipt, cp_raw = charge_cp
             successor = (cp_receipt["retained_manifest_sha256"], cp_receipt["manifest_sha256"])
-        runtime = normal_move.admit_runtime(
+            current_runtime = cp_receipt["runtime_fingerprint"]
+            if terror is not None:
+                terror_receipt, _ = terror
+                if (
+                    terror_receipt["retained_charge_cp_sha256"]
+                    != hashlib.sha256(cp_raw).hexdigest()
+                    or terror_receipt["retained_runtime_fingerprint"] != current_runtime
+                    or terror_receipt["runtime_manifest"]["before"] != successor[1]
+                ):
+                    raise SystemExit("Daemonic Terror requires the exact Charge CP predecessor.")
+                successor = (successor[0], terror_receipt["runtime_manifest"]["after"])
+                current_runtime = terror_receipt["runtime_fingerprint"]
+                if counter_receipt is not None:
+                    if (
+                        counter_receipt["retained_normal_move_sha256"]
+                        != hashlib.sha256(normal_move.raw).hexdigest()
+                        or counter_receipt["retained_charge_cp_policy_sha256"]
+                        != hashlib.sha256(cp_raw).hexdigest()
+                        or counter_receipt["retained_daemonic_terror_sha256"]
+                        != hashlib.sha256(terror[1]).hexdigest()
+                        or counter_receipt["retained_runtime_fingerprint"] != current_runtime
+                        or counter_receipt["runtime_manifest"]["before"] != successor[1]
+                        or counter_receipt["origin_test"]["before"]
+                        != cp_receipt["origin_test"]["after"]
+                    ):
+                        raise SystemExit(
+                            "Counteroffensive Fight types differ from the exact predecessor."
+                        )
+                    successor = (successor[0], counter_receipt["runtime_manifest"]["after"])
+                    current_runtime = counter_receipt["runtime_fingerprint"]
+        elif terror is not None:
+            raise SystemExit("Daemonic Terror requires the Charge CP predecessor.")
+        if ranged is not None:
+            if successor is None:
+                raise SystemExit(
+                    "Ranged profile tests require the composed Counteroffensive runtime."
+                )
+            ranged_receipt = ranged[0]
+            successor = (successor[0], ranged_receipt["manifest_sha256"])
+            current_runtime = ranged_receipt["runtime_fingerprint"]
+        normal_runtime = normal_move.admit_runtime(
             root,
             predecessor=receipt,
             fingerprint=fingerprint,
             manifest_sha256=binding["combined_manifest_sha256"],
             successor=successor,
         )
-        return runtime if charge_cp is None else charge_cp[0]["runtime_fingerprint"]
-    if charge_cp is not None:
-        raise SystemExit("Charge CP policy requires the Normal Move predecessor.")
+        return normal_runtime if current_runtime is None else current_runtime
+    if charge_cp is not None or terror is not None:
+        raise SystemExit("Charge CP and Daemonic Terror require the Normal Move predecessor.")
     _checked_bytes(root, MANIFEST, binding["combined_manifest_sha256"])
     return fingerprint
 
@@ -1665,11 +1892,19 @@ def exact_movement_test_transition(
         additions.update(_selection_members(codec["added_files"], root))
         runtime = codec["runtime_fingerprint"]
         raw += b"\0" + codec_raw
-    pending_battle_shock = _pending_battle_shock_source_transition(root)
+    terror = _daemonic_terror_transition(root)
+    terror_sources = {} if terror is None else terror[0]["source"]
+    pending_battle_shock = _pending_battle_shock_source_transition(
+        root, current_sources=terror_sources
+    )
     pending_sources = {} if pending_battle_shock is None else pending_battle_shock[2]
     from scripts.dark_pact_test_admission import dark_pact_source_successors
 
-    pact_sources = dark_pact_source_successors(root)
+    counter_fight_type = _counteroffensive_fight_type_transition(root)
+    counter_receipt = None if counter_fight_type is None else counter_fight_type[0]
+    pact_sources = dark_pact_source_successors(
+        root, current_sources=None if counter_receipt is None else counter_receipt["sources"]
+    )
     attack_reroll_order_path = root / MONSTER_MASH_ATTACK_REROLL_TRANSITION
     _selection_no_links(root, attack_reroll_order_path)
     attack_reroll_order = (
@@ -1689,7 +1924,7 @@ def exact_movement_test_transition(
             root,
             retained_cutover_sha256,
             attack_reroll_order[1],
-            current_sources=pending_sources,
+            current_sources={**terror_sources, **pending_sources},
         )
     fight_reroll = (
         _stage2_fight_reroll_successor(
@@ -1706,7 +1941,7 @@ def exact_movement_test_transition(
     if has_gameplay_budget:
         if not has_codec:
             raise SystemExit("Gameplay movement budget tests require the oval codec predecessor.")
-        budget_sources = {} if fight_reroll is None else dict(fight_reroll[3])
+        budget_sources = {**terror_sources, **({} if fight_reroll is None else fight_reroll[3])}
         if gore is not None:
             budget_source = _GORE_HUNGRY_ONSLAUGHT_BUDGET_SOURCE
             if budget_source in budget_sources:
@@ -1726,7 +1961,9 @@ def exact_movement_test_transition(
     melee_restore_raw = None
     if has_melee_restore:
         runtime, melee_restore_tests, melee_restore_raw = _stage2_melee_restore_successor(
-            root, current_tests=None if fight_reroll is None else fight_reroll[1]
+            root,
+            current_tests=None if fight_reroll is None else fight_reroll[1],
+            current_sources={} if counter_receipt is None else counter_receipt["sources"],
         )
     if fight_reroll is not None:
         runtime = fight_reroll[0]
@@ -2066,7 +2303,10 @@ def exact_movement_test_transition(
     from scripts.dark_pact_test_admission import dark_pact_test_transition
 
     pact = dark_pact_test_transition(
-        root, runtime=runtime, active_successors={} if malice is None else malice[1]
+        root,
+        runtime=runtime,
+        active_successors={} if malice is None else malice[1],
+        test_successor=None if counter_receipt is None else counter_receipt["dark_pact_test"],
     )
     if pact is not None:
         runtime, pact_updated, pact_added, pact_raw = pact
@@ -2117,6 +2357,12 @@ def exact_movement_test_transition(
         screen is None or runtime != normal_move.receipt["runtime_fingerprint"]
     ):
         raise SystemExit("Normal Move tests require the exact Screen and combined Charge lineage.")
+    if terror is not None and (
+        charge_cp is None or normal_move is None or pending_battle_shock is None
+    ):
+        raise SystemExit(
+            "Daemonic Terror ordered retreat requires its source and runtime predecessors."
+        )
 
     retained = _identity_test_transition(
         root,
@@ -2303,11 +2549,16 @@ def exact_movement_test_transition(
             raise SystemExit("Normal Move tests overlap predecessor tests.")
         additions.update(normal_tests)
         raw += b"\0" + normal_move.raw
+    origin_successor = None if charge_cp is None else charge_cp[0]["origin_test"]
+    if counter_receipt is not None:
+        if origin_successor is None:
+            raise SystemExit("Counteroffensive Fight types require the Charge CP origin test.")
+        origin_successor = {
+            "before": origin_successor["before"],
+            "after": counter_receipt["origin_test"]["after"],
+        }
     origin = normal_move_origin_test_addition(
-        root,
-        predecessor=normal_move,
-        runtime=runtime,
-        successor=None if charge_cp is None else charge_cp[0]["origin_test"],
+        root, predecessor=normal_move, runtime=runtime, successor=origin_successor
     )
     if origin is not None:
         origin_tests, origin_raw = origin
@@ -2324,6 +2575,33 @@ def exact_movement_test_transition(
             raise SystemExit("Charge CP policy tests overlap the predecessor selection.")
         additions.update(cp_tests)
         raw += b"\0" + cp_raw
+    if terror is not None:
+        if origin is None:
+            raise SystemExit("Daemonic Terror test admission requires the Normal Move origin test.")
+        terror_receipt, terror_raw = terror
+        terror_tests = _selection_members(terror_receipt["added_files"], root)
+        if terror_tests.keys() & (updated.keys() | added.keys() | additions.keys()):
+            raise SystemExit("Daemonic Terror ordered retreat tests overlap predecessor tests.")
+        additions.update(terror_tests)
+        raw += b"\0" + terror_raw
+    if counter_fight_type is not None:
+        counter_receipt, counter_raw = counter_fight_type
+        counter_tests = _selection_members(counter_receipt["added_files"], root)
+        if counter_tests.keys() & (updated.keys() | added.keys() | additions.keys()):
+            raise SystemExit("Counteroffensive Fight-type tests overlap predecessor tests.")
+        additions.update(counter_tests)
+        raw += b"\0" + counter_raw
+    from scripts.stage3_ranged_profile_test_admission import ranged_profile_test_addition
+
+    ranged = ranged_profile_test_addition(root)
+    if ranged is not None:
+        if counter_fight_type is None or identity_runtime is None:
+            raise SystemExit("Ranged profile tests require the composed Counteroffensive runtime.")
+        _, ranged_tests, ranged_raw = ranged
+        if ranged_tests.keys() & (updated.keys() | added.keys() | additions.keys()):
+            raise SystemExit("Ranged profile tests overlap the predecessor selection.")
+        additions.update(ranged_tests)
+        raw += b"\0" + ranged_raw
     return updated, {**added, **additions}, retained_raw + b"\0" + raw
 
 

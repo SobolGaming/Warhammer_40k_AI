@@ -405,6 +405,7 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         "data/source_audits/ci64_provenance_v1/stage2-pending-battle-shock-transition-v1.json"
     )
     pending = _record(pending_path)
+    terror = _record(selection.DAEMONIC_TERROR_TRANSITION)
     pending_base = "161378a16c4557228b2af45db0d311a522eb3f8f"
     assert pending["base"] == pending_base
     pending_base_manifest = json.loads(
@@ -923,7 +924,11 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         )
         pending_before[name] = hashlib.sha256(predecessor).hexdigest()
         assert binding["before"] == pending_before[name]
-        assert binding["after"] == hashlib.sha256((ROOT / name).read_bytes()).hexdigest()
+        expected = binding["after"]
+        if name in terror["source"]:
+            assert terror["source"][name]["before"] == expected
+            expected = terror["source"][name]["after"]
+        assert expected == hashlib.sha256((ROOT / name).read_bytes()).hexdigest()
     screen_base_manifest = json.loads(
         subprocess.check_output(
             ["git", "show", ground_charge.SCREEN_BASE + ":" + MANIFEST], cwd=ROOT
@@ -956,10 +961,89 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
     assert normal_move["retained_runtime_fingerprint"] == combined["combined_runtime_fingerprint"]
     assert normal_move["runtime_fingerprint"] == json.loads(normal_move_manifest)["fingerprint"]
     assert charge_cp["retained_manifest_sha256"] == normal_move["runtime_manifest"]["after"]
-    assert (
-        charge_cp["manifest_sha256"] == hashlib.sha256((ROOT / MANIFEST).read_bytes()).hexdigest()
+    cp_manifest = subprocess.check_output(
+        ["git", "show", terror["base"] + ":" + MANIFEST], cwd=ROOT
     )
-    assert charge_cp["runtime_fingerprint"] == _record(MANIFEST)["fingerprint"]
+    assert charge_cp["manifest_sha256"] == hashlib.sha256(cp_manifest).hexdigest()
+    assert charge_cp["runtime_fingerprint"] == json.loads(cp_manifest)["fingerprint"]
+    assert (
+        terror["retained_charge_cp_sha256"]
+        == hashlib.sha256((ROOT / selection.CHARGE_CP_TEST_ADDITION).read_bytes()).hexdigest()
+    )
+    assert terror["retained_runtime_fingerprint"] == charge_cp["runtime_fingerprint"]
+    assert terror["runtime_manifest"]["before"] == charge_cp["manifest_sha256"]
+    manifest_after = terror["runtime_manifest"]["after"]
+    runtime_after = terror["runtime_fingerprint"]
+    origin_after = charge_cp["origin_test"]["after"]
+    receipt_path = ROOT / selection.COUNTEROFFENSIVE_FIGHT_TYPE_TRANSITION
+    counter = (
+        _record(selection.COUNTEROFFENSIVE_FIGHT_TYPE_TRANSITION)
+        if receipt_path.is_file()
+        else None
+    )
+    if counter is not None:
+        assert counter["runtime_manifest"]["before"] == manifest_after
+        assert counter["retained_runtime_fingerprint"] == runtime_after
+        assert counter["origin_test"]["before"] == origin_after
+        manifest_after = counter["runtime_manifest"]["after"]
+        runtime_after = counter["runtime_fingerprint"]
+        origin_after = counter["origin_test"]["after"]
+        counter_owner = selection.COUNTEROFFENSIVE_FIGHT_TYPE_OWNER
+        assert counter_owner in active_files
+        assert sum(counter_owner in group for group in groups) == 1
+        for name, source in counter["sources"].items():
+            before = subprocess.check_output(
+                ["git", "show", counter["base"] + ":" + name], cwd=ROOT
+            )
+            assert source["before"] == hashlib.sha256(before).hexdigest()
+            assert source["after"] == hashlib.sha256((ROOT / name).read_bytes()).hexdigest()
+    from scripts import stage3_ranged_profile_test_admission as ranged
+
+    ranged_record = _record(ranged.RECEIPT)
+    assert ranged_record["base"] == ranged.BASE
+    assert receipt_path.is_file()
+    ranged_base_manifest = subprocess.check_output(
+        ["git", "show", ranged.BASE + ":" + MANIFEST], cwd=ROOT
+    )
+    assert hashlib.sha256(ranged_base_manifest).hexdigest() == manifest_after
+    assert json.loads(ranged_base_manifest)["fingerprint"] == runtime_after
+    assert ranged_record["retained_manifest_sha256"] == manifest_after
+    assert ranged_record["retained_runtime_fingerprint"] == runtime_after
+    assert (
+        ranged_record["retained_counteroffensive_sha256"]
+        == hashlib.sha256(receipt_path.read_bytes()).hexdigest()
+    )
+    assert (
+        ranged_record["manifest_sha256"]
+        == hashlib.sha256((ROOT / MANIFEST).read_bytes()).hexdigest()
+    )
+    assert ranged_record["runtime_fingerprint"] == _record(MANIFEST)["fingerprint"]
+    assert ranged.OWNER in active_files
+    assert sum(ranged.OWNER in group for group in groups) == 1
+    ranged_cases = {
+        f"{ranged.OWNER}::{case}"
+        for case in (
+            "test_bolt_profile_comparison_commits_and_replays[full]",
+            "test_bolt_profile_comparison_commits_and_replays[one-left]",
+            "test_bolt_profile_admission_blocks_unreviewed_contextual_modifier",
+            "test_unsupported_native_bolt_context_declines[damaged]",
+            "test_unsupported_native_bolt_context_declines[lethal]",
+            "test_unsupported_native_bolt_context_declines[sustained]",
+        )
+    }
+    ranged_base_durations = json.loads(
+        subprocess.check_output(
+            ["git", "show", ranged.BASE + ":ci/test_shards/durations.json"], cwd=ROOT
+        )
+    )
+    assert len(ranged_base_durations["case_seconds"]) == 6813
+    assert all(
+        current[node] == seconds for node, seconds in ranged_base_durations["case_seconds"].items()
+    )
+    assert all(
+        summary["files"][node] == seconds
+        for node, seconds in ranged_base_durations["files"].items()
+    )
     assert (
         charge_cp["policy_sha256"]
         == hashlib.sha256((ROOT / selection.CHARGE_CP_POLICY_SOURCE).read_bytes()).hexdigest()
@@ -967,6 +1051,12 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
     for cp_owner in charge_cp["added_files"]:
         assert cp_owner in active_files
         assert sum(cp_owner in group for group in groups) == 1
+    for name, change in terror["source"].items():
+        original = subprocess.check_output(["git", "show", terror["base"] + ":" + name], cwd=ROOT)
+        assert change["before"] == hashlib.sha256(original).hexdigest()
+        assert change["after"] == hashlib.sha256((ROOT / name).read_bytes()).hexdigest()
+    assert selection.DAEMONIC_TERROR_OWNER in active_files
+    assert sum(selection.DAEMONIC_TERROR_OWNER in group for group in groups) == 1
     assert ground_charge.NORMAL_MOVE_OWNER in active_files
     assert sum(ground_charge.NORMAL_MOVE_OWNER in group for group in groups) == 1
     assert normal_move["added_cases"] == [
@@ -979,10 +1069,7 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
     assert origin["runtime_fingerprint"] == normal_move["runtime_fingerprint"]
     origin_owner = ground_charge.NORMAL_MOVE_ORIGIN_OWNER
     assert charge_cp["origin_test"]["before"] == origin["added_files"][origin_owner]
-    assert (
-        charge_cp["origin_test"]["after"]["sha256"]
-        == hashlib.sha256((ROOT / origin_owner).read_bytes()).hexdigest()
-    )
+    assert origin_after["sha256"] == hashlib.sha256((ROOT / origin_owner).read_bytes()).hexdigest()
     assert origin["added_cases"] == [
         f"{ground_charge.NORMAL_MOVE_ORIGIN_OWNER}::{ground_charge.NORMAL_MOVE_ORIGIN_CASE}"
     ]
@@ -1056,6 +1143,8 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         assert round4["source"][source]["before"] == hashlib.sha256(base_source).hexdigest()
         if source in pending_before:
             round4_after = pending_before[source]
+        elif source in terror["source"]:
+            round4_after = terror["source"][source]["before"]
         else:
             round4_after = hashlib.sha256((ROOT / source).read_bytes()).hexdigest()
         assert round4["source"][source]["after"] == round4_after
@@ -1075,6 +1164,10 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         if source == dark_pact.LIFECYCLE_SOURCE:
             assert pact["retained_lifecycle"]["before"] == expected
             expected = pact["retained_lifecycle"]["after"]
+        successor = None if counter is None else counter["sources"].get(source)
+        if successor is not None:
+            assert successor["before"] == expected
+            expected = successor["after"]
         assert expected == hashlib.sha256((ROOT / source).read_bytes()).hexdigest()
     shooting_reroll_owner, fight_reroll_owner = selection.MONSTER_MASH_ATTACK_REROLL_OWNERS
     for attack_reroll_owner in selection.MONSTER_MASH_ATTACK_REROLL_OWNERS:
@@ -1379,6 +1472,9 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         | set(normal_move["added_cases"])
         | set(origin["added_cases"])
         | set(charge_cp["added_cases"])
+        | set(terror["added_cases"])
+        | (set() if counter is None else set(counter["added_cases"]))
+        | ranged_cases
         | shooting_cases
         | {
             ground_charge.SCREEN_OWNER

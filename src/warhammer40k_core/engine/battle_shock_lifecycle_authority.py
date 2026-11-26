@@ -244,6 +244,7 @@ def validate_pending_outcome_request(
             state=state,
             decisions=decisions,
             request=request,
+            historical_effect_sources=runtime_content_bundle.battle_shock_hook_registry.historical_effect_sources,
         )
     )
     if continuation_source_rule_id in provider_source_ids and claim is None:

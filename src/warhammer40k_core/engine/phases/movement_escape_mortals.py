@@ -17,12 +17,13 @@ from warhammer40k_core.engine.desperate_escape_mortal_wounds import (
     CONTINUED,
     pending_escape_movement,
 )
-from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.event_log import EventRecord, JsonValue, validate_json_value
 from warhammer40k_core.engine.movement_proposals import MovementProposalRequest
 from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus
 from warhammer40k_core.engine.phases.movement_model import FallBackActionResultPayload
 from warhammer40k_core.engine.phases.movement_state import FallBackActionResult
 from warhammer40k_core.engine.rules_unit_placement import RulesUnitPlacement
+from warhammer40k_core.geometry.pathing import PathWitness
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
@@ -60,29 +61,6 @@ def resume_escape_movement(
     if application.target_unit_instance_id != resolution.unit_instance_id:
         raise GameLifecycleError("Desperate Escape hazard packet target drift.")
     destroyed_ids = tuple(d.model_instance_id for d in application.applications if d.destroyed)
-    attempted = resolution.attempted_placement
-    components = (
-        (attempted,)
-        if isinstance(attempted, UnitPlacement)
-        else attempted.component_unit_placements
-    )
-    starts = tuple(
-        component.with_model_placements(
-            tuple(
-                p.with_pose(resolution.witness.poses_for_model(p.model_instance_id)[0])
-                for p in component.model_placements
-            )
-        )
-        for component in components
-    )
-    before = (
-        starts[0]
-        if isinstance(attempted, UnitPlacement)
-        else RulesUnitPlacement(
-            rules_unit_instance_id=attempted.rules_unit_instance_id,
-            component_unit_placements=starts,
-        )
-    )
     resolution = replace(
         resolution,
         movement_payload={
@@ -111,7 +89,7 @@ def resume_escape_movement(
         decisions=decisions,
         result=action,
         destruction_source_result_id=None,
-        unit_placement=before,
+        unit_placement=witnessed_escape_start(resolution),
         fall_back_result=resolution,
         destroyed_model_ids=destroyed_ids,
         mortal_wound_application=application,
@@ -248,3 +226,111 @@ def completed_escape_retry(
             "desperate_escape_mortal_application_id": packet_id,
         },
     ), application
+
+
+def witnessed_escape_start(resolution: FallBackActionResult) -> UnitPlacement | RulesUnitPlacement:
+    """Recover the physical start of each accepted path, including its later casualties."""
+    attempted = resolution.attempted_placement
+    components = (
+        (attempted,)
+        if isinstance(attempted, UnitPlacement)
+        else attempted.component_unit_placements
+    )
+    starts = tuple(
+        component.with_model_placements(
+            tuple(
+                p.with_pose(resolution.witness.poses_for_model(p.model_instance_id)[0])
+                for p in component.model_placements
+            )
+        )
+        for component in components
+    )
+    return (
+        starts[0]
+        if isinstance(attempted, UnitPlacement)
+        else RulesUnitPlacement(
+            rules_unit_instance_id=attempted.rules_unit_instance_id,
+            component_unit_placements=starts,
+        )
+    )
+
+
+def forced_escape_outcome_casualties(
+    *,
+    event_records: tuple[EventRecord, ...],
+    proposal_request_id: str,
+    unit_instance_id: str,
+    witness: PathWitness,
+) -> tuple[str, ...]:
+    """Find witnessed models killed by this proposal's forced Battle-shock outcome."""
+    from warhammer40k_core.engine.model_logical_death import (
+        MODEL_LOGICAL_DEATH_RECORDED_EVENT,
+        model_logical_death_record_from_event,
+    )
+    from warhammer40k_core.engine.mortal_wound_application_authority import (
+        MORTAL_WOUND_APPLICATION_STARTED_EVENT,
+        completion_events_for_authority,
+        mortal_wound_application_authority_from_event,
+    )
+
+    tests = [
+        (index, event.payload)
+        for index, event in enumerate(event_records)
+        if event.event_type == "forced_desperate_escape_battle_shock_resolved"
+        and isinstance(event.payload, dict)
+        and event.payload.get("movement_proposal_request_id") == proposal_request_id
+    ]
+    if not tests:
+        return ()
+    if len(tests) != 1 or tests[0][1].get("unit_instance_id") != unit_instance_id:
+        raise GameLifecycleError("Forced Fall Back casualty test occurrence drifted.")
+    test_index, test_payload = tests[0]
+    result = _object(test_payload, "battle_shock_result")
+    if result.get("passed") is not False:
+        return ()
+
+    outcome_events = event_records[test_index + 1 :]
+    casualty_ids: list[str] = []
+    witness_ids = set(witness.model_ids())
+    for index, event in enumerate(outcome_events):
+        if event.event_type != MORTAL_WOUND_APPLICATION_STARTED_EVENT:
+            continue
+        if not isinstance(event.payload, dict):
+            raise GameLifecycleError("Forced Fall Back outcome packet is invalid.")
+        source = event.payload.get("source_context")
+        if not isinstance(source, dict) or source.get("battle_shock_result") != result:
+            continue
+        authority = mortal_wound_application_authority_from_event(event)
+        if authority.target_unit_instance_id != unit_instance_id:
+            continue
+        completions = completion_events_for_authority(
+            authority=authority, event_records=outcome_events[index + 1 :]
+        )
+        if len(completions) != 1 or not isinstance(completions[0].payload, dict):
+            raise GameLifecycleError("Forced Fall Back outcome lacks a completed damage packet.")
+        application = MortalWoundApplication.from_payload(
+            cast(MortalWoundApplicationPayload, _object(completions[0].payload, "application"))
+        )
+        terminal_index = outcome_events.index(completions[0], index + 1)
+        deaths = tuple(
+            model_logical_death_record_from_event(record)
+            for record in outcome_events[index + 1 : terminal_index]
+            if record.event_type == MODEL_LOGICAL_DEATH_RECORDED_EVENT
+            and isinstance(record.payload, dict)
+            and record.payload.get("producer_id") == authority.application_id
+        )
+        destroyed_ids = {
+            damage.model_instance_id for damage in application.applications if damage.destroyed
+        }
+        if destroyed_ids != {death.model_instance_id for death in deaths} or any(
+            death.rules_unit_instance_id != unit_instance_id
+            or death.model_instance_id not in witness_ids
+            or death.destroyed_model_placement.pose
+            != witness.poses_for_model(death.model_instance_id)[0]
+            for death in deaths
+        ):
+            raise GameLifecycleError("Forced Fall Back outcome casualty witness drifted.")
+        casualty_ids.extend(sorted(destroyed_ids))
+    if len(set(casualty_ids)) != len(casualty_ids):
+        raise GameLifecycleError("Forced Fall Back outcome casualty is duplicated.")
+    return tuple(sorted(casualty_ids))
