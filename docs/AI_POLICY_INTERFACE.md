@@ -3315,3 +3315,58 @@ leaves an 8-inch movement budget whether the player spends or declines;
 the same witness remains invalid at a 6-inch budget. The [official Core Rules](source_rules/eng_01-06_warhammer40k_new40k_core_rules-was6fbu1ix-hfewhmxyiy.pdf#page=71)
 and [40k.app supplemental reference](https://www.40k.app/rules/21-flying-and-surging)
 are unchanged from the initial Charge flight admission above.
+
+#### Stage 3 evidence: keeping 1 CP at the same Dense wall
+
+Compare pre-roll Take to the Skies with pre-roll ground Charge on the same
+[Blood Legion fixture from #745](https://github.com/SobolGaming/Warhammer_40k_AI/pull/745),
+fixed target and straight witness. Use one natural 2D6
+roll without modifiers. Decline Command Re-roll and the early Onslaught offer.
+The native target filter distance is about 6.276 inches. The native move
+validator accepts the witness at each ground budget from 7 to 12 inches with
+a live Gore-Hungry Onslaught grant, and at each flight budget from 7 to 10
+inches after the 2-inch penalty. The grant does not help the flight witness.
+At both 11 and 12 inches, the native validator rejects the unassisted
+straight witness for terrain transit and rejects the tested crest and both
+end detours for distance. This does not rule out all unassisted paths on
+11-12.
+
+| Raw 2D6 sum | Ordered rolls | Take to the Skies, no spend | Ground, no grant (any path) | Ground, late 1 CP grant (fixed path) |
+| --- | ---: | --- | --- | --- |
+| 2-6 | 15 | Target out of range | Target out of range | Cannot make the target reachable |
+| 7-8 | 11 | Target out of range | Ruled out by the wall | Completes if offered and used |
+| 9-10 | 7 | Completes and keeps the CP | Ruled out by the wall | Completes if offered and used |
+| 11-12 | 3 | Completes and keeps the CP | Not proved | Completes if offered and used |
+
+With Onslaught still available to this mover and authorized whenever needed,
+ground can reach **21/36** against flight's **10/36**. All **11/36** extra
+successes are rolls of 7 or 8. The fixed-witness ground policy spends only
+if the target is reachable and the mover receives the late offer, and it
+accepts that offer on 7-12. If the offer remains available, its expected spend
+is **21/36 CP** (about 0.58 CP per attempt); 15/36 rolls spend nothing. Flight
+costs **0 CP** and leaves this phase's Onslaught use available.
+Matching the 21/36 ground rate by any path still needs payment on at least
+18/36 rolls (7-10); the 11-12 ground alternatives were not solved. If CP must
+be kept or the grant is unavailable, flight beats the unassisted ground upper
+bound by at least 7/36. These counts do not assign a tactical value to the
+retained CP or the unused stratagem.
+
+Gore-Hungry Onslaught gives terrain transit to one eligible unit. Only an
+actual native offer and accepted use supply the grant to this mover. Being
+able to afford it now neither reserves the CP nor guarantees an offer later;
+a use on another unit consumes this phase's use even with CP left. In the
+paired native controls at 7 (6+1) and 8 (6+2), each comparison starts at the
+same pre-roll checkpoint. Ground declining is blocked, ground paying completes
+and replays exactly, and flight keeps both its penalty and its CP without
+reaching the target. There is no post-roll change of mode. The
+[retained timing tests](../tests/infrastructure/adapters/test_charge_flight_onslaught_timing.py)
+also cover the native late offer at 9, flight at 10, and a spend on another
+unit. This evidence adds no policy action, CP reservation, or ranking.
+
+Source basis: [Core Rules sections 15.01 and 21.03](source_rules/eng_01-06_warhammer40k_new40k_core_rules-was6fbu1ix-hfewhmxyiy.pdf),
+[official Tacoma FAQ, p. 4](source_rules/faq-warhammer-open-tacoma-2026-dtb3ingprd-cvcl2agtfd.pdf#page=4),
+and the [official Chaos Daemons faction pack, p. 124](../data/raw/faction_packs/eng_22-07_warhammer_40,000_faction_pack_chaos_daemons-lycqqrymwe-qogh4b5yly.pdf#page=124).
+The approved 40k.app references corroborate
+[Stratagems](https://www.40k.app/rules/15-stratagems),
+[Flying and Surging](https://www.40k.app/rules/21-flying-and-surging), and
+[Blood Legion](https://www.40k.app/factions/chaos-daemons/detachments/blood-legion).
