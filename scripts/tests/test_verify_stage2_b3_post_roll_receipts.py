@@ -14,12 +14,21 @@ from scripts import verify_stage2_b3_post_roll_receipts as verifier
     ("corrupt", "diagnostic"),
     [(False, "decline-targets-checkpoint.json"), (True, "Raw receipt SHA-256 mismatch")],
 )
+@pytest.mark.parametrize("preservation", [False, True])
 def test_rejects_unverified_archive_without_summary(
-    tmp_path: Path, corrupt: bool, diagnostic: str
+    tmp_path: Path,
+    corrupt: bool,
+    diagnostic: str,
+    preservation: bool,
 ) -> None:
+    first_name = (
+        "producer.txt"
+        if preservation
+        else ("stage2-b3-closeout-evidence/decline-targets-checkpoint.json")
+    )
     if corrupt:
-        first_receipt = tmp_path / "stage2-b3-closeout-evidence" / "decline-targets-checkpoint.json"
-        first_receipt.parent.mkdir()
+        first_receipt = tmp_path / first_name
+        first_receipt.parent.mkdir(exist_ok=True)
         first_receipt.write_bytes(b"{}\n")
     result = subprocess.run(
         [
@@ -29,6 +38,7 @@ def test_rejects_unverified_archive_without_summary(
             "scripts.verify_stage2_b3_post_roll_receipts",
             "--receipts",
             str(tmp_path),
+            *(["--preservation"] if preservation else []),
         ],
         cwd=Path(__file__).resolve().parents[2],
         capture_output=True,
@@ -38,7 +48,7 @@ def test_rejects_unverified_archive_without_summary(
     )
     assert result.returncode == 2
     assert result.stdout == ""
-    assert diagnostic in result.stderr
+    assert (first_name if not corrupt else diagnostic) in result.stderr
 
 
 def test_rejects_fabricated_generated_authored_pair_without_summary(
