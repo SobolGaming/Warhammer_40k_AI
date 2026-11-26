@@ -1509,6 +1509,7 @@ def _counteroffensive_fight_type_transition(
     for name, change in receipt["sources"].items():
         _checked_bytes(root, name, change["after"])
     from scripts.ranged_attack_count_test_admission import ranged_attack_count_runtime
+    from scripts.stage3_defender_coherency_test_admission import defender_coherency_runtime
     from scripts.stage3_ranged_profile_test_admission import ranged_profile_test_addition
 
     manifest_sha256 = receipt["runtime_manifest"]["after"]
@@ -1521,9 +1522,10 @@ def _counteroffensive_fight_type_transition(
             or ranged_receipt["retained_runtime_fingerprint"] != receipt["runtime_fingerprint"]
         ):
             raise SystemExit("Ranged profile tests differ from the exact predecessor.")
-        manifest_sha256, _ = ranged_attack_count_runtime(
+        manifest_sha256, runtime_fingerprint = ranged_attack_count_runtime(
             root, predecessor=ranged_receipt, predecessor_bytes=ranged[2]
         )
+        manifest_sha256, _ = defender_coherency_runtime(root, manifest_sha256, runtime_fingerprint)
     _checked_bytes(root, MANIFEST, manifest_sha256)
     _checked_bytes(root, "tests/support/dark_pact_fixtures.py", receipt["dark_pact_fixture_sha256"])
     return receipt, raw
@@ -1545,6 +1547,7 @@ def combined_charge_runtime(root: Path, flight_raw: bytes, retry_raw: bytes) -> 
         raise SystemExit("Combined Charge runtime fingerprint is malformed.")
     from scripts.ranged_attack_count_test_admission import ranged_attack_count_runtime
     from scripts.stage2_ground_charge_test_admission import load_normal_move_admission
+    from scripts.stage3_defender_coherency_test_admission import defender_coherency_runtime
     from scripts.stage3_ranged_profile_test_admission import ranged_profile_test_addition
 
     normal_move = load_normal_move_admission(root)
@@ -1604,6 +1607,9 @@ def combined_charge_runtime(root: Path, flight_raw: bytes, retry_raw: bytes) -> 
                 )
             manifest_sha256, current_runtime = ranged_attack_count_runtime(
                 root, predecessor=ranged[0], predecessor_bytes=ranged[2]
+            )
+            manifest_sha256, current_runtime = defender_coherency_runtime(
+                root, manifest_sha256, current_runtime
             )
             successor = (successor[0], manifest_sha256)
         normal_runtime = normal_move.admit_runtime(
@@ -2055,6 +2061,9 @@ def exact_movement_test_transition(
         if strict_replay_sources.keys() & source_successors.keys():
             raise SystemExit("Strict replay sources overlap the predecessor transition.")
         source_successors.update(strict_replay_sources)
+    from scripts.stage3_defender_coherency_test_admission import defender_coherency_test_successor
+
+    defender_coherency = defender_coherency_test_successor(root)
     allocation_path = root / ALLOCATION_COHERENCY_ADDITION
     _selection_no_links(root, allocation_path)
     allocation_raw = None
@@ -2081,8 +2090,13 @@ def exact_movement_test_transition(
             or set(allocation["added_files"]) != {ALLOCATION_COHERENCY_OWNER}
         ):
             raise SystemExit("Allocation coherency test addition differs.")
-        _checked_bytes(root, ALLOCATION_COHERENCY_POLICY, allocation["policy_sha256"])
-        additions.update(_selection_members(allocation["added_files"], root))
+        if defender_coherency is None:
+            _checked_bytes(root, ALLOCATION_COHERENCY_POLICY, allocation["policy_sha256"])
+            additions.update(_selection_members(allocation["added_files"], root))
+        else:
+            additions[ALLOCATION_COHERENCY_OWNER] = defender_coherency[1][
+                ALLOCATION_COHERENCY_OWNER
+            ]
         runtime = allocation["runtime_fingerprint"]
     from scripts.ranged_attack_count_test_admission import ranged_attack_count_test_addition
 
@@ -2629,7 +2643,8 @@ def exact_movement_test_transition(
         raw += b"\0" + ranged_raw
     if attack_count is not None:
         attack_receipt, attack_tests, attack_raw = attack_count
-        if ranged is None or identity_runtime != attack_receipt["runtime_fingerprint"]:
+        runtime_receipt = attack_receipt if defender_coherency is None else defender_coherency[0]
+        if ranged is None or identity_runtime != runtime_receipt["runtime_fingerprint"]:
             raise SystemExit(
                 "Ranged attack-count tests require the composed ranged profile runtime."
             )
@@ -2642,6 +2657,17 @@ def exact_movement_test_transition(
             raise SystemExit("Ranged attack-count faction repairs require both predecessors.")
         updated.update(faction_tests)
         raw += b"\0" + faction_repair[1]
+    if defender_coherency is not None:
+        from scripts.stage3_defender_coherency_test_admission import (
+            OWNER as DEFENDER_COHERENCY_OWNER,
+        )
+
+        if attack_count is None or allocation_raw is None:
+            raise SystemExit("Defender coherency tests require both exact predecessors.")
+        if DEFENDER_COHERENCY_OWNER in (updated.keys() | added.keys() | additions.keys()):
+            raise SystemExit("Defender coherency tests overlap the predecessor selection.")
+        additions[DEFENDER_COHERENCY_OWNER] = defender_coherency[1][DEFENDER_COHERENCY_OWNER]
+        raw += b"\0" + defender_coherency[2]
     return updated, {**added, **additions}, retained_raw + b"\0" + raw
 
 

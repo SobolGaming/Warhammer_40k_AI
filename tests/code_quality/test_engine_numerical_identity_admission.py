@@ -1028,11 +1028,44 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
     )
     assert attack_record["retained_manifest_sha256"] == ranged_record["manifest_sha256"]
     assert attack_record["retained_runtime_fingerprint"] == ranged_record["runtime_fingerprint"]
+    from scripts import stage3_defender_coherency_test_admission as defender
+
+    defender_record = _record(defender.RECEIPT)
+    assert defender_record["base"] == defender.BASE
+    defender_base_manifest = subprocess.check_output(
+        ["git", "show", defender.BASE + ":" + MANIFEST], cwd=ROOT
+    )
+    assert attack_record["manifest_sha256"] == hashlib.sha256(defender_base_manifest).hexdigest()
+    assert attack_record["runtime_fingerprint"] == json.loads(defender_base_manifest)["fingerprint"]
+    assert defender_record["retained_manifest_sha256"] == attack_record["manifest_sha256"]
+    assert defender_record["retained_runtime_fingerprint"] == attack_record["runtime_fingerprint"]
     assert (
-        attack_record["manifest_sha256"]
+        defender_record["manifest_sha256"]
         == hashlib.sha256((ROOT / MANIFEST).read_bytes()).hexdigest()
     )
-    assert attack_record["runtime_fingerprint"] == _record(MANIFEST)["fingerprint"]
+    assert defender_record["runtime_fingerprint"] == _record(MANIFEST)["fingerprint"]
+    assert defender_record["retained_cases"] == [
+        f"{defender.RETAINED_OWNER}::{case}" for case in defender.RETAINED_CASES
+    ]
+    assert defender_record["added_cases"] == [
+        f"{defender.OWNER}::{case}" for case in defender.CASES
+    ]
+    assert defender.OWNER in active_files
+    assert sum(defender.OWNER in group for group in groups) == 1
+    retained_weights = json.loads(
+        subprocess.check_output(
+            ["git", "show", defender.BASE + ":ci/test_shards/durations.json"], cwd=ROOT
+        )
+    )
+    assert set(current) == set(retained_weights["case_seconds"]) | set(
+        defender_record["added_cases"]
+    )
+    assert all(
+        current[node] == seconds for node, seconds in retained_weights["case_seconds"].items()
+    )
+    assert all(
+        summary["files"][node] == seconds for node, seconds in retained_weights["files"].items()
+    )
     assert (
         attack_record["gathering_source_sha256"]
         == hashlib.sha256((ROOT / attack_count.SOURCE).read_bytes()).hexdigest()
@@ -1517,6 +1550,7 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         | (set() if counter is None else set(counter["added_cases"]))
         | ranged_cases
         | set(attack_record["added_cases"])
+        | set(defender_record["added_cases"])
         | shooting_cases
         | {
             ground_charge.SCREEN_OWNER

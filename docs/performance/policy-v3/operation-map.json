@@ -263,6 +263,34 @@
     }
   },
   "operations": {
+    "stage3-defender-coherency-policy": {
+      "paths": [
+        "src/warhammer40k_core/ai/allocation_coherency.py",
+        "tests/infrastructure/adapters/test_allocation_coherency_tie_break.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "stage3-defender-coherency-test-admission": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/stage3-defender-coherency-test-v1.json",
+        "scripts/engine_numerical_identity_test_admission.py",
+        "scripts/stage3_defender_coherency_test_admission.py",
+        "tests/code_quality/test_engine_numerical_identity_admission.py",
+        "tests/infrastructure/adapters/test_allocation_coherency.py",
+        "tests/support/screen_rod_allocation.py"
+      ],
+      "owners": [
+        "*"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
     "precision-benchmark-live-checkpoint": {
       "paths": [
         "scripts/measure_precision_grouping.py"
