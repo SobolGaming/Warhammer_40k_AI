@@ -539,7 +539,20 @@ def _completion_witness(
 ) -> PathWitness | None:
     application_id = payload.get("desperate_escape_mortal_application_id")
     if application_id is None:
-        return proposal.witness
+        if proposal.movement_phase_action != "fall_back":
+            return proposal.witness
+        casualties = _forced_escape_casualties_for_proposal(
+            event_records=event_records[:mutation_index],
+            record=proposal_record,
+            proposal=proposal,
+            completion=payload,
+        )
+        if not casualties:
+            return proposal.witness
+        survivors = tuple(
+            path for path in proposal.witness.model_paths if path[0] not in casualties
+        )
+        return PathWitness.for_paths(survivors) if survivors else None
     from warhammer40k_core.engine.damage_allocation import (
         MortalWoundApplication,
         MortalWoundApplicationPayload,
@@ -599,6 +612,7 @@ def _completion_witness(
     if proposal_record != original_record and (
         current_request.context is None
         or current_request.context.get("desperate_escape_completed_packet_id") != application_id
+        or payload.get("prior_battle_shock_casualty_ids") is not None
         or _movement_proposal_request_sources(proposal_record)
         != _movement_proposal_request_sources(original_record)
     ):
@@ -695,9 +709,13 @@ def _completion_witness(
             != original.witness.poses_for_model(death.model_instance_id)[0]
         ):
             raise GameLifecycleError("Movement survivor logical-death attribution drifted.")
-    surviving_ids = {model_id for model_id, _poses in original.witness.model_paths} - set(
-        destroyed_ids
+    prior_outcome_ids = _forced_escape_casualties_for_proposal(
+        event_records=prior[: prior.index(started)],
+        record=original_record,
+        proposal=original,
+        completion=None if proposal_record != original_record else payload,
     )
+    surviving_ids = set(original.witness.model_ids()).difference(destroyed_ids, prior_outcome_ids)
     if proposal_record != original_record and (
         {model_id for model_id, _poses in proposal.witness.model_paths} != surviving_ids
         or any(
@@ -708,6 +726,35 @@ def _completion_witness(
         raise GameLifecycleError("Movement survivor retry model inventory drifted.")
     surviving = tuple(path for path in proposal.witness.model_paths if path[0] in surviving_ids)
     return PathWitness.for_paths(surviving) if surviving else None
+
+
+def _forced_escape_casualties_for_proposal(
+    *,
+    event_records: tuple[EventRecord, ...],
+    record: DecisionRecord,
+    proposal: MovementProposalPayload,
+    completion: dict[str, JsonValue] | None,
+) -> tuple[str, ...]:
+    from warhammer40k_core.engine.phases.movement_escape_mortals import (
+        forced_escape_outcome_casualties,
+    )
+
+    context = MovementProposalRequest.from_decision_request_payload(record.request.payload).context
+    casualties = (
+        forced_escape_outcome_casualties(
+            event_records=event_records,
+            proposal_request_id=record.request.request_id,
+            unit_instance_id=proposal.unit_instance_id,
+            witness=proposal.witness,
+        )
+        if context is not None and "forced_desperate_escape_sources" in context
+        else ()
+    )
+    if completion is not None and completion.get("prior_battle_shock_casualty_ids") != (
+        list(casualties) if casualties else None
+    ):
+        raise GameLifecycleError("Movement survivor prior outcome casualty inventory drifted.")
+    return casualties
 
 
 def _hazard_completion_proposal_records(

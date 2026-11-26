@@ -157,6 +157,22 @@ def resolve_runtime_objective_control(
         runtime_objective_control_operations(context=context, value=value, bindings=binding_tuple),
         selected_modifiers,
     )
+    return apply_objective_control_operations(
+        value=value,
+        modifiers=modifiers,
+        model_instance_id=context.model_instance_id,
+        bindings=binding_tuple,
+    )
+
+
+def apply_objective_control_operations(
+    *,
+    value: CharacteristicValue,
+    modifiers: tuple[Modifier, ...],
+    model_instance_id: str,
+    bindings: tuple[ObjectiveControlModifierBinding, ...] = (),
+) -> CharacteristicValue:
+    """Apply resolved OC operations to the same profile arithmetic in play and history."""
     if not modifiers:
         return value
     if value.modifier_trace is not None:
@@ -173,14 +189,14 @@ def resolve_runtime_objective_control(
     origin_ids = {
         operation.modifier_id: binding.modifier_id
         for operation in modifiers
-        for binding in binding_tuple
+        for binding in bindings
         if operation.modifier_id == binding.modifier_id
         or operation.modifier_id.startswith(f"{binding.modifier_id}:operation:")
     }
     resolved = resolve_characteristic_value(
         replace(value, raw=value.final),
         modifiers,
-        target_id=context.model_instance_id,
+        target_id=model_instance_id,
     )
     has_replacement = any(
         modifier.operation

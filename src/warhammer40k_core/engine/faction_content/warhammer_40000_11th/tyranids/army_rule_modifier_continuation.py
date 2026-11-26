@@ -97,6 +97,7 @@ def _existing_nested_source(
             state=context.state,
             decisions=context.decisions,
             request=request,
+            historical_effect_sources=context.battle_shock_hooks.historical_effect_sources,
         )
     )
     if outcome is None:

@@ -170,6 +170,7 @@ def validate_battle_shock_runtime_content_authority(
             event_records=event_records,
             decision_records=decision_records,
             boundary_event_index=modifier_authority.event_index,
+            historical_effect_sources=runtime_content_bundle,
             request=result.request,
             active_player_id=active_player_id,
             phase=phase,

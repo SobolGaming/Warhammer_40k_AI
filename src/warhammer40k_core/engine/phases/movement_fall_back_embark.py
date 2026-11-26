@@ -212,8 +212,31 @@ def _apply_fall_back_result(
         raise GameLifecycleError(
             "Desperate Escape source result requires destroyed model evidence."
         )
+    battlefield_state = state.battlefield_state
+    if battlefield_state is None:
+        raise GameLifecycleError("Fall Back requires battlefield_state.")
+    removal_ids = set(fall_back_result.witness.model_ids()).intersection(
+        battlefield_state.removed_model_ids
+    )
+    prior_outcome_ids = tuple(sorted(removal_ids.difference(destroyed_model_ids)))
+    prior_outcome_payload: dict[str, JsonValue] = {}
+    if prior_outcome_ids:
+        from warhammer40k_core.engine.phases.movement_escape_mortals import (
+            forced_escape_outcome_casualties,
+            witnessed_escape_start,
+        )
+
+        if prior_outcome_ids != forced_escape_outcome_casualties(
+            event_records=decisions.event_log.records,
+            proposal_request_id=movement_proposal_request_id,
+            unit_instance_id=movement_unit_id,
+            witness=fall_back_result.witness,
+        ):
+            raise GameLifecycleError("Fall Back prior outcome casualty authority drifted.")
+        unit_placement = witnessed_escape_start(fall_back_result)
+        prior_outcome_payload["prior_battle_shock_casualty_ids"] = list(prior_outcome_ids)
     surviving_placement = fall_back_result.surviving_attempted_placement(
-        destroyed_model_ids=destroyed_model_ids,
+        destroyed_model_ids=(*destroyed_model_ids, *prior_outcome_ids),
     )
     if surviving_placement is not None:
         from warhammer40k_core.engine.phases.movement_rules_units import (
@@ -282,6 +305,7 @@ def _apply_fall_back_result(
     transition_batch = fall_back_result.transition_batch(
         before=unit_placement,
         destroyed_model_ids=destroyed_model_ids,
+        prior_outcome_casualty_ids=prior_outcome_ids,
         mortal_wound_application=mortal_wound_application,
     )
     engagement_placement = (
@@ -294,9 +318,6 @@ def _apply_fall_back_result(
         unit_placement=engagement_placement,
         ruleset_descriptor=ruleset_descriptor,
     )
-    battlefield_state = state.battlefield_state
-    if battlefield_state is None:
-        raise GameLifecycleError("Fall Back requires battlefield_state.")
     attempted = surviving_placement
     if attempted is None:
         updated_battlefield = battlefield_state
@@ -386,6 +407,7 @@ def _apply_fall_back_result(
         ),
         "destroyed_model_ids": list(destroyed_model_ids),
         **destruction_source_payload,
+        **prior_outcome_payload,
         "start_engaged_enemy_unit_instance_ids": list(start_engaged_enemy_unit_ids),
         "fall_back_eligibility_grants": [
             validate_json_value(grant.to_payload()) for grant in permission_grants
@@ -566,7 +588,10 @@ def _request_embark_after_move_or_complete_activation(
     battlefield_state = state.battlefield_state
     if battlefield_state is None:
         raise GameLifecycleError("Movement activation completion requires battlefield_state.")
-    if "desperate_escape_mortal_application_id" in movement_payload and witness is not None:
+    if witness is not None and (
+        "desperate_escape_mortal_application_id" in movement_payload
+        or "prior_battle_shock_casualty_ids" in movement_payload
+    ):
         surviving_paths = tuple(
             path
             for path in witness.model_paths

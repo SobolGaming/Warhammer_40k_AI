@@ -1,12 +1,12 @@
 {
   "schema": "finite-counteroffensive-fight-type-v1",
-  "base": "55eef9b20652b030d3ab3e9b85755e0acd7c2d49",
+  "base": "f7fcd013ae67b51945beb4dc71c57edbb2b0015e",
   "retained_normal_move_sha256": "bf15b3ce40bd26cc9c1af4da30a21fc17cd475c8f849bceabf8407f3fa9348a0",
-  "retained_runtime_fingerprint": "6a62fab60ddf5b30cb9651f7a2ec7140e06765f9c35eec1abd625e1f5814caec",
-  "runtime_fingerprint": "366591e46acc04772907dd25b78727cfb8b6688e8e07c4a1795c2fb47499c0c0",
+  "retained_runtime_fingerprint": "2d9f15526ffb5d9e4beece2176972f35e8396c6e4519f950f8838a16f4c713fa",
+  "runtime_fingerprint": "c5732ba60d52525e3b628792bb9cd03bdac3ed82834e6c5a7f09e57f1ffd3443",
   "runtime_manifest": {
-    "before": "011c4baa764d5c8062632b8f19c4f4fcfe5925b5744afce28fba77ed84800720",
-    "after": "a443af2c1cc3bb5c4f56e81d566fbfea0f994bc846c0237896abace3e517322e"
+    "before": "6f3b38d81c97fd2950a2ebc77b03439f843c9db402a2c6fdc77a2a4d5144b048",
+    "after": "50a4f1255d34d13d06257f05352c43b9d591ea23fcd35efe0b56c91009a49f57"
   },
   "sources": {
     "src/warhammer40k_core/engine/fight_activation_requests.py": {
@@ -78,5 +78,6 @@
       "blob_sha1": "1d1c020afa3b1ad87a02568fc51ab93b7b9aafb9"
     }
   },
-  "dark_pact_fixture_sha256": "89eebdab728dcffbcc0d81408f3ac6af8736372c5336e8c69945cad61eb9389e"
+  "dark_pact_fixture_sha256": "89eebdab728dcffbcc0d81408f3ac6af8736372c5336e8c69945cad61eb9389e",
+  "retained_daemonic_terror_sha256": "68e641b2079eaeff94bc4c0724d5662293682512e276bd72dfbf936b60b64c2e"
 }

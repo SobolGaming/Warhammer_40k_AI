@@ -232,6 +232,7 @@ def validate_daemonic_terror_pending_outcome(
         active_player_id=resolution.active_player_id,
         phase=resolution.phase,
         phase_start_battle_shocked_unit_ids=resolution.phase_start_battle_shocked_unit_ids,
+        historical_effect_sources=context.historical_effect_sources,
     )
     daemon_player_id = _identifier(resolution_payload.get("player_id"), "daemon player ID")
     target = historical.rules_unit(result.request.unit_instance_id)

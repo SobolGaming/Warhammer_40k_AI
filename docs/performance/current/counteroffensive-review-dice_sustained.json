@@ -2,12 +2,12 @@
   "policy": "rules-engine-performance-v3",
   "family": "dice_sustained",
   "workload_id": "order96-sustained-d3-optional-wound-rerolls-v1",
-  "base_revision": "55eef9b20652b030d3ab3e9b85755e0acd7c2d49",
-  "head_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:366591e46acc04772907dd25b78727cfb8b6688e8e07c4a1795c2fb47499c0c0",
-  "head_input_digest": "c76189cea3e132a5d977ee5c9da29b63feefbe2049072ca270c6eb74cf4dacc9",
+  "base_revision": "f7fcd013ae67b51945beb4dc71c57edbb2b0015e",
+  "head_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:c5732ba60d52525e3b628792bb9cd03bdac3ed82834e6c5a7f09e57f1ffd3443",
+  "head_input_digest": "f0db99bb2e8c22e3fae15deb5a51c05f40dfe89ca0c0de6b708df556adc7a309",
   "budget_profile": "current-change-relative-v1",
   "base": {
-    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:6a62fab60ddf5b30cb9651f7a2ec7140e06765f9c35eec1abd625e1f5814caec",
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:2d9f15526ffb5d9e4beece2176972f35e8396c6e4519f950f8838a16f4c713fa",
     "host": {
       "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
       "memory_bytes": 67359363072,
@@ -18,35 +18,35 @@
     },
     "lock_sha256": "659a2d81e02176d23168861529651506ac87a4eab1982109f144cd62a63fce71",
     "workload_sha256": "fc4fe1423d4864d251bf8f5b2c1eaf305b4f21a358cc668c8b5a20c166f75daf",
-    "fixture_sha256": "704fcfd470a12ad019475b86f23b2792b851cad8ba3fd0dda8d27b8686f9601e",
+    "fixture_sha256": "64562eeb43c59a7be83bdb1285a3ad57375d0540e0350eea2368178b5325882d",
     "samples": {
       "shooting/false": [
-        1.9355961929999808,
-        1.8561047250000229,
-        1.9140760239999963,
-        1.921343391999983,
-        1.9011657920000289
+        1.884067757999901,
+        1.816832513999998,
+        1.849051012000018,
+        1.839696422999964,
+        1.8480492869999807
       ],
       "shooting/true": [
-        2.0201329790000386,
-        1.9315241290000245,
-        1.9385477870000045,
-        1.9458465320000187,
-        1.9396559589999924
+        1.976930019000065,
+        1.8615661349999755,
+        1.8870896660000653,
+        1.8985804740000276,
+        1.905213826000022
       ],
       "fight/false": [
-        3.042432641000005,
-        2.9268070779999675,
-        2.998458236000033,
-        2.914530859000024,
-        2.927656492999972
+        2.9265486230000306,
+        2.800606951000077,
+        2.9368392360000826,
+        2.7511770789999446,
+        2.757154051000043
       ],
       "fight/true": [
-        3.1426808219999884,
-        3.2409980580000024,
-        3.0629834510000364,
-        3.2465004969999995,
-        3.2189397579999763
+        2.9537162799999805,
+        3.077623248000009,
+        2.952990448000037,
+        3.0397833810000066,
+        2.9899846289999914
       ]
     },
     "completed": true,
@@ -54,7 +54,7 @@
     "coverage": false
   },
   "head": {
-    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:366591e46acc04772907dd25b78727cfb8b6688e8e07c4a1795c2fb47499c0c0",
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:c5732ba60d52525e3b628792bb9cd03bdac3ed82834e6c5a7f09e57f1ffd3443",
     "host": {
       "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
       "memory_bytes": 67359363072,
@@ -65,35 +65,35 @@
     },
     "lock_sha256": "659a2d81e02176d23168861529651506ac87a4eab1982109f144cd62a63fce71",
     "workload_sha256": "fc4fe1423d4864d251bf8f5b2c1eaf305b4f21a358cc668c8b5a20c166f75daf",
-    "fixture_sha256": "704fcfd470a12ad019475b86f23b2792b851cad8ba3fd0dda8d27b8686f9601e",
+    "fixture_sha256": "64562eeb43c59a7be83bdb1285a3ad57375d0540e0350eea2368178b5325882d",
     "samples": {
       "shooting/false": [
-        1.948887875999958,
-        1.9266701509999393,
-        1.8863536669999803,
-        1.8858144010000615,
-        1.920155756999975
+        1.8250547730000335,
+        1.7797660129999713,
+        1.7722776959999464,
+        1.775891492000028,
+        1.7877456180000308
       ],
       "shooting/true": [
-        2.026956849000044,
-        1.9292855050000526,
-        1.8983110049999823,
-        1.8987979849999874,
-        1.9173427539999466
+        1.9029679469999792,
+        1.8567242269999724,
+        1.8172129280000036,
+        1.8651646800000208,
+        1.8512978050000584
       ],
       "fight/false": [
-        2.946448540999995,
-        2.8634861169999795,
-        2.9958293610000055,
-        2.905747973000075,
-        2.908767854999951
+        2.784613924000041,
+        2.7034259890000385,
+        2.7629714199999853,
+        2.636862556999972,
+        2.6774399079999966
       ],
       "fight/true": [
-        3.1481730379999817,
-        3.2642625839999937,
-        3.2000481389999322,
-        3.31355213300003,
-        3.1994804290000047
+        2.8648268340000413,
+        2.9584103990000585,
+        2.8669348439999567,
+        2.9435470600000144,
+        3.0173646050000116
       ]
     },
     "completed": true,
