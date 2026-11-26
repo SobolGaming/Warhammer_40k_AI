@@ -2,7 +2,7 @@
   "policy": "rules-engine-performance-v3",
   "base": "f7fcd013ae67b51945beb4dc71c57edbb2b0015e",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:c5732ba60d52525e3b628792bb9cd03bdac3ed82834e6c5a7f09e57f1ffd3443",
-  "operation_map_sha256": "9efda522ae5b61002f3a366b8a56a510d49ff791ba377ddb169f42cace72b262",
+  "operation_map_sha256": "8ea9c660a2007701334580622231e46763137df1d960db851ec5effed4f7cb95",
   "changes": {
     "ci/test_shards/durations.json": {
       "before_sha256": "5d35ab02b2fb41cb5e1c7896706a2f6f3529bdfa3f20cfc90c2f2b9a210cb99d",
@@ -216,41 +216,41 @@
     },
     "docs/performance/current/counteroffensive-review-dice.json": {
       "before_sha256": null,
-      "after_sha256": "ac81ef01244dcacef998615e328f2d6b6479cd8e12c7e25ad5d919ca6e65e2de",
+      "after_sha256": "10044cb5ca785cfdf44c79a93d7e26d9e0d0053ff0ed5dcf360a9d1228330b78",
       "owners": {
         "@document": {
           "before": null,
-          "after": "ac81ef01244dcacef998615e328f2d6b6479cd8e12c7e25ad5d919ca6e65e2de"
+          "after": "10044cb5ca785cfdf44c79a93d7e26d9e0d0053ff0ed5dcf360a9d1228330b78"
         }
       }
     },
     "docs/performance/current/counteroffensive-review-dice_sustained.json": {
       "before_sha256": null,
-      "after_sha256": "b57da4b9b55bd370c098841ecda0cfd7a70559d83240f3ea4abb75f90f004b82",
+      "after_sha256": "f4d71b21209be1a83a0e0784c93d68fc994bae4ecf6d91f37249c1ef606acdd6",
       "owners": {
         "@document": {
           "before": null,
-          "after": "b57da4b9b55bd370c098841ecda0cfd7a70559d83240f3ea4abb75f90f004b82"
+          "after": "f4d71b21209be1a83a0e0784c93d68fc994bae4ecf6d91f37249c1ef606acdd6"
         }
       }
     },
     "docs/performance/current/counteroffensive-review-reconstruction.json": {
       "before_sha256": null,
-      "after_sha256": "87acaa82bd48b754cc20b4cd37ebac20eeb44b7f1bc725c24e372be7b73e2fc9",
+      "after_sha256": "0e0b095b58f0b9dbdd5df98e80d1d09075b36a2c8d0cb205b45bfca2464ca783",
       "owners": {
         "@document": {
           "before": null,
-          "after": "87acaa82bd48b754cc20b4cd37ebac20eeb44b7f1bc725c24e372be7b73e2fc9"
+          "after": "0e0b095b58f0b9dbdd5df98e80d1d09075b36a2c8d0cb205b45bfca2464ca783"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "17a09fd81425164a83ee091769f1261670a46719b7f2f97db5867340bd5f542e",
-      "after_sha256": "611ebc9dff07314d0f11f81554d89a07657a21d292151b9a0cd9fb2c23fdcd20",
+      "after_sha256": "1d59c7a80417df482040fb449041169345f070f112cdfa759761daba2b466a19",
       "owners": {
         "@document": {
           "before": "17a09fd81425164a83ee091769f1261670a46719b7f2f97db5867340bd5f542e",
-          "after": "611ebc9dff07314d0f11f81554d89a07657a21d292151b9a0cd9fb2c23fdcd20"
+          "after": "1d59c7a80417df482040fb449041169345f070f112cdfa759761daba2b466a19"
         }
       }
     },

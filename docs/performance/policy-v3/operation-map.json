@@ -36838,7 +36838,6 @@
         "GameLifecycle._apply_stratagem_cost_choice_and_resume",
         "GameLifecycle._apply_stratagem_target_proposal_decision",
         "GameLifecycle._build_decision_dispatch_registry",
-        "GameLifecycle.from_payload",
         "_after_enemy_overrun",
         "_apply_counteroffensive_handler",
         "_apply_fight_activation_decision",

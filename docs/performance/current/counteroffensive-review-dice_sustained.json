@@ -4,7 +4,7 @@
   "workload_id": "order96-sustained-d3-optional-wound-rerolls-v1",
   "base_revision": "f7fcd013ae67b51945beb4dc71c57edbb2b0015e",
   "head_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:c5732ba60d52525e3b628792bb9cd03bdac3ed82834e6c5a7f09e57f1ffd3443",
-  "head_input_digest": "f0db99bb2e8c22e3fae15deb5a51c05f40dfe89ca0c0de6b708df556adc7a309",
+  "head_input_digest": "5ab6f7e7986ae7e32d665c65910f618ac663c37b5e00c705fd77dbcce2adef54",
   "budget_profile": "current-change-relative-v1",
   "base": {
     "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:2d9f15526ffb5d9e4beece2176972f35e8396c6e4519f950f8838a16f4c713fa",
