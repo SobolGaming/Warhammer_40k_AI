@@ -208,6 +208,26 @@ class ShootingPhaseHandler:
             if status is not None:
                 return status
             if attack_sequence is None:
+                if any(
+                    pool.pending_attack_count_bonus is not None
+                    for pool in completed_candidate.attack_pools
+                ):
+                    from warhammer40k_core.engine.attack_completion_authority import (
+                        completed_attack_sequence,
+                    )
+                    from warhammer40k_core.engine.shooting_target_replacement import (
+                        declaration_record_for_sequence,
+                    )
+                    from warhammer40k_core.engine.shooting_target_replacement_authority import (
+                        validate_sequence_authority,
+                    )
+
+                    completed_candidate = completed_attack_sequence(
+                        event_records=decisions.event_log.records,
+                        sequence_id=completed_candidate.sequence_id,
+                    )
+                    declaration, _ = declaration_record_for_sequence(decisions, completed_candidate)
+                    validate_sequence_authority(decisions, declaration, completed_candidate)
                 shooting_state = shooting_state.with_pending_completed_attack_sequence(
                     completed_candidate
                 )

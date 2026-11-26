@@ -1,0 +1,36 @@
+{
+  "schema": "finite-ranged-attack-count-reroll-test-v1",
+  "base": "dafbcccdd31d5532c0d58aceac43901e60326d36",
+  "retained_manifest_sha256": "1abd6dc0c5b0b4b994c29d1064cdb0a4dacb571ba588c33f26937a68f2766df7",
+  "manifest_sha256": "404eedf82536aa16a2c601963cba079a3a707c17c82727cb3a16d044aefa72bd",
+  "runtime_fingerprint": "14379b839d569221cb35843f64b1027d4ec7e704f75309dd00eb106a1a9bc8c5",
+  "gathering_source_sha256": "70c8386fe482f42aad773208c819c580df214a1b79efc58dd7ff436ab64490a1",
+  "added_files": {
+    "tests/rules/section10/test_random_attack_count_reroll.py": {
+      "mode": "100644",
+      "blob_sha1": "09b5e3a281eba3178320c9079ad410fe998e6346",
+      "sha256": "2e86c64f637a94faa7d221ac3237b2063077843bfc8ba475b53c6430cb25d212",
+      "bytes": 20131
+    }
+  },
+  "added_cases": [
+    "tests/rules/section10/test_random_attack_count_reroll.py::test_native_fixed_group_resolves_before_unselected_random_attacks",
+    "tests/rules/section10/test_random_attack_count_reroll.py::test_native_group_rolls_separately_for_two_physical_weapons",
+    "tests/rules/section10/test_random_attack_count_reroll.py::test_native_random_attacks_choose_then_gather_and_reroll[False]",
+    "tests/rules/section10/test_random_attack_count_reroll.py::test_native_random_attacks_choose_then_gather_and_reroll[True]",
+    "tests/rules/section10/test_random_attack_count_reroll.py::test_random_attack_count_window_restores_and_replays[1]",
+    "tests/rules/section10/test_random_attack_count_reroll.py::test_random_attack_count_window_restores_and_replays[2]"
+  ],
+  "viewer_sources": {
+    "src/warhammer40k_core/adapters/redaction.py": {
+      "before": "5e07178315b41f8ee8a1e83d21c05c480974a3dbf90c6bb9d7b4d4972049a57e",
+      "after": "1e546ba726c5093771fd298ee62842094ae8b25d5ce09f372d414dd0e58f57d0"
+    },
+    "src/warhammer40k_core/adapters/viewer_identity.py": {
+      "before": "50cb7565c984e288ba2b2fa9ffb1dbfe6c6a83c648e5de4522d239899032418f",
+      "after": "efb84a68c9da0d794f94f528b7d7eb1c1c4a50d899b8293e20c51fcc795b434d"
+    }
+  },
+  "retained_ranged_profile_sha256": "9060d2c1d4f148890cb33154dedb60908bb7f4eaf9350c3b8932b974f63bce92",
+  "retained_runtime_fingerprint": "cdd4dc3a140f7a09efbe307cf6333b3fada76748838fa5543b2160727da765b0"
+}

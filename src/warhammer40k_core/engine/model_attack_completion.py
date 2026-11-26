@@ -93,7 +93,7 @@ def resolved_model_ids(
     """
     complete = completed_model_ids(sequence)
     group = sequence.current_gathered_group
-    if group is None or not group.native_snapshots:
+    if group is None or group.counts_pending or not group.native_snapshots:
         return complete
     steps = {
         (event.payload["attack_context_id"], event.payload["step"]): event.payload["payload"]

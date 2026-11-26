@@ -19,6 +19,10 @@ from warhammer40k_core.engine.attack_sequence_validation import (
 from warhammer40k_core.engine.decision_record import DecisionRecord
 from warhammer40k_core.engine.event_log import EventRecord, JsonValue, canonical_json
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
+from warhammer40k_core.engine.ranged_attack_count_gathering import (
+    RANGED_ATTACK_COUNTS_GATHERED,
+    apply_ranged_attack_count_evidence,
+)
 from warhammer40k_core.engine.weapon_declaration import RangedAttackPool, RangedAttackPoolPayload
 
 
@@ -45,7 +49,7 @@ def validate_profile_attack_group(
     source_phase: BattlePhase | None = None
     selected: GatheredAttackGroup | None = None
     used: set[int] = set()
-    for event in events:
+    for event_index, event in enumerate(events):
         body = event.payload
         if not isinstance(body, dict):
             continue
@@ -226,12 +230,27 @@ def validate_profile_attack_group(
                 )
             used.update(selected.pool_indices)
         elif (
+            event.event_type == RANGED_ATTACK_COUNTS_GATHERED
+            and body.get("sequence_id") == sequence_id
+        ):
+            if selected is None or actor is None:
+                raise GameLifecycleError("Random defensive profile attack counts lack a selection.")
+            pools, selected = apply_ranged_attack_count_evidence(
+                evidence=body,
+                sequence_id=sequence_id,
+                actor_id=actor,
+                pools=pools,
+                group=selected,
+                preceding_events=events[:event_index],
+            )
+        elif (
             event.event_type == "attack_sequence_completed"
             and body.get("sequence_id") == sequence_id
         ):
             selected = None
     if (
         selected is None
+        or selected.counts_pending
         or selected.primary_pool_index != pool_index
         or selected.target_unit_instance_id != target_unit_instance_id
         or (attack_index is not None and not 0 <= attack_index < selected.total_attacks)

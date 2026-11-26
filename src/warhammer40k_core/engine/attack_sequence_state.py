@@ -298,6 +298,24 @@ class AttackSequence:
             and self.pool_index != self.current_gathered_group.primary_pool_index
         ):
             raise GameLifecycleError("AttackSequence pool_index must match gathered group.")
+        if (
+            self.current_gathered_group is not None and self.current_gathered_group.counts_pending
+        ) or (
+            self.current_gathered_group is None
+            and self.attack_pools[self.pool_index].pending_attack_count_bonus is not None
+        ):
+            if (
+                self.attack_index != 0
+                or self.generated_hit_index != 0
+                or self.current_hit_roll is not None
+                or self.pending_grouped_damage is not None
+                or self.pending_destroyed_transport_disembark is not None
+                or self.post_roll_attack_pools is not None
+            ):
+                raise GameLifecycleError(
+                    "Pending attack counts cannot have attack resolution state."
+                )
+            return
         if self.attack_index >= self.current_pool().attacks:
             raise GameLifecycleError("AttackSequence attack_index is outside current pool.")
         if self.generated_hit_index > 0:

@@ -104,7 +104,9 @@ def _base_attacks(
     original: ShootingDeclarationProposal,
     index: int,
     pool: RangedAttackPool,
-) -> int:
+) -> int | None:
+    if pool.pending_attack_count_bonus is not None:
+        return None
     declaration = tuple(
         row for row in original.declarations if row.target_unit_instance_id is not None
     )[index]
@@ -140,7 +142,7 @@ def _candidate_pool(
     original: ShootingDeclarationProposal,
     index: int,
     target_id: str,
-    base_attacks: int,
+    base_attacks: int | None,
     attack_profile: AttackProfile,
     selected_ability_ids: tuple[str, ...] | None = None,
     committed_selection_context: WeaponSelectionContext | None = None,

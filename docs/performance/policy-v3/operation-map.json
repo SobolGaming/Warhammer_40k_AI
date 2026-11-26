@@ -263,6 +263,89 @@
     }
   },
   "operations": {
+    "precision-benchmark-live-checkpoint": {
+      "paths": [
+        "scripts/measure_precision_grouping.py"
+      ],
+      "owners": [
+        "decline_command_reroll"
+      ],
+      "families": [
+        "precision_grouping"
+      ],
+      "sensitive": true,
+      "mandatory": true
+    },
+    "native-ranged-attack-count-reroll": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/ranged-attack-count-reroll-test-v1.json",
+        "docs/ADAPTER_DECISION_CONTRACT.md",
+        "scripts/engine_numerical_identity_test_admission.py",
+        "scripts/ranged_attack_count_test_admission.py",
+        "src/warhammer40k_core/engine/attack_sequence_dispatch.py",
+        "src/warhammer40k_core/engine/attack_sequence_model.py",
+        "src/warhammer40k_core/engine/attack_sequence_state.py",
+        "src/warhammer40k_core/engine/model_attack_completion.py",
+        "src/warhammer40k_core/engine/phases/shooting_declaration_validation.py",
+        "src/warhammer40k_core/engine/phases/shooting_handler.py",
+        "src/warhammer40k_core/engine/random_profile_attack_groups.py",
+        "src/warhammer40k_core/engine/random_weapon_restore.py",
+        "src/warhammer40k_core/engine/ranged_attack_count_gathering.py",
+        "src/warhammer40k_core/engine/shooting_target_replacement.py",
+        "src/warhammer40k_core/engine/shooting_target_replacement_authority.py",
+        "src/warhammer40k_core/engine/stratagems_core_handlers.py",
+        "src/warhammer40k_core/engine/weapon_declaration.py",
+        "tests/code_quality/test_engine_numerical_identity_admission.py",
+        "tests/rules/section10/test_random_attack_count_reroll.py"
+      ],
+      "owners": [
+        "@document",
+        "@module",
+        "AttackSequence.__post_init__",
+        "GatheredAttackContribution.__post_init__",
+        "GatheredAttackGroup.__post_init__",
+        "GatheredAttackGroup.counts_pending",
+        "RangedAttackCountTestAdmission",
+        "RangedAttackPool",
+        "RangedAttackPool.__post_init__",
+        "RangedAttackPool.from_declaration",
+        "RangedAttackPool.from_payload",
+        "RangedAttackPool.to_payload",
+        "RangedAttackPoolPayload",
+        "ShootingPhaseHandler.begin_phase",
+        "_answer_ranged_count",
+        "_apply_command_reroll_handler",
+        "_attack_pools_or_validation",
+        "_base_attacks",
+        "_candidate_pool",
+        "_count_roll_spec",
+        "_counteroffensive_fight_type_transition",
+        "_current_count_roll",
+        "_original_count_roll",
+        "_resolved_count",
+        "_selected_group_event_index",
+        "_validate_sequence_history",
+        "apply_ranged_attack_count_evidence",
+        "combined_charge_runtime",
+        "exact_movement_test_transition",
+        "gather_ranged_attack_counts",
+        "ranged_attack_count_runtime",
+        "ranged_attack_count_test_addition",
+        "resolve_attack_sequence_until_blocked",
+        "resolved_model_ids",
+        "test_identity_inventory_uses_current_twelve_shards_and_native_cohort",
+        "test_native_fixed_group_resolves_before_unselected_random_attacks",
+        "test_native_group_rolls_separately_for_two_physical_weapons",
+        "test_native_random_attacks_choose_then_gather_and_reroll",
+        "test_random_attack_count_window_restores_and_replays",
+        "validate_profile_attack_group",
+        "validate_random_weapon_history",
+        "validate_restored_replacements"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
     "caudit-01-successor-evidence": {
       "mandatory": true,
       "sensitive": false,

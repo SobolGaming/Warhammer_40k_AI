@@ -60,6 +60,7 @@ class RangedAttackPoolPayload(TypedDict):
     target_unit_instance_id: str
     shooting_type: str
     attacks: int
+    pending_attack_count_bonus: NotRequired[int]
     target_visible_model_ids: list[str]
     target_in_range_model_ids: list[str]
     hit_roll_modifier: int
@@ -427,6 +428,7 @@ class RangedAttackPool:
     firing_deck_source_model_instance_id: str | None = None
 
     weapon_selection_context: WeaponSelectionContext | None = None
+    pending_attack_count_bonus: int | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -471,11 +473,16 @@ class RangedAttackPool:
             ),
         )
         object.__setattr__(self, "shooting_type", shooting_type_from_token(self.shooting_type))
-        object.__setattr__(
-            self,
-            "attacks",
-            _validate_positive_int("RangedAttackPool attacks", self.attacks),
-        )
+        if self.pending_attack_count_bonus is None:
+            _validate_positive_int("RangedAttackPool attacks", self.attacks)
+        elif (
+            type(self.attacks) is not int
+            or self.attacks != 0
+            or type(self.pending_attack_count_bonus) is not int
+            or self.pending_attack_count_bonus < 0
+            or self.weapon_profile.attack_profile.dice_expression is None
+        ):
+            raise GameLifecycleError("Pending ranged Attacks requires an unrolled dice profile.")
         object.__setattr__(
             self,
             "target_visible_model_ids",
@@ -583,6 +590,7 @@ class RangedAttackPool:
         hit_roll_modifier: int,
         targeting_rule_ids: tuple[str, ...],
         weapon_selection_context: WeaponSelectionContext | None = None,
+        pending_attack_count_bonus: int | None = None,
     ) -> Self:
         if type(declaration) is not WeaponDeclaration:
             raise GameLifecycleError("RangedAttackPool requires a WeaponDeclaration.")
@@ -600,6 +608,7 @@ class RangedAttackPool:
             target_unit_instance_id=declaration.target_unit_instance_id,
             shooting_type=declaration.shooting_type,
             attacks=attacks,
+            pending_attack_count_bonus=pending_attack_count_bonus,
             target_visible_model_ids=target_visible_model_ids,
             target_in_range_model_ids=target_in_range_model_ids,
             hit_roll_modifier=hit_roll_modifier,
@@ -628,6 +637,8 @@ class RangedAttackPool:
             "firing_deck_source_unit_instance_id": self.firing_deck_source_unit_instance_id,
             "firing_deck_source_model_instance_id": self.firing_deck_source_model_instance_id,
         }
+        if self.pending_attack_count_bonus is not None:
+            payload["pending_attack_count_bonus"] = self.pending_attack_count_bonus
         if self.hit_roll_modifiers:
             payload["hit_roll_modifiers"] = [item.to_payload() for item in self.hit_roll_modifiers]
         if self.weapon_selection_context is not None:
@@ -636,6 +647,11 @@ class RangedAttackPool:
 
     @classmethod
     def from_payload(cls, payload: RangedAttackPoolPayload) -> Self:
+        if (
+            "pending_attack_count_bonus" in payload
+            and type(payload["pending_attack_count_bonus"]) is not int
+        ):
+            raise GameLifecycleError("Pending ranged attack count bonus must be an integer.")
         if "hit_roll_modifiers" in payload and not payload["hit_roll_modifiers"]:
             raise GameLifecycleError("Explicit hit modifier inventory must not be empty.")
         return cls(
@@ -652,6 +668,7 @@ class RangedAttackPool:
             target_unit_instance_id=payload["target_unit_instance_id"],
             shooting_type=shooting_type_from_token(payload["shooting_type"]),
             attacks=payload["attacks"],
+            pending_attack_count_bonus=payload.get("pending_attack_count_bonus"),
             target_visible_model_ids=tuple(payload["target_visible_model_ids"]),
             target_in_range_model_ids=tuple(payload["target_in_range_model_ids"]),
             hit_roll_modifier=payload["hit_roll_modifier"],

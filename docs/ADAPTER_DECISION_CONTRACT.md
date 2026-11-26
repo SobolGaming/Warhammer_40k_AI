@@ -2466,7 +2466,18 @@ attacker-visible attack-resolution decisions:
   `submission_kind: "select_attack_weapon_group"`, `target_unit_instance_id`,
   `sequence_id`, and a JSON-safe `gathered_group` payload with the
   identical-attack signature, contributing pool indices, per-pool attack counts,
-  and total gathered attacks. Multi-contribution groups resolve through a
+  and total gathered attacks. In ordinary 11th Edition Shooting, contributions
+  with random Attacks carry zero in the selection option until that weapon is
+  gathered. The option total sums the counts already known. After the group is
+  selected, the engine rolls separately for each pending physical weapon. The
+  existing Command Re-roll opportunity may pause each count before commitment.
+  Declining the opportunity keeps the original result. For a multi-die count,
+  accepting the Stratagem requires one die selection. Only the shooter receives
+  the pending component options. The viewer's permission uses the same opaque
+  window alias as the Stratagem context. Both players can see the resolved dice.
+  The `ranged_attack_counts_gathered` event binds the group, physical roll IDs, and
+  resolved counts before any Hit roll from that group. Multi-contribution groups
+  resolve through a
   deterministic gathered weapon-pool identity, while each contribution preserves
   its original wargear and weapon-profile IDs in the gathered payload. The
   signature includes every provenance field the current synthetic-pool resolver

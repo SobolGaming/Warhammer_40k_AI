@@ -143,6 +143,24 @@ def resolve_attack_sequence_until_blocked(
                 return current, allocated_model_ids, status
             if current.is_complete:
                 break
+        if (
+            current.current_gathered_group is not None
+            and current.current_gathered_group.counts_pending
+        ):
+            from warhammer40k_core.engine.ranged_attack_count_gathering import (
+                gather_ranged_attack_counts,
+            )
+
+            current, status = gather_ranged_attack_counts(
+                state=state,
+                decisions=decisions,
+                manager=manager,
+                sequence=current,
+                stratagem_index=stratagem_index,
+                stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
+            )
+            if status is not None:
+                return current, allocated_model_ids, status
         next_current, allocated_model_ids, status = _resolve_grouped_current_pool(
             state=state,
             decisions=decisions,

@@ -31,6 +31,10 @@ from warhammer40k_core.engine.post_roll_attack_profiles import (
 )
 from warhammer40k_core.engine.random_attack_authority import validate_generated_profile_attack
 from warhammer40k_core.engine.random_profile_roll_authority import validate_profile_roll
+from warhammer40k_core.engine.ranged_attack_count_gathering import (
+    RANGED_ATTACK_COUNTS_GATHERED,
+    apply_ranged_attack_count_evidence,
+)
 from warhammer40k_core.engine.weapon_declaration import RangedAttackPool, RangedAttackPoolPayload
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     core_random_profiles_2026_09 as random_source,
@@ -65,7 +69,7 @@ def validate_random_weapon_history(
     if catalog is None:
         raise GameLifecycleError("Random weapon restore requires its authoritative catalog.")
     declarations: dict[str, tuple[str, tuple[RangedAttackPool, ...]]] = {}
-    native_groups: dict[str, GatheredAttackGroup] = {}
+    selected_groups: dict[str, GatheredAttackGroup] = {}
     post_roll_profiles: dict[str, WeaponProfile] = {}
     decisions = {record.result.result_id: record for record in decision_records}
     physical_rolls: dict[str, JsonValue] = {}
@@ -124,7 +128,7 @@ def validate_random_weapon_history(
                     cast(GatheredAttackGroupPayload, raw_group)
                 )
                 sequence_id = raw_result_payload.get("sequence_id")
-                if group.native_snapshots:
+                if group.native_snapshots or group.counts_pending:
                     if (
                         type(sequence_id) is not str
                         or sequence_id not in declarations
@@ -142,9 +146,31 @@ def validate_random_weapon_history(
                         used_pool_indices=(),
                         gathered_group=group,
                     )
-                    native_groups[sequence_id] = group
+                    selected_groups[sequence_id] = group
                 elif type(sequence_id) is str:
-                    native_groups.pop(sequence_id, None)
+                    selected_groups.pop(sequence_id, None)
+        elif event.event_type == RANGED_ATTACK_COUNTS_GATHERED:
+            sequence_id = body.get("sequence_id")
+            if (
+                type(sequence_id) is not str
+                or sequence_id not in declarations
+                or sequence_id not in selected_groups
+            ):
+                raise GameLifecycleError("Random weapon attack counts lack a selection.")
+            declaring_actor, pools = declarations[sequence_id]
+            updated, selected = apply_ranged_attack_count_evidence(
+                evidence=body,
+                sequence_id=sequence_id,
+                actor_id=declaring_actor,
+                pools=pools,
+                group=selected_groups[sequence_id],
+                preceding_events=event_records[:event_index],
+            )
+            declarations[sequence_id] = declaring_actor, updated
+            if selected.native_snapshots:
+                selected_groups[sequence_id] = selected
+            else:
+                del selected_groups[sequence_id]
         elif event.event_type == "target_replacement_resolved":
             context = body.get("context")
             sequence_id = context.get("action_id") if isinstance(context, dict) else None
@@ -216,8 +242,10 @@ def validate_random_weapon_history(
             if declaration is None or declaration[0] != actor or pool_index >= len(declaration[1]):
                 raise GameLifecycleError("Random weapon occurrence lacks its accepted attack.")
             pool = declaration[1][pool_index]
-            selected_native_group = native_groups.get(sequence_id)
+            selected_native_group = selected_groups.get(sequence_id)
             if selected_native_group is not None:
+                if selected_native_group.counts_pending:
+                    raise GameLifecycleError("Random weapon occurrence precedes gathered counts.")
                 if (
                     pool_index != selected_native_group.primary_pool_index
                     or attack_index >= selected_native_group.total_attacks
