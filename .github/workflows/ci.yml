@@ -489,7 +489,24 @@ jobs:
         run: uv sync --locked --no-default-groups --group typecheck
 
       - name: Pyright
-        run: uv run --no-sync pyright
+        env:
+          # Strict analysis of src and tests can exceed Node's default old-space limit.
+          NODE_OPTIONS: --max-old-space-size=6144
+        run: |
+          uv run --no-sync node -e '
+            const mib = bytes => Math.round(bytes / 1024 ** 2);
+            const heap = require("node:v8").getHeapStatistics().heap_size_limit;
+            console.log(`Node ${process.version} (${process.execPath})`);
+            console.log(`V8 heap limit: ${mib(heap)} MiB`);
+            const constraint = process.constrainedMemory();
+            // Some Node versions report an unlimited cgroup with a large sentinel.
+            const limit = Number.isSafeInteger(constraint) && constraint > 0
+              ? `${mib(constraint)} MiB`
+              : "none reported";
+            console.log(`OS memory constraint: ${limit}`);
+          '
+          grep -E '^Mem(Total|Available):' /proc/meminfo
+          /usr/bin/time -f 'Pyright peak RSS: %M KiB' uv run --no-sync pyright
 
   behavior-tests:
     name: behavior-shard-${{ matrix.shard_id }}
