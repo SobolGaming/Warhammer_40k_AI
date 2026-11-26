@@ -1,0 +1,42 @@
+{
+  "base": "dec50bca2394c755a0d5fb76e6659882b388c032",
+  "policy_sha256": "9bdee9638108a6240ba4dbae1fd715a32c2f0a6bb190ce08c7caae6be0f5743f",
+  "retained_manifest_sha256": "1701a163d58756209054de421d459e057faedfb3cf670c72d9e3c5f9efc5edaa",
+  "manifest_sha256": "011c4baa764d5c8062632b8f19c4f4fcfe5925b5744afce28fba77ed84800720",
+  "runtime_fingerprint": "6a62fab60ddf5b30cb9651f7a2ec7140e06765f9c35eec1abd625e1f5814caec",
+  "added_files": {
+    "tests/infrastructure/adapters/test_charge_cp_policy.py": {
+      "mode": "100644",
+      "blob_sha1": "f8241e18bf89bb344d25d4b5127513acc4140e66",
+      "sha256": "56a3fde80febd0872595480d3bec8113cbcb83920d3d6233cbd87f725fe2800d",
+      "bytes": 20164
+    }
+  },
+  "added_cases": [
+    "tests/infrastructure/adapters/test_charge_cp_policy.py::test_dense_wall_policy_submits_native_modes_and_costs[conditional-ground]",
+    "tests/infrastructure/adapters/test_charge_cp_policy.py::test_dense_wall_policy_submits_native_modes_and_costs[keep-cp]",
+    "tests/infrastructure/adapters/test_charge_cp_policy.py::test_dense_wall_policy_submits_native_modes_and_costs[short-roll]",
+    "tests/infrastructure/adapters/test_charge_cp_policy.py::test_dense_wall_policy_submits_native_modes_and_costs[unaffordable]",
+    "tests/infrastructure/adapters/test_charge_cp_policy.py::test_late_onslaught_opt_in_requires_boolean[integer]",
+    "tests/infrastructure/adapters/test_charge_cp_policy.py::test_late_onslaught_opt_in_requires_boolean[null]",
+    "tests/infrastructure/adapters/test_charge_cp_policy.py::test_late_onslaught_opt_in_requires_boolean[string-false]",
+    "tests/infrastructure/adapters/test_charge_cp_policy.py::test_late_onslaught_rejects_charge_plan_from_different_position",
+    "tests/infrastructure/adapters/test_charge_cp_policy.py::test_late_onslaught_rejects_charge_plan_when_cp_changed_before_declaration",
+    "tests/infrastructure/adapters/test_charge_cp_policy.py::test_used_phase_allowance_cannot_be_spent_again"
+  ],
+  "origin_test": {
+    "before": {
+      "mode": "100644",
+      "blob_sha1": "66a502beeefdb9f2566252aa6967fee2cb7353e9",
+      "sha256": "7d98b29916544db1d2d973173e041af7f8f3c91c241054b3a13ed0cbaf52d84f",
+      "bytes": 12073
+    },
+    "after": {
+      "mode": "100644",
+      "blob_sha1": "d8e47d43a7b3177e973ca4e4749f7f8c976d95e0",
+      "sha256": "9c65c252a42ca011e78d94203baabd550c97c9782de45ed9b5b6d0b9a6c92b0b",
+      "bytes": 11818
+    }
+  },
+  "declaration_sha256": "7da5a8eb9af42e87b59530ea07278a55c7a7d338692ca060475f02fd888e0dff"
+}
