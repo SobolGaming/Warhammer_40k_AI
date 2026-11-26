@@ -1,7 +1,7 @@
 """Bounded target-dependent grouping and actual selected-history reconstruction.
 
-The actual base incorrectly separates inapplicable Precision. It is a cost
-reference, not a correctness oracle. Every runtime creates its own history.
+Use the matching grouping semantics for each measured runtime. Every runtime
+creates its own history with the same fixture and timed operations.
 """
 
 from __future__ import annotations
@@ -25,6 +25,7 @@ if TYPE_CHECKING:
     from tests.precision_grouping_helpers import PrecisionGroupingScene
 
     from warhammer40k_core.engine.attack_sequence import AttackSequence
+    from warhammer40k_core.engine.decision_request import DecisionRequest
     from warhammer40k_core.engine.game_state import GameState
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -208,6 +209,23 @@ def report_row(
     return row
 
 
+def decline_command_reroll(scene: PrecisionGroupingScene, request: DecisionRequest) -> None:
+    from warhammer40k_core.engine.phase import LifecycleStatusKind
+    from warhammer40k_core.engine.stratagems import DECLINE_STRATAGEM_WINDOW_OPTION_ID
+
+    assert request.decision_type == "use_stratagem"
+    assert any(
+        option.option_id.startswith("use-stratagem:command-reroll:") for option in request.options
+    )
+    assert DECLINE_STRATAGEM_WINDOW_OPTION_ID in {option.option_id for option in request.options}
+    status = scene.session.submit_option(
+        request_id=request.request_id,
+        option_id=DECLINE_STRATAGEM_WINDOW_OPTION_ID,
+        result_id=f"{request.request_id}:precision-benchmark-decline",
+    )
+    assert status.status_kind is not LifecycleStatusKind.INVALID, status
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
@@ -266,9 +284,12 @@ def main() -> None:
         )
 
     scene = precision_shooting_scene(
-        precision_first=True, random_defence=True, duplicate_precision=True
+        precision_first=True,
+        random_defence=True,
+        duplicate_precision=True,
+        pause_at_first_hit=True,
     )
-    # Base requires a choice between two groups; current singleton may already be selected.
+    # Native reroll windows keep the selected group live while Toughness is rolled.
     for _ in range(10):
         decisions = scene.session.lifecycle.decision_controller
         if any(
@@ -278,6 +299,9 @@ def main() -> None:
             break
         request = scene.session.advance_until_decision_or_terminal().decision_request
         assert request is not None
+        if request.decision_type == "use_stratagem":
+            decline_command_reroll(scene, request)
+            continue
         assert request.decision_type == "select_attack_weapon_group"
         precision_option = next(
             option
@@ -301,6 +325,11 @@ def main() -> None:
     state = scene.session.lifecycle.state
     assert state is not None
     assert state.shooting_phase_state is not None
+    assert scene.session.lifecycle.pending_decision_request() is not None
+    assert not any(
+        event.event_type == "attack_sequence_completed"
+        for event in scene.session.lifecycle.decision_controller.event_log.records
+    )
     sequence = state.shooting_phase_state.attack_sequence
     assert sequence is not None
     assert sequence.current_gathered_group is not None
@@ -334,7 +363,10 @@ def main() -> None:
         request = scene.session.advance_until_decision_or_terminal().decision_request
         assert request is not None
         assert request.decision_type != "select_precision_allocation"
-        submit_fixture_request(scene.session, request)
+        if request.decision_type == "use_stratagem":
+            decline_command_reroll(scene, request)
+        else:
+            submit_fixture_request(scene.session, request)
     else:
         raise AssertionError("Physical attack inventory did not complete.")
     final_context = checkpoint_inventory(scene)
@@ -391,9 +423,9 @@ def main() -> None:
             "or ReplayRunner.run only; preparation/JSON/artifact capture/assertions excluded"
         ),
         "qualification": (
-            "Actual base incorrectly splits inapplicable PRECISION; restore compares "
-            "each runtime's first selected random group (one versus two physical contributions); "
-            "replay completes the same two weapons/four physical attacks. Fresh request inputs "
+            "Restore uses the selected group at the live random-defence checkpoint. "
+            "The current grouping combines two physical weapons in that group. "
+            "Replay completes the same two weapons/four physical attacks. Fresh request inputs "
             "are components reconstructed from accepted pools and initial canonical state, "
             "not a pending facade checkpoint. No full-game or long-history certification."
         ),
