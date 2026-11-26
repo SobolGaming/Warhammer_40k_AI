@@ -15,6 +15,7 @@ from warhammer40k_core.engine.decision_record import DecisionRecord
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.event_log import EventRecord, JsonValue, canonical_json
 from warhammer40k_core.engine.fight_activation_units import active_fight_activation_rules_unit
+from warhammer40k_core.engine.fight_order import FIGHT_ACTIVATION_DECISION_TYPE
 from warhammer40k_core.engine.fight_resolution import (
     SUBMIT_MELEE_DECLARATION_DECISION_TYPE,
     MeleeDeclarationProposalRequest,
@@ -26,6 +27,8 @@ from warhammer40k_core.engine.move_completion_effects import (
 from warhammer40k_core.engine.movement_proposals import (
     MOVEMENT_PROPOSAL_DECISION_TYPE,
     PLACEMENT_PROPOSAL_DECISION_TYPE,
+    MovementProposalRequest,
+    ProposalKind,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, GameLifecycleStage
 from warhammer40k_core.engine.reaction_queue import (
@@ -74,6 +77,7 @@ def validate_reaction_queue_consistency(
         pending_request.decision_type not in reaction_frame_decision_types
         and not (charge_active and pending_request.decision_type in charge_types)
         and not _is_interrupted_fight_melee_request(state, pending_request)
+        and not _is_interrupted_fight_selection(state, pending_request, frames[-1])
     ):
         raise GameLifecycleError("Lifecycle reaction queue pending decision_type drift.")
     if (
@@ -86,6 +90,7 @@ def validate_reaction_queue_consistency(
         pending_request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
         and not is_catalog_setup_reactive_charge_move_request(pending_request)
         and not charge_active
+        and not _is_interrupted_fight_pile_in(state, pending_request)
     ):
         raise GameLifecycleError("Lifecycle reaction queue pending movement decision drift.")
     seen_request_ids: set[str] = set()
@@ -101,6 +106,41 @@ def validate_reaction_queue_consistency(
             raise GameLifecycleError("Lifecycle reaction queue frame phase drift.")
     if frames[-1].request_id != pending_request.request_id:
         raise GameLifecycleError("Lifecycle reaction queue active frame request_id drift.")
+
+
+def _is_interrupted_fight_selection(
+    state: GameState, request: DecisionRequest, frame: ReactionQueueFrame
+) -> bool:
+    fight = state.fight_phase_state
+    return (
+        request.decision_type == FIGHT_ACTIVATION_DECISION_TYPE
+        and state.current_battle_phase is BattlePhase.FIGHT
+        and fight is not None
+        and fight.active_activation is None
+        and request.actor_id in frame.reaction_window.eligible_player_ids
+        and isinstance(request.payload, dict)
+        and isinstance(request.payload.get("interrupt_id"), str)
+    )
+
+
+def _is_interrupted_fight_pile_in(state: GameState, request: DecisionRequest) -> bool:
+    fight = state.fight_phase_state
+    if state.current_battle_phase is not BattlePhase.FIGHT or fight is None:
+        return False
+    activation = fight.active_activation
+    if activation is None or activation.interrupt_id is None:
+        return False
+    movement = MovementProposalRequest.from_decision_request_payload(request.payload)
+    return (
+        movement.proposal_kind is ProposalKind.PILE_IN
+        and movement.phase == BattlePhase.FIGHT.value
+        and movement.actor_id == request.actor_id == activation.player_id
+        and movement.unit_instance_id == activation.unit_instance_id
+        and movement.source_decision_request_id == activation.request_id
+        and movement.source_decision_result_id == activation.result_id
+        and movement.context is not None
+        and movement.context.get("fight_movement_timing") == "overrun"
+    )
 
 
 def _is_interrupted_fight_melee_request(state: GameState, request: DecisionRequest) -> bool:

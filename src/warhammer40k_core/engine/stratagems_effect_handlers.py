@@ -341,17 +341,6 @@ def _apply_counteroffensive_handler(
     if not fight_types:
         raise GameLifecycleError("Counteroffensive target has no legal fight type.")
     interrupt_id = f"counteroffensive:{use_record.use_id}"
-    selection = FightActivationSelection(
-        player_id=use_record.player_id,
-        battle_round=use_record.battle_round,
-        unit_instance_id=target_unit_id,
-        ordering_band=fight_context.ordering_band,
-        fight_type=fight_types[0],
-        eligibility_reasons=fight_context.eligibility_reasons,
-        request_id=use_record.request_id,
-        result_id=use_record.result_id,
-        interrupt_id=interrupt_id,
-    )
     effect = PersistingEffect(
         effect_id=f"{use_record.use_id}:counteroffensive:fights-first",
         source_rule_id=use_record.source_id,
@@ -371,6 +360,31 @@ def _apply_counteroffensive_handler(
         },
     )
     state.record_persisting_effect(effect)
+    if len(fight_types) != 1:
+        from warhammer40k_core.engine.fight_activation_requests import request_fight_activation
+
+        request_fight_activation(
+            state=state,
+            decisions=decisions,
+            fight_state=fight_state.with_next_player(use_record.player_id),
+            contexts=(fight_context,),
+            pass_available=False,
+            policy=ruleset_descriptor.fight_policy,
+            interrupt_id=interrupt_id,
+        )
+        return
+    (fight_type,) = fight_types
+    selection = FightActivationSelection(
+        player_id=use_record.player_id,
+        battle_round=use_record.battle_round,
+        unit_instance_id=target_unit_id,
+        ordering_band=fight_context.ordering_band,
+        fight_type=fight_type,
+        eligibility_reasons=fight_context.eligibility_reasons,
+        request_id=use_record.request_id,
+        result_id=use_record.result_id,
+        interrupt_id=interrupt_id,
+    )
     state.replace_fight_phase_state(
         fight_state.with_activation(selection).with_active_activation(selection)
     )

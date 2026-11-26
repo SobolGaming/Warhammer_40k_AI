@@ -1,0 +1,61 @@
+{
+  "schema": "finite-counteroffensive-fight-type-v1",
+  "base": "dec50bca2394c755a0d5fb76e6659882b388c032",
+  "retained_normal_move_sha256": "bf15b3ce40bd26cc9c1af4da30a21fc17cd475c8f849bceabf8407f3fa9348a0",
+  "retained_runtime_fingerprint": "40b91df8a39aa85afd3503b466b7bcab93c87d70db8189243bc9c5d70f924e1a",
+  "runtime_fingerprint": "4145ac829e45612b3fc716574e0cd527b00008c7ec69927fdadb880505d2c392",
+  "runtime_manifest": {
+    "before": "1701a163d58756209054de421d459e057faedfb3cf670c72d9e3c5f9efc5edaa",
+    "after": "a8817518cabf6795fe24deb3ca580d7665940e1eccaab7171255979e4d36b7f2"
+  },
+  "sources": {
+    "src/warhammer40k_core/engine/fight_activation_requests.py": {
+      "before": "ed5eff1db7580118ba8202e091a413ea199680d40384f21e89c254486cdf0aed",
+      "after": "8aeee2054ea66914af364d141b2f1a0dc46806aec62eb3f1e7081a36f6603b54"
+    },
+    "src/warhammer40k_core/engine/fight_order.py": {
+      "before": "f0942554275868586fa1a59b8ac135eb1557ff23b705614f6958bcb101995899",
+      "after": "8937a8178db5ab185c1c3574accbf21b469ed0b4620b3a273985d3da4bebd7d4"
+    },
+    "src/warhammer40k_core/engine/lifecycle_reaction_queue.py": {
+      "before": "91b8ae84f3b83578014182e34eea39d37c6d96e2e2457fee12d105b092307960",
+      "after": "04a888f2b2d9f41b004b83fee80716360427ca2bc0f074402374fb0279614769"
+    },
+    "src/warhammer40k_core/engine/phases/fight.py": {
+      "before": "5b329d78d216336e141692e00cca125d4ffb743ef216a3b0f814ceeaddb7518b",
+      "after": "690c318e7beefb77b59e774fa06b5aea70876c6d052df3e309be2e0670138006"
+    },
+    "src/warhammer40k_core/engine/stratagems_effect_handlers.py": {
+      "before": "eeec51078f3a0a00e066660cffb0ceac98e6544e8995fc330b3cd7f61bb6a3bd",
+      "after": "e2c6ad926969ab2759c087548e087e8ef0de2ef6fb392517bae8022c349c511c"
+    }
+  },
+  "origin_test": {
+    "before": {
+      "mode": "100644",
+      "bytes": 12073,
+      "sha256": "7d98b29916544db1d2d973173e041af7f8f3c91c241054b3a13ed0cbaf52d84f",
+      "blob_sha1": "66a502beeefdb9f2566252aa6967fee2cb7353e9"
+    },
+    "after": {
+      "mode": "100644",
+      "bytes": 12073,
+      "sha256": "fd3e051853e55aff854315b034cb7029b26ddbeb11cf49d6844ecfc2d8af4b1f",
+      "blob_sha1": "80cfc0a9dc2ee2f9afebdb3c4fb97ce35077b587"
+    }
+  },
+  "added_files": {
+    "tests/rules/section12/test_counteroffensive_fight_type.py": {
+      "mode": "100644",
+      "bytes": 11995,
+      "sha256": "229c325387300d18ab79e6fc66b4d303505e302fe1583bc25e613cb73908d2c2",
+      "blob_sha1": "2aa13573e15c0065974eeed39e8f2e5c5177c609"
+    }
+  },
+  "added_cases": [
+    "tests/rules/section12/test_counteroffensive_fight_type.py::test_counteroffensive_preserves_native_fight_type[decline]",
+    "tests/rules/section12/test_counteroffensive_fight_type.py::test_counteroffensive_preserves_native_fight_type[normal]",
+    "tests/rules/section12/test_counteroffensive_fight_type.py::test_counteroffensive_preserves_native_fight_type[overrun]",
+    "tests/rules/section12/test_counteroffensive_fight_type.py::test_counteroffensive_preserves_native_fight_type[single-overrun]"
+  ]
+}

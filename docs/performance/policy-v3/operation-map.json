@@ -36801,6 +36801,40 @@
       "sensitive": false,
       "mandatory": true
     },
+    "counteroffensive-fight-type": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/counteroffensive-fight-type-v1.json",
+        "src/warhammer40k_core/engine/fight_activation_requests.py",
+        "src/warhammer40k_core/engine/fight_order.py",
+        "src/warhammer40k_core/engine/lifecycle_reaction_queue.py",
+        "src/warhammer40k_core/engine/phases/fight.py",
+        "src/warhammer40k_core/engine/stratagems_effect_handlers.py",
+        "tests/rules/section12/test_counteroffensive_fight_type.py"
+      ],
+      "owners": [
+        "@document",
+        "@module",
+        "_after_enemy_overrun",
+        "_apply_counteroffensive_handler",
+        "_apply_fight_activation_decision",
+        "_fight_activation_options",
+        "_invalid_fight_activation_selection_status",
+        "_is_interrupted_fight_pile_in",
+        "_is_interrupted_fight_selection",
+        "_restore",
+        "_viewer_request",
+        "build_fight_activation_request",
+        "current_fight_activation_selection_from_payload",
+        "fight_activation_option_payload",
+        "invalid_fight_activation_status",
+        "request_fight_activation",
+        "test_counteroffensive_preserves_native_fight_type",
+        "validate_reaction_queue_consistency"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": true
+    },
     "stage2-counteroffensive-viewer": {
       "paths": [
         "tests/rules/section15/test_reactions.py"

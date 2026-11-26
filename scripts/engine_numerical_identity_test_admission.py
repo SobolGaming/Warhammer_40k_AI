@@ -465,7 +465,10 @@ def _counteroffensive_test_successor(
 
 
 def _stage2_melee_restore_successor(
-    root: Path, *, current_tests: TestSuccessors | None
+    root: Path,
+    *,
+    current_tests: TestSuccessors | None,
+    current_sources: SourceSuccessors,
 ) -> tuple[str, TestSuccessors, bytes]:
     raw = _checked_bytes(root, STAGE2_MELEE_RESTORE_TRANSITION, STAGE2_MELEE_RESTORE_SHA256)
     record = json.loads(raw, object_pairs_hook=_selection_object)
@@ -492,7 +495,7 @@ def _stage2_melee_restore_successor(
             raise SystemExit(
                 "Stage 2 melee restore requires exact before and after source digests."
             )
-        _checked_bytes(root, name, change["after"])
+        _retained_source(root, name, change["after"], current_sources)
     tests = _selection_members(
         {name: row["after"] for name, row in record["test"].items()},
         root,
@@ -1314,6 +1317,73 @@ COMBINED_CHARGE_TRANSITION_SHA256 = (
 COMBINED_CHARGE_BASE = "4d753ec652ee38b394260d3f539df7b04403149b"
 
 
+COUNTEROFFENSIVE_FIGHT_TYPE_TRANSITION = (
+    "data/source_audits/ci64_provenance_v1/counteroffensive-fight-type-v1.json"
+)
+COUNTEROFFENSIVE_FIGHT_TYPE_SHA256 = (
+    "374958f528106e4b8d8b16f7a9c91d2dd26d03622cfd6a02596b0cf11f0f3a24"
+)
+COUNTEROFFENSIVE_FIGHT_TYPE_OWNER = "tests/rules/section12/test_counteroffensive_fight_type.py"
+_COUNTEROFFENSIVE_FIGHT_TYPE_SOURCES = {
+    "src/warhammer40k_core/engine/fight_activation_requests.py",
+    "src/warhammer40k_core/engine/fight_order.py",
+    "src/warhammer40k_core/engine/lifecycle_reaction_queue.py",
+    "src/warhammer40k_core/engine/phases/fight.py",
+    "src/warhammer40k_core/engine/stratagems_effect_handlers.py",
+}
+
+
+class _CounteroffensiveFightTypeReceipt(TypedDict):
+    schema: str
+    base: str
+    retained_normal_move_sha256: str
+    retained_runtime_fingerprint: str
+    runtime_fingerprint: str
+    runtime_manifest: dict[str, str]
+    sources: SourceSuccessors
+    origin_test: dict[str, dict[str, object]]
+    added_files: TestSuccessors
+    added_cases: list[str]
+
+
+def _counteroffensive_fight_type_transition(
+    root: Path,
+) -> tuple[_CounteroffensiveFightTypeReceipt, bytes] | None:
+    path = root / COUNTEROFFENSIVE_FIGHT_TYPE_TRANSITION
+    _selection_no_links(root, path)
+    if not path.exists():
+        return None
+    raw = _checked_bytes(
+        root, COUNTEROFFENSIVE_FIGHT_TYPE_TRANSITION, COUNTEROFFENSIVE_FIGHT_TYPE_SHA256
+    )
+    receipt = cast(
+        _CounteroffensiveFightTypeReceipt, json.loads(raw, object_pairs_hook=_selection_object)
+    )
+    if (
+        receipt.keys() != _CounteroffensiveFightTypeReceipt.__required_keys__
+        or receipt["schema"] != "finite-counteroffensive-fight-type-v1"
+        or receipt["base"] != "dec50bca2394c755a0d5fb76e6659882b388c032"
+        or receipt["runtime_fingerprint"] == receipt["retained_runtime_fingerprint"]
+        or receipt["sources"].keys() != _COUNTEROFFENSIVE_FIGHT_TYPE_SOURCES
+        or receipt["origin_test"].keys() != {"before", "after"}
+        or receipt["added_files"].keys() != {COUNTEROFFENSIVE_FIGHT_TYPE_OWNER}
+        or receipt["added_cases"]
+        != [
+            f"{COUNTEROFFENSIVE_FIGHT_TYPE_OWNER}::test_counteroffensive_preserves_native_fight_type[{case}]"
+            for case in ("decline", "normal", "overrun", "single-overrun")
+        ]
+        or any(
+            change.keys() != {"before", "after"} or change["before"] == change["after"]
+            for change in (receipt["runtime_manifest"], *receipt["sources"].values())
+        )
+    ):
+        raise SystemExit("Counteroffensive Fight-type test admission differs.")
+    for name, change in receipt["sources"].items():
+        _checked_bytes(root, name, change["after"])
+    _checked_bytes(root, MANIFEST, receipt["runtime_manifest"]["after"])
+    return receipt, raw
+
+
 def combined_charge_runtime(root: Path, flight_raw: bytes, retry_raw: bytes) -> str:
     """Bind both independently validated lineages to their one composed runtime."""
     receipt = _checked_bytes(root, COMBINED_CHARGE_TRANSITION, COMBINED_CHARGE_TRANSITION_SHA256)
@@ -1332,12 +1402,28 @@ def combined_charge_runtime(root: Path, flight_raw: bytes, retry_raw: bytes) -> 
 
     normal_move = load_normal_move_admission(root)
     if normal_move is not None:
-        return normal_move.admit_runtime(
+        counter = _counteroffensive_fight_type_transition(root)
+        counter_receipt = None if counter is None else counter[0]
+        normal_runtime = normal_move.admit_runtime(
             root,
             predecessor=receipt,
             fingerprint=fingerprint,
             manifest_sha256=binding["combined_manifest_sha256"],
+            manifest_successor=None
+            if counter_receipt is None
+            else counter_receipt["runtime_manifest"],
         )
+        if counter_receipt is None:
+            return normal_runtime
+        if (
+            counter_receipt["retained_normal_move_sha256"]
+            != hashlib.sha256(normal_move.raw).hexdigest()
+            or counter_receipt["retained_runtime_fingerprint"] != normal_runtime
+        ):
+            raise SystemExit(
+                "Counteroffensive Fight types require the exact Normal Move predecessor."
+            )
+        return counter_receipt["runtime_fingerprint"]
     _checked_bytes(root, MANIFEST, binding["combined_manifest_sha256"])
     return fingerprint
 
@@ -1682,11 +1768,15 @@ def exact_movement_test_transition(
         runtime, _, successor_raw = fight_successor
         raw += b"\0" + successor_raw
     counteroffensive_runtime = runtime
+    counter_fight_type = _counteroffensive_fight_type_transition(root)
+    counter_receipt = None if counter_fight_type is None else counter_fight_type[0]
     melee_restore_tests = None
     melee_restore_raw = None
     if has_melee_restore:
         runtime, melee_restore_tests, melee_restore_raw = _stage2_melee_restore_successor(
-            root, current_tests=None if fight_reroll is None else fight_reroll[1]
+            root,
+            current_tests=None if fight_reroll is None else fight_reroll[1],
+            current_sources={} if counter_receipt is None else counter_receipt["sources"],
         )
     if fight_reroll is not None:
         runtime = fight_reroll[0]
@@ -2063,8 +2153,16 @@ def exact_movement_test_transition(
         runtime = flight_runtime
     elif retry_runtime is not None:
         runtime = retry_runtime
+    if counter_receipt is not None and normal_move is None:
+        raise SystemExit("Counteroffensive Fight types require the Normal Move predecessor.")
     if normal_move is not None and (
-        screen is None or runtime != normal_move.receipt["runtime_fingerprint"]
+        screen is None
+        or runtime
+        != (
+            normal_move.receipt["runtime_fingerprint"]
+            if counter_receipt is None
+            else counter_receipt["runtime_fingerprint"]
+        )
     ):
         raise SystemExit("Normal Move tests require the exact Screen and combined Charge lineage.")
 
@@ -2253,13 +2351,27 @@ def exact_movement_test_transition(
             raise SystemExit("Normal Move tests overlap predecessor tests.")
         additions.update(normal_tests)
         raw += b"\0" + normal_move.raw
-    origin = normal_move_origin_test_addition(root, predecessor=normal_move, runtime=runtime)
+    origin = normal_move_origin_test_addition(
+        root,
+        predecessor=normal_move,
+        runtime=runtime
+        if counter_receipt is None
+        else counter_receipt["retained_runtime_fingerprint"],
+        successor=None if counter_receipt is None else counter_receipt["origin_test"],
+    )
     if origin is not None:
         origin_tests, origin_raw = origin
         if origin_tests.keys() & (updated.keys() | added.keys() | additions.keys()):
             raise SystemExit("Constructed Normal Move origin tests overlap predecessor tests.")
         additions.update(origin_tests)
         raw += b"\0" + origin_raw
+    if counter_fight_type is not None:
+        counter_receipt, counter_raw = counter_fight_type
+        counter_tests = _selection_members(counter_receipt["added_files"], root)
+        if counter_tests.keys() & (updated.keys() | added.keys() | additions.keys()):
+            raise SystemExit("Counteroffensive Fight-type tests overlap predecessor tests.")
+        additions.update(counter_tests)
+        raw += b"\0" + counter_raw
     return updated, {**added, **additions}, retained_raw + b"\0" + raw
 
 

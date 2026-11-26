@@ -936,6 +936,21 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
     assert ground_charge.SCREEN_OWNER in active_files
     assert sum(ground_charge.SCREEN_OWNER in group for group in groups) == 1
     normal_move = _record(ground_charge.NORMAL_MOVE_TRANSITION)
+    receipt_path = ROOT / selection.COUNTEROFFENSIVE_FIGHT_TYPE_TRANSITION
+    counter_fight_type = (
+        _record(selection.COUNTEROFFENSIVE_FIGHT_TYPE_TRANSITION)
+        if receipt_path.is_file()
+        else None
+    )
+    if counter_fight_type is not None:
+        assert selection.COUNTEROFFENSIVE_FIGHT_TYPE_OWNER in active_files
+        assert sum(selection.COUNTEROFFENSIVE_FIGHT_TYPE_OWNER in group for group in groups) == 1
+        for name, binding in counter_fight_type["sources"].items():
+            before = subprocess.check_output(
+                ["git", "show", counter_fight_type["base"] + ":" + name], cwd=ROOT
+            )
+            assert binding["before"] == hashlib.sha256(before).hexdigest()
+            assert binding["after"] == hashlib.sha256((ROOT / name).read_bytes()).hexdigest()
     assert normal_move["base"] == ground_charge.NORMAL_MOVE_BASE
     assert normal_move["screen_source"]["before"] == screen["policy_sha256"]
     for path, key in (
@@ -946,10 +961,18 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
             ["git", "show", normal_move["base"] + ":" + path], cwd=ROOT
         )
         assert normal_move[key]["before"] == hashlib.sha256(before).hexdigest()
-        assert normal_move[key]["after"] == hashlib.sha256((ROOT / path).read_bytes()).hexdigest()
+        expected = normal_move[key]["after"]
+        if path == MANIFEST and counter_fight_type is not None:
+            assert expected == counter_fight_type["runtime_manifest"]["before"]
+            expected = counter_fight_type["runtime_manifest"]["after"]
+        assert expected == hashlib.sha256((ROOT / path).read_bytes()).hexdigest()
     assert normal_move["runtime_manifest"]["before"] == combined["combined_manifest_sha256"]
     assert normal_move["retained_runtime_fingerprint"] == combined["combined_runtime_fingerprint"]
-    assert normal_move["runtime_fingerprint"] == _record(MANIFEST)["fingerprint"]
+    expected_runtime = normal_move["runtime_fingerprint"]
+    if counter_fight_type is not None:
+        assert expected_runtime == counter_fight_type["retained_runtime_fingerprint"]
+        expected_runtime = counter_fight_type["runtime_fingerprint"]
+    assert expected_runtime == _record(MANIFEST)["fingerprint"]
     assert ground_charge.NORMAL_MOVE_OWNER in active_files
     assert sum(ground_charge.NORMAL_MOVE_OWNER in group for group in groups) == 1
     assert normal_move["added_cases"] == [
@@ -1355,6 +1378,7 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         | set(retry["added_cases"])
         | set(normal_move["added_cases"])
         | set(origin["added_cases"])
+        | (set() if counter_fight_type is None else set(counter_fight_type["added_cases"]))
         | shooting_cases
         | {
             ground_charge.SCREEN_OWNER

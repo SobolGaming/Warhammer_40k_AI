@@ -28,6 +28,7 @@ def request_fight_activation(
     contexts: tuple[FightEligibilityContext, ...],
     pass_available: bool,
     policy: FightPolicyDescriptor,
+    interrupt_id: str | None = None,
 ) -> LifecycleStatus:
     request = build_fight_activation_request(
         state=state,
@@ -36,6 +37,7 @@ def request_fight_activation(
         pass_available=pass_available,
         policy=policy,
         request_id=state.next_decision_request_id(),
+        interrupt_id=interrupt_id,
     )
     decisions.request_decision(request)
     decisions.event_log.append(
@@ -78,6 +80,7 @@ def build_fight_activation_request(
     pass_available: bool,
     policy: FightPolicyDescriptor,
     request_id: str,
+    interrupt_id: str | None = None,
 ) -> DecisionRequest:
     forced_payload: JsonValue = (
         None
@@ -100,6 +103,7 @@ def build_fight_activation_request(
                 "eligible_contexts": [context.to_payload() for context in contexts],
                 "eligible_pass_available": pass_available,
                 **({} if forced_payload is None else {"forced_activation_context": forced_payload}),
+                **({} if interrupt_id is None else {"interrupt_id": interrupt_id}),
             }
         ),
         options=_fight_activation_options(
@@ -108,6 +112,7 @@ def build_fight_activation_request(
             contexts=contexts,
             pass_available=pass_available,
             policy=policy,
+            interrupt_id=interrupt_id,
         ),
     )
 
@@ -149,6 +154,7 @@ def _fight_activation_options(
     contexts: tuple[FightEligibilityContext, ...],
     pass_available: bool,
     policy: FightPolicyDescriptor,
+    interrupt_id: str | None,
 ) -> tuple[DecisionOption, ...]:
     options: list[DecisionOption] = []
     for context in contexts:
@@ -165,6 +171,7 @@ def _fight_activation_options(
                         fight_state=fight_state,
                         context=context,
                         fight_type=fight_type,
+                        interrupt_id=interrupt_id,
                     ),
                 )
             )
