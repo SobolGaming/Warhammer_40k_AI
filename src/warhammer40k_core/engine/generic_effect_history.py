@@ -28,7 +28,10 @@ from warhammer40k_core.engine.generic_rule_source_authority import (
 )
 from warhammer40k_core.engine.mutation_decision_authority import validate_mutation_decision_closure
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
-from warhammer40k_core.engine.rule_duration_execution import expiration_for_clause_effect
+from warhammer40k_core.engine.rule_duration_execution import (
+    expiration_for_clause_effect,
+    expiration_for_duration,
+)
 from warhammer40k_core.engine.rule_execution import RuleExecutionContext
 from warhammer40k_core.engine.rule_frequency import optional_ability_frequency_condition
 from warhammer40k_core.engine.rule_target_resolution import target_unit_instance_ids_for_clause
@@ -38,6 +41,7 @@ from warhammer40k_core.engine.stratagems_model import (
     StratagemUseRecord,
     StratagemUseRecordPayload,
 )
+from warhammer40k_core.rules.rule_ir import RuleDuration, RuleDurationPayload
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.army_mustering import ArmyDefinition
@@ -94,6 +98,52 @@ def historical_generic_effect_may_match(
         )
         for event in events
     )
+
+
+def historical_generic_effect_may_be_active(
+    *,
+    historical: HistoricalEffectAuthority,
+    matches_payload: Callable[[dict[str, JsonValue]], bool],
+) -> bool:
+    """Bound an ambiguity check by effect targets and their recorded lifetimes."""
+    for event in historical.event_records[: historical.boundary_event_index]:
+        if not isinstance(event.payload, dict):
+            continue
+        for effect in _installed_effects(event.event_type, event.payload):
+            payload = _object(effect.effect_payload, "installed effect")
+            if matches_payload(payload) and not _expired_at_test(effect.expiration, historical):
+                return True
+        if event.event_type != "rule_execution_effect_applied" or not matches_payload(
+            event.payload
+        ):
+            continue
+        execution = generic_execution_context_from_payload(
+            _object(event.payload.get("context"), "context")
+        )
+        if not execution.record_persisting_effects:
+            continue
+        duration = event.payload["duration"]
+        if duration is None:
+            # A source's implicit lifetime ends by its creation round. Within
+            # that round, its loaded trigger is needed to prove a shorter lifetime.
+            if execution.battle_round == historical.battle_round:
+                return True
+            continue
+        expiration = expiration_for_duration(
+            duration=RuleDuration.from_payload(
+                cast(RuleDurationPayload, _object(duration, "duration"))
+            ),
+            context=_HistoricalDurationContext(
+                state=historical,
+                player_id=execution.player_id,
+                battle_round=execution.battle_round,
+                phase=execution.phase,
+                active_player_id=execution.active_player_id,
+            ),
+        )
+        if expiration is not None and not _expired_at_test(expiration, historical):
+            return True
+    return False
 
 
 def historical_generic_effect_inventory(

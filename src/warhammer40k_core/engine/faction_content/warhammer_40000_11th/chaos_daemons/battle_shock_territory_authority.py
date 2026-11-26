@@ -9,7 +9,10 @@ from warhammer40k_core.engine.battle_shock_historical_authority import (
 )
 from warhammer40k_core.engine.battlefield_state import ModelPlacement, geometry_model_for_placement
 from warhammer40k_core.engine.event_log import JsonValue
-from warhammer40k_core.engine.generic_effect_history import historical_generic_effect_may_match
+from warhammer40k_core.engine.generic_effect_history import (
+    HistoricalEffectAuthority,
+    historical_generic_effect_may_be_active,
+)
 from warhammer40k_core.engine.objective_control import model_objective_control_characteristic
 from warhammer40k_core.engine.objective_control_sources import resolve_objective_control_sources
 from warhammer40k_core.engine.objective_geometry import (
@@ -21,11 +24,13 @@ from warhammer40k_core.engine.objective_geometry_sources import (
     terrain_objective_geometry,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.rules_units import rules_unit_view_from_armies
 from warhammer40k_core.engine.sticky_objective_control import (
     StickyObjectiveControlState,
     StickyObjectiveControlStatePayload,
 )
 from warhammer40k_core.engine.unit_factory import ModelInstance
+from warhammer40k_core.engine.unit_split_views import split_effect_predecessor_ids
 from warhammer40k_core.rules.rule_ir import RuleEffectKind
 
 
@@ -61,7 +66,7 @@ def historical_territorial_control(
     objective_groups: tuple[tuple[str, ...], ...],
     sticky_candidates: tuple[StickyObjectiveControlState, ...],
 ) -> bool | None:
-    """Prove control for this casualty check where the event-bound facts suffice."""
+    """Prove territorial control where the test-boundary facts suffice."""
     relevant_ids = {objective_id for group in objective_groups for objective_id in group}
     if not relevant_ids:
         return False
@@ -147,35 +152,35 @@ def _historical_control_at_objective(
     if not may_be_sticky and all(owner != player_id for owner, _, _ in participants):
         return False
 
-    phase_start_shocked = context.phase_start_battle_shocked_unit_ids
-    complex_lineage = bool(context.starting_attached_unit_records) or any(
-        army.attached_units or army.unit_splits for army in context.armies
-    )
-    if phase_start_shocked and complex_lineage and participants:
-        return None
-
+    identities = {
+        unit_id: _contributor_identities(context, unit_id)
+        for unit_id in {unit_id for _, unit_id, _ in participants}
+    }
+    shocked = set(context.phase_start_battle_shocked_unit_ids)
     contributing = [
         (owner, unit_id, model)
         for owner, unit_id, model in participants
-        if unit_id not in phase_start_shocked
+        if shocked.isdisjoint(identities[unit_id])
     ]
     if not may_be_sticky and all(owner != player_id for owner, _, _ in contributing):
         return False
 
-    unit_ids = {unit_id for _, unit_id, _ in contributing}
-    if contributing and (
-        historical_generic_effect_may_match(
-            context.event_records[: context.boundary_event_index],
-            lambda payload: _may_modify_objective_control(
-                payload, None if complex_lineage else unit_ids
-            ),
+    effect_targets = {
+        predecessor
+        for unit_id in {unit_id for _, unit_id, _ in contributing}
+        for identity in identities[unit_id]
+        for predecessor in split_effect_predecessor_ids(
+            armies=context.armies, unit_instance_id=identity
         )
+    }
+    if contributing and (
+        _has_active_objective_control_effect(context, effect_targets)
         or any(
             isinstance(model.characteristic(Characteristic.OBJECTIVE_CONTROL), RandomProfileValue)
             for _, _, model in contributing
         )
     ):
-        # This bounded proof does not reconstruct dynamic OC or transferred effect targets.
+        # This bounded proof does not compute active dynamic OC operations.
         return None
 
     scores = dict.fromkeys(context.player_ids, 0)
@@ -190,7 +195,43 @@ def _historical_control_at_objective(
     return None
 
 
-def _may_modify_objective_control(payload: dict[str, JsonValue], unit_ids: set[str] | None) -> bool:
+def _contributor_identities(
+    context: HistoricalBattleShockAuthorityContext, unit_id: str
+) -> tuple[str, ...]:
+    view = rules_unit_view_from_armies(armies=context.armies, unit_instance_id=unit_id)
+    if (
+        view.is_attached_rules_unit
+        and view.unit_instance_id not in context.active_attached_unit_ids
+    ):
+        raise GameLifecycleError("Historical Objective Control contributor attachment drifted.")
+    return (view.unit_instance_id, *view.component_unit_instance_ids)
+
+
+def _has_active_objective_control_effect(
+    context: HistoricalBattleShockAuthorityContext, target_ids: set[str]
+) -> bool:
+    historical = HistoricalEffectAuthority(
+        game_id=context.game_id,
+        player_ids=context.player_ids,
+        turn_order=context.turn_order,
+        battle_phase_sequence=context.battle_phase_sequence,
+        armies=context.armies,
+        event_records=context.event_records,
+        decision_records=context.decision_records,
+        boundary_event_index=context.boundary_event_index,
+        player_id=context.request.player_id,
+        battle_round=context.request.battle_round,
+        active_player_id=context.active_player_id,
+        phase=context.phase,
+        rules_unit_at_event=lambda unit_id, _index: context.rules_unit_containing_unit(unit_id),
+    )
+    return historical_generic_effect_may_be_active(
+        historical=historical,
+        matches_payload=lambda payload: _may_modify_objective_control(payload, target_ids),
+    )
+
+
+def _may_modify_objective_control(payload: dict[str, JsonValue], unit_ids: set[str]) -> bool:
     effect = payload.get("effect")
     if (
         not isinstance(effect, dict)
@@ -198,13 +239,9 @@ def _may_modify_objective_control(payload: dict[str, JsonValue], unit_ids: set[s
     ):
         return False
     target_ids = payload.get("target_unit_instance_ids")
-    if (
-        unit_ids is not None
-        and isinstance(target_ids, list)
-        and target_ids
-        and all(isinstance(unit_id, str) for unit_id in target_ids)
-        and unit_ids.isdisjoint(cast(list[str], target_ids))
-    ):
+    if not isinstance(target_ids, list) or not all(type(unit_id) is str for unit_id in target_ids):
+        raise GameLifecycleError("Historical Objective Control effect targets are invalid.")
+    if unit_ids.isdisjoint(cast(list[str], target_ids)):
         return False
     parameters = effect.get("parameters")
     if not isinstance(parameters, list):

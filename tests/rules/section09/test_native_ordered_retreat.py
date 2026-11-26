@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import cast
+from typing import Any, cast
 
 import pytest
 from tools.generate_ability_support_matrix import (
@@ -13,20 +13,24 @@ from tools.generate_ability_support_matrix import (
 
 from tests.daemons_native_source_helpers import SELECTED
 from tests.support.blood_legion import DETACHMENTS, blood_legion_definitions
-from tests.support.faction_batch01 import anchor, events, locate, request, scene, selection
+from tests.support.faction_batch01 import Scene, anchor, events, locate, request, scene, selection
 from tests.support.section02_fixtures import Section02Definitions
 from tests.support.section03_fixtures import grid
 from tests.support.section09_fixtures import propose
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.engine.battle_shock import BattleShockResult, BattleShockResultPayload
+from warhammer40k_core.engine.battle_shock_resolution import BattleShockResolutionResult
 from warhammer40k_core.engine.damage_allocation import (
     MortalWoundApplication,
     MortalWoundApplicationPayload,
 )
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.event_log import JsonValue
+from warhammer40k_core.engine.lifecycle import GameLifecycle
+from warhammer40k_core.engine.list_validation import AttachmentDeclaration
 from warhammer40k_core.engine.mortal_wound_model_allocation import mortal_wound_resolution_progress
 from warhammer40k_core.engine.movement_proposals import MovementProposalRequest
+from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.replay import ReplayRunner
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.geometry.pose import Pose
@@ -213,3 +217,156 @@ def test_native_ordered_retreat_resolves_and_replays(
     _restore(session)
     replay = ReplayRunner.from_payload(session.replay_artifact(artifact_id=case)).run()
     assert replay.reproduced_exactly, replay.to_payload()
+
+
+def _select_review_retreat(
+    session: LocalGameSession, unit_id: str, *, prefix: str = "audit"
+) -> DecisionRequest:
+    pick = request(session.advance_until_decision_or_terminal(), "select_movement_unit")
+    action = _choose(session, pick, unit_id, f"{prefix}-select", "select_movement_action")
+    return _choose(session, action, ORDINARY, f"{prefix}-fall-back", "submit_movement_proposal")
+
+
+def _review_scene(d: Section02Definitions, *, two_retreats: bool) -> Scene:
+    outside = (selection(d, SPAWN, "outside"),) if two_retreats else ()
+    bodyguards = (selection(d, "000004080", "infractors"),) if two_retreats else ()
+    outside_letters = (selection(d, BLOODLETTERS, "outside-letters"),) if two_retreats else ()
+    battle = scene(
+        d,
+        (selection(d, SPAWN, "retreat"), *outside, selection(d, LORD, "spare"), *bodyguards),
+        (selection(d, BLOODLETTERS, "letters"), *outside_letters),
+        attachments=(AttachmentDeclaration("spare", "infractors"),) if two_retreats else (),
+        detachment_id_by_faction=DETACHMENTS,
+        seed="core-09-07-01-desperate_escape",
+    )
+    locate(battle, SUBJECT, grid(battle.units[SUBJECT], 10, 10))
+    locate(battle, FORCER, grid(battle.units[FORCER], 10, 12.3))
+    locate(battle, SPARE, (Pose.at(31, 35),))
+    if two_retreats:
+        locate(battle, "own:infractors", grid(battle.units["own:infractors"], 33, 35))
+        locate(battle, "own:outside", grid(battle.units["own:outside"], 29, 10))
+        locate(battle, "foe:outside-letters", grid(battle.units["foe:outside-letters"], 29, 12.3))
+    else:
+        battle.state.battle_round = 2
+    anchor(battle)
+    return battle
+
+
+def test_second_forced_retreat_uses_only_territory_contributors(
+    retreat_definitions: Section02Definitions,
+) -> None:
+    battle = _review_scene(retreat_definitions, two_retreats=True)
+    session = battle.session
+    first = _select_review_retreat(session, "own:outside")
+    request(
+        propose(
+            session,
+            first,
+            battle.units["own:outside"],
+            (Pose.at(29, 6), Pose.at(31, 6)),
+            result_id="audit-witness",
+        ),
+        "select_movement_unit",
+    )
+    assert battle.state.battle_shocked_unit_ids == ["own:outside"]
+    assert events(session, TERROR_APPLIED) == []
+    second = _select_review_retreat(session, SUBJECT, prefix="second")
+    restored = _restore(session)
+
+    for current, restore_pending in ((session, False), (restored, True)):
+        status = propose(
+            current,
+            second,
+            battle.units[SUBJECT],
+            (Pose.at(10, 6), Pose.at(12, 6)),
+            result_id="second-witness",
+        )
+        allocation = request(status, "select_mortal_wound_model")
+        progress = mortal_wound_resolution_progress(allocation)
+        rolled_mortals = progress.mortal_wounds
+        assert ":daemonic-terror:" in progress.application_id
+        _, test = events(current, "forced_desperate_escape_battle_shock_resolved")
+        result = BattleShockResult.from_payload(
+            cast(BattleShockResultPayload, test["battle_shock_result"])
+        )
+        assert not result.passed
+        assert [modifier.operand for modifier in result.modified_roll.modifiers] == [-1]
+        assert _positions(current) == (Pose.at(10, 10), Pose.at(12, 10))
+        if restore_pending:
+            restored = current = _restore(current)
+            assert current.lifecycle.pending_decision_request() == allocation
+        for index in range(rolled_mortals):
+            status = current.submit_option(
+                request_id=allocation.request_id,
+                option_id=allocation.options[0].option_id,
+                result_id=f"second-allocate-{index}",
+            )
+            if index + 1 < rolled_mortals:
+                allocation = request(status, "select_mortal_wound_model")
+        hazard = request(status, "select_mortal_wound_model")
+        hazard_progress = mortal_wound_resolution_progress(hazard)
+        assert hazard_progress.application_id == f"desperate-escape:{second.request_id}:hazards"
+        assert hazard_progress.mortal_wounds == 1
+        _choose(
+            current,
+            hazard,
+            hazard.options[0].option_id,
+            "second-hazard",
+            "select_movement_unit",
+        )
+        (applied,) = events(current, TERROR_APPLIED)
+        assert applied["target_unit_instance_id"] == SUBJECT
+        damage = MortalWoundApplication.from_payload(
+            cast(MortalWoundApplicationPayload, applied["mortal_wound_application"])
+        )
+        assert damage.mortal_wounds == rolled_mortals
+        completed = events(current, "movement_activation_completed")
+        assert [row["unit_instance_id"] for row in completed] == ["own:outside", SUBJECT]
+        assert _positions(current) == (Pose.at(10, 6), Pose.at(12, 6))
+
+    assert session.to_persistence_payload() == restored.to_persistence_payload()
+    _restore(session)
+    replay = ReplayRunner.from_payload(
+        session.replay_artifact(artifact_id="second-forced-escape")
+    ).run()
+    assert replay.reproduced_exactly, replay.to_payload()
+
+
+def test_forced_escape_restore_rejects_invented_pretest_shock(
+    retreat_definitions: Section02Definitions, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from warhammer40k_core.engine import battle_shock_modifier_continuation as continuation
+
+    battle = _review_scene(retreat_definitions, two_retreats=False)
+    session = battle.session
+    proposal = _select_review_retreat(session, SUBJECT)
+    resolve = continuation.resolve_battle_shock_after_modifier_choices
+
+    def forge(**kwargs: Any) -> BattleShockResolutionResult:
+        assert kwargs["phase_start_battle_shocked_unit_ids"] == ()
+        kwargs["phase_start_battle_shocked_unit_ids"] = (FORCER,)
+        return resolve(**kwargs)
+
+    with monkeypatch.context() as patch:
+        # Generate the linked records and roll through the real resolver with
+        # an invented pre-test inventory. The actual Battle-shock history is intact.
+        patch.setattr(continuation, "resolve_battle_shock_after_modifier_choices", forge)
+        status = propose(
+            session,
+            proposal,
+            battle.units[SUBJECT],
+            (Pose.at(10, 6), Pose.at(12, 6)),
+            result_id="audit-witness",
+        )
+    request(status, "select_movement_unit")
+    (event,) = events(session, "forced_desperate_escape_battle_shock_resolved")
+    result = BattleShockResult.from_payload(
+        cast(BattleShockResultPayload, event["battle_shock_result"])
+    )
+    assert result.modified_roll.modifiers == ()
+    assert result.total == 6
+    assert events(session, TERROR_APPLIED) == []
+    with pytest.raises(
+        GameLifecycleError, match="Forced Desperate Escape pre-test Battle-shock state drifted"
+    ):
+        GameLifecycle.from_payload(json.loads(json.dumps(session.lifecycle.to_payload())))

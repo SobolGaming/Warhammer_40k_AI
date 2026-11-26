@@ -3,29 +3,47 @@
   "base": "dec50bca2394c755a0d5fb76e6659882b388c032",
   "retained_normal_move_sha256": "bf15b3ce40bd26cc9c1af4da30a21fc17cd475c8f849bceabf8407f3fa9348a0",
   "retained_runtime_fingerprint": "40b91df8a39aa85afd3503b466b7bcab93c87d70db8189243bc9c5d70f924e1a",
-  "runtime_fingerprint": "4bb022db61370de138a6c4d6db0c4afb959bb8ee2874253ee3bc41ff29d1a44b",
+  "runtime_fingerprint": "bc85756c3c466ffd646d5641b4edd4b410f66d84209530cde93fb8e2041ebe16",
   "runtime_manifest": {
     "before": "1701a163d58756209054de421d459e057faedfb3cf670c72d9e3c5f9efc5edaa",
-    "after": "d4f5a1dc06b07a9e6a65c65cb8ea277f396cf53d12154b42fd2c473e5b39b9fe"
+    "after": "01901371192c3b11334a82dceecea97f68c057afd57f9cdc347fc60b164b4885"
   },
   "source": {
     "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/army_rule.py": {
       "before": "00ffe06bf3fbd050cef1efc88b6de38eacd7a11c4d3fd9d5f2a4fff9e1de3043",
       "after": "8ecba93a2d491edc94550b81aae63a55a9ee78d36f7e5ffd5b42f6ebf5d28d3e"
+    },
+    "src/warhammer40k_core/engine/battle_shock_source_family_authority.py": {
+      "before": "4c39c5a0229d595ec84a8ef4083ecc217f40df5f9c090fe7636ae944c186e152",
+      "after": "74f852b834a1ba310251bc7b2dec95ae7454ec99348160edd1dabe2ced9c22d8"
+    },
+    "src/warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/battle_shock_territory_authority.py": {
+      "before": "4f110d54ff14ce4e2976ef551764f67a45ace8f2e74c51101d4cf41eca7a9886",
+      "after": "27920bc57626958d7378f6a090adcdbc2bb0488cd4d3792a4849e257b0b3fed7"
+    },
+    "src/warhammer40k_core/engine/generic_effect_history.py": {
+      "before": "5d8b7ba65b2e48f0003e0976624a32a5971f51429b92b20ac2e78581d1e00093",
+      "after": "c683f8440d0173b03e61a8f56bc73332971e012c7698f0f4fd5c955be7590329"
+    },
+    "src/warhammer40k_core/engine/phases/movement_battle_shock_continuation.py": {
+      "before": "13f6bafd631c7e1996c090ebda96e396d119597426ea99ad91f3dc25910722c5",
+      "after": "241b7ca873189362db2eb40c716fff6ce0c7496b703eb601a9f2441e502f4fd8"
     }
   },
   "added_files": {
     "tests/rules/section09/test_native_ordered_retreat.py": {
       "mode": "100644",
-      "bytes": 9382,
-      "sha256": "c96f528a838319f1cc01744398983fdf6702ccbb362ba0a54a4831dedd15b706",
-      "blob_sha1": "36005d9b7579d1d45e45123fe13e0209695664c6"
+      "bytes": 16609,
+      "sha256": "9ae741700f3f8840758d461a85977483d66103f3a6a3b010d7c0bb683ef9e7d9",
+      "blob_sha1": "f106ca830b923d2b08b950b1993dbd0367b9ebf4"
     }
   },
   "added_cases": [
     "tests/rules/section09/test_native_ordered_retreat.py::test_native_ordered_retreat_resolves_and_replays[territorial-terror]",
     "tests/rules/section09/test_native_ordered_retreat.py::test_native_ordered_retreat_resolves_and_replays[outside-shadow]",
-    "tests/rules/section09/test_native_ordered_retreat.py::test_native_ordered_retreat_resolves_and_replays[excluded-monster]"
+    "tests/rules/section09/test_native_ordered_retreat.py::test_native_ordered_retreat_resolves_and_replays[excluded-monster]",
+    "tests/rules/section09/test_native_ordered_retreat.py::test_second_forced_retreat_uses_only_territory_contributors",
+    "tests/rules/section09/test_native_ordered_retreat.py::test_forced_escape_restore_rejects_invented_pretest_shock"
   ],
   "origin_test": {
     "before": {
@@ -37,8 +55,8 @@
     "after": {
       "mode": "100644",
       "bytes": 12073,
-      "sha256": "c1a9b7ca2f31893e831ecb3e97990c8cedd6b08e461ccfb414a6eea206206e56",
-      "blob_sha1": "7295a7b2c9662592cddf3c277e0e280a1b29ccc7"
+      "sha256": "3d6b4f886ea05fa87650b7df2b062a4d99204e4692867b1fdf3f87a4b1a0e361",
+      "blob_sha1": "dde7e3da1d7214b7677dfb319a4af4e1a2d81fd1"
     }
   }
 }

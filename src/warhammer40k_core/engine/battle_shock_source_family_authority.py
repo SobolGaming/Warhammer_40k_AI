@@ -467,6 +467,10 @@ def validate_battle_shock_runtime_source_family_authority(
         )
         return
     if source_kind == _FORCED_DESPERATE_ESCAPE_SOURCE:
+        # Forced Movement tests capture the current inventory once per test.
+        # Command's separately authenticated snapshot can span several tests.
+        if authority.phase_start_battle_shocked_unit_ids != historical.battle_shocked_unit_ids:
+            raise GameLifecycleError("Forced Desperate Escape pre-test Battle-shock state drifted.")
         movement_record = _validate_forced_desperate_escape_source(
             event_records=event_records,
             decision_records=decision_records,

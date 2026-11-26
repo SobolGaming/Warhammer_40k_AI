@@ -1320,12 +1320,26 @@ DAEMONIC_TERROR_TRANSITION = (
     "data/source_audits/ci64_provenance_v1/daemonic-terror-ordered-retreat-v1.json"
 )
 DAEMONIC_TERROR_TRANSITION_SHA256 = (
-    "11eee65e713a8c93c272abb000c7ce86f16179f4dc0fd6eacf7f7e6f95b3a05c"
+    "b08baf233c5095204ac2f51cc9438f5b9dd5fbd00d735d6c9444e173ec24ecda"
 )
 DAEMONIC_TERROR_OWNER = "tests/rules/section09/test_native_ordered_retreat.py"
 
 
-DAEMONIC_TERROR_CASES = ("territorial-terror", "outside-shadow", "excluded-monster")
+DAEMONIC_TERROR_CASES = (
+    *(
+        f"test_native_ordered_retreat_resolves_and_replays[{case}]"
+        for case in ("territorial-terror", "outside-shadow", "excluded-monster")
+    ),
+    "test_second_forced_retreat_uses_only_territory_contributors",
+    "test_forced_escape_restore_rejects_invented_pretest_shock",
+)
+DAEMONIC_TERROR_SOURCES = {
+    ROUND_FIVE_SHADOW_SOURCES[0],
+    ROUND4_BATTLE_SHOCK_TERRITORY_SOURCE,
+    "src/warhammer40k_core/engine/battle_shock_source_family_authority.py",
+    "src/warhammer40k_core/engine/generic_effect_history.py",
+    "src/warhammer40k_core/engine/phases/movement_battle_shock_continuation.py",
+}
 
 
 class _DaemonicTerrorTransition(TypedDict):
@@ -1352,13 +1366,10 @@ def _daemonic_terror_transition(root: Path) -> tuple[_DaemonicTerrorTransition, 
         record.keys() != _DaemonicTerrorTransition.__required_keys__
         or record["schema"] != "finite-daemonic-terror-ordered-retreat-v1"
         or record["base"] != "dec50bca2394c755a0d5fb76e6659882b388c032"
-        or record["source"].keys() != {ROUND_FIVE_SHADOW_SOURCES[0]}
+        or record["source"].keys() != DAEMONIC_TERROR_SOURCES
         or record["added_files"].keys() != {DAEMONIC_TERROR_OWNER}
         or record["added_cases"]
-        != [
-            f"{DAEMONIC_TERROR_OWNER}::test_native_ordered_retreat_resolves_and_replays[{case}]"
-            for case in DAEMONIC_TERROR_CASES
-        ]
+        != [f"{DAEMONIC_TERROR_OWNER}::{case}" for case in DAEMONIC_TERROR_CASES]
         or record["origin_test"].keys() != {"before", "after"}
         or record["runtime_fingerprint"] == record["retained_runtime_fingerprint"]
         or any(
@@ -1698,8 +1709,9 @@ def exact_movement_test_transition(
         runtime = codec["runtime_fingerprint"]
         raw += b"\0" + codec_raw
     terror = _daemonic_terror_transition(root)
+    terror_sources = {} if terror is None else terror[0]["source"]
     pending_battle_shock = _pending_battle_shock_source_transition(
-        root, current_sources={} if terror is None else terror[0]["source"]
+        root, current_sources=terror_sources
     )
     pending_sources = {} if pending_battle_shock is None else pending_battle_shock[2]
     from scripts.dark_pact_test_admission import dark_pact_source_successors
@@ -1724,7 +1736,7 @@ def exact_movement_test_transition(
             root,
             retained_cutover_sha256,
             attack_reroll_order[1],
-            current_sources=pending_sources,
+            current_sources={**terror_sources, **pending_sources},
         )
     fight_reroll = (
         _stage2_fight_reroll_successor(
@@ -1741,7 +1753,7 @@ def exact_movement_test_transition(
     if has_gameplay_budget:
         if not has_codec:
             raise SystemExit("Gameplay movement budget tests require the oval codec predecessor.")
-        budget_sources = {} if fight_reroll is None else dict(fight_reroll[3])
+        budget_sources = {**terror_sources, **({} if fight_reroll is None else fight_reroll[3])}
         if gore is not None:
             budget_source = _GORE_HUNGRY_ONSLAUGHT_BUDGET_SOURCE
             if budget_source in budget_sources:

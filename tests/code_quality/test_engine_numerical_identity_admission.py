@@ -964,6 +964,10 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
     assert normal_move["retained_runtime_fingerprint"] == combined["combined_runtime_fingerprint"]
     assert normal_move["runtime_fingerprint"] == terror["retained_runtime_fingerprint"]
     assert terror["runtime_fingerprint"] == _record(MANIFEST)["fingerprint"]
+    for name, change in terror["source"].items():
+        original = subprocess.check_output(["git", "show", terror["base"] + ":" + name], cwd=ROOT)
+        assert change["before"] == hashlib.sha256(original).hexdigest()
+        assert change["after"] == hashlib.sha256((ROOT / name).read_bytes()).hexdigest()
     assert selection.DAEMONIC_TERROR_OWNER in active_files
     assert sum(selection.DAEMONIC_TERROR_OWNER in group for group in groups) == 1
     assert ground_charge.NORMAL_MOVE_OWNER in active_files
@@ -1059,6 +1063,8 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         assert round4["source"][source]["before"] == hashlib.sha256(base_source).hexdigest()
         if source in pending_before:
             round4_after = pending_before[source]
+        elif source in terror["source"]:
+            round4_after = terror["source"][source]["before"]
         else:
             round4_after = hashlib.sha256((ROOT / source).read_bytes()).hexdigest()
         assert round4["source"][source]["after"] == round4_after

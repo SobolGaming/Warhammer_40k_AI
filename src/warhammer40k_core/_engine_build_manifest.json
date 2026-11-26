@@ -1,7 +1,7 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:4bb022db61370de138a6c4d6db0c4afb959bb8ee2874253ee3bc41ff29d1a44b",
-  "fingerprint": "4bb022db61370de138a6c4d6db0c4afb959bb8ee2874253ee3bc41ff29d1a44b",
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:bc85756c3c466ffd646d5641b4edd4b410f66d84209530cde93fb8e2041ebe16",
+  "fingerprint": "bc85756c3c466ffd646d5641b4edd4b410f66d84209530cde93fb8e2041ebe16",
   "resource_count": 3297,
   "resources": [
     {
@@ -1415,9 +1415,9 @@
       "sha256": "efc919d27f877d4d5a805a901b7dd023706a63732942c9db8df31d31a797f726"
     },
     {
-      "byte_length": 55882,
+      "byte_length": 56234,
       "path": "warhammer40k_core/engine/battle_shock_source_family_authority.py",
-      "sha256": "4c39c5a0229d595ec84a8ef4083ecc217f40df5f9c090fe7636ae944c186e152"
+      "sha256": "74f852b834a1ba310251bc7b2dec95ae7454ec99348160edd1dabe2ced9c22d8"
     },
     {
       "byte_length": 6174,
@@ -4700,9 +4700,9 @@
       "sha256": "4c66f099bd6f5c504782e167d9686dbfad9998ecf8af16adc165200290f4cfa5"
     },
     {
-      "byte_length": 8762,
+      "byte_length": 10381,
       "path": "warhammer40k_core/engine/faction_content/warhammer_40000_11th/chaos_daemons/battle_shock_territory_authority.py",
-      "sha256": "4f110d54ff14ce4e2976ef551764f67a45ace8f2e74c51101d4cf41eca7a9886"
+      "sha256": "27920bc57626958d7378f6a090adcdbc2bb0488cd4d3792a4849e257b0b3fed7"
     },
     {
       "byte_length": 56022,
@@ -10635,9 +10635,9 @@
       "sha256": "26b042a4b0b3ef03ee0c99b51736ab364e8c0eeccc12cdc96e2c27896a7c77ad"
     },
     {
-      "byte_length": 22268,
+      "byte_length": 24370,
       "path": "warhammer40k_core/engine/generic_effect_history.py",
-      "sha256": "5d8b7ba65b2e48f0003e0976624a32a5971f51429b92b20ac2e78581d1e00093"
+      "sha256": "c683f8440d0173b03e61a8f56bc73332971e012c7698f0f4fd5c955be7590329"
     },
     {
       "byte_length": 35671,
@@ -11695,9 +11695,9 @@
       "sha256": "a079b5db1c0cfcd4a23d157c798077497c6aa5ae46d4818bee8a147b1067d30e"
     },
     {
-      "byte_length": 20204,
+      "byte_length": 20810,
       "path": "warhammer40k_core/engine/phases/movement_battle_shock_continuation.py",
-      "sha256": "13f6bafd631c7e1996c090ebda96e396d119597426ea99ad91f3dc25910722c5"
+      "sha256": "241b7ca873189362db2eb40c716fff6ce0c7496b703eb601a9f2441e502f4fd8"
     },
     {
       "byte_length": 1581,

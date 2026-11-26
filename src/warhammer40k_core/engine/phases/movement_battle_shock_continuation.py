@@ -11,6 +11,7 @@ from warhammer40k_core.engine.battle_shock_hooks import (
 from warhammer40k_core.engine.battle_shock_resolution import BattleShockResolutionResult
 from warhammer40k_core.engine.battle_shock_resolution_authority import (
     BattleShockResolutionAuthority,
+    PendingBattleShockRerollAuthority,
     parse_battle_shock_resolution_authority,
     parse_pending_battle_shock_reroll_authority,
 )
@@ -71,6 +72,7 @@ def record_desperate_escape_battle_shock_resolution(
         if _validate_modifier_preflight(continuation=continuation, request=status.decision_request):
             return status
         pending_authority = parse_pending_battle_shock_reroll_authority(status.decision_request)
+        _validate_pending_forced_shock_inventory(state, pending_authority)
         validate_pending_escape_reroll_matches_continuation(
             continuation=continuation,
             pending_authority=pending_authority,
@@ -140,6 +142,7 @@ def validate_pending_desperate_escape_battle_shock_continuation(
         if _validate_modifier_preflight(continuation=continuation, request=pending_requests[0]):
             return
         pending_reroll_authority = parse_pending_battle_shock_reroll_authority(pending_requests[0])
+        _validate_pending_forced_shock_inventory(state, pending_reroll_authority)
         validate_pending_escape_reroll_matches_continuation(
             continuation=continuation,
             pending_authority=pending_reroll_authority,
@@ -358,15 +361,23 @@ def _validate_resolution_matches_continuation(
         raise GameLifecycleError("Desperate Escape continuation reroll authority drifted.")
 
 
+def _validate_pending_forced_shock_inventory(
+    state: GameState, authority: PendingBattleShockRerollAuthority
+) -> None:
+    # A pending forced reroll has no intervening Battle-shock mutation.
+    # Restore already checked the state's inventory against event history.
+    if (
+        authority.source_kind == _FORCED_SOURCE_KIND
+        and authority.phase_start_battle_shocked_unit_ids != tuple(state.battle_shocked_unit_ids)
+    ):
+        raise GameLifecycleError("Forced Desperate Escape pre-test Battle-shock state drifted.")
+
+
 def validate_pending_escape_reroll_matches_continuation(
     *,
     continuation: PendingDesperateEscapeBattleShockContinuation,
     pending_authority: object,
 ) -> None:
-    from warhammer40k_core.engine.battle_shock_resolution_authority import (
-        PendingBattleShockRerollAuthority,
-    )
-
     if type(pending_authority) is not PendingBattleShockRerollAuthority:
         raise GameLifecycleError("Desperate Escape pending reroll authority must be typed.")
     authority = pending_authority
