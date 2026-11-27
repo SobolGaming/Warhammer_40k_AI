@@ -2,12 +2,382 @@
 
 from __future__ import annotations
 
+from dataclasses import replace
 from pathlib import Path
+from typing import cast
 
 import pytest
+from tests.phase11c_command_phase_helpers import battle_state, phase11c_config
 
 from scripts import stage4_benchmark_entry as bench
+from scripts import stage4_layout_batch as batch
 from scripts import stage4_layout_intake as intake
+from scripts import stage4_split_objective as control
+from warhammer40k_core.adapters.access_control import ViewerContext
+from warhammer40k_core.adapters.local_session import LocalGameSession
+from warhammer40k_core.adapters.projection import (
+    PROJECTION_SCHEMA_VERSION,
+    GameViewPayload,
+    public_decision_request_view,
+)
+from warhammer40k_core.ai.player_policy import PlayerDecisionContext
+from warhammer40k_core.engine.decision_controller import DecisionController
+from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
+from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.event_log import validate_json_value
+from warhammer40k_core.engine.game_state import GameState
+from warhammer40k_core.engine.lifecycle import GameLifecycle
+from warhammer40k_core.engine.mission_action_policies import primary_mission_choice_rule_for_id
+from warhammer40k_core.engine.phase import BattlePhase, LifecycleStatusKind
+from warhammer40k_core.engine.primary_mission_choice_payloads import (
+    CONSECRATE_CHOICE_KIND,
+    LOCATE_AND_DENY_CHOICE_KIND,
+    PUNISHMENT_CHOICE_KIND,
+    PrimaryMissionChoiceData,
+)
+from warhammer40k_core.engine.primary_mission_choices import (
+    LOCATE_AND_DENY_CHOICE_RULE_ID,
+    PUNISHMENT_CHOICE_RULE_ID,
+    SELECT_PRIMARY_MISSION_CHOICE_DECISION_TYPE,
+    apply_primary_mission_choice,
+    locate_and_deny_setup_choice_request,
+    primary_mission_choice_option_id,
+    punishment_choice_request,
+)
+
+
+def _mission_choice_context(
+    kind: str,
+    *,
+    actor_id: str = bench.A,
+    player_id: str | None = None,
+    request_id: str = "first-request",
+    battle_round: int = 1,
+) -> PlayerDecisionContext:
+    setup = kind == LOCATE_AND_DENY_CHOICE_KIND
+    targets = tuple(f"target-{index}" for index in range(6 if setup else 2))
+    selections = (targets[:5], targets[1:]) if setup else ((targets[0],), (targets[1],))
+    choice = PrimaryMissionChoiceData(
+        game_id="synthetic-mission-choice",
+        player_id=actor_id if player_id is None else player_id,
+        choice_kind=kind,
+        primary_mission_id="synthetic-primary",
+        source_descriptor_id="synthetic-descriptor",
+        source_rule_id="synthetic-rule",
+        battle_round=None if setup else battle_round,
+        phase=None if setup else "command",
+        subject_id=None,
+        source_action_id=None,
+        legal_target_ids=targets,
+        selected_target_ids=(),
+        evidence_ids=(),
+        used_fallback_candidates=False,
+    )
+    request = DecisionRequest(
+        request_id=request_id,
+        decision_type=SELECT_PRIMARY_MISSION_CHOICE_DECISION_TYPE,
+        actor_id=actor_id,
+        payload=validate_json_value(choice.to_payload()),
+        options=tuple(
+            DecisionOption(
+                primary_mission_choice_option_id(choice=choice, selected_ids=selection),
+                "Select " + ", ".join(selection),
+                validate_json_value(choice.with_selected_targets(selection).to_payload()),
+            )
+            for selection in selections
+        ),
+    )
+    view = {
+        "projection_schema": PROJECTION_SCHEMA_VERSION,
+        "viewer_role": "player",
+        "viewer_player_id": actor_id,
+        "player_ids": [bench.A, bench.B],
+        "stage": "setup" if setup else "battle",
+        "battle_round": 0 if setup else battle_round,
+        "current_setup_step": "determine_first_turn" if setup else None,
+        "current_battle_phase": choice.phase,
+        "pending_decision": public_decision_request_view(
+            request, viewer=ViewerContext.for_player(actor_id)
+        ),
+    }
+    return PlayerDecisionContext.from_view(cast(GameViewPayload, view), choice_seed=0)
+
+
+def _mission_declaration(
+    kind: str,
+    targets: list[str],
+    *,
+    actor_id: str = bench.A,
+    battle_round: int = 1,
+) -> bench.Row:
+    return {
+        "actor_id": actor_id,
+        "choice_kind": kind,
+        "window": {"phase": "start_battle"}
+        if kind == LOCATE_AND_DENY_CHOICE_KIND
+        else {"phase": "command", "battle_round": battle_round},
+        "selected_target_ids": targets,
+    }
+
+
+@pytest.mark.parametrize(
+    ("kind", "targets"),
+    [
+        (LOCATE_AND_DENY_CHOICE_KIND, ["target-5", "target-4", "target-3", "target-2", "target-1"]),
+        (PUNISHMENT_CHOICE_KIND, ["target-1"]),
+    ],
+)
+def test_primary_mission_choice_uses_the_current_issued_ids(kind: str, targets: list[str]) -> None:
+    declarations = [_mission_declaration(kind, targets)]
+    for request_id in ("first-request", "later-request"):
+        context = _mission_choice_context(kind, request_id=request_id)
+        choices = intake._PrimaryMissionChoices(declarations)
+        action = choices.select(context)
+        (issued,) = [
+            option
+            for option in context.request["options"]
+            if PrimaryMissionChoiceData.from_payload(option["payload"]).selected_target_ids
+            == tuple(sorted(targets))
+        ]
+        assert action == context.select_option(issued["option_id"])
+        choices.require_complete()
+
+
+def test_primary_mission_choice_consumes_each_required_window_once() -> None:
+    kind = PUNISHMENT_CHOICE_KIND
+    choices = intake._PrimaryMissionChoices(
+        [
+            _mission_declaration(kind, ["target-0"], battle_round=1),
+            _mission_declaration(kind, ["target-1"], battle_round=2),
+        ]
+    )
+    choices.select(_mission_choice_context(kind))
+    with pytest.raises(intake.IntakeGap, match="unused_primary_mission_choice"):
+        choices.require_complete()
+    with pytest.raises(intake.IntakeGap, match="repeated_primary_mission_choice"):
+        choices.select(_mission_choice_context(kind, request_id="repeated-window-request"))
+    choices.select(_mission_choice_context(kind, battle_round=2))
+    choices.require_complete()
+
+
+@pytest.mark.parametrize(
+    ("declarations", "reason"),
+    [
+        ([], "unconfigured_primary_mission_choice"),
+        (
+            [_mission_declaration(PUNISHMENT_CHOICE_KIND, ["target-0"], actor_id=bench.B)],
+            "unconfigured_primary_mission_choice",
+        ),
+        (
+            [_mission_declaration(PUNISHMENT_CHOICE_KIND, ["target-0"], battle_round=2)],
+            "unconfigured_primary_mission_choice",
+        ),
+        (
+            [_mission_declaration(PUNISHMENT_CHOICE_KIND, ["unknown-target"])],
+            "unavailable_primary_mission_choice",
+        ),
+        (
+            [_mission_declaration(PUNISHMENT_CHOICE_KIND, ["target-0", "target-1"])],
+            "unavailable_primary_mission_choice",
+        ),
+    ],
+)
+def test_primary_mission_choice_rejects_missing_or_inexact_bindings(
+    declarations: list[bench.Row], reason: str
+) -> None:
+    choices = intake._PrimaryMissionChoices(declarations)
+    with pytest.raises(intake.IntakeGap, match=reason):
+        choices.select(_mission_choice_context(PUNISHMENT_CHOICE_KIND))
+
+
+def test_primary_mission_choice_rejects_duplicate_declarations() -> None:
+    kind = PUNISHMENT_CHOICE_KIND
+    with pytest.raises(intake.IntakeGap, match="repeated_primary_mission_choice"):
+        intake._PrimaryMissionChoices(
+            [_mission_declaration(kind, ["target-0"]), _mission_declaration(kind, ["target-1"])]
+        )
+
+
+@pytest.mark.parametrize(
+    ("change", "reason"),
+    [
+        (
+            {"window": {"phase": "movement", "battle_round": 1}},
+            "invalid_primary_mission_choice_window",
+        ),
+        (
+            {"window": {"phase": "command", "battle_round": True}},
+            "invalid_primary_mission_choice_window",
+        ),
+        (
+            {"selected_target_ids": ["target-0", "target-0"]},
+            "invalid_primary_mission_choice_targets",
+        ),
+    ],
+)
+def test_primary_mission_choice_rejects_invalid_declarations(
+    change: bench.Row, reason: str
+) -> None:
+    declaration = _mission_declaration(PUNISHMENT_CHOICE_KIND, ["target-0"])
+    with pytest.raises(intake.IntakeGap, match=reason):
+        intake._PrimaryMissionChoices([{**declaration, **change}])
+
+
+@pytest.mark.parametrize(
+    ("game_id", "reason"),
+    [
+        ("synthetic-mission-choice", "ambiguous_primary_mission_choice"),
+        ("foreign-source-game", "unavailable_primary_mission_choice"),
+    ],
+)
+def test_primary_mission_choice_rejects_ambiguous_or_foreign_options(
+    game_id: str, reason: str
+) -> None:
+    kind = PUNISHMENT_CHOICE_KIND
+    view = _mission_choice_context(kind).observation
+    request = view["pending_decision"]
+    assert request is not None
+    (original,) = [
+        option
+        for option in request["options"]
+        if PrimaryMissionChoiceData.from_payload(option["payload"]).selected_target_ids
+        == ("target-0",)
+    ]
+    selected = PrimaryMissionChoiceData.from_payload(original["payload"])
+    altered = {**selected.to_payload(), "game_id": game_id}
+    other = DecisionOption("other-option", original["label"], validate_json_value(altered))
+    if altered != selected.to_payload():
+        request["options"].remove(original)
+    request["options"].append(other.to_payload())
+    choices = intake._PrimaryMissionChoices([_mission_declaration(kind, ["target-0"])])
+    context = PlayerDecisionContext.from_view(view, choice_seed=0)
+    with pytest.raises(intake.IntakeGap, match=reason):
+        choices.select(context)
+
+
+@pytest.mark.parametrize(
+    ("kind", "player_id", "reason"),
+    [
+        (PUNISHMENT_CHOICE_KIND, bench.B, "foreign_primary_mission_choice"),
+        (CONSECRATE_CHOICE_KIND, bench.A, "unexpected_primary_mission_choice"),
+    ],
+)
+def test_primary_mission_choice_rejects_foreign_owner_or_unsupported_kind(
+    kind: str, player_id: str, reason: str
+) -> None:
+    choices = intake._PrimaryMissionChoices([])
+    with pytest.raises(intake.IntakeGap, match=reason):
+        choices.select(_mission_choice_context(kind, player_id=player_id))
+
+
+@pytest.mark.parametrize(
+    ("kind", "rule_id", "targets"),
+    [
+        (
+            LOCATE_AND_DENY_CHOICE_KIND,
+            LOCATE_AND_DENY_CHOICE_RULE_ID,
+            [
+                f"{control.LAYOUT}-{target}"
+                for target in (
+                    "logical-terrain-contact-icon-02",
+                    "terrain-area-06",
+                    "terrain-area-07",
+                    "terrain-area-10",
+                    "terrain-area-13",
+                )
+            ],
+        ),
+        (PUNISHMENT_CHOICE_KIND, PUNISHMENT_CHOICE_RULE_ID, ["army-beta:intercessor-unit-3"]),
+    ],
+)
+def test_primary_mission_choice_passes_native_validation_after_prior_allocation(
+    kind: str, rule_id: str, targets: list[str]
+) -> None:
+    declarations = [_mission_declaration(kind, targets)]
+    request_ids = []
+    for allocate_prior in (False, True):
+        decisions = DecisionController()
+        setup_choice = kind == LOCATE_AND_DENY_CHOICE_KIND
+        config = control.config() if setup_choice else phase11c_config()
+        state = GameState.from_config(config) if setup_choice else battle_state(decisions=decisions)
+        setup = state.mission_setup
+        assert setup is not None
+        # Exercise the native choice rules on fixed nonreserve geometry.
+        mission = primary_mission_choice_rule_for_id(rule_id).primary_mission_id
+        state.mission_setup = replace(
+            setup,
+            primary_mission_assignments=tuple(
+                replace(assignment, primary_mission_id=mission)
+                if assignment.player_id == bench.A
+                else assignment
+                for assignment in setup.primary_mission_assignments
+            ),
+        )
+        if setup_choice:
+            state.setup_step_index = len(state.setup_sequence) - 1
+            issue = locate_and_deny_setup_choice_request
+        else:
+            state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.COMMAND)
+            issue = punishment_choice_request
+        if allocate_prior:
+            state.next_decision_request_id()
+
+        request = issue(state=state, decisions=decisions)
+        assert request is not None
+        request_ids.append(request.request_id)
+        decisions.request_decision(request)
+        session = LocalGameSession(
+            lifecycle=GameLifecycle(state=state, decision_controller=decisions, _config=config)
+        )
+        context = bench.actor(session)
+        choices = intake._PrimaryMissionChoices(declarations)
+        action = choices.select(context)
+        assert action.request_id == context.request["request_id"]
+        assert action.option_id is not None
+
+        if setup_choice:
+            # The synthetic assignment exercises the native handler independently of setup replay.
+            result = DecisionResult.for_request(
+                result_id="native-control", request=request, selected_option_id=action.option_id
+            )
+            decisions.submit_result(result)
+            assert apply_primary_mission_choice(
+                state=state, decisions=decisions, request=request, result=result
+            )
+        else:
+            assert (
+                bench.submit(session, context, action).status_kind is LifecycleStatusKind.ADVANCED
+            )
+        result = decisions.records[-1].result
+        assert result.request_id == request.request_id
+        assert PrimaryMissionChoiceData.from_payload(result.payload).selected_target_ids == tuple(
+            sorted(targets)
+        )
+        choices.require_complete()
+    assert request_ids[0] != request_ids[1]
+
+
+def test_primary_mission_choices_are_optional_prospective_page_fields() -> None:
+    base = {"roles": {"screen": "s", "follow": "f", "opponent": "o"}, "routes": {"screen": [1, 0]}}
+    proposal = {
+        "page": 100,
+        "layout": "synthetic-layout",
+        "pairing": ["synthetic-a", "synthetic-b"],
+        "primary_missions": ["synthetic-primary-a", "synthetic-primary-b"],
+        "target": "synthetic-target",
+        "deployment": {"s": [], "f": [], "o": []},
+        "routes": base["routes"],
+        "round_one_moves": {},
+        "proposed_origin": "empty",
+    }
+    key = "primary_mission_choices"
+    declarations = [_mission_declaration(PUNISHMENT_CHOICE_KIND, ["target-0"])]
+    assert key not in batch.recipe_for(proposal, base)
+    assert batch.recipe_for({**proposal, key: declarations}, base)[key] == declarations
+    with pytest.raises(intake.IntakeGap, match="candidate_recipe_fields"):
+        batch.recipe_for({**proposal, "unknown": []}, base)
+    with pytest.raises(intake.IntakeGap, match="page_9_recipe_drift"):
+        batch.recipe_for({"page": 9, key: declarations}, base)
 
 
 @pytest.mark.parametrize(

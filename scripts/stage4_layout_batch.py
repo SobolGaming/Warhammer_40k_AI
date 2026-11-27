@@ -60,7 +60,10 @@ def recipe_for(proposal: bench.Row, base: bench.Row) -> bench.Row:
         "round_one_moves",
         "proposed_origin",
     }
-    intake.need(set(proposal) == shape, "candidate_recipe_fields")
+    intake.need(
+        shape <= proposal.keys() <= shape | {"primary_mission_choices"},
+        "candidate_recipe_fields",
+    )
     intake.need(
         set(proposal["deployment"]) == set(base["roles"].values())
         and set(proposal["routes"]) == set(base["routes"])
@@ -77,7 +80,7 @@ def recipe_for(proposal: bench.Row, base: bench.Row) -> bench.Row:
         )
     return {
         **base,
-        **{key: proposal[key] for key in shape - {"page"}},
+        **{key: proposal[key] for key in proposal.keys() - {"page"}},
         "source_page": proposal["page"],
     }
 
