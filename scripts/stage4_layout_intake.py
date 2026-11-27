@@ -35,7 +35,12 @@ from warhammer40k_core.build_identity import verified_engine_build_identity
 from warhammer40k_core.engine.game_state import GameConfig
 from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.objective_geometry import measure_model_to_objective
-from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatusKind
+from warhammer40k_core.engine.phase import (
+    BattlePhase,
+    GameLifecycleError,
+    LifecycleStatusKind,
+    SetupStep,
+)
 from warhammer40k_core.engine.primary_historical_events import (
     PRIMARY_TURN_START_EVIDENCE_RECORDED_EVENT,
 )
@@ -302,9 +307,10 @@ class _PrimaryMissionChoices:
     "command" and a positive battle_round for Punishment.
     """
 
-    def __init__(self, declarations: object) -> None:
+    def __init__(self, declarations: object, *, final_setup_step: SetupStep) -> None:
         if not isinstance(declarations, list):
             raise IntakeGap("invalid_primary_mission_choice_declarations")
+        self.final_setup_step = final_setup_step
         self.pending: dict[tuple[str, str, int | None, str | None], tuple[str, ...]] = {}
         self.used: set[tuple[str, str, int | None, str | None]] = set()
         for declaration in declarations:
@@ -352,11 +358,17 @@ class _PrimaryMissionChoices:
         actor = context.route.actor_id
         need(choice.player_id == actor, "foreign_primary_mission_choice")
         if choice.choice_kind == LOCATE_AND_DENY_CHOICE_KIND:
-            valid_window = context.route.stage == "setup" and choice.battle_round is None
+            valid_window = (
+                context.route.stage == "setup"
+                and context.route.setup_step == self.final_setup_step.value
+                and choice.battle_round is None
+            )
         elif choice.choice_kind == PUNISHMENT_CHOICE_KIND:
+            observation = context.observation
             valid_window = (
                 choice.phase == context.route.battle_phase == BattlePhase.COMMAND.value
-                and choice.battle_round == context.observation["battle_round"]
+                and choice.battle_round == observation["battle_round"]
+                and actor == observation["active_player_id"]
             )
         else:
             raise IntakeGap("unexpected_primary_mission_choice")
@@ -386,7 +398,10 @@ class _PrimaryMissionChoices:
 def open_origin(
     game: GameConfig, recipe: bench.Row, prefix_moves: list[bench.Row]
 ) -> LocalGameSession:
-    primary_choices = _PrimaryMissionChoices(recipe.get("primary_mission_choices", []))
+    primary_choices = _PrimaryMissionChoices(
+        recipe.get("primary_mission_choices", []),
+        final_setup_step=game.ruleset_descriptor.setup_sequence.steps[-1],
+    )
     session = LocalGameSession()
     status = session.start(game)
     if status.status_kind is LifecycleStatusKind.ADVANCED:

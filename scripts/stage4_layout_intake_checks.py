@@ -28,7 +28,7 @@ from warhammer40k_core.engine.event_log import validate_json_value
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.mission_action_policies import primary_mission_choice_rule_for_id
-from warhammer40k_core.engine.phase import BattlePhase, LifecycleStatusKind
+from warhammer40k_core.engine.phase import BattlePhase, LifecycleStatusKind, SetupStep
 from warhammer40k_core.engine.primary_mission_choice_payloads import (
     CONSECRATE_CHOICE_KIND,
     LOCATE_AND_DENY_CHOICE_KIND,
@@ -94,7 +94,8 @@ def _mission_choice_context(
         "player_ids": [bench.A, bench.B],
         "stage": "setup" if setup else "battle",
         "battle_round": 0 if setup else battle_round,
-        "current_setup_step": "determine_first_turn" if setup else None,
+        "active_player_id": None if setup else actor_id,
+        "current_setup_step": SetupStep.RESOLVE_PREBATTLE_ACTIONS.value if setup else None,
         "current_battle_phase": choice.phase,
         "pending_decision": public_decision_request_view(
             request, viewer=ViewerContext.for_player(actor_id)
@@ -120,6 +121,12 @@ def _mission_declaration(
     }
 
 
+def _configured_mission_choices(declarations: object) -> intake._PrimaryMissionChoices:
+    return intake._PrimaryMissionChoices(
+        declarations, final_setup_step=SetupStep.RESOLVE_PREBATTLE_ACTIONS
+    )
+
+
 @pytest.mark.parametrize(
     ("kind", "targets"),
     [
@@ -131,7 +138,7 @@ def test_primary_mission_choice_uses_the_current_issued_ids(kind: str, targets: 
     declarations = [_mission_declaration(kind, targets)]
     for request_id in ("first-request", "later-request"):
         context = _mission_choice_context(kind, request_id=request_id)
-        choices = intake._PrimaryMissionChoices(declarations)
+        choices = _configured_mission_choices(declarations)
         action = choices.select(context)
         (issued,) = [
             option
@@ -143,9 +150,32 @@ def test_primary_mission_choice_uses_the_current_issued_ids(kind: str, targets: 
         choices.require_complete()
 
 
+@pytest.mark.parametrize(
+    ("kind", "targets", "drift"),
+    [
+        (
+            LOCATE_AND_DENY_CHOICE_KIND,
+            ["target-0", "target-1", "target-2", "target-3", "target-4"],
+            {"current_setup_step": SetupStep.DEPLOY_ARMIES.value},
+        ),
+        (PUNISHMENT_CHOICE_KIND, ["target-0"], {"active_player_id": bench.B}),
+    ],
+)
+def test_primary_mission_choice_rejects_an_inconsistent_window(
+    kind: str, targets: list[str], drift: bench.Row
+) -> None:
+    view = _mission_choice_context(kind).observation
+    context = PlayerDecisionContext.from_view(
+        cast(GameViewPayload, {**view, **drift}), choice_seed=0
+    )
+    choices = _configured_mission_choices([_mission_declaration(kind, targets)])
+    with pytest.raises(intake.IntakeGap, match="invalid_primary_mission_choice_window"):
+        choices.select(context)
+
+
 def test_primary_mission_choice_consumes_each_required_window_once() -> None:
     kind = PUNISHMENT_CHOICE_KIND
-    choices = intake._PrimaryMissionChoices(
+    choices = _configured_mission_choices(
         [
             _mission_declaration(kind, ["target-0"], battle_round=1),
             _mission_declaration(kind, ["target-1"], battle_round=2),
@@ -185,7 +215,7 @@ def test_primary_mission_choice_consumes_each_required_window_once() -> None:
 def test_primary_mission_choice_rejects_missing_or_inexact_bindings(
     declarations: list[bench.Row], reason: str
 ) -> None:
-    choices = intake._PrimaryMissionChoices(declarations)
+    choices = _configured_mission_choices(declarations)
     with pytest.raises(intake.IntakeGap, match=reason):
         choices.select(_mission_choice_context(PUNISHMENT_CHOICE_KIND))
 
@@ -193,7 +223,7 @@ def test_primary_mission_choice_rejects_missing_or_inexact_bindings(
 def test_primary_mission_choice_rejects_duplicate_declarations() -> None:
     kind = PUNISHMENT_CHOICE_KIND
     with pytest.raises(intake.IntakeGap, match="repeated_primary_mission_choice"):
-        intake._PrimaryMissionChoices(
+        _configured_mission_choices(
             [_mission_declaration(kind, ["target-0"]), _mission_declaration(kind, ["target-1"])]
         )
 
@@ -220,7 +250,7 @@ def test_primary_mission_choice_rejects_invalid_declarations(
 ) -> None:
     declaration = _mission_declaration(PUNISHMENT_CHOICE_KIND, ["target-0"])
     with pytest.raises(intake.IntakeGap, match=reason):
-        intake._PrimaryMissionChoices([{**declaration, **change}])
+        _configured_mission_choices([{**declaration, **change}])
 
 
 @pytest.mark.parametrize(
@@ -249,7 +279,7 @@ def test_primary_mission_choice_rejects_ambiguous_or_foreign_options(
     if altered != selected.to_payload():
         request["options"].remove(original)
     request["options"].append(other.to_payload())
-    choices = intake._PrimaryMissionChoices([_mission_declaration(kind, ["target-0"])])
+    choices = _configured_mission_choices([_mission_declaration(kind, ["target-0"])])
     context = PlayerDecisionContext.from_view(view, choice_seed=0)
     with pytest.raises(intake.IntakeGap, match=reason):
         choices.select(context)
@@ -265,7 +295,7 @@ def test_primary_mission_choice_rejects_ambiguous_or_foreign_options(
 def test_primary_mission_choice_rejects_foreign_owner_or_unsupported_kind(
     kind: str, player_id: str, reason: str
 ) -> None:
-    choices = intake._PrimaryMissionChoices([])
+    choices = _configured_mission_choices([])
     with pytest.raises(intake.IntakeGap, match=reason):
         choices.select(_mission_choice_context(kind, player_id=player_id))
 
@@ -330,7 +360,13 @@ def test_primary_mission_choice_passes_native_validation_after_prior_allocation(
             lifecycle=GameLifecycle(state=state, decision_controller=decisions, _config=config)
         )
         context = bench.actor(session)
-        choices = intake._PrimaryMissionChoices(declarations)
+        final_setup_step = config.ruleset_descriptor.setup_sequence.steps[-1]
+        if setup_choice:
+            assert final_setup_step is SetupStep.RESOLVE_PREBATTLE_ACTIONS
+            assert context.route.setup_step == final_setup_step.value
+        else:
+            assert context.observation["active_player_id"] == context.route.actor_id == bench.A
+        choices = intake._PrimaryMissionChoices(declarations, final_setup_step=final_setup_step)
         action = choices.select(context)
         assert action.request_id == context.request["request_id"]
         assert action.option_id is not None
