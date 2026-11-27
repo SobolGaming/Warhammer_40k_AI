@@ -21,7 +21,10 @@ if TYPE_CHECKING:
 def cover_gathering_inventories(
     *, state: GameState, pool: RangedAttackPool, registry: RuntimeModifierRegistry
 ) -> tuple[dict[str, JsonValue], dict[str, JsonValue]]:
+    from warhammer40k_core.engine.attack_sequence_hazardous import gnarlmaw_diseased_cover_sources
+
     raw, applicable = obscuring_model_cover_inventories(state=state, pool=pool)
+    gnarlmaw_cover = gnarlmaw_diseased_cover_sources(state=state, pool=pool)
     common = cast(
         dict[str, JsonValue],
         validate_json_value(
@@ -30,6 +33,11 @@ def cover_gathering_inventories(
                     state=state,
                     target_unit_instance_id=pool.target_unit_instance_id,
                     runtime_modifier_registry=registry,
+                ),
+                **(
+                    {"gnarlmaw_diseased_cover": gnarlmaw_cover}
+                    if gnarlmaw_cover is not None
+                    else {}
                 ),
                 "effects": [
                     effect.to_payload()

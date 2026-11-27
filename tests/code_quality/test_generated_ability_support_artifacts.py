@@ -357,7 +357,7 @@ def test_fortification_generated_support_keeps_both_source_occurrences() -> None
     )
     assert cover.rule_id == "000001470:4"
     assert cover.equivalence_basis is SemanticEquivalenceBasis.STRUCTURED_RULE_IR
-    assert cover.execution_status is SemanticExecutionStatus.BLOCKED_STRUCTURED_SEMANTICS
+    assert cover.execution_status is SemanticExecutionStatus.NAMED_HANDLER_EXECUTABLE
     assert cover.support_transfer is SemanticSupportTransfer.NONE
     assert cover.runtime_consumer_ids == ("catalog-ir:fortification-cover",)
 

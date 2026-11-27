@@ -52,6 +52,9 @@ from warhammer40k_core.rules.rule_ir import (
     RuleTargetKind,
     parameter_payload,
 )
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    chaos_daemons_gnarlmaw_2026_11 as gnarlmaw,
+)
 
 
 class AbilityCoverageSupportStage(StrEnum):
@@ -547,6 +550,20 @@ def ability_coverage_row_for_descriptor(
         raise GameLifecycleError("Ability coverage requires a DatasheetAbilityDescriptor.")
     rule_ir = _rule_ir_for_ability(ability)
     consumer_ids = _runtime_consumer_ids(ability=ability, rule_ir=rule_ir)
+    provisional_cover = (
+        catalog_id == gnarlmaw.CATALOG_ID
+        and datasheet_id == gnarlmaw.DATASHEET_ID
+        and gnarlmaw.is_reviewed_diseased_cover(ability)
+        and CATALOG_IR_FORTIFICATION_COVER_CONSUMER_ID in consumer_ids
+    )
+    allocation_only = (
+        CATALOG_IR_FORTIFICATION_COVER_CONSUMER_ID in consumer_ids and not provisional_cover
+    )
+    support_stage = (
+        AbilityCoverageSupportStage.IR_COMPILED_UNSUPPORTED
+        if allocation_only
+        else _support_stage(ability=ability, rule_ir=rule_ir, consumer_ids=consumer_ids)
+    )
     return AbilityCoverageRow(
         catalog_id=_validate_string("catalog_id", catalog_id),
         datasheet_id=_validate_string("datasheet_id", datasheet_id),
@@ -556,16 +573,16 @@ def ability_coverage_row_for_descriptor(
         source_kind=ability.source_kind,
         source_wargear_id=ability.source_wargear_id,
         catalog_support=ability.support,
-        support_stage=_support_stage(
-            ability=ability,
-            rule_ir=rule_ir,
-            consumer_ids=consumer_ids,
-        ),
+        support_stage=support_stage,
         semantic_categories=_semantic_categories(ability=ability, rule_ir=rule_ir),
         runtime_consumer_ids=consumer_ids,
         diagnostic_reasons=(
             *_diagnostic_reasons(ability),
-            *_allocation_cover_diagnostics(consumer_ids),
+            *(
+                (gnarlmaw.DISEASED_COVER_CONVENTION_ID,)
+                if provisional_cover
+                else _allocation_cover_diagnostics(consumer_ids)
+            ),
         ),
     )
 
@@ -605,11 +622,17 @@ def ability_clause_coverage_rows_for_rule_ir(
     source_id = _validate_string("source_ability_id", source_ability_id)
     name = _validate_string("ability_name", ability_name)
     consumer_override = _validated_clause_consumer_override(runtime_consumers_by_clause_id)
+    provisional_cover = (
+        source_id == gnarlmaw.DISEASED_COVER_SOURCE_ID
+        and rule_ir.source_id == gnarlmaw.DISEASED_COVER_IR_SOURCE_ID
+        and rule_ir.ir_hash() == gnarlmaw.DISEASED_COVER_IR_HASH
+    )
     rows = tuple(
         _clause_coverage_row(
             source_ability_id=source_id,
             ability_name=name,
             clause=clause,
+            provisional_cover=provisional_cover,
             runtime_consumer_ids=(
                 tuple(
                     sorted(
@@ -917,6 +940,7 @@ def _clause_coverage_row(
     ability_name: str,
     clause: RuleClause,
     runtime_consumer_ids: tuple[str, ...],
+    provisional_cover: bool = False,
 ) -> AbilityClauseCoverageRow:
     if type(clause) is not RuleClause:
         raise GameLifecycleError("Ability clause coverage requires RuleClause values.")
@@ -924,6 +948,9 @@ def _clause_coverage_row(
         raise GameLifecycleError("Ability clause coverage consumers must be a tuple.")
     effect_runtime_consumer_ids = _effect_runtime_consumer_ids(
         clause=clause, runtime_consumer_ids=runtime_consumer_ids
+    )
+    provisional_cover = provisional_cover and (
+        CATALOG_IR_FORTIFICATION_COVER_CONSUMER_ID in runtime_consumer_ids
     )
     return AbilityClauseCoverageRow(
         source_ability_id=source_ability_id,
@@ -934,12 +961,19 @@ def _clause_coverage_row(
         effect_kinds=tuple(effect.kind.value for effect in clause.effects),
         effect_runtime_consumer_ids=effect_runtime_consumer_ids,
         runtime_consumer_ids=tuple(sorted(runtime_consumer_ids)),
-        support_stage=_clause_support_stage(
-            clause=clause,
-            effect_runtime_consumer_ids=effect_runtime_consumer_ids,
+        support_stage=(
+            AbilityCoverageSupportStage.ENGINE_CONSUMED
+            if provisional_cover
+            else _clause_support_stage(
+                clause=clause, effect_runtime_consumer_ids=effect_runtime_consumer_ids
+            )
         ),
         diagnostics=(
-            *_allocation_cover_diagnostics(runtime_consumer_ids),
+            *(
+                (gnarlmaw.DISEASED_COVER_CONVENTION_ID,)
+                if provisional_cover
+                else _allocation_cover_diagnostics(runtime_consumer_ids)
+            ),
             *tuple(
                 f"{diagnostic.reason.value}:{diagnostic.source_span.start}-"
                 f"{diagnostic.source_span.end}:{diagnostic.message}"

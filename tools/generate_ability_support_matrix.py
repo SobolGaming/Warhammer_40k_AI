@@ -4775,19 +4775,23 @@ def _chaos_daemons_nurgle_review_rows() -> tuple[DatasheetGroupReviewRow, ...]:
                 "July and September (v1.2) official faction packs, pages 86-87. "
                 "The official pack supersedes Wahapedia."
             ),
-            ir_coverage="IR parsed; host needed",
+            ir_coverage="IR parsed; provisional native execution",
             supported_semantics=(
                 "Native development catalog supports order-of-battle selection and "
                 "Infiltrators deployment. Shroud of Flies uses the shared Stealth aura. "
                 "Fortification uses the shared targeting, Hit-roll and Fall Back exceptions. "
-                "Diseased Cover provides allocation attribution only."
+                "Diseased Cover uses the existing Ballistic Skill cover modifier before the Hit "
+                "roll when the same admitted Gnarlmaw screens every native allocation candidate "
+                "from at least one model in the attacking unit. Grouped attacks include later "
+                "allocation tiers and legal Precision alternatives. Ordinary cover remains "
+                "non-stacking, Ignores Cover applies, and saves receive no cover bonus."
             ),
             semantics_needed=(
-                "The faction pack grants cover at allocation, after the Hit roll that uses "
-                "11th-edition Ballistic Skill. The attack modifier remains unresolved. "
-                "The capability manifest reports the rule's semantic execution as unsupported. "
-                "The terrain-only allocation trace lists the model ID as `industrial_structures`. "
-                "Independently qualifying terrain takes precedence in that trace."
+                "Andrzej approved this development convention "
+                "(Sentinel_ddba1a381e908191b7c48fa763eab182) "
+                "for the Gnarlmaw's allocation-time wording. It carries no official errata or "
+                "full certification. The existing allocation trace can record a model ID as "
+                "`industrial_structures`; independently qualifying terrain takes precedence there."
             ),
             catalog_blockers=(
                 "Andrzej's owner-approved 120 x 90 mm oval and 4.0-inch (101.6 mm) "

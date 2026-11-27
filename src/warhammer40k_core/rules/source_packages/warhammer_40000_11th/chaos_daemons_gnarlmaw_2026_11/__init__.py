@@ -5,6 +5,7 @@ from functools import cache
 from hashlib import sha256
 from typing import Final, cast
 
+from warhammer40k_core.core.datasheet import DatasheetAbilityDescriptor
 from warhammer40k_core.rules.catalog_package import (
     CanonicalCatalogPackage,
     CanonicalCatalogPackagePayload,
@@ -15,7 +16,24 @@ DATASHEET_ID: Final = "000001470"
 PROFILE_ID: Final = f"{DATASHEET_ID}:feculent-gnarlmaw"
 CATALOG_ID: Final = "core-v2:chaos-daemons-gnarlmaw:2026-11"
 PACKAGE_ID: Final = f"data-package:{CATALOG_ID}"
+DISEASED_COVER_ABILITY_ID: Final = f"{DATASHEET_ID}:diseased-cover"
+DISEASED_COVER_CONVENTION_ID: Final = "development:gnarlmaw-diseased-cover:pre-hit-v1"
+DISEASED_COVER_SOURCE_ID: Final = (
+    "data-package:core-v2:chaos-daemons-gnarlmaw-bridge:2026-11:"
+    f"Datasheets_abilities:{DATASHEET_ID}:4"
+)
+DISEASED_COVER_IR_SOURCE_ID: Final = (
+    "data-package:core-v2:chaos-daemons-gnarlmaw-reviewed-datasheet:2026-11:"
+    f"Datasheets_abilities:{DATASHEET_ID}:4:description"
+)
+DISEASED_COVER_IR_HASH: Final = "965a892389c0df514ba26206588580ece0aa42defd02bde97a7f0e42915de868"
 CATALOG_SHA256: Final = "b9ad28049e5de7731bc5b47f762e903bc70e121890eda011ad149b03a877b346"
+
+
+def is_reviewed_diseased_cover(ability: DatasheetAbilityDescriptor) -> bool:
+    return ability.ability_id == DISEASED_COVER_ABILITY_ID and (
+        ability in catalog_package().army_catalog.datasheet_by_id(DATASHEET_ID).abilities
+    )
 
 
 @cache

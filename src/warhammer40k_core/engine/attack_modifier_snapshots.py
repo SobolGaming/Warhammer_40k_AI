@@ -30,6 +30,7 @@ def attack_modifier_snapshots(
     source_phase: BattlePhase,
     runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> tuple[AttackModifierSnapshot, ...]:
+    from warhammer40k_core.engine.attack_sequence_hazardous import gnarlmaw_diseased_cover_sources
     from warhammer40k_core.engine.attack_sequence_hit_wound import (
         _benefit_of_cover_ballistic_skill_penalty,
         _unit_instance_id_for_model,
@@ -45,11 +46,15 @@ def attack_modifier_snapshots(
     snapshots = [
         AttackModifierSnapshot("skill", item) for item in pool.weapon_profile.skill_modifiers
     ]
+    gnarlmaw_cover = gnarlmaw_diseased_cover_sources(state=state, pool=pool)
     skill_deltas = (
         (
             BENEFIT_OF_COVER_RULE_ID,
             _benefit_of_cover_ballistic_skill_penalty(
-                state=state, pool=pool, runtime_modifier_registry=runtime_modifier_registry
+                state=state,
+                pool=pool,
+                runtime_modifier_registry=runtime_modifier_registry,
+                provisional_cover=gnarlmaw_cover is not None,
             ),
         ),
         (PLUNGING_FIRE_RULE_ID, -1 if PLUNGING_FIRE_RULE_ID in pool.targeting_rule_ids else 0),
@@ -70,6 +75,11 @@ def attack_modifier_snapshots(
                                                     state=state,
                                                     target_unit_instance_id=pool.target_unit_instance_id,
                                                     runtime_modifier_registry=runtime_modifier_registry,
+                                                ),
+                                                **(
+                                                    {'gnarlmaw_diseased_cover': gnarlmaw_cover}
+                                                    if gnarlmaw_cover is not None
+                                                    else {}
                                                 ),
                                                 'effects': [
                                                     effect.to_payload()

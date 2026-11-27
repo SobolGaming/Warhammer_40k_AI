@@ -60,6 +60,32 @@ CATALOG_SOURCE_PREIMAGES = {
         "15864f07cf2a3a0d179cf43f74f5b4b8a712748c388566d1f70b0cffc25e329a"
     ),
 }
+PRE_HIT_COVER_RECEIPT = "data/source_audits/ci64_provenance_v1/gnarlmaw-pre-hit-cover-test-v1.json"
+PRE_HIT_COVER_RECEIPT_SHA256 = "19d00acf6fac25c07e4e7953626425f049edbb5af414a776581a95ada1ca5aac"
+PRE_HIT_COVER_BASE = "7f157a5aae0cd289430f794615d0ebb05e074aca"
+PRE_HIT_COVER_PREIMAGES = {
+    "src/warhammer40k_core/engine/ability_coverage.py": (
+        "2ae0a9cfb06f4b03c03184627b0198294edba799e378071af06feabe662754eb"
+    ),
+    "src/warhammer40k_core/engine/attack_modifier_snapshots.py": (
+        "baa4aa7e63014cf75b675fed541b90e301b37c07133981a86a5a4417784e9192"
+    ),
+    "src/warhammer40k_core/engine/attack_sequence_group_selection.py": (
+        "f9a8846b62b5879589c98b38dbe572c585194d2a976888c4a7421e3a66176db9"
+    ),
+    "src/warhammer40k_core/engine/attack_sequence_hazardous.py": (
+        "45f2b0f2485b5c1cbb78c1f86fb5768e320ac8db51bbbb14e24c1f1ef926ba35"
+    ),
+    "src/warhammer40k_core/engine/attack_sequence_hit_wound.py": (
+        "d677e50e2bf25c4bb852e9f131a2f1b4b797e5a51a6ec85808b9e32a3070db69"
+    ),
+    "src/warhammer40k_core/engine/native_gathering_cover_rules.py": (
+        "66a976554ff0398ba2f1dbbf88d329d31eec4713e9716582ae8db20d3546e1bc"
+    ),
+    f"{GNARLMAW_PACKAGE_PATH}/__init__.py": (
+        "09ea0fabc13ca2cc53c00a02d3f5a88327ba7737a27e182842decd81a2dd106c"
+    ),
+}
 ROTATION_SOURCES = {
     "src/warhammer40k_core/engine/phases/movement_geometry.py",
     "src/warhammer40k_core/geometry/physical_predicates.py",
@@ -326,8 +352,28 @@ def _fortification_current_receipt(
             CATALOG_SOURCE_PREIMAGES,
         ),
     )
-    if source is not None:
-        receipt, successor_raw = source
+    if source is None:
+        if (root / PRE_HIT_COVER_RECEIPT).exists():
+            raise SystemExit("Gnarlmaw pre-Hit cover requires the exact catalog predecessor.")
+        return receipt, raw
+    receipt, successor_raw = source
+    raw += b"\0" + successor_raw
+    pre_hit_cover = _fortification_successor(
+        root,
+        receipt,
+        _Successor(
+            PRE_HIT_COVER_RECEIPT,
+            PRE_HIT_COVER_RECEIPT_SHA256,
+            PRE_HIT_COVER_BASE,
+            "finite-gnarlmaw-pre-hit-cover-test-v1",
+            CATALOG_SOURCE_RECEIPT_SHA256,
+            7,
+            set(PRE_HIT_COVER_PREIMAGES),
+            PRE_HIT_COVER_PREIMAGES,
+        ),
+    )
+    if pre_hit_cover is not None:
+        receipt, successor_raw = pre_hit_cover
         raw += b"\0" + successor_raw
     return receipt, raw
 

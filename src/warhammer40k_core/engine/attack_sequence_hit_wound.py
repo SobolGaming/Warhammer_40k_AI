@@ -559,6 +559,7 @@ def _benefit_of_cover_ballistic_skill_penalty(
     state: GameState,
     pool: RangedAttackPool,
     runtime_modifier_registry: RuntimeModifierRegistry | None = None,
+    provisional_cover: bool = False,
 ) -> int:
     from warhammer40k_core.core.weapon_profiles import RangeProfileKind
     from warhammer40k_core.engine.catalog_cover_grants import catalog_cover_inventory
@@ -573,7 +574,7 @@ def _benefit_of_cover_ballistic_skill_penalty(
         target_unit_instance_id=pool.target_unit_instance_id,
     ):
         return 0
-    if catalog_cover_inventory(
+    if provisional_cover or catalog_cover_inventory(
         state=state,
         target_unit_instance_id=pool.target_unit_instance_id,
         runtime_modifier_registry=runtime_modifier_registry,

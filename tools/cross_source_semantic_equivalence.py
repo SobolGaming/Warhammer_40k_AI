@@ -35,6 +35,9 @@ from warhammer40k_core.rules.rule_ir import RuleIR
 from warhammer40k_core.rules.source_data import RuleSourceText
 from warhammer40k_core.rules.source_overlay import SourceOverlayOperationKind
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    chaos_daemons_gnarlmaw_2026_11 as gnarlmaw,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     chaos_maulerfiend_datasheet_overlay_2026_07,
     datasheet_keyword_lexicon_2026_06_14,
     faction_detachments_2026_27,
@@ -508,7 +511,16 @@ def _datasheet_ability_members(
             rule_ir=rule_ir,
         )
         if CATALOG_IR_FORTIFICATION_COVER_CONSUMER_ID in runtime_consumer_ids:
-            status = SemanticExecutionStatus.BLOCKED_STRUCTURED_SEMANTICS
+            if row.source_row_id == f"{gnarlmaw.DATASHEET_ID}:4" and any(
+                gnarlmaw.is_reviewed_diseased_cover(ability)
+                and ability.effect_description == rule_ir.normalized_text
+                for ability in gnarlmaw.catalog_package()
+                .army_catalog.datasheet_by_id(gnarlmaw.DATASHEET_ID)
+                .abilities
+            ):
+                status = SemanticExecutionStatus.NAMED_HANDLER_EXECUTABLE
+            else:
+                status = SemanticExecutionStatus.BLOCKED_STRUCTURED_SEMANTICS
             transfer = SemanticSupportTransfer.NONE
         elif rollup.overall_ability_support is AbilityOverallSupport.FULL and runtime_consumer_ids:
             status = SemanticExecutionStatus.ENGINE_CONSUMED
@@ -906,6 +918,15 @@ def _member_label(member: SemanticEquivalenceMember) -> str:
 
 
 def _group_conclusion(group: SemanticEquivalenceGroup) -> str:
+    if (
+        CATALOG_IR_FORTIFICATION_COVER_CONSUMER_ID in group.runtime_consumer_ids
+        and SemanticExecutionStatus.NAMED_HANDLER_EXECUTABLE in group.execution_statuses
+    ):
+        return (
+            "Owner-approved development convention for the admitted Gnarlmaw only. "
+            "The source-local execution evidence carries no transferable gameplay support "
+            "or official certification."
+        )
     if CATALOG_IR_FORTIFICATION_COVER_CONSUMER_ID in group.runtime_consumer_ids:
         return (
             "Allocation attribution only. The 11th-edition attack modifier remains "

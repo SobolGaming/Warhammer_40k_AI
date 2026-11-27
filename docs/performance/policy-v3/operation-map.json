@@ -38992,6 +38992,7 @@
       "paths": [
         "data/source_audits/ci64_provenance_v1/gnarlmaw-allocation-test-v1.json",
         "data/source_audits/ci64_provenance_v1/gnarlmaw-development-test-v1.json",
+        "data/source_audits/ci64_provenance_v1/gnarlmaw-pre-hit-cover-test-v1.json",
         "data/source_audits/ci64_provenance_v1/gnarlmaw-source-test-v1.json",
         "data/source_audits/ci64_provenance_v1/gnarlmaw-test-typing-v1.json",
         "data/source_audits/feculent_gnarlmaw_2026_11/geometry.json"
@@ -39023,6 +39024,7 @@
         "_allocation_cover_diagnostics",
         "_clause_coverage_row",
         "_clause_support_stage",
+        "ability_clause_coverage_rows_for_rule_ir",
         "ability_coverage_row_for_descriptor"
       ],
       "families": [],
@@ -39034,9 +39036,13 @@
         "tests/rules/section09/test_fortification_engagement.py"
       ],
       "owners": [
+        "_assert_gnarlmaw_natural_two",
+        "_circular_attack_fixture_body",
+        "_gnarlmaw_native_attack",
         "_native_gnarlmaw_config",
         "test_gnarlmaw_deploys_from_native_development_roster",
         "test_gnarlmaw_diseased_cover_uses_native_hull_occlusion",
+        "test_gnarlmaw_pre_hit_cover_respects_allocation_and_modifiers",
         "test_gnarlmaw_records_allocation_cover_after_unmodified_hit_roll"
       ],
       "families": [],
@@ -39080,6 +39086,33 @@
         "_reviewed_source_rows",
         "build_catalog_package",
         "main"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "gnarlmaw-development-precision-eligibility": {
+      "paths": [
+        "src/warhammer40k_core/engine/attack_sequence_group_selection.py"
+      ],
+      "owners": [
+        "_grouped_precision_request_if_available",
+        "precision_allocation_groups_for_pool"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "gnarlmaw-development-cover-modifier": {
+      "paths": [
+        "src/warhammer40k_core/engine/attack_modifier_snapshots.py",
+        "src/warhammer40k_core/engine/attack_sequence_hit_wound.py",
+        "src/warhammer40k_core/engine/native_gathering_cover_rules.py"
+      ],
+      "owners": [
+        "attack_modifier_snapshots",
+        "_benefit_of_cover_ballistic_skill_penalty",
+        "cover_gathering_inventories"
       ],
       "families": [],
       "sensitive": false,

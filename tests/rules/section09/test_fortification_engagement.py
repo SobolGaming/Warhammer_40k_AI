@@ -74,6 +74,7 @@ from warhammer40k_core.engine.physical_engagement import (
     scenario_physically_engaged_enemy_rules_unit_ids,
 )
 from warhammer40k_core.engine.shooting_targets import FORTIFICATION_ENGAGEMENT_RULE_ID
+from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.unit_state import StartingStrengthRecord
 from warhammer40k_core.geometry.base import BaseShape, CircularBase, OvalBase, RectangularBase
 from warhammer40k_core.geometry.model_body import ModelBodyPart
@@ -800,7 +801,7 @@ def _assert_crossing(
     ) == ((enemy.model_id,) if expected else ())
 
 
-def _native_gnarlmaw_config(tmp_path: Path) -> GameConfig:
+def _native_gnarlmaw_config(tmp_path: Path, *, compact_bloodcrushers: bool = False) -> GameConfig:
     from tests.support.monster_mash_v995 import ROOT, monster_mash_vs_cavalcade_config
     from warhammer40k_core.engine.player_army_list import (
         army_muster_request_from_player_army_list,
@@ -833,10 +834,25 @@ def _native_gnarlmaw_config(tmp_path: Path) -> GameConfig:
     else:
         pytest.fail("Expected the export to contain a Bloodletters line for replacement.")
     roster_path.write_text(json.dumps(original), encoding="utf-8")
-    rosters = (
-        load_player_army_list(roster_path),
-        load_player_army_list(ROOT / "data/army_lists/cavalcade-shadow-bloodthirster.json"),
-    )
+    opponent_path = ROOT / "data/army_lists/cavalcade-shadow-bloodthirster.json"
+    if compact_bloodcrushers:
+        opponent = json.loads(opponent_path.read_bytes())
+        first_bloodcrushers = next(
+            line
+            for line in opponent["units"]
+            if line["selection"]["unit_selection_id"] == "bloodcrushers-1"
+        )
+        # The pinned MFM first-unit bracket is 210 for six or 95 for three.
+        # Preserve the export's separately priced enhancement.
+        reduction = 210 - 95
+        opponent["declared_total_points"] -= reduction
+        first_bloodcrushers["declared_points"] -= reduction
+        selection = first_bloodcrushers["selection"]
+        selection["model_profile_selections"][1]["model_count"] = 2
+        selection["wargear_selections"] = []
+        opponent_path = tmp_path / "compact-bloodcrushers.json"
+        opponent_path.write_text(json.dumps(opponent), encoding="utf-8")
+    rosters = (load_player_army_list(roster_path), load_player_army_list(opponent_path))
     return replace(
         baseline,
         army_catalog=package.army_catalog,
@@ -881,11 +897,11 @@ def test_gnarlmaw_deploys_from_native_development_roster(tmp_path: Path) -> None
         row for row in manifest["rule_rows"] if row["owner_id"] == "000001470:diseased-cover"
     )
     assert cover_row["load_support"] == "generic_rule_ir"
-    assert cover_row["semantic_execution"] == "ir_compiled_unsupported"
+    assert cover_row["semantic_execution"] == "engine_consumed"
     assert cover_row["metadata"]["diagnostic_reasons"] == [
-        "fortification_cover_allocation_attribution_only"
+        "development:gnarlmaw-diseased-cover:pre-hit-v1"
     ]
-    assert any(
+    assert not any(
         effect["rule_row_id"] == cover_row["row_id"] for effect in manifest["unsupported_effects"]
     )
     assert (
@@ -1138,28 +1154,83 @@ def test_gnarlmaw_diseased_cover_uses_native_hull_occlusion(tmp_path: Path) -> N
             assert cover.cover_effect is CoverEffect.ATTACKER_BS_MODIFIER
 
 
-def test_gnarlmaw_records_allocation_cover_after_unmodified_hit_roll(tmp_path: Path) -> None:
+def _circular_attack_fixture_body(
+    unit: UnitInstance, *, tall_front_model: bool = False
+) -> UnitInstance:
+    from warhammer40k_core.geometry.model_geometry import BaseFootprintKind, FootprintPart
+
+    return replace(
+        unit,
+        own_models=tuple(
+            replace(
+                model,
+                geometry=replace(
+                    model.geometry,
+                    footprint_kind=BaseFootprintKind.CIRCULAR,
+                    parts=(FootprintPart("fixture", BaseFootprintKind.CIRCULAR, 0.25, 0.25),),
+                    height_inches=10.0 if tall_front_model and index == 0 else 2.0,
+                    body_parts=(),
+                ),
+            )
+            for index, model in enumerate(unit.own_models)
+        ),
+    )
+
+
+def _gnarlmaw_native_attack(
+    tmp_path: Path,
+    *,
+    screen: str,
+    ignores_cover: bool = False,
+    ordinary_cover: bool = False,
+) -> tuple[LocalGameSession, UnitInstance, UnitInstance]:
     from tests.support.faction_batch01 import Scene, unit_placement
     from tests.support.private_randomness import fixture_private_rng_seed
     from tests.support.section04_fixtures import pending
     from tests.support.section10_fixtures import submit
+    from warhammer40k_core.core.weapon_profiles import WeaponKeyword
     from warhammer40k_core.engine.army_mustering import (
         ArmyMusterRequest,
         WarlordSelection,
         muster_army,
     )
-    from warhammer40k_core.engine.attack_sequence_model import HitRollPayload
     from warhammer40k_core.engine.battle_round_flow import BattleRoundFlow
     from warhammer40k_core.engine.battlefield_state import BattlefieldRuntimeState, PlacedArmy
+    from warhammer40k_core.engine.core_stratagem_effects import GO_TO_GROUND_EFFECT_KIND
+    from warhammer40k_core.engine.damage_allocation import allocation_context_for_unit
+    from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
     from warhammer40k_core.engine.game_state import SecondaryMissionChoice, SecondaryMissionMode
     from warhammer40k_core.engine.phase import GameLifecycleStage
     from warhammer40k_core.engine.phases.charge import ChargePhaseHandler
     from warhammer40k_core.engine.phases.command import CommandPhaseHandler
     from warhammer40k_core.engine.phases.fight import FightPhaseHandler
     from warhammer40k_core.engine.phases.shooting_handler import ShootingPhaseHandler
-    from warhammer40k_core.engine.saves import SaveOptionPayload
+    from warhammer40k_core.engine.replay import ReplayArtifact, ReplayRunner
+    from warhammer40k_core.engine.shooting_targets import shooting_target_candidate_for_model
 
-    config = _native_gnarlmaw_config(tmp_path)
+    config = _native_gnarlmaw_config(tmp_path, compact_bloodcrushers=screen in ("mixed", "all"))
+    lash_id = "000001648:lash-of-slaanesh"
+    if ignores_cover:
+        config = replace(
+            config,
+            army_catalog=replace(
+                config.army_catalog,
+                wargear=tuple(
+                    replace(
+                        item,
+                        weapon_profiles=tuple(
+                            replace(
+                                profile, keywords=(*profile.keywords, WeaponKeyword.IGNORES_COVER)
+                            )
+                            for profile in item.weapon_profiles
+                        ),
+                    )
+                    if item.wargear_id == lash_id
+                    else item
+                    for item in config.army_catalog.wargear
+                ),
+            ),
+        )
     mission = config.mission_setup
     assert mission is not None
     mission = replace(
@@ -1172,11 +1243,21 @@ def test_gnarlmaw_records_allocation_cover_after_unmodified_hit_roll(tmp_path: P
         terrain_areas=(),
         objective_terrain_areas=(),
     )
+    target_sheet = "000001115" if screen in ("mixed", "all") else "000001120"
+    owner_sheets = (
+        ("000001648", GNARLMAW, "000001465") if screen == "unrelated" else ("000001648", GNARLMAW)
+    )
+    opponent_sheets = ("000001120", target_sheet)
     selected_rosters: list[ArmyMusterRequest] = []
     for roster, sheets in zip(
-        config.army_muster_requests, (("000001648", GNARLMAW), ("000001120",)), strict=True
+        config.army_muster_requests, (owner_sheets, opponent_sheets), strict=True
     ):
-        selections = tuple(s for s in roster.unit_selections if s.datasheet_id in sheets)
+        selections = tuple(
+            s
+            for s in roster.unit_selections
+            if s.datasheet_id in sheets
+            and (s.datasheet_id != "000001115" or s.unit_selection_id == "bloodcrushers-1")
+        )
         ids = {s.unit_selection_id for s in selections}
         warlord = next(s for s in selections if s.datasheet_id == sheets[0])
         selected_rosters.append(
@@ -1208,11 +1289,46 @@ def test_gnarlmaw_records_allocation_cover_after_unmodified_hit_roll(tmp_path: P
         )
         for roster in config.army_muster_requests
     )
+    if screen in ("mixed", "all"):
+        # Use simple fixture silhouettes for the Bloodcrushers and their observer.
+        # Their native rules and allocation records still apply.
+        # The screening Gnarlmaw keeps its actual catalog hull.
+        owner = replace(
+            owner,
+            units=tuple(
+                _circular_attack_fixture_body(u) if u.datasheet_id == "000001648" else u
+                for u in owner.units
+            ),
+        )
+        opponent = replace(
+            opponent,
+            units=tuple(
+                _circular_attack_fixture_body(u, tall_front_model=True)
+                if u.datasheet_id == target_sheet
+                else u
+                for u in opponent.units
+            ),
+        )
     for army in (owner, opponent):
         state.record_army_definition(army)
     shooter = next(u for u in owner.units if u.datasheet_id == "000001648")
     source = next(u for u in owner.units if u.datasheet_id == GNARLMAW)
-    target = next(u for u in opponent.units if u.datasheet_id == "000001120")
+    target = next(u for u in opponent.units if u.datasheet_id == target_sheet)
+    source_pose = {
+        "clear": Pose.at(15, 32),
+        "unrelated": Pose.at(15, 32),
+        "mixed": Pose.at(16, 20),
+        "all": Pose.at(16, 20),
+    }.get(screen, Pose.at(15, 20))
+    target_poses = {
+        "mixed": (Pose.at(22, 20), Pose.at(24, 15.5), Pose.at(26, 11)),
+        "all": (Pose.at(22, 20), Pose.at(26, 20), Pose.at(30, 20)),
+    }.get(screen, (Pose.at(22, 20),))
+    other_placements = tuple(
+        unit_placement(owner.army_id, owner.player_id, unit, (Pose.at(16, 22.5),))
+        for unit in owner.units
+        if unit.datasheet_id == "000001465"
+    )
     state.record_battlefield_state(
         BattlefieldRuntimeState(
             config.game_id,
@@ -1224,22 +1340,85 @@ def test_gnarlmaw_records_allocation_cover_after_unmodified_hit_roll(tmp_path: P
                     owner.player_id,
                     (
                         unit_placement(owner.army_id, owner.player_id, shooter, (Pose.at(10, 20),)),
-                        unit_placement(owner.army_id, owner.player_id, source, (Pose.at(15, 20),)),
+                        unit_placement(owner.army_id, owner.player_id, source, (source_pose,)),
+                        *other_placements,
                     ),
                 ),
                 PlacedArmy(
                     opponent.army_id,
                     opponent.player_id,
                     (
-                        unit_placement(
-                            opponent.army_id, opponent.player_id, target, (Pose.at(22, 20),)
+                        unit_placement(opponent.army_id, opponent.player_id, target, target_poses),
+                        *(
+                            unit_placement(
+                                opponent.army_id, opponent.player_id, unit, (Pose.at(49, 35),)
+                            )
+                            for unit in opponent.units
+                            if unit.unit_instance_id != target.unit_instance_id
                         ),
                     ),
                 ),
             ),
         )
     )
-    # Construct the shooting boundary with three real, unmodified mustered units.
+    if ordinary_cover:
+        state.record_persisting_effect(
+            PersistingEffect(
+                effect_id="fixture:gnarlmaw-independent-cover",
+                source_rule_id="core-stratagem:go-to-ground",
+                owner_player_id=opponent.player_id,
+                target_unit_instance_ids=(target.unit_instance_id,),
+                started_battle_round=1,
+                started_phase=BattlePhase.SHOOTING,
+                expiration=EffectExpiration.end_of_battle(),
+                effect_payload={"effect_kind": GO_TO_GROUND_EFFECT_KIND, "benefit_of_cover": True},
+            )
+        )
+
+    if screen in ("mixed", "all", "unrelated"):
+        profile = next(
+            item for item in config.army_catalog.wargear if item.wargear_id == lash_id
+        ).weapon_profiles[0]
+        visible = shooting_target_candidate_for_model(
+            scenario=battlefield_scenario_for_state(state=state),
+            ruleset_descriptor=config.ruleset_descriptor,
+            attacker_unit=shooter,
+            attacker_model_instance_id=shooter.own_model_ids()[0],
+            weapon_profile=profile,
+            target_unit_id=target.unit_instance_id,
+        )
+        assert visible.is_legal
+        witness = visible.line_of_sight_witness
+        assert witness is not None
+        if screen == "unrelated":
+            unrelated = next(unit for unit in owner.units if unit.datasheet_id == "000001465")
+            assert any(
+                record.blocker_id in unrelated.own_model_ids() and record.blocks_full_visibility
+                for record in witness.all_blocker_records()
+            )
+        else:
+            candidates = set(
+                allocation_context_for_unit(
+                    state=state, target_unit_instance_id=target.unit_instance_id
+                ).candidate_model_ids()
+            )
+            screened = {
+                record.target_model_id
+                for record in witness.model_records
+                if any(
+                    blocker.blocker_id in source.own_model_ids() and blocker.blocks_full_visibility
+                    for blocker in record.blocker_records
+                )
+            }
+            assert candidates == set(target.own_model_ids())
+            if screen == "mixed":
+                assert screened < candidates
+                assert screened
+                assert (candidates - screened) - set(visible.target_in_range_model_ids)
+            else:
+                assert screened == candidates
+
+    # Start a real shooting phase with the mustered native units.
     state.stage = GameLifecycleStage.BATTLE
     state.setup_step_index = None
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.SHOOTING)
@@ -1288,38 +1467,67 @@ def test_gnarlmaw_records_allocation_cover_after_unmodified_hit_roll(tmp_path: P
     if pending(session).decision_type == "start_mission_action":
         choose_shooting(session, pending(session), "continue_to_shooting")
     request = declaration_request(session, shooter, "normal")
-    lash = next(
-        row for row in weapon_rows(request) if row["wargear_id"] == "000001648:lash-of-slaanesh"
+    lash = next(row for row in weapon_rows(request) if row["wargear_id"] == lash_id)
+    replay_start = (
+        session.lifecycle.to_payload()
+        if screen == "singleton" and not ignores_cover and not ordinary_cover
+        else None
     )
+    if replay_start is not None:
+        session = LocalGameSession(GameLifecycle.from_payload(replay_start))
+        replay_start = session.lifecycle.to_payload()
     assert_valid(submit(session, [lash], [target.unit_instance_id], "normal"))
     finish_attacks(session)
-    steps = events(session, "attack_sequence_step")
-    natural_two_hits = {
-        step["attack_context_id"]: index
-        for index, step in enumerate(steps)
-        if step["step"] == "hit" and cast(HitRollPayload, step["payload"])["unmodified_roll"] == 2
-    }
-    ((save_index, step),) = (
-        (index, step)
-        for index, step in enumerate(steps)
-        if step["step"] == "save" and step["attack_context_id"] in natural_two_hits
-    )
-    hit_index = natural_two_hits[step["attack_context_id"]]
-    assert hit_index < save_index
-    hit = cast(HitRollPayload, steps[hit_index]["payload"])
-    assert hit["target_number"] == 2
-    assert hit["capped_modifier"] == 0
-    assert hit["successful"] is True
-    roll = hit["roll_state"]
-    assert roll is not None
-    assert roll["original_result"]["spec"]["roll_type"] == "attack_sequence.hit"
-    assert roll["original_result"]["source"] == "rng"
-    assert roll["original_result"]["values"] == [2]
+    if replay_start is not None:
+        artifact = ReplayArtifact.capture(
+            artifact_id="gnarlmaw-native-pre-hit",
+            initial_lifecycle_payload=replay_start,
+            final_lifecycle=session.lifecycle,
+        )
+        replay = ReplayRunner.from_payload(artifact.to_payload()).run()
+        assert replay.reproduced_exactly, replay.to_payload()
+    return session, source, target
 
-    save = step["payload"]
+
+def _assert_gnarlmaw_natural_two(session: LocalGameSession, *, target_number: int) -> None:
+    from warhammer40k_core.engine.attack_sequence_model import HitRollPayload
+
+    steps = events(session, "attack_sequence_step")
+    rolled_twos = [
+        step
+        for step in steps
+        if step["step"] == "hit" and cast(HitRollPayload, step["payload"])["unmodified_roll"] == 2
+    ]
+    assert rolled_twos
+    for step in rolled_twos:
+        hit = cast(HitRollPayload, step["payload"])
+        assert not any(
+            next_step["step"] in ("wound", "save")
+            and next_step["attack_context_id"] == step["attack_context_id"]
+            for next_step in steps
+        )
+        assert hit["target_number"] == target_number
+        assert hit["capped_modifier"] == 0
+        assert hit["successful"] is (target_number == 2)
+        roll = hit["roll_state"]
+        assert roll is not None
+        assert roll["original_result"]["spec"]["roll_type"] == "attack_sequence.hit"
+        assert roll["original_result"]["source"] == "rng"
+        assert roll["original_result"]["values"] == [2]
+
+
+def test_gnarlmaw_records_allocation_cover_after_unmodified_hit_roll(tmp_path: Path) -> None:
+    from warhammer40k_core.engine.saves import SaveOptionPayload
+
+    session, source, target = _gnarlmaw_native_attack(tmp_path, screen="singleton")
+    _assert_gnarlmaw_natural_two(session, target_number=3)
+    save = next(
+        step["payload"]
+        for step in events(session, "attack_sequence_step")
+        if step["step"] == "save"
+    )
     assert isinstance(save, dict)
     assert save["allocated_model_id"] == target.own_model_ids()[0]
-    assert save["target_number"] == 4
     (armour,) = (
         option
         for option in cast(list[SaveOptionPayload], save["save_options"])
@@ -1331,3 +1539,32 @@ def test_gnarlmaw_records_allocation_cover_after_unmodified_hit_roll(tmp_path: P
     assert cover is not None
     assert cover["source_feature_ids"] == list(source.own_model_ids())
     assert cover["cover_effect"] == "attacker_bs_modifier"
+
+
+@pytest.mark.parametrize(
+    ("screen", "ignores_cover", "ordinary_cover", "target_number"),
+    [
+        pytest.param("clear", False, False, 2, id="clear"),
+        pytest.param("unrelated", False, False, 2, id="unrelated-blocker"),
+        pytest.param("mixed", False, False, 2, id="mixed-allocation-candidates"),
+        pytest.param("all", False, False, 3, id="all-allocation-candidates"),
+        pytest.param("singleton", True, False, 2, id="ignores-cover"),
+        pytest.param("singleton", False, True, 3, id="ordinary-cover-does-not-stack"),
+        pytest.param("clear", False, True, 3, id="ordinary-cover-alone"),
+    ],
+)
+def test_gnarlmaw_pre_hit_cover_respects_allocation_and_modifiers(
+    tmp_path: Path, screen: str, ignores_cover: bool, ordinary_cover: bool, target_number: int
+) -> None:
+    from warhammer40k_core.engine.attack_sequence_model import HitRollPayload
+
+    session, _, _ = _gnarlmaw_native_attack(
+        tmp_path, screen=screen, ignores_cover=ignores_cover, ordinary_cover=ordinary_cover
+    )
+    hits = [
+        cast(HitRollPayload, step["payload"])
+        for step in events(session, "attack_sequence_step")
+        if step["step"] == "hit"
+    ]
+    assert hits
+    assert {hit["target_number"] for hit in hits} == {target_number}

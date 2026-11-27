@@ -2,6 +2,7 @@
 # pyright: reportUnusedImport=false
 from __future__ import annotations
 
+from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
 from warhammer40k_core.engine.battlefield_visibility_context import battlefield_visibility_context
 from warhammer40k_core.engine.catalog_contextual_status_consumption import (
     CATALOG_IR_FORTIFICATION_COVER_CONSUMER_ID,
@@ -12,6 +13,14 @@ from warhammer40k_core.engine.targetless_weapons import TargetlessWeapon
 from warhammer40k_core.engine.event_log import EventRecord
 
 from typing import TYPE_CHECKING
+
+from warhammer40k_core.core.ruleset_descriptor import CoverEffect
+from warhammer40k_core.engine.attack_sequence_group_selection import (
+    precision_allocation_groups_for_pool,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    chaos_daemons_gnarlmaw_2026_11 as gnarlmaw,
+)
 
 from warhammer40k_core.engine.attack_sequence_imports import *
 
@@ -620,6 +629,125 @@ def _cover_for_allocated_model(
     return fortification_cover if fortification_cover is not None else cover_result
 
 
+def gnarlmaw_diseased_cover_sources(*, state: GameState, pool: RangedAttackPool) -> JsonValue:
+    """Qualify the same admitted source across the whole grouped allocation candidate set."""
+    from warhammer40k_core.core.weapon_profiles import RangeProfileKind
+    from warhammer40k_core.engine.attack_sequence_geometry_targets import (
+        attack_pool_attacker_unit_id,
+    )
+    from warhammer40k_core.engine.damage_allocation_targets import (
+        DamageAllocationTargetState,
+        damage_allocation_target_state,
+    )
+
+    if (
+        pool.weapon_profile.range_profile.kind is not RangeProfileKind.DISTANCE
+        or has_weapon_keyword(pool.weapon_profile, WeaponKeyword.IGNORES_COVER)
+        or has_weapon_keyword(pool.weapon_profile, WeaponKeyword.TORRENT)
+        or state.battlefield_state is None
+    ):
+        return None
+    source_models = frozenset(
+        model.model_instance_id
+        for army in state.army_definitions
+        if army.catalog_id == gnarlmaw.CATALOG_ID
+        for unit in army.units
+        if unit.datasheet_id == gnarlmaw.DATASHEET_ID
+        and any(
+            gnarlmaw.is_reviewed_diseased_cover(ability) for ability in unit.datasheet_abilities
+        )
+        for model in unit.own_models
+        if model.is_alive
+    )
+    if not source_models:
+        return None
+    descriptor = state.ruleset_descriptor_for_runtime_policy()
+    if (
+        descriptor.terrain_visibility_policy.cover_policy.cover_effect
+        is not CoverEffect.ATTACKER_BS_MODIFIER
+    ):
+        return None
+    if (
+        damage_allocation_target_state(
+            state=state, target_unit_instance_id=pool.target_unit_instance_id
+        )
+        is not DamageAllocationTargetState.ALLOCATABLE
+    ):
+        return None
+    scenario = battlefield_scenario_for_state(state=state)
+    attacking_unit_id = attack_pool_attacker_unit_id(state=state, pool=pool)
+    dynamic_blockers = shooting_dynamic_model_blockers(
+        scenario=scenario,
+        observing_unit_id=attacking_unit_id,
+        target_unit_id=pool.target_unit_instance_id,
+    )
+    common_sources = source_models.intersection(model.model_id for model in dynamic_blockers)
+    if not common_sources:
+        return None
+
+    # Grouped saves and damage can exhaust a priority tier. Include every candidate
+    # in the native allocation context, plus the native Precision alternatives.
+    allocation = allocation_context_for_unit(
+        state=state, target_unit_instance_id=pool.target_unit_instance_id
+    )
+    candidates = set(allocation.candidate_model_ids())
+    if allocation.attached_unit_character_model_ids and has_weapon_keyword(
+        pool.weapon_profile, WeaponKeyword.PRECISION
+    ):
+        precision_allocation = replace(
+            allocation,
+            attacker_constraint=AttackAllocationConstraint(
+                source_rule_ids=(PRECISION_RULE_ID,), can_allocate_protected_characters=True
+            ),
+        )
+        candidates.update(
+            model_id
+            for group in precision_allocation_groups_for_pool(
+                state=state, allocation_context=precision_allocation, pool=pool
+            )
+            for model_id in group.model_ids
+        )
+    if not candidates:
+        return None
+
+    battlefield = scenario.battlefield_state
+    terrain_features = battlefield.terrain_features
+    terrain_volumes = tuple(
+        volume for feature in terrain_features for volume in feature.terrain_volumes()
+    )
+    for model_id in sorted(candidates):
+        target_geometry = geometry_model_for_placement(
+            model=model_by_id(state=state, model_instance_id=model_id),
+            placement=battlefield.model_placement_by_id(model_id),
+        )
+        cover = _fortification_cover_for_allocated_model(
+            state=state,
+            ruleset_descriptor=descriptor,
+            scenario=scenario,
+            pool=pool,
+            allocated_model_id=model_id,
+            attacking_unit_id=attacking_unit_id,
+            target_geometry=target_geometry,
+            terrain_features=terrain_features,
+            terrain_volumes=terrain_volumes,
+            dynamic_blockers=dynamic_blockers,
+            eligible_source_model_ids=common_sources,
+        )
+        if cover is None:
+            return None
+        common_sources = common_sources.intersection(cover.source_feature_ids)
+        if not common_sources:
+            return None
+    return validate_json_value(
+        {
+            "convention_id": gnarlmaw.DISEASED_COVER_CONVENTION_ID,
+            "source_ability_id": gnarlmaw.DISEASED_COVER_IR_SOURCE_ID,
+            "source_model_ids": sorted(common_sources),
+            "allocation_candidate_model_ids": sorted(candidates),
+        }
+    )
+
+
 def _fortification_cover_for_allocated_model(
     *,
     state: GameState,
@@ -632,6 +760,7 @@ def _fortification_cover_for_allocated_model(
     terrain_features: tuple[TerrainFeatureDefinition, ...],
     terrain_volumes: tuple[TerrainVolume, ...],
     dynamic_blockers: tuple[GeometryModel, ...],
+    eligible_source_model_ids: frozenset[str] | None = None,
 ) -> BenefitOfCoverResult | None:
     cover_policy = ruleset_descriptor.terrain_visibility_policy.cover_policy
     if not cover_policy.grants_benefit_of_cover or not dynamic_blockers:
@@ -684,11 +813,15 @@ def _fortification_cover_for_allocated_model(
             if (
                 blocker.blocker_kind is not VisibilityBlockerKind.MODEL
                 or not blocker.blocks_full_visibility
+                or (
+                    eligible_source_model_ids is not None
+                    and blocker.blocker_id not in eligible_source_model_ids
+                )
                 or not _model_owner_grants_fortification_cover(
                     state=state, model_instance_id=blocker.blocker_id
                 )
                 or not context.not_fully_visible_because_of(
-                    witness, target_model_id=target_geometry.model_id, sources=(blocker,)
+                    witness, target_model_id=allocated_model_id, sources=(blocker,)
                 )
             ):
                 continue
