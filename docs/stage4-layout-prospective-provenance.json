@@ -1,0 +1,327 @@
+{
+  "schema": "stage4-prospective-plan-provenance-v1",
+  "status": "local_review_candidate",
+  "publication": {
+    "immutable_reference": null,
+    "independent_timestamp_utc": null
+  },
+  "first_native_attempt_utc": null,
+  "native_attempts_in_preparation": 0,
+  "base": {
+    "commit": "1b56472fae25c5c0a253410a3378e69ddb1da74b",
+    "tree": "b91c0c0898c852764401258db351e3263866e7e3",
+    "github_pr": 775,
+    "input_git_blobs": {
+      "docs/stage4-layout-batch-recipe.json": "522fc9fd89891ca82353bd21e83a9625d60a4add",
+      "docs/stage4-layout-intake-recipe.json": "fd44b78ce3f245b9a413c1ac5ea4f82ca7887335",
+      "docs/AI_IMPLEMENTATION_PLAN.md": "f69b5a6c2328d6c90ee284720c2e0ab65276a3ed",
+      "scripts/stage4_layout_batch.py": "c1ca0988afbc7de37a3a1c7d74c80589447f0269",
+      "scripts/stage4_layout_intake.py": "666002f80d29d5d02fbacbfa3d85dc8f6cfee639",
+      "scripts/stage4_benchmark_entry.py": "7da3f360ada0fa212aa4681d8059620418342eb7",
+      "scripts/stage4_evaluation.py": "4332440d3a12ae042b3f4552e6e4afb5f982045a",
+      "scripts/stage4_split_objective.py": "82e05a46eb85caef9a7a60397e43b845f7abf70b",
+      "src/warhammer40k_core/ai/screen_movement_candidates.py": "4ae0625a6531b3e5503b45ef0a6fe3ca6ce00f77",
+      "src/warhammer40k_core/engine/primary_mission_choice_policy.py": "fbc6779c91f70210ef79a847b4025615d5538c63",
+      "src/warhammer40k_core/engine/primary_mission_choices.py": "06699c7c337b51cd7561223033e68d1cd524d352",
+      "src/warhammer40k_core/_engine_build_manifest.json": "703d7ab05485e97f4e7d2817ce15480f27156c1d",
+      "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/event_companion_layouts_2026_06/artifacts/event-companion-battlefields.json": "80464021cf000c71fb33b4d27907c8160a80f8db"
+    }
+  },
+  "plan": {
+    "file": "stage4-layout-prospective-recipe.json",
+    "raw_sha256": "4d87c7072953373725f9db6c2d67c7d9b27f64d966d907a810152071a7cfd49d",
+    "canonical_payload_sha256": "580f3ea08f1cd37401713eaf28573fde2f3a4eb154a1e463853a490dce76f0e4",
+    "git_blob": "68feed0d78a9def192b58d82f2f1704321228da2",
+    "frozen_page9_recipe_canonical_sha256": "d6a3792f5db9a241d6db4392b533bd2d8da98745b684b39c9e1b4b14163d79c1"
+  },
+  "runtime": {
+    "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:1d2913f1ceadb54f99022d8cf1e835c7e0567c6fa73eea0705ac85fe9d94a5c9",
+    "build_resources": 3301,
+    "candidate_generator_sha256": "a3c6c07ad8134788908e04cc2bac661b680a224d2e0b8dadc3b50b8ee36a38f4",
+    "candidate_generator_git_blob": "4ae0625a6531b3e5503b45ef0a6fe3ca6ce00f77",
+    "prefix_worker_final_action": "S's immediate A2 action",
+    "ordinary_prefix_issued_selectors": {
+      "select_secondary_missions": "fixed:assassination:bring_it_down",
+      "select_reserve_declaration": "complete_reserve_declarations",
+      "select_redeploy_unit": "complete_redeploys",
+      "select_prebattle_action": "complete_prebattle_actions",
+      "select_shooting_unit": "complete_shooting_phase",
+      "select_charging_unit": "complete_charge_phase",
+      "use_stratagem": "decline_stratagem_window"
+    },
+    "movement_action_selectors": {
+      "hold": "remain_stationary",
+      "screen": "normal_move"
+    },
+    "model_datasheet": "core-character-leader",
+    "roles": {
+      "screen": "army-alpha:screen",
+      "follow": "army-alpha:ally",
+      "opponent": "army-beta:opponent"
+    },
+    "route_cosine_min": 0.999,
+    "prefix_decision_cap": 64,
+    "native_probe_cap": 2,
+    "worker_wall_seconds": 180,
+    "batch_wall_seconds": 2400,
+    "startup_seeds": {
+      "stage4-movement-comparison-v1/1": "bf94e14ae8d21e91d0fe4eb3cd6009ffcb81f5421d1f8e9d79c68c4568d62af7",
+      "stage4-movement-comparison-v1/2": "976fdb90266ed19d8857742ae957fc9d8d4d0212483ccb3b89cdd0e7e3bf228d"
+    }
+  },
+  "source": {
+    "package": "gw-11e-warhammer-event-companion-layouts-v1-3-2026-10",
+    "artifact_sha256": "be19e97db9124271cae2dba2cdc8ef76992526b67c11505cf7c10c00435d36a7",
+    "pdf_sha256": "187253a9b6ea377f5e44d1148454bd042b165b03bb5c45c51a5880762bf56dc2",
+    "scoring_artifact_sha256": "8358cc11078b27e8773f58182e40bbf6194c54c3bda16b3aa1e286ee9b646dd1",
+    "development_pages": [
+      13,
+      14,
+      38
+    ],
+    "new_candidate_and_anchor_static_bindings": {
+      "reserve-page-10": {
+        "component": [
+          "reserve-page-10"
+        ],
+        "recipe_sha256": "fbf46c984cc3f6e1932f5363fc52cf69f3f770a0369da550d4f28fae0d1d5f64",
+        "id": "reserve-page-10",
+        "partition": "reserve",
+        "scoring_artifact_sha256": "8358cc11078b27e8773f58182e40bbf6194c54c3bda16b3aa1e286ee9b646dd1",
+        "source_diagram_pages": [
+          10
+        ],
+        "scenario_lineage": [
+          "take-and-hold-vs-take-and-hold-layout-2"
+        ],
+        "geometry_families": [
+          "take-and-hold-vs-take-and-hold-layout-2"
+        ],
+        "geometry_sha256": [
+          "411320ae18e429cb6ebd1c48eb20c9ac224779fe4ca3de4f0d4f5266ff8d49fa",
+          "3db75f6392c6339c3c89bef38c192c3f6c400aedc50fc10c6ccc8d658f9c5ab3"
+        ],
+        "trajectory_sha256": []
+      },
+      "reserve-page-11": {
+        "component": [
+          "reserve-page-11"
+        ],
+        "recipe_sha256": "e47673d24e89874ebf8e57eb3c9a950b1151a6c2cae8c1043a709e0d3fdbc486",
+        "id": "reserve-page-11",
+        "partition": "reserve",
+        "scoring_artifact_sha256": "8358cc11078b27e8773f58182e40bbf6194c54c3bda16b3aa1e286ee9b646dd1",
+        "source_diagram_pages": [
+          11
+        ],
+        "scenario_lineage": [
+          "take-and-hold-vs-take-and-hold-layout-3"
+        ],
+        "geometry_families": [
+          "take-and-hold-vs-take-and-hold-layout-3"
+        ],
+        "geometry_sha256": [
+          "a560b16517460293c7387cf5216191b8104c00eb695c224ebbeaec348cd0a24e",
+          "efbe14c9af87628d83dfa7ca6a55943d6c8863def15eaa3ba7426d8c7ca14f9f"
+        ],
+        "trajectory_sha256": []
+      },
+      "reserve-page-20": {
+        "component": [
+          "reserve-page-20"
+        ],
+        "recipe_sha256": "41d227401cef5038b04cb61aa1ae90856275c89d2a45a467e0a376c0966e7988",
+        "id": "reserve-page-20",
+        "partition": "reserve",
+        "scoring_artifact_sha256": "8358cc11078b27e8773f58182e40bbf6194c54c3bda16b3aa1e286ee9b646dd1",
+        "source_diagram_pages": [
+          20
+        ],
+        "scenario_lineage": [
+          "take-and-hold-vs-reconnaissance-layout-3"
+        ],
+        "geometry_families": [
+          "take-and-hold-vs-reconnaissance-layout-3"
+        ],
+        "geometry_sha256": [
+          "c64d70a37ddf8af750f93cf244b83ad266ccb8073ed4df401688bd5fcbdbb792",
+          "4bd38898880cc48ff505a79d82c4f24232f5bc6f6b25376eece70a8f12edeec0"
+        ],
+        "trajectory_sha256": []
+      },
+      "reserve-page-24": {
+        "component": [
+          "reserve-page-24"
+        ],
+        "recipe_sha256": "f8801edd10674d4837a4e79534751f80437eed22b355e435d390372048a1f8a5",
+        "id": "reserve-page-24",
+        "partition": "reserve",
+        "scoring_artifact_sha256": "8358cc11078b27e8773f58182e40bbf6194c54c3bda16b3aa1e286ee9b646dd1",
+        "source_diagram_pages": [
+          24
+        ],
+        "scenario_lineage": [
+          "purge-the-foe-vs-purge-the-foe-layout-1"
+        ],
+        "geometry_families": [
+          "purge-the-foe-vs-purge-the-foe-layout-1"
+        ],
+        "geometry_sha256": [
+          "95d1f7976457177512fda05a35277d3ca51a827f131268ceffdea5b9e48cb89d",
+          "a99d16370b6f8bac7483f61d2f2de152b8383eb6c96e099905720d65846b4c87"
+        ],
+        "trajectory_sha256": []
+      },
+      "reserve-page-50": {
+        "component": [
+          "reserve-page-15",
+          "reserve-page-50"
+        ],
+        "recipe_sha256": "fc39425e9b376d63480e8cd8742532563292a6ff35b8590722dd32bc82b9318b",
+        "id": "reserve-page-50",
+        "partition": "reserve",
+        "scoring_artifact_sha256": "8358cc11078b27e8773f58182e40bbf6194c54c3bda16b3aa1e286ee9b646dd1",
+        "source_diagram_pages": [
+          50
+        ],
+        "scenario_lineage": [
+          "reconnaissance-vs-priority-assets-layout-3"
+        ],
+        "geometry_families": [
+          "reconnaissance-vs-priority-assets-layout-3"
+        ],
+        "geometry_sha256": [
+          "c11d7757e246998aedbe353ef149bd881e97f3db949ea7cdd1362a4da9a204d5",
+          "121118452b589b0966087d97a90d2d585ab737cef0110c0ec968b46f82ad644e"
+        ],
+        "trajectory_sha256": []
+      }
+    }
+  },
+  "constructor": {
+    "source": "PR #774 retained scratch/plan.py",
+    "local_source_path": "C:/Users/nostr/Documents/Codex/2026-11-27/task-11/scratch/plan.py",
+    "original_sha256": "26beba237e9c8937dbc9c08c56166423db797fbdc784b2df54efaeb1410edbfb",
+    "in_memory_adapter_sha256": "61ca182698952c83c565f9f356274ac0267ab1ebfe2a13d04f5706fc477960db",
+    "adaptation": "Normalize line endings. Remove the early pages 10 and 11 exclusion for this run. Filter the construction loop to only those two source rows without altering the full layout index. Redirect output to an in-memory sink. Preserve all constructor comparisons, ranks, direction ordering and bounds.",
+    "scope": [
+      10,
+      11
+    ],
+    "runtime": {
+      "python": "3.14.5",
+      "geos": "3.13.1",
+      "numpy": "2.4.6",
+      "shapely": "2.1.2"
+    },
+    "methods": {
+      "grid_step_inches": 0.5,
+      "non_contact_start": "1.4 < distance < 10",
+      "screen_start": "1.65 < distance < 12",
+      "origin_priority": [
+        "empty",
+        "held",
+        "contested"
+      ],
+      "other_rules": "Original constructor, including board and zone buffers, clearances, route vectors, objective traversal and tuple ordering."
+    }
+  },
+  "mission_selectors": {
+    "locate_and_deny": "Lexicographically first required number of source-eligible logical terrain area IDs from the landed setup-only choice policy.",
+    "punishment": "Sole frozen enemy rules unit at the A Command windows in rounds one and two. Landed driver requires the exact target in the issued actor menu.",
+    "static_evidence": {
+      "27": {
+        "sole_frozen_enemy_rules_unit": "army-beta:opponent"
+      },
+      "29": {
+        "sole_frozen_enemy_rules_unit": "army-beta:opponent"
+      },
+      "42": {
+        "source_eligible_target_ids": [
+          "disruption-vs-priority-assets-layout-1-logical-terrain-contact-icon-01",
+          "disruption-vs-priority-assets-layout-1-logical-terrain-contact-icon-02",
+          "disruption-vs-priority-assets-layout-1-logical-terrain-contact-icon-03",
+          "disruption-vs-priority-assets-layout-1-terrain-area-02",
+          "disruption-vs-priority-assets-layout-1-terrain-area-04",
+          "disruption-vs-priority-assets-layout-1-terrain-area-06",
+          "disruption-vs-priority-assets-layout-1-terrain-area-08",
+          "disruption-vs-priority-assets-layout-1-terrain-area-09",
+          "disruption-vs-priority-assets-layout-1-terrain-area-11",
+          "disruption-vs-priority-assets-layout-1-terrain-area-13",
+          "disruption-vs-priority-assets-layout-1-terrain-area-15",
+          "disruption-vs-priority-assets-layout-1-terrain-area-16"
+        ],
+        "selection_count": 5
+      },
+      "43": {
+        "source_eligible_target_ids": [
+          "disruption-vs-priority-assets-layout-2-logical-terrain-contact-icon-05",
+          "disruption-vs-priority-assets-layout-2-terrain-area-02",
+          "disruption-vs-priority-assets-layout-2-terrain-area-05",
+          "disruption-vs-priority-assets-layout-2-terrain-area-06",
+          "disruption-vs-priority-assets-layout-2-terrain-area-07",
+          "disruption-vs-priority-assets-layout-2-terrain-area-10",
+          "disruption-vs-priority-assets-layout-2-terrain-area-11",
+          "disruption-vs-priority-assets-layout-2-terrain-area-12",
+          "disruption-vs-priority-assets-layout-2-terrain-area-13",
+          "disruption-vs-priority-assets-layout-2-terrain-area-14",
+          "disruption-vs-priority-assets-layout-2-terrain-area-15",
+          "disruption-vs-priority-assets-layout-2-terrain-area-16"
+        ],
+        "selection_count": 5
+      },
+      "44": {
+        "source_eligible_target_ids": [
+          "disruption-vs-priority-assets-layout-3-logical-terrain-contact-icon-03",
+          "disruption-vs-priority-assets-layout-3-logical-terrain-contact-icon-04",
+          "disruption-vs-priority-assets-layout-3-logical-terrain-contact-icon-05",
+          "disruption-vs-priority-assets-layout-3-terrain-area-01",
+          "disruption-vs-priority-assets-layout-3-terrain-area-03",
+          "disruption-vs-priority-assets-layout-3-terrain-area-04",
+          "disruption-vs-priority-assets-layout-3-terrain-area-11",
+          "disruption-vs-priority-assets-layout-3-terrain-area-13",
+          "disruption-vs-priority-assets-layout-3-terrain-area-14",
+          "disruption-vs-priority-assets-layout-3-terrain-area-15",
+          "disruption-vs-priority-assets-layout-3-terrain-area-16"
+        ],
+        "selection_count": 5
+      }
+    }
+  },
+  "rule_drift_checks": {
+    "source_pages": [
+      9,
+      53
+    ],
+    "page_count": 45,
+    "recipe_or_exclusion_counts": {
+      "recipe": 35,
+      "excluded": 10
+    },
+    "static_exclusion_counts": {
+      "development_diagram": 3,
+      "no_frozen_construction": 7
+    },
+    "historical_geometry_recipe_changes": [
+      10,
+      11
+    ],
+    "mission_selector_only_pages": [
+      27,
+      29,
+      42,
+      43,
+      44
+    ],
+    "all_other_historical_rows_equal": true,
+    "all_proposed_rows_source_bound": true,
+    "static_provenance_vertices": 39,
+    "new_rows_excluded_by_static_development_overlap": [],
+    "pairing_admission_maximum": 1,
+    "reserve_component_count": 8,
+    "origin_quota_each": 2,
+    "cohort_order": "Lexicographically first feasible list in ascending source-page order.",
+    "source_checks_only": true,
+    "prior_774_evidence": "Exploratory only. No old eligibility or trajectories used in this plan."
+  }
+}
