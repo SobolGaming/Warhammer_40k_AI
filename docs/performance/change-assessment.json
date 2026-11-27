@@ -1,150 +1,166 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "eac0413c58c26576ea4dac93ac85b63524c7c15b",
+  "base": "e5f2e9d94bbcd99d432d9a4441cbfbd63d564cf3",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:af65d2237320cda39c2d38d0dbeb4d415c424956696fc1cc0f40686921848830",
-  "operation_map_sha256": "f538dcad7c3fb1b314bb83bb4086fccc2eb178174f1dacee015ed20091eb0fd6",
+  "operation_map_sha256": "04c6c4da4038ccf55b0e732f553ecbf6d17d9a6a6a4a315f9b84783cbe4f229b",
   "changes": {
     "docs/AI_IMPLEMENTATION_PLAN.md": {
-      "before_sha256": "2ce678dc5b458b19ac77058505ea0cdd7128f0e5b32b8d02cae031728ac97212",
-      "after_sha256": "3f55e97ecbcc4723642aef1fe95c38297bb206ff1be0001b30daa4d1e6f613db",
+      "before_sha256": "3f55e97ecbcc4723642aef1fe95c38297bb206ff1be0001b30daa4d1e6f613db",
+      "after_sha256": "d9d534ffa78adc2ac6aa80d4efa7a34e47bbf0635dfa4518b6946260fb5ae0b1",
       "owners": {
         "@document": {
-          "before": "2ce678dc5b458b19ac77058505ea0cdd7128f0e5b32b8d02cae031728ac97212",
-          "after": "3f55e97ecbcc4723642aef1fe95c38297bb206ff1be0001b30daa4d1e6f613db"
+          "before": "3f55e97ecbcc4723642aef1fe95c38297bb206ff1be0001b30daa4d1e6f613db",
+          "after": "d9d534ffa78adc2ac6aa80d4efa7a34e47bbf0635dfa4518b6946260fb5ae0b1"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "49f54e886c5ce9e86682ec5c388f7c1053d21bf77449e875b2c44e1a0d206128",
-      "after_sha256": "64a21ee72f2f014644783928d5e6fd75f0a45b9ee80135762a54859f2a54ecf3",
+      "before_sha256": "64a21ee72f2f014644783928d5e6fd75f0a45b9ee80135762a54859f2a54ecf3",
+      "after_sha256": "6bbb93c63879f1cd3bd05f6b4a0b0253930f539a690bb09953c9e1642b71e94d",
       "owners": {
         "@document": {
-          "before": "49f54e886c5ce9e86682ec5c388f7c1053d21bf77449e875b2c44e1a0d206128",
-          "after": "64a21ee72f2f014644783928d5e6fd75f0a45b9ee80135762a54859f2a54ecf3"
+          "before": "64a21ee72f2f014644783928d5e6fd75f0a45b9ee80135762a54859f2a54ecf3",
+          "after": "6bbb93c63879f1cd3bd05f6b4a0b0253930f539a690bb09953c9e1642b71e94d"
         }
       }
     },
-    "docs/stage4-layout-intake-recipe.json": {
+    "docs/stage4-layout-batch-recipe.json": {
       "before_sha256": null,
-      "after_sha256": "8bef1df1c64acdf63c7c628ccd6e9eb5ef8d5ead0c0f7ade37a01201d648cd59",
+      "after_sha256": "084bbd258af04e95ecdc4d85cd1a1b5817e2359c5c242140865c5213f9e29e33",
       "owners": {
         "@document": {
           "before": null,
-          "after": "8bef1df1c64acdf63c7c628ccd6e9eb5ef8d5ead0c0f7ade37a01201d648cd59"
+          "after": "084bbd258af04e95ecdc4d85cd1a1b5817e2359c5c242140865c5213f9e29e33"
         }
       }
     },
     "scripts/stage4_benchmark_entry.py": {
-      "before_sha256": "394cfd3f86ab0a8d6d6caca503c24e4b82a5ab312744cd4b2ee54fa8f4a2793e",
-      "after_sha256": "ef9a3995378f39d0a140413af6da6fa072d0a46646068d799036f1ea8dea1626",
+      "before_sha256": "ef9a3995378f39d0a140413af6da6fa072d0a46646068d799036f1ea8dea1626",
+      "after_sha256": "32c74d54717a1f0c0dd34f99e3d35c70be311887a76a57cdc357d2b504b46fca",
       "owners": {
         "main": {
-          "before": "21ee42e448bde21e0f15e1dc8e67d0773ad15f4f9c9a9af1b702b774735c3c8a",
-          "after": "72dd7538e908088d9b9f741088e04a6a41ec474e1c8776711cc1501374c90e97"
+          "before": "72dd7538e908088d9b9f741088e04a6a41ec474e1c8776711cc1501374c90e97",
+          "after": "a7d344f9d1d0278d4cf616eb6e541ed3596112a7d6611d54b5062a295acbd677"
+        }
+      }
+    },
+    "scripts/stage4_evaluation.py": {
+      "before_sha256": "b0924ae1178198dacc91ddab04310520d6ead7648456e2ebda3ea6911f39ff71",
+      "after_sha256": "19fa9318bc9068940d794eb15ad93440b6c11cce198f4d81284693d376f3d86c",
+      "owners": {
+        "split_binding_keys": {
+          "before": null,
+          "after": "83d72b1eb30cffa48e079b35730a9829c9f2dcf6ee2502d25dbb767374b83bd1"
+        },
+        "validate_split": {
+          "before": "f24110811794451169b83099e226333dbf16589b839e7bb874588693cfe87401",
+          "after": "5fdf4dacea2bcd8e6c0051c3ca5abd6515f4b97a6ae76cf979cfb5589c1e8dcf"
+        }
+      }
+    },
+    "scripts/stage4_layout_batch.py": {
+      "before_sha256": null,
+      "after_sha256": "50e0530e3d1e1d7fcd4fc88a7af6226c4a51643e96c4e5634174c84f3598138b",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "fa57464e4ec2869bdfa07760559314cb411fefe53621b26b13fa4193aa19bb59"
+        },
+        "candidate_disposition": {
+          "before": null,
+          "after": "2940588479cba7b6638990c74787099734b22d903b7bc4d3bacd344d2e071177"
+        },
+        "choose": {
+          "before": null,
+          "after": "3702ddbb748736e5ba9fa71b70cfecff2459a1029d7d8722fd793ba35781420b"
+        },
+        "emit": {
+          "before": null,
+          "after": "d76c1a7993eebd75d85cb0c81b92412b495d93b6accaa9fed631ef5f26c1fe8a"
+        },
+        "group_families": {
+          "before": null,
+          "after": "57aaf0e3d27c81bffa29cfb575a004837dbf9607fa692dfe3ecd9cad135eb812"
+        },
+        "load_plan": {
+          "before": null,
+          "after": "3af5fc4000c68f3e49fbbf086953691b15be5362161835bbed51bdc950c88072"
+        },
+        "preflight_page": {
+          "before": null,
+          "after": "104d2449ddfda1d56664106222f212a561fd970d30b9ef1cb3d2074b89d03af9"
+        },
+        "recipe_for": {
+          "before": null,
+          "after": "a24bfb28831ba16b2b1511dced7a1b85ed84874479f8d271f37bc6e8309c6ec9"
+        },
+        "run": {
+          "before": null,
+          "after": "3ee32848fff9d8db1d904d46bdfad90633ff8444d8d77485a804b3917cd6c9c2"
+        },
+        "run_page": {
+          "before": null,
+          "after": "76bc67ab98da23d7f614f1454cddd5994c689b73c50d4c7f4c442a201069a2eb"
         }
       }
     },
     "scripts/stage4_layout_intake.py": {
-      "before_sha256": null,
-      "after_sha256": "905c74b67e34b091c1f4ff92004d33e0fd08dbf03ce450a98f1d1b226beb45d7",
+      "before_sha256": "905c74b67e34b091c1f4ff92004d33e0fd08dbf03ce450a98f1d1b226beb45d7",
+      "after_sha256": "2bfcba1bef761fb7f0b46a265fe2629187584f28d217061b148ce075fc810fc5",
       "owners": {
         "@module": {
-          "before": null,
-          "after": "b26c8ce140de7bc56e5ce014ecbbc63a77b8c057fe419790dd1503a296a05e39"
+          "before": "b26c8ce140de7bc56e5ce014ecbbc63a77b8c057fe419790dd1503a296a05e39",
+          "after": "2231f75f41afcf60b0e17d4913d403bbc06ab1df8106efc4fce8629fe9346cfe"
         },
-        "IntakeGap": {
+        "development_inventory": {
           "before": null,
-          "after": "eabe721c4f72f41090ce241f66cc5c87f98f9f4e49fb948b99a4c448b9ea174a"
-        },
-        "IntakeGap.__init__": {
-          "before": null,
-          "after": "bb166ae0812be6adbc2103a8efab102dda4f33cdd1bd7c67ebcb513df98d02ca"
-        },
-        "classify_origin": {
-          "before": null,
-          "after": "88ae5e522012a83073187106ea880b4508e53d5efbf5c395d73e4f1f806119a2"
-        },
-        "config": {
-          "before": null,
-          "after": "e0b1b6abaf043281486a5211b81b8c17aa8005b2adea45507187c02f5aee7fa0"
-        },
-        "geometry_key": {
-          "before": null,
-          "after": "560b074071be62af5852c8ebaa4b06d4b10b41c1874dc5256701565bb212a43c"
+          "after": "2dc477086f4e21a9f6facf0f6dd91522ebe916b42858d10e46bf144d90521797"
         },
         "immediate_menu": {
-          "before": null,
-          "after": "8c7dc16b5b0aee3a5a3496481662fe7a2cbd7c905a769d6ea538b36263f69efc"
-        },
-        "linked_footprint_key": {
-          "before": null,
-          "after": "c0ad1f9f45634fc52ed77ae2663107fd046a312635d862fc165f6a4886d292bd"
-        },
-        "load_recipe": {
-          "before": null,
-          "after": "0af0947cdd1135896e691145d525b4318fda8453da3f0662ab070b83c6e68ba0"
-        },
-        "mission": {
-          "before": null,
-          "after": "b2a3ee7b89968f03f7cf811b01b9e4422193f5abe1a5f410da727199c392affc"
-        },
-        "need": {
-          "before": null,
-          "after": "85a2b4cdc3b4e8c21aa22e43d46fb36ea36acc9aa29b0cca373f6459f4d24ca4"
+          "before": "8c7dc16b5b0aee3a5a3496481662fe7a2cbd7c905a769d6ea538b36263f69efc",
+          "after": "1e4830430122de348aa896a853c3f50c16c1a0547499ea5c75ca6bfa7091661a"
         },
         "open_origin": {
-          "before": null,
-          "after": "6b430e3991a18204d63ae0f3f737b80e94bff3031c0d6798caa3f57c5cad92b1"
-        },
-        "origin_type": {
-          "before": null,
-          "after": "8f6d832aeaec02198942e744a40b0f6e26738ec73ea1ff78dddc2f59112986f4"
-        },
-        "polygon_key": {
-          "before": null,
-          "after": "ea0c0384021579d67cdd3ad196ba89dffde4c6eb81b9ef3ee95b10607f768ec1"
+          "before": "6b430e3991a18204d63ae0f3f737b80e94bff3031c0d6798caa3f57c5cad92b1",
+          "after": "cc149f275be4da1dbb8b96b2fe91d1de9053f1e5afa61aac745446a85637df4a"
         },
         "preflight": {
-          "before": null,
-          "after": "e500d151731ac7cf09312a803dc05ba10af78132d396b8e545e6ee30d9d1ead7"
+          "before": "e500d151731ac7cf09312a803dc05ba10af78132d396b8e545e6ee30d9d1ead7",
+          "after": "f3a462a847a8f12233cb4a3214bc630c2187d8096a75e82a16cac68174e46816"
         },
-        "run": {
+        "select_path": {
           "before": null,
-          "after": "09a406ebc1336f871bd37d586c477b7df7866b6011f96785e74bd243e056f84a"
+          "after": "e176afccbd067889ed72395cc2096b26d8133af7cfa92d36142033dff876b1a1"
         },
-        "screen_order": {
+        "source_candidate": {
           "before": null,
-          "after": "ae350f7ca422b69acd1077c2a797bee052caa7dc5101ec7ea40cc18bb9a69915"
+          "after": "821fd8dbac9949ab4500d7c34b5acd3c9d7f2b78009b3116883b18265d55eeaf"
         },
         "source_inventory": {
-          "before": null,
-          "after": "eb40696de5e390e1dfb804cdc58f34453794b498d454ac4410b497ec45655f33"
+          "before": "eb40696de5e390e1dfb804cdc58f34453794b498d454ac4410b497ec45655f33",
+          "after": "31fda3adebe3399cc14e0a7a32c0bea2bb0dd52c04f188d215cafe878f15820f"
         }
       }
     },
     "scripts/stage4_layout_intake_checks.py": {
-      "before_sha256": null,
-      "after_sha256": "da7032f0b2c6ab3a44d47f9d8e9039e6be1d91532891b14be05015d0ff1e6e97",
+      "before_sha256": "da7032f0b2c6ab3a44d47f9d8e9039e6be1d91532891b14be05015d0ff1e6e97",
+      "after_sha256": "99b5367d0816668f76e40d6d819f9a77a1bb3f26ef2eb67a9400c188d14e9fae",
       "owners": {
-        "@module": {
+        "test_batch_overlap_transitively_connects_failed_and_unattempted_candidates": {
           "before": null,
-          "after": "a14d1440667dad4e4959e8b42de8c670b7612c12002498a9a1e151876f318c39"
+          "after": "14033e30359d9b1cea46b99fe9db016caebf9463ab7111785cde24aefde5435b"
         },
-        "test_first_recipe_uses_earliest_unused_diagram": {
+        "test_batch_preserves_origin_types_even_for_failed_native_menus": {
           "before": null,
-          "after": "351aff15b92662ff83edf6fa06bb4a875b7b3b42d3be86111c11914a416bd707"
+          "after": "8dc55eb9402c60112fd6054bb3e7c0e8b87caea332d2637e9db06d3275793705"
         },
-        "test_origin_categories_are_defined_by_visible_control": {
+        "test_batch_selection_skips_earliest_page_only_when_quotas_require_it": {
           "before": null,
-          "after": "d3efdc282fc1b2041e6036b5564cb59f7b03da5dc8cc073cc96209a20b0ebf46"
+          "after": "3e4ee9df5d4288bdd74c481e6e6b91a17f9de2be3965681be2403932a785eb1c"
         },
-        "test_published_development_binding_rejects_reserve_collision": {
+        "test_frozen_batch_inventory_and_original_page_9": {
           "before": null,
-          "after": "7e62e14e9f5b6e1dbe24f2dc85844d6abb20a8a10103dfa6c9d21cd7e581fadf"
-        },
-        "test_retained_control_without_contact_is_ineligible": {
-          "before": null,
-          "after": "3e8436bdf3a0f37330cbf6dfa26fa0ac2225571b0adc518f17ff03eed9789cf8"
+          "after": "4b2e6b34517b80986efdf2f3baf6ee9e093308029b8b53d6f8ca33963392f9e1"
         }
       }
     }
@@ -154,7 +170,7 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Documents the outcome-free reserve intake command, boundaries and observed eligibility evidence.",
+      "rationale": "Documents the bounded native feasibility batch, receipt and provisional split.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -162,15 +178,15 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Maps the bounded native preflight and its focused regressions to the existing opt-in benchmark operation.",
+      "rationale": "Maps the batched preflight to the existing opt-in benchmark workload.",
       "source_obligation": null,
       "unchanged_work": null
     },
-    "docs/stage4-layout-intake-recipe.json": {
+    "docs/stage4-layout-batch-recipe.json": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Freezes the source layout, ordinary setup, route predicates, seeds and native work caps.",
+      "rationale": "Freezes source diagram order, ordinary setup, selectors and exclusions.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -180,7 +196,27 @@
         "stage4-benchmark-entry-reproducer"
       ],
       "selected_families": [],
-      "rationale": "Adds a bounded opt-in CLI mode for immediate native reserve eligibility on one diagram.",
+      "rationale": "Routes the opt-in native batch and its individual diagnostic workers.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "scripts/stage4_evaluation.py": {
+      "category": "measured_workload",
+      "operations": [
+        "stage4-benchmark-entry-reproducer"
+      ],
+      "selected_families": [],
+      "rationale": "Shares the provenance binding keys with preflight component grouping.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "scripts/stage4_layout_batch.py": {
+      "category": "measured_workload",
+      "operations": [
+        "stage4-benchmark-entry-reproducer"
+      ],
+      "selected_families": [],
+      "rationale": "Preflights a finite set of source diagrams through the unchanged native facade.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -190,7 +226,7 @@
         "stage4-benchmark-entry-reproducer"
       ],
       "selected_families": [],
-      "rationale": "Exercises ordinary setup, actor-visible origin checks and immediate native legality in an opt-in development workload.",
+      "rationale": "Shares the existing native selector and verifies round-one prefix movement and A2 origins.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -200,7 +236,7 @@
         "stage4-benchmark-entry-reproducer"
       ],
       "selected_families": [],
-      "rationale": "Covers source ordering, development lineage and actor-visible feasibility strata without outcome labels.",
+      "rationale": "Exercises frozen input order, quota selection and transitive overlap without outcome access.",
       "source_obligation": null,
       "unchanged_work": null
     }

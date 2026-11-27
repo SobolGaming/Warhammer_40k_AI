@@ -35996,7 +35996,8 @@
         "scripts/stage4_scoring_timing_checks.py",
         "scripts/stage4_native_shooting.py",
         "scripts/stage4_layout_intake.py",
-        "scripts/stage4_layout_intake_checks.py"
+        "scripts/stage4_layout_intake_checks.py",
+        "scripts/stage4_layout_batch.py"
       ],
       "owners": [
         "*"

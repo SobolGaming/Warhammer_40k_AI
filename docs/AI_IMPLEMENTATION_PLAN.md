@@ -2090,6 +2090,32 @@ bindings. Its eligibility is provisional pending the sealed continuation
 overlap check. The first preflight supplies one empty-origin candidate
 toward the eight-family feasibility intake.
 
+#### Batched native preflight
+
+The [batch recipe](stage4-layout-batch-recipe.json) records the proposed construction
+or exclusion for every diagram in source page order. It inherits the original
+Page 9 roster, seeds, native probe and prefix caps. A listed round-one move uses
+the same direction filter, stable candidate order and two-probe limit as Screen.
+All other prefix actions use the Page 9 driver.
+
+```sh
+PYTHONPATH=src:. uv run --no-sync python -B -m scripts.stage4_benchmark_entry --layout-intake-batch > batch-receipt.json
+PYTHONPATH=src:. uv run --no-sync pytest -q --no-cov -p no:cacheprovider scripts/stage4_layout_intake_checks.py scripts/stage4_evaluation_checks.py
+```
+
+The receipt records both seed attempts, verified A2 origin categories, menu probes,
+reason codes, elapsed time and the provisional split manifest. The quota uses the
+verified actor-visible category at each seed. The proposed category only guides
+construction. Pass the receipt's `split_manifest` to
+`python -m scripts.stage4_evaluation validate-split` for independent verification.
+The batch joins transitive overlap across all known candidate bindings, including verified origins from
+failed menus. It searches in page order for the first eight that meet the origin
+quotas and use distinct pairings and components. The construction pass was bounded
+to one recipe per diagram. Pages 10 and 11 were logged as unproposed alternatives
+to Page 9. A geometry-only review left some other pages without a proposed recipe.
+Each native fork ends immediately after S's action. Sealed continuation-overlap
+checking and the cohort lock remain pending.
+
 ## 7. Performance and evaluation before scaling
 
 Measure the actual headless workload, with and without the reference transport under matched conditions:
