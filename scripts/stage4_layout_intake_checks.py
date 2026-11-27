@@ -306,3 +306,83 @@ def test_outcome_blind_cli_rejects_historical_receipt_without_dispatch(
         bench.main()
     assert exc.value.code == 2
     assert "historical_scored_receipt_forbidden" in capsys.readouterr().err
+
+
+def test_batch_round_trip_preserves_wall_cap_after_development_overlap(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    import json
+    from hashlib import sha256
+
+    from scripts import stage4_layout_batch as batch
+
+    now = 0.0
+    recipe = intake.load_recipe()
+
+    def fake_preflight(page: int, cap: float) -> tuple[list[bench.Row], str | None]:
+        nonlocal now
+        assert page < 50
+        now += min(cap, 84)
+        attempts = [
+            {
+                "seed_index": index,
+                "startup_seed_hex": sha256(
+                    f"{recipe['seed_namespace']}/{index}".encode()
+                ).hexdigest(),
+                "status": "ineligible",
+            }
+            for index in (1, 2)
+        ]
+        if page not in (9, 15):
+            return attempts, None
+        for attempt in attempts:
+            attempt.update(
+                a2_origin_reached=True,
+                strict_restore_and_replay=True,
+                origin={
+                    "type": "empty",
+                    "controller": None,
+                    "visible_contact_oc": {bench.A: 0, bench.B: 0},
+                },
+                event_prefix_sha256=bench.payload_digest(f"event {page}"),
+                decision_prefix_sha256=bench.payload_digest(f"decision {page}"),
+                origin_sha256=bench.payload_digest(f"origin {page}"),
+                status="origin_verified",
+            )
+        if page == 15:
+            attempts[0]["origin_sha256"] = intake.DEVELOPMENT_ORIGINS["west"][0]
+            return attempts[:1], "preflight_wall_cap"
+        for attempt in attempts:
+            attempt.update(
+                status="eligible",
+                menu={
+                    "actor_id": bench.A,
+                    "issued_options": [bench.HOLD, bench.NORMAL],
+                    "hold": "accepted",
+                    "eligible_candidates": ["synthetic-screen"],
+                    "selected_screen": "synthetic-screen",
+                    "probes": [{"id": "synthetic-screen", "violation": None}],
+                },
+            )
+        return attempts, None
+
+    monkeypatch.setattr(batch, "monotonic", lambda: now)
+    monkeypatch.setattr(batch, "preflight_page", fake_preflight)
+    batch.run()
+    receipt = json.loads(capsys.readouterr().out)
+    by_page = {page["page"]: page for page in receipt["pages"]}
+    assert by_page[15]["reason"] == by_page[50]["reason"] == "development_component_overlap"
+    assert by_page[15]["preflight_disposition"] == "preflight_wall_cap"
+    assert by_page[50]["preflight_disposition"] == "batch_wall_cap"
+    assert "attempts" not in by_page[50]
+    assert ["reserve-page-15", "reserve-page-50", "west"] in receipt["components"]
+
+    verification = batch.verify_receipt(receipt)
+    assert verification["provenance_vertices"] == 37
+    assert verification["qualified_counts"] == {"empty": 1, "contested": 0, "held": 0}
+    assert verification["proposed_pages"] == []
+
+    # The earlier producer did not write the execution disposition.
+    for page in receipt["pages"]:
+        page.pop("preflight_disposition", None)
+    assert batch.verify_receipt(receipt) == verification

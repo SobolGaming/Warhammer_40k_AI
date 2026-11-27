@@ -285,17 +285,27 @@ def run() -> None:
         if family_id is None:
             continue
         if family_id in static_exclusions:
-            receipt.update(status="excluded", reason="development_component_overlap")
+            receipt.update(
+                status="excluded",
+                reason="development_component_overlap",
+                preflight_disposition="skipped_development_overlap",
+            )
             continue
         remaining = plan["batch_wall_seconds"] - (monotonic() - started)
         if remaining <= 0:
-            receipt.update(status="excluded", reason="batch_wall_cap")
+            receipt.update(
+                status="excluded", reason="batch_wall_cap", preflight_disposition="batch_wall_cap"
+            )
             continue
         tick = monotonic()
         attempts, failure = preflight_page(
             receipt["page"], min(remaining, base["worker_wall_seconds"])
         )
-        receipt.update(attempts=attempts, wall_seconds=round(monotonic() - tick, 3))
+        receipt.update(
+            preflight_disposition=failure or "completed",
+            attempts=attempts,
+            wall_seconds=round(monotonic() - tick, 3),
+        )
         bind_attempts(pinned[family_id], attempts)
         candidate_disposition(receipt, attempts, failure)
         if receipt["page"] == 9:
@@ -472,17 +482,40 @@ def verify_receipt(receipt: object) -> bench.Row:
         family_id = page.get("family_id")
         if family_id is None:
             continue
+        has_disposition = "preflight_disposition" in retained
         if family_id in static_exclusions:
+            if has_disposition:
+                page["preflight_disposition"] = "skipped_development_overlap"
             page.update(status="excluded", reason="development_component_overlap")
             continue
-        if retained.get("reason") == "batch_wall_cap":
+
+        reason = retained.get("reason")
+        if has_disposition:
+            disposition = retained["preflight_disposition"]
+            intake.need(
+                disposition in {"completed", "batch_wall_cap", *WORKER_FAILURES},
+                "unknown_preflight_disposition",
+            )
+            page["preflight_disposition"] = disposition
+        elif reason in {"batch_wall_cap", *WORKER_FAILURES}:
+            disposition = reason
+        elif reason == "development_component_overlap" and "attempts" not in retained:
+            # Legacy receipts replaced the batch cap with the later overlap reason.
+            # Static development exclusions have already been reconstructed above.
+            disposition = "batch_wall_cap"
+        else:
+            disposition = "completed"
+
+        if disposition == "batch_wall_cap":
             page.update(status="excluded", reason="batch_wall_cap")
             continue
-        attempts = retained["attempts"]
+        attempts = retained.get("attempts")
+        intake.need(
+            isinstance(attempts, list) and "wall_seconds" in retained, "missing_worker_receipt"
+        )
         verify_attempts(attempts, base)
-        reason = retained.get("reason")
-        failure = reason if reason in WORKER_FAILURES else None
-        if reason != "development_component_overlap" and failure is None:
+        failure = disposition if disposition in WORKER_FAILURES else None
+        if failure is None and (has_disposition or reason != "development_component_overlap"):
             intake.need(
                 len(attempts) == 2
                 and all(trial["status"] != "origin_verified" for trial in attempts),

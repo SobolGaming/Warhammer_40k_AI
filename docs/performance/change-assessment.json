@@ -6,11 +6,11 @@
   "changes": {
     "docs/AI_IMPLEMENTATION_PLAN.md": {
       "before_sha256": "3f55e97ecbcc4723642aef1fe95c38297bb206ff1be0001b30daa4d1e6f613db",
-      "after_sha256": "d2a4974cad598f4c843cca893c75094fa949e707d3fce0252763e1a1b66a9093",
+      "after_sha256": "8b59ff93595eadf43541fa9b2c40cb2407a8c8581c72d723f626a1b69f3be365",
       "owners": {
         "@document": {
           "before": "3f55e97ecbcc4723642aef1fe95c38297bb206ff1be0001b30daa4d1e6f613db",
-          "after": "d2a4974cad598f4c843cca893c75094fa949e707d3fce0252763e1a1b66a9093"
+          "after": "8b59ff93595eadf43541fa9b2c40cb2407a8c8581c72d723f626a1b69f3be365"
         }
       }
     },
@@ -60,7 +60,7 @@
     },
     "scripts/stage4_layout_batch.py": {
       "before_sha256": null,
-      "after_sha256": "1503ce2c809af73027e08b872b3441ea9a5a0aa30ff96fcdd7059132d749bab4",
+      "after_sha256": "bba573e29cd454fc1abee921a064daf7eae5d2fe51027fb342f1d244780eaf50",
       "owners": {
         "@module": {
           "before": null,
@@ -108,7 +108,7 @@
         },
         "run": {
           "before": null,
-          "after": "9eaabb8c0999b80e3d5c88eff8544cb7716ac64f5054012e9bad6c374a941df7"
+          "after": "5d14c42a587fb32305e0147e8fd905261fad8a7442f5f12925d6307969a74e83"
         },
         "run_page": {
           "before": null,
@@ -128,7 +128,7 @@
         },
         "verify_receipt": {
           "before": null,
-          "after": "9fa727f1829df97a979ccb33b9b955844ff587eac5e2a86b4609a4546799209d"
+          "after": "1518a0929e661345fa980ab91486d9a726af82c2f4f7cbb272f3f9b5af224381"
         }
       }
     },
@@ -172,7 +172,7 @@
     },
     "scripts/stage4_layout_intake_checks.py": {
       "before_sha256": "da7032f0b2c6ab3a44d47f9d8e9039e6be1d91532891b14be05015d0ff1e6e97",
-      "after_sha256": "cdea842fee067ae2cd7a2d594b10189cb5241808f6d20f7d3956be978484d237",
+      "after_sha256": "961bc32555ba53f931d32365e701e379236e7edadf66d0c0d5168b8ccdb49f15",
       "owners": {
         "@module": {
           "before": "a14d1440667dad4e4959e8b42de8c670b7612c12002498a9a1e151876f318c39",
@@ -189,6 +189,10 @@
         "test_batch_preserves_origin_types_even_for_failed_native_menus": {
           "before": null,
           "after": "8dc55eb9402c60112fd6054bb3e7c0e8b87caea332d2637e9db06d3275793705"
+        },
+        "test_batch_round_trip_preserves_wall_cap_after_development_overlap": {
+          "before": null,
+          "after": "07c18059637ea5de546b7888eb98117a2cdb1d2ffb56d73558d5d33d5270881a"
         },
         "test_batch_selection_skips_earliest_page_only_when_quotas_require_it": {
           "before": null,

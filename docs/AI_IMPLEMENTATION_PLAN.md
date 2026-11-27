@@ -2117,7 +2117,9 @@ rebuilds the complete provenance graph from the committed recipes, imported
 source data, frozen development bindings and verified A2 commitments in the
 supplied receipt. This includes proposed pages that failed before A2 or were
 never exercised. It checks the full connected components before deriving
-eligibility and quota counts. The stricter `split_manifest` projection contains
+eligibility and quota counts. New receipts record preflight execution separately
+from final eligibility so a wall-cap skip remains visible even when the page
+shares a development component. The stricter `split_manifest` projection contains
 only reserve rows with verified trajectory bindings outside development.
 `stage4_evaluation validate-split` checks that projection.
 
