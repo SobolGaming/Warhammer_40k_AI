@@ -1,5 +1,6 @@
 """Native shooting and Fall Back through the shared source-bound Fortification clause."""
 
+import json
 import math
 from dataclasses import replace
 from pathlib import Path
@@ -47,7 +48,7 @@ from warhammer40k_core.engine.battlefield_state import geometry_model_at_pose
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.event_log import JsonValue
-from warhammer40k_core.engine.game_state import GameState
+from warhammer40k_core.engine.game_state import GameConfig, GameState
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.list_validation import UnitMusterSelection
 from warhammer40k_core.engine.movement_decision_authority import (
@@ -797,3 +798,311 @@ def _assert_crossing(
         enemy_models=(enemy,),
         check_continuous_motion=True,
     ) == ((enemy.model_id,) if expected else ())
+
+
+def _native_gnarlmaw_config(tmp_path: Path) -> GameConfig:
+    from tests.support.monster_mash_v995 import ROOT, monster_mash_vs_cavalcade_config
+    from warhammer40k_core.engine.player_army_list import (
+        army_muster_request_from_player_army_list,
+        load_player_army_list,
+    )
+    from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+        chaos_daemons_gnarlmaw_2026_11 as gnarlmaw,
+    )
+    from warhammer40k_core.rules.source_packages.warhammer_40000_11th import mfm_2026_10
+
+    baseline = monster_mash_vs_cavalcade_config()
+    package = gnarlmaw.catalog_package()
+    roster_path = tmp_path / "gnarlmaw-development.json"
+    original = json.loads((ROOT / "data/army_lists/monster-mash.json").read_bytes())
+    original["declared_total_points"] = 1985
+    original["provenance"]["source_format"] = "native_development_fixture"
+    for line in original["units"]:
+        if line["selection"]["unit_selection_id"] == "bloodletters":
+            line["selection"] = {
+                "unit_selection_id": "gnarlmaw",
+                "datasheet_id": gnarlmaw.DATASHEET_ID,
+                "model_profile_selections": [
+                    {"model_profile_id": gnarlmaw.PROFILE_ID, "model_count": 1}
+                ],
+                "wargear_selections": [],
+                "mustering_option_selections": [],
+            }
+            line["declared_points"] = 100
+            break
+    else:
+        pytest.fail("Expected the export to contain a Bloodletters line for replacement.")
+    roster_path.write_text(json.dumps(original), encoding="utf-8")
+    rosters = (
+        load_player_army_list(roster_path),
+        load_player_army_list(ROOT / "data/army_lists/cavalcade-shadow-bloodthirster.json"),
+    )
+    return replace(
+        baseline,
+        army_catalog=package.army_catalog,
+        model_geometries=package.model_geometries,
+        army_muster_requests=tuple(
+            army_muster_request_from_player_army_list(
+                catalog=package.army_catalog,
+                army_list=roster,
+                points_source_package=mfm_2026_10.source_package(),
+                army_id=old.army_id,
+                player_id=old.player_id,
+            )
+            for old, roster in zip(baseline.army_muster_requests, rosters, strict=True)
+        ),
+    )
+
+
+def test_gnarlmaw_deploys_from_native_development_roster(tmp_path: Path) -> None:
+    from tests.support.monster_mash_v995 import (
+        _submit_option,  # pyright: ignore[reportPrivateUsage]
+    )
+    from tests.support.section04_fixtures import pending
+    from warhammer40k_core.adapters.access_control import ViewerContext
+    from warhammer40k_core.core.model_geometry_catalog import (
+        GeometryReviewStatus,
+        GeometryRulesFootprintPolicy,
+    )
+    from warhammer40k_core.engine.battlefield_state import ModelPlacement
+    from warhammer40k_core.engine.deployment import (
+        DeploymentPlacementProposal,
+        DeploymentPlacementRequest,
+    )
+    from warhammer40k_core.engine.event_log import validate_json_value
+    from warhammer40k_core.engine.phase import SetupStep
+    from warhammer40k_core.engine.replay import ReplayRunner
+
+    config = _native_gnarlmaw_config(tmp_path)
+    session = LocalGameSession()
+    session.start(config)
+    status = session.advance_until_decision_or_terminal()
+    for kind, choice in (
+        ("select_secondary_missions", "fixed:assassination:bring_it_down"),
+        ("select_secondary_missions", "fixed:assassination:bring_it_down"),
+        ("select_reserve_declaration", "complete_reserve_declarations"),
+        ("select_reserve_declaration", "complete_reserve_declarations"),
+        ("select_deployment_unit", "deploy:cavalcade-b:belakor"),
+    ):
+        status = _submit_option(session, status, kind, choice)
+
+    def submit_placement(pose: Pose, result_id: str) -> LifecycleStatus:
+        request = pending(session)
+        assert request.actor_id is not None
+        viewer = ViewerContext.for_player(request.actor_id)
+        issued = session.view_for_context(viewer=viewer)["pending_decision"]
+        assert issued is not None
+        placement = DeploymentPlacementRequest.from_decision_request_payload(issued["payload"])
+        (model_id,) = placement.model_instance_ids
+        army_id = "cavalcade-b" if request.actor_id == "player-b" else "monster-mash-a"
+        proposal = DeploymentPlacementProposal(
+            proposal_request_id=placement.request_id,
+            proposal_kind=placement.proposal_kind,
+            game_id=placement.game_id,
+            ruleset_descriptor_hash=placement.ruleset_descriptor_hash,
+            setup_step=SetupStep.DEPLOY_ARMIES,
+            player_id=placement.player_id,
+            unit_instance_id=placement.unit_instance_id,
+            placement_kind=placement.placement_kind,
+            model_placements=(
+                ModelPlacement(
+                    army_id, placement.player_id, placement.unit_instance_id, model_id, pose
+                ),
+            ),
+            context=placement.context,
+        )
+        return session.submit_viewer_parameterized_payload(
+            viewer=viewer,
+            request_id=issued["request_id"],
+            payload=validate_json_value(proposal.to_payload()),
+            result_id=result_id,
+        )
+
+    status = submit_placement(Pose.at(41, 57), "place-defender")
+    status = _submit_option(
+        session, status, "select_deployment_unit", "deploy:monster-mash-a:gnarlmaw"
+    )
+    state = session.lifecycle.state
+    assert state is not None
+    army = next(a for a in state.army_definitions if a.player_id == "player-a")
+    assert army.roster_legality_report.is_legal
+    unit = next(u for u in army.units if u.datasheet_id == GNARLMAW)
+    (model,) = unit.own_models
+    assert not model.wargear_ids
+    record = next(
+        g for g in config.model_geometries if g.model_profile_id == model.model_profile_id
+    )
+    assert record.rules_footprint_policy is GeometryRulesFootprintPolicy.USE_HULL
+    assert record.support_base is None
+    assert all(
+        e.reviewer_status is GeometryReviewStatus.PROVISIONAL_ESTIMATE for e in record.evidence
+    )
+    assert model.geometry.primary_part().radius_x_inches * 50.8 == pytest.approx(120)
+    assert model.geometry.primary_part().radius_y_inches * 50.8 == pytest.approx(90)
+
+    before = session.lifecycle.to_payload()
+    for pose, code in (
+        (Pose.at(41, 57), "model_overlap"),
+        (Pose.at(20, 3), "infiltrators_enemy_zone_distance"),
+    ):
+        rejected = submit_placement(pose, f"invalid-{code}")
+        assert rejected.status_kind is LifecycleStatusKind.INVALID
+        assert code in str(rejected.to_payload())
+        assert session.lifecycle.to_payload() == before
+
+    accepted = submit_placement(Pose.at(17, 3), "place-gnarlmaw")
+    assert accepted.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION, accepted
+    assert state.battlefield_state is not None
+    placed = state.battlefield_state.model_placement_by_id(model.model_instance_id)
+    assert placed.pose == Pose.at(17, 3)
+    restored = LocalGameSession.from_persistence_payload(session.to_persistence_payload())
+    assert restored.to_persistence_payload() == session.to_persistence_payload()
+    analysis = ReplayRunner.from_payload(
+        session.replay_artifact(artifact_id="native-gnarlmaw-deployment")
+    ).run()
+    assert analysis.reproduced_exactly, analysis.to_payload()
+
+
+def test_gnarlmaw_diseased_cover_uses_native_hull_occlusion(tmp_path: Path) -> None:
+    from tests.support.faction_batch01 import unit_placement
+    from warhammer40k_core.core.ruleset_descriptor import CoverEffect
+    from warhammer40k_core.core.weapon_profiles import RangeProfileKind
+    from warhammer40k_core.engine.army_mustering import muster_army
+    from warhammer40k_core.engine.attack_sequence_geometry_targets import cover_for_allocated_model
+    from warhammer40k_core.engine.battlefield_state import (
+        BattlefieldRuntimeState,
+        BattlefieldScenario,
+        PlacedArmy,
+    )
+    from warhammer40k_core.engine.battlefield_visibility_context import (
+        battlefield_visibility_context,
+    )
+    from warhammer40k_core.engine.shooting_model_blockers import shooting_dynamic_model_blockers
+    from warhammer40k_core.engine.shooting_types import ShootingType
+    from warhammer40k_core.engine.weapon_declaration import RangedAttackPool
+
+    config = _native_gnarlmaw_config(tmp_path)
+    mission = config.mission_setup
+    assert mission is not None
+    mission = replace(
+        mission,
+        battlefield_layout_id=None,
+        deployment_map_id="gnarlmaw-cover:deployment",
+        terrain_layout_id="gnarlmaw-cover:terrain",
+        battlefield_regions=(),
+        terrain_features=(),
+        terrain_areas=(),
+        objective_terrain_areas=(),
+    )
+    descriptor = config.ruleset_descriptor
+    armies = tuple(
+        muster_army(
+            catalog=config.army_catalog,
+            request=request,
+            model_geometries=config.model_geometries,
+        )
+        for request in config.army_muster_requests
+    )
+    owner, opponent = armies
+    shooter = next(u for u in owner.units if u.datasheet_id == "000001125")
+    target = next(u for u in opponent.units if u.datasheet_id == "000001148")
+    source = next(u for u in owner.units if u.datasheet_id == GNARLMAW)
+    unrelated = next(u for u in owner.units if u.datasheet_id == "000001465")
+    attacking_model = shooter.own_models[0]
+    (target_model,) = target.own_models
+    item, profile = next(
+        (item, profile)
+        for item in config.army_catalog.wargear
+        if item.wargear_id in attacking_model.wargear_ids
+        for profile in item.weapon_profiles
+        if profile.range_profile.kind is RangeProfileKind.DISTANCE
+    )
+    pool = RangedAttackPool(
+        weapon_instance_id="native-cover:weapon",
+        attacker_model_instance_id=attacking_model.model_instance_id,
+        wargear_id=item.wargear_id,
+        weapon_profile_id=profile.profile_id,
+        weapon_profile=profile,
+        target_unit_instance_id=target.unit_instance_id,
+        shooting_type=ShootingType.NORMAL,
+        attacks=1,
+        target_visible_model_ids=(target_model.model_instance_id,),
+        target_in_range_model_ids=(target_model.model_instance_id,),
+    )
+    for source_y, unrelated_y, expected_blocker in (
+        (20, 37, source),
+        (34, 37, None),
+        (34, 22.5, unrelated),
+    ):
+        state = GameState.from_config(replace(config, mission_setup=mission))
+        for army in armies:
+            state.record_army_definition(army)
+        battlefield = BattlefieldRuntimeState(
+            config.game_id,
+            mission.battlefield_width_inches,
+            mission.battlefield_depth_inches,
+            placed_armies=(
+                PlacedArmy(
+                    owner.army_id,
+                    owner.player_id,
+                    (
+                        unit_placement(
+                            owner.army_id,
+                            owner.player_id,
+                            shooter,
+                            (Pose.at(10, 20), Pose.at(8.5, 20), Pose.at(11.5, 20)),
+                        ),
+                        unit_placement(
+                            owner.army_id, owner.player_id, source, (Pose.at(17, source_y),)
+                        ),
+                        unit_placement(
+                            owner.army_id, owner.player_id, unrelated, (Pose.at(16, unrelated_y),)
+                        ),
+                    ),
+                ),
+                PlacedArmy(
+                    opponent.army_id,
+                    opponent.player_id,
+                    (
+                        unit_placement(
+                            opponent.army_id, opponent.player_id, target, (Pose.at(22, 20),)
+                        ),
+                    ),
+                ),
+            ),
+        )
+        state.record_battlefield_state(battlefield)
+        scenario = BattlefieldScenario(armies=armies, battlefield_state=battlefield)
+        physical = {model.model_id: model for model in scenario.placed_geometry_models()}
+        context = battlefield_visibility_context(
+            scenario=scenario,
+            ruleset_descriptor=descriptor,
+            los_cache_key="gnarlmaw-cover-probe",
+            observer_model=physical[attacking_model.model_instance_id],
+            target_models=(physical[target_model.model_instance_id],),
+            target_model_keywords=((target_model.model_instance_id, target_model.keywords),),
+            dynamic_model_blockers=shooting_dynamic_model_blockers(
+                scenario=scenario,
+                observing_unit_id=shooter.unit_instance_id,
+                target_unit_id=target.unit_instance_id,
+            ),
+        )
+        witness = context.resolve_line_of_sight()
+        assert witness.unit_visible
+        assert witness.unit_fully_visible is (expected_blocker is None)
+        if expected_blocker is not None:
+            assert any(
+                b.blocker_id in expected_blocker.own_model_ids() and b.blocks_full_visibility
+                for b in witness.all_blocker_records()
+            )
+        cover = cover_for_allocated_model(
+            state=state,
+            ruleset_descriptor=descriptor,
+            pool=pool,
+            allocated_model_id=target_model.model_instance_id,
+        )
+        assert cover is not None
+        assert cover.has_benefit is (expected_blocker is source)
+        if expected_blocker is source:
+            assert cover.source_feature_ids == source.own_model_ids()
+            assert cover.cover_effect is CoverEffect.ATTACKER_BS_MODIFIER

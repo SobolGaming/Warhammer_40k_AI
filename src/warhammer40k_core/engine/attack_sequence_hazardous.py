@@ -3,6 +3,10 @@
 from __future__ import annotations
 
 from warhammer40k_core.engine.battlefield_visibility_context import battlefield_visibility_context
+from warhammer40k_core.engine.catalog_contextual_status_consumption import (
+    CATALOG_IR_FORTIFICATION_COVER_CONSUMER_ID,
+    rules_unit_has_fortification_consumer,
+)
 from warhammer40k_core.engine.targetless_weapons import TargetlessWeapon
 
 from warhammer40k_core.engine.event_log import EventRecord
@@ -629,17 +633,19 @@ def _fortification_cover_for_allocated_model(
     terrain_volumes: tuple[TerrainVolume, ...],
     dynamic_blockers: tuple[GeometryModel, ...],
 ) -> BenefitOfCoverResult | None:
-    battlefield = state.battlefield_state
-    if battlefield is None:
-        raise GameLifecycleError("Fortification cover requires battlefield_state.")
-    try:
-        attacking_unit_placement = battlefield.unit_placement_by_id(attacking_unit_id)
-    except PlacementError as exc:
-        raise GameLifecycleError("Fortification cover attacker placement is invalid.") from exc
+    cover_policy = ruleset_descriptor.terrain_visibility_policy.cover_policy
+    if not cover_policy.grants_benefit_of_cover or not dynamic_blockers:
+        return None
+    attacker = rules_unit_view_by_id(state=state, unit_instance_id=attacking_unit_id)
+    placements = unit_placements_for_rules_unit_or_none(scenario=scenario, rules_unit=attacker)
+    if placements is None:
+        raise GameLifecycleError("Fortification cover requires placed attacking models.")
     blocker_records: set[CoverSourceRecord] = set()
     terrain_areas = shooting_terrain_areas_for_state(state)
     blocker_witness: LineOfSightWitness | None = None
-    for attacker_placement in attacking_unit_placement.model_placements:
+    for attacker_placement in (
+        model for placement in placements for model in placement.model_placements
+    ):
         attacker_model = model_by_id(
             state=state,
             model_instance_id=attacker_placement.model_instance_id,
@@ -674,26 +680,22 @@ def _fortification_cover_for_allocated_model(
             ),
         )
         witness = context.resolve_line_of_sight()
-        fortification_blocker_ids = _fortification_full_visibility_blocker_ids(
-            state=state,
-            witness=witness,
-        )
-        if not fortification_blocker_ids or not context.not_fully_visible_because_of(
-            witness,
-            target_model_id=target_geometry.model_id,
-            sources=tuple(
-                record
-                for record in witness.all_blocker_records()
-                if record.blocker_kind is VisibilityBlockerKind.MODEL
-                and record.blocker_id in fortification_blocker_ids
-            ),
-        ):
-            continue
-        blocker_witness = witness
-        for blocker_id in fortification_blocker_ids:
+        for blocker in witness.all_blocker_records():
+            if (
+                blocker.blocker_kind is not VisibilityBlockerKind.MODEL
+                or not blocker.blocks_full_visibility
+                or not _model_owner_grants_fortification_cover(
+                    state=state, model_instance_id=blocker.blocker_id
+                )
+                or not context.not_fully_visible_because_of(
+                    witness, target_model_id=target_geometry.model_id, sources=(blocker,)
+                )
+            ):
+                continue
+            blocker_witness = witness
             blocker_records.add(
                 CoverSourceRecord(
-                    feature_id=blocker_id,
+                    feature_id=blocker.blocker_id,
                     feature_kind=TerrainFeatureKind.INDUSTRIAL_STRUCTURES,
                     policy_kind=LineOfSightPolicy.TRUE_LINE_OF_SIGHT,
                     reason=CoverSourceReason.NOT_FULLY_VISIBLE_BECAUSE_OF_FEATURE,
@@ -704,45 +706,21 @@ def _fortification_cover_for_allocated_model(
     sorted_records = tuple(sorted(blocker_records, key=lambda item: item.feature_id))
     return BenefitOfCoverResult(
         has_benefit=True,
-        cover_effect=CoverEffect.SAVE_BONUS,
+        cover_effect=cover_policy.cover_effect,
         source_feature_ids=tuple(record.feature_id for record in sorted_records),
         source_policy_kinds=(LineOfSightPolicy.TRUE_LINE_OF_SIGHT,),
         source_records=sorted_records,
         los_cache_key=blocker_witness.los_cache_key,
         target_unit_visible=blocker_witness.unit_visible,
         target_unit_fully_visible=blocker_witness.unit_fully_visible,
-        non_stacking=True,
-        ap_zero_save_bonus_excluded_for_save_3_plus_or_better=True,
+        non_stacking=cover_policy.non_stacking,
+        ap_zero_save_bonus_excluded_for_save_3_plus_or_better=(
+            cover_policy.ap_zero_save_bonus_excluded_for_save_3_plus_or_better
+        ),
     )
 
 
-def _fortification_full_visibility_blocker_ids(
-    *,
-    state: GameState,
-    witness: LineOfSightWitness,
-) -> tuple[str, ...]:
-    blocker_ids: set[str] = set()
-    for blocker in witness.all_blocker_records():
-        if blocker.blocker_kind is not VisibilityBlockerKind.MODEL:
-            continue
-        if not blocker.blocks_full_visibility:
-            continue
-        if _model_owner_unit_has_keyword(
-            state=state,
-            model_instance_id=blocker.blocker_id,
-            keyword="FORTIFICATION",
-        ):
-            blocker_ids.add(blocker.blocker_id)
-    return tuple(sorted(blocker_ids))
-
-
-def _model_owner_unit_has_keyword(
-    *,
-    state: GameState,
-    model_instance_id: str,
-    keyword: str,
-) -> bool:
-    canonical = _canonical_keyword(keyword)
+def _model_owner_grants_fortification_cover(*, state: GameState, model_instance_id: str) -> bool:
     for army in state.army_definitions:
         for unit in army.units:
             for model in unit.own_models:
@@ -750,7 +728,8 @@ def _model_owner_unit_has_keyword(
                     continue
                 if not model.is_alive:
                     return False
-                return canonical in {
-                    _canonical_keyword(unit_keyword) for unit_keyword in unit.keywords
-                }
+                return rules_unit_has_fortification_consumer(
+                    rules_unit_view_by_id(state=state, unit_instance_id=unit.unit_instance_id),
+                    CATALOG_IR_FORTIFICATION_COVER_CONSUMER_ID,
+                )
     raise GameLifecycleError("Fortification cover blocker model is unknown.")

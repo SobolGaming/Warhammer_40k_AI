@@ -4775,20 +4775,25 @@ def _chaos_daemons_nurgle_review_rows() -> tuple[DatasheetGroupReviewRow, ...]:
                 "July and September (v1.2) official faction packs, pages 86-87. "
                 "The official pack supersedes Wahapedia."
             ),
-            ir_coverage="Bridge/catalog blocked",
+            ir_coverage="IR parsed; host needed",
             supported_semantics=(
-                "Infiltrators and The Shadow of Chaos are known structured paths. "
-                "Shroud of Flies uses the shared live Stealth aura and has focused "
-                "shooting evidence with fixture geometry. The shared Fortification "
-                "targeting, Hit-roll and per-model Fall Back exceptions are exercised "
-                "with source-linked descriptors on fixture geometry."
+                "Native development catalog supports order-of-battle selection and "
+                "Infiltrators deployment. Shroud of Flies uses the shared Stealth aura. "
+                "Fortification uses the shared targeting, Hit-roll and Fall Back exceptions. "
+                "Diseased Cover attributes partial occlusion to the source model at allocation."
             ),
             semantics_needed=(
-                "Gnarlmaw-specific Diseased Cover source attribution awaits catalog admission."
+                "The faction pack grants Diseased Cover at allocation. The 11th-edition "
+                "Ballistic Skill penalty applies earlier, at the Hit roll. The allocation "
+                "evidence neither changes that roll retroactively nor provides a Save bonus."
             ),
             catalog_blockers=(
-                "No-equipment/no-option source rows are normalized. The Hull designation "
-                "still requires supported footprint and height evidence for this sculpt."
+                "Andrzej's owner-approved 120 x 90 mm oval and 4.0-inch (101.6 mm) "
+                "height represent the base-less Hull for native development gameplay. "
+                "[Provisional geometry evidence]"
+                "(../../data/source_audits/feculent_gnarlmaw_2026_11/geometry.json) "
+                "confers no official base "
+                "size, physical measurement, or physical-play certification."
             ),
         ),
         DatasheetGroupReviewRow(

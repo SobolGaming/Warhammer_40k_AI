@@ -1,8 +1,8 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0429f98f71d17e6ac65ed66978d6bcb1223b18349ca2b14bf554c2abc987296e",
-  "fingerprint": "0429f98f71d17e6ac65ed66978d6bcb1223b18349ca2b14bf554c2abc987296e",
-  "resource_count": 3301,
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:60b50367975f5e0177e7ae9bc6e7918fa9cb5c9bdc0d689f8a163e8da1b57117",
+  "fingerprint": "60b50367975f5e0177e7ae9bc6e7918fa9cb5c9bdc0d689f8a163e8da1b57117",
+  "resource_count": 3303,
   "resources": [
     {
       "byte_length": 113,
@@ -1245,9 +1245,9 @@
       "sha256": "5db61014d8c863253333a125b6d5f754d567d8a1d36cb30b7984ef428407bc57"
     },
     {
-      "byte_length": 42126,
+      "byte_length": 41865,
       "path": "warhammer40k_core/engine/attack_sequence_hazardous.py",
-      "sha256": "fd0ca164bfe944b2d0d526d67bf1c2271128ec2b0d2f396ad156bc13bba89c98"
+      "sha256": "45f2b0f2485b5c1cbb78c1f86fb5768e320ac8db51bbbb14e24c1f1ef926ba35"
     },
     {
       "byte_length": 37528,
@@ -2520,9 +2520,9 @@
       "sha256": "fa86717d719ef42c8ea52214242f686fc8b023ca66ad2f4fdcc2c2755638b520"
     },
     {
-      "byte_length": 13763,
+      "byte_length": 13936,
       "path": "warhammer40k_core/engine/deployment_geometry.py",
-      "sha256": "e3eb1851835eeef4f0b88bf443cf74fcd47257e7024fb06044777c602145deee"
+      "sha256": "cb2c947506e393daa02e51dce2538b22ec758726fd8751a3c479b8258f133830"
     },
     {
       "byte_length": 675,
@@ -14673,6 +14673,16 @@
       "byte_length": 4286,
       "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/chaos_daemons_cavalcade_2026_11/artifacts/source-review.json",
       "sha256": "f49e9bf5064f4377d222d5be2d69ae996798efb5a790ac3e043d4381a11d54ef"
+    },
+    {
+      "byte_length": 1353,
+      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/chaos_daemons_gnarlmaw_2026_11/__init__.py",
+      "sha256": "01efb3ac32057e2c1784f43082f094908d8fc5ed5b4ba32d2248b3bc7915baa5"
+    },
+    {
+      "byte_length": 387169,
+      "path": "warhammer40k_core/rules/source_packages/warhammer_40000_11th/chaos_daemons_gnarlmaw_2026_11/artifacts/catalog.json",
+      "sha256": "15864f07cf2a3a0d179cf43f74f5b4b8a712748c388566d1f70b0cffc25e329a"
     },
     {
       "byte_length": 1951,

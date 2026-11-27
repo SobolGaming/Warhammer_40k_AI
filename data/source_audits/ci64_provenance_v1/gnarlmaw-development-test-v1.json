@@ -1,0 +1,41 @@
+{
+  "added_cases": [
+    "tests/rules/section09/test_fortification_engagement.py::test_gnarlmaw_deploys_from_native_development_roster",
+    "tests/rules/section09/test_fortification_engagement.py::test_gnarlmaw_diseased_cover_uses_native_hull_occlusion"
+  ],
+  "base": "73d8de5e163908c832cad7d6a2fd5428ed7d9c80",
+  "retained_fortification_sha256": "68735efb653722f33d34525bd2fe85fca4ea543e7dde169b65498ba7547d197b",
+  "runtime_fingerprint": {
+    "after": "60b50367975f5e0177e7ae9bc6e7918fa9cb5c9bdc0d689f8a163e8da1b57117",
+    "before": "0429f98f71d17e6ac65ed66978d6bcb1223b18349ca2b14bf554c2abc987296e"
+  },
+  "runtime_manifest": {
+    "after": "3fe699199d4385aee786fe1b1bbcd71dba98414d6bbd5c05cb6c44b1d77f8865",
+    "before": "659bc7c831876eb2a73492648c4ac7853d4e7040adb1b8b4ce9a640c5e7f7b0a"
+  },
+  "schema": "finite-gnarlmaw-development-test-v1",
+  "sources": {
+    "src/warhammer40k_core/engine/attack_sequence_hazardous.py": {
+      "after": "45f2b0f2485b5c1cbb78c1f86fb5768e320ac8db51bbbb14e24c1f1ef926ba35",
+      "before": "fd0ca164bfe944b2d0d526d67bf1c2271128ec2b0d2f396ad156bc13bba89c98"
+    },
+    "src/warhammer40k_core/engine/deployment_geometry.py": {
+      "after": "cb2c947506e393daa02e51dce2538b22ec758726fd8751a3c479b8258f133830",
+      "before": "e3eb1851835eeef4f0b88bf443cf74fcd47257e7024fb06044777c602145deee"
+    }
+  },
+  "test": {
+    "after": {
+      "blob_sha1": "29d31a038b542b0797b3ac37992bc0c0ab0a34f3",
+      "bytes": 48964,
+      "mode": "100644",
+      "sha256": "8f1f8c41d4d5be320aa99277aa7574b46fd56ca0886b21b7e46b31a80342c412"
+    },
+    "before": {
+      "blob_sha1": "e8742026c3241a7c304cf0a690d0c7f45ac1dbcd",
+      "bytes": 35231,
+      "mode": "100644",
+      "sha256": "bfdd203b60e8e561944fd1fa9e03de5e38db0e3adef0b5bbcc02885ac0a01365"
+    }
+  }
+}

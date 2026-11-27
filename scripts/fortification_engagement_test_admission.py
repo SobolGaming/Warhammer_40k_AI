@@ -22,6 +22,17 @@ ROTATION_BASE = "2a5bb77fd6eb1a04c276037ea159a5ef850f1668"
 RETRY_RECEIPT = "data/source_audits/ci64_provenance_v1/fortification-survivor-retry-test-v1.json"
 RETRY_RECEIPT_SHA256 = "68735efb653722f33d34525bd2fe85fca4ea543e7dde169b65498ba7547d197b"
 RETRY_BASE = "6b6ba4bbf412d4b3b62ba91562c8476cbbb344b1"
+DEVELOPMENT_RECEIPT = "data/source_audits/ci64_provenance_v1/gnarlmaw-development-test-v1.json"
+DEVELOPMENT_RECEIPT_SHA256 = "c08d2e6861d2e552cdb012a66e94f668fd3d1ee6302105240dfc4cdaf52a2158"
+DEVELOPMENT_BASE = "73d8de5e163908c832cad7d6a2fd5428ed7d9c80"
+DEVELOPMENT_PREIMAGES = {
+    "src/warhammer40k_core/engine/attack_sequence_hazardous.py": (
+        "fd0ca164bfe944b2d0d526d67bf1c2271128ec2b0d2f396ad156bc13bba89c98"
+    ),
+    "src/warhammer40k_core/engine/deployment_geometry.py": (
+        "e3eb1851835eeef4f0b88bf443cf74fcd47257e7024fb06044777c602145deee"
+    ),
+}
 ROTATION_SOURCES = {
     "src/warhammer40k_core/engine/phases/movement_geometry.py",
     "src/warhammer40k_core/geometry/physical_predicates.py",
@@ -203,8 +214,30 @@ def _fortification_current_receipt(
             RETRY_PREIMAGES,
         ),
     )
-    if retry is not None:
-        receipt, successor_raw = retry
+    if retry is None:
+        if (root / DEVELOPMENT_RECEIPT).exists():
+            raise SystemExit(
+                "Gnarlmaw development requires the exact Fortification retry predecessor."
+            )
+        return receipt, raw
+    receipt, successor_raw = retry
+    raw += b"\0" + successor_raw
+    development = _fortification_successor(
+        root,
+        receipt,
+        _Successor(
+            DEVELOPMENT_RECEIPT,
+            DEVELOPMENT_RECEIPT_SHA256,
+            DEVELOPMENT_BASE,
+            "finite-gnarlmaw-development-test-v1",
+            RETRY_RECEIPT_SHA256,
+            2,
+            set(DEVELOPMENT_PREIMAGES),
+            DEVELOPMENT_PREIMAGES,
+        ),
+    )
+    if development is not None:
+        receipt, successor_raw = development
         raw += b"\0" + successor_raw
     return receipt, raw
 

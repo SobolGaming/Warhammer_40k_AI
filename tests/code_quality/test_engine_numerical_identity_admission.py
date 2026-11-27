@@ -1757,9 +1757,14 @@ def test_fortification_transition_rejects_source_and_case_drift(tmp_path: Path) 
         fortification.RECEIPT,
         fortification.ROTATION_RECEIPT,
         fortification.RETRY_RECEIPT,
+        fortification.DEVELOPMENT_RECEIPT,
         MANIFEST,
         fortification.OWNER,
-        *sorted(fortification.SOURCES | fortification.RETRY_SOURCES),
+        *sorted(
+            fortification.SOURCES
+            | fortification.RETRY_SOURCES
+            | fortification.DEVELOPMENT_PREIMAGES.keys()
+        ),
     )
     for name in members:
         path = tmp_path / name
@@ -1776,8 +1781,10 @@ def test_fortification_transition_rejects_source_and_case_drift(tmp_path: Path) 
     rotation = _record(fortification.ROTATION_RECEIPT)
     assert receipt["added_cases"][17:22] == rotation["added_cases"]
     retry = _record(fortification.RETRY_RECEIPT)
-    assert receipt["added_cases"][22:] == retry["added_cases"]
-    assert len(receipt["added_cases"]) == len(set(receipt["added_cases"])) == 23
+    assert receipt["added_cases"][22:23] == retry["added_cases"]
+    development = _record(fortification.DEVELOPMENT_RECEIPT)
+    assert receipt["added_cases"][23:] == development["added_cases"]
+    assert len(receipt["added_cases"]) == len(set(receipt["added_cases"])) == 25
 
     for name in members:
         path = tmp_path / name

@@ -237,7 +237,9 @@ def append_geometry_violations(
             state=state,
             models=models,
         )
-    if rules_unit_has_keyword(view, "FORTIFICATION"):
+    # Core 24.20 permits Infiltrators to deploy; retain the unsupported guard
+    # for Fortifications outside the source-linked Infiltrators path.
+    if rules_unit_has_keyword(view, "FORTIFICATION") and not all_infiltrators:
         violations.append(
             DeploymentPlacementViolation(
                 violation_code=(
