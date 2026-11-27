@@ -1,86 +1,86 @@
 {
   "policy": "rules-engine-performance-v3",
   "base": "e5f2e9d94bbcd99d432d9a4441cbfbd63d564cf3",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:76448683a1f87521bc8639d6228c92a051f003395331c09fa651d98201db3104",
-  "operation_map_sha256": "4a2cb9ca1d124955c427b6cc917df85e481b9716721680f73b386b65236c748c",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:1433ec957b57993dccecdc38c9ac03fcfc9e17d882fb253c0a7cd07813cfb9e2",
+  "operation_map_sha256": "d42de0ef2bbecad6de604c10c23354732455ec7200a08e9d6b21e64fc4b893e4",
   "changes": {
     "contracts/examples/persistence/session-persistence.json": {
       "before_sha256": "7abab9a7b4661ea4c9cb6958201cea9e71a4eee6ba32eb2a1056c283236deda8",
-      "after_sha256": "03d0a2b78520c28d2351c7ef3dee67bcc4fced4f6001c7293fe93aa9a8cfd0f8",
+      "after_sha256": "d876b2c0850e18bd18ce4531a94f1d3c932ddc400556d0a8d32abd0d11400961",
       "owners": {
         "@document": {
           "before": "7abab9a7b4661ea4c9cb6958201cea9e71a4eee6ba32eb2a1056c283236deda8",
-          "after": "03d0a2b78520c28d2351c7ef3dee67bcc4fced4f6001c7293fe93aa9a8cfd0f8"
+          "after": "d876b2c0850e18bd18ce4531a94f1d3c932ddc400556d0a8d32abd0d11400961"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "before_sha256": "5ee21507ddf0acafcaf873f8350e164fc86c79dcc7f01f1e7d836ab4756f2155",
-      "after_sha256": "94bc093022427935eece6703158056db31a9f1e11b158ea8809b65219e1ebe7e",
+      "after_sha256": "269d04636b125ef5fab2554901a78f8b21fb3e1d8d9ed204d8124365ffe9990c",
       "owners": {
         "@document": {
           "before": "5ee21507ddf0acafcaf873f8350e164fc86c79dcc7f01f1e7d836ab4756f2155",
-          "after": "94bc093022427935eece6703158056db31a9f1e11b158ea8809b65219e1ebe7e"
+          "after": "269d04636b125ef5fab2554901a78f8b21fb3e1d8d9ed204d8124365ffe9990c"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
       "before_sha256": "7c7d5f461ca08cf7c866d4e5281fc670a4b871c85edb50e4cdb93592205e12a2",
-      "after_sha256": "6a5d7e4113cf7abb427657a7a3517c10e2c10f248003aea65b0f34c63f06f1da",
+      "after_sha256": "55d83181849cb8df2cd41df482ec85347b3155e9ab4175672e5e942f22219922",
       "owners": {
         "@document": {
           "before": "7c7d5f461ca08cf7c866d4e5281fc670a4b871c85edb50e4cdb93592205e12a2",
-          "after": "6a5d7e4113cf7abb427657a7a3517c10e2c10f248003aea65b0f34c63f06f1da"
+          "after": "55d83181849cb8df2cd41df482ec85347b3155e9ab4175672e5e942f22219922"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "before_sha256": "c47c26f8702456c29bc5f9ed4190679a1fbdab6c7b14f6dbc551b6d623a8a8ea",
-      "after_sha256": "32a67c2ebce328f72c5e462ac9c3ad93515ebd39d1de690dd073e0eac9fac2cb",
+      "after_sha256": "6756fbe1c44cc24740be644e32ca16fc1e662b26b795ac300c3067b6b6858b7d",
       "owners": {
         "@document": {
           "before": "c47c26f8702456c29bc5f9ed4190679a1fbdab6c7b14f6dbc551b6d623a8a8ea",
-          "after": "32a67c2ebce328f72c5e462ac9c3ad93515ebd39d1de690dd073e0eac9fac2cb"
+          "after": "6756fbe1c44cc24740be644e32ca16fc1e662b26b795ac300c3067b6b6858b7d"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "before_sha256": "cf86e12a2cac5b2b90d167edd714af04b5d16e2711d0d9da58fdf229fbead659",
-      "after_sha256": "8dabe87e7781197eae36855d750464a7ec4a939b883ab856d3fc32c9ab434538",
+      "after_sha256": "b2f1eadd4daf93a55fed569ead0cfb119763fa590a19e1436e004d7245cefa07",
       "owners": {
         "@document": {
           "before": "cf86e12a2cac5b2b90d167edd714af04b5d16e2711d0d9da58fdf229fbead659",
-          "after": "8dabe87e7781197eae36855d750464a7ec4a939b883ab856d3fc32c9ab434538"
+          "after": "b2f1eadd4daf93a55fed569ead0cfb119763fa590a19e1436e004d7245cefa07"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "before_sha256": "c69c493a3e76d8feb0b7df83da7ecc74171c39fd8f0cfcdcf0010292b5875736",
-      "after_sha256": "c135ea1a469c2af90926f6dbb182f02bd21a3bc67f41e99264db80bea2f638e0",
+      "after_sha256": "3c604fd68477d3db0587231ff508bc90ff9581c7789b368dc9d0ba273953a7ef",
       "owners": {
         "@document": {
           "before": "c69c493a3e76d8feb0b7df83da7ecc74171c39fd8f0cfcdcf0010292b5875736",
-          "after": "c135ea1a469c2af90926f6dbb182f02bd21a3bc67f41e99264db80bea2f638e0"
+          "after": "3c604fd68477d3db0587231ff508bc90ff9581c7789b368dc9d0ba273953a7ef"
         }
       }
     },
     "contracts/examples/support-profile.json": {
       "before_sha256": "6ed8f8d6a4295722f1677ee9085a1a8b3699ed69375ef568a3953ff3a5f27145",
-      "after_sha256": "579c069ac791cdbb1a8bffbf8531f1a81086d2d272377f3d7d5b9798eddb5a5b",
+      "after_sha256": "ced33b17c9ac65d19846d36a93ed982b43446b8c7566843f57a34d2868af51f5",
       "owners": {
         "@document": {
           "before": "6ed8f8d6a4295722f1677ee9085a1a8b3699ed69375ef568a3953ff3a5f27145",
-          "after": "579c069ac791cdbb1a8bffbf8531f1a81086d2d272377f3d7d5b9798eddb5a5b"
+          "after": "ced33b17c9ac65d19846d36a93ed982b43446b8c7566843f57a34d2868af51f5"
         }
       }
     },
     "contracts/manifest.json": {
       "before_sha256": "e243540cd2781243ec299cdea42555ea3e8140e2e95002c4932ce977cf9c4d18",
-      "after_sha256": "bdc2514f8a47d67dbfcf675c5c6e512816579a923fab93a24be6d147eb2798b3",
+      "after_sha256": "fb0fb715b6d20275141f8b5a673484707777960abeef9e61b53007b1554fc365",
       "owners": {
         "@document": {
           "before": "e243540cd2781243ec299cdea42555ea3e8140e2e95002c4932ce977cf9c4d18",
-          "after": "bdc2514f8a47d67dbfcf675c5c6e512816579a923fab93a24be6d147eb2798b3"
+          "after": "fb0fb715b6d20275141f8b5a673484707777960abeef9e61b53007b1554fc365"
         }
       }
     },
@@ -96,11 +96,11 @@
     },
     "data/source_audits/ci64_provenance_v1/shroud-of-flies-test-v1.json": {
       "before_sha256": null,
-      "after_sha256": "f69a91579f3d2395166db934c99bd7703bcd782f66f4f06cb97b273463de0799",
+      "after_sha256": "5d2478c514160ce1a7eeb0499e13b8e3d256a03ffeecc7b126c8023dc8ee02b4",
       "owners": {
         "@document": {
           "before": null,
-          "after": "f69a91579f3d2395166db934c99bd7703bcd782f66f4f06cb97b273463de0799"
+          "after": "5d2478c514160ce1a7eeb0499e13b8e3d256a03ffeecc7b126c8023dc8ee02b4"
         }
       }
     },
@@ -126,11 +126,11 @@
     },
     "docs/performance/policy-v3/operation-map.json": {
       "before_sha256": "64a21ee72f2f014644783928d5e6fd75f0a45b9ee80135762a54859f2a54ecf3",
-      "after_sha256": "9542794fa98b1e51f8b6ec4e8dcf5c428419545079da6422e9d05c0655890907",
+      "after_sha256": "23fd9013f85ee194e7ec98fd7dcc3e6d9eebdd621983a1833e9866295fc285cf",
       "owners": {
         "@document": {
           "before": "64a21ee72f2f014644783928d5e6fd75f0a45b9ee80135762a54859f2a54ecf3",
-          "after": "9542794fa98b1e51f8b6ec4e8dcf5c428419545079da6422e9d05c0655890907"
+          "after": "23fd9013f85ee194e7ec98fd7dcc3e6d9eebdd621983a1833e9866295fc285cf"
         }
       }
     },
@@ -154,11 +154,11 @@
     },
     "scripts/shroud_of_flies_test_admission.py": {
       "before_sha256": null,
-      "after_sha256": "b643a571d82c34492560a25079dd0fa7d6c76c309cf6d2af178880b1d88b573d",
+      "after_sha256": "b19a5e701942daf7c037551da48d62000da477fcb2689c2a454464412c0e5b5c",
       "owners": {
         "@module": {
           "before": null,
-          "after": "e9784e07c0455745615081eaa1ef74d4d2950ae7db6c2a6bb2e0a21d6500743e"
+          "after": "1502fc2774358ef472cdc33b9c84fc970679ce873082994f6959e0edbc5650d0"
         },
         "ShroudOfFliesReceipt": {
           "before": null,
@@ -170,27 +170,27 @@
         },
         "shroud_of_flies_test_successor": {
           "before": null,
-          "after": "eaed69c09f71a8246d43ce528bc9e6018369a8003dd92888d9e141ebb89101f4"
+          "after": "0674ef62483bccceb7ac9e65f96adbc8f30ec6f8615ecf0634e6dc1636a8954b"
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "before_sha256": "9f984acc6ad83e17315c3e542c978c7bcce009051fc2dfb6f39334e1ffef8d2a",
-      "after_sha256": "53ddea6d5017cc820c6a6541ce12e30fa5e073e7d2e208daa8be997767147260",
+      "after_sha256": "57daf2c65068863601a339cd2d036bf685e7d8611036a7839ed13556848dcbf7",
       "owners": {
         "@document": {
           "before": "9f984acc6ad83e17315c3e542c978c7bcce009051fc2dfb6f39334e1ffef8d2a",
-          "after": "53ddea6d5017cc820c6a6541ce12e30fa5e073e7d2e208daa8be997767147260"
+          "after": "57daf2c65068863601a339cd2d036bf685e7d8611036a7839ed13556848dcbf7"
         }
       }
     },
     "src/warhammer40k_core/rules/aura_parser.py": {
       "before_sha256": "42625fc3dd25ba765a0942fb51ba35d395f4352515fc7e29d173fffa574f588a",
-      "after_sha256": "ac521037781d94981086d0745c8afef4918c2bb8464ce0c9810aca1bb967cf62",
+      "after_sha256": "505c52a8b54cc1f064fc077bc1e9766a9fb9474b86821086847a2fccff5215eb",
       "owners": {
         "@module": {
           "before": "bb385901b13e2552d8f9a93773af8e78650b3d3c036d0ac08fc7a23aa23a8c3a",
-          "after": "75700fc7a692d6a57224f8345d43e8dae554c5d85a1189138bb7b96877b18431"
+          "after": "05d0497afa95560939d09351500e4bb30a9445582debd7db318e34af031d4ce2"
         },
         "has_aura_scope": {
           "before": null,
@@ -207,6 +207,10 @@
         "parse_live_aura_ability_effects": {
           "before": null,
           "after": "691b5b35d6fc78f2a8e95c8ad3db225f87918fe42fb188a8139f5b6dd403c92c"
+        },
+        "unsupported_live_aura_qualifier": {
+          "before": null,
+          "after": "832bfea434503e3fafba9b6e4bd7c6aa49d5ea947a7d50c7c0340baab9bdf5d6"
         }
       }
     },
@@ -224,17 +228,39 @@
         }
       }
     },
+    "src/warhammer40k_core/rules/rule_keyword_sequences.py": {
+      "before_sha256": "c9158e12a0706d5fe564d4a7da8bf905057f08dcbfa0c3b36213ea92fae78e63",
+      "after_sha256": "cea550d2d28ae1e37add6b446cc5a4f54ba32f3410ee360eb0406f1bb1ba50be",
+      "owners": {
+        "_normalize_source_keyword_sequence": {
+          "before": null,
+          "after": "7b6547e29aaf763906c3a2d79d36581bef9c34ce15dc6d03ac94840f1a0d4ee6"
+        },
+        "_split_source_keyword_sequence": {
+          "before": "8fdd89198f8828fd9a046dee2ce5cabd5267dd742efbe7a942b10300e8f14ef8",
+          "after": "637f31ec5c62802a9add62cb941ab77bb40d4551ae19a051374d050f16d66235"
+        },
+        "is_known_source_keyword_sequence": {
+          "before": null,
+          "after": "eaa9165246f2ee9239a1eeff541b53043a4c91036b23b95c962a1ff381f7b795"
+        },
+        "keyword_sequence_tokens": {
+          "before": "bd9df60318d2f74a0066166edc3601ffecfe34e18df25ed5a65780e4db05ce5a",
+          "after": "b4c10a0563928775d09ad4516c2fc65b4fc9b9994cd8b9136a6b934af527a38e"
+        }
+      }
+    },
     "src/warhammer40k_core/rules/rule_parser.py": {
       "before_sha256": "3e37613a9e61f3bc1b4aa71215280352aaf7ff1ad33b38ef897e62bc5d0139b9",
-      "after_sha256": "b3deedd4489903aabba7c705d956c87014ffd2dd52eabdc411f728e96b13e5e9",
+      "after_sha256": "0914c7400aec6375330cf9a5148b0564dbd0ce705cdaee580ba78d90e025c885",
       "owners": {
         "@module": {
           "before": "46d18d5aeb61b11763c8615e4b69cb400959abd4e5f521602bed0ea86c6cafe5",
-          "after": "3fb448afa57224f2ce1b9334a401c13b7b3be0070f5e663edfb13cf800988f27"
+          "after": "28206d2ac083ee71b257b4bc45e8edb2688c6dfde90f328436203d2c302f9854"
         },
         "_compile_clause": {
           "before": "9cf80d765c82b284ac5f96c372260439c3a24a52b420c5f681ce0babc6cd1aae",
-          "after": "50f3d9fc949c941588f3e89bceb56d3ee0ae522cd91d0dabbc85d194d2f5c85a"
+          "after": "4637b037abdbbec5666c3c0b51a720fca819d48a67af0a822ca0be5213d3d1e9"
         },
         "_parse_grant_ability_effects": {
           "before": "f9810f045741137b026b9a5763658f7960daea47b6b4bfc290df66e232df8d6d",
@@ -243,6 +269,34 @@
         "_parse_target": {
           "before": "5b68c8c6d8515b29339e12437208e0715545c49ed443a763d34ef76c7739a18d",
           "after": "c984ff64072384a52e56ac20693e8a8f820420a6a702e5ffd716d8f149c72bf8"
+        }
+      }
+    },
+    "tests/code_quality/test_engine_numerical_identity_admission.py": {
+      "before_sha256": "78a93a274246c07f78707888d7aec3251eeda4ca2cd9d9a2cff15f5384fccbe1",
+      "after_sha256": "8864671f75093e0cf4aa9f3f66123a7efc87533d5edb43d7a81d266628a1fb91",
+      "owners": {
+        "@module": {
+          "before": "de58df9fd3fe706af039a0d0d600215777012e73d430d74a7bce3cb9a8969414",
+          "after": "77f7b50536ad10a5c8c7b7f456660b286fbaa31c32ef762c790423197fb14709"
+        },
+        "test_identity_inventory_uses_current_twelve_shards_and_native_cohort": {
+          "before": "55aa847438b80cac6429b98d97e2f382b81305b5f05b6729d7949b53462012e2",
+          "after": "7cb6ba8f20c600e62ff28231c842e134bb3b02312e32d234f01315d6d49c85cc"
+        },
+        "test_shroud_transition_rejects_drift_in_the_current_manifest": {
+          "before": null,
+          "after": "3822ee0a3e640ed3466f4bb0275c07b093b23464856fdde71f8662917b0a5c23"
+        }
+      }
+    },
+    "tests/code_quality/test_generated_ability_support_artifacts.py": {
+      "before_sha256": "a7b8c693d1ab79195d989777a3a8d02d97c05d0acad94a971acd0fa52e638380",
+      "after_sha256": "9ca61c6c61171123b95fc418d8b5c78e03f11dded2d96d4ba94703af927af114",
+      "owners": {
+        "test_fortification_stealth_requires_known_conjunctive_keywords": {
+          "before": null,
+          "after": "b6f798646de7f06296d21bc27a7170c706de7b09b943c70a01bafee0eff15f8c"
         }
       }
     },
@@ -279,111 +333,102 @@
     "contracts/examples/persistence/session-persistence.json": {
       "category": "rule_semantics",
       "operations": [
-        "issue588-contract-publication",
-        "fortification-stealth-aura-source"
+        "issue588-contract-publication"
       ],
       "selected_families": [],
       "rationale": "Regenerates published contract example identities for the exact source-parser build.",
       "source_obligation": "Chaos Daemons official September 2026 faction pack pages 86 and 87 define the live friendly Nurgle Legiones Daemonica Stealth aura.",
-      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their existing algorithms and workload."
+      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their algorithms and workload."
     },
     "contracts/examples/sessions/session-command-outcome.json": {
       "category": "rule_semantics",
       "operations": [
-        "issue588-contract-publication",
-        "fortification-stealth-aura-source"
+        "issue588-contract-publication"
       ],
       "selected_families": [],
       "rationale": "Regenerates published contract example identities for the exact source-parser build.",
       "source_obligation": "Chaos Daemons official September 2026 faction pack pages 86 and 87 define the live friendly Nurgle Legiones Daemonica Stealth aura.",
-      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their existing algorithms and workload."
+      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their algorithms and workload."
     },
     "contracts/examples/sessions/session-command-started.json": {
       "category": "rule_semantics",
       "operations": [
-        "issue588-contract-publication",
-        "fortification-stealth-aura-source"
+        "issue588-contract-publication"
       ],
       "selected_families": [],
       "rationale": "Regenerates published contract example identities for the exact source-parser build.",
       "source_obligation": "Chaos Daemons official September 2026 faction pack pages 86 and 87 define the live friendly Nurgle Legiones Daemonica Stealth aura.",
-      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their existing algorithms and workload."
+      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their algorithms and workload."
     },
     "contracts/examples/sessions/session-metadata-created.json": {
       "category": "rule_semantics",
       "operations": [
-        "issue588-contract-publication",
-        "fortification-stealth-aura-source"
+        "issue588-contract-publication"
       ],
       "selected_families": [],
       "rationale": "Regenerates published contract example identities for the exact source-parser build.",
       "source_obligation": "Chaos Daemons official September 2026 faction pack pages 86 and 87 define the live friendly Nurgle Legiones Daemonica Stealth aura.",
-      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their existing algorithms and workload."
+      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their algorithms and workload."
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
       "category": "rule_semantics",
       "operations": [
-        "issue588-contract-publication",
-        "fortification-stealth-aura-source"
+        "issue588-contract-publication"
       ],
       "selected_families": [],
       "rationale": "Regenerates published contract example identities for the exact source-parser build.",
       "source_obligation": "Chaos Daemons official September 2026 faction pack pages 86 and 87 define the live friendly Nurgle Legiones Daemonica Stealth aura.",
-      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their existing algorithms and workload."
+      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their algorithms and workload."
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
       "category": "rule_semantics",
       "operations": [
-        "issue588-contract-publication",
-        "fortification-stealth-aura-source"
+        "issue588-contract-publication"
       ],
       "selected_families": [],
       "rationale": "Regenerates published contract example identities for the exact source-parser build.",
       "source_obligation": "Chaos Daemons official September 2026 faction pack pages 86 and 87 define the live friendly Nurgle Legiones Daemonica Stealth aura.",
-      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their existing algorithms and workload."
+      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their algorithms and workload."
     },
     "contracts/examples/support-profile.json": {
       "category": "rule_semantics",
       "operations": [
-        "issue588-contract-publication",
-        "fortification-stealth-aura-source"
+        "issue588-contract-publication"
       ],
       "selected_families": [],
       "rationale": "Regenerates published contract example identities for the exact source-parser build.",
       "source_obligation": "Chaos Daemons official September 2026 faction pack pages 86 and 87 define the live friendly Nurgle Legiones Daemonica Stealth aura.",
-      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their existing algorithms and workload."
+      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their algorithms and workload."
     },
     "contracts/manifest.json": {
       "category": "rule_semantics",
       "operations": [
-        "issue588-contract-publication",
-        "fortification-stealth-aura-source"
+        "issue588-contract-publication"
       ],
       "selected_families": [],
       "rationale": "Regenerates published contract example identities for the exact source-parser build.",
       "source_obligation": "Chaos Daemons official September 2026 faction pack pages 86 and 87 define the live friendly Nurgle Legiones Daemonica Stealth aura.",
-      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their existing algorithms and workload."
+      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their algorithms and workload."
     },
     "data/generated/ability_coverage/cross_source_semantic_equivalence.json": {
       "category": "rule_semantics",
       "operations": [
-        "phase-end-healing-source-and-report",
-        "fortification-stealth-aura-source"
+        "phase-end-healing-source-and-report"
       ],
       "selected_families": [],
       "rationale": "Reports the shared live Stealth consumer and preserves the Gnarlmaw hull admission blocker.",
       "source_obligation": "Chaos Daemons official September 2026 faction pack pages 86 and 87 define the live friendly Nurgle Legiones Daemonica Stealth aura.",
-      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their existing algorithms and workload."
+      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their algorithms and workload."
     },
     "data/source_audits/ci64_provenance_v1/shroud-of-flies-test-v1.json": {
       "category": "rule_semantics",
       "operations": [
-        "fortification-stealth-aura-source"
+        "fortification-stealth-aura-shroud-of-flies-test-v1"
       ],
       "selected_families": [],
-      "rationale": "Admits the revised shooting regression file and the exact successor build identity.",
+      "rationale": "Pins live Shroud parser and test bytes and preserves the archived Defender coherency identity.",
       "source_obligation": "Chaos Daemons official September 2026 faction pack pages 86 and 87 define the live friendly Nurgle Legiones Daemonica Stealth aura.",
-      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their existing algorithms and workload."
+      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their algorithms and workload."
     },
     "docs/CROSS_SOURCE_SEMANTIC_EQUIVALENCE.md": {
       "category": "governance",
@@ -405,7 +450,7 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Maps the changed rule-source, admission, test and generated artifact owners to this focused operation.",
+      "rationale": "Maps previously uncovered source and test owners without changing historical operation ownership.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -430,87 +475,126 @@
         "pre-roll-charge-flight-test-admission",
         "gore-hungry-onslaught-predecessor-admission",
         "bounded-charge-flight-wall-proof",
-        "daemonic-terror-ordered-retreat",
-        "fortification-stealth-aura-source"
+        "daemonic-terror-ordered-retreat"
       ],
       "selected_families": [],
-      "rationale": "Admits the revised shooting regression file and the exact successor build identity.",
+      "rationale": "Pins live Shroud parser and test bytes and preserves the archived Defender coherency identity.",
       "source_obligation": "Chaos Daemons official September 2026 faction pack pages 86 and 87 define the live friendly Nurgle Legiones Daemonica Stealth aura.",
-      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their existing algorithms and workload."
+      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their algorithms and workload."
     },
     "scripts/shroud_of_flies_test_admission.py": {
       "category": "rule_semantics",
       "operations": [
-        "fortification-stealth-aura-source"
+        "fortification-stealth-aura-shroud-of-flies-test-admission"
       ],
       "selected_families": [],
-      "rationale": "Admits the revised shooting regression file and the exact successor build identity.",
+      "rationale": "Pins live Shroud parser and test bytes and preserves the archived Defender coherency identity.",
       "source_obligation": "Chaos Daemons official September 2026 faction pack pages 86 and 87 define the live friendly Nurgle Legiones Daemonica Stealth aura.",
-      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their existing algorithms and workload."
+      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their algorithms and workload."
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
       "category": "rule_semantics",
       "operations": [
         "cavalcade-authority-admission",
-        "phase-end-healing-source-and-report",
-        "fortification-stealth-aura-source"
+        "phase-end-healing-source-and-report"
       ],
       "selected_families": [],
-      "rationale": "Regenerates the exact source-parser build fingerprint without a contract schema or runtime algorithm change.",
+      "rationale": "Regenerates the exact source-parser build fingerprint with the existing contract schema and algorithms.",
       "source_obligation": "Chaos Daemons official September 2026 faction pack pages 86 and 87 define the live friendly Nurgle Legiones Daemonica Stealth aura.",
-      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their existing algorithms and workload."
+      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their algorithms and workload."
     },
     "src/warhammer40k_core/rules/aura_parser.py": {
       "category": "rule_semantics",
       "operations": [
-        "fortification-stealth-aura-source"
+        "fortification-stealth-aura-aura-parser"
       ],
       "selected_families": [],
-      "rationale": "Normalizes source-authored live Fortification Stealth grants into the existing aura descriptor.",
+      "rationale": "Admits known conjunctive Fortification Stealth qualifiers using the existing aura descriptor.",
       "source_obligation": "Chaos Daemons official September 2026 faction pack pages 86 and 87 define the live friendly Nurgle Legiones Daemonica Stealth aura.",
-      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their existing algorithms and workload."
+      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their algorithms and workload."
     },
     "src/warhammer40k_core/rules/rule_duration_parser.py": {
       "category": "rule_semantics",
       "operations": [
-        "fortification-stealth-aura-source"
+        "fortification-stealth-aura-rule-duration-parser"
       ],
       "selected_families": [],
-      "rationale": "Normalizes source-authored live Fortification Stealth grants into the existing aura descriptor.",
+      "rationale": "Admits known conjunctive Fortification Stealth qualifiers using the existing aura descriptor.",
       "source_obligation": "Chaos Daemons official September 2026 faction pack pages 86 and 87 define the live friendly Nurgle Legiones Daemonica Stealth aura.",
-      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their existing algorithms and workload."
+      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their algorithms and workload."
+    },
+    "src/warhammer40k_core/rules/rule_keyword_sequences.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order133-keyword-number-identity",
+        "fortification-stealth-aura-rule-keyword-sequences"
+      ],
+      "selected_families": [],
+      "rationale": "Admits known conjunctive Fortification Stealth qualifiers using the existing aura descriptor.",
+      "source_obligation": "Chaos Daemons official September 2026 faction pack pages 86 and 87 define the live friendly Nurgle Legiones Daemonica Stealth aura.",
+      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their algorithms and workload."
     },
     "src/warhammer40k_core/rules/rule_parser.py": {
       "category": "rule_semantics",
       "operations": [
-        "fortification-stealth-aura-source"
+        "order125-default-unit-subjects",
+        "fortification-stealth-aura-rule-parser"
       ],
       "selected_families": [],
-      "rationale": "Normalizes source-authored live Fortification Stealth grants into the existing aura descriptor.",
+      "rationale": "Admits known conjunctive Fortification Stealth qualifiers using the existing aura descriptor.",
       "source_obligation": "Chaos Daemons official September 2026 faction pack pages 86 and 87 define the live friendly Nurgle Legiones Daemonica Stealth aura.",
-      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their existing algorithms and workload."
+      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their algorithms and workload."
+    },
+    "tests/code_quality/test_engine_numerical_identity_admission.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "stage3-defender-coherency-test-admission",
+        "native-ranged-attack-count-reroll",
+        "engine-numerical-identity-admission",
+        "counteroffensive-fight-type",
+        "round4-malice-bearer-liveness",
+        "round4-battle-shock-event-wounds",
+        "stage3-bolt-of-change-test-admission",
+        "stage3-ordinary-melee-test-admission",
+        "skulls-beget-blood-test-admission",
+        "stage3-flight-normal-move-test-admission",
+        "wrath-undeniable-test-admission",
+        "pre-roll-charge-flight-test-admission",
+        "bounded-charge-flight-wall-proof"
+      ],
+      "selected_families": [],
+      "rationale": "Checks the source qualifiers and archives through the exact historical and successor manifests.",
+      "source_obligation": "Chaos Daemons official September 2026 faction pack pages 86 and 87 define the live friendly Nurgle Legiones Daemonica Stealth aura.",
+      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their algorithms and workload."
+    },
+    "tests/code_quality/test_generated_ability_support_artifacts.py": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Checks the source qualifiers and archives through the exact historical and successor manifests.",
+      "source_obligation": null,
+      "unchanged_work": null
     },
     "tests/rules/section10/test_shooting_types.py": {
       "category": "rule_semantics",
       "operations": [
         "qualification40-exact-1c81875882f544fd",
-        "fortification-stealth-aura-source"
+        "fortification-stealth-aura-test-shooting-types"
       ],
       "selected_families": [],
       "rationale": "Runs the source-linked grant through a real shooting declaration, Hit event and live eligibility controls.",
       "source_obligation": "Chaos Daemons official September 2026 faction pack pages 86 and 87 define the live friendly Nurgle Legiones Daemonica Stealth aura.",
-      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their existing algorithms and workload."
+      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their algorithms and workload."
     },
     "tools/generate_ability_support_matrix.py": {
       "category": "rule_semantics",
       "operations": [
-        "phase-end-healing-guide-summary",
-        "fortification-stealth-aura-source"
+        "phase-end-healing-guide-summary"
       ],
       "selected_families": [],
       "rationale": "Reports the shared live Stealth consumer and preserves the Gnarlmaw hull admission blocker.",
       "source_obligation": "Chaos Daemons official September 2026 faction pack pages 86 and 87 define the live friendly Nurgle Legiones Daemonica Stealth aura.",
-      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their existing algorithms and workload."
+      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their algorithms and workload."
     }
   },
   "milestone": "ordinary",

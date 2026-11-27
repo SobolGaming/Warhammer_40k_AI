@@ -12,6 +12,7 @@ import pytest
 from scripts import build_test_shards as sharding
 from scripts import engine_numerical_identity_test_admission as selection
 from scripts import fools_flight_test_admission as fools
+from scripts import shroud_of_flies_test_admission as shroud
 from scripts import stage2_ground_charge_test_admission as ground_charge
 from scripts.canonical_circle_test_admission import ADDITION as CIRCLE_ADDITION
 from scripts.canonical_polygon_pairs_test_admission import ADDITION as PAIRS_ADDITION
@@ -1039,11 +1040,31 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
     assert attack_record["runtime_fingerprint"] == json.loads(defender_base_manifest)["fingerprint"]
     assert defender_record["retained_manifest_sha256"] == attack_record["manifest_sha256"]
     assert defender_record["retained_runtime_fingerprint"] == attack_record["runtime_fingerprint"]
+    shroud_record = _record(shroud.RECEIPT)
+    assert shroud_record["base"] == shroud.BASE
     assert (
-        defender_record["manifest_sha256"]
-        == hashlib.sha256((ROOT / MANIFEST).read_bytes()).hexdigest()
+        shroud_record["retained_defender_sha256"]
+        == hashlib.sha256((ROOT / defender.RECEIPT).read_bytes()).hexdigest()
     )
-    assert defender_record["runtime_fingerprint"] == _record(MANIFEST)["fingerprint"]
+    shroud_base_manifest = subprocess.check_output(
+        ["git", "show", shroud.BASE + ":" + MANIFEST], cwd=ROOT
+    )
+    defender_manifest = hashlib.sha256(shroud_base_manifest).hexdigest()
+    defender_runtime = json.loads(shroud_base_manifest)["fingerprint"]
+    assert defender_record["manifest_sha256"] == defender_manifest
+    assert defender_record["runtime_fingerprint"] == defender_runtime
+    assert shroud_record["runtime_manifest"]["before"] == defender_manifest
+    assert shroud_record["runtime_fingerprint"]["before"] == defender_runtime
+    current_manifest = hashlib.sha256((ROOT / MANIFEST).read_bytes()).hexdigest()
+    current_runtime = _record(MANIFEST)["fingerprint"]
+    assert shroud_record["runtime_manifest"]["after"] == current_manifest
+    assert shroud_record["runtime_fingerprint"]["after"] == current_runtime
+    assert shroud.shroud_of_flies_runtime(ROOT, defender_manifest, defender_runtime) == (
+        current_manifest,
+        current_runtime,
+    )
+    assert shroud.OWNER in active_files
+    assert sum(shroud.OWNER in group for group in groups) == 1
     assert defender_record["retained_cases"] == [
         f"{defender.RETAINED_OWNER}::{case}" for case in defender.RETAINED_CASES
     ]
@@ -1662,3 +1683,21 @@ def test_identity_transition_requires_its_exact_record(transition_snapshot: Path
     target.write_bytes(target.read_bytes() + b"\n")
     with pytest.raises(SystemExit, match="source bytes differ"):
         _transition(transition_snapshot)
+
+
+def test_shroud_transition_rejects_drift_in_the_current_manifest(tmp_path: Path) -> None:
+    for name in (
+        shroud.RECEIPT,
+        sharding.CUTOVER_PATH,
+        MANIFEST,
+        shroud.OWNER,
+        *shroud.PARSER_SOURCES,
+    ):
+        destination = tmp_path / name
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        destination.write_bytes((ROOT / name).read_bytes())
+    assert shroud.shroud_of_flies_test_successor(tmp_path) is not None
+    target = tmp_path / MANIFEST
+    target.write_bytes(target.read_bytes() + b"\n")
+    with pytest.raises(SystemExit, match=r"source bytes differ: .*_engine_build_manifest"):
+        shroud.shroud_of_flies_test_successor(tmp_path)

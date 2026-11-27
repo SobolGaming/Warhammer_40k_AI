@@ -38665,46 +38665,89 @@
       "sensitive": false,
       "mandatory": true
     },
-    "fortification-stealth-aura-source": {
+    "fortification-stealth-aura-shroud-of-flies-test-v1": {
       "paths": [
-        "contracts/examples/persistence/session-persistence.json",
-        "contracts/examples/sessions/session-command-outcome.json",
-        "contracts/examples/sessions/session-command-started.json",
-        "contracts/examples/sessions/session-metadata-created.json",
-        "contracts/examples/support-profile-player-a-redacted.json",
-        "contracts/examples/support-profile-player-b-redacted.json",
-        "contracts/examples/support-profile.json",
-        "contracts/manifest.json",
-        "data/generated/ability_coverage/cross_source_semantic_equivalence.json",
-        "data/source_audits/ci64_provenance_v1/shroud-of-flies-test-v1.json",
-        "scripts/engine_numerical_identity_test_admission.py",
-        "scripts/shroud_of_flies_test_admission.py",
-        "src/warhammer40k_core/_engine_build_manifest.json",
-        "src/warhammer40k_core/rules/aura_parser.py",
-        "src/warhammer40k_core/rules/rule_duration_parser.py",
-        "src/warhammer40k_core/rules/rule_parser.py",
-        "tests/rules/section10/test_shooting_types.py",
-        "tools/generate_ability_support_matrix.py"
+        "data/source_audits/ci64_provenance_v1/shroud-of-flies-test-v1.json"
       ],
       "owners": [
-        "@document",
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "fortification-stealth-aura-shroud-of-flies-test-admission": {
+      "paths": [
+        "scripts/shroud_of_flies_test_admission.py"
+      ],
+      "owners": [
         "@module",
         "ShroudOfFliesReceipt",
-        "_chaos_daemons_nurgle_review_rows",
-        "_compile_clause",
-        "_counteroffensive_fight_type_transition",
-        "_parse_grant_ability_effects",
-        "_parse_target",
-        "combined_charge_runtime",
-        "exact_movement_test_transition",
+        "shroud_of_flies_runtime",
+        "shroud_of_flies_test_successor"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "fortification-stealth-aura-aura-parser": {
+      "paths": [
+        "src/warhammer40k_core/rules/aura_parser.py"
+      ],
+      "owners": [
+        "@module",
         "has_aura_scope",
         "live_aura_distance_conditions",
         "parse_aura_conditions",
         "parse_live_aura_ability_effects",
-        "parse_rule_duration",
+        "unsupported_live_aura_qualifier"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "fortification-stealth-aura-rule-duration-parser": {
+      "paths": [
+        "src/warhammer40k_core/rules/rule_duration_parser.py"
+      ],
+      "owners": [
+        "@module",
+        "parse_rule_duration"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "fortification-stealth-aura-rule-keyword-sequences": {
+      "paths": [
+        "src/warhammer40k_core/rules/rule_keyword_sequences.py"
+      ],
+      "owners": [
+        "_normalize_source_keyword_sequence",
+        "is_known_source_keyword_sequence",
+        "keyword_sequence_tokens"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "fortification-stealth-aura-rule-parser": {
+      "paths": [
+        "src/warhammer40k_core/rules/rule_parser.py"
+      ],
+      "owners": [
+        "_parse_grant_ability_effects"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "fortification-stealth-aura-test-shooting-types": {
+      "paths": [
+        "tests/rules/section10/test_shooting_types.py"
+      ],
+      "owners": [
         "shroud_of_flies",
-        "shroud_of_flies_runtime",
-        "shroud_of_flies_test_successor",
         "test_shroud_of_flies_grants_live_stealth_in_native_shooting"
       ],
       "families": [],

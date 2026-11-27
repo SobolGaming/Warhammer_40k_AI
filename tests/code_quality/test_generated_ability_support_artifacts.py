@@ -499,3 +499,63 @@ def test_current_vyper_report_preserves_source_identity_guard(drift: str) -> Non
         support = replace(support, faction_id="world-eaters")
     with pytest.raises(ValueError, match=r"(identity drifted|predecessor differs)"):
         _catalog_blocker_description(semantic_row=semantic, support_row=support)
+
+
+@pytest.mark.parametrize(
+    ("qualifier", "expected_keywords"),
+    [
+        ("Nurgle Legiones Daemonica", ("NURGLE", "LEGIONES_DAEMONICA")),
+        ("Nurgle or Tzeentch", ()),
+        ("either Nurgle or Tzeentch", ()),
+        ("Nurgle excluding Monsters", ()),
+        ("Nurgle, Tzeentch", ()),
+        ("Nurgle Unreviewed", ()),
+        ("Nurgle Tzeentch Khorne Slaanesh Legiones Daemonica", ()),
+    ],
+)
+@pytest.mark.parametrize("aura_tag", ["", "Aura: "])
+def test_fortification_stealth_requires_known_conjunctive_keywords(
+    qualifier: str, expected_keywords: tuple[str, ...], aura_tag: str
+) -> None:
+    from warhammer40k_core.engine.catalog_rule_consumption import catalog_rule_ir_consumers_for_rule
+    from warhammer40k_core.rules.objective_terminology import ObjectiveRuleScope
+    from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
+    from warhammer40k_core.rules.rule_ir import RuleConditionKind, RuleTargetKind, parameter_payload
+    from warhammer40k_core.rules.source_data import RuleSourceText
+    from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+        datasheet_keyword_lexicon_2026_06_14 as keyword_lexicon,
+    )
+
+    source = RuleSourceText.from_raw(
+        objective_scope=ObjectiveRuleScope.CORE_RULES,
+        source_id="test:fortification-stealth-qualifier",
+        raw_text=(
+            f'{aura_tag}While a friendly {qualifier} unit is within 6" of this Fortification, '
+            "models in that unit have the Stealth ability."
+        ),
+    )
+    ir = compile_rule_source_text(
+        source,
+        source_keyword_sequence_parts=keyword_lexicon.canonical_datasheet_keyword_sequence_parts(),
+    ).rule_ir
+    (clause,) = ir.clauses
+    if not expected_keywords:
+        assert not clause.is_supported
+        assert clause.effects == ()
+        (diagnostic,) = clause.diagnostics
+        assert diagnostic.blocking
+        assert diagnostic.source_span.text == qualifier
+        assert catalog_rule_ir_consumers_for_rule(ir) == ()
+        return
+    assert clause.is_supported
+    assert clause.target is not None
+    assert clause.target.kind is RuleTargetKind.AURA_UNITS
+    target_parameters = parameter_payload(clause.target.parameters)
+    assert target_parameters["allegiance"] == "friendly"
+    assert target_parameters["required_keyword_sequence"] == expected_keywords
+    assert {
+        parameter_payload(condition.parameters)["required_keyword"]
+        for condition in clause.conditions
+        if condition.kind is RuleConditionKind.KEYWORD_GATE
+    } == set(expected_keywords)
+    assert catalog_rule_ir_consumers_for_rule(ir) == ("catalog-ir:aura-ability:stealth",)

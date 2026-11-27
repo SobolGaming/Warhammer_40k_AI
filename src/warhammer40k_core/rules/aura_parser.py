@@ -14,6 +14,7 @@ from warhammer40k_core.rules.rule_ir import (
     parameter_payload,
     parameters_from_pairs,
 )
+from warhammer40k_core.rules.rule_keyword_sequences import is_known_source_keyword_sequence
 from warhammer40k_core.rules.rule_parser_selected_target_extensions import (
     shadow_of_chaos_area_match,
 )
@@ -25,13 +26,32 @@ _EXCLUDE_UNIT_RE = re.compile(
 )
 
 
+_AURA_KEYWORD_SUBJECT_RE = re.compile(r"[A-Z][A-Z0-9_'-]*(?: [A-Z0-9_'-]+){0,4}", re.IGNORECASE)
 _STEALTH_GRANT_AURA_RE = re.compile(
     r"(?:Aura:\s+)?(?P<condition>While) (?:a|another) friendly"
-    r"(?: [A-Z0-9_'-]+){0,5} unit is within \d+(?:\.\d+)?\" of this "
+    r"(?: (?P<qualifier>.+?))? unit is within \d+(?:\.\d+)?\" of this "
     r"fortification, "
     r"(?P<grant>models in that unit have the (?:Stealth|\[Stealth\]) ability)\.?",
     re.IGNORECASE,
 )
+
+
+def unsupported_live_aura_qualifier(
+    span: TextSpan, *, source_keyword_sequence_parts: tuple[str, ...]
+) -> TextSpan | None:
+    match = _STEALTH_GRANT_AURA_RE.fullmatch(span.text)
+    if match is None or (qualifier := match["qualifier"]) is None:
+        return None
+    matches_keyword_subject = _AURA_KEYWORD_SUBJECT_RE.fullmatch(qualifier) is not None
+    if matches_keyword_subject and is_known_source_keyword_sequence(
+        qualifier, source_keyword_sequence_parts=source_keyword_sequence_parts
+    ):
+        return None
+    return TextSpan(
+        text=qualifier,
+        start=span.start + match.start("qualifier"),
+        end=span.start + match.end("qualifier"),
+    )
 
 
 def has_aura_scope(text: str) -> bool:

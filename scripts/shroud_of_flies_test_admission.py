@@ -11,16 +11,21 @@ from scripts.behavioral_selection_members import (
     _selection_no_links,  # pyright: ignore[reportPrivateUsage]
     _selection_object,  # pyright: ignore[reportPrivateUsage]
 )
-from scripts.milli_inch_test_admission import RETAINED_CUTOVER_SHA256
+from scripts.milli_inch_test_admission import MANIFEST, RETAINED_CUTOVER_SHA256
 from scripts.stage3_defender_coherency_test_admission import RECEIPT_SHA256 as DEFENDER_SHA256
 
 RECEIPT = "data/source_audits/ci64_provenance_v1/shroud-of-flies-test-v1.json"
-RECEIPT_SHA256 = "f69a91579f3d2395166db934c99bd7703bcd782f66f4f06cb97b273463de0799"
+RECEIPT_SHA256 = "5d2478c514160ce1a7eeb0499e13b8e3d256a03ffeecc7b126c8023dc8ee02b4"
 BASE = "e5f2e9d94bbcd99d432d9a4441cbfbd63d564cf3"
 OWNER = "tests/rules/section10/test_shooting_types.py"
 PARSER_SOURCES = tuple(
     f"src/warhammer40k_core/rules/{name}"
-    for name in ("aura_parser.py", "rule_duration_parser.py", "rule_parser.py")
+    for name in (
+        "aura_parser.py",
+        "rule_duration_parser.py",
+        "rule_keyword_sequences.py",
+        "rule_parser.py",
+    )
 )
 CASES = ("in_range", "out_of_range", "wrong_patron", "wrong_faction", "enemy", "destroyed")
 
@@ -75,6 +80,12 @@ def shroud_of_flies_test_successor(
         )
     ):
         raise SystemExit("Shroud of Flies test admission inventory differs.")
+    manifest = _checked_bytes(root, MANIFEST, receipt["runtime_manifest"]["after"])
+    if (
+        json.loads(manifest, object_pairs_hook=_selection_object)["fingerprint"]
+        != (receipt["runtime_fingerprint"]["after"])
+    ):
+        raise SystemExit("Shroud of Flies current runtime fingerprint differs from its manifest.")
     for path, digest in receipt["sources"].items():
         _checked_bytes(root, path, digest)
     _selection_members({OWNER: receipt["test"]["after"]}, root)
