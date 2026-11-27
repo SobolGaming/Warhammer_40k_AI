@@ -1767,6 +1767,67 @@ within the same development family and single seed. It adds no delayed-move
 arm, feature columns or training rows. Verification covers the July scoring
 import alongside the October layout.
 
+### Native Shooting chance pilot
+
+The [frozen protocol](stage4-native-shooting-protocol.json) records six startup
+seeds and two native target alternatives for one ordinary A1 Normal Shooting
+declaration. The cannon fires at either one enemy Character Leader or one enemy
+Vehicle Monster. The flat synthetic board retains Layout C's deployment zones
+and mission assignments. Keep the setup, every seed and branch, and the
+shared Layout C lineage in the same development partition. This pilot emits
+zero training rows.
+
+The first setup had only one eligible friendly unit, so the engine completed
+Shooting automatically after its activation. The protocol added an idle
+friendly unit before reading any damage outcome to preserve the next A1
+Shooting unit offer as the common endpoint. The seed list, target alternatives,
+response policy and measures stayed fixed. Both native alternatives submit
+the same single cannon profile through the actor facade. The response policy
+declines optional reactions, keeps natural rolls and selects the first issued
+ID in lexicographic order for the listed mandatory attack requests.
+
+```sh
+PYTHONPATH=src:. uv run --no-sync python -B -m scripts.stage4_benchmark_entry \
+  --native-shooting verify
+```
+
+On PowerShell set `$env:PYTHONPATH = 'src;.'` first. Use `measure` in place of
+`verify` to emit a fresh receipt for comparison. The worker has a 300-second
+wall limit, with separate setup and branch decision caps. Verification compares
+the deterministic evidence to the [recorded receipt](stage4-native-shooting-receipt.json).
+Each origin and endpoint must survive a strict persistence round-trip, both
+actor views and event streams, and independent exact replay.
+
+The two arms of a seed share the same pre-declaration checkpoint and use the
+same fixed startup seed for reproducibility. Native dice can vary with
+decision or event history, stream label and draw index. Interpret the arms as
+separate native realizations at the fixed local boundary. This pilot measures
+damage and RNG consumption for one volley on one synthetic setup.
+
+| Startup seed byte | Leader wounds lost | Leader draws | Vehicle wounds lost | Vehicle draws |
+| --- | ---: | ---: | ---: | ---: |
+| `01` | 0 | 4 | 0 | 3 |
+| `02` | 3 | 6 | 0 | 3 |
+| `03` | 0 | 4 | 0 | 4 |
+| `04` | 3 | 6 | 0 | 3 |
+| `05` | 3 | 4 | 3 | 5 |
+| `06` | 0 | 4 | 0 | 2 |
+
+Each displayed byte repeats 32 times in the full startup seed. The Leader
+lost three wounds in three of six runs, and the Vehicle lost three wounds in
+one of six. There were zero casualties. All six origins had zero draws.
+The Leader arm used 4–6 draws per run and the Vehicle arm used 2–5. All 12
+branches reached the declared endpoint and passed strict replay. Each arm
+needed 3–7 actor submissions and added 5–9 decision records. The engine records
+automatic resolution of the sole declared target and weapon group.
+
+The serial measurement took 126.348 seconds inside the worker on Windows 11
+with Python 3.14.5 and an AMD Ryzen Threadripper 3970X. The timer starts
+after import and runtime identification. Setup with origin verification
+took 4.974–11.409 seconds per seed. Each branch, including restoration and
+strict verification, took 6.654–8.415 seconds. The receipt records individual
+times and the runtime and dependency lock identities.
+
 ### Unseen-layout evaluation contract
 
 Freeze a provenance-only manifest before a same-release split. Validate it

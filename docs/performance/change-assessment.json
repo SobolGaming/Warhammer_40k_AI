@@ -1,122 +1,98 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "9dc8961000c386dfcd3df18bbab61b91a21b4383",
+  "base": "8edef22960a1ed28913f12c7e89062e1e44841b5",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:af65d2237320cda39c2d38d0dbeb4d415c424956696fc1cc0f40686921848830",
-  "operation_map_sha256": "04d7c684eb8a7a1ce05da4125e99b429eb022957a479e1e27dc1a583584d2459",
+  "operation_map_sha256": "37e7605f53e80f4a9ccd972d0af57d2b8b00dcba36329eeeee1a26f297dc36bb",
   "changes": {
     "docs/AI_IMPLEMENTATION_PLAN.md": {
-      "before_sha256": "7e340429d0392656838b48d5a1639b3a6b54ef4f0731ea3be8c571b73e303e08",
-      "after_sha256": "1ba161687e9cda069bba57d8367fba1f0b0ee3011ffa4abd04c60775accda166",
+      "before_sha256": "1ba161687e9cda069bba57d8367fba1f0b0ee3011ffa4abd04c60775accda166",
+      "after_sha256": "f6b89d7d915986becd7a64a696c0c5698df9c482a251dc4aba51bc1975cd07c9",
       "owners": {
         "@document": {
-          "before": "7e340429d0392656838b48d5a1639b3a6b54ef4f0731ea3be8c571b73e303e08",
-          "after": "1ba161687e9cda069bba57d8367fba1f0b0ee3011ffa4abd04c60775accda166"
+          "before": "1ba161687e9cda069bba57d8367fba1f0b0ee3011ffa4abd04c60775accda166",
+          "after": "f6b89d7d915986becd7a64a696c0c5698df9c482a251dc4aba51bc1975cd07c9"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "4e60ad5e764c704b2573f06fc956efd2ad08bd4606bf5d323a1c8418f7c8a453",
-      "after_sha256": "a14439cc07ccde2f05dddf4195b37405487866a77669d8245fd324f82561dab5",
+      "before_sha256": "a14439cc07ccde2f05dddf4195b37405487866a77669d8245fd324f82561dab5",
+      "after_sha256": "49f54e886c5ce9e86682ec5c388f7c1053d21bf77449e875b2c44e1a0d206128",
       "owners": {
         "@document": {
-          "before": "4e60ad5e764c704b2573f06fc956efd2ad08bd4606bf5d323a1c8418f7c8a453",
-          "after": "a14439cc07ccde2f05dddf4195b37405487866a77669d8245fd324f82561dab5"
+          "before": "a14439cc07ccde2f05dddf4195b37405487866a77669d8245fd324f82561dab5",
+          "after": "49f54e886c5ce9e86682ec5c388f7c1053d21bf77449e875b2c44e1a0d206128"
+        }
+      }
+    },
+    "docs/stage4-native-shooting-protocol.json": {
+      "before_sha256": null,
+      "after_sha256": "e9d3b39b80a75f8ac73857df220110bd5efecc8e145717290386e2d320e36e61",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "e9d3b39b80a75f8ac73857df220110bd5efecc8e145717290386e2d320e36e61"
+        }
+      }
+    },
+    "docs/stage4-native-shooting-receipt.json": {
+      "before_sha256": null,
+      "after_sha256": "31b9099f086fcf2989a4f181e80e7caf6e98b434593e3e30673076d7c6da7713",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "31b9099f086fcf2989a4f181e80e7caf6e98b434593e3e30673076d7c6da7713"
         }
       }
     },
     "scripts/stage4_benchmark_entry.py": {
-      "before_sha256": "d30199594500fb3a693d7da7e626c94383d45bcfdaaac8ffeb3cfb492ba1a17b",
-      "after_sha256": "d94f2338a9639b5b9a0aa07dc5e0f357b2d29b0b14fbe0218767463b3e66df11",
+      "before_sha256": "d94f2338a9639b5b9a0aa07dc5e0f357b2d29b0b14fbe0218767463b3e66df11",
+      "after_sha256": "394cfd3f86ab0a8d6d6caca503c24e4b82a5ab312744cd4b2ee54fa8f4a2793e",
       "owners": {
         "main": {
-          "before": "ca3745458be7e958d154d52d1ef8c0da9a421859dffeb151cdd0599dd3d01cb6",
-          "after": "0e9e4b48b916b3f0c0945c2fdf6f40c91a2c53635edfbc99bc6269ed0d4c3e51"
-        },
-        "split_objective": {
-          "before": "de48766bdd4081872561c536d56f89ab17df827225b3a61f7dc1f820911b447f",
-          "after": "b381598c6cde6e6ba6e53a5f3eda3bb8d7449f76a2df2c542cd276a45278a586"
+          "before": "0e9e4b48b916b3f0c0945c2fdf6f40c91a2c53635edfbc99bc6269ed0d4c3e51",
+          "after": "21ee42e448bde21e0f15e1dc8e67d0773ad15f4f9c9a9af1b702b774735c3c8a"
         }
       }
     },
-    "scripts/stage4_scoring_timing.py": {
+    "scripts/stage4_native_shooting.py": {
       "before_sha256": null,
-      "after_sha256": "341a3d40bc2db472ea2b0814e5d1199d7215905a036191997aa48bbf13b8721c",
+      "after_sha256": "a8051f731e25d8ae879a559cd6fef139b44f212d1ee32b14c5e0755387aa0c37",
       "owners": {
         "@module": {
           "before": null,
-          "after": "0f148a086c9b0b14e305087b86d579a8c6ec04eb151c0ee2d20a5cf1e0a2fb2c"
+          "after": "e9ec3bdd2ef707657c765bff9f2544442aec4c5e4916983d0b0c013b1e0e40f5"
         },
-        "advance": {
+        "checkpoint_row": {
           "before": null,
-          "after": "a794d66688dab9fbdcedf312ba45585dd3b22ad7a416764c40267951ecb5ca71"
+          "after": "0c06b29290a976b9034746e3f3b5c1dc815d56d8cf0609d454e90c7b3b5c56b0"
         },
-        "matched_paths": {
+        "config": {
           "before": null,
-          "after": "514afd0af4fbb0d3d483ca177d1ca3b4aafff3c84a949580189415bef1526ccc"
+          "after": "a3f5a3bfb0502410b448383913f9ee5d61dd57098ba41081be0e851b315e7175"
         },
-        "objective_at": {
+        "material": {
           "before": null,
-          "after": "405353cf669a0ae744f2272bd45341de300b412bf4ef209ee637ed466b0d6e33"
+          "after": "b2ea485428042dcf8e1dc877e3f986d6d5b10ad91f1cce892516a0610ee2d103"
         },
-        "protocol": {
+        "open_origin": {
           "before": null,
-          "after": "1d9ac505913f08972ec469ba37b2dac8e52e4b297bcd583a7f76334bf89cdd1d"
+          "after": "4ae976dd6097d0403223a313aff9f234489a73c94fa20065507489435c42d61a"
+        },
+        "response": {
+          "before": null,
+          "after": "dc42cb3d6cc8a8f1d33ef9aae8ffd925f871ae197594f5216701dffe5b48c297"
         },
         "run": {
           "before": null,
-          "after": "934fadc64fa744144e49e31c145489f62ca0bd44ed5b1f3bf3701a3546e653d0"
+          "after": "743b8578427fb2938d8ad2300a75ced21e41c6f6e803b079ed08334ec2731ab1"
         },
-        "timing_outcome": {
+        "run_arm": {
           "before": null,
-          "after": "20711b4835ac67178b245eee2b0e5b8f2a5b9516783d2eebf17330ab92ebe802"
-        }
-      }
-    },
-    "scripts/stage4_scoring_timing_checks.py": {
-      "before_sha256": null,
-      "after_sha256": "6c883ad27fbe025d93fa03dc768072b32fb748e2b424485964bb7e4f7e168981",
-      "owners": {
-        "@module": {
+          "after": "a1f0360853a431fc6b6a044dfe27b97878b4481e317dfcad224ec2f695360198"
+        },
+        "setup_action": {
           "before": null,
-          "after": "b356eaa7a5919c3374dd1b71fac7deaa7563bf4af50dc7c6d4bf90f0d2b7be51"
-        },
-        "continuation": {
-          "before": null,
-          "after": "02020aa89803fcbb3a20154de0db9650d118d9668986e260c463f962744050b3"
-        },
-        "test_award_cannot_move_to_round_four_command": {
-          "before": null,
-          "after": "3b5bba0db598aaceaaa0ce56bb27dc826a1bcedb859fc8f5b4705b7cd9a133a2"
-        },
-        "test_award_rule_must_match_turn_end_provenance": {
-          "before": null,
-          "after": "7e576f702a97acf0398bb3857dc45bb01415c61b924b730c7031fa56353da1d5"
-        },
-        "test_control_can_persist_across_both_scoring_windows": {
-          "before": null,
-          "after": "020df6ceaa8f87f72a898775d7bd0a9a079045855d74ae933380968a8b8554c5"
-        },
-        "test_same_screen_and_opponent_paths_are_required": {
-          "before": null,
-          "after": "90d19059721f8abb65abd1343d5a3c139c17e9f77802ce022f0e973fec573fc6"
-        }
-      }
-    },
-    "scripts/stage4_split_objective_replay.py": {
-      "before_sha256": "b9d733027173ea170f1f79be0f0e041d5439b9f509da442d4dd754948a95b0db",
-      "after_sha256": "c0a93726e38e2186b45b63b0d1fd1c562ed652c243e016272171c1dbcb2c1c52",
-      "owners": {
-        "@module": {
-          "before": "774382b0556701393e2ee52f3d22a4c35b0d88295fce79405e15e2a89deb8ac6",
-          "after": "bf0e40eed9d91e99e34c7d37be5359385cab6d026c2a34dc4a3c81ec149c5800"
-        },
-        "run": {
-          "before": "e8f29a51169eb28c456aa8924837f3dc474eb6698bd1daf7edcc607409b67a3f",
-          "after": "ab9a1b80e7c749566824a8b39eec2db4e6e0d88905cdb8b4dd40f418f4727680"
-        },
-        "score": {
-          "before": "d6cd307bb754781daeb6d7bc012300d25f75609ded957cfa74bbe53543c016c4",
-          "after": "422a0cc76220a239b2b6610ffc3048b1906fe0b600795af5fe50a136f96e4d82"
+          "after": "026a330252942085ea20d4c5a738a76cecd55b531bef590da332b8ca981f95ab"
         }
       }
     }
@@ -126,7 +102,23 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Documents the opt-in native timing comparison, its fixed continuation policy, source limits and replay requirements.",
+      "rationale": "Documents admission, replay and observed variation for the fixed development pilot.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/stage4-native-shooting-protocol.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Freezes the development seed schedule, target arms, native setup, response and outcome measures.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/stage4-native-shooting-receipt.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Records the native outcomes, actual draws and measured development runtime.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -134,7 +126,7 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Maps the development-only timing benchmark and checks to the existing Stage 4 operation.",
+      "rationale": "Maps the isolated pilot to the existing development benchmark operation.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -144,37 +136,17 @@
         "stage4-benchmark-entry-reproducer"
       ],
       "selected_families": [],
-      "rationale": "Adds an opt-in timing mode and worker bound to the existing development CLI.",
+      "rationale": "Adds an opt-in invocation for measurement and receipt verification without changing default operation.",
       "source_obligation": null,
       "unchanged_work": null
     },
-    "scripts/stage4_split_objective_replay.py": {
+    "scripts/stage4_native_shooting.py": {
       "category": "measured_workload",
       "operations": [
         "stage4-benchmark-entry-reproducer"
       ],
       "selected_families": [],
-      "rationale": "Reuses the sealed four-arm admission and native boundary scorer for two passive timing continuations.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "scripts/stage4_scoring_timing.py": {
-      "category": "measured_workload",
-      "operations": [
-        "stage4-benchmark-entry-reproducer"
-      ],
-      "selected_families": [],
-      "rationale": "Runs two bounded passive continuations and checks native boundary, transaction, material and path evidence outside the gameplay runtime.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "scripts/stage4_scoring_timing_checks.py": {
-      "category": "measured_workload",
-      "operations": [
-        "stage4-benchmark-entry-reproducer"
-      ],
-      "selected_families": [],
-      "rationale": "Exercises boundary-local VP and prevents misattributed awards and mismatched native paths.",
+      "rationale": "Reuses native declarations, current RNG and strict replay in a bounded off-CI development workload.",
       "source_obligation": null,
       "unchanged_work": null
     }

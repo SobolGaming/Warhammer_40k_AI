@@ -1162,6 +1162,11 @@ def main() -> None:
         choices=("prepare", "replay", "link", "timing"),
         help="Latch or replay Layout C, link its choices, or compare its native scoring windows.",
     )
+    modes.add_argument(
+        "--native-shooting",
+        choices=("measure", "verify"),
+        help="Run the frozen native Shooting pilot or verify its committed receipt.",
+    )
     parser.add_argument("--checkpoint", type=Path, help="Layout C setup checkpoint path.")
     parser.add_argument("--worker", action="store_true", help=argparse.SUPPRESS)
     args = parser.parse_args()
@@ -1169,6 +1174,19 @@ def main() -> None:
         parser.error("--split-objective and --checkpoint must be supplied together")
     if args.audit_west and args.family != "west":
         parser.error("--audit-west requires --family west")
+    if args.native_shooting is not None:
+        from scripts import stage4_native_shooting
+
+        if args.worker:
+            stage4_native_shooting.run(verify=args.native_shooting == "verify")
+        else:
+            protocol = json.loads(stage4_native_shooting.PROTOCOL.read_text(encoding="utf-8"))
+            run_worker(
+                ["--native-shooting", args.native_shooting],
+                "native Shooting pilot",
+                protocol["worker_wall_seconds"],
+            )
+        return
     if args.split_objective is not None:
         split_objective(args.split_objective, args.checkpoint, worker=args.worker)
         return
