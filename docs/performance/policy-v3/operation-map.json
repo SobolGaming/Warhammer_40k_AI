@@ -38987,6 +38987,101 @@
       "families": [],
       "sensitive": false,
       "mandatory": false
+    },
+    "gnarlmaw-development-admission-receipts": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/gnarlmaw-allocation-test-v1.json",
+        "data/source_audits/ci64_provenance_v1/gnarlmaw-development-test-v1.json",
+        "data/source_audits/ci64_provenance_v1/gnarlmaw-test-typing-v1.json",
+        "data/source_audits/feculent_gnarlmaw_2026_11/geometry.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "gnarlmaw-development-inactive-fixture-admission": {
+      "paths": [
+        "scripts/fortification_engagement_test_admission.py"
+      ],
+      "owners": [
+        "gnarlmaw_inactive_test_successor"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "gnarlmaw-development-capability-report": {
+      "paths": [
+        "src/warhammer40k_core/engine/ability_coverage.py"
+      ],
+      "owners": [
+        "@module",
+        "_allocation_cover_diagnostics",
+        "_clause_coverage_row",
+        "_clause_support_stage",
+        "ability_coverage_row_for_descriptor"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "gnarlmaw-development-native-regressions": {
+      "paths": [
+        "tests/rules/section09/test_fortification_engagement.py"
+      ],
+      "owners": [
+        "_native_gnarlmaw_config",
+        "test_gnarlmaw_deploys_from_native_development_roster",
+        "test_gnarlmaw_diseased_cover_uses_native_hull_occlusion",
+        "test_gnarlmaw_records_allocation_cover_after_unmodified_hit_roll"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "gnarlmaw-development-inactive-fixture": {
+      "paths": [
+        "tests/unit/test_skull_altar_runtime_regressions.py"
+      ],
+      "owners": [
+        "@module",
+        "_with_fortification_cover",
+        "test_fortification_cover_ignores_destroyed_attacker_placements",
+        "test_fortification_cover_keyword_ignores_destroyed_blocker_model"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "gnarlmaw-development-equivalence-report": {
+      "paths": [
+        "tools/cross_source_semantic_equivalence.py"
+      ],
+      "owners": [
+        "@module",
+        "_datasheet_ability_members",
+        "_group_conclusion"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "gnarlmaw-development-catalog-generator": {
+      "paths": [
+        "tools/generate_gnarlmaw_development_catalog.py"
+      ],
+      "owners": [
+        "@module",
+        "_geometry",
+        "build_catalog_package",
+        "main"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",
