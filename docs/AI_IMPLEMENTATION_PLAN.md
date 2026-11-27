@@ -1977,7 +1977,7 @@ validated split and fixture recipes, the engine and candidate-generator
 revisions, and the challenger revision. After collection, check the
 inventory again with all continuation bindings before releasing any
 outcomes. Quarantine any newly colliding component. A collision or
-an incomplete locked block leaves the comparison inconclusive.
+an incomplete locked block leaves feasibility incomplete.
 Retain gaps and failures in the original cohort without substitution.
 
 **Paired metric and reporting.** For each arm, compute the native change
@@ -1991,19 +1991,62 @@ margins in VP over the fixed local horizon.
 
 Average the four paired differences per contrast within each family.
 Give each of the eight connected components equal weight in the
-primary means. For simultaneous 95% coverage, use two-sided 97.5%
-Student t intervals over the eight family means, with seven degrees
-of freedom and Bonferroni adjustment for the two contrasts.
-Treat the intervals as approximate between-family uncertainty for this
-small designed cohort. A positive comparison requires both lower
-bounds above zero and all 32 paired blocks complete. Report each
-family mean, both overall estimates and intervals, choice counts,
-planned and complete blocks, gaps by cause, cap losses and seed draw
-counts. When a block is incomplete, report the observed paired rows
-outside quarantine with their denominators and withhold the primary
-estimates and intervals. When either bound fails to clear zero, report
-that the criterion was unmet. This eight-family minimum is a
-feasibility target.
+descriptive means. This preregistered cohort evaluates feasibility.
+Report whether intake succeeded and all 32 paired blocks passed the
+native eligibility, common horizon and replay checks. Report each
+family mean, both overall means, and the minimum and maximum of the
+eight leave-one-family-out means for each contrast. These ranges show
+sensitivity to dropping a family and carry no confidence coverage.
+Report choice counts, planned and complete blocks, gaps by cause,
+cap losses and seed draw counts. When a block is incomplete, report the
+observed paired rows outside quarantine with their denominators and
+withhold the overall summaries. This cohort yields no superiority
+verdict.
+
+**Separate confirmatory decision.** Register a new cohort of connected
+components disjoint from development and feasibility. Keep the same
+paired endpoint, contrasts and equal family weights. Before collecting
+its outcomes, freeze the challenger, target family population, sampling
+and admission plan, family count and completion criteria. Justify the
+count using family-level design scenarios for the smallest gains worth
+detecting. Include structural zeros, variability and adverse differences,
+and check joint detection across plausible family mixtures. Check
+false-positive calibration when either contrast is at its null boundary.
+Require a design supported by the available independent families and
+these calibration checks. If they do not, report feasibility only. Keep both
+feasibility observations and repeated seeds out of the confirmatory
+family count.
+
+For the single claim of a positive mean VP difference against **both**
+constants, require each family-level one-sided Student t test of
+mean difference `<= 0` to reject at 0.05. In the complete preregistered
+cohort of `n` families, both statistics must exceed the 0.95 t quantile
+with `n - 1` degrees of freedom. A zero-variance contrast or an incomplete locked block
+leaves the joint criterion unmet. This intersection–union rule has
+nominal size at most 0.05 for the conjunctive claim because under its
+null at least one component null is true, and both tests must reject.
+That argument depends on the individual test calibration. Treat the
+t calibration as approximate for designed families with structural
+zeros and justify it in the confirmatory plan. Report both estimates
+and both marginal one-sided 95% lower bounds when defined. The bounds
+have marginal coverage and no simultaneous 95% coverage guarantee.
+See [Berger's intersection–union result](https://doi.org/10.1080/00401706.1982.10487790).
+
+**Synthetic design check.** If the challenger chooses the same action
+at both seeds within each family, at least one contrast has at most four
+nonzero family means among eight families. For a positive mean and
+`k` nonzero entries, Cauchy–Schwarz bounds the statistic by
+`sqrt(7k / (8 - k))`. With `k <= 4`, the bound is 2.646, below the
+2.841 cutoff of a two-sided 97.5% t interval with seven degrees of
+freedom. The table illustrates the separate joint rule at a hypothetical
+eight-family cutoff of 1.895 for each one-sided test. These arithmetic
+examples establish reachability for the balanced case.
+
+| Synthetic case | Family means vs Hold (VP) | Family means vs Screen (VP) | t vs Hold / Screen | Joint criterion |
+| --- | --- | --- | --- | --- |
+| Balanced gains | 4, 4, 4, 4, 0, 0, 0, 0 | 0, 0, 0, 0, 4, 4, 4, 4 | 2.646 / 2.646 | Met |
+| Heterogeneous gains | 8, 1, 1, 1, 0, 0, 0, 0 | 0, 0, 0, 0, 4, 4, 4, 4 | 1.429 / 2.646 | Unmet |
+| Exact ties vs Hold | 0, 0, 0, 0, 0, 0, 0, 0 | 0, 0, 0, 0, 4, 4, 4, 4 | Undefined / 2.646 | Unmet |
 
 Use the existing sealed movement baselines and Shooting receipt as
 development smoke checks. Their respective horizons and seed repeats

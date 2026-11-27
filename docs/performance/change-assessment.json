@@ -6,11 +6,11 @@
   "changes": {
     "docs/AI_IMPLEMENTATION_PLAN.md": {
       "before_sha256": "f6b89d7d915986becd7a64a696c0c5698df9c482a251dc4aba51bc1975cd07c9",
-      "after_sha256": "ce890384ac20ca6c05a22acf120aa4938d0b6e0b82db42884a60c4f4252e1a25",
+      "after_sha256": "2ce678dc5b458b19ac77058505ea0cdd7128f0e5b32b8d02cae031728ac97212",
       "owners": {
         "@document": {
           "before": "f6b89d7d915986becd7a64a696c0c5698df9c482a251dc4aba51bc1975cd07c9",
-          "after": "ce890384ac20ca6c05a22acf120aa4938d0b6e0b82db42884a60c4f4252e1a25"
+          "after": "2ce678dc5b458b19ac77058505ea0cdd7128f0e5b32b8d02cae031728ac97212"
         }
       }
     }
@@ -20,7 +20,7 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Freezes the prospective Movement comparison and reporting plan in the roadmap. No executable workload changes.",
+      "rationale": "Freezes feasibility cohort reporting and specifies a separate confirmatory design. No executable workload changes.",
       "source_obligation": null,
       "unchanged_work": null
     }
