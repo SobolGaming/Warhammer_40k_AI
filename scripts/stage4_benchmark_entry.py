@@ -1167,6 +1167,11 @@ def main() -> None:
         choices=("measure", "verify"),
         help="Run the frozen native Shooting pilot or verify its committed receipt.",
     )
+    modes.add_argument(
+        "--layout-intake",
+        action="store_true",
+        help="Preflight the first prospective reserve layout.",
+    )
     parser.add_argument("--checkpoint", type=Path, help="Layout C setup checkpoint path.")
     parser.add_argument("--worker", action="store_true", help=argparse.SUPPRESS)
     args = parser.parse_args()
@@ -1174,6 +1179,19 @@ def main() -> None:
         parser.error("--split-objective and --checkpoint must be supplied together")
     if args.audit_west and args.family != "west":
         parser.error("--audit-west requires --family west")
+    if args.layout_intake:
+        from scripts import stage4_layout_intake
+
+        if args.worker:
+            if not stage4_layout_intake.run():
+                raise SystemExit(1)
+        else:
+            run_worker(
+                ["--layout-intake"],
+                "native layout intake",
+                stage4_layout_intake.load_recipe()["worker_wall_seconds"],
+            )
+        return
     if args.native_shooting is not None:
         from scripts import stage4_native_shooting
 

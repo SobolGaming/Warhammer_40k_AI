@@ -1,16 +1,150 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "5ef3bb92a59470455bcd66faf62d195e17dbccc3",
+  "base": "eac0413c58c26576ea4dac93ac85b63524c7c15b",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:af65d2237320cda39c2d38d0dbeb4d415c424956696fc1cc0f40686921848830",
-  "operation_map_sha256": "37e7605f53e80f4a9ccd972d0af57d2b8b00dcba36329eeeee1a26f297dc36bb",
+  "operation_map_sha256": "f538dcad7c3fb1b314bb83bb4086fccc2eb178174f1dacee015ed20091eb0fd6",
   "changes": {
     "docs/AI_IMPLEMENTATION_PLAN.md": {
-      "before_sha256": "f6b89d7d915986becd7a64a696c0c5698df9c482a251dc4aba51bc1975cd07c9",
-      "after_sha256": "2ce678dc5b458b19ac77058505ea0cdd7128f0e5b32b8d02cae031728ac97212",
+      "before_sha256": "2ce678dc5b458b19ac77058505ea0cdd7128f0e5b32b8d02cae031728ac97212",
+      "after_sha256": "3f55e97ecbcc4723642aef1fe95c38297bb206ff1be0001b30daa4d1e6f613db",
       "owners": {
         "@document": {
-          "before": "f6b89d7d915986becd7a64a696c0c5698df9c482a251dc4aba51bc1975cd07c9",
-          "after": "2ce678dc5b458b19ac77058505ea0cdd7128f0e5b32b8d02cae031728ac97212"
+          "before": "2ce678dc5b458b19ac77058505ea0cdd7128f0e5b32b8d02cae031728ac97212",
+          "after": "3f55e97ecbcc4723642aef1fe95c38297bb206ff1be0001b30daa4d1e6f613db"
+        }
+      }
+    },
+    "docs/performance/policy-v3/operation-map.json": {
+      "before_sha256": "49f54e886c5ce9e86682ec5c388f7c1053d21bf77449e875b2c44e1a0d206128",
+      "after_sha256": "64a21ee72f2f014644783928d5e6fd75f0a45b9ee80135762a54859f2a54ecf3",
+      "owners": {
+        "@document": {
+          "before": "49f54e886c5ce9e86682ec5c388f7c1053d21bf77449e875b2c44e1a0d206128",
+          "after": "64a21ee72f2f014644783928d5e6fd75f0a45b9ee80135762a54859f2a54ecf3"
+        }
+      }
+    },
+    "docs/stage4-layout-intake-recipe.json": {
+      "before_sha256": null,
+      "after_sha256": "8bef1df1c64acdf63c7c628ccd6e9eb5ef8d5ead0c0f7ade37a01201d648cd59",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "8bef1df1c64acdf63c7c628ccd6e9eb5ef8d5ead0c0f7ade37a01201d648cd59"
+        }
+      }
+    },
+    "scripts/stage4_benchmark_entry.py": {
+      "before_sha256": "394cfd3f86ab0a8d6d6caca503c24e4b82a5ab312744cd4b2ee54fa8f4a2793e",
+      "after_sha256": "ef9a3995378f39d0a140413af6da6fa072d0a46646068d799036f1ea8dea1626",
+      "owners": {
+        "main": {
+          "before": "21ee42e448bde21e0f15e1dc8e67d0773ad15f4f9c9a9af1b702b774735c3c8a",
+          "after": "72dd7538e908088d9b9f741088e04a6a41ec474e1c8776711cc1501374c90e97"
+        }
+      }
+    },
+    "scripts/stage4_layout_intake.py": {
+      "before_sha256": null,
+      "after_sha256": "905c74b67e34b091c1f4ff92004d33e0fd08dbf03ce450a98f1d1b226beb45d7",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "b26c8ce140de7bc56e5ce014ecbbc63a77b8c057fe419790dd1503a296a05e39"
+        },
+        "IntakeGap": {
+          "before": null,
+          "after": "eabe721c4f72f41090ce241f66cc5c87f98f9f4e49fb948b99a4c448b9ea174a"
+        },
+        "IntakeGap.__init__": {
+          "before": null,
+          "after": "bb166ae0812be6adbc2103a8efab102dda4f33cdd1bd7c67ebcb513df98d02ca"
+        },
+        "classify_origin": {
+          "before": null,
+          "after": "88ae5e522012a83073187106ea880b4508e53d5efbf5c395d73e4f1f806119a2"
+        },
+        "config": {
+          "before": null,
+          "after": "e0b1b6abaf043281486a5211b81b8c17aa8005b2adea45507187c02f5aee7fa0"
+        },
+        "geometry_key": {
+          "before": null,
+          "after": "560b074071be62af5852c8ebaa4b06d4b10b41c1874dc5256701565bb212a43c"
+        },
+        "immediate_menu": {
+          "before": null,
+          "after": "8c7dc16b5b0aee3a5a3496481662fe7a2cbd7c905a769d6ea538b36263f69efc"
+        },
+        "linked_footprint_key": {
+          "before": null,
+          "after": "c0ad1f9f45634fc52ed77ae2663107fd046a312635d862fc165f6a4886d292bd"
+        },
+        "load_recipe": {
+          "before": null,
+          "after": "0af0947cdd1135896e691145d525b4318fda8453da3f0662ab070b83c6e68ba0"
+        },
+        "mission": {
+          "before": null,
+          "after": "b2a3ee7b89968f03f7cf811b01b9e4422193f5abe1a5f410da727199c392affc"
+        },
+        "need": {
+          "before": null,
+          "after": "85a2b4cdc3b4e8c21aa22e43d46fb36ea36acc9aa29b0cca373f6459f4d24ca4"
+        },
+        "open_origin": {
+          "before": null,
+          "after": "6b430e3991a18204d63ae0f3f737b80e94bff3031c0d6798caa3f57c5cad92b1"
+        },
+        "origin_type": {
+          "before": null,
+          "after": "8f6d832aeaec02198942e744a40b0f6e26738ec73ea1ff78dddc2f59112986f4"
+        },
+        "polygon_key": {
+          "before": null,
+          "after": "ea0c0384021579d67cdd3ad196ba89dffde4c6eb81b9ef3ee95b10607f768ec1"
+        },
+        "preflight": {
+          "before": null,
+          "after": "e500d151731ac7cf09312a803dc05ba10af78132d396b8e545e6ee30d9d1ead7"
+        },
+        "run": {
+          "before": null,
+          "after": "09a406ebc1336f871bd37d586c477b7df7866b6011f96785e74bd243e056f84a"
+        },
+        "screen_order": {
+          "before": null,
+          "after": "ae350f7ca422b69acd1077c2a797bee052caa7dc5101ec7ea40cc18bb9a69915"
+        },
+        "source_inventory": {
+          "before": null,
+          "after": "eb40696de5e390e1dfb804cdc58f34453794b498d454ac4410b497ec45655f33"
+        }
+      }
+    },
+    "scripts/stage4_layout_intake_checks.py": {
+      "before_sha256": null,
+      "after_sha256": "da7032f0b2c6ab3a44d47f9d8e9039e6be1d91532891b14be05015d0ff1e6e97",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "a14d1440667dad4e4959e8b42de8c670b7612c12002498a9a1e151876f318c39"
+        },
+        "test_first_recipe_uses_earliest_unused_diagram": {
+          "before": null,
+          "after": "351aff15b92662ff83edf6fa06bb4a875b7b3b42d3be86111c11914a416bd707"
+        },
+        "test_origin_categories_are_defined_by_visible_control": {
+          "before": null,
+          "after": "d3efdc282fc1b2041e6036b5564cb59f7b03da5dc8cc073cc96209a20b0ebf46"
+        },
+        "test_published_development_binding_rejects_reserve_collision": {
+          "before": null,
+          "after": "7e62e14e9f5b6e1dbe24f2dc85844d6abb20a8a10103dfa6c9d21cd7e581fadf"
+        },
+        "test_retained_control_without_contact_is_ineligible": {
+          "before": null,
+          "after": "3e8436bdf3a0f37330cbf6dfa26fa0ac2225571b0adc518f17ff03eed9789cf8"
         }
       }
     }
@@ -20,7 +154,53 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Freezes feasibility cohort reporting and specifies a separate confirmatory design. No executable workload changes.",
+      "rationale": "Documents the outcome-free reserve intake command, boundaries and observed eligibility evidence.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/performance/policy-v3/operation-map.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Maps the bounded native preflight and its focused regressions to the existing opt-in benchmark operation.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/stage4-layout-intake-recipe.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Freezes the source layout, ordinary setup, route predicates, seeds and native work caps.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "scripts/stage4_benchmark_entry.py": {
+      "category": "measured_workload",
+      "operations": [
+        "stage4-benchmark-entry-reproducer"
+      ],
+      "selected_families": [],
+      "rationale": "Adds a bounded opt-in CLI mode for immediate native reserve eligibility on one diagram.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "scripts/stage4_layout_intake.py": {
+      "category": "measured_workload",
+      "operations": [
+        "stage4-benchmark-entry-reproducer"
+      ],
+      "selected_families": [],
+      "rationale": "Exercises ordinary setup, actor-visible origin checks and immediate native legality in an opt-in development workload.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "scripts/stage4_layout_intake_checks.py": {
+      "category": "measured_workload",
+      "operations": [
+        "stage4-benchmark-entry-reproducer"
+      ],
+      "selected_families": [],
+      "rationale": "Covers source ordering, development lineage and actor-visible feasibility strata without outcome labels.",
       "source_obligation": null,
       "unchanged_work": null
     }

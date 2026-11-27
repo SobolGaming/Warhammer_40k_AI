@@ -2053,6 +2053,43 @@ development smoke checks. Their respective horizons and seed repeats
 provide no rows for this comparison. No reserve family is admitted by
 this contract alone.
 
+#### First live preflight
+
+The first recipe in source page order is
+[Take and Hold vs Take and Hold, Layout A](stage4-layout-intake-recipe.json)
+on page 9. Both sides retain Battlefield Dominance from the imported mission
+assignments. The target is the Central Objective linked to the two central
+terrain footprints. The recipe freezes S, E and B's deployment, direction
+predicates, and caps. The prefix selects S before E, holds every round-one
+Move, skips Shooting and Charge, and declines optional reactions. The future
+E selector uses the same southward predicate in both arms. Active B uses
+the northward predicate first, then the north-west predicate. Passive B uses
+its issued Hold. The live preflight exercises only S's immediate choice.
+
+```sh
+PYTHONPATH=src:. uv run --no-sync python -B -m scripts.stage4_benchmark_entry --layout-intake
+PYTHONPATH=src:. uv run --no-sync pytest -q --no-cov -p no:cacheprovider scripts/stage4_layout_intake_checks.py
+```
+
+Both frozen seeds reached the same actor-visible A2 S offer after 19 native
+decisions and zero draws each. The Central Objective was empty, with zero
+visible contact OC on each side and no controller. Exact persistence,
+both player projections and event streams, and independent replay matched
+at origin. The finite menu issued Hold, Normal Move and Advance. Advance
+was excluded. The generator returned 32 paths per seed, with two matching
+the Screen predicate. The first ID-sorted witness passed the native probe
+and was accepted on the Screen fork. The Hold fork accepted its issued
+stationary action.
+
+The receipt emits a provenance-only split manifest. The imported diagrams
+on pages 13, 14 and 38 cover Central Guard, West and Layout C respectively.
+The Layout C mechanism and timing controls reuse its lineage, and the
+flat Shooting control stays in the same component. Page 9 forms a
+separate component on the declared source, geometry, prefix and origin
+bindings. Its eligibility is provisional pending the sealed continuation
+overlap check. The first preflight supplies one empty-origin candidate
+toward the eight-family feasibility intake.
+
 ## 7. Performance and evaluation before scaling
 
 Measure the actual headless workload, with and without the reference transport under matched conditions:
