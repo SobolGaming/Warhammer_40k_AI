@@ -1,154 +1,152 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "1ffb1754d786ec2e7eaace841f0b090f3fe15a50",
+  "base": "5deda3506388fdb511bbf04737a8f5514ba1910b",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:af65d2237320cda39c2d38d0dbeb4d415c424956696fc1cc0f40686921848830",
-  "operation_map_sha256": "07af086446791d1a3082bcfd13c5830469a8e435225e365926f74a22f362ccc2",
+  "operation_map_sha256": "eaa52a5564cd028a3f5a528665009017285ab552a45a00970c3ebe1b786b9c3f",
   "changes": {
     "docs/AI_IMPLEMENTATION_PLAN.md": {
-      "before_sha256": "461639ec4dd16d5cb08d06e72f02cf0196fa71cf175c6adffc909f9284e96da9",
-      "after_sha256": "799d48ad44fea24899b219f62429aa38fa5052644f0b4d5c7be82fe33e12b36a",
+      "before_sha256": "799d48ad44fea24899b219f62429aa38fa5052644f0b4d5c7be82fe33e12b36a",
+      "after_sha256": "7e340429d0392656838b48d5a1639b3a6b54ef4f0731ea3be8c571b73e303e08",
       "owners": {
         "@document": {
-          "before": "461639ec4dd16d5cb08d06e72f02cf0196fa71cf175c6adffc909f9284e96da9",
-          "after": "799d48ad44fea24899b219f62429aa38fa5052644f0b4d5c7be82fe33e12b36a"
+          "before": "799d48ad44fea24899b219f62429aa38fa5052644f0b4d5c7be82fe33e12b36a",
+          "after": "7e340429d0392656838b48d5a1639b3a6b54ef4f0731ea3be8c571b73e303e08"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "3f194bb9a61947045f44ed05fc22aba5724f004b388344b6b75f55688150f52a",
-      "after_sha256": "9e5bd7065daf047328818b5523d1360a80a96ca998d1f7d8b026614170618d04",
+      "before_sha256": "9e5bd7065daf047328818b5523d1360a80a96ca998d1f7d8b026614170618d04",
+      "after_sha256": "4e60ad5e764c704b2573f06fc956efd2ad08bd4606bf5d323a1c8418f7c8a453",
       "owners": {
         "@document": {
-          "before": "3f194bb9a61947045f44ed05fc22aba5724f004b388344b6b75f55688150f52a",
-          "after": "9e5bd7065daf047328818b5523d1360a80a96ca998d1f7d8b026614170618d04"
+          "before": "9e5bd7065daf047328818b5523d1360a80a96ca998d1f7d8b026614170618d04",
+          "after": "4e60ad5e764c704b2573f06fc956efd2ad08bd4606bf5d323a1c8418f7c8a453"
+        }
+      }
+    },
+    "scripts/stage4_evaluation.py": {
+      "before_sha256": null,
+      "after_sha256": "b0924ae1178198dacc91ddab04310520d6ead7648456e2ebda3ea6911f39ff71",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "485d80a536e4ace552f3f63fe290e22518fcea9ac0bb142177af15e93aaaf8cb"
+        },
+        "_identifier": {
+          "before": null,
+          "after": "560f45f27d8a0bddc803c41a182b7c6b50985bebecb6cbb8160a535a9083e4fb"
+        },
+        "_margin": {
+          "before": null,
+          "after": "1578b3e8ab3bcb45afa78c31a67ebb8aaf34485f890062ffc3548a40ab6c2c10"
+        },
+        "_nonempty_list": {
+          "before": null,
+          "after": "fda6884c3c80f408755ec569b773c9997cc5aadc2f148165fa23c2c6edcc3512"
+        },
+        "_record": {
+          "before": null,
+          "after": "3dd0ae5ac6ccc085d8d8851f6d5441ed520cdd235622ba3958e36c2ac6cf7958"
+        },
+        "_sha256": {
+          "before": null,
+          "after": "2ba7afbcd85172230d7d85e0a14f366098eda19179a6c0331e294ab8652c63f7"
+        },
+        "_unique_object": {
+          "before": null,
+          "after": "1b97eb4c77367f8ee42e316236516bc7295e36ec9c99629cb3e157664af64c16"
+        },
+        "baseline_table": {
+          "before": null,
+          "after": "a7fcf978375b555ab06a19044c93f33ed327614c1574cf714a305ab3dcadc5df"
+        },
+        "development_baselines": {
+          "before": null,
+          "after": "9b1f2fcddaff42c73c76b2826c53a4d92c96ea2361c91d8d78ddde3a6d826832"
+        },
+        "main": {
+          "before": null,
+          "after": "08f9d4d7af11e47e42c2d56745acb1314ab479ec40ed2aaa566d45eeb5ce2264"
+        },
+        "validate_split": {
+          "before": null,
+          "after": "f24110811794451169b83099e226333dbf16589b839e7bb874588693cfe87401"
+        }
+      }
+    },
+    "scripts/stage4_evaluation_checks.py": {
+      "before_sha256": null,
+      "after_sha256": "04ad67609028f6ad5c1656d2750fc741487acf6d0df434fec005e77ba26c3448",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "995499966bd8ccbda5d938c845730739eabbcc4b37e58831f7b6e9cc3ecec013"
+        },
+        "_family": {
+          "before": null,
+          "after": "70eb7aed7ca68986cf28fc9c1be30a72546ca77167d63298e5ce39873a35f55b"
+        },
+        "_manifest": {
+          "before": null,
+          "after": "c3bcb5625307e49abe563e0415d4824bad255020cd412264b7a97e8d8cd1768c"
+        },
+        "receipts": {
+          "before": null,
+          "after": "c6a915ab50514de136e2856429983ad0f43c2fc7c6e3db41c67b83998798e02f"
+        },
+        "test_arms_seeds_and_responses_do_not_get_independent_assignments": {
+          "before": null,
+          "after": "a3101f90a7cbbf8678b0553ccf897af2d9d8a4cc7f59118c98fd7c78a3494f1b"
+        },
+        "test_duplicate_json_fields_cannot_override_partitions": {
+          "before": null,
+          "after": "cd1f3a32d7475123756e993755ebb8f0c9921a450fdb8f4879778f67709a3ddb"
+        },
+        "test_independent_diagrams_can_split_under_shared_package_hashes": {
+          "before": null,
+          "after": "afdf4b328265b2cc83ea512879e356dae8eee2ad42c0e9f245839f12e70f11e7"
+        },
+        "test_layout_c_link_uses_the_manifest_diagram_identity": {
+          "before": null,
+          "after": "f5bb307321f1e534398dd00bfed13f0a1ce85382a3c31084b90ff9265089895d"
+        },
+        "test_missing_family_provenance_fails_closed": {
+          "before": null,
+          "after": "3005f5f4c3adc114fb76ad55bd60ff10df5cf9ae5b6bdd30bae11c69509b7f10"
+        },
+        "test_missing_or_unrecognized_source_fails_closed": {
+          "before": null,
+          "after": "11308047929edc0d0b20aecc2b7ec4327f0fafacebfd47c20aad335926a3077f"
+        },
+        "test_paired_baselines_and_guard_reversal": {
+          "before": null,
+          "after": "35774da1ea0ea3c1bd70406e6335f3bfa044bf6d4902e89bea8d7b1043300ea3"
+        },
+        "test_receipt_horizon_drift_fails_closed": {
+          "before": null,
+          "after": "777fb65b36421019d4bd198cc55fe1f1ef692101a972dd423bd96103256c75d6"
+        },
+        "test_reserve_requires_development_comparator": {
+          "before": null,
+          "after": "0528b51539daeb193388606157c611dc1bd02af7649f42bea230a5c3ebf3db0d"
+        },
+        "test_reuse_and_shared_trajectory_join_families_transitively": {
+          "before": null,
+          "after": "8e5acec85a6a5ced5cfe83639f4f25010fbb4a973640080d735929fba2425d8c"
         }
       }
     },
     "scripts/stage4_policy_target.py": {
-      "before_sha256": "87f606fbee28f5e278ff387c14dbb8e7ea73e6b0bc38df22db2a6af25cbf8229",
-      "after_sha256": "2cf2d21ab2dc0ac316f944260c6b5ad68f432d0c3446c9d7d2ea7b17cc7d3205",
+      "before_sha256": "2cf2d21ab2dc0ac316f944260c6b5ad68f432d0c3446c9d7d2ea7b17cc7d3205",
+      "after_sha256": "6cb98eec2df2e0b8a59b45b3fce286e10d4c91f557faf970f5ac6155a4c2590f",
       "owners": {
-        "@module": {
-          "before": "115136bf9729849693044ff1bc4237105a4d0f2d4ae133274e7f978a392d1651",
-          "after": "0bf3d1b5a88df75d0f5c1d04c69c90a8c4371bae90946e356c6918c2a44439b1"
-        },
-        "FrozenChoice": {
-          "before": "c33b8d3cee4fbe74a522e0aef2eaf4f2de0515a3cce8e2ebee5b7f5bda68e1e0",
-          "after": "63dc09192038625a20499043cedd20a4564d7d8c1006c0163491c3fa537fcd9b"
-        },
-        "FrozenChoice.capture": {
-          "before": "7b74e58e31827692b4aeffed340812522ee22eb33f2fc7fc10b1bcdbc605c6d5",
-          "after": "aace165666f2ee6059ae9bcce43e03c77a04cecf5fe955ea94fce0c26002f13a"
-        },
-        "FrozenChoice.policy_input": {
-          "before": "c1eb99222534dd748536263fca8f5fd6f853ecf1db8fce9d68e68809a6f16b4a",
-          "after": "dab86e996d2224d50c7dd6d6c95ad1235848854ede93d11f2cc9e2829546742d"
-        },
-        "FrozenMovementOffer": {
-          "before": null,
-          "after": "170b97f2fdc8eaa08c961f55132ca7be5077a27c678c873a3811583547ea8242"
-        },
-        "FrozenMovementOffer.capture": {
-          "before": null,
-          "after": "dce90eb0225f4cea83e86cfc39cc3f2f2642c8e93ec0651ef712afe4d5dfe72d"
-        },
-        "FrozenMovementOffer.policy_input": {
-          "before": null,
-          "after": "87ef5ed311b92947e1978623bcd5eca8814905fca69db9a468f3a7dfbd123b7b"
-        },
-        "arm_target": {
-          "before": "0b912c3c3564ffabae6a38cf20e6e3573928e6c9f4cf9f4fd040df84c5fba812",
-          "after": "1709edccc847c858cfc581f012fc92bfaa79c93970f562447dd6247a5d14d7c5"
-        },
         "build_link": {
-          "before": "18d0e491d702d61b83571a10b238d34bc4072bff8cace4881c7348a2825ff5ae",
-          "after": "38d8720ce94515681cfeec6ef183f320208997a90be69a0daef590eae89d2efe"
-        }
-      }
-    },
-    "scripts/stage4_policy_target_checks.py": {
-      "before_sha256": "edf9217494bff5e96caa3c699d9a79901a3caecdbed419c69cddacc03c924ea6",
-      "after_sha256": "3426aa35c7bd92afcc30a6e26291c5ce48d66077d734e6db817da47fee197209",
-      "owners": {
-        "@module": {
-          "before": "cb44944d73fcfe956eb6a950e134a8f0bbe96e848edefa8e4b2fcc6644d1f640",
-          "after": "da6f23a66487f83b73e1278e0cfc3dfbe1c71ca637687265e9ee94a430877cbb"
+          "before": "38d8720ce94515681cfeec6ef183f320208997a90be69a0daef590eae89d2efe",
+          "after": "721145bd1767eacff33e0fc39291866546d7f75bb1dd061f7cb55c90e2659b3c"
         },
-        "_context": {
+        "source_diagram_key": {
           "before": null,
-          "after": "c42e8ac677ccedb9aa40dfe0b7c82708dc836c6bc4d8b5d3adbb00a37c5c3e13"
-        },
-        "_finite_input": {
-          "before": null,
-          "after": "fdfd7d94cb41ac35e7d7d5307be8e99d29c17530580aa60c8b34b7b4ae68d2ae"
-        },
-        "tactical_view": {
-          "before": null,
-          "after": "6535f0fe8c23ab0e28b86b5c40a9e2d2b88d888841c5209b2fc2c9f98444ca4e"
-        },
-        "test_missing_visible_measurements_are_explicit": {
-          "before": null,
-          "after": "761142fbb92c22f99a493817f81531d67a2ee69f4098e9be661a43f0354427e0"
-        },
-        "test_policy_input_bytes_ignore_targets_and_metadata": {
-          "before": null,
-          "after": "d05272dbb757f9c0692b065d27c41f5892b399cd5410917a3767d2c5b3577e0f"
-        },
-        "test_tactics_measure_both_linked_areas_and_separate_request_kinds": {
-          "before": null,
-          "after": "e8bc72c2317ab1dba14af8b6c7a487603accc7f6441c3888287b93af2d723009"
-        }
-      }
-    },
-    "scripts/stage4_split_objective_replay.py": {
-      "before_sha256": "fa633b6ced25593e7626a4351a74661f19a8bc0fbc981e2ea078ede94330b9db",
-      "after_sha256": "b9d733027173ea170f1f79be0f0e041d5439b9f509da442d4dd754948a95b0db",
-      "owners": {
-        "drive": {
-          "before": "7a7d7a7d8da05cbf62b4d03b2eaaa510e27b9d555522e6fe99ca2ec32c76d09b",
-          "after": "751ac7daf31b146a76a8d2a0e2b6380ada549aab15c37478c9a96c72b1d12e3c"
-        },
-        "run": {
-          "before": "e35ae64e7a321c60ee69579b197f120d0d48353909a8ebf243461a2a82b7bd49",
-          "after": "e8f29a51169eb28c456aa8924837f3dc474eb6698bd1daf7edcc607409b67a3f"
-        },
-        "select_move": {
-          "before": "75801c69146910ead38e25c2d80acb9e0a6f143a5d7da4e06b446cf9aab4a0fa",
-          "after": "a920ae8c3ea6785cbe29f21c20839fc8c532259c8274d4e26d4ff33995f216f4"
-        }
-      }
-    },
-    "scripts/stage4_tactical_features.py": {
-      "before_sha256": null,
-      "after_sha256": "52d9a25297d98b459e5b72206f3aec848811103aba2edaf4146834927b2366f3",
-      "owners": {
-        "@module": {
-          "before": null,
-          "after": "b6b805b5079096bd41194e7c3db3678170b434dafe7878345ab7b6015988a03d"
-        },
-        "VisibleModel": {
-          "before": null,
-          "after": "36f647fde655ac458d084728011c79d37d4eb71c789389b8db8860774743651b"
-        },
-        "_closest_gap": {
-          "before": null,
-          "after": "90da1e27353a4ef52b8d7d9b0a3722495b15997dd8d09c759b7e34c367f42394"
-        },
-        "_linked_objectives": {
-          "before": null,
-          "after": "86c9f6a83affee45b1100968cf6a8bcc4edc99c63c046bece2c902fc786ef250"
-        },
-        "_measure_objective": {
-          "before": null,
-          "after": "72dfd5741833fb0f040c8f10a72d575f6e0bde8e2e1da83e8c76f4e774f4a7ce"
-        },
-        "_model_geometry": {
-          "before": null,
-          "after": "75d12a0e4f1da29c450c2af24f689ac2201e318e6d776db5f7bb42b42aad8f5c"
-        },
-        "tactical_inputs": {
-          "before": null,
-          "after": "17ac8ef49d912e389abe8cdc624528a3741d8b683d8577a3a1b2700950d1768a"
+          "after": "6508cd0b60f87e6726bc423c0755e5f40c10ec9700720e874ab7b5a48800630e"
         }
       }
     }
@@ -158,7 +156,7 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Freezes the development-only finite and child offer feature schema and documents held-out requirements.",
+      "rationale": "Documents the opt-in same-release split and fixed-follow-through development baseline margins.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -166,7 +164,27 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Registers the opt-in feature extractor under the existing Stage 4 development workload.",
+      "rationale": "Registers the opt-in split and baseline entry point and its focused checks with the existing Stage 4 operation.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "scripts/stage4_evaluation.py": {
+      "category": "measured_workload",
+      "operations": [
+        "stage4-benchmark-entry-reproducer"
+      ],
+      "selected_families": [],
+      "rationale": "Validates provenance-only family assignments and summarizes existing sealed scores through an opt-in development command.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "scripts/stage4_evaluation_checks.py": {
+      "category": "measured_workload",
+      "operations": [
+        "stage4-benchmark-entry-reproducer"
+      ],
+      "selected_families": [],
+      "rationale": "Exercises same-package isolation, transitive overlap, closed provenance checks and paired sealed development receipt arithmetic.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -176,37 +194,7 @@
         "stage4-benchmark-entry-reproducer"
       ],
       "selected_families": [],
-      "rationale": "Serializes separately captured finite and Normal Move child inputs alongside existing exact delayed targets.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "scripts/stage4_policy_target_checks.py": {
-      "category": "measured_workload",
-      "operations": [
-        "stage4-benchmark-entry-reproducer"
-      ],
-      "selected_families": [],
-      "rationale": "Adds opt-in checks for linked footprints, typed absence, request scope and immutable feature inputs.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "scripts/stage4_split_objective_replay.py": {
-      "category": "measured_workload",
-      "operations": [
-        "stage4-benchmark-entry-reproducer"
-      ],
-      "selected_families": [],
-      "rationale": "Samples the common Screen child offer only on the development link path before generation or native evaluation.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "scripts/stage4_tactical_features.py": {
-      "category": "measured_workload",
-      "operations": [
-        "stage4-benchmark-entry-reproducer"
-      ],
-      "selected_families": [],
-      "rationale": "Applies existing footprint measurements to detached actor views from the local benchmark; runtime engine and replay logic are unchanged.",
+      "rationale": "Records the source diagram and scenario lineage in development evidence while retaining the source artifact hashes for audit.",
       "source_obligation": null,
       "unchanged_work": null
     }
