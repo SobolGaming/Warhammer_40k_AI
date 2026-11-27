@@ -1,130 +1,146 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "54fd9dcceaa593314a519ceaa695adbafc5ac14a",
+  "base": "f61b40fdcf63ae187b3c94eb325f4dd94207ba0f",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:af65d2237320cda39c2d38d0dbeb4d415c424956696fc1cc0f40686921848830",
-  "operation_map_sha256": "68e3c8992d321e8737648da4f653eced92bfd433f2c58220e5a5edc16cc731b6",
+  "operation_map_sha256": "0c192a784e7b5348cc20eb595dee0756cc2fecd51260ba304827c1baf6e11c6d",
   "changes": {
     "docs/AI_IMPLEMENTATION_PLAN.md": {
-      "before_sha256": "5c4a69be67f89bb55b5811b913e85d9c2e044631bb443e6354b73d1dfdac69a1",
-      "after_sha256": "0b6e3b3c075548e0b99b9f76d096155e8d9d1f99765870fcda8d27e7346cb080",
+      "before_sha256": "0b6e3b3c075548e0b99b9f76d096155e8d9d1f99765870fcda8d27e7346cb080",
+      "after_sha256": "461639ec4dd16d5cb08d06e72f02cf0196fa71cf175c6adffc909f9284e96da9",
       "owners": {
         "@document": {
-          "before": "5c4a69be67f89bb55b5811b913e85d9c2e044631bb443e6354b73d1dfdac69a1",
-          "after": "0b6e3b3c075548e0b99b9f76d096155e8d9d1f99765870fcda8d27e7346cb080"
+          "before": "0b6e3b3c075548e0b99b9f76d096155e8d9d1f99765870fcda8d27e7346cb080",
+          "after": "461639ec4dd16d5cb08d06e72f02cf0196fa71cf175c6adffc909f9284e96da9"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "34581cfa9403cb45e4da4d1d9afe1a5f00f118e1c208abe57f0c61c3c6b328e7",
-      "after_sha256": "6da17ad6c4c0cd905a221a18681226681fa4cd6cb905749f3bdca6e80b23a2d2",
+      "before_sha256": "6da17ad6c4c0cd905a221a18681226681fa4cd6cb905749f3bdca6e80b23a2d2",
+      "after_sha256": "3f194bb9a61947045f44ed05fc22aba5724f004b388344b6b75f55688150f52a",
       "owners": {
         "@document": {
-          "before": "34581cfa9403cb45e4da4d1d9afe1a5f00f118e1c208abe57f0c61c3c6b328e7",
-          "after": "6da17ad6c4c0cd905a221a18681226681fa4cd6cb905749f3bdca6e80b23a2d2"
-        }
-      }
-    },
-    "docs/stage4-split-objective-receipt.json": {
-      "before_sha256": null,
-      "after_sha256": "ba62a4f4a9f4ebc299e5e79e9b7ce79b9c66fd41fd28b5d536ae81d75450e7f4",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "ba62a4f4a9f4ebc299e5e79e9b7ce79b9c66fd41fd28b5d536ae81d75450e7f4"
+          "before": "6da17ad6c4c0cd905a221a18681226681fa4cd6cb905749f3bdca6e80b23a2d2",
+          "after": "3f194bb9a61947045f44ed05fc22aba5724f004b388344b6b75f55688150f52a"
         }
       }
     },
     "scripts/stage4_benchmark_entry.py": {
-      "before_sha256": "bb6960c4b4e0198fe4ba4acf972aecf0e8fa1e69f4edfafb3632b8d82f0e0f07",
-      "after_sha256": "971d82421875a617e3c30c260e12768be5920c3a064ecf621be55c0bb002f476",
+      "before_sha256": "971d82421875a617e3c30c260e12768be5920c3a064ecf621be55c0bb002f476",
+      "after_sha256": "d30199594500fb3a693d7da7e626c94383d45bcfdaaac8ffeb3cfb492ba1a17b",
       "owners": {
         "main": {
-          "before": "af727abf002a85fac10d284ac68535c07434f760076abe232c9b0434647c8b69",
-          "after": "c13f2f6f2779c4f94246d7315aee3c1fedcd28895e746afe8a94415b7e5ab55c"
+          "before": "c13f2f6f2779c4f94246d7315aee3c1fedcd28895e746afe8a94415b7e5ab55c",
+          "after": "ca3745458be7e958d154d52d1ef8c0da9a421859dffeb151cdd0599dd3d01cb6"
         },
         "split_objective": {
-          "before": null,
-          "after": "5669da9ed8a0a1556f352f5d0c82a53bf3876c7e15386b162674081c173aa8a4"
+          "before": "5669da9ed8a0a1556f352f5d0c82a53bf3876c7e15386b162674081c173aa8a4",
+          "after": "de48766bdd4081872561c536d56f89ab17df827225b3a61f7dc1f820911b447f"
         }
       }
     },
-    "scripts/stage4_split_objective.py": {
+    "scripts/stage4_policy_target.py": {
       "before_sha256": null,
-      "after_sha256": "9f923e2c112d7cecc7b225a6fcb13229600d11c2013edb4bbc4efede39778cf6",
+      "after_sha256": "87f606fbee28f5e278ff387c14dbb8e7ea73e6b0bc38df22db2a6af25cbf8229",
       "owners": {
         "@module": {
           "before": null,
-          "after": "8d556a6219a2791ec230adea41869da85e2b0f153ac988b2ab1ab8dc2f681bc0"
+          "after": "115136bf9729849693044ff1bc4237105a4d0f2d4ae133274e7f978a392d1651"
         },
-        "config": {
+        "FrozenChoice": {
           "before": null,
-          "after": "84ae7e2e8cdaad4301421d8db5a56a7369afd82e47c2a3ae012aa3af306a7051"
+          "after": "c33b8d3cee4fbe74a522e0aef2eaf4f2de0515a3cce8e2ebee5b7f5bda68e1e0"
         },
-        "coordinates": {
+        "FrozenChoice.capture": {
           "before": null,
-          "after": "182c73ee8c4315beb7e9191bf263968d3d21574e8e389e8aa663fb3d0dee5282"
+          "after": "7b74e58e31827692b4aeffed340812522ee22eb33f2fc7fc10b1bcdbc605c6d5"
         },
-        "emit": {
+        "FrozenChoice.policy_input": {
           "before": null,
-          "after": "8ad69ec220dafd5a692433dee0519f8aa21fb908d60c90ebfa90793cba4a836c"
+          "after": "c1eb99222534dd748536263fca8f5fd6f853ecf1db8fce9d68e68809a6f16b4a"
         },
-        "ordinary": {
+        "_candidate_coverage": {
           "before": null,
-          "after": "a5d204e5f4e1e95e0efb6ae4fe06f58dd620d30ff4aefb6e6c11bf44e010a9e7"
+          "after": "d6a1136369f2b1ec2d2105ec1a524f6ecb94bd38fdb72d6c88c48071e5719c71"
         },
-        "prepare": {
+        "_material": {
           "before": null,
-          "after": "b8d80ee12170207f3edcfebdcfab1c29eb309273afe060bc85bc9482482794ca"
+          "after": "1515646d0b96241a52ec95bc818adefe24f47b60b38d05fd627f440c96fe17c0"
         },
-        "prepare_setup": {
+        "arm_target": {
           "before": null,
-          "after": "361473a5bea017084daa2022fdadb21c3e3b291b3cef55ed4221c11a671061ed"
+          "after": "0b912c3c3564ffabae6a38cf20e6e3573928e6c9f4cf9f4fd040df84c5fba812"
         },
-        "sealed_receipt": {
+        "build_link": {
           "before": null,
-          "after": "b5e8efdf240e3c6af6b6224d0b9819949ee460f43b4ac74f4608f9839ee0b26b"
+          "after": "18d0e491d702d61b83571a10b238d34bc4072bff8cace4881c7348a2825ff5ae"
         },
-        "source_evidence": {
+        "evaluation_groups": {
           "before": null,
-          "after": "da17f8b443681799728a679a94000c04abb955136fcd8a8948c5697c76231f95"
+          "after": "d2e7e508d1cbf6e949b8f23c5e9a98b98688c552c8dd772983dca14922c9b88b"
+        },
+        "verify_report": {
+          "before": null,
+          "after": "8bb069653b130c4d8da3bada8d717ae7886842e529eae0acc8f5d887b98a3c13"
+        },
+        "verify_seal": {
+          "before": null,
+          "after": "b3023f3524162535829f320548d59f980955283d935f9bac9ec04a12b34873a0"
+        }
+      }
+    },
+    "scripts/stage4_policy_target_checks.py": {
+      "before_sha256": null,
+      "after_sha256": "edf9217494bff5e96caa3c699d9a79901a3caecdbed419c69cddacc03c924ea6",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "cb44944d73fcfe956eb6a950e134a8f0bbe96e848edefa8e4b2fcc6644d1f640"
+        },
+        "reproduction": {
+          "before": null,
+          "after": "842f6855b0b7361e5c93c0edacf6cc7e97ab5de8e867d080a7961fa1ff66468c"
+        },
+        "test_evaluation_groups_transitively_keep_families_together": {
+          "before": null,
+          "after": "cfe0dc4f9a30dbc72f464f7327783aa3a9e32b13346a43b308fb79e0851e50f1"
+        },
+        "test_native_acceptance_cannot_move_between_choice_bindings": {
+          "before": null,
+          "after": "f1a31dd823bbcf94f13859692fb2377a33776f27a08e071721ec61906a6b9a11"
+        },
+        "test_prospective_coverage_excludes_unprobed_candidates": {
+          "before": null,
+          "after": "88aa618998945cfc2b36b819b5745a7f3fafe003c6736aeb2ca23160c21533c2"
+        },
+        "test_receipt_cannot_be_replaced_along_with_replay": {
+          "before": null,
+          "after": "7bde11a873ff476d17ec537b21e58fc6be60c2ff38a3652c02de9fd8d648705c"
+        },
+        "test_reproduction_drift_is_refused": {
+          "before": null,
+          "after": "965234a93b9061b1185ddfe7cbd2c4c3b582b0a357f5a8cc101276e6726931a0"
+        },
+        "test_sealed_development_pair_margins_and_interactions": {
+          "before": null,
+          "after": "595970972689e3c1c4ceed4bb41616d1ec7ff4e9af3d0c132743ec964d19670d"
+        },
+        "test_sealed_reproduction_is_admitted": {
+          "before": null,
+          "after": "ff869e5a5e7331c1bb7b1de1baf02d7138719ec014a0b8ba2128720290486235"
         }
       }
     },
     "scripts/stage4_split_objective_replay.py": {
-      "before_sha256": null,
-      "after_sha256": "6fb6e9eaac061139cc02115acbafc867749d50298783d6592de5bfb13160b033",
+      "before_sha256": "6fb6e9eaac061139cc02115acbafc867749d50298783d6592de5bfb13160b033",
+      "after_sha256": "fa633b6ced25593e7626a4351a74661f19a8bc0fbc981e2ea078ede94330b9db",
       "owners": {
         "@module": {
-          "before": null,
-          "after": "2f8eb6de7d50b816288e3419ed545cea1d51eeb69c44badfe3fe5788a12005de"
-        },
-        "candidate_route": {
-          "before": null,
-          "after": "8c84215242a7abf033114953eff33b185f49fd2438dfd036f2e68c1086571a3e"
-        },
-        "drive": {
-          "before": null,
-          "after": "7a7d7a7d8da05cbf62b4d03b2eaaa510e27b9d555522e6fe99ca2ec32c76d09b"
-        },
-        "ordered_candidates": {
-          "before": null,
-          "after": "a9d20328e173f22514c0e24960f08e3cdaa9c64fceb37625e0137618ab6832c9"
+          "before": "2f8eb6de7d50b816288e3419ed545cea1d51eeb69c44badfe3fe5788a12005de",
+          "after": "774382b0556701393e2ee52f3d22a4c35b0d88295fce79405e15e2a89deb8ac6"
         },
         "run": {
-          "before": null,
-          "after": "614d5aae8ebde1cf170d5e74b16605a1a8bda5918ebe838dbfae82a210945ee4"
-        },
-        "score": {
-          "before": null,
-          "after": "d6cd307bb754781daeb6d7bc012300d25f75609ded957cfa74bbe53543c016c4"
-        },
-        "select_move": {
-          "before": null,
-          "after": "75801c69146910ead38e25c2d80acb9e0a6f143a5d7da4e06b446cf9aab4a0fa"
-        },
-        "unit_radius": {
-          "before": null,
-          "after": "952d52fd5dfb657b040f7092b6c2b73d635be66a0feb94f7c149d244f573dfc5"
+          "before": "614d5aae8ebde1cf170d5e74b16605a1a8bda5918ebe838dbfae82a210945ee4",
+          "after": "e35ae64e7a321c60ee69579b197f120d0d48353909a8ebf243461a2a82b7bd49"
         }
       }
     }
@@ -134,15 +150,7 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Documents the locally qualified split-objective development fixture, native route fallback and observed scoring.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "docs/stage4-split-objective-receipt.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Seals the setup milestones and the independent four-arm replay and objective evidence.",
+      "rationale": "Documents the opt-in Layout C input, target, evidence boundaries and invocation.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -150,7 +158,7 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Registers the two opt-in development scripts with the existing Stage 4 benchmark reproduction operation.",
+      "rationale": "Registers the development-only linker and its explicit opt-in checks.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -160,17 +168,27 @@
         "stage4-benchmark-entry-reproducer"
       ],
       "selected_families": [],
-      "rationale": "Adds optional Layout C setup and replay modes to the existing benchmark launcher, preserving its default and archived modes.",
+      "rationale": "Adds an opt-in launcher mode under the existing Layout C replay worker cap.",
       "source_obligation": null,
       "unchanged_work": null
     },
-    "scripts/stage4_split_objective.py": {
+    "scripts/stage4_policy_target.py": {
       "category": "measured_workload",
       "operations": [
         "stage4-benchmark-entry-reproducer"
       ],
       "selected_families": [],
-      "rationale": "Starts and seals the focused development setup through the existing ordinary player facade with a 120-second cap.",
+      "rationale": "Joins exact actor menu and delayed replay outcomes in a development-only evidence record.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "scripts/stage4_policy_target_checks.py": {
+      "category": "measured_workload",
+      "operations": [
+        "stage4-benchmark-entry-reproducer"
+      ],
+      "selected_families": [],
+      "rationale": "Exercises refusal and transitive grouping in explicit local acceptance checks outside default CI.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -180,7 +198,7 @@
         "stage4-benchmark-entry-reproducer"
       ],
       "selected_families": [],
-      "rationale": "Runs a frozen opt-in four-arm protocol through existing candidate, player facade and replay APIs using a fixed local budget.",
+      "rationale": "Captures the actor choice and exact endpoint evidence on the opt-in link path.",
       "source_obligation": null,
       "unchanged_work": null
     }

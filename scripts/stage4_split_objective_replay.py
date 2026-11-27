@@ -6,10 +6,12 @@ import json
 from collections import Counter
 from math import hypot, isclose
 from pathlib import Path
+from typing import cast
 
 from shapely.geometry import Point, Polygon
 
 from scripts import stage4_benchmark_entry as bench
+from scripts import stage4_policy_target as policy_target
 from scripts import stage4_split_objective as fixture
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.ai.finite_candidates import FiniteCandidateSet
@@ -332,8 +334,10 @@ def score(origin: bench.Row, endpoint: bench.Row) -> bench.Row:
     }
 
 
-def run(checkpoint: Path) -> None:
+def run(checkpoint: Path, *, link_policy_target: bool = False) -> None:
     reference = fixture.sealed_receipt()
+    if link_policy_target:
+        policy_target.verify_seal(reference)
     setup_hash = reference["setup_evidence"]["latch"]["checkpoint"]
     stage = "setup_checkpoint"
     arm = "shared"
@@ -371,7 +375,7 @@ def run(checkpoint: Path) -> None:
         fixture.emit("protocol_frozen", **result["protocol"])
         stage = "stem"
         result["stem"] = drive(common, polygons, "stem", arm)
-        origin = common.to_persistence_payload()
+        origin = cast(bench.Row, common.to_persistence_payload())
         result["origin"] = {
             "checkpoint": origin["content_hash"],
             "event_log": origin["event_log_hash"],
@@ -380,6 +384,12 @@ def run(checkpoint: Path) -> None:
             "request_id": bench.actor(common).request["request_id"],
         }
         fixture.emit("origin", **result["origin"])
+        frozen_choice = (
+            policy_target.FrozenChoice.capture(common, bench.actor(common))
+            if link_policy_target
+            else None
+        )
+        endpoints = {}
         stage = "live_admission"
         branches = {}
         for arm, screen, follow in ARMS:
@@ -398,6 +408,12 @@ def run(checkpoint: Path) -> None:
             drive(branch, polygons, "horizon", arm)
             fixture.emit("horizon_reached", arm=arm, records=branch.decision_record_count())
             endpoint = bench.strict_checkpoint(branch)
+            if frozen_choice is not None:
+                bench.require(
+                    fixture.coordinates(bench.actor(branch)) == HORIZON,
+                    f"{arm} reached a mixed or stale link horizon.",
+                )
+                endpoints[arm] = endpoint
             result["arms"][arm].update(
                 score(origin, endpoint), records=branch.decision_record_count()
             )
@@ -431,4 +447,7 @@ def run(checkpoint: Path) -> None:
     if drift:
         fixture.emit("reproduction_drift", fields=sorted(drift))
         raise bench.BenchmarkGap("The Layout C run differs from its sealed four-arm receipt.")
+    if frozen_choice is not None:
+        link = policy_target.build_link(reference, observed, frozen_choice, origin, endpoints)
+        fixture.emit("development_policy_target", **link, link_hash=payload_digest(link))
     fixture.emit("group_result", **result)
