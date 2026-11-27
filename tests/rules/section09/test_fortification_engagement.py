@@ -876,6 +876,27 @@ def test_gnarlmaw_deploys_from_native_development_roster(tmp_path: Path) -> None
     config = _native_gnarlmaw_config(tmp_path)
     session = LocalGameSession()
     session.start(config)
+    manifest = session.support_profile()["capability_manifest"]
+    (cover_row,) = (
+        row for row in manifest["rule_rows"] if row["owner_id"] == "000001470:diseased-cover"
+    )
+    assert cover_row["load_support"] == "generic_rule_ir"
+    assert cover_row["semantic_execution"] == "ir_compiled_unsupported"
+    assert cover_row["metadata"]["diagnostic_reasons"] == [
+        "fortification_cover_allocation_attribution_only"
+    ]
+    assert any(
+        effect["rule_row_id"] == cover_row["row_id"] for effect in manifest["unsupported_effects"]
+    )
+    assert (
+        next(
+            row["status"]
+            for row in manifest["mode_capabilities"]
+            if row["dimension"] == "FULL_GAME_SUPPORTED"
+        )
+        == "unsupported"
+    )
+    assert manifest["certification_claims"]["phase20a_certified"] is False
     status = session.advance_until_decision_or_terminal()
     for kind, choice in (
         ("select_secondary_missions", "fixed:assassination:bring_it_down"),
@@ -1106,3 +1127,194 @@ def test_gnarlmaw_diseased_cover_uses_native_hull_occlusion(tmp_path: Path) -> N
         if expected_blocker is source:
             assert cover.source_feature_ids == source.own_model_ids()
             assert cover.cover_effect is CoverEffect.ATTACKER_BS_MODIFIER
+
+
+def test_gnarlmaw_records_allocation_cover_after_unmodified_hit_roll(tmp_path: Path) -> None:
+    from tests.support.faction_batch01 import Scene, unit_placement
+    from tests.support.private_randomness import fixture_private_rng_seed
+    from tests.support.section04_fixtures import pending
+    from tests.support.section10_fixtures import submit
+    from warhammer40k_core.engine.army_mustering import WarlordSelection, muster_army
+    from warhammer40k_core.engine.attack_sequence_model import HitRollPayload
+    from warhammer40k_core.engine.battle_round_flow import BattleRoundFlow
+    from warhammer40k_core.engine.battlefield_state import BattlefieldRuntimeState, PlacedArmy
+    from warhammer40k_core.engine.game_state import SecondaryMissionChoice, SecondaryMissionMode
+    from warhammer40k_core.engine.phase import GameLifecycleStage
+    from warhammer40k_core.engine.phases.charge import ChargePhaseHandler
+    from warhammer40k_core.engine.phases.command import CommandPhaseHandler
+    from warhammer40k_core.engine.phases.fight import FightPhaseHandler
+    from warhammer40k_core.engine.phases.shooting_handler import ShootingPhaseHandler
+    from warhammer40k_core.engine.saves import SaveOptionPayload
+
+    config = _native_gnarlmaw_config(tmp_path)
+    mission = config.mission_setup
+    assert mission is not None
+    mission = replace(
+        mission,
+        battlefield_layout_id=None,
+        deployment_map_id="gnarlmaw-attack:deployment",
+        terrain_layout_id="gnarlmaw-attack:terrain",
+        battlefield_regions=(),
+        terrain_features=(),
+        terrain_areas=(),
+        objective_terrain_areas=(),
+    )
+    selected_rosters = []
+    for roster, sheets in zip(
+        config.army_muster_requests, (("000001648", GNARLMAW), ("000001120",)), strict=True
+    ):
+        selections = tuple(s for s in roster.unit_selections if s.datasheet_id in sheets)
+        ids = {s.unit_selection_id for s in selections}
+        warlord = next(s for s in selections if s.datasheet_id == sheets[0])
+        selected_rosters.append(
+            replace(
+                roster,
+                unit_selections=selections,
+                unit_points=tuple(p for p in roster.unit_points if p.unit_selection_id in ids),
+                enhancement_assignments=(),
+                enhancement_point_values=(),
+                detachment_selection=replace(roster.detachment_selection, enhancement_ids=()),
+                warlord_selection=WarlordSelection(
+                    model_profile_id=warlord.model_profile_selections[0].model_profile_id,
+                    model_index=1,
+                    unit_selection_id=warlord.unit_selection_id,
+                    source_id="fixture:gnarlmaw-attack-warlord",
+                ),
+            )
+        )
+    config = replace(
+        config,
+        army_muster_requests=tuple(selected_rosters),
+        mission_setup=mission,
+        private_rng_seed=fixture_private_rng_seed("gnarlmaw-dice-1"),
+    )
+    state = GameState.from_config(config)
+    owner, opponent = tuple(
+        muster_army(
+            catalog=config.army_catalog, request=roster, model_geometries=config.model_geometries
+        )
+        for roster in config.army_muster_requests
+    )
+    for army in (owner, opponent):
+        state.record_army_definition(army)
+    shooter = next(u for u in owner.units if u.datasheet_id == "000001648")
+    source = next(u for u in owner.units if u.datasheet_id == GNARLMAW)
+    target = next(u for u in opponent.units if u.datasheet_id == "000001120")
+    state.record_battlefield_state(
+        BattlefieldRuntimeState(
+            config.game_id,
+            mission.battlefield_width_inches,
+            mission.battlefield_depth_inches,
+            placed_armies=(
+                PlacedArmy(
+                    owner.army_id,
+                    owner.player_id,
+                    (
+                        unit_placement(owner.army_id, owner.player_id, shooter, (Pose.at(10, 20),)),
+                        unit_placement(owner.army_id, owner.player_id, source, (Pose.at(15, 20),)),
+                    ),
+                ),
+                PlacedArmy(
+                    opponent.army_id,
+                    opponent.player_id,
+                    (
+                        unit_placement(
+                            opponent.army_id, opponent.player_id, target, (Pose.at(22, 20),)
+                        ),
+                    ),
+                ),
+            ),
+        )
+    )
+    # Construct the shooting boundary with three real, unmodified mustered units.
+    state.stage = GameLifecycleStage.BATTLE
+    state.setup_step_index = None
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.SHOOTING)
+    state.battle_round = 1
+    state.active_player_id = owner.player_id
+    for player in state.player_ids:
+        state.record_secondary_mission_choice(
+            SecondaryMissionChoice(
+                player, SecondaryMissionMode.FIXED, ("assassination", "bring-it-down")
+            )
+        )
+    handler = ShootingPhaseHandler(
+        ruleset_descriptor=config.ruleset_descriptor, army_catalog=config.army_catalog
+    )
+    session = LocalGameSession(
+        GameLifecycle(
+            state=state,
+            _config=config,
+            _shooting_phase_handler=handler,
+            _battle_round_flow=BattleRoundFlow(
+                phase_handlers={
+                    BattlePhase.COMMAND: CommandPhaseHandler(
+                        ruleset_descriptor=config.ruleset_descriptor,
+                        army_catalog=config.army_catalog,
+                    ),
+                    BattlePhase.MOVEMENT: MovementPhaseHandler(
+                        ruleset_descriptor=config.ruleset_descriptor,
+                        army_catalog=config.army_catalog,
+                    ),
+                    BattlePhase.SHOOTING: handler,
+                    BattlePhase.CHARGE: ChargePhaseHandler(
+                        ruleset_descriptor=config.ruleset_descriptor
+                    ),
+                    BattlePhase.FIGHT: FightPhaseHandler(
+                        ruleset_descriptor=config.ruleset_descriptor,
+                        army_catalog=config.army_catalog,
+                    ),
+                },
+                ruleset_descriptor=config.ruleset_descriptor,
+                army_catalog=config.army_catalog,
+            ),
+        )
+    )
+    anchor(Scene(session, state, {}))
+    handler.begin_phase(state=state, decisions=session.lifecycle.decision_controller)
+    if pending(session).decision_type == "start_mission_action":
+        choose_shooting(session, pending(session), "continue_to_shooting")
+    request = declaration_request(session, shooter, "normal")
+    lash = next(
+        row for row in weapon_rows(request) if row["wargear_id"] == "000001648:lash-of-slaanesh"
+    )
+    assert_valid(submit(session, [lash], [target.unit_instance_id], "normal"))
+    finish_attacks(session)
+    steps = events(session, "attack_sequence_step")
+    natural_two_hits = {
+        step["attack_context_id"]: index
+        for index, step in enumerate(steps)
+        if step["step"] == "hit" and cast(HitRollPayload, step["payload"])["unmodified_roll"] == 2
+    }
+    ((save_index, step),) = (
+        (index, step)
+        for index, step in enumerate(steps)
+        if step["step"] == "save" and step["attack_context_id"] in natural_two_hits
+    )
+    hit_index = natural_two_hits[step["attack_context_id"]]
+    assert hit_index < save_index
+    hit = cast(HitRollPayload, steps[hit_index]["payload"])
+    assert hit["target_number"] == 2
+    assert hit["capped_modifier"] == 0
+    assert hit["successful"] is True
+    roll = hit["roll_state"]
+    assert roll is not None
+    assert roll["original_result"]["spec"]["roll_type"] == "attack_sequence.hit"
+    assert roll["original_result"]["source"] == "rng"
+    assert roll["original_result"]["values"] == [2]
+
+    save = step["payload"]
+    assert isinstance(save, dict)
+    assert save["allocated_model_id"] == target.own_model_ids()[0]
+    assert save["target_number"] == 4
+    (armour,) = (
+        option
+        for option in cast(list[SaveOptionPayload], save["save_options"])
+        if option["save_kind"] == "armour"
+    )
+    assert armour["target_number"] == 7
+    assert armour["cover_applied"] is False
+    cover = armour["cover_result"]
+    assert cover is not None
+    assert cover["source_feature_ids"] == list(source.own_model_ids())
+    assert cover["cover_effect"] == "attacker_bs_modifier"

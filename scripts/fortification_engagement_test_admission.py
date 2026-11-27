@@ -33,6 +33,14 @@ DEVELOPMENT_PREIMAGES = {
         "e3eb1851835eeef4f0b88bf443cf74fcd47257e7024fb06044777c602145deee"
     ),
 }
+ALLOCATION_RECEIPT = "data/source_audits/ci64_provenance_v1/gnarlmaw-allocation-test-v1.json"
+ALLOCATION_RECEIPT_SHA256 = "f55d16d2594073381a50616806ddf5358d9f75be2cdad1d98a45e6b5db9b3935"
+ALLOCATION_BASE = "f106e9d80b7d9170bdf08c6cad8189dcdff8e169"
+ALLOCATION_PREIMAGES = {
+    "src/warhammer40k_core/engine/ability_coverage.py": (
+        "01f751c83cfcc153547830ee37f304b0e1d9479bbd855f1d6ddbc313d35c216d"
+    ),
+}
 ROTATION_SOURCES = {
     "src/warhammer40k_core/engine/phases/movement_geometry.py",
     "src/warhammer40k_core/geometry/physical_predicates.py",
@@ -236,8 +244,28 @@ def _fortification_current_receipt(
             DEVELOPMENT_PREIMAGES,
         ),
     )
-    if development is not None:
-        receipt, successor_raw = development
+    if development is None:
+        if (root / ALLOCATION_RECEIPT).exists():
+            raise SystemExit("Gnarlmaw allocation requires the exact development predecessor.")
+        return receipt, raw
+    receipt, successor_raw = development
+    raw += b"\0" + successor_raw
+    allocation = _fortification_successor(
+        root,
+        receipt,
+        _Successor(
+            ALLOCATION_RECEIPT,
+            ALLOCATION_RECEIPT_SHA256,
+            ALLOCATION_BASE,
+            "finite-gnarlmaw-allocation-test-v1",
+            DEVELOPMENT_RECEIPT_SHA256,
+            1,
+            set(ALLOCATION_PREIMAGES),
+            ALLOCATION_PREIMAGES,
+        ),
+    )
+    if allocation is not None:
+        receipt, successor_raw = allocation
         raw += b"\0" + successor_raw
     return receipt, raw
 

@@ -4780,12 +4780,14 @@ def _chaos_daemons_nurgle_review_rows() -> tuple[DatasheetGroupReviewRow, ...]:
                 "Native development catalog supports order-of-battle selection and "
                 "Infiltrators deployment. Shroud of Flies uses the shared Stealth aura. "
                 "Fortification uses the shared targeting, Hit-roll and Fall Back exceptions. "
-                "Diseased Cover attributes partial occlusion to the source model at allocation."
+                "Diseased Cover provides allocation attribution only."
             ),
             semantics_needed=(
-                "The faction pack grants Diseased Cover at allocation. The 11th-edition "
-                "Ballistic Skill penalty applies earlier, at the Hit roll. The allocation "
-                "evidence neither changes that roll retroactively nor provides a Save bonus."
+                "The faction pack grants cover at allocation, after the Hit roll that uses "
+                "11th-edition Ballistic Skill. The attack modifier remains unresolved. "
+                "The capability manifest reports the rule's semantic execution as unsupported. "
+                "The terrain-only allocation trace lists the model ID as `industrial_structures`. "
+                "Independently qualifying terrain takes precedence in that trace."
             ),
             catalog_blockers=(
                 "Andrzej's owner-approved 120 x 90 mm oval and 4.0-inch (101.6 mm) "

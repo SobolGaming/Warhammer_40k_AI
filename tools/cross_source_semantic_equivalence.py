@@ -15,6 +15,9 @@ from warhammer40k_core.engine.ability_coverage import (
     ability_clause_coverage_rows_for_rule_ir,
     ability_support_rollup_for_rule_ir,
 )
+from warhammer40k_core.engine.catalog_contextual_status_consumption import (
+    CATALOG_IR_FORTIFICATION_COVER_CONSUMER_ID,
+)
 from warhammer40k_core.engine.semantic_equivalence import (
     CrossSourceSemanticAudit,
     SemanticContentKind,
@@ -504,7 +507,10 @@ def _datasheet_ability_members(
             ),
             rule_ir=rule_ir,
         )
-        if rollup.overall_ability_support is AbilityOverallSupport.FULL and runtime_consumer_ids:
+        if CATALOG_IR_FORTIFICATION_COVER_CONSUMER_ID in runtime_consumer_ids:
+            status = SemanticExecutionStatus.BLOCKED_STRUCTURED_SEMANTICS
+            transfer = SemanticSupportTransfer.NONE
+        elif rollup.overall_ability_support is AbilityOverallSupport.FULL and runtime_consumer_ids:
             status = SemanticExecutionStatus.ENGINE_CONSUMED
             transfer = SemanticSupportTransfer.CONTENT_NEUTRAL_GENERIC_IR
         elif rule_ir.is_supported:
@@ -900,6 +906,11 @@ def _member_label(member: SemanticEquivalenceMember) -> str:
 
 
 def _group_conclusion(group: SemanticEquivalenceGroup) -> str:
+    if CATALOG_IR_FORTIFICATION_COVER_CONSUMER_ID in group.runtime_consumer_ids:
+        return (
+            "Allocation attribution only. The 11th-edition attack modifier remains "
+            "unresolved and gameplay support does not transfer."
+        )
     if group.support_transfer is SemanticSupportTransfer.CONTENT_NEUTRAL_GENERIC_IR:
         consumers = ", ".join(f"`{value}`" for value in group.runtime_consumer_ids)
         return f"Engine-consumed through content-neutral generic RuleIR: {consumers}."

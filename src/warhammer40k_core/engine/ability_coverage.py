@@ -15,6 +15,9 @@ from warhammer40k_core.core.datasheet import (
     DatasheetAbilityDescriptor,
     DatasheetDefinition,
 )
+from warhammer40k_core.engine.catalog_contextual_status_consumption import (
+    CATALOG_IR_FORTIFICATION_COVER_CONSUMER_ID,
+)
 from warhammer40k_core.engine.catalog_descriptor_consumption import (
     catalog_descriptor_consumption_for,
 )
@@ -64,6 +67,8 @@ class AbilityOverallSupport(StrEnum):
     PARSED = "Parsed"
     UNSUPPORTED = "Unsupported"
 
+
+ALLOCATION_COVER_TIMING_DIAGNOSTIC = "fortification_cover_allocation_attribution_only"
 
 _CONTEXTUAL_CLAUSE_WIDE_CONSUMER_IDS = frozenset(
     {
@@ -558,7 +563,10 @@ def ability_coverage_row_for_descriptor(
         ),
         semantic_categories=_semantic_categories(ability=ability, rule_ir=rule_ir),
         runtime_consumer_ids=consumer_ids,
-        diagnostic_reasons=_diagnostic_reasons(ability),
+        diagnostic_reasons=(
+            *_diagnostic_reasons(ability),
+            *_allocation_cover_diagnostics(consumer_ids),
+        ),
     )
 
 
@@ -930,10 +938,13 @@ def _clause_coverage_row(
             clause=clause,
             effect_runtime_consumer_ids=effect_runtime_consumer_ids,
         ),
-        diagnostics=tuple(
-            f"{diagnostic.reason.value}:{diagnostic.source_span.start}-"
-            f"{diagnostic.source_span.end}:{diagnostic.message}"
-            for diagnostic in clause.diagnostics
+        diagnostics=(
+            *_allocation_cover_diagnostics(runtime_consumer_ids),
+            *tuple(
+                f"{diagnostic.reason.value}:{diagnostic.source_span.start}-"
+                f"{diagnostic.source_span.end}:{diagnostic.message}"
+                for diagnostic in clause.diagnostics
+            ),
         ),
     )
 
@@ -972,12 +983,20 @@ def _effect_runtime_consumer_ids(
     )
 
 
+def _allocation_cover_diagnostics(consumer_ids: tuple[str, ...]) -> tuple[str, ...]:
+    if CATALOG_IR_FORTIFICATION_COVER_CONSUMER_ID in consumer_ids:
+        return (ALLOCATION_COVER_TIMING_DIAGNOSTIC,)
+    return ()
+
+
 def _clause_support_stage(
     *,
     clause: RuleClause,
     effect_runtime_consumer_ids: tuple[tuple[str, ...], ...],
 ) -> AbilityCoverageSupportStage:
-    if not clause.is_supported:
+    if not clause.is_supported or any(
+        _allocation_cover_diagnostics(consumers) for consumers in effect_runtime_consumer_ids
+    ):
         return AbilityCoverageSupportStage.IR_COMPILED_UNSUPPORTED
     if effect_runtime_consumer_ids and all(effect_runtime_consumer_ids):
         return AbilityCoverageSupportStage.ENGINE_CONSUMED
