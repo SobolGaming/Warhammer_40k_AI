@@ -1159,8 +1159,8 @@ def main() -> None:
     )
     modes.add_argument(
         "--split-objective",
-        choices=("prepare", "replay"),
-        help="Latch or replay the four-arm Layout C development pilot.",
+        choices=("prepare", "replay", "link"),
+        help="Latch, replay, or link the verified Layout C development choices to targets.",
     )
     parser.add_argument("--checkpoint", type=Path, help="Layout C setup checkpoint path.")
     parser.add_argument("--worker", action="store_true", help=argparse.SUPPRESS)
@@ -1197,13 +1197,18 @@ def main() -> None:
 def split_objective(mode: str, checkpoint: Path, *, worker: bool) -> None:
     if mode == "prepare":
         from scripts.stage4_split_objective import PREPARE_SECONDS as cap
-        from scripts.stage4_split_objective import prepare as work
     else:
         from scripts.stage4_split_objective_replay import WALL_SECONDS as cap
-        from scripts.stage4_split_objective_replay import run as work
 
     if worker:
-        work(checkpoint)
+        if mode == "prepare":
+            from scripts.stage4_split_objective import prepare
+
+            prepare(checkpoint)
+        else:
+            from scripts.stage4_split_objective_replay import run
+
+            run(checkpoint, link_policy_target=mode == "link")
     else:
         run_worker(
             ["--split-objective", mode, "--checkpoint", str(checkpoint)],

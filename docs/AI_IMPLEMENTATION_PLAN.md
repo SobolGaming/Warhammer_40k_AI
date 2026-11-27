@@ -1646,6 +1646,43 @@ All four arms restored and replayed exactly and retained three living models,
 15 wounds and zero active RNG draws. This one-seed group is development-only
 and yields zero training rows.
 
+### Layout C policy input and delayed target
+
+Use the existing setup checkpoint from `--split-objective prepare` for this
+opt-in, offline link. The worker freezes the actor's round-two movement
+decision before forking, and emits one `development_policy_target` line only
+after the four strict replays and their receipts agree with #765.
+
+```sh
+PYTHONPATH=src:. uv run --no-sync python -B -m scripts.stage4_benchmark_entry \
+  --split-objective link --checkpoint /tmp/stage4-split-setup.json
+PYTHONPATH=src:. uv run --no-sync pytest -q --no-cov -p no:cacheprovider \
+  scripts/stage4_policy_target_checks.py
+```
+
+The policy input contains the existing semantic observation's finite option
+count and the ordered, generic movement action IDs issued at the sealed
+prefix. The count is the only model feature. A separate hash commits to
+the policy input alone. Native proposal IDs, observation and replay hashes,
+seed and source identities stay in evidence. The finite action request and
+selection are recorded separately from the child proposal request and commit.
+The receipt records which geometry proposals were accepted or rejected by
+the original capped live protocol, which was committed, what the cap left
+unprobed, and the number excluded by the geometry predicates. Reproduction
+checks the raw menu fingerprint. Legality evidence comes from native
+acceptance. The targets attach to the committed Screen path and its matched
+Hold control. The remaining issued finite options are unlabelled.
+
+Targets are changes in each side's VP, surviving models and remaining
+wounds from the common origin to the first A3 Movement offer after Command
+scoring. Screen minus Hold is paired within each ally policy, with ally
+omission and ally follow-through kept separate. Layout C contributes one
+development evaluation group. Source, geometry family and verified trajectory
+bindings connect overlapping families transitively. Future partition
+assignments must keep every connected component intact and admit separately
+sourced reserve families before any reserve scores are examined. The link
+emits zero training rows.
+
 ## 7. Performance and evaluation before scaling
 
 Measure the actual headless workload, with and without the reference transport under matched conditions:
