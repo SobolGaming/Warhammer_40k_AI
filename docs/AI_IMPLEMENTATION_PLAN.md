@@ -1660,18 +1660,39 @@ PYTHONPATH=src:. uv run --no-sync pytest -q --no-cov -p no:cacheprovider \
   scripts/stage4_policy_target_checks.py
 ```
 
-The policy input contains the existing semantic observation's finite option
-count and the ordered, generic movement action IDs issued at the sealed
-prefix. The count is the only model feature. A separate hash commits to
-the policy input alone. Native proposal IDs, observation and replay hashes,
-seed and source identities stay in evidence. The finite action request and
-selection are recorded separately from the child proposal request and commit.
-The receipt records which geometry proposals were accepted or rejected by
-the original capped live protocol, which was committed, what the cap left
-unprobed, and the number excluded by the geometry predicates. Reproduction
-checks the raw menu fingerprint. Legality evidence comes from native
-acceptance. The targets attach to the committed Screen path and its matched
-Hold control. The remaining issued finite options are unlabelled.
+The link uses `stage4-development-policy-target-v2`. Its `feature_columns`
+pins the order of both numeric vectors. The finite `policy_input` begins
+with the issued option count and carries the ordered generic action IDs
+alongside the vector. The `movement_offer_input` is captured on the actual
+Screen Normal Move child request, before proposal generation and native
+probing. It contains only the four shared tactical columns. Both Screen arms
+must reproduce the same child binding. Hold and Advance have no child row in
+this link. Each input has its own hash in the evidence.
+
+| Shared column | Measurement |
+| --- | --- |
+| `visible_contact_oc_margin` | Sum of visible current OC for all friendly models touching the linked objective, minus the corresponding opponent sum. A model touching either or both linked areas contributes once. |
+| `acting_unit_gap_inches` | Minimum horizontal footprint gap from a placed model in the acting rules unit to the linked objective. |
+| `other_ally_gap_inches` | Minimum horizontal footprint gap for another placed friendly model to that same objective. |
+| `opponent_gap_inches` | Minimum horizontal footprint gap for a placed visible opponent model to that same objective. |
+
+The reference objective is the one with the smallest unrounded acting-unit
+gap. When objectives tie, use the lowest visible OC margin and each side's
+shortest gap across the tied objectives. Gaps are rounded to four decimal
+places after geometry and contact checks. A missing side's gap or an unknown
+contacting model's OC is null. Missing linked geometry, an unavailable
+acting-unit placement, or unsupported visible model geometry leaves all
+four columns null. This schema uses centered circular, oval and rectangular
+footprints from the actor's battlefield projection. It measures horizontal
+spacing and visible OC at contact. Native rules determine legal paths and
+objective ownership, including modifiers and persistent control.
+
+Observation and replay hashes, source and request IDs, seed, policy settings,
+proposal IDs, future scores and native verdicts stay in evidence or delayed
+targets. The link retains native acceptance and rejection, the commit,
+unprobed cap losses, and geometry exclusions. The targets attach to the
+committed Screen path and its matched Hold control. The remaining issued
+options and unplayed proposals are unlabelled.
 
 Targets are changes in each side's VP, surviving models and remaining
 wounds from the common origin to the first A3 Movement offer after Command
@@ -1682,6 +1703,31 @@ bindings connect overlapping families transitively. Future partition
 assignments must keep every connected component intact and admit separately
 sourced reserve families before any reserve scores are examined. The link
 emits zero training rows.
+
+The three known development origins issue the same three finite options.
+Their tactical inputs capture different current situations.
+
+| Development origin | Visible OC margin | Acting gap (in) | Other ally gap (in) | Opponent gap (in) |
+| --- | ---: | ---: | ---: | ---: |
+| West | 0 | 8.3601 | 1.4878 | 23.8695 |
+| Guard | +4 | 0.0000 | 13.4952 | 0.0000 |
+| Layout C | 0 | 0.4626 | 0.2126 | 0.1126 |
+
+Guard already has both sides in contact. Layout C has both sides close
+and out of contact, while West's other ally is substantially nearer than
+the opponent. At the Layout C Screen child offer, the same tactical values
+are measured anew from the unchanged board. These comparisons characterize
+the pre-choice position. Prediction and ranking require a separate evaluation.
+
+Freeze and admit reserved connected components from independently sourced
+layouts and objective geometry, with examples of empty, contested and
+already held linked objectives. Include earlier and later intervention
+windows with the same response opportunity and a declared common scoring
+horizon. Compare further opponent rules, including a passive control and
+an active alternate route, with matched ally omission and follow-through.
+Keep timing, response, seed, side-swap and repeated trajectories within
+their source and geometry components. Predeclare the live cap, eligibility,
+horizon and chance handling before opening any reserved labels.
 
 ## 7. Performance and evaluation before scaling
 

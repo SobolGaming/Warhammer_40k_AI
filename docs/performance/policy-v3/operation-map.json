@@ -35988,7 +35988,8 @@
         "scripts/stage4_split_objective.py",
         "scripts/stage4_split_objective_replay.py",
         "scripts/stage4_policy_target.py",
-        "scripts/stage4_policy_target_checks.py"
+        "scripts/stage4_policy_target_checks.py",
+        "scripts/stage4_tactical_features.py"
       ],
       "owners": [
         "*"

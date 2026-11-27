@@ -5,6 +5,12 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from scripts import stage4_benchmark_entry as bench
+from scripts.stage4_tactical_features import (
+    FINITE_COLUMNS,
+    TACTICAL_COLUMNS,
+    TacticalInputs,
+    tactical_inputs,
+)
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.ai.finite_candidates import FiniteCandidateSet
 from warhammer40k_core.ai.player_policy import PlayerDecisionContext, payload_digest
@@ -20,6 +26,7 @@ PAIRS = (("hold-omit", "screen-omit"), ("hold-follow", "screen-follow"))
 class FrozenChoice:
     observation: SemanticObservation
     finite: FiniteCandidateSet
+    tactics: TacticalInputs
     authoritative_request_id: str
 
     @classmethod
@@ -40,13 +47,43 @@ class FrozenChoice:
             {bench.HOLD, bench.NORMAL} <= set(finite.candidate_ids) <= stable_ids,
             "Layout C finite menu is missing a control or contains a non-generic action ID.",
         )
-        return cls(observation, finite, pending.request_id)
+        return cls(observation, finite, tactical_inputs(context), pending.request_id)
 
     def policy_input(self) -> bench.Row:
         return {
-            "model_inputs": list(self.observation.model_inputs),
+            "model_inputs": [*self.observation.model_inputs, *self.tactics],
             "legal_action_ids": list(self.finite.candidate_ids),
         }
+
+
+@dataclass(frozen=True, slots=True)
+class FrozenMovementOffer:
+    tactics: TacticalInputs
+    request_id: str
+    authoritative_request_id: str
+    observation_hash: str
+
+    @classmethod
+    def capture(
+        cls, session: LocalGameSession, context: PlayerDecisionContext
+    ) -> FrozenMovementOffer:
+        pending = session.lifecycle.pending_decision_request()
+        bench.require(
+            pending is not None
+            and context == bench.actor(session)
+            and context.request["is_parameterized"],
+            "Expected a pending child movement offer.",
+        )
+        assert pending is not None
+        return cls(
+            tactical_inputs(context),
+            context.request["request_id"],
+            pending.request_id,
+            context.observation_hash,
+        )
+
+    def policy_input(self) -> bench.Row:
+        return {"model_inputs": list(self.tactics)}
 
 
 def verify_seal(reference: bench.Row) -> None:
@@ -107,7 +144,11 @@ def _material(checkpoint: bench.Row, player: str) -> tuple[int, int]:
 
 
 def arm_target(
-    choice: FrozenChoice, origin: bench.Row, endpoint: bench.Row, arm: bench.Row
+    choice: FrozenChoice,
+    movement_offer: FrozenMovementOffer,
+    origin: bench.Row,
+    endpoint: bench.Row,
+    arm: bench.Row,
 ) -> bench.Row:
     """Use the strict endpoint checkpoint and prove its first action shares the origin."""
     start, stop = (cp["replay_artifact"] for cp in (origin, endpoint))
@@ -139,7 +180,15 @@ def arm_target(
     )
     if finite_id == bench.NORMAL:
         bench.require(len(records) > len(prefix) + 1, "Screen proposal record is missing.")
-        proposal = records[len(prefix) + 1]["result"]["payload"]
+        child = records[len(prefix) + 1]
+        bench.require(
+            child["request"]["request_id"] == movement_offer.authoritative_request_id
+            and child["request"]["actor_id"] == choice.finite.actor_id
+            and menu["proposal_request_id"] == movement_offer.request_id
+            and menu["actor_view_hash"] == movement_offer.observation_hash,
+            "Stage 4 Screen proposal does not share the captured child offer.",
+        )
+        proposal = child["result"]["payload"]
         shape = {key: value for key, value in proposal.items() if key != "proposal_request_id"}
         bench.require(
             menu["selected"] == "normal-move:" + payload_digest(shape)
@@ -200,6 +249,7 @@ def build_link(
     reference: bench.Row,
     observed: bench.Row,
     choice: FrozenChoice,
+    movement_offer: FrozenMovementOffer,
     origin: bench.Row,
     endpoints: dict[str, bench.Row],
 ) -> bench.Row:
@@ -213,7 +263,10 @@ def build_link(
     )
     live_screen = [_candidate_coverage(arms[screen]["menus"][0]) for _, screen in PAIRS]
     bench.require(live_screen[0] == live_screen[1], "Screen proposal changed across matched arms.")
-    targets = {name: arm_target(choice, origin, endpoints[name], arm) for name, arm in arms.items()}
+    targets = {
+        name: arm_target(choice, movement_offer, origin, endpoints[name], arm)
+        for name, arm in arms.items()
+    }
     pairs = {}
     for control, screen in PAIRS:
         pairs[screen.removeprefix("screen-")] = {
@@ -241,11 +294,17 @@ def build_link(
         }
     )
     policy_input = choice.policy_input()
+    movement_offer_input = movement_offer.policy_input()
     return {
-        "schema": "stage4-development-policy-target-v1",
+        "schema": "stage4-development-policy-target-v2",
         "partition": "development",
         "training_rows": 0,
+        "feature_columns": {
+            "policy_input": list(FINITE_COLUMNS),
+            "movement_offer_input": list(TACTICAL_COLUMNS),
+        },
         "policy_input": policy_input,
+        "movement_offer_input": movement_offer_input,
         "delayed_targets": {
             "units": {"vp": "VP", "living_models": "models", "wounds": "wounds"},
             "deltas_from_origin": targets,
@@ -264,6 +323,11 @@ def build_link(
             "origin": observed["origin"],
             "observation": choice.observation.to_payload(),
             "policy_input_hash": payload_digest(policy_input),
+            "movement_offer_input_hash": payload_digest(movement_offer_input),
+            "movement_offer_binding": {
+                "request_id": movement_offer.request_id,
+                "observation_hash": movement_offer.observation_hash,
+            },
             "finite_menu_hash": choice.finite.content_hash,
             "finite_menu_evidence": "reproduced-from-sealed-pending-request",
             "horizon": protocol["horizon"],
