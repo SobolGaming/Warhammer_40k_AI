@@ -1760,6 +1760,7 @@ def test_fortification_transition_rejects_source_and_case_drift(tmp_path: Path) 
         fortification.DEVELOPMENT_RECEIPT,
         fortification.ALLOCATION_RECEIPT,
         fortification.TYPING_RECEIPT,
+        fortification.CATALOG_SOURCE_RECEIPT,
         MANIFEST,
         fortification.OWNER,
         *sorted(
@@ -1767,6 +1768,7 @@ def test_fortification_transition_rejects_source_and_case_drift(tmp_path: Path) 
             | fortification.RETRY_SOURCES
             | fortification.DEVELOPMENT_PREIMAGES.keys()
             | fortification.ALLOCATION_PREIMAGES.keys()
+            | fortification.CATALOG_SOURCE_PREIMAGES.keys()
         ),
     )
     for name in members:

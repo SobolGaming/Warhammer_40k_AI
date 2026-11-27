@@ -38992,6 +38992,7 @@
       "paths": [
         "data/source_audits/ci64_provenance_v1/gnarlmaw-allocation-test-v1.json",
         "data/source_audits/ci64_provenance_v1/gnarlmaw-development-test-v1.json",
+        "data/source_audits/ci64_provenance_v1/gnarlmaw-source-test-v1.json",
         "data/source_audits/ci64_provenance_v1/gnarlmaw-test-typing-v1.json",
         "data/source_audits/feculent_gnarlmaw_2026_11/geometry.json"
       ],
@@ -39076,6 +39077,7 @@
       "owners": [
         "@module",
         "_geometry",
+        "_reviewed_source_rows",
         "build_catalog_package",
         "main"
       ],

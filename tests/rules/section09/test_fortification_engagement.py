@@ -948,6 +948,15 @@ def test_gnarlmaw_deploys_from_native_development_roster(tmp_path: Path) -> None
     army = next(a for a in state.army_definitions if a.player_id == "player-a")
     assert army.roster_legality_report.is_legal
     unit = next(u for u in army.units if u.datasheet_id == GNARLMAW)
+    assert unit.keywords == (
+        "CHAOS",
+        "DAEMON",
+        "FECULENT GNARLMAW",
+        "FORTIFICATION",
+        "FRAME",
+        "NURGLE",
+    )
+    assert unit.faction_keywords == ("LEGIONES DAEMONICA",)
     (model,) = unit.own_models
     assert not model.wargear_ids
     geometries = config.model_geometries

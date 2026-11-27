@@ -45,6 +45,21 @@ TYPING_RECEIPT = "data/source_audits/ci64_provenance_v1/gnarlmaw-test-typing-v1.
 TYPING_RECEIPT_SHA256 = "3edf827ba489182f3522315588789e03b22957a047887195dc36ec976c94c01d"
 TYPING_BASE = "e8f79d797aa99c1f4e40b1609df7580a480bb3f2"
 TYPING_INACTIVE_OWNER = "tests/unit/test_skull_altar_runtime_regressions.py"
+CATALOG_SOURCE_RECEIPT = "data/source_audits/ci64_provenance_v1/gnarlmaw-source-test-v1.json"
+CATALOG_SOURCE_RECEIPT_SHA256 = "5e395e78befc9c49490658852563516e3da2d144f8d6b9e3e6ec4966fdb3f7e3"
+CATALOG_SOURCE_BASE = "dffa47e8ab1d8243028c878da4a7a28a3b843c6d"
+GNARLMAW_PACKAGE_PATH = (
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/"
+    "chaos_daemons_gnarlmaw_2026_11"
+)
+CATALOG_SOURCE_PREIMAGES = {
+    f"{GNARLMAW_PACKAGE_PATH}/__init__.py": (
+        "01efb3ac32057e2c1784f43082f094908d8fc5ed5b4ba32d2248b3bc7915baa5"
+    ),
+    f"{GNARLMAW_PACKAGE_PATH}/artifacts/catalog.json": (
+        "15864f07cf2a3a0d179cf43f74f5b4b8a712748c388566d1f70b0cffc25e329a"
+    ),
+}
 ROTATION_SOURCES = {
     "src/warhammer40k_core/engine/phases/movement_geometry.py",
     "src/warhammer40k_core/geometry/physical_predicates.py",
@@ -291,8 +306,28 @@ def _fortification_current_receipt(
             {},
         ),
     )
-    if typing is not None:
-        receipt, successor_raw = typing
+    if typing is None:
+        if (root / CATALOG_SOURCE_RECEIPT).exists():
+            raise SystemExit("Gnarlmaw catalog sources require the exact typing predecessor.")
+        return receipt, raw
+    receipt, successor_raw = typing
+    raw += b"\0" + successor_raw
+    source = _fortification_successor(
+        root,
+        receipt,
+        _Successor(
+            CATALOG_SOURCE_RECEIPT,
+            CATALOG_SOURCE_RECEIPT_SHA256,
+            CATALOG_SOURCE_BASE,
+            "finite-gnarlmaw-source-test-v1",
+            TYPING_RECEIPT_SHA256,
+            0,
+            set(CATALOG_SOURCE_PREIMAGES),
+            CATALOG_SOURCE_PREIMAGES,
+        ),
+    )
+    if source is not None:
+        receipt, successor_raw = source
         raw += b"\0" + successor_raw
     return receipt, raw
 

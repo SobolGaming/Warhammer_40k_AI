@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import cast
 
 from tools import generate_chaos_daemons_roster_catalog as historical
+from tools.generate_cavalcade_v995_catalog import _promote  # pyright: ignore[reportPrivateUsage]
 from warhammer40k_core.core.model_geometry_catalog import (
     GeometryEvidenceKind,
     GeometryMeasurementKind,
@@ -43,7 +44,10 @@ from warhammer40k_core.rules.wahapedia_bridge_defaults import (
     DEFAULT_HEIGHT_OVERRIDES,
     ModelHeightOverride,
 )
+from warhammer40k_core.rules.wahapedia_bridge_rows import SelectedSourceRows, bridge_rows_by_table
 from warhammer40k_core.rules.wahapedia_schema import (
+    NormalizedSourceRow,
+    NormalizedSourceRowPayload,
     WahapediaJsonArtifact,
     WahapediaJsonArtifactPayload,
 )
@@ -69,6 +73,11 @@ PACKAGE = DataPackageId(
 BRIDGE_PACKAGE = DataPackageId(
     namespace="core-v2", package_name="chaos-daemons-gnarlmaw-bridge", version="2026-11"
 )
+REVIEWED_DATASHEET_SOURCE = DataPackageId(
+    namespace="core-v2", package_name="chaos-daemons-gnarlmaw-reviewed-datasheet", version="2026-11"
+)
+RETAINED_DATASHEET_SHA256 = "e637f6662a425d0b32e1fad52f3de8a714b0202eac693059c1f0231b9a71724c"
+BRIDGE_DATASHEETS = ("000001148", gnarlmaw.DATASHEET_ID)
 VERSION = CatalogVersion.dated(
     version_id="warhammer-40000-11th-chaos-daemons-gnarlmaw", source_date=date(2026, 11, 27)
 )
@@ -130,6 +139,36 @@ def _geometry() -> ModelGeometryCatalogRecord:
     )
 
 
+def _reviewed_source_rows(artifacts: tuple[WahapediaJsonArtifact, ...]) -> SelectedSourceRows:
+    retained_digest = historical._generator_input_datasheet_payload_hash(  # pyright: ignore[reportPrivateUsage]
+        source_artifacts=artifacts, datasheet_id=gnarlmaw.DATASHEET_ID
+    )
+    if retained_digest != RETAINED_DATASHEET_SHA256:
+        raise ValueError("Gnarlmaw reviewed generator rows drifted.")
+
+    rows_by_table = bridge_rows_by_table(artifacts, error_type=ValueError)
+    old_identity = historical.EXPECTED_GENERATOR_INPUT_PACKAGE_ID.stable_identity()
+    tables: list[tuple[str, tuple[NormalizedSourceRow, ...]]] = []
+    for table, rows in rows_by_table.items():
+        reviewed_rows: list[NormalizedSourceRow] = []
+        for row in rows:
+            if row.source_row_id.partition(":")[0] != gnarlmaw.DATASHEET_ID:
+                reviewed_rows.append(row)
+                continue
+            # The July pack omits this retired keyword. FRAME comes from the PDF correction.
+            if (
+                table == "Datasheets_keywords"
+                and row.runtime_fields_payload()["keyword"] == "Shadow Legion"
+            ):
+                continue
+            payload = _promote(row.to_payload(), old_identity, REVIEWED_DATASHEET_SOURCE)
+            reviewed_rows.append(
+                NormalizedSourceRow.from_payload(cast(NormalizedSourceRowPayload, payload))
+            )
+        tables.append((table, tuple(reviewed_rows)))
+    return SelectedSourceRows(tuple(tables), BRIDGE_DATASHEETS)
+
+
 def build_catalog_package() -> CanonicalCatalogPackage:
     base = predecessor.catalog_package()
     if hashlib.sha256(FACTION_PDF.read_bytes()).hexdigest() != reviewed.OFFICIAL_PDF_SHA256:
@@ -153,9 +192,9 @@ def build_catalog_package() -> CanonicalCatalogPackage:
     # Include existing Be'lakor in the bridge build because the canonical builder
     # requires a nonempty wargear table. Its existing catalog entry is retained.
     bridge = build_wahapedia_canonical_bridge_artifacts(
-        source_artifacts=artifacts,
+        source_artifacts=_reviewed_source_rows(artifacts),
         bridge_package_id=BRIDGE_PACKAGE,
-        datasheet_ids=("000001148", gnarlmaw.DATASHEET_ID),
+        datasheet_ids=BRIDGE_DATASHEETS,
         height_overrides=(
             *DEFAULT_HEIGHT_OVERRIDES,
             ModelHeightOverride(

@@ -15,7 +15,7 @@ DATASHEET_ID: Final = "000001470"
 PROFILE_ID: Final = f"{DATASHEET_ID}:feculent-gnarlmaw"
 CATALOG_ID: Final = "core-v2:chaos-daemons-gnarlmaw:2026-11"
 PACKAGE_ID: Final = f"data-package:{CATALOG_ID}"
-CATALOG_SHA256: Final = "15864f07cf2a3a0d179cf43f74f5b4b8a712748c388566d1f70b0cffc25e329a"
+CATALOG_SHA256: Final = "b9ad28049e5de7731bc5b47f762e903bc70e121890eda011ad149b03a877b346"
 
 
 @cache
