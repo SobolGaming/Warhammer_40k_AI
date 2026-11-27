@@ -1172,6 +1172,18 @@ def main() -> None:
         action="store_true",
         help="Preflight the first prospective reserve layout.",
     )
+    modes.add_argument(
+        "--layout-intake-batch", action="store_true", help="Preflight the frozen reserve batch."
+    )
+    modes.add_argument(
+        "--layout-intake-verify",
+        type=Path,
+        metavar="RECEIPT",
+        help="Verify a retained Stage 4 batch receipt without running preflight.",
+    )
+    modes.add_argument(
+        "--layout-intake-page", type=int, choices=range(9, 54), help=argparse.SUPPRESS
+    )
     parser.add_argument("--checkpoint", type=Path, help="Layout C setup checkpoint path.")
     parser.add_argument("--worker", action="store_true", help=argparse.SUPPRESS)
     args = parser.parse_args()
@@ -1179,6 +1191,22 @@ def main() -> None:
         parser.error("--split-objective and --checkpoint must be supplied together")
     if args.audit_west and args.family != "west":
         parser.error("--audit-west requires --family west")
+    if args.layout_intake_verify is not None:
+        from scripts import stage4_layout_batch
+
+        try:
+            stage4_layout_batch.emit(stage4_layout_batch.verify_file(args.layout_intake_verify))
+        except BenchmarkGap as exc:
+            parser.error(str(exc))
+        return
+    if args.layout_intake_batch or args.layout_intake_page is not None:
+        from scripts import stage4_layout_batch
+
+        if args.layout_intake_batch:
+            stage4_layout_batch.run()
+        else:
+            stage4_layout_batch.run_page(args.layout_intake_page)
+        return
     if args.layout_intake:
         from scripts import stage4_layout_intake
 
