@@ -41,21 +41,37 @@ from tests.support.section11_fixtures import begin
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.engine.abilities import AbilityCatalogIndex
 from warhammer40k_core.engine.ability_catalog import catalog_ability_records_from_catalog
+from warhammer40k_core.engine.battle_shock_state import apply_direct_battle_shock_state
+from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
 from warhammer40k_core.engine.battlefield_state import geometry_model_at_pose
+from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.event_log import JsonValue
+from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.list_validation import UnitMusterSelection
 from warhammer40k_core.engine.movement_decision_authority import (
     validate_movement_completion_decision_authority,
 )
-from warhammer40k_core.engine.movement_proposals import MovementProposalPayload, ProposalKind
+from warhammer40k_core.engine.movement_proposals import (
+    MovementProposalPayload,
+    MovementProposalRequest,
+    ProposalKind,
+)
 from warhammer40k_core.engine.phase import BattlePhase, LifecycleStatus, LifecycleStatusKind
-from warhammer40k_core.engine.phases.movement import DesperateEscapeRoll, DesperateEscapeRollPayload
+from warhammer40k_core.engine.phases.movement import (
+    DesperateEscapeRoll,
+    DesperateEscapeRollPayload,
+    FallBackModeKind,
+)
+from warhammer40k_core.engine.phases.movement_escape_mortals import completed_escape_retry
 from warhammer40k_core.engine.phases.movement_geometry import (
-    _enemy_model_ids_crossed_by_witness,  # pyright: ignore[reportPrivateUsage]
+    _enemy_model_ids_crossed_by_witness,
 )
 from warhammer40k_core.engine.phases.movement_handler import MovementPhaseHandler
+from warhammer40k_core.engine.physical_engagement import (
+    scenario_physically_engaged_enemy_rules_unit_ids,
+)
 from warhammer40k_core.engine.shooting_targets import FORTIFICATION_ENGAGEMENT_RULE_ID
 from warhammer40k_core.engine.unit_state import StartingStrengthRecord
 from warhammer40k_core.geometry.base import BaseShape, CircularBase, OvalBase, RectangularBase
@@ -457,14 +473,19 @@ def _submit_fall_back(
 
 
 @pytest.mark.parametrize(
-    ("new_crossing_fails", "rng_label"),
-    [(False, "fortification-crossing-retry-13"), (True, "fortification-crossing-retry-4")],
-    ids=("pass", "fail"),
+    ("new_crossing_fails", "rng_label", "initial_enemy_y"),
+    [
+        (False, "fortification-crossing-retry-30", 11.55),
+        (True, "fortification-crossing-retry-4", 11.55),
+        (False, "fortification-crossing-retry-0", 12.25),
+    ],
+    ids=("pass", "fail", "disengaged-after-casualty"),
 )
 def test_fortification_survivor_retry_rolls_each_new_crossing_only_once(
     faction_definitions: Section02Definitions,
     new_crossing_fails: bool,
     rng_label: str,
+    initial_enemy_y: float,
 ) -> None:
     d = with_fortification(faction_definitions, provider_sheet=LORD, fortification_sheet=GNARLMAW)
     battle = scene(
@@ -479,8 +500,14 @@ def test_fortification_survivor_retry_rolls_each_new_crossing_only_once(
     fortification = battle.units["foe:fortification"]
     starts = tuple(Pose.at(x, 10) for x in (6, 8, 10.6, 13.2, 15.2))
     locate(battle, unit.unit_instance_id, starts)
-    locate(battle, fortification.unit_instance_id, (Pose.at(10.6, 11.55),))
-    battle.state.battle_shocked_unit_ids.append(unit.unit_instance_id)
+    locate(battle, fortification.unit_instance_id, (Pose.at(10.6, initial_enemy_y),))
+    apply_direct_battle_shock_state(
+        state=battle.state,
+        player_id="owner",
+        unit_instance_id=unit.unit_instance_id,
+        source_result_id="fixture-starting-battle-shock",
+        battle_round=battle.state.battle_round,
+    )
     anchor(battle)
 
     session = battle.session
@@ -520,14 +547,46 @@ def test_fortification_survivor_retry_rolls_each_new_crossing_only_once(
     retry = session.lifecycle.pending_decision_request()
     assert retry is not None
     assert retry.decision_type == request.decision_type
-    invalid_paths = tuple(path for path in initial_paths if path[0] != middle)
+    if initial_enemy_y == 12.25:
+        assert (
+            scenario_physically_engaged_enemy_rules_unit_ids(
+                scenario=battlefield_scenario_for_state(state=battle.state),
+                ruleset_descriptor=session.lifecycle.config.ruleset_descriptor,
+                unit_instance_id=unit.unit_instance_id,
+            )
+            == ()
+        )
+        checkpoint = session.lifecycle.to_payload()
+        restored_state = GameState.from_payload(checkpoint["state"])
+        restored_decisions = DecisionController.from_payload(checkpoint["decisions"])
+        (restored_request,) = restored_decisions.queue.pending_requests
+        assert restored_request == retry
+        restored_retry = completed_escape_retry(
+            state=restored_state,
+            decisions=restored_decisions,
+            proposal=MovementProposalRequest.from_decision_request_payload(
+                restored_request.payload
+            ),
+            fall_back_mode=FallBackModeKind.DESPERATE_ESCAPE,
+        )
+        assert restored_retry is not None
+        assert restored_retry.start_engaged_enemy_unit_ids == (fortification.unit_instance_id,)
+    invalid_paths = tuple(
+        (model_id, (poses[0], Pose.at(11.72, 12), poses[-1]))
+        if model_id == fourth and rng_label == "fortification-crossing-retry-4"
+        else (model_id, poses)
+        for model_id, poses in initial_paths
+        if model_id != middle
+    )
     before_mismatch = session.lifecycle.to_payload()
     mismatch = _submit_fall_back(
         session, retry, "unrelated-unit", invalid_paths, result_id="mismatched-retry"
     )
     assert mismatch.status_kind is LifecycleStatusKind.INVALID, mismatch
     assert session.lifecycle.to_payload() == before_mismatch
-    battlefield = battle.state.battlefield_state
+    active_state = session.lifecycle.state
+    assert active_state is not None
+    before_rejection = active_state.to_payload()
     records = session.lifecycle.decision_controller.event_log.records
     rejected = _submit_fall_back(
         session, retry, unit.unit_instance_id, invalid_paths, result_id="invalid-retry"
@@ -535,7 +594,11 @@ def test_fortification_survivor_retry_rolls_each_new_crossing_only_once(
     assert rejected.status_kind is LifecycleStatusKind.INVALID, rejected
     assert isinstance(rejected.payload, dict)
     assert rejected.payload["violation_code"] == "unit_coherency_broken"
-    assert battle.state.battlefield_state == battlefield
+    after_rejection = active_state.to_payload()
+    assert after_rejection == {
+        **before_rejection,
+        "decision_request_count": before_rejection["decision_request_count"] + 1,
+    }
     assert session.lifecycle.decision_controller.event_log.records[: len(records)] == records
     assert not {
         "dice_rolled",
@@ -578,6 +641,9 @@ def test_fortification_survivor_retry_rolls_each_new_crossing_only_once(
         assert status.status_kind is not LifecycleStatusKind.INVALID, status
     (completed,) = events(session, "movement_activation_completed")
     assert completed.get("fortification_desperate_escape_exempt_model_ids") == [first, last]
+    assert completed.get("start_engaged_enemy_unit_instance_ids") == [
+        fortification.unit_instance_id
+    ]
     assert len(events(session, "desperate_escape_hazard_mortals_resolved")) == (
         2 if new_crossing_fails else 1
     )
@@ -626,8 +692,8 @@ def test_fortification_native_bloodcrusher_pivot_is_independent_of_waypoint(
     moving_base = geometry_model_at_pose(model=unit.own_models[0], pose=starts[0]).base
     obstacle_base = geometry_model_at_pose(model=provider.own_models[0], pose=starts[0]).base
     assert isinstance(moving_base, OvalBase)
-    assert moving_base.length == pytest.approx(90 / 25.4)
-    assert moving_base.width == pytest.approx(52.5 / 25.4)
+    assert math.isclose(moving_base.length, 90 / 25.4)
+    assert math.isclose(moving_base.width, 52.5 / 25.4)
     assert isinstance(obstacle_base, CircularBase)
     obstacle = Pose.at(10, 10 + moving_base.max_radius() + obstacle_base.radius - overlap)
     for split in (True, False):

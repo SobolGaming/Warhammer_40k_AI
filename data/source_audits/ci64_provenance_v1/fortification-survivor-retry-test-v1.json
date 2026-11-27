@@ -1,0 +1,52 @@
+{
+  "added_cases": [
+    "tests/rules/section09/test_fortification_engagement.py::test_fortification_survivor_retry_rolls_each_new_crossing_only_once[disengaged-after-casualty]"
+  ],
+  "base": "6b6ba4bbf412d4b3b62ba91562c8476cbbb344b1",
+  "retained_fortification_sha256": "13d8d42dfc5f317238e78ebe1f978b21c1b77c88dc41d56a20f6a6139cb54d20",
+  "runtime_fingerprint": {
+    "after": "0429f98f71d17e6ac65ed66978d6bcb1223b18349ca2b14bf554c2abc987296e",
+    "before": "a728d0d6acfecbdf39a6c1c2f72510fe5b2d418ebf2d487743d30b3f5c8ac989"
+  },
+  "runtime_manifest": {
+    "after": "659bc7c831876eb2a73492648c4ac7853d4e7040adb1b8b4ce9a640c5e7f7b0a",
+    "before": "431ff9b7b5da4ccaf21c15f5c28583e716092d1c5c90f6002b0dd6bcbef98ced"
+  },
+  "schema": "finite-fortification-survivor-retry-test-v1",
+  "sources": {
+    "src/warhammer40k_core/engine/phases/movement_escape_mortals.py": {
+      "after": "bbaa8d2230a20924f014458e0e7d3f9aa321fa1a4cf3f2b41de0ed6df787df91",
+      "before": "77e2bb097412cda1ae84581119c240a99af7829681454b6f2f053cf6dd7f489b"
+    },
+    "src/warhammer40k_core/engine/phases/movement_fall_back_embark.py": {
+      "after": "e9c7331eadd58a030c7f54f7292c5034d66e4260070d015150f9d0076c54a8f5",
+      "before": "54092610a2f236c9400b03c42d09de5cfa6338ba10338cc967a22352bbefc296"
+    },
+    "src/warhammer40k_core/engine/phases/movement_geometry.py": {
+      "after": "1a1d895cd89a03209989c5867d96023d993803a666fd507bc1d9bb19b3bb9646",
+      "before": "e54149a97804f4fdec167b29a77ca7d83287958bfa43cc6e9aa0428459e3706c"
+    },
+    "src/warhammer40k_core/engine/phases/movement_resolution_flow.py": {
+      "after": "48aa7f0c5b814fd5320facb8fbcc4a576ae9dfd184c34a746dba725b667e4f31",
+      "before": "e3084f7adf18665f44e7ea390734edefad50e15b2d16b25e699ca08e671ea7f9"
+    },
+    "src/warhammer40k_core/engine/phases/movement_rules_units.py": {
+      "after": "ff696b40359a274b8066f0d92e3aa9c32fba40c0ec6a344113f479e8a52876d5",
+      "before": "b28df2aa7d9bfc7467f21cb4a69f4f526083b14d7eebffc2afd7f57ae09e9c1d"
+    }
+  },
+  "test": {
+    "after": {
+      "blob_sha1": "e8742026c3241a7c304cf0a690d0c7f45ac1dbcd",
+      "bytes": 35231,
+      "mode": "100644",
+      "sha256": "bfdd203b60e8e561944fd1fa9e03de5e38db0e3adef0b5bbcc02885ac0a01365"
+    },
+    "before": {
+      "blob_sha1": "8978b18fc10129986da28c7c43876b8ff8296ca1",
+      "bytes": 32630,
+      "mode": "100644",
+      "sha256": "5b50e54f85348ddd6b252a3dd932e95c120b7c19b0014d7e4e409a03cf75325a"
+    }
+  }
+}

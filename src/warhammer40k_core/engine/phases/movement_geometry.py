@@ -192,6 +192,7 @@ def _desperate_escape_requirements_for_fall_back(
     battle_shocked_unit_ids: tuple[str, ...],
     forced_desperate_escape_source_rule_ids: tuple[str, ...] = (),
     overflight_auto_pass_model_ids: tuple[str, ...] = (),
+    only_engaged_with_fortifications: bool | None = None,
 ) -> tuple[tuple[DesperateEscapeRequirement, ...], tuple[str, ...]]:
     if type(scenario) is not BattlefieldScenario:
         raise GameLifecycleError("Desperate Escape requirements require a scenario.")
@@ -231,11 +232,19 @@ def _desperate_escape_requirements_for_fall_back(
         player_id=unit_placement.player_id,
     )
     is_battle_shocked = unit_placement.unit_instance_id in battle_shocked_ids
-    fortification_exemption = is_battle_shocked and _unit_only_engaged_with_enemy_fortifications(
-        scenario=scenario,
-        unit_placement=unit_placement,
-        ruleset_descriptor=ruleset_descriptor,
-    )
+    if is_battle_shocked and only_engaged_with_fortifications is None:
+        engaged_enemy_unit_ids = _enemy_engaged_unit_ids_for_unit_placement(
+            scenario=scenario,
+            unit_placement=unit_placement,
+            ruleset_descriptor=ruleset_descriptor,
+        )
+        only_engaged_with_fortifications = bool(engaged_enemy_unit_ids) and (
+            engaged_enemy_unit_ids
+            == enemy_fortification_unit_ids(
+                scenario=scenario, engaged_enemy_unit_ids=engaged_enemy_unit_ids
+            )
+        )
+    fortification_exemption = is_battle_shocked and bool(only_engaged_with_fortifications)
     requirements: list[DesperateEscapeRequirement] = []
     exempt_model_ids: list[str] = []
     desperate_mode = fall_back_mode is FallBackModeKind.DESPERATE_ESCAPE
@@ -285,28 +294,21 @@ def _desperate_escape_requirements_for_fall_back(
     return tuple(requirements), tuple(sorted(exempt_model_ids))
 
 
-def _unit_only_engaged_with_enemy_fortifications(
+def enemy_fortification_unit_ids(
     *,
     scenario: BattlefieldScenario,
-    unit_placement: UnitPlacement,
-    ruleset_descriptor: RulesetDescriptor,
-) -> bool:
-    engaged_enemy_unit_ids = _enemy_engaged_unit_ids_for_unit_placement(
-        scenario=scenario,
-        unit_placement=unit_placement,
-        ruleset_descriptor=ruleset_descriptor,
-    )
-    if not engaged_enemy_unit_ids:
-        return False
-    return all(
-        rules_unit_has_fortification_consumer(
+    engaged_enemy_unit_ids: tuple[str, ...],
+) -> tuple[str, ...]:
+    return tuple(
+        enemy_unit_id
+        for enemy_unit_id in engaged_enemy_unit_ids
+        if rules_unit_has_fortification_consumer(
             rules_unit_view_from_armies(
                 armies=scenario.armies,
                 unit_instance_id=enemy_unit_id,
             ),
             CATALOG_IR_FORTIFICATION_DESPERATE_ESCAPE_CONSUMER_ID,
         )
-        for enemy_unit_id in engaged_enemy_unit_ids
     )
 
 

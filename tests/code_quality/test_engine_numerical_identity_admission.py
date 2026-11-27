@@ -1170,10 +1170,22 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
     for cp_owner in charge_cp["added_files"]:
         assert cp_owner in active_files
         assert sum(cp_owner in group for group in groups) == 1
+    from tools.performance_preflight_successor import read_frozen_blobs
+
+    terror_commit = "f7fcd013ae67b51945beb4dc71c57edbb2b0015e"
+    terror_sources = read_frozen_blobs(ROOT, terror_commit, sorted(terror["source"]))
+    terror_successors = fortification.fortification_historical_source_successors(
+        ROOT,
+        previous_sha256=selection.DAEMONIC_TERROR_TRANSITION_SHA256,
+        previous_sources=terror["source"],
+    )
     for name, change in terror["source"].items():
         original = subprocess.check_output(["git", "show", terror["base"] + ":" + name], cwd=ROOT)
         assert change["before"] == hashlib.sha256(original).hexdigest()
-        assert change["after"] == hashlib.sha256((ROOT / name).read_bytes()).hexdigest()
+        assert change["after"] == hashlib.sha256(terror_sources[name]).hexdigest()
+        successor = terror_successors.get(name)
+        expected_current = change["after"] if successor is None else successor["after"]
+        assert expected_current == hashlib.sha256((ROOT / name).read_bytes()).hexdigest()
     assert selection.DAEMONIC_TERROR_OWNER in active_files
     assert sum(selection.DAEMONIC_TERROR_OWNER in group for group in groups) == 1
     assert ground_charge.NORMAL_MOVE_OWNER in active_files
@@ -1744,9 +1756,10 @@ def test_fortification_transition_rejects_source_and_case_drift(tmp_path: Path) 
     members = (
         fortification.RECEIPT,
         fortification.ROTATION_RECEIPT,
+        fortification.RETRY_RECEIPT,
         MANIFEST,
         fortification.OWNER,
-        *sorted(fortification.SOURCES),
+        *sorted(fortification.SOURCES | fortification.RETRY_SOURCES),
     )
     for name in members:
         path = tmp_path / name
@@ -1760,7 +1773,11 @@ def test_fortification_transition_rejects_source_and_case_drift(tmp_path: Path) 
     assert fortification.OWNER in sharding.behavioral_selection(ROOT).active_files
     previous = _record(fortification.RECEIPT)
     assert receipt["added_cases"][:17] == previous["added_cases"]
-    assert len(receipt["added_cases"]) == len(set(receipt["added_cases"])) == 22
+    rotation = _record(fortification.ROTATION_RECEIPT)
+    assert receipt["added_cases"][17:22] == rotation["added_cases"]
+    retry = _record(fortification.RETRY_RECEIPT)
+    assert receipt["added_cases"][22:] == retry["added_cases"]
+    assert len(receipt["added_cases"]) == len(set(receipt["added_cases"])) == 23
 
     for name in members:
         path = tmp_path / name

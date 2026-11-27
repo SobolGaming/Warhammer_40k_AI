@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import TypedDict, cast
+from typing import NamedTuple, TypedDict, cast
 
 from scripts.behavioral_selection_members import (
     _selection_members,  # pyright: ignore[reportPrivateUsage]
@@ -19,9 +19,24 @@ BASE = "767c5f2a09f10ec1fe6216ac2c3785fe12f48670"
 ROTATION_RECEIPT = "data/source_audits/ci64_provenance_v1/fortification-rotation-test-v1.json"
 ROTATION_RECEIPT_SHA256 = "13d8d42dfc5f317238e78ebe1f978b21c1b77c88dc41d56a20f6a6139cb54d20"
 ROTATION_BASE = "2a5bb77fd6eb1a04c276037ea159a5ef850f1668"
+RETRY_RECEIPT = "data/source_audits/ci64_provenance_v1/fortification-survivor-retry-test-v1.json"
+RETRY_RECEIPT_SHA256 = "68735efb653722f33d34525bd2fe85fca4ea543e7dde169b65498ba7547d197b"
+RETRY_BASE = "6b6ba4bbf412d4b3b62ba91562c8476cbbb344b1"
 ROTATION_SOURCES = {
     "src/warhammer40k_core/engine/phases/movement_geometry.py",
     "src/warhammer40k_core/geometry/physical_predicates.py",
+}
+RETRY_PREIMAGES = {
+    "src/warhammer40k_core/engine/phases/movement_fall_back_embark.py": (
+        "54092610a2f236c9400b03c42d09de5cfa6338ba10338cc967a22352bbefc296"
+    ),
+}
+RETRY_SOURCES = {
+    *RETRY_PREIMAGES,
+    "src/warhammer40k_core/engine/phases/movement_escape_mortals.py",
+    "src/warhammer40k_core/engine/phases/movement_geometry.py",
+    "src/warhammer40k_core/engine/phases/movement_resolution_flow.py",
+    "src/warhammer40k_core/engine/phases/movement_rules_units.py",
 }
 OWNER = "tests/rules/section09/test_fortification_engagement.py"
 SOURCES = frozenset(
@@ -65,7 +80,7 @@ class FortificationTestReceipt(TypedDict):
     added_cases: list[str]
 
 
-class FortificationRotationReceipt(TypedDict):
+class FortificationSuccessorReceipt(TypedDict):
     schema: str
     base: str
     retained_fortification_sha256: str
@@ -76,34 +91,47 @@ class FortificationRotationReceipt(TypedDict):
     added_cases: list[str]
 
 
-def _fortification_rotation_successor(
+class _Successor(NamedTuple):
+    path: str
+    sha256: str
+    base: str
+    schema: str
+    prior_sha256: str
+    added_count: int
+    sources: set[str]
+    additional_preimages: dict[str, str]
+
+
+def _fortification_successor(
     root: Path,
     previous: FortificationTestReceipt,
+    transition: _Successor,
 ) -> tuple[FortificationTestReceipt, bytes] | None:
     from scripts.engine_numerical_identity_test_admission import (
         _checked_bytes,  # pyright: ignore[reportPrivateUsage]
     )
 
-    path = root / ROTATION_RECEIPT
+    path = root / transition.path
     _selection_no_links(root, path)
     if not path.exists():
         return None
-    raw = _checked_bytes(root, ROTATION_RECEIPT, ROTATION_RECEIPT_SHA256)
+    raw = _checked_bytes(root, transition.path, transition.sha256)
     receipt = cast(
-        FortificationRotationReceipt, json.loads(raw, object_pairs_hook=_selection_object)
+        FortificationSuccessorReceipt, json.loads(raw, object_pairs_hook=_selection_object)
     )
     additions = receipt["added_cases"]
+    source_preimages = {**previous["sources"], **transition.additional_preimages}
     if (
-        receipt.keys() != FortificationRotationReceipt.__required_keys__
-        or receipt["schema"] != "finite-fortification-rotation-test-v1"
-        or receipt["base"] != ROTATION_BASE
-        or receipt["retained_fortification_sha256"] != RECEIPT_SHA256
-        or receipt["sources"].keys() != ROTATION_SOURCES
+        receipt.keys() != FortificationSuccessorReceipt.__required_keys__
+        or receipt["schema"] != transition.schema
+        or receipt["base"] != transition.base
+        or receipt["retained_fortification_sha256"] != transition.prior_sha256
+        or receipt["sources"].keys() != transition.sources
         or receipt["test"].keys() != {"before", "after"}
         or receipt["test"]["before"] != previous["added_files"][OWNER]
         or receipt["test"]["before"] == receipt["test"]["after"]
-        or len(additions) != 5
-        or len(set(additions)) != 5
+        or len(additions) != transition.added_count
+        or len(set(additions)) != transition.added_count
         or set(additions).intersection(previous["added_cases"])
         or any(not node.startswith(f"{OWNER}::") for node in additions)
         or any(
@@ -113,14 +141,11 @@ def _fortification_rotation_successor(
             for change, old_digest in (
                 (receipt["runtime_manifest"], previous["runtime_manifest"]["after"]),
                 (receipt["runtime_fingerprint"], previous["runtime_fingerprint"]["after"]),
-                *(
-                    (change, previous["sources"][name])
-                    for name, change in receipt["sources"].items()
-                ),
+                *((change, source_preimages[name]) for name, change in receipt["sources"].items()),
             )
         )
     ):
-        raise SystemExit("Fortification rotation differs from the exact predecessor.")
+        raise SystemExit("Fortification successor differs from the exact predecessor.")
     current: FortificationTestReceipt = {
         **previous,
         "runtime_manifest": {
@@ -139,6 +164,49 @@ def _fortification_rotation_successor(
         "added_cases": [*previous["added_cases"], *additions],
     }
     return current, raw
+
+
+def _fortification_current_receipt(
+    root: Path, receipt: FortificationTestReceipt, raw: bytes
+) -> tuple[FortificationTestReceipt, bytes]:
+    rotation = _fortification_successor(
+        root,
+        receipt,
+        _Successor(
+            ROTATION_RECEIPT,
+            ROTATION_RECEIPT_SHA256,
+            ROTATION_BASE,
+            "finite-fortification-rotation-test-v1",
+            RECEIPT_SHA256,
+            5,
+            ROTATION_SOURCES,
+            {},
+        ),
+    )
+    if rotation is None:
+        if (root / RETRY_RECEIPT).exists():
+            raise SystemExit("Fortification survivor retry requires its rotation predecessor.")
+        return receipt, raw
+    receipt, successor_raw = rotation
+    raw += b"\0" + successor_raw
+    retry = _fortification_successor(
+        root,
+        receipt,
+        _Successor(
+            RETRY_RECEIPT,
+            RETRY_RECEIPT_SHA256,
+            RETRY_BASE,
+            "finite-fortification-survivor-retry-test-v1",
+            ROTATION_RECEIPT_SHA256,
+            1,
+            RETRY_SOURCES,
+            RETRY_PREIMAGES,
+        ),
+    )
+    if retry is not None:
+        receipt, successor_raw = retry
+        raw += b"\0" + successor_raw
+    return receipt, raw
 
 
 def _fortification_receipt(root: Path) -> tuple[FortificationTestReceipt, bytes] | None:
@@ -180,20 +248,28 @@ def fortification_historical_source_successors(
 ) -> dict[str, dict[str, str]]:
     """Admit current owner bytes against the exact historical receipt that pinned them."""
     from scripts.engine_numerical_identity_test_admission import (
+        DAEMONIC_TERROR_TRANSITION_SHA256,
         _checked_bytes,  # pyright: ignore[reportPrivateUsage]
     )
 
     loaded = _fortification_receipt(root)
     if loaded is None:
         return {}
-    receipt, _ = loaded
+    receipt, raw = loaded
     historical = receipt["historical_sources"].get(previous_sha256)
-    if historical is None or any(
+    receipt, _ = _fortification_current_receipt(root, receipt, raw)
+    if historical is None:
+        raise SystemExit("Fortification retry source preimage differs from its historical receipt.")
+    if previous_sha256 == DAEMONIC_TERROR_TRANSITION_SHA256 and RETRY_PREIMAGES.keys() <= (
+        receipt["sources"].keys()
+    ):
+        historical = {**historical, **RETRY_PREIMAGES}
+    if any(
         name not in previous_sources or previous_sources[name]["after"] != before
         for name, before in historical.items()
     ):
         raise SystemExit("Fortification retry source preimage differs from its historical receipt.")
-    successors = {}
+    successors: dict[str, dict[str, str]] = {}
     for name, before in historical.items():
         after = receipt["sources"][name]
         if before == after:
@@ -232,10 +308,7 @@ def fortification_test_addition(
         or receipt["runtime_fingerprint"]["before"] != predecessor_fingerprint
     ):
         raise SystemExit("Fortification test admission differs from the exact Shroud predecessor.")
-    rotation = _fortification_rotation_successor(root, receipt)
-    if rotation is not None:
-        receipt, rotation_raw = rotation
-        raw += b"\0" + rotation_raw
+    receipt, raw = _fortification_current_receipt(root, receipt, raw)
     manifest = _checked_bytes(root, MANIFEST, receipt["runtime_manifest"]["after"])
     if (
         json.loads(manifest, object_pairs_hook=_selection_object)["fingerprint"]

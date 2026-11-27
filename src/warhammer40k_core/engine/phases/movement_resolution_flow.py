@@ -398,6 +398,14 @@ def _apply_movement_proposal_decision(
             != forced_desperate_escape_source_rule_ids
         ):
             raise GameLifecycleError("Forced Desperate Escape source payload IDs drift.")
+        from warhammer40k_core.engine.phases.movement_escape_mortals import completed_escape_retry
+
+        retry = completed_escape_retry(
+            state=state,
+            decisions=decisions,
+            proposal=proposal_request,
+            fall_back_mode=fall_back_mode,
+        )
         fall_back_resolution = resolve_rules_unit_fall_back_move(
             state=state,
             scenario=scenario,
@@ -409,6 +417,9 @@ def _apply_movement_proposal_decision(
             movement_mode=movement_mode,
             battle_round=state.battle_round,
             battle_shocked_unit_ids=tuple(state.battle_shocked_unit_ids),
+            start_engaged_enemy_unit_ids=None
+            if retry is None
+            else retry.start_engaged_enemy_unit_ids,
             forced_desperate_escape_source_rule_ids=forced_desperate_escape_source_rule_ids,
             objective_markers=_objective_markers_for_state(state),
             movement_bonus_inches=_movement_bonus_inches_for_unit(
@@ -445,18 +456,6 @@ def _apply_movement_proposal_decision(
             resolution=fall_back_resolution,
             fall_back_mode=fall_back_mode,
         )
-        from warhammer40k_core.engine.phases.movement_escape_mortals import completed_escape_retry
-
-        retry = (
-            completed_escape_retry(
-                state=state,
-                decisions=decisions,
-                proposal=proposal_request,
-                resolution=fall_back_resolution,
-            )
-            if mode_violation_code is None and fall_back_resolution.is_valid
-            else None
-        )
         decisions.commit_movement_result(result)
         if mode_violation_code is not None:
             return _reject_invalid_movement_resolution(
@@ -472,7 +471,9 @@ def _apply_movement_proposal_decision(
                 proposal_request=proposal_request,
                 field="fall_back_mode",
             )
-        if not fall_back_resolution.is_valid:
+        if not fall_back_resolution.is_valid or (
+            retry is not None and not fall_back_resolution.coherency_result.is_coherent
+        ):
             violation_code = _normal_move_violation_code(fall_back_resolution)
             return _reject_invalid_movement_resolution(
                 state=state,
@@ -494,7 +495,7 @@ def _apply_movement_proposal_decision(
         requirements = (
             fall_back_resolution.desperate_escape_requirements
             if retry is None
-            else retry.untested_requirements
+            else retry.untested_requirements(fall_back_resolution)
         )
         if fall_back_mode is FallBackModeKind.DESPERATE_ESCAPE and requirements:
             from warhammer40k_core.engine.desperate_escape_modifier_evaluation import (

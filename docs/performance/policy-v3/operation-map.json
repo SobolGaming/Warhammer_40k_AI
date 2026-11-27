@@ -38914,6 +38914,79 @@
       "families": [],
       "sensitive": false,
       "mandatory": false
+    },
+    "fortification-survivor-retry-receipt": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/fortification-survivor-retry-test-v1.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "fortification-survivor-retry-admission": {
+      "paths": [
+        "scripts/fortification_engagement_test_admission.py",
+        "tests/code_quality/test_engine_numerical_identity_admission.py"
+      ],
+      "owners": [
+        "FortificationSuccessorReceipt",
+        "_Successor",
+        "_fortification_successor",
+        "_fortification_current_receipt",
+        "test_fortification_transition_rejects_source_and_case_drift"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "fortification-survivor-retry-movement": {
+      "paths": [
+        "src/warhammer40k_core/engine/phases/movement_escape_mortals.py",
+        "src/warhammer40k_core/engine/phases/movement_fall_back_embark.py",
+        "src/warhammer40k_core/engine/phases/movement_geometry.py",
+        "src/warhammer40k_core/engine/phases/movement_resolution_flow.py",
+        "src/warhammer40k_core/engine/phases/movement_rules_units.py"
+      ],
+      "owners": [
+        "@module",
+        "CompletedEscapeRetry",
+        "CompletedEscapeRetry.untested_requirements",
+        "CompletedEscapeRetry.with_new_rolls",
+        "_apply_fall_back_result",
+        "_apply_movement_proposal_decision",
+        "_desperate_escape_requirements_for_fall_back",
+        "_unit_only_engaged_with_enemy_fortifications",
+        "completed_escape_retry",
+        "enemy_fortification_unit_ids",
+        "recorded_fall_back_start_engagement",
+        "resolve_rules_unit_fall_back_move"
+      ],
+      "families": [
+        "movement",
+        "reconstruction",
+        "shock_reconstruction"
+      ],
+      "sensitive": true,
+      "mandatory": false
+    },
+    "fortification-survivor-retry-quality-controls": {
+      "paths": [
+        "tests/code_quality/test_d07_geometry_containment.py",
+        "tests/code_quality/test_generated_ability_support_artifacts.py"
+      ],
+      "owners": [
+        "@module",
+        "_changed_geometry",
+        "test_d07_bounded_ast_rejects_unlisted_changes_even_without_byte_pins",
+        "test_d07_recomputed_current_pin_cannot_admit_fourth_statement",
+        "test_fortification_generated_support_keeps_both_source_occurrences"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

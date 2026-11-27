@@ -92,8 +92,8 @@ def reviewed_fnp_stage(tmp_path: Path) -> tuple[Path, _FnpRecipeConstants]:
     return tmp_path, constants
 
 
-def _changed_geometry(kind: str) -> bytes:
-    tree = ast.parse((ROOT / geometry.LIVE).read_bytes())
+def _changed_geometry(current: bytes, kind: str) -> bytes:
+    tree = ast.parse(current)
     proposal = tree.body[19]
     assert isinstance(proposal, ast.FunctionDef)
     branch = proposal.body[21]
@@ -163,9 +163,17 @@ def test_d07_geometry_exact_containment_positive(preserved_root: Path) -> None:
     ],
 )
 def test_d07_bounded_ast_rejects_unlisted_changes_even_without_byte_pins(kind: str) -> None:
+    from tools.performance_preflight_successor import read_frozen_blobs
+
     old = (ROOT / geometry.ARCHIVE).read_bytes()
+    current = read_frozen_blobs(ROOT, geometry.CURRENT_RUNTIME_COMMIT, [geometry.LIVE])[
+        geometry.LIVE
+    ]
+    geometry.assert_bounded_geometry(old, current)
+    changed = _changed_geometry(current, kind)
+    assert ast.dump(ast.parse(changed)) != ast.dump(ast.parse(current))
     with pytest.raises(ValueError, match="D07"):
-        geometry.assert_bounded_geometry(old, _changed_geometry(kind))
+        geometry.assert_bounded_geometry(old, changed)
 
 
 @pytest.mark.parametrize(
@@ -217,7 +225,7 @@ def test_d07_recomputed_current_pin_cannot_admit_fourth_statement(
     recipe_path = preserved_root / geometry.RECIPE
     live = live_path.read_bytes()
     frozen = recipe_path.read_bytes()
-    changed = _changed_geometry("fourth_retry_statement")
+    changed = _changed_geometry(live, "fourth_retry_statement")
     recipe = json.loads(frozen)
     recipe["source_files"][geometry.LIVE] = hashlib.sha256(changed).hexdigest()
     repinned = (json.dumps(recipe, indent=2) + "\n").encode()

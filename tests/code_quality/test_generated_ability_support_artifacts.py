@@ -57,6 +57,10 @@ from warhammer40k_core.engine.semantic_equivalence import (
     SemanticSupportTransfer,
     load_cross_source_semantic_audit,
 )
+from warhammer40k_core.rules.wahapedia_schema import (
+    WahapediaJsonArtifact,
+    WahapediaJsonArtifactPayload,
+)
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -319,6 +323,15 @@ def test_cross_source_semantic_audit_reports_both_shalaxi_sources_as_engine_cons
 def test_fortification_generated_support_keeps_both_source_occurrences() -> None:
     audit = _semantic_audit()
     source_rows = ("000001470:5", "000001588:5")
+    source_path = DEFAULT_SEMANTIC_EQUIVALENCE_SOURCE_JSON_DIR / "Datasheets_abilities.json"
+    source = WahapediaJsonArtifact.from_payload(
+        cast(WahapediaJsonArtifactPayload, json.loads(source_path.read_bytes()))
+    )
+    source_ids = {
+        row.source_row_id: row.stable_source_id()
+        for row in source.rows
+        if row.source_row_id in source_rows
+    }
     members = tuple(
         audit.member(
             content_kind=SemanticContentKind.DATASHEET_ABILITY,
@@ -334,10 +347,7 @@ def test_fortification_generated_support_keeps_both_source_occurrences() -> None
             "catalog-ir:fortification-desperate-escape",
             "catalog-ir:fortification-target-permission",
         )
-        assert member.source_row_ids == (
-            f"data-package:wahapedia:source-mirror:10th-edition-2026-06-14:"
-            f"Datasheets_abilities:{source_row}",
-        )
+        assert member.source_row_ids == (source_ids[source_row],)
         assert member.execution_status is SemanticExecutionStatus.ENGINE_CONSUMED
 
 
