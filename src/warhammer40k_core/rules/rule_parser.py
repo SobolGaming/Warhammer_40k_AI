@@ -19,11 +19,12 @@ from warhammer40k_core.rules.attack_target_parser import (
     this_model_attack_target_match_ranges,
 )
 from warhammer40k_core.rules.aura_parser import (
-    AURA_TAG_RE as _AURA_RE,
-)
-from warhammer40k_core.rules.aura_parser import (
     aura_excludes_source_unit,
+    has_aura_scope,
+    live_aura_distance_conditions,
     parse_aura_conditions,
+    parse_live_aura_ability_effects,
+    unsupported_live_aura_clause,
 )
 from warhammer40k_core.rules.command_point_parser import (
     command_point_target,
@@ -802,6 +803,14 @@ def _compile_clause(
     )
     if triggered_action_clause is not None:
         return triggered_action_clause
+    clause_id = f"{source_id}:clause:{clause_index:03d}"
+    unsupported_aura_clause = unsupported_live_aura_clause(
+        clause_text.span,
+        clause_id=clause_id,
+        source_keyword_sequence_parts=parser_context.source_keyword_sequence_parts,
+    )
+    if unsupported_aura_clause is not None:
+        return unsupported_aura_clause
     trigger = _parse_trigger(clause_text)
     conditions = _dedupe_conditions(
         (
@@ -821,10 +830,9 @@ def _compile_clause(
             *parse_frequency_conditions(clause_text.span),
             *parse_command_point_conditions(clause_text.span),
             *_parse_keyword_conditions(clause_text, parser_context=parser_context),
-            *_parse_distance_conditions(
-                clause_text,
-                parsed_text,
-                parser_context=parser_context,
+            *live_aura_distance_conditions(
+                clause_text.span,
+                _parse_distance_conditions(clause_text, parsed_text, parser_context=parser_context),
             ),
             *_selected_target_extensions.parse_visibility_conditions(
                 text=clause_text.text,
@@ -885,7 +893,6 @@ def _compile_clause(
         text=clause_text.text,
         source_keyword_sequence_parts=parser_context.source_keyword_sequence_parts,
     )
-    clause_id = f"{source_id}:clause:{clause_index:03d}"
     residual_diagnostic = _residual_diagnostic(
         clause_text=clause_text,
         trigger=trigger,
@@ -1496,7 +1503,7 @@ def _parse_target(
     command_target = command_point_target(clause_text.span)
     if command_target is not None:
         return command_target
-    if _AURA_RE.search(clause_text.text) is not None:
+    if has_aura_scope(clause_text.text):
         return RuleTargetSpec(
             kind=RuleTargetKind.AURA_UNITS,
             source_span=clause_text.span,
@@ -2014,7 +2021,7 @@ def _parse_return_on_death_effects(clause_text: _ClauseText) -> tuple[RuleEffect
 
 
 def _parse_grant_ability_effects(clause_text: _ClauseText) -> tuple[RuleEffectSpec, ...]:
-    effects: list[RuleEffectSpec] = []
+    effects = list(parse_live_aura_ability_effects(clause_text.span))
     for match in _SHOOT_ELIGIBILITY_AFTER_FALL_BACK_RE.finditer(clause_text.text):
         effects.append(
             RuleEffectSpec(
