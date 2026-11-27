@@ -1,152 +1,122 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "5deda3506388fdb511bbf04737a8f5514ba1910b",
+  "base": "9dc8961000c386dfcd3df18bbab61b91a21b4383",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:af65d2237320cda39c2d38d0dbeb4d415c424956696fc1cc0f40686921848830",
-  "operation_map_sha256": "eaa52a5564cd028a3f5a528665009017285ab552a45a00970c3ebe1b786b9c3f",
+  "operation_map_sha256": "04d7c684eb8a7a1ce05da4125e99b429eb022957a479e1e27dc1a583584d2459",
   "changes": {
     "docs/AI_IMPLEMENTATION_PLAN.md": {
-      "before_sha256": "799d48ad44fea24899b219f62429aa38fa5052644f0b4d5c7be82fe33e12b36a",
-      "after_sha256": "7e340429d0392656838b48d5a1639b3a6b54ef4f0731ea3be8c571b73e303e08",
+      "before_sha256": "7e340429d0392656838b48d5a1639b3a6b54ef4f0731ea3be8c571b73e303e08",
+      "after_sha256": "1ba161687e9cda069bba57d8367fba1f0b0ee3011ffa4abd04c60775accda166",
       "owners": {
         "@document": {
-          "before": "799d48ad44fea24899b219f62429aa38fa5052644f0b4d5c7be82fe33e12b36a",
-          "after": "7e340429d0392656838b48d5a1639b3a6b54ef4f0731ea3be8c571b73e303e08"
+          "before": "7e340429d0392656838b48d5a1639b3a6b54ef4f0731ea3be8c571b73e303e08",
+          "after": "1ba161687e9cda069bba57d8367fba1f0b0ee3011ffa4abd04c60775accda166"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "9e5bd7065daf047328818b5523d1360a80a96ca998d1f7d8b026614170618d04",
-      "after_sha256": "4e60ad5e764c704b2573f06fc956efd2ad08bd4606bf5d323a1c8418f7c8a453",
+      "before_sha256": "4e60ad5e764c704b2573f06fc956efd2ad08bd4606bf5d323a1c8418f7c8a453",
+      "after_sha256": "a14439cc07ccde2f05dddf4195b37405487866a77669d8245fd324f82561dab5",
       "owners": {
         "@document": {
-          "before": "9e5bd7065daf047328818b5523d1360a80a96ca998d1f7d8b026614170618d04",
-          "after": "4e60ad5e764c704b2573f06fc956efd2ad08bd4606bf5d323a1c8418f7c8a453"
+          "before": "4e60ad5e764c704b2573f06fc956efd2ad08bd4606bf5d323a1c8418f7c8a453",
+          "after": "a14439cc07ccde2f05dddf4195b37405487866a77669d8245fd324f82561dab5"
         }
       }
     },
-    "scripts/stage4_evaluation.py": {
-      "before_sha256": null,
-      "after_sha256": "b0924ae1178198dacc91ddab04310520d6ead7648456e2ebda3ea6911f39ff71",
+    "scripts/stage4_benchmark_entry.py": {
+      "before_sha256": "d30199594500fb3a693d7da7e626c94383d45bcfdaaac8ffeb3cfb492ba1a17b",
+      "after_sha256": "d94f2338a9639b5b9a0aa07dc5e0f357b2d29b0b14fbe0218767463b3e66df11",
       "owners": {
-        "@module": {
-          "before": null,
-          "after": "485d80a536e4ace552f3f63fe290e22518fcea9ac0bb142177af15e93aaaf8cb"
-        },
-        "_identifier": {
-          "before": null,
-          "after": "560f45f27d8a0bddc803c41a182b7c6b50985bebecb6cbb8160a535a9083e4fb"
-        },
-        "_margin": {
-          "before": null,
-          "after": "1578b3e8ab3bcb45afa78c31a67ebb8aaf34485f890062ffc3548a40ab6c2c10"
-        },
-        "_nonempty_list": {
-          "before": null,
-          "after": "fda6884c3c80f408755ec569b773c9997cc5aadc2f148165fa23c2c6edcc3512"
-        },
-        "_record": {
-          "before": null,
-          "after": "3dd0ae5ac6ccc085d8d8851f6d5441ed520cdd235622ba3958e36c2ac6cf7958"
-        },
-        "_sha256": {
-          "before": null,
-          "after": "2ba7afbcd85172230d7d85e0a14f366098eda19179a6c0331e294ab8652c63f7"
-        },
-        "_unique_object": {
-          "before": null,
-          "after": "1b97eb4c77367f8ee42e316236516bc7295e36ec9c99629cb3e157664af64c16"
-        },
-        "baseline_table": {
-          "before": null,
-          "after": "a7fcf978375b555ab06a19044c93f33ed327614c1574cf714a305ab3dcadc5df"
-        },
-        "development_baselines": {
-          "before": null,
-          "after": "9b1f2fcddaff42c73c76b2826c53a4d92c96ea2361c91d8d78ddde3a6d826832"
-        },
         "main": {
-          "before": null,
-          "after": "08f9d4d7af11e47e42c2d56745acb1314ab479ec40ed2aaa566d45eeb5ce2264"
+          "before": "ca3745458be7e958d154d52d1ef8c0da9a421859dffeb151cdd0599dd3d01cb6",
+          "after": "0e9e4b48b916b3f0c0945c2fdf6f40c91a2c53635edfbc99bc6269ed0d4c3e51"
         },
-        "validate_split": {
-          "before": null,
-          "after": "f24110811794451169b83099e226333dbf16589b839e7bb874588693cfe87401"
+        "split_objective": {
+          "before": "de48766bdd4081872561c536d56f89ab17df827225b3a61f7dc1f820911b447f",
+          "after": "b381598c6cde6e6ba6e53a5f3eda3bb8d7449f76a2df2c542cd276a45278a586"
         }
       }
     },
-    "scripts/stage4_evaluation_checks.py": {
+    "scripts/stage4_scoring_timing.py": {
       "before_sha256": null,
-      "after_sha256": "04ad67609028f6ad5c1656d2750fc741487acf6d0df434fec005e77ba26c3448",
+      "after_sha256": "341a3d40bc2db472ea2b0814e5d1199d7215905a036191997aa48bbf13b8721c",
       "owners": {
         "@module": {
           "before": null,
-          "after": "995499966bd8ccbda5d938c845730739eabbcc4b37e58831f7b6e9cc3ecec013"
+          "after": "0f148a086c9b0b14e305087b86d579a8c6ec04eb151c0ee2d20a5cf1e0a2fb2c"
         },
-        "_family": {
+        "advance": {
           "before": null,
-          "after": "70eb7aed7ca68986cf28fc9c1be30a72546ca77167d63298e5ce39873a35f55b"
+          "after": "a794d66688dab9fbdcedf312ba45585dd3b22ad7a416764c40267951ecb5ca71"
         },
-        "_manifest": {
+        "matched_paths": {
           "before": null,
-          "after": "c3bcb5625307e49abe563e0415d4824bad255020cd412264b7a97e8d8cd1768c"
+          "after": "514afd0af4fbb0d3d483ca177d1ca3b4aafff3c84a949580189415bef1526ccc"
         },
-        "receipts": {
+        "objective_at": {
           "before": null,
-          "after": "c6a915ab50514de136e2856429983ad0f43c2fc7c6e3db41c67b83998798e02f"
+          "after": "405353cf669a0ae744f2272bd45341de300b412bf4ef209ee637ed466b0d6e33"
         },
-        "test_arms_seeds_and_responses_do_not_get_independent_assignments": {
+        "protocol": {
           "before": null,
-          "after": "a3101f90a7cbbf8678b0553ccf897af2d9d8a4cc7f59118c98fd7c78a3494f1b"
+          "after": "1d9ac505913f08972ec469ba37b2dac8e52e4b297bcd583a7f76334bf89cdd1d"
         },
-        "test_duplicate_json_fields_cannot_override_partitions": {
+        "run": {
           "before": null,
-          "after": "cd1f3a32d7475123756e993755ebb8f0c9921a450fdb8f4879778f67709a3ddb"
+          "after": "934fadc64fa744144e49e31c145489f62ca0bd44ed5b1f3bf3701a3546e653d0"
         },
-        "test_independent_diagrams_can_split_under_shared_package_hashes": {
+        "timing_outcome": {
           "before": null,
-          "after": "afdf4b328265b2cc83ea512879e356dae8eee2ad42c0e9f245839f12e70f11e7"
-        },
-        "test_layout_c_link_uses_the_manifest_diagram_identity": {
-          "before": null,
-          "after": "f5bb307321f1e534398dd00bfed13f0a1ce85382a3c31084b90ff9265089895d"
-        },
-        "test_missing_family_provenance_fails_closed": {
-          "before": null,
-          "after": "3005f5f4c3adc114fb76ad55bd60ff10df5cf9ae5b6bdd30bae11c69509b7f10"
-        },
-        "test_missing_or_unrecognized_source_fails_closed": {
-          "before": null,
-          "after": "11308047929edc0d0b20aecc2b7ec4327f0fafacebfd47c20aad335926a3077f"
-        },
-        "test_paired_baselines_and_guard_reversal": {
-          "before": null,
-          "after": "35774da1ea0ea3c1bd70406e6335f3bfa044bf6d4902e89bea8d7b1043300ea3"
-        },
-        "test_receipt_horizon_drift_fails_closed": {
-          "before": null,
-          "after": "777fb65b36421019d4bd198cc55fe1f1ef692101a972dd423bd96103256c75d6"
-        },
-        "test_reserve_requires_development_comparator": {
-          "before": null,
-          "after": "0528b51539daeb193388606157c611dc1bd02af7649f42bea230a5c3ebf3db0d"
-        },
-        "test_reuse_and_shared_trajectory_join_families_transitively": {
-          "before": null,
-          "after": "8e5acec85a6a5ced5cfe83639f4f25010fbb4a973640080d735929fba2425d8c"
+          "after": "20711b4835ac67178b245eee2b0e5b8f2a5b9516783d2eebf17330ab92ebe802"
         }
       }
     },
-    "scripts/stage4_policy_target.py": {
-      "before_sha256": "2cf2d21ab2dc0ac316f944260c6b5ad68f432d0c3446c9d7d2ea7b17cc7d3205",
-      "after_sha256": "6cb98eec2df2e0b8a59b45b3fce286e10d4c91f557faf970f5ac6155a4c2590f",
+    "scripts/stage4_scoring_timing_checks.py": {
+      "before_sha256": null,
+      "after_sha256": "6c883ad27fbe025d93fa03dc768072b32fb748e2b424485964bb7e4f7e168981",
       "owners": {
-        "build_link": {
-          "before": "38d8720ce94515681cfeec6ef183f320208997a90be69a0daef590eae89d2efe",
-          "after": "721145bd1767eacff33e0fc39291866546d7f75bb1dd061f7cb55c90e2659b3c"
-        },
-        "source_diagram_key": {
+        "@module": {
           "before": null,
-          "after": "6508cd0b60f87e6726bc423c0755e5f40c10ec9700720e874ab7b5a48800630e"
+          "after": "b356eaa7a5919c3374dd1b71fac7deaa7563bf4af50dc7c6d4bf90f0d2b7be51"
+        },
+        "continuation": {
+          "before": null,
+          "after": "02020aa89803fcbb3a20154de0db9650d118d9668986e260c463f962744050b3"
+        },
+        "test_award_cannot_move_to_round_four_command": {
+          "before": null,
+          "after": "3b5bba0db598aaceaaa0ce56bb27dc826a1bcedb859fc8f5b4705b7cd9a133a2"
+        },
+        "test_award_rule_must_match_turn_end_provenance": {
+          "before": null,
+          "after": "7e576f702a97acf0398bb3857dc45bb01415c61b924b730c7031fa56353da1d5"
+        },
+        "test_control_can_persist_across_both_scoring_windows": {
+          "before": null,
+          "after": "020df6ceaa8f87f72a898775d7bd0a9a079045855d74ae933380968a8b8554c5"
+        },
+        "test_same_screen_and_opponent_paths_are_required": {
+          "before": null,
+          "after": "90d19059721f8abb65abd1343d5a3c139c17e9f77802ce022f0e973fec573fc6"
+        }
+      }
+    },
+    "scripts/stage4_split_objective_replay.py": {
+      "before_sha256": "b9d733027173ea170f1f79be0f0e041d5439b9f509da442d4dd754948a95b0db",
+      "after_sha256": "c0a93726e38e2186b45b63b0d1fd1c562ed652c243e016272171c1dbcb2c1c52",
+      "owners": {
+        "@module": {
+          "before": "774382b0556701393e2ee52f3d22a4c35b0d88295fce79405e15e2a89deb8ac6",
+          "after": "bf0e40eed9d91e99e34c7d37be5359385cab6d026c2a34dc4a3c81ec149c5800"
+        },
+        "run": {
+          "before": "e8f29a51169eb28c456aa8924837f3dc474eb6698bd1daf7edcc607409b67a3f",
+          "after": "ab9a1b80e7c749566824a8b39eec2db4e6e0d88905cdb8b4dd40f418f4727680"
+        },
+        "score": {
+          "before": "d6cd307bb754781daeb6d7bc012300d25f75609ded957cfa74bbe53543c016c4",
+          "after": "422a0cc76220a239b2b6610ffc3048b1906fe0b600795af5fe50a136f96e4d82"
         }
       }
     }
@@ -156,7 +126,7 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Documents the opt-in same-release split and fixed-follow-through development baseline margins.",
+      "rationale": "Documents the opt-in native timing comparison, its fixed continuation policy, source limits and replay requirements.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -164,37 +134,47 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Registers the opt-in split and baseline entry point and its focused checks with the existing Stage 4 operation.",
+      "rationale": "Maps the development-only timing benchmark and checks to the existing Stage 4 operation.",
       "source_obligation": null,
       "unchanged_work": null
     },
-    "scripts/stage4_evaluation.py": {
+    "scripts/stage4_benchmark_entry.py": {
       "category": "measured_workload",
       "operations": [
         "stage4-benchmark-entry-reproducer"
       ],
       "selected_families": [],
-      "rationale": "Validates provenance-only family assignments and summarizes existing sealed scores through an opt-in development command.",
+      "rationale": "Adds an opt-in timing mode and worker bound to the existing development CLI.",
       "source_obligation": null,
       "unchanged_work": null
     },
-    "scripts/stage4_evaluation_checks.py": {
+    "scripts/stage4_split_objective_replay.py": {
       "category": "measured_workload",
       "operations": [
         "stage4-benchmark-entry-reproducer"
       ],
       "selected_families": [],
-      "rationale": "Exercises same-package isolation, transitive overlap, closed provenance checks and paired sealed development receipt arithmetic.",
+      "rationale": "Reuses the sealed four-arm admission and native boundary scorer for two passive timing continuations.",
       "source_obligation": null,
       "unchanged_work": null
     },
-    "scripts/stage4_policy_target.py": {
+    "scripts/stage4_scoring_timing.py": {
       "category": "measured_workload",
       "operations": [
         "stage4-benchmark-entry-reproducer"
       ],
       "selected_families": [],
-      "rationale": "Records the source diagram and scenario lineage in development evidence while retaining the source artifact hashes for audit.",
+      "rationale": "Runs two bounded passive continuations and checks native boundary, transaction, material and path evidence outside the gameplay runtime.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "scripts/stage4_scoring_timing_checks.py": {
+      "category": "measured_workload",
+      "operations": [
+        "stage4-benchmark-entry-reproducer"
+      ],
+      "selected_families": [],
+      "rationale": "Exercises boundary-local VP and prevents misattributed awards and mismatched native paths.",
       "source_obligation": null,
       "unchanged_work": null
     }

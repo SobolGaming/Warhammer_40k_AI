@@ -1159,8 +1159,8 @@ def main() -> None:
     )
     modes.add_argument(
         "--split-objective",
-        choices=("prepare", "replay", "link"),
-        help="Latch, replay, or link the verified Layout C development choices to targets.",
+        choices=("prepare", "replay", "link", "timing"),
+        help="Latch or replay Layout C, link its choices, or compare its native scoring windows.",
     )
     parser.add_argument("--checkpoint", type=Path, help="Layout C setup checkpoint path.")
     parser.add_argument("--worker", action="store_true", help=argparse.SUPPRESS)
@@ -1197,6 +1197,8 @@ def main() -> None:
 def split_objective(mode: str, checkpoint: Path, *, worker: bool) -> None:
     if mode == "prepare":
         from scripts.stage4_split_objective import PREPARE_SECONDS as cap
+    elif mode == "timing":
+        from scripts.stage4_scoring_timing import WALL_SECONDS as cap
     else:
         from scripts.stage4_split_objective_replay import WALL_SECONDS as cap
 
@@ -1208,7 +1210,7 @@ def split_objective(mode: str, checkpoint: Path, *, worker: bool) -> None:
         else:
             from scripts.stage4_split_objective_replay import run
 
-            run(checkpoint, link_policy_target=mode == "link")
+            run(checkpoint, link_policy_target=mode == "link", scoring_timing=mode == "timing")
     else:
         run_worker(
             ["--split-objective", mode, "--checkpoint", str(checkpoint)],

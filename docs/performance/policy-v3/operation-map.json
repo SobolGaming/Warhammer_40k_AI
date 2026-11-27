@@ -35991,7 +35991,9 @@
         "scripts/stage4_policy_target_checks.py",
         "scripts/stage4_tactical_features.py",
         "scripts/stage4_evaluation.py",
-        "scripts/stage4_evaluation_checks.py"
+        "scripts/stage4_evaluation_checks.py",
+        "scripts/stage4_scoring_timing.py",
+        "scripts/stage4_scoring_timing_checks.py"
       ],
       "owners": [
         "*"
