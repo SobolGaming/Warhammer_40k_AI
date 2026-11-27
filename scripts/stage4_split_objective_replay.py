@@ -131,6 +131,8 @@ def select_move(
     polygons: dict[str, Polygon],
     role: str,
     arm: str,
+    *,
+    screen_offers: list[policy_target.FrozenMovementOffer] | None = None,
 ) -> bench.Row:
     unit = context.request["payload"]["unit_instance_id"]
     menu = FiniteCandidateSet.from_context(context)
@@ -150,6 +152,8 @@ def select_move(
     fixture.emit("movement_offer", **stamp)
     bench.commit(scratch, context, menu.select(context, bench.NORMAL))
     offer = bench.actor(scratch)
+    if screen_offers is not None and role == "screen":
+        screen_offers.append(policy_target.FrozenMovementOffer.capture(scratch, offer))
     raw = bench.raw_moves(offer)
     order, geometry = ordered_candidates(offer, raw, polygons, role)
     ledger: bench.Row = {
@@ -197,6 +201,8 @@ def drive(
     arm: str,
     screen: bool = False,
     follow: bool = False,
+    *,
+    screen_offers: list[policy_target.FrozenMovementOffer] | None = None,
 ) -> list[bench.Row]:
     rows = []
     for _ in range(DECISION_CAP):
@@ -226,7 +232,9 @@ def drive(
         bench.require(leg == "preflight" and rnd == 2, f"{arm} missed its horizon.")
         role = ROLE_BY_UNIT[unit]
         if role == "respond" or (role == "screen" and screen) or (role == "follow" and follow):
-            rows.append(select_move(session, context, polygons, role, arm))
+            rows.append(
+                select_move(session, context, polygons, role, arm, screen_offers=screen_offers)
+            )
         else:
             bench.commit(session, context, fixture.ordinary(context))
             rows.append(
@@ -392,9 +400,14 @@ def run(checkpoint: Path, *, link_policy_target: bool = False) -> None:
         endpoints = {}
         stage = "live_admission"
         branches = {}
+        screen_offers: list[policy_target.FrozenMovementOffer] | None = (
+            [] if link_policy_target else None
+        )
         for arm, screen, follow in ARMS:
             branch = common.fork()
-            menus = drive(branch, polygons, "preflight", arm, screen, follow)
+            menus = drive(
+                branch, polygons, "preflight", arm, screen, follow, screen_offers=screen_offers
+            )
             branches[arm] = branch
             result["arms"][arm] = {"menus": menus}
             fixture.emit("live_arm_admitted", arm=arm, menus=menus)
@@ -448,6 +461,15 @@ def run(checkpoint: Path, *, link_policy_target: bool = False) -> None:
         fixture.emit("reproduction_drift", fields=sorted(drift))
         raise bench.BenchmarkGap("The Layout C run differs from its sealed four-arm receipt.")
     if frozen_choice is not None:
-        link = policy_target.build_link(reference, observed, frozen_choice, origin, endpoints)
+        bench.require(
+            screen_offers is not None
+            and len(screen_offers) == len(policy_target.PAIRS)
+            and all(offer == screen_offers[0] for offer in screen_offers),
+            "Matched Screen arms did not capture the same child offer.",
+        )
+        assert screen_offers is not None
+        link = policy_target.build_link(
+            reference, observed, frozen_choice, screen_offers[0], origin, endpoints
+        )
         fixture.emit("development_policy_target", **link, link_hash=payload_digest(link))
     fixture.emit("group_result", **result)
