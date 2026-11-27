@@ -1,896 +1,142 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "2de7669118258c988798c8b857c4ce705abfb094",
+  "base": "767c5f2a09f10ec1fe6216ac2c3785fe12f48670",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:1d2913f1ceadb54f99022d8cf1e835c7e0567c6fa73eea0705ac85fe9d94a5c9",
   "operation_map_sha256": "9880bd783417f40b20a2df0dee2aff2251c1c4818427982c3657d66fc9c39a34",
   "changes": {
-    "ci/quality_shards/all.txt": {
-      "before_sha256": "f7b6cb51753d8836fd5991e325c94b258e279bfa75a0c23da78e45d4cccb085d",
-      "after_sha256": "17559618e7d9311e2856b98b5b6359a0999fe664a5e0b9891d79080bd5e9b2c9",
+    "scripts/stage4_layout_batch.py": {
+      "before_sha256": "bba573e29cd454fc1abee921a064daf7eae5d2fe51027fb342f1d244780eaf50",
+      "after_sha256": "8b6e56783f1a339fd01014aa93121ced9d4ca565079794286feb190b2e60ce3f",
       "owners": {
-        "@document": {
-          "before": "f7b6cb51753d8836fd5991e325c94b258e279bfa75a0c23da78e45d4cccb085d",
-          "after": "17559618e7d9311e2856b98b5b6359a0999fe664a5e0b9891d79080bd5e9b2c9"
+        "recipe_for": {
+          "before": "a24bfb28831ba16b2b1511dced7a1b85ed84874479f8d271f37bc6e8309c6ec9",
+          "after": "0ca883386e02923877a597d0544c7346424c582fe1c3f3abab4debd1deaf2fa5"
         }
       }
     },
-    "ci/quality_shards/shard-4.txt": {
-      "before_sha256": "6638459fc909c8e9e56f6f36be633968f5fbab33b6f2001fb5b53413949ee581",
-      "after_sha256": "02786677d241a7b9069c2c9d00856b92ac9c9b66bf2d3f254f195681aa6f0849",
-      "owners": {
-        "@document": {
-          "before": "6638459fc909c8e9e56f6f36be633968f5fbab33b6f2001fb5b53413949ee581",
-          "after": "02786677d241a7b9069c2c9d00856b92ac9c9b66bf2d3f254f195681aa6f0849"
-        }
-      }
-    },
-    "ci/test_shards/durations.json": {
-      "before_sha256": "7fa3e0bddbcb9a444f27b2407d07977404727207af09969193b7a61cdc020ee0",
-      "after_sha256": "37caee69a6bf81b73d59adb68a69d2b2c63fbf6fee070aec1e4e7d29a05ac191",
-      "owners": {
-        "@document": {
-          "before": "7fa3e0bddbcb9a444f27b2407d07977404727207af09969193b7a61cdc020ee0",
-          "after": "37caee69a6bf81b73d59adb68a69d2b2c63fbf6fee070aec1e4e7d29a05ac191"
-        }
-      }
-    },
-    "ci/test_shards/shard-1.txt": {
-      "before_sha256": "43f27e04ffd1698ac6c74b6e1389563902ebadffd755f324922ce6a0d43dba37",
-      "after_sha256": "b0c12de4179800fa0f4f619823968e11ac282c31403345cbe045a1a3a6d0ff07",
-      "owners": {
-        "@document": {
-          "before": "43f27e04ffd1698ac6c74b6e1389563902ebadffd755f324922ce6a0d43dba37",
-          "after": "b0c12de4179800fa0f4f619823968e11ac282c31403345cbe045a1a3a6d0ff07"
-        }
-      }
-    },
-    "ci/test_shards/shard-10.txt": {
-      "before_sha256": "11eaee4edeee40bc6e3b167538fa1f90a3363548c7fd924523fbb04c89921af3",
-      "after_sha256": "cf270cd4e30162c4a4d4dc655d6121cc405e6d1f245a65a4306060d4e557988b",
-      "owners": {
-        "@document": {
-          "before": "11eaee4edeee40bc6e3b167538fa1f90a3363548c7fd924523fbb04c89921af3",
-          "after": "cf270cd4e30162c4a4d4dc655d6121cc405e6d1f245a65a4306060d4e557988b"
-        }
-      }
-    },
-    "ci/test_shards/shard-11.txt": {
-      "before_sha256": "db73a13c99659754df526a5eaec5b6d761af1f6e8b9f3a465e831d55d9b8c8fd",
-      "after_sha256": "54e80f39157ecb6790f066c21446a981b8e695202cd389f061dbe6ab30ea645c",
-      "owners": {
-        "@document": {
-          "before": "db73a13c99659754df526a5eaec5b6d761af1f6e8b9f3a465e831d55d9b8c8fd",
-          "after": "54e80f39157ecb6790f066c21446a981b8e695202cd389f061dbe6ab30ea645c"
-        }
-      }
-    },
-    "ci/test_shards/shard-12.txt": {
-      "before_sha256": "d39fc0a7f0403139aafa517001ba3297becb11cf71ac14f9cbd9a9fac0863a51",
-      "after_sha256": "42d020e03273f82553dafd278570b6fddfe05342d419c75843732c32adcd38bc",
-      "owners": {
-        "@document": {
-          "before": "d39fc0a7f0403139aafa517001ba3297becb11cf71ac14f9cbd9a9fac0863a51",
-          "after": "42d020e03273f82553dafd278570b6fddfe05342d419c75843732c32adcd38bc"
-        }
-      }
-    },
-    "ci/test_shards/shard-2.txt": {
-      "before_sha256": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
-      "after_sha256": "8936c2327d0f9464644c5844994604114c1544ae43a84c72b1db18867ec0e9e5",
-      "owners": {
-        "@document": {
-          "before": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
-          "after": "8936c2327d0f9464644c5844994604114c1544ae43a84c72b1db18867ec0e9e5"
-        }
-      }
-    },
-    "ci/test_shards/shard-3.txt": {
-      "before_sha256": "ed8b2de4f896240a0d1fb02f3619cf22c5a51a118cc241c105470311b8b39d28",
-      "after_sha256": "c8fba93dec3b7a24bf1e99fd46a6ebb0f4ad2ff12a160c10027224a6e2317e6c",
-      "owners": {
-        "@document": {
-          "before": "ed8b2de4f896240a0d1fb02f3619cf22c5a51a118cc241c105470311b8b39d28",
-          "after": "c8fba93dec3b7a24bf1e99fd46a6ebb0f4ad2ff12a160c10027224a6e2317e6c"
-        }
-      }
-    },
-    "ci/test_shards/shard-4.txt": {
-      "before_sha256": "612496c224c83b8dee2a80b11651371edbfcab66250ad3ff59c666d15714862e",
-      "after_sha256": "8694dfc37735bb680aadf02ad2ede1b667c20387be64ec63349daf3c816f21e9",
-      "owners": {
-        "@document": {
-          "before": "612496c224c83b8dee2a80b11651371edbfcab66250ad3ff59c666d15714862e",
-          "after": "8694dfc37735bb680aadf02ad2ede1b667c20387be64ec63349daf3c816f21e9"
-        }
-      }
-    },
-    "ci/test_shards/shard-5.txt": {
-      "before_sha256": "76bb21cf1a8a6cc8b35f11264cf0cb5c57df306261253773201033b7508538cc",
-      "after_sha256": "8ae38bbacc39e8f4e4f75e87fe35687e4b11c16479f1c5a578ecc1055d77e7b9",
-      "owners": {
-        "@document": {
-          "before": "76bb21cf1a8a6cc8b35f11264cf0cb5c57df306261253773201033b7508538cc",
-          "after": "8ae38bbacc39e8f4e4f75e87fe35687e4b11c16479f1c5a578ecc1055d77e7b9"
-        }
-      }
-    },
-    "ci/test_shards/shard-6.txt": {
-      "before_sha256": "3c9a3681197b0f14645262e6a32857e0988b06357bb51a915fa0f442437c6574",
-      "after_sha256": "2567c7e1ee8e1d1a900f5e697314d63d224e5ad2a405a01c92abee8b4f915d6b",
-      "owners": {
-        "@document": {
-          "before": "3c9a3681197b0f14645262e6a32857e0988b06357bb51a915fa0f442437c6574",
-          "after": "2567c7e1ee8e1d1a900f5e697314d63d224e5ad2a405a01c92abee8b4f915d6b"
-        }
-      }
-    },
-    "ci/test_shards/shard-7.txt": {
-      "before_sha256": "4c0b8d6d8fde107865d8f4650ff2961fd44d3efc88a8f840ef96b9980ffc4554",
-      "after_sha256": "9bb0aab7c761a245ea6615d6a0a745d954231abae2af8481f0aae4bbea9067ed",
-      "owners": {
-        "@document": {
-          "before": "4c0b8d6d8fde107865d8f4650ff2961fd44d3efc88a8f840ef96b9980ffc4554",
-          "after": "9bb0aab7c761a245ea6615d6a0a745d954231abae2af8481f0aae4bbea9067ed"
-        }
-      }
-    },
-    "ci/test_shards/shard-8.txt": {
-      "before_sha256": "b29dc16398e05e09c7b6420f1bfa7ed4da5bd7e47ca1b449c08a7ee15f73b2b9",
-      "after_sha256": "92e450a58df823355ee9eb5cca59cd9c22530c0f1b5defcffa2045f9b5c89c32",
-      "owners": {
-        "@document": {
-          "before": "b29dc16398e05e09c7b6420f1bfa7ed4da5bd7e47ca1b449c08a7ee15f73b2b9",
-          "after": "92e450a58df823355ee9eb5cca59cd9c22530c0f1b5defcffa2045f9b5c89c32"
-        }
-      }
-    },
-    "ci/test_shards/shard-9.txt": {
-      "before_sha256": "a9a34bf0bf3502dc7192455277546e6b44654eda28ab726795b6b1bbaa900749",
-      "after_sha256": "6c1c8128ee96c489cbd82a5b8187b2fe997cf0681cb0dabe050c8156809f7460",
-      "owners": {
-        "@document": {
-          "before": "a9a34bf0bf3502dc7192455277546e6b44654eda28ab726795b6b1bbaa900749",
-          "after": "6c1c8128ee96c489cbd82a5b8187b2fe997cf0681cb0dabe050c8156809f7460"
-        }
-      }
-    },
-    "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "7abab9a7b4661ea4c9cb6958201cea9e71a4eee6ba32eb2a1056c283236deda8",
-      "after_sha256": "d953c58b3eb8a4bbc2252be004cdd0ab3270566e5a74aaf230a338be1cfcb037",
-      "owners": {
-        "@document": {
-          "before": "7abab9a7b4661ea4c9cb6958201cea9e71a4eee6ba32eb2a1056c283236deda8",
-          "after": "d953c58b3eb8a4bbc2252be004cdd0ab3270566e5a74aaf230a338be1cfcb037"
-        }
-      }
-    },
-    "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "5ee21507ddf0acafcaf873f8350e164fc86c79dcc7f01f1e7d836ab4756f2155",
-      "after_sha256": "714633223d7f21b3562949d14d982115d874a48da7cee3cfb9dfad29026fe786",
-      "owners": {
-        "@document": {
-          "before": "5ee21507ddf0acafcaf873f8350e164fc86c79dcc7f01f1e7d836ab4756f2155",
-          "after": "714633223d7f21b3562949d14d982115d874a48da7cee3cfb9dfad29026fe786"
-        }
-      }
-    },
-    "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "7c7d5f461ca08cf7c866d4e5281fc670a4b871c85edb50e4cdb93592205e12a2",
-      "after_sha256": "4e00ead501f5ddff8fd8833522562bfaa1d46b77fa841edcf9838a9be83053ca",
-      "owners": {
-        "@document": {
-          "before": "7c7d5f461ca08cf7c866d4e5281fc670a4b871c85edb50e4cdb93592205e12a2",
-          "after": "4e00ead501f5ddff8fd8833522562bfaa1d46b77fa841edcf9838a9be83053ca"
-        }
-      }
-    },
-    "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "c47c26f8702456c29bc5f9ed4190679a1fbdab6c7b14f6dbc551b6d623a8a8ea",
-      "after_sha256": "bc5d87b6d7a9bb19d0a736eef71680564d737edce1fe3b6f0a66f2d6b243aa3e",
-      "owners": {
-        "@document": {
-          "before": "c47c26f8702456c29bc5f9ed4190679a1fbdab6c7b14f6dbc551b6d623a8a8ea",
-          "after": "bc5d87b6d7a9bb19d0a736eef71680564d737edce1fe3b6f0a66f2d6b243aa3e"
-        }
-      }
-    },
-    "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "cf86e12a2cac5b2b90d167edd714af04b5d16e2711d0d9da58fdf229fbead659",
-      "after_sha256": "9d6a29d16883ca7ade24113faa6b6182645bcd6b05161d6b8633ab2ef9d94f83",
-      "owners": {
-        "@document": {
-          "before": "cf86e12a2cac5b2b90d167edd714af04b5d16e2711d0d9da58fdf229fbead659",
-          "after": "9d6a29d16883ca7ade24113faa6b6182645bcd6b05161d6b8633ab2ef9d94f83"
-        }
-      }
-    },
-    "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "c69c493a3e76d8feb0b7df83da7ecc74171c39fd8f0cfcdcf0010292b5875736",
-      "after_sha256": "970f528b0695764f40ad686026f078c8b4b41b5c377eb41b774b858d7ea4fe38",
-      "owners": {
-        "@document": {
-          "before": "c69c493a3e76d8feb0b7df83da7ecc74171c39fd8f0cfcdcf0010292b5875736",
-          "after": "970f528b0695764f40ad686026f078c8b4b41b5c377eb41b774b858d7ea4fe38"
-        }
-      }
-    },
-    "contracts/examples/support-profile.json": {
-      "before_sha256": "6ed8f8d6a4295722f1677ee9085a1a8b3699ed69375ef568a3953ff3a5f27145",
-      "after_sha256": "de7a5344aacf45eff4207feddf9d06174134a5b5f435cd3010e33a96b9044820",
-      "owners": {
-        "@document": {
-          "before": "6ed8f8d6a4295722f1677ee9085a1a8b3699ed69375ef568a3953ff3a5f27145",
-          "after": "de7a5344aacf45eff4207feddf9d06174134a5b5f435cd3010e33a96b9044820"
-        }
-      }
-    },
-    "contracts/manifest.json": {
-      "before_sha256": "e243540cd2781243ec299cdea42555ea3e8140e2e95002c4932ce977cf9c4d18",
-      "after_sha256": "0cb0990ea02feed4e4584bdf6a7f57c6090bbd5f841302f68310f21b3a635ac9",
-      "owners": {
-        "@document": {
-          "before": "e243540cd2781243ec299cdea42555ea3e8140e2e95002c4932ce977cf9c4d18",
-          "after": "0cb0990ea02feed4e4584bdf6a7f57c6090bbd5f841302f68310f21b3a635ac9"
-        }
-      }
-    },
-    "data/generated/ability_coverage/cross_source_semantic_equivalence.json": {
-      "before_sha256": "9d3d3d39a66c619ec5085a0296351f80ae101466c25938ad1534900019a08d82",
-      "after_sha256": "e9ce8884c7bdbd0588ea04c2ba60a1254f740a7b8d57118da5b3ffa4e121ffa6",
-      "owners": {
-        "@document": {
-          "before": "9d3d3d39a66c619ec5085a0296351f80ae101466c25938ad1534900019a08d82",
-          "after": "e9ce8884c7bdbd0588ea04c2ba60a1254f740a7b8d57118da5b3ffa4e121ffa6"
-        }
-      }
-    },
-    "data/source_audits/ci64_provenance_v1/shroud-of-flies-test-v1.json": {
-      "before_sha256": null,
-      "after_sha256": "f2b0af28e69590b1289ee63780398c48c9165ed08aa27a15ff641ca5fb002934",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "f2b0af28e69590b1289ee63780398c48c9165ed08aa27a15ff641ca5fb002934"
-        }
-      }
-    },
-    "docs/CROSS_SOURCE_SEMANTIC_EQUIVALENCE.md": {
-      "before_sha256": "8f80a554fbe7fbb847bdd76bba2ee528bf651874c82ad2d0d67e87c368c804c4",
-      "after_sha256": "3683ff5acbb3dbf0dc57cd322eb7b95183fdb93c0b35ce11fc1b1423ff22617c",
-      "owners": {
-        "@document": {
-          "before": "8f80a554fbe7fbb847bdd76bba2ee528bf651874c82ad2d0d67e87c368c804c4",
-          "after": "3683ff5acbb3dbf0dc57cd322eb7b95183fdb93c0b35ce11fc1b1423ff22617c"
-        }
-      }
-    },
-    "docs/factions/chaos-daemons.md": {
-      "before_sha256": "7bc5ff0ad171b709a9de5d55b3e91888c9537d8396ed2ceeca2a369c5b437a2f",
-      "after_sha256": "d6f57e63aa954042d4c54e01cd33074c36c7952e5f54a3951463e3f2a3ac74ca",
-      "owners": {
-        "@document": {
-          "before": "7bc5ff0ad171b709a9de5d55b3e91888c9537d8396ed2ceeca2a369c5b437a2f",
-          "after": "d6f57e63aa954042d4c54e01cd33074c36c7952e5f54a3951463e3f2a3ac74ca"
-        }
-      }
-    },
-    "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "6bbb93c63879f1cd3bd05f6b4a0b0253930f539a690bb09953c9e1642b71e94d",
-      "after_sha256": "0fdd830d022b11d9d9563ba965e782bcb1f5ff7a122009a6c33a81d05ab3fc37",
-      "owners": {
-        "@document": {
-          "before": "6bbb93c63879f1cd3bd05f6b4a0b0253930f539a690bb09953c9e1642b71e94d",
-          "after": "0fdd830d022b11d9d9563ba965e782bcb1f5ff7a122009a6c33a81d05ab3fc37"
-        }
-      }
-    },
-    "scripts/engine_numerical_identity_test_admission.py": {
-      "before_sha256": "dfefcd9d556109c0f131d49fce2a693acd9328a9cbac61f9402a41a42ec72a51",
-      "after_sha256": "00ad8cf398cd8a016c2db17e20b9ba4080b9dc509558a067c6b3f8b6358a4744",
-      "owners": {
-        "_counteroffensive_fight_type_transition": {
-          "before": "8ca8ec85ee694edcf085bffd3dc25bc1d0c4dc1122df9069b345699167ca0da8",
-          "after": "2020ca818932acbff4dbf70ef5f63749ce0f0d01a11920d28aaee179a418b8dd"
-        },
-        "combined_charge_runtime": {
-          "before": "a912a5cded7e214596ff75a081d935dd2e92ee93a59f98b7ae0d32d336b8ebc0",
-          "after": "b7a129e20919a40e04326723a53c9a85cf6549bc0a4ecf042c46f7881d954eae"
-        },
-        "exact_movement_test_transition": {
-          "before": "a656b81cd44789f967800a50caa042aa0c52b7c30acc8d444234a4ae95cd0185",
-          "after": "03439013f9b7df85da9a1fb7bf144668dcf66a571497835c2aa236e9c697b9a9"
-        }
-      }
-    },
-    "scripts/shroud_of_flies_test_admission.py": {
-      "before_sha256": null,
-      "after_sha256": "3fe33de087682ffd18185077fb8e3a7e1af55c3e2d9d4f972a2a201702e9bbe8",
+    "scripts/stage4_layout_intake.py": {
+      "before_sha256": "566c07acbfe1158b568805fcee9209770245cfd45cf63c7454f630d2da96361a",
+      "after_sha256": "d75cd439f2c8a61fc0a2f3a27654c12fd6b67c4c33f565c2598bc5022d943db3",
       "owners": {
         "@module": {
-          "before": null,
-          "after": "a7708f7a5de91a73e74d60c902c7ab045436f7bbc4fc1e48f7f29f24c3c6200a"
+          "before": "2231f75f41afcf60b0e17d4913d403bbc06ab1df8106efc4fce8629fe9346cfe",
+          "after": "df84ed69e49d6ce40688a5f720b728692e729fb35dd09064153274e07617a289"
         },
-        "ShroudOfFliesReceipt": {
+        "_PrimaryMissionChoices": {
           "before": null,
-          "after": "13fbceaccca4d963016f52e409e1d063b7e75e440058d4e84769c7a421972df0"
+          "after": "7d154185a5de1ebbee5e4440965bddfe466e05b3b8ee6c698ba84f64e2d6d960"
         },
-        "shroud_of_flies_runtime": {
+        "_PrimaryMissionChoices.__init__": {
           "before": null,
-          "after": "55081fd8dc804f23f1cb1ccca60a231a6ab442956fd1a7d3dd026b43239be68a"
+          "after": "f6a7ad2b2f878571b0e2c99346d929804bfce1a7784d5eee3dbab9858bf941bb"
         },
-        "shroud_of_flies_test_successor": {
+        "_PrimaryMissionChoices.require_complete": {
           "before": null,
-          "after": "0674ef62483bccceb7ac9e65f96adbc8f30ec6f8615ecf0634e6dc1636a8954b"
+          "after": "6cf01660a3a6efae58f6c6fa91cbdd16dc2776f80276f0cf29ce9b4d00bf7082"
+        },
+        "_PrimaryMissionChoices.select": {
+          "before": null,
+          "after": "d4ffc8cd1ee6dc53b1c0d2814be2696f79f4d7936a3fa46355f451405a1feb8f"
+        },
+        "open_origin": {
+          "before": "cc149f275be4da1dbb8b96b2fe91d1de9053f1e5afa61aac745446a85637df4a",
+          "after": "b50e06967f555a071c356e3a04afd35c56cfd2cf95c8e6aa796d736b871c8b66"
         }
       }
     },
-    "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "9f984acc6ad83e17315c3e542c978c7bcce009051fc2dfb6f39334e1ffef8d2a",
-      "after_sha256": "0ff2069ea62022e6045ee8d2bbbbdc61f58d7bee181d88832494e3638dd9013b",
-      "owners": {
-        "@document": {
-          "before": "9f984acc6ad83e17315c3e542c978c7bcce009051fc2dfb6f39334e1ffef8d2a",
-          "after": "0ff2069ea62022e6045ee8d2bbbbdc61f58d7bee181d88832494e3638dd9013b"
-        }
-      }
-    },
-    "src/warhammer40k_core/rules/aura_parser.py": {
-      "before_sha256": "42625fc3dd25ba765a0942fb51ba35d395f4352515fc7e29d173fffa574f588a",
-      "after_sha256": "c08a6ef0764aef00bfb7f01a306e4ba571f306cd4fae8cf6651c2c298cd7f142",
+    "scripts/stage4_layout_intake_checks.py": {
+      "before_sha256": "961bc32555ba53f931d32365e701e379236e7edadf66d0c0d5168b8ccdb49f15",
+      "after_sha256": "c25e34e8aed93d739b8d0474d7456379b8b60405d7e6968217ab8228b6865ebd",
       "owners": {
         "@module": {
-          "before": "bb385901b13e2552d8f9a93773af8e78650b3d3c036d0ac08fc7a23aa23a8c3a",
-          "after": "d471ab10cb4eb3b1a763a00a611f03801d26ec554661d07961cbdff913bcb01d"
+          "before": "ea26a4d4d2e69bc91ec61970727b795f9275f65bec8cb66769ec5173980faeb3",
+          "after": "f8eea0e87d279f67cd3301b9bed136d901e22876d70e1b08c6a594d7813087f9"
         },
-        "has_aura_scope": {
+        "_configured_mission_choices": {
           "before": null,
-          "after": "0ab01d2857d7552ece5d9bb137cbe2a44ebaa3572cdaeed2b4d22ea735afe506"
+          "after": "2a87e33d1f75de0ca0de3fa30fc48cf023ac1e63837bb656e1dafdc8f7d6940f"
         },
-        "live_aura_distance_conditions": {
+        "_mission_choice_context": {
           "before": null,
-          "after": "afb992a0aa3f1a172160fd144ae67989bebb96e2d9f03a8ffcac13f8e44057dc"
+          "after": "0d7258aeb32f405f38f2fe973d2d01b2c9cc8b633391426796c8f0f5c64388f1"
         },
-        "parse_aura_conditions": {
-          "before": "d5ef0ba126f7dbf3050a7b2ab1265e252a96919d1d09ee728b409db770f150e3",
-          "after": "f374e790ea90af37e84cc9b5734947ee696ab11e806190457883dede17603a75"
-        },
-        "parse_live_aura_ability_effects": {
+        "_mission_declaration": {
           "before": null,
-          "after": "691b5b35d6fc78f2a8e95c8ad3db225f87918fe42fb188a8139f5b6dd403c92c"
+          "after": "b4e8162ad1ef8df47989e1b40579799ceb6c3b1154ba5696b73e96fc074063f0"
         },
-        "unsupported_live_aura_clause": {
+        "test_primary_mission_choice_consumes_each_required_window_once": {
           "before": null,
-          "after": "371eb1d9e852fed9d3390a15e954a5e1846e0da44b13641975ebad05c05503da"
-        }
-      }
-    },
-    "src/warhammer40k_core/rules/rule_duration_parser.py": {
-      "before_sha256": "ccb18ea13cbd7e4f5da0876cac0197da406d8dd116c25c7c56996ca7f1cdedc6",
-      "after_sha256": "eb362f358a6410a4176ba4df8ac2616c6991b8d53448335dda5870f6e5337700",
-      "owners": {
-        "@module": {
-          "before": "f98fc4ff7cc061c08857c61bf50a61f3abc6e1cc54110c2ae3112eddd6fc24af",
-          "after": "2b7685c745c82c5939f637a8fed8fbbae85ef8d04d32fec6b7e9032334b71b5b"
+          "after": "52dbf7e327245f474e9820905ed84bce18f65884347d7ee8ee42814839d05b62"
         },
-        "parse_rule_duration": {
-          "before": "78d5283f73d1b3501037f56e10f777cb2f51a41f4216be52ce8a13721e8732b0",
-          "after": "2f2e48ac990b540379b4e2e63d4981ca34ca12b111be377687eb2284753a4dbc"
-        }
-      }
-    },
-    "src/warhammer40k_core/rules/rule_keyword_sequences.py": {
-      "before_sha256": "c9158e12a0706d5fe564d4a7da8bf905057f08dcbfa0c3b36213ea92fae78e63",
-      "after_sha256": "cea550d2d28ae1e37add6b446cc5a4f54ba32f3410ee360eb0406f1bb1ba50be",
-      "owners": {
-        "_normalize_source_keyword_sequence": {
+        "test_primary_mission_choice_passes_native_validation_after_prior_allocation": {
           "before": null,
-          "after": "7b6547e29aaf763906c3a2d79d36581bef9c34ce15dc6d03ac94840f1a0d4ee6"
+          "after": "38716543c8de0aed5697aa69feb51e2f92d18dfbadf3e3671e3cc4e21604b4e6"
         },
-        "_split_source_keyword_sequence": {
-          "before": "8fdd89198f8828fd9a046dee2ce5cabd5267dd742efbe7a942b10300e8f14ef8",
-          "after": "637f31ec5c62802a9add62cb941ab77bb40d4551ae19a051374d050f16d66235"
-        },
-        "is_known_source_keyword_sequence": {
+        "test_primary_mission_choice_rejects_ambiguous_or_foreign_options": {
           "before": null,
-          "after": "eaa9165246f2ee9239a1eeff541b53043a4c91036b23b95c962a1ff381f7b795"
+          "after": "13ddba76eb6a886ebea28c4b59507f569d53d68002c444aed2bbacf45b8cb884"
         },
-        "keyword_sequence_tokens": {
-          "before": "bd9df60318d2f74a0066166edc3601ffecfe34e18df25ed5a65780e4db05ce5a",
-          "after": "b4c10a0563928775d09ad4516c2fc65b4fc9b9994cd8b9136a6b934af527a38e"
-        }
-      }
-    },
-    "src/warhammer40k_core/rules/rule_parser.py": {
-      "before_sha256": "3e37613a9e61f3bc1b4aa71215280352aaf7ff1ad33b38ef897e62bc5d0139b9",
-      "after_sha256": "7475deca2064116ba380b51de7f13435db84a4184b4299c15997612f02b2966c",
-      "owners": {
-        "@module": {
-          "before": "46d18d5aeb61b11763c8615e4b69cb400959abd4e5f521602bed0ea86c6cafe5",
-          "after": "a7842c4d9f513970d72a3d65a1856bc9cdffb0e8af736ef7233aa80f10d1fec9"
-        },
-        "_compile_clause": {
-          "before": "9cf80d765c82b284ac5f96c372260439c3a24a52b420c5f681ce0babc6cd1aae",
-          "after": "23ec03180f98b0f725d81d3e221ba0e217eee81a69a6a0f2821f9c738faf0c1e"
-        },
-        "_parse_grant_ability_effects": {
-          "before": "f9810f045741137b026b9a5763658f7960daea47b6b4bfc290df66e232df8d6d",
-          "after": "7da9081c4de3e35aa25025a9e0108b2508e74ae42412f3991ce5d83ae7479229"
-        },
-        "_parse_target": {
-          "before": "5b68c8c6d8515b29339e12437208e0715545c49ed443a763d34ef76c7739a18d",
-          "after": "c984ff64072384a52e56ac20693e8a8f820420a6a702e5ffd716d8f149c72bf8"
-        }
-      }
-    },
-    "tests/code_quality/test_engine_numerical_identity_admission.py": {
-      "before_sha256": "78a93a274246c07f78707888d7aec3251eeda4ca2cd9d9a2cff15f5384fccbe1",
-      "after_sha256": "2a1a3c225c37a55850d54399b952e764c0b052f16d16bcd715b3865385c9313c",
-      "owners": {
-        "@module": {
-          "before": "de58df9fd3fe706af039a0d0d600215777012e73d430d74a7bce3cb9a8969414",
-          "after": "77f7b50536ad10a5c8c7b7f456660b286fbaa31c32ef762c790423197fb14709"
-        },
-        "test_identity_inventory_uses_current_twelve_shards_and_native_cohort": {
-          "before": "55aa847438b80cac6429b98d97e2f382b81305b5f05b6729d7949b53462012e2",
-          "after": "4c2ecc49483a326285b8167509b33c038049f7a8cdea17fc49096bcd843604a2"
-        },
-        "test_shroud_transition_rejects_drift_in_the_current_manifest": {
+        "test_primary_mission_choice_rejects_an_inconsistent_window": {
           "before": null,
-          "after": "3822ee0a3e640ed3466f4bb0275c07b093b23464856fdde71f8662917b0a5c23"
-        }
-      }
-    },
-    "tests/code_quality/test_generated_ability_support_artifacts.py": {
-      "before_sha256": "a7b8c693d1ab79195d989777a3a8d02d97c05d0acad94a971acd0fa52e638380",
-      "after_sha256": "9ca61c6c61171123b95fc418d8b5c78e03f11dded2d96d4ba94703af927af114",
-      "owners": {
-        "test_fortification_stealth_requires_known_conjunctive_keywords": {
-          "before": null,
-          "after": "b6f798646de7f06296d21bc27a7170c706de7b09b943c70a01bafee0eff15f8c"
-        }
-      }
-    },
-    "tests/rules/section10/test_shooting_types.py": {
-      "before_sha256": "8f7f2cfdccee7b688671fa6f6ec099402824b2c6dd67c13eade64482a840d773",
-      "after_sha256": "df099463b3a908ac2bb617ca8730a7fd9a41850b67b467ba4c167abd363be530",
-      "owners": {
-        "@module": {
-          "before": "cb36b8afb58535da6d0e8af902e89837cd485a504a9e084fa64a4822bc8634ae",
-          "after": "67786403f5af032c300d33b4400869e3563ff885fc716c4a811c446bed3d2b3c"
+          "after": "973bca577ef0fe715d8d3d709491e9a6502c9a860479aaadb5c4bb6a7d307843"
         },
-        "shroud_of_flies": {
+        "test_primary_mission_choice_rejects_duplicate_declarations": {
           "before": null,
-          "after": "f2f3c9746b8a05a41967f9955e68987421a2ed562ae032035a082474e2f562d3"
+          "after": "734ca080ed33f8a3febfeb017f03bfabd302a41da2564c2c59048f7525095e51"
         },
-        "test_shroud_of_flies_grants_live_stealth_in_native_shooting": {
+        "test_primary_mission_choice_rejects_foreign_owner_or_unsupported_kind": {
           "before": null,
-          "after": "8ff62c0b78306c43ec04d2441f04a67db3730133af84b3875deeeb111c16a787"
-        }
-      }
-    },
-    "tools/generate_ability_support_matrix.py": {
-      "before_sha256": "76d547de784f93801f52412f82d044223afdfa5bd6f678d13ba8fe70003d2334",
-      "after_sha256": "5decd095de6e40d4c30a1d6569c5f2d9591acae808dd1873ea7f9463976a7458",
-      "owners": {
-        "_chaos_daemons_nurgle_review_rows": {
-          "before": "1b03cd39e65e3b8b234c54c4d78981d31366ed3fe136cb7f41f6711d1fd8edfb",
-          "after": "2c4581825570f892867834db898f808fd041d5620013eebdcaefe48912c94dad"
+          "after": "56526716e24c80be453ba09a9ed915cfd2e1f197ca18e6aa74b782ae9280a937"
+        },
+        "test_primary_mission_choice_rejects_invalid_declarations": {
+          "before": null,
+          "after": "0718da1449da9ffa86f57db1421fbae9c2f5745145a4cd76290e27be44599df7"
+        },
+        "test_primary_mission_choice_rejects_missing_or_inexact_bindings": {
+          "before": null,
+          "after": "d2ab829dd849296746d3b189de8c92e6c1972bbb35e7e9f73c4327bc717c8265"
+        },
+        "test_primary_mission_choice_uses_the_current_issued_ids": {
+          "before": null,
+          "after": "1d6272d0f99e246101034fb6d8fa34c03182a5226887110fbf3fd2db0701c559"
+        },
+        "test_primary_mission_choices_are_optional_prospective_page_fields": {
+          "before": null,
+          "after": "ceb5c20a76eea1ef74fdf673f57aa8b63fa36a7d3688db6990a2991df2cac0fe"
         }
       }
     }
   },
   "rows": {
-    "ci/quality_shards/all.txt": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Registers the fourteen Shroud qualifier cases and one manifest drift case for quality dispatch.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "ci/quality_shards/shard-4.txt": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Registers the fourteen Shroud qualifier cases and one manifest drift case for quality dispatch.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "ci/test_shards/durations.json": {
+    "scripts/stage4_layout_batch.py": {
       "category": "measured_workload",
       "operations": [
-        "mfm-current-behavior-profile"
+        "stage4-benchmark-entry-reproducer"
       ],
       "selected_families": [],
-      "rationale": "Regenerates the twelve-shard schedule from one complete covered local profile of the exact Shroud behavioral inventory.",
+      "rationale": "Carries optional choice declarations through prospective page validation for the existing driver.",
       "source_obligation": null,
       "unchanged_work": null
     },
-    "ci/test_shards/shard-1.txt": {
+    "scripts/stage4_layout_intake.py": {
       "category": "measured_workload",
       "operations": [
-        "mfm-current-behavior-profile"
+        "stage4-benchmark-entry-reproducer"
       ],
       "selected_families": [],
-      "rationale": "Regenerates the twelve-shard schedule from one complete covered local profile of the exact Shroud behavioral inventory.",
+      "rationale": "Matches declared targets against a single native actor menu option in its exact setup or Command window.",
       "source_obligation": null,
       "unchanged_work": null
     },
-    "ci/test_shards/shard-10.txt": {
+    "scripts/stage4_layout_intake_checks.py": {
       "category": "measured_workload",
       "operations": [
-        "mfm-current-behavior-profile"
+        "stage4-benchmark-entry-reproducer"
       ],
       "selected_families": [],
-      "rationale": "Regenerates the twelve-shard schedule from one complete covered local profile of the exact Shroud behavioral inventory.",
+      "rationale": "Exercises menu matching, rejection, request renumbering, and native submission using nonreserve controls.",
       "source_obligation": null,
       "unchanged_work": null
-    },
-    "ci/test_shards/shard-11.txt": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerates the twelve-shard schedule from one complete covered local profile of the exact Shroud behavioral inventory.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "ci/test_shards/shard-12.txt": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerates the twelve-shard schedule from one complete covered local profile of the exact Shroud behavioral inventory.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "ci/test_shards/shard-2.txt": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerates the twelve-shard schedule from one complete covered local profile of the exact Shroud behavioral inventory.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "ci/test_shards/shard-3.txt": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerates the twelve-shard schedule from one complete covered local profile of the exact Shroud behavioral inventory.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "ci/test_shards/shard-4.txt": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerates the twelve-shard schedule from one complete covered local profile of the exact Shroud behavioral inventory.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "ci/test_shards/shard-5.txt": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerates the twelve-shard schedule from one complete covered local profile of the exact Shroud behavioral inventory.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "ci/test_shards/shard-6.txt": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerates the twelve-shard schedule from one complete covered local profile of the exact Shroud behavioral inventory.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "ci/test_shards/shard-7.txt": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerates the twelve-shard schedule from one complete covered local profile of the exact Shroud behavioral inventory.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "ci/test_shards/shard-8.txt": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerates the twelve-shard schedule from one complete covered local profile of the exact Shroud behavioral inventory.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "ci/test_shards/shard-9.txt": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerates the twelve-shard schedule from one complete covered local profile of the exact Shroud behavioral inventory.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "contracts/examples/persistence/session-persistence.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerates published contract example identities for the exact source-parser build.",
-      "source_obligation": "Chaos Daemons official September 2026 faction pack pages 86 and 87 define the live friendly Nurgle Legiones Daemonica Stealth aura.",
-      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their algorithms and workload."
-    },
-    "contracts/examples/sessions/session-command-outcome.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerates published contract example identities for the exact source-parser build.",
-      "source_obligation": "Chaos Daemons official September 2026 faction pack pages 86 and 87 define the live friendly Nurgle Legiones Daemonica Stealth aura.",
-      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their algorithms and workload."
-    },
-    "contracts/examples/sessions/session-command-started.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerates published contract example identities for the exact source-parser build.",
-      "source_obligation": "Chaos Daemons official September 2026 faction pack pages 86 and 87 define the live friendly Nurgle Legiones Daemonica Stealth aura.",
-      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their algorithms and workload."
-    },
-    "contracts/examples/sessions/session-metadata-created.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerates published contract example identities for the exact source-parser build.",
-      "source_obligation": "Chaos Daemons official September 2026 faction pack pages 86 and 87 define the live friendly Nurgle Legiones Daemonica Stealth aura.",
-      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their algorithms and workload."
-    },
-    "contracts/examples/support-profile-player-a-redacted.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerates published contract example identities for the exact source-parser build.",
-      "source_obligation": "Chaos Daemons official September 2026 faction pack pages 86 and 87 define the live friendly Nurgle Legiones Daemonica Stealth aura.",
-      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their algorithms and workload."
-    },
-    "contracts/examples/support-profile-player-b-redacted.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerates published contract example identities for the exact source-parser build.",
-      "source_obligation": "Chaos Daemons official September 2026 faction pack pages 86 and 87 define the live friendly Nurgle Legiones Daemonica Stealth aura.",
-      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their algorithms and workload."
-    },
-    "contracts/examples/support-profile.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerates published contract example identities for the exact source-parser build.",
-      "source_obligation": "Chaos Daemons official September 2026 faction pack pages 86 and 87 define the live friendly Nurgle Legiones Daemonica Stealth aura.",
-      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their algorithms and workload."
-    },
-    "contracts/manifest.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "issue588-contract-publication"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerates published contract example identities for the exact source-parser build.",
-      "source_obligation": "Chaos Daemons official September 2026 faction pack pages 86 and 87 define the live friendly Nurgle Legiones Daemonica Stealth aura.",
-      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their algorithms and workload."
-    },
-    "data/generated/ability_coverage/cross_source_semantic_equivalence.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "phase-end-healing-source-and-report"
-      ],
-      "selected_families": [],
-      "rationale": "Reports the shared live Stealth consumer and preserves the Gnarlmaw hull admission blocker.",
-      "source_obligation": "Chaos Daemons official September 2026 faction pack pages 86 and 87 define the live friendly Nurgle Legiones Daemonica Stealth aura.",
-      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their algorithms and workload."
-    },
-    "data/source_audits/ci64_provenance_v1/shroud-of-flies-test-v1.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "fortification-stealth-aura-shroud-of-flies-test-v1"
-      ],
-      "selected_families": [],
-      "rationale": "Pins live Shroud parser and test bytes and preserves the archived Defender coherency identity.",
-      "source_obligation": "Chaos Daemons official September 2026 faction pack pages 86 and 87 define the live friendly Nurgle Legiones Daemonica Stealth aura.",
-      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their algorithms and workload."
-    },
-    "docs/CROSS_SOURCE_SEMANTIC_EQUIVALENCE.md": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Reports the shared live Stealth consumer and preserves the Gnarlmaw hull admission blocker.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "docs/factions/chaos-daemons.md": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Reports the shared live Stealth consumer and preserves the Gnarlmaw hull admission blocker.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "docs/performance/policy-v3/operation-map.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Maps previously uncovered source and test owners without changing historical operation ownership.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "scripts/engine_numerical_identity_test_admission.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "stage3-defender-coherency-test-admission",
-        "native-ranged-attack-count-reroll",
-        "cavalcade-authority-admission",
-        "stage2-strict-replay-test-admission",
-        "close-quarters-test-admission",
-        "engine-numerical-identity-admission",
-        "round4-malice-bearer-liveness",
-        "round4-battle-shock-event-wounds",
-        "phase-end-healing-test-admission",
-        "sheathed-in-brass-test-admission",
-        "stage3-bolt-of-change-test-admission",
-        "stage3-ordinary-melee-test-admission",
-        "skulls-beget-blood-test-admission",
-        "stage3-flight-normal-move-test-admission",
-        "wrath-undeniable-test-admission",
-        "pre-roll-charge-flight-test-admission",
-        "gore-hungry-onslaught-predecessor-admission",
-        "bounded-charge-flight-wall-proof",
-        "daemonic-terror-ordered-retreat"
-      ],
-      "selected_families": [],
-      "rationale": "Pins live Shroud parser and test bytes and preserves the archived Defender coherency identity.",
-      "source_obligation": "Chaos Daemons official September 2026 faction pack pages 86 and 87 define the live friendly Nurgle Legiones Daemonica Stealth aura.",
-      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their algorithms and workload."
-    },
-    "scripts/shroud_of_flies_test_admission.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "fortification-stealth-aura-shroud-of-flies-test-admission"
-      ],
-      "selected_families": [],
-      "rationale": "Pins live Shroud parser and test bytes and preserves the archived Defender coherency identity.",
-      "source_obligation": "Chaos Daemons official September 2026 faction pack pages 86 and 87 define the live friendly Nurgle Legiones Daemonica Stealth aura.",
-      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their algorithms and workload."
-    },
-    "src/warhammer40k_core/_engine_build_manifest.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "cavalcade-authority-admission",
-        "phase-end-healing-source-and-report"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerates the exact source-parser build fingerprint with the existing contract schema and algorithms.",
-      "source_obligation": "Chaos Daemons official September 2026 faction pack pages 86 and 87 define the live friendly Nurgle Legiones Daemonica Stealth aura.",
-      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their algorithms and workload."
-    },
-    "src/warhammer40k_core/rules/aura_parser.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "fortification-stealth-aura-aura-parser"
-      ],
-      "selected_families": [],
-      "rationale": "Admits known conjunctive Fortification Stealth qualifiers using the existing aura descriptor.",
-      "source_obligation": "Chaos Daemons official September 2026 faction pack pages 86 and 87 define the live friendly Nurgle Legiones Daemonica Stealth aura.",
-      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their algorithms and workload."
-    },
-    "src/warhammer40k_core/rules/rule_duration_parser.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "fortification-stealth-aura-rule-duration-parser"
-      ],
-      "selected_families": [],
-      "rationale": "Admits known conjunctive Fortification Stealth qualifiers using the existing aura descriptor.",
-      "source_obligation": "Chaos Daemons official September 2026 faction pack pages 86 and 87 define the live friendly Nurgle Legiones Daemonica Stealth aura.",
-      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their algorithms and workload."
-    },
-    "src/warhammer40k_core/rules/rule_keyword_sequences.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "order133-keyword-number-identity",
-        "fortification-stealth-aura-rule-keyword-sequences"
-      ],
-      "selected_families": [],
-      "rationale": "Admits known conjunctive Fortification Stealth qualifiers using the existing aura descriptor.",
-      "source_obligation": "Chaos Daemons official September 2026 faction pack pages 86 and 87 define the live friendly Nurgle Legiones Daemonica Stealth aura.",
-      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their algorithms and workload."
-    },
-    "src/warhammer40k_core/rules/rule_parser.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "order125-default-unit-subjects",
-        "fortification-stealth-aura-rule-parser"
-      ],
-      "selected_families": [],
-      "rationale": "Admits known conjunctive Fortification Stealth qualifiers using the existing aura descriptor.",
-      "source_obligation": "Chaos Daemons official September 2026 faction pack pages 86 and 87 define the live friendly Nurgle Legiones Daemonica Stealth aura.",
-      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their algorithms and workload."
-    },
-    "tests/code_quality/test_engine_numerical_identity_admission.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "stage3-defender-coherency-test-admission",
-        "native-ranged-attack-count-reroll",
-        "engine-numerical-identity-admission",
-        "counteroffensive-fight-type",
-        "round4-malice-bearer-liveness",
-        "round4-battle-shock-event-wounds",
-        "stage3-bolt-of-change-test-admission",
-        "stage3-ordinary-melee-test-admission",
-        "skulls-beget-blood-test-admission",
-        "stage3-flight-normal-move-test-admission",
-        "wrath-undeniable-test-admission",
-        "pre-roll-charge-flight-test-admission",
-        "bounded-charge-flight-wall-proof"
-      ],
-      "selected_families": [],
-      "rationale": "Checks historical source and timing snapshots and the exact Shroud successor manifest and case inventory.",
-      "source_obligation": "Chaos Daemons official September 2026 faction pack pages 86 and 87 define the live friendly Nurgle Legiones Daemonica Stealth aura.",
-      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their algorithms and workload."
-    },
-    "tests/code_quality/test_generated_ability_support_artifacts.py": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Checks the source qualifiers and archives through the exact historical and successor manifests.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "tests/rules/section10/test_shooting_types.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "qualification40-exact-1c81875882f544fd",
-        "fortification-stealth-aura-test-shooting-types"
-      ],
-      "selected_families": [],
-      "rationale": "Runs the source-linked grant through a real shooting declaration, Hit event and live eligibility controls.",
-      "source_obligation": "Chaos Daemons official September 2026 faction pack pages 86 and 87 define the live friendly Nurgle Legiones Daemonica Stealth aura.",
-      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their algorithms and workload."
-    },
-    "tools/generate_ability_support_matrix.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "phase-end-healing-guide-summary"
-      ],
-      "selected_families": [],
-      "rationale": "Reports the shared live Stealth consumer and preserves the Gnarlmaw hull admission blocker.",
-      "source_obligation": "Chaos Daemons official September 2026 faction pack pages 86 and 87 define the live friendly Nurgle Legiones Daemonica Stealth aura.",
-      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their algorithms and workload."
     }
   },
   "milestone": "ordinary",

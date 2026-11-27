@@ -24,15 +24,33 @@ from warhammer40k_core.adapters.setup_smoke import (
 )
 from warhammer40k_core.ai import screen_movement_candidates
 from warhammer40k_core.ai.finite_candidates import FiniteCandidateSet
-from warhammer40k_core.ai.player_policy import PlayerDecisionContext, PolicyError, payload_digest
+from warhammer40k_core.ai.player_policy import (
+    PlayerDecisionContext,
+    PolicyAction,
+    PolicyError,
+    payload_digest,
+)
 from warhammer40k_core.ai.screen_movement_candidates import ScreenMovementGap
 from warhammer40k_core.build_identity import verified_engine_build_identity
 from warhammer40k_core.engine.game_state import GameConfig
 from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.objective_geometry import measure_model_to_objective
-from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatusKind
+from warhammer40k_core.engine.phase import (
+    BattlePhase,
+    GameLifecycleError,
+    LifecycleStatusKind,
+    SetupStep,
+)
 from warhammer40k_core.engine.primary_historical_events import (
     PRIMARY_TURN_START_EVIDENCE_RECORDED_EVENT,
+)
+from warhammer40k_core.engine.primary_mission_choice_payloads import (
+    LOCATE_AND_DENY_CHOICE_KIND,
+    PUNISHMENT_CHOICE_KIND,
+    PrimaryMissionChoiceData,
+)
+from warhammer40k_core.engine.primary_mission_choices import (
+    SELECT_PRIMARY_MISSION_CHOICE_DECISION_TYPE,
 )
 from warhammer40k_core.engine.replay import ReplayArtifactError
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th.event_companion_layouts_2026_06.event_companion_full_artifact_types import (  # noqa: E501
@@ -282,9 +300,108 @@ def config(recipe: bench.Row, setup: MissionSetup, seed: str) -> GameConfig:
     return replace(base, army_muster_requests=rosters, mission_setup=setup, reserve_unit_points=())
 
 
+class _PrimaryMissionChoices:
+    """Bind each required prefix choice to exact targets in the current actor menu.
+
+    A recipe window uses phase "start_battle" for Locate and Deny, or phase
+    "command" and a positive battle_round for Punishment.
+    """
+
+    def __init__(self, declarations: object, *, final_setup_step: SetupStep) -> None:
+        if not isinstance(declarations, list):
+            raise IntakeGap("invalid_primary_mission_choice_declarations")
+        self.final_setup_step = final_setup_step
+        self.pending: dict[tuple[str, str, int | None, str | None], tuple[str, ...]] = {}
+        self.used: set[tuple[str, str, int | None, str | None]] = set()
+        for declaration in declarations:
+            need(
+                isinstance(declaration, dict)
+                and set(declaration)
+                == {"actor_id", "choice_kind", "window", "selected_target_ids"},
+                "invalid_primary_mission_choice_declaration",
+            )
+            actor = declaration["actor_id"]
+            kind = declaration["choice_kind"]
+            window = declaration["window"]
+            targets = declaration["selected_target_ids"]
+            need(actor in (bench.A, bench.B), "invalid_primary_mission_choice_actor")
+            if kind == LOCATE_AND_DENY_CHOICE_KIND:
+                need(window == {"phase": "start_battle"}, "invalid_primary_mission_choice_window")
+                key = (actor, kind, None, None)
+            elif kind == PUNISHMENT_CHOICE_KIND:
+                need(
+                    isinstance(window, dict)
+                    and set(window) == {"battle_round", "phase"}
+                    and window["phase"] == BattlePhase.COMMAND.value
+                    and type(window["battle_round"]) is int
+                    and window["battle_round"] > 0,
+                    "invalid_primary_mission_choice_window",
+                )
+                key = (actor, kind, window["battle_round"], window["phase"])
+            else:
+                raise IntakeGap("unexpected_primary_mission_choice")
+            need(
+                isinstance(targets, list)
+                and all(
+                    isinstance(target, str) and target and target == target.strip()
+                    for target in targets
+                )
+                and len(set(targets)) == len(targets),
+                "invalid_primary_mission_choice_targets",
+            )
+            need(key not in self.pending, "repeated_primary_mission_choice")
+            self.pending[key] = tuple(sorted(targets))
+
+    def select(self, context: PlayerDecisionContext) -> PolicyAction:
+        request = context.request
+        choice = PrimaryMissionChoiceData.from_payload(request["payload"])
+        actor = context.route.actor_id
+        need(choice.player_id == actor, "foreign_primary_mission_choice")
+        if choice.choice_kind == LOCATE_AND_DENY_CHOICE_KIND:
+            valid_window = (
+                context.route.stage == "setup"
+                and context.route.setup_step == self.final_setup_step.value
+                and choice.battle_round is None
+            )
+        elif choice.choice_kind == PUNISHMENT_CHOICE_KIND:
+            observation = context.observation
+            valid_window = (
+                choice.phase == context.route.battle_phase == BattlePhase.COMMAND.value
+                and choice.battle_round == observation["battle_round"]
+                and actor == observation["active_player_id"]
+            )
+        else:
+            raise IntakeGap("unexpected_primary_mission_choice")
+        need(valid_window, "invalid_primary_mission_choice_window")
+        key = (actor, choice.choice_kind, choice.battle_round, choice.phase)
+        need(key not in self.used, "repeated_primary_mission_choice")
+        need(key in self.pending, "unconfigured_primary_mission_choice")
+        targets = self.pending[key]
+        need(set(targets) <= set(choice.legal_target_ids), "unavailable_primary_mission_choice")
+        expected = choice.with_selected_targets(targets)
+        matches = [
+            option["option_id"]
+            for option in request["options"]
+            if PrimaryMissionChoiceData.from_payload(option["payload"]) == expected
+        ]
+        need(bool(matches), "unavailable_primary_mission_choice")
+        need(len(matches) == 1, "ambiguous_primary_mission_choice")
+        action = bench.finite(context, matches[0])
+        del self.pending[key]
+        self.used.add(key)
+        return action
+
+    def require_complete(self) -> None:
+        need(not self.pending, "unused_primary_mission_choice")
+
+
 def open_origin(
     game: GameConfig, recipe: bench.Row, prefix_moves: list[bench.Row]
 ) -> LocalGameSession:
+    primary_choices = _PrimaryMissionChoices(
+        recipe.get("primary_mission_choices", []),
+        final_setup_step=game.ruleset_descriptor.setup_sequence.steps[-1],
+    )
     session = LocalGameSession()
     status = session.start(game)
     if status.status_kind is LifecycleStatusKind.ADVANCED:
@@ -303,6 +420,7 @@ def open_origin(
                 "wrong_origin_unit",
             )
             need(completed_moves == set(expected_moves), "missing_round_one_move")
+            primary_choices.require_complete()
             return session
         need(occurrence[0] <= 2, "missed_a2_origin")
         if step == recipe["prefix_decision_cap"]:
@@ -311,6 +429,8 @@ def open_origin(
             action = bench.placement(context, recipe)
         elif kind == "select_secondary_missions":
             action = bench.finite(context, recipe["fixed_secondary_option"])
+        elif kind == SELECT_PRIMARY_MISSION_CHOICE_DECISION_TYPE:
+            action = primary_choices.select(context)
         elif occurrence[0] == 1 and kind == bench.MOVE_ACTION:
             unit = context.request["payload"]["unit_instance_id"]
             if unit in expected_moves:
