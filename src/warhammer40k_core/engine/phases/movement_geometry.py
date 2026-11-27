@@ -8,7 +8,14 @@ from warhammer40k_core.engine.sequential_movement import sequential_friendly_mod
 
 from warhammer40k_core.engine.unit_keyword_queries import unit_has_keyword
 
-from warhammer40k_core.geometry.physical_model import base_crosses_physical_model_footprint
+from itertools import pairwise
+
+from warhammer40k_core.geometry.base import CircularBase
+from warhammer40k_core.geometry.physical_model import (
+    base_crosses_physical_model_footprint,
+    physical_prisms,
+)
+from warhammer40k_core.geometry.physical_predicates import translated_footprint_crosses
 
 from typing import TYPE_CHECKING
 from warhammer40k_core.engine.aircraft_rules import aircraft_rules_unit
@@ -245,6 +252,7 @@ def _desperate_escape_requirements_for_fall_back(
                 moving_model=moving_model,
                 witness=witness,
                 enemy_models=enemy_models,
+                check_continuous_translation=fortification_exemption,
             )
         # Battle-shock forces this mode. The fortification clause exempts a clear
         # model from that hazard, while separate rules can still require a roll.
@@ -307,12 +315,31 @@ def _enemy_model_ids_crossed_by_witness(
     moving_model: Model,
     witness: PathWitness,
     enemy_models: tuple[Model, ...],
+    check_continuous_translation: bool,
 ) -> tuple[str, ...]:
+    poses = witness.poses_for_model(moving_model.model_id)
     crossed_enemy_ids: set[str] = set()
-    for pose in _sampled_witness_transit_poses(
-        witness.poses_for_model(moving_model.model_id),
-        sample_interval_inches=0.5,
-    ):
+    if check_continuous_translation:
+        segments = tuple(pairwise(poses))
+        round_mover = isinstance(moving_model.base, CircularBase)
+        translations = tuple(
+            (start, end)
+            for start, end in segments
+            if start.position != end.position and (round_mover or start.facing == end.facing)
+        )
+        for enemy in enemy_models:
+            prisms = physical_prisms(enemy)
+            if any(
+                translated_footprint_crosses(moving_model.base, start, end, part.base, part.pose)
+                for start, end in translations
+                for part in prisms
+            ):
+                crossed_enemy_ids.add(enemy.model_id)
+        if round_mover or all(start.facing == end.facing for start, end in segments):
+            return tuple(sorted(crossed_enemy_ids))
+        # Rotating noncircular footprints still use the existing transit check.
+        # Sampling the original witness preserves its shared waypoints.
+    for pose in _sampled_witness_transit_poses(poses, sample_interval_inches=0.5):
         sampled_model = _model_at_pose(moving_model, pose)
         for enemy_model in enemy_models:
             if base_crosses_physical_model_footprint(sampled_model, enemy_model):

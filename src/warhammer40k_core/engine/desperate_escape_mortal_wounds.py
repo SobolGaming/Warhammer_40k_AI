@@ -2,15 +2,17 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.engine.damage_allocation import MortalWoundApplicationProgress
 from warhammer40k_core.engine.decision_controller import DecisionController
+from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.desperate_escape import DESPERATE_ESCAPE_BATTLE_SHOCK_SOURCE_RULE_ID
 from warhammer40k_core.engine.destruction_provenance import DestructionSourceKind
 from warhammer40k_core.engine.dice import DiceRollManager
-from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.event_log import EventRecord, JsonValue, validate_json_value
 from warhammer40k_core.engine.hazard import hazard_mortal_wounds_per_failed_roll
 from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
     MortalWoundDestructionEvidence,
@@ -25,6 +27,7 @@ from warhammer40k_core.engine.mortal_wound_feel_no_pain_hooks import (
     MortalWoundFeelNoPainContinuationContext,
     MortalWoundFeelNoPainContinuationHookBinding,
 )
+from warhammer40k_core.engine.movement_proposals import MovementProposalRequest
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatus
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 
@@ -36,6 +39,7 @@ SOURCE_KIND = "desperate_escape_hazard_mortals"
 STARTED = "desperate_escape_hazard_mortals_started"
 RESOLVED = "desperate_escape_hazard_mortals_resolved"
 CONTINUED = "desperate_escape_hazard_movement_continued"
+RETRY_PACKET_KEY = "desperate_escape_completed_packet_id"
 
 
 def desperate_escape_mortal_wound_binding() -> MortalWoundFeelNoPainContinuationHookBinding:
@@ -55,8 +59,15 @@ def begin_escape_mortals(
     fall_back_result: FallBackActionResult,
     action_result: DecisionResult,
     movement_proposal_request_id: str,
+    newly_failed_model_ids: frozenset[str] | None = None,
 ) -> LifecycleStatus | None:
-    if not fall_back_result.failed_desperate_escape_rolls:
+    failed_rolls = tuple(
+        roll
+        for roll in fall_back_result.failed_desperate_escape_rolls
+        if newly_failed_model_ids is None
+        or roll.requirement.model_instance_id in newly_failed_model_ids
+    )
+    if not failed_rolls:
         return None
     unit = rules_unit_view_by_id(state=state, unit_instance_id=fall_back_result.unit_instance_id)
     source: dict[str, JsonValue] = {
@@ -82,10 +93,7 @@ def begin_escape_mortals(
         source_context=source,
         target_unit_instance_id=unit.unit_instance_id,
         defender_player_id=unit.owner_player_id,
-        mortal_wounds=(
-            len(fall_back_result.failed_desperate_escape_rolls)
-            * hazard_mortal_wounds_per_failed_roll(unit)
-        ),
+        mortal_wounds=(len(failed_rolls) * hazard_mortal_wounds_per_failed_roll(unit)),
         spill_over=True,
         destruction_evidence=MortalWoundDestructionEvidence.for_non_attack_state(
             state=state,
@@ -191,6 +199,50 @@ def pending_escape_movement(
     source = pending[0]
     _validate_selection(state, source)
     return source
+
+
+def completed_escape_hazard_chain(
+    *,
+    application_id: str,
+    event_records: tuple[EventRecord, ...],
+    requests: Mapping[str, DecisionRequest],
+) -> tuple[dict[str, JsonValue], ...]:
+    """Return completed packets newest-first, following issued retry bindings."""
+    packets: dict[str, list[tuple[int, dict[str, JsonValue]]]] = {}
+    for index, event in enumerate(event_records):
+        payload = event.payload
+        if event.event_type == RESOLVED and isinstance(payload, dict):
+            packet_id = payload.get("application_id")
+            if isinstance(packet_id, str):
+                packets.setdefault(packet_id, []).append((index, payload))
+    chain: list[dict[str, JsonValue]] = []
+    bound = len(event_records)
+    current: JsonValue = application_id
+    action: tuple[str, str, str] | None = None
+    while current is not None:
+        matches = packets.get(current, []) if isinstance(current, str) else []
+        if len(matches) != 1 or matches[0][0] >= bound:
+            raise GameLifecycleError("Hazard survivor retry lacks a unique earlier packet.")
+        bound, payload = matches[0]
+        request_id = payload.get("movement_proposal_request_id")
+        if not isinstance(request_id, str) or request_id not in requests:
+            raise GameLifecycleError("Hazard survivor retry packet lacks its accepted proposal.")
+        proposal = MovementProposalRequest.from_decision_request_payload(
+            requests[request_id].payload
+        )
+        owner = (
+            proposal.unit_instance_id,
+            proposal.source_decision_request_id,
+            proposal.source_decision_result_id,
+        )
+        if proposal.unit_instance_id != payload.get("unit_instance_id") or (
+            action is not None and action != owner
+        ):
+            raise GameLifecycleError("Hazard survivor retry packet selection drifted.")
+        chain.append(payload)
+        action = owner
+        current = (proposal.context or {}).get(RETRY_PACKET_KEY)
+    return tuple(chain)
 
 
 def _validate_selection(state: GameState, source: dict[str, JsonValue]) -> None:

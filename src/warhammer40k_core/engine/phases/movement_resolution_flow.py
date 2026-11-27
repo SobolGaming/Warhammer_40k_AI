@@ -445,6 +445,18 @@ def _apply_movement_proposal_decision(
             resolution=fall_back_resolution,
             fall_back_mode=fall_back_mode,
         )
+        from warhammer40k_core.engine.phases.movement_escape_mortals import completed_escape_retry
+
+        retry = (
+            completed_escape_retry(
+                state=state,
+                decisions=decisions,
+                proposal=proposal_request,
+                resolution=fall_back_resolution,
+            )
+            if mode_violation_code is None and fall_back_resolution.is_valid
+            else None
+        )
         decisions.commit_movement_result(result)
         if mode_violation_code is not None:
             return _reject_invalid_movement_resolution(
@@ -477,16 +489,80 @@ def _apply_movement_proposal_decision(
                 ),
                 proposal_request=proposal_request,
             )
-        from warhammer40k_core.engine.phases.movement_escape_mortals import completed_escape_retry
-
-        completed_retry = completed_escape_retry(
-            state=state,
-            decisions=decisions,
-            proposal=proposal_request,
-            resolution=fall_back_resolution,
+        fall_back_result = fall_back_resolution
+        new_rolls: tuple[DesperateEscapeRoll, ...] = ()
+        requirements = (
+            fall_back_resolution.desperate_escape_requirements
+            if retry is None
+            else retry.untested_requirements
         )
-        if completed_retry is not None:
-            retry_resolution, application = completed_retry
+        if fall_back_mode is FallBackModeKind.DESPERATE_ESCAPE and requirements:
+            from warhammer40k_core.engine.desperate_escape_modifier_evaluation import (
+                prepare_desperate_escape_modifiers,
+            )
+            from warhammer40k_core.engine.phases.movement_options_dice import (
+                _desperate_escape_roll_modifiers,  # pyright: ignore[reportPrivateUsage]
+            )
+
+            pending = prepare_desperate_escape_modifiers(
+                state=state,
+                decisions=decisions,
+                ability_index=ability_index,
+                movement_proposal_result_id=result.result_id,
+                requirements=requirements,
+                modifiers=_desperate_escape_roll_modifiers(fall_back_resolution),
+            )
+            if pending is not None:
+                return pending
+            new_rolls = _roll_desperate_escape_dice(
+                state=state,
+                decisions=decisions,
+                resolution=fall_back_resolution,
+                movement_proposal_result_id=result.result_id,
+                untested_requirements=requirements,
+            )
+        if retry is not None:
+            fall_back_result = retry.with_new_rolls(fall_back_resolution, new_rolls)
+        elif new_rolls:
+            fall_back_result = FallBackActionResult.with_desperate_escape_rolls(
+                resolution=fall_back_resolution,
+                desperate_escape_rolls=new_rolls,
+            )
+        action_result = _action_result_from_proposal_request(
+            proposal_request=proposal_request,
+            actor_id=active_player_id,
+            selected_option_id=source_selected_option_id,
+            payload={
+                "movement_phase_action": MovementPhaseActionKind.FALL_BACK.value,
+                "unit_instance_id": proposal_request.unit_instance_id,
+                "witness": validate_json_value(submission.witness.to_payload()),
+                **fall_back_result.movement_payload,
+            },
+        )
+        if retry is not None:
+            newly_failed = frozenset(
+                roll.requirement.model_instance_id for roll in new_rolls if roll.is_failed
+            )
+            if newly_failed:
+                from warhammer40k_core.engine.desperate_escape_mortal_wounds import (
+                    begin_escape_mortals,
+                )
+
+                return begin_escape_mortals(
+                    state=state,
+                    decisions=decisions,
+                    fall_back_result=fall_back_result,
+                    action_result=action_result,
+                    movement_proposal_request_id=proposal_request.request_id,
+                    newly_failed_model_ids=newly_failed,
+                )
+            retry_resolution = replace(
+                fall_back_result,
+                movement_payload={
+                    **fall_back_result.movement_payload,
+                    "desperate_escape_mortal_application_id": retry.packet_id,
+                },
+            )
             return _apply_fall_back_result(
                 state=state,
                 decisions=decisions,
@@ -505,9 +581,9 @@ def _apply_movement_proposal_decision(
                 unit_placement=rules_unit_placement,
                 fall_back_result=retry_resolution,
                 destroyed_model_ids=tuple(
-                    d.model_instance_id for d in application.applications if d.destroyed
+                    row.model_instance_id for row in retry.application.applications if row.destroyed
                 ),
-                mortal_wound_application=application,
+                mortal_wound_application=retry.application,
                 movement_proposal_request_id=proposal_request.request_id,
                 ruleset_descriptor=ruleset_descriptor,
                 reaction_queue=reaction_queue,
@@ -517,46 +593,6 @@ def _apply_movement_proposal_decision(
                 ability_index=ability_index,
                 runtime_modifier_registry=runtime_modifier_registry,
             )
-        fall_back_result = fall_back_resolution
-        if fall_back_mode is FallBackModeKind.DESPERATE_ESCAPE:
-            from warhammer40k_core.engine.desperate_escape_modifier_evaluation import (
-                prepare_desperate_escape_modifiers,
-            )
-            from warhammer40k_core.engine.phases.movement_options_dice import (
-                _desperate_escape_roll_modifiers,  # pyright: ignore[reportPrivateUsage]
-            )
-
-            pending = prepare_desperate_escape_modifiers(
-                state=state,
-                decisions=decisions,
-                ability_index=ability_index,
-                movement_proposal_result_id=result.result_id,
-                requirements=fall_back_resolution.desperate_escape_requirements,
-                modifiers=_desperate_escape_roll_modifiers(fall_back_resolution),
-            )
-            if pending is not None:
-                return pending
-            desperate_escape_rolls = _roll_desperate_escape_dice(
-                state=state,
-                decisions=decisions,
-                resolution=fall_back_resolution,
-                movement_proposal_result_id=result.result_id,
-            )
-            fall_back_result = FallBackActionResult.with_desperate_escape_rolls(
-                resolution=fall_back_resolution,
-                desperate_escape_rolls=desperate_escape_rolls,
-            )
-        action_result = _action_result_from_proposal_request(
-            proposal_request=proposal_request,
-            actor_id=active_player_id,
-            selected_option_id=source_selected_option_id,
-            payload={
-                "movement_phase_action": MovementPhaseActionKind.FALL_BACK.value,
-                "unit_instance_id": proposal_request.unit_instance_id,
-                "witness": validate_json_value(submission.witness.to_payload()),
-                **fall_back_result.movement_payload,
-            },
-        )
         if fall_back_mode is FallBackModeKind.DESPERATE_ESCAPE:
             if forced_desperate_escape_sources:
                 begin_desperate_escape_battle_shock_continuation(

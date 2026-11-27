@@ -454,6 +454,7 @@ def _roll_desperate_escape_dice(
     decisions: DecisionController,
     resolution: FallBackActionResult,
     movement_proposal_result_id: str,
+    untested_requirements: tuple[DesperateEscapeRequirement, ...] | None = None,
 ) -> tuple[DesperateEscapeRoll, ...]:
     from warhammer40k_core.engine.catalog_modifier_ignore import ModifierIgnoreKind
     from warhammer40k_core.engine.desperate_escape_modifier_evaluation import (
@@ -467,7 +468,12 @@ def _roll_desperate_escape_dice(
     rolls: list[DesperateEscapeRoll] = []
     manager = _dice_roll_manager_for_state(state=state, decisions=decisions)
     roll_modifiers = _desperate_escape_roll_modifiers(resolution)
-    for requirement in resolution.desperate_escape_requirements:
+    requirements = (
+        resolution.desperate_escape_requirements
+        if untested_requirements is None
+        else untested_requirements
+    )
+    for requirement in requirements:
         decisions.event_log.append(
             "desperate_escape_roll_requested",
             {

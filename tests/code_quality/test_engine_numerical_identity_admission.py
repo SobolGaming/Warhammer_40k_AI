@@ -1752,7 +1752,7 @@ def test_fortification_transition_rejects_source_and_case_drift(tmp_path: Path) 
     receipt, suites, _ = addition
     assert suites.keys() == {fortification.OWNER}
     assert fortification.OWNER in sharding.behavioral_selection(ROOT).active_files
-    assert len(receipt["added_cases"]) == len(set(receipt["added_cases"])) == 13
+    assert len(receipt["added_cases"]) == len(set(receipt["added_cases"])) == 17
 
     for name in members:
         path = tmp_path / name

@@ -36,16 +36,28 @@ from tests.support.section11_fixtures import begin
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.engine.abilities import AbilityCatalogIndex
 from warhammer40k_core.engine.ability_catalog import catalog_ability_records_from_catalog
+from warhammer40k_core.engine.battlefield_state import geometry_model_at_pose
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.list_validation import UnitMusterSelection
+from warhammer40k_core.engine.movement_decision_authority import (
+    validate_movement_completion_decision_authority,
+)
+from warhammer40k_core.engine.movement_proposals import MovementProposalPayload, ProposalKind
 from warhammer40k_core.engine.phase import BattlePhase, LifecycleStatus, LifecycleStatusKind
 from warhammer40k_core.engine.phases.movement import DesperateEscapeRoll, DesperateEscapeRollPayload
+from warhammer40k_core.engine.phases.movement_geometry import (
+    _enemy_model_ids_crossed_by_witness,  # pyright: ignore[reportPrivateUsage]
+)
 from warhammer40k_core.engine.phases.movement_handler import MovementPhaseHandler
 from warhammer40k_core.engine.shooting_targets import FORTIFICATION_ENGAGEMENT_RULE_ID
 from warhammer40k_core.engine.unit_state import StartingStrengthRecord
+from warhammer40k_core.geometry.base import CircularBase
+from warhammer40k_core.geometry.model_body import ModelBodyPart
+from warhammer40k_core.geometry.pathing import PathWitness
 from warhammer40k_core.geometry.pose import Pose
+from warhammer40k_core.geometry.volume import Model, ModelVolume
 
 
 @pytest.mark.parametrize(
@@ -151,12 +163,7 @@ def test_fortification_fall_back_hazards_follow_each_native_path(
     status = propose(session, request, unit, (Pose.at(10, end_y), Pose.at(13, end_y)))
     assert status.status_kind is not LifecycleStatusKind.INVALID, status
     first, second = unit.own_model_ids()
-    rolls = [
-        DesperateEscapeRoll.from_payload(
-            cast(DesperateEscapeRollPayload, event["desperate_escape_roll"])
-        )
-        for event in events(session, "desperate_escape_roll_resolved")
-    ]
+    rolls = _escape_rolls(session)
     assert (
         tuple(roll.requirement.model_instance_id for roll in rolls)
         == (first, second)[:hazard_count]
@@ -322,4 +329,265 @@ def _submit_native_shot(
         request_id=request.request_id,
         result_id=f"fortification:shoot:{target}:{len(weapons)}",
         payload=payload,
+    )
+
+
+def test_fortification_native_shallow_crossing_is_independent_of_waypoint(
+    section09_definitions: Section02Definitions,
+) -> None:
+    d = with_fortification(section09_definitions, provider_sheet=LORD, fortification_sheet=GNARLMAW)
+    unit = d.unit("000004090")
+    provider = d.unit(LORD, army_id="enemy", identity="fortification")
+    first, second = unit.own_model_ids()
+    first_base = geometry_model_at_pose(model=unit.own_models[0], pose=Pose.at(10, 10)).base
+    obstacle_base = geometry_model_at_pose(model=provider.own_models[0], pose=Pose.at(10, 10)).base
+    assert isinstance(first_base, CircularBase)
+    assert isinstance(obstacle_base, CircularBase)
+    reach = first_base.radius + obstacle_base.radius
+    for split in (False, True):
+        for overlap in (0.008, 0.0, -0.008):
+            starts = (Pose.at(10, 10), Pose.at(7, 10))
+            state = native_state(
+                d,
+                unit,
+                starts,
+                enemy=provider,
+                enemy_poses=(Pose.at(10 + reach - overlap, 11.25),),
+            )
+            attach_mission(state)
+            add_unit(
+                state, d.unit("000004090", identity="spare"), (Pose.at(10, 30), Pose.at(12.5, 30))
+            )
+            state.battle_shocked_unit_ids.append(unit.unit_instance_id)
+            session = movement_session(d, state)
+            action = select(session, unit)
+            anchor_hazard_scene(session)
+            request = choose(session, action, "fall_back:desperate_escape")
+            first_path: tuple[Pose, ...] = (starts[0], Pose.at(10, 17))
+            if split:
+                first_path = (first_path[0], Pose.at(10, 11.25), first_path[1])
+            status = _submit_fall_back(
+                session,
+                request,
+                unit.unit_instance_id,
+                ((first, first_path), (second, (starts[1], Pose.at(7, 17)))),
+                result_id="shallow-crossing",
+            )
+            assert status.status_kind is not LifecycleStatusKind.INVALID, status
+            assert tuple(roll.requirement.model_instance_id for roll in _escape_rolls(session)) == (
+                (first,) if overlap > 0 else ()
+            )
+
+
+def test_fortification_crossing_uses_planar_body_projection_and_strict_clearance() -> None:
+    mover = Model("mover", Pose.at(10, 10), CircularBase(1), ModelVolume(1))
+    enemy = Model("enemy", Pose.at(12, 11.25), CircularBase(1), ModelVolume(1))
+    for z in (0.0, 5.0):
+        for split in (False, True):
+            start, end = Pose.at(10, 10, z), Pose.at(10, 17, z)
+            poses = (start, Pose.at(10, 11.25, z), end) if split else (start, end)
+            witness = PathWitness.for_paths(((mover.model_id, poses),))
+            for obstacle_x, expected in (
+                (11.992, (enemy.model_id,)),
+                (11.999999998, (enemy.model_id,)),
+                (11.999999999, ()),
+                (12.0, ()),
+                (12.008, ()),
+            ):
+                support = replace(enemy, pose=Pose.at(obstacle_x, 11.25))
+                assert (
+                    _enemy_model_ids_crossed_by_witness(
+                        moving_model=mover,
+                        witness=witness,
+                        enemy_models=(support,),
+                        check_continuous_translation=True,
+                    )
+                    == expected
+                )
+            # The same explicit overhang geometry as section 17's body fixture.
+            body = ModelBodyPart("overhang", CircularBase(0.5), 3, 0, 1, 1, "constructed:s17:body")
+            support = replace(enemy, pose=Pose.at(8.492, 11.25), base=CircularBase(0.25))
+            assert _enemy_model_ids_crossed_by_witness(
+                moving_model=mover,
+                witness=witness,
+                enemy_models=(support, replace(support, model_id="body", body_parts=(body,))),
+                check_continuous_translation=True,
+            ) == ("body",)
+
+
+def _escape_rolls(session: LocalGameSession) -> tuple[DesperateEscapeRoll, ...]:
+    return tuple(
+        DesperateEscapeRoll.from_payload(
+            cast(DesperateEscapeRollPayload, event["desperate_escape_roll"])
+        )
+        for event in events(session, "desperate_escape_roll_resolved")
+    )
+
+
+def _submit_fall_back(
+    session: LocalGameSession,
+    request: DecisionRequest,
+    unit_id: str,
+    paths: tuple[tuple[str, tuple[Pose, ...]], ...],
+    *,
+    result_id: str,
+) -> LifecycleStatus:
+    return session.submit_parameterized_payload(
+        request_id=request.request_id,
+        result_id=result_id,
+        payload=cast(
+            JsonValue,
+            MovementProposalPayload(
+                proposal_request_id=request.request_id,
+                proposal_kind=ProposalKind.FALL_BACK,
+                unit_instance_id=unit_id,
+                movement_phase_action="fall_back",
+                movement_mode="fall_back",
+                fall_back_mode="desperate_escape",
+                witness=PathWitness.for_paths(paths),
+            ).to_payload(),
+        ),
+    )
+
+
+@pytest.mark.parametrize(
+    ("new_crossing_fails", "rng_label"),
+    [(False, "fortification-crossing-retry-13"), (True, "fortification-crossing-retry-4")],
+    ids=("pass", "fail"),
+)
+def test_fortification_survivor_retry_rolls_each_new_crossing_only_once(
+    faction_definitions: Section02Definitions,
+    new_crossing_fails: bool,
+    rng_label: str,
+) -> None:
+    d = with_fortification(faction_definitions, provider_sheet=LORD, fortification_sheet=GNARLMAW)
+    battle = scene(
+        d,
+        (selection(d, AVENGERS, "retreat"), selection(d, AVENGERS, "spare")),
+        (selection(d, LORD, "fortification"),),
+        seed="fortification-crossing-retry",
+        rng_seed_label=rng_label,
+    )
+    unit = battle.units["own:retreat"]
+    first, second, middle, fourth, last = unit.own_model_ids()
+    fortification = battle.units["foe:fortification"]
+    starts = tuple(Pose.at(x, 10) for x in (6, 8, 10.6, 13.2, 15.2))
+    locate(battle, unit.unit_instance_id, starts)
+    locate(battle, fortification.unit_instance_id, (Pose.at(10.6, 11.55),))
+    battle.state.battle_shocked_unit_ids.append(unit.unit_instance_id)
+    anchor(battle)
+
+    session = battle.session
+    action = select(session, unit)
+    anchor_hazard_scene(session)
+    grant = choose(session, action, "fall_back:desperate_escape")
+    assert grant.decision_type == "select_movement_action_grant"
+    request = choose(session, grant, "decline_movement_action_grant")
+    initial_paths = tuple(
+        (
+            model_id,
+            (start, Pose.at(9.48, 12), end) if model_id == second else (start, end),
+        )
+        for model_id, start, end in zip(
+            (first, second, middle, fourth, last),
+            starts,
+            tuple(Pose.at(start.position.x, 16) for start in starts),
+            strict=True,
+        )
+    )
+    after_initial = _submit_fall_back(
+        session, request, unit.unit_instance_id, initial_paths, result_id="initial-path"
+    )
+    initial_rolls = _escape_rolls(session)
+    assert tuple(roll.requirement.model_instance_id for roll in initial_rolls) == (second, middle)
+    assert tuple(roll.is_failed for roll in initial_rolls) == (False, True), initial_rolls
+    assert after_initial.decision_request is not None, after_initial
+    mortal = after_initial.decision_request
+    assert mortal.decision_type == "select_mortal_wound_model", mortal
+    after_casualty = session.submit_option(
+        request_id=mortal.request_id, result_id="crossing-casualty", option_id=middle
+    )
+    assert after_casualty.status_kind is LifecycleStatusKind.INVALID, after_casualty
+    assert isinstance(after_casualty.payload, dict)
+    assert after_casualty.payload["violation_code"] == "unit_coherency_broken"
+
+    retry = session.lifecycle.pending_decision_request()
+    assert retry is not None
+    assert retry.decision_type == request.decision_type
+    invalid_paths = tuple(path for path in initial_paths if path[0] != middle)
+    before_mismatch = session.lifecycle.to_payload()
+    mismatch = _submit_fall_back(
+        session, retry, "unrelated-unit", invalid_paths, result_id="mismatched-retry"
+    )
+    assert mismatch.status_kind is LifecycleStatusKind.INVALID, mismatch
+    assert session.lifecycle.to_payload() == before_mismatch
+    battlefield = battle.state.battlefield_state
+    records = session.lifecycle.decision_controller.event_log.records
+    rejected = _submit_fall_back(
+        session, retry, unit.unit_instance_id, invalid_paths, result_id="invalid-retry"
+    )
+    assert rejected.status_kind is LifecycleStatusKind.INVALID, rejected
+    assert isinstance(rejected.payload, dict)
+    assert rejected.payload["violation_code"] == "unit_coherency_broken"
+    assert battle.state.battlefield_state == battlefield
+    assert session.lifecycle.decision_controller.event_log.records[: len(records)] == records
+    assert not {
+        "dice_rolled",
+        "desperate_escape_roll_requested",
+        "desperate_escape_roll_resolved",
+        "desperate_escape_hazard_mortals_resolved",
+        "fall_back_move_applied",
+    }.intersection(
+        record.event_type
+        for record in session.lifecycle.decision_controller.event_log.records[len(records) :]
+    )
+    assert _escape_rolls(session) == initial_rolls
+
+    retry = session.lifecycle.pending_decision_request()
+    assert retry is not None
+    corrected = (
+        (first, (starts[0], Pose.at(7.5, 16))),
+        (second, (starts[1], Pose.at(9.48, 12), Pose.at(9.5, 16))),
+        (fourth, (starts[3], Pose.at(11.72, 12), Pose.at(12, 16))),
+        (last, (starts[4], Pose.at(14.5, 16))),
+    )
+    status = _submit_fall_back(
+        session, retry, unit.unit_instance_id, corrected, result_id="valid-retry"
+    )
+    assert status.status_kind is not LifecycleStatusKind.INVALID, status
+    rolls = _escape_rolls(session)
+    assert rolls[:2] == initial_rolls
+    assert len(rolls) == 3
+    assert rolls[-1].requirement.model_instance_id == fourth
+    assert rolls[-1].requirement.enemy_model_ids == fortification.own_model_ids()
+    assert rolls[-1].is_failed is new_crossing_fails, rolls[-1]
+    if new_crossing_fails:
+        assert status.decision_request is not None, status
+        assert status.decision_request.decision_type == "select_mortal_wound_model"
+        status = session.submit_option(
+            request_id=status.decision_request.request_id,
+            result_id="new-crossing-casualty",
+            option_id=last,
+        )
+        assert status.status_kind is not LifecycleStatusKind.INVALID, status
+    (completed,) = events(session, "movement_activation_completed")
+    assert completed.get("fortification_desperate_escape_exempt_model_ids") == [first, last]
+    assert len(events(session, "desperate_escape_hazard_mortals_resolved")) == (
+        2 if new_crossing_fails else 1
+    )
+    decisions = session.lifecycle.decision_controller
+    mutation_index = next(
+        i
+        for i, record in enumerate(decisions.event_log.records)
+        if record.event_type == "movement_activation_completed"
+    )
+    authority = validate_movement_completion_decision_authority(
+        event_records=decisions.event_log.records,
+        decision_records=decisions.records,
+        mutation_index=mutation_index,
+        payload=completed,
+    )
+    assert authority is not None
+    assert authority.witness == PathWitness.for_paths(
+        tuple(path for path in corrected if not (new_crossing_fails and path[0] == last))
     )

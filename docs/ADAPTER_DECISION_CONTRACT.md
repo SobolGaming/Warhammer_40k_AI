@@ -1199,6 +1199,8 @@ Battle-shocked rules unit, the existing Desperate Escape mode still applies. The
 `fortification_desperate_escape_exempt_model_ids` resolution field records models whose paths
 avoid enemy models. These models skip the mode's hazard, but a separate rule can still require
 their rolls. The engine computes this field from the accepted PathWitness and start engagement.
+When casualties require a corrected survivor path, the engine retains completed rolls and damage.
+Each surviving model whose corrected path creates a new hazard rolls once before movement.
 
 The engine resolves any Hazard Roll casualties, applies the grouped `PathWitness` transition, and
 then checks the unit's authoritative Battle-shock state. If at least one model survives and the
