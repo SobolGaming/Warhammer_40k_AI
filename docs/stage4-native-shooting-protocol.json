@@ -1,0 +1,40 @@
+{
+  "schema": "stage4-native-shooting-v1",
+  "base": "8edef22960a1ed28913f12c7e89062e1e44841b5",
+  "family": "layout-c-flatboard-shooting-dev",
+  "group_with": "disruption-mirror-c-split-central-dev",
+  "partition": "development",
+  "training_rows": 0,
+  "source_layout": "disruption-vs-disruption-layout-3",
+  "board": "Synthetic flat board retaining the earlier Layout C deployment zones and mission assignments. No placed terrain areas, terrain features or linked objective areas.",
+  "seeds": [
+    "0101010101010101010101010101010101010101010101010101010101010101",
+    "0202020202020202020202020202020202020202020202020202020202020202",
+    "0303030303030303030303030303030303030303030303030303030303030303",
+    "0404040404040404040404040404040404040404040404040404040404040404",
+    "0505050505050505050505050505050505050505050505050505050505050505",
+    "0606060606060606060606060606060606060606060606060606060606060606"
+  ],
+  "roster": {
+    "army-alpha:cannon": {"sheet": "core-vehicle-monster", "xy": [[11.0, 34.0]]},
+    "army-beta:leader": {"sheet": "core-character-leader", "xy": [[34.0, 19.0]]},
+    "army-beta:vehicle": {"sheet": "core-vehicle-monster", "xy": [[34.0, 26.0]]}
+  },
+  "shooter": "army-alpha:cannon",
+  "weapon_profile": "core-heavy-cannon:standard",
+  "arms": ["army-beta:leader", "army-beta:vehicle"],
+  "origin": [1, "player-a", "shooting", "submit_shooting_declaration"],
+  "endpoint": [1, "player-a", "shooting", "select_shooting_unit"],
+  "setup": "Use the native setup and deployment facade in frozen roster order. Choose fixed Assassination and Bring It Down, complete reserve, redeploy and prebattle selections, keep units stationary, then select the cannon and Normal Shooting.",
+  "response": "Decline optional Stratagem windows and target proposals. For required resolve-target, weapon-group, post-roll pool and damage-allocation requests, select the first offered option in lexicographic ID order.",
+  "measures": [
+    "wounds lost and models destroyed by enemy unit",
+    "branch RNG draw delta from the common seed-specific origin",
+    "accepted branch decisions and event count at the endpoint",
+    "elapsed seconds for setup and for each branch, including strict verification"
+  ],
+  "verification": "Strict persistence round-trip, both actor views and independent exact event replay at each origin and endpoint. Both arms must commit one declaration for the pinned native weapon and reach the same boundary. Unexpected requests, invalid actions, timeouts and replay drift are gaps.",
+  "setup_decision_cap": 30,
+  "branch_decision_cap": 18,
+  "worker_wall_seconds": 300
+}
