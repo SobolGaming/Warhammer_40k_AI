@@ -1729,6 +1729,44 @@ Keep timing, response, seed, side-swap and repeated trajectories within
 their source and geometry components. Predeclare the live cap, eligibility,
 horizon and chance handling before opening any reserved labels.
 
+### Layout C native scoring timing comparison
+
+Use the existing `--split-objective prepare` checkpoint with the same
+benchmark entry point.
+
+```sh
+PYTHONPATH=src:. uv run --no-sync python -B -m scripts.stage4_benchmark_entry \
+  --split-objective timing --checkpoint /tmp/stage4-split-setup.json
+PYTHONPATH=src:. uv run --no-sync pytest -q --no-cov -p no:cacheprovider \
+  scripts/stage4_scoring_timing_checks.py
+```
+
+The timing worker freezes its protocol before advancing the shared history.
+It reproduces the four-arm receipt, then continues only the two Screen arms
+from their exact A3 Movement offers. The selected Screen and B2 northwest
+paths must match between the arms. The only intervention difference is the
+ally's A2 follow-through. Both players Hold, complete phases, and decline
+optional reactions through the first B4 Movement offer, with at most 60
+additional accepted decisions per arm and a 1,700-second worker cap.
+The two continuations preserve placement and material, consume no additional
+draws, and must pass strict restore with both actor views and independent
+replay.
+
+The July v1.1 Outmanoeuvre import awards 5 VP per controlled non-home objective
+at the active player's Command end in rounds two and three. From round four it
+awards 6 VP per controlled non-home objective at that player's turn end. The
+comparison reads native target OC, controller and boundary-local VP from B2
+turn end through A4 turn end, including the intervening Command boundaries.
+The run reconciles every new ledger award with its native objective record.
+It emits the paired boundary VP differences, exact endpoint identities, and
+path, material and scoring provenance.
+
+The native cadence and award value change together across rounds. This
+comparison uses passive continuations of the already played interventions
+within the same development family and single seed. It adds no delayed-move
+arm, feature columns or training rows. Verification covers the July scoring
+import alongside the October layout.
+
 ### Unseen-layout evaluation contract
 
 Freeze a provenance-only manifest before a same-release split. Validate it

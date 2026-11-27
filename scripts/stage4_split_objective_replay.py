@@ -26,7 +26,9 @@ DECISION_CAP = 50
 WALL_SECONDS = 1100
 ORIGIN = (2, bench.A, "movement", bench.MOVE_ACTION)
 HORIZON = (3, bench.A, "movement", "select_movement_unit")
-BOUNDARIES = (
+type Boundary = tuple[int, str, str, str]
+
+BOUNDARIES: tuple[Boundary, ...] = (
     (2, bench.A, "fight", "turn_end"),
     (2, bench.B, "command", "phase_end"),
     (2, bench.B, "fight", "turn_end"),
@@ -257,15 +259,19 @@ def drive(
     raise bench.BenchmarkGap(f"{arm} {leg} exceeded {DECISION_CAP} decisions.")
 
 
-def score(origin: bench.Row, endpoint: bench.Row) -> bench.Row:
+def score(
+    origin: bench.Row, endpoint: bench.Row, *, boundaries: tuple[Boundary, ...] = BOUNDARIES
+) -> bench.Row:
     start, end = (cp["lifecycle"]["state"] for cp in (origin, endpoint))
-    records = {}
-    for boundary in BOUNDARIES:
-        (row,) = [
+    records: dict[str, bench.Row] = {}
+    for boundary in boundaries:
+        matches = [
             r
             for r in end["objective_control_records"]
             if (r["battle_round"], r["active_player_id"], r["phase"], r["timing"]) == boundary
         ]
+        bench.require(len(matches) == 1, f"Expected one objective record at {boundary}.")
+        row = matches[0]
         records[row["record_id"]] = {
             "boundary": list(boundary),
             "objectives": {},
@@ -299,15 +305,26 @@ def score(origin: bench.Row, endpoint: bench.Row) -> bench.Row:
             rule = metadata["scoring_rule_id"]
             bench.require(
                 tx["source_id"] == "primary-outmaneuver"
+                and tx["source_kind"] == "primary"
+                and tx["hidden"] is False
+                and tx["player_id"] == player
                 and boundary in records
+                and records[boundary]["boundary"]
+                == [tx["battle_round"], player, tx["phase"], tx["scoring_timing"]]
                 and bool(ids)
+                and len(ids) == len(set(ids))
                 and tx["amount"] == per * len(ids),
                 f"Cannot allocate the award unambiguously to objectives: {tx}.",
             )
             if rule == fixture.RULE:
                 bench.require(
                     per == 5
-                    and records[boundary]["boundary"] in (list(BOUNDARIES[1]), list(BOUNDARIES[3])),
+                    and tuple(records[boundary]["boundary"])
+                    in {
+                        (2, bench.B, "command", "phase_end"),
+                        (3, bench.A, "command", "phase_end"),
+                        (3, bench.B, "command", "phase_end"),
+                    },
                     f"Wrong Outmanoeuvre Command clause or boundary: {tx}.",
                 )
             for objective_id in ids:
@@ -342,9 +359,14 @@ def score(origin: bench.Row, endpoint: bench.Row) -> bench.Row:
     }
 
 
-def run(checkpoint: Path, *, link_policy_target: bool = False) -> None:
+def run(
+    checkpoint: Path, *, link_policy_target: bool = False, scoring_timing: bool = False
+) -> None:
+    if scoring_timing:
+        from scripts import stage4_scoring_timing as timing
+
     reference = fixture.sealed_receipt()
-    if link_policy_target:
+    if link_policy_target or scoring_timing:
         policy_target.verify_seal(reference)
     setup_hash = reference["setup_evidence"]["latch"]["checkpoint"]
     stage = "setup_checkpoint"
@@ -358,6 +380,7 @@ def run(checkpoint: Path, *, link_policy_target: bool = False) -> None:
         "training_rows": 0,
         "arms": {},
     }
+    timing_protocol: bench.Row | None = None
     try:
         saved_setup = json.loads(checkpoint.read_text(encoding="utf-8"))
         bench.require(
@@ -381,6 +404,9 @@ def run(checkpoint: Path, *, link_policy_target: bool = False) -> None:
             "october_scoring_clause_verified": False,
         }
         fixture.emit("protocol_frozen", **result["protocol"])
+        if scoring_timing:
+            timing_protocol = timing.protocol(source)
+            fixture.emit("timing_protocol_frozen", **timing_protocol)
         stage = "stem"
         result["stem"] = drive(common, polygons, "stem", arm)
         origin = cast(bench.Row, common.to_persistence_payload())
@@ -421,10 +447,10 @@ def run(checkpoint: Path, *, link_policy_target: bool = False) -> None:
             drive(branch, polygons, "horizon", arm)
             fixture.emit("horizon_reached", arm=arm, records=branch.decision_record_count())
             endpoint = bench.strict_checkpoint(branch)
-            if frozen_choice is not None:
+            if frozen_choice is not None or scoring_timing:
                 bench.require(
                     fixture.coordinates(bench.actor(branch)) == HORIZON,
-                    f"{arm} reached a mixed or stale link horizon.",
+                    f"{arm} reached a mixed or stale A3 Movement horizon.",
                 )
                 endpoints[arm] = endpoint
             result["arms"][arm].update(
@@ -473,3 +499,9 @@ def run(checkpoint: Path, *, link_policy_target: bool = False) -> None:
         )
         fixture.emit("development_policy_target", **link, link_hash=payload_digest(link))
     fixture.emit("group_result", **result)
+    if scoring_timing and timing_protocol is not None:
+        try:
+            timing.run(timing_protocol, observed, branches, endpoints)
+        except ERRORS as exc:
+            fixture.emit("timing_gap", type=type(exc).__name__, detail=str(exc))
+            raise SystemExit(1) from exc
