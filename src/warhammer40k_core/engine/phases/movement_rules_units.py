@@ -268,10 +268,8 @@ def resolve_rules_unit_fall_back_move(
     if rules_unit.unit_instance_id in shocked_ids:
         shocked_ids.update(rules_unit.component_unit_instance_ids)
     auto_pass_ids = set(resolved.desperate_escape_auto_pass_model_ids)
-    requirements = tuple(
-        requirement
-        for component in before.component_unit_placements
-        for requirement in _desperate_escape_requirements_for_fall_back(
+    component_hazards = tuple(
+        _desperate_escape_requirements_for_fall_back(
             scenario=scenario,
             ruleset_descriptor=ruleset_descriptor,
             unit_placement=component,
@@ -288,6 +286,17 @@ def resolve_rules_unit_fall_back_move(
                 )
             ),
         )
+        for component in before.component_unit_placements
+    )
+    requirements = tuple(
+        requirement
+        for component_requirements, _ in component_hazards
+        for requirement in component_requirements
+    )
+    exempt_model_ids = sorted(
+        model_id
+        for _, component_exempt_ids in component_hazards
+        for model_id in component_exempt_ids
     )
     movement_payload = {
         **resolved.movement_payload,
@@ -300,6 +309,10 @@ def resolve_rules_unit_fall_back_move(
         "desperate_escape_rolls": [],
         "desperate_escape_auto_pass_model_ids": validate_json_value(sorted(auto_pass_ids)),
     }
+    if exempt_model_ids:
+        movement_payload["fortification_desperate_escape_exempt_model_ids"] = validate_json_value(
+            exempt_model_ids
+        )
     if forced_desperate_escape_source_rule_ids:
         movement_payload["forced_desperate_escape_source_rule_ids"] = list(
             forced_desperate_escape_source_rule_ids

@@ -2693,6 +2693,19 @@ def exact_movement_test_transition(
             raise SystemExit("Shroud of Flies tests overlap the predecessor selection.")
         updated[SHROUD_OF_FLIES_OWNER] = shroud[0]["test"]["after"]
         raw += b"\0" + shroud[1]
+        from scripts.fortification_engagement_test_admission import fortification_test_addition
+
+        fortification = fortification_test_addition(
+            root,
+            predecessor_manifest=shroud[0]["runtime_manifest"]["after"],
+            predecessor_fingerprint=shroud[0]["runtime_fingerprint"]["after"],
+        )
+        if fortification is not None:
+            _, fortification_tests, fortification_raw = fortification
+            if fortification_tests.keys() & (updated.keys() | added.keys() | additions.keys()):
+                raise SystemExit("Fortification tests overlap the predecessor selection.")
+            additions.update(fortification_tests)
+            raw += b"\0" + fortification_raw
     return updated, {**added, **additions}, retained_raw + b"\0" + raw
 
 

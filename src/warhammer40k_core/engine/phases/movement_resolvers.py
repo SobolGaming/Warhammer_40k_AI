@@ -262,7 +262,7 @@ def resolve_fall_back_move(
         rules_unit_instance_id=resolved_unit_id,
         fall_back_mode=fall_back_mode,
     )
-    desperate_escape_requirements = _desperate_escape_requirements_for_fall_back(
+    desperate_escape_requirements, exempt_model_ids = _desperate_escape_requirements_for_fall_back(
         scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,
         unit_placement=unit_placement,
@@ -286,6 +286,8 @@ def resolve_fall_back_move(
             list(resolved.desperate_escape_auto_pass_model_ids)
         ),
     }
+    if exempt_model_ids:
+        movement_payload["fortification_desperate_escape_exempt_model_ids"] = list(exempt_model_ids)
     if forced_source_ids:
         movement_payload["forced_desperate_escape_source_rule_ids"] = list(forced_source_ids)
     return FallBackActionResult.unresolved(

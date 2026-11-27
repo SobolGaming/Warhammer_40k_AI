@@ -12,6 +12,11 @@ from warhammer40k_core.geometry.physical_model import base_crosses_physical_mode
 
 from typing import TYPE_CHECKING
 from warhammer40k_core.engine.aircraft_rules import aircraft_rules_unit
+from warhammer40k_core.engine.catalog_contextual_status_consumption import (
+    CATALOG_IR_FORTIFICATION_DESPERATE_ESCAPE_CONSUMER_ID,
+    rules_unit_has_fortification_consumer,
+)
+from warhammer40k_core.engine.rules_units import rules_unit_view_from_armies
 
 from warhammer40k_core.engine.physical_engagement import (
     physical_geometry_models_for_rules_unit,
@@ -180,7 +185,7 @@ def _desperate_escape_requirements_for_fall_back(
     battle_shocked_unit_ids: tuple[str, ...],
     forced_desperate_escape_source_rule_ids: tuple[str, ...] = (),
     overflight_auto_pass_model_ids: tuple[str, ...] = (),
-) -> tuple[DesperateEscapeRequirement, ...]:
+) -> tuple[tuple[DesperateEscapeRequirement, ...], tuple[str, ...]]:
     if type(scenario) is not BattlefieldScenario:
         raise GameLifecycleError("Desperate Escape requirements require a scenario.")
     if type(ruleset_descriptor) is not RulesetDescriptor:
@@ -218,30 +223,20 @@ def _desperate_escape_requirements_for_fall_back(
         scenario=scenario,
         player_id=unit_placement.player_id,
     )
-    battle_shocked_desperate_escape_suppressed = (
-        unit_placement.unit_instance_id in battle_shocked_ids
-        and _unit_only_engaged_with_enemy_fortifications(
-            scenario=scenario,
-            unit_placement=unit_placement,
-            ruleset_descriptor=ruleset_descriptor,
-        )
+    is_battle_shocked = unit_placement.unit_instance_id in battle_shocked_ids
+    fortification_exemption = is_battle_shocked and _unit_only_engaged_with_enemy_fortifications(
+        scenario=scenario,
+        unit_placement=unit_placement,
+        ruleset_descriptor=ruleset_descriptor,
     )
     requirements: list[DesperateEscapeRequirement] = []
+    exempt_model_ids: list[str] = []
+    desperate_mode = fall_back_mode is FallBackModeKind.DESPERATE_ESCAPE
     for index, placement in enumerate(unit_placement.model_placements, start=1):
         if placement.model_instance_id in auto_pass_model_ids:
             continue
-        reasons: list[DesperateEscapeRequirementReason] = []
         enemy_model_ids: tuple[str, ...] = ()
-        if fall_back_mode is FallBackModeKind.DESPERATE_ESCAPE:
-            reasons.append(DesperateEscapeRequirementReason.SELECTED_MODE)
-        if (
-            unit_placement.unit_instance_id in battle_shocked_ids
-            and not battle_shocked_desperate_escape_suppressed
-        ):
-            reasons.append(DesperateEscapeRequirementReason.BATTLE_SHOCKED)
-        if forced_source_ids:
-            reasons.append(DesperateEscapeRequirementReason.FORCED_BY_RULE)
-        if not overflight_exempt and fall_back_mode is FallBackModeKind.DESPERATE_ESCAPE:
+        if desperate_mode and (not overflight_exempt or fortification_exemption):
             moving_model = geometry_model_for_placement(
                 model=scenario.model_instance_for_placement(placement),
                 placement=placement,
@@ -251,10 +246,20 @@ def _desperate_escape_requirements_for_fall_back(
                 witness=witness,
                 enemy_models=enemy_models,
             )
-            if enemy_model_ids and placement.model_instance_id not in auto_pass_model_ids:
-                reasons.append(DesperateEscapeRequirementReason.ENEMY_MODEL_OVERFLIGHT)
-            elif enemy_model_ids:
-                enemy_model_ids = ()
+        # Battle-shock forces this mode. The fortification clause exempts a clear
+        # model from that hazard, while separate rules can still require a roll.
+        exempt = fortification_exemption and not enemy_model_ids
+        if desperate_mode and exempt:
+            exempt_model_ids.append(placement.model_instance_id)
+        reasons: list[DesperateEscapeRequirementReason] = []
+        if desperate_mode and not exempt:
+            reasons.append(DesperateEscapeRequirementReason.SELECTED_MODE)
+        if is_battle_shocked and not exempt:
+            reasons.append(DesperateEscapeRequirementReason.BATTLE_SHOCKED)
+        if forced_source_ids:
+            reasons.append(DesperateEscapeRequirementReason.FORCED_BY_RULE)
+        if enemy_model_ids:
+            reasons.append(DesperateEscapeRequirementReason.ENEMY_MODEL_OVERFLIGHT)
         if not reasons:
             continue
         requirements.append(
@@ -269,7 +274,7 @@ def _desperate_escape_requirements_for_fall_back(
                 enemy_model_ids=enemy_model_ids,
             )
         )
-    return tuple(requirements)
+    return tuple(requirements), tuple(sorted(exempt_model_ids))
 
 
 def _unit_only_engaged_with_enemy_fortifications(
@@ -286,33 +291,15 @@ def _unit_only_engaged_with_enemy_fortifications(
     if not engaged_enemy_unit_ids:
         return False
     return all(
-        _unit_has_fortification_keyword(
-            _unit_instance_by_id_in_scenario(
-                scenario=scenario,
+        rules_unit_has_fortification_consumer(
+            rules_unit_view_from_armies(
+                armies=scenario.armies,
                 unit_instance_id=enemy_unit_id,
-            )
+            ),
+            CATALOG_IR_FORTIFICATION_DESPERATE_ESCAPE_CONSUMER_ID,
         )
         for enemy_unit_id in engaged_enemy_unit_ids
     )
-
-
-def _unit_instance_by_id_in_scenario(
-    *,
-    scenario: BattlefieldScenario,
-    unit_instance_id: str,
-) -> UnitInstance:
-    requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
-    for army in scenario.armies:
-        for unit in army.units:
-            if unit.unit_instance_id == requested_unit_id:
-                return unit
-    raise GameLifecycleError("Scenario unit lookup failed.")
-
-
-def _unit_has_fortification_keyword(unit: UnitInstance) -> bool:
-    return _canonical_keyword("FORTIFICATION") in {
-        _canonical_keyword(keyword) for keyword in unit.keywords
-    }
 
 
 def _enemy_model_ids_crossed_by_witness(

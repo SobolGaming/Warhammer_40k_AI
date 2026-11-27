@@ -316,6 +316,31 @@ def test_cross_source_semantic_audit_reports_both_shalaxi_sources_as_engine_cons
         )
 
 
+def test_fortification_generated_support_keeps_both_source_occurrences() -> None:
+    audit = _semantic_audit()
+    source_rows = ("000001470:5", "000001588:5")
+    members = tuple(
+        audit.member(
+            content_kind=SemanticContentKind.DATASHEET_ABILITY,
+            owner_id=source_row.split(":")[0],
+            rule_name="Fortification",
+        )
+        for source_row in source_rows
+    )
+    assert members[0].equivalence_hash == members[1].equivalence_hash
+    for source_row, member in zip(source_rows, members, strict=True):
+        assert member.rule_id == source_row
+        assert member.runtime_consumer_ids == (
+            "catalog-ir:fortification-desperate-escape",
+            "catalog-ir:fortification-target-permission",
+        )
+        assert member.source_row_ids == (
+            f"data-package:wahapedia:source-mirror:10th-edition-2026-06-14:"
+            f"Datasheets_abilities:{source_row}",
+        )
+        assert member.execution_status is SemanticExecutionStatus.ENGINE_CONSUMED
+
+
 def test_cross_source_semantic_audit_uses_exact_non_materialization_static_rule_ir() -> None:
     member = _semantic_audit().member(
         content_kind=SemanticContentKind.DATASHEET_ABILITY,

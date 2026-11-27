@@ -4779,12 +4779,12 @@ def _chaos_daemons_nurgle_review_rows() -> tuple[DatasheetGroupReviewRow, ...]:
             supported_semantics=(
                 "Infiltrators and The Shadow of Chaos are known structured paths. "
                 "Shroud of Flies uses the shared live Stealth aura and has focused "
-                "shooting evidence with fixture geometry. Shared Fortification "
-                "targeting, Hit-roll, Fall Back and cover paths exist."
+                "shooting evidence with fixture geometry. The shared Fortification "
+                "targeting, Hit-roll and per-model Fall Back exceptions are exercised "
+                "with source-linked descriptors on fixture geometry."
             ),
             semantics_needed=(
-                "Native Gnarlmaw evidence for Diseased Cover source attribution and "
-                "the Fortification exceptions awaits catalog admission."
+                "Gnarlmaw-specific Diseased Cover source attribution awaits catalog admission."
             ),
             catalog_blockers=(
                 "No-equipment/no-option source rows are normalized. The Hull designation "
