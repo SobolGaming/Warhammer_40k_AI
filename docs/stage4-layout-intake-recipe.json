@@ -1,0 +1,65 @@
+{
+  "schema": "stage4-movement-intake-v1",
+  "protocol_base": "eac0413c58c26576ea4dac93ac85b63524c7c15b",
+  "source_page": 9,
+  "layout": "take-and-hold-vs-take-and-hold-layout-1",
+  "pairing": [
+    "take-and-hold",
+    "take-and-hold"
+  ],
+  "primary_missions": [
+    "primary-battlefield-dominance",
+    "primary-battlefield-dominance"
+  ],
+  "target": "take-and-hold-vs-take-and-hold-layout-1-central",
+  "roles": {
+    "screen": "army-alpha:screen",
+    "follow": "army-alpha:ally",
+    "opponent": "army-beta:opponent"
+  },
+  "datasheet": "core-character-leader",
+  "deployment": {
+    "army-alpha:screen": [
+      [
+        19.25,
+        41.5
+      ]
+    ],
+    "army-alpha:ally": [
+      [
+        16.75,
+        41.5
+      ]
+    ],
+    "army-beta:opponent": [
+      [
+        24.75,
+        18.5
+      ]
+    ]
+  },
+  "routes": {
+    "screen": [
+      0,
+      -1
+    ],
+    "follow": [
+      0,
+      -1
+    ],
+    "opponent_preferred": [
+      0,
+      1
+    ],
+    "opponent_alternate": [
+      -3,
+      8
+    ]
+  },
+  "route_cosine_min": 0.999,
+  "seed_namespace": "stage4-movement-comparison-v1",
+  "fixed_secondary_option": "fixed:assassination:bring_it_down",
+  "prefix_decision_cap": 64,
+  "native_probe_cap": 2,
+  "worker_wall_seconds": 180
+}
