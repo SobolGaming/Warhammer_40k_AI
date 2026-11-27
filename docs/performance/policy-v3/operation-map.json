@@ -35984,7 +35984,9 @@
     },
     "stage4-benchmark-entry-reproducer": {
       "paths": [
-        "scripts/stage4_benchmark_entry.py"
+        "scripts/stage4_benchmark_entry.py",
+        "scripts/stage4_split_objective.py",
+        "scripts/stage4_split_objective_replay.py"
       ],
       "owners": [
         "*"

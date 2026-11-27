@@ -1587,6 +1587,65 @@ a +5 VP interaction. Expansion 2 accounted for every VP award. The
 origin and all four endpoints passed exact persistence and strict replay.
 All arms retained 12 models and 34 wounds, with zero active RNG draws.
 
+### Split central objective cooperation pilot
+
+The [four-arm receipt](stage4-split-objective-receipt.json) covers Disruption
+versus Disruption, Layout C, with one central objective shared by two terrain
+areas. The October Event Companion v1.3 diagram on page 38 identifies the
+layout and the Outmanoeuvre pairing. The October layout artifact links
+`disruption-vs-disruption-layout-3-central-01` to terrain areas `08` and
+`09`. The receipt records both placed footprint polygons. The separate July
+v1.1 mission and primary scoring import awards 5 VP per controlled non-home
+objective at the active player's Command end in rounds two and three. Scoring
+was verified against that retained import. The October scoring clause remains
+unverified.
+
+The frozen setup uses three independent single-model Core units with 40 mm
+circular bases, a 6-inch Move and 1 OC each. All three placements passed through
+the ordinary facade. The opt-in setup reopens the checkpoint with matching
+state and actor views before the shared round-one stem.
+
+```sh
+PYTHONPATH=src:. uv run --no-sync python -B -m scripts.stage4_benchmark_entry \
+  --split-objective prepare --checkpoint /tmp/stage4-split-setup.json
+PYTHONPATH=src:. uv run --no-sync python -B -m scripts.stage4_benchmark_entry \
+  --split-objective replay --checkpoint /tmp/stage4-split-setup.json
+```
+
+Round-two Screen and ally follow moves target the west and east linked areas,
+respectively. B's actor-visible Normal Move rule reserves one native probe for
+each route when both are offered. It prefers the west approach, then the
+northwest diagonal, then the issued Hold. Both Hold arms took the west
+approach. Both Screen arms triggered the native Engagement Range transit
+rejection and took the northwest fallback. Each arm reached its declared
+actions with a two-probe cap before endpoint evaluation. The horizon is A's
+first round-three Movement offer after Command scoring. Setup and replay
+use separate worker caps of 120 and 1,100 seconds and verify the sealed receipt.
+
+The eight post-fork Normal Move menus produced 256 proposals. The geometry
+predicates excluded 232. Eight eligible B alternatives fell outside the
+two-probe cap and remain untested. Native validation accepted 14 of the 16
+probes and rejected two for Engagement Range transit. The receipt preserves
+those dispositions, the selected responses and the objective-level records.
+
+| Arm | Central 1 OC at A2 turn end (A-B) | B2 Command end | B2 turn end | A3 Command end | Central 1 VP gain (A-B) |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Hold, ally omitted | 0-0 | 0-0 | 0-1 | 0-1 | 0-0 |
+| Hold, ally follows | 1-0 | 1-0 | 1-1 | 1-1 | 0-0 |
+| Screen, ally omitted | 1-0 | 1-0 | 1-1 | 1-1 | 0-0 |
+| Screen, ally follows | 2-0 | 2-0 | 2-1 | 2-1 | 5-0 |
+
+In West, Screen supplied zero OC and B Held after its preferred move was blocked.
+Here, Screen supplied 1 OC and B's legal fallback still supplied 1 OC.
+Only Screen plus ally exceeded B's OC. Ally follow changed the A-minus-B VP
+margin by 0 after Hold and +5 after Screen, yielding a +5 VP interaction.
+The +5 estimate applies to the combined change in OC and the opponent's route.
+The effect of blocking the route alone remains unmeasured.
+
+All four arms restored and replayed exactly and retained three living models,
+15 wounds and zero active RNG draws. This one-seed group is development-only
+and yields zero training rows.
+
 ## 7. Performance and evaluation before scaling
 
 Measure the actual headless workload, with and without the reference transport under matched conditions:
