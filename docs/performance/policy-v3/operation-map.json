@@ -38876,6 +38876,44 @@
       "families": [],
       "sensitive": false,
       "mandatory": false
+    },
+    "fortification-rotation-admission-receipt": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/fortification-rotation-test-v1.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "fortification-rotation-test-admission": {
+      "paths": [
+        "scripts/fortification_engagement_test_admission.py"
+      ],
+      "owners": [
+        "FortificationRotationReceipt",
+        "_fortification_rotation_successor"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "fortification-rotation-native-tests": {
+      "paths": [
+        "tests/rules/section09/test_fortification_engagement.py"
+      ],
+      "owners": [
+        "_assert_crossing",
+        "fortification_pivot_definitions",
+        "test_fortification_crossing_interpolates_rotation_and_translation_together",
+        "test_fortification_crossing_respects_physical_overlap_tolerance",
+        "test_fortification_native_bloodcrusher_pivot_is_independent_of_waypoint"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",
