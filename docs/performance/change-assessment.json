@@ -6,11 +6,11 @@
   "changes": {
     "docs/AI_IMPLEMENTATION_PLAN.md": {
       "before_sha256": "3f55e97ecbcc4723642aef1fe95c38297bb206ff1be0001b30daa4d1e6f613db",
-      "after_sha256": "d9d534ffa78adc2ac6aa80d4efa7a34e47bbf0635dfa4518b6946260fb5ae0b1",
+      "after_sha256": "d2a4974cad598f4c843cca893c75094fa949e707d3fce0252763e1a1b66a9093",
       "owners": {
         "@document": {
           "before": "3f55e97ecbcc4723642aef1fe95c38297bb206ff1be0001b30daa4d1e6f613db",
-          "after": "d9d534ffa78adc2ac6aa80d4efa7a34e47bbf0635dfa4518b6946260fb5ae0b1"
+          "after": "d2a4974cad598f4c843cca893c75094fa949e707d3fce0252763e1a1b66a9093"
         }
       }
     },
@@ -36,11 +36,11 @@
     },
     "scripts/stage4_benchmark_entry.py": {
       "before_sha256": "ef9a3995378f39d0a140413af6da6fa072d0a46646068d799036f1ea8dea1626",
-      "after_sha256": "32c74d54717a1f0c0dd34f99e3d35c70be311887a76a57cdc357d2b504b46fca",
+      "after_sha256": "4b311d136dc1ae076460599a4961306c9f94858e8262549f6f14486a693fc2f8",
       "owners": {
         "main": {
           "before": "72dd7538e908088d9b9f741088e04a6a41ec474e1c8776711cc1501374c90e97",
-          "after": "a7d344f9d1d0278d4cf616eb6e541ed3596112a7d6611d54b5062a295acbd677"
+          "after": "aba988a909dbdd9c3e17d727001f5091b50bd29c5add901f516a685e7f69447b"
         }
       }
     },
@@ -60,15 +60,23 @@
     },
     "scripts/stage4_layout_batch.py": {
       "before_sha256": null,
-      "after_sha256": "65a0abda1afdddfc4e00a044ce97903dcd974ab9a057676220d030c176554dc4",
+      "after_sha256": "1503ce2c809af73027e08b872b3441ea9a5a0aa30ff96fcdd7059132d749bab4",
       "owners": {
         "@module": {
           "before": null,
-          "after": "fa57464e4ec2869bdfa07760559314cb411fefe53621b26b13fa4193aa19bb59"
+          "after": "f320039fe3deecc4febb7da7b7bbb7d1244f087587ec1bc4677cb95249ab29b6"
+        },
+        "analyze": {
+          "before": null,
+          "after": "c089bc424a6f9669514caefdd1e79764bc9a8ca4ab1aa50d207e56eafcc8398a"
+        },
+        "bind_attempts": {
+          "before": null,
+          "after": "a7de1c2ac764779f97424a20176806df968e52b67da33499c406ad3375fff7dc"
         },
         "candidate_disposition": {
           "before": null,
-          "after": "2940588479cba7b6638990c74787099734b22d903b7bc4d3bacd344d2e071177"
+          "after": "fa392c5ff7522085e438e0093fd9024d4494e986c0e715db06c0b76c77874c5e"
         },
         "choose": {
           "before": null,
@@ -81,6 +89,10 @@
         "group_families": {
           "before": null,
           "after": "57aaf0e3d27c81bffa29cfb575a004837dbf9607fa692dfe3ecd9cad135eb812"
+        },
+        "inventory": {
+          "before": null,
+          "after": "183fe983fa625de1f8c46a3d6111039cda64a26425d8136835ca19068b86de47"
         },
         "load_plan": {
           "before": null,
@@ -96,11 +108,27 @@
         },
         "run": {
           "before": null,
-          "after": "5fa1835393c2afac616f596af8b198b8ea3a067c13512868c614bdba38a763ae"
+          "after": "9eaabb8c0999b80e3d5c88eff8544cb7716ac64f5054012e9bad6c374a941df7"
         },
         "run_page": {
           "before": null,
           "after": "76bc67ab98da23d7f614f1454cddd5994c689b73c50d4c7f4c442a201069a2eb"
+        },
+        "static_development_overlaps": {
+          "before": null,
+          "after": "4ee33fdb2384c088f0f2921a724ff5a95acc553371a702b9f0ffc9ebcc7070da"
+        },
+        "verify_attempts": {
+          "before": null,
+          "after": "f49f808211a24c92982dc08900ee75d59da4c16fc150d541110751b1de84de79"
+        },
+        "verify_file": {
+          "before": null,
+          "after": "d28ea70ecdcb14b650581516029f7d742f6b929a9414fc071a8a7f926dc1ee52"
+        },
+        "verify_receipt": {
+          "before": null,
+          "after": "9fa727f1829df97a979ccb33b9b955844ff587eac5e2a86b4609a4546799209d"
         }
       }
     },
@@ -144,8 +172,12 @@
     },
     "scripts/stage4_layout_intake_checks.py": {
       "before_sha256": "da7032f0b2c6ab3a44d47f9d8e9039e6be1d91532891b14be05015d0ff1e6e97",
-      "after_sha256": "301f4e30de91447fff7e2b565199bf23113b3bc73b85ab65c9b585643c0eed31",
+      "after_sha256": "cdea842fee067ae2cd7a2d594b10189cb5241808f6d20f7d3956be978484d237",
       "owners": {
+        "@module": {
+          "before": "a14d1440667dad4e4959e8b42de8c670b7612c12002498a9a1e151876f318c39",
+          "after": "ea26a4d4d2e69bc91ec61970727b795f9275f65bec8cb66769ec5173980faeb3"
+        },
         "test_batch_can_revisit_first_pairing_at_last_page": {
           "before": null,
           "after": "57760bcfd1040dc5022086186a31ef8fa6a129dde4b5dabfcc10092d21d6c531"
@@ -166,9 +198,21 @@
           "before": null,
           "after": "4b2e6b34517b80986efdf2f3baf6ee9e093308029b8b53d6f8ca33963392f9e1"
         },
+        "test_outcome_blind_cli_rejects_historical_receipt_without_dispatch": {
+          "before": null,
+          "after": "87c289fedb84bc3dd92545b8559690e9cba9aa100c55f44be7dd4cd8c6e983e2"
+        },
         "test_page_9_screen_probe_uses_native_child_fork": {
           "before": null,
           "after": "8017ef584107436997987c676f3dfd9b56bda2be417d833bdfb081e872919e27"
+        },
+        "test_receipt_verification_rejects_an_omitted_no_origin_bridge": {
+          "before": null,
+          "after": "c62d5e0be8d106b57ded1bc5c4e0b7be557943d6687772faa3b06b0692a19a54"
+        },
+        "test_verification_rejects_scored_receipts_before_reading": {
+          "before": null,
+          "after": "5c181fb2297c79a98d46698bb416c0ea21d1a262d1b9bcad6d5c5334fe27b5df"
         }
       }
     }
@@ -178,7 +222,7 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Documents the bounded native feasibility batch, receipt and provisional split.",
+      "rationale": "Distinguishes exploratory preflight evidence from a published and qualified cohort and documents verification.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -204,7 +248,7 @@
         "stage4-benchmark-entry-reproducer"
       ],
       "selected_families": [],
-      "rationale": "Routes the opt-in native batch and its individual diagnostic workers.",
+      "rationale": "Routes the bounded native preflight and adds an outcome-blind verifier for retained receipt data.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -224,7 +268,7 @@
         "stage4-benchmark-entry-reproducer"
       ],
       "selected_families": [],
-      "rationale": "Preflights a finite set of source diagrams through the unchanged native facade.",
+      "rationale": "Exercises native preflight and independently reconstructs all candidate provenance from retained receipt data.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -244,7 +288,7 @@
         "stage4-benchmark-entry-reproducer"
       ],
       "selected_families": [],
-      "rationale": "Exercises frozen input order, quota selection and transitive overlap without outcome access.",
+      "rationale": "Checks quota selection, complete provenance and historical scored input guards.",
       "source_obligation": null,
       "unchanged_work": null
     }

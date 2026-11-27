@@ -15,6 +15,14 @@ from scripts import stage4_layout_intake as intake
 bench = intake.bench
 evaluation = intake.evaluation
 RECIPE = intake.RECIPE.with_name("stage4-layout-batch-recipe.json")
+RECEIPT_SCHEMA = "stage4-movement-batch-receipt-v1"
+HISTORICAL_SCORED_RECEIPTS = (
+    bench.RECEIPT,
+    bench.WEST_RECEIPT,
+    bench.RECEIPT.with_name("stage4-split-objective-receipt.json"),
+    bench.RECEIPT.with_name("stage4-native-shooting-receipt.json"),
+)
+WORKER_FAILURES = {"preflight_wall_cap", "preflight_worker_failed"}
 TYPES = ("empty", "contested", "held")
 TARGET_SIZE = 8
 MIN_PER_TYPE = 2
@@ -187,7 +195,7 @@ def candidate_disposition(
         receipt["origin_type"] = kinds[0]
     if failure is not None:
         receipt.update(status="ineligible", reason=failure)
-    elif any(row["status"] != "eligible" for row in attempts):
+    elif len(attempts) != 2 or any(row["status"] != "eligible" for row in attempts):
         receipt.update(status="ineligible", reason="seed_preflight_failed")
     elif "origin_type" not in receipt:
         receipt.update(status="ineligible", reason="origin_type_mismatch")
@@ -195,13 +203,12 @@ def candidate_disposition(
         receipt.update(status="provisionally_eligible")
 
 
-def run() -> None:
-    started = monotonic()
-    plan = load_plan()
-    base = intake.load_recipe()
+def inventory(
+    plan: bench.Row, base: bench.Row
+) -> tuple[bench.Row, dict[str, bench.Row], list[bench.Row]]:
+    """Reconstruct every proposed vertex from the committed source recipes."""
     layouts, development, development_pages = intake.development_inventory()
     layouts_by_page = {layout.source_page: layout for layout in layouts.values()}
-    development_ids = {family["id"] for family in development["families"]}
     pinned = {}
     receipts = []
     for proposal in plan["pages"]:
@@ -243,10 +250,36 @@ def run() -> None:
         )
         pinned[family["id"]] = family
 
-    static_groups = group_families(development, list(pinned.values()))
-    static_exclusions = {
-        name for group in static_groups if development_ids.intersection(group) for name in group
+    return development, pinned, receipts
+
+
+def static_development_overlaps(development: bench.Row, pinned: dict[str, bench.Row]) -> set[str]:
+    development_ids = {family["id"] for family in development["families"]}
+    return {
+        name
+        for group in group_families(development, list(pinned.values()))
+        if development_ids.intersection(group)
+        for name in group
     }
+
+
+def bind_attempts(family: bench.Row, attempts: list[bench.Row]) -> None:
+    family["trajectory_sha256"] = sorted(
+        {
+            row[key]
+            for row in attempts
+            if row.get("strict_restore_and_replay")
+            for key in PREFIX_KEYS
+        }
+    )
+
+
+def run() -> None:
+    started = monotonic()
+    plan = load_plan()
+    base = intake.load_recipe()
+    development, pinned, receipts = inventory(plan, base)
+    static_exclusions = static_development_overlaps(development, pinned)
     for receipt in receipts:
         family_id = receipt.get("family_id")
         if family_id is None:
@@ -263,19 +296,40 @@ def run() -> None:
             receipt["page"], min(remaining, base["worker_wall_seconds"])
         )
         receipt.update(attempts=attempts, wall_seconds=round(monotonic() - tick, 3))
-        pinned[family_id]["trajectory_sha256"] = sorted(
-            {
-                row[key]
-                for row in attempts
-                if row.get("strict_restore_and_replay")
-                for key in PREFIX_KEYS
-            }
-        )
+        bind_attempts(pinned[family_id], attempts)
         candidate_disposition(receipt, attempts, failure)
         if receipt["page"] == 9:
             intake.need(receipt["status"] == "provisionally_eligible", "page_9_control_failed")
 
+    analysis = analyze(development, pinned, receipts)
+    emit(
+        {
+            "schema": RECEIPT_SCHEMA,
+            "plan_sha256": bench.payload_digest(plan),
+            "engine_build_id": intake.verified_engine_build_identity().build_id,
+            "candidate_generator_sha256": sha256(
+                Path(intake.screen_movement_candidates.__file__).read_bytes()
+            ).hexdigest(),
+            "continuation_disjointness": "sealed_check_pending",
+            "cohort_lock": "pending",
+            "wall_seconds": round(monotonic() - started, 3),
+            "pages": receipts,
+            **analysis,
+        }
+    )
+
+
+def analyze(
+    development: bench.Row,
+    pinned: dict[str, bench.Row],
+    receipts: list[bench.Row],
+    *,
+    expected_components: object = None,
+) -> bench.Row:
+    development_ids = {family["id"] for family in development["families"]}
     groups = group_families(development, list(pinned.values()))
+    if expected_components is not None:
+        intake.need(groups == expected_components, "full_provenance_graph_mismatch")
     component_by_id = {name: group for group in groups for name in group}
     eligible = []
     for receipt in receipts:
@@ -319,31 +373,148 @@ def run() -> None:
         for size in range(min(TARGET_SIZE, len(eligible)), -1, -1)
         if (choice := choose(eligible, size, 0)) is not None
     )
-    emit(
-        {
-            "schema": "stage4-movement-batch-receipt-v1",
-            "status": "provisional_cohort" if chosen is not None else "intake_gap",
-            "plan_sha256": bench.payload_digest(plan),
-            "engine_build_id": intake.verified_engine_build_identity().build_id,
-            "candidate_generator_sha256": sha256(
-                Path(intake.screen_movement_candidates.__file__).read_bytes()
-            ).hexdigest(),
-            "continuation_disjointness": "sealed_check_pending",
-            "cohort_lock": "pending",
-            "proposed_pages": sorted(selected_pages),
-            "max_pairing_and_component_distinct_up_to_eight": len(usable),
-            "qualified_counts": {kind: qualified_counts[kind] for kind in TYPES},
-            "reached_by_both_seeds": {kind: both_seed_counts[kind] for kind in TYPES},
-            "reached_by_seed": {kind: seed_counts[kind] for kind in TYPES},
-            "a2_origins_reached": sum(
-                trial.get("a2_origin_reached", False)
-                for row in receipts
-                for trial in row.get("attempts", [])
-            ),
-            "wall_seconds": round(monotonic() - started, 3),
-            "pages": receipts,
-            "components": groups,
-            "verified_split_components": verified_groups,
-            "split_manifest": split,
-        }
+    return {
+        "status": "provisional_cohort" if chosen is not None else "intake_gap",
+        "proposed_pages": sorted(selected_pages),
+        "max_pairing_and_component_distinct_up_to_eight": len(usable),
+        "qualified_counts": {kind: qualified_counts[kind] for kind in TYPES},
+        "reached_by_both_seeds": {kind: both_seed_counts[kind] for kind in TYPES},
+        "reached_by_seed": {kind: seed_counts[kind] for kind in TYPES},
+        "a2_origins_reached": sum(
+            trial.get("a2_origin_reached", False)
+            for row in receipts
+            for trial in row.get("attempts", [])
+        ),
+        "components": groups,
+        "verified_split_components": verified_groups,
+        "split_manifest": split,
+    }
+
+
+def verify_file(path: Path) -> bench.Row:
+    """Verify a retained preflight receipt without replay or historical score reads."""
+    path = path.resolve(strict=True)
+    intake.need(
+        all(
+            path.name.casefold() != scored.name.casefold() and not path.samefile(scored)
+            for scored in HISTORICAL_SCORED_RECEIPTS
+        ),
+        "historical_scored_receipt_forbidden",
     )
+    raw = path.read_bytes()
+    receipt = json.loads(raw, object_pairs_hook=evaluation._unique_object)
+    result = verify_receipt(receipt)
+    return {**result, "receipt_sha256": sha256(raw).hexdigest()}
+
+
+def verify_attempts(attempts: list[bench.Row], base: bench.Row) -> None:
+    indices = [attempt["seed_index"] for attempt in attempts]
+    intake.need(indices in ([], [1], [1, 2]), "preflight_seed_order_mismatch")
+    for index, trial in zip(indices, attempts, strict=True):
+        seed = sha256(f"{base['seed_namespace']}/{index}".encode()).hexdigest()
+        intake.need(
+            trial["startup_seed_hex"] == seed
+            and trial["status"] in {"eligible", "ineligible", "origin_verified"},
+            "preflight_seed_evidence_mismatch",
+        )
+        if trial.get("strict_restore_and_replay"):
+            intake.need(
+                trial["strict_restore_and_replay"] is True
+                and trial["a2_origin_reached"] is True
+                and all(evaluation._sha256(trial[key], key) for key in PREFIX_KEYS),
+                "preflight_origin_commitment_mismatch",
+            )
+        if "origin" in trial:
+            origin = trial["origin"]
+            intake.need(
+                trial.get("strict_restore_and_replay") is True
+                and intake.classify_origin(origin["visible_contact_oc"], origin["controller"])
+                == origin["type"],
+                "preflight_origin_type_mismatch",
+            )
+        if trial["status"] == "eligible":
+            menu = trial["menu"]
+            probes = menu["probes"]
+            intake.need(
+                "origin" in trial
+                and menu["actor_id"] == bench.A
+                and {bench.HOLD, bench.NORMAL}.issubset(menu["issued_options"])
+                and menu["hold"] == "accepted"
+                and 0 < len(probes) <= base["native_probe_cap"]
+                and [probe["id"] for probe in probes] == menu["eligible_candidates"][: len(probes)]
+                and all(probe["violation"] is not None for probe in probes[:-1])
+                and probes[-1] == {"id": menu["selected_screen"], "violation": None},
+                "preflight_menu_evidence_mismatch",
+            )
+
+
+def verify_receipt(receipt: object) -> bench.Row:
+    if not isinstance(receipt, dict) or receipt.get("schema") != RECEIPT_SCHEMA:
+        raise intake.IntakeGap("not_stage4_preflight_receipt")
+    plan = load_plan()
+    base = intake.load_recipe()
+    intake.need(
+        receipt["plan_sha256"] == bench.payload_digest(plan)
+        and receipt["engine_build_id"] == intake.verified_engine_build_identity().build_id
+        and receipt["candidate_generator_sha256"]
+        == sha256(Path(intake.screen_movement_candidates.__file__).read_bytes()).hexdigest()
+        and receipt["continuation_disjointness"] == "sealed_check_pending"
+        and receipt["cohort_lock"] == "pending",
+        "preflight_receipt_identity_mismatch",
+    )
+    development, pinned, pages = inventory(plan, base)
+    static_exclusions = static_development_overlaps(development, pinned)
+    intake.need(
+        [page["page"] for page in receipt["pages"]] == list(PAGES),
+        "preflight_receipt_page_order_mismatch",
+    )
+    for page, retained in zip(pages, receipt["pages"], strict=True):
+        family_id = page.get("family_id")
+        if family_id is None:
+            continue
+        if family_id in static_exclusions:
+            page.update(status="excluded", reason="development_component_overlap")
+            continue
+        if retained.get("reason") == "batch_wall_cap":
+            page.update(status="excluded", reason="batch_wall_cap")
+            continue
+        attempts = retained["attempts"]
+        verify_attempts(attempts, base)
+        reason = retained.get("reason")
+        failure = reason if reason in WORKER_FAILURES else None
+        if reason != "development_component_overlap" and failure is None:
+            intake.need(
+                len(attempts) == 2
+                and all(trial["status"] != "origin_verified" for trial in attempts),
+                "incomplete_worker_receipt",
+            )
+        page.update(attempts=attempts, wall_seconds=retained["wall_seconds"])
+        bind_attempts(pinned[family_id], attempts)
+        candidate_disposition(page, attempts, failure)
+        if page["page"] == 9:
+            intake.need(page["status"] == "provisionally_eligible", "page_9_control_failed")
+
+    expected = receipt["components"]
+    intake.need(isinstance(expected, list), "full_provenance_graph_mismatch")
+    result = analyze(development, pinned, pages, expected_components=expected)
+    intake.need(pages == receipt["pages"], "preflight_page_evidence_mismatch")
+    intake.need(
+        all(receipt[key] == value for key, value in result.items()), "preflight_summary_mismatch"
+    )
+    return {
+        "verification": "exploratory_preflight_receipt",
+        "publication_before_preflight": "unverified",
+        "plan_sha256": receipt["plan_sha256"],
+        "verified_pages": len(pages),
+        "provenance_vertices": len(development["families"]) + len(pinned),
+        **{
+            key: result[key]
+            for key in (
+                "status",
+                "qualified_counts",
+                "proposed_pages",
+                "reached_by_seed",
+                "reached_by_both_seeds",
+            )
+        },
+    }

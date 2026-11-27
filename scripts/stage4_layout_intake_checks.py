@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import pytest
 
 from scripts import stage4_benchmark_entry as bench
@@ -211,3 +213,96 @@ def test_page_9_screen_probe_uses_native_child_fork() -> None:
     assert proof["strict_restore_and_replay"]
     assert proof["menu"]["hold"] == "accepted"
     assert proof["menu"]["probes"] == [{"id": proof["menu"]["selected_screen"], "violation": None}]
+
+
+def test_receipt_verification_rejects_an_omitted_no_origin_bridge() -> None:
+    from scripts import stage4_layout_batch as batch
+
+    _, development, candidate, _ = intake.source_inventory(intake.load_recipe())
+    candidate["trajectory_sha256"] = [bench.payload_digest("synthetic admitted origin")]
+    bridge = {
+        **candidate,
+        "id": "reserve-page-10",
+        "source_diagram_pages": [10],
+        "geometry_sha256": [development["families"][0]["geometry_sha256"][0]],
+        "trajectory_sha256": [],
+    }
+    pinned = {family["id"]: family for family in (candidate, bridge)}
+    pages = [
+        {
+            "page": 9,
+            "family_id": candidate["id"],
+            "pairing": ["take-and-hold", "take-and-hold"],
+            "origin_type": "empty",
+            "status": "provisionally_eligible",
+        },
+        {"page": 10, "family_id": bridge["id"], "status": "ineligible"},
+    ]
+    reduced = {**development, "families": [*development["families"], candidate]}
+    reduced_components = intake.evaluation.validate_split(reduced)
+    assert [candidate["id"]] in reduced_components
+    with pytest.raises(intake.IntakeGap, match="full_provenance_graph_mismatch"):
+        batch.analyze(development, pinned, pages, expected_components=reduced_components)
+    assert pages[0]["status"] == "provisionally_eligible"
+
+    analysis = batch.analyze(development, pinned, pages)
+    assert [bridge["id"], candidate["id"], "west"] in analysis["components"]
+    assert pages[0]["reason"] == "development_component_overlap"
+    assert analysis["qualified_counts"] == dict.fromkeys(batch.TYPES, 0)
+
+
+@pytest.mark.parametrize("alias", ["original", "symlink", "hardlink"])
+def test_verification_rejects_scored_receipts_before_reading(
+    alias: str, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from os import link
+
+    from scripts import stage4_layout_batch as batch
+
+    scored = batch.HISTORICAL_SCORED_RECEIPTS[0]
+    path = scored
+    if alias == "symlink":
+        path = tmp_path / "preflight.json"
+        try:
+            path.symlink_to(scored)
+        except OSError:
+            pytest.skip("Creating a symbolic link is unavailable on this platform.")
+    if alias == "hardlink":
+        path = tmp_path / "preflight.json"
+        try:
+            link(scored, path)
+        except OSError:
+            pytest.skip("Creating a hard link is unavailable on this volume.")
+
+    def forbid_read(_path: Path) -> bytes:
+        raise AssertionError("Verifier read a historical scored receipt")
+
+    monkeypatch.setattr(Path, "read_bytes", forbid_read)
+    with pytest.raises(intake.IntakeGap, match="historical_scored_receipt_forbidden"):
+        batch.verify_file(path)
+
+
+def test_outcome_blind_cli_rejects_historical_receipt_without_dispatch(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    import sys
+
+    from scripts import stage4_layout_batch as batch
+
+    def forbid_read(_path: Path, **_kwargs: object) -> str:
+        raise AssertionError("Verifier entered a scored receipt reader")
+
+    monkeypatch.setattr(Path, "read_text", forbid_read)
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "stage4_benchmark_entry",
+            "--layout-intake-verify",
+            str(batch.HISTORICAL_SCORED_RECEIPTS[2]),
+        ],
+    )
+    with pytest.raises(SystemExit) as exc:
+        bench.main()
+    assert exc.value.code == 2
+    assert "historical_scored_receipt_forbidden" in capsys.readouterr().err
