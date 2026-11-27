@@ -1886,6 +1886,130 @@ Central Guard reverses the Screen advantage seen in the other two cases.
 These three paired results describe the sealed development plays at their
 respective horizons.
 
+### First prospective Movement policy comparison
+
+Freeze this comparison before collecting reserve outcomes. It uses the
+October v1.3 layout release and the engine's July v1.1 scoring import.
+Keep the layout's assigned missions and record both mission IDs and the
+scoring artifact hash for each family. The endpoint and VP calculation
+are identical across families. The native mission awards can differ by
+layout. Each paired contrast keeps both sides' mission assignments fixed.
+
+**Action and horizon.** At A's round-two `select_movement_action` request
+for the designated screen unit S, compare exactly two actions. Hold is
+the issued `remain_stationary` option. Screen is the issued `normal_move`
+option followed by one generated, natively accepted path matching the
+family's frozen Screen predicate. Exclude the other issued options from
+the evaluation menu and report them in the inventory. Require both
+options to bind to the same actor and request, and require the Screen
+path to be available under the live cap. Freeze the affected linked
+non-home objective, the units S and E, and the route predicates before
+preflight. For each required route, order matching raw proposals by
+stable candidate ID. Spend at most two native probes per request on
+disposable forks. For the two-route response, give each route one slot
+when both have matching proposals. If only one route has candidates, it
+may use both slots. Select the first native accept in route-priority
+order, then candidate ID order, and commit it through the actor facade.
+
+All evaluated policies choose Hold or Screen once from the same
+actor-visible pre-choice observation and two action IDs. Freeze the
+challenger implementation and any decision randomness before reserve
+collection. Use one deterministic challenger for this comparison. The
+common Screen selector handles the child path for every policy. E must
+use the same frozen follow-through rule toward the declared objective
+in both arms. Stop at A's first round-three `select_movement_unit`
+offer after Command scoring and before any A3 movement. Both arms
+must originate from the same verified checkpoint for each seed. Require
+exact restore, both viewer projections and visible event streams, and
+independent event replay at origin and endpoint.
+
+**Responses and seeds.** Run both opponent rules on every pair and weight
+them equally. Passive B uses its issued Hold. Active B takes the first
+natively accepted candidate on its frozen preferred approach, then
+its alternate approach, then the issued Hold if neither passes the
+live cap. Record the route and every probe disposition. The same B
+unit and route predicates apply after either A action. E follows in
+both response blocks. During the continuation both sides Hold with other
+units. In the prefix and continuation, skip Shooting and Charge and
+decline optional reactions. Both sides use fixed Assassination and
+Bring It Down. Freeze required
+submission IDs or deterministic selectors, relevant phase completions
+and worker and decision caps in the fixture recipe. An unexpected
+request, absent required E move, missed endpoint or replay mismatch
+is a typed gap. A prescribed B Hold after exhausting its route probes
+is an observed response.
+
+Use exactly the two native startup seeds given by SHA-256 of the UTF-8
+strings `stage4-movement-comparison-v1/1` and
+`stage4-movement-comparison-v1/2`. Use the 32 digest bytes as each seed
+and record their lowercase hex values. Pair on startup seed and origin,
+with independent native continuations from that origin. Record realized
+draw counts, including zero. Keep the seed and continuation evidence
+outside the policy input. Run every action, response and seed combination
+for every locked family. There is no seed replacement or extension.
+
+**Reserve intake.** Start with all 45 imported diagrams in ascending PDF
+page order. Exclude diagrams used in policy development and any setup
+that shares a declared scenario, geometry or trajectory binding with
+development. Include the West, Central Guard and Layout C lineages and
+their related mechanism, timing and Shooting controls in that inventory.
+Use at most one admitted family per force-disposition pairing. Review
+the remaining pages in that order, with at most one ordinary-setup
+recipe per page. Publish the target objective, setup recipe, route
+predicates and caps for each candidate before its preflight. Preflight
+may construct and verify the A2 origins for both seeds and probe the
+immediate S action. Do it from the native actor facade. Keep future
+scoring and continuation receipts sealed.
+
+Lock exactly eight disjoint reserve components. Use the lexicographically
+first ordered eight-page list that passes the outcome-free preflight
+and includes at least two families of each origin type, using the
+target's actor-visible state at both seeds. Use empty with no current
+controller and no visible OC contact, contested with both sides
+contributing positive visible OC, and held with exactly one side
+contributing positive visible OC and controlling the objective. The
+other two families may be of any of these types. Check overlap and partition
+assignments with `validate-split` using verified prefix and origin
+hashes. Record every attempted diagram and its preflight disposition.
+If eight cannot be locked, report an intake gap with the counts and
+leave outcomes sealed. Before any endpoint collection, freeze the
+validated split and fixture recipes, the engine and candidate-generator
+revisions, and the challenger revision. After collection, check the
+inventory again with all continuation bindings before releasing any
+outcomes. Quarantine any newly colliding component. A collision or
+an incomplete locked block leaves the comparison inconclusive.
+Retain gaps and failures in the original cohort without substitution.
+
+**Paired metric and reporting.** For each arm, compute the native change
+in A-minus-B total VP from origin to endpoint. For each
+family × response × seed block, subtract the margin for Always Hold
+and for Always Screen from the margin of the challenger's frozen
+selection. The two constant policies use the same menu and continuations
+as the challenger. The immediate-material rule is an alias of Always
+Hold on this Movement menu and gets no additional contrast. Report
+margins in VP over the fixed local horizon.
+
+Average the four paired differences per contrast within each family.
+Give each of the eight connected components equal weight in the
+primary means. For simultaneous 95% coverage, use two-sided 97.5%
+Student t intervals over the eight family means, with seven degrees
+of freedom and Bonferroni adjustment for the two contrasts.
+Treat the intervals as approximate between-family uncertainty for this
+small designed cohort. A positive comparison requires both lower
+bounds above zero and all 32 paired blocks complete. Report each
+family mean, both overall estimates and intervals, choice counts,
+planned and complete blocks, gaps by cause, cap losses and seed draw
+counts. When a block is incomplete, report the observed paired rows
+outside quarantine with their denominators and withhold the primary
+estimates and intervals. When either bound fails to clear zero, report
+that the criterion was unmet. This eight-family minimum is a
+feasibility target.
+
+Use the existing sealed movement baselines and Shooting receipt as
+development smoke checks. Their respective horizons and seed repeats
+provide no rows for this comparison. No reserve family is admitted by
+this contract alone.
+
 ## 7. Performance and evaluation before scaling
 
 Measure the actual headless workload, with and without the reference transport under matched conditions:

@@ -1,98 +1,16 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "8edef22960a1ed28913f12c7e89062e1e44841b5",
+  "base": "5ef3bb92a59470455bcd66faf62d195e17dbccc3",
   "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:af65d2237320cda39c2d38d0dbeb4d415c424956696fc1cc0f40686921848830",
   "operation_map_sha256": "37e7605f53e80f4a9ccd972d0af57d2b8b00dcba36329eeeee1a26f297dc36bb",
   "changes": {
     "docs/AI_IMPLEMENTATION_PLAN.md": {
-      "before_sha256": "1ba161687e9cda069bba57d8367fba1f0b0ee3011ffa4abd04c60775accda166",
-      "after_sha256": "f6b89d7d915986becd7a64a696c0c5698df9c482a251dc4aba51bc1975cd07c9",
+      "before_sha256": "f6b89d7d915986becd7a64a696c0c5698df9c482a251dc4aba51bc1975cd07c9",
+      "after_sha256": "ce890384ac20ca6c05a22acf120aa4938d0b6e0b82db42884a60c4f4252e1a25",
       "owners": {
         "@document": {
-          "before": "1ba161687e9cda069bba57d8367fba1f0b0ee3011ffa4abd04c60775accda166",
-          "after": "f6b89d7d915986becd7a64a696c0c5698df9c482a251dc4aba51bc1975cd07c9"
-        }
-      }
-    },
-    "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "a14439cc07ccde2f05dddf4195b37405487866a77669d8245fd324f82561dab5",
-      "after_sha256": "49f54e886c5ce9e86682ec5c388f7c1053d21bf77449e875b2c44e1a0d206128",
-      "owners": {
-        "@document": {
-          "before": "a14439cc07ccde2f05dddf4195b37405487866a77669d8245fd324f82561dab5",
-          "after": "49f54e886c5ce9e86682ec5c388f7c1053d21bf77449e875b2c44e1a0d206128"
-        }
-      }
-    },
-    "docs/stage4-native-shooting-protocol.json": {
-      "before_sha256": null,
-      "after_sha256": "e9d3b39b80a75f8ac73857df220110bd5efecc8e145717290386e2d320e36e61",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "e9d3b39b80a75f8ac73857df220110bd5efecc8e145717290386e2d320e36e61"
-        }
-      }
-    },
-    "docs/stage4-native-shooting-receipt.json": {
-      "before_sha256": null,
-      "after_sha256": "31b9099f086fcf2989a4f181e80e7caf6e98b434593e3e30673076d7c6da7713",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "31b9099f086fcf2989a4f181e80e7caf6e98b434593e3e30673076d7c6da7713"
-        }
-      }
-    },
-    "scripts/stage4_benchmark_entry.py": {
-      "before_sha256": "d94f2338a9639b5b9a0aa07dc5e0f357b2d29b0b14fbe0218767463b3e66df11",
-      "after_sha256": "394cfd3f86ab0a8d6d6caca503c24e4b82a5ab312744cd4b2ee54fa8f4a2793e",
-      "owners": {
-        "main": {
-          "before": "0e9e4b48b916b3f0c0945c2fdf6f40c91a2c53635edfbc99bc6269ed0d4c3e51",
-          "after": "21ee42e448bde21e0f15e1dc8e67d0773ad15f4f9c9a9af1b702b774735c3c8a"
-        }
-      }
-    },
-    "scripts/stage4_native_shooting.py": {
-      "before_sha256": null,
-      "after_sha256": "a8051f731e25d8ae879a559cd6fef139b44f212d1ee32b14c5e0755387aa0c37",
-      "owners": {
-        "@module": {
-          "before": null,
-          "after": "e9ec3bdd2ef707657c765bff9f2544442aec4c5e4916983d0b0c013b1e0e40f5"
-        },
-        "checkpoint_row": {
-          "before": null,
-          "after": "0c06b29290a976b9034746e3f3b5c1dc815d56d8cf0609d454e90c7b3b5c56b0"
-        },
-        "config": {
-          "before": null,
-          "after": "a3f5a3bfb0502410b448383913f9ee5d61dd57098ba41081be0e851b315e7175"
-        },
-        "material": {
-          "before": null,
-          "after": "b2ea485428042dcf8e1dc877e3f986d6d5b10ad91f1cce892516a0610ee2d103"
-        },
-        "open_origin": {
-          "before": null,
-          "after": "4ae976dd6097d0403223a313aff9f234489a73c94fa20065507489435c42d61a"
-        },
-        "response": {
-          "before": null,
-          "after": "dc42cb3d6cc8a8f1d33ef9aae8ffd925f871ae197594f5216701dffe5b48c297"
-        },
-        "run": {
-          "before": null,
-          "after": "743b8578427fb2938d8ad2300a75ced21e41c6f6e803b079ed08334ec2731ab1"
-        },
-        "run_arm": {
-          "before": null,
-          "after": "a1f0360853a431fc6b6a044dfe27b97878b4481e317dfcad224ec2f695360198"
-        },
-        "setup_action": {
-          "before": null,
-          "after": "026a330252942085ea20d4c5a738a76cecd55b531bef590da332b8ca981f95ab"
+          "before": "f6b89d7d915986becd7a64a696c0c5698df9c482a251dc4aba51bc1975cd07c9",
+          "after": "ce890384ac20ca6c05a22acf120aa4938d0b6e0b82db42884a60c4f4252e1a25"
         }
       }
     }
@@ -102,51 +20,7 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Documents admission, replay and observed variation for the fixed development pilot.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "docs/stage4-native-shooting-protocol.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Freezes the development seed schedule, target arms, native setup, response and outcome measures.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "docs/stage4-native-shooting-receipt.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Records the native outcomes, actual draws and measured development runtime.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "docs/performance/policy-v3/operation-map.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Maps the isolated pilot to the existing development benchmark operation.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "scripts/stage4_benchmark_entry.py": {
-      "category": "measured_workload",
-      "operations": [
-        "stage4-benchmark-entry-reproducer"
-      ],
-      "selected_families": [],
-      "rationale": "Adds an opt-in invocation for measurement and receipt verification without changing default operation.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "scripts/stage4_native_shooting.py": {
-      "category": "measured_workload",
-      "operations": [
-        "stage4-benchmark-entry-reproducer"
-      ],
-      "selected_families": [],
-      "rationale": "Reuses native declarations, current RNG and strict replay in a bounded off-CI development workload.",
+      "rationale": "Freezes the prospective Movement comparison and reporting plan in the roadmap. No executable workload changes.",
       "source_obligation": null,
       "unchanged_work": null
     }
