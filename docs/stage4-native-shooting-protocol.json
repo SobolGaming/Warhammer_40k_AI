@@ -1,5 +1,5 @@
 {
-  "schema": "stage4-native-shooting-v1",
+  "schema": "stage4-native-shooting-v2",
   "base": "8edef22960a1ed28913f12c7e89062e1e44841b5",
   "family": "layout-c-flatboard-shooting-dev",
   "group_with": "disruption-mirror-c-split-central-dev",
@@ -7,6 +7,7 @@
   "training_rows": 0,
   "source_layout": "disruption-vs-disruption-layout-3",
   "board": "Synthetic flat board retaining the earlier Layout C deployment zones and mission assignments. No placed terrain areas, terrain features or linked objective areas.",
+  "setup_revision": "The one-friendly-unit fixture auto-completed Shooting after the cannon activation. Add an idle friendly unit to preserve the fixed Shooting endpoint. No outcome was read and every seed and target stays in the sweep.",
   "seeds": [
     "0101010101010101010101010101010101010101010101010101010101010101",
     "0202020202020202020202020202020202020202020202020202020202020202",
@@ -17,6 +18,7 @@
   ],
   "roster": {
     "army-alpha:cannon": {"sheet": "core-vehicle-monster", "xy": [[11.0, 34.0]]},
+    "army-alpha:boundary-keeper": {"sheet": "core-character-leader", "xy": [[5.0, 46.0]]},
     "army-beta:leader": {"sheet": "core-character-leader", "xy": [[34.0, 19.0]]},
     "army-beta:vehicle": {"sheet": "core-vehicle-monster", "xy": [[34.0, 26.0]]}
   },
