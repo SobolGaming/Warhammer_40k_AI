@@ -1,0 +1,88 @@
+{
+  "policy": "rules-engine-performance-v3",
+  "family": "shock_reconstruction",
+  "workload_id": "v963-shock-reconstruction-v1",
+  "base_revision": "1b56472fae25c5c0a253410a3378e69ddb1da74b",
+  "head_runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:a728d0d6acfecbdf39a6c1c2f72510fe5b2d418ebf2d487743d30b3f5c8ac989",
+  "head_input_digest": "86859962ab16d32bb250e8b84542d74c9cc42f980a52aef36ceccfed8042dbad",
+  "budget_profile": "current-change-relative-v1",
+  "base": {
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:1d2913f1ceadb54f99022d8cf1e835c7e0567c6fa73eea0705ac85fe9d94a5c9",
+    "host": {
+      "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+      "memory_bytes": 67359367168,
+      "logical_cpus": 64,
+      "platform": "Linux-6.18.58.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "659a2d81e02176d23168861529651506ac87a4eab1982109f144cd62a63fce71",
+    "workload_sha256": "f9a750bddeacecac6dca0a3d3e4c5c03a3ac6347596fa4d8ae827d0b5f5638d5",
+    "fixture_sha256": "f78fdbde338a0a1fc6c19c632686c97a2076c40eb4aaf6328be2a3ba62353305",
+    "samples": {
+      "active_shock/restore": [
+        1.0516171009999198,
+        1.054372001999809,
+        0.938147681999908
+      ],
+      "active_shock/replay": [
+        0.28896437899993543,
+        0.29071283400003267,
+        0.2890613160000157
+      ],
+      "expired_shock/restore": [
+        1.5101781519999804,
+        1.6154065129999253,
+        1.616140446999907
+      ],
+      "expired_shock/replay": [
+        0.707547477999924,
+        0.6976687660001062,
+        0.6960723340000641
+      ]
+    },
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false
+  },
+  "head": {
+    "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:a728d0d6acfecbdf39a6c1c2f72510fe5b2d418ebf2d487743d30b3f5c8ac989",
+    "host": {
+      "cpu": "AMD Ryzen Threadripper 3970X 32-Core Processor",
+      "memory_bytes": 67359367168,
+      "logical_cpus": 64,
+      "platform": "Linux-6.18.58.1-microsoft-standard-WSL2-x86_64-with-glibc2.31",
+      "python": "3.14.5",
+      "role": "provisional"
+    },
+    "lock_sha256": "659a2d81e02176d23168861529651506ac87a4eab1982109f144cd62a63fce71",
+    "workload_sha256": "f9a750bddeacecac6dca0a3d3e4c5c03a3ac6347596fa4d8ae827d0b5f5638d5",
+    "fixture_sha256": "f78fdbde338a0a1fc6c19c632686c97a2076c40eb4aaf6328be2a3ba62353305",
+    "samples": {
+      "active_shock/restore": [
+        1.0254637949999506,
+        1.0296604209997895,
+        0.9293947730000127
+      ],
+      "active_shock/replay": [
+        0.2864152980000654,
+        0.2894463810000616,
+        0.28523484499987717
+      ],
+      "expired_shock/restore": [
+        1.5063511289999951,
+        1.6040642920002028,
+        1.6064587549999487
+      ],
+      "expired_shock/replay": [
+        0.7006796209998356,
+        0.6908782680000058,
+        0.6910481600000367
+      ]
+    },
+    "completed": true,
+    "concurrency": 1,
+    "coverage": false
+  },
+  "historical_failures": []
+}
