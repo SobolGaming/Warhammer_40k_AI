@@ -144,8 +144,12 @@
     },
     "scripts/stage4_layout_intake_checks.py": {
       "before_sha256": "da7032f0b2c6ab3a44d47f9d8e9039e6be1d91532891b14be05015d0ff1e6e97",
-      "after_sha256": "99b5367d0816668f76e40d6d819f9a77a1bb3f26ef2eb67a9400c188d14e9fae",
+      "after_sha256": "1e44a67c72aa1cd91fe9516ebb6aabe8e48d0c7d84d92e46c4cd835779a0ff13",
       "owners": {
+        "test_batch_can_revisit_first_pairing_at_last_page": {
+          "before": null,
+          "after": "57760bcfd1040dc5022086186a31ef8fa6a129dde4b5dabfcc10092d21d6c531"
+        },
         "test_batch_overlap_transitively_connects_failed_and_unattempted_candidates": {
           "before": null,
           "after": "14033e30359d9b1cea46b99fe9db016caebf9463ab7111785cde24aefde5435b"

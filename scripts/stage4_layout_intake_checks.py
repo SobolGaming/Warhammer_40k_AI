@@ -128,6 +128,29 @@ def test_batch_selection_skips_earliest_page_only_when_quotas_require_it() -> No
     assert batch.choose([row for row in rows if row["page"] != 10], 8, 2) is None
 
 
+def test_batch_can_revisit_first_pairing_at_last_page() -> None:
+    from scripts import stage4_layout_batch as batch
+
+    rows = [
+        {"page": page, "pairing": [pair], "component": page, "origin_type": kind}
+        for page, (pair, kind) in enumerate(
+            (
+                ("P", "empty"),
+                ("A", "empty"),
+                ("B", "empty"),
+                ("C", "contested"),
+                ("D", "contested"),
+                ("E", "held"),
+                ("F", "empty"),
+                ("G", "contested"),
+                ("P", "held"),
+            ),
+            start=9,
+        )
+    ]
+    assert batch.choose(rows, 8, 2) == rows[1:]
+
+
 def test_batch_overlap_transitively_connects_failed_and_unattempted_candidates() -> None:
     from scripts import stage4_layout_batch as batch
 
