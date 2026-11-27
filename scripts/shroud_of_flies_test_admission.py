@@ -15,7 +15,7 @@ from scripts.milli_inch_test_admission import MANIFEST, RETAINED_CUTOVER_SHA256
 from scripts.stage3_defender_coherency_test_admission import RECEIPT_SHA256 as DEFENDER_SHA256
 
 RECEIPT = "data/source_audits/ci64_provenance_v1/shroud-of-flies-test-v1.json"
-RECEIPT_SHA256 = "5d2478c514160ce1a7eeb0499e13b8e3d256a03ffeecc7b126c8023dc8ee02b4"
+RECEIPT_SHA256 = "f2b0af28e69590b1289ee63780398c48c9165ed08aa27a15ff641ca5fb002934"
 BASE = "e5f2e9d94bbcd99d432d9a4441cbfbd63d564cf3"
 OWNER = "tests/rules/section10/test_shooting_types.py"
 PARSER_SOURCES = tuple(

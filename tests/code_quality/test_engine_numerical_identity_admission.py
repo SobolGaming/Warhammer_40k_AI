@@ -152,8 +152,14 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         selection.OPENING_MOVEMENT_UNIT_OWNER,
     } <= cohort
     assert sum(cohort <= group for group in groups) == 1
-    summary = _record("ci/test_shards/durations.json")
-    current = sharding.summary_case_seconds(summary)
+    timing_path = "ci/test_shards/durations.json"
+    current = sharding.summary_case_seconds(_record(timing_path))
+    # The complete Shroud profile remeasures every case. Compare historical retained
+    # costs to the exact snapshot that still used them for dispatch.
+    pre_shroud_weights = json.loads(
+        subprocess.check_output(["git", "show", f"{shroud.BASE}:{timing_path}"], cwd=ROOT)
+    )
+    pre_shroud_cases = sharding.summary_case_seconds(pre_shroud_weights)
     fight = _record(selection.STAGE2_FIGHT_TRANSITION)
     base_manifest = json.loads(
         subprocess.check_output(
@@ -584,7 +590,7 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
             ["git", "show", dark_pact.BASE + ":ci/test_shards/durations.json"], cwd=ROOT
         )
     )["case_seconds"]
-    assert all(current[node] == seconds for node, seconds in base_weights.items())
+    assert all(pre_shroud_cases[node] == seconds for node, seconds in base_weights.items())
     fools_record = _record(fools.TRANSITION)
     flight_base_manifest = json.loads(
         subprocess.check_output(["git", "show", fools.BASE + ":" + MANIFEST], cwd=ROOT)
@@ -616,10 +622,9 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
             ["git", "show", fools.BASE + ":ci/test_shards/durations.json"], cwd=ROOT
         )
     )
-    current_weights = _record("ci/test_shards/durations.json")
     for weights in ("files", "case_seconds"):
         assert all(
-            current_weights[weights][node] == seconds
+            pre_shroud_weights[weights][node] == seconds
             for node, seconds in flight_base_weights[weights].items()
         )
     assert set(fools_record["replaced_sources"]) == fools.REPLACED_SOURCES
@@ -1078,14 +1083,19 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
             ["git", "show", defender.BASE + ":ci/test_shards/durations.json"], cwd=ROOT
         )
     )
-    assert set(current) == set(retained_weights["case_seconds"]) | set(
+    assert pre_shroud_cases.keys() == retained_weights["case_seconds"].keys() | set(
         defender_record["added_cases"]
     )
+    shroud_cases = set(shroud_record["added_cases"])
+    assert shroud_cases.isdisjoint(pre_shroud_cases)
+    assert current.keys() == pre_shroud_cases.keys() | shroud_cases
     assert all(
-        current[node] == seconds for node, seconds in retained_weights["case_seconds"].items()
+        pre_shroud_cases[node] == seconds
+        for node, seconds in retained_weights["case_seconds"].items()
     )
     assert all(
-        summary["files"][node] == seconds for node, seconds in retained_weights["files"].items()
+        pre_shroud_weights["files"][node] == seconds
+        for node, seconds in retained_weights["files"].items()
     )
     assert (
         attack_record["gathering_source_sha256"]
@@ -1110,10 +1120,11 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
     )
     assert len(attack_base_durations["case_seconds"]) == 6819
     assert all(
-        current[node] == seconds for node, seconds in attack_base_durations["case_seconds"].items()
+        pre_shroud_cases[node] == seconds
+        for node, seconds in attack_base_durations["case_seconds"].items()
     )
     assert all(
-        summary["files"][node] == seconds
+        pre_shroud_weights["files"][node] == seconds
         for node, seconds in attack_base_durations["files"].items()
     )
     assert ranged.OWNER in active_files
@@ -1136,10 +1147,11 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
     )
     assert len(ranged_base_durations["case_seconds"]) == 6813
     assert all(
-        current[node] == seconds for node, seconds in ranged_base_durations["case_seconds"].items()
+        pre_shroud_cases[node] == seconds
+        for node, seconds in ranged_base_durations["case_seconds"].items()
     )
     assert all(
-        summary["files"][node] == seconds
+        pre_shroud_weights["files"][node] == seconds
         for node, seconds in ranged_base_durations["files"].items()
     )
     assert (
@@ -1572,6 +1584,7 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         | ranged_cases
         | set(attack_record["added_cases"])
         | set(defender_record["added_cases"])
+        | shroud_cases
         | shooting_cases
         | {
             ground_charge.SCREEN_OWNER

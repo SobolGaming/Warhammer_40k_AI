@@ -24,7 +24,7 @@ from warhammer40k_core.rules.aura_parser import (
     live_aura_distance_conditions,
     parse_aura_conditions,
     parse_live_aura_ability_effects,
-    unsupported_live_aura_qualifier,
+    unsupported_live_aura_clause,
 )
 from warhammer40k_core.rules.command_point_parser import (
     command_point_target,
@@ -803,22 +803,14 @@ def _compile_clause(
     )
     if triggered_action_clause is not None:
         return triggered_action_clause
-    qualifier = unsupported_live_aura_qualifier(
-        clause_text.span, source_keyword_sequence_parts=parser_context.source_keyword_sequence_parts
+    clause_id = f"{source_id}:clause:{clause_index:03d}"
+    unsupported_aura_clause = unsupported_live_aura_clause(
+        clause_text.span,
+        clause_id=clause_id,
+        source_keyword_sequence_parts=parser_context.source_keyword_sequence_parts,
     )
-    if qualifier is not None:
-        return RuleClause(
-            clause_id=f"{source_id}:clause:{clause_index:03d}",
-            source_span=clause_text.span,
-            unsupported_reason=RuleUnsupportedReason.UNSUPPORTED_LANGUAGE,
-            diagnostics=(
-                RuleParseDiagnostic(
-                    reason=RuleUnsupportedReason.UNSUPPORTED_LANGUAGE,
-                    message="Fortification Stealth aura requires known conjunctive keywords.",
-                    source_span=qualifier,
-                ),
-            ),
-        )
+    if unsupported_aura_clause is not None:
+        return unsupported_aura_clause
     trigger = _parse_trigger(clause_text)
     conditions = _dedupe_conditions(
         (
@@ -901,7 +893,6 @@ def _compile_clause(
         text=clause_text.text,
         source_keyword_sequence_parts=parser_context.source_keyword_sequence_parts,
     )
-    clause_id = f"{source_id}:clause:{clause_index:03d}"
     residual_diagnostic = _residual_diagnostic(
         clause_text=clause_text,
         trigger=trigger,

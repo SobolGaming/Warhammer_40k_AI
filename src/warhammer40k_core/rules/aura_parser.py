@@ -7,10 +7,13 @@ from dataclasses import replace
 
 from warhammer40k_core.rules.parsed_tokens import TextSpan
 from warhammer40k_core.rules.rule_ir import (
+    RuleClause,
     RuleCondition,
     RuleConditionKind,
     RuleEffectKind,
     RuleEffectSpec,
+    RuleParseDiagnostic,
+    RuleUnsupportedReason,
     parameter_payload,
     parameters_from_pairs,
 )
@@ -36,9 +39,9 @@ _STEALTH_GRANT_AURA_RE = re.compile(
 )
 
 
-def unsupported_live_aura_qualifier(
-    span: TextSpan, *, source_keyword_sequence_parts: tuple[str, ...]
-) -> TextSpan | None:
+def unsupported_live_aura_clause(
+    span: TextSpan, *, clause_id: str, source_keyword_sequence_parts: tuple[str, ...]
+) -> RuleClause | None:
     match = _STEALTH_GRANT_AURA_RE.fullmatch(span.text)
     if match is None or (qualifier := match["qualifier"]) is None:
         return None
@@ -47,10 +50,21 @@ def unsupported_live_aura_qualifier(
         qualifier, source_keyword_sequence_parts=source_keyword_sequence_parts
     ):
         return None
-    return TextSpan(
-        text=qualifier,
-        start=span.start + match.start("qualifier"),
-        end=span.start + match.end("qualifier"),
+    return RuleClause(
+        clause_id=clause_id,
+        source_span=span,
+        unsupported_reason=RuleUnsupportedReason.UNSUPPORTED_LANGUAGE,
+        diagnostics=(
+            RuleParseDiagnostic(
+                reason=RuleUnsupportedReason.UNSUPPORTED_LANGUAGE,
+                message="Fortification Stealth aura requires known conjunctive keywords.",
+                source_span=TextSpan(
+                    text=qualifier,
+                    start=span.start + match.start("qualifier"),
+                    end=span.start + match.end("qualifier"),
+                ),
+            ),
+        ),
     )
 
 
