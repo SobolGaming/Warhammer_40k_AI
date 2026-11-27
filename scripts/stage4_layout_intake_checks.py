@@ -44,3 +44,39 @@ def test_first_recipe_uses_earliest_unused_diagram() -> None:
     ]
     with pytest.raises(intake.IntakeGap, match="candidate_page_order"):
         intake.source_inventory({**recipe, "source_page": 10})
+
+
+@pytest.mark.parametrize(
+    ("field", "binding", "component"),
+    [
+        (
+            "trajectory_sha256",
+            "fb22f83cbb3890e655fc764abc1cbccd22991f2cb7ad398ec7b6f487ab846398",
+            "synthetic-reserve, west",
+        ),
+        (
+            "geometry_sha256",
+            "45793e48a681e6d0acd2361798d73f832037d136059a1352859d5ccd82475e32",
+            "layout-c, shooting, synthetic-reserve",
+        ),
+    ],
+)
+def test_published_development_binding_rejects_reserve_collision(
+    field: str, binding: str, component: str
+) -> None:
+    _, manifest, reserve, _ = intake.source_inventory(intake.load_recipe())
+    synthetic = {
+        **reserve,
+        "id": "synthetic-reserve",
+        "source_diagram_pages": [10],
+        "scenario_lineage": ["synthetic-scenario"],
+        "geometry_families": ["synthetic-geometry"],
+        "geometry_sha256": [bench.payload_digest("synthetic board")],
+        "trajectory_sha256": [bench.payload_digest("synthetic origin")],
+    }
+    manifest["families"].append(synthetic)
+    assert ["synthetic-reserve"] in intake.evaluation.validate_split(manifest)
+
+    synthetic[field].append(binding)
+    with pytest.raises(bench.BenchmarkGap, match=f"crosses a connected component: {component}"):
+        intake.evaluation.validate_split(manifest)

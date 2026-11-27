@@ -49,14 +49,15 @@ DEVELOPMENT_LAYOUTS = {
     "shooting": LAYOUT_C,
 }
 
-# Origin and event commitments from the West/Guard benchmark, the Layout C
-# setup latch and origin, and the six Shooting origins in the public Stage 4
+# Origin and event commitments from the West/Guard benchmark, West cooperation,
+# the Layout C setup latch and origin, and the six Shooting origins in the public
 # development receipts at the protocol base. Timing/mechanism reuse Layout C.
 # The intake worker needs no outcome-bearing receipt.
 DEVELOPMENT_ORIGINS = {
     "west": [
         "fb0441ed6e037bbd70762cb7fb27e3b39c3a18a8ab88e7a3b70680f99767d2b8",
         "f7d263deefb3facb0dfaabe58df7371929dcda0d13488f88b8c7e2ee7c04a393",
+        "fb22f83cbb3890e655fc764abc1cbccd22991f2cb7ad398ec7b6f487ab846398",
     ],
     "guard": [
         "4171ab82b3c1ea656c6fb5f7a4f85804f247eb189dda0c1c7e30deb8516096d5",
@@ -150,6 +151,23 @@ def geometry_key(setup: MissionSetup, *, flat: bool = False) -> str:
     )
 
 
+def linked_footprint_key(setup: MissionSetup, target: str) -> str:
+    """Match the linked-footprint geometry binding published by stage4_policy_target."""
+    data = setup.to_payload()
+    (links,) = [
+        row["terrain_area_ids"]
+        for row in data["objective_terrain_areas"]
+        if row["objective_marker_id"] == target
+    ]
+    return payload_digest(
+        sorted(
+            [[point["x_inches"], point["y_inches"]] for point in area["footprint_polygon"]]
+            for area in data["terrain_areas"]
+            if area["terrain_area_id"] in links
+        )
+    )
+
+
 def source_inventory(recipe: bench.Row) -> tuple[MissionSetup, bench.Row, bench.Row, list[int]]:
     artifact = evaluation.event_layouts.battlefield_artifact()
     scoring = event_companion_primary_scoring_artifact()
@@ -188,9 +206,10 @@ def source_inventory(recipe: bench.Row) -> tuple[MissionSetup, bench.Row, bench.
     }
     for name, layout in DEVELOPMENT_LAYOUTS.items():
         dev = layouts[layout]
-        geometry = geometry_key(
-            mission(layout, list(dev.force_disposition_pair)), flat=name == "shooting"
-        )
+        dev_setup = mission(layout, list(dev.force_disposition_pair))
+        geometry = [geometry_key(dev_setup, flat=name == "shooting")]
+        if name == "layout-c":
+            geometry.append(linked_footprint_key(dev_setup, setup_driver.TARGET))
         manifest["families"].append(
             {
                 "id": name,
@@ -199,7 +218,7 @@ def source_inventory(recipe: bench.Row) -> tuple[MissionSetup, bench.Row, bench.
                 "source_diagram_pages": [dev.source_page],
                 "scenario_lineage": [layout, *DEVELOPMENT_SCENARIOS[name]],
                 "geometry_families": [layout],
-                "geometry_sha256": [geometry],
+                "geometry_sha256": geometry,
                 "trajectory_sha256": DEVELOPMENT_ORIGINS[name],
             }
         )
@@ -210,11 +229,14 @@ def source_inventory(recipe: bench.Row) -> tuple[MissionSetup, bench.Row, bench.
         "source_diagram_pages": [page],
         "scenario_lineage": [row.layout_id],
         "geometry_families": [row.layout_id],
-        "geometry_sha256": [geometry_key(setup)],
+        "geometry_sha256": [geometry_key(setup), linked_footprint_key(setup, recipe["target"])],
         "trajectory_sha256": [],
     }
     need(
-        all(reserve["geometry_sha256"] != dev["geometry_sha256"] for dev in manifest["families"]),
+        all(
+            set(reserve["geometry_sha256"]).isdisjoint(dev["geometry_sha256"])
+            for dev in manifest["families"]
+        ),
         "development_geometry_overlap",
     )
     return setup, manifest, reserve, used

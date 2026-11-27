@@ -46,11 +46,11 @@
     },
     "scripts/stage4_layout_intake.py": {
       "before_sha256": null,
-      "after_sha256": "44642b5f4f8a286d39d8936497f9f314fade0c2e43e13de1484e77994662dc61",
+      "after_sha256": "905c74b67e34b091c1f4ff92004d33e0fd08dbf03ce450a98f1d1b226beb45d7",
       "owners": {
         "@module": {
           "before": null,
-          "after": "a5c08a182b008844d9b280966b71c328910907a2b4ee4aebb0a0eb50abf78695"
+          "after": "b26c8ce140de7bc56e5ce014ecbbc63a77b8c057fe419790dd1503a296a05e39"
         },
         "IntakeGap": {
           "before": null,
@@ -75,6 +75,10 @@
         "immediate_menu": {
           "before": null,
           "after": "8c7dc16b5b0aee3a5a3496481662fe7a2cbd7c905a769d6ea538b36263f69efc"
+        },
+        "linked_footprint_key": {
+          "before": null,
+          "after": "c0ad1f9f45634fc52ed77ae2663107fd046a312635d862fc165f6a4886d292bd"
         },
         "load_recipe": {
           "before": null,
@@ -114,13 +118,13 @@
         },
         "source_inventory": {
           "before": null,
-          "after": "bb76fdfadad879bdc04a81fa49740d907bb4a7e75b6b5c0cbae730b5f4791364"
+          "after": "eb40696de5e390e1dfb804cdc58f34453794b498d454ac4410b497ec45655f33"
         }
       }
     },
     "scripts/stage4_layout_intake_checks.py": {
       "before_sha256": null,
-      "after_sha256": "f2325ebfad359901f5113b625a2642d77c3e523d62dd3947c48bbb7671d087e6",
+      "after_sha256": "da7032f0b2c6ab3a44d47f9d8e9039e6be1d91532891b14be05015d0ff1e6e97",
       "owners": {
         "@module": {
           "before": null,
@@ -133,6 +137,10 @@
         "test_origin_categories_are_defined_by_visible_control": {
           "before": null,
           "after": "d3efdc282fc1b2041e6036b5564cb59f7b03da5dc8cc073cc96209a20b0ebf46"
+        },
+        "test_published_development_binding_rejects_reserve_collision": {
+          "before": null,
+          "after": "7e62e14e9f5b6e1dbe24f2dc85844d6abb20a8a10103dfa6c9d21cd7e581fadf"
         },
         "test_retained_control_without_contact_is_ineligible": {
           "before": null,
