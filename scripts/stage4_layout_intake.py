@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from collections.abc import Callable
 from dataclasses import replace
 from hashlib import sha256
 from math import hypot
@@ -34,6 +35,9 @@ from warhammer40k_core.engine.primary_historical_events import (
     PRIMARY_TURN_START_EVIDENCE_RECORDED_EVENT,
 )
 from warhammer40k_core.engine.replay import ReplayArtifactError
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th.event_companion_layouts_2026_06.event_companion_full_artifact_types import (  # noqa: E501
+    BattlefieldLayoutArtifact,
+)
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th.event_companion_primary_scoring_2026_06 import (  # noqa: E501
     event_companion_primary_scoring_artifact,
 )
@@ -169,32 +173,27 @@ def linked_footprint_key(setup: MissionSetup, target: str) -> str:
 
 
 def source_inventory(recipe: bench.Row) -> tuple[MissionSetup, bench.Row, bench.Row, list[int]]:
+    layouts, manifest, used = development_inventory()
+    page = recipe["source_page"]
+    need(page == next(p for p in range(9, 54) if p not in used), "candidate_page_order")
+    setup, reserve = source_candidate(recipe, layouts[recipe["layout"]], manifest)
+    need(
+        all(
+            set(reserve["geometry_sha256"]).isdisjoint(dev["geometry_sha256"])
+            for dev in manifest["families"]
+        ),
+        "development_geometry_overlap",
+    )
+    return setup, manifest, reserve, used
+
+
+def development_inventory() -> tuple[dict[str, BattlefieldLayoutArtifact], bench.Row, list[int]]:
     artifact = evaluation.event_layouts.battlefield_artifact()
     scoring = event_companion_primary_scoring_artifact()
     layouts = {row.layout_id: row for row in artifact.layouts}
     pages = sorted(row.source_page for row in layouts.values())
     need(pages == list(range(9, 54)), "layout_inventory_drift")
     used = sorted({layouts[key].source_page for key in DEVELOPMENT_LAYOUTS.values()})
-    page = recipe["source_page"]
-    need(page == next(p for p in pages if p not in used), "candidate_page_order")
-    row = layouts[recipe["layout"]]
-    setup = mission(row.layout_id, recipe["pairing"])
-    need(
-        row.source_page == page
-        and list(row.force_disposition_pair) == recipe["pairing"]
-        and list(row.primary_missions)
-        == recipe["primary_missions"]
-        == [a.primary_mission_id for a in setup.primary_mission_assignments]
-        and [a.force_disposition_id for a in setup.primary_mission_assignments] == recipe["pairing"]
-        and any(
-            o.objective_id == recipe["target"]
-            and o.terrain_area_ids
-            and o.role in {"central", "expansion"}
-            for o in row.objectives
-        )
-        and recipe["target"] in bench.objective_areas(setup),
-        "source_binding_drift",
-    )
     manifest: bench.Row = {
         "schema": evaluation.SPLIT_SCHEMA,
         "layout_release": {
@@ -222,24 +221,40 @@ def source_inventory(recipe: bench.Row) -> tuple[MissionSetup, bench.Row, bench.
                 "trajectory_sha256": DEVELOPMENT_ORIGINS[name],
             }
         )
-    reserve = {
-        "id": "reserve-page-9",
+    return layouts, manifest, used
+
+
+def source_candidate(
+    recipe: bench.Row, row: BattlefieldLayoutArtifact, manifest: bench.Row
+) -> tuple[MissionSetup, bench.Row]:
+    setup = mission(row.layout_id, recipe["pairing"])
+    need(
+        row.source_page == recipe["source_page"]
+        and row.layout_id == recipe["layout"]
+        and list(row.force_disposition_pair) == recipe["pairing"]
+        and list(row.primary_missions)
+        == recipe["primary_missions"]
+        == [a.primary_mission_id for a in setup.primary_mission_assignments]
+        and [a.force_disposition_id for a in setup.primary_mission_assignments] == recipe["pairing"]
+        and any(
+            o.objective_id == recipe["target"]
+            and o.terrain_area_ids
+            and o.role in {"central", "expansion"}
+            for o in row.objectives
+        )
+        and recipe["target"] in bench.objective_areas(setup),
+        "source_binding_drift",
+    )
+    return setup, {
+        "id": f"reserve-page-{row.source_page}",
         "partition": "reserve",
-        "scoring_artifact_sha256": scoring.package_hash,
-        "source_diagram_pages": [page],
+        "scoring_artifact_sha256": manifest["families"][0]["scoring_artifact_sha256"],
+        "source_diagram_pages": [row.source_page],
         "scenario_lineage": [row.layout_id],
         "geometry_families": [row.layout_id],
         "geometry_sha256": [geometry_key(setup), linked_footprint_key(setup, recipe["target"])],
         "trajectory_sha256": [],
     }
-    need(
-        all(
-            set(reserve["geometry_sha256"]).isdisjoint(dev["geometry_sha256"])
-            for dev in manifest["families"]
-        ),
-        "development_geometry_overlap",
-    )
-    return setup, manifest, reserve, used
 
 
 def config(recipe: bench.Row, setup: MissionSetup, seed: str) -> GameConfig:
@@ -267,12 +282,16 @@ def config(recipe: bench.Row, setup: MissionSetup, seed: str) -> GameConfig:
     return replace(base, army_muster_requests=rosters, mission_setup=setup, reserve_unit_points=())
 
 
-def open_origin(game: GameConfig, recipe: bench.Row) -> LocalGameSession:
+def open_origin(
+    game: GameConfig, recipe: bench.Row, prefix_moves: list[bench.Row]
+) -> LocalGameSession:
     session = LocalGameSession()
     status = session.start(game)
     if status.status_kind is LifecycleStatusKind.ADVANCED:
         status = session.advance_until_decision_or_terminal()
     need(status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION, "startup_failed")
+    expected_moves = recipe.get("round_one_moves", {})
+    completed_moves = set()
     for step in range(recipe["prefix_decision_cap"] + 1):
         context = bench.actor(session)
         occurrence = setup_driver.coordinates(context)
@@ -283,6 +302,7 @@ def open_origin(game: GameConfig, recipe: bench.Row) -> LocalGameSession:
                 and context.request["payload"]["unit_instance_id"] == recipe["roles"]["screen"],
                 "wrong_origin_unit",
             )
+            need(completed_moves == set(expected_moves), "missing_round_one_move")
             return session
         need(occurrence[0] <= 2, "missed_a2_origin")
         if step == recipe["prefix_decision_cap"]:
@@ -291,9 +311,30 @@ def open_origin(game: GameConfig, recipe: bench.Row) -> LocalGameSession:
             action = bench.placement(context, recipe)
         elif kind == "select_secondary_missions":
             action = bench.finite(context, recipe["fixed_secondary_option"])
+        elif occurrence[0] == 1 and kind == bench.MOVE_ACTION:
+            unit = context.request["payload"]["unit_instance_id"]
+            if unit in expected_moves:
+                need(unit not in completed_moves, "duplicate_round_one_move")
+                bench.commit(session, context, bench.finite(context, bench.NORMAL))
+                continue
+            action = setup_driver.ordinary(context)
+        elif kind == "submit_movement_proposal":
+            unit = context.request["payload"]["proposal_request"]["unit_instance_id"]
+            need(
+                occurrence[0] == 1
+                and context.route.proposal_kind == bench.NORMAL
+                and unit in expected_moves
+                and unit not in completed_moves,
+                "unexpected_prefix_move",
+            )
+            raw = bench.raw_moves(context)
+            selected, selection = select_path(session, context, raw, recipe, expected_moves[unit])
+            prefix_moves.append({"unit": unit, **selection})
+            need(selected is not None, "round_one_path_unavailable")
+            completed_moves.add(unit)
+            action = raw[selected][0]
         else:
-            # The shared driver holds all other Movement offers, skips Shooting and Charge,
-            # declines optional reactions and uses the same frozen roster selection order.
+            # All other Movement offers Hold. Shooting, Charge and optional reactions are skipped.
             action = setup_driver.ordinary(context)
         bench.commit(session, context, action)
     raise IntakeGap("prefix_decision_cap")
@@ -363,6 +404,29 @@ def screen_order(raw: bench.Raw, direction: list[int], threshold: float) -> list
     )
 
 
+def select_path(
+    session: LocalGameSession,
+    context: PlayerDecisionContext,
+    raw: bench.Raw,
+    recipe: bench.Row,
+    direction: list[int],
+) -> tuple[str | None, bench.Row]:
+    order = screen_order(raw, direction, recipe["route_cosine_min"])
+    probes = []
+    selected = None
+    for key in order[: recipe["native_probe_cap"]]:
+        violation = bench.trial(session, context, raw, key)
+        probes.append({"id": key, "violation": violation})
+        if violation is None:
+            selected = key
+            break
+    return selected, {
+        "eligible_candidates": order,
+        "cap_losses": max(0, len(order) - recipe["native_probe_cap"]),
+        "probes": probes,
+    }
+
+
 def immediate_menu(
     session: LocalGameSession, context: PlayerDecisionContext, recipe: bench.Row
 ) -> bench.Row:
@@ -403,29 +467,17 @@ def immediate_menu(
         "screen_child_binding",
     )
     raw = bench.raw_moves(child)
-    order = screen_order(raw, recipe["routes"]["screen"], recipe["route_cosine_min"])
-    accepted = None
-    probes = []
-    for key in order[: recipe["native_probe_cap"]]:
-        violation = bench.trial(screen, child, raw, key)
-        probes.append({"id": key, "violation": violation})
-        if violation is None:
-            accepted = key
-            break
-    cap_losses = max(0, len(order) - recipe["native_probe_cap"])
+    accepted, selection = select_path(screen, child, raw, recipe, recipe["routes"]["screen"])
     if accepted is None:
-        raise IntakeGap(
-            "screen_unavailable_under_cap",
-            eligible_candidates=order,
-            probes=probes,
-            cap_losses=cap_losses,
-        )
+        raise IntakeGap("screen_unavailable_under_cap", **selection)
     # Submit the selected native path on the branch through the same adapter, without
     # advancing to another decision. Neither branch is continued past S.
+    records = screen.decision_record_count()
     status = bench.submit(screen, child, raw[accepted][0])
     need(
         status.status_kind
         in {LifecycleStatusKind.ADVANCED, LifecycleStatusKind.WAITING_FOR_DECISION}
+        and screen.decision_record_count() == records + 1
         and payload_digest(session.lifecycle.to_payload()) == before,
         "screen_commit_or_parent_isolation",
     )
@@ -439,31 +491,42 @@ def immediate_menu(
         "normal_move_child_request_id": child.request["request_id"],
         "raw_candidates": len(raw),
         "raw_candidate_ids_sha256": payload_digest(sorted(raw)),
-        "eligible_candidates": order,
-        "cap_losses": cap_losses,
-        "probes": probes,
+        **selection,
         "selected_screen": accepted,
     }
 
 
-def preflight(recipe: bench.Row, setup: MissionSetup, seed: str) -> bench.Row:
-    session = open_origin(config(recipe, setup, seed), recipe)
+def preflight(
+    recipe: bench.Row,
+    setup: MissionSetup,
+    seed: str,
+    evidence: bench.Row | None = None,
+    *,
+    on_origin: Callable[[bench.Row], None] | None = None,
+) -> bench.Row:
+    proof = {} if evidence is None else evidence
+    prefix_moves: list[bench.Row] = []
+    if evidence is not None:
+        proof["round_one_probes"] = prefix_moves
+    session = open_origin(config(recipe, setup, seed), recipe, prefix_moves)
+    proof["a2_origin_reached"] = True
     context = bench.actor(session)
     checkpoint = bench.strict_checkpoint(session)
     rng = checkpoint["rng_state"]
     need(rng["seed"] == seed, "startup_seed_drift")
-    origin = origin_type(session, context, recipe["target"])
-    menu = immediate_menu(session, context, recipe)
-    return {
-        "origin": origin,
-        "menu": menu,
-        "origin_sha256": checkpoint["content_hash"],
-        "event_prefix_sha256": checkpoint["event_log_hash"],
-        "decision_prefix_sha256": checkpoint["decision_records_hash"],
-        "decision_count": session.decision_record_count(),
-        "draw_count": rng["draw_count"],
-        "strict_restore_and_replay": True,
-    }
+    proof.update(
+        origin_sha256=checkpoint["content_hash"],
+        event_prefix_sha256=checkpoint["event_log_hash"],
+        decision_prefix_sha256=checkpoint["decision_records_hash"],
+        decision_count=session.decision_record_count(),
+        draw_count=rng["draw_count"],
+        strict_restore_and_replay=True,
+    )
+    proof["origin"] = origin_type(session, context, recipe["target"])
+    if on_origin is not None:
+        on_origin({**proof, "status": "origin_verified"})
+    proof["menu"] = immediate_menu(session, context, recipe)
+    return proof
 
 
 def run() -> bool:

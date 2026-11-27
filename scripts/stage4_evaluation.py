@@ -51,6 +51,24 @@ def _nonempty_list(value: object, name: str) -> list[object]:
     return value
 
 
+def split_binding_keys(
+    family: bench.Row, pdf: str, *, require_trajectory: bool = True
+) -> frozenset[tuple[str, str]]:
+    """Use the same overlap keys before and after verified origins are available."""
+    name = family["id"]
+    pages = _nonempty_list(family["source_diagram_pages"], f"{name} diagram pages")
+    keys = {link.source_diagram_key(pdf, page) for page in pages}
+    for field, namespace in LINEAGE_FIELDS.items():
+        if field == "trajectory_sha256" and not require_trajectory and family[field] == []:
+            continue
+        check = _sha256 if field.endswith("_sha256") else _identifier
+        keys.update(
+            (namespace, check(key, f"{name} {field}"))
+            for key in _nonempty_list(family[field], f"{name} {field}")
+        )
+    return frozenset(keys)
+
+
 def validate_split(manifest: object) -> list[list[str]]:
     """Validate whole-family assignments before any reserve scoring is considered."""
     data = _record(manifest, {"schema", "layout_release", "families"}, "Stage 4 manifest")
@@ -80,19 +98,11 @@ def validate_split(manifest: object) -> list[list[str]]:
         bench.require(partition in PARTITIONS, f"Unknown Stage 4 partition for {name}.")
         bench.require(name not in partitions, f"Duplicate Stage 4 family {name}.")
         _sha256(family["scoring_artifact_sha256"], f"{name} scoring artifact")
-        pages = _nonempty_list(family["source_diagram_pages"], f"{name} diagram pages")
-        keys = {link.source_diagram_key(pdf, page) for page in pages}
+        keys_by_family[name] = split_binding_keys(family, pdf)
         bench.require(
-            all(page in source_pages for page in pages),
+            all(page in source_pages for page in family["source_diagram_pages"]),
             f"Unknown Stage 4 source diagram page for {name}.",
         )
-        for field, namespace in LINEAGE_FIELDS.items():
-            check = _sha256 if field.endswith("_sha256") else _identifier
-            keys.update(
-                (namespace, check(key, f"{name} {field}"))
-                for key in _nonempty_list(family[field], f"{name} {field}")
-            )
-        keys_by_family[name] = frozenset(keys)
         partitions[name] = partition
 
     bench.require(

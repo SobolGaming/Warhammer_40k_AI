@@ -2090,6 +2090,53 @@ bindings. Its eligibility is provisional pending the sealed continuation
 overlap check. The first preflight supplies one empty-origin candidate
 toward the eight-family feasibility intake.
 
+#### Batched native preflight
+
+The [batch recipe](stage4-layout-batch-recipe.json) records one proposed
+construction or exclusion per diagram in source page order. It inherits the
+Page 9 roster, seeds, native probe and prefix caps. A listed round-one move uses
+the same direction filter, stable candidate order and two-probe limit as Screen.
+All other prefix actions use the Page 9 driver.
+
+The retained #774 receipt records an exploratory run. Commit
+`6fe315c49b9723ff86966b6a1077fd2bed7862da` records the plan's local
+precommitment. Publication of that recipe before the first preflight is
+unverified. The run found 28 provisionally eligible pages and zero eight-page
+lists meeting the pairing, overlap and origin quotas. Its original evidence and
+receipt schema are retained.
+
+Verify the retained preflight receipt without starting a trajectory:
+
+```sh
+PYTHONPATH=src:. uv run --no-sync python -B -m scripts.stage4_benchmark_entry --layout-intake-verify /path/to/batch-receipt.json
+PYTHONPATH=src:. uv run --no-sync pytest -q --no-cov -p no:cacheprovider scripts/stage4_layout_intake_checks.py -k 'not screen_probe_uses_native_child_fork'
+```
+
+The verifier rejects the historical scored receipts before reading them. It
+rebuilds the complete provenance graph from the committed recipes, imported
+source data, frozen development bindings and verified A2 commitments in the
+supplied receipt. This includes proposed pages that failed before A2 or were
+never exercised. It checks the full connected components before deriving
+eligibility and quota counts. New receipts record preflight execution separately
+from final eligibility so a wall-cap skip remains visible even when the page
+shares a development component. The stricter `split_manifest` projection contains
+only reserve rows with verified trajectory bindings outside development.
+`stage4_evaluation validate-split` checks that projection.
+
+Pages 10, 11, 21, 22, 28, 30, 32, 39 and 47 are unproposed in the retained
+recipe and compatible with anchors 20, 24 and 50 at the source level. Their
+target setups and native origin categories are unverified.
+
+For a prospective run, publish the complete candidate recipe and order at an
+immutable revision before starting any preflight. Record the publication
+reference and timestamp, the plan digest, the engine and generator identities,
+and the time of the first attempt. Freeze target and actor bindings, selectors,
+both seeds, and work caps in the published recipe. Verify the resulting
+preflight receipt and apply the frozen source order, component, pairing and
+origin rules. Record any shortfall as an intake gap. Each preflight fork ends
+immediately after S's action. Any qualifying cohort proposal still requires
+the separate sealed continuation-overlap check and cohort lock.
+
 ## 7. Performance and evaluation before scaling
 
 Measure the actual headless workload, with and without the reference transport under matched conditions:
