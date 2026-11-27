@@ -1,0 +1,44 @@
+{
+  "added_cases": [
+    "tests/rules/section09/test_fortification_engagement.py::test_fortification_native_bloodcrusher_pivot_is_independent_of_waypoint[crossing]",
+    "tests/rules/section09/test_fortification_engagement.py::test_fortification_native_bloodcrusher_pivot_is_independent_of_waypoint[tangent]",
+    "tests/rules/section09/test_fortification_engagement.py::test_fortification_native_bloodcrusher_pivot_is_independent_of_waypoint[clear]",
+    "tests/rules/section09/test_fortification_engagement.py::test_fortification_crossing_respects_physical_overlap_tolerance",
+    "tests/rules/section09/test_fortification_engagement.py::test_fortification_crossing_interpolates_rotation_and_translation_together"
+  ],
+  "base": "2a5bb77fd6eb1a04c276037ea159a5ef850f1668",
+  "retained_fortification_sha256": "aaa5fe2e0078d0b63ed6bd67b01cd3e4c4369a2460045695a9c5201de4a4a7be",
+  "runtime_fingerprint": {
+    "after": "a728d0d6acfecbdf39a6c1c2f72510fe5b2d418ebf2d487743d30b3f5c8ac989",
+    "before": "6b4759f62bfbcdc13f8100ffae35cfe11c60853295f879ae5adc34bb847e20d5"
+  },
+  "runtime_manifest": {
+    "after": "431ff9b7b5da4ccaf21c15f5c28583e716092d1c5c90f6002b0dd6bcbef98ced",
+    "before": "cd6f66d11f2df45f097c5ea2d046dd6349f0335ad69729801aa0973683623fc9"
+  },
+  "schema": "finite-fortification-rotation-test-v1",
+  "sources": {
+    "src/warhammer40k_core/engine/phases/movement_geometry.py": {
+      "after": "e54149a97804f4fdec167b29a77ca7d83287958bfa43cc6e9aa0428459e3706c",
+      "before": "3123bd8207f6f1ff61e3b284af0fe2cbd1c0c99fe3755e9a9271faa5253ab2bb"
+    },
+    "src/warhammer40k_core/geometry/physical_predicates.py": {
+      "after": "05788f1045f1453eca0f93966a6e044db231cc77136dab6fd9542e4af7eba63e",
+      "before": "e3e08dbde475eae011e28d143df542d094a0e1762cc5f05df4b29b7d8cb46a30"
+    }
+  },
+  "test": {
+    "after": {
+      "blob_sha1": "8978b18fc10129986da28c7c43876b8ff8296ca1",
+      "bytes": 32630,
+      "mode": "100644",
+      "sha256": "5b50e54f85348ddd6b252a3dd932e95c120b7c19b0014d7e4e409a03cf75325a"
+    },
+    "before": {
+      "blob_sha1": "7f4e9d23dd8f52f53e030ab24e1a2ecd59484489",
+      "bytes": 26318,
+      "mode": "100644",
+      "sha256": "8bac820ff92fea3a4f09227a6d9f2aa9e974148b3df50f2f33d100c5a40866f5"
+    }
+  }
+}

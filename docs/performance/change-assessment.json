@@ -1,145 +1,1840 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "767c5f2a09f10ec1fe6216ac2c3785fe12f48670",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:1d2913f1ceadb54f99022d8cf1e835c7e0567c6fa73eea0705ac85fe9d94a5c9",
-  "operation_map_sha256": "9880bd783417f40b20a2df0dee2aff2251c1c4818427982c3657d66fc9c39a34",
+  "base": "1b56472fae25c5c0a253410a3378e69ddb1da74b",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:0429f98f71d17e6ac65ed66978d6bcb1223b18349ca2b14bf554c2abc987296e",
+  "operation_map_sha256": "da9b13ae00ca841134e96d89ac5b6eae2e0d7c9cb74fbbc0c2d7de64d90efe6c",
   "changes": {
-    "scripts/stage4_layout_batch.py": {
-      "before_sha256": "bba573e29cd454fc1abee921a064daf7eae5d2fe51027fb342f1d244780eaf50",
-      "after_sha256": "8b6e56783f1a339fd01014aa93121ced9d4ca565079794286feb190b2e60ce3f",
+    "ci/quality_shards/all.txt": {
+      "before_sha256": "17559618e7d9311e2856b98b5b6359a0999fe664a5e0b9891d79080bd5e9b2c9",
+      "after_sha256": "083a6c16429531da0d0e3ad0c865728cac1861a43c41c38c2d5ef43f0dd7197a",
       "owners": {
-        "recipe_for": {
-          "before": "a24bfb28831ba16b2b1511dced7a1b85ed84874479f8d271f37bc6e8309c6ec9",
-          "after": "0ca883386e02923877a597d0544c7346424c582fe1c3f3abab4debd1deaf2fa5"
+        "@document": {
+          "before": "17559618e7d9311e2856b98b5b6359a0999fe664a5e0b9891d79080bd5e9b2c9",
+          "after": "083a6c16429531da0d0e3ad0c865728cac1861a43c41c38c2d5ef43f0dd7197a"
         }
       }
     },
-    "scripts/stage4_layout_intake.py": {
-      "before_sha256": "566c07acbfe1158b568805fcee9209770245cfd45cf63c7454f630d2da96361a",
-      "after_sha256": "d75cd439f2c8a61fc0a2f3a27654c12fd6b67c4c33f565c2598bc5022d943db3",
+    "ci/quality_shards/shard-4.txt": {
+      "before_sha256": "02786677d241a7b9069c2c9d00856b92ac9c9b66bf2d3f254f195681aa6f0849",
+      "after_sha256": "8216c87238b93eaecd1bb5824ce74264cea04e8fb78016574a06985a67d7f666",
       "owners": {
-        "@module": {
-          "before": "2231f75f41afcf60b0e17d4913d403bbc06ab1df8106efc4fce8629fe9346cfe",
-          "after": "df84ed69e49d6ce40688a5f720b728692e729fb35dd09064153274e07617a289"
-        },
-        "_PrimaryMissionChoices": {
-          "before": null,
-          "after": "7d154185a5de1ebbee5e4440965bddfe466e05b3b8ee6c698ba84f64e2d6d960"
-        },
-        "_PrimaryMissionChoices.__init__": {
-          "before": null,
-          "after": "f6a7ad2b2f878571b0e2c99346d929804bfce1a7784d5eee3dbab9858bf941bb"
-        },
-        "_PrimaryMissionChoices.require_complete": {
-          "before": null,
-          "after": "6cf01660a3a6efae58f6c6fa91cbdd16dc2776f80276f0cf29ce9b4d00bf7082"
-        },
-        "_PrimaryMissionChoices.select": {
-          "before": null,
-          "after": "d4ffc8cd1ee6dc53b1c0d2814be2696f79f4d7936a3fa46355f451405a1feb8f"
-        },
-        "open_origin": {
-          "before": "cc149f275be4da1dbb8b96b2fe91d1de9053f1e5afa61aac745446a85637df4a",
-          "after": "b50e06967f555a071c356e3a04afd35c56cfd2cf95c8e6aa796d736b871c8b66"
+        "@document": {
+          "before": "02786677d241a7b9069c2c9d00856b92ac9c9b66bf2d3f254f195681aa6f0849",
+          "after": "8216c87238b93eaecd1bb5824ce74264cea04e8fb78016574a06985a67d7f666"
         }
       }
     },
-    "scripts/stage4_layout_intake_checks.py": {
-      "before_sha256": "961bc32555ba53f931d32365e701e379236e7edadf66d0c0d5168b8ccdb49f15",
-      "after_sha256": "c25e34e8aed93d739b8d0474d7456379b8b60405d7e6968217ab8228b6865ebd",
+    "ci/test_shards/durations.json": {
+      "before_sha256": "37caee69a6bf81b73d59adb68a69d2b2c63fbf6fee070aec1e4e7d29a05ac191",
+      "after_sha256": "557b04107d031db5f85271682117e640812912ec3654f87b97baf74befaca620",
+      "owners": {
+        "@document": {
+          "before": "37caee69a6bf81b73d59adb68a69d2b2c63fbf6fee070aec1e4e7d29a05ac191",
+          "after": "557b04107d031db5f85271682117e640812912ec3654f87b97baf74befaca620"
+        }
+      }
+    },
+    "ci/test_shards/shard-1.txt": {
+      "before_sha256": "b0c12de4179800fa0f4f619823968e11ac282c31403345cbe045a1a3a6d0ff07",
+      "after_sha256": "a411a2f60ca96719e21e1cda95ad09dbf069c21df16a750bffaafbcb904dea5f",
+      "owners": {
+        "@document": {
+          "before": "b0c12de4179800fa0f4f619823968e11ac282c31403345cbe045a1a3a6d0ff07",
+          "after": "a411a2f60ca96719e21e1cda95ad09dbf069c21df16a750bffaafbcb904dea5f"
+        }
+      }
+    },
+    "ci/test_shards/shard-10.txt": {
+      "before_sha256": "cf270cd4e30162c4a4d4dc655d6121cc405e6d1f245a65a4306060d4e557988b",
+      "after_sha256": "0cd7156e9a00f2a3acb1ef58ca377397256feadbab38a54744722683ef3a7dfb",
+      "owners": {
+        "@document": {
+          "before": "cf270cd4e30162c4a4d4dc655d6121cc405e6d1f245a65a4306060d4e557988b",
+          "after": "0cd7156e9a00f2a3acb1ef58ca377397256feadbab38a54744722683ef3a7dfb"
+        }
+      }
+    },
+    "ci/test_shards/shard-11.txt": {
+      "before_sha256": "54e80f39157ecb6790f066c21446a981b8e695202cd389f061dbe6ab30ea645c",
+      "after_sha256": "8cce960eb68771b98b0710d84eeaf84e7fa1129b21d8ff35a5d80af7584f90a6",
+      "owners": {
+        "@document": {
+          "before": "54e80f39157ecb6790f066c21446a981b8e695202cd389f061dbe6ab30ea645c",
+          "after": "8cce960eb68771b98b0710d84eeaf84e7fa1129b21d8ff35a5d80af7584f90a6"
+        }
+      }
+    },
+    "ci/test_shards/shard-12.txt": {
+      "before_sha256": "42d020e03273f82553dafd278570b6fddfe05342d419c75843732c32adcd38bc",
+      "after_sha256": "9a6e6ee40a27e176e7d6a65565ad01bca49bdb47193868572be6b3ae318e2c5f",
+      "owners": {
+        "@document": {
+          "before": "42d020e03273f82553dafd278570b6fddfe05342d419c75843732c32adcd38bc",
+          "after": "9a6e6ee40a27e176e7d6a65565ad01bca49bdb47193868572be6b3ae318e2c5f"
+        }
+      }
+    },
+    "ci/test_shards/shard-2.txt": {
+      "before_sha256": "8936c2327d0f9464644c5844994604114c1544ae43a84c72b1db18867ec0e9e5",
+      "after_sha256": "51171cc207def4f72ef0dc4a87738275488c25674bd94ad48918585fc25ef927",
+      "owners": {
+        "@document": {
+          "before": "8936c2327d0f9464644c5844994604114c1544ae43a84c72b1db18867ec0e9e5",
+          "after": "51171cc207def4f72ef0dc4a87738275488c25674bd94ad48918585fc25ef927"
+        }
+      }
+    },
+    "ci/test_shards/shard-3.txt": {
+      "before_sha256": "c8fba93dec3b7a24bf1e99fd46a6ebb0f4ad2ff12a160c10027224a6e2317e6c",
+      "after_sha256": "070e7a0f4bb0f60463f3d981860a3dca05aaef548d832f51822f2f8522cdccc6",
+      "owners": {
+        "@document": {
+          "before": "c8fba93dec3b7a24bf1e99fd46a6ebb0f4ad2ff12a160c10027224a6e2317e6c",
+          "after": "070e7a0f4bb0f60463f3d981860a3dca05aaef548d832f51822f2f8522cdccc6"
+        }
+      }
+    },
+    "ci/test_shards/shard-4.txt": {
+      "before_sha256": "8694dfc37735bb680aadf02ad2ede1b667c20387be64ec63349daf3c816f21e9",
+      "after_sha256": "a9cdd65997de775734725b6b2a7d7b8c321005f773441cf302877fba9ec8d49c",
+      "owners": {
+        "@document": {
+          "before": "8694dfc37735bb680aadf02ad2ede1b667c20387be64ec63349daf3c816f21e9",
+          "after": "a9cdd65997de775734725b6b2a7d7b8c321005f773441cf302877fba9ec8d49c"
+        }
+      }
+    },
+    "ci/test_shards/shard-5.txt": {
+      "before_sha256": "8ae38bbacc39e8f4e4f75e87fe35687e4b11c16479f1c5a578ecc1055d77e7b9",
+      "after_sha256": "65e2e2953fc8b936b2429f5cf36fbe36e7c14cd701ab1a748836a822a992c59f",
+      "owners": {
+        "@document": {
+          "before": "8ae38bbacc39e8f4e4f75e87fe35687e4b11c16479f1c5a578ecc1055d77e7b9",
+          "after": "65e2e2953fc8b936b2429f5cf36fbe36e7c14cd701ab1a748836a822a992c59f"
+        }
+      }
+    },
+    "ci/test_shards/shard-6.txt": {
+      "before_sha256": "2567c7e1ee8e1d1a900f5e697314d63d224e5ad2a405a01c92abee8b4f915d6b",
+      "after_sha256": "3be7f77ac3cb595ecaa9bbc4ed76523ec7fc9b0019d409ad7dc637346099a379",
+      "owners": {
+        "@document": {
+          "before": "2567c7e1ee8e1d1a900f5e697314d63d224e5ad2a405a01c92abee8b4f915d6b",
+          "after": "3be7f77ac3cb595ecaa9bbc4ed76523ec7fc9b0019d409ad7dc637346099a379"
+        }
+      }
+    },
+    "ci/test_shards/shard-7.txt": {
+      "before_sha256": "9bb0aab7c761a245ea6615d6a0a745d954231abae2af8481f0aae4bbea9067ed",
+      "after_sha256": "e5be1e9834161e8007de3dc4d199234147f76b015f0351464b15491caec7d2d4",
+      "owners": {
+        "@document": {
+          "before": "9bb0aab7c761a245ea6615d6a0a745d954231abae2af8481f0aae4bbea9067ed",
+          "after": "e5be1e9834161e8007de3dc4d199234147f76b015f0351464b15491caec7d2d4"
+        }
+      }
+    },
+    "ci/test_shards/shard-8.txt": {
+      "before_sha256": "92e450a58df823355ee9eb5cca59cd9c22530c0f1b5defcffa2045f9b5c89c32",
+      "after_sha256": "54a9c4eccf2bd3d99143abbac5fa61c1e6d6ac504a5f52e3e264ae430211bc21",
+      "owners": {
+        "@document": {
+          "before": "92e450a58df823355ee9eb5cca59cd9c22530c0f1b5defcffa2045f9b5c89c32",
+          "after": "54a9c4eccf2bd3d99143abbac5fa61c1e6d6ac504a5f52e3e264ae430211bc21"
+        }
+      }
+    },
+    "ci/test_shards/shard-9.txt": {
+      "before_sha256": "6c1c8128ee96c489cbd82a5b8187b2fe997cf0681cb0dabe050c8156809f7460",
+      "after_sha256": "059d1239827466c49f704a2abfd8c1398ca43543967a3300455839e76ee51f84",
+      "owners": {
+        "@document": {
+          "before": "6c1c8128ee96c489cbd82a5b8187b2fe997cf0681cb0dabe050c8156809f7460",
+          "after": "059d1239827466c49f704a2abfd8c1398ca43543967a3300455839e76ee51f84"
+        }
+      }
+    },
+    "contracts/examples/persistence/session-persistence.json": {
+      "before_sha256": "d953c58b3eb8a4bbc2252be004cdd0ab3270566e5a74aaf230a338be1cfcb037",
+      "after_sha256": "50797e86ca8fbd49322b106b6c4774f0e06d4327b660ff236c06b47c4a7f905a",
+      "owners": {
+        "@document": {
+          "before": "d953c58b3eb8a4bbc2252be004cdd0ab3270566e5a74aaf230a338be1cfcb037",
+          "after": "50797e86ca8fbd49322b106b6c4774f0e06d4327b660ff236c06b47c4a7f905a"
+        }
+      }
+    },
+    "contracts/examples/sessions/session-command-outcome.json": {
+      "before_sha256": "714633223d7f21b3562949d14d982115d874a48da7cee3cfb9dfad29026fe786",
+      "after_sha256": "e120ee6689aa61739003bae1cadb01d5c85079f628fbe5ae533c2ea95306dbb1",
+      "owners": {
+        "@document": {
+          "before": "714633223d7f21b3562949d14d982115d874a48da7cee3cfb9dfad29026fe786",
+          "after": "e120ee6689aa61739003bae1cadb01d5c85079f628fbe5ae533c2ea95306dbb1"
+        }
+      }
+    },
+    "contracts/examples/sessions/session-command-started.json": {
+      "before_sha256": "4e00ead501f5ddff8fd8833522562bfaa1d46b77fa841edcf9838a9be83053ca",
+      "after_sha256": "4c8d28ccc240dd2d70bdfb7346940900e6997505e42eddecd8298c22d5e9af99",
+      "owners": {
+        "@document": {
+          "before": "4e00ead501f5ddff8fd8833522562bfaa1d46b77fa841edcf9838a9be83053ca",
+          "after": "4c8d28ccc240dd2d70bdfb7346940900e6997505e42eddecd8298c22d5e9af99"
+        }
+      }
+    },
+    "contracts/examples/sessions/session-metadata-created.json": {
+      "before_sha256": "bc5d87b6d7a9bb19d0a736eef71680564d737edce1fe3b6f0a66f2d6b243aa3e",
+      "after_sha256": "e63d066e41547a2e5da2aa0e99bcd0f9325d15ba26935cf0fdeaa29c05efc551",
+      "owners": {
+        "@document": {
+          "before": "bc5d87b6d7a9bb19d0a736eef71680564d737edce1fe3b6f0a66f2d6b243aa3e",
+          "after": "e63d066e41547a2e5da2aa0e99bcd0f9325d15ba26935cf0fdeaa29c05efc551"
+        }
+      }
+    },
+    "contracts/examples/support-profile-player-a-redacted.json": {
+      "before_sha256": "9d6a29d16883ca7ade24113faa6b6182645bcd6b05161d6b8633ab2ef9d94f83",
+      "after_sha256": "0eddb1eed1bda7462130ad63054daf5df977d376d099d50c02ce9cb7fbfa7b52",
+      "owners": {
+        "@document": {
+          "before": "9d6a29d16883ca7ade24113faa6b6182645bcd6b05161d6b8633ab2ef9d94f83",
+          "after": "0eddb1eed1bda7462130ad63054daf5df977d376d099d50c02ce9cb7fbfa7b52"
+        }
+      }
+    },
+    "contracts/examples/support-profile-player-b-redacted.json": {
+      "before_sha256": "970f528b0695764f40ad686026f078c8b4b41b5c377eb41b774b858d7ea4fe38",
+      "after_sha256": "0b23c9401098e31d697b4960b12f981b32e7d2556e77635a1f3a26f3ff1de155",
+      "owners": {
+        "@document": {
+          "before": "970f528b0695764f40ad686026f078c8b4b41b5c377eb41b774b858d7ea4fe38",
+          "after": "0b23c9401098e31d697b4960b12f981b32e7d2556e77635a1f3a26f3ff1de155"
+        }
+      }
+    },
+    "contracts/examples/support-profile.json": {
+      "before_sha256": "de7a5344aacf45eff4207feddf9d06174134a5b5f435cd3010e33a96b9044820",
+      "after_sha256": "add06399276deb1e99868f9114a77158836b91151dfeb3bb32f863cf5a67f359",
+      "owners": {
+        "@document": {
+          "before": "de7a5344aacf45eff4207feddf9d06174134a5b5f435cd3010e33a96b9044820",
+          "after": "add06399276deb1e99868f9114a77158836b91151dfeb3bb32f863cf5a67f359"
+        }
+      }
+    },
+    "contracts/manifest.json": {
+      "before_sha256": "0cb0990ea02feed4e4584bdf6a7f57c6090bbd5f841302f68310f21b3a635ac9",
+      "after_sha256": "3afe5e7db2b20f9e32d6b95fd600ae534c515726b6df230cdcbe58e4af0789ea",
+      "owners": {
+        "@document": {
+          "before": "0cb0990ea02feed4e4584bdf6a7f57c6090bbd5f841302f68310f21b3a635ac9",
+          "after": "3afe5e7db2b20f9e32d6b95fd600ae534c515726b6df230cdcbe58e4af0789ea"
+        }
+      }
+    },
+    "data/generated/ability_coverage/cross_source_semantic_equivalence.json": {
+      "before_sha256": "e9ce8884c7bdbd0588ea04c2ba60a1254f740a7b8d57118da5b3ffa4e121ffa6",
+      "after_sha256": "f9e331e5c82c83649a23fff0fa8cb76d8d7219d7bcf5034e863ab19e4c38217e",
+      "owners": {
+        "@document": {
+          "before": "e9ce8884c7bdbd0588ea04c2ba60a1254f740a7b8d57118da5b3ffa4e121ffa6",
+          "after": "f9e331e5c82c83649a23fff0fa8cb76d8d7219d7bcf5034e863ab19e4c38217e"
+        }
+      }
+    },
+    "data/source_audits/ci64_provenance_v1/fortification-engagement-test-v1.json": {
+      "before_sha256": null,
+      "after_sha256": "aaa5fe2e0078d0b63ed6bd67b01cd3e4c4369a2460045695a9c5201de4a4a7be",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "aaa5fe2e0078d0b63ed6bd67b01cd3e4c4369a2460045695a9c5201de4a4a7be"
+        }
+      }
+    },
+    "data/source_audits/ci64_provenance_v1/fortification-rotation-test-v1.json": {
+      "before_sha256": null,
+      "after_sha256": "13d8d42dfc5f317238e78ebe1f978b21c1b77c88dc41d56a20f6a6139cb54d20",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "13d8d42dfc5f317238e78ebe1f978b21c1b77c88dc41d56a20f6a6139cb54d20"
+        }
+      }
+    },
+    "data/source_audits/ci64_provenance_v1/fortification-survivor-retry-test-v1.json": {
+      "before_sha256": null,
+      "after_sha256": "68735efb653722f33d34525bd2fe85fca4ea543e7dde169b65498ba7547d197b",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "68735efb653722f33d34525bd2fe85fca4ea543e7dde169b65498ba7547d197b"
+        }
+      }
+    },
+    "docs/ADAPTER_DECISION_CONTRACT.md": {
+      "before_sha256": "a02ce5add787ea9c60d935b48ef3e542552f2c0290dbcd0a204519c09ef39efd",
+      "after_sha256": "4bb6154f10c5749007e3a538b343ee916cf5f7d6056598d6f396118d6bee2636",
+      "owners": {
+        "@document": {
+          "before": "a02ce5add787ea9c60d935b48ef3e542552f2c0290dbcd0a204519c09ef39efd",
+          "after": "4bb6154f10c5749007e3a538b343ee916cf5f7d6056598d6f396118d6bee2636"
+        }
+      }
+    },
+    "docs/CROSS_SOURCE_SEMANTIC_EQUIVALENCE.md": {
+      "before_sha256": "3683ff5acbb3dbf0dc57cd322eb7b95183fdb93c0b35ce11fc1b1423ff22617c",
+      "after_sha256": "bb3a50426fd2f35a6d5df4637fd70c3d88af88185bf369f18b2a487a69678e28",
+      "owners": {
+        "@document": {
+          "before": "3683ff5acbb3dbf0dc57cd322eb7b95183fdb93c0b35ce11fc1b1423ff22617c",
+          "after": "bb3a50426fd2f35a6d5df4637fd70c3d88af88185bf369f18b2a487a69678e28"
+        }
+      }
+    },
+    "docs/factions/astra-militarum.md": {
+      "before_sha256": "4fee0a29fc787c9eaace8afdad7db48e575b06f5c638ce8cd86b8b218405cde6",
+      "after_sha256": "fb75b7330a109160214b2bf5075c9161a8abf0ab5335d4d403bad150c79c9404",
+      "owners": {
+        "@document": {
+          "before": "4fee0a29fc787c9eaace8afdad7db48e575b06f5c638ce8cd86b8b218405cde6",
+          "after": "fb75b7330a109160214b2bf5075c9161a8abf0ab5335d4d403bad150c79c9404"
+        }
+      }
+    },
+    "docs/factions/chaos-daemons.md": {
+      "before_sha256": "d6f57e63aa954042d4c54e01cd33074c36c7952e5f54a3951463e3f2a3ac74ca",
+      "after_sha256": "76dc4d2e03a8de62b444b900bd0e7836bdb80875f1cf32bd18b9ecbc84e7237b",
+      "owners": {
+        "@document": {
+          "before": "d6f57e63aa954042d4c54e01cd33074c36c7952e5f54a3951463e3f2a3ac74ca",
+          "after": "76dc4d2e03a8de62b444b900bd0e7836bdb80875f1cf32bd18b9ecbc84e7237b"
+        }
+      }
+    },
+    "docs/factions/chaos-space-marines.md": {
+      "before_sha256": "bba928afb167a035f69ca1dc9d0c966027e3db379ea46760cc416872cdefaad5",
+      "after_sha256": "3f3fa8b72d226242fc852de4b0e34826faee57c3c07609036d55873101f3d354",
+      "owners": {
+        "@document": {
+          "before": "bba928afb167a035f69ca1dc9d0c966027e3db379ea46760cc416872cdefaad5",
+          "after": "3f3fa8b72d226242fc852de4b0e34826faee57c3c07609036d55873101f3d354"
+        }
+      }
+    },
+    "docs/factions/death-guard.md": {
+      "before_sha256": "5c51530762e860e4e4a9c5e87665313f2eedf1d87a5d69eddd218218c26e1087",
+      "after_sha256": "6cb577eff65d647d531f812e29534ad2abc680357bc80c4cee437fe9566261cf",
+      "owners": {
+        "@document": {
+          "before": "5c51530762e860e4e4a9c5e87665313f2eedf1d87a5d69eddd218218c26e1087",
+          "after": "6cb577eff65d647d531f812e29534ad2abc680357bc80c4cee437fe9566261cf"
+        }
+      }
+    },
+    "docs/factions/necrons.md": {
+      "before_sha256": "f651d9d6b99023b1f2daacb363099817bab9094fe2ed17722f1b1b6998da3d64",
+      "after_sha256": "42f391639ae5a76d1aff68798ad0119d8efa5be644a49e1cd41c1e918f6fbe38",
+      "owners": {
+        "@document": {
+          "before": "f651d9d6b99023b1f2daacb363099817bab9094fe2ed17722f1b1b6998da3d64",
+          "after": "42f391639ae5a76d1aff68798ad0119d8efa5be644a49e1cd41c1e918f6fbe38"
+        }
+      }
+    },
+    "docs/factions/orks.md": {
+      "before_sha256": "2646fec85955e2937880f1817640bc63342eb45d425d724d151535db04a15dd4",
+      "after_sha256": "22fc6a705a85ebd1ae6a74429fe1296672b05fca35608a2b3f8b8a2937f10bb4",
+      "owners": {
+        "@document": {
+          "before": "2646fec85955e2937880f1817640bc63342eb45d425d724d151535db04a15dd4",
+          "after": "22fc6a705a85ebd1ae6a74429fe1296672b05fca35608a2b3f8b8a2937f10bb4"
+        }
+      }
+    },
+    "docs/factions/space-marines.md": {
+      "before_sha256": "eefc741d880904ca738f08b9d8fc4a792e81b15357fbd15a236cffaa265882e1",
+      "after_sha256": "4e8566f171aef8d9ddfa3c9f54703e84d563b434e7694a1619ba46ee61b8df1b",
+      "owners": {
+        "@document": {
+          "before": "eefc741d880904ca738f08b9d8fc4a792e81b15357fbd15a236cffaa265882e1",
+          "after": "4e8566f171aef8d9ddfa3c9f54703e84d563b434e7694a1619ba46ee61b8df1b"
+        }
+      }
+    },
+    "docs/factions/tau-empire.md": {
+      "before_sha256": "8e43bdd658a1c902cc7c0d9e40b6a777ed4dd7292c4a726bd674a0dd70f65fe6",
+      "after_sha256": "229824e2c284a673e3717dd7d2470e47e635e10736e48a1063fcef3a66b7fb07",
+      "owners": {
+        "@document": {
+          "before": "8e43bdd658a1c902cc7c0d9e40b6a777ed4dd7292c4a726bd674a0dd70f65fe6",
+          "after": "229824e2c284a673e3717dd7d2470e47e635e10736e48a1063fcef3a66b7fb07"
+        }
+      }
+    },
+    "docs/performance/current/fortification-97b6deae-dice.json": {
+      "before_sha256": null,
+      "after_sha256": "d9d39e189d80c20ee17d80bc3621b05f0b9e3382080e8bfa462102fff7e6441d",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "d9d39e189d80c20ee17d80bc3621b05f0b9e3382080e8bfa462102fff7e6441d"
+        }
+      }
+    },
+    "docs/performance/current/fortification-97b6deae-movement.json": {
+      "before_sha256": null,
+      "after_sha256": "6a19c77d6e0963a88c154e16a6941e508d33cc4febeb853e6433be5ab786951d",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "6a19c77d6e0963a88c154e16a6941e508d33cc4febeb853e6433be5ab786951d"
+        }
+      }
+    },
+    "docs/performance/current/fortification-97b6deae-reconstruction.json": {
+      "before_sha256": null,
+      "after_sha256": "61dae593744a2599d9ac988e3f606e8165b5d7f6258869db27aa929b36ca4709",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "61dae593744a2599d9ac988e3f606e8165b5d7f6258869db27aa929b36ca4709"
+        }
+      }
+    },
+    "docs/performance/current/fortification-97b6deae-setup.json": {
+      "before_sha256": null,
+      "after_sha256": "f9bcb3d58101e7f7a272f12f1a01aab7a623914c30213b3504ee044f3371d589",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "f9bcb3d58101e7f7a272f12f1a01aab7a623914c30213b3504ee044f3371d589"
+        }
+      }
+    },
+    "docs/performance/current/fortification-97b6deae-shock_reconstruction.json": {
+      "before_sha256": null,
+      "after_sha256": "24a197afdfdeea4ad5373b725e5a85495e0c3ffa54abb22dbc53b9dde558b1aa",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "24a197afdfdeea4ad5373b725e5a85495e0c3ffa54abb22dbc53b9dde558b1aa"
+        }
+      }
+    },
+    "docs/performance/current/fortification-97b6deae-visibility.json": {
+      "before_sha256": null,
+      "after_sha256": "4fd0ce760b5e3566bf46660d55f299adc73a0564081c1833ec08858a8b143e98",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "4fd0ce760b5e3566bf46660d55f299adc73a0564081c1833ec08858a8b143e98"
+        }
+      }
+    },
+    "docs/performance/historical/fortification-1244bd49/fortification-1244bd49-dice.json": {
+      "before_sha256": null,
+      "after_sha256": "edd1b6d8622433077ae033446d2e7c0242b277b24dfd755ee1001a5772ae9fe6",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "edd1b6d8622433077ae033446d2e7c0242b277b24dfd755ee1001a5772ae9fe6"
+        }
+      }
+    },
+    "docs/performance/historical/fortification-1244bd49/fortification-1244bd49-movement.json": {
+      "before_sha256": null,
+      "after_sha256": "882d9085c983a0e734078664ea8a0d8b924ca458dccfaf21124bc91645285ec4",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "882d9085c983a0e734078664ea8a0d8b924ca458dccfaf21124bc91645285ec4"
+        }
+      }
+    },
+    "docs/performance/historical/fortification-1244bd49/fortification-1244bd49-reconstruction.json": {
+      "before_sha256": null,
+      "after_sha256": "7c99d60ea35e40f5aa2004d6d9b566ca8655c269b89b4ccca717a2394cb8f2c8",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "7c99d60ea35e40f5aa2004d6d9b566ca8655c269b89b4ccca717a2394cb8f2c8"
+        }
+      }
+    },
+    "docs/performance/historical/fortification-1244bd49/fortification-1244bd49-setup.json": {
+      "before_sha256": null,
+      "after_sha256": "d96434693d9fff90ed1c749c8ad758d3f673a44e1e9b192ceb28ff2da6005b9d",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "d96434693d9fff90ed1c749c8ad758d3f673a44e1e9b192ceb28ff2da6005b9d"
+        }
+      }
+    },
+    "docs/performance/historical/fortification-1244bd49/fortification-1244bd49-shock_reconstruction.json": {
+      "before_sha256": null,
+      "after_sha256": "2694c167e1f7b16560438adc26b4a1207a764e7833fb4efebaaee9140a154c3b",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "2694c167e1f7b16560438adc26b4a1207a764e7833fb4efebaaee9140a154c3b"
+        }
+      }
+    },
+    "docs/performance/historical/fortification-1244bd49/fortification-1244bd49-visibility.json": {
+      "before_sha256": null,
+      "after_sha256": "bb808848ddcfdcad2b1ee6d988fa922e72385add807a27933bebbc097294d456",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "bb808848ddcfdcad2b1ee6d988fa922e72385add807a27933bebbc097294d456"
+        }
+      }
+    },
+    "docs/performance/policy-v3/operation-map.json": {
+      "before_sha256": "0fdd830d022b11d9d9563ba965e782bcb1f5ff7a122009a6c33a81d05ab3fc37",
+      "after_sha256": "5f27fd43ffd614fc2d1c8842dff95f4f6359172225381d589bb2c05d5c65621c",
+      "owners": {
+        "@document": {
+          "before": "0fdd830d022b11d9d9563ba965e782bcb1f5ff7a122009a6c33a81d05ab3fc37",
+          "after": "5f27fd43ffd614fc2d1c8842dff95f4f6359172225381d589bb2c05d5c65621c"
+        }
+      }
+    },
+    "scripts/engine_numerical_identity_test_admission.py": {
+      "before_sha256": "00ad8cf398cd8a016c2db17e20b9ba4080b9dc509558a067c6b3f8b6358a4744",
+      "after_sha256": "3cf64b182d3c2e3e86c73ccbdf22d050466b4e871331c5b7446172a3b3008cd0",
+      "owners": {
+        "_daemonic_terror_transition": {
+          "before": "f1432dd10330d87f27b5b26b3430737578e44428ed46641e64377b327a934785",
+          "after": "d8207e7457efdc3e78a6b51491fa5514018172d517d05d7c0c041d22bbcccbf8"
+        },
+        "_gore_hungry_onslaught_transition": {
+          "before": "c87b79e283b46532c8acd6876ef0786c3a39946b3b6d42fb6f01a5616214b628",
+          "after": "ce7ef66482b5e3b9b02546ef1d76b6a77a9e5afd562ecdeb4043cee1e4bf72b1"
+        },
+        "exact_movement_test_transition": {
+          "before": "03439013f9b7df85da9a1fb7bf144668dcf66a571497835c2aa236e9c697b9a9",
+          "after": "154fcf0bed5ef7fc5229ce8056c2c01ded617e6e27400383949e986cac81eee2"
+        }
+      }
+    },
+    "scripts/fortification_engagement_test_admission.py": {
+      "before_sha256": null,
+      "after_sha256": "88f10cf56712fca16272cf282f14056d1dc872c4f4df9f118c19a0535e4357ff",
       "owners": {
         "@module": {
-          "before": "ea26a4d4d2e69bc91ec61970727b795f9275f65bec8cb66769ec5173980faeb3",
-          "after": "f8eea0e87d279f67cd3301b9bed136d901e22876d70e1b08c6a594d7813087f9"
-        },
-        "_configured_mission_choices": {
           "before": null,
-          "after": "2a87e33d1f75de0ca0de3fa30fc48cf023ac1e63837bb656e1dafdc8f7d6940f"
+          "after": "f89901f6a79f5bbb06970de22c2516923990fe31de66458ca59aff79bcb2a0b7"
         },
-        "_mission_choice_context": {
+        "FortificationSuccessorReceipt": {
           "before": null,
-          "after": "0d7258aeb32f405f38f2fe973d2d01b2c9cc8b633391426796c8f0f5c64388f1"
+          "after": "e9577e5e7d98c46f85d0b8bcaa274f634391bb56df03a212f9dc09a3c93ea3e3"
         },
-        "_mission_declaration": {
+        "FortificationTestReceipt": {
           "before": null,
-          "after": "b4e8162ad1ef8df47989e1b40579799ceb6c3b1154ba5696b73e96fc074063f0"
+          "after": "d7a20a5bd47cabe87bbbf8138d7781b7830fa679ea756177a5ee02c1ae80ab5c"
         },
-        "test_primary_mission_choice_consumes_each_required_window_once": {
+        "_Successor": {
           "before": null,
-          "after": "52dbf7e327245f474e9820905ed84bce18f65884347d7ee8ee42814839d05b62"
+          "after": "3adde5e224d9a9d19fcfeadbd69dd4e598cdabfe0f4f76f60284bc99939730a8"
         },
-        "test_primary_mission_choice_passes_native_validation_after_prior_allocation": {
+        "_fortification_current_receipt": {
           "before": null,
-          "after": "38716543c8de0aed5697aa69feb51e2f92d18dfbadf3e3671e3cc4e21604b4e6"
+          "after": "0d59d9da695596db1e646904b73277df19e109f38ed2722b7b5c5718753cd07e"
         },
-        "test_primary_mission_choice_rejects_ambiguous_or_foreign_options": {
+        "_fortification_receipt": {
           "before": null,
-          "after": "13ddba76eb6a886ebea28c4b59507f569d53d68002c444aed2bbacf45b8cb884"
+          "after": "f337c0d99f4f388c0233a9b3297306991975f7b01d411188462b249e9b9878b7"
         },
-        "test_primary_mission_choice_rejects_an_inconsistent_window": {
+        "_fortification_successor": {
           "before": null,
-          "after": "973bca577ef0fe715d8d3d709491e9a6502c9a860479aaadb5c4bb6a7d307843"
+          "after": "d01ca68c211081241f09c8ed676b27eac2a43d89eb41b13d8a51b3890bbe164a"
         },
-        "test_primary_mission_choice_rejects_duplicate_declarations": {
+        "fortification_historical_source_successors": {
           "before": null,
-          "after": "734ca080ed33f8a3febfeb017f03bfabd302a41da2564c2c59048f7525095e51"
+          "after": "10bc7fbd3c844e8ecd000479bee59999d75f03917255862370b801b899e78f47"
         },
-        "test_primary_mission_choice_rejects_foreign_owner_or_unsupported_kind": {
+        "fortification_test_addition": {
           "before": null,
-          "after": "56526716e24c80be453ba09a9ed915cfd2e1f197ca18e6aa74b782ae9280a937"
+          "after": "4920f8e6b454b39abdcd5536dc3d22756e868d3bfff4fa7369f8d3a675fccba0"
+        }
+      }
+    },
+    "scripts/shroud_of_flies_test_admission.py": {
+      "before_sha256": "3fe33de087682ffd18185077fb8e3a7e1af55c3e2d9d4f972a2a201702e9bbe8",
+      "after_sha256": "c3d7676389c6a183e69545998da17d27e4dcb5c43a9b990f09e726eb4a7f5c69",
+      "owners": {
+        "@module": {
+          "before": "a7708f7a5de91a73e74d60c902c7ab045436f7bbc4fc1e48f7f29f24c3c6200a",
+          "after": "5ba36b9d204e39e2d8cec2f3777b6aa6959b5963242157fe93ff485b74753fa8"
         },
-        "test_primary_mission_choice_rejects_invalid_declarations": {
+        "_fortification_successor": {
           "before": null,
-          "after": "0718da1449da9ffa86f57db1421fbae9c2f5745145a4cd76290e27be44599df7"
+          "after": "2fa8e30a1520f55d6eda5bfa67eaa5e34db4b816230b61e2ad2fb9bc661fe6d3"
         },
-        "test_primary_mission_choice_rejects_missing_or_inexact_bindings": {
-          "before": null,
-          "after": "d2ab829dd849296746d3b189de8c92e6c1972bbb35e7e9f73c4327bc717c8265"
+        "shroud_of_flies_runtime": {
+          "before": "55081fd8dc804f23f1cb1ccca60a231a6ab442956fd1a7d3dd026b43239be68a",
+          "after": "aff5ffb585b3b9798c42cdb1bc4192b06de5eef17de0b155a9a0b4dc0015cf8c"
         },
-        "test_primary_mission_choice_uses_the_current_issued_ids": {
-          "before": null,
-          "after": "1d6272d0f99e246101034fb6d8fa34c03182a5226887110fbf3fd2db0701c559"
+        "shroud_of_flies_test_successor": {
+          "before": "0674ef62483bccceb7ac9e65f96adbc8f30ec6f8615ecf0634e6dc1636a8954b",
+          "after": "ee8edfc5eaf9da05b8c257bb18b1b8a6aa8f43d3823d8d7444b7e3feb3f5cbe0"
+        }
+      }
+    },
+    "src/warhammer40k_core/_engine_build_manifest.json": {
+      "before_sha256": "0ff2069ea62022e6045ee8d2bbbbdc61f58d7bee181d88832494e3638dd9013b",
+      "after_sha256": "659bc7c831876eb2a73492648c4ac7853d4e7040adb1b8b4ce9a640c5e7f7b0a",
+      "owners": {
+        "@document": {
+          "before": "0ff2069ea62022e6045ee8d2bbbbdc61f58d7bee181d88832494e3638dd9013b",
+          "after": "659bc7c831876eb2a73492648c4ac7853d4e7040adb1b8b4ce9a640c5e7f7b0a"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/catalog_contextual_status_consumption.py": {
+      "before_sha256": "cb1c70b6a0229523b3c00efed64b8d09bc34692800ab69024b9934f85229da91",
+      "after_sha256": "80da4d0a22190839b6f7ad381eecc9fb69b74778ca7d6aa36568bfb4dbb16159",
+      "owners": {
+        "@module": {
+          "before": "0c9fcb5708b00c6995b7d158f1d47ccb48caceff99bd4eaef10f523d335a1310",
+          "after": "a2e3212b79f7d22ad2f81dbfe109b0994d48e7e981706548abcd6d8794083a62"
         },
-        "test_primary_mission_choices_are_optional_prospective_page_fields": {
+        "_effect_is_fortification_desperate_escape": {
+          "before": "a95e897d51dbeac7465f9f62b0449e9f08442fd55eb403f6798c7eb098286c3d",
+          "after": "946786edc7e72b7872cc035e4dcde1c5bf41a8c134e29960e51f1534aae5ef85"
+        },
+        "_effect_is_fortification_target_permission": {
+          "before": "66b0c1a264bf933414ca039deab386caa668e5b14ae24ea043b407c0326b4657",
+          "after": "c6ef0e074cdd98e2ce5e51525e1be2577f1a687dee4674c677a4a11ed053b01a"
+        },
+        "rules_unit_has_fortification_consumer": {
           "before": null,
-          "after": "ceb5c20a76eea1ef74fdf673f57aa8b63fa36a7d3688db6990a2991df2cac0fe"
+          "after": "5605a343f05237ed0844d56b1bf221440afc174b5c5b5642cc50f0e54ff5afc5"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/desperate_escape_mortal_wounds.py": {
+      "before_sha256": "8c1e85201145f2c92f06cfd652a8ad3e23283f4586dabf3246281dc1080b5951",
+      "after_sha256": "2720f4125265a8345307d7d91a1f1536df4920925551959d12efb350ea9919ef",
+      "owners": {
+        "@module": {
+          "before": "ec4222beb8f6f15018913568e4397ce8b1690cad280b351d5b8e35c34a5dc5aa",
+          "after": "e29e53703c925fd4a3643daaf7251a4a25f6a1cb7a2b26e7d3476d02f80eca0f"
+        },
+        "begin_escape_mortals": {
+          "before": "acc9ba8d579031dd74b1b42fb77822895c2b373eec8943054f3b43bddd704fbf",
+          "after": "b81ba6743e0a8264c20de8fde8358bb2d69a2f940774c331a38c28c0dfdec274"
+        },
+        "completed_escape_hazard_chain": {
+          "before": null,
+          "after": "3700223f6a62f3cdca493138db75bf8a609f0e392d55fc2ec64868d8bac35db9"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/movement_decision_authority.py": {
+      "before_sha256": "8397bb5f30fd3560708cff3067758bb698e6d99d12dc7bd1a97f3e6f3e478b28",
+      "after_sha256": "25e0e019e70656ba23a34a060b4cf9758f3e0ce4911146f69407c4b612752f31",
+      "owners": {
+        "_hazard_completion_proposal_records": {
+          "before": "aebe0d943ee2f0c043d8debb23c3e97e316665e649a5f1b2874d1f64626b8d31",
+          "after": "e9777a4bafbe101cb39b4763deda4e2315e75e91f5135bdc546ab1af90426aa2"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/phases/movement_escape_mortals.py": {
+      "before_sha256": "a6628a5a662f70acd4e84dd70e545af9891b0c5ed72e2d5337254d8a87445668",
+      "after_sha256": "bbaa8d2230a20924f014458e0e7d3f9aa321fa1a4cf3f2b41de0ed6df787df91",
+      "owners": {
+        "@module": {
+          "before": "2c12b372c85e78e4200572e20254cb05d28f078db2fb1735c82489063457ba7b",
+          "after": "886a96109d2a916278e6767438fe9c8e2a0900c657207edb4b5b727efd999242"
+        },
+        "CompletedEscapeRetry": {
+          "before": null,
+          "after": "edae092ac8b08f6476d647d9d3c8a67ce1bf8601489bb4815ccbe450e2154e7e"
+        },
+        "CompletedEscapeRetry.untested_requirements": {
+          "before": null,
+          "after": "c0622e33cd8b27bc484e534516ba26a860263f95bd6bb34bf68afc0ded6a889e"
+        },
+        "CompletedEscapeRetry.with_new_rolls": {
+          "before": null,
+          "after": "c2d684956b0cae911f31aef61772edc0ab18f773cbdd652537d302cae98daeba"
+        },
+        "completed_escape_retry": {
+          "before": "8602186366d86b0e0dab521a58b88259e828ca474b312ea215591de323401bd5",
+          "after": "76aab2780d2dbf881720178f15123f8ec35fa282f5e063c21246b7b34a8ed98f"
+        },
+        "recorded_fall_back_start_engagement": {
+          "before": null,
+          "after": "306ac451750ecb3184058b33f7b6a3cd168c2cd6c15cc615a2102cb3d296105b"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/phases/movement_fall_back_embark.py": {
+      "before_sha256": "54092610a2f236c9400b03c42d09de5cfa6338ba10338cc967a22352bbefc296",
+      "after_sha256": "e9c7331eadd58a030c7f54f7292c5034d66e4260070d015150f9d0076c54a8f5",
+      "owners": {
+        "_apply_fall_back_result": {
+          "before": "6bf7bca6cbe7098a2b06626a66ea4faa2b1ddeeab61193361b411289a137d30d",
+          "after": "fb84a53194d42c58d258c50f6a5b6b9f768b94e7472aaddd9b7b0f9ab48afa2a"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/phases/movement_geometry.py": {
+      "before_sha256": "482bf37d6253e318b879948cfa79e51a12e860a4b69d21130e4a4cb91cc5b6cf",
+      "after_sha256": "1a1d895cd89a03209989c5867d96023d993803a666fd507bc1d9bb19b3bb9646",
+      "owners": {
+        "@module": {
+          "before": "9e6c752e30a8721fb9c151edfd330c5818e83b605f05c0d779e235be5569b966",
+          "after": "7fa03bebb720ad043854b151cd0d8a26d091dbe1f1c40957b6a8fb448233f072"
+        },
+        "_desperate_escape_requirements_for_fall_back": {
+          "before": "659343572dc3c7460bb70c795c527676465fc15e719c11689467261cd08f007d",
+          "after": "38581dff5b825a0442f1d9e9d30864d25e0a42d5cb66f23416496621abe18b4d"
+        },
+        "_enemy_model_ids_crossed_by_witness": {
+          "before": "7507d39407a05ffae852776d332b6d1b31fdec7866238a26c2200f9bb888dec0",
+          "after": "8b7925057d508b0f37fd0ef5155ea7f4104e1fa48ec58072881e24f81c23e083"
+        },
+        "_unit_has_fortification_keyword": {
+          "before": "7576da13c9a66f8ee4bc12bef9a031f712dbf8783c0a23e24a014b4c1b57017f",
+          "after": null
+        },
+        "_unit_instance_by_id_in_scenario": {
+          "before": "469ceebfd635f7f79f7a41ba12cc4be5fe24c0cf8f1b13656056f821388d1c4b",
+          "after": null
+        },
+        "_unit_only_engaged_with_enemy_fortifications": {
+          "before": "edd813393350625f0dd3073d80ed379cf9de43af6eb382dc54926d1dc2448dba",
+          "after": null
+        },
+        "enemy_fortification_unit_ids": {
+          "before": null,
+          "after": "74d1595e4cdddb313826b2cef259ba1f853ef27106aa6c80fab94ca9e3102674"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/phases/movement_options_dice.py": {
+      "before_sha256": "fd638eb64531de161c5f534c726e2fadde961476cc33ee1b23faa8c3a1b0e9b9",
+      "after_sha256": "391b78292c6979635af9360fe7af83fb8ae271bc2450f7fd0f0329f920fad25e",
+      "owners": {
+        "_roll_desperate_escape_dice": {
+          "before": "59214fdc2a539b309793b43f45f2834be18f20c1e388c47f3878d49d353e58c9",
+          "after": "34720d30f1b2a56704c53952b46ed29db04182f5dac1b0dc34327bd29f0f379d"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/phases/movement_resolution_flow.py": {
+      "before_sha256": "2e71792a4984f45cda1e09d25edd7e20a4522c25428daf25098549f8697671a9",
+      "after_sha256": "48aa7f0c5b814fd5320facb8fbcc4a576ae9dfd184c34a746dba725b667e4f31",
+      "owners": {
+        "_apply_movement_proposal_decision": {
+          "before": "e6c69eb98d23d6cdbac6c6e3731cf3b47564b1e0198fd3b6ba31fde8e3513bb5",
+          "after": "09b42770930ed88ae9ad34ef0325bb0eb5def5758a9b1fb396eb02ddbab5bc0e"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/phases/movement_resolvers.py": {
+      "before_sha256": "9b269e065511a68819f49bbe9988d59c54dcc505f337d5ae6149e8e6d83687dd",
+      "after_sha256": "357ff0b46806214962282373a168a1a3adce0af52ce8746494dec4b4c9b0e5d5",
+      "owners": {
+        "resolve_fall_back_move": {
+          "before": "0adacc7fe50a9f302cbd9c731a471a903ac4c985894fce8b5934594d08a5afd9",
+          "after": "3cb611585d967719dd1d6087f1789453eec96905cd6fb98a72efa91e501ee9df"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/phases/movement_rules_units.py": {
+      "before_sha256": "ed7c88ce9bce29048035763a851a86f34e0086bb6024fc515863a45c38bd39cc",
+      "after_sha256": "ff696b40359a274b8066f0d92e3aa9c32fba40c0ec6a344113f479e8a52876d5",
+      "owners": {
+        "@module": {
+          "before": "13d0f7c0c6f9a399cb72ea5124f55aeaed321fee7b4541aff28a3fc574a3503b",
+          "after": "66da619e4cd7dc767d4acc12b295fb9139c5b64242060bd7915c2d5f1ba8fc86"
+        },
+        "resolve_rules_unit_fall_back_move": {
+          "before": "74ec61ac83ef12c900f892b1cbda4c21ae2ff6197828a697ca70b5effd6ed2ea",
+          "after": "80768e848abc0f30b2dcdd3075546e0be11b1f06bede1834e5e469ae2b890a25"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/phases/movement_validation.py": {
+      "before_sha256": "3e697c50f83a7c1e5d99f457fd8666ac002d045536cd866aafd21bba7aa7fd3e",
+      "after_sha256": "c4b99f65f6f65b84b6644d5e6a8af940a25b74001b9917285061c5c90e02dc12",
+      "owners": {
+        "_fall_back_mode_violation_code": {
+          "before": "3a7f5883cd16000991b4b450fa040aabc01f06206bfb0f92f099e35662658aa1",
+          "after": "9624febaf6fb79309990cfe972db3c41bd3af1c89db88f63281ea3b73e1581f5"
+        }
+      }
+    },
+    "src/warhammer40k_core/engine/shooting_targets.py": {
+      "before_sha256": "f087201dfa03c10164f292b0fd93d9dfc6eb09940100ed7588acec812464dbc0",
+      "after_sha256": "c3f177dc2565afd7db3e21efea05608d85376ef79d953bc748f9e205666f3778",
+      "owners": {
+        "@module": {
+          "before": "e3fab60d4e467b9d6f9f72976885783500f6b461a2f5173e9b6296eaf0725d6a",
+          "after": "ff17c99a8e20ffc657f6c80143ac0376cd4b560f3cb4f0cd106de35ab33aa213"
+        },
+        "_rules_unit_has_fortification_keyword": {
+          "before": "dcb42f8f27449693f667bfbd62460f2e5218863fbb30d938a1768f88516f2ba2",
+          "after": null
+        },
+        "_target_engagement_context": {
+          "before": "981e3808933aaf7c35b584fc03a800c1c6abda773dd8a78e6e0582a10b9c5d75",
+          "after": "5b70f233e68e56bfc8280df9afa571650fb0e26e8b77cf56546b3ecce0ed7003"
+        }
+      }
+    },
+    "src/warhammer40k_core/geometry/physical_predicates.py": {
+      "before_sha256": "24ff60d49eb1de4e873d38946c5d3d5793f3c0073b8d16e35b4823c1c6b9daa0",
+      "after_sha256": "05788f1045f1453eca0f93966a6e044db231cc77136dab6fd9542e4af7eba63e",
+      "owners": {
+        "@module": {
+          "before": "62bf139f5d6bfaa46545f5332cc4ec97756ff718fe38552266c13de685127895",
+          "after": "0d9c9eec2fdf178e6a1a46c5a18facbda94f85d57036a2c4ccc1fca5a7e62b09"
+        },
+        "_FootprintSupport": {
+          "before": null,
+          "after": "c509137c39fb5d04c42b9fca3c047a8462b46d6ea0763f6dfacd9e5d3db19a7f"
+        },
+        "_FootprintSupport.at": {
+          "before": null,
+          "after": "440129c45988d5641aac70f1690402850f438085a83fbc5a4756056b8c5f0787"
+        },
+        "_FootprintSupport.extreme": {
+          "before": null,
+          "after": "96ce9a1dc46dd3f23c0eacb66c9d3dade735d99770355419edf4bad78004ca9e"
+        },
+        "_disk_path_crosses": {
+          "before": null,
+          "after": "17054c5bbc7f0102f54792c9657862bb8c11409a96348ddd7f7eab8864b160ea"
+        },
+        "_dot": {
+          "before": null,
+          "after": "90230a2a700ea44215e254613a857bbeb0528941743246890b7a25e72abb6d92"
+        },
+        "_gap": {
+          "before": null,
+          "after": "98d603eb5715e73497db4f58616274ba5381d12fb4f59c7f79eb26dd2f56c5a8"
+        },
+        "_minkowski_extreme": {
+          "before": null,
+          "after": "9bec5783446d4dce7eeb8f3eb5c1c87977fafb97d4c5bb3948fad6e9df2a29d2"
+        },
+        "_normal": {
+          "before": null,
+          "after": "c35b47f97556aa9bae8006e3288e27bfe0741e498d6547a5ff310d495e74e90e"
+        },
+        "_round_footprint": {
+          "before": null,
+          "after": "1451d3a8690b02b73f4bd37c86ad55dae8c84fdcd50f570f285043b2e768d8c8"
+        },
+        "_separating_direction": {
+          "before": null,
+          "after": "98aeda7aea090a83d811edf7750e3ec7ebbdd3586234518fb2ddb77c1d852383"
+        },
+        "_shortest_turn": {
+          "before": null,
+          "after": "00524515a6802fe1a5ea484d8cff3b5fc8cdf6b5867b91885929e78733117444"
+        },
+        "_subdivides_motion": {
+          "before": null,
+          "after": "28b038b1280a6465c2da352cb90679989e78b5d1a5100c71ad7cc9d213a43be9"
+        },
+        "moving_footprint_crosses": {
+          "before": null,
+          "after": "bae1a4a261085e97b4af05df45959394502e1399370e5872b5da2264d03aba7d"
+        },
+        "nonoverlapping": {
+          "before": "6fb9119ff72ba3167e1eebc8e669a80a17183b6d2e79d5bb3362d3e1e7196888",
+          "after": "58317497bb17bc39b45c553fc6434f93d82ae52d03570f6267440d7f88d6089a"
+        },
+        "planar_motion_segments": {
+          "before": null,
+          "after": "79072de5d3c5c7250cd633a21d76cb7dd8a87fab6079760d83f8b6df19a0c209"
+        }
+      }
+    },
+    "src/warhammer40k_core/rules/rule_parser_selected_target_extensions.py": {
+      "before_sha256": "6bf8fce1f31a1a7b1509bd6676aa6487f15623ac3bfccfcddaddfd771396c8f1",
+      "after_sha256": "626d2225a9070cafc51a702c89df7853b8410a576b81beed28103002dd7f03e1",
+      "owners": {
+        "@module": {
+          "before": "77f5bcf12544f73a78466179752c0efb29adfd6d4218fe4553f08c30c97c6d13",
+          "after": "3de3af73425bfd8f87813180bcb9ed72b4bfa4658d26609bcdecc444b051d089"
+        },
+        "compile_fortification_engagement_clauses": {
+          "before": null,
+          "after": "8bee5848795c59172d11ae3891abdf071d180131f4b3b64527781deb11d60ddb"
+        },
+        "parse_fortification_contextual_status_effects": {
+          "before": "ff4150d559e47d58b3f56eb5bcbc9f1606f4c8a58949cd9eb7adaa40a769c961",
+          "after": "a4f1d743816fd09f3774b6e1180888e7a278560f5cace3f1c5b53e0ffc48d509"
+        }
+      }
+    },
+    "src/warhammer40k_core/rules/specialized_rule_parser.py": {
+      "before_sha256": "dd282499b6d6cd578af9eca3f8e20c292feedb83d94fe588f8a0116cf9b29b2b",
+      "after_sha256": "47b10f4514f10861b2cab80e7e822aa60481f8c81038623ed20d9ccd88401b20",
+      "owners": {
+        "@module": {
+          "before": "b81ea47c9d0dc248c4df3053307e8d88c88b40dd9e8bdbdb0aa605cf9655b487",
+          "after": "676247a4fbb5773b134efb45d048ea3f5ed1189ef223d62856d7175125bda994"
+        },
+        "compile_specialized_rule_clauses": {
+          "before": "b4c9a90ded7e24379626ee3dfa6df06ccdec20db159ab6c1fdb996e5702e465d",
+          "after": "4b6f5a641cec0701bfa711ecd5437049e133c52f4485981e1c996a429db0b22c"
+        }
+      }
+    },
+    "tests/code_quality/test_d07_geometry_containment.py": {
+      "before_sha256": "ec8082b0da104c49fed89455d9a85d49e14d8026c28bda1c56573981bcd8a4ae",
+      "after_sha256": "531c554cc023c70f9e9e12d9800aabcf3edf1f79afe1db9e1bd995f6c8cbd54f",
+      "owners": {
+        "_changed_geometry": {
+          "before": "ed4eb45b509a72c34251f24cb71b406dadcb504ae7b4a116abc10d724902d653",
+          "after": "d0ddfb88ee393d75a8d42a9c6c05e49e614bb244b7f42a8b3cf84978fd5c365c"
+        },
+        "test_d07_bounded_ast_rejects_unlisted_changes_even_without_byte_pins": {
+          "before": "a9ddf305901485fee844f9e659849062ec2cf9af66579026ee8704ec8ee4b21a",
+          "after": "0fbe5019ae9a90434032360a83a8efbd22aa46de7c07ea395b899791ebbdf7b2"
+        },
+        "test_d07_recomputed_current_pin_cannot_admit_fourth_statement": {
+          "before": "8ca7c4977e599947361ae26e1aa56c69be08bfa86e178a08848a3916479e3425",
+          "after": "043ed75cc429c58650035c3b7e9eb8bdaa172b06298c7e59d2cf418f0e308e73"
+        }
+      }
+    },
+    "tests/code_quality/test_engine_numerical_identity_admission.py": {
+      "before_sha256": "2a1a3c225c37a55850d54399b952e764c0b052f16d16bcd715b3865385c9313c",
+      "after_sha256": "441abc0f85f38a4fb4e55a22e8aeaf997bb10dfb6cab9ec91c67728832b65075",
+      "owners": {
+        "@module": {
+          "before": "77f7b50536ad10a5c8c7b7f456660b286fbaa31c32ef762c790423197fb14709",
+          "after": "31b256343a14cab3794d9ff92a415b37d3baa4d6cc846f532c9479a62127e07e"
+        },
+        "test_fortification_transition_rejects_source_and_case_drift": {
+          "before": null,
+          "after": "d09598e2687427160a9bca9a8c622942578c89ce955be44af5c2e22c21055a2c"
+        },
+        "test_identity_inventory_uses_current_twelve_shards_and_native_cohort": {
+          "before": "4c2ecc49483a326285b8167509b33c038049f7a8cdea17fc49096bcd843604a2",
+          "after": "8a5a25842f12d28acfcabc062a6cd3d68916229b763c3ca859079936ae90772a"
+        },
+        "test_shroud_transition_rejects_drift_in_the_current_manifest": {
+          "before": "3822ee0a3e640ed3466f4bb0275c07b093b23464856fdde71f8662917b0a5c23",
+          "after": "dd5fdeb5b0032b17fc978c49b2b50d857eb899603d174d00bf633aefe380298e"
+        }
+      }
+    },
+    "tests/code_quality/test_generated_ability_support_artifacts.py": {
+      "before_sha256": "9ca61c6c61171123b95fc418d8b5c78e03f11dded2d96d4ba94703af927af114",
+      "after_sha256": "c70245966a8b88ed753acaf1b1cd7140b52b42219f9737a4a1116871ae8ccb1d",
+      "owners": {
+        "@module": {
+          "before": "bac96800c66340d7fc573190ab84f1387e5c3908601407afaf00ce6c352f2210",
+          "after": "984251a2b848de0928c31834695ff70ee91abb4c118ed9df497a6cf28a44f4ab"
+        },
+        "test_fortification_generated_support_keeps_both_source_occurrences": {
+          "before": null,
+          "after": "ff34639cbca63ea73a0c7b78bfb098207a4e2d38d9c902d8c4746ef464592862"
+        }
+      }
+    },
+    "tests/rules/section09/test_fortification_engagement.py": {
+      "before_sha256": null,
+      "after_sha256": "bfdd203b60e8e561944fd1fa9e03de5e38db0e3adef0b5bbcc02885ac0a01365",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "0a957ae6a10836f029d64461266fa96c76a696fd3f0b22436bbaa993cea79a3b"
+        },
+        "_assert_crossing": {
+          "before": null,
+          "after": "1a462476a121c76e632e09e6333b8cbfce29352f623592bee36d2789fe463527"
+        },
+        "_escape_rolls": {
+          "before": null,
+          "after": "bd00b6cd1a0fa266d649a0db70345395756c7b6088527615daaf4a075d4329c7"
+        },
+        "_submit_fall_back": {
+          "before": null,
+          "after": "b4d2a0d2daf2e66de64513450fc3befe6b7258e87fd6e65187b68690e4e14bb3"
+        },
+        "_submit_native_shot": {
+          "before": null,
+          "after": "a7040f4df6b8fc1dc8ad3ac5b0eae13bdb06755ff70fe07fa026edbb056d9d5d"
+        },
+        "fortification_pivot_definitions": {
+          "before": null,
+          "after": "f1fd4daab6c0954e37088faf1b3514834ecc2f3d61813d2d6ee11dc7660d0502"
+        },
+        "test_fortification_crossing_interpolates_rotation_and_translation_together": {
+          "before": null,
+          "after": "d8e23ffc6791ec6bb5a22a67c097e5d290fd189c1f035b913aca5211763948cc"
+        },
+        "test_fortification_crossing_respects_physical_overlap_tolerance": {
+          "before": null,
+          "after": "936b0b4b3838ee353f6e6e232da2e502a94d4515a9a4597159eca0b07545c16e"
+        },
+        "test_fortification_crossing_uses_planar_body_projection_and_strict_clearance": {
+          "before": null,
+          "after": "dd3e40389c5710e62becf694119343e97f5b45bc2dd577587e7279f6313e03e1"
+        },
+        "test_fortification_engagement_through_normal_shooting": {
+          "before": null,
+          "after": "ac70f60cf0be279517b10edae740d10e3a9767c0df4de4aa4acc1b6fc04b4261"
+        },
+        "test_fortification_fall_back_hazards_follow_each_native_path": {
+          "before": null,
+          "after": "02173391d4bed2431cf49f9bd457177848974bf09161966d7e2cc0cb600724ba"
+        },
+        "test_fortification_native_bloodcrusher_pivot_is_independent_of_waypoint": {
+          "before": null,
+          "after": "fa870024fe6fbf46d236a2d77b743d0b516f371b160e5c7536d34ee0218f72bf"
+        },
+        "test_fortification_native_shallow_crossing_is_independent_of_waypoint": {
+          "before": null,
+          "after": "4e8ba5788d40220bf1e2ece844895076abf3e79cc9d4556a0758e461e13dc4ed"
+        },
+        "test_fortification_survivor_retry_rolls_each_new_crossing_only_once": {
+          "before": null,
+          "after": "0768379b45f7c3dc7e88112bfd475aebd21ac426930a9fcfdffb9a737fb3c7e6"
+        }
+      }
+    },
+    "tests/support/fortification_fixtures.py": {
+      "before_sha256": null,
+      "after_sha256": "17ba56a52cc2db6d3e8a9bc44311d0ad19f84f00996e709aaee88c7d58813e66",
+      "owners": {
+        "@module": {
+          "before": null,
+          "after": "7d83142d7ebe24e2430b2a06c0dab652887dfa05ab512891c05188261618cbd1"
+        },
+        "fortification_ability": {
+          "before": null,
+          "after": "e04c13d66c6753256edb76213c73c31b9f0feeae06b891f48bfcd35f32e9336e"
+        },
+        "with_fortification": {
+          "before": null,
+          "after": "55dc98dd41ffae327398e7756655374c39faff67903ce5f903820a140a07935f"
+        }
+      }
+    },
+    "tools/generate_ability_support_matrix.py": {
+      "before_sha256": "5decd095de6e40d4c30a1d6569c5f2d9591acae808dd1873ea7f9463976a7458",
+      "after_sha256": "441d93670266066e01babea403b48727774ce6e8ffc58c365e23fd069f881d70",
+      "owners": {
+        "_chaos_daemons_nurgle_review_rows": {
+          "before": "2c4581825570f892867834db898f808fd041d5620013eebdcaefe48912c94dad",
+          "after": "8081ea3e55994fb38ae114014f9444f740297ac50f2a326a9f62133a8ad46122"
         }
       }
     }
   },
   "rows": {
-    "scripts/stage4_layout_batch.py": {
-      "category": "measured_workload",
-      "operations": [
-        "stage4-benchmark-entry-reproducer"
-      ],
+    "ci/quality_shards/all.txt": {
+      "category": "governance",
+      "operations": [],
       "selected_families": [],
-      "rationale": "Carries optional choice declarations through prospective page validation for the existing driver.",
+      "rationale": "Verify the exact source admission and generated clause attachment through the existing quality inventory.",
       "source_obligation": null,
       "unchanged_work": null
     },
-    "scripts/stage4_layout_intake.py": {
-      "category": "measured_workload",
-      "operations": [
-        "stage4-benchmark-entry-reproducer"
-      ],
+    "ci/quality_shards/shard-4.txt": {
+      "category": "governance",
+      "operations": [],
       "selected_families": [],
-      "rationale": "Matches declared targets against a single native actor menu option in its exact setup or Command window.",
+      "rationale": "Verify the exact source admission and generated clause attachment through the existing quality inventory.",
       "source_obligation": null,
       "unchanged_work": null
     },
-    "scripts/stage4_layout_intake_checks.py": {
+    "ci/test_shards/durations.json": {
       "category": "measured_workload",
       "operations": [
-        "stage4-benchmark-entry-reproducer"
+        "mfm-current-behavior-profile"
       ],
       "selected_families": [],
-      "rationale": "Exercises menu matching, rejection, request renumbering, and native submission using nonreserve controls.",
+      "rationale": "Regenerate the deterministic twelve-shard schedule from the one complete source-bound covered observation and its exact current case inventory.",
       "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-1.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate the deterministic twelve-shard schedule from the one complete source-bound covered observation and its exact current case inventory.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-10.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate the deterministic twelve-shard schedule from the one complete source-bound covered observation and its exact current case inventory.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-11.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate the deterministic twelve-shard schedule from the one complete source-bound covered observation and its exact current case inventory.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-12.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate the deterministic twelve-shard schedule from the one complete source-bound covered observation and its exact current case inventory.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-2.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate the deterministic twelve-shard schedule from the one complete source-bound covered observation and its exact current case inventory.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-3.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate the deterministic twelve-shard schedule from the one complete source-bound covered observation and its exact current case inventory.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-4.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate the deterministic twelve-shard schedule from the one complete source-bound covered observation and its exact current case inventory.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-5.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate the deterministic twelve-shard schedule from the one complete source-bound covered observation and its exact current case inventory.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-6.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate the deterministic twelve-shard schedule from the one complete source-bound covered observation and its exact current case inventory.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-7.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate the deterministic twelve-shard schedule from the one complete source-bound covered observation and its exact current case inventory.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-8.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate the deterministic twelve-shard schedule from the one complete source-bound covered observation and its exact current case inventory.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-9.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate the deterministic twelve-shard schedule from the one complete source-bound covered observation and its exact current case inventory.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "contracts/examples/persistence/session-persistence.json": {
+      "category": "measured_workload",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh the existing contract examples and manifest to bind the verified engine runtime identity.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "contracts/examples/sessions/session-command-outcome.json": {
+      "category": "measured_workload",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh the existing contract examples and manifest to bind the verified engine runtime identity.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "contracts/examples/sessions/session-command-started.json": {
+      "category": "measured_workload",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh the existing contract examples and manifest to bind the verified engine runtime identity.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "contracts/examples/sessions/session-metadata-created.json": {
+      "category": "measured_workload",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh the existing contract examples and manifest to bind the verified engine runtime identity.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "contracts/examples/support-profile-player-a-redacted.json": {
+      "category": "measured_workload",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh the existing contract examples and manifest to bind the verified engine runtime identity.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "contracts/examples/support-profile-player-b-redacted.json": {
+      "category": "measured_workload",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh the existing contract examples and manifest to bind the verified engine runtime identity.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "contracts/examples/support-profile.json": {
+      "category": "measured_workload",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh the existing contract examples and manifest to bind the verified engine runtime identity.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "contracts/manifest.json": {
+      "category": "measured_workload",
+      "operations": [
+        "issue588-contract-publication"
+      ],
+      "selected_families": [],
+      "rationale": "Refresh the existing contract examples and manifest to bind the verified engine runtime identity.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "data/generated/ability_coverage/cross_source_semantic_equivalence.json": {
+      "category": "measured_workload",
+      "operations": [
+        "phase-end-healing-source-and-report"
+      ],
+      "selected_families": [],
+      "rationale": "Generate the common Fortification semantic support for both official and approved source rows.",
+      "source_obligation": "Use the September official Chaos Daemons Fortification clause and its approved 40k.app source occurrences through the shared engine descriptor.",
+      "unchanged_work": null
+    },
+    "data/source_audits/ci64_provenance_v1/fortification-engagement-test-v1.json": {
+      "category": "measured_workload",
+      "operations": [
+        "fortification-engagement-admission-receipt"
+      ],
+      "selected_families": [],
+      "rationale": "Admit the new Fortification behavioral ownership and exact manifest while preserving the predecessor test and source receipts byte-for-byte.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "data/source_audits/ci64_provenance_v1/fortification-rotation-test-v1.json": {
+      "category": "measured_workload",
+      "operations": [
+        "fortification-rotation-admission-receipt"
+      ],
+      "selected_families": [],
+      "rationale": "Admit the new Fortification behavioral ownership and exact manifest while preserving the predecessor test and source receipts byte-for-byte.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "data/source_audits/ci64_provenance_v1/fortification-survivor-retry-test-v1.json": {
+      "category": "measured_workload",
+      "operations": [
+        "fortification-survivor-retry-receipt"
+      ],
+      "selected_families": [],
+      "rationale": "Bind the five changed runtime owners and the new native regression to the repaired snapshot.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/ADAPTER_DECISION_CONTRACT.md": {
+      "category": "measured_workload",
+      "operations": [
+        "native-ranged-attack-count-reroll"
+      ],
+      "selected_families": [],
+      "rationale": "Document the source-backed Fortification scope and the resulting adapter-visible behavior.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/CROSS_SOURCE_SEMANTIC_EQUIVALENCE.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Document the source-backed Fortification scope and the resulting adapter-visible behavior.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/factions/astra-militarum.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Document the source-backed Fortification scope and the resulting adapter-visible behavior.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/factions/chaos-daemons.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Document the source-backed Fortification scope and the resulting adapter-visible behavior.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/factions/chaos-space-marines.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Document the source-backed Fortification scope and the resulting adapter-visible behavior.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/factions/death-guard.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Document the source-backed Fortification scope and the resulting adapter-visible behavior.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/factions/necrons.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Document the source-backed Fortification scope and the resulting adapter-visible behavior.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/factions/orks.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Document the source-backed Fortification scope and the resulting adapter-visible behavior.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/factions/space-marines.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Document the source-backed Fortification scope and the resulting adapter-visible behavior.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/factions/tau-empire.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Document the source-backed Fortification scope and the resulting adapter-visible behavior.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/performance/current/fortification-97b6deae-dice.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Record the fresh matched samples for the exact #775 base and reviewed repaired runtime.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/performance/current/fortification-97b6deae-movement.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Record the fresh matched samples for the exact #775 base and reviewed repaired runtime.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/performance/current/fortification-97b6deae-reconstruction.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Record the fresh matched samples for the exact #775 base and reviewed repaired runtime.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/performance/current/fortification-97b6deae-setup.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Record the fresh matched samples for the exact #775 base and reviewed repaired runtime.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/performance/current/fortification-97b6deae-shock_reconstruction.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Record the fresh matched samples for the exact #775 base and reviewed repaired runtime.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/performance/current/fortification-97b6deae-visibility.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Record the fresh matched samples for the exact #775 base and reviewed repaired runtime.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/performance/historical/fortification-1244bd49/fortification-1244bd49-dice.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Retain the exact preceding Fortification comparison bytes as historical evidence.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/performance/historical/fortification-1244bd49/fortification-1244bd49-movement.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Retain the exact preceding Fortification comparison bytes as historical evidence.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/performance/historical/fortification-1244bd49/fortification-1244bd49-reconstruction.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Retain the exact preceding Fortification comparison bytes as historical evidence.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/performance/historical/fortification-1244bd49/fortification-1244bd49-setup.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Retain the exact preceding Fortification comparison bytes as historical evidence.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/performance/historical/fortification-1244bd49/fortification-1244bd49-shock_reconstruction.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Retain the exact preceding Fortification comparison bytes as historical evidence.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/performance/historical/fortification-1244bd49/fortification-1244bd49-visibility.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Retain the exact preceding Fortification comparison bytes as historical evidence.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/performance/policy-v3/operation-map.json": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Record the Fortification operation owners without modifying existing registrations.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "scripts/engine_numerical_identity_test_admission.py": {
+      "category": "measured_workload",
+      "operations": [
+        "bounded-charge-flight-wall-proof",
+        "cavalcade-authority-admission",
+        "close-quarters-test-admission",
+        "daemonic-terror-ordered-retreat",
+        "engine-numerical-identity-admission",
+        "gore-hungry-onslaught-predecessor-admission",
+        "native-ranged-attack-count-reroll",
+        "phase-end-healing-test-admission",
+        "pre-roll-charge-flight-test-admission",
+        "round4-battle-shock-event-wounds",
+        "round4-malice-bearer-liveness",
+        "sheathed-in-brass-test-admission",
+        "skulls-beget-blood-test-admission",
+        "stage2-strict-replay-test-admission",
+        "stage3-bolt-of-change-test-admission",
+        "stage3-defender-coherency-test-admission",
+        "stage3-flight-normal-move-test-admission",
+        "stage3-ordinary-melee-test-admission",
+        "wrath-undeniable-test-admission"
+      ],
+      "selected_families": [],
+      "rationale": "Admit the new Fortification behavioral ownership and exact manifest while preserving the predecessor test and source receipts byte-for-byte.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "scripts/fortification_engagement_test_admission.py": {
+      "category": "measured_workload",
+      "operations": [
+        "fortification-engagement-test-admission",
+        "fortification-survivor-retry-admission"
+      ],
+      "selected_families": [],
+      "rationale": "Admit the new Fortification behavioral ownership and exact manifest while preserving the predecessor test and source receipts byte-for-byte.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "scripts/shroud_of_flies_test_admission.py": {
+      "category": "measured_workload",
+      "operations": [
+        "fortification-engagement-test-successor",
+        "fortification-stealth-aura-shroud-of-flies-test-admission"
+      ],
+      "selected_families": [],
+      "rationale": "Admit the new Fortification behavioral ownership and exact manifest while preserving the predecessor test and source receipts byte-for-byte.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "src/warhammer40k_core/_engine_build_manifest.json": {
+      "category": "measured_workload",
+      "operations": [
+        "cavalcade-authority-admission",
+        "phase-end-healing-source-and-report"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerate the canonical runtime identity from the changed source-bound Fortification files.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "src/warhammer40k_core/engine/catalog_contextual_status_consumption.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "fortification-engagement-contextual-consumers",
+        "fortification-engagement-fall-back-context",
+        "order110-action-battle-shock-semantics"
+      ],
+      "selected_families": [
+        "movement",
+        "visibility"
+      ],
+      "rationale": "Consume the source-bound ranged-target and Battle-shocked Fall Back clauses from the canonical rules unit rather than a named datasheet.",
+      "source_obligation": "The same approved Fortification clause appears on the Gnarlmaw and Skull Altar sources.",
+      "unchanged_work": "Existing contextual consumers and source lookup remain in place for every ordinary selection."
+    },
+    "src/warhammer40k_core/engine/desperate_escape_mortal_wounds.py": {
+      "category": "serialization_or_replay_work",
+      "operations": [
+        "cumulative-exact-020",
+        "fortification-engagement-retry-history"
+      ],
+      "selected_families": [
+        "dice",
+        "movement",
+        "reconstruction",
+        "shock_reconstruction"
+      ],
+      "rationale": "Bind each accepted or deferred retry proposal to its actual completed damage packet without rerolling tested survivors or duplicating earlier damage.",
+      "source_obligation": "Use the September official Chaos Daemons Fortification clause and its approved 40k.app source occurrences through the shared engine descriptor.",
+      "unchanged_work": "The existing decision ledger, historical damage authority, and replay entry points remain in use."
+    },
+    "src/warhammer40k_core/engine/movement_decision_authority.py": {
+      "category": "serialization_or_replay_work",
+      "operations": [
+        "desperate-escape-survivor-history"
+      ],
+      "selected_families": [
+        "reconstruction"
+      ],
+      "rationale": "Bind each accepted or deferred retry proposal to its actual completed damage packet without rerolling tested survivors or duplicating earlier damage.",
+      "source_obligation": "Use the September official Chaos Daemons Fortification clause and its approved 40k.app source occurrences through the shared engine descriptor.",
+      "unchanged_work": "The existing decision ledger, historical damage authority, and replay entry points remain in use."
+    },
+    "src/warhammer40k_core/engine/phases/movement_escape_mortals.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemonic-terror-ordered-retreat",
+        "fortification-survivor-retry-movement",
+        "movement-rule-branch"
+      ],
+      "selected_families": [
+        "movement",
+        "reconstruction",
+        "shock_reconstruction"
+      ],
+      "rationale": "Reuse completed per-model hazard rolls and resolve only newly required rolls when the previous damage packet leads to a corrected survivor proposal.",
+      "source_obligation": "Use the September official Chaos Daemons Fortification clause and its approved 40k.app source occurrences through the shared engine descriptor.",
+      "unchanged_work": "A retry uses the original native Fall Back action, packet authority, and damage allocator."
+    },
+    "src/warhammer40k_core/engine/phases/movement_fall_back_embark.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "daemonic-terror-ordered-retreat",
+        "fortification-survivor-retry-movement"
+      ],
+      "selected_families": [
+        "movement",
+        "reconstruction",
+        "shock_reconstruction"
+      ],
+      "rationale": "Preserve the original engaged enemy IDs in the native completed Fall Back evidence.",
+      "source_obligation": "Apply the original Fall Back engagement and each survivor's current crossing through the Fortification clause recorded by the existing native hazard authority.",
+      "unchanged_work": "Movement transitions, casualty authority, and the existing reaction consumer use their established paths."
+    },
+    "src/warhammer40k_core/engine/phases/movement_geometry.py": {
+      "category": "algorithm_or_search",
+      "operations": [
+        "fortification-survivor-retry-movement",
+        "movement-rule-branch"
+      ],
+      "selected_families": [
+        "movement",
+        "reconstruction",
+        "setup",
+        "shock_reconstruction"
+      ],
+      "rationale": "Apply the continuous projected crossing check to the Fortification exemption while preserving the native witness, shortest turn, and body-prism inventory.",
+      "source_obligation": "Use the September official Chaos Daemons Fortification clause and its approved 40k.app source occurrences through the shared engine descriptor.",
+      "unchanged_work": "The representative ordinary move and rejected setup workloads exercise the same existing entry points."
+    },
+    "src/warhammer40k_core/engine/phases/movement_options_dice.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "movement-rule-branch"
+      ],
+      "selected_families": [],
+      "rationale": "Pass the still-untested subset to the existing Desperate Escape dice and modifier flow.",
+      "source_obligation": "Use the September official Chaos Daemons Fortification clause and its approved 40k.app source occurrences through the shared engine descriptor.",
+      "unchanged_work": "Normal movement and already resolved hazards continue through their established dice events."
+    },
+    "src/warhammer40k_core/engine/phases/movement_resolution_flow.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "fortification-survivor-retry-movement",
+        "movement-rule-branch"
+      ],
+      "selected_families": [
+        "movement",
+        "reconstruction",
+        "shock_reconstruction"
+      ],
+      "rationale": "Resolve the pending new requirements before applying corrected survivor movement and retain the ordinary forced Battle-shock ordering.",
+      "source_obligation": "Use the September official Chaos Daemons Fortification clause and its approved 40k.app source occurrences through the shared engine descriptor.",
+      "unchanged_work": "The existing proposal validation, native dice, and shared damage application remain authoritative."
+    },
+    "src/warhammer40k_core/engine/phases/movement_resolvers.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "movement-rule-branch"
+      ],
+      "selected_families": [],
+      "rationale": "Record per-model Fortification exemptions from the resolved native Fall Back witness.",
+      "source_obligation": "Use the September official Chaos Daemons Fortification clause and its approved 40k.app source occurrences through the shared engine descriptor.",
+      "unchanged_work": "Native movement still uses the same endpoint validation and non-Fortification hazard routing."
+    },
+    "src/warhammer40k_core/engine/phases/movement_rules_units.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "fortification-survivor-retry-movement",
+        "movement-rule-branch",
+        "movement-witness-membership-validation"
+      ],
+      "selected_families": [
+        "movement",
+        "reconstruction",
+        "shock_reconstruction"
+      ],
+      "rationale": "Collect per-component Fortification exemptions through the existing rules-unit Fall Back resolver.",
+      "source_obligation": "Use the September official Chaos Daemons Fortification clause and its approved 40k.app source occurrences through the shared engine descriptor.",
+      "unchanged_work": "The established grouped placement and independently forced hazard resolution remain in use."
+    },
+    "src/warhammer40k_core/engine/phases/movement_validation.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "movement-rule-branch"
+      ],
+      "selected_families": [],
+      "rationale": "Validate the exact existing movement payload plus the admitted Fortification exemption field.",
+      "source_obligation": "Use the September official Chaos Daemons Fortification clause and its approved 40k.app source occurrences through the shared engine descriptor.",
+      "unchanged_work": "Ordinary validated proposal and movement result payloads retain their existing authority."
+    },
+    "src/warhammer40k_core/engine/shooting_targets.py": {
+      "category": "hot_query_or_data_structure",
+      "operations": [
+        "order135-visibility-hot-consumers"
+      ],
+      "selected_families": [
+        "visibility"
+      ],
+      "rationale": "Apply ordinary target selection and the hit modifier exception using the source-bound Fortification context while keeping Pistol's own eligibility authoritative.",
+      "source_obligation": "Use the September official Chaos Daemons Fortification clause and its approved 40k.app source occurrences through the shared engine descriptor.",
+      "unchanged_work": "The matched visibility driver uses the identical candidate and line-of-sight query fixture suite."
+    },
+    "src/warhammer40k_core/geometry/physical_predicates.py": {
+      "category": "algorithm_or_search",
+      "operations": [
+        "geometry-search"
+      ],
+      "selected_families": [
+        "movement",
+        "setup",
+        "visibility"
+      ],
+      "rationale": "Compute planar footprint crossing with exact circular sweeps and bounded support refinement for translated and rotating convex bases.",
+      "source_obligation": "Use the September official Chaos Daemons Fortification clause and its approved 40k.app source occurrences through the shared engine descriptor.",
+      "unchanged_work": "Independent ordinary collision predicates and visibility fixtures retain their established shapes and entry points."
+    },
+    "src/warhammer40k_core/rules/rule_parser_selected_target_extensions.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "fortification-engagement-parser"
+      ],
+      "selected_families": [],
+      "rationale": "Compile the recurring Fortification targeting and Fall Back language into the native semantic clauses.",
+      "source_obligation": "Use the September official Chaos Daemons Fortification clause and its approved 40k.app source occurrences through the shared engine descriptor.",
+      "unchanged_work": "Existing matched rule text and catalog normalization use their original parser and resolver routes."
+    },
+    "src/warhammer40k_core/rules/specialized_rule_parser.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "order124-nested-conditions"
+      ],
+      "selected_families": [],
+      "rationale": "Register the source-bound Fortification extension through the existing specialized parser dispatch.",
+      "source_obligation": "Use the September official Chaos Daemons Fortification clause and its approved 40k.app source occurrences through the shared engine descriptor.",
+      "unchanged_work": "Other selected-target clauses and supported catalog rules retain the same dispatch."
+    },
+    "tests/code_quality/test_d07_geometry_containment.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "ci69-qualification-e709350c1a267aaebeb5ffe034def0b7f25722eff69f7007f3bdbf993d1320f1",
+        "fortification-survivor-retry-quality-controls"
+      ],
+      "selected_families": [],
+      "rationale": "Run the D07 authority sensitivity controls against the exact accepted historical geometry.",
+      "source_obligation": "Authenticate the historical accepted D07 snapshot and enforce the original exact mutation boundary.",
+      "unchanged_work": "The verifier and its byte pins, runtime workloads, and external contract comparison driver retain their behavior."
+    },
+    "tests/code_quality/test_engine_numerical_identity_admission.py": {
+      "category": "measured_workload",
+      "operations": [
+        "bounded-charge-flight-wall-proof",
+        "counteroffensive-fight-type",
+        "engine-numerical-identity-admission",
+        "fortification-survivor-retry-admission",
+        "native-ranged-attack-count-reroll",
+        "pre-roll-charge-flight-test-admission",
+        "round4-battle-shock-event-wounds",
+        "round4-malice-bearer-liveness",
+        "skulls-beget-blood-test-admission",
+        "stage3-bolt-of-change-test-admission",
+        "stage3-defender-coherency-test-admission",
+        "stage3-flight-normal-move-test-admission",
+        "stage3-ordinary-melee-test-admission",
+        "wrath-undeniable-test-admission"
+      ],
+      "selected_families": [],
+      "rationale": "Verify the exact source admission and generated clause attachment through the existing quality inventory.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "tests/code_quality/test_generated_ability_support_artifacts.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "fortification-survivor-retry-quality-controls",
+        "supported-vyper-source-regression-controls"
+      ],
+      "selected_families": [],
+      "rationale": "Verify both Fortification source occurrences using their stable IDs from the approved source table.",
+      "source_obligation": "Each generated occurrence must retain the published bridge row and the two shared semantic consumers.",
+      "unchanged_work": "The same generated catalog matrix and independent source-table checks run through the existing quality inventory."
+    },
+    "tests/rules/section09/test_fortification_engagement.py": {
+      "category": "measured_workload",
+      "operations": [
+        "fortification-engagement-native-tests",
+        "fortification-rotation-native-tests"
+      ],
+      "selected_families": [],
+      "rationale": "Exercise the source-bound Fortification clause through native selection, shooting, movement, survivor retries, and analytic crossing controls.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "tests/support/fortification_fixtures.py": {
+      "category": "measured_workload",
+      "operations": [
+        "fortification-engagement-source-fixture"
+      ],
+      "selected_families": [],
+      "rationale": "Exercise the source-bound Fortification clause through native selection, shooting, movement, survivor retries, and analytic crossing controls.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "tools/generate_ability_support_matrix.py": {
+      "category": "measured_workload",
+      "operations": [
+        "phase-end-healing-guide-summary"
+      ],
+      "selected_families": [],
+      "rationale": "Generate the common Fortification semantic support for both official and approved source rows.",
+      "source_obligation": "Use the September official Chaos Daemons Fortification clause and its approved 40k.app source occurrences through the shared engine descriptor.",
       "unchanged_work": null
     }
   },
   "milestone": "ordinary",
-  "comparisons": {},
+  "comparisons": {
+    "dice": "docs/performance/current/fortification-97b6deae-dice.json",
+    "movement": "docs/performance/current/fortification-97b6deae-movement.json",
+    "reconstruction": "docs/performance/current/fortification-97b6deae-reconstruction.json",
+    "setup": "docs/performance/current/fortification-97b6deae-setup.json",
+    "shock_reconstruction": "docs/performance/current/fortification-97b6deae-shock_reconstruction.json",
+    "visibility": "docs/performance/current/fortification-97b6deae-visibility.json"
+  },
   "full_game": null
 }

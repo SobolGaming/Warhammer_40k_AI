@@ -30,6 +30,10 @@ from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
 )
 from warhammer40k_core.engine.battlefield_visibility_context import battlefield_visibility_context
+from warhammer40k_core.engine.catalog_contextual_status_consumption import (
+    CATALOG_IR_FORTIFICATION_TARGET_PERMISSION_CONSUMER_ID,
+    rules_unit_has_fortification_consumer,
+)
 from warhammer40k_core.engine.hidden_detection import hidden_detection_eligible_target_model_ids
 from warhammer40k_core.engine.lone_operative import (
     lone_operative_profile_for_rules_unit,
@@ -1286,11 +1290,12 @@ def _target_engagement_context(
     if set(target_rules_unit.component_unit_instance_ids) & engaged_friendly_unit_ids:
         raise GameLifecycleError("Target engagement context included a target component.")
     engaged_only_by_fortifications = bool(engaged_friendly_unit_ids) and all(
-        _rules_unit_has_fortification_keyword(
+        rules_unit_has_fortification_consumer(
             rules_unit_view_from_armies(
                 armies=scenario.armies,
                 unit_instance_id=friendly_unit_id,
-            )
+            ),
+            CATALOG_IR_FORTIFICATION_TARGET_PERMISSION_CONSUMER_ID,
         )
         for friendly_unit_id in engaged_friendly_unit_ids
     )
@@ -1374,14 +1379,6 @@ def _rules_unit_has_stealth(rules_unit: RulesUnitView) -> bool:
     if type(rules_unit) is not RulesUnitView:
         raise GameLifecycleError("Stealth target lookup requires a rules unit.")
     return rules_unit_has_native_stealth(rules_unit)
-
-
-def _rules_unit_has_fortification_keyword(rules_unit: RulesUnitView) -> bool:
-    if type(rules_unit) is not RulesUnitView:
-        raise GameLifecycleError("Fortification target lookup requires a rules unit.")
-    return all(
-        _unit_has_keyword(component.unit, "FORTIFICATION") for component in rules_unit.components
-    )
 
 
 def _unit_has_keyword(unit: UnitInstance, keyword: str) -> bool:

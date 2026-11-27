@@ -4,6 +4,7 @@ import re
 
 from warhammer40k_core.rules.parsed_tokens import TextSpan
 from warhammer40k_core.rules.rule_ir import (
+    RuleClause,
     RuleCondition,
     RuleConditionKind,
     RuleEffectKind,
@@ -76,22 +77,70 @@ _FORTIFICATION_COVER_RE = re.compile(
     r"has\s+the\s+Benefit\s+of\s+Cover\s+against\s+that\s+attack\b",
     re.IGNORECASE,
 )
-_FORTIFICATION_TARGET_PERMISSION_RE = re.compile(
-    r"\bwhile\s+an\s+enemy\s+unit\s+is\s+only\s+within\s+Engagement\s+Range\s+of\s+"
-    r"one\s+or\s+more\s+Fortifications\s+from\s+your\s+army:\s*-\s*"
+_FORTIFICATION_ENGAGEMENT_RE = re.compile(
+    r"(?P<target>while\s+an\s+enemy\s+unit\s+is\s+only\s+within\s+Engagement\s+Range\s+of\s+"
+    r"one\s+or\s+more\s+Fortifications\s+from\s+your\s+army:\s*[-\u2022\u25a0]\s*"
     r"That\s+unit\s+can\s+still\s+be\s+selected\s+as\s+the\s+target\s+of\s+"
     r"ranged\s+attacks,\s+but\s+each\s+time\s+such\s+an\s+attack\s+is\s+made,\s+"
-    r"unless\s+it\s+is\s+made\s+with\s+a\s+Pistol,\s+subtract\s+1\s+from\s+the\s+"
-    r"Hit\s+roll\b",
-    re.IGNORECASE,
-)
-_FORTIFICATION_DESPERATE_ESCAPE_RE = re.compile(
-    r"\bModels\s+in\s+that\s+unit\s+do\s+not\s+need\s+to\s+take\s+"
+    r"unless\s+it\s+is\s+made\s+with\s+a\s+Pistol(?:\s+weapon)?,\s+"
+    r"subtract\s+1\s+from\s+the\s+Hit\s+roll)\.\s*[-\u2022\u25a0]\s*"
+    r"(?P<escape>Models\s+in\s+that\s+unit\s+(?:do|so)\s+not\s+need\s+to\s+take\s+"
     r"Desperate\s+Escape\s+tests\s+due\s+to\s+Falling\s+Back\s+while\s+"
     r"Battle-shocked,\s+except\s+for\s+those\s+that\s+will\s+move\s+over\s+"
-    r"enemy\s+models\s+when\s+doing\s+so\b",
+    r"enemy\s+models\s+when\s+doing\s+so)\.?",
     re.IGNORECASE,
 )
+
+
+def compile_fortification_engagement_clauses(
+    *, source_id: str, normalized_text: str
+) -> tuple[RuleClause, ...] | None:
+    """Keep the shared engagement qualifier attached to both listed effects."""
+    match = _FORTIFICATION_ENGAGEMENT_RE.fullmatch(normalized_text)
+    if match is None:
+        return None
+    span = TextSpan(text=normalized_text, start=0, end=len(normalized_text))
+    return (
+        RuleClause(
+            clause_id=f"{source_id}:clause:001",
+            source_span=span,
+            template_id="phase17c:contextual-status",
+            effects=(
+                RuleEffectSpec(
+                    kind=RuleEffectKind.SET_CONTEXTUAL_STATUS,
+                    source_span=TextSpan(
+                        text=match["target"], start=match.start("target"), end=match.end("target")
+                    ),
+                    parameters=parameters_from_pairs(
+                        (
+                            ("status", "fortification_engagement_ranged_target_permission"),
+                            ("rules_context", "shooting_target_selection"),
+                            ("source_reference", "friendly_fortifications"),
+                            ("hit_roll_modifier", -1),
+                            ("excluded_weapon_keyword", "PISTOL"),
+                        )
+                    ),
+                ),
+                RuleEffectSpec(
+                    kind=RuleEffectKind.SET_CONTEXTUAL_STATUS,
+                    source_span=TextSpan(
+                        text=match["escape"], start=match.start("escape"), end=match.end("escape")
+                    ),
+                    parameters=parameters_from_pairs(
+                        (
+                            (
+                                "status",
+                                "fortification_engagement_battle_shocked_desperate_escape_exception",
+                            ),
+                            ("rules_context", "fall_back_desperate_escape"),
+                            ("source_reference", "enemy_fortifications"),
+                            ("overflight_exception", True),
+                        )
+                    ),
+                ),
+            ),
+        ),
+    )
 
 
 def parse_selected_target_attack_trigger(
@@ -385,38 +434,6 @@ def parse_fortification_contextual_status_effects(
                             "visibility_predicate",
                             "not_fully_visible_to_every_attacking_model_because_of_source",
                         ),
-                    )
-                ),
-            )
-        )
-    for match in _FORTIFICATION_TARGET_PERMISSION_RE.finditer(text):
-        effects.append(
-            RuleEffectSpec(
-                kind=RuleEffectKind.SET_CONTEXTUAL_STATUS,
-                source_span=_span_from_match(source_span, match),
-                parameters=parameters_from_pairs(
-                    (
-                        ("status", "fortification_engagement_ranged_target_permission"),
-                        ("rules_context", "shooting_target_selection"),
-                        ("source_reference", "friendly_fortifications"),
-                    )
-                ),
-            )
-        )
-    for match in _FORTIFICATION_DESPERATE_ESCAPE_RE.finditer(text):
-        effects.append(
-            RuleEffectSpec(
-                kind=RuleEffectKind.SET_CONTEXTUAL_STATUS,
-                source_span=_span_from_match(source_span, match),
-                parameters=parameters_from_pairs(
-                    (
-                        (
-                            "status",
-                            "fortification_engagement_battle_shocked_desperate_escape_exception",
-                        ),
-                        ("rules_context", "fall_back_desperate_escape"),
-                        ("source_reference", "enemy_fortifications"),
-                        ("overflight_exception", True),
                     )
                 ),
             )

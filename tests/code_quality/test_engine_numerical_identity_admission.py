@@ -12,6 +12,7 @@ import pytest
 from scripts import build_test_shards as sharding
 from scripts import engine_numerical_identity_test_admission as selection
 from scripts import fools_flight_test_admission as fools
+from scripts import fortification_engagement_test_admission as fortification
 from scripts import shroud_of_flies_test_admission as shroud
 from scripts import stage2_ground_charge_test_admission as ground_charge
 from scripts.canonical_circle_test_admission import ADDITION as CIRCLE_ADDITION
@@ -153,7 +154,10 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
     } <= cohort
     assert sum(cohort <= group for group in groups) == 1
     timing_path = "ci/test_shards/durations.json"
-    current = sharding.summary_case_seconds(_record(timing_path))
+    shroud_weights = json.loads(
+        subprocess.check_output(["git", "show", f"{fortification.BASE}:{timing_path}"], cwd=ROOT)
+    )
+    shroud_timing = sharding.summary_case_seconds(shroud_weights)
     # The complete Shroud profile remeasures every case. Compare historical retained
     # costs to the exact snapshot that still used them for dispatch.
     pre_shroud_weights = json.loads(
@@ -584,7 +588,7 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         == hashlib.sha256((ROOT / dark_pact.RECEIPT).read_bytes()).hexdigest()
     )
     assert sum(dark_pact.NEW_TEST in group for group in groups) == 1
-    assert len([node for node in current if node.startswith(dark_pact.NEW_TEST + "::")]) == 21
+    assert len([node for node in shroud_timing if node.startswith(dark_pact.NEW_TEST + "::")]) == 21
     base_weights = json.loads(
         subprocess.check_output(
             ["git", "show", dark_pact.BASE + ":ci/test_shards/durations.json"], cwd=ROOT
@@ -1060,10 +1064,15 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
     assert defender_record["runtime_fingerprint"] == defender_runtime
     assert shroud_record["runtime_manifest"]["before"] == defender_manifest
     assert shroud_record["runtime_fingerprint"]["before"] == defender_runtime
+    shroud_manifest = subprocess.check_output(
+        ["git", "show", f"{fortification.BASE}:{MANIFEST}"], cwd=ROOT
+    )
+    assert shroud_record["runtime_manifest"]["after"] == hashlib.sha256(shroud_manifest).hexdigest()
+    assert (
+        shroud_record["runtime_fingerprint"]["after"] == json.loads(shroud_manifest)["fingerprint"]
+    )
     current_manifest = hashlib.sha256((ROOT / MANIFEST).read_bytes()).hexdigest()
     current_runtime = _record(MANIFEST)["fingerprint"]
-    assert shroud_record["runtime_manifest"]["after"] == current_manifest
-    assert shroud_record["runtime_fingerprint"]["after"] == current_runtime
     assert shroud.shroud_of_flies_runtime(ROOT, defender_manifest, defender_runtime) == (
         current_manifest,
         current_runtime,
@@ -1088,7 +1097,7 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
     )
     shroud_cases = set(shroud_record["added_cases"])
     assert shroud_cases.isdisjoint(pre_shroud_cases)
-    assert current.keys() == pre_shroud_cases.keys() | shroud_cases
+    assert shroud_timing.keys() == pre_shroud_cases.keys() | shroud_cases
     assert all(
         pre_shroud_cases[node] == seconds
         for node, seconds in retained_weights["case_seconds"].items()
@@ -1161,10 +1170,22 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
     for cp_owner in charge_cp["added_files"]:
         assert cp_owner in active_files
         assert sum(cp_owner in group for group in groups) == 1
+    from tools.performance_preflight_successor import read_frozen_blobs
+
+    terror_commit = "f7fcd013ae67b51945beb4dc71c57edbb2b0015e"
+    terror_sources = read_frozen_blobs(ROOT, terror_commit, sorted(terror["source"]))
+    terror_successors = fortification.fortification_historical_source_successors(
+        ROOT,
+        previous_sha256=selection.DAEMONIC_TERROR_TRANSITION_SHA256,
+        previous_sources=terror["source"],
+    )
     for name, change in terror["source"].items():
         original = subprocess.check_output(["git", "show", terror["base"] + ":" + name], cwd=ROOT)
         assert change["before"] == hashlib.sha256(original).hexdigest()
-        assert change["after"] == hashlib.sha256((ROOT / name).read_bytes()).hexdigest()
+        assert change["after"] == hashlib.sha256(terror_sources[name]).hexdigest()
+        successor = terror_successors.get(name)
+        expected_current = change["after"] if successor is None else successor["after"]
+        assert expected_current == hashlib.sha256((ROOT / name).read_bytes()).hexdigest()
     assert selection.DAEMONIC_TERROR_OWNER in active_files
     assert sum(selection.DAEMONIC_TERROR_OWNER in group for group in groups) == 1
     assert ground_charge.NORMAL_MOVE_OWNER in active_files
@@ -1414,49 +1435,57 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         subprocess.check_output(["git", "show", BASE + ":ci/test_shards/durations.json"], cwd=ROOT)
     )
     previous = sharding.summary_case_seconds(prior)
-    added = {node for node in current if node.startswith(selection.OWNER + "::")}
+    added = {node for node in shroud_timing if node.startswith(selection.OWNER + "::")}
     assert len(added) == 28
     successors = _record(selection.ADDITION)["case_id_successors"]
     retained = {successors.get(node, node) for node in previous}
     assert len(retained) == len(previous)
-    staged = {node for node in current if node.startswith(selection.EXACT_MOVEMENT_OWNER + "::")}
+    staged = {
+        node for node in shroud_timing if node.startswith(selection.EXACT_MOVEMENT_OWNER + "::")
+    }
     assert staged
     assert sum(selection.EXACT_MOVEMENT_OWNER in group for group in groups) == 1
-    mixed = {node for node in current if node.startswith(selection.CIRCLE_POLYGON_OWNER + "::")}
+    mixed = {
+        node for node in shroud_timing if node.startswith(selection.CIRCLE_POLYGON_OWNER + "::")
+    }
     assert mixed
     assert sum(selection.CIRCLE_POLYGON_OWNER in group for group in groups) == 1
-    oval = {node for node in current if node.startswith(selection.OVAL_POINT_OWNER + "::")}
+    oval = {node for node in shroud_timing if node.startswith(selection.OVAL_POINT_OWNER + "::")}
     assert oval
     assert sum(selection.OVAL_POINT_OWNER in group for group in groups) == 1
     oval_polygon = {
-        node for node in current if node.startswith(selection.OVAL_POLYGON_OWNER + "::")
+        node for node in shroud_timing if node.startswith(selection.OVAL_POLYGON_OWNER + "::")
     }
     assert oval_polygon
     assert sum(selection.OVAL_POLYGON_OWNER in group for group in groups) == 1
     oval_polygon_gap = {
-        node for node in current if node.startswith(selection.OVAL_POLYGON_GAP_OWNER + "::")
+        node for node in shroud_timing if node.startswith(selection.OVAL_POLYGON_GAP_OWNER + "::")
     }
     assert oval_polygon_gap
     assert sum(selection.OVAL_POLYGON_GAP_OWNER in group for group in groups) == 1
-    circle_oval = {node for node in current if node.startswith(selection.CIRCLE_OVAL_OWNER + "::")}
+    circle_oval = {
+        node for node in shroud_timing if node.startswith(selection.CIRCLE_OVAL_OWNER + "::")
+    }
     assert circle_oval
     assert sum(selection.CIRCLE_OVAL_OWNER in group for group in groups) == 1
     oval_oval = {
-        node for node in current if node.startswith(selection.OVAL_OVAL_TOPOLOGY_OWNER + "::")
+        node for node in shroud_timing if node.startswith(selection.OVAL_OVAL_TOPOLOGY_OWNER + "::")
     }
     assert len(oval_oval) == 24
     assert sum(selection.OVAL_OVAL_TOPOLOGY_OWNER in group for group in groups) == 1
     oval_oval_gap = {
-        node for node in current if node.startswith(selection.OVAL_OVAL_GAP_OWNER + "::")
+        node for node in shroud_timing if node.startswith(selection.OVAL_OVAL_GAP_OWNER + "::")
     }
     assert len(oval_oval_gap) == 27
     assert sum(selection.OVAL_OVAL_GAP_OWNER in group for group in groups) == 1
     oval_oval_witnesses = {
-        node for node in current if node.startswith(selection.OVAL_OVAL_WITNESS_OWNER + "::")
+        node for node in shroud_timing if node.startswith(selection.OVAL_OVAL_WITNESS_OWNER + "::")
     }
     assert len(oval_oval_witnesses) == 7
     assert sum(selection.OVAL_OVAL_WITNESS_OWNER in group for group in groups) == 1
-    oval_codec = {node for node in current if node.startswith(selection.OVAL_CODEC_OWNER + "::")}
+    oval_codec = {
+        node for node in shroud_timing if node.startswith(selection.OVAL_CODEC_OWNER + "::")
+    }
     assert len(oval_codec) == 32
     assert sum(selection.OVAL_CODEC_OWNER in group for group in groups) == 1
     gameplay_prefix = (
@@ -1556,7 +1585,7 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         f"{dark_pact.NEW_TEST}::test_native_overwatch_grant_expires_at_its_own_boundary[{phase_scoped}]"
         for phase_scoped in (True, False)
     )
-    assert current.keys() == (
+    assert shroud_timing.keys() == (
         retained
         | pact_cases
         | added
@@ -1708,9 +1737,56 @@ def test_shroud_transition_rejects_drift_in_the_current_manifest(tmp_path: Path)
     ):
         destination = tmp_path / name
         destination.parent.mkdir(parents=True, exist_ok=True)
-        destination.write_bytes((ROOT / name).read_bytes())
+        destination.write_bytes(
+            subprocess.check_output(["git", "show", f"{fortification.BASE}:{name}"], cwd=ROOT)
+        )
     assert shroud.shroud_of_flies_test_successor(tmp_path) is not None
     target = tmp_path / MANIFEST
     target.write_bytes(target.read_bytes() + b"\n")
     with pytest.raises(SystemExit, match=r"source bytes differ: .*_engine_build_manifest"):
         shroud.shroud_of_flies_test_successor(tmp_path)
+
+
+def test_fortification_transition_rejects_source_and_case_drift(tmp_path: Path) -> None:
+    predecessor = _record(shroud.RECEIPT)
+    parameters = {
+        "predecessor_manifest": predecessor["runtime_manifest"]["after"],
+        "predecessor_fingerprint": predecessor["runtime_fingerprint"]["after"],
+    }
+    members = (
+        fortification.RECEIPT,
+        fortification.ROTATION_RECEIPT,
+        fortification.RETRY_RECEIPT,
+        MANIFEST,
+        fortification.OWNER,
+        *sorted(fortification.SOURCES | fortification.RETRY_SOURCES),
+    )
+    for name in members:
+        path = tmp_path / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes((ROOT / name).read_bytes())
+
+    addition = fortification.fortification_test_addition(tmp_path, **parameters)
+    assert addition is not None
+    receipt, suites, _ = addition
+    assert suites.keys() == {fortification.OWNER}
+    assert fortification.OWNER in sharding.behavioral_selection(ROOT).active_files
+    previous = _record(fortification.RECEIPT)
+    assert receipt["added_cases"][:17] == previous["added_cases"]
+    rotation = _record(fortification.ROTATION_RECEIPT)
+    assert receipt["added_cases"][17:22] == rotation["added_cases"]
+    retry = _record(fortification.RETRY_RECEIPT)
+    assert receipt["added_cases"][22:] == retry["added_cases"]
+    assert len(receipt["added_cases"]) == len(set(receipt["added_cases"])) == 23
+
+    for name in members:
+        path = tmp_path / name
+        original = path.read_bytes()
+        path.write_bytes(original + b"\n")
+        with pytest.raises(SystemExit, match=r"source bytes differ|Cutover member bytes changed"):
+            fortification.fortification_test_addition(tmp_path, **parameters)
+        path.write_bytes(original)
+    with pytest.raises(SystemExit, match="exact Shroud predecessor"):
+        fortification.fortification_test_addition(
+            tmp_path, **{**parameters, "predecessor_fingerprint": "0" * 64}
+        )

@@ -20,6 +20,8 @@ from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.phases.movement_geometry import (
     _desperate_escape_requirements_for_fall_back,
+    _enemy_engaged_unit_ids_for_unit_placement,
+    enemy_fortification_unit_ids,
 )
 from warhammer40k_core.engine.phases.movement_model import (
     AdvanceRollResult,
@@ -245,6 +247,7 @@ def resolve_rules_unit_fall_back_move(
     runtime_modifier_registry: RuntimeModifierRegistry,
     ability_index: AbilityCatalogIndex,
     temporary_movement_keywords: tuple[str, ...],
+    start_engaged_enemy_unit_ids: tuple[str, ...] | None = None,
 ) -> FallBackActionResult:
     resolved = _resolve_rules_unit_move(
         state=state,
@@ -264,14 +267,24 @@ def resolve_rules_unit_fall_back_move(
         ability_index=ability_index,
         temporary_movement_keywords=temporary_movement_keywords,
     )
+    if start_engaged_enemy_unit_ids is None:
+        start_engaged_enemy_unit_ids = _enemy_engaged_unit_ids_for_unit_placement(
+            scenario=scenario,
+            unit_placement=before.component_unit_placements[0],
+            ruleset_descriptor=ruleset_descriptor,
+        )
+    fortifications = enemy_fortification_unit_ids(
+        scenario=scenario, engaged_enemy_unit_ids=start_engaged_enemy_unit_ids
+    )
+    only_engaged_with_fortifications = bool(fortifications) and (
+        fortifications == start_engaged_enemy_unit_ids
+    )
     shocked_ids = set(battle_shocked_unit_ids)
     if rules_unit.unit_instance_id in shocked_ids:
         shocked_ids.update(rules_unit.component_unit_instance_ids)
     auto_pass_ids = set(resolved.desperate_escape_auto_pass_model_ids)
-    requirements = tuple(
-        requirement
-        for component in before.component_unit_placements
-        for requirement in _desperate_escape_requirements_for_fall_back(
+    component_hazards = tuple(
+        _desperate_escape_requirements_for_fall_back(
             scenario=scenario,
             ruleset_descriptor=ruleset_descriptor,
             unit_placement=component,
@@ -280,6 +293,7 @@ def resolve_rules_unit_fall_back_move(
             battle_round=battle_round,
             battle_shocked_unit_ids=tuple(sorted(shocked_ids)),
             forced_desperate_escape_source_rule_ids=forced_desperate_escape_source_rule_ids,
+            only_engaged_with_fortifications=only_engaged_with_fortifications,
             overflight_auto_pass_model_ids=tuple(
                 sorted(
                     placement.model_instance_id
@@ -288,6 +302,17 @@ def resolve_rules_unit_fall_back_move(
                 )
             ),
         )
+        for component in before.component_unit_placements
+    )
+    requirements = tuple(
+        requirement
+        for component_requirements, _ in component_hazards
+        for requirement in component_requirements
+    )
+    exempt_model_ids = sorted(
+        model_id
+        for _, component_exempt_ids in component_hazards
+        for model_id in component_exempt_ids
     )
     movement_payload = {
         **resolved.movement_payload,
@@ -300,6 +325,14 @@ def resolve_rules_unit_fall_back_move(
         "desperate_escape_rolls": [],
         "desperate_escape_auto_pass_model_ids": validate_json_value(sorted(auto_pass_ids)),
     }
+    if fortifications:
+        movement_payload["start_engaged_enemy_unit_instance_ids"] = list(
+            start_engaged_enemy_unit_ids
+        )
+    if exempt_model_ids:
+        movement_payload["fortification_desperate_escape_exempt_model_ids"] = validate_json_value(
+            exempt_model_ids
+        )
     if forced_desperate_escape_source_rule_ids:
         movement_payload["forced_desperate_escape_source_rule_ids"] = list(
             forced_desperate_escape_source_rule_ids

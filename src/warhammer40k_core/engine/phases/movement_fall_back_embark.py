@@ -308,16 +308,22 @@ def _apply_fall_back_result(
         prior_outcome_casualty_ids=prior_outcome_ids,
         mortal_wound_application=mortal_wound_application,
     )
-    engagement_placement = (
-        unit_placement
-        if isinstance(unit_placement, UnitPlacement)
-        else unit_placement.component_unit_placements[0]
+    from warhammer40k_core.engine.phases.movement_escape_mortals import (
+        recorded_fall_back_start_engagement,
     )
-    start_engaged_enemy_unit_ids = _enemy_engaged_unit_ids_for_unit_placement(
-        scenario=scenario,
-        unit_placement=engagement_placement,
-        ruleset_descriptor=ruleset_descriptor,
-    )
+
+    start_engaged_enemy_unit_ids = recorded_fall_back_start_engagement(fall_back_result)
+    if start_engaged_enemy_unit_ids is None:
+        engagement_placement = (
+            unit_placement
+            if isinstance(unit_placement, UnitPlacement)
+            else unit_placement.component_unit_placements[0]
+        )
+        start_engaged_enemy_unit_ids = _enemy_engaged_unit_ids_for_unit_placement(
+            scenario=scenario,
+            unit_placement=engagement_placement,
+            ruleset_descriptor=ruleset_descriptor,
+        )
     attempted = surviving_placement
     if attempted is None:
         updated_battlefield = battlefield_state

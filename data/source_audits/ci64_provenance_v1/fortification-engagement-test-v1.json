@@ -1,0 +1,66 @@
+{
+  "added_cases": [
+    "tests/rules/section09/test_fortification_engagement.py::test_fortification_fall_back_hazards_follow_each_native_path[000001470-False-True-True-False-1]",
+    "tests/rules/section09/test_fortification_engagement.py::test_fortification_fall_back_hazards_follow_each_native_path[000001470-False-False-True-False-0]",
+    "tests/rules/section09/test_fortification_engagement.py::test_fortification_fall_back_hazards_follow_each_native_path[000001470-True-True-True-False-2]",
+    "tests/rules/section09/test_fortification_engagement.py::test_fortification_fall_back_hazards_follow_each_native_path[000001470-False-True-False-False-2]",
+    "tests/rules/section09/test_fortification_engagement.py::test_fortification_fall_back_hazards_follow_each_native_path[000001588-False-True-True-False-1]",
+    "tests/rules/section09/test_fortification_engagement.py::test_fortification_fall_back_hazards_follow_each_native_path[None-False-True-True-False-2]",
+    "tests/rules/section09/test_fortification_engagement.py::test_fortification_fall_back_hazards_follow_each_native_path[000001470-False-True-True-True-2]",
+    "tests/rules/section09/test_fortification_engagement.py::test_fortification_engagement_through_normal_shooting[000001470-False-avenger-shuriken-catapult--1]",
+    "tests/rules/section09/test_fortification_engagement.py::test_fortification_engagement_through_normal_shooting[000001470-False-shuriken-pistol-0]",
+    "tests/rules/section09/test_fortification_engagement.py::test_fortification_engagement_through_normal_shooting[000001470-True-avenger-shuriken-catapult-None]",
+    "tests/rules/section09/test_fortification_engagement.py::test_fortification_engagement_through_normal_shooting[000001470-True-shuriken-pistol-None]",
+    "tests/rules/section09/test_fortification_engagement.py::test_fortification_engagement_through_normal_shooting[000001588-False-avenger-shuriken-catapult--1]",
+    "tests/rules/section09/test_fortification_engagement.py::test_fortification_engagement_through_normal_shooting[None-False-avenger-shuriken-catapult-None]",
+    "tests/rules/section09/test_fortification_engagement.py::test_fortification_native_shallow_crossing_is_independent_of_waypoint",
+    "tests/rules/section09/test_fortification_engagement.py::test_fortification_crossing_uses_planar_body_projection_and_strict_clearance",
+    "tests/rules/section09/test_fortification_engagement.py::test_fortification_survivor_retry_rolls_each_new_crossing_only_once[pass]",
+    "tests/rules/section09/test_fortification_engagement.py::test_fortification_survivor_retry_rolls_each_new_crossing_only_once[fail]"
+  ],
+  "added_files": {
+    "tests/rules/section09/test_fortification_engagement.py": {
+      "blob_sha1": "7f4e9d23dd8f52f53e030ab24e1a2ecd59484489",
+      "bytes": 26318,
+      "mode": "100644",
+      "sha256": "8bac820ff92fea3a4f09227a6d9f2aa9e974148b3df50f2f33d100c5a40866f5"
+    }
+  },
+  "base": "767c5f2a09f10ec1fe6216ac2c3785fe12f48670",
+  "historical_sources": {
+    "68e641b2079eaeff94bc4c0724d5662293682512e276bd72dfbf936b60b64c2e": {
+      "src/warhammer40k_core/engine/movement_decision_authority.py": "8397bb5f30fd3560708cff3067758bb698e6d99d12dc7bd1a97f3e6f3e478b28",
+      "src/warhammer40k_core/engine/phases/movement_escape_mortals.py": "a6628a5a662f70acd4e84dd70e545af9891b0c5ed72e2d5337254d8a87445668"
+    },
+    "6f854ba2aad31c2ff3d84343151692174d492356cac79afeed1c6105a2f72ead": {
+      "src/warhammer40k_core/engine/phases/movement_resolution_flow.py": "2e71792a4984f45cda1e09d25edd7e20a4522c25428daf25098549f8697671a9"
+    }
+  },
+  "retained_shroud_sha256": "f2b0af28e69590b1289ee63780398c48c9165ed08aa27a15ff641ca5fb002934",
+  "runtime_fingerprint": {
+    "after": "6b4759f62bfbcdc13f8100ffae35cfe11c60853295f879ae5adc34bb847e20d5",
+    "before": "1d2913f1ceadb54f99022d8cf1e835c7e0567c6fa73eea0705ac85fe9d94a5c9"
+  },
+  "runtime_manifest": {
+    "after": "cd6f66d11f2df45f097c5ea2d046dd6349f0335ad69729801aa0973683623fc9",
+    "before": "0ff2069ea62022e6045ee8d2bbbbdc61f58d7bee181d88832494e3638dd9013b"
+  },
+  "schema": "finite-fortification-engagement-test-v1",
+  "sources": {
+    "src/warhammer40k_core/engine/catalog_contextual_status_consumption.py": "80da4d0a22190839b6f7ad381eecc9fb69b74778ca7d6aa36568bfb4dbb16159",
+    "src/warhammer40k_core/engine/desperate_escape_mortal_wounds.py": "2720f4125265a8345307d7d91a1f1536df4920925551959d12efb350ea9919ef",
+    "src/warhammer40k_core/engine/movement_decision_authority.py": "25e0e019e70656ba23a34a060b4cf9758f3e0ce4911146f69407c4b612752f31",
+    "src/warhammer40k_core/engine/phases/movement_escape_mortals.py": "77e2bb097412cda1ae84581119c240a99af7829681454b6f2f053cf6dd7f489b",
+    "src/warhammer40k_core/engine/phases/movement_geometry.py": "3123bd8207f6f1ff61e3b284af0fe2cbd1c0c99fe3755e9a9271faa5253ab2bb",
+    "src/warhammer40k_core/engine/phases/movement_options_dice.py": "391b78292c6979635af9360fe7af83fb8ae271bc2450f7fd0f0329f920fad25e",
+    "src/warhammer40k_core/engine/phases/movement_resolution_flow.py": "e3084f7adf18665f44e7ea390734edefad50e15b2d16b25e699ca08e671ea7f9",
+    "src/warhammer40k_core/engine/phases/movement_resolvers.py": "357ff0b46806214962282373a168a1a3adce0af52ce8746494dec4b4c9b0e5d5",
+    "src/warhammer40k_core/engine/phases/movement_rules_units.py": "b28df2aa7d9bfc7467f21cb4a69f4f526083b14d7eebffc2afd7f57ae09e9c1d",
+    "src/warhammer40k_core/engine/phases/movement_validation.py": "c4b99f65f6f65b84b6644d5e6a8af940a25b74001b9917285061c5c90e02dc12",
+    "src/warhammer40k_core/engine/shooting_targets.py": "c3f177dc2565afd7db3e21efea05608d85376ef79d953bc748f9e205666f3778",
+    "src/warhammer40k_core/geometry/physical_predicates.py": "e3e08dbde475eae011e28d143df542d094a0e1762cc5f05df4b29b7d8cb46a30",
+    "src/warhammer40k_core/rules/rule_parser_selected_target_extensions.py": "626d2225a9070cafc51a702c89df7853b8410a576b81beed28103002dd7f03e1",
+    "src/warhammer40k_core/rules/specialized_rule_parser.py": "47b10f4514f10861b2cab80e7e822aa60481f8c81038623ed20d9ccd88401b20",
+    "tests/support/fortification_fixtures.py": "17ba56a52cc2db6d3e8a9bc44311d0ad19f84f00996e709aaee88c7d58813e66"
+  }
+}

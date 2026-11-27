@@ -807,10 +807,19 @@ def _gore_hungry_onslaught_transition(root: Path) -> tuple[_GoreOnslaughtTransit
         )
     ):
         raise SystemExit("Gore-Hungry Onslaught test transition differs.")
+    from scripts.fortification_engagement_test_admission import (
+        fortification_historical_source_successors,
+    )
+
+    successors = fortification_historical_source_successors(
+        root,
+        previous_sha256=GORE_HUNGRY_ONSLAUGHT_SHA256,
+        previous_sources=record["historical_sources"],
+    )
     for source, binding in record["historical_sources"].items():
         if binding.keys() != {"before", "after"} or binding["before"] == binding["after"]:
             raise SystemExit("Gore-Hungry Onslaught historical source binding differs: " + source)
-        _checked_bytes(root, source, binding["after"])
+        _retained_source(root, source, binding["after"], successors)
     return record, raw
 
 
@@ -1432,8 +1441,15 @@ def _daemonic_terror_transition(root: Path) -> tuple[_DaemonicTerrorTransition, 
         )
     ):
         raise SystemExit("Daemonic Terror ordered retreat test admission differs.")
+    from scripts.fortification_engagement_test_admission import (
+        fortification_historical_source_successors,
+    )
+
+    successors = fortification_historical_source_successors(
+        root, previous_sha256=DAEMONIC_TERROR_TRANSITION_SHA256, previous_sources=record["source"]
+    )
     for name, change in record["source"].items():
-        _checked_bytes(root, name, change["after"])
+        _retained_source(root, name, change["after"], successors)
     return record, raw
 
 
@@ -2693,6 +2709,19 @@ def exact_movement_test_transition(
             raise SystemExit("Shroud of Flies tests overlap the predecessor selection.")
         updated[SHROUD_OF_FLIES_OWNER] = shroud[0]["test"]["after"]
         raw += b"\0" + shroud[1]
+        from scripts.fortification_engagement_test_admission import fortification_test_addition
+
+        fortification = fortification_test_addition(
+            root,
+            predecessor_manifest=shroud[0]["runtime_manifest"]["after"],
+            predecessor_fingerprint=shroud[0]["runtime_fingerprint"]["after"],
+        )
+        if fortification is not None:
+            _, fortification_tests, fortification_raw = fortification
+            if fortification_tests.keys() & (updated.keys() | added.keys() | additions.keys()):
+                raise SystemExit("Fortification tests overlap the predecessor selection.")
+            additions.update(fortification_tests)
+            raw += b"\0" + fortification_raw
     return updated, {**added, **additions}, retained_raw + b"\0" + raw
 
 

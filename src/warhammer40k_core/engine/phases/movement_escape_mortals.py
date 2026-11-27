@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import replace
+from dataclasses import dataclass, replace
 from typing import TYPE_CHECKING, cast
 
 from warhammer40k_core.engine.battlefield_state import UnitPlacement
@@ -15,12 +15,19 @@ from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult, DecisionResultPayload
 from warhammer40k_core.engine.desperate_escape_mortal_wounds import (
     CONTINUED,
+    RETRY_PACKET_KEY,
+    completed_escape_hazard_chain,
     pending_escape_movement,
 )
 from warhammer40k_core.engine.event_log import EventRecord, JsonValue, validate_json_value
 from warhammer40k_core.engine.movement_proposals import MovementProposalRequest
 from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus
-from warhammer40k_core.engine.phases.movement_model import FallBackActionResultPayload
+from warhammer40k_core.engine.phases.movement_model import (
+    DesperateEscapeRequirement,
+    DesperateEscapeRoll,
+    FallBackActionResultPayload,
+    FallBackModeKind,
+)
 from warhammer40k_core.engine.phases.movement_state import FallBackActionResult
 from warhammer40k_core.engine.rules_unit_placement import RulesUnitPlacement
 from warhammer40k_core.geometry.pathing import PathWitness
@@ -113,9 +120,6 @@ def _object(source: dict[str, JsonValue], key: str) -> dict[str, JsonValue]:
     return value
 
 
-RETRY_PACKET_KEY = "desperate_escape_completed_packet_id"
-
-
 def request_escape_survivor_retry(
     *,
     state: GameState,
@@ -158,34 +162,56 @@ def request_escape_survivor_retry(
     )
 
 
+@dataclass(frozen=True, slots=True)
+class CompletedEscapeRetry:
+    packet_id: str
+    application: MortalWoundApplication
+    saved_rolls: tuple[DesperateEscapeRoll, ...]
+    start_engaged_enemy_unit_ids: tuple[str, ...] | None
+
+    def untested_requirements(
+        self, resolution: FallBackActionResult
+    ) -> tuple[DesperateEscapeRequirement, ...]:
+        tested_ids = {roll.requirement.model_instance_id for roll in self.saved_rolls}
+        return tuple(
+            requirement
+            for requirement in resolution.desperate_escape_requirements
+            if requirement.model_instance_id not in tested_ids
+        )
+
+    def with_new_rolls(
+        self, resolution: FallBackActionResult, new_rolls: tuple[DesperateEscapeRoll, ...]
+    ) -> FallBackActionResult:
+        rolls_by_model = {
+            roll.requirement.model_instance_id: roll for roll in (*self.saved_rolls, *new_rolls)
+        }
+        return FallBackActionResult.with_desperate_escape_rolls(
+            resolution=resolution,
+            desperate_escape_rolls=tuple(
+                replace(rolls_by_model[requirement.model_instance_id], requirement=requirement)
+                for requirement in resolution.desperate_escape_requirements
+            ),
+        )
+
+
 def completed_escape_retry(
     *,
     state: GameState,
     decisions: DecisionController,
     proposal: MovementProposalRequest,
-    resolution: FallBackActionResult,
-) -> tuple[FallBackActionResult, MortalWoundApplication] | None:
-    from warhammer40k_core.engine.desperate_escape_mortal_wounds import RESOLVED
-
+    fall_back_mode: FallBackModeKind,
+) -> CompletedEscapeRetry | None:
     packet_id = (proposal.context or {}).get(RETRY_PACKET_KEY)
     if packet_id is None:
         return None
     if not isinstance(packet_id, str):
         raise GameLifecycleError("Hazard survivor retry requires its completed packet ID.")
-    sources = [
-        e.payload
-        for e in decisions.event_log.records
-        if e.event_type == RESOLVED
-        and isinstance(e.payload, dict)
-        and e.payload.get("application_id") == packet_id
-    ]
-    if len(sources) != 1:
-        raise GameLifecycleError("Hazard survivor retry lacks a unique completed packet.")
-    source = sources[0]
-    original = FallBackActionResult.from_payload(
-        cast(FallBackActionResultPayload, _object(source, "fall_back_result")),
-        certified_paths=True,
+    chain = completed_escape_hazard_chain(
+        application_id=packet_id,
+        event_records=decisions.event_log.records,
+        requests={record.request.request_id: record.request for record in decisions.records},
     )
+    source = chain[0]
     action = DecisionResult.from_payload(
         cast(DecisionResultPayload, _object(source, "action_result"))
     )
@@ -196,36 +222,56 @@ def completed_escape_retry(
     if (
         movement is None
         or movement.active_selection is None
-        or movement.active_selection.unit_instance_id != original.unit_instance_id
-        or proposal.unit_instance_id != original.unit_instance_id
+        or movement.active_selection.unit_instance_id != source.get("unit_instance_id")
+        or proposal.unit_instance_id != source.get("unit_instance_id")
         or proposal.actor_id != action.actor_id
         or proposal.source_decision_request_id != action.request_id
         or proposal.source_decision_result_id != action.result_id
-        or resolution.movement_payload.get("fall_back_mode")
-        != original.movement_payload.get("fall_back_mode")
-        or application.target_unit_instance_id != original.unit_instance_id
+        or application.target_unit_instance_id != proposal.unit_instance_id
     ):
         raise GameLifecycleError("Hazard survivor retry source or selection drift.")
-    rolls = {r.requirement.model_instance_id: r for r in original.desperate_escape_rolls}
-    if any(r.model_instance_id not in rolls for r in resolution.desperate_escape_requirements):
-        raise GameLifecycleError("Hazard survivor retry introduced an untested model.")
-    # A new legal witness may change overflight details. Preserve each model's
-    # actual die and modifiers; the immutable original packet retains the first witness.
-    saved_rolls = tuple(
-        replace(rolls[r.model_instance_id], requirement=r)
-        for r in resolution.desperate_escape_requirements
+    rolls: dict[str, DesperateEscapeRoll] = {}
+    start_engaged_enemy_unit_ids = None
+    for completed in reversed(chain):
+        original = FallBackActionResult.from_payload(
+            cast(FallBackActionResultPayload, _object(completed, "fall_back_result")),
+            certified_paths=True,
+        )
+        if original.movement_payload.get("fall_back_mode") != fall_back_mode.value:
+            raise GameLifecycleError("Hazard survivor retry mode drifted.")
+        engagement = recorded_fall_back_start_engagement(original)
+        if completed is chain[-1]:
+            start_engaged_enemy_unit_ids = engagement
+        elif engagement != start_engaged_enemy_unit_ids:
+            raise GameLifecycleError("Hazard survivor retry start engagement drifted.")
+        for recorded_roll in original.desperate_escape_rolls:
+            requirement = recorded_roll.requirement
+            prior = rolls.setdefault(requirement.model_instance_id, recorded_roll)
+            if replace(prior, requirement=requirement) != recorded_roll:
+                raise GameLifecycleError("Hazard survivor retry roll receipt drifted.")
+    # A retry can change a requirement's crossing details. Keep each physical die
+    # and the action's original engagement through casualties and restoration.
+    return CompletedEscapeRetry(
+        packet_id, application, tuple(rolls.values()), start_engaged_enemy_unit_ids
     )
-    resolution = FallBackActionResult.with_desperate_escape_rolls(
-        resolution=resolution,
-        desperate_escape_rolls=saved_rolls,
-    )
-    return replace(
-        resolution,
-        movement_payload={
-            **resolution.movement_payload,
-            "desperate_escape_mortal_application_id": packet_id,
-        },
-    ), application
+
+
+def recorded_fall_back_start_engagement(
+    resolution: FallBackActionResult,
+) -> tuple[str, ...] | None:
+    key = "start_engaged_enemy_unit_instance_ids"
+    payload = resolution.movement_payload
+    if key not in payload:
+        return None
+    enemies = payload[key]
+    if not isinstance(enemies, list) or not all(
+        isinstance(enemy, str) and enemy for enemy in enemies
+    ):
+        raise GameLifecycleError("Fall Back has invalid start engagement evidence.")
+    enemy_ids = tuple(cast(list[str], enemies))
+    if enemy_ids != tuple(sorted(set(enemy_ids))):
+        raise GameLifecycleError("Fall Back start engagement evidence must be sorted and unique.")
+    return enemy_ids
 
 
 def witnessed_escape_start(resolution: FallBackActionResult) -> UnitPlacement | RulesUnitPlacement:

@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING, cast
+
+from warhammer40k_core.core.datasheet import CatalogAbilitySupport
 from warhammer40k_core.engine.catalog_self_hit_thresholds import charged_melee_self_threshold
 from warhammer40k_core.engine.mission_action_battle_shock import (
     ACTION_BATTLE_SHOCK_CONSUMER_ID,
@@ -12,9 +15,14 @@ from warhammer40k_core.rules.rule_ir import (
     RuleConditionKind,
     RuleEffectKind,
     RuleEffectSpec,
+    RuleIR,
+    RuleIRPayload,
     RuleTargetKind,
     parameter_payload,
 )
+
+if TYPE_CHECKING:
+    from warhammer40k_core.engine.rules_units import RulesUnitView
 
 CATALOG_IR_CRITICAL_HIT_THRESHOLD_CONSUMER_ID = "catalog-ir:critical-hit-threshold"
 CATALOG_IR_HIT_ROLL_REROLL_CONSUMER_ID = "catalog-ir:hit-roll-reroll"
@@ -127,6 +135,22 @@ def hook_ids_for_effect(effect: RuleEffectSpec) -> tuple[str, ...]:
     if _effect_is_fortification_desperate_escape(effect):
         return (CATALOG_IR_FORTIFICATION_DESPERATE_ESCAPE_CONSUMER_ID,)
     return ()
+
+
+def rules_unit_has_fortification_consumer(rules_unit: RulesUnitView, consumer_id: str) -> bool:
+    return all(
+        "FORTIFICATION" in component.unit.keywords
+        and any(
+            consumer_id in hook_ids_for_effect(effect)
+            for descriptor in component.unit.datasheet_abilities
+            if descriptor.support is CatalogAbilitySupport.GENERIC_RULE_IR
+            for clause in RuleIR.from_payload(
+                cast(RuleIRPayload, descriptor.rule_ir_payload)
+            ).clauses
+            for effect in clause.effects
+        )
+        for component in rules_unit.components
+    )
 
 
 def aura_attack_roll_reroll_consumer_ids_for_clause(clause: RuleClause) -> tuple[str, ...]:
@@ -285,6 +309,9 @@ def _effect_is_fortification_target_permission(effect: RuleEffectSpec) -> bool:
     return (
         parameters.get("status") == "fortification_engagement_ranged_target_permission"
         and parameters.get("rules_context") == "shooting_target_selection"
+        and parameters.get("source_reference") == "friendly_fortifications"
+        and parameters.get("hit_roll_modifier") == -1
+        and parameters.get("excluded_weapon_keyword") == "PISTOL"
     )
 
 
@@ -302,6 +329,7 @@ def _effect_is_fortification_desperate_escape(effect: RuleEffectSpec) -> bool:
         parameters.get("status")
         == "fortification_engagement_battle_shocked_desperate_escape_exception"
         and parameters.get("rules_context") == "fall_back_desperate_escape"
+        and parameters.get("source_reference") == "enemy_fortifications"
         and parameters.get("overflight_exception") is True
     )
 

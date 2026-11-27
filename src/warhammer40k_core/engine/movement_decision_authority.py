@@ -772,25 +772,22 @@ def _hazard_completion_proposal_records(
     )
     if len(candidates) <= 1:
         return candidates
-    from warhammer40k_core.engine.desperate_escape_mortal_wounds import RESOLVED
+    from warhammer40k_core.engine.desperate_escape_mortal_wounds import (
+        RETRY_PACKET_KEY,
+        completed_escape_hazard_chain,
+    )
 
     by_request = {record.request.request_id: record for record in proposal_records}
-    packets = [
-        event.payload
-        for event in event_records
-        if event.event_type == RESOLVED
-        and isinstance(event.payload, dict)
-        and event.payload.get("application_id")
-        == payload.get("desperate_escape_mortal_application_id")
-    ]
-    if len(packets) != 1:
-        raise GameLifecycleError("Movement survivor retry hazard root is missing.")
-    # _completion_witness authenticates this packet's complete source against
-    # shared mortal-wound authority. Its original proposal roots only the later
-    # survivor chain; ordinary corrected proposals may precede that root.
-    root_id = _payload_string(packets[0], "movement_proposal_request_id")
-    if root_id not in by_request:
-        raise GameLifecycleError("Movement survivor retry original proposal is missing.")
+    application_id = _payload_string(payload, "desperate_escape_mortal_application_id")
+    chain = completed_escape_hazard_chain(
+        application_id=application_id,
+        event_records=event_records,
+        requests={key: record.request for key, record in by_request.items()},
+    )
+    # The original packet roots the retry chain even if a later witness
+    # produced new damage. _completion_witness authenticates the last packet.
+    root_id = _payload_string(chain[-1], "movement_proposal_request_id")
+    packet_ids = {_payload_string(packet, "application_id") for packet in chain}
     root_requests = [
         index
         for index, event in enumerate(event_records)
@@ -801,22 +798,26 @@ def _hazard_completion_proposal_records(
         raise GameLifecycleError("Movement survivor retry original request drifted.")
     root_index = root_requests[0]
     links: dict[str, str] = {}
-    seen_requests: set[str] = set()
+    requested_at: dict[str, int] = {}
     for index, event in enumerate(event_records):
         row = event.payload
         if event.event_type != "movement_proposal_requested" or not isinstance(row, dict):
             continue
         request_id = row.get("request_id")
         previous = row.get("previous_proposal_request_id")
-        if not isinstance(request_id, str) or request_id not in by_request or previous is None:
+        if not isinstance(request_id, str) or request_id not in by_request:
+            continue
+        if request_id in requested_at:
+            raise GameLifecycleError("Movement survivor proposal request is duplicated.")
+        requested_at[request_id] = index
+        if previous is None:
             continue
         if (
             not isinstance(previous, str)
-            or previous not in by_request
-            or request_id in seen_requests
+            or previous not in requested_at
+            or requested_at[previous] == index
         ):
             raise GameLifecycleError("Movement survivor retry chain drifted.")
-        seen_requests.add(request_id)
         record = by_request[request_id]
         predecessor = by_request[previous]
         request = MovementProposalRequest.from_decision_request_payload(record.request.payload)
@@ -840,22 +841,26 @@ def _hazard_completion_proposal_records(
             ):
                 raise GameLifecycleError("Movement survivor ordinary retry prefix drifted.")
             continue
-        if request.context is None or request.context.get(
-            "desperate_escape_completed_packet_id"
-        ) != payload.get("desperate_escape_mortal_application_id"):
+        packet_id = (request.context or {}).get(RETRY_PACKET_KEY)
+        if not isinstance(packet_id, str) or packet_id not in packet_ids:
             raise GameLifecycleError("Movement survivor retry packet context drifted.")
+        if predecessor_rejected:
+            predecessor_context = MovementProposalRequest.from_decision_request_payload(
+                predecessor.request.payload
+            ).context
+            if (predecessor_context or {}).get(RETRY_PACKET_KEY) != packet_id:
+                raise GameLifecycleError("Movement survivor retry changed its completed packet.")
         if not predecessor_rejected:
             failures = [
                 e
-                for e in event_records[:index]
+                for e in event_records[requested_at[previous] + 1 : index]
                 if e.event_type == "movement_action_invalid"
                 and isinstance(e.payload, dict)
                 and e.payload.get("request_id") == request.source_decision_request_id
                 and e.payload.get("result_id") == request.source_decision_result_id
                 and e.payload.get("unit_instance_id") == request.unit_instance_id
                 and e.payload.get("violation_code") == "unit_coherency_broken"
-                and e.payload.get("desperate_escape_mortal_application_id")
-                == payload.get("desperate_escape_mortal_application_id")
+                and e.payload.get("desperate_escape_mortal_application_id") == packet_id
             ]
             if (
                 len(failures) != 1

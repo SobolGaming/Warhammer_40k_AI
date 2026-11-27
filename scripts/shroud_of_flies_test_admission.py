@@ -11,6 +11,10 @@ from scripts.behavioral_selection_members import (
     _selection_no_links,  # pyright: ignore[reportPrivateUsage]
     _selection_object,  # pyright: ignore[reportPrivateUsage]
 )
+from scripts.fortification_engagement_test_admission import (
+    FortificationTestReceipt,
+    fortification_test_addition,
+)
 from scripts.milli_inch_test_admission import MANIFEST, RETAINED_CUTOVER_SHA256
 from scripts.stage3_defender_coherency_test_admission import RECEIPT_SHA256 as DEFENDER_SHA256
 
@@ -80,12 +84,13 @@ def shroud_of_flies_test_successor(
         )
     ):
         raise SystemExit("Shroud of Flies test admission inventory differs.")
-    manifest = _checked_bytes(root, MANIFEST, receipt["runtime_manifest"]["after"])
-    if (
-        json.loads(manifest, object_pairs_hook=_selection_object)["fingerprint"]
-        != (receipt["runtime_fingerprint"]["after"])
-    ):
-        raise SystemExit("Shroud of Flies current runtime fingerprint differs from its manifest.")
+    if _fortification_successor(root, receipt) is None:
+        manifest = _checked_bytes(root, MANIFEST, receipt["runtime_manifest"]["after"])
+        if (
+            json.loads(manifest, object_pairs_hook=_selection_object)["fingerprint"]
+            != (receipt["runtime_fingerprint"]["after"])
+        ):
+            raise SystemExit("Shroud of Flies runtime fingerprint differs from its manifest.")
     for path, digest in receipt["sources"].items():
         _checked_bytes(root, path, digest)
     _selection_members({OWNER: receipt["test"]["after"]}, root)
@@ -103,4 +108,18 @@ def shroud_of_flies_runtime(
     fingerprint = receipt["runtime_fingerprint"]
     if (manifest["before"], fingerprint["before"]) != (manifest_sha256, runtime_fingerprint):
         raise SystemExit("Shroud of Flies tests require the exact defender coherency runtime.")
+    fortification = _fortification_successor(root, receipt)
+    if fortification is not None:
+        current, _, _ = fortification
+        return current["runtime_manifest"]["after"], current["runtime_fingerprint"]["after"]
     return manifest["after"], fingerprint["after"]
+
+
+def _fortification_successor(
+    root: Path, receipt: ShroudOfFliesReceipt
+) -> tuple[FortificationTestReceipt, dict[str, dict[str, object]], bytes] | None:
+    return fortification_test_addition(
+        root,
+        predecessor_manifest=receipt["runtime_manifest"]["after"],
+        predecessor_fingerprint=receipt["runtime_fingerprint"]["after"],
+    )

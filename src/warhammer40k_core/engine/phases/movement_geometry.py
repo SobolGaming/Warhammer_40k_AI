@@ -8,10 +8,22 @@ from warhammer40k_core.engine.sequential_movement import sequential_friendly_mod
 
 from warhammer40k_core.engine.unit_keyword_queries import unit_has_keyword
 
-from warhammer40k_core.geometry.physical_model import base_crosses_physical_model_footprint
+from warhammer40k_core.geometry.physical_model import (
+    base_crosses_physical_model_footprint,
+    physical_prisms,
+)
+from warhammer40k_core.geometry.physical_predicates import (
+    moving_footprint_crosses,
+    planar_motion_segments,
+)
 
 from typing import TYPE_CHECKING
 from warhammer40k_core.engine.aircraft_rules import aircraft_rules_unit
+from warhammer40k_core.engine.catalog_contextual_status_consumption import (
+    CATALOG_IR_FORTIFICATION_DESPERATE_ESCAPE_CONSUMER_ID,
+    rules_unit_has_fortification_consumer,
+)
+from warhammer40k_core.engine.rules_units import rules_unit_view_from_armies
 
 from warhammer40k_core.engine.physical_engagement import (
     physical_geometry_models_for_rules_unit,
@@ -180,7 +192,8 @@ def _desperate_escape_requirements_for_fall_back(
     battle_shocked_unit_ids: tuple[str, ...],
     forced_desperate_escape_source_rule_ids: tuple[str, ...] = (),
     overflight_auto_pass_model_ids: tuple[str, ...] = (),
-) -> tuple[DesperateEscapeRequirement, ...]:
+    only_engaged_with_fortifications: bool | None = None,
+) -> tuple[tuple[DesperateEscapeRequirement, ...], tuple[str, ...]]:
     if type(scenario) is not BattlefieldScenario:
         raise GameLifecycleError("Desperate Escape requirements require a scenario.")
     if type(ruleset_descriptor) is not RulesetDescriptor:
@@ -218,30 +231,28 @@ def _desperate_escape_requirements_for_fall_back(
         scenario=scenario,
         player_id=unit_placement.player_id,
     )
-    battle_shocked_desperate_escape_suppressed = (
-        unit_placement.unit_instance_id in battle_shocked_ids
-        and _unit_only_engaged_with_enemy_fortifications(
+    is_battle_shocked = unit_placement.unit_instance_id in battle_shocked_ids
+    if is_battle_shocked and only_engaged_with_fortifications is None:
+        engaged_enemy_unit_ids = _enemy_engaged_unit_ids_for_unit_placement(
             scenario=scenario,
             unit_placement=unit_placement,
             ruleset_descriptor=ruleset_descriptor,
         )
-    )
+        only_engaged_with_fortifications = bool(engaged_enemy_unit_ids) and (
+            engaged_enemy_unit_ids
+            == enemy_fortification_unit_ids(
+                scenario=scenario, engaged_enemy_unit_ids=engaged_enemy_unit_ids
+            )
+        )
+    fortification_exemption = is_battle_shocked and bool(only_engaged_with_fortifications)
     requirements: list[DesperateEscapeRequirement] = []
+    exempt_model_ids: list[str] = []
+    desperate_mode = fall_back_mode is FallBackModeKind.DESPERATE_ESCAPE
     for index, placement in enumerate(unit_placement.model_placements, start=1):
         if placement.model_instance_id in auto_pass_model_ids:
             continue
-        reasons: list[DesperateEscapeRequirementReason] = []
         enemy_model_ids: tuple[str, ...] = ()
-        if fall_back_mode is FallBackModeKind.DESPERATE_ESCAPE:
-            reasons.append(DesperateEscapeRequirementReason.SELECTED_MODE)
-        if (
-            unit_placement.unit_instance_id in battle_shocked_ids
-            and not battle_shocked_desperate_escape_suppressed
-        ):
-            reasons.append(DesperateEscapeRequirementReason.BATTLE_SHOCKED)
-        if forced_source_ids:
-            reasons.append(DesperateEscapeRequirementReason.FORCED_BY_RULE)
-        if not overflight_exempt and fall_back_mode is FallBackModeKind.DESPERATE_ESCAPE:
+        if desperate_mode and (not overflight_exempt or fortification_exemption):
             moving_model = geometry_model_for_placement(
                 model=scenario.model_instance_for_placement(placement),
                 placement=placement,
@@ -250,11 +261,22 @@ def _desperate_escape_requirements_for_fall_back(
                 moving_model=moving_model,
                 witness=witness,
                 enemy_models=enemy_models,
+                check_continuous_motion=fortification_exemption,
             )
-            if enemy_model_ids and placement.model_instance_id not in auto_pass_model_ids:
-                reasons.append(DesperateEscapeRequirementReason.ENEMY_MODEL_OVERFLIGHT)
-            elif enemy_model_ids:
-                enemy_model_ids = ()
+        # Battle-shock forces this mode. The fortification clause exempts a clear
+        # model from that hazard, while separate rules can still require a roll.
+        exempt = fortification_exemption and not enemy_model_ids
+        if desperate_mode and exempt:
+            exempt_model_ids.append(placement.model_instance_id)
+        reasons: list[DesperateEscapeRequirementReason] = []
+        if desperate_mode and not exempt:
+            reasons.append(DesperateEscapeRequirementReason.SELECTED_MODE)
+        if is_battle_shocked and not exempt:
+            reasons.append(DesperateEscapeRequirementReason.BATTLE_SHOCKED)
+        if forced_source_ids:
+            reasons.append(DesperateEscapeRequirementReason.FORCED_BY_RULE)
+        if enemy_model_ids:
+            reasons.append(DesperateEscapeRequirementReason.ENEMY_MODEL_OVERFLIGHT)
         if not reasons:
             continue
         requirements.append(
@@ -269,50 +291,25 @@ def _desperate_escape_requirements_for_fall_back(
                 enemy_model_ids=enemy_model_ids,
             )
         )
-    return tuple(requirements)
+    return tuple(requirements), tuple(sorted(exempt_model_ids))
 
 
-def _unit_only_engaged_with_enemy_fortifications(
+def enemy_fortification_unit_ids(
     *,
     scenario: BattlefieldScenario,
-    unit_placement: UnitPlacement,
-    ruleset_descriptor: RulesetDescriptor,
-) -> bool:
-    engaged_enemy_unit_ids = _enemy_engaged_unit_ids_for_unit_placement(
-        scenario=scenario,
-        unit_placement=unit_placement,
-        ruleset_descriptor=ruleset_descriptor,
-    )
-    if not engaged_enemy_unit_ids:
-        return False
-    return all(
-        _unit_has_fortification_keyword(
-            _unit_instance_by_id_in_scenario(
-                scenario=scenario,
-                unit_instance_id=enemy_unit_id,
-            )
-        )
+    engaged_enemy_unit_ids: tuple[str, ...],
+) -> tuple[str, ...]:
+    return tuple(
+        enemy_unit_id
         for enemy_unit_id in engaged_enemy_unit_ids
+        if rules_unit_has_fortification_consumer(
+            rules_unit_view_from_armies(
+                armies=scenario.armies,
+                unit_instance_id=enemy_unit_id,
+            ),
+            CATALOG_IR_FORTIFICATION_DESPERATE_ESCAPE_CONSUMER_ID,
+        )
     )
-
-
-def _unit_instance_by_id_in_scenario(
-    *,
-    scenario: BattlefieldScenario,
-    unit_instance_id: str,
-) -> UnitInstance:
-    requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
-    for army in scenario.armies:
-        for unit in army.units:
-            if unit.unit_instance_id == requested_unit_id:
-                return unit
-    raise GameLifecycleError("Scenario unit lookup failed.")
-
-
-def _unit_has_fortification_keyword(unit: UnitInstance) -> bool:
-    return _canonical_keyword("FORTIFICATION") in {
-        _canonical_keyword(keyword) for keyword in unit.keywords
-    }
 
 
 def _enemy_model_ids_crossed_by_witness(
@@ -320,12 +317,22 @@ def _enemy_model_ids_crossed_by_witness(
     moving_model: Model,
     witness: PathWitness,
     enemy_models: tuple[Model, ...],
+    check_continuous_motion: bool,
 ) -> tuple[str, ...]:
+    poses = witness.poses_for_model(moving_model.model_id)
     crossed_enemy_ids: set[str] = set()
-    for pose in _sampled_witness_transit_poses(
-        witness.poses_for_model(moving_model.model_id),
-        sample_interval_inches=0.5,
-    ):
+    if check_continuous_motion:
+        segments = planar_motion_segments(poses)
+        for enemy in enemy_models:
+            prisms = physical_prisms(enemy)
+            if any(
+                moving_footprint_crosses(moving_model.base, start, end, part.base, part.pose)
+                for start, end in segments
+                for part in prisms
+            ):
+                crossed_enemy_ids.add(enemy.model_id)
+        return tuple(sorted(crossed_enemy_ids))
+    for pose in _sampled_witness_transit_poses(poses, sample_interval_inches=0.5):
         sampled_model = _model_at_pose(moving_model, pose)
         for enemy_model in enemy_models:
             if base_crosses_physical_model_footprint(sampled_model, enemy_model):

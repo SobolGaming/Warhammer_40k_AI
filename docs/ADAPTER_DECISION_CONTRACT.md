@@ -1194,7 +1194,13 @@ Desperate Escape is legal even when no overflight or content rule forces it. The
 `submit_movement_proposal` must preserve the emitted `fall_back_mode`, and the engine creates one
 `selected_mode` Desperate Escape requirement and one Hazard Roll for every model in the complete
 canonical rules unit. Overflight, Battle-shock, and source-backed forced reasons may coexist on
-those same per-model requirements; they do not replace the selected-mode inventory.
+those same per-model requirements. When the source-backed Fortification clause applies to a
+Battle-shocked rules unit, the existing Desperate Escape mode still applies. The optional
+`fortification_desperate_escape_exempt_model_ids` resolution field records models whose paths
+avoid enemy models. These models skip the mode's hazard, but a separate rule can still require
+their rolls. The engine computes this field from the accepted PathWitness and start engagement.
+When casualties require a corrected survivor path, the engine retains completed rolls and damage.
+Each surviving model whose corrected path creates a new hazard rolls once before movement.
 
 The engine resolves any Hazard Roll casualties, applies the grouped `PathWitness` transition, and
 then checks the unit's authoritative Battle-shock state. If at least one model survives and the
