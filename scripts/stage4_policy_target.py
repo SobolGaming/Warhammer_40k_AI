@@ -113,6 +113,13 @@ def verify_report(reference: bench.Row, observed: bench.Row) -> None:
     )
 
 
+def source_diagram_key(pdf_sha256: str, page: object) -> tuple[str, str]:
+    """Identify a source diagram in the Event Companion's one-diagram-per-page layout pack."""
+    if type(page) is not int or page < 1:
+        raise bench.BenchmarkGap("Invalid Stage 4 source diagram page.")
+    return "source_diagram", f"{pdf_sha256}:{page}"
+
+
 def evaluation_groups(
     families: dict[str, frozenset[tuple[str, str]]],
 ) -> list[list[str]]:
@@ -283,10 +290,11 @@ def build_link(
 
     protocol = observed["protocol"]
     family = observed["group"]
+    layout_source = protocol["layout_source"]
     group_keys = frozenset(
         {
-            ("source", protocol["layout_source"]["artifact_hash"]),
-            ("source", protocol["mission_source"]["scoring_artifact_hash"]),
+            source_diagram_key(layout_source["pdf_sha256"], layout_source["page"]),
+            ("scenario", family),
             ("geometry", payload_digest(sorted(protocol["linked_footprints_inches"].values()))),
             ("geometry_family", protocol["target"].removesuffix("-central-01")),
             ("trajectory", protocol["setup"]),

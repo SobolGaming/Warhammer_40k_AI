@@ -1729,6 +1729,64 @@ Keep timing, response, seed, side-swap and repeated trajectories within
 their source and geometry components. Predeclare the live cap, eligibility,
 horizon and chance handling before opening any reserved labels.
 
+### Unseen-layout evaluation contract
+
+Freeze a provenance-only manifest before a same-release split. Validate it
+with the opt-in development command. The command also accepts a
+development-only inventory while a reserve is being prepared.
+
+```sh
+PYTHONPATH=src:. uv run --no-sync python -B -m scripts.stage4_evaluation validate-split PATH
+PYTHONPATH=src:. uv run --no-sync python -B -m scripts.stage4_evaluation baselines --hindsight
+PYTHONPATH=src:. uv run --no-sync pytest -q --no-cov -p no:cacheprovider \
+  scripts/stage4_evaluation_checks.py scripts/stage4_policy_target_checks.py
+```
+
+The manifest uses schema `stage4-unseen-layout-split-v1`. Its
+`layout_release` object declares `package`, `artifact_sha256` (the
+artifact's canonical package hash), and `pdf_sha256` for the imported
+Event Companion layout release. Each object in `families` carries a unique
+`id`, one `partition` (`development` or `reserve`), and its
+`scoring_artifact_sha256`. Declare the full inventory of development and
+proposed reserve families. A reserve assignment requires a development
+comparator.
+
+Every family supplies nonempty inventories of `source_diagram_pages`,
+`scenario_lineage`, `geometry_families`, `geometry_sha256`, and
+`trajectory_sha256`. The reviewed release has one layout diagram per layout
+page. Use its PDF identity and page for a source diagram and stable shared
+IDs for scenario lineage and reviewed geometry variants. Include canonical
+geometry fingerprints and verified trajectory hashes for reused setups,
+origins, prefixes and continuations wherever they overlap. Review the
+inventory for complete provenance across all arms, ally policies, timings,
+seeds, opponent responses, side swaps and repeats before assigning the
+family as a unit. Shared diagram, lineage, geometry or trajectory bindings
+join families transitively, and a connected component can have only one
+partition. Full layout and scoring artifact hashes serve as audit provenance.
+Independent diagrams in the same package can therefore occupy different
+partitions when their other bindings are independent. The validator checks
+the declared inventory and the imported source diagram pages. Geometry
+lineage and trajectory completeness require review of the underlying
+evidence.
+
+The baseline command reads the sealed West, Central Guard and Layout C
+receipts. Each row uses the same origin and scoring horizon for Hold and
+Screen with fixed ally follow-through. The margin is the change in A-minus-B
+VP at the family's first A Movement offer after Command scoring. Both issued
+movement controls tie on immediate wound swing, so
+`immediate-material-hold-v1` selects Hold. The optional hindsight ceiling
+takes the larger of the two observed margins in each row.
+
+| Development family | Horizon | Always Hold | Always Screen | Immediate material | Hindsight ceiling |
+| --- | --- | ---: | ---: | ---: | ---: |
+| West | A4 Movement | -3 | 5 | -3 | 5 |
+| Central Guard | A4 Movement | 13 | 5 | 13 | 13 |
+| Layout C | A3 Movement | 0 | 5 | 0 | 5 |
+
+Central Guard reverses the Screen advantage seen in the other two cases.
+These three paired results describe the sealed development plays at their
+respective horizons.
+
 ## 7. Performance and evaluation before scaling
 
 Measure the actual headless workload, with and without the reference transport under matched conditions:
