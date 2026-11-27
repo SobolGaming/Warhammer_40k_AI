@@ -1,0 +1,672 @@
+{
+  "evidence": {
+    "protocol_sha256": "78ecf01170821427a7a9b530a3acd02ec9e3486f336d0f8cfa2d0d3d7318756a",
+    "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:af65d2237320cda39c2d38d0dbeb4d415c424956696fc1cc0f40686921848830",
+    "lock_sha256": "659a2d81e02176d23168861529651506ac87a4eab1982109f144cd62a63fce71",
+    "seeds": [
+      {
+        "seed": "0101010101010101010101010101010101010101010101010101010101010101",
+        "origin": {
+          "checkpoint": "282ddb81939e10e0b0792ca27b5ad1060632cf825ec932b97f572e0e1783e0a4",
+          "event_log": "52378b871afbbc54c3bf604d88d2a32c8026675a3f0c13992daedfc25405d06d",
+          "request_id": "decision-request-000018",
+          "decisions": 17,
+          "events": 115,
+          "rng_draws": 0,
+          "rng_history_sha256": "94ca7dc201ff0f21177b623fccc0960b3799d3e8da1153ef4b59b1113090b613"
+        },
+        "arms": [
+          {
+            "target": "army-beta:leader",
+            "candidate": "d8cb6a3307cc58bd6ee969fb071743d951f24f678b8cfc6993e3cf0721b05684",
+            "endpoint": {
+              "checkpoint": "fd81bd63e4ebf20230e257104055a282ea7eeb5dc4ff789b1b124f69b10b0ab6",
+              "event_log": "140489226ecceb911e3254a142089566b17c171683f9aa108990821ef1e5627b",
+              "request_id": "decision-request-000025",
+              "decisions": 24,
+              "events": 154,
+              "rng_draws": 4,
+              "rng_history_sha256": "79910868cd1d08e56f464ada9c8b3a989985275f80dd6ba447fd7570031deed6"
+            },
+            "submitted_decisions": 5,
+            "new_decision_records": 7,
+            "responses": [
+              [
+                "use_stratagem",
+                "decline_stratagem_window"
+              ],
+              [
+                "use_stratagem",
+                "decline_stratagem_window"
+              ],
+              [
+                "use_stratagem",
+                "decline_stratagem_window"
+              ],
+              [
+                "use_stratagem",
+                "decline_stratagem_window"
+              ]
+            ],
+            "rng_draw_delta": 4,
+            "material": {
+              "army-beta:leader": {
+                "wounds_lost": 0,
+                "models_destroyed": 0
+              },
+              "army-beta:vehicle": {
+                "wounds_lost": 0,
+                "models_destroyed": 0
+              }
+            }
+          },
+          {
+            "target": "army-beta:vehicle",
+            "candidate": "572c483e138b92b0a3a76d226caa87f2e93216c7162f890d4d27f77df8d443c8",
+            "endpoint": {
+              "checkpoint": "2370818806ed3ab5fa070e57368d6c8058bf732e17dcda587211378ed41a9b45",
+              "event_log": "7f534d727b593000f1d42845125707cbb8aa33e8104f2b6d15beb2653b4bfba2",
+              "request_id": "decision-request-000024",
+              "decisions": 23,
+              "events": 146,
+              "rng_draws": 3,
+              "rng_history_sha256": "a6fe9629e180608394dd18e74ee1121f272d202470ada79b94ce36e5d8bf1928"
+            },
+            "submitted_decisions": 4,
+            "new_decision_records": 6,
+            "responses": [
+              [
+                "use_stratagem",
+                "decline_stratagem_window"
+              ],
+              [
+                "use_stratagem",
+                "decline_stratagem_window"
+              ],
+              [
+                "use_stratagem",
+                "decline_stratagem_window"
+              ]
+            ],
+            "rng_draw_delta": 3,
+            "material": {
+              "army-beta:leader": {
+                "wounds_lost": 0,
+                "models_destroyed": 0
+              },
+              "army-beta:vehicle": {
+                "wounds_lost": 0,
+                "models_destroyed": 0
+              }
+            }
+          }
+        ]
+      },
+      {
+        "seed": "0202020202020202020202020202020202020202020202020202020202020202",
+        "origin": {
+          "checkpoint": "85f8c3ba6f8eb28d56687e81a821b1700e050f44cbdfab5f292ba57b49e15b74",
+          "event_log": "6c841f1a288f6843609876034e518d826cd26338a818af9824234231533f6d00",
+          "request_id": "decision-request-000018",
+          "decisions": 17,
+          "events": 115,
+          "rng_draws": 0,
+          "rng_history_sha256": "94ca7dc201ff0f21177b623fccc0960b3799d3e8da1153ef4b59b1113090b613"
+        },
+        "arms": [
+          {
+            "target": "army-beta:leader",
+            "candidate": "d8cb6a3307cc58bd6ee969fb071743d951f24f678b8cfc6993e3cf0721b05684",
+            "endpoint": {
+              "checkpoint": "779c61453152239374a736240e8824ee093a262d646aa8914e877e50d48bd32d",
+              "event_log": "944000f5028763d6e931e52633c258c373a9555a81086b7b0593b2ef365f4a7b",
+              "request_id": "decision-request-000027",
+              "decisions": 26,
+              "events": 166,
+              "rng_draws": 6,
+              "rng_history_sha256": "9f2cfc7ca1eeacbb88380d984684a3caa07f2859173247dcf1878c7b045678dd"
+            },
+            "submitted_decisions": 7,
+            "new_decision_records": 9,
+            "responses": [
+              [
+                "use_stratagem",
+                "decline_stratagem_window"
+              ],
+              [
+                "use_stratagem",
+                "decline_stratagem_window"
+              ],
+              [
+                "use_stratagem",
+                "decline_stratagem_window"
+              ],
+              [
+                "use_stratagem",
+                "decline_stratagem_window"
+              ],
+              [
+                "use_stratagem",
+                "decline_stratagem_window"
+              ],
+              [
+                "use_stratagem",
+                "decline_stratagem_window"
+              ]
+            ],
+            "rng_draw_delta": 6,
+            "material": {
+              "army-beta:leader": {
+                "wounds_lost": 3,
+                "models_destroyed": 0
+              },
+              "army-beta:vehicle": {
+                "wounds_lost": 0,
+                "models_destroyed": 0
+              }
+            }
+          },
+          {
+            "target": "army-beta:vehicle",
+            "candidate": "572c483e138b92b0a3a76d226caa87f2e93216c7162f890d4d27f77df8d443c8",
+            "endpoint": {
+              "checkpoint": "9a31a0a76504e788135a7f6d56162b4b5e3034c9e8175748f815683964bad968",
+              "event_log": "82c818b14956b6ed6886f057c3172049054ab526fe60625a68cd0cf0bf3a2513",
+              "request_id": "decision-request-000024",
+              "decisions": 23,
+              "events": 146,
+              "rng_draws": 3,
+              "rng_history_sha256": "4a9a9cd7e3ecb916f6adda73c68a03655fd7f904c48a989cb72cff913d90206b"
+            },
+            "submitted_decisions": 4,
+            "new_decision_records": 6,
+            "responses": [
+              [
+                "use_stratagem",
+                "decline_stratagem_window"
+              ],
+              [
+                "use_stratagem",
+                "decline_stratagem_window"
+              ],
+              [
+                "use_stratagem",
+                "decline_stratagem_window"
+              ]
+            ],
+            "rng_draw_delta": 3,
+            "material": {
+              "army-beta:leader": {
+                "wounds_lost": 0,
+                "models_destroyed": 0
+              },
+              "army-beta:vehicle": {
+                "wounds_lost": 0,
+                "models_destroyed": 0
+              }
+            }
+          }
+        ]
+      },
+      {
+        "seed": "0303030303030303030303030303030303030303030303030303030303030303",
+        "origin": {
+          "checkpoint": "2859e1797e547565b194a3fce22b9257b261e5342768082e13767f7e4afaa224",
+          "event_log": "9b49742542698b40d31c3b7734d9d531f525f4aee8bfb19eaa03b7def685dced",
+          "request_id": "decision-request-000018",
+          "decisions": 17,
+          "events": 115,
+          "rng_draws": 0,
+          "rng_history_sha256": "94ca7dc201ff0f21177b623fccc0960b3799d3e8da1153ef4b59b1113090b613"
+        },
+        "arms": [
+          {
+            "target": "army-beta:leader",
+            "candidate": "d8cb6a3307cc58bd6ee969fb071743d951f24f678b8cfc6993e3cf0721b05684",
+            "endpoint": {
+              "checkpoint": "88b66a15f333e40a9607735e096a675984e77fa4a413a4135336427415c7b828",
+              "event_log": "2b4e35f5ffa70c7d9356d1fb485165bcada31fbbfb6e49ef849e0bc7ba26c46b",
+              "request_id": "decision-request-000025",
+              "decisions": 24,
+              "events": 153,
+              "rng_draws": 4,
+              "rng_history_sha256": "ddabf64e4f5fc334f87130622064c01e092182b91f157e2224dfa73d051502ab"
+            },
+            "submitted_decisions": 5,
+            "new_decision_records": 7,
+            "responses": [
+              [
+                "use_stratagem",
+                "decline_stratagem_window"
+              ],
+              [
+                "use_stratagem",
+                "decline_stratagem_window"
+              ],
+              [
+                "use_stratagem",
+                "decline_stratagem_window"
+              ],
+              [
+                "use_stratagem",
+                "decline_stratagem_window"
+              ]
+            ],
+            "rng_draw_delta": 4,
+            "material": {
+              "army-beta:leader": {
+                "wounds_lost": 0,
+                "models_destroyed": 0
+              },
+              "army-beta:vehicle": {
+                "wounds_lost": 0,
+                "models_destroyed": 0
+              }
+            }
+          },
+          {
+            "target": "army-beta:vehicle",
+            "candidate": "572c483e138b92b0a3a76d226caa87f2e93216c7162f890d4d27f77df8d443c8",
+            "endpoint": {
+              "checkpoint": "49b9978037bdfe4207176bed340f17c79e63304918ad1bbba524ef170736e2b4",
+              "event_log": "47db8ff1e8a4ad7174fb9ca4918911e1b61565bf4e42bf9b691a5c4ebd8f2e2c",
+              "request_id": "decision-request-000025",
+              "decisions": 24,
+              "events": 151,
+              "rng_draws": 4,
+              "rng_history_sha256": "bc8cda2bb88cf26709c517df90766a6a345696bdcd01455798287b530d31e466"
+            },
+            "submitted_decisions": 5,
+            "new_decision_records": 7,
+            "responses": [
+              [
+                "use_stratagem",
+                "decline_stratagem_window"
+              ],
+              [
+                "use_stratagem",
+                "decline_stratagem_window"
+              ],
+              [
+                "use_stratagem",
+                "decline_stratagem_window"
+              ],
+              [
+                "use_stratagem",
+                "decline_stratagem_window"
+              ]
+            ],
+            "rng_draw_delta": 4,
+            "material": {
+              "army-beta:leader": {
+                "wounds_lost": 0,
+                "models_destroyed": 0
+              },
+              "army-beta:vehicle": {
+                "wounds_lost": 0,
+                "models_destroyed": 0
+              }
+            }
+          }
+        ]
+      },
+      {
+        "seed": "0404040404040404040404040404040404040404040404040404040404040404",
+        "origin": {
+          "checkpoint": "a4fbdf41f1f0bcecc540508559300237687072216a2dc0a63719fea1ec5d7b1a",
+          "event_log": "672646149847b304af683c6fb938839d4380c24601df648b7a61bbdff330c2e2",
+          "request_id": "decision-request-000018",
+          "decisions": 17,
+          "events": 115,
+          "rng_draws": 0,
+          "rng_history_sha256": "94ca7dc201ff0f21177b623fccc0960b3799d3e8da1153ef4b59b1113090b613"
+        },
+        "arms": [
+          {
+            "target": "army-beta:leader",
+            "candidate": "d8cb6a3307cc58bd6ee969fb071743d951f24f678b8cfc6993e3cf0721b05684",
+            "endpoint": {
+              "checkpoint": "e57e08af1f2cf39a25902fc79d8be830aa1998deb0ceccf497454b5d9cccc4b8",
+              "event_log": "e82991ead248c222c57f1c129d8f8a8fc1cffa36187cc42a75f7083154287d63",
+              "request_id": "decision-request-000027",
+              "decisions": 26,
+              "events": 165,
+              "rng_draws": 6,
+              "rng_history_sha256": "1eb249353c034acd89f423c305584fe3df7dd0dfad2a96728b5d79056c8f2ce6"
+            },
+            "submitted_decisions": 7,
+            "new_decision_records": 9,
+            "responses": [
+              [
+                "use_stratagem",
+                "decline_stratagem_window"
+              ],
+              [
+                "use_stratagem",
+                "decline_stratagem_window"
+              ],
+              [
+                "use_stratagem",
+                "decline_stratagem_window"
+              ],
+              [
+                "use_stratagem",
+                "decline_stratagem_window"
+              ],
+              [
+                "use_stratagem",
+                "decline_stratagem_window"
+              ],
+              [
+                "use_stratagem",
+                "decline_stratagem_window"
+              ]
+            ],
+            "rng_draw_delta": 6,
+            "material": {
+              "army-beta:leader": {
+                "wounds_lost": 3,
+                "models_destroyed": 0
+              },
+              "army-beta:vehicle": {
+                "wounds_lost": 0,
+                "models_destroyed": 0
+              }
+            }
+          },
+          {
+            "target": "army-beta:vehicle",
+            "candidate": "572c483e138b92b0a3a76d226caa87f2e93216c7162f890d4d27f77df8d443c8",
+            "endpoint": {
+              "checkpoint": "03be689b98142617992ccb009f14d405ccf024b79de072e973474f3fc20800df",
+              "event_log": "2b46aa384135d0a3b2b5e12f522da279c5a3cc25f6b22569a8aa0b0dd9b21579",
+              "request_id": "decision-request-000024",
+              "decisions": 23,
+              "events": 146,
+              "rng_draws": 3,
+              "rng_history_sha256": "b3c1e00ab647c695c5d6dc5f67fa212db2890b5369d57722a4e5c3a5252f7ccc"
+            },
+            "submitted_decisions": 4,
+            "new_decision_records": 6,
+            "responses": [
+              [
+                "use_stratagem",
+                "decline_stratagem_window"
+              ],
+              [
+                "use_stratagem",
+                "decline_stratagem_window"
+              ],
+              [
+                "use_stratagem",
+                "decline_stratagem_window"
+              ]
+            ],
+            "rng_draw_delta": 3,
+            "material": {
+              "army-beta:leader": {
+                "wounds_lost": 0,
+                "models_destroyed": 0
+              },
+              "army-beta:vehicle": {
+                "wounds_lost": 0,
+                "models_destroyed": 0
+              }
+            }
+          }
+        ]
+      },
+      {
+        "seed": "0505050505050505050505050505050505050505050505050505050505050505",
+        "origin": {
+          "checkpoint": "c9c0cb979ba72d6a69694d09d7e65e4f08975e9241061c45a6f07f368908cf30",
+          "event_log": "5484c2fb3a050a8954a7e5de4441f5fb96755e67167a8c7bb2107489ece97a04",
+          "request_id": "decision-request-000018",
+          "decisions": 17,
+          "events": 115,
+          "rng_draws": 0,
+          "rng_history_sha256": "94ca7dc201ff0f21177b623fccc0960b3799d3e8da1153ef4b59b1113090b613"
+        },
+        "arms": [
+          {
+            "target": "army-beta:leader",
+            "candidate": "d8cb6a3307cc58bd6ee969fb071743d951f24f678b8cfc6993e3cf0721b05684",
+            "endpoint": {
+              "checkpoint": "ccfd11937363569e94ffef918fe7c6a922f444268a789664bb26829446183062",
+              "event_log": "e03d42695dec89a9f4d350ed91f0cb787ba4e20739b534b125dce626f83e56d5",
+              "request_id": "decision-request-000025",
+              "decisions": 24,
+              "events": 153,
+              "rng_draws": 4,
+              "rng_history_sha256": "24df50f63c8d921774eebf4bf035fea2835d92300c9d1858566257c12222f05d"
+            },
+            "submitted_decisions": 5,
+            "new_decision_records": 7,
+            "responses": [
+              [
+                "use_stratagem",
+                "decline_stratagem_window"
+              ],
+              [
+                "use_stratagem",
+                "decline_stratagem_window"
+              ],
+              [
+                "use_stratagem",
+                "decline_stratagem_window"
+              ],
+              [
+                "use_stratagem",
+                "decline_stratagem_window"
+              ]
+            ],
+            "rng_draw_delta": 4,
+            "material": {
+              "army-beta:leader": {
+                "wounds_lost": 3,
+                "models_destroyed": 0
+              },
+              "army-beta:vehicle": {
+                "wounds_lost": 0,
+                "models_destroyed": 0
+              }
+            }
+          },
+          {
+            "target": "army-beta:vehicle",
+            "candidate": "572c483e138b92b0a3a76d226caa87f2e93216c7162f890d4d27f77df8d443c8",
+            "endpoint": {
+              "checkpoint": "9dd10a194ab9e425646edd981e1d4673f5353232198d3a77eb920833ee9e0fd9",
+              "event_log": "6ff98737baf67762cfc78052f439f15f063a53057053310a2e4cf416ee4e60ed",
+              "request_id": "decision-request-000026",
+              "decisions": 25,
+              "events": 161,
+              "rng_draws": 5,
+              "rng_history_sha256": "b83efb97537f038377087d18adb13a0394718ae73916465af20abae92259629e"
+            },
+            "submitted_decisions": 6,
+            "new_decision_records": 8,
+            "responses": [
+              [
+                "use_stratagem",
+                "decline_stratagem_window"
+              ],
+              [
+                "use_stratagem",
+                "decline_stratagem_window"
+              ],
+              [
+                "use_stratagem",
+                "decline_stratagem_window"
+              ],
+              [
+                "use_stratagem",
+                "decline_stratagem_window"
+              ],
+              [
+                "use_stratagem",
+                "decline_stratagem_window"
+              ]
+            ],
+            "rng_draw_delta": 5,
+            "material": {
+              "army-beta:leader": {
+                "wounds_lost": 0,
+                "models_destroyed": 0
+              },
+              "army-beta:vehicle": {
+                "wounds_lost": 3,
+                "models_destroyed": 0
+              }
+            }
+          }
+        ]
+      },
+      {
+        "seed": "0606060606060606060606060606060606060606060606060606060606060606",
+        "origin": {
+          "checkpoint": "bef2f7d63892681e95a2ae7c730f17ae4c02ca07ffb9500ea73ed3936f4317ec",
+          "event_log": "18138d602ea26fd84ab140121bfdc88032628d4cca6dabbce5f89d6ba68050a9",
+          "request_id": "decision-request-000018",
+          "decisions": 17,
+          "events": 115,
+          "rng_draws": 0,
+          "rng_history_sha256": "94ca7dc201ff0f21177b623fccc0960b3799d3e8da1153ef4b59b1113090b613"
+        },
+        "arms": [
+          {
+            "target": "army-beta:leader",
+            "candidate": "d8cb6a3307cc58bd6ee969fb071743d951f24f678b8cfc6993e3cf0721b05684",
+            "endpoint": {
+              "checkpoint": "3871dbc0d35b25167ff41a9208ed2cf5d6c7aee4a5fa37d7bfb5a541e0404c15",
+              "event_log": "044f976a754ddcae58004cb12220f656daf4f85b3c43034db207e1325dab5029",
+              "request_id": "decision-request-000025",
+              "decisions": 24,
+              "events": 151,
+              "rng_draws": 4,
+              "rng_history_sha256": "6d8c78c09d9a8eddae9e47791760081163e5574a34baa8c39fd5fad0a1330937"
+            },
+            "submitted_decisions": 5,
+            "new_decision_records": 7,
+            "responses": [
+              [
+                "use_stratagem",
+                "decline_stratagem_window"
+              ],
+              [
+                "use_stratagem",
+                "decline_stratagem_window"
+              ],
+              [
+                "use_stratagem",
+                "decline_stratagem_window"
+              ],
+              [
+                "use_stratagem",
+                "decline_stratagem_window"
+              ]
+            ],
+            "rng_draw_delta": 4,
+            "material": {
+              "army-beta:leader": {
+                "wounds_lost": 0,
+                "models_destroyed": 0
+              },
+              "army-beta:vehicle": {
+                "wounds_lost": 0,
+                "models_destroyed": 0
+              }
+            }
+          },
+          {
+            "target": "army-beta:vehicle",
+            "candidate": "572c483e138b92b0a3a76d226caa87f2e93216c7162f890d4d27f77df8d443c8",
+            "endpoint": {
+              "checkpoint": "b507351ff07470504cc37ff678c29d2b11f6d39921f67b5fcf39ae71ceb8cdcf",
+              "event_log": "7d07b8bdea560f39a5426d149ae860fcb5e65c30f71cde6db7796203bb913286",
+              "request_id": "decision-request-000023",
+              "decisions": 22,
+              "events": 141,
+              "rng_draws": 2,
+              "rng_history_sha256": "c8052dcaa494e9a86782c58edbc014c1b2d76f25420b2879a8135cb224cd1603"
+            },
+            "submitted_decisions": 3,
+            "new_decision_records": 5,
+            "responses": [
+              [
+                "use_stratagem",
+                "decline_stratagem_window"
+              ],
+              [
+                "use_stratagem",
+                "decline_stratagem_window"
+              ]
+            ],
+            "rng_draw_delta": 2,
+            "material": {
+              "army-beta:leader": {
+                "wounds_lost": 0,
+                "models_destroyed": 0
+              },
+              "army-beta:vehicle": {
+                "wounds_lost": 0,
+                "models_destroyed": 0
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "evidence_hash": "7facf4279891ee83aaa7307f51752a7550f0205cb8eaa163caf7aeaacc191edf",
+  "timing": {
+    "system": "Windows-11-10.0.26300-SP0",
+    "python": "3.14.5",
+    "worker_seconds": 126.348,
+    "seeds": [
+      {
+        "setup_seconds": 11.409,
+        "arms_seconds": {
+          "army-beta:leader": 7.41,
+          "army-beta:vehicle": 7.137
+        }
+      },
+      {
+        "setup_seconds": 5.167,
+        "arms_seconds": {
+          "army-beta:leader": 8.415,
+          "army-beta:vehicle": 6.953
+        }
+      },
+      {
+        "setup_seconds": 4.974,
+        "arms_seconds": {
+          "army-beta:leader": 7.447,
+          "army-beta:vehicle": 7.31
+        }
+      },
+      {
+        "setup_seconds": 4.975,
+        "arms_seconds": {
+          "army-beta:leader": 8.366,
+          "army-beta:vehicle": 6.914
+        }
+      },
+      {
+        "setup_seconds": 5.084,
+        "arms_seconds": {
+          "army-beta:leader": 7.418,
+          "army-beta:vehicle": 7.855
+        }
+      },
+      {
+        "setup_seconds": 5.313,
+        "arms_seconds": {
+          "army-beta:leader": 7.284,
+          "army-beta:vehicle": 6.654
+        }
+      }
+    ],
+    "processor": "AMD Ryzen Threadripper 3970X"
+  }
+}

@@ -35993,7 +35993,8 @@
         "scripts/stage4_evaluation.py",
         "scripts/stage4_evaluation_checks.py",
         "scripts/stage4_scoring_timing.py",
-        "scripts/stage4_scoring_timing_checks.py"
+        "scripts/stage4_scoring_timing_checks.py",
+        "scripts/stage4_native_shooting.py"
       ],
       "owners": [
         "*"
