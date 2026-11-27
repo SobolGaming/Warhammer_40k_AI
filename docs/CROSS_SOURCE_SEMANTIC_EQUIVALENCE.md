@@ -13,13 +13,13 @@ A registered static RuleIR is eligible for this audit when its normalized text e
 | Content kind | Source members | Structured RuleIR |
 | --- | ---: | ---: |
 | `faction_rule` | 28 | 0 |
-| `datasheet_ability` | 2049 | 652 |
+| `datasheet_ability` | 2049 | 653 |
 | `detachment_rule` | 266 | 12 |
 | `enhancement` | 701 | 70 |
 | `stratagem` | 1050 | 82 |
-| **Total** | **4094** | **816** |
+| **Total** | **4094** | **817** |
 
-Equivalent groups: **322**; cross-faction groups: **159**; exact-text-only members: **3167**; source-text-unavailable members: **111**.
+Equivalent groups: **322**; cross-faction groups: **159**; exact-text-only members: **3166**; source-text-unavailable members: **111**.
 
 ## Equivalence Groups
 

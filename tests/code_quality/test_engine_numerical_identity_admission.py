@@ -12,6 +12,7 @@ import pytest
 from scripts import build_test_shards as sharding
 from scripts import engine_numerical_identity_test_admission as selection
 from scripts import fools_flight_test_admission as fools
+from scripts import shroud_of_flies_test_admission as shroud
 from scripts import stage2_ground_charge_test_admission as ground_charge
 from scripts.canonical_circle_test_admission import ADDITION as CIRCLE_ADDITION
 from scripts.canonical_polygon_pairs_test_admission import ADDITION as PAIRS_ADDITION
@@ -151,8 +152,14 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         selection.OPENING_MOVEMENT_UNIT_OWNER,
     } <= cohort
     assert sum(cohort <= group for group in groups) == 1
-    summary = _record("ci/test_shards/durations.json")
-    current = sharding.summary_case_seconds(summary)
+    timing_path = "ci/test_shards/durations.json"
+    current = sharding.summary_case_seconds(_record(timing_path))
+    # The complete Shroud profile remeasures every case. Compare historical retained
+    # costs to the exact snapshot that still used them for dispatch.
+    pre_shroud_weights = json.loads(
+        subprocess.check_output(["git", "show", f"{shroud.BASE}:{timing_path}"], cwd=ROOT)
+    )
+    pre_shroud_cases = sharding.summary_case_seconds(pre_shroud_weights)
     fight = _record(selection.STAGE2_FIGHT_TRANSITION)
     base_manifest = json.loads(
         subprocess.check_output(
@@ -583,7 +590,7 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
             ["git", "show", dark_pact.BASE + ":ci/test_shards/durations.json"], cwd=ROOT
         )
     )["case_seconds"]
-    assert all(current[node] == seconds for node, seconds in base_weights.items())
+    assert all(pre_shroud_cases[node] == seconds for node, seconds in base_weights.items())
     fools_record = _record(fools.TRANSITION)
     flight_base_manifest = json.loads(
         subprocess.check_output(["git", "show", fools.BASE + ":" + MANIFEST], cwd=ROOT)
@@ -615,10 +622,9 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
             ["git", "show", fools.BASE + ":ci/test_shards/durations.json"], cwd=ROOT
         )
     )
-    current_weights = _record("ci/test_shards/durations.json")
     for weights in ("files", "case_seconds"):
         assert all(
-            current_weights[weights][node] == seconds
+            pre_shroud_weights[weights][node] == seconds
             for node, seconds in flight_base_weights[weights].items()
         )
     assert set(fools_record["replaced_sources"]) == fools.REPLACED_SOURCES
@@ -1039,11 +1045,31 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
     assert attack_record["runtime_fingerprint"] == json.loads(defender_base_manifest)["fingerprint"]
     assert defender_record["retained_manifest_sha256"] == attack_record["manifest_sha256"]
     assert defender_record["retained_runtime_fingerprint"] == attack_record["runtime_fingerprint"]
+    shroud_record = _record(shroud.RECEIPT)
+    assert shroud_record["base"] == shroud.BASE
     assert (
-        defender_record["manifest_sha256"]
-        == hashlib.sha256((ROOT / MANIFEST).read_bytes()).hexdigest()
+        shroud_record["retained_defender_sha256"]
+        == hashlib.sha256((ROOT / defender.RECEIPT).read_bytes()).hexdigest()
     )
-    assert defender_record["runtime_fingerprint"] == _record(MANIFEST)["fingerprint"]
+    shroud_base_manifest = subprocess.check_output(
+        ["git", "show", shroud.BASE + ":" + MANIFEST], cwd=ROOT
+    )
+    defender_manifest = hashlib.sha256(shroud_base_manifest).hexdigest()
+    defender_runtime = json.loads(shroud_base_manifest)["fingerprint"]
+    assert defender_record["manifest_sha256"] == defender_manifest
+    assert defender_record["runtime_fingerprint"] == defender_runtime
+    assert shroud_record["runtime_manifest"]["before"] == defender_manifest
+    assert shroud_record["runtime_fingerprint"]["before"] == defender_runtime
+    current_manifest = hashlib.sha256((ROOT / MANIFEST).read_bytes()).hexdigest()
+    current_runtime = _record(MANIFEST)["fingerprint"]
+    assert shroud_record["runtime_manifest"]["after"] == current_manifest
+    assert shroud_record["runtime_fingerprint"]["after"] == current_runtime
+    assert shroud.shroud_of_flies_runtime(ROOT, defender_manifest, defender_runtime) == (
+        current_manifest,
+        current_runtime,
+    )
+    assert shroud.OWNER in active_files
+    assert sum(shroud.OWNER in group for group in groups) == 1
     assert defender_record["retained_cases"] == [
         f"{defender.RETAINED_OWNER}::{case}" for case in defender.RETAINED_CASES
     ]
@@ -1057,14 +1083,19 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
             ["git", "show", defender.BASE + ":ci/test_shards/durations.json"], cwd=ROOT
         )
     )
-    assert set(current) == set(retained_weights["case_seconds"]) | set(
+    assert pre_shroud_cases.keys() == retained_weights["case_seconds"].keys() | set(
         defender_record["added_cases"]
     )
+    shroud_cases = set(shroud_record["added_cases"])
+    assert shroud_cases.isdisjoint(pre_shroud_cases)
+    assert current.keys() == pre_shroud_cases.keys() | shroud_cases
     assert all(
-        current[node] == seconds for node, seconds in retained_weights["case_seconds"].items()
+        pre_shroud_cases[node] == seconds
+        for node, seconds in retained_weights["case_seconds"].items()
     )
     assert all(
-        summary["files"][node] == seconds for node, seconds in retained_weights["files"].items()
+        pre_shroud_weights["files"][node] == seconds
+        for node, seconds in retained_weights["files"].items()
     )
     assert (
         attack_record["gathering_source_sha256"]
@@ -1089,10 +1120,11 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
     )
     assert len(attack_base_durations["case_seconds"]) == 6819
     assert all(
-        current[node] == seconds for node, seconds in attack_base_durations["case_seconds"].items()
+        pre_shroud_cases[node] == seconds
+        for node, seconds in attack_base_durations["case_seconds"].items()
     )
     assert all(
-        summary["files"][node] == seconds
+        pre_shroud_weights["files"][node] == seconds
         for node, seconds in attack_base_durations["files"].items()
     )
     assert ranged.OWNER in active_files
@@ -1115,10 +1147,11 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
     )
     assert len(ranged_base_durations["case_seconds"]) == 6813
     assert all(
-        current[node] == seconds for node, seconds in ranged_base_durations["case_seconds"].items()
+        pre_shroud_cases[node] == seconds
+        for node, seconds in ranged_base_durations["case_seconds"].items()
     )
     assert all(
-        summary["files"][node] == seconds
+        pre_shroud_weights["files"][node] == seconds
         for node, seconds in ranged_base_durations["files"].items()
     )
     assert (
@@ -1551,6 +1584,7 @@ def test_identity_inventory_uses_current_twelve_shards_and_native_cohort() -> No
         | ranged_cases
         | set(attack_record["added_cases"])
         | set(defender_record["added_cases"])
+        | shroud_cases
         | shooting_cases
         | {
             ground_charge.SCREEN_OWNER
@@ -1662,3 +1696,21 @@ def test_identity_transition_requires_its_exact_record(transition_snapshot: Path
     target.write_bytes(target.read_bytes() + b"\n")
     with pytest.raises(SystemExit, match="source bytes differ"):
         _transition(transition_snapshot)
+
+
+def test_shroud_transition_rejects_drift_in_the_current_manifest(tmp_path: Path) -> None:
+    for name in (
+        shroud.RECEIPT,
+        sharding.CUTOVER_PATH,
+        MANIFEST,
+        shroud.OWNER,
+        *shroud.PARSER_SOURCES,
+    ):
+        destination = tmp_path / name
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        destination.write_bytes((ROOT / name).read_bytes())
+    assert shroud.shroud_of_flies_test_successor(tmp_path) is not None
+    target = tmp_path / MANIFEST
+    target.write_bytes(target.read_bytes() + b"\n")
+    with pytest.raises(SystemExit, match=r"source bytes differ: .*_engine_build_manifest"):
+        shroud.shroud_of_flies_test_successor(tmp_path)

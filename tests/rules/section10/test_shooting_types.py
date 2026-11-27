@@ -1,9 +1,25 @@
 """10.04/05/06: physical native weapons reach real declaration and attack consumers."""
 
+from dataclasses import replace
+from typing import cast
+
 import pytest
 
+from tests.support.faction_batch01 import (
+    ELDRAD,
+    anchor,
+    casualty_checkpoint,
+    events,
+    locate,
+    scene,
+    selection,
+)
+from tests.support.faction_batch01 import (
+    faction_definitions as faction_definitions,
+)
 from tests.support.section02_fixtures import Section02Definitions
-from tests.support.section04_fixtures import add_enemy, finish_attacks, pending, weapon_rows
+from tests.support.section03_fixtures import grid
+from tests.support.section04_fixtures import add_enemy, choose, finish_attacks, pending, weapon_rows
 from tests.support.section10_fixtures import (
     AVENGERS,
     DEFILER,
@@ -18,12 +34,25 @@ from tests.support.section10_fixtures import (
     submit,
 )
 from tests.support.section10_fixtures import shooting_session as combat_session
+from tests.support.section11_fixtures import begin
+from tests.support.wahapedia_source_fixtures import wahapedia_source_artifacts
 from warhammer40k_core.adapters.event_stream import EventStreamCursor
+from warhammer40k_core.core.datasheet import CatalogAbilitySupport, DatasheetAbilityDescriptor
+from warhammer40k_core.engine.catalog_datasheet_rule_support import (
+    CATALOG_IR_STEALTH_AURA_CONSUMER_ID,
+)
+from warhammer40k_core.engine.catalog_rule_consumption import catalog_rule_ir_consumers_for_rule
+from warhammer40k_core.engine.event_log import JsonValue
+from warhammer40k_core.engine.faction_content.runtime import build_runtime_content_bundle_for_armies
 from warhammer40k_core.engine.mission_action_eligibility import (
     mission_action_unit_ineligibility_reason,
 )
 from warhammer40k_core.engine.phase import BattlePhase, LifecycleStatusKind
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
+from warhammer40k_core.engine.stealth import rules_unit_stealth_sources
+from warhammer40k_core.geometry.pose import Pose
+from warhammer40k_core.rules.rule_ir import RuleIR, RuleIRPayload
+from warhammer40k_core.rules.wahapedia_datasheet_ability_bridge import bridge_datasheet_abilities
 
 
 @pytest.mark.parametrize(
@@ -180,3 +209,121 @@ def test_declaration_cannot_change_the_selected_type(
     assert result.status_kind is LifecycleStatusKind.INVALID
     assert session.lifecycle.to_payload() == before
     assert_valid(submit(session, rows, ["enemy:target"], "normal", result_id="legal-type"))
+
+
+@pytest.fixture(scope="module")
+def shroud_of_flies() -> DatasheetAbilityDescriptor:
+    (row,) = (
+        row
+        for row in bridge_datasheet_abilities(
+            source_artifacts=wahapedia_source_artifacts(),
+            datasheet_ids=("000001470",),
+        )
+        if row.source_row_id == "000001470:3"
+    )
+    descriptor = row.descriptor
+    assert descriptor.support is CatalogAbilitySupport.GENERIC_RULE_IR
+    rule = RuleIR.from_payload(cast(RuleIRPayload, descriptor.rule_ir_payload))
+    assert catalog_rule_ir_consumers_for_rule(rule) == (CATALOG_IR_STEALTH_AURA_CONSUMER_ID,)
+    return descriptor
+
+
+@pytest.mark.parametrize(
+    "case_name",
+    ["in_range", "out_of_range", "wrong_patron", "wrong_faction", "enemy", "destroyed"],
+)
+def test_shroud_of_flies_grants_live_stealth_in_native_shooting(
+    faction_definitions: Section02Definitions,
+    shroud_of_flies: DatasheetAbilityDescriptor,
+    case_name: str,
+) -> None:
+    # Use the real bridge descriptor on a test fortification with known geometry.
+    # The Gnarlmaw itself still has no admitted hull.
+    d = faction_definitions
+    catalog = d.package.army_catalog
+    source = catalog.datasheet_by_id(ELDRAD)
+    source = replace(
+        source,
+        keywords=replace(source.keywords, keywords=(*source.keywords.keywords, "FORTIFICATION")),
+        abilities=(*source.abilities, shroud_of_flies),
+        source_ids=tuple(sorted({*source.source_ids, shroud_of_flies.source_id})),
+    )
+    eligible_sheet_id = LORD if case_name == "enemy" else AVENGERS
+    recipient = catalog.datasheet_by_id(eligible_sheet_id)
+    recipient = replace(
+        recipient,
+        keywords=replace(
+            recipient.keywords,
+            keywords=(
+                recipient.keywords.keywords
+                if case_name == "wrong_patron"
+                else (*recipient.keywords.keywords, "NURGLE")
+            ),
+            faction_keywords=(
+                recipient.keywords.faction_keywords
+                if case_name == "wrong_faction"
+                else (*recipient.keywords.faction_keywords, "LEGIONES DAEMONICA")
+            ),
+        ),
+    )
+    sheets = {source.datasheet_id: source, recipient.datasheet_id: recipient}
+    catalog = replace(
+        catalog,
+        datasheets=tuple(sheets.get(row.datasheet_id, row) for row in catalog.datasheets),
+        source_ids=tuple(sorted({*catalog.source_ids, shroud_of_flies.source_id})),
+    )
+    definitions = Section02Definitions(replace(d.package, army_catalog=catalog), 0.0)
+    battle = scene(
+        definitions,
+        (selection(definitions, AVENGERS, "target"), selection(definitions, ELDRAD, "source")),
+        (selection(definitions, LORD, "shooter"),),
+        phase=BattlePhase.SHOOTING,
+        active="opponent",
+        seed="shroud-of-flies",
+    )
+    target = battle.units["own:target"]
+    provider = battle.units["own:source"]
+    shooter = battle.units["foe:shooter"]
+    locate(battle, target.unit_instance_id, grid(target, 20, 20))
+    locate(
+        battle, provider.unit_instance_id, (Pose.at(17, 35 if case_name == "out_of_range" else 26),)
+    )
+    locate(battle, shooter.unit_instance_id, (Pose.at(13, 20),))
+    anchor(battle)
+    if case_name == "destroyed":
+        casualty_checkpoint(battle, provider.own_model_ids())
+
+    session = battle.session
+    bundle = build_runtime_content_bundle_for_armies(
+        config=session.lifecycle.config, armies=tuple(battle.state.army_definitions)
+    )
+    inventory = rules_unit_stealth_sources(
+        state=battle.state,
+        target_unit_instance_id=(shooter if case_name == "enemy" else target).unit_instance_id,
+        runtime_modifier_registry=bundle.runtime_modifier_registry,
+    )
+    if case_name == "in_range":
+        assert isinstance(inventory, dict)
+        (grant,) = cast(list[dict[str, JsonValue]], inventory["sources"])
+        assert str(grant["source_id"]).startswith(shroud_of_flies.source_id)
+        assert grant["model_ids"] == sorted(target.own_model_ids())
+    else:
+        assert inventory is None
+
+    request = begin(session)
+    if request.decision_type == "start_mission_action":
+        choose(session, request, "continue_to_shooting")
+    request = declaration_request(session, shooter, "normal")
+    row = next(r for r in weapon_rows(request) if r["wargear_id"] == f"{LORD}:bolt-pistol")
+    assert_valid(submit(session, [row], [target.unit_instance_id], "normal"))
+    assert accepted_pools(session)[0]["target_unit_instance_id"] == target.unit_instance_id
+    finish_attacks(session)
+    hit_rolls = [
+        cast(dict[str, JsonValue], event["payload"])
+        for event in events(session, "attack_sequence_step")
+        if event["step"] == "hit"
+    ]
+    assert hit_rolls
+    # Native bolt pistol is BS 2+. Core Stealth makes it 3+ via Benefit of Cover.
+    expected_target_number = 3 if case_name == "in_range" else 2
+    assert all(roll["target_number"] == expected_target_number for roll in hit_rolls)
