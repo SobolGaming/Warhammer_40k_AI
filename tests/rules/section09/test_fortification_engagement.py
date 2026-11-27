@@ -1,15 +1,20 @@
 """Native shooting and Fall Back through the shared source-bound Fortification clause."""
 
+import math
 from dataclasses import replace
+from pathlib import Path
 from typing import cast
 
 import pytest
+from tools.generate_ability_support_matrix import (
+    _ability_support_catalog_package,  # pyright: ignore[reportPrivateUsage]
+)
 
 from tests.setup_completion_helpers import record_primary_turn_start_evidence_for_fixture
 from tests.support.faction_batch01 import ELDRAD, RANGERS, anchor, locate, scene, selection
 from tests.support.faction_batch01 import faction_definitions as faction_definitions
 from tests.support.fortification_fixtures import GNARLMAW, SKULL_ALTAR, with_fortification
-from tests.support.section02_fixtures import Section02Definitions
+from tests.support.section02_fixtures import INFRACTORS, Section02Definitions
 from tests.support.section03_fixtures import grid, native_state, placement
 from tests.support.section03_session import movement_session
 from tests.support.section04_fixtures import choose as choose_shooting
@@ -53,9 +58,10 @@ from warhammer40k_core.engine.phases.movement_geometry import (
 from warhammer40k_core.engine.phases.movement_handler import MovementPhaseHandler
 from warhammer40k_core.engine.shooting_targets import FORTIFICATION_ENGAGEMENT_RULE_ID
 from warhammer40k_core.engine.unit_state import StartingStrengthRecord
-from warhammer40k_core.geometry.base import CircularBase
+from warhammer40k_core.geometry.base import BaseShape, CircularBase, OvalBase, RectangularBase
 from warhammer40k_core.geometry.model_body import ModelBodyPart
 from warhammer40k_core.geometry.pathing import PathWitness
+from warhammer40k_core.geometry.physical_predicates import physical_footprints_overlap
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.geometry.volume import Model, ModelVolume
 
@@ -400,7 +406,7 @@ def test_fortification_crossing_uses_planar_body_projection_and_strict_clearance
                         moving_model=mover,
                         witness=witness,
                         enemy_models=(support,),
-                        check_continuous_translation=True,
+                        check_continuous_motion=True,
                     )
                     == expected
                 )
@@ -411,7 +417,7 @@ def test_fortification_crossing_uses_planar_body_projection_and_strict_clearance
                 moving_model=mover,
                 witness=witness,
                 enemy_models=(support, replace(support, model_id="body", body_parts=(body,))),
-                check_continuous_translation=True,
+                check_continuous_motion=True,
             ) == ("body",)
 
 
@@ -591,3 +597,137 @@ def test_fortification_survivor_retry_rolls_each_new_crossing_only_once(
     assert authority.witness == PathWitness.for_paths(
         tuple(path for path in corrected if not (new_crossing_fails and path[0] == last))
     )
+
+
+@pytest.fixture(scope="session")
+def fortification_pivot_definitions(
+    selected_army_source_index: Path | None,
+) -> Section02Definitions:
+    return Section02Definitions(
+        _ability_support_catalog_package(
+            datasheet_ids=(INFRACTORS, LORD, "000001115", "000004090"),
+            source_index_dir=selected_army_source_index,
+        ),
+        0,
+    )
+
+
+@pytest.mark.parametrize("overlap", [0.008, 0.0, -0.008], ids=("crossing", "tangent", "clear"))
+def test_fortification_native_bloodcrusher_pivot_is_independent_of_waypoint(
+    fortification_pivot_definitions: Section02Definitions, overlap: float
+) -> None:
+    d = with_fortification(
+        fortification_pivot_definitions, provider_sheet=LORD, fortification_sheet=GNARLMAW
+    )
+    unit = d.unit("000001115")
+    first, second, third = unit.own_model_ids()
+    provider = d.unit(LORD, army_id="enemy", identity="fortification")
+    starts = (Pose.at(10, 10), Pose.at(13.65, 10), Pose.at(17.3, 10))
+    moving_base = geometry_model_at_pose(model=unit.own_models[0], pose=starts[0]).base
+    obstacle_base = geometry_model_at_pose(model=provider.own_models[0], pose=starts[0]).base
+    assert isinstance(moving_base, OvalBase)
+    assert moving_base.length == pytest.approx(90 / 25.4)
+    assert moving_base.width == pytest.approx(52.5 / 25.4)
+    assert isinstance(obstacle_base, CircularBase)
+    obstacle = Pose.at(10, 10 + moving_base.max_radius() + obstacle_base.radius - overlap)
+    for split in (True, False):
+        state = native_state(d, unit, starts, enemy=provider, enemy_poses=(obstacle,))
+        attach_mission(state)
+        add_unit(state, d.unit("000004090", identity="spare"), (Pose.at(10, 30), Pose.at(12.5, 30)))
+        state.battle_shocked_unit_ids.append(unit.unit_instance_id)
+        session = movement_session(d, state)
+        action = select(session, unit)
+        anchor_hazard_scene(session)
+        request = choose(session, action, "fall_back:desperate_escape")
+        pivot = (starts[0], Pose.at(10, 10, facing_degrees=90)) if split else (starts[0],)
+        status = _submit_fall_back(
+            session,
+            request,
+            unit.unit_instance_id,
+            (
+                (
+                    first,
+                    (
+                        *pivot,
+                        Pose.at(10, 10, facing_degrees=180),
+                        Pose.at(10, 6, facing_degrees=180),
+                    ),
+                ),
+                (second, (starts[1], Pose.at(13.65, 6))),
+                (third, (starts[2], Pose.at(17.3, 6))),
+            ),
+            result_id="bloodcrusher-pivot",
+        )
+        assert status.status_kind is not LifecycleStatusKind.INVALID, (split, status)
+        rolls = _escape_rolls(session)
+        assert tuple(roll.requirement.model_instance_id for roll in rolls) == (
+            (first,) if overlap > 0 else ()
+        ), (split, rolls)
+        if rolls:
+            assert rolls[0].requirement.enemy_model_ids == provider.own_model_ids()
+
+
+def test_fortification_crossing_respects_physical_overlap_tolerance() -> None:
+    start, end = Pose.at(10, 10), Pose.at(10, 17)
+    for penetration, expected in ((0.5e-9, False), (2e-9, True)):
+        obstacle = Pose.at(12 - penetration, 11.25)
+        for first in (CircularBase(1), OvalBase(2, 2)):
+            for second in (CircularBase(1), OvalBase(2, 2)):
+                assert (
+                    physical_footprints_overlap(first, Pose.at(10, 11.25), second, obstacle)
+                    is expected
+                )
+                _assert_crossing(first, second, obstacle, (start, end), expected)
+
+    # A physical margin at a flat face can persist along an entire segment.
+    slab = RectangularBase(16, 4)
+    for penetration, expected in ((1e-9, False), (2e-9, True)):
+        obstacle = Pose.at(10, 13 - penetration)
+        _assert_crossing(
+            OvalBase(4, 2), slab, obstacle, (Pose.at(6, 10), Pose.at(14, 10)), expected
+        )
+
+
+def test_fortification_crossing_interpolates_rotation_and_translation_together() -> None:
+    moving, enemy = OvalBase(4, 2), CircularBase(0.75)
+    start, end = Pose.at(9, 10), Pose.at(11, 10, facing_degrees=180)
+    for obstacle_y, expected in ((12.742, True), (12.75, False)):
+        obstacle = Pose.at(10, obstacle_y)
+        _assert_crossing(moving, enemy, obstacle, (start, end), expected)
+        _assert_crossing(
+            moving, enemy, obstacle, (start, Pose.at(9.5, 10, facing_degrees=45), end), expected
+        )
+    # Across the zero-degree seam the short turn keeps the narrow side toward
+    # the obstacle. Sweeping the long way would reach it.
+    start, end = Pose.at(9, 10, facing_degrees=350), Pose.at(11, 10, facing_degrees=10)
+    obstacle = Pose.at(10, 12.5)
+    _assert_crossing(moving, enemy, obstacle, (start, end), False)
+    _assert_crossing(moving, enemy, obstacle, (start, Pose.at(10, 10), end), False)
+
+    # Neither endpoint nor the initial temporal midpoint reaches this obstacle.
+    start, end = Pose.at(10, 10), Pose.at(10, 10, facing_degrees=150)
+    obstacle = Pose.at(10, 12.738)
+    angle = math.radians(75)
+    assert math.hypot(2 * math.sin(angle), math.cos(angle)) + enemy.radius < 2.738
+    _assert_crossing(moving, enemy, obstacle, (start, end), True)
+    _assert_crossing(
+        moving, enemy, obstacle, (start, Pose.at(10, 10, facing_degrees=30), end), True
+    )
+    _assert_crossing(RectangularBase(4, 2), enemy, obstacle, (start, end), True)
+
+
+def _assert_crossing(
+    first: BaseShape,
+    second: BaseShape,
+    obstacle: Pose,
+    poses: tuple[Pose, ...],
+    expected: bool,
+) -> None:
+    mover = Model("mover", poses[0], first, ModelVolume(1))
+    enemy = Model("obstacle", obstacle, second, ModelVolume(1))
+    assert _enemy_model_ids_crossed_by_witness(
+        moving_model=mover,
+        witness=PathWitness.for_paths(((mover.model_id, poses),)),
+        enemy_models=(enemy,),
+        check_continuous_motion=True,
+    ) == ((enemy.model_id,) if expected else ())

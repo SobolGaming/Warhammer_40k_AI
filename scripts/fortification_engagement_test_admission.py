@@ -16,6 +16,13 @@ from scripts.milli_inch_test_admission import MANIFEST
 RECEIPT = "data/source_audits/ci64_provenance_v1/fortification-engagement-test-v1.json"
 RECEIPT_SHA256 = "aaa5fe2e0078d0b63ed6bd67b01cd3e4c4369a2460045695a9c5201de4a4a7be"
 BASE = "767c5f2a09f10ec1fe6216ac2c3785fe12f48670"
+ROTATION_RECEIPT = "data/source_audits/ci64_provenance_v1/fortification-rotation-test-v1.json"
+ROTATION_RECEIPT_SHA256 = "13d8d42dfc5f317238e78ebe1f978b21c1b77c88dc41d56a20f6a6139cb54d20"
+ROTATION_BASE = "2a5bb77fd6eb1a04c276037ea159a5ef850f1668"
+ROTATION_SOURCES = {
+    "src/warhammer40k_core/engine/phases/movement_geometry.py",
+    "src/warhammer40k_core/geometry/physical_predicates.py",
+}
 OWNER = "tests/rules/section09/test_fortification_engagement.py"
 SOURCES = frozenset(
     {
@@ -56,6 +63,82 @@ class FortificationTestReceipt(TypedDict):
     sources: dict[str, str]
     added_files: dict[str, dict[str, object]]
     added_cases: list[str]
+
+
+class FortificationRotationReceipt(TypedDict):
+    schema: str
+    base: str
+    retained_fortification_sha256: str
+    runtime_manifest: dict[str, str]
+    runtime_fingerprint: dict[str, str]
+    sources: dict[str, dict[str, str]]
+    test: dict[str, dict[str, object]]
+    added_cases: list[str]
+
+
+def _fortification_rotation_successor(
+    root: Path,
+    previous: FortificationTestReceipt,
+) -> tuple[FortificationTestReceipt, bytes] | None:
+    from scripts.engine_numerical_identity_test_admission import (
+        _checked_bytes,  # pyright: ignore[reportPrivateUsage]
+    )
+
+    path = root / ROTATION_RECEIPT
+    _selection_no_links(root, path)
+    if not path.exists():
+        return None
+    raw = _checked_bytes(root, ROTATION_RECEIPT, ROTATION_RECEIPT_SHA256)
+    receipt = cast(
+        FortificationRotationReceipt, json.loads(raw, object_pairs_hook=_selection_object)
+    )
+    additions = receipt["added_cases"]
+    if (
+        receipt.keys() != FortificationRotationReceipt.__required_keys__
+        or receipt["schema"] != "finite-fortification-rotation-test-v1"
+        or receipt["base"] != ROTATION_BASE
+        or receipt["retained_fortification_sha256"] != RECEIPT_SHA256
+        or receipt["sources"].keys() != ROTATION_SOURCES
+        or receipt["test"].keys() != {"before", "after"}
+        or receipt["test"]["before"] != previous["added_files"][OWNER]
+        or receipt["test"]["before"] == receipt["test"]["after"]
+        or len(additions) != 5
+        or len(set(additions)) != 5
+        or set(additions).intersection(previous["added_cases"])
+        or any(not node.startswith(f"{OWNER}::") for node in additions)
+        or any(
+            change.keys() != {"before", "after"}
+            or change["before"] != old_digest
+            or change["after"] == old_digest
+            for change, old_digest in (
+                (receipt["runtime_manifest"], previous["runtime_manifest"]["after"]),
+                (receipt["runtime_fingerprint"], previous["runtime_fingerprint"]["after"]),
+                *(
+                    (change, previous["sources"][name])
+                    for name, change in receipt["sources"].items()
+                ),
+            )
+        )
+    ):
+        raise SystemExit("Fortification rotation differs from the exact predecessor.")
+    current: FortificationTestReceipt = {
+        **previous,
+        "runtime_manifest": {
+            **previous["runtime_manifest"],
+            "after": receipt["runtime_manifest"]["after"],
+        },
+        "runtime_fingerprint": {
+            **previous["runtime_fingerprint"],
+            "after": receipt["runtime_fingerprint"]["after"],
+        },
+        "sources": {
+            **previous["sources"],
+            **{name: change["after"] for name, change in receipt["sources"].items()},
+        },
+        "added_files": {OWNER: receipt["test"]["after"]},
+        "added_cases": [*previous["added_cases"], *additions],
+    }
+    return current, raw
 
 
 def _fortification_receipt(root: Path) -> tuple[FortificationTestReceipt, bytes] | None:
@@ -149,6 +232,10 @@ def fortification_test_addition(
         or receipt["runtime_fingerprint"]["before"] != predecessor_fingerprint
     ):
         raise SystemExit("Fortification test admission differs from the exact Shroud predecessor.")
+    rotation = _fortification_rotation_successor(root, receipt)
+    if rotation is not None:
+        receipt, rotation_raw = rotation
+        raw += b"\0" + rotation_raw
     manifest = _checked_bytes(root, MANIFEST, receipt["runtime_manifest"]["after"])
     if (
         json.loads(manifest, object_pairs_hook=_selection_object)["fingerprint"]

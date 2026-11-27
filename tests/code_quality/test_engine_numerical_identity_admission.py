@@ -1741,7 +1741,13 @@ def test_fortification_transition_rejects_source_and_case_drift(tmp_path: Path) 
         "predecessor_manifest": predecessor["runtime_manifest"]["after"],
         "predecessor_fingerprint": predecessor["runtime_fingerprint"]["after"],
     }
-    members = (fortification.RECEIPT, MANIFEST, fortification.OWNER, *sorted(fortification.SOURCES))
+    members = (
+        fortification.RECEIPT,
+        fortification.ROTATION_RECEIPT,
+        MANIFEST,
+        fortification.OWNER,
+        *sorted(fortification.SOURCES),
+    )
     for name in members:
         path = tmp_path / name
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -1752,7 +1758,9 @@ def test_fortification_transition_rejects_source_and_case_drift(tmp_path: Path) 
     receipt, suites, _ = addition
     assert suites.keys() == {fortification.OWNER}
     assert fortification.OWNER in sharding.behavioral_selection(ROOT).active_files
-    assert len(receipt["added_cases"]) == len(set(receipt["added_cases"])) == 17
+    previous = _record(fortification.RECEIPT)
+    assert receipt["added_cases"][:17] == previous["added_cases"]
+    assert len(receipt["added_cases"]) == len(set(receipt["added_cases"])) == 22
 
     for name in members:
         path = tmp_path / name
