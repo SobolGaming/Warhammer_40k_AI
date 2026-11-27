@@ -42,8 +42,9 @@ ALLOCATION_PREIMAGES = {
     ),
 }
 TYPING_RECEIPT = "data/source_audits/ci64_provenance_v1/gnarlmaw-test-typing-v1.json"
-TYPING_RECEIPT_SHA256 = "07c4c332132e6b38fca4e4e7ede1f565ffb765f33996e8ed901293e0fd942381"
+TYPING_RECEIPT_SHA256 = "3edf827ba489182f3522315588789e03b22957a047887195dc36ec976c94c01d"
 TYPING_BASE = "e8f79d797aa99c1f4e40b1609df7580a480bb3f2"
+TYPING_INACTIVE_OWNER = "tests/unit/test_skull_altar_runtime_regressions.py"
 ROTATION_SOURCES = {
     "src/warhammer40k_core/engine/phases/movement_geometry.py",
     "src/warhammer40k_core/geometry/physical_predicates.py",
@@ -141,10 +142,13 @@ def _fortification_successor(
     receipt = cast(
         FortificationSuccessorReceipt, json.loads(raw, object_pairs_hook=_selection_object)
     )
+    keys = FortificationSuccessorReceipt.__required_keys__
+    if transition.path == TYPING_RECEIPT:
+        keys = keys | {"inactive_test"}
     additions = receipt["added_cases"]
     source_preimages = {**previous["sources"], **transition.additional_preimages}
     if (
-        receipt.keys() != FortificationSuccessorReceipt.__required_keys__
+        receipt.keys() != keys
         or receipt["schema"] != transition.schema
         or receipt["base"] != transition.base
         or receipt["retained_fortification_sha256"] != transition.prior_sha256
@@ -291,6 +295,30 @@ def _fortification_current_receipt(
         receipt, successor_raw = typing
         raw += b"\0" + successor_raw
     return receipt, raw
+
+
+def gnarlmaw_inactive_test_successor(
+    root: Path, retained: dict[str, object]
+) -> dict[str, dict[str, object]]:
+    """Validate the shared cover helper repair in its existing inactive fixture."""
+    from scripts.engine_numerical_identity_test_admission import (
+        _checked_bytes,  # pyright: ignore[reportPrivateUsage]
+    )
+
+    path = root / TYPING_RECEIPT
+    _selection_no_links(root, path)
+    if not path.exists():
+        return {}
+    raw = _checked_bytes(root, TYPING_RECEIPT, TYPING_RECEIPT_SHA256)
+    record = json.loads(raw, object_pairs_hook=_selection_object)
+    row = record["inactive_test"]
+    if (
+        not isinstance(row, dict)
+        or row.keys() != {"before", "after"}
+        or row["before"] != retained.get(TYPING_INACTIVE_OWNER)
+    ):
+        raise SystemExit("Gnarlmaw inactive test preimage does not match retained membership.")
+    return _selection_members({TYPING_INACTIVE_OWNER: row["after"]}, root)
 
 
 def _fortification_receipt(root: Path) -> tuple[FortificationTestReceipt, bytes] | None:

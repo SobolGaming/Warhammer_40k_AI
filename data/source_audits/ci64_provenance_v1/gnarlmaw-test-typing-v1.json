@@ -1,6 +1,20 @@
 {
   "added_cases": [],
   "base": "e8f79d797aa99c1f4e40b1609df7580a480bb3f2",
+  "inactive_test": {
+    "after": {
+      "blob_sha1": "4ffcc267c83dfd994e9996126ca7f39daa7f31ae",
+      "bytes": 57084,
+      "mode": "100644",
+      "sha256": "ce7f25caac812a41093cdf5dfe44ad60b9bc133a0803f8dadc81e29b37c5fae3"
+    },
+    "before": {
+      "blob_sha1": "8f4789e51e56f2d39235eb35abd799e021dd3a51",
+      "bytes": 56678,
+      "mode": "100644",
+      "sha256": "87575faf896253d832dbd8c4a9efc2a473f9e0168f4d2b17c9c6d544fc9d80c6"
+    }
+  },
   "retained_fortification_sha256": "f55d16d2594073381a50616806ddf5358d9f75be2cdad1d98a45e6b5db9b3935",
   "runtime_fingerprint": {
     "after": "bba4a5825dd25db8231d044d19326314fb57b4e40d75582a33cafc686251b4da",

@@ -1759,6 +1759,7 @@ def test_fortification_transition_rejects_source_and_case_drift(tmp_path: Path) 
         fortification.RETRY_RECEIPT,
         fortification.DEVELOPMENT_RECEIPT,
         fortification.ALLOCATION_RECEIPT,
+        fortification.TYPING_RECEIPT,
         MANIFEST,
         fortification.OWNER,
         *sorted(
@@ -1777,7 +1778,9 @@ def test_fortification_transition_rejects_source_and_case_drift(tmp_path: Path) 
     assert addition is not None
     receipt, suites, _ = addition
     assert suites.keys() == {fortification.OWNER}
-    assert fortification.OWNER in sharding.behavioral_selection(ROOT).active_files
+    selected = sharding.behavioral_selection(ROOT)
+    assert fortification.OWNER in selected.active_files
+    assert fortification.TYPING_INACTIVE_OWNER in selected.inactive_files
     previous = _record(fortification.RECEIPT)
     assert receipt["added_cases"][:17] == previous["added_cases"]
     rotation = _record(fortification.ROTATION_RECEIPT)

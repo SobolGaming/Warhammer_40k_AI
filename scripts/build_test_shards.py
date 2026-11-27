@@ -466,6 +466,12 @@ def behavioral_selection(root: Path) -> BehavioralSelection:
         if name in current:
             raise SystemExit("Dark Pact fixture updates overlap a predecessor selection.")
         current[name] = after
+    from scripts.fortification_engagement_test_admission import gnarlmaw_inactive_test_successor
+
+    for name, after in gnarlmaw_inactive_test_successor(root, present_inactive).items():
+        if name in current:
+            raise SystemExit("Gnarlmaw fixture update overlaps a predecessor selection.")
+        current[name] = after
     inactive = _selection_members(present_inactive, root, current=current)
     inactive.update({name: value["inactive_legacy_files"][name] for name in retired})
     benchmarks = _selection_members(value["benchmark_files"], root)
