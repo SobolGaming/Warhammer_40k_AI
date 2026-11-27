@@ -24,6 +24,136 @@
         }
       }
     },
+    "ci/test_shards/durations.json": {
+      "before_sha256": "7fa3e0bddbcb9a444f27b2407d07977404727207af09969193b7a61cdc020ee0",
+      "after_sha256": "37caee69a6bf81b73d59adb68a69d2b2c63fbf6fee070aec1e4e7d29a05ac191",
+      "owners": {
+        "@document": {
+          "before": "7fa3e0bddbcb9a444f27b2407d07977404727207af09969193b7a61cdc020ee0",
+          "after": "37caee69a6bf81b73d59adb68a69d2b2c63fbf6fee070aec1e4e7d29a05ac191"
+        }
+      }
+    },
+    "ci/test_shards/shard-1.txt": {
+      "before_sha256": "43f27e04ffd1698ac6c74b6e1389563902ebadffd755f324922ce6a0d43dba37",
+      "after_sha256": "b0c12de4179800fa0f4f619823968e11ac282c31403345cbe045a1a3a6d0ff07",
+      "owners": {
+        "@document": {
+          "before": "43f27e04ffd1698ac6c74b6e1389563902ebadffd755f324922ce6a0d43dba37",
+          "after": "b0c12de4179800fa0f4f619823968e11ac282c31403345cbe045a1a3a6d0ff07"
+        }
+      }
+    },
+    "ci/test_shards/shard-10.txt": {
+      "before_sha256": "11eaee4edeee40bc6e3b167538fa1f90a3363548c7fd924523fbb04c89921af3",
+      "after_sha256": "cf270cd4e30162c4a4d4dc655d6121cc405e6d1f245a65a4306060d4e557988b",
+      "owners": {
+        "@document": {
+          "before": "11eaee4edeee40bc6e3b167538fa1f90a3363548c7fd924523fbb04c89921af3",
+          "after": "cf270cd4e30162c4a4d4dc655d6121cc405e6d1f245a65a4306060d4e557988b"
+        }
+      }
+    },
+    "ci/test_shards/shard-11.txt": {
+      "before_sha256": "db73a13c99659754df526a5eaec5b6d761af1f6e8b9f3a465e831d55d9b8c8fd",
+      "after_sha256": "54e80f39157ecb6790f066c21446a981b8e695202cd389f061dbe6ab30ea645c",
+      "owners": {
+        "@document": {
+          "before": "db73a13c99659754df526a5eaec5b6d761af1f6e8b9f3a465e831d55d9b8c8fd",
+          "after": "54e80f39157ecb6790f066c21446a981b8e695202cd389f061dbe6ab30ea645c"
+        }
+      }
+    },
+    "ci/test_shards/shard-12.txt": {
+      "before_sha256": "d39fc0a7f0403139aafa517001ba3297becb11cf71ac14f9cbd9a9fac0863a51",
+      "after_sha256": "42d020e03273f82553dafd278570b6fddfe05342d419c75843732c32adcd38bc",
+      "owners": {
+        "@document": {
+          "before": "d39fc0a7f0403139aafa517001ba3297becb11cf71ac14f9cbd9a9fac0863a51",
+          "after": "42d020e03273f82553dafd278570b6fddfe05342d419c75843732c32adcd38bc"
+        }
+      }
+    },
+    "ci/test_shards/shard-2.txt": {
+      "before_sha256": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
+      "after_sha256": "8936c2327d0f9464644c5844994604114c1544ae43a84c72b1db18867ec0e9e5",
+      "owners": {
+        "@document": {
+          "before": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
+          "after": "8936c2327d0f9464644c5844994604114c1544ae43a84c72b1db18867ec0e9e5"
+        }
+      }
+    },
+    "ci/test_shards/shard-3.txt": {
+      "before_sha256": "ed8b2de4f896240a0d1fb02f3619cf22c5a51a118cc241c105470311b8b39d28",
+      "after_sha256": "c8fba93dec3b7a24bf1e99fd46a6ebb0f4ad2ff12a160c10027224a6e2317e6c",
+      "owners": {
+        "@document": {
+          "before": "ed8b2de4f896240a0d1fb02f3619cf22c5a51a118cc241c105470311b8b39d28",
+          "after": "c8fba93dec3b7a24bf1e99fd46a6ebb0f4ad2ff12a160c10027224a6e2317e6c"
+        }
+      }
+    },
+    "ci/test_shards/shard-4.txt": {
+      "before_sha256": "612496c224c83b8dee2a80b11651371edbfcab66250ad3ff59c666d15714862e",
+      "after_sha256": "8694dfc37735bb680aadf02ad2ede1b667c20387be64ec63349daf3c816f21e9",
+      "owners": {
+        "@document": {
+          "before": "612496c224c83b8dee2a80b11651371edbfcab66250ad3ff59c666d15714862e",
+          "after": "8694dfc37735bb680aadf02ad2ede1b667c20387be64ec63349daf3c816f21e9"
+        }
+      }
+    },
+    "ci/test_shards/shard-5.txt": {
+      "before_sha256": "76bb21cf1a8a6cc8b35f11264cf0cb5c57df306261253773201033b7508538cc",
+      "after_sha256": "8ae38bbacc39e8f4e4f75e87fe35687e4b11c16479f1c5a578ecc1055d77e7b9",
+      "owners": {
+        "@document": {
+          "before": "76bb21cf1a8a6cc8b35f11264cf0cb5c57df306261253773201033b7508538cc",
+          "after": "8ae38bbacc39e8f4e4f75e87fe35687e4b11c16479f1c5a578ecc1055d77e7b9"
+        }
+      }
+    },
+    "ci/test_shards/shard-6.txt": {
+      "before_sha256": "3c9a3681197b0f14645262e6a32857e0988b06357bb51a915fa0f442437c6574",
+      "after_sha256": "2567c7e1ee8e1d1a900f5e697314d63d224e5ad2a405a01c92abee8b4f915d6b",
+      "owners": {
+        "@document": {
+          "before": "3c9a3681197b0f14645262e6a32857e0988b06357bb51a915fa0f442437c6574",
+          "after": "2567c7e1ee8e1d1a900f5e697314d63d224e5ad2a405a01c92abee8b4f915d6b"
+        }
+      }
+    },
+    "ci/test_shards/shard-7.txt": {
+      "before_sha256": "4c0b8d6d8fde107865d8f4650ff2961fd44d3efc88a8f840ef96b9980ffc4554",
+      "after_sha256": "9bb0aab7c761a245ea6615d6a0a745d954231abae2af8481f0aae4bbea9067ed",
+      "owners": {
+        "@document": {
+          "before": "4c0b8d6d8fde107865d8f4650ff2961fd44d3efc88a8f840ef96b9980ffc4554",
+          "after": "9bb0aab7c761a245ea6615d6a0a745d954231abae2af8481f0aae4bbea9067ed"
+        }
+      }
+    },
+    "ci/test_shards/shard-8.txt": {
+      "before_sha256": "b29dc16398e05e09c7b6420f1bfa7ed4da5bd7e47ca1b449c08a7ee15f73b2b9",
+      "after_sha256": "92e450a58df823355ee9eb5cca59cd9c22530c0f1b5defcffa2045f9b5c89c32",
+      "owners": {
+        "@document": {
+          "before": "b29dc16398e05e09c7b6420f1bfa7ed4da5bd7e47ca1b449c08a7ee15f73b2b9",
+          "after": "92e450a58df823355ee9eb5cca59cd9c22530c0f1b5defcffa2045f9b5c89c32"
+        }
+      }
+    },
+    "ci/test_shards/shard-9.txt": {
+      "before_sha256": "a9a34bf0bf3502dc7192455277546e6b44654eda28ab726795b6b1bbaa900749",
+      "after_sha256": "6c1c8128ee96c489cbd82a5b8187b2fe997cf0681cb0dabe050c8156809f7460",
+      "owners": {
+        "@document": {
+          "before": "a9a34bf0bf3502dc7192455277546e6b44654eda28ab726795b6b1bbaa900749",
+          "after": "6c1c8128ee96c489cbd82a5b8187b2fe997cf0681cb0dabe050c8156809f7460"
+        }
+      }
+    },
     "contracts/examples/persistence/session-persistence.json": {
       "before_sha256": "7abab9a7b4661ea4c9cb6958201cea9e71a4eee6ba32eb2a1056c283236deda8",
       "after_sha256": "d953c58b3eb8a4bbc2252be004cdd0ab3270566e5a74aaf230a338be1cfcb037",
@@ -363,6 +493,136 @@
       "operations": [],
       "selected_families": [],
       "rationale": "Registers the fourteen Shroud qualifier cases and one manifest drift case for quality dispatch.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/durations.json": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerates the twelve-shard schedule from one complete covered local profile of the exact Shroud behavioral inventory.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-1.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerates the twelve-shard schedule from one complete covered local profile of the exact Shroud behavioral inventory.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-10.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerates the twelve-shard schedule from one complete covered local profile of the exact Shroud behavioral inventory.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-11.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerates the twelve-shard schedule from one complete covered local profile of the exact Shroud behavioral inventory.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-12.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerates the twelve-shard schedule from one complete covered local profile of the exact Shroud behavioral inventory.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-2.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerates the twelve-shard schedule from one complete covered local profile of the exact Shroud behavioral inventory.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-3.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerates the twelve-shard schedule from one complete covered local profile of the exact Shroud behavioral inventory.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-4.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerates the twelve-shard schedule from one complete covered local profile of the exact Shroud behavioral inventory.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-5.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerates the twelve-shard schedule from one complete covered local profile of the exact Shroud behavioral inventory.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-6.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerates the twelve-shard schedule from one complete covered local profile of the exact Shroud behavioral inventory.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-7.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerates the twelve-shard schedule from one complete covered local profile of the exact Shroud behavioral inventory.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-8.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerates the twelve-shard schedule from one complete covered local profile of the exact Shroud behavioral inventory.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-9.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerates the twelve-shard schedule from one complete covered local profile of the exact Shroud behavioral inventory.",
       "source_obligation": null,
       "unchanged_work": null
     },
