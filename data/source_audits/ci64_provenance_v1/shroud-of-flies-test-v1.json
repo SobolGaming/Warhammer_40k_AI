@@ -1,0 +1,41 @@
+{
+  "added_cases": [
+    "tests/rules/section10/test_shooting_types.py::test_shroud_of_flies_grants_live_stealth_in_native_shooting[in_range]",
+    "tests/rules/section10/test_shooting_types.py::test_shroud_of_flies_grants_live_stealth_in_native_shooting[out_of_range]",
+    "tests/rules/section10/test_shooting_types.py::test_shroud_of_flies_grants_live_stealth_in_native_shooting[wrong_patron]",
+    "tests/rules/section10/test_shooting_types.py::test_shroud_of_flies_grants_live_stealth_in_native_shooting[wrong_faction]",
+    "tests/rules/section10/test_shooting_types.py::test_shroud_of_flies_grants_live_stealth_in_native_shooting[enemy]",
+    "tests/rules/section10/test_shooting_types.py::test_shroud_of_flies_grants_live_stealth_in_native_shooting[destroyed]"
+  ],
+  "base": "e5f2e9d94bbcd99d432d9a4441cbfbd63d564cf3",
+  "retained_cutover_sha256": "4cd1f0b062fad661e1c71fe27d2e9f8279c3c21d2a9f7bea9e3b053db79afce3",
+  "retained_defender_sha256": "f1165ef04248316b694d625044c05656cfb640d1e38577579a0c9b011681cffe",
+  "runtime_fingerprint": {
+    "after": "76448683a1f87521bc8639d6228c92a051f003395331c09fa651d98201db3104",
+    "before": "af65d2237320cda39c2d38d0dbeb4d415c424956696fc1cc0f40686921848830"
+  },
+  "runtime_manifest": {
+    "after": "53ddea6d5017cc820c6a6541ce12e30fa5e073e7d2e208daa8be997767147260",
+    "before": "9f984acc6ad83e17315c3e542c978c7bcce009051fc2dfb6f39334e1ffef8d2a"
+  },
+  "schema": "finite-shroud-of-flies-test-v1",
+  "sources": {
+    "src/warhammer40k_core/rules/aura_parser.py": "ac521037781d94981086d0745c8afef4918c2bb8464ce0c9810aca1bb967cf62",
+    "src/warhammer40k_core/rules/rule_duration_parser.py": "eb362f358a6410a4176ba4df8ac2616c6991b8d53448335dda5870f6e5337700",
+    "src/warhammer40k_core/rules/rule_parser.py": "b3deedd4489903aabba7c705d956c87014ffd2dd52eabdc411f728e96b13e5e9"
+  },
+  "test": {
+    "after": {
+      "blob_sha1": "a45f0cc48f05c40e6792f60a760d90c2e8e02187",
+      "bytes": 14360,
+      "mode": "100644",
+      "sha256": "df099463b3a908ac2bb617ca8730a7fd9a41850b67b467ba4c167abd363be530"
+    },
+    "before": {
+      "blob_sha1": "c24389a0b528e2c62e5480d62437ff3387cbeedf",
+      "bytes": 8148,
+      "mode": "100644",
+      "sha256": "8f7f2cfdccee7b688671fa6f6ec099402824b2c6dd67c13eade64482a840d773"
+    }
+  }
+}

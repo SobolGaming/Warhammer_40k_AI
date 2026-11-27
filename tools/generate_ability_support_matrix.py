@@ -4771,19 +4771,24 @@ def _chaos_daemons_nurgle_review_rows() -> tuple[DatasheetGroupReviewRow, ...]:
         DatasheetGroupReviewRow(
             datasheet="Feculent Gnarlmaw",
             datasheet_id="000001470",
-            source_basis="PDF pages 86-87; supersedes Wahapedia.",
+            source_basis=(
+                "July and September (v1.2) official faction packs, pages 86-87. "
+                "The official pack supersedes Wahapedia."
+            ),
             ir_coverage="Bridge/catalog blocked",
             supported_semantics=(
-                "Infiltrators, The Shadow of Chaos, and Shroud of Flies Stealth grant are "
-                "known structured paths."
+                "Infiltrators and The Shadow of Chaos are known structured paths. "
+                "Shroud of Flies uses the shared live Stealth aura and has focused "
+                "shooting evidence with fixture geometry. Shared Fortification "
+                "targeting, Hit-roll, Fall Back and cover paths exist."
             ),
             semantics_needed=(
-                "Diseased Cover terrain semantics; Shroud of Flies aura host; Fortification "
-                "hit-roll and Desperate Escape exceptions."
+                "Native Gnarlmaw evidence for Diseased Cover source attribution and "
+                "the Fortification exceptions awaits catalog admission."
             ),
             catalog_blockers=(
-                "No-equipment/no-option source rows are normalized; Hull footprint geometry "
-                "still requires an explicit geometry override."
+                "No-equipment/no-option source rows are normalized. The Hull designation "
+                "still requires supported footprint and height evidence for this sculpt."
             ),
         ),
         DatasheetGroupReviewRow(

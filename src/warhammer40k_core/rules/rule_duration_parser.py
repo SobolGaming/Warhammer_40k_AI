@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import re
 
+from warhammer40k_core.rules.aura_parser import has_aura_scope
 from warhammer40k_core.rules.parsed_tokens import TextSpan
 from warhammer40k_core.rules.rule_ir import (
     RuleDuration,
@@ -29,7 +30,6 @@ _UNTIL_ATTACKING_UNIT_FINISHES_ATTACKS_RE = re.compile(
     r"\buntil\s+the\s+attacking\s+unit\s+has\s+finished\s+making\s+its\s+attacks\b",
     re.IGNORECASE,
 )
-_AURA_RE = re.compile(r"(?:\bAura\b|^\s*Aura\s*:)", re.IGNORECASE)
 
 
 def parse_rule_duration(*, text: str, span: TextSpan) -> RuleDuration | None:
@@ -86,7 +86,7 @@ def parse_rule_duration(*, text: str, span: TextSpan) -> RuleDuration | None:
             ),
         )
 
-    if _AURA_RE.search(text) is not None and "while" in text.lower():
+    if has_aura_scope(text) and "while" in text.lower():
         return RuleDuration(
             kind=RuleDurationKind.WHILE_CONDITION_TRUE,
             source_span=span,

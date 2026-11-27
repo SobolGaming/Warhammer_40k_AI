@@ -1,160 +1,403 @@
 {
   "policy": "rules-engine-performance-v3",
-  "base": "eac0413c58c26576ea4dac93ac85b63524c7c15b",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:af65d2237320cda39c2d38d0dbeb4d415c424956696fc1cc0f40686921848830",
-  "operation_map_sha256": "f538dcad7c3fb1b314bb83bb4086fccc2eb178174f1dacee015ed20091eb0fd6",
+  "base": "e5f2e9d94bbcd99d432d9a4441cbfbd63d564cf3",
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:76448683a1f87521bc8639d6228c92a051f003395331c09fa651d98201db3104",
+  "operation_map_sha256": "4a2cb9ca1d124955c427b6cc917df85e481b9716721680f73b386b65236c748c",
   "changes": {
-    "docs/AI_IMPLEMENTATION_PLAN.md": {
-      "before_sha256": "2ce678dc5b458b19ac77058505ea0cdd7128f0e5b32b8d02cae031728ac97212",
-      "after_sha256": "3f55e97ecbcc4723642aef1fe95c38297bb206ff1be0001b30daa4d1e6f613db",
+    "contracts/examples/persistence/session-persistence.json": {
+      "before_sha256": "7abab9a7b4661ea4c9cb6958201cea9e71a4eee6ba32eb2a1056c283236deda8",
+      "after_sha256": "03d0a2b78520c28d2351c7ef3dee67bcc4fced4f6001c7293fe93aa9a8cfd0f8",
       "owners": {
         "@document": {
-          "before": "2ce678dc5b458b19ac77058505ea0cdd7128f0e5b32b8d02cae031728ac97212",
-          "after": "3f55e97ecbcc4723642aef1fe95c38297bb206ff1be0001b30daa4d1e6f613db"
+          "before": "7abab9a7b4661ea4c9cb6958201cea9e71a4eee6ba32eb2a1056c283236deda8",
+          "after": "03d0a2b78520c28d2351c7ef3dee67bcc4fced4f6001c7293fe93aa9a8cfd0f8"
+        }
+      }
+    },
+    "contracts/examples/sessions/session-command-outcome.json": {
+      "before_sha256": "5ee21507ddf0acafcaf873f8350e164fc86c79dcc7f01f1e7d836ab4756f2155",
+      "after_sha256": "94bc093022427935eece6703158056db31a9f1e11b158ea8809b65219e1ebe7e",
+      "owners": {
+        "@document": {
+          "before": "5ee21507ddf0acafcaf873f8350e164fc86c79dcc7f01f1e7d836ab4756f2155",
+          "after": "94bc093022427935eece6703158056db31a9f1e11b158ea8809b65219e1ebe7e"
+        }
+      }
+    },
+    "contracts/examples/sessions/session-command-started.json": {
+      "before_sha256": "7c7d5f461ca08cf7c866d4e5281fc670a4b871c85edb50e4cdb93592205e12a2",
+      "after_sha256": "6a5d7e4113cf7abb427657a7a3517c10e2c10f248003aea65b0f34c63f06f1da",
+      "owners": {
+        "@document": {
+          "before": "7c7d5f461ca08cf7c866d4e5281fc670a4b871c85edb50e4cdb93592205e12a2",
+          "after": "6a5d7e4113cf7abb427657a7a3517c10e2c10f248003aea65b0f34c63f06f1da"
+        }
+      }
+    },
+    "contracts/examples/sessions/session-metadata-created.json": {
+      "before_sha256": "c47c26f8702456c29bc5f9ed4190679a1fbdab6c7b14f6dbc551b6d623a8a8ea",
+      "after_sha256": "32a67c2ebce328f72c5e462ac9c3ad93515ebd39d1de690dd073e0eac9fac2cb",
+      "owners": {
+        "@document": {
+          "before": "c47c26f8702456c29bc5f9ed4190679a1fbdab6c7b14f6dbc551b6d623a8a8ea",
+          "after": "32a67c2ebce328f72c5e462ac9c3ad93515ebd39d1de690dd073e0eac9fac2cb"
+        }
+      }
+    },
+    "contracts/examples/support-profile-player-a-redacted.json": {
+      "before_sha256": "cf86e12a2cac5b2b90d167edd714af04b5d16e2711d0d9da58fdf229fbead659",
+      "after_sha256": "8dabe87e7781197eae36855d750464a7ec4a939b883ab856d3fc32c9ab434538",
+      "owners": {
+        "@document": {
+          "before": "cf86e12a2cac5b2b90d167edd714af04b5d16e2711d0d9da58fdf229fbead659",
+          "after": "8dabe87e7781197eae36855d750464a7ec4a939b883ab856d3fc32c9ab434538"
+        }
+      }
+    },
+    "contracts/examples/support-profile-player-b-redacted.json": {
+      "before_sha256": "c69c493a3e76d8feb0b7df83da7ecc74171c39fd8f0cfcdcf0010292b5875736",
+      "after_sha256": "c135ea1a469c2af90926f6dbb182f02bd21a3bc67f41e99264db80bea2f638e0",
+      "owners": {
+        "@document": {
+          "before": "c69c493a3e76d8feb0b7df83da7ecc74171c39fd8f0cfcdcf0010292b5875736",
+          "after": "c135ea1a469c2af90926f6dbb182f02bd21a3bc67f41e99264db80bea2f638e0"
+        }
+      }
+    },
+    "contracts/examples/support-profile.json": {
+      "before_sha256": "6ed8f8d6a4295722f1677ee9085a1a8b3699ed69375ef568a3953ff3a5f27145",
+      "after_sha256": "579c069ac791cdbb1a8bffbf8531f1a81086d2d272377f3d7d5b9798eddb5a5b",
+      "owners": {
+        "@document": {
+          "before": "6ed8f8d6a4295722f1677ee9085a1a8b3699ed69375ef568a3953ff3a5f27145",
+          "after": "579c069ac791cdbb1a8bffbf8531f1a81086d2d272377f3d7d5b9798eddb5a5b"
+        }
+      }
+    },
+    "contracts/manifest.json": {
+      "before_sha256": "e243540cd2781243ec299cdea42555ea3e8140e2e95002c4932ce977cf9c4d18",
+      "after_sha256": "bdc2514f8a47d67dbfcf675c5c6e512816579a923fab93a24be6d147eb2798b3",
+      "owners": {
+        "@document": {
+          "before": "e243540cd2781243ec299cdea42555ea3e8140e2e95002c4932ce977cf9c4d18",
+          "after": "bdc2514f8a47d67dbfcf675c5c6e512816579a923fab93a24be6d147eb2798b3"
+        }
+      }
+    },
+    "data/generated/ability_coverage/cross_source_semantic_equivalence.json": {
+      "before_sha256": "9d3d3d39a66c619ec5085a0296351f80ae101466c25938ad1534900019a08d82",
+      "after_sha256": "e9ce8884c7bdbd0588ea04c2ba60a1254f740a7b8d57118da5b3ffa4e121ffa6",
+      "owners": {
+        "@document": {
+          "before": "9d3d3d39a66c619ec5085a0296351f80ae101466c25938ad1534900019a08d82",
+          "after": "e9ce8884c7bdbd0588ea04c2ba60a1254f740a7b8d57118da5b3ffa4e121ffa6"
+        }
+      }
+    },
+    "data/source_audits/ci64_provenance_v1/shroud-of-flies-test-v1.json": {
+      "before_sha256": null,
+      "after_sha256": "f69a91579f3d2395166db934c99bd7703bcd782f66f4f06cb97b273463de0799",
+      "owners": {
+        "@document": {
+          "before": null,
+          "after": "f69a91579f3d2395166db934c99bd7703bcd782f66f4f06cb97b273463de0799"
+        }
+      }
+    },
+    "docs/CROSS_SOURCE_SEMANTIC_EQUIVALENCE.md": {
+      "before_sha256": "8f80a554fbe7fbb847bdd76bba2ee528bf651874c82ad2d0d67e87c368c804c4",
+      "after_sha256": "3683ff5acbb3dbf0dc57cd322eb7b95183fdb93c0b35ce11fc1b1423ff22617c",
+      "owners": {
+        "@document": {
+          "before": "8f80a554fbe7fbb847bdd76bba2ee528bf651874c82ad2d0d67e87c368c804c4",
+          "after": "3683ff5acbb3dbf0dc57cd322eb7b95183fdb93c0b35ce11fc1b1423ff22617c"
+        }
+      }
+    },
+    "docs/factions/chaos-daemons.md": {
+      "before_sha256": "7bc5ff0ad171b709a9de5d55b3e91888c9537d8396ed2ceeca2a369c5b437a2f",
+      "after_sha256": "d6f57e63aa954042d4c54e01cd33074c36c7952e5f54a3951463e3f2a3ac74ca",
+      "owners": {
+        "@document": {
+          "before": "7bc5ff0ad171b709a9de5d55b3e91888c9537d8396ed2ceeca2a369c5b437a2f",
+          "after": "d6f57e63aa954042d4c54e01cd33074c36c7952e5f54a3951463e3f2a3ac74ca"
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "49f54e886c5ce9e86682ec5c388f7c1053d21bf77449e875b2c44e1a0d206128",
-      "after_sha256": "64a21ee72f2f014644783928d5e6fd75f0a45b9ee80135762a54859f2a54ecf3",
+      "before_sha256": "64a21ee72f2f014644783928d5e6fd75f0a45b9ee80135762a54859f2a54ecf3",
+      "after_sha256": "9542794fa98b1e51f8b6ec4e8dcf5c428419545079da6422e9d05c0655890907",
       "owners": {
         "@document": {
-          "before": "49f54e886c5ce9e86682ec5c388f7c1053d21bf77449e875b2c44e1a0d206128",
-          "after": "64a21ee72f2f014644783928d5e6fd75f0a45b9ee80135762a54859f2a54ecf3"
+          "before": "64a21ee72f2f014644783928d5e6fd75f0a45b9ee80135762a54859f2a54ecf3",
+          "after": "9542794fa98b1e51f8b6ec4e8dcf5c428419545079da6422e9d05c0655890907"
         }
       }
     },
-    "docs/stage4-layout-intake-recipe.json": {
-      "before_sha256": null,
-      "after_sha256": "8bef1df1c64acdf63c7c628ccd6e9eb5ef8d5ead0c0f7ade37a01201d648cd59",
+    "scripts/engine_numerical_identity_test_admission.py": {
+      "before_sha256": "dfefcd9d556109c0f131d49fce2a693acd9328a9cbac61f9402a41a42ec72a51",
+      "after_sha256": "00ad8cf398cd8a016c2db17e20b9ba4080b9dc509558a067c6b3f8b6358a4744",
       "owners": {
-        "@document": {
-          "before": null,
-          "after": "8bef1df1c64acdf63c7c628ccd6e9eb5ef8d5ead0c0f7ade37a01201d648cd59"
+        "_counteroffensive_fight_type_transition": {
+          "before": "8ca8ec85ee694edcf085bffd3dc25bc1d0c4dc1122df9069b345699167ca0da8",
+          "after": "2020ca818932acbff4dbf70ef5f63749ce0f0d01a11920d28aaee179a418b8dd"
+        },
+        "combined_charge_runtime": {
+          "before": "a912a5cded7e214596ff75a081d935dd2e92ee93a59f98b7ae0d32d336b8ebc0",
+          "after": "b7a129e20919a40e04326723a53c9a85cf6549bc0a4ecf042c46f7881d954eae"
+        },
+        "exact_movement_test_transition": {
+          "before": "a656b81cd44789f967800a50caa042aa0c52b7c30acc8d444234a4ae95cd0185",
+          "after": "03439013f9b7df85da9a1fb7bf144668dcf66a571497835c2aa236e9c697b9a9"
         }
       }
     },
-    "scripts/stage4_benchmark_entry.py": {
-      "before_sha256": "394cfd3f86ab0a8d6d6caca503c24e4b82a5ab312744cd4b2ee54fa8f4a2793e",
-      "after_sha256": "ef9a3995378f39d0a140413af6da6fa072d0a46646068d799036f1ea8dea1626",
-      "owners": {
-        "main": {
-          "before": "21ee42e448bde21e0f15e1dc8e67d0773ad15f4f9c9a9af1b702b774735c3c8a",
-          "after": "72dd7538e908088d9b9f741088e04a6a41ec474e1c8776711cc1501374c90e97"
-        }
-      }
-    },
-    "scripts/stage4_layout_intake.py": {
+    "scripts/shroud_of_flies_test_admission.py": {
       "before_sha256": null,
-      "after_sha256": "905c74b67e34b091c1f4ff92004d33e0fd08dbf03ce450a98f1d1b226beb45d7",
+      "after_sha256": "b643a571d82c34492560a25079dd0fa7d6c76c309cf6d2af178880b1d88b573d",
       "owners": {
         "@module": {
           "before": null,
-          "after": "b26c8ce140de7bc56e5ce014ecbbc63a77b8c057fe419790dd1503a296a05e39"
+          "after": "e9784e07c0455745615081eaa1ef74d4d2950ae7db6c2a6bb2e0a21d6500743e"
         },
-        "IntakeGap": {
+        "ShroudOfFliesReceipt": {
           "before": null,
-          "after": "eabe721c4f72f41090ce241f66cc5c87f98f9f4e49fb948b99a4c448b9ea174a"
+          "after": "13fbceaccca4d963016f52e409e1d063b7e75e440058d4e84769c7a421972df0"
         },
-        "IntakeGap.__init__": {
+        "shroud_of_flies_runtime": {
           "before": null,
-          "after": "bb166ae0812be6adbc2103a8efab102dda4f33cdd1bd7c67ebcb513df98d02ca"
+          "after": "55081fd8dc804f23f1cb1ccca60a231a6ab442956fd1a7d3dd026b43239be68a"
         },
-        "classify_origin": {
+        "shroud_of_flies_test_successor": {
           "before": null,
-          "after": "88ae5e522012a83073187106ea880b4508e53d5efbf5c395d73e4f1f806119a2"
-        },
-        "config": {
-          "before": null,
-          "after": "e0b1b6abaf043281486a5211b81b8c17aa8005b2adea45507187c02f5aee7fa0"
-        },
-        "geometry_key": {
-          "before": null,
-          "after": "560b074071be62af5852c8ebaa4b06d4b10b41c1874dc5256701565bb212a43c"
-        },
-        "immediate_menu": {
-          "before": null,
-          "after": "8c7dc16b5b0aee3a5a3496481662fe7a2cbd7c905a769d6ea538b36263f69efc"
-        },
-        "linked_footprint_key": {
-          "before": null,
-          "after": "c0ad1f9f45634fc52ed77ae2663107fd046a312635d862fc165f6a4886d292bd"
-        },
-        "load_recipe": {
-          "before": null,
-          "after": "0af0947cdd1135896e691145d525b4318fda8453da3f0662ab070b83c6e68ba0"
-        },
-        "mission": {
-          "before": null,
-          "after": "b2a3ee7b89968f03f7cf811b01b9e4422193f5abe1a5f410da727199c392affc"
-        },
-        "need": {
-          "before": null,
-          "after": "85a2b4cdc3b4e8c21aa22e43d46fb36ea36acc9aa29b0cca373f6459f4d24ca4"
-        },
-        "open_origin": {
-          "before": null,
-          "after": "6b430e3991a18204d63ae0f3f737b80e94bff3031c0d6798caa3f57c5cad92b1"
-        },
-        "origin_type": {
-          "before": null,
-          "after": "8f6d832aeaec02198942e744a40b0f6e26738ec73ea1ff78dddc2f59112986f4"
-        },
-        "polygon_key": {
-          "before": null,
-          "after": "ea0c0384021579d67cdd3ad196ba89dffde4c6eb81b9ef3ee95b10607f768ec1"
-        },
-        "preflight": {
-          "before": null,
-          "after": "e500d151731ac7cf09312a803dc05ba10af78132d396b8e545e6ee30d9d1ead7"
-        },
-        "run": {
-          "before": null,
-          "after": "09a406ebc1336f871bd37d586c477b7df7866b6011f96785e74bd243e056f84a"
-        },
-        "screen_order": {
-          "before": null,
-          "after": "ae350f7ca422b69acd1077c2a797bee052caa7dc5101ec7ea40cc18bb9a69915"
-        },
-        "source_inventory": {
-          "before": null,
-          "after": "eb40696de5e390e1dfb804cdc58f34453794b498d454ac4410b497ec45655f33"
+          "after": "eaed69c09f71a8246d43ce528bc9e6018369a8003dd92888d9e141ebb89101f4"
         }
       }
     },
-    "scripts/stage4_layout_intake_checks.py": {
-      "before_sha256": null,
-      "after_sha256": "da7032f0b2c6ab3a44d47f9d8e9039e6be1d91532891b14be05015d0ff1e6e97",
+    "src/warhammer40k_core/_engine_build_manifest.json": {
+      "before_sha256": "9f984acc6ad83e17315c3e542c978c7bcce009051fc2dfb6f39334e1ffef8d2a",
+      "after_sha256": "53ddea6d5017cc820c6a6541ce12e30fa5e073e7d2e208daa8be997767147260",
+      "owners": {
+        "@document": {
+          "before": "9f984acc6ad83e17315c3e542c978c7bcce009051fc2dfb6f39334e1ffef8d2a",
+          "after": "53ddea6d5017cc820c6a6541ce12e30fa5e073e7d2e208daa8be997767147260"
+        }
+      }
+    },
+    "src/warhammer40k_core/rules/aura_parser.py": {
+      "before_sha256": "42625fc3dd25ba765a0942fb51ba35d395f4352515fc7e29d173fffa574f588a",
+      "after_sha256": "ac521037781d94981086d0745c8afef4918c2bb8464ce0c9810aca1bb967cf62",
       "owners": {
         "@module": {
-          "before": null,
-          "after": "a14d1440667dad4e4959e8b42de8c670b7612c12002498a9a1e151876f318c39"
+          "before": "bb385901b13e2552d8f9a93773af8e78650b3d3c036d0ac08fc7a23aa23a8c3a",
+          "after": "75700fc7a692d6a57224f8345d43e8dae554c5d85a1189138bb7b96877b18431"
         },
-        "test_first_recipe_uses_earliest_unused_diagram": {
+        "has_aura_scope": {
           "before": null,
-          "after": "351aff15b92662ff83edf6fa06bb4a875b7b3b42d3be86111c11914a416bd707"
+          "after": "0ab01d2857d7552ece5d9bb137cbe2a44ebaa3572cdaeed2b4d22ea735afe506"
         },
-        "test_origin_categories_are_defined_by_visible_control": {
+        "live_aura_distance_conditions": {
           "before": null,
-          "after": "d3efdc282fc1b2041e6036b5564cb59f7b03da5dc8cc073cc96209a20b0ebf46"
+          "after": "afb992a0aa3f1a172160fd144ae67989bebb96e2d9f03a8ffcac13f8e44057dc"
         },
-        "test_published_development_binding_rejects_reserve_collision": {
-          "before": null,
-          "after": "7e62e14e9f5b6e1dbe24f2dc85844d6abb20a8a10103dfa6c9d21cd7e581fadf"
+        "parse_aura_conditions": {
+          "before": "d5ef0ba126f7dbf3050a7b2ab1265e252a96919d1d09ee728b409db770f150e3",
+          "after": "f374e790ea90af37e84cc9b5734947ee696ab11e806190457883dede17603a75"
         },
-        "test_retained_control_without_contact_is_ineligible": {
+        "parse_live_aura_ability_effects": {
           "before": null,
-          "after": "3e8436bdf3a0f37330cbf6dfa26fa0ac2225571b0adc518f17ff03eed9789cf8"
+          "after": "691b5b35d6fc78f2a8e95c8ad3db225f87918fe42fb188a8139f5b6dd403c92c"
+        }
+      }
+    },
+    "src/warhammer40k_core/rules/rule_duration_parser.py": {
+      "before_sha256": "ccb18ea13cbd7e4f5da0876cac0197da406d8dd116c25c7c56996ca7f1cdedc6",
+      "after_sha256": "eb362f358a6410a4176ba4df8ac2616c6991b8d53448335dda5870f6e5337700",
+      "owners": {
+        "@module": {
+          "before": "f98fc4ff7cc061c08857c61bf50a61f3abc6e1cc54110c2ae3112eddd6fc24af",
+          "after": "2b7685c745c82c5939f637a8fed8fbbae85ef8d04d32fec6b7e9032334b71b5b"
+        },
+        "parse_rule_duration": {
+          "before": "78d5283f73d1b3501037f56e10f777cb2f51a41f4216be52ce8a13721e8732b0",
+          "after": "2f2e48ac990b540379b4e2e63d4981ca34ca12b111be377687eb2284753a4dbc"
+        }
+      }
+    },
+    "src/warhammer40k_core/rules/rule_parser.py": {
+      "before_sha256": "3e37613a9e61f3bc1b4aa71215280352aaf7ff1ad33b38ef897e62bc5d0139b9",
+      "after_sha256": "b3deedd4489903aabba7c705d956c87014ffd2dd52eabdc411f728e96b13e5e9",
+      "owners": {
+        "@module": {
+          "before": "46d18d5aeb61b11763c8615e4b69cb400959abd4e5f521602bed0ea86c6cafe5",
+          "after": "3fb448afa57224f2ce1b9334a401c13b7b3be0070f5e663edfb13cf800988f27"
+        },
+        "_compile_clause": {
+          "before": "9cf80d765c82b284ac5f96c372260439c3a24a52b420c5f681ce0babc6cd1aae",
+          "after": "50f3d9fc949c941588f3e89bceb56d3ee0ae522cd91d0dabbc85d194d2f5c85a"
+        },
+        "_parse_grant_ability_effects": {
+          "before": "f9810f045741137b026b9a5763658f7960daea47b6b4bfc290df66e232df8d6d",
+          "after": "7da9081c4de3e35aa25025a9e0108b2508e74ae42412f3991ce5d83ae7479229"
+        },
+        "_parse_target": {
+          "before": "5b68c8c6d8515b29339e12437208e0715545c49ed443a763d34ef76c7739a18d",
+          "after": "c984ff64072384a52e56ac20693e8a8f820420a6a702e5ffd716d8f149c72bf8"
+        }
+      }
+    },
+    "tests/rules/section10/test_shooting_types.py": {
+      "before_sha256": "8f7f2cfdccee7b688671fa6f6ec099402824b2c6dd67c13eade64482a840d773",
+      "after_sha256": "df099463b3a908ac2bb617ca8730a7fd9a41850b67b467ba4c167abd363be530",
+      "owners": {
+        "@module": {
+          "before": "cb36b8afb58535da6d0e8af902e89837cd485a504a9e084fa64a4822bc8634ae",
+          "after": "67786403f5af032c300d33b4400869e3563ff885fc716c4a811c446bed3d2b3c"
+        },
+        "shroud_of_flies": {
+          "before": null,
+          "after": "f2f3c9746b8a05a41967f9955e68987421a2ed562ae032035a082474e2f562d3"
+        },
+        "test_shroud_of_flies_grants_live_stealth_in_native_shooting": {
+          "before": null,
+          "after": "8ff62c0b78306c43ec04d2441f04a67db3730133af84b3875deeeb111c16a787"
+        }
+      }
+    },
+    "tools/generate_ability_support_matrix.py": {
+      "before_sha256": "76d547de784f93801f52412f82d044223afdfa5bd6f678d13ba8fe70003d2334",
+      "after_sha256": "5decd095de6e40d4c30a1d6569c5f2d9591acae808dd1873ea7f9463976a7458",
+      "owners": {
+        "_chaos_daemons_nurgle_review_rows": {
+          "before": "1b03cd39e65e3b8b234c54c4d78981d31366ed3fe136cb7f41f6711d1fd8edfb",
+          "after": "2c4581825570f892867834db898f808fd041d5620013eebdcaefe48912c94dad"
         }
       }
     }
   },
   "rows": {
-    "docs/AI_IMPLEMENTATION_PLAN.md": {
+    "contracts/examples/persistence/session-persistence.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication",
+        "fortification-stealth-aura-source"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerates published contract example identities for the exact source-parser build.",
+      "source_obligation": "Chaos Daemons official September 2026 faction pack pages 86 and 87 define the live friendly Nurgle Legiones Daemonica Stealth aura.",
+      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their existing algorithms and workload."
+    },
+    "contracts/examples/sessions/session-command-outcome.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication",
+        "fortification-stealth-aura-source"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerates published contract example identities for the exact source-parser build.",
+      "source_obligation": "Chaos Daemons official September 2026 faction pack pages 86 and 87 define the live friendly Nurgle Legiones Daemonica Stealth aura.",
+      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their existing algorithms and workload."
+    },
+    "contracts/examples/sessions/session-command-started.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication",
+        "fortification-stealth-aura-source"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerates published contract example identities for the exact source-parser build.",
+      "source_obligation": "Chaos Daemons official September 2026 faction pack pages 86 and 87 define the live friendly Nurgle Legiones Daemonica Stealth aura.",
+      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their existing algorithms and workload."
+    },
+    "contracts/examples/sessions/session-metadata-created.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication",
+        "fortification-stealth-aura-source"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerates published contract example identities for the exact source-parser build.",
+      "source_obligation": "Chaos Daemons official September 2026 faction pack pages 86 and 87 define the live friendly Nurgle Legiones Daemonica Stealth aura.",
+      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their existing algorithms and workload."
+    },
+    "contracts/examples/support-profile-player-a-redacted.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication",
+        "fortification-stealth-aura-source"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerates published contract example identities for the exact source-parser build.",
+      "source_obligation": "Chaos Daemons official September 2026 faction pack pages 86 and 87 define the live friendly Nurgle Legiones Daemonica Stealth aura.",
+      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their existing algorithms and workload."
+    },
+    "contracts/examples/support-profile-player-b-redacted.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication",
+        "fortification-stealth-aura-source"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerates published contract example identities for the exact source-parser build.",
+      "source_obligation": "Chaos Daemons official September 2026 faction pack pages 86 and 87 define the live friendly Nurgle Legiones Daemonica Stealth aura.",
+      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their existing algorithms and workload."
+    },
+    "contracts/examples/support-profile.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication",
+        "fortification-stealth-aura-source"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerates published contract example identities for the exact source-parser build.",
+      "source_obligation": "Chaos Daemons official September 2026 faction pack pages 86 and 87 define the live friendly Nurgle Legiones Daemonica Stealth aura.",
+      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their existing algorithms and workload."
+    },
+    "contracts/manifest.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "issue588-contract-publication",
+        "fortification-stealth-aura-source"
+      ],
+      "selected_families": [],
+      "rationale": "Regenerates published contract example identities for the exact source-parser build.",
+      "source_obligation": "Chaos Daemons official September 2026 faction pack pages 86 and 87 define the live friendly Nurgle Legiones Daemonica Stealth aura.",
+      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their existing algorithms and workload."
+    },
+    "data/generated/ability_coverage/cross_source_semantic_equivalence.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "phase-end-healing-source-and-report",
+        "fortification-stealth-aura-source"
+      ],
+      "selected_families": [],
+      "rationale": "Reports the shared live Stealth consumer and preserves the Gnarlmaw hull admission blocker.",
+      "source_obligation": "Chaos Daemons official September 2026 faction pack pages 86 and 87 define the live friendly Nurgle Legiones Daemonica Stealth aura.",
+      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their existing algorithms and workload."
+    },
+    "data/source_audits/ci64_provenance_v1/shroud-of-flies-test-v1.json": {
+      "category": "rule_semantics",
+      "operations": [
+        "fortification-stealth-aura-source"
+      ],
+      "selected_families": [],
+      "rationale": "Admits the revised shooting regression file and the exact successor build identity.",
+      "source_obligation": "Chaos Daemons official September 2026 faction pack pages 86 and 87 define the live friendly Nurgle Legiones Daemonica Stealth aura.",
+      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their existing algorithms and workload."
+    },
+    "docs/CROSS_SOURCE_SEMANTIC_EQUIVALENCE.md": {
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Documents the outcome-free reserve intake command, boundaries and observed eligibility evidence.",
+      "rationale": "Reports the shared live Stealth consumer and preserves the Gnarlmaw hull admission blocker.",
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "docs/factions/chaos-daemons.md": {
+      "category": "governance",
+      "operations": [],
+      "selected_families": [],
+      "rationale": "Reports the shared live Stealth consumer and preserves the Gnarlmaw hull admission blocker.",
       "source_obligation": null,
       "unchanged_work": null
     },
@@ -162,47 +405,112 @@
       "category": "governance",
       "operations": [],
       "selected_families": [],
-      "rationale": "Maps the bounded native preflight and its focused regressions to the existing opt-in benchmark operation.",
+      "rationale": "Maps the changed rule-source, admission, test and generated artifact owners to this focused operation.",
       "source_obligation": null,
       "unchanged_work": null
     },
-    "docs/stage4-layout-intake-recipe.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Freezes the source layout, ordinary setup, route predicates, seeds and native work caps.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "scripts/stage4_benchmark_entry.py": {
-      "category": "measured_workload",
+    "scripts/engine_numerical_identity_test_admission.py": {
+      "category": "rule_semantics",
       "operations": [
-        "stage4-benchmark-entry-reproducer"
+        "stage3-defender-coherency-test-admission",
+        "native-ranged-attack-count-reroll",
+        "cavalcade-authority-admission",
+        "stage2-strict-replay-test-admission",
+        "close-quarters-test-admission",
+        "engine-numerical-identity-admission",
+        "round4-malice-bearer-liveness",
+        "round4-battle-shock-event-wounds",
+        "phase-end-healing-test-admission",
+        "sheathed-in-brass-test-admission",
+        "stage3-bolt-of-change-test-admission",
+        "stage3-ordinary-melee-test-admission",
+        "skulls-beget-blood-test-admission",
+        "stage3-flight-normal-move-test-admission",
+        "wrath-undeniable-test-admission",
+        "pre-roll-charge-flight-test-admission",
+        "gore-hungry-onslaught-predecessor-admission",
+        "bounded-charge-flight-wall-proof",
+        "daemonic-terror-ordered-retreat",
+        "fortification-stealth-aura-source"
       ],
       "selected_families": [],
-      "rationale": "Adds a bounded opt-in CLI mode for immediate native reserve eligibility on one diagram.",
-      "source_obligation": null,
-      "unchanged_work": null
+      "rationale": "Admits the revised shooting regression file and the exact successor build identity.",
+      "source_obligation": "Chaos Daemons official September 2026 faction pack pages 86 and 87 define the live friendly Nurgle Legiones Daemonica Stealth aura.",
+      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their existing algorithms and workload."
     },
-    "scripts/stage4_layout_intake.py": {
-      "category": "measured_workload",
+    "scripts/shroud_of_flies_test_admission.py": {
+      "category": "rule_semantics",
       "operations": [
-        "stage4-benchmark-entry-reproducer"
+        "fortification-stealth-aura-source"
       ],
       "selected_families": [],
-      "rationale": "Exercises ordinary setup, actor-visible origin checks and immediate native legality in an opt-in development workload.",
-      "source_obligation": null,
-      "unchanged_work": null
+      "rationale": "Admits the revised shooting regression file and the exact successor build identity.",
+      "source_obligation": "Chaos Daemons official September 2026 faction pack pages 86 and 87 define the live friendly Nurgle Legiones Daemonica Stealth aura.",
+      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their existing algorithms and workload."
     },
-    "scripts/stage4_layout_intake_checks.py": {
-      "category": "measured_workload",
+    "src/warhammer40k_core/_engine_build_manifest.json": {
+      "category": "rule_semantics",
       "operations": [
-        "stage4-benchmark-entry-reproducer"
+        "cavalcade-authority-admission",
+        "phase-end-healing-source-and-report",
+        "fortification-stealth-aura-source"
       ],
       "selected_families": [],
-      "rationale": "Covers source ordering, development lineage and actor-visible feasibility strata without outcome labels.",
-      "source_obligation": null,
-      "unchanged_work": null
+      "rationale": "Regenerates the exact source-parser build fingerprint without a contract schema or runtime algorithm change.",
+      "source_obligation": "Chaos Daemons official September 2026 faction pack pages 86 and 87 define the live friendly Nurgle Legiones Daemonica Stealth aura.",
+      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their existing algorithms and workload."
+    },
+    "src/warhammer40k_core/rules/aura_parser.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "fortification-stealth-aura-source"
+      ],
+      "selected_families": [],
+      "rationale": "Normalizes source-authored live Fortification Stealth grants into the existing aura descriptor.",
+      "source_obligation": "Chaos Daemons official September 2026 faction pack pages 86 and 87 define the live friendly Nurgle Legiones Daemonica Stealth aura.",
+      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their existing algorithms and workload."
+    },
+    "src/warhammer40k_core/rules/rule_duration_parser.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "fortification-stealth-aura-source"
+      ],
+      "selected_families": [],
+      "rationale": "Normalizes source-authored live Fortification Stealth grants into the existing aura descriptor.",
+      "source_obligation": "Chaos Daemons official September 2026 faction pack pages 86 and 87 define the live friendly Nurgle Legiones Daemonica Stealth aura.",
+      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their existing algorithms and workload."
+    },
+    "src/warhammer40k_core/rules/rule_parser.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "fortification-stealth-aura-source"
+      ],
+      "selected_families": [],
+      "rationale": "Normalizes source-authored live Fortification Stealth grants into the existing aura descriptor.",
+      "source_obligation": "Chaos Daemons official September 2026 faction pack pages 86 and 87 define the live friendly Nurgle Legiones Daemonica Stealth aura.",
+      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their existing algorithms and workload."
+    },
+    "tests/rules/section10/test_shooting_types.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "qualification40-exact-1c81875882f544fd",
+        "fortification-stealth-aura-source"
+      ],
+      "selected_families": [],
+      "rationale": "Runs the source-linked grant through a real shooting declaration, Hit event and live eligibility controls.",
+      "source_obligation": "Chaos Daemons official September 2026 faction pack pages 86 and 87 define the live friendly Nurgle Legiones Daemonica Stealth aura.",
+      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their existing algorithms and workload."
+    },
+    "tools/generate_ability_support_matrix.py": {
+      "category": "rule_semantics",
+      "operations": [
+        "phase-end-healing-guide-summary",
+        "fortification-stealth-aura-source"
+      ],
+      "selected_families": [],
+      "rationale": "Reports the shared live Stealth consumer and preserves the Gnarlmaw hull admission blocker.",
+      "source_obligation": "Chaos Daemons official September 2026 faction pack pages 86 and 87 define the live friendly Nurgle Legiones Daemonica Stealth aura.",
+      "unchanged_work": "Existing aura distance queries, attack resolution, pathing, cache policy, save and replay execution retain their existing algorithms and workload."
     }
   },
   "milestone": "ordinary",

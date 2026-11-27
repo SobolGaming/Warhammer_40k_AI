@@ -181,7 +181,7 @@ This source-review table covers Chaos Daemons datasheets in the 11th edition Cha
 | --- | --- | --- | --- | --- | --- |
 | Beasts of Nurgle (`000001134`) | PDF pages 82-83; supersedes Wahapedia. | All consumed | Deadly Demise 1, Deep Strike, Scouts 6", and The Shadow of Chaos are known structured paths. Grotesque Regeneration restores the living model's lost wounds at the end of each phase through shared catalog RuleIR. | None for the listed rules. | Representative height remains unreviewed outside this report. |
 | Epidemius (`000001129`) | PDF pages 72-73; supersedes Wahapedia. | Unsupported IR | Deep Strike, The Shadow of Chaos, and led-unit 4+ invulnerable save semantics are structured paths. Source-backed Leader attachment targets are consumed by generic army mustering. | Tally of Pestilence destroyed-model counter and Command phase CP reward. | Representative height remains unreviewed outside this report. |
-| Feculent Gnarlmaw (`000001470`) | PDF pages 86-87; supersedes Wahapedia. | Bridge/catalog blocked | Infiltrators, The Shadow of Chaos, and Shroud of Flies Stealth grant are known structured paths. | Diseased Cover terrain semantics; Shroud of Flies aura host; Fortification hit-roll and Desperate Escape exceptions. | No-equipment/no-option source rows are normalized; Hull footprint geometry still requires an explicit geometry override. |
+| Feculent Gnarlmaw (`000001470`) | July and September (v1.2) official faction packs, pages 86-87. The official pack supersedes Wahapedia. | Bridge/catalog blocked | Infiltrators and The Shadow of Chaos are known structured paths. Shroud of Flies uses the shared live Stealth aura and has focused shooting evidence with fixture geometry. Shared Fortification targeting, Hit-roll, Fall Back and cover paths exist. | Native Gnarlmaw evidence for Diseased Cover source attribution and the Fortification exceptions awaits catalog admission. | No-equipment/no-option source rows are normalized. The Hull designation still requires supported footprint and height evidence for this sculpt. |
 | Great Unclean One (`000001130`) | PDF pages 66-67; supersedes Wahapedia. | Unsupported IR | Deep Strike, Deadly Demise D6, Feel No Pain 6+, The Shadow of Chaos, and Daemon Lord of Nurgle Toughness modifier semantics and Greater Daemon of Nurgle Shadow aura are structured paths. | Nurgle's Rot Toughness debuff host; Reverberating Summons Plaguebearer revival. | No known catalog blocker. |
 | Horticulous Slimux (`000001466`) | PDF pages 76-77; supersedes Wahapedia. | Unsupported IR | Deep Strike, The Shadow of Chaos, and Beast Handler charge reroll semantics are structured paths. Source-backed Leader attachment targets are consumed by generic army mustering. | Heroic Intervention Stratagem cost and extra-use semantics; Seed the Garden terrain Shadow extension. | Representative height remains unreviewed outside this report. |
 | Nurglings (`000001133`) | PDF pages 80-81; supersedes Wahapedia. | All consumed | Deep Strike, Infiltrators, The Shadow of Chaos, and Mischief Makers melee hit modifier engagement-range aura are consumed. | None. | Representative height remains unreviewed outside this report. |
@@ -229,7 +229,7 @@ This section is generated from the repository-wide semantic audit. It audits por
 
 | Source members | Structured RuleIR | Equivalent groups |
 | ---: | ---: | ---: |
-| 203 | 134 | 45 |
+| 203 | 135 | 45 |
 
 | Group | Kind / surface | Basis | Equivalent source rules | Execution conclusion |
 | --- | --- | --- | --- | --- |
