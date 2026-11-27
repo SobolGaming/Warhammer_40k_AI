@@ -198,3 +198,16 @@ def test_batch_preserves_origin_types_even_for_failed_native_menus() -> None:
     attempts[1] = {"origin": {"type": "contested"}, "status": "eligible"}
     batch.candidate_disposition(receipt, attempts, None)
     assert receipt == {"status": "ineligible", "reason": "origin_type_mismatch"}
+
+
+def test_page_9_screen_probe_uses_native_child_fork() -> None:
+    from hashlib import sha256
+
+    recipe = intake.load_recipe()
+    setup, _, _, _ = intake.source_inventory(recipe)
+    seed = sha256(f"{recipe['seed_namespace']}/1".encode()).hexdigest()
+    proof = intake.preflight(recipe, setup, seed)
+    assert proof["origin"]["type"] == "empty"
+    assert proof["strict_restore_and_replay"]
+    assert proof["menu"]["hold"] == "accepted"
+    assert proof["menu"]["probes"] == [{"id": proof["menu"]["selected_screen"], "violation": None}]

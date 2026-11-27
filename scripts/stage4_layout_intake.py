@@ -467,7 +467,7 @@ def immediate_menu(
         "screen_child_binding",
     )
     raw = bench.raw_moves(child)
-    accepted, selection = select_path(session, child, raw, recipe, recipe["routes"]["screen"])
+    accepted, selection = select_path(screen, child, raw, recipe, recipe["routes"]["screen"])
     if accepted is None:
         raise IntakeGap("screen_unavailable_under_cap", **selection)
     # Submit the selected native path on the branch through the same adapter, without

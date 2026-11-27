@@ -60,7 +60,7 @@
     },
     "scripts/stage4_layout_batch.py": {
       "before_sha256": null,
-      "after_sha256": "50e0530e3d1e1d7fcd4fc88a7af6226c4a51643e96c4e5634174c84f3598138b",
+      "after_sha256": "65a0abda1afdddfc4e00a044ce97903dcd974ab9a057676220d030c176554dc4",
       "owners": {
         "@module": {
           "before": null,
@@ -96,7 +96,7 @@
         },
         "run": {
           "before": null,
-          "after": "3ee32848fff9d8db1d904d46bdfad90633ff8444d8d77485a804b3917cd6c9c2"
+          "after": "5fa1835393c2afac616f596af8b198b8ea3a067c13512868c614bdba38a763ae"
         },
         "run_page": {
           "before": null,
@@ -106,7 +106,7 @@
     },
     "scripts/stage4_layout_intake.py": {
       "before_sha256": "905c74b67e34b091c1f4ff92004d33e0fd08dbf03ce450a98f1d1b226beb45d7",
-      "after_sha256": "2bfcba1bef761fb7f0b46a265fe2629187584f28d217061b148ce075fc810fc5",
+      "after_sha256": "566c07acbfe1158b568805fcee9209770245cfd45cf63c7454f630d2da96361a",
       "owners": {
         "@module": {
           "before": "b26c8ce140de7bc56e5ce014ecbbc63a77b8c057fe419790dd1503a296a05e39",
@@ -118,7 +118,7 @@
         },
         "immediate_menu": {
           "before": "8c7dc16b5b0aee3a5a3496481662fe7a2cbd7c905a769d6ea538b36263f69efc",
-          "after": "1e4830430122de348aa896a853c3f50c16c1a0547499ea5c75ca6bfa7091661a"
+          "after": "551d6dd82911791213f779cd831e0b91bc3215dbcc5273a63b1ff2e9e13d33f7"
         },
         "open_origin": {
           "before": "6b430e3991a18204d63ae0f3f737b80e94bff3031c0d6798caa3f57c5cad92b1",
@@ -144,7 +144,7 @@
     },
     "scripts/stage4_layout_intake_checks.py": {
       "before_sha256": "da7032f0b2c6ab3a44d47f9d8e9039e6be1d91532891b14be05015d0ff1e6e97",
-      "after_sha256": "1e44a67c72aa1cd91fe9516ebb6aabe8e48d0c7d84d92e46c4cd835779a0ff13",
+      "after_sha256": "301f4e30de91447fff7e2b565199bf23113b3bc73b85ab65c9b585643c0eed31",
       "owners": {
         "test_batch_can_revisit_first_pairing_at_last_page": {
           "before": null,
@@ -165,6 +165,10 @@
         "test_frozen_batch_inventory_and_original_page_9": {
           "before": null,
           "after": "4b2e6b34517b80986efdf2f3baf6ee9e093308029b8b53d6f8ca33963392f9e1"
+        },
+        "test_page_9_screen_probe_uses_native_child_fork": {
+          "before": null,
+          "after": "8017ef584107436997987c676f3dfd9b56bda2be417d833bdfb081e872919e27"
         }
       }
     }

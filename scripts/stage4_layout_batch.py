@@ -272,6 +272,8 @@ def run() -> None:
             }
         )
         candidate_disposition(receipt, attempts, failure)
+        if receipt["page"] == 9:
+            intake.need(receipt["status"] == "provisionally_eligible", "page_9_control_failed")
 
     groups = group_families(development, list(pinned.values()))
     component_by_id = {name: group for group in groups for name in group}
