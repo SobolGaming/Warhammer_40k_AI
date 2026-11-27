@@ -41,6 +41,9 @@ ALLOCATION_PREIMAGES = {
         "01f751c83cfcc153547830ee37f304b0e1d9479bbd855f1d6ddbc313d35c216d"
     ),
 }
+TYPING_RECEIPT = "data/source_audits/ci64_provenance_v1/gnarlmaw-test-typing-v1.json"
+TYPING_RECEIPT_SHA256 = "07c4c332132e6b38fca4e4e7ede1f565ffb765f33996e8ed901293e0fd942381"
+TYPING_BASE = "e8f79d797aa99c1f4e40b1609df7580a480bb3f2"
 ROTATION_SOURCES = {
     "src/warhammer40k_core/engine/phases/movement_geometry.py",
     "src/warhammer40k_core/geometry/physical_predicates.py",
@@ -156,7 +159,7 @@ def _fortification_successor(
         or any(
             change.keys() != {"before", "after"}
             or change["before"] != old_digest
-            or change["after"] == old_digest
+            or (change["after"] != old_digest) != bool(transition.sources)
             for change, old_digest in (
                 (receipt["runtime_manifest"], previous["runtime_manifest"]["after"]),
                 (receipt["runtime_fingerprint"], previous["runtime_fingerprint"]["after"]),
@@ -264,8 +267,28 @@ def _fortification_current_receipt(
             ALLOCATION_PREIMAGES,
         ),
     )
-    if allocation is not None:
-        receipt, successor_raw = allocation
+    if allocation is None:
+        if (root / TYPING_RECEIPT).exists():
+            raise SystemExit("Gnarlmaw test typing requires the exact allocation predecessor.")
+        return receipt, raw
+    receipt, successor_raw = allocation
+    raw += b"\0" + successor_raw
+    typing = _fortification_successor(
+        root,
+        receipt,
+        _Successor(
+            TYPING_RECEIPT,
+            TYPING_RECEIPT_SHA256,
+            TYPING_BASE,
+            "finite-gnarlmaw-test-typing-v1",
+            ALLOCATION_RECEIPT_SHA256,
+            0,
+            set(),
+            {},
+        ),
+    )
+    if typing is not None:
+        receipt, successor_raw = typing
         raw += b"\0" + successor_raw
     return receipt, raw
 

@@ -950,16 +950,16 @@ def test_gnarlmaw_deploys_from_native_development_roster(tmp_path: Path) -> None
     unit = next(u for u in army.units if u.datasheet_id == GNARLMAW)
     (model,) = unit.own_models
     assert not model.wargear_ids
-    record = next(
-        g for g in config.model_geometries if g.model_profile_id == model.model_profile_id
-    )
+    geometries = config.model_geometries
+    assert geometries is not None
+    record = next(g for g in geometries if g.model_profile_id == model.model_profile_id)
     assert record.rules_footprint_policy is GeometryRulesFootprintPolicy.USE_HULL
     assert record.support_base is None
     assert all(
         e.reviewer_status is GeometryReviewStatus.PROVISIONAL_ESTIMATE for e in record.evidence
     )
-    assert model.geometry.primary_part().radius_x_inches * 50.8 == pytest.approx(120)
-    assert model.geometry.primary_part().radius_y_inches * 50.8 == pytest.approx(90)
+    assert math.isclose(model.geometry.primary_part().radius_x_inches * 50.8, 120)
+    assert math.isclose(model.geometry.primary_part().radius_y_inches * 50.8, 90)
 
     before = session.lifecycle.to_payload()
     for pose, code in (
@@ -1134,7 +1134,11 @@ def test_gnarlmaw_records_allocation_cover_after_unmodified_hit_roll(tmp_path: P
     from tests.support.private_randomness import fixture_private_rng_seed
     from tests.support.section04_fixtures import pending
     from tests.support.section10_fixtures import submit
-    from warhammer40k_core.engine.army_mustering import WarlordSelection, muster_army
+    from warhammer40k_core.engine.army_mustering import (
+        ArmyMusterRequest,
+        WarlordSelection,
+        muster_army,
+    )
     from warhammer40k_core.engine.attack_sequence_model import HitRollPayload
     from warhammer40k_core.engine.battle_round_flow import BattleRoundFlow
     from warhammer40k_core.engine.battlefield_state import BattlefieldRuntimeState, PlacedArmy
@@ -1159,7 +1163,7 @@ def test_gnarlmaw_records_allocation_cover_after_unmodified_hit_roll(tmp_path: P
         terrain_areas=(),
         objective_terrain_areas=(),
     )
-    selected_rosters = []
+    selected_rosters: list[ArmyMusterRequest] = []
     for roster, sheets in zip(
         config.army_muster_requests, (("000001648", GNARLMAW), ("000001120",)), strict=True
     ):

@@ -1,0 +1,29 @@
+{
+  "added_cases": [],
+  "base": "e8f79d797aa99c1f4e40b1609df7580a480bb3f2",
+  "retained_fortification_sha256": "f55d16d2594073381a50616806ddf5358d9f75be2cdad1d98a45e6b5db9b3935",
+  "runtime_fingerprint": {
+    "after": "bba4a5825dd25db8231d044d19326314fb57b4e40d75582a33cafc686251b4da",
+    "before": "bba4a5825dd25db8231d044d19326314fb57b4e40d75582a33cafc686251b4da"
+  },
+  "runtime_manifest": {
+    "after": "309b9992140b7d74e05620d29b90eecfedc28ae7dd3370832b13ddf09e47ce8d",
+    "before": "309b9992140b7d74e05620d29b90eecfedc28ae7dd3370832b13ddf09e47ce8d"
+  },
+  "schema": "finite-gnarlmaw-test-typing-v1",
+  "sources": {},
+  "test": {
+    "after": {
+      "blob_sha1": "66695ae7a211a64c299e815b677630e27662a7a0",
+      "bytes": 58437,
+      "mode": "100644",
+      "sha256": "379c727e17f3be808fa380f6553ed4df6b4c7781beb03a4fc01748eaa02c0534"
+    },
+    "before": {
+      "blob_sha1": "f08bf06aa2a4fceed26ea2abb062fd0d4f7e20a7",
+      "bytes": 58318,
+      "mode": "100644",
+      "sha256": "7dc50a961cf45c220677f563f65908d484c5da890afc35618dd933612a826c06"
+    }
+  }
+}
