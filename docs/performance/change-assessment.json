@@ -1,1720 +1,473 @@
 {
-  "policy": "rules-engine-performance-v3",
-  "base": "73d8de5e163908c832cad7d6a2fd5428ed7d9c80",
-  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:68088b6cc28ea636abdc414206bff35b5574647bbed6b545026cb6f825b8a016",
-  "operation_map_sha256": "ccf0b3570fc32c12b9948400ba65215f74579e982309c15b85eb71c33c69bc59",
+  "base": "c61269d843e6fce49afb6ed3618e988e03d8baff",
   "changes": {
-    "ci/test_shards/durations.json": {
-      "before_sha256": "557b04107d031db5f85271682117e640812912ec3654f87b97baf74befaca620",
-      "after_sha256": "180a41705f656ee22fb71806b7bdf3d10488ad5bb636346ab267dad622e62b9f",
-      "owners": {
-        "@document": {
-          "before": "557b04107d031db5f85271682117e640812912ec3654f87b97baf74befaca620",
-          "after": "180a41705f656ee22fb71806b7bdf3d10488ad5bb636346ab267dad622e62b9f"
-        }
-      }
-    },
-    "ci/test_shards/shard-1.txt": {
-      "before_sha256": "a411a2f60ca96719e21e1cda95ad09dbf069c21df16a750bffaafbcb904dea5f",
-      "after_sha256": "89f8ccc864f50038af807e8f4f1783915f5704f4ab35ee4a84de90a0e27e27cb",
-      "owners": {
-        "@document": {
-          "before": "a411a2f60ca96719e21e1cda95ad09dbf069c21df16a750bffaafbcb904dea5f",
-          "after": "89f8ccc864f50038af807e8f4f1783915f5704f4ab35ee4a84de90a0e27e27cb"
-        }
-      }
-    },
-    "ci/test_shards/shard-10.txt": {
-      "before_sha256": "0cd7156e9a00f2a3acb1ef58ca377397256feadbab38a54744722683ef3a7dfb",
-      "after_sha256": "de16024f475ec132301139d6dd56bbc2154769f64faba4ea290a8832764093c2",
-      "owners": {
-        "@document": {
-          "before": "0cd7156e9a00f2a3acb1ef58ca377397256feadbab38a54744722683ef3a7dfb",
-          "after": "de16024f475ec132301139d6dd56bbc2154769f64faba4ea290a8832764093c2"
-        }
-      }
-    },
-    "ci/test_shards/shard-11.txt": {
-      "before_sha256": "8cce960eb68771b98b0710d84eeaf84e7fa1129b21d8ff35a5d80af7584f90a6",
-      "after_sha256": "b66a6359c435fa10f9624253fe7d6fc84a30a927719b210b69f02a6de96f6756",
-      "owners": {
-        "@document": {
-          "before": "8cce960eb68771b98b0710d84eeaf84e7fa1129b21d8ff35a5d80af7584f90a6",
-          "after": "b66a6359c435fa10f9624253fe7d6fc84a30a927719b210b69f02a6de96f6756"
-        }
-      }
-    },
-    "ci/test_shards/shard-12.txt": {
-      "before_sha256": "9a6e6ee40a27e176e7d6a65565ad01bca49bdb47193868572be6b3ae318e2c5f",
-      "after_sha256": "eacc53314050a48390be9ffa6f92821fab41463c7ba9224197c74c026e15f115",
-      "owners": {
-        "@document": {
-          "before": "9a6e6ee40a27e176e7d6a65565ad01bca49bdb47193868572be6b3ae318e2c5f",
-          "after": "eacc53314050a48390be9ffa6f92821fab41463c7ba9224197c74c026e15f115"
-        }
-      }
-    },
-    "ci/test_shards/shard-2.txt": {
-      "before_sha256": "51171cc207def4f72ef0dc4a87738275488c25674bd94ad48918585fc25ef927",
-      "after_sha256": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
-      "owners": {
-        "@document": {
-          "before": "51171cc207def4f72ef0dc4a87738275488c25674bd94ad48918585fc25ef927",
-          "after": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c"
-        }
-      }
-    },
-    "ci/test_shards/shard-3.txt": {
-      "before_sha256": "070e7a0f4bb0f60463f3d981860a3dca05aaef548d832f51822f2f8522cdccc6",
-      "after_sha256": "0eabe3b36959f3c83da0f569b3df5ad108ff3cefdb758bd804851fd874ed7a0f",
-      "owners": {
-        "@document": {
-          "before": "070e7a0f4bb0f60463f3d981860a3dca05aaef548d832f51822f2f8522cdccc6",
-          "after": "0eabe3b36959f3c83da0f569b3df5ad108ff3cefdb758bd804851fd874ed7a0f"
-        }
-      }
-    },
-    "ci/test_shards/shard-4.txt": {
-      "before_sha256": "a9cdd65997de775734725b6b2a7d7b8c321005f773441cf302877fba9ec8d49c",
-      "after_sha256": "d3dd4b42ac62194d750717b3ec1e037b51f576fb878baaffb41ec6aefef86f03",
-      "owners": {
-        "@document": {
-          "before": "a9cdd65997de775734725b6b2a7d7b8c321005f773441cf302877fba9ec8d49c",
-          "after": "d3dd4b42ac62194d750717b3ec1e037b51f576fb878baaffb41ec6aefef86f03"
-        }
-      }
-    },
-    "ci/test_shards/shard-5.txt": {
-      "before_sha256": "65e2e2953fc8b936b2429f5cf36fbe36e7c14cd701ab1a748836a822a992c59f",
-      "after_sha256": "caf16df1eab1b2d118f120faec79f52fbe1041819586aa21185e08edd112a936",
-      "owners": {
-        "@document": {
-          "before": "65e2e2953fc8b936b2429f5cf36fbe36e7c14cd701ab1a748836a822a992c59f",
-          "after": "caf16df1eab1b2d118f120faec79f52fbe1041819586aa21185e08edd112a936"
-        }
-      }
-    },
-    "ci/test_shards/shard-6.txt": {
-      "before_sha256": "3be7f77ac3cb595ecaa9bbc4ed76523ec7fc9b0019d409ad7dc637346099a379",
-      "after_sha256": "e46d4d74b38a8484209604790cc2aa1042f54ebf1cd72367e140c0c61ecd3f47",
-      "owners": {
-        "@document": {
-          "before": "3be7f77ac3cb595ecaa9bbc4ed76523ec7fc9b0019d409ad7dc637346099a379",
-          "after": "e46d4d74b38a8484209604790cc2aa1042f54ebf1cd72367e140c0c61ecd3f47"
-        }
-      }
-    },
-    "ci/test_shards/shard-7.txt": {
-      "before_sha256": "e5be1e9834161e8007de3dc4d199234147f76b015f0351464b15491caec7d2d4",
-      "after_sha256": "54172cb2d68e324be8de1450e20a6157bf3dadf713fb0cc2d6328f50bb49d96a",
-      "owners": {
-        "@document": {
-          "before": "e5be1e9834161e8007de3dc4d199234147f76b015f0351464b15491caec7d2d4",
-          "after": "54172cb2d68e324be8de1450e20a6157bf3dadf713fb0cc2d6328f50bb49d96a"
-        }
-      }
-    },
-    "ci/test_shards/shard-8.txt": {
-      "before_sha256": "54a9c4eccf2bd3d99143abbac5fa61c1e6d6ac504a5f52e3e264ae430211bc21",
-      "after_sha256": "b910d0aaaf9213939be0917e40f67095aa724320d02081b32cfd5f9f658abdb4",
-      "owners": {
-        "@document": {
-          "before": "54a9c4eccf2bd3d99143abbac5fa61c1e6d6ac504a5f52e3e264ae430211bc21",
-          "after": "b910d0aaaf9213939be0917e40f67095aa724320d02081b32cfd5f9f658abdb4"
-        }
-      }
-    },
-    "ci/test_shards/shard-9.txt": {
-      "before_sha256": "059d1239827466c49f704a2abfd8c1398ca43543967a3300455839e76ee51f84",
-      "after_sha256": "36ea504291924eb191e18b97f499320bd6f8057f49a7578136360fc9275cebf8",
-      "owners": {
-        "@document": {
-          "before": "059d1239827466c49f704a2abfd8c1398ca43543967a3300455839e76ee51f84",
-          "after": "36ea504291924eb191e18b97f499320bd6f8057f49a7578136360fc9275cebf8"
-        }
-      }
-    },
     "contracts/examples/persistence/session-persistence.json": {
-      "before_sha256": "50797e86ca8fbd49322b106b6c4774f0e06d4327b660ff236c06b47c4a7f905a",
-      "after_sha256": "427fb55ed19884f1912b0e88c5453b221640334069d63a63b67586a9e8b64212",
+      "after_sha256": "a9115b45133c38082b43d796e85900bc3858439767849eee9e5557d9c59c9a3d",
+      "before_sha256": "427fb55ed19884f1912b0e88c5453b221640334069d63a63b67586a9e8b64212",
       "owners": {
         "@document": {
-          "before": "50797e86ca8fbd49322b106b6c4774f0e06d4327b660ff236c06b47c4a7f905a",
-          "after": "427fb55ed19884f1912b0e88c5453b221640334069d63a63b67586a9e8b64212"
+          "after": "a9115b45133c38082b43d796e85900bc3858439767849eee9e5557d9c59c9a3d",
+          "before": "427fb55ed19884f1912b0e88c5453b221640334069d63a63b67586a9e8b64212"
         }
       }
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "before_sha256": "e120ee6689aa61739003bae1cadb01d5c85079f628fbe5ae533c2ea95306dbb1",
-      "after_sha256": "a68966c4b26a7135f1a9e3f716349e0457e0f902e9fee9cb3010bab611d28f8d",
+      "after_sha256": "5917613733a3df42927d9f3772fa9300cfa2fdbdc2422d27ddff1ccc6fa96bfc",
+      "before_sha256": "a68966c4b26a7135f1a9e3f716349e0457e0f902e9fee9cb3010bab611d28f8d",
       "owners": {
         "@document": {
-          "before": "e120ee6689aa61739003bae1cadb01d5c85079f628fbe5ae533c2ea95306dbb1",
-          "after": "a68966c4b26a7135f1a9e3f716349e0457e0f902e9fee9cb3010bab611d28f8d"
+          "after": "5917613733a3df42927d9f3772fa9300cfa2fdbdc2422d27ddff1ccc6fa96bfc",
+          "before": "a68966c4b26a7135f1a9e3f716349e0457e0f902e9fee9cb3010bab611d28f8d"
         }
       }
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "before_sha256": "4c8d28ccc240dd2d70bdfb7346940900e6997505e42eddecd8298c22d5e9af99",
-      "after_sha256": "0b80000c8f6b139ba125691d1f97597c72c7d843a4555d0be5e03792bc337fe5",
+      "after_sha256": "f82ba57ea73eb6c61b9d0b7350909cf31cd43a20cac9fb4e7cbe4b39969c1554",
+      "before_sha256": "0b80000c8f6b139ba125691d1f97597c72c7d843a4555d0be5e03792bc337fe5",
       "owners": {
         "@document": {
-          "before": "4c8d28ccc240dd2d70bdfb7346940900e6997505e42eddecd8298c22d5e9af99",
-          "after": "0b80000c8f6b139ba125691d1f97597c72c7d843a4555d0be5e03792bc337fe5"
+          "after": "f82ba57ea73eb6c61b9d0b7350909cf31cd43a20cac9fb4e7cbe4b39969c1554",
+          "before": "0b80000c8f6b139ba125691d1f97597c72c7d843a4555d0be5e03792bc337fe5"
         }
       }
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "before_sha256": "e63d066e41547a2e5da2aa0e99bcd0f9325d15ba26935cf0fdeaa29c05efc551",
-      "after_sha256": "2664b9520117afc0e64c86a5fd37f809ab61232c08c253cbd22c8d2b32fe480a",
+      "after_sha256": "5148d4e01b4a403b10bcc35e0430477ec47d8bdd50d986a3cd55886b02e7690d",
+      "before_sha256": "2664b9520117afc0e64c86a5fd37f809ab61232c08c253cbd22c8d2b32fe480a",
       "owners": {
         "@document": {
-          "before": "e63d066e41547a2e5da2aa0e99bcd0f9325d15ba26935cf0fdeaa29c05efc551",
-          "after": "2664b9520117afc0e64c86a5fd37f809ab61232c08c253cbd22c8d2b32fe480a"
+          "after": "5148d4e01b4a403b10bcc35e0430477ec47d8bdd50d986a3cd55886b02e7690d",
+          "before": "2664b9520117afc0e64c86a5fd37f809ab61232c08c253cbd22c8d2b32fe480a"
         }
       }
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "before_sha256": "0eddb1eed1bda7462130ad63054daf5df977d376d099d50c02ce9cb7fbfa7b52",
-      "after_sha256": "f874e322fcc60b590857aeb236c69b923723ffb4f396c18959a616a3e979888d",
+      "after_sha256": "2d9125e18b690a41069d6cfecbab37e8961a4b43b10e2c5931fb3af4424f1531",
+      "before_sha256": "f874e322fcc60b590857aeb236c69b923723ffb4f396c18959a616a3e979888d",
       "owners": {
         "@document": {
-          "before": "0eddb1eed1bda7462130ad63054daf5df977d376d099d50c02ce9cb7fbfa7b52",
-          "after": "f874e322fcc60b590857aeb236c69b923723ffb4f396c18959a616a3e979888d"
+          "after": "2d9125e18b690a41069d6cfecbab37e8961a4b43b10e2c5931fb3af4424f1531",
+          "before": "f874e322fcc60b590857aeb236c69b923723ffb4f396c18959a616a3e979888d"
         }
       }
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "before_sha256": "0b23c9401098e31d697b4960b12f981b32e7d2556e77635a1f3a26f3ff1de155",
-      "after_sha256": "ac7168143c4ad3ec237ef7a9ee4e5093b79d74b214bfed349e1feb5939d4e832",
+      "after_sha256": "3e8da7a2dbb74c6a86df00fa7e6077b919813c5a4585fea75f994887325e443b",
+      "before_sha256": "ac7168143c4ad3ec237ef7a9ee4e5093b79d74b214bfed349e1feb5939d4e832",
       "owners": {
         "@document": {
-          "before": "0b23c9401098e31d697b4960b12f981b32e7d2556e77635a1f3a26f3ff1de155",
-          "after": "ac7168143c4ad3ec237ef7a9ee4e5093b79d74b214bfed349e1feb5939d4e832"
+          "after": "3e8da7a2dbb74c6a86df00fa7e6077b919813c5a4585fea75f994887325e443b",
+          "before": "ac7168143c4ad3ec237ef7a9ee4e5093b79d74b214bfed349e1feb5939d4e832"
         }
       }
     },
     "contracts/examples/support-profile.json": {
-      "before_sha256": "add06399276deb1e99868f9114a77158836b91151dfeb3bb32f863cf5a67f359",
-      "after_sha256": "2de660b839bc52d909cffc0c426ddbc3347847df328b6d67804cfda736bb4941",
+      "after_sha256": "df26ab9c704afc9fd4c55dd37bf489ef985a4cd46ae40e8fee1834936643e68d",
+      "before_sha256": "2de660b839bc52d909cffc0c426ddbc3347847df328b6d67804cfda736bb4941",
       "owners": {
         "@document": {
-          "before": "add06399276deb1e99868f9114a77158836b91151dfeb3bb32f863cf5a67f359",
-          "after": "2de660b839bc52d909cffc0c426ddbc3347847df328b6d67804cfda736bb4941"
+          "after": "df26ab9c704afc9fd4c55dd37bf489ef985a4cd46ae40e8fee1834936643e68d",
+          "before": "2de660b839bc52d909cffc0c426ddbc3347847df328b6d67804cfda736bb4941"
         }
       }
     },
     "contracts/manifest.json": {
-      "before_sha256": "3afe5e7db2b20f9e32d6b95fd600ae534c515726b6df230cdcbe58e4af0789ea",
-      "after_sha256": "b93ed99ac77fd964eeb4c93dff31f45cc2c6e4552a74c5835e6e1a422aa93e8e",
+      "after_sha256": "52cfce03d7f28d4681254fa391d7cbbbe6ce6bf90513bdd333528c9b78f3365a",
+      "before_sha256": "b93ed99ac77fd964eeb4c93dff31f45cc2c6e4552a74c5835e6e1a422aa93e8e",
       "owners": {
         "@document": {
-          "before": "3afe5e7db2b20f9e32d6b95fd600ae534c515726b6df230cdcbe58e4af0789ea",
-          "after": "b93ed99ac77fd964eeb4c93dff31f45cc2c6e4552a74c5835e6e1a422aa93e8e"
+          "after": "52cfce03d7f28d4681254fa391d7cbbbe6ce6bf90513bdd333528c9b78f3365a",
+          "before": "b93ed99ac77fd964eeb4c93dff31f45cc2c6e4552a74c5835e6e1a422aa93e8e"
         }
       }
     },
-    "data/generated/ability_coverage/cross_source_semantic_equivalence.json": {
-      "before_sha256": "f9e331e5c82c83649a23fff0fa8cb76d8d7219d7bcf5034e863ab19e4c38217e",
-      "after_sha256": "d8137a37095b38fa00d8853171e552b49e2fb8f7d7152cbd9988da5d270f5a5a",
-      "owners": {
-        "@document": {
-          "before": "f9e331e5c82c83649a23fff0fa8cb76d8d7219d7bcf5034e863ab19e4c38217e",
-          "after": "d8137a37095b38fa00d8853171e552b49e2fb8f7d7152cbd9988da5d270f5a5a"
-        }
-      }
-    },
-    "data/source_audits/ci64_provenance_v1/gnarlmaw-allocation-group-bounds-test-v1.json": {
+    "data/source_audits/ci64_provenance_v1/exact-terrain-cover-test-v1.json": {
+      "after_sha256": "28f8e87aeb41e7749f6376bb2fe1588f155b58cb590a2e82f7e019da0769aad6",
       "before_sha256": null,
-      "after_sha256": "0002be4a267ec21738049fa3df0ceecdc56d166e0fc418fd230264d9e77cc694",
       "owners": {
         "@document": {
-          "before": null,
-          "after": "0002be4a267ec21738049fa3df0ceecdc56d166e0fc418fd230264d9e77cc694"
+          "after": "28f8e87aeb41e7749f6376bb2fe1588f155b58cb590a2e82f7e019da0769aad6",
+          "before": null
         }
       }
     },
-    "data/source_audits/ci64_provenance_v1/gnarlmaw-allocation-projection-split-test-v1.json": {
+    "docs/performance/current/exact-terrain-cover-movement.json": {
+      "after_sha256": "ad945e20706a066a2b2a62ed21163a0a2707f483f04c6f586ce641c363744461",
       "before_sha256": null,
-      "after_sha256": "4f85dd056b26aff4fcade4599bcb2a049c109f5f962be57d17bb6da8016040e9",
       "owners": {
         "@document": {
-          "before": null,
-          "after": "4f85dd056b26aff4fcade4599bcb2a049c109f5f962be57d17bb6da8016040e9"
+          "after": "ad945e20706a066a2b2a62ed21163a0a2707f483f04c6f586ce641c363744461",
+          "before": null
         }
       }
     },
-    "data/source_audits/ci64_provenance_v1/gnarlmaw-allocation-reachability-test-v1.json": {
+    "docs/performance/current/exact-terrain-cover-setup.json": {
+      "after_sha256": "95386d19476a74682a5565eb195b79f2afeedd807c1392c1437cd7357b081436",
       "before_sha256": null,
-      "after_sha256": "0ccdc779a4509f95af377e77008cf0e24afb1e96194c6a76b37b773591439fcf",
       "owners": {
         "@document": {
-          "before": null,
-          "after": "0ccdc779a4509f95af377e77008cf0e24afb1e96194c6a76b37b773591439fcf"
+          "after": "95386d19476a74682a5565eb195b79f2afeedd807c1392c1437cd7357b081436",
+          "before": null
         }
       }
     },
-    "data/source_audits/ci64_provenance_v1/gnarlmaw-allocation-test-v1.json": {
+    "docs/performance/current/exact-terrain-cover-visibility.json": {
+      "after_sha256": "bd347e496289b84e13d9c47e03d37dc9a09920fd4cae561af676b4cec0dc0b93",
       "before_sha256": null,
-      "after_sha256": "f55d16d2594073381a50616806ddf5358d9f75be2cdad1d98a45e6b5db9b3935",
       "owners": {
         "@document": {
-          "before": null,
-          "after": "f55d16d2594073381a50616806ddf5358d9f75be2cdad1d98a45e6b5db9b3935"
-        }
-      }
-    },
-    "data/source_audits/ci64_provenance_v1/gnarlmaw-development-test-v1.json": {
-      "before_sha256": null,
-      "after_sha256": "c08d2e6861d2e552cdb012a66e94f668fd3d1ee6302105240dfc4cdaf52a2158",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "c08d2e6861d2e552cdb012a66e94f668fd3d1ee6302105240dfc4cdaf52a2158"
-        }
-      }
-    },
-    "data/source_audits/ci64_provenance_v1/gnarlmaw-native-save-subgroups-test-v1.json": {
-      "before_sha256": null,
-      "after_sha256": "9de8528df9b8a24b2bf2c00d0fb8d65c31a54163b72c5b519005c9932610b947",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "9de8528df9b8a24b2bf2c00d0fb8d65c31a54163b72c5b519005c9932610b947"
-        }
-      }
-    },
-    "data/source_audits/ci64_provenance_v1/gnarlmaw-pre-hit-cover-test-v1.json": {
-      "before_sha256": null,
-      "after_sha256": "19d00acf6fac25c07e4e7953626425f049edbb5af414a776581a95ada1ca5aac",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "19d00acf6fac25c07e4e7953626425f049edbb5af414a776581a95ada1ca5aac"
-        }
-      }
-    },
-    "data/source_audits/ci64_provenance_v1/gnarlmaw-source-test-v1.json": {
-      "before_sha256": null,
-      "after_sha256": "5e395e78befc9c49490658852563516e3da2d144f8d6b9e3e6ec4966fdb3f7e3",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "5e395e78befc9c49490658852563516e3da2d144f8d6b9e3e6ec4966fdb3f7e3"
-        }
-      }
-    },
-    "data/source_audits/ci64_provenance_v1/gnarlmaw-test-typing-v1.json": {
-      "before_sha256": null,
-      "after_sha256": "3edf827ba489182f3522315588789e03b22957a047887195dc36ec976c94c01d",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "3edf827ba489182f3522315588789e03b22957a047887195dc36ec976c94c01d"
-        }
-      }
-    },
-    "data/source_audits/feculent_gnarlmaw_2026_11/geometry.json": {
-      "before_sha256": null,
-      "after_sha256": "f9c2a6e58dcfb601fa488b586fd7bb88e53174d378ac073184e6c4cd53ae30b8",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "f9c2a6e58dcfb601fa488b586fd7bb88e53174d378ac073184e6c4cd53ae30b8"
-        }
-      }
-    },
-    "docs/ADAPTER_DECISION_CONTRACT.md": {
-      "before_sha256": "4bb6154f10c5749007e3a538b343ee916cf5f7d6056598d6f396118d6bee2636",
-      "after_sha256": "95d690a2815f247d96da0aaed7b2db04ce5df2ed7e687349d5f450d1accd3a8f",
-      "owners": {
-        "@document": {
-          "before": "4bb6154f10c5749007e3a538b343ee916cf5f7d6056598d6f396118d6bee2636",
-          "after": "95d690a2815f247d96da0aaed7b2db04ce5df2ed7e687349d5f450d1accd3a8f"
-        }
-      }
-    },
-    "docs/CROSS_SOURCE_SEMANTIC_EQUIVALENCE.md": {
-      "before_sha256": "bb3a50426fd2f35a6d5df4637fd70c3d88af88185bf369f18b2a487a69678e28",
-      "after_sha256": "8bf0b00fb097f56ef9513ee0c8b03fa5bcee080f01ff5c5a096653331aa87745",
-      "owners": {
-        "@document": {
-          "before": "bb3a50426fd2f35a6d5df4637fd70c3d88af88185bf369f18b2a487a69678e28",
-          "after": "8bf0b00fb097f56ef9513ee0c8b03fa5bcee080f01ff5c5a096653331aa87745"
-        }
-      }
-    },
-    "docs/factions/astra-militarum.md": {
-      "before_sha256": "fb75b7330a109160214b2bf5075c9161a8abf0ab5335d4d403bad150c79c9404",
-      "after_sha256": "a32b133eda42e797a0df717409267154b170a5c5d06b2e708438878c9d42a94e",
-      "owners": {
-        "@document": {
-          "before": "fb75b7330a109160214b2bf5075c9161a8abf0ab5335d4d403bad150c79c9404",
-          "after": "a32b133eda42e797a0df717409267154b170a5c5d06b2e708438878c9d42a94e"
-        }
-      }
-    },
-    "docs/factions/chaos-daemons.md": {
-      "before_sha256": "76dc4d2e03a8de62b444b900bd0e7836bdb80875f1cf32bd18b9ecbc84e7237b",
-      "after_sha256": "a54b4a8f724d4f5073f398caa49ee7b886c32f38a4e8b0a3170b6bfe4c5fead1",
-      "owners": {
-        "@document": {
-          "before": "76dc4d2e03a8de62b444b900bd0e7836bdb80875f1cf32bd18b9ecbc84e7237b",
-          "after": "a54b4a8f724d4f5073f398caa49ee7b886c32f38a4e8b0a3170b6bfe4c5fead1"
-        }
-      }
-    },
-    "docs/factions/chaos-space-marines.md": {
-      "before_sha256": "3f3fa8b72d226242fc852de4b0e34826faee57c3c07609036d55873101f3d354",
-      "after_sha256": "783f1021363eac3284664e1660973111f9e9be200f417e7bd66290ce4e199bd2",
-      "owners": {
-        "@document": {
-          "before": "3f3fa8b72d226242fc852de4b0e34826faee57c3c07609036d55873101f3d354",
-          "after": "783f1021363eac3284664e1660973111f9e9be200f417e7bd66290ce4e199bd2"
-        }
-      }
-    },
-    "docs/factions/necrons.md": {
-      "before_sha256": "42f391639ae5a76d1aff68798ad0119d8efa5be644a49e1cd41c1e918f6fbe38",
-      "after_sha256": "b7daa11e2539527a2d3ee92faa5b3e9ae4e5e1dc764e52b4759dedb9400eba93",
-      "owners": {
-        "@document": {
-          "before": "42f391639ae5a76d1aff68798ad0119d8efa5be644a49e1cd41c1e918f6fbe38",
-          "after": "b7daa11e2539527a2d3ee92faa5b3e9ae4e5e1dc764e52b4759dedb9400eba93"
-        }
-      }
-    },
-    "docs/factions/orks.md": {
-      "before_sha256": "22fc6a705a85ebd1ae6a74429fe1296672b05fca35608a2b3f8b8a2937f10bb4",
-      "after_sha256": "05f872651374b48487715d12de3a5ba488844ec60d9e989466376298e478f063",
-      "owners": {
-        "@document": {
-          "before": "22fc6a705a85ebd1ae6a74429fe1296672b05fca35608a2b3f8b8a2937f10bb4",
-          "after": "05f872651374b48487715d12de3a5ba488844ec60d9e989466376298e478f063"
-        }
-      }
-    },
-    "docs/factions/space-marines.md": {
-      "before_sha256": "4e8566f171aef8d9ddfa3c9f54703e84d563b434e7694a1619ba46ee61b8df1b",
-      "after_sha256": "fcec8e0651579f8754ed4aecce671287de82b5dd965e968ff7606bdb97e60cdf",
-      "owners": {
-        "@document": {
-          "before": "4e8566f171aef8d9ddfa3c9f54703e84d563b434e7694a1619ba46ee61b8df1b",
-          "after": "fcec8e0651579f8754ed4aecce671287de82b5dd965e968ff7606bdb97e60cdf"
-        }
-      }
-    },
-    "docs/factions/tau-empire.md": {
-      "before_sha256": "229824e2c284a673e3717dd7d2470e47e635e10736e48a1063fcef3a66b7fb07",
-      "after_sha256": "49dee6c47691801a90ca427781a5a366c157c2af75aaefdf1cea1d1ea296cfe0",
-      "owners": {
-        "@document": {
-          "before": "229824e2c284a673e3717dd7d2470e47e635e10736e48a1063fcef3a66b7fb07",
-          "after": "49dee6c47691801a90ca427781a5a366c157c2af75aaefdf1cea1d1ea296cfe0"
-        }
-      }
-    },
-    "docs/performance/current/gnarlmaw-dice.json": {
-      "before_sha256": null,
-      "after_sha256": "d84e7f023da016129e5ef3252916ef896a74c84506ce48a67468d9116f0125d8",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "d84e7f023da016129e5ef3252916ef896a74c84506ce48a67468d9116f0125d8"
-        }
-      }
-    },
-    "docs/performance/current/gnarlmaw-dice_sustained.json": {
-      "before_sha256": null,
-      "after_sha256": "088324e65a20c6dbc440578cfbe281a643f6937818f93a758fa41c91d772a6be",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "088324e65a20c6dbc440578cfbe281a643f6937818f93a758fa41c91d772a6be"
-        }
-      }
-    },
-    "docs/performance/current/gnarlmaw-visibility.json": {
-      "before_sha256": null,
-      "after_sha256": "abecd99e440e03374972d300b67e04bbe1474a85175925a321dff93b95fbacc2",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "abecd99e440e03374972d300b67e04bbe1474a85175925a321dff93b95fbacc2"
+          "after": "bd347e496289b84e13d9c47e03d37dc9a09920fd4cae561af676b4cec0dc0b93",
+          "before": null
         }
       }
     },
     "docs/performance/policy-v3/operation-map.json": {
-      "before_sha256": "5f27fd43ffd614fc2d1c8842dff95f4f6359172225381d589bb2c05d5c65621c",
-      "after_sha256": "170073dd49caa2bcdfa58ef41a1e780184cd393f16c1c3ec5f409f243778fe8d",
+      "after_sha256": "a374b0dc2fc0a08c4219ea673e9f7a1395812f965923b93fd4a90f7bc2a4533a",
+      "before_sha256": "170073dd49caa2bcdfa58ef41a1e780184cd393f16c1c3ec5f409f243778fe8d",
       "owners": {
         "@document": {
-          "before": "5f27fd43ffd614fc2d1c8842dff95f4f6359172225381d589bb2c05d5c65621c",
-          "after": "170073dd49caa2bcdfa58ef41a1e780184cd393f16c1c3ec5f409f243778fe8d"
+          "after": "a374b0dc2fc0a08c4219ea673e9f7a1395812f965923b93fd4a90f7bc2a4533a",
+          "before": "170073dd49caa2bcdfa58ef41a1e780184cd393f16c1c3ec5f409f243778fe8d"
         }
       }
     },
-    "scripts/build_test_shards.py": {
-      "before_sha256": "e9c278924ec18958737f61437b68653c86ea35d2ae7e4ac9915ffa2b6c233c56",
-      "after_sha256": "a2143c4c1a6ba70f95503c4008c8280f383b503d56b0c6492df3207be93d2848",
+    "scripts/engine_numerical_identity_test_admission.py": {
+      "after_sha256": "2664baaa06b9edbb1e94b12eac16380877d7b7037d3111e6680311906b49a52a",
+      "before_sha256": "3cf64b182d3c2e3e86c73ccbdf22d050466b4e871331c5b7446172a3b3008cd0",
       "owners": {
-        "behavioral_selection": {
-          "before": "cdaa7621aba65303a981bb288fa70254999a894b6bfa1e722609e023d9b300d6",
-          "after": "9024cdf9996425af15e2fffbe061f139da62dfd749845815e49e7a989cfe7eec"
+        "exact_movement_test_transition": {
+          "after": "c37bfe894039408b25cfdc6d993d797c04aa4f4675c76e7e369652301ffc333e",
+          "before": "154fcf0bed5ef7fc5229ce8056c2c01ded617e6e27400383949e986cac81eee2"
         }
       }
     },
     "scripts/fortification_engagement_test_admission.py": {
-      "before_sha256": "88f10cf56712fca16272cf282f14056d1dc872c4f4df9f118c19a0535e4357ff",
-      "after_sha256": "a4c64b431776e6765064df65afb408b47236cae406411aa2316882a5f7df39e1",
+      "after_sha256": "6f4345d68a381ebb70a96bf8b2b0ac76cf969919f602d733542d9eb6cb570d58",
+      "before_sha256": "a4c64b431776e6765064df65afb408b47236cae406411aa2316882a5f7df39e1",
       "owners": {
         "@module": {
-          "before": "f89901f6a79f5bbb06970de22c2516923990fe31de66458ca59aff79bcb2a0b7",
-          "after": "b8dd62ea8e54671a290f5ac92624e36de0d6887e89d62594cf5a200119888e05"
+          "after": "f43a3e82e89cbb3944d24cd57b7b94d95bbc344acd1681ea94096bcccce73400",
+          "before": "b8dd62ea8e54671a290f5ac92624e36de0d6887e89d62594cf5a200119888e05"
         },
-        "_fortification_current_receipt": {
-          "before": "0d59d9da695596db1e646904b73277df19e109f38ed2722b7b5c5718753cd07e",
-          "after": "0d3ea8f1d14056815a7e45358c339e3a607c0a96834dedf09b01334bd447cbfd"
+        "fortification_test_addition": {
+          "after": "3e254db12779de1d75fdc072d96e043fd518cdbbc9599b8bb7afe219fb51c9dd",
+          "before": "4920f8e6b454b39abdcd5536dc3d22756e868d3bfff4fa7369f8d3a675fccba0"
+        }
+      }
+    },
+    "scripts/terrain_cover_test_admission.py": {
+      "after_sha256": "12c7a202d9c206650ad1b8e82e5e97a9f646ff1ca6d452768109bab74ece4bbb",
+      "before_sha256": null,
+      "owners": {
+        "@module": {
+          "after": "41b74cd9dee1ab7de3d895906575798560e91c7e89245aeddd47887e0bb6c88e",
+          "before": null
         },
-        "_fortification_successor": {
-          "before": "d01ca68c211081241f09c8ed676b27eac2a43d89eb41b13d8a51b3890bbe164a",
-          "after": "5c5777cd24f187179b3e388f44ef70486ea89ed4d50a3e30639b2db8dfa20910"
+        "TerrainCoverTestReceipt": {
+          "after": "930abffc6b2f6cb4d34d0b54c77d8cdd55e94944f5a0d78a56fde6ec2922f652",
+          "before": null
         },
-        "gnarlmaw_inactive_test_successor": {
-          "before": null,
-          "after": "166062cd2a9dd24157304faa71d40f6e2c68d14b11c288cd64bad08541642105"
+        "terrain_cover_test_successor": {
+          "after": "ee867114d82de896f156443a120d79bbf1ad8e7e7c72750995063cdedb36aa29",
+          "before": null
         }
       }
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "before_sha256": "659bc7c831876eb2a73492648c4ac7853d4e7040adb1b8b4ce9a640c5e7f7b0a",
-      "after_sha256": "e33ea878a09395ed361b134fc2e9107b69cfc443a1339b4f4e760c1c446e2ce0",
+      "after_sha256": "c8b332b0f725b6524cd2d1acede91916f75294ff1dbe3c578168886d2bd13368",
+      "before_sha256": "e33ea878a09395ed361b134fc2e9107b69cfc443a1339b4f4e760c1c446e2ce0",
       "owners": {
         "@document": {
-          "before": "659bc7c831876eb2a73492648c4ac7853d4e7040adb1b8b4ce9a640c5e7f7b0a",
-          "after": "e33ea878a09395ed361b134fc2e9107b69cfc443a1339b4f4e760c1c446e2ce0"
+          "after": "c8b332b0f725b6524cd2d1acede91916f75294ff1dbe3c578168886d2bd13368",
+          "before": "e33ea878a09395ed361b134fc2e9107b69cfc443a1339b4f4e760c1c446e2ce0"
         }
       }
     },
-    "src/warhammer40k_core/engine/ability_coverage.py": {
-      "before_sha256": "01f751c83cfcc153547830ee37f304b0e1d9479bbd855f1d6ddbc313d35c216d",
-      "after_sha256": "ebcd82639ebd2e2fa3d03720649754d3b7b0265f5f0beeb48058d5bc420399dc",
+    "src/warhammer40k_core/geometry/visibility_occlusion.py": {
+      "after_sha256": "e87c6a2af8d677b693220dcc071ccdcccf570677b85bbfc48de5036429549cda",
+      "before_sha256": "ab800ad2e3dd9ede5cc83e03f3ed6ccd8d6273444e8058bd8c2baba0eeb7eb98",
       "owners": {
-        "@module": {
-          "before": "e661d2b9b8e4e6cfe443ca16b6de07c178270e74d0ca2d3f6731b5fd2e8a3b5b",
-          "after": "53314aa53d4d7770c5938c3cb751542f4078ad3d050fbe3b4b8208377eecef64"
-        },
-        "_allocation_cover_diagnostics": {
-          "before": null,
-          "after": "7303f03c2340456fd78c9b0ac2599638c5a6d77841a3ed360c2f8ab0ab9a84d3"
-        },
-        "_clause_coverage_row": {
-          "before": "2bc55f655994eb7740c86d5b5b1c0acd8908abc764feae772a7bbd4e3146a8b6",
-          "after": "4c80e199b8b55e79cb7403315e6ade9bcf3480c63fbf026454bf3362064f18e8"
-        },
-        "_clause_support_stage": {
-          "before": "15f118b22495a028bb6f1f3249188abd593afa549c2fca6ad97b754457ffa4df",
-          "after": "b671dfbf67d2af3f5ed4e4b933f09cad5e3c6fb84e0e890e3029de5a93faec18"
-        },
-        "ability_clause_coverage_rows_for_rule_ir": {
-          "before": "3b84dc8ad3c71f729b6cf2c52e647d36f7fca166fb0b1fb95e249c2413a69862",
-          "after": "aaaf770c5629aa1f6ca8f8af0380578720d3fd0c732cfbb4ca82f6b99faaab46"
-        },
-        "ability_coverage_row_for_descriptor": {
-          "before": "9afa8963187fa93aadf30679120be59e8629229e04fad893048e89b46dc14603",
-          "after": "f932fb01e2352f3f835d758fb9e9955f250eab4cf0f50ce9cf2254ca9bafa9d5"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/attack_modifier_evaluation.py": {
-      "before_sha256": "b163d6938b8cef90fbe19f33604b6689262a8a1d6d77a18f742a7cfaa9f2d702",
-      "after_sha256": "1beade972234dbd38ab4c77128c6cd55ff8293ded65b0f662b845a42a8b46218",
-      "owners": {
-        "select_hit_modifiers": {
-          "before": "cc5cc71aa8df53a02e405ebea388fa071617094c66902876bb6c036025401503",
-          "after": "2e380f4003c4382b0f2d099060992c8eb93a2d2c8d126b2a1820ce475a2b5354"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/attack_modifier_snapshots.py": {
-      "before_sha256": "baa4aa7e63014cf75b675fed541b90e301b37c07133981a86a5a4417784e9192",
-      "after_sha256": "ad55cef3c24fe3979e4dbca13e917e11b1e118a46fe55cd69d0ddfc3d23b21e1",
-      "owners": {
-        "attack_modifier_snapshots": {
-          "before": "8d62c0541fea160a8a78e541e6fa6347f755d1001b487566d7a42ed5254c04db",
-          "after": "37df9a1cbd2c33ff4583ea6b9c18f18aa6d70b12c1aa900e0ab177d21f59a5c8"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/attack_sequence_allocation_projection.py": {
-      "before_sha256": null,
-      "after_sha256": "3abf7036804017f13ddd9fdc7cb2a592c15478d8e816e4c6516fa14575f0dd08",
-      "owners": {
-        "@module": {
-          "before": null,
-          "after": "52707ec12b9e190b2f0f72c0f2bacf81697577e85d324a6aa72a24af47ecb9db"
-        },
-        "_reachable_allocation_models": {
-          "before": null,
-          "after": "3b00670bad903aeae817b2bafb034ce7a7a2d34d4de25bae741a502747ee620a"
-        },
-        "allocation_models_reachable_by_pool": {
-          "before": null,
-          "after": "47e63f1abdccdf43765d1ef0438cc303e34afc8c3fc970192d961a23435320dd"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/attack_sequence_dice_rerolls.py": {
-      "before_sha256": "d763fb03b4aac8d1117d7e6f52148766ac1ea0dfe47ed69f06f78c9cf3908dbd",
-      "after_sha256": "e90c99f9779acebb75abad6e66bcf65ff4701a46d565abda67aff567d4ba718a",
-      "owners": {
-        "_roll_hit_step": {
-          "before": "ec2336ea3b0fe8358b6b6c1dcd893464fb5dc47c79e4ab3c6204f587f9a27abd",
-          "after": "e7e85f87c38786fc9605e744375f17b74c363a9794467281e25f67b6a631ca0a"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/attack_sequence_group_selection.py": {
-      "before_sha256": "f9a8846b62b5879589c98b38dbe572c585194d2a976888c4a7421e3a66176db9",
-      "after_sha256": "90ffc427008ea43c9d25609001366e5b8cb60dac489d7fd7a2bb8a52c8dac888",
-      "owners": {
-        "_grouped_precision_request_if_available": {
-          "before": "bfa9be046d4bb0b90a7e4f2af722fab550c3658242f2154550dca6e9405e3e9b",
-          "after": "d6966666dac95be1cbc514d1916e70ca6f2a4e0377a0c8ac25ca1877f5517fab"
-        },
-        "_resolve_grouped_current_pool": {
-          "before": "5ed96e2153ce923cea821fe64cb627bb33e9b8d3e3e41e603b63f87d25d802c1",
-          "after": "0d8877f2e9e71d8a0006b327df9412cf55c1ed454686b661f227110590cc95e7"
-        },
-        "precision_allocation_groups_for_pool": {
-          "before": null,
-          "after": "369b48c0a4c55031d081d51a0b8c1f6cd85853e1f468996dfb6f69e5536d5b90"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/attack_sequence_grouped_allocation.py": {
-      "before_sha256": "5db61014d8c863253333a125b6d5f754d567d8a1d36cb30b7984ef428407bc57",
-      "after_sha256": "ee3e330a537bdb6f68094bd9285bf1bd106920b36c65d785e0ef1d625f03a193",
-      "owners": {
-        "_allocation_groups_by_effective_save_profile": {
-          "before": "7708f0ac210cad868f05b320662842f4cd2a4d0dc0b7abb84f69aeff01562879",
-          "after": "3f77cbb07d7fa32587b130a9135cc741aec11e58d62aa68dbd541adfafc58133"
-        },
-        "allocation_group_by_save_signature": {
-          "before": null,
-          "after": "ca35ba69bba438f647a35c76b40d5ca2cb6bbc5bf5abcfb65e10ba955b6f0ea2"
-        },
-        "grouped_wounded_contexts_for_pool": {
-          "before": "522555e19727d56e0d5f770df80fd4fa7a6961c037fc3930c3f20ea21c26b967",
-          "after": "1f4fd06827e4d7d900b21b5bfbc98b11a28fce585568bfa5c5353c020bf137ba"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/attack_sequence_hazardous.py": {
-      "before_sha256": "fd0ca164bfe944b2d0d526d67bf1c2271128ec2b0d2f396ad156bc13bba89c98",
-      "after_sha256": "ad5fe9f89b4a074a6fa54da7739738cb88e2a88ca564d0e5f20c288cf8ede5f9",
-      "owners": {
-        "@module": {
-          "before": "138d586a4db0a76c719b53c0c6f7d6ae66ffcc98c27e1c57e16c0941fe0dc167",
-          "after": "832608e71f96e5b8c4347106b7061ddcf95862a8fa5ce5fab9459863e3fe10b5"
-        },
-        "_fortification_cover_for_allocated_model": {
-          "before": "1a4a57851ef38c137b7280034a5ec09a1688255ceca0529c62e10d66b4b629f4",
-          "after": "7834baf5c8cc4d2d1340ae15e9fe2b82e79497a261ffc46a47d8953bcdd0e55b"
-        },
-        "_fortification_full_visibility_blocker_ids": {
-          "before": "bc67d6e1c00bfd694a39e8374532107c043aa65cb9369845db6ecb52cedbf9fb",
-          "after": null
-        },
-        "_model_owner_grants_fortification_cover": {
-          "before": null,
-          "after": "88e32afd20c264d07eef94f21b495dc46d05768fd55f48c774c1e15f1cf42479"
-        },
-        "_model_owner_unit_has_keyword": {
-          "before": "46884089a06b1788ec8d260ef1f7c5226467fba88ce3060259189b8c841b4995",
-          "after": null
-        },
-        "_ordinary_attack_damage_ceiling": {
-          "before": null,
-          "after": "bc78de70705551b6528432c733dc110fbae6131adadb12895def9216d33fcd85"
-        },
-        "_project_allocation_save_subgroups": {
-          "before": null,
-          "after": "dd17e97d6dfa343d97b71068e6d522b47d9d874adbc35a1261c74ef362064234"
-        },
-        "approved_pre_hit_cover_sources": {
-          "before": null,
-          "after": "460ccaa31ed881998fdad3ec62bcdca804b676d13c10c7225f7e7b17c04ba197"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/attack_sequence_hit_wound.py": {
-      "before_sha256": "d677e50e2bf25c4bb852e9f131a2f1b4b797e5a51a6ec85808b9e32a3070db69",
-      "after_sha256": "d037557183fe4f085b934349e694adab02c0dcc6d430570fa28ef3afb3460adc",
-      "owners": {
-        "_benefit_of_cover_ballistic_skill_penalty": {
-          "before": "06dafcb60057fbfc355cf909c1094c70c95bfa2517eafc3f031d09ec907e99e1",
-          "after": "05bc5ca2c344ac5266048130f901c9b1cffc5f3a544bebeb97a91d18d84a0682"
-        },
-        "_roll_hit": {
-          "before": "781d78555bd32b7bff1dcf768926ce02bd0d55124e2e291b253410d92c788a0e",
-          "after": "29fcfd4c9aa59a5aa56b9ff73cdbade17d84602dc5837109f1239cc855ed6188"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/attack_sequence_psychic_modifiers.py": {
-      "before_sha256": "2e8ae6413a3c9b66bae3cdaa921461f9683886ad74231c7681878630321e5f69",
-      "after_sha256": "993c91f8823b5e01525c97df29d17486b84168b798d04231a5c64f1fa25d9061",
-      "owners": {
-        "_psychic_attack_modifier_ignore_request": {
-          "before": "e0df0d0eb72cb54f714fbe79d6efdb331160d8bcddd919631d6bc16886b3919d",
-          "after": "928547a80b47162014a399dac50ed32e9d190d31e644f28fccebdfb778822f4d"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/damage_allocation.py": {
-      "before_sha256": "524a0aa87e0f7dac45d6e603caadff8259ceb86904d609b7f9864767784c5d14",
-      "after_sha256": "19dc29a53307ec64ae4f51caf9e2ecbbd4378b7f53017bfcafdc1bfc5941d10a",
-      "owners": {
-        "_allocation_order_tiers": {
-          "before": "7404eb1b18918dba527b7ffbceb721e4b3280e66438a3045c45f954afa7d2616",
-          "after": "da99eb790191bb676edde03400210edba8f389b04833b67c374e3234a1b1da92"
-        },
-        "allocation_order_tier": {
-          "before": null,
-          "after": "02d6fb4e85d7f3dcde6213a02abfbf2baa0cc172da62f2c98da38199a3746a6d"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/deployment_geometry.py": {
-      "before_sha256": "e3eb1851835eeef4f0b88bf443cf74fcd47257e7024fb06044777c602145deee",
-      "after_sha256": "cb2c947506e393daa02e51dce2538b22ec758726fd8751a3c479b8258f133830",
-      "owners": {
-        "append_geometry_violations": {
-          "before": "2ca96edb2ed5d5bc61eb8b76b46c681f9a6be7a835a4f5c7f0254b79e8e975ad",
-          "after": "f6d0071ca19aa4a2471e07398082a21ed8e68bb75fc8ef8a70125ee46dcc73f9"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/gathered_attack_dice.py": {
-      "before_sha256": "9ddd68d856559fc2327cbd94d22b984a0db258404a6c935be327415b230e8241",
-      "after_sha256": "ee3fcb019fb5a23d344061ca4cd87585b92040a0ae34fd3ad8f62229aa0c8511",
-      "owners": {
-        "resolve_gathered_attack_dice": {
-          "before": "68565f9b0908a11b313ceda5aa9b41b26dbc74a00f80305fd399f0f30a325455",
-          "after": "2e4a2827519222b24b2b0de8b7cb49bf6580e7fb09c80efcb24caf9d88312244"
-        }
-      }
-    },
-    "src/warhammer40k_core/engine/native_gathering_cover_rules.py": {
-      "before_sha256": "66a976554ff0398ba2f1dbbf88d329d31eec4713e9716582ae8db20d3546e1bc",
-      "after_sha256": "3e90bb81972b8c96fa734ad295e7123df1921dddc455386f34fe5a8eb1ef385f",
-      "owners": {
-        "@module": {
-          "before": "25cdf49267bbea20b07311e375511ce38e583e50ba31382a2edc812bf4e9a193",
-          "after": "3ab1b9fb19d5005253f9b0572b1110c99bf91592eec53c3975974fea24c1262e"
-        },
-        "AllocationCoverSourceBinding": {
-          "before": null,
-          "after": "92c0f5906839c957e7e5e5f62801d35b970ba046875c8abbcfcec4165a1f45df"
-        },
-        "allocation_cover_bindings_by_model": {
-          "before": null,
-          "after": "c82a8edc40d4c0aa65aa53d7764a4e45a765666400cd07c0f755a26dcc7adf73"
-        },
-        "allocation_cover_provenance": {
-          "before": null,
-          "after": "b60bfb0900f7601c4f12b06053488121fd2eb615cac20324804258717b789d19"
-        },
-        "approved_allocation_cover_bindings": {
-          "before": null,
-          "after": "99e594927be9d42372e7c5f4572631fbd3f4102a2d848ad1acfd8f2da78d92fa"
-        },
-        "cover_gathering_inventories": {
-          "before": "877bcc7777db95edc0345ca4f9c8c6929ed4c6ec24263b057acbe9042eff3be7",
-          "after": "c1d5930c0b084d6f4ff35ec322da178f8683dfb1746ac76a3c9d103b147072c4"
-        }
-      }
-    },
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/chaos_daemons_gnarlmaw_2026_11/__init__.py": {
-      "before_sha256": null,
-      "after_sha256": "3c5efadf49b02933d92dac30045ce7113d83a3ffc0f5f99370b474af6a6bf67f",
-      "owners": {
-        "@module": {
-          "before": null,
-          "after": "83e7e4e0739817bd257774c4337546adbff3abdc7d061118aaf49c15bb556aba"
-        },
-        "catalog_package": {
-          "before": null,
-          "after": "d732c41d03102208bb608c5570c6f3580a9966cfb92667e372ea6395f1c5e35a"
-        },
-        "is_reviewed_diseased_cover": {
-          "before": null,
-          "after": "ed95d703e2eba63e93c7f73ecf43f62091dbd8b0e78c58c563d4a0c2fe99b7ce"
-        }
-      }
-    },
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/chaos_daemons_gnarlmaw_2026_11/artifacts/catalog.json": {
-      "before_sha256": null,
-      "after_sha256": "b9ad28049e5de7731bc5b47f762e903bc70e121890eda011ad149b03a877b346",
-      "owners": {
-        "@document": {
-          "before": null,
-          "after": "b9ad28049e5de7731bc5b47f762e903bc70e121890eda011ad149b03a877b346"
-        }
-      }
-    },
-    "tests/code_quality/test_ci_performance_gates.py": {
-      "before_sha256": "b5671373c974408e66d954d7318713f9026e5883a641727cbd32581726dd7e03",
-      "after_sha256": "97cb8e4771608253950b3f2c7524f70ac6fed29d5619eeef58dfd9d64deb0fdc",
-      "owners": {
-        "test_cutover_real_cli_rejects_naming_override": {
-          "before": "0a68b5caaf878b06a6d08d8a22a478c51f1ba19cdbc8fff82310a03918ef16e3",
-          "after": "8cae5d097bc401cab3d90bb2f8867ea92ae45a53c46b7e73ae7581c0ff3673ce"
-        },
-        "test_cutover_real_pytest_cli_does_not_bypass_explicit_file_guard": {
-          "before": "a80ed82df7ed314bc4ef6a84cdd9e0ffbac7a26edb64e265593d0617da0c89d4",
-          "after": "e811d7347320702fce02bec863c38559c8a6f470b210a2f8180e3bca0c12cbe6"
+        "source_group_obscures": {
+          "after": "a31849de746e85f98a1adebfff813e9e8d6098b0e5469287be78549f16f0ae30",
+          "before": "41bc18a31ab5cf85081dcc5902e77ed8edf2b22a21d900e515b60d047b9d7710"
         }
       }
     },
     "tests/code_quality/test_engine_numerical_identity_admission.py": {
-      "before_sha256": "441abc0f85f38a4fb4e55a22e8aeaf997bb10dfb6cab9ec91c67728832b65075",
-      "after_sha256": "26f4446d593329fa0078f6499eeaf0640a05c34b854ef03f37a2628064351096",
+      "after_sha256": "ce1dd81d703f4d365569a77b9e1e2a0ca6fdefd5beffe8fcd389acb94675e46e",
+      "before_sha256": "26f4446d593329fa0078f6499eeaf0640a05c34b854ef03f37a2628064351096",
       "owners": {
+        "@module": {
+          "after": "1bbcc14a1970f2299ade6fca5dede8c594c81216009c6cdf1dedba718035b895",
+          "before": "31b256343a14cab3794d9ff92a415b37d3baa4d6cc846f532c9479a62127e07e"
+        },
         "test_fortification_transition_rejects_source_and_case_drift": {
-          "before": "d09598e2687427160a9bca9a8c622942578c89ce955be44af5c2e22c21055a2c",
-          "after": "55a3b06144e5375c13c324729f379f43f39f32cd1c0cb4a829c0995a381a00b4"
+          "after": "8caffdb44a5e40710cb1234cbbcabc7a7cc346bf401240110d4eb8f182219795",
+          "before": "55a3b06144e5375c13c324729f379f43f39f32cd1c0cb4a829c0995a381a00b4"
         }
       }
     },
-    "tests/code_quality/test_generated_ability_support_artifacts.py": {
-      "before_sha256": "c70245966a8b88ed753acaf1b1cd7140b52b42219f9737a4a1116871ae8ccb1d",
-      "after_sha256": "7ccdf5a775270303cf2c241e713bd02aec24c6920dccde467d05987e6ce10af5",
-      "owners": {
-        "test_fortification_generated_support_keeps_both_source_occurrences": {
-          "before": "ff34639cbca63ea73a0c7b78bfb098207a4e2d38d9c902d8c4746ef464592862",
-          "after": "3a69ea89566a6ab83b35bf8c78c2bdc1b14e941a0bb1cab91ef4858a88ad8717"
-        }
-      }
-    },
-    "tests/code_quality/test_ws12_generated_data_artifacts.py": {
-      "before_sha256": "8bbb2b6e142c998cdb50da0516ba3b6cdb01f0467976c4e9355b45486d3fd0d9",
-      "after_sha256": "f00cfa4b23ce10d5b08edec0fb7cba3566fc8baf10026ca65ddfb46af2d02ec4",
+    "tests/rules/section13/test_visibility.py": {
+      "after_sha256": "01859cbadfbeca79c127109ee1ea098841601da0f17acb6b1de7822b271e645a",
+      "before_sha256": "f7ccae3061610652c20cc906678b92f2f9911863748f91594cae7c674c8d5eae",
       "owners": {
         "@module": {
-          "before": "e5ce230bb9f0a0965bccc21843dfede8c2cfbf0bd2d1bd98ee614a80d34eac15",
-          "after": "ec65963d01e95508b6a9b399b243ea6f25840911a54e6f5fce28d0192b00b322"
-        }
-      }
-    },
-    "tests/rules/section09/test_fortification_engagement.py": {
-      "before_sha256": "bfdd203b60e8e561944fd1fa9e03de5e38db0e3adef0b5bbcc02885ac0a01365",
-      "after_sha256": "f1eff0889b6145a4b481df9546a2a864fadf1146bde6677719dccfb1e0522a89",
-      "owners": {
-        "@module": {
-          "before": "0a957ae6a10836f029d64461266fa96c76a696fd3f0b22436bbaa993cea79a3b",
-          "after": "6e77d8708df168bf2fc52aabb444e95b8729a6c6d1b822d1399d45e8b345e92c"
+          "after": "ed443eb07832795ef7e7e61e4cbab0c43b02186c2107d1c8be27fdf6a42a4145",
+          "before": "667c93e8b1b6eda52fa52e335d30eade22f2ec7551f89aad643150ba2b96a9f2"
         },
-        "_assert_gnarlmaw_natural_two": {
-          "before": null,
-          "after": "b8aeab694c45b3f79f3d7b648cd0fef29321e288086407de60bba3c74c887389"
+        "_rectangular_cover_prism": {
+          "after": "f5b202eec8aa0365372579c2008987293c1e2f4692bcfd95d230c4f3058a5b7e",
+          "before": null
         },
-        "_circular_attack_fixture_body": {
-          "before": null,
-          "after": "0ea0cb96b87bf40afa31db8ec5a72862a5b3c7b3b7eb2f3f2d88b9b05af30a6a"
+        "test_cover_attribution_chooses_exact_visibility_masks": {
+          "after": "9b4f84f4f37c062200a751c8d2922f42c93645d6d127377949fb32d18113f89d",
+          "before": null
         },
-        "_gnarlmaw_native_attack": {
-          "before": null,
-          "after": "de77ea504721bb8493c28351b4f347454d240d24754ada05ff5a0528d8ac4ef8"
+        "test_cover_attribution_preserves_a_contained_observer": {
+          "after": "83668176c0f7f087336f0566a6d79a7a6884a73fcaad7c202c074ec06631f299",
+          "before": null
         },
-        "_native_gnarlmaw_config": {
-          "before": null,
-          "after": "52f7421db4c3f0c54b274df94280b10792295f843ca57b87a0671ece2b184f94"
-        },
-        "test_approved_pre_hit_cover_binding_requires_exact_source_and_emits_its_provenance": {
-          "before": null,
-          "after": "7f8562713347413773417146ca46e97e9b325f8aa49f9504ba7471493e4dfdea"
-        },
-        "test_gnarlmaw_deploys_from_native_development_roster": {
-          "before": null,
-          "after": "fe55fe42a2652658ea298d183c07a8d8b37e4cf131842d217c2f55e2d3471732"
-        },
-        "test_gnarlmaw_diseased_cover_uses_native_hull_occlusion": {
-          "before": null,
-          "after": "682728374266af5ccf1cb6b109a5a6e60576f2e69a97ef7083f27e357cd685d4"
-        },
-        "test_gnarlmaw_pre_hit_cover_keeps_healthy_prior_allocation_options": {
-          "before": null,
-          "after": "1f0b72ca23359b2bb2e8774aaf35240a9ea2702afb67f5384226a2b19273a839"
-        },
-        "test_gnarlmaw_pre_hit_cover_reaches_only_allocation_within_pool": {
-          "before": null,
-          "after": "cc6073c15ed61682b8924baac08ef7f86e02bda28e426561089b2781a0b811d0"
-        },
-        "test_gnarlmaw_pre_hit_cover_reaches_precision_follow_on_character": {
-          "before": null,
-          "after": "e7ed555d0dca2c5bfa9cc42c503505292cc0ed4af893d78f782f3d0fb4fabaa3"
-        },
-        "test_gnarlmaw_pre_hit_cover_requires_clearing_the_whole_save_group": {
-          "before": null,
-          "after": "9056682d5fd6f22182e1b25ed5f6f66fe545f32bef3abd12badda673fbf2be62"
-        },
-        "test_gnarlmaw_pre_hit_cover_respects_allocation_and_modifiers": {
-          "before": null,
-          "after": "dd89b4b567dfed51f70fe7e28c2e9d952316a926dc5eeb9f33ff58d19d053508"
-        },
-        "test_gnarlmaw_pre_hit_cover_respects_live_allocation_from_earlier_pool": {
-          "before": null,
-          "after": "b54c0793766264e45d77f098ba73a291264bb6fc4f78f7e8ed2e4acc50037919"
-        },
-        "test_gnarlmaw_pre_hit_cover_retains_finite_damage_bound": {
-          "before": null,
-          "after": "10d91ebfe2b59bf2ea2d062c7141476bcac9707044690df4cacfd1478223c4a2"
-        },
-        "test_gnarlmaw_records_allocation_cover_after_unmodified_hit_roll": {
-          "before": null,
-          "after": "3edd522defc69a5e1009551db4a94d915dea85cb4a1fd9675e25459e0f825cdf"
-        }
-      }
-    },
-    "tests/unit/test_skull_altar_runtime_regressions.py": {
-      "before_sha256": "87575faf896253d832dbd8c4a9efc2a473f9e0168f4d2b17c9c6d544fc9d80c6",
-      "after_sha256": "ce7f25caac812a41093cdf5dfe44ad60b9bc133a0803f8dadc81e29b37c5fae3",
-      "owners": {
-        "@module": {
-          "before": "28f8666c0246e073b18377012a72a4d39a6f295ca6b9317f0aaad8dc6ba9ff26",
-          "after": "4fa7deda48bcd2371b6a6e36e1e670aaab44ec6f4ea48b5105d6ac7e343d47e9"
-        },
-        "_with_fortification_cover": {
-          "before": null,
-          "after": "ba52be47c962f2f6c1674240019d576f5a87453a69a3f5d334fc8b9bbaa44d30"
-        },
-        "test_fortification_cover_ignores_destroyed_attacker_placements": {
-          "before": "e4e6a9bfb079f30d5185530b75a16da42641447bdd18d53803f563868cae90db",
-          "after": "fe0870c573c89da7ee1a95701aa00fdaa39b8566405cfa0f812a4fa988b37082"
-        },
-        "test_fortification_cover_keyword_ignores_destroyed_blocker_model": {
-          "before": "9734ff8efaa9988bf94f5f6a3753bbf890932aa6b3255cd3ffa5a62d25061112",
-          "after": "958f9dd93163e80fb2899b2474c7870993c3d4bf8f654475f2ac0dd6cedc2d6e"
-        }
-      }
-    },
-    "tools/cross_source_semantic_equivalence.py": {
-      "before_sha256": "4d65a1661aa3d6b866a723fd3b57f901155a6aed06e2f6de63e7417e6a261919",
-      "after_sha256": "e822bee36022cd97a8d3847922114d338ec60d1c627fb69637b3f9420a127fe3",
-      "owners": {
-        "@module": {
-          "before": "6f9eb65cff6075f646c6e9a95de2efebb259521a6c6837cc6611076129bf366c",
-          "after": "aaf01cd4168a0bba2fbf0b9216c64aae9ea99dd9723b9730a5bc504739ce3aff"
-        },
-        "_datasheet_ability_members": {
-          "before": "355d7e064b1985c2af6396d0f566615e7ff36f6d64f03e46b017d72f6e3e1d85",
-          "after": "7ac67184366716f59d8264d1a178452ffb291006edafdb6c107f3be22dfa06f9"
-        },
-        "_group_conclusion": {
-          "before": "5896e5372be66a9b557f9c981c696da924dbff5714361365a869504a669f6c69",
-          "after": "4b42be81201ef56b6a0e58c0fc60f888c4e5076f787337213ff86c3de4cc2804"
-        }
-      }
-    },
-    "tools/generate_ability_support_matrix.py": {
-      "before_sha256": "441d93670266066e01babea403b48727774ce6e8ffc58c365e23fd069f881d70",
-      "after_sha256": "54fc8d1cff03bf93a198dc0a5cc6a28d518e04b9d1628d9f4e4bfc2f14c761ae",
-      "owners": {
-        "_chaos_daemons_nurgle_review_rows": {
-          "before": "8081ea3e55994fb38ae114014f9444f740297ac50f2a326a9f62133a8ad46122",
-          "after": "13f3da26ccd76e24ac9beaf9d3f777e7d36b33845c753c4754a8d01ae5af11d2"
-        }
-      }
-    },
-    "tools/generate_gnarlmaw_development_catalog.py": {
-      "before_sha256": null,
-      "after_sha256": "fb8c8ca67fac918155b1468c2cd7081c30d3418989f7b81d7f54b758bfc4768f",
-      "owners": {
-        "@module": {
-          "before": null,
-          "after": "0d8144061c43027cca923a397cdcce3f8ffc3283a30f34d575a10d0547ebb6c5"
-        },
-        "_geometry": {
-          "before": null,
-          "after": "3e8be726c62c5ad043b3a78458593505d11c51d5022492e30d2bc40ea848a423"
-        },
-        "_reviewed_source_rows": {
-          "before": null,
-          "after": "69d082a2c02ce7d1a91a924a137f280ee7855371d992863e3b5bd4d45ef838d9"
-        },
-        "build_catalog_package": {
-          "before": null,
-          "after": "9d6a70b0b8e4099320f4c738fdfb70528bc04d558350bf886dc453f5749c300c"
-        },
-        "main": {
-          "before": null,
-          "after": "4c049e612d34226a0f4f246554258c68efb9029427a81b6feb9c4371e1724438"
+        "test_cover_attribution_preserves_causal_sources": {
+          "after": "2bbd554788c256c09c4d2c97684b5282d4b075a8bd92a65ac90bbbfc7da15d07",
+          "before": null
         }
       }
     }
   },
+  "comparisons": {
+    "movement": "docs/performance/current/exact-terrain-cover-movement.json",
+    "setup": "docs/performance/current/exact-terrain-cover-setup.json",
+    "visibility": "docs/performance/current/exact-terrain-cover-visibility.json"
+  },
+  "full_game": null,
+  "milestone": "ordinary",
+  "operation_map_sha256": "be9a68436f0494b8a3202034ea2048ad327d4173e59067a4bc488e46fed8e87e",
+  "policy": "rules-engine-performance-v3",
   "rows": {
-    "ci/test_shards/durations.json": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerate the complete twelve-shard schedule using the one covered profile for the exact current behavioral cases.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "ci/test_shards/shard-1.txt": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerate the complete twelve-shard schedule using the one covered profile for the exact current behavioral cases.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "ci/test_shards/shard-10.txt": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerate the complete twelve-shard schedule using the one covered profile for the exact current behavioral cases.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "ci/test_shards/shard-11.txt": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerate the complete twelve-shard schedule using the one covered profile for the exact current behavioral cases.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "ci/test_shards/shard-12.txt": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerate the complete twelve-shard schedule using the one covered profile for the exact current behavioral cases.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "ci/test_shards/shard-2.txt": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerate the complete twelve-shard schedule using the one covered profile for the exact current behavioral cases.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "ci/test_shards/shard-3.txt": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerate the complete twelve-shard schedule using the one covered profile for the exact current behavioral cases.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "ci/test_shards/shard-4.txt": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerate the complete twelve-shard schedule using the one covered profile for the exact current behavioral cases.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "ci/test_shards/shard-5.txt": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerate the complete twelve-shard schedule using the one covered profile for the exact current behavioral cases.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "ci/test_shards/shard-6.txt": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerate the complete twelve-shard schedule using the one covered profile for the exact current behavioral cases.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "ci/test_shards/shard-7.txt": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerate the complete twelve-shard schedule using the one covered profile for the exact current behavioral cases.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "ci/test_shards/shard-8.txt": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerate the complete twelve-shard schedule using the one covered profile for the exact current behavioral cases.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "ci/test_shards/shard-9.txt": {
-      "category": "measured_workload",
-      "operations": [
-        "mfm-current-behavior-profile"
-      ],
-      "selected_families": [],
-      "rationale": "Regenerate the complete twelve-shard schedule using the one covered profile for the exact current behavioral cases.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
     "contracts/examples/persistence/session-persistence.json": {
-      "category": "rule_semantics",
+      "category": "measured_workload",
       "operations": [
         "issue588-contract-publication"
       ],
+      "rationale": "Bind the reviewed regression, generated identity, or recorded complete workload inventory.",
       "selected_families": [],
-      "rationale": "Bind the exact development fixture, catalog, scoped rule behavior, or generated capability evidence.",
-      "source_obligation": "Use the owner-approved representative Hull and existing rules sources for development. Apply the source-configured provisional Diseased Cover rule with native allocation reachability.",
-      "unchanged_work": "Reuse the established catalog, geometry and phase interfaces; this source-backed scope carries no performance optimization or complete-combat claim."
+      "source_obligation": null,
+      "unchanged_work": null
     },
     "contracts/examples/sessions/session-command-outcome.json": {
-      "category": "rule_semantics",
+      "category": "measured_workload",
       "operations": [
         "issue588-contract-publication"
       ],
+      "rationale": "Bind the reviewed regression, generated identity, or recorded complete workload inventory.",
       "selected_families": [],
-      "rationale": "Bind the exact development fixture, catalog, scoped rule behavior, or generated capability evidence.",
-      "source_obligation": "Use the owner-approved representative Hull and existing rules sources for development. Apply the source-configured provisional Diseased Cover rule with native allocation reachability.",
-      "unchanged_work": "Reuse the established catalog, geometry and phase interfaces; this source-backed scope carries no performance optimization or complete-combat claim."
+      "source_obligation": null,
+      "unchanged_work": null
     },
     "contracts/examples/sessions/session-command-started.json": {
-      "category": "rule_semantics",
+      "category": "measured_workload",
       "operations": [
         "issue588-contract-publication"
       ],
+      "rationale": "Bind the reviewed regression, generated identity, or recorded complete workload inventory.",
       "selected_families": [],
-      "rationale": "Bind the exact development fixture, catalog, scoped rule behavior, or generated capability evidence.",
-      "source_obligation": "Use the owner-approved representative Hull and existing rules sources for development. Apply the source-configured provisional Diseased Cover rule with native allocation reachability.",
-      "unchanged_work": "Reuse the established catalog, geometry and phase interfaces; this source-backed scope carries no performance optimization or complete-combat claim."
+      "source_obligation": null,
+      "unchanged_work": null
     },
     "contracts/examples/sessions/session-metadata-created.json": {
-      "category": "rule_semantics",
+      "category": "measured_workload",
       "operations": [
         "issue588-contract-publication"
       ],
+      "rationale": "Bind the reviewed regression, generated identity, or recorded complete workload inventory.",
       "selected_families": [],
-      "rationale": "Bind the exact development fixture, catalog, scoped rule behavior, or generated capability evidence.",
-      "source_obligation": "Use the owner-approved representative Hull and existing rules sources for development. Apply the source-configured provisional Diseased Cover rule with native allocation reachability.",
-      "unchanged_work": "Reuse the established catalog, geometry and phase interfaces; this source-backed scope carries no performance optimization or complete-combat claim."
+      "source_obligation": null,
+      "unchanged_work": null
     },
     "contracts/examples/support-profile-player-a-redacted.json": {
-      "category": "rule_semantics",
+      "category": "measured_workload",
       "operations": [
         "issue588-contract-publication"
       ],
+      "rationale": "Bind the reviewed regression, generated identity, or recorded complete workload inventory.",
       "selected_families": [],
-      "rationale": "Bind the exact development fixture, catalog, scoped rule behavior, or generated capability evidence.",
-      "source_obligation": "Use the owner-approved representative Hull and existing rules sources for development. Apply the source-configured provisional Diseased Cover rule with native allocation reachability.",
-      "unchanged_work": "Reuse the established catalog, geometry and phase interfaces; this source-backed scope carries no performance optimization or complete-combat claim."
+      "source_obligation": null,
+      "unchanged_work": null
     },
     "contracts/examples/support-profile-player-b-redacted.json": {
-      "category": "rule_semantics",
+      "category": "measured_workload",
       "operations": [
         "issue588-contract-publication"
       ],
+      "rationale": "Bind the reviewed regression, generated identity, or recorded complete workload inventory.",
       "selected_families": [],
-      "rationale": "Bind the exact development fixture, catalog, scoped rule behavior, or generated capability evidence.",
-      "source_obligation": "Use the owner-approved representative Hull and existing rules sources for development. Apply the source-configured provisional Diseased Cover rule with native allocation reachability.",
-      "unchanged_work": "Reuse the established catalog, geometry and phase interfaces; this source-backed scope carries no performance optimization or complete-combat claim."
+      "source_obligation": null,
+      "unchanged_work": null
     },
     "contracts/examples/support-profile.json": {
-      "category": "rule_semantics",
+      "category": "measured_workload",
       "operations": [
         "issue588-contract-publication"
       ],
+      "rationale": "Bind the reviewed regression, generated identity, or recorded complete workload inventory.",
       "selected_families": [],
-      "rationale": "Bind the exact development fixture, catalog, scoped rule behavior, or generated capability evidence.",
-      "source_obligation": "Use the owner-approved representative Hull and existing rules sources for development. Apply the source-configured provisional Diseased Cover rule with native allocation reachability.",
-      "unchanged_work": "Reuse the established catalog, geometry and phase interfaces; this source-backed scope carries no performance optimization or complete-combat claim."
+      "source_obligation": null,
+      "unchanged_work": null
     },
     "contracts/manifest.json": {
-      "category": "rule_semantics",
+      "category": "measured_workload",
       "operations": [
         "issue588-contract-publication"
       ],
+      "rationale": "Bind the reviewed regression, generated identity, or recorded complete workload inventory.",
       "selected_families": [],
-      "rationale": "Bind the exact development fixture, catalog, scoped rule behavior, or generated capability evidence.",
-      "source_obligation": "Use the owner-approved representative Hull and existing rules sources for development. Apply the source-configured provisional Diseased Cover rule with native allocation reachability.",
-      "unchanged_work": "Reuse the established catalog, geometry and phase interfaces; this source-backed scope carries no performance optimization or complete-combat claim."
-    },
-    "data/generated/ability_coverage/cross_source_semantic_equivalence.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "phase-end-healing-source-and-report"
-      ],
-      "selected_families": [],
-      "rationale": "Bind the exact development fixture, catalog, scoped rule behavior, or generated capability evidence.",
-      "source_obligation": "Use the owner-approved representative Hull and existing rules sources for development. Apply the source-configured provisional Diseased Cover rule with native allocation reachability.",
-      "unchanged_work": "Reuse the established catalog, geometry and phase interfaces; this source-backed scope carries no performance optimization or complete-combat claim."
-    },
-    "data/source_audits/ci64_provenance_v1/gnarlmaw-allocation-group-bounds-test-v1.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "gnarlmaw-development-admission-receipts"
-      ],
-      "selected_families": [],
-      "rationale": "Bind the exact development fixture, catalog, scoped rule behavior, or generated capability evidence.",
-      "source_obligation": "Use the owner-approved representative Hull and existing rules sources for development. Apply the source-configured provisional Diseased Cover rule with native allocation reachability.",
-      "unchanged_work": "Reuse the established catalog, geometry and phase interfaces; this source-backed scope carries no performance optimization or complete-combat claim."
-    },
-    "data/source_audits/ci64_provenance_v1/gnarlmaw-allocation-projection-split-test-v1.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "gnarlmaw-development-admission-receipts"
-      ],
-      "selected_families": [],
-      "rationale": "Bind the exact development fixture, catalog, scoped rule behavior, or generated capability evidence.",
-      "source_obligation": "Use the owner-approved representative Hull and existing rules sources for development. Apply the source-configured provisional Diseased Cover rule with native allocation reachability.",
-      "unchanged_work": "Reuse the established catalog, geometry and phase interfaces; this source-backed scope carries no performance optimization or complete-combat claim."
-    },
-    "data/source_audits/ci64_provenance_v1/gnarlmaw-allocation-reachability-test-v1.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "gnarlmaw-development-admission-receipts"
-      ],
-      "selected_families": [],
-      "rationale": "Bind the exact development fixture, catalog, scoped rule behavior, or generated capability evidence.",
-      "source_obligation": "Use the owner-approved representative Hull and existing rules sources for development. Apply the source-configured provisional Diseased Cover rule with native allocation reachability.",
-      "unchanged_work": "Reuse the established catalog, geometry and phase interfaces; this source-backed scope carries no performance optimization or complete-combat claim."
-    },
-    "data/source_audits/ci64_provenance_v1/gnarlmaw-allocation-test-v1.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "gnarlmaw-development-admission-receipts"
-      ],
-      "selected_families": [],
-      "rationale": "Bind the exact development fixture, catalog, scoped rule behavior, or generated capability evidence.",
-      "source_obligation": "Use the owner-approved representative Hull and existing rules sources for development. Apply the source-configured provisional Diseased Cover rule with native allocation reachability.",
-      "unchanged_work": "Reuse the established catalog, geometry and phase interfaces; this source-backed scope carries no performance optimization or complete-combat claim."
-    },
-    "data/source_audits/ci64_provenance_v1/gnarlmaw-development-test-v1.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "gnarlmaw-development-admission-receipts"
-      ],
-      "selected_families": [],
-      "rationale": "Bind the exact development fixture, catalog, scoped rule behavior, or generated capability evidence.",
-      "source_obligation": "Use the owner-approved representative Hull and existing rules sources for development. Apply the source-configured provisional Diseased Cover rule with native allocation reachability.",
-      "unchanged_work": "Reuse the established catalog, geometry and phase interfaces; this source-backed scope carries no performance optimization or complete-combat claim."
-    },
-    "data/source_audits/ci64_provenance_v1/gnarlmaw-native-save-subgroups-test-v1.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "gnarlmaw-development-admission-receipts"
-      ],
-      "selected_families": [],
-      "rationale": "Bind the exact development fixture, catalog, scoped rule behavior, or generated capability evidence.",
-      "source_obligation": "Use the owner-approved representative Hull and existing rules sources for development. Apply the source-configured provisional Diseased Cover rule with native allocation reachability.",
-      "unchanged_work": "Reuse the established catalog, geometry and phase interfaces; this source-backed scope carries no performance optimization or complete-combat claim."
-    },
-    "data/source_audits/ci64_provenance_v1/gnarlmaw-pre-hit-cover-test-v1.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "gnarlmaw-development-admission-receipts"
-      ],
-      "selected_families": [],
-      "rationale": "Bind the exact development fixture, catalog, scoped rule behavior, or generated capability evidence.",
-      "source_obligation": "Use the owner-approved representative Hull and existing rules sources for development. Apply the source-configured provisional Diseased Cover rule with native allocation reachability.",
-      "unchanged_work": "Reuse the established catalog, geometry and phase interfaces; this source-backed scope carries no performance optimization or complete-combat claim."
-    },
-    "data/source_audits/ci64_provenance_v1/gnarlmaw-source-test-v1.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "gnarlmaw-development-admission-receipts"
-      ],
-      "selected_families": [],
-      "rationale": "Bind the exact development fixture, catalog, scoped rule behavior, or generated capability evidence.",
-      "source_obligation": "Use the owner-approved representative Hull and existing rules sources for development. Apply the source-configured provisional Diseased Cover rule with native allocation reachability.",
-      "unchanged_work": "Reuse the established catalog, geometry and phase interfaces; this source-backed scope carries no performance optimization or complete-combat claim."
-    },
-    "data/source_audits/ci64_provenance_v1/gnarlmaw-test-typing-v1.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "gnarlmaw-development-admission-receipts"
-      ],
-      "selected_families": [],
-      "rationale": "Bind the exact development fixture, catalog, scoped rule behavior, or generated capability evidence.",
-      "source_obligation": "Use the owner-approved representative Hull and existing rules sources for development. Apply the source-configured provisional Diseased Cover rule with native allocation reachability.",
-      "unchanged_work": "Reuse the established catalog, geometry and phase interfaces; this source-backed scope carries no performance optimization or complete-combat claim."
-    },
-    "data/source_audits/feculent_gnarlmaw_2026_11/geometry.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "gnarlmaw-development-admission-receipts"
-      ],
-      "selected_families": [],
-      "rationale": "Bind the exact development fixture, catalog, scoped rule behavior, or generated capability evidence.",
-      "source_obligation": "Use the owner-approved representative Hull and existing rules sources for development. Apply the source-configured provisional Diseased Cover rule with native allocation reachability.",
-      "unchanged_work": "Reuse the established catalog, geometry and phase interfaces; this source-backed scope carries no performance optimization or complete-combat claim."
-    },
-    "docs/ADAPTER_DECISION_CONTRACT.md": {
-      "category": "rule_semantics",
-      "operations": [
-        "native-ranged-attack-count-reroll"
-      ],
-      "selected_families": [],
-      "rationale": "Bind the exact development fixture, catalog, scoped rule behavior, or generated capability evidence.",
-      "source_obligation": "Use the owner-approved representative Hull and existing rules sources for development. Apply the source-configured provisional Diseased Cover rule with native allocation reachability.",
-      "unchanged_work": "Reuse the established catalog, geometry and phase interfaces; this source-backed scope carries no performance optimization or complete-combat claim."
-    },
-    "docs/CROSS_SOURCE_SEMANTIC_EQUIVALENCE.md": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Record the exact scoped development source, support limitations, or local qualification evidence.",
       "source_obligation": null,
       "unchanged_work": null
     },
-    "docs/factions/astra-militarum.md": {
-      "category": "governance",
-      "operations": [],
+    "data/source_audits/ci64_provenance_v1/exact-terrain-cover-test-v1.json": {
+      "category": "measured_workload",
+      "operations": [
+        "exact-terrain-cover-regression-admission"
+      ],
+      "rationale": "Bind the reviewed regression, generated identity, or recorded complete workload inventory.",
       "selected_families": [],
-      "rationale": "Record the exact scoped development source, support limitations, or local qualification evidence.",
       "source_obligation": null,
       "unchanged_work": null
     },
-    "docs/factions/chaos-daemons.md": {
+    "docs/performance/current/exact-terrain-cover-movement.json": {
       "category": "governance",
       "operations": [],
+      "rationale": "Record the exact input ownership or validated matched measurement results for this change.",
       "selected_families": [],
-      "rationale": "Record the exact scoped development source, support limitations, or local qualification evidence.",
       "source_obligation": null,
       "unchanged_work": null
     },
-    "docs/factions/chaos-space-marines.md": {
+    "docs/performance/current/exact-terrain-cover-setup.json": {
       "category": "governance",
       "operations": [],
+      "rationale": "Record the exact input ownership or validated matched measurement results for this change.",
       "selected_families": [],
-      "rationale": "Record the exact scoped development source, support limitations, or local qualification evidence.",
       "source_obligation": null,
       "unchanged_work": null
     },
-    "docs/factions/necrons.md": {
+    "docs/performance/current/exact-terrain-cover-visibility.json": {
       "category": "governance",
       "operations": [],
+      "rationale": "Record the exact input ownership or validated matched measurement results for this change.",
       "selected_families": [],
-      "rationale": "Record the exact scoped development source, support limitations, or local qualification evidence.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "docs/factions/orks.md": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Record the exact scoped development source, support limitations, or local qualification evidence.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "docs/factions/space-marines.md": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Record the exact scoped development source, support limitations, or local qualification evidence.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "docs/factions/tau-empire.md": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Record the exact scoped development source, support limitations, or local qualification evidence.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "docs/performance/current/gnarlmaw-dice.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Record the exact scoped development source, support limitations, or local qualification evidence.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "docs/performance/current/gnarlmaw-dice_sustained.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Record the exact scoped development source, support limitations, or local qualification evidence.",
-      "source_obligation": null,
-      "unchanged_work": null
-    },
-    "docs/performance/current/gnarlmaw-visibility.json": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Record the exact scoped development source, support limitations, or local qualification evidence.",
       "source_obligation": null,
       "unchanged_work": null
     },
     "docs/performance/policy-v3/operation-map.json": {
       "category": "governance",
       "operations": [],
+      "rationale": "Record the exact input ownership or validated matched measurement results for this change.",
       "selected_families": [],
-      "rationale": "Record the exact scoped development source, support limitations, or local qualification evidence.",
       "source_obligation": null,
       "unchanged_work": null
     },
-    "scripts/build_test_shards.py": {
-      "category": "rule_semantics",
+    "scripts/engine_numerical_identity_test_admission.py": {
+      "category": "measured_workload",
       "operations": [
-        "ci78-cutover-owners-83cd0803bcde80cbfc805d2a110f3274d501da3bc2230de8cc7f95cc0cbd608f"
+        "bounded-charge-flight-wall-proof",
+        "cavalcade-authority-admission",
+        "close-quarters-test-admission",
+        "engine-numerical-identity-admission",
+        "gore-hungry-onslaught-predecessor-admission",
+        "native-ranged-attack-count-reroll",
+        "phase-end-healing-test-admission",
+        "pre-roll-charge-flight-test-admission",
+        "round4-battle-shock-event-wounds",
+        "round4-malice-bearer-liveness",
+        "sheathed-in-brass-test-admission",
+        "skulls-beget-blood-test-admission",
+        "stage2-strict-replay-test-admission",
+        "stage3-bolt-of-change-test-admission",
+        "stage3-defender-coherency-test-admission",
+        "stage3-flight-normal-move-test-admission",
+        "stage3-ordinary-melee-test-admission",
+        "wrath-undeniable-test-admission"
       ],
+      "rationale": "Bind the reviewed regression, generated identity, or recorded complete workload inventory.",
       "selected_families": [],
-      "rationale": "Authenticate the exact retained inactive fixture while preserving its existing quarantine and active case selection.",
-      "source_obligation": "Use the owner-approved representative Hull and existing rules sources for development. Apply the source-configured provisional Diseased Cover rule with native allocation reachability.",
-      "unchanged_work": "The selection gate authenticates one additional receipt; benchmark and external contract source-token inputs and algorithms retain their existing roles."
+      "source_obligation": null,
+      "unchanged_work": null
     },
     "scripts/fortification_engagement_test_admission.py": {
-      "category": "rule_semantics",
+      "category": "measured_workload",
       "operations": [
-        "fortification-engagement-test-admission",
-        "fortification-survivor-retry-admission",
-        "gnarlmaw-development-inactive-fixture-admission"
+        "fortification-engagement-test-admission"
       ],
+      "rationale": "Bind the reviewed regression, generated identity, or recorded complete workload inventory.",
       "selected_families": [],
-      "rationale": "Bind the exact development fixture, catalog, scoped rule behavior, or generated capability evidence.",
-      "source_obligation": "Use the owner-approved representative Hull and existing rules sources for development. Apply the source-configured provisional Diseased Cover rule with native allocation reachability.",
-      "unchanged_work": "Reuse the established catalog, geometry and phase interfaces; this source-backed scope carries no performance optimization or complete-combat claim."
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "scripts/terrain_cover_test_admission.py": {
+      "category": "measured_workload",
+      "operations": [
+        "exact-terrain-cover-regression-admission"
+      ],
+      "rationale": "Bind the reviewed regression, generated identity, or recorded complete workload inventory.",
+      "selected_families": [],
+      "source_obligation": null,
+      "unchanged_work": null
     },
     "src/warhammer40k_core/_engine_build_manifest.json": {
-      "category": "rule_semantics",
+      "category": "measured_workload",
       "operations": [
         "cavalcade-authority-admission",
         "phase-end-healing-source-and-report"
       ],
+      "rationale": "Bind the reviewed regression, generated identity, or recorded complete workload inventory.",
       "selected_families": [],
-      "rationale": "Bind the exact development fixture, catalog, scoped rule behavior, or generated capability evidence.",
-      "source_obligation": "Use the owner-approved representative Hull and existing rules sources for development. Apply the source-configured provisional Diseased Cover rule with native allocation reachability.",
-      "unchanged_work": "Reuse the established catalog, geometry and phase interfaces; this source-backed scope carries no performance optimization or complete-combat claim."
-    },
-    "src/warhammer40k_core/engine/ability_coverage.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "gnarlmaw-development-capability-report"
-      ],
-      "selected_families": [],
-      "rationale": "Bind the exact development fixture, catalog, scoped rule behavior, or generated capability evidence.",
-      "source_obligation": "Use the owner-approved representative Hull and existing rules sources for development. Apply the source-configured provisional Diseased Cover rule with native allocation reachability.",
-      "unchanged_work": "Reuse the established catalog, geometry and phase interfaces; this source-backed scope carries no performance optimization or complete-combat claim."
-    },
-    "src/warhammer40k_core/engine/attack_modifier_evaluation.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "gnarlmaw-development-allocation-reachability"
-      ],
-      "selected_families": [
-        "visibility"
-      ],
-      "rationale": "Bind the exact development fixture, catalog, scoped rule behavior, or generated capability evidence.",
-      "source_obligation": "Use the owner-approved representative Hull and existing rules sources for development. Apply the source-configured provisional Diseased Cover rule with native allocation reachability.",
-      "unchanged_work": "Reuse the established catalog, geometry and phase interfaces; this source-backed scope carries no performance optimization or complete-combat claim."
-    },
-    "src/warhammer40k_core/engine/attack_modifier_snapshots.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "gnarlmaw-development-allocation-reachability",
-        "gnarlmaw-development-cover-modifier"
-      ],
-      "selected_families": [
-        "visibility"
-      ],
-      "rationale": "Bind the exact development fixture, catalog, scoped rule behavior, or generated capability evidence.",
-      "source_obligation": "Use the owner-approved representative Hull and existing rules sources for development. Apply the source-configured provisional Diseased Cover rule with native allocation reachability.",
-      "unchanged_work": "Reuse the established catalog, geometry and phase interfaces; this source-backed scope carries no performance optimization or complete-combat claim."
-    },
-    "src/warhammer40k_core/engine/attack_sequence_allocation_projection.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "gnarlmaw-development-allocation-reachability"
-      ],
-      "selected_families": [
-        "visibility"
-      ],
-      "rationale": "Bind the exact development fixture, catalog, scoped rule behavior, or generated capability evidence.",
-      "source_obligation": "Use the owner-approved representative Hull and existing rules sources for development. Apply the source-configured provisional Diseased Cover rule with native allocation reachability.",
-      "unchanged_work": "Reuse the established catalog, geometry and phase interfaces; this source-backed scope carries no performance optimization or complete-combat claim."
-    },
-    "src/warhammer40k_core/engine/attack_sequence_dice_rerolls.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "gnarlmaw-development-allocation-reachability",
-        "order135-gathered-attack-steps"
-      ],
-      "selected_families": [
-        "dice",
-        "dice_sustained",
-        "visibility"
-      ],
-      "rationale": "Bind the exact development fixture, catalog, scoped rule behavior, or generated capability evidence.",
-      "source_obligation": "Use the owner-approved representative Hull and existing rules sources for development. Apply the source-configured provisional Diseased Cover rule with native allocation reachability.",
-      "unchanged_work": "Reuse the established catalog, geometry and phase interfaces; this source-backed scope carries no performance optimization or complete-combat claim."
-    },
-    "src/warhammer40k_core/engine/attack_sequence_group_selection.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "gnarlmaw-development-allocation-reachability",
-        "gnarlmaw-development-precision-eligibility"
-      ],
-      "selected_families": [
-        "visibility"
-      ],
-      "rationale": "Bind the exact development fixture, catalog, scoped rule behavior, or generated capability evidence.",
-      "source_obligation": "Use the owner-approved representative Hull and existing rules sources for development. Apply the source-configured provisional Diseased Cover rule with native allocation reachability.",
-      "unchanged_work": "Reuse the established catalog, geometry and phase interfaces; this source-backed scope carries no performance optimization or complete-combat claim."
-    },
-    "src/warhammer40k_core/engine/attack_sequence_grouped_allocation.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "gnarlmaw-development-allocation-reachability",
-        "order135-gathered-attack-steps"
-      ],
-      "selected_families": [
-        "dice",
-        "dice_sustained",
-        "visibility"
-      ],
-      "rationale": "Bind the exact development fixture, catalog, scoped rule behavior, or generated capability evidence.",
-      "source_obligation": "Use the owner-approved representative Hull and existing rules sources for development. Apply the source-configured provisional Diseased Cover rule with native allocation reachability.",
-      "unchanged_work": "Reuse the established catalog, geometry and phase interfaces; this source-backed scope carries no performance optimization or complete-combat claim."
-    },
-    "src/warhammer40k_core/engine/attack_sequence_hazardous.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "gnarlmaw-development-allocation-reachability",
-        "order135-visibility-hot-consumers"
-      ],
-      "selected_families": [
-        "visibility"
-      ],
-      "rationale": "Apply source-bound blocker qualification for both pre-Hit cover and attribution after allocation.",
-      "source_obligation": "Use the owner-approved representative Hull and existing rules sources for development. Apply the source-configured provisional Diseased Cover rule with native allocation reachability.",
-      "unchanged_work": "The operation retains existing visibility and save interfaces. The configured source affects pre-Hit cover eligibility and per-model blocker attribution."
-    },
-    "src/warhammer40k_core/engine/attack_sequence_hit_wound.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "gnarlmaw-development-allocation-reachability",
-        "gnarlmaw-development-cover-modifier"
-      ],
-      "selected_families": [
-        "visibility"
-      ],
-      "rationale": "Bind the exact development fixture, catalog, scoped rule behavior, or generated capability evidence.",
-      "source_obligation": "Use the owner-approved representative Hull and existing rules sources for development. Apply the source-configured provisional Diseased Cover rule with native allocation reachability.",
-      "unchanged_work": "Reuse the established catalog, geometry and phase interfaces; this source-backed scope carries no performance optimization or complete-combat claim."
-    },
-    "src/warhammer40k_core/engine/attack_sequence_psychic_modifiers.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "gnarlmaw-development-allocation-reachability",
-        "order135-gathered-attack-steps"
-      ],
-      "selected_families": [
-        "dice",
-        "dice_sustained",
-        "visibility"
-      ],
-      "rationale": "Bind the exact development fixture, catalog, scoped rule behavior, or generated capability evidence.",
-      "source_obligation": "Use the owner-approved representative Hull and existing rules sources for development. Apply the source-configured provisional Diseased Cover rule with native allocation reachability.",
-      "unchanged_work": "Reuse the established catalog, geometry and phase interfaces; this source-backed scope carries no performance optimization or complete-combat claim."
-    },
-    "src/warhammer40k_core/engine/damage_allocation.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "gnarlmaw-development-allocation-reachability"
-      ],
-      "selected_families": [
-        "visibility"
-      ],
-      "rationale": "Bind the exact development fixture, catalog, scoped rule behavior, or generated capability evidence.",
-      "source_obligation": "Use the owner-approved representative Hull and existing rules sources for development. Apply the source-configured provisional Diseased Cover rule with native allocation reachability.",
-      "unchanged_work": "Reuse the established catalog, geometry and phase interfaces; this source-backed scope carries no performance optimization or complete-combat claim."
-    },
-    "src/warhammer40k_core/engine/deployment_geometry.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "order128-whole-model-setup"
-      ],
-      "selected_families": [],
-      "rationale": "Bind the exact development fixture, catalog, scoped rule behavior, or generated capability evidence.",
-      "source_obligation": "Use the owner-approved representative Hull and existing rules sources for development. Apply the source-configured provisional Diseased Cover rule with native allocation reachability.",
-      "unchanged_work": "Reuse the established catalog, geometry and phase interfaces; this source-backed scope carries no performance optimization or complete-combat claim."
-    },
-    "src/warhammer40k_core/engine/gathered_attack_dice.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "gnarlmaw-development-allocation-reachability",
-        "order135-gathered-attack-steps"
-      ],
-      "selected_families": [
-        "dice",
-        "dice_sustained",
-        "visibility"
-      ],
-      "rationale": "Bind the exact development fixture, catalog, scoped rule behavior, or generated capability evidence.",
-      "source_obligation": "Use the owner-approved representative Hull and existing rules sources for development. Apply the source-configured provisional Diseased Cover rule with native allocation reachability.",
-      "unchanged_work": "Reuse the established catalog, geometry and phase interfaces; this source-backed scope carries no performance optimization or complete-combat claim."
-    },
-    "src/warhammer40k_core/engine/native_gathering_cover_rules.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "gnarlmaw-development-allocation-reachability",
-        "gnarlmaw-development-cover-modifier"
-      ],
-      "selected_families": [
-        "visibility"
-      ],
-      "rationale": "Bind the exact development fixture, catalog, scoped rule behavior, or generated capability evidence.",
-      "source_obligation": "Use the owner-approved representative Hull and existing rules sources for development. Apply the source-configured provisional Diseased Cover rule with native allocation reachability.",
-      "unchanged_work": "Reuse the established catalog, geometry and phase interfaces; this source-backed scope carries no performance optimization or complete-combat claim."
-    },
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/chaos_daemons_gnarlmaw_2026_11/__init__.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "source-record"
-      ],
-      "selected_families": [],
-      "rationale": "Bind the exact development fixture, catalog, scoped rule behavior, or generated capability evidence.",
-      "source_obligation": "Use the owner-approved representative Hull and existing rules sources for development. Apply the source-configured provisional Diseased Cover rule with native allocation reachability.",
-      "unchanged_work": "Reuse the established catalog, geometry and phase interfaces; this source-backed scope carries no performance optimization or complete-combat claim."
-    },
-    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/chaos_daemons_gnarlmaw_2026_11/artifacts/catalog.json": {
-      "category": "rule_semantics",
-      "operations": [
-        "source-record"
-      ],
-      "selected_families": [],
-      "rationale": "Bind the exact development fixture, catalog, scoped rule behavior, or generated capability evidence.",
-      "source_obligation": "Use the owner-approved representative Hull and existing rules sources for development. Apply the source-configured provisional Diseased Cover rule with native allocation reachability.",
-      "unchanged_work": "Reuse the established catalog, geometry and phase interfaces; this source-backed scope carries no performance optimization or complete-combat claim."
-    },
-    "tests/code_quality/test_ci_performance_gates.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "ci78-cutover-owners-2bec45eb6ecc7574f5395711c9381e101ae612cb57b1a0e433c8a508aa991453",
-        "milli-inch-test-admission"
-      ],
-      "selected_families": [],
-      "rationale": "Bind the exact development fixture, catalog, scoped rule behavior, or generated capability evidence.",
-      "source_obligation": "Use the owner-approved representative Hull and existing rules sources for development. Apply the source-configured provisional Diseased Cover rule with native allocation reachability.",
-      "unchanged_work": "Reuse the established catalog, geometry and phase interfaces; this source-backed scope carries no performance optimization or complete-combat claim."
-    },
-    "tests/code_quality/test_engine_numerical_identity_admission.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "bounded-charge-flight-wall-proof",
-        "engine-numerical-identity-admission",
-        "stage3-bolt-of-change-test-admission",
-        "stage3-defender-coherency-test-admission"
-      ],
-      "selected_families": [],
-      "rationale": "Bind the exact development fixture, catalog, scoped rule behavior, or generated capability evidence.",
-      "source_obligation": "Use the owner-approved representative Hull and existing rules sources for development. Apply the source-configured provisional Diseased Cover rule with native allocation reachability.",
-      "unchanged_work": "Reuse the established catalog, geometry and phase interfaces; this source-backed scope carries no performance optimization or complete-combat claim."
-    },
-    "tests/code_quality/test_generated_ability_support_artifacts.py": {
-      "category": "governance",
-      "operations": [],
-      "selected_families": [],
-      "rationale": "Record the exact scoped development source, support limitations, or local qualification evidence.",
       "source_obligation": null,
       "unchanged_work": null
     },
-    "tests/code_quality/test_ws12_generated_data_artifacts.py": {
-      "category": "rule_semantics",
+    "src/warhammer40k_core/geometry/visibility_occlusion.py": {
+      "category": "algorithm_or_search",
       "operations": [
-        "supported-vyper-source-regression-controls"
+        "geometry-search"
       ],
-      "selected_families": [],
-      "rationale": "Bind the exact development fixture, catalog, scoped rule behavior, or generated capability evidence.",
-      "source_obligation": "Use the owner-approved representative Hull and existing rules sources for development. Apply the source-configured provisional Diseased Cover rule with native allocation reachability.",
-      "unchanged_work": "Reuse the established catalog, geometry and phase interfaces; this source-backed scope carries no performance optimization or complete-combat claim."
+      "rationale": "Skip the existential solve when separated bounds make it a consequence of full visibility.",
+      "selected_families": [
+        "movement",
+        "setup",
+        "visibility"
+      ],
+      "source_obligation": null,
+      "unchanged_work": null
     },
-    "tests/rules/section09/test_fortification_engagement.py": {
-      "category": "rule_semantics",
+    "tests/code_quality/test_engine_numerical_identity_admission.py": {
+      "category": "measured_workload",
       "operations": [
-        "fortification-engagement-native-tests",
-        "gnarlmaw-development-native-regressions"
+        "bounded-charge-flight-wall-proof",
+        "counteroffensive-fight-type",
+        "engine-numerical-identity-admission",
+        "native-ranged-attack-count-reroll",
+        "round4-battle-shock-event-wounds",
+        "round4-malice-bearer-liveness",
+        "skulls-beget-blood-test-admission",
+        "stage3-bolt-of-change-test-admission",
+        "stage3-defender-coherency-test-admission",
+        "wrath-undeniable-test-admission"
       ],
+      "rationale": "Bind the reviewed regression, generated identity, or recorded complete workload inventory.",
       "selected_families": [],
-      "rationale": "Bind the exact development fixture, catalog, scoped rule behavior, or generated capability evidence.",
-      "source_obligation": "Use the owner-approved representative Hull and existing rules sources for development. Apply the source-configured provisional Diseased Cover rule with native allocation reachability.",
-      "unchanged_work": "Reuse the established catalog, geometry and phase interfaces; this source-backed scope carries no performance optimization or complete-combat claim."
+      "source_obligation": null,
+      "unchanged_work": null
     },
-    "tests/unit/test_skull_altar_runtime_regressions.py": {
-      "category": "rule_semantics",
+    "tests/rules/section13/test_visibility.py": {
+      "category": "measured_workload",
       "operations": [
-        "gnarlmaw-development-inactive-fixture"
+        "exact-terrain-cover-regression-admission",
+        "qualification40-exact-737c559cc5836f27"
       ],
+      "rationale": "Bind the reviewed regression, generated identity, or recorded complete workload inventory.",
       "selected_families": [],
-      "rationale": "Bind the exact development fixture, catalog, scoped rule behavior, or generated capability evidence.",
-      "source_obligation": "Use the owner-approved representative Hull and existing rules sources for development. Apply the source-configured provisional Diseased Cover rule with native allocation reachability.",
-      "unchanged_work": "Reuse the established catalog, geometry and phase interfaces; this source-backed scope carries no performance optimization or complete-combat claim."
-    },
-    "tools/cross_source_semantic_equivalence.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "gnarlmaw-development-equivalence-report"
-      ],
-      "selected_families": [],
-      "rationale": "Bind the exact development fixture, catalog, scoped rule behavior, or generated capability evidence.",
-      "source_obligation": "Use the owner-approved representative Hull and existing rules sources for development. Apply the source-configured provisional Diseased Cover rule with native allocation reachability.",
-      "unchanged_work": "Reuse the established catalog, geometry and phase interfaces; this source-backed scope carries no performance optimization or complete-combat claim."
-    },
-    "tools/generate_ability_support_matrix.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "phase-end-healing-guide-summary"
-      ],
-      "selected_families": [],
-      "rationale": "Bind the exact development fixture, catalog, scoped rule behavior, or generated capability evidence.",
-      "source_obligation": "Use the owner-approved representative Hull and existing rules sources for development. Apply the source-configured provisional Diseased Cover rule with native allocation reachability.",
-      "unchanged_work": "Reuse the established catalog, geometry and phase interfaces; this source-backed scope carries no performance optimization or complete-combat claim."
-    },
-    "tools/generate_gnarlmaw_development_catalog.py": {
-      "category": "rule_semantics",
-      "operations": [
-        "gnarlmaw-development-catalog-generator"
-      ],
-      "selected_families": [],
-      "rationale": "Bind the exact development fixture, catalog, scoped rule behavior, or generated capability evidence.",
-      "source_obligation": "Use the owner-approved representative Hull and existing rules sources for development. Apply the source-configured provisional Diseased Cover rule with native allocation reachability.",
-      "unchanged_work": "Reuse the established catalog, geometry and phase interfaces; this source-backed scope carries no performance optimization or complete-combat claim."
+      "source_obligation": null,
+      "unchanged_work": null
     }
   },
-  "milestone": "ordinary",
-  "comparisons": {
-    "dice": "docs/performance/current/gnarlmaw-dice.json",
-    "dice_sustained": "docs/performance/current/gnarlmaw-dice_sustained.json",
-    "visibility": "docs/performance/current/gnarlmaw-visibility.json"
-  },
-  "full_game": null
+  "runtime_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:9d54c04290cac9e8c3cc6098121f293f0e06844998d5f56e69a33c21a68ce3c9"
 }
