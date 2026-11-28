@@ -4781,9 +4781,10 @@ def _chaos_daemons_nurgle_review_rows() -> tuple[DatasheetGroupReviewRow, ...]:
                 "Infiltrators deployment. Shroud of Flies uses the shared Stealth aura. "
                 "Fortification uses the shared targeting, Hit-roll and Fall Back exceptions. "
                 "Diseased Cover uses the existing Ballistic Skill cover modifier before the Hit "
-                "roll when the same admitted Gnarlmaw screens every native allocation candidate "
-                "from at least one model in the attacking unit. Grouped attacks include later "
-                "allocation tiers and legal Precision alternatives. Ordinary cover remains "
+                "roll when the same admitted Gnarlmaw screens every recipient reachable in the "
+                "current pool from at least one model in the attacking unit. The projection "
+                "uses live wounds and allocation history. It includes reachable later tiers "
+                "and the follow-on groups after a legal Precision choice. Ordinary cover remains "
                 "non-stacking, Ignores Cover applies, and saves receive no cover bonus."
             ),
             semantics_needed=(

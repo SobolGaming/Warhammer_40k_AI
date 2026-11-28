@@ -86,6 +86,46 @@ PRE_HIT_COVER_PREIMAGES = {
         "09ea0fabc13ca2cc53c00a02d3f5a88327ba7737a27e182842decd81a2dd106c"
     ),
 }
+REACHABILITY_RECEIPT = (
+    "data/source_audits/ci64_provenance_v1/gnarlmaw-allocation-reachability-test-v1.json"
+)
+REACHABILITY_RECEIPT_SHA256 = "0ccdc779a4509f95af377e77008cf0e24afb1e96194c6a76b37b773591439fcf"
+REACHABILITY_BASE = "f35492594d11bf8cf7db432acbb63f63c5e7defc"
+REACHABILITY_PREIMAGES = {
+    "src/warhammer40k_core/engine/attack_modifier_evaluation.py": (
+        "b163d6938b8cef90fbe19f33604b6689262a8a1d6d77a18f742a7cfaa9f2d702"
+    ),
+    "src/warhammer40k_core/engine/attack_modifier_snapshots.py": (
+        "11f07f79e6f516a7e2eda01ba5cc9e008f16ec0a58dd966da4e629c258ae1b16"
+    ),
+    "src/warhammer40k_core/engine/attack_sequence_dice_rerolls.py": (
+        "d763fb03b4aac8d1117d7e6f52148766ac1ea0dfe47ed69f06f78c9cf3908dbd"
+    ),
+    "src/warhammer40k_core/engine/attack_sequence_group_selection.py": (
+        "8e6f1c375a8310b717e8789acb60c8b482d859f35650f1372e25e356977a7a59"
+    ),
+    "src/warhammer40k_core/engine/attack_sequence_grouped_allocation.py": (
+        "5db61014d8c863253333a125b6d5f754d567d8a1d36cb30b7984ef428407bc57"
+    ),
+    "src/warhammer40k_core/engine/attack_sequence_hazardous.py": (
+        "4103e059e2043ab4ca73c3361c6d4fd9ac322149c4b79f49ce193738cdd8f264"
+    ),
+    "src/warhammer40k_core/engine/attack_sequence_hit_wound.py": (
+        "4a16c9e62535884b7317684aeec1424b47a79272c37a079379cf8f8c168c7b3a"
+    ),
+    "src/warhammer40k_core/engine/attack_sequence_psychic_modifiers.py": (
+        "2e8ae6413a3c9b66bae3cdaa921461f9683886ad74231c7681878630321e5f69"
+    ),
+    "src/warhammer40k_core/engine/damage_allocation.py": (
+        "524a0aa87e0f7dac45d6e603caadff8259ceb86904d609b7f9864767784c5d14"
+    ),
+    "src/warhammer40k_core/engine/gathered_attack_dice.py": (
+        "9ddd68d856559fc2327cbd94d22b984a0db258404a6c935be327415b230e8241"
+    ),
+    "src/warhammer40k_core/engine/native_gathering_cover_rules.py": (
+        "5f0872125ff2f5d437033c9d3c75f2e44a7a705e8ffc6c45a2c347a2269f0670"
+    ),
+}
 ROTATION_SOURCES = {
     "src/warhammer40k_core/engine/phases/movement_geometry.py",
     "src/warhammer40k_core/geometry/physical_predicates.py",
@@ -372,8 +412,28 @@ def _fortification_current_receipt(
             PRE_HIT_COVER_PREIMAGES,
         ),
     )
-    if pre_hit_cover is not None:
-        receipt, successor_raw = pre_hit_cover
+    if pre_hit_cover is None:
+        if (root / REACHABILITY_RECEIPT).exists():
+            raise SystemExit("Gnarlmaw reachability requires the exact pre-Hit predecessor.")
+        return receipt, raw
+    receipt, successor_raw = pre_hit_cover
+    raw += b"\0" + successor_raw
+    reachability = _fortification_successor(
+        root,
+        receipt,
+        _Successor(
+            REACHABILITY_RECEIPT,
+            REACHABILITY_RECEIPT_SHA256,
+            REACHABILITY_BASE,
+            "finite-gnarlmaw-allocation-reachability-test-v1",
+            PRE_HIT_COVER_RECEIPT_SHA256,
+            7,
+            set(REACHABILITY_PREIMAGES),
+            REACHABILITY_PREIMAGES,
+        ),
+    )
+    if reachability is not None:
+        receipt, successor_raw = reachability
         raw += b"\0" + successor_raw
     return receipt, raw
 

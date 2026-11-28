@@ -102,6 +102,7 @@ def _roll_hit_step(
     runtime_modifier_registry: RuntimeModifierRegistry,
     hit_stage: Literal["prepare", "roll", "resolve"] = "resolve",
     gathered_pool: RangedAttackPool | None = None,
+    allocated_model_ids: tuple[str, ...] | None = None,
     prepared_hits: dict[
         str, tuple[RangedAttackPool, PsychicAttackModifierIgnoreSelection | None, tuple[str, ...]]
     ]
@@ -135,6 +136,7 @@ def _roll_hit_step(
                     attack_context_id=attack_context_id,
                     source_phase=attack_sequence.source_phase,
                     runtime_modifier_registry=runtime_modifier_registry,
+                    allocated_model_ids=allocated_model_ids,
                     previous_selection=psychic_modifier_selection,
                 )
                 if request is not None:
@@ -163,6 +165,7 @@ def _roll_hit_step(
                     attack_context_id=attack_context_id,
                     source_phase=attack_sequence.source_phase,
                     registry=runtime_modifier_registry,
+                    allocated_model_ids=allocated_model_ids,
                 )
                 if status is not None:
                     return None, status
@@ -189,6 +192,7 @@ def _roll_hit_step(
                 runtime_modifier_registry=runtime_modifier_registry,
                 psychic_modifier_selection=psychic_modifier_selection,
                 ignored_modifier_ids=ignored_modifier_ids,
+                allocated_model_ids=allocated_model_ids,
             )
             if rolled_hits is not None:
                 rolled_hits[attack_context_id] = hit_roll

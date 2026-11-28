@@ -78,6 +78,7 @@ def _roll_hit(
     runtime_modifier_registry: RuntimeModifierRegistry | None = None,
     psychic_modifier_selection: PsychicAttackModifierIgnoreSelection | None = None,
     ignored_modifier_ids: tuple[str, ...] = (),
+    allocated_model_ids: tuple[str, ...] | None = None,
 ) -> HitRoll:
     from warhammer40k_core.engine.attack_modifier_snapshots import attack_modifier_snapshots
 
@@ -90,6 +91,8 @@ def _roll_hit(
         pool=pool,
         source_phase=source_phase,
         runtime_modifier_registry=_runtime_modifier_registry(runtime_modifier_registry),
+        allocated_model_ids=allocated_model_ids,
+        gathering_preview=False,
     )
     if psychic_modifier_selection is not None:
         if (

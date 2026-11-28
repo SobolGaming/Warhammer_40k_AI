@@ -29,6 +29,8 @@ def attack_modifier_snapshots(
     pool: RangedAttackPool,
     source_phase: BattlePhase,
     runtime_modifier_registry: RuntimeModifierRegistry,
+    allocated_model_ids: tuple[str, ...] | None = None,
+    gathering_preview: bool = True,
 ) -> tuple[AttackModifierSnapshot, ...]:
     from warhammer40k_core.engine.attack_sequence_hazardous import gnarlmaw_diseased_cover_sources
     from warhammer40k_core.engine.attack_sequence_hit_wound import (
@@ -46,7 +48,13 @@ def attack_modifier_snapshots(
     snapshots = [
         AttackModifierSnapshot("skill", item) for item in pool.weapon_profile.skill_modifiers
     ]
-    gnarlmaw_cover = gnarlmaw_diseased_cover_sources(state=state, pool=pool)
+    gnarlmaw_cover = gnarlmaw_diseased_cover_sources(
+        state=state,
+        pool=pool,
+        allocated_model_ids=allocated_model_ids,
+        runtime_modifier_registry=runtime_modifier_registry,
+        gathering_preview=gathering_preview,
+    )
     skill_deltas = (
         (
             BENEFIT_OF_COVER_RULE_ID,

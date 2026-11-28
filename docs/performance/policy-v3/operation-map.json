@@ -38992,6 +38992,7 @@
       "paths": [
         "data/source_audits/ci64_provenance_v1/gnarlmaw-allocation-test-v1.json",
         "data/source_audits/ci64_provenance_v1/gnarlmaw-development-test-v1.json",
+        "data/source_audits/ci64_provenance_v1/gnarlmaw-allocation-reachability-test-v1.json",
         "data/source_audits/ci64_provenance_v1/gnarlmaw-pre-hit-cover-test-v1.json",
         "data/source_audits/ci64_provenance_v1/gnarlmaw-source-test-v1.json",
         "data/source_audits/ci64_provenance_v1/gnarlmaw-test-typing-v1.json",
@@ -39031,6 +39032,42 @@
       "sensitive": false,
       "mandatory": false
     },
+    "gnarlmaw-development-allocation-reachability": {
+      "paths": [
+        "src/warhammer40k_core/engine/attack_modifier_evaluation.py",
+        "src/warhammer40k_core/engine/attack_modifier_snapshots.py",
+        "src/warhammer40k_core/engine/attack_sequence_dice_rerolls.py",
+        "src/warhammer40k_core/engine/attack_sequence_group_selection.py",
+        "src/warhammer40k_core/engine/attack_sequence_grouped_allocation.py",
+        "src/warhammer40k_core/engine/attack_sequence_hazardous.py",
+        "src/warhammer40k_core/engine/attack_sequence_hit_wound.py",
+        "src/warhammer40k_core/engine/attack_sequence_psychic_modifiers.py",
+        "src/warhammer40k_core/engine/damage_allocation.py",
+        "src/warhammer40k_core/engine/gathered_attack_dice.py",
+        "src/warhammer40k_core/engine/native_gathering_cover_rules.py"
+      ],
+      "owners": [
+        "_allocation_order_tiers",
+        "_psychic_attack_modifier_ignore_request",
+        "_reachable_allocation_models",
+        "_resolve_grouped_current_pool",
+        "_roll_hit",
+        "_roll_hit_step",
+        "allocation_models_reachable_by_pool",
+        "allocation_order_tier",
+        "attack_modifier_snapshots",
+        "cover_gathering_inventories",
+        "gnarlmaw_diseased_cover_sources",
+        "grouped_wounded_contexts_for_pool",
+        "resolve_gathered_attack_dice",
+        "select_hit_modifiers"
+      ],
+      "families": [
+        "visibility"
+      ],
+      "sensitive": true,
+      "mandatory": false
+    },
     "gnarlmaw-development-native-regressions": {
       "paths": [
         "tests/rules/section09/test_fortification_engagement.py"
@@ -39042,7 +39079,10 @@
         "_native_gnarlmaw_config",
         "test_gnarlmaw_deploys_from_native_development_roster",
         "test_gnarlmaw_diseased_cover_uses_native_hull_occlusion",
+        "test_gnarlmaw_pre_hit_cover_reaches_only_allocation_within_pool",
+        "test_gnarlmaw_pre_hit_cover_reaches_precision_follow_on_character",
         "test_gnarlmaw_pre_hit_cover_respects_allocation_and_modifiers",
+        "test_gnarlmaw_pre_hit_cover_respects_live_allocation_from_earlier_pool",
         "test_gnarlmaw_records_allocation_cover_after_unmodified_hit_roll"
       ],
       "families": [],

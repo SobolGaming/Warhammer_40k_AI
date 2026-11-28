@@ -16,7 +16,7 @@ from typing import TYPE_CHECKING
 
 from warhammer40k_core.core.ruleset_descriptor import CoverEffect
 from warhammer40k_core.engine.attack_sequence_group_selection import (
-    precision_allocation_groups_for_pool,
+    allocation_models_reachable_by_pool,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     chaos_daemons_gnarlmaw_2026_11 as gnarlmaw,
@@ -629,9 +629,17 @@ def _cover_for_allocated_model(
     return fortification_cover if fortification_cover is not None else cover_result
 
 
-def gnarlmaw_diseased_cover_sources(*, state: GameState, pool: RangedAttackPool) -> JsonValue:
-    """Qualify the same admitted source across the whole grouped allocation candidate set."""
+def gnarlmaw_diseased_cover_sources(
+    *,
+    state: GameState,
+    pool: RangedAttackPool,
+    runtime_modifier_registry: RuntimeModifierRegistry,
+    allocated_model_ids: tuple[str, ...] | None = None,
+    gathering_preview: bool = False,
+) -> JsonValue:
+    """Qualify the same admitted source across all reachable allocation recipients."""
     from warhammer40k_core.core.weapon_profiles import RangeProfileKind
+    from warhammer40k_core.engine.weapon_abilities import sustained_hits_generated_hits
     from warhammer40k_core.engine.attack_sequence_geometry_targets import (
         attack_pool_attacker_unit_id,
     )
@@ -685,28 +693,51 @@ def gnarlmaw_diseased_cover_sources(*, state: GameState, pool: RangedAttackPool)
     if not common_sources:
         return None
 
-    # Grouped saves and damage can exhaust a priority tier. Include every candidate
-    # in the native allocation context, plus the native Precision alternatives.
-    allocation = allocation_context_for_unit(
-        state=state, target_unit_instance_id=pool.target_unit_instance_id
-    )
-    candidates = set(allocation.candidate_model_ids())
-    if allocation.attached_unit_character_model_ids and has_weapon_keyword(
-        pool.weapon_profile, WeaponKeyword.PRECISION
+    if allocated_model_ids is None:
+        out_of_phase = state.out_of_phase_shooting_state
+        shooting = state.shooting_phase_state
+        if out_of_phase is not None and out_of_phase.attack_sequence is not None:
+            allocated_model_ids = out_of_phase.allocated_model_ids
+        elif shooting is not None:
+            allocated_model_ids = shooting.allocated_model_ids_this_phase
+        else:
+            allocated_model_ids = ()
+    target = rules_unit_view_by_id(state=state, unit_instance_id=pool.target_unit_instance_id)
+    profile = pool.weapon_profile
+    post_roll_profiles = runtime_modifier_registry.post_roll_weapon_profile_modifier_bindings
+    wound_slots = None
+    if (
+        not gathering_preview
+        and pool.pending_attack_count_bonus is None
+        and not post_roll_profiles
+        and not has_weapon_keyword(profile, WeaponKeyword.DEVASTATING_WOUNDS)
     ):
-        precision_allocation = replace(
-            allocation,
-            attacker_constraint=AttackAllocationConstraint(
-                source_rule_ids=(PRECISION_RULE_ID,), can_allocate_protected_characters=True
-            ),
+        wound_slots = pool.attacks * sustained_hits_generated_hits(
+            profile,
+            critical_hit=True,
+            target_keywords=target.keywords,
+            name_keywords=target.datasheet_name_keywords,
+            d3_value=3,
         )
-        candidates.update(
-            model_id
-            for group in precision_allocation_groups_for_pool(
-                state=state, allocation_context=precision_allocation, pool=pool
-            )
-            for model_id in group.model_ids
-        )
+    maximum_damage = None
+    damage = profile.damage_profile
+    if (
+        wound_slots is not None
+        and damage.fixed_damage is not None
+        and not damage.modifiers
+        and not has_weapon_keyword(profile, WeaponKeyword.MELTA)
+        and not runtime_modifier_registry.allocated_attack_damage_modifier_bindings
+    ):
+        maximum_damage = max(1, damage.fixed_damage)
+    candidates = allocation_models_reachable_by_pool(
+        state=state,
+        pool=pool,
+        allocated_model_ids=allocated_model_ids,
+        wound_slots=wound_slots,
+        maximum_damage=maximum_damage,
+        precision_possible=bool(post_roll_profiles)
+        or has_weapon_keyword(profile, WeaponKeyword.PRECISION),
+    )
     if not candidates:
         return None
 

@@ -1762,6 +1762,7 @@ def test_fortification_transition_rejects_source_and_case_drift(tmp_path: Path) 
         fortification.TYPING_RECEIPT,
         fortification.CATALOG_SOURCE_RECEIPT,
         fortification.PRE_HIT_COVER_RECEIPT,
+        fortification.REACHABILITY_RECEIPT,
         MANIFEST,
         fortification.OWNER,
         *sorted(
@@ -1771,6 +1772,7 @@ def test_fortification_transition_rejects_source_and_case_drift(tmp_path: Path) 
             | fortification.ALLOCATION_PREIMAGES.keys()
             | fortification.CATALOG_SOURCE_PREIMAGES.keys()
             | fortification.PRE_HIT_COVER_PREIMAGES.keys()
+            | fortification.REACHABILITY_PREIMAGES.keys()
         ),
     )
     for name in members:
@@ -1796,8 +1798,10 @@ def test_fortification_transition_rejects_source_and_case_drift(tmp_path: Path) 
     allocation = _record(fortification.ALLOCATION_RECEIPT)
     assert receipt["added_cases"][25:26] == allocation["added_cases"]
     pre_hit_cover = _record(fortification.PRE_HIT_COVER_RECEIPT)
-    assert receipt["added_cases"][26:] == pre_hit_cover["added_cases"]
-    assert len(receipt["added_cases"]) == len(set(receipt["added_cases"])) == 33
+    assert receipt["added_cases"][26:33] == pre_hit_cover["added_cases"]
+    reachability = _record(fortification.REACHABILITY_RECEIPT)
+    assert receipt["added_cases"][33:] == reachability["added_cases"]
+    assert len(receipt["added_cases"]) == len(set(receipt["added_cases"])) == 40
 
     for name in members:
         path = tmp_path / name
