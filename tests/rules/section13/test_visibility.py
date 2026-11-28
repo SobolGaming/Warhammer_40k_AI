@@ -192,6 +192,7 @@ def test_faq34_constructed_frame_body_overhang_controls_area_membership(z: float
 
 def test_one_agreed_area_can_contain_features_with_different_movement_categories() -> None:
     from tests.support.section13_fixtures import transit
+    from warhammer40k_core.geometry.pose import Pose
 
     dense = feature(C.DENSE, x=13, y=8, width=1, depth=2, identity="s13:dense-member")
     light = feature(C.LIGHT, x=17, y=12, width=1, depth=2, identity="s13:light-member")

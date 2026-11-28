@@ -14,7 +14,7 @@ from scripts.behavioral_selection_members import (
 from scripts.milli_inch_test_admission import RETAINED_CUTOVER_SHA256
 
 RECEIPT = "data/source_audits/ci64_provenance_v1/exact-terrain-cover-test-v1.json"
-RECEIPT_SHA256 = "7033df5af0af14cdf37e7f5f8bfc38775b0d53a3f6dc7e56a39985a768d72825"
+RECEIPT_SHA256 = "28f8e87aeb41e7749f6376bb2fe1588f155b58cb590a2e82f7e019da0769aad6"
 BASE = "c61269d843e6fce49afb6ed3618e988e03d8baff"
 OWNER = "tests/rules/section13/test_visibility.py"
 SOURCE = "src/warhammer40k_core/geometry/visibility_occlusion.py"

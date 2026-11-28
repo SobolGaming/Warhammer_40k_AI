@@ -25,10 +25,10 @@
   },
   "test": {
     "after": {
-      "blob_sha1": "076a30cb7b2307dfca1967eb9f79fc7610abe7ca",
-      "bytes": 14214,
+      "blob_sha1": "b80dcf6048501d63efae5b34230f0c98c17a40af",
+      "bytes": 14267,
       "mode": "100644",
-      "sha256": "6d9507df2037c9145d7c4d655f8f39fd7f536aac76c421713bd06d7f178bc569"
+      "sha256": "01859cbadfbeca79c127109ee1ea098841601da0f17acb6b1de7822b271e645a"
     },
     "before": {
       "blob_sha1": "bbcfd3734ea64491c03fd56d91567e61c8cf2807",
