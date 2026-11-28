@@ -1187,7 +1187,8 @@ def _gnarlmaw_native_attack(
     attacks: int | None = None,
     wounded_front: int | None = None,
     first_pool: bool = False,
-    separate_hunter: bool = False,
+    check_native_save_split: bool = False,
+    one_screened_model: bool = False,
     crusher_wounds: int | None = None,
     damage: DamageProfile | None = None,
     devastating: bool = False,
@@ -1294,19 +1295,15 @@ def _gnarlmaw_native_attack(
                 ),
             ),
         )
-    if separate_hunter or crusher_wounds is not None:
+    if crusher_wounds is not None:
         catalog = config.army_catalog
         bloodcrushers = catalog.datasheet_by_id("000001115")
         profiles = tuple(
             replace(
                 profile,
                 characteristics=tuple(
-                    CharacteristicValue.from_raw(Characteristic.SAVE, 6)
-                    if separate_hunter
-                    and profile.model_profile_id.endswith(":bloodhunter")
-                    and value.characteristic is Characteristic.SAVE
-                    else CharacteristicValue.from_raw(Characteristic.WOUNDS, crusher_wounds)
-                    if crusher_wounds is not None and value.characteristic is Characteristic.WOUNDS
+                    CharacteristicValue.from_raw(Characteristic.WOUNDS, crusher_wounds)
+                    if value.characteristic is Characteristic.WOUNDS
                     else value
                     for value in profile.characteristics
                 ),
@@ -1495,6 +1492,8 @@ def _gnarlmaw_native_attack(
         "all": (Pose.at(22, 20), Pose.at(26, 20), Pose.at(30, 20)),
         "precision": (Pose.at(22, 20), Pose.at(26, 20), Pose.at(30, 20)),
     }.get(screen, (Pose.at(22, 20),))
+    if one_screened_model:
+        target_poses = (Pose.at(21, 17.8), Pose.at(21, 15.4), Pose.at(22.5, 13.5))
     other_placements = tuple(
         unit_placement(
             owner.army_id, owner.player_id, unit, (Pose.at(16, 25.5 if precision else 22.5),)
@@ -1608,7 +1607,9 @@ def _gnarlmaw_native_attack(
                 assert screened < candidates
                 assert screened
                 assert (candidates - screened) - set(visible.target_in_range_model_ids)
-                if separate_hunter:
+                if one_screened_model:
+                    assert screened == {target.own_model_ids()[0]}
+                if check_native_save_split:
                     groups = allocation_groups_for_context(
                         state=state,
                         allocation_context=allocation_context_for_unit(
@@ -1616,14 +1617,14 @@ def _gnarlmaw_native_attack(
                         ),
                         include_priority_tiers=True,
                     )
-                    first, later = groups
-                    assert first.wounded_model_ids == (target.own_model_ids()[0],)
-                    assert len(first.model_ids) == 2
-                    assert set(first.model_ids) == screened
-                    (hunter,) = (
-                        m for m in target.own_models if m.model_profile_id.endswith(":bloodhunter")
-                    )
-                    assert later.model_ids == (hunter.model_instance_id,)
+                    (initial,) = groups
+                    assert initial.wounded_model_ids == (target.own_model_ids()[0],)
+                    assert set(initial.model_ids) == candidates
+                    assert screened == {
+                        m.model_instance_id
+                        for m in target.own_models
+                        if m.model_profile_id.endswith(":bloodcrushers")
+                    }
             else:
                 assert screened == candidates
 
@@ -1686,7 +1687,7 @@ def _gnarlmaw_native_attack(
         if (screen == "singleton" and not ignores_cover and not ordinary_cover)
         or (
             screen == "mixed"
-            and (attacks == 1 or separate_hunter or damage is not None or first_pool)
+            and (attacks == 1 or check_native_save_split or damage is not None or first_pool)
         )
         else None
     )
@@ -1821,6 +1822,7 @@ def test_gnarlmaw_pre_hit_cover_reaches_only_allocation_within_pool(
         screen="mixed",
         attacks=attack_count,
         wounded_front=first_model_wounds,
+        one_screened_model=attack_count > 1,
         seed="gnarlmaw-dice-12" if attack_count == 1 else "gnarlmaw-dice-1",
     )
     hits = [
@@ -1896,30 +1898,105 @@ def test_gnarlmaw_pre_hit_cover_requires_clearing_the_whole_save_group(
     from warhammer40k_core.engine.attack_sequence_model import HitRollPayload
     from warhammer40k_core.engine.damage_allocation import AllocationGroupPayload
 
-    session, _, _ = _gnarlmaw_native_attack(
+    session, _, target = _gnarlmaw_native_attack(
         tmp_path,
         screen="mixed",
         attacks=attack_count,
         wounded_front=1,
-        separate_hunter=True,
+        check_native_save_split=True,
         damage=DamageProfile.fixed(30),
-        seed="gnarlmaw-dice-2",
+        seed="gnarlmaw-dice-3",
     )
     steps = events(session, "attack_sequence_step")
     hits = [cast(HitRollPayload, row["payload"]) for row in steps if row["step"] == "hit"]
     assert len(hits) == attack_count
     assert {hit["target_number"] for hit in hits} == {target_number}
     if attack_count == 2:
+        _assert_gnarlmaw_natural_two(session, target_number=3)
+        order_session, _, _ = _gnarlmaw_native_attack(
+            tmp_path,
+            screen="mixed",
+            attacks=attack_count,
+            wounded_front=1,
+            check_native_save_split=True,
+            damage=DamageProfile.fixed(30),
+            seed="gnarlmaw-dice-2",
+        )
+        order_steps = events(order_session, "attack_sequence_step")
         final_order = next(
             row["payload"]
-            for row in steps
+            for row in order_steps
             if row["step"] == "allocate"
             and isinstance(row["payload"], dict)
             and row["payload"].get("forced") is True
         )
         assert isinstance(final_order, dict)
-        groups = cast(list[AllocationGroupPayload], final_order["allocation_groups"])
-        assert [len(group["model_ids"]) for group in groups] == [2, 1]
+        first, later = cast(list[AllocationGroupPayload], final_order["allocation_groups"])
+        assert set(first["model_ids"]) == {
+            m.model_instance_id
+            for m in target.own_models
+            if m.model_profile_id.endswith(":bloodcrushers")
+        }
+        (hunter,) = (m for m in target.own_models if m.model_profile_id.endswith(":bloodhunter"))
+        assert later["model_ids"] == [hunter.model_instance_id]
+
+
+def test_approved_pre_hit_cover_binding_requires_exact_source_and_emits_its_provenance(
+    tmp_path: Path,
+) -> None:
+    from warhammer40k_core.core.datasheet import CatalogJsonObject
+    from warhammer40k_core.engine.native_gathering_cover_rules import (
+        AllocationCoverSourceBinding,
+        allocation_cover_bindings_by_model,
+        allocation_cover_provenance,
+        approved_allocation_cover_bindings,
+    )
+    from warhammer40k_core.rules.rule_ir import RuleIR, RuleIRPayload
+
+    session, source, target = _gnarlmaw_native_attack(tmp_path, screen="clear", attacks=1)
+    state = session.lifecycle.state
+    assert state is not None
+    army = next(a for a in state.army_definitions if source in a.units)
+    (approved,) = approved_allocation_cover_bindings()
+    (reviewed,) = (
+        ability for ability in source.datasheet_abilities if approved.matches_ability(ability)
+    )
+    assert reviewed.rule_ir_payload is not None
+    new_ir = replace(
+        RuleIR.from_payload(cast(RuleIRPayload, reviewed.rule_ir_payload)),
+        source_id="fixture:second-reviewed-cover-ir",
+    )
+    synthetic_ability = replace(
+        reviewed,
+        ability_id="fixture:second-cover-ability",
+        rule_ir_payload=cast(CatalogJsonObject, new_ir.to_payload()),
+    )
+    synthetic = AllocationCoverSourceBinding(
+        "fixture:second-cover-catalog",
+        source.datasheet_id,
+        "fixture:second-pre-hit-convention",
+        lambda ability: ability == synthetic_ability,
+    )
+    unrelated_source = replace(source, datasheet_abilities=(synthetic_ability,))
+    alternate_army = replace(
+        army,
+        catalog_id=synthetic.catalog_id,
+        units=tuple(unrelated_source if unit == source else unit for unit in army.units),
+    )
+    assert not allocation_cover_bindings_by_model((alternate_army,), (approved,))
+    assert not allocation_cover_bindings_by_model(
+        (replace(alternate_army, catalog_id=army.catalog_id),), (approved, synthetic)
+    )
+    model_ids = frozenset(source.own_model_ids())
+    candidates = set(target.own_model_ids())
+    selected = allocation_cover_bindings_by_model((alternate_army,), (approved, synthetic))
+    assert selected.keys() == model_ids
+    assert allocation_cover_provenance(selected, model_ids, candidates) == {
+        "convention_id": synthetic.convention_id,
+        "source_ability_id": new_ir.source_id,
+        "source_model_ids": sorted(model_ids),
+        "allocation_candidate_model_ids": sorted(candidates),
+    }
 
 
 @pytest.mark.parametrize(

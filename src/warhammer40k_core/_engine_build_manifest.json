@@ -1,7 +1,7 @@
 {
   "algorithm": "runtime-tree-sha256-v1",
-  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:125a24d6a90db088cec5c4481a126c0d4ea790a8c7d91019ade3b2f275ad5db1",
-  "fingerprint": "125a24d6a90db088cec5c4481a126c0d4ea790a8c7d91019ade3b2f275ad5db1",
+  "build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:9cff6501c665707bb7c0738f23fb06b0d2266282f6d26c181fab975d48a72217",
+  "fingerprint": "9cff6501c665707bb7c0738f23fb06b0d2266282f6d26c181fab975d48a72217",
   "resource_count": 3303,
   "resources": [
     {
@@ -1135,9 +1135,9 @@
       "sha256": "1beade972234dbd38ab4c77128c6cd55ff8293ded65b0f662b845a42a8b46218"
     },
     {
-      "byte_length": 7365,
+      "byte_length": 7363,
       "path": "warhammer40k_core/engine/attack_modifier_snapshots.py",
-      "sha256": "85de8bfd4091fd2dae462c34e50c3e710d1049271a76b99e2e86878d580781d1"
+      "sha256": "ad55cef3c24fe3979e4dbca13e917e11b1e118a46fe55cd69d0ddfc3d23b21e1"
     },
     {
       "byte_length": 3860,
@@ -1235,19 +1235,19 @@
       "sha256": "550554909ee838d02a50a99ef05c4b5e55090589942a873c38438da75d5996ee"
     },
     {
-      "byte_length": 75154,
+      "byte_length": 76045,
       "path": "warhammer40k_core/engine/attack_sequence_group_selection.py",
-      "sha256": "74da755b5e362546e54494c291d532a4591d2a609721453ec2bd7cb99a4f830a"
+      "sha256": "90b75cb698edae98cd53e3fbc022c3f3729c46d6ec6b85d1a70133c4bde5315c"
     },
     {
-      "byte_length": 63344,
+      "byte_length": 63587,
       "path": "warhammer40k_core/engine/attack_sequence_grouped_allocation.py",
-      "sha256": "cdc9bb084666e941de47d8d32e88c0410c45e8657cb0520ec41c8514c974fa4d"
+      "sha256": "ee3e330a537bdb6f68094bd9285bf1bd106920b36c65d785e0ef1d625f03a193"
     },
     {
-      "byte_length": 53345,
+      "byte_length": 54113,
       "path": "warhammer40k_core/engine/attack_sequence_hazardous.py",
-      "sha256": "2f28376e3ea2847a772fccdcbd4962a2313985e518886b5197f7343a94cbc0f6"
+      "sha256": "5de0df370ee5fc945c771cd2b205168686fc035e0743f4fe3bf55167fa15b511"
     },
     {
       "byte_length": 37724,
@@ -11505,9 +11505,9 @@
       "sha256": "892b83d36c3f2b9251fd10a4929b92842428ce9f992e33450986c233173ece0a"
     },
     {
-      "byte_length": 3373,
+      "byte_length": 6697,
       "path": "warhammer40k_core/engine/native_gathering_cover_rules.py",
-      "sha256": "a3ba1b26904532627d05fd1546817625be4bee344fe30f30902157842b08b757"
+      "sha256": "3e90bb81972b8c96fa734ad295e7123df1921dddc455386f34fe5a8eb1ef385f"
     },
     {
       "byte_length": 5076,

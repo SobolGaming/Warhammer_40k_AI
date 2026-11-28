@@ -1107,7 +1107,8 @@ def allocation_models_reachable_by_pool(
     wound_slots: int | None,
     maximum_damage: int | None,
     precision_possible: bool,
-    models_share_save_group: Callable[[tuple[str, ...]], bool],
+    refine_save_group: Callable[[AllocationGroup], tuple[AllocationGroup, ...] | None],
+    may_skip_saves: bool,
 ) -> set[str]:
     """Union the recipients reachable after decline or any legal Precision lead."""
     target_id = pool.target_unit_instance_id
@@ -1121,13 +1122,32 @@ def allocation_models_reachable_by_pool(
     groups = allocation_groups_for_context(
         state=state, allocation_context=allocation, include_priority_tiers=True
     )
-    candidates = _reachable_allocation_models(
-        state=state,
-        groups=groups,
-        wound_slots=wound_slots,
-        maximum_damage=maximum_damage,
-        models_share_save_group=models_share_save_group,
-    )
+
+    def reachable(groups: tuple[AllocationGroup, ...], lead_id: str | None = None) -> set[str]:
+        result = _reachable_allocation_models(
+            state=state,
+            groups=groups,
+            wound_slots=wound_slots,
+            maximum_damage=maximum_damage,
+            refine_save_group=refine_save_group,
+            lead_id=lead_id,
+        )
+        if may_skip_saves:
+            # If every retained wound skips saves, the ordinary Save partition
+            # can merge back into the initial native groups.
+            result.update(
+                _reachable_allocation_models(
+                    state=state,
+                    groups=groups,
+                    wound_slots=wound_slots,
+                    maximum_damage=maximum_damage,
+                    refine_save_group=lambda group: (group,),
+                    lead_id=lead_id,
+                )
+            )
+        return result
+
+    candidates = reachable(groups)
     if precision_possible:
         for lead in precision_allocation_groups_for_pool(
             state=state,
@@ -1145,16 +1165,7 @@ def allocation_models_reachable_by_pool(
                 allocated_model_ids=allocated_model_ids,
                 precision_selection=PrecisionPoolSelection(lead.group_id, lead.model_ids, True),
             )
-            candidates.update(
-                _reachable_allocation_models(
-                    state=state,
-                    groups=final_groups,
-                    wound_slots=wound_slots,
-                    maximum_damage=maximum_damage,
-                    models_share_save_group=models_share_save_group,
-                    lead_id=priority_ids[0] if priority_ids else None,
-                )
-            )
+            candidates.update(reachable(final_groups, priority_ids[0] if priority_ids else None))
     return candidates
 
 
@@ -1164,7 +1175,7 @@ def _reachable_allocation_models(
     groups: tuple[AllocationGroup, ...],
     wound_slots: int | None,
     maximum_damage: int | None,
-    models_share_save_group: Callable[[tuple[str, ...]], bool],
+    refine_save_group: Callable[[AllocationGroup], tuple[AllocationGroup, ...] | None],
     lead_id: str | None = None,
 ) -> set[str]:
     from warhammer40k_core.engine.damage_allocation import allocation_order_tier
@@ -1189,22 +1200,33 @@ def _reachable_allocation_models(
     lead_cost = sum(costs[model_id] for model_id in reachable)
     groups = tuple(group for group in groups if group.group_id != lead_id)
 
-    # Native allocation stays in its current group until every member is gone.
-    # A potential Save split can move the healthy members of a mixed group to
-    # a later tier, so only charge them early when the group is proved intact.
+    # The native resolver clears each effective Save subgroup before advancing.
+    # Preserve proven subgroups. An unresolved split can move healthy members
+    # to a later tier, so count only its wounded members as forced early.
+    effective_groups: list[AllocationGroup] = []
+    unresolved: set[str] = set()
+    for group in groups:
+        if not 0 < len(group.wounded_model_ids) < len(group.model_ids):
+            effective_groups.append(group)
+            continue
+        predicted = refine_save_group(group)
+        if predicted is None:
+            unresolved.add(group.group_id)
+            effective_groups.append(group)
+        else:
+            effective_groups.extend(predicted)
+
     tier_costs = [0, 0, 0, 0]
-    for group in groups:
-        intact = (
-            group.wounded
-            and len(group.wounded_model_ids) < len(group.model_ids)
-            and models_share_save_group(group.model_ids)
-        )
+    for group in effective_groups:
         for model_id in group.model_ids:
-            tier = allocation_order_tier(
-                group.role, wounded=intact or model_id in group.wounded_model_ids
+            wounded = (
+                model_id in group.wounded_model_ids
+                if group.group_id in unresolved
+                else group.wounded
             )
+            tier = allocation_order_tier(group.role, wounded=wounded)
             tier_costs[tier] += costs[model_id]
-    for group in groups:
+    for group in effective_groups:
         tier = allocation_order_tier(group.role, wounded=group.wounded)
         preceding = lead_cost + sum(tier_costs[:tier])
         wounded_cost = sum(costs[model_id] for model_id in group.wounded_model_ids)

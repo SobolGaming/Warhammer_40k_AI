@@ -1764,6 +1764,7 @@ def test_fortification_transition_rejects_source_and_case_drift(tmp_path: Path) 
         fortification.PRE_HIT_COVER_RECEIPT,
         fortification.REACHABILITY_RECEIPT,
         fortification.GROUP_BOUNDS_RECEIPT,
+        fortification.SAVE_SUBGROUP_RECEIPT,
         MANIFEST,
         fortification.OWNER,
         *sorted(
@@ -1775,6 +1776,7 @@ def test_fortification_transition_rejects_source_and_case_drift(tmp_path: Path) 
             | fortification.PRE_HIT_COVER_PREIMAGES.keys()
             | fortification.REACHABILITY_PREIMAGES.keys()
             | fortification.GROUP_BOUNDS_PREIMAGES.keys()
+            | fortification.SAVE_SUBGROUP_PREIMAGES.keys()
         ),
     )
     for name in members:
@@ -1804,8 +1806,10 @@ def test_fortification_transition_rejects_source_and_case_drift(tmp_path: Path) 
     reachability = _record(fortification.REACHABILITY_RECEIPT)
     assert receipt["added_cases"][33:40] == reachability["added_cases"]
     bounds = _record(fortification.GROUP_BOUNDS_RECEIPT)
-    assert receipt["added_cases"][40:] == bounds["added_cases"]
-    assert len(receipt["added_cases"]) == len(set(receipt["added_cases"])) == 45
+    assert receipt["added_cases"][40:45] == bounds["added_cases"]
+    subgroups = _record(fortification.SAVE_SUBGROUP_RECEIPT)
+    assert receipt["added_cases"][45:] == subgroups["added_cases"]
+    assert len(receipt["added_cases"]) == len(set(receipt["added_cases"])) == 46
 
     for name in members:
         path = tmp_path / name

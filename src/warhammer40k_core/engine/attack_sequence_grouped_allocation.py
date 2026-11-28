@@ -267,62 +267,75 @@ def _allocation_groups_by_effective_save_profile(
     wounded_contexts: tuple[tuple[AttackSequence, AttackResolutionContextPayload], ...],
     runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> tuple[AllocationGroup, ...]:
-    refined_groups: list[AllocationGroup] = []
-    for allocation_group in allocation_groups:
-        models_by_signature: dict[str, list[str]] = {}
-        for model_id in allocation_group.model_ids:
-            signature = _effective_save_profile_signature(
-                state=state,
-                decisions=decisions,
-                ruleset_descriptor=ruleset_descriptor,
-                model_id=model_id,
-                wounded_contexts=wounded_contexts,
-                runtime_modifier_registry=runtime_modifier_registry,
-            )
-            models_by_signature.setdefault(signature, []).append(model_id)
-        if len(models_by_signature) == 1:
-            refined_groups.append(allocation_group)
-            continue
-        for signature, model_ids in models_by_signature.items():
-            subgroup_model_ids = tuple(model_ids)
-            subgroup_model_id_set = set(subgroup_model_ids)
-            signature_hash = sha256(signature.encode("utf-8")).hexdigest()
-            subgroup_wounded_ids = tuple(
-                model_id
-                for model_id in allocation_group.wounded_model_ids
-                if model_id in subgroup_model_id_set
-            )
-            subgroup_allocated_ids = tuple(
-                model_id
-                for model_id in allocation_group.already_allocated_model_ids
-                if model_id in subgroup_model_id_set
-            )
-            refined_groups.append(
-                replace(
-                    allocation_group,
-                    group_id=(f"{allocation_group.group_id}:effective-save:{signature_hash}"),
-                    model_ids=subgroup_model_ids,
-                    wounded_model_ids=subgroup_wounded_ids,
-                    already_allocated_model_ids=subgroup_allocated_ids,
-                    bodyguard_model_ids=tuple(
-                        model_id
-                        for model_id in allocation_group.bodyguard_model_ids
-                        if model_id in subgroup_model_id_set
-                    ),
-                    character_model_ids=tuple(
-                        model_id
-                        for model_id in allocation_group.character_model_ids
-                        if model_id in subgroup_model_id_set
-                    ),
-                    legality_reasons=tuple(
-                        reason
-                        for reason in allocation_group.legality_reasons
-                        if reason != "wounded_group_priority" or bool(subgroup_wounded_ids)
-                        if reason != "already_allocated_group_priority"
-                        or bool(subgroup_allocated_ids)
-                    ),
+    return tuple(
+        subgroup
+        for group in allocation_groups
+        for subgroup in allocation_group_by_save_signature(
+            group,
+            {
+                model_id: _effective_save_profile_signature(
+                    state=state,
+                    decisions=decisions,
+                    ruleset_descriptor=ruleset_descriptor,
+                    model_id=model_id,
+                    wounded_contexts=wounded_contexts,
+                    runtime_modifier_registry=runtime_modifier_registry,
                 )
+                for model_id in group.model_ids
+            },
+        )
+    )
+
+
+def allocation_group_by_save_signature(
+    allocation_group: AllocationGroup, model_signatures: dict[str, str]
+) -> tuple[AllocationGroup, ...]:
+    """Retain each equal-signature subgroup and its native allocation priority."""
+    models_by_signature: dict[str, list[str]] = {}
+    for model_id in allocation_group.model_ids:
+        models_by_signature.setdefault(model_signatures[model_id], []).append(model_id)
+    if len(models_by_signature) == 1:
+        return (allocation_group,)
+    refined_groups: list[AllocationGroup] = []
+    for signature, model_ids in models_by_signature.items():
+        subgroup_model_ids = tuple(model_ids)
+        subgroup_model_id_set = set(subgroup_model_ids)
+        signature_hash = sha256(signature.encode("utf-8")).hexdigest()
+        subgroup_wounded_ids = tuple(
+            model_id
+            for model_id in allocation_group.wounded_model_ids
+            if model_id in subgroup_model_id_set
+        )
+        subgroup_allocated_ids = tuple(
+            model_id
+            for model_id in allocation_group.already_allocated_model_ids
+            if model_id in subgroup_model_id_set
+        )
+        refined_groups.append(
+            replace(
+                allocation_group,
+                group_id=(f"{allocation_group.group_id}:effective-save:{signature_hash}"),
+                model_ids=subgroup_model_ids,
+                wounded_model_ids=subgroup_wounded_ids,
+                already_allocated_model_ids=subgroup_allocated_ids,
+                bodyguard_model_ids=tuple(
+                    model_id
+                    for model_id in allocation_group.bodyguard_model_ids
+                    if model_id in subgroup_model_id_set
+                ),
+                character_model_ids=tuple(
+                    model_id
+                    for model_id in allocation_group.character_model_ids
+                    if model_id in subgroup_model_id_set
+                ),
+                legality_reasons=tuple(
+                    reason
+                    for reason in allocation_group.legality_reasons
+                    if reason != "wounded_group_priority" or bool(subgroup_wounded_ids)
+                    if reason != "already_allocated_group_priority" or bool(subgroup_allocated_ids)
+                ),
             )
+        )
     return tuple(refined_groups)
 
 

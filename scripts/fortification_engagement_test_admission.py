@@ -139,6 +139,28 @@ GROUP_BOUNDS_PREIMAGES = {
         "5238279a34a608d3c72372e67665a2997a63dc0040745d384cc3618e6454d196"
     ),
 }
+SAVE_SUBGROUP_RECEIPT = (
+    "data/source_audits/ci64_provenance_v1/gnarlmaw-native-save-subgroups-test-v1.json"
+)
+SAVE_SUBGROUP_RECEIPT_SHA256 = "9de8528df9b8a24b2bf2c00d0fb8d65c31a54163b72c5b519005c9932610b947"
+SAVE_SUBGROUP_BASE = "516ff80f3b354cc3c82f51404ae1cb875e78d53a"
+SAVE_SUBGROUP_PREIMAGES = {
+    "src/warhammer40k_core/engine/attack_modifier_snapshots.py": (
+        "85de8bfd4091fd2dae462c34e50c3e710d1049271a76b99e2e86878d580781d1"
+    ),
+    "src/warhammer40k_core/engine/attack_sequence_group_selection.py": (
+        "74da755b5e362546e54494c291d532a4591d2a609721453ec2bd7cb99a4f830a"
+    ),
+    "src/warhammer40k_core/engine/attack_sequence_grouped_allocation.py": (
+        "cdc9bb084666e941de47d8d32e88c0410c45e8657cb0520ec41c8514c974fa4d"
+    ),
+    "src/warhammer40k_core/engine/attack_sequence_hazardous.py": (
+        "2f28376e3ea2847a772fccdcbd4962a2313985e518886b5197f7343a94cbc0f6"
+    ),
+    "src/warhammer40k_core/engine/native_gathering_cover_rules.py": (
+        "a3ba1b26904532627d05fd1546817625be4bee344fe30f30902157842b08b757"
+    ),
+}
 ROTATION_SOURCES = {
     "src/warhammer40k_core/engine/phases/movement_geometry.py",
     "src/warhammer40k_core/geometry/physical_predicates.py",
@@ -465,8 +487,30 @@ def _fortification_current_receipt(
             GROUP_BOUNDS_PREIMAGES,
         ),
     )
-    if group_bounds is not None:
-        receipt, successor_raw = group_bounds
+    if group_bounds is None:
+        if (root / SAVE_SUBGROUP_RECEIPT).exists():
+            raise SystemExit(
+                "Native Save subgroup proof requires the exact group bounds predecessor."
+            )
+        return receipt, raw
+    receipt, successor_raw = group_bounds
+    raw += b"\0" + successor_raw
+    save_subgroups = _fortification_successor(
+        root,
+        receipt,
+        _Successor(
+            SAVE_SUBGROUP_RECEIPT,
+            SAVE_SUBGROUP_RECEIPT_SHA256,
+            SAVE_SUBGROUP_BASE,
+            "finite-gnarlmaw-native-save-subgroups-test-v1",
+            GROUP_BOUNDS_RECEIPT_SHA256,
+            1,
+            set(SAVE_SUBGROUP_PREIMAGES),
+            SAVE_SUBGROUP_PREIMAGES,
+        ),
+    )
+    if save_subgroups is not None:
+        receipt, successor_raw = save_subgroups
         raw += b"\0" + successor_raw
     return receipt, raw
 

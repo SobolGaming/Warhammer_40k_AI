@@ -18,8 +18,10 @@ from warhammer40k_core.core.ruleset_descriptor import CoverEffect
 from warhammer40k_core.engine.attack_sequence_group_selection import (
     allocation_models_reachable_by_pool,
 )
-from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
-    chaos_daemons_gnarlmaw_2026_11 as gnarlmaw,
+from warhammer40k_core.engine.native_gathering_cover_rules import (
+    allocation_cover_bindings_by_model,
+    allocation_cover_provenance,
+    approved_allocation_cover_bindings,
 )
 
 from warhammer40k_core.engine.attack_sequence_imports import *
@@ -629,7 +631,7 @@ def _cover_for_allocated_model(
     return fortification_cover if fortification_cover is not None else cover_result
 
 
-def gnarlmaw_diseased_cover_sources(
+def approved_pre_hit_cover_sources(
     *,
     state: GameState,
     pool: RangedAttackPool,
@@ -641,7 +643,11 @@ def gnarlmaw_diseased_cover_sources(
     from functools import cache
 
     from warhammer40k_core.core.weapon_profiles import RangeProfileKind
-    from warhammer40k_core.engine.weapon_abilities import sustained_hits_generated_hits
+    from warhammer40k_core.engine.weapon_abilities import (
+        DevastatingWoundsResolution,
+        devastating_wounds_resolution,
+        sustained_hits_generated_hits,
+    )
     from warhammer40k_core.engine.attack_sequence_geometry_targets import (
         attack_pool_attacker_unit_id,
     )
@@ -657,19 +663,10 @@ def gnarlmaw_diseased_cover_sources(
         or state.battlefield_state is None
     ):
         return None
-    source_models = frozenset(
-        model.model_instance_id
-        for army in state.army_definitions
-        if army.catalog_id == gnarlmaw.CATALOG_ID
-        for unit in army.units
-        if unit.datasheet_id == gnarlmaw.DATASHEET_ID
-        and any(
-            gnarlmaw.is_reviewed_diseased_cover(ability) for ability in unit.datasheet_abilities
-        )
-        for model in unit.own_models
-        if model.is_alive
+    bindings_by_model = allocation_cover_bindings_by_model(
+        tuple(state.army_definitions), approved_allocation_cover_bindings()
     )
-    if not source_models:
+    if not bindings_by_model:
         return None
     descriptor = state.ruleset_descriptor_for_runtime_policy()
     if (
@@ -691,7 +688,9 @@ def gnarlmaw_diseased_cover_sources(
         observing_unit_id=attacking_unit_id,
         target_unit_id=pool.target_unit_instance_id,
     )
-    common_sources = source_models.intersection(model.model_id for model in dynamic_blockers)
+    common_sources = frozenset(
+        model.model_id for model in dynamic_blockers if model.model_id in bindings_by_model
+    )
     if not common_sources:
         return None
 
@@ -720,14 +719,14 @@ def gnarlmaw_diseased_cover_sources(
         )
 
     @cache
-    def models_share_save_group(model_ids: tuple[str, ...]) -> bool:
-        return _allocation_group_has_uniform_saves(
+    def refine_save_group(group: AllocationGroup) -> tuple[AllocationGroup, ...] | None:
+        return _project_allocation_save_subgroups(
             state=state,
             descriptor=descriptor,
             pool=pool,
             attacking_unit_id=attacking_unit_id,
             registry=runtime_modifier_registry,
-            model_ids=model_ids,
+            group=group,
         )
 
     candidates = allocation_models_reachable_by_pool(
@@ -738,7 +737,13 @@ def gnarlmaw_diseased_cover_sources(
         maximum_damage=_ordinary_attack_damage_ceiling(pool, runtime_modifier_registry),
         precision_possible=bool(post_roll_profiles)
         or has_weapon_keyword(profile, WeaponKeyword.PRECISION),
-        models_share_save_group=models_share_save_group,
+        refine_save_group=refine_save_group,
+        may_skip_saves=devastating_wounds_resolution(
+            profile,
+            target_keywords=target.keywords,
+            name_keywords=target.datasheet_name_keywords,
+        )
+        is DevastatingWoundsResolution.NO_SAVES,
     )
     if not candidates:
         return None
@@ -771,14 +776,7 @@ def gnarlmaw_diseased_cover_sources(
         common_sources = common_sources.intersection(cover.source_feature_ids)
         if not common_sources:
             return None
-    return validate_json_value(
-        {
-            "convention_id": gnarlmaw.DISEASED_COVER_CONVENTION_ID,
-            "source_ability_id": gnarlmaw.DISEASED_COVER_IR_SOURCE_ID,
-            "source_model_ids": sorted(common_sources),
-            "allocation_candidate_model_ids": sorted(candidates),
-        }
-    )
+    return allocation_cover_provenance(bindings_by_model, common_sources, candidates)
 
 
 def _ordinary_attack_damage_ceiling(
@@ -799,16 +797,21 @@ def _ordinary_attack_damage_ceiling(
     return max(1, expression.total((expression.sides,) * expression.quantity))
 
 
-def _allocation_group_has_uniform_saves(
+def _project_allocation_save_subgroups(
     *,
     state: GameState,
     descriptor: RulesetDescriptor,
     pool: RangedAttackPool,
     attacking_unit_id: str,
     registry: RuntimeModifierRegistry,
-    model_ids: tuple[str, ...],
-) -> bool:
+    group: AllocationGroup,
+) -> tuple[AllocationGroup, ...] | None:
     from warhammer40k_core.core.random_profile_values import RandomProfileValue
+    from warhammer40k_core.engine.attack_sequence_grouped_allocation import (
+        allocation_group_by_save_signature,
+    )
+    from warhammer40k_core.engine.obscuring_model_cover import obscuring_model_cover_sources
+    from warhammer40k_core.engine.stealth import rules_unit_stealth_sources
     from warhammer40k_core.engine.catalog_modifier_ignore import (
         ModifierIgnoreKind,
         modifier_ignore_sources_for_gathering,
@@ -826,11 +829,23 @@ def _allocation_group_has_uniform_saves(
         or len(rules_unit_view_by_id(state=state, unit_instance_id=attacking_unit_id).own_models)
         != 1
     ):
-        return False
+        return None
 
     # Save choices and source-backed rerolls can refine the native group even
     # when its initial profile is homogeneous. Leave those cases conservative.
     target_id = pool.target_unit_instance_id
+    if (
+        _target_has_effect_cover(state=state, target_unit_instance_id=target_id)
+        or _target_has_effect_cover_denial(state=state, target_unit_instance_id=target_id)
+        or INDIRECT_FIRE_BENEFIT_OF_COVER_RULE_ID in pool.targeting_rule_ids
+        or obscuring_model_cover_sources(state=state, pool=pool) is not None
+        or rules_unit_stealth_sources(
+            state=state, target_unit_instance_id=target_id, runtime_modifier_registry=registry
+        )
+        is not None
+    ):
+        return None
+
     target_owner = unit_owner_player_id(state=state, unit_instance_id=target_id)
     if any(
         source_backed_reroll_permission_contexts_for_unit(
@@ -844,7 +859,7 @@ def _allocation_group_has_uniform_saves(
         )
         for roll in ("attack_sequence.save.armour", "attack_sequence.save.invulnerable")
     ):
-        return False
+        return None
 
     def has_ignore_sources(
         unit_id: str, model_id: str, kind: ModifierIgnoreKind, role: Literal["attacker", "target"]
@@ -876,9 +891,9 @@ def _allocation_group_has_uniform_saves(
         ModifierIgnoreKind.ARMOR_PENETRATION_CHARACTERISTIC,
         "attacker",
     ):
-        return False
-    expected: tuple[SaveOption, ...] | None = None
-    for model_id in model_ids:
+        return None
+    signatures: dict[str, str] = {}
+    for model_id in group.model_ids:
         model = model_by_id(state=state, model_instance_id=model_id)
         if any(
             isinstance(value, RandomProfileValue)
@@ -892,7 +907,7 @@ def _allocation_group_has_uniform_saves(
                 ModifierIgnoreKind.SAVE_ROLL,
             )
         ):
-            return False
+            return None
         options = save_options_for_model(
             model=model,
             armor_penetration=profile.armor_penetration.final,
@@ -903,10 +918,8 @@ def _allocation_group_has_uniform_saves(
                 allocated_model_id=model_id,
             ),
         )
-        if expected is not None and options != expected:
-            return False
-        expected = options
-    return True
+        signatures[model_id] = canonical_json([option.to_payload() for option in options])
+    return allocation_group_by_save_signature(group, signatures)
 
 
 def _fortification_cover_for_allocated_model(

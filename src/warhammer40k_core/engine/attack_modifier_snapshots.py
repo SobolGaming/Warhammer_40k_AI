@@ -32,7 +32,7 @@ def attack_modifier_snapshots(
     allocated_model_ids: tuple[str, ...] | None = None,
     gathering_preview: bool = True,
 ) -> tuple[AttackModifierSnapshot, ...]:
-    from warhammer40k_core.engine.attack_sequence_hazardous import gnarlmaw_diseased_cover_sources
+    from warhammer40k_core.engine.attack_sequence_hazardous import approved_pre_hit_cover_sources
     from warhammer40k_core.engine.attack_sequence_hit_wound import (
         _benefit_of_cover_ballistic_skill_penalty,
         _unit_instance_id_for_model,
@@ -48,7 +48,7 @@ def attack_modifier_snapshots(
     snapshots = [
         AttackModifierSnapshot("skill", item) for item in pool.weapon_profile.skill_modifiers
     ]
-    gnarlmaw_cover = gnarlmaw_diseased_cover_sources(
+    gnarlmaw_cover = approved_pre_hit_cover_sources(
         state=state,
         pool=pool,
         allocated_model_ids=allocated_model_ids,
