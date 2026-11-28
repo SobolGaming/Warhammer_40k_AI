@@ -12,7 +12,7 @@ from warhammer40k_core.engine.targetless_weapons import TargetlessWeapon
 
 from warhammer40k_core.engine.event_log import EventRecord
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal
 
 from warhammer40k_core.core.ruleset_descriptor import CoverEffect
 from warhammer40k_core.engine.attack_sequence_group_selection import (
@@ -638,6 +638,8 @@ def gnarlmaw_diseased_cover_sources(
     gathering_preview: bool = False,
 ) -> JsonValue:
     """Qualify the same admitted source across all reachable allocation recipients."""
+    from functools import cache
+
     from warhammer40k_core.core.weapon_profiles import RangeProfileKind
     from warhammer40k_core.engine.weapon_abilities import sustained_hits_generated_hits
     from warhammer40k_core.engine.attack_sequence_geometry_targets import (
@@ -706,12 +708,9 @@ def gnarlmaw_diseased_cover_sources(
     profile = pool.weapon_profile
     post_roll_profiles = runtime_modifier_registry.post_roll_weapon_profile_modifier_bindings
     wound_slots = None
-    if (
-        not gathering_preview
-        and pool.pending_attack_count_bonus is None
-        and not post_roll_profiles
-        and not has_weapon_keyword(profile, WeaponKeyword.DEVASTATING_WOUNDS)
-    ):
+    if not gathering_preview and pool.pending_attack_count_bonus is None and not post_roll_profiles:
+        # No-save wounds share this ordinary allocation walk. Mortal conversion
+        # and additional mortal wounds are deferred beyond the ordinary slots.
         wound_slots = pool.attacks * sustained_hits_generated_hits(
             profile,
             critical_hit=True,
@@ -719,24 +718,27 @@ def gnarlmaw_diseased_cover_sources(
             name_keywords=target.datasheet_name_keywords,
             d3_value=3,
         )
-    maximum_damage = None
-    damage = profile.damage_profile
-    if (
-        wound_slots is not None
-        and damage.fixed_damage is not None
-        and not damage.modifiers
-        and not has_weapon_keyword(profile, WeaponKeyword.MELTA)
-        and not runtime_modifier_registry.allocated_attack_damage_modifier_bindings
-    ):
-        maximum_damage = max(1, damage.fixed_damage)
+
+    @cache
+    def models_share_save_group(model_ids: tuple[str, ...]) -> bool:
+        return _allocation_group_has_uniform_saves(
+            state=state,
+            descriptor=descriptor,
+            pool=pool,
+            attacking_unit_id=attacking_unit_id,
+            registry=runtime_modifier_registry,
+            model_ids=model_ids,
+        )
+
     candidates = allocation_models_reachable_by_pool(
         state=state,
         pool=pool,
         allocated_model_ids=allocated_model_ids,
         wound_slots=wound_slots,
-        maximum_damage=maximum_damage,
+        maximum_damage=_ordinary_attack_damage_ceiling(pool, runtime_modifier_registry),
         precision_possible=bool(post_roll_profiles)
         or has_weapon_keyword(profile, WeaponKeyword.PRECISION),
+        models_share_save_group=models_share_save_group,
     )
     if not candidates:
         return None
@@ -777,6 +779,134 @@ def gnarlmaw_diseased_cover_sources(
             "allocation_candidate_model_ids": sorted(candidates),
         }
     )
+
+
+def _ordinary_attack_damage_ceiling(
+    pool: RangedAttackPool, registry: RuntimeModifierRegistry
+) -> int | None:
+    damage = pool.weapon_profile.damage_profile
+    if (
+        damage.modifiers
+        or has_weapon_keyword(pool.weapon_profile, WeaponKeyword.MELTA)
+        or registry.allocated_attack_damage_modifier_bindings
+    ):
+        return None
+    if damage.fixed_damage is not None:
+        return damage.fixed_damage
+    expression = damage.dice_expression
+    if expression is None or registry.damage_roll_modifier_bindings:
+        return None
+    return max(1, expression.total((expression.sides,) * expression.quantity))
+
+
+def _allocation_group_has_uniform_saves(
+    *,
+    state: GameState,
+    descriptor: RulesetDescriptor,
+    pool: RangedAttackPool,
+    attacking_unit_id: str,
+    registry: RuntimeModifierRegistry,
+    model_ids: tuple[str, ...],
+) -> bool:
+    from warhammer40k_core.core.random_profile_values import RandomProfileValue
+    from warhammer40k_core.engine.catalog_modifier_ignore import (
+        ModifierIgnoreKind,
+        modifier_ignore_sources_for_gathering,
+    )
+    from warhammer40k_core.engine.modifier_permission_context import ModifierPermissionAttackContext
+    from warhammer40k_core.engine.saves import save_options_for_model
+    from warhammer40k_core.engine.source_backed_rerolls import (
+        source_backed_reroll_permission_contexts_for_unit,
+    )
+
+    profile = pool.weapon_profile
+    if (
+        registry.save_option_modifier_bindings
+        or isinstance(profile.armor_penetration, RandomProfileValue)
+        or len(rules_unit_view_by_id(state=state, unit_instance_id=attacking_unit_id).own_models)
+        != 1
+    ):
+        return False
+
+    # Save choices and source-backed rerolls can refine the native group even
+    # when its initial profile is homogeneous. Leave those cases conservative.
+    target_id = pool.target_unit_instance_id
+    target_owner = unit_owner_player_id(state=state, unit_instance_id=target_id)
+    if any(
+        source_backed_reroll_permission_contexts_for_unit(
+            state=state,
+            player_id=target_owner,
+            unit_instance_id=attacking_unit_id,
+            target_unit_instance_id=target_id,
+            roll_type=roll,
+            timing_window=roll,
+            attack_kind="ranged",
+        )
+        for roll in ("attack_sequence.save.armour", "attack_sequence.save.invulnerable")
+    ):
+        return False
+
+    def has_ignore_sources(
+        unit_id: str, model_id: str, kind: ModifierIgnoreKind, role: Literal["attacker", "target"]
+    ) -> bool:
+        owner = unit_owner_player_id(state=state, unit_instance_id=unit_id)
+        sources = modifier_ignore_sources_for_gathering(
+            state=state,
+            ability_index=registry.modifier_permission_index(owner),
+            unit_instance_id=unit_id,
+            kind=kind,
+            model_instance_id=model_id,
+            weapon_profile_id=pool.weapon_profile_id if role == "attacker" else None,
+            attack_context=ModifierPermissionAttackContext(
+                attacking_unit_id,
+                pool.attacker_model_instance_id,
+                target_id,
+                role,
+                BattlePhase.SHOOTING,
+                profile,
+                None,
+                None,
+            ),
+        )
+        return bool(sources.catalog_permissions or sources.persisted_source_templates)
+
+    if has_ignore_sources(
+        attacking_unit_id,
+        pool.attacker_model_instance_id,
+        ModifierIgnoreKind.ARMOR_PENETRATION_CHARACTERISTIC,
+        "attacker",
+    ):
+        return False
+    expected: tuple[SaveOption, ...] | None = None
+    for model_id in model_ids:
+        model = model_by_id(state=state, model_instance_id=model_id)
+        if any(
+            isinstance(value, RandomProfileValue)
+            and value.characteristic in (Characteristic.SAVE, Characteristic.INVULNERABLE_SAVE)
+            for value in model.characteristics
+        ) or any(
+            has_ignore_sources(target_id, model_id, kind, "target")
+            for kind in (
+                ModifierIgnoreKind.SAVE_CHARACTERISTIC,
+                ModifierIgnoreKind.INVULNERABLE_SAVE_CHARACTERISTIC,
+                ModifierIgnoreKind.SAVE_ROLL,
+            )
+        ):
+            return False
+        options = save_options_for_model(
+            model=model,
+            armor_penetration=profile.armor_penetration.final,
+            cover_result=_cover_for_allocated_model(
+                state=state,
+                ruleset_descriptor=descriptor,
+                pool=pool,
+                allocated_model_id=model_id,
+            ),
+        )
+        if expected is not None and options != expected:
+            return False
+        expected = options
+    return True
 
 
 def _fortification_cover_for_allocated_model(

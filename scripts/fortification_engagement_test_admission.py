@@ -126,6 +126,19 @@ REACHABILITY_PREIMAGES = {
         "5f0872125ff2f5d437033c9d3c75f2e44a7a705e8ffc6c45a2c347a2269f0670"
     ),
 }
+GROUP_BOUNDS_RECEIPT = (
+    "data/source_audits/ci64_provenance_v1/gnarlmaw-allocation-group-bounds-test-v1.json"
+)
+GROUP_BOUNDS_RECEIPT_SHA256 = "0002be4a267ec21738049fa3df0ceecdc56d166e0fc418fd230264d9e77cc694"
+GROUP_BOUNDS_BASE = "e0aa8ed420b82f11c2f8c129b44d067c5f60f7f3"
+GROUP_BOUNDS_PREIMAGES = {
+    "src/warhammer40k_core/engine/attack_sequence_group_selection.py": (
+        "4f52c77b1346c7e63f56b9d2d7d416d1a68095eeb2d0a6f9a76e0536d81a1e21"
+    ),
+    "src/warhammer40k_core/engine/attack_sequence_hazardous.py": (
+        "5238279a34a608d3c72372e67665a2997a63dc0040745d384cc3618e6454d196"
+    ),
+}
 ROTATION_SOURCES = {
     "src/warhammer40k_core/engine/phases/movement_geometry.py",
     "src/warhammer40k_core/geometry/physical_predicates.py",
@@ -432,8 +445,28 @@ def _fortification_current_receipt(
             REACHABILITY_PREIMAGES,
         ),
     )
-    if reachability is not None:
-        receipt, successor_raw = reachability
+    if reachability is None:
+        if (root / GROUP_BOUNDS_RECEIPT).exists():
+            raise SystemExit("Gnarlmaw group bounds require the exact reachability predecessor.")
+        return receipt, raw
+    receipt, successor_raw = reachability
+    raw += b"\0" + successor_raw
+    group_bounds = _fortification_successor(
+        root,
+        receipt,
+        _Successor(
+            GROUP_BOUNDS_RECEIPT,
+            GROUP_BOUNDS_RECEIPT_SHA256,
+            GROUP_BOUNDS_BASE,
+            "finite-gnarlmaw-allocation-group-bounds-test-v1",
+            REACHABILITY_RECEIPT_SHA256,
+            5,
+            set(GROUP_BOUNDS_PREIMAGES),
+            GROUP_BOUNDS_PREIMAGES,
+        ),
+    )
+    if group_bounds is not None:
+        receipt, successor_raw = group_bounds
         raw += b"\0" + successor_raw
     return receipt, raw
 

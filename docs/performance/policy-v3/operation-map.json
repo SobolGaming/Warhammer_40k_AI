@@ -38992,6 +38992,7 @@
       "paths": [
         "data/source_audits/ci64_provenance_v1/gnarlmaw-allocation-test-v1.json",
         "data/source_audits/ci64_provenance_v1/gnarlmaw-development-test-v1.json",
+        "data/source_audits/ci64_provenance_v1/gnarlmaw-allocation-group-bounds-test-v1.json",
         "data/source_audits/ci64_provenance_v1/gnarlmaw-allocation-reachability-test-v1.json",
         "data/source_audits/ci64_provenance_v1/gnarlmaw-pre-hit-cover-test-v1.json",
         "data/source_audits/ci64_provenance_v1/gnarlmaw-source-test-v1.json",
@@ -39048,6 +39049,8 @@
       ],
       "owners": [
         "_allocation_order_tiers",
+        "_allocation_group_has_uniform_saves",
+        "_ordinary_attack_damage_ceiling",
         "_psychic_attack_modifier_ignore_request",
         "_reachable_allocation_models",
         "_resolve_grouped_current_pool",
@@ -39079,10 +39082,13 @@
         "_native_gnarlmaw_config",
         "test_gnarlmaw_deploys_from_native_development_roster",
         "test_gnarlmaw_diseased_cover_uses_native_hull_occlusion",
+        "test_gnarlmaw_pre_hit_cover_keeps_healthy_prior_allocation_options",
         "test_gnarlmaw_pre_hit_cover_reaches_only_allocation_within_pool",
         "test_gnarlmaw_pre_hit_cover_reaches_precision_follow_on_character",
+        "test_gnarlmaw_pre_hit_cover_requires_clearing_the_whole_save_group",
         "test_gnarlmaw_pre_hit_cover_respects_allocation_and_modifiers",
         "test_gnarlmaw_pre_hit_cover_respects_live_allocation_from_earlier_pool",
+        "test_gnarlmaw_pre_hit_cover_retains_finite_damage_bound",
         "test_gnarlmaw_records_allocation_cover_after_unmodified_hit_roll"
       ],
       "families": [],

@@ -1107,6 +1107,7 @@ def allocation_models_reachable_by_pool(
     wound_slots: int | None,
     maximum_damage: int | None,
     precision_possible: bool,
+    models_share_save_group: Callable[[tuple[str, ...]], bool],
 ) -> set[str]:
     """Union the recipients reachable after decline or any legal Precision lead."""
     target_id = pool.target_unit_instance_id
@@ -1121,7 +1122,11 @@ def allocation_models_reachable_by_pool(
         state=state, allocation_context=allocation, include_priority_tiers=True
     )
     candidates = _reachable_allocation_models(
-        state=state, groups=groups, wound_slots=wound_slots, maximum_damage=maximum_damage
+        state=state,
+        groups=groups,
+        wound_slots=wound_slots,
+        maximum_damage=maximum_damage,
+        models_share_save_group=models_share_save_group,
     )
     if precision_possible:
         for lead in precision_allocation_groups_for_pool(
@@ -1146,6 +1151,7 @@ def allocation_models_reachable_by_pool(
                     groups=final_groups,
                     wound_slots=wound_slots,
                     maximum_damage=maximum_damage,
+                    models_share_save_group=models_share_save_group,
                     lead_id=priority_ids[0] if priority_ids else None,
                 )
             )
@@ -1158,6 +1164,7 @@ def _reachable_allocation_models(
     groups: tuple[AllocationGroup, ...],
     wound_slots: int | None,
     maximum_damage: int | None,
+    models_share_save_group: Callable[[tuple[str, ...]], bool],
     lead_id: str | None = None,
 ) -> set[str]:
     from warhammer40k_core.engine.damage_allocation import allocation_order_tier
@@ -1182,13 +1189,20 @@ def _reachable_allocation_models(
     lead_cost = sum(costs[model_id] for model_id in reachable)
     groups = tuple(group for group in groups if group.group_id != lead_id)
 
-    # Effective saves can split a group. Give each other group the latest tier
-    # its models could occupy, and this candidate's group its earliest tier.
-    # Either way the group's living wounded models precede its unwounded models.
+    # Native allocation stays in its current group until every member is gone.
+    # A potential Save split can move the healthy members of a mixed group to
+    # a later tier, so only charge them early when the group is proved intact.
     tier_costs = [0, 0, 0, 0]
     for group in groups:
+        intact = (
+            group.wounded
+            and len(group.wounded_model_ids) < len(group.model_ids)
+            and models_share_save_group(group.model_ids)
+        )
         for model_id in group.model_ids:
-            tier = allocation_order_tier(group.role, wounded=model_id in group.wounded_model_ids)
+            tier = allocation_order_tier(
+                group.role, wounded=intact or model_id in group.wounded_model_ids
+            )
             tier_costs[tier] += costs[model_id]
     for group in groups:
         tier = allocation_order_tier(group.role, wounded=group.wounded)

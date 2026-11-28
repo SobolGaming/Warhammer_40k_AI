@@ -40,6 +40,7 @@ from tests.support.section10_fixtures import (
 )
 from tests.support.section11_fixtures import begin
 from warhammer40k_core.adapters.local_session import LocalGameSession
+from warhammer40k_core.core.count_profiles import DamageProfile
 from warhammer40k_core.engine.abilities import AbilityCatalogIndex
 from warhammer40k_core.engine.ability_catalog import catalog_ability_records_from_catalog
 from warhammer40k_core.engine.battle_shock_state import apply_direct_battle_shock_state
@@ -1186,17 +1187,27 @@ def _gnarlmaw_native_attack(
     attacks: int | None = None,
     wounded_front: int | None = None,
     first_pool: bool = False,
+    separate_hunter: bool = False,
+    crusher_wounds: int | None = None,
+    damage: DamageProfile | None = None,
+    devastating: bool = False,
     seed: str = "gnarlmaw-dice-1",
 ) -> tuple[LocalGameSession, UnitInstance, UnitInstance]:
     from tests.support.faction_batch01 import Scene, unit_placement
     from tests.support.private_randomness import fixture_private_rng_seed
     from tests.support.section04_fixtures import pending
     from tests.support.section10_fixtures import submit
+    from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
     from warhammer40k_core.core.model_geometry_catalog import (
         GeometryRulesFootprintPolicy,
         ModelFootprintKind,
     )
-    from warhammer40k_core.core.weapon_profiles import AttackProfile, DamageProfile, WeaponKeyword
+    from warhammer40k_core.core.weapon_profiles import (
+        AbilityDescriptor,
+        AttackProfile,
+        DevastatingWoundsEffect,
+        WeaponKeyword,
+    )
     from warhammer40k_core.engine.army_mustering import (
         ArmyMusterRequest,
         WarlordSelection,
@@ -1210,6 +1221,7 @@ def _gnarlmaw_native_attack(
     from warhammer40k_core.engine.damage_allocation import (
         AllocationGroupPayload,
         allocation_context_for_unit,
+        allocation_groups_for_context,
     )
     from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
     from warhammer40k_core.engine.game_state import SecondaryMissionChoice, SecondaryMissionMode
@@ -1226,8 +1238,12 @@ def _gnarlmaw_native_attack(
     config = _native_gnarlmaw_config(tmp_path, compact_bloodcrushers=multi_model)
     lash_id = "000001648:lash-of-slaanesh"
     prior_weapon_id = "000001648:pavane-of-slaanesh"
-    keyword = WeaponKeyword.PRECISION if precision else WeaponKeyword.IGNORES_COVER
-    if ignores_cover or precision or attacks is not None:
+    extra_keywords = (
+        *((WeaponKeyword.PRECISION,) if precision else ()),
+        *((WeaponKeyword.IGNORES_COVER,) if ignores_cover else ()),
+        *((WeaponKeyword.DEVASTATING_WOUNDS,) if devastating else ()),
+    )
+    if extra_keywords or attacks is not None or damage is not None or first_pool:
         config = replace(
             config,
             army_catalog=replace(
@@ -1238,15 +1254,21 @@ def _gnarlmaw_native_attack(
                         weapon_profiles=tuple(
                             replace(
                                 profile,
-                                keywords=(*profile.keywords, keyword)
-                                if ignores_cover or precision
-                                else profile.keywords,
+                                keywords=(*profile.keywords, *extra_keywords),
+                                abilities=(
+                                    *profile.abilities,
+                                    AbilityDescriptor.devastating_wounds(
+                                        DevastatingWoundsEffect.NO_SAVES
+                                    ),
+                                )
+                                if devastating
+                                else profile.abilities,
                                 attack_profile=AttackProfile.fixed(attacks)
                                 if attacks is not None
                                 else profile.attack_profile,
                                 damage_profile=DamageProfile.fixed(30)
                                 if precision
-                                else profile.damage_profile,
+                                else damage or profile.damage_profile,
                             )
                             for profile in item.weapon_profiles
                         ),
@@ -1269,6 +1291,35 @@ def _gnarlmaw_native_attack(
                     if first_pool and item.wargear_id == prior_weapon_id
                     else item
                     for item in config.army_catalog.wargear
+                ),
+            ),
+        )
+    if separate_hunter or crusher_wounds is not None:
+        catalog = config.army_catalog
+        bloodcrushers = catalog.datasheet_by_id("000001115")
+        profiles = tuple(
+            replace(
+                profile,
+                characteristics=tuple(
+                    CharacteristicValue.from_raw(Characteristic.SAVE, 6)
+                    if separate_hunter
+                    and profile.model_profile_id.endswith(":bloodhunter")
+                    and value.characteristic is Characteristic.SAVE
+                    else CharacteristicValue.from_raw(Characteristic.WOUNDS, crusher_wounds)
+                    if crusher_wounds is not None and value.characteristic is Characteristic.WOUNDS
+                    else value
+                    for value in profile.characteristics
+                ),
+            )
+            for profile in bloodcrushers.model_profiles
+        )
+        config = replace(
+            config,
+            army_catalog=replace(
+                catalog,
+                datasheets=tuple(
+                    replace(sheet, model_profiles=profiles) if sheet == bloodcrushers else sheet
+                    for sheet in catalog.datasheets
                 ),
             ),
         )
@@ -1557,6 +1608,22 @@ def _gnarlmaw_native_attack(
                 assert screened < candidates
                 assert screened
                 assert (candidates - screened) - set(visible.target_in_range_model_ids)
+                if separate_hunter:
+                    groups = allocation_groups_for_context(
+                        state=state,
+                        allocation_context=allocation_context_for_unit(
+                            state=state, target_unit_instance_id=target_id
+                        ),
+                        include_priority_tiers=True,
+                    )
+                    first, later = groups
+                    assert first.wounded_model_ids == (target.own_model_ids()[0],)
+                    assert len(first.model_ids) == 2
+                    assert set(first.model_ids) == screened
+                    (hunter,) = (
+                        m for m in target.own_models if m.model_profile_id.endswith(":bloodhunter")
+                    )
+                    assert later.model_ids == (hunter.model_instance_id,)
             else:
                 assert screened == candidates
 
@@ -1617,7 +1684,10 @@ def _gnarlmaw_native_attack(
     replay_start = (
         session.lifecycle.to_payload()
         if (screen == "singleton" and not ignores_cover and not ordinary_cover)
-        or (screen == "mixed" and attacks == 1)
+        or (
+            screen == "mixed"
+            and (attacks == 1 or separate_hunter or damage is not None or first_pool)
+        )
         else None
     )
     if replay_start is not None:
@@ -1787,6 +1857,110 @@ def test_gnarlmaw_pre_hit_cover_respects_live_allocation_from_earlier_pool(tmp_p
     assert state is not None
     assert state.shooting_phase_state is not None
     assert target.own_model_ids()[0] in state.shooting_phase_state.allocated_model_ids_this_phase
+
+
+def test_gnarlmaw_pre_hit_cover_keeps_healthy_prior_allocation_options(tmp_path: Path) -> None:
+    from warhammer40k_core.engine.attack_sequence_model import HitRollPayload
+
+    session, _, target = _gnarlmaw_native_attack(
+        tmp_path,
+        screen="mixed",
+        attacks=1,
+        first_pool=True,
+        seed="gnarlmaw-dice-4",
+    )
+    steps = events(session, "attack_sequence_step")
+    final_hit = next(step for step in reversed(steps) if step["step"] == "hit")
+    assert cast(HitRollPayload, final_hit["payload"])["target_number"] == 2
+    (prior_save,) = (
+        row["payload"] for row in steps[: steps.index(final_hit)] if row["step"] == "save"
+    )
+    assert isinstance(prior_save, dict)
+    assert prior_save["successful"] is True
+    allocated = prior_save["allocated_model_id"]
+    assert allocated in target.own_model_ids()
+    assert all(model.current_wounds == model.initial_wounds for model in target.own_models)
+    state = session.lifecycle.state
+    assert state is not None
+    assert state.shooting_phase_state is not None
+    assert allocated in state.shooting_phase_state.allocated_model_ids_this_phase
+
+
+@pytest.mark.parametrize(
+    ("attack_count", "target_number"),
+    [pytest.param(2, 3, id="clears-whole-group"), pytest.param(3, 2, id="reaches-next-group")],
+)
+def test_gnarlmaw_pre_hit_cover_requires_clearing_the_whole_save_group(
+    tmp_path: Path, attack_count: int, target_number: int
+) -> None:
+    from warhammer40k_core.engine.attack_sequence_model import HitRollPayload
+    from warhammer40k_core.engine.damage_allocation import AllocationGroupPayload
+
+    session, _, _ = _gnarlmaw_native_attack(
+        tmp_path,
+        screen="mixed",
+        attacks=attack_count,
+        wounded_front=1,
+        separate_hunter=True,
+        damage=DamageProfile.fixed(30),
+        seed="gnarlmaw-dice-2",
+    )
+    steps = events(session, "attack_sequence_step")
+    hits = [cast(HitRollPayload, row["payload"]) for row in steps if row["step"] == "hit"]
+    assert len(hits) == attack_count
+    assert {hit["target_number"] for hit in hits} == {target_number}
+    if attack_count == 2:
+        final_order = next(
+            row["payload"]
+            for row in steps
+            if row["step"] == "allocate"
+            and isinstance(row["payload"], dict)
+            and row["payload"].get("forced") is True
+        )
+        assert isinstance(final_order, dict)
+        groups = cast(list[AllocationGroupPayload], final_order["allocation_groups"])
+        assert [len(group["model_ids"]) for group in groups] == [2, 1]
+
+
+@pytest.mark.parametrize(
+    ("devastating", "attack_count"),
+    [pytest.param(False, 2, id="finite-d3"), pytest.param(True, 1, id="devastating-no-save")],
+)
+def test_gnarlmaw_pre_hit_cover_retains_finite_damage_bound(
+    tmp_path: Path, devastating: bool, attack_count: int
+) -> None:
+    from warhammer40k_core.core.dice import DiceExpression
+    from warhammer40k_core.engine.attack_sequence_model import HitRollPayload
+
+    session, _, target = _gnarlmaw_native_attack(
+        tmp_path,
+        screen="mixed",
+        attacks=attack_count,
+        wounded_front=4,
+        crusher_wounds=5,
+        devastating=devastating,
+        damage=DamageProfile.fixed(1) if devastating else DamageProfile.dice(DiceExpression(1, 3)),
+        seed="gnarlmaw-dice-9" if devastating else "gnarlmaw-dice-3",
+    )
+    steps = events(session, "attack_sequence_step")
+    hits = [cast(HitRollPayload, row["payload"]) for row in steps if row["step"] == "hit"]
+    assert len(hits) == attack_count
+    assert {hit["target_number"] for hit in hits} == {3}
+    assert target.own_models[0].current_wounds == 4
+    assert target.own_models[0].initial_wounds == 5
+    (save,) = (row["payload"] for row in steps if row["step"] == "save")
+    assert isinstance(save, dict)
+    assert save["allocated_model_id"] == target.own_model_ids()[0]
+    if devastating:
+        assert save["save_kind"] is None
+        assert not events(session, "devastating_wounds_deferred")
+    else:
+        (damage_roll,) = (
+            roll
+            for roll in events(session, "random_characteristic_rolled")
+            if roll["characteristic"] == "damage"
+        )
+        assert 1 <= cast(int, damage_roll["value"]) <= 3
 
 
 @pytest.mark.parametrize(
