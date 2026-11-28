@@ -38990,6 +38990,7 @@
     },
     "gnarlmaw-development-admission-receipts": {
       "paths": [
+        "data/source_audits/ci64_provenance_v1/gnarlmaw-allocation-projection-split-test-v1.json",
         "data/source_audits/ci64_provenance_v1/gnarlmaw-allocation-test-v1.json",
         "data/source_audits/ci64_provenance_v1/gnarlmaw-development-test-v1.json",
         "data/source_audits/ci64_provenance_v1/gnarlmaw-allocation-group-bounds-test-v1.json",
@@ -39036,6 +39037,7 @@
     },
     "gnarlmaw-development-allocation-reachability": {
       "paths": [
+        "src/warhammer40k_core/engine/attack_sequence_allocation_projection.py",
         "src/warhammer40k_core/engine/attack_modifier_evaluation.py",
         "src/warhammer40k_core/engine/attack_modifier_snapshots.py",
         "src/warhammer40k_core/engine/attack_sequence_dice_rerolls.py",

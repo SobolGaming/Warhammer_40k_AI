@@ -161,6 +161,15 @@ SAVE_SUBGROUP_PREIMAGES = {
         "a3ba1b26904532627d05fd1546817625be4bee344fe30f30902157842b08b757"
     ),
 }
+PROJECTION_SPLIT_RECEIPT = (
+    "data/source_audits/ci64_provenance_v1/gnarlmaw-allocation-projection-split-test-v1.json"
+)
+PROJECTION_SPLIT_RECEIPT_SHA256 = "4f85dd056b26aff4fcade4599bcb2a049c109f5f962be57d17bb6da8016040e9"
+PROJECTION_SPLIT_BASE = "432bc2af668b7596ec33ef5944c5f1fb0f0d4598"
+PROJECTION_SPLIT_SOURCES = {
+    "src/warhammer40k_core/engine/attack_sequence_group_selection.py",
+    "src/warhammer40k_core/engine/attack_sequence_hazardous.py",
+}
 ROTATION_SOURCES = {
     "src/warhammer40k_core/engine/phases/movement_geometry.py",
     "src/warhammer40k_core/geometry/physical_predicates.py",
@@ -509,8 +518,30 @@ def _fortification_current_receipt(
             SAVE_SUBGROUP_PREIMAGES,
         ),
     )
-    if save_subgroups is not None:
-        receipt, successor_raw = save_subgroups
+    if save_subgroups is None:
+        if (root / PROJECTION_SPLIT_RECEIPT).exists():
+            raise SystemExit(
+                "Allocation projection split requires the exact Save subgroup predecessor."
+            )
+        return receipt, raw
+    receipt, successor_raw = save_subgroups
+    raw += b"\0" + successor_raw
+    projection_split = _fortification_successor(
+        root,
+        receipt,
+        _Successor(
+            PROJECTION_SPLIT_RECEIPT,
+            PROJECTION_SPLIT_RECEIPT_SHA256,
+            PROJECTION_SPLIT_BASE,
+            "finite-gnarlmaw-allocation-projection-split-test-v1",
+            SAVE_SUBGROUP_RECEIPT_SHA256,
+            0,
+            PROJECTION_SPLIT_SOURCES,
+            {},
+        ),
+    )
+    if projection_split is not None:
+        receipt, successor_raw = projection_split
         raw += b"\0" + successor_raw
     return receipt, raw
 

@@ -15,7 +15,7 @@ from warhammer40k_core.engine.event_log import EventRecord
 from typing import TYPE_CHECKING, Literal
 
 from warhammer40k_core.core.ruleset_descriptor import CoverEffect
-from warhammer40k_core.engine.attack_sequence_group_selection import (
+from warhammer40k_core.engine.attack_sequence_allocation_projection import (
     allocation_models_reachable_by_pool,
 )
 from warhammer40k_core.engine.native_gathering_cover_rules import (

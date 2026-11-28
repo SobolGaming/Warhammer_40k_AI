@@ -1765,6 +1765,7 @@ def test_fortification_transition_rejects_source_and_case_drift(tmp_path: Path) 
         fortification.REACHABILITY_RECEIPT,
         fortification.GROUP_BOUNDS_RECEIPT,
         fortification.SAVE_SUBGROUP_RECEIPT,
+        fortification.PROJECTION_SPLIT_RECEIPT,
         MANIFEST,
         fortification.OWNER,
         *sorted(

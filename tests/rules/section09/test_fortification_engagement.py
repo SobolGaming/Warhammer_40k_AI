@@ -1333,7 +1333,7 @@ def _gnarlmaw_native_attack(
         objective_terrain_areas=(),
     )
     target_sheet = "000001115" if multi_model else "000001120"
-    owner_sheets = ("000001648", GNARLMAW)
+    owner_sheets: tuple[str, ...] = ("000001648", GNARLMAW)
     if screen in ("unrelated", "precision"):
         owner_sheets = (*owner_sheets, "000001465")
     opponent_sheets = (

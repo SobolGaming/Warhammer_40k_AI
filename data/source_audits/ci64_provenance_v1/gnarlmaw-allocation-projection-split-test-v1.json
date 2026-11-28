@@ -1,0 +1,38 @@
+{
+  "added_cases": [],
+  "base": "432bc2af668b7596ec33ef5944c5f1fb0f0d4598",
+  "retained_fortification_sha256": "9de8528df9b8a24b2bf2c00d0fb8d65c31a54163b72c5b519005c9932610b947",
+  "runtime_fingerprint": {
+    "after": "68088b6cc28ea636abdc414206bff35b5574647bbed6b545026cb6f825b8a016",
+    "before": "9cff6501c665707bb7c0738f23fb06b0d2266282f6d26c181fab975d48a72217"
+  },
+  "runtime_manifest": {
+    "after": "e33ea878a09395ed361b134fc2e9107b69cfc443a1339b4f4e760c1c446e2ce0",
+    "before": "cbdb3bf914181dbb29836c08d5dcf644971823dba86f079d49cf1bc82e0f11b0"
+  },
+  "schema": "finite-gnarlmaw-allocation-projection-split-test-v1",
+  "sources": {
+    "src/warhammer40k_core/engine/attack_sequence_group_selection.py": {
+      "after": "90ffc427008ea43c9d25609001366e5b8cb60dac489d7fd7a2bb8a52c8dac888",
+      "before": "90b75cb698edae98cd53e3fbc022c3f3729c46d6ec6b85d1a70133c4bde5315c"
+    },
+    "src/warhammer40k_core/engine/attack_sequence_hazardous.py": {
+      "after": "ad5fe9f89b4a074a6fa54da7739738cb88e2a88ca564d0e5f20c288cf8ede5f9",
+      "before": "5de0df370ee5fc945c771cd2b205168686fc035e0743f4fe3bf55167fa15b511"
+    }
+  },
+  "test": {
+    "after": {
+      "blob_sha1": "387836a260903bb5102a5bd83a51f691d758c21c",
+      "bytes": 91378,
+      "mode": "100644",
+      "sha256": "f1eff0889b6145a4b481df9546a2a864fadf1146bde6677719dccfb1e0522a89"
+    },
+    "before": {
+      "blob_sha1": "56596608a8c2342cf7bdda2b181577c0f611f8a6",
+      "bytes": 91361,
+      "mode": "100644",
+      "sha256": "8de1757cac56cf19cced2895e5cd2c1aab142fce420287d26e0ae0c379f26d79"
+    }
+  }
+}
