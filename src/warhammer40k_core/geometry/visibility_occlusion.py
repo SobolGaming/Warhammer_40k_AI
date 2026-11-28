@@ -33,7 +33,15 @@ def source_group_obscures(
 ) -> bool:
     if not selected:
         return False
-    alone = resolve_visibility_pair(observer, target, selected, selected)
+    separated = any(
+        observer.bounds[axis + 2] < target.bounds[axis]
+        or target.bounds[axis + 2] < observer.bounds[axis]
+        for axis in (0, 1)
+    )
+    # For separated footprints a facing part exists, so seeing every facing
+    # part through selected also implies seeing some part through selected.
+    # With overlap the facing domain can be empty; retain both masks there.
+    alone = resolve_visibility_pair(observer, target, () if separated else selected, selected)
     if not alone.model_fully_visible:
         return True
     if not remaining:
