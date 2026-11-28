@@ -2,12 +2,27 @@
 # pyright: reportUnusedImport=false
 from __future__ import annotations
 
+from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
 from warhammer40k_core.engine.battlefield_visibility_context import battlefield_visibility_context
+from warhammer40k_core.engine.catalog_contextual_status_consumption import (
+    CATALOG_IR_FORTIFICATION_COVER_CONSUMER_ID,
+    rules_unit_has_fortification_consumer,
+)
 from warhammer40k_core.engine.targetless_weapons import TargetlessWeapon
 
 from warhammer40k_core.engine.event_log import EventRecord
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal
+
+from warhammer40k_core.core.ruleset_descriptor import CoverEffect
+from warhammer40k_core.engine.attack_sequence_allocation_projection import (
+    allocation_models_reachable_by_pool,
+)
+from warhammer40k_core.engine.native_gathering_cover_rules import (
+    allocation_cover_bindings_by_model,
+    allocation_cover_provenance,
+    approved_allocation_cover_bindings,
+)
 
 from warhammer40k_core.engine.attack_sequence_imports import *
 
@@ -616,6 +631,297 @@ def _cover_for_allocated_model(
     return fortification_cover if fortification_cover is not None else cover_result
 
 
+def approved_pre_hit_cover_sources(
+    *,
+    state: GameState,
+    pool: RangedAttackPool,
+    runtime_modifier_registry: RuntimeModifierRegistry,
+    allocated_model_ids: tuple[str, ...] | None = None,
+    gathering_preview: bool = False,
+) -> JsonValue:
+    """Qualify the same admitted source across all reachable allocation recipients."""
+    from functools import cache
+
+    from warhammer40k_core.core.weapon_profiles import RangeProfileKind
+    from warhammer40k_core.engine.weapon_abilities import (
+        DevastatingWoundsResolution,
+        devastating_wounds_resolution,
+        sustained_hits_generated_hits,
+    )
+    from warhammer40k_core.engine.attack_sequence_geometry_targets import (
+        attack_pool_attacker_unit_id,
+    )
+    from warhammer40k_core.engine.damage_allocation_targets import (
+        DamageAllocationTargetState,
+        damage_allocation_target_state,
+    )
+
+    if (
+        pool.weapon_profile.range_profile.kind is not RangeProfileKind.DISTANCE
+        or has_weapon_keyword(pool.weapon_profile, WeaponKeyword.IGNORES_COVER)
+        or has_weapon_keyword(pool.weapon_profile, WeaponKeyword.TORRENT)
+        or state.battlefield_state is None
+    ):
+        return None
+    bindings_by_model = allocation_cover_bindings_by_model(
+        tuple(state.army_definitions), approved_allocation_cover_bindings()
+    )
+    if not bindings_by_model:
+        return None
+    descriptor = state.ruleset_descriptor_for_runtime_policy()
+    if (
+        descriptor.terrain_visibility_policy.cover_policy.cover_effect
+        is not CoverEffect.ATTACKER_BS_MODIFIER
+    ):
+        return None
+    if (
+        damage_allocation_target_state(
+            state=state, target_unit_instance_id=pool.target_unit_instance_id
+        )
+        is not DamageAllocationTargetState.ALLOCATABLE
+    ):
+        return None
+    scenario = battlefield_scenario_for_state(state=state)
+    attacking_unit_id = attack_pool_attacker_unit_id(state=state, pool=pool)
+    dynamic_blockers = shooting_dynamic_model_blockers(
+        scenario=scenario,
+        observing_unit_id=attacking_unit_id,
+        target_unit_id=pool.target_unit_instance_id,
+    )
+    common_sources = frozenset(
+        model.model_id for model in dynamic_blockers if model.model_id in bindings_by_model
+    )
+    if not common_sources:
+        return None
+
+    if allocated_model_ids is None:
+        out_of_phase = state.out_of_phase_shooting_state
+        shooting = state.shooting_phase_state
+        if out_of_phase is not None and out_of_phase.attack_sequence is not None:
+            allocated_model_ids = out_of_phase.allocated_model_ids
+        elif shooting is not None:
+            allocated_model_ids = shooting.allocated_model_ids_this_phase
+        else:
+            allocated_model_ids = ()
+    target = rules_unit_view_by_id(state=state, unit_instance_id=pool.target_unit_instance_id)
+    profile = pool.weapon_profile
+    post_roll_profiles = runtime_modifier_registry.post_roll_weapon_profile_modifier_bindings
+    wound_slots = None
+    if not gathering_preview and pool.pending_attack_count_bonus is None and not post_roll_profiles:
+        # No-save wounds share this ordinary allocation walk. Mortal conversion
+        # and additional mortal wounds are deferred beyond the ordinary slots.
+        wound_slots = pool.attacks * sustained_hits_generated_hits(
+            profile,
+            critical_hit=True,
+            target_keywords=target.keywords,
+            name_keywords=target.datasheet_name_keywords,
+            d3_value=3,
+        )
+
+    @cache
+    def refine_save_group(group: AllocationGroup) -> tuple[AllocationGroup, ...] | None:
+        return _project_allocation_save_subgroups(
+            state=state,
+            descriptor=descriptor,
+            pool=pool,
+            attacking_unit_id=attacking_unit_id,
+            registry=runtime_modifier_registry,
+            group=group,
+        )
+
+    candidates = allocation_models_reachable_by_pool(
+        state=state,
+        pool=pool,
+        allocated_model_ids=allocated_model_ids,
+        wound_slots=wound_slots,
+        maximum_damage=_ordinary_attack_damage_ceiling(pool, runtime_modifier_registry),
+        precision_possible=bool(post_roll_profiles)
+        or has_weapon_keyword(profile, WeaponKeyword.PRECISION),
+        refine_save_group=refine_save_group,
+        may_skip_saves=devastating_wounds_resolution(
+            profile,
+            target_keywords=target.keywords,
+            name_keywords=target.datasheet_name_keywords,
+        )
+        is DevastatingWoundsResolution.NO_SAVES,
+    )
+    if not candidates:
+        return None
+
+    battlefield = scenario.battlefield_state
+    terrain_features = battlefield.terrain_features
+    terrain_volumes = tuple(
+        volume for feature in terrain_features for volume in feature.terrain_volumes()
+    )
+    for model_id in sorted(candidates):
+        target_geometry = geometry_model_for_placement(
+            model=model_by_id(state=state, model_instance_id=model_id),
+            placement=battlefield.model_placement_by_id(model_id),
+        )
+        cover = _fortification_cover_for_allocated_model(
+            state=state,
+            ruleset_descriptor=descriptor,
+            scenario=scenario,
+            pool=pool,
+            allocated_model_id=model_id,
+            attacking_unit_id=attacking_unit_id,
+            target_geometry=target_geometry,
+            terrain_features=terrain_features,
+            terrain_volumes=terrain_volumes,
+            dynamic_blockers=dynamic_blockers,
+            eligible_source_model_ids=common_sources,
+        )
+        if cover is None:
+            return None
+        common_sources = common_sources.intersection(cover.source_feature_ids)
+        if not common_sources:
+            return None
+    return allocation_cover_provenance(bindings_by_model, common_sources, candidates)
+
+
+def _ordinary_attack_damage_ceiling(
+    pool: RangedAttackPool, registry: RuntimeModifierRegistry
+) -> int | None:
+    damage = pool.weapon_profile.damage_profile
+    if (
+        damage.modifiers
+        or has_weapon_keyword(pool.weapon_profile, WeaponKeyword.MELTA)
+        or registry.allocated_attack_damage_modifier_bindings
+    ):
+        return None
+    if damage.fixed_damage is not None:
+        return damage.fixed_damage
+    expression = damage.dice_expression
+    if expression is None or registry.damage_roll_modifier_bindings:
+        return None
+    return max(1, expression.total((expression.sides,) * expression.quantity))
+
+
+def _project_allocation_save_subgroups(
+    *,
+    state: GameState,
+    descriptor: RulesetDescriptor,
+    pool: RangedAttackPool,
+    attacking_unit_id: str,
+    registry: RuntimeModifierRegistry,
+    group: AllocationGroup,
+) -> tuple[AllocationGroup, ...] | None:
+    from warhammer40k_core.core.random_profile_values import RandomProfileValue
+    from warhammer40k_core.engine.attack_sequence_grouped_allocation import (
+        allocation_group_by_save_signature,
+    )
+    from warhammer40k_core.engine.obscuring_model_cover import obscuring_model_cover_sources
+    from warhammer40k_core.engine.stealth import rules_unit_stealth_sources
+    from warhammer40k_core.engine.catalog_modifier_ignore import (
+        ModifierIgnoreKind,
+        modifier_ignore_sources_for_gathering,
+    )
+    from warhammer40k_core.engine.modifier_permission_context import ModifierPermissionAttackContext
+    from warhammer40k_core.engine.saves import save_options_for_model
+    from warhammer40k_core.engine.source_backed_rerolls import (
+        source_backed_reroll_permission_contexts_for_unit,
+    )
+
+    profile = pool.weapon_profile
+    if (
+        registry.save_option_modifier_bindings
+        or isinstance(profile.armor_penetration, RandomProfileValue)
+        or len(rules_unit_view_by_id(state=state, unit_instance_id=attacking_unit_id).own_models)
+        != 1
+    ):
+        return None
+
+    # Save choices and source-backed rerolls can refine the native group even
+    # when its initial profile is homogeneous. Leave those cases conservative.
+    target_id = pool.target_unit_instance_id
+    if (
+        _target_has_effect_cover(state=state, target_unit_instance_id=target_id)
+        or _target_has_effect_cover_denial(state=state, target_unit_instance_id=target_id)
+        or INDIRECT_FIRE_BENEFIT_OF_COVER_RULE_ID in pool.targeting_rule_ids
+        or obscuring_model_cover_sources(state=state, pool=pool) is not None
+        or rules_unit_stealth_sources(
+            state=state, target_unit_instance_id=target_id, runtime_modifier_registry=registry
+        )
+        is not None
+    ):
+        return None
+
+    target_owner = unit_owner_player_id(state=state, unit_instance_id=target_id)
+    if any(
+        source_backed_reroll_permission_contexts_for_unit(
+            state=state,
+            player_id=target_owner,
+            unit_instance_id=attacking_unit_id,
+            target_unit_instance_id=target_id,
+            roll_type=roll,
+            timing_window=roll,
+            attack_kind="ranged",
+        )
+        for roll in ("attack_sequence.save.armour", "attack_sequence.save.invulnerable")
+    ):
+        return None
+
+    def has_ignore_sources(
+        unit_id: str, model_id: str, kind: ModifierIgnoreKind, role: Literal["attacker", "target"]
+    ) -> bool:
+        owner = unit_owner_player_id(state=state, unit_instance_id=unit_id)
+        sources = modifier_ignore_sources_for_gathering(
+            state=state,
+            ability_index=registry.modifier_permission_index(owner),
+            unit_instance_id=unit_id,
+            kind=kind,
+            model_instance_id=model_id,
+            weapon_profile_id=pool.weapon_profile_id if role == "attacker" else None,
+            attack_context=ModifierPermissionAttackContext(
+                attacking_unit_id,
+                pool.attacker_model_instance_id,
+                target_id,
+                role,
+                BattlePhase.SHOOTING,
+                profile,
+                None,
+                None,
+            ),
+        )
+        return bool(sources.catalog_permissions or sources.persisted_source_templates)
+
+    if has_ignore_sources(
+        attacking_unit_id,
+        pool.attacker_model_instance_id,
+        ModifierIgnoreKind.ARMOR_PENETRATION_CHARACTERISTIC,
+        "attacker",
+    ):
+        return None
+    signatures: dict[str, str] = {}
+    for model_id in group.model_ids:
+        model = model_by_id(state=state, model_instance_id=model_id)
+        if any(
+            isinstance(value, RandomProfileValue)
+            and value.characteristic in (Characteristic.SAVE, Characteristic.INVULNERABLE_SAVE)
+            for value in model.characteristics
+        ) or any(
+            has_ignore_sources(target_id, model_id, kind, "target")
+            for kind in (
+                ModifierIgnoreKind.SAVE_CHARACTERISTIC,
+                ModifierIgnoreKind.INVULNERABLE_SAVE_CHARACTERISTIC,
+                ModifierIgnoreKind.SAVE_ROLL,
+            )
+        ):
+            return None
+        options = save_options_for_model(
+            model=model,
+            armor_penetration=profile.armor_penetration.final,
+            cover_result=_cover_for_allocated_model(
+                state=state,
+                ruleset_descriptor=descriptor,
+                pool=pool,
+                allocated_model_id=model_id,
+            ),
+        )
+        signatures[model_id] = canonical_json([option.to_payload() for option in options])
+    return allocation_group_by_save_signature(group, signatures)
+
+
 def _fortification_cover_for_allocated_model(
     *,
     state: GameState,
@@ -628,18 +934,21 @@ def _fortification_cover_for_allocated_model(
     terrain_features: tuple[TerrainFeatureDefinition, ...],
     terrain_volumes: tuple[TerrainVolume, ...],
     dynamic_blockers: tuple[GeometryModel, ...],
+    eligible_source_model_ids: frozenset[str] | None = None,
 ) -> BenefitOfCoverResult | None:
-    battlefield = state.battlefield_state
-    if battlefield is None:
-        raise GameLifecycleError("Fortification cover requires battlefield_state.")
-    try:
-        attacking_unit_placement = battlefield.unit_placement_by_id(attacking_unit_id)
-    except PlacementError as exc:
-        raise GameLifecycleError("Fortification cover attacker placement is invalid.") from exc
+    cover_policy = ruleset_descriptor.terrain_visibility_policy.cover_policy
+    if not cover_policy.grants_benefit_of_cover or not dynamic_blockers:
+        return None
+    attacker = rules_unit_view_by_id(state=state, unit_instance_id=attacking_unit_id)
+    placements = unit_placements_for_rules_unit_or_none(scenario=scenario, rules_unit=attacker)
+    if placements is None:
+        raise GameLifecycleError("Fortification cover requires placed attacking models.")
     blocker_records: set[CoverSourceRecord] = set()
     terrain_areas = shooting_terrain_areas_for_state(state)
     blocker_witness: LineOfSightWitness | None = None
-    for attacker_placement in attacking_unit_placement.model_placements:
+    for attacker_placement in (
+        model for placement in placements for model in placement.model_placements
+    ):
         attacker_model = model_by_id(
             state=state,
             model_instance_id=attacker_placement.model_instance_id,
@@ -674,26 +983,26 @@ def _fortification_cover_for_allocated_model(
             ),
         )
         witness = context.resolve_line_of_sight()
-        fortification_blocker_ids = _fortification_full_visibility_blocker_ids(
-            state=state,
-            witness=witness,
-        )
-        if not fortification_blocker_ids or not context.not_fully_visible_because_of(
-            witness,
-            target_model_id=target_geometry.model_id,
-            sources=tuple(
-                record
-                for record in witness.all_blocker_records()
-                if record.blocker_kind is VisibilityBlockerKind.MODEL
-                and record.blocker_id in fortification_blocker_ids
-            ),
-        ):
-            continue
-        blocker_witness = witness
-        for blocker_id in fortification_blocker_ids:
+        for blocker in witness.all_blocker_records():
+            if (
+                blocker.blocker_kind is not VisibilityBlockerKind.MODEL
+                or not blocker.blocks_full_visibility
+                or (
+                    eligible_source_model_ids is not None
+                    and blocker.blocker_id not in eligible_source_model_ids
+                )
+                or not _model_owner_grants_fortification_cover(
+                    state=state, model_instance_id=blocker.blocker_id
+                )
+                or not context.not_fully_visible_because_of(
+                    witness, target_model_id=allocated_model_id, sources=(blocker,)
+                )
+            ):
+                continue
+            blocker_witness = witness
             blocker_records.add(
                 CoverSourceRecord(
-                    feature_id=blocker_id,
+                    feature_id=blocker.blocker_id,
                     feature_kind=TerrainFeatureKind.INDUSTRIAL_STRUCTURES,
                     policy_kind=LineOfSightPolicy.TRUE_LINE_OF_SIGHT,
                     reason=CoverSourceReason.NOT_FULLY_VISIBLE_BECAUSE_OF_FEATURE,
@@ -704,45 +1013,21 @@ def _fortification_cover_for_allocated_model(
     sorted_records = tuple(sorted(blocker_records, key=lambda item: item.feature_id))
     return BenefitOfCoverResult(
         has_benefit=True,
-        cover_effect=CoverEffect.SAVE_BONUS,
+        cover_effect=cover_policy.cover_effect,
         source_feature_ids=tuple(record.feature_id for record in sorted_records),
         source_policy_kinds=(LineOfSightPolicy.TRUE_LINE_OF_SIGHT,),
         source_records=sorted_records,
         los_cache_key=blocker_witness.los_cache_key,
         target_unit_visible=blocker_witness.unit_visible,
         target_unit_fully_visible=blocker_witness.unit_fully_visible,
-        non_stacking=True,
-        ap_zero_save_bonus_excluded_for_save_3_plus_or_better=True,
+        non_stacking=cover_policy.non_stacking,
+        ap_zero_save_bonus_excluded_for_save_3_plus_or_better=(
+            cover_policy.ap_zero_save_bonus_excluded_for_save_3_plus_or_better
+        ),
     )
 
 
-def _fortification_full_visibility_blocker_ids(
-    *,
-    state: GameState,
-    witness: LineOfSightWitness,
-) -> tuple[str, ...]:
-    blocker_ids: set[str] = set()
-    for blocker in witness.all_blocker_records():
-        if blocker.blocker_kind is not VisibilityBlockerKind.MODEL:
-            continue
-        if not blocker.blocks_full_visibility:
-            continue
-        if _model_owner_unit_has_keyword(
-            state=state,
-            model_instance_id=blocker.blocker_id,
-            keyword="FORTIFICATION",
-        ):
-            blocker_ids.add(blocker.blocker_id)
-    return tuple(sorted(blocker_ids))
-
-
-def _model_owner_unit_has_keyword(
-    *,
-    state: GameState,
-    model_instance_id: str,
-    keyword: str,
-) -> bool:
-    canonical = _canonical_keyword(keyword)
+def _model_owner_grants_fortification_cover(*, state: GameState, model_instance_id: str) -> bool:
     for army in state.army_definitions:
         for unit in army.units:
             for model in unit.own_models:
@@ -750,7 +1035,8 @@ def _model_owner_unit_has_keyword(
                     continue
                 if not model.is_alive:
                     return False
-                return canonical in {
-                    _canonical_keyword(unit_keyword) for unit_keyword in unit.keywords
-                }
+                return rules_unit_has_fortification_consumer(
+                    rules_unit_view_by_id(state=state, unit_instance_id=unit.unit_instance_id),
+                    CATALOG_IR_FORTIFICATION_COVER_CONSUMER_ID,
+                )
     raise GameLifecycleError("Fortification cover blocker model is unknown.")

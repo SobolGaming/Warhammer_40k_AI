@@ -35,6 +35,7 @@ def resolve_gathered_attack_dice(
     decisions: DecisionController,
     manager: DiceRollManager,
     attack_sequence: AttackSequence,
+    allocated_model_ids: tuple[str, ...],
     hooks: AttackSequenceHooks,
     stratagem_index: StratagemCatalogIndex | None,
     stratagem_cost_modifier_registry: StratagemCostModifierRegistry | None,
@@ -82,6 +83,7 @@ def resolve_gathered_attack_dice(
                 runtime_modifier_registry=runtime_modifier_registry,
                 hit_stage=stage,
                 gathered_pool=current.current_pool(),
+                allocated_model_ids=allocated_model_ids,
                 prepared_hits=prepared_hits,
                 rolled_hits=rolled_hits,
             )

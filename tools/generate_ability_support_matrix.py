@@ -4775,20 +4775,32 @@ def _chaos_daemons_nurgle_review_rows() -> tuple[DatasheetGroupReviewRow, ...]:
                 "July and September (v1.2) official faction packs, pages 86-87. "
                 "The official pack supersedes Wahapedia."
             ),
-            ir_coverage="Bridge/catalog blocked",
+            ir_coverage="IR parsed; provisional native execution",
             supported_semantics=(
-                "Infiltrators and The Shadow of Chaos are known structured paths. "
-                "Shroud of Flies uses the shared live Stealth aura and has focused "
-                "shooting evidence with fixture geometry. The shared Fortification "
-                "targeting, Hit-roll and per-model Fall Back exceptions are exercised "
-                "with source-linked descriptors on fixture geometry."
+                "Native development catalog supports order-of-battle selection and "
+                "Infiltrators deployment. Shroud of Flies uses the shared Stealth aura. "
+                "Fortification uses the shared targeting, Hit-roll and Fall Back exceptions. "
+                "Diseased Cover uses the existing Ballistic Skill cover modifier before the Hit "
+                "roll when the same admitted Gnarlmaw screens every recipient reachable in the "
+                "current pool from at least one model in the attacking unit. The projection "
+                "uses live wounds and allocation history. It includes reachable later tiers "
+                "and the follow-on groups after a legal Precision choice. Ordinary cover remains "
+                "non-stacking, Ignores Cover applies, and saves receive no cover bonus."
             ),
             semantics_needed=(
-                "Gnarlmaw-specific Diseased Cover source attribution awaits catalog admission."
+                "Andrzej approved this development convention "
+                "(Sentinel_ddba1a381e908191b7c48fa763eab182) "
+                "for the Gnarlmaw's allocation-time wording. It carries no official errata or "
+                "full certification. The existing allocation trace can record a model ID as "
+                "`industrial_structures`; independently qualifying terrain takes precedence there."
             ),
             catalog_blockers=(
-                "No-equipment/no-option source rows are normalized. The Hull designation "
-                "still requires supported footprint and height evidence for this sculpt."
+                "Andrzej's owner-approved 120 x 90 mm oval and 4.0-inch (101.6 mm) "
+                "height represent the base-less Hull for native development gameplay. "
+                "[Provisional geometry evidence]"
+                "(../../data/source_audits/feculent_gnarlmaw_2026_11/geometry.json) "
+                "confers no official base "
+                "size, physical measurement, or physical-play certification."
             ),
         ),
         DatasheetGroupReviewRow(

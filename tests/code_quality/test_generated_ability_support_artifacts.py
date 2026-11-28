@@ -350,6 +350,17 @@ def test_fortification_generated_support_keeps_both_source_occurrences() -> None
         assert member.source_row_ids == (source_ids[source_row],)
         assert member.execution_status is SemanticExecutionStatus.ENGINE_CONSUMED
 
+    cover = audit.member(
+        content_kind=SemanticContentKind.DATASHEET_ABILITY,
+        owner_id="000001470",
+        rule_name="Diseased Cover",
+    )
+    assert cover.rule_id == "000001470:4"
+    assert cover.equivalence_basis is SemanticEquivalenceBasis.STRUCTURED_RULE_IR
+    assert cover.execution_status is SemanticExecutionStatus.NAMED_HANDLER_EXECUTABLE
+    assert cover.support_transfer is SemanticSupportTransfer.NONE
+    assert cover.runtime_consumer_ids == ("catalog-ir:fortification-cover",)
+
 
 def test_cross_source_semantic_audit_uses_exact_non_materialization_static_rule_ir() -> None:
     member = _semantic_audit().member(

@@ -1,0 +1,36 @@
+{
+  "added_cases": [
+    "tests/rules/section09/test_fortification_engagement.py::test_gnarlmaw_records_allocation_cover_after_unmodified_hit_roll"
+  ],
+  "base": "f106e9d80b7d9170bdf08c6cad8189dcdff8e169",
+  "retained_fortification_sha256": "c08d2e6861d2e552cdb012a66e94f668fd3d1ee6302105240dfc4cdaf52a2158",
+  "runtime_fingerprint": {
+    "after": "bba4a5825dd25db8231d044d19326314fb57b4e40d75582a33cafc686251b4da",
+    "before": "60b50367975f5e0177e7ae9bc6e7918fa9cb5c9bdc0d689f8a163e8da1b57117"
+  },
+  "runtime_manifest": {
+    "after": "309b9992140b7d74e05620d29b90eecfedc28ae7dd3370832b13ddf09e47ce8d",
+    "before": "3fe699199d4385aee786fe1b1bbcd71dba98414d6bbd5c05cb6c44b1d77f8865"
+  },
+  "schema": "finite-gnarlmaw-allocation-test-v1",
+  "sources": {
+    "src/warhammer40k_core/engine/ability_coverage.py": {
+      "after": "2ae0a9cfb06f4b03c03184627b0198294edba799e378071af06feabe662754eb",
+      "before": "01f751c83cfcc153547830ee37f304b0e1d9479bbd855f1d6ddbc313d35c216d"
+    }
+  },
+  "test": {
+    "after": {
+      "blob_sha1": "f08bf06aa2a4fceed26ea2abb062fd0d4f7e20a7",
+      "bytes": 58318,
+      "mode": "100644",
+      "sha256": "7dc50a961cf45c220677f563f65908d484c5da890afc35618dd933612a826c06"
+    },
+    "before": {
+      "blob_sha1": "29d31a038b542b0797b3ac37992bc0c0ab0a34f3",
+      "bytes": 48964,
+      "mode": "100644",
+      "sha256": "8f1f8c41d4d5be320aa99277aa7574b46fd56ca0886b21b7e46b31a80342c412"
+    }
+  }
+}

@@ -6669,7 +6669,8 @@
       "equivalence_basis": "structured_rule_ir",
       "equivalence_hash": "f8646cbcab6b2d11c75abb4713313e2a39fb15b588daa67a72146d3cc074ec04",
       "execution_statuses": [
-        "engine_consumed"
+        "blocked_structured_semantics",
+        "named_handler_executable"
       ],
       "faction_ids": [
         "astra-militarum",
@@ -6698,7 +6699,7 @@
       "runtime_consumer_ids": [
         "catalog-ir:fortification-cover"
       ],
-      "support_transfer": "content_neutral_generic_ir"
+      "support_transfer": "none"
     },
     {
       "content_kind": "datasheet_ability",
@@ -9288,7 +9289,7 @@
       "diagnostic_reasons": [],
       "equivalence_basis": "structured_rule_ir",
       "equivalence_hash": "f8646cbcab6b2d11c75abb4713313e2a39fb15b588daa67a72146d3cc074ec04",
-      "execution_status": "engine_consumed",
+      "execution_status": "blocked_structured_semantics",
       "faction_id": "space-marines",
       "faction_name": "Space Marines",
       "member_id": "datasheet-ability:000000097:4",
@@ -9309,7 +9310,7 @@
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000097:4:description"
       ],
-      "support_transfer": "content_neutral_generic_ir"
+      "support_transfer": "none"
     },
     {
       "content_kind": "datasheet_ability",
@@ -14611,7 +14612,7 @@
       "diagnostic_reasons": [],
       "equivalence_basis": "structured_rule_ir",
       "equivalence_hash": "f8646cbcab6b2d11c75abb4713313e2a39fb15b588daa67a72146d3cc074ec04",
-      "execution_status": "engine_consumed",
+      "execution_status": "blocked_structured_semantics",
       "faction_id": "tau-empire",
       "faction_name": "T'au Empire",
       "member_id": "datasheet-ability:000000435:5",
@@ -14632,7 +14633,7 @@
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000435:5:description"
       ],
-      "support_transfer": "content_neutral_generic_ir"
+      "support_transfer": "none"
     },
     {
       "content_kind": "datasheet_ability",
@@ -14668,7 +14669,7 @@
       "diagnostic_reasons": [],
       "equivalence_basis": "structured_rule_ir",
       "equivalence_hash": "f8646cbcab6b2d11c75abb4713313e2a39fb15b588daa67a72146d3cc074ec04",
-      "execution_status": "engine_consumed",
+      "execution_status": "blocked_structured_semantics",
       "faction_id": "tau-empire",
       "faction_name": "T'au Empire",
       "member_id": "datasheet-ability:000000436:4",
@@ -14689,7 +14690,7 @@
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000436:4:description"
       ],
-      "support_transfer": "content_neutral_generic_ir"
+      "support_transfer": "none"
     },
     {
       "content_kind": "datasheet_ability",
@@ -14753,7 +14754,7 @@
       "diagnostic_reasons": [],
       "equivalence_basis": "structured_rule_ir",
       "equivalence_hash": "f8646cbcab6b2d11c75abb4713313e2a39fb15b588daa67a72146d3cc074ec04",
-      "execution_status": "engine_consumed",
+      "execution_status": "blocked_structured_semantics",
       "faction_id": "tau-empire",
       "faction_name": "T'au Empire",
       "member_id": "datasheet-ability:000000437:4",
@@ -14774,7 +14775,7 @@
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000000437:4:description"
       ],
-      "support_transfer": "content_neutral_generic_ir"
+      "support_transfer": "none"
     },
     {
       "content_kind": "datasheet_ability",
@@ -32833,7 +32834,7 @@
       "diagnostic_reasons": [],
       "equivalence_basis": "structured_rule_ir",
       "equivalence_hash": "f8646cbcab6b2d11c75abb4713313e2a39fb15b588daa67a72146d3cc074ec04",
-      "execution_status": "engine_consumed",
+      "execution_status": "named_handler_executable",
       "faction_id": "chaos-daemons",
       "faction_name": "Chaos Daemons",
       "member_id": "datasheet-ability:000001470:4",
@@ -32854,7 +32855,7 @@
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000001470:4:description"
       ],
-      "support_transfer": "content_neutral_generic_ir"
+      "support_transfer": "none"
     },
     {
       "content_kind": "datasheet_ability",
@@ -34798,7 +34799,7 @@
       "diagnostic_reasons": [],
       "equivalence_basis": "structured_rule_ir",
       "equivalence_hash": "f8646cbcab6b2d11c75abb4713313e2a39fb15b588daa67a72146d3cc074ec04",
-      "execution_status": "engine_consumed",
+      "execution_status": "blocked_structured_semantics",
       "faction_id": "chaos-space-marines",
       "faction_name": "Chaos Space Marines",
       "member_id": "datasheet-ability:000001587:4",
@@ -34819,7 +34820,7 @@
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000001587:4:description"
       ],
-      "support_transfer": "content_neutral_generic_ir"
+      "support_transfer": "none"
     },
     {
       "content_kind": "datasheet_ability",
@@ -34884,7 +34885,7 @@
       "diagnostic_reasons": [],
       "equivalence_basis": "structured_rule_ir",
       "equivalence_hash": "f8646cbcab6b2d11c75abb4713313e2a39fb15b588daa67a72146d3cc074ec04",
-      "execution_status": "engine_consumed",
+      "execution_status": "blocked_structured_semantics",
       "faction_id": "chaos-daemons",
       "faction_name": "Chaos Daemons",
       "member_id": "datasheet-ability:000001588:4",
@@ -34905,7 +34906,7 @@
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000001588:4:description"
       ],
-      "support_transfer": "content_neutral_generic_ir"
+      "support_transfer": "none"
     },
     {
       "content_kind": "datasheet_ability",
@@ -38276,7 +38277,7 @@
       "diagnostic_reasons": [],
       "equivalence_basis": "structured_rule_ir",
       "equivalence_hash": "f8646cbcab6b2d11c75abb4713313e2a39fb15b588daa67a72146d3cc074ec04",
-      "execution_status": "engine_consumed",
+      "execution_status": "blocked_structured_semantics",
       "faction_id": "necrons",
       "faction_name": "Necrons",
       "member_id": "datasheet-ability:000002361:3",
@@ -38297,7 +38298,7 @@
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002361:3:description"
       ],
-      "support_transfer": "content_neutral_generic_ir"
+      "support_transfer": "none"
     },
     {
       "content_kind": "datasheet_ability",
@@ -39537,7 +39538,7 @@
       "diagnostic_reasons": [],
       "equivalence_basis": "structured_rule_ir",
       "equivalence_hash": "f8646cbcab6b2d11c75abb4713313e2a39fb15b588daa67a72146d3cc074ec04",
-      "execution_status": "engine_consumed",
+      "execution_status": "blocked_structured_semantics",
       "faction_id": "orks",
       "faction_name": "Orks",
       "member_id": "datasheet-ability:000002499:4",
@@ -39558,7 +39559,7 @@
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002499:4:description"
       ],
-      "support_transfer": "content_neutral_generic_ir"
+      "support_transfer": "none"
     },
     {
       "content_kind": "datasheet_ability",
@@ -43824,7 +43825,7 @@
       "diagnostic_reasons": [],
       "equivalence_basis": "structured_rule_ir",
       "equivalence_hash": "f8646cbcab6b2d11c75abb4713313e2a39fb15b588daa67a72146d3cc074ec04",
-      "execution_status": "engine_consumed",
+      "execution_status": "blocked_structured_semantics",
       "faction_id": "astra-militarum",
       "faction_name": "Astra Militarum",
       "member_id": "datasheet-ability:000002619:2",
@@ -43845,7 +43846,7 @@
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002619:2:description"
       ],
-      "support_transfer": "content_neutral_generic_ir"
+      "support_transfer": "none"
     },
     {
       "content_kind": "datasheet_ability",
@@ -54349,7 +54350,7 @@
       "diagnostic_reasons": [],
       "equivalence_basis": "structured_rule_ir",
       "equivalence_hash": "f8646cbcab6b2d11c75abb4713313e2a39fb15b588daa67a72146d3cc074ec04",
-      "execution_status": "engine_consumed",
+      "execution_status": "blocked_structured_semantics",
       "faction_id": "astra-militarum",
       "faction_name": "Astra Militarum",
       "member_id": "datasheet-ability:000003955:2",
@@ -54370,7 +54371,7 @@
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000003955:2:description"
       ],
-      "support_transfer": "content_neutral_generic_ir"
+      "support_transfer": "none"
     },
     {
       "content_kind": "datasheet_ability",
@@ -121998,7 +121999,7 @@
     "Source": "be71483d32107f42173bc13bf191f2769a8d17279ebdb2bb24d2fca372a1826c",
     "Stratagems": "b13ffe800908d95adcb221fb28b653ae319b0a84bb88d17b0585bceb3d939958"
   },
-  "source_payload_checksum_sha256": "bca806469b7bf3d838ea67b3b6b9391a24ca20367ce6bbd0c427703082946317",
+  "source_payload_checksum_sha256": "abbbc9bb14f72030c71ecbf1462c3aa198c86e8429f925c89e7179b12c3826ed",
   "source_text_unavailable_member_count": 111,
   "structured_member_count": 818,
   "upstream_execution_checksum_sha256": "662b0f11b9903d46f9bf5568e829bd4fb3a821a1cdd0bd8892ab6381e0b57b77"

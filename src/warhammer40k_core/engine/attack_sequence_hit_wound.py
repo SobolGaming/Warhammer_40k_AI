@@ -78,6 +78,7 @@ def _roll_hit(
     runtime_modifier_registry: RuntimeModifierRegistry | None = None,
     psychic_modifier_selection: PsychicAttackModifierIgnoreSelection | None = None,
     ignored_modifier_ids: tuple[str, ...] = (),
+    allocated_model_ids: tuple[str, ...] | None = None,
 ) -> HitRoll:
     from warhammer40k_core.engine.attack_modifier_snapshots import attack_modifier_snapshots
 
@@ -90,6 +91,8 @@ def _roll_hit(
         pool=pool,
         source_phase=source_phase,
         runtime_modifier_registry=_runtime_modifier_registry(runtime_modifier_registry),
+        allocated_model_ids=allocated_model_ids,
+        gathering_preview=False,
     )
     if psychic_modifier_selection is not None:
         if (
@@ -559,6 +562,7 @@ def _benefit_of_cover_ballistic_skill_penalty(
     state: GameState,
     pool: RangedAttackPool,
     runtime_modifier_registry: RuntimeModifierRegistry | None = None,
+    provisional_cover: bool = False,
 ) -> int:
     from warhammer40k_core.core.weapon_profiles import RangeProfileKind
     from warhammer40k_core.engine.catalog_cover_grants import catalog_cover_inventory
@@ -573,7 +577,7 @@ def _benefit_of_cover_ballistic_skill_penalty(
         target_unit_instance_id=pool.target_unit_instance_id,
     ):
         return 0
-    if catalog_cover_inventory(
+    if provisional_cover or catalog_cover_inventory(
         state=state,
         target_unit_instance_id=pool.target_unit_instance_id,
         runtime_modifier_registry=runtime_modifier_registry,

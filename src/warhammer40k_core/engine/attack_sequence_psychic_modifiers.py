@@ -67,6 +67,7 @@ def _psychic_attack_modifier_ignore_request(
     source_phase: BattlePhase,
     runtime_modifier_registry: RuntimeModifierRegistry,
     previous_selection: PsychicAttackModifierIgnoreSelection | None = None,
+    allocated_model_ids: tuple[str, ...] | None = None,
     request_id: str | None = None,
 ) -> DecisionRequest | None:
     if not is_psychic_weapon_profile(pool.weapon_profile) or has_weapon_keyword(
@@ -80,6 +81,8 @@ def _psychic_attack_modifier_ignore_request(
         pool=pool,
         source_phase=source_phase,
         runtime_modifier_registry=runtime_modifier_registry,
+        allocated_model_ids=allocated_model_ids,
+        gathering_preview=False,
     )
     selection = PsychicAttackModifierIgnoreSelection(
         "pending",

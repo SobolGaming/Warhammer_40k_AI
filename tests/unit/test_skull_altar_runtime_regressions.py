@@ -113,6 +113,9 @@ from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
 from warhammer40k_core.rules.rule_ir import RuleIR
 from warhammer40k_core.rules.source_data import RuleSourceText
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    chaos_daemons_gnarlmaw_2026_11 as gnarlmaw_source,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     datasheet_keyword_lexicon_2026_06_14 as datasheet_keyword_lexicon_source,
 )
 
@@ -827,10 +830,7 @@ def test_battle_shock_resolution_records_failed_state_updates() -> None:
 
 def test_fortification_cover_keyword_ignores_destroyed_blocker_model() -> None:
     source_army, target_army = _mustered_core_armies()
-    fortification_unit = with_unit_keywords(
-        _unit_with_dead_models(source_army.units[0]),
-        keywords=tuple(sorted((*source_army.units[0].keywords, "FORTIFICATION"))),
-    )
+    fortification_unit = _unit_with_dead_models(_with_fortification_cover(source_army.units[0]))
     source_army = replace(source_army, units=(fortification_unit,))
     state = _state_with_battlefield(
         armies=(source_army, target_army),
@@ -846,10 +846,9 @@ def test_fortification_cover_keyword_ignores_destroyed_blocker_model() -> None:
         phase=BattlePhase.SHOOTING,
     )
 
-    assert not attack_sequence_hazardous._model_owner_unit_has_keyword(  # pyright: ignore[reportPrivateUsage]
+    assert not attack_sequence_hazardous._model_owner_grants_fortification_cover(  # pyright: ignore[reportPrivateUsage]
         state=state,
         model_instance_id=fortification_unit.own_models[0].model_instance_id,
-        keyword="FORTIFICATION",
     )
 
 
@@ -1043,9 +1042,7 @@ def test_fortification_cover_ignores_destroyed_attacker_placements() -> None:
         unit_instance_id=fortification_unit_id,
         model_prefix=f"{fortification_unit_id}:model",
     )
-    fortification_unit = with_unit_keywords(
-        fortification_unit, keywords=tuple(sorted((*fortification_unit.keywords, "FORTIFICATION")))
-    )
+    fortification_unit = _with_fortification_cover(fortification_unit)
     source_army = replace(source_army, units=(attacker_unit, fortification_unit))
     target_unit = target_army.units[0]
     battlefield = BattlefieldRuntimeState(
@@ -1450,6 +1447,14 @@ def _state_with_battlefield(
         starting_attached_unit_records=list(starting_attached_unit_records),
         battlefield_state=battlefield,
     )
+
+
+def _with_fortification_cover(unit: UnitInstance) -> UnitInstance:
+    catalog = gnarlmaw_source.catalog_package().army_catalog
+    gnarlmaw = catalog.datasheet_by_id(gnarlmaw_source.DATASHEET_ID)
+    (cover,) = (a for a in gnarlmaw.abilities if a.ability_id == "000001470:diseased-cover")
+    unit = with_unit_keywords(unit, keywords=tuple(sorted((*unit.keywords, "FORTIFICATION"))))
+    return replace(unit, datasheet_abilities=(*unit.datasheet_abilities, cover))
 
 
 def _unit_with_dead_models(unit: UnitInstance) -> UnitInstance:

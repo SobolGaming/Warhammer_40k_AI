@@ -2919,30 +2919,14 @@ def _allocation_order_tiers(
     allocation_groups: tuple[AllocationGroup, ...],
 ) -> tuple[tuple[AllocationGroup, ...], ...]:
     groups = _validate_allocation_groups(allocation_groups)
-    wounded_non_character: list[AllocationGroup] = []
-    unwounded_non_character: list[AllocationGroup] = []
-    wounded_character: list[AllocationGroup] = []
-    unwounded_character: list[AllocationGroup] = []
+    tiers: list[list[AllocationGroup]] = [[], [], [], []]
     for group in groups:
-        is_character_group = group.role in _CHARACTER_ALLOCATION_GROUP_ROLES
-        if is_character_group and group.wounded:
-            wounded_character.append(group)
-        elif is_character_group:
-            unwounded_character.append(group)
-        elif group.wounded:
-            wounded_non_character.append(group)
-        else:
-            unwounded_non_character.append(group)
-    return tuple(
-        tuple(tier)
-        for tier in (
-            wounded_non_character,
-            unwounded_non_character,
-            wounded_character,
-            unwounded_character,
-        )
-        if tier
-    )
+        tiers[allocation_order_tier(group.role, wounded=group.wounded)].append(group)
+    return tuple(tuple(tier) for tier in tiers if tier)
+
+
+def allocation_order_tier(role: AllocationGroupRole, *, wounded: bool) -> int:
+    return (2 if role in _CHARACTER_ALLOCATION_GROUP_ROLES else 0) + (0 if wounded else 1)
 
 
 def _character_allocation_group_id(model_instance_id: str) -> str:

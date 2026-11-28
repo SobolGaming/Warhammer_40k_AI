@@ -62,6 +62,7 @@ def select_hit_modifiers(
     attack_context_id: str,
     source_phase: BattlePhase,
     registry: RuntimeModifierRegistry,
+    allocated_model_ids: tuple[str, ...] | None = None,
 ) -> tuple[tuple[str, ...], LifecycleStatus | None]:
     from warhammer40k_core.engine.attack_sequence_hit_wound import _unit_instance_id_for_model
 
@@ -74,6 +75,8 @@ def select_hit_modifiers(
         pool=pool,
         source_phase=source_phase,
         runtime_modifier_registry=registry,
+        allocated_model_ids=allocated_model_ids,
+        gathering_preview=False,
     )
     ignored: list[str] = []
     for label, kind in (

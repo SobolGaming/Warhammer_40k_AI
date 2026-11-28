@@ -1,0 +1,38 @@
+{
+  "added_cases": [],
+  "base": "dffa47e8ab1d8243028c878da4a7a28a3b843c6d",
+  "retained_fortification_sha256": "3edf827ba489182f3522315588789e03b22957a047887195dc36ec976c94c01d",
+  "runtime_fingerprint": {
+    "after": "4d252d4ccf694d52559f2816433de89afd1366532c5be211bc3d119ed06f52c5",
+    "before": "bba4a5825dd25db8231d044d19326314fb57b4e40d75582a33cafc686251b4da"
+  },
+  "runtime_manifest": {
+    "after": "8c8e3dac38d6352002bc563b437bed1d67737f9fa4b77c6df6e3c62edfda2009",
+    "before": "309b9992140b7d74e05620d29b90eecfedc28ae7dd3370832b13ddf09e47ce8d"
+  },
+  "schema": "finite-gnarlmaw-source-test-v1",
+  "sources": {
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/chaos_daemons_gnarlmaw_2026_11/__init__.py": {
+      "after": "09ea0fabc13ca2cc53c00a02d3f5a88327ba7737a27e182842decd81a2dd106c",
+      "before": "01efb3ac32057e2c1784f43082f094908d8fc5ed5b4ba32d2248b3bc7915baa5"
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/chaos_daemons_gnarlmaw_2026_11/artifacts/catalog.json": {
+      "after": "b9ad28049e5de7731bc5b47f762e903bc70e121890eda011ad149b03a877b346",
+      "before": "15864f07cf2a3a0d179cf43f74f5b4b8a712748c388566d1f70b0cffc25e329a"
+    }
+  },
+  "test": {
+    "after": {
+      "blob_sha1": "3956b821c55acdbfb3f2148313bee2e37562282a",
+      "bytes": 58657,
+      "mode": "100644",
+      "sha256": "071cfaa4fd9c09ef77661baee4bd5c27d497ccad560ebf9a99239e9c44f2aa6a"
+    },
+    "before": {
+      "blob_sha1": "66695ae7a211a64c299e815b677630e27662a7a0",
+      "bytes": 58437,
+      "mode": "100644",
+      "sha256": "379c727e17f3be808fa380f6553ed4df6b4c7781beb03a4fc01748eaa02c0534"
+    }
+  }
+}

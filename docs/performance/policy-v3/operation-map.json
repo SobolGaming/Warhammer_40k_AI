@@ -38987,6 +38987,193 @@
       "families": [],
       "sensitive": false,
       "mandatory": false
+    },
+    "gnarlmaw-development-admission-receipts": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/gnarlmaw-allocation-projection-split-test-v1.json",
+        "data/source_audits/ci64_provenance_v1/gnarlmaw-allocation-test-v1.json",
+        "data/source_audits/ci64_provenance_v1/gnarlmaw-development-test-v1.json",
+        "data/source_audits/ci64_provenance_v1/gnarlmaw-allocation-group-bounds-test-v1.json",
+        "data/source_audits/ci64_provenance_v1/gnarlmaw-allocation-reachability-test-v1.json",
+        "data/source_audits/ci64_provenance_v1/gnarlmaw-native-save-subgroups-test-v1.json",
+        "data/source_audits/ci64_provenance_v1/gnarlmaw-pre-hit-cover-test-v1.json",
+        "data/source_audits/ci64_provenance_v1/gnarlmaw-source-test-v1.json",
+        "data/source_audits/ci64_provenance_v1/gnarlmaw-test-typing-v1.json",
+        "data/source_audits/feculent_gnarlmaw_2026_11/geometry.json"
+      ],
+      "owners": [
+        "@document"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "gnarlmaw-development-inactive-fixture-admission": {
+      "paths": [
+        "scripts/fortification_engagement_test_admission.py"
+      ],
+      "owners": [
+        "gnarlmaw_inactive_test_successor"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "gnarlmaw-development-capability-report": {
+      "paths": [
+        "src/warhammer40k_core/engine/ability_coverage.py"
+      ],
+      "owners": [
+        "@module",
+        "_allocation_cover_diagnostics",
+        "_clause_coverage_row",
+        "_clause_support_stage",
+        "ability_clause_coverage_rows_for_rule_ir",
+        "ability_coverage_row_for_descriptor"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "gnarlmaw-development-allocation-reachability": {
+      "paths": [
+        "src/warhammer40k_core/engine/attack_sequence_allocation_projection.py",
+        "src/warhammer40k_core/engine/attack_modifier_evaluation.py",
+        "src/warhammer40k_core/engine/attack_modifier_snapshots.py",
+        "src/warhammer40k_core/engine/attack_sequence_dice_rerolls.py",
+        "src/warhammer40k_core/engine/attack_sequence_group_selection.py",
+        "src/warhammer40k_core/engine/attack_sequence_grouped_allocation.py",
+        "src/warhammer40k_core/engine/attack_sequence_hazardous.py",
+        "src/warhammer40k_core/engine/attack_sequence_hit_wound.py",
+        "src/warhammer40k_core/engine/attack_sequence_psychic_modifiers.py",
+        "src/warhammer40k_core/engine/damage_allocation.py",
+        "src/warhammer40k_core/engine/gathered_attack_dice.py",
+        "src/warhammer40k_core/engine/native_gathering_cover_rules.py"
+      ],
+      "owners": [
+        "@module",
+        "AllocationCoverSourceBinding",
+        "_allocation_order_tiers",
+        "_allocation_groups_by_effective_save_profile",
+        "_ordinary_attack_damage_ceiling",
+        "_psychic_attack_modifier_ignore_request",
+        "_project_allocation_save_subgroups",
+        "_reachable_allocation_models",
+        "_resolve_grouped_current_pool",
+        "_roll_hit",
+        "_roll_hit_step",
+        "allocation_models_reachable_by_pool",
+        "allocation_order_tier",
+        "attack_modifier_snapshots",
+        "cover_gathering_inventories",
+        "allocation_cover_bindings_by_model",
+        "allocation_cover_provenance",
+        "allocation_group_by_save_signature",
+        "approved_allocation_cover_bindings",
+        "approved_pre_hit_cover_sources",
+        "grouped_wounded_contexts_for_pool",
+        "resolve_gathered_attack_dice",
+        "select_hit_modifiers"
+      ],
+      "families": [
+        "visibility"
+      ],
+      "sensitive": true,
+      "mandatory": false
+    },
+    "gnarlmaw-development-native-regressions": {
+      "paths": [
+        "tests/rules/section09/test_fortification_engagement.py"
+      ],
+      "owners": [
+        "_assert_gnarlmaw_natural_two",
+        "_circular_attack_fixture_body",
+        "_gnarlmaw_native_attack",
+        "_native_gnarlmaw_config",
+        "test_approved_pre_hit_cover_binding_requires_exact_source_and_emits_its_provenance",
+        "test_gnarlmaw_deploys_from_native_development_roster",
+        "test_gnarlmaw_diseased_cover_uses_native_hull_occlusion",
+        "test_gnarlmaw_pre_hit_cover_keeps_healthy_prior_allocation_options",
+        "test_gnarlmaw_pre_hit_cover_reaches_only_allocation_within_pool",
+        "test_gnarlmaw_pre_hit_cover_reaches_precision_follow_on_character",
+        "test_gnarlmaw_pre_hit_cover_requires_clearing_the_whole_save_group",
+        "test_gnarlmaw_pre_hit_cover_respects_allocation_and_modifiers",
+        "test_gnarlmaw_pre_hit_cover_respects_live_allocation_from_earlier_pool",
+        "test_gnarlmaw_pre_hit_cover_retains_finite_damage_bound",
+        "test_gnarlmaw_records_allocation_cover_after_unmodified_hit_roll"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "gnarlmaw-development-inactive-fixture": {
+      "paths": [
+        "tests/unit/test_skull_altar_runtime_regressions.py"
+      ],
+      "owners": [
+        "@module",
+        "_with_fortification_cover",
+        "test_fortification_cover_ignores_destroyed_attacker_placements",
+        "test_fortification_cover_keyword_ignores_destroyed_blocker_model"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "gnarlmaw-development-equivalence-report": {
+      "paths": [
+        "tools/cross_source_semantic_equivalence.py"
+      ],
+      "owners": [
+        "@module",
+        "_datasheet_ability_members",
+        "_group_conclusion"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "gnarlmaw-development-catalog-generator": {
+      "paths": [
+        "tools/generate_gnarlmaw_development_catalog.py"
+      ],
+      "owners": [
+        "@module",
+        "_geometry",
+        "_reviewed_source_rows",
+        "build_catalog_package",
+        "main"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "gnarlmaw-development-precision-eligibility": {
+      "paths": [
+        "src/warhammer40k_core/engine/attack_sequence_group_selection.py"
+      ],
+      "owners": [
+        "_grouped_precision_request_if_available",
+        "precision_allocation_groups_for_pool"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "gnarlmaw-development-cover-modifier": {
+      "paths": [
+        "src/warhammer40k_core/engine/attack_modifier_snapshots.py",
+        "src/warhammer40k_core/engine/attack_sequence_hit_wound.py",
+        "src/warhammer40k_core/engine/native_gathering_cover_rules.py"
+      ],
+      "owners": [
+        "attack_modifier_snapshots",
+        "_benefit_of_cover_ballistic_skill_penalty",
+        "cover_gathering_inventories"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
     }
   },
   "qualification": "An unlisted runtime/workload owner requires a reviewed map addition. Ordinary rule branches require explicit source and unchanged-work assessment. Critical selectors cannot be downgraded. This initial current-comparison set reuses ten existing representative drivers; a rules-complete review must assess and extend coverage for every supported operation before claiming comprehensive profiling.",

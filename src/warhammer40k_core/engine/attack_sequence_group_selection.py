@@ -1058,14 +1058,8 @@ def _grouped_precision_request_if_available(
             can_allocate_protected_characters=True,
         ),
     )
-    allocation_groups = allocation_groups_for_context(
-        state=state,
-        allocation_context=allocation_context,
-        visible_model_ids=pool.target_visible_model_ids,
-        include_priority_tiers=True,
-    )
-    eligible_character_groups = tuple(
-        group for group in allocation_groups if group.role in _PRECISION_CHARACTER_GROUP_ROLES
+    eligible_character_groups = precision_allocation_groups_for_pool(
+        state=state, allocation_context=allocation_context, pool=pool
     )
     if not eligible_character_groups:
         return None
@@ -1087,6 +1081,21 @@ def _grouped_precision_request_if_available(
             }
         ),
         options=request.options,
+    )
+
+
+def precision_allocation_groups_for_pool(
+    *, state: GameState, allocation_context: AttackAllocationRuleContext, pool: RangedAttackPool
+) -> tuple[AllocationGroup, ...]:
+    return tuple(
+        group
+        for group in allocation_groups_for_context(
+            state=state,
+            allocation_context=allocation_context,
+            visible_model_ids=pool.target_visible_model_ids,
+            include_priority_tiers=True,
+        )
+        if group.role in _PRECISION_CHARACTER_GROUP_ROLES
     )
 
 
@@ -1288,6 +1297,7 @@ def _resolve_grouped_current_pool(
             decisions=decisions,
             manager=manager,
             attack_sequence=attack_sequence,
+            allocated_model_ids=allocated_model_ids,
             hooks=hooks,
             stratagem_index=stratagem_index,
             stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,

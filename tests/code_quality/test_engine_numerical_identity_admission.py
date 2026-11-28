@@ -1757,9 +1757,28 @@ def test_fortification_transition_rejects_source_and_case_drift(tmp_path: Path) 
         fortification.RECEIPT,
         fortification.ROTATION_RECEIPT,
         fortification.RETRY_RECEIPT,
+        fortification.DEVELOPMENT_RECEIPT,
+        fortification.ALLOCATION_RECEIPT,
+        fortification.TYPING_RECEIPT,
+        fortification.CATALOG_SOURCE_RECEIPT,
+        fortification.PRE_HIT_COVER_RECEIPT,
+        fortification.REACHABILITY_RECEIPT,
+        fortification.GROUP_BOUNDS_RECEIPT,
+        fortification.SAVE_SUBGROUP_RECEIPT,
+        fortification.PROJECTION_SPLIT_RECEIPT,
         MANIFEST,
         fortification.OWNER,
-        *sorted(fortification.SOURCES | fortification.RETRY_SOURCES),
+        *sorted(
+            fortification.SOURCES
+            | fortification.RETRY_SOURCES
+            | fortification.DEVELOPMENT_PREIMAGES.keys()
+            | fortification.ALLOCATION_PREIMAGES.keys()
+            | fortification.CATALOG_SOURCE_PREIMAGES.keys()
+            | fortification.PRE_HIT_COVER_PREIMAGES.keys()
+            | fortification.REACHABILITY_PREIMAGES.keys()
+            | fortification.GROUP_BOUNDS_PREIMAGES.keys()
+            | fortification.SAVE_SUBGROUP_PREIMAGES.keys()
+        ),
     )
     for name in members:
         path = tmp_path / name
@@ -1770,14 +1789,28 @@ def test_fortification_transition_rejects_source_and_case_drift(tmp_path: Path) 
     assert addition is not None
     receipt, suites, _ = addition
     assert suites.keys() == {fortification.OWNER}
-    assert fortification.OWNER in sharding.behavioral_selection(ROOT).active_files
+    selected = sharding.behavioral_selection(ROOT)
+    assert fortification.OWNER in selected.active_files
+    assert fortification.TYPING_INACTIVE_OWNER in selected.inactive_files
     previous = _record(fortification.RECEIPT)
     assert receipt["added_cases"][:17] == previous["added_cases"]
     rotation = _record(fortification.ROTATION_RECEIPT)
     assert receipt["added_cases"][17:22] == rotation["added_cases"]
     retry = _record(fortification.RETRY_RECEIPT)
-    assert receipt["added_cases"][22:] == retry["added_cases"]
-    assert len(receipt["added_cases"]) == len(set(receipt["added_cases"])) == 23
+    assert receipt["added_cases"][22:23] == retry["added_cases"]
+    development = _record(fortification.DEVELOPMENT_RECEIPT)
+    assert receipt["added_cases"][23:25] == development["added_cases"]
+    allocation = _record(fortification.ALLOCATION_RECEIPT)
+    assert receipt["added_cases"][25:26] == allocation["added_cases"]
+    pre_hit_cover = _record(fortification.PRE_HIT_COVER_RECEIPT)
+    assert receipt["added_cases"][26:33] == pre_hit_cover["added_cases"]
+    reachability = _record(fortification.REACHABILITY_RECEIPT)
+    assert receipt["added_cases"][33:40] == reachability["added_cases"]
+    bounds = _record(fortification.GROUP_BOUNDS_RECEIPT)
+    assert receipt["added_cases"][40:45] == bounds["added_cases"]
+    subgroups = _record(fortification.SAVE_SUBGROUP_RECEIPT)
+    assert receipt["added_cases"][45:] == subgroups["added_cases"]
+    assert len(receipt["added_cases"]) == len(set(receipt["added_cases"])) == 46
 
     for name in members:
         path = tmp_path / name

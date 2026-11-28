@@ -1,0 +1,66 @@
+{
+  "added_cases": [
+    "tests/rules/section09/test_fortification_engagement.py::test_gnarlmaw_pre_hit_cover_respects_allocation_and_modifiers[clear]",
+    "tests/rules/section09/test_fortification_engagement.py::test_gnarlmaw_pre_hit_cover_respects_allocation_and_modifiers[unrelated-blocker]",
+    "tests/rules/section09/test_fortification_engagement.py::test_gnarlmaw_pre_hit_cover_respects_allocation_and_modifiers[mixed-allocation-candidates]",
+    "tests/rules/section09/test_fortification_engagement.py::test_gnarlmaw_pre_hit_cover_respects_allocation_and_modifiers[all-allocation-candidates]",
+    "tests/rules/section09/test_fortification_engagement.py::test_gnarlmaw_pre_hit_cover_respects_allocation_and_modifiers[ignores-cover]",
+    "tests/rules/section09/test_fortification_engagement.py::test_gnarlmaw_pre_hit_cover_respects_allocation_and_modifiers[ordinary-cover-does-not-stack]",
+    "tests/rules/section09/test_fortification_engagement.py::test_gnarlmaw_pre_hit_cover_respects_allocation_and_modifiers[ordinary-cover-alone]"
+  ],
+  "base": "7f157a5aae0cd289430f794615d0ebb05e074aca",
+  "retained_fortification_sha256": "5e395e78befc9c49490658852563516e3da2d144f8d6b9e3e6ec4966fdb3f7e3",
+  "runtime_fingerprint": {
+    "after": "3d97a378ad2c478d79ea870b81a27b1e6ab7891dab93b3e20a893f521c74eb01",
+    "before": "4d252d4ccf694d52559f2816433de89afd1366532c5be211bc3d119ed06f52c5"
+  },
+  "runtime_manifest": {
+    "after": "6ed959dc3d3fbc66724304e911336a638841a6099bc0815346cdcd72f3399417",
+    "before": "8c8e3dac38d6352002bc563b437bed1d67737f9fa4b77c6df6e3c62edfda2009"
+  },
+  "schema": "finite-gnarlmaw-pre-hit-cover-test-v1",
+  "sources": {
+    "src/warhammer40k_core/engine/ability_coverage.py": {
+      "after": "ebcd82639ebd2e2fa3d03720649754d3b7b0265f5f0beeb48058d5bc420399dc",
+      "before": "2ae0a9cfb06f4b03c03184627b0198294edba799e378071af06feabe662754eb"
+    },
+    "src/warhammer40k_core/engine/attack_modifier_snapshots.py": {
+      "after": "11f07f79e6f516a7e2eda01ba5cc9e008f16ec0a58dd966da4e629c258ae1b16",
+      "before": "baa4aa7e63014cf75b675fed541b90e301b37c07133981a86a5a4417784e9192"
+    },
+    "src/warhammer40k_core/engine/attack_sequence_group_selection.py": {
+      "after": "8e6f1c375a8310b717e8789acb60c8b482d859f35650f1372e25e356977a7a59",
+      "before": "f9a8846b62b5879589c98b38dbe572c585194d2a976888c4a7421e3a66176db9"
+    },
+    "src/warhammer40k_core/engine/attack_sequence_hazardous.py": {
+      "after": "4103e059e2043ab4ca73c3361c6d4fd9ac322149c4b79f49ce193738cdd8f264",
+      "before": "45f2b0f2485b5c1cbb78c1f86fb5768e320ac8db51bbbb14e24c1f1ef926ba35"
+    },
+    "src/warhammer40k_core/engine/attack_sequence_hit_wound.py": {
+      "after": "4a16c9e62535884b7317684aeec1424b47a79272c37a079379cf8f8c168c7b3a",
+      "before": "d677e50e2bf25c4bb852e9f131a2f1b4b797e5a51a6ec85808b9e32a3070db69"
+    },
+    "src/warhammer40k_core/engine/native_gathering_cover_rules.py": {
+      "after": "5f0872125ff2f5d437033c9d3c75f2e44a7a705e8ffc6c45a2c347a2269f0670",
+      "before": "66a976554ff0398ba2f1dbbf88d329d31eec4713e9716582ae8db20d3546e1bc"
+    },
+    "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/chaos_daemons_gnarlmaw_2026_11/__init__.py": {
+      "after": "3c5efadf49b02933d92dac30045ce7113d83a3ffc0f5f99370b474af6a6bf67f",
+      "before": "09ea0fabc13ca2cc53c00a02d3f5a88327ba7737a27e182842decd81a2dd106c"
+    }
+  },
+  "test": {
+    "after": {
+      "blob_sha1": "260d27d34883dca08d00da31e28aaf1916992300",
+      "bytes": 68720,
+      "mode": "100644",
+      "sha256": "31f80feb5301d8f020e24dff1f18749c07f1baa003fa6db79d15723b691c0937"
+    },
+    "before": {
+      "blob_sha1": "3956b821c55acdbfb3f2148313bee2e37562282a",
+      "bytes": 58657,
+      "mode": "100644",
+      "sha256": "071cfaa4fd9c09ef77661baee4bd5c27d497ccad560ebf9a99239e9c44f2aa6a"
+    }
+  }
+}

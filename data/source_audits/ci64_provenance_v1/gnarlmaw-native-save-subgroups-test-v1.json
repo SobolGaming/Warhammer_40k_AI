@@ -1,0 +1,52 @@
+{
+  "added_cases": [
+    "tests/rules/section09/test_fortification_engagement.py::test_approved_pre_hit_cover_binding_requires_exact_source_and_emits_its_provenance"
+  ],
+  "base": "516ff80f3b354cc3c82f51404ae1cb875e78d53a",
+  "retained_fortification_sha256": "0002be4a267ec21738049fa3df0ceecdc56d166e0fc418fd230264d9e77cc694",
+  "runtime_fingerprint": {
+    "after": "9cff6501c665707bb7c0738f23fb06b0d2266282f6d26c181fab975d48a72217",
+    "before": "125a24d6a90db088cec5c4481a126c0d4ea790a8c7d91019ade3b2f275ad5db1"
+  },
+  "runtime_manifest": {
+    "after": "cbdb3bf914181dbb29836c08d5dcf644971823dba86f079d49cf1bc82e0f11b0",
+    "before": "7730d9c4d3e2f1ee25b13d410ac5a9c1f0cf96ba2172f060989f4ab60a353b32"
+  },
+  "schema": "finite-gnarlmaw-native-save-subgroups-test-v1",
+  "sources": {
+    "src/warhammer40k_core/engine/attack_modifier_snapshots.py": {
+      "after": "ad55cef3c24fe3979e4dbca13e917e11b1e118a46fe55cd69d0ddfc3d23b21e1",
+      "before": "85de8bfd4091fd2dae462c34e50c3e710d1049271a76b99e2e86878d580781d1"
+    },
+    "src/warhammer40k_core/engine/attack_sequence_group_selection.py": {
+      "after": "90b75cb698edae98cd53e3fbc022c3f3729c46d6ec6b85d1a70133c4bde5315c",
+      "before": "74da755b5e362546e54494c291d532a4591d2a609721453ec2bd7cb99a4f830a"
+    },
+    "src/warhammer40k_core/engine/attack_sequence_grouped_allocation.py": {
+      "after": "ee3e330a537bdb6f68094bd9285bf1bd106920b36c65d785e0ef1d625f03a193",
+      "before": "cdc9bb084666e941de47d8d32e88c0410c45e8657cb0520ec41c8514c974fa4d"
+    },
+    "src/warhammer40k_core/engine/attack_sequence_hazardous.py": {
+      "after": "5de0df370ee5fc945c771cd2b205168686fc035e0743f4fe3bf55167fa15b511",
+      "before": "2f28376e3ea2847a772fccdcbd4962a2313985e518886b5197f7343a94cbc0f6"
+    },
+    "src/warhammer40k_core/engine/native_gathering_cover_rules.py": {
+      "after": "3e90bb81972b8c96fa734ad295e7123df1921dddc455386f34fe5a8eb1ef385f",
+      "before": "a3ba1b26904532627d05fd1546817625be4bee344fe30f30902157842b08b757"
+    }
+  },
+  "test": {
+    "after": {
+      "blob_sha1": "56596608a8c2342cf7bdda2b181577c0f611f8a6",
+      "bytes": 91361,
+      "mode": "100644",
+      "sha256": "8de1757cac56cf19cced2895e5cd2c1aab142fce420287d26e0ae0c379f26d79"
+    },
+    "before": {
+      "blob_sha1": "e5913ea5ccf916839ddb25e66d220b5ae4bca770",
+      "bytes": 88151,
+      "mode": "100644",
+      "sha256": "c8efb2b5818485ef6d3bb3038d8f3857e480e40b6549e31d5bd9285a4eca5d44"
+    }
+  }
+}

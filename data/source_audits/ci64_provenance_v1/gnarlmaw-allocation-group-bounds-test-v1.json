@@ -1,0 +1,44 @@
+{
+  "added_cases": [
+    "tests/rules/section09/test_fortification_engagement.py::test_gnarlmaw_pre_hit_cover_keeps_healthy_prior_allocation_options",
+    "tests/rules/section09/test_fortification_engagement.py::test_gnarlmaw_pre_hit_cover_requires_clearing_the_whole_save_group[clears-whole-group]",
+    "tests/rules/section09/test_fortification_engagement.py::test_gnarlmaw_pre_hit_cover_requires_clearing_the_whole_save_group[reaches-next-group]",
+    "tests/rules/section09/test_fortification_engagement.py::test_gnarlmaw_pre_hit_cover_retains_finite_damage_bound[finite-d3]",
+    "tests/rules/section09/test_fortification_engagement.py::test_gnarlmaw_pre_hit_cover_retains_finite_damage_bound[devastating-no-save]"
+  ],
+  "base": "e0aa8ed420b82f11c2f8c129b44d067c5f60f7f3",
+  "retained_fortification_sha256": "0ccdc779a4509f95af377e77008cf0e24afb1e96194c6a76b37b773591439fcf",
+  "runtime_fingerprint": {
+    "after": "125a24d6a90db088cec5c4481a126c0d4ea790a8c7d91019ade3b2f275ad5db1",
+    "before": "49ee4ca79bd1f54ce681ea0109880b02ca2b160449ea4d15850fc92ebe30e82f"
+  },
+  "runtime_manifest": {
+    "after": "7730d9c4d3e2f1ee25b13d410ac5a9c1f0cf96ba2172f060989f4ab60a353b32",
+    "before": "437ecfd924b1b6636ebf083acd2399897c8d75cc9013866928e69787027ca488"
+  },
+  "schema": "finite-gnarlmaw-allocation-group-bounds-test-v1",
+  "sources": {
+    "src/warhammer40k_core/engine/attack_sequence_group_selection.py": {
+      "after": "74da755b5e362546e54494c291d532a4591d2a609721453ec2bd7cb99a4f830a",
+      "before": "4f52c77b1346c7e63f56b9d2d7d416d1a68095eeb2d0a6f9a76e0536d81a1e21"
+    },
+    "src/warhammer40k_core/engine/attack_sequence_hazardous.py": {
+      "after": "2f28376e3ea2847a772fccdcbd4962a2313985e518886b5197f7343a94cbc0f6",
+      "before": "5238279a34a608d3c72372e67665a2997a63dc0040745d384cc3618e6454d196"
+    }
+  },
+  "test": {
+    "after": {
+      "blob_sha1": "e5913ea5ccf916839ddb25e66d220b5ae4bca770",
+      "bytes": 88151,
+      "mode": "100644",
+      "sha256": "c8efb2b5818485ef6d3bb3038d8f3857e480e40b6549e31d5bd9285a4eca5d44"
+    },
+    "before": {
+      "blob_sha1": "a3e7ffb2372133a304c414530bcc1baafa0ccdb8",
+      "bytes": 80808,
+      "mode": "100644",
+      "sha256": "b8785bdadcc415dc2d7d71bf9cfe0a6d220c026ab00bc60ae26b12ce839edc73"
+    }
+  }
+}
