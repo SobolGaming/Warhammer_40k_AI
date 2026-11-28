@@ -5,11 +5,26 @@ from dataclasses import replace
 import pytest
 
 from tests.support.section13_fixtures import area, feature, tiny, visibility, window
+from warhammer40k_core.core.visibility import (
+    BenefitOfCoverResult,
+    LineOfSightWitness,
+    VisibilityBlockerKind,
+)
 from warhammer40k_core.engine.shooting_terrain_visibility import (
     terrain_visibility_areas_from_placements,
 )
+from warhammer40k_core.geometry import visibility_occlusion
+from warhammer40k_core.geometry.base import RectangularBase
+from warhammer40k_core.geometry.continuous_visibility import (
+    ContinuousVisibilityEvidence,
+    resolve_visibility_pair,
+)
+from warhammer40k_core.geometry.physical_visibility import physical_model_visibility_prisms
+from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.geometry.terrain_area_visibility import model_intersects_terrain_area
 from warhammer40k_core.geometry.terrain_classification import TerrainAreaClassification as C
+from warhammer40k_core.geometry.visibility_exact import VisibilityPrism
+from warhammer40k_core.geometry.volume import Model, ModelVolume
 
 
 @pytest.mark.parametrize("z", [0, 10])
@@ -177,7 +192,6 @@ def test_faq34_constructed_frame_body_overhang_controls_area_membership(z: float
 
 def test_one_agreed_area_can_contain_features_with_different_movement_categories() -> None:
     from tests.support.section13_fixtures import transit
-    from warhammer40k_core.geometry.pose import Pose
 
     dense = feature(C.DENSE, x=13, y=8, width=1, depth=2, identity="s13:dense-member")
     light = feature(C.LIGHT, x=17, y=12, width=1, depth=2, identity="s13:light-member")
@@ -194,3 +208,111 @@ def test_one_agreed_area_can_contain_features_with_different_movement_categories
     # The same declared area does not make its Dense physical feature Light.
     assert dense.classification is C.DENSE
     assert light.classification is C.LIGHT
+
+
+@pytest.mark.parametrize(
+    ("terrain_height", "model_bottom", "model_height", "grants_cover"),
+    [(4.0, 0.0, 4.0, True), (1.0, 1.0, 3.0, True), (1.0, 0.0, 4.0, False)],
+    ids=["independent", "joint-only", "incidental"],
+)
+def test_cover_attribution_preserves_causal_sources(
+    terrain_height: float, model_bottom: float, model_height: float, grants_cover: bool
+) -> None:
+    # The low wall and the intervening model either complete one blocker
+    # together or leave terrain incidental to the model's own obstruction.
+    terrain = feature(C.LIGHT, x=-1, y=1, height=terrain_height, width=0.1, depth=2)
+    blocker = Model(
+        "other-model",
+        Pose.at(-1, 1, model_bottom),
+        RectangularBase(0.1, 2),
+        ModelVolume(model_height),
+    )
+    target = replace(tiny("target", x=3, y=0), volume=ModelVolume(4))
+    context = replace(
+        visibility(
+            replace(tiny("observer", x=-3, y=0), volume=ModelVolume(4)),
+            (target,),
+            features=(terrain,),
+        ),
+        dynamic_model_blockers=(blocker,),
+    )
+    witness = context.resolve_line_of_sight()
+    assert witness.unit_visible
+    assert not witness.unit_fully_visible
+    assert context.resolve_line_of_sight_uncached().to_payload() == witness.to_payload()
+    assert LineOfSightWitness.from_payload(witness.to_payload()) == witness
+    sources = tuple(
+        row
+        for row in witness.all_blocker_records()
+        if row.blocker_kind is VisibilityBlockerKind.TERRAIN_VOLUME
+    )
+    assert tuple(row.terrain_feature_id for row in sources) == (terrain.feature_id,)
+    assert (
+        context.not_fully_visible_because_of(
+            witness, target_model_id=target.model_id, sources=sources
+        )
+        is grants_cover
+    )
+
+    cover = context.benefit_of_cover(witness)
+    assert cover.has_benefit is grants_cover
+    assert cover.source_feature_ids == ((terrain.feature_id,) if grants_cover else ())
+    assert cover.source_terrain_area_ids == ()
+    assert BenefitOfCoverResult.from_payload(cover.to_payload()) == cover
+
+    terrain_only = replace(context, dynamic_model_blockers=()).resolve_line_of_sight()
+    assert terrain_only.unit_visible
+    assert terrain_only.unit_fully_visible is (terrain_height == 1)
+
+    # The intervening model still hides some part after removing terrain.
+    # The joint result concerns the particular part that terrain helps hide.
+    model_only = replace(context, terrain_features=()).resolve_line_of_sight()
+    assert model_only.unit_visible
+    assert not model_only.unit_fully_visible
+
+
+def _rectangular_cover_prism(identity: str, *, x: float, size: float) -> VisibilityPrism:
+    (prism,) = physical_model_visibility_prisms(
+        Model(identity, Pose.at(x, 0), RectangularBase(size, size), ModelVolume(1))
+    )
+    return prism
+
+
+def test_cover_attribution_preserves_a_contained_observer() -> None:
+    observer = _rectangular_cover_prism("observer", x=0, size=1)
+    target = _rectangular_cover_prism("target", x=0, size=4)
+    selected = (_rectangular_cover_prism("wall", x=0, size=2),)
+
+    # With no facing target patch, full-mask visibility can be vacuously true
+    # even though the wall blocks every actual ray from the observer.
+    assert resolve_visibility_pair(observer, target, (), selected).model_fully_visible
+    both_masks = resolve_visibility_pair(observer, target, selected, selected)
+    assert not both_masks.model_visible
+    assert not both_masks.model_fully_visible
+    assert visibility_occlusion.source_group_obscures(observer, target, selected, ())
+
+
+@pytest.mark.parametrize(
+    ("target_x", "separated"), [(3, True), (2, False)], ids=["separated", "touching"]
+)
+def test_cover_attribution_chooses_exact_visibility_masks(
+    monkeypatch: pytest.MonkeyPatch, target_x: float, separated: bool
+) -> None:
+    observer = _rectangular_cover_prism("observer", x=0, size=2)
+    target = _rectangular_cover_prism("target", x=target_x, size=2)
+    selected = (_rectangular_cover_prism("wall", x=0, size=2),)
+    masks: list[tuple[tuple[VisibilityPrism, ...], tuple[VisibilityPrism, ...]]] = []
+
+    def record_masks(
+        origin: VisibilityPrism,
+        destination: VisibilityPrism,
+        any_blockers: tuple[VisibilityPrism, ...],
+        full_blockers: tuple[VisibilityPrism, ...],
+    ) -> ContinuousVisibilityEvidence:
+        masks.append((any_blockers, full_blockers))
+        return resolve_visibility_pair(origin, destination, any_blockers, full_blockers)
+
+    # Observe the masks while executing the real exact resolver in both cases.
+    monkeypatch.setattr(visibility_occlusion, "resolve_visibility_pair", record_masks)
+    assert visibility_occlusion.source_group_obscures.__wrapped__(observer, target, selected, ())
+    assert masks == [((), selected) if separated else (selected, selected)]

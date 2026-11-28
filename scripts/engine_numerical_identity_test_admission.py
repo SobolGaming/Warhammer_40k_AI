@@ -2700,6 +2700,7 @@ def exact_movement_test_transition(
     from scripts.shroud_of_flies_test_admission import shroud_of_flies_test_successor
 
     shroud = shroud_of_flies_test_successor(root)
+    fortification = None
     if shroud is not None:
         if defender_coherency is None:
             raise SystemExit(
@@ -2722,6 +2723,17 @@ def exact_movement_test_transition(
                 raise SystemExit("Fortification tests overlap the predecessor selection.")
             additions.update(fortification_tests)
             raw += b"\0" + fortification_raw
+    from scripts.terrain_cover_test_admission import OWNER as TERRAIN_COVER_OWNER
+    from scripts.terrain_cover_test_admission import terrain_cover_test_successor
+
+    cover = terrain_cover_test_successor(root)
+    if cover is not None:
+        if fortification is None:
+            raise SystemExit("Exact terrain cover tests require the Fortification predecessor.")
+        if TERRAIN_COVER_OWNER in (updated.keys() | added.keys() | additions.keys()):
+            raise SystemExit("Exact terrain cover tests overlap the predecessor selection.")
+        updated[TERRAIN_COVER_OWNER] = cover[0]["test"]["after"]
+        raw += b"\0" + cover[1]
     return updated, {**added, **additions}, retained_raw + b"\0" + raw
 
 

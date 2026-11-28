@@ -38942,6 +38942,26 @@
       "sensitive": false,
       "mandatory": false
     },
+    "exact-terrain-cover-regression-admission": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/exact-terrain-cover-test-v1.json",
+        "scripts/terrain_cover_test_admission.py",
+        "tests/rules/section13/test_visibility.py"
+      ],
+      "owners": [
+        "@document",
+        "@module",
+        "TerrainCoverTestReceipt",
+        "_rectangular_cover_prism",
+        "terrain_cover_test_successor",
+        "test_cover_attribution_chooses_exact_visibility_masks",
+        "test_cover_attribution_preserves_a_contained_observer",
+        "test_cover_attribution_preserves_causal_sources"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
     "fortification-survivor-retry-movement": {
       "paths": [
         "src/warhammer40k_core/engine/phases/movement_escape_mortals.py",
