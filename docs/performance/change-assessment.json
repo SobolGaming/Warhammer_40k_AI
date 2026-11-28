@@ -1,6 +1,136 @@
 {
   "base": "c61269d843e6fce49afb6ed3618e988e03d8baff",
   "changes": {
+    "ci/test_shards/durations.json": {
+      "after_sha256": "610f285e2b621fea317902747f6bd5837d45939731c8fd0af20f29fbff79b01f",
+      "before_sha256": "180a41705f656ee22fb71806b7bdf3d10488ad5bb636346ab267dad622e62b9f",
+      "owners": {
+        "@document": {
+          "after": "610f285e2b621fea317902747f6bd5837d45939731c8fd0af20f29fbff79b01f",
+          "before": "180a41705f656ee22fb71806b7bdf3d10488ad5bb636346ab267dad622e62b9f"
+        }
+      }
+    },
+    "ci/test_shards/shard-1.txt": {
+      "after_sha256": "3715528175553dd1b96e3fd212c7b38e699b300ba71934fc8bc1aed063c61e84",
+      "before_sha256": "89f8ccc864f50038af807e8f4f1783915f5704f4ab35ee4a84de90a0e27e27cb",
+      "owners": {
+        "@document": {
+          "after": "3715528175553dd1b96e3fd212c7b38e699b300ba71934fc8bc1aed063c61e84",
+          "before": "89f8ccc864f50038af807e8f4f1783915f5704f4ab35ee4a84de90a0e27e27cb"
+        }
+      }
+    },
+    "ci/test_shards/shard-10.txt": {
+      "after_sha256": "08236c286222266b4e9651318c64ff75ebc8ae44fc909ca08f5d9928cc5179a4",
+      "before_sha256": "de16024f475ec132301139d6dd56bbc2154769f64faba4ea290a8832764093c2",
+      "owners": {
+        "@document": {
+          "after": "08236c286222266b4e9651318c64ff75ebc8ae44fc909ca08f5d9928cc5179a4",
+          "before": "de16024f475ec132301139d6dd56bbc2154769f64faba4ea290a8832764093c2"
+        }
+      }
+    },
+    "ci/test_shards/shard-11.txt": {
+      "after_sha256": "709a72fbb4235849fcfb8199d1e94bbeae91634e3c353a0ea5507367d935717d",
+      "before_sha256": "b66a6359c435fa10f9624253fe7d6fc84a30a927719b210b69f02a6de96f6756",
+      "owners": {
+        "@document": {
+          "after": "709a72fbb4235849fcfb8199d1e94bbeae91634e3c353a0ea5507367d935717d",
+          "before": "b66a6359c435fa10f9624253fe7d6fc84a30a927719b210b69f02a6de96f6756"
+        }
+      }
+    },
+    "ci/test_shards/shard-12.txt": {
+      "after_sha256": "adfb7ffacb6b07b863892c13ae69b4ea3064108855075b2b0d6322ca842d5623",
+      "before_sha256": "eacc53314050a48390be9ffa6f92821fab41463c7ba9224197c74c026e15f115",
+      "owners": {
+        "@document": {
+          "after": "adfb7ffacb6b07b863892c13ae69b4ea3064108855075b2b0d6322ca842d5623",
+          "before": "eacc53314050a48390be9ffa6f92821fab41463c7ba9224197c74c026e15f115"
+        }
+      }
+    },
+    "ci/test_shards/shard-2.txt": {
+      "after_sha256": "fba096f5b4a09f35af50517ade631eab17c51ef710d79a11872f61f82afcd61f",
+      "before_sha256": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c",
+      "owners": {
+        "@document": {
+          "after": "fba096f5b4a09f35af50517ade631eab17c51ef710d79a11872f61f82afcd61f",
+          "before": "4c111ca305bf5540969291024e06bc0ed6044cc107a304adc1aaf12e6cd9043c"
+        }
+      }
+    },
+    "ci/test_shards/shard-3.txt": {
+      "after_sha256": "d4e84903547abddb7a1a4926d7cf17e0ba8a4d84a2339f5f4775ecb4511e289e",
+      "before_sha256": "0eabe3b36959f3c83da0f569b3df5ad108ff3cefdb758bd804851fd874ed7a0f",
+      "owners": {
+        "@document": {
+          "after": "d4e84903547abddb7a1a4926d7cf17e0ba8a4d84a2339f5f4775ecb4511e289e",
+          "before": "0eabe3b36959f3c83da0f569b3df5ad108ff3cefdb758bd804851fd874ed7a0f"
+        }
+      }
+    },
+    "ci/test_shards/shard-4.txt": {
+      "after_sha256": "e7869672fc73516d937ac4dc6b314da22699f4214db4a2902ac9604177646dfb",
+      "before_sha256": "d3dd4b42ac62194d750717b3ec1e037b51f576fb878baaffb41ec6aefef86f03",
+      "owners": {
+        "@document": {
+          "after": "e7869672fc73516d937ac4dc6b314da22699f4214db4a2902ac9604177646dfb",
+          "before": "d3dd4b42ac62194d750717b3ec1e037b51f576fb878baaffb41ec6aefef86f03"
+        }
+      }
+    },
+    "ci/test_shards/shard-5.txt": {
+      "after_sha256": "b19bf34d99b7b90e012d86bfafcd16217ada67bb5ac6400b6c47ce876f62ec73",
+      "before_sha256": "caf16df1eab1b2d118f120faec79f52fbe1041819586aa21185e08edd112a936",
+      "owners": {
+        "@document": {
+          "after": "b19bf34d99b7b90e012d86bfafcd16217ada67bb5ac6400b6c47ce876f62ec73",
+          "before": "caf16df1eab1b2d118f120faec79f52fbe1041819586aa21185e08edd112a936"
+        }
+      }
+    },
+    "ci/test_shards/shard-6.txt": {
+      "after_sha256": "860aa4d6f7804928d9aa815ac723bc5d9c23ac5481ea563ddbe6110b6f50a530",
+      "before_sha256": "e46d4d74b38a8484209604790cc2aa1042f54ebf1cd72367e140c0c61ecd3f47",
+      "owners": {
+        "@document": {
+          "after": "860aa4d6f7804928d9aa815ac723bc5d9c23ac5481ea563ddbe6110b6f50a530",
+          "before": "e46d4d74b38a8484209604790cc2aa1042f54ebf1cd72367e140c0c61ecd3f47"
+        }
+      }
+    },
+    "ci/test_shards/shard-7.txt": {
+      "after_sha256": "90a40ae992fb614077c5cbce01e46a5ebe6cb1bf84a6b2033de7aa7926b7a2df",
+      "before_sha256": "54172cb2d68e324be8de1450e20a6157bf3dadf713fb0cc2d6328f50bb49d96a",
+      "owners": {
+        "@document": {
+          "after": "90a40ae992fb614077c5cbce01e46a5ebe6cb1bf84a6b2033de7aa7926b7a2df",
+          "before": "54172cb2d68e324be8de1450e20a6157bf3dadf713fb0cc2d6328f50bb49d96a"
+        }
+      }
+    },
+    "ci/test_shards/shard-8.txt": {
+      "after_sha256": "e25e6aceb1e1c8a859c9596f40d99e3402e82ff84c3a269453ebb1a9ad563ab1",
+      "before_sha256": "b910d0aaaf9213939be0917e40f67095aa724320d02081b32cfd5f9f658abdb4",
+      "owners": {
+        "@document": {
+          "after": "e25e6aceb1e1c8a859c9596f40d99e3402e82ff84c3a269453ebb1a9ad563ab1",
+          "before": "b910d0aaaf9213939be0917e40f67095aa724320d02081b32cfd5f9f658abdb4"
+        }
+      }
+    },
+    "ci/test_shards/shard-9.txt": {
+      "after_sha256": "180b269f627af22b9fbe77c850629cb09040fd3053a84f2a14b1fd1b4f0eb8ac",
+      "before_sha256": "36ea504291924eb191e18b97f499320bd6f8057f49a7578136360fc9275cebf8",
+      "owners": {
+        "@document": {
+          "after": "180b269f627af22b9fbe77c850629cb09040fd3053a84f2a14b1fd1b4f0eb8ac",
+          "before": "36ea504291924eb191e18b97f499320bd6f8057f49a7578136360fc9275cebf8"
+        }
+      }
+    },
     "contracts/examples/persistence/session-persistence.json": {
       "after_sha256": "a9115b45133c38082b43d796e85900bc3858439767849eee9e5557d9c59c9a3d",
       "before_sha256": "427fb55ed19884f1912b0e88c5453b221640334069d63a63b67586a9e8b64212",
@@ -244,6 +374,136 @@
   "operation_map_sha256": "be9a68436f0494b8a3202034ea2048ad327d4173e59067a4bc488e46fed8e87e",
   "policy": "rules-engine-performance-v3",
   "rows": {
+    "ci/test_shards/durations.json": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "rationale": "Bind the reviewed regression, generated identity, or recorded complete workload inventory.",
+      "selected_families": [],
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-1.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "rationale": "Bind the reviewed regression, generated identity, or recorded complete workload inventory.",
+      "selected_families": [],
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-10.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "rationale": "Bind the reviewed regression, generated identity, or recorded complete workload inventory.",
+      "selected_families": [],
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-11.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "rationale": "Bind the reviewed regression, generated identity, or recorded complete workload inventory.",
+      "selected_families": [],
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-12.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "rationale": "Bind the reviewed regression, generated identity, or recorded complete workload inventory.",
+      "selected_families": [],
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-2.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "rationale": "Bind the reviewed regression, generated identity, or recorded complete workload inventory.",
+      "selected_families": [],
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-3.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "rationale": "Bind the reviewed regression, generated identity, or recorded complete workload inventory.",
+      "selected_families": [],
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-4.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "rationale": "Bind the reviewed regression, generated identity, or recorded complete workload inventory.",
+      "selected_families": [],
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-5.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "rationale": "Bind the reviewed regression, generated identity, or recorded complete workload inventory.",
+      "selected_families": [],
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-6.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "rationale": "Bind the reviewed regression, generated identity, or recorded complete workload inventory.",
+      "selected_families": [],
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-7.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "rationale": "Bind the reviewed regression, generated identity, or recorded complete workload inventory.",
+      "selected_families": [],
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-8.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "rationale": "Bind the reviewed regression, generated identity, or recorded complete workload inventory.",
+      "selected_families": [],
+      "source_obligation": null,
+      "unchanged_work": null
+    },
+    "ci/test_shards/shard-9.txt": {
+      "category": "measured_workload",
+      "operations": [
+        "mfm-current-behavior-profile"
+      ],
+      "rationale": "Bind the reviewed regression, generated identity, or recorded complete workload inventory.",
+      "selected_families": [],
+      "source_obligation": null,
+      "unchanged_work": null
+    },
     "contracts/examples/persistence/session-persistence.json": {
       "category": "measured_workload",
       "operations": [
