@@ -481,6 +481,19 @@ class TerrainVisibilityContext:
             )
         if record.model_fully_visible or not sources:
             return False
+        blockers = tuple(
+            blocker
+            for blocker in record.blocker_records
+            if blocker.blocks_model_visibility or blocker.blocks_full_visibility
+        )
+        if blockers and all(
+            blocker.blocks_model_visibility
+            and blocker.blocks_full_visibility
+            and blocker in sources
+            for blocker in blockers
+        ):
+            # The validated record already evaluated these exact masks.
+            return True
         target = next(model for model in self.target_models if model.model_id == target_model_id)
         entries = self._obstacle_entries(
             target,

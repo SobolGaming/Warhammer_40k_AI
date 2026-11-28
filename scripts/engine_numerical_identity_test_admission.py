@@ -1984,6 +1984,10 @@ def exact_movement_test_transition(
         _stage2_fight_successor(root, current_tests=faction_tests) if has_stage2_fight else None
     )
     stage2_fight_tests = {} if fight_successor is None else fight_successor[1]
+    from scripts.terrain_cover_test_admission import OWNER as TERRAIN_COVER_OWNER
+    from scripts.terrain_cover_test_admission import terrain_cover_test_successor
+
+    cover = terrain_cover_test_successor(root)
     gore = _gore_hungry_onslaught_transition(root)
     if has_gameplay_budget:
         if not has_codec:
@@ -1994,6 +1998,11 @@ def exact_movement_test_transition(
             if budget_source in budget_sources:
                 raise SystemExit("Gore-Hungry Onslaught duplicates a budget source successor.")
             budget_sources[budget_source] = gore[0]["historical_sources"][budget_source]
+        if cover is not None:
+            cover_sources = cover[0]["sources"]
+            if cover_sources.keys() & budget_sources.keys():
+                raise SystemExit("Exact terrain cover duplicates a budget source successor.")
+            budget_sources.update(cover_sources)
         runtime, source_successors, test_successors, successor_raw = _gameplay_budget_successor(
             root,
             current_tests={**stage2_fight_tests, **faction_tests},
@@ -2723,10 +2732,6 @@ def exact_movement_test_transition(
                 raise SystemExit("Fortification tests overlap the predecessor selection.")
             additions.update(fortification_tests)
             raw += b"\0" + fortification_raw
-    from scripts.terrain_cover_test_admission import OWNER as TERRAIN_COVER_OWNER
-    from scripts.terrain_cover_test_admission import terrain_cover_test_successor
-
-    cover = terrain_cover_test_successor(root)
     if cover is not None:
         if fortification is None:
             raise SystemExit("Exact terrain cover tests require the Fortification predecessor.")

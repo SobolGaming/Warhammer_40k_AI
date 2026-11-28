@@ -14,10 +14,13 @@ from scripts.behavioral_selection_members import (
 from scripts.milli_inch_test_admission import RETAINED_CUTOVER_SHA256
 
 RECEIPT = "data/source_audits/ci64_provenance_v1/exact-terrain-cover-test-v1.json"
-RECEIPT_SHA256 = "28f8e87aeb41e7749f6376bb2fe1588f155b58cb590a2e82f7e019da0769aad6"
+RECEIPT_SHA256 = "8efd0a5728e4a54e30579208af05ba18c92f07f8e29fc8453dcf2746197237ee"
 BASE = "c61269d843e6fce49afb6ed3618e988e03d8baff"
 OWNER = "tests/rules/section13/test_visibility.py"
-SOURCE = "src/warhammer40k_core/geometry/visibility_occlusion.py"
+SOURCES = (
+    "src/warhammer40k_core/core/visibility.py",
+    "src/warhammer40k_core/geometry/visibility_occlusion.py",
+)
 CASES = (
     "test_cover_attribution_preserves_causal_sources[independent]",
     "test_cover_attribution_preserves_causal_sources[joint-only]",
@@ -35,7 +38,7 @@ class TerrainCoverTestReceipt(TypedDict):
     retained_cutover_sha256: str
     runtime_manifest: dict[str, str]
     runtime_fingerprint: dict[str, str]
-    source: dict[str, str]
+    sources: dict[str, dict[str, str]]
     test: dict[str, dict[str, object]]
     added_cases: list[str]
 
@@ -64,16 +67,18 @@ def terrain_cover_test_successor(root: Path) -> tuple[TerrainCoverTestReceipt, b
         or receipt["test"].keys() != {"before", "after"}
         or receipt["test"]["before"] != cutover["active_files"][OWNER]
         or receipt["test"]["before"] == receipt["test"]["after"]
+        or receipt["sources"].keys() != set(SOURCES)
         or any(
             change.keys() != {"before", "after"} or change["before"] == change["after"]
             for change in (
                 receipt["runtime_manifest"],
                 receipt["runtime_fingerprint"],
-                receipt["source"],
+                *receipt["sources"].values(),
             )
         )
     ):
         raise SystemExit("Exact terrain cover test admission inventory differs.")
-    _checked_bytes(root, SOURCE, receipt["source"]["after"])
+    for path, change in receipt["sources"].items():
+        _checked_bytes(root, path, change["after"])
     _selection_members({OWNER: receipt["test"]["after"]}, root)
     return receipt, raw

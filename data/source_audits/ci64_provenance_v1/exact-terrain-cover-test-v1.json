@@ -11,24 +11,30 @@
   "retained_cutover_sha256": "4cd1f0b062fad661e1c71fe27d2e9f8279c3c21d2a9f7bea9e3b053db79afce3",
   "retained_fortification_sha256": "4f85dd056b26aff4fcade4599bcb2a049c109f5f962be57d17bb6da8016040e9",
   "runtime_fingerprint": {
-    "after": "9d54c04290cac9e8c3cc6098121f293f0e06844998d5f56e69a33c21a68ce3c9",
+    "after": "0d00f0d5f307111f057ca53340ac2797ff93271d6c714652656decc78616e486",
     "before": "68088b6cc28ea636abdc414206bff35b5574647bbed6b545026cb6f825b8a016"
   },
   "runtime_manifest": {
-    "after": "c8b332b0f725b6524cd2d1acede91916f75294ff1dbe3c578168886d2bd13368",
+    "after": "f6340c9c138da49389f36dab71a4ceccec96a4c722c38c63a2088e57c7641036",
     "before": "e33ea878a09395ed361b134fc2e9107b69cfc443a1339b4f4e760c1c446e2ce0"
   },
   "schema": "finite-exact-terrain-cover-test-v1",
-  "source": {
-    "after": "e87c6a2af8d677b693220dcc071ccdcccf570677b85bbfc48de5036429549cda",
-    "before": "ab800ad2e3dd9ede5cc83e03f3ed6ccd8d6273444e8058bd8c2baba0eeb7eb98"
+  "sources": {
+    "src/warhammer40k_core/core/visibility.py": {
+      "after": "048209660655cbff026d1fd2dd6eccc705ccca4a9e44c30ce8ab08974514bbc7",
+      "before": "8f9b4061489016292b7a24f9f32d924b02b792e786fa25b8db3d9b6dbecd28d5"
+    },
+    "src/warhammer40k_core/geometry/visibility_occlusion.py": {
+      "after": "e87c6a2af8d677b693220dcc071ccdcccf570677b85bbfc48de5036429549cda",
+      "before": "ab800ad2e3dd9ede5cc83e03f3ed6ccd8d6273444e8058bd8c2baba0eeb7eb98"
+    }
   },
   "test": {
     "after": {
-      "blob_sha1": "b80dcf6048501d63efae5b34230f0c98c17a40af",
-      "bytes": 14267,
+      "blob_sha1": "c59fc6ad709ef5c03a4e202d5ee6a85fb542139b",
+      "bytes": 14795,
       "mode": "100644",
-      "sha256": "01859cbadfbeca79c127109ee1ea098841601da0f17acb6b1de7822b271e645a"
+      "sha256": "ed6becd8d400c00e417a03d4d6d45ded5a3ff758699e224babb295f06083d139"
     },
     "before": {
       "blob_sha1": "bbcfd3734ea64491c03fd56d91567e61c8cf2807",

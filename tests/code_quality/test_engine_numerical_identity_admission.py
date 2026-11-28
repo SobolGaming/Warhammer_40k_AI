@@ -1771,7 +1771,7 @@ def test_fortification_transition_rejects_source_and_case_drift(tmp_path: Path) 
         fortification.OWNER,
         terrain_cover.RECEIPT,
         terrain_cover.OWNER,
-        terrain_cover.SOURCE,
+        *terrain_cover.SOURCES,
         sharding.CUTOVER_PATH,
         *sorted(
             fortification.SOURCES

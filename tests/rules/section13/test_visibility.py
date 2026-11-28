@@ -261,15 +261,26 @@ def test_cover_attribution_preserves_causal_sources(
     assert cover.source_terrain_area_ids == ()
     assert BenefitOfCoverResult.from_payload(cover.to_payload()) == cover
 
-    terrain_only = replace(context, dynamic_model_blockers=()).resolve_line_of_sight()
+    terrain_context = replace(context, dynamic_model_blockers=())
+    terrain_only = terrain_context.resolve_line_of_sight()
     assert terrain_only.unit_visible
     assert terrain_only.unit_fully_visible is (terrain_height == 1)
+    terrain_cover = terrain_context.benefit_of_cover(terrain_only)
+    assert terrain_cover.has_benefit is (terrain_height == 4)
+    assert terrain_cover.source_feature_ids == (
+        (terrain.feature_id,) if terrain_height == 4 else ()
+    )
 
     # The intervening model still hides some part after removing terrain.
     # The joint result concerns the particular part that terrain helps hide.
-    model_only = replace(context, terrain_features=()).resolve_line_of_sight()
+    model_context = replace(context, terrain_features=(), terrain_volumes=())
+    model_only = model_context.resolve_line_of_sight()
     assert model_only.unit_visible
     assert not model_only.unit_fully_visible
+    assert {row.blocker_kind for row in model_only.all_blocker_records()} == {
+        VisibilityBlockerKind.MODEL
+    }
+    assert not model_context.benefit_of_cover(model_only).has_benefit
 
 
 def _rectangular_cover_prism(identity: str, *, x: float, size: float) -> VisibilityPrism:
