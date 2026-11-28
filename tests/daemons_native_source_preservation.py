@@ -94,6 +94,17 @@ def before_daemons_registry(value: dict[str, Any]) -> dict[str, Any]:
 def before_pr2_comparison_provenance(raw: bytes) -> bytes:
     """Authenticate only the additive PR2 comparison registration before older proofs."""
     # Source-data projection only: preserve every original PR2 and older proof.
+    addition = b"    scopes.TERRAIN_COVER_BASE,\n"
+    if addition in raw:
+        if raw.count(addition) != 1 or sha256(raw).hexdigest() != (
+            "ca25825dd2513e19638db1811a550350a355f045ab5509af1586225ce72836c8"
+        ):
+            raise ValueError("Exact registered edition provenance inputs changed.")
+        raw = raw.replace(addition, b"", 1)
+        if sha256(raw).hexdigest() != (
+            "32d50981912240150793b0a24626a550671aac23932f5d573c4dc997aed2d75a"
+        ):
+            raise ValueError("Exact registered edition provenance inputs changed.")
     addition = b"    scopes.GAMEPLAY_MOVEMENT_BUDGET_BASE,\n"
     if addition in raw:
         if (

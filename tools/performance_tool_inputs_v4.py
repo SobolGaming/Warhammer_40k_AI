@@ -112,7 +112,57 @@ NUMERICAL_IDENTITY_MAIN692_REPORT_PATH = (
 
 GAMEPLAY_MOVEMENT_BUDGET_BASE = "59959e71d95a68a4af8935d2897fd2280a8b76c2"
 
+TERRAIN_COVER_BASE = "c61269d843e6fce49afb6ed3618e988e03d8baff"
+TERRAIN_COVER_SPEC_PATH = "docs/performance/policy-v3/exact-terrain-cover-input-roles-v4.json"
+TERRAIN_COVER_REPORT_PATH = "docs/performance/current/exact-terrain-cover-external-contract-v4.json"
+
 _SCOPES = (
+    ReviewedScope(
+        TERRAIN_COVER_BASE,
+        TERRAIN_COVER_SPEC_PATH,
+        "19067376e472800bf0eeee11e3a0f6bdab10761ac19e1b91cb020e2272b4619f",
+        "fa1d93fe8f194f7d92dfea8a9ac1c5cbbd4bd9791b20fed59d8a0562af2a319e",
+        TERRAIN_COVER_REPORT_PATH,
+        frozenset(),
+        frozenset(
+            {
+                "src/warhammer40k_core/core/visibility.py",
+                "src/warhammer40k_core/geometry/visibility_occlusion.py",
+            }
+        ),
+        frozenset(
+            {
+                "contracts/examples/persistence/session-persistence.json",
+                "contracts/examples/sessions/session-command-outcome.json",
+                "contracts/examples/sessions/session-command-started.json",
+                "contracts/examples/sessions/session-metadata-created.json",
+                "contracts/examples/support-profile-player-a-redacted.json",
+                "contracts/examples/support-profile-player-b-redacted.json",
+                "contracts/examples/support-profile.json",
+                "contracts/manifest.json",
+                "src/warhammer40k_core/_engine_build_manifest.json",
+            }
+        ),
+        frozenset(
+            {
+                "data/source_audits/ci64_provenance_v1/exact-terrain-cover-test-v1.json",
+                "docs/performance/policy-v3/exact-terrain-cover-input-roles-v4.json",
+                "docs/performance/policy-v3/operation-map.json",
+                "scripts/engine_numerical_identity_test_admission.py",
+                "scripts/fortification_engagement_test_admission.py",
+                "scripts/terrain_cover_test_admission.py",
+                "tests/code_quality/test_ci_performance_gates.py",
+                "tests/code_quality/test_engine_numerical_identity_admission.py",
+                "tests/code_quality/test_registered_source_scopes.py",
+                "tests/daemons_native_source_preservation.py",
+                "tests/rules/section13/test_visibility.py",
+                "tools/performance_tool_inputs_v4.py",
+                "tools/source_scope_provenance.py",
+            }
+        ),
+        REQUIRED,
+        HARNESS,
+    ),
     ReviewedScope(
         GAMEPLAY_MOVEMENT_BUDGET_BASE,
         "docs/performance/policy-v3/gameplay-movement-budget-input-roles-v4.json",

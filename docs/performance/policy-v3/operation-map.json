@@ -210,7 +210,7 @@
       "workload_id": "external-contract-orphan-write-independent-check-v1",
       "input_binding": {
         "schema": "tool-input-roles-v4",
-        "role_specification": "docs/performance/policy-v3/gameplay-movement-budget-input-roles-v4.json"
+        "role_specification": "docs/performance/policy-v3/exact-terrain-cover-input-roles-v4.json"
       }
     },
     "session_command_fork": {

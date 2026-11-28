@@ -908,16 +908,28 @@ def test_numerical_identity_scope_routes_current_base_without_replacing_history(
     assert historical.base == "9747b9b0873b4f442d3cd81f72280b24810d952c"
     assert scopes.read_role_spec(ROOT, scope_base=historical.base)["base"] == historical.base
     active = scopes.registered_scope(scopes.GAMEPLAY_MOVEMENT_BUDGET_BASE)
+    terrain_cover = scopes.registered_scope(scopes.TERRAIN_COVER_BASE)
     current = json.loads((ROOT / inputs.MAP_PATH).read_bytes())["families"][inputs.FAMILY]
     assert current["input_binding"] == {
         "schema": scopes.SCHEMA,
-        "role_specification": active.spec_path,
+        "role_specification": terrain_cover.spec_path,
     }
     assert scopes.read_role_spec(ROOT, scope_base=active.base)["base"] == active.base
     assert active.required == scope.required
     assert active.harness == scope.harness
     assert "contracts/compatibility/48.0.0-shape.json" in active.new_treatment
     assert provenance.registered_provenance_context(active.spec_path) is not None
+    assert terrain_cover.base == "c61269d843e6fce49afb6ed3618e988e03d8baff"
+    assert scopes.read_role_spec(ROOT, scope_base=terrain_cover.base)["base"] == terrain_cover.base
+    assert terrain_cover.required == active.required
+    assert terrain_cover.harness == active.harness
+    assert not terrain_cover.new_treatment
+    assert terrain_cover.treatment == {
+        "src/warhammer40k_core/core/visibility.py",
+        "src/warhammer40k_core/geometry/visibility_occlusion.py",
+    }
+    assert provenance.registered_provenance_context(terrain_cover.spec_path) is not None
+    assert provenance.registered_provenance_context(terrain_cover.report_path) is not None
     assert scope.harness == scopes.registered_scope(scopes.PR2_BASE).harness
     assert scope.required == scopes.registered_scope(scopes.PR2_BASE).required
     assert (
@@ -943,6 +955,7 @@ def test_numerical_comparison_context_inverse_rejects_partial_and_duplicate_sour
     for changed in (
         raw + b"\n",
         raw.replace(b"scopes.NUMERICAL_IDENTITY_BASE", b"scopes.PR2_BASE"),
+        raw.replace(b"    scopes.TERRAIN_COVER_BASE,\n", b"    scopes.TERRAIN_COVER_BASE,\n" * 2),
         raw.replace(
             b"    scopes.NUMERICAL_IDENTITY_BASE,\n", b"    scopes.NUMERICAL_IDENTITY_BASE,\n" * 2
         ),
