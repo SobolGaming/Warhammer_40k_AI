@@ -210,7 +210,7 @@
       "workload_id": "external-contract-orphan-write-independent-check-v1",
       "input_binding": {
         "schema": "tool-input-roles-v4",
-        "role_specification": "docs/performance/policy-v3/gameplay-movement-budget-input-roles-v4.json"
+        "role_specification": "docs/performance/policy-v3/exact-terrain-cover-input-roles-v4.json"
       }
     },
     "session_command_fork": {
@@ -38937,6 +38937,26 @@
         "_fortification_successor",
         "_fortification_current_receipt",
         "test_fortification_transition_rejects_source_and_case_drift"
+      ],
+      "families": [],
+      "sensitive": false,
+      "mandatory": false
+    },
+    "exact-terrain-cover-regression-admission": {
+      "paths": [
+        "data/source_audits/ci64_provenance_v1/exact-terrain-cover-test-v1.json",
+        "scripts/terrain_cover_test_admission.py",
+        "tests/rules/section13/test_visibility.py"
+      ],
+      "owners": [
+        "@document",
+        "@module",
+        "TerrainCoverTestReceipt",
+        "_rectangular_cover_prism",
+        "terrain_cover_test_successor",
+        "test_cover_attribution_chooses_exact_visibility_masks",
+        "test_cover_attribution_preserves_a_contained_observer",
+        "test_cover_attribution_preserves_causal_sources"
       ],
       "families": [],
       "sensitive": false,

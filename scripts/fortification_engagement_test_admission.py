@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path
 from typing import NamedTuple, TypedDict, cast
@@ -12,6 +13,7 @@ from scripts.behavioral_selection_members import (
     _selection_object,  # pyright: ignore[reportPrivateUsage]
 )
 from scripts.milli_inch_test_admission import MANIFEST
+from scripts.terrain_cover_test_admission import terrain_cover_test_successor
 
 RECEIPT = "data/source_audits/ci64_provenance_v1/fortification-engagement-test-v1.json"
 RECEIPT_SHA256 = "aaa5fe2e0078d0b63ed6bd67b01cd3e4c4369a2460045695a9c5201de4a4a7be"
@@ -670,6 +672,30 @@ def fortification_test_addition(
     ):
         raise SystemExit("Fortification test admission differs from the exact Shroud predecessor.")
     receipt, raw = _fortification_current_receipt(root, receipt, raw)
+    cover = terrain_cover_test_successor(root)
+    if cover is not None:
+        successor, _ = cover
+        predecessor = raw.rsplit(b"\0", 1)[-1]
+        if (
+            successor["retained_fortification_sha256"] != hashlib.sha256(predecessor).hexdigest()
+            or successor["runtime_manifest"]["before"] != receipt["runtime_manifest"]["after"]
+            or successor["runtime_fingerprint"]["before"] != receipt["runtime_fingerprint"]["after"]
+        ):
+            raise SystemExit(
+                "Exact terrain cover tests require the admitted Fortification runtime."
+            )
+        current: FortificationTestReceipt = {
+            **receipt,
+            "runtime_manifest": {
+                **receipt["runtime_manifest"],
+                "after": successor["runtime_manifest"]["after"],
+            },
+            "runtime_fingerprint": {
+                **receipt["runtime_fingerprint"],
+                "after": successor["runtime_fingerprint"]["after"],
+            },
+        }
+        receipt = current
     manifest = _checked_bytes(root, MANIFEST, receipt["runtime_manifest"]["after"])
     if (
         json.loads(manifest, object_pairs_hook=_selection_object)["fingerprint"]

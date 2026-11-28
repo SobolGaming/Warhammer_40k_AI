@@ -15,6 +15,7 @@ from scripts import fools_flight_test_admission as fools
 from scripts import fortification_engagement_test_admission as fortification
 from scripts import shroud_of_flies_test_admission as shroud
 from scripts import stage2_ground_charge_test_admission as ground_charge
+from scripts import terrain_cover_test_admission as terrain_cover
 from scripts.canonical_circle_test_admission import ADDITION as CIRCLE_ADDITION
 from scripts.canonical_polygon_pairs_test_admission import ADDITION as PAIRS_ADDITION
 from scripts.canonical_polygon_queries_test_admission import ADDITION as QUERIES_ADDITION
@@ -1768,6 +1769,10 @@ def test_fortification_transition_rejects_source_and_case_drift(tmp_path: Path) 
         fortification.PROJECTION_SPLIT_RECEIPT,
         MANIFEST,
         fortification.OWNER,
+        terrain_cover.RECEIPT,
+        terrain_cover.OWNER,
+        *terrain_cover.SOURCES,
+        sharding.CUTOVER_PATH,
         *sorted(
             fortification.SOURCES
             | fortification.RETRY_SOURCES
@@ -1811,6 +1816,10 @@ def test_fortification_transition_rejects_source_and_case_drift(tmp_path: Path) 
     subgroups = _record(fortification.SAVE_SUBGROUP_RECEIPT)
     assert receipt["added_cases"][45:] == subgroups["added_cases"]
     assert len(receipt["added_cases"]) == len(set(receipt["added_cases"])) == 46
+    successor = _record(terrain_cover.RECEIPT)
+    assert receipt["runtime_manifest"]["after"] == successor["runtime_manifest"]["after"]
+    assert receipt["runtime_fingerprint"]["after"] == successor["runtime_fingerprint"]["after"]
+    assert terrain_cover.OWNER in selected.active_files
 
     for name in members:
         path = tmp_path / name
